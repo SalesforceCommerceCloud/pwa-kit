@@ -7,11 +7,8 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import {withRouter} from 'react-router-dom'
-import {Button} from '@chakra-ui/react'
-import {AlertIcon} from '../icons'
-
-// import Button from '@salesforce/pwa-kit-react-sdk/components/button'
-// import Icon from '@salesforce/pwa-kit-react-sdk/components/icon'
+import {Button, Box, Heading, Text} from '@chakra-ui/react'
+import {AlertIcon} from '../../components/icons'
 
 /**
  * OfflineBoundary is a React Error boundary that catches errors thrown when
@@ -68,24 +65,14 @@ class OfflineBoundary extends React.Component {
         return (
             <React.Fragment>
                 {chunkLoadError ? (
-                    <div className="c-offline-boundary u-direction-column u-text-align-center u-padding-top u-padding-bottom">
+                    <Box>
                         <AlertIcon />
-
-                        <h1 className="u-margin-bottom-md u-text-family">
-                            You are currently offline
-                        </h1>
-
-                        <p className="u-margin-bottom-lg">
+                        <Heading>You are currently offline</Heading>
+                        <Text>
                             {"We couldn't load the next page on this connection. Please try again."}
-                        </p>
-
-                        <Button
-                            className="u-width-block-full pw--primary qa-retry-button"
-                            onClick={() => this.clearError()}
-                        >
-                            Retry Connection
-                        </Button>
-                    </div>
+                        </Text>
+                        <Button onClick={() => this.clearError()}>Retry Connection</Button>
+                    </Box>
                 ) : (
                     children
                 )}

@@ -5,66 +5,53 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React, {Fragment, useRef} from 'react'
+import React, {useState} from 'react'
 import PropTypes from 'prop-types'
+import {Box, Popover, useSlotRecipe} from '@chakra-ui/react'
 
-// Project Components
-import {ListMenuContent} from './list-menu-content'
-import {ListMenuTrigger} from './list-menu-trigger'
-
-// Components
-import {
-    Box,
-    Popover,
-    PopoverContent,
-    PopoverBody,
-
-    // Hooks
-    useDisclosure,
-    useTheme
-} from '@chakra-ui/react'
+import {ListMenuContent} from '../../components/list-menu/list-menu-content'
+import {ListMenuTrigger} from '../../components/list-menu/list-menu-trigger'
 
 const ListMenuPopover = ({contentComponent, item, name, itemsKey, maxColumns}) => {
-    const initialFocusRef = useRef()
-    const {isOpen, onClose, onOpen} = useDisclosure()
+    const [open, setOpen] = useState(false)
+    const onOpen = () => setOpen(true)
+    const onClose = () => setOpen(false)
     const ContentComponent = contentComponent || ListMenuContent
-    const theme = useTheme()
-    const {baseStyle} = theme.components.ListMenu
+    const recipe = useSlotRecipe({key: 'listMenu'})
+    const styles = recipe()
 
     return (
         <Box onMouseLeave={onClose}>
-            <Popover
-                isLazy
-                placement={'bottom-start'}
-                initialFocusRef={initialFocusRef}
-                onOpen={onOpen}
-                onClose={onClose}
-                isOpen={isOpen}
-                variant="fullWidth"
+            <Popover.Root
+                open={open}
+                positioning={{placement: 'bottom-start'}}
+                lazyMounted
+                unstyled
             >
-                <Fragment>
-                    <ListMenuTrigger
-                        item={item}
-                        name={name}
-                        isOpen={isOpen}
-                        onOpen={onOpen}
-                        onClose={onClose}
-                    />
-                    {isOpen && (
-                        <PopoverContent data-testid="popover-menu" {...baseStyle.popoverContent}>
-                            <PopoverBody {...baseStyle.popoverBody}>
-                                <ContentComponent
-                                    item={item}
-                                    itemsKey={itemsKey}
-                                    initialFocusRef={initialFocusRef}
-                                    onClose={onClose}
-                                    maxColumns={maxColumns}
-                                />
-                            </PopoverBody>
-                        </PopoverContent>
-                    )}
-                </Fragment>
-            </Popover>
+                <Popover.Trigger asChild>
+                    <Box onMouseEnter={onOpen}>
+                        <ListMenuTrigger
+                            item={item}
+                            name={name}
+                            isOpen={open}
+                            onOpen={onOpen}
+                            onClose={onClose}
+                        />
+                    </Box>
+                </Popover.Trigger>
+                <Popover.Positioner>
+                    <Popover.Content data-testid="popover-menu" css={styles.popoverContent}>
+                        <Popover.Body css={styles.popoverBody}>
+                            <ContentComponent
+                                item={item}
+                                itemsKey={itemsKey}
+                                onClose={onClose}
+                                maxColumns={maxColumns}
+                            />
+                        </Popover.Body>
+                    </Popover.Content>
+                </Popover.Positioner>
+            </Popover.Root>
         </Box>
     )
 }

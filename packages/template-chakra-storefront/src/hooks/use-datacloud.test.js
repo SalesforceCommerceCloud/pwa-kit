@@ -29,7 +29,7 @@ import {
     mockCategory,
     mockSearchResults,
     mockRecommenderDetails
-} from './einstein-mock-data'
+} from '../hooks/einstein-mock-data'
 import {renderWithProviders} from '../utils/test-utils'
 
 jest.mock('@salesforce/commerce-sdk-react', () => {

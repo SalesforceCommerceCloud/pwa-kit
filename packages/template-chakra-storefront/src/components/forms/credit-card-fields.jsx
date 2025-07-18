@@ -4,11 +4,12 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React, {useState} from 'react'
+import React from 'react'
 import PropTypes from 'prop-types'
 import ccValidator from 'card-validator'
 import {useIntl} from 'react-intl'
-import {Box, Flex, FormLabel, InputRightElement, SimpleGrid, Stack, Tooltip} from '@chakra-ui/react'
+import {Box, Flex, SimpleGrid, Stack, Field as ChakraField} from '@chakra-ui/react'
+import Tooltip from '../../components/tooltip'
 import {formatCreditCardNumber, getCreditCardIcon} from '../../utils/cc-utils'
 import useCreditCardFields from './useCreditCardFields'
 import Field from '../field'
@@ -16,7 +17,6 @@ import {AmexIcon, DiscoverIcon, MastercardIcon, VisaIcon, InfoIcon} from '../ico
 
 const CreditCardFields = ({form, prefix = ''}) => {
     const {formatMessage} = useIntl()
-    const [isTooltipOpen, setIsTooltipOpen] = useState(false)
     const fields = useCreditCardFields({form, prefix})
 
     // Rerender the fields when we `cardType` changes so the detected
@@ -42,31 +42,15 @@ const CreditCardFields = ({form, prefix = ''}) => {
                   description: 'Generic credit card security code help text'
               })
 
-    const handleTooltipClose = () => {
-        setIsTooltipOpen(false)
-        if (document) {
-            document.removeEventListener('click', handleTooltipClose)
-            document.removeEventListener('keydown', handleTooltipClose)
-        }
-    }
-
-    const handleTooltipOpen = () => {
-        setIsTooltipOpen(true)
-        if (document) {
-            document.addEventListener('click', handleTooltipClose)
-            document.addEventListener('keydown', handleTooltipClose)
-        }
-    }
-
     return (
         <Box>
-            <Stack spacing={5}>
+            <Stack gap={5}>
                 <Field
                     {...fields.number}
                     formLabel={
-                        <Flex justify="space-between">
-                            <FormLabel>{fields.number.label}</FormLabel>
-                            <Stack direction="row" spacing={1}>
+                        <Flex justify="space-between" align="center" w="full">
+                            <Box>{fields.number.label}</Box>
+                            <Stack direction="row" gap={1}>
                                 <VisaIcon layerStyle="ccIcon" />
                                 <MastercardIcon layerStyle="ccIcon" />
                                 <AmexIcon layerStyle="ccIcon" />
@@ -84,19 +68,17 @@ const CreditCardFields = ({form, prefix = ''}) => {
                                 : number
                             form.setValue('cardType', card?.type || '')
                             return onChange(formattedNumber)
-                        }
+                        },
+                        endElement:
+                            CardIcon && form.getValues().number?.length > 2 ? (
+                                <CardIcon layerStyle="ccIcon" />
+                            ) : undefined
                     })}
-                >
-                    {CardIcon && form.getValues().number?.length > 2 && (
-                        <InputRightElement width="60px">
-                            <CardIcon layerStyle="ccIcon" />
-                        </InputRightElement>
-                    )}
-                </Field>
+                />
 
                 <Field {...fields.holder} />
 
-                <SimpleGrid columns={[2, 2, 3]} spacing={5}>
+                <SimpleGrid columns={[2, 2, 3]} gap={5}>
                     <Field
                         {...fields.expiry}
                         inputProps={({onChange}) => ({
@@ -131,33 +113,31 @@ const CreditCardFields = ({form, prefix = ''}) => {
                     <Field
                         {...fields.securityCode}
                         formLabel={
-                            <>
-                                <FormLabel display="inline" mr={1}>
-                                    {fields.securityCode.label}
-                                </FormLabel>
-                                <Box
-                                    onMouseEnter={handleTooltipOpen}
-                                    onFocus={handleTooltipOpen}
-                                    as="span"
-                                >
+                            <ChakraField.Label>
+                                <Flex align="center" justify="space-between">
+                                    <Box>{fields.securityCode.label}</Box>
                                     <Tooltip
-                                        hasArrow
-                                        placement="top"
-                                        label={securityCodeTooltipLabel}
-                                        shouldWrapChildren={true}
-                                        isOpen={isTooltipOpen}
+                                        content={securityCodeTooltipLabel}
+                                        contentProps={{
+                                            css: {'--tooltip-bg': 'colors.blue.800'}
+                                        }}
                                     >
-                                        <InfoIcon
-                                            boxSize={5}
-                                            color="gray.700"
+                                        <Box
+                                            as="button"
                                             aria-label={formatMessage({
                                                 id: 'credit_card_fields.tool_tip.security_code_aria_label',
                                                 defaultMessage: 'Security code info'
                                             })}
-                                        />
+                                        >
+                                            <InfoIcon
+                                                boxSize={4}
+                                                color="gray.700"
+                                                cursor="pointer"
+                                            />
+                                        </Box>
                                     </Tooltip>
-                                </Box>
-                            </>
+                                </Flex>
+                            </ChakraField.Label>
                         }
                     />
                 </SimpleGrid>

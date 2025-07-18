@@ -18,11 +18,11 @@ const PromoCodeFields = ({form, prefix = '', ...props}) => {
 
     return (
         <Box aria-labelledby="code-feedback" {...props}>
-            <Field inputProps={{flex: 1, mr: 2}} {...fields.code}>
+            <Field inputProps={{flex: 1, display: 'flex'}} {...fields.code}>
                 <Button
                     type="submit"
                     fontSize="sm"
-                    isLoading={form.formState.isSubmitting}
+                    loading={form.formState.isSubmitting}
                     disabled={code?.length < 3}
                 >
                     <FormattedMessage defaultMessage="Apply" id="promo_code_fields.button.apply" />

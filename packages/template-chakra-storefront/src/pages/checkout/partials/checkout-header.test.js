@@ -12,7 +12,7 @@ import {renderWithProviders} from '../../../utils/test-utils'
 
 // Mock getConfig to return our mockConfig
 jest.mock('@salesforce/pwa-kit-runtime/utils/ssr-config', () => {
-    const actualConfig = jest.requireActual('../../../../mock-config')
+    const actualConfig = jest.requireActual('../../../../config/mocks/mock-config')
     return {
         getConfig: jest.fn().mockReturnValue(actualConfig)
     }

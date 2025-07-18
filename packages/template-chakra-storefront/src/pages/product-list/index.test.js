@@ -13,11 +13,11 @@ import {
     mockedEmptyCustomerProductList,
     mockCategories
 } from '../../../mocks/mock-data'
-import {screen, waitFor} from '@testing-library/react'
+import {act, screen, waitFor} from '@testing-library/react'
 import {Route, Switch} from 'react-router-dom'
 import {createPathWithDefaults, renderWithProviders} from '../../utils/test-utils'
 import ProductList from '.'
-import EmptySearchResults from './partials/empty-results'
+import EmptySearchResults from '../../pages/product-list/partials/empty-results'
 import {useProductSearch, useCategory} from '@salesforce/commerce-sdk-react'
 
 const MOCK_USE_QUERY_RESULT = {
@@ -53,6 +53,17 @@ jest.mock('@salesforce/commerce-sdk-react', () => {
         useCategory: jest.fn()
     }
 })
+
+jest.mock('../../hooks/use-datacloud', () => ({
+    __esModule: true,
+    default: jest.fn(() => ({
+        sendViewPage: jest.fn(),
+        sendViewProduct: jest.fn(),
+        sendViewCategory: jest.fn(),
+        sendViewSearchResults: jest.fn(),
+        sendViewRecommendations: jest.fn()
+    }))
+}))
 let mockProductListSearchResponse = mockProductSearch
 
 const MockedComponent = ({isLoading}) => {
@@ -80,7 +91,8 @@ MockedComponent.propTypes = {
 const MockedEmptyPage = () => {
     return <EmptySearchResults searchQuery={'test'} category={undefined} />
 }
-
+// TODO: fix all
+// Found an unhandled GET request to https://www.domain.com/mobify/proxy/api/product/shopper-products/v1/organizations/f_ecom_zzrf_001/products?ids=11736753M%2C22951021M%2C25592770M%2C25752986M&expand=availability%2Clinks%2Cpromotions%2Coptions%2Cimages%2Cprices%2Cvariations&locale=en-GB&allImages=true&perPricebook=true&siteId=site-1
 beforeEach(() => {
     global.server.use(
         rest.get('*/product-search', (req, res, ctx) => {
@@ -141,7 +153,9 @@ test('should render skeleton on initial fetch', async () => {
     }))
     window.history.pushState({}, 'ProductList', '/uk/en-GB/category/mens-clothing-jackets')
     renderWithProviders(<MockedComponent isLoading />)
-    expect(screen.getAllByTestId('sf-product-tile-skeleton')).toHaveLength(25)
+    await waitFor(() => {
+        expect(screen.getAllByTestId('sf-product-tile-skeleton')).toHaveLength(25)
+    })
 })
 
 test('should render only pricing and promotions skeleton when data is refreshing', async () => {
@@ -151,11 +165,16 @@ test('should render only pricing and promotions skeleton when data is refreshing
         isRefetching: true,
         isFetched: true
     }))
+
     window.history.pushState({}, 'ProductList', '/uk/en-GB/category/mens-clothing-jackets')
+
     renderWithProviders(<MockedComponent isLoading />)
-    expect(screen.getAllByTestId('sf-product-tile-pricing-and-promotions-skeleton')).toHaveLength(
-        25
-    )
+
+    await waitFor(() => {
+        expect(
+            screen.getAllByTestId('sf-product-tile-pricing-and-promotions-skeleton')
+        ).toHaveLength(25)
+    })
     expect(screen.queryByTestId('sf-product-tile-skeleton')).not.toBeInTheDocument()
 })
 
@@ -186,7 +205,9 @@ test.skip('show login modal when an unauthenticated user tries to add an item to
     expect(await screen.findAllByText('Black')).toBeInTheDocument()
     const wishlistButton = await screen.getAllByLabelText('Wishlist')
     expect(wishlistButton).toHaveLength(25)
-    await user.click(wishlistButton[0])
+    await act(async () => {
+        await user.click(wishlistButton[0])
+    })
     expect(await screen.findByText(/Email/)).toBeInTheDocument()
     expect(await screen.findByText(/Password/)).toBeInTheDocument()
 })
@@ -198,8 +219,9 @@ test('clicking a filter will change url', async () => {
     })
     // NOTE: Look for a better wait to wait an additional render.
     await waitFor(() => !!screen.getByText(/Beige/i))
-
-    await user.click(screen.getByText(/Beige/i))
+    await act(async () => {
+        await user.click(screen.getByText(/Beige/i))
+    })
     await waitFor(() =>
         expect(window.location.search).toBe(
             '?limit=25&refine=c_refinementColor%3DBeige&sort=best-matches'
@@ -223,14 +245,18 @@ test('clicking a filter on mobile or desktop applies changes to both', async () 
     expect(beigeBtns).toHaveLength(1)
     expect(blueBtns).toHaveLength(1)
 
-    // click beige filter and ensure that only beige is checked
-    await user.click(beigeBtns[0])
+    await act(async () => {
+        // click beige filter and ensure that only beige is checked
+        await user.click(beigeBtns[0])
+    })
     expect(beigeBtns[0]).toHaveAttribute('aria-checked', 'true')
     expect(screen.getByLabelText('Add filter: Blue (27)')).toHaveAttribute('aria-checked', 'false')
 
-    // click filter button for mobile that is hidden on desktop but present in DOM
-    // this opens the filter modal on mobile
-    await user.click(screen.getByText('Filter'))
+    await act(async () => {
+        // click filter button for mobile that is hidden on desktop but present in DOM
+        // this opens the filter modal on mobile
+        await user.click(screen.getByText('Filter'))
+    })
 
     // re-query for desktop and mobile filters
     beigeBtns = screen.getAllByLabelText('Remove filter: Beige (6)')
@@ -246,8 +272,10 @@ test('clicking a filter on mobile or desktop applies changes to both', async () 
     expect(blueBtns[0]).toHaveAttribute('aria-checked', 'false')
     expect(blueBtns[1]).toHaveAttribute('aria-checked', 'false')
 
-    // click mobile filter for blue
-    await user.click(blueBtns[1])
+    await act(async () => {
+        // click mobile filter for blue
+        await user.click(blueBtns[1])
+    })
 
     // buttons for beige and blue should be checked on both desktop and mobile
     expect(beigeBtns[0]).toHaveAttribute('aria-checked', 'true')
@@ -255,8 +283,10 @@ test('clicking a filter on mobile or desktop applies changes to both', async () 
     expect(blueBtns[0]).toHaveAttribute('aria-checked', 'true')
     expect(blueBtns[1]).toHaveAttribute('aria-checked', 'true')
 
-    // uncheck beige
-    await user.click(beigeBtns[1])
+    await act(async () => {
+        // uncheck beige
+        await user.click(beigeBtns[1])
+    })
 
     // beige button should be unchecked for both mobile and desktop
     expect(beigeBtns[0]).toHaveAttribute('aria-checked', 'false')
@@ -275,7 +305,9 @@ test('click on Clear All should clear out all the filter in search params', asyn
         wrapperProps: {siteAlias: 'uk', locale: {id: 'en-GB'}}
     })
     const clearAllButton = await screen.findAllByText(/Clear All/i)
-    await user.click(clearAllButton[0])
+    await act(async () => {
+        await user.click(clearAllButton[0])
+    })
     await waitFor(() => expect(window.location.search).toBe('?limit=25&offset=0&sort=best-matches'))
 })
 
@@ -296,7 +328,9 @@ test('clicking a filter on search result will change url', async () => {
     // NOTE: Look for a better wait to wait an additional render.
     await waitFor(() => !!screen.getByText(/Beige/i))
 
-    await user.click(screen.getByText(/Beige/i))
+    await act(async () => {
+        await user.click(screen.getByText(/Beige/i))
+    })
 
     await waitFor(() =>
         expect(window.location.search).toBe(

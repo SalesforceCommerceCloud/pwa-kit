@@ -6,13 +6,12 @@
  */
 import React from 'react'
 import {renderWithProviders, createPathWithDefaults} from '../../utils/test-utils'
-import userEvent from '@testing-library/user-event'
-import {screen, waitFor, within} from '@testing-library/react'
-import SearchInput from './index'
-import Suggestions from './partials/suggestions'
+import {screen, waitFor, within, act} from '@testing-library/react'
+import SearchInput from '../../components/search/index'
+import Suggestions from '../../components/search/partials/suggestions'
 import {clearSessionJSONItem, getSessionJSONItem, setSessionJSONItem, noop} from '../../utils/utils'
 import mockSearchResults from '../../../mocks/searchResults'
-import mockConfig from '../../../mock-config'
+import mockConfig from '../../../config/mocks/mock-config'
 import {rest} from 'msw'
 import {mockCustomerBaskets} from '../../../mocks/mock-data'
 
@@ -33,6 +32,10 @@ beforeEach(() => {
     )
 })
 
+afterEach(() => {
+    jest.restoreAllMocks()
+})
+
 test('renders SearchInput', () => {
     renderWithProviders(<SearchInput />)
     const searchInput = document.querySelector('input[type="search"]')
@@ -40,13 +43,13 @@ test('renders SearchInput', () => {
 })
 
 test('changes url when enter is pressed', async () => {
-    const user = userEvent.setup()
-
-    renderWithProviders(<SearchInput />, {
+    const {user} = renderWithProviders(<SearchInput />, {
         wrapperProps: {siteAlias: 'uk', appConfig: mockConfig.app}
     })
     const searchInput = document.querySelector('input[type="search"]')
-    await user.type(searchInput, 'Dresses{enter}')
+    await act(async () => {
+        await user.type(searchInput, 'Dresses{enter}')
+    })
     await waitFor(() => {
         expect(window.location.pathname).toEqual(createPathWithDefaults('/search'))
         expect(window.location.search).toBe('?q=Dresses')
@@ -56,12 +59,12 @@ test('changes url when enter is pressed', async () => {
 })
 
 test('shows previously searched items when focused', async () => {
-    const user = userEvent.setup()
-
     setSessionJSONItem(RECENT_SEARCH_KEY, ['Dresses', 'Suits', 'Tops'])
-    renderWithProviders(<SearchInput />)
+    const {user} = renderWithProviders(<SearchInput />)
     const searchInput = document.querySelector('input[type="search"]')
-    await user.clear(searchInput)
+    await act(async () => {
+        await user.clear(searchInput)
+    })
     await searchInput.focus()
     const suggestionPopoverEl = await screen.getByTestId('sf-suggestion-popover')
     const recentSearchesEl = await within(suggestionPopoverEl).getByTestId('sf-suggestion-recent')
@@ -72,29 +75,32 @@ test('shows previously searched items when focused', async () => {
 })
 
 test('saves recent searches on submit', async () => {
-    const user = userEvent.setup()
     setSessionJSONItem(RECENT_SEARCH_KEY, ['Dresses', 'Suits', 'Tops'])
-    renderWithProviders(<SearchInput />)
+    const {user} = renderWithProviders(<SearchInput />)
     const searchInput = document.querySelector('input[type="search"]')
-    await user.type(searchInput, 'Gloves{enter}')
+    await act(async () => {
+        await user.type(searchInput, 'Gloves{enter}')
+    })
     expect(getSessionJSONItem(RECENT_SEARCH_KEY)).toHaveLength(4)
 })
 
 test('limits number of saved recent searches', async () => {
-    const user = userEvent.setup()
-
     setSessionJSONItem(RECENT_SEARCH_KEY, ['Dresses', 'Suits', 'Tops', 'Gloves', 'Bracelets'])
-    renderWithProviders(<SearchInput />)
+    const {user} = renderWithProviders(<SearchInput />)
     const searchInput = document.querySelector('input[type="search"]')
-    await user.type(searchInput, 'Ties{enter}')
+    await act(async () => {
+        await user.type(searchInput, 'Ties{enter}')
+    })
     expect(getSessionJSONItem(RECENT_SEARCH_KEY)).toHaveLength(RECENT_SEARCH_LIMIT)
 })
 
 test('suggestions render when there are some', async () => {
-    const user = userEvent.setup()
-    renderWithProviders(<SearchInput />)
+    const {user} = renderWithProviders(<SearchInput />)
+
     const searchInput = document.querySelector('input[type="search"]')
-    await user.type(searchInput, 'Dress')
+    await act(async () => {
+        await user.type(searchInput, 'Dress')
+    })
     expect(searchInput.value).toBe('Dress')
     const suggestionPopoverEl = await screen.getByTestId('sf-suggestion-popover')
     await waitFor(() => {
@@ -104,13 +110,16 @@ test('suggestions render when there are some', async () => {
 })
 
 test('clicking clear searches clears recent searches', async () => {
-    const user = userEvent.setup()
     setSessionJSONItem(RECENT_SEARCH_KEY, ['Dresses', 'Suits', 'Tops'])
-    renderWithProviders(<SearchInput />)
+    const {user} = renderWithProviders(<SearchInput />)
     const searchInput = document.querySelector('input[type="search"]')
-    await searchInput.focus()
+    await act(async () => {
+        await searchInput.focus()
+    })
     const clearSearch = document.getElementById('clear-search')
-    await user.click(clearSearch)
+    await act(async () => {
+        await user.click(clearSearch)
+    })
     expect(getSessionJSONItem(RECENT_SEARCH_KEY)).toBeUndefined()
 })
 

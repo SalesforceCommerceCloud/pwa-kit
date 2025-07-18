@@ -8,62 +8,75 @@
 import React, {useState, useEffect} from 'react'
 import PropTypes from 'prop-types'
 import {useHistory, useLocation} from 'react-router-dom'
+import {Helmet} from 'react-helmet'
 import {StorefrontPreview} from '@salesforce/commerce-sdk-react/components'
-import {getAssetUrl} from '@salesforce/pwa-kit-react-sdk/ssr/universal/utils'
-import useActiveData from '../../../src/hooks/use-active-data'
-import useEinstein from '../../../src/hooks/use-einstein'
-import useDataCloud from '../../../src/hooks/use-datacloud'
 import {useQuery} from '@tanstack/react-query'
+
+// Removes focus for non-keyboard interactions for the whole application
+import 'focus-visible/dist/focus-visible'
+
+// Platform Imports
+import {getAssetUrl} from '@salesforce/pwa-kit-react-sdk/ssr/universal/utils'
+import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
+
 import {
     useAccessToken,
     useCategory,
     useShopperBasketsMutation
 } from '@salesforce/commerce-sdk-react'
-import logger from '../../../src/utils/logger-instance'
-import {useAppOrigin} from '../../../src/hooks/use-app-origin'
-import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 
 // Chakra
-import {Box, Center, Fade, Spinner, useDisclosure, useStyleConfig} from '@chakra-ui/react'
-import {SkipNavLink, SkipNavContent} from '@chakra-ui/skip-nav'
+import {
+    Box,
+    Center,
+    Spinner,
 
-// Contexts
-import {CurrencyProvider} from '../../../src/contexts'
+    // hooks
+    useDisclosure,
+    useSlotRecipe,
+    useToken
+} from '@chakra-ui/react'
 
 // Local Project Components
-import Header from '../../../src/components/header'
-import OfflineBanner from '../../../src/components/offline-banner'
-import OfflineBoundary from '../../../src/components/offline-boundary'
-import ScrollToTop from '../../../src/components/scroll-to-top'
-import Footer from '../../../src/components/footer'
-import CheckoutHeader from '../../../src/pages/checkout/partials/checkout-header'
-import CheckoutFooter from '../../../src/pages/checkout/partials/checkout-footer'
-import {DrawerMenu} from '../../../src/components/drawer-menu'
-import {ListMenu, ListMenuContent} from '../../../src/components/list-menu'
-import {HideOnDesktop, HideOnMobile} from '../../../src/components/responsive'
-import StoreLocatorModal from '../../../src/components/store-locator-modal'
-// Hooks
-import {AuthModal, useAuthModal} from '../../../src/hooks/use-auth-modal'
-import {DntNotification, useDntNotification} from '../../../src/hooks/use-dnt-notification'
-import {useTheme} from '@chakra-ui/react'
-import {AddToCartModalProvider} from '../../../src/hooks/use-add-to-cart-modal'
-import useMultiSite from '../../../src/hooks/use-multi-site'
-import {useCurrentCustomer} from '../../../src/hooks/use-current-customer'
-import {useCurrentBasket} from '../../../src/hooks/use-current-basket'
-import {useUpdateShopperContext} from '../../../src/hooks/use-update-shopper-context'
+import {DrawerMenu} from '../drawer-menu'
+import {SkipNavLink, SkipNavContent} from '../skip-nav'
+import {getPathWithLocale} from '../../utils/url'
+import {HideOnDesktop, HideOnMobile} from '../responsive'
+// import StoreLocatorModal from '../../components/store-locator-modal'
+import {ListMenu, ListMenuContent} from '../list-menu'
+import CheckoutHeader from '../../pages/checkout/partials/checkout-header'
+import CheckoutFooter from '../../pages/checkout/partials/checkout-footer'
+import Footer from '../footer'
+import Header from '../header'
+import OfflineBanner from '../offline-banner'
+import OfflineBoundary from '../offline-boundary'
+import Seo from '../seo'
+import ScrollToTop from '../scroll-to-top'
+import Fade from '../fade'
 
-// HOCs
-import {withCommerceSdkReact} from '../../../src/components/with-commerce-sdk-react'
-
+// Contexts
+import {CurrencyProvider} from '../../contexts'
 // Localization
 import {IntlProvider} from 'react-intl'
-// Others
-import {watchOnlineStatus, flatten, isServer} from '../../../src/utils/utils'
-import {getTargetLocale, fetchTranslations} from '../../../src/utils/locale'
+// Local Project Hooks
+import {AuthModal, useAuthModal} from '../../hooks/use-auth-modal'
+import {AddToCartModalProvider} from '../../hooks/use-add-to-cart-modal'
+import {useCurrentCustomer, useCurrentBasket} from '../../hooks'
+import {useAppOrigin} from '../../hooks/use-app-origin'
+import {useUpdateShopperContext} from '../../hooks/use-update-shopper-context'
+import useMultiSite from '../../hooks/use-multi-site'
+import {DntNotification, useDntNotification} from '../../hooks/use-dnt-notification'
+import useActiveData from '../../../src/hooks/use-active-data'
+import useEinstein from '../../../src/hooks/use-einstein'
+import useDataCloud from '../../../src/hooks/use-datacloud'
+import logger from '../../../src/utils/logger-instance'
 
-import Seo from '../../../src/components/seo'
-import {Helmet} from 'react-helmet'
-import {getPathWithLocale} from '../../../src/utils/url'
+// HOCs
+import {withCommerceSdkReact} from '../with-commerce-sdk-react'
+
+//other
+import {watchOnlineStatus, flatten, isServer} from '../../utils/utils'
+import {getTargetLocale, fetchTranslations} from '../../utils/locale'
 
 const PlaceholderComponent = () => (
     <Center p="2">
@@ -89,11 +102,7 @@ const DrawerMenuItemWithData = withCommerceSdkReact(
 )
 
 const ListMenuContentWithData = withCommerceSdkReact(
-    ({data, ...rest}) => (
-        <Fade in={true}>
-            <ListMenuContent {...rest} item={data} />
-        </Fade>
-    ),
+    ({data, ...rest}) => <ListMenuContent {...rest} item={data} />,
     {
         hook: useCategory,
         queryOptions: ({item}) => ({
@@ -130,15 +139,23 @@ const App = (props) => {
     const {site, locale, buildUrl} = useMultiSite()
 
     const [isOnline, setIsOnline] = useState(true)
-    const {colors} = useTheme()
-    const styles = useStyleConfig('App')
 
-    const {isOpen, onOpen, onClose} = useDisclosure()
+    // Apply styles from the theme
+    const recipe = useSlotRecipe({key: 'app'})
+    const styles = recipe()
+    // https://www.chakra-ui.com/docs/theming/overview#tokens-1
+    const [themeColor] = useToken('colors.blue', '600')
     const {
-        isOpen: isOpenStoreLocator,
-        onOpen: onOpenStoreLocator,
-        onClose: onCloseStoreLocator
+        open: isDrawerMenuOpen,
+        onOpen: onDrawerMenuOpen,
+        onClose: onDrawerMenuClose
     } = useDisclosure()
+
+    // const {
+    //     isOpen: isOpenStoreLocator,
+    //     onOpen: onOpenStoreLocator,
+    //     onClose: onCloseStoreLocator
+    // } = useDisclosure()
 
     const targetLocale = getTargetLocale({
         getUserPreferredLocales: () => {
@@ -233,7 +250,7 @@ const App = (props) => {
     useEffect(() => {
         // Lets automatically close the mobile navigation when the
         // location path is changed.
-        onClose()
+        onDrawerMenuClose()
     }, [location])
 
     const onLogoClick = () => {
@@ -243,7 +260,7 @@ const App = (props) => {
         history.push(path)
 
         // Close the drawer.
-        onClose()
+        onDrawerMenuClose()
     }
 
     const onCartClick = () => {
@@ -251,7 +268,7 @@ const App = (props) => {
         history.push(path)
 
         // Close the drawer.
-        onClose()
+        onDrawerMenuClose()
     }
 
     const onAccountClick = () => {
@@ -277,7 +294,7 @@ const App = (props) => {
     }, [location])
 
     return (
-        <Box className="sf-app" {...styles.container}>
+        <Box className="sf-app" css={styles.container}>
             <StorefrontPreview getToken={getTokenWhenReady}>
                 <Helmet>
                     {appConfig.activeDataEnabled && (
@@ -318,19 +335,16 @@ const App = (props) => {
                 >
                     <CurrencyProvider currency={currency}>
                         <Seo>
-                            <meta name="theme-color" content={colors.blue['600']} />
+                            <meta name="theme-color" content={themeColor} />
                             <meta
                                 name="apple-mobile-web-app-title"
                                 content={appConfig.defaultSiteTitle}
                             />
-                            <link
-                                rel="apple-touch-icon"
-                                href={getAssetUrl('static/img/global/apple-touch-icon.png')}
-                            />
-                            <link rel="manifest" href={getAssetUrl('static/manifest.json')} />
 
                             {/* Urls for all localized versions of this page (including current page)
-                            For more details on hrefLang, see https://developers.google.com/search/docs/advanced/crawling/localized-versions */}
+                                For more details on hrefLang, see
+                                https://developers.google.com/search/docs/advanced/crawling/localized-versions
+                             */}
                             {site.l10n?.supportedLocales.map((locale) => (
                                 <link
                                     rel="alternate"
@@ -363,25 +377,25 @@ const App = (props) => {
 
                         <Box id="app" display="flex" flexDirection="column" flex={1}>
                             <SkipNavLink zIndex="skipLink">Skip to Content</SkipNavLink>
-                            <StoreLocatorModal
-                                isOpen={isOpenStoreLocator}
-                                onClose={onCloseStoreLocator}
-                            />
-                            <Box {...styles.headerWrapper}>
+                            {/*Disable until you move the extesion store locator code in*/}
+                            {/*<StoreLocatorModal*/}
+                            {/*    isOpen={isOpenStoreLocator}*/}
+                            {/*    onClose={onCloseStoreLocator}*/}
+                            {/*/>*/}
+                            <Box css={styles.headerWrapper}>
                                 {!isCheckout ? (
                                     <>
                                         <Header
-                                            onMenuClick={onOpen}
+                                            onMenuClick={onDrawerMenuOpen}
                                             onLogoClick={onLogoClick}
                                             onMyCartClick={onCartClick}
                                             onMyAccountClick={onAccountClick}
                                             onWishlistClick={onWishlistClick}
-                                            onStoreLocatorClick={onOpenStoreLocator}
                                         >
                                             <HideOnDesktop>
                                                 <DrawerMenu
-                                                    isOpen={isOpen}
-                                                    onClose={onClose}
+                                                    isOpen={isDrawerMenuOpen}
+                                                    onClose={onDrawerMenuClose}
                                                     onLogoClick={onLogoClick}
                                                     root={
                                                         categories?.[
@@ -416,7 +430,7 @@ const App = (props) => {
                             {!isOnline && <OfflineBanner />}
                             <AddToCartModalProvider>
                                 <SkipNavContent
-                                    style={{
+                                    css={{
                                         display: 'flex',
                                         flexDirection: 'column',
                                         flex: 1,

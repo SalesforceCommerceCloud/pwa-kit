@@ -6,7 +6,6 @@
  */
 
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
-import {absoluteUrl} from './url'
 
 /**
  * This functions takes an url and returns a site object,

@@ -1,0 +1,1780 @@
+{
+  "account.accordion.button.my_account": {
+    "defaultMessage": "Oma tili"
+  },
+  "account.heading.my_account": {
+    "defaultMessage": "Oma tili"
+  },
+  "account.logout_button.button.log_out": {
+    "defaultMessage": "Kirjaudu ulos"
+  },
+  "account_addresses.badge.default": {
+    "defaultMessage": "Oletusarvoinen"
+  },
+  "account_addresses.button.add_address": {
+    "defaultMessage": "Lisää osoite"
+  },
+  "account_addresses.info.address_removed": {
+    "defaultMessage": "Osoite poistettu"
+  },
+  "account_addresses.info.address_updated": {
+    "defaultMessage": "Osoite päivitetty"
+  },
+  "account_addresses.info.new_address_saved": {
+    "defaultMessage": "Uusi osoite tallennettu"
+  },
+  "account_addresses.page_action_placeholder.button.add_address": {
+    "defaultMessage": "Lisää osoite"
+  },
+  "account_addresses.page_action_placeholder.heading.no_saved_addresses": {
+    "defaultMessage": "Ei tallennettuja osoitteita"
+  },
+  "account_addresses.page_action_placeholder.message.add_new_address": {
+    "defaultMessage": "Lisää uusi osoitemenetelmä maksujen nopeuttamiseksi."
+  },
+  "account_addresses.title.addresses": {
+    "defaultMessage": "Osoitteet"
+  },
+  "account_detail.title.account_details": {
+    "defaultMessage": "Tilin tiedot"
+  },
+  "account_order_detail.heading.billing_address": {
+    "defaultMessage": "Laskutusosoite"
+  },
+  "account_order_detail.heading.num_of_items": {
+    "defaultMessage": "{count} tuotetta"
+  },
+  "account_order_detail.heading.payment_method": {
+    "defaultMessage": "Maksutapa"
+  },
+  "account_order_detail.heading.shipping_address": {
+    "defaultMessage": "Toimitusosoite"
+  },
+  "account_order_detail.heading.shipping_method": {
+    "defaultMessage": "Lähetystapa"
+  },
+  "account_order_detail.label.order_number": {
+    "defaultMessage": "Tilausnumero: {orderNumber}"
+  },
+  "account_order_detail.label.ordered_date": {
+    "defaultMessage": "Tilattu: {date}"
+  },
+  "account_order_detail.label.pending_tracking_number": {
+    "defaultMessage": "Vireillä"
+  },
+  "account_order_detail.label.tracking_number": {
+    "defaultMessage": "Seurantanumero"
+  },
+  "account_order_detail.link.back_to_history": {
+    "defaultMessage": "Takaisin tilaushistoriaan"
+  },
+  "account_order_detail.shipping_status.not_shipped": {
+    "defaultMessage": "Ei lähetetty"
+  },
+  "account_order_detail.shipping_status.part_shipped": {
+    "defaultMessage": "Lähetetty osittain"
+  },
+  "account_order_detail.shipping_status.shipped": {
+    "defaultMessage": "Lähetetty"
+  },
+  "account_order_detail.title.order_details": {
+    "defaultMessage": "Tilauksen tiedot"
+  },
+  "account_order_history.button.continue_shopping": {
+    "defaultMessage": "Jatka ostoksia"
+  },
+  "account_order_history.description.once_you_place_order": {
+    "defaultMessage": "Kun teet tilauksen, tiedot näkyvät täällä."
+  },
+  "account_order_history.heading.no_order_yet": {
+    "defaultMessage": "Et ole vielä tehnyt tilausta."
+  },
+  "account_order_history.label.num_of_items": {
+    "defaultMessage": "{count} tuotetta",
+    "description": "Number of items in order"
+  },
+  "account_order_history.label.order_number": {
+    "defaultMessage": "Tilausnumero: {orderNumber}"
+  },
+  "account_order_history.label.ordered_date": {
+    "defaultMessage": "Tilattu: {date}"
+  },
+  "account_order_history.label.shipped_to": {
+    "defaultMessage": "Toimitetaan osoitteeseen: {name}"
+  },
+  "account_order_history.link.view_details": {
+    "defaultMessage": "Näytä tiedot"
+  },
+  "account_order_history.title.order_history": {
+    "defaultMessage": "Tilaushistoria"
+  },
+  "account_wishlist.button.continue_shopping": {
+    "defaultMessage": "Jatka ostoksia"
+  },
+  "account_wishlist.description.continue_shopping": {
+    "defaultMessage": "Jatka ostosten tekemistä ja lisää tuotteita toivelistallesi."
+  },
+  "account_wishlist.heading.no_wishlist": {
+    "defaultMessage": "Toivelistalla ei ole tuotteita"
+  },
+  "account_wishlist.title.wishlist": {
+    "defaultMessage": "Toivelista"
+  },
+  "action_card.action.edit": {
+    "defaultMessage": "Muokkaa"
+  },
+  "action_card.action.remove": {
+    "defaultMessage": "Poista"
+  },
+  "add_to_cart_modal.info.added_to_cart": {
+    "defaultMessage": "{quantity} {quantity, plural, one {tuote} other {tuotetta}} lisätty ostoskoriin"
+  },
+  "add_to_cart_modal.label.cart_subtotal": {
+    "defaultMessage": "Ostoskorin välisumma ({itemAccumulatedCount} tuote)"
+  },
+  "add_to_cart_modal.label.quantity": {
+    "defaultMessage": "Lkm"
+  },
+  "add_to_cart_modal.link.checkout": {
+    "defaultMessage": "Siirry kassalle"
+  },
+  "add_to_cart_modal.link.view_cart": {
+    "defaultMessage": "Näytä ostoskori"
+  },
+  "add_to_cart_modal.recommended_products.title.might_also_like": {
+    "defaultMessage": "Saatat myös pitää näistä"
+  },
+  "auth_modal.button.close.assistive_msg": {
+    "defaultMessage": "Sulje kirjautumislomake"
+  },
+  "auth_modal.check_email.button.resend_link": {
+    "defaultMessage": "Lähetä linkki uudelleen"
+  },
+  "auth_modal.check_email.description.check_spam_folder": {
+    "defaultMessage": "Linkin saapuminen voi kestää muutaman minuutin. Tarkista roskapostikansiosi, jos et löydä sitä"
+  },
+  "auth_modal.check_email.description.just_sent": {
+    "defaultMessage": "Lähetimme juuri kirjautumislinkin osoitteeseen <b>{email}</b>"
+  },
+  "auth_modal.check_email.title.check_your_email": {
+    "defaultMessage": "Tarkista sähköpostisi"
+  },
+  "auth_modal.description.now_signed_in": {
+    "defaultMessage": "Olet nyt kirjautunut sisään."
+  },
+  "auth_modal.error.incorrect_email_or_password": {
+    "defaultMessage": "Jotain on vialla sähköpostisi tai salasanasi kanssa. Yritä uudelleen."
+  },
+  "auth_modal.info.welcome_user": {
+    "defaultMessage": "Tervetuloa {name},"
+  },
+  "auth_modal.password_reset_success.button.back_to_sign_in": {
+    "defaultMessage": "Takaisin kirjautumiseen"
+  },
+  "auth_modal.password_reset_success.info.will_email_shortly": {
+    "defaultMessage": "Saat pian osoitteeseen <b>{email}</b> sähköpostin, jossa on linkki salasanasi nollaamiseen."
+  },
+  "auth_modal.password_reset_success.title.password_reset": {
+    "defaultMessage": "Salasanan nollaus"
+  },
+  "carousel.button.scroll_left.assistive_msg": {
+    "defaultMessage": "Vieritä karusellia vasemmalle"
+  },
+  "carousel.button.scroll_right.assistive_msg": {
+    "defaultMessage": "Vieritä karusellia oikealle"
+  },
+  "cart.info.removed_from_cart": {
+    "defaultMessage": "Tuote poistettu ostoskorista"
+  },
+  "cart.product_edit_modal.modal_label": {
+    "defaultMessage": "Muokkaa kohteen {productName} modaalia"
+  },
+  "cart.recommended_products.title.may_also_like": {
+    "defaultMessage": "Saatat myös pitää näistä"
+  },
+  "cart.recommended_products.title.recently_viewed": {
+    "defaultMessage": "Viimeksi katsottu"
+  },
+  "cart_cta.link.checkout": {
+    "defaultMessage": "Siirry kassalle"
+  },
+  "cart_secondary_button_group.action.added_to_wishlist": {
+    "defaultMessage": "Lisää toivelistalle"
+  },
+  "cart_secondary_button_group.action.edit": {
+    "defaultMessage": "Muokkaa"
+  },
+  "cart_secondary_button_group.action.remove": {
+    "defaultMessage": "Poista"
+  },
+  "cart_secondary_button_group.label.this_is_gift": {
+    "defaultMessage": "Tämä on lahja."
+  },
+  "cart_skeleton.heading.order_summary": {
+    "defaultMessage": "Tilauksen yhteenveto"
+  },
+  "cart_skeleton.title.cart": {
+    "defaultMessage": "Ostoskori"
+  },
+  "cart_title.title.cart_num_of_items": {
+    "defaultMessage": "Ostoskori ({itemCount, plural, =0 {0 tuotetta} one {# tuote} other {# tuotetta}})"
+  },
+  "category_links.button_text": {
+    "defaultMessage": "Kategoriat"
+  },
+  "cc_radio_group.action.remove": {
+    "defaultMessage": "Poista"
+  },
+  "cc_radio_group.button.add_new_card": {
+    "defaultMessage": "Lisää uusi kortti"
+  },
+  "checkout.button.place_order": {
+    "defaultMessage": "Tee tilaus"
+  },
+  "checkout.message.generic_error": {
+    "defaultMessage": "Kassalla tapahtui odottamaton virhe."
+  },
+  "checkout_confirmation.button.create_account": {
+    "defaultMessage": "Luo tili"
+  },
+  "checkout_confirmation.heading.billing_address": {
+    "defaultMessage": "Laskutusosoite"
+  },
+  "checkout_confirmation.heading.create_account": {
+    "defaultMessage": "Luo tili, niin voit tehdä tilauksia nopeammin"
+  },
+  "checkout_confirmation.heading.credit_card": {
+    "defaultMessage": "Luottokortti"
+  },
+  "checkout_confirmation.heading.delivery_details": {
+    "defaultMessage": "Toimitustiedot"
+  },
+  "checkout_confirmation.heading.order_summary": {
+    "defaultMessage": "Tilauksen yhteenveto"
+  },
+  "checkout_confirmation.heading.payment_details": {
+    "defaultMessage": "Maksutiedot"
+  },
+  "checkout_confirmation.heading.shipping_address": {
+    "defaultMessage": "Toimitusosoite"
+  },
+  "checkout_confirmation.heading.shipping_method": {
+    "defaultMessage": "Lähetystapa"
+  },
+  "checkout_confirmation.heading.thank_you_for_order": {
+    "defaultMessage": "Kiitos tilauksestasi!"
+  },
+  "checkout_confirmation.label.free": {
+    "defaultMessage": "Veloituksetta"
+  },
+  "checkout_confirmation.label.order_number": {
+    "defaultMessage": "Tilausnumero"
+  },
+  "checkout_confirmation.label.order_total": {
+    "defaultMessage": "Tilauksen loppusumma"
+  },
+  "checkout_confirmation.label.promo_applied": {
+    "defaultMessage": "Alennus lisätty"
+  },
+  "checkout_confirmation.label.shipping": {
+    "defaultMessage": "Toimitus"
+  },
+  "checkout_confirmation.label.shipping.strikethrough.price": {
+    "defaultMessage": "Alun perin {originalPrice}, nyt {newPrice}"
+  },
+  "checkout_confirmation.label.subtotal": {
+    "defaultMessage": "Yhteensä"
+  },
+  "checkout_confirmation.label.tax": {
+    "defaultMessage": "Verot"
+  },
+  "checkout_confirmation.link.continue_shopping": {
+    "defaultMessage": "Jatka ostoksia"
+  },
+  "checkout_confirmation.link.login": {
+    "defaultMessage": "Kirjaudu sisään täällä"
+  },
+  "checkout_confirmation.message.already_has_account": {
+    "defaultMessage": "Tällä sähköpostilla on jo tili."
+  },
+  "checkout_confirmation.message.num_of_items_in_order": {
+    "defaultMessage": "{itemCount, plural, =0 {0 tuotetta} one {# tuote} other {# tuotetta}}",
+    "description": "# item(s) in order"
+  },
+  "checkout_confirmation.message.will_email_shortly": {
+    "defaultMessage": "Lähetämme pian sähköpostiviestiä osoitteeseen <b>{email}</b>, jossa on vahvistusnumerosi ja kuittisi."
+  },
+  "checkout_footer.link.privacy_policy": {
+    "defaultMessage": "Tietosuojakäytäntö"
+  },
+  "checkout_footer.link.returns_exchanges": {
+    "defaultMessage": "Palautukset ja vaihdot"
+  },
+  "checkout_footer.link.shipping": {
+    "defaultMessage": "Toimitus"
+  },
+  "checkout_footer.link.site_map": {
+    "defaultMessage": "Sivustokartta"
+  },
+  "checkout_footer.link.terms_conditions": {
+    "defaultMessage": "Ehdot"
+  },
+  "checkout_footer.message.copyright": {
+    "defaultMessage": "Salesforce tai sen tytäryhtiöt. Kaikki oikeudet pidätetään. Tämä on vain demomyymälä. Tilauksia EI käsitellä."
+  },
+  "checkout_header.link.assistive_msg.cart": {
+    "defaultMessage": "Takaisin ostoskoriin, tuotteiden määrä: {numItems}"
+  },
+  "checkout_header.link.cart": {
+    "defaultMessage": "Takaisin ostoskoriin"
+  },
+  "checkout_payment.action.remove": {
+    "defaultMessage": "Poista"
+  },
+  "checkout_payment.button.review_order": {
+    "defaultMessage": "Tarkista tilaus"
+  },
+  "checkout_payment.heading.billing_address": {
+    "defaultMessage": "Laskutusosoite"
+  },
+  "checkout_payment.heading.credit_card": {
+    "defaultMessage": "Luottokortti"
+  },
+  "checkout_payment.label.billing_address_form": {
+    "defaultMessage": "Laskutusosoitelomake"
+  },
+  "checkout_payment.label.same_as_shipping": {
+    "defaultMessage": "Sama kuin toimitusosoite"
+  },
+  "checkout_payment.title.payment": {
+    "defaultMessage": "Maksu"
+  },
+  "colorRefinements.label.hitCount": {
+    "defaultMessage": "{colorLabel} ({colorHitCount})"
+  },
+  "confirmation_modal.default.action.no": {
+    "defaultMessage": "Ei"
+  },
+  "confirmation_modal.default.action.yes": {
+    "defaultMessage": "Kyllä"
+  },
+  "confirmation_modal.default.assistive_msg.no": {
+    "defaultMessage": "Ei, peruuta toiminto"
+  },
+  "confirmation_modal.default.assistive_msg.yes": {
+    "defaultMessage": "Kyllä, vahvista toiminto"
+  },
+  "confirmation_modal.default.message.you_want_to_continue": {
+    "defaultMessage": "Haluatko varmasti jatkaa?"
+  },
+  "confirmation_modal.default.title.confirm_action": {
+    "defaultMessage": "Vahvista toiminto"
+  },
+  "confirmation_modal.remove_cart_item.action.no": {
+    "defaultMessage": "Ei, pidä tuote"
+  },
+  "confirmation_modal.remove_cart_item.action.remove": {
+    "defaultMessage": "Poista"
+  },
+  "confirmation_modal.remove_cart_item.action.yes": {
+    "defaultMessage": "Kyllä, poista tuote"
+  },
+  "confirmation_modal.remove_cart_item.assistive_msg.no": {
+    "defaultMessage": "Ei, pidä tuote"
+  },
+  "confirmation_modal.remove_cart_item.assistive_msg.remove": {
+    "defaultMessage": "Poista tuotteet, jotka eivät ole saatavilla"
+  },
+  "confirmation_modal.remove_cart_item.assistive_msg.yes": {
+    "defaultMessage": "Kyllä, poista tuote"
+  },
+  "confirmation_modal.remove_cart_item.message.need_to_remove_due_to_unavailability": {
+    "defaultMessage": "Jotkin tuotteet eivät ole enää saatavilla verkossa, ja ne poistetaan ostoskoristasi."
+  },
+  "confirmation_modal.remove_cart_item.message.sure_to_remove": {
+    "defaultMessage": "Haluatko varmasti poistaa tämän tuotteen ostoskoristasi?"
+  },
+  "confirmation_modal.remove_cart_item.title.confirm_remove": {
+    "defaultMessage": "Vahvista tuotteen poisto"
+  },
+  "confirmation_modal.remove_cart_item.title.items_unavailable": {
+    "defaultMessage": "Tuotteita ei ole saatavilla"
+  },
+  "confirmation_modal.remove_wishlist_item.action.no": {
+    "defaultMessage": "Ei, pidä tuote"
+  },
+  "confirmation_modal.remove_wishlist_item.action.yes": {
+    "defaultMessage": "Kyllä, poista tuote"
+  },
+  "confirmation_modal.remove_wishlist_item.message.sure_to_remove": {
+    "defaultMessage": "Haluatko varmasti poistaa tämän tuotteen toivelistaltasi?"
+  },
+  "confirmation_modal.remove_wishlist_item.title.confirm_remove": {
+    "defaultMessage": "Vahvista tuotteen poisto"
+  },
+  "contact_info.action.sign_out": {
+    "defaultMessage": "Kirjaudu ulos"
+  },
+  "contact_info.button.already_have_account": {
+    "defaultMessage": "Onko sinulla jo tili? Kirjaudu sisään"
+  },
+  "contact_info.button.back_to_sign_in_options": {
+    "defaultMessage": "Takaisin kirjautumisvaihtoehtoihin"
+  },
+  "contact_info.button.checkout_as_guest": {
+    "defaultMessage": "Tee tilaus vieraana"
+  },
+  "contact_info.button.login": {
+    "defaultMessage": "Kirjaudu sisään"
+  },
+  "contact_info.button.password": {
+    "defaultMessage": "Salasana"
+  },
+  "contact_info.button.secure_link": {
+    "defaultMessage": "Turvallinen linkki"
+  },
+  "contact_info.error.incorrect_username_or_password": {
+    "defaultMessage": "Väärä käyttäjätunnus tai salasana, yritä uudelleen."
+  },
+  "contact_info.link.forgot_password": {
+    "defaultMessage": "Unohditko salasanan?"
+  },
+  "contact_info.message.or_login_with": {
+    "defaultMessage": "Tai kirjaudu sisään jollakin seuraavista"
+  },
+  "contact_info.title.contact_info": {
+    "defaultMessage": "Yhteystiedot"
+  },
+  "credit_card_fields.tool_tip.security_code": {
+    "defaultMessage": "Tämä kolminumeroinen koodi löytyy korttisi kääntöpuolelta.",
+    "description": "Generic credit card security code help text"
+  },
+  "credit_card_fields.tool_tip.security_code.american_express": {
+    "defaultMessage": "Tämä nelinumeroinen koodi löytyy korttisi etupuolelta.",
+    "description": "American Express security code help text"
+  },
+  "credit_card_fields.tool_tip.security_code_aria_label": {
+    "defaultMessage": "Turvakoodin tiedot"
+  },
+  "display_price.assistive_msg.current_price": {
+    "defaultMessage": "nykyinen hinta {currentPrice}"
+  },
+  "display_price.assistive_msg.current_price_with_range": {
+    "defaultMessage": "Nykyisestä hinnasta {currentPrice}"
+  },
+  "display_price.assistive_msg.strikethrough_price": {
+    "defaultMessage": "alkuperäinen hinta {listPrice}"
+  },
+  "display_price.assistive_msg.strikethrough_price_with_range": {
+    "defaultMessage": "Alkuperäisestä hinnasta {listPrice}"
+  },
+  "display_price.label.current_price_with_range": {
+    "defaultMessage": "Alkaen {currentPrice}"
+  },
+  "dnt_notification.button.accept": {
+    "defaultMessage": "Hyväksy"
+  },
+  "dnt_notification.button.assistive_msg.accept": {
+    "defaultMessage": "Hyväksy seuranta"
+  },
+  "dnt_notification.button.assistive_msg.close": {
+    "defaultMessage": "Sulje suostumuksen seurantalomake"
+  },
+  "dnt_notification.button.assistive_msg.decline": {
+    "defaultMessage": "Kiellä seuranta"
+  },
+  "dnt_notification.button.decline": {
+    "defaultMessage": "Kiellä"
+  },
+  "dnt_notification.description": {
+    "defaultMessage": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur."
+  },
+  "dnt_notification.title": {
+    "defaultMessage": "Suostumuksen seuranta"
+  },
+  "drawer_menu.button.account_details": {
+    "defaultMessage": "Tilin tiedot"
+  },
+  "drawer_menu.button.addresses": {
+    "defaultMessage": "Osoitteet"
+  },
+  "drawer_menu.button.log_out": {
+    "defaultMessage": "Kirjaudu ulos"
+  },
+  "drawer_menu.button.my_account": {
+    "defaultMessage": "Oma tili"
+  },
+  "drawer_menu.button.order_history": {
+    "defaultMessage": "Tilaushistoria"
+  },
+  "drawer_menu.header.assistive_msg.title": {
+    "defaultMessage": "Valikkolaatikko"
+  },
+  "drawer_menu.link.about_us": {
+    "defaultMessage": "Tietoa meistä"
+  },
+  "drawer_menu.link.customer_support": {
+    "defaultMessage": "Asiakastuki"
+  },
+  "drawer_menu.link.customer_support.contact_us": {
+    "defaultMessage": "Ota yhteyttä"
+  },
+  "drawer_menu.link.customer_support.shipping_and_returns": {
+    "defaultMessage": "Toimitus ja palautukset"
+  },
+  "drawer_menu.link.our_company": {
+    "defaultMessage": "Yrityksemme"
+  },
+  "drawer_menu.link.privacy_and_security": {
+    "defaultMessage": "Yksityisyys ja turvallisuus"
+  },
+  "drawer_menu.link.privacy_policy": {
+    "defaultMessage": "Tietosuojakäytäntö"
+  },
+  "drawer_menu.link.shop_all": {
+    "defaultMessage": "Tutustu kaikkiin"
+  },
+  "drawer_menu.link.sign_in": {
+    "defaultMessage": "Kirjaudu sisään"
+  },
+  "drawer_menu.link.site_map": {
+    "defaultMessage": "Sivustokartta"
+  },
+  "drawer_menu.link.store_locator": {
+    "defaultMessage": "Myymäläpaikannin"
+  },
+  "drawer_menu.link.terms_and_conditions": {
+    "defaultMessage": "Ehdot"
+  },
+  "empty_cart.description.empty_cart": {
+    "defaultMessage": "Ostoskorisi on tyhjä."
+  },
+  "empty_cart.link.continue_shopping": {
+    "defaultMessage": "Jatka ostoksia"
+  },
+  "empty_cart.link.sign_in": {
+    "defaultMessage": "Kirjaudu sisään"
+  },
+  "empty_cart.message.continue_shopping": {
+    "defaultMessage": "Jatka ostoksia lisätäksesi tuotteita ostoskoriin."
+  },
+  "empty_cart.message.sign_in_or_continue_shopping": {
+    "defaultMessage": "Kirjaudu sisään hakeaksesi tallennetut tuotteet tai jatka ostoksia."
+  },
+  "empty_search_results.info.cant_find_anything_for_category": {
+    "defaultMessage": "Kategorialle {category} ei löytynyt tuloksia. Kokeile etsiä tuotetta tai {link}."
+  },
+  "empty_search_results.info.cant_find_anything_for_query": {
+    "defaultMessage": "Hakusanalla \"{searchQuery}\" ei löytynyt mitään."
+  },
+  "empty_search_results.info.double_check_spelling": {
+    "defaultMessage": "Tarkista oikeinkirjoitus ja yritä uudelleen tai {link}."
+  },
+  "empty_search_results.link.contact_us": {
+    "defaultMessage": "Ota yhteyttä"
+  },
+  "empty_search_results.recommended_products.title.most_viewed": {
+    "defaultMessage": "Eniten katsotut"
+  },
+  "empty_search_results.recommended_products.title.top_sellers": {
+    "defaultMessage": "Huippumyyjät"
+  },
+  "field.password.assistive_msg.hide_password": {
+    "defaultMessage": "Piilota salasana"
+  },
+  "field.password.assistive_msg.show_password": {
+    "defaultMessage": "Näytä salasana"
+  },
+  "footer.column.account": {
+    "defaultMessage": "Tili"
+  },
+  "footer.column.customer_support": {
+    "defaultMessage": "Asiakastuki"
+  },
+  "footer.column.our_company": {
+    "defaultMessage": "Yrityksemme"
+  },
+  "footer.link.about_us": {
+    "defaultMessage": "Tietoa meistä"
+  },
+  "footer.link.contact_us": {
+    "defaultMessage": "Ota yhteyttä"
+  },
+  "footer.link.order_status": {
+    "defaultMessage": "Tilauksen tila"
+  },
+  "footer.link.privacy_policy": {
+    "defaultMessage": "Tietosuojakäytäntö"
+  },
+  "footer.link.shipping": {
+    "defaultMessage": "Toimitus"
+  },
+  "footer.link.signin_create_account": {
+    "defaultMessage": "Kirjaudu sisään tai luo tili"
+  },
+  "footer.link.site_map": {
+    "defaultMessage": "Sivustokartta"
+  },
+  "footer.link.store_locator": {
+    "defaultMessage": "Myymäläpaikannin"
+  },
+  "footer.link.terms_conditions": {
+    "defaultMessage": "Ehdot"
+  },
+  "footer.locale_selector.assistive_msg": {
+    "defaultMessage": "Valitse kieli"
+  },
+  "footer.message.copyright": {
+    "defaultMessage": "Salesforce tai sen tytäryhtiöt. Kaikki oikeudet pidätetään. Tämä on vain demomyymälä. Tilauksia EI käsitellä."
+  },
+  "footer.subscribe.button.sign_up": {
+    "defaultMessage": "Rekisteröidy"
+  },
+  "footer.subscribe.description.sign_up": {
+    "defaultMessage": "Rekisteröidy, niin pysyt ajan tasalla kuumimmista tarjouksista"
+  },
+  "footer.subscribe.email.assistive_msg": {
+    "defaultMessage": "Sähköpostiosoite uutiskirjettä varten"
+  },
+  "footer.subscribe.heading.first_to_know": {
+    "defaultMessage": "Saat tietää ensimmäisten joukossa"
+  },
+  "form_action_buttons.button.cancel": {
+    "defaultMessage": "Peruuta"
+  },
+  "form_action_buttons.button.save": {
+    "defaultMessage": "Tallenna"
+  },
+  "global.account.link.account_details": {
+    "defaultMessage": "Tilin tiedot"
+  },
+  "global.account.link.addresses": {
+    "defaultMessage": "Osoitteet"
+  },
+  "global.account.link.order_history": {
+    "defaultMessage": "Tilaushistoria"
+  },
+  "global.account.link.wishlist": {
+    "defaultMessage": "Toivelista"
+  },
+  "global.error.create_account": {
+    "defaultMessage": "Tämä ominaisuus ei ole tällä hetkellä saatavilla. Luo tili, jotta voit käyttää tätä ominaisuutta."
+  },
+  "global.error.feature_unavailable": {
+    "defaultMessage": "Tämä ominaisuus ei ole tällä hetkellä saatavilla."
+  },
+  "global.error.invalid_token": {
+    "defaultMessage": "Merkki on virheellinen, yritä uudelleen."
+  },
+  "global.error.something_went_wrong": {
+    "defaultMessage": "Jokin meni vikaan. Yritä uudelleen!"
+  },
+  "global.info.added_to_wishlist": {
+    "defaultMessage": "{quantity} {quantity, plural, one {tuote} other {tuotetta}} lisätty toivelistalle"
+  },
+  "global.info.already_in_wishlist": {
+    "defaultMessage": "Tuote on jo toivelistalla"
+  },
+  "global.info.removed_from_wishlist": {
+    "defaultMessage": "Tuote poistettu toivelistalta"
+  },
+  "global.link.added_to_wishlist.view_wishlist": {
+    "defaultMessage": "Näytä"
+  },
+  "header.button.assistive_msg.logo": {
+    "defaultMessage": "Logo"
+  },
+  "header.button.assistive_msg.menu": {
+    "defaultMessage": "Valikko"
+  },
+  "header.button.assistive_msg.menu.open_dialog": {
+    "defaultMessage": "Avaa valintaikkunan"
+  },
+  "header.button.assistive_msg.my_account": {
+    "defaultMessage": "Oma tili"
+  },
+  "header.button.assistive_msg.my_account_menu": {
+    "defaultMessage": "Avaa tilivalikko"
+  },
+  "header.button.assistive_msg.my_cart_with_num_items": {
+    "defaultMessage": "Oma ostoskori, tuotteiden määrä: {numItems}"
+  },
+  "header.button.assistive_msg.store_locator": {
+    "defaultMessage": "Myymäläpaikannin"
+  },
+  "header.button.assistive_msg.wishlist": {
+    "defaultMessage": "Toivelista"
+  },
+  "header.field.placeholder.search_for_products": {
+    "defaultMessage": "Etsi tuotteita..."
+  },
+  "header.popover.action.log_out": {
+    "defaultMessage": "Kirjaudu ulos"
+  },
+  "header.popover.title.my_account": {
+    "defaultMessage": "Oma tili"
+  },
+  "home.description.features": {
+    "defaultMessage": "Valmiit ominaisuudet, jotta voit keskittyä vain parannusten lisäämiseen."
+  },
+  "home.description.here_to_help": {
+    "defaultMessage": "Ota yhteyttä tukihenkilöstöömme."
+  },
+  "home.description.here_to_help_line_2": {
+    "defaultMessage": "He opastavat sinut oikeaan paikkaan."
+  },
+  "home.description.shop_products": {
+    "defaultMessage": "Tässä osiossa on sisältöä luettelosta. Katso tietoja {docLink}, miten se korvataan.",
+    "description": "{docLink} is a html button that links the user to https://sfdc.co/business-manager-manage-catalogs"
+  },
+  "home.features.description.cart_checkout": {
+    "defaultMessage": "Verkkokaupan parhaat käytännöt ostoskori- ja maksukokemusta varten."
+  },
+  "home.features.description.components": {
+    "defaultMessage": "Rakennettu käyttäen Chakra-käyttöliittymää, joka on yksinkertainen, modulaarinen ja helppokäyttöinen React-komponenttikirjasto."
+  },
+  "home.features.description.einstein_recommendations": {
+    "defaultMessage": "Toimita jokaiselle ostajalle seuraavaksi paras tuote tai tarjous tuotesuositusten avulla."
+  },
+  "home.features.description.my_account": {
+    "defaultMessage": "Ostajat voivat hallita tilitietojaan, kuten profiiliaan, osoitteitaan, maksujaan ja tilauksiaan."
+  },
+  "home.features.description.shopper_login": {
+    "defaultMessage": "Anna ostajille mahdollisuus kirjautua helposti sisään ja hyötyä personoidusta ostokokemuksesta."
+  },
+  "home.features.description.wishlist": {
+    "defaultMessage": "Rekisteröityneet ostajat voivat lisätä tuotteita toivelistalleen ja ostaa ne myöhemmin."
+  },
+  "home.features.heading.cart_checkout": {
+    "defaultMessage": "Ostoskori ja maksu"
+  },
+  "home.features.heading.components": {
+    "defaultMessage": "Komponentit ja Design Kit"
+  },
+  "home.features.heading.einstein_recommendations": {
+    "defaultMessage": "Einsteinin suositukset"
+  },
+  "home.features.heading.my_account": {
+    "defaultMessage": "Oma tili"
+  },
+  "home.features.heading.shopper_login": {
+    "defaultMessage": "Ostajan sisäänkirjautuminen ja API-yhteyspalvelu"
+  },
+  "home.features.heading.wishlist": {
+    "defaultMessage": "Toivelista"
+  },
+  "home.heading.features": {
+    "defaultMessage": "Ominaisuudet"
+  },
+  "home.heading.here_to_help": {
+    "defaultMessage": "Olemme apunasi"
+  },
+  "home.heading.shop_products": {
+    "defaultMessage": "Osta tuotteita"
+  },
+  "home.hero_features.link.design_kit": {
+    "defaultMessage": "Luo Figma PWA Design Kitin avulla"
+  },
+  "home.hero_features.link.on_github": {
+    "defaultMessage": "Lataa Githubista"
+  },
+  "home.hero_features.link.on_managed_runtime": {
+    "defaultMessage": "Käyttöönotto hallittuun suoritusaikaan"
+  },
+  "home.link.contact_us": {
+    "defaultMessage": "Ota yhteyttä"
+  },
+  "home.link.get_started": {
+    "defaultMessage": "Aloita"
+  },
+  "home.link.read_docs": {
+    "defaultMessage": "Lue asiakirjoista"
+  },
+  "home.title.react_starter_store": {
+    "defaultMessage": "React PWA Starter Store vähittäiskaupalle"
+  },
+  "icons.assistive_msg.lock": {
+    "defaultMessage": "Turvallinen"
+  },
+  "item_attributes.label.promotions": {
+    "defaultMessage": "Tarjoukset"
+  },
+  "item_attributes.label.quantity": {
+    "defaultMessage": "Määrä: {quantity}"
+  },
+  "item_attributes.label.selected_options": {
+    "defaultMessage": "Valitut vaihtoehdot"
+  },
+  "item_image.label.sale": {
+    "defaultMessage": "Ale",
+    "description": "A sale badge placed on top of a product image"
+  },
+  "item_image.label.unavailable": {
+    "defaultMessage": "Ei käytettävissä",
+    "description": "A unavailable badge placed on top of a product image"
+  },
+  "item_variant.assistive_msg.quantity": {
+    "defaultMessage": "Määrä {quantity}"
+  },
+  "item_variant.quantity.label": {
+    "defaultMessage": "Määränvalitsin tuotteelle {productName}. Valittu määrä on {quantity}"
+  },
+  "lCPCxk": {
+    "defaultMessage": "Valitse kaikki vaihtoehdot yllä"
+  },
+  "list_menu.nav.assistive_msg": {
+    "defaultMessage": "Päänavigointi"
+  },
+  "locale_text.message.ar-SA": {
+    "defaultMessage": "Arabia (Saudi-Arabia)"
+  },
+  "locale_text.message.bn-BD": {
+    "defaultMessage": "Bangla (Bangladesh)"
+  },
+  "locale_text.message.bn-IN": {
+    "defaultMessage": "Bangla (Intia)"
+  },
+  "locale_text.message.cs-CZ": {
+    "defaultMessage": "Tšekki (Tšekin tasavalta)"
+  },
+  "locale_text.message.da-DK": {
+    "defaultMessage": "Tanska (Tanska)"
+  },
+  "locale_text.message.de-AT": {
+    "defaultMessage": "Saksa (Itävalta)"
+  },
+  "locale_text.message.de-CH": {
+    "defaultMessage": "Saksa (Sveitsi)"
+  },
+  "locale_text.message.de-DE": {
+    "defaultMessage": "Saksa (Saksa)"
+  },
+  "locale_text.message.el-GR": {
+    "defaultMessage": "Kreikka (Kreikka)"
+  },
+  "locale_text.message.en-AU": {
+    "defaultMessage": "Englanti (Australia)"
+  },
+  "locale_text.message.en-CA": {
+    "defaultMessage": "Englanti (Kanada)"
+  },
+  "locale_text.message.en-GB": {
+    "defaultMessage": "Englanti (Yhdistynyt kuningaskunta)"
+  },
+  "locale_text.message.en-IE": {
+    "defaultMessage": "Englanti (Irlanti)"
+  },
+  "locale_text.message.en-IN": {
+    "defaultMessage": "Englanti (Intia)"
+  },
+  "locale_text.message.en-NZ": {
+    "defaultMessage": "Englanti (Uusi-Seelanti)"
+  },
+  "locale_text.message.en-US": {
+    "defaultMessage": "Englanti (Yhdysvallat)"
+  },
+  "locale_text.message.en-ZA": {
+    "defaultMessage": "Englanti (Etelä-Afrikka)"
+  },
+  "locale_text.message.es-AR": {
+    "defaultMessage": "Espanja (Argentiina)"
+  },
+  "locale_text.message.es-CL": {
+    "defaultMessage": "Espanja (Chile)"
+  },
+  "locale_text.message.es-CO": {
+    "defaultMessage": "Espanja (Kolumbia)"
+  },
+  "locale_text.message.es-ES": {
+    "defaultMessage": "Espanja (Espanja)"
+  },
+  "locale_text.message.es-MX": {
+    "defaultMessage": "Espanja (Meksiko)"
+  },
+  "locale_text.message.es-US": {
+    "defaultMessage": "Espanja (Yhdysvallat)"
+  },
+  "locale_text.message.fi-FI": {
+    "defaultMessage": "Suomi (Suomi)"
+  },
+  "locale_text.message.fr-BE": {
+    "defaultMessage": "Ranska (Belgia)"
+  },
+  "locale_text.message.fr-CA": {
+    "defaultMessage": "Ranska (Kanada)"
+  },
+  "locale_text.message.fr-CH": {
+    "defaultMessage": "Ranska (Sveitsi)"
+  },
+  "locale_text.message.fr-FR": {
+    "defaultMessage": "Ranska (Ranska)"
+  },
+  "locale_text.message.he-IL": {
+    "defaultMessage": "Heprea (Israel)"
+  },
+  "locale_text.message.hi-IN": {
+    "defaultMessage": "Hindi (Intia)"
+  },
+  "locale_text.message.hu-HU": {
+    "defaultMessage": "Unkari (Unkari)"
+  },
+  "locale_text.message.id-ID": {
+    "defaultMessage": "Indonesian kieli (Indonesia)"
+  },
+  "locale_text.message.it-CH": {
+    "defaultMessage": "Italia (Sveitsi)"
+  },
+  "locale_text.message.it-IT": {
+    "defaultMessage": "Italia (Italia)"
+  },
+  "locale_text.message.ja-JP": {
+    "defaultMessage": "Japani (Japani)"
+  },
+  "locale_text.message.ko-KR": {
+    "defaultMessage": "Korea (Korean tasavalta)"
+  },
+  "locale_text.message.nl-BE": {
+    "defaultMessage": "Hollanti (Belgia)"
+  },
+  "locale_text.message.nl-NL": {
+    "defaultMessage": "Hollanti (Alankomaat)"
+  },
+  "locale_text.message.no-NO": {
+    "defaultMessage": "Norja (Norja)"
+  },
+  "locale_text.message.pl-PL": {
+    "defaultMessage": "Puola (Puola)"
+  },
+  "locale_text.message.pt-BR": {
+    "defaultMessage": "Portugali (Brasilia)"
+  },
+  "locale_text.message.pt-PT": {
+    "defaultMessage": "Portugali (Portugali)"
+  },
+  "locale_text.message.ro-RO": {
+    "defaultMessage": "Romania (Romania)"
+  },
+  "locale_text.message.ru-RU": {
+    "defaultMessage": "Venäjä (Venäjän federaatio)"
+  },
+  "locale_text.message.sk-SK": {
+    "defaultMessage": "Slovakki (Slovakia)"
+  },
+  "locale_text.message.sv-SE": {
+    "defaultMessage": "Ruotsi (Ruotsi)"
+  },
+  "locale_text.message.ta-IN": {
+    "defaultMessage": "Tamili (Intia)"
+  },
+  "locale_text.message.ta-LK": {
+    "defaultMessage": "Tamili (Sri Lanka)"
+  },
+  "locale_text.message.th-TH": {
+    "defaultMessage": "Thai (Thaimaa)"
+  },
+  "locale_text.message.tr-TR": {
+    "defaultMessage": "Turkki (Turkki)"
+  },
+  "locale_text.message.zh-CN": {
+    "defaultMessage": "Kiina (Kiina)"
+  },
+  "locale_text.message.zh-HK": {
+    "defaultMessage": "Kiina (Hongkong)"
+  },
+  "locale_text.message.zh-TW": {
+    "defaultMessage": "Kiina (Taiwan)"
+  },
+  "login_form.action.create_account": {
+    "defaultMessage": "Luo tili"
+  },
+  "login_form.button.apple": {
+    "defaultMessage": "Apple"
+  },
+  "login_form.button.back": {
+    "defaultMessage": "Takaisin kirjautumisvaihtoehtoihin"
+  },
+  "login_form.button.continue_securely": {
+    "defaultMessage": "Jatka turvallisesti"
+  },
+  "login_form.button.google": {
+    "defaultMessage": "Google"
+  },
+  "login_form.button.password": {
+    "defaultMessage": "Salasana"
+  },
+  "login_form.button.sign_in": {
+    "defaultMessage": "Kirjaudu sisään"
+  },
+  "login_form.link.forgot_password": {
+    "defaultMessage": "Unohditko salasanan?"
+  },
+  "login_form.message.dont_have_account": {
+    "defaultMessage": "Eikö sinulla ole tiliä?"
+  },
+  "login_form.message.or_login_with": {
+    "defaultMessage": "Tai kirjaudu sisään jollakin seuraavista"
+  },
+  "login_form.message.welcome_back": {
+    "defaultMessage": "Tervetuloa takaisin"
+  },
+  "login_page.error.incorrect_username_or_password": {
+    "defaultMessage": "Väärä käyttäjätunnus tai salasana, yritä uudelleen."
+  },
+  "offline_banner.description.browsing_offline_mode": {
+    "defaultMessage": "Selaat tällä hetkellä offline-tilassa"
+  },
+  "order_summary.action.remove_promo": {
+    "defaultMessage": "Poista"
+  },
+  "order_summary.cart_items.action.num_of_items_in_cart": {
+    "defaultMessage": "{itemCount, plural, =0 {0 tuotetta} one {# tuote} other {# tuotetta}} ostoskorissa",
+    "description": "clicking it would expand/show the items in cart"
+  },
+  "order_summary.cart_items.link.edit_cart": {
+    "defaultMessage": "Muokkaa ostoskoria"
+  },
+  "order_summary.heading.order_summary": {
+    "defaultMessage": "Tilauksen yhteenveto"
+  },
+  "order_summary.label.estimated_total": {
+    "defaultMessage": "Arvioitu kokonaismäärä"
+  },
+  "order_summary.label.free": {
+    "defaultMessage": "Veloituksetta"
+  },
+  "order_summary.label.order_total": {
+    "defaultMessage": "Tilauksen loppusumma"
+  },
+  "order_summary.label.promo_applied": {
+    "defaultMessage": "Alennus lisätty"
+  },
+  "order_summary.label.promotions_applied": {
+    "defaultMessage": "Alennukset lisätty"
+  },
+  "order_summary.label.shipping": {
+    "defaultMessage": "Toimitus"
+  },
+  "order_summary.label.subtotal": {
+    "defaultMessage": "Yhteensä"
+  },
+  "order_summary.label.tax": {
+    "defaultMessage": "Verot"
+  },
+  "page_not_found.action.go_back": {
+    "defaultMessage": "Takaisin edelliselle sivulle"
+  },
+  "page_not_found.link.homepage": {
+    "defaultMessage": "Siirry kotisivulle"
+  },
+  "page_not_found.message.suggestion_to_try": {
+    "defaultMessage": "Yritä kirjoittaa osoite uudelleen, palata edelliselle sivulle tai siirtyä kotisivulle."
+  },
+  "page_not_found.title.page_cant_be_found": {
+    "defaultMessage": "Etsimääsi sivua ei löydy."
+  },
+  "pagination.field.num_of_pages": {
+    "defaultMessage": "/ {numOfPages}"
+  },
+  "pagination.field.page_number_select": {
+    "defaultMessage": "Valitse sivunumero"
+  },
+  "pagination.link.next": {
+    "defaultMessage": "Seuraava"
+  },
+  "pagination.link.next.assistive_msg": {
+    "defaultMessage": "Seuraava sivu"
+  },
+  "pagination.link.prev": {
+    "defaultMessage": "Edellinen"
+  },
+  "pagination.link.prev.assistive_msg": {
+    "defaultMessage": "Edellinen sivu"
+  },
+  "password_card.info.password_updated": {
+    "defaultMessage": "Salasana päivitetty"
+  },
+  "password_card.label.password": {
+    "defaultMessage": "Salasana"
+  },
+  "password_card.title.password": {
+    "defaultMessage": "Salasana"
+  },
+  "password_requirements.error.eight_letter_minimum": {
+    "defaultMessage": "Vähintään 8 merkkiä",
+    "description": "Password requirement"
+  },
+  "password_requirements.error.one_lowercase_letter": {
+    "defaultMessage": "1 pieni kirjain",
+    "description": "Password requirement"
+  },
+  "password_requirements.error.one_number": {
+    "defaultMessage": "1 numero",
+    "description": "Password requirement"
+  },
+  "password_requirements.error.one_special_character": {
+    "defaultMessage": "1 erikoismerkki (esimerkiksi , $ ! % #)",
+    "description": "Password requirement"
+  },
+  "password_requirements.error.one_uppercase_letter": {
+    "defaultMessage": "1 iso kirjain",
+    "description": "Password requirement"
+  },
+  "password_reset_success.toast": {
+    "defaultMessage": "Salasanan nollaus onnistui"
+  },
+  "payment_selection.heading.credit_card": {
+    "defaultMessage": "Luottokortti"
+  },
+  "payment_selection.radio_group.assistive_msg": {
+    "defaultMessage": "Maksu"
+  },
+  "payment_selection.tooltip.secure_payment": {
+    "defaultMessage": "Tämä on turvallinen SSL-salattu maksu."
+  },
+  "price_per_item.label.each": {
+    "defaultMessage": "kpl",
+    "description": "Abbreviated 'each', follows price per item, like $10/ea"
+  },
+  "product_detail.accordion.button.product_detail": {
+    "defaultMessage": "Tuotteen tiedot"
+  },
+  "product_detail.accordion.button.questions": {
+    "defaultMessage": "Kysymykset"
+  },
+  "product_detail.accordion.button.reviews": {
+    "defaultMessage": "Arvostelut"
+  },
+  "product_detail.accordion.button.size_fit": {
+    "defaultMessage": "Koko ja malli"
+  },
+  "product_detail.accordion.message.coming_soon": {
+    "defaultMessage": "Tulossa pian"
+  },
+  "product_detail.recommended_products.title.complete_set": {
+    "defaultMessage": "Täydennä setti"
+  },
+  "product_detail.recommended_products.title.might_also_like": {
+    "defaultMessage": "Saatat myös pitää näistä"
+  },
+  "product_detail.recommended_products.title.recently_viewed": {
+    "defaultMessage": "Viimeksi katsottu"
+  },
+  "product_item.label.quantity": {
+    "defaultMessage": "Määrä:"
+  },
+  "product_list.button.filter": {
+    "defaultMessage": "Suodatin"
+  },
+  "product_list.button.sort_by": {
+    "defaultMessage": "Lajitteluperuste: {sortOption}"
+  },
+  "product_list.drawer.title.sort_by": {
+    "defaultMessage": "Lajitteluperuste"
+  },
+  "product_list.modal.button.clear_filters": {
+    "defaultMessage": "Poista suodattimet"
+  },
+  "product_list.modal.button.view_items": {
+    "defaultMessage": "Näytä {prroductCount} tuotetta"
+  },
+  "product_list.modal.title.filter": {
+    "defaultMessage": "Suodatin"
+  },
+  "product_list.refinements.button.assistive_msg.add_filter": {
+    "defaultMessage": "Lisää suodatin: {label}"
+  },
+  "product_list.refinements.button.assistive_msg.add_filter_with_hit_count": {
+    "defaultMessage": "Lisää suodatin: {label} ({hitCount})"
+  },
+  "product_list.refinements.button.assistive_msg.remove_filter": {
+    "defaultMessage": "Poista suodatin: {label}"
+  },
+  "product_list.refinements.button.assistive_msg.remove_filter_with_hit_count": {
+    "defaultMessage": "Poista suodatin: {label} ({hitCount})"
+  },
+  "product_list.select.sort_by": {
+    "defaultMessage": "Lajitteluperuste: {sortOption}"
+  },
+  "product_list.sort_by.label.assistive_msg": {
+    "defaultMessage": "Tuotteiden lajitteluperuste"
+  },
+  "product_scroller.assistive_msg.scroll_left": {
+    "defaultMessage": "Selaa tuotteita vasemmalle"
+  },
+  "product_scroller.assistive_msg.scroll_right": {
+    "defaultMessage": "Selaa tuotteita oikealle"
+  },
+  "product_tile.assistive_msg.add_to_wishlist": {
+    "defaultMessage": "Lisää {product} toivelistalle"
+  },
+  "product_tile.assistive_msg.remove_from_wishlist": {
+    "defaultMessage": "Poista {product} toivelistalta"
+  },
+  "product_tile.badge.label.new": {
+    "defaultMessage": "Uusi"
+  },
+  "product_tile.badge.label.sale": {
+    "defaultMessage": "Ale"
+  },
+  "product_view.button.add_bundle_to_cart": {
+    "defaultMessage": "Lisää paketti ostoskoriin"
+  },
+  "product_view.button.add_bundle_to_wishlist": {
+    "defaultMessage": "Lisää paketti toivelistalle"
+  },
+  "product_view.button.add_set_to_cart": {
+    "defaultMessage": "Lisää setti ostoskoriin"
+  },
+  "product_view.button.add_set_to_wishlist": {
+    "defaultMessage": "Lisää setti toivelistalle"
+  },
+  "product_view.button.add_to_cart": {
+    "defaultMessage": "Lisää ostoskoriin"
+  },
+  "product_view.button.add_to_wishlist": {
+    "defaultMessage": "Lisää toivelistalle"
+  },
+  "product_view.button.update": {
+    "defaultMessage": "Päivitys"
+  },
+  "product_view.label.assistive_msg.quantity_decrement": {
+    "defaultMessage": "Vähennä tuotteen {productName} määrää"
+  },
+  "product_view.label.assistive_msg.quantity_increment": {
+    "defaultMessage": "Lisää tuotteen {productName} määrää"
+  },
+  "product_view.label.quantity": {
+    "defaultMessage": "Määrä"
+  },
+  "product_view.label.quantity_decrement": {
+    "defaultMessage": "-"
+  },
+  "product_view.label.quantity_increment": {
+    "defaultMessage": "+"
+  },
+  "product_view.label.variant_type": {
+    "defaultMessage": "{variantType}"
+  },
+  "product_view.link.full_details": {
+    "defaultMessage": "Katso kaikki tiedot"
+  },
+  "profile_card.info.profile_updated": {
+    "defaultMessage": "Profiili päivitetty"
+  },
+  "profile_card.label.email": {
+    "defaultMessage": "Sähköposti"
+  },
+  "profile_card.label.full_name": {
+    "defaultMessage": "Koko nimi"
+  },
+  "profile_card.label.phone": {
+    "defaultMessage": "Puhelinnumero"
+  },
+  "profile_card.message.not_provided": {
+    "defaultMessage": "Ei annettu"
+  },
+  "profile_card.title.my_profile": {
+    "defaultMessage": "Oma profiili"
+  },
+  "profile_fields.label.profile_form": {
+    "defaultMessage": "Profiililomake"
+  },
+  "promo_code_fields.button.apply": {
+    "defaultMessage": "Käytä"
+  },
+  "promo_popover.assistive_msg.info": {
+    "defaultMessage": "Tiedot"
+  },
+  "promo_popover.heading.promo_applied": {
+    "defaultMessage": "Alennukset lisätty"
+  },
+  "promocode.accordion.button.have_promocode": {
+    "defaultMessage": "Onko sinulla tarjouskoodi?"
+  },
+  "recent_searches.action.clear_searches": {
+    "defaultMessage": "Poista viimeisimmät haut"
+  },
+  "recent_searches.heading.recent_searches": {
+    "defaultMessage": "Viimeisimmät haut"
+  },
+  "register_form.action.sign_in": {
+    "defaultMessage": "Kirjaudu sisään"
+  },
+  "register_form.button.create_account": {
+    "defaultMessage": "Luo tili"
+  },
+  "register_form.heading.lets_get_started": {
+    "defaultMessage": "Aloitetaan!"
+  },
+  "register_form.message.agree_to_policy_terms": {
+    "defaultMessage": "Luomalla tilin hyväksyt Salesforcen <policy>tietosuojakäytännön</policy> ja <terms>ehdot</terms>"
+  },
+  "register_form.message.already_have_account": {
+    "defaultMessage": "Onko sinulla jo tili?"
+  },
+  "register_form.message.create_an_account": {
+    "defaultMessage": "Luo tili ja voit hyödyntää ensimmäisten joukossa parhaat tuotteet, inspiraation ja yhteisön."
+  },
+  "reset_password_form.action.sign_in": {
+    "defaultMessage": "Kirjaudu sisään"
+  },
+  "reset_password_form.button.reset_password": {
+    "defaultMessage": "Nollaa salasana"
+  },
+  "reset_password_form.message.enter_your_email": {
+    "defaultMessage": "Anna sähköpostiosoitteesi, niin saat ohjeet salasanasi nollaamiseen"
+  },
+  "reset_password_form.message.return_to_sign_in": {
+    "defaultMessage": "Tai palaa kohteeseen",
+    "description": "Precedes link to return to sign in"
+  },
+  "reset_password_form.title.reset_password": {
+    "defaultMessage": "Nollaa salasana"
+  },
+  "search.action.cancel": {
+    "defaultMessage": "Peruuta"
+  },
+  "selected_refinements.action.assistive_msg.clear_all": {
+    "defaultMessage": "Poista kaikki suodattimet"
+  },
+  "selected_refinements.action.clear_all": {
+    "defaultMessage": "Poista kaikki"
+  },
+  "shipping_address.button.continue_to_shipping": {
+    "defaultMessage": "Jatka lähetystapaan"
+  },
+  "shipping_address.label.edit_button": {
+    "defaultMessage": "Muokkaa: {address}"
+  },
+  "shipping_address.label.remove_button": {
+    "defaultMessage": "Poista {address}"
+  },
+  "shipping_address.label.shipping_address_form": {
+    "defaultMessage": "Toimitusosoitelomake"
+  },
+  "shipping_address.title.shipping_address": {
+    "defaultMessage": "Toimitusosoite"
+  },
+  "shipping_address_edit_form.button.save_and_continue": {
+    "defaultMessage": "Tallenna ja jatka lähetystapaan"
+  },
+  "shipping_address_form.heading.edit_address": {
+    "defaultMessage": "Muokkaa osoitetta"
+  },
+  "shipping_address_form.heading.new_address": {
+    "defaultMessage": "Lisää uusi osoite"
+  },
+  "shipping_address_selection.button.add_address": {
+    "defaultMessage": "Lisää uusi osoite"
+  },
+  "shipping_address_selection.button.submit": {
+    "defaultMessage": "Lähetä"
+  },
+  "shipping_address_selection.title.add_address": {
+    "defaultMessage": "Lisää uusi osoite"
+  },
+  "shipping_address_selection.title.edit_shipping": {
+    "defaultMessage": "Muokkaa toimitusosoitetta"
+  },
+  "shipping_options.action.send_as_a_gift": {
+    "defaultMessage": "Haluatko lähettää tämän lahjana?"
+  },
+  "shipping_options.button.continue_to_payment": {
+    "defaultMessage": "Jatka maksuun"
+  },
+  "shipping_options.title.shipping_gift_options": {
+    "defaultMessage": "Lähetys- ja lahjavaihtoehdot"
+  },
+  "signout_confirmation_dialog.button.cancel": {
+    "defaultMessage": "Peruuta"
+  },
+  "signout_confirmation_dialog.button.sign_out": {
+    "defaultMessage": "Kirjaudu ulos"
+  },
+  "signout_confirmation_dialog.heading.sign_out": {
+    "defaultMessage": "Kirjaudu ulos"
+  },
+  "signout_confirmation_dialog.message.sure_to_sign_out": {
+    "defaultMessage": "Haluatko varmasti kirjautua ulos? Sinun täytyy kirjautua takaisin sisään jatkaaksesi nykyistä tilaustasi."
+  },
+  "social_login_redirect.message.authenticating": {
+    "defaultMessage": "Todennetaan..."
+  },
+  "social_login_redirect.message.redirect_link": {
+    "defaultMessage": "Jos sinua ei ohjata eteenpäin automaattisesti, jatka valitsemalla <linkki>tämä linkki</linkki>."
+  },
+  "store_locator.action.find": {
+    "defaultMessage": "Etsi"
+  },
+  "store_locator.action.select_a_country": {
+    "defaultMessage": "Valitse maa"
+  },
+  "store_locator.action.use_my_location": {
+    "defaultMessage": "Käytä sijaintiani"
+  },
+  "store_locator.action.viewMore": {
+    "defaultMessage": "Näytä lisää"
+  },
+  "store_locator.description.away": {
+    "defaultMessage": "päässä"
+  },
+  "store_locator.description.loading_locations": {
+    "defaultMessage": "Kohteita ladataan..."
+  },
+  "store_locator.description.no_locations": {
+    "defaultMessage": "Valitettavasti tällä alueella ei ole kohteita"
+  },
+  "store_locator.description.or": {
+    "defaultMessage": "Tai"
+  },
+  "store_locator.description.phone": {
+    "defaultMessage": "Puhelin:"
+  },
+  "store_locator.description.viewing_near_postal_code": {
+    "defaultMessage": "Näytetään myymälät, jotka sijaitsevat {distance}{distanceUnit} säteellä osoitteessa {postalCode} kohteessa"
+  },
+  "store_locator.description.viewing_near_your_location": {
+    "defaultMessage": "Sijaintiasi lähellä olevat myymälät näytetään"
+  },
+  "store_locator.dropdown.germany": {
+    "defaultMessage": "Saksa"
+  },
+  "store_locator.dropdown.united_states": {
+    "defaultMessage": "Yhdysvallat"
+  },
+  "store_locator.error.agree_to_share_your_location": {
+    "defaultMessage": "Hyväksy sijaintisi jakaminen"
+  },
+  "store_locator.error.please_enter_a_postal_code": {
+    "defaultMessage": "Anna postinumero."
+  },
+  "store_locator.error.please_select_a_country": {
+    "defaultMessage": "Valitse maa."
+  },
+  "store_locator.field.placeholder.enter_postal_code": {
+    "defaultMessage": "Anna postinumero"
+  },
+  "store_locator.pagination.load_more": {
+    "defaultMessage": "Lataa lisää"
+  },
+  "store_locator.title": {
+    "defaultMessage": "Etsi myymälä"
+  },
+  "swatch_group.selected.label": {
+    "defaultMessage": "{label}:"
+  },
+  "toggle_card.action.edit": {
+    "defaultMessage": "Muokkaa"
+  },
+  "toggle_card.action.editContactInfo": {
+    "defaultMessage": "Muokkaa yhteystietoja"
+  },
+  "toggle_card.action.editPaymentInfo": {
+    "defaultMessage": "Muokkaa maksutietoja"
+  },
+  "toggle_card.action.editShippingAddress": {
+    "defaultMessage": "Muokkaa toimitusosoitetta"
+  },
+  "toggle_card.action.editShippingOptions": {
+    "defaultMessage": "Muokkaa lähetysvaihtoehtoja"
+  },
+  "update_password_fields.button.forgot_password": {
+    "defaultMessage": "Unohditko salasanan?"
+  },
+  "use_address_fields.error.please_enter_first_name": {
+    "defaultMessage": "Anna etunimesi."
+  },
+  "use_address_fields.error.please_enter_last_name": {
+    "defaultMessage": "Anna sukunimesi."
+  },
+  "use_address_fields.error.please_enter_phone_number": {
+    "defaultMessage": "Anna puhelinnumerosi."
+  },
+  "use_address_fields.error.please_enter_your_postal_or_zip": {
+    "defaultMessage": "Anna postinumerosi.",
+    "description": "Error message for a blank zip code (US-specific checkout)"
+  },
+  "use_address_fields.error.please_select_your_address": {
+    "defaultMessage": "Anna osoitteesi."
+  },
+  "use_address_fields.error.please_select_your_city": {
+    "defaultMessage": "Anna postitoimipaikkasi."
+  },
+  "use_address_fields.error.please_select_your_country": {
+    "defaultMessage": "Valitse maasi."
+  },
+  "use_address_fields.error.please_select_your_state_or_province": {
+    "defaultMessage": "Valitse osavaltiosi.",
+    "description": "Error message for a blank state (US-specific checkout)"
+  },
+  "use_address_fields.error.required": {
+    "defaultMessage": "Vaadittu"
+  },
+  "use_address_fields.error.state_code_invalid": {
+    "defaultMessage": "Anna 2-kirjaiminen osavaltio/provinssi."
+  },
+  "use_address_fields.label.address": {
+    "defaultMessage": "Osoite"
+  },
+  "use_address_fields.label.address_form": {
+    "defaultMessage": "Osoitelomake"
+  },
+  "use_address_fields.label.city": {
+    "defaultMessage": "Postitoimipaikka"
+  },
+  "use_address_fields.label.country": {
+    "defaultMessage": "Maa"
+  },
+  "use_address_fields.label.first_name": {
+    "defaultMessage": "Etunimi"
+  },
+  "use_address_fields.label.last_name": {
+    "defaultMessage": "Sukunimi"
+  },
+  "use_address_fields.label.phone": {
+    "defaultMessage": "Puhelin"
+  },
+  "use_address_fields.label.postal_code": {
+    "defaultMessage": "Postinumero"
+  },
+  "use_address_fields.label.preferred": {
+    "defaultMessage": "Aseta oletusarvoksi"
+  },
+  "use_address_fields.label.province": {
+    "defaultMessage": "Provinssi"
+  },
+  "use_address_fields.label.state": {
+    "defaultMessage": "Osavaltio"
+  },
+  "use_address_fields.label.zipCode": {
+    "defaultMessage": "Postinumero"
+  },
+  "use_credit_card_fields.error.required": {
+    "defaultMessage": "Vaadittu"
+  },
+  "use_credit_card_fields.error.required_card_number": {
+    "defaultMessage": "Anna korttisi numero."
+  },
+  "use_credit_card_fields.error.required_expiry": {
+    "defaultMessage": "Anna viimeinen voimassaolopäivämäärä."
+  },
+  "use_credit_card_fields.error.required_name": {
+    "defaultMessage": "Anna nimesi niin kuin se näkyy kortissasi."
+  },
+  "use_credit_card_fields.error.required_security_code": {
+    "defaultMessage": "Anna turvakoodisi."
+  },
+  "use_credit_card_fields.error.valid_card_number": {
+    "defaultMessage": "Anna kelvollinen kortin numero."
+  },
+  "use_credit_card_fields.error.valid_date": {
+    "defaultMessage": "Anna kelvollinen päivämäärä."
+  },
+  "use_credit_card_fields.error.valid_name": {
+    "defaultMessage": "Anna kelvollinen nimi."
+  },
+  "use_credit_card_fields.error.valid_security_code": {
+    "defaultMessage": "Anna kelvollinen turvakoodi."
+  },
+  "use_credit_card_fields.label.card_number": {
+    "defaultMessage": "Kortin numero"
+  },
+  "use_credit_card_fields.label.card_type": {
+    "defaultMessage": "Kortin tyyppi"
+  },
+  "use_credit_card_fields.label.expiry": {
+    "defaultMessage": "Viimeinen voimassaolopäivä"
+  },
+  "use_credit_card_fields.label.name": {
+    "defaultMessage": "Nimi kortissa"
+  },
+  "use_credit_card_fields.label.security_code": {
+    "defaultMessage": "Turvakoodi"
+  },
+  "use_login_fields.error.required_email": {
+    "defaultMessage": "Anna sähköpostiosoitteesi."
+  },
+  "use_login_fields.error.required_password": {
+    "defaultMessage": "Anna salasanasi."
+  },
+  "use_login_fields.label.email": {
+    "defaultMessage": "Sähköposti"
+  },
+  "use_login_fields.label.password": {
+    "defaultMessage": "Salasana"
+  },
+  "use_product.message.inventory_remaining": {
+    "defaultMessage": "Vain {stockLevel} jäljellä!"
+  },
+  "use_product.message.inventory_remaining_for_product": {
+    "defaultMessage": "Vain {stockLevel} tuotetta ({productName}) jäljellä!"
+  },
+  "use_product.message.out_of_stock": {
+    "defaultMessage": "Ei varastossa"
+  },
+  "use_product.message.out_of_stock_for_product": {
+    "defaultMessage": "{productName} ei varastossa"
+  },
+  "use_profile_fields.error.required_email": {
+    "defaultMessage": "Anna kelvollinen sähköpostiosoite."
+  },
+  "use_profile_fields.error.required_first_name": {
+    "defaultMessage": "Anna etunimesi."
+  },
+  "use_profile_fields.error.required_last_name": {
+    "defaultMessage": "Anna sukunimesi."
+  },
+  "use_profile_fields.error.required_phone": {
+    "defaultMessage": "Anna puhelinnumerosi."
+  },
+  "use_profile_fields.label.email": {
+    "defaultMessage": "Sähköposti"
+  },
+  "use_profile_fields.label.first_name": {
+    "defaultMessage": "Etunimi"
+  },
+  "use_profile_fields.label.last_name": {
+    "defaultMessage": "Sukunimi"
+  },
+  "use_profile_fields.label.phone": {
+    "defaultMessage": "Puhelinnumero"
+  },
+  "use_promo_code_fields.error.required_promo_code": {
+    "defaultMessage": "Anna kelvollinen tarjouskoodi."
+  },
+  "use_promo_code_fields.label.promo_code": {
+    "defaultMessage": "Tarjouskoodi"
+  },
+  "use_promocode.error.check_the_code": {
+    "defaultMessage": "Tarkista koodi ja yritä uudelleen, sitä on ehkä jo käytetty tai tarjous on vanhentunut."
+  },
+  "use_promocode.info.promo_applied": {
+    "defaultMessage": "Alennus lisätty"
+  },
+  "use_promocode.info.promo_removed": {
+    "defaultMessage": "Alennus poistettu"
+  },
+  "use_registration_fields.error.contain_number": {
+    "defaultMessage": "Salasanassa täytyy olla vähintään yksi numero."
+  },
+  "use_registration_fields.error.lowercase_letter": {
+    "defaultMessage": "Salasanassa täytyy olla vähintään yksi pieni kirjain."
+  },
+  "use_registration_fields.error.minimum_characters": {
+    "defaultMessage": "Salasanassa täytyy olla vähintään 8 merkkiä."
+  },
+  "use_registration_fields.error.required_email": {
+    "defaultMessage": "Anna kelvollinen sähköpostiosoite."
+  },
+  "use_registration_fields.error.required_first_name": {
+    "defaultMessage": "Anna etunimesi."
+  },
+  "use_registration_fields.error.required_last_name": {
+    "defaultMessage": "Anna sukunimesi."
+  },
+  "use_registration_fields.error.required_password": {
+    "defaultMessage": "Luo salasana."
+  },
+  "use_registration_fields.error.special_character": {
+    "defaultMessage": "Salasanassa täytyy olla vähintään yksi erikoismerkki."
+  },
+  "use_registration_fields.error.uppercase_letter": {
+    "defaultMessage": "Salasanassa täytyy olla vähintään yksi iso kirjain."
+  },
+  "use_registration_fields.label.email": {
+    "defaultMessage": "Sähköposti"
+  },
+  "use_registration_fields.label.first_name": {
+    "defaultMessage": "Etunimi"
+  },
+  "use_registration_fields.label.last_name": {
+    "defaultMessage": "Sukunimi"
+  },
+  "use_registration_fields.label.password": {
+    "defaultMessage": "Salasana"
+  },
+  "use_registration_fields.label.sign_up_to_emails": {
+    "defaultMessage": "Haluan tilata Salesforcen sähköpostiviestit (voit peruuttaa tilauksen milloin tahansa)"
+  },
+  "use_reset_password_fields.error.required_email": {
+    "defaultMessage": "Anna kelvollinen sähköpostiosoite."
+  },
+  "use_reset_password_fields.label.email": {
+    "defaultMessage": "Sähköposti"
+  },
+  "use_update_password_fields.error.contain_number": {
+    "defaultMessage": "Salasanassa täytyy olla vähintään yksi numero."
+  },
+  "use_update_password_fields.error.lowercase_letter": {
+    "defaultMessage": "Salasanassa täytyy olla vähintään yksi pieni kirjain."
+  },
+  "use_update_password_fields.error.minimum_characters": {
+    "defaultMessage": "Salasanassa täytyy olla vähintään 8 merkkiä."
+  },
+  "use_update_password_fields.error.password_mismatch": {
+    "defaultMessage": "Salasanat eivät täsmää."
+  },
+  "use_update_password_fields.error.required_confirm_password": {
+    "defaultMessage": "Vahvista salasanasi."
+  },
+  "use_update_password_fields.error.required_new_password": {
+    "defaultMessage": "Anna uusi salasana."
+  },
+  "use_update_password_fields.error.required_password": {
+    "defaultMessage": "Anna salasanasi."
+  },
+  "use_update_password_fields.error.special_character": {
+    "defaultMessage": "Salasanassa täytyy olla vähintään yksi erikoismerkki."
+  },
+  "use_update_password_fields.error.uppercase_letter": {
+    "defaultMessage": "Salasanassa täytyy olla vähintään yksi iso kirjain."
+  },
+  "use_update_password_fields.label.confirm_new_password": {
+    "defaultMessage": "Vahvista uusi salasana"
+  },
+  "use_update_password_fields.label.current_password": {
+    "defaultMessage": "Nykyinen salasana"
+  },
+  "use_update_password_fields.label.new_password": {
+    "defaultMessage": "Uusi salasana"
+  },
+  "wishlist_primary_action.button.addSetToCart.label": {
+    "defaultMessage": "Lisää {productName} setti ostoskoriin"
+  },
+  "wishlist_primary_action.button.addToCart.label": {
+    "defaultMessage": "Lisää {productName} ostoskoriin"
+  },
+  "wishlist_primary_action.button.add_set_to_cart": {
+    "defaultMessage": "Lisää setti ostoskoriin"
+  },
+  "wishlist_primary_action.button.add_to_cart": {
+    "defaultMessage": "Lisää ostoskoriin"
+  },
+  "wishlist_primary_action.button.viewFullDetails.label": {
+    "defaultMessage": "Näytä kaikki tiedot tuotteesta {productName}"
+  },
+  "wishlist_primary_action.button.view_full_details": {
+    "defaultMessage": "Näytä kaikki tiedot"
+  },
+  "wishlist_primary_action.button.view_options": {
+    "defaultMessage": "Näytä vaihtoehdot"
+  },
+  "wishlist_primary_action.button.view_options.label": {
+    "defaultMessage": "Näytä vaihtoehdot tuotteelle {productName}"
+  },
+  "wishlist_primary_action.info.added_to_cart": {
+    "defaultMessage": "{quantity} {quantity, plural, one {tuote} other {tuotetta}} lisätty ostoskoriin"
+  },
+  "wishlist_secondary_button_group.action.remove": {
+    "defaultMessage": "Poista"
+  },
+  "wishlist_secondary_button_group.info.item.remove.label": {
+    "defaultMessage": "Poista {productName}"
+  },
+  "wishlist_secondary_button_group.info.item_removed": {
+    "defaultMessage": "Tuote poistettu toivelistalta"
+  },
+  "with_registration.info.please_sign_in": {
+    "defaultMessage": "Kirjaudu sisään jatkaaksesi!"
+  }
+}

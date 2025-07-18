@@ -7,7 +7,7 @@
 import React from 'react'
 import {renderWithProviders} from '../../utils/test-utils'
 import {useForm} from 'react-hook-form'
-import LoginFields from './login-fields'
+import LoginFields from '../../components/forms/login-fields'
 import {screen} from '@testing-library/react'
 
 const WrapperComponent = ({...props}) => {

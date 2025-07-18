@@ -8,25 +8,25 @@
 import React, {Fragment} from 'react'
 import PropTypes from 'prop-types'
 import {FormattedMessage} from 'react-intl'
-import {Alert, Button, Stack, Text, Link as ChakraLink} from '@chakra-ui/react'
-import {AlertIcon, BrandLogo} from '../icons'
+import {Alert, Button, Stack, Text} from '@chakra-ui/react'
+import {AlertIcon, BrandLogo} from '../../components/icons'
 import {noop} from '../../utils/utils'
-import RegistrationFields from '../forms/registration-fields'
-import Link from '../link'
+import RegistrationFields from '../../components/forms/registration-fields'
+import Link from '../../components/link'
 
 const RegisterForm = ({submitForm, clickSignIn = noop, form}) => {
     return (
         <Fragment>
-            <Stack justify="center" align="center" spacing={8}>
+            <Stack justifyContent="center" alignItems="center" gap={8}>
                 <BrandLogo width="60px" height="auto" />
-                <Stack spacing={2}>
-                    <Text align="center" fontSize="xl" fontWeight="semibold">
+                <Stack gap={2}>
+                    <Text textAlign="center" fontSize="xl" fontWeight="semibold">
                         <FormattedMessage
                             defaultMessage="Let's get started!"
                             id="register_form.heading.lets_get_started"
                         />
                     </Text>
-                    <Text fontSize="sm" align="center" color="gray.700">
+                    <Text fontSize="sm" textAlign="center" color="gray.700">
                         <FormattedMessage
                             defaultMessage="Create an account and get first access to the very best products, inspiration and community."
                             id="register_form.message.create_an_account"
@@ -38,21 +38,23 @@ const RegisterForm = ({submitForm, clickSignIn = noop, form}) => {
                 onSubmit={form.handleSubmit(submitForm)}
                 data-testid="sf-auth-modal-form-register"
             >
-                <Stack paddingTop={8} spacing={8} paddingLeft={4} paddingRight={4}>
+                <Stack paddingTop={8} gap={8} paddingLeft={4} paddingRight={4}>
                     {form.formState.errors?.global && (
-                        <Alert status="error">
-                            <AlertIcon color="red.500" boxSize={4} />
-                            <Text fontSize="sm" ml={3}>
+                        <Alert.Root status="error">
+                            <Alert.Indicator>
+                                <AlertIcon color="red.500" boxSize={4} />
+                            </Alert.Indicator>
+                            <Alert.Description>
                                 {form.formState.errors.global.message}
-                            </Text>
-                        </Alert>
+                            </Alert.Description>
+                        </Alert.Root>
                     )}
                     <RegistrationFields form={form} />
-                    <Stack spacing={6}>
+                    <Stack gap={6}>
                         <Button
                             type="submit"
                             onClick={() => form.clearErrors('global')}
-                            isLoading={form.formState.isSubmitting}
+                            loading={form.formState.isSubmitting}
                         >
                             <FormattedMessage
                                 defaultMessage="Create Account"
@@ -60,14 +62,19 @@ const RegisterForm = ({submitForm, clickSignIn = noop, form}) => {
                             />
                         </Button>
 
-                        <Stack direction="row" spacing={1} justify="center">
+                        <Stack direction="row" gap={1} justifyContent="center">
                             <Text fontSize="sm">
                                 <FormattedMessage
                                     defaultMessage="Already have an account?"
                                     id="register_form.message.already_have_account"
                                 />
                             </Text>
-                            <Button variant="link" size="sm" onClick={clickSignIn}>
+                            <Button
+                                variant="link-blue"
+                                size="sm"
+                                lineHeight="1"
+                                onClick={clickSignIn}
+                            >
                                 <FormattedMessage
                                     defaultMessage="Sign in"
                                     id="register_form.action.sign_in"
@@ -75,25 +82,21 @@ const RegisterForm = ({submitForm, clickSignIn = noop, form}) => {
                             </Button>
                         </Stack>
 
-                        <Text fontSize="sm" align="center">
+                        <Text fontSize="sm" textAlign="center">
                             <FormattedMessage
                                 id="register_form.message.agree_to_policy_terms"
                                 defaultMessage="By creating an account, you agree to Salesforce <policy>Privacy Policy</policy> and <terms>Terms & Conditions</terms>"
                                 values={{
                                     policy: (chunks) => (
-                                        <ChakraLink as={Link} to="/privacy-policy" color="blue.600">
+                                        <Link to="/privacy-policy" color="blue.600">
                                             {chunks}
-                                        </ChakraLink>
+                                        </Link>
                                     ),
 
                                     terms: (chunks) => (
-                                        <ChakraLink
-                                            as={Link}
-                                            to="/terms-conditions"
-                                            color="blue.600"
-                                        >
+                                        <Link to="/terms-conditions" color="blue.600">
                                             {chunks}
-                                        </ChakraLink>
+                                        </Link>
                                     )
                                 }}
                             />

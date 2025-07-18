@@ -7,27 +7,18 @@
 
 import React, {useState, useRef} from 'react'
 import PropTypes from 'prop-types'
-import {
-    Modal,
-    ModalBody,
-    ModalCloseButton,
-    ModalContent,
-    ModalOverlay,
-    Flex,
-    Box,
-    VStack,
-    useBreakpointValue
-} from '@chakra-ui/react'
-import ProductView from '../product-view'
+import {Dialog, Flex, Box, VStack, useBreakpointValue} from '@chakra-ui/react'
 import {keepPreviousData} from '@tanstack/react-query'
+import ProductView from '../../components/product-view'
 import {useProductViewModal} from '../../hooks/use-product-view-modal'
+import SafePortal from '../safe-portal'
 import {useProducts} from '@salesforce/commerce-sdk-react'
-import ImageGallery, {Skeleton as ImageGallerySkeleton} from '../image-gallery'
+import ImageGallery, {Skeleton as ImageGallerySkeleton} from '../../components/image-gallery'
 import {useDerivedProduct} from '../../hooks'
 import {useIntl} from 'react-intl'
 
 /**
- * A Modal that contains Product View for product bundle
+ * A Dialog that contains Product View for product bundle
  */
 const BundleProductViewModal = ({product: bundle, isOpen, onClose, updateCart, ...props}) => {
     const productViewModalData = useProductViewModal(bundle)
@@ -66,97 +57,122 @@ const BundleProductViewModal = ({product: bundle, isOpen, onClose, updateCart, .
     )
 
     return (
-        <Modal size="4xl" isOpen={isOpen} onClose={onClose}>
-            <ModalOverlay />
-            <ModalContent containerProps={{'data-testid': 'product-view-modal'}} aria-label={label}>
-                <ModalCloseButton />
-                <ModalBody pb={8} bg="white" paddingBottom={6} marginTop={6}>
-                    <Flex direction={['column', 'column', 'column', 'row']}>
-                        {/* Due to desktop layout, we'll need to render the image gallery separately, from outside the ProductView */}
-                        <Box
-                            flex={1}
-                            mr={[0, 0, 0, 6, 6]}
-                            display={['none', 'none', 'none', 'block']}
-                        >
-                            {bundle ? (
-                                <>
-                                    <ImageGallery
-                                        size="sm"
-                                        imageGroups={bundle.imageGroups}
-                                        selectedVariationAttributes={variationParams}
-                                    />
-                                </>
-                            ) : (
-                                <ImageGallerySkeleton />
-                            )}
-                        </Box>
+        <Dialog.Root
+            open={isOpen}
+            onOpenChange={() => onClose()}
+            size="4xl"
+            closeOnInteractOutside={false}
+        >
+            <SafePortal>
+                <Dialog.Backdrop />
+                <Dialog.Positioner>
+                    <Dialog.Content data-testid="product-view-modal" aria-label={label}>
+                        <Dialog.CloseTrigger />
+                        <Dialog.Body pb={8} bg="white" paddingBottom={6} marginTop={6}>
+                            <Flex direction={['column', 'column', 'column', 'row']}>
+                                {/* Due to desktop layout, we'll need to render the image gallery separately, from outside the ProductView */}
+                                <Box
+                                    flex={1}
+                                    mr={[0, 0, 0, 6, 6]}
+                                    display={['none', 'none', 'none', 'block']}
+                                >
+                                    {bundle ? (
+                                        <>
+                                            <ImageGallery
+                                                size="sm"
+                                                imageGroups={bundle.imageGroups}
+                                                selectedVariationAttributes={variationParams}
+                                            />
+                                        </>
+                                    ) : (
+                                        <ImageGallerySkeleton />
+                                    )}
+                                </Box>
 
-                        <VStack align="stretch" flex={1}>
-                            {/* Parent product */}
-                            <Box marginBottom={6}>
-                                <ProductView
-                                    showFullLink={false}
-                                    showImageGallery={trueIfMobile}
-                                    product={productViewModalData.product}
-                                    isLoading={productViewModalData.isFetching}
-                                    updateCart={(product, quantity) =>
-                                        updateCart(product, quantity, selectedChildProducts)
-                                    }
-                                    validateOrderability={() => {
-                                        return Object.values(childProductRefs.current).every(
-                                            ({validateOrderability}) => validateOrderability()
-                                        )
-                                    }}
-                                    childProductOrderability={childProductOrderability}
-                                    setSelectedBundleQuantity={setSelectedBundleQuantity}
-                                    {...props}
-                                />
-                            </Box>
-
-                            {childProducts &&
-                                childProducts.data.map((_product, i) => {
-                                    const product = {
-                                        ..._product,
-                                        ...productViewModalData.product.bundledProductItems[i]
-                                    }
-                                    const quantityPerBundle = product.quantity / bundle.quantity
-
-                                    return (
+                                <VStack align="stretch" flex={1}>
+                                    {/* Parent product */}
+                                    <Box marginBottom={6}>
                                         <ProductView
-                                            key={i}
-                                            // Do not use an arrow function as we are manipulating the functions scope.
-                                            ref={function (ref) {
-                                                // Assign the "set" scope of the ref, this is how we access the internal validation.
-                                                childProductRefs.current[product.itemId] = {
-                                                    ref,
-                                                    validateOrderability: this.validateOrderability
-                                                }
-                                            }}
-                                            showImageGallery={false}
-                                            isProductPartOfBundle={true}
                                             showFullLink={false}
-                                            product={product}
-                                            isLoading={isLoading}
-                                            setChildProductOrderability={
-                                                setChildProductOrderability
+                                            showImageGallery={trueIfMobile}
+                                            product={productViewModalData.product}
+                                            isLoading={productViewModalData.isFetching}
+                                            updateCart={(product, quantity) =>
+                                                updateCart(product, quantity, selectedChildProducts)
                                             }
-                                            childOfBundleQuantity={quantityPerBundle}
-                                            selectedBundleParentQuantity={selectedBundleQuantity}
-                                            onVariantSelected={(product, variant, quantity) => {
-                                                setSelectedChildProducts((prev) => {
-                                                    const newArray = prev.slice(0)
-                                                    newArray[i] = {product, variant, quantity}
-                                                    return newArray
-                                                })
+                                            validateOrderability={() => {
+                                                return Object.values(
+                                                    childProductRefs.current
+                                                ).every(({validateOrderability}) =>
+                                                    validateOrderability()
+                                                )
                                             }}
+                                            childProductOrderability={childProductOrderability}
+                                            setSelectedBundleQuantity={setSelectedBundleQuantity}
+                                            {...props}
                                         />
-                                    )
-                                })}
-                        </VStack>
-                    </Flex>
-                </ModalBody>
-            </ModalContent>
-        </Modal>
+                                    </Box>
+
+                                    {childProducts &&
+                                        childProducts.data.map((_product, i) => {
+                                            const product = {
+                                                ..._product,
+                                                ...productViewModalData.product.bundledProductItems[
+                                                    i
+                                                ]
+                                            }
+                                            const quantityPerBundle =
+                                                product.quantity / bundle.quantity
+
+                                            return (
+                                                <ProductView
+                                                    key={i}
+                                                    // Do not use an arrow function as we are manipulating the functions scope.
+                                                    ref={function (ref) {
+                                                        // Assign the "set" scope of the ref, this is how we access the internal validation.
+                                                        childProductRefs.current[product.itemId] = {
+                                                            ref,
+                                                            validateOrderability:
+                                                                this.validateOrderability
+                                                        }
+                                                    }}
+                                                    showImageGallery={false}
+                                                    isProductPartOfBundle={true}
+                                                    showFullLink={false}
+                                                    product={product}
+                                                    isLoading={isLoading}
+                                                    setChildProductOrderability={
+                                                        setChildProductOrderability
+                                                    }
+                                                    childOfBundleQuantity={quantityPerBundle}
+                                                    selectedBundleParentQuantity={
+                                                        selectedBundleQuantity
+                                                    }
+                                                    onVariantSelected={(
+                                                        product,
+                                                        variant,
+                                                        quantity
+                                                    ) => {
+                                                        setSelectedChildProducts((prev) => {
+                                                            const newArray = prev.slice(0)
+                                                            newArray[i] = {
+                                                                product,
+                                                                variant,
+                                                                quantity
+                                                            }
+                                                            return newArray
+                                                        })
+                                                    }}
+                                                />
+                                            )
+                                        })}
+                                </VStack>
+                            </Flex>
+                        </Dialog.Body>
+                    </Dialog.Content>
+                </Dialog.Positioner>
+            </SafePortal>
+        </Dialog.Root>
     )
 }
 

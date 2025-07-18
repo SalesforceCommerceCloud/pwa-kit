@@ -35,7 +35,7 @@ const AddressFields = ({
 
     return (
         <Stack
-            spacing={5}
+            gap={5}
             aria-label={intl.formatMessage(formTitleAriaLabel)}
             tabIndex="0"
             ref={addressFormRef}

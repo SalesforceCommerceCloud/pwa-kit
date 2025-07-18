@@ -7,13 +7,14 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import {Modal, ModalBody, ModalCloseButton, ModalContent, ModalOverlay} from '@chakra-ui/react'
-import ProductView from '../product-view'
+import {Dialog, CloseButton} from '@chakra-ui/react'
+import ProductView from '../../components/product-view'
 import {useProductViewModal} from '../../hooks/use-product-view-modal'
+import SafePortal from '../safe-portal'
 import {useIntl} from 'react-intl'
 
 /**
- * A Modal that contains Product View
+ * A Dialog that contains Product View
  */
 const ProductViewModal = ({product, isOpen, onClose, ...props}) => {
     const productViewModalData = useProductViewModal(product)
@@ -26,23 +27,35 @@ const ProductViewModal = ({product, isOpen, onClose, ...props}) => {
         },
         {productName: productViewModalData?.product?.name}
     )
-
     return (
-        <Modal size="4xl" isOpen={isOpen} onClose={onClose}>
-            <ModalOverlay />
-            <ModalContent containerProps={{'data-testid': 'product-view-modal'}} aria-label={label}>
-                <ModalCloseButton />
-                <ModalBody pb={8} bg="white" paddingBottom={6} marginTop={6}>
-                    <ProductView
-                        showFullLink={true}
-                        imageSize="sm"
-                        product={productViewModalData.product}
-                        isLoading={productViewModalData.isFetching}
-                        {...props}
-                    />
-                </ModalBody>
-            </ModalContent>
-        </Modal>
+        <Dialog.Root
+            lazyMount
+            open={isOpen}
+            onOpenChange={() => onClose()}
+            size="xl"
+            closeOnInteractOutside={false}
+        >
+            <SafePortal>
+                <Dialog.Backdrop />
+                <Dialog.Positioner>
+                    <Dialog.Content data-testid="product-view-modal" aria-label={label}>
+                        <Dialog.CloseTrigger />
+                        <Dialog.Body pb={8} bg="white" paddingBottom={6} marginTop={6}>
+                            <ProductView
+                                showFullLink={true}
+                                imageSize="sm"
+                                product={productViewModalData.product}
+                                isLoading={productViewModalData.isFetching}
+                                {...props}
+                            />
+                        </Dialog.Body>
+                        <Dialog.CloseTrigger asChild>
+                            <CloseButton size="sm" />
+                        </Dialog.CloseTrigger>
+                    </Dialog.Content>
+                </Dialog.Positioner>
+            </SafePortal>
+        </Dialog.Root>
     )
 }
 

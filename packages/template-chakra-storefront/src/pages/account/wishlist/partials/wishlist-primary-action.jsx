@@ -9,7 +9,7 @@ import {Button, useDisclosure} from '@chakra-ui/react'
 import {FormattedMessage, useIntl} from 'react-intl'
 import {useItemVariant} from '../../../../components/item-variant'
 import ProductViewModal from '../../../../components/product-view-modal'
-import {useToast} from '../../../../hooks/use-toast'
+import useToast from '../../../../hooks/use-toast'
 import {API_ERROR_MESSAGE} from '../../../../../config/constants'
 import Link from '../../../../components/link'
 import {useShopperBasketsMutationHelper} from '@salesforce/commerce-sdk-react'
@@ -26,9 +26,9 @@ const WishlistPrimaryAction = () => {
     const isMasterProduct = variant?.type?.master || false
     const isProductASet = variant?.type?.set
     const isProductABundle = variant?.type?.bundle
-    const showToast = useToast()
+    const toast = useToast()
     const [isLoading, setIsLoading] = useState(false)
-    const {isOpen, onOpen, onClose} = useDisclosure()
+    const {open, onOpen, onClose} = useDisclosure()
 
     const handleAddToCart = async (item, quantity) => {
         setIsLoading(true)
@@ -50,7 +50,7 @@ const WishlistPrimaryAction = () => {
 
         try {
             await addItemToNewOrExistingBasket(productItems)
-            showToast({
+            toast({
                 title: formatMessage(
                     {
                         defaultMessage:
@@ -59,13 +59,13 @@ const WishlistPrimaryAction = () => {
                     },
                     {quantity: isAddingASet ? quantity * item.setProducts.length : quantity}
                 ),
-                status: 'success'
+                type: 'success'
             })
             onClose()
         } catch (e) {
-            showToast({
+            toast({
                 title: formatMessage(API_ERROR_MESSAGE),
-                status: 'error'
+                type: 'error'
             })
         } finally {
             setIsLoading(false)
@@ -103,10 +103,10 @@ const WishlistPrimaryAction = () => {
         if (variant.setProducts?.every((child) => !hasVariants(child))) {
             return (
                 <Button
-                    variant={'solid'}
+                    variant="solid"
                     onClick={() => handleAddToCart(variant, variant.quantity)}
-                    w={'full'}
-                    isLoading={isLoading}
+                    size="md"
+                    loading={isLoading}
                     aria-label={formatMessage(
                         {
                             id: 'wishlist_primary_action.button.addSetToCart.label',
@@ -121,10 +121,9 @@ const WishlistPrimaryAction = () => {
         } else {
             return (
                 <Button
-                    as={Link}
-                    href={`/product/${variant.id}`}
-                    w={'full'}
-                    variant={'solid'}
+                    asChild
+                    size="md"
+                    variant="solid"
                     _hover={{textDecoration: 'none'}}
                     aria-label={formatMessage(
                         {
@@ -134,17 +133,16 @@ const WishlistPrimaryAction = () => {
                         {productName: variant.name}
                     )}
                 >
-                    {buttonText.viewFullDetails}
+                    <Link href={`/product/${variant.id}`}>{buttonText.viewFullDetails}</Link>
                 </Button>
             )
         }
     } else if (isProductABundle) {
         return (
             <Button
-                as={Link}
-                href={`/product/${variant.id}`}
-                w={'full'}
-                variant={'solid'}
+                asChild
+                size="md"
+                variant="solid"
                 _hover={{textDecoration: 'none'}}
                 aria-label={formatMessage(
                     {
@@ -154,7 +152,7 @@ const WishlistPrimaryAction = () => {
                     {productName: variant.name}
                 )}
             >
-                {buttonText.viewFullDetails}
+                <Link href={`/product/${variant.id}`}>{buttonText.viewFullDetails}</Link>
             </Button>
         )
     } else {
@@ -169,15 +167,17 @@ const WishlistPrimaryAction = () => {
                             },
                             {productName: variant.name}
                         )}
-                        w={'full'}
-                        variant={'solid'}
-                        onClick={onOpen}
+                        size="md"
+                        variant="solid"
+                        onClick={() => {
+                            onOpen()
+                        }}
                     >
                         {buttonText.viewOptions}
                     </Button>
-                    {isOpen && (
+                    {open && (
                         <ProductViewModal
-                            isOpen={isOpen}
+                            isOpen={open}
                             onOpen={onOpen}
                             onClose={onClose}
                             product={variant}
@@ -189,10 +189,10 @@ const WishlistPrimaryAction = () => {
         } else {
             return (
                 <Button
-                    variant={'solid'}
+                    variant="solid"
                     onClick={() => handleAddToCart(variant, variant.quantity)}
-                    w={'full'}
-                    isLoading={isLoading}
+                    size="md"
+                    loading={isLoading}
                     aria-label={formatMessage(
                         {
                             id: 'wishlist_primary_action.button.addToCart.label',

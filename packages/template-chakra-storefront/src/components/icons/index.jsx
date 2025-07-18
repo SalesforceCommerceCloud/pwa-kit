@@ -7,70 +7,70 @@
 import React, {forwardRef, useContext} from 'react'
 import {defineMessage, IntlContext} from 'react-intl'
 import PropTypes from 'prop-types'
-import {Icon, useTheme} from '@chakra-ui/react'
+import {Icon, useRecipe} from '@chakra-ui/react'
 
 // Our own SVG imports. These will be extracted to a single sprite sheet by the
 // svg-sprite-loader webpack plugin at build time and injected in the <body> tag
 // during SSR.
 // NOTE: Another solution would be to use `require-context.macro` package to accomplish
 // importing icon svg's.
-import '/assets/svg/account.svg'
-import '/assets/svg/alert.svg'
-import '/assets/svg/apple.svg'
-import '/assets/svg/basket.svg'
-import '/assets/svg/check.svg'
-import '/assets/svg/check-circle.svg'
-import '/assets/svg/chevron-up.svg'
-import '/assets/svg/chevron-down.svg'
-import '/assets/svg/chevron-right.svg'
-import '/assets/svg/chevron-left.svg'
-import '/assets/svg/chevron-right.svg'
-import '/assets/svg/chevron-up.svg'
-import '/assets/svg/dashboard.svg'
-import '/assets/svg/figma-logo.svg'
-import '/assets/svg/filter.svg'
-import '/assets/svg/file.svg'
-import '/assets/svg/flag-ca.svg'
-import '/assets/svg/flag-us.svg'
-import '/assets/svg/flag-gb.svg'
-import '/assets/svg/flag-fr.svg'
-import '/assets/svg/flag-it.svg'
-import '/assets/svg/flag-cn.svg'
-import '/assets/svg/flag-jp.svg'
-import '/assets/svg/github-logo.svg'
-import '/assets/svg/google.svg'
-import '/assets/svg/hamburger.svg'
-import '/assets/svg/info.svg'
-import '/assets/svg/social-facebook.svg'
-import '/assets/svg/social-instagram.svg'
-import '/assets/svg/social-twitter.svg'
-import '/assets/svg/social-youtube.svg'
-import '/assets/svg/store.svg'
-import '/assets/svg/like.svg'
-import '/assets/svg/lock.svg'
-import '/assets/svg/plug.svg'
-import '/assets/svg/plus.svg'
-import '/assets/svg/receipt.svg'
-import '/assets/svg/search.svg'
-import '/assets/svg/signout.svg'
-import '/assets/svg/user.svg'
-import '/assets/svg/visibility.svg'
-import '/assets/svg/visibility-off.svg'
-import '/assets/svg/heart.svg'
-import '/assets/svg/heart-solid.svg'
-import '/assets/svg/close.svg'
+import '../../../assets/svg/account.svg'
+import '../../../assets/svg/alert.svg'
+import '../../../assets/svg/apple.svg'
+import '../../../assets/svg/basket.svg'
+import '../../../assets/svg/check.svg'
+import '../../../assets/svg/check-circle.svg'
+import '../../../assets/svg/chevron-up.svg'
+import '../../../assets/svg/chevron-down.svg'
+import '../../../assets/svg/chevron-right.svg'
+import '../../../assets/svg/chevron-left.svg'
+import '../../../assets/svg/chevron-right.svg'
+import '../../../assets/svg/chevron-up.svg'
+import '../../../assets/svg/dashboard.svg'
+import '../../../assets/svg/figma-logo.svg'
+import '../../../assets/svg/filter.svg'
+import '../../../assets/svg/file.svg'
+import '../../../assets/svg/flag-ca.svg'
+import '../../../assets/svg/flag-us.svg'
+import '../../../assets/svg/flag-gb.svg'
+import '../../../assets/svg/flag-fr.svg'
+import '../../../assets/svg/flag-it.svg'
+import '../../../assets/svg/flag-cn.svg'
+import '../../../assets/svg/flag-jp.svg'
+import '../../../assets/svg/github-logo.svg'
+import '../../../assets/svg/google.svg'
+import '../../../assets/svg/hamburger.svg'
+import '../../../assets/svg/info.svg'
+import '../../../assets/svg/social-facebook.svg'
+import '../../../assets/svg/social-instagram.svg'
+import '../../../assets/svg/social-twitter.svg'
+import '../../../assets/svg/social-youtube.svg'
+import '../../../assets/svg/store.svg'
+import '../../../assets/svg/like.svg'
+import '../../../assets/svg/lock.svg'
+import '../../../assets/svg/plug.svg'
+import '../../../assets/svg/plus.svg'
+import '../../../assets/svg/receipt.svg'
+import '../../../assets/svg/search.svg'
+import '../../../assets/svg/signout.svg'
+import '../../../assets/svg/user.svg'
+import '../../../assets/svg/visibility.svg'
+import '../../../assets/svg/visibility-off.svg'
+import '../../../assets/svg/heart.svg'
+import '../../../assets/svg/heart-solid.svg'
+import '../../../assets/svg/close.svg'
 
 // For non-square SVGs, we can use the symbol data from the import to set the
 // proper viewBox attribute on the Icon wrapper.
-import AmexSymbol from '/assets/svg/cc-amex.svg'
-import BrandLogoSymbol from '/assets/svg/brand-logo.svg'
-import CVVSymbol from '/assets/svg/cc-cvv.svg'
-import DiscoverSymbol from '/assets/svg/cc-discover.svg'
-import LocationSymbol from '/assets/svg/location.svg'
-import MastercardSymbol from '/assets/svg/cc-mastercard.svg'
-import PaypalSymbol from '/assets/svg/paypal.svg'
-import SocialPinterestSymbol from '/assets/svg/social-pinterest.svg'
-import VisaSymbol from '/assets/svg/cc-visa.svg'
+import AmexSymbol from '../../../assets/svg/cc-amex.svg'
+import BrandLogoSymbol from '../../../assets/svg/brand-logo.svg'
+import CVVSymbol from '../../../assets/svg/cc-cvv.svg'
+import DiscoverSymbol from '../../../assets/svg/cc-discover.svg'
+import LocationSymbol from '../../../assets/svg/location.svg'
+import MastercardSymbol from '../../../assets/svg/cc-mastercard.svg'
+import PaypalSymbol from '../../../assets/svg/paypal.svg'
+import SocialPinterestSymbol from '../../../assets/svg/social-pinterest.svg'
+import VisaSymbol from '../../../assets/svg/cc-visa.svg'
 
 // TODO: We're hardcoding the `viewBox` for these imported SVGs temporarily as the
 // SVG loader plugin is not properly providing us the symbol data on the client side.
@@ -100,10 +100,11 @@ export const icon = (name, passProps, localizationAttributes) => {
         .replace(/(?:^|[\s-/])\w/g, (match) => match.toUpperCase())
         .replace(/-/g, '')
     const component = forwardRef((props, ref) => {
-        const theme = useTheme()
         // NOTE: We want to avoid `useIntl` here because that throws when <IntlProvider> is not in
         // the component ancestry, but we only enforce `intl` if we have `localizationAttributes`.
         let intl = useContext(IntlContext)
+        const recipe = useRecipe({key: 'icon'})
+        const baseStyles = recipe()
         if (localizationAttributes) {
             if (props?.intl) {
                 const {intl: intlProp, ...otherProps} = props
@@ -120,16 +121,26 @@ export const icon = (name, passProps, localizationAttributes) => {
                 passProps[key] = intl.formatMessage(localizationAttributes[key])
             })
         }
-        const baseStyle = theme?.components?.Icon?.baseStyle
+        const {css = {}, ...restOfProps} = props
         return (
-            <Icon ref={ref} role="img" aria-label={name} {...baseStyle} {...props} {...passProps}>
+            <Icon
+                ref={ref}
+                viewBox="0 0 24 24"
+                role="img"
+                aria-label={name}
+                as="svg"
+                css={{...baseStyles, ...css}}
+                {...restOfProps}
+                {...passProps}
+            >
                 <use role="presentation" xlinkHref={`#${name}`} />
             </Icon>
         )
     })
 
     component.propTypes = {
-        intl: PropTypes.object
+        intl: PropTypes.object,
+        css: PropTypes.object
     }
 
     component.displayName = `${displayName}Icon`

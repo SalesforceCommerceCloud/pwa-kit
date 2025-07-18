@@ -6,22 +6,13 @@
  */
 
 import React from 'react'
-import {
-    Heading,
-    Stack,
-    Divider,
-    Accordion,
-    AccordionItem,
-    AccordionButton,
-    AccordionPanel,
-    AccordionIcon
-} from '@chakra-ui/react'
+import {Heading, Stack, Accordion} from '@chakra-ui/react'
 import PropTypes from 'prop-types'
-import ColorRefinements from './color-refinements'
-import SizeRefinements from './size-refinements'
-import RadioRefinements from './radio-refinements'
-import CheckboxRefinements from './checkbox-refinements'
-import LinkRefinements from './link-refinements'
+import ColorRefinements from '../../../pages/product-list/partials/color-refinements'
+import SizeRefinements from '../../../pages/product-list/partials/size-refinements'
+import RadioRefinements from '../../../pages/product-list/partials/radio-refinements'
+import CheckboxRefinements from '../../../pages/product-list/partials/checkbox-refinements'
+import LinkRefinements from '../../../pages/product-list/partials/link-refinements'
 import {isServer} from '../../../utils/utils'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 
@@ -71,10 +62,11 @@ const Refinements = ({
         }
     }
 
-    // Handle saving acccordion state
-    const updateAccordionState = (expandedIndex) => {
+    // Handle saving accordion state
+    const updateAccordionState = (expandedValues) => {
+        const expandedIndexes = expandedValues.map(Number).filter((idx) => !isNaN(idx))
         const filterState = filters
-            ?.filter((filter, index) => expandedIndex.includes(index))
+            ?.filter((filter, index) => expandedIndexes.includes(index))
             .map((filter) => filter.attributeId)
 
         // TODO: Update when localStorage detection is more robust? useLocalStorage is only a getter
@@ -82,16 +74,17 @@ const Refinements = ({
     }
 
     return (
-        <Stack spacing={8}>
+        <Stack gap={8}>
             {/* Wait to have filters before rendering the Accordion to allow the default indexes to be accurate */}
             {filtersIndexes && (
-                <Accordion
-                    pointerEvents={isLoading ? 'none' : 'auto'}
-                    onChange={updateAccordionState}
-                    opacity={isLoading ? 0.2 : 1}
-                    allowMultiple={true}
-                    defaultIndex={filtersIndexes}
-                    reduceMotion={true}
+                <Accordion.Root
+                    multiple
+                    defaultValue={filtersIndexes.map(String)}
+                    onValueChange={(details) => updateAccordionState(details.value)}
+                    style={{
+                        pointerEvents: isLoading ? 'none' : 'auto',
+                        opacity: isLoading ? 0.2 : 1
+                    }}
                 >
                     {itemsBefore}
 
@@ -107,55 +100,46 @@ const Refinements = ({
 
                         if (filter.values) {
                             return (
-                                <Stack key={filter.attributeId} divider={<Divider />}>
-                                    <AccordionItem
-                                        paddingTop={idx !== 0 || itemsBefore ? 6 : 0}
-                                        borderBottom={
-                                            idx === filters.length - 1
-                                                ? '1px solid gray.200'
-                                                : 'none'
-                                        }
-                                        paddingBottom={6}
-                                        borderTop={
-                                            idx === 0 && !itemsBefore
-                                                ? 'none'
-                                                : '1px solid gray.200'
-                                        }
+                                <Accordion.Item
+                                    key={filter.attributeId}
+                                    value={String(idx)}
+                                    paddingTop={idx !== 0 || itemsBefore ? 6 : 0}
+                                    borderBottom={idx === filters.length - 1 ? '1px solid' : 'none'}
+                                    borderBottomColor="gray.200"
+                                    paddingBottom={6}
+                                    borderTop={idx === 0 && !itemsBefore ? 'none' : '1px solid'}
+                                    borderTopColor="gray.200"
+                                >
+                                    <Accordion.ItemTrigger
+                                        paddingTop={0}
+                                        paddingBottom={2}
+                                        cursor="pointer"
                                     >
-                                        {({isExpanded}) => (
-                                            <>
-                                                <AccordionButton
-                                                    paddingTop={0}
-                                                    paddingBottom={isExpanded ? 2 : 0}
-                                                >
-                                                    <Heading
-                                                        as="h2"
-                                                        flex="1"
-                                                        textAlign="left"
-                                                        fontSize="md"
-                                                        fontWeight={600}
-                                                    >
-                                                        {filter.label}
-                                                    </Heading>
-                                                    <AccordionIcon />
-                                                </AccordionButton>
-                                                <AccordionPanel paddingLeft={0}>
-                                                    <Values
-                                                        selectedFilters={selectedFiltersArray}
-                                                        filter={filter}
-                                                        toggleFilter={toggleFilter}
-                                                    />
-                                                </AccordionPanel>
-                                            </>
-                                        )}
-                                    </AccordionItem>
-                                </Stack>
+                                        <Heading
+                                            as="h2"
+                                            flex="1"
+                                            textAlign="left"
+                                            fontSize="md"
+                                            fontWeight={600}
+                                        >
+                                            {filter.label}
+                                        </Heading>
+                                        <Accordion.ItemIndicator />
+                                    </Accordion.ItemTrigger>
+                                    <Accordion.ItemContent paddingLeft={0}>
+                                        <Values
+                                            selectedFilters={selectedFiltersArray}
+                                            filter={filter}
+                                            toggleFilter={toggleFilter}
+                                        />
+                                    </Accordion.ItemContent>
+                                </Accordion.Item>
                             )
                         } else {
                             return null
                         }
                     })}
-                </Accordion>
+                </Accordion.Root>
             )}
         </Stack>
     )

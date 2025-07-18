@@ -6,23 +6,23 @@
  */
 import React, {useEffect, useState} from 'react'
 import {FormattedMessage, useIntl} from 'react-intl'
-import {Alert, AlertIcon, Box, Button, Container, Grid, GridItem, Stack} from '@chakra-ui/react'
+import {Alert, Box, Button, Container, Grid, GridItem, Stack} from '@chakra-ui/react'
 import useNavigation from '../../hooks/use-navigation'
 import {CheckoutProvider, useCheckout} from './util/checkout-context'
-import ContactInfo from './partials/contact-info'
-import ShippingAddress from './partials/shipping-address'
-import ShippingOptions from './partials/shipping-options'
-import Payment from './partials/payment'
+import ContactInfo from '../../pages/checkout/partials/contact-info'
+import ShippingAddress from '../../pages/checkout/partials/shipping-address'
+import ShippingOptions from '../../pages/checkout/partials/shipping-options'
+import Payment from '../../pages/checkout/partials/payment'
 import OrderSummary from '../../components/order-summary'
-import {useCurrentCustomer} from '../../hooks/use-current-customer'
-import {useCurrentBasket} from '../../hooks/use-current-basket'
-import CheckoutSkeleton from './partials/checkout-skeleton'
+import {useCurrentCustomer, useCurrentBasket} from '../../hooks'
+import CheckoutSkeleton from '../../pages/checkout/partials/checkout-skeleton'
 import {useShopperOrdersMutation, useShopperBasketsMutation} from '@salesforce/commerce-sdk-react'
 import UnavailableProductConfirmationModal from '../../components/unavailable-product-confirmation-modal'
 import {API_ERROR_MESSAGE, TOAST_MESSAGE_REMOVED_ITEM_FROM_CART} from '../../../config/constants'
-import {useToast} from '../../hooks/use-toast'
+import useToast from '../../hooks/use-toast'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import LoadingSpinner from '../../components/loading-spinner'
+import {AlertIcon} from '../../components/icons'
 
 const Checkout = () => {
     const {formatMessage} = useIntl()
@@ -71,12 +71,14 @@ const Checkout = () => {
             >
                 <Grid templateColumns={{base: '1fr', lg: '66% 1fr'}} gap={{base: 10, xl: 20}}>
                     <GridItem>
-                        <Stack spacing={4}>
+                        <Stack gap={4}>
                             {error && (
-                                <Alert status="error" variant="left-accent">
-                                    <AlertIcon />
-                                    {error}
-                                </Alert>
+                                <Alert.Root status="error" colorPalette="red">
+                                    <Alert.Indicator>
+                                        <AlertIcon color="red.500" boxSize={4} />
+                                    </Alert.Indicator>
+                                    <Alert.Description>{error}</Alert.Description>
+                                </Alert.Root>
                             )}
 
                             <ContactInfo
@@ -117,7 +119,7 @@ const Checkout = () => {
 
                         {step === 4 && (
                             <Box display={{base: 'none', lg: 'block'}} pt={2}>
-                                <Button w="full" onClick={submitOrder} isLoading={isLoading}>
+                                <Button w="full" onClick={submitOrder} loading={isLoading}>
                                     <FormattedMessage
                                         defaultMessage="Place Order"
                                         id="checkout.button.place_order"
@@ -172,13 +174,13 @@ const CheckoutContainer = () => {
                 onSuccess: () => {
                     toast({
                         title: formatMessage(TOAST_MESSAGE_REMOVED_ITEM_FROM_CART, {quantity: 1}),
-                        status: 'success'
+                        type: 'success'
                     })
                 },
                 onError: () => {
                     toast({
                         title: formatMessage(API_ERROR_MESSAGE),
-                        status: 'error'
+                        type: 'error'
                     })
                 }
             }

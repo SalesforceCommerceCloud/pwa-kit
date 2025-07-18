@@ -11,7 +11,7 @@ import {useShopperContext, useShopperContextsMutation} from '@salesforce/commerc
 
 import {renderWithProviders} from '../utils/test-utils'
 import {createMemoryHistory} from 'history'
-import {useUpdateShopperContext} from './use-update-shopper-context'
+import {useUpdateShopperContext} from '../hooks/use-update-shopper-context'
 
 const usid = 'test-usid'
 jest.mock('@salesforce/commerce-sdk-react', () => {
