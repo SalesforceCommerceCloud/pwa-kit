@@ -8,10 +8,8 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 
 import {renderHook, act} from '@testing-library/react'
-import {renderWithProviders} from '../../../utils/test-utils'
 import {useAppModals} from './use-app-modals'
 
-// Mock dependencies
 jest.mock('react-router-dom', () => ({
     useLocation: jest.fn(),
     Router: jest.fn(({children}) => children),
@@ -62,7 +60,7 @@ const mockDntNotification = {
 describe('useAppModals', () => {
     beforeEach(() => {
         jest.clearAllMocks()
-        
+
         const {useLocation} = require('react-router-dom')
         const {useDisclosure} = require('@chakra-ui/react')
         const {useDntNotification} = require('../../../hooks/use-dnt-notification')
@@ -137,7 +135,6 @@ describe('useAppModals', () => {
         // Since useDisclosure manages the state internally, we test the return values
         const {result} = renderHook(() => useAppModals())
 
-        // Test that drawer menu can be opened by calling the open handler
         act(() => {
             result.current.onDrawerMenuOpen()
         })
@@ -145,26 +142,23 @@ describe('useAppModals', () => {
         // The actual implementation uses useDisclosure which manages state internally
         // We verify the function exists and can be called
         expect(result.current.onDrawerMenuOpen).toEqual(expect.any(Function))
-        expect(result.current.isDrawerMenuOpen).toBe(false) // Default state from mock
+        expect(result.current.isDrawerMenuOpen).toBe(false)
     })
 
     test('handles different store locator states', () => {
-        // Test that store locator functionality works correctly
         const {result} = renderHook(() => useAppModals())
 
-        // Test that store locator can be opened by calling the open handler
         act(() => {
             result.current.onOpenStoreLocator()
         })
 
-        // Verify the function exists and can be called
         expect(result.current.onOpenStoreLocator).toEqual(expect.any(Function))
-        expect(result.current.isOpenStoreLocator).toBe(false) // Default state from mock
+        expect(result.current.isOpenStoreLocator).toBe(false)
     })
 
     test('provides correct handlers for drawer menu', () => {
         const {useDisclosure} = require('@chakra-ui/react')
-        
+
         // Setup fresh mocks for this test - override the beforeEach setup
         useDisclosure
             .mockReturnValueOnce(mockDrawerDisclosure)
@@ -177,14 +171,11 @@ describe('useAppModals', () => {
     })
 
     test('provides correct handlers for store locator', () => {
-        // Test that store locator handlers are correctly provided
         const {result} = renderHook(() => useAppModals())
 
-        // Verify the handlers are functions and can be called
         expect(result.current.onOpenStoreLocator).toEqual(expect.any(Function))
         expect(result.current.onCloseStoreLocator).toEqual(expect.any(Function))
-        
-        // Test that handlers can be called without errors
+
         act(() => {
             result.current.onOpenStoreLocator()
             result.current.onCloseStoreLocator()

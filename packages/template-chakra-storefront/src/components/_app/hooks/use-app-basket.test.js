@@ -41,10 +41,10 @@ const mockCustomer = {
 describe('useAppBasket', () => {
     beforeEach(() => {
         jest.clearAllMocks()
-        
+
         // Setup fresh mocks for each test - recreate mock objects to avoid cross-test contamination
         const {useShopperBasketsMutation} = require('@salesforce/commerce-sdk-react')
-        
+
         // Reset and setup default mocks
         useShopperBasketsMutation.mockImplementation((operation) => {
             if (operation === 'updateBasket') {
@@ -184,7 +184,7 @@ describe('useAppBasket', () => {
     test('returns correct loading states when mutations are pending', () => {
         // Clear previous calls and set up mocks for this test
         const {useShopperBasketsMutation} = require('@salesforce/commerce-sdk-react')
-        
+
         // Mock the hook to return pending states
         useShopperBasketsMutation.mockImplementation((operation) => {
             if (operation === 'updateBasket') {

@@ -39,16 +39,29 @@ jest.mock('@salesforce/pwa-kit-react-sdk/ssr/universal/utils', () => ({
 }))
 
 jest.mock('../../seo', () => {
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    const React = require('react')
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    const PropTypes = require('prop-types')
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    const {Helmet} = require('react-helmet')
+
     const MockSeo = ({title, description, children, ...props}) => {
-        const React = require('react')
-        const {Helmet} = require('react-helmet')
-        
-        return React.createElement(Helmet, props, 
+        return React.createElement(
+            Helmet,
+            props,
             title && React.createElement('title', null, title),
             description && React.createElement('meta', {name: 'description', content: description}),
             children
         )
     }
+
+    MockSeo.propTypes = {
+        title: PropTypes.string,
+        description: PropTypes.string,
+        children: PropTypes.node
+    }
+
     return {
         __esModule: true,
         default: MockSeo
@@ -92,10 +105,10 @@ describe('AppSEO', () => {
 
         // Check that Helmet is called (the structure is complex due to nested Seo/Helmet components)
         expect(Helmet).toHaveBeenCalled()
-        
+
         // Verify that meta tags are present in the calls
         const helmetCalls = Helmet.mock.calls
-        const hasMetaTags = helmetCalls.some(call => {
+        const hasMetaTags = helmetCalls.some((call) => {
             const props = call[0]
             return props && props.children && Array.isArray(props.children)
         })

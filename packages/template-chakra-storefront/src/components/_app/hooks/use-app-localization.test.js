@@ -8,7 +8,6 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 
 import {renderHook} from '@testing-library/react'
-import {renderWithProviders} from '../../../utils/test-utils'
 import {useAppLocalization} from './use-app-localization'
 
 jest.mock('react-router-dom', () => ({
@@ -85,7 +84,7 @@ const mockIntl = {
 
 const mockMultiSite = {
     site: {
-        id: 'test-site', 
+        id: 'test-site',
         alias: 'uk',
         l10n: {
             supportedLocales: [
@@ -117,7 +116,7 @@ const mockAppConfig = {
 describe('useAppLocalization', () => {
     beforeEach(() => {
         jest.clearAllMocks()
-        
+
         // Setup useAppConfig mock
         const {useAppConfig} = require('./use-app-config')
         useAppConfig.mockReturnValue({
@@ -130,23 +129,18 @@ describe('useAppLocalization', () => {
         const {useIntl} = require('react-intl')
         useIntl.mockReturnValue(mockIntl)
 
-        // Setup useMultiSite mock
         const useMultiSite = require('../../../hooks/use-multi-site').default
         useMultiSite.mockReturnValue(mockMultiSite)
 
-        // Setup useAppOrigin mock
         const {useAppOrigin} = require('../../../hooks/use-app-origin')
         useAppOrigin.mockReturnValue(mockAppOrigin)
 
-        // Setup buildUrl mock
         const {buildUrl} = require('../../../utils/url')
         buildUrl.mockImplementation(() => `${mockAppOrigin.origin}/test-path`)
-        
-        // Setup useLocation mock
+
         const {useLocation} = require('react-router-dom')
         useLocation.mockReturnValue({pathname: '/test-path'})
 
-        // Mock getConfig
         const {getConfig} = require('@salesforce/pwa-kit-runtime/utils/ssr-config')
         getConfig.mockReturnValue(mockAppConfig)
     })
@@ -159,7 +153,7 @@ describe('useAppLocalization', () => {
         const {result} = renderHook(() => useAppLocalization())
 
         expect(result.current.targetLocale).toBe('en-GB')
-        expect(result.current.messages).toEqual({messages: {}}) // useQuery mock returns {messages: {}}
+        expect(result.current.messages).toEqual({messages: {}})
         expect(result.current.site).toBe(mockMultiSite.site)
         expect(result.current.locale).toBe(mockMultiSite.locale)
         expect(result.current.currency).toBe(mockMultiSite.currency)
@@ -170,7 +164,7 @@ describe('useAppLocalization', () => {
 
         const url = result.current.buildUrl('/products')
         expect(url).toBe('/test-path/products')
-        
+
         // The buildUrl function should be the one from mockMultiSite, not the mocked url utility
         expect(typeof result.current.buildUrl).toBe('function')
     })
@@ -178,7 +172,7 @@ describe('useAppLocalization', () => {
     test('builds URLs with app origin correctly', () => {
         // This function doesn't exist in the actual hook, removing this test
         const {result} = renderHook(() => useAppLocalization())
-        
+
         // Test that we have appOrigin from the hook (it returns the whole object)
         expect(result.current.appOrigin).toEqual(mockAppOrigin)
     })
@@ -201,7 +195,6 @@ describe('useAppLocalization', () => {
 
     test('handles different currencies', () => {
         const useMultiSite = require('../../../hooks/use-multi-site').default
-        // Clear previous mock and set new value
         useMultiSite.mockClear()
         useMultiSite.mockReturnValue({
             ...mockMultiSite,

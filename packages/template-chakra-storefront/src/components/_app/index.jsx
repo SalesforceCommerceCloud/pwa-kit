@@ -41,23 +41,12 @@ const App = (props) => {
     const {children} = props
     const location = useLocation()
 
-    // App configuration and theme
     const {appConfig, styles, themeColor} = useAppConfig()
-
-    // Data fetching (categories, customer, basket)
     const {categories, customer, basket} = useAppData()
-
-    // Authentication
     const {getTokenWhenReady, authModal} = useAppAuth()
-
-    // Localization and internationalization
     const {targetLocale, messages, site, locale, buildUrl, currency, appOrigin} =
         useAppLocalization()
-
-    // Navigation handlers
     const {onLogoClick, onCartClick, onAccountClick, onWishlistClick} = useAppNavigation()
-
-    // Modal states
     const {
         isDrawerMenuOpen,
         onDrawerMenuOpen,
@@ -69,22 +58,14 @@ const App = (props) => {
         // onCloseStoreLocator
     } = useAppModals()
 
-    // Basket management
     useAppBasket(basket, customer, currency)
-
-    // Online status monitoring
     const {isOnline} = useAppOnlineStatus()
-
-    // Analytics tracking
     useAppAnalytics(site.id, locale.id, currency)
-
-    // Handle updating the shopper context
     useUpdateShopperContext()
 
     // Used to conditionally render header/footer for checkout page
     const isCheckout = /\/checkout$/.test(location?.pathname)
 
-    // Mobile navigation props
     const mobileNavigationProps = {
         categories,
         isDrawerMenuOpen,
@@ -92,7 +73,6 @@ const App = (props) => {
         onLogoClick
     }
 
-    // Header props
     const headerProps = {
         isCheckout,
         styles,
@@ -105,7 +85,6 @@ const App = (props) => {
         mobileNavigationProps
     }
 
-    // SEO props
     const seoProps = {
         appConfig,
         appOrigin,
@@ -116,7 +95,6 @@ const App = (props) => {
         location
     }
 
-    // Modal props
     const modalProps = {
         authModal,
         dntNotification
