@@ -37,20 +37,24 @@ export const createTemporaryBasket = async (sku, authToken, site, quantity = 1) 
             throw new Error('Organization ID is required and not found in configuration')
         }
         
-        const response = await fetch(`/mobify/proxy/api/checkout/shopper-baskets/v2/organizations/${organizationId}/baskets?siteId=${site.id}&temporary=true`, {
+        const requestBody = {
+            productItems: [
+                {
+                    productId: sku,
+                    quantity: quantity
+                }
+            ]
+        }
+        
+        const requestUrl = `/mobify/proxy/api/checkout/shopper-baskets/v2/organizations/${organizationId}/baskets?siteId=${site.id}&temporary=true`
+        
+        const response = await fetch(requestUrl, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${authToken}`
             },
-            body: JSON.stringify({
-                productItems: [
-                    {
-                        productId: sku,
-                        quantity: quantity
-                    }
-                ]
-            })
+            body: JSON.stringify(requestBody)
         })
 
         if (!response.ok) {
@@ -66,7 +70,53 @@ export const createTemporaryBasket = async (sku, authToken, site, quantity = 1) 
         
         return tempBasket
     } catch (error) {
-        console.error('Error creating temporary basket:', error)
         throw error
+    }
+}
+
+/**
+ * Deletes a temporary basket when Apple Pay is cancelled or fails
+ * @param {string} basketId - The basket ID to delete
+ * @param {string} authToken - Authentication token
+ * @param {object} site - Site configuration object
+ * @returns {Promise<boolean>} - True if deletion was successful, false otherwise
+ */
+export const deleteTemporaryBasket = async (basketId, authToken, site) => {
+    if (!basketId) {
+        return false
+    }
+    
+    if (!authToken) {
+        return false
+    }
+    
+    if (!site?.id) {
+        return false
+    }
+    
+    try {
+        // Get the organizationId from the commerce API configuration
+        const {app: {commerceAPI: config}} = getConfig()
+        const {organizationId} = config.parameters
+        
+        if (!organizationId) {
+            return false
+        }
+        
+        const requestUrl = `/mobify/proxy/api/checkout/shopper-baskets/v2/organizations/${organizationId}/baskets/${basketId}?siteId=${site.id}`
+        
+        const response = await fetch(requestUrl, {
+            method: 'DELETE',
+            headers: {
+                'Authorization': `Bearer ${authToken}`
+            }
+        })
+
+        // Return true if deletion was successful (200-299 status codes)
+        return response.ok
+    } catch (error) {
+        // Log error but don't throw - basket cleanup shouldn't break the user experience
+        console.warn('Failed to delete temporary basket:', error)
+        return false
     }
 } 

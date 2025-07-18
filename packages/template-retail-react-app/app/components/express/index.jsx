@@ -43,16 +43,23 @@ function Express() {
 
     return (
         <div>
-            <AdyenExpressCheckoutProvider
-                authToken={authToken}
-                customerId={customerId}
-                locale={locale}
-                site={site}
-                basket={basket}
-                navigate={navigate}
-            >
+            {sku ? (
+                // "Buy Now" mode - use ApplePayExpress directly without the provider
+                // This prevents the regular Adyen APIs from being called
                 <ApplePayExpress sku={sku} />
-            </AdyenExpressCheckoutProvider>
+            ) : (
+                // Regular mode - use the full Adyen provider
+                <AdyenExpressCheckoutProvider
+                    authToken={authToken}
+                    customerId={customerId}
+                    locale={locale}
+                    site={site}
+                    basket={basket}
+                    navigate={navigate}
+                >
+                    <ApplePayExpress />
+                </AdyenExpressCheckoutProvider>
+            )}
         </div>
     )
 }

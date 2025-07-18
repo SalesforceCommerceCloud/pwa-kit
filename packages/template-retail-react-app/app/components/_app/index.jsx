@@ -242,7 +242,7 @@ const App = (props) => {
     }, [])
 
     // Handle updating the shopper context
-    useUpdateShopperContext()
+    // useUpdateShopperContext()
 
     useEffect(() => {
         // Lets automatically close the mobile navigation when the

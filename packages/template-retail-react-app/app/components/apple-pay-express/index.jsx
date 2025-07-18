@@ -13,7 +13,12 @@ import {getCurrencyValueForApi} from '@salesforce/retail-react-app/app/component
 import {AdyenShippingMethodsService} from '@salesforce/retail-react-app/app/components/apple-pay-express/utils/shipping-methods'
 import {AdyenShippingAddressService} from '@salesforce/retail-react-app/app/components/apple-pay-express/utils/shipping-address'
 import {AdyenPaymentsService} from '@salesforce/retail-react-app/app/components/apple-pay-express/utils/payments'
-import {createTemporaryBasket} from '@salesforce/retail-react-app/app/components/apple-pay-express/utils/temporary-basket'
+import {createTemporaryBasket, deleteTemporaryBasket} from '@salesforce/retail-react-app/app/components/apple-pay-express/utils/temporary-basket'
+import {calculateBasketTotals, getBasketWithTotals, forceOrderCalculation} from '@salesforce/retail-react-app/app/components/apple-pay-express/utils/basket-calculation'
+import {useStandalonePaymentMethods} from '@salesforce/retail-react-app/app/components/apple-pay-express/hooks/use-standalone-payment-methods'
+import {useAccessToken} from '@salesforce/commerce-sdk-react'
+import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
+import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
 
 const PAYMENT_METHOD = 'applepay'
 const EXPRESS_PAYMENT_AVAILABLE = 'express.payment.available'
@@ -88,6 +93,30 @@ export const getAppleButtonConfig = (
     // Use temporary basket if available, otherwise use main basket
     const currentBasket = tempBasket || basket
     let applePayAmount = currentBasket?.orderTotal || 0
+    
+    // Shared basket reference to prevent multiple basket creation
+    // This will be updated by callbacks and shared across all Apple Pay events
+    let sharedBasketRef = currentBasket
+    
+    // Helper function to get or create basket (prevents multiple creation)
+    const getOrCreateBasket = async () => {
+        // If we already have a shared basket, return it
+        if (sharedBasketRef && sharedBasketRef.basketId) {
+            return sharedBasketRef
+        }
+        
+        // For "Buy Now" flows, create temporary basket if needed
+        if (sku && setTempBasket) {
+            const newBasket = await createTemporaryBasket(sku, authToken, site)
+            sharedBasketRef = newBasket  // Update shared reference immediately
+            setTempBasket(newBasket)     // Update React state for re-renders
+            return newBasket
+        }
+        
+        // Return null if no basket can be created/found
+        return null
+    }
+    
     const buttonConfig = {
         showPayButton: true,
         isExpress: true,
@@ -102,33 +131,36 @@ export const getAppleButtonConfig = (
             label: sm.name,
             detail: sm.description,
             identifier: sm.id,
-            amount: `${sm.price}`
-        })),
+            amount: parseFloat(sm.price).toFixed(2)
+        })) || [],
         onClick: async (resolve, reject) => {
             if (sku && setTempBasket) {
-                // "Buy Now" flow - create temporary basket
+                // "Buy Now" flow - get or create temporary basket
                 try {
-                    const tempBasketData = await createTemporaryBasket(sku, authToken, site)
-                    setTempBasket(tempBasketData)
-                    
-                    // Update the button config with the temporary basket data
-                    buttonConfig.amount = {
-                        value: getCurrencyValueForApi(tempBasketData.orderTotal, tempBasketData.currency),
-                        currency: tempBasketData.currency
+                    const basketToUse = await getOrCreateBasket()
+                    if (!basketToUse) {
+                        reject()
+                        return
                     }
-                    applePayAmount = tempBasketData.orderTotal
                     
-                    // Update the Apple Pay sheet with the new pricing
+                    // Update the button config with the basket data
+                    const totalToUse = basketToUse.orderTotal || basketToUse.productTotal || 0
+                    buttonConfig.amount = {
+                        value: getCurrencyValueForApi(totalToUse, basketToUse.currency),
+                        currency: basketToUse.currency
+                    }
+                    applePayAmount = totalToUse
+                    
+                    // Update the Apple Pay sheet with the current pricing
                     const priceUpdate = {
                         newTotal: {
                             type: 'final',
-                            label: applePayConfig.merchantName,
-                            amount: `${tempBasketData.orderTotal}`
+                            label: applePayConfig.merchantName || 'Total',
+                            amount: parseFloat(applePayAmount).toFixed(2)
                         }
                     }
                     resolve(priceUpdate)
                 } catch (error) {
-                    console.error('Error creating temporary basket:', error)
                     reject()
                 }
             } else {
@@ -139,6 +171,7 @@ export const getAppleButtonConfig = (
         onAuthorized: async (resolve, reject, event) => {
             try {
                 const {shippingContact, billingContact, token} = event.payment
+                
                 const state = {
                     data: {
                         paymentType: 'express',
@@ -151,24 +184,93 @@ export const getAppleButtonConfig = (
                     }
                 }
                 
-                // Use temporary basket if available, otherwise use main basket
-                const currentBasket = tempBasket || basket
+                // Get or create basket using shared reference
+                let currentBasket = await getOrCreateBasket()
+                if (!currentBasket || !currentBasket.basketId) {
+                    // Clean up temporary basket on failure
+                    if (sku && sharedBasketRef?.basketId) {
+                        try {
+                            await deleteTemporaryBasket(sharedBasketRef.basketId, authToken, site)
+                            if (setTempBasket) setTempBasket(null)
+                            sharedBasketRef = null
+                        } catch (cleanupError) {
+                            console.warn('Failed to cleanup temporary basket:', cleanupError)
+                        }
+                    }
+                    reject()
+                    sendExpressMessage(EXPRESS_PAYMENT_FAILURE, {
+                        PAYMENT_METHOD
+                    })
+                    return
+                }
+                
+                applePayAmount = currentBasket.orderTotal || currentBasket.productTotal || 0
+                
+                // CRITICAL: Force final order calculation before payment
+                // This ensures orderTotal is calculated and not null
+                try {
+                    const finalizedBasket = await forceOrderCalculation(currentBasket.basketId, authToken, site)
+                    currentBasket = finalizedBasket
+                    
+                    // Update the amount tracking with calculated totals
+                    applePayAmount = currentBasket.orderTotal || currentBasket.productTotal || 0
+                    
+                    // Ensure we have a valid order total before proceeding
+                    if (currentBasket.orderTotal === null || currentBasket.orderTotal === undefined) {
+                        // Clean up temporary basket on failure
+                        if (sku && sharedBasketRef?.basketId) {
+                            try {
+                                await deleteTemporaryBasket(sharedBasketRef.basketId, authToken, site)
+                                if (setTempBasket) setTempBasket(null)
+                                sharedBasketRef = null
+                            } catch (cleanupError) {
+                                console.warn('Failed to cleanup temporary basket:', cleanupError)
+                            }
+                        }
+                        reject()
+                        sendExpressMessage(EXPRESS_PAYMENT_FAILURE, {
+                            PAYMENT_METHOD
+                        })
+                        return
+                    }
+                    
+                } catch (calculationError) {
+                    // This is a critical error - we cannot proceed without order total
+                    // Clean up temporary basket on failure
+                    if (sku && sharedBasketRef?.basketId) {
+                        try {
+                            await deleteTemporaryBasket(sharedBasketRef.basketId, authToken, site)
+                            if (setTempBasket) setTempBasket(null)
+                            sharedBasketRef = null
+                        } catch (cleanupError) {
+                            console.warn('Failed to cleanup temporary basket:', cleanupError)
+                        }
+                    }
+                    reject()
+                    sendExpressMessage(EXPRESS_PAYMENT_FAILURE, {
+                        PAYMENT_METHOD
+                    })
+                    return
+                }
+                
+                const paymentData = {
+                    ...state.data,
+                    origin: state.data.origin ? state.data.origin : window.location.origin
+                }
                 
                 const adyenPaymentService = new AdyenPaymentsService(authToken, site)
                 const paymentsResponse = await adyenPaymentService.submitPayment(
-                    {
-                        ...state.data,
-                        origin: state.data.origin ? state.data.origin : window.location.origin
-                    },
+                    paymentData,
                     currentBasket?.basketId,
                     currentBasket?.customerInfo?.customerId
                 )
+                
                 if (paymentsResponse?.isFinal && paymentsResponse?.isSuccessful) {
                     const finalPriceUpdate = {
                         newTotal: {
                             type: 'final',
-                            label: applePayConfig.merchantName,
-                            amount: `${applePayAmount}`
+                            label: applePayConfig.merchantName || 'Total',
+                            amount: parseFloat(applePayAmount).toFixed(2)
                         }
                     }
                     resolve(finalPriceUpdate)
@@ -180,12 +282,32 @@ export const getAppleButtonConfig = (
                         PAYMENT_METHOD
                     })
                 } else {
+                    // Clean up temporary basket on payment failure
+                    if (sku && sharedBasketRef?.basketId) {
+                        try {
+                            await deleteTemporaryBasket(sharedBasketRef.basketId, authToken, site)
+                            if (setTempBasket) setTempBasket(null)
+                            sharedBasketRef = null
+                        } catch (cleanupError) {
+                            console.warn('Failed to cleanup temporary basket:', cleanupError)
+                        }
+                    }
                     reject()
                     sendExpressMessage(EXPRESS_PAYMENT_FAILURE, {
                         PAYMENT_METHOD
                     })
                 }
             } catch (err) {
+                // Clean up temporary basket on any unexpected error
+                if (sku && sharedBasketRef?.basketId) {
+                    try {
+                        await deleteTemporaryBasket(sharedBasketRef.basketId, authToken, site)
+                        if (setTempBasket) setTempBasket(null)
+                        sharedBasketRef = null
+                    } catch (cleanupError) {
+                        console.warn('Failed to cleanup temporary basket:', cleanupError)
+                    }
+                }
                 reject()
                 sendExpressMessage(EXPRESS_PAYMENT_FAILURE, {
                     PAYMENT_METHOD
@@ -197,8 +319,12 @@ export const getAppleButtonConfig = (
             try {
                 const {shippingContact} = event
                 
-                // Use temporary basket if available, otherwise use main basket
-                const currentBasket = tempBasket || basket
+                // Get or create basket using shared reference
+                let currentBasket = await getOrCreateBasket()
+                if (!currentBasket || !currentBasket.basketId) {
+                    reject()
+                    return
+                }
                 
                 const adyenShippingAddressService = new AdyenShippingAddressService(authToken, site)
                 const adyenShippingMethodsService = new AdyenShippingMethodsService(authToken, site)
@@ -207,11 +333,52 @@ export const getAppleButtonConfig = (
                     currentBasket.basketId,
                     customerShippingDetails
                 )
-                const newShippingMethods = await fetchShippingMethods(
-                    currentBasket?.basketId,
-                    site,
-                    authToken
-                )
+                
+                // Get shipping methods - use fetchShippingMethods if available, otherwise use our service
+                let newShippingMethods
+                if (fetchShippingMethods && typeof fetchShippingMethods === 'function') {
+                    newShippingMethods = await fetchShippingMethods(
+                        currentBasket?.basketId,
+                        site,
+                        authToken
+                    )
+                } else {
+                    // Fallback for "Buy Now" mode - use our shipping methods service
+                    try {
+                        const shippingMethodsResponse = await adyenShippingMethodsService.getShippingMethods(currentBasket.basketId)
+                        
+                        // Ensure the response has the expected format
+                        if (shippingMethodsResponse && shippingMethodsResponse.applicableShippingMethods) {
+                            newShippingMethods = shippingMethodsResponse
+                        } else if (Array.isArray(shippingMethodsResponse)) {
+                            // Handle case where response is directly an array
+                            newShippingMethods = {
+                                applicableShippingMethods: shippingMethodsResponse
+                            }
+                        } else {
+                            // Create a minimal fallback shipping method
+                            newShippingMethods = {
+                                applicableShippingMethods: [{
+                                    id: 'standard',
+                                    name: 'Standard Shipping',
+                                    description: 'Standard shipping',
+                                    price: 0
+                                }]
+                            }
+                        }
+                    } catch (error) {
+                        // Provide a fallback shipping method so the flow can continue
+                        newShippingMethods = {
+                            applicableShippingMethods: [{
+                                id: 'standard',
+                                name: 'Standard Shipping',
+                                description: 'Standard shipping',
+                                price: 0
+                            }]
+                        }
+                    }
+                }
+                
                 if (!newShippingMethods?.applicableShippingMethods?.length) {
                     reject()
                 } else {
@@ -219,24 +386,40 @@ export const getAppleButtonConfig = (
                         newShippingMethods.applicableShippingMethods[0].id,
                         currentBasket.basketId
                     )
-                    buttonConfig.amount = {
-                        value: getCurrencyValueForApi(response.orderTotal, response.currency),
-                        currency: response.currency
+                    
+                    // Calculate basket totals after shipping method assignment
+                    let finalResponse = response
+                    try {
+                        if (response.orderTotal === null || response.orderTotal === undefined) {
+                            const calculatedBasket = await getBasketWithTotals(currentBasket.basketId, authToken, site)
+                            finalResponse = calculatedBasket
+                        }
+                    } catch (calculationError) {
+                        // Continue with original response if calculation fails
                     }
-                    applePayAmount = response.orderTotal
+                    
+                    buttonConfig.amount = {
+                        value: getCurrencyValueForApi(finalResponse.orderTotal || finalResponse.productTotal || 0, finalResponse.currency),
+                        currency: finalResponse.currency
+                    }
+                    applePayAmount = finalResponse.orderTotal || finalResponse.productTotal || 0
+                    
+                    // Ensure amount is formatted as string with proper decimal places
+                    const formattedAmount = parseFloat(applePayAmount).toFixed(2)
+                    
                     const finalPriceUpdate = {
                         newShippingMethods: newShippingMethods?.applicableShippingMethods?.map(
                             (sm) => ({
                                 label: sm.name,
                                 detail: sm.description,
                                 identifier: sm.id,
-                                amount: `${sm.price}`
+                                amount: parseFloat(sm.price).toFixed(2)
                             })
                         ),
                         newTotal: {
                             type: 'final',
-                            label: applePayConfig.merchantName,
-                            amount: `${applePayAmount}`
+                            label: applePayConfig.merchantName || 'Total',
+                            amount: formattedAmount
                         }
                     }
                     resolve(finalPriceUpdate)
@@ -249,8 +432,12 @@ export const getAppleButtonConfig = (
             try {
                 const {shippingMethod} = event
                 
-                // Use temporary basket if available, otherwise use main basket
-                const currentBasket = tempBasket || basket
+                // Get or create basket using shared reference
+                let currentBasket = await getOrCreateBasket()
+                if (!currentBasket || !currentBasket.basketId) {
+                    reject()
+                    return
+                }
                 
                 const adyenShippingMethodsService = new AdyenShippingMethodsService(authToken, site)
                 const response = await adyenShippingMethodsService.updateShippingMethod(
@@ -260,16 +447,31 @@ export const getAppleButtonConfig = (
                 if (response.error) {
                     reject()
                 } else {
-                    buttonConfig.amount = {
-                        value: getCurrencyValueForApi(response.orderTotal, response.currency),
-                        currency: response.currency
+                    // Calculate basket totals after shipping method update
+                    let finalResponse = response
+                    try {
+                        if (response.orderTotal === null || response.orderTotal === undefined) {
+                            const calculatedBasket = await getBasketWithTotals(currentBasket.basketId, authToken, site)
+                            finalResponse = calculatedBasket
+                        }
+                    } catch (calculationError) {
+                        // Continue with original response if calculation fails
                     }
-                    applePayAmount = response.orderTotal
+                    
+                    buttonConfig.amount = {
+                        value: getCurrencyValueForApi(finalResponse.orderTotal || finalResponse.productTotal || 0, finalResponse.currency),
+                        currency: finalResponse.currency
+                    }
+                    applePayAmount = finalResponse.orderTotal || finalResponse.productTotal || 0
+                    
+                    // Ensure amount is formatted as string with proper decimal places
+                    const formattedAmount = parseFloat(applePayAmount).toFixed(2)
+                    
                     const applePayShippingMethodUpdate = {
                         newTotal: {
                             type: 'final',
-                            label: applePayConfig.merchantName,
-                            amount: `${applePayAmount}`
+                            label: applePayConfig.merchantName || 'Total',
+                            amount: formattedAmount
                         }
                     }
                     resolve(applePayShippingMethodUpdate)
@@ -279,11 +481,29 @@ export const getAppleButtonConfig = (
             }
         },
         onError: (error) => {
+            // Clean up temporary basket when Apple Pay is cancelled or fails
+            const cleanup = async () => {
+                if (sku && sharedBasketRef?.basketId) {
+                    try {
+                        await deleteTemporaryBasket(sharedBasketRef.basketId, authToken, site)
+                        // Clear the temporary basket state
+                        if (setTempBasket) {
+                            setTempBasket(null)
+                        }
+                        sharedBasketRef = null
+                    } catch (cleanupError) {
+                        console.warn('Failed to cleanup temporary basket:', cleanupError)
+                    }
+                }
+            }
+            
             if (error.name === 'CANCEL') {
+                cleanup()
                 sendExpressMessage(EXPRESS_PAYMENT_CANCEL, {
                     PAYMENT_METHOD
                 })
             } else {
+                cleanup()
                 sendExpressMessage(EXPRESS_PAYMENT_FAILURE, {
                     PAYMENT_METHOD
                 })
@@ -294,19 +514,56 @@ export const getAppleButtonConfig = (
 }
 
 export const ApplePayExpress = ({sku}) => {
-    const {
-        adyenEnvironment,
-        adyenPaymentMethods,
-        basket,
-        locale,
-        site,
-        authToken,
-        navigate,
-        shippingMethods,
-        fetchShippingMethods
-    } = useAdyenExpressCheckout()
-    const paymentContainer = useRef(null)
+    const {getTokenWhenReady} = useAccessToken()
+    const {locale, site} = useMultiSite()
+    const navigate = useNavigation()
+    
+    const [authToken, setAuthToken] = useState()
     const [tempBasket, setTempBasket] = useState(null)
+    const paymentContainer = useRef(null)
+
+    // Get auth token
+    useEffect(() => {
+        const getToken = async () => {
+            const token = await getTokenWhenReady()
+            setAuthToken(token)
+        }
+        getToken()
+    }, [])
+
+    // For "Buy Now" flow, use standalone payment methods
+    // For regular flow, use the standard Adyen hook
+    const {
+        paymentMethods: standalonePaymentMethods,
+        loading: standaloneLoading,
+        error: standaloneError
+    } = useStandalonePaymentMethods(authToken, site, locale, !!sku && !!authToken)
+
+    const regularAdyenData = useAdyenExpressCheckout()
+
+    // Determine which data source to use
+    const usingStandalone = sku && authToken
+    
+    // Use environment from standalone response or regular Adyen data
+    const adyenEnvironment = usingStandalone ? 
+        standalonePaymentMethods?.environment : 
+        regularAdyenData.adyenEnvironment
+    
+    const adyenPaymentMethods = usingStandalone ? standalonePaymentMethods : regularAdyenData.adyenPaymentMethods
+    const basket = regularAdyenData.basket
+    const shippingMethods = regularAdyenData.shippingMethods
+    const fetchShippingMethods = regularAdyenData.fetchShippingMethods
+
+    // Cleanup effect to remove temporary basket when component unmounts
+    useEffect(() => {
+        return () => {
+            // Clean up temporary basket when component unmounts (user navigates away)
+            if (sku && tempBasket?.basketId && authToken && site) {
+                deleteTemporaryBasket(tempBasket.basketId, authToken, site)
+                    .catch(error => console.warn('Failed to cleanup temporary basket on unmount:', error))
+            }
+        }
+    }, [tempBasket?.basketId, authToken, site?.id, sku])
 
     useEffect(() => {
         let isCanceled = false
@@ -316,9 +573,27 @@ export const ApplePayExpress = ({sku}) => {
                 return
             }
 
-            // For "Buy Now" flow, we don't need a basket initially
+            // For "Buy Now" flow, we don't need a basket initially but we do need payment methods
             // For regular flow, we need a basket to continue
-            if (!sku && !basket) {
+            if (sku) {
+                if (!standalonePaymentMethods || standaloneLoading) {
+                    return
+                }
+                if (standaloneError) {
+                    console.error('Standalone payment methods error:', standaloneError)
+                    sendExpressMessage(EXPRESS_PAYMENT_UNAVAILABLE, {
+                        PAYMENT_METHOD
+                    })
+                    return
+                }
+            } else {
+                if (!basket) {
+                    return
+                }
+            }
+
+            if (!adyenEnvironment) {
+                console.warn('Adyen environment not available')
                 return
             }
 
@@ -342,11 +617,19 @@ export const ApplePayExpress = ({sku}) => {
                         }
                     })
                 } catch (ex) {
+                    console.error('Failed to initialize AdyenCheckout:', ex)
                     handleApplePayUnavailable()
                     return
                 }
 
                 const applePaymentMethodConfig = getApplePaymentMethodConfig(adyenPaymentMethods)
+                
+                if (!applePaymentMethodConfig) {
+                    console.warn('Apple Pay configuration not found in payment methods')
+                    handleApplePayUnavailable()
+                    return
+                }
+
                 const appleButtonConfig = getAppleButtonConfig(
                     authToken,
                     site,
@@ -364,6 +647,7 @@ export const ApplePayExpress = ({sku}) => {
                 try {
                     applePayButton = await checkout.create('applepay', appleButtonConfig)
                 } catch (ex) {
+                    console.error('Failed to create Apple Pay button:', ex)
                     handleApplePayUnavailable()
                     return
                 }
@@ -386,6 +670,7 @@ export const ApplePayExpress = ({sku}) => {
                         PAYMENT_METHOD
                     })
                 } catch (error) {
+                    console.error('Failed to mount Apple Pay button:', error)
                     handleApplePayUnavailable()
                 }
             } catch (err) {
@@ -408,7 +693,7 @@ export const ApplePayExpress = ({sku}) => {
         return () => {
             isCanceled = true
         }
-    }, [adyenEnvironment, adyenPaymentMethods, tempBasket, basket, shippingMethods])
+    }, [adyenEnvironment, adyenPaymentMethods, tempBasket, basket, shippingMethods, standalonePaymentMethods, standaloneLoading, standaloneError])
 
     return (
         <>

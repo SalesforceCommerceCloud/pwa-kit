@@ -35,7 +35,7 @@ module.exports = {
                 landingPath: '/reset-password-landing'
             }
         },
-        defaultSite: 'RefArchGlobal',
+        defaultSite: 'RefArch',
         siteAliases: {
             RefArch: 'us',
             RefArchGlobal: 'global'
@@ -44,7 +44,7 @@ module.exports = {
         commerceAPI: {
             proxyPath: `/mobify/proxy/api`,
             parameters: {
-                clientId: '2c0dea89-0c7f-4c71-b951-7c7eb37af8be',
+                clientId: 'c2804605-c747-4338-a702-7deeac41540b',
                 organizationId: 'f_ecom_zyom_004',
                 shortCode: 'sandbox-001',
                 siteId: 'RefArch'
