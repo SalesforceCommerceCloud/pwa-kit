@@ -148,7 +148,7 @@ export default function ShippingAddress() {
     } else if (isEditingShippingAddress && canUseMultiShipping) {
         editLabel = formatMessage({
             defaultMessage: 'Deliver to Multiple Addresses',
-            id: 'shipping_address.link.deliver_to_multiple_addresses'
+            id: 'shipping_address.action.deliver_to_multiple_addresses'
         })
         onEdit = () => setIsMultiShipping(true)
     } else {
