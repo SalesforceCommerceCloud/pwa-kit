@@ -5,8 +5,9 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import {ShopperSearch} from 'commerce-sdk-isomorphic'
-import {Argument, ExcludeTail} from '../types'
+import {ApiClients, Argument, ExcludeTail} from '../types'
 import {pickValidParams} from '../utils'
+
 // We must use a client with no parameters in order to have required/optional match the API spec
 type Client = ShopperSearch<{shortCode: string}>
 type Params<T extends keyof QueryKeys> = Partial<Argument<Client[T]>['parameters']>
@@ -40,13 +41,13 @@ export const productSearch: QueryKeyHelper<'productSearch'> = {
     path: (params) => [
         '/commerce-sdk-react',
         '/organizations/',
-        params.organizationId,
+        params?.organizationId,
         '/product-search'
     ],
     queryKey: (params: Params<'productSearch'>) => {
         return [
             ...productSearch.path(params),
-            pickValidParams(params, ShopperSearch.paramKeys.productSearch)
+            pickValidParams(params || {}, ShopperSearch.paramKeys.productSearch)
         ]
     }
 }
@@ -55,13 +56,13 @@ export const getSearchSuggestions: QueryKeyHelper<'getSearchSuggestions'> = {
     path: (params) => [
         '/commerce-sdk-react',
         '/organizations/',
-        params.organizationId,
+        params?.organizationId,
         '/search-suggestions'
     ],
     queryKey: (params: Params<'getSearchSuggestions'>) => {
         return [
             ...getSearchSuggestions.path(params),
-            pickValidParams(params, ShopperSearch.paramKeys.getSearchSuggestions)
+            pickValidParams(params || {}, ShopperSearch.paramKeys.getSearchSuggestions)
         ]
     }
 }

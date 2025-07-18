@@ -67,10 +67,10 @@ const TOKEN_RESPONSE: ShopperLoginTypes.TokenResponse = {
     expires_in: 0,
     id_token: 'id_token',
     refresh_token: 'refresh_tone',
-    token_type: 'token_type',
+    token_type: 'Bearer',
     usid: 'usid',
     idp_access_token: 'idp_access_token',
-    refresh_token_expires_in: 'refresh_token_expires_in'
+    refresh_token_expires_in: 30 * 24 * 3600
 }
 
 // --- TEST CASES --- //

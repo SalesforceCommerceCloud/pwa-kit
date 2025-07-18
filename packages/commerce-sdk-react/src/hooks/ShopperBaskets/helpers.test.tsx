@@ -93,13 +93,15 @@ describe('useShopperBasketsMutationHelper.addItemToNewOrExistingBasket', functio
         await waitFor(() =>
             expect(mockAsyncMutate.mock.calls[0][0]).toEqual({
                 parameters: {basketId},
-                body: [
-                    {
-                        productId: 'product-123',
-                        price: 100,
-                        quantity: 1
-                    }
-                ]
+                body: {
+                    productItems: [
+                        {
+                            productId: 'product-123',
+                            price: 100,
+                            quantity: 1
+                        }
+                    ]
+                }
             })
         )
     })
@@ -140,13 +142,15 @@ describe('useShopperBasketsMutationHelper.addItemToNewOrExistingBasket', functio
         await waitFor(() =>
             expect(mockAsyncMutate.mock.calls[1][0]).toEqual({
                 parameters: {basketId},
-                body: [
-                    {
-                        productId: 'product-123',
-                        price: 100,
-                        quantity: 1
-                    }
-                ]
+                body: {
+                    productItems: [
+                        {
+                            productId: 'product-123',
+                            price: 100,
+                            quantity: 1
+                        }
+                    ]
+                }
             })
         )
     })

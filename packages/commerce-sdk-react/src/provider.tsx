@@ -19,17 +19,19 @@ import {
     ShopperContexts,
     ShopperCustomers,
     ShopperExperience,
+    ShopperGiftCertificates,
     ShopperLogin,
     ShopperOrders,
     ShopperProducts,
     ShopperPromotions,
-    ShopperGiftCertificates,
     ShopperSearch,
-    ShopperSeo,
-    ShopperBasketsTypes,
+    ShopperSEO,
     ShopperStores
 } from 'commerce-sdk-isomorphic'
 import {transformSDKClient} from './utils'
+
+// Define FetchOptions type locally since it's not exported from the isomorphic SDK
+type FetchOptions = RequestInit
 
 export interface CommerceApiProviderProps extends ApiClientConfigParams {
     children: React.ReactNode
@@ -37,7 +39,7 @@ export interface CommerceApiProviderProps extends ApiClientConfigParams {
     locale: string
     currency: string
     redirectURI: string
-    fetchOptions?: ShopperBasketsTypes.FetchOptions
+    fetchOptions?: FetchOptions
     headers?: Record<string, string>
     fetchedToken?: string
     enablePWAKitPrivateClient?: boolean
@@ -255,7 +257,7 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
             shopperProducts: new ShopperProducts(config),
             shopperPromotions: new ShopperPromotions(config),
             shopperSearch: new ShopperSearch(config),
-            shopperSeo: new ShopperSeo(config),
+            shopperSeo: new ShopperSEO(config),
             shopperStores: new ShopperStores(config)
         }
     }, [

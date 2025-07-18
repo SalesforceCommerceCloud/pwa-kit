@@ -59,7 +59,7 @@ export const usePromotions = (
         method,
         queryKey,
         requiredParameters
-    })
+    }) as UseQueryResult<Data>
 }
 /**
  * Handles get promotion by filter criteria. Returns an array of enabled promotions matching the specified filter
@@ -109,5 +109,5 @@ export const usePromotionsForCampaign = (
         method,
         queryKey,
         requiredParameters
-    })
+    }) as UseQueryResult<Data>
 }

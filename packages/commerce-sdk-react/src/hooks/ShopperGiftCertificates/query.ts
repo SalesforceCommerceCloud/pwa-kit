@@ -56,20 +56,9 @@ export const useGiftCertificate = (
 
     // For some reason, if we don't explicitly set these generic parameters, the inferred type for
     // `Data` sometimes, but not always, includes `Response`, which is incorrect. I don't know why.
-    return useQuery<Client, Options, Data>(
-        {...netOptions, parameters},
-        {
-            // !!! This is a violation of our design goal of minimal logic in the indivudal endpoint
-            // endpoint hooks. This is because this method is a post method, rather than GET,
-            // and its body contains secrets. Setting cacheTime to 0 avoids exposing the secrets in
-            // the shared cache.
-            cacheTime: 0,
-            ...queryOptions
-        },
-        {
-            method,
-            queryKey,
-            requiredParameters
-        }
-    )
+    return useQuery<Client, Options, Data>({...netOptions, parameters}, queryOptions, {
+        method,
+        queryKey,
+        requiredParameters
+    }) as UseQueryResult<Data>
 }

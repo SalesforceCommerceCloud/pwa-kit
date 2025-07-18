@@ -62,7 +62,7 @@ export const usePages = (
         method,
         queryKey,
         requiredParameters
-    })
+    }) as UseQueryResult<Data>
 }
 /**
  * Get a Page Designer page based on a single page ID.
@@ -110,5 +110,5 @@ export const usePage = (
         method,
         queryKey,
         requiredParameters
-    })
+    }) as UseQueryResult<Data>
 }

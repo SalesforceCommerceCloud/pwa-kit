@@ -94,7 +94,7 @@ export const useCustomer = (
         method,
         queryKey,
         requiredParameters
-    })
+    }) as UseQueryResult<Data>
 }
 /**
  * Retrieves a customer's address by address name.
@@ -139,7 +139,7 @@ export const useCustomerAddress = (
         method,
         queryKey,
         requiredParameters
-    })
+    }) as UseQueryResult<Data>
 }
 /**
  * Gets the baskets of a customer.
@@ -184,7 +184,7 @@ export const useCustomerBaskets = (
         method,
         queryKey,
         requiredParameters
-    })
+    }) as UseQueryResult<Data>
 }
 /**
  * Returns a pageable list of all customer's orders.
@@ -231,7 +231,7 @@ export const useCustomerOrders = (
         method,
         queryKey,
         requiredParameters
-    })
+    }) as UseQueryResult<Data>
 }
 /**
  * Retrieves a customer's payment instrument by its ID.
@@ -276,7 +276,7 @@ export const useCustomerPaymentInstrument = (
         method,
         queryKey,
         requiredParameters
-    })
+    }) as UseQueryResult<Data>
 }
 /**
  * Returns all customer product lists.
@@ -321,7 +321,7 @@ export const useCustomerProductLists = (
         method,
         queryKey,
         requiredParameters
-    })
+    }) as UseQueryResult<Data>
 }
 /**
  * Returns a customer product list of the given customer and the items in the list.
@@ -366,7 +366,7 @@ export const useCustomerProductList = (
         method,
         queryKey,
         requiredParameters
-    })
+    }) as UseQueryResult<Data>
 }
 /**
  * Returns an item of a customer product list and the actual product details like image, availability and price.
@@ -411,7 +411,7 @@ export const useCustomerProductListItem = (
         method,
         queryKey,
         requiredParameters
-    })
+    }) as UseQueryResult<Data>
 }
 /**
  * Retrieves all public product lists as defined by the given search term (for example, email OR first name and last name).
@@ -456,7 +456,7 @@ export const usePublicProductListsBySearchTerm = (
         method,
         queryKey,
         requiredParameters
-    })
+    }) as UseQueryResult<Data>
 }
 /**
  * Retrieves a public product list by ID and the items under that product list.
@@ -501,7 +501,7 @@ export const usePublicProductList = (
         method,
         queryKey,
         requiredParameters
-    })
+    }) as UseQueryResult<Data>
 }
 /**
  * Retrieves an item from a public product list and the actual product details like product, image, availability and price.
@@ -546,5 +546,5 @@ export const useProductListItem = (
         method,
         queryKey,
         requiredParameters
-    })
+    }) as UseQueryResult<Data>
 }

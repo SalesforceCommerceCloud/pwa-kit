@@ -16,7 +16,7 @@ import {
     ShopperProducts,
     ShopperPromotions,
     ShopperSearch,
-    ShopperSeo,
+    ShopperSEO,
     ShopperStores
 } from 'commerce-sdk-isomorphic'
 import {helpers} from 'commerce-sdk-isomorphic'
@@ -94,7 +94,7 @@ export interface ApiClients {
     shopperProducts?: ShopperProducts<ApiClientConfigParams>
     shopperPromotions?: ShopperPromotions<ApiClientConfigParams>
     shopperSearch?: ShopperSearch<ApiClientConfigParams>
-    shopperSeo?: ShopperSeo<ApiClientConfigParams>
+    shopperSeo?: ShopperSEO<ApiClientConfigParams>
     shopperStores?: ShopperStores<ApiClientConfigParams>
 }
 
@@ -139,17 +139,17 @@ export type DataType<T> = T extends ApiMethod<any, Response | infer R> ? R : nev
  */
 export type MergedOptions<Client extends ApiClient, Options extends ApiOptions> = Required<
     ApiOptions<
-        NonNullable<Client['clientConfig']['parameters'] & Options['parameters']>,
+        NonNullable<Options['parameters']>,
         // `body` may not exist on `Options`, in which case it is `unknown` here. Due to the type
         // constraint in `ApiOptions`, that is not a valid value. We must replace it with `never`
         // to indicate that the result type does not have a `body`.
         unknown extends Options['body'] ? never : Options['body'],
-        NonNullable<Client['clientConfig']['headers'] & Options['headers']>
+        NonNullable<Options['headers']>
     >
 >
 
 /** Query key interface used by API query hooks. */
-export type ApiQueryKey<Params extends Record<string, unknown> = Record<string, unknown>> =
+export type ApiQueryKey<Params extends Record<string, unknown> | undefined = Record<string, unknown> | undefined> =
     readonly [...path: (string | undefined)[], parameters: Params]
 
 /** Query options for endpoint hooks. */
@@ -179,7 +179,7 @@ export type OmitNullableParameters<T extends {parameters: object}> = Omit<T, 'pa
  * @property updater - Either the new data or a function that accepts old data and returns new data
  */
 export type CacheUpdateUpdate<T> = {
-    queryKey: ApiQueryKey
+    queryKey: ApiQueryKey<Record<string, unknown> | undefined>
     updater?: Updater<T | undefined, T | undefined>
 }
 

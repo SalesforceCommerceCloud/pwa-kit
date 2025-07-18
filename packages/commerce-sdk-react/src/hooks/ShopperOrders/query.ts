@@ -56,7 +56,7 @@ export const useOrder = (
         method,
         queryKey,
         requiredParameters
-    })
+    }) as UseQueryResult<Data>
 }
 /**
  * Gets the applicable payment methods for an existing order considering the open payment amount only.
@@ -98,7 +98,7 @@ export const usePaymentMethodsForOrder = (
         method,
         queryKey,
         requiredParameters
-    })
+    }) as UseQueryResult<Data>
 }
 /**
  * This method gives you the external taxation data of the order transferred from the basket during
@@ -142,5 +142,5 @@ export const useTaxesFromOrder = (
         method,
         queryKey,
         requiredParameters
-    })
+    }) as UseQueryResult<Data>
 }

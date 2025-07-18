@@ -120,14 +120,13 @@ const configPasswordlessSms = {
 const FAKE_SLAS_EXPIRY = DEFAULT_SLAS_REFRESH_TOKEN_REGISTERED_TTL - 1
 
 const TOKEN_RESPONSE: ShopperLoginTypes.TokenResponse = {
-    access_token:
-        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjYy1zbGFzOjp6enJmXzAwMTo6c2NpZDpjOWM0NWJmZC0wZWQzLTRhYTIteHh4eC00MGY4ODk2MmI4MzY6OnVzaWQ6YjQ4NjUyMzMtZGU5Mi00MDM5LXh4eHgtYWEyZGZjOGMxZWE1IiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyLCJpc2IiOiJ1aWRvOmVjb206OnVwbjpHdWVzdHx8am9obi5kb2VAZXhhbXBsZS5jb206OnVpZG46Sm9obiBEb2U6OmdjaWQ6Z3Vlc3QtMTIzNDU6OnJjaWQ6cmVnaXN0ZXJlZC02Nzg5MCIsImRudCI6InRlc3QifQ.9yKtUb22ExO-Q4VNQRAyIgTm63l3x5z45Uu1FIQa5dQ',
+    access_token: 'access_token_xyz',
     customer_id: 'customer_id_xyz',
     enc_user_id: 'enc_user_id_xyz',
     expires_in: 1800,
     id_token: 'id_token_xyz',
     refresh_token: 'refresh_token_xyz',
-    token_type: 'token_type_abc',
+    token_type: 'Bearer',
     usid: 'usid_xyz',
     idp_access_token: 'idp_access_token_xyz',
     // test that this is authoritative and not set to
@@ -180,7 +179,7 @@ describe('Auth', () => {
             expires_in: 1800,
             id_token: 'id_token',
             idp_access_token: 'idp_access_token',
-            token_type: 'token_type',
+            token_type: 'Bearer',
             usid: 'usid',
             customer_type: 'guest',
             refresh_token_expires_in: FAKE_SLAS_EXPIRY
@@ -281,7 +280,7 @@ describe('Auth', () => {
             expires_in: 1800,
             id_token: 'id_token',
             idp_access_token: 'idp_access_token',
-            token_type: 'token_type',
+            token_type: 'Bearer',
             usid: 'usid',
             customer_type: 'guest'
         }
@@ -301,7 +300,7 @@ describe('Auth', () => {
             expires_in: 1800,
             id_token: 'id_token',
             idp_access_token: 'idp_access_token',
-            token_type: 'token_type',
+            token_type: 'Bearer',
             usid: 'usid',
             customer_type: 'guest',
             refresh_token_expires_in: FAKE_SLAS_EXPIRY
@@ -383,10 +382,10 @@ describe('Auth', () => {
             expires_in: 1800,
             id_token: 'id_token',
             idp_access_token: 'idp_access_token',
-            token_type: 'token_type',
+            token_type: 'Bearer',
             usid: 'usid',
             customer_type: 'guest',
-            refresh_token_expires_in: 'refresh_token_expires_in'
+            refresh_token_expires_in: 30 * 24 * 3600
         }
 
         Object.keys(data).forEach((key) => {
@@ -417,7 +416,7 @@ describe('Auth', () => {
             expires_in: 1800,
             id_token: 'id_token',
             idp_access_token: 'idp_access_token',
-            token_type: 'token_type',
+            token_type: 'Bearer',
             usid: 'usid',
             customer_type: 'guest',
             refresh_token_expires_in: 30 * 24 * 3600
@@ -469,7 +468,7 @@ describe('Auth', () => {
             expires_in: 1800,
             id_token: 'id_token',
             idp_access_token: 'idp_access_token',
-            token_type: 'token_type',
+            token_type: 'Bearer',
             usid: 'usid',
             customer_type: 'guest',
             refresh_token_expires_in: 30 * 24 * 3600
@@ -584,7 +583,7 @@ describe('Auth', () => {
         'refreshTokenRegisteredCookieTTL is set correctly for refreshTokenRegisteredCookieTTLValue=`%p`, expected=`%s`',
         async (refreshTokenRegisteredCookieTTL, expected, hasNoResponseValue) => {
             // Mock the loginRegisteredUserB2C helper to return a token response
-            TOKEN_RESPONSE.refresh_token_expires_in = hasNoResponseValue
+            ;(TOKEN_RESPONSE as any).refresh_token_expires_in = hasNoResponseValue
                 ? undefined
                 : DEFAULT_SLAS_REFRESH_TOKEN_REGISTERED_TTL
             ;(helpers.loginRegisteredUserB2C as jest.Mock).mockResolvedValueOnce(TOKEN_RESPONSE)
