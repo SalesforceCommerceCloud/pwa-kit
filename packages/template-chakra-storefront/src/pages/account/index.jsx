@@ -5,10 +5,10 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React, {useEffect, useState} from 'react'
+import React, {useState} from 'react'
 import PropTypes from 'prop-types'
 import {FormattedMessage, useIntl} from 'react-intl'
-import {Route, Switch, Redirect, useLocation, useRouteMatch} from 'react-router-dom'
+import {Route, Switch, Redirect, useRouteMatch} from 'react-router-dom'
 import {
     Accordion,
     AccordionButton,
@@ -35,8 +35,6 @@ import {messages, navLinks} from './constant'
 import useNavigation from '../../hooks/use-navigation'
 import LoadingSpinner from '../../components/loading-spinner'
 import useMultiSite from '../../hooks/use-multi-site'
-import useEinstein from '../../hooks/use-einstein'
-import useDataCloud from '../../hooks/use-datacloud'
 import {useAuthHelper, AuthHelpers} from '@salesforce/commerce-sdk-react'
 import {useCurrentCustomer} from '../../hooks/use-current-customer'
 import {isHydrated} from '../../utils/utils'
@@ -83,21 +81,12 @@ const Account = () => {
     const {isRegistered, customerType} = customer
 
     const logout = useAuthHelper(AuthHelpers.Logout)
-    const location = useLocation()
     const navigate = useNavigation()
 
     const [mobileNavIndex, setMobileNavIndex] = useState(-1)
     const [showLoading, setShowLoading] = useState(false)
 
-    const einstein = useEinstein()
-    const dataCloud = useDataCloud()
-
     const {buildUrl} = useMultiSite()
-    /**************** Einstein ****************/
-    useEffect(() => {
-        einstein.sendViewPage(location.pathname)
-        dataCloud.sendViewPage(location.pathname)
-    }, [location])
 
     const onSignoutClick = async () => {
         setShowLoading(true)
