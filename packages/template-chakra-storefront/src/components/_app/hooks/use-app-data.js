@@ -16,7 +16,6 @@ import {flatten} from '../../../utils/utils'
  * @returns {Object} App data including categories, customer, and basket
  */
 export const useAppData = () => {
-    // Fetch categories tree for navigation
     const {data: categoriesTree} = useCategory({
         parameters: {
             id: 'root',
@@ -24,10 +23,8 @@ export const useAppData = () => {
         }
     })
 
-    // Flatten categories for easier usage
     const categories = flatten(categoriesTree || {}, 'categories')
 
-    // Get current customer and basket data
     const {data: customer} = useCurrentCustomer()
     const {data: basket} = useCurrentBasket()
 

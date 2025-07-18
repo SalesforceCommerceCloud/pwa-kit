@@ -22,7 +22,6 @@ export const useAppNavigation = () => {
     const history = useHistory()
 
     const onLogoClick = useCallback(() => {
-        // Goto the home page.
         const path = buildUrl(appConfig.pages.home.path)
         history?.push(path)
     }, [appConfig.pages.home.path, buildUrl, history])

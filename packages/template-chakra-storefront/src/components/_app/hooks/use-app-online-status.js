@@ -16,19 +16,16 @@ import {watchOnlineStatus} from '../../../utils/utils'
  */
 export const useAppOnlineStatus = () => {
     const [isOnline, setIsOnline] = useState(() => {
-        // Initialize with actual online status if available
         return typeof navigator !== 'undefined' && navigator.onLine !== undefined
             ? navigator.onLine
             : true
     })
 
     useEffect(() => {
-        // Set initial status from navigator
         if (typeof navigator !== 'undefined' && navigator.onLine !== undefined) {
             setIsOnline(navigator.onLine)
         }
 
-        // Listen for online status changes.
         const unsubscribe = watchOnlineStatus((newIsOnline) => {
             setIsOnline(newIsOnline)
         })
