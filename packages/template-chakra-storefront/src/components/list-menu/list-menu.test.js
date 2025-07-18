@@ -31,7 +31,9 @@ describe('ListMenu', () => {
     })
 
     test('ListMenu renders Spinner without root categories', () => {
-        renderWithProviders(<ListMenu root={null} />)
+        renderWithProviders(<ListMenu />, {
+            wrapperProps: {initialCategories: {}}
+        })
         const spinner = document.querySelector('.chakra-spinner')
         expect(spinner).toBeInTheDocument()
     })
