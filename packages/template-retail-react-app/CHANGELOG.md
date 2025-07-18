@@ -12,7 +12,7 @@
 - Support saving billing phone number on user registration from order confirmation [#2653](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2653)
 - Support saving default shipping address on user registration from order confirmation [#2706](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2706)
 - Minor updates to support BOPIS E2E tests [#2716](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2716)
-- Provide support for partial hydration [#2696](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2696)
+- Provide conditional support for partial hydration (feature flag `PARTIAL_HYDRATION_ENABLED`) [#2696](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2696) [#2846](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2846)
 - Show Automatic Bonus Products on Cart Page [#2704](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2704) [#2760](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2760) [#2815](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2815) 
 - Support Standard Products [2697](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2697)
 - Fix passwordless race conditions in form submission [#2758](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2758)
