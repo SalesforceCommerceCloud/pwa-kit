@@ -17,6 +17,7 @@ import React, {
 } from 'react'
 import PropTypes from 'prop-types'
 import {isServer} from '@salesforce/retail-react-app/app/components/island/utils'
+import {PARTIAL_HYDRATION_ENABLED} from '@salesforce/retail-react-app/app/constants'
 
 const IslandContext = createContext(null)
 
@@ -40,7 +41,9 @@ function findChildren(children, componentType) {
 
 /**
  * This component is intended to give developers explicit and fine-granular control over the
- * hydration behavior of their experiences.
+ * hydration behavior of their experiences. The influence of the `<Island/>` components on the
+ * hydration behavior can be activated or deactivated using the {@link PARTIAL_HYDRATION_ENABLED}
+ * constant.
  * @param {Object} props
  * @param {ReactNode} [props.children] The child tree
  * @param {('load' | 'idle' | 'visible' | 'off')} [props.hydrateOn='load'] The island's hydration strategy
@@ -79,7 +82,12 @@ function findChildren(children, componentType) {
  * @see {@link https://developer.mozilla.org/en-US/docs/Web/API/IntersectionObserver}
  */
 function Island(props) {
-    const {children, hydrateOn = 'load', options, clientOnly = false} = props
+    const {children} = props
+    if (!PARTIAL_HYDRATION_ENABLED) {
+        return <>{children}</>
+    }
+
+    const {hydrateOn = 'load', options, clientOnly = false} = props
     const ssr = isServer()
     const [hydrated, setHydrated] = useState(ssr) // Ensure SSR immediately returns the generated HTML
     const context = useIslandContext()
@@ -156,8 +164,8 @@ function Island(props) {
                     typeof options === 'object' && options !== null
                         ? options
                         : {
-                              rootMargin: '250px'
-                          }
+                            rootMargin: '250px'
+                        }
                 )
                 observer.observe(element)
                 return () => observer.disconnect()

@@ -467,139 +467,139 @@ const ProductDetail = () => {
     }, [product, childProductSelection])
 
     /**************** Product Set Handlers ****************/
-    // 1. Gather the selected child products from state.
-    // 2. Call handleAddToCart with the selected products.
-    // 3. The add-to-cart modal will be opened in handleAddToCart.
+        // 1. Gather the selected child products from state.
+        // 2. Call handleAddToCart with the selected products.
+        // 3. The add-to-cart modal will be opened in handleAddToCart.
     const handleProductSetAddToCart = () => {
-        // Get all the selected products, and pass them to the addToCart handler which
-        // accepts an array.
-        const productSelectionValues = Object.values(childProductSelection)
-        return handleAddToCart(productSelectionValues)
-    }
+            // Get all the selected products, and pass them to the addToCart handler which
+            // accepts an array.
+            const productSelectionValues = Object.values(childProductSelection)
+            return handleAddToCart(productSelectionValues)
+        }
 
     /**************** Product Bundle Handlers ****************/
-    // Top level bundle does not have variants
+        // Top level bundle does not have variants
     const handleProductBundleAddToCart = async ([{quantity: selectedQuantity}]) => {
-        try {
-            const childProductSelections = Object.values(childProductSelection)
-            // Check if any products have pickup selected (including main product and bundle items)
-            const bundleSelectionValues = [
-                {product, variant: null, selectedQuantity},
-                ...childProductSelections
-            ]
-            const hasAnyPickupSelected = hasPickupItems(
-                bundleSelectionValues,
-                pickupInStoreMap,
-                product
-            )
+            try {
+                const childProductSelections = Object.values(childProductSelection)
+                // Check if any products have pickup selected (including main product and bundle items)
+                const bundleSelectionValues = [
+                    {product, variant: null, selectedQuantity},
+                    ...childProductSelections
+                ]
+                const hasAnyPickupSelected = hasPickupItems(
+                    bundleSelectionValues,
+                    pickupInStoreMap,
+                    product
+                )
 
-            // Check for delivery method conflicts before adding to cart
-            if (basket && basket.productItems?.length > 0) {
-                const currentShippingMethod = basket?.shipments?.[0]?.shippingMethod
-                const currentShippingMethodIsPickup =
-                    isCurrentShippingMethodPickup(currentShippingMethod)
+                // Check for delivery method conflicts before adding to cart
+                if (basket && basket.productItems?.length > 0) {
+                    const currentShippingMethod = basket?.shipments?.[0]?.shippingMethod
+                    const currentShippingMethodIsPickup =
+                        isCurrentShippingMethodPickup(currentShippingMethod)
 
-                // If there's no shipping method, treat it as non-pickup (ship to address)
-                if (
-                    hasAnyPickupSelected &&
-                    (!currentShippingMethod || !currentShippingMethodIsPickup)
-                ) {
-                    throw new Error(
-                        formatMessage({
-                            id: 'product_view.error.select_ship_to_address',
-                            defaultMessage:
+                    // If there's no shipping method, treat it as non-pickup (ship to address)
+                    if (
+                        hasAnyPickupSelected &&
+                        (!currentShippingMethod || !currentShippingMethodIsPickup)
+                    ) {
+                        throw new Error(
+                            formatMessage({
+                                id: 'product_view.error.select_ship_to_address',
+                                defaultMessage:
                                 "Select 'Ship to Address' to match the delivery method for the items in your cart."
-                        })
-                    )
-                } else if (
-                    !hasAnyPickupSelected &&
-                    currentShippingMethod &&
-                    currentShippingMethodIsPickup
-                ) {
-                    throw new Error(
-                        formatMessage({
-                            id: 'product_view.error.select_pickup_in_store',
-                            defaultMessage:
+                            })
+                        )
+                    } else if (
+                        !hasAnyPickupSelected &&
+                        currentShippingMethod &&
+                        currentShippingMethodIsPickup
+                    ) {
+                        throw new Error(
+                            formatMessage({
+                                id: 'product_view.error.select_pickup_in_store',
+                                defaultMessage:
                                 "Select 'Pick Up in Store' to match the delivery method for the items in your cart."
-                        })
-                    )
+                            })
+                        )
+                    }
                 }
-            }
 
-            let productItems = [
-                {
-                    productId: product.id,
-                    price: product.price,
-                    quantity: selectedQuantity,
-                    // The add item endpoint in the shopper baskets API does not respect variant selections
-                    // for bundle children, so we have to make a follow up call to update the basket
-                    // with the chosen variant selections
-                    bundledProductItems: childProductSelections.map((child) => {
-                        return {
-                            productId: child.variant?.productId || child.product?.id,
-                            quantity: child.quantity
-                        }
+                let productItems = [
+                    {
+                        productId: product.id,
+                        price: product.price,
+                        quantity: selectedQuantity,
+                        // The add item endpoint in the shopper baskets API does not respect variant selections
+                        // for bundle children, so we have to make a follow up call to update the basket
+                        // with the chosen variant selections
+                        bundledProductItems: childProductSelections.map((child) => {
+                            return {
+                                productId: child.variant?.productId || child.product?.id,
+                                quantity: child.quantity
+                            }
+                        })
+                    }
+                ]
+
+                // Add inventory IDs for pickup items using the hook helper
+                productItems = addInventoryIdsToPickupItems(
+                    productItems,
+                    pickupInStoreMap,
+                    selectedStore
+                )
+
+                const res = await addItemToNewOrExistingBasket(productItems)
+
+                const bundleChildMasterIds = childProductSelections.map((child) => {
+                    return child.product.id
+                })
+
+                // since the returned data includes all products in basket
+                // here we compare list of productIds in bundleProductItems of each productItem to filter out the
+                // current bundle that was last added into cart
+                const currentBundle = res.productItems.find((productItem) => {
+                    if (!productItem.bundledProductItems?.length) return
+                    const bundleChildIds = productItem.bundledProductItems?.map((item) => {
+                        // seek out the bundle child that still uses masterId as product id
+                        return item.productId
+                    })
+                    return bundleChildIds.every((id) => bundleChildMasterIds.includes(id))
+                })
+
+                const itemsToBeUpdated = getUpdateBundleChildArray(
+                    currentBundle,
+                    childProductSelections
+                )
+
+                if (itemsToBeUpdated.length) {
+                    // make a follow up call to update child variant selection for product bundle
+                    // since add item endpoint doesn't currently consider product bundle child variants
+                    await updateItemsInBasketMutation.mutateAsync({
+                        method: 'PATCH',
+                        parameters: {
+                            basketId: res.basketId
+                        },
+                        body: itemsToBeUpdated
                     })
                 }
-            ]
 
-            // Add inventory IDs for pickup items using the hook helper
-            productItems = addInventoryIdsToPickupItems(
-                productItems,
-                pickupInStoreMap,
-                selectedStore
-            )
+                // Configure shipping method based on pickup selection
+                await updateShippingMethodIfNeeded(
+                    res,
+                    productItems,
+                    hasAnyPickupSelected,
+                    selectedStore
+                )
 
-            const res = await addItemToNewOrExistingBasket(productItems)
+                einstein.sendAddToCart(productItems)
 
-            const bundleChildMasterIds = childProductSelections.map((child) => {
-                return child.product.id
-            })
-
-            // since the returned data includes all products in basket
-            // here we compare list of productIds in bundleProductItems of each productItem to filter out the
-            // current bundle that was last added into cart
-            const currentBundle = res.productItems.find((productItem) => {
-                if (!productItem.bundledProductItems?.length) return
-                const bundleChildIds = productItem.bundledProductItems?.map((item) => {
-                    // seek out the bundle child that still uses masterId as product id
-                    return item.productId
-                })
-                return bundleChildIds.every((id) => bundleChildMasterIds.includes(id))
-            })
-
-            const itemsToBeUpdated = getUpdateBundleChildArray(
-                currentBundle,
-                childProductSelections
-            )
-
-            if (itemsToBeUpdated.length) {
-                // make a follow up call to update child variant selection for product bundle
-                // since add item endpoint doesn't currently consider product bundle child variants
-                await updateItemsInBasketMutation.mutateAsync({
-                    method: 'PATCH',
-                    parameters: {
-                        basketId: res.basketId
-                    },
-                    body: itemsToBeUpdated
-                })
+                return childProductSelections
+            } catch (error) {
+                showError(error)
             }
-
-            // Configure shipping method based on pickup selection
-            await updateShippingMethodIfNeeded(
-                res,
-                productItems,
-                hasAnyPickupSelected,
-                selectedStore
-            )
-
-            einstein.sendAddToCart(productItems)
-
-            return childProductSelections
-        } catch (error) {
-            showError(error)
         }
-    }
 
     /**************** Einstein ****************/
     useEffect(() => {
@@ -688,85 +688,83 @@ const ProductDetail = () => {
                             // Render the child products
                             comboProduct.childProducts.map(
                                 ({product: childProduct, quantity: childQuantity}) => (
-                                    <Island hydrateOn={'visible'} key={childProduct.id}>
-                                        <Box data-testid="child-product">
-                                            <ProductView
-                                                // Do not use an arrow function as we are manipulating the functions scope.
-                                                ref={function (ref) {
-                                                    // Assign the "set" scope of the ref, this is how we access the internal
-                                                    // validation.
-                                                    childProductRefs.current[childProduct.id] = {
-                                                        ref,
-                                                        validateOrderability:
-                                                            this.validateOrderability
-                                                    }
-                                                }}
-                                                product={childProduct}
-                                                isProductPartOfSet={isProductASet}
-                                                isProductPartOfBundle={isProductABundle}
-                                                childOfBundleQuantity={childQuantity}
-                                                selectedBundleParentQuantity={
-                                                    selectedBundleQuantity
+                                    <Box key={childProduct.id} data-testid="child-product">
+                                        <ProductView
+                                            // Do not use an arrow function as we are manipulating the functions scope.
+                                            ref={function(ref) {
+                                                // Assign the "set" scope of the ref, this is how we access the internal
+                                                // validation.
+                                                childProductRefs.current[childProduct.id] = {
+                                                    ref,
+                                                    validateOrderability:
+                                                    this.validateOrderability
                                                 }
-                                                addToCart={
-                                                    isProductASet
-                                                        ? (productSelectionValues) =>
-                                                              handleAddToCart(
-                                                                  productSelectionValues
-                                                              )
-                                                        : null
-                                                }
-                                                addToWishlist={
-                                                    isProductASet ? handleAddToWishlist : null
-                                                }
-                                                onVariantSelected={(product, variant, quantity) => {
-                                                    if (quantity) {
-                                                        setChildProductSelection(
-                                                            (previousState) => ({
-                                                                ...previousState,
-                                                                [product.id]: {
-                                                                    product,
-                                                                    variant,
-                                                                    quantity: isProductABundle
-                                                                        ? childQuantity
-                                                                        : quantity
-                                                                }
-                                                            })
+                                            }}
+                                            product={childProduct}
+                                            isProductPartOfSet={isProductASet}
+                                            isProductPartOfBundle={isProductABundle}
+                                            childOfBundleQuantity={childQuantity}
+                                            selectedBundleParentQuantity={
+                                                selectedBundleQuantity
+                                            }
+                                            addToCart={
+                                                isProductASet
+                                                    ? (productSelectionValues) =>
+                                                        handleAddToCart(
+                                                            productSelectionValues
                                                         )
-                                                    } else {
-                                                        const selections = {
-                                                            ...childProductSelection
-                                                        }
-                                                        delete selections[product.id]
-                                                        setChildProductSelection(selections)
-                                                    }
-                                                }}
-                                                isProductLoading={isProductLoading}
-                                                isBasketLoading={isBasketLoading}
-                                                isWishlistLoading={isWishlistLoading}
-                                                setChildProductOrderability={
-                                                    setChildProductOrderability
-                                                }
-                                                pickupInStore={!!pickupInStoreMap[childProduct?.id]}
-                                                setPickupInStore={(checked) =>
-                                                    childProduct &&
-                                                    handlePickupInStoreChange(
-                                                        childProduct.id,
-                                                        checked
+                                                    : null
+                                            }
+                                            addToWishlist={
+                                                isProductASet ? handleAddToWishlist : null
+                                            }
+                                            onVariantSelected={(product, variant, quantity) => {
+                                                if (quantity) {
+                                                    setChildProductSelection(
+                                                        (previousState) => ({
+                                                            ...previousState,
+                                                            [product.id]: {
+                                                                product,
+                                                                variant,
+                                                                quantity: isProductABundle
+                                                                    ? childQuantity
+                                                                    : quantity
+                                                            }
+                                                        })
                                                     )
+                                                } else {
+                                                    const selections = {
+                                                        ...childProductSelection
+                                                    }
+                                                    delete selections[product.id]
+                                                    setChildProductSelection(selections)
                                                 }
-                                                onOpenStoreLocator={onOpenStoreLocator}
-                                                showDeliveryOptions={
-                                                    STORE_LOCATOR_IS_ENABLED && !isProductABundle
-                                                }
-                                            />
-                                            <InformationAccordion product={childProduct} />
+                                            }}
+                                            isProductLoading={isProductLoading}
+                                            isBasketLoading={isBasketLoading}
+                                            isWishlistLoading={isWishlistLoading}
+                                            setChildProductOrderability={
+                                                setChildProductOrderability
+                                            }
+                                            pickupInStore={!!pickupInStoreMap[childProduct?.id]}
+                                            setPickupInStore={(checked) =>
+                                                childProduct &&
+                                                handlePickupInStoreChange(
+                                                    childProduct.id,
+                                                    checked
+                                                )
+                                            }
+                                            onOpenStoreLocator={onOpenStoreLocator}
+                                            showDeliveryOptions={
+                                                STORE_LOCATOR_IS_ENABLED && !isProductABundle
+                                            }
+                                        />
+                                        <InformationAccordion product={childProduct} />
 
-                                            <Box display={['none', 'none', 'none', 'block']}>
-                                                <hr />
-                                            </Box>
+                                        <Box display={['none', 'none', 'none', 'block']}>
+                                            <hr />
                                         </Box>
-                                    </Island>
+                                    </Box>
                                 )
                             )
                         }
