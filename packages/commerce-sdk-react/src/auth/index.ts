@@ -509,7 +509,7 @@ class Auth {
 
             /**
              * If a token exists, handleTokenResponse will be called to set the data in storage.
-             * The refresh_token_expires_in wil already be set based on whether overridesValue, responseValue or defaultValue is set.
+             * The refresh_token_expires_in will already be set based on whether overridesValue, responseValue or defaultValue is set.
              * We can use this value to set the usid expiration but if the value is missing from storage we need to re-evaluate the correct value.
              * So we call getRefreshTokenCookieTTLValue again.
              */
