@@ -17,17 +17,21 @@ import {useCheckout} from '@salesforce/retail-react-app/app/pages/checkout/util/
 jest.mock('@salesforce/retail-react-app/app/pages/checkout/util/checkout-context')
 jest.mock('@salesforce/retail-react-app/app/hooks/use-current-customer')
 jest.mock('@salesforce/retail-react-app/app/hooks/use-current-basket')
+jest.mock('@salesforce/retail-react-app/app/hooks/use-toast')
 
 // Mock mutation hooks to prevent QueryClient errors
+const mockMutateAsync = jest.fn().mockResolvedValue({})
+const mockCustomerMutateAsync = jest.fn().mockResolvedValue({})
+
 jest.mock('@salesforce/commerce-sdk-react', () => {
     const originalModule = jest.requireActual('@salesforce/commerce-sdk-react')
     return {
         ...originalModule,
         useShopperCustomersMutation: () => ({
-            mutateAsync: jest.fn().mockResolvedValue({})
+            mutateAsync: mockCustomerMutateAsync
         }),
         useShopperBasketsMutation: () => ({
-            mutateAsync: jest.fn().mockResolvedValue({})
+            mutateAsync: mockMutateAsync
         })
     }
 })
@@ -159,6 +163,8 @@ const mockBasket = {
     ]
 }
 
+const mockShowToast = jest.fn()
+
 const mockCheckoutContext = {
     step: 3, // SHIPPING_ADDRESS
     goToStep: jest.fn(),
@@ -193,6 +199,9 @@ const renderWithIntl = (component) => {
 describe('ShippingAddress', () => {
     beforeEach(() => {
         mockCheckoutContext.goToStep.mockClear()
+        mockShowToast.mockClear()
+        mockMutateAsync.mockClear()
+        mockCustomerMutateAsync.mockClear()
         useCurrentCustomer.mockReturnValue({
             data: mockCustomer
         })
@@ -200,6 +209,11 @@ describe('ShippingAddress', () => {
             data: mockBasket
         })
         useCheckout.mockReturnValue(mockCheckoutContext)
+
+        // Mock useToast hook
+        // eslint-disable-next-line @typescript-eslint/no-var-requires
+        const useToast = require('@salesforce/retail-react-app/app/hooks/use-toast').useToast
+        useToast.mockReturnValue(mockShowToast)
     })
 
     afterEach(() => {
@@ -355,6 +369,27 @@ describe('ShippingAddress', () => {
 
         // Should still render the component
         expect(screen.getByTestId('toggle-card')).toBeInTheDocument()
+    })
+
+    it('should show toast error when address submission fails', async () => {
+        // Mock the mutation to throw an error
+        mockMutateAsync.mockRejectedValueOnce(new Error('Network error'))
+
+        renderWithIntl(<ShippingAddress {...defaultProps} />)
+
+        // Submit the address form
+        fireEvent.click(screen.getByTestId('submit-address'))
+
+        // Wait for the error to be handled
+        await waitFor(() => {
+            expect(mockShowToast).toHaveBeenCalledWith({
+                title: expect.stringContaining('Error updating shipping address'),
+                status: 'error'
+            })
+        })
+
+        // Verify that goToStep was not called due to the error
+        expect(mockCheckoutContext.goToStep).not.toHaveBeenCalled()
     })
 
     describe('Toggle Card Behavior', () => {

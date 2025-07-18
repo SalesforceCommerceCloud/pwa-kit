@@ -23,6 +23,7 @@ import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-cur
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
 import ShippingMultiAddress from '@salesforce/retail-react-app/app/pages/checkout/partials/shipping-multi-address'
 import {MULTISHIP_IS_ENABLED} from '@salesforce/retail-react-app/app/constants'
+import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
 
 const submitButtonMessage = defineMessage({
     defaultMessage: 'Continue to Shipping Method',
@@ -59,6 +60,7 @@ export default function ShippingAddress() {
     const updateShippingAddressForShipment = useShopperBasketsMutation(
         'updateShippingAddressForShipment'
     )
+    const showToast = useToast()
 
     const submitAndContinue = async (address) => {
         setIsLoading(true)
@@ -122,7 +124,13 @@ export default function ShippingAddress() {
 
             goToStep(STEPS.SHIPPING_OPTIONS)
         } catch (e) {
-            console.error('Error in submitAndContinue:', e)
+            showToast({
+                title: formatMessage({
+                    defaultMessage: 'Error updating shipping address. Please try again.',
+                    id: 'shipping_address.error.update_failed'
+                }),
+                status: 'error'
+            })
         } finally {
             setIsLoading(false)
         }
@@ -179,9 +187,6 @@ export default function ShippingAddress() {
         >
             {isMultiShipping ? (
                 <>
-                    <style>{`
-                        .multi-shipping-card .chakra-stack > .chakra-flex { display: none !important; }
-                    `}</style>
                     <ShippingMultiAddress
                         basket={basket}
                         onSubmit={submitAndContinue}
