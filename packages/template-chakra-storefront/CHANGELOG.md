@@ -1,5 +1,6 @@
 ## 0.1.0-extensibility-preview.5
 - Migrate directory structure from `app/*` to `src/*` [#2693](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2693)
+- Move Einstein and Data Cloud Page view event to the App component so that all page views are tracked [#2836](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2836)
 
 ## 0.1.0-extensibility-preview.4
 - Fix hreflang alternate links [#2269](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2269)
