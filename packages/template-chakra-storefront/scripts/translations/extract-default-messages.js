@@ -12,23 +12,6 @@
  * If a file is overridden, it won't extract messages from that file in the base template
  */
 const {exec} = require('child_process')
-const fs = require('fs')
-const path = require('path')
-
-const getAllFilesByExtensions = (dirPath, arrayOfFiles = [], extensions = []) => {
-    const files = fs.readdirSync(dirPath, {withFileTypes: true})
-
-    files.forEach(function (file) {
-        const filePath = path.join(dirPath, file.name)
-        if (file.isDirectory()) {
-            arrayOfFiles = getAllFilesByExtensions(filePath, arrayOfFiles, extensions)
-        } else if (extensions.length === 0 || extensions.includes(path.extname(filePath))) {
-            arrayOfFiles.push(filePath)
-        }
-    })
-
-    return arrayOfFiles
-}
 
 function extract(locale) {
     // `extends` is a reserved word (`class A extends B {}`)
