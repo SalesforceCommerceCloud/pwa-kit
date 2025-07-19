@@ -8,7 +8,7 @@
     "publish-to-npm": "node ./scripts/publish-to-npm.js",
     "format": "lerna run --stream format",
     "preinstall": "node ./scripts/check-version.js",
-    "postinstall": "node ./scripts/bootstrap.js && node ./scripts/check-lockfiles.mjs && npm run check-dep-version",
+    "postinstall": "node ./scripts/bootstrap.js && node ./scripts/check-lockfiles.mjs && npm run sync-eslint-deps && npm run check-dep-version",
     "lerna": "lerna",
     "lint": "lerna run --stream lint",
     "lint:fix": "lerna run lint:fix",
@@ -20,7 +20,9 @@
     "test:e2e:ui": "npx playwright test --ui",
     "test": "lerna run --stream --concurrency=1 test",
     "test:max-file-size": "lerna run --stream test:max-file-size",
-    "check-dep-version": "syncpack list-mismatches --types prod,dev",
+    "check-dep-version": "syncpack list-mismatches --config syncpack.config.js",
+    "fix-dep-version": "syncpack fix-mismatches --config syncpack.config.js", 
+    "sync-eslint-deps": "node scripts/sync-eslint-deps.js",
     "test:e2e:extra_features": "npx playwright test --project=extra-features-desktop --project=extra-features-mobile"
   },
   "devDependencies": {
