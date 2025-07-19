@@ -518,7 +518,14 @@ describe('trim-extensions', () => {
         }
         expect(console.error).toHaveBeenCalledWith(
             expect.stringContaining(
-                'Error updating file /mock/dir/src/components/featureComponent.jsx: Failed to write file'
+                `Error updating file ${path.join(
+                    path.sep,
+                    'mock',
+                    'dir',
+                    'src',
+                    'components',
+                    'featureComponent.jsx'
+                )}: Failed to write file`
             )
         )
         consoleSpy.mockRestore()
