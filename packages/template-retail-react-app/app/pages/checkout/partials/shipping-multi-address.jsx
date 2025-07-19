@@ -364,7 +364,24 @@ const ShippingMultiAddress = ({
                                                         }}
                                                     >
                                                         + {formatMessage(addNewAddressLabel)}
-                                                    </option>
+                                                  const addressLine2 = formatMessage(
+        {
+            id: 'shipping_multi_address.format.address_line_2',
+            defaultMessage: '{city}, {stateCode} {postalCode}'
+        },
+        {
+            city: addr.city,
+            stateCode: addr.stateCode || '',
+            postalCode: addr.postalCode
+        }
+    )
+    const fullAddress = `${addr.firstName} ${addr.lastName} - ${addr.address1}, ${addressLine2}`
+    
+    return (
+        <option key={addr.addressId} value={addr.addressId}>
+            {fullAddress}
+        </option>
+    )
                                                 </Select>
                                             </Box>
 
