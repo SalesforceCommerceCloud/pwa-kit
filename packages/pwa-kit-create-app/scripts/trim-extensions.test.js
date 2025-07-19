@@ -25,6 +25,106 @@ const trimExtensions = require('./trim-extensions')
 jest.mock('fs')
 jest.mock('child_process')
 
+// Test data constants
+const TEST_CODES = {
+    BASIC_COMPONENT: `
+        import loadable from '@loadable/component'
+        const ComponentA = SFDC_EXT_featureA && loadable(() => import('./featureAComponent'))
+        const ComponentB = SFDC_EXT_featureB && loadable(() => import('./featureBComponent'))
+    `,
+    BASIC_COMPONENT_TRIMMED: `
+        import loadable from '@loadable/component'
+        const ComponentA = loadable(() => import('./featureAComponent'))
+    `,
+    COMPONENT_A: `export default ComponentA`,
+    COMPONENT_B: `export default ComponentB`,
+    FEATURE_B_PAGE: `export const FeatureBPage = 'FeatureBPage'`,
+    COMPONENT_B_WITH_PAGE_REF: `
+        const pageB = SFDC_EXT_featureB && loadable(() => import('../../pages/featureBPage'))
+        export default ComponentB
+    `,
+    COMPONENT_B_WITH_PAGE_REF_TRIMMED: `export default ComponentB`,
+    FEATURE_B_PAGE_WITH_COMPONENT_REF: `
+        const ComponentB = SFDC_EXT_featureB && loadable(() => import('../../components/featureBComponent'))
+        export const FeatureBPage = 'FeatureBPage'
+    `,
+    FEATURE_B_PAGE_WITH_COMPONENT_REF_TRIMMED: `export const FeatureBPage = 'FeatureBPage'`
+}
+
+// Helper functions
+const createFileContentMock = (contentMap, callCounters = {}) => {
+    return (filePath) => {
+        for (const [pathPattern, content] of Object.entries(contentMap)) {
+            if (filePath.includes(pathPattern)) {
+                if (Array.isArray(content)) {
+                    const counter = callCounters[pathPattern] || 0
+                    callCounters[pathPattern] = counter + 1
+                    return content[counter] || content[content.length - 1]
+                }
+                return content
+            }
+        }
+        console.error('Unhandled file', filePath)
+        return ''
+    }
+}
+
+const mockConsole = (method = 'error') => {
+    const spy = jest.spyOn(console, method).mockImplementation(() => jest.fn())
+    return spy
+}
+
+const expectFileOperation = (operation, matcher, options = {}) => {
+    if (options.not) {
+        expect(fs[operation]).not.toHaveBeenCalledWith(matcher, options.args)
+    } else {
+        expect(fs[operation]).toHaveBeenCalledWith(matcher, options.args)
+    }
+}
+
+const expectFileWrite = (expectedContent) => {
+    expect(fs.writeFileSync).toHaveBeenCalledWith(
+        expect.any(String),
+        expect.toEqualTrimmedLines(expectedContent)
+    )
+}
+
+const expectFileNotContain = (content) => {
+    expect(fs.writeFileSync).not.toHaveBeenCalledWith(
+        expect.any(String),
+        expect.stringContaining(content)
+    )
+}
+
+const expectPrettierRun = (filePath) => {
+    expect(execSync).toHaveBeenCalledWith(
+        `npx prettier --write ${path.join('/mock', 'dir', 'src', 'components', filePath)}`
+    )
+}
+
+const setupDeleteErrorTest = (errorCode = 'EPERM') => {
+    fs.rmSync.mockImplementation((filePath) => {
+        if (filePath.includes('featureBComponent')) {
+            const error = new Error('Permission denied')
+            error.code = errorCode
+            throw error
+        }
+    })
+
+    const consoleSpy = mockConsole('log')
+
+    const contentMap = {
+        'featureComponent.jsx': [TEST_CODES.BASIC_COMPONENT, TEST_CODES.BASIC_COMPONENT_TRIMMED],
+        featureAComponent: TEST_CODES.COMPONENT_A,
+        featureBComponent: TEST_CODES.COMPONENT_B,
+        featureBPage: TEST_CODES.FEATURE_B_PAGE
+    }
+
+    fs.readFileSync.mockImplementation(createFileContentMock(contentMap))
+
+    return consoleSpy
+}
+
 // custom matcher to compare strings line by line with trimming
 expect.extend({
     toEqualTrimmedLines(received, expected) {
@@ -94,63 +194,6 @@ const mockFs = () => {
     fs.unlinkSync.mockReturnValue(true)
 }
 
-const testDeleteError = (errorCode = 'EPERM', expectedLogMessage) => {
-    fs.rmSync.mockImplementation((filePath) => {
-        if (filePath.includes('featureBComponent')) {
-            const error = new Error('Permission denied')
-            error.code = errorCode
-            throw error
-        }
-    })
-    jest.spyOn(console, 'log').mockImplementation(() => jest.fn())
-
-    const code = `
-        import loadable from '@loadable/component'
-        const ComponentA = SFDC_EXT_featureA && loadable(() => import('./featureAComponent'))
-        const ComponentB = SFDC_EXT_featureB && loadable(() => import('./featureBComponent'))
-    `
-
-    const trimmedCode = `
-        import loadable from '@loadable/component'
-        const ComponentA = loadable(() => import('./featureAComponent'))
-    `
-    const componentACode = `
-        export default ComponentA
-    `
-    const componentBCode = `
-        export default ComponentB
-    `
-    const featureBPageCode = `
-        export const FeatureBPage = 'FeatureBPage'
-    `
-    let trimExtensionsCalled = false
-    fs.readFileSync.mockImplementation((filePath) => {
-        if (filePath.includes('featureComponent.jsx')) {
-            if (!trimExtensionsCalled) {
-                trimExtensionsCalled = true
-                return code
-            } else {
-                return trimmedCode
-            }
-        } else if (filePath.includes('featureAComponent')) {
-            return componentACode
-        } else if (filePath.includes('featureBComponent')) {
-            return componentBCode
-        } else if (filePath.includes('featureBPage')) {
-            return featureBPageCode
-        } else {
-            console.error('Unhandled file', filePath)
-        }
-    })
-
-    trimExtensions('/mock/dir', {SFDC_EXT_featureA: true, SFDC_EXT_featureB: false})
-
-    expect(fs.rmSync).toHaveBeenCalledWith(expect.stringContaining('featureBComponent'), {
-        force: true,
-        recursive: true
-    })
-}
-
 describe('trim-extensions without config', () => {
     beforeEach(() => {
         jest.resetModules()
@@ -160,10 +203,10 @@ describe('trim-extensions without config', () => {
             plugins: {}
         }))
         const trimExtensions = require('./trim-extensions')
-        jest.spyOn(console, 'log').mockImplementation(() => jest.fn())
+        const consoleSpy = mockConsole('log')
         trimExtensions('/mock/dir', {})
         expect(console.log).toHaveBeenCalledWith('No plugins found, skipping trim')
-        console.log.mockRestore()
+        consoleSpy.mockRestore()
     })
 })
 
@@ -191,32 +234,19 @@ describe('trim-extensions with nested directories', () => {
     })
 
     it('recursively removes unused directories', () => {
-        const routeCode = `
-            const storeLocatorPage = SFDC_EXT_featureA && loadable(() => import('./pages/store-locator'))
-        `
-        const storeLocatorCode = `
-            import { Modal } from './partial/modal' 
-            export default StoreLocator = 'StoreLocatorModal'
-        `
-        const modalCode = `
-            export const StoreLocator = 'StoreLocatorModal'
-        `
-        fs.readFileSync.mockImplementation((filePath) => {
-            if (filePath.includes('route.jsx')) {
-                return routeCode
-            } else if (filePath.includes(`store-locator${path.sep}index.jsx`)) {
-                return storeLocatorCode
-            } else if (filePath.includes(`store-locator${path.sep}partial${path.sep}modal.jsx`)) {
-                return modalCode
-            } else {
-                console.error('Unhandled file', filePath)
-            }
-        })
+        const contentMap = {
+            'route.jsx': `const storeLocatorPage = SFDC_EXT_featureA && loadable(() => import('./pages/store-locator'))`,
+            [`store-locator${path.sep}index.jsx`]: `import { Modal } from './partial/modal' 
+                export default StoreLocator = 'StoreLocatorModal'`,
+            [`store-locator${path.sep}partial${path.sep}modal.jsx`]: `export const StoreLocator = 'StoreLocatorModal'`
+        }
+
+        fs.readFileSync.mockImplementation(createFileContentMock(contentMap))
         trimExtensions('/mock/dir', {SFDC_EXT_featureA: false})
-        expect(fs.rmSync).toHaveBeenCalledWith(
-            expect.stringContaining(`pages${path.sep}store-locator`),
-            {force: true, recursive: true}
-        )
+
+        expectFileOperation('rmSync', expect.stringContaining(`pages${path.sep}store-locator`), {
+            args: {force: true, recursive: true}
+        })
     })
 })
 
@@ -253,131 +283,79 @@ describe('trim-extensions', () => {
         fs.readFileSync.mockReturnValue(code)
 
         trimExtensions('/mock/dir', {SFDC_EXT_featureA: false})
-        expect(fs.writeFileSync).toHaveBeenCalledWith(
-            expect.any(String),
-            expect.toEqualTrimmedLines(expected)
-        )
+        expectFileWrite(expected)
     })
 
     it('handles OR operator correctly', () => {
         const code = `const feature = (SFDC_EXT_featureA || SFDC_EXT_featureB) && 'Feature Enabled';`
-        fs.readFileSync.mockImplementation((filePath) => {
-            if (filePath.includes('featureComponent.jsx')) {
-                return code
-            } else {
-                return ''
-            }
-        })
+        const contentMap = {
+            'featureComponent.jsx': code,
+            featureAComponent: '',
+            featureBComponent: '',
+            featureBPage: ''
+        }
+
+        fs.readFileSync.mockImplementation(createFileContentMock(contentMap))
 
         trimExtensions('/mock/dir', {SFDC_EXT_featureA: true, SFDC_EXT_featureB: false})
-        expect(fs.writeFileSync).toHaveBeenCalledWith(
-            expect.any(String),
-            expect.toEqualTrimmedLines("const feature = 'Feature Enabled';")
-        )
-        expect(execSync).toHaveBeenCalledWith(
-            `npx prettier --write ${path.join(
-                '/mock',
-                'dir',
-                'src',
-                'components',
-                'featureComponent.jsx'
-            )}`
-        )
+        expectFileWrite("const feature = 'Feature Enabled';")
+        expectPrettierRun('featureComponent.jsx')
     })
 
     it('handles variable declarations correctly', () => {
         const code = `const featureAFunc = SFDC_EXT_featureA && (() => 'Feature A');
             const featureBFunc = SFDC_EXT_featureB && (() => 'Feature B');
         `
-        fs.readFileSync.mockImplementation((filePath) => {
-            if (filePath.includes('featureComponent.jsx')) {
-                return code
-            } else {
-                return ''
-            }
-        })
+        const contentMap = {
+            'featureComponent.jsx': code,
+            featureAComponent: '',
+            featureBComponent: '',
+            featureBPage: ''
+        }
+
+        fs.readFileSync.mockImplementation(createFileContentMock(contentMap))
 
         trimExtensions('/mock/dir', {SFDC_EXT_featureA: true, SFDC_EXT_featureB: false})
 
-        expect(fs.writeFileSync).toHaveBeenCalledWith(
-            expect.any(String),
-            expect.toEqualTrimmedLines("const featureAFunc = () => 'Feature A';")
-        )
-        expect(fs.writeFileSync).toHaveBeenCalledWith(
-            expect.any(String),
-            expect.not.stringContaining("const featureBFunc = () => 'Feature B';")
-        )
-        expect(execSync).toHaveBeenCalledWith(
-            `npx prettier --write ${path.join(
-                '/mock',
-                'dir',
-                'src',
-                'components',
-                'featureComponent.jsx'
-            )}`
-        )
+        expectFileWrite("const featureAFunc = () => 'Feature A';")
+        expectFileNotContain("const featureBFunc = () => 'Feature B';")
+        expectPrettierRun('featureComponent.jsx')
     })
 
     it('handles variable with ternary expressions correctly when true', () => {
         const code = `const showFeature = SFDC_EXT_featureA ? Feature_A : Feature_B;`
-        fs.readFileSync.mockImplementation((filePath) => {
-            if (filePath.includes('featureComponent.jsx')) {
-                return code
-            } else {
-                return ''
-            }
-        })
+        const contentMap = {
+            'featureComponent.jsx': code,
+            featureAComponent: '',
+            featureBComponent: '',
+            featureBPage: ''
+        }
+
+        fs.readFileSync.mockImplementation(createFileContentMock(contentMap))
 
         trimExtensions('/mock/dir', {SFDC_EXT_featureA: true})
 
-        expect(fs.writeFileSync).toHaveBeenCalledWith(
-            expect.any(String),
-            expect.toEqualTrimmedLines('const showFeature = Feature_A;')
-        )
-        expect(fs.writeFileSync).toHaveBeenCalledWith(
-            expect.any(String),
-            expect.not.stringContaining('const showFeature = Feature_B')
-        )
-        expect(execSync).toHaveBeenCalledWith(
-            `npx prettier --write ${path.join(
-                '/mock',
-                'dir',
-                'src',
-                'components',
-                'featureComponent.jsx'
-            )}`
-        )
+        expectFileWrite('const showFeature = Feature_A;')
+        expectFileNotContain('const showFeature = Feature_B')
+        expectPrettierRun('featureComponent.jsx')
     })
 
     it('handles variable with ternary expressions correctly when false', () => {
         const code = `const showFeature = SFDC_EXT_featureA ? Feature_A : Feature_B;`
-        fs.readFileSync.mockImplementation((filePath) => {
-            if (filePath.includes('featureComponent.jsx')) {
-                return code
-            } else {
-                return ''
-            }
-        })
+        const contentMap = {
+            'featureComponent.jsx': code,
+            featureAComponent: '',
+            featureBComponent: '',
+            featureBPage: ''
+        }
+
+        fs.readFileSync.mockImplementation(createFileContentMock(contentMap))
 
         trimExtensions('/mock/dir', {SFDC_EXT_featureA: false})
 
-        expect(fs.writeFileSync).toHaveBeenCalledWith(
-            expect.any(String),
-            expect.toEqualTrimmedLines('const showFeature = Feature_B;')
-        )
-        expect(fs.writeFileSync).toHaveBeenCalledWith(
-            expect.any(String),
-            expect.not.stringContaining('const showFeature = Feature_A')
-        )
-        expect(execSync).toHaveBeenCalledWith(
-            `npx prettier --write ${path.join(
-                '/mock',
-                'dir',
-                'src',
-                'components',
-                'featureComponent.jsx'
-            )}`
-        )
+        expectFileWrite('const showFeature = Feature_B;')
+        expectFileNotContain('const showFeature = Feature_A')
+        expectPrettierRun('featureComponent.jsx')
     })
 
     it('handles return with ternary expressions correctly', () => {
@@ -395,19 +373,8 @@ describe('trim-extensions', () => {
                 return Feature_A;
             }
         `
-        expect(fs.writeFileSync).toHaveBeenCalledWith(
-            expect.any(String),
-            expect.toEqualTrimmedLines(expected)
-        )
-        expect(execSync).toHaveBeenCalledWith(
-            `npx prettier --write ${path.join(
-                '/mock',
-                'dir',
-                'src',
-                'components',
-                'featureComponent.jsx'
-            )}`
-        )
+        expectFileWrite(expected)
+        expectPrettierRun('featureComponent.jsx')
     })
 
     it('handles PropTypes declarations correctly', () => {
@@ -439,23 +406,9 @@ describe('trim-extensions', () => {
                 featureAProp: PropTypes.string
             };
         `
-        expect(fs.writeFileSync).toHaveBeenCalledWith(
-            expect.any(String),
-            expect.toEqualTrimmedLines(expected)
-        )
-        expect(fs.writeFileSync).not.toHaveBeenCalledWith(
-            expect.any(String),
-            expect.stringContaining('featureBProp: PropTypes.string')
-        )
-        expect(execSync).toHaveBeenCalledWith(
-            `npx prettier --write ${path.join(
-                '/mock',
-                'dir',
-                'src',
-                'components',
-                'featureComponent.jsx'
-            )}`
-        )
+        expectFileWrite(expected)
+        expectFileNotContain('featureBProp: PropTypes.string')
+        expectPrettierRun('featureComponent.jsx')
     })
 
     it('handles ternary expressions in return statements correctly', () => {
@@ -473,23 +426,9 @@ describe('trim-extensions', () => {
                 return "componentB";
             }
         `
-        expect(fs.writeFileSync).toHaveBeenCalledWith(
-            expect.any(String),
-            expect.toEqualTrimmedLines(expected)
-        )
-        expect(fs.writeFileSync).not.toHaveBeenCalledWith(
-            expect.any(String),
-            expect.stringContaining('componentA')
-        )
-        expect(execSync).toHaveBeenCalledWith(
-            `npx prettier --write ${path.join(
-                '/mock',
-                'dir',
-                'src',
-                'components',
-                'featureComponent.jsx'
-            )}`
-        )
+        expectFileWrite(expected)
+        expectFileNotContain('componentA')
+        expectPrettierRun('featureComponent.jsx')
     })
 
     it('handles JSX elements in return statements correctly', () => {
@@ -515,105 +454,49 @@ describe('trim-extensions', () => {
                     </div>);
             }
         `
-        expect(fs.writeFileSync).toHaveBeenCalledWith(
-            expect.any(String),
-            expect.toEqualTrimmedLines(expected)
-        )
-        expect(fs.writeFileSync).not.toHaveBeenCalledWith(
-            expect.any(String),
-            expect.stringContaining('<ComponentB />')
-        )
-        expect(execSync).toHaveBeenCalledWith(
-            `npx prettier --write ${path.join(
-                '/mock',
-                'dir',
-                'src',
-                'components',
-                'featureComponent.jsx'
-            )}`
-        )
+        expectFileWrite(expected)
+        expectFileNotContain('<ComponentB />')
+        expectPrettierRun('featureComponent.jsx')
     })
 
     it('does not remove referenced imports', () => {
-        const code = `
-            import { FeatureA } from './featureAComponent'
-        `
-        const featureAComponentCode = `
-            export const FeatureA = 'FeatureA'
-        `
-        const featureBComponentCode = `
-            export const FeatureB = 'FeatureB'
-        `
-        const featureBPageCode = `
-            export const FeatureBPage = 'FeatureBPage'
-        `
-        fs.readFileSync.mockImplementation((filePath) => {
-            if (filePath.includes('featureComponent.jsx')) {
-                return code
-            } else if (filePath.includes('featureAComponent')) {
-                return featureAComponentCode
-            } else if (filePath.includes('featureBComponent')) {
-                return featureBComponentCode
-            } else if (filePath.includes('featureBPage')) {
-                return featureBPageCode
-            } else {
-                console.error('Unhandled file', filePath)
-            }
-        })
+        const code = `import { FeatureA } from './featureAComponent'`
+        const contentMap = {
+            'featureComponent.jsx': code,
+            featureAComponent: TEST_CODES.COMPONENT_A,
+            featureBComponent: TEST_CODES.COMPONENT_B,
+            featureBPage: TEST_CODES.FEATURE_B_PAGE
+        }
+
+        fs.readFileSync.mockImplementation(createFileContentMock(contentMap))
 
         trimExtensions('/mock/dir', {SFDC_EXT_featureA: true})
 
-        expect(fs.unlinkSync).not.toHaveBeenCalledWith(
-            expect.stringContaining('src/components/featureAComponent')
+        expectFileOperation(
+            'unlinkSync',
+            expect.stringContaining('src/components/featureAComponent'),
+            {not: true}
         )
     })
 
     it('removes unused loadable import file when no more references exist', () => {
-        const code = `
-            import loadable from '@loadable/component'
-            const ComponentA = SFDC_EXT_featureA && loadable(() => import('./featureAComponent'))
-            const ComponentB = SFDC_EXT_featureB && loadable(() => import('./featureBComponent'))
-        `
+        const contentMap = {
+            'featureComponent.jsx': [
+                TEST_CODES.BASIC_COMPONENT,
+                TEST_CODES.BASIC_COMPONENT_TRIMMED
+            ],
+            featureAComponent: TEST_CODES.COMPONENT_A,
+            featureBComponent: TEST_CODES.COMPONENT_B,
+            featureBPage: TEST_CODES.FEATURE_B_PAGE
+        }
 
-        const trimmedCode = `
-            import loadable from '@loadable/component'
-            const ComponentA = loadable(() => import('./featureAComponent'))
-        `
-        const componentACode = `
-            export default ComponentA
-        `
-        const componentBCode = `
-            export default ComponentB
-        `
-        const featureBPageCode = `
-            export const FeatureAPage = 'FeatureAPage'
-        `
-        let trimExtensionsCalled = false
-        fs.readFileSync.mockImplementation((filePath) => {
-            if (filePath.includes('featureComponent.jsx')) {
-                if (!trimExtensionsCalled) {
-                    trimExtensionsCalled = true
-                    return code
-                } else {
-                    return trimmedCode
-                }
-            } else if (filePath.includes('featureAComponent')) {
-                return componentACode
-            } else if (filePath.includes('featureBComponent')) {
-                return componentBCode
-            } else if (filePath.includes('featureBPage')) {
-                return featureBPageCode
-            } else {
-                console.error('Unhandled file', filePath)
-            }
-        })
+        fs.readFileSync.mockImplementation(createFileContentMock(contentMap))
 
         trimExtensions('/mock/dir', {SFDC_EXT_featureA: true, SFDC_EXT_featureB: false})
 
-        expect(fs.rmSync).not.toHaveBeenCalledWith(expect.stringContaining('featureAComponent'))
-        expect(fs.rmSync).toHaveBeenCalledWith(expect.stringContaining('featureBComponent'), {
-            force: true,
-            recursive: true
+        expectFileOperation('rmSync', expect.stringContaining('featureAComponent'), {not: true})
+        expectFileOperation('rmSync', expect.stringContaining('featureBComponent'), {
+            args: {force: true, recursive: true}
         })
     })
 
@@ -621,7 +504,7 @@ describe('trim-extensions', () => {
         fs.writeFileSync.mockImplementation(() => {
             throw new Error('Failed to write file')
         })
-        jest.spyOn(console, 'error').mockImplementation(() => jest.fn())
+        const consoleSpy = mockConsole('error')
         const code = `
         function test() {
             return SFDC_EXT_featureA ? Feature_A : Feature_B;
@@ -638,25 +521,29 @@ describe('trim-extensions', () => {
                 'Error updating file /mock/dir/src/components/featureComponent.jsx: Failed to write file'
             )
         )
-        console.error.mockRestore()
+        consoleSpy.mockRestore()
     })
 
     it('reports error when delete permission is denied', () => {
-        testDeleteError('EPERM')
+        const consoleSpy = setupDeleteErrorTest('EPERM')
+        trimExtensions('/mock/dir', {SFDC_EXT_featureA: true, SFDC_EXT_featureB: false})
+
         expect(console.log).toHaveBeenCalledWith(
             expect.stringContaining(
                 '✗ Permission denied - cannot delete. You may need to run with sudo or check permissions.'
             )
         )
-        console.log.mockRestore()
+        consoleSpy.mockRestore()
     })
 
     it('reports error when delete fails', () => {
-        testDeleteError(null)
+        const consoleSpy = setupDeleteErrorTest(null)
+        trimExtensions('/mock/dir', {SFDC_EXT_featureA: true, SFDC_EXT_featureB: false})
+
         expect(console.log).toHaveBeenCalledWith(
             expect.stringContaining('✗ Error deleting: Permission denied')
         )
-        console.log.mockRestore()
+        consoleSpy.mockRestore()
     })
 
     /**
@@ -664,75 +551,32 @@ describe('trim-extensions', () => {
      * The test ensures that the unused directories are removed when no "outside" references exist
      */
     it('removes separate unused directories when the only references are from each other', () => {
-        const code = `
-            import loadable from '@loadable/component'
-            const ComponentA = SFDC_EXT_featureA && loadable(() => import('./featureAComponent'))
-            const ComponentB = SFDC_EXT_featureB && loadable(() => import('./featureBComponent'))
-        `
+        const contentMap = {
+            'featureComponent.jsx': [
+                TEST_CODES.BASIC_COMPONENT,
+                TEST_CODES.BASIC_COMPONENT_TRIMMED
+            ],
+            featureAComponent: TEST_CODES.COMPONENT_A,
+            featureBComponent: [
+                TEST_CODES.COMPONENT_B_WITH_PAGE_REF,
+                TEST_CODES.COMPONENT_B_WITH_PAGE_REF_TRIMMED
+            ],
+            featureBPage: [
+                TEST_CODES.FEATURE_B_PAGE_WITH_COMPONENT_REF,
+                TEST_CODES.FEATURE_B_PAGE_WITH_COMPONENT_REF_TRIMMED
+            ]
+        }
 
-        const trimmedCode = `
-            import loadable from '@loadable/component'
-            const ComponentA = loadable(() => import('./featureAComponent'))
-        `
-        const componentACode = `
-            export default ComponentA
-        `
-        const componentBCode = `
-            const pageB = SFDC_EXT_featureB && loadable(() => import('../../pages/featureBPage'))
-            export default ComponentB
-        `
-        const trimmedComponentBCode = `
-            export default ComponentB
-        `
-        const featureBPageCode = `
-            const ComponentB = SFDC_EXT_featureB && loadable(() => import('../../components/featureBComponent'))
-            export const FeatureBPage = 'FeatureBPage'
-        `
-        const trimmedFeatureBPageCode = `
-            export const FeatureBPage = 'FeatureBPage'
-        `
-        let componentTrimmed = false
-        let componentBTrimmed = false
-        let pageBTrimmed = false
-        fs.readFileSync.mockImplementation((filePath) => {
-            if (filePath.includes('featureComponent.jsx')) {
-                if (!componentTrimmed) {
-                    componentTrimmed = true
-                    return code
-                } else {
-                    return trimmedCode
-                }
-            } else if (filePath.includes('featureAComponent')) {
-                return componentACode
-            } else if (filePath.includes('featureBComponent')) {
-                if (!componentBTrimmed) {
-                    componentBTrimmed = true
-                    return componentBCode
-                } else {
-                    return trimmedComponentBCode
-                }
-            } else if (filePath.includes('featureBPage')) {
-                if (!pageBTrimmed) {
-                    pageBTrimmed = true
-                    return featureBPageCode
-                } else {
-                    return trimmedFeatureBPageCode
-                }
-            } else {
-                console.error('Unhandled file', filePath)
-            }
-        })
+        fs.readFileSync.mockImplementation(createFileContentMock(contentMap))
 
         trimExtensions('/mock/dir', {SFDC_EXT_featureA: true, SFDC_EXT_featureB: false})
 
-        expect(fs.unlinkSync).not.toHaveBeenCalledWith(expect.stringContaining('featureAComponent'))
-        expect(fs.rmSync).toHaveBeenCalledWith(expect.stringContaining('featureBComponent'), {
-            force: true,
-            recursive: true
+        expectFileOperation('unlinkSync', expect.stringContaining('featureAComponent'), {not: true})
+        expectFileOperation('rmSync', expect.stringContaining('featureBComponent'), {
+            args: {force: true, recursive: true}
         })
-        expect(fs.rmSync).toHaveBeenCalledWith(expect.stringContaining('featureBPage'), {
-            force: true,
-            recursive: true
+        expectFileOperation('rmSync', expect.stringContaining('featureBPage'), {
+            args: {force: true, recursive: true}
         })
     })
 })
