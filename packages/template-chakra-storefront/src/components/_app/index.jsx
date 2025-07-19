@@ -53,6 +53,7 @@ import OfflineBoundary from '../offline-boundary'
 import Seo from '../seo'
 import ScrollToTop from '../scroll-to-top'
 import Fade from '../fade'
+import Toaster, {toaster} from '../toaster'
 
 // Contexts
 import {CurrencyProvider} from '../../contexts'
@@ -453,6 +454,7 @@ const App = (props) => {
                                 {!isCheckout ? <Footer /> : <CheckoutFooter />}
                                 <AuthModal {...authModal} />
                                 <DntNotification {...dntNotification} />
+                                <Toaster toaster={toaster} />
                             </AddToCartModalProvider>
                         </Box>
                     </CurrencyProvider>
