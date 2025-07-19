@@ -23,7 +23,6 @@ import SearchSuggestions from '@salesforce/retail-react-app/app/components/searc
 import {SearchIcon} from '@salesforce/retail-react-app/app/components/icons'
 import {
     capitalize,
-    boldString,
     getSessionJSONItem,
     setSessionJSONItem
 } from '@salesforce/retail-react-app/app/utils/utils'
@@ -34,7 +33,8 @@ import debounce from 'lodash/debounce'
 import {
     RECENT_SEARCH_KEY,
     RECENT_SEARCH_LIMIT,
-    RECENT_SEARCH_MIN_LENGTH
+    RECENT_SEARCH_MIN_LENGTH,
+    PRODUCT_BADGE_CUSTOM_FIELD_NAME
 } from '@salesforce/retail-react-app/app/constants'
 import {
     productUrlBuilder,
@@ -42,7 +42,7 @@ import {
     categoryUrlBuilder
 } from '@salesforce/retail-react-app/app/utils/url'
 
-const formatSuggestions = (searchSuggestions, input) => {
+const formatSuggestions = (searchSuggestions) => {
     return {
         categorySuggestions: searchSuggestions?.categorySuggestions?.categories?.map(
             (suggestion) => {
@@ -50,7 +50,9 @@ const formatSuggestions = (searchSuggestions, input) => {
                     type: 'category',
                     id: suggestion.id,
                     link: categoryUrlBuilder({id: suggestion.id}),
-                    name: boldString(suggestion.name, capitalize(input))
+                    name: capitalize(suggestion.name),
+                    image: suggestion.image?.disBaseLink, // Add image if available
+                    parentCategoryName: suggestion.parentCategoryName // Add parent category if available
                 }
             }
         ),
@@ -60,15 +62,24 @@ const formatSuggestions = (searchSuggestions, input) => {
                 currency: product.currency,
                 price: product.price,
                 productId: product.productId,
-                name: boldString(product.productName, capitalize(input)),
-                link: productUrlBuilder({id: product.productId})
+                name: capitalize(product.productName),
+                link: productUrlBuilder({id: product.productId}),
+                image: product.image?.disBaseLink // Add image if available
+            }
+        }),
+        brandSuggestions: searchSuggestions?.brandSuggestions?.suggestedPhrases?.map((brand) => {
+            // Init cap the brand name
+            return {
+                type: 'brand',
+                name: capitalize(brand.phrase),
+                link: searchUrlBuilder(brand.phrase)
             }
         }),
         phraseSuggestions: searchSuggestions?.categorySuggestions?.suggestedPhrases?.map(
             (phrase) => {
                 return {
                     type: 'phrase',
-                    name: boldString(phrase.phrase, capitalize(input)),
+                    name: capitalize(phrase.phrase),
                     link: searchUrlBuilder(phrase.phrase)
                 }
             }
@@ -91,7 +102,9 @@ const Search = (props) => {
     const searchSuggestion = useSearchSuggestions(
         {
             parameters: {
-                q: searchQuery
+                q: searchQuery,
+                expand: 'images,prices,custom_product_properties',
+                includedCustomProductProperties: PRODUCT_BADGE_CUSTOM_FIELD_NAME
             }
         },
         {
@@ -101,7 +114,7 @@ const Search = (props) => {
     const searchInputRef = useRef()
     const recentSearches = getSessionJSONItem(RECENT_SEARCH_KEY)
     const searchSuggestions = useMemo(
-        () => formatSuggestions(searchSuggestion.data, searchInputRef?.current?.value),
+        () => formatSuggestions(searchSuggestion.data),
         [searchSuggestion]
     )
 
