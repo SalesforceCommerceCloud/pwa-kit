@@ -8,7 +8,12 @@ In this monorepo, ESLint plugins are installed in `@salesforce/pwa-kit-dev` but 
 
 We maintain ESLint plugins in both locations:
 - **Source of Truth**: `packages/pwa-kit-dev/package.json` (dependencies and devDependencies)  
-- **IDE Compatibility**: `packages/template-retail-react-app/package.json` (devDependencies only)
+- **IDE Compatibility**: Template packages (devDependencies only):
+  - `packages/template-retail-react-app`
+  - `packages/template-typescript-minimal`  
+  - `packages/template-express-minimal`
+  - `packages/template-mrt-reference-app`
+  - `packages/test-commerce-sdk-react`
 
 ## Automated Synchronization
 
@@ -20,8 +25,8 @@ npm run sync-eslint-deps
 
 This script:
 - Reads ESLint-related dependencies from `pwa-kit-dev`
-- Updates `template-retail-react-app` devDependencies to match
-- Reports what was added, updated, or removed
+- Updates all template packages' devDependencies to match
+- Reports what was added, updated, or removed for each package
 - Runs automatically during `npm install` (postinstall hook)
 
 ### 2. Syncpack Configuration

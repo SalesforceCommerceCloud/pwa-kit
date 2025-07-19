@@ -13,7 +13,11 @@ module.exports = {
       label: 'ESLint Dependencies',
       packages: [
         'packages/pwa-kit-dev',
-        'packages/template-retail-react-app'
+        'packages/template-retail-react-app',
+        'packages/template-typescript-minimal',
+        'packages/template-express-minimal', 
+        'packages/template-mrt-reference-app',
+        'packages/test-commerce-sdk-react'
       ],
       dependencies: [
         '@typescript-eslint/**',
