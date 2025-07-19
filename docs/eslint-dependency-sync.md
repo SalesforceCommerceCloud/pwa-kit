@@ -14,7 +14,7 @@ In monorepos, ESLint plugins installed in individual packages can cause IDE inte
 - **Node.js Resolution**: Individual packages find plugins via Node.js module resolution
 - **No Duplication**: No need to install ESLint plugins in individual template packages
 - **Automatic Discovery**: IDEs automatically find plugins from the root node_modules
-- **Automatic Sync**: ESLint dependencies are automatically synced from `pwa-kit-dev` to root during install
+- **Automatic Sync**: ESLint dependencies are automatically synced from `pwa-kit-dev` to root before install
 
 ## ESLint Dependencies (Root Level)
 
@@ -43,7 +43,7 @@ All packages use these centrally installed dependencies:
 ### Adding New ESLint Plugins
 
 1. Add to `packages/pwa-kit-dev/package.json` devDependencies (source of truth)
-2. Run `npm run sync-eslint-to-root` (or happens automatically during `npm install`)
+2. Run `npm run sync-eslint-to-root` (or happens automatically before `npm install`)
 3. Plugin is automatically available to all packages
 
 ### Updating ESLint Plugin Versions
@@ -55,7 +55,7 @@ All packages use these centrally installed dependencies:
 ### Verification
 
 ```bash
-# Sync ESLint dependencies from pwa-kit-dev to root (runs automatically)
+# Sync ESLint dependencies from pwa-kit-dev to root (runs automatically before npm install)
 npm run sync-eslint-to-root
 
 # Check for version mismatches across packages  
@@ -70,4 +70,4 @@ npm run check-dep-version
 - ✅ **Version consistency** - impossible to have version conflicts
 - ✅ **Clean package.json** files in individual packages
 - ✅ **Faster installs** - no duplicate dependency downloads
-- ✅ **Automatic sync** - dependencies stay in sync during install 
+- ✅ **Automatic sync** - dependencies synced before install for perfect timing 
