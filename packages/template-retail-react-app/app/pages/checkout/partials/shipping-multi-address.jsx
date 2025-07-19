@@ -217,7 +217,7 @@ const ShippingMultiAddress = ({
                                     overflow="visible"
                                     role="article"
                                     aria-labelledby={`product-title-${addressKey}`}
-                                    aria-describedby={`product-description-${addressKey}`}
+                                    aria-describedby={`product-description-${item.itemId}`}
                                 >
                                     <Flex
                                         direction={{base: 'column', md: 'row'}}
