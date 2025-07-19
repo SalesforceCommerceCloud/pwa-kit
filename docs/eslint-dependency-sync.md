@@ -1,91 +1,68 @@
-# ESLint Dependency Synchronization
+# ESLint Centralized Setup
 
 ## Problem
 
-In this monorepo, ESLint plugins are installed in `@salesforce/pwa-kit-dev` but used by other packages like `template-retail-react-app`. This causes IDE integration issues because ESLint plugins cannot be resolved across package boundaries in monorepos.
+In monorepos, ESLint plugins installed in individual packages can cause IDE integration issues because plugins cannot be resolved across package boundaries.
 
 ## Solution
 
-We maintain ESLint plugins in both locations:
-- **Source of Truth**: `packages/pwa-kit-dev/package.json` (dependencies and devDependencies)  
-- **IDE Compatibility**: Template packages (devDependencies only):
-  - `packages/template-retail-react-app`
-  - `packages/template-typescript-minimal`  
-  - `packages/template-express-minimal`
-  - `packages/template-mrt-reference-app`
-  - `packages/test-commerce-sdk-react`
+**Centralized ESLint Dependencies**: All ESLint plugins and related dependencies are installed at the **root level** in the main `package.json` devDependencies.
 
-## Automated Synchronization
+## How It Works
 
-### 1. Custom Sync Script
+- **Single Installation Point**: All ESLint dependencies in root `package.json`
+- **Node.js Resolution**: Individual packages find plugins via Node.js module resolution
+- **No Duplication**: No need to install ESLint plugins in individual template packages
+- **Automatic Discovery**: IDEs automatically find plugins from the root node_modules
 
-```bash
-npm run sync-eslint-deps
+## ESLint Dependencies (Root Level)
+
+All packages use these centrally installed dependencies:
+
+```json
+{
+  "devDependencies": {
+    "eslint": "^8.37.0",
+    "@typescript-eslint/eslint-plugin": "^5.57.0",
+    "@typescript-eslint/parser": "^5.57.0",
+    "eslint-config-prettier": "8.8.0",
+    "eslint-plugin-jest": "^27.2.1",
+    "eslint-plugin-jsx-a11y": "6.7.1",
+    "eslint-plugin-prettier": "4.2.1",
+    "eslint-plugin-react": "^7.32.2",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "eslint-plugin-use-effect-no-deps": "^1.1.2",
+    "prettier": "^2.8.6"
+  }
+}
 ```
-
-This script:
-- Reads ESLint-related dependencies from `pwa-kit-dev`
-- Updates all template packages' devDependencies to match
-- Reports what was added, updated, or removed for each package
-- Runs automatically during `npm install` (postinstall hook)
-
-### 2. Syncpack Configuration
-
-```bash
-npm run check-dep-version  # Check for version mismatches
-npm run fix-dep-version    # Fix version mismatches automatically
-```
-
-The `syncpack.config.js` ensures ESLint dependency versions stay in sync between packages.
-
-## ESLint Dependencies Managed
-
-The following dependency patterns are automatically synchronized:
-
-- `@typescript-eslint/*`
-- `eslint`
-- `eslint-*` (all eslint plugins)
-- `prettier`
 
 ## Maintenance Workflow
 
-### When Adding New ESLint Plugins
+### Adding New ESLint Plugins
 
-1. Add the plugin to `packages/pwa-kit-dev/package.json`
-2. Run `npm run sync-eslint-deps` (or it will run automatically on next install)
-3. Commit both package.json files
+1. Add to root `package.json` devDependencies
+2. Run `npm install` from root
+3. Plugin is automatically available to all packages
 
-### When Updating ESLint Plugin Versions
+### Updating ESLint Plugin Versions
 
-1. Update versions in `packages/pwa-kit-dev/package.json`
-2. Run `npm run sync-eslint-deps`
-3. Run `npm install` to update lockfiles
-4. Commit changes
+1. Update version in root `package.json`
+2. Run `npm install` from root  
+3. All packages use the updated version
 
 ### Verification
 
 ```bash
-# Check that dependencies are in sync
+# Check for version mismatches across packages
 npm run check-dep-version
-
-# If mismatches are found, fix them
-npm run fix-dep-version
-
-# Or manually sync ESLint deps
-npm run sync-eslint-deps
 ```
-
-## Files Involved
-
-- `syncpack.config.js` - Syncpack configuration for version management
-- `scripts/sync-eslint-deps.js` - Custom script for dependency synchronization  
-- `packages/pwa-kit-dev/package.json` - Source of truth for ESLint dependencies
-- `packages/template-retail-react-app/package.json` - Contains synced ESLint devDependencies
 
 ## Benefits
 
-- ✅ **No manual IDE configuration** required
-- ✅ **Automatic synchronization** during install
-- ✅ **Version consistency** across packages
-- ✅ **Clear source of truth** for ESLint dependencies
-- ✅ **Easy maintenance** with automated scripts 
+- ✅ **Simple maintenance** - single location for all ESLint dependencies
+- ✅ **No duplication** - dependencies installed once at root
+- ✅ **Automatic IDE support** - plugins discoverable from root
+- ✅ **Version consistency** - impossible to have version conflicts
+- ✅ **Clean package.json** files in individual packages
+- ✅ **Faster installs** - no duplicate dependency downloads 
