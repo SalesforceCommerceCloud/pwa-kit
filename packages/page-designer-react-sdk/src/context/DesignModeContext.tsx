@@ -7,7 +7,6 @@ import React, {
 import {useLocation} from 'react-router-dom'
 import {componentConfigs} from '../ComponentRegistry'
 import {PD, setupComponentRegistryMessaging} from '../core/registry'
-import {DESIGN_MODE_CSS} from './design-mode'
 
 type DesignModeContextType = {
     isDesignMode: boolean
@@ -29,17 +28,8 @@ export const DesignModeProvider = ({children}: {children: React.ReactNode}) => {
     useEffect(() => {
         if (!isDesignMode) return
 
-        const styleEl = document.createElement('style')
-        styleEl.setAttribute('data-pd-style', 'true')
-        styleEl.textContent = DESIGN_MODE_CSS
-        document.head.appendChild(styleEl)
-
         setupComponentRegistryMessaging()
         // componentConfigs.forEach(PD.registerComponent)
-
-        return () => {
-            document.querySelector('[data-pd-style]')?.remove()
-        }
     }, [isDesignMode])
 
     const contextValue = useMemo<DesignModeContextType>(() => ({

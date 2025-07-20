@@ -1,6 +1,7 @@
 import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react'
 import {useLocation} from 'react-router-dom'
 import {useDesignMode} from '../context'
+import {usePageDesignerMode} from '../context/usePageDesignerMode'
 import {useParentConnection} from './parentConnection'
 
 const getComponentConfigFromElement = (el: HTMLElement) => {
@@ -18,11 +19,8 @@ export const smartComponent = (Component) => {
     const Wrapped = (props: any) => {
         const designModeContext = useDesignMode()
         const isDesign = designModeContext?.isDesignMode
+        const {isDesignMode, isPreviewMode, isAnyModeActive} = usePageDesignerMode()
         const location = useLocation()
-        const isDesignMode = useMemo(() => {
-            const query = new URLSearchParams(location.search)
-            return query.get('design') === 'true'
-        }, [location.search])
         const ref = useRef<HTMLDivElement>(null)
 
         const componentId =
@@ -59,7 +57,7 @@ export const smartComponent = (Component) => {
         }
 
         const handleClick = (e: React.MouseEvent<HTMLDivElement>) => {
-            if (!isDesign) return
+            if (!isDesignMode) return
 
             // Prevent bubbling if needed
             e.preventDefault()

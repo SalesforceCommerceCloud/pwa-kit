@@ -10,7 +10,7 @@ import React from 'react'
 import {Route, Switch as RouterSwitch} from 'react-router-dom'
 import {UIDFork, UIDReset} from 'react-uid'
 import AppErrorBoundary from '../app-error-boundary'
-import {DesignModeProvider} from '@salesforce/page-designer-react-sdk/dist'
+import {PageDesignerProvider} from '@salesforce/page-designer-react-sdk/dist'
 
 /**
  * The Switch component packages up the bits of rendering that are shared between
@@ -28,7 +28,7 @@ const Switch = (props) => {
             <AppErrorBoundary error={error}>
                 {!error && (
                     <App preloadedProps={appState.appProps}>
-                        <DesignModeProvider>
+                        <PageDesignerProvider>
                             <RouterSwitch>
                                 {routes.map((route, i) => {
                                     const {component: Component, ...routeProps} = route
@@ -41,7 +41,7 @@ const Switch = (props) => {
                                     )
                                 })}
                             </RouterSwitch>
-                        </DesignModeProvider>
+                        </PageDesignerProvider>
                     </App>
                 )}
             </AppErrorBoundary>
