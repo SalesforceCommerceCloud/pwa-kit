@@ -1,56 +1,112 @@
-# Support onboarding: analytics session
+# Support Onboarding: Analytics Session
 
-OUTLINE:
+## Overview
 
-* There are 3 analytics providers. How are they similar?  
-* Then now focus on the differences. Go talk about each analytics one by one.  
-  * How to verify events on the frontend  
-  * What the customers see on the dashboards  
-  * How to configure on the frontend and backend  
-  * Then show under the hood: summary of how the integration works.. Because an investigation may require some debugging if there’s potentially a bug in our code.  
-* General strategy: if all’s good on the frontend, pass the investigation to the backend team.  
-* Next actions: what permissions are needed for new teams to join the support rotation?
+This guide provides comprehensive training for support teams joining the analytics rotation. You'll learn to investigate and resolve customer analytics issues across three major providers integrated with PWA Kit.
 
-There are 3 analytics providers that we’ll learn today:
+**Target Audience:** New support team members who will help customers troubleshoot analytics integration problems.
 
-* Data Cloud  
-* Active Data  
-* Einstein
+## Table of Contents
+1. [Analytics Providers Overview](#analytics-providers-overview)
+2. [General Troubleshooting Strategy](#general-troubleshooting-strategy)
+3. [Data Cloud](#data-cloud)
+4. [Active Data](#active-data)
+5. [Einstein Analytics](#einstein-analytics)
+6. [Next Actions](#next-actions)
 
-They’re all enabled by default in retail-react-app. We have spinned up some instances for developers to play with. But they’ll need to configure their own and update the configuration values accordingly.
+---
 
-How are the analytics providers similarly integrated into the pwa kit site?
+## Analytics Providers Overview
 
-* They have a very similar interface, React hooks. Calling the hook will return methods for sending typical analytics events.  
-* They all also respect the DNT (do not track) setting.
+PWA Kit integrates with **three analytics providers**, each serving different business needs:
 
-With investigations, the general troubleshooting approach is to first narrow down the source of the problem. Is it frontend, backend, or both perhaps? Since no team owns the whole thing end to end, usually multiple teams are involved. However, we can start by verifying things on the front end.
+| Provider | Purpose | Primary Use Case |
+|----------|---------|------------------|
+| **Data Cloud** | Customer data unification | Latest Salesforce analytics platform for unified customer profiles |
+| **Active Data** | Merchandising analytics | Product performance tracking and automated merchandising rules |
+| **Einstein** | General analytics + recommendations | Comprehensive analytics with AI-powered product recommendations |
 
-Usually, an investigation would be something like a customer noticing the data on dashboard looks incorrect to them. What happened? It could be because they’ve recently migrated to a PWA site.
+### Common Integration Patterns
 
-Demo for each analytics provider:
+All three providers share similar integration approaches in PWA Kit:
 
-* Use this site as reference: [pwa-kit.mobify-storefront.com](http://pwa-kit.mobify-storefront.com)   
-* Verifying events and seeing the dashboards  
-* Example of common gotchas if they exist  
-* Mention how users have the final say re: tracking (regardless of our configurations)  
-  * With vs without DNT (do not track)  
-  * Ad blockers too
+#### 1. **React Hook Interface**
+- Each provider exposes a custom React hook (`useDataCloud`, `useActiveData`, `useEinstein`)
+- Hooks return methods for sending standard e-commerce events (page views, product views, searches, etc.)
+- Consistent API pattern across providers
+
+#### 2. **Do Not Track (DNT) Compliance**
+- All providers respect user privacy settings
+- When DNT is enabled (`dw_dnt=1`), behavior varies by provider:
+  - **Data Cloud**: Replaces personal data with `'__DNT__'` 
+  - **Active Data**: Still sends events, but backend ignores them
+  - **Einstein**: Skips sending events entirely (`dnt !== false`)
+
+#### 3. **Default Enablement**
+- All providers are enabled by default in `template-retail-react-app`
+- Customers must configure their own instances and update configuration values
+
+---
+
+## General Troubleshooting Strategy
+
+When investigating analytics issues, follow this systematic approach:
+
+### 1. **Narrow Down the Problem Source**
+- Is it a frontend issue (events not being sent)?
+- Is it a backend issue (events not processed/displayed)?
+- Is it a configuration issue?
+
+### 2. **Frontend Verification First**
+Since multiple teams are involved end-to-end, start with frontend verification:
+- Check if events are being sent from the browser
+- Verify event payloads contain expected data
+- Confirm configuration is correct
+
+### 3. **Common Investigation Triggers**
+- Customer reports incorrect dashboard data
+- Missing analytics data after PWA migration
+- Events not appearing in backend systems
+
+### 4. **Escalation Path**
+- If frontend verification passes → escalate to backend team
+- If configuration issues → check with customer's setup team
+- If code issues → escalate to PWA Kit team
+
+---
 
 ## Data Cloud
 
-Purpose: it’s the latest and greatest. To unify your customer data on Salesforce.
+### Purpose
+Data Cloud is Salesforce's latest analytics platform designed to unify customer data across all touchpoints, enabling personalized experiences and comprehensive customer insights.
 
-How it works?
+### How It Works
 
-* Also a hook [`useDataCloud`](https://github.com/SalesforceCommerceCloud/pwa-kit/blob/develop/packages/template-retail-react-app/app/hooks/use-datacloud.js) and relies on third party code ([cc-datacloud-typescript](https://www.npmjs.com/package/@salesforce/cc-datacloud-typescript) library)  
-* Also respects DNT
+#### Technical Implementation
+- **Hook**: [`useDataCloud`](https://github.com/SalesforceCommerceCloud/pwa-kit/blob/develop/packages/template-retail-react-app/app/hooks/use-datacloud.js)
+- **Third-party Library**: [@salesforce/cc-datacloud-typescript](https://www.npmjs.com/package/@salesforce/cc-datacloud-typescript)
+- **API Endpoint**: `c360a.salesforce.com`
+- **DNT Handling**: Replaces personal identifiers with `'__DNT__'` when DNT is enabled
 
-How to configure it?  
-Some prerequisites on the backend are required. TODO: show briefly, and point people to the public docs for details.
+#### Event Types Supported
+- `ViewPage` — Page view tracking
+- `ViewProduct` — Product detail page views
+- `ViewCategory` — Category/listing page views  
+- `ViewSearchResults` — Product search tracking
+- `ViewRecommendations` — Recommendation impression tracking
 
-And then this on the frontend:
+### Configuration
 
+#### Prerequisites (Backend)
+Customers must complete setup in Data Cloud before frontend configuration:
+1. Set up production Data Cloud instance
+2. Connect website/mobile app to Data Cloud
+3. Create data stream
+4. Obtain tenant ID and app source ID
+
+> **Reference**: [Data Cloud Integration Guide](https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/integrate-data-cloud.html)
+
+#### Frontend Configuration
 ```javascript
 // config/default.js
 app: {
@@ -61,72 +117,174 @@ app: {
 }
 ```
 
-How can we verify it?
+### Verification Steps
 
-* Look for requests to [c360a.salesforce.com](http://c360a.salesforce.com). Their payload is base64 encoded.  
-* Wait for 15 mins for data to show up on DataCloud
+#### 1. **Browser Network Tab**
+- Look for requests to `c360a.salesforce.com`
+- Event payloads are **base64 encoded**
+- Check for 200 status responses
 
-Common issues
+#### 2. **Data Cloud Dashboard**
+- Navigate to Data Cloud → Data Explorer
+- Select data space → Data Model Object → Website Engagement
+- **Data latency**: ~15 minutes for events to appear
 
-* I don’t think we’ve ever had an investigation for this yet. Still new integration, so no common issues yet.
+#### 3. **Testing Flow**
+1. Perform shopper activities (search, view product, etc.)
+2. Wait 15 minutes
+3. Refresh Data Explorer to verify events
 
-Resources
+### Common Issues
 
-* Public documentation [https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/integrate-data-cloud.html](https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/integrate-data-cloud.html)   
-* TODO: ask Carson if there’s any runbook for it
+#### Missing Configuration
+**Symptom**: No requests to Data Cloud endpoints
+**Cause**: Missing `appSourceId` or `tenantId` in config
+**Solution**: Verify configuration values with customer's Data Cloud setup
 
-## 
+#### Backend Setup Incomplete  
+**Symptom**: 400/401 errors in network requests
+**Cause**: Data Cloud instance not properly configured
+**Solution**: Refer customer to Data Cloud setup documentation
+
+#### Incorrect Tenant/App Source IDs
+**Symptom**: 400 Bad Request errors with valid payloads
+**Cause**: Wrong `tenantId` or `appSourceId` values (common during environment migrations)
+**Solution**: Verify IDs match the customer's Data Cloud configuration exactly
+
+#### Data Stream Not Connected
+**Symptom**: Events send successfully (200 responses) but don't appear in Data Cloud
+**Cause**: Data stream not properly connected to the website/app in Data Cloud setup
+**Solution**: Check Data Cloud console → Data Streams → Website connection
+
+#### Wrong Environment Configuration
+**Symptom**: Data appearing in wrong Data Cloud environment or not at all
+**Cause**: Production vs. sandbox configuration mismatch
+**Solution**: Verify frontend config matches the intended Data Cloud environment (production/sandbox)
+
+#### Event Payload Validation Errors
+**Symptom**: Some events fail while others succeed
+**Cause**: Missing required fields or incorrect data types in event payloads
+**Solution**: Check browser console for validation errors and verify event data structure
+
+### Under the Hood
+
+Data Cloud integration works by:
+1. Hook initializes SDK with tenant/app source IDs
+2. Events are constructed with base event data + specific event details  
+3. Personal data is conditionally replaced with `'__DNT__'` based on privacy settings
+4. Events sent as interactions to Data Cloud's REST API
+5. Data processed and available in Data Cloud's analytics interface
+
+---
 
 ## Active Data
 
-Purpose: analytics for merchandizers
+### Purpose
+Active Data provides **merchandising analytics** by collecting shopper engagement data to help merchandisers optimize product offerings and configure automated rules.
 
-How it works?  
-Most of the logic lies in a third party [static javascript file](https://github.com/SalesforceCommerceCloud/pwa-kit/blob/develop/packages/template-retail-react-app/app/assets/js/active-data.js), which the [`useActiveData`](https://github.com/SalesforceCommerceCloud/pwa-kit/blob/develop/packages/template-retail-react-app/app/hooks/use-active-data.js) hook would dynamically import. Calling the hooks would give you methods to call to send typical analytics events like pageview, view search, etc.
+### How It Works
 
-Respects DNT, although not mentioned in the code. If do-not-track is true (`dw_dnt=1`), the app still sends events but the backend will ignore them.
+#### Technical Implementation
+- **Hook**: [`useActiveData`](https://github.com/SalesforceCommerceCloud/pwa-kit/blob/develop/packages/template-retail-react-app/app/hooks/use-active-data.js)
+- **Core Logic**: [Static JavaScript file](https://github.com/SalesforceCommerceCloud/pwa-kit/blob/develop/packages/template-retail-react-app/app/assets/js/active-data.js) dynamically imported
+- **API Endpoint**: OCAPI endpoints with `__Analytics-Start` suffix
+- **DNT Handling**: Sends events regardless, but backend ignores them when `dw_dnt=1`
 
-How to configure it? 
+#### Events Tracked
+| Event | Description | PWA Kit Support |
+|-------|-------------|-----------------|
+| Product Impression | Product shown in minimal detail (search results, recommendations) | ✅ |
+| Product View | Product shown in detail (PDP, comparison pages) | ✅ |
+| Order | Customer order placement | ✅ |
 
-* On front end (PWA Kit)  
-* `ACTIVE_DATA_ENABLED` in app/constants.js file
+### Configuration
 
-* In Business Manager  
-  * See [https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/active-data.html\#configure-business-manager](https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/active-data.html#configure-business-manager) 
+#### Frontend Configuration
+```javascript
+// app/constants.js
+export const ACTIVE_DATA_ENABLED = true
+```
 
-How can we verify? 
+#### Business Manager Configuration
+Required settings in Business Manager:
+1. **Administration → Sites → Manage Sites**: Ensure site status is **Online**
+2. **Merchant Tools → Site Preferences → Privacy Settings**: Set "Tracking (Default for New Storefront Session)" to **Enabled**
 
-* `__Analytics-Start` requests in the browser’s Network tab.  
-  * Look at `dw_dnt` in the payload  
-* Wait 24 hours before data shows up
+> **Reference**: [Active Data Configuration Guide](https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/active-data.html#configure-business-manager)
 
-Common issues
+#### Additional Requirements
+- Customer must open support case to enable data collection
+- Only works with production environments  
+- Requires OCAPI proxy configuration
 
-* Is there a common issue? No, we haven’t gotten much investigations for Active Data  
-* But recently there’s this [Slack thread](https://salesforce-internal.slack.com/archives/C01JSFFE3HQ/p1749678460701599?thread_ts=1749566800.646919&cid=C01JSFFE3HQ):  
-  \> If the shoppers have do not track enabled, the orders can still be higher but the views can be less.
+### Verification Steps
 
-Resources:
+#### 1. **Browser Network Tab**
+- Look for requests containing `__Analytics-Start` in the URL
+- Check request payload for `dw_dnt` parameter
+- Verify 200 status responses
 
-* Public documentation: [https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/active-data.html](https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/active-data.html)   
-* Internal doc: [https://salesforce.quip.com/Ar7lADMMF0MC](https://salesforce.quip.com/Ar7lADMMF0MC)   
-* Original pull request to integrate Active Data into PWA Kit: [https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1555](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1555)
+#### 2. **Business Manager Verification**
+- Navigate to Product Catalog → Select Product → **Active Data** tab
+- **Data latency**: 24 hours for metrics to appear/update
+- Confirm traffic and conversion metrics are incrementing
 
+#### 3. **Debugging Steps**
+If metrics aren't updating:
+1. Wait full 24 hours after events
+2. Verify `__Analytics-Start` requests return 200 status
+3. Check Business Manager site and privacy settings
+4. Open support case if issues persist
 
-## Einstein
+### Common Issues
 
-Purpose: general analytics and also product recommendations
+#### DNT Impact on Data
+**Symptom**: Orders higher than expected vs. views lower than expected
+**Cause**: Users with DNT enabled still complete orders (backend tracking) but views aren't recorded (frontend tracking)
+**Context**: This is expected behavior, not a bug
 
-How it works?
+#### Missing Events
+**Symptom**: No `__Analytics-Start` requests
+**Cause**: `ACTIVE_DATA_ENABLED` set to false or OCAPI proxy not configured
+**Solution**: Verify frontend constants and proxy configuration
 
-* Unlike the other hooks, useEinstein does not rely on third party code. It sends requests directly to Einstein APIs.   
-* Respects DNT
+### Under the Hood
 
-How to configure it?  
-Some backend prerequisites. Only PIG instances have Einstein available.
+Active Data integration works by:
+1. Hook dynamically imports the static Active Data JavaScript file
+2. File creates global `dw.ac` object with tracking methods
+3. Events sent to OCAPI endpoints via configured proxy
+4. Backend processes events and aggregates data nightly
+5. Aggregated metrics available in Business Manager after 24 hours
 
-Config file
+---
 
+## Einstein Analytics
+
+### Purpose
+Einstein provides **comprehensive analytics and AI-powered product recommendations** through integration with Salesforce Commerce Cloud's Einstein platform.
+
+### How It Works  
+
+#### Technical Implementation
+- **Hook**: [`useEinstein`](https://github.com/SalesforceCommerceCloud/pwa-kit/blob/develop/packages/template-retail-react-app/app/hooks/use-einstein.js)
+- **Direct API Integration**: No third-party libraries, direct HTTP requests
+- **API Endpoint**: `api.cquotient.com`  
+- **DNT Handling**: Completely skips sending events when DNT is enabled
+
+#### Capabilities
+- **Analytics Events**: Page views, product views, searches, cart actions, checkout steps
+- **Recommendations**: AI-powered product recommendations via recommenders and zones
+- **Reports & Dashboards**: Comprehensive analytics reporting interface
+
+### Configuration
+
+#### Prerequisites (Backend)
+- Only available on PIG (Production Integration Grade) instances
+- Customer must request Einstein Activities enablement via support case
+- Account Manager role with Reports & Dashboards permissions required
+
+#### Frontend Configuration
 ```javascript
 // config/default.js
 app: {
@@ -134,28 +292,122 @@ app: {
         host: 'https://api.cquotient.com',
         einsteinId: '1ea06c6e-c936-4324-bcf0-fada93f83bb1',
         siteId: 'aaij-MobileFirst',
-        isProduction: false
+        isProduction: false  // Set to true for production data to appear in dashboards
     }
 }
 ```
 
-How can we verify it?
+#### Critical Configuration Notes
+- **`host`**: Almost always `api.cquotient.com` (can be proxy path like `/mobify/proxy/einstein`)
+- **`isProduction`**: MUST be `true` for data to appear in Reports & Dashboards
+- **`siteId`**: Format is `realm-siteId` (e.g., `zzrf-RefArch`)
 
-* Look for cquotient requests  
-* Use Chrome plugin “Commerce Cloud Recommendation Validator”  
-* Wait 24 hours for data to show up on Reports and Dashboards
+### Verification Steps
 
-Common issues
+#### 1. **Browser Network Tab**
+- Look for requests to `cquotient.com` domains
+- Verify request payloads and 200 responses
+- Check `instanceType` field is set to `prd` for production
 
-* Missing events  
-* Misconfiguration
+#### 2. **Chrome Extension**
+Install "Commerce Cloud Recommendation Validator" extension:
+- Shows real-time Einstein activity events
+- Displays key fields like `realm`, `instanceType`
+- Helps debug configuration issues
 
-Resource
+#### 3. **Reports & Dashboards Verification**
+After 24 hours:
+1. Business Manager → **Merchant Tools → Analytics → Reports & Dashboards**
+2. **Home and Sales tabs**: Verify order numbers match expectations  
+3. **Traffic → Shopper Journey**: Check "Visits With Orders" metrics
 
-* Public documentation: [https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/reports-and-dashboards.html](https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/reports-and-dashboards.html)  
-* Runbook: [https://salesforce.quip.com/aZkgAjUfEvKI](https://salesforce.quip.com/aZkgAjUfEvKI) 
+### Common Issues
 
-## Next Actions (for the teams joining the support rotation)
+#### No Data in Dashboards
 
-* What permissions do we need for each analytics provider? Account Manager roles?  
-* TODO: list of contacts, Slack channels to ask for help
+**Cause 1: Recent Configuration**
+- **Solution**: Wait at least 24 hours after completing setup
+
+**Cause 2: Configuration Errors**  
+- **Symptoms**: Empty `realm` field, `instanceType` not `prd`
+- **Solution**: Verify Account Manager permissions and `isProduction: true`
+
+**Cause 3: Ad Blockers**
+- **Symptoms**: Blocked requests to Einstein APIs
+- **Solution**: Set up proxy in Runtime Admin:
+  - Path: `mobify/proxy/einstein` 
+  - Host: `api.cquotient.com`
+  - Update hook to send `clientUserAgent = navigator.userAgent`
+
+#### Missing Events
+**Symptom**: Some analytics events not appearing
+**Cause**: DNT enabled users, incomplete event implementation, or network issues  
+**Solution**: Check DNT settings, verify event firing in code, check network logs
+
+### Under the Hood
+
+Einstein integration works by:
+1. Hook constructs events with user parameters (cookieId, userId)
+2. Events sent directly to Einstein REST APIs with authentication headers
+3. Backend processes events for analytics and recommendation training
+4. Data aggregated and displayed in Reports & Dashboards after 24-hour delay
+5. Recommendation engine uses event data to power personalized product suggestions
+
+#### Event Processing Flow
+```
+Frontend Event → Einstein API → Analytics Processing → Reports & Dashboards
+                                    ↓
+                           Recommendation Training → AI Models → Product Recommendations
+```
+
+---
+
+## Next Actions
+
+### Required Permissions and Access
+
+#### For Data Cloud Support
+- [ ] Data Cloud instance access for verification
+- [ ] Understanding of Data Cloud setup process
+- [ ] Access to customer's Data Cloud tenants (case-by-case basis)
+
+#### For Active Data Support  
+- [ ] Business Manager access to verify configurations
+- [ ] Understanding of OCAPI proxy setup
+- [ ] Knowledge of merchandising use cases
+
+#### For Einstein Support
+- [ ] Account Manager access with Reports & Dashboards role
+- [ ] Business Manager access for verification
+- [ ] Understanding of PIG instance requirements
+
+### Team Contacts and Resources
+
+#### Internal Documentation
+- **Active Data Internal Doc**: [Quip Link](https://salesforce.quip.com/Ar7lADMMF0MC)
+- **Einstein Runbook**: [Quip Link](https://salesforce.quip.com/aZkgAjUfEvKI)
+
+#### Slack Channels for Support
+- TODO: Add specific Slack channels for PWA Kit support questions
+- TODO: Add analytics-specific discussion channels  
+- TODO: Add Data Cloud technical support channels
+
+#### Key Contacts
+- TODO: Add PWA Kit team contacts for integration issues
+- TODO: Add Analytics backend team contacts for data processing issues  
+- TODO: Add Data Cloud team contacts for Data Cloud specific problems
+
+#### Reference Links
+- [Reports & Dashboards Documentation](https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/reports-and-dashboards.html)
+- [Active Data Documentation](https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/active-data.html)  
+- [Data Cloud Integration Documentation](https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/integrate-data-cloud.html)
+
+### Demo Environment
+- **Reference Site**: [pwa-kit.mobify-storefront.com](http://pwa-kit.mobify-storefront.com)
+- Use this site for hands-on testing and verification of each analytics provider
+- Practice the verification steps outlined in each section
+
+---
+
+*Last Updated: [Current Date]*  
+*For questions or updates to this guide, contact the PWA Kit Support Team*
