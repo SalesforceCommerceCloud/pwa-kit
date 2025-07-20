@@ -1,0 +1,21 @@
+{
+  "template": "account",
+  "path": "/account",
+  "componentPath": "./pages/account",
+  "structure": [
+    {
+      "type": "Redirect",
+      "props": {
+        "to": {
+          "pathname": {
+            "type": "identifier",
+            "name": "path"
+          },
+          "state": {
+            "directedFrom": "/account"
+          }
+        }
+      }
+    }
+  ]
+}

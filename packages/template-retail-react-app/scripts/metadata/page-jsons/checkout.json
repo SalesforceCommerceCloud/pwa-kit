@@ -1,0 +1,10 @@
+{
+  "template": "checkout",
+  "path": "/checkout",
+  "componentPath": "./pages/checkout",
+  "structure": [
+    {
+      "type": "CheckoutSkeleton"
+    }
+  ]
+}

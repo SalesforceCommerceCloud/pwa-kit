@@ -1,0 +1,15 @@
+{
+  "template": "login-redirect",
+  "path": "/callback",
+  "componentPath": "./pages/login-redirect",
+  "structure": [
+    {
+      "type": "Fragment",
+      "children": [
+        {
+          "type": "h1"
+        }
+      ]
+    }
+  ]
+}

@@ -56,6 +56,9 @@ const Wishlist = loadable(() => import('./pages/account/wishlist'), {
 })
 const PageNotFound = loadable(() => import('./pages/page-not-found'))
 
+// Create a loadable page for `page-viewer`.
+const PageViewer = loadable(() => import('./pages/page-viewer'), {fallback})
+
 export const routes = [
     {
         path: '/',
@@ -138,6 +141,10 @@ export const routes = [
     {
         path: '*',
         component: PageNotFound
+    },
+    {
+        page: '/page-viewer/:pageId',
+        component: PageViewer
     }
 ]
 

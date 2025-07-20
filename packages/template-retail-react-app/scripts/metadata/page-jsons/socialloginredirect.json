@@ -1,0 +1,93 @@
+{
+  "template": "socialloginredirect",
+  "path": "/social-callback",
+  "componentPath": "./pages/social-login-redirect",
+  "structure": [
+    {
+      "type": "Box",
+      "props": {
+        "data-testid": "login-redirect-page",
+        "bg": "gray.50",
+        "py": [
+          8,
+          16
+        ]
+      },
+      "children": [
+        {
+          "type": "Container",
+          "props": {
+            "paddingTop": 16,
+            "width": [
+              "100%",
+              "407px"
+            ],
+            "bg": "white",
+            "paddingBottom": 14,
+            "marginTop": 8,
+            "marginBottom": 8,
+            "borderRadius": "base"
+          },
+          "children": [
+            {
+              "type": "Stack",
+              "props": {
+                "justify": "center",
+                "align": "center",
+                "spacing": 8,
+                "marginBottom": 8
+              },
+              "children": [
+                {
+                  "type": "Spinner",
+                  "props": {
+                    "opacity": 0.85,
+                    "color": "blue.600",
+                    "animationDuration": "0.8s",
+                    "size": "lg"
+                  }
+                },
+                {
+                  "type": "Text",
+                  "props": {
+                    "align": "center",
+                    "fontSize": "xl",
+                    "fontWeight": "semibold"
+                  },
+                  "children": [
+                    {
+                      "type": "FormattedMessage",
+                      "props": {
+                        "id": "social_login_redirect.message.authenticating",
+                        "defaultMessage": "Authenticating..."
+                      }
+                    }
+                  ]
+                },
+                {
+                  "type": "Text",
+                  "props": {
+                    "align": "center",
+                    "fontSize": "m"
+                  },
+                  "children": [
+                    {
+                      "type": "FormattedMessage",
+                      "props": {
+                        "id": "social_login_redirect.message.redirect_link",
+                        "defaultMessage": "If you are not automatically redirected, click <link>this link</link> to proceed.",
+                        "values": {
+                          "link": "<function>"
+                        }
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

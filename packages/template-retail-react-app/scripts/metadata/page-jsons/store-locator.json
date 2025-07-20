@@ -1,0 +1,20 @@
+{
+  "template": "store-locator",
+  "path": "/store-locator",
+  "componentPath": "./pages/store-locator",
+  "structure": [
+    {
+      "type": "Box",
+      "children": [
+        {
+          "type": "Container",
+          "children": [
+            {
+              "type": "StoreLocator"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

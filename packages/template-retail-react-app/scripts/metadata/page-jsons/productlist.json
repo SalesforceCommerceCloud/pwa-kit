@@ -1,0 +1,516 @@
+{
+  "template": "productlist",
+  "path": "/category/:categoryId",
+  "componentPath": "./pages/product-list",
+  "structure": [
+    {
+      "type": "Box",
+      "props": {
+        "className": "sf-product-list-page",
+        "data-testid": "sf-product-list-page",
+        "layerStyle": "page",
+        "paddingTop": {
+          "base": 6,
+          "lg": 8
+        },
+        "...": "<spread>"
+      },
+      "children": [
+        {
+          "type": "Helmet",
+          "children": [
+            {
+              "type": "title"
+            },
+            {
+              "type": "meta",
+              "props": {
+                "name": "description",
+                "content": "<expression>"
+              }
+            },
+            {
+              "type": "meta",
+              "props": {
+                "name": "keywords",
+                "content": "<expression>"
+              }
+            }
+          ]
+        },
+        {
+          "type": "Fragment",
+          "children": [
+            {
+              "type": "AbovePageHeader"
+            },
+            {
+              "type": "PageDesignerPromotionalBanner"
+            },
+            {
+              "type": "Stack",
+              "props": {
+                "display": {
+                  "base": "none",
+                  "lg": "flex"
+                },
+                "direction": "row",
+                "justify": "flex-start",
+                "align": "flex-start",
+                "spacing": 4,
+                "marginBottom": 6
+              },
+              "children": [
+                {
+                  "type": "Flex",
+                  "props": {
+                    "align": "left",
+                    "width": "287px"
+                  },
+                  "children": [
+                    {
+                      "type": "PageHeader",
+                      "props": {
+                        "searchQuery": {
+                          "type": "identifier",
+                          "name": "searchQuery"
+                        },
+                        "category": {
+                          "type": "identifier",
+                          "name": "category"
+                        },
+                        "productSearchResult": {
+                          "type": "identifier",
+                          "name": "productSearchResult"
+                        },
+                        "isLoading": {
+                          "type": "identifier",
+                          "name": "isLoading"
+                        }
+                      }
+                    }
+                  ]
+                },
+                {
+                  "type": "Box",
+                  "props": {
+                    "flex": 1,
+                    "paddingTop": "45px"
+                  },
+                  "children": [
+                    {
+                      "type": "SelectedRefinements",
+                      "props": {
+                        "filters": "<expression>",
+                        "toggleFilter": {
+                          "type": "identifier",
+                          "name": "toggleFilter"
+                        },
+                        "handleReset": {
+                          "type": "identifier",
+                          "name": "resetFilters"
+                        },
+                        "selectedFilterValues": "<expression>"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "type": "Box",
+                  "props": {
+                    "paddingTop": "45px"
+                  },
+                  "children": [
+                    {
+                      "type": "Sort",
+                      "props": {
+                        "sortUrls": {
+                          "type": "identifier",
+                          "name": "sortUrls"
+                        },
+                        "productSearchResult": {
+                          "type": "identifier",
+                          "name": "productSearchResult"
+                        },
+                        "basePath": {
+                          "type": "identifier",
+                          "name": "basePath"
+                        }
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "HideOnDesktop",
+              "children": [
+                {
+                  "type": "Stack",
+                  "props": {
+                    "spacing": 6
+                  },
+                  "children": [
+                    {
+                      "type": "PageHeader",
+                      "props": {
+                        "searchQuery": {
+                          "type": "identifier",
+                          "name": "searchQuery"
+                        },
+                        "category": {
+                          "type": "identifier",
+                          "name": "category"
+                        },
+                        "productSearchResult": {
+                          "type": "identifier",
+                          "name": "productSearchResult"
+                        },
+                        "isLoading": {
+                          "type": "identifier",
+                          "name": "isLoading"
+                        }
+                      }
+                    },
+                    {
+                      "type": "Stack",
+                      "props": {
+                        "display": {
+                          "base": "flex",
+                          "md": "none"
+                        },
+                        "direction": "row",
+                        "justify": "flex-start",
+                        "align": "center",
+                        "spacing": 1,
+                        "height": 12,
+                        "borderColor": "gray.100"
+                      },
+                      "children": [
+                        {
+                          "type": "Flex",
+                          "props": {
+                            "align": "center"
+                          },
+                          "children": [
+                            {
+                              "type": "Button",
+                              "props": {
+                                "fontSize": "sm",
+                                "colorScheme": "black",
+                                "variant": "outline",
+                                "marginRight": 2,
+                                "display": "inline-flex",
+                                "leftIcon": {
+                                  "type": "FilterIcon",
+                                  "props": {
+                                    "boxSize": 5
+                                  }
+                                },
+                                "onClick": {
+                                  "type": "identifier",
+                                  "name": "onOpen"
+                                }
+                              },
+                              "children": [
+                                {
+                                  "type": "FormattedMessage",
+                                  "props": {
+                                    "defaultMessage": "Filter",
+                                    "id": "product_list.button.filter"
+                                  }
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "Flex",
+                          "props": {
+                            "align": "center"
+                          },
+                          "children": [
+                            {
+                              "type": "Button",
+                              "props": {
+                                "maxWidth": "245px",
+                                "fontSize": "sm",
+                                "marginRight": 2,
+                                "colorScheme": "black",
+                                "variant": "outline",
+                                "display": "inline-flex",
+                                "rightIcon": {
+                                  "type": "ChevronDownIcon",
+                                  "props": {
+                                    "boxSize": 5
+                                  }
+                                },
+                                "onClick": "<function>"
+                              }
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "Box",
+                  "props": {
+                    "marginBottom": 4
+                  },
+                  "children": [
+                    {
+                      "type": "SelectedRefinements",
+                      "props": {
+                        "filters": "<expression>",
+                        "toggleFilter": {
+                          "type": "identifier",
+                          "name": "toggleFilter"
+                        },
+                        "handleReset": {
+                          "type": "identifier",
+                          "name": "resetFilters"
+                        },
+                        "selectedFilterValues": "<expression>"
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "Grid",
+              "props": {
+                "templateColumns": {
+                  "base": "1fr",
+                  "md": "280px 1fr"
+                },
+                "columnGap": 6
+              },
+              "children": [
+                {
+                  "type": "Stack",
+                  "props": {
+                    "display": {
+                      "base": "none",
+                      "md": "flex"
+                    }
+                  },
+                  "children": [
+                    {
+                      "type": "Refinements",
+                      "props": {
+                        "itemsBefore": "<expression>",
+                        "isLoading": {
+                          "type": "identifier",
+                          "name": "filtersLoading"
+                        },
+                        "toggleFilter": {
+                          "type": "identifier",
+                          "name": "toggleFilter"
+                        },
+                        "filters": "<expression>",
+                        "excludedFilters": [
+                          "cgid"
+                        ],
+                        "selectedFilters": "<expression>"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "type": "Box"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "Modal",
+          "props": {
+            "isOpen": {
+              "type": "identifier",
+              "name": "isOpen"
+            },
+            "onClose": {
+              "type": "identifier",
+              "name": "onClose"
+            },
+            "size": "full",
+            "motionPreset": "slideInBottom",
+            "scrollBehavior": "inside"
+          },
+          "children": [
+            {
+              "type": "ModalOverlay"
+            },
+            {
+              "type": "ModalContent",
+              "props": {
+                "top": 0,
+                "marginTop": 0
+              },
+              "children": [
+                {
+                  "type": "ModalHeader",
+                  "children": [
+                    {
+                      "type": "Heading",
+                      "props": {
+                        "as": "h1",
+                        "fontWeight": "bold",
+                        "fontSize": "2xl"
+                      },
+                      "children": [
+                        {
+                          "type": "FormattedMessage",
+                          "props": {
+                            "defaultMessage": "Filter",
+                            "id": "product_list.modal.title.filter"
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "ModalCloseButton"
+                },
+                {
+                  "type": "ModalBody",
+                  "props": {
+                    "py": 4
+                  },
+                  "children": [
+                    {
+                      "type": "Refinements",
+                      "props": {
+                        "toggleFilter": {
+                          "type": "identifier",
+                          "name": "toggleFilter"
+                        },
+                        "filters": "<expression>",
+                        "selectedFilters": "<expression>",
+                        "itemsBefore": "<expression>",
+                        "excludedFilters": [
+                          "cgid"
+                        ]
+                      }
+                    }
+                  ]
+                },
+                {
+                  "type": "ModalFooter",
+                  "props": {
+                    "display": "block",
+                    "width": "full",
+                    "borderTop": "1px solid",
+                    "borderColor": "gray.100",
+                    "paddingBottom": 10
+                  },
+                  "children": [
+                    {
+                      "type": "Stack",
+                      "children": [
+                        {
+                          "type": "Button",
+                          "props": {
+                            "width": "full",
+                            "onClick": {
+                              "type": "identifier",
+                              "name": "onClose"
+                            }
+                          }
+                        },
+                        {
+                          "type": "Button",
+                          "props": {
+                            "width": "full",
+                            "variant": "outline",
+                            "onClick": {
+                              "type": "identifier",
+                              "name": "resetFilters"
+                            }
+                          },
+                          "children": [
+                            {
+                              "type": "FormattedMessage",
+                              "props": {
+                                "defaultMessage": "Clear Filters",
+                                "id": "product_list.modal.button.clear_filters"
+                              }
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "Drawer",
+          "props": {
+            "placement": "bottom",
+            "isOpen": {
+              "type": "identifier",
+              "name": "sortOpen"
+            },
+            "onClose": "<function>",
+            "size": "sm",
+            "motionPreset": "slideInBottom",
+            "scrollBehavior": "inside",
+            "isFullHeight": false,
+            "height": "50%"
+          },
+          "children": [
+            {
+              "type": "DrawerOverlay"
+            },
+            {
+              "type": "DrawerContent",
+              "props": {
+                "marginTop": 0
+              },
+              "children": [
+                {
+                  "type": "DrawerHeader",
+                  "props": {
+                    "boxShadow": "none"
+                  },
+                  "children": [
+                    {
+                      "type": "Text",
+                      "props": {
+                        "fontWeight": "bold",
+                        "fontSize": "2xl"
+                      },
+                      "children": [
+                        {
+                          "type": "FormattedMessage",
+                          "props": {
+                            "defaultMessage": "Sort By",
+                            "id": "product_list.drawer.title.sort_by"
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "DrawerCloseButton"
+                },
+                {
+                  "type": "DrawerBody"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

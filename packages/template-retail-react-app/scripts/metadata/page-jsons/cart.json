@@ -1,0 +1,10 @@
+{
+  "template": "cart",
+  "path": "/cart",
+  "componentPath": "./pages/cart",
+  "structure": [
+    {
+      "type": "CartSkeleton"
+    }
+  ]
+}

@@ -1,0 +1,47 @@
+{
+  "template": "wishlist",
+  "path": "/account/wishlist",
+  "componentPath": "./pages/account/wishlist",
+  "structure": [
+    {
+      "type": "Stack",
+      "props": {
+        "spacing": 4,
+        "data-testid": "account-wishlist-page"
+      },
+      "children": [
+        {
+          "type": "Heading",
+          "props": {
+            "as": "h1",
+            "fontSize": "2xl",
+            "tabIndex": "0",
+            "ref": {
+              "type": "identifier",
+              "name": "headingRef"
+            }
+          },
+          "children": [
+            {
+              "type": "FormattedMessage",
+              "props": {
+                "defaultMessage": "Wishlist",
+                "id": "account_wishlist.title.wishlist"
+              }
+            }
+          ]
+        },
+        {
+          "type": "UnavailableProductConfirmationModal",
+          "props": {
+            "productItems": "<expression>",
+            "handleUnavailableProducts": {
+              "type": "identifier",
+              "name": "handleUnavailableProducts"
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,36 @@
+{
+  "template": "product-detail",
+  "path": "/product/:productId",
+  "componentPath": "./pages/product-detail",
+  "structure": [
+    {
+      "type": "Box",
+      "children": [
+        {
+          "type": "Helmet",
+          "children": [
+            {
+              "type": "title"
+            }
+          ]
+        },
+        {
+          "type": "Stack",
+          "children": [
+            {
+              "type": "Stack",
+              "children": [
+                {
+                  "type": "RecommendedProducts"
+                },
+                {
+                  "type": "RecommendedProducts"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
