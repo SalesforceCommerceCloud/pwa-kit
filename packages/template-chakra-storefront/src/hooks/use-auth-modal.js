@@ -241,6 +241,11 @@ export const AuthModal = ({
         // We are done with the modal.
         onClose()
 
+        if (registering) {
+            // Execute action to be performed on successful registration
+            onRegistrationSuccess()
+        }
+
         // Defer operations to the next tick to avoid flushSync warnings
         // This moves the operations out of React's synchronous render cycle
         setTimeout(() => {
@@ -265,12 +270,6 @@ export const AuthModal = ({
 
                 // Execute action to be performed on successful login
                 onLoginSuccess()
-            }
-
-            // TODO: try moving this out of the setTimeout
-            if (registering) {
-                // Execute action to be performed on successful registration
-                onRegistrationSuccess()
             }
         }, 0)
     }, [isRegistered])
