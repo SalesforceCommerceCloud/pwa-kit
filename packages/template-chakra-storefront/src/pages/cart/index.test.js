@@ -6,8 +6,8 @@
  */
 
 import React from 'react'
-import { screen, within, fireEvent, waitFor, act } from '@testing-library/react'
-import { renderWithProviders } from '../../utils/test-utils'
+import {screen, within, fireEvent, waitFor, act} from '@testing-library/react'
+import {renderWithProviders} from '../../utils/test-utils'
 import Cart from '../../pages/cart/index'
 import {
     mockShippingMethods,
@@ -22,8 +22,8 @@ import {
     mockGetBundleChildrenProducts,
     basketWithProductBundle
 } from '../../../mocks/product-bundle'
-import { prependHandlersToServer } from '../../../jest-setup'
-import { baskets as mockBaskets, products as mockProducts } from '../../pages/cart/cart.mock'
+import {prependHandlersToServer} from '../../../jest-setup'
+import {baskets as mockBaskets, products as mockProducts} from '../../pages/cart/cart.mock'
 
 const mockProduct = {
     ...mockVariant,
@@ -79,7 +79,7 @@ beforeEach(() => {
         {
             path: '*/products',
             method: 'get',
-            res: () => ({ data: [mockCartVariant] })
+            res: () => ({data: [mockCartVariant]})
         },
         {
             path: '*/baskets/:basketId/shipments/:shipmentId',
@@ -192,8 +192,7 @@ describe('Skeleton tests', function () {
 
 describe('Cart tests', () => {
     test('Can update item quantity in the cart', async () => {
-
-        const { user } = renderWithProviders(<Cart />)
+        const {user} = renderWithProviders(<Cart />)
         await waitFor(async () => {
             expect(screen.getByTestId('sf-cart-container')).toBeInTheDocument()
             expect(screen.getByText(/Belted Cardigan With Studs/i)).toBeInTheDocument()
@@ -219,7 +218,7 @@ describe('Cart tests', () => {
                     // Return updated basket with incremented quantity
                     return {
                         ...mockCustomerBaskets.baskets[0],
-                        productItems: mockCustomerBaskets.baskets[0].productItems.map(item => ({
+                        productItems: mockCustomerBaskets.baskets[0].productItems.map((item) => ({
                             ...item,
                             quantity: item.quantity + 1
                         }))
@@ -234,8 +233,6 @@ describe('Cart tests', () => {
     })
 })
 
-
-
 describe('Product view tests', function () {
     beforeEach(() => {
         prependHandlersToServer([
@@ -248,7 +245,7 @@ describe('Product view tests', function () {
     })
 
     test('Can update item quantity from product view modal', async () => {
-        const { user } = renderWithProviders(<Cart />)
+        const {user} = renderWithProviders(<Cart />)
         expect(await screen.findByTestId('sf-cart-container')).toBeInTheDocument()
         expect(screen.getByText(/Belted Cardigan With Studs/i)).toBeInTheDocument()
 
@@ -256,7 +253,7 @@ describe('Product view tests', function () {
             `sf-cart-item-${mockCustomerBaskets.baskets[0].productItems[0].productId}`
         )
 
-        const editCartButton = within(cartItem).getByRole('button', { name: 'Edit' })
+        const editCartButton = within(cartItem).getByRole('button', {name: 'Edit'})
         await act(async () => {
             await user.click(editCartButton)
         })
@@ -264,7 +261,7 @@ describe('Product view tests', function () {
         const productView = screen.queryByTestId('product-view')
 
         const incrementButton = await within(productView).findByTestId('quantity-increment')
-        
+
         // Mock the PATCH request for updating basket item quantity right before clicking
         prependHandlersToServer([
             {
@@ -274,7 +271,7 @@ describe('Product view tests', function () {
                     // Return updated basket with incremented quantity
                     return {
                         ...mockCustomerBaskets.baskets[0],
-                        productItems: mockCustomerBaskets.baskets[0].productItems.map(item => ({
+                        productItems: mockCustomerBaskets.baskets[0].productItems.map((item) => ({
                             ...item,
                             quantity: item.quantity + 1
                         }))
@@ -282,25 +279,25 @@ describe('Product view tests', function () {
                 }
             }
         ])
-        
+
         // update item quantity
         await act(async () => {
             await user.click(incrementButton)
         })
-        
+
         await waitFor(() => {
             expect(within(productView).getByDisplayValue('3')).toBeInTheDocument()
         })
 
-        const updateCartButtons = within(productView).getAllByRole('button', { name: 'Update' })
+        const updateCartButtons = within(productView).getAllByRole('button', {name: 'Update'})
         await act(async () => {
             await user.click(updateCartButtons[0])
         })
-        
+
         await waitFor(() => {
             expect(productView).not.toBeInTheDocument()
         })
-        
+
         await waitFor(() => {
             expect(within(cartItem).getByDisplayValue('3')).toBeInTheDocument()
         })
@@ -319,7 +316,7 @@ describe('Remove item from cart', function () {
     })
 
     test('Can remove item from the cart', async () => {
-        const { user } = renderWithProviders(<Cart />)
+        const {user} = renderWithProviders(<Cart />)
 
         let cartItem
         await waitFor(() => {
@@ -352,7 +349,7 @@ describe('Remove item from cart', function () {
             () => {
                 expect(screen.getByTestId('sf-cart-empty')).toBeInTheDocument()
             },
-            { timeout: 20000 }
+            {timeout: 20000}
         )
     })
 })
@@ -415,12 +412,12 @@ describe('Coupons tests', function () {
             {
                 path: '*/customers/:customerId/baskets',
                 method: 'get',
-                res: () => ({ total: 1, baskets: [mockCustomerBasketsWithSuit] })
+                res: () => ({total: 1, baskets: [mockCustomerBasketsWithSuit]})
             },
             {
                 path: '*/products',
                 method: 'get',
-                res: () => ({ data: [mockSuitProduct] })
+                res: () => ({data: [mockSuitProduct]})
             },
             {
                 path: '*/baskets/:basketId/coupons',
@@ -487,7 +484,7 @@ describe('Coupons tests', function () {
         ])
     })
     test('Can apply and remove product-level coupon code with promotion', async () => {
-        const { user } = renderWithProviders(<Cart />)
+        const {user} = renderWithProviders(<Cart />)
 
         // Wait for cart to fully load
         expect(await screen.findByTestId('sf-cart-container')).toBeInTheDocument()
@@ -565,7 +562,7 @@ describe('Gift option tests', function () {
         ])
     })
     test('can update item when user clicks this is a gift checkbox', async () => {
-        const { user } = renderWithProviders(<Cart />)
+        const {user} = renderWithProviders(<Cart />)
         await waitFor(() => {
             expect(screen.getByTestId('sf-cart-container')).toBeInTheDocument()
             expect(screen.getByText(/Belted Cardigan With Studs/i)).toBeInTheDocument()
@@ -639,9 +636,9 @@ describe('Product bundles', () => {
                 method: 'get',
                 res: (req) => {
                     if (req.url.toString().includes('test-bundle')) {
-                        return { data: [{ ...mockProductBundle }] }
+                        return {data: [{...mockProductBundle}]}
                     }
-                    return { data: [...mockGetBundleChildrenProducts] }
+                    return {data: [...mockGetBundleChildrenProducts]}
                 }
             },
             {
@@ -675,7 +672,7 @@ describe('Product bundles', () => {
     })
 
     test('displays inventory message when incrementing quantity above available stock', async () => {
-        const { user } = renderWithProviders(<Cart />)
+        const {user} = renderWithProviders(<Cart />)
 
         await waitFor(
             async () => {
@@ -687,12 +684,12 @@ describe('Product bundles', () => {
                 expect(screen.getByText(/swing tank/i)).toBeInTheDocument()
                 expect(screen.getByText(/pull on neutral pant/i)).toBeInTheDocument()
             },
-            { timeout: 10000 }
+            {timeout: 10000}
         )
 
         // Change quantity for bundle to 4, swing tank only has 3 in stock
         // so availability message should show up
-        const quantityElement = screen.getByRole('spinbutton', { id: 'quantity' })
+        const quantityElement = screen.getByRole('spinbutton', {id: 'quantity'})
         expect(quantityElement).toBeInTheDocument()
         expect(quantityElement).toHaveValue('1')
 
@@ -706,7 +703,7 @@ describe('Product bundles', () => {
                 expect(quantityElement).toHaveValue('4')
                 expect(screen.getByText(/only 3 left for swing tank!/i)).toBeInTheDocument()
             },
-            { timeout: 10000 }
+            {timeout: 10000}
         )
     })
 
@@ -739,12 +736,12 @@ describe('Product bundles', () => {
                 expect(screen.getByText(/size: s/i)).toBeInTheDocument()
                 expect(screen.getByText(/qty: 2/i)).toBeInTheDocument()
             },
-            { timeout: 10000 }
+            {timeout: 10000}
         )
     })
 
     test('can be updated using the product view modal', async () => {
-        const { user } = renderWithProviders(<Cart />)
+        const {user} = renderWithProviders(<Cart />)
         await waitFor(async () => {
             expect(screen.getByTestId('sf-cart-container')).toBeInTheDocument()
             // Parent bundle
@@ -772,10 +769,10 @@ describe('Product bundles', () => {
                 productViewModal = screen.getByTestId('product-view-modal')
                 expect(productViewModal).toBeInTheDocument()
             },
-            { timeout: 10000 }
+            {timeout: 10000}
         )
 
-        const quantityElement = within(productViewModal).getByRole('spinbutton', { id: 'quantity' })
+        const quantityElement = within(productViewModal).getByRole('spinbutton', {id: 'quantity'})
         expect(quantityElement).toHaveValue('1')
         const incrementButton = await within(productViewModal).findByTestId('quantity-increment')
 
@@ -787,7 +784,7 @@ describe('Product bundles', () => {
             expect(quantityElement).toHaveValue('2')
         })
 
-        const updateCartButtons = within(productViewModal).getAllByRole('button', { name: 'Update' })
+        const updateCartButtons = within(productViewModal).getAllByRole('button', {name: 'Update'})
         await act(async () => {
             await user.click(updateCartButtons[0])
         })
@@ -809,11 +806,11 @@ describe('Product bundles', () => {
 describe('Unavailable products tests', function () {
     test('Remove unavailable/out of stock/low stock products from cart', async () => {
         prependHandlersToServer([
-            { path: '*/customers/:customerId/baskets', res: () => mockBaskets },
-            { path: '*/products', res: () => mockProducts }
+            {path: '*/customers/:customerId/baskets', res: () => mockBaskets},
+            {path: '*/products', res: () => mockProducts}
         ])
 
-        const { user, getByText } = renderWithProviders(<Cart />)
+        const {user, getByText} = renderWithProviders(<Cart />)
         await waitFor(() => {
             expect(screen.getByTestId('sf-cart-container')).toBeInTheDocument()
             expect(screen.getByText(/Worn Gold Dangle Earring/i)).toBeInTheDocument()
@@ -880,10 +877,10 @@ describe('Unavailable products tests', function () {
         })
         await waitFor(() => {
             expect(
-                screen.getByRole('link', { name: /Worn Gold Dangle Earring$/i })
+                screen.getByRole('link', {name: /Worn Gold Dangle Earring$/i})
             ).toBeInTheDocument()
             expect(
-                screen.queryByRole('link', { name: /Straight Leg Trousers$/i })
+                screen.queryByRole('link', {name: /Straight Leg Trousers$/i})
             ).not.toBeInTheDocument()
         })
     })
