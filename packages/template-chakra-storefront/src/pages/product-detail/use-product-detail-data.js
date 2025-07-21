@@ -20,7 +20,7 @@ import {useHistory, useLocation, useParams} from 'react-router-dom'
 
 import {useCurrentBasket, useVariant} from '../../hooks'
 import useEinstein from '../../hooks/use-einstein'
-import {useProductDetailWishlist} from './use-product-detail-wishlist'
+import {useWishList} from '../../hooks/use-wish-list'
 
 import {normalizeSetBundleProduct, getUpdateBundleChildArray} from '../../utils/product-utils'
 import {useErrorHandler} from '../../hooks/use-errors'
@@ -32,7 +32,9 @@ export const useProductDetailData = () => {
     const location = useLocation()
     const einstein = useEinstein()
     const showError = useErrorHandler()
-    const {handleAddToWishlist, isWishlistLoading} = useProductDetailWishlist()
+    const {addToWishlist, isPending: isWishlistLoading} = useWishList()
+    const handleAddToWishlist = (product, variant, quantity) =>
+        addToWishlist(product, variant, {quantity, showError})
 
     /****************************** Basket *********************************/
     const {isLoading: isBasketLoading} = useCurrentBasket()
