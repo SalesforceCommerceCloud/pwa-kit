@@ -66,6 +66,7 @@ import UnavailableProductConfirmationModal from '@salesforce/retail-react-app/ap
 import {getUpdateBundleChildArray} from '@salesforce/retail-react-app/app/utils/product-utils'
 import {useSelectedStore} from '@salesforce/retail-react-app/app/hooks/use-selected-store'
 import {useMultiship} from '@salesforce/retail-react-app/app/hooks/use-multiship'
+import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
 
 const DEBOUNCE_WAIT = 750
 
@@ -93,6 +94,7 @@ const Cart = () => {
 
     const {selectedStore} = useSelectedStore()
     const selectedInventoryId = selectedStore?.inventoryId || null
+    const {site} = useMultiSite()
     const {handleDeliveryOptionChange, assignDefaultShippingMethodsToShipments} =
         useMultiship(basket)
     const productIds = basket?.productItems?.map(({productId}) => productId).join(',') ?? ''
@@ -697,7 +699,23 @@ const Cart = () => {
                     setSelectedItem(productItem)
 
                     const selectedPickup = selectedDeliveryOption === DELIVERY_OPTIONS.PICKUP
-                    await handleDeliveryOptionChange(productItem, selectedPickup, selectedStore)
+
+                    // Get default inventory ID from product data - throw error if not available
+                    const productData = products?.[productItem.productId]
+                    const defaultInventoryId = productData?.inventory?.id
+
+                    if (!defaultInventoryId) {
+                        throw new Error(
+                            `No inventory ID found for product ${productItem.productId}`
+                        )
+                    }
+
+                    await handleDeliveryOptionChange(
+                        productItem,
+                        selectedPickup,
+                        selectedStore,
+                        defaultInventoryId
+                    )
                 } catch (error) {
                     console.error('Error changing delivery option:', error)
                     showError()

@@ -39,6 +39,9 @@ describe('useMultiship', () => {
     const mockGetPickupShippingMethodId = jest.fn()
     const mockConfigureDefaultShipmentIfNeeded = jest.fn()
 
+    // Mock defaultInventoryId for tests
+    const mockDefaultInventoryId = 'default-inventory-id'
+
     // Mock basket data
     const mockBasket = {
         basketId: 'test-basket-id',
@@ -661,7 +664,11 @@ describe('useMultiship', () => {
             mockUpdateItemInBasket.mockResolvedValue(mockResponse)
 
             await act(async () => {
-                const response = await result.current.moveItemToDeliveryShipment(mockProductItem)
+                const response = await result.current.moveItemToDeliveryShipment(
+                    mockProductItem,
+                    'me',
+                    mockDefaultInventoryId
+                )
                 expect(response).toEqual(mockResponse)
             })
 
@@ -674,7 +681,7 @@ describe('useMultiship', () => {
                     productId: 'product-1',
                     quantity: 1,
                     shipmentId: 'me',
-                    inventoryId: null
+                    inventoryId: mockDefaultInventoryId
                 }
             })
         })
@@ -688,7 +695,8 @@ describe('useMultiship', () => {
             await act(async () => {
                 const response = await result.current.moveItemToDeliveryShipment(
                     mockProductItem,
-                    'delivery-shipment'
+                    'delivery-shipment',
+                    mockDefaultInventoryId
                 )
                 expect(response).toEqual(mockResponse)
             })
@@ -702,7 +710,7 @@ describe('useMultiship', () => {
                     productId: 'product-1',
                     quantity: 1,
                     shipmentId: 'delivery-shipment',
-                    inventoryId: null
+                    inventoryId: mockDefaultInventoryId
                 }
             })
         })
@@ -720,7 +728,9 @@ describe('useMultiship', () => {
 
             await act(async () => {
                 const response = await result.current.moveItemToDeliveryShipment(
-                    productItemWithoutInventory
+                    productItemWithoutInventory,
+                    'me',
+                    mockDefaultInventoryId
                 )
                 expect(response).toEqual(mockResponse)
             })
@@ -743,7 +753,11 @@ describe('useMultiship', () => {
 
             await act(async () => {
                 await expect(
-                    result.current.moveItemToDeliveryShipment(mockProductItem)
+                    result.current.moveItemToDeliveryShipment(
+                        mockProductItem,
+                        'me',
+                        mockDefaultInventoryId
+                    )
                 ).rejects.toThrow('Invalid basket or product item')
             })
         })
@@ -752,9 +766,9 @@ describe('useMultiship', () => {
             const {result} = renderHook(() => useMultiship(mockBasket))
 
             await act(async () => {
-                await expect(result.current.moveItemToDeliveryShipment(null)).rejects.toThrow(
-                    'Invalid basket or product item'
-                )
+                await expect(
+                    result.current.moveItemToDeliveryShipment(null, 'me', mockDefaultInventoryId)
+                ).rejects.toThrow('Invalid basket or product item')
             })
         })
     })
@@ -772,7 +786,12 @@ describe('useMultiship', () => {
 
             await act(async () => {
                 await expect(
-                    result.current.handleDeliveryOptionChange(mockProductItem, false, null)
+                    result.current.handleDeliveryOptionChange(
+                        mockProductItem,
+                        false,
+                        null,
+                        mockDefaultInventoryId
+                    )
                 ).rejects.toThrow('Invalid basket or product item')
             })
         })
@@ -782,7 +801,12 @@ describe('useMultiship', () => {
 
             await act(async () => {
                 await expect(
-                    result.current.handleDeliveryOptionChange(null, false, null)
+                    result.current.handleDeliveryOptionChange(
+                        null,
+                        false,
+                        null,
+                        mockDefaultInventoryId
+                    )
                 ).rejects.toThrow('Invalid basket or product item')
             })
         })
@@ -839,7 +863,8 @@ describe('useMultiship', () => {
                     await result.current.handleDeliveryOptionChange(
                         pickupProductItem,
                         false,
-                        mockStoreInfo
+                        mockStoreInfo,
+                        mockDefaultInventoryId
                     )
                 })
 
@@ -885,7 +910,8 @@ describe('useMultiship', () => {
                     await result.current.handleDeliveryOptionChange(
                         pickupProductItem,
                         false,
-                        mockStoreInfo
+                        mockStoreInfo,
+                        mockDefaultInventoryId
                     )
                 })
 
@@ -910,7 +936,8 @@ describe('useMultiship', () => {
                         result.current.handleDeliveryOptionChange(
                             pickupProductItem,
                             false,
-                            mockStoreInfo
+                            mockStoreInfo,
+                            mockDefaultInventoryId
                         )
                     ).rejects.toThrow('Failed to find or create shipment')
                 })
@@ -955,7 +982,8 @@ describe('useMultiship', () => {
                     await result.current.handleDeliveryOptionChange(
                         mockProductItem,
                         true,
-                        mockStoreInfo
+                        mockStoreInfo,
+                        mockDefaultInventoryId
                     )
                 })
 
@@ -998,7 +1026,8 @@ describe('useMultiship', () => {
                     await result.current.handleDeliveryOptionChange(
                         mockProductItem,
                         true,
-                        mockStoreInfo
+                        mockStoreInfo,
+                        mockDefaultInventoryId
                     )
                 })
 
@@ -1020,7 +1049,12 @@ describe('useMultiship', () => {
 
                 await act(async () => {
                     await expect(
-                        result.current.handleDeliveryOptionChange(mockProductItem, true, null)
+                        result.current.handleDeliveryOptionChange(
+                            mockProductItem,
+                            true,
+                            null,
+                            mockDefaultInventoryId
+                        )
                     ).rejects.toThrow('No store selected for pickup')
                 })
             })
@@ -1045,7 +1079,8 @@ describe('useMultiship', () => {
                         result.current.handleDeliveryOptionChange(
                             mockProductItem,
                             true,
-                            storeWithoutInventory
+                            storeWithoutInventory,
+                            mockDefaultInventoryId
                         )
                     ).rejects.toThrow('Selected store does not have an inventory ID')
                 })
@@ -1071,7 +1106,8 @@ describe('useMultiship', () => {
                         result.current.handleDeliveryOptionChange(
                             mockProductItem,
                             true,
-                            mockStoreInfo
+                            mockStoreInfo,
+                            mockDefaultInventoryId
                         )
                     ).rejects.toThrow('Failed to find or create shipment')
                 })
@@ -1118,7 +1154,8 @@ describe('useMultiship', () => {
                 await result.current.handleDeliveryOptionChange(
                     mockProductItem,
                     true,
-                    mockStoreInfo
+                    mockStoreInfo,
+                    mockDefaultInventoryId
                 )
             })
 
@@ -1181,7 +1218,8 @@ describe('useMultiship', () => {
                         shipmentId: 'custom-shipment' // Item starts in custom-shipment
                     },
                     true,
-                    mockStoreInfo
+                    mockStoreInfo,
+                    mockDefaultInventoryId
                 )
             })
 
@@ -1837,7 +1875,8 @@ describe('useMultiship', () => {
             await act(async () => {
                 const response = await result.current.moveItemsToDeliveryShipment(
                     mockProductItems,
-                    'delivery-shipment'
+                    'delivery-shipment',
+                    mockDefaultInventoryId
                 )
                 expect(response).toEqual(mockResponse)
             })
@@ -1852,14 +1891,14 @@ describe('useMultiship', () => {
                         productId: 'product-1',
                         quantity: 2,
                         shipmentId: 'delivery-shipment',
-                        inventoryId: null
+                        inventoryId: mockDefaultInventoryId
                     },
                     {
                         itemId: 'item-2',
                         productId: 'product-2',
                         quantity: 1,
                         shipmentId: 'delivery-shipment',
-                        inventoryId: null
+                        inventoryId: mockDefaultInventoryId
                     }
                 ]
             })
@@ -1880,7 +1919,9 @@ describe('useMultiship', () => {
 
             await act(async () => {
                 const response = await result.current.moveItemsToDeliveryShipment(
-                    itemsWithoutInventory
+                    itemsWithoutInventory,
+                    'me',
+                    mockDefaultInventoryId
                 )
                 expect(response).toEqual(mockResponse)
             })
@@ -1905,7 +1946,11 @@ describe('useMultiship', () => {
 
             await act(async () => {
                 await expect(
-                    result.current.moveItemsToDeliveryShipment(mockProductItems)
+                    result.current.moveItemsToDeliveryShipment(
+                        mockProductItems,
+                        'me',
+                        mockDefaultInventoryId
+                    )
                 ).rejects.toThrow('Invalid basket or product items array')
             })
         })
@@ -1914,9 +1959,9 @@ describe('useMultiship', () => {
             const {result} = renderHook(() => useMultiship(mockBasket))
 
             await act(async () => {
-                await expect(result.current.moveItemsToDeliveryShipment(null)).rejects.toThrow(
-                    'Invalid basket or product items array'
-                )
+                await expect(
+                    result.current.moveItemsToDeliveryShipment(null, 'me', mockDefaultInventoryId)
+                ).rejects.toThrow('Invalid basket or product items array')
             })
         })
 
@@ -1924,9 +1969,9 @@ describe('useMultiship', () => {
             const {result} = renderHook(() => useMultiship(mockBasket))
 
             await act(async () => {
-                await expect(result.current.moveItemsToDeliveryShipment([])).rejects.toThrow(
-                    'Invalid basket or product items array'
-                )
+                await expect(
+                    result.current.moveItemsToDeliveryShipment([], 'me', mockDefaultInventoryId)
+                ).rejects.toThrow('Invalid basket or product items array')
             })
         })
 
@@ -1937,7 +1982,11 @@ describe('useMultiship', () => {
             mockUpdateItemsInBasket.mockRejectedValue(new Error('API Error'))
 
             await act(async () => {
-                const response = await result.current.moveItemsToDeliveryShipment(mockProductItems)
+                const response = await result.current.moveItemsToDeliveryShipment(
+                    mockProductItems,
+                    'me',
+                    mockDefaultInventoryId
+                )
                 expect(response).toEqual(new Error('API Error'))
             })
 

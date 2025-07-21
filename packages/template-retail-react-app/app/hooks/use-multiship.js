@@ -306,9 +306,14 @@ export const useMultiship = (basket) => {
      * Moves a product item from pickup to delivery shipment
      * @param {Object} productItem - The product item to move
      * @param {string} targetShipmentId - The target shipment ID (optional)
+     * @param {string} defaultInventoryId - The default inventory ID to use for delivery items (required)
      * @returns {Promise<Object>} The updated basket response
      */
-    const moveItemToDeliveryShipment = async (productItem, targetShipmentId = 'me') => {
+    const moveItemToDeliveryShipment = async (
+        productItem,
+        targetShipmentId = 'me',
+        defaultInventoryId
+    ) => {
         if (!basket?.basketId || !productItem?.itemId) {
             throw new Error('Invalid basket or product item')
         }
@@ -320,12 +325,9 @@ export const useMultiship = (basket) => {
             shipmentId: targetShipmentId
         }
 
-        // Remove inventoryId if it exists (for pickup items) by setting it to null
-        //
-        // TODO: This does not actually clear the id. We need an API fix maybe?
-        //
+        // Set inventoryId to default for delivery items (instead of null which doesn't work)
         if (productItem.inventoryId) {
-            updateData.inventoryId = null
+            updateData.inventoryId = defaultInventoryId
         }
 
         return await updateItemInBasketMutation.mutateAsync({
@@ -341,9 +343,14 @@ export const useMultiship = (basket) => {
      * Moves multiple product items from pickup to delivery shipment in parallel
      * @param {Array} productItems - Array of product items to move
      * @param {string} targetShipmentId - The target shipment ID (optional)
+     * @param {string} defaultInventoryId - The default inventory ID to use for delivery items (required)
      * @returns {Promise<Object>} The updated basket response
      */
-    const moveItemsToDeliveryShipment = async (productItems, targetShipmentId = 'me') => {
+    const moveItemsToDeliveryShipment = async (
+        productItems,
+        targetShipmentId = 'me',
+        defaultInventoryId
+    ) => {
         if (!basket?.basketId || !Array.isArray(productItems) || productItems.length === 0) {
             throw new Error('Invalid basket or product items array')
         }
@@ -354,8 +361,8 @@ export const useMultiship = (basket) => {
             productId: productItem.productId,
             quantity: productItem.quantity,
             shipmentId: targetShipmentId,
-            // TODO: API does not support removing inventoryId currently, so set to global inventory as a workaround
-            ...(productItem.inventoryId && {inventoryId: null})
+            // Set inventoryId to default for delivery items (instead of null which doesn't work)
+            ...(productItem.inventoryId && {inventoryId: defaultInventoryId})
         }))
 
         try {
@@ -412,9 +419,15 @@ export const useMultiship = (basket) => {
      * @param {Object} productItem - The product item
      * @param {boolean} selectedPickup - Whether pickup is selected (true) or delivery is selected (false)
      * @param {Object} storeInfo - The selected store object (required for pickup)
+     * @param {string} defaultInventoryId - The default inventory ID to use for delivery items (required)
      * @returns {Promise<void>}
      */
-    const handleDeliveryOptionChange = async (productItem, selectedPickup, storeInfo) => {
+    const handleDeliveryOptionChange = async (
+        productItem,
+        selectedPickup,
+        storeInfo,
+        defaultInventoryId
+    ) => {
         if (!basket?.basketId || !productItem) {
             throw new Error('Invalid basket or product item')
         }
@@ -515,7 +528,11 @@ export const useMultiship = (basket) => {
 
                     // Move all items to "me" if there are any to consolidate
                     if (allItemsToConsolidate.length > 0) {
-                        await moveItemsToDeliveryShipment(allItemsToConsolidate, 'me')
+                        await moveItemsToDeliveryShipment(
+                            allItemsToConsolidate,
+                            'me',
+                            defaultInventoryId
+                        )
                     }
 
                     // Remove the now empty delivery shipments
@@ -546,7 +563,11 @@ export const useMultiship = (basket) => {
                     throw new Error('Failed to find or create shipment')
                 }
 
-                updatedBasket = await moveItemToDeliveryShipment(productItem, targetShipmentId)
+                updatedBasket = await moveItemToDeliveryShipment(
+                    productItem,
+                    targetShipmentId,
+                    defaultInventoryId
+                )
             }
             // Handle change from delivery to pickup
             else if (selectedPickup && !isCurrentlyPickup) {
