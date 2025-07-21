@@ -340,6 +340,7 @@ Header.propTypes = {
     onMyAccountClick: PropTypes.func,
     onWishlistClick: PropTypes.func,
     onMyCartClick: PropTypes.func,
+    onStoreLocatorClick: PropTypes.func,
     searchInputRef: PropTypes.oneOfType([
         PropTypes.func,
         PropTypes.shape({current: PropTypes.elementType})
