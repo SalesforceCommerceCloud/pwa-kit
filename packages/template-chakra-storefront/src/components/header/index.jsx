@@ -115,7 +115,6 @@ const Header = ({
     }
     const isStoreLocatorEnabled = !!storeLocatorExtension && storeLocatorExtension.isEnabled
     const openModal = () => {
-
         // TODO: unwire this from upgradeability zustand store slice
         // onStoreLocatorClick()
         console.log('openModal')
