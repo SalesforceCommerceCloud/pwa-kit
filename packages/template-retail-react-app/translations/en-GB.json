@@ -1170,8 +1170,8 @@
   "pickup_address.title.store_information": {
     "defaultMessage": "Store Information"
   },
-  "pickup_or_delivery.label.delivery": {
-    "defaultMessage": "Delivery:"
+  "pickup_or_delivery.label.choose_delivery_option": {
+    "defaultMessage": "Choose delivery option"
   },
   "pickup_or_delivery.label.pickup_in_store": {
     "defaultMessage": "Pick Up in Store"

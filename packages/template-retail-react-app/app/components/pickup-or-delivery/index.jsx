@@ -7,10 +7,10 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import {useIntl, FormattedMessage} from 'react-intl'
+import {useIntl} from 'react-intl'
 
 // Chakra Components
-import {Box, Text, Select} from '@salesforce/retail-react-app/app/components/shared/ui'
+import {Box, Select} from '@salesforce/retail-react-app/app/components/shared/ui'
 
 // Constants
 const DELIVERY_OPTIONS = {
@@ -24,17 +24,13 @@ const DELIVERY_OPTIONS = {
  * @param {function} onChange - Callback function when delivery option changes
  * @param {boolean} isPickupDisabled - Whether pickup option is disabled
  * @param {boolean} isShipDisabled - Whether shipping option is disabled
- * @param {boolean} showLabels - Whether to show the delivery label
- * @param {string} size - Size of the select dropdown (sm, md, lg)
  * @returns A JSX element representing the pickup or delivery selection
  */
 const PickupOrDelivery = ({
     value = DELIVERY_OPTIONS.SHIP,
     onChange,
     isPickupDisabled = false,
-    isShipDisabled = false,
-    showLabels = false,
-    size = 'sm'
+    isShipDisabled = false
 }) => {
     const intl = useIntl()
 
@@ -46,19 +42,15 @@ const PickupOrDelivery = ({
 
     return (
         <Box>
-            {showLabels && (
-                <Text fontWeight={600} mb={2}>
-                    <FormattedMessage
-                        defaultMessage="Delivery:"
-                        id="pickup_or_delivery.label.delivery"
-                    />
-                </Text>
-            )}
             <Select
                 value={value}
                 onChange={(e) => handleDeliveryOptionChange(e.target.value)}
-                size={size}
+                size="sm"
                 data-testid="delivery-option-select"
+                aria-label={intl.formatMessage({
+                    defaultMessage: 'Choose delivery option',
+                    id: 'pickup_or_delivery.label.choose_delivery_option'
+                })}
             >
                 <option value={DELIVERY_OPTIONS.SHIP} disabled={isShipDisabled}>
                     {intl.formatMessage({
@@ -81,9 +73,7 @@ PickupOrDelivery.propTypes = {
     value: PropTypes.oneOf([DELIVERY_OPTIONS.SHIP, DELIVERY_OPTIONS.PICKUP]),
     onChange: PropTypes.func,
     isPickupDisabled: PropTypes.bool,
-    isShipDisabled: PropTypes.bool,
-    showLabels: PropTypes.bool,
-    size: PropTypes.oneOf(['sm', 'md', 'lg'])
+    isShipDisabled: PropTypes.bool
 }
 
 export default PickupOrDelivery
