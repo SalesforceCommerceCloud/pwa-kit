@@ -304,7 +304,7 @@ describe('Product view tests', function () {
         const updatedCartItem = await screen.findByTestId(
             `sf-cart-item-${mockCustomerBaskets.baskets[0].productItems[0].productId}`
         )
-        
+
         await waitFor(() => {
             expect(within(updatedCartItem).getByDisplayValue('3')).toBeInTheDocument()
         })
