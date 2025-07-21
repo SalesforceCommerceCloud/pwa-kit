@@ -42,11 +42,11 @@ const AppModals = ({
 }
 
 AppModals.propTypes = {
-    authModal: PropTypes.object.isRequired,
-    dntNotification: PropTypes.object.isRequired
+    authModal: PropTypes.object,
+    dntNotification: PropTypes.object
     // Uncomment when store locator is enabled
-    // isOpenStoreLocator: PropTypes.bool.isRequired,
-    // onCloseStoreLocator: PropTypes.func.isRequired
+    // isOpenStoreLocator: PropTypes.bool,
+    // onCloseStoreLocator: PropTypes.func
 }
 
 export default AppModals
