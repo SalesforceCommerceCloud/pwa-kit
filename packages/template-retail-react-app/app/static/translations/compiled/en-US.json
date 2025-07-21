@@ -3335,7 +3335,7 @@
       "value": "Deliver to Multiple Addresses"
     }
   ],
-  "shipping_address.action.ship_items_to_one_address": [
+  "shipping_address.action.ship_to_one_address": [
     {
       "type": 0,
       "value": "Ship Items to One Address"
@@ -3495,12 +3495,6 @@
       "value": "productName"
     }
   ],
-  "shipping_multi_address.loading.label": [
-    {
-      "type": 0,
-      "value": "Loading products"
-    }
-  ],
   "shipping_multi_address.loading.message": [
     {
       "type": 0,
@@ -3513,10 +3507,10 @@
       "value": "Multi-shipping address selection"
     }
   ],
-  "shipping_multi_address.price.label": [
+  "shipping_multi_address.product_attributes.label": [
     {
       "type": 0,
-      "value": "Product price"
+      "value": "Product attributes"
     }
   ],
   "shipping_multi_address.products.region": [
@@ -3529,12 +3523,6 @@
     {
       "type": 0,
       "value": "Quantity"
-    }
-  ],
-  "shipping_multi_address.submit.description": [
-    {
-      "type": 0,
-      "value": "Continue to next step with selected delivery addresses"
     }
   ],
   "shipping_options.action.send_as_a_gift": [

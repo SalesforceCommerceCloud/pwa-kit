@@ -39,11 +39,18 @@ jest.mock('@salesforce/commerce-sdk-react', () => {
 // Mock the toggle card components
 jest.mock('@salesforce/retail-react-app/app/components/toggle-card', () => {
     // eslint-disable-next-line react/prop-types
-    const ToggleCard = ({children, editing, onEdit, editLabel}) => (
+    const ToggleCard = ({children, editing, onEdit, editLabel, editAction, onEditActionClick}) => (
         <div data-testid="toggle-card" data-editing={editing ? 'true' : 'false'}>
-            <button data-testid="edit-button" onClick={onEdit}>
-                {editLabel}
-            </button>
+            {!editing && (
+                <button data-testid="edit-button" onClick={onEdit}>
+                    {editLabel}
+                </button>
+            )}
+            {editing && editAction && onEditActionClick && (
+                <button data-testid="edit-action-button" onClick={onEditActionClick}>
+                    {editAction}
+                </button>
+            )}
             {children}
         </div>
     )
@@ -264,8 +271,8 @@ describe('ShippingAddress', () => {
 
         renderWithIntl(<ShippingAddress {...defaultProps} />)
 
-        // First click the edit button to enable multi-shipping
-        fireEvent.click(screen.getByTestId('edit-button'))
+        // First click the edit action button to enable multi-shipping
+        fireEvent.click(screen.getByTestId('edit-action-button'))
 
         // Now the multi-shipping component should be visible
         expect(screen.getByTestId('multi-shipping')).toBeInTheDocument()
@@ -293,7 +300,7 @@ describe('ShippingAddress', () => {
         expect(editButton).toHaveTextContent('Edit Shipping Address')
     })
 
-    it('should show edit button with correct label for multi-shipping', () => {
+    it('should show edit action button with correct label for multi-shipping', () => {
         // Mock that we're in editing mode with multiple items
         const editingContext = {
             ...mockCheckoutContext,
@@ -303,9 +310,9 @@ describe('ShippingAddress', () => {
 
         renderWithIntl(<ShippingAddress {...defaultProps} />)
 
-        const editButton = screen.getByTestId('edit-button')
-        expect(editButton).toBeInTheDocument()
-        expect(editButton).toHaveTextContent('Deliver to Multiple Addresses')
+        const editActionButton = screen.getByTestId('edit-action-button')
+        expect(editActionButton).toBeInTheDocument()
+        expect(editActionButton).toHaveTextContent('Deliver to Multiple Addresses')
     })
 
     it('should handle edit button click for single shipping', () => {
@@ -324,7 +331,7 @@ describe('ShippingAddress', () => {
         expect(mockCheckoutContext.goToStep).toHaveBeenCalledWith(3) // SHIPPING_ADDRESS
     })
 
-    it('should handle edit button click for multi-shipping', () => {
+    it('should handle edit action button click for multi-shipping', () => {
         // Mock that we're in editing mode
         const editingContext = {
             ...mockCheckoutContext,
@@ -334,7 +341,7 @@ describe('ShippingAddress', () => {
 
         renderWithIntl(<ShippingAddress {...defaultProps} />)
 
-        fireEvent.click(screen.getByTestId('edit-button'))
+        fireEvent.click(screen.getByTestId('edit-action-button'))
 
         // Should enable multi-shipping mode
         expect(screen.getByTestId('multi-shipping')).toBeInTheDocument()
@@ -435,8 +442,8 @@ describe('ShippingAddress', () => {
             // Multi-shipping is not shown by default, only when toggled
             expect(screen.queryByTestId('multi-shipping')).not.toBeInTheDocument()
 
-            // Click edit button to enable multi-shipping
-            fireEvent.click(screen.getByTestId('edit-button'))
+            // Click edit action button to enable multi-shipping
+            fireEvent.click(screen.getByTestId('edit-action-button'))
 
             // Now multi-shipping should be visible
             expect(screen.getByTestId('multi-shipping')).toBeInTheDocument()

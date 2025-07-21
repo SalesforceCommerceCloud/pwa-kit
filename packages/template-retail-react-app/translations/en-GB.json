@@ -1409,7 +1409,7 @@
   "shipping_address.action.deliver_to_multiple_addresses": {
     "defaultMessage": "Deliver to Multiple Addresses"
   },
-  "shipping_address.action.ship_items_to_one_address": {
+  "shipping_address.action.ship_to_one_address": {
     "defaultMessage": "Ship Items to One Address"
   },
   "shipping_address.button.add_new_address": {
@@ -1475,26 +1475,20 @@
   "shipping_multi_address.image.alt": {
     "defaultMessage": "Product image for {productName}"
   },
-  "shipping_multi_address.loading.label": {
-    "defaultMessage": "Loading products"
-  },
   "shipping_multi_address.loading.message": {
     "defaultMessage": "Loading products..."
   },
   "shipping_multi_address.main.label": {
     "defaultMessage": "Multi-shipping address selection"
   },
-  "shipping_multi_address.price.label": {
-    "defaultMessage": "Product price"
+  "shipping_multi_address.product_attributes.label": {
+    "defaultMessage": "Product attributes"
   },
   "shipping_multi_address.products.region": {
     "defaultMessage": "Products and delivery addresses"
   },
   "shipping_multi_address.quantity.label": {
     "defaultMessage": "Quantity"
-  },
-  "shipping_multi_address.submit.description": {
-    "defaultMessage": "Continue to next step with selected delivery addresses"
   },
   "shipping_options.action.send_as_a_gift": {
     "defaultMessage": "Do you want to send this as a gift?"

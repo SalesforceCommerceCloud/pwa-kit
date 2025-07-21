@@ -31,9 +31,10 @@ export const ToggleCard = ({
     disableEdit,
     onEdit,
     editLabel,
-    enableEditAction,
+    editAction,
     isLoading,
     children,
+    onEditActionClick,
     ...props
 }) => {
     const titleRef = useRef()
@@ -65,7 +66,7 @@ export const ToggleCard = ({
                         >
                             {title}
                         </Heading>
-                        {(!editing || enableEditAction) && !disabled && onEdit && !disableEdit && (
+                        {!editing && !disabled && onEdit && !disableEdit && (
                             <Button
                                 variant="link"
                                 size="sm"
@@ -78,6 +79,16 @@ export const ToggleCard = ({
                                         id="toggle_card.action.edit"
                                     />
                                 )}
+                            </Button>
+                        )}
+                        {editing && editAction && onEditActionClick && (
+                            <Button
+                                variant="link"
+                                size="sm"
+                                onClick={onEditActionClick}
+                                aria-label={editAction}
+                            >
+                                {editAction}
                             </Button>
                         )}
                     </Flex>
@@ -109,7 +120,8 @@ ToggleCard.propTypes = {
     disabled: PropTypes.bool,
     disableEdit: PropTypes.bool,
     onEdit: PropTypes.func,
-    enableEditAction: PropTypes.bool,
+    editAction: PropTypes.string,
+    onEditActionClick: PropTypes.func,
     children: PropTypes.any
 }
 

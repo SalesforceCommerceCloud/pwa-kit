@@ -22,7 +22,6 @@ import {
 import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
 import ShippingMultiAddress from '@salesforce/retail-react-app/app/pages/checkout/partials/shipping-multi-address'
-import {MULTISHIP_IS_ENABLED} from '@salesforce/retail-react-app/app/constants'
 import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
 
 const submitButtonMessage = defineMessage({
@@ -44,6 +43,14 @@ const noItemsInBasketMessage = defineMessage({
 const deliveryAddressLabel = defineMessage({
     defaultMessage: 'Delivery Address',
     id: 'shipping_address.label.delivery_address'
+})
+const shipToOneAddressLabel = defineMessage({
+    defaultMessage: 'Ship Items to One Address',
+    id: 'shipping_address.action.ship_to_one_address'
+})
+const deliverToMultipleAddressesLabel = defineMessage({
+    defaultMessage: 'Deliver to Multiple Addresses',
+    id: 'shipping_address.action.deliver_to_multiple_addresses'
 })
 
 export default function ShippingAddress() {
@@ -137,37 +144,7 @@ export default function ShippingAddress() {
     }
 
     // Determine if multi-shipping should be available
-    const hasMultipleItems = basket?.productItems?.length > 1
     const isEditingShippingAddress = step === STEPS.SHIPPING_ADDRESS
-    const isRegisteredUser = customer?.isRegistered
-    const canUseMultiShipping = hasMultipleItems && isRegisteredUser && MULTISHIP_IS_ENABLED
-
-    // Update editLabel and onEdit logic
-    let editLabel
-    let onEdit
-    if (isMultiShipping) {
-        editLabel = formatMessage({
-            defaultMessage: 'Ship Items to One Address',
-            id: 'shipping_address.action.ship_items_to_one_address'
-        })
-        onEdit = () => setIsMultiShipping(false)
-    } else if (isEditingShippingAddress && canUseMultiShipping) {
-        editLabel = formatMessage({
-            defaultMessage: 'Deliver to Multiple Addresses',
-            id: 'shipping_address.action.deliver_to_multiple_addresses'
-        })
-        onEdit = () => setIsMultiShipping(true)
-    } else {
-        editLabel = formatMessage({
-            defaultMessage: 'Edit Shipping Address',
-            id: 'toggle_card.action.editShippingAddress'
-        })
-        onEdit = () => {
-            // Navigate to shipping address step to enable editing
-            goToStep(STEPS.SHIPPING_ADDRESS)
-            setIsMultiShipping(false)
-        }
-    }
 
     return (
         <ToggleCard
@@ -179,12 +156,29 @@ export default function ShippingAddress() {
             editing={isEditingShippingAddress}
             isLoading={isLoading}
             disabled={step === STEPS.CONTACT_INFO && !selectedShippingAddress}
-            onEdit={onEdit}
-            editLabel={editLabel}
-            enableEditAction={isMultiShipping || (isEditingShippingAddress && canUseMultiShipping)}
+            onEdit={() => goToStep(STEPS.SHIPPING_ADDRESS)}
+            editLabel={formatMessage({
+                defaultMessage: 'Edit Shipping Address',
+                id: 'toggle_card.action.editShippingAddress'
+            })}
+            editAction={
+                isMultiShipping
+                    ? formatMessage(shipToOneAddressLabel)
+                    : formatMessage(deliverToMultipleAddressesLabel)
+            }
+            onEditActionClick={() => {
+                setIsMultiShipping(!isMultiShipping)
+            }}
         >
-            {isMultiShipping ? (
-                <>
+            <ToggleCardEdit>
+                {!isMultiShipping ? (
+                    <ShippingAddressSelection
+                        selectedAddress={selectedShippingAddress}
+                        submitButtonLabel={submitButtonMessage}
+                        onSubmit={submitAndContinue}
+                        formTitleAriaLabel={shippingAddressAriaLabel}
+                    />
+                ) : (
                     <ShippingMultiAddress
                         basket={basket}
                         onSubmit={submitAndContinue}
@@ -193,23 +187,12 @@ export default function ShippingAddress() {
                         noItemsInBasketMessage={noItemsInBasketMessage}
                         deliveryAddressLabel={deliveryAddressLabel}
                     />
-                </>
-            ) : (
-                <>
-                    <ToggleCardEdit>
-                        <ShippingAddressSelection
-                            selectedAddress={selectedShippingAddress}
-                            submitButtonLabel={submitButtonMessage}
-                            onSubmit={submitAndContinue}
-                            formTitleAriaLabel={shippingAddressAriaLabel}
-                        />
-                    </ToggleCardEdit>
-                    {isAddressFilled && (
-                        <ToggleCardSummary>
-                            <AddressDisplay address={selectedShippingAddress} />
-                        </ToggleCardSummary>
-                    )}
-                </>
+                )}
+            </ToggleCardEdit>
+            {isAddressFilled && (
+                <ToggleCardSummary>
+                    <AddressDisplay address={selectedShippingAddress} />
+                </ToggleCardSummary>
             )}
         </ToggleCard>
     )
