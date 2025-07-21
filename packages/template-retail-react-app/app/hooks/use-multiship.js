@@ -483,6 +483,12 @@ export const useMultiship = (basket) => {
                     )
                 }
             }
+            // If we're configuring for pickup but have no existing pickup shipment to consolidate,
+            // we still need to update the product item with the proper inventoryId
+            else if (selectedPickup && !existingPickupShipmentId) {
+                // Update the current product item with the proper inventoryId for pickup
+                await moveItemsToPickupShipment([productItem], 'me', storeInfo.inventoryId)
+            }
             // If we're configuring for delivery, consolidate existing delivery shipments with same shipping method
             if (!selectedPickup) {
                 // Find other delivery shipments that can be consolidated (same shipping method)
@@ -538,6 +544,10 @@ export const useMultiship = (basket) => {
                             )
                         }
                     }
+                } else {
+                    // If there are no delivery shipments to consolidate, we still need to update
+                    // the product item with the proper inventoryId for delivery
+                    await moveItemsToDeliveryShipment([productItem], 'me', defaultInventoryId)
                 }
             }
         } else {

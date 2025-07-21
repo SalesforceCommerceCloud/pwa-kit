@@ -1272,7 +1272,21 @@ describe('useMultiship', () => {
                     true,
                     mockStoreInfo
                 )
-                expect(mockUpdateItemInBasket).not.toHaveBeenCalled()
+                // Should call moveItemsToPickupShipment to update the product item's inventoryId
+                expect(mockUpdateItemsInBasket).toHaveBeenCalledWith({
+                    parameters: {
+                        basketId: 'test-basket-id'
+                    },
+                    body: [
+                        {
+                            itemId: 'item-1',
+                            productId: 'product-1',
+                            quantity: 1,
+                            shipmentId: 'me',
+                            inventoryId: 'inventory-1'
+                        }
+                    ]
+                })
                 expect(mockCreateShipmentForBasket).not.toHaveBeenCalled()
                 expect(mockRemoveShipmentFromBasket).not.toHaveBeenCalled()
             })
@@ -1331,7 +1345,8 @@ describe('useMultiship', () => {
                     await result.current.handleDeliveryOptionChange(
                         mockProductItem,
                         true,
-                        mockStoreInfo
+                        mockStoreInfo,
+                        mockDefaultInventoryId
                     )
                 })
 
@@ -1411,7 +1426,8 @@ describe('useMultiship', () => {
                             inventoryId: 'inventory-1'
                         },
                         false,
-                        mockStoreInfo
+                        mockStoreInfo,
+                        mockDefaultInventoryId
                     )
                 })
 
@@ -1421,7 +1437,21 @@ describe('useMultiship', () => {
                     false,
                     mockStoreInfo
                 )
-                expect(mockUpdateItemInBasket).not.toHaveBeenCalled()
+                // Should call moveItemsToDeliveryShipment to update the product item's inventoryId
+                expect(mockUpdateItemsInBasket).toHaveBeenCalledWith({
+                    parameters: {
+                        basketId: 'test-basket-id'
+                    },
+                    body: [
+                        {
+                            itemId: 'item-1',
+                            productId: 'product-1',
+                            quantity: 1,
+                            shipmentId: 'me',
+                            inventoryId: mockDefaultInventoryId
+                        }
+                    ]
+                })
                 expect(mockCreateShipmentForBasket).not.toHaveBeenCalled()
                 expect(mockRemoveShipmentFromBasket).not.toHaveBeenCalled()
             })
@@ -1644,7 +1674,8 @@ describe('useMultiship', () => {
                             inventoryId: 'inventory-1'
                         },
                         false,
-                        mockStoreInfo
+                        mockStoreInfo,
+                        mockDefaultInventoryId
                     )
                 })
 
@@ -1655,7 +1686,21 @@ describe('useMultiship', () => {
                     mockStoreInfo
                 )
                 // Should not attempt to consolidate items from delivery shipment with different shipping method
-                expect(mockUpdateItemsInBasket).not.toHaveBeenCalled()
+                // But should still update the product item's inventory ID
+                expect(mockUpdateItemsInBasket).toHaveBeenCalledWith({
+                    parameters: {
+                        basketId: 'test-basket-id'
+                    },
+                    body: [
+                        {
+                            itemId: 'item-1',
+                            productId: 'product-1',
+                            quantity: 1,
+                            shipmentId: 'me',
+                            inventoryId: mockDefaultInventoryId
+                        }
+                    ]
+                })
                 expect(mockRemoveShipmentFromBasket).not.toHaveBeenCalled()
             })
 
@@ -1709,7 +1754,8 @@ describe('useMultiship', () => {
                     await result.current.handleDeliveryOptionChange(
                         mockProductItem,
                         true,
-                        mockStoreInfo
+                        mockStoreInfo,
+                        mockDefaultInventoryId
                     )
                 })
 
@@ -1767,7 +1813,8 @@ describe('useMultiship', () => {
                     await result.current.handleDeliveryOptionChange(
                         mockProductItem,
                         true,
-                        mockStoreInfo
+                        mockStoreInfo,
+                        mockDefaultInventoryId
                     )
                 })
 
@@ -1778,7 +1825,21 @@ describe('useMultiship', () => {
                     mockStoreInfo
                 )
                 // Should not attempt to consolidate items from different store
-                expect(mockUpdateItemsInBasket).not.toHaveBeenCalled()
+                // But should still update the product item's inventory ID
+                expect(mockUpdateItemsInBasket).toHaveBeenCalledWith({
+                    parameters: {
+                        basketId: 'test-basket-id'
+                    },
+                    body: [
+                        {
+                            itemId: 'item-1',
+                            productId: 'product-1',
+                            quantity: 1,
+                            shipmentId: 'me',
+                            inventoryId: 'inventory-1'
+                        }
+                    ]
+                })
                 expect(mockRemoveShipmentFromBasket).not.toHaveBeenCalled()
             })
 
@@ -1815,7 +1876,8 @@ describe('useMultiship', () => {
                     await result.current.handleDeliveryOptionChange(
                         mockProductItem,
                         true,
-                        mockStoreInfo
+                        mockStoreInfo,
+                        mockDefaultInventoryId
                     )
                 })
 
