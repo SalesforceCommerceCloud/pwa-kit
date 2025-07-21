@@ -96,6 +96,14 @@ describe('useMultiship', () => {
         ]
     }
 
+    // Mock second product item for multi-item test scenarios
+    const mockSecondProductItem = {
+        itemId: 'item-2',
+        productId: 'product-2',
+        quantity: 1,
+        shipmentId: 'me'
+    }
+
     // Mock shipping methods
     const mockShippingMethods = {
         applicableShippingMethods: [
@@ -921,7 +929,7 @@ describe('useMultiship', () => {
                             c_fromStoreId: 'store-1'
                         }
                     ],
-                    productItems: [mockProductItem]
+                    productItems: [mockProductItem, mockSecondProductItem]
                 }
 
                 const {result} = renderHook(() => useMultiship(basketWithBothShipments))
@@ -937,7 +945,8 @@ describe('useMultiship', () => {
                         {
                             ...mockProductItem,
                             shipmentId: 'pickup-shipment'
-                        }
+                        },
+                        mockSecondProductItem
                     ]
                 }
                 mockUpdateItemInBasket.mockResolvedValue(mockUpdatedBasket)
@@ -956,7 +965,12 @@ describe('useMultiship', () => {
             })
 
             test('should create new pickup shipment and move item', async () => {
-                const {result} = renderHook(() => useMultiship(mockBasket))
+                // Create basket with multiple items in "me" to avoid special case handling
+                const basketWithMultipleItems = {
+                    ...mockBasket,
+                    productItems: [mockProductItem, mockSecondProductItem]
+                }
+                const {result} = renderHook(() => useMultiship(basketWithMultipleItems))
 
                 // Mock that current shipment is NOT pickup initially
                 mockIsCurrentShippingMethodPickup.mockImplementation((method) => {
@@ -975,8 +989,8 @@ describe('useMultiship', () => {
                 mockCreateShipmentForBasket.mockResolvedValue(mockNewShipmentResponse)
 
                 const mockUpdatedBasket = {
-                    ...mockBasket,
-                    productItems: [] // No remaining items in 'me' shipment
+                    ...basketWithMultipleItems,
+                    productItems: [mockSecondProductItem] // Only one item remains in 'me' shipment
                 }
                 mockUpdateItemInBasket.mockResolvedValue(mockUpdatedBasket)
 
@@ -995,7 +1009,12 @@ describe('useMultiship', () => {
             })
 
             test('should throw error if no store selected', async () => {
-                const {result} = renderHook(() => useMultiship(mockBasket))
+                // Create basket with multiple items in "me" to avoid special case handling
+                const basketWithMultipleItems = {
+                    ...mockBasket,
+                    productItems: [mockProductItem, mockSecondProductItem]
+                }
+                const {result} = renderHook(() => useMultiship(basketWithMultipleItems))
 
                 mockIsCurrentShippingMethodPickup.mockReturnValue(false)
 
@@ -1007,7 +1026,12 @@ describe('useMultiship', () => {
             })
 
             test('should throw error if store has no inventory ID', async () => {
-                const {result} = renderHook(() => useMultiship(mockBasket))
+                // Create basket with multiple items in "me" to avoid special case handling
+                const basketWithMultipleItems = {
+                    ...mockBasket,
+                    productItems: [mockProductItem, mockSecondProductItem]
+                }
+                const {result} = renderHook(() => useMultiship(basketWithMultipleItems))
 
                 mockIsCurrentShippingMethodPickup.mockReturnValue(false)
 
@@ -1028,7 +1052,12 @@ describe('useMultiship', () => {
             })
 
             test('should throw error if failed to create pickup shipment', async () => {
-                const {result} = renderHook(() => useMultiship(mockBasket))
+                // Create basket with multiple items in "me" to avoid special case handling
+                const basketWithMultipleItems = {
+                    ...mockBasket,
+                    productItems: [mockProductItem, mockSecondProductItem]
+                }
+                const {result} = renderHook(() => useMultiship(basketWithMultipleItems))
 
                 mockIsCurrentShippingMethodPickup.mockReturnValue(false)
 
@@ -1161,6 +1190,625 @@ describe('useMultiship', () => {
                 expect.any(Error)
             )
             consoleErrorSpy.mockRestore()
+        })
+
+        describe('special case: single item in "me" shipment', () => {
+            test('should reconfigure "me" from delivery to pickup without existing pickup shipment', async () => {
+                const basketWithSingleItemInMe = {
+                    ...mockBasket,
+                    shipments: [
+                        {
+                            shipmentId: 'me',
+                            shippingMethod: {id: 'default-shipping-method'}
+                        }
+                    ],
+                    productItems: [mockProductItem] // Only one item in "me" shipment
+                }
+
+                const {result} = renderHook(() => useMultiship(basketWithSingleItemInMe))
+
+                // Mock that current shipment is delivery (not pickup)
+                mockIsCurrentShippingMethodPickup.mockReturnValue(false)
+
+                const mockConfigureResponse = {
+                    basketId: 'test-basket-id',
+                    shipments: [
+                        {
+                            shipmentId: 'me',
+                            shippingMethod: {id: 'pickup-shipping-method'},
+                            c_fromStoreId: 'store-1'
+                        }
+                    ]
+                }
+                mockConfigureDefaultShipmentIfNeeded.mockResolvedValue(mockConfigureResponse)
+
+                await act(async () => {
+                    await result.current.handleDeliveryOptionChange(
+                        mockProductItem,
+                        true,
+                        mockStoreInfo
+                    )
+                })
+
+                expect(mockConfigureDefaultShipmentIfNeeded).toHaveBeenCalledWith(
+                    basketWithSingleItemInMe,
+                    'me',
+                    [mockProductItem],
+                    true,
+                    mockStoreInfo
+                )
+                expect(mockUpdateItemInBasket).not.toHaveBeenCalled()
+                expect(mockCreateShipmentForBasket).not.toHaveBeenCalled()
+                expect(mockRemoveShipmentFromBasket).not.toHaveBeenCalled()
+            })
+
+            test('should reconfigure "me" from delivery to pickup and consolidate existing pickup shipment', async () => {
+                const basketWithPickupAndSingleItemInMe = {
+                    ...mockBasket,
+                    shipments: [
+                        {
+                            shipmentId: 'me',
+                            shippingMethod: {id: 'default-shipping-method'}
+                        },
+                        {
+                            shipmentId: 'existing-pickup',
+                            shippingMethod: {id: 'pickup-shipping-method'},
+                            c_fromStoreId: 'store-1'
+                        }
+                    ],
+                    productItems: [
+                        mockProductItem, // Only one item in "me" shipment
+                        {
+                            itemId: 'pickup-item-1',
+                            productId: 'pickup-product-1',
+                            quantity: 1,
+                            shipmentId: 'existing-pickup'
+                        },
+                        {
+                            itemId: 'pickup-item-2',
+                            productId: 'pickup-product-2',
+                            quantity: 2,
+                            shipmentId: 'existing-pickup'
+                        }
+                    ]
+                }
+
+                const {result} = renderHook(() => useMultiship(basketWithPickupAndSingleItemInMe))
+
+                // Mock that current shipment is delivery (not pickup)
+                mockIsCurrentShippingMethodPickup.mockImplementation((method) => {
+                    return method?.id === 'pickup-shipping-method'
+                })
+
+                const mockConfigureResponse = {
+                    basketId: 'test-basket-id',
+                    shipments: [
+                        {
+                            shipmentId: 'me',
+                            shippingMethod: {id: 'pickup-shipping-method'},
+                            c_fromStoreId: 'store-1'
+                        }
+                    ]
+                }
+                mockConfigureDefaultShipmentIfNeeded.mockResolvedValue(mockConfigureResponse)
+
+                await act(async () => {
+                    await result.current.handleDeliveryOptionChange(
+                        mockProductItem,
+                        true,
+                        mockStoreInfo
+                    )
+                })
+
+                expect(mockConfigureDefaultShipmentIfNeeded).toHaveBeenCalledWith(
+                    basketWithPickupAndSingleItemInMe,
+                    'me',
+                    [mockProductItem],
+                    true,
+                    mockStoreInfo
+                )
+                expect(mockUpdateItemsInBasket).toHaveBeenCalledWith({
+                    parameters: {
+                        basketId: 'test-basket-id'
+                    },
+                    body: [
+                        {
+                            itemId: 'pickup-item-1',
+                            productId: 'pickup-product-1',
+                            quantity: 1,
+                            shipmentId: 'me',
+                            inventoryId: 'inventory-1'
+                        },
+                        {
+                            itemId: 'pickup-item-2',
+                            productId: 'pickup-product-2',
+                            quantity: 2,
+                            shipmentId: 'me',
+                            inventoryId: 'inventory-1'
+                        }
+                    ]
+                })
+                expect(mockRemoveShipmentFromBasket).toHaveBeenCalledWith({
+                    parameters: {
+                        basketId: 'test-basket-id',
+                        shipmentId: 'existing-pickup'
+                    }
+                })
+            })
+
+            test('should reconfigure "me" from pickup to delivery', async () => {
+                const basketWithPickupSingleItemInMe = {
+                    ...mockBasket,
+                    shipments: [
+                        {
+                            shipmentId: 'me',
+                            shippingMethod: {id: 'pickup-shipping-method'},
+                            c_fromStoreId: 'store-1'
+                        }
+                    ],
+                    productItems: [
+                        {
+                            ...mockProductItem,
+                            inventoryId: 'inventory-1'
+                        }
+                    ]
+                }
+
+                const {result} = renderHook(() => useMultiship(basketWithPickupSingleItemInMe))
+
+                // Mock that current shipment is pickup
+                mockIsCurrentShippingMethodPickup.mockReturnValue(true)
+
+                const mockConfigureResponse = {
+                    basketId: 'test-basket-id',
+                    shipments: [
+                        {
+                            shipmentId: 'me',
+                            shippingMethod: {id: 'default-shipping-method'}
+                        }
+                    ]
+                }
+                mockConfigureDefaultShipmentIfNeeded.mockResolvedValue(mockConfigureResponse)
+
+                await act(async () => {
+                    await result.current.handleDeliveryOptionChange(
+                        {
+                            ...mockProductItem,
+                            inventoryId: 'inventory-1'
+                        },
+                        false,
+                        mockStoreInfo
+                    )
+                })
+
+                expect(mockConfigureDefaultShipmentIfNeeded).toHaveBeenCalledWith(
+                    basketWithPickupSingleItemInMe,
+                    'me',
+                    [
+                        {
+                            ...mockProductItem,
+                            inventoryId: 'inventory-1'
+                        }
+                    ],
+                    false,
+                    mockStoreInfo
+                )
+                expect(mockUpdateItemInBasket).not.toHaveBeenCalled()
+                expect(mockCreateShipmentForBasket).not.toHaveBeenCalled()
+                expect(mockRemoveShipmentFromBasket).not.toHaveBeenCalled()
+            })
+
+            test('should reconfigure "me" from pickup to delivery and consolidate existing delivery shipment', async () => {
+                const basketWithPickupAndDeliveryShipments = {
+                    ...mockBasket,
+                    shipments: [
+                        {
+                            shipmentId: 'me',
+                            shippingMethod: {id: 'pickup-shipping-method'},
+                            c_fromStoreId: 'store-1'
+                        },
+                        {
+                            shipmentId: 'existing-delivery',
+                            shippingMethod: {id: 'default-shipping-method'}
+                        }
+                    ],
+                    productItems: [
+                        {
+                            ...mockProductItem,
+                            inventoryId: 'inventory-1'
+                        },
+                        {
+                            itemId: 'delivery-item-1',
+                            productId: 'delivery-product-1',
+                            quantity: 2,
+                            shipmentId: 'existing-delivery'
+                        },
+                        {
+                            itemId: 'delivery-item-2',
+                            productId: 'delivery-product-2',
+                            quantity: 1,
+                            shipmentId: 'existing-delivery'
+                        }
+                    ]
+                }
+
+                const {result} = renderHook(() =>
+                    useMultiship(basketWithPickupAndDeliveryShipments)
+                )
+
+                // Mock that current shipment is pickup
+                mockIsCurrentShippingMethodPickup.mockImplementation((method) => {
+                    return method?.id === 'pickup-shipping-method'
+                })
+
+                const mockConfigureResponse = {
+                    basketId: 'test-basket-id',
+                    shipments: [
+                        {
+                            shipmentId: 'me',
+                            shippingMethod: {id: 'default-shipping-method'}
+                        }
+                    ]
+                }
+                mockConfigureDefaultShipmentIfNeeded.mockResolvedValue(mockConfigureResponse)
+
+                await act(async () => {
+                    await result.current.handleDeliveryOptionChange(
+                        {
+                            ...mockProductItem,
+                            inventoryId: 'inventory-1'
+                        },
+                        false,
+                        mockStoreInfo
+                    )
+                })
+
+                expect(mockConfigureDefaultShipmentIfNeeded).toHaveBeenCalledWith(
+                    basketWithPickupAndDeliveryShipments,
+                    'me',
+                    [
+                        {
+                            ...mockProductItem,
+                            inventoryId: 'inventory-1'
+                        }
+                    ],
+                    false,
+                    mockStoreInfo
+                )
+                expect(mockUpdateItemsInBasket).toHaveBeenCalledWith({
+                    parameters: {
+                        basketId: 'test-basket-id'
+                    },
+                    body: [
+                        {
+                            itemId: 'delivery-item-1',
+                            productId: 'delivery-product-1',
+                            quantity: 2,
+                            shipmentId: 'me'
+                        },
+                        {
+                            itemId: 'delivery-item-2',
+                            productId: 'delivery-product-2',
+                            quantity: 1,
+                            shipmentId: 'me'
+                        }
+                    ]
+                })
+                expect(mockRemoveShipmentFromBasket).toHaveBeenCalledWith({
+                    parameters: {
+                        basketId: 'test-basket-id',
+                        shipmentId: 'existing-delivery'
+                    }
+                })
+            })
+
+            test('should handle error when consolidating delivery shipment', async () => {
+                const basketWithPickupAndDeliveryShipments = {
+                    ...mockBasket,
+                    shipments: [
+                        {
+                            shipmentId: 'me',
+                            shippingMethod: {id: 'pickup-shipping-method'},
+                            c_fromStoreId: 'store-1'
+                        },
+                        {
+                            shipmentId: 'existing-delivery',
+                            shippingMethod: {id: 'default-shipping-method'}
+                        }
+                    ],
+                    productItems: [
+                        {
+                            ...mockProductItem,
+                            inventoryId: 'inventory-1'
+                        },
+                        {
+                            itemId: 'delivery-item-1',
+                            productId: 'delivery-product-1',
+                            quantity: 1,
+                            shipmentId: 'existing-delivery'
+                        }
+                    ]
+                }
+
+                const {result} = renderHook(() =>
+                    useMultiship(basketWithPickupAndDeliveryShipments)
+                )
+
+                mockIsCurrentShippingMethodPickup.mockImplementation((method) => {
+                    return method?.id === 'pickup-shipping-method'
+                })
+
+                const mockConfigureResponse = {
+                    basketId: 'test-basket-id',
+                    shipments: [
+                        {
+                            shipmentId: 'me',
+                            shippingMethod: {id: 'default-shipping-method'}
+                        }
+                    ]
+                }
+                mockConfigureDefaultShipmentIfNeeded.mockResolvedValue(mockConfigureResponse)
+
+                const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {})
+                mockRemoveShipmentFromBasket.mockRejectedValue(new Error('Remove error'))
+
+                await act(async () => {
+                    await result.current.handleDeliveryOptionChange(
+                        {
+                            ...mockProductItem,
+                            inventoryId: 'inventory-1'
+                        },
+                        false,
+                        mockStoreInfo
+                    )
+                })
+
+                expect(consoleErrorSpy).toHaveBeenCalledWith(
+                    'Failed to remove consolidated delivery shipment existing-delivery:',
+                    expect.any(Error)
+                )
+                consoleErrorSpy.mockRestore()
+            })
+
+            test('should not consolidate delivery shipments with different shipping methods', async () => {
+                const basketWithDifferentDeliveryMethods = {
+                    ...mockBasket,
+                    shipments: [
+                        {
+                            shipmentId: 'me',
+                            shippingMethod: {id: 'pickup-shipping-method'},
+                            c_fromStoreId: 'store-1'
+                        },
+                        {
+                            shipmentId: 'other-delivery',
+                            shippingMethod: {id: 'express-shipping-method'} // Different method
+                        }
+                    ],
+                    productItems: [
+                        {
+                            ...mockProductItem,
+                            inventoryId: 'inventory-1'
+                        },
+                        {
+                            itemId: 'delivery-item-1',
+                            productId: 'delivery-product-1',
+                            quantity: 1,
+                            shipmentId: 'other-delivery'
+                        }
+                    ]
+                }
+
+                const {result} = renderHook(() => useMultiship(basketWithDifferentDeliveryMethods))
+
+                mockIsCurrentShippingMethodPickup.mockImplementation((method) => {
+                    return method?.id === 'pickup-shipping-method'
+                })
+
+                const mockConfigureResponse = {
+                    basketId: 'test-basket-id',
+                    shipments: [
+                        {
+                            shipmentId: 'me',
+                            shippingMethod: {id: 'default-shipping-method'}
+                        }
+                    ]
+                }
+                mockConfigureDefaultShipmentIfNeeded.mockResolvedValue(mockConfigureResponse)
+
+                await act(async () => {
+                    await result.current.handleDeliveryOptionChange(
+                        {
+                            ...mockProductItem,
+                            inventoryId: 'inventory-1'
+                        },
+                        false,
+                        mockStoreInfo
+                    )
+                })
+
+                expect(mockConfigureDefaultShipmentIfNeeded).toHaveBeenCalledWith(
+                    basketWithDifferentDeliveryMethods,
+                    'me',
+                    [
+                        {
+                            ...mockProductItem,
+                            inventoryId: 'inventory-1'
+                        }
+                    ],
+                    false,
+                    mockStoreInfo
+                )
+                // Should not attempt to consolidate items from delivery shipment with different shipping method
+                expect(mockUpdateItemsInBasket).not.toHaveBeenCalled()
+                expect(mockRemoveShipmentFromBasket).not.toHaveBeenCalled()
+            })
+
+            test('should handle error when consolidating pickup shipment', async () => {
+                const basketWithPickupAndSingleItemInMe = {
+                    ...mockBasket,
+                    shipments: [
+                        {
+                            shipmentId: 'me',
+                            shippingMethod: {id: 'default-shipping-method'}
+                        },
+                        {
+                            shipmentId: 'existing-pickup',
+                            shippingMethod: {id: 'pickup-shipping-method'},
+                            c_fromStoreId: 'store-1'
+                        }
+                    ],
+                    productItems: [
+                        mockProductItem,
+                        {
+                            itemId: 'pickup-item-1',
+                            productId: 'pickup-product-1',
+                            quantity: 1,
+                            shipmentId: 'existing-pickup'
+                        }
+                    ]
+                }
+
+                const {result} = renderHook(() => useMultiship(basketWithPickupAndSingleItemInMe))
+
+                mockIsCurrentShippingMethodPickup.mockImplementation((method) => {
+                    return method?.id === 'pickup-shipping-method'
+                })
+
+                const mockConfigureResponse = {
+                    basketId: 'test-basket-id',
+                    shipments: [
+                        {
+                            shipmentId: 'me',
+                            shippingMethod: {id: 'pickup-shipping-method'},
+                            c_fromStoreId: 'store-1'
+                        }
+                    ]
+                }
+                mockConfigureDefaultShipmentIfNeeded.mockResolvedValue(mockConfigureResponse)
+
+                const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {})
+                mockRemoveShipmentFromBasket.mockRejectedValue(new Error('Remove error'))
+
+                await act(async () => {
+                    await result.current.handleDeliveryOptionChange(
+                        mockProductItem,
+                        true,
+                        mockStoreInfo
+                    )
+                })
+
+                expect(consoleErrorSpy).toHaveBeenCalledWith(
+                    'Failed to remove consolidated pickup shipment existing-pickup:',
+                    expect.any(Error)
+                )
+                consoleErrorSpy.mockRestore()
+            })
+
+            test('should not consolidate pickup shipment from different store', async () => {
+                const basketWithDifferentStorePickup = {
+                    ...mockBasket,
+                    shipments: [
+                        {
+                            shipmentId: 'me',
+                            shippingMethod: {id: 'default-shipping-method'}
+                        },
+                        {
+                            shipmentId: 'other-store-pickup',
+                            shippingMethod: {id: 'pickup-shipping-method'},
+                            c_fromStoreId: 'store-2' // Different store
+                        }
+                    ],
+                    productItems: [
+                        mockProductItem,
+                        {
+                            itemId: 'pickup-item-1',
+                            productId: 'pickup-product-1',
+                            quantity: 1,
+                            shipmentId: 'other-store-pickup'
+                        }
+                    ]
+                }
+
+                const {result} = renderHook(() => useMultiship(basketWithDifferentStorePickup))
+
+                mockIsCurrentShippingMethodPickup.mockImplementation((method) => {
+                    return method?.id === 'pickup-shipping-method'
+                })
+
+                const mockConfigureResponse = {
+                    basketId: 'test-basket-id',
+                    shipments: [
+                        {
+                            shipmentId: 'me',
+                            shippingMethod: {id: 'pickup-shipping-method'},
+                            c_fromStoreId: 'store-1'
+                        }
+                    ]
+                }
+                mockConfigureDefaultShipmentIfNeeded.mockResolvedValue(mockConfigureResponse)
+
+                await act(async () => {
+                    await result.current.handleDeliveryOptionChange(
+                        mockProductItem,
+                        true,
+                        mockStoreInfo
+                    )
+                })
+
+                expect(mockConfigureDefaultShipmentIfNeeded).toHaveBeenCalledWith(
+                    basketWithDifferentStorePickup,
+                    'me',
+                    [mockProductItem],
+                    true,
+                    mockStoreInfo
+                )
+                // Should not attempt to consolidate items from different store
+                expect(mockUpdateItemsInBasket).not.toHaveBeenCalled()
+                expect(mockRemoveShipmentFromBasket).not.toHaveBeenCalled()
+            })
+
+            test('should not apply special handling when "me" has multiple items', async () => {
+                const basketWithMultipleItemsInMe = {
+                    ...mockBasket,
+                    shipments: [
+                        {
+                            shipmentId: 'me',
+                            shippingMethod: {id: 'default-shipping-method'}
+                        }
+                    ],
+                    productItems: [mockProductItem, mockSecondProductItem]
+                }
+
+                const {result} = renderHook(() => useMultiship(basketWithMultipleItemsInMe))
+
+                mockIsCurrentShippingMethodPickup.mockImplementation((method) => {
+                    return method?.id === 'pickup-shipping-method'
+                })
+
+                const mockNewShipmentResponse = {
+                    shipments: [
+                        {
+                            shipmentId: 'new-pickup-shipment',
+                            shippingMethod: {id: 'pickup-shipping-method'},
+                            c_fromStoreId: 'store-1'
+                        }
+                    ]
+                }
+                mockCreateShipmentForBasket.mockResolvedValue(mockNewShipmentResponse)
+
+                await act(async () => {
+                    await result.current.handleDeliveryOptionChange(
+                        mockProductItem,
+                        true,
+                        mockStoreInfo
+                    )
+                })
+
+                // Should follow normal logic - create new shipment and move item
+                expect(mockCreateShipmentForBasket).toHaveBeenCalled()
+                expect(mockUpdateItemInBasket).toHaveBeenCalled()
+                expect(mockConfigureDefaultShipmentIfNeeded).not.toHaveBeenCalled()
+            })
         })
     })
 
