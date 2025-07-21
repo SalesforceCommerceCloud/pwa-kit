@@ -6,8 +6,8 @@
  */
 
 import React from 'react'
-import {screen, within, fireEvent, waitFor, act} from '@testing-library/react'
-import {renderWithProviders} from '../../utils/test-utils'
+import { screen, within, fireEvent, waitFor, act } from '@testing-library/react'
+import { renderWithProviders } from '../../utils/test-utils'
 import Cart from '../../pages/cart/index'
 import {
     mockShippingMethods,
@@ -17,14 +17,13 @@ import {
     mockedCustomerProductLists
 } from '../../../mocks/mock-data'
 import mockVariant from '../../../mocks/variant-750518699578M'
-import {rest} from 'msw'
 import {
     mockProductBundle,
     mockGetBundleChildrenProducts,
     basketWithProductBundle
 } from '../../../mocks/product-bundle'
-import {prependHandlersToServer} from '../../../jest-setup'
-import {baskets as mockBaskets, products as mockProducts} from '../../pages/cart/cart.mock'
+import { prependHandlersToServer } from '../../../jest-setup'
+import { baskets as mockBaskets, products as mockProducts } from '../../pages/cart/cart.mock'
 
 const mockProduct = {
     ...mockVariant,
@@ -66,84 +65,98 @@ const mockProductBundleBasket = {
 
 // Set up and clean up
 beforeEach(() => {
-    global.server.use(
-        rest.get('*/customers/:customerId/product-lists', (req, res, ctx) => {
-            return res(ctx.delay(0), ctx.json(mockedCustomerProductLists))
-        }),
-        rest.get('*/products/:productId', (req, res, ctx) => {
-            return res(ctx.delay(0), ctx.json(mockProduct))
-        }),
-        rest.get('*/products', (req, res, ctx) => {
-            return res(ctx.delay(0), ctx.json({data: [mockCartVariant]}))
-        }),
-
-        rest.put('*/baskets/:basketId/shipments/:shipmentId', (req, res, ctx) => {
-            const basket = mockCustomerBaskets.baskets[0]
-            const updatedBasketWithShippingMethod = {
-                ...basket,
-                shipments: [
-                    {
-                        ...basket.shipments[0],
-                        shippingMethod: {
-                            description: 'Order received the next business day',
-                            id: '003',
-                            name: 'Overnight',
-                            price: 29.99
-                        },
-                        shippingAddress: {
-                            address1: '4911  Lincoln Street',
-                            postalCode: '97350',
-                            city: 'IDANHA',
-                            countryCode: 'US',
-                            firstName: 'Ward J',
-                            fullName: 'Ward J Adamek',
-                            id: 'b3e1269a2c1d0ad56694206741',
-                            lastName: 'Adamek',
-                            stateCode: 'OR'
+    prependHandlersToServer([
+        {
+            path: '*/customers/:customerId/product-lists',
+            method: 'get',
+            res: () => mockedCustomerProductLists
+        },
+        {
+            path: '*/products/:productId',
+            method: 'get',
+            res: () => mockProduct
+        },
+        {
+            path: '*/products',
+            method: 'get',
+            res: () => ({ data: [mockCartVariant] })
+        },
+        {
+            path: '*/baskets/:basketId/shipments/:shipmentId',
+            method: 'put',
+            res: () => {
+                const basket = mockCustomerBaskets.baskets[0]
+                return {
+                    ...basket,
+                    shipments: [
+                        {
+                            ...basket.shipments[0],
+                            shippingMethod: {
+                                description: 'Order received the next business day',
+                                id: '003',
+                                name: 'Overnight',
+                                price: 29.99
+                            },
+                            shippingAddress: {
+                                address1: '4911  Lincoln Street',
+                                postalCode: '97350',
+                                city: 'IDANHA',
+                                countryCode: 'US',
+                                firstName: 'Ward J',
+                                fullName: 'Ward J Adamek',
+                                id: 'b3e1269a2c1d0ad56694206741',
+                                lastName: 'Adamek',
+                                stateCode: 'OR'
+                            }
                         }
-                    }
-                ]
+                    ]
+                }
             }
-            return res(ctx.delay(0), ctx.json(updatedBasketWithShippingMethod))
-        }),
-        rest.get('*/baskets/:basketId/shipments', (req, res, ctx) => {
-            return res(ctx.delay(0), ctx.json(mockShippingMethods))
-        }),
-
-        rest.put('*/shipments/me/shipping-method', (req, res, ctx) => {
-            const basketWithShipment = {
-                ...mockCustomerBaskets.baskets[0],
-                shipments: [
-                    {
-                        ...mockCustomerBaskets.baskets[0].shipments[0],
-                        shippingMethod: {
-                            description: 'Order received within 7-10 business days',
-                            id: 'GBP001',
-                            name: 'Ground',
-                            price: 7.99,
-                            shippingPromotions: [
-                                {
-                                    calloutMsg: 'Free Shipping Amount Above 50',
-                                    promotionId: 'FreeShippingAmountAbove50',
-                                    promotionName: 'Free Shipping Amount Above 50'
-                                }
-                            ],
-                            c_estimatedArrivalTime: '7-10 Business Days'
+        },
+        {
+            path: '*/baskets/:basketId/shipments',
+            method: 'get',
+            res: () => mockShippingMethods
+        },
+        {
+            path: '*/shipments/me/shipping-method',
+            method: 'put',
+            res: () => {
+                return {
+                    ...mockCustomerBaskets.baskets[0],
+                    shipments: [
+                        {
+                            ...mockCustomerBaskets.baskets[0].shipments[0],
+                            shippingMethod: {
+                                description: 'Order received within 7-10 business days',
+                                id: 'GBP001',
+                                name: 'Ground',
+                                price: 7.99,
+                                shippingPromotions: [
+                                    {
+                                        calloutMsg: 'Free Shipping Amount Above 50',
+                                        promotionId: 'FreeShippingAmountAbove50',
+                                        promotionName: 'Free Shipping Amount Above 50'
+                                    }
+                                ],
+                                c_estimatedArrivalTime: '7-10 Business Days'
+                            }
                         }
-                    }
-                ]
+                    ]
+                }
             }
-            return res(ctx.delay(0), ctx.json(basketWithShipment))
-        }),
-
-        rest.get('*/shipments/me/shipping-methods', (req, res, ctx) => {
-            return res(ctx.delay(0), ctx.json(mockShippingMethods))
-        }),
-
-        rest.get('*/promotions', (req, res, ctx) => {
-            return res(ctx.delay(0), ctx.status(200), ctx.json(mockPromotions))
-        })
-    )
+        },
+        {
+            path: '*/shipments/me/shipping-methods',
+            method: 'get',
+            res: () => mockShippingMethods
+        },
+        {
+            path: '*/promotions',
+            method: 'get',
+            res: () => mockPromotions
+        }
+    ])
 })
 afterEach(() => {
     jest.restoreAllMocks()
@@ -153,11 +166,13 @@ jest.setTimeout(30000)
 
 describe('Empty cart tests', function () {
     beforeEach(() => {
-        global.server.use(
-            rest.get('*/customers/:customerId/baskets', (req, res, ctx) => {
-                return res(ctx.delay(0), ctx.json(mockEmptyBasket))
-            })
-        )
+        prependHandlersToServer([
+            {
+                path: '*/customers/:customerId/baskets',
+                method: 'get',
+                res: () => mockEmptyBasket
+            }
+        ])
     })
 
     test('Renders empty cart when there are no items', async () => {
@@ -166,7 +181,7 @@ describe('Empty cart tests', function () {
     })
 })
 
-describe('Rendering skeleton tests', function () {
+describe('Skeleton tests', function () {
     test('Renders skeleton initially', async () => {
         renderWithProviders(<Cart />)
 
@@ -175,58 +190,65 @@ describe('Rendering skeleton tests', function () {
     })
 })
 
-// TODO: Fix flaky/broken test
-// eslint-disable-next-line jest/no-disabled-tests
-test.skip('Can update item quantity in the cart', async () => {
-    renderWithProviders(<Cart />)
-    await waitFor(async () => {
-        expect(screen.getByTestId('sf-cart-container')).toBeInTheDocument()
-        expect(screen.getByText(/Belted Cardigan With Studs/i)).toBeInTheDocument()
-    })
+describe('Cart tests', () => {
+    test('Can update item quantity in the cart', async () => {
 
-    const cartItem = await screen.findByTestId(
-        `sf-cart-item-${mockCustomerBaskets.baskets[0].productItems[0].productId}`
-    )
+        const { user } = renderWithProviders(<Cart />)
+        await waitFor(async () => {
+            expect(screen.getByTestId('sf-cart-container')).toBeInTheDocument()
+            expect(screen.getByText(/Belted Cardigan With Studs/i)).toBeInTheDocument()
+        })
 
-    // TODO: Fix assertion
-    // eslint-disable-next-line jest/valid-expect
-    expect(within(cartItem).getByDisplayValue('2'))
+        const cartItem = await screen.findByTestId(
+            `sf-cart-item-${mockCustomerBaskets.baskets[0].productItems[0].productId}`
+        )
 
-    await act(async () => {
+        expect(within(cartItem).getByDisplayValue('2')).toBeInTheDocument()
+
         const incrementButton = await within(cartItem).findByTestId('quantity-increment')
 
-        // update item quantity
-        fireEvent.pointerDown(incrementButton)
-    })
+        await act(async () => {
+            await user.click(incrementButton)
+        })
+        // Mock the PATCH request for updating basket item quantity
+        prependHandlersToServer([
+            {
+                path: '*/baskets/*/items/*',
+                method: 'patch',
+                res: () => {
+                    // Return updated basket with incremented quantity
+                    return {
+                        ...mockCustomerBaskets.baskets[0],
+                        productItems: mockCustomerBaskets.baskets[0].productItems.map(item => ({
+                            ...item,
+                            quantity: item.quantity + 1
+                        }))
+                    }
+                }
+            }
+        ])
 
-    await waitFor(() => {
-        expect(screen.getByTestId('loading')).toBeInTheDocument()
-    })
-
-    await waitFor(() => {
-        // TODO: Fix assertion
-        // eslint-disable-next-line jest/valid-expect
-        expect(within(cartItem).getByDisplayValue('3'))
-    })
-
-    await waitFor(() => {
-        expect(screen.queryByTestId('loading')).not.toBeInTheDocument()
+        await waitFor(() => {
+            expect(within(cartItem).getByDisplayValue('3')).toBeInTheDocument()
+        })
     })
 })
 
-// TODO: Fix flaky/broken test
-// eslint-disable-next-line jest/no-disabled-tests
-describe.skip('Update quantity in product view', function () {
+
+
+describe('Product view tests', function () {
     beforeEach(() => {
-        global.server.use(
-            rest.get('*/products/:productId', (req, res, ctx) => {
-                return res(ctx.delay(0), ctx.json(mockCartVariant))
-            })
-        )
+        prependHandlersToServer([
+            {
+                path: '*/products/:productId',
+                method: 'get',
+                res: () => mockCartVariant
+            }
+        ])
     })
 
     test('Can update item quantity from product view modal', async () => {
-        const {user} = renderWithProviders(<Cart />)
+        const { user } = renderWithProviders(<Cart />)
         expect(await screen.findByTestId('sf-cart-container')).toBeInTheDocument()
         expect(screen.getByText(/Belted Cardigan With Studs/i)).toBeInTheDocument()
 
@@ -234,7 +256,7 @@ describe.skip('Update quantity in product view', function () {
             `sf-cart-item-${mockCustomerBaskets.baskets[0].productItems[0].productId}`
         )
 
-        const editCartButton = within(cartItem).getByRole('button', {name: 'Edit'})
+        const editCartButton = within(cartItem).getByRole('button', { name: 'Edit' })
         await act(async () => {
             await user.click(editCartButton)
         })
@@ -242,42 +264,62 @@ describe.skip('Update quantity in product view', function () {
         const productView = screen.queryByTestId('product-view')
 
         const incrementButton = await within(productView).findByTestId('quantity-increment')
+        
+        // Mock the PATCH request for updating basket item quantity right before clicking
+        prependHandlersToServer([
+            {
+                path: '*/baskets/*/items/*',
+                method: 'patch',
+                res: () => {
+                    // Return updated basket with incremented quantity
+                    return {
+                        ...mockCustomerBaskets.baskets[0],
+                        productItems: mockCustomerBaskets.baskets[0].productItems.map(item => ({
+                            ...item,
+                            quantity: item.quantity + 1
+                        }))
+                    }
+                }
+            }
+        ])
+        
         // update item quantity
-        fireEvent.pointerDown(incrementButton)
-        // TODO: Fix assertion
-        // eslint-disable-next-line jest/valid-expect
-        expect(within(productView).getByDisplayValue('3'))
+        await act(async () => {
+            await user.click(incrementButton)
+        })
+        
+        await waitFor(() => {
+            expect(within(productView).getByDisplayValue('3')).toBeInTheDocument()
+        })
 
-        const updateCartButtons = within(productView).getAllByRole('button', {name: 'Update'})
+        const updateCartButtons = within(productView).getAllByRole('button', { name: 'Update' })
         await act(async () => {
             await user.click(updateCartButtons[0])
         })
+        
         await waitFor(() => {
             expect(productView).not.toBeInTheDocument()
         })
+        
         await waitFor(() => {
-            // TODO: Fix assertion
-            // eslint-disable-next-line jest/valid-expect
-            expect(within(cartItem).getByDisplayValue('3'))
-        })
-
-        await waitFor(() => {
-            expect(screen.queryByTestId('loading')).not.toBeInTheDocument()
+            expect(within(cartItem).getByDisplayValue('3')).toBeInTheDocument()
         })
     })
 })
 
 describe('Remove item from cart', function () {
     beforeEach(() => {
-        global.server.use(
-            rest.delete('*/baskets/:basket/items/:itemId', (req, res, ctx) => {
-                return res(ctx.delay(0), ctx.json(mockEmptyBasket.baskets[0]))
-            })
-        )
+        prependHandlersToServer([
+            {
+                path: '*/baskets/:basket/items/:itemId',
+                method: 'delete',
+                res: () => mockEmptyBasket.baskets[0]
+            }
+        ])
     })
 
     test('Can remove item from the cart', async () => {
-        const {user} = renderWithProviders(<Cart />)
+        const { user } = renderWithProviders(<Cart />)
 
         let cartItem
         await waitFor(() => {
@@ -310,7 +352,7 @@ describe('Remove item from cart', function () {
             () => {
                 expect(screen.getByTestId('sf-cart-empty')).toBeInTheDocument()
             },
-            {timeout: 20000}
+            { timeout: 20000 }
         )
     })
 })
@@ -369,76 +411,83 @@ describe('Coupons tests', function () {
             id: '750518699585M'
         }
 
-        global.server.use(
-            rest.get('*/customers/:customerId/baskets', (req, res, ctx) => {
-                return res(
-                    ctx.delay(0),
-                    ctx.json({total: 1, baskets: [mockCustomerBasketsWithSuit]})
-                )
-            }),
-            rest.get('*/products', (req, res, ctx) => {
-                return res(ctx.delay(0), ctx.json({data: [mockSuitProduct]}))
-            }),
-            rest.post('*/baskets/:basketId/coupons', (req, res, ctx) => {
-                const basketWithCoupon = {
-                    ...mockCustomerBasketsWithSuit,
-                    couponItems: [
-                        {
-                            code: 'menssuits',
-                            couponItemId: '565dd1c773fcb316d4c2ff9211',
-                            statusCode: 'applied',
-                            valid: true
-                        }
-                    ],
-                    productItems: [
-                        {
-                            adjustedTax: 8.23,
-                            basePrice: 191.99,
-                            bonusProductLineItem: false,
-                            gift: false,
-                            itemId: '54c599fdace475d97aeec72453',
-                            itemText: 'Black Single Pleat Athletic Fit Wool Suit - Edit',
-                            price: 191.99,
-                            priceAdjustments: [
-                                {
-                                    appliedDiscount: {
-                                        amount: 0.1,
-                                        percentage: 10,
-                                        type: 'percentage'
-                                    },
-                                    couponCode: 'menssuits',
-                                    creationDate: '2023-02-15T18:04:27.857Z',
-                                    custom: false,
-                                    itemText: "10% off men's suits",
-                                    lastModified: '2023-02-15T18:04:27.863Z',
-                                    manual: false,
-                                    price: -19.2,
-                                    priceAdjustmentId: '3207da3927b865d676e68bcb60',
-                                    promotionId: '10offsuits'
-                                }
-                            ],
-                            priceAfterItemDiscount: 172.79,
-                            priceAfterOrderDiscount: 172.79,
-                            productId: '750518699585M',
-                            productName: 'Black Single Pleat Athletic Fit Wool Suit - Edit',
-                            quantity: 1,
-                            shipmentId: 'me',
-                            tax: 9.14,
-                            taxBasis: 191.99,
-                            taxClassId: 'standard',
-                            taxRate: 0.05
-                        }
-                    ]
+        prependHandlersToServer([
+            {
+                path: '*/customers/:customerId/baskets',
+                method: 'get',
+                res: () => ({ total: 1, baskets: [mockCustomerBasketsWithSuit] })
+            },
+            {
+                path: '*/products',
+                method: 'get',
+                res: () => ({ data: [mockSuitProduct] })
+            },
+            {
+                path: '*/baskets/:basketId/coupons',
+                method: 'post',
+                res: () => {
+                    const basketWithCoupon = {
+                        ...mockCustomerBasketsWithSuit,
+                        couponItems: [
+                            {
+                                code: 'menssuits',
+                                couponItemId: '565dd1c773fcb316d4c2ff9211',
+                                statusCode: 'applied',
+                                valid: true
+                            }
+                        ],
+                        productItems: [
+                            {
+                                adjustedTax: 8.23,
+                                basePrice: 191.99,
+                                bonusProductLineItem: false,
+                                gift: false,
+                                itemId: '54c599fdace475d97aeec72453',
+                                itemText: 'Black Single Pleat Athletic Fit Wool Suit - Edit',
+                                price: 191.99,
+                                priceAdjustments: [
+                                    {
+                                        appliedDiscount: {
+                                            amount: 0.1,
+                                            percentage: 10,
+                                            type: 'percentage'
+                                        },
+                                        couponCode: 'menssuits',
+                                        creationDate: '2023-02-15T18:04:27.857Z',
+                                        custom: false,
+                                        itemText: "10% off men's suits",
+                                        lastModified: '2023-02-15T18:04:27.863Z',
+                                        manual: false,
+                                        price: -19.2,
+                                        priceAdjustmentId: '3207da3927b865d676e68bcb60',
+                                        promotionId: '10offsuits'
+                                    }
+                                ],
+                                priceAfterItemDiscount: 172.79,
+                                priceAfterOrderDiscount: 172.79,
+                                productId: '750518699585M',
+                                productName: 'Black Single Pleat Athletic Fit Wool Suit - Edit',
+                                quantity: 1,
+                                shipmentId: 'me',
+                                tax: 9.14,
+                                taxBasis: 191.99,
+                                taxClassId: 'standard',
+                                taxRate: 0.05
+                            }
+                        ]
+                    }
+                    return basketWithCoupon
                 }
-                return res(ctx.delay(0), ctx.json(basketWithCoupon))
-            }),
-            rest.delete('*/baskets/:basketId/coupons/:couponId', (req, res, ctx) => {
-                return res(ctx.delay(0), ctx.json(mockCustomerBasketsWithSuit))
-            })
-        )
+            },
+            {
+                path: '*/baskets/:basketId/coupons/:couponId',
+                method: 'delete',
+                res: () => mockCustomerBasketsWithSuit
+            }
+        ])
     })
     test('Can apply and remove product-level coupon code with promotion', async () => {
-        const {user} = renderWithProviders(<Cart />)
+        const { user } = renderWithProviders(<Cart />)
 
         // Wait for cart to fully load
         expect(await screen.findByTestId('sf-cart-container')).toBeInTheDocument()
@@ -479,41 +528,44 @@ describe('Coupons tests', function () {
         })
     })
 })
-describe('Update this is a gift option', function () {
+describe('Gift option tests', function () {
     beforeEach(() => {
-        global.server.use(
-            rest.patch('*/baskets/:basketId/items/:itemId', (req, res, ctx) => {
-                const basket = mockCustomerBaskets.baskets[0]
-                const updatedBasket = {
-                    ...basket,
-                    productItems: [
-                        {
-                            adjustedTax: 2.93,
-                            basePrice: 61.43,
-                            bonusProductLineItem: false,
-                            gift: true,
-                            itemId: '4a9af0a24fe46c3f6d8721b371',
-                            itemText: 'Belted Cardigan With Studs',
-                            price: 61.43,
-                            priceAfterItemDiscount: 61.43,
-                            priceAfterOrderDiscount: 61.43,
-                            productId: '701642889830M',
-                            productName: 'Belted Cardigan With Studs',
-                            quantity: 2,
-                            shipmentId: 'me',
-                            tax: 2.93,
-                            taxBasis: 61.43,
-                            taxClassId: 'standard',
-                            taxRate: 0.05
-                        }
-                    ]
+        prependHandlersToServer([
+            {
+                path: '*/baskets/:basketId/items/:itemId',
+                method: 'patch',
+                res: () => {
+                    const basket = mockCustomerBaskets.baskets[0]
+                    return {
+                        ...basket,
+                        productItems: [
+                            {
+                                adjustedTax: 2.93,
+                                basePrice: 61.43,
+                                bonusProductLineItem: false,
+                                gift: true,
+                                itemId: '4a9af0a24fe46c3f6d8721b371',
+                                itemText: 'Belted Cardigan With Studs',
+                                price: 61.43,
+                                priceAfterItemDiscount: 61.43,
+                                priceAfterOrderDiscount: 61.43,
+                                productId: '701642889830M',
+                                productName: 'Belted Cardigan With Studs',
+                                quantity: 2,
+                                shipmentId: 'me',
+                                tax: 2.93,
+                                taxBasis: 61.43,
+                                taxClassId: 'standard',
+                                taxRate: 0.05
+                            }
+                        ]
+                    }
                 }
-                return res(ctx.json(updatedBasket))
-            })
-        )
+            }
+        ])
     })
     test('can update item when user clicks this is a gift checkbox', async () => {
-        const {user} = renderWithProviders(<Cart />)
+        const { user } = renderWithProviders(<Cart />)
         await waitFor(() => {
             expect(screen.getByTestId('sf-cart-container')).toBeInTheDocument()
             expect(screen.getByText(/Belted Cardigan With Studs/i)).toBeInTheDocument()
@@ -527,42 +579,41 @@ describe('Update this is a gift option', function () {
         await act(async () => {
             await user.click(giftCheckbox)
         })
-        global.server.use(
-            rest.get('*/customers/:customerId/baskets', (req, res, ctx) => {
-                return res.once(
-                    ctx.delay(0),
-                    ctx.json({
-                        baskets: [
-                            {
-                                ...mockCustomerBaskets.baskets[0],
-                                productItems: [
-                                    {
-                                        adjustedTax: 2.93,
-                                        basePrice: 61.43,
-                                        bonusProductLineItem: false,
-                                        gift: true,
-                                        itemId: '4a9af0a24fe46c3f6d8721b371',
-                                        itemText: 'Belted Cardigan With Studs',
-                                        price: 61.43,
-                                        priceAfterItemDiscount: 61.43,
-                                        priceAfterOrderDiscount: 61.43,
-                                        productId: '701642889830M',
-                                        productName: 'Belted Cardigan With Studs',
-                                        quantity: 2,
-                                        shipmentId: 'me',
-                                        tax: 2.93,
-                                        taxBasis: 61.43,
-                                        taxClassId: 'standard',
-                                        taxRate: 0.05
-                                    }
-                                ]
-                            }
-                        ],
-                        total: 1
-                    })
-                )
-            })
-        )
+        prependHandlersToServer([
+            {
+                path: '*/customers/:customerId/baskets',
+                method: 'get',
+                res: () => ({
+                    baskets: [
+                        {
+                            ...mockCustomerBaskets.baskets[0],
+                            productItems: [
+                                {
+                                    adjustedTax: 2.93,
+                                    basePrice: 61.43,
+                                    bonusProductLineItem: false,
+                                    gift: true,
+                                    itemId: '4a9af0a24fe46c3f6d8721b371',
+                                    itemText: 'Belted Cardigan With Studs',
+                                    price: 61.43,
+                                    priceAfterItemDiscount: 61.43,
+                                    priceAfterOrderDiscount: 61.43,
+                                    productId: '701642889830M',
+                                    productName: 'Belted Cardigan With Studs',
+                                    quantity: 2,
+                                    shipmentId: 'me',
+                                    tax: 2.93,
+                                    taxBasis: 61.43,
+                                    taxClassId: 'standard',
+                                    taxRate: 0.05
+                                }
+                            ]
+                        }
+                    ],
+                    total: 1
+                })
+            }
+        ])
 
         await waitFor(() => {
             expect(giftCheckbox).toBeChecked()
@@ -572,44 +623,59 @@ describe('Update this is a gift option', function () {
 
 describe('Product bundles', () => {
     beforeEach(() => {
-        global.server.use(
-            rest.get('*/customers/:customerId/baskets', (req, res, ctx) =>
-                res(ctx.delay(0), ctx.status(200), ctx.json(mockProductBundleBasket))
-            ),
-            rest.get('*/products/:productId', (req, res, ctx) => {
-                return res(ctx.delay(0), ctx.json(mockProductBundle))
-            }),
-            rest.get('*/products', (req, res, ctx) => {
-                if (req.url.toString().includes('test-bundle')) {
-                    return res(ctx.delay(0), ctx.json({data: [{...mockProductBundle}]}))
+        prependHandlersToServer([
+            {
+                path: '*/customers/:customerId/baskets',
+                method: 'get',
+                res: () => mockProductBundleBasket
+            },
+            {
+                path: '*/products/:productId',
+                method: 'get',
+                res: () => mockProductBundle
+            },
+            {
+                path: '*/products',
+                method: 'get',
+                res: (req) => {
+                    if (req.url.toString().includes('test-bundle')) {
+                        return { data: [{ ...mockProductBundle }] }
+                    }
+                    return { data: [...mockGetBundleChildrenProducts] }
                 }
-                return res(ctx.delay(0), ctx.json({data: [...mockGetBundleChildrenProducts]}))
-            }),
-            rest.patch('*/baskets/:basketId/items', (req, res, ctx) => {
-                const curretProductItems = basketWithProductBundle.productItems[0]
-                const updatedBasket = {
-                    ...basketWithProductBundle,
-                    productItems: [
-                        {
-                            ...curretProductItems,
-                            quantity: 2,
-                            bundledProductItems: curretProductItems.bundledProductItems.map(
-                                (bundleChild) => ({
-                                    ...bundleChild,
-                                    quantity: bundleChild.quantity * 2
-                                })
-                            )
-                        }
-                    ]
+            },
+            {
+                path: '*/baskets/:basketId/items',
+                method: 'patch',
+                res: () => {
+                    const curretProductItems = basketWithProductBundle.productItems[0]
+                    return {
+                        ...basketWithProductBundle,
+                        productItems: [
+                            {
+                                ...curretProductItems,
+                                quantity: 2,
+                                bundledProductItems: curretProductItems.bundledProductItems.map(
+                                    (bundleChild) => ({
+                                        ...bundleChild,
+                                        quantity: bundleChild.quantity * 2
+                                    })
+                                )
+                            }
+                        ]
+                    }
                 }
-                return res(ctx.json(updatedBasket))
-            }),
-            rest.patch('*/baskets/:basketId/items/:itemId', () => {})
-        )
+            },
+            {
+                path: '*/baskets/:basketId/items/:itemId',
+                method: 'patch',
+                res: () => ({})
+            }
+        ])
     })
 
     test('displays inventory message when incrementing quantity above available stock', async () => {
-        const {user} = renderWithProviders(<Cart />)
+        const { user } = renderWithProviders(<Cart />)
 
         await waitFor(
             async () => {
@@ -621,12 +687,12 @@ describe('Product bundles', () => {
                 expect(screen.getByText(/swing tank/i)).toBeInTheDocument()
                 expect(screen.getByText(/pull on neutral pant/i)).toBeInTheDocument()
             },
-            {timeout: 10000}
+            { timeout: 10000 }
         )
 
         // Change quantity for bundle to 4, swing tank only has 3 in stock
         // so availability message should show up
-        const quantityElement = screen.getByRole('spinbutton', {id: 'quantity'})
+        const quantityElement = screen.getByRole('spinbutton', { id: 'quantity' })
         expect(quantityElement).toBeInTheDocument()
         expect(quantityElement).toHaveValue('1')
 
@@ -640,7 +706,7 @@ describe('Product bundles', () => {
                 expect(quantityElement).toHaveValue('4')
                 expect(screen.getByText(/only 3 left for swing tank!/i)).toBeInTheDocument()
             },
-            {timeout: 10000}
+            { timeout: 10000 }
         )
     })
 
@@ -673,12 +739,12 @@ describe('Product bundles', () => {
                 expect(screen.getByText(/size: s/i)).toBeInTheDocument()
                 expect(screen.getByText(/qty: 2/i)).toBeInTheDocument()
             },
-            {timeout: 10000}
+            { timeout: 10000 }
         )
     })
 
     test('can be updated using the product view modal', async () => {
-        const {user} = renderWithProviders(<Cart />)
+        const { user } = renderWithProviders(<Cart />)
         await waitFor(async () => {
             expect(screen.getByTestId('sf-cart-container')).toBeInTheDocument()
             // Parent bundle
@@ -706,10 +772,10 @@ describe('Product bundles', () => {
                 productViewModal = screen.getByTestId('product-view-modal')
                 expect(productViewModal).toBeInTheDocument()
             },
-            {timeout: 10000}
+            { timeout: 10000 }
         )
 
-        const quantityElement = within(productViewModal).getByRole('spinbutton', {id: 'quantity'})
+        const quantityElement = within(productViewModal).getByRole('spinbutton', { id: 'quantity' })
         expect(quantityElement).toHaveValue('1')
         const incrementButton = await within(productViewModal).findByTestId('quantity-increment')
 
@@ -721,7 +787,7 @@ describe('Product bundles', () => {
             expect(quantityElement).toHaveValue('2')
         })
 
-        const updateCartButtons = within(productViewModal).getAllByRole('button', {name: 'Update'})
+        const updateCartButtons = within(productViewModal).getAllByRole('button', { name: 'Update' })
         await act(async () => {
             await user.click(updateCartButtons[0])
         })
@@ -743,11 +809,11 @@ describe('Product bundles', () => {
 describe('Unavailable products tests', function () {
     test('Remove unavailable/out of stock/low stock products from cart', async () => {
         prependHandlersToServer([
-            {path: '*/customers/:customerId/baskets', res: () => mockBaskets},
-            {path: '*/products', res: () => mockProducts}
+            { path: '*/customers/:customerId/baskets', res: () => mockBaskets },
+            { path: '*/products', res: () => mockProducts }
         ])
 
-        const {user, getByText} = renderWithProviders(<Cart />)
+        const { user, getByText } = renderWithProviders(<Cart />)
         await waitFor(() => {
             expect(screen.getByTestId('sf-cart-container')).toBeInTheDocument()
             expect(screen.getByText(/Worn Gold Dangle Earring/i)).toBeInTheDocument()
@@ -814,10 +880,10 @@ describe('Unavailable products tests', function () {
         })
         await waitFor(() => {
             expect(
-                screen.getByRole('link', {name: /Worn Gold Dangle Earring$/i})
+                screen.getByRole('link', { name: /Worn Gold Dangle Earring$/i })
             ).toBeInTheDocument()
             expect(
-                screen.queryByRole('link', {name: /Straight Leg Trousers$/i})
+                screen.queryByRole('link', { name: /Straight Leg Trousers$/i })
             ).not.toBeInTheDocument()
         })
     })
