@@ -16,7 +16,7 @@ import {HideOnDesktop, HideOnMobile} from '@salesforce/retail-react-app/app/comp
 import ItemVariantProvider from '@salesforce/retail-react-app/app/components/item-variant'
 import CartItemVariantImage from '@salesforce/retail-react-app/app/components/item-variant/item-image'
 import CartItemVariantName from '@salesforce/retail-react-app/app/components/item-variant/item-name'
-import CartItemVariantAttributes from '@salesforce/retail-react-app/app/components/item-variant/item-attributes'
+import CheckoutItemAttributes from '@salesforce/retail-react-app/app/components/item-variant/checkout-item-attributes'
 import CartItemVariantPrice from '@salesforce/retail-react-app/app/components/item-variant/item-price'
 import LoadingSpinner from '@salesforce/retail-react-app/app/components/loading-spinner'
 import BonusProductQuantity from '@salesforce/retail-react-app/app/components/product-item/bonus-product-quantity'
@@ -53,7 +53,7 @@ const CheckoutProductItem = ({
                             <Flex align="flex-end" justify="space-between">
                                 <Stack spacing={1}>
                                     <CartItemVariantName />
-                                    <CartItemVariantAttributes excludeBonusLabel />
+                                    <CheckoutItemAttributes excludeBonusLabel />
                                     <HideOnDesktop>
                                         <Box marginTop={2}>
                                             <CartItemVariantPrice
