@@ -107,8 +107,6 @@ Data Cloud integration works by:
 4. Events sent as interactions to Data Cloud's REST API
 5. Data processed and available in Data Cloud's analytics interface
 
-#### Data Flow Architecture
-
 ```mermaid
 graph TD
     A["React Component<br/>(PDP, PLP, Search, etc.)"] --> B["useDataCloud Hook"]
@@ -124,10 +122,10 @@ graph TD
     
     K["Configuration<br/>tenantId + appSourceId"] --> B
     
-    style A fill:#e1f5fe
-    style J fill:#c8e6c9
-    style D fill:#fff3e0
-    style E fill:#ffebee
+    style A fill:#4a90e2,color:#ffffff
+    style J fill:#7cb342,color:#ffffff
+    style D fill:#f5a623,color:#000000
+    style E fill:#d0021b,color:#ffffff
 ```
 
 #### Event Types Supported
@@ -176,34 +174,27 @@ app: {
 2. Wait 15 minutes
 3. Refresh Data Explorer to verify events
 
-### Possible Issues
-
-I don't think we've had an investigation yet for Data Cloud. So here are some _possible_ issues that we can anticipate.
+### Common Issues
 
 #### Missing Configuration
-**Symptom**: No requests to Data Cloud endpoints
-**Cause**: Missing `appSourceId` or `tenantId` in config
-**Solution**: Verify configuration values with customer's Data Cloud setup
+**Symptom**: No requests to Data Cloud endpoints in browser network tab
+**Cause**: Missing `appSourceId` or `tenantId` in PWA Kit configuration
+**Solution**: Verify configuration values are present and match customer's Data Cloud setup
 
-#### Backend Setup Incomplete  
-**Symptom**: 400/401 errors in network requests
-**Cause**: Data Cloud instance not properly configured
-**Solution**: Refer customer to Data Cloud setup documentation
+#### 400 Bad Request Errors
+**Symptom**: Network requests to `c360a.salesforce.com` return 400 status
+**Cause**: Based on code implementation, likely incorrect `appSourceId`/`tenantId` or invalid event payload
+**Solution**: 
+- Verify configuration IDs match customer's Data Cloud setup exactly
+- Check browser console for specific error details
+- Validate event payload structure
 
-#### Incorrect Tenant/App Source IDs
-**Symptom**: 400 Bad Request errors with valid payloads
-**Cause**: Wrong `tenantId` or `appSourceId` values (common during environment migrations)
-**Solution**: Verify IDs match the customer's Data Cloud configuration exactly
+#### Events Not Appearing in Dashboard
+**Symptom**: Network requests successful (200 responses) but no data in Data Cloud dashboard after 15+ minutes  
+**Cause**: Unknown - requires escalation to Data Cloud team for backend investigation
+**Solution**: Escalate with network request evidence showing successful sends
 
-#### Data Stream Not Connected
-**Symptom**: Events send successfully (200 responses) but don't appear in Data Cloud
-**Cause**: Data stream not properly connected to the website/app in Data Cloud setup
-**Solution**: Check Data Cloud console → Data Streams → Website connection
-
-#### Event Payload Validation Errors
-**Symptom**: Some events fail while others succeed
-**Cause**: Missing required fields or incorrect data types in event payloads
-**Solution**: Check browser console for validation errors and verify event data structure
+**Note**: Data Cloud integration is newer, so troubleshooting knowledge is still developing. Document additional issues as they're discovered.
 
 
 ---
@@ -211,7 +202,7 @@ I don't think we've had an investigation yet for Data Cloud. So here are some _p
 ## Active Data
 
 ### Purpose
-Active Data provides **merchandising analytics** by collecting shopper engagement data to help merchandisers optimize product offerings and configure automated rules.
+Active Data provides merchandising analytics by collecting shopper engagement data to help merchandisers optimize product offerings and configure automated rules.
 
 ### How It Works
 
@@ -227,6 +218,31 @@ Active Data integration works by:
 3. Events sent to OCAPI endpoints via configured proxy
 4. Backend processes events and aggregates data nightly
 5. Aggregated metrics available in Business Manager after 24 hours
+
+```mermaid
+graph TD
+    A["React Component<br/>(PDP, PLP, Search, etc.)"] --> B["useActiveData Hook"]
+    B --> C["Dynamic Import<br/>active-data.js"]
+    C --> D["Global dw.ac Object<br/>Created"]
+    D --> E["Event Collection<br/>(Product Views/Impressions)"]
+    E --> F{"DNT Cookie<br/>(dw_dnt)"}
+    F -->|Present| G["Send with dw_dnt=1<br/>(Backend ignores)"]
+    F -->|Absent| H["Send normally"]
+    G --> I["OCAPI Proxy<br/>__Analytics-Start endpoint"]
+    H --> I
+    I --> J["B2C Commerce Backend<br/>Event Processing"]
+    J --> K["Nightly Aggregation"]
+    K --> L["Business Manager<br/>Active Data Tab<br/>(~24 hour latency)"]
+    
+    M["OCAPI Proxy Config<br/>/mobify/proxy/ocapi"] --> I
+    N["ACTIVE_DATA_ENABLED<br/>constant"] --> B
+    
+    style A fill:#4a90e2,color:#ffffff
+    style L fill:#7cb342,color:#ffffff
+    style F fill:#f5a623,color:#000000
+    style G fill:#ff6b6b,color:#ffffff
+    style C fill:#9b59b6,color:#ffffff
+```
 
 #### Events Tracked
 | Event | Description |
@@ -246,7 +262,7 @@ export const ACTIVE_DATA_ENABLED = true
 Requires OCAPI proxy configuration in PWA Kit Runtime Admin:
 - **Path**: `/mobify/proxy/ocapi` 
 - **Target Host**: Customer's OCAPI endpoint (e.g., `zzrf-001.dx.commercecloud.salesforce.com`)
-- Active Data events are sent to `${proxyPath}/ocapi/on/demandware.store/Sites-${siteId}-Site/${locale}/__Analytics-Start`
+- Active Data events are sent to `/mobify/proxy/ocapi/on/demandware.store/Sites-${siteId}-Site/${locale}/__Analytics-Start`
 
 #### Business Manager Configuration
 Required settings in Business Manager:
@@ -282,9 +298,7 @@ If metrics aren't updating:
 #### DNT Impact on Data
 **Symptom**: Orders higher than expected and views lower than expected
 **Cause**: Users with DNT enabled still complete orders (backend tracking) but views aren't recorded (frontend tracking)
-**Context**: This is expected behavior, not a bug
-
-TODO: add link to the original Slack thread
+**Context**: This is expected behavior, not a bug. See this [Slack thread](https://salesforce-internal.slack.com/archives/C01JSFFE3HQ/p1749678460701599?thread_ts=1749566800.646919&cid=C01JSFFE3HQ).
 
 #### Missing Events
 **Symptom**: No `__Analytics-Start` requests
@@ -296,7 +310,7 @@ TODO: add link to the original Slack thread
 ## Einstein Analytics
 
 ### Purpose
-Einstein provides **comprehensive analytics and AI-powered product recommendations** through integration with Salesforce Commerce Cloud's Einstein platform.
+Einstein provides comprehensive analytics and AI-powered product recommendations through integration with Salesforce Commerce Cloud's Einstein platform.
 
 ### How It Works  
 
@@ -404,6 +418,11 @@ TODO: any other common issues? inaccurate dashboards?
 ---
 ## Resources
 
+### Reference Links
+- [Einstein Reports & Dashboards Documentation](https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/reports-and-dashboards.html)
+- [Active Data Documentation](https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/active-data.html)  
+- [Data Cloud Integration Documentation](https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/integrate-data-cloud.html)
+
 ### Internal Documentation
 - **Active Data Internal Doc**: [Quip Link](https://salesforce.quip.com/Ar7lADMMF0MC)
 - **Einstein Runbook**: [Quip Link](https://salesforce.quip.com/aZkgAjUfEvKI)
@@ -414,10 +433,6 @@ TODO: any other common issues? inaccurate dashboards?
 ### Key Contacts
 - TODO
 
-### Reference Links
-- [Reports & Dashboards Documentation](https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/reports-and-dashboards.html)
-- [Active Data Documentation](https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/active-data.html)  
-- [Data Cloud Integration Documentation](https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/integrate-data-cloud.html)
 
 ## Demo Environment
 **Reference Site**: [pwa-kit.mobify-storefront.com](http://pwa-kit.mobify-storefront.com)
