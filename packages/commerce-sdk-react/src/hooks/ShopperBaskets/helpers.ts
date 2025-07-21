@@ -14,6 +14,7 @@ import {CLIENT_KEYS} from '../../constant'
 const CLIENT_KEY = CLIENT_KEYS.SHOPPER_BASKETS
 type Client = NonNullable<ApiClients[typeof CLIENT_KEY]>
 type Basket = ShopperBasketsTypes.Basket
+type ProductItem = ShopperBasketsTypes.ProductItem
 
 /**
  * This is a helper function for Basket Mutations.
@@ -47,7 +48,7 @@ export function useShopperBasketsMutationHelper() {
     const addItemToBasketMutation = useShopperBasketsMutation('addItemToBasket')
     return {
         addItemToNewOrExistingBasket: async (
-            productItem: Argument<Client['addItemToBasket']> extends {body: infer B} ? B : undefined
+            productItem: (Argument<Client['addItemToBasket']> extends {body: infer B} ? B : undefined) | ProductItem[]
         ): Promise<Basket> => {
             if (basketsData && basketsData.total > 0) {
                 // we know that if basketData.total > 0, current basket will always be available
@@ -56,7 +57,7 @@ export function useShopperBasketsMutationHelper() {
                 return await addItemToBasketMutation.mutateAsync({
                     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
                     parameters: {basketId: currentBasket!.basketId!},
-                    body: productItem
+                    body: productItem as any
                 })
             } else {
                 const data = await createBasket.mutateAsync({
@@ -67,7 +68,7 @@ export function useShopperBasketsMutationHelper() {
                 } else {
                     return await addItemToBasketMutation.mutateAsync({
                         parameters: {basketId: data.basketId},
-                        body: productItem
+                        body: productItem as any
                     })
                 }
             }

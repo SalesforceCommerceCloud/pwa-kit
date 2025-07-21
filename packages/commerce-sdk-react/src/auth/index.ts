@@ -78,8 +78,38 @@ type LoginRegisteredUserB2CCredentials = Parameters<Helpers['loginRegisteredUser
  * loginRegisteredUserB2C so that it takes in a body rather than just credentials
  *
  */
-type LoginRegisteredUserCredentialsWithCustomParams = LoginRegisteredUserB2CCredentials & {
-    options?: {body: helpers.CustomRequestBody}
+type LoginRegisteredUserCredentialsWithCustomParams = 
+    | {
+        username: string
+        password: string
+        options?: {body: helpers.CustomRequestBody}
+    }
+    | LoginRegisteredUserB2CCredentials
+
+/**
+ * Simplified types for public API methods
+ */
+type LoginIDPUserPublicParams = {
+    redirectURI?: string
+    code: string
+    usid?: string
+}
+
+type AuthorizeIDPPublicParams = {
+    redirectURI: string
+    hint: string
+    usid?: string
+    [key: string]: any // Allow custom parameters
+}
+
+type AuthorizePasswordlessPublicParams = {
+    callbackURI?: string
+    userid: string
+    mode?: string
+}
+
+type GetPasswordLessAccessTokenPublicParams = {
+    pwdlessLoginToken: string
 }
 
 /**
@@ -909,11 +939,18 @@ class Auth {
         const usid = this.get('usid')
         const dntPref = this.getDnt({includeDefaults: true})
         const isGuest = false
+        
+        // Handle both internal calls (with slasClient) and public calls (with username/password)
+        const isInternalCall = 'slasClient' in credentials
+        const username = isInternalCall ? credentials.credentials?.username || '' : credentials.username || ''
+        const password = isInternalCall ? credentials.credentials?.password || '' : credentials.password || ''
+        const body = isInternalCall ? credentials.body : credentials.options?.body
+        
         const token = await helpers.loginRegisteredUserB2C({
             slasClient: this.client,
             credentials: {
-                username: credentials.credentials?.username || '',
-                password: credentials.credentials?.password || '',
+                username,
+                password,
                 clientSecret: this.clientSecret
             },
             parameters: {
@@ -921,7 +958,7 @@ class Auth {
                 dnt: dntPref,
                 ...(usid && {usid})
             },
-            body: credentials.body
+            body
         })
         this.handleTokenResponse(token, isGuest)
         if (onClient()) {
@@ -1111,21 +1148,43 @@ class Auth {
      * A wrapper method for commerce-sdk-isomorphic helper: authorizeIDP.
      *
      */
-    async authorizeIDP(parameters: AuthorizeIDPParams) {
-        const redirectURI = parameters.parameters?.redirectURI || this.redirectURI
+    async authorizeIDP(parameters: AuthorizeIDPPublicParams | AuthorizeIDPParams) {
+        const codeVerifier = helpers.createCodeVerifier()
+        const codeChallenge = await helpers.generateCodeChallenge(codeVerifier)
+        const organizationId = this.client.clientConfig.parameters.organizationId
+        const clientId = this.client.clientConfig.parameters.clientId
+        const siteId = this.client.clientConfig.parameters.siteId
         const usid = this.get('usid')
-        const customParameters = extractCustomParameters(parameters.parameters || {})
-        const {url, codeVerifier} = await helpers.authorizeIDP({
-            slasClient: this.client,
-            parameters: {
-                redirectURI,
-                hint: parameters.parameters?.hint || '',
-                ...(usid && {usid}),
-                ...customParameters
-            },
-            privateClient: this.isPrivate
-        })
+        const dntPref = this.getDnt({includeDefaults: true})
 
+        // Handle both public and internal calls
+        const isPublicCall = 'redirectURI' in parameters && !('parameters' in parameters)
+        const redirectURI = isPublicCall ? parameters.redirectURI : parameters.parameters?.redirectURI || this.redirectURI
+        const hint = isPublicCall ? parameters.hint : parameters.parameters?.hint || ''
+        const customParams = isPublicCall ? parameters : parameters.parameters || {}
+
+        const url = `${
+            this.client.clientConfig.proxy || ''
+        }/shopper/auth/v1/organizations/${organizationId}/oauth2/authorize?${[
+            ...[
+                `client_id=${clientId}`,
+                `channel_id=${siteId}`,
+                `redirect_uri=${redirectURI}`,
+                `response_type=code`,
+                `hint=${hint}`,
+                `code_challenge=${codeChallenge}`,
+                `code_challenge_method=S256`
+            ],
+            ...(!this.clientSecret ? [`code_verifier=${codeVerifier}`] : []),
+            ...(usid ? [`usid=${usid}`] : []),
+            ...(dntPref ? [`dnt=${dntPref}`] : []),
+            // Add custom parameters
+            ...Object.entries(customParams)
+                .filter(([key]) => !['redirectURI', 'hint', 'usid', 'dnt'].includes(key))
+                .map(([key, value]) => `${key}=${value}`)
+        ].join('&')}`
+
+        this.set('code_verifier', codeVerifier)
         if (onClient()) {
             window.location.assign(url)
         } else {
@@ -1138,11 +1197,14 @@ class Auth {
      * A wrapper method for commerce-sdk-isomorphic helper: loginIDPUser.
      *
      */
-    async loginIDPUser(parameters: LoginIDPUserParams) {
+    async loginIDPUser(parameters: LoginIDPUserPublicParams | LoginIDPUserParams) {
         const codeVerifier = this.get('code_verifier')
-        const code = parameters.parameters?.code || ''
-        const usid = parameters.parameters?.usid || this.get('usid')
-        const redirectURI = parameters.parameters?.redirectURI || this.redirectURI
+        
+        // Handle both public and internal calls
+        const isPublicCall = 'code' in parameters && !('parameters' in parameters)
+        const code = isPublicCall ? parameters.code : parameters.parameters?.code || ''
+        const usid = isPublicCall ? parameters.usid : parameters.parameters?.usid || this.get('usid')
+        const redirectURI = isPublicCall ? (parameters.redirectURI || this.redirectURI) : (parameters.parameters?.redirectURI || this.redirectURI)
         const dntPref = this.getDnt({includeDefaults: true})
 
         const token = await helpers.loginIDPUser({
@@ -1171,11 +1233,14 @@ class Auth {
     /**
      * A wrapper method for commerce-sdk-isomorphic helper: authorizePasswordless.
      */
-    async authorizePasswordless(parameters: AuthorizePasswordlessParams) {
-        const userid = parameters.parameters?.userid || ''
-        const callbackURI = parameters.parameters?.callbackURI || this.passwordlessLoginCallbackURI
+    async authorizePasswordless(parameters: AuthorizePasswordlessPublicParams | AuthorizePasswordlessParams) {
+        // Handle both public and internal calls
+        const isPublicCall = 'userid' in parameters && !('parameters' in parameters)
+        const userid = isPublicCall ? parameters.userid : parameters.parameters?.userid || ''
+        const callbackURI = isPublicCall ? parameters.callbackURI : parameters.parameters?.callbackURI || this.passwordlessLoginCallbackURI
+        const mode = isPublicCall ? parameters.mode : parameters.parameters?.mode
         const usid = this.get('usid')
-        const mode = callbackURI ? 'callback' : 'sms'
+        const finalMode = callbackURI ? 'callback' : (mode || 'sms')
 
         const res = await helpers.authorizePasswordless({
             slasClient: this.client,
@@ -1186,7 +1251,7 @@ class Auth {
                 ...(callbackURI && {callbackURI: callbackURI}),
                 ...(usid && {usid}),
                 userid,
-                mode
+                mode: finalMode
             }
         })
         if (res && res.status !== 200) {
@@ -1199,8 +1264,8 @@ class Auth {
     /**
      * A wrapper method for commerce-sdk-isomorphic helper: getPasswordLessAccessToken.
      */
-    async getPasswordLessAccessToken(parameters: LoginPasswordlessParams) {
-        const pwdlessLoginToken = parameters.parameters?.pwdlessLoginToken || ''
+    async getPasswordLessAccessToken(parameters: GetPasswordLessAccessTokenPublicParams) {
+        const pwdlessLoginToken = parameters.pwdlessLoginToken || ''
         const dntPref = this.getDnt({includeDefaults: true})
         const token = await helpers.getPasswordLessAccessToken({
             slasClient: this.client,

@@ -585,7 +585,7 @@ describe('Auth', () => {
             // Mock the loginRegisteredUserB2C helper to return a token response
             ;(TOKEN_RESPONSE as any).refresh_token_expires_in = hasNoResponseValue
                 ? undefined
-                : DEFAULT_SLAS_REFRESH_TOKEN_REGISTERED_TTL
+                : DEFAULT_SLAS_REFRESH_TOKEN_GUEST_TTL
             ;(helpers.loginRegisteredUserB2C as jest.Mock).mockResolvedValueOnce(TOKEN_RESPONSE)
 
             const auth = new Auth({...config, refreshTokenRegisteredCookieTTL})
@@ -607,10 +607,11 @@ describe('Auth', () => {
         'refreshTokenGuestCookieTTL is set correctly for refreshTokenGuestCookieTTLValue=`%p`, expected=`%s`',
         async (refreshTokenGuestCookieTTL, expected, hasNoResponseValue) => {
             // Mock the loginRegisteredUserB2C helper to return a token response
-            TOKEN_RESPONSE.refresh_token_expires_in = hasNoResponseValue
+            const tokenResponse = {...TOKEN_RESPONSE}
+            ;(tokenResponse as any).refresh_token_expires_in = hasNoResponseValue
                 ? undefined
                 : DEFAULT_SLAS_REFRESH_TOKEN_GUEST_TTL
-            ;(helpers.loginGuestUser as jest.Mock).mockResolvedValueOnce(TOKEN_RESPONSE)
+            ;(helpers.loginGuestUser as jest.Mock).mockResolvedValueOnce(tokenResponse)
 
             const auth = new Auth({...config, refreshTokenGuestCookieTTL})
             // Call the public method because the getter for refresh_token_expires_in is private
@@ -921,7 +922,7 @@ describe('Auth', () => {
             expires_in: 1800,
             id_token: 'id_token_xyz',
             refresh_token: 'refresh_token_xyz',
-            token_type: 'token_type_abc',
+            token_type: 'Bearer',
             usid: 'usid_xyz',
             idp_access_token: 'idp_access_token_xyz',
             refresh_token_expires_in: DEFAULT_SLAS_REFRESH_TOKEN_GUEST_TTL

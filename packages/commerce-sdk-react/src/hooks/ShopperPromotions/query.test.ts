@@ -23,7 +23,7 @@ jest.mock('../../auth/index.ts', () => {
 type Queries = typeof queries
 const promotionsEndpoint = '/pricing/shopper-promotions/'
 // Not all endpoints use all parameters, but unused parameters are safely discarded
-const OPTIONS = {parameters: {campaignId: 'campaignId', ids: 'a,b'}}
+const OPTIONS = {parameters: {campaignId: 'campaignId', ids: ['id1', 'id2']}}
 
 /** Map of query name to returned data type */
 type TestMap = {[K in keyof Queries]: NonNullable<ReturnType<Queries[K]>['data']>}

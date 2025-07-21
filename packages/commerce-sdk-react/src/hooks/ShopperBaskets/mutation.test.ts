@@ -119,7 +119,7 @@ const testMap: TestMap = {
         {shipmentId: 'shipmentId'}
     ),
     addCouponToBasket: createOptions<'addCouponToBasket'>({code: 'coupon'}, {}),
-    addItemToBasket: createOptions<'addItemToBasket'>([], {}),
+    addItemToBasket: createOptions<'addItemToBasket'>([{productId: 'test-product', quantity: 1}] as any, {}),
     addPaymentInstrumentToBasket: createOptions<'addPaymentInstrumentToBasket'>({}, {}),
     createBasket: createOptions<'createBasket'>({}, {}),
     mergeBasket: createOptions<'mergeBasket'>(undefined, {}),
@@ -140,7 +140,7 @@ const testMap: TestMap = {
         {}
     ),
     updateItemInBasket: createOptions<'updateItemInBasket'>({}, {itemId: 'itemId'}),
-    updateItemsInBasket: createOptions<'updateItemsInBasket'>([], {}),
+    updateItemsInBasket: createOptions<'updateItemsInBasket'>([{itemId: 'itemId', quantity: 1}] as any, {}),
     updatePaymentInstrumentInBasket: createOptions<'updatePaymentInstrumentInBasket'>(
         {},
         {paymentInstrumentId: 'paymentInstrumentId'}
@@ -158,7 +158,7 @@ const createTestCase = ['createBasket', createOptions<'createBasket'>({}, {})] a
 const deleteTestCase = ['deleteBasket', createOptions<'deleteBasket'>(undefined, {})] as const
 const addPriceBooksToBasketTestCase = [
     'addPriceBooksToBasket',
-    createOptions<'addPriceBooksToBasket'>([], {})
+    createOptions<'addPriceBooksToBasket'>([] as any, {})
 ] as const
 const addTaxesForBasketTestCase = [
     'addTaxesForBasket',
