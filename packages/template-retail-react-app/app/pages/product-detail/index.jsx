@@ -107,12 +107,7 @@ const ProductDetail = () => {
     } = usePickupShipment(basket)
 
     /*************************** Multiship ********************/
-    const {
-        moveItemsToDeliveryShipment,
-        moveItemsToPickupShipment,
-        findOrCreateDeliveryShipment,
-        findOrCreatePickupShipment
-    } = useMultiship(basket)
+    const {getShipmentForItems} = useMultiship(basket)
 
     /*************************** Product Detail and Category ********************/
     const {productId} = useParams()
@@ -413,29 +408,21 @@ const ProductDetail = () => {
                 }
             }
 
-            // Set target to default shipment
-            let targetShipmentId = 'me'
+            // Fetch and assign a suitable shipment for product items
+            const targetShipmentId = await getShipmentForItems(
+                productItems,
+                selectedStore,
+                hasAnyPickupSelected
+            )
 
-            if (basket) {
-                // Ensure a suitable shipment exists
-                if (hasAnyPickupSelected) {
-                    targetShipmentId = await findOrCreatePickupShipment(productItems, selectedStore)
-                } else {
-                    targetShipmentId = await findOrCreateDeliveryShipment(
-                        productItems,
-                        selectedStore
-                    )
-                }
-
-                if (!targetShipmentId) {
-                    throw new Error('Failed to find or create shipment')
-                }
-
-                productItems = productItems.map((item) => ({
-                    ...item,
-                    shipmentId: targetShipmentId
-                }))
+            if (!targetShipmentId) {
+                throw new Error('Failed to find or create shipment')
             }
+
+            productItems = productItems.map((item) => ({
+                ...item,
+                shipmentId: targetShipmentId
+            }))
 
             const basketResponse = await addItemToNewOrExistingBasket(productItems)
 
@@ -530,7 +517,7 @@ const ProductDetail = () => {
             )
 
             // Check for delivery method conflicts before adding to cart
-            if (basket && basket.productItems?.length > 0) {
+            if (!MULTISHIP_IS_ENABLED && basket && basket.productItems?.length > 0) {
                 const currentShippingMethod = basket?.shipments?.[0]?.shippingMethod
                 const currentShippingMethodIsPickup =
                     isCurrentShippingMethodPickup(currentShippingMethod)
@@ -585,6 +572,22 @@ const ProductDetail = () => {
                 pickupInStoreMap,
                 selectedStore
             )
+
+            // Fetch and assign a suitable shipment for product items
+            const targetShipmentId = await getShipmentForItems(
+                productItems,
+                selectedStore,
+                hasAnyPickupSelected
+            )
+
+            if (!targetShipmentId) {
+                throw new Error('Failed to find or create shipment')
+            }
+
+            productItems = productItems.map((item) => ({
+                ...item,
+                shipmentId: targetShipmentId
+            }))
 
             const res = await addItemToNewOrExistingBasket(productItems)
 

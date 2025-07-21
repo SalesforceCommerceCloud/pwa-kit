@@ -108,6 +108,14 @@ jest.mock('@salesforce/retail-react-app/app/hooks/use-selected-store', () => ({
     useSelectedStore: () => mockUseSelectedStore()
 }))
 
+// Mock useMultiship hook
+const mockGetShipmentForItems = jest.fn()
+jest.mock('@salesforce/retail-react-app/app/hooks/use-multiship', () => ({
+    useMultiship: () => ({
+        getShipmentForItems: mockGetShipmentForItems
+    })
+}))
+
 const MockedComponent = () => {
     return (
         <Switch>
@@ -129,6 +137,7 @@ beforeEach(() => {
         error: null,
         hasSelectedStore: false
     }))
+    mockGetShipmentForItems.mockResolvedValue('me')
 
     global.server.use(
         // By default, the page will be rendered with a product set
