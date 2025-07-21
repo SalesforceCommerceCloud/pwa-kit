@@ -3391,10 +3391,40 @@
       "value": "In Stock"
     }
   ],
+  "shipping_address.action.deliver_to_multiple_addresses": [
+    {
+      "type": 0,
+      "value": "Deliver to Multiple Addresses"
+    }
+  ],
+  "shipping_address.action.ship_to_one_address": [
+    {
+      "type": 0,
+      "value": "Ship Items to One Address"
+    }
+  ],
+  "shipping_address.button.add_new_address": [
+    {
+      "type": 0,
+      "value": "Add New Address"
+    }
+  ],
   "shipping_address.button.continue_to_shipping": [
     {
       "type": 0,
       "value": "Continue to Shipping Method"
+    }
+  ],
+  "shipping_address.error.update_failed": [
+    {
+      "type": 0,
+      "value": "Error updating shipping address. Please try again."
+    }
+  ],
+  "shipping_address.label.delivery_address": [
+    {
+      "type": 0,
+      "value": "Delivery Address"
     }
   ],
   "shipping_address.label.edit_button": [
@@ -3421,6 +3451,12 @@
     {
       "type": 0,
       "value": "Shipping Address Form"
+    }
+  ],
+  "shipping_address.message.no_items_in_basket": [
+    {
+      "type": 0,
+      "value": "No items in basket."
     }
   ],
   "shipping_address.title.shipping_address": [
@@ -3469,6 +3505,68 @@
     {
       "type": 0,
       "value": "Edit Shipping Address"
+    }
+  ],
+  "shipping_multi_address.error.label": [
+    {
+      "type": 0,
+      "value": "Error loading products"
+    }
+  ],
+  "shipping_multi_address.error.message": [
+    {
+      "type": 0,
+      "value": "Error loading products. Please try again."
+    }
+  ],
+  "shipping_multi_address.format.address_line_2": [
+    {
+      "type": 1,
+      "value": "city"
+    },
+    {
+      "type": 0,
+      "value": ", "
+    },
+    {
+      "type": 1,
+      "value": "stateCode"
+    },
+    {
+      "type": 0,
+      "value": " "
+    },
+    {
+      "type": 1,
+      "value": "postalCode"
+    }
+  ],
+  "shipping_multi_address.image.alt": [
+    {
+      "type": 0,
+      "value": "Product image for "
+    },
+    {
+      "type": 1,
+      "value": "productName"
+    }
+  ],
+  "shipping_multi_address.loading.message": [
+    {
+      "type": 0,
+      "value": "Loading products..."
+    }
+  ],
+  "shipping_multi_address.product_attributes.label": [
+    {
+      "type": 0,
+      "value": "Product attributes"
+    }
+  ],
+  "shipping_multi_address.quantity.label": [
+    {
+      "type": 0,
+      "value": "Quantity"
     }
   ],
   "shipping_options.action.send_as_a_gift": [
