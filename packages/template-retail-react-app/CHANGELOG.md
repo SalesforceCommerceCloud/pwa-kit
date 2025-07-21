@@ -19,6 +19,7 @@
 - Use `<picture>` element for responsive images [#2724](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2724)
 - Add cancel button and modal [#2775](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2775)
 - Add Data Cloud partyIdentification events and improve error handling [#2811](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2811)
+- Add cancel button and modal [#2775](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2775)
 
 ## v6.1.0 (May 22, 2025)
 
