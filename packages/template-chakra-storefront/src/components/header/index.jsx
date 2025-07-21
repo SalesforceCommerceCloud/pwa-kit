@@ -87,6 +87,7 @@ const SearchBar = (props) => {
  * @param   {func} props.onMyAccountClick click event handler for my account button
  * @param   {func} props.onMyCartClick click event handler for my cart button
  * @param   {func} props.onWishlistClick click event handler for wish list button
+ * @param   {func} props.onStoreLocatorClick click event handler for store locator button
  * @param   {React.ReactElement} props.children - React Node to be rendered inside Header
  * @return  {React.ReactElement} - Header component
  */
@@ -97,6 +98,7 @@ const Header = ({
     onLogoClick = noop,
     onMyCartClick = noop,
     onWishlistClick = noop,
+    onStoreLocatorClick = noop,
     ...props
 }) => {
     const intl = useIntl()
@@ -113,7 +115,9 @@ const Header = ({
     }
     const isStoreLocatorEnabled = !!storeLocatorExtension && storeLocatorExtension.isEnabled
     const openModal = () => {
+
         // TODO: unwire this from upgradeability zustand store slice
+        // onStoreLocatorClick()
         console.log('openModal')
     }
 
@@ -295,6 +299,7 @@ const Header = ({
                             css={styles.iconButton}
                             variant="unstyled"
                             onClick={() => {
+                                // TODO fix when store locator is ready
                                 openModal()
                             }}
                         >
