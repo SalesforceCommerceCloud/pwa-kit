@@ -18,7 +18,13 @@ import {AddToCartModalProvider} from '../../../hooks/use-add-to-cart-modal'
  * AppLayout component that provides the main layout structure
  * Handles skip navigation, scroll to top, offline banner, and main content wrapper
  */
-const AppLayout = ({children, isOnline = true, headerComponent, footerComponent, modalsComponent}) => {
+const AppLayout = ({
+    children,
+    isOnline = true,
+    headerComponent,
+    footerComponent,
+    modalsComponent
+}) => {
     return (
         <>
             <ScrollToTop />

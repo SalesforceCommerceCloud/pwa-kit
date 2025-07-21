@@ -164,5 +164,4 @@ describe('AppHeader', () => {
         expect(screen.getByTestId('header')).toBeInTheDocument()
         expect(screen.getByTestId('mobile-navigation')).toBeInTheDocument()
     })
-
 })
