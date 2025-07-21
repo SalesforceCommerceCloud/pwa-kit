@@ -13,12 +13,10 @@ import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-cur
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
 import {CurrencyProvider} from '@salesforce/retail-react-app/app/contexts'
 
-// Mock the commerce-sdk-react hooks
 jest.mock('@salesforce/commerce-sdk-react', () => ({
     useProducts: jest.fn()
 }))
 
-// Mock the hooks that ShippingMultiAddress component uses
 jest.mock('@salesforce/retail-react-app/app/hooks/use-current-customer', () => ({
     useCurrentCustomer: jest.fn()
 }))
@@ -27,10 +25,8 @@ jest.mock('@salesforce/retail-react-app/app/hooks/use-current-basket', () => ({
     useCurrentBasket: jest.fn()
 }))
 
-// Mock the image groups utility
 jest.mock('@salesforce/retail-react-app/app/utils/image-groups-utils', () => ({
     findImageGroupBy: jest.fn((imageGroups) => {
-        // Return different images based on the productId in the test
         if (
             imageGroups &&
             imageGroups[0]?.images?.[0]?.disBaseLink === 'https://test-image-1.jpg'
@@ -47,7 +43,6 @@ jest.mock('@salesforce/retail-react-app/app/utils/image-groups-utils', () => ({
     })
 }))
 
-// Mock the item variant provider
 jest.mock('@salesforce/retail-react-app/app/components/item-variant', () => {
     // eslint-disable-next-line react/prop-types
     function MockItemVariantProvider({children}) {
@@ -56,12 +51,9 @@ jest.mock('@salesforce/retail-react-app/app/components/item-variant', () => {
     return MockItemVariantProvider
 })
 
-// Mock the DisplayPrice component
-// eslint-disable-next-line react/prop-types
 jest.mock('@salesforce/retail-react-app/app/components/display-price', () => {
-    // eslint-disable-next-line react/prop-types
+    /* eslint-disable react/prop-types */
     function MockDisplayPrice({priceData, currency}) {
-        // Always return a price element for testing
         return (
             <span data-testid="display-price">
                 {new Intl.NumberFormat('en', {
@@ -71,6 +63,7 @@ jest.mock('@salesforce/retail-react-app/app/components/display-price', () => {
             </span>
         )
     }
+    /* eslint-enable react/prop-types */
 
     return MockDisplayPrice
 })
@@ -237,8 +230,7 @@ describe('ShippingMultiAddress', () => {
         renderWithIntl(<ShippingMultiAddress {...defaultProps} />)
 
         const deliveryAddressLabels = screen.getAllByText('Delivery Address')
-        // Both desktop and mobile versions are rendered for each product (2 products × 2 versions = 4)
-        expect(deliveryAddressLabels).toHaveLength(4)
+        expect(deliveryAddressLabels).toHaveLength(2)
     })
 
     it('should render product images', () => {
@@ -249,7 +241,7 @@ describe('ShippingMultiAddress', () => {
         expect(images[0]).toHaveAttribute('src', 'https://test-image-1.jpg')
     })
 
-    it.skip('should render variation attributes', () => {
+    it('should render variation attributes', () => {
         renderWithIntl(<ShippingMultiAddress {...defaultProps} />)
 
         expect(screen.getByText('Color: Red')).toBeInTheDocument()
@@ -258,17 +250,13 @@ describe('ShippingMultiAddress', () => {
         expect(screen.getByText('Size: Large')).toBeInTheDocument()
     })
 
-    it.skip('should render product prices', () => {
+    it('should render product prices', () => {
         renderWithIntl(<ShippingMultiAddress {...defaultProps} />)
 
-        // The DisplayPrice component should render price elements
-        // Since we're mocking DisplayPrice, we should see the formatted prices
         const priceElements = screen.getAllByTestId('display-price')
 
-        // Each product should have a price displayed (2 products × 2 versions = 4 total)
-        expect(priceElements).toHaveLength(4)
+        expect(priceElements).toHaveLength(2)
 
-        // Check that the prices are formatted correctly (from our mock)
         priceElements.forEach((element) => {
             expect(element.textContent).toMatch(/\$\d+\.\d{2}/)
         })
@@ -291,7 +279,6 @@ describe('ShippingMultiAddress', () => {
     it('should render address dropdowns', () => {
         renderWithIntl(<ShippingMultiAddress {...defaultProps} />)
 
-        // The dropdowns should be present but collapsed initially
         const dropdowns = screen.getAllByRole('combobox', {hidden: true})
         expect(dropdowns.length).toBeGreaterThan(0)
     })
@@ -303,7 +290,6 @@ describe('ShippingMultiAddress', () => {
 
         renderWithIntl(<ShippingMultiAddress {...defaultProps} />)
 
-        // Should still render the products even without detailed product data
         expect(screen.getByText('Test Product 1')).toBeInTheDocument()
         expect(screen.getByText('Test Product 2')).toBeInTheDocument()
     })
@@ -333,11 +319,9 @@ describe('ShippingMultiAddress', () => {
 
         renderWithIntl(<ShippingMultiAddress {...customProps} />)
 
-        // Find and click the dropdown trigger using role=combobox
         const dropdownTriggers = screen.getAllByRole('combobox')
         fireEvent.click(dropdownTriggers[0])
 
-        // The add new address option should be available in dropdowns
         const addNewAddressOptions = screen.getAllByText((content, element) =>
             element?.textContent?.replace(/\s+/g, ' ').trim().includes('Add Another Address')
         )
@@ -374,11 +358,9 @@ describe('ShippingMultiAddress', () => {
         it('should use proper i18n for address formatting', () => {
             renderWithIntl(<ShippingMultiAddress {...defaultProps} />)
 
-            // Verify that the select elements are present and functional
             const selectElements = screen.getAllByRole('combobox')
-            expect(selectElements).toHaveLength(4) // 2 products × 2 versions (desktop + mobile)
+            expect(selectElements).toHaveLength(2)
 
-            // Verify that all selects have the expected default value
             selectElements.forEach((select) => {
                 expect(select).toHaveValue('addr-1')
             })
@@ -401,11 +383,9 @@ describe('ShippingMultiAddress', () => {
 
             renderWithIntl(<ShippingMultiAddress {...defaultProps} />)
 
-            // Verify that the select elements are present and functional
             const selectElements = screen.getAllByRole('combobox')
-            expect(selectElements).toHaveLength(4) // 2 products × 2 versions (desktop + mobile)
+            expect(selectElements).toHaveLength(2)
 
-            // Verify that all selects have the expected default value
             selectElements.forEach((select) => {
                 expect(select).toHaveValue('addr-1')
             })
@@ -414,22 +394,18 @@ describe('ShippingMultiAddress', () => {
         it('should display address in current format', () => {
             renderWithIntl(<ShippingMultiAddress {...defaultProps} />)
 
-            // Verify that the select elements are present
             const selectElements = screen.getAllByRole('combobox')
-            expect(selectElements).toHaveLength(4) // 2 products × 2 versions (desktop + mobile)
+            expect(selectElements).toHaveLength(2)
 
-            // Verify that the first select has the expected default value
             expect(selectElements[0]).toHaveValue('addr-1')
         })
 
         it('should not use hardcoded address formatting', () => {
             renderWithIntl(<ShippingMultiAddress {...defaultProps} />)
 
-            // Verify that the select elements are present and functional
             const selectElements = screen.getAllByRole('combobox')
-            expect(selectElements).toHaveLength(4) // 2 products × 2 versions (desktop + mobile)
+            expect(selectElements).toHaveLength(2)
 
-            // Verify that all selects have the expected default value
             selectElements.forEach((select) => {
                 expect(select).toHaveValue('addr-1')
             })
@@ -440,51 +416,41 @@ describe('ShippingMultiAddress', () => {
         it('should handle arrow key navigation in dropdown', () => {
             renderWithIntl(<ShippingMultiAddress {...defaultProps} />)
 
-            // Find the first select element
             const selectElements = screen.getAllByRole('combobox')
             const firstSelect = selectElements[0]
 
-            // Verify the select has the expected options
             expect(firstSelect).toBeInTheDocument()
-            expect(firstSelect).toHaveValue('addr-1') // Default selected value
+            expect(firstSelect).toHaveValue('addr-1')
 
-            // Test changing selection
             fireEvent.change(firstSelect, {target: {value: 'addr-2'}})
             expect(firstSelect).toHaveValue('addr-2')
 
-            // Test selecting "Add New Address" - this triggers the function and resets to first address
             fireEvent.change(firstSelect, {target: {value: 'add-new'}})
-            expect(firstSelect).toHaveValue('addr-1') // Should reset to first address
+            expect(firstSelect).toHaveValue('addr-1')
         })
 
         it('should handle Enter key to select address', () => {
             renderWithIntl(<ShippingMultiAddress {...defaultProps} />)
 
-            // Find the first select element
             const selectElements = screen.getAllByRole('combobox')
             const firstSelect = selectElements[0]
 
-            // Test selecting second address
             fireEvent.change(firstSelect, {target: {value: 'addr-2'}})
             expect(firstSelect).toHaveValue('addr-2')
 
-            // Test selecting "Add New Address" - this triggers the function and resets to first address
             fireEvent.change(firstSelect, {target: {value: 'add-new'}})
-            expect(firstSelect).toHaveValue('addr-1') // Should reset to first address
+            expect(firstSelect).toHaveValue('addr-1')
         })
 
         it('should handle Space key to select address', () => {
             renderWithIntl(<ShippingMultiAddress {...defaultProps} />)
 
-            // Find the first select element
             const selectElements = screen.getAllByRole('combobox')
             const firstSelect = selectElements[0]
 
-            // Test selecting "Add New Address" - this triggers the function and resets to first address
             fireEvent.change(firstSelect, {target: {value: 'add-new'}})
-            expect(firstSelect).toHaveValue('addr-1') // Should reset to first address
+            expect(firstSelect).toHaveValue('addr-1')
 
-            // Test selecting first address
             fireEvent.change(firstSelect, {target: {value: 'addr-1'}})
             expect(firstSelect).toHaveValue('addr-1')
         })
@@ -492,15 +458,12 @@ describe('ShippingMultiAddress', () => {
         it('should handle Escape key to close dropdown', () => {
             renderWithIntl(<ShippingMultiAddress {...defaultProps} />)
 
-            // Find the first select element
             const selectElements = screen.getAllByRole('combobox')
             const firstSelect = selectElements[0]
 
-            // Test that the select is accessible and functional
             expect(firstSelect).toBeInTheDocument()
             expect(firstSelect).toHaveValue('addr-1')
 
-            // Test that we can change the selection
             fireEvent.change(firstSelect, {target: {value: 'addr-2'}})
             expect(firstSelect).toHaveValue('addr-2')
         })

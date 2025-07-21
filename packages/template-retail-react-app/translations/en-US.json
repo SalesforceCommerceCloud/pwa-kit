@@ -1460,9 +1460,6 @@
   "shipping_address_selection.title.edit_shipping": {
     "defaultMessage": "Edit Shipping Address"
   },
-  "shipping_multi_address.actions.region": {
-    "defaultMessage": "Checkout actions"
-  },
   "shipping_multi_address.error.label": {
     "defaultMessage": "Error loading products"
   },
@@ -1478,14 +1475,8 @@
   "shipping_multi_address.loading.message": {
     "defaultMessage": "Loading products..."
   },
-  "shipping_multi_address.main.label": {
-    "defaultMessage": "Multi-shipping address selection"
-  },
   "shipping_multi_address.product_attributes.label": {
     "defaultMessage": "Product attributes"
-  },
-  "shipping_multi_address.products.region": {
-    "defaultMessage": "Products and delivery addresses"
   },
   "shipping_multi_address.quantity.label": {
     "defaultMessage": "Quantity"

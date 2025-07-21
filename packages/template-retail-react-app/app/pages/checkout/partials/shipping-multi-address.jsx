@@ -5,6 +5,9 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React, {useState} from 'react'
+import {useIntl} from 'react-intl'
+import PropTypes from 'prop-types'
+
 import {useProducts} from '@salesforce/commerce-sdk-react'
 import {findImageGroupBy} from '@salesforce/retail-react-app/app/utils/image-groups-utils'
 import {getPriceData} from '@salesforce/retail-react-app/app/utils/product-utils'
@@ -15,7 +18,6 @@ import ItemVariantProvider from '@salesforce/retail-react-app/app/components/ite
 import {
     Text,
     Button,
-    Container,
     Box,
     Flex,
     VStack,
@@ -27,13 +29,9 @@ import {
     Alert,
     AlertIcon,
     AlertTitle,
-    AlertDescription,
     Center,
     Spinner
 } from '@salesforce/retail-react-app/app/components/shared/ui'
-import {HideOnDesktop, HideOnMobile} from '@salesforce/retail-react-app/app/components/responsive'
-import {useIntl} from 'react-intl'
-import PropTypes from 'prop-types'
 
 const MultiShippingItemAttributes = ({variant, includeQuantity = true}) => {
     const {formatMessage} = useIntl()
@@ -170,29 +168,22 @@ const ShippingMultiAddress = ({
                         defaultMessage: 'Error loading products'
                     })}
                 </AlertTitle>
-                <AlertDescription>
+                <Text>
                     {formatMessage({
                         id: 'shipping_multi_address.error.message',
                         defaultMessage: 'Error loading products. Please try again.'
                     })}
-                </AlertDescription>
+                </Text>
             </Alert>
         )
     }
 
     const onAddNewAddress = () => {
-        // TODO: Implement add new address logic/modal
         console.log('Add New Address clicked!')
     }
 
     return (
-        <Box
-            role="region"
-            aria-label={formatMessage({
-                id: 'shipping_multi_address.main.label',
-                defaultMessage: 'Multi-shipping address selection'
-            })}
-        >
+        <Box>
             <VStack spacing={0}>
                 <Box
                     border="1px solid"
@@ -201,18 +192,11 @@ const ShippingMultiAddress = ({
                     bg="white"
                     p={2}
                     w="100%"
-                    role="region"
-                    aria-label={formatMessage({
-                        id: 'shipping_multi_address.products.region',
-                        defaultMessage: 'Products and delivery addresses'
-                    })}
                 >
                     <VStack spacing={2} w="100%" h="100%">
                         {basket.productItems.map((item) => {
-                            // Merge product details into item
                             const productDetail = productsMap?.[item.productId] || {}
                             const variant = {...item, ...productDetail}
-                            // Use findImageGroupBy to get the image
                             const image = findImageGroupBy(productDetail.imageGroups, {
                                 viewType: 'small',
                                 selectedVariationAttributes: variant.variationValues
@@ -230,9 +214,6 @@ const ShippingMultiAddress = ({
                                     borderRadius="md"
                                     p={4}
                                     data-testid="multi-shipping-card"
-                                    role="group"
-                                    aria-labelledby={`product-title-${addressKey}`}
-                                    aria-describedby={`product-description-${addressKey}`}
                                     w="100%"
                                     flex="1"
                                 >
@@ -243,7 +224,6 @@ const ShippingMultiAddress = ({
                                         h="100%"
                                         gap={{base: 4, md: 6}}
                                     >
-                                        {/* Left: Image and info */}
                                         <Flex direction="row" align="flex-start" flex={1} minW={0}>
                                             <HStack align="flex-start" spacing={3} w="100%">
                                                 <Box
@@ -252,7 +232,8 @@ const ShippingMultiAddress = ({
                                                     bg="gray.100"
                                                     overflow="hidden"
                                                     position="relative"
-                                                    w={{base: '60px', md: '80px'}}
+                                                    maxW={{base: '60px', md: '80px'}}
+                                                    w="100%"
                                                     aspectRatio="1"
                                                 >
                                                     <Image
@@ -305,123 +286,19 @@ const ShippingMultiAddress = ({
                                             </HStack>
                                         </Flex>
 
-                                        {/* Right: Address dropdown and price - only on desktop */}
-                                        <HideOnMobile>
-                                            <VStack
-                                                align="flex-start"
-                                                w={{base: '100%', md: '340px'}}
-                                                flexShrink={0}
-                                                pt={0}
-                                            >
-                                                <Text
-                                                    id={`delivery-address-label-desktop-${addressKey}`}
-                                                    data-testid={`delivery-address-label-desktop-${addressKey}`}
-                                                    fontWeight="medium"
-                                                    fontSize="sm"
-                                                    mb={2}
-                                                >
-                                                    {formatMessage(deliveryAddressLabel)}
-                                                </Text>
-
-                                                {/* Address Dropdown */}
-                                                <Box w="100%" mb={6}>
-                                                    <Select
-                                                        value={selectedAddressId || ''}
-                                                        onChange={(e) => {
-                                                            const value = e.target.value
-                                                            if (value === 'add-new') {
-                                                                onAddNewAddress()
-                                                                // Reset to first address after calling onAddNewAddress
-                                                                setSelectedAddresses((prev) => ({
-                                                                    ...prev,
-                                                                    [addressKey]:
-                                                                        addresses[0]?.addressId ||
-                                                                        ''
-                                                                }))
-                                                            } else {
-                                                                setSelectedAddresses((prev) => ({
-                                                                    ...prev,
-                                                                    [addressKey]: value
-                                                                }))
-                                                            }
-                                                        }}
-                                                        aria-labelledby={`delivery-address-label-desktop-${addressKey}`}
-                                                        borderColor="gray.300"
-                                                        _hover={{borderColor: 'gray.400'}}
-                                                        _focus={{
-                                                            borderColor: 'blue.500',
-                                                            boxShadow:
-                                                                '0 0 0 1px var(--chakra-colors-blue-500)'
-                                                        }}
-                                                    >
-                                                        {addresses.map((addr) => (
-                                                            <option
-                                                                key={addr.addressId}
-                                                                value={addr.addressId}
-                                                            >
-                                                                {addr.firstName} {addr.lastName} -{' '}
-                                                                {addr.address1},{' '}
-                                                                {formatMessage(
-                                                                    {
-                                                                        id: 'shipping_multi_address.format.address_line_2',
-                                                                        defaultMessage:
-                                                                            '{city}, {stateCode} {postalCode}'
-                                                                    },
-                                                                    {
-                                                                        city: addr.city,
-                                                                        stateCode:
-                                                                            addr.stateCode || '',
-                                                                        postalCode: addr.postalCode
-                                                                    }
-                                                                )}
-                                                            </option>
-                                                        ))}
-                                                        <option
-                                                            value="add-new"
-                                                            style={{
-                                                                color: 'var(--chakra-colors-blue-600)',
-                                                                fontWeight: 'bold'
-                                                            }}
-                                                        >
-                                                            + {formatMessage(addNewAddressLabel)}
-                                                        </option>
-                                                    </Select>
-                                                </Box>
-
-                                                {/* Price */}
-                                                <Box
-                                                    fontWeight="semibold"
-                                                    fontSize="md"
-                                                    color="gray.900"
-                                                    alignSelf="flex-end"
-                                                    mt="auto"
-                                                >
-                                                    <DisplayPrice
-                                                        priceData={getPriceData(variant)}
-                                                        currency={currency}
-                                                        labelForA11y={variant.productName}
-                                                    />
-                                                </Box>
-                                            </VStack>
-                                        </HideOnMobile>
-                                    </Flex>
-
-                                    {/* Mobile: Address dropdown and price - only on mobile */}
-                                    <HideOnDesktop>
                                         <VStack
                                             align="flex-start"
                                             w="100%"
-                                            spacing={3}
-                                            mt={4}
+                                            flex={{base: 'none', md: '0 0 auto'}}
+                                            minW={{base: '100%', md: '280px'}}
+                                            maxW={{base: '100%', md: '400px'}}
                                             pt={0}
-                                            minW={0}
-                                            maxW="100%"
-                                            overflowX="hidden"
-                                            minH="auto"
+                                            spacing={3}
+                                            mt={{base: 4, md: 0}}
                                         >
                                             <Text
-                                                id={`delivery-address-label-mobile-${addressKey}`}
-                                                data-testid={`delivery-address-label-mobile-${addressKey}`}
+                                                id={`delivery-address-label-${addressKey}`}
+                                                data-testid={`delivery-address-label-${addressKey}`}
                                                 fontWeight="medium"
                                                 fontSize="sm"
                                                 mb={2}
@@ -429,7 +306,6 @@ const ShippingMultiAddress = ({
                                                 {formatMessage(deliveryAddressLabel)}
                                             </Text>
 
-                                            {/* Address Dropdown */}
                                             <Box w="100%" mb={6}>
                                                 <Select
                                                     value={selectedAddressId || ''}
@@ -437,6 +313,12 @@ const ShippingMultiAddress = ({
                                                         const value = e.target.value
                                                         if (value === 'add-new') {
                                                             onAddNewAddress()
+                                                            // Reset to first address after calling onAddNewAddress
+                                                            setSelectedAddresses((prev) => ({
+                                                                ...prev,
+                                                                [addressKey]:
+                                                                    addresses[0]?.addressId || ''
+                                                            }))
                                                         } else {
                                                             setSelectedAddresses((prev) => ({
                                                                 ...prev,
@@ -444,7 +326,7 @@ const ShippingMultiAddress = ({
                                                             }))
                                                         }
                                                     }}
-                                                    aria-labelledby={`delivery-address-label-mobile-${addressKey}`}
+                                                    aria-labelledby={`delivery-address-label-${addressKey}`}
                                                     borderColor="gray.300"
                                                     _hover={{borderColor: 'gray.400'}}
                                                     _focus={{
@@ -474,19 +356,12 @@ const ShippingMultiAddress = ({
                                                             )}
                                                         </option>
                                                     ))}
-                                                    <option
-                                                        value="add-new"
-                                                        style={{
-                                                            color: 'var(--chakra-colors-blue-600)',
-                                                            fontWeight: 'bold'
-                                                        }}
-                                                    >
+                                                    <option value="add-new">
                                                         + {formatMessage(addNewAddressLabel)}
                                                     </option>
                                                 </Select>
                                             </Box>
 
-                                            {/* Price */}
                                             <Box
                                                 fontWeight="semibold"
                                                 fontSize="md"
@@ -501,26 +376,16 @@ const ShippingMultiAddress = ({
                                                 />
                                             </Box>
                                         </VStack>
-                                    </HideOnDesktop>
+                                    </Flex>
                                 </Box>
                             )
                         })}
                     </VStack>
                 </Box>
-                <Box
-                    pt={2}
-                    w="100%"
-                    role="region"
-                    aria-label={formatMessage({
-                        id: 'shipping_multi_address.actions.region',
-                        defaultMessage: 'Checkout actions'
-                    })}
-                >
-                    <Container variant="form">
-                        <Button type="button" width="full" onClick={onSubmit}>
-                            {formatMessage(submitButtonLabel)}
-                        </Button>
-                    </Container>
+                <Box pt={2} w="100%">
+                    <Button type="button" width="full" onClick={onSubmit}>
+                        {formatMessage(submitButtonLabel)}
+                    </Button>
                 </Box>
             </VStack>
         </Box>

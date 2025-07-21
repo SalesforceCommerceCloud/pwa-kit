@@ -3445,12 +3445,6 @@
       "value": "Edit Shipping Address"
     }
   ],
-  "shipping_multi_address.actions.region": [
-    {
-      "type": 0,
-      "value": "Checkout actions"
-    }
-  ],
   "shipping_multi_address.error.label": [
     {
       "type": 0,
@@ -3501,22 +3495,10 @@
       "value": "Loading products..."
     }
   ],
-  "shipping_multi_address.main.label": [
-    {
-      "type": 0,
-      "value": "Multi-shipping address selection"
-    }
-  ],
   "shipping_multi_address.product_attributes.label": [
     {
       "type": 0,
       "value": "Product attributes"
-    }
-  ],
-  "shipping_multi_address.products.region": [
-    {
-      "type": 0,
-      "value": "Products and delivery addresses"
     }
   ],
   "shipping_multi_address.quantity.label": [
