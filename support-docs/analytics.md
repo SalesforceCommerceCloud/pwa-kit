@@ -28,7 +28,29 @@ All three providers share similar integration approaches in PWA Kit:
 - Each provider exposes a custom React hook (`useDataCloud`, `useActiveData`, `useEinstein`)
 - Hooks return methods for sending standard e-commerce events (page views, product views, searches, etc.)
 
-TODO: show code snippet of the hooks in action
+**Example Usage in a Product Detail Page:**
+
+```javascript
+// pages/product-detail/index.jsx
+import useDataCloud from '@salesforce/retail-react-app/app/hooks/use-datacloud'
+import useActiveData from '@salesforce/retail-react-app/app/hooks/use-active-data'
+import useEinstein from '@salesforce/retail-react-app/app/hooks/use-einstein'
+
+const ProductDetail = ({product, category}) => {
+    const dataCloud = useDataCloud()
+    const activeData = useActiveData()
+    const einstein = useEinstein()
+    
+    useEffect(() => {
+        dataCloud.sendViewProduct(product)
+        activeData.sendViewProduct(category, product, 'detail')
+        einstein.sendViewProduct(product)
+    }, [product?.id])
+    
+    ...   
+}
+```
+
 
 #### 2. **Do Not Track (DNT) Compliance**
 - All providers respect user privacy settings
@@ -85,7 +107,28 @@ Data Cloud integration works by:
 4. Events sent as interactions to Data Cloud's REST API
 5. Data processed and available in Data Cloud's analytics interface
 
-TODO: add a diagram?
+#### Data Flow Architecture
+
+```mermaid
+graph TD
+    A["React Component<br/>(PDP, PLP, Search, etc.)"] --> B["useDataCloud Hook"]
+    B --> C["Event Construction"]
+    C --> D{"DNT Enabled?"}
+    D -->|Yes| E["Replace personal data<br/>with '__DNT__'"]
+    D -->|No| F["Keep original data"]
+    E --> G["Data Cloud SDK<br/>(@salesforce/cc-datacloud-typescript)"]
+    F --> G
+    G --> H["REST API Call<br/>c360a.salesforce.com"]
+    H --> I["Data Cloud Backend<br/>Event Processing"]
+    I --> J["Data Cloud Dashboard<br/>(~15 min latency)"]
+    
+    K["Configuration<br/>tenantId + appSourceId"] --> B
+    
+    style A fill:#e1f5fe
+    style J fill:#c8e6c9
+    style D fill:#fff3e0
+    style E fill:#ffebee
+```
 
 #### Event Types Supported
 - `ViewPage` — Page view tracking
@@ -200,7 +243,10 @@ Active Data integration works by:
 export const ACTIVE_DATA_ENABLED = true
 ```
 
-Requires OCAPI proxy configuration. TODO: elaborate
+Requires OCAPI proxy configuration in PWA Kit Runtime Admin:
+- **Path**: `/mobify/proxy/ocapi` 
+- **Target Host**: Customer's OCAPI endpoint (e.g., `zzrf-001.dx.commercecloud.salesforce.com`)
+- Active Data events are sent to `${proxyPath}/ocapi/on/demandware.store/Sites-${siteId}-Site/${locale}/__Analytics-Start`
 
 #### Business Manager Configuration
 Required settings in Business Manager:
@@ -273,12 +319,18 @@ Frontend Event → Einstein API → Analytics Processing → Reports & Dashboard
                            Recommendation Training → AI Models → Product Recommendations
 ```
 
-#### Capabilities
-TODO: replace this section with event types?
-
-- **Analytics Events**: Page views, product views, searches, cart actions, checkout steps
-- **Recommendations**: AI-powered product recommendations via recommenders and zones
-- **Reports & Dashboards**: Comprehensive analytics reporting interface
+#### Event Types Supported
+- `ViewProduct` — Product detail page views
+- `ViewSearch` — Product search tracking with results 
+- `ClickSearch` — Clicks on search result products
+- `ViewCategory` — Category/listing page views with products
+- `ClickCategory` — Clicks on products from category pages
+- `ViewPage` — General page view tracking
+- `ViewReco` — Recommendation impression tracking
+- `ClickReco` — Clicks on recommended products
+- `BeginCheckout` — Checkout process initiation
+- `CheckoutStep` — Individual checkout step tracking
+- `AddToCart` — Product additions to cart
 
 ### Configuration
 
@@ -332,8 +384,8 @@ After 24 hours:
 - **Solution**: Wait at least 24 hours after completing setup
 
 **Cause 2: Configuration Errors**  
-- **Symptoms**: Empty `realm` field, `instanceType` not `prd`
-- **Solution**: Verify Account Manager permissions and `isProduction: true`. TODO: verify
+- **Symptoms**: `instanceType` not `prd`
+- **Solution**: Ensure `isProduction: true` in configuration
 
 **Cause 3: Ad Blockers**
 - **Symptoms**: Blocked requests to Einstein APIs
