@@ -128,7 +128,7 @@ const Cart = () => {
                 ids: bundleChildVariantIds?.join(','),
                 allImages: false,
                 expand: ['availability', 'variations'],
-                select: '(data.(id,inventory))',
+                select: '(data.(id,inventories,inventory))',
                 ...(selectedInventoryId ? {inventoryIds: selectedInventoryId} : {})
             }
         },
@@ -720,6 +720,7 @@ const Cart = () => {
                                             updateCart={(product, quantity, childProducts) =>
                                                 handleUpdateBundle(product, quantity, childProducts)
                                             }
+                                            showDeliveryOptions={false}
                                         />
                                     )}
                                 </Box>
