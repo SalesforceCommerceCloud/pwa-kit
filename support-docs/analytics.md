@@ -137,6 +137,8 @@ graph TD
 
 ### Configuration
 
+See this public doc for more details: https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/integrate-data-cloud.html
+
 #### Prerequisites (Backend)
 Customers must complete setup in Data Cloud before frontend configuration:
 1. Set up production Data Cloud instance
@@ -151,8 +153,8 @@ Customers must complete setup in Data Cloud before frontend configuration:
 // config/default.js
 app: {
     dataCloudAPI: {
-        appSourceId: '7ae070a6-f4ec-4def-a383-d9cacc3f20a1',
-        tenantId: 'g82wgnrvm-ywk9dggrrw8mtggy.pc-rnd'
+        appSourceId: 'YOUR_APP_SOURCE_ID',
+        tenantId: 'YOUR_TENANT_ID'
     }
 }
 ```
@@ -226,8 +228,8 @@ graph TD
     C --> D["Global dw.ac Object<br/>Created"]
     D --> E["Event Collection<br/>(Product Views/Impressions)"]
     E --> F{"DNT Cookie<br/>(dw_dnt)"}
-    F -->|Present| G["Send with dw_dnt=1<br/>(Backend ignores)"]
-    F -->|Absent| H["Send normally"]
+    F -->|value is 1| G["Send payload with dw_dnt=1<br/>(But backend ignores)"]
+    F -->|value is 0| H["Send payload with dw_dnt=0"]
     G --> I["OCAPI Proxy<br/>__Analytics-Start endpoint"]
     H --> I
     I --> J["B2C Commerce Backend<br/>Event Processing"]
@@ -252,6 +254,8 @@ graph TD
 | Order | Customer order placement |
 
 ### Configuration
+
+See this public doc for more details: https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/active-data.html
 
 #### Frontend Configuration
 ```javascript
@@ -327,11 +331,33 @@ Einstein integration works by:
 4. Data aggregated and displayed in Reports & Dashboards after 24-hour delay
 5. Recommendation engine uses event data to power personalized product suggestions
 
+**Note**: Consistent `cookieId` across user sessions is critical for accurate analytics and personalized recommendations. Inconsistent cookie IDs can lead to inflated user counts and poor recommendation quality.
+
+```mermaid
+graph TD
+    A["React Component<br/>(PDP, PLP, Search, etc.)"] --> B["useEinstein Hook"]
+    B --> C{"DNT Enabled?"}
+    C -->|Yes| D["Skip sending events<br/>entirely"]
+    C -->|No| E["Construct event payload<br/>with cookieId/userId"]
+    E --> F["Direct HTTP Request<br/>api.cquotient.com"]
+    F --> G["Einstein Backend<br/>Event Processing"]
+    G --> H["Analytics Processing"]
+    G --> I["Recommendation Training"]
+    H --> J["Reports & Dashboards<br/>(~24 hour latency)"]
+    I --> K["AI Models"]
+    K --> L["Product Recommendations<br/>(getRecommendations/getZoneRecommendations)"]
+    
+    M["Configuration<br/>einsteinId + siteId<br/>isProduction"] --> B
+    N["PIG Instance<br/>Requirement"] --> G
+    
+    style A fill:#4a90e2,color:#ffffff
+    style J fill:#7cb342,color:#ffffff
+    style L fill:#7cb342,color:#ffffff
+    style C fill:#f5a623,color:#000000
+    style D fill:#d0021b,color:#ffffff
+    style K fill:#9b59b6,color:#ffffff
 ```
-Frontend Event → Einstein API → Analytics Processing → Reports & Dashboards
-                                    ↓
-                           Recommendation Training → AI Models → Product Recommendations
-```
+
 
 #### Event Types Supported
 - `ViewProduct` — Product detail page views
@@ -348,10 +374,17 @@ Frontend Event → Einstein API → Analytics Processing → Reports & Dashboard
 
 ### Configuration
 
+See this public doc for more details: https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/reports-and-dashboards.html
+
 #### Prerequisites (Backend)
 - Only available on PIG instances
 - Customer must request Einstein Activities enablement via support case
-- Account Manager role with Reports & Dashboards permissions required
+- **Einstein Configurator**: Configure API access and obtain Einstein client ID (API key)
+- **Business Manager**: Configure Einstein Activities as the analytics source
+
+> **References**: 
+> - [Einstein Configurator Setup](https://developer.salesforce.com/docs/commerce/einstein-api/guide/einstein-activities-overview.html#enable-access)
+> - [Business Manager Configuration](https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/reports-and-dashboards.html#1-configure-business-manager)
 
 #### Frontend Configuration
 ```javascript
@@ -359,15 +392,15 @@ Frontend Event → Einstein API → Analytics Processing → Reports & Dashboard
 app: {
     einsteinAPI: {
         host: 'https://api.cquotient.com',
-        einsteinId: '1ea06c6e-c936-4324-bcf0-fada93f83bb1',
-        siteId: 'aaij-MobileFirst',
+        einsteinId: 'YOUR_EINSTEIN_CLIENT_ID',
+        siteId: 'zzrf-RefArch',
         isProduction: false  // Set to true for production data to appear in dashboards
     }
 }
 ```
 
 #### Critical Configuration Notes
-- **`host`**: Almost always `api.cquotient.com` (can be proxy path like `/mobify/proxy/einstein`)
+- **`host`**: Almost always `api.cquotient.com`
 - **`isProduction`**: MUST be `true` for data to appear in Reports & Dashboards
 - **`siteId`**: Format is `realm-siteId` (e.g., `zzrf-RefArch`)
 
@@ -379,14 +412,14 @@ app: {
 - Check `instanceType` field is set to `prd` for production
 
 #### 2. **Chrome Extension**
-Install "Commerce Cloud Recommendation Validator" extension:
+Install "[Commerce Cloud Recommendation Validator](https://chromewebstore.google.com/detail/commerce-cloud-recommenda/dobmbolmcejainkefklnpkjbaibgjihn)" extension:
 - Shows real-time Einstein activity events
 - Displays key fields like `realm`, `instanceType`
 - Helps debug configuration issues
 
 #### 3. **Reports & Dashboards Verification**
 After 24 hours:
-1. Business Manager → **Merchant Tools → Analytics → Reports & Dashboards**
+1. **Visit the dashboard** at: Business Manager → Merchant Tools → Analytics → Reports & Dashboards (or navigate directly to https://ccac.analytics.commercecloud.salesforce.com/)
 2. **Home and Sales tabs**: Verify order numbers match expectations  
 3. **Traffic → Shopper Journey**: Check "Visits With Orders" metrics
 
@@ -401,19 +434,20 @@ After 24 hours:
 - **Symptoms**: `instanceType` not `prd`
 - **Solution**: Ensure `isProduction: true` in configuration
 
-**Cause 3: Ad Blockers**
-- **Symptoms**: Blocked requests to Einstein APIs
-- **Solution**: Set up proxy in Runtime Admin:
-  - Path: `mobify/proxy/einstein` 
-  - Host: `api.cquotient.com`
-  - Update hook to send `clientUserAgent = navigator.userAgent`
-
 #### Missing Events
 **Symptom**: Some analytics events not appearing
 **Cause**: DNT enabled users, incomplete event implementation, or network issues  
 **Solution**: Check DNT settings, verify event firing in code, check network logs
 
-TODO: any other common issues? inaccurate dashboards?
+#### Inaccurate Dashboard Data
+**Symptom**: User counts, order counts, or revenue metrics don't match expectations
+**Causes**: 
+- **Inconsistent cookieId values** across user sessions leading to inflated user counts and poor recommendation quality
+- Events sent with incorrect product pricing or quantities
+- Missing or duplicate events in the analytics flow
+**Solution**: 
+- Monitor `cookieId` consistency across page visits
+- Verify event payload accuracy and avoid sending duplicate events
 
 ---
 ## Resources
@@ -445,8 +479,7 @@ TODO: any other common issues? inaccurate dashboards?
 ### Required Permissions and Access
 
 #### For Data Cloud Support
-- [ ] Access to customer's Data Cloud tenants (case-by-case basis)
-TODO: ask Carson or Yuna
+- [ ] Access to dashboards. TODO: ask Carson or Yuna
 
 #### For Active Data Support  
 - [ ] Business Manager access to verify configurations
