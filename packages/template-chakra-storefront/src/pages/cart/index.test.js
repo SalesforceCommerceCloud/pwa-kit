@@ -253,16 +253,7 @@ describe('Product view tests', function () {
             `sf-cart-item-${mockCustomerBaskets.baskets[0].productItems[0].productId}`
         )
 
-        const editCartButton = within(cartItem).getByRole('button', {name: 'Edit'})
-        await act(async () => {
-            await user.click(editCartButton)
-        })
-
-        const productView = screen.queryByTestId('product-view')
-
-        const incrementButton = await within(productView).findByTestId('quantity-increment')
-
-        // Mock the PATCH request for updating basket item quantity right before clicking
+        // Mock the PATCH request for updating basket item quantity before opening modal
         prependHandlersToServer([
             {
                 path: '*/baskets/*/items/*',
@@ -279,6 +270,17 @@ describe('Product view tests', function () {
                 }
             }
         ])
+
+        const editCartButton = within(cartItem).getByRole('button', {name: 'Edit'})
+        await act(async () => {
+            await user.click(editCartButton)
+        })
+
+        // Wait for the product view modal to appear
+        const productView = await screen.findByTestId('product-view')
+        expect(productView).toBeInTheDocument()
+
+        const incrementButton = await within(productView).findByTestId('quantity-increment')
 
         // update item quantity
         await act(async () => {
@@ -298,8 +300,13 @@ describe('Product view tests', function () {
             expect(productView).not.toBeInTheDocument()
         })
 
+        // Re-find the cart item to avoid stale element references
+        const updatedCartItem = await screen.findByTestId(
+            `sf-cart-item-${mockCustomerBaskets.baskets[0].productItems[0].productId}`
+        )
+        
         await waitFor(() => {
-            expect(within(cartItem).getByDisplayValue('3')).toBeInTheDocument()
+            expect(within(updatedCartItem).getByDisplayValue('3')).toBeInTheDocument()
         })
     })
 })
