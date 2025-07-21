@@ -249,6 +249,15 @@ describe('ShippingMultiAddress', () => {
         expect(images[0]).toHaveAttribute('src', 'https://test-image-1.jpg')
     })
 
+    it.skip('should render variation attributes', () => {
+        renderWithIntl(<ShippingMultiAddress {...defaultProps} />)
+
+        expect(screen.getByText('Color: Red')).toBeInTheDocument()
+        expect(screen.getByText('Size: Medium')).toBeInTheDocument()
+        expect(screen.getByText('Color: Blue')).toBeInTheDocument()
+        expect(screen.getByText('Size: Large')).toBeInTheDocument()
+    })
+
     it.skip('should render product prices', () => {
         renderWithIntl(<ShippingMultiAddress {...defaultProps} />)
 
