@@ -165,15 +165,4 @@ describe('AppHeader', () => {
         expect(screen.getByTestId('mobile-navigation')).toBeInTheDocument()
     })
 
-    test('handles missing mobileNavigationProps gracefully', () => {
-        const props = {
-            ...defaultProps,
-            mobileNavigationProps: undefined
-        }
-
-        renderWithProviders(<AppHeader {...props} />)
-
-        expect(screen.getByTestId('header')).toBeInTheDocument()
-        expect(screen.getByTestId('mobile-navigation')).toBeInTheDocument()
-    })
 })

@@ -18,7 +18,7 @@ import {AddToCartModalProvider} from '../../../hooks/use-add-to-cart-modal'
  * AppLayout component that provides the main layout structure
  * Handles skip navigation, scroll to top, offline banner, and main content wrapper
  */
-const AppLayout = ({children, isOnline, headerComponent, footerComponent, modalsComponent}) => {
+const AppLayout = ({children, isOnline = true, headerComponent, footerComponent, modalsComponent}) => {
     return (
         <>
             <ScrollToTop />
@@ -29,7 +29,7 @@ const AppLayout = ({children, isOnline, headerComponent, footerComponent, modals
                 {headerComponent}
 
                 {/* Offline Banner */}
-                {isOnline === false && <OfflineBanner />}
+                {isOnline === false && <OfflineBanner isOnline={isOnline} />}
 
                 <AddToCartModalProvider>
                     <SkipNavContent
@@ -64,11 +64,11 @@ const AppLayout = ({children, isOnline, headerComponent, footerComponent, modals
 }
 
 AppLayout.propTypes = {
-    children: PropTypes.node.isRequired,
-    isOnline: PropTypes.bool.isRequired,
-    headerComponent: PropTypes.node.isRequired,
-    footerComponent: PropTypes.node.isRequired,
-    modalsComponent: PropTypes.node.isRequired
+    children: PropTypes.node,
+    isOnline: PropTypes.bool,
+    headerComponent: PropTypes.node,
+    footerComponent: PropTypes.node,
+    modalsComponent: PropTypes.node
 }
 
 export default AppLayout

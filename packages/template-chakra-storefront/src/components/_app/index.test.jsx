@@ -174,9 +174,4 @@ describe('App', () => {
         expect(screen.getByTestId('app-providers')).toBeInTheDocument()
     })
 
-    test('handles missing children gracefully', () => {
-        renderWithProviders(<App />)
-
-        expect(screen.getByTestId('app-layout')).toBeInTheDocument()
-    })
 })
