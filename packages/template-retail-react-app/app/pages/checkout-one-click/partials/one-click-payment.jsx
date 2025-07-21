@@ -19,9 +19,10 @@ import {
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 import {useForm} from 'react-hook-form'
 import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
-import {useShopperBasketsMutation} from '@salesforce/commerce-sdk-react'
+import {useShopperBasketsMutation, useShopperOrdersMutation} from '@salesforce/commerce-sdk-react'
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
 import {useCheckout} from '@salesforce/retail-react-app/app/pages/checkout-container/util/checkout-context'
+import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
 import {
     getPaymentInstrumentCardType,
     getMaskCreditCardNumber,
@@ -40,6 +41,7 @@ import {API_ERROR_MESSAGE} from '@salesforce/retail-react-app/app/constants'
 
 const Payment = () => {
     const {formatMessage} = useIntl()
+    const navigate = useNavigation()
     const {data: basket} = useCurrentBasket()
     const selectedShippingAddress = basket?.shipments && basket?.shipments[0]?.shippingAddress
     const selectedBillingAddress = basket?.billingAddress
@@ -47,6 +49,8 @@ const Payment = () => {
 
     const isPickupOrder = basket?.shipments[0]?.shippingMethod?.c_storePickupEnabled === true
     const [billingSameAsShipping, setBillingSameAsShipping] = useState(!isPickupOrder)
+    const [isLoading, setIsLoading] = useState(false)
+
     const {mutateAsync: addPaymentInstrumentToBasket} = useShopperBasketsMutation(
         'addPaymentInstrumentToBasket'
     )
@@ -56,15 +60,17 @@ const Payment = () => {
     const {mutateAsync: removePaymentInstrumentFromBasket} = useShopperBasketsMutation(
         'removePaymentInstrumentFromBasket'
     )
+    const {mutateAsync: createOrder} = useShopperOrdersMutation('createOrder')
+
     const showToast = useToast()
-    const showError = () => {
+    const showError = (message) => {
         showToast({
-            title: formatMessage(API_ERROR_MESSAGE),
+            title: message || formatMessage(API_ERROR_MESSAGE),
             status: 'error'
         })
     }
 
-    const {step, STEPS, goToStep, goToNextStep} = useCheckout()
+    const {step, STEPS, goToStep} = useCheckout()
 
     const billingAddressForm = useForm({
         mode: 'onChange',
@@ -129,17 +135,39 @@ const Payment = () => {
         }
     }
 
-    const onSubmit = paymentMethodForm.handleSubmit(async (paymentFormValues) => {
-        if (!appliedPayment) {
-            await onPaymentSubmit(paymentFormValues)
+    const submitOrder = async () => {
+        setIsLoading(true)
+        try {
+            const order = await createOrder({
+                body: {basketId: basket.basketId}
+            })
+            navigate(`/checkout/confirmation/${order.orderNo}`)
+        } catch (error) {
+            const message = formatMessage({
+                id: 'checkout.message.generic_error',
+                defaultMessage: 'An unexpected error occurred during checkout.'
+            })
+            showError(message)
+        } finally {
+            setIsLoading(false)
         }
+    }
 
-        // If successful `onBillingSubmit` returns the updated basket. If the form was invalid on
-        // submit, `undefined` is returned.
-        const updatedBasket = await onBillingSubmit()
+    const onSubmit = paymentMethodForm.handleSubmit(async (paymentFormValues) => {
+        try {
+            if (!appliedPayment) {
+                await onPaymentSubmit(paymentFormValues)
+            }
 
-        if (updatedBasket) {
-            goToNextStep()
+            // If successful `onBillingSubmit` returns the updated basket. If the form was invalid on
+            // submit, `undefined` is returned.
+            const updatedBasket = await onBillingSubmit()
+
+            if (updatedBasket) {
+                await submitOrder()
+            }
+        } catch (error) {
+            showError()
         }
     })
 
@@ -150,12 +178,14 @@ const Payment = () => {
 
     return (
         <ToggleCard
-            id="step-3"
+            id="step-4"
+            data-testid="payment-component"
             title={formatMessage({defaultMessage: 'Payment', id: 'checkout_payment.title.payment'})}
             editing={step === STEPS.PAYMENT}
             isLoading={
                 paymentMethodForm.formState.isSubmitting ||
-                billingAddressForm.formState.isSubmitting
+                billingAddressForm.formState.isSubmitting ||
+                isLoading
             }
             disabled={appliedPayment == null}
             onEdit={() => goToStep(STEPS.PAYMENT)}
@@ -241,10 +271,16 @@ const Payment = () => {
 
                     <Box pt={3}>
                         <Container variant="form">
-                            <Button w="full" onClick={onSubmit}>
+                            {/* Always visible Place Order Button */}
+                            <Button
+                                w="full"
+                                onClick={onSubmit}
+                                isLoading={isLoading}
+                                data-testid="place-order-button"
+                            >
                                 <FormattedMessage
-                                    defaultMessage="Review Order"
-                                    id="checkout_payment.button.review_order"
+                                    defaultMessage="Place Order"
+                                    id="checkout_payment.button.place_order"
                                 />
                             </Button>
                         </Container>
