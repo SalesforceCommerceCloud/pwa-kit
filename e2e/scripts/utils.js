@@ -54,7 +54,13 @@ function simplifyViolations(violations) {
             failureSummary: node.failureSummary,
             // Simplify target selectors for stability
             // #app-header[data-v-12345] > .navigation[data-testid="main-nav"] => #app-header > .navigation
-            target: node.target.map((t) => t.split(/\[.*?\]/).join(''))
+            // Also handle Chakra UI dynamic selectors like #popover-trigger-:r5l4v:
+            target: node.target.map((t) => 
+                t
+                    .split(/\[.*?\]/).join('') // Remove data attributes
+                    .replace(/#[^"]*:[a-zA-Z0-9]+[^"]*/g, '#...') // Remove Chakra UI dynamic IDs
+                    .replace(/\.css-[a-zA-Z0-9]+/g, '.css-...') // Simplify Chakra UI CSS classes
+            )
         }))
     }))
 }
@@ -77,6 +83,23 @@ function sanitizeHtml(html) {
             .replace(/style="[^"]*"/g, '')
             // Remove content of script tags
             .replace(/<script\b[^>]*>([\s\S]*?)<\/script>/gi, '<script>...</script>')
+            // Remove Chakra UI specific dynamic attributes
+            .replace(/aria-controls="[^"]*"/g, 'aria-controls="..."')
+            .replace(/aria-describedby="[^"]*"/g, 'aria-describedby="..."')
+            .replace(/aria-labelledby="[^"]*"/g, 'aria-labelledby="..."')
+            .replace(/aria-owns="[^"]*"/g, 'aria-owns="..."')
+            // Remove Chakra UI generated IDs in attributes
+            .replace(/id="[^"]*:[a-zA-Z0-9]+[^"]*"/g, 'id="..."')
+            // Remove Chakra UI generated IDs in aria-controls
+            .replace(/aria-controls="[^"]*:[a-zA-Z0-9]+[^"]*"/g, 'aria-controls="..."')
+            // Remove Chakra UI generated IDs in aria-describedby
+            .replace(/aria-describedby="[^"]*:[a-zA-Z0-9]+[^"]*"/g, 'aria-describedby="..."')
+            // Remove Chakra UI generated IDs in aria-labelledby
+            .replace(/aria-labelledby="[^"]*:[a-zA-Z0-9]+[^"]*"/g, 'aria-labelledby="..."')
+            // Remove Chakra UI generated IDs in aria-owns
+            .replace(/aria-owns="[^"]*:[a-zA-Z0-9]+[^"]*"/g, 'aria-owns="..."')
+            // Remove Chakra UI generated IDs in target selectors
+            .replace(/#[^"]*:[a-zA-Z0-9]+[^"]*/g, '#...')
             // Trim whitespace
             .trim()
     )
