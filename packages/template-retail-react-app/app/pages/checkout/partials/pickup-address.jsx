@@ -4,21 +4,23 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React, {useState} from 'react'
+import React, {useState, useMemo} from 'react'
 import {FormattedMessage, useIntl} from 'react-intl'
 
 // Components
-import {Box, Button, Container, Text} from '@salesforce/retail-react-app/app/components/shared/ui'
+import {Box, Button, Container, Text, Stack} from '@salesforce/retail-react-app/app/components/shared/ui'
 import {
     ToggleCard,
     ToggleCardSummary
 } from '@salesforce/retail-react-app/app/components/toggle-card'
 import AddressDisplay from '@salesforce/retail-react-app/app/components/address-display'
+import CheckoutProductItemList from '@salesforce/retail-react-app/app/components/product-item-list/checkout-product-item-list'
 
 // Hooks
 import {useCheckout} from '@salesforce/retail-react-app/app/pages/checkout/util/checkout-context'
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
-import {useShopperBasketsMutation, useStores} from '@salesforce/commerce-sdk-react'
+import {useShopperBasketsMutation, useStores, useProducts} from '@salesforce/commerce-sdk-react'
+import {STORE_LOCATOR_IS_ENABLED} from '@salesforce/retail-react-app/app/constants'
 
 const PickupAddress = () => {
     const {formatMessage} = useIntl()
@@ -31,6 +33,28 @@ const PickupAddress = () => {
 
     const selectedShippingAddress = basket?.shipments && basket?.shipments[0]?.shippingAddress
     const isAddressFilled = selectedShippingAddress?.address1 && selectedShippingAddress?.city
+
+    // Get product data for display
+    const productIds = basket?.productItems?.map(({productId}) => productId).join(',') ?? ''
+    const {data: products, isLoading: isProductsLoading} = useProducts(
+        {
+            parameters: {
+                ids: productIds,
+                allImages: true,
+                perPricebook: true
+            }
+        },
+        {
+            enabled: Boolean(productIds),
+            select: (result) => {
+                return result?.data?.reduce((result, item) => {
+                    const key = item.id
+                    result[key] = item
+                    return result
+                }, {})
+            }
+        }
+    )
 
     // Check if basket is a pickup order
     const isPickupOrder = basket?.shipments?.[0]?.shippingMethod?.c_storePickupEnabled === true
@@ -45,6 +69,64 @@ const PickupAddress = () => {
             enabled: !!storeId && isPickupOrder
         }
     )
+
+    // Create productsByItemId mapping
+    const productsByItemId = useMemo(() => {
+        const updateProductsByItemId = {}
+        basket?.productItems?.forEach((productItem) => {
+            const currentProduct = products?.[productItem?.productId]
+            updateProductsByItemId[productItem.itemId] = currentProduct
+        })
+        return updateProductsByItemId
+    }, [basket, products])
+
+    // Get pickup shipment items
+    const pickupShipmentItems = useMemo(() => {
+        if (!basket?.shipments || !basket?.productItems) return []
+
+        const pickupShipments = []
+        
+        basket.shipments.forEach((shipment) => {
+            const isPickupOrder = STORE_LOCATOR_IS_ENABLED
+                ? shipment?.shippingMethod?.c_storePickupEnabled === true
+                : false
+            
+            if (isPickupOrder) {
+                const storeId = shipment?.c_fromStoreId
+                const store = storeData?.data?.find((store) => store.id === storeId)
+
+                // Filter products for this shipment
+                const shipmentProducts =
+                    basket.productItems?.filter(
+                        (productItem) => productItem.shipmentId === shipment.shipmentId
+                    ) || []
+
+                // Categorize products into regular and bonus for this shipment
+                const categorizedProducts = shipmentProducts.reduce(
+                    (acc, productItem) => {
+                        if (productItem.bonusProductLineItem) {
+                            acc.bonusProducts.push(productItem)
+                        } else {
+                            acc.regularProducts.push(productItem)
+                        }
+                        return acc
+                    },
+                    {regularProducts: [], bonusProducts: []}
+                )
+
+                pickupShipments.push({
+                    shipment,
+                    store,
+                    categorizedProducts,
+                    itemsInShipment:
+                        categorizedProducts.regularProducts.length +
+                        categorizedProducts.bonusProducts.length
+                })
+            }
+        })
+
+        return pickupShipments
+    }, [basket?.shipments, basket?.productItems, storeData])
     const store = storeData?.data?.[0]
     const pickupAddress = {
         address1: store?.address1,
@@ -102,6 +184,53 @@ const PickupAddress = () => {
                         />
                     </Text>
                     <AddressDisplay address={pickupAddress} />
+                    
+                    {/* Display pickup items */}
+                    {pickupShipmentItems.length > 0 && (
+                        <Box mt={4}>
+                            <Stack spacing={4}>
+                                {pickupShipmentItems.map((shipmentInfo) => (
+                                    <Box
+                                        key={shipmentInfo.shipment?.shipmentId}
+                                        bg="gray.50"
+                                        border="1px solid"
+                                        borderColor="gray.200"
+                                        borderRadius="md"
+                                        p={4}
+                                    >
+                                        {/* Regular Products */}
+                                        {shipmentInfo.categorizedProducts.regularProducts.length > 0 && (
+                                            <CheckoutProductItemList
+                                                productItems={shipmentInfo.categorizedProducts.regularProducts}
+                                                productsByItemId={productsByItemId}
+                                                isProductsLoading={isProductsLoading}
+                                            />
+                                        )}
+
+                                        {/* Bonus Products */}
+                                        {shipmentInfo.categorizedProducts.bonusProducts.length > 0 && (
+                                            <>
+                                                <Box mt={3} mb={2}>
+                                                    <Text fontWeight="bold" fontSize="sm" color="gray.600">
+                                                        <FormattedMessage
+                                                            defaultMessage="Bonus Items"
+                                                            id="pickup_address.bonus_products.title"
+                                                        />
+                                                    </Text>
+                                                </Box>
+                                                <CheckoutProductItemList
+                                                    productItems={shipmentInfo.categorizedProducts.bonusProducts}
+                                                    productsByItemId={productsByItemId}
+                                                    isProductsLoading={isProductsLoading}
+                                                />
+                                            </>
+                                        )}
+                                    </Box>
+                                ))}
+                            </Stack>
+                        </Box>
+                    )}
+                    
                     <Box pt={3}>
                         <Container variant="form">
                             <Button w="full" onClick={() => submitAndContinue(pickupAddress)}>
@@ -123,6 +252,52 @@ const PickupAddress = () => {
                         />
                     </Text>
                     <AddressDisplay address={selectedShippingAddress} />
+                    
+                    {/* Display pickup items in summary */}
+                    {pickupShipmentItems.length > 0 && (
+                        <Box mt={4}>
+                            <Stack spacing={4}>
+                                {pickupShipmentItems.map((shipmentInfo) => (
+                                    <Box
+                                        key={shipmentInfo.shipment?.shipmentId}
+                                        bg="gray.50"
+                                        border="1px solid"
+                                        borderColor="gray.200"
+                                        borderRadius="md"
+                                        p={4}
+                                    >
+                                        {/* Regular Products */}
+                                        {shipmentInfo.categorizedProducts.regularProducts.length > 0 && (
+                                            <CheckoutProductItemList
+                                                productItems={shipmentInfo.categorizedProducts.regularProducts}
+                                                productsByItemId={productsByItemId}
+                                                isProductsLoading={isProductsLoading}
+                                            />
+                                        )}
+
+                                        {/* Bonus Products */}
+                                        {shipmentInfo.categorizedProducts.bonusProducts.length > 0 && (
+                                            <>
+                                                <Box mt={3} mb={2}>
+                                                    <Text fontWeight="bold" fontSize="sm" color="gray.600">
+                                                        <FormattedMessage
+                                                            defaultMessage="Bonus Items"
+                                                            id="pickup_address.bonus_products.title"
+                                                        />
+                                                    </Text>
+                                                </Box>
+                                                <CheckoutProductItemList
+                                                    productItems={shipmentInfo.categorizedProducts.bonusProducts}
+                                                    productsByItemId={productsByItemId}
+                                                    isProductsLoading={isProductsLoading}
+                                                />
+                                            </>
+                                        )}
+                                    </Box>
+                                ))}
+                            </Stack>
+                        </Box>
+                    )}
                 </ToggleCardSummary>
             )}
         </ToggleCard>
