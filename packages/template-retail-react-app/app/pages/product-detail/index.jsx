@@ -415,14 +415,12 @@ const ProductDetail = () => {
                 hasAnyPickupSelected
             )
 
-            if (!targetShipmentId) {
-                throw new Error('Failed to find or create shipment')
+            if (targetShipmentId) {
+                productItems = productItems.map((item) => ({
+                    ...item,
+                    shipmentId: targetShipmentId
+                }))
             }
-
-            productItems = productItems.map((item) => ({
-                ...item,
-                shipmentId: targetShipmentId
-            }))
 
             const basketResponse = await addItemToNewOrExistingBasket(productItems)
 
@@ -580,14 +578,12 @@ const ProductDetail = () => {
                 hasAnyPickupSelected
             )
 
-            if (!targetShipmentId) {
-                throw new Error('Failed to find or create shipment')
+            if (targetShipmentId) {
+                productItems = productItems.map((item) => ({
+                    ...item,
+                    shipmentId: targetShipmentId
+                }))
             }
-
-            productItems = productItems.map((item) => ({
-                ...item,
-                shipmentId: targetShipmentId
-            }))
 
             const res = await addItemToNewOrExistingBasket(productItems)
 
