@@ -29,6 +29,7 @@ import {
     Alert,
     AlertIcon,
     AlertTitle,
+    AlertDescription,
     Center,
     Spinner
 } from '@salesforce/retail-react-app/app/components/shared/ui'
@@ -161,19 +162,19 @@ const ShippingMultiAddress = ({
                 height="200px"
                 aria-live="assertive"
             >
-                <AlertIcon boxSize="40px" mr={0} />
+                <AlertIcon boxSize={5} mr={0} />
                 <AlertTitle mr={2}>
                     {formatMessage({
                         id: 'shipping_multi_address.error.label',
                         defaultMessage: 'Error loading products'
                     })}
                 </AlertTitle>
-                <Text>
+                <AlertDescription>
                     {formatMessage({
                         id: 'shipping_multi_address.error.message',
                         defaultMessage: 'Error loading products. Please try again.'
                     })}
-                </Text>
+                </AlertDescription>
             </Alert>
         )
     }

@@ -210,14 +210,14 @@ describe('ShippingMultiAddress', () => {
         jest.clearAllMocks()
     })
 
-    it('should render empty state when no items in basket', () => {
+    test('should render empty state when no items in basket', () => {
         const emptyBasket = {...mockBasket, productItems: []}
         renderWithIntl(<ShippingMultiAddress {...defaultProps} basket={emptyBasket} />)
 
         expect(screen.getByText('No items in basket.')).toBeInTheDocument()
     })
 
-    it('should render product items with correct information', () => {
+    test('should render product items with correct information', () => {
         renderWithIntl(<ShippingMultiAddress {...defaultProps} />)
 
         expect(screen.getByText('Test Product 1')).toBeInTheDocument()
@@ -226,14 +226,14 @@ describe('ShippingMultiAddress', () => {
         expect(screen.getByText('Quantity: 1')).toBeInTheDocument()
     })
 
-    it('should render delivery address sections for each product', () => {
+    test('should render delivery address sections for each product', () => {
         renderWithIntl(<ShippingMultiAddress {...defaultProps} />)
 
         const deliveryAddressLabels = screen.getAllByText('Delivery Address')
         expect(deliveryAddressLabels).toHaveLength(2)
     })
 
-    it('should render product images', () => {
+    test('should render product images', () => {
         renderWithIntl(<ShippingMultiAddress {...defaultProps} />)
 
         const images = screen.getAllByAltText('Product image for Test Product 1')
@@ -241,7 +241,7 @@ describe('ShippingMultiAddress', () => {
         expect(images[0]).toHaveAttribute('src', 'https://test-image-1.jpg')
     })
 
-    it('should render variation attributes', () => {
+    test('should render variation attributes', () => {
         renderWithIntl(<ShippingMultiAddress {...defaultProps} />)
 
         expect(screen.getByText('Color: Red')).toBeInTheDocument()
@@ -250,7 +250,7 @@ describe('ShippingMultiAddress', () => {
         expect(screen.getByText('Size: Large')).toBeInTheDocument()
     })
 
-    it('should render product prices', () => {
+    test('should render product prices', () => {
         renderWithIntl(<ShippingMultiAddress {...defaultProps} />)
 
         const priceElements = screen.getAllByTestId('display-price')
@@ -262,13 +262,13 @@ describe('ShippingMultiAddress', () => {
         })
     })
 
-    it('should render continue button', () => {
+    test('should render continue button', () => {
         renderWithIntl(<ShippingMultiAddress {...defaultProps} />)
 
         expect(screen.getByText('Continue')).toBeInTheDocument()
     })
 
-    it('should call onSubmit when continue button is clicked', () => {
+    test('should call onSubmit when continue button is clicked', () => {
         const mockOnSubmit = jest.fn()
         renderWithIntl(<ShippingMultiAddress {...defaultProps} onSubmit={mockOnSubmit} />)
 
@@ -276,14 +276,14 @@ describe('ShippingMultiAddress', () => {
         expect(mockOnSubmit).toHaveBeenCalledTimes(1)
     })
 
-    it('should render address dropdowns', () => {
+    test('should render address dropdowns', () => {
         renderWithIntl(<ShippingMultiAddress {...defaultProps} />)
 
         const dropdowns = screen.getAllByRole('combobox', {hidden: true})
         expect(dropdowns.length).toBeGreaterThan(0)
     })
 
-    it('should handle empty product data gracefully', () => {
+    test('should handle empty product data gracefully', () => {
         useProducts.mockReturnValue({
             data: null
         })
@@ -294,7 +294,7 @@ describe('ShippingMultiAddress', () => {
         expect(screen.getByText('Test Product 2')).toBeInTheDocument()
     })
 
-    it('should render with custom submit button label', () => {
+    test('should render with custom submit button label', () => {
         const customProps = {
             ...defaultProps,
             submitButtonLabel: {
@@ -308,7 +308,7 @@ describe('ShippingMultiAddress', () => {
         expect(screen.getByText('Proceed to Shipping')).toBeInTheDocument()
     })
 
-    it('should render with custom add new address label', () => {
+    test('should render with custom add new address label', () => {
         const customProps = {
             ...defaultProps,
             addNewAddressLabel: {
@@ -329,14 +329,14 @@ describe('ShippingMultiAddress', () => {
     })
 
     describe('Accessibility', () => {
-        it('should have proper alt text for images', () => {
+        test('should have proper alt text for images', () => {
             renderWithIntl(<ShippingMultiAddress {...defaultProps} />)
 
             const images = screen.getAllByAltText(/Product image for Test Product/)
             expect(images).toHaveLength(2)
         })
 
-        it('should have proper button roles', () => {
+        test('should have proper button roles', () => {
             renderWithIntl(<ShippingMultiAddress {...defaultProps} />)
 
             const continueButton = screen.getByText('Continue')
@@ -345,7 +345,7 @@ describe('ShippingMultiAddress', () => {
     })
 
     describe('Responsive Design', () => {
-        it('should apply responsive CSS classes', () => {
+        test('should apply responsive CSS classes', () => {
             renderWithIntl(<ShippingMultiAddress {...defaultProps} />)
 
             // Check that the component has the expected number of cards using data-testid
@@ -355,7 +355,7 @@ describe('ShippingMultiAddress', () => {
     })
 
     describe('Internationalization', () => {
-        it('should use proper i18n for address formatting', () => {
+        test('should use proper i18n for address formatting', () => {
             renderWithIntl(<ShippingMultiAddress {...defaultProps} />)
 
             const selectElements = screen.getAllByRole('combobox')
@@ -366,7 +366,7 @@ describe('ShippingMultiAddress', () => {
             })
         })
 
-        it('should handle missing state code in address formatting', () => {
+        test('should handle missing state code in address formatting', () => {
             const customerWithMissingState = {
                 ...mockCustomer,
                 addresses: [
@@ -391,7 +391,7 @@ describe('ShippingMultiAddress', () => {
             })
         })
 
-        it('should display address in current format', () => {
+        test('should display address in current format', () => {
             renderWithIntl(<ShippingMultiAddress {...defaultProps} />)
 
             const selectElements = screen.getAllByRole('combobox')
@@ -400,7 +400,7 @@ describe('ShippingMultiAddress', () => {
             expect(selectElements[0]).toHaveValue('addr-1')
         })
 
-        it('should not use hardcoded address formatting', () => {
+        test('should not use hardcoded address formatting', () => {
             renderWithIntl(<ShippingMultiAddress {...defaultProps} />)
 
             const selectElements = screen.getAllByRole('combobox')
@@ -413,7 +413,7 @@ describe('ShippingMultiAddress', () => {
     })
 
     describe('Keyboard Navigation', () => {
-        it('should handle arrow key navigation in dropdown', () => {
+        test('should handle arrow key navigation in dropdown', () => {
             renderWithIntl(<ShippingMultiAddress {...defaultProps} />)
 
             const selectElements = screen.getAllByRole('combobox')
@@ -429,7 +429,7 @@ describe('ShippingMultiAddress', () => {
             expect(firstSelect).toHaveValue('addr-1')
         })
 
-        it('should handle Enter key to select address', () => {
+        test('should handle Enter key to select address', () => {
             renderWithIntl(<ShippingMultiAddress {...defaultProps} />)
 
             const selectElements = screen.getAllByRole('combobox')
@@ -442,7 +442,7 @@ describe('ShippingMultiAddress', () => {
             expect(firstSelect).toHaveValue('addr-1')
         })
 
-        it('should handle Space key to select address', () => {
+        test('should handle Space key to select address', () => {
             renderWithIntl(<ShippingMultiAddress {...defaultProps} />)
 
             const selectElements = screen.getAllByRole('combobox')
@@ -455,7 +455,7 @@ describe('ShippingMultiAddress', () => {
             expect(firstSelect).toHaveValue('addr-1')
         })
 
-        it('should handle Escape key to close dropdown', () => {
+        test('should handle Escape key to close dropdown', () => {
             renderWithIntl(<ShippingMultiAddress {...defaultProps} />)
 
             const selectElements = screen.getAllByRole('combobox')
