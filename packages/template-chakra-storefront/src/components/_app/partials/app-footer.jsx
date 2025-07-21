@@ -19,7 +19,7 @@ const AppFooter = ({isCheckout}) => {
 }
 
 AppFooter.propTypes = {
-    isCheckout: PropTypes.bool.isRequired
+    isCheckout: PropTypes.bool
 }
 
 export default AppFooter
