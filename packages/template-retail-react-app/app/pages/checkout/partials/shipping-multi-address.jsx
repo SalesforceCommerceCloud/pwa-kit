@@ -207,7 +207,7 @@ const ShippingMultiAddress = ({
                         defaultMessage: 'Products and delivery addresses'
                     })}
                 >
-                    <VStack spacing={2}>
+                    <VStack spacing={2} w="100%" h="100%">
                         {basket.productItems.map((item) => {
                             // Merge product details into item
                             const productDetail = productsMap?.[item.productId] || {}
@@ -233,11 +233,14 @@ const ShippingMultiAddress = ({
                                     role="group"
                                     aria-labelledby={`product-title-${addressKey}`}
                                     aria-describedby={`product-description-${addressKey}`}
+                                    w="100%"
+                                    flex="1"
                                 >
                                     <Flex
                                         direction={{base: 'column', md: 'row'}}
                                         align="flex-start"
                                         w="100%"
+                                        h="100%"
                                         gap={{base: 4, md: 6}}
                                     >
                                         {/* Left: Image and info */}
