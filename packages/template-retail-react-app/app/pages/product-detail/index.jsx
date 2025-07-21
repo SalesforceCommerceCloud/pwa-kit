@@ -428,7 +428,6 @@ const ProductDetail = () => {
             await configureDefaultShipmentIfNeeded(
                 basketResponse,
                 targetShipmentId,
-                productItems,
                 hasAnyPickupSelected,
                 selectedStore
             )
@@ -621,12 +620,7 @@ const ProductDetail = () => {
             }
 
             // Configure shipping method based on pickup selection
-            await configureDefaultShipmentIfNeeded(
-                res,
-                productItems,
-                hasAnyPickupSelected,
-                selectedStore
-            )
+            await configureDefaultShipmentIfNeeded(res, 'me', hasAnyPickupSelected, selectedStore)
 
             einstein.sendAddToCart(productItems)
 

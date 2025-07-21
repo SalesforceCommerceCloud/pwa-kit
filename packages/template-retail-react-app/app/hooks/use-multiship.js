@@ -128,13 +128,7 @@ export const useMultiship = (basket) => {
             defaultShipment && !basket.productItems?.some((item) => item.shipmentId === 'me')
 
         if (isDefaultShipmentEmpty) {
-            return await configureDefaultShipmentIfNeeded(
-                basket,
-                'me',
-                productItems,
-                false,
-                storeInfo
-            )
+            return await configureDefaultShipmentIfNeeded(basket, 'me', false, storeInfo)
         }
 
         // Otherwise, create a new shipment without a shipping method
@@ -242,13 +236,7 @@ export const useMultiship = (basket) => {
             defaultShipment && !basket.productItems?.some((item) => item.shipmentId === 'me')
 
         if (isDefaultShipmentEmpty) {
-            return await configureDefaultShipmentIfNeeded(
-                basket,
-                'me',
-                productItems,
-                true,
-                storeInfo
-            )
+            return await configureDefaultShipmentIfNeeded(basket, 'me', true, storeInfo)
         }
 
         // Get shipping methods to determine the pickup shipping method ID
@@ -464,7 +452,6 @@ export const useMultiship = (basket) => {
             updatedBasket = await configureDefaultShipmentIfNeeded(
                 basket,
                 'me',
-                [productItem],
                 selectedPickup,
                 storeInfo
             )

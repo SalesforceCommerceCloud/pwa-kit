@@ -429,18 +429,14 @@ describe('usePickupShipment', () => {
             })
         })
 
-        test('configures pickup shipment successfully with pickup items', async () => {
+        test('configures pickup shipment successfully', async () => {
             const storeData = {inventoryId: 'store-123', id: 'store-id-456'}
 
             const {result} = renderHook(() => usePickupShipment())
 
             const basketId = 'basket-123'
-            const productItems = [
-                {productId: 'product-1', inventoryId: 'store-123', quantity: 1},
-                {productId: 'product-2', quantity: 2} // No inventoryId, not a pickup item
-            ]
 
-            await result.current.updatePickupShipment(basketId, productItems, storeData)
+            await result.current.updatePickupShipment(basketId, storeData)
 
             expect(mockMutateAsync).toHaveBeenCalledWith({
                 parameters: {
@@ -463,10 +459,9 @@ describe('usePickupShipment', () => {
             const {result} = renderHook(() => usePickupShipment())
 
             const basketId = 'basket-123'
-            const productItems = [{productId: 'product-1', inventoryId: 'store-123', quantity: 1}]
             const options = {pickupShippingMethodId: 'custom-pickup-method'}
 
-            await result.current.updatePickupShipment(basketId, productItems, storeData, options)
+            await result.current.updatePickupShipment(basketId, storeData, options)
 
             expect(mockMutateAsync).toHaveBeenCalledWith({
                 parameters: {
@@ -483,28 +478,12 @@ describe('usePickupShipment', () => {
             })
         })
 
-        test('returns early when no pickup items exist', async () => {
-            const storeData = {inventoryId: 'store-123', id: 'store-id-456'}
-            const {result} = renderHook(() => usePickupShipment())
-
-            const basketId = 'basket-123'
-            const productItems = [
-                {productId: 'product-1', quantity: 1}, // No inventoryId
-                {productId: 'product-2', quantity: 2} // No inventoryId
-            ]
-
-            await result.current.updatePickupShipment(basketId, productItems, storeData)
-
-            expect(mockMutateAsync).not.toHaveBeenCalled()
-        })
-
         test('returns early when store info is invalid and throwOnError is false', async () => {
             const {result} = renderHook(() => usePickupShipment())
 
             const basketId = 'basket-123'
-            const productItems = [{productId: 'product-1', inventoryId: 'store-123', quantity: 1}]
 
-            await result.current.updatePickupShipment(basketId, productItems, null) // Invalid store info
+            await result.current.updatePickupShipment(basketId, null) // Invalid store info
 
             expect(mockMutateAsync).not.toHaveBeenCalled()
         })
@@ -513,11 +492,10 @@ describe('usePickupShipment', () => {
             const {result} = renderHook(() => usePickupShipment())
 
             const basketId = 'basket-123'
-            const productItems = [{productId: 'product-1', inventoryId: 'store-123', quantity: 1}]
             const options = {throwOnError: true}
 
             await expect(
-                result.current.updatePickupShipment(basketId, productItems, null, options) // Invalid store info
+                result.current.updatePickupShipment(basketId, null, options) // Invalid store info
             ).rejects.toThrow('Failed to retrieve store information')
         })
 
@@ -525,9 +503,8 @@ describe('usePickupShipment', () => {
             const {result} = renderHook(() => usePickupShipment())
 
             const basketId = 'basket-123'
-            const productItems = [{productId: 'product-1', inventoryId: 'store-123', quantity: 1}]
 
-            await result.current.updatePickupShipment(basketId, productItems, null)
+            await result.current.updatePickupShipment(basketId, null)
 
             expect(mockMutateAsync).not.toHaveBeenCalled()
         })
@@ -536,11 +513,10 @@ describe('usePickupShipment', () => {
             const {result} = renderHook(() => usePickupShipment())
 
             const basketId = 'basket-123'
-            const productItems = [{productId: 'product-1', inventoryId: 'store-123', quantity: 1}]
             const options = {throwOnError: true}
 
             await expect(
-                result.current.updatePickupShipment(basketId, productItems, null, options)
+                result.current.updatePickupShipment(basketId, null, options)
             ).rejects.toThrow('Failed to retrieve store information')
         })
 
@@ -550,9 +526,8 @@ describe('usePickupShipment', () => {
             const {result} = renderHook(() => usePickupShipment())
 
             const basketId = 'basket-123'
-            const productItems = [{productId: 'product-1', inventoryId: 'store-123', quantity: 1}]
 
-            await result.current.updatePickupShipment(basketId, productItems, storeData)
+            await result.current.updatePickupShipment(basketId, storeData)
 
             expect(mockMutateAsync).not.toHaveBeenCalled()
         })
@@ -563,11 +538,10 @@ describe('usePickupShipment', () => {
             const {result} = renderHook(() => usePickupShipment())
 
             const basketId = 'basket-123'
-            const productItems = [{productId: 'product-1', inventoryId: 'store-123', quantity: 1}]
             const options = {throwOnError: true}
 
             await expect(
-                result.current.updatePickupShipment(basketId, productItems, storeData, options)
+                result.current.updatePickupShipment(basketId, storeData, options)
             ).rejects.toThrow('No store inventory ID found')
         })
 
@@ -582,9 +556,8 @@ describe('usePickupShipment', () => {
             const {result} = renderHook(() => usePickupShipment())
 
             const basketId = 'basket-123'
-            const productItems = [{productId: 'product-1', inventoryId: 'store-123', quantity: 1}]
 
-            await result.current.updatePickupShipment(basketId, productItems, storeData)
+            await result.current.updatePickupShipment(basketId, storeData)
 
             expect(consoleSpy).toHaveBeenCalledWith(
                 'Failed to configure pickup shipment:',
@@ -604,11 +577,10 @@ describe('usePickupShipment', () => {
             const {result} = renderHook(() => usePickupShipment())
 
             const basketId = 'basket-123'
-            const productItems = [{productId: 'product-1', inventoryId: 'store-123', quantity: 1}]
             const options = {throwOnError: true}
 
             await expect(
-                result.current.updatePickupShipment(basketId, productItems, storeData, options)
+                result.current.updatePickupShipment(basketId, storeData, options)
             ).rejects.toThrow('Mutation failed')
         })
     })
@@ -660,7 +632,6 @@ describe('usePickupShipment', () => {
                     }
                 ]
             }
-            const productItems = [{productId: 'product-1', inventoryId: 'inv-1', quantity: 1}]
             const targetShipmentId = 'me'
             const hasAnyPickupSelected = true
             const selectedStore = {id: 'store-1', inventoryId: 'inv-1'}
@@ -668,7 +639,6 @@ describe('usePickupShipment', () => {
             await result.current.configureDefaultShipmentIfNeeded(
                 basketResponse,
                 targetShipmentId,
-                productItems,
                 hasAnyPickupSelected,
                 selectedStore
             )
@@ -706,7 +676,6 @@ describe('usePickupShipment', () => {
                     }
                 ]
             }
-            const productItems = [{productId: 'product-1', quantity: 1}]
             const targetShipmentId = 'me'
             const hasAnyPickupSelected = false
             const selectedStore = {id: 'store-1', inventoryId: 'inv-1'}
@@ -714,7 +683,6 @@ describe('usePickupShipment', () => {
             await result.current.configureDefaultShipmentIfNeeded(
                 basketResponse,
                 targetShipmentId,
-                productItems,
                 hasAnyPickupSelected,
                 selectedStore
             )
@@ -753,7 +721,6 @@ describe('usePickupShipment', () => {
                     }
                 ]
             }
-            const productItems = [{productId: 'product-1', inventoryId: 'inv-1', quantity: 1}]
             const targetShipmentId = 'custom-shipment-456'
             const hasAnyPickupSelected = true
             const selectedStore = {id: 'store-1', inventoryId: 'inv-1'}
@@ -761,7 +728,6 @@ describe('usePickupShipment', () => {
             await result.current.configureDefaultShipmentIfNeeded(
                 basketResponse,
                 targetShipmentId,
-                productItems,
                 hasAnyPickupSelected,
                 selectedStore
             )
@@ -785,7 +751,6 @@ describe('usePickupShipment', () => {
                     }
                 ]
             }
-            const productItems = [{productId: 'product-1', quantity: 1}]
             const targetShipmentId = 'me'
             const hasAnyPickupSelected = true // Pickup selected and current method is pickup
             const selectedStore = {id: 'store-1', inventoryId: 'inv-1'}
@@ -793,7 +758,6 @@ describe('usePickupShipment', () => {
             await result.current.configureDefaultShipmentIfNeeded(
                 basketResponse,
                 targetShipmentId,
-                productItems,
                 hasAnyPickupSelected,
                 selectedStore
             )
@@ -816,7 +780,6 @@ describe('usePickupShipment', () => {
                     }
                 ]
             }
-            const productItems = [{productId: 'product-1', quantity: 1}]
             const targetShipmentId = 'me'
             const hasAnyPickupSelected = false // No pickup selected and current method is not pickup
             const selectedStore = {id: 'store-1', inventoryId: 'inv-1'}
@@ -824,7 +787,6 @@ describe('usePickupShipment', () => {
             await result.current.configureDefaultShipmentIfNeeded(
                 basketResponse,
                 targetShipmentId,
-                productItems,
                 hasAnyPickupSelected,
                 selectedStore
             )
@@ -859,7 +821,6 @@ describe('usePickupShipment', () => {
                     }
                 ]
             }
-            const productItems = [{productId: 'product-1', inventoryId: 'inv-1', quantity: 1}]
             const targetShipmentId = 'me'
             const hasAnyPickupSelected = true
             const selectedStore = {id: 'store-1', inventoryId: 'inv-1'}
@@ -867,7 +828,6 @@ describe('usePickupShipment', () => {
             await result.current.configureDefaultShipmentIfNeeded(
                 basketResponse,
                 targetShipmentId,
-                productItems,
                 hasAnyPickupSelected,
                 selectedStore
             )
@@ -916,7 +876,6 @@ describe('usePickupShipment', () => {
                     }
                 ]
             }
-            const productItems = [{productId: 'product-1', quantity: 1}]
             const targetShipmentId = 'me'
             const hasAnyPickupSelected = false
             const selectedStore = {id: 'store-1', inventoryId: 'inv-1'}
@@ -924,7 +883,6 @@ describe('usePickupShipment', () => {
             await result.current.configureDefaultShipmentIfNeeded(
                 basketResponse,
                 targetShipmentId,
-                productItems,
                 hasAnyPickupSelected,
                 selectedStore
             )

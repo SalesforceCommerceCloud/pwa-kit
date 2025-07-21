@@ -491,7 +491,6 @@ describe('useMultiship', () => {
             expect(mockConfigureDefaultShipmentIfNeeded).toHaveBeenCalledWith(
                 basketWithEmptyDefault,
                 'me',
-                [],
                 false,
                 mockStoreInfo
             )
@@ -569,7 +568,6 @@ describe('useMultiship', () => {
             expect(mockConfigureDefaultShipmentIfNeeded).toHaveBeenCalledWith(
                 basketWithEmptyDefault,
                 'me',
-                [],
                 true,
                 mockStoreInfo
             )
@@ -1271,7 +1269,6 @@ describe('useMultiship', () => {
                 expect(mockConfigureDefaultShipmentIfNeeded).toHaveBeenCalledWith(
                     basketWithSingleItemInMe,
                     'me',
-                    [mockProductItem],
                     true,
                     mockStoreInfo
                 )
@@ -1341,7 +1338,6 @@ describe('useMultiship', () => {
                 expect(mockConfigureDefaultShipmentIfNeeded).toHaveBeenCalledWith(
                     basketWithPickupAndSingleItemInMe,
                     'me',
-                    [mockProductItem],
                     true,
                     mockStoreInfo
                 )
@@ -1422,12 +1418,6 @@ describe('useMultiship', () => {
                 expect(mockConfigureDefaultShipmentIfNeeded).toHaveBeenCalledWith(
                     basketWithPickupSingleItemInMe,
                     'me',
-                    [
-                        {
-                            ...mockProductItem,
-                            inventoryId: 'inventory-1'
-                        }
-                    ],
                     false,
                     mockStoreInfo
                 )
@@ -1504,12 +1494,6 @@ describe('useMultiship', () => {
                 expect(mockConfigureDefaultShipmentIfNeeded).toHaveBeenCalledWith(
                     basketWithPickupAndDeliveryShipments,
                     'me',
-                    [
-                        {
-                            ...mockProductItem,
-                            inventoryId: 'inventory-1'
-                        }
-                    ],
                     false,
                     mockStoreInfo
                 )
@@ -1667,12 +1651,6 @@ describe('useMultiship', () => {
                 expect(mockConfigureDefaultShipmentIfNeeded).toHaveBeenCalledWith(
                     basketWithDifferentDeliveryMethods,
                     'me',
-                    [
-                        {
-                            ...mockProductItem,
-                            inventoryId: 'inventory-1'
-                        }
-                    ],
                     false,
                     mockStoreInfo
                 )
@@ -1796,7 +1774,6 @@ describe('useMultiship', () => {
                 expect(mockConfigureDefaultShipmentIfNeeded).toHaveBeenCalledWith(
                     basketWithDifferentStorePickup,
                     'me',
-                    [mockProductItem],
                     true,
                     mockStoreInfo
                 )
