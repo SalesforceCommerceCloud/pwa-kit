@@ -1133,7 +1133,7 @@ describe('useMultiship', () => {
             const {result} = renderHook(() => useMultiship(null))
 
             await act(async () => {
-                await result.current.removeEmptyShipments(mockDefaultInventoryId)
+                await result.current.removeEmptyShipments()
             })
 
             expect(mockRemoveShipmentFromBasket).not.toHaveBeenCalled()
@@ -1144,7 +1144,7 @@ describe('useMultiship', () => {
             const {result} = renderHook(() => useMultiship(basketWithoutId))
 
             await act(async () => {
-                await result.current.removeEmptyShipments(mockDefaultInventoryId)
+                await result.current.removeEmptyShipments()
             })
 
             expect(mockRemoveShipmentFromBasket).not.toHaveBeenCalled()
@@ -1155,7 +1155,7 @@ describe('useMultiship', () => {
             const {result} = renderHook(() => useMultiship(basketWithoutShipments))
 
             await act(async () => {
-                await result.current.removeEmptyShipments(mockDefaultInventoryId)
+                await result.current.removeEmptyShipments()
             })
 
             expect(mockRemoveShipmentFromBasket).not.toHaveBeenCalled()
@@ -1165,7 +1165,7 @@ describe('useMultiship', () => {
             const {result} = renderHook(() => useMultiship(mockBasket))
 
             await act(async () => {
-                await result.current.removeEmptyShipments(mockDefaultInventoryId)
+                await result.current.removeEmptyShipments()
             })
 
             expect(mockRemoveShipmentFromBasket).not.toHaveBeenCalled()
@@ -1198,7 +1198,7 @@ describe('useMultiship', () => {
             const {result} = renderHook(() => useMultiship(basketWithEmptyShipments))
 
             await act(async () => {
-                await result.current.removeEmptyShipments(mockDefaultInventoryId)
+                await result.current.removeEmptyShipments()
             })
 
             expect(mockRemoveShipmentFromBasket).toHaveBeenCalledTimes(2)
@@ -1242,7 +1242,7 @@ describe('useMultiship', () => {
             mockRemoveShipmentFromBasket.mockRejectedValue(new Error('Remove error'))
 
             await act(async () => {
-                await result.current.removeEmptyShipments(mockDefaultInventoryId)
+                await result.current.removeEmptyShipments()
             })
 
             expect(consoleErrorSpy).toHaveBeenCalledWith(
@@ -1292,7 +1292,7 @@ describe('useMultiship', () => {
                 })
 
                 await act(async () => {
-                    await result.current.removeEmptyShipments(mockDefaultInventoryId)
+                    await result.current.removeEmptyShipments()
                 })
 
                 expect(mockConfigureDefaultShipmentIfNeeded).toHaveBeenCalledWith(
@@ -1364,7 +1364,7 @@ describe('useMultiship', () => {
                 mockIsCurrentShippingMethodPickup.mockReturnValue(false)
 
                 await act(async () => {
-                    await result.current.removeEmptyShipments(mockDefaultInventoryId)
+                    await result.current.removeEmptyShipments()
                 })
 
                 expect(mockConfigureDefaultShipmentIfNeeded).toHaveBeenCalledWith(
@@ -1419,7 +1419,7 @@ describe('useMultiship', () => {
                             productId: 'delivery-product-1',
                             quantity: 1,
                             shipmentId: 'delivery-shipment',
-                            inventoryId: 'old-inventory-id'
+                            inventoryId: 'default-inventory-id'
                         }
                     ]
                 }
@@ -1429,7 +1429,7 @@ describe('useMultiship', () => {
                 mockIsCurrentShippingMethodPickup.mockReturnValue(false)
 
                 await act(async () => {
-                    await result.current.removeEmptyShipments(mockDefaultInventoryId)
+                    await result.current.removeEmptyShipments()
                 })
 
                 expect(mockUpdateItemsInBasket).toHaveBeenCalledWith({
@@ -1480,7 +1480,7 @@ describe('useMultiship', () => {
                 })
 
                 await act(async () => {
-                    await result.current.removeEmptyShipments(mockDefaultInventoryId)
+                    await result.current.removeEmptyShipments()
                 })
 
                 // Should not attempt to configure or move items due to missing store info
@@ -1508,7 +1508,7 @@ describe('useMultiship', () => {
                 const {result} = renderHook(() => useMultiship(basketWithAllEmptyShipments))
 
                 await act(async () => {
-                    await result.current.removeEmptyShipments(mockDefaultInventoryId)
+                    await result.current.removeEmptyShipments()
                 })
 
                 // Should not configure "me" since there are no items to consolidate
@@ -1558,7 +1558,7 @@ describe('useMultiship', () => {
                 mockRemoveShipmentFromBasket.mockRejectedValue(new Error('Remove error'))
 
                 await act(async () => {
-                    await result.current.removeEmptyShipments(mockDefaultInventoryId)
+                    await result.current.removeEmptyShipments()
                 })
 
                 expect(consoleErrorSpy).toHaveBeenCalledWith(
@@ -1608,7 +1608,7 @@ describe('useMultiship', () => {
                 mockIsCurrentShippingMethodPickup.mockReturnValue(false)
 
                 await act(async () => {
-                    await result.current.removeEmptyShipments(mockDefaultInventoryId)
+                    await result.current.removeEmptyShipments()
                 })
 
                 // Should consolidate the first non-empty shipment (delivery)
@@ -1687,7 +1687,7 @@ describe('useMultiship', () => {
             })
 
             await act(async () => {
-                await result.current.removeEmptyShipments(mockDefaultInventoryId)
+                await result.current.removeEmptyShipments()
             })
 
             // Should consolidate pickup shipment into "me"

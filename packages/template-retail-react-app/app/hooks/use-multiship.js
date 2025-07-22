@@ -463,10 +463,9 @@ export const useMultiship = (basket) => {
      * Removes empty shipments from the basket
      * Special handling for "me" shipment: if "me" is empty but other shipments have items,
      * transfers items to "me" and reconfigures it appropriately, then removes the original shipment
-     * @param {string} defaultInventoryId - The default inventory ID to use for delivery items (required)
      * @returns {Promise<void>}
      */
-    const removeEmptyShipments = async (defaultInventoryId) => {
+    const removeEmptyShipments = async () => {
         if (!basket?.basketId || !basket?.shipments?.length) {
             return
         }
@@ -528,6 +527,8 @@ export const useMultiship = (basket) => {
                             consolidationSuccessful = true
                         }
                     } else {
+                        const defaultInventoryId = itemsToMove[0]?.inventoryId
+
                         // Reconfigure "me" for delivery and move items
                         await configureDefaultShipmentIfNeeded(basket, 'me', false, null)
                         await moveItemsToDeliveryShipment(itemsToMove, 'me', defaultInventoryId)
