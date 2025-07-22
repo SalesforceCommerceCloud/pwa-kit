@@ -10,6 +10,23 @@
 require('cross-fetch/polyfill')
 require('raf/polyfill') // fix requestAnimationFrame issue with polyfill
 require('@testing-library/jest-dom/extend-expect')
+
+// Add PointerEvent polyfill for jsdom
+class MockPointerEvent extends Event {
+    constructor(type, props) {
+        super(type, props)
+    }
+}
+
+global.PointerEvent = MockPointerEvent
+global.window.PointerEvent = MockPointerEvent
+
+// Add pointer capture methods
+if (typeof Element !== 'undefined') {
+    Element.prototype.setPointerCapture = Element.prototype.setPointerCapture || function() {}
+    Element.prototype.releasePointerCapture = Element.prototype.releasePointerCapture || function() {}
+    Element.prototype.hasPointerCapture = Element.prototype.hasPointerCapture || function() { return false }
+}
 const mockConfig = require('./config/mocks/mock-config')
 
 const mockAppConfig = {
