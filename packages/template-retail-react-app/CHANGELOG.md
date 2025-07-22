@@ -18,6 +18,8 @@
 - Fix passwordless race conditions in form submission [#2758](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2758)
 - Use `<picture>` element for responsive images [#2724](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2724)
 - Add Data Cloud partyIdentification events and improve error handling [#2811](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2811)
+- Introduce the cursor rules to assist project developers [#2820](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2820)
+
 
 ## v6.1.0 (May 22, 2025)
 
