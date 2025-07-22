@@ -5249,6 +5249,84 @@
       "value": "]"
     }
   ],
+  "order.status.cancelled.message": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ŧħīş ǿǿřḓḗḗř ħȧȧş ƀḗḗḗḗƞ ƈȧȧƞƈḗḗŀŀḗḗḓ ȧȧƞḓ ẇīŀŀ ƞǿǿŧ ƀḗḗ ƥřǿǿƈḗḗşşḗḗḓ."
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "order.status.cancelled.title": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ǿřḓḗḗř Ƈȧȧƞƈḗḗŀŀḗḗḓ"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "order.status.current.description": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ƈŭŭřřḗḗƞŧ şŧȧȧŧŭŭş: "
+    },
+    {
+      "type": 1,
+      "value": "status"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "order.status.tracker.subtitle": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ǿřḓḗḗř #"
+    },
+    {
+      "type": 1,
+      "value": "orderNo"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "order.status.tracker.title": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ǿřḓḗḗř Şŧȧȧŧŭŭş"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
   "order_summary.action.remove_promo": [
     {
       "type": 0,
@@ -7351,6 +7429,40 @@
     {
       "type": 0,
       "value": " ŧǿǿ ƥřǿǿƈḗḗḗḗḓ."
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "status.bar.progress": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Şŧḗḗƥ "
+    },
+    {
+      "type": 1,
+      "value": "current"
+    },
+    {
+      "type": 0,
+      "value": " ǿǿƒ "
+    },
+    {
+      "type": 1,
+      "value": "total"
+    },
+    {
+      "type": 0,
+      "value": ": "
+    },
+    {
+      "type": 1,
+      "value": "description"
     },
     {
       "type": 0,

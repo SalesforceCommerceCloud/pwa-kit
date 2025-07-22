@@ -2473,6 +2473,44 @@
       "value": "You're currently browsing in offline mode"
     }
   ],
+  "order.status.cancelled.message": [
+    {
+      "type": 0,
+      "value": "This order has been cancelled and will not be processed."
+    }
+  ],
+  "order.status.cancelled.title": [
+    {
+      "type": 0,
+      "value": "Order Cancelled"
+    }
+  ],
+  "order.status.current.description": [
+    {
+      "type": 0,
+      "value": "Current status: "
+    },
+    {
+      "type": 1,
+      "value": "status"
+    }
+  ],
+  "order.status.tracker.subtitle": [
+    {
+      "type": 0,
+      "value": "Order #"
+    },
+    {
+      "type": 1,
+      "value": "orderNo"
+    }
+  ],
+  "order.status.tracker.title": [
+    {
+      "type": 0,
+      "value": "Order Status"
+    }
+  ],
   "order_summary.action.remove_promo": [
     {
       "type": 0,
@@ -3475,6 +3513,32 @@
     {
       "type": 0,
       "value": " to proceed."
+    }
+  ],
+  "status.bar.progress": [
+    {
+      "type": 0,
+      "value": "Step "
+    },
+    {
+      "type": 1,
+      "value": "current"
+    },
+    {
+      "type": 0,
+      "value": " of "
+    },
+    {
+      "type": 1,
+      "value": "total"
+    },
+    {
+      "type": 0,
+      "value": ": "
+    },
+    {
+      "type": 1,
+      "value": "description"
     }
   ],
   "status_bar.delivered": [
