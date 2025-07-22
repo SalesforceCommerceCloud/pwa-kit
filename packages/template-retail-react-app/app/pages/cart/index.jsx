@@ -293,7 +293,7 @@ const Cart = () => {
     )
     const handleAddToWishlist = async (product) => {
         try {
-            if (!customerId || !wishlist) {
+            if (!customerId || !wishlist?.id) {
                 return
             }
 
@@ -341,7 +341,7 @@ const Cart = () => {
                     )
                 })
             }
-        } catch {
+        } catch (error) {
             showError()
         }
     }

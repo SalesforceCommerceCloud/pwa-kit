@@ -244,17 +244,24 @@ export const AuthModal = ({
 
         // Show a toast only for those registed users returning to the site.
         if (loggingIn) {
-            toast({
-                variant: 'subtle',
-                title: `${formatMessage(
+            // Use different message based on whether we have customer name data
+            const customerName = customer.data?.firstName
+            const welcomeMessage = customerName
+                ? formatMessage(
                     {
                         defaultMessage: 'Welcome {name},',
                         id: 'auth_modal.info.welcome_user'
                     },
-                    {
-                        name: customer.data?.firstName || ''
-                    }
-                )}`,
+                    { name: customerName }
+                )
+                : formatMessage({
+                    defaultMessage: 'Welcome!',
+                    id: 'auth_modal.info.welcome_generic'
+                })
+
+            toast({
+                variant: 'subtle',
+                title: welcomeMessage,
                 description: `${formatMessage({
                     defaultMessage: "You're now signed in.",
                     id: 'auth_modal.description.now_signed_in'

@@ -247,7 +247,12 @@ const ProductList = (props) => {
         setWishlistLoading([...wishlistLoading, product.productId])
 
         // TODO: This wishlist object is from an old API, we need to replace it with the new one.
-        const listId = wishlist.id
+        const listId = wishlist?.id
+        if (!listId) {
+            setWishlistLoading(wishlistLoading.filter((id) => id !== product.productId))
+            return
+        }
+
         await createCustomerProductListItem(
             {
                 parameters: {customerId, listId},
@@ -292,10 +297,20 @@ const ProductList = (props) => {
     const removeItemFromWishlist = async (product) => {
         setWishlistLoading([...wishlistLoading, product.productId])
 
-        const listId = wishlist.id
+        const listId = wishlist?.id
+        if (!listId || !wishlist?.customerProductListItems) {
+            setWishlistLoading(wishlistLoading.filter((id) => id !== product.productId))
+            return
+        }
+
         const itemId = wishlist.customerProductListItems.find(
             (i) => i.productId === product.productId
-        ).id
+        )?.id
+
+        if (!itemId) {
+            setWishlistLoading(wishlistLoading.filter((id) => id !== product.productId))
+            return
+        }
 
         await deleteCustomerProductListItem(
             {

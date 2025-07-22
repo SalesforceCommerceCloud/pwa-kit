@@ -255,6 +255,11 @@ const ProductDetail = () => {
     )
 
     const handleAddToWishlist = (product, variant, quantity) => {
+        // Early return if wishlist data isn't available yet
+        if (!wishlist?.id) {
+            return
+        }
+
         const isItemInWishlist = wishlist?.customerProductListItems?.find(
             (i) => i.productId === variant?.productId || i.productId === product?.id
         )
