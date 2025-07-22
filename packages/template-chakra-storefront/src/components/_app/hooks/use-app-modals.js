@@ -21,13 +21,13 @@ export const useAppModals = () => {
     const dntNotification = useDntNotification()
 
     const {
-        isOpen: isDrawerMenuOpen,
+        open: isDrawerMenuOpen,
         onOpen: onDrawerMenuOpen,
         onClose: onDrawerMenuClose
     } = useDisclosure()
 
     const {
-        isOpen: isOpenStoreLocator,
+        open: isOpenStoreLocator,
         onOpen: onOpenStoreLocator,
         onClose: onCloseStoreLocator
     } = useDisclosure()
