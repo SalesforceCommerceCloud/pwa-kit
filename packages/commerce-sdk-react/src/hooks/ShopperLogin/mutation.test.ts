@@ -36,7 +36,7 @@ const OPTIONS = {
         refresh_token: 'token',
         // These parameters are required in the query parameters for certain mutations, while in the request body for others.
         redirect_uri: 'redirect_uri',
-        response_type: 'response_type',
+        response_type: 'code' as const,
         code_challenge: 'code_challenge'
     },
     body: {
@@ -47,7 +47,7 @@ const OPTIONS = {
         code_challenge: 'code_challenge',
         code_verifier: 'code_verifier',
         dwsid: 'dwsid',
-        grant_type: 'grant_type',
+        grant_type: 'client_credentials' as const,
         hint: 'hint',
         idp_origin: 'idp_origin',
         login_id: 'login_id',
@@ -70,7 +70,7 @@ const TOKEN_RESPONSE: ShopperLoginTypes.TokenResponse = {
     token_type: 'Bearer',
     usid: 'usid',
     idp_access_token: 'idp_access_token',
-    refresh_token_expires_in: 30 * 24 * 3600
+    refresh_token_expires_in: 0
 }
 
 // --- TEST CASES --- //
@@ -78,17 +78,48 @@ type Implemented = ShopperLoginMutation
 // This is an object rather than an array to more easily ensure we cover all mutations
 type TestMap = {[Mut in Implemented]: [Argument<Client[Mut]>, DataType<Client[Mut]>]}
 const testMap: TestMap = {
-    authorizePasswordlessCustomer: [{parameters: {userid: 'test-user'}} as any, 'success' as any],
-    authorizeCustomer: [{parameters: {redirectURI: 'test-uri', hint: 'test-hint'}} as any, undefined],
-    getAccessToken: [{parameters: {grant_type: 'authorization_code' as const}, body: {code: 'test-code'}} as any, TOKEN_RESPONSE],
-    getPasswordResetToken: [{parameters: {login: 'test-login'}} as any, undefined],
-    getPasswordLessAccessToken: [{parameters: {grant_type: 'password' as const}, body: {login_id: 'test-login'}} as any, TOKEN_RESPONSE],
-    getSessionBridgeAccessToken: [{parameters: {grant_type: 'password' as const}, body: {login_id: 'test-login'}} as any, TOKEN_RESPONSE],
-    getTrustedAgentAccessToken: [{parameters: {grant_type: 'password' as const}, body: {login_id: 'test-login'}} as any, TOKEN_RESPONSE],
-    getTrustedSystemAccessToken: [{parameters: {grant_type: 'password' as const}, body: {login_id: 'test-login'}} as any, TOKEN_RESPONSE],
-    introspectToken: [{body: {token: 'test-token'}} as any, {token: 'test-token'} as any],
-    resetPassword: [{body: {token: 'test-token', new_password: 'new-password'}} as any, undefined],
-    revokeToken: [{body: {token: 'test-token'}} as any, {token: 'test-token'} as any],
-    logoutCustomer: [{parameters: {refresh_token: 'test-token'}} as any, TOKEN_RESPONSE]
+    authorizePasswordlessCustomer: [OPTIONS, 'authorizePasswordlessCustomer'],
+    authorizeCustomer: [OPTIONS, undefined],
+    getAccessToken: [OPTIONS, TOKEN_RESPONSE],
+    getPasswordResetToken: [OPTIONS, undefined],
+    getPasswordLessAccessToken: [OPTIONS, TOKEN_RESPONSE],
+    getSessionBridgeAccessToken: [OPTIONS, TOKEN_RESPONSE],
+    getTrustedAgentAccessToken: [OPTIONS, TOKEN_RESPONSE],
+    getTrustedSystemAccessToken: [OPTIONS, TOKEN_RESPONSE],
+    introspectToken: [OPTIONS, {token: 'token'}],
+    resetPassword: [OPTIONS, undefined],
+    revokeToken: [OPTIONS, {token: 'token'}],
+    logoutCustomer: [OPTIONS, TOKEN_RESPONSE]
 }
-// Type assertion is necessary because `
+// Type assertion is necessary because `Object.entries` is limited
+const testCases = Object.entries(testMap) as Array<[Implemented, TestMap[Implemented]]>
+
+describe('ShopperLogin mutations', () => {
+    beforeEach(() => nock.cleanAll())
+    test.each(testCases)('`%s` returns data on success', async (mutationName, [options, data]) => {
+        mockMutationEndpoints(loginEndpoint, data ?? {}) // Fallback for `void` endpoints
+        mockQueryEndpoint(loginEndpoint, data ?? {}) // `customerLogout` uses GET
+
+        const {result} = renderHookWithProviders(() => {
+            return useShopperLoginMutation(mutationName)
+        })
+        expect(result.current.data).toBeUndefined()
+        act(() => result.current.mutate(options))
+        await waitAndExpectSuccess(() => result.current)
+        expect(result.current.data).toEqual(data)
+    })
+    test.each(testCases)('`%s` returns error on error', async (mutationName, [options]) => {
+        mockMutationEndpoints(loginEndpoint, {error: true}, 400)
+        mockQueryEndpoint(loginEndpoint, {error: true}, 400)
+
+        const {result} = renderHookWithProviders(() => {
+            return useShopperLoginMutation(mutationName)
+        })
+        expect(result.current.error).toBeNull()
+        act(() => result.current.mutate(options))
+        await waitAndExpectError(() => result.current)
+        // Validate that we get a `ResponseError` from commerce-sdk-isomorphic. Ideally, we could do
+        // `.toBeInstanceOf(ResponseError)`, but the class isn't exported. :\
+        expect(result.current.error).toHaveProperty('response')
+    })
+})

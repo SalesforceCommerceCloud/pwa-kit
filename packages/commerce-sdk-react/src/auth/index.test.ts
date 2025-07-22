@@ -120,7 +120,8 @@ const configPasswordlessSms = {
 const FAKE_SLAS_EXPIRY = DEFAULT_SLAS_REFRESH_TOKEN_REGISTERED_TTL - 1
 
 const TOKEN_RESPONSE: ShopperLoginTypes.TokenResponse = {
-    access_token: 'access_token_xyz',
+    access_token:
+        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjYy1zbGFzOjp6enJmXzAwMTo6c2NpZDpjOWM0NWJmZC0wZWQzLTRhYTIteHh4eC00MGY4ODk2MmI4MzY6OnVzaWQ6YjQ4NjUyMzMtZGU5Mi00MDM5LXh4eHgtYWEyZGZjOGMxZWE1IiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyLCJpc2IiOiJ1aWRvOmVjb206OnVwbjpHdWVzdHx8am9obi5kb2VAZXhhbXBsZS5jb206OnVpZG46Sm9obiBEb2U6OmdjaWQ6Z3Vlc3QtMTIzNDU6OnJjaWQ6cmVnaXN0ZXJlZC02Nzg5MCIsImRudCI6InRlc3QifQ.9yKtUb22ExO-Q4VNQRAyIgTm63l3x5z45Uu1FIQa5dQ',
     customer_id: 'customer_id_xyz',
     enc_user_id: 'enc_user_id_xyz',
     expires_in: 1800,
@@ -280,7 +281,7 @@ describe('Auth', () => {
             expires_in: 1800,
             id_token: 'id_token',
             idp_access_token: 'idp_access_token',
-            token_type: 'Bearer',
+            token_type: 'token_type',
             usid: 'usid',
             customer_type: 'guest'
         }
@@ -385,7 +386,7 @@ describe('Auth', () => {
             token_type: 'Bearer',
             usid: 'usid',
             customer_type: 'guest',
-            refresh_token_expires_in: 30 * 24 * 3600
+            refresh_token_expires_in: 0
         }
 
         Object.keys(data).forEach((key) => {
@@ -583,9 +584,9 @@ describe('Auth', () => {
         'refreshTokenRegisteredCookieTTL is set correctly for refreshTokenRegisteredCookieTTLValue=`%p`, expected=`%s`',
         async (refreshTokenRegisteredCookieTTL, expected, hasNoResponseValue) => {
             // Mock the loginRegisteredUserB2C helper to return a token response
-            ;(TOKEN_RESPONSE as any).refresh_token_expires_in = hasNoResponseValue
-                ? undefined
-                : DEFAULT_SLAS_REFRESH_TOKEN_GUEST_TTL
+            TOKEN_RESPONSE.refresh_token_expires_in = hasNoResponseValue
+                ? 0
+                : DEFAULT_SLAS_REFRESH_TOKEN_REGISTERED_TTL
             ;(helpers.loginRegisteredUserB2C as jest.Mock).mockResolvedValueOnce(TOKEN_RESPONSE)
 
             const auth = new Auth({...config, refreshTokenRegisteredCookieTTL})
@@ -607,11 +608,10 @@ describe('Auth', () => {
         'refreshTokenGuestCookieTTL is set correctly for refreshTokenGuestCookieTTLValue=`%p`, expected=`%s`',
         async (refreshTokenGuestCookieTTL, expected, hasNoResponseValue) => {
             // Mock the loginRegisteredUserB2C helper to return a token response
-            const tokenResponse = {...TOKEN_RESPONSE}
-            ;(tokenResponse as any).refresh_token_expires_in = hasNoResponseValue
-                ? undefined
+            TOKEN_RESPONSE.refresh_token_expires_in = hasNoResponseValue
+                ? 0
                 : DEFAULT_SLAS_REFRESH_TOKEN_GUEST_TTL
-            ;(helpers.loginGuestUser as jest.Mock).mockResolvedValueOnce(tokenResponse)
+            ;(helpers.loginGuestUser as jest.Mock).mockResolvedValueOnce(TOKEN_RESPONSE)
 
             const auth = new Auth({...config, refreshTokenGuestCookieTTL})
             // Call the public method because the getter for refresh_token_expires_in is private

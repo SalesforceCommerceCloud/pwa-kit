@@ -41,9 +41,9 @@ type TestMap = {[K in keyof Queries]: NonNullable<ReturnType<Queries[K]>['data']
 // This is an object rather than an array to more easily ensure we cover all hooks
 const testMap: TestMap = {
     // These endpoints return type `Object`, which isn't helpful, so we just use some mock data
-    useJwksUri: 'mock-jwks-uri' as any,
-    useUserInfo: 'mock-user-info' as any,
-    useWellknownOpenidConfiguration: 'mock-wellknown-openid-configuration' as any
+    useJwksUri: {mockJwksUriData: true},
+    useUserInfo: 'useUserInfo',
+    useWellknownOpenidConfiguration: 'useWellknownOpenidConfiguration'
 }
 // Type assertion is necessary because `Object.entries` is limited
 const testCases = Object.entries(testMap) as Array<[keyof TestMap, TestMap[keyof TestMap]]>

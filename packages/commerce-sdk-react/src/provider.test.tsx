@@ -31,7 +31,7 @@ describe('provider', () => {
             headers: {'correlation-id': '373a3f80-6bbb-4157-a617-63d27fb15769'},
             fetchOptions: {
                 timeout: 50
-            } as any
+            }
         }
         renderWithProviders(<Component />, config)
         expect(screen.getByText(config.headers['correlation-id'])).toBeInTheDocument()
