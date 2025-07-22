@@ -1047,21 +1047,6 @@
   "offline_banner.description.browsing_offline_mode": {
     "defaultMessage": "You're currently browsing in offline mode"
   },
-  "order.status.cancelled.message": {
-    "defaultMessage": "This order has been cancelled and will not be processed."
-  },
-  "order.status.cancelled.title": {
-    "defaultMessage": "Order Cancelled"
-  },
-  "order.status.current.description": {
-    "defaultMessage": "Current status: {status}"
-  },
-  "order.status.tracker.subtitle": {
-    "defaultMessage": "Order #{orderNo}"
-  },
-  "order.status.tracker.title": {
-    "defaultMessage": "Order Status"
-  },
   "order_summary.action.remove_promo": {
     "defaultMessage": "Remove"
   },
@@ -1483,9 +1468,6 @@
   },
   "social_login_redirect.message.redirect_link": {
     "defaultMessage": "If you are not automatically redirected, click <link>this link</link> to proceed."
-  },
-  "status.bar.progress": {
-    "defaultMessage": "Step {current} of {total}: {description}"
   },
   "status_bar.delivered": {
     "defaultMessage": "Delivered"
