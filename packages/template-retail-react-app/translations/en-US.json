@@ -1421,8 +1421,23 @@
   "selected_refinements.filter.in_stock": {
     "defaultMessage": "In Stock"
   },
+  "shipping_address.action.deliver_to_multiple_addresses": {
+    "defaultMessage": "Deliver to Multiple Addresses"
+  },
+  "shipping_address.action.ship_to_one_address": {
+    "defaultMessage": "Ship Items to One Address"
+  },
+  "shipping_address.button.add_new_address": {
+    "defaultMessage": "Add New Address"
+  },
   "shipping_address.button.continue_to_shipping": {
     "defaultMessage": "Continue to Shipping Method"
+  },
+  "shipping_address.error.update_failed": {
+    "defaultMessage": "Error updating shipping address. Please try again."
+  },
+  "shipping_address.label.delivery_address": {
+    "defaultMessage": "Delivery Address"
   },
   "shipping_address.label.edit_button": {
     "defaultMessage": "Edit {address}"
@@ -1432,6 +1447,9 @@
   },
   "shipping_address.label.shipping_address_form": {
     "defaultMessage": "Shipping Address Form"
+  },
+  "shipping_address.message.no_items_in_basket": {
+    "defaultMessage": "No items in basket."
   },
   "shipping_address.title.shipping_address": {
     "defaultMessage": "Shipping Address"
@@ -1456,6 +1474,27 @@
   },
   "shipping_address_selection.title.edit_shipping": {
     "defaultMessage": "Edit Shipping Address"
+  },
+  "shipping_multi_address.error.label": {
+    "defaultMessage": "Error loading products"
+  },
+  "shipping_multi_address.error.message": {
+    "defaultMessage": "Error loading products. Please try again."
+  },
+  "shipping_multi_address.format.address_line_2": {
+    "defaultMessage": "{city}, {stateCode} {postalCode}"
+  },
+  "shipping_multi_address.image.alt": {
+    "defaultMessage": "Product image for {productName}"
+  },
+  "shipping_multi_address.loading.message": {
+    "defaultMessage": "Loading products..."
+  },
+  "shipping_multi_address.product_attributes.label": {
+    "defaultMessage": "Product attributes"
+  },
+  "shipping_multi_address.quantity.label": {
+    "defaultMessage": "Quantity"
   },
   "shipping_options.action.send_as_a_gift": {
     "defaultMessage": "Do you want to send this as a gift?"
