@@ -310,14 +310,6 @@ describe('Recommended Products', () => {
         // const user = userEvent.setup({advanceTimers: jest.advanceTimersByTime})
         renderWithProviders(<MockedComponent />)
 
-        // If we poll for updates immediately, the test output is flooded with errors:
-        // "Warning: An update to WrappedComponent inside a test was not wrapped in act(...)."
-        // If we wait to poll until the component is updated, then the errors disappear. Using a
-        // timeout is clearly a suboptimal solution, but I don't know the "correct" way to fix it.
-        // let done = false
-        // setTimeout(() => (done = true), 200)
-        // await waitFor(() => expect(done).toBeTruthy())
-
         await waitFor(() => {
             expect(screen.getByRole('link', {name: /mens/i})).toBeInTheDocument()
             expect(screen.getByText(/You might also like/i)).toBeInTheDocument()
@@ -326,14 +318,7 @@ describe('Recommended Products', () => {
         })
     })
 })
-function delay(ms) {
-    return new Promise((resolve) => setTimeout(resolve, ms))
-}
-//TODO: fix failing unhandle api mock
-// Found an unhandled GET request to
-// https://www.domain.com/mobify/proxy/api/product/shopper-products/v1/organizations/f_ecom_zzrf_001/products?ids=11736753M%2C22951021M%2C25592770M%2C25752986M&expand=availability%2Clinks%2Cpromotions%2Coptions%2Cimages%2Cprices%2Cvariations&locale=en-GB&allImages=true&perPricebook=true&siteId=site-1
-// console.error
-//     retail-react-app.useEinstein.fetchRecProductDetails ERROR Error fetching product details for recommendations {"error":{"response":{"size":0,"timeout":0}}}
+
 describe('product bundles', () => {
     let hasUpdatedBundleChildren = false
     beforeEach(() => {
