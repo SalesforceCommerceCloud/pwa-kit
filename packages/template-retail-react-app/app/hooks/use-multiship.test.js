@@ -179,6 +179,7 @@ describe('useMultiship', () => {
 
             expect(result.current).toHaveProperty('assignDefaultShippingMethodsToShipments')
             expect(result.current).toHaveProperty('handleDeliveryOptionChange')
+            expect(result.current).toHaveProperty('removeEmptyShipments')
             expect(result.current).toHaveProperty('findExistingDeliveryShipment')
             expect(result.current).toHaveProperty('findExistingPickupShipment')
             expect(result.current).toHaveProperty('createNewDeliveryShipment')
@@ -1885,6 +1886,613 @@ describe('useMultiship', () => {
                 expect(mockCreateShipmentForBasket).toHaveBeenCalled()
                 expect(mockUpdateItemInBasket).toHaveBeenCalled()
                 expect(mockConfigureDefaultShipmentIfNeeded).not.toHaveBeenCalled()
+            })
+        })
+    })
+
+    describe('removeEmptyShipments', () => {
+        test('should return early if no basket', async () => {
+            const {result} = renderHook(() => useMultiship(null))
+
+            await act(async () => {
+                await result.current.removeEmptyShipments(mockDefaultInventoryId)
+            })
+
+            expect(mockRemoveShipmentFromBasket).not.toHaveBeenCalled()
+        })
+
+        test('should return early if no basketId', async () => {
+            const basketWithoutId = {...mockBasket, basketId: undefined}
+            const {result} = renderHook(() => useMultiship(basketWithoutId))
+
+            await act(async () => {
+                await result.current.removeEmptyShipments(mockDefaultInventoryId)
+            })
+
+            expect(mockRemoveShipmentFromBasket).not.toHaveBeenCalled()
+        })
+
+        test('should return early if no shipments', async () => {
+            const basketWithoutShipments = {...mockBasket, shipments: []}
+            const {result} = renderHook(() => useMultiship(basketWithoutShipments))
+
+            await act(async () => {
+                await result.current.removeEmptyShipments(mockDefaultInventoryId)
+            })
+
+            expect(mockRemoveShipmentFromBasket).not.toHaveBeenCalled()
+        })
+
+        test('should return early if no empty shipments', async () => {
+            const {result} = renderHook(() => useMultiship(mockBasket))
+
+            await act(async () => {
+                await result.current.removeEmptyShipments(mockDefaultInventoryId)
+            })
+
+            expect(mockRemoveShipmentFromBasket).not.toHaveBeenCalled()
+        })
+
+        test('should remove empty non-me shipments', async () => {
+            const basketWithEmptyShipments = {
+                ...mockBasket,
+                shipments: [
+                    ...mockBasket.shipments,
+                    {
+                        shipmentId: 'empty-shipment-1',
+                        shippingMethod: {id: 'default-shipping-method'}
+                    },
+                    {
+                        shipmentId: 'empty-shipment-2',
+                        shippingMethod: {id: 'pickup-shipping-method'}
+                    }
+                ],
+                productItems: [
+                    {
+                        itemId: 'item-1',
+                        productId: 'product-1',
+                        quantity: 1,
+                        shipmentId: 'me'
+                    }
+                ] // Items only in 'me' shipment
+            }
+
+            const {result} = renderHook(() => useMultiship(basketWithEmptyShipments))
+
+            await act(async () => {
+                await result.current.removeEmptyShipments(mockDefaultInventoryId)
+            })
+
+            expect(mockRemoveShipmentFromBasket).toHaveBeenCalledTimes(2)
+            expect(mockRemoveShipmentFromBasket).toHaveBeenCalledWith({
+                parameters: {
+                    basketId: 'test-basket-id',
+                    shipmentId: 'empty-shipment-1'
+                }
+            })
+            expect(mockRemoveShipmentFromBasket).toHaveBeenCalledWith({
+                parameters: {
+                    basketId: 'test-basket-id',
+                    shipmentId: 'empty-shipment-2'
+                }
+            })
+        })
+
+        test('should handle error when removing empty shipment', async () => {
+            const basketWithEmptyShipment = {
+                ...mockBasket,
+                shipments: [
+                    ...mockBasket.shipments,
+                    {
+                        shipmentId: 'empty-shipment',
+                        shippingMethod: {id: 'default-shipping-method'}
+                    }
+                ],
+                productItems: [
+                    {
+                        itemId: 'item-1',
+                        productId: 'product-1',
+                        quantity: 1,
+                        shipmentId: 'me'
+                    }
+                ] // Items only in 'me' shipment
+            }
+
+            const {result} = renderHook(() => useMultiship(basketWithEmptyShipment))
+
+            const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {})
+            mockRemoveShipmentFromBasket.mockRejectedValue(new Error('Remove error'))
+
+            await act(async () => {
+                await result.current.removeEmptyShipments(mockDefaultInventoryId)
+            })
+
+            expect(consoleErrorSpy).toHaveBeenCalledWith(
+                'Failed to remove empty shipment empty-shipment:',
+                expect.any(Error)
+            )
+            consoleErrorSpy.mockRestore()
+        })
+
+        describe('when "me" is empty', () => {
+            test('should consolidate pickup shipment into "me"', async () => {
+                const basketWithEmptyMe = {
+                    ...mockBasket,
+                    shipments: [
+                        {
+                            shipmentId: 'me',
+                            shippingMethod: {id: 'default-shipping-method'}
+                        },
+                        {
+                            shipmentId: 'pickup-shipment',
+                            shippingMethod: {id: 'pickup-shipping-method'},
+                            c_fromStoreId: 'store-1'
+                        }
+                    ],
+                    productItems: [
+                        {
+                            itemId: 'pickup-item-1',
+                            productId: 'pickup-product-1',
+                            quantity: 1,
+                            shipmentId: 'pickup-shipment',
+                            inventoryId: 'inventory-1'
+                        },
+                        {
+                            itemId: 'pickup-item-2',
+                            productId: 'pickup-product-2',
+                            quantity: 2,
+                            shipmentId: 'pickup-shipment',
+                            inventoryId: 'inventory-1'
+                        }
+                    ]
+                }
+
+                const {result} = renderHook(() => useMultiship(basketWithEmptyMe))
+
+                mockIsCurrentShippingMethodPickup.mockImplementation((method) => {
+                    return method?.id === 'pickup-shipping-method'
+                })
+
+                await act(async () => {
+                    await result.current.removeEmptyShipments(mockDefaultInventoryId)
+                })
+
+                expect(mockConfigureDefaultShipmentIfNeeded).toHaveBeenCalledWith(
+                    basketWithEmptyMe,
+                    'me',
+                    true,
+                    {id: 'store-1', inventoryId: 'inventory-1'}
+                )
+                expect(mockUpdateItemsInBasket).toHaveBeenCalledWith({
+                    parameters: {
+                        basketId: 'test-basket-id'
+                    },
+                    body: [
+                        {
+                            itemId: 'pickup-item-1',
+                            productId: 'pickup-product-1',
+                            quantity: 1,
+                            shipmentId: 'me',
+                            inventoryId: 'inventory-1'
+                        },
+                        {
+                            itemId: 'pickup-item-2',
+                            productId: 'pickup-product-2',
+                            quantity: 2,
+                            shipmentId: 'me',
+                            inventoryId: 'inventory-1'
+                        }
+                    ]
+                })
+                expect(mockRemoveShipmentFromBasket).toHaveBeenCalledWith({
+                    parameters: {
+                        basketId: 'test-basket-id',
+                        shipmentId: 'pickup-shipment'
+                    }
+                })
+            })
+
+            test('should consolidate delivery shipment into "me"', async () => {
+                const basketWithEmptyMe = {
+                    ...mockBasket,
+                    shipments: [
+                        {
+                            shipmentId: 'me',
+                            shippingMethod: {id: 'default-shipping-method'}
+                        },
+                        {
+                            shipmentId: 'delivery-shipment',
+                            shippingMethod: {id: 'default-shipping-method'}
+                        }
+                    ],
+                    productItems: [
+                        {
+                            itemId: 'delivery-item-1',
+                            productId: 'delivery-product-1',
+                            quantity: 1,
+                            shipmentId: 'delivery-shipment'
+                        },
+                        {
+                            itemId: 'delivery-item-2',
+                            productId: 'delivery-product-2',
+                            quantity: 3,
+                            shipmentId: 'delivery-shipment'
+                        }
+                    ]
+                }
+
+                const {result} = renderHook(() => useMultiship(basketWithEmptyMe))
+
+                mockIsCurrentShippingMethodPickup.mockReturnValue(false)
+
+                await act(async () => {
+                    await result.current.removeEmptyShipments(mockDefaultInventoryId)
+                })
+
+                expect(mockConfigureDefaultShipmentIfNeeded).toHaveBeenCalledWith(
+                    basketWithEmptyMe,
+                    'me',
+                    false,
+                    null
+                )
+                expect(mockUpdateItemsInBasket).toHaveBeenCalledWith({
+                    parameters: {
+                        basketId: 'test-basket-id'
+                    },
+                    body: [
+                        {
+                            itemId: 'delivery-item-1',
+                            productId: 'delivery-product-1',
+                            quantity: 1,
+                            shipmentId: 'me'
+                        },
+                        {
+                            itemId: 'delivery-item-2',
+                            productId: 'delivery-product-2',
+                            quantity: 3,
+                            shipmentId: 'me'
+                        }
+                    ]
+                })
+                expect(mockRemoveShipmentFromBasket).toHaveBeenCalledWith({
+                    parameters: {
+                        basketId: 'test-basket-id',
+                        shipmentId: 'delivery-shipment'
+                    }
+                })
+            })
+
+            test('should consolidate delivery shipment into "me" with defaultInventoryId', async () => {
+                const basketWithEmptyMe = {
+                    ...mockBasket,
+                    shipments: [
+                        {
+                            shipmentId: 'me',
+                            shippingMethod: {id: 'default-shipping-method'}
+                        },
+                        {
+                            shipmentId: 'delivery-shipment',
+                            shippingMethod: {id: 'default-shipping-method'}
+                        }
+                    ],
+                    productItems: [
+                        {
+                            itemId: 'delivery-item-1',
+                            productId: 'delivery-product-1',
+                            quantity: 1,
+                            shipmentId: 'delivery-shipment',
+                            inventoryId: 'old-inventory-id'
+                        }
+                    ]
+                }
+
+                const {result} = renderHook(() => useMultiship(basketWithEmptyMe))
+
+                mockIsCurrentShippingMethodPickup.mockReturnValue(false)
+
+                await act(async () => {
+                    await result.current.removeEmptyShipments(mockDefaultInventoryId)
+                })
+
+                expect(mockUpdateItemsInBasket).toHaveBeenCalledWith({
+                    parameters: {
+                        basketId: 'test-basket-id'
+                    },
+                    body: [
+                        {
+                            itemId: 'delivery-item-1',
+                            productId: 'delivery-product-1',
+                            quantity: 1,
+                            shipmentId: 'me',
+                            inventoryId: mockDefaultInventoryId
+                        }
+                    ]
+                })
+            })
+
+            test('should not consolidate if pickup shipment missing store info', async () => {
+                const basketWithEmptyMe = {
+                    ...mockBasket,
+                    shipments: [
+                        {
+                            shipmentId: 'me',
+                            shippingMethod: {id: 'default-shipping-method'}
+                        },
+                        {
+                            shipmentId: 'pickup-shipment',
+                            shippingMethod: {id: 'pickup-shipping-method'}
+                            // Missing c_fromStoreId
+                        }
+                    ],
+                    productItems: [
+                        {
+                            itemId: 'pickup-item-1',
+                            productId: 'pickup-product-1',
+                            quantity: 1,
+                            shipmentId: 'pickup-shipment'
+                            // Missing inventoryId
+                        }
+                    ]
+                }
+
+                const {result} = renderHook(() => useMultiship(basketWithEmptyMe))
+
+                mockIsCurrentShippingMethodPickup.mockImplementation((method) => {
+                    return method?.id === 'pickup-shipping-method'
+                })
+
+                await act(async () => {
+                    await result.current.removeEmptyShipments(mockDefaultInventoryId)
+                })
+
+                // Should not attempt to configure or move items due to missing store info
+                expect(mockConfigureDefaultShipmentIfNeeded).not.toHaveBeenCalled()
+                expect(mockUpdateItemsInBasket).not.toHaveBeenCalled()
+                expect(mockRemoveShipmentFromBasket).not.toHaveBeenCalled()
+            })
+
+            test('should do nothing if "me" is empty and no other shipments have items', async () => {
+                const basketWithAllEmptyShipments = {
+                    ...mockBasket,
+                    shipments: [
+                        {
+                            shipmentId: 'me',
+                            shippingMethod: {id: 'default-shipping-method'}
+                        },
+                        {
+                            shipmentId: 'empty-shipment',
+                            shippingMethod: {id: 'default-shipping-method'}
+                        }
+                    ],
+                    productItems: [] // No items in any shipment
+                }
+
+                const {result} = renderHook(() => useMultiship(basketWithAllEmptyShipments))
+
+                await act(async () => {
+                    await result.current.removeEmptyShipments(mockDefaultInventoryId)
+                })
+
+                // Should not configure "me" since there are no items to consolidate
+                expect(mockConfigureDefaultShipmentIfNeeded).not.toHaveBeenCalled()
+                expect(mockUpdateItemsInBasket).not.toHaveBeenCalled()
+                // Should still remove other empty shipments
+                expect(mockRemoveShipmentFromBasket).toHaveBeenCalledWith({
+                    parameters: {
+                        basketId: 'test-basket-id',
+                        shipmentId: 'empty-shipment'
+                    }
+                })
+            })
+
+            test('should handle error when consolidating pickup shipment', async () => {
+                const basketWithEmptyMe = {
+                    ...mockBasket,
+                    shipments: [
+                        {
+                            shipmentId: 'me',
+                            shippingMethod: {id: 'default-shipping-method'}
+                        },
+                        {
+                            shipmentId: 'pickup-shipment',
+                            shippingMethod: {id: 'pickup-shipping-method'},
+                            c_fromStoreId: 'store-1'
+                        }
+                    ],
+                    productItems: [
+                        {
+                            itemId: 'pickup-item-1',
+                            productId: 'pickup-product-1',
+                            quantity: 1,
+                            shipmentId: 'pickup-shipment',
+                            inventoryId: 'inventory-1'
+                        }
+                    ]
+                }
+
+                const {result} = renderHook(() => useMultiship(basketWithEmptyMe))
+
+                mockIsCurrentShippingMethodPickup.mockImplementation((method) => {
+                    return method?.id === 'pickup-shipping-method'
+                })
+
+                const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {})
+                mockRemoveShipmentFromBasket.mockRejectedValue(new Error('Remove error'))
+
+                await act(async () => {
+                    await result.current.removeEmptyShipments(mockDefaultInventoryId)
+                })
+
+                expect(consoleErrorSpy).toHaveBeenCalledWith(
+                    'Failed to remove consolidated shipment pickup-shipment:',
+                    expect.any(Error)
+                )
+                consoleErrorSpy.mockRestore()
+            })
+
+            test('should prioritize first non-empty shipment for consolidation', async () => {
+                const basketWithMultipleNonEmptyShipments = {
+                    ...mockBasket,
+                    shipments: [
+                        {
+                            shipmentId: 'me',
+                            shippingMethod: {id: 'default-shipping-method'}
+                        },
+                        {
+                            shipmentId: 'first-shipment',
+                            shippingMethod: {id: 'default-shipping-method'}
+                        },
+                        {
+                            shipmentId: 'second-shipment',
+                            shippingMethod: {id: 'pickup-shipping-method'},
+                            c_fromStoreId: 'store-1'
+                        }
+                    ],
+                    productItems: [
+                        {
+                            itemId: 'first-item',
+                            productId: 'first-product',
+                            quantity: 1,
+                            shipmentId: 'first-shipment'
+                        },
+                        {
+                            itemId: 'second-item',
+                            productId: 'second-product',
+                            quantity: 1,
+                            shipmentId: 'second-shipment',
+                            inventoryId: 'inventory-1'
+                        }
+                    ]
+                }
+
+                const {result} = renderHook(() => useMultiship(basketWithMultipleNonEmptyShipments))
+
+                mockIsCurrentShippingMethodPickup.mockReturnValue(false)
+
+                await act(async () => {
+                    await result.current.removeEmptyShipments(mockDefaultInventoryId)
+                })
+
+                // Should consolidate the first non-empty shipment (delivery)
+                expect(mockConfigureDefaultShipmentIfNeeded).toHaveBeenCalledWith(
+                    basketWithMultipleNonEmptyShipments,
+                    'me',
+                    false,
+                    null
+                )
+                expect(mockUpdateItemsInBasket).toHaveBeenCalledWith({
+                    parameters: {
+                        basketId: 'test-basket-id'
+                    },
+                    body: [
+                        {
+                            itemId: 'first-item',
+                            productId: 'first-product',
+                            quantity: 1,
+                            shipmentId: 'me'
+                        }
+                    ]
+                })
+                expect(mockRemoveShipmentFromBasket).toHaveBeenCalledWith({
+                    parameters: {
+                        basketId: 'test-basket-id',
+                        shipmentId: 'first-shipment'
+                    }
+                })
+                // Should not touch the second shipment
+                expect(mockRemoveShipmentFromBasket).not.toHaveBeenCalledWith({
+                    parameters: {
+                        basketId: 'test-basket-id',
+                        shipmentId: 'second-shipment'
+                    }
+                })
+            })
+        })
+
+        test('should handle mixed scenario with empty "me" and other empty shipments', async () => {
+            const basketWithMixedEmptyShipments = {
+                ...mockBasket,
+                shipments: [
+                    {
+                        shipmentId: 'me',
+                        shippingMethod: {id: 'default-shipping-method'}
+                    },
+                    {
+                        shipmentId: 'pickup-shipment',
+                        shippingMethod: {id: 'pickup-shipping-method'},
+                        c_fromStoreId: 'store-1'
+                    },
+                    {
+                        shipmentId: 'empty-shipment-1',
+                        shippingMethod: {id: 'default-shipping-method'}
+                    },
+                    {
+                        shipmentId: 'empty-shipment-2',
+                        shippingMethod: {id: 'pickup-shipping-method'}
+                    }
+                ],
+                productItems: [
+                    {
+                        itemId: 'pickup-item',
+                        productId: 'pickup-product',
+                        quantity: 1,
+                        shipmentId: 'pickup-shipment',
+                        inventoryId: 'inventory-1'
+                    }
+                ]
+            }
+
+            const {result} = renderHook(() => useMultiship(basketWithMixedEmptyShipments))
+
+            mockIsCurrentShippingMethodPickup.mockImplementation((method) => {
+                return method?.id === 'pickup-shipping-method'
+            })
+
+            await act(async () => {
+                await result.current.removeEmptyShipments(mockDefaultInventoryId)
+            })
+
+            // Should consolidate pickup shipment into "me"
+            expect(mockConfigureDefaultShipmentIfNeeded).toHaveBeenCalledWith(
+                basketWithMixedEmptyShipments,
+                'me',
+                true,
+                {id: 'store-1', inventoryId: 'inventory-1'}
+            )
+            expect(mockUpdateItemsInBasket).toHaveBeenCalledWith({
+                parameters: {
+                    basketId: 'test-basket-id'
+                },
+                body: [
+                    {
+                        itemId: 'pickup-item',
+                        productId: 'pickup-product',
+                        quantity: 1,
+                        shipmentId: 'me',
+                        inventoryId: 'inventory-1'
+                    }
+                ]
+            })
+
+            // Should remove all empty shipments including the consolidated one
+            expect(mockRemoveShipmentFromBasket).toHaveBeenCalledTimes(3)
+            expect(mockRemoveShipmentFromBasket).toHaveBeenCalledWith({
+                parameters: {
+                    basketId: 'test-basket-id',
+                    shipmentId: 'pickup-shipment'
+                }
+            })
+            expect(mockRemoveShipmentFromBasket).toHaveBeenCalledWith({
+                parameters: {
+                    basketId: 'test-basket-id',
+                    shipmentId: 'empty-shipment-1'
+                }
+            })
+            expect(mockRemoveShipmentFromBasket).toHaveBeenCalledWith({
+                parameters: {
+                    basketId: 'test-basket-id',
+                    shipmentId: 'empty-shipment-2'
+                }
             })
         })
     })
