@@ -43,7 +43,7 @@ describe('ListMenu', () => {
         renderWithProviders(<ListMenu root={mockCategories.root} itemsKey="categories" />)
 
         // Find the popover trigger button (which wraps the entire ListMenuTrigger)
-        const triggerButton = screen.getByRole('button', { expanded: false })
+        const triggerButton = screen.getByRole('button', {expanded: false})
         expect(triggerButton).toBeInTheDocument()
 
         // Focus on the trigger button and press Enter to open popover
@@ -61,7 +61,7 @@ describe('ListMenu', () => {
 
         // Focus on a focusable element within the popover (the Suits link) before pressing Escape
         // In real non-test scenario, this focusing should already happen automatically.
-        const suitsLink = screen.getByRole('link', { name: /suits/i })
+        const suitsLink = screen.getByRole('link', {name: /suits/i})
         await act(async () => {
             suitsLink.focus()
             await user.keyboard('{Escape}')
