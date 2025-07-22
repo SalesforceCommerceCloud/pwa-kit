@@ -1475,11 +1475,26 @@
   "shipping_address_selection.title.edit_shipping": {
     "defaultMessage": "Edit Shipping Address"
   },
+  "shipping_multi_address.actions.region": {
+    "defaultMessage": "Checkout actions"
+  },
+  "shipping_multi_address.error.forms_open": {
+    "defaultMessage": "Please save or cancel all address forms before continuing"
+  },
   "shipping_multi_address.error.label": {
     "defaultMessage": "Error loading products"
   },
   "shipping_multi_address.error.message": {
     "defaultMessage": "Error loading products. Please try again."
+  },
+  "shipping_multi_address.error.save_failed": {
+    "defaultMessage": "Failed to save address"
+  },
+  "shipping_multi_address.error.submission_failed": {
+    "defaultMessage": "Failed to proceed with checkout"
+  },
+  "shipping_multi_address.error.title": {
+    "defaultMessage": "Error"
   },
   "shipping_multi_address.format.address_line_2": {
     "defaultMessage": "{city}, {stateCode} {postalCode}"
@@ -1495,6 +1510,15 @@
   },
   "shipping_multi_address.quantity.label": {
     "defaultMessage": "Quantity"
+  },
+  "shipping_multi_address.submit.description": {
+    "defaultMessage": "Continue to next step with selected delivery addresses"
+  },
+  "shipping_multi_address.submit.loading": {
+    "defaultMessage": "Saving address..."
+  },
+  "shipping_multi_address.success.address_saved": {
+    "defaultMessage": "Address saved successfully"
   },
   "shipping_options.action.send_as_a_gift": {
     "defaultMessage": "Do you want to send this as a gift?"

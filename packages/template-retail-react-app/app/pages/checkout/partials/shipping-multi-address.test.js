@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
-import {render, screen, fireEvent} from '@testing-library/react'
+import {render, screen, fireEvent, waitFor} from '@testing-library/react'
 import {IntlProvider} from 'react-intl'
 import ShippingMultiAddress from '@salesforce/retail-react-app/app/pages/checkout/partials/shipping-multi-address'
 import {useProducts} from '@salesforce/commerce-sdk-react'
@@ -14,7 +14,18 @@ import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-curre
 import {CurrencyProvider} from '@salesforce/retail-react-app/app/contexts'
 
 jest.mock('@salesforce/commerce-sdk-react', () => ({
-    useProducts: jest.fn()
+    useProducts: jest.fn(),
+    useShopperCustomersMutation: jest.fn(() => ({
+        mutateAsync: jest.fn().mockResolvedValue({
+            addressId: 'addr-new',
+            firstName: 'Alice',
+            lastName: 'Wonder',
+            address1: '789 New St',
+            city: 'New City',
+            stateCode: 'TX',
+            postalCode: '55555'
+        })
+    }))
 }))
 
 jest.mock('@salesforce/retail-react-app/app/hooks/use-current-customer', () => ({
@@ -308,25 +319,9 @@ describe('ShippingMultiAddress', () => {
         expect(screen.getByText('Proceed to Shipping')).toBeInTheDocument()
     })
 
-    test('should render with custom add new address label', () => {
-        const customProps = {
-            ...defaultProps,
-            addNewAddressLabel: {
-                defaultMessage: 'Add Another Address',
-                id: 'checkout.button.add_another_address'
-            }
-        }
 
-        renderWithIntl(<ShippingMultiAddress {...customProps} />)
 
-        const dropdownTriggers = screen.getAllByRole('combobox')
-        fireEvent.click(dropdownTriggers[0])
 
-        const addNewAddressOptions = screen.getAllByText((content, element) =>
-            element?.textContent?.replace(/\s+/g, ' ').trim().includes('Add Another Address')
-        )
-        expect(addNewAddressOptions.length).toBeGreaterThan(0)
-    })
 
     describe('Accessibility', () => {
         test('should have proper alt text for images', () => {
@@ -424,9 +419,6 @@ describe('ShippingMultiAddress', () => {
 
             fireEvent.change(firstSelect, {target: {value: 'addr-2'}})
             expect(firstSelect).toHaveValue('addr-2')
-
-            fireEvent.change(firstSelect, {target: {value: 'add-new'}})
-            expect(firstSelect).toHaveValue('addr-1')
         })
 
         test('should handle Enter key to select address', () => {
@@ -437,9 +429,6 @@ describe('ShippingMultiAddress', () => {
 
             fireEvent.change(firstSelect, {target: {value: 'addr-2'}})
             expect(firstSelect).toHaveValue('addr-2')
-
-            fireEvent.change(firstSelect, {target: {value: 'add-new'}})
-            expect(firstSelect).toHaveValue('addr-1')
         })
 
         test('should handle Space key to select address', () => {
@@ -448,8 +437,8 @@ describe('ShippingMultiAddress', () => {
             const selectElements = screen.getAllByRole('combobox')
             const firstSelect = selectElements[0]
 
-            fireEvent.change(firstSelect, {target: {value: 'add-new'}})
-            expect(firstSelect).toHaveValue('addr-1')
+            fireEvent.change(firstSelect, {target: {value: 'addr-2'}})
+            expect(firstSelect).toHaveValue('addr-2')
 
             fireEvent.change(firstSelect, {target: {value: 'addr-1'}})
             expect(firstSelect).toHaveValue('addr-1')
@@ -465,6 +454,123 @@ describe('ShippingMultiAddress', () => {
             expect(firstSelect).toHaveValue('addr-1')
 
             fireEvent.change(firstSelect, {target: {value: 'addr-2'}})
+            expect(firstSelect).toHaveValue('addr-2')
+        })
+    })
+
+    describe('Add New Address Functionality', () => {
+        test('should show "Add New Address" option in dropdown', () => {
+            renderWithIntl(<ShippingMultiAddress {...defaultProps} />)
+
+            const selectElements = screen.getAllByRole('combobox')
+            const firstSelect = selectElements[0]
+
+            // Check that "Add New Address" option is present
+            expect(firstSelect).toHaveTextContent('+ Add New Address')
+        })
+
+        test('should show address form when "Add New Address" is selected', async () => {
+            renderWithIntl(<ShippingMultiAddress {...defaultProps} />)
+
+            const selectElements = screen.getAllByRole('combobox')
+            const firstSelect = selectElements[0]
+
+            // Select "Add New Address" option
+            fireEvent.change(firstSelect, {target: {value: 'add-new-address'}})
+
+            // Wait for the form to appear
+            await waitFor(() => {
+                expect(screen.getByText('First Name')).toBeInTheDocument()
+                expect(screen.getByText('Last Name')).toBeInTheDocument()
+                expect(screen.getByText('Phone')).toBeInTheDocument()
+                expect(screen.getByText('Country')).toBeInTheDocument()
+                expect(screen.getByText('Address')).toBeInTheDocument()
+                expect(screen.getByText('City')).toBeInTheDocument()
+                expect(screen.getByText('State')).toBeInTheDocument()
+                expect(screen.getByText('Zip Code')).toBeInTheDocument()
+            })
+        })
+
+        test('should show Save and Cancel buttons in address form', async () => {
+            renderWithIntl(<ShippingMultiAddress {...defaultProps} />)
+
+            const selectElements = screen.getAllByRole('combobox')
+            const firstSelect = selectElements[0]
+
+            // Select "Add New Address" option
+            fireEvent.change(firstSelect, {target: {value: 'add-new-address'}})
+
+            // Wait for the form to appear and check for buttons
+            await waitFor(() => {
+                expect(screen.getByText('Save')).toBeInTheDocument()
+                expect(screen.getByText('Cancel')).toBeInTheDocument()
+            })
+        })
+
+        test('should hide address form when Cancel button is clicked', async () => {
+            renderWithIntl(<ShippingMultiAddress {...defaultProps} />)
+
+            const selectElements = screen.getAllByRole('combobox')
+            const firstSelect = selectElements[0]
+
+            // Select "Add New Address" option
+            fireEvent.change(firstSelect, {target: {value: 'add-new-address'}})
+
+            // Wait for the form to appear
+            await waitFor(() => {
+                expect(screen.getByText('First Name')).toBeInTheDocument()
+            })
+
+            // Click Cancel button
+            fireEvent.click(screen.getByText('Cancel'))
+
+            // Wait for the form to disappear
+            await waitFor(() => {
+                expect(screen.queryByText('First Name')).not.toBeInTheDocument()
+            })
+        })
+
+        test('should update dropdown to show "Add New Address" when form is open', async () => {
+            renderWithIntl(<ShippingMultiAddress {...defaultProps} />)
+
+            const selectElements = screen.getAllByRole('combobox')
+            const firstSelect = selectElements[0]
+
+            // Select "Add New Address" option
+            fireEvent.change(firstSelect, {target: {value: 'add-new-address'}})
+
+            // Wait for the form to appear
+            await waitFor(() => {
+                expect(screen.getByText('First Name')).toBeInTheDocument()
+            })
+
+            // Check that the dropdown still shows "Add New Address" as selected
+            expect(firstSelect).toHaveValue('add-new-address')
+        })
+
+        test('should hide form and reset dropdown when an existing address is selected', async () => {
+            renderWithIntl(<ShippingMultiAddress {...defaultProps} />)
+
+            const selectElements = screen.getAllByRole('combobox')
+            const firstSelect = selectElements[0]
+
+            // Select "Add New Address" option
+            fireEvent.change(firstSelect, {target: {value: 'add-new-address'}})
+
+            // Wait for the form to appear
+            await waitFor(() => {
+                expect(screen.getByText('First Name')).toBeInTheDocument()
+            })
+
+            // Select an existing address
+            fireEvent.change(firstSelect, {target: {value: 'addr-2'}})
+
+            // Wait for the form to disappear
+            await waitFor(() => {
+                expect(screen.queryByText('First Name')).not.toBeInTheDocument()
+            })
+
+            // Check that the dropdown shows the selected address
             expect(firstSelect).toHaveValue('addr-2')
         })
     })
