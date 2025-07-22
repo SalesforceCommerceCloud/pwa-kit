@@ -30,6 +30,8 @@ jobs:
                   version=`jq -r ".version" packages/template-retail-react-app/package.json`
                   echo "retail_app_template_version=$version" >> "$GITHUB_ENV"
 
+            # TODO: This is set to generate an app with extensibility using a SLAS private client which I don't know is what they'll be running tests on.
+            # TODO: Change this to generate an app with the performance metrics template.
             - name: Generate Retail App Private Client
               uses: ./.github/actions/e2e_generate_app
               with:
