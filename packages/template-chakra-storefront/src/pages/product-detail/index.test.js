@@ -9,9 +9,9 @@ import React from 'react'
 import {act, screen, fireEvent, waitFor, within} from '@testing-library/react'
 import {mockCustomerBaskets, mockedCustomerProductLists} from '../../../mocks/mock-data'
 import {Route, Switch} from 'react-router-dom'
-import {rest} from 'msw'
 import ProductDetail from '.'
 import {renderWithProviders} from '../../utils/test-utils'
+import {prependHandlersToServer} from '../../../jest-setup'
 import {
     basketWithProductSet,
     mockWishlistWithItem,
@@ -65,24 +65,34 @@ const MockedComponent = () => {
 beforeEach(() => {
     jest.resetModules()
 
-    global.server.use(
-        // By default, the page will be rendered with a product set
-        rest.get('*/products/:productId', (req, res, ctx) => {
-            return res(ctx.delay(0), ctx.status(200), ctx.json(mockedProductSet))
-        }),
-        rest.get('*/customers/:customerId/baskets', (req, res, ctx) => {
-            return res(ctx.delay(0), ctx.status(200), ctx.json(mockCustomerBaskets))
-        }),
-        rest.get('*/customers/:customerId/product-lists', (req, res, ctx) => {
-            return res(ctx.delay(0), ctx.status(200), ctx.json(mockedCustomerProductLists))
-        }),
-        rest.get('*/products', (req, res, ctx) => {
-            return res(ctx.json(productsForEinstein))
-        }),
-        rest.post('*/v3/personalization/recs/EinsteinTestSite/*', (req, res, ctx) => {
-            return res(ctx.delay(0), ctx.status(200), ctx.json(einsteinRecommendation))
-        })
-    )
+    prependHandlersToServer([
+        {
+            // By default, the page will be rendered with a product set
+            path: '*/products/:productId',
+            method: 'get',
+            res: () => mockedProductSet
+        },
+        {
+            path: '*/customers/:customerId/baskets',
+            method: 'get',
+            res: () => mockCustomerBaskets
+        },
+        {
+            path: '*/customers/:customerId/product-lists',
+            method: 'get',
+            res: () => mockedCustomerProductLists
+        },
+        {
+            path: '*/products',
+            method: 'get',
+            res: () => productsForEinstein
+        },
+        {
+            path: '*/v3/personalization/recs/EinsteinTestSite/*',
+            method: 'post',
+            res: () => einsteinRecommendation
+        }
+    ])
 
     // Since we're testing some navigation logic, we are using a simple Router
     // around our component. We need to initialize the default route/path here.
@@ -94,90 +104,104 @@ afterEach(() => {
     jest.clearAllMocks()
 })
 
-test('should render product details page', async () => {
-    global.server.use(
-        // Use a single product (and not a product set)
-        rest.get('*/products/:productId', (req, res, ctx) => {
-            return res(ctx.json(masterProduct))
+describe('product detail', () => {
+    test('should render product details page', async () => {
+        prependHandlersToServer([
+            {
+                // Use a single product (and not a product set)
+                path: '*/products/:productId',
+                method: 'get',
+                res: () => masterProduct
+            }
+        ])
+
+        renderWithProviders(<MockedComponent />)
+
+        expect(await screen.findByTestId('product-details-page')).toBeInTheDocument()
+        await waitFor(() => {
+            expect(screen.getByRole('link', {name: /mens/i})).toBeInTheDocument()
+            expect(screen.getAllByText(/Long Sleeve Crew Neck/)).toHaveLength(2)
+            expect(screen.getAllByText(/from £9\.59/i)).toHaveLength(2)
+            expect(screen.getAllByText(/£15\.36/i)).toHaveLength(4)
+            expect(screen.getAllByText(/Add to Cart/)).toHaveLength(2)
+            expect(screen.getAllByText(/Add to Wishlist/)).toHaveLength(2)
+            expect(screen.getAllByTestId('product-view')).toHaveLength(1)
+            expect(screen.getByText(/You might also like/i)).toBeInTheDocument()
         })
-    )
-
-    renderWithProviders(<MockedComponent />)
-
-    expect(await screen.findByTestId('product-details-page')).toBeInTheDocument()
-    await waitFor(() => {
-        expect(screen.getByRole('link', {name: /mens/i})).toBeInTheDocument()
-        expect(screen.getAllByText(/Long Sleeve Crew Neck/)).toHaveLength(2)
-        expect(screen.getAllByText(/from £9\.59/i)).toHaveLength(2)
-        expect(screen.getAllByText(/£15\.36/i)).toHaveLength(4)
-        expect(screen.getAllByText(/Add to Cart/)).toHaveLength(2)
-        expect(screen.getAllByText(/Add to Wishlist/)).toHaveLength(2)
-        expect(screen.getAllByTestId('product-view')).toHaveLength(1)
-        expect(screen.getByText(/You might also like/i)).toBeInTheDocument()
     })
-})
 
-test('should add to wishlist', async () => {
-    global.server.use(
-        // Use a single product (and not a product set)
-        rest.get('*/products/:productId', (req, res, ctx) => {
-            return res(ctx.json(masterProduct))
+    test('should add to wishlist', async () => {
+        prependHandlersToServer([
+            {
+                // Use a single product (and not a product set)
+                path: '*/products/:productId',
+                method: 'get',
+                res: () => masterProduct
+            }
+        ])
+
+        const {user} = renderWithProviders(<MockedComponent />)
+        expect(await screen.findByTestId('product-details-page')).toBeInTheDocument()
+        // wait for data to fully loaded before taking any action
+        await waitFor(() => {
+            expect(screen.getByRole('link', {name: /mens/i})).toBeInTheDocument()
+            expect(screen.getAllByText(/Long Sleeve Crew Neck/)).toHaveLength(2)
+            expect(screen.getByText(/You might also like/i)).toBeInTheDocument()
         })
-    )
-
-    const {user} = renderWithProviders(<MockedComponent />)
-    expect(await screen.findByTestId('product-details-page')).toBeInTheDocument()
-    // wait for data to fully loaded before taking any action
-    await waitFor(() => {
-        expect(screen.getByRole('link', {name: /mens/i})).toBeInTheDocument()
-        expect(screen.getAllByText(/Long Sleeve Crew Neck/)).toHaveLength(2)
-        expect(screen.getByText(/You might also like/i)).toBeInTheDocument()
-    })
-    const wishlistButton = await screen.findByRole('button', {name: 'Add to Wishlist'})
-    await act(async () => {
-        await user.click(wishlistButton)
-    })
-    await waitFor(() => {
-        expect(mockAddToWishlist).toHaveBeenCalledTimes(1)
-    })
-})
-
-test('should not add to wishlist if item is already in wishlist', async () => {
-    global.server.use(
-        // Use a product that is already in the wishlist
-        rest.get('*/products/:productId', (req, res, ctx) => {
-            return res(ctx.json(masterProduct))
-        }),
-        rest.get('*/customers/:customerId/product-lists', (req, res, ctx) => {
-            return res(ctx.delay(0), ctx.status(200), ctx.json(mockWishlistWithItem))
+        const wishlistButton = await screen.findByRole('button', {name: 'Add to Wishlist'})
+        await act(async () => {
+            await user.click(wishlistButton)
         })
-    )
-
-    const {user} = renderWithProviders(<MockedComponent />)
-    // wait for data to fully loaded before taking any action
-    await waitFor(() => {
-        expect(screen.getByRole('link', {name: /mens/i})).toBeInTheDocument()
-        expect(screen.getAllByText(/Long Sleeve Crew Neck/)).toHaveLength(2)
-        expect(screen.getByText(/You might also like/i)).toBeInTheDocument()
+        await waitFor(() => {
+            expect(mockAddToWishlist).toHaveBeenCalledTimes(1)
+        })
     })
-    const wishlistButton = await screen.findByRole('button', {name: 'Add to Wishlist'})
 
-    await act(async () => {
-        await user.click(wishlistButton)
-    })
-    await waitFor(() => {
-        expect(mockAddToWishlist).toHaveBeenCalledTimes(0)
+    test('should not add to wishlist if item is already in wishlist', async () => {
+        prependHandlersToServer([
+            {
+                // Use a product that is already in the wishlist
+                path: '*/products/:productId',
+                method: 'get',
+                res: () => masterProduct
+            },
+            {
+                path: '*/customers/:customerId/product-lists',
+                method: 'get',
+                res: () => mockWishlistWithItem
+            }
+        ])
+
+        const {user} = renderWithProviders(<MockedComponent />)
+        // wait for data to fully loaded before taking any action
+        await waitFor(() => {
+            expect(screen.getByRole('link', {name: /mens/i})).toBeInTheDocument()
+            expect(screen.getAllByText(/Long Sleeve Crew Neck/)).toHaveLength(2)
+            expect(screen.getByText(/You might also like/i)).toBeInTheDocument()
+        })
+        const wishlistButton = await screen.findByRole('button', {name: 'Add to Wishlist'})
+
+        await act(async () => {
+            await user.click(wishlistButton)
+        })
+        await waitFor(() => {
+            expect(mockAddToWishlist).toHaveBeenCalledTimes(0)
+        })
     })
 })
 
 describe('product set', () => {
     beforeEach(() => {
-        global.server.use(
-            // For adding items to basket
-            rest.post('*/baskets/:basketId/items', (req, res, ctx) => {
-                return res(ctx.json(basketWithProductSet))
-            })
-        )
+        window.history.pushState({}, 'ProductDetail', '/uk/en-GB/product/winter-lookM')
+
+        prependHandlersToServer([
+            {
+                // For adding items to basket
+                path: '*/baskets/:basketId/items',
+                method: 'post',
+                res: () => basketWithProductSet
+            }
+        ])
     })
 
     test('render multi-product layout', async () => {
@@ -275,12 +299,14 @@ describe('product set', () => {
 
 describe('Recommended Products', () => {
     test('Recently Viewed gets updated when navigating between products', async () => {
-        global.server.use(
-            // Use a single product (and not a product set)
-            rest.get('*/products/:productId', (req, res, ctx) => {
-                return res(ctx.json(masterProduct))
-            })
-        )
+        prependHandlersToServer([
+            {
+                // Use a single product (and not a product set)
+                path: '*/products/:productId',
+                method: 'get',
+                res: () => masterProduct
+            }
+        ])
         // const user = userEvent.setup({advanceTimers: jest.advanceTimersByTime})
         renderWithProviders(<MockedComponent />)
 
@@ -300,7 +326,9 @@ describe('Recommended Products', () => {
         })
     })
 })
-
+function delay(ms) {
+    return new Promise((resolve) => setTimeout(resolve, ms))
+}
 //TODO: fix failing unhandle api mock
 // Found an unhandled GET request to
 // https://www.domain.com/mobify/proxy/api/product/shopper-products/v1/organizations/f_ecom_zzrf_001/products?ids=11736753M%2C22951021M%2C25592770M%2C25752986M&expand=availability%2Clinks%2Cpromotions%2Coptions%2Cimages%2Cprices%2Cvariations&locale=en-GB&allImages=true&perPricebook=true&siteId=site-1
@@ -309,54 +337,74 @@ describe('Recommended Products', () => {
 describe('product bundles', () => {
     let hasUpdatedBundleChildren = false
     beforeEach(() => {
+        window.history.pushState({}, 'ProductDetail', '/uk/en-GB/product/test-bundle')
         hasUpdatedBundleChildren = false
-        global.server.use(
-            // Use product bundle instead of product set
-            rest.get('*/products/:productId', (req, res, ctx) => {
-                return res(ctx.delay(0), ctx.status(200), ctx.json(mockProductBundle))
-            }),
-            rest.get('*/products', (req, res, ctx) => {
-                let inventoryLevel = 0
-                let bundleChildVariantId = '701643473915M'
-                if (req.url.toString().includes('701643473908M')) {
-                    bundleChildVariantId = '701643473908M'
-                    inventoryLevel = 3
-                }
-                const bundleChildVariantData = {
-                    data: [
-                        {
-                            id: bundleChildVariantId,
-                            inventory: {
-                                ats: inventoryLevel,
-                                backorderable: false,
-                                id: 'inventory_m',
-                                orderable: false,
-                                preorderable: false,
-                                stockLevel: inventoryLevel
-                            },
-                            master: {
-                                masterId: '25565139M',
-                                orderable: true
+
+        prependHandlersToServer([
+            {
+                // Use product bundle instead of product set
+                path: '*/products/:productId',
+                method: 'get',
+                res: () => mockProductBundle
+            },
+            {
+                path: '*/products',
+                method: 'get',
+                res: (req) => {
+                    const url = req.url.toString()
+                    // use for all 3 recommendations, "you might also like", "complete the set", and "recently viewed"
+                    if (url.includes('ids=11736753M%2C22951021M%2C25592770M%2C25752986M')) {
+                        return productsForEinstein
+                    }
+                    let inventoryLevel = 0
+                    let bundleChildVariantId = '701643473915M'
+                    if (req.url.toString().includes('701643473908M')) {
+                        bundleChildVariantId = '701643473908M'
+                        inventoryLevel = 3
+                    }
+                    return {
+                        data: [
+                            {
+                                id: bundleChildVariantId,
+                                inventory: {
+                                    ats: inventoryLevel,
+                                    backorderable: false,
+                                    id: 'inventory_m',
+                                    orderable: false,
+                                    preorderable: false,
+                                    stockLevel: inventoryLevel
+                                },
+                                master: {
+                                    masterId: '25565139M',
+                                    orderable: true
+                                }
                             }
-                        }
-                    ]
+                        ]
+                    }
                 }
-                return res(ctx.delay(0), ctx.status(200), ctx.json(bundleChildVariantData))
-            }),
-            // For adding items to basket
-            rest.post('*/baskets/:basketId/items', (req, res, ctx) => {
-                const basketWithBundle = {
-                    ...basketWithProductBundle,
-                    productItems: bundleProductItemsForPDP
+            },
+            {
+                // For adding items to basket
+                path: '*/baskets/:basketId/items',
+                method: 'post',
+                res: () => {
+                    const basketWithBundle = {
+                        ...basketWithProductBundle,
+                        productItems: bundleProductItemsForPDP
+                    }
+                    return basketWithBundle
                 }
-                return res(ctx.json(basketWithBundle))
-            }),
-            // Follow up call to update child bundle variant selections
-            rest.patch('*/baskets/:basketId/items', (req, res, ctx) => {
-                hasUpdatedBundleChildren = true
-                return res(ctx.json(basketWithProductBundle))
-            })
-        )
+            },
+            {
+                // Follow up call to update child bundle variant selections
+                path: '*/baskets/:basketId/items',
+                method: 'patch',
+                res: () => {
+                    hasUpdatedBundleChildren = true
+                    return basketWithProductBundle
+                }
+            }
+        ])
     })
 
     test('renders multi-product layout', async () => {
@@ -364,6 +412,18 @@ describe('product bundles', () => {
 
         await waitFor(() => {
             expect(screen.getAllByTestId('product-view')).toHaveLength(4) // 1 parent + 3 children
+            expect(screen.getByRole('heading', {name: /swing Tank/i})).toBeInTheDocument()
+            expect(screen.getByRole('heading', {name: /Pull On Neutral Pant/i})).toBeInTheDocument()
+            expect(
+                screen.getByRole('heading', {name: /Sleeveless Pleated Floral Front Blouse/i})
+            ).toBeInTheDocument()
+
+            expect(screen.getByText(/Recently Viewed/i)).toBeInTheDocument()
+            expect(screen.getByText(/Complete the set/i)).toBeInTheDocument()
+            expect(screen.getByText(/You might also like/i)).toBeInTheDocument()
+            // For 3 recommendation sections, complete the set, recently viewed, You also might like sections
+            expect(screen.getAllByText(/summer bomber jacket/i).length).toEqual(3)
+            expect(screen.getAllByText(/classic wrap/i).length).toEqual(3)
         })
     })
 
@@ -379,7 +439,7 @@ describe('product bundles', () => {
 
         // Initial basket is necessary to add items to it
         const initialBasket = {basketId: 'valid_id'}
-        renderWithProviders(<MockedComponent />, {wrapperProps: {initialBasket}})
+        const {user} = renderWithProviders(<MockedComponent />, {wrapperProps: {initialBasket}})
 
         await waitFor(() => {
             expect(screen.getAllByText("Women's clothing test bundle")[0]).toBeInTheDocument()
@@ -387,7 +447,9 @@ describe('product bundles', () => {
         })
 
         const buttons = await screen.findAllByText(/add bundle to cart/i)
-        fireEvent.click(buttons[0])
+        await act(async () => {
+            await user.click(buttons[0])
+        })
 
         await waitFor(
             () => {
