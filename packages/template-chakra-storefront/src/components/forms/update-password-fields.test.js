@@ -26,8 +26,7 @@ WrapperComponent.propTypes = {
 }
 
 describe('UpdatePasswordFields component', () => {
-    // TODO: fix failing test
-    test.skip('renders current password, new password, and confirm new password fields by default', () => {
+    test('renders current password, new password, and confirm new password fields by default', () => {
         renderWithProviders(<WrapperComponent />)
 
         const currentPasswordInput = screen.getByLabelText('Current Password')
@@ -43,8 +42,7 @@ describe('UpdatePasswordFields component', () => {
         expect(confirmNewPasswordInput).toHaveAttribute('type', 'password')
     })
 
-    // TODO: fix failing test
-    test.skip('shows error when passwords do not match', async () => {
+    test('shows error when passwords do not match', async () => {
         const onSubmit = jest.fn()
         const {user} = renderWithProviders(<WrapperComponent onSubmit={onSubmit} />)
 

@@ -229,8 +229,7 @@ test('onVariantSelected callback is called after successfully selected a variant
 })
 
 describe('add to cart button loading tests', () => {
-    //TODO fix broken tests
-    test.skip('add to cart button is disabled if isBasketLoading is true', async () => {
+    test('add to cart button is disabled if isBasketLoading is true', async () => {
         renderWithProviders(
             <MockComponent
                 product={mockProductDetail}
@@ -238,7 +237,10 @@ describe('add to cart button loading tests', () => {
                 isBasketLoading={true}
             />
         )
-        expect(screen.getByRole('button', {name: /add to cart/i})).toBeDisabled()
+        // In Chakra UI v3, when a Button has loading={true}, the button text is hidden with a loading spinner.
+        // A data-loading attribute is automatically added to the DOM element
+        const addToCartButton = document.querySelector('[data-loading]')
+        expect(addToCartButton).toBeDisabled()
     })
 
     test('add to cart button is enabled if isBasketLoading is false', async () => {

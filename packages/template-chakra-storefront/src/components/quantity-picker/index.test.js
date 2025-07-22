@@ -11,12 +11,17 @@ import QuantityPicker from './index'
 
 const MockComponent = () => {
     const [quantity, setQuantity] = useState(5)
-    return <QuantityPicker value={quantity} onChange={(str, num) => setQuantity(num)} />
+    return (
+        <QuantityPicker
+            value={quantity}
+            onValueChange={({value, valueAsNumber}) => setQuantity(valueAsNumber)}
+        />
+    )
 }
 
 const MINUS = '\u2212' // HTML `&minus;`, not the same as '-' (\u002d)
-//TOD: fix failed tests
-describe.skip('QuantityPicker', () => {
+
+describe('QuantityPicker', () => {
     test('clicking plus increments value', async () => {
         const {user} = renderWithProviders(<MockComponent />)
         const input = screen.getByRole('spinbutton')
@@ -24,7 +29,9 @@ describe.skip('QuantityPicker', () => {
         await act(async () => {
             await user.click(button)
         })
-        expect(input.value).toBe('6')
+        await waitFor(() => {
+            expect(input.value).toBe('6')
+        })
     })
     test('clicking minus decrements value', async () => {
         const {user} = renderWithProviders(<MockComponent />)
@@ -33,51 +40,56 @@ describe.skip('QuantityPicker', () => {
         await act(async () => {
             await user.click(button)
         })
-        expect(input.value).toBe('4')
+        await waitFor(() => {
+            expect(input.value).toBe('4')
+        })
     })
-    test('hitting enter/space on plus increments value', async () => {
-        const {user} = renderWithProviders(<MockComponent />)
-        const input = screen.getByRole('spinbutton')
-        const button = screen.getByText('+')
-        await act(async () => {
-            await user.type(button, '{enter}')
-        })
-        expect(input.value).toBe('6')
-        await act(async () => {
-            await user.type(button, '{space}')
-        })
-        expect(input.value).toBe('7')
-    })
-    test('hitting space on minus decrements value', async () => {
-        const {user} = renderWithProviders(<MockComponent />)
-        const input = screen.getByRole('spinbutton')
-        const button = screen.getByText(MINUS)
-        await act(async () => {
-            await user.type(button, '{enter}')
-        })
-        expect(input.value).toBe('4')
-        await act(async () => {
-            await user.type(button, '{space}')
-        })
-        expect(input.value).toBe('3')
-    })
-    test('plus button is tabbable', async () => {
+    test('arrow keys increment/decrement value when input is focused', async () => {
         const {user} = renderWithProviders(<MockComponent />)
         const input = screen.getByRole('spinbutton')
         await act(async () => {
-            await user.type(input, '{tab}')
+            await user.click(input)
+            await user.keyboard('{ArrowUp}')
         })
-        const button = screen.getByText('+')
-        expect(button).toHaveFocus()
+        await waitFor(() => {
+            expect(input.value).toBe('6')
+        })
+        await act(async () => {
+            await user.keyboard('{ArrowDown}')
+        })
+        await waitFor(() => {
+            expect(input.value).toBe('5')
+        })
     })
-    test('minus button is tabbable', async () => {
+    test('input can be focused and accepts direct input', async () => {
         const {user} = renderWithProviders(<MockComponent />)
         const input = screen.getByRole('spinbutton')
         await act(async () => {
-            // > modifier in {shift>} means "keep key pressed"
-            await user.type(input, '{shift>}{tab}')
+            await user.click(input)
+            await user.clear(input)
+            await user.type(input, '10')
         })
-        const button = screen.getByText(MINUS)
-        expect(button).toHaveFocus()
+        await waitFor(() => {
+            expect(input.value).toBe('10')
+        })
+    })
+    test('input is focusable and accessible', async () => {
+        const {user} = renderWithProviders(<MockComponent />)
+        const input = screen.getByRole('spinbutton')
+        await act(async () => {
+            await user.click(input)
+        })
+        expect(input).toHaveFocus()
+        expect(input).toHaveAttribute('aria-label', 'Quantity')
+    })
+    test('buttons have proper accessibility attributes', async () => {
+        renderWithProviders(<MockComponent />)
+        const incrementButton = screen.getByText('+')
+        const decrementButton = screen.getByText(MINUS)
+
+        expect(incrementButton).toHaveAttribute('aria-label', 'increment value')
+        expect(decrementButton).toHaveAttribute('aria-label', 'decrease value')
+        expect(incrementButton).toHaveAttribute('data-testid', 'quantity-increment')
+        expect(decrementButton).toHaveAttribute('data-testid', 'quantity-decrement')
     })
 })

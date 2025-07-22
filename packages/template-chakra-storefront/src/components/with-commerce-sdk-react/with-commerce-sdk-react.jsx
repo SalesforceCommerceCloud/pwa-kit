@@ -25,7 +25,13 @@ const withCommerceSdkReact = (Component, opts = {}) => {
             typeof queryOptions === 'function' ? queryOptions(props) : queryOptions || {}
         )
 
-        return isLoading ? <Placeholder {...props} /> : <Component {...props} data={data} />
+        return isLoading ? (
+            Placeholder ? (
+                <Placeholder {...props} />
+            ) : null
+        ) : (
+            <Component {...props} data={data} />
+        )
     }
 
     WrappedComponent.propTypes = {}
