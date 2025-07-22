@@ -81,9 +81,7 @@ export const useWishList = ({listId = ''} = {}) => {
     )
 
     const addToWishlist = useCallback(
-        async (product, variant, options = {}) => {
-            const {quantity = 1, showError} = options
-
+        async (product, variant, quantity = 1) => {
             try {
                 if (!customerId || !wishlist) {
                     return
@@ -128,14 +126,11 @@ export const useWishList = ({listId = ''} = {}) => {
                     )
                 })
             } catch (error) {
-                const errorHandler =
-                    showError ||
-                    (() =>
-                        toast({
-                            title: formatMessage(API_ERROR_MESSAGE),
-                            type: 'error'
-                        }))
-                errorHandler()
+                console.error(error)
+                toast({
+                    title: formatMessage(API_ERROR_MESSAGE),
+                    type: 'error'
+                })
             }
         },
         [
@@ -150,9 +145,7 @@ export const useWishList = ({listId = ''} = {}) => {
     )
 
     const removeFromWishlist = useCallback(
-        async (product, variant, options = {}) => {
-            const {showError} = options
-
+        async (product, variant) => {
             try {
                 if (!customerId || !wishlist) {
                     return
@@ -175,14 +168,11 @@ export const useWishList = ({listId = ''} = {}) => {
                     type: 'success'
                 })
             } catch (error) {
-                const errorHandler =
-                    showError ||
-                    (() =>
-                        toast({
-                            title: formatMessage(API_ERROR_MESSAGE),
-                            type: 'error'
-                        }))
-                errorHandler()
+                console.error(error)
+                toast({
+                    title: formatMessage(API_ERROR_MESSAGE),
+                    type: 'error'
+                })
             }
         },
         [customerId, wishlist, deleteCustomerProductListItem, toast, formatMessage]

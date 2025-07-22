@@ -52,7 +52,7 @@ const Cart = () => {
 
     // Wishlist operations
     const {addToWishlist} = useWishList()
-    const handleAddToWishlist = (product) => addToWishlist(product, null, {showError})
+    const handleAddToWishlist = (product) => addToWishlist(product)
 
     // Gift items
     const {localIsGiftItems, handleIsAGiftChange} = useCartGiftItems(

@@ -33,8 +33,6 @@ export const useProductDetailData = () => {
     const einstein = useEinstein()
     const showError = useErrorHandler()
     const {addToWishlist, isPending: isWishlistLoading} = useWishList()
-    const handleAddToWishlist = (product, variant, quantity) =>
-        addToWishlist(product, variant, {quantity, showError})
 
     /****************************** Basket *********************************/
     const {isLoading: isBasketLoading} = useCurrentBasket()
@@ -325,7 +323,7 @@ export const useProductDetailData = () => {
         selectedBundleQuantity,
         setSelectedBundleQuantity,
         handleAddToCart,
-        handleAddToWishlist,
+        handleAddToWishlist: addToWishlist,
         handleProductSetAddToCart,
         handleProductBundleAddToCart,
         handleChildProductValidation,
