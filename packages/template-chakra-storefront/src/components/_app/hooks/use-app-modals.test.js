@@ -41,13 +41,13 @@ const mockLocation = {
 }
 
 const mockDrawerDisclosure = {
-    isOpen: false,
+    open: false,
     onOpen: jest.fn(),
     onClose: jest.fn()
 }
 
 const mockStoreLocatorDisclosure = {
-    isOpen: false,
+    open: false,
     onOpen: jest.fn(),
     onClose: jest.fn()
 }
