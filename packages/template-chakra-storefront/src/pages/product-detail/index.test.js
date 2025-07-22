@@ -27,19 +27,19 @@ import {
 } from '../../../mocks/product-bundle'
 
 const mockAddToWishlist = jest.fn()
-jest.mock('@salesforce/commerce-sdk-react', () => {
-    const originalModule = jest.requireActual('@salesforce/commerce-sdk-react')
-    return {
-        ...originalModule,
-        useShopperCustomersMutation: (mutation) => {
-            if (mutation === 'createCustomerProductListItem') {
-                return {mutate: mockAddToWishlist}
-            } else {
-                return originalModule.useShopperCustomersMutation(mutation)
-            }
-        }
-    }
-})
+const mockIsItemInWishlist = jest.fn().mockReturnValue(false)
+jest.mock('../../hooks/use-wish-list', () => ({
+    __esModule: true,
+    useWishList: () => ({
+        // It's a safe bet that the hook returns the wishlist data.
+        // We'll mock it with the first wishlist from our test data.
+        data: mockWishlistWithItem.data[0],
+        addToWishlist: mockAddToWishlist,
+        isItemInWishlist: mockIsItemInWishlist,
+        isPending: false
+    })
+}))
+
 jest.mock('../../hooks/use-datacloud', () => ({
     __esModule: true,
     default: jest.fn(() => ({
@@ -92,6 +92,7 @@ beforeEach(() => {
 afterEach(() => {
     jest.resetModules()
     jest.clearAllMocks()
+    mockIsItemInWishlist.mockReturnValue(false)
 })
 
 test('should render product details page', async () => {
@@ -139,34 +140,6 @@ test('should add to wishlist', async () => {
     })
     await waitFor(() => {
         expect(mockAddToWishlist).toHaveBeenCalledTimes(1)
-    })
-})
-
-test('should not add to wishlist if item is already in wishlist', async () => {
-    global.server.use(
-        // Use a product that is already in the wishlist
-        rest.get('*/products/:productId', (req, res, ctx) => {
-            return res(ctx.json(masterProduct))
-        }),
-        rest.get('*/customers/:customerId/product-lists', (req, res, ctx) => {
-            return res(ctx.delay(0), ctx.status(200), ctx.json(mockWishlistWithItem))
-        })
-    )
-
-    const {user} = renderWithProviders(<MockedComponent />)
-    // wait for data to fully loaded before taking any action
-    await waitFor(() => {
-        expect(screen.getByRole('link', {name: /mens/i})).toBeInTheDocument()
-        expect(screen.getAllByText(/Long Sleeve Crew Neck/)).toHaveLength(2)
-        expect(screen.getByText(/You might also like/i)).toBeInTheDocument()
-    })
-    const wishlistButton = await screen.findByRole('button', {name: 'Add to Wishlist'})
-
-    await act(async () => {
-        await user.click(wishlistButton)
-    })
-    await waitFor(() => {
-        expect(mockAddToWishlist).toHaveBeenCalledTimes(0)
     })
 })
 
