@@ -422,8 +422,8 @@ describe('product bundles', () => {
             expect(screen.getByText(/Complete the set/i)).toBeInTheDocument()
             expect(screen.getByText(/You might also like/i)).toBeInTheDocument()
             // For 3 recommendation sections, complete the set, recently viewed, You also might like sections
-            expect(screen.getAllByText(/summer bomber jacket/i).length).toEqual(3)
-            expect(screen.getAllByText(/classic wrap/i).length).toEqual(3)
+            expect(screen.getAllByText(/summer bomber jacket/i).length).toBe(3)
+            expect(screen.getAllByText(/classic wrap/i).length).toBe(3)
         })
     })
 
