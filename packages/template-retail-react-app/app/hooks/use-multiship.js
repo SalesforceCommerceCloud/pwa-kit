@@ -483,27 +483,6 @@ export const useMultiship = (basket) => {
         //
     }
 
-    /**
-     * Fetches the appropriate shipment ID for product items based on pickup selection
-     * @param {Array} productItems - Array of product items
-     * @param {Object} selectedStore - Selected store information
-     * @param {boolean} hasAnyPickupSelected - Whether any items have pickup selected
-     * @returns {Promise<string>} The target shipment ID
-     */
-    const getShipmentForItems = async (productItems, selectedStore, hasAnyPickupSelected) => {
-        let targetShipmentId = 'me'
-
-        if (basket) {
-            // Ensure a suitable shipment exists
-            if (hasAnyPickupSelected) {
-                targetShipmentId = await findOrCreatePickupShipment(productItems, selectedStore)
-            } else {
-                targetShipmentId = await findOrCreateDeliveryShipment(productItems, selectedStore)
-            }
-        }
-        return targetShipmentId
-    }
-
     return {
         assignDefaultShippingMethodsToShipments,
         handleDeliveryOptionChange,
@@ -516,7 +495,6 @@ export const useMultiship = (basket) => {
         moveItemToPickupShipment,
         moveItemsToPickupShipment,
         findOrCreateDeliveryShipment,
-        findOrCreatePickupShipment,
-        getShipmentForItems
+        findOrCreatePickupShipment
     }
 }

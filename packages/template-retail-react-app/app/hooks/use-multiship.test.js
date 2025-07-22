@@ -61,41 +61,6 @@ describe('useMultiship', () => {
         ]
     }
 
-    const mockBasketWithPickupShipment = {
-        basketId: 'test-basket-id',
-        shipments: [
-            {
-                shipmentId: 'me',
-                shippingMethod: {
-                    id: 'default-shipping-method',
-                    name: 'Default Shipping'
-                }
-            },
-            {
-                shipmentId: 'pickup-shipment',
-                shippingMethod: {
-                    id: 'pickup-shipping-method',
-                    name: 'Pickup in Store'
-                },
-                c_fromStoreId: 'store-1'
-            }
-        ],
-        productItems: [
-            {
-                itemId: 'item-1',
-                productId: 'product-1',
-                quantity: 1,
-                shipmentId: 'me'
-            },
-            {
-                itemId: 'item-2',
-                productId: 'product-2',
-                quantity: 2,
-                shipmentId: 'pickup-shipment'
-            }
-        ]
-    }
-
     // Mock shipping methods
     const mockShippingMethods = {
         applicableShippingMethods: [
@@ -1566,63 +1531,6 @@ describe('useMultiship', () => {
                 await expect(
                     result.current.findOrCreatePickupShipment([], mockStoreInfo) // Add empty array as first parameter
                 ).rejects.toThrow('No pickup shipping method found')
-            })
-        })
-    })
-
-    describe('getShipmentForItems', () => {
-        const mockProductItems = [
-            {
-                itemId: 'item-1',
-                productId: 'product-1',
-                quantity: 2
-            },
-            {
-                itemId: 'item-2',
-                productId: 'product-2',
-                quantity: 1
-            }
-        ]
-
-        test('should return product items unchanged when no basket', async () => {
-            const {result} = renderHook(() => useMultiship(null))
-
-            await act(async () => {
-                const response = await result.current.getShipmentForItems(
-                    mockProductItems,
-                    mockStoreInfo,
-                    false
-                )
-                expect(response).toBe('me')
-            })
-        })
-
-        test('should assign delivery shipment ID when pickup is not selected', async () => {
-            const {result} = renderHook(() => useMultiship(mockBasketWithPickupShipment))
-
-            await act(async () => {
-                const response = await result.current.getShipmentForItems(
-                    mockProductItems,
-                    mockStoreInfo,
-                    false
-                )
-                // Should return items with 'me' shipment ID since findOrCreateDeliveryShipment returns 'me'
-                expect(response).toBe('me')
-            })
-        })
-
-        test('should assign pickup shipment ID when pickup is selected', async () => {
-            mockIsCurrentShippingMethodPickup.mockReturnValue(true)
-            const {result} = renderHook(() => useMultiship(mockBasketWithPickupShipment))
-
-            await act(async () => {
-                const response = await result.current.getShipmentForItems(
-                    mockProductItems,
-                    mockStoreInfo,
-                    true
-                )
-                // Should return items with pickup shipment ID since findOrCreatePickupShipment returns a valid shipment ID
-                expect(response).toBe('pickup-shipment')
             })
         })
     })

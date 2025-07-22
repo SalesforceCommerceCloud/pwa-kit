@@ -107,7 +107,12 @@ const ProductDetail = () => {
     } = usePickupShipment(basket)
 
     /*************************** Multiship ********************/
-    const {getShipmentForItems} = useMultiship(basket)
+    const {
+        moveItemsToDeliveryShipment,
+        moveItemsToPickupShipment,
+        findOrCreateDeliveryShipment,
+        findOrCreatePickupShipment
+    } = useMultiship(basket)
 
     /*************************** Product Detail and Category ********************/
     const {productId} = useParams()
@@ -408,14 +413,24 @@ const ProductDetail = () => {
                 }
             }
 
-            // Fetch and assign a suitable shipment for product items
-            const targetShipmentId = await getShipmentForItems(
-                productItems,
-                selectedStore,
-                hasAnyPickupSelected
-            )
+            // Set target to default shipment
+            let targetShipmentId = 'me'
 
-            if (targetShipmentId) {
+            if (basket) {
+                // Ensure a suitable shipment exists
+                if (hasAnyPickupSelected) {
+                    targetShipmentId = await findOrCreatePickupShipment(productItems, selectedStore)
+                } else {
+                    targetShipmentId = await findOrCreateDeliveryShipment(
+                        productItems,
+                        selectedStore
+                    )
+                }
+
+                if (!targetShipmentId) {
+                    throw new Error('Failed to find or create shipment')
+                }
+
                 productItems = productItems.map((item) => ({
                     ...item,
                     shipmentId: targetShipmentId
@@ -515,7 +530,7 @@ const ProductDetail = () => {
             )
 
             // Check for delivery method conflicts before adding to cart
-            if (!MULTISHIP_IS_ENABLED && basket && basket.productItems?.length > 0) {
+            if (basket && basket.productItems?.length > 0) {
                 const currentShippingMethod = basket?.shipments?.[0]?.shippingMethod
                 const currentShippingMethodIsPickup =
                     isCurrentShippingMethodPickup(currentShippingMethod)
@@ -570,20 +585,6 @@ const ProductDetail = () => {
                 pickupInStoreMap,
                 selectedStore
             )
-
-            // Fetch and assign a suitable shipment for product items
-            const targetShipmentId = await getShipmentForItems(
-                productItems,
-                selectedStore,
-                hasAnyPickupSelected
-            )
-
-            if (targetShipmentId) {
-                productItems = productItems.map((item) => ({
-                    ...item,
-                    shipmentId: targetShipmentId
-                }))
-            }
 
             const res = await addItemToNewOrExistingBasket(productItems)
 
