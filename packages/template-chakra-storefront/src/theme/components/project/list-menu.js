@@ -118,10 +118,10 @@ export default defineSlotRecipe({
             marginRight: 3,
             marginBottom: 2,
             marginLeft: 0,
+            cursor: 'pointer',
             _hover: {
                 textDecoration: 'none'
-            },
-            cursor: 'pointer'
+            }
         }
     }
 })
