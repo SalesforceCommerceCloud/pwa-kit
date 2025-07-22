@@ -904,7 +904,7 @@ describe('usePickupShipment', () => {
         })
     })
 
-    describe('updateRegularShippingMethod', () => {
+    describe('updateDeliveryShipment', () => {
         let mockMutateAsync
 
         beforeEach(() => {
@@ -925,7 +925,7 @@ describe('usePickupShipment', () => {
             const basketId = 'basket-123'
             const shippingMethodId = 'standard-shipping'
 
-            await result.current.updateRegularShippingMethod(basketId, shippingMethodId)
+            await result.current.updateDeliveryShipment(basketId, shippingMethodId)
 
             expect(mockMutateAsync).toHaveBeenCalledWith({
                 parameters: {
@@ -953,7 +953,7 @@ describe('usePickupShipment', () => {
             const basketId = 'basket-123'
             const shippingMethodId = 'standard-shipping'
 
-            await result.current.updateRegularShippingMethod(basketId, shippingMethodId)
+            await result.current.updateDeliveryShipment(basketId, shippingMethodId)
 
             expect(consoleSpy).toHaveBeenCalledWith(
                 'Failed to configure regular shipping method:',
@@ -974,7 +974,7 @@ describe('usePickupShipment', () => {
             const throwOnError = true
 
             await expect(
-                result.current.updateRegularShippingMethod(basketId, shippingMethodId, throwOnError)
+                result.current.updateDeliveryShipment(basketId, shippingMethodId, throwOnError)
             ).rejects.toThrow('Regular shipping mutation failed')
         })
     })
@@ -1069,7 +1069,7 @@ describe('usePickupShipment', () => {
 
             // Verify that all expected functions are returned
             expect(result.current.updatePickupShipment).toBeDefined()
-            expect(result.current.updateRegularShippingMethod).toBeDefined()
+            expect(result.current.updateDeliveryShipment).toBeDefined()
             expect(result.current.configureDefaultShipmentIfNeeded).toBeDefined()
             expect(result.current.hasPickupItems).toBeDefined()
             expect(result.current.addInventoryIdsToPickupItems).toBeDefined()
@@ -1084,7 +1084,7 @@ describe('usePickupShipment', () => {
 
             // Verify that all expected functions are returned
             expect(result.current.updatePickupShipment).toBeDefined()
-            expect(result.current.updateRegularShippingMethod).toBeDefined()
+            expect(result.current.updateDeliveryShipment).toBeDefined()
             expect(result.current.configureDefaultShipmentIfNeeded).toBeDefined()
             expect(result.current.hasPickupItems).toBeDefined()
             expect(result.current.addInventoryIdsToPickupItems).toBeDefined()
