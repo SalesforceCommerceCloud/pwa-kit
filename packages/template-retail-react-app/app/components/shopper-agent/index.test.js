@@ -9,6 +9,8 @@ import React from 'react'
 import {render, act} from '@testing-library/react'
 import ShopperAgent from '@salesforce/retail-react-app/app/components/shopper-agent/index'
 import useScript from '@salesforce/retail-react-app/app/hooks/use-script'
+import useAuthContext from '@salesforce/commerce-sdk-react/hooks/useAuthContext'
+import useCustomerType from '@salesforce/commerce-sdk-react/hooks/useCustomerType'
 
 // Mock the embeddedservice_bootstrap object
 const mockEmbeddedService = {
@@ -31,6 +33,12 @@ jest.mock('@salesforce/commerce-sdk-react', () => {
         useUsid: () => ({usid: 'test-usid'})
     }
 })
+
+jest.mock('@salesforce/commerce-sdk-react/hooks/useAuthContext')
+jest.mock('@salesforce/commerce-sdk-react/hooks/useCustomerType')
+
+const mockedUseAuthContext = useAuthContext
+const mockedUseCustomerType = useCustomerType
 
 jest.mock('@salesforce/retail-react-app/app/components/shared/ui', () => {
     const originalModule = jest.requireActual(
@@ -70,6 +78,15 @@ describe('ShopperAgent Component', () => {
         global.window.embeddedservice_bootstrap = mockEmbeddedService
 
         useScript.mockReturnValue({loaded: false, error: false})
+
+        // Default auth mocks
+        mockedUseAuthContext.mockReturnValue({
+            get: jest.fn().mockReturnValue(null)
+        })
+        mockedUseCustomerType.mockReturnValue({
+            isGuest: false,
+            isRegistered: false
+        })
 
         // Clear any existing scripts
         const scripts = document.querySelectorAll('script[src]')
@@ -572,6 +589,158 @@ describe('ShopperAgent Component', () => {
 
             // Verify no event listeners were added
             expect(mockAddEventListener).not.toHaveBeenCalled()
+        })
+    })
+
+    describe('Refresh Token Tests', () => {
+        test('should get refresh_token_registered when user is registered', () => {
+            const mockAuthGet = jest.fn()
+            mockAuthGet.mockReturnValue('registered-refresh-token')
+            
+            mockedUseAuthContext.mockReturnValue({
+                get: mockAuthGet
+            })
+            mockedUseCustomerType.mockReturnValue({
+                isGuest: false,
+                isRegistered: true
+            })
+
+            useScript.mockReturnValue({loaded: true, error: false})
+            render(<ShopperAgent {...defaultProps} />)
+
+            expect(mockAuthGet).toHaveBeenCalledWith('refresh_token_registered')
+            expect(mockAuthGet).not.toHaveBeenCalledWith('refresh_token_guest')
+        })
+
+        test('should get refresh_token_guest when user is guest', () => {
+            const mockAuthGet = jest.fn()
+            mockAuthGet.mockReturnValue('guest-refresh-token')
+            
+            mockedUseAuthContext.mockReturnValue({
+                get: mockAuthGet
+            })
+            mockedUseCustomerType.mockReturnValue({
+                isGuest: true,
+                isRegistered: false
+            })
+
+            useScript.mockReturnValue({loaded: true, error: false})
+            render(<ShopperAgent {...defaultProps} />)
+
+            expect(mockAuthGet).toHaveBeenCalledWith('refresh_token_guest')
+            expect(mockAuthGet).not.toHaveBeenCalledWith('refresh_token_registered')
+        })
+
+        test('should return null when user is neither guest nor registered', () => {
+            const mockAuthGet = jest.fn()
+            
+            mockedUseAuthContext.mockReturnValue({
+                get: mockAuthGet
+            })
+            mockedUseCustomerType.mockReturnValue({
+                isGuest: false,
+                isRegistered: false
+            })
+
+            useScript.mockReturnValue({loaded: true, error: false})
+            render(<ShopperAgent {...defaultProps} />)
+
+            expect(mockAuthGet).not.toHaveBeenCalled()
+        })
+
+        test('should handle null refresh token from auth.get', () => {
+            const mockAuthGet = jest.fn()
+            mockAuthGet.mockReturnValue(null)
+            
+            mockedUseAuthContext.mockReturnValue({
+                get: mockAuthGet
+            })
+            mockedUseCustomerType.mockReturnValue({
+                isGuest: true,
+                isRegistered: false
+            })
+
+            useScript.mockReturnValue({loaded: true, error: false})
+            render(<ShopperAgent {...defaultProps} />)
+
+            expect(mockAuthGet).toHaveBeenCalledWith('refresh_token_guest')
+            expect(mockAuthGet.mock.results[0].value).toBeNull()
+        })
+
+        test('should handle empty string refresh token from auth.get', () => {
+            const mockAuthGet = jest.fn()
+            mockAuthGet.mockReturnValue('')
+            
+            mockedUseAuthContext.mockReturnValue({
+                get: mockAuthGet
+            })
+            mockedUseCustomerType.mockReturnValue({
+                isGuest: false,
+                isRegistered: true
+            })
+
+            useScript.mockReturnValue({loaded: true, error: false})
+            render(<ShopperAgent {...defaultProps} />)
+
+            expect(mockAuthGet).toHaveBeenCalledWith('refresh_token_registered')
+            expect(mockAuthGet.mock.results[0].value).toBe('')
+        })
+
+        test('should handle undefined refresh token from auth.get', () => {
+            const mockAuthGet = jest.fn()
+            mockAuthGet.mockReturnValue(undefined)
+            
+            mockedUseAuthContext.mockReturnValue({
+                get: mockAuthGet
+            })
+            mockedUseCustomerType.mockReturnValue({
+                isGuest: true,
+                isRegistered: false
+            })
+
+            useScript.mockReturnValue({loaded: true, error: false})
+            render(<ShopperAgent {...defaultProps} />)
+
+            expect(mockAuthGet).toHaveBeenCalledWith('refresh_token_guest')
+            expect(mockAuthGet.mock.results[0].value).toBe(undefined)
+        })
+
+        test('should prioritize registered user over guest user', () => {
+            const mockAuthGet = jest.fn()
+            mockAuthGet.mockReturnValue('registered-refresh-token')
+            
+            mockedUseAuthContext.mockReturnValue({
+                get: mockAuthGet
+            })
+            mockedUseCustomerType.mockReturnValue({
+                isGuest: true,
+                isRegistered: true
+            })
+
+            useScript.mockReturnValue({loaded: true, error: false})
+            render(<ShopperAgent {...defaultProps} />)
+
+            expect(mockAuthGet).toHaveBeenCalledWith('refresh_token_registered')
+            expect(mockAuthGet).not.toHaveBeenCalledWith('refresh_token_guest')
+        })
+
+        test('should pass refresh token to ShopperAgentWindow component', () => {
+            const mockAuthGet = jest.fn()
+            mockAuthGet.mockReturnValue('test-refresh-token')
+            
+            mockedUseAuthContext.mockReturnValue({
+                get: mockAuthGet
+            })
+            mockedUseCustomerType.mockReturnValue({
+                isGuest: false,
+                isRegistered: true
+            })
+
+            useScript.mockReturnValue({loaded: true, error: false})
+            
+            render(<ShopperAgent {...defaultProps} />)
+            
+            expect(mockAuthGet).toHaveBeenCalledWith('refresh_token_registered')
         })
     })
 })
