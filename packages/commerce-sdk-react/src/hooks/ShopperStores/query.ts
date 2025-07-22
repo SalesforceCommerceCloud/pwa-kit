@@ -62,7 +62,7 @@ export const useSearchStores = (
         method,
         queryKey,
         requiredParameters
-    }) as UseQueryResult<Data>
+    })
 }
 
 /**
@@ -105,5 +105,5 @@ export const useStores = (
         method,
         queryKey,
         requiredParameters
-    }) as UseQueryResult<Data>
+    })
 }

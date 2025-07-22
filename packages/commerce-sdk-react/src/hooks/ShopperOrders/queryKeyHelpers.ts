@@ -58,10 +58,8 @@ export const getOrder: QueryKeyHelper<'getOrder'> = {
         params?.orderNo
     ],
     queryKey: (params: Params<'getOrder'>) => {
-        return [
-            ...getOrder.path(params),
-            pickValidParams(params || {}, ShopperOrders.paramKeys.getOrder)
-        ]
+        // TODO: replace `as any`
+        return [...getOrder.path(params), pickValidParams(params as any, ShopperOrders.paramKeys.getOrder)]
     }
 }
 
@@ -77,7 +75,8 @@ export const getPaymentMethodsForOrder: QueryKeyHelper<'getPaymentMethodsForOrde
     queryKey: (params: Params<'getPaymentMethodsForOrder'>) => {
         return [
             ...getPaymentMethodsForOrder.path(params),
-            pickValidParams(params || {}, ShopperOrders.paramKeys.getPaymentMethodsForOrder)
+            // TODO: replace `as any`
+            pickValidParams(params as any, ShopperOrders.paramKeys.getPaymentMethodsForOrder)
         ]
     }
 }
@@ -94,7 +93,8 @@ export const getTaxesFromOrder: QueryKeyHelper<'getTaxesFromOrder'> = {
     queryKey: (params: Params<'getTaxesFromOrder'>) => {
         return [
             ...getTaxesFromOrder.path(params),
-            pickValidParams(params || {}, ShopperOrders.paramKeys.getTaxesFromOrder)
+            // TODO: replace `as any`
+            pickValidParams(params as any, ShopperOrders.paramKeys.getTaxesFromOrder)
         ]
     }
 }

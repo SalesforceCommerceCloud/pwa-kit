@@ -54,7 +54,8 @@ export const getUserInfo: QueryKeyHelper<'getUserInfo'> = {
     queryKey: (params: Params<'getUserInfo'>) => {
         return [
             ...getUserInfo.path(params),
-            pickValidParams(params || {}, ShopperLogin.paramKeys.getUserInfo)
+            // TODO: replace `as any`
+            pickValidParams(params as any, ShopperLogin.paramKeys.getUserInfo)
         ]
     }
 }
@@ -69,7 +70,8 @@ export const getWellknownOpenidConfiguration: QueryKeyHelper<'getWellknownOpenid
     queryKey: (params: Params<'getWellknownOpenidConfiguration'>) => {
         return [
             ...getWellknownOpenidConfiguration.path(params),
-            pickValidParams(params || {}, ShopperLogin.paramKeys.getWellknownOpenidConfiguration)
+            // TODO: replace `as any`
+            pickValidParams(params as any, ShopperLogin.paramKeys.getWellknownOpenidConfiguration)
         ]
     }
 }
@@ -84,7 +86,8 @@ export const getJwksUri: QueryKeyHelper<'getJwksUri'> = {
     queryKey: (params: Params<'getJwksUri'>) => {
         return [
             ...getJwksUri.path(params),
-            pickValidParams(params || {}, ShopperLogin.paramKeys.getJwksUri)
+            // TODO: replace `as any`
+            pickValidParams(params as any, ShopperLogin.paramKeys.getJwksUri)
         ]
     }
 }

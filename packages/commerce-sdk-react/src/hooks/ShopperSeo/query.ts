@@ -59,5 +59,5 @@ export const useUrlMapping = (
         method,
         queryKey,
         requiredParameters
-    }) as UseQueryResult<Data>
+    })
 }

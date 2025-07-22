@@ -73,10 +73,12 @@ export const mergeOptions = <Client extends ApiClient, Options extends ApiOption
               {body: options.body as MergedOptions<Client, Options>['body']}
             : ({} as {body: never})),
         parameters: {
+            ...client.clientConfig.parameters,
             // If we pass a blank override, don't actually override it.
             ...(options.parameters ? omitNullable(options.parameters) : {})
         },
         headers: {
+            ...client.clientConfig.headers,
             ...options.headers
         }
     }

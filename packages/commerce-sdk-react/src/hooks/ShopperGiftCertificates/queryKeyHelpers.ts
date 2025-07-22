@@ -40,7 +40,8 @@ export const getGiftCertificate: QueryKeyHelper<'getGiftCertificate'> = {
     queryKey: (params: Params<'getGiftCertificate'>) => {
         return [
             ...getGiftCertificate.path(params),
-            pickValidParams(params || {}, ShopperGiftCertificates.paramKeys.getGiftCertificate)
+            // TODO: replace `as any`
+            pickValidParams(params as any, ShopperGiftCertificates.paramKeys.getGiftCertificate)
         ]
     }
 }

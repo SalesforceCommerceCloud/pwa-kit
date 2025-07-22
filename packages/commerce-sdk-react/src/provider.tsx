@@ -26,12 +26,10 @@ import {
     ShopperPromotions,
     ShopperSearch,
     ShopperSEO,
-    ShopperStores
+    ShopperStores,
+    FetchOptions
 } from 'commerce-sdk-isomorphic'
 import {transformSDKClient} from './utils'
-
-// Define FetchOptions type locally since it's not exported from the isomorphic SDK
-type FetchOptions = RequestInit
 
 export interface CommerceApiProviderProps extends ApiClientConfigParams {
     children: React.ReactNode

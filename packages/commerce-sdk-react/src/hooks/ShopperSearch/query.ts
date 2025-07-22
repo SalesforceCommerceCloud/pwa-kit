@@ -59,7 +59,7 @@ export const useProductSearch = (
         method,
         queryKey,
         requiredParameters
-    }) as UseQueryResult<Data>
+    })
 }
 /**
  * Provides keyword search functionality for products, categories, and brands suggestions.
@@ -103,5 +103,5 @@ export const useSearchSuggestions = (
         method,
         queryKey,
         requiredParameters
-    }) as UseQueryResult<Data>
+    })
 }

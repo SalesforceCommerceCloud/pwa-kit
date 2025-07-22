@@ -56,7 +56,7 @@ export const useBasket = (
         method,
         queryKey,
         requiredParameters
-    }) as UseQueryResult<Data>
+    })
 }
 /**
  * Gets applicable payment methods for an existing basket considering the open payment amount only.
@@ -98,7 +98,7 @@ export const usePaymentMethodsForBasket = (
         method,
         queryKey,
         requiredParameters
-    }) as UseQueryResult<Data>
+    })
 }
 /**
  * Gets applicable price books for an existing basket.
@@ -140,7 +140,7 @@ export const usePriceBooksForBasket = (
         method,
         queryKey,
         requiredParameters
-    }) as UseQueryResult<Data>
+    })
 }
 /**
  * Gets the applicable shipping methods for a certain shipment of a basket.
@@ -182,7 +182,7 @@ export const useShippingMethodsForShipment = (
         method,
         queryKey,
         requiredParameters
-    }) as UseQueryResult<Data>
+    })
 }
 /**
  * This method gives you the external taxation data set by the PUT taxes API. This endpoint can be called only if external taxation mode was used for basket creation. See POST /baskets for more information.
@@ -224,5 +224,5 @@ export const useTaxesFromBasket = (
         method,
         queryKey,
         requiredParameters
-    }) as UseQueryResult<Data>
+    })
 }

@@ -41,7 +41,8 @@ export const getShopperContext: QueryKeyHelper<'getShopperContext'> = {
     queryKey: (params: Params<'getShopperContext'>) => {
         return [
             ...getShopperContext.path(params),
-            pickValidParams(params || {}, ShopperContexts.paramKeys.getShopperContext)
+            // TODO: replace `as any`
+            pickValidParams(params as any, ShopperContexts.paramKeys.getShopperContext)
         ]
     }
 }

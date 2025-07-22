@@ -57,5 +57,5 @@ export const useShopperContext = (
         method,
         queryKey,
         requiredParameters
-    }) as UseQueryResult<Data>
+    })
 }

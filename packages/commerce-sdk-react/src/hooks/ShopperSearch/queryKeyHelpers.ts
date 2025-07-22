@@ -5,9 +5,8 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import {ShopperSearch} from 'commerce-sdk-isomorphic'
-import {ApiClients, Argument, ExcludeTail} from '../types'
+import {Argument, ExcludeTail} from '../types'
 import {pickValidParams} from '../utils'
-
 // We must use a client with no parameters in order to have required/optional match the API spec
 type Client = ShopperSearch<{shortCode: string}>
 type Params<T extends keyof QueryKeys> = Partial<Argument<Client[T]>['parameters']>
@@ -47,7 +46,8 @@ export const productSearch: QueryKeyHelper<'productSearch'> = {
     queryKey: (params: Params<'productSearch'>) => {
         return [
             ...productSearch.path(params),
-            pickValidParams(params || {}, ShopperSearch.paramKeys.productSearch)
+            // TODO: replace `as any`
+            pickValidParams(params as any, ShopperSearch.paramKeys.productSearch)
         ]
     }
 }
@@ -62,7 +62,8 @@ export const getSearchSuggestions: QueryKeyHelper<'getSearchSuggestions'> = {
     queryKey: (params: Params<'getSearchSuggestions'>) => {
         return [
             ...getSearchSuggestions.path(params),
-            pickValidParams(params || {}, ShopperSearch.paramKeys.getSearchSuggestions)
+            // TODO: replace `as any`
+            pickValidParams(params as any, ShopperSearch.paramKeys.getSearchSuggestions)
         ]
     }
 }

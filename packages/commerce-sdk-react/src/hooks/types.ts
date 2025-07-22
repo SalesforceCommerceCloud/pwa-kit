@@ -139,12 +139,12 @@ export type DataType<T> = T extends ApiMethod<any, Response | infer R> ? R : nev
  */
 export type MergedOptions<Client extends ApiClient, Options extends ApiOptions> = Required<
     ApiOptions<
-        NonNullable<Options['parameters']>,
+        NonNullable<Client['clientConfig']['parameters'] & Options['parameters']>,
         // `body` may not exist on `Options`, in which case it is `unknown` here. Due to the type
         // constraint in `ApiOptions`, that is not a valid value. We must replace it with `never`
         // to indicate that the result type does not have a `body`.
         unknown extends Options['body'] ? never : Options['body'],
-        NonNullable<Options['headers']>
+        NonNullable<Client['clientConfig']['headers'] & Options['headers']>
     >
 >
 
@@ -179,7 +179,7 @@ export type OmitNullableParameters<T extends {parameters: object}> = Omit<T, 'pa
  * @property updater - Either the new data or a function that accepts old data and returns new data
  */
 export type CacheUpdateUpdate<T> = {
-    queryKey: ApiQueryKey<Record<string, unknown> | undefined>
+    queryKey: ApiQueryKey
     updater?: Updater<T | undefined, T | undefined>
 }
 

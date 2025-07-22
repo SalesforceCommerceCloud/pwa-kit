@@ -80,7 +80,8 @@ export const getBasket: QueryKeyHelper<'getBasket'> = {
     queryKey: (params: Params<'getBasket'>) => {
         return [
             ...getBasket.path(params),
-            pickValidParams(params || {}, ShopperBaskets.paramKeys.getBasket)
+            // TODO: replace `as any`
+            pickValidParams(params as any, ShopperBaskets.paramKeys.getBasket)
         ]
     }
 }
@@ -97,7 +98,8 @@ export const getPaymentMethodsForBasket: QueryKeyHelper<'getPaymentMethodsForBas
     queryKey: (params: Params<'getPaymentMethodsForBasket'>) => {
         return [
             ...getPaymentMethodsForBasket.path(params),
-            pickValidParams(params || {}, ShopperBaskets.paramKeys.getPaymentMethodsForBasket)
+            // TODO: replace `as any`
+            pickValidParams(params as any, ShopperBaskets.paramKeys.getPaymentMethodsForBasket)
         ]
     }
 }
@@ -114,7 +116,8 @@ export const getPriceBooksForBasket: QueryKeyHelper<'getPriceBooksForBasket'> = 
     queryKey: (params: Params<'getPriceBooksForBasket'>) => {
         return [
             ...getPriceBooksForBasket.path(params),
-            pickValidParams(params || {}, ShopperBaskets.paramKeys.getPriceBooksForBasket)
+            // TODO: replace `as any`
+            pickValidParams(params as any, ShopperBaskets.paramKeys.getPriceBooksForBasket)
         ]
     }
 }
@@ -133,7 +136,8 @@ export const getShippingMethodsForShipment: QueryKeyHelper<'getShippingMethodsFo
     queryKey: (params: Params<'getShippingMethodsForShipment'>) => {
         return [
             ...getShippingMethodsForShipment.path(params),
-            pickValidParams(params || {}, ShopperBaskets.paramKeys.getShippingMethodsForShipment)
+            // TODO: replace `as any`
+            pickValidParams(params as any, ShopperBaskets.paramKeys.getShippingMethodsForShipment)
         ]
     }
 }
@@ -150,7 +154,8 @@ export const getTaxesFromBasket: QueryKeyHelper<'getTaxesFromBasket'> = {
     queryKey: (params: Params<'getTaxesFromBasket'>) => {
         return [
             ...getTaxesFromBasket.path(params),
-            pickValidParams(params || {}, ShopperBaskets.paramKeys.getTaxesFromBasket)
+            // TODO: replace `as any`
+            pickValidParams(params as any, ShopperBaskets.paramKeys.getTaxesFromBasket)
         ]
     }
 }

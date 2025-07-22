@@ -37,21 +37,6 @@ type QueryKeyHelper<T extends keyof QueryKeys> = {
     queryKey: (params: Params<T>) => QueryKeys[T]
 }
 
-export const getStores: QueryKeyHelper<'getStores'> = {
-    path: (params) => [
-        '/commerce-sdk-react',
-        '/organizations/',
-        params?.organizationId,
-        '/stores'
-    ],
-    queryKey: (params: Params<'getStores'>) => {
-        return [
-            ...getStores.path(params),
-            pickValidParams(params || {}, ShopperStores.paramKeys.getStores)
-        ]
-    }
-}
-
 export const searchStores: QueryKeyHelper<'searchStores'> = {
     path: (params) => [
         '/commerce-sdk-react',
@@ -62,7 +47,19 @@ export const searchStores: QueryKeyHelper<'searchStores'> = {
     queryKey: (params: Params<'searchStores'>) => {
         return [
             ...searchStores.path(params),
-            pickValidParams(params || {}, ShopperStores.paramKeys.searchStores)
+            // TODO: replace `as any`
+            pickValidParams(params as any, ShopperStores.paramKeys.searchStores)
+        ]
+    }
+}
+
+export const getStores: QueryKeyHelper<'getStores'> = {
+    path: (params) => ['/commerce-sdk-react', '/organizations/', params?.organizationId, '/stores'],
+    queryKey: (params: Params<'getStores'>) => {
+        return [
+            ...getStores.path(params),
+            // TODO: replace `as any`
+            pickValidParams(params as any, ShopperStores.paramKeys.getStores)
         ]
     }
 }

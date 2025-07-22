@@ -55,26 +55,23 @@ export const useQuery = <Client extends ApiClient, Options extends ApiOptions, D
     // for this case would add significantly more complexity.
     const wrappedMethod = async () => await authenticatedMethod(apiOptions as Options)
 
-    return useReactQuery(
-        hookConfig.queryKey as any,
-        wrappedMethod as any,
-        {
-            enabled:
-                // Individual hooks can provide `enabled` checks that are done in ADDITION to
-                // the required parameter check
-                hookConfig.enabled !== false &&
-                // The default `enabled` is "has all required parameters"
-                hasAllKeys(apiOptions.parameters, hookConfig.requiredParameters),
-            // End users can always completely OVERRIDE the default `enabled` check
+    // TODO: replace `as any`
+    return useReactQuery(hookConfig.queryKey as any, wrappedMethod as any, {
+        enabled:
+            // Individual hooks can provide `enabled` checks that are done in ADDITION to
+            // the required parameter check
+            hookConfig.enabled !== false &&
+            // The default `enabled` is "has all required parameters"
+            hasAllKeys(apiOptions.parameters, hookConfig.requiredParameters),
+        // End users can always completely OVERRIDE the default `enabled` check
 
-            ...queryOptions,
-            // never retry on server side because it hurts server side rendering performance
-            ...(queryOptions?.retry ? {retry: onClient() ? queryOptions?.retry : false} : {}),
-            ...(queryOptions?.retryOnMount
-                ? {retryOnMount: onClient() ? queryOptions?.retryOnMount : false}
-                : {})
-        } as any
-    )
+        ...queryOptions,
+        // never retry on server side because it hurts server side rendering performance
+        ...(queryOptions?.retry ? {retry: onClient() ? queryOptions?.retry : false} : {}),
+        ...(queryOptions?.retryOnMount
+            ? {retryOnMount: onClient() ? queryOptions?.retryOnMount : false}
+            : {})
+    })
 }
 
 /**

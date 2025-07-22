@@ -45,13 +45,14 @@ const MockComponent = () => {
             <button
                 onClick={() => {
                     helpers
+                        // TODO: replace `as any`
                         .addItemToNewOrExistingBasket([
                             {
                                 productId: 'product-123',
                                 price: 100,
                                 quantity: 1
                             }
-                        ])
+                        ] as any)
                         .catch((e) => console.log('e', e))
                 }}
             >
@@ -93,15 +94,13 @@ describe('useShopperBasketsMutationHelper.addItemToNewOrExistingBasket', functio
         await waitFor(() =>
             expect(mockAsyncMutate.mock.calls[0][0]).toEqual({
                 parameters: {basketId},
-                body: {
-                    productItems: [
-                        {
-                            productId: 'product-123',
-                            price: 100,
-                            quantity: 1
-                        }
-                    ]
-                }
+                body: [
+                    {
+                        productId: 'product-123',
+                        price: 100,
+                        quantity: 1
+                    }
+                ]
             })
         )
     })
@@ -142,15 +141,13 @@ describe('useShopperBasketsMutationHelper.addItemToNewOrExistingBasket', functio
         await waitFor(() =>
             expect(mockAsyncMutate.mock.calls[1][0]).toEqual({
                 parameters: {basketId},
-                body: {
-                    productItems: [
-                        {
-                            productId: 'product-123',
-                            price: 100,
-                            quantity: 1
-                        }
-                    ]
-                }
+                body: [
+                    {
+                        productId: 'product-123',
+                        price: 100,
+                        quantity: 1
+                    }
+                ]
             })
         )
     })
