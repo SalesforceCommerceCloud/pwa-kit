@@ -7487,20 +7487,6 @@
       "value": "]"
     }
   ],
-  "shipping_multi_address.error.title": [
-    {
-      "type": 0,
-      "value": "["
-    },
-    {
-      "type": 0,
-      "value": "Ḗřřǿǿř"
-    },
-    {
-      "type": 0,
-      "value": "]"
-    }
-  ],
   "shipping_multi_address.format.address_line_2": [
     {
       "type": 0,

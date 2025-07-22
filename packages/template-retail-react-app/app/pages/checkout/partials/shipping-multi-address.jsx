@@ -168,8 +168,6 @@ const ShippingMultiAddress = ({
 
     // Add address form state - track which product card is showing the add address form
     const [showAddAddressForm, setShowAddAddressForm] = useState({}) // productId-index -> boolean
-    const [isSubmitting, setIsSubmitting] = useState(false)
-    const [formErrors, setFormErrors] = useState({}) // Track form-specific errors
 
     // Create form instance for address form
     const addressForm = useForm({
@@ -271,7 +269,8 @@ const ShippingMultiAddress = ({
 
     // Handle address creation
     const handleCreateAddress = async (addressData, productId, index, form, itemId) => {
-        const addressKey = itemId || `${productId}-${index}`
+        // itemId is unique for each basket item and always present
+        const addressKey = itemId
 
         try {
             const newAddress = {
@@ -289,8 +288,8 @@ const ShippingMultiAddress = ({
             setShowAddAddressForm((prev) => ({...prev, [addressKey]: false}))
             form.reset()
 
-            // Clear any previous errors for this form
-            setFormErrors((prev) => ({...prev, [addressKey]: null}))
+            // Clear form errors using react-hook-form
+            form.clearErrors()
 
             // Refetch customer data to get the updated addresses list
             await refetchCustomer()
@@ -310,13 +309,15 @@ const ShippingMultiAddress = ({
             })
         } catch (error) {
             console.error('Error creating address:', error)
-            setFormErrors((prev) => ({
-                ...prev,
-                [addressKey]: formatMessage({
+
+            // Use react-hook-form's setError to set a global error
+            addressForm.setError('global', {
+                type: 'manual',
+                message: formatMessage({
                     id: 'shipping_multi_address.error.save_failed',
                     defaultMessage: 'Failed to save address. Please try again.'
                 })
-            }))
+            })
 
             showToast({
                 title: formatMessage({
@@ -348,7 +349,8 @@ const ShippingMultiAddress = ({
                                 selectedVariationAttributes: variant.variationValues
                             })?.images?.[0]
                             const imageUrl = image?.disBaseLink || image?.link || ''
-                            const addressKey = item.itemId || `${item.productId}-${index}`
+                            // itemId is unique for each basket item and always present
+                            const addressKey = item.itemId
                             const selectedAddressId =
                                 selectedAddresses[addressKey] ||
                                 (addresses.length > 0 ? addresses[0]?.addressId : '')
@@ -540,24 +542,6 @@ const ShippingMultiAddress = ({
                                     {/* Add New Address Form - appears inside the product card */}
                                     {showAddAddressForm[addressKey] && (
                                         <Box position="relative" mt={4} width="100%">
-                                            {/* Error display */}
-                                            {formErrors[addressKey] && (
-                                                <Alert status="error" mb={4}>
-                                                    <AlertIcon />
-                                                    <Box>
-                                                        <AlertTitle>
-                                                            {formatMessage({
-                                                                id: 'shipping_multi_address.error.title',
-                                                                defaultMessage: 'Error'
-                                                            })}
-                                                        </AlertTitle>
-                                                        <AlertDescription>
-                                                            {formErrors[addressKey]}
-                                                        </AlertDescription>
-                                                    </Box>
-                                                </Alert>
-                                            )}
-
                                             <AddressForm
                                                 item={item}
                                                 index={index}
@@ -568,10 +552,8 @@ const ShippingMultiAddress = ({
                                                         ...prev,
                                                         [addressKey]: false
                                                     }))
-                                                    setFormErrors((prev) => ({
-                                                        ...prev,
-                                                        [addressKey]: null
-                                                    }))
+                                                    // Clear form errors using react-hook-form
+                                                    addressForm.clearErrors()
                                                 }}
                                             />
                                         </Box>
@@ -594,7 +576,7 @@ const ShippingMultiAddress = ({
                         <Button
                             type="button"
                             width="full"
-                            isLoading={isSubmitting}
+                            isLoading={addressForm.formState.isSubmitting}
                             loadingText={formatMessage({
                                 id: 'shipping_multi_address.submit.loading',
                                 defaultMessage: 'Saving address...'
@@ -605,8 +587,6 @@ const ShippingMultiAddress = ({
                                     'Continue to next step with selected delivery addresses'
                             })}
                             onClick={async () => {
-                                setIsSubmitting(true)
-
                                 try {
                                     // Check if there are any open address forms that need to be saved
                                     const openForms = Object.keys(showAddAddressForm).filter(
@@ -622,7 +602,6 @@ const ShippingMultiAddress = ({
                                             }),
                                             status: 'warning'
                                         })
-                                        setIsSubmitting(false)
                                         return
                                     }
 
@@ -637,8 +616,6 @@ const ShippingMultiAddress = ({
                                         }),
                                         status: 'error'
                                     })
-                                } finally {
-                                    setIsSubmitting(false)
                                 }
                             }}
                         >

@@ -82,6 +82,7 @@ jest.mock('@salesforce/retail-react-app/app/components/display-price', () => {
 const mockBasket = {
     productItems: [
         {
+            itemId: 'item-1',
             productId: 'product-1',
             productName: 'Test Product 1',
             quantity: 2,
@@ -89,6 +90,7 @@ const mockBasket = {
             variationValues: {color: 'red', size: 'M'}
         },
         {
+            itemId: 'item-2',
             productId: 'product-2',
             productName: 'Test Product 2',
             quantity: 1,
