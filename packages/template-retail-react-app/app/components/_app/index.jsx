@@ -454,7 +454,7 @@ const App = (props) => {
                                 {!isCheckout && !isDevPath ? <Footer /> : !isDevPath ? <CheckoutFooter /> : null}
 
                                 <AuthModal {...authModal} />
-                                <DntNotification {...dntNotification} />
+                                {!isDevPath && <DntNotification {...dntNotification} />}
                             </AddToCartModalProvider>
                         </Box>
                     </CurrencyProvider>

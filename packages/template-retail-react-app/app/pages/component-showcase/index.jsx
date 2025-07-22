@@ -84,7 +84,6 @@ import Hero2 from '@salesforce/retail-react-app/app/components/Hero3/index.jsx';
 import Hero3 from '@salesforce/retail-react-app/app/components/Hero2/index.jsx';
 import ShopCategory from '@salesforce/retail-react-app/app/components/ShopCategory';
 import ShopNowBar from '@salesforce/retail-react-app/app/components/ShopNowBar';
-import Carousel from '@salesforce/retail-react-app/app/page-designer/layouts/Carousel';
 import Carousel2 from '@salesforce/retail-react-app/app/components/Carousel2';
 
 const mockProducts = [
@@ -295,7 +294,12 @@ const componentCategories = [
             <Box maxW="400px">
                 <ActionCard
                     onEdit={() => alert('Edit clicked!')}
-                    onRemove={() => new Promise(resolve => { setTimeout(resolve, 1000); alert('Removed!') })}
+                    onRemove={() => new Promise(resolve => { 
+                        setTimeout(() => {
+                            alert('Removed!');
+                            resolve();
+                        }, 1000);
+                    })}
                 >
                     <Box>
                         <strong>Shipping Address</strong>
@@ -554,31 +558,6 @@ const componentCategories = [
         description: 'A bar with multiple ShopCategory components.',
         component: (
             <ShopNowBar />
-        )
-    },
-    {
-        name: 'Carousel',
-        description: 'A carousel component for showcasing items.',
-        component: (
-            <Carousel
-                textHeadline="Featured Products"
-                xsCarouselIndicators={true}
-                smCarouselIndicators={true}
-                mdCarouselIndicators={true}
-                xsCarouselControls={true}
-                smCarouselControls={true}
-                xsCarouselSlidesToDisplay={1}
-                smCarouselSlidesToDisplay={2}
-                mdCarouselSlidesToDisplay={3}
-                regions={[{ components: mockProducts.map(product => (
-                    <ProductTile
-                        key={product.id}
-                        product={product}
-                        enableFavourite={true}
-                        isFavourite={false}
-                    />
-                )) }]}
-            />
         )
     },
     {
