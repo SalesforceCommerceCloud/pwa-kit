@@ -31,8 +31,6 @@ const mockIsItemInWishlist = jest.fn().mockReturnValue(false)
 jest.mock('../../hooks/use-wish-list', () => ({
     __esModule: true,
     useWishList: () => ({
-        // It's a safe bet that the hook returns the wishlist data.
-        // We'll mock it with the first wishlist from our test data.
         data: mockWishlistWithItem.data[0],
         addToWishlist: mockAddToWishlist,
         isItemInWishlist: mockIsItemInWishlist,
