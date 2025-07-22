@@ -46,16 +46,12 @@ describe('ListMenu', () => {
         const triggerButton = screen.getByRole('button', {expanded: false})
         expect(triggerButton).toBeInTheDocument()
 
-        // Focus on the trigger button and press Enter to open popover
         await act(async () => {
             triggerButton.focus()
             await user.keyboard('{Enter}')
         })
-
-        // Verify popover is open by checking aria-expanded attribute
         expect(triggerButton).toHaveAttribute('aria-expanded', 'true')
 
-        // Verify popover content is visible
         const suit = screen.getByText(/suits/i)
         expect(suit).toBeInTheDocument()
 
@@ -67,7 +63,6 @@ describe('ListMenu', () => {
             await user.keyboard('{Escape}')
         })
 
-        // Verify popover is closed by checking aria-expanded attribute
         await waitFor(() => {
             expect(triggerButton).toHaveAttribute('aria-expanded', 'false')
         })
