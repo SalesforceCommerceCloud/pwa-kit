@@ -634,10 +634,13 @@ const Cart = () => {
                     categorizedProducts.bonusProducts.length
             }
 
-            if (isPickupOrder) {
-                pickupShipments.push(shipmentData)
-            } else {
-                deliveryShipments.push(shipmentData)
+            // Only add shipments that have items
+            if (shipmentData.itemsInShipment > 0) {
+                if (isPickupOrder) {
+                    pickupShipments.push(shipmentData)
+                } else {
+                    deliveryShipments.push(shipmentData)
+                }
             }
         })
 
