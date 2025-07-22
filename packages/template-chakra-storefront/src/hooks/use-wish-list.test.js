@@ -313,7 +313,7 @@ describe('useWishList', () => {
         const product = {id: 'new-product'}
 
         await act(async () => {
-            await result.current.addToWishlist(product, null, {quantity: 3})
+            await result.current.addToWishlist(product, null, 3)
         })
 
         expect(mockCreateCustomerProductListItem.mutateAsync).toHaveBeenCalledWith(
@@ -323,21 +323,5 @@ describe('useWishList', () => {
                 })
             })
         )
-    })
-
-    it('should use custom error handler when provided', async () => {
-        const customErrorHandler = jest.fn()
-        mockCreateCustomerProductListItem.mutateAsync.mockRejectedValue(new Error('API Error'))
-
-        const {result} = renderHook(() => useWishList())
-
-        const product = {id: 'new-product'}
-
-        await act(async () => {
-            await result.current.addToWishlist(product, null, {showError: customErrorHandler})
-        })
-
-        expect(customErrorHandler).toHaveBeenCalled()
-        expect(mockToast).not.toHaveBeenCalledWith(expect.objectContaining({type: 'error'}))
     })
 })
