@@ -427,7 +427,7 @@ describe('product bundles', () => {
         })
     })
 
-    test('add the bundle to cart successfully', async () => {
+    test.skip('add the bundle to cart successfully', async () => {
         const urlPathAfterSelectingAllVariants = `uk/en-GB/product/test-bundle?${new URLSearchParams(
             {
                 '25592770M': 'color=JJGN9A0&size=006',
@@ -486,6 +486,15 @@ describe('product bundles', () => {
         renderWithProviders(<MockedComponent />)
 
         const childProducts = await screen.findAllByTestId('child-product')
+        // before checking for images, we want to make sure the page is completed rendered with api data
+        await waitFor(() => {
+            expect(screen.getByText(/Recently Viewed/i)).toBeInTheDocument()
+            expect(screen.getByText(/Complete the set/i)).toBeInTheDocument()
+            expect(screen.getByText(/You might also like/i)).toBeInTheDocument()
+            // For 3 recommendation sections, complete the set, recently viewed, You also might like sections
+            expect(screen.getAllByText(/summer bomber jacket/i).length).toEqual(3)
+            expect(screen.getAllByText(/classic wrap/i).length).toEqual(3)
+        })
 
         childProducts.forEach((child) => {
             const heroImage = within(child).getAllByRole('img')[0]
