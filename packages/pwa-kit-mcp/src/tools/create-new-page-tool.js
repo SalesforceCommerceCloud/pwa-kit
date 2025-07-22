@@ -26,9 +26,9 @@ const systemPromptForProductHook =
             1. add the hook useProduct with parameters to the new page following exactly product-detail/index.jsx as example, \
             2. update ProductView tag to pass product and isProductLoading as props, \
             3. in routes.jsx, update the path for the new page with '/:productId'. \
-            If user answers no, skip this step.`;
+            4. open the new page in the browser with URL: http://localhost:3000/{static-route-path}/25592300M \
+            If user answers no, skip above steps.`;
 
-// Define the system prompt function
 const systemPromptForUnfoundComponents = (unfoundComponents) => 
     `The following components were not found: ${unfoundComponents.join(', ')}. \
      Please try to suggest changes based on these unfound components within the newly generated page file.`;
