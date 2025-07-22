@@ -39,8 +39,7 @@ export const getUrlMapping: QueryKeyHelper<'getUrlMapping'> = {
     queryKey: (params: Params<'getUrlMapping'>) => {
         return [
             ...getUrlMapping.path(params),
-            // TODO: replace `as any`
-            pickValidParams(params as any, ShopperSEO.paramKeys.getUrlMapping)
+            pickValidParams(params || {}, ShopperSEO.paramKeys.getUrlMapping)
         ]
     }
 }

@@ -47,8 +47,7 @@ export const searchStores: QueryKeyHelper<'searchStores'> = {
     queryKey: (params: Params<'searchStores'>) => {
         return [
             ...searchStores.path(params),
-            // TODO: replace `as any`
-            pickValidParams(params as any, ShopperStores.paramKeys.searchStores)
+            pickValidParams(params || {}, ShopperStores.paramKeys.searchStores)
         ]
     }
 }
@@ -58,8 +57,7 @@ export const getStores: QueryKeyHelper<'getStores'> = {
     queryKey: (params: Params<'getStores'>) => {
         return [
             ...getStores.path(params),
-            // TODO: replace `as any`
-            pickValidParams(params as any, ShopperStores.paramKeys.getStores)
+            pickValidParams(params || {}, ShopperStores.paramKeys.getStores)
         ]
     }
 }

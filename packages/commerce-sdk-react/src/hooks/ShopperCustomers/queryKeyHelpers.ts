@@ -150,8 +150,7 @@ export const getCustomer: QueryKeyHelper<'getCustomer'> = {
     queryKey: (params: Params<'getCustomer'>) => {
         return [
             ...getCustomer.path(params),
-            // TODO: replace `as any`
-            pickValidParams(params as any, ShopperCustomers.paramKeys.getCustomer)
+            pickValidParams(params || {}, ShopperCustomers.paramKeys.getCustomer)
         ]
     }
 }
@@ -169,8 +168,7 @@ export const getCustomerAddress: QueryKeyHelper<'getCustomerAddress'> = {
     queryKey: (params: Params<'getCustomerAddress'>) => {
         return [
             ...getCustomerAddress.path(params),
-            // TODO: replace `as any`
-            pickValidParams(params as any, ShopperCustomers.paramKeys.getCustomerAddress)
+            pickValidParams(params || {}, ShopperCustomers.paramKeys.getCustomerAddress)
         ]
     }
 }
@@ -186,8 +184,7 @@ export const getCustomerBaskets: QueryKeyHelper<'getCustomerBaskets'> = {
     queryKey: (params: Params<'getCustomerBaskets'>) => {
         return [
             ...getCustomerBaskets.path(params),
-            // TODO: replace `as any`
-            pickValidParams(params as any, ShopperCustomers.paramKeys.getCustomerBaskets)
+            pickValidParams(params || {}, ShopperCustomers.paramKeys.getCustomerBaskets)
         ]
     }
 }
@@ -204,8 +201,7 @@ export const getCustomerOrders: QueryKeyHelper<'getCustomerOrders'> = {
     queryKey: (params: Params<'getCustomerOrders'>) => {
         return [
             ...getCustomerOrders.path(params),
-            // TODO: replace `as any`
-            pickValidParams(params as any, ShopperCustomers.paramKeys.getCustomerOrders)
+            pickValidParams(params || {}, ShopperCustomers.paramKeys.getCustomerOrders)
         ]
     }
 }
@@ -223,8 +219,7 @@ export const getCustomerPaymentInstrument: QueryKeyHelper<'getCustomerPaymentIns
     queryKey: (params: Params<'getCustomerPaymentInstrument'>) => {
         return [
             ...getCustomerPaymentInstrument.path(params),
-            // TODO: replace `as any`
-            pickValidParams(params as any, ShopperCustomers.paramKeys.getCustomerPaymentInstrument)
+            pickValidParams(params || {}, ShopperCustomers.paramKeys.getCustomerPaymentInstrument)
         ]
     }
 }
@@ -241,8 +236,7 @@ export const getCustomerProductLists: QueryKeyHelper<'getCustomerProductLists'> 
     queryKey: (params: Params<'getCustomerProductLists'>) => {
         return [
             ...getCustomerProductLists.path(params),
-            // TODO: replace `as any`
-                pickValidParams(params as any, ShopperCustomers.paramKeys.getCustomerProductLists)
+            pickValidParams(params || {}, ShopperCustomers.paramKeys.getCustomerProductLists)
         ]
     }
 }
@@ -260,8 +254,7 @@ export const getCustomerProductList: QueryKeyHelper<'getCustomerProductList'> = 
     queryKey: (params: Params<'getCustomerProductList'>) => {
         return [
             ...getCustomerProductList.path(params),
-            // TODO: replace `as any`
-            pickValidParams(params as any, ShopperCustomers.paramKeys.getCustomerProductList)
+            pickValidParams(params || {}, ShopperCustomers.paramKeys.getCustomerProductList)
         ]
     }
 }
@@ -281,8 +274,7 @@ export const getCustomerProductListItem: QueryKeyHelper<'getCustomerProductListI
     queryKey: (params: Params<'getCustomerProductListItem'>) => {
         return [
             ...getCustomerProductListItem.path(params),
-            // TODO: replace `as any`
-            pickValidParams(params as any, ShopperCustomers.paramKeys.getCustomerProductListItem)
+            pickValidParams(params || {}, ShopperCustomers.paramKeys.getCustomerProductListItem)
         ]
     }
 }
@@ -298,9 +290,8 @@ export const getPublicProductListsBySearchTerm: QueryKeyHelper<'getPublicProduct
         queryKey: (params: Params<'getPublicProductListsBySearchTerm'>) => {
             return [
                 ...getPublicProductListsBySearchTerm.path(params),
-                // TODO: replace `as any`
                 pickValidParams(
-                    params as any,
+                    params || {},
                     ShopperCustomers.paramKeys.getPublicProductListsBySearchTerm
                 )
             ]
@@ -318,8 +309,7 @@ export const getPublicProductList: QueryKeyHelper<'getPublicProductList'> = {
     queryKey: (params: Params<'getPublicProductList'>) => {
         return [
             ...getPublicProductList.path(params),
-            // TODO: replace `as any`
-            pickValidParams(params as any, ShopperCustomers.paramKeys.getPublicProductList)
+            pickValidParams(params || {}, ShopperCustomers.paramKeys.getPublicProductList)
         ]
     }
 }
@@ -337,8 +327,7 @@ export const getProductListItem: QueryKeyHelper<'getProductListItem'> = {
     queryKey: (params: Params<'getProductListItem'>) => {
         return [
             ...getProductListItem.path(params),
-            // TODO: replace `as any`
-            pickValidParams(params as any, ShopperCustomers.paramKeys.getProductListItem)
+            pickValidParams(params || {}, ShopperCustomers.paramKeys.getProductListItem)
         ]
     }
 }

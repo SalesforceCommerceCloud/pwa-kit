@@ -43,7 +43,7 @@ export const getPages: QueryKeyHelper<'getPages'> = {
     queryKey: (params: Params<'getPages'>) => {
         return [
             ...getPages.path(params),
-            pickValidParams(params as any, ShopperExperience.paramKeys.getPages)
+            pickValidParams(params || {}, ShopperExperience.paramKeys.getPages)
         ]
     }
 }
@@ -59,8 +59,7 @@ export const getPage: QueryKeyHelper<'getPage'> = {
     queryKey: (params: Params<'getPage'>) => {
         return [
             ...getPage.path(params),
-            // TODO: replace `as any`
-            pickValidParams(params as any, ShopperExperience.paramKeys.getPage)
+            pickValidParams(params || {}, ShopperExperience.paramKeys.getPage)
         ]
     }
 }

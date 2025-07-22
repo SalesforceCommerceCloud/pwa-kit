@@ -48,8 +48,7 @@ export const getPromotions: QueryKeyHelper<'getPromotions'> = {
     queryKey: (params: Params<'getPromotions'>) => {
         return [
             ...getPromotions.path(params),  
-            // TODO: replace `as any`
-            pickValidParams(params as any, ShopperPromotions.paramKeys.getPromotions)
+            pickValidParams(params || {}, ShopperPromotions.paramKeys.getPromotions)
         ]
     }
 }
@@ -65,8 +64,7 @@ export const getPromotionsForCampaign: QueryKeyHelper<'getPromotionsForCampaign'
     queryKey: (params: Params<'getPromotionsForCampaign'>) => {
         return [
             ...getPromotionsForCampaign.path(params),   
-            // TODO: replace `as any`
-            pickValidParams(params as any, ShopperPromotions.paramKeys.getPromotionsForCampaign)
+            pickValidParams(params || {}, ShopperPromotions.paramKeys.getPromotionsForCampaign)
         ]
     }
 }

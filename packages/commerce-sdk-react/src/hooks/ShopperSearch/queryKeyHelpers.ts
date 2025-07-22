@@ -46,8 +46,7 @@ export const productSearch: QueryKeyHelper<'productSearch'> = {
     queryKey: (params: Params<'productSearch'>) => {
         return [
             ...productSearch.path(params),
-            // TODO: replace `as any`
-            pickValidParams(params as any, ShopperSearch.paramKeys.productSearch)
+            pickValidParams(params || {}, ShopperSearch.paramKeys.productSearch)
         ]
     }
 }
@@ -62,8 +61,7 @@ export const getSearchSuggestions: QueryKeyHelper<'getSearchSuggestions'> = {
     queryKey: (params: Params<'getSearchSuggestions'>) => {
         return [
             ...getSearchSuggestions.path(params),
-            // TODO: replace `as any`
-            pickValidParams(params as any, ShopperSearch.paramKeys.getSearchSuggestions)
+            pickValidParams(params || {}, ShopperSearch.paramKeys.getSearchSuggestions)
         ]
     }
 }
