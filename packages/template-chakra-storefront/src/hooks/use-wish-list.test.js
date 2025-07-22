@@ -47,7 +47,7 @@ const mockProductLists = {
 describe('useWishList', () => {
     beforeEach(() => {
         jest.clearAllMocks()
-        
+
         useIntl.mockReturnValue({formatMessage: mockFormatMessage})
         useToast.mockReturnValue(mockToast)
         useNavigation.mockReturnValue(mockNavigate)
@@ -96,7 +96,7 @@ describe('useWishList', () => {
 
     it('should check if item is in wishlist correctly', () => {
         const {result} = renderHook(() => useWishList())
-        
+
         const productInWishlist = {id: 'product-1'}
         const productNotInWishlist = {id: 'product-3'}
 
@@ -106,7 +106,7 @@ describe('useWishList', () => {
 
     it('should check item in wishlist with variant', () => {
         const {result} = renderHook(() => useWishList())
-        
+
         const product = {id: 'base-product'}
         const variant = {productId: 'product-1'}
 
@@ -115,9 +115,9 @@ describe('useWishList', () => {
 
     it('should add item to wishlist successfully', async () => {
         mockCreateCustomerProductListItem.mutateAsync.mockResolvedValue({})
-        
+
         const {result} = renderHook(() => useWishList())
-        
+
         const product = {id: 'new-product'}
 
         await act(async () => {
@@ -146,7 +146,7 @@ describe('useWishList', () => {
 
     it('should show info toast when item already in wishlist', async () => {
         const {result} = renderHook(() => useWishList())
-        
+
         const product = {id: 'product-1'}
 
         await act(async () => {
@@ -163,9 +163,9 @@ describe('useWishList', () => {
 
     it('should handle add to wishlist error', async () => {
         mockCreateCustomerProductListItem.mutateAsync.mockRejectedValue(new Error('API Error'))
-        
+
         const {result} = renderHook(() => useWishList())
-        
+
         const product = {id: 'new-product'}
 
         await act(async () => {
@@ -180,9 +180,9 @@ describe('useWishList', () => {
 
     it('should remove item from wishlist successfully', async () => {
         mockDeleteCustomerProductListItem.mutateAsync.mockResolvedValue({})
-        
+
         const {result} = renderHook(() => useWishList())
-        
+
         const product = {id: 'product-1'}
 
         await act(async () => {
@@ -205,7 +205,7 @@ describe('useWishList', () => {
 
     it('should not remove item that is not in wishlist', async () => {
         const {result} = renderHook(() => useWishList())
-        
+
         const product = {id: 'product-not-in-list'}
 
         await act(async () => {
@@ -217,9 +217,9 @@ describe('useWishList', () => {
 
     it('should handle remove from wishlist error', async () => {
         mockDeleteCustomerProductListItem.mutateAsync.mockRejectedValue(new Error('API Error'))
-        
+
         const {result} = renderHook(() => useWishList())
-        
+
         const product = {id: 'product-1'}
 
         await act(async () => {
@@ -234,9 +234,9 @@ describe('useWishList', () => {
 
     it('should toggle wishlist - add when not in wishlist', async () => {
         mockCreateCustomerProductListItem.mutateAsync.mockResolvedValue({})
-        
+
         const {result} = renderHook(() => useWishList())
-        
+
         const product = {id: 'new-product'}
 
         await act(async () => {
@@ -248,9 +248,9 @@ describe('useWishList', () => {
 
     it('should toggle wishlist - remove when in wishlist', async () => {
         mockDeleteCustomerProductListItem.mutateAsync.mockResolvedValue({})
-        
+
         const {result} = renderHook(() => useWishList())
-        
+
         const product = {id: 'product-1'}
 
         await act(async () => {
@@ -262,7 +262,7 @@ describe('useWishList', () => {
 
     it('should handle no customerId gracefully', () => {
         useCustomerId.mockReturnValue(null)
-        
+
         const {result} = renderHook(() => useWishList())
 
         act(() => {
@@ -279,7 +279,7 @@ describe('useWishList', () => {
             isLoading: false,
             error: null
         })
-        
+
         const {result} = renderHook(() => useWishList())
 
         act(() => {
@@ -296,7 +296,7 @@ describe('useWishList', () => {
             isLoading: false,
             error: null
         })
-        
+
         renderHook(() => useWishList())
 
         expect(mockCreateCustomerProductList.mutate).toHaveBeenCalledWith({
@@ -307,9 +307,9 @@ describe('useWishList', () => {
 
     it('should handle custom quantity in addToWishlist', async () => {
         mockCreateCustomerProductListItem.mutateAsync.mockResolvedValue({})
-        
+
         const {result} = renderHook(() => useWishList())
-        
+
         const product = {id: 'new-product'}
 
         await act(async () => {
@@ -328,9 +328,9 @@ describe('useWishList', () => {
     it('should use custom error handler when provided', async () => {
         const customErrorHandler = jest.fn()
         mockCreateCustomerProductListItem.mutateAsync.mockRejectedValue(new Error('API Error'))
-        
+
         const {result} = renderHook(() => useWishList())
-        
+
         const product = {id: 'new-product'}
 
         await act(async () => {
@@ -338,8 +338,6 @@ describe('useWishList', () => {
         })
 
         expect(customErrorHandler).toHaveBeenCalled()
-        expect(mockToast).not.toHaveBeenCalledWith(
-            expect.objectContaining({type: 'error'})
-        )
+        expect(mockToast).not.toHaveBeenCalledWith(expect.objectContaining({type: 'error'}))
     })
 })
