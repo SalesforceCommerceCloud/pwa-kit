@@ -48,6 +48,7 @@ import {
     STORE_LOCATOR_IS_ENABLED
 } from '@salesforce/retail-react-app/app/constants'
 import {useCurrency} from '@salesforce/retail-react-app/app/hooks'
+import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import {nanoid} from 'nanoid'
 
 const onClient = typeof window !== 'undefined'
@@ -71,6 +72,7 @@ const CheckoutConfirmation = () => {
     const {data: products} = useProducts({parameters: {ids: itemIds?.join(',')}})
     const productItemsMap = products?.data.reduce((map, item) => ({...map, [item.id]: item}), {})
     const form = useForm()
+    const {oneClickCheckout = {}} = getConfig().app || {}
 
     // Check if this is a pickup order and get store details
     const isPickupOrder = STORE_LOCATOR_IS_ENABLED
@@ -226,7 +228,7 @@ const CheckoutConfirmation = () => {
                         </Stack>
                     </Box>
 
-                    {customer.isGuest && (
+                    {!oneClickCheckout.enabled && customer.isGuest && (
                         <Box
                             layerStyle="card"
                             rounded={[0, 0, 'base']}
