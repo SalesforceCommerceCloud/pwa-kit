@@ -10,18 +10,6 @@
  * Functions for handling address autocomplete functionality
  */
 
-import {mockAddresses} from '@salesforce/retail-react-app/app/mocks/mock-address-suggestions'
-
-// Constants
-const API_DELAY_MS = 300
-/**
- * Simulates API delay similar to real Google Places API
- * @param {number} delay - Delay in milliseconds
- */
-const simulateDelay = (delay = API_DELAY_MS) => {
-    return new Promise((resolve) => setTimeout(resolve, delay))
-}
-
 /**
  * Mock function to get address suggestions based on input
  * @param {string} input - User input string
@@ -29,37 +17,54 @@ const simulateDelay = (delay = API_DELAY_MS) => {
  * @returns {Promise<Array>} Array of address suggestions
  */
 export const getAddressSuggestions = async (input, countryCode) => {
-    // Simulate API delay
-    await simulateDelay()
+    // Mock data for testing
+    const mockSuggestions = [
+        {
+            description: '123 Main St, New York, NY 10001, USA',
+            place_id: 'mock_1',
+            structured_formatting: {
+                main_text: '123 Main St',
+                secondary_text: 'New York, NY 10001, USA'
+            },
+            terms: [
+                {value: '123 Main St'},
+                {value: 'New York'},
+                {value: 'NY'},
+                {value: '10001'},
+                {value: 'USA'}
+            ]
+        },
+        {
+            description: '456 Oak Ave, Toronto, ON M5C 1W4, Canada',
+            place_id: 'mock_2',
+            structured_formatting: {
+                main_text: '456 Oak Ave',
+                secondary_text: 'Toronto, ON M5C 1W4, Canada'
+            },
+            terms: [
+                {value: '456 Oak Ave'},
+                {value: 'Toronto'},
+                {value: 'ON'},
+                {value: 'M5C 1W4'},
+                {value: 'Canada'}
+            ]
+        }
+    ]
 
-    // Convert input to lowercase for case-insensitive matching
-    const searchTerm = input.toLowerCase().trim()
+    // Filter by country if specified
+    if (countryCode) {
+        return mockSuggestions.filter((suggestion) => {
+            const description = suggestion.description.toLowerCase()
+            if (countryCode === 'US') {
+                return description.includes('usa')
+            } else if (countryCode === 'CA') {
+                return description.includes('canada')
+            }
+            return true
+        })
+    }
 
-    // Filter addresses that match the input and country
-    const filteredAddresses = mockAddresses.filter((address) => {
-        const description = address.description.toLowerCase()
-        const mainText = address.structured_formatting.main_text.toLowerCase()
-        const secondaryText = address.structured_formatting.secondary_text.toLowerCase()
-
-        // Extract country from the last term (country is always the last term)
-        const countryTerm = address.terms[address.terms.length - 1]?.value || ''
-        const isInSelectedCountry =
-            countryTerm === countryCode ||
-            (countryCode === 'US' && countryTerm === 'USA') ||
-            (countryCode === 'GB' && countryTerm === 'UK') ||
-            (countryCode === 'CA' && countryTerm === 'Canada')
-
-        // Match against description, main text, or secondary text, and country
-        const matchesSearch =
-            description.includes(searchTerm) ||
-            mainText.includes(searchTerm) ||
-            secondaryText.includes(searchTerm)
-        const matches = matchesSearch && isInSelectedCountry
-
-        return matches
-    })
-
-    return filteredAddresses
+    return mockSuggestions
 }
 
 /**
@@ -67,7 +72,7 @@ export const getAddressSuggestions = async (input, countryCode) => {
  * @param {Object} suggestion - Address suggestion object from the API
  * @returns {Object} Parsed address fields
  */
-export const parseAddressSuggestion = (suggestion) => {
+export const parseAddressSuggestion = async (suggestion) => {
     const {structured_formatting, terms} = suggestion
     const {main_text, secondary_text} = structured_formatting
 

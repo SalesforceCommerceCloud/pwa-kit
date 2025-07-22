@@ -11,8 +11,6 @@ import {
     Flex,
     Text,
     IconButton,
-    VStack,
-    HStack,
     Spinner
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 import {CloseIcon} from '@salesforce/retail-react-app/app/components/icons'
@@ -155,9 +153,9 @@ const AddressSuggestionDropdown = ({
                         {/* Address Text */}
                         <Box flex={1}>
                             <Text fontSize="sm" noOfLines={1}>
-                                {suggestion.structured_formatting.main_text}
+                                {suggestion.structured_formatting?.main_text}
                             </Text>
-                            {suggestion.structured_formatting.secondary_text && (
+                            {suggestion.structured_formatting?.secondary_text && (
                                 <Text fontSize="xs" color="gray.500" noOfLines={1}>
                                     {suggestion.structured_formatting.secondary_text}
                                 </Text>
@@ -186,7 +184,8 @@ AddressSuggestionDropdown.propTypes = {
                     value: PropTypes.string
                 })
             ),
-            types: PropTypes.arrayOf(PropTypes.string)
+            types: PropTypes.arrayOf(PropTypes.string),
+            placePrediction: PropTypes.object
         })
     ),
 

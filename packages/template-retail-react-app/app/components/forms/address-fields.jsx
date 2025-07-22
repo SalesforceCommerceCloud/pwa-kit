@@ -35,6 +35,7 @@ const AddressFields = ({
     const fields = useAddressFields({form, prefix})
     const intl = useIntl()
     const addressFormRef = useRef()
+
     useEffect(() => {
         // Focus on the form when the component mounts for accessibility
         addressFormRef?.current?.focus()

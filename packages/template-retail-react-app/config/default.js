@@ -57,6 +57,9 @@ module.exports = {
         dataCloudAPI: {
             appSourceId: 'f22ae831-ac03-4bf6-afc1-3a0b19f1ea8e',
             tenantId: 'mmydmztgh04dczjzmnsw0zd0g8.pc-rnd'
+        },
+        googleCloudAPI: {
+            apiKey: process.env.GOOGLE_CLOUD_API_KEY
         }
     },
     externals: [],
