@@ -5,10 +5,10 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
-import {render, screen} from '@testing-library/react'
+import {render} from '@testing-library/react'
 import {IntlProvider} from 'react-intl'
 import {ChakraProvider} from '@chakra-ui/react'
-import {getOrderStatusColorScheme} from './order-history'
+import {getOrderStatusColorScheme} from '@salesforce/retail-react-app/app/pages/account/order-history'
 
 // Mock the commerce-sdk-react hooks
 jest.mock('@salesforce/commerce-sdk-react', () => ({
@@ -85,17 +85,6 @@ describe('Order Status Badge Colors', () => {
     test('getOrderStatusColorScheme helper returns default colors for unknown status', () => {
         const unknownColor = getOrderStatusColorScheme('unknown')
         expect(unknownColor).toEqual({
-            bg: 'gray',
-            color: 'white'
-        })
-    })
-
-    test('getOrderStatusColorScheme helper handles null and undefined', () => {
-        expect(getOrderStatusColorScheme(null)).toEqual({
-            bg: 'gray',
-            color: 'white'
-        })
-        expect(getOrderStatusColorScheme(undefined)).toEqual({
             bg: 'gray',
             color: 'white'
         })

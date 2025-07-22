@@ -35,8 +35,6 @@ import {DEFAULT_ORDERS_SEARCH_PARAMS} from '@salesforce/retail-react-app/app/con
 
 // Helper function to get color scheme based on order status
 export const getOrderStatusColorScheme = (status) => {
-    if (!status) return {bg: 'gray', color: 'white'}
-
     const normalizedStatus = status.toLowerCase().trim()
 
     switch (normalizedStatus) {
@@ -196,6 +194,7 @@ const AccountOrderHistory = () => {
                                                 values={{orderNumber: order.orderNo}}
                                             />
                                         </Text>
+                                        {order.status} &&
                                         <Badge
                                             bg={getOrderStatusColorScheme(order.status).bg}
                                             color={getOrderStatusColorScheme(order.status).color}
