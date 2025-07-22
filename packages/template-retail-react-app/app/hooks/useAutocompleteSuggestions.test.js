@@ -33,6 +33,7 @@ describe('useAutocompleteSuggestions', () => {
 
     beforeEach(() => {
         jest.clearAllMocks()
+        jest.useFakeTimers()
 
         // Mock session token
         mockAutocompleteSessionToken = jest.fn()
@@ -52,6 +53,10 @@ describe('useAutocompleteSuggestions', () => {
         useMapsLibrary.mockReturnValue(mockPlaces)
     })
 
+    afterEach(() => {
+        jest.useRealTimers()
+    })
+
     it('should return initial state', () => {
         const {result} = renderHook(() => useAutocompleteSuggestions('', ''))
 
@@ -65,7 +70,10 @@ describe('useAutocompleteSuggestions', () => {
         const {result} = renderHook(() => useAutocompleteSuggestions('ab', 'US'))
 
         // Wait for any potential API calls
-        await new Promise((resolve) => setTimeout(resolve, 350))
+        await act(async () => {
+            jest.advanceTimersByTime(350)
+            await Promise.resolve()
+        })
 
         expect(mockAutocompleteSuggestion.fetchAutocompleteSuggestions).not.toHaveBeenCalled()
         expect(result.current.suggestions).toEqual([])
@@ -88,7 +96,11 @@ describe('useAutocompleteSuggestions', () => {
         const {result} = renderHook(() => useAutocompleteSuggestions('123 Main', 'US'))
 
         // Wait for debounce and API call
-        await new Promise((resolve) => setTimeout(resolve, 350))
+        await act(async () => {
+            jest.advanceTimersByTime(350)
+            await Promise.resolve()
+            await Promise.resolve()
+        })
 
         expect(mockAutocompleteSuggestion.fetchAutocompleteSuggestions).toHaveBeenCalledWith({
             input: '123 Main',
@@ -131,7 +143,11 @@ describe('useAutocompleteSuggestions', () => {
         const {result} = renderHook(() => useAutocompleteSuggestions('123 Main', 'US'))
 
         // Wait for debounce and API call
-        await new Promise((resolve) => setTimeout(resolve, 350))
+        await act(async () => {
+            jest.advanceTimersByTime(350)
+            await Promise.resolve()
+            await Promise.resolve()
+        })
 
         expect(result.current.suggestions).toHaveLength(1)
         expect(result.current.suggestions[0].description).toContain('USA')
@@ -160,7 +176,11 @@ describe('useAutocompleteSuggestions', () => {
         const {result} = renderHook(() => useAutocompleteSuggestions('456 Oak', 'CA'))
 
         // Wait for debounce and API call
-        await new Promise((resolve) => setTimeout(resolve, 350))
+        await act(async () => {
+            jest.advanceTimersByTime(350)
+            await Promise.resolve()
+            await Promise.resolve()
+        })
 
         expect(result.current.suggestions).toHaveLength(1)
         expect(result.current.suggestions[0].description).toContain('Canada')
@@ -176,7 +196,11 @@ describe('useAutocompleteSuggestions', () => {
         const {result} = renderHook(() => useAutocompleteSuggestions('123 Main', 'US'))
 
         // Wait for debounce and API call
-        await new Promise((resolve) => setTimeout(resolve, 350))
+        await act(async () => {
+            jest.advanceTimersByTime(350)
+            await Promise.resolve()
+            await Promise.resolve()
+        })
 
         expect(consoleSpy).toHaveBeenCalledWith(
             'Error fetching address suggestions:',
@@ -206,7 +230,11 @@ describe('useAutocompleteSuggestions', () => {
         mockAutocompleteSuggestion.fetchAutocompleteSuggestions.mockResolvedValue(mockResponse)
 
         // Wait for initial suggestions
-        await new Promise((resolve) => setTimeout(resolve, 350))
+        await act(async () => {
+            jest.advanceTimersByTime(350)
+            await Promise.resolve()
+            await Promise.resolve()
+        })
 
         expect(result.current.suggestions).toHaveLength(1)
 
@@ -225,7 +253,10 @@ describe('useAutocompleteSuggestions', () => {
         const {result} = renderHook(() => useAutocompleteSuggestions('123 Main', 'US'))
 
         // Wait for any potential API calls
-        await new Promise((resolve) => setTimeout(resolve, 350))
+        await act(async () => {
+            jest.advanceTimersByTime(350)
+            await Promise.resolve()
+        })
 
         expect(mockAutocompleteSuggestion.fetchAutocompleteSuggestions).not.toHaveBeenCalled()
         expect(result.current.suggestions).toEqual([])
@@ -241,14 +272,16 @@ describe('useAutocompleteSuggestions', () => {
         const {result} = renderHook(() => useAutocompleteSuggestions('123 Main', 'US'))
 
         // Wait for any potential API calls
-        await new Promise((resolve) => setTimeout(resolve, 350))
+        await act(async () => {
+            jest.advanceTimersByTime(350)
+            await Promise.resolve()
+        })
 
         expect(mockAutocompleteSuggestion.fetchAutocompleteSuggestions).not.toHaveBeenCalled()
         expect(result.current.suggestions).toEqual([])
     })
 
     it('should debounce API calls', async () => {
-        jest.useFakeTimers()
         // Mock useMapsLibrary to return a valid object
         const mockPlaces = {
             AutocompleteSessionToken: jest.fn(() => ({})),
@@ -306,7 +339,5 @@ describe('useAutocompleteSuggestions', () => {
                 input: '12345'
             })
         )
-
-        jest.useRealTimers()
     })
 })
