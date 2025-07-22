@@ -18,6 +18,7 @@ import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-cur
 import {useCurrency} from '@salesforce/retail-react-app/app/hooks'
 import ItemVariantProvider from '@salesforce/retail-react-app/app/components/item-variant'
 import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
+import {ADD_NEW_ADDRESS_OPTION} from '@salesforce/retail-react-app/app/constants'
 
 import AddressFields from '@salesforce/retail-react-app/app/components/forms/address-fields'
 import FormActionButtons from '@salesforce/retail-react-app/app/components/forms/form-action-buttons'
@@ -40,7 +41,6 @@ import {
     Center,
     Spinner,
     Container,
-    VisuallyHidden,
     Stack
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 
@@ -90,23 +90,8 @@ MultiShippingItemAttributes.propTypes = {
     includeQuantity: PropTypes.bool
 }
 
-// Separate component for address form to properly use hooks
-const AddressFormComponent = ({item, index, onSubmit, onCancel}) => {
-    const form = useForm({
-        mode: 'onSubmit',
-        defaultValues: {
-            firstName: '',
-            lastName: '',
-            phone: '',
-            countryCode: 'US',
-            address1: '',
-            city: '',
-            stateCode: '',
-            postalCode: '',
-            preferred: false
-        }
-    })
-
+// Address form component - receives form as prop from parent
+const AddressForm = ({item, index, form, onSubmit, onCancel}) => {
     return (
         <Box position="relative" bg="white" padding={6} width="100%">
             {form.formState.isSubmitting && <LoadingSpinner />}
@@ -138,9 +123,10 @@ const AddressFormComponent = ({item, index, onSubmit, onCancel}) => {
     )
 }
 
-AddressFormComponent.propTypes = {
+AddressForm.propTypes = {
     item: PropTypes.object.isRequired,
     index: PropTypes.number.isRequired,
+    form: PropTypes.object.isRequired,
     onSubmit: PropTypes.func.isRequired,
     onCancel: PropTypes.func.isRequired
 }
@@ -179,12 +165,27 @@ const ShippingMultiAddress = ({
     const [selectedAddresses, setSelectedAddresses] = useState({})
     const [openDropdown, setOpenDropdown] = useState(null)
     const dropdownRefs = useRef({})
-    const [focusedIndex, setFocusedIndex] = useState(-1)
 
     // Add address form state - track which product card is showing the add address form
     const [showAddAddressForm, setShowAddAddressForm] = useState({}) // productId-index -> boolean
     const [isSubmitting, setIsSubmitting] = useState(false)
     const [formErrors, setFormErrors] = useState({}) // Track form-specific errors
+
+    // Create form instance for address form
+    const addressForm = useForm({
+        mode: 'onSubmit',
+        defaultValues: {
+            firstName: '',
+            lastName: '',
+            phone: '',
+            countryCode: 'US',
+            address1: '',
+            city: '',
+            stateCode: '',
+            postalCode: '',
+            preferred: false
+        }
+    })
 
     const createCustomerAddress = useShopperCustomersMutation('createCustomerAddress')
     const showToast = useToast()
@@ -195,46 +196,12 @@ const ShippingMultiAddress = ({
                 const ref = dropdownRefs.current[openDropdown]
                 if (ref && !ref.contains(event.target)) {
                     setOpenDropdown(null)
-                    setFocusedIndex(-1)
                 }
             }
         }
         document.addEventListener('mousedown', handleClickOutside)
         return () => document.removeEventListener('mousedown', handleClickOutside)
     }, [openDropdown])
-
-    // Reset focused index when dropdown closes
-    useEffect(() => {
-        if (openDropdown === null) {
-            setFocusedIndex(-1)
-        }
-    }, [openDropdown])
-
-    // Focus the element at the current focused index
-    useEffect(() => {
-        if (focusedIndex >= 0 && openDropdown) {
-            const dropdownKey = openDropdown.endsWith('-mobile') ? openDropdown : openDropdown
-            const isMobile = dropdownKey.endsWith('-mobile')
-            const baseKey = isMobile ? dropdownKey.replace('-mobile', '') : dropdownKey
-
-            // Find the element to focus
-            let elementToFocus = null
-            if (focusedIndex < addresses.length) {
-                // Focus an address item
-                const addressId = addresses[focusedIndex]?.addressId
-                if (addressId) {
-                    elementToFocus = document.querySelector(`[data-address-id="${addressId}"]`)
-                }
-            } else {
-                // Focus the "Add New Address" item
-                elementToFocus = document.querySelector(`[data-add-new-address="${baseKey}"]`)
-            }
-
-            if (elementToFocus) {
-                elementToFocus.focus()
-            }
-        }
-    }, [focusedIndex, openDropdown, addresses])
 
     if (!basket?.productItems?.length) {
         return (
@@ -490,7 +457,7 @@ const ShippingMultiAddress = ({
                                                 <Select
                                                     value={
                                                         showAddAddressForm[addressKey]
-                                                            ? 'add-new-address'
+                                                            ? ADD_NEW_ADDRESS_OPTION
                                                             : selectedAddressId || ''
                                                     }
                                                     onChange={(e) => {
@@ -499,7 +466,7 @@ const ShippingMultiAddress = ({
                                                             item.itemId ||
                                                             `${item.productId}-${index}`
 
-                                                        if (value === 'add-new-address') {
+                                                        if (value === ADD_NEW_ADDRESS_OPTION) {
                                                             // Show the address form when "Add New Address" is selected
                                                             setShowAddAddressForm((prev) => ({
                                                                 ...prev,
@@ -548,7 +515,7 @@ const ShippingMultiAddress = ({
                                                             )}
                                                         </option>
                                                     ))}
-                                                    <option value="add-new-address">
+                                                    <option value={ADD_NEW_ADDRESS_OPTION}>
                                                         + {formatMessage(addNewAddressLabel)}
                                                     </option>
                                                 </Select>
@@ -591,9 +558,10 @@ const ShippingMultiAddress = ({
                                                 </Alert>
                                             )}
 
-                                            <AddressFormComponent
+                                            <AddressForm
                                                 item={item}
                                                 index={index}
+                                                form={addressForm}
                                                 onSubmit={handleCreateAddress}
                                                 onCancel={() => {
                                                     setShowAddAddressForm((prev) => ({
@@ -630,6 +598,11 @@ const ShippingMultiAddress = ({
                             loadingText={formatMessage({
                                 id: 'shipping_multi_address.submit.loading',
                                 defaultMessage: 'Saving address...'
+                            })}
+                            aria-label={formatMessage({
+                                id: 'shipping_multi_address.submit.description',
+                                defaultMessage:
+                                    'Continue to next step with selected delivery addresses'
                             })}
                             onClick={async () => {
                                 setIsSubmitting(true)
@@ -668,17 +641,9 @@ const ShippingMultiAddress = ({
                                     setIsSubmitting(false)
                                 }
                             }}
-                            aria-describedby="submit-button-description"
                         >
                             {formatMessage(submitButtonLabel)}
                         </Button>
-                        <VisuallyHidden id="submit-button-description">
-                            {formatMessage({
-                                id: 'shipping_multi_address.submit.description',
-                                defaultMessage:
-                                    'Continue to next step with selected delivery addresses'
-                            })}
-                        </VisuallyHidden>
                     </Container>
                 </Box>
             </VStack>
