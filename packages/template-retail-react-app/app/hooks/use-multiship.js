@@ -392,6 +392,7 @@ export const useMultiship = (basket) => {
 
     /**
      * Handles delivery option change for a product item
+     * Note: this might leave empty shipments behind
      * @param {Object} productItem - The product item
      * @param {boolean} selectedPickup - Whether pickup is selected (true) or delivery is selected (false)
      * @param {Object} storeInfo - The selected store object (required for pickup)
@@ -412,193 +413,30 @@ export const useMultiship = (basket) => {
             (shipment) => shipment.shipmentId === productItem.shipmentId
         )
         const isCurrentlyPickup = isCurrentShippingMethodPickup(currentShipment?.shippingMethod)
-        const sourceShipmentId = productItem.shipmentId
 
-        // Check if the product item is in the "me" shipment and is the only item in that shipment
-        const isInMeShipment = sourceShipmentId === 'me'
-        const itemsInMeShipment =
-            basket.productItems?.filter((item) => item.shipmentId === 'me') || []
-        const isOnlyItemInMeShipment = isInMeShipment && itemsInMeShipment.length === 1
+        let targetShipmentId = null
 
-        let updatedBasket = null
-        let targetShipmentId = 'me'
+        // Handle change from pickup to delivery
+        if (!selectedPickup && isCurrentlyPickup) {
+            targetShipmentId = await findOrCreateDeliveryShipment()
 
-        // Special handling for items in "me" shipment that are the only item
-        if (isOnlyItemInMeShipment) {
-            let existingPickupShipmentId = null
-
-            // If configuring for pickup, first check if there's another pickup shipment for the same store
-            if (selectedPickup && storeInfo?.id) {
-                const existingPickupShipment = findExistingPickupShipment(basket, storeInfo.id)
-                if (existingPickupShipment && existingPickupShipment.shipmentId !== 'me') {
-                    // Store the shipment ID for later consolidation, but don't move items yet
-                    existingPickupShipmentId = existingPickupShipment.shipmentId
-                }
+            if (!targetShipmentId) {
+                throw new Error('Failed to find or create shipment')
             }
 
-            // Reconfigure the "me" shipment for pickup or delivery with the single item
-            updatedBasket = await configureDefaultShipmentIfNeeded(
-                basket,
-                'me',
-                selectedPickup,
-                storeInfo
-            )
-
-            // If we're configuring for pickup and have items to consolidate from another pickup shipment
-            if (existingPickupShipmentId && selectedPickup) {
-                const itemsToConsolidate =
-                    basket.productItems?.filter(
-                        (item) => item.shipmentId === existingPickupShipmentId
-                    ) || []
-
-                if (itemsToConsolidate.length > 0) {
-                    // Move items directly to "me" as pickup items (now that "me" is configured for pickup)
-                    await moveItemsToPickupShipment(itemsToConsolidate, 'me', storeInfo.inventoryId)
-                }
-
-                // Remove the now empty pickup shipment
-                try {
-                    await removeShipmentFromBasketMutation.mutateAsync({
-                        parameters: {
-                            basketId: basket.basketId,
-                            shipmentId: existingPickupShipmentId
-                        }
-                    })
-                } catch (error) {
-                    console.error(
-                        `Failed to remove consolidated pickup shipment ${existingPickupShipmentId}:`,
-                        error
-                    )
-                }
-            }
-            // If we're configuring for pickup but have no existing pickup shipment to consolidate,
-            // we still need to update the product item with the proper inventoryId
-            else if (selectedPickup && !existingPickupShipmentId) {
-                // Update the current product item with the proper inventoryId for pickup
-                await moveItemsToPickupShipment([productItem], 'me', storeInfo.inventoryId)
-            }
-            // If we're configuring for delivery, consolidate existing delivery shipments with same shipping method
-            if (!selectedPickup) {
-                // Find other delivery shipments that can be consolidated (same shipping method)
-                const deliveryShipmentsToConsolidate =
-                    basket.shipments?.filter(
-                        (shipment) =>
-                            shipment.shipmentId !== 'me' &&
-                            !isCurrentShippingMethodPickup(shipment.shippingMethod) &&
-                            shipment.shippingMethod?.id ===
-                                updatedBasket?.shipments?.find((s) => s.shipmentId === 'me')
-                                    ?.shippingMethod?.id
-                    ) || []
-
-                if (deliveryShipmentsToConsolidate.length > 0) {
-                    // Move items from all consolidatable delivery shipments to "me"
-                    const allItemsToConsolidate = []
-                    const shipmentIdsToRemove = []
-
-                    for (const shipment of deliveryShipmentsToConsolidate) {
-                        const itemsInShipment =
-                            basket.productItems?.filter(
-                                (item) => item.shipmentId === shipment.shipmentId
-                            ) || []
-
-                        if (itemsInShipment.length > 0) {
-                            allItemsToConsolidate.push(...itemsInShipment)
-                            shipmentIdsToRemove.push(shipment.shipmentId)
-                        }
-                    }
-
-                    // Move all items to "me" if there are any to consolidate
-                    if (allItemsToConsolidate.length > 0) {
-                        await moveItemsToDeliveryShipment(
-                            allItemsToConsolidate,
-                            'me',
-                            defaultInventoryId
-                        )
-                    }
-
-                    // Remove the now empty delivery shipments
-                    for (const shipmentId of shipmentIdsToRemove) {
-                        try {
-                            await removeShipmentFromBasketMutation.mutateAsync({
-                                parameters: {
-                                    basketId: basket.basketId,
-                                    shipmentId: shipmentId
-                                }
-                            })
-                        } catch (error) {
-                            console.error(
-                                `Failed to remove consolidated delivery shipment ${shipmentId}:`,
-                                error
-                            )
-                        }
-                    }
-                } else {
-                    // If there are no delivery shipments to consolidate, we still need to update
-                    // the product item with the proper inventoryId for delivery
-                    await moveItemsToDeliveryShipment([productItem], 'me', defaultInventoryId)
-                }
-            }
-        } else {
-            // Original logic for other cases
-            // Handle change from pickup to delivery
-            if (!selectedPickup && isCurrentlyPickup) {
-                targetShipmentId = await findOrCreateDeliveryShipment()
-
-                if (!targetShipmentId) {
-                    throw new Error('Failed to find or create shipment')
-                }
-
-                updatedBasket = await moveItemToDeliveryShipment(
-                    productItem,
-                    targetShipmentId,
-                    defaultInventoryId
-                )
-            }
-            // Handle change from delivery to pickup
-            else if (selectedPickup && !isCurrentlyPickup) {
-                targetShipmentId = await findOrCreatePickupShipment(storeInfo)
-
-                if (!targetShipmentId) {
-                    throw new Error('Failed to find or create shipment')
-                }
-
-                // Move the item to the pickup shipment
-                updatedBasket = await moveItemToPickupShipment(
-                    productItem,
-                    targetShipmentId,
-                    storeInfo.inventoryId
-                )
-            }
-
-            // Check if the source shipment is now empty and remove it if necessary
-            // Use the updated basket from the move operation
-            if (sourceShipmentId && sourceShipmentId !== 'me' && updatedBasket) {
-                // Check if any remaining items are in the source shipment using the updated basket
-                const hasRemainingItems = updatedBasket.productItems?.some(
-                    (item) => item.shipmentId === sourceShipmentId
-                )
-
-                if (!hasRemainingItems) {
-                    try {
-                        await removeShipmentFromBasketMutation.mutateAsync({
-                            parameters: {
-                                basketId: basket.basketId,
-                                shipmentId: sourceShipmentId
-                            }
-                        })
-                    } catch (error) {
-                        console.error(
-                            `Failed to remove empty source shipment ${sourceShipmentId}:`,
-                            error
-                        )
-                    }
-                }
-            }
+            await moveItemToDeliveryShipment(productItem, targetShipmentId, defaultInventoryId)
         }
+        // Handle change from delivery to pickup
+        else if (selectedPickup && !isCurrentlyPickup) {
+            targetShipmentId = await findOrCreatePickupShipment(storeInfo)
 
-        //
-        // TODO: if there was an error along the way we need to clean up, especialy delete the empty new shipment.
-        //
+            if (!targetShipmentId) {
+                throw new Error('Failed to find or create shipment')
+            }
+
+            // Move the item to the pickup shipment
+            await moveItemToPickupShipment(productItem, targetShipmentId, storeInfo.inventoryId)
+        }
     }
 
     /**
