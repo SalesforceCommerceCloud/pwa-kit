@@ -11,6 +11,8 @@ import {
 } from '@salesforce/commerce-sdk-react'
 import {usePickupShipment} from '@salesforce/retail-react-app/app/hooks/use-pickup-shipment'
 
+const DEFAULT_SHIPMENT_ID = 'me'
+
 /**
  * Custom hook to handle multiship functionality for cart items
  * @param {Object} basket - The current basket object
@@ -36,11 +38,11 @@ export const useMultiship = (basket) => {
     //
     // TODO: Ideally we would not use the shipping methods for the main shipment on all shipments
     //
-    const {refetch: refetchMeShippingMethods} = useShippingMethodsForShipment(
+    const {refetch: refetchShippingMethods} = useShippingMethodsForShipment(
         {
             parameters: {
                 basketId: basket?.basketId,
-                shipmentId: 'me'
+                shipmentId: DEFAULT_SHIPMENT_ID
             }
         },
         {
@@ -71,7 +73,7 @@ export const useMultiship = (basket) => {
         try {
             // Get shipping methods (using main shipment as reference)
             // Note: This is a limitation - all shipments will get the same options
-            const {data: shippingMethods} = await refetchMeShippingMethods()
+            const {data: shippingMethods} = await refetchShippingMethods()
             const defaultShippingMethodId = getDefaultShippingMethodId(shippingMethods)
 
             // Update each shipment that doesn't have a shipping method
@@ -121,12 +123,15 @@ export const useMultiship = (basket) => {
      */
     const createNewDeliveryShipment = async (basket) => {
         // If default shipment is empty, configure it for delivery and return
-        const defaultShipment = basket.shipments?.find((shipment) => shipment.shipmentId === 'me')
+        const defaultShipment = basket.shipments?.find(
+            (shipment) => shipment.shipmentId === DEFAULT_SHIPMENT_ID
+        )
         const isDefaultShipmentEmpty =
-            defaultShipment && !basket.productItems?.some((item) => item.shipmentId === 'me')
+            defaultShipment &&
+            !basket.productItems?.some((item) => item.shipmentId === DEFAULT_SHIPMENT_ID)
 
         if (isDefaultShipmentEmpty) {
-            return await configureDefaultShipmentIfNeeded(basket, 'me', false)
+            return await configureDefaultShipmentIfNeeded(basket, DEFAULT_SHIPMENT_ID, false)
         }
 
         // Otherwise, create a new shipment without a shipping method
@@ -219,16 +224,24 @@ export const useMultiship = (basket) => {
      */
     const createNewPickupShipment = async (basket, storeInfo) => {
         // If default shipment is empty, configure it for pickup and return
-        const defaultShipment = basket.shipments?.find((shipment) => shipment.shipmentId === 'me')
+        const defaultShipment = basket.shipments?.find(
+            (shipment) => shipment.shipmentId === DEFAULT_SHIPMENT_ID
+        )
         const isDefaultShipmentEmpty =
-            defaultShipment && !basket.productItems?.some((item) => item.shipmentId === 'me')
+            defaultShipment &&
+            !basket.productItems?.some((item) => item.shipmentId === DEFAULT_SHIPMENT_ID)
 
         if (isDefaultShipmentEmpty) {
-            return await configureDefaultShipmentIfNeeded(basket, 'me', true, storeInfo)
+            return await configureDefaultShipmentIfNeeded(
+                basket,
+                DEFAULT_SHIPMENT_ID,
+                true,
+                storeInfo
+            )
         }
 
         // Get shipping methods to determine the pickup shipping method ID
-        const {data: shippingMethods} = await refetchMeShippingMethods()
+        const {data: shippingMethods} = await refetchShippingMethods()
         const pickupShippingMethodId = getPickupShippingMethodId(shippingMethods)
 
         if (!pickupShippingMethodId) {
@@ -287,7 +300,7 @@ export const useMultiship = (basket) => {
      */
     const moveItemToDeliveryShipment = async (
         productItem,
-        targetShipmentId = 'me',
+        targetShipmentId = DEFAULT_SHIPMENT_ID,
         defaultInventoryId
     ) => {
         if (!basket?.basketId || !productItem?.itemId) {
@@ -324,7 +337,7 @@ export const useMultiship = (basket) => {
      */
     const moveItemsToDeliveryShipment = async (
         productItems,
-        targetShipmentId = 'me',
+        targetShipmentId = DEFAULT_SHIPMENT_ID,
         defaultInventoryId
     ) => {
         if (!basket?.basketId || !Array.isArray(productItems) || productItems.length === 0) {
@@ -446,7 +459,7 @@ export const useMultiship = (basket) => {
      * @returns {Promise<string>} The target shipment ID
      */
     const getShipmentForItems = async (selectedPickup, selectedStore) => {
-        let targetShipmentId = 'me'
+        let targetShipmentId = DEFAULT_SHIPMENT_ID
 
         if (basket) {
             // Ensure a suitable shipment exists
@@ -460,6 +473,179 @@ export const useMultiship = (basket) => {
     }
 
     /**
+     * Identifies shipments that have no product items
+     * @param {Object} basket - The basket object
+     * @returns {Array} Array of empty shipments
+     */
+    const findEmptyShipments = (basket) => {
+        if (!basket?.shipments?.length) {
+            return []
+        }
+
+        return basket.shipments.filter((shipment) => {
+            const hasItems = basket.productItems?.some(
+                (item) => item.shipmentId === shipment.shipmentId
+            )
+            return !hasItems
+        })
+    }
+
+    /**
+     * Finds the best non-empty shipment to consolidate into the default shipment
+     * @param {Object} basket - The basket object
+     * @returns {Object|null} The shipment to consolidate or null if none found
+     */
+    const findShipmentToConsolidate = (basket) => {
+        if (!basket?.shipments?.length) {
+            return null
+        }
+
+        return (
+            basket.shipments.find((shipment) => {
+                const hasItems = basket.productItems?.some(
+                    (item) => item.shipmentId === shipment.shipmentId
+                )
+                return hasItems && shipment.shipmentId !== DEFAULT_SHIPMENT_ID
+            }) || null
+        )
+    }
+
+    /**
+     * Gets items that belong to a specific shipment
+     * @param {Object} basket - The basket object
+     * @param {string} shipmentId - The shipment ID
+     * @returns {Array} Array of product items
+     */
+    const getItemsForShipment = (basket, shipmentId) => {
+        return basket?.productItems?.filter((item) => item.shipmentId === shipmentId) || []
+    }
+
+    /**
+     * Consolidates items from a source shipment into the default shipment
+     * @param {Object} sourceShipment - The shipment to consolidate from
+     * @param {Array} itemsToMove - The items to move
+     * @returns {Promise<boolean>} True if consolidation was successful
+     */
+    const consolidateIntoDefaultShipment = async (sourceShipment, itemsToMove) => {
+        try {
+            const isSourcePickup = isCurrentShippingMethodPickup(sourceShipment.shippingMethod)
+
+            if (isSourcePickup) {
+                return await consolidatePickupShipment(sourceShipment, itemsToMove)
+            } else {
+                return await consolidateDeliveryShipment(itemsToMove)
+            }
+        } catch (error) {
+            console.error(`Failed to consolidate shipment ${sourceShipment.shipmentId}:`, error)
+            return false
+        }
+    }
+
+    /**
+     * Consolidates a pickup shipment into the default shipment
+     * @param {Object} sourceShipment - The pickup shipment to consolidate
+     * @param {Array} itemsToMove - The items to move
+     * @returns {Promise<boolean>} True if successful
+     */
+    const consolidatePickupShipment = async (sourceShipment, itemsToMove) => {
+        const storeId = sourceShipment.c_fromStoreId
+        const inventoryId = itemsToMove[0]?.inventoryId
+
+        if (!storeId || !inventoryId) {
+            console.warn('Missing store or inventory information for pickup consolidation')
+            return false
+        }
+
+        const storeInfo = {id: storeId, inventoryId: inventoryId}
+
+        await configureDefaultShipmentIfNeeded(basket, DEFAULT_SHIPMENT_ID, true, storeInfo)
+        await moveItemsToPickupShipment(itemsToMove, DEFAULT_SHIPMENT_ID, inventoryId)
+
+        return true
+    }
+
+    /**
+     * Consolidates a delivery shipment into the default shipment
+     * @param {Array} itemsToMove - The items to move
+     * @returns {Promise<boolean>} True if successful
+     */
+    const consolidateDeliveryShipment = async (itemsToMove) => {
+        const defaultInventoryId = itemsToMove[0]?.inventoryId
+
+        await configureDefaultShipmentIfNeeded(basket, DEFAULT_SHIPMENT_ID, false, null)
+        await moveItemsToDeliveryShipment(itemsToMove, DEFAULT_SHIPMENT_ID, defaultInventoryId)
+
+        return true
+    }
+
+    /**
+     * Removes a shipment from the basket
+     * @param {string} shipmentId - The shipment ID to remove
+     * @returns {Promise<boolean>} True if removal was successful
+     */
+    const removeShipment = async (shipmentId) => {
+        try {
+            await removeShipmentFromBasketMutation.mutateAsync({
+                parameters: {
+                    basketId: basket.basketId,
+                    shipmentId: shipmentId
+                }
+            })
+            return true
+        } catch (error) {
+            console.error(`Failed to remove shipment ${shipmentId}:`, error)
+            return false
+        }
+    }
+
+    /**
+     * Removes multiple shipments in parallel
+     * @param {Array} shipments - Array of shipments to remove
+     * @returns {Promise<void>}
+     */
+    const removeShipmentsInParallel = async (shipments) => {
+        const removalPromises = shipments.map((shipment) => removeShipment(shipment.shipmentId))
+        await Promise.all(removalPromises)
+    }
+
+    /**
+     * Handles consolidation when the default shipment is empty
+     * @param {Array} emptyShipments - Array of empty shipments
+     * @returns {Promise<string|null>} The shipment ID that was consolidated, or null
+     */
+    const handleDefaultShipmentConsolidation = async (emptyShipments) => {
+        const defaultShipment = emptyShipments.find(
+            (shipment) => shipment.shipmentId === DEFAULT_SHIPMENT_ID
+        )
+
+        if (!defaultShipment) {
+            return null
+        }
+
+        const sourceShipment = findShipmentToConsolidate(basket)
+        if (!sourceShipment) {
+            return null
+        }
+
+        const itemsToMove = getItemsForShipment(basket, sourceShipment.shipmentId)
+        if (itemsToMove.length === 0) {
+            return null
+        }
+
+        const consolidationSuccessful = await consolidateIntoDefaultShipment(
+            sourceShipment,
+            itemsToMove
+        )
+
+        if (consolidationSuccessful) {
+            await removeShipment(sourceShipment.shipmentId)
+            return sourceShipment.shipmentId
+        }
+
+        return null
+    }
+
+    /**
      * Removes empty shipments from the basket
      * Special handling for "me" shipment: if "me" is empty but other shipments have items,
      * transfers items to "me" and reconfigures it appropriately, then removes the original shipment
@@ -470,106 +656,25 @@ export const useMultiship = (basket) => {
             return
         }
 
-        // Find shipments that have no items
-        const emptyShipments = basket.shipments.filter((shipment) => {
-            const hasItems = basket.productItems?.some(
-                (item) => item.shipmentId === shipment.shipmentId
-            )
-            return !hasItems
-        })
-
+        const emptyShipments = findEmptyShipments(basket)
         if (emptyShipments.length === 0) {
             return
         }
 
-        // Check if "me" is empty
-        const meShipment = emptyShipments.find((shipment) => shipment.shipmentId === 'me')
-        const otherEmptyShipments = emptyShipments.filter(
-            (shipment) => shipment.shipmentId !== 'me'
-        )
+        // Handle default shipment consolidation first
+        const consolidatedShipmentId = await handleDefaultShipmentConsolidation(emptyShipments)
 
-        // If "me" is empty but other shipments have items, consolidate into "me"
-        if (meShipment) {
-            const nonEmptyShipments = basket.shipments.filter((shipment) => {
-                const hasItems = basket.productItems?.some(
-                    (item) => item.shipmentId === shipment.shipmentId
-                )
-                return hasItems && shipment.shipmentId !== 'me'
-            })
-
-            if (nonEmptyShipments.length > 0) {
-                // Pick the first non-empty shipment to consolidate into "me"
-                const sourceShipment = nonEmptyShipments[0]
-                const itemsToMove =
-                    basket.productItems?.filter(
-                        (item) => item.shipmentId === sourceShipment.shipmentId
-                    ) || []
-
-                if (itemsToMove.length > 0) {
-                    // Determine if source shipment is pickup or delivery
-                    const isSourcePickup = isCurrentShippingMethodPickup(
-                        sourceShipment.shippingMethod
-                    )
-
-                    let consolidationSuccessful = false
-
-                    if (isSourcePickup) {
-                        // Extract store info from the shipment and items
-                        const storeId = sourceShipment.c_fromStoreId
-                        const inventoryId = itemsToMove[0]?.inventoryId
-
-                        if (storeId && inventoryId) {
-                            const storeInfo = {id: storeId, inventoryId: inventoryId}
-
-                            // Reconfigure "me" for pickup and move items
-                            await configureDefaultShipmentIfNeeded(basket, 'me', true, storeInfo)
-                            await moveItemsToPickupShipment(itemsToMove, 'me', inventoryId)
-                            consolidationSuccessful = true
-                        }
-                    } else {
-                        const defaultInventoryId = itemsToMove[0]?.inventoryId
-
-                        // Reconfigure "me" for delivery and move items
-                        await configureDefaultShipmentIfNeeded(basket, 'me', false, null)
-                        await moveItemsToDeliveryShipment(itemsToMove, 'me', defaultInventoryId)
-                        consolidationSuccessful = true
-                    }
-
-                    // Only remove the source shipment if consolidation was successful
-                    if (consolidationSuccessful) {
-                        try {
-                            await removeShipmentFromBasketMutation.mutateAsync({
-                                parameters: {
-                                    basketId: basket.basketId,
-                                    shipmentId: sourceShipment.shipmentId
-                                }
-                            })
-                        } catch (error) {
-                            console.error(
-                                `Failed to remove consolidated shipment ${sourceShipment.shipmentId}:`,
-                                error
-                            )
-                        }
-                    }
-                }
-            }
-        }
-
-        // Remove all other empty shipments (except "me")
-        const removalPromises = otherEmptyShipments.map(async (shipment) => {
-            try {
-                await removeShipmentFromBasketMutation.mutateAsync({
-                    parameters: {
-                        basketId: basket.basketId,
-                        shipmentId: shipment.shipmentId
-                    }
-                })
-            } catch (error) {
-                console.error(`Failed to remove empty shipment ${shipment.shipmentId}:`, error)
-            }
+        // Remove remaining empty shipments (excluding "me" and any that were consolidated)
+        const shipmentsToRemove = emptyShipments.filter((shipment) => {
+            return (
+                shipment.shipmentId !== DEFAULT_SHIPMENT_ID &&
+                shipment.shipmentId !== consolidatedShipmentId
+            )
         })
 
-        await Promise.all(removalPromises)
+        if (shipmentsToRemove.length > 0) {
+            await removeShipmentsInParallel(shipmentsToRemove)
+        }
     }
 
     return {
@@ -586,6 +691,9 @@ export const useMultiship = (basket) => {
         moveItemsToPickupShipment,
         findOrCreateDeliveryShipment,
         findOrCreatePickupShipment,
-        getShipmentForItems
+        getShipmentForItems,
+        findEmptyShipments,
+        findShipmentToConsolidate,
+        getItemsForShipment
     }
 }

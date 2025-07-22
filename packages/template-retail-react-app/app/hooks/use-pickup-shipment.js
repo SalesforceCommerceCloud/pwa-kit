@@ -10,6 +10,8 @@ import {
     useShippingMethodsForShipment
 } from '@salesforce/commerce-sdk-react'
 
+const DEFAULT_SHIPMENT_ID = 'me'
+
 /**
  * Custom hook to handle pickup in store shipment configuration
  * @returns {Object} Object containing helper functions for pickup shipment management
@@ -22,7 +24,7 @@ export const usePickupShipment = (basket) => {
         {
             parameters: {
                 basketId: basket?.basketId,
-                shipmentId: 'me'
+                shipmentId: DEFAULT_SHIPMENT_ID
             }
         },
         {
@@ -94,7 +96,7 @@ export const usePickupShipment = (basket) => {
             return await updateShipmentForBasketMutation.mutateAsync({
                 parameters: {
                     basketId,
-                    shipmentId: 'me'
+                    shipmentId: DEFAULT_SHIPMENT_ID
                 },
                 body: {
                     shippingMethod: {
@@ -131,7 +133,7 @@ export const usePickupShipment = (basket) => {
             return await updateShipmentForBasketMutation.mutateAsync({
                 parameters: {
                     basketId,
-                    shipmentId: 'me'
+                    shipmentId: DEFAULT_SHIPMENT_ID
                 },
                 body: {
                     shippingMethod: {
@@ -215,7 +217,7 @@ export const usePickupShipment = (basket) => {
         if (
             !basketResponse?.basketId ||
             !basketResponse?.shipments?.length ||
-            targetShipmentId !== 'me'
+            targetShipmentId !== DEFAULT_SHIPMENT_ID
         ) {
             return
         }
@@ -224,7 +226,7 @@ export const usePickupShipment = (basket) => {
         const isCurrentlyPickup = isCurrentShippingMethodPickup(currentShippingMethod)
 
         // Only configure if there's a mismatch between pickup selection and current method
-        if ((selectedPickup && !isCurrentlyPickup) || (!selectedPickup && isCurrentlyPickup)) {
+        if (Boolean(selectedPickup) !== Boolean(isCurrentlyPickup)) {
             // Fetch shipping methods to get available options
             const {data: fetchedShippingMethods} = await refetchShippingMethods()
 
