@@ -90,24 +90,30 @@ import {ApplePayExpress} from '@salesforce/retail-react-app/app/components/apple
 <ApplePayExpress />  // No SKU = regular mode
 ```
 
-### 3. Express Page with URL Parameters
+### 3. Express Page with PDP Mode
 
 ```jsx
-// URL: /express?sku=green-umbrella-variant-1
-// The Express component automatically extracts SKU from URL
+// URL: /express?pdp=true
+// Use postMessage to set SKU dynamically
+const iframe = document.getElementById('expressCheckout');
+iframe.contentWindow.postMessage({
+    type: 'UPDATE_SKU',
+    sku: 'green-umbrella-variant-1'
+}, '*');
 ```
 
 ## Technical Flow
 
 ### Buy Now Flow:
-1. **Component Initialization**: `ApplePayExpress` component loads with `sku` prop
-2. **Payment Methods**: Standalone hook fetches payment methods without basket
-3. **Apple Pay Button**: Button displays with minimal configuration
-4. **User Clicks**: Temporary basket is created with the SKU
-5. **Payment Processing**: Uses temporary basket for the entire payment flow
+1. **Component Initialization**: Express component loads with `?pdp=true` flag
+2. **PostMessage**: SKU is set via postMessage from parent window
+3. **Payment Methods**: Standalone hook fetches payment methods without basket
+4. **Apple Pay Button**: Button displays with minimal configuration
+5. **User Clicks**: Temporary basket is created with the SKU
+6. **Payment Processing**: Uses temporary basket for the entire payment flow
 
 ### Regular Checkout Flow:
-1. **Component Initialization**: `ApplePayExpress` component loads without `sku` prop
+1. **Component Initialization**: Express component loads without `?pdp=true` flag
 2. **Payment Methods**: Standard Adyen hook fetches payment methods (requires basket)
 3. **Apple Pay Button**: Button displays with existing basket data
 4. **User Clicks**: Uses existing shopping cart basket

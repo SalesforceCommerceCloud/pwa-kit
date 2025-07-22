@@ -23,10 +23,13 @@ function Express() {
     const location = useLocation()
 
     const [authToken, setAuthToken] = useState()
-
-    // Extract SKU from URL parameters for "Buy Now" flow
+    
+    // Check for PDP mode flag in URL
     const urlParams = new URLSearchParams(location.search)
-    const sku = urlParams.get('sku') || urlParams.get('productId')
+    const isPdpMode = urlParams.get('pdp') === 'true'
+    
+    // State to track current SKU (will only be set via postMessage)
+    const [currentSku, setCurrentSku] = useState(null)
 
     useEffect(() => {
         const getToken = async () => {
@@ -37,29 +40,52 @@ function Express() {
         getToken()
     }, [])
 
+    // PostMessage listener for SKU updates
+    useEffect(() => {
+        const handleMessage = (event) => {
+            // Basic security check - accept messages from any origin for now
+            // In production, you might want to restrict this to specific origins
+            
+            if (event.data && typeof event.data === 'object') {
+                const {type, sku} = event.data
+                
+                // Handle SKU update messages
+                if (type === 'UPDATE_SKU' && typeof sku === 'string') {
+                    setCurrentSku(sku)
+                }
+                
+                // Handle SKU clear messages (for regular checkout)
+                if (type === 'CLEAR_SKU') {
+                    setCurrentSku(null)
+                }
+            }
+        }
+
+        // Add event listener
+        window.addEventListener('message', handleMessage)
+
+        // Cleanup event listener on unmount
+        return () => {
+            window.removeEventListener('message', handleMessage)
+        }
+    }, [])
+
     if (!authToken) {
         return null
     }
 
     return (
         <div>
-            {sku ? (
-                // "Buy Now" mode - use ApplePayExpress directly without the provider
-                // This prevents the regular Adyen APIs from being called
-                <ApplePayExpress sku={sku} />
-            ) : (
-                // Regular mode - use the full Adyen provider
-                <AdyenExpressCheckoutProvider
-                    authToken={authToken}
-                    customerId={customerId}
-                    locale={locale}
-                    site={site}
-                    basket={basket}
-                    navigate={navigate}
-                >
-                    <ApplePayExpress />
-                </AdyenExpressCheckoutProvider>
-            )}
+            <AdyenExpressCheckoutProvider
+                authToken={authToken}
+                customerId={customerId}
+                locale={locale}
+                site={site}
+                basket={basket}
+                navigate={navigate}
+            >
+                <ApplePayExpress sku={currentSku} isPdpMode={isPdpMode} />
+            </AdyenExpressCheckoutProvider>
         </div>
     )
 }

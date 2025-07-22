@@ -290,7 +290,7 @@ const App = (props) => {
 
     return isExpress ? (
         <OfflineBoundary isOnline={false}>
-            <div style={{width: '100%', height: '32px', overflowY: 'hidden'}}>{children}</div>
+            <div style={{width: '100%', height: '40px', overflowY: 'hidden'}}>{children}</div>
         </OfflineBoundary>
     ) : (
         <Box className="sf-app" {...styles.container}>

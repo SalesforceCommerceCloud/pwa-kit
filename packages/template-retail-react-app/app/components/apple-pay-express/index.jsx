@@ -88,7 +88,8 @@ export const getAppleButtonConfig = (
     fetchShippingMethods,
     sku = null,
     setTempBasket = null,
-    tempBasket = null
+    tempBasket = null,
+    isPdpMode = false
 ) => {
     // Use temporary basket if available, otherwise use main basket
     const currentBasket = tempBasket || basket
@@ -105,8 +106,8 @@ export const getAppleButtonConfig = (
             return sharedBasketRef
         }
         
-        // For "Buy Now" flows, create temporary basket if needed
-        if (sku && setTempBasket) {
+        // For PDP flows, create temporary basket if needed (and SKU is available)
+        if (isPdpMode && sku && setTempBasket) {
             const newBasket = await createTemporaryBasket(sku, authToken, site)
             sharedBasketRef = newBasket  // Update shared reference immediately
             setTempBasket(newBasket)     // Update React state for re-renders
@@ -134,8 +135,8 @@ export const getAppleButtonConfig = (
             amount: parseFloat(sm.price).toFixed(2)
         })) || [],
         onClick: async (resolve, reject) => {
-            if (sku && setTempBasket) {
-                // "Buy Now" flow - get or create temporary basket
+            if (isPdpMode && setTempBasket) {
+                // PDP "Buy Now" flow - get or create temporary basket
                 try {
                     const basketToUse = await getOrCreateBasket()
                     if (!basketToUse) {
@@ -188,7 +189,7 @@ export const getAppleButtonConfig = (
                 let currentBasket = await getOrCreateBasket()
                 if (!currentBasket || !currentBasket.basketId) {
                     // Clean up temporary basket on failure
-                    if (sku && sharedBasketRef?.basketId) {
+                    if (isPdpMode && sharedBasketRef?.basketId) {
                         try {
                             await deleteTemporaryBasket(sharedBasketRef.basketId, authToken, site)
                             if (setTempBasket) setTempBasket(null)
@@ -218,7 +219,7 @@ export const getAppleButtonConfig = (
                     // Ensure we have a valid order total before proceeding
                     if (currentBasket.orderTotal === null || currentBasket.orderTotal === undefined) {
                         // Clean up temporary basket on failure
-                        if (sku && sharedBasketRef?.basketId) {
+                        if (isPdpMode && sharedBasketRef?.basketId) {
                             try {
                                 await deleteTemporaryBasket(sharedBasketRef.basketId, authToken, site)
                                 if (setTempBasket) setTempBasket(null)
@@ -237,7 +238,7 @@ export const getAppleButtonConfig = (
                 } catch (calculationError) {
                     // This is a critical error - we cannot proceed without order total
                     // Clean up temporary basket on failure
-                    if (sku && sharedBasketRef?.basketId) {
+                    if (isPdpMode && sharedBasketRef?.basketId) {
                         try {
                             await deleteTemporaryBasket(sharedBasketRef.basketId, authToken, site)
                             if (setTempBasket) setTempBasket(null)
@@ -283,7 +284,7 @@ export const getAppleButtonConfig = (
                     })
                 } else {
                     // Clean up temporary basket on payment failure
-                    if (sku && sharedBasketRef?.basketId) {
+                    if (isPdpMode && sharedBasketRef?.basketId) {
                         try {
                             await deleteTemporaryBasket(sharedBasketRef.basketId, authToken, site)
                             if (setTempBasket) setTempBasket(null)
@@ -299,7 +300,7 @@ export const getAppleButtonConfig = (
                 }
             } catch (err) {
                 // Clean up temporary basket on any unexpected error
-                if (sku && sharedBasketRef?.basketId) {
+                if (isPdpMode && sharedBasketRef?.basketId) {
                     try {
                         await deleteTemporaryBasket(sharedBasketRef.basketId, authToken, site)
                         if (setTempBasket) setTempBasket(null)
@@ -483,7 +484,7 @@ export const getAppleButtonConfig = (
         onError: (error) => {
             // Clean up temporary basket when Apple Pay is cancelled or fails
             const cleanup = async () => {
-                if (sku && sharedBasketRef?.basketId) {
+                if (isPdpMode && sharedBasketRef?.basketId) {
                     try {
                         await deleteTemporaryBasket(sharedBasketRef.basketId, authToken, site)
                         // Clear the temporary basket state
@@ -513,14 +514,28 @@ export const getAppleButtonConfig = (
     return buttonConfig
 }
 
-export const ApplePayExpress = ({sku}) => {
+export const ApplePayExpress = ({sku, isPdpMode = false}) => {
     const {getTokenWhenReady} = useAccessToken()
     const {locale, site} = useMultiSite()
     const navigate = useNavigation()
     
     const [authToken, setAuthToken] = useState()
     const [tempBasket, setTempBasket] = useState(null)
+    const [currentSku, setCurrentSku] = useState(sku)
     const paymentContainer = useRef(null)
+
+    // Handle SKU prop changes (for postMessage updates)
+    useEffect(() => {
+        if (sku !== currentSku) {
+            // Clean up previous temporary basket if switching SKUs
+            if (currentSku && tempBasket?.basketId && authToken && site) {
+                deleteTemporaryBasket(tempBasket.basketId, authToken, site)
+                    .catch(error => console.warn('Failed to cleanup previous temporary basket:', error))
+                setTempBasket(null)
+            }
+            setCurrentSku(sku)
+        }
+    }, [sku, currentSku, tempBasket?.basketId, authToken, site])
 
     // Get auth token
     useEffect(() => {
@@ -531,18 +546,18 @@ export const ApplePayExpress = ({sku}) => {
         getToken()
     }, [])
 
-    // For "Buy Now" flow, use standalone payment methods
-    // For regular flow, use the standard Adyen hook
+    // For PDP mode, use standalone payment methods
+    // For regular mode, use the standard Adyen hook
     const {
         paymentMethods: standalonePaymentMethods,
         loading: standaloneLoading,
         error: standaloneError
-    } = useStandalonePaymentMethods(authToken, site, locale, !!sku && !!authToken)
+    } = useStandalonePaymentMethods(authToken, site, locale, isPdpMode && !!authToken)
 
     const regularAdyenData = useAdyenExpressCheckout()
 
-    // Determine which data source to use
-    const usingStandalone = sku && authToken
+    // Determine which data source to use based on PDP mode, not SKU existence
+    const usingStandalone = isPdpMode && authToken
     
     // Use environment from standalone response or regular Adyen data
     const adyenEnvironment = usingStandalone ? 
@@ -558,12 +573,12 @@ export const ApplePayExpress = ({sku}) => {
     useEffect(() => {
         return () => {
             // Clean up temporary basket when component unmounts (user navigates away)
-            if (sku && tempBasket?.basketId && authToken && site) {
+            if (isPdpMode && currentSku && tempBasket?.basketId && authToken && site) {
                 deleteTemporaryBasket(tempBasket.basketId, authToken, site)
                     .catch(error => console.warn('Failed to cleanup temporary basket on unmount:', error))
             }
         }
-    }, [tempBasket?.basketId, authToken, site?.id, sku])
+    }, [tempBasket?.basketId, authToken, site?.id, currentSku, isPdpMode])
 
     useEffect(() => {
         let isCanceled = false
@@ -573,9 +588,9 @@ export const ApplePayExpress = ({sku}) => {
                 return
             }
 
-            // For "Buy Now" flow, we don't need a basket initially but we do need payment methods
-            // For regular flow, we need a basket to continue
-            if (sku) {
+            // For PDP mode, we don't need a basket initially but we do need payment methods
+            // For regular mode, we need a basket to continue
+            if (isPdpMode) {
                 if (!standalonePaymentMethods || standaloneLoading) {
                     return
                 }
@@ -638,9 +653,10 @@ export const ApplePayExpress = ({sku}) => {
                     applePaymentMethodConfig,
                     navigate,
                     fetchShippingMethods,
-                    sku,
+                    currentSku,
                     setTempBasket,
-                    tempBasket
+                    tempBasket,
+                    isPdpMode
                 )
 
                 let applePayButton
@@ -679,10 +695,10 @@ export const ApplePayExpress = ({sku}) => {
                     err instanceof TypeError &&
                     err.message == "undefined is not an object (evaluating 'a.orderTotal')"
                 
-                // For "Buy Now" flow, missing order total is expected initially
-                const isExpectedBuyNowError = sku && isMissingOrderTotalError && !tempBasket
+                // For PDP mode, missing order total is expected initially when no SKU is set
+                const isExpectedPdpError = isPdpMode && isMissingOrderTotalError && !tempBasket
                 
-                if (!isMissingOrderTotalError && !isExpectedBuyNowError) {
+                if (!isMissingOrderTotalError && !isExpectedPdpError) {
                     handleApplePayUnavailable()
                 }
             }
@@ -693,7 +709,7 @@ export const ApplePayExpress = ({sku}) => {
         return () => {
             isCanceled = true
         }
-    }, [adyenEnvironment, adyenPaymentMethods, tempBasket, basket, shippingMethods, standalonePaymentMethods, standaloneLoading, standaloneError])
+    }, [adyenEnvironment, adyenPaymentMethods, tempBasket, basket, shippingMethods, standalonePaymentMethods, standaloneLoading, standaloneError, currentSku, isPdpMode])
 
     return (
         <>
@@ -704,5 +720,6 @@ export const ApplePayExpress = ({sku}) => {
 
 ApplePayExpress.propTypes = {
     shippingMethods: PropTypes.array,
-    sku: PropTypes.string
+    sku: PropTypes.string,
+    isPdpMode: PropTypes.bool
 }
