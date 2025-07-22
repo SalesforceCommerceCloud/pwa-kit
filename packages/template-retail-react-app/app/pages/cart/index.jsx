@@ -66,7 +66,6 @@ import UnavailableProductConfirmationModal from '@salesforce/retail-react-app/ap
 import {getUpdateBundleChildArray} from '@salesforce/retail-react-app/app/utils/product-utils'
 import {useSelectedStore} from '@salesforce/retail-react-app/app/hooks/use-selected-store'
 import {useMultiship} from '@salesforce/retail-react-app/app/hooks/use-multiship'
-import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
 
 const DEBOUNCE_WAIT = 750
 
@@ -94,7 +93,6 @@ const Cart = () => {
 
     const {selectedStore} = useSelectedStore()
     const selectedInventoryId = selectedStore?.inventoryId || null
-    const {site} = useMultiSite()
     const {handleDeliveryOptionChange, assignDefaultShippingMethodsToShipments} =
         useMultiship(basket)
     const productIds = basket?.productItems?.map(({productId}) => productId).join(',') ?? ''

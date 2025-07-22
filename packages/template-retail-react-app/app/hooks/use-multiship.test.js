@@ -446,11 +446,7 @@ describe('useMultiship', () => {
             mockCreateShipmentForBasket.mockResolvedValue(mockResponse)
 
             await act(async () => {
-                const response = await result.current.createNewDeliveryShipment(
-                    mockBasket,
-                    [],
-                    mockStoreInfo
-                )
+                const response = await result.current.createNewDeliveryShipment(mockBasket)
                 expect(response).toEqual(mockResponse)
             })
 
@@ -482,9 +478,7 @@ describe('useMultiship', () => {
 
             await act(async () => {
                 const response = await result.current.createNewDeliveryShipment(
-                    basketWithEmptyDefault,
-                    [],
-                    mockStoreInfo
+                    basketWithEmptyDefault
                 )
                 expect(response).toEqual(mockConfigureResponse)
             })
@@ -492,8 +486,7 @@ describe('useMultiship', () => {
             expect(mockConfigureDefaultShipmentIfNeeded).toHaveBeenCalledWith(
                 basketWithEmptyDefault,
                 'me',
-                false,
-                mockStoreInfo
+                false
             )
             expect(mockCreateShipmentForBasket).not.toHaveBeenCalled()
         })
@@ -517,7 +510,6 @@ describe('useMultiship', () => {
             await act(async () => {
                 const response = await result.current.createNewPickupShipment(
                     mockBasket,
-                    [],
                     mockStoreInfo
                 )
                 expect(response).toEqual(mockResponse)
@@ -560,7 +552,6 @@ describe('useMultiship', () => {
             await act(async () => {
                 const response = await result.current.createNewPickupShipment(
                     basketWithEmptyDefault,
-                    [],
                     mockStoreInfo
                 )
                 expect(response).toEqual(mockConfigureResponse)
@@ -581,7 +572,7 @@ describe('useMultiship', () => {
 
             await act(async () => {
                 await expect(
-                    result.current.createNewPickupShipment(mockBasket, [], mockStoreInfo)
+                    result.current.createNewPickupShipment(mockBasket, mockStoreInfo)
                 ).rejects.toThrow('No pickup shipping method found')
             })
         })
@@ -2761,10 +2752,7 @@ describe('useMultiship', () => {
             mockIsCurrentShippingMethodPickup.mockReturnValue(false)
 
             await act(async () => {
-                const shipmentId = await result.current.findOrCreateDeliveryShipment(
-                    [],
-                    mockStoreInfo
-                )
+                const shipmentId = await result.current.findOrCreateDeliveryShipment()
                 expect(shipmentId).toBe('me')
             })
         })
@@ -2797,10 +2785,7 @@ describe('useMultiship', () => {
             mockCreateShipmentForBasket.mockResolvedValue(mockNewShipmentResponse)
 
             await act(async () => {
-                const shipmentId = await result.current.findOrCreateDeliveryShipment(
-                    [],
-                    mockStoreInfo
-                )
+                const shipmentId = await result.current.findOrCreateDeliveryShipment()
                 expect(shipmentId).toBe('new-delivery-shipment')
             })
         })
@@ -2823,10 +2808,7 @@ describe('useMultiship', () => {
             mockIsCurrentShippingMethodPickup.mockReturnValue(true)
 
             await act(async () => {
-                const shipmentId = await result.current.findOrCreatePickupShipment(
-                    [],
-                    mockStoreInfo
-                ) // Add empty array as first parameter
+                const shipmentId = await result.current.findOrCreatePickupShipment(mockStoreInfo)
                 expect(shipmentId).toBe('pickup-shipment')
             })
         })
@@ -2852,10 +2834,7 @@ describe('useMultiship', () => {
             })
 
             await act(async () => {
-                const shipmentId = await result.current.findOrCreatePickupShipment(
-                    [],
-                    mockStoreInfo
-                ) // Add empty array as first parameter
+                const shipmentId = await result.current.findOrCreatePickupShipment(mockStoreInfo)
                 expect(shipmentId).toBe('new-pickup-shipment')
             })
         })
@@ -2864,7 +2843,7 @@ describe('useMultiship', () => {
             const {result} = renderHook(() => useMultiship(mockBasket))
 
             await act(async () => {
-                await expect(result.current.findOrCreatePickupShipment([], null)).rejects.toThrow(
+                await expect(result.current.findOrCreatePickupShipment(null)).rejects.toThrow(
                     'No store selected for pickup'
                 )
             })
@@ -2880,7 +2859,7 @@ describe('useMultiship', () => {
 
             await act(async () => {
                 await expect(
-                    result.current.findOrCreatePickupShipment([], storeWithoutId) // Add empty array as first parameter
+                    result.current.findOrCreatePickupShipment(storeWithoutId)
                 ).rejects.toThrow('No store selected for pickup')
             })
         })
@@ -2895,7 +2874,7 @@ describe('useMultiship', () => {
 
             await act(async () => {
                 await expect(
-                    result.current.findOrCreatePickupShipment([], storeWithoutInventory) // Add empty array as first parameter
+                    result.current.findOrCreatePickupShipment(storeWithoutInventory)
                 ).rejects.toThrow('Selected store does not have an inventory ID')
             })
         })
@@ -2908,35 +2887,18 @@ describe('useMultiship', () => {
 
             await act(async () => {
                 await expect(
-                    result.current.findOrCreatePickupShipment([], mockStoreInfo) // Add empty array as first parameter
+                    result.current.findOrCreatePickupShipment(mockStoreInfo)
                 ).rejects.toThrow('No pickup shipping method found')
             })
         })
     })
 
     describe('getShipmentForItems', () => {
-        const mockProductItems = [
-            {
-                itemId: 'item-1',
-                productId: 'product-1',
-                quantity: 2
-            },
-            {
-                itemId: 'item-2',
-                productId: 'product-2',
-                quantity: 1
-            }
-        ]
-
         test('should return product items unchanged when no basket', async () => {
             const {result} = renderHook(() => useMultiship(null))
 
             await act(async () => {
-                const response = await result.current.getShipmentForItems(
-                    mockProductItems,
-                    mockStoreInfo,
-                    false
-                )
+                const response = await result.current.getShipmentForItems(false, mockStoreInfo)
                 expect(response).toBe('me')
             })
         })
@@ -2945,11 +2907,7 @@ describe('useMultiship', () => {
             const {result} = renderHook(() => useMultiship(mockBasketWithPickupShipment))
 
             await act(async () => {
-                const response = await result.current.getShipmentForItems(
-                    mockProductItems,
-                    mockStoreInfo,
-                    false
-                )
+                const response = await result.current.getShipmentForItems(false, mockStoreInfo)
                 // Should return items with 'me' shipment ID since findOrCreateDeliveryShipment returns 'me'
                 expect(response).toBe('me')
             })
@@ -2960,11 +2918,7 @@ describe('useMultiship', () => {
             const {result} = renderHook(() => useMultiship(mockBasketWithPickupShipment))
 
             await act(async () => {
-                const response = await result.current.getShipmentForItems(
-                    mockProductItems,
-                    mockStoreInfo,
-                    true
-                )
+                const response = await result.current.getShipmentForItems(true, mockStoreInfo)
                 // Should return items with pickup shipment ID since findOrCreatePickupShipment returns a valid shipment ID
                 expect(response).toBe('pickup-shipment')
             })

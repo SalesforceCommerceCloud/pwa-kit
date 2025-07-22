@@ -409,11 +409,7 @@ const ProductDetail = () => {
             }
 
             // Fetch and assign a suitable shipment for product items
-            const targetShipmentId = await getShipmentForItems(
-                productItems,
-                selectedStore,
-                hasAnyPickupSelected
-            )
+            const targetShipmentId = await getShipmentForItems(hasAnyPickupSelected, selectedStore)
 
             if (targetShipmentId) {
                 productItems = productItems.map((item) => ({
@@ -571,11 +567,7 @@ const ProductDetail = () => {
             )
 
             // Fetch and assign a suitable shipment for product items
-            const targetShipmentId = await getShipmentForItems(
-                productItems,
-                selectedStore,
-                hasAnyPickupSelected
-            )
+            const targetShipmentId = await getShipmentForItems(hasAnyPickupSelected, selectedStore)
 
             if (targetShipmentId) {
                 productItems = productItems.map((item) => ({
@@ -620,7 +612,12 @@ const ProductDetail = () => {
             }
 
             // Configure shipping method based on pickup selection
-            await configureDefaultShipmentIfNeeded(res, 'me', hasAnyPickupSelected, selectedStore)
+            await configureDefaultShipmentIfNeeded(
+                res,
+                targetShipmentId,
+                hasAnyPickupSelected,
+                selectedStore
+            )
 
             einstein.sendAddToCart(productItems)
 

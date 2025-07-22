@@ -201,14 +201,14 @@ export const usePickupShipment = (basket) => {
      * Configure shipping method based on pickup selection for default shipment
      * @param {Object} basket - The basket object
      * @param {string} targetShipmentId - The target shipment ID
-     * @param {boolean} hasAnyPickupSelected - Whether any items have pickup selected
-     * @param {Object} selectedStore - The selected store information
+     * @param {boolean} selectedPickup - Whether pickup is selected (true) or delivery is selected (false)
+     * @param {Object} selectedStore - The selected store information. Required when selectedPickup
      * @returns {Promise<Object>} The updated shipment response
      */
     const configureDefaultShipmentIfNeeded = async (
         basketResponse,
         targetShipmentId,
-        hasAnyPickupSelected,
+        selectedPickup,
         selectedStore
     ) => {
         // Only needed for reconfiguring default shipment
@@ -224,20 +224,17 @@ export const usePickupShipment = (basket) => {
         const isCurrentlyPickup = isCurrentShippingMethodPickup(currentShippingMethod)
 
         // Only configure if there's a mismatch between pickup selection and current method
-        if (
-            (hasAnyPickupSelected && !isCurrentlyPickup) ||
-            (!hasAnyPickupSelected && isCurrentlyPickup)
-        ) {
+        if ((selectedPickup && !isCurrentlyPickup) || (!selectedPickup && isCurrentlyPickup)) {
             // Fetch shipping methods to get available options
             const {data: fetchedShippingMethods} = await refetchShippingMethods()
 
-            if (hasAnyPickupSelected && !isCurrentlyPickup) {
+            if (selectedPickup && !isCurrentlyPickup) {
                 // Configure pickup shipment if pickup is selected but current method is not pickup
                 const pickupShippingMethodId = getPickupShippingMethodId(fetchedShippingMethods)
                 return await updatePickupShipment(basketResponse.basketId, selectedStore, {
                     pickupShippingMethodId
                 })
-            } else if (!hasAnyPickupSelected && isCurrentlyPickup) {
+            } else if (!selectedPickup && isCurrentlyPickup) {
                 // Configure regular shipping if pickup is not selected but current method is pickup
                 const defaultShippingMethodId = getDefaultShippingMethodId(fetchedShippingMethods)
                 return await updateRegularShippingMethod(
