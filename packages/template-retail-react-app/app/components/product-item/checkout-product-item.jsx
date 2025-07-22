@@ -7,11 +7,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import {FormattedMessage} from 'react-intl'
-
-// Chakra Components
 import {Box, Fade, Flex, Stack, Text} from '@salesforce/retail-react-app/app/components/shared/ui'
-
-// Project Components
 import {HideOnDesktop, HideOnMobile} from '@salesforce/retail-react-app/app/components/responsive'
 import ItemVariantProvider from '@salesforce/retail-react-app/app/components/item-variant'
 import CartItemVariantImage from '@salesforce/retail-react-app/app/components/item-variant/item-image'
@@ -22,10 +18,8 @@ import LoadingSpinner from '@salesforce/retail-react-app/app/components/loading-
 import BonusProductQuantity from '@salesforce/retail-react-app/app/components/product-item/bonus-product-quantity'
 import PickupOrDelivery from '@salesforce/retail-react-app/app/components/pickup-or-delivery'
 
-// Utilities
 import {noop} from '@salesforce/retail-react-app/app/utils/utils'
 
-// Hooks
 import {useCurrency, useDerivedProduct} from '@salesforce/retail-react-app/app/hooks'
 
 const CheckoutProductItem = ({
@@ -36,7 +30,7 @@ const CheckoutProductItem = ({
     showLoading = false,
     deliveryActions
 }) => {
-    const {stepQuantity, showInventoryMessage, inventoryMessage, quantity, setQuantity} =
+    const {showInventoryMessage, inventoryMessage, quantity} =
         useDerivedProduct(product)
     const {currency: activeCurrency} = useCurrency()
     return (
@@ -46,7 +40,7 @@ const CheckoutProductItem = ({
         >
             <ItemVariantProvider variant={product}>
                 {showLoading && <LoadingSpinner />}
-                <Stack layerStyle="cardBordered" align="flex-start">
+                <Stack border="1px solid" borderColor="gray.200" borderRadius="md" p={3} align="flex-start">
                     <Flex width="full" alignItems="flex-start" backgroundColor="white">
                         <CartItemVariantImage width={['88px', '136px']} mr={4} />
                         <Stack spacing={3} flex={1}>
