@@ -1,0 +1,85 @@
+{
+  "template": "productdetail",
+  "path": "/product/:productId",
+  "componentPath": "./pages/product-detail",
+  "structure": [
+    {
+      "type": "Box",
+      "props": {
+        "className": "sf-product-detail-page",
+        "layerStyle": "page",
+        "data-testid": "product-details-page"
+      },
+      "children": [
+        {
+          "type": "Helmet",
+          "children": [
+            {
+              "type": "title"
+            }
+          ]
+        },
+        {
+          "type": "Stack",
+          "props": {
+            "spacing": 16
+          },
+          "children": [
+            {
+              "type": "Stack",
+              "props": {
+                "spacing": 16
+              },
+              "children": [
+                {
+                  "type": "RecommendedProducts",
+                  "props": {
+                    "title": {
+                      "type": "FormattedMessage",
+                      "props": {
+                        "defaultMessage": "You might also like",
+                        "id": "product_detail.recommended_products.title.might_also_like"
+                      }
+                    },
+                    "recommender": "<expression>",
+                    "products": [
+                      {
+                        "type": "identifier",
+                        "name": "product"
+                      }
+                    ],
+                    "mx": {
+                      "base": "<expression>",
+                      "md": "<expression>",
+                      "lg": 0
+                    },
+                    "shouldFetch": "<function>"
+                  }
+                },
+                {
+                  "type": "RecommendedProducts",
+                  "props": {
+                    "key": "<expression>",
+                    "title": {
+                      "type": "FormattedMessage",
+                      "props": {
+                        "defaultMessage": "Recently Viewed",
+                        "id": "product_detail.recommended_products.title.recently_viewed"
+                      }
+                    },
+                    "recommender": "<expression>",
+                    "mx": {
+                      "base": "<expression>",
+                      "md": "<expression>",
+                      "lg": 0
+                    }
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,40 @@
+{
+  "template": "storelocator",
+  "path": "/store-locator",
+  "componentPath": "./pages/store-locator",
+  "structure": [
+    {
+      "type": "Box",
+      "props": {
+        "data-testid": "store-locator-page",
+        "bg": "gray.50",
+        "py": [
+          8,
+          16
+        ]
+      },
+      "children": [
+        {
+          "type": "Container",
+          "props": {
+            "overflowY": "scroll",
+            "paddingTop": 8,
+            "width": [
+              "90%"
+            ],
+            "bg": "white",
+            "paddingBottom": 14,
+            "marginTop": 8,
+            "marginBottom": 8,
+            "borderRadius": "base"
+          },
+          "children": [
+            {
+              "type": "StoreLocator"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

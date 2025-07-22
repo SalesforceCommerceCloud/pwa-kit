@@ -1,0 +1,949 @@
+{
+  "_v": "1",
+  "_resource_state": "6e0abb552f5381e500f6179166c0370dddbf0a342c9e9e81c36648aba63ef1d7",
+  "content_attributes": {
+    "localized": false
+  },
+  "creation_date": "2025-06-24T07:47:06.000Z",
+  "description": "Sample homepage",
+  "id": "homepage-example",
+  "name": "homepage-example",
+  "object_assignments": {
+    "category_lookup_mode": "implicit"
+  },
+  "online": {
+    "default@RefArch": true
+  },
+  "page_type_id": "storePage",
+  "regions": [
+    {
+      "has_visibility_rules": false,
+      "id": "headerbanner",
+      "owner_id": "homepage-example",
+      "type": "page"
+    },
+    {
+      "components": [
+        {
+          "content_attributes": {
+            "localized": true
+          },
+          "has_visibility_rules": false,
+          "id": "eb3ba0039c140b78f32810d7b1",
+          "name": "1 Row x 1 Col (Mobile), 1 Row x 1 Col (Desktop) Component",
+          "regions": [
+            {
+              "components": [
+                {
+                  "content_attributes": {
+                    "data": {
+                      "bannerMessage": "<p>We're Taking Sale To the Next Level! 80% OFF!</p>"
+                    },
+                    "localized": true
+                  },
+                  "has_visibility_rules": false,
+                  "id": "f21da510024de04a5980bdfb72",
+                  "name": "Campaign Banner Component",
+                  "resource_state": "9f929b8a943b8464c53f9858329182fc04b2ab1c303ac2dea56ad9fb6f288dbb",
+                  "type_id": "commerce_assets.campaignBanner"
+                },
+                {
+                  "content_attributes": {
+                    "data": {
+                      "ITCLink": "$url('Search-Show', 'cgid', 'newarrivals')$",
+                      "image": {
+                        "path": "placeholder%20410x307.5.png",
+                        "focal_point": {
+                          "x": 0.5,
+                          "y": 0.5
+                        }
+                      },
+                      "heading": "<h2>Summer Look</h2><p><u>Shop Now</u></p>"
+                    },
+                    "localized": true
+                  },
+                  "has_visibility_rules": false,
+                  "id": "72a40c2ba402656f1744c91471",
+                  "name": "Image And Text Component",
+                  "resource_state": "17195c222bf57b1513220c7fed8705a4537eabc6a4dc6866104b2c576683bcbf",
+                  "type_id": "commerce_assets.imageAndText"
+                },
+                {
+                  "content_attributes": {
+                    "data": {
+                      "category2": "mens",
+                      "image": {
+                        "path": "gray.png",
+                        "focal_point": {
+                          "x": 0.5,
+                          "y": 0.5
+                        },
+                        "meta_data": {
+                          "height": 150,
+                          "width": 1
+                        }
+                      },
+                      "category3": "womens-accessories-shoes",
+                      "category4": "womens-accessories-scarves",
+                      "category5": "mens-accessories",
+                      "customCategoryName1": "Women's New Arrivals",
+                      "category1": "womens",
+                      "customCategoryName2": "Men's New Arrivals",
+                      "applyImageShade": false,
+                      "textHeadline": "<h3>Shop Category</h3>",
+                      "changeTextColor": false
+                    },
+                    "localized": true
+                  },
+                  "has_visibility_rules": false,
+                  "id": "2988c7cd5e2643a99553bdc54f",
+                  "name": "Shop Category Component",
+                  "resource_state": "ea201f5521f7441ba015a6afcaf6c204c2c4fcbeed082a5b1b3dc5980701ed16",
+                  "type_id": "commerce_assets.category"
+                },
+                {
+                  "content_attributes": {
+                    "data": {
+                      "textHeadline": "Popular Catalogs"
+                    },
+                    "localized": true
+                  },
+                  "has_visibility_rules": false,
+                  "id": "b1b243d7a35161cae990cb1ab9",
+                  "name": "Popular Categories Component",
+                  "regions": [
+                    {
+                      "components": [
+                        {
+                          "content_attributes": {
+                            "data": {
+                              "catDisplayName": "Outfits",
+                              "category": "newarrivals-womens"
+                            },
+                            "localized": true
+                          },
+                          "has_visibility_rules": false,
+                          "id": "a6e5cde39b16c65d969f312e0d",
+                          "name": "Popular Category Component",
+                          "resource_state": "d61b811f47d465faf1efd05927108be83ef0fae2f4613fe70bcdac106d00b56c",
+                          "type_id": "commerce_assets.popularCategory"
+                        },
+                        {
+                          "content_attributes": {
+                            "data": {
+                              "catDisplayName": "Tops",
+                              "category": "womens-clothing-tops"
+                            },
+                            "localized": true
+                          },
+                          "has_visibility_rules": false,
+                          "id": "d34cd47d9e2e36e5fc9f658caf",
+                          "name": "Popular Category Component",
+                          "resource_state": "7a0c4578313abbbc8248cec24f731ef66c863acfeba6f27506a4407e1f7d07ae",
+                          "type_id": "commerce_assets.popularCategory"
+                        },
+                        {
+                          "content_attributes": {
+                            "data": {
+                              "category": "womens-clothing-dresses"
+                            },
+                            "localized": true
+                          },
+                          "has_visibility_rules": false,
+                          "id": "ad5ce74d73bc733e93b3c81df0",
+                          "name": "Popular Category Component",
+                          "resource_state": "a9a446f183ff0ee9824a2e477c6d7e6c0ee7324769dc87f309f953425ec5fa01",
+                          "type_id": "commerce_assets.popularCategory"
+                        },
+                        {
+                          "content_attributes": {
+                            "data": {
+                              "category": "womens-clothing-bottoms"
+                            },
+                            "localized": true
+                          },
+                          "has_visibility_rules": false,
+                          "id": "22e532910def38f170498c2367",
+                          "name": "Popular Category Component",
+                          "resource_state": "804de2ca95fe7be376f747e2b0e489cd98a4fa2c3e6dff07f6682f038acaaa0b",
+                          "type_id": "commerce_assets.popularCategory"
+                        },
+                        {
+                          "content_attributes": {
+                            "data": {
+                              "catDisplayName": "Jackets & Coats",
+                              "category": "womens-clothing-jackets"
+                            },
+                            "localized": true
+                          },
+                          "has_visibility_rules": false,
+                          "id": "0404c7e4a19b2ba8d62f814edd",
+                          "name": "Popular Category Component",
+                          "resource_state": "79c3c6d6f9ecc44c662c8ece75114efa3eea889993246e1f4b35f89b7eb8ad05",
+                          "type_id": "commerce_assets.popularCategory"
+                        },
+                        {
+                          "content_attributes": {
+                            "data": {
+                              "catDisplayName": "Feeling Red",
+                              "category": "newarrivals-womens"
+                            },
+                            "localized": true
+                          },
+                          "has_visibility_rules": false,
+                          "id": "b2c8047100a6ce1d334c83a02e",
+                          "name": "Popular Category Component",
+                          "resource_state": "0ca57a6bcfbc7e6ad1801ad1793335508d1041008531dfe8b4743b8487ae70ef",
+                          "type_id": "commerce_assets.popularCategory"
+                        }
+                      ],
+                      "has_visibility_rules": false,
+                      "id": "categories",
+                      "owner_id": "b1b243d7a35161cae990cb1ab9",
+                      "type": "component"
+                    }
+                  ],
+                  "resource_state": "4b0ca1cef4ad30bce933eafcbf588aae1cf881ee2654e770c16b8d5d79493efd",
+                  "type_id": "commerce_layouts.popularCategories"
+                }
+              ],
+              "has_visibility_rules": false,
+              "id": "column1",
+              "owner_id": "eb3ba0039c140b78f32810d7b1",
+              "type": "component"
+            }
+          ],
+          "resource_state": "47f5c807614f8b8303527c3c55b464b9b13b09bfa3d73e168b4b69a8f20e6137",
+          "type_id": "commerce_layouts.mobileGrid1r1c"
+        },
+        {
+          "content_attributes": {
+            "data": {
+              "xsCarouselIndicators": false,
+              "smCarouselControls": false,
+              "mdCarouselIndicators": false,
+              "xsCarouselControls": false,
+              "smCarouselIndicators": false,
+              "xsCarouselSlidesToDisplay": 1,
+              "mdCarouselSlidesToDisplay": 1,
+              "smCarouselSlidesToDisplay": 1
+            },
+            "localized": true
+          },
+          "has_visibility_rules": false,
+          "id": "5a55822431448c8116e19e8f9c",
+          "name": "Carousel Component",
+          "regions": [
+            {
+              "components": [
+                {
+                  "content_attributes": {
+                    "data": {
+                      "image": {
+                        "path": "placeholder%20410x307.5.png",
+                        "focal_point": {
+                          "x": 0.5,
+                          "y": 0.5
+                        }
+                      },
+                      "heading": "<h2>Dresses </h2><p>for </p><h2>Besties</h2><p></p>",
+                      "categoryLink": "womens-clothing-dresses"
+                    },
+                    "localized": true
+                  },
+                  "has_visibility_rules": false,
+                  "id": "537ad48a8506022cec39634a21",
+                  "name": "Main Banner Component",
+                  "resource_state": "541d43bf03ee58e43e9cc82d3d7a9bb87dbd0c689832012a887af618f33abd0d",
+                  "type_id": "commerce_assets.mainBanner"
+                },
+                {
+                  "content_attributes": {
+                    "data": {
+                      "image": {
+                        "path": "placeholder%20410x307.5.png",
+                        "focal_point": {
+                          "x": 0.5,
+                          "y": 0.5
+                        }
+                      },
+                      "heading": "<h2>Summer Sales</h2>",
+                      "categoryLink": "newarrivals-womens"
+                    },
+                    "localized": true
+                  },
+                  "has_visibility_rules": false,
+                  "id": "0a716d6c96b95657d0eb186b13",
+                  "name": "Main Banner Component",
+                  "resource_state": "660a2a73db56e487e7f0426aadd1338392c3613840ca19878801a5bf99d26ee3",
+                  "type_id": "commerce_assets.mainBanner"
+                }
+              ],
+              "has_visibility_rules": false,
+              "id": "slides",
+              "owner_id": "5a55822431448c8116e19e8f9c",
+              "type": "component"
+            }
+          ],
+          "resource_state": "bbdd91397d7ca394cdd37c5c297fb2920e8c64c972a6efd07dab07adf84cb023",
+          "type_id": "commerce_layouts.carousel"
+        },
+        {
+          "content_attributes": {
+            "data": {
+              "xsCarouselIndicators": false,
+              "smCarouselControls": true,
+              "mdCarouselIndicators": false,
+              "xsCarouselControls": true,
+              "smCarouselIndicators": false,
+              "xsCarouselSlidesToDisplay": 2,
+              "mdCarouselSlidesToDisplay": 4,
+              "textHeadline": "You May Like",
+              "smCarouselSlidesToDisplay": 4
+            },
+            "localized": true
+          },
+          "has_visibility_rules": false,
+          "id": "604a71c075ebac37052361ac28",
+          "name": "Carousel Component",
+          "regions": [
+            {
+              "components": [
+                {
+                  "content_attributes": {
+                    "data": {
+                      "product": "25696881M",
+                      "displayRatings": false
+                    },
+                    "localized": true
+                  },
+                  "has_visibility_rules": false,
+                  "id": "14bc311d27f72374e01d843d0e",
+                  "name": "Product Tile Component",
+                  "resource_state": "6b5ad304ec5f490ca49542c0444041d75189f071148c435aa0cd8ac74d927a30",
+                  "type_id": "commerce_assets.productTile"
+                },
+                {
+                  "content_attributes": {
+                    "data": {
+                      "product": "25695451M",
+                      "displayRatings": false
+                    },
+                    "localized": true
+                  },
+                  "has_visibility_rules": false,
+                  "id": "4ef33d8773384bf09bc0fd28af",
+                  "name": "Product Tile Component",
+                  "resource_state": "8c57637a867bcd600ef3fb03ef15a23640f26ee843e7032b355aafd0f8864568",
+                  "type_id": "commerce_assets.productTile"
+                },
+                {
+                  "content_attributes": {
+                    "data": {
+                      "product": "25589165M",
+                      "displayRatings": false
+                    },
+                    "localized": true
+                  },
+                  "has_visibility_rules": false,
+                  "id": "8be9091c241e957a0ee9eb1114",
+                  "name": "Product Tile Component",
+                  "resource_state": "c1dededfbfc7fb7dc489626a1affb882b7e29a419fa46cc5d9a4fb44acf907be",
+                  "type_id": "commerce_assets.productTile"
+                },
+                {
+                  "content_attributes": {
+                    "data": {
+                      "product": "25688608M",
+                      "displayRatings": false
+                    },
+                    "localized": true
+                  },
+                  "has_visibility_rules": false,
+                  "id": "b35dd0d793153420b9e71dbbdf",
+                  "name": "Product Tile Component",
+                  "resource_state": "8b318948c657d43531bf0a804263c7747024304805a04883daecb7b367837f06",
+                  "type_id": "commerce_assets.productTile"
+                },
+                {
+                  "content_attributes": {
+                    "data": {
+                      "product": "25778945M",
+                      "displayRatings": false
+                    },
+                    "localized": true
+                  },
+                  "has_visibility_rules": false,
+                  "id": "c2c4fca566b40c84b7a0c368ce",
+                  "name": "Product Tile Component",
+                  "resource_state": "fe3bc4bc4232b66198482cf5fab3d433ef2b3fbbc76692cb27ad2f31f492b99d",
+                  "type_id": "commerce_assets.productTile"
+                }
+              ],
+              "has_visibility_rules": false,
+              "id": "slides",
+              "owner_id": "604a71c075ebac37052361ac28",
+              "type": "component"
+            }
+          ],
+          "resource_state": "1c0537474bb687b2d122301c40f220ef7538621292cd7459a78532a794f23e3a",
+          "type_id": "commerce_layouts.carousel"
+        },
+        {
+          "content_attributes": {
+            "data": {
+              "richText": "<h3>What's New Trending</h3>"
+            },
+            "localized": true
+          },
+          "has_visibility_rules": false,
+          "id": "48754edd8c9777cb6b709b49ec",
+          "name": "Editorial Rich Text Component",
+          "resource_state": "81cc4df737a81575e6f643bf59fb7e45ff887c72cf76cbf61fb4c6e7aae231f7",
+          "type_id": "commerce_assets.editorialRichText"
+        },
+        {
+          "content_attributes": {
+            "localized": true
+          },
+          "has_visibility_rules": false,
+          "id": "e51cd7f6192e1ba89a826099d2",
+          "name": "Desktop/Tablet 2 row x 3 column, Mobile 3 row x 2 column Component",
+          "regions": [
+            {
+              "components": [
+                {
+                  "content_attributes": {
+                    "data": {
+                      "ITCLink": "$url('Search-Show', 'cgid', 'mens-clothing-dress-shirts')$",
+                      "ITCText": "<p><a data-category-catalog-id=\"storefront-catalog-m-en\" data-category-id=\"mens-clothing-dress-shirts\" data-link-label=\"Dress Shirts\" data-link-type=\"category\" target=\"_self\" href=\"$url('Search-Show', 'cgid', 'mens-clothing-dress-shirts')$\">Shirts</a></p>",
+                      "image": {
+                        "path": "placeholder%20410x410.png",
+                        "focal_point": {
+                          "x": 0.5,
+                          "y": 0.5
+                        }
+                      }
+                    },
+                    "localized": true
+                  },
+                  "has_visibility_rules": false,
+                  "id": "35ef9944c87fb28761edf389e1",
+                  "name": "Image And Text Component",
+                  "resource_state": "5fde3789788293f21b7137f36f5f5bda95854463b7889e2bc59ff5b488cd32ae",
+                  "type_id": "commerce_assets.imageAndText"
+                }
+              ],
+              "has_visibility_rules": false,
+              "id": "column1",
+              "owner_id": "e51cd7f6192e1ba89a826099d2",
+              "type": "component"
+            },
+            {
+              "components": [
+                {
+                  "content_attributes": {
+                    "data": {
+                      "ITCText": "<p><a data-category-catalog-id=\"storefront-catalog-m-en\" data-category-id=\"mens-clothing-pants\" data-link-label=\"Pants\" data-link-type=\"category\" target=\"_self\" href=\"$url('Search-Show', 'cgid', 'mens-clothing-pants')$\">Pants</a></p>",
+                      "image": {
+                        "path": "placeholder%20410x410.png",
+                        "focal_point": {
+                          "x": 0.5,
+                          "y": 0.5
+                        }
+                      }
+                    },
+                    "localized": true
+                  },
+                  "has_visibility_rules": false,
+                  "id": "932c4631cd219ab8a36a20aa23",
+                  "name": "Image And Text Component",
+                  "resource_state": "9032d3a51ee17bc574135bac6c7f7d2f8f361cc22b5ea7192d14652a22a12dc3",
+                  "type_id": "commerce_assets.imageAndText"
+                }
+              ],
+              "has_visibility_rules": false,
+              "id": "column2",
+              "owner_id": "e51cd7f6192e1ba89a826099d2",
+              "type": "component"
+            },
+            {
+              "components": [
+                {
+                  "content_attributes": {
+                    "data": {
+                      "ITCLink": "$url('Search-Show', 'cgid', 'newarrivals-womens')$",
+                      "ITCText": "<p><a data-category-catalog-id=\"storefront-catalog-m-en\" data-category-id=\"newarrivals-womens\" data-link-label=\"Womens\" data-link-type=\"category\" target=\"_self\" href=\"$url('Search-Show', 'cgid', 'newarrivals-womens')$\">Sunglasses</a></p>",
+                      "image": {
+                        "path": "placeholder%20410x410.png",
+                        "focal_point": {
+                          "x": 0.5,
+                          "y": 0.5
+                        }
+                      }
+                    },
+                    "localized": true
+                  },
+                  "has_visibility_rules": false,
+                  "id": "01fc2b169ffc3a3ddaa670e239",
+                  "name": "Image And Text Component",
+                  "resource_state": "5378e28fe31bf453bb16dc1f83620b466aaa4872bf8809d0aef9041bf798ed92",
+                  "type_id": "commerce_assets.imageAndText"
+                }
+              ],
+              "has_visibility_rules": false,
+              "id": "column3",
+              "owner_id": "e51cd7f6192e1ba89a826099d2",
+              "type": "component"
+            },
+            {
+              "components": [
+                {
+                  "content_attributes": {
+                    "data": {
+                      "ITCLink": "$url('Search-Show', 'cgid', 'womens-accessories-scarves')$",
+                      "ITCText": "<p><a style=\"background-color: rgb(255, 255, 255);\" data-category-catalog-id=\"storefront-catalog-m-en\" data-category-id=\"womens-accessories-scarves\" data-link-label=\"Scarves\" data-link-type=\"category\" target=\"_self\" href=\"https://ecom-2015260144-stg.vpod.t.force.com/on/demandware.store/Sites-Site/default/ViewLdsBusinessManagerScreen-PageDesigner/$url('Search-Show',%20'cgid',%20'womens-accessories-scarves')$\">Scarves</a></p>",
+                      "image": {
+                        "path": "placeholder%20410x410.png",
+                        "focal_point": {
+                          "x": 0.5,
+                          "y": 0.5
+                        }
+                      },
+                      "heading": ""
+                    },
+                    "localized": true
+                  },
+                  "has_visibility_rules": false,
+                  "id": "ee6fae89259c4e52d06e31a54a",
+                  "name": "Image And Text Component",
+                  "resource_state": "d69f9919248cca67f35a3e61fa2aea6b7a875b60c3e1d5a7203b172a4c3e384c",
+                  "type_id": "commerce_assets.imageAndText"
+                }
+              ],
+              "has_visibility_rules": false,
+              "id": "column4",
+              "owner_id": "e51cd7f6192e1ba89a826099d2",
+              "type": "component"
+            },
+            {
+              "components": [
+                {
+                  "content_attributes": {
+                    "data": {
+                      "ITCLink": "$url('Search-Show', 'cgid', 'womens-clothing-dresses')$",
+                      "ITCText": "<p><a data-category-catalog-id=\"storefront-catalog-m-en\" data-category-id=\"womens-clothing-dresses\" data-link-label=\"Dresses\" data-link-type=\"category\" target=\"_self\" href=\"$url('Search-Show', 'cgid', 'womens-clothing-dresses')$\">Dresses</a></p>",
+                      "image": {
+                        "path": "placeholder%20410x410.png",
+                        "focal_point": {
+                          "x": 0.5,
+                          "y": 0.5
+                        }
+                      }
+                    },
+                    "localized": true
+                  },
+                  "has_visibility_rules": false,
+                  "id": "673524e49f7ff570ab3c5cb560",
+                  "name": "Image And Text Component",
+                  "resource_state": "e453496bf4718210066294018fceb6c3025af2559d3af5e89f4207b2ffefd8c2",
+                  "type_id": "commerce_assets.imageAndText"
+                }
+              ],
+              "has_visibility_rules": false,
+              "id": "column5",
+              "owner_id": "e51cd7f6192e1ba89a826099d2",
+              "type": "component"
+            },
+            {
+              "components": [
+                {
+                  "content_attributes": {
+                    "data": {
+                      "ITCLink": "$url('Search-Show', 'cgid', 'mens')$",
+                      "ITCText": "<p><a data-category-catalog-id=\"storefront-catalog-m-en\" data-category-id=\"mens\" data-link-label=\"Mens\" data-link-type=\"category\" target=\"_self\" href=\"$url('Search-Show', 'cgid', 'mens')$\">Men's</a></p>",
+                      "image": {
+                        "path": "placeholder%20410x410.png",
+                        "focal_point": {
+                          "x": 0.5,
+                          "y": 0.5
+                        }
+                      }
+                    },
+                    "localized": true
+                  },
+                  "has_visibility_rules": false,
+                  "id": "c902669568cdf7c4d7f8b74cf9",
+                  "name": "Image And Text Component",
+                  "resource_state": "20d150b51be12a6032fd09666074a216b8b949700b844598fe042f0119f5b14b",
+                  "type_id": "commerce_assets.imageAndText"
+                }
+              ],
+              "has_visibility_rules": false,
+              "id": "column6",
+              "owner_id": "e51cd7f6192e1ba89a826099d2",
+              "type": "component"
+            }
+          ],
+          "resource_state": "17e202d3cc249099c6c8e639d97f959a1832852bf7f1e9188affdee267156ea6",
+          "type_id": "commerce_layouts.mobileGrid3r2c"
+        },
+        {
+          "content_attributes": {
+            "localized": true
+          },
+          "has_visibility_rules": false,
+          "id": "82e49a64c867b4c218a266dea0",
+          "name": "2 Row x 1 Col (Mobile), 1 Row x 2 Col (Desktop) Component",
+          "regions": [
+            {
+              "components": [
+                {
+                  "content_attributes": {
+                    "data": {
+                      "image": {
+                        "path": "placeholder%20410x179.4.png",
+                        "focal_point": {
+                          "x": 0.5,
+                          "y": 0.5
+                        }
+                      }
+                    },
+                    "localized": true
+                  },
+                  "has_visibility_rules": false,
+                  "id": "33cddd8f81abade7306c29edad",
+                  "name": "Photo Tile Component",
+                  "resource_state": "1a2893071aeadac7ca5a6c13e5fcce6e6734ae3786e26043d16a8e9796442d73",
+                  "type_id": "commerce_assets.photoTile"
+                }
+              ],
+              "has_visibility_rules": false,
+              "id": "column1",
+              "owner_id": "82e49a64c867b4c218a266dea0",
+              "type": "component"
+            },
+            {
+              "components": [
+                {
+                  "content_attributes": {
+                    "data": {
+                      "richText": "<p>Hello,</p><h2>SUNSHINE</h2><p></p><p></p><p></p><p></p><p>Fresh Picks for Warmer Days...</p><p><a href=\"$url('Search-Show', 'cgid', 'newarrivals')$\" target=\"_self\" data-link-type=\"category\" data-link-label=\"New Arrivals\" data-category-id=\"newarrivals\" data-category-catalog-id=\"storefront-catalog-m-en\">Shop Must Haves</a></p>"
+                    },
+                    "localized": true
+                  },
+                  "has_visibility_rules": false,
+                  "id": "8b4cb78e27e27fe721e76e9af0",
+                  "name": "Editorial Rich Text Component",
+                  "resource_state": "8ea38dd66bf1d55eb0d3b5fe77877f60fcadc548d90234915e39a718329643e6",
+                  "type_id": "commerce_assets.editorialRichText"
+                }
+              ],
+              "has_visibility_rules": false,
+              "id": "column2",
+              "owner_id": "82e49a64c867b4c218a266dea0",
+              "type": "component"
+            }
+          ],
+          "resource_state": "20cbbdbf3e6d5f80ea889ca8c2eae36498d786b5b5e0ea8c737db166b71d1c64",
+          "type_id": "commerce_layouts.mobileGrid2r1c"
+        },
+        {
+          "content_attributes": {
+            "data": {
+              "category2": "mens-clothing-pants",
+              "image": {
+                "path": "gray.png",
+                "focal_point": {
+                  "x": 0.5,
+                  "y": 0.5
+                },
+                "meta_data": {
+                  "height": 150,
+                  "width": 1
+                }
+              },
+              "category3": "womens-accessories-scarves",
+              "category4": "mens-accessories-gloves",
+              "customCategoryName1": "Shirts",
+              "category1": "mens-clothing-dress-shirts",
+              "applyImageShade": false,
+              "textHeadline": "<h2>SUMMER SALE 50% OFF</h2>",
+              "changeTextColor": false
+            },
+            "localized": true
+          },
+          "has_visibility_rules": false,
+          "id": "f4574bbd4b2a6414ee920f692a",
+          "name": "Shop Category Component",
+          "resource_state": "45e126886e45f37b21542d7b5d4192b882f73b0e05bc86e7ba669813b363b296",
+          "type_id": "commerce_assets.category"
+        },
+        {
+          "content_attributes": {
+            "data": {
+              "richText": "<h3>Shop The Look</h3><p><a data-category-catalog-id=\"storefront-catalog-m-en\" data-category-id=\"newarrivals\" data-link-label=\"New Arrivals\" data-link-type=\"category\" target=\"_self\" href=\"$url('Search-Show', 'cgid', 'newarrivals')$\">See all</a></p>"
+            },
+            "localized": true
+          },
+          "has_visibility_rules": false,
+          "id": "a9127294e7ff4471d1bdb5446c",
+          "name": "Editorial Rich Text Component",
+          "resource_state": "e9da6669ea23f82767b45810454b5bd1ad1b55405f6584db5a7bf16a07aa2374",
+          "type_id": "commerce_assets.editorialRichText"
+        },
+        {
+          "content_attributes": {
+            "localized": true
+          },
+          "has_visibility_rules": false,
+          "id": "ef20356ba8fc951d79bf02df19",
+          "name": "Shop The Look Layout Component",
+          "regions": [
+            {
+              "components": [
+                {
+                  "content_attributes": {
+                    "data": {
+                      "product": "spring-lookM",
+                      "priceDisplay": false
+                    },
+                    "localized": true
+                  },
+                  "has_visibility_rules": false,
+                  "id": "8b5e6e751e60d706f1f86b86eb",
+                  "name": "Shop The Look Product Tile Component",
+                  "resource_state": "d523389098639bd4a4f71ac0cf9e04b748116e3caad3a1996a3c84ed83bd8bba",
+                  "type_id": "commerce_assets.shopTheLook"
+                }
+              ],
+              "has_visibility_rules": false,
+              "id": "column1",
+              "owner_id": "ef20356ba8fc951d79bf02df19",
+              "type": "component"
+            },
+            {
+              "components": [
+                {
+                  "content_attributes": {
+                    "data": {
+                      "product": "Spring-look-2M",
+                      "priceDisplay": false
+                    },
+                    "localized": true
+                  },
+                  "has_visibility_rules": false,
+                  "id": "cfdf1818159f462fe8867b5812",
+                  "name": "Shop The Look Product Tile Component",
+                  "resource_state": "973e0140d606c6ea76212d83bd7876e9ca0233c1101db55918689013e1fc6f97",
+                  "type_id": "commerce_assets.shopTheLook"
+                }
+              ],
+              "has_visibility_rules": false,
+              "id": "column2",
+              "owner_id": "ef20356ba8fc951d79bf02df19",
+              "type": "component"
+            },
+            {
+              "components": [
+                {
+                  "content_attributes": {
+                    "data": {
+                      "image": {
+                        "path": "placeholder%20410x410.png",
+                        "focal_point": {
+                          "x": 0.5,
+                          "y": 0.5
+                        }
+                      }
+                    },
+                    "localized": true
+                  },
+                  "has_visibility_rules": false,
+                  "id": "6ee84af022b410e0adc8953372",
+                  "name": "Image With Text Component",
+                  "resource_state": "d2cfe102b389866b336d605bae509a08f24848c87b3a7f138a8e8db384d8215d",
+                  "type_id": "commerce_assets.imageAndText"
+                }
+              ],
+              "has_visibility_rules": false,
+              "id": "column3",
+              "owner_id": "ef20356ba8fc951d79bf02df19",
+              "type": "component"
+            },
+            {
+              "components": [
+                {
+                  "content_attributes": {
+                    "data": {
+                      "product": "25695441M",
+                      "priceDisplay": false
+                    },
+                    "localized": true
+                  },
+                  "has_visibility_rules": false,
+                  "id": "8e51e306ea0e7a468239b967aa",
+                  "name": "Shop The Look Product Tile Component",
+                  "resource_state": "904321c1334280213e07915ccd66214c23f87daba8b1ead0aa2f893c8e304c0b",
+                  "type_id": "commerce_assets.shopTheLook"
+                }
+              ],
+              "has_visibility_rules": false,
+              "id": "column4",
+              "owner_id": "ef20356ba8fc951d79bf02df19",
+              "type": "component"
+            },
+            {
+              "components": [
+                {
+                  "content_attributes": {
+                    "data": {
+                      "product": "25642436M",
+                      "priceDisplay": false
+                    },
+                    "localized": true
+                  },
+                  "has_visibility_rules": false,
+                  "id": "ab8e4b826df49a961407fe4d53",
+                  "name": "Shop The Look Product Tile Component",
+                  "resource_state": "34269e0c8c2df7d2865816f57ff1538ed873c43739dfb26667dd031761f7397b",
+                  "type_id": "commerce_assets.shopTheLook"
+                }
+              ],
+              "has_visibility_rules": false,
+              "id": "column5",
+              "owner_id": "ef20356ba8fc951d79bf02df19",
+              "type": "component"
+            },
+            {
+              "components": [
+                {
+                  "content_attributes": {
+                    "data": {
+                      "product": "25695461M",
+                      "priceDisplay": false
+                    },
+                    "localized": true
+                  },
+                  "has_visibility_rules": false,
+                  "id": "3e6a2c105138751e32c1bebce3",
+                  "name": "Shop The Look Product Tile Component",
+                  "resource_state": "815b02c5ed0bd6f8cd0a247152aa1a91b2504f9fb92f7535e1984b8113cd925d",
+                  "type_id": "commerce_assets.shopTheLook"
+                }
+              ],
+              "has_visibility_rules": false,
+              "id": "column6",
+              "owner_id": "ef20356ba8fc951d79bf02df19",
+              "type": "component"
+            }
+          ],
+          "resource_state": "72d190d731012b94a75d5b8c2470d78cb156e7f65bcb8d31b8484aa40503782a",
+          "type_id": "commerce_layouts.mobileGridLookBook"
+        },
+        {
+          "content_attributes": {
+            "localized": true
+          },
+          "has_visibility_rules": false,
+          "id": "148ed12df9418d68549713a303",
+          "name": "2 Row x 1 Col (Mobile), 1 Row x 2 Col (Desktop) Component",
+          "regions": [
+            {
+              "components": [
+                {
+                  "content_attributes": {
+                    "data": {
+                      "richText": "<h4>Our Inspiration to Style and Trends</h4><h3>   </h3><p><a href=\"www.google.com\" target=\"_self\" data-link-type=\"external\" data-link-label=\"www.google.com\">Check out Blog</a></p>"
+                    },
+                    "localized": true
+                  },
+                  "has_visibility_rules": false,
+                  "id": "b9043a146951b8be8953259f27",
+                  "name": "Editorial Rich Text Component",
+                  "resource_state": "268e8e6a1196d95e8ddbc2e90e426efb00a6db49b79f25a1be8165d3172bc886",
+                  "type_id": "commerce_assets.editorialRichText"
+                }
+              ],
+              "has_visibility_rules": false,
+              "id": "column1",
+              "owner_id": "148ed12df9418d68549713a303",
+              "type": "component"
+            },
+            {
+              "components": [
+                {
+                  "content_attributes": {
+                    "data": {
+                      "image": {
+                        "path": "placeholder%20410x410.png",
+                        "focal_point": {
+                          "x": 0.5,
+                          "y": 0.5
+                        }
+                      }
+                    },
+                    "localized": true
+                  },
+                  "has_visibility_rules": false,
+                  "id": "3b856e1dbddd8613a2a149bf1a",
+                  "name": "Photo Tile Component",
+                  "resource_state": "8e94af15c7a305aa116633aff4081d4ad04a804bd04447b365dbbbfce27e0fba",
+                  "type_id": "commerce_assets.photoTile"
+                }
+              ],
+              "has_visibility_rules": false,
+              "id": "column2",
+              "owner_id": "148ed12df9418d68549713a303",
+              "type": "component"
+            }
+          ],
+          "resource_state": "84b59217eca81ff7c2fde5c29affc99c806c4a9fd1e12ea98a9085e2948c5c97",
+          "type_id": "commerce_layouts.mobileGrid2r1c"
+        }
+      ],
+      "has_visibility_rules": false,
+      "id": "main",
+      "owner_id": "homepage-example",
+      "type": "page"
+    },
+    {
+      "has_visibility_rules": false,
+      "id": "legalnotice",
+      "owner_id": "homepage-example",
+      "type": "page"
+    }
+  ],
+  "repository_information": {
+    "id": "RefArchSharedLibrary",
+    "name": "",
+    "site_information": [
+      {
+        "page_online": true,
+        "page_searchable": false,
+        "page_status": "ok",
+        "site_info": {
+          "site_id": "5de5f7219dedc287d44f42419f",
+          "site_name": "Sites-RefArch-Site"
+        }
+      },
+      {
+        "page_online": false,
+        "page_searchable": false,
+        "page_status": "ok",
+        "site_info": {
+          "site_id": "2db53e796eb43724e1288e7d8a",
+          "site_name": "Sites-RefArchGlobal-Site"
+        }
+      }
+    ],
+    "uuid": "81994a7ea80f5cdbc1e5adb702"
+  },
+  "searchable": {
+    "default@RefArch": false
+  },
+  "site_map_included": {
+    "default@RefArch": false
+  },
+  "visibility_mode": "visible"
+}

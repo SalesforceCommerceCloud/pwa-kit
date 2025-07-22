@@ -1,0 +1,42 @@
+{
+  "template": "login",
+  "path": "PASSWORDLESS_LOGIN_LANDING_PATH",
+  "componentPath": "./pages/login",
+  "structure": [
+    {
+      "type": "Box",
+      "props": {
+        "data-testid": "login-page",
+        "bg": "gray.50",
+        "py": [
+          8,
+          16
+        ]
+      },
+      "children": [
+        {
+          "type": "Seo",
+          "props": {
+            "title": "Sign in",
+            "description": "Customer sign in"
+          }
+        },
+        {
+          "type": "Container",
+          "props": {
+            "paddingTop": 16,
+            "width": [
+              "100%",
+              "407px"
+            ],
+            "bg": "white",
+            "paddingBottom": 14,
+            "marginTop": 8,
+            "marginBottom": 8,
+            "borderRadius": "base"
+          }
+        }
+      ]
+    }
+  ]
+}

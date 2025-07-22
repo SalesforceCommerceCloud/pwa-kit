@@ -25,6 +25,8 @@ import {getRuntime} from '@salesforce/pwa-kit-runtime/ssr/server/express'
 import {defaultPwaKitSecurityHeaders} from '@salesforce/pwa-kit-runtime/utils/middleware'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import {getAppOrigin} from '@salesforce/pwa-kit-react-sdk/utils/url'
+import {pageTypes} from './metadata/pageTypes'
+import {componentTypes} from './metadata/componentTypes'
 
 const config = getConfig()
 
@@ -39,7 +41,7 @@ const options = {
     mobify: config,
 
     // The port that the local dev server listens on
-    port: 3000,
+    port: 5123,
 
     // The protocol on which the development Express app listens.
     // Note that http://localhost is treated as a secure context for development,
@@ -332,6 +334,14 @@ const {handler} = runtime.createHandler(options, (app) => {
 
     app.get('/:shortCode/:tenantId/oauth2/jwks', (req, res) => {
         jwksCaching(req, res, {shortCode: req.params.shortCode, tenantId: req.params.tenantId})
+    })
+
+    app.get('/_internal/page-designer/pageTypes', (req, res) => {
+        res.json(pageTypes)
+    })
+
+    app.get('/_internal/page-designer/componentTypes', (req, res) => {
+        res.json(componentTypes)
     })
 
     // Handles the passwordless login callback route. SLAS makes a POST request to this

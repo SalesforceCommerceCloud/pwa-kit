@@ -1,0 +1,35 @@
+{
+    "name": "@salesforce/page-designer-react-sdk",
+    "version": "1.0.0",
+    "description": "React SDK for Salesforce Commerce Cloud Page Designer",
+    "main": "dist/index.js",
+    "types": "dist/index.d.ts",
+    "scripts": {
+        "build": "cross-env NODE_ENV=production internal-lib-build build",
+        "test": "jest",
+        "lint": "eslint .",
+        "format": "prettier --write \"**/*.{js,jsx,ts,tsx,json,md}\""
+    },
+    "author": "Salesforce",
+    "license": "BSD-3-Clause",
+    "peerDependencies": {
+        "react": "^18.2.0",
+        "react-dom": "^18.2.0",
+        "react-router-dom": "^5.3.4"
+    },
+    "devDependencies": {
+        "@testing-library/react": "^14.0.0",
+        "internal-lib-build": "3.11.0-dev.0",
+        "cross-env": "^5.2.1",
+        "eslint": "^8.37.0",
+        "jest": "^26.6.3",
+        "prettier": "^2.8.6",
+        "react": "^18.2.0",
+        "react-dom": "^18.2.0",
+        "react-router-dom": "^5.3.4",
+        "typescript": "4.9.5"
+    },
+    "publishConfig": {
+        "directory": "dist"
+    }
+}

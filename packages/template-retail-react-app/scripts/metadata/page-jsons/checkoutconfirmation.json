@@ -1,0 +1,614 @@
+{
+  "template": "checkoutconfirmation",
+  "path": "/checkout/confirmation/:orderNo",
+  "componentPath": "./pages/checkout/confirmation",
+  "structure": [
+    {
+      "type": "Box",
+      "props": {
+        "background": "gray.50"
+      },
+      "children": [
+        {
+          "type": "Container",
+          "props": {
+            "maxWidth": "container.md",
+            "py": {
+              "base": 7,
+              "md": 16
+            },
+            "px": {
+              "base": 0,
+              "md": 4
+            },
+            "data-testid": "sf-checkout-confirmation-container"
+          },
+          "children": [
+            {
+              "type": "Stack",
+              "props": {
+                "spacing": 4
+              },
+              "children": [
+                {
+                  "type": "Box",
+                  "props": {
+                    "layerStyle": "card",
+                    "rounded": [
+                      0,
+                      0,
+                      "base"
+                    ],
+                    "px": [
+                      4,
+                      4,
+                      6
+                    ],
+                    "py": [
+                      6,
+                      6,
+                      8
+                    ]
+                  },
+                  "children": [
+                    {
+                      "type": "Stack",
+                      "props": {
+                        "spacing": 6
+                      },
+                      "children": [
+                        {
+                          "type": "Heading",
+                          "props": {
+                            "align": "center",
+                            "fontSize": [
+                              "2xl"
+                            ]
+                          },
+                          "children": [
+                            {
+                              "type": "FormattedMessage",
+                              "props": {
+                                "defaultMessage": "Thank you for your order!",
+                                "id": "checkout_confirmation.heading.thank_you_for_order"
+                              }
+                            }
+                          ]
+                        },
+                        {
+                          "type": "Box",
+                          "children": [
+                            {
+                              "type": "Container",
+                              "props": {
+                                "variant": "form"
+                              },
+                              "children": [
+                                {
+                                  "type": "Stack",
+                                  "props": {
+                                    "spacing": 3
+                                  },
+                                  "children": [
+                                    {
+                                      "type": "Text",
+                                      "props": {
+                                        "align": "center"
+                                      },
+                                      "children": [
+                                        {
+                                          "type": "FormattedMessage",
+                                          "props": {
+                                            "defaultMessage": "Order Number",
+                                            "id": "checkout_confirmation.label.order_number"
+                                          }
+                                        },
+                                        {
+                                          "type": "Text",
+                                          "props": {
+                                            "as": "span",
+                                            "fontWeight": "bold"
+                                          }
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": "Text",
+                                      "props": {
+                                        "align": "center"
+                                      },
+                                      "children": [
+                                        {
+                                          "type": "FormattedMessage",
+                                          "props": {
+                                            "defaultMessage": "We will send an email to <b>{email}</b> with your confirmation number and receipt shortly.",
+                                            "id": "checkout_confirmation.message.will_email_shortly",
+                                            "values": {
+                                              "b": "<function>",
+                                              "email": "<expression>"
+                                            }
+                                          }
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": "Spacer"
+                                    },
+                                    {
+                                      "type": "Button",
+                                      "props": {
+                                        "as": {
+                                          "type": "identifier",
+                                          "name": "Link"
+                                        },
+                                        "href": "/",
+                                        "variant": "outline"
+                                      },
+                                      "children": [
+                                        {
+                                          "type": "FormattedMessage",
+                                          "props": {
+                                            "defaultMessage": "Continue Shopping",
+                                            "id": "checkout_confirmation.link.continue_shopping"
+                                          }
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "Box",
+                  "props": {
+                    "layerStyle": "card",
+                    "rounded": [
+                      0,
+                      0,
+                      "base"
+                    ],
+                    "px": [
+                      4,
+                      4,
+                      6
+                    ],
+                    "py": [
+                      6,
+                      6,
+                      8
+                    ]
+                  },
+                  "children": [
+                    {
+                      "type": "Container",
+                      "props": {
+                        "variant": "form"
+                      },
+                      "children": [
+                        {
+                          "type": "Stack",
+                          "props": {
+                            "spacing": 6
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "Box",
+                  "props": {
+                    "layerStyle": "card",
+                    "rounded": [
+                      0,
+                      0,
+                      "base"
+                    ],
+                    "px": [
+                      4,
+                      4,
+                      6
+                    ],
+                    "py": [
+                      6,
+                      6,
+                      8
+                    ]
+                  },
+                  "children": [
+                    {
+                      "type": "Container",
+                      "props": {
+                        "variant": "form"
+                      },
+                      "children": [
+                        {
+                          "type": "Stack",
+                          "props": {
+                            "spacing": 6
+                          },
+                          "children": [
+                            {
+                              "type": "Heading",
+                              "props": {
+                                "fontSize": "lg"
+                              },
+                              "children": [
+                                {
+                                  "type": "FormattedMessage",
+                                  "props": {
+                                    "defaultMessage": "Order Summary",
+                                    "id": "checkout_confirmation.heading.order_summary"
+                                  }
+                                }
+                              ]
+                            },
+                            {
+                              "type": "Stack",
+                              "props": {
+                                "spacing": 4
+                              },
+                              "children": [
+                                {
+                                  "type": "Text",
+                                  "children": [
+                                    {
+                                      "type": "FormattedMessage",
+                                      "props": {
+                                        "description": "# item(s) in order",
+                                        "defaultMessage": "{itemCount, plural, =0 {0 items} one {# item} other {# items}}",
+                                        "values": {
+                                          "itemCount": "<expression>"
+                                        },
+                                        "id": "checkout_confirmation.message.num_of_items_in_order"
+                                      }
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "Stack",
+                                  "props": {
+                                    "spacing": 5,
+                                    "align": "flex-start"
+                                  },
+                                  "children": [
+                                    {
+                                      "type": "Stack",
+                                      "props": {
+                                        "spacing": 5,
+                                        "align": "flex-start",
+                                        "width": "full",
+                                        "divider": {
+                                          "type": "Divider"
+                                        }
+                                      }
+                                    },
+                                    {
+                                      "type": "Stack",
+                                      "props": {
+                                        "w": "full",
+                                        "py": 4,
+                                        "borderY": "1px",
+                                        "borderColor": "gray.200"
+                                      },
+                                      "children": [
+                                        {
+                                          "type": "Flex",
+                                          "props": {
+                                            "justify": "space-between"
+                                          },
+                                          "children": [
+                                            {
+                                              "type": "Text",
+                                              "props": {
+                                                "fontWeight": "bold"
+                                              },
+                                              "children": [
+                                                {
+                                                  "type": "FormattedMessage",
+                                                  "props": {
+                                                    "defaultMessage": "Subtotal",
+                                                    "id": "checkout_confirmation.label.subtotal"
+                                                  }
+                                                }
+                                              ]
+                                            },
+                                            {
+                                              "type": "Text",
+                                              "props": {
+                                                "fontWeight": "bold"
+                                              },
+                                              "children": [
+                                                {
+                                                  "type": "FormattedNumber",
+                                                  "props": {
+                                                    "style": "currency",
+                                                    "currency": "<expression>",
+                                                    "value": "<expression>"
+                                                  }
+                                                }
+                                              ]
+                                            }
+                                          ]
+                                        },
+                                        {
+                                          "type": "Flex",
+                                          "props": {
+                                            "justify": "space-between"
+                                          },
+                                          "children": [
+                                            {
+                                              "type": "Flex",
+                                              "props": {
+                                                "alignItems": "center"
+                                              },
+                                              "children": [
+                                                {
+                                                  "type": "Text",
+                                                  "props": {
+                                                    "lineHeight": 1
+                                                  },
+                                                  "children": [
+                                                    {
+                                                      "type": "FormattedMessage",
+                                                      "props": {
+                                                        "defaultMessage": "Shipping",
+                                                        "id": "checkout_confirmation.label.shipping"
+                                                      }
+                                                    }
+                                                  ]
+                                                }
+                                              ]
+                                            }
+                                          ]
+                                        },
+                                        {
+                                          "type": "Flex",
+                                          "props": {
+                                            "justify": "space-between"
+                                          },
+                                          "children": [
+                                            {
+                                              "type": "Text",
+                                              "children": [
+                                                {
+                                                  "type": "FormattedMessage",
+                                                  "props": {
+                                                    "defaultMessage": "Tax",
+                                                    "id": "checkout_confirmation.label.tax"
+                                                  }
+                                                }
+                                              ]
+                                            },
+                                            {
+                                              "type": "Text",
+                                              "children": [
+                                                {
+                                                  "type": "FormattedNumber",
+                                                  "props": {
+                                                    "value": "<expression>",
+                                                    "style": "currency",
+                                                    "currency": "<expression>"
+                                                  }
+                                                }
+                                              ]
+                                            }
+                                          ]
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": "Flex",
+                                      "props": {
+                                        "w": "full",
+                                        "justify": "space-between"
+                                      },
+                                      "children": [
+                                        {
+                                          "type": "Text",
+                                          "props": {
+                                            "fontWeight": "bold"
+                                          },
+                                          "children": [
+                                            {
+                                              "type": "FormattedMessage",
+                                              "props": {
+                                                "defaultMessage": "Order Total",
+                                                "id": "checkout_confirmation.label.order_total"
+                                              }
+                                            }
+                                          ]
+                                        },
+                                        {
+                                          "type": "Text",
+                                          "props": {
+                                            "fontWeight": "bold"
+                                          },
+                                          "children": [
+                                            {
+                                              "type": "FormattedNumber",
+                                              "props": {
+                                                "style": "currency",
+                                                "currency": "<expression>",
+                                                "value": "<expression>"
+                                              }
+                                            }
+                                          ]
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "Box",
+                  "props": {
+                    "layerStyle": "card",
+                    "rounded": [
+                      0,
+                      0,
+                      "base"
+                    ],
+                    "px": [
+                      4,
+                      4,
+                      6
+                    ],
+                    "py": [
+                      6,
+                      6,
+                      8
+                    ]
+                  },
+                  "children": [
+                    {
+                      "type": "Container",
+                      "props": {
+                        "variant": "form"
+                      },
+                      "children": [
+                        {
+                          "type": "Stack",
+                          "props": {
+                            "spacing": 6
+                          },
+                          "children": [
+                            {
+                              "type": "Heading",
+                              "props": {
+                                "fontSize": "lg"
+                              },
+                              "children": [
+                                {
+                                  "type": "FormattedMessage",
+                                  "props": {
+                                    "defaultMessage": "Payment Details",
+                                    "id": "checkout_confirmation.heading.payment_details"
+                                  }
+                                }
+                              ]
+                            },
+                            {
+                              "type": "SimpleGrid",
+                              "props": {
+                                "columns": [
+                                  1,
+                                  1,
+                                  2
+                                ],
+                                "spacing": 6
+                              },
+                              "children": [
+                                {
+                                  "type": "Stack",
+                                  "props": {
+                                    "spacing": 1
+                                  },
+                                  "children": [
+                                    {
+                                      "type": "Heading",
+                                      "props": {
+                                        "as": "h3",
+                                        "fontSize": "sm"
+                                      },
+                                      "children": [
+                                        {
+                                          "type": "FormattedMessage",
+                                          "props": {
+                                            "defaultMessage": "Billing Address",
+                                            "id": "checkout_confirmation.heading.billing_address"
+                                          }
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": "AddressDisplay",
+                                      "props": {
+                                        "address": "<expression>"
+                                      }
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "Stack",
+                                  "props": {
+                                    "spacing": 1
+                                  },
+                                  "children": [
+                                    {
+                                      "type": "Heading",
+                                      "props": {
+                                        "as": "h3",
+                                        "fontSize": "sm"
+                                      },
+                                      "children": [
+                                        {
+                                          "type": "FormattedMessage",
+                                          "props": {
+                                            "defaultMessage": "Credit Card",
+                                            "id": "checkout_confirmation.heading.credit_card"
+                                          }
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": "Stack",
+                                      "props": {
+                                        "direction": "row"
+                                      },
+                                      "children": [
+                                        {
+                                          "type": "Box",
+                                          "children": [
+                                            {
+                                              "type": "Text"
+                                            },
+                                            {
+                                              "type": "Stack",
+                                              "props": {
+                                                "direction": "row"
+                                              },
+                                              "children": [
+                                                {
+                                                  "type": "Text"
+                                                },
+                                                {
+                                                  "type": "Text"
+                                                }
+                                              ]
+                                            }
+                                          ]
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,41 @@
+{
+  "template": "social-login-redirect",
+  "path": "/social-callback",
+  "componentPath": "./pages/social-login-redirect",
+  "structure": [
+    {
+      "type": "Box",
+      "children": [
+        {
+          "type": "Container",
+          "children": [
+            {
+              "type": "Stack",
+              "children": [
+                {
+                  "type": "Spinner"
+                },
+                {
+                  "type": "Text",
+                  "children": [
+                    {
+                      "type": "FormattedMessage"
+                    }
+                  ]
+                },
+                {
+                  "type": "Text",
+                  "children": [
+                    {
+                      "type": "FormattedMessage"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

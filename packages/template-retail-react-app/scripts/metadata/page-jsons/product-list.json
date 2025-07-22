@@ -1,0 +1,15 @@
+{
+  "template": "product-list",
+  "path": "/category/:categoryId",
+  "componentPath": "./pages/product-list",
+  "structure": [
+    {
+      "type": "FormControl",
+      "children": [
+        {
+          "type": "Select"
+        }
+      ]
+    }
+  ]
+}

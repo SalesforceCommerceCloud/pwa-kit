@@ -86,7 +86,10 @@
     "react-router-dom": "^5.3.4"
   },
   "devDependencies": {
-    "cross-env": "^5.2.1"
+    "@babel/parser": "^7.21.3",
+    "@babel/traverse": "^7.23.2",
+    "cross-env": "^5.2.1",
+    "react-docgen": "^6.0.0"
   },
   "overrides": {
     "react-router": {
