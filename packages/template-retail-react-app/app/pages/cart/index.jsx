@@ -38,6 +38,7 @@ import {DELIVERY_OPTIONS} from '@salesforce/retail-react-app/app/components/pick
 import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
 import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
 import {useWishList} from '@salesforce/retail-react-app/app/hooks/use-wish-list'
+import {useStoreLocatorModal} from '@salesforce/retail-react-app/app/hooks/use-store-locator'
 
 // Constants
 import {
@@ -249,6 +250,7 @@ const Cart = () => {
     const toast = useToast()
     const navigate = useNavigation()
     const modalProps = useDisclosure()
+    const storeLocatorModal = useStoreLocatorModal()
 
     /******************* Assign Default Shipping Methods to Shipments *******************/
     // Assign default shipping methods to any shipments that don't have one
@@ -780,6 +782,7 @@ const Cart = () => {
                                                     totalItemsInCart={
                                                         basket?.productItems?.length || 0
                                                     }
+                                                    onChangeStore={storeLocatorModal.onOpen}
                                                 />
                                             )}
                                             {/* Regular Products */}

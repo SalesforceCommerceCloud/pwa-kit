@@ -1538,6 +1538,9 @@
   "social_login_redirect.message.redirect_link": {
     "defaultMessage": "If you are not automatically redirected, click <link>this link</link> to proceed."
   },
+  "store_display.button.change_store": {
+    "defaultMessage": "Change Store"
+  },
   "store_display.format.address_line_2": {
     "defaultMessage": "{city}, {stateCode} {postalCode}"
   },

@@ -10,7 +10,13 @@ import {FormattedMessage} from 'react-intl'
 import {Box, Text} from '@salesforce/retail-react-app/app/components/shared/ui'
 import StoreDisplay from '@salesforce/retail-react-app/app/components/store-display'
 
-const OrderTypeDisplay = ({isPickupOrder, store, itemsInShipment, totalItemsInCart}) => {
+const OrderTypeDisplay = ({
+    isPickupOrder,
+    store,
+    itemsInShipment,
+    totalItemsInCart,
+    onChangeStore
+}) => {
     return (
         <Box layerStyle="cardBordered" p={3}>
             {isPickupOrder ? (
@@ -30,6 +36,7 @@ const OrderTypeDisplay = ({isPickupOrder, store, itemsInShipment, totalItemsInCa
                         showDistance={true}
                         textSize="sm"
                         nameStyle={{fontSize: 'sm', fontWeight: 'semibold'}}
+                        onChangeStore={onChangeStore}
                     />
                 </Box>
             ) : (
@@ -52,7 +59,8 @@ OrderTypeDisplay.propTypes = {
     isPickupOrder: PropTypes.bool.isRequired,
     store: PropTypes.object,
     itemsInShipment: PropTypes.number.isRequired,
-    totalItemsInCart: PropTypes.number.isRequired
+    totalItemsInCart: PropTypes.number.isRequired,
+    onChangeStore: PropTypes.func
 }
 
 export default OrderTypeDisplay

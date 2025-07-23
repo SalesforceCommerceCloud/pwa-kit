@@ -7731,6 +7731,20 @@
       "value": "]"
     }
   ],
+  "store_display.button.change_store": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ƈħȧȧƞɠḗḗ Şŧǿǿřḗḗ"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
   "store_display.format.address_line_2": [
     {
       "type": 0,
