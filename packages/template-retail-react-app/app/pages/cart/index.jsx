@@ -634,10 +634,13 @@ const Cart = () => {
                     categorizedProducts.bonusProducts.length
             }
 
-            if (isPickupOrder) {
-                pickupShipments.push(shipmentData)
-            } else {
-                deliveryShipments.push(shipmentData)
+            // Only add shipments that have items
+            if (shipmentData.itemsInShipment > 0) {
+                if (isPickupOrder) {
+                    pickupShipments.push(shipmentData)
+                } else {
+                    deliveryShipments.push(shipmentData)
+                }
             }
         })
 
@@ -697,7 +700,23 @@ const Cart = () => {
                     setSelectedItem(productItem)
 
                     const selectedPickup = selectedDeliveryOption === DELIVERY_OPTIONS.PICKUP
-                    await handleDeliveryOptionChange(productItem, selectedPickup, selectedStore)
+
+                    // Get default inventory ID from product data - throw error if not available
+                    const productData = products?.[productItem.productId]
+                    const defaultInventoryId = productData?.inventory?.id
+
+                    if (!defaultInventoryId) {
+                        throw new Error(
+                            `No inventory ID found for product ${productItem.productId}`
+                        )
+                    }
+
+                    await handleDeliveryOptionChange(
+                        productItem,
+                        selectedPickup,
+                        selectedStore,
+                        defaultInventoryId
+                    )
                 } catch (error) {
                     console.error('Error changing delivery option:', error)
                     showError()

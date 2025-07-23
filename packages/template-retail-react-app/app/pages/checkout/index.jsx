@@ -40,6 +40,7 @@ import {
 import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
 import LoadingSpinner from '@salesforce/retail-react-app/app/components/loading-spinner'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
+import {useMultiship} from '@salesforce/retail-react-app/app/hooks/use-multiship'
 
 const Checkout = () => {
     const {formatMessage} = useIntl()
@@ -53,6 +54,7 @@ const Checkout = () => {
     const idps = social?.idps
     const isSocialEnabled = !!social?.enabled
     const isPasswordlessEnabled = !!passwordless?.enabled
+    const {removeEmptyShipments} = useMultiship(basket)
 
     // Only enable BOPIS functionality if the feature toggle is on
     const isPickupOrder = STORE_LOCATOR_IS_ENABLED
@@ -64,6 +66,13 @@ const Checkout = () => {
             window.scrollTo({top: 0})
         }
     }, [error, step])
+
+    // Remove empty shipments when there are multiple shipments
+    useEffect(() => {
+        if (basket?.shipments?.length > 1 && removeEmptyShipments) {
+            removeEmptyShipments()
+        }
+    }, [basket?.shipments?.length])
 
     const submitOrder = async () => {
         setIsLoading(true)
