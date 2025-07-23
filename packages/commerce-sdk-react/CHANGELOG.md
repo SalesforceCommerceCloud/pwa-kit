@@ -1,9 +1,12 @@
-## v3.4.0-dev.0 (May 23, 2025)
+## v3.5.0-dev (Jul 22, 2025)
 
+
+## v3.4.0 (Jul 22, 2025)
 - Optionally disable auth init in CommerceApiProvider [#2629](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2629)
 - Now compatible with either React 17 and 18 [#2506](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2506)
 - Gracefully handle missing SDK Clients in CommerceApiProvider [#2539](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2539)
 - Refactor commerce-sdk-react to allow injecting ApiClients [#2519](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2519)
+- Upgrade to commerce-sdk-isomorphic v3.4.0 [#2866](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2866)
 
 
 ## v3.3.0 (May 22, 2025)
