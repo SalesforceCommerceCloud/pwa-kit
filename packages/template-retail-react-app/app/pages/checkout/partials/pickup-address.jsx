@@ -80,6 +80,9 @@ const PickupAddress = () => {
         }
     )
 
+    // Check if store data is still loading
+    const isStoreDataLoading = !!allStoreIds && !storeData
+
     // Create productsByItemId mapping
     const productsByItemId = useMemo(() => {
         const updateProductsByItemId = {}
@@ -135,9 +138,14 @@ const PickupAddress = () => {
             }
         })
 
+        console.log('Debug - basket shipments:', basket?.shipments)
+        console.log('Debug - storeData:', storeData)
+        console.log('Debug - pickupShipments:', pickupShipments)
         return pickupShipments
     }, [basket?.shipments, basket?.productItems, storeData])
-    const store = storeData?.data?.[0]
+    
+    // For single pickup, use the first store; for multiple pickups, this will be handled differently
+    const store = pickupShipmentItems.length === 1 ? pickupShipmentItems[0]?.store : storeData?.data?.[0]
     const pickupAddress = {
         address1: store?.address1,
         city: store?.city,
@@ -188,7 +196,7 @@ const PickupAddress = () => {
             {step === STEPS.PICKUP_ADDRESS && (
                 <>
                     {/* Display pickup stores and items */}
-                    {pickupShipmentItems.length > 0 && (
+                    {pickupShipmentItems.length > 0 && !isStoreDataLoading && (
                         <>
                             {/* Single pickup - use original behavior */}
                             {pickupShipmentItems.length === 1 && (
@@ -208,7 +216,7 @@ const PickupAddress = () => {
                                 <Stack spacing={6}>
                                     {pickupShipmentItems.map((shipmentInfo, index) => (
                                         <Box 
-                                            key={shipmentInfo.shipment?.shipmentId}
+                                            key={`pickup-${shipmentInfo.shipment?.shipmentId}-${shipmentInfo.store?.id || index}`}
                                             border="1px solid"
                                             borderColor="gray.200"
                                             borderRadius="md"
@@ -299,7 +307,7 @@ const PickupAddress = () => {
             {isAddressFilled && (
                 <ToggleCardSummary>
                     {/* Display pickup stores and items in summary */}
-                    {pickupShipmentItems.length > 0 && (
+                    {pickupShipmentItems.length > 0 && !isStoreDataLoading && (
                         <>
                             {/* Single pickup - use original behavior */}
                             {pickupShipmentItems.length === 1 && (
@@ -319,7 +327,7 @@ const PickupAddress = () => {
                                 <Stack spacing={6}>
                                     {pickupShipmentItems.map((shipmentInfo, index) => (
                                         <Box 
-                                            key={shipmentInfo.shipment?.shipmentId}
+                                            key={`pickup-${shipmentInfo.shipment?.shipmentId}-${shipmentInfo.store?.id || index}`}
                                             border="1px solid"
                                             borderColor="gray.200"
                                             borderRadius="md"
