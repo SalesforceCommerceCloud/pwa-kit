@@ -8,14 +8,13 @@ import React, {useState, useMemo} from 'react'
 import {FormattedMessage, useIntl} from 'react-intl'
 
 // Components
-import {Box, Button, Container, Text, Stack, Divider, Heading} from '@salesforce/retail-react-app/app/components/shared/ui'
+import {Box, Button, Container, Text, Stack, Divider} from '@salesforce/retail-react-app/app/components/shared/ui'
 import {
     ToggleCard,
     ToggleCardSummary
 } from '@salesforce/retail-react-app/app/components/toggle-card'
 import AddressDisplay from '@salesforce/retail-react-app/app/components/address-display'
 import CheckoutProductItemList from '@salesforce/retail-react-app/app/components/product-item-list/checkout-product-item-list'
-import StoreDisplay from '@salesforce/retail-react-app/app/components/store-display'
 
 // Hooks
 import {useCheckout} from '@salesforce/retail-react-app/app/pages/checkout/util/checkout-context'
@@ -288,35 +287,33 @@ const PickupAddress = () => {
                                                 </Box>
                                                 
                                                 {/* Cart Items for this store */}
-                                                <Box mt={4} border="1px solid" borderColor="gray.200" borderRadius="md" p={4}>
-                                                    {/* Regular Products */}
-                                                    {shipmentInfo.categorizedProducts.regularProducts.length > 0 && (
+                                                {/* Regular Products */}
+                                                {shipmentInfo.categorizedProducts.regularProducts.length > 0 && (
+                                                    <CheckoutProductItemList
+                                                        productItems={shipmentInfo.categorizedProducts.regularProducts}
+                                                        productsByItemId={productsByItemId}
+                                                        isProductsLoading={isProductsLoading}
+                                                    />
+                                                )}
+
+                                                {/* Bonus Products */}
+                                                {shipmentInfo.categorizedProducts.bonusProducts.length > 0 && (
+                                                    <>
+                                                        <Box mt={3} mb={2}>
+                                                            <Text fontWeight="bold" fontSize="sm" color="gray.600">
+                                                                <FormattedMessage
+                                                                    defaultMessage="Bonus Items"
+                                                                    id="pickup_address.bonus_products.title"
+                                                                />
+                                                            </Text>
+                                                        </Box>
                                                         <CheckoutProductItemList
-                                                            productItems={shipmentInfo.categorizedProducts.regularProducts}
+                                                            productItems={shipmentInfo.categorizedProducts.bonusProducts}
                                                             productsByItemId={productsByItemId}
                                                             isProductsLoading={isProductsLoading}
                                                         />
-                                                    )}
-
-                                                    {/* Bonus Products */}
-                                                    {shipmentInfo.categorizedProducts.bonusProducts.length > 0 && (
-                                                        <>
-                                                            <Box mt={3} mb={2}>
-                                                                <Text fontWeight="bold" fontSize="sm" color="gray.600">
-                                                                    <FormattedMessage
-                                                                        defaultMessage="Bonus Items"
-                                                                        id="pickup_address.bonus_products.title"
-                                                                    />
-                                                                </Text>
-                                                            </Box>
-                                                            <CheckoutProductItemList
-                                                                productItems={shipmentInfo.categorizedProducts.bonusProducts}
-                                                                productsByItemId={productsByItemId}
-                                                                isProductsLoading={isProductsLoading}
-                                                            />
-                                                        </>
-                                                    )}
-                                                </Box>
+                                                    </>
+                                                )}
                                             </Box>
                                         ))}
                                     </Stack>
