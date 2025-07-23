@@ -5,14 +5,12 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
-import {waitFor} from '@testing-library/react'
-import {rest} from 'msw'
+import {waitFor, screen} from '@testing-library/react'
 import {renderWithProviders, createPathWithDefaults} from '../../utils/test-utils'
 import Login from '.'
 import {BrowserRouter as Router, Route} from 'react-router-dom'
 import Account from '../../pages/account'
 import mockConfig from '../../../config/mocks/mock-config'
-import {mockedRegisteredCustomer} from '../../../mocks/mock-data'
 import {AuthHelpers} from '@salesforce/commerce-sdk-react'
 
 const mockMergedBasket = {
@@ -67,35 +65,11 @@ jest.mock('@salesforce/commerce-sdk-react', () => {
     }
 })
 
-// Set up and clean up
-beforeEach(() => {
-    global.server.use(
-        rest.post('*/customers', (req, res, ctx) => {
-            return res(ctx.delay(0), ctx.status(200), ctx.json(mockedRegisteredCustomer))
-        }),
-        rest.get('*/customers/:customerId', (req, res, ctx) => {
-            const {customerId} = req.params
-            if (customerId === 'customerId') {
-                return res(
-                    ctx.delay(0),
-                    ctx.status(200),
-                    ctx.json({
-                        authType: 'guest',
-                        customerId: 'customerid'
-                    })
-                )
-            }
-            return res(ctx.delay(0), ctx.status(200), ctx.json(mockedRegisteredCustomer))
-        })
-    )
-})
 afterEach(() => {
     jest.resetModules()
 })
 
-// TODO fix when https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2758 is ported over
-describe.skip('Passwordless landing tests', function () {
-    // TODO: fix test
+describe('Passwordless landing tests', function () {
     test('redirects to account page when redirect url is not passed', async () => {
         const token = '12345678'
         window.history.pushState(
@@ -122,8 +96,7 @@ describe.skip('Passwordless landing tests', function () {
         })
     })
 
-    // TODO: fix test
-    test.skip('redirects to redirectUrl when passed as param', async () => {
+    test('redirects to redirectUrl when passed as param', async () => {
         const token = '12345678'
         const redirectUrl = '/womens-tops'
         window.history.pushState(
