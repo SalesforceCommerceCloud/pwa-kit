@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import {getCurrencyValueForApi, getShippingOptionParameters} from './parsers'
+import {getCurrencyValueForApi, getGPShippingOptionParameters} from './parsers'
 
 // Mock the currency list
 jest.mock('./currency-list', () => [
@@ -66,7 +66,7 @@ describe('getShippingOptionParameters', () => {
             defaultShippingMethodId: 'shipping-1'
         }
 
-        const result = getShippingOptionParameters(shippingMethods)
+        const result = getGPShippingOptionParameters(shippingMethods)
 
         expect(result).toEqual({
             defaultSelectedOptionId: 'shipping-1',
@@ -103,7 +103,7 @@ describe('getShippingOptionParameters', () => {
             defaultShippingMethodId: 'shipping-1'
         }
 
-        const result = getShippingOptionParameters(shippingMethods)
+        const result = getGPShippingOptionParameters(shippingMethods)
 
         expect(result).toEqual({
             defaultSelectedOptionId: 'shipping-1',
@@ -122,25 +122,24 @@ describe('getShippingOptionParameters', () => {
         })
     })
 
-    it('should handle empty shipping methods array', () => {
+    it('should handle empty applicable shipping methods', () => {
         const shippingMethods = {
-            applicableShippingMethods: [],
-            defaultShippingMethodId: null
+            defaultShippingMethodId: 'method-1',
+            applicableShippingMethods: []
         }
 
-        const result = getShippingOptionParameters(shippingMethods)
+        const result = getGPShippingOptionParameters(shippingMethods)
 
-        expect(result).toEqual({
-            defaultSelectedOptionId: null,
-            shippingOptions: []
-        })
+        expect(result).toBeUndefined()
     })
 
     it('should handle null/undefined shipping methods', () => {
-        const result = getShippingOptionParameters(null)
-        expect(result).toEqual({
-            defaultSelectedOptionId: undefined,
-            shippingOptions: undefined
-        })
+        const result = getGPShippingOptionParameters(null)
+        expect(result).toBeUndefined()
+    })
+
+    it('should handle undefined shipping methods', () => {
+        const result = getGPShippingOptionParameters(undefined)
+        expect(result).toBeUndefined()
     })
 }) 

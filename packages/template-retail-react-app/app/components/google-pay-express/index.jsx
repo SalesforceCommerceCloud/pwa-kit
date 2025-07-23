@@ -9,18 +9,10 @@ import AdyenCheckout from '@adyen/adyen-web'
 import '@adyen/adyen-web/dist/adyen.css'
 import PropTypes from 'prop-types'
 import {useAdyenExpressCheckout} from '@adyen/adyen-salesforce-pwa'
-import {getCurrencyValueForApi, getShippingOptionParameters} from '@salesforce/retail-react-app/app/components/express/utils/parsers'
+import {getCurrencyValueForApi, getGPShippingOptionParameters} from '@salesforce/retail-react-app/app/components/express/utils/parsers'
 import {AdyenShippingMethodsService} from '@salesforce/retail-react-app/app/components/express/utils/shipping-methods'
 import {AdyenShippingAddressService} from '@salesforce/retail-react-app/app/components/express/utils/shipping-address'
 import {AdyenPaymentsService} from '@salesforce/retail-react-app/app/components/express/utils/payments'
-
-const GOOGLE_PAY_CALLBACK_TRIGGERS = {
-    INITIALIZE: 'INITIALIZE',
-    SHIPPING_ADDRESS: 'SHIPPING_ADDRESS',
-    SHIPPING_OPTION: 'SHIPPING_OPTION'
-}
-
-// TODO: do i need to handle shipping address change differently?
 
 const PAYMENT_METHOD = 'googlepay'
 const EXPRESS_PAYMENT_AVAILABLE = 'express.payment.available'
@@ -56,7 +48,7 @@ export const getCustomerShippingDetails = (shippingAddress) => {
             stateOrProvince: shippingAddress.administrativeArea,
             street: shippingAddress.address1
         },
-        profile: { // TODO: check if 'profile' is needed
+        profile: {
             firstName: shippingAddress.name?.split(' ')[0] || '',
             lastName: shippingAddress.name?.split(' ').slice(1).join(' ') || '',
         }
@@ -90,7 +82,7 @@ export const updateShippingOption = async (
         if (!shippingMethodResponse.applicableShippingMethods.some((sm) => sm.id === shippingOptionId)) {
             return {
                 newShippingOptionParameters: {
-                    ...getShippingOptionParameters(shippingMethodResponse)
+                    ...getGPShippingOptionParameters(shippingMethodResponse)
                 },
                 error: {
                     reason: 'SHIPPING_OPTION_UNAVAILABLE',
@@ -107,7 +99,7 @@ export const updateShippingOption = async (
         if (response.error) {
             return {
                 newShippingOptionParameters: {
-                    ...getShippingOptionParameters(shippingMethodResponse)
+                    ...getGPShippingOptionParameters(shippingMethodResponse)
                 },
                 error: {
                     reason: 'SHIPPING_OPTION_UNAVAILABLE',
@@ -120,7 +112,7 @@ export const updateShippingOption = async (
         shippingMethodResponse.defaultShippingMethodId = shippingOptionId
         return {
             newShippingOptionParameters: {
-                ...getShippingOptionParameters(shippingMethodResponse)
+                ...getGPShippingOptionParameters(shippingMethodResponse)
             },
             newTransactionInfo: {
                 countryCode: response.currency,
@@ -133,7 +125,7 @@ export const updateShippingOption = async (
     } catch (error) {
         return {
             newShippingOptionParameters: {
-                ...getShippingOptionParameters(shippingMethodResponse)
+                ...getGPShippingOptionParameters(shippingMethodResponse)
             },
             error: {
                 reason: 'SHIPPING_OPTION_UNAVAILABLE',
@@ -171,7 +163,7 @@ export const initializeShippingOption = async (
 
         return {
             newShippingOptionParameters: {
-                ...getShippingOptionParameters(shippingMethodResponse)
+                ...getGPShippingOptionParameters(shippingMethodResponse)
             },
             newTransactionInfo: {
                 countryCode: response.currency,
@@ -193,6 +185,7 @@ export const initializeShippingOption = async (
     }
 }
 
+// TODO: do i need to handle shipping address change differently?
 export const updateShippingAddress = async (
     authToken,
     site,
@@ -244,12 +237,12 @@ export const getGoogleButtonConfig = (
         buttonType: 'buy', 
         isExpress: true,
         shippingAddressRequired: true,
-        // shippingAddressParameters: {"allowedCountryCodes": ["US"]}, // This should restrict the country codes to what is supported
+        // shippingAddressParameters: {"allowedCountryCodes": ["US"]}, // If you want to restrict country codes, you can do that here (it greys out options out of allowedCountryCodes)
         shippingOptionRequired: true,
-        shippingOptionParameters: getShippingOptionParameters(shippingMethods), 
+        shippingOptionParameters: getGPShippingOptionParameters(shippingMethods), 
         billingAddressRequired: true,
-        billingAddressParameters: {"format": "FULL"}, // TODO: See what this does...
-        emailRequired: true, // MAYBE don't need this?
+        billingAddressParameters: {"format": "FULL"},
+        emailRequired: true,
         configuration: googlePayConfig,
         amount: {
             value: getCurrencyValueForApi(googlePayAmount, basket.currency),

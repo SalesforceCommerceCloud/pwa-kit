@@ -17,14 +17,10 @@ export function getCurrencyValueForApi(amount, currencyCode) {
     return Math.round(amount * Math.pow(10, currency.Decimals))
 } 
 
-// converts the shipping methods to shippingOptionParameter
-export function getShippingOptionParameters(shippingMethods) { // TODO: rename to something GPay specifc!
-    // Handle null/undefined input -- TODO handle differently?
-    if (!shippingMethods) {
-        return {
-            defaultSelectedOptionId: undefined,
-            shippingOptions: undefined
-        }
+// converts shipping methods to the shippingOptionParameters that Google Pay expects
+export function getGPShippingOptionParameters(shippingMethods) {
+    if (!shippingMethods || !shippingMethods.applicableShippingMethods || shippingMethods.applicableShippingMethods.length === 0) {
+        return undefined
     }
 
     let shippingOptions = shippingMethods?.applicableShippingMethods?.map((sm) => ({
