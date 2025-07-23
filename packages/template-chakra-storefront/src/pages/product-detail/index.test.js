@@ -326,9 +326,7 @@ describe('Recommended Products', () => {
         })
     })
 })
-function delay(ms) {
-    return new Promise((resolve) => setTimeout(resolve, ms))
-}
+
 describe('product bundles', () => {
     let hasUpdatedBundleChildren = false
     beforeEach(() => {

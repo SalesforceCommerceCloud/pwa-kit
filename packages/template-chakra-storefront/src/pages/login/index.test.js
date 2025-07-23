@@ -5,16 +5,16 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
-import { act, screen, waitFor } from '@testing-library/react'
-import { renderWithProviders, createPathWithDefaults, guestToken } from '../../utils/test-utils'
+import {act, screen, waitFor} from '@testing-library/react'
+import {renderWithProviders, createPathWithDefaults, guestToken} from '../../utils/test-utils'
 import Login from '.'
-import { BrowserRouter as Router, Route } from 'react-router-dom'
+import {BrowserRouter as Router, Route} from 'react-router-dom'
 import Account from '../../pages/account'
 import Registration from '../../pages/registration'
 import ResetPassword from '../../pages/reset-password'
 import mockConfig from '../../../config/mocks/mock-config'
-import { mockedRegisteredCustomer } from '../../../mocks/mock-data'
-import { prependHandlersToServer } from '../../../jest-setup'
+import {mockedRegisteredCustomer} from '../../../mocks/mock-data'
+import {prependHandlersToServer} from '../../../jest-setup'
 
 jest.mock('../../hooks/use-datacloud', () => ({
     __esModule: true,
@@ -38,7 +38,7 @@ const mockMergedBasket = {
 
 const MockedComponent = () => {
     const match = {
-        params: { pageName: 'profile' }
+        params: {pageName: 'profile'}
     }
     return (
         <Router>
@@ -73,7 +73,7 @@ beforeEach(() => {
             status: 200,
             delay: 0,
             res: (req) => {
-                const { customerId } = req.params
+                const {customerId} = req.params
                 if (customerId === 'customerId') {
                     return {
                         authType: 'guest',
@@ -117,12 +117,11 @@ describe('Logging in tests', function () {
         ])
     })
 
-    //TODO: fix broken test
-    test.only('Allows customer to sign in to their account', async () => {
-        const { user } = renderWithProviders(<MockedComponent />, {
+    test('Allows customer to sign in to their account', async () => {
+        const {user} = renderWithProviders(<MockedComponent />, {
             wrapperProps: {
                 siteAlias: 'uk',
-                locale: { id: 'en-GB' },
+                locale: {id: 'en-GB'},
                 appConfig: mockConfig,
                 bypassAuth: false
             }
@@ -196,10 +195,10 @@ describe('Error while logging in', function () {
     })
 
     test('Renders error when given incorrect log in credentials', async () => {
-        const { user } = renderWithProviders(<MockedComponent />, {
+        const {user} = renderWithProviders(<MockedComponent />, {
             wrapperProps: {
                 siteAlias: 'uk',
-                locale: { id: 'en-GB' },
+                locale: {id: 'en-GB'},
                 appConfig: mockConfig.app,
                 bypassAuth: false
             }
@@ -218,14 +217,14 @@ describe('Error while logging in', function () {
                 method: 'post',
                 status: 401,
                 delay: 0,
-                res: () => ({ message: 'Unauthorized Credentials.' })
+                res: () => ({message: 'Unauthorized Credentials.'})
             },
             {
                 path: '*/customers',
                 method: 'post',
                 status: 404,
                 delay: 0,
-                res: () => ({ message: 'Not Found.' })
+                res: () => ({message: 'Not Found.'})
             }
         ])
         await act(async () => {
@@ -240,10 +239,10 @@ describe('Error while logging in', function () {
 })
 describe('Navigate away from login page tests', function () {
     test('should navigate to sign up page when the user clicks Create Account', async () => {
-        const { user } = renderWithProviders(<MockedComponent />, {
+        const {user} = renderWithProviders(<MockedComponent />, {
             wrapperProps: {
                 siteAlias: 'uk',
-                locale: { id: 'en-GB' },
+                locale: {id: 'en-GB'},
                 appConfig: mockConfig.app,
                 isGuest: true
             }
@@ -258,10 +257,10 @@ describe('Navigate away from login page tests', function () {
         })
     })
     test('should navigate to reset password page when the user clicks Forgot Password', async () => {
-        const { user } = renderWithProviders(<MockedComponent />, {
+        const {user} = renderWithProviders(<MockedComponent />, {
             wrapperProps: {
                 siteAlias: 'uk',
-                locale: { id: 'en-GB' },
+                locale: {id: 'en-GB'},
                 config: mockConfig,
                 isGuest: true
             }

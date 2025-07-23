@@ -5,16 +5,16 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
-import { act, screen, waitFor } from '@testing-library/react'
-import { createPathWithDefaults, renderWithProviders } from '../../utils/test-utils'
+import {act, screen, waitFor} from '@testing-library/react'
+import {createPathWithDefaults, renderWithProviders} from '../../utils/test-utils'
 import AccountAddresses from '../../pages/account/addresses'
 import {
     mockedRegisteredCustomerWithNoAddress,
     mockedRegisteredCustomer
 } from '../../../mocks/mock-data'
-import { prependHandlersToServer } from '../../../jest-setup'
+import {prependHandlersToServer} from '../../../jest-setup'
 
-import { Route, Switch } from 'react-router-dom'
+import {Route, Switch} from 'react-router-dom'
 import mockConfig from '../../../config/mocks/mock-config'
 
 let mockCustomer = {}
@@ -32,7 +32,6 @@ const MockedComponent = () => {
 const helperAddNewAddress = async (user) => {
     await act(async () => {
         await user.click(screen.getByText(/add address/i))
-
     })
     await act(async () => {
         await user.type(screen.getByLabelText('First Name'), 'Test')
@@ -40,7 +39,6 @@ const helperAddNewAddress = async (user) => {
         await user.type(screen.getByLabelText('Phone'), '7275551234')
         await user.type(screen.getByLabelText('Address'), '123 Main St')
         await user.type(screen.getByLabelText('City'), 'Tampa')
-
     })
 
     await act(async () => {
@@ -130,8 +128,8 @@ test('Allows customer to add addresses', async () => {
             res: () => mockedRegisteredCustomerWithNoAddress
         }
     ])
-    const { user } = renderWithProviders(<MockedComponent />, {
-        wrapperProps: { siteAlias: 'uk', appConfig: mockConfig.app }
+    const {user} = renderWithProviders(<MockedComponent />, {
+        wrapperProps: {siteAlias: 'uk', appConfig: mockConfig.app}
     })
 
     await waitFor(() => {
@@ -181,7 +179,7 @@ test('Allows customer to remove addresses', async () => {
             res: () => mockedRegisteredCustomer
         }
     ])
-    const { user } = renderWithProviders(<MockedComponent />)
+    const {user} = renderWithProviders(<MockedComponent />)
     await waitFor(() => expect(screen.getByText('123 Main St')).toBeInTheDocument())
 
     prependHandlersToServer([
@@ -200,8 +198,7 @@ test('Allows customer to remove addresses', async () => {
     expect(await screen.findByText(/no saved addresses/i)).toBeInTheDocument()
 })
 
-// TODO fix failing tests
-test.skip('Handles focus for cancel/save buttons in address form correctly', async () => {
+test('Handles focus for cancel/save buttons in address form correctly', async () => {
     prependHandlersToServer([
         {
             path: '*/customers/:customerId',
@@ -211,8 +208,8 @@ test.skip('Handles focus for cancel/save buttons in address form correctly', asy
             res: () => mockedRegisteredCustomerWithNoAddress
         }
     ])
-    const { user } = renderWithProviders(<MockedComponent />, {
-        wrapperProps: { siteAlias: 'uk', appConfig: mockConfig.app }
+    const {user} = renderWithProviders(<MockedComponent />, {
+        wrapperProps: {siteAlias: 'uk', appConfig: mockConfig.app}
     })
 
     await waitFor(() => {
@@ -220,18 +217,18 @@ test.skip('Handles focus for cancel/save buttons in address form correctly', asy
     })
 
     // Focus is on heading when component initially renders
-    expect(document.activeElement).toBe(screen.getByRole('heading', { name: /addresses/i }))
+    expect(document.activeElement).toBe(screen.getByRole('heading', {name: /addresses/i}))
 
     await helperAddNewAddress(user)
 
-    const editBtn = screen.getByRole('button', { name: /edit/i })
+    const editBtn = screen.getByRole('button', {name: /edit/i})
 
     await act(async () => {
         // hitting cancel button on edit form brings focus back to edit button
         await user.click(editBtn)
     })
     await act(async () => {
-        await user.click(screen.getByRole('button', { name: /cancel/i }))
+        await user.click(screen.getByRole('button', {name: /cancel/i}))
     })
     expect(document.activeElement).toBe(editBtn)
 
@@ -240,7 +237,7 @@ test.skip('Handles focus for cancel/save buttons in address form correctly', asy
         await user.click(editBtn)
     })
     await act(async () => {
-        await user.click(screen.getByRole('button', { name: /save/i }))
+        await user.click(screen.getByRole('button', {name: /save/i}))
     })
     expect(document.activeElement).toBe(editBtn)
 })
