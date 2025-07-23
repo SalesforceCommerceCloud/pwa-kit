@@ -4,11 +4,11 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import CreateAppGuidelineTool from './pwa-create-app-guideline-tool'
-import {EmptyJsonSchema} from './utils'
+import CreateAppGuidelineTool from './pwa-create-app-guideline'
+import {EmptyJsonSchema} from '../utils/utils'
 
-jest.mock('./utils', () => {
-    const originalModule = jest.requireActual('./utils')
+jest.mock('../utils/utils', () => {
+    const originalModule = jest.requireActual('../utils/utils')
     // eslint-disable-next-line @typescript-eslint/no-var-requires
     const path = require('path')
     const mockScriptPath = path.resolve('../pwa-kit-create-app/scripts/create-mobify-app.js')
