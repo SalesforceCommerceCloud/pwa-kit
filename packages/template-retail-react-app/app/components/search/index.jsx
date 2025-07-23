@@ -24,8 +24,7 @@ import {SearchIcon} from '@salesforce/retail-react-app/app/components/icons'
 import {
     capitalize,
     getSessionJSONItem,
-    setSessionJSONItem,
-    boldString
+    setSessionJSONItem
 } from '@salesforce/retail-react-app/app/utils/utils'
 import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
 import {HideOnDesktop, HideOnMobile} from '@salesforce/retail-react-app/app/components/responsive'
@@ -80,7 +79,7 @@ const formatSuggestions = (searchSuggestions) => {
             (phrase) => {
                 return {
                     type: 'phrase',
-                    name: boldString(phrase.phrase, capitalize(phrase.phrase)),
+                    name: capitalize(phrase.phrase),
                     link: searchUrlBuilder(phrase.phrase)
                 }
             }
