@@ -483,6 +483,22 @@ describe('product bundles', () => {
 
         const childProducts = await screen.findAllByTestId('child-product')
 
+        // make sure the page is finishing rendering all data from api before checking
+        await waitFor(() => {
+            expect(screen.getAllByTestId('product-view')).toHaveLength(4) // 1 parent + 3 children
+            expect(screen.getByRole('heading', {name: /swing Tank/i})).toBeInTheDocument()
+            expect(screen.getByRole('heading', {name: /Pull On Neutral Pant/i})).toBeInTheDocument()
+            expect(
+                screen.getByRole('heading', {name: /Sleeveless Pleated Floral Front Blouse/i})
+            ).toBeInTheDocument()
+
+            expect(screen.getByText(/Recently Viewed/i)).toBeInTheDocument()
+            expect(screen.getByText(/Complete the set/i)).toBeInTheDocument()
+            expect(screen.getByText(/You might also like/i)).toBeInTheDocument()
+            // For 3 recommendation sections, complete the set, recently viewed, You also might like sections
+            expect(screen.getAllByText(/summer bomber jacket/i)).toHaveLength(3)
+            expect(screen.getAllByText(/classic wrap/i)).toHaveLength(3)
+        })
         childProducts.forEach((child) => {
             const heroImage = within(child).getAllByRole('img')[0]
             expect(heroImage.getAttribute('loading')).toBe('lazy')
