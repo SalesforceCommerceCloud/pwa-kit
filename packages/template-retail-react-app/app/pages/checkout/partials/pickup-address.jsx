@@ -366,13 +366,7 @@ const PickupAddress = () => {
                             {shouldShowCartItems && (
                                 <Stack spacing={4}>
                                     {pickupShipmentItems.map((shipmentInfo, index) => (
-                                        <Box 
-                                            key={`pickup-summary-${shipmentInfo.shipment?.shipmentId}-${shipmentInfo.store?.id || index}`}
-                                            border="1px solid"
-                                            borderColor="gray.200"
-                                            borderRadius="md"
-                                            p={3}
-                                        >
+                                        <Box key={`pickup-summary-${shipmentInfo.shipment?.shipmentId}-${shipmentInfo.store?.id || index}`}>
                                             <Text fontWeight="bold" fontSize="md" mb={2}>
                                                 <FormattedMessage
                                                     defaultMessage="Store Information"
@@ -394,6 +388,9 @@ const PickupAddress = () => {
                                                         {shipmentInfo.store.countryCode}
                                                     </Text>
                                                 </Box>
+                                            )}
+                                            {index < pickupShipmentItems.length - 1 && (
+                                                <Divider my={4} />
                                             )}
                                         </Box>
                                     ))}
