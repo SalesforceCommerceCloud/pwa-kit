@@ -122,32 +122,6 @@ test('renders bundle product view modal with handleUpdateCart handler', async ()
 
 test('bundle product view modal disables update button when child is out of stock', async () => {
     // Override the mock for this specific test to make Medium variant out of stock
-   /* global.server.use(
-        rest.get('*!/products', (req, res, ctx) => {
-            const swingTankBlackMediumVariantId = '701643473915M'
-            if (req.url.toString().includes(swingTankBlackMediumVariantId)) {
-                // Return out of stock data only for Medium variant
-                const modifiedData = {
-                    ...mockProductBundleWithVariants,
-                    data: mockProductBundleWithVariants.data.map((product, index) => ({
-                        ...product,
-                        inventory:
-                            index === 1
-                                ? {
-                                      ...product.inventory,
-                                      stockLevel: 0,
-                                      orderable: false,
-                                      ats: 0
-                                  }
-                                : product.inventory
-                    }))
-                }
-                return res(ctx.json(modifiedData))
-            }
-            return res(ctx.json(mockProductBundleWithVariants))
-        })
-    )*/
-
     renderWithProviders(<MockComponent />)
     await waitFor(async () => {
         const trigger = screen.getByText(/open modal/i)
