@@ -58,7 +58,10 @@ export const getOrder: QueryKeyHelper<'getOrder'> = {
         params?.orderNo
     ],
     queryKey: (params: Params<'getOrder'>) => {
-        return [...getOrder.path(params), pickValidParams(params || {}, ShopperOrders.paramKeys.getOrder)]
+        return [
+            ...getOrder.path(params),
+            pickValidParams(params || {}, ShopperOrders.paramKeys.getOrder)
+        ]
     }
 }
 

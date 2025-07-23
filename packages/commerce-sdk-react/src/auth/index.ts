@@ -78,12 +78,12 @@ type LoginRegisteredUserB2CCredentials = Parameters<Helpers['loginRegisteredUser
  * loginRegisteredUserB2C so that it takes in a body rather than just credentials
  *
  */
-type LoginRegisteredUserCredentialsWithCustomParams = 
+type LoginRegisteredUserCredentialsWithCustomParams =
     | {
-        username: string
-        password: string
-        options?: {body: helpers.CustomRequestBody}
-    }
+          username: string
+          password: string
+          options?: {body: helpers.CustomRequestBody}
+      }
     | LoginRegisteredUserB2CCredentials
 
 /**
@@ -939,13 +939,17 @@ class Auth {
         const usid = this.get('usid')
         const dntPref = this.getDnt({includeDefaults: true})
         const isGuest = false
-        
+
         // Handle both internal calls (with slasClient) and public calls (with username/password)
         const isInternalCall = 'slasClient' in credentials
-        const username = isInternalCall ? credentials.credentials?.username || '' : credentials.username || ''
-        const password = isInternalCall ? credentials.credentials?.password || '' : credentials.password || ''
+        const username = isInternalCall
+            ? credentials.credentials?.username || ''
+            : credentials.username || ''
+        const password = isInternalCall
+            ? credentials.credentials?.password || ''
+            : credentials.password || ''
         const body = isInternalCall ? credentials.body : credentials.options?.body
-        
+
         const token = await helpers.loginRegisteredUserB2C({
             slasClient: this.client,
             credentials: {
@@ -1159,7 +1163,9 @@ class Auth {
 
         // Handle both public and internal calls
         const isPublicCall = 'redirectURI' in parameters && !('parameters' in parameters)
-        const redirectURI = isPublicCall ? parameters.redirectURI : parameters.parameters?.redirectURI || this.redirectURI
+        const redirectURI = isPublicCall
+            ? parameters.redirectURI
+            : parameters.parameters?.redirectURI || this.redirectURI
         const hint = isPublicCall ? parameters.hint : parameters.parameters?.hint || ''
         const customParams = isPublicCall ? parameters : parameters.parameters || {}
 
@@ -1169,9 +1175,9 @@ class Auth {
             ...[
                 `client_id=${clientId}`,
                 `channel_id=${siteId}`,
-                `redirect_uri=${redirectURI}`,
+                `redirect_uri=${redirectURI as string}`,
                 `response_type=code`,
-                `hint=${hint}`,
+                `hint=${hint as string}`,
                 `code_challenge=${codeChallenge}`,
                 `code_challenge_method=S256`
             ],
@@ -1181,7 +1187,7 @@ class Auth {
             // Add custom parameters
             ...Object.entries(customParams)
                 .filter(([key]) => !['redirectURI', 'hint', 'usid', 'dnt'].includes(key))
-                .map(([key, value]) => `${key}=${value}`)
+                .map(([key, value]) => `${key}=${value as string}`)
         ].join('&')}`
 
         this.set('code_verifier', codeVerifier)
@@ -1199,12 +1205,16 @@ class Auth {
      */
     async loginIDPUser(parameters: LoginIDPUserPublicParams | LoginIDPUserParams) {
         const codeVerifier = this.get('code_verifier')
-        
+
         // Handle both public and internal calls
         const isPublicCall = 'code' in parameters && !('parameters' in parameters)
         const code = isPublicCall ? parameters.code : parameters.parameters?.code || ''
-        const usid = isPublicCall ? parameters.usid : parameters.parameters?.usid || this.get('usid')
-        const redirectURI = isPublicCall ? (parameters.redirectURI || this.redirectURI) : (parameters.parameters?.redirectURI || this.redirectURI)
+        const usid = isPublicCall
+            ? parameters.usid
+            : parameters.parameters?.usid || this.get('usid')
+        const redirectURI = isPublicCall
+            ? parameters.redirectURI || this.redirectURI
+            : parameters.parameters?.redirectURI || this.redirectURI
         const dntPref = this.getDnt({includeDefaults: true})
 
         const token = await helpers.loginIDPUser({
@@ -1233,14 +1243,18 @@ class Auth {
     /**
      * A wrapper method for commerce-sdk-isomorphic helper: authorizePasswordless.
      */
-    async authorizePasswordless(parameters: AuthorizePasswordlessPublicParams | AuthorizePasswordlessParams) {
+    async authorizePasswordless(
+        parameters: AuthorizePasswordlessPublicParams | AuthorizePasswordlessParams
+    ) {
         // Handle both public and internal calls
         const isPublicCall = 'userid' in parameters && !('parameters' in parameters)
         const userid = isPublicCall ? parameters.userid : parameters.parameters?.userid || ''
-        const callbackURI = isPublicCall ? parameters.callbackURI : parameters.parameters?.callbackURI || this.passwordlessLoginCallbackURI
+        const callbackURI = isPublicCall
+            ? parameters.callbackURI
+            : parameters.parameters?.callbackURI || this.passwordlessLoginCallbackURI
         const mode = isPublicCall ? parameters.mode : parameters.parameters?.mode
         const usid = this.get('usid')
-        const finalMode = callbackURI ? 'callback' : (mode || 'sms')
+        const finalMode = callbackURI ? 'callback' : mode || 'sms'
 
         const res = await helpers.authorizePasswordless({
             slasClient: this.client,
@@ -1289,10 +1303,7 @@ class Auth {
      * A wrapper method for the SLAS endpoint: getPasswordResetToken.
      *
      */
-    async getPasswordResetToken(parameters: {
-        user_id: string
-        callback_uri: string
-    }) {
+    async getPasswordResetToken(parameters: {user_id: string; callback_uri: string}) {
         const slasClient = this.client
         const callbackURI = parameters.callback_uri
 
