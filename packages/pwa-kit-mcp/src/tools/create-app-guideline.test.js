@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import CreateAppGuidelineTool from './pwa-create-app-guideline'
+import CreateAppGuidelineTool from './create-app-guideline'
 import {EmptyJsonSchema} from '../utils/utils'
 
 jest.mock('../utils/utils', () => {

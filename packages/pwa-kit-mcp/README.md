@@ -166,15 +166,23 @@ The server outputs debug information to stderr and handle MCP protocol messages 
   /src
     /server
       - server.js
+      - server.test.js
+    /tools
+      - index.js
+      - developer-guideline.js
+      - developer-guideline.test.js
+      - create-app-guideline.js
+      - create-app-guideline.test.js
+      - create-new-component.js
+      - create-new-component.test.js
+      - site-test.js
+      - site-test.test.js
+      - site-test-accessibility.js
+      - site-test-performance.js
     /utils
       - index.js
       - utils.js
-      - pwa-developer-guideline-tool.js
-      - pwa-create-app-guideline-tool.js
-      - create-new-component-tool.js
-      - run-site-test-tool.js
-      - run-site-test-accessibility.js
-      - run-site-test-performance.js
+      - utils.test.js
     /data
       - CategoryDocument.json
       - DocumentList.json
@@ -187,11 +195,11 @@ The server outputs debug information to stderr and handle MCP protocol messages 
         - cursor-settings.png
     - cursor-integration-guide.md
   /dist
-  /node_modules
 ```
 
 - Server code is in `src/server/`.
-- Utilities/tools are in `src/utils/`.
+- MCP tools are in `src/tools/`.
+- Utilities are in `src/utils/`.
 - Data files are in `src/data/`.
 - Documentation is in `docs/`.
 - Built distribution files are in `dist/`.
