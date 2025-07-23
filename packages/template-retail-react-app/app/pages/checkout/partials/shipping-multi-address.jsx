@@ -44,7 +44,6 @@ import {
 
 const MultiShippingItemAttributes = ({variant, includeQuantity = true}) => {
     const {formatMessage} = useIntl()
-    // Get display values for attributes
     const variationAttributes = variant?.variationAttributes || []
     const variationValues = variant?.variationValues || {}
     return (
@@ -88,7 +87,6 @@ MultiShippingItemAttributes.propTypes = {
     includeQuantity: PropTypes.bool
 }
 
-// Address form component - receives form as prop from parent
 const AddressForm = ({item, form, onSubmit, onCancel}) => {
     const saveButtonLabel = defineMessage({
         defaultMessage: 'Save',
@@ -160,10 +158,8 @@ const ShippingMultiAddress = ({
     const addresses = customer?.addresses || []
     const [selectedAddresses, setSelectedAddresses] = useState({})
 
-    // Add address form state - track which product card is showing the add address form
-    const [showAddAddressForm, setShowAddAddressForm] = useState({}) // productId-index -> boolean
+    const [showAddAddressForm, setShowAddAddressForm] = useState({})
 
-    // Create form instance for address form
     const addressForm = useForm({
         mode: 'onSubmit',
         defaultValues: {
@@ -182,9 +178,8 @@ const ShippingMultiAddress = ({
     const createCustomerAddress = useShopperCustomersMutation('createCustomerAddress')
     const showToast = useToast()
 
-    // Calculate if button should be disabled
-    const openForms = Object.keys(showAddAddressForm).filter((key) => showAddAddressForm[key])
-    const isAddressFormOpen = openForms.length > 0
+    const isAddressFormOpen =
+        Object.keys(showAddAddressForm).filter((key) => showAddAddressForm[key])?.length > 0
 
     if (!basket?.productItems?.length) {
         return (
@@ -205,7 +200,6 @@ const ShippingMultiAddress = ({
         )
     }
 
-    // Loading state
     if (productsLoading) {
         return (
             <Center p={8} textAlign="center" color="gray.500">
@@ -222,7 +216,6 @@ const ShippingMultiAddress = ({
         )
     }
 
-    // Error state
     if (productsError) {
         return (
             <Alert
@@ -252,9 +245,15 @@ const ShippingMultiAddress = ({
         )
     }
 
-    // Handle address creation
+    const handleCancelAddressForm = (addressKey) => {
+        setShowAddAddressForm((prev) => ({
+            ...prev,
+            [addressKey]: false
+        }))
+        addressForm.clearErrors()
+    }
+
     const handleCreateAddress = async (addressData, form, itemId) => {
-        // itemId is unique for each basket item and always present
         const addressKey = itemId
 
         try {
@@ -263,23 +262,18 @@ const ShippingMultiAddress = ({
                 addressId: nanoid()
             }
 
-            // Create the address and wait for the mutation to complete
             const createdAddress = await createCustomerAddress.mutateAsync({
                 body: newAddress,
                 parameters: {customerId: customer.customerId}
             })
 
-            // Close form and reset
             setShowAddAddressForm((prev) => ({...prev, [addressKey]: false}))
             form.reset()
 
-            // Clear form errors using react-hook-form
             form.clearErrors()
 
-            // Refetch customer data to get the updated addresses list
             await refetchCustomer()
 
-            // Automatically select the newly created address for this product card
             setSelectedAddresses((prev) => ({
                 ...prev,
                 [addressKey]: createdAddress.addressId
@@ -323,11 +317,8 @@ const ShippingMultiAddress = ({
                                 selectedVariationAttributes: variant.variationValues
                             })?.images?.[0]
                             const imageUrl = image?.disBaseLink || image?.link || ''
-                            // itemId is unique for each basket item and always present
                             const addressKey = item.itemId
-                            const selectedAddressId =
-                                selectedAddresses[addressKey] ||
-                                (addresses.length > 0 ? addresses[0]?.addressId : '')
+                            const selectedAddressId = selectedAddresses[addressKey]
 
                             return (
                                 <Box
@@ -442,14 +433,11 @@ const ShippingMultiAddress = ({
                                                         if (
                                                             value === ADD_NEW_ADDRESS_OPTION_VALUE
                                                         ) {
-                                                            // Show the address form when "Add New Address" is selected
                                                             setShowAddAddressForm((prev) => ({
                                                                 ...prev,
                                                                 [addressKey]: true
                                                             }))
-                                                            // Don't set a selected address since we're adding a new one
                                                         } else {
-                                                            // Hide the address form when a real address is selected
                                                             setShowAddAddressForm((prev) => ({
                                                                 ...prev,
                                                                 [addressKey]: false
@@ -519,14 +507,7 @@ const ShippingMultiAddress = ({
                                                 item={item}
                                                 form={addressForm}
                                                 onSubmit={handleCreateAddress}
-                                                onCancel={() => {
-                                                    setShowAddAddressForm((prev) => ({
-                                                        ...prev,
-                                                        [addressKey]: false
-                                                    }))
-                                                    // Clear form errors using react-hook-form
-                                                    addressForm.clearErrors()
-                                                }}
+                                                onCancel={() => handleCancelAddressForm(addressKey)}
                                             />
                                         </Box>
                                     )}
@@ -540,7 +521,7 @@ const ShippingMultiAddress = ({
                     width="full"
                     mt={2}
                     isLoading={addressForm.formState.isSubmitting}
-                    {...(isAddressFormOpen && {disabled: true, 'data-disabled': true})}
+                    {...(isAddressFormOpen && {disabled: true})}
                     data-testid="continue-to-shipping-button"
                     loadingText={formatMessage({
                         id: 'shipping_multi_address.submit.loading',
@@ -550,24 +531,9 @@ const ShippingMultiAddress = ({
                         id: 'shipping_multi_address.submit.description',
                         defaultMessage: 'Continue to next step with selected delivery addresses'
                     })}
-                    onClick={async () => {
-                        // Prevent click if button is disabled
-                        if (isAddressFormOpen) {
-                            return
-                        }
-
-                        try {
-                            // Now proceed with the checkout
+                    onClick={() => {
+                        if (!isAddressFormOpen) {
                             onSubmit()
-                        } catch (error) {
-                            console.error('Error during submission:', error)
-                            showToast({
-                                title: formatMessage({
-                                    id: 'shipping_multi_address.error.submission_failed',
-                                    defaultMessage: 'Failed to proceed with checkout'
-                                }),
-                                status: 'error'
-                            })
                         }
                     }}
                 >
