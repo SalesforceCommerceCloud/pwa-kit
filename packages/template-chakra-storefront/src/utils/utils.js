@@ -195,6 +195,17 @@ export const mergeMatchedItems = (arr1 = [], arr2 = []) => {
 }
 
 /**
+ * Returns a normalized product id from a product and variant object.
+ *
+ * @param {object} product - The product object
+ * @param {object} variant - The variant object
+ * @returns {string|undefined}
+ */
+export const normalizeProductId = (product, variant) => {
+    return variant?.productId || product?.productId || product?.id
+}
+
+/**
  * This util func determines if the app is finished hydration
  * @return {boolean}
  */
