@@ -22,6 +22,7 @@ import {
 } from '@salesforce/retail-react-app/app/components/toggle-card'
 import AddressDisplay from '@salesforce/retail-react-app/app/components/address-display'
 import CheckoutProductItemList from '@salesforce/retail-react-app/app/components/product-item-list/checkout-product-item-list'
+import StoreDisplay from '@salesforce/retail-react-app/app/components/store-display'
 
 // Hooks
 import {useCheckout} from '@salesforce/retail-react-app/app/pages/checkout/util/checkout-context'
@@ -262,42 +263,28 @@ const PickupAddress = () => {
                                                     mb={4}
                                                 >
                                                     {/* Store Information */}
-                                                    <Box
-                                                        border="1px solid"
-                                                        borderColor="gray.300"
-                                                        borderRadius="sm"
-                                                        p={3}
-                                                        mb={4}
-                                                    >
-                                                        <Text
-                                                            fontWeight="bold"
-                                                            fontSize="md"
-                                                            mb={2}
-                                                        >
-                                                            <FormattedMessage
-                                                                defaultMessage="Store Information"
-                                                                id="pickup_address.title.store_information"
+                                                    <Text fontWeight="bold" fontSize="md" mb={2}>
+                                                        <FormattedMessage
+                                                            defaultMessage="Store Information"
+                                                            id="pickup_address.title.store_information"
+                                                        />
+                                                    </Text>
+                                                    {shipmentInfo.store && (
+                                                        <Box mb={4}>
+                                                            <StoreDisplay
+                                                                store={shipmentInfo.store}
+                                                                showDistance={false}
+                                                                showStoreHours={false}
+                                                                showPhone={false}
+                                                                showEmail={false}
+                                                                nameStyle={{
+                                                                    fontSize: 'sm',
+                                                                    fontWeight: 'normal'
+                                                                }}
+                                                                textSize="sm"
                                                             />
-                                                        </Text>
-                                                        {shipmentInfo.store && (
-                                                            <Box>
-                                                                <Text>
-                                                                    {shipmentInfo.store.name}
-                                                                </Text>
-                                                                <Text>
-                                                                    {shipmentInfo.store.address1}
-                                                                </Text>
-                                                                <Text>
-                                                                    {shipmentInfo.store.city},{' '}
-                                                                    {shipmentInfo.store.stateCode}{' '}
-                                                                    {shipmentInfo.store.postalCode}
-                                                                </Text>
-                                                                <Text>
-                                                                    {shipmentInfo.store.countryCode}
-                                                                </Text>
-                                                            </Box>
-                                                        )}
-                                                    </Box>
+                                                        </Box>
+                                                    )}
 
                                                     {/* Cart Items for this store */}
                                                     {/* Regular Products */}
@@ -403,16 +390,18 @@ const PickupAddress = () => {
                                                 />
                                             </Text>
                                             {shipmentInfo.store && (
-                                                <Box>
-                                                    <Text>{shipmentInfo.store.name}</Text>
-                                                    <Text>{shipmentInfo.store.address1}</Text>
-                                                    <Text>
-                                                        {shipmentInfo.store.city},{' '}
-                                                        {shipmentInfo.store.stateCode}{' '}
-                                                        {shipmentInfo.store.postalCode}
-                                                    </Text>
-                                                    <Text>{shipmentInfo.store.countryCode}</Text>
-                                                </Box>
+                                                <StoreDisplay
+                                                    store={shipmentInfo.store}
+                                                    showDistance={false}
+                                                    showStoreHours={false}
+                                                    showPhone={false}
+                                                    showEmail={false}
+                                                    nameStyle={{
+                                                        fontSize: 'sm',
+                                                        fontWeight: 'normal'
+                                                    }}
+                                                    textSize="sm"
+                                                />
                                             )}
                                             {index < pickupShipmentItems.length - 1 && (
                                                 <Divider my={4} />
