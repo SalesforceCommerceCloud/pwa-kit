@@ -3519,12 +3519,6 @@
       "value": "Checkout actions"
     }
   ],
-  "shipping_multi_address.error.forms_open": [
-    {
-      "type": 0,
-      "value": "Please save or cancel all address forms before continuing"
-    }
-  ],
   "shipping_multi_address.error.label": [
     {
       "type": 0,

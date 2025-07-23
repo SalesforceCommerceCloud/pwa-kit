@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React, {useState, useRef, useEffect} from 'react'
-import {useIntl} from 'react-intl'
+import {useIntl, defineMessage} from 'react-intl'
 import PropTypes from 'prop-types'
 import {useForm} from 'react-hook-form'
 import {nanoid} from 'nanoid'
@@ -92,6 +92,10 @@ MultiShippingItemAttributes.propTypes = {
 
 // Address form component - receives form as prop from parent
 const AddressForm = ({item, index, form, onSubmit, onCancel}) => {
+    const saveButtonLabel = defineMessage({
+        defaultMessage: 'Save',
+        id: 'shipping_address_form.button.save'
+    })
     return (
         <Box position="relative" bg="white" padding={6} width="100%">
             {form.formState.isSubmitting && <LoadingSpinner />}
@@ -110,13 +114,7 @@ const AddressForm = ({item, index, form, onSubmit, onCancel}) => {
                         </Alert>
                     )}
                     <AddressFields form={form} />
-                    <FormActionButtons
-                        onCancel={onCancel}
-                        saveButtonLabel={{
-                            defaultMessage: 'Save',
-                            id: 'shipping_address_form.button.save'
-                        }}
-                    />
+                    <FormActionButtons onCancel={onCancel} saveButtonLabel={saveButtonLabel} />
                 </Stack>
             </form>
         </Box>
@@ -190,6 +188,8 @@ const ShippingMultiAddress = ({
 
     // Calculate if button should be disabled
     const openForms = Object.keys(showAddAddressForm).filter((key) => showAddAddressForm[key])
+
+    // Button is disabled when any address form is open
     const isButtonDisabled = openForms.length > 0
 
     useEffect(() => {
@@ -578,9 +578,8 @@ const ShippingMultiAddress = ({
                             type="button"
                             width="full"
                             isLoading={addressForm.formState.isSubmitting}
-                            disabled={isButtonDisabled}
+                            {...(isButtonDisabled && {disabled: true, 'data-disabled': true})}
                             data-testid="continue-to-shipping-button"
-                            data-disabled={isButtonDisabled}
                             loadingText={formatMessage({
                                 id: 'shipping_multi_address.submit.loading',
                                 defaultMessage: 'Saving address...'
@@ -597,23 +596,6 @@ const ShippingMultiAddress = ({
                                 }
 
                                 try {
-                                    // Check if there are any open address forms that need to be saved
-                                    const openForms = Object.keys(showAddAddressForm).filter(
-                                        (key) => showAddAddressForm[key]
-                                    )
-
-                                    if (openForms.length > 0) {
-                                        showToast({
-                                            title: formatMessage({
-                                                id: 'shipping_multi_address.error.forms_open',
-                                                defaultMessage:
-                                                    'Please save or cancel all address forms before continuing'
-                                            }),
-                                            status: 'warning'
-                                        })
-                                        return
-                                    }
-
                                     // Now proceed with the checkout
                                     onSubmit()
                                 } catch (error) {
