@@ -144,11 +144,7 @@ export const useWishList = ({listId = ''} = {}) => {
                 })
             }
         },
-        [
-            customerId,
-            wishlist,
-            isItemInWishlist
-        ]
+        [customerId, wishlist, isItemInWishlist]
     )
 
     const removeFromWishlist = useCallback(
