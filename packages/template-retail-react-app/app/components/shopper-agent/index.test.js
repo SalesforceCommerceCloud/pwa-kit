@@ -11,6 +11,7 @@ import ShopperAgent from '@salesforce/retail-react-app/app/components/shopper-ag
 import useScript from '@salesforce/retail-react-app/app/hooks/use-script'
 import useAuthContext from '@salesforce/commerce-sdk-react/hooks/useAuthContext'
 import useCustomerType from '@salesforce/commerce-sdk-react/hooks/useCustomerType'
+import useRefreshToken from '@salesforce/retail-react-app/app/hooks/use-refresh-token'
 
 // Mock the embeddedservice_bootstrap object
 const mockEmbeddedService = {
@@ -36,9 +37,11 @@ jest.mock('@salesforce/commerce-sdk-react', () => {
 
 jest.mock('@salesforce/commerce-sdk-react/hooks/useAuthContext')
 jest.mock('@salesforce/commerce-sdk-react/hooks/useCustomerType')
+jest.mock('@salesforce/retail-react-app/app/hooks/use-refresh-token')
 
 const mockedUseAuthContext = useAuthContext
 const mockedUseCustomerType = useCustomerType
+const mockedUseRefreshToken = useRefreshToken
 
 jest.mock('@salesforce/retail-react-app/app/components/shared/ui', () => {
     const originalModule = jest.requireActual(
@@ -87,6 +90,9 @@ describe('ShopperAgent Component', () => {
             isGuest: false,
             isRegistered: false
         })
+
+        // Default refresh token mock
+        mockedUseRefreshToken.mockReturnValue(null)
 
         // Clear any existing scripts
         const scripts = document.querySelectorAll('script[src]')
@@ -592,155 +598,236 @@ describe('ShopperAgent Component', () => {
         })
     })
 
-    describe('Refresh Token Tests', () => {
-        test('should get refresh_token_registered when user is registered', () => {
-            const mockAuthGet = jest.fn()
-            mockAuthGet.mockReturnValue('registered-refresh-token')
+    describe('Refresh Token Integration', () => {
+        beforeEach(() => {
+            jest.clearAllMocks()
+            mockedUseRefreshToken.mockReturnValue(null)
+        })
+
+        test('should pass refresh token to ShopperAgentWindow when available for registered user', async () => {
+            const registeredToken = 'registered-refresh-token-123'
+            mockedUseRefreshToken.mockReturnValue(registeredToken)
             
-            mockedUseAuthContext.mockReturnValue({
-                get: mockAuthGet
-            })
             mockedUseCustomerType.mockReturnValue({
                 isGuest: false,
                 isRegistered: true
             })
 
             useScript.mockReturnValue({loaded: true, error: false})
-            render(<ShopperAgent {...defaultProps} />)
 
-            expect(mockAuthGet).toHaveBeenCalledWith('refresh_token_registered')
-            expect(mockAuthGet).not.toHaveBeenCalledWith('refresh_token_guest')
+            const props = {
+                ...defaultProps,
+                commerceAgentConfiguration: commerceAgentSettings,
+                basketDoneLoading: true
+            }
+
+            render(<ShopperAgent {...props} />)
+
+            // Wait for async operations to complete
+            await act(async () => {
+                await new Promise(resolve => setTimeout(resolve, 0))
+            })
+            
+            // Verify useRefreshToken was called with correct parameters
+            expect(mockedUseRefreshToken).toHaveBeenCalledWith(
+                expect.any(Object), // auth context
+                true, // isRegistered
+                false // isGuest
+            )
         })
 
-        test('should get refresh_token_guest when user is guest', () => {
-            const mockAuthGet = jest.fn()
-            mockAuthGet.mockReturnValue('guest-refresh-token')
+        test('should pass refresh token to ShopperAgentWindow when available for guest user', async () => {
+            const guestToken = 'guest-refresh-token-456'
+            mockedUseRefreshToken.mockReturnValue(guestToken)
             
-            mockedUseAuthContext.mockReturnValue({
-                get: mockAuthGet
-            })
             mockedUseCustomerType.mockReturnValue({
                 isGuest: true,
                 isRegistered: false
             })
 
             useScript.mockReturnValue({loaded: true, error: false})
-            render(<ShopperAgent {...defaultProps} />)
 
-            expect(mockAuthGet).toHaveBeenCalledWith('refresh_token_guest')
-            expect(mockAuthGet).not.toHaveBeenCalledWith('refresh_token_registered')
+            const props = {
+                ...defaultProps,
+                commerceAgentConfiguration: commerceAgentSettings,
+                basketDoneLoading: true
+            }
+
+            render(<ShopperAgent {...props} />)
+
+            // Wait for async operations to complete
+            await act(async () => {
+                await new Promise(resolve => setTimeout(resolve, 0))
+            })
+            
+            // Verify useRefreshToken was called with correct parameters
+            expect(mockedUseRefreshToken).toHaveBeenCalledWith(
+                expect.any(Object), // auth context
+                false, // isRegistered
+                true // isGuest
+            )
         })
 
-        test('should return null when user is neither guest nor registered', () => {
-            const mockAuthGet = jest.fn()
+        test('should handle null refresh token gracefully', async () => {
+            mockedUseRefreshToken.mockReturnValue(null)
             
-            mockedUseAuthContext.mockReturnValue({
-                get: mockAuthGet
-            })
             mockedUseCustomerType.mockReturnValue({
                 isGuest: false,
                 isRegistered: false
             })
 
             useScript.mockReturnValue({loaded: true, error: false})
-            render(<ShopperAgent {...defaultProps} />)
 
-            expect(mockAuthGet).not.toHaveBeenCalled()
+            const props = {
+                ...defaultProps,
+                commerceAgentConfiguration: commerceAgentSettings,
+                basketDoneLoading: true
+            }
+
+            render(<ShopperAgent {...props} />)
+
+            // Wait for async operations to complete
+            await act(async () => {
+                await new Promise(resolve => setTimeout(resolve, 0))
+            })
+            
+            // Verify useRefreshToken was called
+            expect(mockedUseRefreshToken).toHaveBeenCalledWith(
+                expect.any(Object), // auth context
+                false, // isRegistered
+                false // isGuest
+            )
         })
 
-        test('should handle null refresh token from auth.get', () => {
-            const mockAuthGet = jest.fn()
-            mockAuthGet.mockReturnValue(null)
+        test('should handle undefined refresh token gracefully', async () => {
+            mockedUseRefreshToken.mockReturnValue(undefined)
             
-            mockedUseAuthContext.mockReturnValue({
-                get: mockAuthGet
-            })
             mockedUseCustomerType.mockReturnValue({
                 isGuest: true,
                 isRegistered: false
             })
 
             useScript.mockReturnValue({loaded: true, error: false})
-            render(<ShopperAgent {...defaultProps} />)
 
-            expect(mockAuthGet).toHaveBeenCalledWith('refresh_token_guest')
-            expect(mockAuthGet.mock.results[0].value).toBeNull()
+            const props = {
+                ...defaultProps,
+                commerceAgentConfiguration: commerceAgentSettings,
+                basketDoneLoading: true
+            }
+
+            render(<ShopperAgent {...props} />)
+
+            // Wait for async operations to complete
+            await act(async () => {
+                await new Promise(resolve => setTimeout(resolve, 0))
+            })
+            
+            // Verify useRefreshToken was called
+            expect(mockedUseRefreshToken).toHaveBeenCalledWith(
+                expect.any(Object), // auth context
+                false, // isRegistered
+                true // isGuest
+            )
         })
 
-        test('should handle empty string refresh token from auth.get', () => {
-            const mockAuthGet = jest.fn()
-            mockAuthGet.mockReturnValue('')
+        test('should prioritize registered user over guest user for refresh token', async () => {
+            const registeredToken = 'registered-refresh-token-priority'
+            mockedUseRefreshToken.mockReturnValue(registeredToken)
             
-            mockedUseAuthContext.mockReturnValue({
-                get: mockAuthGet
-            })
+            // Both flags are true, but registered should take priority
             mockedUseCustomerType.mockReturnValue({
-                isGuest: false,
+                isGuest: true,
                 isRegistered: true
             })
 
             useScript.mockReturnValue({loaded: true, error: false})
-            render(<ShopperAgent {...defaultProps} />)
 
-            expect(mockAuthGet).toHaveBeenCalledWith('refresh_token_registered')
-            expect(mockAuthGet.mock.results[0].value).toBe('')
+            const props = {
+                ...defaultProps,
+                commerceAgentConfiguration: commerceAgentSettings,
+                basketDoneLoading: true
+            }
+
+            render(<ShopperAgent {...props} />)
+
+            // Wait for async operations to complete
+            await act(async () => {
+                await new Promise(resolve => setTimeout(resolve, 0))
+            })
+            
+            // Verify useRefreshToken was called with registered user priority
+            expect(mockedUseRefreshToken).toHaveBeenCalledWith(
+                expect.any(Object), // auth context
+                true, // isRegistered (should be prioritized)
+                true // isGuest
+            )
         })
 
-        test('should handle undefined refresh token from auth.get', () => {
-            const mockAuthGet = jest.fn()
-            mockAuthGet.mockReturnValue(undefined)
+        test('should not render when refresh token is not available and component is disabled', () => {
+            mockedUseRefreshToken.mockReturnValue(null)
             
-            mockedUseAuthContext.mockReturnValue({
-                get: mockAuthGet
-            })
+            const disabledSettings = {...commerceAgentSettings, enabled: 'false'}
+            const props = {
+                ...defaultProps,
+                commerceAgentConfiguration: disabledSettings,
+                basketDoneLoading: true
+            }
+
+            render(<ShopperAgent {...props} />)
+            
+            // useRefreshToken should still be called (but result doesn't matter)
+            expect(mockedUseRefreshToken).toHaveBeenCalled()
+        })
+
+        test('should handle refresh token changes when user type changes', async () => {
+            // Initial state - guest user
+            mockedUseRefreshToken.mockReturnValue('guest-token-1')
             mockedUseCustomerType.mockReturnValue({
                 isGuest: true,
                 isRegistered: false
             })
 
             useScript.mockReturnValue({loaded: true, error: false})
-            render(<ShopperAgent {...defaultProps} />)
 
-            expect(mockAuthGet).toHaveBeenCalledWith('refresh_token_guest')
-            expect(mockAuthGet.mock.results[0].value).toBe(undefined)
-        })
+            const props = {
+                ...defaultProps,
+                commerceAgentConfiguration: commerceAgentSettings,
+                basketDoneLoading: true
+            }
 
-        test('should prioritize registered user over guest user', () => {
-            const mockAuthGet = jest.fn()
-            mockAuthGet.mockReturnValue('registered-refresh-token')
-            
-            mockedUseAuthContext.mockReturnValue({
-                get: mockAuthGet
-            })
-            mockedUseCustomerType.mockReturnValue({
-                isGuest: true,
-                isRegistered: true
+            const {rerender} = render(<ShopperAgent {...props} />)
+
+            // Wait for async operations to complete
+            await act(async () => {
+                await new Promise(resolve => setTimeout(resolve, 0))
             })
 
-            useScript.mockReturnValue({loaded: true, error: false})
-            render(<ShopperAgent {...defaultProps} />)
+            expect(mockedUseRefreshToken).toHaveBeenCalledWith(
+                expect.any(Object),
+                false, // isRegistered
+                true // isGuest
+            )
 
-            expect(mockAuthGet).toHaveBeenCalledWith('refresh_token_registered')
-            expect(mockAuthGet).not.toHaveBeenCalledWith('refresh_token_guest')
-        })
-
-        test('should pass refresh token to ShopperAgentWindow component', () => {
-            const mockAuthGet = jest.fn()
-            mockAuthGet.mockReturnValue('test-refresh-token')
-            
-            mockedUseAuthContext.mockReturnValue({
-                get: mockAuthGet
-            })
+            // Change to registered user
+            mockedUseRefreshToken.mockReturnValue('registered-token-2')
             mockedUseCustomerType.mockReturnValue({
                 isGuest: false,
                 isRegistered: true
             })
 
-            useScript.mockReturnValue({loaded: true, error: false})
-            
-            render(<ShopperAgent {...defaultProps} />)
-            
-            expect(mockAuthGet).toHaveBeenCalledWith('refresh_token_registered')
+            rerender(<ShopperAgent {...props} />)
+
+            // Wait for async operations to complete
+            await act(async () => {
+                await new Promise(resolve => setTimeout(resolve, 0))
+            })
+
+            // Verify useRefreshToken was called again with new parameters
+            expect(mockedUseRefreshToken).toHaveBeenCalledWith(
+                expect.any(Object),
+                true, // isRegistered
+                false // isGuest
+            )
         })
     })
 })

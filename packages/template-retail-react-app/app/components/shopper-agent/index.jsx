@@ -13,6 +13,7 @@ import {useTheme} from '@salesforce/retail-react-app/app/components/shared/ui'
 import useMiaw from '@salesforce/retail-react-app/app/hooks/use-miaw'
 import useAuthContext from '@salesforce/commerce-sdk-react/hooks/useAuthContext'
 import useCustomerType from '@salesforce/commerce-sdk-react/hooks/useCustomerType'
+import useRefreshToken from '@salesforce/retail-react-app/app/hooks/use-refresh-token'
 
 const onClient = typeof window !== 'undefined'
 
@@ -208,17 +209,7 @@ const ShopperAgent = ({commerceAgentConfiguration, basketId, locale, basketDoneL
     const isShopperAgentEnabled = isEnabled(enabled)
     const auth = useAuthContext()
     const { isGuest, isRegistered } = useCustomerType()
-    // Get the refresh token
-    const getRefreshToken = () => {
-        if (isRegistered) {
-            return auth.get('refresh_token_registered')
-        } else if (isGuest) {
-            return auth.get('refresh_token_guest')
-        }
-        return null
-    }
-    
-    const refreshToken = getRefreshToken()
+    const refreshToken = useRefreshToken(auth, isRegistered, isGuest)
 
     return isShopperAgentEnabled &&
         basketDoneLoading &&
