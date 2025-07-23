@@ -46,7 +46,7 @@ describe('OrderStatusPage', () => {
         })
     })
 
-    test('renders the order status page with correct structure', () => {
+    test('displays order status page with main heading and proper page structure', () => {
         renderWithProviders(<OrderStatusPage />)
 
         // Check main page container
@@ -56,7 +56,7 @@ describe('OrderStatusPage', () => {
         expect(screen.getByRole('heading', {name: /order status/i})).toBeInTheDocument()
     })
 
-    test('renders the sign in card for guest users', () => {
+    test('displays sign in card with brand logo and sign in button for guest users', () => {
         renderWithProviders(<OrderStatusPage />)
 
         // Check sign in card content
@@ -68,7 +68,7 @@ describe('OrderStatusPage', () => {
         expect(brandLogo).toBeInTheDocument()
     })
 
-    test('does not render sign in card for registered users', () => {
+    test('hides sign in card completely for registered users', () => {
         // Mock registered user
         mockUseCurrentCustomer.mockReturnValue({
             data: {
@@ -85,7 +85,7 @@ describe('OrderStatusPage', () => {
         expect(screen.queryByRole('img', {name: /brand-logo/i})).not.toBeInTheDocument()
     })
 
-    test('does not render sign in card when customer data is loading', () => {
+    test('hides sign in card when customer data is still loading', () => {
         // Mock loading state (customerType is null)
         mockUseCurrentCustomer.mockReturnValue({
             data: {
@@ -101,7 +101,7 @@ describe('OrderStatusPage', () => {
         expect(screen.queryByRole('button', {name: /sign in/i})).not.toBeInTheDocument()
     })
 
-    test('handles sign in button click for guest users', async () => {
+    test('navigates to login page when sign in button is clicked by guest users', async () => {
         renderWithProviders(<OrderStatusPage />)
 
         const signInButton = screen.getByRole('button', {name: /sign in/i})
@@ -110,7 +110,7 @@ describe('OrderStatusPage', () => {
         expect(mockNavigate).toHaveBeenCalledWith('/login')
     })
 
-    test('has proper page styling and layout for guest users', () => {
+    test('displays complete page layout with sign in card for guest users', () => {
         renderWithProviders(<OrderStatusPage />)
 
         // Check main page structure
@@ -125,7 +125,7 @@ describe('OrderStatusPage', () => {
         expect(screen.getByText(/sign in with your account/i)).toBeInTheDocument()
     })
 
-    test('has proper page styling and layout for registered users', () => {
+    test('displays page layout without sign in card for registered users', () => {
         // Mock registered user
         mockUseCurrentCustomer.mockReturnValue({
             data: {
