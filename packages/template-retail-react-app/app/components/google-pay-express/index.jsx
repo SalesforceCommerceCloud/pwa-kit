@@ -55,15 +55,16 @@ export const getCustomerShippingDetails = (shippingAddress) => {
     }
 }
 
-export const getCustomerBillingDetails = (shippingAddress) => { // TODO: is there a better way to take in billing address?
+// inputAddress is the billing address if available, else we fall back to the shipping address
+export const getCustomerBillingDetails = (inputAddress) => {
     return {
         billingAddress: {
-            city: shippingAddress.locality,
-            country: shippingAddress.countryCode,
-            houseNumberOrName: shippingAddress.address2,
-            postalCode: shippingAddress.postalCode,
-            stateOrProvince: shippingAddress.administrativeArea,
-            street: shippingAddress.address1
+            city: inputAddress.locality,
+            country: inputAddress.countryCode,
+            houseNumberOrName: inputAddress.address2,
+            postalCode: inputAddress.postalCode,
+            stateOrProvince: inputAddress.administrativeArea,
+            street: inputAddress.address1
         }
     }
 }
@@ -185,7 +186,7 @@ export const initializeShippingOption = async (
     }
 }
 
-// TODO: do i need to handle shipping address change differently?
+// TODO: update shippingOptionParameters on address change too
 export const updateShippingAddress = async (
     authToken,
     site,
@@ -229,7 +230,7 @@ export const getGoogleButtonConfig = (
     navigate,
     fetchShippingMethods
 ) => {    
-    // Use productTotal if orderTotal is null, otherwise use orderTotal
+    // Use productTotal if orderTotal is null, otherwise use orderTotal (INITIALIZE callback will update this in payment sheet eventually anyways)
     let googlePayAmount = basket.orderTotal || (basket.productTotal)
     
     const buttonConfig = {
@@ -251,7 +252,7 @@ export const getGoogleButtonConfig = (
         requiredShippingContactFields: ['postalAddress', 'name', 'email', 'phone'],
         requiredBillingContactFields: ['postalAddress'],
         
-        onAuthorized: async (data, actions) => {
+        onAuthorized: async (data) => {
             try {
                 const state = {
                     data: {
@@ -261,7 +262,7 @@ export const getGoogleButtonConfig = (
                             googlePayToken: data.paymentMethodData.tokenizationData.token
                         },
                         ...getCustomerShippingDetails(data?.shippingAddress),
-                        ...getCustomerBillingDetails(data?.shippingAddress)
+                        ...getCustomerBillingDetails(data?.paymentMethodData?.info?.billingAddress || data?.shippingAddress)
                     }
                 }
                 const adyenPaymentService = new AdyenPaymentsService(authToken, site)
@@ -380,9 +381,6 @@ export const GooglePayExpress = () => {
                 }
 
                 const googlePaymentMethodConfig = getGooglePaymentMethodConfig(adyenPaymentMethods)
-                if (basket?.basketId && !shippingMethods) {
-                     const newshippingMethods = await fetchShippingMethods(basket?.basketId, site, authToken)
-                }
                 
                 const googleButtonConfig = getGoogleButtonConfig(
                     authToken,
