@@ -312,17 +312,6 @@ const ShippingMultiAddress = ({
                 status: 'success'
             })
         } catch (error) {
-            console.error('Error creating address:', error)
-
-            // Use react-hook-form's setError to set a global error
-            addressForm.setError('global', {
-                type: 'manual',
-                message: formatMessage({
-                    id: 'shipping_multi_address.error.save_failed',
-                    defaultMessage: 'Failed to save address. Please try again.'
-                })
-            })
-
             showToast({
                 title: formatMessage({
                     id: 'shipping_multi_address.error.save_failed',
