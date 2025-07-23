@@ -10,28 +10,28 @@ import { toKebabCase, toPascalCase, logMCPMessage } from '../utils';
 import { z } from 'zod';
 
 const systemPromptForCreatePage = 
-            `You are a smart assistant that can use tools when needed. \
-            Please ask the user to provide following information **one at a time**, in a natural and conversational way. \
-            Do **not** ask all the questions at once. \
-            - What is the name of the new page to create? \
-            - With page name specified, what is the layout type (e.g., grid, flex, list) of the new page? \
-            - List the components to include on the page, separated by commas (e.g., AddressDisplay, ProductView) \
-            - What is the URL route for this page? (e.g., /new-home, /my-products) \
-            Collect answers to these questions, then call the tool with the collected information as input parameters. `;
+        `You are a smart assistant that can use tools when needed. \
+        Please ask the user to provide following information **one at a time**, in a natural and conversational way. \
+        Do **not** ask all the questions at once. \
+        - What is the name of the new page to create? \
+        - With page name specified, what is the layout type (e.g., grid, flex, list) of the new page? \
+        - List the components to include on the page, separated by commas (e.g., AddressDisplay, ProductView) \
+        - What is the URL route for this page? (e.g., /new-home, /my-products) \
+        Collect answers to these questions, then call the tool with the collected information as input parameters. `;
 
 const systemPromptForProductHook = 
-            `User have added the ProductView component to the new page. Please ask user: \
-            "To make it work, would you like to add the hook useProduct to your page?" \
-            If user answers yes, please make sure do do following: \
-            1. add the hook useProduct with parameters to the new page following exactly product-detail/index.jsx as example, \
-            2. update ProductView tag to pass product and isProductLoading as props, \
-            3. in routes.jsx, update the path for the new page with '/:productId'. \
-            4. open the new page in the browser with URL: http://localhost:3000/{static-route-path}/25592300M \
-            If user answers no, skip above steps.`;
+        `User have added the ProductView component to the new page. Please ask user: \
+        "To make it work, would you like to add the hook useProduct to your page?" \
+        If user answers yes, please make sure do do following: \
+        1. add the useProduct with ALL parameters following product-detail's useProduct as example, \
+        2. update ProductView tag to pass product and isProductLoading as props, \
+        3. in routes.jsx, update the path for the new page with '/:productId'. \
+        4. open the new page in the browser with URL: http://localhost:3000/{static-route-path}/25592300M \
+        If user answers no, skip above steps.`;
 
 const systemPromptForUnfoundComponents = (unfoundComponents) => 
-    `The following components were not found: ${unfoundComponents.join(', ')}. \
-     Please try to suggest changes based on these unfound components within the newly generated page file.`;
+        `The following components were not found: ${unfoundComponents.join(', ')}. \
+        Please try to suggest changes based on these unfound components within the newly generated page file.`;
 
 class CreateNewPageTool {
     constructor() {
@@ -77,8 +77,8 @@ class CreateNewPageTool {
             if (componentList.length == 0) {
                 componentList.push(pageName);
             }
-            const pageContent = this.generatePageContent(pageName, layout, componentList);
-
+            const pageContent = await this.generatePageContent(pageName, layout, componentList);
+            logMCPMessage(`!!!!!! \n pageContent: ${pageContent} \n !!!!!`);
             const indexPath = path.join(pageDir, 'index.jsx');
             await fs.writeFile(indexPath, pageContent, 'utf8');
             await this.updateRoutes(pageName, route);
@@ -115,9 +115,8 @@ class CreateNewPageTool {
             `import Seo from '@salesforce/retail-react-app/app/components/seo'`
         ];
 
-
         // Add component imports
-        componentList.forEach(async component => {
+        const accessPromises = componentList.map(async component => {
             const componentName = component.charAt(0).toUpperCase() + component.slice(1);
             const componentDir = toKebabCase(componentName);
             try {
@@ -129,21 +128,24 @@ class CreateNewPageTool {
                     throw err;
                 }
             }
-            logMCPMessage(`??????importing ${componentName} from '@salesforce/retail-react-app/app/components/${componentDir}'`);
+            logMCPMessage(`?????? importing ${componentName} from '@salesforce/retail-react-app/app/components/${componentDir}'`);
             imports.push(
                 `import ${componentName} from '@salesforce/retail-react-app/app/components/${componentDir}'`
             );
         });
 
-        const layoutStyle = layout === 'flex' ? 'display="flex"' : 
-                           layout === 'grid' ? 'display="grid"' : '';
+        return Promise.all(accessPromises).then(() => {
+            logMCPMessage(`?????? imports ${imports.join('\n')}`);
 
-        const componentJsx = componentList.map(component => {
-            const componentName = component.charAt(0).toUpperCase() + component.slice(1);
-            return `                <${componentName} />`;
-        }).join('\n');
+            const layoutStyle = layout === 'flex' ? 'display="flex"' : 
+                               layout === 'grid' ? 'display="grid"' : '';
 
-        return `/*
+            const componentJsx = componentList.map(component => {
+                const componentName = component.charAt(0).toUpperCase() + component.slice(1);
+                return `                <${componentName} />`;
+            }).join('\n');
+
+            return `/*
  * Copyright (c) ${new Date().getFullYear()}, Salesforce, Inc.
  * All rights reserved.
  * SPDX-License-Identifier: BSD-3-Clause
@@ -173,7 +175,8 @@ ${componentJsx}
 }
 
 export default ${pageName};
-`;
+        `;
+        });
     }
 
     async updateRoutes(pageName, route) {
@@ -181,18 +184,35 @@ export default ${pageName};
         try {
             const routesContent = await fs.readFile(routesPath, 'utf8')
             // Debugging output to log the routesContent
-            //console.log('Routes content before replace:', routesContent)
-            const importStatement = `import ${pageName} from './pages/${toKebabCase(pageName)}'`;
 
-            const routeObject = `{
-    path: '${route}',
-    component: ${pageName},
-    exact: true
-},`;
+            const importStatement = `const ${pageName} = loadable(() => import('./pages/${toKebabCase(pageName)}'), {fallback})`;
 
+            logMCPMessage(`!!!!!!!!!! importStatement: ${importStatement}`);
 
-            let updatedContent = `${importStatement}\n` + routesContent;
+            // Match all loadable import statements
+            const loadableRegex = /const\s+\w+\s*=\s*loadable\(\(\)\s*=>\s*import\(['"`].*?['"`]\)(?:,\s*\{fallback\})?\);?/g;
+            const matches = [...routesContent.matchAll(loadableRegex)];
 
+            if (matches.length === 0) {
+                throw new Error("No loadable import statements found.");
+            }
+
+            const lastMatch = matches[matches.length - 1];
+            const insertPosition = lastMatch.index + lastMatch[0].length;
+
+            // Insert the new import after the last one
+            let updatedContent =
+                routesContent.slice(0, insertPosition) +
+                `\n${importStatement}` +
+                routesContent.slice(insertPosition);
+
+            
+            const routeObject = 
+            `   {
+        path: '${route}',
+        component: ${pageName},
+        exact: true
+    },`;
 
             updatedContent = updatedContent.replace(
                 /(export\s+const\s+routes\s*=\s*\[\s*{[^}]*},)/g,
