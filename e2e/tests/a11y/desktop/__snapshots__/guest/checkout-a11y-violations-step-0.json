@@ -26,7 +26,7 @@
         "html": "<a class=\"...\" aria-label=\"Back to cart, number of items: 2\" href=\"/cart\">",
         "failureSummary": "Fix any of the following:\n  Some page content is not contained by landmarks",
         "target": [
-          ".css-1k2aozt"
+          ".css-..."
         ]
       }
     ]
