@@ -121,7 +121,6 @@ test('renders bundle product view modal with handleUpdateCart handler', async ()
 })
 
 test('bundle product view modal disables update button when child is out of stock', async () => {
-    // Override the mock for this specific test to make Medium variant out of stock
     renderWithProviders(<MockComponent />)
     await waitFor(async () => {
         const trigger = screen.getByText(/open modal/i)
