@@ -1,4 +1,4 @@
-import React, {useState, useEffect, useRef} from 'react'
+import React, {useState, useEffect, useRef, useMemo, useCallback} from 'react'
 import {FormattedMessage, useIntl} from 'react-intl'
 import {
     ToggleCard,
@@ -28,16 +28,18 @@ import {useShopperBasketsMutation} from '@salesforce/commerce-sdk-react'
 import ShippingAddressSelection from '@salesforce/retail-react-app/app/pages/checkout/partials/shipping-address-selection'
 import {usePaymentProcessing} from '../../../../hooks/salesforce-payments/use-payment-processing'
 import {getAddressDetails} from '../../../../utils/salesforce-payments/address-mapper'
-
+import PaymentSheetForm from '../../../../components/salesforce-payments/paymentSheetForm'
 // Module-level storage for paymentSheet
 let paymentSheetInstance = null
+// ✅ ADD this module-level variable declaration
+let confirmPaymentFunction = null
 
 export const usePaymentSheetSubmission = () => {
     const {processPayment, isProcessing} = usePaymentProcessing()
     const {data: basket} = useCurrentBasket()
     
     const createPaymentIntent = async (paymentData) => {
-        const basketId = "4cc1463610b01710f3240ee65f" // TODO: use basket.basketId
+        const basketId = "1f6a561e694175fff0435dd144" // TODO: use basket.basketId
         
         try {
             const paymentResult = await processPayment({
@@ -60,45 +62,18 @@ export const usePaymentSheetSubmission = () => {
     }
     
     const submitPaymentSheetOrder = async () => {
-        if (!paymentSheetInstance) {
+        if (!confirmPaymentFunction) {
             throw new Error('Payment sheet not ready. Please wait for payment component to load.')
         }
         
         try {
+            // ✅ Checkout-specific logic: get addresses from basket
             const {billing, shipping} = getAddressDetails(basket)
+            billing.email = "test@test.com"
+            billing.address.country = "US"
             
-            return new Promise((resolve, reject) => {
-                billing.email = "test@test.com"
-                billing.address.country = "US"
-                
-                paymentSheetInstance.confirm(createPaymentIntent, billing, {})
-                    .then(function (resp) {
-                        const respData = resp.data
-                        
-                        if (resp.responseCode === 0) {
-                            resolve(respData)
-                        } else {
-                            reject(new Error('Payment failed'))
-                        }
-                    })
-                    .catch(function (err) {
-                        // Simulate success for testing
-                        resolve({
-                            responseCode: 0,
-                            data: {
-                                paymentData: {
-                                    id: 'pi_test_fake_123',
-                                    uuid: 'test-guid-456',
-                                    paymentGatewayId: 'test-gateway-id',
-                                    gatewayCustomerId: 'test-customer-id',
-                                },
-                                paymentToken: 'pi_test_fake_123',
-                                billingDetails: billing,
-                                testOverride: true,
-                            },
-                        });
-                    })
-            })
+            // ✅ Call PaymentSheetForm's confirm function
+            return await confirmPaymentFunction(createPaymentIntent, billing, {})
         } catch (error) {
             console.error('SFP payment processing failed:', error)
             throw error
@@ -120,6 +95,7 @@ const SFPaymentsSheet = ({paymentState}) => {
     } = paymentState
 
     const isReady = !paymentConfigLoading && paymentConfig && metadata
+
     const intl = useIntl()
     
     // Load scripts and SFP
@@ -153,6 +129,7 @@ const SFPaymentsSheet = ({paymentState}) => {
     
     // Create SFP component with fresh values (no stale closure)
     useEffect(() => {
+        return;
         if (step === STEPS.PAYMENT && editContainerRef.current && isReady && !sfpComponentCreated) {
             // Create element if it doesn't exist
             if (!paymentElementRef.current) {
@@ -255,10 +232,56 @@ const SFPaymentsSheet = ({paymentState}) => {
         }
     }
     
+   // ✅ Memoize paymentRequestInfo so it doesn't recreate on every render
+   const paymentRequestInfo = useMemo(() => {
+    return basket ? createPaymentRequestInfo(basket, intl.locale) : null
+}, [basket, intl.locale])
+
+     // ✅ Callback when PaymentSheetForm is ready
+     const handlePaymentSheetReady = (paymentSheet) => {
+        console.log('✅ Payment sheet ready')
+    }
+    
+    // ✅ Callback to receive confirm function from PaymentSheetForm
+    const handleConfirmMethodReady = useCallback((confirmFunction) => {
+        confirmPaymentFunction = confirmFunction
+    }, [])
+
+    const handlePaymentSheetError = (error) => {
+        console.error('❌ Payment sheet error:', error)
+    }
+
+    // ✅ Memoize options object
+    const paymentSheetOptions = useMemo(() => ({
+        elementId: 'salesforce-payments-element',
+        locale: intl.locale,
+        paymentFlow: 'checkout',
+        customTheme: {
+            'color-primary': '#007bff'
+        },
+        minHeight: '300px'
+    }), [intl.locale])
+
+
+ // ✅ Add debugging to track what's changing
+ useEffect(() => {
+    console.log('🔍 PaymentSheet render conditions:', {
+        step,
+        STEPS_PAYMENT: STEPS.PAYMENT,
+        isPaymentStep: step === STEPS.PAYMENT,
+        isReady,
+        hasSfpInstance: !!sfpInstance,
+        hasPaymentRequestInfo: !!paymentRequestInfo,
+        willRenderForm: step === STEPS.PAYMENT && isReady && sfpInstance && paymentRequestInfo
+    })
+})
+
+
+
     return (
         <Box>
             {/* Payment container - only shows in edit mode */}
-            <Box
+            {/*<Box
                 ref={editContainerRef}
                 display={step === STEPS.PAYMENT ? "block" : "none"}
                 minH="300px"
@@ -267,7 +290,30 @@ const SFPaymentsSheet = ({paymentState}) => {
                 p={4}
                 bg="white"
                 mb={4}
-            />
+            />*/}
+            {/* ✅ PaymentSheetForm OUTSIDE ToggleCard - persists across edit/summary 
+                  Don't conditionally render based on step. Instead, always render the PaymentSheetForm 
+                  but use CSS to show/hide it. Preserves form data when switching between edit/summary:
+                  Stays mounted across step changes
+                  If you include the step === STEPS.PAYMENT condition, the form will unmount and remount
+                  when you switch between edit/summary, losing form data since the step value changes.
+                  */}
+                {isReady && sfpInstance && paymentRequestInfo && (
+                <PaymentSheetForm
+                    sfpInstance={sfpInstance}
+                    paymentConfig={paymentConfig}
+                    metadata={metadata}
+                    paymentRequestInfo={paymentRequestInfo}
+                    options={paymentSheetOptions}
+                    onConfirmMethodReady={handleConfirmMethodReady}
+                    containerProps={{ 
+                        mb: 4,
+                        // ✅ Use CSS to show/hide instead of unmount/mount
+                        display: step === STEPS.PAYMENT ? "block" : "none"
+                    }}
+                />
+            )}
+
 
             <ToggleCard
                 id="step-3"
