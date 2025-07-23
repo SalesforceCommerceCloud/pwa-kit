@@ -74,7 +74,7 @@ export const useWishList = ({listId = ''} = {}) => {
             parameters: {customerId},
             body: {type: 'wish_list'}
         })
-    }, [productLists, isProductListsSuccess])
+    }, [productLists, isProductListsSuccess, customerId])
 
     const wishLists = productLists?.data?.filter((list) => list.type === 'wish_list') || []
     const currentWishlist = wishLists.find((list) => list.id === listId)
@@ -147,11 +147,7 @@ export const useWishList = ({listId = ''} = {}) => {
         [
             customerId,
             wishlist,
-            isItemInWishlist,
-            createCustomerProductListItem,
-            toast,
-            formatMessage,
-            navigate
+            isItemInWishlist
         ]
     )
 
@@ -186,13 +182,13 @@ export const useWishList = ({listId = ''} = {}) => {
                 })
             }
         },
-        [customerId, wishlist, deleteCustomerProductListItem, toast, formatMessage]
+        [customerId, wishlist]
     )
 
     const toggleWishlist = useCallback(
-        (product, variant, options = {}) => {
+        (product, variant, ...args) => {
             const action = isItemInWishlist(product, variant) ? removeFromWishlist : addToWishlist
-            action(product, variant, options)
+            action(product, variant, ...args)
         },
         [isItemInWishlist, removeFromWishlist, addToWishlist]
     )
