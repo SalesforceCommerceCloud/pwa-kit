@@ -22,12 +22,9 @@ import {
     TOAST_MESSAGE_ALREADY_IN_WISHLIST,
     TOAST_MESSAGE_REMOVED_FROM_WISHLIST
 } from '../../config/constants'
+import {normalizeProductId} from '../utils/utils'
 
 const onClient = typeof window !== 'undefined'
-
-const normalizeProductId = (product, variant) => {
-    return variant?.productId || product?.productId || product?.id
-}
 
 export const useWishList = ({listId = ''} = {}) => {
     const {formatMessage} = useIntl()
