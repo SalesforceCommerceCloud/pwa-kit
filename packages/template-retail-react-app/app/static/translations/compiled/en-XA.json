@@ -6999,6 +6999,62 @@
       "value": "]"
     }
   ],
+  "search.suggestions.brands": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ɓřȧȧƞḓş"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "search.suggestions.categories": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ƈȧȧŧḗḗɠǿǿřīḗḗş"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "search.suggestions.products": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ƥřǿǿḓŭŭƈŧş"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "search_suggestions.category.in_parent": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "īƞ"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
   "selected_refinements.action.assistive_msg.clear_all": [
     {
       "type": 0,

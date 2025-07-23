@@ -3311,6 +3311,30 @@
       "value": "Cancel"
     }
   ],
+  "search.suggestions.brands": [
+    {
+      "type": 0,
+      "value": "Brands"
+    }
+  ],
+  "search.suggestions.categories": [
+    {
+      "type": 0,
+      "value": "Categories"
+    }
+  ],
+  "search.suggestions.products": [
+    {
+      "type": 0,
+      "value": "Products"
+    }
+  ],
+  "search_suggestions.category.in_parent": [
+    {
+      "type": 0,
+      "value": "in"
+    }
+  ],
   "selected_refinements.action.assistive_msg.clear_all": [
     {
       "type": 0,
