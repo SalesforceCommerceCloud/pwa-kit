@@ -84,7 +84,10 @@ export const runCommand = async (command, args = [], options = {}) => {
  * @returns {boolean} True if lerna.json exists in the current workspace, false otherwise.
  */
 export function isMonoRepo() {
-    const lernaPath = path.resolve(process.env.WORKSPACE_FOLDER_PATHS, 'lerna.json')
+    const lernaPath = path.resolve(
+        ...(process.env.WORKSPACE_FOLDER_PATHS ? [process.env.WORKSPACE_FOLDER_PATHS] : []),
+        'lerna.json'
+    )
     return fs.existsSync(lernaPath)
 }
 
