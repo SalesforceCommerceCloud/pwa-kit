@@ -141,7 +141,7 @@ const CheckoutOneClick = () => {
     }
 
     const submitOrder = async () => {
-        const registerUserPasswordless = async (data) => {
+        const registerUser = async (data) => {
             try {
                 const body = {
                     customer: {
@@ -196,7 +196,7 @@ const CheckoutOneClick = () => {
             })
 
             if (enableUserRegistration) {
-                await registerUserPasswordless({
+                await registerUser({
                     firstName: order.billingAddress.firstName,
                     lastName: order.billingAddress.lastName,
                     email: order.customerInfo.email
