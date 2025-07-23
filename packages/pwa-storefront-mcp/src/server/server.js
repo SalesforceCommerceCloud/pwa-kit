@@ -9,7 +9,12 @@ import {McpServer} from '@modelcontextprotocol/sdk/server/mcp.js'
 import {StdioServerTransport} from '@modelcontextprotocol/sdk/server/stdio.js'
 
 import {z} from 'zod'
-import {CreateAppGuidelinesTool, CreateNewComponentTool, DeveloperGuidelinesTool, CreateNewPageTool} from '../utils'
+import {
+    CreateAppGuidelinesTool,
+    CreateNewComponentTool,
+    DeveloperGuidelinesTool,
+    CreateNewPageTool
+} from '../utils'
 
 import {TestWithPlaywrightTool} from '../utils/run-site-test-tool'
 
@@ -24,7 +29,6 @@ const documentList = require('../data/DocumentList.json')
 const packageJson = require('../../package.json')
 
 const FALLBACK_VERSION = '0.1.0'
-
 
 class PwaStorefrontMCPServerHighLevel {
     constructor() {
@@ -85,12 +89,12 @@ class PwaStorefrontMCPServerHighLevel {
             },
             (args) => this.handleCreateNewSampleComponent(args)
         ),
-        this.server.tool(
-            CreateNewPageTool.name,
-            CreateNewPageTool.description,
-            CreateNewPageTool.inputSchema,    
-            CreateNewPageTool.handler
-        )
+            this.server.tool(
+                CreateNewPageTool.name,
+                CreateNewPageTool.description,
+                CreateNewPageTool.inputSchema,
+                CreateNewPageTool.handler
+            )
     }
 
     /**
