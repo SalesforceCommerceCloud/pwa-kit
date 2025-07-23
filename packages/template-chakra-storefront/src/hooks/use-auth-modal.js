@@ -241,33 +241,37 @@ export const AuthModal = ({
         // We are done with the modal.
         onClose()
 
-        // Show a toast only for those registed users returning to the site.
-        if (loggingIn) {
-            toast({
-                title: `${formatMessage(
-                    {
-                        defaultMessage: 'Welcome {name},',
-                        id: 'auth_modal.info.welcome_user'
-                    },
-                    {
-                        name: customer.data?.firstName || ''
-                    }
-                )}`,
-                description: `${formatMessage({
-                    defaultMessage: "You're now signed in.",
-                    id: 'auth_modal.description.now_signed_in'
-                })}`,
-                type: 'success'
-            })
-
-            // Execute action to be performed on successful login
-            onLoginSuccess()
-        }
-
         if (registering) {
             // Execute action to be performed on successful registration
             onRegistrationSuccess()
         }
+
+        // Defer operations to the next tick to avoid flushSync warnings
+        // This moves the operations out of React's synchronous render cycle
+        setTimeout(() => {
+            // Show a toast only for those registed users returning to the site.
+            if (loggingIn) {
+                toast({
+                    title: `${formatMessage(
+                        {
+                            defaultMessage: 'Welcome {name},',
+                            id: 'auth_modal.info.welcome_user'
+                        },
+                        {
+                            name: customer.data?.firstName || ''
+                        }
+                    )}`,
+                    description: `${formatMessage({
+                        defaultMessage: "You're now signed in.",
+                        id: 'auth_modal.description.now_signed_in'
+                    })}`,
+                    type: 'success'
+                })
+
+                // Execute action to be performed on successful login
+                onLoginSuccess()
+            }
+        }, 0)
     }, [isRegistered])
 
     const onBackToSignInClick = () =>

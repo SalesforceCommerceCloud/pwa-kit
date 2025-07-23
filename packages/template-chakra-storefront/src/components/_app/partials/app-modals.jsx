@@ -14,7 +14,7 @@ import Toaster, {toaster} from '../../../components/toaster'
 
 /**
  * AppModals component that renders all app-level modals using React Portals
- * Handles AuthModal, DntNotification, and optional StoreLocatorModal
+ * Handles AuthModal, DntNotification, Toaster, and optional StoreLocatorModal
  */
 const AppModals = ({
     authModal,
@@ -31,6 +31,7 @@ const AppModals = ({
             {/* Do Not Track Notification */}
             <DntNotification {...dntNotification} />
 
+            {/* Toast Notifications */}
             <Toaster toaster={toaster} />
 
             {/* Store Locator Modal - Disabled until extension is moved */}
@@ -45,11 +46,11 @@ const AppModals = ({
 }
 
 AppModals.propTypes = {
-    authModal: PropTypes.object.isRequired,
-    dntNotification: PropTypes.object.isRequired
+    authModal: PropTypes.object,
+    dntNotification: PropTypes.object
     // Uncomment when store locator is enabled
-    // isOpenStoreLocator: PropTypes.bool.isRequired,
-    // onCloseStoreLocator: PropTypes.func.isRequired
+    // isOpenStoreLocator: PropTypes.bool,
+    // onCloseStoreLocator: PropTypes.func
 }
 
 export default AppModals

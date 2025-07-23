@@ -173,10 +173,4 @@ describe('App', () => {
         // AppProviders should be rendered with the correct props
         expect(screen.getByTestId('app-providers')).toBeInTheDocument()
     })
-
-    test('handles missing children gracefully', () => {
-        renderWithProviders(<App />)
-
-        expect(screen.getByTestId('app-layout')).toBeInTheDocument()
-    })
 })

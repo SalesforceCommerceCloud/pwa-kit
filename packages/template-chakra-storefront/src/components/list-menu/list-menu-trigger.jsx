@@ -16,21 +16,15 @@ import {ChevronDownIcon} from '../../components/icons'
 
 import {categoryUrlBuilder} from '../../utils/url'
 
-const ListMenuTrigger = ({item, name, isOpen, onOpen, onClose}) => {
+const ListMenuTrigger = ({item, name, isOpen}) => {
     const recipe = useSlotRecipe({key: 'listMenu'})
     const styles = recipe()
-
-    const keyMap = {
-        Escape: () => onClose(),
-        Enter: () => onOpen()
-    }
 
     return (
         <Box css={styles.listMenuTriggerContainer}>
             <Link
                 as={RouteLink}
                 to={categoryUrlBuilder(item)}
-                onMouseOver={onOpen}
                 css={styles.listMenuTriggerLink}
                 {...{name: name + ' __'}}
                 {...(isOpen ? {css: styles.listMenuTriggerLinkActive} : {})}
@@ -38,17 +32,10 @@ const ListMenuTrigger = ({item, name, isOpen, onOpen, onClose}) => {
                 {name}
             </Link>
 
-            <Link
-                as={RouteLink}
-                to={'#'}
-                onMouseOver={onOpen}
-                onKeyDown={(e) => {
-                    keyMap[e.key]?.(e)
-                }}
-                css={styles.listMenuTriggerLinkIcon}
-            >
+            {/* NOTE: To avoid nested buttons (since ListMenuTrigger will be wrapped with Popover.Trigger), this cannot be a Button */}
+            <Box css={styles.listMenuTriggerLinkIcon} role="button" tabIndex="0">
                 <ChevronDownIcon />
-            </Link>
+            </Box>
         </Box>
     )
 }
@@ -56,9 +43,7 @@ const ListMenuTrigger = ({item, name, isOpen, onOpen, onClose}) => {
 ListMenuTrigger.propTypes = {
     item: PropTypes.object,
     name: PropTypes.string,
-    isOpen: PropTypes.bool,
-    onOpen: PropTypes.func,
-    onClose: PropTypes.func
+    isOpen: PropTypes.bool
 }
 
 export {ListMenuTrigger}
