@@ -29,8 +29,38 @@ const PickupAddress = () => {
     const updateShippingAddressForShipment = useShopperBasketsMutation(
         'updateShippingAddressForShipment'
     )
-    const {step, STEPS, goToStep} = useCheckout()
+    const {step, STEPS, goToStep, goToNextStep} = useCheckout()
     const {data: basket} = useCurrentBasket()
+
+    // Check if there are any pickup shipments
+    const hasPickupShipments = useMemo(() => {
+        if (!basket?.shipments) return false
+        return basket.shipments.some(shipment => 
+            shipment?.shippingMethod?.c_storePickupEnabled === true
+        )
+    }, [basket?.shipments])
+
+    // Check if there are delivery shipments (for determining display mode)
+    const hasDeliveryShipments = useMemo(() => {
+        if (!basket?.shipments) return false
+        return basket.shipments.some(shipment => 
+            !shipment?.shippingMethod?.c_storePickupEnabled
+        )
+    }, [basket?.shipments])
+
+    // Check if there are multiple pickup shipments
+    const pickupShipments = basket?.shipments?.filter(shipment => 
+        shipment?.shippingMethod?.c_storePickupEnabled === true
+    ) || []
+    const hasMultiplePickups = pickupShipments.length > 1
+
+    // Determine if we should show cart items (multi-pickup or mixed basket)
+    const shouldShowCartItems = hasMultiplePickups || hasDeliveryShipments
+
+    // If no pickup shipments, don't render anything
+    if (!hasPickupShipments) {
+        return null
+    }
 
     const selectedShippingAddress = basket?.shipments && basket?.shipments[0]?.shippingAddress
     const isAddressFilled = selectedShippingAddress?.address1 && selectedShippingAddress?.city
@@ -179,7 +209,7 @@ const PickupAddress = () => {
             }
         })
         setIsLoading(false)
-        goToStep(STEPS.PAYMENT)
+        goToNextStep()
     }
 
     return (
@@ -192,14 +222,135 @@ const PickupAddress = () => {
             editing={step === STEPS.PICKUP_ADDRESS}
             disabled={step === STEPS.CONTACT_INFO}
             isLoading={isLoading}
+            onEdit={() => goToStep(STEPS.PICKUP_ADDRESS)}
         >
             {step === STEPS.PICKUP_ADDRESS && (
                 <>
                     {/* Display pickup stores and items */}
+                    {(() => {
+                        return pickupShipmentItems.length > 0 && !isStoreDataLoading && (
+                            <>
+                                {/* Single pickup - use original behavior */}
+                                {pickupShipmentItems.length === 1 && !shouldShowCartItems && (
+                                    <>
+                                        <Text fontWeight="bold" fontSize="md" mb={2}>
+                                            <FormattedMessage
+                                                defaultMessage="Store Information"
+                                                id="pickup_address.title.store_information"
+                                            />
+                                        </Text>
+                                        <AddressDisplay address={pickupAddress} />
+                                    </>
+                                )}
+                                
+                                {/* Multiple pickups or mixed basket - use new grouped behavior */}
+                                {shouldShowCartItems && (
+                                    <Stack spacing={6}>
+                                        {pickupShipmentItems.map((shipmentInfo, index) => (
+                                            <Box 
+                                                key={`pickup-${shipmentInfo.shipment?.shipmentId}-${shipmentInfo.store?.id || index}`}
+                                                border="1px solid"
+                                                borderColor="gray.200"
+                                                borderRadius="md"
+                                                p={4}
+                                                mb={4}
+                                            >
+                                                {/* Store Information */}
+                                                <Box 
+                                                    border="1px solid"
+                                                    borderColor="gray.300"
+                                                    borderRadius="sm"
+                                                    p={3}
+                                                    mb={4}
+                                                >
+                                                    <Text fontWeight="bold" fontSize="md" mb={2}>
+                                                        <FormattedMessage
+                                                            defaultMessage="Store Information"
+                                                            id="pickup_address.title.store_information"
+                                                        />
+                                                    </Text>
+                                                    {shipmentInfo.store && (
+                                                        <Box>
+                                                            <Text>
+                                                                {shipmentInfo.store.name}
+                                                            </Text>
+                                                            <Text>
+                                                                {shipmentInfo.store.address1}
+                                                            </Text>
+                                                            <Text>
+                                                                {shipmentInfo.store.city}, {shipmentInfo.store.stateCode} {shipmentInfo.store.postalCode}
+                                                            </Text>
+                                                            <Text>
+                                                                {shipmentInfo.store.countryCode}
+                                                            </Text>
+                                                        </Box>
+                                                    )}
+                                                </Box>
+                                                
+                                                {/* Cart Items for this store */}
+                                                <Box mt={4} border="1px solid" borderColor="gray.200" borderRadius="md" p={4}>
+                                                    {/* Regular Products */}
+                                                    {shipmentInfo.categorizedProducts.regularProducts.length > 0 && (
+                                                        <CheckoutProductItemList
+                                                            productItems={shipmentInfo.categorizedProducts.regularProducts}
+                                                            productsByItemId={productsByItemId}
+                                                            isProductsLoading={isProductsLoading}
+                                                        />
+                                                    )}
+
+                                                    {/* Bonus Products */}
+                                                    {shipmentInfo.categorizedProducts.bonusProducts.length > 0 && (
+                                                        <>
+                                                            <Box mt={3} mb={2}>
+                                                                <Text fontWeight="bold" fontSize="sm" color="gray.600">
+                                                                    <FormattedMessage
+                                                                        defaultMessage="Bonus Items"
+                                                                        id="pickup_address.bonus_products.title"
+                                                                    />
+                                                                </Text>
+                                                            </Box>
+                                                            <CheckoutProductItemList
+                                                                productItems={shipmentInfo.categorizedProducts.bonusProducts}
+                                                                productsByItemId={productsByItemId}
+                                                                isProductsLoading={isProductsLoading}
+                                                            />
+                                                        </>
+                                                    )}
+                                                </Box>
+                                            </Box>
+                                        ))}
+                                    </Stack>
+                                )}
+                            </>
+                        )
+                    })()}
+                    
+                    <Box pt={3}>
+                        <Container variant="form">
+                            <Button w="full" onClick={() => submitAndContinue(pickupAddress)}>
+                                {hasDeliveryShipments ? (
+                                    <FormattedMessage
+                                        defaultMessage="Continue to Shipping Address"
+                                        id="pickup_address.button.continue_to_shipping_address"
+                                    />
+                                ) : (
+                                    <FormattedMessage
+                                        defaultMessage="Continue to Payment"
+                                        id="pickup_address.button.continue_to_payment"
+                                    />
+                                )}
+                            </Button>
+                        </Container>
+                    </Box>
+                </>
+            )}
+            {isAddressFilled && (
+                <ToggleCardSummary>
+                    {/* Display pickup stores in summary view (no cart items) */}
                     {pickupShipmentItems.length > 0 && !isStoreDataLoading && (
                         <>
-                            {/* Single pickup - use original behavior */}
-                            {pickupShipmentItems.length === 1 && (
+                            {/* Single pickup - show store info only */}
+                            {pickupShipmentItems.length === 1 && !shouldShowCartItems && (
                                 <>
                                     <Text fontWeight="bold" fontSize="md" mb={2}>
                                         <FormattedMessage
@@ -211,191 +362,39 @@ const PickupAddress = () => {
                                 </>
                             )}
                             
-                            {/* Multiple pickups - use new grouped behavior */}
-                            {pickupShipmentItems.length > 1 && (
-                                <Stack spacing={6}>
+                            {/* Multiple pickups or mixed basket - show store info only */}
+                            {shouldShowCartItems && (
+                                <Stack spacing={4}>
                                     {pickupShipmentItems.map((shipmentInfo, index) => (
                                         <Box 
-                                            key={`pickup-${shipmentInfo.shipment?.shipmentId}-${shipmentInfo.store?.id || index}`}
+                                            key={`pickup-summary-${shipmentInfo.shipment?.shipmentId}-${shipmentInfo.store?.id || index}`}
                                             border="1px solid"
                                             borderColor="gray.200"
                                             borderRadius="md"
-                                            p={4}
-                                            mb={4}
+                                            p={3}
                                         >
-                                            {/* Store Information */}
-                                            <Box 
-                                                border="1px solid"
-                                                borderColor="gray.300"
-                                                borderRadius="sm"
-                                                p={3}
-                                                mb={4}
-                                            >
-                                                <Text fontWeight="bold" fontSize="md" mb={2}>
-                                                    <FormattedMessage
-                                                        defaultMessage="Store Information"
-                                                        id="pickup_address.title.store_information"
-                                                    />
-                                                </Text>
-                                                {shipmentInfo.store && (
-                                                    <Box>
-                                                        <Text>
-                                                            {shipmentInfo.store.name}
-                                                        </Text>
-                                                        <Text>
-                                                            {shipmentInfo.store.address1}
-                                                        </Text>
-                                                        <Text>
-                                                            {shipmentInfo.store.city}, {shipmentInfo.store.stateCode} {shipmentInfo.store.postalCode}
-                                                        </Text>
-                                                        <Text>
-                                                            {shipmentInfo.store.countryCode}
-                                                        </Text>
-                                                    </Box>
-                                                )}
-                                            </Box>
-                                            
-                                            {/* Cart Items for this store */}
-                                            <Box mt={4} bg="gray.50" border="1px solid" borderColor="gray.200" borderRadius="md" p={4}>
-                                                {/* Regular Products */}
-                                                {shipmentInfo.categorizedProducts.regularProducts.length > 0 && (
-                                                    <CheckoutProductItemList
-                                                        productItems={shipmentInfo.categorizedProducts.regularProducts}
-                                                        productsByItemId={productsByItemId}
-                                                        isProductsLoading={isProductsLoading}
-                                                    />
-                                                )}
-
-                                                {/* Bonus Products */}
-                                                {shipmentInfo.categorizedProducts.bonusProducts.length > 0 && (
-                                                    <>
-                                                        <Box mt={3} mb={2}>
-                                                            <Text fontWeight="bold" fontSize="sm" color="gray.600">
-                                                                <FormattedMessage
-                                                                    defaultMessage="Bonus Items"
-                                                                    id="pickup_address.bonus_products.title"
-                                                                />
-                                                            </Text>
-                                                        </Box>
-                                                        <CheckoutProductItemList
-                                                            productItems={shipmentInfo.categorizedProducts.bonusProducts}
-                                                            productsByItemId={productsByItemId}
-                                                            isProductsLoading={isProductsLoading}
-                                                        />
-                                                    </>
-                                                )}
-                                            </Box>
-                                        </Box>
-                                    ))}
-                                </Stack>
-                            )}
-                        </>
-                    )}
-                    
-                    <Box pt={3}>
-                        <Container variant="form">
-                            <Button w="full" onClick={() => submitAndContinue(pickupAddress)}>
-                                <FormattedMessage
-                                    defaultMessage="Continue to Payment"
-                                    id="pickup_address.button.continue_to_payment"
-                                />
-                            </Button>
-                        </Container>
-                    </Box>
-                </>
-            )}
-            {isAddressFilled && (
-                <ToggleCardSummary>
-                    {/* Display pickup stores and items in summary */}
-                    {pickupShipmentItems.length > 0 && !isStoreDataLoading && (
-                        <>
-                            {/* Single pickup - use original behavior */}
-                            {pickupShipmentItems.length === 1 && (
-                                <>
-                                    <Text fontWeight="bold" fontSize="md" mb={2}>
-                                        <FormattedMessage
-                                            defaultMessage="Store Information"
-                                            id="pickup_address.title.store_information"
-                                        />
-                                    </Text>
-                                    <AddressDisplay address={selectedShippingAddress} />
-                                </>
-                            )}
-                            
-                            {/* Multiple pickups - use new grouped behavior */}
-                            {pickupShipmentItems.length > 1 && (
-                                <Stack spacing={6}>
-                                    {pickupShipmentItems.map((shipmentInfo, index) => (
-                                        <Box 
-                                            key={`pickup-${shipmentInfo.shipment?.shipmentId}-${shipmentInfo.store?.id || index}`}
-                                            border="1px solid"
-                                            borderColor="gray.200"
-                                            borderRadius="md"
-                                            p={4}
-                                            mb={4}
-                                        >
-                                            {/* Store Information */}
-                                            <Box 
-                                                border="1px solid"
-                                                borderColor="gray.300"
-                                                borderRadius="sm"
-                                                p={3}
-                                                mb={4}
-                                            >
-                                                <Text fontWeight="bold" fontSize="md" mb={2}>
-                                                    <FormattedMessage
-                                                        defaultMessage="Store Information"
-                                                        id="pickup_address.title.store_information"
-                                                    />
-                                                </Text>
-                                                {shipmentInfo.store && (
-                                                    <Box>
-                                                        <Text>
-                                                            {shipmentInfo.store.name}
-                                                        </Text>
-                                                        <Text>
-                                                            {shipmentInfo.store.address1}
-                                                        </Text>
-                                                        <Text>
-                                                            {shipmentInfo.store.city}, {shipmentInfo.store.stateCode} {shipmentInfo.store.postalCode}
-                                                        </Text>
-                                                        <Text>
-                                                            {shipmentInfo.store.countryCode}
-                                                        </Text>
-                                                    </Box>
-                                                )}
-                                            </Box>
-                                            
-                                            {/* Cart Items for this store */}
-                                            <Box mt={4} bg="gray.50" border="1px solid" borderColor="gray.200" borderRadius="md" p={4}>
-                                                {/* Regular Products */}
-                                                {shipmentInfo.categorizedProducts.regularProducts.length > 0 && (
-                                                    <CheckoutProductItemList
-                                                        productItems={shipmentInfo.categorizedProducts.regularProducts}
-                                                        productsByItemId={productsByItemId}
-                                                        isProductsLoading={isProductsLoading}
-                                                    />
-                                                )}
-
-                                                {/* Bonus Products */}
-                                                {shipmentInfo.categorizedProducts.bonusProducts.length > 0 && (
-                                                    <>
-                                                        <Box mt={3} mb={2}>
-                                                            <Text fontWeight="bold" fontSize="sm" color="gray.600">
-                                                                <FormattedMessage
-                                                                    defaultMessage="Bonus Items"
-                                                                    id="pickup_address.bonus_products.title"
-                                                                />
-                                                            </Text>
-                                                        </Box>
-                                                        <CheckoutProductItemList
-                                                            productItems={shipmentInfo.categorizedProducts.bonusProducts}
-                                                            productsByItemId={productsByItemId}
-                                                            isProductsLoading={isProductsLoading}
-                                                        />
-                                                    </>
-                                                )}
-                                            </Box>
+                                            <Text fontWeight="bold" fontSize="md" mb={2}>
+                                                <FormattedMessage
+                                                    defaultMessage="Store Information"
+                                                    id="pickup_address.title.store_information"
+                                                />
+                                            </Text>
+                                            {shipmentInfo.store && (
+                                                <Box>
+                                                    <Text>
+                                                        {shipmentInfo.store.name}
+                                                    </Text>
+                                                    <Text>
+                                                        {shipmentInfo.store.address1}
+                                                    </Text>
+                                                    <Text>
+                                                        {shipmentInfo.store.city}, {shipmentInfo.store.stateCode} {shipmentInfo.store.postalCode}
+                                                    </Text>
+                                                    <Text>
+                                                        {shipmentInfo.store.countryCode}
+                                                    </Text>
+                                                </Box>
+                                            )}
                                         </Box>
                                     ))}
                                 </Stack>
