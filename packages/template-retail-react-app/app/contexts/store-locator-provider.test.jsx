@@ -7,6 +7,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import {render, act} from '@testing-library/react'
+import {MemoryRouter} from 'react-router-dom'
 import {
     StoreLocatorProvider,
     StoreLocatorContext
@@ -47,7 +48,9 @@ describe('StoreLocatorProvider', () => {
 
     const TestWrapper = ({children}) => (
         <MultiSiteProvider site={mockSite}>
-            <StoreLocatorProvider config={mockConfig}>{children}</StoreLocatorProvider>
+            <MemoryRouter>
+                <StoreLocatorProvider config={mockConfig}>{children}</StoreLocatorProvider>
+            </MemoryRouter>
         </MultiSiteProvider>
     )
 
@@ -80,9 +83,12 @@ describe('StoreLocatorProvider', () => {
                 longitude: null
             },
             selectedStoreId: null,
-            config: mockConfig
+            config: mockConfig,
+            isModalOpen: false
         })
         expect(typeof contextValue?.setState).toBe('function')
+        expect(typeof contextValue?.openModal).toBe('function')
+        expect(typeof contextValue?.closeModal).toBe('function')
     })
 
     it('initializes with stored selectedStoreId from localStorage', () => {
@@ -168,5 +174,34 @@ describe('StoreLocatorProvider', () => {
         )
 
         expect(getByText('Test Child')).toBeTruthy()
+    })
+
+    it('handles modal state correctly', () => {
+        let contextValue
+        const TestComponent = () => {
+            contextValue = React.useContext(StoreLocatorContext)
+            return null
+        }
+
+        render(
+            <TestWrapper>
+                <TestComponent />
+            </TestWrapper>
+        )
+
+        // Initially modal should be closed
+        expect(contextValue?.state.isModalOpen).toBe(false)
+
+        // Open modal
+        act(() => {
+            contextValue?.openModal()
+        })
+        expect(contextValue?.state.isModalOpen).toBe(true)
+
+        // Close modal
+        act(() => {
+            contextValue?.closeModal()
+        })
+        expect(contextValue?.state.isModalOpen).toBe(false)
     })
 })

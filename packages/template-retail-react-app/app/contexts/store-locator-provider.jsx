@@ -6,6 +6,7 @@
  */
 
 import React, {useState, useEffect, createContext} from 'react'
+import {useLocation} from 'react-router-dom'
 import PropTypes from 'prop-types'
 import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
 
@@ -26,6 +27,7 @@ export const StoreLocatorProvider = ({config, children}) => {
     const {site} = useMultiSite()
     const selectedStoreBySiteId = `selectedStore_${site?.id}`
     const selectedStoreId = readValue(selectedStoreBySiteId)
+    const {pathname} = useLocation()
 
     const [state, setState] = useState({
         mode: 'input',
@@ -38,7 +40,9 @@ export const StoreLocatorProvider = ({config, children}) => {
             longitude: null
         },
         selectedStoreId,
-        config
+        config,
+        // Modal state
+        isModalOpen: false
     })
 
     useEffect(() => {
@@ -47,9 +51,28 @@ export const StoreLocatorProvider = ({config, children}) => {
         }
     }, [state.selectedStoreId])
 
+    // Auto-close modal when navigating to different pages
+    useEffect(() => {
+        if (state.isModalOpen) {
+            setState((prev) => ({...prev, isModalOpen: false}))
+        }
+    }, [pathname])
+
+    // Modal actions
+    const openModal = () => {
+        setState((prev) => ({...prev, isModalOpen: true}))
+    }
+
+    const closeModal = () => {
+        setState((prev) => ({...prev, isModalOpen: false}))
+    }
+
     const value = {
         state,
-        setState
+        setState,
+        // Modal actions
+        openModal,
+        closeModal
     }
 
     return <StoreLocatorContext.Provider value={value}>{children}</StoreLocatorContext.Provider>

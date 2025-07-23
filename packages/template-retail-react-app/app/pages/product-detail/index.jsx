@@ -45,7 +45,6 @@ import {
 import RecommendedProducts from '@salesforce/retail-react-app/app/components/recommended-products'
 import ProductView from '@salesforce/retail-react-app/app/components/product-view'
 import InformationAccordion from '@salesforce/retail-react-app/app/pages/product-detail/partials/information-accordion'
-import {StoreLocatorModal} from '@salesforce/retail-react-app/app/components/store-locator'
 import Island from '@salesforce/retail-react-app/app/components/island'
 
 import {HTTPNotFound, HTTPError} from '@salesforce/pwa-kit-react-sdk/ssr/universal/errors'
@@ -65,7 +64,7 @@ import {rebuildPathWithParams} from '@salesforce/retail-react-app/app/utils/url'
 import {useHistory, useLocation, useParams} from 'react-router-dom'
 import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
 import {useWishList} from '@salesforce/retail-react-app/app/hooks/use-wish-list'
-import {useDisclosure} from '@salesforce/retail-react-app/app/components/shared/ui'
+import {useStoreLocatorModal} from '@salesforce/retail-react-app/app/hooks/use-store-locator'
 
 const ProductDetail = () => {
     const {formatMessage} = useIntl()
@@ -77,11 +76,7 @@ const ProductDetail = () => {
     const toast = useToast()
     const navigate = useNavigation()
     const customerId = useCustomerId()
-    const {
-        isOpen: isStoreLocatorOpen,
-        onOpen: onOpenStoreLocator,
-        onClose: onCloseStoreLocator
-    } = useDisclosure()
+    const {onOpen: onOpenStoreLocator} = useStoreLocatorModal()
 
     /****************************** Basket *********************************/
     const {data: basket, isLoading: isBasketLoading} = useCurrentBasket()
@@ -872,9 +867,6 @@ const ProductDetail = () => {
                     </Island>
                 </Stack>
             </Stack>
-            {STORE_LOCATOR_IS_ENABLED && (
-                <StoreLocatorModal isOpen={isStoreLocatorOpen} onClose={onCloseStoreLocator} />
-            )}
         </Box>
     )
 }
