@@ -677,6 +677,53 @@ export const useMultiship = (basket) => {
         }
     }
 
+    /**
+     * Changes the store for a pickup shipment by moving items to an existing pickup shipment
+     * for the new store or updating the current shipment to use the new store
+     * @param {string} sourceShipmentId - The shipment ID containing pickup items to move
+     * @param {Object} newStore - The new store object containing id and inventoryId
+     * @returns {Promise<void>}
+     */
+    const changeStoreForPickupShipment = async (sourceShipmentId, newStore) => {
+        if (!basket?.basketId || !sourceShipmentId || !newStore?.id || !newStore?.inventoryId) {
+            throw new Error('Invalid parameters for changing store')
+        }
+
+        // Get all items from the source shipment
+        const itemsToMove = getItemsForShipment(basket, sourceShipmentId)
+        if (itemsToMove.length === 0) {
+            return // Nothing to move
+        }
+
+        // Check if there's already a pickup shipment for the new store
+        const existingPickupShipment = findExistingPickupShipment(basket, newStore.id)
+
+        if (existingPickupShipment) {
+            // Move all items to the existing pickup shipment for the new store
+            await moveItemsToPickupShipment(
+                itemsToMove,
+                existingPickupShipment.shipmentId,
+                newStore.inventoryId
+            )
+
+            // Remove the now-empty source shipment if it's not the default shipment
+            if (sourceShipmentId !== DEFAULT_SHIPMENT_ID) {
+                await removeShipment(sourceShipmentId)
+            }
+        } else {
+            // Create a new pickup shipment for the new store and move items there
+            const newPickupShipmentId = await findOrCreatePickupShipment(newStore)
+
+            // Move all items to the new pickup shipment
+            await moveItemsToPickupShipment(itemsToMove, newPickupShipmentId, newStore.inventoryId)
+
+            // Remove the now-empty source shipment if it's not the default shipment
+            if (sourceShipmentId !== DEFAULT_SHIPMENT_ID) {
+                await removeShipment(sourceShipmentId)
+            }
+        }
+    }
+
     return {
         assignDefaultShippingMethodsToShipments,
         handleDeliveryOptionChange,
@@ -694,6 +741,7 @@ export const useMultiship = (basket) => {
         getShipmentForItems,
         findEmptyShipments,
         findShipmentToConsolidate,
-        getItemsForShipment
+        getItemsForShipment,
+        changeStoreForPickupShipment
     }
 }

@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React, {useState, useMemo, useEffect} from 'react'
+import React, {useState, useMemo, useEffect, useRef} from 'react'
 import {FormattedMessage, useIntl} from 'react-intl'
 
 // Chakra Components
@@ -94,8 +94,11 @@ const Cart = () => {
 
     const {selectedStore} = useSelectedStore()
     const selectedInventoryId = selectedStore?.inventoryId || null
-    const {handleDeliveryOptionChange, assignDefaultShippingMethodsToShipments} =
-        useMultiship(basket)
+    const {
+        handleDeliveryOptionChange,
+        assignDefaultShippingMethodsToShipments,
+        changeStoreForPickupShipment
+    } = useMultiship(basket)
     const productIds = basket?.productItems?.map(({productId}) => productId).join(',') ?? ''
     const {data: products, isLoading: isProductsLoading} = useProducts(
         {
@@ -251,6 +254,50 @@ const Cart = () => {
     const navigate = useNavigation()
     const modalProps = useDisclosure()
     const storeLocatorModal = useStoreLocatorModal()
+    const modalOpenedFromCart = useRef(null)
+
+    // Handle when modal closes after being opened from cart's "Change Store" button
+    useEffect(() => {
+        // If modal was opened from cart and is now closed, check if store changed
+        if (modalOpenedFromCart.current && !storeLocatorModal.isOpen) {
+            const originalStoreId = modalOpenedFromCart.current.storeId
+            const shipmentId = modalOpenedFromCart.current.shipmentId
+            const newStoreId = selectedStore?.id
+
+            // Reset the ref
+            modalOpenedFromCart.current = null
+
+            // Only run action if store actually changed and all required data is available
+            if (
+                originalStoreId !== newStoreId &&
+                selectedStore?.id &&
+                selectedStore?.inventoryId &&
+                shipmentId
+            ) {
+                const changeStore = async () => {
+                    try {
+                        await changeStoreForPickupShipment(shipmentId, {
+                            id: selectedStore.id,
+                            inventoryId: selectedStore.inventoryId
+                        })
+                    } catch (error) {
+                        console.error('Failed to change store for pickup shipment:', error)
+                        showError()
+                    }
+                }
+                changeStore()
+            }
+        }
+    }, [storeLocatorModal.isOpen, selectedStore?.id])
+
+    // Custom handler for opening store locator from cart's "Change Store" button
+    const handleChangeStoreFromCart = (shipmentInfo) => {
+        modalOpenedFromCart.current = {
+            storeId: shipmentInfo.store?.id,
+            shipmentId: shipmentInfo.shipment?.shipmentId
+        }
+        storeLocatorModal.onOpen()
+    }
 
     /******************* Assign Default Shipping Methods to Shipments *******************/
     // Assign default shipping methods to any shipments that don't have one
@@ -782,7 +829,9 @@ const Cart = () => {
                                                     totalItemsInCart={
                                                         basket?.productItems?.length || 0
                                                     }
-                                                    onChangeStore={storeLocatorModal.onOpen}
+                                                    onChangeStore={() =>
+                                                        handleChangeStoreFromCart(shipmentInfo)
+                                                    }
                                                 />
                                             )}
                                             {/* Regular Products */}
