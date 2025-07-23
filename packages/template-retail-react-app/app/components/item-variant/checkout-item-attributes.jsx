@@ -224,4 +224,4 @@ CheckoutItemAttributes.propTypes = {
     excludeBonusLabel: PropTypes.bool
 }
 
-export default CheckoutItemAttributes 
+export default CheckoutItemAttributes

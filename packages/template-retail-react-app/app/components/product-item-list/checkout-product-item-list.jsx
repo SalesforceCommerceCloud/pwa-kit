@@ -79,4 +79,4 @@ CheckoutProductItemList.propTypes = {
     deliveryActions: PropTypes.object
 }
 
-export default CheckoutProductItemList 
+export default CheckoutProductItemList

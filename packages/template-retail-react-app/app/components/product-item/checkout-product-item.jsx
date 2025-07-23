@@ -151,4 +151,4 @@ CheckoutProductItem.propTypes = {
     })
 }
 
-export default CheckoutProductItem 
+export default CheckoutProductItem
