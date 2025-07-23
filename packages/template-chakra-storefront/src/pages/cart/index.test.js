@@ -6,7 +6,7 @@
  */
 
 import React from 'react'
-import {screen, within, fireEvent, waitFor, act} from '@testing-library/react'
+import {screen, within, waitFor, act} from '@testing-library/react'
 import {renderWithProviders} from '../../utils/test-utils'
 import Cart from '../../pages/cart/index'
 import {
@@ -25,6 +25,7 @@ import {
 import {prependHandlersToServer} from '../../../jest-setup'
 import {baskets as mockBaskets, products as mockProducts} from '../../pages/cart/cart.mock'
 
+// mock the Black Single Pleat Athletic Fit Wool Suit variationValues
 const mockProduct = {
     ...mockVariant,
     id: '750518699660M',
