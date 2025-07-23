@@ -5,9 +5,9 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
-import {Route, Switch} from 'react-router-dom'
-import {screen, act, waitFor, within} from '@testing-library/react'
-import {renderWithProviders, createPathWithDefaults, guestToken} from '../../utils/test-utils'
+import { Route, Switch } from 'react-router-dom'
+import { screen, act, waitFor, within } from '@testing-library/react'
+import { renderWithProviders, createPathWithDefaults, guestToken } from '../../utils/test-utils'
 import {
     mockOrderHistory,
     mockedGuestCustomer,
@@ -18,8 +18,8 @@ import {
 import Account from '../../pages/account/index'
 import Login from '../../pages/login'
 import mockConfig from '../../../config/mocks/mock-config'
-import {useCustomerType} from '@salesforce/commerce-sdk-react'
-import {prependHandlersToServer} from '../../../jest-setup'
+import { useCustomerType } from '@salesforce/commerce-sdk-react'
+import { prependHandlersToServer } from '../../../jest-setup'
 
 jest.setTimeout(60000)
 jest.mock('@salesforce/commerce-sdk-react', () => ({
@@ -95,16 +95,16 @@ describe('Test redirects', function () {
         ])
     })
     test('Redirects to login page if the customer is not logged in', async () => {
-        useCustomerType.mockReturnValue({isRegistered: false, isGuest: true})
+        useCustomerType.mockReturnValue({ isRegistered: false, isGuest: true })
         renderWithProviders(<MockedComponent />, {
-            wrapperProps: {siteAlias: 'uk', appConfig: mockConfig, isGuest: true}
+            wrapperProps: { siteAlias: 'uk', appConfig: mockConfig, isGuest: true }
         })
         await waitFor(() => expect(window.location.pathname).toBe(`${expectedBasePath}/login`))
     })
 })
 describe('Page Navigation', () => {
     test('works for subpages', async () => {
-        useCustomerType.mockReturnValue({isRegistered: true, isGuest: false})
+        useCustomerType.mockReturnValue({ isRegistered: true, isGuest: false })
         prependHandlersToServer([
             {
                 path: '*/products',
@@ -119,8 +119,8 @@ describe('Page Navigation', () => {
                 res: () => mockOrderHistory
             }
         ])
-        const {user} = renderWithProviders(<MockedComponent />, {
-            wrapperProps: {siteAlias: 'uk', appConfig: mockConfig}
+        const { user } = renderWithProviders(<MockedComponent />, {
+            wrapperProps: { siteAlias: 'uk', appConfig: mockConfig }
         })
         expect(await screen.findByTestId('account-page')).toBeInTheDocument()
 
@@ -142,10 +142,9 @@ describe('Page Navigation', () => {
 
 describe('Render and logs out', function () {
     test('Renders account detail page by default for logged-in customer, and can log out', async () => {
-        useCustomerType.mockReturnValue({isRegistered: true, isGuest: false})
+        useCustomerType.mockReturnValue({ isRegistered: true, isGuest: false, customerType: 'registered' })
 
-        const {user} = renderWithProviders(<MockedComponent />)
-
+        const { user } = renderWithProviders(<MockedComponent />)
         // Render user profile page
         await waitFor(() => {
             expect(window.location.pathname).toBe(`${expectedBasePath}/account`)
@@ -157,10 +156,13 @@ describe('Render and logs out', function () {
             expect(logOutIcons[0]).toHaveAttribute('aria-hidden', 'true')
             expect(logOutIcons[1]).toHaveAttribute('aria-hidden', 'true')
         })
+        useCustomerType.mockReturnValue({ isRegistered: false, isGuest: true, customerType: 'guest' })
 
         await act(async () => {
             await user.click(screen.getAllByText(/Log Out/)[0])
         })
+
+
 
         // Check that logout redirects to login page
         await waitFor(() => {
@@ -172,7 +174,7 @@ describe('Render and logs out', function () {
 
 describe('updating profile', function () {
     beforeEach(() => {
-        useCustomerType.mockReturnValue({isRegistered: true, isExternal: false})
+        useCustomerType.mockReturnValue({ isRegistered: true, isExternal: false })
         prependHandlersToServer([
             {
                 path: '*/customers/:customerId',
@@ -186,8 +188,8 @@ describe('updating profile', function () {
         ])
     })
     test('Allows customer to edit profile details', async () => {
-        useCustomerType.mockReturnValue({isRegistered: true, isExternal: false})
-        const {user} = renderWithProviders(<MockedComponent />)
+        useCustomerType.mockReturnValue({ isRegistered: true, isExternal: false })
+        const { user } = renderWithProviders(<MockedComponent />)
         expect(await screen.findByTestId('account-page')).toBeInTheDocument()
         expect(await screen.findByTestId('account-detail-page')).toBeInTheDocument()
         await waitFor(() => {
@@ -213,9 +215,9 @@ describe('updating profile', function () {
     })
 })
 
-describe.skip('updating password', function () {
+describe('updating password', function () {
     beforeEach(() => {
-        useCustomerType.mockReturnValue({isRegistered: true, isExternal: false})
+        useCustomerType.mockReturnValue({ isRegistered: true, isExternal: false })
         prependHandlersToServer([
             {
                 path: '*/oauth2/token',
@@ -233,19 +235,20 @@ describe.skip('updating password', function () {
         ])
     })
     test('Password update form is rendered correctly', async () => {
-        const {user} = renderWithProviders(<MockedComponent />)
+        const { user } = renderWithProviders(<MockedComponent />)
         expect(await screen.findByTestId('account-page')).toBeInTheDocument()
         expect(await screen.findByTestId('account-detail-page')).toBeInTheDocument()
 
         const el = within(screen.getByTestId('sf-toggle-card-password'))
-        await user.click(el.getByText(/edit/i))
+        await act(async () => {
+            await user.click(el.getByText(/edit/i))
+        })
 
         expect(el.getByLabelText(/current password/i)).toBeInTheDocument()
         expect(el.getByLabelText(/new password/i)).toBeInTheDocument()
         expect(el.getByText(/forgot password/i)).toBeInTheDocument()
     })
 
-    // TODO: Fix test
     test('Allows customer to update password', async () => {
         prependHandlersToServer([
             {
@@ -256,16 +259,22 @@ describe.skip('updating password', function () {
             }
         ])
 
-        const {user} = renderWithProviders(<MockedComponent />)
+        const { user } = renderWithProviders(<MockedComponent />)
 
         const el = within(screen.getByTestId('sf-toggle-card-password'))
-        await user.click(el.getByText(/edit/i))
-        await user.type(el.getByLabelText(/current password/i), 'Password!12345')
-        await user.type(el.getByLabelText(/new password/i), 'Password!98765')
-        await user.click(el.getByText(/Forgot password/i))
-        await user.click(el.getByText(/save/i))
+        await act(async () => {
+            await user.click(el.getByText(/edit/i))
+        })
 
-        // expect(await screen.findByText('••••••••')).toBeInTheDocument()
+        await act(async () => {
+            await user.type(el.getByLabelText(/current password/i), 'Password!12345')
+            await user.type(el.getByLabelText(/new password/i), 'Password!98765')
+        })
+        await act(async () => {
+            await user.click(el.getByText(/Forgot password/i))
+            await user.click(el.getByText(/save/i))
+        })
+        expect(await screen.findByText('••••••••')).toBeInTheDocument()
     })
 
     test('Warns customer when updating password with invalid current password', async () => {
@@ -278,14 +287,21 @@ describe.skip('updating password', function () {
             }
         ])
 
-        const {user} = renderWithProviders(<MockedComponent />)
+        const { user } = renderWithProviders(<MockedComponent />)
 
         const el = within(screen.getByTestId('sf-toggle-card-password'))
-        await user.click(el.getByText(/edit/i))
-        await user.type(el.getByLabelText(/current password/i), 'Password!123456')
-        await user.type(el.getByLabelText(/new password/i), 'Password!98765')
-        await user.click(el.getByText(/Forgot password/i))
-        await user.click(el.getByText(/save/i))
+        await act(async () => {
+            await user.click(el.getByText(/edit/i))
+        })
+        await act(async () => {
+            await user.type(el.getByLabelText(/current password/i), 'Password!123456')
+            await user.type(el.getByLabelText(/new password/i), 'Password!98765')
+        })
+
+        await act(async () => {
+            await user.click(el.getByText(/Forgot password/i))
+            await user.click(el.getByText(/save/i))
+        })
 
         expect(await screen.findByTestId('password-update-error')).toBeInTheDocument()
     })
