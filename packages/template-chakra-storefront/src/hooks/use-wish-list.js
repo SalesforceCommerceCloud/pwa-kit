@@ -26,6 +26,20 @@ import {normalizeProductId} from '../utils/utils'
 
 const onClient = typeof window !== 'undefined'
 
+/**
+ * A hook for managing a customer's wish list.
+ *
+ * This hook provides state and actions for managing a wish list. It fetches the customer's
+ * product lists and identifies the wish list. If no wish list exists, it creates one.
+ * By default, it uses the first wish list found for the customer.
+ *
+ * The returned object also includes all the query states from `useCustomerProductLists`,
+ * such as `isLoading`, `isError`, etc.
+ *
+ * @param {object} [options]
+ * @param {string} [options.listId] - The ID of a specific wish list to use. If not provided, the first found wish list is used.
+ * @returns {object} An object containing the wish list data and actions.
+ */
 export const useWishList = ({listId = ''} = {}) => {
     const {formatMessage} = useIntl()
     const navigate = useNavigation()
