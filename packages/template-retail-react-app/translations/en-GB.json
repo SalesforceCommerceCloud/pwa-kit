@@ -1478,9 +1478,6 @@
   "shipping_address_selection.title.edit_shipping": {
     "defaultMessage": "Edit Shipping Address"
   },
-  "shipping_multi_address.actions.region": {
-    "defaultMessage": "Checkout actions"
-  },
   "shipping_multi_address.error.label": {
     "defaultMessage": "Error loading products"
   },

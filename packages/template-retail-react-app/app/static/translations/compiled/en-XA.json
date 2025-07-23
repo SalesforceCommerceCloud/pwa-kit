@@ -7417,20 +7417,6 @@
       "value": "]"
     }
   ],
-  "shipping_multi_address.actions.region": [
-    {
-      "type": 0,
-      "value": "["
-    },
-    {
-      "type": 0,
-      "value": "Ƈħḗḗƈķǿǿŭŭŧ ȧȧƈŧīǿǿƞş"
-    },
-    {
-      "type": 0,
-      "value": "]"
-    }
-  ],
   "shipping_multi_address.error.label": [
     {
       "type": 0,

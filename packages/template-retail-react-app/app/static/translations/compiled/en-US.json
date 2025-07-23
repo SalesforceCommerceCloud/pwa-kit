@@ -3513,12 +3513,6 @@
       "value": "Edit Shipping Address"
     }
   ],
-  "shipping_multi_address.actions.region": [
-    {
-      "type": 0,
-      "value": "Checkout actions"
-    }
-  ],
   "shipping_multi_address.error.label": [
     {
       "type": 0,

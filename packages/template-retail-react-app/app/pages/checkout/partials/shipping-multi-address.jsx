@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React, {useState, useRef, useEffect} from 'react'
+import React, {useState} from 'react'
 import {useIntl, defineMessage} from 'react-intl'
 import PropTypes from 'prop-types'
 import {useForm} from 'react-hook-form'
@@ -18,7 +18,6 @@ import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-cur
 import {useCurrency} from '@salesforce/retail-react-app/app/hooks'
 import ItemVariantProvider from '@salesforce/retail-react-app/app/components/item-variant'
 import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
-import {ADD_NEW_ADDRESS_OPTION} from '@salesforce/retail-react-app/app/constants'
 
 import AddressFields from '@salesforce/retail-react-app/app/components/forms/address-fields'
 import FormActionButtons from '@salesforce/retail-react-app/app/components/forms/form-action-buttons'
@@ -40,7 +39,6 @@ import {
     AlertDescription,
     Center,
     Spinner,
-    Container,
     Stack
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 
@@ -91,7 +89,7 @@ MultiShippingItemAttributes.propTypes = {
 }
 
 // Address form component - receives form as prop from parent
-const AddressForm = ({item, index, form, onSubmit, onCancel}) => {
+const AddressForm = ({item, form, onSubmit, onCancel}) => {
     const saveButtonLabel = defineMessage({
         defaultMessage: 'Save',
         id: 'shipping_address_form.button.save'
@@ -101,7 +99,7 @@ const AddressForm = ({item, index, form, onSubmit, onCancel}) => {
             {form.formState.isSubmitting && <LoadingSpinner />}
             <form
                 onSubmit={form.handleSubmit(async (data) => {
-                    await onSubmit(data, item.productId, index, form, item.itemId)
+                    await onSubmit(data, form, item.itemId)
                 })}
             >
                 <Stack spacing={6} width="100%">
@@ -123,7 +121,6 @@ const AddressForm = ({item, index, form, onSubmit, onCancel}) => {
 
 AddressForm.propTypes = {
     item: PropTypes.object.isRequired,
-    index: PropTypes.number.isRequired,
     form: PropTypes.object.isRequired,
     onSubmit: PropTypes.func.isRequired,
     onCancel: PropTypes.func.isRequired
@@ -139,6 +136,7 @@ const ShippingMultiAddress = ({
 }) => {
     const {formatMessage} = useIntl()
     const {currency} = useCurrency()
+    const ADD_NEW_ADDRESS_OPTION_VALUE = 'add-new-address'
     const productIds = basket?.productItems?.map((item) => item.productId).join(',')
     const {
         data: productsMap,
@@ -161,8 +159,6 @@ const ShippingMultiAddress = ({
     const {data: customer, refetch: refetchCustomer} = useCurrentCustomer()
     const addresses = customer?.addresses || []
     const [selectedAddresses, setSelectedAddresses] = useState({})
-    const [openDropdown, setOpenDropdown] = useState(null)
-    const dropdownRefs = useRef({})
 
     // Add address form state - track which product card is showing the add address form
     const [showAddAddressForm, setShowAddAddressForm] = useState({}) // productId-index -> boolean
@@ -188,22 +184,7 @@ const ShippingMultiAddress = ({
 
     // Calculate if button should be disabled
     const openForms = Object.keys(showAddAddressForm).filter((key) => showAddAddressForm[key])
-
-    // Button is disabled when any address form is open
-    const isButtonDisabled = openForms.length > 0
-
-    useEffect(() => {
-        function handleClickOutside(event) {
-            if (openDropdown !== null) {
-                const ref = dropdownRefs.current[openDropdown]
-                if (ref && !ref.contains(event.target)) {
-                    setOpenDropdown(null)
-                }
-            }
-        }
-        document.addEventListener('mousedown', handleClickOutside)
-        return () => document.removeEventListener('mousedown', handleClickOutside)
-    }, [openDropdown])
+    const isAddressFormOpen = openForms.length > 0
 
     if (!basket?.productItems?.length) {
         return (
@@ -272,7 +253,7 @@ const ShippingMultiAddress = ({
     }
 
     // Handle address creation
-    const handleCreateAddress = async (addressData, productId, index, form, itemId) => {
+    const handleCreateAddress = async (addressData, form, itemId) => {
         // itemId is unique for each basket item and always present
         const addressKey = itemId
 
@@ -334,7 +315,7 @@ const ShippingMultiAddress = ({
                     w="100%"
                 >
                     <VStack spacing={2} w="100%" h="100%">
-                        {basket.productItems.map((item, index) => {
+                        {basket.productItems.map((item) => {
                             const productDetail = productsMap?.[item.productId] || {}
                             const variant = {...item, ...productDetail}
                             const image = findImageGroupBy(productDetail.imageGroups, {
@@ -452,13 +433,15 @@ const ShippingMultiAddress = ({
                                                 <Select
                                                     value={
                                                         showAddAddressForm[addressKey]
-                                                            ? ADD_NEW_ADDRESS_OPTION
+                                                            ? ADD_NEW_ADDRESS_OPTION_VALUE
                                                             : selectedAddressId || ''
                                                     }
                                                     onChange={(e) => {
                                                         const value = e.target.value
 
-                                                        if (value === ADD_NEW_ADDRESS_OPTION) {
+                                                        if (
+                                                            value === ADD_NEW_ADDRESS_OPTION_VALUE
+                                                        ) {
                                                             // Show the address form when "Add New Address" is selected
                                                             setShowAddAddressForm((prev) => ({
                                                                 ...prev,
@@ -507,7 +490,7 @@ const ShippingMultiAddress = ({
                                                             )}
                                                         </option>
                                                     ))}
-                                                    <option value={ADD_NEW_ADDRESS_OPTION}>
+                                                    <option value={ADD_NEW_ADDRESS_OPTION_VALUE}>
                                                         + {formatMessage(addNewAddressLabel)}
                                                     </option>
                                                 </Select>
@@ -534,7 +517,6 @@ const ShippingMultiAddress = ({
                                         <Box position="relative" mt={4} width="100%">
                                             <AddressForm
                                                 item={item}
-                                                index={index}
                                                 form={addressForm}
                                                 onSubmit={handleCreateAddress}
                                                 onCancel={() => {
@@ -553,56 +535,44 @@ const ShippingMultiAddress = ({
                         })}
                     </VStack>
                 </Box>
-                <Box
-                    pt={2}
-                    w="100%"
-                    role="region"
-                    aria-label={formatMessage({
-                        id: 'shipping_multi_address.actions.region',
-                        defaultMessage: 'Checkout actions'
+                <Button
+                    type="button"
+                    width="full"
+                    mt={2}
+                    isLoading={addressForm.formState.isSubmitting}
+                    {...(isAddressFormOpen && {disabled: true, 'data-disabled': true})}
+                    data-testid="continue-to-shipping-button"
+                    loadingText={formatMessage({
+                        id: 'shipping_multi_address.submit.loading',
+                        defaultMessage: 'Saving address...'
                     })}
-                >
-                    <Container variant="form">
-                        <Button
-                            type="button"
-                            width="full"
-                            isLoading={addressForm.formState.isSubmitting}
-                            {...(isButtonDisabled && {disabled: true, 'data-disabled': true})}
-                            data-testid="continue-to-shipping-button"
-                            loadingText={formatMessage({
-                                id: 'shipping_multi_address.submit.loading',
-                                defaultMessage: 'Saving address...'
-                            })}
-                            aria-label={formatMessage({
-                                id: 'shipping_multi_address.submit.description',
-                                defaultMessage:
-                                    'Continue to next step with selected delivery addresses'
-                            })}
-                            onClick={async () => {
-                                // Prevent click if button is disabled
-                                if (isButtonDisabled) {
-                                    return
-                                }
+                    aria-label={formatMessage({
+                        id: 'shipping_multi_address.submit.description',
+                        defaultMessage: 'Continue to next step with selected delivery addresses'
+                    })}
+                    onClick={async () => {
+                        // Prevent click if button is disabled
+                        if (isAddressFormOpen) {
+                            return
+                        }
 
-                                try {
-                                    // Now proceed with the checkout
-                                    onSubmit()
-                                } catch (error) {
-                                    console.error('Error during submission:', error)
-                                    showToast({
-                                        title: formatMessage({
-                                            id: 'shipping_multi_address.error.submission_failed',
-                                            defaultMessage: 'Failed to proceed with checkout'
-                                        }),
-                                        status: 'error'
-                                    })
-                                }
-                            }}
-                        >
-                            {formatMessage(submitButtonLabel)}
-                        </Button>
-                    </Container>
-                </Box>
+                        try {
+                            // Now proceed with the checkout
+                            onSubmit()
+                        } catch (error) {
+                            console.error('Error during submission:', error)
+                            showToast({
+                                title: formatMessage({
+                                    id: 'shipping_multi_address.error.submission_failed',
+                                    defaultMessage: 'Failed to proceed with checkout'
+                                }),
+                                status: 'error'
+                            })
+                        }
+                    }}
+                >
+                    {formatMessage(submitButtonLabel)}
+                </Button>
             </VStack>
         </Box>
     )
