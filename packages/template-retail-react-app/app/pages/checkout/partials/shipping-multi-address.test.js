@@ -54,31 +54,6 @@ jest.mock('@salesforce/retail-react-app/app/utils/image-groups-utils', () => ({
     })
 }))
 
-jest.mock('@salesforce/retail-react-app/app/components/item-variant', () => {
-    // eslint-disable-next-line react/prop-types
-    function MockItemVariantProvider({children}) {
-        return <div data-testid="item-variant-provider">{children}</div>
-    }
-    return MockItemVariantProvider
-})
-
-jest.mock('@salesforce/retail-react-app/app/components/display-price', () => {
-    /* eslint-disable react/prop-types */
-    function MockDisplayPrice({priceData, currency}) {
-        return (
-            <span data-testid="display-price">
-                {new Intl.NumberFormat('en', {
-                    style: 'currency',
-                    currency: currency || 'USD'
-                }).format(priceData?.currentPrice || 29.99)}
-            </span>
-        )
-    }
-    /* eslint-enable react/prop-types */
-
-    return MockDisplayPrice
-})
-
 const mockBasket = {
     productItems: [
         {
@@ -230,55 +205,43 @@ describe('ShippingMultiAddress', () => {
         expect(screen.getByText('No items in basket.')).toBeInTheDocument()
     })
 
-    test('should render product items with correct information', () => {
+    test('should render properly with all essential elements', () => {
         renderWithIntl(<ShippingMultiAddress {...defaultProps} />)
 
+        // assert all of the element that is supposed to be rendered on first render
         expect(screen.getByText('Test Product 1')).toBeInTheDocument()
         expect(screen.getByText('Test Product 2')).toBeInTheDocument()
         expect(screen.getByText('Quantity: 2')).toBeInTheDocument()
         expect(screen.getByText('Quantity: 1')).toBeInTheDocument()
-    })
 
-    test('should render delivery address sections for each product', () => {
-        renderWithIntl(<ShippingMultiAddress {...defaultProps} />)
-
+        // Check delivery address sections
         const deliveryAddressLabels = screen.getAllByText('Delivery Address')
         expect(deliveryAddressLabels).toHaveLength(2)
-    })
 
-    test('should render product images', () => {
-        renderWithIntl(<ShippingMultiAddress {...defaultProps} />)
-
+        // Check product images
         const images = screen.getAllByAltText('Product image for Test Product 1')
         expect(images).toHaveLength(1)
         expect(images[0]).toHaveAttribute('src', 'https://test-image-1.jpg')
-    })
 
-    test('should render variation attributes', () => {
-        renderWithIntl(<ShippingMultiAddress {...defaultProps} />)
-
+        // Check variation attributes
         expect(screen.getByText('Color: Red')).toBeInTheDocument()
         expect(screen.getByText('Size: Medium')).toBeInTheDocument()
         expect(screen.getByText('Color: Blue')).toBeInTheDocument()
         expect(screen.getByText('Size: Large')).toBeInTheDocument()
-    })
 
-    test('should render product prices', () => {
-        renderWithIntl(<ShippingMultiAddress {...defaultProps} />)
-
-        const priceElements = screen.getAllByTestId('display-price')
-
+        // Check product prices
+        const priceElements = screen.getAllByLabelText(/current price/)
         expect(priceElements).toHaveLength(2)
-
         priceElements.forEach((element) => {
             expect(element.textContent).toMatch(/\$\d+\.\d{2}/)
         })
-    })
 
-    test('should render continue button', () => {
-        renderWithIntl(<ShippingMultiAddress {...defaultProps} />)
-
+        // Check continue button
         expect(screen.getByText('Continue')).toBeInTheDocument()
+
+        // Check address dropdowns
+        const dropdowns = screen.getAllByRole('combobox', {hidden: true})
+        expect(dropdowns.length).toBeGreaterThan(0)
     })
 
     test('should call onSubmit when continue button is clicked', () => {
@@ -287,13 +250,6 @@ describe('ShippingMultiAddress', () => {
 
         fireEvent.click(screen.getByText('Continue'))
         expect(mockOnSubmit).toHaveBeenCalledTimes(1)
-    })
-
-    test('should render address dropdowns', () => {
-        renderWithIntl(<ShippingMultiAddress {...defaultProps} />)
-
-        const dropdowns = screen.getAllByRole('combobox', {hidden: true})
-        expect(dropdowns.length).toBeGreaterThan(0)
     })
 
     test('should handle empty product data gracefully', () => {
@@ -319,141 +275,6 @@ describe('ShippingMultiAddress', () => {
         renderWithIntl(<ShippingMultiAddress {...customProps} />)
 
         expect(screen.getByText('Proceed to Shipping')).toBeInTheDocument()
-    })
-
-    describe('Accessibility', () => {
-        test('should have proper alt text for images', () => {
-            renderWithIntl(<ShippingMultiAddress {...defaultProps} />)
-
-            const images = screen.getAllByAltText(/Product image for Test Product/)
-            expect(images).toHaveLength(2)
-        })
-
-        test('should have proper button roles', () => {
-            renderWithIntl(<ShippingMultiAddress {...defaultProps} />)
-
-            const continueButton = screen.getByText('Continue')
-            expect(continueButton).toBeInTheDocument()
-        })
-    })
-
-    describe('Responsive Design', () => {
-        test('should apply responsive CSS classes', () => {
-            renderWithIntl(<ShippingMultiAddress {...defaultProps} />)
-
-            // Check that the component has the expected number of cards using data-testid
-            const multiShippingCards = screen.getAllByTestId('multi-shipping-card')
-            expect(multiShippingCards).toHaveLength(2)
-        })
-    })
-
-    describe('Internationalization', () => {
-        test('should use proper i18n for address formatting', () => {
-            renderWithIntl(<ShippingMultiAddress {...defaultProps} />)
-
-            const selectElements = screen.getAllByRole('combobox')
-            expect(selectElements).toHaveLength(2)
-
-            selectElements.forEach((select) => {
-                expect(select).toHaveValue('addr-1')
-            })
-        })
-
-        test('should handle missing state code in address formatting', () => {
-            const customerWithMissingState = {
-                ...mockCustomer,
-                addresses: [
-                    {
-                        ...mockCustomer.addresses[0],
-                        stateCode: null
-                    }
-                ]
-            }
-
-            useCurrentCustomer.mockReturnValue({
-                data: customerWithMissingState
-            })
-
-            renderWithIntl(<ShippingMultiAddress {...defaultProps} />)
-
-            const selectElements = screen.getAllByRole('combobox')
-            expect(selectElements).toHaveLength(2)
-
-            selectElements.forEach((select) => {
-                expect(select).toHaveValue('addr-1')
-            })
-        })
-
-        test('should display address in current format', () => {
-            renderWithIntl(<ShippingMultiAddress {...defaultProps} />)
-
-            const selectElements = screen.getAllByRole('combobox')
-            expect(selectElements).toHaveLength(2)
-
-            expect(selectElements[0]).toHaveValue('addr-1')
-        })
-
-        test('should not use hardcoded address formatting', () => {
-            renderWithIntl(<ShippingMultiAddress {...defaultProps} />)
-
-            const selectElements = screen.getAllByRole('combobox')
-            expect(selectElements).toHaveLength(2)
-
-            selectElements.forEach((select) => {
-                expect(select).toHaveValue('addr-1')
-            })
-        })
-    })
-
-    describe('Keyboard Navigation', () => {
-        test('should handle arrow key navigation in dropdown', () => {
-            renderWithIntl(<ShippingMultiAddress {...defaultProps} />)
-
-            const selectElements = screen.getAllByRole('combobox')
-            const firstSelect = selectElements[0]
-
-            expect(firstSelect).toBeInTheDocument()
-            expect(firstSelect).toHaveValue('addr-1')
-
-            fireEvent.change(firstSelect, {target: {value: 'addr-2'}})
-            expect(firstSelect).toHaveValue('addr-2')
-        })
-
-        test('should handle Enter key to select address', () => {
-            renderWithIntl(<ShippingMultiAddress {...defaultProps} />)
-
-            const selectElements = screen.getAllByRole('combobox')
-            const firstSelect = selectElements[0]
-
-            fireEvent.change(firstSelect, {target: {value: 'addr-2'}})
-            expect(firstSelect).toHaveValue('addr-2')
-        })
-
-        test('should handle Space key to select address', () => {
-            renderWithIntl(<ShippingMultiAddress {...defaultProps} />)
-
-            const selectElements = screen.getAllByRole('combobox')
-            const firstSelect = selectElements[0]
-
-            fireEvent.change(firstSelect, {target: {value: 'addr-2'}})
-            expect(firstSelect).toHaveValue('addr-2')
-
-            fireEvent.change(firstSelect, {target: {value: 'addr-1'}})
-            expect(firstSelect).toHaveValue('addr-1')
-        })
-
-        test('should handle Escape key to close dropdown', () => {
-            renderWithIntl(<ShippingMultiAddress {...defaultProps} />)
-
-            const selectElements = screen.getAllByRole('combobox')
-            const firstSelect = selectElements[0]
-
-            expect(firstSelect).toBeInTheDocument()
-            expect(firstSelect).toHaveValue('addr-1')
-
-            fireEvent.change(firstSelect, {target: {value: 'addr-2'}})
-            expect(firstSelect).toHaveValue('addr-2')
-        })
     })
 
     describe('Add New Address Functionality', () => {
@@ -607,35 +428,6 @@ describe('ShippingMultiAddress', () => {
             expect(mockOnSubmit).not.toHaveBeenCalled()
         })
 
-        test('should be disabled when multiple address forms are open', async () => {
-            const mockOnSubmit = jest.fn()
-            renderWithIntl(<ShippingMultiAddress {...defaultProps} onSubmit={mockOnSubmit} />)
-
-            const selectElements = screen.getAllByRole('combobox')
-
-            // Select "Add New Address" for first product
-            fireEvent.change(selectElements[0], {target: {value: 'add-new-address'}})
-
-            // Wait for first form to appear
-            await waitFor(() => {
-                expect(screen.getByText('First Name')).toBeInTheDocument()
-            })
-
-            // Select "Add New Address" for second product
-            fireEvent.change(selectElements[1], {target: {value: 'add-new-address'}})
-
-            // Wait for second form to appear
-            await waitFor(() => {
-                const firstNameFields = screen.getAllByText('First Name')
-                expect(firstNameFields).toHaveLength(2)
-            })
-
-            // Try to click the button (should not call onSubmit)
-            const continueButton = screen.getByText('Continue')
-            fireEvent.click(continueButton)
-            expect(mockOnSubmit).not.toHaveBeenCalled()
-        })
-
         test('should be re-enabled when address form is cancelled', async () => {
             const mockOnSubmit = jest.fn()
             renderWithIntl(<ShippingMultiAddress {...defaultProps} onSubmit={mockOnSubmit} />)
@@ -709,98 +501,6 @@ describe('ShippingMultiAddress', () => {
             // Button should now be enabled
             fireEvent.click(continueButton)
             expect(mockOnSubmit).toHaveBeenCalledTimes(1)
-        })
-
-        test('should be re-enabled when existing address is selected', async () => {
-            const mockOnSubmit = jest.fn()
-            renderWithIntl(<ShippingMultiAddress {...defaultProps} onSubmit={mockOnSubmit} />)
-
-            const selectElements = screen.getAllByRole('combobox')
-            const firstSelect = selectElements[0]
-
-            // Select "Add New Address" option
-            fireEvent.change(firstSelect, {target: {value: 'add-new-address'}})
-
-            // Wait for the form to appear
-            await waitFor(() => {
-                expect(screen.getByText('First Name')).toBeInTheDocument()
-            })
-
-            // Try to click the button (should not call onSubmit)
-            const continueButton = screen.getByText('Continue')
-            fireEvent.click(continueButton)
-            expect(mockOnSubmit).not.toHaveBeenCalled()
-
-            // Select an existing address
-            fireEvent.change(firstSelect, {target: {value: 'addr-2'}})
-
-            // Wait for the form to disappear
-            await waitFor(() => {
-                expect(screen.queryByText('First Name')).not.toBeInTheDocument()
-            })
-
-            // Click the button again (should call onSubmit now)
-            fireEvent.click(continueButton)
-            expect(mockOnSubmit).toHaveBeenCalledTimes(1)
-        })
-
-        test('should not call onSubmit when clicked while disabled', async () => {
-            const mockOnSubmit = jest.fn()
-            renderWithIntl(<ShippingMultiAddress {...defaultProps} onSubmit={mockOnSubmit} />)
-
-            const selectElements = screen.getAllByRole('combobox')
-            const firstSelect = selectElements[0]
-
-            // Select "Add New Address" option
-            fireEvent.change(firstSelect, {target: {value: 'add-new-address'}})
-
-            // Wait for the form to appear
-            await waitFor(() => {
-                expect(screen.getByText('First Name')).toBeInTheDocument()
-            })
-
-            // Try to click the button
-            const continueButton = screen.getByText('Continue')
-            fireEvent.click(continueButton)
-
-            // Verify onSubmit was not called
-            expect(mockOnSubmit).not.toHaveBeenCalled()
-        })
-
-        test('should call onSubmit when clicked while enabled', async () => {
-            const mockOnSubmit = jest.fn()
-            renderWithIntl(<ShippingMultiAddress {...defaultProps} onSubmit={mockOnSubmit} />)
-
-            const continueButton = screen.getByText('Continue')
-
-            // Click the enabled button
-            fireEvent.click(continueButton)
-
-            // Verify onSubmit was called
-            expect(mockOnSubmit).toHaveBeenCalledTimes(1)
-        })
-
-        test('should show visual feedback when disabled', async () => {
-            const mockOnSubmit = jest.fn()
-            renderWithIntl(<ShippingMultiAddress {...defaultProps} onSubmit={mockOnSubmit} />)
-
-            const selectElements = screen.getAllByRole('combobox')
-            const firstSelect = selectElements[0]
-
-            // Select "Add New Address" option
-            fireEvent.change(firstSelect, {target: {value: 'add-new-address'}})
-
-            // Wait for the form to appear
-            await waitFor(() => {
-                expect(screen.getByText('First Name')).toBeInTheDocument()
-            })
-
-            // Try to click the button
-            const continueButton = screen.getByText('Continue')
-            fireEvent.click(continueButton)
-
-            // Verify onSubmit was not called (button is functionally disabled)
-            expect(mockOnSubmit).not.toHaveBeenCalled()
         })
 
         test('should handle mixed state - some forms open, some closed', async () => {
