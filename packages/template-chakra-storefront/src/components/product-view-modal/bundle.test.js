@@ -209,6 +209,15 @@ test('bundle product view modal disables update button when quantity exceeds chi
         expect(swingTankProductView).toBeInTheDocument()
         expect(sizeSelectBtn).toBeInTheDocument()
         expect(quantityInput).toBeInTheDocument()
+    })
+
+    // First select the size to make the button enabled
+    await act(async () => {
+        fireEvent.click(sizeSelectBtn)
+    })
+
+    await waitFor(() => {
+        expect(within(swingTankProductView).getAllByText('L')).toHaveLength(2)
         expect(updateBtn).toBeEnabled()
     })
 
@@ -216,8 +225,6 @@ test('bundle product view modal disables update button when quantity exceeds chi
         // Set product bundle quantity selection to 4
         fireEvent.change(quantityInput, {target: {value: '4'}})
         fireEvent.keyDown(quantityInput, {key: 'Enter', code: 'Enter', charCode: 13})
-
-        fireEvent.click(sizeSelectBtn)
     })
 
     await waitFor(() => {
