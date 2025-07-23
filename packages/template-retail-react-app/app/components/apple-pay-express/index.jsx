@@ -92,13 +92,15 @@ export const getAppleButtonConfig = (
     tempBasket = null,
     isPdpMode = false
 ) => {
-    // Use temporary basket if available, otherwise use main basket
-    const currentBasket = tempBasket || basket
+    // For PDP mode, prioritize temporary basket creation over existing basket
+    // For regular mode, use existing basket
+    const currentBasket = isPdpMode ? tempBasket : (tempBasket || basket)
     let applePayAmount = currentBasket?.orderTotal || 0
     
     // Shared basket reference to prevent multiple basket creation
     // This will be updated by callbacks and shared across all Apple Pay events
-    let sharedBasketRef = currentBasket
+    // In PDP mode, start with null/tempBasket to force temporary basket creation
+    let sharedBasketRef = isPdpMode ? tempBasket : currentBasket
     
     // Helper function to get or create basket (prevents multiple creation)
     const getOrCreateBasket = async () => {
