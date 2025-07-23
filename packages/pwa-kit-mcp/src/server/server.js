@@ -29,7 +29,7 @@ class PwaStorefrontMCPServerHighLevel {
         // Using McpServer instead of Server
         this.server = new McpServer(
             {
-                name: 'pwa-storefront-mcp-server',
+                name: 'pwa-kit-mcp',
                 version: packageJson?.version || FALLBACK_VERSION
             },
             {
