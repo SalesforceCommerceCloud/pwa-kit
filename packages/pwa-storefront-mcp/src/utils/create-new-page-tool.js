@@ -13,8 +13,9 @@ const systemPromptForCreatePage =
         `You are a smart assistant that can use tools when needed. \
         Please ask the user to provide following information **one at a time**, in a natural and conversational way. \
         Do **not** ask all the questions at once. \
-        - What is the name of the new page to create? \
-        - With page name specified, what is the layout type (e.g., grid, flex, list) of the new page? \
+        Do **not** assume all paramaters are present and automatically create a new page, always ask the user to provide the information one at a time. \
+        **Always** map the user's answer to the tool's input parameters one by one. \
+        - What is the name of the new page to create? (The name will be used exactly as provided, without corrections) \
         - List the components to include on the page, separated by commas (e.g., AddressDisplay, ProductView) \
         - What is the URL route for this page? (e.g., /new-home, /my-products) \
         Collect answers to these questions, then call the tool with the collected information as input parameters. `;
@@ -36,10 +37,9 @@ const systemPromptForUnfoundComponents = (unfoundComponents) =>
 class CreateNewPageTool {
     constructor() {
         this.name = 'create_sample_storefront_page';
-        this.description = 'Create a sample PWA storefront page. Gather information from user for the MCP tool parameters **one at a time**, in a natural and conversational way. Do **not** ask all the questions at once.';
+        this.description = 'Create a sample PWA storefront page. Gather information from user for the MCP tool parameters **one at a time**, in a natural and conversational way. Do **not** ask all the questions at once. Do **not** assume all pramaters are present and automatically create new pages, always ask the user to provide the information one at a time.';
         this.inputSchema = {
-            pageName: z.string().describe('Tthe name of the new page to create?'),
-            layout: z.string().optional().describe('The layout type (e.g., flex, grid, list) of the new page?'),
+            pageName: z.string().describe('The name of the new page to create?'),
             componentList: z.array(z.string()).describe('The existing components to include on the page, separated by commas (e.g., AddressDisplay, ProductView, Footer)'),
             route: z.string().describe('The URL route for this page? (e.g., /new-home, /my-product-view)')
         };
@@ -47,20 +47,22 @@ class CreateNewPageTool {
 
         this.handler = async (args) => {
             logMCPMessage(`------- Calling CreateNewPageTool handler`)
-            if (!args || !args.pageName || !args.layout || !args.componentList || !args.route) {
+            // This is to ensure that the tool discards any previous state and starts fresh.
+            args = {}
+            if (!args || !args.pageName || !args.componentList || !args.route) {
                 return {
                     role: 'system',
                     content: [{ type: 'text', text: systemPromptForCreatePage }]
                 };
             }
-            return this.createPage(args.pageName, args.layout, args.componentList, args.route);
+            return this.createPage(args.pageName, args.componentList, args.route);
         };
     }
 
-    async createPage(pageName, layout = 'flex', componentList, route) {
-        logMCPMessage(`========== Creating page ${pageName} with layout ${layout} and components ${componentList} and route ${route}`);
+    async createPage(pageName, componentList, route) {
+        logMCPMessage(`========== Creating page ${pageName} with layout 'flex' and components ${componentList} and route ${route}`);
         this.unfoundComponents = [];
-        await logMCPMessage(`Creating page ${pageName} with layout ${layout} and components ${componentList} and route ${route}`);
+        await logMCPMessage(`Creating page ${pageName} with layout 'flex' and components ${componentList} and route ${route}`);
 
         try {
             const messages = [];
@@ -77,7 +79,7 @@ class CreateNewPageTool {
             if (componentList.length == 0) {
                 componentList.push(pageName);
             }
-            const pageContent = await this.generatePageContent(pageName, layout, componentList);
+            const pageContent = await this.generatePageContent(pageName, componentList);
             logMCPMessage(`!!!!!! \n pageContent: ${pageContent} \n !!!!!`);
             const indexPath = path.join(pageDir, 'index.jsx');
             await fs.writeFile(indexPath, pageContent, 'utf8');
@@ -107,7 +109,7 @@ class CreateNewPageTool {
         }   
     }
 
-    generatePageContent(pageName, layout, componentList) {
+    generatePageContent(pageName, componentList) {
         const imports = [
             `import React from 'react'`,
             `import {useIntl} from 'react-intl'`,
@@ -136,10 +138,6 @@ class CreateNewPageTool {
 
         return Promise.all(accessPromises).then(() => {
             logMCPMessage(`?????? imports ${imports.join('\n')}`);
-
-            const layoutStyle = layout === 'flex' ? 'display="flex"' : 
-                               layout === 'grid' ? 'display="grid"' : '';
-
             const componentJsx = componentList.map(component => {
                 const componentName = component.charAt(0).toUpperCase() + component.slice(1);
                 return `                <${componentName} />`;
@@ -162,7 +160,7 @@ const ${pageName} = () => {
     const intl = useIntl();
 
     return (
-        <Box data-testid="${pageName.toLowerCase()}-page" layerStyle="page" ${layoutStyle}>
+        <Box data-testid="${pageName.toLowerCase()}-page" layerStyle="page" display="flex">
             <Seo
                 title="${pageName}"
                 description="${pageName} Page"

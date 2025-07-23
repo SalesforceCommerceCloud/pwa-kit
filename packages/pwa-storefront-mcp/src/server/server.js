@@ -10,7 +10,6 @@ import {StdioServerTransport} from '@modelcontextprotocol/sdk/server/stdio.js'
 
 import {z} from 'zod'
 import {CreateAppGuidelinesTool, CreateNewComponentTool, DeveloperGuidelinesTool, CreateNewPageTool} from '../utils'
-import {logMCPMessage} from '../utils/utils'
 
 import {TestWithPlaywrightTool} from '../utils/run-site-test-tool'
 
@@ -25,15 +24,6 @@ const documentList = require('../data/DocumentList.json')
 const packageJson = require('../../package.json')
 
 const FALLBACK_VERSION = '0.1.0'
-
-const systemPromptForCreatePage = `You are a smart assistant that can use tools when needed. \
-    Please ask the user to provide following information **one at a time**, in a natural and conversational way. \
-    Do **not** ask all the questions at once. \
-    - What is the name of the new page to create? \
-    - With page name specified, what is the layout type (e.g., grid, flex, list) of the new page? \
-    - List the components to include on the page, separated by commas (e.g., Header, ProductCard, Footer) \
-    - What is the URL route for this page? (e.g., /new-home, /my-products) \
-    Collect answers to these questions, then call the tool with the collected information as input parameters. `;
 
 
 class PwaStorefrontMCPServerHighLevel {
