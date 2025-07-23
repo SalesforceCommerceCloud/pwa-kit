@@ -51,11 +51,11 @@ npm ci
 
 2. In the Cursor Menu on the top menu bar, click **Settings** > **Cursor Settings...**. 
 
-<img src="./docs/images/cursor-settings.png" alt="Cursor Settings Screenshot" width="50%" />
+<img src="https://raw.githubusercontent.com/SalesforceCommerceCloud/pwa-kit/refs/heads/develop/packages/pwa-kit-mcp/docs/images/cursor-settings.png" alt="Cursor Settings Screenshot" width="50%" />
 
 3. Click **Tools & Integrations** > **MCP Tools** > **New MCP Server**.
 
-<img src="./docs/images/cursor-mcp-tools.png" alt="Cursor MCP Tools Screenshot" width="50%" />
+<img src="https://raw.githubusercontent.com/SalesforceCommerceCloud/pwa-kit/refs/heads/develop/packages/pwa-kit-mcp/docs/images/cursor-mcp-tools.png" alt="Cursor MCP Tools Screenshot" width="50%" />
 
 The `mcp.json` file opens. Add this definition to your `mcp.json` file and replace {{parent-dir-to-mcp}} and {{path-to-app-directory}} placeholders with correct values.
 
@@ -88,7 +88,7 @@ You can go back to MCP Tools and choose to enable/disable any MCP Server or tool
 1. In the Claude app menu, on the top menu bar, click **Developer** > **Edit Config**.
 The `claude_desktop_config.json` file opens.
 
-<img src="./docs/images/claude-config.png" alt="Claude MCP Config Screenshot" width="50%" />
+<img src="https://raw.githubusercontent.com/SalesforceCommerceCloud/pwa-kit/refs/heads/develop/packages/pwa-kit-mcp/docs/images/claude-config.png" alt="Claude MCP Config Screenshot" width="50%" />
 
 2. Add this server definition to your `claude_desktop_config.json` and replace {{path-to-node}}, {{parent-dir-to-mcp}} and {{path-to-app-directory}} placeholders with correct values.
 
@@ -112,7 +112,7 @@ After you modify the `claude_desktop_config.json` file, Claude will do these act
 - Connect to the MCP server as a client.
 - List available tools.
 
-<img src="./docs/images/claude-list-tools.png" alt="Claude MCP Tools Screenshot" width="40%" />
+<img src="https://raw.githubusercontent.com/SalesforceCommerceCloud/pwa-kit/refs/heads/develop/packages/pwa-kit-mcp/docs/images/claude-list-tools.png" alt="Claude MCP Tools Screenshot" width="40%" />
 
 You can also enable/disable any available tools from here.
 
@@ -155,26 +155,43 @@ The server outputs debug information to stderr and handle MCP protocol messages 
   - package.json
   - package-lock.json
   - README.md
+  - CHANGELOG.md
   - mcp.json
   - claude_desktop_config.json
+  - babel.config.js
+  - jest.config.js
+  - jest-setup.js
+  - .eslintrc.js
+  - .eslintignore
   /src
     /server
       - server.js
     /utils
-      - pwa-developer-guideline-tool.js
+      - index.js
       - utils.js
-    /tests
-      - test-mcp.js
+      - pwa-developer-guideline-tool.js
+      - pwa-create-app-guideline-tool.js
+      - create-new-component-tool.js
+      - run-site-test-tool.js
+      - run-site-test-accessibility.js
+      - run-site-test-performance.js
+    /data
+      - CategoryDocument.json
+      - DocumentList.json
+      - ProductDocument.json
   /docs
     /images
         - claude-config.png
         - claude-list-tools.png
-        - cursor-list-tools.png
-        - cursor-settings.pnb
+        - cursor-mcp-tools.png
+        - cursor-settings.png
     - cursor-integration-guide.md
+  /dist
   /node_modules
 ```
 
 - Server code is in `src/server/`.
 - Utilities/tools are in `src/utils/`.
+- Data files are in `src/data/`.
 - Documentation is in `docs/`.
+- Built distribution files are in `dist/`.
