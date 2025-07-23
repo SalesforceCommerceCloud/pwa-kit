@@ -9,11 +9,12 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import {AuthModal} from '../../../hooks/use-auth-modal'
 import {DntNotification} from '../../../hooks/use-dnt-notification'
+import Toaster, {toaster} from '../../toaster'
 // import StoreLocatorModal from '../../../components/store-locator-modal'
 
 /**
  * AppModals component that renders all app-level modals using React Portals
- * Handles AuthModal, DntNotification, and optional StoreLocatorModal
+ * Handles AuthModal, DntNotification, Toaster, and optional StoreLocatorModal
  */
 const AppModals = ({
     authModal,
@@ -29,6 +30,9 @@ const AppModals = ({
 
             {/* Do Not Track Notification */}
             <DntNotification {...dntNotification} />
+
+            {/* Toast Notifications */}
+            <Toaster toaster={toaster} />
 
             {/* Store Locator Modal - Disabled until extension is moved */}
             {/*
