@@ -58,18 +58,19 @@ const Checkout = () => {
     const {removeEmptyShipments} = useMultiship(basket)
 
     // cart has both pickup and delivery orders
-    const isDeliveryAndPickupOrder = STORE_LOCATOR_IS_ENABLED && MULTISHIP_IS_ENABLED
-        ? basket?.shipments?.some(shipment => 
-        shipment?.shippingMethod?.c_storePickupEnabled === true
-        ) && basket?.shipments?.some(shipment =>
-            !shipment?.shippingMethod?.c_storePickupEnabled
-        )
-        : false
+    const isDeliveryAndPickupOrder =
+        STORE_LOCATOR_IS_ENABLED && MULTISHIP_IS_ENABLED
+            ? basket?.shipments?.some(
+                  (shipment) => shipment?.shippingMethod?.c_storePickupEnabled === true
+              ) &&
+              basket?.shipments?.some((shipment) => !shipment?.shippingMethod?.c_storePickupEnabled)
+            : false
 
     // Only enable BOPIS functionality if the feature toggle is on
-    const isPickupOrderOnly = STORE_LOCATOR_IS_ENABLED && !isDeliveryAndPickupOrder
-        ? basket?.shipments[0]?.shippingMethod?.c_storePickupEnabled === true
-        : false
+    const isPickupOrderOnly =
+        STORE_LOCATOR_IS_ENABLED && !isDeliveryAndPickupOrder
+            ? basket?.shipments[0]?.shippingMethod?.c_storePickupEnabled === true
+            : false
 
     useEffect(() => {
         if (error || step === 4) {
@@ -134,9 +135,7 @@ const Checkout = () => {
                                 </>
                             )}
 
-                            {isPickupOrderOnly && (
-                                <PickupAddress />
-                            )}
+                            {isPickupOrderOnly && <PickupAddress />}
 
                             {!isDeliveryAndPickupOrder && !isPickupOrderOnly && (
                                 <>

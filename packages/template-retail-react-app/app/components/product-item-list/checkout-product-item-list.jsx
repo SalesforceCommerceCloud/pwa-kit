@@ -44,7 +44,9 @@ const CheckoutProductItemList = ({
                         deliveryActions={deliveryActions}
                         product={{
                             ...productItem,
-                            ...(productsByItemId && productsByItemId[productItem.itemId] ? productsByItemId[productItem.itemId] : {}),
+                            ...(productsByItemId && productsByItemId[productItem.itemId]
+                                ? productsByItemId[productItem.itemId]
+                                : {}),
                             isProductUnavailable: !isProductsLoading
                                 ? !productsByItemId?.[productItem.itemId]
                                 : undefined,

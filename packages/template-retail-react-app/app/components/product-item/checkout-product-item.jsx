@@ -30,8 +30,7 @@ const CheckoutProductItem = ({
     showLoading = false,
     deliveryActions
 }) => {
-    const {showInventoryMessage, inventoryMessage, quantity} =
-        useDerivedProduct(product)
+    const {showInventoryMessage, inventoryMessage, quantity} = useDerivedProduct(product)
     const {currency: activeCurrency} = useCurrency()
     return (
         <Box
@@ -40,7 +39,13 @@ const CheckoutProductItem = ({
         >
             <ItemVariantProvider variant={product}>
                 {showLoading && <LoadingSpinner />}
-                <Stack border="1px solid" borderColor="gray.200" borderRadius="md" p={3} align="flex-start">
+                <Stack
+                    border="1px solid"
+                    borderColor="gray.200"
+                    borderRadius="md"
+                    p={3}
+                    align="flex-start"
+                >
                     <Flex width="full" alignItems="flex-start" backgroundColor="white">
                         <CartItemVariantImage width={['88px', '136px']} mr={4} />
                         <Stack spacing={3} flex={1}>
