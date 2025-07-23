@@ -166,10 +166,6 @@ const PickupAddress = () => {
                 })
             }
         })
-
-        console.log('Debug - basket shipments:', basket?.shipments)
-        console.log('Debug - storeData:', storeData)
-        console.log('Debug - pickupShipments:', pickupShipments)
         return pickupShipments
     }, [basket?.shipments, basket?.productItems, storeData])
     
