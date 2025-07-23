@@ -134,7 +134,7 @@ const Checkout = () => {
                                 </>
                             )}
 
-                            {!isDeliveryAndPickupOrder && isPickupOrderOnly && (
+                            {isPickupOrderOnly && (
                                 <PickupAddress />
                             )}
 
