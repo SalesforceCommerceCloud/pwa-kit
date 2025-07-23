@@ -42,39 +42,28 @@ MockComponent.propTypes = {
 beforeEach(() => {
     global.server.use(
         rest.get('*/products/:productId', (req, res, ctx) => {
+            console.log('product req url=', req.url.toString())
             return res(ctx.delay(0), ctx.status(200), ctx.json(mockProductBundle))
         }),
         rest.get('*/products', (req, res, ctx) => {
             const swingTankBlackMediumVariantId = '701643473915M'
             const swingTankBlackLargeVariantId = '701643473908M'
-
-            // Ensure ALL products in the bundle have adequate stock and are orderable
-            const modifiedData = {
-                ...mockProductBundleWithVariants,
-                data: mockProductBundleWithVariants.data.map((product, index) => ({
-                    ...product,
-                    inventory: {
-                        ...product.inventory,
-                        stockLevel: 10,
-                        orderable: true,
-                        ats: 10
-                    }
-                }))
-            }
-
-            // Then modify specific variants for testing
             if (req.url.toString().includes(swingTankBlackMediumVariantId)) {
-                modifiedData.data[1].inventory = {
-                    ...modifiedData.data[1].inventory,
-                    stockLevel: 5 // Start with adequate stock
+                mockProductBundleWithVariants.data[1].inventory = {
+                    ...mockProductBundleWithVariants.data[1].inventory,
+                    stockLevel: 0
                 }
             } else if (req.url.toString().includes(swingTankBlackLargeVariantId)) {
-                modifiedData.data[1].inventory = {
-                    ...modifiedData.data[1].inventory,
-                    stockLevel: 1 // This will be the variant we test
+                mockProductBundleWithVariants.data[1].inventory = {
+                    ...mockProductBundleWithVariants.data[1].inventory,
+                    stockLevel: 1
                 }
             }
-            return res(ctx.json(modifiedData))
+            console.log(
+                'req url=',
+                req.url.toString()
+            )
+            return res(ctx.json(mockProductBundleWithVariants))
         })
     )
 })
@@ -133,8 +122,8 @@ test('renders bundle product view modal with handleUpdateCart handler', async ()
 
 test('bundle product view modal disables update button when child is out of stock', async () => {
     // Override the mock for this specific test to make Medium variant out of stock
-    global.server.use(
-        rest.get('*/products', (req, res, ctx) => {
+   /* global.server.use(
+        rest.get('*!/products', (req, res, ctx) => {
             const swingTankBlackMediumVariantId = '701643473915M'
             if (req.url.toString().includes(swingTankBlackMediumVariantId)) {
                 // Return out of stock data only for Medium variant
@@ -157,7 +146,7 @@ test('bundle product view modal disables update button when child is out of stoc
             }
             return res(ctx.json(mockProductBundleWithVariants))
         })
-    )
+    )*/
 
     renderWithProviders(<MockComponent />)
     await waitFor(async () => {
@@ -201,8 +190,8 @@ test('bundle product view modal disables update button when child is out of stoc
 
 test('bundle product view modal disables update button when quantity exceeds child inventory', async () => {
     // Override the mock to ensure Large variant has stock level of 1
-    global.server.use(
-        rest.get('*/products', (req, res, ctx) => {
+   /* global.server.use(
+        rest.get('*!/products', (req, res, ctx) => {
             const swingTankBlackLargeVariantId = '701643473908M'
             const modifiedData = {
                 ...mockProductBundleWithVariants,
@@ -220,7 +209,7 @@ test('bundle product view modal disables update button when quantity exceeds chi
             }
             return res(ctx.json(modifiedData))
         })
-    )
+    )*/
 
     renderWithProviders(<MockComponent />)
     await waitFor(async () => {
