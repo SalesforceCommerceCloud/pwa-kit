@@ -188,6 +188,10 @@ const ShippingMultiAddress = ({
     const createCustomerAddress = useShopperCustomersMutation('createCustomerAddress')
     const showToast = useToast()
 
+    // Calculate if button should be disabled
+    const openForms = Object.keys(showAddAddressForm).filter((key) => showAddAddressForm[key])
+    const isButtonDisabled = openForms.length > 0
+
     useEffect(() => {
         function handleClickOutside(event) {
             if (openDropdown !== null) {
@@ -464,22 +468,19 @@ const ShippingMultiAddress = ({
                                                     }
                                                     onChange={(e) => {
                                                         const value = e.target.value
-                                                        const key =
-                                                            item.itemId ||
-                                                            `${item.productId}-${index}`
 
                                                         if (value === ADD_NEW_ADDRESS_OPTION) {
                                                             // Show the address form when "Add New Address" is selected
                                                             setShowAddAddressForm((prev) => ({
                                                                 ...prev,
-                                                                [key]: true
+                                                                [addressKey]: true
                                                             }))
                                                             // Don't set a selected address since we're adding a new one
                                                         } else {
                                                             // Hide the address form when a real address is selected
                                                             setShowAddAddressForm((prev) => ({
                                                                 ...prev,
-                                                                [key]: false
+                                                                [addressKey]: false
                                                             }))
                                                             setSelectedAddresses((prev) => ({
                                                                 ...prev,
@@ -577,6 +578,9 @@ const ShippingMultiAddress = ({
                             type="button"
                             width="full"
                             isLoading={addressForm.formState.isSubmitting}
+                            disabled={isButtonDisabled}
+                            data-testid="continue-to-shipping-button"
+                            data-disabled={isButtonDisabled}
                             loadingText={formatMessage({
                                 id: 'shipping_multi_address.submit.loading',
                                 defaultMessage: 'Saving address...'
@@ -587,6 +591,11 @@ const ShippingMultiAddress = ({
                                     'Continue to next step with selected delivery addresses'
                             })}
                             onClick={async () => {
+                                // Prevent click if button is disabled
+                                if (isButtonDisabled) {
+                                    return
+                                }
+
                                 try {
                                     // Check if there are any open address forms that need to be saved
                                     const openForms = Object.keys(showAddAddressForm).filter(

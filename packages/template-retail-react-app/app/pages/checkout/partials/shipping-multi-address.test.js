@@ -321,10 +321,6 @@ describe('ShippingMultiAddress', () => {
         expect(screen.getByText('Proceed to Shipping')).toBeInTheDocument()
     })
 
-
-
-
-
     describe('Accessibility', () => {
         test('should have proper alt text for images', () => {
             renderWithIntl(<ShippingMultiAddress {...defaultProps} />)
@@ -574,6 +570,272 @@ describe('ShippingMultiAddress', () => {
 
             // Check that the dropdown shows the selected address
             expect(firstSelect).toHaveValue('addr-2')
+        })
+    })
+
+    describe('Continue to Shipping Method Button', () => {
+        test('should be enabled when no address forms are open', () => {
+            const mockOnSubmit = jest.fn()
+            renderWithIntl(<ShippingMultiAddress {...defaultProps} onSubmit={mockOnSubmit} />)
+
+            const continueButton = screen.getByText('Continue')
+            expect(continueButton).toBeInTheDocument()
+
+            // Click the button to verify it's functional
+            fireEvent.click(continueButton)
+            expect(mockOnSubmit).toHaveBeenCalledTimes(1)
+        })
+
+        test('should be disabled when "Add New Address" is selected', async () => {
+            const mockOnSubmit = jest.fn()
+            renderWithIntl(<ShippingMultiAddress {...defaultProps} onSubmit={mockOnSubmit} />)
+
+            const selectElements = screen.getAllByRole('combobox')
+            const firstSelect = selectElements[0]
+
+            // Select "Add New Address" option
+            fireEvent.change(firstSelect, {target: {value: 'add-new-address'}})
+
+            // Wait for the form to appear
+            await waitFor(() => {
+                expect(screen.getByText('First Name')).toBeInTheDocument()
+            })
+
+            // Try to click the button (should not call onSubmit)
+            const continueButton = screen.getByText('Continue')
+            fireEvent.click(continueButton)
+            expect(mockOnSubmit).not.toHaveBeenCalled()
+        })
+
+        test('should be disabled when multiple address forms are open', async () => {
+            const mockOnSubmit = jest.fn()
+            renderWithIntl(<ShippingMultiAddress {...defaultProps} onSubmit={mockOnSubmit} />)
+
+            const selectElements = screen.getAllByRole('combobox')
+
+            // Select "Add New Address" for first product
+            fireEvent.change(selectElements[0], {target: {value: 'add-new-address'}})
+
+            // Wait for first form to appear
+            await waitFor(() => {
+                expect(screen.getByText('First Name')).toBeInTheDocument()
+            })
+
+            // Select "Add New Address" for second product
+            fireEvent.change(selectElements[1], {target: {value: 'add-new-address'}})
+
+            // Wait for second form to appear
+            await waitFor(() => {
+                const firstNameFields = screen.getAllByText('First Name')
+                expect(firstNameFields).toHaveLength(2)
+            })
+
+            // Try to click the button (should not call onSubmit)
+            const continueButton = screen.getByText('Continue')
+            fireEvent.click(continueButton)
+            expect(mockOnSubmit).not.toHaveBeenCalled()
+        })
+
+        test('should be re-enabled when address form is cancelled', async () => {
+            const mockOnSubmit = jest.fn()
+            renderWithIntl(<ShippingMultiAddress {...defaultProps} onSubmit={mockOnSubmit} />)
+
+            const selectElements = screen.getAllByRole('combobox')
+            const firstSelect = selectElements[0]
+
+            // Select "Add New Address" option
+            fireEvent.change(firstSelect, {target: {value: 'add-new-address'}})
+
+            // Wait for the form to appear
+            await waitFor(() => {
+                expect(screen.getByText('First Name')).toBeInTheDocument()
+            })
+
+            // Try to click the button (should not call onSubmit)
+            const continueButton = screen.getByText('Continue')
+            fireEvent.click(continueButton)
+            expect(mockOnSubmit).not.toHaveBeenCalled()
+
+            // Click Cancel button
+            fireEvent.click(screen.getByText('Cancel'))
+
+            // Wait for the form to disappear
+            await waitFor(() => {
+                expect(screen.queryByText('First Name')).not.toBeInTheDocument()
+            })
+
+            // Button should now be enabled
+            fireEvent.click(continueButton)
+            expect(mockOnSubmit).toHaveBeenCalledTimes(1)
+        })
+
+        test('should be re-enabled when address form is saved', async () => {
+            const mockOnSubmit = jest.fn()
+            renderWithIntl(<ShippingMultiAddress {...defaultProps} onSubmit={mockOnSubmit} />)
+
+            const selectElements = screen.getAllByRole('combobox')
+            const firstSelect = selectElements[0]
+
+            // Select "Add New Address" option
+            fireEvent.change(firstSelect, {target: {value: 'add-new-address'}})
+
+            // Wait for the form to appear
+            await waitFor(() => {
+                expect(screen.getByText('First Name')).toBeInTheDocument()
+            })
+
+            // Try to click the button (should not call onSubmit)
+            const continueButton = screen.getByText('Continue')
+            fireEvent.click(continueButton)
+            expect(mockOnSubmit).not.toHaveBeenCalled()
+
+            // Fill out the form
+            fireEvent.change(screen.getByLabelText('First Name'), {target: {value: 'John'}})
+            fireEvent.change(screen.getByLabelText('Last Name'), {target: {value: 'Doe'}})
+            fireEvent.change(screen.getByLabelText('Phone'), {target: {value: '1234567890'}})
+            fireEvent.change(screen.getByLabelText('Address'), {target: {value: '123 Test St'}})
+            fireEvent.change(screen.getByLabelText('City'), {target: {value: 'Test City'}})
+            fireEvent.change(screen.getByLabelText('State'), {target: {value: 'TX'}})
+            fireEvent.change(screen.getByLabelText('Zip Code'), {target: {value: '12345'}})
+
+            // Click Save button
+            fireEvent.click(screen.getByText('Save'))
+
+            // Wait for the form to disappear
+            await waitFor(() => {
+                expect(screen.queryByText('First Name')).not.toBeInTheDocument()
+            })
+
+            // Button should now be enabled
+            fireEvent.click(continueButton)
+            expect(mockOnSubmit).toHaveBeenCalledTimes(1)
+        })
+
+        test('should be re-enabled when existing address is selected', async () => {
+            const mockOnSubmit = jest.fn()
+            renderWithIntl(<ShippingMultiAddress {...defaultProps} onSubmit={mockOnSubmit} />)
+
+            const selectElements = screen.getAllByRole('combobox')
+            const firstSelect = selectElements[0]
+
+            // Select "Add New Address" option
+            fireEvent.change(firstSelect, {target: {value: 'add-new-address'}})
+
+            // Wait for the form to appear
+            await waitFor(() => {
+                expect(screen.getByText('First Name')).toBeInTheDocument()
+            })
+
+            // Try to click the button (should not call onSubmit)
+            const continueButton = screen.getByText('Continue')
+            fireEvent.click(continueButton)
+            expect(mockOnSubmit).not.toHaveBeenCalled()
+
+            // Select an existing address
+            fireEvent.change(firstSelect, {target: {value: 'addr-2'}})
+
+            // Wait for the form to disappear
+            await waitFor(() => {
+                expect(screen.queryByText('First Name')).not.toBeInTheDocument()
+            })
+
+            // Click the button again (should call onSubmit now)
+            fireEvent.click(continueButton)
+            expect(mockOnSubmit).toHaveBeenCalledTimes(1)
+        })
+
+        test('should not call onSubmit when clicked while disabled', async () => {
+            const mockOnSubmit = jest.fn()
+            renderWithIntl(<ShippingMultiAddress {...defaultProps} onSubmit={mockOnSubmit} />)
+
+            const selectElements = screen.getAllByRole('combobox')
+            const firstSelect = selectElements[0]
+
+            // Select "Add New Address" option
+            fireEvent.change(firstSelect, {target: {value: 'add-new-address'}})
+
+            // Wait for the form to appear
+            await waitFor(() => {
+                expect(screen.getByText('First Name')).toBeInTheDocument()
+            })
+
+            // Try to click the button
+            const continueButton = screen.getByText('Continue')
+            fireEvent.click(continueButton)
+
+            // Verify onSubmit was not called
+            expect(mockOnSubmit).not.toHaveBeenCalled()
+        })
+
+        test('should call onSubmit when clicked while enabled', async () => {
+            const mockOnSubmit = jest.fn()
+            renderWithIntl(<ShippingMultiAddress {...defaultProps} onSubmit={mockOnSubmit} />)
+
+            const continueButton = screen.getByText('Continue')
+
+            // Click the enabled button
+            fireEvent.click(continueButton)
+
+            // Verify onSubmit was called
+            expect(mockOnSubmit).toHaveBeenCalledTimes(1)
+        })
+
+        test('should show visual feedback when disabled', async () => {
+            const mockOnSubmit = jest.fn()
+            renderWithIntl(<ShippingMultiAddress {...defaultProps} onSubmit={mockOnSubmit} />)
+
+            const selectElements = screen.getAllByRole('combobox')
+            const firstSelect = selectElements[0]
+
+            // Select "Add New Address" option
+            fireEvent.change(firstSelect, {target: {value: 'add-new-address'}})
+
+            // Wait for the form to appear
+            await waitFor(() => {
+                expect(screen.getByText('First Name')).toBeInTheDocument()
+            })
+
+            // Try to click the button
+            const continueButton = screen.getByText('Continue')
+            fireEvent.click(continueButton)
+
+            // Verify onSubmit was not called (button is functionally disabled)
+            expect(mockOnSubmit).not.toHaveBeenCalled()
+        })
+
+        test('should handle mixed state - some forms open, some closed', async () => {
+            const mockOnSubmit = jest.fn()
+            renderWithIntl(<ShippingMultiAddress {...defaultProps} onSubmit={mockOnSubmit} />)
+
+            const selectElements = screen.getAllByRole('combobox')
+
+            // Select "Add New Address" for first product
+            fireEvent.change(selectElements[0], {target: {value: 'add-new-address'}})
+
+            // Wait for first form to appear
+            await waitFor(() => {
+                expect(screen.getByText('First Name')).toBeInTheDocument()
+            })
+
+            // Select existing address for second product
+            fireEvent.change(selectElements[1], {target: {value: 'addr-2'}})
+
+            // Try to click the button (should not call onSubmit)
+            const continueButton = screen.getByText('Continue')
+            fireEvent.click(continueButton)
+            expect(mockOnSubmit).not.toHaveBeenCalled()
+
+            // Cancel the first form
+            fireEvent.click(screen.getByText('Cancel'))
+
+            // Wait for form to disappear
+            await waitFor(() => {
+                expect(screen.queryByText('First Name')).not.toBeInTheDocument()
+            })
+
+            // Button should now be enabled
+            fireEvent.click(continueButton)
+            expect(mockOnSubmit).toHaveBeenCalledTimes(1)
         })
     })
 })

@@ -3471,6 +3471,12 @@
       "value": "Save & Continue to Shipping Method"
     }
   ],
+  "shipping_address_form.button.save": [
+    {
+      "type": 0,
+      "value": "Save"
+    }
+  ],
   "shipping_address_form.heading.edit_address": [
     {
       "type": 0,

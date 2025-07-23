@@ -1457,6 +1457,9 @@
   "shipping_address_edit_form.button.save_and_continue": {
     "defaultMessage": "Save & Continue to Shipping Method"
   },
+  "shipping_address_form.button.save": {
+    "defaultMessage": "Save"
+  },
   "shipping_address_form.heading.edit_address": {
     "defaultMessage": "Edit Address"
   },
