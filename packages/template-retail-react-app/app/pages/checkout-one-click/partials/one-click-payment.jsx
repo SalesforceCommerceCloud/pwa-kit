@@ -17,12 +17,10 @@ import {
     Text,
     Divider
 } from '@salesforce/retail-react-app/app/components/shared/ui'
-import {useForm} from 'react-hook-form'
 import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
-import {useShopperBasketsMutation, useShopperOrdersMutation} from '@salesforce/commerce-sdk-react'
+import {useShopperBasketsMutation} from '@salesforce/commerce-sdk-react'
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
 import {useCheckout} from '@salesforce/retail-react-app/app/pages/checkout-container/util/checkout-context'
-import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
 import {
     getPaymentInstrumentCardType,
     getMaskCreditCardNumber,
@@ -39,9 +37,8 @@ import AddressDisplay from '@salesforce/retail-react-app/app/components/address-
 import {PromoCode, usePromoCode} from '@salesforce/retail-react-app/app/components/promo-code'
 import {API_ERROR_MESSAGE} from '@salesforce/retail-react-app/app/constants'
 
-const Payment = () => {
+const Payment = ({paymentMethodForm, billingAddressForm}) => {
     const {formatMessage} = useIntl()
-    const navigate = useNavigation()
     const {data: basket} = useCurrentBasket()
     const selectedShippingAddress = basket?.shipments && basket?.shipments[0]?.shippingAddress
     const selectedBillingAddress = basket?.billingAddress
@@ -49,7 +46,6 @@ const Payment = () => {
 
     const isPickupOrder = basket?.shipments[0]?.shippingMethod?.c_storePickupEnabled === true
     const [billingSameAsShipping, setBillingSameAsShipping] = useState(!isPickupOrder)
-    const [isLoading, setIsLoading] = useState(false)
 
     const {mutateAsync: addPaymentInstrumentToBasket} = useShopperBasketsMutation(
         'addPaymentInstrumentToBasket'
@@ -60,7 +56,6 @@ const Payment = () => {
     const {mutateAsync: removePaymentInstrumentFromBasket} = useShopperBasketsMutation(
         'removePaymentInstrumentFromBasket'
     )
-    const {mutateAsync: createOrder} = useShopperOrdersMutation('createOrder')
 
     const showToast = useToast()
     const showError = (message) => {
@@ -72,17 +67,9 @@ const Payment = () => {
 
     const {step, STEPS, goToStep} = useCheckout()
 
-    const billingAddressForm = useForm({
-        mode: 'onChange',
-        shouldUnregister: false,
-        defaultValues: {...selectedBillingAddress}
-    })
-
     // Using destructuring to remove properties from the object...
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const {removePromoCode, ...promoCodeProps} = usePromoCode()
-
-    const paymentMethodForm = useForm()
 
     const onPaymentSubmit = async (formValue) => {
         // The form gives us the expiration date as `MM/YY` - so we need to split it into
@@ -105,6 +92,7 @@ const Payment = () => {
             body: paymentInstrument
         })
     }
+
     const onBillingSubmit = async () => {
         const isFormValid = await billingAddressForm.trigger()
 
@@ -122,6 +110,7 @@ const Payment = () => {
             parameters: {basketId: basket.basketId}
         })
     }
+
     const onPaymentRemoval = async () => {
         try {
             await removePaymentInstrumentFromBasket({
@@ -135,37 +124,14 @@ const Payment = () => {
         }
     }
 
-    const submitOrder = async () => {
-        setIsLoading(true)
-        try {
-            const order = await createOrder({
-                body: {basketId: basket.basketId}
-            })
-            navigate(`/checkout/confirmation/${order.orderNo}`)
-        } catch (error) {
-            const message = formatMessage({
-                id: 'checkout.message.generic_error',
-                defaultMessage: 'An unexpected error occurred during checkout.'
-            })
-            showError(message)
-        } finally {
-            setIsLoading(false)
-        }
-    }
-
     const onSubmit = paymentMethodForm.handleSubmit(async (paymentFormValues) => {
         try {
             if (!appliedPayment) {
                 await onPaymentSubmit(paymentFormValues)
             }
 
-            // If successful `onBillingSubmit` returns the updated basket. If the form was invalid on
-            // submit, `undefined` is returned.
-            const updatedBasket = await onBillingSubmit()
-
-            if (updatedBasket) {
-                await submitOrder()
-            }
+            // Update billing address
+            await onBillingSubmit()
         } catch (error) {
             showError()
         }
@@ -184,8 +150,7 @@ const Payment = () => {
             editing={step === STEPS.PAYMENT}
             isLoading={
                 paymentMethodForm.formState.isSubmitting ||
-                billingAddressForm.formState.isSubmitting ||
-                isLoading
+                billingAddressForm.formState.isSubmitting
             }
             disabled={appliedPayment == null}
             onEdit={() => goToStep(STEPS.PAYMENT)}
@@ -201,7 +166,7 @@ const Payment = () => {
 
                 <Stack spacing={6}>
                     {!appliedPayment?.paymentCard ? (
-                        <PaymentForm form={paymentMethodForm} onSubmit={onPaymentSubmit} />
+                        <PaymentForm form={paymentMethodForm} onSubmit={onSubmit} />
                     ) : (
                         <Stack spacing={3}>
                             <Heading as="h3" fontSize="md">
@@ -237,7 +202,7 @@ const Payment = () => {
                             />
                         </Heading>
 
-                        {!isPickupOrder && (
+                        {!isPickupOrder && selectedShippingAddress && (
                             <Checkbox
                                 name="billingSameAsShipping"
                                 isChecked={billingSameAsShipping}
@@ -268,23 +233,6 @@ const Payment = () => {
                             isBillingAddress
                         />
                     )}
-
-                    <Box pt={3}>
-                        <Container variant="form">
-                            {/* Always visible Place Order Button */}
-                            <Button
-                                w="full"
-                                onClick={onSubmit}
-                                isLoading={isLoading}
-                                data-testid="place-order-button"
-                            >
-                                <FormattedMessage
-                                    defaultMessage="Place Order"
-                                    id="checkout_payment.button.place_order"
-                                />
-                            </Button>
-                        </Container>
-                    </Box>
                 </Stack>
             </ToggleCardEdit>
 
@@ -339,5 +287,10 @@ const PaymentCardSummary = ({payment}) => {
 }
 
 PaymentCardSummary.propTypes = {payment: PropTypes.object}
+
+Payment.propTypes = {
+    paymentMethodForm: PropTypes.object.isRequired,
+    billingAddressForm: PropTypes.object.isRequired
+}
 
 export default Payment
