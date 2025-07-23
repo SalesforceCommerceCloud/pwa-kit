@@ -8,16 +8,15 @@
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 
 /**
- * Calculates basket totals using the Salesforce Commerce API
- * This ensures orderTotal, shippingTotal, and taxTotal are properly calculated
- * @param {string} basketId - The basket ID to calculate totals for
+ * Validates common parameters and gets organization config
+ * @param {string} basketId - The basket ID
  * @param {string} authToken - Authentication token
  * @param {object} site - Site configuration object
- * @returns {Promise<object>} - The updated basket with calculated totals
+ * @returns {string} organizationId
  */
-export const calculateBasketTotals = async (basketId, authToken, site) => {
+const validateParamsAndGetConfig = (basketId, authToken, site) => {
     if (!basketId) {
-        throw new Error('Basket ID is required to calculate totals')
+        throw new Error('Basket ID is required')
     }
     
     if (!authToken) {
@@ -28,14 +27,27 @@ export const calculateBasketTotals = async (basketId, authToken, site) => {
         throw new Error('Site ID is required')
     }
     
+    const {app: {commerceAPI: config}} = getConfig()
+    const {organizationId} = config.parameters
+    
+    if (!organizationId) {
+        throw new Error('Organization ID is required and not found in configuration')
+    }
+    
+    return organizationId
+}
+
+/**
+ * Calculates basket totals using the Salesforce Commerce API
+ * This ensures orderTotal, shippingTotal, and taxTotal are properly calculated
+ * @param {string} basketId - The basket ID to calculate totals for
+ * @param {string} authToken - Authentication token
+ * @param {object} site - Site configuration object
+ * @returns {Promise<object>} - The updated basket with calculated totals
+ */
+export const calculateBasketTotals = async (basketId, authToken, site) => {
     try {
-        // Get the organizationId from the commerce API configuration
-        const {app: {commerceAPI: config}} = getConfig()
-        const {organizationId} = config.parameters
-        
-        if (!organizationId) {
-            throw new Error('Organization ID is required and not found in configuration')
-        }
+        const organizationId = validateParamsAndGetConfig(basketId, authToken, site)
         
         // Use PATCH method to update/calculate the basket
         // This triggers the Commerce Cloud to recalculate all totals
@@ -73,26 +85,8 @@ export const calculateBasketTotals = async (basketId, authToken, site) => {
  * @returns {Promise<object>} - The basket with current totals
  */
 export const getBasketWithTotals = async (basketId, authToken, site) => {
-    if (!basketId) {
-        throw new Error('Basket ID is required')
-    }
-    
-    if (!authToken) {
-        throw new Error('Authentication token is required')
-    }
-    
-    if (!site?.id) {
-        throw new Error('Site ID is required')
-    }
-    
     try {
-        // Get the organizationId from the commerce API configuration
-        const {app: {commerceAPI: config}} = getConfig()
-        const {organizationId} = config.parameters
-        
-        if (!organizationId) {
-            throw new Error('Organization ID is required and not found in configuration')
-        }
+        const organizationId = validateParamsAndGetConfig(basketId, authToken, site)
         
         // GET the basket to retrieve current calculated totals
         const requestUrl = `/mobify/proxy/api/checkout/shopper-baskets/v2/organizations/${organizationId}/baskets/${basketId}?siteId=${site.id}`
@@ -141,35 +135,27 @@ export const forceOrderCalculation = async (basketId, authToken, site) => {
         
         if (!hasShippingMethod) {
             // Apply a default shipping method to trigger order total calculation
-            const {app: {commerceAPI: config}} = getConfig()
-            const {organizationId} = config.parameters
-            
+            const organizationId = validateParamsAndGetConfig(basketId, authToken, site)
             const shippingUrl = `/mobify/proxy/api/checkout/shopper-baskets/v2/organizations/${organizationId}/baskets/${basketId}/shipments/me/shipping-method?siteId=${site.id}`
             
-            // Apply a basic shipping method (this should trigger total calculation)
-            const shippingResponse = await fetch(shippingUrl, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${authToken}`
-                },
-                body: JSON.stringify({
-                    id: '001' // Default/standard shipping method ID
-                })
-            })
+            // Try common shipping method IDs in order of preference
+            const shippingMethodIds = ['001', 'Ground', 'standard']
             
-            if (!shippingResponse.ok) {
-                // If standard shipping fails, try without specific ID
-                const altShippingResponse = await fetch(shippingUrl, {
+            for (const methodId of shippingMethodIds) {
+                const shippingResponse = await fetch(shippingUrl, {
                     method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json',
                         'Authorization': `Bearer ${authToken}`
                     },
                     body: JSON.stringify({
-                        id: 'Ground'
+                        id: methodId
                     })
                 })
+                
+                if (shippingResponse.ok) {
+                    break // Successfully applied shipping method
+                }
             }
         }
         

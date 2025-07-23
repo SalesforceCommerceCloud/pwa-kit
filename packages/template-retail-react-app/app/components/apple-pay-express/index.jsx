@@ -163,6 +163,7 @@ export const getAppleButtonConfig = (
                     }
                     resolve(priceUpdate)
                 } catch (error) {
+                    await cleanupTemporaryBasket(isPdpMode, sharedBasketRef, authToken, site, setTempBasket)
                     reject()
                 }
             } else {
@@ -654,11 +655,7 @@ export const ApplePayExpress = ({sku, isPdpMode = false}) => {
         }
     }, [adyenEnvironment, adyenPaymentMethods, tempBasket, basket, shippingMethods, standalonePaymentMethods, standaloneLoading, standaloneError, currentSku, isPdpMode])
 
-    return (
-        <>
-            <div ref={paymentContainer}></div>
-        </>
-    )
+    return <div ref={paymentContainer}></div>
 }
 
 ApplePayExpress.propTypes = {

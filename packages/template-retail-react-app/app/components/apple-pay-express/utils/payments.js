@@ -15,30 +15,21 @@ export class AdyenPaymentsService {
     }
 
     async submitPayment(adyenStateData, basketId, customerId) {
-        const requestBody = {
+        const res = await this.apiClient.post({
+            body: JSON.stringify({
                 data: adyenStateData
-        }
-        
-        const requestHeaders = {
+            }),
+            headers: {
                 customerid: customerId,
                 basketid: basketId
             }
-        
-        try {
-            const res = await this.apiClient.post({
-                body: JSON.stringify(requestBody),
-                headers: requestHeaders
         })
 
         if (res.status >= 300) {
             const errorBody = await res.text()
             throw new Error(`Request failed with status ${res.status}: ${errorBody}`)
-        } else {
-                const responseData = await res.json()
-                return responseData
-            }
-        } catch (error) {
-            throw error
         }
+        
+        return res.json()
     }
 }
