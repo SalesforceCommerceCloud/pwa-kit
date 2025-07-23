@@ -24,7 +24,7 @@ const ItemAttributes = ({
     includeQuantity,
     currency,
     excludeBonusLabel,
-    showLabels = true,
+    hideAttributeLabels = false,
     ...props
 }) => {
     const variant = useItemVariant()
@@ -116,7 +116,9 @@ const ItemAttributes = ({
                         fontSize="sm"
                         key={`${key}: ${variationValues[key]}`}
                     >
-                        {showLabels ? `${key}: ${variationValues[key]}` : variationValues[key]}
+                        {hideAttributeLabels
+                            ? variationValues[key]
+                            : `${key}: ${variationValues[key]}`}
                     </Text>
                 ))}
 
@@ -229,7 +231,7 @@ ItemAttributes.propTypes = {
     includeQuantity: PropTypes.bool,
     currency: PropTypes.string,
     excludeBonusLabel: PropTypes.bool,
-    showLabels: PropTypes.bool
+    hideAttributeLabels: PropTypes.bool
 }
 
 export default ItemAttributes

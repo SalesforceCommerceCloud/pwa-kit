@@ -52,7 +52,7 @@ const CheckoutProductItem = ({
                             <Flex align="flex-end" justify="space-between">
                                 <Stack spacing={1}>
                                     <CartItemVariantName />
-                                    <ItemAttributes excludeBonusLabel showLabels={false} />
+                                    <ItemAttributes excludeBonusLabel hideAttributeLabels={true} />
                                     <HideOnDesktop>
                                         <Box marginTop={2}>
                                             <CartItemVariantPrice
