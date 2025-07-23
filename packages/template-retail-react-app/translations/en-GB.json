@@ -1481,6 +1481,18 @@
   "social_login_redirect.message.redirect_link": {
     "defaultMessage": "If you are not automatically redirected, click <link>this link</link> to proceed."
   },
+  "status_bar.delivered": {
+    "defaultMessage": "Delivered"
+  },
+  "status_bar.dispatched": {
+    "defaultMessage": "Dispatched"
+  },
+  "status_bar.ordered": {
+    "defaultMessage": "Ordered"
+  },
+  "status_bar.out_for_delivery": {
+    "defaultMessage": "Out for delivery"
+  },
   "store_display.format.address_line_2": {
     "defaultMessage": "{city}, {stateCode} {postalCode}"
   },

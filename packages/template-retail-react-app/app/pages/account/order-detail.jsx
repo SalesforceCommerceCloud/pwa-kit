@@ -34,6 +34,8 @@ import CartItemVariantAttributes from '@salesforce/retail-react-app/app/componen
 import CartItemVariantPrice from '@salesforce/retail-react-app/app/components/item-variant/item-price'
 import CancelOrderModal from '@salesforce/retail-react-app/app/components/cancel-order-modal'
 import PropTypes from 'prop-types'
+import OrderStatusBar from '@salesforce/retail-react-app/app/components/order-status-bar/index'
+
 const onClient = typeof window !== 'undefined'
 
 const OrderProducts = ({productItems, currency}) => {
@@ -222,6 +224,8 @@ const AccountOrderDetail = () => {
                     )}
                 </Stack>
             </Stack>
+
+            {!isLoading && <OrderStatusBar currentStepLabel={order.status} />}
 
             <Box layerStyle="cardBordered">
                 <Grid templateColumns={{base: '1fr', xl: '60% 1fr'}} gap={{base: 6, xl: 2}}>
