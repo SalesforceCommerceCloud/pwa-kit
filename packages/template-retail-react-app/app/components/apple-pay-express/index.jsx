@@ -14,7 +14,8 @@ import {AdyenShippingMethodsService} from '@salesforce/retail-react-app/app/comp
 import {AdyenShippingAddressService} from '@salesforce/retail-react-app/app/components/apple-pay-express/utils/shipping-address'
 import {AdyenPaymentsService} from '@salesforce/retail-react-app/app/components/apple-pay-express/utils/payments'
 import {createTemporaryBasket, deleteTemporaryBasket} from '@salesforce/retail-react-app/app/components/apple-pay-express/utils/temporary-basket'
-import {calculateBasketTotals, getBasketWithTotals, forceOrderCalculation} from '@salesforce/retail-react-app/app/components/apple-pay-express/utils/basket-calculation'
+import {getBasketWithTotals, forceOrderCalculation} from '@salesforce/retail-react-app/app/components/apple-pay-express/utils/basket-calculation'
+import {cleanupTemporaryBasket} from '@salesforce/retail-react-app/app/components/apple-pay-express/utils/basket-cleanup'
 import {useStandalonePaymentMethods} from '@salesforce/retail-react-app/app/components/apple-pay-express/hooks/use-standalone-payment-methods'
 import {useAccessToken} from '@salesforce/commerce-sdk-react'
 import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
@@ -188,16 +189,7 @@ export const getAppleButtonConfig = (
                 // Get or create basket using shared reference
                 let currentBasket = await getOrCreateBasket()
                 if (!currentBasket || !currentBasket.basketId) {
-                    // Clean up temporary basket on failure
-                    if (isPdpMode && sharedBasketRef?.basketId) {
-                        try {
-                            await deleteTemporaryBasket(sharedBasketRef.basketId, authToken, site)
-                            if (setTempBasket) setTempBasket(null)
-                            sharedBasketRef = null
-                        } catch (cleanupError) {
-                            console.warn('Failed to cleanup temporary basket:', cleanupError)
-                        }
-                    }
+                    await cleanupTemporaryBasket(isPdpMode, sharedBasketRef, authToken, site, setTempBasket)
                     reject()
                     sendExpressMessage(EXPRESS_PAYMENT_FAILURE, {
                         PAYMENT_METHOD
@@ -218,16 +210,7 @@ export const getAppleButtonConfig = (
                     
                     // Ensure we have a valid order total before proceeding
                     if (currentBasket.orderTotal === null || currentBasket.orderTotal === undefined) {
-                        // Clean up temporary basket on failure
-                        if (isPdpMode && sharedBasketRef?.basketId) {
-                            try {
-                                await deleteTemporaryBasket(sharedBasketRef.basketId, authToken, site)
-                                if (setTempBasket) setTempBasket(null)
-                                sharedBasketRef = null
-                            } catch (cleanupError) {
-                                console.warn('Failed to cleanup temporary basket:', cleanupError)
-                            }
-                        }
+                        await cleanupTemporaryBasket(isPdpMode, sharedBasketRef, authToken, site, setTempBasket)
                         reject()
                         sendExpressMessage(EXPRESS_PAYMENT_FAILURE, {
                             PAYMENT_METHOD
@@ -237,16 +220,7 @@ export const getAppleButtonConfig = (
                     
                 } catch (calculationError) {
                     // This is a critical error - we cannot proceed without order total
-                    // Clean up temporary basket on failure
-                    if (isPdpMode && sharedBasketRef?.basketId) {
-                        try {
-                            await deleteTemporaryBasket(sharedBasketRef.basketId, authToken, site)
-                            if (setTempBasket) setTempBasket(null)
-                            sharedBasketRef = null
-                        } catch (cleanupError) {
-                            console.warn('Failed to cleanup temporary basket:', cleanupError)
-                        }
-                    }
+                    await cleanupTemporaryBasket(isPdpMode, sharedBasketRef, authToken, site, setTempBasket)
                     reject()
                     sendExpressMessage(EXPRESS_PAYMENT_FAILURE, {
                         PAYMENT_METHOD
@@ -284,15 +258,7 @@ export const getAppleButtonConfig = (
                     })
                 } else {
                     // Clean up temporary basket on payment failure
-                    if (isPdpMode && sharedBasketRef?.basketId) {
-                        try {
-                            await deleteTemporaryBasket(sharedBasketRef.basketId, authToken, site)
-                            if (setTempBasket) setTempBasket(null)
-                            sharedBasketRef = null
-                        } catch (cleanupError) {
-                            console.warn('Failed to cleanup temporary basket:', cleanupError)
-                        }
-                    }
+                    await cleanupTemporaryBasket(isPdpMode, sharedBasketRef, authToken, site, setTempBasket)
                     reject()
                     sendExpressMessage(EXPRESS_PAYMENT_FAILURE, {
                         PAYMENT_METHOD
@@ -300,15 +266,7 @@ export const getAppleButtonConfig = (
                 }
             } catch (err) {
                 // Clean up temporary basket on any unexpected error
-                if (isPdpMode && sharedBasketRef?.basketId) {
-                    try {
-                        await deleteTemporaryBasket(sharedBasketRef.basketId, authToken, site)
-                        if (setTempBasket) setTempBasket(null)
-                        sharedBasketRef = null
-                    } catch (cleanupError) {
-                        console.warn('Failed to cleanup temporary basket:', cleanupError)
-                    }
-                }
+                await cleanupTemporaryBasket(isPdpMode, sharedBasketRef, authToken, site, setTempBasket)
                 reject()
                 sendExpressMessage(EXPRESS_PAYMENT_FAILURE, {
                     PAYMENT_METHOD
@@ -482,29 +440,14 @@ export const getAppleButtonConfig = (
             }
         },
         onError: (error) => {
-            // Clean up temporary basket when Apple Pay is cancelled or fails
-            const cleanup = async () => {
-                if (isPdpMode && sharedBasketRef?.basketId) {
-                    try {
-                        await deleteTemporaryBasket(sharedBasketRef.basketId, authToken, site)
-                        // Clear the temporary basket state
-                        if (setTempBasket) {
-                            setTempBasket(null)
-                        }
-                        sharedBasketRef = null
-                    } catch (cleanupError) {
-                        console.warn('Failed to cleanup temporary basket:', cleanupError)
-                    }
-                }
-            }
-            
+            // Clean up temporary basket when Apple Pay is cancelled or fails            
             if (error.name === 'CANCEL') {
-                cleanup()
+                cleanupTemporaryBasket(isPdpMode, sharedBasketRef, authToken, site, setTempBasket)
                 sendExpressMessage(EXPRESS_PAYMENT_CANCEL, {
                     PAYMENT_METHOD
                 })
             } else {
-                cleanup()
+                cleanupTemporaryBasket(isPdpMode, sharedBasketRef, authToken, site, setTempBasket)
                 sendExpressMessage(EXPRESS_PAYMENT_FAILURE, {
                     PAYMENT_METHOD
                 })
