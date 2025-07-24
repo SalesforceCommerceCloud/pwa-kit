@@ -134,29 +134,8 @@ export const forceOrderCalculation = async (basketId, authToken, site) => {
         const hasShippingMethod = currentBasket.shipments?.[0]?.shippingMethod != null
         
         if (!hasShippingMethod) {
-            // Apply a default shipping method to trigger order total calculation
-            const organizationId = validateParamsAndGetConfig(basketId, authToken, site)
-            const shippingUrl = `/mobify/proxy/api/checkout/shopper-baskets/v2/organizations/${organizationId}/baskets/${basketId}/shipments/me/shipping-method?siteId=${site.id}`
-            
-            // Try common shipping method IDs in order of preference
-            const shippingMethodIds = ['001', 'Ground', 'standard']
-            
-            for (const methodId of shippingMethodIds) {
-                const shippingResponse = await fetch(shippingUrl, {
-                    method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${authToken}`
-                    },
-                    body: JSON.stringify({
-                        id: methodId
-                    })
-                })
-                
-                if (shippingResponse.ok) {
-                    break // Successfully applied shipping method
-                }
-            }
+            // No shipping method applied - cannot calculate valid order total
+            throw new Error('No shipping method applied - cannot proceed with payment without valid shipping costs')
         }
         
         // Force a final calculation regardless of shipping method success
