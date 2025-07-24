@@ -94,7 +94,7 @@ const PickupAddress = () => {
             }
         },
         {
-            enabled: !!allStoreIds && STORE_LOCATOR_IS_ENABLED
+            enabled: STORE_LOCATOR_IS_ENABLED && !!allStoreIds
         }
     )
 
