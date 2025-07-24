@@ -12,6 +12,7 @@ import HorizontalSuggestions from '@salesforce/retail-react-app/app/components/s
 import {FormattedMessage} from 'react-intl'
 import {HideOnDesktop, HideOnMobile} from '@salesforce/retail-react-app/app/components/responsive'
 import Link from '@salesforce/retail-react-app/app/components/link'
+import {searchUrlBuilder} from '@salesforce/retail-react-app/app/utils/url'
 
 const SuggestionSection = ({searchSuggestions, closeAndNavigate, styles}) => {
     const hasCategories = searchSuggestions?.categorySuggestions?.length
@@ -20,22 +21,22 @@ const SuggestionSection = ({searchSuggestions, closeAndNavigate, styles}) => {
 
     return (
         <Fragment>
-            {hasPhraseSuggestions &&
-                searchSuggestions?.phraseSuggestions[0].exactMatch === false && (
-                    <Fragment>
-                        <Box {...styles.textContainer}>
-                            <FormattedMessage
-                                defaultMessage="Did you mean"
-                                id="search.suggestions.didYouMean"
-                            />
-                            <Link to={searchSuggestions?.phraseSuggestions[0].link}>
-                                {' ' + searchSuggestions?.phraseSuggestions[0].name + '?'}
-                            </Link>
-                        </Box>
-                    </Fragment>
-                )}
             {/* Mobile - Vertical alignment */}
             <HideOnDesktop>
+                {hasPhraseSuggestions &&
+                    searchSuggestions?.phraseSuggestions[0].exactMatch === false && (
+                        <Fragment>
+                            <Box {...styles.textContainer}>
+                                <FormattedMessage
+                                    defaultMessage="Did you mean"
+                                    id="search.suggestions.didYouMean"
+                                />
+                                <Link to={searchSuggestions?.phraseSuggestions[0].link}>
+                                    {' ' + searchSuggestions?.phraseSuggestions[0].name + '?'}
+                                </Link>
+                            </Box>
+                        </Fragment>
+                    )}
                 {hasCategories && (
                     <Fragment>
                         <Box {...styles.sectionHeader}>
@@ -65,10 +66,26 @@ const SuggestionSection = ({searchSuggestions, closeAndNavigate, styles}) => {
                     </Fragment>
                 )}
             </HideOnDesktop>
-            {/* Desktop - Horizontal alignment */}
+            {/* Desktop - Vertical and Horizontal alignment */}
             <HideOnMobile>
-                <Box display="flex" gap="4" minH="230px">
+                <Box display="flex" gap="5" minH="280px">
                     <Box flex="1">
+                        {hasPhraseSuggestions &&
+                            searchSuggestions?.phraseSuggestions[0].exactMatch === false && (
+                                <Fragment>
+                                    <Box {...styles.phraseContainer} mb="4">
+                                        <FormattedMessage
+                                            defaultMessage="Did you mean"
+                                            id="search.suggestions.didYouMean"
+                                        />
+                                        <Link to={searchSuggestions?.phraseSuggestions[0].link}>
+                                            {' ' +
+                                                searchSuggestions?.phraseSuggestions[0].name +
+                                                '?'}
+                                        </Link>
+                                    </Box>
+                                </Fragment>
+                            )}
                         {hasCategories && (
                             <Fragment>
                                 <Box {...styles.sectionHeader}>
@@ -91,6 +108,22 @@ const SuggestionSection = ({searchSuggestions, closeAndNavigate, styles}) => {
                                     closeAndNavigate={closeAndNavigate}
                                     suggestions={searchSuggestions?.productSuggestions}
                                 />
+                            </Fragment>
+                        )}
+                    </Box>
+                    <Box flex="1" display="flex" alignItems="center">
+                        {hasProducts && (
+                            <Fragment>
+                                <Box textAlign="center" width="100%">
+                                    <Link
+                                        to={searchUrlBuilder(searchSuggestions?.searchPhrase || '')}
+                                    >
+                                        <FormattedMessage
+                                            defaultMessage="View All"
+                                            id="search.suggestions.viewAll"
+                                        />
+                                    </Link>
+                                </Box>
                             </Fragment>
                         )}
                     </Box>

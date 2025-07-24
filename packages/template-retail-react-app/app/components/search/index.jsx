@@ -84,7 +84,8 @@ const formatSuggestions = (searchSuggestions) => {
                     exactMatch: phrase.exactMatch
                 }
             }
-        )
+        ),
+        searchPhrase: searchSuggestions?.searchPhrase
     }
 }
 

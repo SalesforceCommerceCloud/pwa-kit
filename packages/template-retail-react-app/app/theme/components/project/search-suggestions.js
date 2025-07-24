@@ -18,6 +18,10 @@ export default {
             fontSize: 'sm',
             lineHeight: 1.2
         },
+        phraseContainer: {
+            margin: '2 0 1 0',
+            paddingLeft: 12
+        },
         suggestionsContainer: {
             spacing: 0
         },
