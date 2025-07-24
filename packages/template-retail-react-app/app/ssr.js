@@ -330,7 +330,6 @@ const {handler} = runtime.createHandler(options, (app) => {
                         '*.salesforce-scrt.com',
 
                         '*.test1.my.pc-rnd.salesforce-scrt.com',
-                        'https://api.lab.amplitude.com/sdk/vardata'
                     ],
                     'frame-src': [
                         // Allow frames from Salesforce site.com (Needed for MIAW)
