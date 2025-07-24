@@ -33,6 +33,7 @@ The PWA Storefront MCP Server provides these features.
     - "What PWA-Kit presets are available?"
     - "Create a PWA-Kit project using the `retail-react-app-demo` preset in the `~/test-project` directory."
 - `run_site_test`: Run site performance or accessibility test for a given site URL (e.g. [https://pwa-kit.mobify-storefront.com](https://pwa-kit.mobify-storefront.com))
+-`create_sample_storefront_page`: Helps developers create a new sample PWA Storefront page. This feature guides develoopers through a few simple questions and then generates code for the page based on the name of the page, components included, and route.
 
 ## Setup
 
