@@ -38,6 +38,10 @@ const messages = defineMessages({
     mostViewed: {
         id: 'empty_search_results.recommended_products.title.most_viewed',
         defaultMessage: 'Most Viewed'
+    },
+    test:{
+        id: 'empty_search_results.test',
+        defaultMessage: 'Test123'
     }
 })
 

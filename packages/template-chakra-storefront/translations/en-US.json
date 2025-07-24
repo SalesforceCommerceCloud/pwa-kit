@@ -573,6 +573,9 @@
   "empty_search_results.recommended_products.title.top_sellers": {
     "defaultMessage": "Top Sellers"
   },
+  "empty_search_results.test": {
+    "defaultMessage": "Test123"
+  },
   "field.password.assistive_msg.hide_password": {
     "defaultMessage": "Hide password"
   },

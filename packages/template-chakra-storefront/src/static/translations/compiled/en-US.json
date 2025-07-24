@@ -1413,6 +1413,12 @@
       "value": "Top Sellers"
     }
   ],
+  "empty_search_results.test": [
+    {
+      "type": 0,
+      "value": "Test123"
+    }
+  ],
   "field.password.assistive_msg.hide_password": [
     {
       "type": 0,

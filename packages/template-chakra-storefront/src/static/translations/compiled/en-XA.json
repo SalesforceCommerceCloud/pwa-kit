@@ -2933,6 +2933,20 @@
       "value": "]"
     }
   ],
+  "empty_search_results.test": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ŧḗḗşŧ123"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
   "field.password.assistive_msg.hide_password": [
     {
       "type": 0,
