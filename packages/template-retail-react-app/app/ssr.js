@@ -342,7 +342,7 @@ const {handler} = runtime.createHandler(options, (app) => {
                         'https://pay.google.com'
                     ],
                     'frame-ancestors': [
-                        "'self'"
+                        'self'
                     ]
                 }
             }
