@@ -6,7 +6,7 @@
  */
 
 import {renderHook, act} from '@testing-library/react'
-import {useAutocompleteSuggestions} from './useAutocompleteSuggestions'
+import {useAutocompleteSuggestions} from '@salesforce/retail-react-app/../../app/hooks/useAutocompleteSuggestions'
 import {useMapsLibrary} from '@vis.gl/react-google-maps'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 
@@ -106,7 +106,7 @@ describe('useAutocompleteSuggestions', () => {
             input: '123 Main',
             includedPrimaryTypes: ['street_address'],
             sessionToken: expect.any(Object),
-            locationBias: {lat: 39.8283, lng: -98.5795}
+            includedRegionCodes: ['US']
         })
 
         expect(result.current.suggestions).toHaveLength(1)
@@ -127,12 +127,6 @@ describe('useAutocompleteSuggestions', () => {
                     placePrediction: {
                         text: {text: '123 Main St, New York, NY 10001, USA'},
                         placeId: 'us-place-id'
-                    }
-                },
-                {
-                    placePrediction: {
-                        text: {text: '456 Oak Ave, Toronto, ON M5C 1W4, Canada'},
-                        placeId: 'ca-place-id'
                     }
                 }
             ]
@@ -156,12 +150,6 @@ describe('useAutocompleteSuggestions', () => {
     it('should filter suggestions by country for Canada', async () => {
         const mockResponse = {
             suggestions: [
-                {
-                    placePrediction: {
-                        text: {text: '123 Main St, New York, NY 10001, USA'},
-                        placeId: 'us-place-id'
-                    }
-                },
                 {
                     placePrediction: {
                         text: {text: '456 Oak Ave, Toronto, ON M5C 1W4, Canada'},

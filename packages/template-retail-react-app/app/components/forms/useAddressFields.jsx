@@ -12,7 +12,10 @@ import {
     provinceOptions
 } from '@salesforce/retail-react-app/app/components/forms/state-province-options'
 import {SHIPPING_COUNTRY_CODES} from '@salesforce/retail-react-app/app/constants'
-import {parseAddressSuggestion} from '@salesforce/retail-react-app/app/utils/address-suggestions'
+import {
+    processAddressSuggestion,
+    setAddressFieldValues
+} from '@salesforce/retail-react-app/app/utils/address-suggestions'
 import {useAutocompleteSuggestions} from '@salesforce/retail-react-app/app/hooks/useAutocompleteSuggestions'
 
 const messages = defineMessages({
@@ -145,97 +148,18 @@ export default function useAddressFields({
         resetSession()
     }, [setShowDropdown, setIsDismissed, resetSession])
 
-    // Fetch and extract address fields from Google Maps place
-    const fetchAndExtractAddressFields = useCallback(
-        async (place) => {
-            await place.fetchFields({
-                fields: ['formattedAddress', 'addressComponents']
-            })
-
-            // Extract detailed components for address, city, state, and postal code
-            if (place.addressComponents) {
-                const components = place.addressComponents
-
-                // Extract street address (street number + route)
-                const streetNumber = components.find((comp) => comp.types.includes('street_number'))
-                const route = components.find((comp) => comp.types.includes('route'))
-
-                let streetAddress = ''
-                if (streetNumber && route) {
-                    streetAddress = `${streetNumber.longText} ${route.longText}`
-                } else if (route) {
-                    streetAddress = route.longText
-                } else if (streetNumber) {
-                    streetAddress = streetNumber.longText
-                }
-
-                if (streetAddress) {
-                    setValue(`${prefix}address1`, streetAddress)
-                } else {
-                    // Fallback to formatted address if we can't extract street components
-                    setValue(`${prefix}address1`, place.formattedAddress || '')
-                }
-
-                // Extract city
-                const locality = components.find(
-                    (comp) => comp.types.includes('locality') || comp.types.includes('sublocality')
-                )
-                if (locality) {
-                    setValue(`${prefix}city`, locality.longText)
-                }
-
-                // Extract state/province
-                const administrativeArea = components.find((comp) =>
-                    comp.types.includes('administrative_area_level_1')
-                )
-                if (administrativeArea) {
-                    // Prefer short code if available, otherwise use long name
-                    const stateCode = administrativeArea.shortText || administrativeArea.longText
-                    setValue(`${prefix}stateCode`, stateCode)
-                }
-
-                // Extract postal code
-                const postalCode = components.find((comp) => comp.types.includes('postal_code'))
-                if (postalCode) {
-                    setValue(`${prefix}postalCode`, postalCode.longText)
-                }
-            } else {
-                // Fallback to formatted address if no components available
-                setValue(`${prefix}address1`, place.formattedAddress || '')
-            }
-        },
-        [prefix, setValue]
-    )
-
     // Handle suggestion selection
     const handleSuggestionSelect = useCallback(
         async (suggestion) => {
             try {
-                // If we have the placePrediction, get detailed place information
-                if (suggestion.placePrediction) {
-                    const place = suggestion.placePrediction.toPlace()
-                    await fetchAndExtractAddressFields(place)
+                // Process address suggestion using unified utility method
+                const addressFields = await processAddressSuggestion(suggestion)
 
-                    // Reset session token after selecting a place
-                    resetSession()
-                } else {
-                    // Fallback to parsing from structured_formatting
-                    const parsedFields = await parseAddressSuggestion(suggestion)
-                    setValue(`${prefix}address1`, parsedFields.address1)
-                    if (parsedFields.city) {
-                        setValue(`${prefix}city`, parsedFields.city)
-                    }
-                    if (parsedFields.stateCode) {
-                        setValue(`${prefix}stateCode`, parsedFields.stateCode)
-                    }
-                    if (parsedFields.postalCode) {
-                        setValue(`${prefix}postalCode`, parsedFields.postalCode)
-                    }
-                    if (parsedFields.countryCode) {
-                        setValue(`${prefix}countryCode`, parsedFields.countryCode)
-                    }
-                }
+                // Set all address field values using the utility function
+                setAddressFieldValues(setValue, prefix, addressFields)
 
+                // Reset session token after selecting a place
+                resetSession()
                 setShowDropdown(false)
                 setIsDismissed(true)
                 setCurrentInput('')
@@ -243,7 +167,7 @@ export default function useAddressFields({
                 console.error('Error parsing address suggestion:', error)
             }
         },
-        [prefix, setValue, fetchAndExtractAddressFields, resetSession]
+        [prefix, setValue, resetSession]
     )
 
     // Define address fields

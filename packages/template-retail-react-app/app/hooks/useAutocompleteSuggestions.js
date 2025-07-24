@@ -8,6 +8,9 @@
 import {useState, useRef, useCallback, useEffect} from 'react'
 import {useMapsLibrary} from '@vis.gl/react-google-maps'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
+import {convertGoogleMapsSuggestions} from '../utils/address-suggestions'
+
+const DEBOUNCE_DELAY = 300
 
 /**
  * Custom hook for Google Maps Places autocomplete suggestions
@@ -63,53 +66,19 @@ export const useAutocompleteSuggestions = (
                     sessionToken: sessionTokenRef.current // REUSED SESSION TOKEN
                 }
 
-                // Add location bias for better country-specific results
-                if (countryCode === 'CA') {
-                    request.locationBias = {lat: 56.1304, lng: -106.3468} // Center of Canada
-                } else if (countryCode === 'US') {
-                    request.locationBias = {lat: 39.8283, lng: -98.5795} // Center of US
+                // Add included region codes for country-specific results as requested in code review
+                // Places API (New) uses includedRegionCodes instead of componentRestrictions
+                if (countryCode) {
+                    request.includedRegionCodes = [countryCode]
                 }
 
                 // Get suggestions from Google Maps API
                 const response = await AutocompleteSuggestion.fetchAutocompleteSuggestions(request)
 
                 // Convert Google Maps format to our expected format
-                const googleSuggestions = response.suggestions.map((suggestion) => ({
-                    description: suggestion.placePrediction.text.text,
-                    place_id: suggestion.placePrediction.placeId,
-                    structured_formatting: {
-                        main_text:
-                            suggestion.placePrediction.text.text.split(',')[0] ||
-                            suggestion.placePrediction.text.text,
-                        secondary_text: suggestion.placePrediction.text.text
-                            .split(',')
-                            .slice(1)
-                            .join(',')
-                            .trim()
-                    },
-                    terms: suggestion.placePrediction.text.text
-                        .split(',')
-                        .map((term) => ({value: term.trim()})),
-                    placePrediction: suggestion.placePrediction // Keep original for detailed place fetching
-                }))
+                const googleSuggestions = convertGoogleMapsSuggestions(response.suggestions)
 
-                // Filter by country if specified
-                let filteredSuggestions = googleSuggestions
-                if (countryCode) {
-                    filteredSuggestions = googleSuggestions.filter((suggestion) => {
-                        const description = suggestion.description.toLowerCase()
-                        if (countryCode === 'US') {
-                            return (
-                                description.includes('usa') || description.includes('united states')
-                            )
-                        } else if (countryCode === 'CA') {
-                            return description.includes('canada')
-                        }
-                        return true
-                    })
-                }
-
-                setSuggestions(filteredSuggestions)
+                setSuggestions(googleSuggestions)
             } catch (error) {
                 console.error('Error fetching address suggestions:', error)
                 setSuggestions([])
@@ -146,7 +115,7 @@ export const useAutocompleteSuggestions = (
         // Debounce the API call
         debounceTimeoutRef.current = setTimeout(() => {
             fetchSuggestions(inputString)
-        }, 300) // 300ms debounce
+        }, DEBOUNCE_DELAY)
 
         // Cleanup function
         return () => {

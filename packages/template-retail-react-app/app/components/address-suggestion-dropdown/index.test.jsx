@@ -8,7 +8,7 @@
 import React from 'react'
 import {render, screen, fireEvent} from '@testing-library/react'
 import '@testing-library/jest-dom'
-import AddressSuggestionDropdown from './index'
+import AddressSuggestionDropdown from '@salesforce/retail-react-app/../../app/components/address-suggestion-dropdown/index'
 
 describe('AddressSuggestionDropdown', () => {
     const mockSuggestions = [
