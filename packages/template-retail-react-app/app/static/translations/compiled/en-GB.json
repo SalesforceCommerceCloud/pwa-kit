@@ -3471,6 +3471,12 @@
       "value": "Save & Continue to Shipping Method"
     }
   ],
+  "shipping_address_form.button.save": [
+    {
+      "type": 0,
+      "value": "Save"
+    }
+  ],
   "shipping_address_form.heading.edit_address": [
     {
       "type": 0,
@@ -3517,6 +3523,18 @@
     {
       "type": 0,
       "value": "Error loading products. Please try again."
+    }
+  ],
+  "shipping_multi_address.error.save_failed": [
+    {
+      "type": 0,
+      "value": "Failed to save address"
+    }
+  ],
+  "shipping_multi_address.error.submission_failed": [
+    {
+      "type": 0,
+      "value": "Failed to proceed with checkout"
     }
   ],
   "shipping_multi_address.format.address_line_2": [
@@ -3567,6 +3585,24 @@
     {
       "type": 0,
       "value": "Quantity"
+    }
+  ],
+  "shipping_multi_address.submit.description": [
+    {
+      "type": 0,
+      "value": "Continue to next step with selected delivery addresses"
+    }
+  ],
+  "shipping_multi_address.submit.loading": [
+    {
+      "type": 0,
+      "value": "Saving address..."
+    }
+  ],
+  "shipping_multi_address.success.address_saved": [
+    {
+      "type": 0,
+      "value": "Address saved successfully"
     }
   ],
   "shipping_options.action.send_as_a_gift": [

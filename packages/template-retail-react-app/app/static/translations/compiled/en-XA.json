@@ -7319,6 +7319,20 @@
       "value": "]"
     }
   ],
+  "shipping_address_form.button.save": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Şȧȧṽḗḗ"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
   "shipping_address_form.heading.edit_address": [
     {
       "type": 0,
@@ -7431,6 +7445,34 @@
       "value": "]"
     }
   ],
+  "shipping_multi_address.error.save_failed": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ƒȧȧīŀḗḗḓ ŧǿǿ şȧȧṽḗḗ ȧȧḓḓřḗḗşş"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "shipping_multi_address.error.submission_failed": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ƒȧȧīŀḗḗḓ ŧǿǿ ƥřǿǿƈḗḗḗḗḓ ẇīŧħ ƈħḗḗƈķǿǿŭŭŧ"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
   "shipping_multi_address.format.address_line_2": [
     {
       "type": 0,
@@ -7515,6 +7557,48 @@
     {
       "type": 0,
       "value": "Ɋŭŭȧȧƞŧīŧẏ"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "shipping_multi_address.submit.description": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ƈǿǿƞŧīƞŭŭḗḗ ŧǿǿ ƞḗḗẋŧ şŧḗḗƥ ẇīŧħ şḗḗŀḗḗƈŧḗḗḓ ḓḗḗŀīṽḗḗřẏ ȧȧḓḓřḗḗşşḗḗş"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "shipping_multi_address.submit.loading": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Şȧȧṽīƞɠ ȧȧḓḓřḗḗşş..."
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "shipping_multi_address.success.address_saved": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ȧḓḓřḗḗşş şȧȧṽḗḗḓ şŭŭƈƈḗḗşşƒŭŭŀŀẏ"
     },
     {
       "type": 0,

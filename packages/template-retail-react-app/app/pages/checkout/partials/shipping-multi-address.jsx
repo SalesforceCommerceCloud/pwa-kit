@@ -5,16 +5,23 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React, {useState} from 'react'
-import {useIntl} from 'react-intl'
+import {useIntl, defineMessage} from 'react-intl'
 import PropTypes from 'prop-types'
+import {useForm} from 'react-hook-form'
+import {nanoid} from 'nanoid'
 
-import {useProducts} from '@salesforce/commerce-sdk-react'
+import {useProducts, useShopperCustomersMutation} from '@salesforce/commerce-sdk-react'
 import {findImageGroupBy} from '@salesforce/retail-react-app/app/utils/image-groups-utils'
 import {getPriceData} from '@salesforce/retail-react-app/app/utils/product-utils'
 import DisplayPrice from '@salesforce/retail-react-app/app/components/display-price'
 import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
 import {useCurrency} from '@salesforce/retail-react-app/app/hooks'
 import ItemVariantProvider from '@salesforce/retail-react-app/app/components/item-variant'
+import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
+
+import AddressFields from '@salesforce/retail-react-app/app/components/forms/address-fields'
+import FormActionButtons from '@salesforce/retail-react-app/app/components/forms/form-action-buttons'
+import LoadingSpinner from '@salesforce/retail-react-app/app/components/loading-spinner'
 import {
     Text,
     Button,
@@ -31,12 +38,12 @@ import {
     AlertTitle,
     AlertDescription,
     Center,
-    Spinner
+    Spinner,
+    Stack
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 
 const MultiShippingItemAttributes = ({variant, includeQuantity = true}) => {
     const {formatMessage} = useIntl()
-    // Get display values for attributes
     const variationAttributes = variant?.variationAttributes || []
     const variationValues = variant?.variationValues || {}
     return (
@@ -80,6 +87,43 @@ MultiShippingItemAttributes.propTypes = {
     includeQuantity: PropTypes.bool
 }
 
+const AddressForm = ({item, form, onSubmit, onCancel}) => {
+    const saveButtonLabel = defineMessage({
+        defaultMessage: 'Save',
+        id: 'shipping_address_form.button.save'
+    })
+    return (
+        <Box position="relative" bg="white" padding={6} width="100%">
+            {form.formState.isSubmitting && <LoadingSpinner />}
+            <form
+                onSubmit={form.handleSubmit(async (data) => {
+                    await onSubmit(data, form, item.itemId)
+                })}
+            >
+                <Stack spacing={6} width="100%">
+                    {form.formState.errors?.global && (
+                        <Alert status="error">
+                            <AlertIcon color="red.600" boxSize={4} />
+                            <Text fontSize="sm" ml={3}>
+                                {form.formState.errors.global.message}
+                            </Text>
+                        </Alert>
+                    )}
+                    <AddressFields form={form} />
+                    <FormActionButtons onCancel={onCancel} saveButtonLabel={saveButtonLabel} />
+                </Stack>
+            </form>
+        </Box>
+    )
+}
+
+AddressForm.propTypes = {
+    item: PropTypes.object.isRequired,
+    form: PropTypes.object.isRequired,
+    onSubmit: PropTypes.func.isRequired,
+    onCancel: PropTypes.func.isRequired
+}
+
 const ShippingMultiAddress = ({
     basket,
     onSubmit,
@@ -90,6 +134,7 @@ const ShippingMultiAddress = ({
 }) => {
     const {formatMessage} = useIntl()
     const {currency} = useCurrency()
+    const ADD_NEW_ADDRESS_OPTION_VALUE = 'add-new-address'
     const productIds = basket?.productItems?.map((item) => item.productId).join(',')
     const {
         data: productsMap,
@@ -109,9 +154,32 @@ const ShippingMultiAddress = ({
             }
         }
     )
-    const {data: customer} = useCurrentCustomer()
+    const {data: customer, refetch: refetchCustomer} = useCurrentCustomer()
     const addresses = customer?.addresses || []
     const [selectedAddresses, setSelectedAddresses] = useState({})
+
+    const [showAddAddressForm, setShowAddAddressForm] = useState({})
+
+    const addressForm = useForm({
+        mode: 'onSubmit',
+        defaultValues: {
+            firstName: '',
+            lastName: '',
+            phone: '',
+            countryCode: 'US',
+            address1: '',
+            city: '',
+            stateCode: '',
+            postalCode: '',
+            preferred: false
+        }
+    })
+
+    const createCustomerAddress = useShopperCustomersMutation('createCustomerAddress')
+    const showToast = useToast()
+
+    const isAddressFormOpen =
+        Object.keys(showAddAddressForm).filter((key) => showAddAddressForm[key])?.length > 0
 
     if (!basket?.productItems?.length) {
         return (
@@ -132,7 +200,6 @@ const ShippingMultiAddress = ({
         )
     }
 
-    // Loading state
     if (productsLoading) {
         return (
             <Center p={8} textAlign="center" color="gray.500">
@@ -149,7 +216,6 @@ const ShippingMultiAddress = ({
         )
     }
 
-    // Error state
     if (productsError) {
         return (
             <Alert
@@ -179,8 +245,56 @@ const ShippingMultiAddress = ({
         )
     }
 
-    const onAddNewAddress = () => {
-        console.log('Add New Address clicked!')
+    const handleCancelAddressForm = (addressKey) => {
+        setShowAddAddressForm((prev) => ({
+            ...prev,
+            [addressKey]: false
+        }))
+        addressForm.clearErrors()
+    }
+
+    const handleCreateAddress = async (addressData, form, itemId) => {
+        const addressKey = itemId
+
+        try {
+            const newAddress = {
+                ...addressData,
+                addressId: nanoid()
+            }
+
+            const createdAddress = await createCustomerAddress.mutateAsync({
+                body: newAddress,
+                parameters: {customerId: customer.customerId}
+            })
+
+            setShowAddAddressForm((prev) => ({...prev, [addressKey]: false}))
+            form.reset()
+
+            form.clearErrors()
+
+            await refetchCustomer()
+
+            setSelectedAddresses((prev) => ({
+                ...prev,
+                [addressKey]: createdAddress.addressId
+            }))
+
+            showToast({
+                title: formatMessage({
+                    id: 'shipping_multi_address.success.address_saved',
+                    defaultMessage: 'Address saved successfully'
+                }),
+                status: 'success'
+            })
+        } catch (error) {
+            showToast({
+                title: formatMessage({
+                    id: 'shipping_multi_address.error.save_failed',
+                    defaultMessage: 'Failed to save address'
+                }),
+                status: 'error'
+            })
+        }
     }
 
     return (
@@ -204,8 +318,7 @@ const ShippingMultiAddress = ({
                             })?.images?.[0]
                             const imageUrl = image?.disBaseLink || image?.link || ''
                             const addressKey = item.itemId
-                            const selectedAddressId =
-                                selectedAddresses[addressKey] || addresses[0]?.addressId
+                            const selectedAddressId = selectedAddresses[addressKey]
 
                             return (
                                 <Box
@@ -309,18 +422,26 @@ const ShippingMultiAddress = ({
 
                                             <Box w="100%" mb={6}>
                                                 <Select
-                                                    value={selectedAddressId || ''}
+                                                    value={
+                                                        showAddAddressForm[addressKey]
+                                                            ? ADD_NEW_ADDRESS_OPTION_VALUE
+                                                            : selectedAddressId || ''
+                                                    }
                                                     onChange={(e) => {
                                                         const value = e.target.value
-                                                        if (value === 'add-new') {
-                                                            onAddNewAddress()
-                                                            // Reset to first address after calling onAddNewAddress
-                                                            setSelectedAddresses((prev) => ({
+
+                                                        if (
+                                                            value === ADD_NEW_ADDRESS_OPTION_VALUE
+                                                        ) {
+                                                            setShowAddAddressForm((prev) => ({
                                                                 ...prev,
-                                                                [addressKey]:
-                                                                    addresses[0]?.addressId || ''
+                                                                [addressKey]: true
                                                             }))
                                                         } else {
+                                                            setShowAddAddressForm((prev) => ({
+                                                                ...prev,
+                                                                [addressKey]: false
+                                                            }))
                                                             setSelectedAddresses((prev) => ({
                                                                 ...prev,
                                                                 [addressKey]: value
@@ -357,7 +478,7 @@ const ShippingMultiAddress = ({
                                                             )}
                                                         </option>
                                                     ))}
-                                                    <option value="add-new">
+                                                    <option value={ADD_NEW_ADDRESS_OPTION_VALUE}>
                                                         + {formatMessage(addNewAddressLabel)}
                                                     </option>
                                                 </Select>
@@ -378,16 +499,46 @@ const ShippingMultiAddress = ({
                                             </Box>
                                         </VStack>
                                     </Flex>
+
+                                    {/* Add New Address Form - appears inside the product card */}
+                                    {showAddAddressForm[addressKey] && (
+                                        <Box position="relative" mt={4} width="100%">
+                                            <AddressForm
+                                                item={item}
+                                                form={addressForm}
+                                                onSubmit={handleCreateAddress}
+                                                onCancel={() => handleCancelAddressForm(addressKey)}
+                                            />
+                                        </Box>
+                                    )}
                                 </Box>
                             )
                         })}
                     </VStack>
                 </Box>
-                <Box pt={2} w="100%">
-                    <Button type="button" width="full" onClick={onSubmit}>
-                        {formatMessage(submitButtonLabel)}
-                    </Button>
-                </Box>
+                <Button
+                    type="button"
+                    width="full"
+                    mt={2}
+                    isLoading={addressForm.formState.isSubmitting}
+                    {...(isAddressFormOpen && {disabled: true})}
+                    data-testid="continue-to-shipping-button"
+                    loadingText={formatMessage({
+                        id: 'shipping_multi_address.submit.loading',
+                        defaultMessage: 'Saving address...'
+                    })}
+                    aria-label={formatMessage({
+                        id: 'shipping_multi_address.submit.description',
+                        defaultMessage: 'Continue to next step with selected delivery addresses'
+                    })}
+                    onClick={() => {
+                        if (!isAddressFormOpen) {
+                            onSubmit()
+                        }
+                    }}
+                >
+                    {formatMessage(submitButtonLabel)}
+                </Button>
             </VStack>
         </Box>
     )
