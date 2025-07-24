@@ -5,7 +5,7 @@ on:
     schedule:
         # Run every day at 12am (PST) - cron uses UTC times.
         # Runs on the default branch.
-        - cron: '0 8 * * *'
+        # - cron: '0 8 * * *'
 
 jobs:
     run-performance-metrics:
@@ -61,8 +61,9 @@ jobs:
             - name: Set Retail App Private Client Home
               run: export RETAIL_APP_HOME=https://scaffold-pwa-e2e-pwa-kit-private.mobify-storefront.com/
 
-            - name: Run Performance Metrics
-              run: npm run test:performance-metrics # TODO: Replace with whatever command is used for performance metrics.
+            # TODO: This step is not needed. We don't need to worry about calling it from the workflow. What we need to worry about is the build and deploy to MRT.
+            # - name: Run Performance Metrics
+            #   run: npm run test:performance-metrics # TODO: Replace with whatever command is used for performance metrics.
 
     # Optionally send Slack notifications for performance metrics.
     notify-slack-performance-metrics:
