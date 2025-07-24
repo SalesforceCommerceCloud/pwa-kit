@@ -10,6 +10,18 @@
  * This is specifically for "Buy Now" flows where we need to show Apple Pay
  * before creating a basket
  */
+
+// Helper function to get the Adyen PWA library version dynamically
+function getAdyenPwaVersion() {
+    try {
+        // Try to read the version from the installed package
+        const packageJson = require('@adyen/adyen-salesforce-pwa/package.json')
+        return packageJson.version
+    } catch (error) {
+        console.error('Unable to determine Adyen PWA version', error)
+    }
+}
+
 export default async function handler(req, res) {
     if (req.method !== 'GET') {
         return res.status(405).json({error: 'Method not allowed'})
@@ -17,7 +29,7 @@ export default async function handler(req, res) {
 
     try {
         const {siteId, locale} = req.query
-        
+
         if (!siteId) {
             return res.status(400).json({error: 'siteId is required'})
         }
@@ -37,9 +49,10 @@ export default async function handler(req, res) {
         }
 
         // Construct Adyen API URL
-        const adyenBaseUrl = environment === 'live' 
-            ? 'https://checkout-live.adyen.com/v70'
-            : 'https://checkout-test.adyen.com/v70'
+        const adyenBaseUrl =
+            environment === 'live'
+                ? 'https://checkout-live.adyen.com/v70'
+                : 'https://checkout-test.adyen.com/v70'
 
         // Call Adyen payment methods API without basket dependency
         const adyenResponse = await fetch(`${adyenBaseUrl}/paymentMethods`, {
@@ -75,11 +88,10 @@ export default async function handler(req, res) {
             applicationInfo: {
                 adyenLibrary: {
                     name: 'adyen-salesforce-pwa',
-                    version: '3.0.0'
+                    version: getAdyenPwaVersion()
                 }
             }
         })
-
     } catch (error) {
         console.error('Payment methods API error:', error)
         res.status(500).json({
@@ -87,4 +99,4 @@ export default async function handler(req, res) {
             message: error.message
         })
     }
-} 
+}

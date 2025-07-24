@@ -18,22 +18,24 @@ const validateParamsAndGetConfig = (basketId, authToken, site) => {
     if (!basketId) {
         throw new Error('Basket ID is required')
     }
-    
+
     if (!authToken) {
         throw new Error('Authentication token is required')
     }
-    
+
     if (!site?.id) {
         throw new Error('Site ID is required')
     }
-    
-    const {app: {commerceAPI: config}} = getConfig()
+
+    const {
+        app: {commerceAPI: config}
+    } = getConfig()
     const {organizationId} = config.parameters
-    
+
     if (!organizationId) {
         throw new Error('Organization ID is required and not found in configuration')
     }
-    
+
     return organizationId
 }
 
@@ -48,16 +50,16 @@ const validateParamsAndGetConfig = (basketId, authToken, site) => {
 export const calculateBasketTotals = async (basketId, authToken, site) => {
     try {
         const organizationId = validateParamsAndGetConfig(basketId, authToken, site)
-        
+
         // Use PATCH method to update/calculate the basket
         // This triggers the Commerce Cloud to recalculate all totals
         const requestUrl = `/mobify/proxy/api/checkout/shopper-baskets/v2/organizations/${organizationId}/baskets/${basketId}?siteId=${site.id}`
-        
+
         const response = await fetch(requestUrl, {
             method: 'PATCH',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${authToken}`
+                Authorization: `Bearer ${authToken}`
             },
             body: JSON.stringify({
                 // Empty body - this triggers recalculation without changing anything
@@ -70,7 +72,7 @@ export const calculateBasketTotals = async (basketId, authToken, site) => {
         }
 
         const calculatedBasket = await response.json()
-        
+
         return calculatedBasket
     } catch (error) {
         throw error
@@ -80,22 +82,22 @@ export const calculateBasketTotals = async (basketId, authToken, site) => {
 /**
  * Alternative method using direct basket retrieval to get calculated totals
  * @param {string} basketId - The basket ID to retrieve with calculated totals
- * @param {string} authToken - Authentication token  
+ * @param {string} authToken - Authentication token
  * @param {object} site - Site configuration object
  * @returns {Promise<object>} - The basket with current totals
  */
 export const getBasketWithTotals = async (basketId, authToken, site) => {
     try {
         const organizationId = validateParamsAndGetConfig(basketId, authToken, site)
-        
+
         // GET the basket to retrieve current calculated totals
         const requestUrl = `/mobify/proxy/api/checkout/shopper-baskets/v2/organizations/${organizationId}/baskets/${basketId}?siteId=${site.id}`
-        
+
         const response = await fetch(requestUrl, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${authToken}`
+                Authorization: `Bearer ${authToken}`
             }
         })
 
@@ -105,7 +107,7 @@ export const getBasketWithTotals = async (basketId, authToken, site) => {
         }
 
         const basket = await response.json()
-        
+
         return basket
     } catch (error) {
         throw error
@@ -124,30 +126,34 @@ export const forceOrderCalculation = async (basketId, authToken, site) => {
     try {
         // First, get the current basket state
         const currentBasket = await getBasketWithTotals(basketId, authToken, site)
-        
+
         // If orderTotal is already calculated, return as-is
         if (currentBasket.orderTotal !== null && currentBasket.orderTotal !== undefined) {
             return currentBasket
         }
-        
+
         // Check if we have a shipping method applied
         const hasShippingMethod = currentBasket.shipments?.[0]?.shippingMethod != null
-        
+
         if (!hasShippingMethod) {
             // No shipping method applied - cannot calculate valid order total
-            throw new Error('No shipping method applied - cannot proceed with payment without valid shipping costs')
+            throw new Error(
+                'No shipping method applied - cannot proceed with payment without valid shipping costs'
+            )
         }
-        
+
         // Force a final calculation regardless of shipping method success
         const finalBasket = await calculateBasketTotals(basketId, authToken, site)
-        
+
         // If still no orderTotal, the basket calculation failed - don't proceed with Apple Pay
         if (finalBasket.orderTotal === null || finalBasket.orderTotal === undefined) {
-            throw new Error('Unable to calculate order total - shipping methods may not be available for this location')
+            throw new Error(
+                'Unable to calculate order total - shipping methods may not be available for this location'
+            )
         }
-        
+
         return finalBasket
     } catch (error) {
         throw error
     }
-} 
+}

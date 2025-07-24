@@ -29,7 +29,7 @@ export class AdyenPaymentsService {
             const errorBody = await res.text()
             throw new Error(`Request failed with status ${res.status}: ${errorBody}`)
         }
-        
+
         return res.json()
     }
 }

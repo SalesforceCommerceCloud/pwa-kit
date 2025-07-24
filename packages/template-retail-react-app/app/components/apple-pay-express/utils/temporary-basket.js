@@ -19,24 +19,26 @@ export const createTemporaryBasket = async (sku, authToken, site, quantity = 1) 
     if (!sku) {
         throw new Error('SKU is required to create temporary basket')
     }
-    
+
     if (!authToken) {
         throw new Error('Authentication token is required')
     }
-    
+
     if (!site?.id) {
         throw new Error('Site ID is required')
     }
-    
+
     try {
         // Get the organizationId from the commerce API configuration
-        const {app: {commerceAPI: config}} = getConfig()
+        const {
+            app: {commerceAPI: config}
+        } = getConfig()
         const {organizationId} = config.parameters
-        
+
         if (!organizationId) {
             throw new Error('Organization ID is required and not found in configuration')
         }
-        
+
         const requestBody = {
             productItems: [
                 {
@@ -45,14 +47,14 @@ export const createTemporaryBasket = async (sku, authToken, site, quantity = 1) 
                 }
             ]
         }
-        
+
         const requestUrl = `/mobify/proxy/api/checkout/shopper-baskets/v2/organizations/${organizationId}/baskets?siteId=${site.id}&temporary=true`
-        
+
         const response = await fetch(requestUrl, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${authToken}`
+                Authorization: `Bearer ${authToken}`
             },
             body: JSON.stringify(requestBody)
         })
@@ -63,11 +65,11 @@ export const createTemporaryBasket = async (sku, authToken, site, quantity = 1) 
         }
 
         const tempBasket = await response.json()
-        
+
         if (!tempBasket || !tempBasket.basketId) {
             throw new Error('Invalid temporary basket response')
         }
-        
+
         return tempBasket
     } catch (error) {
         throw error
@@ -85,30 +87,32 @@ export const deleteTemporaryBasket = async (basketId, authToken, site) => {
     if (!basketId) {
         return false
     }
-    
+
     if (!authToken) {
         return false
     }
-    
+
     if (!site?.id) {
         return false
     }
-    
+
     try {
         // Get the organizationId from the commerce API configuration
-        const {app: {commerceAPI: config}} = getConfig()
+        const {
+            app: {commerceAPI: config}
+        } = getConfig()
         const {organizationId} = config.parameters
-        
+
         if (!organizationId) {
             return false
         }
-        
+
         const requestUrl = `/mobify/proxy/api/checkout/shopper-baskets/v2/organizations/${organizationId}/baskets/${basketId}?siteId=${site.id}`
-        
+
         const response = await fetch(requestUrl, {
             method: 'DELETE',
             headers: {
-                'Authorization': `Bearer ${authToken}`
+                Authorization: `Bearer ${authToken}`
             }
         })
 
@@ -131,7 +135,13 @@ export const deleteTemporaryBasket = async (basketId, authToken, site) => {
  * @param {function} setTempBasket - Function to clear temporary basket state
  * @returns {Promise<void>}
  */
-export const cleanupTemporaryBasket = async (isPdpMode, sharedBasketRef, authToken, site, setTempBasket) => {
+export const cleanupTemporaryBasket = async (
+    isPdpMode,
+    sharedBasketRef,
+    authToken,
+    site,
+    setTempBasket
+) => {
     if (isPdpMode && sharedBasketRef?.basketId) {
         try {
             await deleteTemporaryBasket(sharedBasketRef.basketId, authToken, site)
@@ -156,6 +166,12 @@ export const cleanupTemporaryBasket = async (isPdpMode, sharedBasketRef, authTok
  * @param {function} setTempBasket - Function to clear temporary basket state
  * @returns {function} Cleanup function
  */
-export const createCleanupFunction = (isPdpMode, sharedBasketRef, authToken, site, setTempBasket) => {
+export const createCleanupFunction = (
+    isPdpMode,
+    sharedBasketRef,
+    authToken,
+    site,
+    setTempBasket
+) => {
     return () => cleanupTemporaryBasket(isPdpMode, sharedBasketRef, authToken, site, setTempBasket)
-} 
+}

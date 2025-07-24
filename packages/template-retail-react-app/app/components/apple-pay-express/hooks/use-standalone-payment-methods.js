@@ -5,13 +5,13 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import {useState, useEffect} from 'react'
-import {AdyenPaymentMethodsService} from '../utils/payment-methods'
+import {AdyenPaymentMethodsService} from '@salesforce/retail-react-app/app/components/apple-pay-express/utils/payment-methods'
 
 /**
  * Hook for fetching payment methods without basket dependency (for "Buy Now" flows)
  * @param {string} authToken - Authentication token
  * @param {object} site - Site configuration
- * @param {object} locale - Locale configuration  
+ * @param {object} locale - Locale configuration
  * @param {boolean} enabled - Whether the hook should make API calls (default: true)
  * @returns {object} Payment methods data, loading state, and error
  */
@@ -30,10 +30,10 @@ export const useStandalonePaymentMethods = (authToken, site, locale, enabled = t
             try {
                 setLoading(true)
                 setError(null)
-                
+
                 const service = new AdyenPaymentMethodsService(authToken, site)
                 const data = await service.getPaymentMethods()
-                
+
                 setPaymentMethods(data)
             } catch (err) {
                 console.error('Error fetching standalone payment methods:', err)
@@ -51,4 +51,4 @@ export const useStandalonePaymentMethods = (authToken, site, locale, enabled = t
         loading,
         error
     }
-} 
+}

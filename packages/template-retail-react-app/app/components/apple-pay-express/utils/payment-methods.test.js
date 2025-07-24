@@ -122,4 +122,4 @@ describe('AdyenPaymentMethodsService', () => {
             await expect(paymentMethodsService.getPaymentMethods()).rejects.toThrow('Network error')
         })
     })
-}) 
+})

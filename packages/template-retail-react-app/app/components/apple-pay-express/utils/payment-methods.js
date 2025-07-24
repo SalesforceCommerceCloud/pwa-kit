@@ -35,4 +35,4 @@ export class AdyenPaymentMethodsService {
         })
         return this._handleResponse(res)
     }
-} 
+}
