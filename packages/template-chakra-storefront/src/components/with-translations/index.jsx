@@ -1,5 +1,11 @@
 // hoc/withTranslations.js
-import { useIntl } from 'react-intl';
+import {useIntl} from 'react-intl'
+
+// Re-export defineMessages for a cohesive API. This allows components to import
+// everything they need for translations from a single file, simplifying imports
+// and making mocking for tests.
+// WARNING: you MUST keep the name "defineMessages" for react-intl static analysis to work.
+export {defineMessages} from 'react-intl'
 
 /**
  * Higher-Order Component that abstracts React Intl complexity from components
