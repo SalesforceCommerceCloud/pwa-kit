@@ -55,7 +55,7 @@ export const getCustomerShippingDetails = (shippingAddress) => {
     }
 }
 
-// 'inputAddress' is the billing address if available, else we fall back to the shipping address
+// 'inputAddress' is the billing address if available, else we will fall back to the shipping address
 export const getCustomerBillingDetails = (inputAddress) => {
     return {
         billingAddress: {
@@ -95,7 +95,7 @@ export const updateShippingAddress = async (
         const shippingMethodResponse = await adyenShippingMethodsService.getShippingMethods(basket.basketId)
         let shippingOptionId = shippingMethodResponse.defaultShippingMethodId
 
-        // If the default shipping method is not applicable, update to the first applicable shipping method
+        // If the default shipping method is not applicable for this address, update to the first applicable
         if (!shippingMethodResponse.applicableShippingMethods.some((sm) => sm.id === shippingOptionId)) {
             shippingOptionId = shippingMethodResponse.applicableShippingMethods[0].id
             shippingMethodResponse.defaultShippingMethodId = shippingOptionId
@@ -144,7 +144,8 @@ export const updateShippingOption = async (
                 totalPrice: `${response.orderTotal}`
             }
         }
-        // If we were called by updateShippingAddress, we need to update the shippingOptionParameters as well
+        // If we were called by updateShippingAddress we will have shippingMethodResponse
+        // We need to update the shippingOptionParameters for applicable shipping methods to the new address
         if (shippingMethodResponse) {
             paymentDataRequestUpdate.newShippingOptionParameters = {
                 ...getGPShippingOptionParameters(shippingMethodResponse)
@@ -171,7 +172,8 @@ export const getGoogleButtonConfig = (
     navigate,
     fetchShippingMethods
 ) => {    
-    // Use productTotal if orderTotal is null, otherwise use orderTotal (INITIALIZE callback will update this in payment sheet eventually anyways)
+    // Use productTotal if orderTotal is null, otherwise use orderTotal
+    // The INITIALIZE callback will update this in payment sheet before user can try to pay
     let googlePayAmount = basket.orderTotal || (basket.productTotal)
     
     const buttonConfig = {
@@ -246,7 +248,7 @@ export const getGoogleButtonConfig = (
                     if (callbackTrigger === 'SHIPPING_OPTION') {
                         paymentDataRequestUpdate = await updateShippingOption(authToken, site, basket, shippingOptionData?.id)
                     }
-                    
+
                     resolve(paymentDataRequestUpdate);
                 });
             }
