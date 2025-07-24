@@ -93,12 +93,14 @@ export const updateShippingAddress = async (
 
         const adyenShippingMethodsService = new AdyenShippingMethodsService(authToken, site)
         const shippingMethodResponse = await adyenShippingMethodsService.getShippingMethods(basket.basketId)
-        if (!shippingMethodResponse.applicableShippingMethods.some((sm) => sm.id === shippingMethodResponse.defaultShippingMethodId)) {
-            const newShippingOptionId = shippingMethodResponse.applicableShippingMethods[0].id
-            shippingMethodResponse.defaultShippingMethodId = newShippingOptionId
-            return updateShippingOption(authToken, site, basket, newShippingOptionId, shippingMethodResponse)
+        let shippingOptionId = shippingMethodResponse.defaultShippingMethodId
+
+        // If the default shipping method is not applicable, update to the first applicable shipping method
+        if (!shippingMethodResponse.applicableShippingMethods.some((sm) => sm.id === shippingOptionId)) {
+            shippingOptionId = shippingMethodResponse.applicableShippingMethods[0].id
+            shippingMethodResponse.defaultShippingMethodId = shippingOptionId
         }
-        return updateShippingOption(authToken, site, basket, shippingMethodResponse.defaultShippingMethodId, shippingMethodResponse)
+        return updateShippingOption(authToken, site, basket, shippingOptionId, shippingMethodResponse)
     } catch (error) {
         return {
             error: {
@@ -177,7 +179,7 @@ export const getGoogleButtonConfig = (
         buttonType: 'buy', 
         isExpress: true,
         shippingAddressRequired: true,
-        // shippingAddressParameters: {"allowedCountryCodes": ["US"]}, // If you want to restrict country codes, you can do that here (it greys out options out of allowedCountryCodes)
+        // shippingAddressParameters: {"allowedCountryCodes": ["US"]}, // If you want to restrict country codes, you can do that here
         shippingOptionRequired: true,
         shippingOptionParameters: getGPShippingOptionParameters(shippingMethods), 
         billingAddressRequired: true,
@@ -313,7 +315,6 @@ export const GooglePayExpress = () => {
                 }
 
                 const googlePaymentMethodConfig = getGooglePaymentMethodConfig(adyenPaymentMethods)
-                
                 const googleButtonConfig = getGoogleButtonConfig(
                     authToken,
                     site,
@@ -353,11 +354,10 @@ export const GooglePayExpress = () => {
                     handleGooglePayUnavailable()
                 }
             } catch (err) {
-                // TODO: safari, chrome, (probably other browsers) throw different errors, so need to handle these properly
                 const isMissingOrderTotalError =
                     err instanceof TypeError &&
-                    (/undefined is not an object \(evaluating '[a-z]\.orderTotal'\)/.test(err.message) || 
-                    /Cannot read properties of undefined \(reading 'orderTotal'\)/.test(err.message))
+                    (/undefined is not an object \(evaluating '[a-z]\.orderTotal'\)/.test(err.message) || // Safari error
+                    /Cannot read properties of undefined \(reading 'orderTotal'\)/.test(err.message)) // Chrome error
 
                 const isMissingShippingMethodsError =
                     err instanceof TypeError &&
