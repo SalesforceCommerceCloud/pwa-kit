@@ -679,8 +679,73 @@ describe('Checkout happy path', () => {
     })
 })
 
-describe.skip('Checkout Addresses tests', () => {
+describe('Checkout Addresses tests', () => {
     test('Can edit address during checkout as a registered customer', async () => {
+        let currentBasket = JSON.parse(JSON.stringify(scapiBasketWithItem))
+
+        // Set up mock handlers for the component to function properly
+        prependHandlersToServer([
+            {
+                path: '*/baskets/:basketId/customer',
+                method: 'put',
+                status: 200,
+                delay: 0,
+                res: () => {
+                    currentBasket.customerInfo.email = 'customer@test.com'
+                    return currentBasket
+                }
+            },
+            {
+                path: '*/customers/:customerId/product-lists',
+                method: 'get',
+                status: 200,
+                delay: 0,
+                res: () => mockedCustomerProductLists
+            },
+            {
+                path: '*/shipping-address',
+                method: 'put',
+                status: 200,
+                delay: 0,
+                res: (req) => {
+                    const shippingAddress = {
+                        address1: req.body.address1,
+                        city: req.body.city || 'Tampa',
+                        countryCode: 'US',
+                        firstName: req.body.firstName || 'Test',
+                        fullName: `${req.body.firstName || 'Test'} ${req.body.lastName || 'McTester'}`,
+                        id: '047b18d4aaaf4138f693a4b931',
+                        lastName: req.body.lastName || 'McTester',
+                        phone: req.body.phone || '(727) 555-1234',
+                        postalCode: req.body.postalCode || '33712',
+                        stateCode: req.body.stateCode || 'FL'
+                    }
+                    currentBasket.shipments[0].shippingAddress = shippingAddress
+                    return currentBasket
+                }
+            },
+            {
+                path: '*/addresses/savedaddress1',
+                method: 'patch',
+                status: 200,
+                delay: 0,
+                res: (req) => ({
+                    ...mockedRegisteredCustomer.addresses[0],
+                    ...req.body
+                })
+            },
+            {
+                path: '*/baskets',
+                method: 'get',
+                status: 200,
+                delay: 0,
+                res: () => ({
+                    baskets: [currentBasket],
+                    total: 1
+                })
+            }
+        ])
+
         // Set the initial browser router path and render our component tree.
         window.history.pushState({}, 'Checkout', createPathWithDefaults('/checkout'))
         const {user} = renderWithProviders(<WrappedCheckout history={history} />, {
@@ -728,6 +793,68 @@ describe.skip('Checkout Addresses tests', () => {
     })
 
     test('Can add address during checkout as a registered customer', async () => {
+        let currentBasket = JSON.parse(JSON.stringify(scapiBasketWithItem))
+
+        // Set up mock handlers for the component to function properly
+        prependHandlersToServer([
+            {
+                path: '*/baskets/:basketId/customer',
+                method: 'put',
+                status: 200,
+                delay: 0,
+                res: () => {
+                    currentBasket.customerInfo.email = 'customer@test.com'
+                    return currentBasket
+                }
+            },
+            {
+                path: '*/customers/:customerId/product-lists',
+                method: 'get',
+                status: 200,
+                delay: 0,
+                res: () => mockedCustomerProductLists
+            },
+            {
+                path: '*/shipping-address',
+                method: 'put',
+                status: 200,
+                delay: 0,
+                res: (req) => {
+                    const shippingAddress = {
+                        address1: req.body.address1,
+                        city: req.body.city || 'Tampa',
+                        countryCode: 'US',
+                        firstName: req.body.firstName || 'Test',
+                        fullName: `${req.body.firstName || 'Test'} ${req.body.lastName || 'McTester'}`,
+                        id: '047b18d4aaaf4138f693a4b931',
+                        lastName: req.body.lastName || 'McTester',
+                        phone: req.body.phone || '(727) 555-1234',
+                        postalCode: req.body.postalCode || '33712',
+                        stateCode: req.body.stateCode || 'FL'
+                    }
+                    currentBasket.shipments[0].shippingAddress = shippingAddress
+                    return currentBasket
+                }
+            },
+            {
+                path: '*/customers/:customerId/addresses',
+                method: 'post',
+                status: 200,
+                delay: 0,
+                res: (req) => req.body
+            },
+            {
+                path: '*/baskets',
+                method: 'get',
+                status: 200,
+                delay: 0,
+                res: () => ({
+                    baskets: [currentBasket],
+                    total: 1
+                })
+            }
+        ])
+
         // Set the initial browser router path and render our component tree.
         window.history.pushState({}, 'Checkout', createPathWithDefaults('/checkout'))
         const {user} = renderWithProviders(<WrappedCheckout history={history} />, {
@@ -740,16 +867,6 @@ describe.skip('Checkout Addresses tests', () => {
                 config: mockConfig
             }
         })
-
-        prependHandlersToServer([
-            {
-                path: '*/customers/:customerId/addresses',
-                method: 'post',
-                status: 200,
-                delay: 0,
-                res: (req) => req.body
-            }
-        ])
 
         await waitFor(() => {
             expect(screen.getByText(/add new address/i)).toBeInTheDocument()

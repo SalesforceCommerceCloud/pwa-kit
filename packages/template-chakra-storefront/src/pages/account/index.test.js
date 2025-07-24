@@ -97,7 +97,7 @@ describe('Test redirects', function () {
     test('Redirects to login page if the customer is not logged in', async () => {
         useCustomerType.mockReturnValue({isRegistered: false, isGuest: true})
         renderWithProviders(<MockedComponent />, {
-            wrapperProps: {siteAlias: 'uk', appConfig: mockConfig, isGuest: true}
+            wrapperProps: {siteAlias: 'uk', config: mockConfig, isGuest: true}
         })
         await waitFor(() => expect(window.location.pathname).toBe(`${expectedBasePath}/login`))
     })
@@ -120,7 +120,7 @@ describe('Page Navigation', () => {
             }
         ])
         const {user} = renderWithProviders(<MockedComponent />, {
-            wrapperProps: {siteAlias: 'uk', appConfig: mockConfig}
+            wrapperProps: {siteAlias: 'uk', config: mockConfig}
         })
         expect(await screen.findByTestId('account-page')).toBeInTheDocument()
 

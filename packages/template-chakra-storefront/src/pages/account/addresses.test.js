@@ -129,7 +129,7 @@ test('Allows customer to add addresses', async () => {
         }
     ])
     const {user} = renderWithProviders(<MockedComponent />, {
-        wrapperProps: {siteAlias: 'uk', appConfig: mockConfig.app}
+        wrapperProps: {siteAlias: 'uk', config: mockConfig}
     })
 
     await waitFor(() => {
@@ -209,7 +209,7 @@ test('Handles focus for cancel/save buttons in address form correctly', async ()
         }
     ])
     const {user} = renderWithProviders(<MockedComponent />, {
-        wrapperProps: {siteAlias: 'uk', appConfig: mockConfig.app}
+        wrapperProps: {siteAlias: 'uk', config: mockConfig}
     })
 
     await waitFor(() => {

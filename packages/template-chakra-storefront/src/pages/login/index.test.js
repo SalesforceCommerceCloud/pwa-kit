@@ -122,7 +122,7 @@ describe('Logging in tests', function () {
             wrapperProps: {
                 siteAlias: 'uk',
                 locale: {id: 'en-GB'},
-                appConfig: mockConfig,
+                config: mockConfig,
                 bypassAuth: false
             }
         })
@@ -199,7 +199,7 @@ describe('Error while logging in', function () {
             wrapperProps: {
                 siteAlias: 'uk',
                 locale: {id: 'en-GB'},
-                appConfig: mockConfig.app,
+                config: mockConfig,
                 bypassAuth: false
             }
         })
@@ -243,7 +243,7 @@ describe('Navigate away from login page tests', function () {
             wrapperProps: {
                 siteAlias: 'uk',
                 locale: {id: 'en-GB'},
-                appConfig: mockConfig.app,
+                config: mockConfig,
                 isGuest: true
             }
         })
