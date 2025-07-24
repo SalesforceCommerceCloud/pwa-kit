@@ -56,21 +56,25 @@ let vol
 // Helper to create in-memory file system with test files
 const createTestFileSystem = (fileContents = {}) => {
     vol = new Volume()
-    
+
     // Default file structure
     const defaultFiles = {
-        '/mock/dir/src/components/featureComponent.jsx': fileContents.featureComponent || TEST_CODES.BASIC_COMPONENT,
-        '/mock/dir/src/components/featureAComponent/index.jsx': fileContents.featureAComponent || TEST_CODES.COMPONENT_A,
-        '/mock/dir/src/components/featureBComponent/index.jsx': fileContents.featureBComponent || TEST_CODES.COMPONENT_B,
-        '/mock/dir/src/pages/featureBPage/index.jsx': fileContents.featureBPage || TEST_CODES.FEATURE_B_PAGE,
-        ...fileContents.additional || {}
+        '/mock/dir/src/components/featureComponent.jsx':
+            fileContents.featureComponent || TEST_CODES.BASIC_COMPONENT,
+        '/mock/dir/src/components/featureAComponent/index.jsx':
+            fileContents.featureAComponent || TEST_CODES.COMPONENT_A,
+        '/mock/dir/src/components/featureBComponent/index.jsx':
+            fileContents.featureBComponent || TEST_CODES.COMPONENT_B,
+        '/mock/dir/src/pages/featureBPage/index.jsx':
+            fileContents.featureBPage || TEST_CODES.FEATURE_B_PAGE,
+        ...(fileContents.additional || {})
     }
-    
+
     vol.fromJSON(defaultFiles)
-    
+
     // Mock fs module with memfs volume
     jest.doMock('fs', () => vol)
-    
+
     return vol
 }
 
@@ -147,9 +151,9 @@ describe('trim-extensions without config', () => {
 
         const trimExtensions = require('./trim-extensions')
         const consoleSpy = mockConsole('log')
-        
+
         trimExtensions('/mock/dir', {})
-        
+
         expect(console.log).toHaveBeenCalledWith('No plugins found, skipping trim')
         consoleSpy.mockRestore()
     })
@@ -161,12 +165,12 @@ describe('trim-extensions with nested directories', () => {
     beforeEach(() => {
         jest.resetModules()
         jest.resetAllMocks()
-        
+
         // Ensure the original mock is restored
         jest.doMock('../assets/plugin-config', () => ({
             plugins: mockedPluginConfig
         }))
-        
+
         // Create file system with nested structure
         createTestFileSystem({
             additional: {
@@ -176,7 +180,7 @@ describe('trim-extensions with nested directories', () => {
                 '/mock/dir/src/pages/store-locator/partial/modal.jsx': `export const StoreLocator = 'StoreLocatorModal'`
             }
         })
-        
+
         trimExtensions = require('./trim-extensions')
         execSync.mockReturnValue(true)
     })
@@ -223,18 +227,18 @@ describe('trim-extensions', () => {
         vol.writeFileSync('/mock/dir/src/components/featureComponent.jsx', code)
 
         trimExtensions('/mock/dir', {SFDC_EXT_featureA: false})
-        
+
         const result = readFile('/mock/dir/src/components/featureComponent.jsx')
         expect(result).toEqualTrimmedLines(expected)
     })
 
     it('handles OR operator correctly', () => {
         const code = `const feature = (SFDC_EXT_featureA || SFDC_EXT_featureB) && 'Feature Enabled';`
-        
+
         vol.writeFileSync('/mock/dir/src/components/featureComponent.jsx', code)
 
         trimExtensions('/mock/dir', {SFDC_EXT_featureA: true, SFDC_EXT_featureB: false})
-        
+
         const result = readFile('/mock/dir/src/components/featureComponent.jsx')
         expect(result).toEqualTrimmedLines("const feature = 'Feature Enabled';")
     })
@@ -243,7 +247,7 @@ describe('trim-extensions', () => {
         const code = `const featureAFunc = SFDC_EXT_featureA && (() => 'Feature A');
             const featureBFunc = SFDC_EXT_featureB && (() => 'Feature B');
         `
-        
+
         vol.writeFileSync('/mock/dir/src/components/featureComponent.jsx', code)
 
         trimExtensions('/mock/dir', {SFDC_EXT_featureA: true, SFDC_EXT_featureB: false})
@@ -255,7 +259,7 @@ describe('trim-extensions', () => {
 
     it('handles variable with ternary expressions correctly when true', () => {
         const code = `const showFeature = SFDC_EXT_featureA ? Feature_A : Feature_B;`
-        
+
         vol.writeFileSync('/mock/dir/src/components/featureComponent.jsx', code)
 
         trimExtensions('/mock/dir', {SFDC_EXT_featureA: true})
@@ -267,7 +271,7 @@ describe('trim-extensions', () => {
 
     it('handles variable with ternary expressions correctly when false', () => {
         const code = `const showFeature = SFDC_EXT_featureA ? Feature_A : Feature_B;`
-        
+
         vol.writeFileSync('/mock/dir/src/components/featureComponent.jsx', code)
 
         trimExtensions('/mock/dir', {SFDC_EXT_featureA: false})
@@ -283,7 +287,7 @@ describe('trim-extensions', () => {
                 return SFDC_EXT_featureA ? Feature_A : Feature_B;
             }
         `
-        
+
         vol.writeFileSync('/mock/dir/src/components/featureComponent.jsx', code)
 
         trimExtensions('/mock/dir', {SFDC_EXT_featureA: true})
@@ -312,7 +316,7 @@ describe('trim-extensions', () => {
                 featureBProp: PropTypes.string
             });
         `
-        
+
         vol.writeFileSync('/mock/dir/src/components/featureComponent.jsx', code)
 
         trimExtensions('/mock/dir', {SFDC_EXT_featureA: true})
@@ -338,7 +342,7 @@ describe('trim-extensions', () => {
                 return SFDC_EXT_featureA ? "componentA" : "componentB";
             }
         `
-        
+
         vol.writeFileSync('/mock/dir/src/components/featureComponent.jsx', code)
 
         trimExtensions('/mock/dir', {SFDC_EXT_featureA: false})
@@ -364,7 +368,7 @@ describe('trim-extensions', () => {
                 );
             }
         `
-        
+
         vol.writeFileSync('/mock/dir/src/components/featureComponent.jsx', code)
 
         trimExtensions('/mock/dir', {SFDC_EXT_featureA: true, SFDC_EXT_featureB: false})
@@ -384,7 +388,7 @@ describe('trim-extensions', () => {
 
     it('does not remove referenced imports', () => {
         const code = `import { FeatureA } from './featureAComponent'`
-        
+
         vol.writeFileSync('/mock/dir/src/components/featureComponent.jsx', code)
 
         trimExtensions('/mock/dir', {SFDC_EXT_featureA: true})
@@ -396,12 +400,15 @@ describe('trim-extensions', () => {
 
     it('removes unused loadable import file when no more references exist', () => {
         // component B with page ref to featureBPage
-        vol.writeFileSync('/mock/dir/src/components/featureBComponent/index.jsx', TEST_CODES.COMPONENT_B_WITH_PAGE_REF)
+        vol.writeFileSync(
+            '/mock/dir/src/components/featureBComponent/index.jsx',
+            TEST_CODES.COMPONENT_B_WITH_PAGE_REF
+        )
         trimExtensions('/mock/dir', {SFDC_EXT_featureA: true, SFDC_EXT_featureB: false})
 
         // FeatureA should remain (it's enabled)
         expect(fileExists('/mock/dir/src/components/featureAComponent')).toBe(true)
-        
+
         // FeatureB should be removed (it's disabled and unused)
         expect(fileExists('/mock/dir/src/components/featureBComponent')).toBe(false)
         expect(fileExists('/mock/dir/src/pages/featureBPage')).toBe(false)
@@ -409,9 +416,12 @@ describe('trim-extensions', () => {
 
     it('reports error when updating file fails', () => {
         const consoleSpy = mockConsole('error')
-        
+
         // Create a read-only file to simulate write failure
-        vol.writeFileSync('/mock/dir/src/components/featureComponent.jsx', `const feature = SFDC_EXT_featureA ? Feature_A : Feature_B;`)
+        vol.writeFileSync(
+            '/mock/dir/src/components/featureComponent.jsx',
+            `const feature = SFDC_EXT_featureA ? Feature_A : Feature_B;`
+        )
         vol.writeFileSync = (...args) => {
             throw new Error('Simulated write error')
         }
@@ -422,22 +432,26 @@ describe('trim-extensions', () => {
             // Expected to fail
         }
 
-        expect(console.error).toHaveBeenCalledWith(
-            expect.stringContaining('Error updating file')
-        )
+        expect(console.error).toHaveBeenCalledWith(expect.stringContaining('Error updating file'))
         consoleSpy.mockRestore()
     })
 
     it('removes separate unused directories when the only references are from each other', () => {
         // Set up files that reference each other but are both unused
-        vol.writeFileSync('/mock/dir/src/components/featureBComponent/index.jsx', TEST_CODES.COMPONENT_B_WITH_PAGE_REF)
-        vol.writeFileSync('/mock/dir/src/pages/featureBPage/index.jsx', TEST_CODES.FEATURE_B_PAGE_WITH_COMPONENT_REF)
+        vol.writeFileSync(
+            '/mock/dir/src/components/featureBComponent/index.jsx',
+            TEST_CODES.COMPONENT_B_WITH_PAGE_REF
+        )
+        vol.writeFileSync(
+            '/mock/dir/src/pages/featureBPage/index.jsx',
+            TEST_CODES.FEATURE_B_PAGE_WITH_COMPONENT_REF
+        )
 
         trimExtensions('/mock/dir', {SFDC_EXT_featureA: true, SFDC_EXT_featureB: false})
 
         // FeatureA should remain
         expect(fileExists('/mock/dir/src/components/featureAComponent')).toBe(true)
-        
+
         // Both FeatureB component and page should be removed since they only reference each other
         expect(fileExists('/mock/dir/src/components/featureBComponent')).toBe(false)
         expect(fileExists('/mock/dir/src/pages/featureBPage')).toBe(false)
