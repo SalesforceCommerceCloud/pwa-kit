@@ -25,18 +25,7 @@ import {
     basketWithProductBundle,
     bundleProductItemsForPDP
 } from '../../../mocks/product-bundle'
-
-const mockAddToWishlist = jest.fn()
-const mockIsItemInWishlist = jest.fn().mockReturnValue(false)
-jest.mock('../../hooks/use-wish-list', () => ({
-    __esModule: true,
-    useWishList: () => ({
-        data: mockWishlistWithItem.data[0],
-        addToWishlist: mockAddToWishlist,
-        isItemInWishlist: mockIsItemInWishlist,
-        isPending: false
-    })
-}))
+import Toaster, {toaster} from '../../components/toaster'
 
 jest.mock('../../hooks/use-datacloud', () => ({
     __esModule: true,
@@ -51,12 +40,15 @@ jest.mock('../../hooks/use-datacloud', () => ({
 
 const MockedComponent = () => {
     return (
-        <Switch>
-            <Route
-                path="/uk/en-GB/product/:productId"
-                render={(props) => <ProductDetail {...props} />}
-            />
-        </Switch>
+        <>
+            <Switch>
+                <Route
+                    path="/uk/en-GB/product/:productId"
+                    render={(props) => <ProductDetail {...props} />}
+                />
+            </Switch>
+            <Toaster toaster={toaster} />
+        </>
     )
 }
 
@@ -100,7 +92,7 @@ beforeEach(() => {
 afterEach(() => {
     jest.resetModules()
     jest.clearAllMocks()
-    mockIsItemInWishlist.mockReturnValue(false)
+    // mockIsItemInWishlist.mockReturnValue(false)
 })
 
 describe('product detail', () => {
@@ -136,6 +128,25 @@ describe('product detail', () => {
                 path: '*/products/:productId',
                 method: 'get',
                 res: () => masterProduct
+            },
+            {
+                // Mock the API call for adding items to wishlist
+                path: '*/customers/:customerId/product-lists/:productListId/items',
+                method: 'post',
+                res: () => ({
+                    ...mockWishlistWithItem.data[0],
+                    customerProductListItems: [
+                        ...mockWishlistWithItem.data[0].customerProductListItems,
+                        {
+                            id: 'new-item-id',
+                            productId: '25517823M',
+                            priority: 1,
+                            quantity: 1,
+                            public: false,
+                            type: 'product'
+                        }
+                    ]
+                })
             }
         ])
 
@@ -152,7 +163,7 @@ describe('product detail', () => {
             await user.click(wishlistButton)
         })
         await waitFor(() => {
-            expect(mockAddToWishlist).toHaveBeenCalledTimes(1)
+            expect(screen.getByText(/item added to wishlist/i)).toBeInTheDocument()
         })
     })
 
@@ -178,13 +189,14 @@ describe('product detail', () => {
             expect(screen.getAllByText(/Long Sleeve Crew Neck/)).toHaveLength(2)
             expect(screen.getByText(/You might also like/i)).toBeInTheDocument()
         })
+
         const wishlistButton = await screen.findByRole('button', {name: 'Add to Wishlist'})
 
         await act(async () => {
             await user.click(wishlistButton)
         })
         await waitFor(() => {
-            expect(mockAddToWishlist).toHaveBeenCalledTimes(0)
+            expect(screen.getByText(/item is already in wishlist/i)).toBeInTheDocument()
         })
     })
 })
