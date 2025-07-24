@@ -41,7 +41,7 @@ const options = {
     // Set this to false if using a SLAS public client
     // When setting this to true, make sure to also set the PWA_KIT_SLAS_CLIENT_SECRET
     // environment variable as this endpoint will return HTTP 501 if it is not set
-    useSLASPrivateClient: false,
+    useSLASPrivateClient: true,
 
     // If you wish to use additional SLAS endpoints that require private clients,
     // customize this regex to include the additional endpoints the custom SLAS
@@ -294,17 +294,20 @@ const {handler} = runtime.createHandler(options, (app) => {
                 directives: {
                     'img-src': [
                         // Default source for product images - replace with your CDN
-                        '*.commercecloud.salesforce.com'
+                        '*.commercecloud.salesforce.com',
+                        '*.sfcc-store-internal.net'
                     ],
                     'script-src': [
                         // Used by the service worker in /worker/main.js
-                        'storage.googleapis.com'
+                        'storage.googleapis.com',
+                        '*.sfcc-store-internal.net'
                     ],
                     'connect-src': [
                         // Connect to Einstein APIs
                         'api.cquotient.com',
                         // Connect to DataCloud APIs
-                        '*.c360a.salesforce.com'
+                        '*.c360a.salesforce.com',
+                        '*.sfcc-store-internal.net'
                     ]
                 }
             }

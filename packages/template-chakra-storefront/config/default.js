@@ -14,10 +14,10 @@ module.exports = {
     commerceAPI: {
         proxyPath: '/mobify/proxy/api',
         parameters: {
-            clientId: 'c9c45bfd-0ed3-4aa2-9971-40f88962b836',
-            organizationId: 'f_ecom_zzrf_001',
-            shortCode: '8o7m175y',
-            siteId: 'RefArchGlobal'
+            clientId: '9629ef22-f8b8-4987-90ac-b815be3940c8',
+            organizationId: 'f_ecom_tbbn_prd',
+            shortCode: 'performance-001',
+            siteId: 'SiteNemesis'
         }
     },
     mobify: {
@@ -44,7 +44,7 @@ module.exports = {
             ]
         }
     },
-    defaultSite: 'RefArchGlobal',
+    defaultSite: 'SiteNemesis',
     defaultAppLocale: 'en-US',
     defaultSiteTitle: 'Chakra Storefront',
     pages: {
@@ -137,13 +137,10 @@ module.exports = {
         recentSearchLimit: 5,
         recentSearchMinLength: 3
     },
-    siteAliases: {
-        RefArch: 'us',
-        RefArchGlobal: 'global'
-    },
+    siteAliases: {SiteNemesis: ''},
     sites: [
         {
-            id: 'RefArch',
+            id: 'SiteNemesis',
             l10n: {
                 supportedCurrencies: ['USD'],
                 defaultCurrency: 'USD',
@@ -152,62 +149,8 @@ module.exports = {
                     {
                         id: 'en-US',
                         preferredCurrency: 'USD'
-                    },
-                    {
-                        id: 'en-CA',
-                        preferredCurrency: 'USD'
                     }
                 ]
-            }
-        },
-        {
-            id: 'RefArchGlobal',
-            l10n: {
-                supportedCurrencies: ['GBP', 'EUR', 'CNY', 'JPY'],
-                defaultCurrency: 'GBP',
-                supportedLocales: [
-                    {
-                        id: 'de-DE',
-                        preferredCurrency: 'EUR'
-                    },
-                    {
-                        id: 'en-GB',
-                        preferredCurrency: 'GBP'
-                    },
-                    {
-                        id: 'es-MX',
-                        preferredCurrency: 'MXN'
-                    },
-                    {
-                        id: 'fr-FR',
-                        preferredCurrency: 'EUR'
-                    },
-                    {
-                        id: 'it-IT',
-                        preferredCurrency: 'EUR'
-                    },
-                    {
-                        id: 'ja-JP',
-                        preferredCurrency: 'JPY'
-                    },
-                    {
-                        id: 'ko-KR',
-                        preferredCurrency: 'KRW'
-                    },
-                    {
-                        id: 'pt-BR',
-                        preferredCurrency: 'BRL'
-                    },
-                    {
-                        id: 'zh-CN',
-                        preferredCurrency: 'CNY'
-                    },
-                    {
-                        id: 'zh-TW',
-                        preferredCurrency: 'TWD'
-                    }
-                ],
-                defaultLocale: 'en-GB'
             }
         }
     ],
