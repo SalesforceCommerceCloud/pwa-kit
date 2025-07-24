@@ -552,17 +552,29 @@ describe('product bundles', () => {
         const childProducts = screen.getAllByTestId('child-product')
         expect(childProducts).toHaveLength(3)
 
+        // Select variants for all 3 child products to enable the "Add Bundle to Cart" button
+
+        // Child product 0: Sleeveless Pleated Floral Front Blouse (only one color available)
+        const blouseProduct = childProducts[0]
+        const blouseSizeBtn = within(blouseProduct).getByLabelText('6')
+        await act(async () => {
+            await user.click(blouseSizeBtn)
+        })
+
+        // Child product 1: Swing Tank - Select Black + L (this has 3 inventory)
         const swingTankProduct = childProducts[1]
         const colorSelectionBtn = within(swingTankProduct).getByLabelText('Black')
         const sizeSelectionBtn = within(swingTankProduct).getByLabelText('L')
-
-        expect(swingTankProduct).toBeInTheDocument()
-        expect(colorSelectionBtn).toBeInTheDocument()
-        expect(sizeSelectionBtn).toBeInTheDocument()
-
         await act(async () => {
             await user.click(colorSelectionBtn)
             await user.click(sizeSelectionBtn)
+        })
+
+        // Child product 2: Pull On Neutral Pant (only one color available)
+        const pantProduct = childProducts[2]
+        const pantSizeBtn = within(pantProduct).getByLabelText('S')
+        await act(async () => {
+            await user.click(pantSizeBtn)
         })
 
         const addBundleToCartBtn = screen.getByRole('button', {name: /add bundle to cart/i})
