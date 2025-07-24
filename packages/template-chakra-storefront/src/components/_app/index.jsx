@@ -32,6 +32,7 @@ import {useUpdateShopperContext} from '../../hooks/use-update-shopper-context'
 
 // Components
 import {AppProviders, AppSEO, AppHeader, AppFooter, AppModals, AppLayout} from './partials'
+import {noop} from '../../utils/utils'
 
 /**
  * Main App component that orchestrates the entire application
@@ -83,6 +84,7 @@ const App = (props) => {
         onWishlistClick,
         // TODO: Will be enabled when store locator feature is ready
         // onStoreLocatorClick: onOpenStoreLocator,
+        onStoreLocatorClick: noop,
         mobileNavigationProps
     }
 

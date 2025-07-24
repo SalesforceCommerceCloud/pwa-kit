@@ -11,7 +11,7 @@ import {useCurrentBasket, useCurrentCustomer} from '../../hooks/'
 // Custom Cart Hooks
 import {useCartProducts} from '../../hooks/cart/use-cart-products'
 import {useCartOperations} from '../../hooks/cart/use-cart-operations'
-import {useCartWishlist} from '../../hooks/cart/use-cart-wishlist'
+import {useWishList} from '../../hooks/use-wish-list'
 import {useCartGiftItems} from '../../hooks/cart/use-cart-gift-items'
 import {useCartDefaultShipping} from '../../hooks/cart/use-cart-default-shipping'
 import {useErrorHandler} from '../../hooks/use-errors'
@@ -51,7 +51,8 @@ const Cart = () => {
     } = useCartOperations(basket, productsByItemId, showError)
 
     // Wishlist operations
-    const {handleAddToWishlist} = useCartWishlist(showError)
+    const {addToWishlist} = useWishList()
+    const handleAddToWishlist = (product) => addToWishlist(product)
 
     // Gift items
     const {localIsGiftItems, handleIsAGiftChange} = useCartGiftItems(
