@@ -46,7 +46,6 @@
   "devDependencies": {
     "@salesforce/pwa-kit-dev": "4.0.0-extensibility-preview.5",
     "internal-lib-build": "4.0.0-extensibility-preview.5",
-    "memfs": "^4.6.0",
     "verdaccio": "^5.22.1"
   },
   "engines": {
