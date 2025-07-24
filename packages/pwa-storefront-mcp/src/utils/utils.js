@@ -4,7 +4,8 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import fs from 'fs/promises'
+import fs from 'fs'
+import fsPromises from 'fs/promises'
 import path from 'path'
 import {spawn} from 'cross-spawn'
 import {zodToJsonSchema} from 'zod-to-json-schema'
@@ -94,7 +95,7 @@ export async function runNpxCommand(NPX_COMMAND, CREATE_APP_COMMAND, DISPLAY_PRO
                 return
             }
 
-            fs.promises
+            fsPromises.promises
                 .readFile(outputFilePath, 'utf-8')
                 .then((data) => resolve(data))
                 .catch((err) => reject(err))
