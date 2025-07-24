@@ -291,6 +291,7 @@ const {handler} = runtime.createHandler(options, (app) => {
         helmet({
             contentSecurityPolicy: {
                 useDefaults: true,
+                // TODO: the generator does not handle these directives
                 directives: {
                     'img-src': [
                         // Default source for product images - replace with your CDN

@@ -4,6 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
+// TODO: the corresponding file in the generator's assets needs to change its filename to .js to match this file.
 module.exports = {
     enabled: true,
     activeDataEnabled: false,
@@ -137,7 +138,7 @@ module.exports = {
         recentSearchLimit: 5,
         recentSearchMinLength: 3
     },
-    siteAliases: {SiteNemesis: ''},
+    siteAliases: {SiteNemesis: ''}, // TODO: this property is not covered by the generator
     sites: [
         {
             id: 'SiteNemesis',
