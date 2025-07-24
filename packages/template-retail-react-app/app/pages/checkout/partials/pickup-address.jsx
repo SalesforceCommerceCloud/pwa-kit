@@ -39,7 +39,7 @@ const PickupAddress = () => {
     const {step, STEPS, goToStep, goToNextStep} = useCheckout()
     const {data: basket} = useCurrentBasket()
 
-    // Check if there are any pickup shipments
+    // Check if there are any pickup shipments - moved to top
     const hasPickupShipments = useMemo(() => {
         if (!basket?.shipments) return false
         return basket.shipments.some(
@@ -47,28 +47,13 @@ const PickupAddress = () => {
         )
     }, [basket?.shipments])
 
-    // Check if there are delivery shipments (for determining display mode)
+    // Check if there are delivery shipments (for determining display mode) - moved to top
     const hasDeliveryShipments = useMemo(() => {
         if (!basket?.shipments) return false
         return basket.shipments.some((shipment) => !shipment?.shippingMethod?.c_storePickupEnabled)
     }, [basket?.shipments])
 
-    // Check if there are multiple pickup shipments
-    const pickupShipments =
-        basket?.shipments?.filter(
-            (shipment) => shipment?.shippingMethod?.c_storePickupEnabled === true
-        ) || []
-    const hasMultiplePickups = pickupShipments.length > 1
-
-    // Determine if we should show cart items (multi-pickup or mixed basket)
-    const shouldShowCartItems = hasMultiplePickups || hasDeliveryShipments
-
-    // If no pickup shipments, don't render anything
-    if (!hasPickupShipments) {
-        return null
-    }
-
-    // Get product data for display
+    // Get product data for display - moved to top before any conditional returns
     const productIds = basket?.productItems?.map(({productId}) => productId).join(',') ?? ''
     const {data: products, isLoading: isProductsLoading} = useProducts(
         {
@@ -90,7 +75,7 @@ const PickupAddress = () => {
         }
     )
 
-    // Get all unique store IDs from pickup shipments
+    // Get all unique store IDs from pickup shipments - moved to top
     const allStoreIds = useMemo(() => {
         if (!basket?.shipments) return ''
 
@@ -116,7 +101,7 @@ const PickupAddress = () => {
     // Check if store data is still loading
     const isStoreDataLoading = !!allStoreIds && !storeData
 
-    // Create productsByItemId mapping
+    // Create productsByItemId mapping - moved to top
     const productsByItemId = useMemo(() => {
         const updateProductsByItemId = {}
         basket?.productItems?.forEach((productItem) => {
@@ -126,7 +111,7 @@ const PickupAddress = () => {
         return updateProductsByItemId
     }, [basket, products])
 
-    // Get pickup shipment items grouped by store
+    // Get pickup shipment items grouped by store - moved to top
     const pickupShipmentItems = useMemo(() => {
         if (!basket?.shipments || !basket?.productItems) return []
 
@@ -163,15 +148,31 @@ const PickupAddress = () => {
                 pickupShipments.push({
                     shipment,
                     store,
-                    categorizedProducts,
-                    itemsInShipment:
-                        categorizedProducts.regularProducts.length +
-                        categorizedProducts.bonusProducts.length
+                    regularProducts: categorizedProducts.regularProducts,
+                    bonusProducts: categorizedProducts.bonusProducts
                 })
             }
         })
+
         return pickupShipments
-    }, [basket?.shipments, basket?.productItems, storeData])
+    }, [basket?.shipments, basket?.productItems, storeData?.data])
+
+    // Determine pickup and delivery shipment counts
+    const pickupShipments =
+        basket?.shipments?.filter((shipment) =>
+            STORE_LOCATOR_IS_ENABLED
+                ? shipment?.shippingMethod?.c_storePickupEnabled === true
+                : false
+        ) || []
+    const hasMultiplePickups = pickupShipments.length > 1
+
+    // Determine if we should show cart items (multi-pickup or mixed basket)
+    const shouldShowCartItems = hasMultiplePickups || hasDeliveryShipments
+
+    // If no pickup shipments, don't render anything
+    if (!hasPickupShipments) {
+        return null
+    }
 
     // Check if pickup data is ready (has store data and not loading)
     const isPickupDataReady = pickupShipmentItems.length > 0 && !isStoreDataLoading
@@ -285,12 +286,10 @@ const PickupAddress = () => {
                                                     )}
 
                                                     {/* Regular Products */}
-                                                    {shipmentInfo.categorizedProducts
-                                                        .regularProducts.length > 0 && (
+                                                    {shipmentInfo.regularProducts.length > 0 && (
                                                         <CheckoutProductItemList
                                                             productItems={
-                                                                shipmentInfo.categorizedProducts
-                                                                    .regularProducts
+                                                                shipmentInfo.regularProducts
                                                             }
                                                             productsByItemId={productsByItemId}
                                                             isProductsLoading={isProductsLoading}
@@ -298,8 +297,7 @@ const PickupAddress = () => {
                                                     )}
 
                                                     {/* Bonus Products */}
-                                                    {shipmentInfo.categorizedProducts.bonusProducts
-                                                        .length > 0 && (
+                                                    {shipmentInfo.bonusProducts.length > 0 && (
                                                         <>
                                                             <Box mt={3} mb={2}>
                                                                 <Text
@@ -315,8 +313,7 @@ const PickupAddress = () => {
                                                             </Box>
                                                             <CheckoutProductItemList
                                                                 productItems={
-                                                                    shipmentInfo.categorizedProducts
-                                                                        .bonusProducts
+                                                                    shipmentInfo.bonusProducts
                                                                 }
                                                                 productsByItemId={productsByItemId}
                                                                 isProductsLoading={
