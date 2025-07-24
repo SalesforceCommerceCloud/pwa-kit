@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, salesforce.com, inc.
+ * Copyright (c) 2025, salesforce.com, inc.
  * All rights reserved.
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
@@ -10,7 +10,6 @@ import {render, screen} from '@testing-library/react'
 
 import {withCommerceSdkReact} from '.'
 
-// Mock hook for testing
 const createMockHook = (data, isLoading = false) => {
     return jest.fn(() => ({
         data,
@@ -18,7 +17,6 @@ const createMockHook = (data, isLoading = false) => {
     }))
 }
 
-// Test component to be wrapped
 const TestComponent = ({data, testProp}) => (
     <div data-testid="test-component">
         Test Component: {testProp}
@@ -31,7 +29,6 @@ TestComponent.propTypes = {
     testProp: PropTypes.string
 }
 
-// Placeholder component
 const PlaceholderComponent = ({testProp}) => (
     <div data-testid="placeholder-component">Loading... {testProp}</div>
 )
@@ -45,8 +42,7 @@ describe('withCommerceSdkReact HOC', () => {
         jest.clearAllMocks()
     })
 
-    test('renders components correctly based on loading state and passes props', () => {
-        // Test with data loaded and placeholder
+    test('renders main component with data when not loading and has placeholder', () => {
         const mockData = {message: 'Hello World'}
         const mockHook = createMockHook(mockData, false)
 
@@ -55,29 +51,29 @@ describe('withCommerceSdkReact HOC', () => {
             placeholder: PlaceholderComponent
         })
 
-        const {rerender} = render(<WrappedComponent testProp="test-value" />)
+        render(<WrappedComponent testProp="test-value" />)
 
         expect(screen.getByTestId('test-component')).toBeInTheDocument()
         expect(screen.getByText('Test Component: test-value')).toBeInTheDocument()
         expect(screen.getByTestId('test-data')).toHaveTextContent('{"message":"Hello World"}')
         expect(screen.queryByTestId('placeholder-component')).not.toBeInTheDocument()
+    })
 
-        // Test with loading state and placeholder
+    test('renders placeholder component when loading and has placeholder', () => {
         const loadingHook = createMockHook(null, true)
         const LoadingComponent = withCommerceSdkReact(TestComponent, {
             hook: loadingHook,
             placeholder: PlaceholderComponent
         })
 
-        rerender(<LoadingComponent testProp="custom-value" />)
+        render(<LoadingComponent testProp="custom-value" />)
 
         expect(screen.getByTestId('placeholder-component')).toBeInTheDocument()
         expect(screen.getByText('Loading... custom-value')).toBeInTheDocument()
         expect(screen.queryByTestId('test-component')).not.toBeInTheDocument()
     })
 
-    test('works without placeholder component in both loading and loaded states', () => {
-        // Test with data loaded, no placeholder
+    test('renders main component with data when not loading and no placeholder', () => {
         const mockData = {message: 'Hello'}
         const mockHook = createMockHook(mockData, false)
 
@@ -85,61 +81,65 @@ describe('withCommerceSdkReact HOC', () => {
             hook: mockHook
         })
 
-        const {rerender} = render(<WrappedComponent testProp="test" />)
+        render(<WrappedComponent testProp="test" />)
 
         expect(screen.getByTestId('test-component')).toBeInTheDocument()
         expect(screen.getByText('Test Component: test')).toBeInTheDocument()
+    })
 
-        // Test with loading state, no placeholder
+    test('renders nothing when loading and no placeholder', () => {
         const loadingHook = createMockHook(null, true)
         const LoadingComponent = withCommerceSdkReact(TestComponent, {
             hook: loadingHook
         })
 
-        rerender(<LoadingComponent testProp="test" />)
+        render(<LoadingComponent testProp="test" />)
 
         // Should render nothing when loading without placeholder
         expect(screen.queryByTestId('test-component')).not.toBeInTheDocument()
         expect(screen.queryByTestId('placeholder-component')).not.toBeInTheDocument()
     })
 
-    test('calls hook with different queryOptions configurations', () => {
-        // Test with static queryOptions
+    test('calls hook with static queryOptions', () => {
         const mockData = {id: 1}
-        const mockHook1 = createMockHook(mockData, false)
+        const mockHook = createMockHook(mockData, false)
         const queryOptions = {limit: 10, offset: 0}
 
-        const WrappedComponent1 = withCommerceSdkReact(TestComponent, {
-            hook: mockHook1,
+        const WrappedComponent = withCommerceSdkReact(TestComponent, {
+            hook: mockHook,
             queryOptions,
             placeholder: PlaceholderComponent
         })
 
-        render(<WrappedComponent1 testProp="test" />)
-        expect(mockHook1).toHaveBeenCalledWith(queryOptions)
+        render(<WrappedComponent testProp="test" />)
+        expect(mockHook).toHaveBeenCalledWith(queryOptions)
+    })
 
-        // Test with function queryOptions
-        const mockHook2 = createMockHook(mockData, false)
+    test('calls hook with function queryOptions', () => {
+        const mockData = {id: 1}
+        const mockHook = createMockHook(mockData, false)
         const queryOptionsFunction = (props) => ({id: props.itemId})
 
-        const WrappedComponent2 = withCommerceSdkReact(TestComponent, {
-            hook: mockHook2,
+        const WrappedComponent = withCommerceSdkReact(TestComponent, {
+            hook: mockHook,
             queryOptions: queryOptionsFunction,
             placeholder: PlaceholderComponent
         })
 
-        render(<WrappedComponent2 itemId="123" testProp="test" />)
-        expect(mockHook2).toHaveBeenCalledWith({id: '123'})
+        render(<WrappedComponent itemId="123" testProp="test" />)
+        expect(mockHook).toHaveBeenCalledWith({id: '123'})
+    })
 
-        // Test with no queryOptions (should use empty object)
-        const mockHook3 = createMockHook(mockData, false)
+    test('calls hook with empty object when no queryOptions provided', () => {
+        const mockData = {id: 1}
+        const mockHook = createMockHook(mockData, false)
 
-        const WrappedComponent3 = withCommerceSdkReact(TestComponent, {
-            hook: mockHook3,
+        const WrappedComponent = withCommerceSdkReact(TestComponent, {
+            hook: mockHook,
             placeholder: PlaceholderComponent
         })
 
-        render(<WrappedComponent3 testProp="test" />)
-        expect(mockHook3).toHaveBeenCalledWith({})
+        render(<WrappedComponent testProp="test" />)
+        expect(mockHook).toHaveBeenCalledWith({})
     })
 })
