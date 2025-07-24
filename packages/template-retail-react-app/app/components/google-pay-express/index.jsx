@@ -105,7 +105,7 @@ export const updateShippingAddress = async (
         return {
             error: {
                 reason: 'SHIPPING_ADDRESS_UNAVAILABLE',
-                message: 'Error updating shipping address',
+                message: 'Cannot ship to the selected address',
                 intent: 'SHIPPING_ADDRESS'
             }
         }
@@ -235,18 +235,18 @@ export const getGoogleButtonConfig = (
         onSubmit: () => {},
         callbackIntents: ['SHIPPING_ADDRESS', 'SHIPPING_OPTION'],
         paymentDataCallbacks: {
-             onPaymentDataChanged: async (intermediatePaymentData) => {
-                const { callbackTrigger, shippingAddress, shippingOptionData } = intermediatePaymentData;
-                let paymentDataRequestUpdate = {};
-                    
-                if (callbackTrigger === 'INITIALIZE' || callbackTrigger === 'SHIPPING_ADDRESS') {
-                    paymentDataRequestUpdate = await updateShippingAddress(authToken, site, basket, shippingAddress)
-                }
-                if (callbackTrigger === 'SHIPPING_OPTION') {
-                    paymentDataRequestUpdate = await updateShippingOption(authToken, site, basket, shippingOptionData?.id)
-                }
-                
+             onPaymentDataChanged: (intermediatePaymentData) => {
                 return new Promise(async (resolve) => {
+                    const { callbackTrigger, shippingAddress, shippingOptionData } = intermediatePaymentData;
+                    let paymentDataRequestUpdate = {};
+                        
+                    if (callbackTrigger === 'INITIALIZE' || callbackTrigger === 'SHIPPING_ADDRESS') {
+                        paymentDataRequestUpdate = await updateShippingAddress(authToken, site, basket, shippingAddress)
+                    }
+                    if (callbackTrigger === 'SHIPPING_OPTION') {
+                        paymentDataRequestUpdate = await updateShippingOption(authToken, site, basket, shippingOptionData?.id)
+                    }
+                    
                     resolve(paymentDataRequestUpdate);
                 });
             }
