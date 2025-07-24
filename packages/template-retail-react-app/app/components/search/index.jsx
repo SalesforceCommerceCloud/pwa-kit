@@ -75,12 +75,13 @@ const formatSuggestions = (searchSuggestions) => {
                 link: searchUrlBuilder(brand.phrase)
             }
         }),
-        phraseSuggestions: searchSuggestions?.categorySuggestions?.suggestedPhrases?.map(
+        phraseSuggestions: searchSuggestions?.productSuggestions?.suggestedPhrases?.map(
             (phrase) => {
                 return {
                     type: 'phrase',
-                    name: capitalize(phrase.phrase),
-                    link: searchUrlBuilder(phrase.phrase)
+                    name: phrase.phrase,
+                    link: searchUrlBuilder(phrase.phrase),
+                    exactMatch: phrase.exactMatch
                 }
             }
         )
@@ -246,7 +247,7 @@ const Search = (props) => {
                 </PopoverTrigger>
 
                 <HideOnMobile>
-                    <PopoverContent 
+                    <PopoverContent
                         data-testid="sf-suggestion-popover"
                         width="100vw"
                         maxWidth="100vw"

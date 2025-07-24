@@ -6,18 +6,9 @@
  */
 import React from 'react'
 import PropTypes from 'prop-types'
-import {
-    Text,
-    Button,
-    Box,
-    Flex,
-    Image,
-    useMultiStyleConfig
-} from '@salesforce/retail-react-app/app/components/shared/ui'
+import {Text, Button, Box, Flex, Image} from '@salesforce/retail-react-app/app/components/shared/ui'
 
 const HorizontalSuggestions = ({suggestions, closeAndNavigate}) => {
-    const styles = useMultiStyleConfig('SearchSuggestions')
-
     if (!suggestions) {
         return null
     }
@@ -59,7 +50,7 @@ const HorizontalSuggestions = ({suggestions, closeAndNavigate}) => {
                                 >
                                     ♡
                                 </Box>
-                                
+
                                 {suggestion.isNew && (
                                     <Box
                                         position="absolute"
@@ -87,13 +78,9 @@ const HorizontalSuggestions = ({suggestions, closeAndNavigate}) => {
                             >
                                 {suggestion.name}
                             </Text>
-                            
+
                             {suggestion.price && (
-                                <Text
-                                    fontSize="sm"
-                                    color="gray.900"
-                                    fontWeight="medium"
-                                >
+                                <Text fontSize="sm" color="gray.900" fontWeight="medium">
                                     ${suggestion.price}
                                 </Text>
                             )}
@@ -110,4 +97,4 @@ HorizontalSuggestions.propTypes = {
     closeAndNavigate: PropTypes.func
 }
 
-export default HorizontalSuggestions 
+export default HorizontalSuggestions

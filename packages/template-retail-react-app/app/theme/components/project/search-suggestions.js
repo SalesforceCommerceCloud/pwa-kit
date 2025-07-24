@@ -22,7 +22,7 @@ export default {
             spacing: 0
         },
         suggestionsBox: {
-            mx: '-16px',
+            mx: '-16px'
             // borderBottom: '1px solid',
             // borderColor: 'gray.200'
         },

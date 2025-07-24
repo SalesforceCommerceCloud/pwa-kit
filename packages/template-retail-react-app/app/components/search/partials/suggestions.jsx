@@ -6,7 +6,6 @@
  */
 import React from 'react'
 import PropTypes from 'prop-types'
-import {FormattedMessage} from 'react-intl'
 import {
     Text,
     Button,
@@ -16,6 +15,7 @@ import {
     Image,
     useMultiStyleConfig
 } from '@salesforce/retail-react-app/app/components/shared/ui'
+import {FormattedMessage} from 'react-intl'
 
 const Suggestions = ({suggestions, closeAndNavigate}) => {
     const styles = useMultiStyleConfig('SearchSuggestions')
@@ -35,30 +35,16 @@ const Suggestions = ({suggestions, closeAndNavigate}) => {
                         <Flex align="center">
                             {/* Reserve space for image for all, but only render if present */}
                             <Box {...styles.imageContainer}>
-                                {(suggestion.type === 'product' ||
-                                    suggestion.type === 'category') &&
-                                    suggestion.image && (
-                                        <Image
-                                            src={suggestion.image}
-                                            alt=""
-                                            {...styles.suggestionImage}
-                                        />
-                                    )}
+                                {suggestion.type === 'product' && suggestion.image && (
+                                    <Image
+                                        src={suggestion.image}
+                                        alt=""
+                                        {...styles.suggestionImage}
+                                    />
+                                )}
                             </Box>
                             <Box {...styles.textContainer}>
                                 <Text {...styles.suggestionName}>{suggestion.name}</Text>
-                                {/* For categories, show parentCategoryName if present */}
-                                {suggestion.type === 'category' &&
-                                    suggestion.parentCategoryName && (
-                                        <Text {...styles.categoryParent}>
-                                            {' '}
-                                            <FormattedMessage
-                                                defaultMessage=" in "
-                                                id="search_suggestions.category.in_parent"
-                                            />
-                                            {' ' + suggestion.parentCategoryName}
-                                        </Text>
-                                    )}
                             </Box>
                         </Flex>
                     </Button>
