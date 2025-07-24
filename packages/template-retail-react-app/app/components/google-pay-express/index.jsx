@@ -55,7 +55,7 @@ export const getCustomerShippingDetails = (shippingAddress) => {
     }
 }
 
-// inputAddress is the billing address if available, else we fall back to the shipping address
+// 'inputAddress' is the billing address if available, else we fall back to the shipping address
 export const getCustomerBillingDetails = (inputAddress) => {
     return {
         billingAddress: {
@@ -69,124 +69,6 @@ export const getCustomerBillingDetails = (inputAddress) => {
     }
 }
 
-export const updateShippingOption = async (
-    authToken,
-    site,
-    basket,
-    shippingOptionId
-) => {
-    try {
-        const adyenShippingMethodsService = new AdyenShippingMethodsService(authToken, site)
-        const shippingMethodResponse = await adyenShippingMethodsService.getShippingMethods(basket.basketId)
-        
-        // If shippingOptionId is not available, surface an error and update shipping options to what is available
-        if (!shippingMethodResponse.applicableShippingMethods.some((sm) => sm.id === shippingOptionId)) {
-            return {
-                newShippingOptionParameters: {
-                    ...getGPShippingOptionParameters(shippingMethodResponse)
-                },
-                error: {
-                    reason: 'SHIPPING_OPTION_UNAVAILABLE',
-                    message: 'Cannot use the selected shipping option',
-                    intent: 'SHIPPING_OPTION'
-                }
-            }
-        }
-        
-        const response = await adyenShippingMethodsService.updateShippingMethod(
-            shippingOptionId,
-            basket.basketId
-        )
-        if (response.error) {
-            return {
-                newShippingOptionParameters: {
-                    ...getGPShippingOptionParameters(shippingMethodResponse)
-                },
-                error: {
-                    reason: 'SHIPPING_OPTION_UNAVAILABLE',
-                    message: 'Cannot ship to the selected address',
-                    intent: 'SHIPPING_OPTION'
-                }
-            }
-        } 
-        const googlePayAmount = response.orderTotal
-        shippingMethodResponse.defaultShippingMethodId = shippingOptionId
-        return {
-            newShippingOptionParameters: {
-                ...getGPShippingOptionParameters(shippingMethodResponse)
-            },
-            newTransactionInfo: {
-                countryCode: response.currency,
-                currencyCode: response.currency,
-                totalPriceStatus: 'FINAL',
-                totalPriceLabel: 'Total',
-                totalPrice: `${googlePayAmount}`
-            }
-        }
-    } catch (error) {
-        return {
-            newShippingOptionParameters: {
-                ...getGPShippingOptionParameters(shippingMethodResponse)
-            },
-            error: {
-                reason: 'SHIPPING_OPTION_UNAVAILABLE',
-                message: 'Error updating shipping option',
-                intent: 'SHIPPING_OPTION'
-            }
-        }
-    }
-}
-
-export const initializeShippingOption = async (
-    authToken,
-    site,
-    basket,
-    shippingOptionId
-) => {
-    try {
-        const adyenShippingMethodsService = new AdyenShippingMethodsService(authToken, site)
-        const response = await adyenShippingMethodsService.updateShippingMethod(
-            shippingOptionId,
-            basket.basketId
-        )
-
-        if (response.error) {
-            return {
-                error: {
-                    reason: 'SHIPPING_OPTION_UNAVAILABLE',
-                    message: 'Cannot ship to the selected address',
-                    intent: 'SHIPPING_OPTION'
-                }
-            }
-        } 
-        const googlePayAmount = response.orderTotal
-        const shippingMethodResponse = await adyenShippingMethodsService.getShippingMethods(basket.basketId)
-
-        return {
-            newShippingOptionParameters: {
-                ...getGPShippingOptionParameters(shippingMethodResponse)
-            },
-            newTransactionInfo: {
-                countryCode: response.currency,
-                currencyCode: response.currency,
-                totalPriceStatus: 'FINAL',
-                totalPriceLabel: 'Total',
-                totalPrice: `${googlePayAmount}`
-            }
-        }
-
-    } catch (error) {
-        return {
-            error: {
-                reason: 'SHIPPING_OPTION_UNAVAILABLE',
-                message: 'Error initializing shipping option',
-                intent: 'SHIPPING_OPTION'
-            }
-        }
-    }
-}
-
-// TODO: update shippingOptionParameters on address change too
 export const updateShippingAddress = async (
     authToken,
     site,
@@ -199,7 +81,6 @@ export const updateShippingAddress = async (
             basket.basketId,
             getCustomerShippingDetails(shippingAddress)
         )
-
         if (response.error) {
             return {
                 error: {
@@ -209,13 +90,71 @@ export const updateShippingAddress = async (
                 }
             }
         }
-        return 
+
+        const adyenShippingMethodsService = new AdyenShippingMethodsService(authToken, site)
+        const shippingMethodResponse = await adyenShippingMethodsService.getShippingMethods(basket.basketId)
+        if (!shippingMethodResponse.applicableShippingMethods.some((sm) => sm.id === shippingMethodResponse.defaultShippingMethodId)) {
+            const newShippingOptionId = shippingMethodResponse.applicableShippingMethods[0].id
+            shippingMethodResponse.defaultShippingMethodId = newShippingOptionId
+            return updateShippingOption(authToken, site, basket, newShippingOptionId, shippingMethodResponse)
+        }
+        return updateShippingOption(authToken, site, basket, shippingMethodResponse.defaultShippingMethodId, shippingMethodResponse)
     } catch (error) {
         return {
             error: {
                 reason: 'SHIPPING_ADDRESS_UNAVAILABLE',
                 message: 'Error updating shipping address',
                 intent: 'SHIPPING_ADDRESS'
+            }
+        }
+    }
+}
+
+export const updateShippingOption = async (
+    authToken,
+    site,
+    basket,
+    shippingOptionId,
+    shippingMethodResponse = null
+) => {
+    try {
+        const adyenShippingMethodsService = new AdyenShippingMethodsService(authToken, site)    
+        const response = await adyenShippingMethodsService.updateShippingMethod(
+            shippingOptionId,
+            basket.basketId
+        )
+        if (response.error) {
+            return {
+                error: {
+                    reason: 'SHIPPING_OPTION_UNAVAILABLE',
+                    message: 'Cannot ship to the selected address',
+                    intent: 'SHIPPING_OPTION'
+                }
+            }
+        } 
+
+        const paymentDataRequestUpdate = {
+            newTransactionInfo: {
+                countryCode: response.currency,
+                currencyCode: response.currency,
+                totalPriceStatus: 'FINAL',
+                totalPriceLabel: 'Total',
+                totalPrice: `${response.orderTotal}`
+            }
+        }
+        // If we were called by updateShippingAddress, we need to update the shippingOptionParameters as well
+        if (shippingMethodResponse) {
+            paymentDataRequestUpdate.newShippingOptionParameters = {
+                ...getGPShippingOptionParameters(shippingMethodResponse)
+            }
+        }
+        return paymentDataRequestUpdate
+    } catch (error) {
+        return {
+            error: {
+                reason: 'SHIPPING_OPTION_UNAVAILABLE',
+                message: 'Error updating shipping option',
+                intent: 'SHIPPING_OPTION'
             }
         }
     }
@@ -294,25 +233,18 @@ export const getGoogleButtonConfig = (
         onSubmit: () => {},
         callbackIntents: ['SHIPPING_ADDRESS', 'SHIPPING_OPTION'],
         paymentDataCallbacks: {
-            onPaymentDataChanged: (intermediatePaymentData) => {        
-                // eslint-disable-next-line no-async-promise-executor
-                return new Promise(async (resolve) => {
-                    const { callbackTrigger, shippingAddress, shippingOptionData } = intermediatePaymentData;
-                    let paymentDataRequestUpdate = {};
+             onPaymentDataChanged: async (intermediatePaymentData) => {
+                const { callbackTrigger, shippingAddress, shippingOptionData } = intermediatePaymentData;
+                let paymentDataRequestUpdate = {};
                     
-                    if (callbackTrigger === 'INITIALIZE') {
-                        paymentDataRequestUpdate = await initializeShippingOption(authToken, site, basket, shippingOptionData?.id)
-                        await updateShippingAddress(authToken, site, basket, shippingAddress)
-                    }
-
-                    if (callbackTrigger === 'SHIPPING_ADDRESS') {
-                        await updateShippingAddress(authToken, site, basket, shippingAddress)
-                    }
-
-                    if (callbackTrigger === 'SHIPPING_OPTION') {
-                        paymentDataRequestUpdate = await updateShippingOption(authToken, site, basket, shippingOptionData?.id)
-                    }
-
+                if (callbackTrigger === 'INITIALIZE' || callbackTrigger === 'SHIPPING_ADDRESS') {
+                    paymentDataRequestUpdate = await updateShippingAddress(authToken, site, basket, shippingAddress)
+                }
+                if (callbackTrigger === 'SHIPPING_OPTION') {
+                    paymentDataRequestUpdate = await updateShippingOption(authToken, site, basket, shippingOptionData?.id)
+                }
+                
+                return new Promise(async (resolve) => {
                     resolve(paymentDataRequestUpdate);
                 });
             }
@@ -454,4 +386,3 @@ export const GooglePayExpress = () => {
 GooglePayExpress.propTypes = {
     shippingMethods: PropTypes.array
 }
-
