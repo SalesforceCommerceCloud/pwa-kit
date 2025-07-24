@@ -20,7 +20,7 @@ import React from 'react'
  */
 const withCommerceSdkReact = (Component, opts = {}) => {
     const WrappedComponent = (props) => {
-        const {hook, queryOptions, placeholder: Placeholder = React.Fragment} = opts
+        const {hook, queryOptions, placeholder: Placeholder = () => null} = opts
         const {data, isLoading} = hook(
             typeof queryOptions === 'function' ? queryOptions(props) : queryOptions || {}
         )
