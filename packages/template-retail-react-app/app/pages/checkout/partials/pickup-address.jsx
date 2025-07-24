@@ -244,7 +244,20 @@ const PickupAddress = () => {
                                                     id="pickup_address.title.store_information"
                                                 />
                                             </Text>
-                                            <AddressDisplay address={pickupAddress} />
+                                            {store && (
+                                                <StoreDisplay
+                                                    store={store}
+                                                    showDistance={false}
+                                                    showStoreHours={false}
+                                                    showPhone={false}
+                                                    showEmail={false}
+                                                    nameStyle={{
+                                                        fontSize: 'sm',
+                                                        fontWeight: 'normal'
+                                                    }}
+                                                    textSize="sm"
+                                                />
+                                            )}
                                         </>
                                     )}
 
