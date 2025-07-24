@@ -28,8 +28,9 @@ function Express() {
     const urlParams = new URLSearchParams(location.search)
     const isPdpMode = urlParams.get('pdp') === 'true'
     
-    // State to track current SKU (will only be set via postMessage)
+    // State to track current SKU and quantity (will be set via postMessage)
     const [currentSku, setCurrentSku] = useState(null)
+    const [currentQuantity, setCurrentQuantity] = useState(1)
 
     useEffect(() => {
         const getToken = async () => {
@@ -47,16 +48,28 @@ function Express() {
             // In production, you might want to restrict this to specific origins
             
             if (event.data && typeof event.data === 'object') {
-                const {type, sku} = event.data
+                const {type, sku, quantity} = event.data
                 
                 // Handle SKU update messages
                 if (type === 'UPDATE_SKU' && typeof sku === 'string') {
                     setCurrentSku(sku)
+                    // Reset quantity to 1 when SKU changes (unless specified)
+                    if (typeof quantity === 'number' && quantity > 0) {
+                        setCurrentQuantity(quantity)
+                    } else {
+                        setCurrentQuantity(1)
+                    }
+                }
+                
+                // Handle quantity-only updates
+                if (type === 'UPDATE_QUANTITY' && typeof quantity === 'number' && quantity > 0) {
+                    setCurrentQuantity(quantity)
                 }
                 
                 // Handle SKU clear messages (for regular checkout)
                 if (type === 'CLEAR_SKU') {
                     setCurrentSku(null)
+                    setCurrentQuantity(1) // Reset quantity when clearing
                 }
             }
         }
@@ -84,7 +97,7 @@ function Express() {
                 basket={basket}
                 navigate={navigate}
             >
-                <ApplePayExpress sku={currentSku} isPdpMode={isPdpMode} />
+                <ApplePayExpress sku={currentSku} quantity={currentQuantity} isPdpMode={isPdpMode} />
             </AdyenExpressCheckoutProvider>
         </div>
     )

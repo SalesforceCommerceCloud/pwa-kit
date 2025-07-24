@@ -110,7 +110,7 @@ export const getAppleButtonConfig = (
         
         // For PDP flows, create temporary basket if needed (and SKU is available)
         if (isPdpMode && sku && setTempBasket) {
-            const newBasket = await createTemporaryBasket(sku, authToken, site)
+            const newBasket = await createTemporaryBasket(sku, authToken, site, quantity)
             sharedBasketRef = newBasket  // Update shared reference immediately
             setTempBasket(newBasket)     // Update React state for re-renders
             return newBasket
@@ -445,7 +445,7 @@ export const getAppleButtonConfig = (
     return buttonConfig
 }
 
-export const ApplePayExpress = ({sku, isPdpMode = false}) => {
+export const ApplePayExpress = ({sku, quantity = 1, isPdpMode = false}) => {
     const {getTokenWhenReady} = useAccessToken()
     const {locale, site} = useMultiSite()
     const navigate = useNavigation()
@@ -648,5 +648,6 @@ export const ApplePayExpress = ({sku, isPdpMode = false}) => {
 ApplePayExpress.propTypes = {
     shippingMethods: PropTypes.array,
     sku: PropTypes.string,
+    quantity: PropTypes.number,
     isPdpMode: PropTypes.bool
 }
