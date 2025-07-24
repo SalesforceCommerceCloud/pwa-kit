@@ -14,9 +14,10 @@ const systemPromptForCreatePage =
         Please ask the user to provide following information **one at a time**, in a natural and conversational way. \
         Do **not** ask all the questions at once. \
         - What is the name of the new page to create? \
-        - List the components to include on the page, separated by commas (e.g., AddressDisplay, ProductView) \
+        - List the components to include on the page, separated by commas (e.g., Image, ProductView) \
         - What is the URL route for this page? (e.g., /new-home, /my-products) \
-        Collect answers to these questions, then call the tool with the collected information as input parameters. `;
+        Collect answers to these questions, then call the tool with the collected information as input parameters. 
+        Do **not** assume the answers to the questions.`;
 
 const systemPromptForProductHook = 
         `User have added the ProductView component to the new page. Please ask user: \
@@ -27,6 +28,20 @@ const systemPromptForProductHook =
         3. in routes.jsx, update the path for the new page with '/:productId'. \
         4. open the new page in the browser with URL: http://localhost:3000/{static-route-path}/25592300M \
         If user answers no, skip above steps.`;
+
+const systemPromptForImageComponent = 
+        `User has added the Image component to the new page. Please ask user after they have provided with the URL route: \
+        "To make it work, would you like to provide the full path of the image source to your page, Note that CORS (Cross-Origin Resource Sharing) restrictions may apply.?" \
+        If user answers yes, please make sure do do following: \
+        1. Ask the user to provide the full path of the image source, \
+        2. Ask the user to provide the alt text for the image, \
+        3. Ask the user to provide the width and height of the image, \
+        4. Update the src of the newly createdImage component to the path of the image and the alt text once the user has provided the path and the alt text, \
+        5. Update the width and height of the newly created Image component to the width and height of the image once the user has provided the width and height, \
+        6. If the image is from a URL from the internet, then update the Content Security Policy inside packages/template-retail-react-app/app/ssr.js file to allow the site to access the image. \
+        7. Restart the front end server running. \
+        8. Open the new page in the browser with URL: http://localhost:3000/{static-route-path} \
+        If user answers no, tell the user that the default image located at /static/img/hero.png is being displayed.`;
 
 const systemPromptForUnfoundComponents = (unfoundComponents) => 
         `The following components were not found: ${unfoundComponents.join(', ')}. \
@@ -86,6 +101,9 @@ class CreateNewPageTool {
             if (componentList.includes('ProductView')) {
                 messages.push(systemPromptForProductHook);
             }
+            if (componentList.includes('Image')) {
+                messages.push(systemPromptForImageComponent);
+            }
             logMCPMessage(`Unfound components: ${this.unfoundComponents}`);
             if (this.unfoundComponents.length != 0) {
                 messages.push(systemPromptForUnfoundComponents(this.unfoundComponents));
@@ -128,6 +146,7 @@ class CreateNewPageTool {
             }
             logMCPMessage(`?????? importing ${componentName} from '@salesforce/retail-react-app/app/components/${componentDir}'`);
             imports.push(
+                `import {getAssetUrl} from '@salesforce/pwa-kit-react-sdk/ssr/universal/utils'`,
                 `import ${componentName} from '@salesforce/retail-react-app/app/components/${componentDir}'`
             );
         });
@@ -138,6 +157,9 @@ class CreateNewPageTool {
             const componentJsx = componentList.map(component => {
                 component = toPascalCase(component);
                 const componentName = component.charAt(0).toUpperCase() + component.slice(1);
+                if (componentName === 'Image') {
+                    return ` <Image src={getAssetUrl('static/img/hero.png')} alt="pwa-kit banner" style={{ width: '700px', height: 'auto' }} />`;
+                }
                 return `                <${componentName} />`;
             }).join('\n');
 
