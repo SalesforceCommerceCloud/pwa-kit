@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import {getEnvBasePath, getProxyPath, getBundlePath} from './ssr-paths'
+import {getEnvBasePath, getProxyBasePath, getBundleBasePath} from './ssr-paths'
 import {getConfig} from './ssr-config'
 
 jest.mock('./ssr-config', () => {
@@ -30,12 +30,12 @@ describe('environment base path tests', () => {
 
     test('basePath is included in proxy path', () => {
         getConfig.mockImplementation(() => mockConfig)
-        expect(getProxyPath()).toBe('/test/mobify/proxy')
+        expect(getProxyBasePath()).toBe('/test/mobify/proxy')
     })
 
     test('basePath is included in bundle path', () => {
         getConfig.mockImplementation(() => mockConfig)
-        expect(getBundlePath()).toBe('/test/mobify/bundle')
+        expect(getBundleBasePath()).toBe('/test/mobify/bundle')
     })
 
     test('basePath is set to empty string if there is no config', () => {

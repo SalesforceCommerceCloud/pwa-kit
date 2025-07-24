@@ -42,8 +42,8 @@ import http from 'http'
 import https from 'https'
 import {proxyConfigs, updatePackageMobify} from '../../utils/ssr-shared'
 import {
-    getProxyPath,
-    getBundlePath,
+    getProxyBasePath,
+    getBundleBasePath,
     getHealthCheckPath,
     getSlasPrivateProxyPath
 } from '../../utils/ssr-paths'
@@ -223,7 +223,7 @@ export const RemoteServerFactory = {
      * @private
      */
     _isBundleOrProxyPath(url) {
-        return url.startsWith(getProxyPath()) || url.startsWith(getBundlePath())
+        return url.startsWith(getProxyBasePath()) || url.startsWith(getBundleBasePath())
     },
 
     /**
@@ -667,7 +667,7 @@ export const RemoteServerFactory = {
      */
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     _setupProxying(app, options) {
-        app.all(`${getProxyPath()}/*`, (_, res) => {
+        app.all(`${getProxyBasePath()}/*`, (_, res) => {
             return res.status(501).json({
                 message:
                     'Environment proxies are not set: https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/proxying-requests.html'

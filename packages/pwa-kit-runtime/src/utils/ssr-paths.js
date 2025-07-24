@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024, salesforce.com, inc.
+ * Copyright (c) 2025, salesforce.com, inc.
  * All rights reserved.
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
@@ -30,14 +30,15 @@ export const getEnvBasePath = () => {
 
     if (typeof basePath !== 'string') {
         logger.warn('Invalid envBasePath configuration. No base path is applied.')
-        basePath = ''
+        return ''
     }
 
     return basePath.replace(/\/$/, '')
 }
 
-export const getProxyPath = () => `${getEnvBasePath()}${PROXY_PATH_BASE}`
-export const getBundlePath = () => `${getEnvBasePath()}${BUNDLE_PATH_BASE}`
-export const getCachingPath = () => `${getEnvBasePath()}${CACHING_PATH_BASE}`
+// These routes are implemented as functions so that getEnvBasePath can be re-evaluated when the config is hydrated client side
+export const getProxyBasePath = () => `${getEnvBasePath()}${PROXY_PATH_BASE}`
+export const getBundleBasePath = () => `${getEnvBasePath()}${BUNDLE_PATH_BASE}`
+export const getCachingBasePath = () => `${getEnvBasePath()}${CACHING_PATH_BASE}`
 export const getHealthCheckPath = () => `${getEnvBasePath()}${HEALTHCHECK_PATH}`
 export const getSlasPrivateProxyPath = () => `${getEnvBasePath()}${SLAS_PRIVATE_CLIENT_PROXY_PATH}`

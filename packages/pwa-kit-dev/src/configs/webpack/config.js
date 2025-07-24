@@ -18,7 +18,7 @@ import {BundleAnalyzerPlugin} from 'webpack-bundle-analyzer'
 import LoadablePlugin from '@loadable/webpack-plugin'
 import ReactRefreshWebpackPlugin from '@pmmmwh/react-refresh-webpack-plugin'
 import SpeedMeasurePlugin from 'speed-measure-webpack-plugin'
-import {getBundlePath} from '@salesforce/pwa-kit-runtime/utils/ssr-paths'
+import {getBundleBasePath} from '@salesforce/pwa-kit-runtime/utils/ssr-paths'
 
 import OverridesResolverPlugin from './overrides-plugin'
 import {sdkReplacementPlugin} from './plugins'
@@ -392,7 +392,7 @@ const enableReactRefresh = (config) => {
 
     const newRule = ruleForBabelLoader([require.resolve('react-refresh/babel')])
     const rules = findAndReplace(config.module.rules, (rule) => rule.id === 'babel-loader', newRule)
-    const hmrBasePath = `${getBundlePath()}/development/`
+    const hmrBasePath = `${getBundleBasePath()}/development/`
 
     return {
         ...config,

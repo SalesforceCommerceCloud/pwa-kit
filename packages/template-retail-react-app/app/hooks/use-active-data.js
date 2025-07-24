@@ -6,7 +6,7 @@
  */
 /*global globalThis*/
 import {ACTIVE_DATA_ENABLED} from '@salesforce/retail-react-app/app/constants'
-import {getProxyPath} from '@salesforce/pwa-kit-runtime/utils/ssr-paths'
+import {getProxyBasePath} from '@salesforce/pwa-kit-runtime/utils/ssr-paths'
 import logger from '@salesforce/retail-react-app/app/utils/logger-instance'
 
 /**
@@ -99,7 +99,7 @@ export default function useActiveData() {
                     if (!ac?._analytics) {
                         ac?.setDWAnalytics?.(
                             globalThis.dw?.__dwAnalytics?.getTracker?.(
-                                `${getProxyPath()}/ocapi/on/demandware.store/Sites-${siteId}-Site/${localeId}/__Analytics-Start`
+                                `${getProxyBasePath()}/ocapi/on/demandware.store/Sites-${siteId}-Site/${localeId}/__Analytics-Start`
                             )
                         )
                     }
