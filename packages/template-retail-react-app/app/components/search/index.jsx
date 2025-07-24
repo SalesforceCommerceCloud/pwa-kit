@@ -246,7 +246,15 @@ const Search = (props) => {
                 </PopoverTrigger>
 
                 <HideOnMobile>
-                    <PopoverContent data-testid="sf-suggestion-popover">
+                    <PopoverContent 
+                        data-testid="sf-suggestion-popover"
+                        width="100vw"
+                        maxWidth="100vw"
+                        left={0}
+                        right={0}
+                        marginLeft={0}
+                        marginRight={0}
+                    >
                         <SearchSuggestions
                             closeAndNavigate={closeAndNavigate}
                             recentSearches={recentSearches}

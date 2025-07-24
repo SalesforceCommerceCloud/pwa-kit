@@ -23,8 +23,8 @@ export default {
         },
         suggestionsBox: {
             mx: '-16px',
-            borderBottom: '1px solid',
-            borderColor: 'gray.200'
+            // borderBottom: '1px solid',
+            // borderColor: 'gray.200'
         },
         suggestionButton: {
             width: 'full',
