@@ -92,7 +92,6 @@ beforeEach(() => {
 afterEach(() => {
     jest.resetModules()
     jest.clearAllMocks()
-    // mockIsItemInWishlist.mockReturnValue(false)
 })
 
 describe('product detail', () => {
@@ -321,14 +320,7 @@ describe('Recommended Products', () => {
         // const user = userEvent.setup({advanceTimers: jest.advanceTimersByTime})
         renderWithProviders(<MockedComponent />)
 
-        // If we poll for updates immediately, the test output is flooded with errors:
-        // "Warning: An update to WrappedComponent inside a test was not wrapped in act(...)."
-        // If we wait to poll until the component is updated, then the errors disappear. Using a
-        // timeout is clearly a suboptimal solution, but I don't know the "correct" way to fix it.
-        // let done = false
-        // setTimeout(() => (done = true), 200)
-        // await waitFor(() => expect(done).toBeTruthy())
-
+        // wait for data to fully loaded before asserting
         await waitFor(() => {
             expect(screen.getByRole('link', {name: /mens/i})).toBeInTheDocument()
             expect(screen.getByText(/You might also like/i)).toBeInTheDocument()
@@ -352,6 +344,7 @@ describe('product bundles', () => {
                 res: () => mockProductBundle
             },
             {
+                // Generic inventory mock with good stock for most tests
                 path: '*/products',
                 method: 'get',
                 res: (req) => {
@@ -431,20 +424,18 @@ describe('product bundles', () => {
         })
     })
 
-    //TODO why does it exceed test time 10s
-    test.skip('add the bundle to cart successfully', async () => {
+    test('add the bundle to cart successfully', async () => {
+        // make sure the bundle children are all in stock and orderable
         const urlPathAfterSelectingAllVariants = `uk/en-GB/product/test-bundle?${new URLSearchParams(
             {
                 '25592770M': 'color=JJGN9A0&size=006',
-                '25565139M': 'color=JJ169XX&size=9SM',
+                '25565139M': 'color=JJ169XX&size=9LG',
                 '25565094M': 'color=JJ0CZXX&size=9XS'
             }
         )}`
         window.history.pushState({}, 'ProductDetail', urlPathAfterSelectingAllVariants)
 
-        // Initial basket is necessary to add items to it
-        const initialBasket = {basketId: 'valid_id'}
-        const {user} = renderWithProviders(<MockedComponent />, {wrapperProps: {initialBasket}})
+        const {user} = renderWithProviders(<MockedComponent />)
 
         await waitFor(() => {
             expect(screen.getAllByText("Women's clothing test bundle")[0]).toBeInTheDocument()
@@ -452,6 +443,7 @@ describe('product bundles', () => {
         })
 
         const buttons = await screen.findAllByText(/add bundle to cart/i)
+        expect(buttons[0]).toBeEnabled()
         await act(async () => {
             await user.click(buttons[0])
         })
@@ -545,7 +537,106 @@ describe('product bundles', () => {
 
     // TODO: fix failing tests
     test.skip('add to cart button is disabled when quantity exceeds child stock level', async () => {
-        const {user} = renderWithProviders(<MockedComponent />)
+        // Mock inventory with limited stock for Swing Tank (3) to test quantity constraint
+        prependHandlersToServer([
+            {
+                path: '*/products',
+                method: 'get',
+                res: (req) => {
+                    const url = req.url.toString()
+                    // use for all 3 recommendations, "you might also like", "complete the set", and "recently viewed"
+                    if (url.includes('ids=11736753M%2C22951021M%2C25592770M%2C25752986M')) {
+                        return productsForEinstein
+                    }
+
+                    const results = []
+
+                    // Sleeveless Pleated Floral Front Blouse - Size 6 (701644044237M)
+                    if (url.includes('701644044237M')) {
+                        results.push({
+                            id: '701644044237M',
+                            inventory: {
+                                ats: 100,
+                                backorderable: false,
+                                id: 'inventory_m',
+                                orderable: true,
+                                preorderable: false,
+                                stockLevel: 100
+                            },
+                            master: {
+                                masterId: '25592770M',
+                                orderable: true
+                            }
+                        })
+                    }
+
+                    // Swing Tank - Black + L (701643473908M) - LIMITED STOCK for quantity test
+                    if (url.includes('701643473908M')) {
+                        results.push({
+                            id: '701643473908M',
+                            inventory: {
+                                ats: 3,
+                                backorderable: false,
+                                id: 'inventory_m',
+                                orderable: true,
+                                preorderable: false,
+                                stockLevel: 3
+                            },
+                            master: {
+                                masterId: '25565139M',
+                                orderable: true
+                            }
+                        })
+                    }
+
+                    // Pull On Neutral Pant - Size S (701643458486M)
+                    if (url.includes('701643458486M')) {
+                        results.push({
+                            id: '701643458486M',
+                            inventory: {
+                                ats: 100,
+                                backorderable: false,
+                                id: 'inventory_m',
+                                orderable: true,
+                                preorderable: false,
+                                stockLevel: 100
+                            },
+                            master: {
+                                masterId: '25565094M',
+                                orderable: true
+                            }
+                        })
+                    }
+
+                    // Fallback for other variants (no stock)
+                    if (results.length === 0) {
+                        results.push({
+                            id: '701643473915M',
+                            inventory: {
+                                ats: 0,
+                                backorderable: false,
+                                id: 'inventory_m',
+                                orderable: false,
+                                preorderable: false,
+                                stockLevel: 0
+                            },
+                            master: {
+                                masterId: '25565139M',
+                                orderable: true
+                            }
+                        })
+                    }
+
+                    return {
+                        data: results
+                    }
+                }
+            }
+        ])
+
+        // Initial basket is necessary to add items to it
+        const initialBasket = {basketId: 'valid_id'}
+        const {user} = renderWithProviders(<MockedComponent />, {wrapperProps: {initialBasket}})
         await waitFor(() => {
             expect(screen.getAllByText("Women's clothing test bundle")[0]).toBeInTheDocument()
         })

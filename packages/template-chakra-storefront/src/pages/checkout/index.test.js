@@ -713,7 +713,9 @@ describe('Checkout Addresses tests', () => {
                         city: req.body.city || 'Tampa',
                         countryCode: 'US',
                         firstName: req.body.firstName || 'Test',
-                        fullName: `${req.body.firstName || 'Test'} ${req.body.lastName || 'McTester'}`,
+                        fullName: `${req.body.firstName || 'Test'} ${
+                            req.body.lastName || 'McTester'
+                        }`,
                         id: '047b18d4aaaf4138f693a4b931',
                         lastName: req.body.lastName || 'McTester',
                         phone: req.body.phone || '(727) 555-1234',
@@ -825,7 +827,9 @@ describe('Checkout Addresses tests', () => {
                         city: req.body.city || 'Tampa',
                         countryCode: 'US',
                         firstName: req.body.firstName || 'Test',
-                        fullName: `${req.body.firstName || 'Test'} ${req.body.lastName || 'McTester'}`,
+                        fullName: `${req.body.firstName || 'Test'} ${
+                            req.body.lastName || 'McTester'
+                        }`,
                         id: '047b18d4aaaf4138f693a4b931',
                         lastName: req.body.lastName || 'McTester',
                         phone: req.body.phone || '(727) 555-1234',
