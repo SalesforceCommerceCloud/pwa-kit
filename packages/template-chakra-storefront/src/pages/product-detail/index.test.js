@@ -27,19 +27,17 @@ import {
 } from '../../../mocks/product-bundle'
 
 const mockAddToWishlist = jest.fn()
-jest.mock('@salesforce/commerce-sdk-react', () => {
-    const originalModule = jest.requireActual('@salesforce/commerce-sdk-react')
-    return {
-        ...originalModule,
-        useShopperCustomersMutation: (mutation) => {
-            if (mutation === 'createCustomerProductListItem') {
-                return {mutate: mockAddToWishlist}
-            } else {
-                return originalModule.useShopperCustomersMutation(mutation)
-            }
-        }
-    }
-})
+const mockIsItemInWishlist = jest.fn().mockReturnValue(false)
+jest.mock('../../hooks/use-wish-list', () => ({
+    __esModule: true,
+    useWishList: () => ({
+        data: mockWishlistWithItem.data[0],
+        addToWishlist: mockAddToWishlist,
+        isItemInWishlist: mockIsItemInWishlist,
+        isPending: false
+    })
+}))
+
 jest.mock('../../hooks/use-datacloud', () => ({
     __esModule: true,
     default: jest.fn(() => ({
@@ -102,6 +100,7 @@ beforeEach(() => {
 afterEach(() => {
     jest.resetModules()
     jest.clearAllMocks()
+    mockIsItemInWishlist.mockReturnValue(false)
 })
 
 describe('product detail', () => {

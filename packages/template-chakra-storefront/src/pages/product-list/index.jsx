@@ -22,7 +22,7 @@ import ProductListPagination from './partials/product-list-pagination'
 import PageAnalytics from './page-analytics'
 
 // Hooks
-import {useProductListWishlist} from './hooks/use-product-list-wishlist'
+import {useWishList} from '../../hooks/use-wish-list'
 import {useProductListData} from './hooks/use-product-list-data'
 import {useProductListControls} from './hooks/use-product-list-controls'
 
@@ -35,7 +35,7 @@ const ProductList = () => {
     const {
         pages: {productList: productListConfig}
     } = getConfig()
-    const {toggleItem, isItemInWishlist} = useProductListWishlist()
+    const {toggleWishlist, isItemInWishlist} = useWishList()
 
     const {
         category,
@@ -122,7 +122,7 @@ const ProductList = () => {
                                     productListConfig={productListConfig}
                                     isItemInWishlist={isItemInWishlist}
                                     onClickProduct={handleProductClick}
-                                    onFavouriteToggle={toggleItem}
+                                    onFavouriteToggle={toggleWishlist}
                                 />
                                 <ProductListPagination basePath={basePath} pageUrls={pageUrls} />
                             </Box>
