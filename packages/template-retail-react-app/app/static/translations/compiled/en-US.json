@@ -2497,6 +2497,48 @@
       "value": "You're currently browsing in offline mode"
     }
   ],
+  "order_lookup.button.continue": [
+    {
+      "type": 0,
+      "value": "Continue"
+    }
+  ],
+  "order_lookup.heading.look_up_with_order_number": [
+    {
+      "type": 0,
+      "value": "Look it up with your order number"
+    }
+  ],
+  "order_lookup.link.help_to_find_order_number": [
+    {
+      "type": 0,
+      "value": "Need help finding your order number?"
+    }
+  ],
+  "order_lookup.subheading.find_individual_order": [
+    {
+      "type": 0,
+      "value": "Find an individual order"
+    }
+  ],
+  "order_status_page.heading.order_status": [
+    {
+      "type": 0,
+      "value": "Order Status"
+    }
+  ],
+  "order_status_page.sign_in.button": [
+    {
+      "type": 0,
+      "value": "Sign in"
+    }
+  ],
+  "order_status_page.sign_in.heading": [
+    {
+      "type": 0,
+      "value": "Sign in with your Account"
+    }
+  ],
   "order_summary.action.remove_promo": [
     {
       "type": 0,
@@ -4047,6 +4089,42 @@
     {
       "type": 0,
       "value": "Password"
+    }
+  ],
+  "use_order_lookup_fields.error.required_email": [
+    {
+      "type": 0,
+      "value": "Please enter your email address."
+    }
+  ],
+  "use_order_lookup_fields.error.required_order_number": [
+    {
+      "type": 0,
+      "value": "Please enter your order number."
+    }
+  ],
+  "use_order_lookup_fields.label.email": [
+    {
+      "type": 0,
+      "value": "Email"
+    }
+  ],
+  "use_order_lookup_fields.label.order_number": [
+    {
+      "type": 0,
+      "value": "Order Number"
+    }
+  ],
+  "use_order_lookup_fields.placeholder.email": [
+    {
+      "type": 0,
+      "value": "you@email.com"
+    }
+  ],
+  "use_order_lookup_fields.placeholder.order_number": [
+    {
+      "type": 0,
+      "value": "Enter order number"
     }
   ],
   "use_product.message.inventory_remaining": [

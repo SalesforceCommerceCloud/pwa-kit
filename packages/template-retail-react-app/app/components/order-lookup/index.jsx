@@ -8,8 +8,10 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import {useForm} from 'react-hook-form'
+import {FormattedMessage} from 'react-intl'
 import {Button, Text, Stack, Box, Link} from '@salesforce/retail-react-app/app/components/shared/ui'
 import Field from '@salesforce/retail-react-app/app/components/field'
+import useOrderLookupFields from '@salesforce/retail-react-app/app/components/forms/use-order-lookup-fields'
 
 const OrderLookupForm = ({onSubmit}) => {
     const form = useForm({
@@ -20,38 +22,8 @@ const OrderLookupForm = ({onSubmit}) => {
         }
     })
 
-    const {
-        handleSubmit,
-        formState: {errors}
-    } = form
-
-    const fields = {
-        orderNumber: {
-            name: 'orderNumber',
-            label: 'Order Number',
-            placeholder: 'Enter order number',
-            type: 'text',
-            defaultValue: '',
-            rules: {
-                required: 'Please enter your order number.'
-            },
-            error: errors.orderNumber,
-            control: form.control
-        },
-        email: {
-            name: 'email',
-            label: 'Email',
-            placeholder: 'you@email.com',
-            type: 'email',
-            autoComplete: 'email',
-            defaultValue: '',
-            rules: {
-                required: 'Please enter your email address.'
-            },
-            error: errors.email,
-            control: form.control
-        }
-    }
+    const {handleSubmit} = form
+    const fields = useOrderLookupFields({form})
 
     const onSubmitForm = (data) => {
         if (onSubmit) {
@@ -72,10 +44,16 @@ const OrderLookupForm = ({onSubmit}) => {
             <Stack spacing={6}>
                 <Box textAlign="center">
                     <Text fontSize="lg" fontWeight="medium">
-                        Look it up with your order number
+                        <FormattedMessage
+                            defaultMessage="Look it up with your order number"
+                            id="order_lookup.heading.look_up_with_order_number"
+                        />
                     </Text>
                     <Text fontSize="sm" color="gray.600" mt={1}>
-                        Find an individual order
+                        <FormattedMessage
+                            defaultMessage="Find an individual order"
+                            id="order_lookup.subheading.find_individual_order"
+                        />
                     </Text>
                 </Box>
 
@@ -85,7 +63,10 @@ const OrderLookupForm = ({onSubmit}) => {
                         <Field {...fields.email} />
 
                         <Button type="submit" colorScheme="blue" size="lg" width="100%" mt={2}>
-                            Continue
+                            <FormattedMessage
+                                defaultMessage="Continue"
+                                id="order_lookup.button.continue"
+                            />
                         </Button>
                     </Stack>
                 </form>
@@ -93,7 +74,10 @@ const OrderLookupForm = ({onSubmit}) => {
                 <Box textAlign="center">
                     {/* TODO: Add a link to the order retrieval help page */}
                     <Link color="blue.600" fontSize="sm" textDecoration="underline">
-                        Can&apos;t find? How to find your order number
+                        <FormattedMessage
+                            defaultMessage="Need help finding your order number?"
+                            id="order_lookup.link.help_to_find_order_number"
+                        />
                     </Link>
                 </Box>
             </Stack>
