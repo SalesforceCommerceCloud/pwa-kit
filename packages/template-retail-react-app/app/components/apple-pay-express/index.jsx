@@ -318,26 +318,12 @@ export const getAppleButtonConfig = (
                                 applicableShippingMethods: shippingMethodsResponse
                             }
                         } else {
-                            // Create a minimal fallback shipping method
-                            newShippingMethods = {
-                                applicableShippingMethods: [{
-                                    id: 'standard',
-                                    name: 'Standard Shipping',
-                                    description: 'Standard shipping',
-                                    price: 0
-                                }]
-                            }
+                            // No valid shipping methods available - fail the Apple Pay flow
+                            newShippingMethods = null
                         }
                     } catch (error) {
-                        // Provide a fallback shipping method so the flow can continue
-                        newShippingMethods = {
-                            applicableShippingMethods: [{
-                                id: 'standard',
-                                name: 'Standard Shipping',
-                                description: 'Standard shipping',
-                                price: 0
-                            }]
-                        }
+                        // API call failed - fail the Apple Pay flow (no free shipping fallback)
+                        newShippingMethods = null
                     }
                 }
                 

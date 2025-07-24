@@ -162,13 +162,9 @@ export const forceOrderCalculation = async (basketId, authToken, site) => {
         // Force a final calculation regardless of shipping method success
         const finalBasket = await calculateBasketTotals(basketId, authToken, site)
         
-        // If still no orderTotal, use productTotal + tax as fallback
+        // If still no orderTotal, the basket calculation failed - don't proceed with Apple Pay
         if (finalBasket.orderTotal === null || finalBasket.orderTotal === undefined) {
-            const fallbackTotal = (finalBasket.productTotal || 0) + (finalBasket.merchandizeTotalTax || 0)
-            
-            // Set the calculated total
-            finalBasket.orderTotal = fallbackTotal
-            finalBasket.calculatedByFallback = true
+            throw new Error('Unable to calculate order total - shipping methods may not be available for this location')
         }
         
         return finalBasket
