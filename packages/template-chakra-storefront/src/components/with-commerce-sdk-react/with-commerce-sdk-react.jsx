@@ -20,18 +20,12 @@ import React from 'react'
  */
 const withCommerceSdkReact = (Component, opts = {}) => {
     const WrappedComponent = (props) => {
-        const {hook, queryOptions, placeholder: Placeholder} = opts
+        const {hook, queryOptions, placeholder: Placeholder = React.Fragment} = opts
         const {data, isLoading} = hook(
             typeof queryOptions === 'function' ? queryOptions(props) : queryOptions || {}
         )
 
-        return isLoading ? (
-            Placeholder ? (
-                <Placeholder {...props} />
-            ) : null
-        ) : (
-            <Component {...props} data={data} />
-        )
+        return isLoading ? <Placeholder {...props} /> : <Component {...props} data={data} />
     }
 
     WrappedComponent.propTypes = {}
