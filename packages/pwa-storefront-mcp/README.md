@@ -16,6 +16,7 @@ The PWA Storefront MCP Server provides these features.
 - `create_new_sample_component`: Helps developers create a new sample PWA Storefront component. This feature guides developers through a few simple questions and then generates code for the component based on the commerce data model used, layouts, etc.
 - `create_app_guidelines`: Helps developers generate a new PWA Storefront project.
 - `run_site_test`: Run site performance or accessibility test for a given site URL (e.g. [https://pwa-kit.mobify-storefront.com](https://pwa-kit.mobify-storefront.com))
+-`create_sample_storefront_page`: Helps developers create a new sample PWA Storefront page. This feature guides develoopers through a few simple questions and then generates code for the page based on the name of the page, components included, and route.
 
 ## Setup
 
