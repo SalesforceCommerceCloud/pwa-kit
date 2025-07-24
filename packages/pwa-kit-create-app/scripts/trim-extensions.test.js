@@ -57,7 +57,7 @@ let vol
 const createTestFileSystem = (fileContents = {}) => {
     vol = new Volume()
 
-    // Default file structure
+    // Default file structure, this is the file system starting point for every unit test cases in this file
     const defaultFiles = {
         '/mock/dir/src/components/featureComponent.jsx':
             fileContents.featureComponent || TEST_CODES.BASIC_COMPONENT,
