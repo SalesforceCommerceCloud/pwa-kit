@@ -39,19 +39,48 @@ const PickupAddress = () => {
     const {step, STEPS, goToStep, goToNextStep} = useCheckout()
     const {data: basket} = useCurrentBasket()
 
-    // Check if there are any pickup shipments - moved to top
-    const hasPickupShipments = useMemo(() => {
-        if (!basket?.shipments) return false
-        return basket.shipments.some(
-            (shipment) => shipment?.shippingMethod?.c_storePickupEnabled === true
-        )
+    // Single scan to get all shipment data - optimized
+    const shipmentData = useMemo(() => {
+        if (!basket?.shipments) {
+            return {
+                hasPickupShipments: false,
+                hasDeliveryShipments: false,
+                pickupShipments: [],
+                allStoreIds: '',
+                pickupShipmentItems: []
+            }
+        }
+
+        const pickupShipments = []
+        const storeIds = new Set()
+        let hasPickupShipments = false
+        let hasDeliveryShipments = false
+
+        basket.shipments.forEach((shipment) => {
+            const isPickupOrder = STORE_LOCATOR_IS_ENABLED
+                ? shipment?.shippingMethod?.c_storePickupEnabled === true
+                : false
+
+            if (isPickupOrder) {
+                hasPickupShipments = true
+                pickupShipments.push(shipment)
+                if (shipment.c_fromStoreId) {
+                    storeIds.add(shipment.c_fromStoreId)
+                }
+            } else {
+                hasDeliveryShipments = true
+            }
+        })
+
+        return {
+            hasPickupShipments,
+            hasDeliveryShipments,
+            pickupShipments,
+            allStoreIds: Array.from(storeIds).join(',')
+        }
     }, [basket?.shipments])
 
-    // Check if there are delivery shipments (for determining display mode) - moved to top
-    const hasDeliveryShipments = useMemo(() => {
-        if (!basket?.shipments) return false
-        return basket.shipments.some((shipment) => !shipment?.shippingMethod?.c_storePickupEnabled)
-    }, [basket?.shipments])
+    const {hasPickupShipments, hasDeliveryShipments, pickupShipments, allStoreIds} = shipmentData
 
     // Get product data for display - moved to top before any conditional returns
     const productIds = basket?.productItems?.map(({productId}) => productId).join(',') ?? ''
@@ -74,18 +103,6 @@ const PickupAddress = () => {
             }
         }
     )
-
-    // Get all unique store IDs from pickup shipments - moved to top
-    const allStoreIds = useMemo(() => {
-        if (!basket?.shipments) return ''
-
-        return basket.shipments
-            .filter((shipment) => shipment?.shippingMethod?.c_storePickupEnabled === true)
-            .map((shipment) => shipment.c_fromStoreId)
-            .filter(Boolean)
-            .filter((id, index, array) => array.indexOf(id) === index) // Remove duplicates
-            .join(',')
-    }, [basket?.shipments])
 
     const {data: storeData} = useStores(
         {
@@ -157,13 +174,7 @@ const PickupAddress = () => {
         return pickupShipments
     }, [basket?.shipments, basket?.productItems, storeData?.data])
 
-    // Determine pickup and delivery shipment counts
-    const pickupShipments =
-        basket?.shipments?.filter((shipment) =>
-            STORE_LOCATOR_IS_ENABLED
-                ? shipment?.shippingMethod?.c_storePickupEnabled === true
-                : false
-        ) || []
+    // Determine if we should show cart items (multi-pickup or mixed basket)
     const hasMultiplePickups = pickupShipments.length > 1
 
     // Determine if we should show cart items (multi-pickup or mixed basket)
