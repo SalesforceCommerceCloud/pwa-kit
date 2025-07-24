@@ -8,7 +8,6 @@ import fs from 'fs/promises'
 import path from 'path'
 import {toKebabCase, toPascalCase, getCopyrightHeader} from './utils'
 
-
 // Utility to infer entity from component name
 function inferEntityFromComponentName(componentName) {
     const name = componentName.toLowerCase()
