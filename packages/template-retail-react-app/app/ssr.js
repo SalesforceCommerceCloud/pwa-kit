@@ -308,48 +308,28 @@ const {handler} = runtime.createHandler(options, (app) => {
                     'img-src': [
                         // Default source for product images - replace with your CDN
                         '*.commercecloud.salesforce.com',
-                        'checkoutshopper-test.adyen.com',
-                        // Allow Google Pay specific imgs
-                        'https://www.gstatic.com/images/icons/material/system/1x/payment_white_36dp.png',
-                        'https://www.gstatic.com/instantbuy/svg/dark_gpay.svg'
+                        'checkoutshopper-test.adyen.com'
                     ],
                     'script-src': [
                         // Used by the service worker in /worker/main.js
-                        'storage.googleapis.com',
-                        'https://pay.google.com/gp/p/js/pay.js',
-                        '*.test1.my.pc-rnd.site.com',
-                        '*.adyen.com',
-                        'https://checkoutshopper-test.adyen.com',
-                        'checkoutshopper-test.adyen.com'
+                        'storage.googleapis.com'
                     ],
                     'connect-src': [
                         // Connect to Einstein APIs
                         'api.cquotient.com',
                         // Connect to DataCloud APIs
                         '*.c360a.salesforce.com',
-                        '*.test1.my.pc-rnd.salesforce-scrt.com',
                         'https://api.lab.amplitude.com/sdk/vardata',
                         '*.adyen.com',
                         // Connect to SCRT2 URLs
-                        '*.salesforce-scrt.com',
-                        '*.test1.my.pc-rnd.salesforce-scrt.com',
-                        '*.test1.my.pc-rnd.site.com',
-                        'checkoutshopper-test.adyen.com',
-                        // Allow Google Pay Specific frames
-                        'https://pay.google.com'
+                        '*.salesforce-scrt.com'
                     ],
                     'frame-src': [
                         // Allow frames from Salesforce site.com (Needed for MIAW)
                         '*.site.com',
                         'checkoutshopper-test.adyen.com'
                     ],
-                    'frame-ancestors': [
-                        "'self'",
-                        // MIAW
-                        'https://orgfarm-b31c63e95f.test1.my.pc-rnd.site.com',
-                        // PWA
-                        'https://agent-checkout-payme-production.mobify-storefront.com'
-                    ]
+                    'frame-ancestors': ["'self'"]
                 }
             }
         })
