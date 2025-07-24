@@ -9,6 +9,7 @@ const fs = require('fs')
 const {execSync} = require('child_process')
 const path = require('path')
 
+// mock plugin config to simulate different plugin states
 let mockedPluginConfig = {
     SFDC_EXT_featureA: {
         description: 'Feature A'
@@ -20,7 +21,6 @@ let mockedPluginConfig = {
 jest.mock('../assets/plugin-config', () => ({
     plugins: mockedPluginConfig
 }))
-const trimExtensions = require('./trim-extensions')
 
 jest.mock('fs')
 jest.mock('child_process')
@@ -51,7 +51,32 @@ const TEST_CODES = {
     FEATURE_B_PAGE_WITH_COMPONENT_REF_TRIMMED: `export const FeatureBPage = 'FeatureBPage'`
 }
 
-// Helper functions
+/**
+ *
+ * @typedef {Object} contentMap
+ * A mapping of file path patterns (string) to file contents (string or string[]).
+ * If the value is an array, each call to the mock will return the next item in the array,
+ * allowing simulation of file content changes (pre and post trim) across multiple reads.
+ *
+ * Example:
+ * {
+ *   'featureComponent.jsx': [
+ *     'initial content',
+ *     'trimmed/updated content'
+ *   ],
+ *   'featureAComponent': 'static content'
+ * }
+ *
+ * @typedef {Object} callCounters
+ * A mapping of file path patterns (string) to the number of times the mock has been called for that pattern.
+ * Used to track which version of the content array to return for each file.
+ *
+ * Example:
+ * {
+ *   'featureComponent.jsx': 1,
+ *   'featureAComponent': 0
+ * }
+ */
 const createFileContentMock = (contentMap, callCounters = {}) => {
     return (filePath) => {
         for (const [pathPattern, content] of Object.entries(contentMap)) {
@@ -69,11 +94,13 @@ const createFileContentMock = (contentMap, callCounters = {}) => {
     }
 }
 
+// mock console.error to verify error messages are logged
 const mockConsole = (method = 'error') => {
     const spy = jest.spyOn(console, method).mockImplementation(() => jest.fn())
     return spy
 }
 
+// verify file operations are called with the correct arguments
 const expectFileOperation = (operation, matcher, options = {}) => {
     if (options.not) {
         expect(fs[operation]).not.toHaveBeenCalledWith(matcher, options.args)
@@ -82,6 +109,7 @@ const expectFileOperation = (operation, matcher, options = {}) => {
     }
 }
 
+// verify file is written with the correct content, using the custom matcher toEqualTrimmedLines
 const expectFileWrite = (expectedContent) => {
     expect(fs.writeFileSync).toHaveBeenCalledWith(
         expect.any(String),
@@ -89,6 +117,7 @@ const expectFileWrite = (expectedContent) => {
     )
 }
 
+// verify file is not written with the expected content
 const expectFileNotContain = (content) => {
     expect(fs.writeFileSync).not.toHaveBeenCalledWith(
         expect.any(String),
@@ -96,12 +125,14 @@ const expectFileNotContain = (content) => {
     )
 }
 
+// verify prettier is run with the correct arguments
 const expectPrettierRun = (filePath) => {
     expect(execSync).toHaveBeenCalledWith(
         `npx prettier --write ${path.join('/mock', 'dir', 'src', 'components', filePath)}`
     )
 }
 
+// setup test for delete error scenarios
 const setupDeleteErrorTest = (errorCode = 'EPERM') => {
     fs.rmSync.mockImplementation((filePath) => {
         if (filePath.includes('featureBComponent')) {
@@ -211,6 +242,7 @@ describe('trim-extensions without config', () => {
 })
 
 describe('trim-extensions with nested directories', () => {
+    const trimExtensions = require('./trim-extensions')
     beforeEach(() => {
         jest.resetAllMocks()
     })
@@ -251,6 +283,7 @@ describe('trim-extensions with nested directories', () => {
 })
 
 describe('trim-extensions', () => {
+    const trimExtensions = require('./trim-extensions')
     beforeEach(() => {
         jest.resetAllMocks()
         fs.readdirSync.mockReturnValue([
