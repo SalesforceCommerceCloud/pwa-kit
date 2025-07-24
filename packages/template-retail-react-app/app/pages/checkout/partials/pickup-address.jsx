@@ -68,9 +68,6 @@ const PickupAddress = () => {
         return null
     }
 
-    const selectedShippingAddress = basket?.shipments && basket?.shipments[0]?.shippingAddress
-    const isAddressFilled = selectedShippingAddress?.address1 && selectedShippingAddress?.city
-
     // Get product data for display
     const productIds = basket?.productItems?.map(({productId}) => productId).join(',') ?? ''
     const {data: products, isLoading: isProductsLoading} = useProducts(
@@ -176,6 +173,9 @@ const PickupAddress = () => {
         return pickupShipments
     }, [basket?.shipments, basket?.productItems, storeData])
 
+    // Check if pickup data is ready (has store data and not loading)
+    const isPickupDataReady = pickupShipmentItems.length > 0 && !isStoreDataLoading
+
     // For single pickup, use the first store; for multiple pickups, this will be handled differently
     const store =
         pickupShipmentItems.length === 1 ? pickupShipmentItems[0]?.store : storeData?.data?.[0]
@@ -229,13 +229,12 @@ const PickupAddress = () => {
         >
             {step === STEPS.PICKUP_ADDRESS && (
                 <>
-                    {/* Display pickup stores and items */}
                     {(() => {
                         return (
                             pickupShipmentItems.length > 0 &&
                             !isStoreDataLoading && (
                                 <>
-                                    {/* Single pickup - use original behavior */}
+                                    {/* Single pickup */}
                                     {pickupShipmentItems.length === 1 && !shouldShowCartItems && (
                                         <>
                                             <Text fontWeight="bold" fontSize="md" mb={2}>
@@ -248,7 +247,7 @@ const PickupAddress = () => {
                                         </>
                                     )}
 
-                                    {/* Multiple pickups or mixed basket - use new grouped behavior */}
+                                    {/* Multiple pickups/mixed basket */}
                                     {shouldShowCartItems && (
                                         <Stack spacing={6}>
                                             {pickupShipmentItems.map((shipmentInfo, index) => (
@@ -262,7 +261,6 @@ const PickupAddress = () => {
                                                     p={4}
                                                     mb={4}
                                                 >
-                                                    {/* Store Information */}
                                                     <Text fontWeight="bold" fontSize="md" mb={2}>
                                                         <FormattedMessage
                                                             defaultMessage="Store Information"
@@ -286,7 +284,6 @@ const PickupAddress = () => {
                                                         </Box>
                                                     )}
 
-                                                    {/* Cart Items for this store */}
                                                     {/* Regular Products */}
                                                     {shipmentInfo.categorizedProducts
                                                         .regularProducts.length > 0 && (
@@ -356,12 +353,12 @@ const PickupAddress = () => {
                     </Box>
                 </>
             )}
-            {isAddressFilled && (
+            {isPickupDataReady && (
                 <ToggleCardSummary>
-                    {/* Display pickup stores in summary view (no cart items) */}
+                    {/* pickup stores summary view */}
                     {pickupShipmentItems.length > 0 && !isStoreDataLoading && (
                         <>
-                            {/* Single pickup - show store info only */}
+                            {/* Single pickup */}
                             {pickupShipmentItems.length === 1 && !shouldShowCartItems && (
                                 <>
                                     <Text fontWeight="bold" fontSize="md" mb={2}>
@@ -374,7 +371,7 @@ const PickupAddress = () => {
                                 </>
                             )}
 
-                            {/* Multiple pickups or mixed basket - show store info only */}
+                            {/* Multiple pickups or mixed basket */}
                             {shouldShowCartItems && (
                                 <Stack spacing={4}>
                                     {pickupShipmentItems.map((shipmentInfo, index) => (
