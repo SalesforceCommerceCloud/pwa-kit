@@ -344,7 +344,6 @@ describe('product bundles', () => {
                 res: () => mockProductBundle
             },
             {
-                // Generic inventory mock with good stock for most tests
                 path: '*/products',
                 method: 'get',
                 res: (req) => {
@@ -537,103 +536,6 @@ describe('product bundles', () => {
 
     // TODO: fix failing tests
     test.skip('add to cart button is disabled when quantity exceeds child stock level', async () => {
-        // Mock inventory with limited stock for Swing Tank (3) to test quantity constraint
-        prependHandlersToServer([
-            {
-                path: '*/products',
-                method: 'get',
-                res: (req) => {
-                    const url = req.url.toString()
-                    // use for all 3 recommendations, "you might also like", "complete the set", and "recently viewed"
-                    if (url.includes('ids=11736753M%2C22951021M%2C25592770M%2C25752986M')) {
-                        return productsForEinstein
-                    }
-
-                    const results = []
-
-                    // Sleeveless Pleated Floral Front Blouse - Size 6 (701644044237M)
-                    if (url.includes('701644044237M')) {
-                        results.push({
-                            id: '701644044237M',
-                            inventory: {
-                                ats: 100,
-                                backorderable: false,
-                                id: 'inventory_m',
-                                orderable: true,
-                                preorderable: false,
-                                stockLevel: 100
-                            },
-                            master: {
-                                masterId: '25592770M',
-                                orderable: true
-                            }
-                        })
-                    }
-
-                    // Swing Tank - Black + L (701643473908M) - LIMITED STOCK for quantity test
-                    if (url.includes('701643473908M')) {
-                        results.push({
-                            id: '701643473908M',
-                            inventory: {
-                                ats: 3,
-                                backorderable: false,
-                                id: 'inventory_m',
-                                orderable: true,
-                                preorderable: false,
-                                stockLevel: 3
-                            },
-                            master: {
-                                masterId: '25565139M',
-                                orderable: true
-                            }
-                        })
-                    }
-
-                    // Pull On Neutral Pant - Size S (701643458486M)
-                    if (url.includes('701643458486M')) {
-                        results.push({
-                            id: '701643458486M',
-                            inventory: {
-                                ats: 100,
-                                backorderable: false,
-                                id: 'inventory_m',
-                                orderable: true,
-                                preorderable: false,
-                                stockLevel: 100
-                            },
-                            master: {
-                                masterId: '25565094M',
-                                orderable: true
-                            }
-                        })
-                    }
-
-                    // Fallback for other variants (no stock)
-                    if (results.length === 0) {
-                        results.push({
-                            id: '701643473915M',
-                            inventory: {
-                                ats: 0,
-                                backorderable: false,
-                                id: 'inventory_m',
-                                orderable: false,
-                                preorderable: false,
-                                stockLevel: 0
-                            },
-                            master: {
-                                masterId: '25565139M',
-                                orderable: true
-                            }
-                        })
-                    }
-
-                    return {
-                        data: results
-                    }
-                }
-            }
-        ])
-
         // Initial basket is necessary to add items to it
         const initialBasket = {basketId: 'valid_id'}
         const {user} = renderWithProviders(<MockedComponent />, {wrapperProps: {initialBasket}})
