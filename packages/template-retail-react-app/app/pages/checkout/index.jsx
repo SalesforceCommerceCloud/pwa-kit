@@ -66,6 +66,13 @@ const Checkout = () => {
               basket?.shipments?.some((shipment) => !shipment?.shippingMethod?.c_storePickupEnabled)
             : false
 
+    // Check if there are pickup shipments
+    const hasPickupShipments = STORE_LOCATOR_IS_ENABLED
+        ? basket?.shipments?.some(
+              (shipment) => shipment?.shippingMethod?.c_storePickupEnabled === true
+          )
+        : false
+
     // Only enable BOPIS functionality if the feature toggle is on
     const isPickupOrderOnly =
         STORE_LOCATOR_IS_ENABLED && !isDeliveryAndPickupOrder
@@ -127,18 +134,11 @@ const Checkout = () => {
                                 idps={idps}
                             />
 
-                            {isDeliveryAndPickupOrder && (
+                            {isPickupOrderOnly ? (
+                                <PickupAddress />
+                            ) : (
                                 <>
-                                    <PickupAddress />
-                                    <ShippingAddress />
-                                    <ShippingOptions />
-                                </>
-                            )}
-
-                            {isPickupOrderOnly && <PickupAddress />}
-
-                            {!isDeliveryAndPickupOrder && !isPickupOrderOnly && (
-                                <>
+                                    {hasPickupShipments && <PickupAddress />}
                                     <ShippingAddress />
                                     <ShippingOptions />
                                 </>
