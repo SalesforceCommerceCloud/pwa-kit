@@ -5,7 +5,6 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React, {useEffect, useState} from 'react'
-import {FormattedMessage, useIntl} from 'react-intl'
 import {
     Alert,
     AlertIcon,
@@ -35,7 +34,6 @@ import ShippingOptions from '@salesforce/retail-react-app/app/pages/checkout-one
 import Payment from '@salesforce/retail-react-app/app/pages/checkout-one-click/partials/one-click-payment'
 import OrderSummary from '@salesforce/retail-react-app/app/components/order-summary'
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
-import {useShopperOrdersMutation} from '@salesforce/commerce-sdk-react'
 import {STORE_LOCATOR_IS_ENABLED} from '@salesforce/retail-react-app/app/constants'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import {
@@ -336,7 +334,7 @@ const CheckoutOneClick = () => {
                 id: 'checkout.message.generic_error',
                 defaultMessage: 'An unexpected error occurred during checkout.'
             })
-            setError(message)
+            showError(message)
         } finally {
             setIsLoading(false)
         }
@@ -461,43 +459,9 @@ const CheckoutOneClick = () => {
                             showTaxEstimationForm={false}
                             showCartItems={true}
                         />
-
-                        {step === 5 && (
-                            <Box display={{base: 'none', lg: 'block'}} pt={2}>
-                                <Button w="full" onClick={submitOrder} isLoading={isLoading}>
-                                    <FormattedMessage
-                                        defaultMessage="Place Order"
-                                        id="checkout.button.place_order"
-                                    />
-                                </Button>
-                            </Box>
-                        )}
                     </GridItem>
                 </Grid>
             </Container>
-
-            {step === 5 && (
-                <Box
-                    display={{lg: 'none'}}
-                    position="sticky"
-                    bottom="0"
-                    px={4}
-                    pt={6}
-                    pb={11}
-                    background="white"
-                    borderTop="1px solid"
-                    borderColor="gray.100"
-                >
-                    <Container variant="form">
-                        <Button w="full" onClick={submitOrder} isLoading={isLoading}>
-                            <FormattedMessage
-                                defaultMessage="Place Order"
-                                id="checkout.button.place_order"
-                            />
-                        </Button>
-                    </Container>
-                </Box>
-            )}
         </Box>
     )
 }

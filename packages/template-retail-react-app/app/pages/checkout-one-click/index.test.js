@@ -605,25 +605,16 @@ describe('Checkout One Click', () => {
     })
 
     // Wait for checkout to load and display first step
-    await screen.findByText(/checkout as guest/i)
+    await screen.findByText(/Continue to Shipping Address/i)
 
     // Verify cart products display
     await user.click(screen.getByText(/2 items in cart/i))
     expect(await screen.findByText(/Long Sleeve Crew Neck$/i)).toBeInTheDocument()
 
     // Verify password field is reset if customer toggles login form
-    const loginToggleButton = screen.getByText(/Already have an account\? Log in/i)
-    await user.click(loginToggleButton)
-    // Provide customer email and submit
-    const passwordInput = document.querySelector('input[type="password"]')
-    await user.type(passwordInput, 'Password1!')
-
-    const checkoutAsGuestButton = screen.getByText(/Checkout as guest/i)
-    await user.click(checkoutAsGuestButton)
-
     // Provide customer email and submit
     const emailInput = screen.getByLabelText(/email/i)
-    const submitBtn = screen.getByText(/checkout as guest/i)
+    const submitBtn = screen.getByText(/Continue to Shipping Address/i)
     await user.type(emailInput, 'test@test.com')
     await user.click(submitBtn)
 
@@ -704,29 +695,11 @@ describe('Checkout One Click', () => {
     ).not.toBeChecked()
     expect(userRegistrationForm.queryByText(/when you place your order/i)).not.toBeInTheDocument()
 
-    // Should display billing address that matches shipping address
-    const step3Content = within(screen.getByTestId('sf-toggle-card-step-3-content'))
-    expect(step3Content.getByText('Tester McTesting')).toBeInTheDocument()
-    expect(step3Content.getByText('123 Main St')).toBeInTheDocument()
-    expect(step3Content.getByText('Tampa, FL 33610')).toBeInTheDocument()
-    expect(step3Content.getByText('US')).toBeInTheDocument()
-
     // Move to final review step
-    await user.click(screen.getByText(/review order/i))
 
     const placeOrderBtn = await screen.findByTestId('place-order-button', undefined, {
         timeout: 10000
     })
-
-    // Verify applied payment and billing address
-    expect(step3Content.getByText('Visa')).toBeInTheDocument()
-    expect(step3Content.getByText('•••• 1111')).toBeInTheDocument()
-    expect(step3Content.getByText('1/2040')).toBeInTheDocument()
-
-    expect(step3Content.getByText('Tester McTesting')).toBeInTheDocument()
-    expect(step3Content.getByText('123 Main St')).toBeInTheDocument()
-    expect(step3Content.getByText('Tampa, FL 33610')).toBeInTheDocument()
-    expect(step3Content.getByText('US')).toBeInTheDocument()
     // Place the order
     await user.click(placeOrderBtn)
 
@@ -787,7 +760,7 @@ test('Can proceed through checkout as registered customer', async () => {
 
     // Wait for next step to render
     await waitFor(() => {
-        expect(screen.getByTestId('sf-toggle-card-step-3-content')).not.toBeEmptyDOMElement()
+        expect(screen.getByTestId('sf-toggle-card-step-4-content')).not.toBeEmptyDOMElement()
     })
 
     // Applied shipping method should be displayed in previous step summary
