@@ -243,8 +243,17 @@
   "checkout.button.place_order": {
     "defaultMessage": "Place Order"
   },
+  "checkout.label.user_registration": {
+    "defaultMessage": "Create an account for a faster checkout"
+  },
   "checkout.message.generic_error": {
     "defaultMessage": "An unexpected error occurred during checkout."
+  },
+  "checkout.message.user_registration": {
+    "defaultMessage": "When you place your order, we create an account for you and save your payment information and other details for future purchases. During your next checkout, confirm your account using the code we'll send to you."
+  },
+  "checkout.title.user_registration": {
+    "defaultMessage": "Save for Future Use"
   },
   "checkout_confirmation.button.create_account": {
     "defaultMessage": "Create Account"
