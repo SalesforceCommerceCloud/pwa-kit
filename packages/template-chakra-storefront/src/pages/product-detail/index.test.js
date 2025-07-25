@@ -358,7 +358,7 @@ describe('product bundles', () => {
                         bundleChildVariantId = '701643473908M'
                         inventoryLevel = 3
                     }
-                    return {
+                    const bundleChildVariantData = {
                         data: [
                             {
                                 id: bundleChildVariantId,
@@ -377,6 +377,7 @@ describe('product bundles', () => {
                             }
                         ]
                     }
+                    return bundleChildVariantData
                 }
             },
             {
@@ -523,6 +524,8 @@ describe('product bundles', () => {
 
         await act(async () => {
             await user.click(colorSelectionBtn)
+        })
+        await act(async () => {
             await user.click(sizeSelectionBtn)
         })
 
@@ -534,8 +537,7 @@ describe('product bundles', () => {
         })
     })
 
-    // TODO: fix failing tests
-    test.skip('add to cart button is disabled when quantity exceeds child stock level', async () => {
+    test('add to cart button is disabled when quantity exceeds child stock level', async () => {
         // Initial basket is necessary to add items to it
         const initialBasket = {basketId: 'valid_id'}
         const {user} = renderWithProviders(<MockedComponent />, {wrapperProps: {initialBasket}})
@@ -553,16 +555,18 @@ describe('product bundles', () => {
         await act(async () => {
             await user.click(blouseSizeBtn)
         })
-
+        //
         // Child product 1: Swing Tank - Select Black + L (this has 3 inventory)
         const swingTankProduct = childProducts[1]
         const colorSelectionBtn = within(swingTankProduct).getByLabelText('Black')
         const sizeSelectionBtn = within(swingTankProduct).getByLabelText('L')
         await act(async () => {
-            await user.click(colorSelectionBtn)
             await user.click(sizeSelectionBtn)
         })
 
+        await act(async () => {
+            await user.click(colorSelectionBtn)
+        })
         // Child product 2: Pull On Neutral Pant (only one color available)
         const pantProduct = childProducts[2]
         const pantSizeBtn = within(pantProduct).getByLabelText('S')
@@ -579,14 +583,15 @@ describe('product bundles', () => {
 
         // Set product bundle quantity selection to 4
         const quantityInput = screen.getByRole('spinbutton', {name: /quantity/i})
-        quantityInput.focus()
         await act(async () => {
-            fireEvent.change(quantityInput, {target: {value: '4'}})
+            await user.clear(quantityInput)
+            await user.type(quantityInput, '4')
         })
 
         await waitFor(() => {
             expect(screen.getByRole('spinbutton', {name: /quantity/i})).toHaveValue('4')
             expect(screen.getByText('Only 3 left!')).toBeInTheDocument()
+            const addBundleToCartBtn = screen.getByRole('button', {name: /add bundle to cart/i})
             expect(addBundleToCartBtn).toBeDisabled()
         })
     })
