@@ -43,3 +43,4 @@ BonusProductQuantity.propTypes = {
 }
 
 export default BonusProductQuantity
+# Test change

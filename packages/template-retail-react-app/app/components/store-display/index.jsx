@@ -165,3 +165,4 @@ StoreDisplay.propTypes = {
 }
 
 export default StoreDisplay
+# Test change
