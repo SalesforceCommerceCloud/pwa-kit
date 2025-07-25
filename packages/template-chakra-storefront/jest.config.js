@@ -46,16 +46,14 @@ module.exports = {
         'src/page-designer/**/*.{js,jsx}',
         '!**/node_modules/**',
         '!**/dist/**',
-        '!src/utils/test-utils.js',
+        '!src/utils/test-utils.js'
     ],
-    //@TODO: Revert this threshold back to original numbers stattements: 80, branches: 72, functions: 78, lines: 83
-    // TODO: Revert this threshold once we start adding tests back to the codebase
     coverageThreshold: {
         global: {
-            statements: 73,
-            branches: 60,
-            functions: 65,
-            lines: 74
+            statements: 80,
+            branches: 72,
+            functions: 78,
+            lines: 83
         }
     },
     // Increase to: 6 x default timeout of 5 seconds
