@@ -6,7 +6,7 @@
  */
 import fs from 'fs/promises'
 import path from 'path'
-import {toKebabCase, toPascalCase} from './utils'
+import {toKebabCase, toPascalCase} from '../utils/utils'
 
 export const getCopyrightHeader = () => {
     const year = new Date().getFullYear()
