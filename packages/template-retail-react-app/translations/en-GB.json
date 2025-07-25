@@ -1487,9 +1487,6 @@
   "shipping_multi_address.error.save_failed": {
     "defaultMessage": "Failed to save address"
   },
-  "shipping_multi_address.error.submission_failed": {
-    "defaultMessage": "Failed to proceed with checkout"
-  },
   "shipping_multi_address.format.address_line_2": {
     "defaultMessage": "{city}, {stateCode} {postalCode}"
   },

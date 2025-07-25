@@ -3531,12 +3531,6 @@
       "value": "Failed to save address"
     }
   ],
-  "shipping_multi_address.error.submission_failed": [
-    {
-      "type": 0,
-      "value": "Failed to proceed with checkout"
-    }
-  ],
   "shipping_multi_address.format.address_line_2": [
     {
       "type": 1,

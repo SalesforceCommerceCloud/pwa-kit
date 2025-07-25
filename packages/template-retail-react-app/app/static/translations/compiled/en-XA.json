@@ -7459,20 +7459,6 @@
       "value": "]"
     }
   ],
-  "shipping_multi_address.error.submission_failed": [
-    {
-      "type": 0,
-      "value": "["
-    },
-    {
-      "type": 0,
-      "value": "Ƒȧȧīŀḗḗḓ ŧǿǿ ƥřǿǿƈḗḗḗḗḓ ẇīŧħ ƈħḗḗƈķǿǿŭŭŧ"
-    },
-    {
-      "type": 0,
-      "value": "]"
-    }
-  ],
   "shipping_multi_address.format.address_line_2": [
     {
       "type": 0,
