@@ -383,8 +383,6 @@ export const GooglePayExpress = () => {
                     handleGooglePayUnavailable()
                 }
             } catch (err) {
-                console.log('BROWSER SPECIFIC err', err)
-
                 const isMissingOrderTotalError =
                     err instanceof TypeError &&
                     (/undefined is not an object \(evaluating '[a-z]\.orderTotal'\)/.test(

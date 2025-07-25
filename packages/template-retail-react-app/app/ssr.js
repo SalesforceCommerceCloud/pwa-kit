@@ -309,7 +309,7 @@ const {handler} = runtime.createHandler(options, (app) => {
                         '*.commercecloud.salesforce.com',
                         'checkoutshopper-test.adyen.com',
                         // Allow Google Pay specific images
-                        'https://www.gstatic.com/',
+                        'https://www.gstatic.com/'
                     ],
                     'script-src': [
                         // Used by the service worker in /worker/main.js
@@ -328,8 +328,7 @@ const {handler} = runtime.createHandler(options, (app) => {
                         '*.adyen.com',
                         // Connect to SCRT2 URLs
                         '*.salesforce-scrt.com',
-
-                        '*.test1.my.pc-rnd.salesforce-scrt.com',
+                        '*.test1.my.pc-rnd.salesforce-scrt.com'
                     ],
                     'frame-src': [
                         // Allow frames from Salesforce site.com (Needed for MIAW)
