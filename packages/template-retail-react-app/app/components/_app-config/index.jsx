@@ -28,10 +28,10 @@ import {
     resolveLocaleFromUrl
 } from '@salesforce/retail-react-app/app/utils/site-utils'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
-import {getEnvBasePath, getProxyBasePath} from '@salesforce/pwa-kit-runtime/utils/ssr-paths'
+import {getEnvBasePath, slasPrivateProxyPath} from '@salesforce/pwa-kit-runtime/utils/ssr-namespace-paths'
 import {createUrlTemplate} from '@salesforce/retail-react-app/app/utils/url'
 import createLogger from '@salesforce/pwa-kit-runtime/utils/logger-factory'
-import {isAbsoluteUrl} from '@salesforce/retail-react-app/app/page-designer/utils' // TODO - move this to a more general location
+import {isAbsoluteURL} from '@salesforce/retail-react-app/app/page-designer/utils' // TODO - move this to a more general location
 
 import {CommerceApiProvider} from '@salesforce/commerce-sdk-react'
 import {withReactQuery} from '@salesforce/pwa-kit-react-sdk/ssr/universal/components/with-react-query'
@@ -79,11 +79,12 @@ const AppConfig = ({children, locals = {}}) => {
     }
 
     // Set absolute uris for CommerceApiProvider proxies and callbacks
-    const redirectURI = `${appOrigin}/callback`
+    const redirectURI = `${appOrigin}/callback` // if base path is added here, the SLAS client redirectURI will need to be updated as well
+    // const redirectURI = `${appOrigin}${getEnvBasePath()}/callback`
     const proxy = `${appOrigin}${getEnvBasePath()}${commerceApiConfig.proxyPath}`
-    const slasPrivateClientProxyEndpoint = `${appOrigin}${getSlasPrivateProxyPath()}`
-    const passwordlessLoginCallbackURI = isAbsoluteUrl(passwordlessLoginCallbackURI)
-        ? passwordlessLoginCallbackURI
+    const slasPrivateClientProxyEndpoint = `${appOrigin}${getEnvBasePath()}${slasPrivateProxyPath}`
+    const passwordlessLoginCallbackURI = isAbsoluteURL(passwordlessCallback)
+        ? passwordlessCallback
         : `${appOrigin}${getEnvBasePath()}${passwordlessCallback}`
 
     return (
@@ -101,7 +102,7 @@ const AppConfig = ({children, locals = {}}) => {
             defaultDnt={DEFAULT_DNT_STATE}
             // Uncomment 'enablePWAKitPrivateClient' to use SLAS private client login flows.
             // Make sure to also enable useSLASPrivateClient in ssr.js when enabling this setting.
-            // enablePWAKitPrivateClient={true}
+            enablePWAKitPrivateClient={true}
             slasPrivateClientProxyEndpoint={slasPrivateClientProxyEndpoint}
             logger={createLogger({packageName: 'commerce-sdk-react'})}
         >

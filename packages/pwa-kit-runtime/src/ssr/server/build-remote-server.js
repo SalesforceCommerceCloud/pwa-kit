@@ -42,11 +42,12 @@ import http from 'http'
 import https from 'https'
 import {proxyConfigs, updatePackageMobify} from '../../utils/ssr-shared'
 import {
-    getProxyBasePath,
-    getBundleBasePath,
-    getHealthCheckPath,
-    getSlasPrivateProxyPath
-} from '../../utils/ssr-paths'
+    getEnvBasePath,
+    proxyBasePath,
+    bundleBasePath,
+    healthCheckPath,
+    slasPrivateProxyPath
+} from '../../utils/ssr-namespace-paths'
 import {applyProxyRequestHeaders} from '../../utils/ssr-server/configure-proxy'
 import awsServerlessExpress from 'aws-serverless-express'
 import expressLogging from 'morgan'
@@ -223,8 +224,30 @@ export const RemoteServerFactory = {
      * @private
      */
     _isBundleOrProxyPath(url) {
-        return url.startsWith(getProxyBasePath()) || url.startsWith(getBundleBasePath())
+        return url.startsWith(this._applyBasePathToPath(proxyBasePath)) || url.startsWith(this._applyBasePathToPath(bundleBasePath))
     },
+
+    /**
+     * @private
+     * 
+     * On remote servers, it is expected that a CDN removes the base path from an incoming request before it reaches the server.
+     * The following example illustrates this:
+     * 
+     * Suppose we have a domain of https://www.example.com/ and a base path of /shop
+     * A request to the mobify proxy might look like this: https://www.example.com/shop/mobify/proxy/...
+     * 
+     * Also suppose we have an MRT environment deployed to https://example1.mobify-storefront.com
+     * The mobify proxy is accessed at https://example1.mobify-storefront.com/mobify/proxy/...
+     *  
+     * When our request from the client reaches a CDN in front of the MRT server, the CDN will remove the /shop from url as part of the request routing.
+     * In other words, https://www.example.com/shop/mobify/proxy/... routes to https://example1.mobify-storefront.com/mobify/proxy/...
+     */
+    _applyBasePathToPath(path) {
+        if (!isRemote()) {
+            return `${getEnvBasePath()}${path}`
+        }
+        return path
+    },    
 
     /**
      * @private
@@ -667,7 +690,7 @@ export const RemoteServerFactory = {
      */
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     _setupProxying(app, options) {
-        app.all(`${getProxyBasePath()}/*`, (_, res) => {
+        app.all(`${this._applyBasePathToPath(proxyBasePath)}/*`, (_, res) => {
             return res.status(501).json({
                 message:
                     'Environment proxies are not set: https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/proxying-requests.html'
@@ -679,7 +702,7 @@ export const RemoteServerFactory = {
      * @private
      */
     _handleMissingSlasPrivateEnvVar(app) {
-        app.use(getSlasPrivateProxyPath(), (_, res) => {
+        app.use(this._applyBasePathToPath(slasPrivateProxyPath), (_, res) => {
             return res.status(501).json({
                 message:
                     'Environment variable PWA_KIT_SLAS_CLIENT_SECRET not set: Please set this environment variable to proceed.'
@@ -695,7 +718,9 @@ export const RemoteServerFactory = {
             return
         }
 
-        localDevLog(`Proxying ${getSlasPrivateProxyPath()} to ${options.slasTarget}`)
+        const slasPrivateProxyPathWithBasePath = this._applyBasePathToPath(slasPrivateProxyPath)
+
+        localDevLog(`Proxying ${slasPrivateProxyPathWithBasePath} to ${options.slasTarget}`)
 
         const clientId = options.mobify?.app?.commerceAPI?.parameters?.clientId
         const clientSecret = process.env.PWA_KIT_SLAS_CLIENT_SECRET
@@ -707,16 +732,16 @@ export const RemoteServerFactory = {
         const encodedSlasCredentials = Buffer.from(`${clientId}:${clientSecret}`).toString('base64')
 
         app.use(
-            getSlasPrivateProxyPath(),
+            slasPrivateProxyPathWithBasePath,
             createProxyMiddleware({
                 target: options.slasTarget,
                 changeOrigin: true,
-                pathRewrite: {[getSlasPrivateProxyPath()]: ''},
+                pathRewrite: {[slasPrivateProxyPathWithBasePath]: ''},
                 onProxyReq: (proxyRequest, incomingRequest, res) => {
                     applyProxyRequestHeaders({
                         proxyRequest,
                         incomingRequest,
-                        proxyPath: getSlasPrivateProxyPath(),
+                        proxyPath: slasPrivateProxyPathWithBasePath,
                         targetHost: options.slasHostName,
                         targetProtocol: 'https'
                     })
@@ -750,7 +775,7 @@ export const RemoteServerFactory = {
      * @private
      */
     _setupHealthcheck(app) {
-        app.get(`${getHealthCheckPath()}`, (_, res) =>
+        app.get(`${this._applyBasePathToPath(healthCheckPath)}`, (_, res) =>
             res.set('cache-control', NO_CACHE).sendStatus(200).end()
         )
     },

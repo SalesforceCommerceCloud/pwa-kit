@@ -17,13 +17,13 @@ module.exports = {
         },
         login: {
             passwordless: {
-                enabled: false,
+                enabled: true,
                 callbackURI:
                     process.env.PASSWORDLESS_LOGIN_CALLBACK_URI || '/passwordless-login-callback',
                 landingPath: '/passwordless-login-landing'
             },
             social: {
-                enabled: false,
+                enabled: true,
                 idps: ['google', 'apple'],
                 redirectURI: process.env.SOCIAL_LOGIN_REDIRECT_URI || '/social-callback'
             },
@@ -41,9 +41,9 @@ module.exports = {
         commerceAPI: {
             proxyPath: `/mobify/proxy/api`,
             parameters: {
-                clientId: 'c9c45bfd-0ed3-4aa2-9971-40f88962b836',
+                clientId: '0841faa5-4e6b-40d6-acc0-5876d7dd7d42',
                 organizationId: 'f_ecom_zzrf_001',
-                shortCode: '8o7m175y',
+                shortCode: 'kv7kzm78',
                 siteId: 'RefArchGlobal'
             }
         },
@@ -59,6 +59,7 @@ module.exports = {
             tenantId: 'g82wgnrvm-ywk9dggrrw8mtggy.pc-rnd'
         }
     },
+    envBasePath: '/shop',
     externals: [],
     pageNotFoundURL: '/page-not-found',
     ssrEnabled: true,
