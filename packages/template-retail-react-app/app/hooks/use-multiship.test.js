@@ -686,12 +686,13 @@ describe('useMultiship', () => {
             mockUpdateItemsInBasket.mockRejectedValue(new Error('API Error'))
 
             await act(async () => {
-                const response = await result.current.moveItemsToDeliveryShipment(
-                    mockProductItems,
-                    'me',
-                    mockDefaultInventoryId
-                )
-                expect(response).toEqual(expect.any(Error))
+                await expect(
+                    result.current.moveItemsToDeliveryShipment(
+                        mockProductItems,
+                        'me',
+                        mockDefaultInventoryId
+                    )
+                ).rejects.toThrow('API Error')
             })
 
             expect(consoleErrorSpy).toHaveBeenCalledWith(
@@ -761,12 +762,13 @@ describe('useMultiship', () => {
             mockUpdateItemsInBasket.mockRejectedValue(new Error('API Error'))
 
             await act(async () => {
-                const response = await result.current.moveItemsToPickupShipment(
-                    mockProductItems,
-                    'pickup-shipment',
-                    'inventory-1'
-                )
-                expect(response).toEqual(expect.any(Error))
+                await expect(
+                    result.current.moveItemsToPickupShipment(
+                        mockProductItems,
+                        'pickup-shipment',
+                        'inventory-1'
+                    )
+                ).rejects.toThrow('API Error')
             })
 
             expect(consoleErrorSpy).toHaveBeenCalledWith(

@@ -276,6 +276,7 @@ const Cart = () => {
             ) {
                 const changeStore = async () => {
                     try {
+                        setCartItemLoading(true)
                         await changeStoreForPickupShipment(shipmentId, {
                             id: selectedStore.id,
                             inventoryId: selectedStore.inventoryId
@@ -283,6 +284,8 @@ const Cart = () => {
                     } catch (error) {
                         console.error('Failed to change store for pickup shipment:', error)
                         showError()
+                    } finally {
+                        setCartItemLoading(false)
                     }
                 }
                 changeStore()

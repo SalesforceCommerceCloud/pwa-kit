@@ -363,7 +363,7 @@ export const useMultiship = (basket) => {
             })
         } catch (error) {
             console.error('Failed to move items to delivery shipment:', error)
-            return error
+            throw error
         }
     }
 
@@ -399,7 +399,7 @@ export const useMultiship = (basket) => {
             return response
         } catch (error) {
             console.error('Failed to move items to pickup shipment:', error)
-            return error
+            throw error
         }
     }
 
@@ -695,32 +695,21 @@ export const useMultiship = (basket) => {
             return // Nothing to move
         }
 
-        // Check if there's already a pickup shipment for the new store
+        // Check if there's already a pickup shipment for the new store or create a new one
+        let targetShipmentId
         const existingPickupShipment = findExistingPickupShipment(basket, newStore.id)
-
         if (existingPickupShipment) {
-            // Move all items to the existing pickup shipment for the new store
-            await moveItemsToPickupShipment(
-                itemsToMove,
-                existingPickupShipment.shipmentId,
-                newStore.inventoryId
-            )
-
-            // Remove the now-empty source shipment if it's not the default shipment
-            if (sourceShipmentId !== DEFAULT_SHIPMENT_ID) {
-                await removeShipment(sourceShipmentId)
-            }
+            targetShipmentId = existingPickupShipment.shipmentId
         } else {
-            // Create a new pickup shipment for the new store and move items there
-            const newPickupShipmentId = await findOrCreatePickupShipment(newStore)
+            targetShipmentId = await findOrCreatePickupShipment(newStore)
+        }
 
-            // Move all items to the new pickup shipment
-            await moveItemsToPickupShipment(itemsToMove, newPickupShipmentId, newStore.inventoryId)
+        // Move all items to the target pickup shipment for the new store
+        await moveItemsToPickupShipment(itemsToMove, targetShipmentId, newStore.inventoryId)
 
-            // Remove the now-empty source shipment if it's not the default shipment
-            if (sourceShipmentId !== DEFAULT_SHIPMENT_ID) {
-                await removeShipment(sourceShipmentId)
-            }
+        // Remove the now-empty source shipment if it's not the default shipment
+        if (sourceShipmentId !== DEFAULT_SHIPMENT_ID) {
+            await removeShipment(sourceShipmentId)
         }
     }
 
