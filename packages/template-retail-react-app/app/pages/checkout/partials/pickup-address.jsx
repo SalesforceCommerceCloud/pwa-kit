@@ -103,7 +103,7 @@ const PickupAddress = () => {
         }
     )
 
-    const {data: storeData} = useStores(
+    const {data: storeData, isLoading: isStoreDataLoading} = useStores(
         {
             parameters: {
                 ids: allStoreIds
@@ -113,8 +113,6 @@ const PickupAddress = () => {
             enabled: STORE_LOCATOR_IS_ENABLED && !!allStoreIds
         }
     )
-
-    const isStoreDataLoading = !!allStoreIds && !storeData
 
     const productsByItemId = useMemo(() => {
         const updateProductsByItemId = {}
