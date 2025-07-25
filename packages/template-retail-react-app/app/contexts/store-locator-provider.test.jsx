@@ -83,12 +83,12 @@ describe('StoreLocatorProvider', () => {
                 longitude: null
             },
             selectedStoreId: null,
-            config: mockConfig,
-            isModalOpen: false
+            config: mockConfig
         })
         expect(typeof contextValue?.setState).toBe('function')
-        expect(typeof contextValue?.openModal).toBe('function')
-        expect(typeof contextValue?.closeModal).toBe('function')
+        expect(typeof contextValue?.isOpen).toBe('boolean')
+        expect(typeof contextValue?.onOpen).toBe('function')
+        expect(typeof contextValue?.onClose).toBe('function')
     })
 
     it('initializes with stored selectedStoreId from localStorage', () => {
@@ -190,18 +190,18 @@ describe('StoreLocatorProvider', () => {
         )
 
         // Initially modal should be closed
-        expect(contextValue?.state.isModalOpen).toBe(false)
+        expect(contextValue?.isOpen).toBe(false)
 
         // Open modal
         act(() => {
-            contextValue?.openModal()
+            contextValue?.onOpen()
         })
-        expect(contextValue?.state.isModalOpen).toBe(true)
+        expect(contextValue?.isOpen).toBe(true)
 
         // Close modal
         act(() => {
-            contextValue?.closeModal()
+            contextValue?.onClose()
         })
-        expect(contextValue?.state.isModalOpen).toBe(false)
+        expect(contextValue?.isOpen).toBe(false)
     })
 })

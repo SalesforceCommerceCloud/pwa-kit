@@ -96,9 +96,9 @@ describe('StoreLocatorForm', () => {
             formValues: {countryCode: '', postalCode: ''},
             setFormValues: mockSetFormValues,
             setDeviceCoordinates: mockSetDeviceCoordinates,
-            isModalOpen: false,
-            openModal: jest.fn(),
-            closeModal: jest.fn()
+            isOpen: false,
+            onOpen: jest.fn(),
+            onClose: jest.fn()
         }))
 
         useGeolocation.mockImplementation(() => ({
@@ -204,9 +204,9 @@ describe('StoreLocatorForm', () => {
             formValues: {countryCode: '', postalCode: ''},
             setFormValues: mockSetFormValues,
             setDeviceCoordinates: mockSetDeviceCoordinates,
-            isModalOpen: false,
-            openModal: jest.fn(),
-            closeModal: jest.fn()
+            isOpen: false,
+            onOpen: jest.fn(),
+            onClose: jest.fn()
         }))
 
         renderWithProviders(<StoreLocatorForm />)
@@ -230,9 +230,9 @@ describe('StoreLocatorForm', () => {
             formValues: {countryCode: '', postalCode: ''},
             setFormValues: mockSetFormValues,
             setDeviceCoordinates: mockSetDeviceCoordinates,
-            isModalOpen: false,
-            openModal: jest.fn(),
-            closeModal: jest.fn()
+            isOpen: false,
+            onOpen: jest.fn(),
+            onClose: jest.fn()
         }))
 
         renderWithProviders(<StoreLocatorForm />)

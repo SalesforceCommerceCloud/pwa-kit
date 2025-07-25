@@ -209,23 +209,23 @@ describe('useStoreLocator', () => {
 
     it('provides modal actions', () => {
         const {result} = renderHook(() => useStoreLocator(), {wrapper})
-        expect(typeof result.current.openModal).toBe('function')
-        expect(typeof result.current.closeModal).toBe('function')
-        expect(result.current.isModalOpen).toBe(false)
+        expect(typeof result.current.onOpen).toBe('function')
+        expect(typeof result.current.onClose).toBe('function')
+        expect(result.current.isOpen).toBe(false)
     })
 
     it('can open and close modal', () => {
         const {result} = renderHook(() => useStoreLocator(), {wrapper})
 
         act(() => {
-            result.current.openModal()
+            result.current.onOpen()
         })
-        expect(result.current.isModalOpen).toBe(true)
+        expect(result.current.isOpen).toBe(true)
 
         act(() => {
-            result.current.closeModal()
+            result.current.onClose()
         })
-        expect(result.current.isModalOpen).toBe(false)
+        expect(result.current.isOpen).toBe(false)
     })
 
     describe('useStoreLocator - localStorage behavior', () => {
@@ -340,13 +340,13 @@ describe('useStoreLocatorModal', () => {
             result.current.modalHook.onOpen()
         })
         expect(result.current.modalHook.isOpen).toBe(true)
-        expect(result.current.storeHook.isModalOpen).toBe(true)
+        expect(result.current.storeHook.isOpen).toBe(true)
 
         act(() => {
-            result.current.storeHook.closeModal()
+            result.current.storeHook.onClose()
         })
         expect(result.current.modalHook.isOpen).toBe(false)
-        expect(result.current.storeHook.isModalOpen).toBe(false)
+        expect(result.current.storeHook.isOpen).toBe(false)
     })
 
     it('auto-closes modal when pathname changes', () => {

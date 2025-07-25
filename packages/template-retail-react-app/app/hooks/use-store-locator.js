@@ -52,7 +52,7 @@ export const useStoreLocator = () => {
         throw new Error('useStoreLocator must be used within a StoreLocatorProvider')
     }
 
-    const {state, setState, openModal, closeModal} = context
+    const {state, setState, isOpen, onOpen, onClose} = context
     const storesQuery = useStores(state)
 
     // There are two modes, input and device.
@@ -93,8 +93,9 @@ export const useStoreLocator = () => {
         setDeviceCoordinates,
         setSelectedStoreId,
         // Modal actions
-        openModal,
-        closeModal
+        isOpen,
+        onOpen,
+        onClose
     }
 }
 
@@ -107,11 +108,11 @@ export const useStoreLocatorModal = () => {
         throw new Error('useStoreLocatorModal must be used within a StoreLocatorProvider')
     }
 
-    const {state, openModal, closeModal} = context
+    const {isOpen, onOpen, onClose} = context
 
     return {
-        isOpen: state.isModalOpen,
-        onOpen: openModal,
-        onClose: closeModal
+        isOpen,
+        onOpen,
+        onClose
     }
 }
