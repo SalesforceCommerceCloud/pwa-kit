@@ -15,7 +15,6 @@ import {
     Text,
     Divider
 } from '@salesforce/retail-react-app/app/components/shared/ui'
-import {useForm} from 'react-hook-form'
 import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
 import {useShopperBasketsMutation} from '@salesforce/commerce-sdk-react'
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
@@ -172,6 +171,7 @@ const Payment = ({
 
     const isPickupOrder = basket?.shipments[0]?.shippingMethod?.c_storePickupEnabled === true
     const [billingSameAsShipping, setBillingSameAsShipping] = useState(!isPickupOrder)
+
     const {mutateAsync: addPaymentInstrumentToBasket} = useShopperBasketsMutation(
         'addPaymentInstrumentToBasket'
     )
@@ -181,21 +181,16 @@ const Payment = ({
     const {mutateAsync: removePaymentInstrumentFromBasket} = useShopperBasketsMutation(
         'removePaymentInstrumentFromBasket'
     )
+
     const showToast = useToast()
-    const showError = () => {
+    const showError = (message) => {
         showToast({
-            title: formatMessage(API_ERROR_MESSAGE),
+            title: message || formatMessage(API_ERROR_MESSAGE),
             status: 'error'
         })
     }
 
-    const {step, STEPS, goToStep, goToNextStep} = useCheckout()
-
-    const billingAddressForm = useForm({
-        mode: 'onChange',
-        shouldUnregister: false,
-        defaultValues: {...selectedBillingAddress}
-    })
+    const {step, STEPS, goToStep} = useCheckout()
 
     // Using destructuring to remove properties from the object...
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -361,6 +356,7 @@ const Payment = ({
             parameters: {basketId: activeBasketIdRef.current || basket.basketId}
         })
     }
+
     const onPaymentRemoval = async () => {
         try {
             await removePaymentInstrumentFromBasket({
@@ -645,5 +641,10 @@ const PaymentCardSummary = ({payment}) => {
 }
 
 PaymentCardSummary.propTypes = {payment: PropTypes.object}
+
+Payment.propTypes = {
+    paymentMethodForm: PropTypes.object.isRequired,
+    billingAddressForm: PropTypes.object.isRequired
+}
 
 export default Payment
