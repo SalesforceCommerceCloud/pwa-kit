@@ -236,6 +236,11 @@ describe('updating password', function () {
             }
         ])
     })
+
+    afterEach(() => {
+        jest.restoreAllMocks()
+    })
+
     test('Password update form is rendered correctly', async () => {
         const {user} = renderWithProviders(<MockedComponent />)
         expect(await screen.findByTestId('account-page')).toBeInTheDocument()
@@ -246,9 +251,12 @@ describe('updating password', function () {
             await user.click(el.getByText(/edit/i))
         })
 
-        expect(el.getByLabelText(/current password/i)).toBeInTheDocument()
-        expect(el.getByLabelText(/new password/i)).toBeInTheDocument()
-        expect(el.getByText(/forgot password/i)).toBeInTheDocument()
+        await waitFor(() => {
+            expect(el.getByText(/current password/i)).toBeInTheDocument()
+            expect(el.getByText('New Password')).toBeInTheDocument()
+            expect(el.getByText('Confirm New Password')).toBeInTheDocument()
+            expect(el.getByText(/forgot password/i)).toBeInTheDocument()
+        })
     })
 
     test('Allows customer to update password', async () => {
@@ -267,16 +275,19 @@ describe('updating password', function () {
         await act(async () => {
             await user.click(el.getByText(/edit/i))
         })
-
         await act(async () => {
             await user.type(el.getByLabelText(/current password/i), 'Password!12345')
-            await user.type(el.getByLabelText(/new password/i), 'Password!98765')
+            await user.type(el.getByLabelText('New Password'), 'Password!98765')
+            await user.type(el.getByLabelText('Confirm New Password'), 'Password!98765')
         })
         await act(async () => {
-            await user.click(el.getByText(/Forgot password/i))
             await user.click(el.getByText(/save/i))
         })
-        expect(await screen.findByText('••••••••')).toBeInTheDocument()
+        // Verify the form is no longer in edit mode and shows masked password
+        await waitFor(() => {
+            expect(el.queryByText(/save/i)).not.toBeInTheDocument()
+            expect(el.getByText('••••••••')).toBeInTheDocument()
+        })
     })
 
     test('Warns customer when updating password with invalid current password', async () => {
@@ -297,11 +308,10 @@ describe('updating password', function () {
         })
         await act(async () => {
             await user.type(el.getByLabelText(/current password/i), 'Password!123456')
-            await user.type(el.getByLabelText(/new password/i), 'Password!98765')
+            await user.type(el.getByLabelText('New Password'), 'Password!98765')
+            await user.type(el.getByLabelText('Confirm New Password'), 'Password!98765')
         })
-
         await act(async () => {
-            await user.click(el.getByText(/Forgot password/i))
             await user.click(el.getByText(/save/i))
         })
 
