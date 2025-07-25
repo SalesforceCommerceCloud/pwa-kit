@@ -204,27 +204,32 @@ const PickupAddress = () => {
 
     const submitAndContinue = async (address) => {
         setIsLoading(true)
-        const {address1, city, countryCode, firstName, lastName, phone, postalCode, stateCode} =
-            address
-        await updateShippingAddressForShipment.mutateAsync({
-            parameters: {
-                basketId: basket.basketId,
-                shipmentId: 'me',
-                useAsBilling: false
-            },
-            body: {
-                address1,
-                city,
-                countryCode,
-                firstName,
-                lastName,
-                phone,
-                postalCode,
-                stateCode
-            }
-        })
-        setIsLoading(false)
-        goToNextStep()
+        try {
+            const {address1, city, countryCode, firstName, lastName, phone, postalCode, stateCode} =
+                address
+            await updateShippingAddressForShipment.mutateAsync({
+                parameters: {
+                    basketId: basket.basketId,
+                    shipmentId: 'me',
+                    useAsBilling: false
+                },
+                body: {
+                    address1,
+                    city,
+                    countryCode,
+                    firstName,
+                    lastName,
+                    phone,
+                    postalCode,
+                    stateCode
+                }
+            })
+            setIsLoading(false)
+            goToNextStep()
+        } catch (error) {
+            setIsLoading(false)
+            console.error(error)
+        }
     }
 
     return (
@@ -392,7 +397,7 @@ const PickupAddress = () => {
                                 </>
                             )}
 
-                            {/* Multiple pickups or mixed basket */}
+                            {/* Multiple pickups/mixed basket */}
                             {shouldShowCartItems && (
                                 <Stack spacing={4}>
                                     {pickupShipmentItems.map((shipmentInfo, index) => (
