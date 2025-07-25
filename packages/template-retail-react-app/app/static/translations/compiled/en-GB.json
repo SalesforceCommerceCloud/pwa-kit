@@ -965,6 +965,12 @@
       "value": "Remove"
     }
   ],
+  "checkout_payment.button.place_order": [
+    {
+      "type": 0,
+      "value": "Place Order"
+    }
+  ],
   "checkout_payment.button.review_order": [
     {
       "type": 0,

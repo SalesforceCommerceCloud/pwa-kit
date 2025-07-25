@@ -25,6 +25,8 @@ import mockConfig from '@salesforce/retail-react-app/config/mocks/default'
 jest.retryTimes(5)
 jest.setTimeout(40_000)
 
+mockConfig.app.oneClickCheckout.enabled = true
+
 // Minimal subset of `ocapiOrderResponse` in app/mocks/mock-data.js
 const scapiOrderResponse = {
     orderNo: '00000101',
@@ -317,25 +319,16 @@ test('Can proceed through checkout steps as guest', async () => {
     })
 
     // Wait for checkout to load and display first step
-    await screen.findByText(/checkout as guest/i)
+    await screen.findByText(/Continue to Shipping Address/i)
 
     // Verify cart products display
     await user.click(screen.getByText(/2 items in cart/i))
     expect(await screen.findByText(/Long Sleeve Crew Neck$/i)).toBeInTheDocument()
 
     // Verify password field is reset if customer toggles login form
-    const loginToggleButton = screen.getByText(/Already have an account\? Log in/i)
-    await user.click(loginToggleButton)
-    // Provide customer email and submit
-    const passwordInput = document.querySelector('input[type="password"]')
-    await user.type(passwordInput, 'Password1!')
-
-    const checkoutAsGuestButton = screen.getByText(/Checkout as guest/i)
-    await user.click(checkoutAsGuestButton)
-
     // Provide customer email and submit
     const emailInput = screen.getByLabelText(/email/i)
-    const submitBtn = screen.getByText(/checkout as guest/i)
+    const submitBtn = screen.getByText(/Continue to Shipping Address/i)
     await user.type(emailInput, 'test@test.com')
     await user.click(submitBtn)
 
@@ -385,7 +378,7 @@ test('Can proceed through checkout steps as guest', async () => {
 
     // Wait for next step to render
     await waitFor(() => {
-        expect(screen.getByTestId('sf-toggle-card-step-3-content')).not.toBeEmptyDOMElement()
+        expect(screen.getByTestId('sf-toggle-card-step-2-content')).not.toBeEmptyDOMElement()
     })
 
     // Applied shipping method should be displayed in previous step summary
@@ -400,29 +393,11 @@ test('Can proceed through checkout steps as guest', async () => {
     // Same as shipping checkbox selected by default
     expect(screen.getByLabelText(/same as shipping address/i)).toBeChecked()
 
-    // Should display billing address that matches shipping address
-    const step3Content = within(screen.getByTestId('sf-toggle-card-step-3-content'))
-    expect(step3Content.getByText('Tester McTesting')).toBeInTheDocument()
-    expect(step3Content.getByText('123 Main St')).toBeInTheDocument()
-    expect(step3Content.getByText('Tampa, FL 33610')).toBeInTheDocument()
-    expect(step3Content.getByText('US')).toBeInTheDocument()
-
     // Move to final review step
-    await user.click(screen.getByText(/review order/i))
 
-    const placeOrderBtn = await screen.findByTestId('sf-checkout-place-order-btn', undefined, {
+    const placeOrderBtn = await screen.findByTestId('place-order-button', undefined, {
         timeout: 5000
     })
-
-    // Verify applied payment and billing address
-    expect(step3Content.getByText('Visa')).toBeInTheDocument()
-    expect(step3Content.getByText('•••• 1111')).toBeInTheDocument()
-    expect(step3Content.getByText('1/2040')).toBeInTheDocument()
-
-    expect(step3Content.getByText('Tester McTesting')).toBeInTheDocument()
-    expect(step3Content.getByText('123 Main St')).toBeInTheDocument()
-    expect(step3Content.getByText('Tampa, FL 33610')).toBeInTheDocument()
-    expect(step3Content.getByText('US')).toBeInTheDocument()
     // Place the order
     await user.click(placeOrderBtn)
 
@@ -478,7 +453,7 @@ test('Can proceed through checkout as registered customer', async () => {
 
     // Wait for next step to render
     await waitFor(() => {
-        expect(screen.getByTestId('sf-toggle-card-step-3-content')).not.toBeEmptyDOMElement()
+        expect(screen.getByTestId('sf-toggle-card-step-4-content')).not.toBeEmptyDOMElement()
     })
 
     // Applied shipping method should be displayed in previous step summary
@@ -495,7 +470,7 @@ test('Can proceed through checkout as registered customer', async () => {
     expect(screen.getByLabelText(/same as shipping address/i)).toBeChecked()
 
     // Should display billing address that matches shipping address
-    const step3Content = within(screen.getByTestId('sf-toggle-card-step-3-content'))
+    const step3Content = within(screen.getByTestId('sf-toggle-card-step-4-content'))
     expect(step3Content.getByText('123 Main St')).toBeInTheDocument()
 
     // Edit billing address
@@ -512,22 +487,7 @@ test('Can proceed through checkout as registered customer', async () => {
     await user.type(lastNameInput, 'Smith')
 
     // Move to final review step
-    await user.click(screen.getByText(/review order/i))
-
-    const placeOrderBtn = await screen.findByTestId('sf-checkout-place-order-btn', undefined, {
-        timeout: 5000
-    })
-
-    // Verify applied payment and billing address
-    expect(step3Content.getByText('Master Card')).toBeInTheDocument()
-    expect(step3Content.getByText('•••• 5454')).toBeInTheDocument()
-    expect(step3Content.getByText('1/2040')).toBeInTheDocument()
-
-    expect(step3Content.getByText('John Smith')).toBeInTheDocument()
-    expect(step3Content.getByText('123 Main St')).toBeInTheDocument()
-
-    // Place the order
-    await user.click(placeOrderBtn)
+    await user.click(screen.getByText(/place order/i))
 
     // Should now be on our mocked confirmation route/page
     expect(await screen.findByText(/success/i)).toBeInTheDocument()

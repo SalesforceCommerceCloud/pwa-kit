@@ -352,6 +352,9 @@
   "checkout_payment.action.remove": {
     "defaultMessage": "Remove"
   },
+  "checkout_payment.button.place_order": {
+    "defaultMessage": "Place Order"
+  },
   "checkout_payment.button.review_order": {
     "defaultMessage": "Review Order"
   },
