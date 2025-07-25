@@ -48,7 +48,8 @@ import {
     BrandLogo,
     SignoutIcon,
     StoreIcon,
-    UserIcon
+    UserIcon,
+    SearchIcon
 } from '@salesforce/retail-react-app/app/components/icons'
 
 // Others
@@ -77,6 +78,7 @@ const DrawerSeparator = () => (
 // CUSTOMIZE YOUR NAVIGATION BY ALTERING THESE VALUES
 const SIGN_IN_HREF = '/login'
 const STORE_LOCATOR_HREF = '/store-locator'
+const ORDER_STATUS_HREF = '/order-status'
 
 /**
  * This is the navigation component used for mobile devices (phone and tablet). It's
@@ -289,6 +291,20 @@ const DrawerMenu = ({
                                     </Link>
                                 </Box>
                             )}
+                            {/* Order Status menu item */}
+                            <Box {...styles.actionsItem}>
+                                <Link to={ORDER_STATUS_HREF}>
+                                    <HStack spacing={2}>
+                                        <SearchIcon {...styles.icon} />
+                                        <Text>
+                                            {intl.formatMessage({
+                                                id: 'drawer_menu.link.order_status',
+                                                defaultMessage: 'Order Status'
+                                            })}
+                                        </Text>
+                                    </HStack>
+                                </Link>
+                            </Box>
                             {showLocaleSelector && (
                                 <Box>
                                     <LocaleSelector

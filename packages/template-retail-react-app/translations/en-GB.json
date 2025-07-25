@@ -555,6 +555,9 @@
   "drawer_menu.link.customer_support.shipping_and_returns": {
     "defaultMessage": "Shipping & Returns"
   },
+  "drawer_menu.link.order_status": {
+    "defaultMessage": "Order Status"
+  },
   "drawer_menu.link.our_company": {
     "defaultMessage": "Our Company"
   },

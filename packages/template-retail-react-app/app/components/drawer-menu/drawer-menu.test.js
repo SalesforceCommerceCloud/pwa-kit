@@ -45,7 +45,7 @@ describe('DrawerMenu', () => {
                     supportedLocales: [{id: 'en-US'}, {id: 'fr-FR'}, {id: 'de-DE'}]
                 }
             },
-            buildUrl: jest.fn()
+            buildUrl: jest.fn((url) => url)
         })
         useCustomerType.mockReturnValue({isRegistered: false})
         useAuthHelper.mockReturnValue(mockLogout)
@@ -185,5 +185,18 @@ describe('DrawerMenu', () => {
 
         const categoryNav = document.querySelector('#category-nav')
         expect(categoryNav).toBeInTheDocument()
+    })
+
+    test('renders Order Status menu item with correct link', () => {
+        renderWithProviders(<DrawerMenu isOpen={true} root={mockCategories.root} />)
+
+        // Find the Order Status link by its accessible name
+        const orderStatusLink = screen.getByRole('link', {name: /order status/i})
+        expect(orderStatusLink).toBeInTheDocument()
+        expect(orderStatusLink).toHaveClass('chakra-link')
+        expect(orderStatusLink.textContent.toLowerCase()).toContain('order status')
+
+        // Test that the link has the correct href attribute
+        expect(orderStatusLink).toHaveAttribute('href', '/order-status')
     })
 })
