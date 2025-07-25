@@ -522,7 +522,7 @@ test('Can proceed through checkout as registered customer', async () => {
 
     // Wait for next step to render
     await waitFor(() => {
-        expect(screen.getByTestId('sf-toggle-card-step-4-content')).not.toBeEmptyDOMElement()
+        expect(screen.getByTestId('sf-toggle-card-step-3-content')).not.toBeEmptyDOMElement()
     })
 
     // Applied shipping method should be displayed in previous step summary
@@ -539,7 +539,7 @@ test('Can proceed through checkout as registered customer', async () => {
     expect(screen.getByLabelText(/same as shipping address/i)).toBeChecked()
 
     // Should display billing address that matches shipping address
-    const step3Content = within(screen.getByTestId('sf-toggle-card-step-4-content'))
+    const step3Content = within(screen.getByTestId('sf-toggle-card-step-3-content'))
     expect(step3Content.getByText('123 Main St')).toBeInTheDocument()
 
     // Edit billing address
