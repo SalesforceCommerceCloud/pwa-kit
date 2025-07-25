@@ -39,7 +39,6 @@ const PickupAddress = () => {
     const {step, STEPS, goToStep, goToNextStep} = useCheckout()
     const {data: basket} = useCurrentBasket()
 
-    // Single scan to get all shipment data - optimized
     const shipmentData = useMemo(() => {
         if (!basket?.shipments) {
             return {
@@ -82,7 +81,7 @@ const PickupAddress = () => {
 
     const {hasPickupShipments, hasDeliveryShipments, pickupShipments, allStoreIds} = shipmentData
 
-    // Get product data for display - moved to top before any conditional returns
+    // Get product data for display
     const productIds = basket?.productItems?.map(({productId}) => productId).join(',') ?? ''
     const {data: products, isLoading: isProductsLoading} = useProducts(
         {
@@ -115,10 +114,8 @@ const PickupAddress = () => {
         }
     )
 
-    // Check if store data is still loading
     const isStoreDataLoading = !!allStoreIds && !storeData
 
-    // Create productsByItemId mapping - moved to top
     const productsByItemId = useMemo(() => {
         const updateProductsByItemId = {}
         basket?.productItems?.forEach((productItem) => {
@@ -128,7 +125,7 @@ const PickupAddress = () => {
         return updateProductsByItemId
     }, [basket, products])
 
-    // Get pickup shipment items grouped by store - moved to top
+    // pickup shipment items grouped by store
     const pickupShipmentItems = useMemo(() => {
         if (!basket?.shipments || !basket?.productItems) return []
 
@@ -174,21 +171,16 @@ const PickupAddress = () => {
         return pickupShipments
     }, [basket?.shipments, basket?.productItems, storeData?.data])
 
-    // Determine if we should show cart items (multi-pickup or mixed basket)
     const hasMultiplePickups = pickupShipments.length > 1
-
-    // Determine if we should show cart items (multi-pickup or mixed basket)
     const shouldShowCartItems = hasMultiplePickups || hasDeliveryShipments
 
-    // If no pickup shipments, don't render anything
     if (!hasPickupShipments) {
         return null
     }
 
-    // Check if pickup data is ready (has store data and not loading)
     const isPickupDataReady = pickupShipmentItems.length > 0 && !isStoreDataLoading
 
-    // For single pickup, use the first store; for multiple pickups, this will be handled differently
+    // For single pickup, use the first store
     const store =
         pickupShipmentItems.length === 1 ? pickupShipmentItems[0]?.store : storeData?.data?.[0]
     const pickupAddress = {
