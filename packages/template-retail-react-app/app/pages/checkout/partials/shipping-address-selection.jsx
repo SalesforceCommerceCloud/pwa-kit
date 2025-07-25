@@ -194,6 +194,21 @@ const ShippingAddressSelection = ({
         }
     }, [matchedAddress])
 
+    // Initialize form with selectedAddress when component mounts or selectedAddress changes
+    useEffect(() => {
+        if (selectedAddress && Object.keys(selectedAddress).length > 0) {
+            // If we have a selectedAddress but no matchedAddress, it means this is a new address
+            // We should populate the form with this address data
+            if (!matchedAddress) {
+                form.reset({...selectedAddress})
+                // If this is a new address, we should be in edit mode
+                if (!selectedAddress.addressId) {
+                    setIsEditingAddress(true)
+                }
+            }
+        }
+    }, [selectedAddress, matchedAddress, form])
+
     // Updates the selected customer address if we've an address selected
     // else saves a new customer address
     const submitForm = async (address) => {
