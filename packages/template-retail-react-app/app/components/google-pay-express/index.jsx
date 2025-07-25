@@ -9,7 +9,10 @@ import AdyenCheckout from '@adyen/adyen-web'
 import '@adyen/adyen-web/dist/adyen.css'
 import PropTypes from 'prop-types'
 import {useAdyenExpressCheckout} from '@adyen/adyen-salesforce-pwa'
-import {getCurrencyValueForApi, getGPShippingOptionParameters} from '@salesforce/retail-react-app/app/components/express/utils/parsers'
+import {
+    getCurrencyValueForApi,
+    getGPShippingOptionParameters
+} from '@salesforce/retail-react-app/app/components/express/utils/parsers'
 import {AdyenShippingMethodsService} from '@salesforce/retail-react-app/app/components/express/utils/shipping-methods'
 import {AdyenShippingAddressService} from '@salesforce/retail-react-app/app/components/express/utils/shipping-address'
 import {AdyenPaymentsService} from '@salesforce/retail-react-app/app/components/express/utils/payments'
@@ -50,7 +53,7 @@ export const getCustomerShippingDetails = (shippingAddress) => {
         },
         profile: {
             firstName: shippingAddress.name?.split(' ')[0] || '',
-            lastName: shippingAddress.name?.split(' ').slice(1).join(' ') || '',
+            lastName: shippingAddress.name?.split(' ').slice(1).join(' ') || ''
         }
     }
 }
@@ -69,12 +72,7 @@ export const getCustomerBillingDetails = (inputAddress) => {
     }
 }
 
-export const updateShippingAddress = async (
-    authToken,
-    site,
-    basket,
-    shippingAddress
-) => {
+export const updateShippingAddress = async (authToken, site, basket, shippingAddress) => {
     try {
         const adyenShippingAddressService = new AdyenShippingAddressService(authToken, site)
         const response = await adyenShippingAddressService.updateShippingAddress(
@@ -92,15 +90,27 @@ export const updateShippingAddress = async (
         }
 
         const adyenShippingMethodsService = new AdyenShippingMethodsService(authToken, site)
-        const shippingMethodResponse = await adyenShippingMethodsService.getShippingMethods(basket.basketId)
+        const shippingMethodResponse = await adyenShippingMethodsService.getShippingMethods(
+            basket.basketId
+        )
         let shippingOptionId = shippingMethodResponse.defaultShippingMethodId
 
         // If the default shipping method is not applicable for this address, update to the first applicable
-        if (!shippingMethodResponse.applicableShippingMethods.some((sm) => sm.id === shippingOptionId)) {
+        if (
+            !shippingMethodResponse.applicableShippingMethods.some(
+                (sm) => sm.id === shippingOptionId
+            )
+        ) {
             shippingOptionId = shippingMethodResponse.applicableShippingMethods[0].id
             shippingMethodResponse.defaultShippingMethodId = shippingOptionId
         }
-        return updateShippingOption(authToken, site, basket, shippingOptionId, shippingMethodResponse)
+        return updateShippingOption(
+            authToken,
+            site,
+            basket,
+            shippingOptionId,
+            shippingMethodResponse
+        )
     } catch (error) {
         return {
             error: {
@@ -120,7 +130,7 @@ export const updateShippingOption = async (
     shippingMethodResponse = null
 ) => {
     try {
-        const adyenShippingMethodsService = new AdyenShippingMethodsService(authToken, site)    
+        const adyenShippingMethodsService = new AdyenShippingMethodsService(authToken, site)
         const response = await adyenShippingMethodsService.updateShippingMethod(
             shippingOptionId,
             basket.basketId
@@ -133,7 +143,7 @@ export const updateShippingOption = async (
                     intent: 'SHIPPING_OPTION'
                 }
             }
-        } 
+        }
 
         const paymentDataRequestUpdate = {
             newTransactionInfo: {
@@ -168,24 +178,22 @@ export const getGoogleButtonConfig = (
     site,
     basket,
     shippingMethods,
-    googlePayConfig,
-    navigate,
-    fetchShippingMethods
-) => {    
+    googlePayConfig
+) => {
     // Use productTotal if orderTotal is null, otherwise use orderTotal
     // The INITIALIZE callback will update this in payment sheet before user can try to pay
-    let googlePayAmount = basket.orderTotal || (basket.productTotal)
-    
+    let googlePayAmount = basket.orderTotal || basket.productTotal
+
     const buttonConfig = {
         showPayButton: true,
-        buttonType: 'buy', 
+        buttonType: 'buy',
         isExpress: true,
         shippingAddressRequired: true,
         // shippingAddressParameters: {"allowedCountryCodes": ["US"]}, // If you want to restrict country codes, you can do that here
         shippingOptionRequired: true,
-        shippingOptionParameters: getGPShippingOptionParameters(shippingMethods), 
+        shippingOptionParameters: getGPShippingOptionParameters(shippingMethods),
         billingAddressRequired: true,
-        billingAddressParameters: {"format": "FULL"},
+        billingAddressParameters: {format: 'FULL'},
         emailRequired: true,
         configuration: googlePayConfig,
         amount: {
@@ -194,7 +202,7 @@ export const getGoogleButtonConfig = (
         },
         requiredShippingContactFields: ['postalAddress', 'name', 'email', 'phone'],
         requiredBillingContactFields: ['postalAddress'],
-        
+
         onAuthorized: async (data) => {
             try {
                 const state = {
@@ -205,13 +213,15 @@ export const getGoogleButtonConfig = (
                             googlePayToken: data.paymentMethodData.tokenizationData.token
                         },
                         ...getCustomerShippingDetails(data?.shippingAddress),
-                        ...getCustomerBillingDetails(data?.paymentMethodData?.info?.billingAddress || data?.shippingAddress)
+                        ...getCustomerBillingDetails(
+                            data?.paymentMethodData?.info?.billingAddress || data?.shippingAddress
+                        )
                     }
                 }
                 const adyenPaymentService = new AdyenPaymentsService(authToken, site)
                 const paymentsResponse = await adyenPaymentService.submitPayment(
                     {
-                        ...state.data,
+                        ...state.data
                     },
                     basket?.basketId,
                     basket?.customerInfo?.customerId
@@ -237,20 +247,38 @@ export const getGoogleButtonConfig = (
         onSubmit: () => {},
         callbackIntents: ['SHIPPING_ADDRESS', 'SHIPPING_OPTION'],
         paymentDataCallbacks: {
-             onPaymentDataChanged: (intermediatePaymentData) => {
-                return new Promise(async (resolve) => {
-                    const { callbackTrigger, shippingAddress, shippingOptionData } = intermediatePaymentData;
-                    let paymentDataRequestUpdate = {};
-                        
-                    if (callbackTrigger === 'INITIALIZE' || callbackTrigger === 'SHIPPING_ADDRESS') {
-                        paymentDataRequestUpdate = await updateShippingAddress(authToken, site, basket, shippingAddress)
-                    }
-                    if (callbackTrigger === 'SHIPPING_OPTION') {
-                        paymentDataRequestUpdate = await updateShippingOption(authToken, site, basket, shippingOptionData?.id)
+            onPaymentDataChanged: (intermediatePaymentData) => {
+                return new Promise((resolve) => {
+                    const {callbackTrigger, shippingAddress, shippingOptionData} =
+                        intermediatePaymentData
+                    let paymentDataRequestUpdate = {}
+
+                    const handlePaymentDataChanged = async () => {
+                        if (
+                            callbackTrigger === 'INITIALIZE' ||
+                            callbackTrigger === 'SHIPPING_ADDRESS'
+                        ) {
+                            paymentDataRequestUpdate = await updateShippingAddress(
+                                authToken,
+                                site,
+                                basket,
+                                shippingAddress
+                            )
+                        }
+                        if (callbackTrigger === 'SHIPPING_OPTION') {
+                            paymentDataRequestUpdate = await updateShippingOption(
+                                authToken,
+                                site,
+                                basket,
+                                shippingOptionData?.id
+                            )
+                        }
+
+                        resolve(paymentDataRequestUpdate)
                     }
 
-                    resolve(paymentDataRequestUpdate);
-                });
+                    handlePaymentDataChanged()
+                })
             }
         },
 
@@ -277,7 +305,6 @@ export const GooglePayExpress = () => {
         locale,
         site,
         authToken,
-        navigate,
         shippingMethods,
         fetchShippingMethods
     } = useAdyenExpressCheckout()
@@ -321,10 +348,10 @@ export const GooglePayExpress = () => {
                     authToken,
                     site,
                     basket,
-                    !shippingMethods && basket?.basketId ? await fetchShippingMethods(basket?.basketId, site, authToken) : shippingMethods,
-                    googlePaymentMethodConfig,
-                    navigate,
-                    fetchShippingMethods
+                    !shippingMethods && basket?.basketId
+                        ? await fetchShippingMethods(basket?.basketId, site, authToken)
+                        : shippingMethods,
+                    googlePaymentMethodConfig
                 )
 
                 let googlePayButton
@@ -356,15 +383,25 @@ export const GooglePayExpress = () => {
                     handleGooglePayUnavailable()
                 }
             } catch (err) {
+                console.log('BROWSER SPECIFIC err', err)
+
                 const isMissingOrderTotalError =
                     err instanceof TypeError &&
-                    (/undefined is not an object \(evaluating '[a-z]\.orderTotal'\)/.test(err.message) || // Safari error
-                    /Cannot read properties of undefined \(reading 'orderTotal'\)/.test(err.message)) // Chrome error
+                    (/undefined is not an object \(evaluating '[a-z]\.orderTotal'\)/.test(
+                        err.message
+                    ) || // Safari error
+                        /Cannot read properties of undefined \(reading 'orderTotal'\)/.test(
+                            err.message
+                        )) // Chrome error
 
                 const isMissingShippingMethodsError =
                     err instanceof TypeError &&
-                    (/undefined is not an object \(evaluating '[a-z]\.defaultShippingMethodId'\)/.test(err.message)|| 
-                    /Cannot read properties of undefined \(reading 'defaultShippingMethodId'\)/.test(err.message))
+                    (/undefined is not an object \(evaluating '[a-z]\.defaultShippingMethodId'\)/.test(
+                        err.message
+                    ) ||
+                        /Cannot read properties of undefined \(reading 'defaultShippingMethodId'\)/.test(
+                            err.message
+                        ))
 
                 if (!isMissingOrderTotalError && !isMissingShippingMethodsError) {
                     handleGooglePayUnavailable()

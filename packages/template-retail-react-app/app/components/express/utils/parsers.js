@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import CurrencyList from './currency-list'
+import CurrencyList from '@salesforce/retail-react-app/app/components/express/utils/currency-list'
 
 const INVALID_CURRENCY_ERROR = 'Invalid currency code'
 
@@ -15,11 +15,15 @@ export function getCurrencyValueForApi(amount, currencyCode) {
         throw new Error(`${INVALID_CURRENCY_ERROR}: ${currencyCode}`)
     }
     return Math.round(amount * Math.pow(10, currency.Decimals))
-} 
+}
 
 // converts shipping methods to the shippingOptionParameters that Google Pay expects
 export function getGPShippingOptionParameters(shippingMethods) {
-    if (!shippingMethods || !shippingMethods.applicableShippingMethods || shippingMethods.applicableShippingMethods.length === 0) {
+    if (
+        !shippingMethods ||
+        !shippingMethods.applicableShippingMethods ||
+        shippingMethods.applicableShippingMethods.length === 0
+    ) {
         return undefined
     }
 

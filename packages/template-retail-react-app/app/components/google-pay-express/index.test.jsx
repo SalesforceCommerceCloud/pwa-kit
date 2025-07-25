@@ -54,9 +54,7 @@ jest.mock('@salesforce/retail-react-app/app/components/express/utils/parsers', (
     getCurrencyValueForApi: jest.fn((amount) => amount * 100),
     getGPShippingOptionParameters: jest.fn(() => ({
         defaultSelectedOptionId: 'method-1',
-        shippingOptions: [
-            {id: 'method-1', label: 'Standard Shipping', description: '5-7 days'}
-        ]
+        shippingOptions: [{id: 'method-1', label: 'Standard Shipping', description: '5-7 days'}]
     }))
 }))
 
@@ -267,9 +265,6 @@ describe('Utility functions', () => {
 })
 
 describe('getGoogleButtonConfig', () => {
-    const mockNavigate = jest.fn()
-    const mockFetchShippingMethods = jest.fn()
-
     beforeEach(() => {
         jest.clearAllMocks()
         mockPostMessage.mockClear()
@@ -281,9 +276,7 @@ describe('getGoogleButtonConfig', () => {
             mockData.site,
             mockData.basket,
             mockData.shippingMethods,
-            mockData.googlePayConfig,
-            mockNavigate,
-            mockFetchShippingMethods
+            mockData.googlePayConfig
         )
         expect(config.showPayButton).toBe(true)
         expect(config.buttonType).toBe('buy')
@@ -300,9 +293,7 @@ describe('getGoogleButtonConfig', () => {
             mockData.site,
             basketWithoutOrderTotal,
             mockData.shippingMethods,
-            mockData.googlePayConfig,
-            mockNavigate,
-            mockFetchShippingMethods
+            mockData.googlePayConfig
         )
         expect(config.amount.value).toBe(9500) // 95 * 100
     })
@@ -322,9 +313,7 @@ describe('getGoogleButtonConfig', () => {
             mockData.site,
             mockData.basket,
             mockData.shippingMethods,
-            mockData.googlePayConfig,
-            mockNavigate,
-            mockFetchShippingMethods
+            mockData.googlePayConfig
         )
 
         const mockPaymentData = {
@@ -374,9 +363,7 @@ describe('getGoogleButtonConfig', () => {
             mockData.site,
             mockData.basket,
             mockData.shippingMethods,
-            mockData.googlePayConfig,
-            mockNavigate,
-            mockFetchShippingMethods
+            mockData.googlePayConfig
         )
 
         const mockPaymentData = {
@@ -415,9 +402,7 @@ describe('getGoogleButtonConfig', () => {
             mockData.site,
             mockData.basket,
             mockData.shippingMethods,
-            mockData.googlePayConfig,
-            mockNavigate,
-            mockFetchShippingMethods
+            mockData.googlePayConfig
         )
 
         const mockPaymentData = {
@@ -451,9 +436,7 @@ describe('getGoogleButtonConfig', () => {
             mockData.site,
             mockData.basket,
             mockData.shippingMethods,
-            mockData.googlePayConfig,
-            mockNavigate,
-            mockFetchShippingMethods
+            mockData.googlePayConfig
         )
 
         config.onError({name: 'CANCEL'})
@@ -508,9 +491,7 @@ describe('getGoogleButtonConfig', () => {
             mockData.site,
             mockData.basket,
             mockData.shippingMethods,
-            mockData.googlePayConfig,
-            mockNavigate,
-            mockFetchShippingMethods
+            mockData.googlePayConfig
         )
 
         // Test INITIALIZE callback
@@ -646,7 +627,10 @@ describe('updateShippingOption', () => {
             mockData.basket,
             mockShippingOptionId
         )
-        expect(mockMethodsService.updateShippingMethod).toHaveBeenCalledWith('method-1', 'test-basket')
+        expect(mockMethodsService.updateShippingMethod).toHaveBeenCalledWith(
+            'method-1',
+            'test-basket'
+        )
         expect(result).toHaveProperty('newTransactionInfo')
     })
 
@@ -704,48 +688,53 @@ describe('GooglePayExpress error and edge cases', () => {
     const errorScenarios = [
         {
             name: 'AdyenCheckout throwing',
-            setup: () => AdyenCheckout.mockImplementation(() => {
-                throw new Error('fail')
-            })
+            setup: () =>
+                AdyenCheckout.mockImplementation(() => {
+                    throw new Error('fail')
+                })
         },
         {
             name: 'create throwing',
-            setup: () => setupMockAdyenCheckout({
-                create: jest.fn().mockImplementation(() => {
-                    throw new Error('fail create')
+            setup: () =>
+                setupMockAdyenCheckout({
+                    create: jest.fn().mockImplementation(() => {
+                        throw new Error('fail create')
+                    })
                 })
-            })
         },
         {
             name: 'isAvailable throwing',
-            setup: () => setupMockAdyenCheckout({
-                create: jest.fn().mockResolvedValue({
-                    isAvailable: jest.fn().mockImplementation(() => {
-                        throw new Error('fail available')
-                    }),
-                    mount: jest.fn()
+            setup: () =>
+                setupMockAdyenCheckout({
+                    create: jest.fn().mockResolvedValue({
+                        isAvailable: jest.fn().mockImplementation(() => {
+                            throw new Error('fail available')
+                        }),
+                        mount: jest.fn()
+                    })
                 })
-            })
         },
         {
             name: 'isAvailable returning false',
-            setup: () => setupMockAdyenCheckout({
-                create: jest.fn().mockResolvedValue({
-                    isAvailable: jest.fn().mockResolvedValue(false),
-                    mount: jest.fn()
+            setup: () =>
+                setupMockAdyenCheckout({
+                    create: jest.fn().mockResolvedValue({
+                        isAvailable: jest.fn().mockResolvedValue(false),
+                        mount: jest.fn()
+                    })
                 })
-            })
         },
         {
             name: 'mount throwing',
-            setup: () => setupMockAdyenCheckout({
-                create: jest.fn().mockResolvedValue({
-                    isAvailable: jest.fn().mockResolvedValue(true),
-                    mount: jest.fn().mockImplementation(() => {
-                        throw new Error('fail mount')
+            setup: () =>
+                setupMockAdyenCheckout({
+                    create: jest.fn().mockResolvedValue({
+                        isAvailable: jest.fn().mockResolvedValue(true),
+                        mount: jest.fn().mockImplementation(() => {
+                            throw new Error('fail mount')
+                        })
                     })
                 })
-            })
         }
     ]
 
@@ -794,7 +783,9 @@ describe('GooglePayExpress error and edge cases', () => {
     })
 
     it('handles missing shipping methods error gracefully', async () => {
-        const error = new TypeError("Cannot read properties of undefined (reading 'defaultShippingMethodId')")
+        const error = new TypeError(
+            "Cannot read properties of undefined (reading 'defaultShippingMethodId')"
+        )
         setupMockAdyenCheckout({
             create: jest.fn().mockRejectedValue(error)
         })
@@ -806,4 +797,4 @@ describe('GooglePayExpress error and edge cases', () => {
             )
         })
     })
-}) 
+})

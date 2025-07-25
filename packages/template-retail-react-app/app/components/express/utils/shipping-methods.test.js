@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import {AdyenShippingMethodsService} from './shipping-methods'
+import {AdyenShippingMethodsService} from '@salesforce/retail-react-app/app/components/express/utils/shipping-methods'
 
 // Mock the ApiClient
 jest.mock('./api')
@@ -15,16 +15,16 @@ describe('AdyenShippingMethodsService', () => {
     const mockToken = 'test-token'
     const mockSite = {id: 'test-site'}
 
-    beforeEach(() => {
+    beforeEach(async () => {
         mockApiClient = {
             get: jest.fn(),
             post: jest.fn()
         }
-        
+
         // Mock the ApiClient constructor
-        const {ApiClient} = require('./api')
+        const {ApiClient} = await import('./api')
         ApiClient.mockImplementation(() => mockApiClient)
-        
+
         shippingMethodsService = new AdyenShippingMethodsService(mockToken, mockSite)
     })
 
@@ -37,9 +37,13 @@ describe('AdyenShippingMethodsService', () => {
             expect(shippingMethodsService.baseUrl).toBe('/api/adyen/shipping-methods')
         })
 
-        it('should create ApiClient with correct parameters', () => {
-            const {ApiClient} = require('./api')
-            expect(ApiClient).toHaveBeenCalledWith('/api/adyen/shipping-methods', mockToken, mockSite)
+        it('should create ApiClient with correct parameters', async () => {
+            const {ApiClient} = await import('./api')
+            expect(ApiClient).toHaveBeenCalledWith(
+                '/api/adyen/shipping-methods',
+                mockToken,
+                mockSite
+            )
         })
     })
 
@@ -61,9 +65,9 @@ describe('AdyenShippingMethodsService', () => {
                 text: () => Promise.resolve('Bad Request')
             }
 
-            await expect(
-                shippingMethodsService._handleResponse(mockResponse)
-            ).rejects.toThrow('Request failed with status 400: Bad Request')
+            await expect(shippingMethodsService._handleResponse(mockResponse)).rejects.toThrow(
+                'Request failed with status 400: Bad Request'
+            )
         })
     })
 
@@ -73,12 +77,13 @@ describe('AdyenShippingMethodsService', () => {
         it('should get shipping methods successfully', async () => {
             const mockResponse = {
                 status: 200,
-                json: () => Promise.resolve({
-                    shippingMethods: [
-                        {id: 'method-1', name: 'Standard Shipping'},
-                        {id: 'method-2', name: 'Express Shipping'}
-                    ]
-                })
+                json: () =>
+                    Promise.resolve({
+                        shippingMethods: [
+                            {id: 'method-1', name: 'Standard Shipping'},
+                            {id: 'method-2', name: 'Express Shipping'}
+                        ]
+                    })
             }
             mockApiClient.get.mockResolvedValue(mockResponse)
 
@@ -105,9 +110,9 @@ describe('AdyenShippingMethodsService', () => {
             }
             mockApiClient.get.mockResolvedValue(mockResponse)
 
-            await expect(
-                shippingMethodsService.getShippingMethods(mockBasketId)
-            ).rejects.toThrow('Request failed with status 500: Internal Server Error')
+            await expect(shippingMethodsService.getShippingMethods(mockBasketId)).rejects.toThrow(
+                'Request failed with status 500: Internal Server Error'
+            )
         })
     })
 
@@ -118,15 +123,19 @@ describe('AdyenShippingMethodsService', () => {
         it('should update shipping method successfully', async () => {
             const mockResponse = {
                 status: 200,
-                json: () => Promise.resolve({
-                    success: true,
-                    orderTotal: 105.99,
-                    currency: 'USD'
-                })
+                json: () =>
+                    Promise.resolve({
+                        success: true,
+                        orderTotal: 105.99,
+                        currency: 'USD'
+                    })
             }
             mockApiClient.post.mockResolvedValue(mockResponse)
 
-            const result = await shippingMethodsService.updateShippingMethod(mockShippingMethodId, mockBasketId)
+            const result = await shippingMethodsService.updateShippingMethod(
+                mockShippingMethodId,
+                mockBasketId
+            )
 
             expect(mockApiClient.post).toHaveBeenCalledWith({
                 body: JSON.stringify({
@@ -156,4 +165,4 @@ describe('AdyenShippingMethodsService', () => {
             ).rejects.toThrow('Request failed with status 400: Invalid shipping method')
         })
     })
-}) 
+})

@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import {AdyenShippingAddressService} from './shipping-address'
+import {AdyenShippingAddressService} from '@salesforce/retail-react-app/app/components/express/utils/shipping-address'
 
 // Mock the ApiClient
 jest.mock('./api')
@@ -15,15 +15,15 @@ describe('AdyenShippingAddressService', () => {
     const mockToken = 'test-token'
     const mockSite = {id: 'test-site'}
 
-    beforeEach(() => {
+    beforeEach(async () => {
         mockApiClient = {
             post: jest.fn()
         }
-        
+
         // Mock the ApiClient constructor
-        const {ApiClient} = require('./api')
+        const {ApiClient} = await import('./api')
         ApiClient.mockImplementation(() => mockApiClient)
-        
+
         shippingAddressService = new AdyenShippingAddressService(mockToken, mockSite)
     })
 
@@ -36,9 +36,13 @@ describe('AdyenShippingAddressService', () => {
             expect(shippingAddressService.baseUrl).toBe('/api/adyen/shipping-address')
         })
 
-        it('should create ApiClient with correct parameters', () => {
-            const {ApiClient} = require('./api')
-            expect(ApiClient).toHaveBeenCalledWith('/api/adyen/shipping-address', mockToken, mockSite)
+        it('should create ApiClient with correct parameters', async () => {
+            const {ApiClient} = await import('./api')
+            expect(ApiClient).toHaveBeenCalledWith(
+                '/api/adyen/shipping-address',
+                mockToken,
+                mockSite
+            )
         })
     })
 
@@ -63,14 +67,18 @@ describe('AdyenShippingAddressService', () => {
         it('should update shipping address successfully', async () => {
             const mockResponse = {
                 status: 200,
-                json: () => Promise.resolve({
-                    success: true,
-                    basketId: mockBasketId
-                })
+                json: () =>
+                    Promise.resolve({
+                        success: true,
+                        basketId: mockBasketId
+                    })
             }
             mockApiClient.post.mockResolvedValue(mockResponse)
 
-            const result = await shippingAddressService.updateShippingAddress(mockBasketId, mockData)
+            const result = await shippingAddressService.updateShippingAddress(
+                mockBasketId,
+                mockData
+            )
 
             expect(mockApiClient.post).toHaveBeenCalledWith({
                 body: JSON.stringify({
@@ -120,4 +128,4 @@ describe('AdyenShippingAddressService', () => {
             ).rejects.toThrow('Request failed with status 500: Internal Server Error')
         })
     })
-}) 
+})

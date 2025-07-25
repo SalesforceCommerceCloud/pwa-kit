@@ -4,7 +4,10 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import {getCurrencyValueForApi, getGPShippingOptionParameters} from './parsers'
+import {
+    getCurrencyValueForApi,
+    getGPShippingOptionParameters
+} from '@salesforce/retail-react-app/app/components/express/utils/parsers'
 
 // Mock the currency list
 jest.mock('./currency-list', () => [
@@ -15,7 +18,7 @@ jest.mock('./currency-list', () => [
 
 describe('getCurrencyValueForApi', () => {
     it('should convert USD amount correctly', () => {
-        const result = getCurrencyValueForApi(100.50, 'USD')
+        const result = getCurrencyValueForApi(100.5, 'USD')
         expect(result).toBe(10050) // 100.50 * 10^2
     })
 
@@ -57,7 +60,7 @@ describe('getShippingOptionParameters', () => {
                     price: 5.99
                 },
                 {
-                    id: 'shipping-2', 
+                    id: 'shipping-2',
                     name: 'Express Shipping',
                     description: '2-3 business days',
                     price: 12.99
@@ -78,7 +81,7 @@ describe('getShippingOptionParameters', () => {
                 },
                 {
                     id: 'shipping-2',
-                    label: '$12.99: Express Shipping', 
+                    label: '$12.99: Express Shipping',
                     description: '2-3 business days'
                 }
             ]
@@ -97,7 +100,7 @@ describe('getShippingOptionParameters', () => {
                     id: 'shipping-2',
                     name: 'Premium Shipping',
                     description: 'Fast delivery',
-                    price: 15.00
+                    price: 15.0
                 }
             ],
             defaultShippingMethodId: 'shipping-1'
@@ -142,4 +145,4 @@ describe('getShippingOptionParameters', () => {
         const result = getGPShippingOptionParameters(undefined)
         expect(result).toBeUndefined()
     })
-}) 
+})
