@@ -39,8 +39,10 @@ const QuantityPicker = (props) => {
                 const {onFocus} = props
 
                 // This is useful for mobile devices, this allows the user to pop open the keyboard and set the
-                // new quantity with one click.
-                e.target.select()
+                // new quantity with one click. Only apply to input elements.
+                if (e.target.select) {
+                    e.target.select()
+                }
 
                 // If there is a `onFocus` property define, call it with the event captured.
                 // eslint-disable-next-line react/prop-types
@@ -58,6 +60,7 @@ const QuantityPicker = (props) => {
                         css={styles.decrementTrigger}
                         data-testid="quantity-decrement"
                         variant="outline"
+                        tabIndex={0}
                         ariaLabel={intl.formatMessage(
                             {
                                 defaultMessage: 'Decrement Quantity for {productName}',
@@ -90,6 +93,7 @@ const QuantityPicker = (props) => {
                         css={styles.incrementTrigger}
                         data-testid="quantity-increment"
                         variant="outline"
+                        tabIndex={0}
                         ariaLabel={intl.formatMessage(
                             {
                                 defaultMessage: 'Increment Quantity for {productName}',
