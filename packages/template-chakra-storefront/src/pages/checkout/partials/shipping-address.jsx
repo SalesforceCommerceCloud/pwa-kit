@@ -15,8 +15,7 @@ import {
     useShopperCustomersMutation,
     useShopperBasketsMutation
 } from '@salesforce/commerce-sdk-react'
-import {useCurrentCustomer} from '../../../hooks/use-current-customer'
-import {useCurrentBasket} from '../../../hooks/use-current-basket'
+import {useCurrentCustomer, useCurrentBasket} from '../../../hooks'
 
 const submitButtonMessage = defineMessage({
     defaultMessage: 'Continue to Shipping Method',

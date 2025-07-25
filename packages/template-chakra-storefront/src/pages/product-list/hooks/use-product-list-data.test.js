@@ -55,7 +55,7 @@ describe('useProductListData', () => {
             }
         ])
         useProductSearch.mockReturnValue({
-            isLoading: true,
+            isPending: true,
             data: undefined,
             isRefetching: false
         })
@@ -67,7 +67,7 @@ describe('useProductListData', () => {
 
     test('returns initial loading state', () => {
         const {result} = renderHook(() => useProductListData())
-        expect(result.current.isLoading).toBe(true)
+        expect(result.current.isPending).toBe(true)
         expect(result.current.productSearchResult).toBeUndefined()
     })
 
@@ -81,7 +81,7 @@ describe('useProductListData', () => {
                 }
             ])
             useProductSearch.mockReturnValue({
-                isLoading: false,
+                isPending: false,
                 isFetched: true,
                 isRefetching: false,
                 data: mockProductSearchResult
@@ -109,7 +109,7 @@ describe('useProductListData', () => {
 
         test('shows no results message when there are no hits', () => {
             useProductSearch.mockReturnValue({
-                isLoading: false,
+                isPending: false,
                 isFetched: true,
                 isRefetching: false,
                 data: {hits: null, total: 0}
@@ -128,7 +128,7 @@ describe('useProductListData', () => {
                 }
             ])
             useProductSearch.mockReturnValue({
-                isLoading: false,
+                isPending: false,
                 isFetched: true,
                 isRefetching: false,
                 data: mockProductSearchResult

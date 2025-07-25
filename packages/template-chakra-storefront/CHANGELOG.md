@@ -1,4 +1,5 @@
 ## 0.1.0-extensibility-preview.5
+- Fix failing tests in pages folder [#2872](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2872)
 - Fix component tests in storefront template [#2878](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2878)
 - Migrate directory structure from `app/*` to `src/*` [#2693](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2693)
 - Upgrade to Chakra UI v3 [2839](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2839)

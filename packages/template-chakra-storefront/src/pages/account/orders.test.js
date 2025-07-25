@@ -57,7 +57,7 @@ test('Renders order history and details', async () => {
         })
     )
     const {user} = renderWithProviders(<MockedComponent history={history} />, {
-        wrapperProps: {siteAlias: 'uk', appConfig: mockConfig.app}
+        wrapperProps: {siteAlias: 'uk', config: mockConfig}
     })
     expect(await screen.findByTestId('account-order-history-page')).toBeInTheDocument()
     expect(await screen.findAllByText(/Ordered: /i)).toHaveLength(3)
@@ -89,7 +89,7 @@ test('Renders order history place holder when no orders', async () => {
         })
     )
     await renderWithProviders(<MockedComponent history={history} />, {
-        wrapperProps: {siteAlias: 'uk', appConfig: mockConfig.app}
+        wrapperProps: {siteAlias: 'uk', config: mockConfig}
     })
 
     expect(await screen.findByTestId('account-order-history-place-holder')).toBeInTheDocument()

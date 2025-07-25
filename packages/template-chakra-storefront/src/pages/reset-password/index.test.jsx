@@ -36,7 +36,7 @@ jest.setTimeout(20000)
 test('Allows customer to go to sign in page', async () => {
     // render our test component
     const {user} = renderWithProviders(<MockedComponent />, {
-        wrapperProps: {siteAlias: 'uk', appConfig: mockConfig.app}
+        wrapperProps: {siteAlias: 'uk', config: mockConfig}
     })
     await act(async () => {
         await user.click(await screen.findByText('Sign in'))
@@ -53,7 +53,7 @@ test('Allows customer to generate password token', async () => {
     )
     // render our test component
     const {user} = renderWithProviders(<MockedComponent />, {
-        wrapperProps: {siteAlias: 'uk', appConfig: mockConfig.app}
+        wrapperProps: {siteAlias: 'uk', config: mockConfig}
     })
 
     await act(async () => {
