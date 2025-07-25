@@ -685,10 +685,28 @@
       "value": "Place Order"
     }
   ],
+  "checkout.label.user_registration": [
+    {
+      "type": 0,
+      "value": "Create an account for a faster checkout"
+    }
+  ],
   "checkout.message.generic_error": [
     {
       "type": 0,
       "value": "An unexpected error occurred during checkout."
+    }
+  ],
+  "checkout.message.user_registration": [
+    {
+      "type": 0,
+      "value": "When you place your order, we create an account for you and save your payment information and other details for future purchases. During your next checkout, confirm your account using the code we'll send to you."
+    }
+  ],
+  "checkout.title.user_registration": [
+    {
+      "type": 0,
+      "value": "Save for Future Use"
     }
   ],
   "checkout_confirmation.button.create_account": [
