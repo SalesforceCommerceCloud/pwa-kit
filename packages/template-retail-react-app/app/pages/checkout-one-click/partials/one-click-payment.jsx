@@ -623,6 +623,13 @@ Payment.propTypes = {
     onSavePreferenceChange: PropTypes.func
 }
 
+Payment.propTypes = {
+    /** Whether user registration is enabled */
+    enableUserRegistration: PropTypes.bool,
+    /** Callback to set user registration state */
+    setEnableUserRegistration: PropTypes.func
+}
+
 const PaymentCardSummary = ({payment}) => {
     const CardIcon = getCreditCardIcon(payment?.paymentCard?.cardType)
     return (
