@@ -155,7 +155,7 @@ describe('CreateNewPageTool', () => {
             /suggest changes to the newly generated page file based on the components not found/i
         )
     })
-    it('allows .commercecloud.salesforce.com image if domain is already present in CSP', async () => {
+    it('allows image from internet if domain is already present in CSP', async () => {
         const customSrc =
             'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw5777f7f6/images/large/PG.CJZACCO.BLKBKPA.PZ.jpg?sw=1360&q=60'
         const customAlt = 'Commerce Cloud Product'
@@ -177,7 +177,7 @@ describe('CreateNewPageTool', () => {
         expect(isAllowed).toBe(true)
     })
 
-    it('does not allow .commercecloud.salesforce.com image if domain is not present in CSP', async () => {
+    it('does not allow an image from internet if domain is not present in CSP', async () => {
         const customSrc =
             'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw5777f7f6/images/large/PG.CJZACCO.BLKBKPA.PZ.jpg?sw=1360&q=60'
         const customAlt = 'Commerce Cloud Product'
@@ -194,26 +194,6 @@ describe('CreateNewPageTool', () => {
     }`
         const pageContent = await createNewPageTool.generatePageContent('Test', ['Image'])
         const isAllowed = ssrContent.includes('.commercecloud.salesforce.com')
-        expect(isAllowed).toBe(false)
-        expect(pageContent).toContain(customSrc)
-    })
-
-    it('does not allow example.com image if CSP only allows .commercecloud.salesforce.com', async () => {
-        const customSrc = 'https://example.com/image.jpg'
-        const customAlt = 'Example Image'
-        const customWidth = 500
-        const customHeight = 300
-        const customImageString = `<Image src={"${customSrc}"} alt={"${customAlt}"} width={${customWidth}} height={${customHeight}} />`
-        jest.spyOn(createNewPageTool, 'generatePageContent').mockResolvedValue(
-            `import Image from 'somewhere';\n${customImageString}`
-        )
-        const ssrContent = `contentSecurityPolicy: {
-      directives: {
-        imgSrc: ["'self'", "https://edge.disstg.commercecloud.salesforce.com"]
-      }
-    }`
-        const pageContent = await createNewPageTool.generatePageContent('Test', ['Image'])
-        const isAllowed = ssrContent.includes('example.com')
         expect(isAllowed).toBe(false)
         expect(pageContent).toContain(customSrc)
     })
