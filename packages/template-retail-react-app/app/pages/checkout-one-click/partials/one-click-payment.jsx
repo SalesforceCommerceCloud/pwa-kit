@@ -18,7 +18,7 @@ import {
     Divider
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
-import {useShopperBasketsMutation} from '@salesforce/commerce-sdk-react'
+import {useShopperBasketsMutation, useCustomerType} from '@salesforce/commerce-sdk-react'
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
 import {useCheckout} from '@salesforce/retail-react-app/app/pages/checkout-container/util/checkout-context'
 import {
@@ -33,13 +33,20 @@ import {
 } from '@salesforce/retail-react-app/app/components/toggle-card'
 import PaymentForm from '@salesforce/retail-react-app/app/pages/checkout-one-click/partials/one-click-payment-form'
 import ShippingAddressSelection from '@salesforce/retail-react-app/app/pages/checkout-one-click/partials/one-click-shipping-address-selection'
+import UserRegistration from '@salesforce/retail-react-app/app/pages/checkout-one-click/partials/one-click-user-registration'
 import AddressDisplay from '@salesforce/retail-react-app/app/components/address-display'
 import {PromoCode, usePromoCode} from '@salesforce/retail-react-app/app/components/promo-code'
 import {API_ERROR_MESSAGE} from '@salesforce/retail-react-app/app/constants'
 
-const Payment = ({paymentMethodForm, billingAddressForm}) => {
+const Payment = ({
+    paymentMethodForm,
+    billingAddressForm,
+    enableUserRegistration,
+    setEnableUserRegistration
+}) => {
     const {formatMessage} = useIntl()
     const {data: basket} = useCurrentBasket()
+    const {isGuest} = useCustomerType()
     const selectedShippingAddress = basket?.shipments && basket?.shipments[0]?.shippingAddress
     const selectedBillingAddress = basket?.billingAddress
     const appliedPayment = basket?.paymentInstruments && basket?.paymentInstruments[0]
@@ -144,7 +151,7 @@ const Payment = ({paymentMethodForm, billingAddressForm}) => {
 
     return (
         <ToggleCard
-            id="step-4"
+            id="step-3"
             data-testid="payment-component"
             title={formatMessage({defaultMessage: 'Payment', id: 'checkout_payment.title.payment'})}
             editing={step === STEPS.PAYMENT}
@@ -233,6 +240,12 @@ const Payment = ({paymentMethodForm, billingAddressForm}) => {
                             isBillingAddress
                         />
                     )}
+                    {isGuest && (
+                        <UserRegistration
+                            enableUserRegistration={enableUserRegistration}
+                            setEnableUserRegistration={setEnableUserRegistration}
+                        />
+                    )}
                 </Stack>
             </ToggleCardEdit>
 
@@ -263,10 +276,22 @@ const Payment = ({paymentMethodForm, billingAddressForm}) => {
                             <AddressDisplay address={selectedBillingAddress} />
                         </Stack>
                     )}
+
+                    <UserRegistration
+                        enableUserRegistration={enableUserRegistration}
+                        setEnableUserRegistration={setEnableUserRegistration}
+                    />
                 </Stack>
             </ToggleCardSummary>
         </ToggleCard>
     )
+}
+
+Payment.propTypes = {
+    /** Whether user registration is enabled */
+    enableUserRegistration: PropTypes.bool,
+    /** Callback to set user registration state */
+    setEnableUserRegistration: PropTypes.func
 }
 
 const PaymentCardSummary = ({payment}) => {

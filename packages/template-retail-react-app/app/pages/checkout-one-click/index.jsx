@@ -17,8 +17,13 @@ import {
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 import {FormattedMessage, useIntl} from 'react-intl'
 import {useForm} from 'react-hook-form'
+import {
+    useAuthHelper,
+    AuthHelpers,
+    useShopperBasketsMutation,
+    useShopperOrdersMutation
+} from '@salesforce/commerce-sdk-react'
 import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
-import {useShopperBasketsMutation, useShopperOrdersMutation} from '@salesforce/commerce-sdk-react'
 import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
 import {useCheckout} from '@salesforce/retail-react-app/app/pages/checkout-container/util/checkout-context'
 import ContactInfo from '@salesforce/retail-react-app/app/pages/checkout-one-click/partials/one-click-contact-info'
@@ -28,21 +33,29 @@ import ShippingOptions from '@salesforce/retail-react-app/app/pages/checkout-one
 import Payment from '@salesforce/retail-react-app/app/pages/checkout-one-click/partials/one-click-payment'
 import OrderSummary from '@salesforce/retail-react-app/app/components/order-summary'
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
-import {STORE_LOCATOR_IS_ENABLED} from '@salesforce/retail-react-app/app/constants'
+import {
+    API_ERROR_MESSAGE,
+    STORE_LOCATOR_IS_ENABLED
+} from '@salesforce/retail-react-app/app/constants'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import {
     getPaymentInstrumentCardType,
     getMaskCreditCardNumber
 } from '@salesforce/retail-react-app/app/utils/cc-utils'
-import {API_ERROR_MESSAGE} from '@salesforce/retail-react-app/app/constants'
+import {generatePassword} from '@salesforce/retail-react-app/app/utils/password-utils'
 
 const CheckoutOneClick = () => {
     const {formatMessage} = useIntl()
     const navigate = useNavigation()
-    const {step, STEPS} = useCheckout()
+    const {step} = useCheckout()
     const [error] = useState()
+    const showToast = useToast()
+
     const [isLoading, setIsLoading] = useState(false)
+    const [enableUserRegistration, setEnableUserRegistration] = useState(false)
+
     const {data: basket} = useCurrentBasket()
+
     const {passwordless = {}, social = {}} = getConfig().app.login || {}
     const idps = social?.idps
     const isSocialEnabled = !!social?.enabled
@@ -64,8 +77,8 @@ const CheckoutOneClick = () => {
         'updateBillingAddressForBasket'
     )
     const {mutateAsync: createOrder} = useShopperOrdersMutation('createOrder')
+    const {mutateAsync: register} = useAuthHelper(AuthHelpers.Register)
 
-    const showToast = useToast()
     const showError = (message) => {
         showToast({
             title: message || formatMessage(API_ERROR_MESSAGE),
@@ -128,11 +141,68 @@ const CheckoutOneClick = () => {
     }
 
     const submitOrder = async () => {
+        const registerUser = async (data) => {
+            try {
+                const body = {
+                    customer: {
+                        firstName: data.firstName,
+                        lastName: data.lastName,
+                        email: data.email,
+                        login: data.email
+                    },
+                    password: generatePassword()
+                }
+                await register(body)
+
+                showToast({
+                    variant: 'subtle',
+                    title: `${formatMessage(
+                        {
+                            defaultMessage: 'Welcome {name},',
+                            id: 'auth_modal.info.welcome_user'
+                        },
+                        {
+                            name: data.firstName || ''
+                        }
+                    )}`,
+                    description: `${formatMessage({
+                        defaultMessage: "You're now signed in.",
+                        id: 'auth_modal.description.now_signed_in'
+                    })}`,
+                    status: 'success',
+                    position: 'top-right',
+                    isClosable: true
+                })
+            } catch (error) {
+                let message = formatMessage(API_ERROR_MESSAGE)
+                if (error.response) {
+                    const json = await error.response.json()
+                    if (/the login is already in use/i.test(json.detail)) {
+                        message = formatMessage({
+                            id: 'checkout_confirmation.message.already_has_account',
+                            defaultMessage: 'This email already has an account.'
+                        })
+                    }
+                }
+
+                showError(message)
+            }
+        }
+
         setIsLoading(true)
         try {
             const order = await createOrder({
                 body: {basketId: basket.basketId}
             })
+
+            if (enableUserRegistration) {
+                await registerUser({
+                    firstName: order.billingAddress.firstName,
+                    lastName: order.billingAddress.lastName,
+                    email: order.customerInfo.email
+                })
+            }
+
             navigate(`/checkout/confirmation/${order.orderNo}`)
         } catch (error) {
             const message = formatMessage({
@@ -195,6 +265,8 @@ const CheckoutOneClick = () => {
                             {isPickupOrder ? <PickupAddress /> : <ShippingAddress />}
                             {!isPickupOrder && <ShippingOptions />}
                             <Payment
+                                enableUserRegistration={enableUserRegistration}
+                                setEnableUserRegistration={setEnableUserRegistration}
                                 paymentMethodForm={paymentMethodForm}
                                 billingAddressForm={billingAddressForm}
                             />
