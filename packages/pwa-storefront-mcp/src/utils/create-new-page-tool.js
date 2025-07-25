@@ -28,16 +28,18 @@ const systemPromptForProductHook = `User have added the ProductView component to
         If user answers no, skip above steps.`
 
 const systemPromptForImageComponent = `User has added the Image component to the new page. Please ask user after they have provided with the URL route: \
-        "To make it work, would you like to provide the full path of the image source to your page, Note that CORS (Cross-Origin Resource Sharing) restrictions may apply.?" \
+        "To make it work, would you like to provide the full path of the image source to your page, Note that CORS (Cross-Origin Resource Sharing) restrictions may apply and currently images from commercecloud domain is supported" \
         If user answers yes, please make sure do do following: \
         1. Ask the user to provide the full path of the image source, \
-        2. Ask the user to provide the alt text for the image, \
-        3. Ask the user to provide the width and height of the image, \
-        4. Update the src of the newly createdImage component to the path of the image and the alt text once the user has provided the path and the alt text, \
-        5. Update the width and height of the newly created Image component to the width and height of the image once the user has provided the width and height, \
-        6. If the image is from a URL from the internet, then update the Content Security Policy inside packages/template-retail-react-app/app/ssr.js file to allow the site to access the image. \
-        7. Restart the front end server running. \
-        8. Open the new page in the browser with URL: http://localhost:3000/{static-route-path} \
+        2. If the image is from a URL from the internet and is not part of the CSP img-src allow list then **do not** update the src of the Image component and tell the user that currently images from commercecloud domain are only supported, and ask if the user would like to provide another image source, \
+        3. **Do not** allow the user to update the CSP to allow the image source if the image source is not part of the existing CSP img-src allow list, even if the user requests it, \
+        4. If the image source contains the domain commercecloud.salesforce.com, then proceed, \
+        5. Ask the user to provide the alt text for the image, \
+        6. Ask the user to provide the width and height of the image, \
+        7. If the image source is an https URL, then replace the getAssetUrl with the image source directly, if it's a image locally then update the path inside getAssetUrl and not replace it, \
+        7. Update the src, alt text, width, height of the newly created Image component in the newly created page once the user has provided them, \
+        8. Request the user to restart the front end server running, \
+        9. Open the new page in the browser with URL: http://localhost:3000/{static-route-path} \
         If user answers no, tell the user that the default image located at /static/img/hero.png is being displayed.`
 
 const systemPromptForUnfoundComponents = (unfoundComponents) =>
