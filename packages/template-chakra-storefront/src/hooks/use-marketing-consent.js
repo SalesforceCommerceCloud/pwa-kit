@@ -81,7 +81,7 @@ export const useMarketingConsent = () => {
                     locale: locale.id,
                     ...(tags && {tags})
                 })
-                const url = `/mobify/proxy/api/marketing/shopper-consents/v1/organizationId/${organizationId}/subscriptions?${queryParams}`
+                const url = `/mobify/proxy/api/shopper/shopper-consents/v1/organizations/${organizationId}/subscriptions?${queryParams}`
 
                 const response = await fetch(url, {
                     method: 'GET',
@@ -124,7 +124,7 @@ export const useMarketingConsent = () => {
 
             try {
                 const token = await getTokenWhenReady()
-                const url = `/mobify/proxy/api/marketing/shopper-consents/v1/organizationId/${organizationId}/subscriptions`
+                const url = `/mobify/proxy/api/shopper/shopper-consents/v1/organizations/${organizationId}/subscriptions`
 
                 const response = await fetch(url, {
                     method: 'POST',
