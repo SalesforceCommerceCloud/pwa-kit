@@ -39,9 +39,8 @@ import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
 import LoadingSpinner from '@salesforce/retail-react-app/app/components/loading-spinner'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import {APIProvider} from '@vis.gl/react-google-maps'
-import PropTypes from 'prop-types'
 
-const Checkout = ({googleCloudAPI}) => {
+const Checkout = () => {
     const {formatMessage} = useIntl()
     const navigate = useNavigation()
     const {step} = useCheckout()
@@ -174,12 +173,6 @@ const Checkout = ({googleCloudAPI}) => {
     )
 }
 
-Checkout.propTypes = {
-    googleCloudAPI: PropTypes.shape({
-        apiKey: PropTypes.string
-    })
-}
-
 const CheckoutContainer = () => {
     const {data: customer} = useCurrentCustomer()
     const {data: basket} = useCurrentBasket()
@@ -230,7 +223,7 @@ const CheckoutContainer = () => {
             <CheckoutProvider>
                 {isDeletingUnavailableItem && <LoadingSpinner wrapperStyles={{height: '100vh'}} />}
 
-                <Checkout googleCloudAPI={googleCloudAPI} />
+                <Checkout />
                 <UnavailableProductConfirmationModal
                     productItems={basket?.productItems}
                     handleUnavailableProducts={handleUnavailableProducts}

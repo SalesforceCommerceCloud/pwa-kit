@@ -66,8 +66,7 @@ export const useAutocompleteSuggestions = (
                     sessionToken: sessionTokenRef.current // REUSED SESSION TOKEN
                 }
 
-                // Add included region codes for country-specific results as requested in code review
-                // Places API (New) uses includedRegionCodes instead of componentRestrictions
+                // Places API (New) uses includedRegionCodes
                 if (countryCode) {
                     request.includedRegionCodes = [countryCode]
                 }
@@ -80,7 +79,6 @@ export const useAutocompleteSuggestions = (
 
                 setSuggestions(googleSuggestions)
             } catch (error) {
-                console.error('Error fetching address suggestions:', error)
                 setSuggestions([])
             } finally {
                 setIsLoading(false)

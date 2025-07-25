@@ -10,8 +10,6 @@
  * Functions for handling address autocomplete functionality
  */
 
-import {mockAddresses} from '../mocks/mock-address-suggestions'
-
 /**
  * Convert Google Maps API suggestions to our expected format
  * @param {Array} suggestions - Array of suggestions from Google Maps API
@@ -36,29 +34,6 @@ export const convertGoogleMapsSuggestions = (suggestions) => {
             .map((term) => ({value: term.trim()})),
         placePrediction: suggestion.placePrediction // Keep original for detailed place fetching
     }))
-}
-
-/**
- * Mock function to get address suggestions based on input
- * @param {string} input - User input string
- * @param {string} countryCode - Country code to filter addresses (e.g., 'US', 'UK', 'AU')
- * @returns {Promise<Array>} Array of address suggestions
- */
-export const getAddressSuggestions = async (input, countryCode) => {
-    // Filter by country if specified
-    if (countryCode) {
-        return mockAddresses.filter((suggestion) => {
-            const description = suggestion.description.toLowerCase()
-            if (countryCode === 'US') {
-                return description.includes('usa')
-            } else if (countryCode === 'CA') {
-                return description.includes('canada')
-            }
-            return true
-        })
-    }
-
-    return mockAddresses
 }
 
 /**
@@ -150,79 +125,73 @@ export const extractAddressFieldsFromPlace = async (place) => {
 /**
  * Parse formatted address string to extract individual address fields
  * @param {string} formattedAddress - Full formatted address string
- * @returns {Object} Structured address fields
+ * @returns {Object} Structured address fields following adr microformat
  */
 export const parseFormattedAddress = (formattedAddress) => {
     if (!formattedAddress) {
         return {address1: ''}
     }
 
-    const parts = formattedAddress.split(', ')
-    const addressFields = {}
+    // Split by comma
+    const parts = formattedAddress.split(',').map(part => part.trim())
+    
+    // Initialize with microformat structure following adr specification
+    const addressFields = {
+        'street-address': parts[0] || '', // street-address (adr microformat)
+        'locality': '',                   // locality (adr microformat)
+        'region': '',                     // region (adr microformat)
+        'postal-code': '',                // postal-code (adr microformat)
+        'country-name': ''                // country-name (adr microformat)
+    }
 
+    // Map parts to microformat fields based on adr specification
     if (parts.length >= 4) {
         // Format: "123 Main St, New York, NY 10001, USA" OR "123 Main St, New York, CA, USA"
-        addressFields.address1 = parts[0] // Street address
-        addressFields.city = parts[1] // City
-
-        // Parse state and postal code from the third part
+        addressFields['locality'] = parts[1] // City
         const statePostalPart = parts[2]
-        // Updated regex to better handle postal codes with spaces
-        const statePostalMatch = statePostalPart.match(/^([A-Z]{2})\s+([A-Z0-9\s]+)$/)
-
-        if (statePostalMatch) {
-            // Format: "NY 10001" - has postal code
-            addressFields.stateCode = statePostalMatch[1]
-            addressFields.postalCode = statePostalMatch[2].trim()
+        const statePostalSplit = statePostalPart.split(' ')
+        
+        if (statePostalSplit.length >= 2) {
+            // Has both state and postal code
+            addressFields['region'] = statePostalSplit[0] // State (first part)
+            addressFields['postal-code'] = statePostalSplit.slice(1).join(' ') // Postal code
         } else {
-            // Format: "CA" - just state code, no postal code
-            const stateMatch = statePostalPart.match(/^([A-Z]{2})$/)
-            if (stateMatch) {
-                addressFields.stateCode = stateMatch[1]
-                // No postal code available in this format
-            } else {
-                addressFields.stateCode = statePostalPart
-            }
+            // Just state code
+            addressFields['region'] = statePostalPart
         }
-
-        // Parse country from the last part
-        const countryPart = parts[3]
-        if (countryPart === 'USA') {
-            addressFields.countryCode = 'US'
-        } else if (countryPart === 'Canada') {
-            addressFields.countryCode = 'CA'
-        } else {
-            addressFields.countryCode = countryPart
-        }
+        addressFields['country-name'] = parts[3]
     } else if (parts.length === 3) {
         // Format: "123 Main St, New York, NY" or "123 Main St, New York, USA"
-        addressFields.address1 = parts[0]
-        addressFields.city = parts[1]
-
+        addressFields['locality'] = parts[1]
         const lastPart = parts[2]
+        
         if (lastPart === 'USA' || lastPart === 'Canada') {
-            addressFields.countryCode = lastPart === 'USA' ? 'US' : 'CA'
+            addressFields['country-name'] = lastPart
         } else {
-            // Try to parse state and postal code from the last part
-            const statePostalMatch = lastPart.match(/^([A-Z]{2})\s+([A-Z0-9\s]+)$/)
-            if (statePostalMatch) {
-                addressFields.stateCode = statePostalMatch[1]
-                addressFields.postalCode = statePostalMatch[2].trim()
+            // Parse state and postal code
+            const statePostalSplit = lastPart.split(' ')
+            if (statePostalSplit.length >= 2) {
+                addressFields['region'] = statePostalSplit[0]
+                addressFields['postal-code'] = statePostalSplit.slice(1).join(' ')
             } else {
-                // Assume it's just a state code
-                addressFields.stateCode = lastPart
+                addressFields['region'] = lastPart
             }
         }
     } else if (parts.length === 2) {
         // Format: "123 Main St, New York"
-        addressFields.address1 = parts[0]
-        addressFields.city = parts[1]
-    } else {
-        // Single part - just the street address
-        addressFields.address1 = formattedAddress
+        addressFields['locality'] = parts[1]
     }
 
-    return addressFields
+    // Convert microformat fields to expected format
+    return {
+        address1: addressFields['street-address'],
+        city: addressFields['locality'],
+        stateCode: addressFields['region'],
+        postalCode: addressFields['postal-code'],
+        countryCode: addressFields['country-name'] === 'USA' ? 'US' : 
+                    addressFields['country-name'] === 'Canada' ? 'CA' : 
+                    addressFields['country-name']
+    }
 }
 
 /**
