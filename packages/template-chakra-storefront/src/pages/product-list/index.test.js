@@ -94,7 +94,6 @@ beforeEach(() => {
 })
 
 afterEach(() => {
-    // mockProductListSearchResponse = mockProductSearch
     jest.resetModules()
     localStorage.clear()
 })
