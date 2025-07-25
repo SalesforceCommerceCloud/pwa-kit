@@ -201,6 +201,12 @@ export const parseFormattedAddress = (formattedAddress) => {
  * @param {Object} addressFields - Address fields object
  */
 export const setAddressFieldValues = (setValue, prefix, addressFields) => {
+    // Set country code first to prevent the country change effect from clearing other fields
+    if (addressFields.countryCode) {
+        setValue(`${prefix}countryCode`, addressFields.countryCode)
+    }
+    
+    // Then set the address fields
     setValue(`${prefix}address1`, addressFields.address1)
     if (addressFields.city) {
         setValue(`${prefix}city`, addressFields.city)
@@ -210,9 +216,6 @@ export const setAddressFieldValues = (setValue, prefix, addressFields) => {
     }
     if (addressFields.postalCode) {
         setValue(`${prefix}postalCode`, addressFields.postalCode)
-    }
-    if (addressFields.countryCode) {
-        setValue(`${prefix}countryCode`, addressFields.countryCode)
     }
 }
 
