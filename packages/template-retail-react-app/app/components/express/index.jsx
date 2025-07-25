@@ -11,15 +11,13 @@ import {AdyenExpressCheckoutProvider} from '@adyen/adyen-salesforce-pwa'
 import {ApplePayExpress} from '@salesforce/retail-react-app/app/components/apple-pay-express/index'
 import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
 import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
-import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
 
 function Express() {
     const {getTokenWhenReady} = useAccessToken()
     const customerId = useCustomerId()
     const navigate = useNavigation()
     const {locale, site} = useMultiSite()
-    const {data: basket} = useCurrentBasket()
-
+    const [basketData, setBasketData] = useState(null)
     const [authToken, setAuthToken] = useState()
 
     useEffect(() => {
@@ -29,6 +27,30 @@ function Express() {
         }
 
         getToken()
+    }, [])
+
+    useEffect(() => {
+        const handleMessage = (event) => {
+            if (event.data?.type === 'BASKET_DATA') {
+                const {data} = event.data
+                console.log('Received BASKET_DATA:', {
+                    amount: data.amount,
+                    currencyCode: data.currencyCode,
+                    id: data.id,
+                    customerId: data.customerId,
+                    isCartSummary: data.isCartSummary,
+                    items: data.items
+                })
+
+                setBasketData(data)
+            }
+        }
+
+        window.addEventListener('message', handleMessage)
+
+        return () => {
+            window.removeEventListener('message', handleMessage)
+        }
     }, [])
 
     if (!authToken) {
@@ -42,10 +64,9 @@ function Express() {
                 customerId={customerId}
                 locale={locale}
                 site={site}
-                basket={basket}
                 navigate={navigate}
             >
-                <ApplePayExpress />
+                <ApplePayExpress basketData={basketData} />
             </AdyenExpressCheckoutProvider>
         </div>
     )

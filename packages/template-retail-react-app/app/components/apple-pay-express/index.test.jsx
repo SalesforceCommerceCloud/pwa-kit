@@ -70,8 +70,16 @@ afterAll(() => {
 })
 
 describe('ApplePayExpress', () => {
+    const mockBasket = {
+        basketId: 'test-basket',
+        orderTotal: 100,
+        currency: 'USD',
+        id: 'test-basket',
+        customerId: 'test-customer'
+    }
+
     const mockProps = {
-        shippingMethods: []
+        basket: mockBasket
     }
 
     const mockAdyenEnvironment = {
@@ -89,15 +97,6 @@ describe('ApplePayExpress', () => {
             }
         ],
         applicationInfo: {}
-    }
-
-    const mockBasket = {
-        basketId: 'test-basket',
-        orderTotal: 100,
-        currency: 'USD',
-        customerInfo: {
-            customerId: 'test-customer'
-        }
     }
 
     beforeEach(() => {
@@ -252,7 +251,8 @@ describe('getAppleButtonConfig', () => {
         basketId: 'basket',
         orderTotal: 100,
         currency: 'USD',
-        customerInfo: {customerId: 'customer'}
+        id: 'basket',
+        customerId: 'customer'
     }
     const mockShippingMethods = [{name: 'Standard', description: 'desc', id: 'sm1', price: 10}]
     const mockApplePayConfig = {merchantName: 'Test Merchant'}
@@ -554,17 +554,18 @@ describe('getAppleButtonConfig', () => {
 })
 
 describe('ApplePayExpress error and edge cases', () => {
-    const mockProps = {shippingMethods: []}
-    const mockAdyenEnvironment = {ADYEN_ENVIRONMENT: 'test', ADYEN_CLIENT_KEY: 'test_key'}
-    const mockAdyenPaymentMethods = {
-        paymentMethods: [{type: 'applepay', configuration: {merchantName: 'Test Merchant'}}],
-        applicationInfo: {}
-    }
     const mockBasket = {
         basketId: 'test-basket',
         orderTotal: 100,
         currency: 'USD',
-        customerInfo: {customerId: 'test-customer'}
+        id: 'test-basket',
+        customerId: 'test-customer'
+    }
+    const mockProps = {basket: mockBasket}
+    const mockAdyenEnvironment = {ADYEN_ENVIRONMENT: 'test', ADYEN_CLIENT_KEY: 'test_key'}
+    const mockAdyenPaymentMethods = {
+        paymentMethods: [{type: 'applepay', configuration: {merchantName: 'Test Merchant'}}],
+        applicationInfo: {}
     }
     let originalPostMessage
     beforeEach(() => {
@@ -673,10 +674,10 @@ describe('ApplePayExpress error and edge cases', () => {
             shippingMethods: {applicableShippingMethods: []},
             fetchShippingMethods: jest.fn()
         })
-        render(<ApplePayExpress {...mockProps} />)
-        // Should call AdyenCheckout once when basket is undefined
+        render(<ApplePayExpress basket={undefined} />)
+        // Should not call AdyenCheckout when basket is undefined
         await waitFor(() => {
-            expect(AdyenCheckout).toHaveBeenCalledTimes(1)
+            expect(AdyenCheckout).toHaveBeenCalledTimes(0)
         })
     })
     it('handles missing config', async () => {
