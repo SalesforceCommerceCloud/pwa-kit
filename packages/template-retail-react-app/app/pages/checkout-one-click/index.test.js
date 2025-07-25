@@ -20,6 +20,7 @@ import {
     mockedCustomerProductLists
 } from '@salesforce/retail-react-app/app/mocks/mock-data'
 import mockConfig from '@salesforce/retail-react-app/config/mocks/default'
+import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 
 // This is a flaky test file!
 jest.retryTimes(5)
@@ -601,22 +602,25 @@ describe('Checkout One Click', () => {
     // Set the initial browser router path and render our component tree.
     window.history.pushState({}, 'Checkout', createPathWithDefaults('/checkout'))
     const {user} = renderWithProviders(<WrappedCheckout history={history} />, {
-        wrapperProps: {isGuest: true, siteAlias: 'uk', appConfig: mockConfig.app}
+        wrapperProps: {
+            isGuest: true,
+            siteAlias: 'uk',
+            appConfig: mockConfig.app
+        }
     })
 
     // Wait for checkout to load and display first step
-    await screen.findByText(/Continue to Shipping Address/i)
+    await screen.findByText(/contact info/i)
 
     // Verify cart products display
     await user.click(screen.getByText(/2 items in cart/i))
     expect(await screen.findByText(/Long Sleeve Crew Neck$/i)).toBeInTheDocument()
 
-    // Verify password field is reset if customer toggles login form
     // Provide customer email and submit
     const emailInput = screen.getByLabelText(/email/i)
-    const submitBtn = screen.getByText(/Continue to Shipping Address/i)
+    const continueBtn = screen.getByText(/continue to shipping address/i)
     await user.type(emailInput, 'test@test.com')
-    await user.click(submitBtn)
+    await user.click(continueBtn)
 
     // Wait for next step to render
     await waitFor(() => {
@@ -695,6 +699,15 @@ describe('Checkout One Click', () => {
     ).not.toBeChecked()
     expect(userRegistrationForm.queryByText(/when you place your order/i)).not.toBeInTheDocument()
 
+    // Expect UserRegistration component to be visible
+    expect(screen.getByTestId('sf-user-registration-content')).toBeInTheDocument()
+    const userRegistrationForm = within(screen.getByTestId('sf-user-registration-content'))
+    expect(userRegistrationForm.getByText(/save for future use/i)).toBeInTheDocument()
+    expect(
+        userRegistrationForm.getByLabelText(/create an account for a faster checkout/i)
+    ).not.toBeChecked()
+    expect(userRegistrationForm.queryByText(/when you place your order/i)).not.toBeInTheDocument()
+
     // Move to final review step
 
     const placeOrderBtn = await screen.findByTestId('place-order-button', undefined, {
@@ -760,7 +773,7 @@ test('Can proceed through checkout as registered customer', async () => {
 
     // Wait for next step to render
     await waitFor(() => {
-        expect(screen.getByTestId('sf-toggle-card-step-4-content')).not.toBeEmptyDOMElement()
+        expect(screen.getByTestId('sf-toggle-card-step-3-content')).not.toBeEmptyDOMElement()
     })
 
     // Applied shipping method should be displayed in previous step summary
@@ -1054,5 +1067,76 @@ test('Can register account during checkout as a guest', async () => {
     // Wait for next step to render
     await waitFor(() => {
         expect(screen.getByTestId('sf-toggle-card-step-2-content')).not.toBeEmptyDOMElement()
+    })
+})
+
+test('Can register account during checkout as a guest', async () => {
+    // Set the initial browser router path and render our component tree.
+    window.history.pushState({}, 'Checkout', createPathWithDefaults('/checkout'))
+    const {user} = renderWithProviders(<WrappedCheckout history={history} />, {
+        wrapperProps: {
+            isGuest: true,
+            siteAlias: 'uk',
+            locale: {id: 'en-GB'},
+            appConfig: mockConfig.app
+        }
+    })
+
+    await screen.findByText(/contact info/i)
+
+    const emailInput = screen.getByLabelText(/email/i)
+    const continueBtn = screen.getByText(/continue to shipping address/i)
+    await user.type(emailInput, 'test@test.com')
+    await user.click(continueBtn)
+
+    await waitFor(() => {
+        expect(screen.getByTestId('sf-toggle-card-step-1-content')).not.toBeEmptyDOMElement()
+    })
+
+    await user.type(screen.getByLabelText(/first name/i), 'Tester')
+    await user.type(screen.getByLabelText(/last name/i), 'McTesting')
+    await user.type(screen.getByLabelText(/phone/i), '(727) 555-1234')
+    await user.type(screen.getAllByLabelText(/address/i)[0], '123 Main St')
+    await user.type(screen.getByLabelText(/city/i), 'Tampa')
+    await user.selectOptions(screen.getByLabelText(/state/i), ['FL'])
+    await user.type(screen.getByLabelText(/zip code/i), '33610')
+    await user.click(screen.getByText(/continue to shipping method/i))
+
+    await waitFor(() => {
+        expect(screen.getByTestId('sf-toggle-card-step-2-content')).not.toBeEmptyDOMElement()
+    })
+
+    await user.click(screen.getByText(/continue to payment/i))
+
+    await waitFor(() => {
+        expect(screen.getByTestId('sf-toggle-card-step-3-content')).not.toBeEmptyDOMElement()
+    })
+
+    await user.type(screen.getByLabelText(/card number/i), '4111111111111111')
+    await user.type(screen.getByLabelText(/name on card/i), 'Testy McTester')
+    await user.type(screen.getByLabelText(/expiration date/i), '0140')
+    await user.type(screen.getByLabelText(/^security code$/i /* not "security code info" */), '123')
+
+    // Check the checkbox to create an account
+    await user.click(screen.getByLabelText(/create an account for a faster checkout/i))
+    const userRegistrationForm = within(screen.getByTestId('sf-user-registration-content'))
+    expect(userRegistrationForm.getByText(/when you place your order/i)).toBeInTheDocument()
+
+    const placeOrderBtn = await screen.findByTestId('place-order-button', undefined, {
+        timeout: 5000
+    })
+
+    await user.click(placeOrderBtn)
+    await screen.findByText(/success/i)
+
+    // Check that user registration was called
+    expect(mockUseAuthHelper).toHaveBeenCalledWith({
+        customer: {
+            firstName: 'John',
+            lastName: 'Smith',
+            email: 'customer@test.com',
+            login: 'customer@test.com'
+        },
+        password: expect.any(String)
     })
 })
