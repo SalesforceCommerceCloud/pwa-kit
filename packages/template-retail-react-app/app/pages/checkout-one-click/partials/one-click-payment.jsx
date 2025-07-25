@@ -16,7 +16,7 @@ import {
     Divider
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
-import {useShopperBasketsMutation} from '@salesforce/commerce-sdk-react'
+import {useShopperBasketsMutation, useCustomerType} from '@salesforce/commerce-sdk-react'
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
 import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
 import {useCheckout} from '@salesforce/retail-react-app/app/pages/checkout-container/util/checkout-context'
@@ -621,6 +621,13 @@ Payment.propTypes = {
     onPaymentMethodSaved: PropTypes.func,
     /** Callback when save preference changes */
     onSavePreferenceChange: PropTypes.func
+}
+
+Payment.propTypes = {
+    /** Whether user registration is enabled */
+    enableUserRegistration: PropTypes.bool,
+    /** Callback to set user registration state */
+    setEnableUserRegistration: PropTypes.func
 }
 
 const PaymentCardSummary = ({payment}) => {
