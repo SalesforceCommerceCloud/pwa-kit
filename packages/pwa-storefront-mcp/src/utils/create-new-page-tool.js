@@ -28,18 +28,21 @@ const systemPromptForProductHook = `User have added the ProductView component to
         If user answers no, skip above steps.`
 
 const systemPromptForImageComponent = `User has added the Image component to the new page. Please ask user after they have provided with the URL route: \
-        "To make it work, would you like to provide the full path of the image source to your page, Note that CORS (Cross-Origin Resource Sharing) restrictions may apply and currently images from commercecloud domain is supported" \
+        "To make it work, would you like to provide the full path of the image source to your page, Note that CORS (Cross-Origin Resource Sharing) restrictions may apply." \
         If user answers yes, please make sure do do following: \
         1. Ask the user to provide the full path of the image source, \
-        2. If the image is from a URL from the internet and is not part of the CSP img-src allow list then **do not** update the src of the Image component and tell the user that currently images from commercecloud domain are only supported, and ask if the user would like to provide another image source, \
-        3. **Do not** allow the user to update the CSP to allow the image source if the image source is not part of the existing CSP img-src allow list, even if the user requests it, \
-        4. If the image source contains the domain commercecloud.salesforce.com, then proceed, \
-        5. Ask the user to provide the alt text for the image, \
-        6. Ask the user to provide the width and height of the image, \
-        7. If the image source is an https URL, then replace the getAssetUrl with the image source directly, if it's a image locally then update the path inside getAssetUrl and not replace it, \
-        7. Update the src, alt text, width, height of the newly created Image component in the newly created page once the user has provided them, \
-        8. Request the user to restart the front end server running, \
-        9. Open the new page in the browser with URL: http://localhost:3000/{static-route-path} \
+        2. If the image is from a URL from the internet, always check in the codebase if the domain of the image source is present in the CSP img-src allow list in ssr.js or related server files. \
+        3. If the domain is not present in the allow list, inform the user and **do not** update the src of the Image component. Tell the user that the CSP img-src allow list needs to be updated manually, and do not proceed further until the domain is confirmed present in the codebase. \
+        4. **Do not** update the CSP img-src allow list in ssr.js yourself, always ask the user to update the CSP img-src allow list manually, even if the user requests it. \
+        5. Once the user confirms they have updated the CSP img-src allow list, check again in the codebase if the domain of the image source is part of the CSP img-src allow list. If yes, then proceed. If no, tell the user that the CSP img-src allow list needs to be updated manually, or ask the user to provide another image source. \
+        6. Only if the image from the internet is part of the CSP img-src allow list, then proceed. \
+        7. If the image source is an https URL, then replace the getAssetUrl with the image source directly, if it's an image locally then update the path inside getAssetUrl and not replace it. \
+        8. Ask the user to provide the alt text for the image, \
+        9. Ask the user to provide the width and height of the image, \
+        10. If the image source is an https URL, then replace the getAssetUrl with the image source directly, if it's an image locally then update the path inside getAssetUrl and not replace it. \
+        11. Update the src, alt text, width, height of the newly created Image component in the newly created page once the user has provided them, \
+        12. Request the user to restart the front end server running, \
+        13. Open the new page in the browser with URL: http://localhost:3000/{static-route-path} \
         If user answers no, tell the user that the default image located at /static/img/hero.png is being displayed.`
 
 const systemPromptForUnfoundComponents = (unfoundComponents) =>
