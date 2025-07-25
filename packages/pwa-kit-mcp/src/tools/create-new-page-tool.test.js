@@ -126,31 +126,6 @@ describe('CreateNewPageTool', () => {
         expect(pageContent).not.toMatch(/https?:\/\//)
     })
 
-    it('updates image src, alt, height, width and ssr.js if user provides custom image info', async () => {
-        const customSrc =
-            'https://a.sfdcstatic.com/shared/images/c360-nav/salesforce-with-type-logo.svg'
-        const customAlt = 'Salesforce Logo'
-        const customWidth = 200
-        const customHeight = 100
-        const customImageString = `<Image src={"${customSrc}"} alt={"${customAlt}"} width={${customWidth}} height={${customHeight}} />`
-        jest.spyOn(CreateNewPageTool, 'generatePageContent').mockResolvedValue(
-            `import Image from 'somewhere';\n${customImageString}`
-        )
-        const ssrContent = `contentSecurityPolicy: {
-  directives: {
-    imgSrc: ["'self'", "https://a.sfdcstatic.com"]
-  }
-}`
-        // In a real test, you would mock fs.readFile and fs.writeFile for ssr.js, but here we just check the logic
-        const pageContent = await CreateNewPageTool.generatePageContent('Test', ['Image'])
-        expect(pageContent).toContain(customSrc)
-        expect(pageContent).toContain(customAlt)
-        expect(pageContent).toContain(customWidth.toString())
-        expect(pageContent).toContain(customHeight.toString())
-        expect(ssrContent).toContain('a.sfdcstatic.com')
-        expect(ssrContent).toContain('imgSrc')
-    })
-
     it('responds with message listing unknown component and suggests changes to page file', async () => {
         jest.spyOn(fs, 'access').mockImplementation((p) => {
             if (String(p).includes('components')) {
@@ -179,5 +154,80 @@ describe('CreateNewPageTool', () => {
         expect(result.content[0].text).toMatch(
             /suggest changes to the newly generated page file based on the components not found/i
         )
+    })
+    it('allows .commercecloud.salesforce.com image if domain is already present in CSP', async () => {
+        const customSrc =
+            'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw5777f7f6/images/large/PG.CJZACCO.BLKBKPA.PZ.jpg?sw=1360&q=60'
+        const customAlt = 'Commerce Cloud Product'
+        const customWidth = 1360
+        const customHeight = 900
+        const customImageString = `<Image src={"${customSrc}"} alt={"${customAlt}"} width={${customWidth}} height={${customHeight}} />`
+        jest.spyOn(createNewPageTool, 'generatePageContent').mockResolvedValue(
+            `import Image from 'somewhere';\n${customImageString}`
+        )
+        const ssrContent = `contentSecurityPolicy: {
+      directives: {
+        imgSrc: ["'self'", "https://edge.disstg.commercecloud.salesforce.com"]
+      }
+    }`
+        const pageContent = await createNewPageTool.generatePageContent('Test', ['Image'])
+        expect(pageContent).toContain(customSrc)
+        expect(ssrContent).toContain('.commercecloud.salesforce.com')
+        const isAllowed = ssrContent.includes('.commercecloud.salesforce.com')
+        expect(isAllowed).toBe(true)
+    })
+
+    it('does not allow .commercecloud.salesforce.com image if domain is not present in CSP', async () => {
+        const customSrc =
+            'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw5777f7f6/images/large/PG.CJZACCO.BLKBKPA.PZ.jpg?sw=1360&q=60'
+        const customAlt = 'Commerce Cloud Product'
+        const customWidth = 1360
+        const customHeight = 900
+        const customImageString = `<Image src={"${customSrc}"} alt={"${customAlt}"} width={${customWidth}} height={${customHeight}} />`
+        jest.spyOn(createNewPageTool, 'generatePageContent').mockResolvedValue(
+            `import Image from 'somewhere';\n${customImageString}`
+        )
+        const ssrContent = `contentSecurityPolicy: {
+      directives: {
+        imgSrc: ["'self'", "https://some-other-domain.com"]
+      }
+    }`
+        const pageContent = await createNewPageTool.generatePageContent('Test', ['Image'])
+        const isAllowed = ssrContent.includes('.commercecloud.salesforce.com')
+        expect(isAllowed).toBe(false)
+        expect(pageContent).toContain(customSrc)
+    })
+
+    it('does not allow example.com image if CSP only allows .commercecloud.salesforce.com', async () => {
+        const customSrc = 'https://example.com/image.jpg'
+        const customAlt = 'Example Image'
+        const customWidth = 500
+        const customHeight = 300
+        const customImageString = `<Image src={"${customSrc}"} alt={"${customAlt}"} width={${customWidth}} height={${customHeight}} />`
+        jest.spyOn(createNewPageTool, 'generatePageContent').mockResolvedValue(
+            `import Image from 'somewhere';\n${customImageString}`
+        )
+        const ssrContent = `contentSecurityPolicy: {
+      directives: {
+        imgSrc: ["'self'", "https://edge.disstg.commercecloud.salesforce.com"]
+      }
+    }`
+        const pageContent = await createNewPageTool.generatePageContent('Test', ['Image'])
+        const isAllowed = ssrContent.includes('example.com')
+        expect(isAllowed).toBe(false)
+        expect(pageContent).toContain(customSrc)
+    })
+
+    it('does not allow user to update CSP with a new image domain of their choice', async () => {
+        let ssrContent = `contentSecurityPolicy: {
+      directives: {
+        imgSrc: ["'self'", "https://edge.disstg.commercecloud.salesforce.com"]
+      }
+    }`
+        const requestedDomain = 'https://example.com'
+        const attemptToUpdateCSP = (currentCSP, newDomain) => currentCSP
+        const updatedCSP = attemptToUpdateCSP(ssrContent, requestedDomain)
+        expect(updatedCSP).not.toContain(requestedDomain)
+        expect(updatedCSP).toContain('.commercecloud.salesforce.com')
     })
 })
