@@ -487,18 +487,14 @@ export const ApplePayExpress = ({sku, quantity = 1, isPdpMode = false}) => {
 
     const regularAdyenData = useAdyenExpressCheckout()
 
-    // Determine which data source to use based on PDP mode, not SKU existence
-    const usingStandalone = isPdpMode && authToken
-    
-    // Use environment from standalone response or regular Adyen data
-    const adyenEnvironment = usingStandalone ? 
+    const adyenEnvironment = isPdpMode ? 
         standalonePaymentMethods?.environment : 
         regularAdyenData.adyenEnvironment
     
-    const adyenPaymentMethods = usingStandalone ? standalonePaymentMethods : regularAdyenData.adyenPaymentMethods
-    const basket = regularAdyenData.basket
-    const shippingMethods = regularAdyenData.shippingMethods
-    const fetchShippingMethods = regularAdyenData.fetchShippingMethods
+    const adyenPaymentMethods = isPdpMode ? standalonePaymentMethods : regularAdyenData.adyenPaymentMethods
+    const basket = isPdpMode ? null : regularAdyenData.basket
+    const shippingMethods = isPdpMode ? null : regularAdyenData.shippingMethods
+    const fetchShippingMethods = isPdpMode ? null : regularAdyenData.fetchShippingMethods
 
     // Cleanup effect to remove temporary basket when component unmounts
     useEffect(() => {
