@@ -53,6 +53,7 @@ const Payment = ({
 
     const isPickupOrder = basket?.shipments[0]?.shippingMethod?.c_storePickupEnabled === true
     const [billingSameAsShipping, setBillingSameAsShipping] = useState(!isPickupOrder)
+
     const {mutateAsync: addPaymentInstrumentToBasket} = useShopperBasketsMutation(
         'addPaymentInstrumentToBasket'
     )
@@ -98,6 +99,7 @@ const Payment = ({
             body: paymentInstrument
         })
     }
+
     const onBillingSubmit = async () => {
         const isFormValid = await billingAddressForm.trigger()
 
@@ -115,6 +117,7 @@ const Payment = ({
             parameters: {basketId: basket.basketId}
         })
     }
+
     const onPaymentRemoval = async () => {
         try {
             await removePaymentInstrumentFromBasket({
