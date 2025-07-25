@@ -642,4 +642,9 @@ const PaymentCardSummary = ({payment}) => {
 
 PaymentCardSummary.propTypes = {payment: PropTypes.object}
 
+Payment.propTypes = {
+    paymentMethodForm: PropTypes.object.isRequired,
+    billingAddressForm: PropTypes.object.isRequired
+}
+
 export default Payment

@@ -778,7 +778,7 @@ test('Can proceed through checkout as registered customer', async () => {
 
     // Wait for next step to render
     await waitFor(() => {
-        expect(screen.getByTestId('sf-toggle-card-step-3-content')).not.toBeEmptyDOMElement()
+        expect(screen.getByTestId('sf-toggle-card-step-4-content')).not.toBeEmptyDOMElement()
     })
 
     // Applied shipping method should be displayed in previous step summary
