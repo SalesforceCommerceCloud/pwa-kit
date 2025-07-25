@@ -19,7 +19,11 @@ import {
     InputRightElement,
     createStylesContext,
     Button,
-    FormControl
+    FormControl,
+    Alert,
+    AlertIcon,
+    AlertTitle,
+    AlertDescription
 } from '@chakra-ui/react'
 import {useIntl} from 'react-intl'
 
@@ -29,6 +33,8 @@ import {HideOnDesktop, HideOnMobile} from '../responsive'
 import {getPathWithLocale} from '../../utils/url'
 import LocaleText from '../locale-text'
 import useMultiSite from '../../hooks/use-multi-site'
+import {useMarketingConsent} from '../../hooks/use-marketing-consent'
+import {CONSENT_STATUS, CONSENT_CHANNELS, CONSENT_TAGS} from '../../constants/marketing-consent'
 import styled from '@emotion/styled'
 
 const [StylesProvider, useStyles] = createStylesContext('Footer')
@@ -194,6 +200,72 @@ export default Footer
 const Subscribe = ({...otherProps}) => {
     const styles = useStyles()
     const intl = useIntl()
+    const [email, setEmail] = useState('')
+    const [message, setMessage] = useState(null)
+    const [messageType, setMessageType] = useState('success')
+    const {fetchConsentItems, submitConsent, isLoading} = useMarketingConsent()
+    const PAGE_TAG = CONSENT_TAGS.HOMEPAGE_BANNER
+    const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+
+    const handleSignUp = async () => {
+        if (!email) {
+            setMessage('Please enter your email address')
+            setMessageType('error')
+            return
+        }
+
+        // Basic email validation
+        if (!EMAIL_REGEX.test(email)) {
+            setMessage('Please enter a valid email address')
+            setMessageType('error')
+            return
+        }
+
+        try {
+            setMessage(null)
+
+            // Fetch consent items with HOMEPAGE_BANNER tag
+            const consentData = await fetchConsentItems(PAGE_TAG)
+
+            // Filter items that have HOMEPAGE_BANNER in their tags
+            const homepageBannerItems =
+                consentData.data?.filter((item) => item.tags?.includes(PAGE_TAG)) || []
+
+            if (homepageBannerItems.length === 0) {
+                setMessage('No subscription options available at this time')
+                setMessageType('error')
+                return
+            }
+
+            // Use the first available consent item for submission
+            // (There may be one or more subscriptionIds available for a single channel.)
+            const firstConsentItem = homepageBannerItems[0]
+            const consentItem = {
+                subscriptionId: firstConsentItem.subscriptionId,
+                contactPointValue: email,
+                channel: CONSENT_CHANNELS.EMAIL,
+                consent: CONSENT_STATUS.OPT_IN
+            }
+
+            // Submit the consent
+            const result = await submitConsent(consentItem)
+
+            // Check if the submission was successful
+            if (result?.status === CONSENT_STATUS.OPT_IN) {
+                setMessage('Thank you for subscribing! You will receive our latest updates.')
+                setMessageType('success')
+                setEmail('')
+            } else {
+                setMessage('Subscription failed. Please try again later.')
+                setMessageType('error')
+            }
+        } catch (error) {
+            console.error('Subscription error:', error)
+            setMessage('Something went wrong. Please try again later.')
+            setMessageType('error')
+        }
+    }
+
     return (
         <Box {...styles.subscribe} {...otherProps}>
             <Heading as="h1" {...styles.subscribeHeading}>
@@ -209,6 +281,13 @@ const Subscribe = ({...otherProps}) => {
                 })}
             </Text>
 
+            {message && (
+                <Alert status={messageType} mb={4} borderRadius="md">
+                    <AlertIcon />
+                    <AlertDescription>{message}</AlertDescription>
+                </Alert>
+            )}
+
             <Box>
                 <InputGroup>
                     {/* Had to swap the following InputRightElement and Input
@@ -216,7 +295,12 @@ const Subscribe = ({...otherProps}) => {
                         This is a workaround for Lastpass plugin that automatically injects its icon for input fields.
                     */}
                     <InputRightElement {...styles.subscribeButtonContainer}>
-                        <Button variant="footer">
+                        <Button
+                            variant="footer"
+                            onClick={handleSignUp}
+                            isLoading={isLoading}
+                            loadingText="Signing Up"
+                        >
                             {intl.formatMessage({
                                 id: 'footer.subscribe.button.sign_up',
                                 defaultMessage: 'Sign Up'
@@ -226,6 +310,13 @@ const Subscribe = ({...otherProps}) => {
                     <Input
                         type="email"
                         placeholder="you@email.com"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        onKeyDown={(e) => {
+                            if (e.key === 'Enter') {
+                                handleSignUp()
+                            }
+                        }}
                         aria-label={intl.formatMessage({
                             id: 'footer.subscribe.email.assistive_msg',
                             defaultMessage: 'Email address for newsletter'
