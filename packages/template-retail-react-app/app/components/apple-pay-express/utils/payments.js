@@ -14,13 +14,12 @@ export class AdyenPaymentsService {
         this.apiClient = new ApiClient(this.baseUrl, token, site)
     }
 
-    async submitPayment(adyenStateData, basketId, customerId) {
+    async submitPayment(adyenStateData, basketId) {
         const res = await this.apiClient.post({
             body: JSON.stringify({
                 data: adyenStateData
             }),
             headers: {
-                customerid: customerId,
                 basketid: basketId
             }
         })

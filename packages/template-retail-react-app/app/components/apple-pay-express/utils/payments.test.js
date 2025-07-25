@@ -53,8 +53,7 @@ describe('AdyenPaymentsService', () => {
 
             const result = await paymentsService.submitPayment(
                 mockAdyenStateData,
-                mockBasketId,
-                mockCustomerId
+                mockBasketId
             )
 
             expect(mockApiClient.post).toHaveBeenCalledWith({
@@ -62,7 +61,6 @@ describe('AdyenPaymentsService', () => {
                     data: mockAdyenStateData
                 }),
                 headers: {
-                    customerid: mockCustomerId,
                     basketid: mockBasketId
                 }
             })
@@ -78,7 +76,7 @@ describe('AdyenPaymentsService', () => {
             mockApiClient.post.mockResolvedValue(mockResponse)
 
             await expect(
-                paymentsService.submitPayment(mockAdyenStateData, mockBasketId, mockCustomerId)
+                paymentsService.submitPayment(mockAdyenStateData, mockBasketId)
             ).rejects.toThrow(`Request failed with status 400: ${errorMessage}`)
 
             expect(mockApiClient.post).toHaveBeenCalledWith({
@@ -86,7 +84,6 @@ describe('AdyenPaymentsService', () => {
                     data: mockAdyenStateData
                 }),
                 headers: {
-                    customerid: mockCustomerId,
                     basketid: mockBasketId
                 }
             })

@@ -81,23 +81,39 @@ export const getAppleButtonConfig = (
     navigate,
     fetchShippingMethods
 ) => {
-    let applePayAmount = basket.orderTotal
+    // Add defensive checks for basket
+    if (!basket) {
+        console.error('getAppleButtonConfig: basket is null or undefined')
+        return null
+    }
+
+    console.log('getAppleButtonConfig - basket:', basket)
+    console.log('getAppleButtonConfig - basket.orderTotal:', basket.orderTotal)
+
+    // Use basket for all properties with defensive checks
+    const orderTotal = basket.orderTotal
+    const currency = basket.currency
+    const basketId = basket.id
+
+    let applePayAmount = orderTotal
     const buttonConfig = {
         showPayButton: true,
         isExpress: true,
         configuration: applePayConfig,
         amount: {
-            value: getCurrencyValueForApi(basket.orderTotal, basket.currency),
-            currency: basket.currency
+            value: getCurrencyValueForApi(orderTotal, currency),
+            currency: currency
         },
         requiredShippingContactFields: ['postalAddress', 'name', 'email', 'phone'],
         requiredBillingContactFields: ['postalAddress'],
-        shippingMethods: shippingMethods?.map((sm) => ({
-            label: sm.name,
-            detail: sm.description,
-            identifier: sm.id,
-            amount: `${sm.price}`
-        })),
+        shippingMethods: Array.isArray(shippingMethods)
+            ? shippingMethods.map((sm) => ({
+                  label: sm.name,
+                  detail: sm.description,
+                  identifier: sm.id,
+                  amount: `${sm.price}`
+              }))
+            : [],
         onAuthorized: async (resolve, reject, event) => {
             try {
                 const {shippingContact, billingContact, token} = event.payment
@@ -118,8 +134,7 @@ export const getAppleButtonConfig = (
                         ...state.data,
                         origin: state.data.origin ? state.data.origin : window.location.origin
                     },
-                    basket?.basketId,
-                    basket?.customerInfo?.customerId
+                    basketId
                 )
                 if (paymentsResponse?.isFinal && paymentsResponse?.isSuccessful) {
                     const finalPriceUpdate = {
@@ -158,20 +173,16 @@ export const getAppleButtonConfig = (
                 const adyenShippingMethodsService = new AdyenShippingMethodsService(authToken, site)
                 const customerShippingDetails = getCustomerShippingDetails(shippingContact)
                 await adyenShippingAddressService.updateShippingAddress(
-                    basket.basketId,
+                    basketId,
                     customerShippingDetails
                 )
-                const newShippingMethods = await fetchShippingMethods(
-                    basket?.basketId,
-                    site,
-                    authToken
-                )
+                const newShippingMethods = await fetchShippingMethods(basketId, site, authToken)
                 if (!newShippingMethods?.applicableShippingMethods?.length) {
                     reject()
                 } else {
                     const response = await adyenShippingMethodsService.updateShippingMethod(
                         newShippingMethods.applicableShippingMethods[0].id,
-                        basket.basketId
+                        basketId
                     )
                     buttonConfig.amount = {
                         value: getCurrencyValueForApi(response.orderTotal, response.currency),
@@ -205,7 +216,7 @@ export const getAppleButtonConfig = (
                 const adyenShippingMethodsService = new AdyenShippingMethodsService(authToken, site)
                 const response = await adyenShippingMethodsService.updateShippingMethod(
                     shippingMethod.identifier,
-                    basket.basketId
+                    basketId
                 )
                 if (response.error) {
                     reject()
@@ -243,11 +254,12 @@ export const getAppleButtonConfig = (
     return buttonConfig
 }
 
-export const ApplePayExpress = () => {
+export const ApplePayExpress = ({basket}) => {
+    console.log('🚀 ApplePayExpress component called with basket:', basket)
+
     const {
         adyenEnvironment,
         adyenPaymentMethods,
-        basket,
         locale,
         site,
         authToken,
@@ -255,13 +267,47 @@ export const ApplePayExpress = () => {
         shippingMethods,
         fetchShippingMethods
     } = useAdyenExpressCheckout()
+
+    // Log basket contents for debugging
+    const renderTime = performance.now()
+    console.log('=== APPLE PAY EXPRESS COMPONENT RENDERED ===')
+    console.log('🔄 Render time:', new Date().toISOString(), 'Performance time:', renderTime)
+    console.log('ApplePayExpress - Basket contents:', basket)
+    console.log('ApplePayExpress - Basket type:', typeof basket)
+    console.log(
+        'ApplePayExpress - Basket keys:',
+        basket ? Object.keys(basket) : 'basket is null/undefined'
+    )
+    console.log('ApplePayExpress - basketData:', basket?.basketData)
+    console.log('ApplePayExpress - orderTotal:', basket?.basketData?.orderTotal)
+    console.log('ApplePayExpress - currency:', basket?.basketData?.currency)
+    console.log('ApplePayExpress - id:', basket?.basketData?.id)
+    console.log('=== END APPLE PAY EXPRESS LOGGING ===')
+
+    // Check if we have the minimum required basket data (from basket only)
+    const hasRequiredBasketData =
+        basket &&
+        basket.basketData &&
+        basket.basketData.orderTotal !== undefined &&
+        basket.basketData.currency &&
+        basket.basketData.id
     const paymentContainer = useRef(null)
 
     useEffect(() => {
         let isCanceled = false
 
+        console.log('🔄 ApplePayExpress useEffect triggered with basket:', basket)
+
         const createCheckout = async () => {
             if (isCanceled) {
+                return
+            }
+
+            console.log('🔧 createCheckout called with basket:', basket)
+
+            // Validate required basket properties
+            if (!hasRequiredBasketData) {
+                console.log('❌ Missing required basket data, skipping checkout creation')
                 return
             }
 
@@ -293,12 +339,19 @@ export const ApplePayExpress = () => {
                 const appleButtonConfig = getAppleButtonConfig(
                     authToken,
                     site,
-                    basket,
-                    shippingMethods?.applicableShippingMethods,
+                    basket.basketData,
+                    shippingMethods?.applicableShippingMethods || [],
                     applePaymentMethodConfig,
                     navigate,
                     fetchShippingMethods
                 )
+
+                // Check if button config was created successfully
+                if (!appleButtonConfig) {
+                    console.error('Failed to create Apple Pay button config - missing basket data')
+                    handleApplePayUnavailable()
+                    return
+                }
 
                 let applePayButton
                 try {
@@ -339,12 +392,13 @@ export const ApplePayExpress = () => {
             }
         }
 
+        // Create checkout since basket is guaranteed to be available
         createCheckout()
 
         return () => {
             isCanceled = true
         }
-    }, [adyenEnvironment, adyenPaymentMethods])
+    }, [adyenEnvironment, adyenPaymentMethods, basket, hasRequiredBasketData])
 
     return (
         <>
@@ -354,5 +408,6 @@ export const ApplePayExpress = () => {
 }
 
 ApplePayExpress.propTypes = {
-    shippingMethods: PropTypes.array
+    shippingMethods: PropTypes.array,
+    basket: PropTypes.object
 }

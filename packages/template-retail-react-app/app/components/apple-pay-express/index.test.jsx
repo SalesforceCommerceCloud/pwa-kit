@@ -70,8 +70,18 @@ afterAll(() => {
 })
 
 describe('ApplePayExpress', () => {
+    const mockBasket = {
+        basketData: {
+            basketId: 'test-basket',
+            orderTotal: 100,
+            currency: 'USD',
+            id: 'test-basket',
+            customerId: 'test-customer'
+        }
+    }
+
     const mockProps = {
-        shippingMethods: []
+        basket: mockBasket
     }
 
     const mockAdyenEnvironment = {
@@ -91,15 +101,6 @@ describe('ApplePayExpress', () => {
         applicationInfo: {}
     }
 
-    const mockBasket = {
-        basketId: 'test-basket',
-        orderTotal: 100,
-        currency: 'USD',
-        customerInfo: {
-            customerId: 'test-customer'
-        }
-    }
-
     beforeEach(() => {
         // Reset all mocks before each test
         jest.clearAllMocks()
@@ -117,16 +118,14 @@ describe('ApplePayExpress', () => {
             fetchShippingMethods: jest.fn()
         })
 
-        // Mock AdyenCheckout
-        const mockCreate = jest.fn()
-        const mockIsAvailable = jest.fn()
-        const mockMount = jest.fn()
+        // Mock AdyenCheckout to return a promise that resolves to an object with create method
+        const mockCreate = jest.fn().mockResolvedValue({
+            isAvailable: jest.fn().mockResolvedValue(true),
+            mount: jest.fn()
+        })
 
         AdyenCheckout.mockResolvedValue({
-            create: mockCreate.mockResolvedValue({
-                isAvailable: mockIsAvailable.mockResolvedValue(true),
-                mount: mockMount
-            })
+            create: mockCreate
         })
     })
 
@@ -151,9 +150,11 @@ describe('ApplePayExpress', () => {
         // Mock AdyenCheckout to throw an error
         AdyenCheckout.mockRejectedValue(new Error('Apple Pay not available'))
 
-        const originalPostMessage = window.postMessage
         const mockPostMessage = jest.fn()
-        window.postMessage = mockPostMessage
+        Object.defineProperty(window, 'postMessage', {
+            value: mockPostMessage,
+            writable: true
+        })
 
         render(<ApplePayExpress {...mockProps} />)
 
@@ -166,8 +167,6 @@ describe('ApplePayExpress', () => {
                 '*'
             )
         })
-
-        window.postMessage = originalPostMessage
     })
 
     it('mounts Apple Pay button when available', async () => {
@@ -252,7 +251,8 @@ describe('getAppleButtonConfig', () => {
         basketId: 'basket',
         orderTotal: 100,
         currency: 'USD',
-        customerInfo: {customerId: 'customer'}
+        id: 'basket',
+        customerId: 'customer'
     }
     const mockShippingMethods = [{name: 'Standard', description: 'desc', id: 'sm1', price: 10}]
     const mockApplePayConfig = {merchantName: 'Test Merchant'}
@@ -554,23 +554,30 @@ describe('getAppleButtonConfig', () => {
 })
 
 describe('ApplePayExpress error and edge cases', () => {
-    const mockProps = {shippingMethods: []}
+    const mockBasket = {
+        basketData: {
+            basketId: 'test-basket',
+            orderTotal: 100,
+            currency: 'USD',
+            id: 'test-basket',
+            customerId: 'test-customer'
+        }
+    }
+    const mockProps = {basket: mockBasket}
     const mockAdyenEnvironment = {ADYEN_ENVIRONMENT: 'test', ADYEN_CLIENT_KEY: 'test_key'}
     const mockAdyenPaymentMethods = {
         paymentMethods: [{type: 'applepay', configuration: {merchantName: 'Test Merchant'}}],
         applicationInfo: {}
     }
-    const mockBasket = {
-        basketId: 'test-basket',
-        orderTotal: 100,
-        currency: 'USD',
-        customerInfo: {customerId: 'test-customer'}
-    }
-    let originalPostMessage
     beforeEach(() => {
         jest.clearAllMocks()
-        originalPostMessage = window.postMessage
-        window.postMessage = jest.fn()
+
+        // Mock window.postMessage
+        Object.defineProperty(window, 'postMessage', {
+            value: jest.fn(),
+            writable: true
+        })
+
         useAdyenExpressCheckout.mockReturnValue({
             adyenEnvironment: mockAdyenEnvironment,
             adyenPaymentMethods: mockAdyenPaymentMethods,
@@ -582,9 +589,6 @@ describe('ApplePayExpress error and edge cases', () => {
             shippingMethods: {applicableShippingMethods: []},
             fetchShippingMethods: jest.fn()
         })
-    })
-    afterEach(() => {
-        window.postMessage = originalPostMessage
     })
     it('handles AdyenCheckout throwing', async () => {
         AdyenCheckout.mockImplementation(() => {
@@ -673,10 +677,10 @@ describe('ApplePayExpress error and edge cases', () => {
             shippingMethods: {applicableShippingMethods: []},
             fetchShippingMethods: jest.fn()
         })
-        render(<ApplePayExpress {...mockProps} />)
-        // Should call AdyenCheckout once when basket is undefined
+        render(<ApplePayExpress basket={undefined} />)
+        // Should not call AdyenCheckout when basket is undefined
         await waitFor(() => {
-            expect(AdyenCheckout).toHaveBeenCalledTimes(1)
+            expect(AdyenCheckout).toHaveBeenCalledTimes(0)
         })
     })
     it('handles missing config', async () => {
