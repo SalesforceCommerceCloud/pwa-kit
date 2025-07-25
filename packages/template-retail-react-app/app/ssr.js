@@ -314,7 +314,6 @@ const {handler} = runtime.createHandler(options, (app) => {
                     'script-src': [
                         // Used by the service worker in /worker/main.js
                         'storage.googleapis.com',
-                        '*.test1.my.pc-rnd.site.com',
                         '*.adyen.com',
                         'https://checkoutshopper-test.adyen.com',
                         'https://pay.google.com/gp/p/js/pay.js'
@@ -328,13 +327,10 @@ const {handler} = runtime.createHandler(options, (app) => {
                         '*.adyen.com',
                         // Connect to SCRT2 URLs
                         '*.salesforce-scrt.com',
-                        '*.test1.my.pc-rnd.salesforce-scrt.com'
                     ],
                     'frame-src': [
                         // Allow frames from Salesforce site.com (Needed for MIAW)
                         '*.site.com',
-                        '*.test1.my.pc-rnd.salesforce-scrt.com',
-                        '*.test1.my.pc-rnd.site.com',
                         'checkoutshopper-test.adyen.com',
                         // Allow Google Pay Specific frames
                         'https://pay.google.com'
