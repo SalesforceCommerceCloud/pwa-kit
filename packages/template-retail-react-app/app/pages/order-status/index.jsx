@@ -5,7 +5,8 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React from 'react'
+import React, {useRef, useEffect} from 'react'
+import {FormattedMessage} from 'react-intl'
 import {
     Box,
     Heading,
@@ -24,6 +25,12 @@ const OrderStatusPage = () => {
     const navigate = useNavigation()
     const {data: customer} = useCurrentCustomer()
     const {isRegistered, customerType} = customer
+    const headingRef = useRef()
+
+    useEffect(() => {
+        // Focus the 'Order Status' header when the component mounts for accessibility
+        headingRef?.current?.focus()
+    }, [])
 
     const handleSignInClick = () => {
         navigate('/login')
@@ -39,8 +46,11 @@ const OrderStatusPage = () => {
     return (
         <Box data-testid="order-status-page" bg="gray.50">
             <Container py={{base: 8, md: 8}} pt={{base: 12, md: 24}}>
-                <Heading as="h1" size="lg" textAlign="left">
-                    Order Status
+                <Heading as="h1" size="lg" textAlign="left" tabIndex="0" ref={headingRef}>
+                    <FormattedMessage
+                        defaultMessage="Order Status"
+                        id="order_status_page.heading.order_status"
+                    />
                 </Heading>
             </Container>
             <Container maxW="container.lg" px={4} mt={8} pb={{base: 8, md: 16}}>
@@ -64,7 +74,10 @@ const OrderStatusPage = () => {
                             <Stack spacing={6} align="center">
                                 <BrandLogo width="60px" height="auto" />
                                 <Text fontSize="lg" fontWeight="medium" textAlign="center">
-                                    Sign in with your Account
+                                    <FormattedMessage
+                                        defaultMessage="Sign in with your Account"
+                                        id="order_status_page.sign_in.heading"
+                                    />
                                 </Text>
                                 <Button
                                     colorScheme="blue"
@@ -72,7 +85,10 @@ const OrderStatusPage = () => {
                                     width="100%"
                                     onClick={handleSignInClick}
                                 >
-                                    Sign in
+                                    <FormattedMessage
+                                        defaultMessage="Sign in"
+                                        id="order_status_page.sign_in.button"
+                                    />
                                 </Button>
                             </Stack>
                         </Box>
