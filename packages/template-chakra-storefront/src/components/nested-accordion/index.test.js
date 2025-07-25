@@ -89,9 +89,7 @@ test('Renders NestedAccordion with items functions before and after', () => {
     expect(itemAfter).toBeInTheDocument()
 })
 
-// TODO: This tests fails because our Link component is incorrectly rendering the anchor tag with a "to" attribute
-// instead of the "href" attribute. Once that component is fixed, we can re-enable this test.
-test.skip('Renders NestedAccordion with custom url builder', () => {
+test('Renders NestedAccordion with custom url builder', () => {
     const mockPath = '/mock-path'
     renderWithProviders(<NestedAccordion item={mockItem} urlBuilder={() => mockPath} />)
 

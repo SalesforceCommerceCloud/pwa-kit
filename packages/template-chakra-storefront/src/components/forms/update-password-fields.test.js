@@ -7,7 +7,7 @@
 import React from 'react'
 import {useForm} from 'react-hook-form'
 import UpdatePasswordFields from './update-password-fields'
-import {screen, waitFor} from '@testing-library/react'
+import {screen, waitFor, act} from '@testing-library/react'
 import PropTypes from 'prop-types'
 import {renderWithProviders} from '../../utils/test-utils'
 
@@ -26,8 +26,7 @@ WrapperComponent.propTypes = {
 }
 
 describe('UpdatePasswordFields component', () => {
-    // TODO: fix failing test
-    test.skip('renders current password, new password, and confirm new password fields by default', () => {
+    test('renders current password, new password, and confirm new password fields by default', () => {
         renderWithProviders(<WrapperComponent />)
 
         const currentPasswordInput = screen.getByLabelText('Current Password')
@@ -43,19 +42,24 @@ describe('UpdatePasswordFields component', () => {
         expect(confirmNewPasswordInput).toHaveAttribute('type', 'password')
     })
 
-    // TODO: fix failing test
-    test.skip('shows error when passwords do not match', async () => {
+    test('shows error when passwords do not match', async () => {
         const onSubmit = jest.fn()
         const {user} = renderWithProviders(<WrapperComponent onSubmit={onSubmit} />)
 
         const newPasswordInput = screen.getByLabelText('New Password')
         const confirmNewPasswordInput = screen.getByLabelText('Confirm New Password')
 
-        await user.type(newPasswordInput, 'Password123!')
-        await user.type(confirmNewPasswordInput, 'DifferentPassword123!')
+        await act(async () => {
+            await user.type(newPasswordInput, 'Password123!')
+        })
 
-        // Submit the form
-        await user.click(screen.getByRole('button', {name: 'Submit'}))
+        await act(async () => {
+            await user.type(confirmNewPasswordInput, 'DifferentPassword123!')
+        })
+
+        await act(async () => {
+            await user.click(screen.getByRole('button', {name: 'Submit'}))
+        })
 
         await waitFor(() => {
             expect(screen.getByText(/Passwords do not match/i)).toBeInTheDocument()
