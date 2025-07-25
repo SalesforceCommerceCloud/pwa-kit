@@ -12,11 +12,11 @@ import { z } from 'zod';
 const systemPromptForCreatePage = `You are a smart assistant that can use tools when needed. \
         Please ask the user to provide following information **one at a time**, in a natural and conversational way. \
         Do **not** ask all the questions at once. \
+        Do **not** assume the answers to the questions, especially the URL route. **Always** ask the user for the URL route. \
         - What is the name of the new page to create? \
         - List the components to include on the page, separated by commas (e.g., Image, ProductView) \
         - What is the URL route for this page? (e.g., /new-home, /my-products) \
-        Collect answers to these questions, then call the tool with the collected information as input parameters. 
-        Do **not** assume the answers to the questions.`
+        Collect answers to these questions, then call the tool with the collected information as input parameters.`
 
 const systemPromptForProductHook = `User have added the ProductView component to the new page. Please ask user: \
         "To make it work, would you like to add the hook useProduct to your page?" \
