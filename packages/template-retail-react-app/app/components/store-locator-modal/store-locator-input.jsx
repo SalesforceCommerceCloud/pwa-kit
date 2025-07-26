@@ -8,6 +8,7 @@
 import React, {useEffect, useContext} from 'react'
 import {useIntl} from 'react-intl'
 import PropTypes from 'prop-types'
+import { withComponentTag } from '../with-component-tag.js';
 
 // Components
 import {
@@ -227,4 +228,4 @@ StoreLocatorInput.propTypes = {
     submitForm: PropTypes.func
 }
 
-export default StoreLocatorInput
+export default withComponentTag(StoreLocatorInput)

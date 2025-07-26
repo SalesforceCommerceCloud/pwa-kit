@@ -17,6 +17,7 @@ import {
     Stack
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 import {useIntl} from 'react-intl'
+import { withComponentTag } from '@salesforce/retail-react-app/app/components/with-component-tag.js';
 
 const InformationAccordion = ({product}) => {
     const {formatMessage} = useIntl()
@@ -118,4 +119,4 @@ InformationAccordion.propTypes = {
     product: PropTypes.object
 }
 
-export default InformationAccordion
+export default withComponentTag(InformationAccordion)

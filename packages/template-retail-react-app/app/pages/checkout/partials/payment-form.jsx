@@ -21,6 +21,7 @@ import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-curre
 import {LockIcon, PaypalIcon} from '@salesforce/retail-react-app/app/components/icons'
 import CreditCardFields from '@salesforce/retail-react-app/app/components/forms/credit-card-fields'
 import {useCurrency} from '@salesforce/retail-react-app/app/hooks'
+import { withComponentTag } from '@salesforce/retail-react-app/app/components/with-component-tag.js';
 
 const PaymentForm = ({form, onSubmit}) => {
     const {formatMessage} = useIntl()
@@ -110,4 +111,4 @@ PaymentForm.propTypes = {
     onSubmit: PropTypes.func
 }
 
-export default PaymentForm
+export default withComponentTag(PaymentForm)

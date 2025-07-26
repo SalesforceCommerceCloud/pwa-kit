@@ -24,6 +24,7 @@ import CheckboxRefinements from '@salesforce/retail-react-app/app/pages/product-
 import LinkRefinements from '@salesforce/retail-react-app/app/pages/product-list/partials/link-refinements'
 import {isServer} from '@salesforce/retail-react-app/app/utils/utils'
 import {FILTER_ACCORDION_SATE} from '@salesforce/retail-react-app/app/constants'
+import { withComponentTag } from '@salesforce/retail-react-app/app/components/with-component-tag.js';
 
 /** Map of refinement attribute IDs to the components used to display values as filter options. */
 export const componentMap = {
@@ -166,4 +167,4 @@ Refinements.propTypes = {
     isLoading: PropTypes.bool
 }
 
-export default Refinements
+export default withComponentTag(Refinements)

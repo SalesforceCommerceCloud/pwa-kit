@@ -17,6 +17,7 @@ import {
 import ProductTile from '@salesforce/retail-react-app/app/components/product-tile'
 import {ChevronLeftIcon, ChevronRightIcon} from '@salesforce/retail-react-app/app/components/icons'
 import {useIntl} from 'react-intl'
+import { withComponentTag } from '../with-component-tag.js';
 
 /**
  * Renders a scrollable, horizontal container of products with native scroll
@@ -194,4 +195,4 @@ ProductScroller.propTypes = {
     productTileProps: PropTypes.oneOfType([PropTypes.func, PropTypes.object])
 }
 
-export default ProductScroller
+export default withComponentTag(ProductScroller)

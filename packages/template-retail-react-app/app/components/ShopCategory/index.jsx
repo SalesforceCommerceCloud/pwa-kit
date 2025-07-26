@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Box, Image, Text, Link, VStack } from '@chakra-ui/react';
 import PropTypes from 'prop-types';
 import { useCategory } from '@salesforce/commerce-sdk-react';
+import { withComponentTag } from '../with-component-tag.js';
 
 const useCategoryData = (categoryId) => {
     const { data: categoriesTree } = useCategory({
@@ -40,4 +41,4 @@ ShopCategory.propTypes = {
     categoryId: PropTypes.string.isRequired
 };
 
-export default ShopCategory; 
+export default withComponentTag(ShopCategory); 

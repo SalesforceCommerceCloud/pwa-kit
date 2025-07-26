@@ -17,6 +17,7 @@ import {
     Box
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 import {FormattedMessage} from 'react-intl'
+import { withComponentTag } from '@salesforce/retail-react-app/app/components/with-component-tag.js';
 
 const CartItemSkeleton = () => {
     return (
@@ -90,4 +91,4 @@ const CartSkeleton = () => {
     )
 }
 
-export default CartSkeleton
+export default withComponentTag(CartSkeleton)

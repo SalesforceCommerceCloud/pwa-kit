@@ -31,6 +31,7 @@ import CartItemVariantPrice from '@salesforce/retail-react-app/app/components/it
 import PromoPopover from '@salesforce/retail-react-app/app/components/promo-popover'
 import {useProducts} from '@salesforce/commerce-sdk-react'
 import {BasketIcon} from '@salesforce/retail-react-app/app/components/icons'
+import { withComponentTag } from '../with-component-tag.js';
 
 const CartItems = ({basket}) => {
     const totalItems = basket?.productItems?.reduce((acc, item) => acc + item.quantity, 0) || 0
@@ -346,4 +347,4 @@ OrderSummary.propTypes = {
     fontSize: PropTypes.oneOf(['xs', 'sm', 'md', 'lg', 'xl'])
 }
 
-export default OrderSummary
+export default withComponentTag(OrderSummary)

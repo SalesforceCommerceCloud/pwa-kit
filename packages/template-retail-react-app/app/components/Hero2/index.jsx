@@ -1,7 +1,8 @@
 import React from 'react';
 import { Box, Button, Flex, Heading, Text } from '@chakra-ui/react';
+import { withComponentTag } from '../with-component-tag.js';
 
-const Hero2 = () => {
+const Hero2 = () => { 
     return (
         <Box bg="gray.100" position="relative">
         <Flex justify="space-between" align="center" bg="gray.100" p={2}>
@@ -20,7 +21,7 @@ const Hero2 = () => {
                 </Box>
         </Flex>
         </Box>
-    );
+    )
 };
 
-export default Hero2; 
+export default withComponentTag(Hero2); 

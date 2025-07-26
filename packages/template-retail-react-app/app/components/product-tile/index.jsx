@@ -47,6 +47,7 @@ import {
     getDecoratedVariationAttributes
 } from '@salesforce/retail-react-app/app/utils/product-utils'
 import {PRODUCT_BADGE_DETAILS} from '@salesforce/retail-react-app/app/constants'
+import { withComponentTag } from '../with-component-tag.js';
 
 const IconButtonWithRegistration = withRegistration(IconButton)
 
@@ -398,7 +399,7 @@ ProductTile.propTypes = {
     isRefreshingData: PropTypes.bool
 }
 
-export default ProductTile
+export default withComponentTag(ProductTile)
 
 const shouldShowPromoCallout = (productWithFilteredVariants) => {
     return productWithFilteredVariants.variants

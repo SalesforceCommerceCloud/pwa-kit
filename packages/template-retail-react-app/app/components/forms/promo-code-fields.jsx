@@ -10,6 +10,7 @@ import {FormattedMessage} from 'react-intl'
 import {Box, Button} from '@salesforce/retail-react-app/app/components/shared/ui'
 import usePromoCodeFields from '@salesforce/retail-react-app/app/components/forms/usePromoCodeFields'
 import Field from '@salesforce/retail-react-app/app/components/field'
+import { withComponentTag } from '../with-component-tag.js';
 
 const PromoCodeFields = ({form, prefix = '', ...props}) => {
     const fields = usePromoCodeFields({form, prefix})
@@ -40,4 +41,4 @@ PromoCodeFields.propTypes = {
     prefix: PropTypes.string
 }
 
-export default PromoCodeFields
+export default withComponentTag(PromoCodeFields)

@@ -36,6 +36,7 @@ import {useSearchStores} from '@salesforce/commerce-sdk-react'
 import {useForm} from 'react-hook-form'
 
 import {StoreLocatorContext} from '@salesforce/retail-react-app/app/components/store-locator-modal/index'
+import { withComponentTag } from '../with-component-tag.js';
 
 const StoreLocatorContent = () => {
     const {
@@ -210,4 +211,4 @@ const StoreLocatorContent = () => {
 
 StoreLocatorContent.propTypes = {}
 
-export default StoreLocatorContent
+export default withComponentTag(StoreLocatorContent)

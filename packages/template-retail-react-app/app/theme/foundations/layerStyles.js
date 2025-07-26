@@ -34,7 +34,7 @@ export default {
         paddingTop: [4, 4, 6, 6, 8],
         paddingBottom: 32,
         width: '100%',
-        maxWidth: 'container.xxxl',
+        maxWidth: '2000px', // Adjusted maxWidth
         marginLeft: 'auto',
         marginRight: 'auto'
     }

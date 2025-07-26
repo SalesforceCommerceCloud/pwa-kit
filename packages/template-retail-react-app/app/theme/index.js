@@ -54,6 +54,17 @@ import ImageGallery from '@salesforce/retail-react-app/app/theme/components/proj
 // Please refer to the Chakra-Ui theme customization docs found
 // here https://chakra-ui.com/docs/theming/customize-theme to learn
 // more about extending and overriding themes for your project.
+
+
+const breakpoints = {
+  sm: '40em',   // 640px
+  md: '52em',   // 832px
+  lg: '100em',   // 1024px
+  xl: '120em',   // 1280px
+  '2xl': '160em' // 1536px
+}
+
+
 export const overrides = {
     styles,
     layerStyles,
@@ -62,6 +73,7 @@ export const overrides = {
     space,
     gradients,
     shadows,
+    breakpoints,
     components: {
         // base components
         Accordion,

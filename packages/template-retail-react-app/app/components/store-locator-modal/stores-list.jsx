@@ -8,6 +8,7 @@
 import React, {useEffect, useState} from 'react'
 import {useIntl} from 'react-intl'
 import PropTypes from 'prop-types'
+import { withComponentTag } from '../with-component-tag.js';
 
 // Components
 import {
@@ -128,4 +129,4 @@ StoresList.propTypes = {
     storesInfo: PropTypes.array
 }
 
-export default StoresList
+export default withComponentTag(StoresList)

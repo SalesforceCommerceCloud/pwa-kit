@@ -39,6 +39,7 @@ import Swatch from '@salesforce/retail-react-app/app/components/swatch-group/swa
 import SwatchGroup from '@salesforce/retail-react-app/app/components/swatch-group'
 import {getPriceData} from '@salesforce/retail-react-app/app/utils/product-utils'
 import PromoCallout from '@salesforce/retail-react-app/app/components/product-tile/promo-callout'
+import { withComponentTag } from '../with-component-tag.js';
 
 const ProductViewHeader = ({
     name,
@@ -701,4 +702,4 @@ ProductView.propTypes = {
     selectedBundleParentQuantity: PropTypes.number
 }
 
-export default ProductView
+export default withComponentTag(ProductView)

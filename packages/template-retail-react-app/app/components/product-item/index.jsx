@@ -33,6 +33,7 @@ import {noop} from '@salesforce/retail-react-app/app/utils/utils'
 
 // Hooks
 import {useCurrency, useDerivedProduct} from '@salesforce/retail-react-app/app/hooks'
+import { withComponentTag } from '../with-component-tag.js';
 
 /**
  * Component representing a product item usually in a list with details about the product - name, variant, pricing, etc.
@@ -185,4 +186,4 @@ ProductItem.propTypes = {
     secondaryActions: PropTypes.node
 }
 
-export default ProductItem
+export default withComponentTag(ProductItem)

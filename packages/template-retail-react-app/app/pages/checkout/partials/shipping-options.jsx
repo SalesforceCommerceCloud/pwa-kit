@@ -30,8 +30,9 @@ import {
 } from '@salesforce/commerce-sdk-react'
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
 import {useCurrency} from '@salesforce/retail-react-app/app/hooks'
+import { withComponentTag } from '@salesforce/retail-react-app/app/components/with-component-tag.js';
 
-export default function ShippingOptions() {
+function ShippingOptions() {
     const {formatMessage} = useIntl()
     const {step, STEPS, goToStep, goToNextStep} = useCheckout()
     const {data: basket} = useCurrentBasket()
@@ -267,3 +268,5 @@ export default function ShippingOptions() {
         </ToggleCard>
     )
 }
+
+export default withComponentTag(ShippingOptions);

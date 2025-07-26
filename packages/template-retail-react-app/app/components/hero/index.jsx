@@ -14,6 +14,7 @@ import {
     Stack,
     Image
 } from '@salesforce/retail-react-app/app/components/shared/ui'
+import { withComponentTag } from '../with-component-tag.js';
 
 const Hero = ({title, img, actions, ...props}) => {
     const {src, alt} = img
@@ -89,4 +90,4 @@ Hero.propTypes = {
     actions: PropTypes.element
 }
 
-export default Hero
+export default withComponentTag(Hero)

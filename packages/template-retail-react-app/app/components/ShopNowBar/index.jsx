@@ -2,6 +2,7 @@ import React from 'react';
 //import HorizontalGridLayout from '../HorizontalGridLayout';
 import ShopCategory from '../ShopCategory';
 import { Box, HStack } from '../shared/ui/index';
+import { withComponentTag } from '../with-component-tag.js';
 
 const ShopNowBar = () => {
     console.log('===========ShopNowBar===========\n');
@@ -26,4 +27,4 @@ const ShopNowBar = () => {
     );
 };
 
-export default ShopNowBar; 
+export default withComponentTag(ShopNowBar); 

@@ -16,6 +16,7 @@ import {
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 import {AccountIcon, BasketIcon} from '@salesforce/retail-react-app/app/components/icons'
 import Link from '@salesforce/retail-react-app/app/components/link'
+import { withComponentTag } from '@salesforce/retail-react-app/app/components/with-component-tag.js';
 
 const EmptyCart = ({isRegistered}) => {
     return (
@@ -89,4 +90,4 @@ const EmptyCart = ({isRegistered}) => {
 }
 EmptyCart.propTypes = {isRegistered: PropTypes.bool}
 
-export default EmptyCart
+export default withComponentTag(EmptyCart)

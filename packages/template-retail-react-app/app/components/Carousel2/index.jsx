@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { Box, Image, Text, AspectRatio } from '@chakra-ui/react';
+import { withComponentTag } from '../with-component-tag.js';
 
 const Carousel2 = ({ items, interval = 2000 }) => {
     const [currentIndex, setCurrentIndex] = useState(0);
@@ -65,4 +66,4 @@ Carousel2.propTypes = {
     interval: PropTypes.number
 };
 
-export default Carousel2;
+export default withComponentTag(Carousel2);

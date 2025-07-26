@@ -17,6 +17,7 @@ import {
     useBreakpointValue
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 import StoreLocatorContent from '@salesforce/retail-react-app/app/components/store-locator-modal/store-locator-content'
+import { withComponentTag } from '../with-component-tag.js';
 
 // Others
 import {
@@ -99,4 +100,4 @@ StoreLocatorModal.propTypes = {
     onClose: PropTypes.func
 }
 
-export default StoreLocatorModal
+export default withComponentTag(StoreLocatorModal)

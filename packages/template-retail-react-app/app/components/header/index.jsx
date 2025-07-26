@@ -52,6 +52,7 @@ import {HideOnDesktop, HideOnMobile} from '@salesforce/retail-react-app/app/comp
 import {isHydrated, noop} from '@salesforce/retail-react-app/app/utils/utils'
 import {STORE_LOCATOR_IS_ENABLED} from '@salesforce/retail-react-app/app/constants'
 const IconButtonWithRegistration = withRegistration(IconButton)
+import { withComponentTag } from '../with-component-tag.js';
 
 /**
  * Search bar for the header.
@@ -366,4 +367,4 @@ Header.propTypes = {
     ])
 }
 
-export default Header
+export default withComponentTag(Header)
