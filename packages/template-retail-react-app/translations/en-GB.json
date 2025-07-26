@@ -1,6 +1,4 @@
 {
-<<<<<<< HEAD
-=======
   "account.accordion.button.my_account": {
     "defaultMessage": "My Account"
   },
@@ -101,23 +99,65 @@
   "account_order_history.label.ordered_date": {
     "defaultMessage": "Ordered: {date}"
   },
-  "account_order_history.label.shipped_to": {
-    "defaultMessage": "Shipped to: {name}"
+  "account_order_history.label.pending_tracking_number": {
+    "defaultMessage": "Pending"
   },
-  "account_order_history.link.view_details": {
-    "defaultMessage": "View details"
+  "account_order_history.label.tracking_number": {
+    "defaultMessage": "Tracking Number"
+  },
+  "account_order_history.link.back_to_account": {
+    "defaultMessage": "Back to My Account"
+  },
+  "account_order_history.link.view_order_details": {
+    "defaultMessage": "View Order Details"
   },
   "account_order_history.title.order_history": {
     "defaultMessage": "Order History"
   },
-  "account_wishlist.button.continue_shopping": {
-    "defaultMessage": "Continue Shopping"
+  "account_payment_methods.button.add_payment_method": {
+    "defaultMessage": "Add Payment Method"
   },
-  "account_wishlist.description.continue_shopping": {
-    "defaultMessage": "Continue shopping and add items to your wishlist."
+  "account_payment_methods.info.payment_method_removed": {
+    "defaultMessage": "Payment method removed"
   },
-  "account_wishlist.heading.no_wishlist": {
-    "defaultMessage": "No Wishlist Items"
+  "account_payment_methods.info.payment_method_updated": {
+    "defaultMessage": "Payment method updated"
+  },
+  "account_payment_methods.info.saved_payment_method": {
+    "defaultMessage": "Saved payment method"
+  },
+  "account_payment_methods.page_action_placeholder.button.add_payment_method": {
+    "defaultMessage": "Add Payment Method"
+  },
+  "account_payment_methods.page_action_placeholder.heading.no_saved_payment_methods": {
+    "defaultMessage": "No Saved Payment Methods"
+  },
+  "account_payment_methods.page_action_placeholder.message.add_new_payment_method": {
+    "defaultMessage": "Add a new payment method for faster checkout."
+  },
+  "account_payment_methods.title.payment_methods": {
+    "defaultMessage": "Payment Methods"
+  },
+  "account_profile.button.update_profile": {
+    "defaultMessage": "Update Profile"
+  },
+  "account_profile.info.profile_updated": {
+    "defaultMessage": "Profile updated"
+  },
+  "account_profile.title.profile": {
+    "defaultMessage": "Profile"
+  },
+  "account_wishlist.button.add_to_wishlist": {
+    "defaultMessage": "Add to Wishlist"
+  },
+  "account_wishlist.button.remove_from_wishlist": {
+    "defaultMessage": "Remove from Wishlist"
+  },
+  "account_wishlist.info.added_to_wishlist": {
+    "defaultMessage": "Added to Wishlist"
+  },
+  "account_wishlist.info.removed_from_wishlist": {
+    "defaultMessage": "Removed from Wishlist"
   },
   "account_wishlist.title.wishlist": {
     "defaultMessage": "Wishlist"
@@ -1869,5 +1909,4 @@
   "with_registration.info.please_sign_in": {
     "defaultMessage": "Please sign in to continue!"
   }
->>>>>>> 576d020c54168397b7463e89ea71cf4022435e40
 }
