@@ -10,6 +10,21 @@
  * Functions for handling address autocomplete functionality
  */
 
+// Country code mapping for address parsing
+const COUNTRY_CODE_MAP = {
+    'USA': 'US',
+    'Canada': 'CA',
+}
+
+/**
+ * Resolve country code from country name
+ * @param {string} countryName - Full country name from address
+ * @returns {string} Standardized country code
+ */
+const resolveCountryCode = (countryName) => {
+    return COUNTRY_CODE_MAP[countryName] || countryName
+}
+
 /**
  * Convert Google Maps API suggestions to our expected format
  * @param {Array} suggestions - Array of suggestions from Google Maps API
@@ -188,9 +203,7 @@ export const parseFormattedAddress = (formattedAddress) => {
         city: addressFields['locality'],
         stateCode: addressFields['region'],
         postalCode: addressFields['postal-code'],
-        countryCode: addressFields['country-name'] === 'USA' ? 'US' : 
-                    addressFields['country-name'] === 'Canada' ? 'CA' : 
-                    addressFields['country-name']
+        countryCode: resolveCountryCode(addressFields['country-name'])
     }
 }
 
