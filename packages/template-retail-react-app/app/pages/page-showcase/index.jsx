@@ -280,6 +280,20 @@ const PageShowcase = () => {
         });
     };
 
+    React.useEffect(() => {
+        const handleBeforeUnload = () => {
+            const labels = document.querySelectorAll('.component-label');
+            labels.forEach(label => label.remove());
+        };
+
+        window.addEventListener('beforeunload', handleBeforeUnload);
+
+        return () => {
+            handleBeforeUnload();
+            window.removeEventListener('beforeunload', handleBeforeUnload);
+        };
+    }, []);
+
     return (
         <Box data-testid="page-showcase-page" layerStyle="page" minHeight="200vh">
             <ShowcaseTopBar />
