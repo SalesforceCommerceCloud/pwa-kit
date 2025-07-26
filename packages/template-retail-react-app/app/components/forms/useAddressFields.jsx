@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import {useIntl, defineMessages} from 'react-intl'
-import {useState, useCallback, useEffect} from 'react'
+import {useState, useCallback, useEffect, useRef} from 'react'
 import {formatPhoneNumber} from '@salesforce/retail-react-app/app/utils/phone-utils'
 import {
     stateOptions,
@@ -13,8 +13,7 @@ import {
 } from '@salesforce/retail-react-app/app/components/forms/state-province-options'
 import {SHIPPING_COUNTRY_CODES} from '@salesforce/retail-react-app/app/constants'
 import {
-    processAddressSuggestion,
-    setAddressFieldValues
+    processAddressSuggestion
 } from '@salesforce/retail-react-app/app/utils/address-suggestions'
 import {useAutocompleteSuggestions} from '@salesforce/retail-react-app/app/hooks/useAutocompleteSuggestions'
 
@@ -49,6 +48,7 @@ export default function useAddressFields({
         watch,
         control,
         setValue,
+        reset,
         formState: {errors}
     },
     prefix = ''
@@ -59,6 +59,8 @@ export default function useAddressFields({
     const [showDropdown, setShowDropdown] = useState(false) // dropdown is initially hidden
     const [isDismissed, setIsDismissed] = useState(false) // user has not dismissed the dropdown
     const [currentInput, setCurrentInput] = useState('') // current input value for autocomplete
+    const [isSettingFieldsProgrammatically, setIsSettingFieldsProgrammatically] = useState(false) // state to track when we're setting fields programmatically
+    const [previousCountry, setPreviousCountry] = useState(undefined) // state to track previous country code
 
     const countryCode = watch('countryCode')
 
@@ -70,17 +72,29 @@ export default function useAddressFields({
 
     // Reset address fields when country changes
     useEffect(() => {
-        // Clear address fields when country changes
-        setValue(`${prefix}address1`, '')
-        setValue(`${prefix}city`, '')
-        setValue(`${prefix}stateCode`, '')
-        setValue(`${prefix}postalCode`, '')
-        // Clear autocomplete suggestions
-        setCurrentInput('')
-        setShowDropdown(false)
-        setIsDismissed(false)
-        resetSession()
-    }, [countryCode, prefix, setValue, resetSession])
+        // Only clear fields if we're not currently setting fields programmatically
+        if (isSettingFieldsProgrammatically) {
+            return
+        }
+        
+        // Only clear fields if the country actually changed from a previous value
+        // and we have a previous value (not initial load)
+        if (countryCode && previousCountry !== undefined && countryCode !== previousCountry) {
+            // Clear address fields when country changes
+            setValue(`${prefix}address1`, '')
+            setValue(`${prefix}city`, '')
+            setValue(`${prefix}stateCode`, '')
+            setValue(`${prefix}postalCode`, '')
+            // Clear autocomplete suggestions
+            setCurrentInput('')
+            setShowDropdown(false)
+            setIsDismissed(false)
+            resetSession()
+        }
+        
+        // Update the previous country after checking for changes
+        setPreviousCountry(countryCode)
+    }, [countryCode, prefix, setValue, resetSession, isSettingFieldsProgrammatically, previousCountry])
 
     // Handle address input changes
     const handleAddressInputChange = useCallback((value) => {
@@ -152,22 +166,35 @@ export default function useAddressFields({
     const handleSuggestionSelect = useCallback(
         async (suggestion) => {
             try {
+                // Set flag to prevent country change effect from running
+                setIsSettingFieldsProgrammatically(true)
+                
                 // Process address suggestion using unified utility method
                 const addressFields = await processAddressSuggestion(suggestion)
 
-                // Set all address field values using the utility function
-                setAddressFieldValues(setValue, prefix, addressFields)
-
+                // Set all fields directly using setValue
+                setValue(`${prefix}address1`, addressFields.address1 || '')
+                setValue(`${prefix}city`, addressFields.city || '')
+                setValue(`${prefix}stateCode`, addressFields.stateCode || '')
+                setValue(`${prefix}postalCode`, addressFields.postalCode || '')
+                setValue(`${prefix}countryCode`, addressFields.countryCode || 'US')
+                
                 // Reset session token after selecting a place
                 resetSession()
                 setShowDropdown(false)
                 setIsDismissed(true)
                 setCurrentInput('')
+                
+                // Clear the flag after setting fields
+                setTimeout(() => {
+                    setIsSettingFieldsProgrammatically(false)
+                }, 100)
             } catch (error) {
                 console.error('Error parsing address suggestion:', error)
+                setIsSettingFieldsProgrammatically(false)
             }
         },
-        [prefix, setValue, resetSession]
+        [prefix, setValue, resetSession, setIsSettingFieldsProgrammatically]
     )
 
     // Define address fields
