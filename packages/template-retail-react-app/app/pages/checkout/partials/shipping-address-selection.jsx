@@ -187,20 +187,12 @@ const ShippingAddressSelection = ({
                 addressId: matchedAddress.addressId,
                 ...matchedAddress
             })
-        } else if (selectedAddress && Object.keys(selectedAddress).length > 0) {
-            // If we have a selectedAddress but no matchedAddress, it means this is a new/unsaved address
-            // We should populate the form with this address data
-            form.reset({...selectedAddress})
-            // If this is a new address (not saved), we should be in edit mode
-            if (!selectedAddress.addressId) {
-                setIsEditingAddress(true)
-            }
         }
 
         if (!matchedAddress && selectedAddressId) {
             setIsEditingAddress(true)
         }
-    }, [matchedAddress, selectedAddress, selectedAddressId, form])
+    }, [matchedAddress])
 
     // Updates the selected customer address if we've an address selected
     // else saves a new customer address
