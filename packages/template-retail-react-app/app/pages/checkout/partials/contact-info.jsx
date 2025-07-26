@@ -81,7 +81,6 @@ const ContactInfo = ({isSocialEnabled = false, isPasswordlessEnabled = false, id
 
     const [authModalView, setAuthModalView] = useState(PASSWORD_VIEW)
     const authModal = useAuthModal(authModalView)
-    const [isPasswordlessLoginClicked, setIsPasswordlessLoginClicked] = useState(false)
     const passwordlessConfigCallback = getConfig().app.login?.passwordless?.callbackURI
     const callbackURL = isAbsoluteURL(passwordlessConfigCallback)
         ? passwordlessConfigCallback
@@ -108,11 +107,6 @@ const ContactInfo = ({isSocialEnabled = false, isPasswordlessEnabled = false, id
 
     const submitForm = async (data) => {
         setError(null)
-        if (isPasswordlessLoginClicked) {
-            handlePasswordlessLogin(data.email)
-            setIsPasswordlessLoginClicked(false)
-            return
-        }
         try {
             if (!data.password) {
                 await updateCustomerForBasket.mutateAsync({
@@ -167,8 +161,15 @@ const ContactInfo = ({isSocialEnabled = false, isPasswordlessEnabled = false, id
         }
     }, [showPasswordField])
 
-    const onPasswordlessLoginClick = async () => {
-        setIsPasswordlessLoginClicked(true)
+    const onPasswordlessLoginClick = async (e) => {
+        const isValid = await form.trigger('email')
+        const domForm = e.target.closest('form')
+        if (isValid && domForm.checkValidity()) {
+            const email = form.getValues().email
+            await handlePasswordlessLogin(email)
+        } else {
+            domForm.reportValidity()
+        }
     }
 
     return (

@@ -30,7 +30,14 @@ import {useIntl} from 'react-intl'
 /**
  * A Modal that contains Product View for product bundle
  */
-const BundleProductViewModal = ({product: bundle, isOpen, onClose, updateCart, ...props}) => {
+const BundleProductViewModal = ({
+    product: bundle,
+    isOpen,
+    onClose,
+    updateCart,
+    showDeliveryOptions,
+    ...props
+}) => {
     const productViewModalData = useProductViewModal(bundle)
     const {variationParams} = useDerivedProduct(bundle)
     const childProductRefs = useRef({})
@@ -44,7 +51,9 @@ const BundleProductViewModal = ({product: bundle, isOpen, onClose, updateCart, .
     let childProductIds = productViewModalData.product?.bundledProductItems
         ?.map(({productId}) => productId)
         .join(',')
-    const productIds = selectedChildProducts.map(({variant}) => variant.productId).join(',')
+    const productIds = selectedChildProducts
+        .map(({variant, product}) => variant?.productId || product?.id)
+        .join(',')
     if (productIds?.length > 0 && productIds !== childProductIds) {
         childProductIds = productIds
     }
@@ -98,6 +107,7 @@ const BundleProductViewModal = ({product: bundle, isOpen, onClose, updateCart, .
                                 <ProductView
                                     showFullLink={false}
                                     showImageGallery={trueIfMobile}
+                                    showDeliveryOptions={showDeliveryOptions}
                                     product={productViewModalData.product}
                                     isLoading={productViewModalData.isFetching}
                                     updateCart={(product, quantity) =>
@@ -134,6 +144,7 @@ const BundleProductViewModal = ({product: bundle, isOpen, onClose, updateCart, .
                                                 }
                                             }}
                                             showImageGallery={false}
+                                            showDeliveryOptions={false}
                                             isProductPartOfBundle={true}
                                             showFullLink={false}
                                             product={product}
@@ -167,7 +178,8 @@ BundleProductViewModal.propTypes = {
     onClose: PropTypes.func.isRequired,
     product: PropTypes.object,
     isLoading: PropTypes.bool,
-    updateCart: PropTypes.func
+    updateCart: PropTypes.func,
+    showDeliveryOptions: PropTypes.bool
 }
 
 export default BundleProductViewModal

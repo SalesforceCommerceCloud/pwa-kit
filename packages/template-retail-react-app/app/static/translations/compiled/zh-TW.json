@@ -340,7 +340,7 @@
   "add_to_cart_modal.link.checkout": [
     {
       "type": 0,
-      "value": "繼續以結帳"
+      "value": "前往結帳"
     }
   ],
   "add_to_cart_modal.link.view_cart": [
@@ -361,6 +361,40 @@
       "value": "關閉登入表單"
     }
   ],
+  "auth_modal.check_email.button.resend_link": [
+    {
+      "type": 0,
+      "value": "重新傳送連結"
+    }
+  ],
+  "auth_modal.check_email.description.check_spam_folder": [
+    {
+      "type": 0,
+      "value": "連結可能需要幾分鐘才會送達，若您未收到，請檢查垃圾郵件資料夾"
+    }
+  ],
+  "auth_modal.check_email.description.just_sent": [
+    {
+      "type": 0,
+      "value": "我們剛剛已傳送登入連結至 "
+    },
+    {
+      "children": [
+        {
+          "type": 1,
+          "value": "email"
+        }
+      ],
+      "type": 8,
+      "value": "b"
+    }
+  ],
+  "auth_modal.check_email.title.check_your_email": [
+    {
+      "type": 0,
+      "value": "檢查您的電子郵件"
+    }
+  ],
   "auth_modal.description.now_signed_in": [
     {
       "type": 0,
@@ -375,12 +409,16 @@
   ],
   "auth_modal.info.welcome_user": [
     {
+      "type": 0,
+      "value": "歡迎 "
+    },
+    {
       "type": 1,
       "value": "name"
     },
     {
       "type": 0,
-      "value": "，歡迎："
+      "value": "，"
     }
   ],
   "auth_modal.password_reset_success.button.back_to_sign_in": [
@@ -433,6 +471,16 @@
       "value": "已從購物車移除商品"
     }
   ],
+  "cart.product_edit_modal.modal_label": [
+    {
+      "type": 1,
+      "value": "productName"
+    },
+    {
+      "type": 0,
+      "value": " 的編輯互動視窗 (modal)"
+    }
+  ],
   "cart.recommended_products.title.may_also_like": [
     {
       "type": 0,
@@ -448,7 +496,7 @@
   "cart_cta.link.checkout": [
     {
       "type": 0,
-      "value": "繼續以結帳"
+      "value": "前往結帳"
     }
   ],
   "cart_secondary_button_group.action.added_to_wishlist": [
@@ -533,6 +581,12 @@
     {
       "type": 0,
       "value": ")"
+    }
+  ],
+  "category_links.button_text": [
+    {
+      "type": 0,
+      "value": "類別"
     }
   ],
   "cc_radio_group.action.remove": [
@@ -647,6 +701,24 @@
     {
       "type": 0,
       "value": "運送"
+    }
+  ],
+  "checkout_confirmation.label.shipping.strikethrough.price": [
+    {
+      "type": 0,
+      "value": "原本 "
+    },
+    {
+      "type": 1,
+      "value": "originalPrice"
+    },
+    {
+      "type": 0,
+      "value": " ，現在 "
+    },
+    {
+      "type": 1,
+      "value": "newPrice"
     }
   ],
   "checkout_confirmation.label.subtotal": [
@@ -815,6 +887,12 @@
       "value": "信用卡"
     }
   ],
+  "checkout_payment.label.billing_address_form": [
+    {
+      "type": 0,
+      "value": "帳單地址表單"
+    }
+  ],
   "checkout_payment.label.same_as_shipping": [
     {
       "type": 0,
@@ -857,6 +935,18 @@
       "value": "是"
     }
   ],
+  "confirmation_modal.default.assistive_msg.no": [
+    {
+      "type": 0,
+      "value": "否，取消動作"
+    }
+  ],
+  "confirmation_modal.default.assistive_msg.yes": [
+    {
+      "type": 0,
+      "value": "是，確認動作"
+    }
+  ],
   "confirmation_modal.default.message.you_want_to_continue": [
     {
       "type": 0,
@@ -882,6 +972,24 @@
     }
   ],
   "confirmation_modal.remove_cart_item.action.yes": [
+    {
+      "type": 0,
+      "value": "是，移除商品"
+    }
+  ],
+  "confirmation_modal.remove_cart_item.assistive_msg.no": [
+    {
+      "type": 0,
+      "value": "否，保留商品"
+    }
+  ],
+  "confirmation_modal.remove_cart_item.assistive_msg.remove": [
+    {
+      "type": 0,
+      "value": "移除無法提供的產品"
+    }
+  ],
+  "confirmation_modal.remove_cart_item.assistive_msg.yes": [
     {
       "type": 0,
       "value": "是，移除商品"
@@ -947,6 +1055,12 @@
       "value": "已經有帳戶了？登入"
     }
   ],
+  "contact_info.button.back_to_sign_in_options": [
+    {
+      "type": 0,
+      "value": "返回登入選項"
+    }
+  ],
   "contact_info.button.checkout_as_guest": [
     {
       "type": 0,
@@ -959,6 +1073,18 @@
       "value": "登入"
     }
   ],
+  "contact_info.button.password": [
+    {
+      "type": 0,
+      "value": "密碼"
+    }
+  ],
+  "contact_info.button.secure_link": [
+    {
+      "type": 0,
+      "value": "安全連結"
+    }
+  ],
   "contact_info.error.incorrect_username_or_password": [
     {
       "type": 0,
@@ -969,6 +1095,12 @@
     {
       "type": 0,
       "value": "忘記密碼了嗎？"
+    }
+  ],
+  "contact_info.message.or_login_with": [
+    {
+      "type": 0,
+      "value": "或使用下列方式登入"
     }
   ],
   "contact_info.title.contact_info": [
@@ -993,6 +1125,98 @@
     {
       "type": 0,
       "value": "安全碼資訊"
+    }
+  ],
+  "display_price.assistive_msg.current_price": [
+    {
+      "type": 0,
+      "value": "目前價格 "
+    },
+    {
+      "type": 1,
+      "value": "currentPrice"
+    }
+  ],
+  "display_price.assistive_msg.current_price_with_range": [
+    {
+      "type": 0,
+      "value": "從目前價格 "
+    },
+    {
+      "type": 1,
+      "value": "currentPrice"
+    }
+  ],
+  "display_price.assistive_msg.strikethrough_price": [
+    {
+      "type": 0,
+      "value": "原價 "
+    },
+    {
+      "type": 1,
+      "value": "listPrice"
+    }
+  ],
+  "display_price.assistive_msg.strikethrough_price_with_range": [
+    {
+      "type": 0,
+      "value": "從原價 "
+    },
+    {
+      "type": 1,
+      "value": "listPrice"
+    }
+  ],
+  "display_price.label.current_price_with_range": [
+    {
+      "type": 0,
+      "value": "從 "
+    },
+    {
+      "type": 1,
+      "value": "currentPrice"
+    }
+  ],
+  "dnt_notification.button.accept": [
+    {
+      "type": 0,
+      "value": "接受"
+    }
+  ],
+  "dnt_notification.button.assistive_msg.accept": [
+    {
+      "type": 0,
+      "value": "接受追蹤"
+    }
+  ],
+  "dnt_notification.button.assistive_msg.close": [
+    {
+      "type": 0,
+      "value": "關閉同意追蹤表"
+    }
+  ],
+  "dnt_notification.button.assistive_msg.decline": [
+    {
+      "type": 0,
+      "value": "拒絕追蹤"
+    }
+  ],
+  "dnt_notification.button.decline": [
+    {
+      "type": 0,
+      "value": "拒絕"
+    }
+  ],
+  "dnt_notification.description": [
+    {
+      "type": 0,
+      "value": "Lorem ipsum dolor sit amet， consectetur adipiscing elit， sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.Ut enim ad minim veniam， quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur."
+    }
+  ],
+  "dnt_notification.title": [
+    {
+      "type": 0,
+      "value": "同意追蹤"
     }
   ],
   "drawer_menu.button.account_details": [
@@ -1023,6 +1247,12 @@
     {
       "type": 0,
       "value": "訂單記錄"
+    }
+  ],
+  "drawer_menu.header.assistive_msg.title": [
+    {
+      "type": 0,
+      "value": "隱藏式側選單"
     }
   ],
   "drawer_menu.link.about_us": [
@@ -1279,6 +1509,12 @@
       "value": "條款與條件"
     }
   ],
+  "footer.locale_selector.assistive_msg": [
+    {
+      "type": 0,
+      "value": "選擇語言"
+    }
+  ],
   "footer.message.copyright": [
     {
       "type": 0,
@@ -1295,6 +1531,12 @@
     {
       "type": 0,
       "value": "註冊來獲得最熱門的優惠消息"
+    }
+  ],
+  "footer.subscribe.email.assistive_msg": [
+    {
+      "type": 0,
+      "value": "電子報的電子郵件地址"
     }
   ],
   "footer.subscribe.heading.first_to_know": [
@@ -1337,6 +1579,24 @@
     {
       "type": 0,
       "value": "願望清單"
+    }
+  ],
+  "global.error.create_account": [
+    {
+      "type": 0,
+      "value": "目前不支援此功能。您必須建立帳戶才能存取此功能。"
+    }
+  ],
+  "global.error.feature_unavailable": [
+    {
+      "type": 0,
+      "value": "目前不支援此功能。"
+    }
+  ],
+  "global.error.invalid_token": [
+    {
+      "type": 0,
+      "value": "權杖無效，請再試一次。"
     }
   ],
   "global.error.something_went_wrong": [
@@ -1413,6 +1673,12 @@
       "value": "選單"
     }
   ],
+  "header.button.assistive_msg.menu.open_dialog": [
+    {
+      "type": 0,
+      "value": "開啟對話方塊"
+    }
+  ],
   "header.button.assistive_msg.my_account": [
     {
       "type": 0,
@@ -1433,6 +1699,12 @@
     {
       "type": 1,
       "value": "numItems"
+    }
+  ],
+  "header.button.assistive_msg.store_locator": [
+    {
+      "type": 0,
+      "value": "商店位置搜尋"
     }
   ],
   "header.button.assistive_msg.wishlist": [
@@ -1480,7 +1752,7 @@
   "home.description.shop_products": [
     {
       "type": 0,
-      "value": "此區塊包含來自目錄的內容。"
+      "value": "此區塊包含來自目錄的內容。請"
     },
     {
       "type": 1,
@@ -1488,7 +1760,7 @@
     },
     {
       "type": 0,
-      "value": "來了解如何取代。"
+      "value": "來瞭解如何替換。"
     }
   ],
   "home.features.description.cart_checkout": [
@@ -1620,7 +1892,7 @@
   "home.title.react_starter_store": [
     {
       "type": 0,
-      "value": "零售型 React PWA Starter Store"
+      "value": "適用於零售的 React PWA 入門商店"
     }
   ],
   "icons.assistive_msg.lock": [
@@ -1645,6 +1917,12 @@
       "value": "quantity"
     }
   ],
+  "item_attributes.label.selected_options": [
+    {
+      "type": 0,
+      "value": "已選取的選項"
+    }
+  ],
   "item_image.label.sale": [
     {
       "type": 0,
@@ -1657,10 +1935,28 @@
       "value": "不可用"
     }
   ],
-  "item_price.label.starting_at": [
+  "item_variant.assistive_msg.quantity": [
     {
       "type": 0,
-      "value": "起始"
+      "value": "數量 "
+    },
+    {
+      "type": 1,
+      "value": "quantity"
+    }
+  ],
+  "item_variant.quantity.label": [
+    {
+      "type": 1,
+      "value": "productName"
+    },
+    {
+      "type": 0,
+      "value": " 的數量選擇器 。 選擇的數量是 "
+    },
+    {
+      "type": 1,
+      "value": "quantity"
     }
   ],
   "lCPCxk": [
@@ -1999,6 +2295,36 @@
       "value": "建立帳戶"
     }
   ],
+  "login_form.button.apple": [
+    {
+      "type": 0,
+      "value": "Apple"
+    }
+  ],
+  "login_form.button.back": [
+    {
+      "type": 0,
+      "value": "返回登入選項"
+    }
+  ],
+  "login_form.button.continue_securely": [
+    {
+      "type": 0,
+      "value": "安全地繼續"
+    }
+  ],
+  "login_form.button.google": [
+    {
+      "type": 0,
+      "value": "Google"
+    }
+  ],
+  "login_form.button.password": [
+    {
+      "type": 0,
+      "value": "密碼"
+    }
+  ],
   "login_form.button.sign_in": [
     {
       "type": 0,
@@ -2015,6 +2341,12 @@
     {
       "type": 0,
       "value": "沒有帳戶嗎？"
+    }
+  ],
+  "login_form.message.or_login_with": [
+    {
+      "type": 0,
+      "value": "或使用下列方式登入"
     }
   ],
   "login_form.message.welcome_back": [
@@ -2179,6 +2511,12 @@
       "value": " 頁"
     }
   ],
+  "pagination.field.page_number_select": [
+    {
+      "type": 0,
+      "value": "選擇頁碼"
+    }
+  ],
   "pagination.link.next": [
     {
       "type": 0,
@@ -2251,10 +2589,22 @@
       "value": "1 個大寫字母"
     }
   ],
+  "password_reset_success.toast": [
+    {
+      "type": 0,
+      "value": "成功重設密碼"
+    }
+  ],
   "payment_selection.heading.credit_card": [
     {
       "type": 0,
       "value": "信用卡"
+    }
+  ],
+  "payment_selection.radio_group.assistive_msg": [
+    {
+      "type": 0,
+      "value": "付款"
     }
   ],
   "payment_selection.tooltip.secure_payment": [
@@ -2445,6 +2795,12 @@
       "value": "sortOption"
     }
   ],
+  "product_list.sort_by.label.assistive_msg": [
+    {
+      "type": 0,
+      "value": "產品排序方式依"
+    }
+  ],
   "product_scroller.assistive_msg.scroll_left": [
     {
       "type": 0,
@@ -2481,14 +2837,28 @@
       "value": "product"
     }
   ],
-  "product_tile.label.starting_at_price": [
-    {
-      "type": 1,
-      "value": "price"
-    },
+  "product_tile.badge.label.new": [
     {
       "type": 0,
-      "value": " 起"
+      "value": "新增"
+    }
+  ],
+  "product_tile.badge.label.sale": [
+    {
+      "type": 0,
+      "value": "特價"
+    }
+  ],
+  "product_view.button.add_bundle_to_cart": [
+    {
+      "type": 0,
+      "value": "新增搭售方案到購物車"
+    }
+  ],
+  "product_view.button.add_bundle_to_wishlist": [
+    {
+      "type": 0,
+      "value": "新增搭售方案到願望清單"
     }
   ],
   "product_view.button.add_set_to_cart": [
@@ -2523,14 +2893,22 @@
   ],
   "product_view.label.assistive_msg.quantity_decrement": [
     {
+      "type": 1,
+      "value": "productName"
+    },
+    {
       "type": 0,
-      "value": "遞減數量"
+      "value": " 的遞減數量"
     }
   ],
   "product_view.label.assistive_msg.quantity_increment": [
     {
+      "type": 1,
+      "value": "productName"
+    },
+    {
       "type": 0,
-      "value": "遞增數量"
+      "value": " 的遞增數量"
     }
   ],
   "product_view.label.quantity": [
@@ -2549,12 +2927,6 @@
     {
       "type": 0,
       "value": "+"
-    }
-  ],
-  "product_view.label.starting_at_price": [
-    {
-      "type": 0,
-      "value": "起始"
     }
   ],
   "product_view.label.variant_type": [
@@ -2603,6 +2975,12 @@
     {
       "type": 0,
       "value": "我的個人資料"
+    }
+  ],
+  "profile_fields.label.profile_form": [
+    {
+      "type": 0,
+      "value": "設定檔表單"
     }
   ],
   "promo_code_fields.button.apply": [
@@ -2701,38 +3079,6 @@
       "value": "建立帳戶，就能搶先獲得最棒產品、靈感來源和社群最新消息。"
     }
   ],
-  "reset_password.button.back_to_sign_in": [
-    {
-      "type": 0,
-      "value": "返回登入"
-    }
-  ],
-  "reset_password.info.receive_email_shortly": [
-    {
-      "type": 0,
-      "value": "您很快就會在 "
-    },
-    {
-      "children": [
-        {
-          "type": 1,
-          "value": "email"
-        }
-      ],
-      "type": 8,
-      "value": "b"
-    },
-    {
-      "type": 0,
-      "value": " 收到一封電子郵件，內含重設密碼的連結。"
-    }
-  ],
-  "reset_password.title.password_reset": [
-    {
-      "type": 0,
-      "value": "重設密碼"
-    }
-  ],
   "reset_password_form.action.sign_in": [
     {
       "type": 0,
@@ -2784,7 +3130,33 @@
   "shipping_address.button.continue_to_shipping": [
     {
       "type": 0,
-      "value": "繼續前往運送方式"
+      "value": "繼續前往送貨方式"
+    }
+  ],
+  "shipping_address.label.edit_button": [
+    {
+      "type": 0,
+      "value": "編輯 "
+    },
+    {
+      "type": 1,
+      "value": "address"
+    }
+  ],
+  "shipping_address.label.remove_button": [
+    {
+      "type": 0,
+      "value": "移除 "
+    },
+    {
+      "type": 1,
+      "value": "address"
+    }
+  ],
+  "shipping_address.label.shipping_address_form": [
+    {
+      "type": 0,
+      "value": "送貨地址表單"
     }
   ],
   "shipping_address.title.shipping_address": [
@@ -2877,6 +3249,170 @@
       "value": "確定要登出嗎？您必須重新登入，才能繼續目前的訂單流程。"
     }
   ],
+  "social_login_redirect.message.authenticating": [
+    {
+      "type": 0,
+      "value": "進行驗證..."
+    }
+  ],
+  "social_login_redirect.message.redirect_link": [
+    {
+      "type": 0,
+      "value": "若未被重新導向，請按一下 "
+    },
+    {
+      "children": [
+        {
+          "type": 0,
+          "value": "此連結"
+        }
+      ],
+      "type": 8,
+      "value": "link"
+    },
+    {
+      "type": 0,
+      "value": " 以繼續。"
+    }
+  ],
+  "store_locator.action.find": [
+    {
+      "type": 0,
+      "value": "尋找"
+    }
+  ],
+  "store_locator.action.select_a_country": [
+    {
+      "type": 0,
+      "value": "選擇國家/地區"
+    }
+  ],
+  "store_locator.action.use_my_location": [
+    {
+      "type": 0,
+      "value": "使用我的位置"
+    }
+  ],
+  "store_locator.action.viewMore": [
+    {
+      "type": 0,
+      "value": "檢視更多"
+    }
+  ],
+  "store_locator.description.away": [
+    {
+      "type": 0,
+      "value": "離開"
+    }
+  ],
+  "store_locator.description.loading_locations": [
+    {
+      "type": 0,
+      "value": "載入位置..."
+    }
+  ],
+  "store_locator.description.no_locations": [
+    {
+      "type": 0,
+      "value": "對不起，此區域沒有位置"
+    }
+  ],
+  "store_locator.description.or": [
+    {
+      "type": 0,
+      "value": "或"
+    }
+  ],
+  "store_locator.description.phone": [
+    {
+      "type": 0,
+      "value": "電話："
+    }
+  ],
+  "store_locator.description.viewing_near_postal_code": [
+    {
+      "type": 0,
+      "value": "檢視在 "
+    },
+    {
+      "type": 1,
+      "value": "postalCode"
+    },
+    {
+      "type": 0,
+      "value": " 的 "
+    },
+    {
+      "type": 1,
+      "value": "distance"
+    },
+    {
+      "type": 0,
+      "value": " "
+    },
+    {
+      "type": 1,
+      "value": "distanceUnit"
+    },
+    {
+      "type": 0,
+      "value": " 商店"
+    }
+  ],
+  "store_locator.description.viewing_near_your_location": [
+    {
+      "type": 0,
+      "value": "檢視您所在附近的商店位置"
+    }
+  ],
+  "store_locator.dropdown.germany": [
+    {
+      "type": 0,
+      "value": "德國"
+    }
+  ],
+  "store_locator.dropdown.united_states": [
+    {
+      "type": 0,
+      "value": "美國"
+    }
+  ],
+  "store_locator.error.agree_to_share_your_location": [
+    {
+      "type": 0,
+      "value": "請同意分享您的位置"
+    }
+  ],
+  "store_locator.error.please_enter_a_postal_code": [
+    {
+      "type": 0,
+      "value": "請輸入郵遞區號。"
+    }
+  ],
+  "store_locator.error.please_select_a_country": [
+    {
+      "type": 0,
+      "value": "請選擇國家/地區。"
+    }
+  ],
+  "store_locator.field.placeholder.enter_postal_code": [
+    {
+      "type": 0,
+      "value": "輸入郵遞區號"
+    }
+  ],
+  "store_locator.pagination.load_more": [
+    {
+      "type": 0,
+      "value": "載入更多"
+    }
+  ],
+  "store_locator.title": [
+    {
+      "type": 0,
+      "value": "尋找商店"
+    }
+  ],
   "swatch_group.selected.label": [
     {
       "type": 1,
@@ -2891,6 +3427,30 @@
     {
       "type": 0,
       "value": "編輯"
+    }
+  ],
+  "toggle_card.action.editContactInfo": [
+    {
+      "type": 0,
+      "value": "編輯聯絡資訊"
+    }
+  ],
+  "toggle_card.action.editPaymentInfo": [
+    {
+      "type": 0,
+      "value": "編輯付款資訊"
+    }
+  ],
+  "toggle_card.action.editShippingAddress": [
+    {
+      "type": 0,
+      "value": "編輯運送地址"
+    }
+  ],
+  "toggle_card.action.editShippingOptions": [
+    {
+      "type": 0,
+      "value": "編輯運送選項"
     }
   ],
   "update_password_fields.button.forgot_password": [
@@ -2944,7 +3504,7 @@
   "use_address_fields.error.please_select_your_state_or_province": [
     {
       "type": 0,
-      "value": "請選擇您的州/省。"
+      "value": "請選擇您所在的州。"
     }
   ],
   "use_address_fields.error.required": [
@@ -3153,10 +3713,38 @@
       "value": " 個！"
     }
   ],
+  "use_product.message.inventory_remaining_for_product": [
+    {
+      "type": 1,
+      "value": "productName"
+    },
+    {
+      "type": 0,
+      "value": "只剩下 "
+    },
+    {
+      "type": 1,
+      "value": "stockLevel"
+    },
+    {
+      "type": 0,
+      "value": "！"
+    }
+  ],
   "use_product.message.out_of_stock": [
     {
       "type": 0,
       "value": "缺貨"
+    }
+  ],
+  "use_product.message.out_of_stock_for_product": [
+    {
+      "type": 0,
+      "value": "缺貨 "
+    },
+    {
+      "type": 1,
+      "value": "productName"
     }
   ],
   "use_profile_fields.error.required_email": [
@@ -3351,6 +3939,18 @@
       "value": "密碼必須包含至少 8 個字元。"
     }
   ],
+  "use_update_password_fields.error.password_mismatch": [
+    {
+      "type": 0,
+      "value": "密碼不相符。"
+    }
+  ],
+  "use_update_password_fields.error.required_confirm_password": [
+    {
+      "type": 0,
+      "value": "請確認您的密碼。"
+    }
+  ],
   "use_update_password_fields.error.required_new_password": [
     {
       "type": 0,
@@ -3375,6 +3975,12 @@
       "value": "密碼必須包含至少 1 個大寫字母。"
     }
   ],
+  "use_update_password_fields.label.confirm_new_password": [
+    {
+      "type": 0,
+      "value": "確認新密碼"
+    }
+  ],
   "use_update_password_fields.label.current_password": [
     {
       "type": 0,
@@ -3385,6 +3991,34 @@
     {
       "type": 0,
       "value": "新密碼"
+    }
+  ],
+  "wishlist_primary_action.button.addSetToCart.label": [
+    {
+      "type": 0,
+      "value": "新增 "
+    },
+    {
+      "type": 1,
+      "value": "productName"
+    },
+    {
+      "type": 0,
+      "value": " 組合至購物車"
+    }
+  ],
+  "wishlist_primary_action.button.addToCart.label": [
+    {
+      "type": 0,
+      "value": "新增 "
+    },
+    {
+      "type": 1,
+      "value": "productName"
+    },
+    {
+      "type": 0,
+      "value": " 至購物車"
     }
   ],
   "wishlist_primary_action.button.add_set_to_cart": [
@@ -3399,6 +4033,20 @@
       "value": "新增至購物車"
     }
   ],
+  "wishlist_primary_action.button.viewFullDetails.label": [
+    {
+      "type": 0,
+      "value": "檢視 "
+    },
+    {
+      "type": 1,
+      "value": "productName"
+    },
+    {
+      "type": 0,
+      "value": " 完整詳細資訊"
+    }
+  ],
   "wishlist_primary_action.button.view_full_details": [
     {
       "type": 0,
@@ -3409,6 +4057,20 @@
     {
       "type": 0,
       "value": "檢視選項"
+    }
+  ],
+  "wishlist_primary_action.button.view_options.label": [
+    {
+      "type": 0,
+      "value": "檢視 "
+    },
+    {
+      "type": 1,
+      "value": "productName"
+    },
+    {
+      "type": 0,
+      "value": " 的選項"
     }
   ],
   "wishlist_primary_action.info.added_to_cart": [
@@ -3453,6 +4115,16 @@
     {
       "type": 0,
       "value": "移除"
+    }
+  ],
+  "wishlist_secondary_button_group.info.item.remove.label": [
+    {
+      "type": 0,
+      "value": "移除 "
+    },
+    {
+      "type": 1,
+      "value": "productName"
     }
   ],
   "wishlist_secondary_button_group.info.item_removed": [

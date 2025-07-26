@@ -1,49 +1,35 @@
 /*
- * Copyright (c) 2021, salesforce.com, inc.
+ * Copyright (c) 2024, salesforce.com, inc.
  * All rights reserved.
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
 import React from 'react'
+import {Box, Container} from '@chakra-ui/react'
+import {StoreLocator} from '@salesforce/retail-react-app/app/components/store-locator'
 
-// Components
-import {Box, Container} from '@salesforce/retail-react-app/app/components/shared/ui'
-import Seo from '@salesforce/retail-react-app/app/components/seo'
-import StoreLocatorContent from '@salesforce/retail-react-app/app/components/store-locator-modal/store-locator-content'
-
-// Others
-import {
-    StoreLocatorContext,
-    useStoreLocator
-} from '@salesforce/retail-react-app/app/components/store-locator-modal/index'
-
-const StoreLocator = () => {
-    const storeLocator = useStoreLocator()
-
+const StoreLocatorPage = () => {
     return (
-        <StoreLocatorContext.Provider value={storeLocator}>
-            <Box data-testid="store-locator-page" bg="gray.50" py={[8, 16]}>
-                <Seo title="Store Locator" description="Find a Store" />
-                <Container
-                    overflowY="scroll"
-                    paddingTop={8}
-                    width={['90%']}
-                    bg="white"
-                    paddingBottom={14}
-                    marginTop={8}
-                    marginBottom={8}
-                    borderRadius="base"
-                >
-                    <StoreLocatorContent />
-                </Container>
-            </Box>
-        </StoreLocatorContext.Provider>
+        <Box data-testid="store-locator-page" bg="gray.50" py={[8, 16]}>
+            <Container
+                overflowY="scroll"
+                paddingTop={8}
+                width={['90%']}
+                bg="white"
+                paddingBottom={14}
+                marginTop={8}
+                marginBottom={8}
+                borderRadius="base"
+            >
+                <StoreLocator />
+            </Container>
+        </Box>
     )
 }
 
-StoreLocator.getTemplateName = () => 'store-locator'
+StoreLocatorPage.getTemplateName = () => 'store-locator'
 
-StoreLocator.propTypes = {}
+StoreLocatorPage.propTypes = {}
 
-export default StoreLocator
+export default StoreLocatorPage

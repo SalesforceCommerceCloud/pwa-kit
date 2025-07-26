@@ -1,0 +1,239 @@
+{
+    "description": "Document representing a category.",
+    "properties": {
+        "c_alternativeUrl": {
+            "$ref": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/markup_text",
+            "description": "Renders an alternative URL in main navigation. Uses Commerce Cloud content url notation. For example: $url('Account-Show')$ or normal URL http://xchange.demandware.com",
+            "x-label": {
+                "default": "Alternative URL"
+            }
+        },
+        "c_catBannerID": {
+            "description": "Used to define the content asset used to populate a grid page banner for a category. This value is applied to all sub-category navigation (cascading) if no specific catBannerID has been defined for  a sub-category.",
+            "x-label": {
+                "default": "Category Banner ID"
+            },
+            "type": "string"
+        },
+        "c_customCSSFile": {
+            "$ref": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/media_file",
+            "description": "Use this attribute to apply custom styles for this category.",
+            "x-label": {
+                "default": "Custom CSS File"
+            }
+        },
+        "c_enableCompare": {
+            "description": "Used to define if/when the Compare feature is to be visualized in the storefront based on navigation. If enableCompare = FALSE, no Compare checkboxes will be displayed in the grid view. If enableCompare = TRUE, the category (and its children) will support the Compare feature.",
+            "x-label": {
+                "default": "Enable Compare"
+            },
+            "type": "boolean"
+        },
+        "c_headerMenuBanner": {
+            "$ref": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/markup_text",
+            "x-label": {
+                "default": "Header Menu Banner"
+            }
+        },
+        "c_headerMenuOrientation": {
+            "description": "Which way to orient the menu and optional header menu HTML. Vertical will list all in one line. Horizontal will list in columns.",
+            "enum": [
+                "Horizontal",
+                "Vertical"
+            ],
+            "x-enum-labels": [
+                {
+                    "default": "Horizontal"
+                },
+                {
+                    "default": "Vertical"
+                }
+            ],
+            "x-label": {
+                "default": "Header Menu Orientation"
+            },
+            "type": "string"
+        },
+        "c_showInMenu": {
+            "description": "Used to indicate that a category (such as Mens -> Footwear -> Boots) will display in the roll-over navigation. A sub-category only shows if also the parent category is marked as showInMenu. Up to three category levels are shown in roll-over navigation.",
+            "x-label": {
+                "default": "Show in Menu Navigation"
+            },
+            "type": "boolean"
+        },
+        "c_sizeChartID": {
+            "description": "Used to define the content asset ID of the Size Chart that is appropriate for products whose PRIMARY category is the associated category (and its children). Whenever a product detail page (or quick view) is rendered, the Size Chart link is populated based on the value of this attribute for the products primary categorization. If not defined, NO size chart link is displayed.",
+            "x-label": {
+                "default": "Size Chart"
+            },
+            "type": "string"
+        },
+        "c_slotBannerHtml": {
+            "additionalProperties": {
+                "$ref": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/markup_text"
+            },
+            "format": "localized",
+            "x-label": {
+                "default": "Slot Banner HTML"
+            },
+            "type": "object"
+        },
+        "c_slotBannerImage": {
+            "$ref": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/media_file",
+            "description": "Image used on either the top or bottom slot on the category landing pages.",
+            "x-label": {
+                "default": "Category Landing Slot Image"
+            }
+        },
+        "catalog_id": {
+            "description": "The id of the catalog that contains it.",
+            "x-label": {
+                "default": "ID"
+            },
+            "type": "string"
+        },
+        "categories": {
+            "description": "The array of sub categories for the category.",
+            "items": {
+                "$ref": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/category"
+            },
+            "type": "array"
+        },
+        "creation_date": {
+            "description": "Returns the value of attribute 'creationDate'.",
+            "format": "date-time",
+            "x-label": {
+                "default": "Creation Date"
+            },
+            "readOnly": true,
+            "type": "string"
+        },
+        "description": {
+            "additionalProperties": {
+                "type": "string"
+            },
+            "description": "The localized description of the category.",
+            "format": "localized",
+            "x-label": {
+                "default": "Description"
+            },
+            "type": "object"
+        },
+        "id": {
+            "description": "The id of the category.",
+            "x-label": {
+                "default": "ID"
+            },
+            "maxLength": 256,
+            "minLength": 1,
+            "type": "string"
+        },
+        "image": {
+            "description": "The name of the category image. The URL to the image is computed.",
+            "x-label": {
+                "default": "Standard Image"
+            },
+            "maxLength": 256,
+            "minLength": 1,
+            "type": "string"
+        },
+        "last_modified": {
+            "description": "Returns the value of attribute 'lastModified'.",
+            "format": "date-time",
+            "x-label": {
+                "default": "Last Modified"
+            },
+            "readOnly": true,
+            "type": "string"
+        },
+        "link": {
+            "description": "The URL to get the category. This is a computed attribute and cannot be modified.",
+            "type": "string"
+        },
+        "name": {
+            "additionalProperties": {
+                "type": "string"
+            },
+            "description": "The localized name of the category.",
+            "format": "localized",
+            "x-label": {
+                "default": "Name"
+            },
+            "type": "object"
+        },
+        "online": {
+            "description": "The online status of the category determines if it is visible in the storefront. Defaults to false if not specified on create.",
+            "x-label": {
+                "default": "Online"
+            },
+            "type": "boolean"
+        },
+        "page_description": {
+            "additionalProperties": {
+                "type": "string"
+            },
+            "description": "The localized page description of the category.",
+            "format": "localized",
+            "x-label": {
+                "default": "Page Description"
+            },
+            "type": "object"
+        },
+        "page_keywords": {
+            "additionalProperties": {
+                "type": "string"
+            },
+            "description": "The localized page keywords for the category.",
+            "format": "localized",
+            "x-label": {
+                "default": "Page Keywords"
+            },
+            "type": "object"
+        },
+        "page_title": {
+            "additionalProperties": {
+                "type": "string"
+            },
+            "description": "The localized page title of the category.",
+            "format": "localized",
+            "x-label": {
+                "default": "Page Title"
+            },
+            "type": "object"
+        },
+        "parent_category_id": {
+            "description": "The id of the parent category. Defaults to root if not specified on create.",
+            "maxLength": 256,
+            "minLength": 1,
+            "type": "string"
+        },
+        "paths": {
+            "description": "The paths that contains catalog and category information requested by non-standard expand request",
+            "items": {
+                "$ref": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/path_record"
+            },
+            "type": "array"
+        },
+        "position": {
+            "description": "The position of the category determines the display order in the storefront.",
+            "format": "double",
+            "type": "number"
+        },
+        "sorting_rules": {
+            "description": "The sorting rules that are attached to the category requested by non-standard expand request",
+            "items": {
+                "$ref": "https://zzrf-001.dx.commercecloud.salesforce.com/s/-/dw/meta/rest/data/v23_1/documents/sorting_rule"
+            },
+            "type": "array"
+        },
+        "thumbnail": {
+            "description": "The name of the category thumbnail. The URL to the thumbnail is computed.",
+            "x-label": {
+                "default": "Thumbnail Image"
+            },
+            "maxLength": 256,
+            "minLength": 1,
+            "type": "string"
+        }
+    }
+}

@@ -11,13 +11,20 @@ import {
     Box,
     Flex,
     Heading,
-    Stack,
-    Image
+    Image as Img,
+    Stack
 } from '@salesforce/retail-react-app/app/components/shared/ui'
+import Image from '@salesforce/retail-react-app/app/components/image'
 import { withComponentTag } from '../with-component-tag.js';
 
 const Hero = ({title, img, actions, ...props}) => {
-    const {src, alt} = img
+    const imageProps = {
+        fit: 'cover', // The Chakra `Image`'s non-standard replacement for `objectFit`
+        align: 'center', // The Chakra `Image`'s non-standard replacement for `objectPosition`
+        width: '100%',
+        height: '100%',
+        ...img
+    }
 
     return (
         <Box
@@ -55,14 +62,7 @@ const Hero = ({title, img, actions, ...props}) => {
                     paddingTop={{base: 4, lg: 0}}
                 >
                     <Box position={'relative'} width={{base: 'full', md: '80%', lg: 'full'}}>
-                        <Image
-                            fit={'cover'}
-                            align={'center'}
-                            width={'100%'}
-                            height={'100%'}
-                            src={src}
-                            alt={alt}
-                        />
+                        <Image as={Img} {...imageProps} />
                     </Box>
                 </Flex>
             </Stack>

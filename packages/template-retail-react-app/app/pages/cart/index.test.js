@@ -14,7 +14,8 @@ import {
     mockCustomerBaskets,
     mockEmptyBasket,
     mockCartVariant,
-    mockedCustomerProductLists
+    mockedCustomerProductLists,
+    mockBasketWithBonusProducts
 } from '@salesforce/retail-react-app/app/mocks/mock-data'
 import mockVariant from '@salesforce/retail-react-app/app/mocks/variant-750518699578M'
 import {rest} from 'msw'
@@ -29,6 +30,19 @@ import {
     products as mockProducts
 } from '@salesforce/retail-react-app/app/pages/cart/cart.mock'
 import userEvent from '@testing-library/user-event'
+
+// Mock useMultiSite hook
+const mockUseMultiSite = jest.fn()
+jest.mock('@salesforce/retail-react-app/app/hooks/use-multi-site', () => ({
+    __esModule: true,
+    default: () => mockUseMultiSite()
+}))
+
+// Mock useSelectedStore hook
+const mockUseSelectedStore = jest.fn()
+jest.mock('@salesforce/retail-react-app/app/hooks/use-selected-store', () => ({
+    useSelectedStore: () => mockUseSelectedStore()
+}))
 
 const mockProduct = {
     ...mockVariant,
@@ -70,6 +84,20 @@ const mockProductBundleBasket = {
 
 // Set up and clean up
 beforeEach(() => {
+    // Default mock for useMultiSite
+    mockUseMultiSite.mockReturnValue({
+        site: {id: 'site-1'},
+        buildUrl: (url) => url
+    })
+
+    // Default mock for useSelectedStore (no selected store by default)
+    mockUseSelectedStore.mockImplementation(() => ({
+        selectedStore: null,
+        isLoading: false,
+        error: null,
+        hasSelectedStore: false
+    }))
+
     global.server.use(
         rest.get('*/customers/:customerId/product-lists', (req, res, ctx) => {
             return res(ctx.delay(0), ctx.json(mockedCustomerProductLists))
@@ -149,6 +177,7 @@ beforeEach(() => {
         })
     )
 })
+
 afterEach(() => {
     localStorage.clear()
 })
@@ -836,6 +865,398 @@ describe('Product bundles', () => {
             expect(screen.getByText(/qty: 4/i)).toBeInTheDocument()
         })
     })
+
+    describe('with selectedInventoryId', () => {
+        const mockSiteId = 'bundle-test-site'
+        const mockInventoryId = 'store-inventory-123'
+
+        beforeEach(() => {
+            // Mock useMultiSite to return our test site ID
+            mockUseMultiSite.mockReturnValue({
+                site: {id: mockSiteId},
+                buildUrl: (url) => url
+            })
+
+            // Mock useSelectedStore to return a store with inventoryId
+            mockUseSelectedStore.mockImplementation(() => ({
+                selectedStore: {
+                    id: 'store-123',
+                    name: 'Test Store',
+                    inventoryId: mockInventoryId
+                },
+                isLoading: false,
+                error: null,
+                hasSelectedStore: true
+            }))
+
+            // Create bundle product with inventories array
+            const bundleProductWithInventories = {
+                ...mockProductBundle,
+                inventories: [
+                    {
+                        id: 'inventory_m',
+                        stockLevel: 100,
+                        ats: 100,
+                        orderable: true,
+                        backorderable: false,
+                        preorderable: false
+                    },
+                    {
+                        id: mockInventoryId,
+                        stockLevel: 50, // Store has 50 in stock
+                        ats: 50,
+                        orderable: true,
+                        backorderable: false,
+                        preorderable: false
+                    }
+                ]
+            }
+
+            // Create bundle children products with inventories arrays for store-specific inventory
+            const bundleChildrenWithInventories = mockGetBundleChildrenProducts.map((product) => ({
+                ...product,
+                inventories: [
+                    {
+                        id: 'inventory_m',
+                        stockLevel: product.inventory.stockLevel,
+                        ats: product.inventory.ats,
+                        orderable: product.inventory.orderable,
+                        backorderable: product.inventory.backorderable,
+                        preorderable: product.inventory.preorderable
+                    },
+                    {
+                        id: mockInventoryId,
+                        stockLevel: Math.floor(product.inventory.stockLevel * 0.5), // Store has half the stock
+                        ats: Math.floor(product.inventory.ats * 0.5),
+                        orderable: product.inventory.orderable,
+                        backorderable: product.inventory.backorderable,
+                        preorderable: product.inventory.preorderable
+                    }
+                ]
+            }))
+
+            global.server.use(
+                rest.get('*/customers/:customerId/baskets', (req, res, ctx) =>
+                    res(ctx.delay(0), ctx.status(200), ctx.json(mockProductBundleBasket))
+                ),
+                rest.get('*/products/:productId', (req, res, ctx) => {
+                    return res(ctx.delay(0), ctx.json(bundleProductWithInventories))
+                }),
+                rest.get('*/products', (req, res, ctx) => {
+                    if (req.url.toString().includes('test-bundle')) {
+                        return res(ctx.delay(0), ctx.json({data: [bundleProductWithInventories]}))
+                    }
+                    return res(ctx.delay(0), ctx.json({data: bundleChildrenWithInventories}))
+                }),
+                rest.patch('*/baskets/:basketId/items', (req, res, ctx) => {
+                    const curretProductItems = basketWithProductBundle.productItems[0]
+                    const updatedBasket = {
+                        ...basketWithProductBundle,
+                        productItems: [
+                            {
+                                ...curretProductItems,
+                                quantity: 2,
+                                bundledProductItems: curretProductItems.bundledProductItems.map(
+                                    (bundleChild) => ({
+                                        ...bundleChild,
+                                        quantity: bundleChild.quantity * 2
+                                    })
+                                )
+                            }
+                        ]
+                    }
+                    return res(ctx.json(updatedBasket))
+                }),
+                rest.patch('*/baskets/:basketId/items/:itemId', () => {})
+            )
+        })
+
+        test('passes inventoryIds parameter to API when selectedInventoryId is available', async () => {
+            // Spy on the products API call to verify parameters
+            const productsApiSpy = jest.fn()
+
+            global.server.use(
+                rest.get('*/products', (req, res, ctx) => {
+                    productsApiSpy(req)
+                    if (req.url.toString().includes('test-bundle')) {
+                        // Return the bundle product with inventories
+                        const bundleProductWithInventories = {
+                            ...mockProductBundle,
+                            inventories: [
+                                {
+                                    id: 'inventory_m',
+                                    stockLevel: 100,
+                                    ats: 100,
+                                    orderable: true,
+                                    backorderable: false,
+                                    preorderable: false
+                                },
+                                {
+                                    id: mockInventoryId,
+                                    stockLevel: 50,
+                                    ats: 50,
+                                    orderable: true,
+                                    backorderable: false,
+                                    preorderable: false
+                                }
+                            ]
+                        }
+                        return res(ctx.delay(0), ctx.json({data: [bundleProductWithInventories]}))
+                    }
+                    // Return bundle children with inventories
+                    const bundleChildrenWithInventories = mockGetBundleChildrenProducts.map(
+                        (product) => ({
+                            ...product,
+                            inventories: [
+                                {
+                                    id: 'inventory_m',
+                                    stockLevel: product.inventory.stockLevel,
+                                    ats: product.inventory.ats,
+                                    orderable: product.inventory.orderable,
+                                    backorderable: product.inventory.backorderable,
+                                    preorderable: product.inventory.preorderable
+                                },
+                                {
+                                    id: mockInventoryId,
+                                    stockLevel: Math.floor(product.inventory.stockLevel * 0.5),
+                                    ats: Math.floor(product.inventory.ats * 0.5),
+                                    orderable: product.inventory.orderable,
+                                    backorderable: product.inventory.backorderable,
+                                    preorderable: product.inventory.preorderable
+                                }
+                            ]
+                        })
+                    )
+                    return res(ctx.delay(0), ctx.json({data: bundleChildrenWithInventories}))
+                })
+            )
+
+            renderWithProviders(<Cart />)
+
+            await waitFor(() => {
+                expect(screen.getByTestId('sf-cart-container')).toBeInTheDocument()
+            })
+
+            // Verify that the products API was called with inventoryIds parameter
+            await waitFor(() => {
+                expect(productsApiSpy).toHaveBeenCalled()
+                const lastCall = productsApiSpy.mock.calls[productsApiSpy.mock.calls.length - 1][0]
+                const url = new URL(lastCall.url)
+                expect(url.searchParams.get('inventoryIds')).toBe(mockInventoryId)
+            })
+        })
+
+        test('calculates lowest stock level among bundle children for store inventory', async () => {
+            // Create bundle children with different stock levels for store inventory
+            const bundleChildrenWithVaryingStock = mockGetBundleChildrenProducts.map(
+                (product, index) => ({
+                    ...product,
+                    inventories: [
+                        {
+                            id: 'inventory_m',
+                            stockLevel: product.inventory.stockLevel,
+                            ats: product.inventory.ats,
+                            orderable: product.inventory.orderable,
+                            backorderable: product.inventory.backorderable,
+                            preorderable: product.inventory.preorderable
+                        },
+                        {
+                            id: mockInventoryId,
+                            stockLevel: 10 - index, // Different stock levels: 10, 9, 8
+                            ats: 10 - index,
+                            orderable: product.inventory.orderable,
+                            backorderable: product.inventory.backorderable,
+                            preorderable: product.inventory.preorderable
+                        }
+                    ]
+                })
+            )
+
+            global.server.use(
+                rest.get('*/products', (req, res, ctx) => {
+                    if (req.url.toString().includes('test-bundle')) {
+                        return res(ctx.delay(0), ctx.json({data: [mockProductBundle]}))
+                    }
+                    return res(ctx.delay(0), ctx.json({data: bundleChildrenWithVaryingStock}))
+                })
+            )
+
+            renderWithProviders(<Cart />)
+
+            await waitFor(() => {
+                expect(screen.getByTestId('sf-cart-container')).toBeInTheDocument()
+            })
+
+            // The lowest stock level should be 8 (from the third child product)
+            // This should be reflected in the inventory calculation
+            await waitFor(() => {
+                expect(screen.getByText(/women's clothing test bundle/i)).toBeInTheDocument()
+            })
+        })
+
+        test('handles missing store inventory gracefully', async () => {
+            // Create bundle children without the specific store inventory
+            const bundleChildrenWithoutStoreInventory = mockGetBundleChildrenProducts.map(
+                (product) => ({
+                    ...product,
+                    inventories: [
+                        {
+                            id: 'inventory_m',
+                            stockLevel: product.inventory.stockLevel,
+                            ats: product.inventory.ats,
+                            orderable: product.inventory.orderable,
+                            backorderable: product.inventory.backorderable,
+                            preorderable: product.inventory.preorderable
+                        }
+                        // No store-specific inventory
+                    ]
+                })
+            )
+
+            global.server.use(
+                rest.get('*/products', (req, res, ctx) => {
+                    if (req.url.toString().includes('test-bundle')) {
+                        return res(ctx.delay(0), ctx.json({data: [mockProductBundle]}))
+                    }
+                    return res(ctx.delay(0), ctx.json({data: bundleChildrenWithoutStoreInventory}))
+                })
+            )
+
+            renderWithProviders(<Cart />)
+
+            await waitFor(() => {
+                expect(screen.getByTestId('sf-cart-container')).toBeInTheDocument()
+                expect(screen.getByText(/women's clothing test bundle/i)).toBeInTheDocument()
+            })
+        })
+
+        test('updates bundle inventory with lowest stock level product name', async () => {
+            // Create bundle children where one has the lowest stock
+            const bundleChildrenWithLowestStock = mockGetBundleChildrenProducts.map(
+                (product, index) => ({
+                    ...product,
+                    inventories: [
+                        {
+                            id: 'inventory_m',
+                            stockLevel: product.inventory.stockLevel,
+                            ats: product.inventory.ats,
+                            orderable: product.inventory.orderable,
+                            backorderable: product.inventory.backorderable,
+                            preorderable: product.inventory.preorderable
+                        },
+                        {
+                            id: mockInventoryId,
+                            stockLevel: index === 1 ? 2 : 10, // Second product has lowest stock
+                            ats: index === 1 ? 2 : 10,
+                            orderable: product.inventory.orderable,
+                            backorderable: product.inventory.backorderable,
+                            preorderable: product.inventory.preorderable
+                        }
+                    ]
+                })
+            )
+
+            global.server.use(
+                rest.get('*/products', (req, res, ctx) => {
+                    if (req.url.toString().includes('test-bundle')) {
+                        return res(ctx.delay(0), ctx.json({data: [mockProductBundle]}))
+                    }
+                    return res(ctx.delay(0), ctx.json({data: bundleChildrenWithLowestStock}))
+                })
+            )
+
+            renderWithProviders(<Cart />)
+
+            await waitFor(() => {
+                expect(screen.getByTestId('sf-cart-container')).toBeInTheDocument()
+                expect(screen.getByText(/women's clothing test bundle/i)).toBeInTheDocument()
+            })
+        })
+
+        test('handles bundle children with no inventory data', async () => {
+            // Create bundle children without any inventory data
+            const bundleChildrenWithoutInventory = mockGetBundleChildrenProducts.map((product) => ({
+                ...product,
+                inventory: undefined,
+                inventories: undefined
+            }))
+
+            global.server.use(
+                rest.get('*/products', (req, res, ctx) => {
+                    if (req.url.toString().includes('test-bundle')) {
+                        return res(ctx.delay(0), ctx.json({data: [mockProductBundle]}))
+                    }
+                    return res(ctx.delay(0), ctx.json({data: bundleChildrenWithoutInventory}))
+                })
+            )
+
+            renderWithProviders(<Cart />)
+
+            await waitFor(() => {
+                expect(screen.getByTestId('sf-cart-container')).toBeInTheDocument()
+                expect(screen.getByText(/women's clothing test bundle/i)).toBeInTheDocument()
+            })
+        })
+
+        test('handles bundle product without inventories array', async () => {
+            // Create bundle product without inventories array
+            const bundleProductWithoutInventories = {
+                ...mockProductBundle,
+                inventories: undefined
+            }
+
+            global.server.use(
+                rest.get('*/products/:productId', (req, res, ctx) => {
+                    return res(ctx.delay(0), ctx.json(bundleProductWithoutInventories))
+                }),
+                rest.get('*/products', (req, res, ctx) => {
+                    if (req.url.toString().includes('test-bundle')) {
+                        return res(
+                            ctx.delay(0),
+                            ctx.json({data: [bundleProductWithoutInventories]})
+                        )
+                    }
+                    return res(ctx.delay(0), ctx.json({data: mockGetBundleChildrenProducts}))
+                })
+            )
+
+            renderWithProviders(<Cart />)
+
+            await waitFor(() => {
+                expect(screen.getByTestId('sf-cart-container')).toBeInTheDocument()
+                expect(screen.getByText(/women's clothing test bundle/i)).toBeInTheDocument()
+            })
+        })
+    })
+})
+
+describe('Bonus products', () => {
+    beforeEach(() => {
+        prependHandlersToServer([
+            {
+                path: '*/customers/:customerId/baskets',
+                method: 'get',
+                res: () => mockBasketWithBonusProducts
+            }
+        ])
+    })
+
+    test('renders bonus products in cart with correct styling and no quantity picker', async () => {
+        renderWithProviders(<Cart />)
+
+        // Wait for the cart to load
+        await waitFor(() => {
+            expect(screen.queryByTestId('sf-cart-skeleton')).not.toBeInTheDocument()
+        })
+
+        // Find products by their names
+        const regularProduct = screen.getByText('Belted Cardigan With Studs')
+        const bonusProduct = screen.getByText('Free Gift with Purchase')
+
+        expect(regularProduct).toBeInTheDocument()
+        expect(bonusProduct).toBeInTheDocument()
+        expect(within(bonusProduct).queryByTestId('quantity-picker')).not.toBeInTheDocument()
+    })
 })
 
 describe('Unavailable products tests', function () {
@@ -941,4 +1362,55 @@ test('shows error toast when updating cart item fails', async () => {
 
     // Wait for the error toast to appear
     await waitFor(() => expect(screen.getByText(/something went wrong/i)).toBeInTheDocument())
+})
+
+describe('Selected inventory ID tests', function () {
+    const mockSiteId = 'test-site-123'
+    const mockInventoryId = 'inventory-456'
+
+    beforeEach(() => {
+        // Mock useMultiSite to return our test site ID
+        mockUseMultiSite.mockReturnValue({
+            site: {id: mockSiteId},
+            buildUrl: (url) => url
+        })
+
+        // Mock useSelectedStore to return a store with inventoryId
+        mockUseSelectedStore.mockImplementation(() => ({
+            selectedStore: {
+                id: 'store-123',
+                name: 'Test Store',
+                inventoryId: mockInventoryId
+            },
+            isLoading: false,
+            error: null,
+            hasSelectedStore: true
+        }))
+    })
+
+    test('includes inventoryIds parameter when selectedInventoryId is available', async () => {
+        // Spy on the products API call to verify parameters
+        const productsApiSpy = jest.fn()
+
+        global.server.use(
+            rest.get('*/products', (req, res, ctx) => {
+                productsApiSpy(req)
+                return res(ctx.delay(0), ctx.json({data: [mockCartVariant]}))
+            })
+        )
+
+        renderWithProviders(<Cart />)
+
+        await waitFor(() => {
+            expect(screen.getByTestId('sf-cart-container')).toBeInTheDocument()
+        })
+
+        // Verify that the products API was called with inventoryIds parameter
+        await waitFor(() => {
+            expect(productsApiSpy).toHaveBeenCalled()
+            const lastCall = productsApiSpy.mock.calls[productsApiSpy.mock.calls.length - 1][0]
+            const url = new URL(lastCall.url)
+            expect(url.searchParams.get('inventoryIds')).toBe(mockInventoryId)
+        })
+    })
 })

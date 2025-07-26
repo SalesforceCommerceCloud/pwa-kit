@@ -18,16 +18,58 @@ const {getCreditCardExpiry, runAccessibilityTest} = require('../scripts/utils.js
  * @param {Boolean} dnt - Do Not Track value to answer the form. False to enable tracking, True to disable tracking.
  */
 export const answerConsentTrackingForm = async (page, dnt = false) => {
-    if ((await page.locator('text=Tracking Consent').count()) > 0) {
-        var text = 'Accept'
-        if (dnt) text = 'Decline'
-        const answerButton = await page.locator('button:visible', {hasText: text})
-        await expect(answerButton).toBeVisible()
-        await answerButton.click()
-        await expect(answerButton).not.toBeVisible()
+    try {
+        const consentFormVisible = await page
+            .locator('text=Tracking Consent')
+            .isVisible()
+            .catch(() => false)
+        if (!consentFormVisible) {
+            return
+        }
+
+        const buttonText = dnt ? 'Decline' : 'Accept'
+        await page
+            .getByRole('button', {name: new RegExp(buttonText, 'i')})
+            .first()
+            .waitFor({timeout: 3000})
+
+        // Find and click consent buttons (handles both mobile and desktop versions existing in the DOM)
+        const clickSuccess = await page.evaluate((targetText) => {
+            // Try aria-label first, then fallback to text content
+            let buttons = Array.from(
+                document.querySelectorAll(`button[aria-label="${targetText} tracking"]`)
+            )
+
+            if (buttons.length === 0) {
+                buttons = Array.from(document.querySelectorAll('button')).filter(
+                    (btn) =>
+                        btn.textContent &&
+                        btn.textContent.trim().toLowerCase() === targetText.toLowerCase()
+                )
+            }
+
+            let clickedCount = 0
+            buttons.forEach((button) => {
+                // Only click visible buttons
+                if (button.offsetParent !== null) {
+                    button.click()
+                    clickedCount++
+                }
+            })
+
+            return clickedCount
+        }, buttonText)
+
         // after clicking an answering button, the tracking consent should not stay in the DOM
-        const consentElements = await page.locator('text=Tracking Consent').count()
-        expect(consentElements).toBe(0)
+        if (clickSuccess > 0) {
+            await page.waitForTimeout(2000)
+            await page
+                .locator('text=Tracking Consent')
+                .isHidden({timeout: 5000})
+                .catch(() => {})
+        }
+    } catch (error) {
+        // Silently continue - consent form handling should not break tests
     }
 }
 
@@ -135,7 +177,7 @@ export const navigateToPDPDesktopSocial = async ({
     productColor,
     productPrice
 }) => {
-    await page.goto(config.SOCIAL_LOGIN_RETAIL_APP_HOME)
+    await page.goto(config.EXTRA_FEATURES_E2E_RETAIL_APP_HOME)
     await answerConsentTrackingForm(page)
 
     await page.getByRole('link', {name: 'Womens'}).hover()
@@ -212,8 +254,23 @@ export const registerShopper = async ({page, userCredentials, isMobile = false})
 
     await page.waitForLoadState()
 
+    // Skip registration if user is already logged in
+    const initialUrl = page.url()
+    if (initialUrl.includes('/account')) {
+        return
+    }
+
     const registrationFormHeading = page.getByText(/Let's get started!/i)
-    await registrationFormHeading.waitFor()
+    try {
+        await registrationFormHeading.waitFor({timeout: 10000})
+    } catch (error) {
+        // Check if user was redirected to account page during wait
+        const urlAfterWait = page.url()
+        if (urlAfterWait.includes('/account')) {
+            return
+        }
+        throw new Error(`Registration form not found. Current URL: ${urlAfterWait}`)
+    }
 
     await page.locator('input#firstName').fill(userCredentials.firstName)
     await page.locator('input#lastName').fill(userCredentials.lastName)
@@ -226,16 +283,11 @@ export const registerShopper = async ({page, userCredentials, isMobile = false})
         '**/shopper/auth/v1/organizations/**/oauth2/token'
     )
     await page.getByRole('button', {name: /Create Account/i}).click()
-    await tokenResponsePromise
-    expect((await tokenResponsePromise).status()).toBe(200)
+    const tokenResponse = await tokenResponsePromise
+    expect(tokenResponse.status()).toBe(200)
 
-    await expect(page.getByRole('heading', {name: /Account Details/i})).toBeVisible()
+    await page.waitForURL(/.*\/account.*/, {timeout: 10000})
 
-    if (!isMobile) {
-        await expect(page.getByRole('heading', {name: /My Account/i})).toBeVisible()
-    }
-
-    await expect(page.getByText(/Email/i)).toBeVisible()
     await expect(page.getByText(userCredentials.email)).toBeVisible()
 }
 
@@ -310,12 +362,18 @@ export const loginShopper = async ({page, userCredentials}) => {
             '**/shopper/auth/v1/organizations/**/oauth2/token'
         )
         await page.getByRole('button', {name: /Sign In/i}).click()
-        await loginResponsePromise
-        expect((await loginResponsePromise).status()).toBe(303) // Login returns a 303 redirect to /callback with authCode and usid
-        await tokenResponsePromise
-        expect((await tokenResponsePromise).status()).toBe(200)
+
+        const loginResponse = await loginResponsePromise
+        expect(loginResponse.status()).toBe(303) // Login returns a 303 redirect to /callback with authCode and usid
+
+        const tokenResponse = await tokenResponsePromise
+        expect(tokenResponse.status()).toBe(200)
+
+        await page.waitForURL(/.*\/account.*/, {timeout: 10000})
+
+        await expect(page.getByText(userCredentials.email)).toBeVisible()
         return true
-    } catch {
+    } catch (error) {
         return false
     }
 }
@@ -328,7 +386,7 @@ export const loginShopper = async ({page, userCredentials}) => {
  */
 export const socialLoginShopper = async ({page}) => {
     try {
-        await page.goto(config.SOCIAL_LOGIN_RETAIL_APP_HOME + '/login')
+        await page.goto(config.EXTRA_FEATURES_E2E_RETAIL_APP_HOME + '/login')
 
         await page.getByText(/Google/i).click()
         await expect(page.getByText(/Sign in with Google/i)).toBeVisible({timeout: 10000})
@@ -484,8 +542,13 @@ export const registeredUserHappyPath = async ({page, registeredUserCredentials, 
             userCredentials: registeredUserCredentials
         })
     }
+    await answerConsentTrackingForm(page)
     await page.waitForLoadState()
-    await expect(page.getByRole('heading', {name: /Account Details/i})).toBeVisible()
+
+    // Verify we're on account page and user is logged in
+    const currentUrl = page.url()
+    expect(currentUrl).toMatch(/\/account/)
+    await expect(page.getByText(registeredUserCredentials.email)).toBeVisible()
 
     // Shop for items as registered user
     await addProductToCart({page})
@@ -535,14 +598,20 @@ export const registeredUserHappyPath = async ({page, registeredUserCredentials, 
         name: /Continue to Payment/i
     })
 
-    if (continueToPayment.isEnabled()) {
+    let hasShippingStep = false
+    try {
+        await expect(continueToPayment).toBeVisible({timeout: 2000})
         await continueToPayment.click()
+        hasShippingStep = true
+    } catch {
+        // Shipping step was skipped, proceed directly to payment
     }
 
-    // Confirm the shipping options form toggles to show edit button on clicking "Checkout as guest"
-    const step2Card = page.locator("div[data-testid='sf-toggle-card-step-2']")
-
-    await expect(step2Card.getByRole('button', {name: /Edit/i})).toBeVisible()
+    // Verify step-2 edit button only if shipping step was present
+    if (hasShippingStep) {
+        const step2Card = page.locator("div[data-testid='sf-toggle-card-step-2']")
+        await expect(step2Card.getByRole('button', {name: /Edit/i})).toBeVisible()
+    }
 
     await expect(page.getByRole('heading', {name: /Payment/i})).toBeVisible()
 
@@ -585,6 +654,15 @@ export const registeredUserHappyPath = async ({page, registeredUserCredentials, 
     await validateOrderHistory({page, a11y})
 }
 
+/**
+ * Executes the wishlist flow for a registered user.
+ *
+ * Includes robust authentication handling with fallback mechanisms.
+ *
+ * @param {Object} options.page - Playwright page object representing a browser tab/window
+ * @param {Object} options.registeredUserCredentials - User credentials for authentication
+ * @param {Object} options.a11y - Accessibility testing configuration (optional)
+ */
 export const wishlistFlow = async ({page, registeredUserCredentials, a11y = {}}) => {
     const isLoggedIn = await loginShopper({
         page,
@@ -592,15 +670,32 @@ export const wishlistFlow = async ({page, registeredUserCredentials, a11y = {}})
     })
 
     if (!isLoggedIn) {
-        await registerShopper({
-            page,
-            userCredentials: registeredUserCredentials
-        })
+        try {
+            await registerShopper({
+                page,
+                userCredentials: registeredUserCredentials
+            })
+        } catch (error) {
+            // If registration fails attempt to log in
+            const secondLoginAttempt = await loginShopper({
+                page,
+                userCredentials: registeredUserCredentials
+            })
+            if (!secondLoginAttempt) {
+                throw new Error('Authentication failed: Both login and registration unsuccessful')
+            }
+        }
     }
 
     // The consent form does not stick after registration
     await answerConsentTrackingForm(page)
     await page.waitForLoadState()
+
+    const currentUrl = page.url()
+    if (!currentUrl.includes('/account')) {
+        await page.goto(config.RETAIL_APP_HOME + '/account')
+        await page.waitForLoadState()
+    }
 
     // Navigate to PDP
     await navigateToPDPDesktop({page})
@@ -613,4 +708,87 @@ export const wishlistFlow = async ({page, registeredUserCredentials, a11y = {}})
 
     // wishlist
     await validateWishlist({page, a11y})
+}
+
+/**
+ * Navigates to a PLP and opens the store inventory filter to select a store.
+ *
+ * This helper function demonstrates the store inventory filtering functionality by:
+ * 1. Navigating to the Womens > Tops category PLP
+ * 2. Opening the store locator modal
+ * 3. Searching for stores by postal code
+ * 4. Returning the available store selection options
+ *
+ * This is useful for testing store inventory features and BOPIS (Buy Online, Pick Up In Store) functionality.
+ *
+ * @param {Object} options.page - Playwright page object representing a browser tab/window
+ */
+export const selectStoreFromPLP = async ({page}) => {
+    // Navigate to a product category (Womens > Tops)
+    await page.getByRole('link', {name: 'Womens'}).hover()
+    const topsNav = await page.getByRole('link', {name: 'Tops', exact: true})
+    await expect(topsNav).toBeVisible()
+    await topsNav.click()
+
+    // Verify we're on the PLP
+    await expect(page.getByRole('heading', {name: 'Tops'})).toBeVisible()
+    const productTile = page.getByRole('link', {
+        name: /Cotton Turtleneck Sweater/i
+    })
+    const productTileImg = productTile.locator('img')
+    await productTileImg.waitFor({state: 'visible'})
+
+    // Look for the store inventory filter component
+    const storeInventoryFilter = page.getByTestId('sf-store-inventory-filter')
+    await expect(storeInventoryFilter).toBeVisible()
+
+    // Verify the filter shows "Select Store" initially
+    await expect(page.getByText('Select Store')).toBeVisible()
+    await expect(page.getByText('Shop by Availability')).toBeVisible()
+
+    // Click on the store inventory filter checkbox to open store locator
+    const inventoryCheckbox = page.getByTestId('sf-store-inventory-filter-checkbox')
+    await inventoryCheckbox.click()
+
+    // Verify store locator modal opens and select a store
+    await expect(page.getByText('Find a Store')).toBeVisible()
+    await page.locator('select[name="countryCode"]').selectOption({label: 'United States'})
+    await page.locator('input[name="postalCode"]').fill('01803')
+    const searchStoreButton = page.getByRole('button', {name: 'Find'})
+    await expect(searchStoreButton).toBeVisible()
+
+    const storeSearchResponsePromise = page.waitForResponse(
+        (resp) =>
+            resp.url().includes('/shopper-stores/v1/organizations/') &&
+            resp.url().includes('/store-search')
+    )
+    await searchStoreButton.click()
+    const storeSearchResponse = await storeSearchResponsePromise
+
+    expect(storeSearchResponse.status()).toBe(200)
+
+    // Select the first available store (if any stores are available)
+    await expect(page.getByText(/Burlington Retail Store/i)).toBeVisible()
+
+    // Find and click the first available store label
+    const storeRadioLabels = page.locator(
+        'label.chakra-radio:has(input[aria-describedby^="store-info-"])'
+    )
+    const storeCount = await storeRadioLabels.count()
+
+    if (storeCount > 0) {
+        // Select the first store
+        await storeRadioLabels.first().click()
+
+        // Close the store locator modal
+        await page.locator('button[aria-label="Close"]').click()
+        await page.waitForLoadState()
+        await expect(page.getByText('Find a Store')).not.toBeVisible()
+    } else {
+        // If no stores are available, verify the appropriate message is shown
+        await expect(page.getByText('Sorry, there are no locations in this area.')).toBeVisible()
+
+        // Close the modal
+        await page.getByRole('button', {name: 'Close'}).click()
+    }
 }

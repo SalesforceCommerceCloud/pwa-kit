@@ -49,7 +49,9 @@ import {DrawerMenu} from '@salesforce/retail-react-app/app/components/drawer-men
 import {ListMenu, ListMenuContent} from '@salesforce/retail-react-app/app/components/list-menu'
 import {HideOnDesktop, HideOnMobile} from '@salesforce/retail-react-app/app/components/responsive'
 import AboveHeader from '@salesforce/retail-react-app/app/components/_app/partials/above-header'
-import StoreLocatorModal from '@salesforce/retail-react-app/app/components/store-locator-modal'
+import {StoreLocatorModal} from '@salesforce/retail-react-app/app/components/store-locator'
+import Island from '@salesforce/retail-react-app/app/components/island'
+
 // Hooks
 import {AuthModal, useAuthModal} from '@salesforce/retail-react-app/app/hooks/use-auth-modal'
 import {
@@ -78,11 +80,10 @@ import {
     CAT_MENU_DEFAULT_NAV_SSR_DEPTH,
     CAT_MENU_DEFAULT_ROOT_CATEGORY,
     DEFAULT_LOCALE,
-    ACTIVE_DATA_ENABLED
+    STORE_LOCATOR_IS_ENABLED
 } from '@salesforce/retail-react-app/app/constants'
 
 import Seo from '@salesforce/retail-react-app/app/components/seo'
-import {Helmet} from 'react-helmet'
 import {getPathWithLocale} from '@salesforce/retail-react-app/app/utils/url'
 
 const PlaceholderComponent = () => (
@@ -289,15 +290,6 @@ const App = (props) => {
     return (
         <Box className="sf-app" {...styles.container}>
             <StorefrontPreview getToken={getTokenWhenReady}>
-                <Helmet>
-                    {ACTIVE_DATA_ENABLED && (
-                        <script
-                            src={getAssetUrl('static/head-active_data.js')}
-                            id="headActiveData"
-                            type="text/javascript"
-                        ></script>
-                    )}
-                </Helmet>
                 <IntlProvider
                     onError={(err) => {
                         if (!messages) {
@@ -370,63 +362,61 @@ const App = (props) => {
 
                         <Box id="app" display="flex" flexDirection="column" flex={1}>
                             <SkipNavLink zIndex="skipLink">Skip to Content</SkipNavLink>
+                            {STORE_LOCATOR_IS_ENABLED && (
                             <StoreLocatorModal
                                 isOpen={isOpenStoreLocator}
                                 onClose={onCloseStoreLocator}
                             />
+                            )}
+                    
+                            <Island hydrateOn={'visible'}>
                             <Box {...styles.headerWrapper}>
                                 {!isCheckout ? (
                                     <>
                                         <AboveHeader />
-                                        {isDevPath ? (
-                                            <DevCanvasHeader
-                                                onMenuClick={onOpen}
-                                                onLogoClick={onLogoClick}
-                                                onMyCartClick={onCartClick}
-                                                onMyAccountClick={onAccountClick}
-                                                onWishlistClick={onWishlistClick}
-                                                onStoreLocatorClick={onOpenStoreLocator}
-                                            />
-                                        ) : (
-                                            <Header
-                                                onMenuClick={onOpen}
-                                                onLogoClick={onLogoClick}
-                                                onMyCartClick={onCartClick}
-                                                onMyAccountClick={onAccountClick}
-                                                onWishlistClick={onWishlistClick}
-                                                onStoreLocatorClick={onOpenStoreLocator}
-                                            >
-                                                <HideOnDesktop>
-                                                    <DrawerMenu
-                                                        isOpen={isOpen}
-                                                        onClose={onClose}
-                                                        onLogoClick={onLogoClick}
-                                                        root={
-                                                            categories?.[CAT_MENU_DEFAULT_ROOT_CATEGORY]
-                                                        }
-                                                        itemsKey="categories"
-                                                        itemsCountKey="onlineSubCategoriesCount"
-                                                        itemComponent={DrawerMenuItemWithData}
-                                                    />
-                                                </HideOnDesktop>
+                                        <Header
+                                            onMenuClick={onOpen}
+                                            onLogoClick={onLogoClick}
+                                            onMyCartClick={onCartClick}
+                                            onMyAccountClick={onAccountClick}
+                                            onWishlistClick={onWishlistClick}
+                                            onStoreLocatorClick={onOpenStoreLocator}
+                                        >
+                                            <HideOnDesktop>
+                                                <DrawerMenu
+                                                    isOpen={isOpen}
+                                                    onClose={onClose}
+                                                    onLogoClick={onLogoClick}
+                                                    root={
+                                                        categories?.[
+                                                            CAT_MENU_DEFAULT_ROOT_CATEGORY
+                                                        ]
+                                                    }
+                                                    itemsKey="categories"
+                                                    itemsCountKey="onlineSubCategoriesCount"
+                                                    itemComponent={DrawerMenuItemWithData}
+                                                />
+                                            </HideOnDesktop>
 
-                                                <HideOnMobile>
-                                                    <ListMenu
-                                                        root={
-                                                            categories?.[CAT_MENU_DEFAULT_ROOT_CATEGORY]
-                                                        }
-                                                        itemsKey="categories"
-                                                        itemsCountKey="onlineSubCategoriesCount"
-                                                        contentComponent={ListMenuContentWithData}
-                                                    />
-                                                </HideOnMobile>
-                                            </Header>
-                                        )}
+                                            <HideOnMobile>
+                                                <ListMenu
+                                                    root={
+                                                        categories?.[
+                                                            CAT_MENU_DEFAULT_ROOT_CATEGORY
+                                                        ]
+                                                    }
+                                                    itemsKey="categories"
+                                                    itemsCountKey="onlineSubCategoriesCount"
+                                                    contentComponent={ListMenuContentWithData}
+                                                />
+                                            </HideOnMobile>
+                                        </Header>
                                     </>
                                 ) : (
                                     <CheckoutHeader />
                                 )}
                             </Box>
+                            </Island>
                             {!isOnline && <OfflineBanner />}
                             <AddToCartModalProvider>
                                 <SkipNavContent
@@ -450,32 +440,15 @@ const App = (props) => {
                                         </OfflineBoundary>
                                     </Box>
                                 </SkipNavContent>
-
-                                {!isCheckout && !isDevPath ? <Footer /> : !isDevPath ? <CheckoutFooter /> : null}
-
+                                <Island hydrateOn={'visible'}>
+                                {!isCheckout ? <Footer /> : <CheckoutFooter />}
+                                </Island>
                                 <AuthModal {...authModal} />
                                 {!isDevPath && <DntNotification {...dntNotification} />}
                             </AddToCartModalProvider>
                         </Box>
                     </CurrencyProvider>
                 </IntlProvider>
-                {ACTIVE_DATA_ENABLED && (
-                    <script
-                        type="text/javascript"
-                        src={getAssetUrl('static/dwanalytics-22.2.js')}
-                        id="dwanalytics"
-                        async="async"
-                        onLoad={trackPage}
-                    ></script>
-                )}
-                {ACTIVE_DATA_ENABLED && (
-                    <script
-                        src={getAssetUrl('static/dwac-21.7.js')}
-                        type="text/javascript"
-                        id="dwac"
-                        async="async"
-                    ></script>
-                )}
             </StorefrontPreview>
         </Box>
     )

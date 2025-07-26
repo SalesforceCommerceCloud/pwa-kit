@@ -1,7 +1,20 @@
-## v3.11.0-dev.0 (May 23, 2025)
+## v3.12.0-dev (Jul 22, 2025)
+- Add `--initGit` to automate git repo creation for the generated project [#2817](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2817)
+
+## v3.11.0 (Jul 22, 2025)
+- Fix the demo instance details in `program.json`[#2800](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2800)
+- Fix exiting before `program.json` content can be flushed [#2699](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2699)
+- Add `program.json` + Support for Agent-Friendly CLI Input via stdio [#2662](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2662)
+- Change the default ECOM instance in the generated application [#2610](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2610)
+- Load active data scripts on demand only [#2623](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2623)
+- Introduce the cursor rules to assist storefront project developers [#2578](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2578) [#2754](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2754)
+- Add `StoreLocatorProvider` to the `AppConfig` template to support BOPIS [#2753](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2753)
+- Remove search constants overrides so more than 3 products at a time can be fetched [#2819](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2819)
+- Update Data Cloud configurations [#2843](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2843) [#2811](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2811)
+- Remove the need of redundant assets/cursor_rules [#2820](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2820)
 
 ## v3.10.0 (May 22, 2025)
-- Add Data Cloud API configuration to `default.js`. [#2318] (https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2229)
+- Add Data Cloud API configuration to `default.js`. [#2318](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2318)
 - Fix dependencies vulnerabilities [#2338](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2338)
 
 ## v3.9.1 (Mar 05, 2025)
@@ -9,9 +22,9 @@
 
 ## v3.9.0 (Feb 18, 2025)
 
-- Update `default.js` and `ssr.js` template to support new passwordless, social, and reset password flows. [#2263] (https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2263)
+- Update `default.js` and `ssr.js` template to support new passwordless, social, and reset password flows. [#2263](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2263)
 - Support Node 22 [#2218](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2218)
-- Update `default.js` template to include new login configurations [#2079] (https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2079)
+- Update `default.js` template to include new login configurations [#2079](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2079)
 - Handle import error when ssr.js imports from template retail react app [#2270](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2270)
 
 ## v3.8.0 (Oct 28, 2024)

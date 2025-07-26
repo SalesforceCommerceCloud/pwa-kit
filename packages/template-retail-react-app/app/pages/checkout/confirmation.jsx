@@ -22,11 +22,19 @@ import {
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 import {useForm} from 'react-hook-form'
 import {useParams} from 'react-router-dom'
-import {useOrder, useProducts, useAuthHelper, AuthHelpers} from '@salesforce/commerce-sdk-react'
+import {
+    useOrder,
+    useProducts,
+    useAuthHelper,
+    AuthHelpers,
+    useStores,
+    useShopperCustomersMutation
+} from '@salesforce/commerce-sdk-react'
 import {getCreditCardIcon} from '@salesforce/retail-react-app/app/utils/cc-utils'
 import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
 import Link from '@salesforce/retail-react-app/app/components/link'
 import AddressDisplay from '@salesforce/retail-react-app/app/components/address-display'
+import StoreDisplay from '@salesforce/retail-react-app/app/components/store-display'
 import PostCheckoutRegistrationFields from '@salesforce/retail-react-app/app/components/forms/post-checkout-registration-fields'
 import PromoPopover from '@salesforce/retail-react-app/app/components/promo-popover'
 import ItemVariantProvider from '@salesforce/retail-react-app/app/components/item-variant'
@@ -35,8 +43,12 @@ import CartItemVariantName from '@salesforce/retail-react-app/app/components/ite
 import CartItemVariantAttributes from '@salesforce/retail-react-app/app/components/item-variant/item-attributes'
 import CartItemVariantPrice from '@salesforce/retail-react-app/app/components/item-variant/item-price'
 import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
-import {API_ERROR_MESSAGE} from '@salesforce/retail-react-app/app/constants'
+import {
+    API_ERROR_MESSAGE,
+    STORE_LOCATOR_IS_ENABLED
+} from '@salesforce/retail-react-app/app/constants'
 import {useCurrency} from '@salesforce/retail-react-app/app/hooks'
+import {nanoid} from 'nanoid'
 
 const onClient = typeof window !== 'undefined'
 
@@ -45,6 +57,7 @@ const CheckoutConfirmation = () => {
     const navigate = useNavigation()
     const {data: customer} = useCurrentCustomer()
     const register = useAuthHelper(AuthHelpers.Register)
+    const createCustomerAddress = useShopperCustomersMutation('createCustomerAddress')
     const {data: order} = useOrder(
         {
             parameters: {orderNo}
@@ -58,6 +71,23 @@ const CheckoutConfirmation = () => {
     const {data: products} = useProducts({parameters: {ids: itemIds?.join(',')}})
     const productItemsMap = products?.data.reduce((map, item) => ({...map, [item.id]: item}), {})
     const form = useForm()
+
+    // Check if this is a pickup order and get store details
+    const isPickupOrder = STORE_LOCATOR_IS_ENABLED
+        ? order?.shipments?.[0]?.shippingMethod?.c_storePickupEnabled === true
+        : false
+    const storeId = order?.shipments?.[0]?.c_fromStoreId
+    const {data: storeData} = useStores(
+        {
+            parameters: {
+                ids: storeId
+            }
+        },
+        {
+            enabled: !!storeId && isPickupOrder && onClient
+        }
+    )
+    const store = storeData?.data?.[0]
 
     useEffect(() => {
         form.reset({
@@ -75,17 +105,38 @@ const CheckoutConfirmation = () => {
     const CardIcon = getCreditCardIcon(order.paymentInstruments[0].paymentCard?.cardType)
 
     const submitForm = async (data) => {
+        const saveShippingAddress = async (customerId) => {
+            try {
+                const shippingAddress = order.shipments[0].shippingAddress
+                let {id, ...shippingAddressWithoutId} = shippingAddress
+                const bodyShippingAddress = {
+                    addressId: nanoid(),
+                    ...shippingAddressWithoutId
+                }
+                await createCustomerAddress.mutateAsync({
+                    body: bodyShippingAddress,
+                    parameters: {customerId: customerId}
+                })
+            } catch (error) {
+                // Fail silently
+            }
+        }
+
         try {
             const body = {
                 customer: {
                     firstName: data.firstName,
                     lastName: data.lastName,
                     email: data.email,
-                    login: data.email
+                    login: data.email,
+                    phoneHome: order.billingAddress.phone
                 },
                 password: data.password
             }
-            await register.mutateAsync(body)
+            const registerData = await register.mutateAsync(body)
+
+            // Save the shipping address from this order, should not block account creation
+            await saveShippingAddress(registerData.customerId)
 
             navigate(`/account`)
         } catch (error) {
@@ -221,41 +272,84 @@ const CheckoutConfirmation = () => {
                     <Box layerStyle="card" rounded={[0, 0, 'base']} px={[4, 4, 6]} py={[6, 6, 8]}>
                         <Container variant="form">
                             <Stack spacing={6}>
-                                <Heading fontSize="lg">
-                                    <FormattedMessage
-                                        defaultMessage="Delivery Details"
-                                        id="checkout_confirmation.heading.delivery_details"
-                                    />
-                                </Heading>
-
-                                <SimpleGrid columns={[1, 1, 2]} spacing={6}>
-                                    <Stack spacing={1}>
-                                        <Heading as="h3" fontSize="sm">
+                                {isPickupOrder ? (
+                                    <>
+                                        <Heading fontSize="lg">
                                             <FormattedMessage
-                                                defaultMessage="Shipping Address"
-                                                id="checkout_confirmation.heading.shipping_address"
+                                                defaultMessage="Pickup Details"
+                                                id="checkout_confirmation.heading.pickup_details"
                                             />
                                         </Heading>
-                                        <AddressDisplay
-                                            address={order.shipments[0].shippingAddress}
-                                        />
-                                    </Stack>
 
-                                    <Stack spacing={1}>
-                                        <Heading as="h3" fontSize="sm">
+                                        <Stack spacing={2}>
+                                            <Heading as="h3" fontSize="md">
+                                                <FormattedMessage
+                                                    defaultMessage="Pickup Address"
+                                                    id="checkout_confirmation.heading.pickup_address"
+                                                />
+                                            </Heading>
+                                            {store ? (
+                                                <StoreDisplay
+                                                    store={store}
+                                                    showDistance={false}
+                                                    showEmail={true}
+                                                    showPhone={true}
+                                                    showStoreHours={true}
+                                                />
+                                            ) : (
+                                                <Text>
+                                                    <FormattedMessage
+                                                        defaultMessage="Store information isn't available"
+                                                        id="checkout_confirmation.message.store_info_unavailable"
+                                                    />
+                                                </Text>
+                                            )}
+                                        </Stack>
+                                    </>
+                                ) : (
+                                    <>
+                                        <Heading fontSize="lg">
                                             <FormattedMessage
-                                                defaultMessage="Shipping Method"
-                                                id="checkout_confirmation.heading.shipping_method"
+                                                defaultMessage="Delivery Details"
+                                                id="checkout_confirmation.heading.delivery_details"
                                             />
                                         </Heading>
-                                        <Box>
-                                            <Text>{order.shipments[0].shippingMethod.name}</Text>
-                                            <Text>
-                                                {order.shipments[0].shippingMethod.description}
-                                            </Text>
-                                        </Box>
-                                    </Stack>
-                                </SimpleGrid>
+
+                                        <SimpleGrid columns={[1, 1, 2]} spacing={6}>
+                                            <Stack spacing={1}>
+                                                <Heading as="h3" fontSize="sm">
+                                                    <FormattedMessage
+                                                        defaultMessage="Shipping Address"
+                                                        id="checkout_confirmation.heading.shipping_address"
+                                                    />
+                                                </Heading>
+                                                <AddressDisplay
+                                                    address={order.shipments[0].shippingAddress}
+                                                />
+                                            </Stack>
+
+                                            <Stack spacing={1}>
+                                                <Heading as="h3" fontSize="sm">
+                                                    <FormattedMessage
+                                                        defaultMessage="Shipping Method"
+                                                        id="checkout_confirmation.heading.shipping_method"
+                                                    />
+                                                </Heading>
+                                                <Box>
+                                                    <Text>
+                                                        {order.shipments[0].shippingMethod.name}
+                                                    </Text>
+                                                    <Text>
+                                                        {
+                                                            order.shipments[0].shippingMethod
+                                                                .description
+                                                        }
+                                                    </Text>
+                                                </Box>
+                                            </Stack>
+                                        </SimpleGrid>
+                                    </>
+                                )}
                             </Stack>
                         </Container>
                     </Box>

@@ -34,10 +34,15 @@ import useEinstein from '@salesforce/retail-react-app/app/hooks/use-einstein'
 import useDataCloud from '@salesforce/retail-react-app/app/hooks/use-datacloud'
 import useActiveData from '@salesforce/retail-react-app/app/hooks/use-active-data'
 import {useServerContext} from '@salesforce/pwa-kit-react-sdk/ssr/universal/hooks'
+import usePickupShipment from '@salesforce/retail-react-app/app/hooks/use-pickup-shipment'
+import {useSelectedStore} from '@salesforce/retail-react-app/app/hooks/use-selected-store'
+import {STORE_LOCATOR_IS_ENABLED} from '@salesforce/retail-react-app/app/constants'
 // Project Components
 import RecommendedProducts from '@salesforce/retail-react-app/app/components/recommended-products'
 import ProductView from '@salesforce/retail-react-app/app/components/product-view'
 import InformationAccordion from '@salesforce/retail-react-app/app/pages/product-detail/partials/information-accordion'
+import {StoreLocatorModal} from '@salesforce/retail-react-app/app/components/store-locator'
+import Island from '@salesforce/retail-react-app/app/components/island'
 
 import {HTTPNotFound, HTTPError} from '@salesforce/pwa-kit-react-sdk/ssr/universal/errors'
 import logger from '@salesforce/retail-react-app/app/utils/logger-instance'
@@ -56,6 +61,7 @@ import {rebuildPathWithParams} from '@salesforce/retail-react-app/app/utils/url'
 import {useHistory, useLocation, useParams} from 'react-router-dom'
 import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
 import {useWishList} from '@salesforce/retail-react-app/app/hooks/use-wish-list'
+import {useDisclosure} from '@salesforce/retail-react-app/app/components/shared/ui'
 
 const ProductDetail = () => {
     const {formatMessage} = useIntl()
@@ -67,9 +73,14 @@ const ProductDetail = () => {
     const toast = useToast()
     const navigate = useNavigation()
     const customerId = useCustomerId()
+    const {
+        isOpen: isStoreLocatorOpen,
+        onOpen: onOpenStoreLocator,
+        onClose: onCloseStoreLocator
+    } = useDisclosure()
 
     /****************************** Basket *********************************/
-    const {isLoading: isBasketLoading} = useCurrentBasket()
+    const {data: basket, isLoading: isBasketLoading} = useCurrentBasket()
     const {addItemToNewOrExistingBasket} = useShopperBasketsMutationHelper()
     const updateItemsInBasketMutation = useShopperBasketsMutation('updateItemsInBasket')
     const {res} = useServerContext()
@@ -79,6 +90,17 @@ const ProductDetail = () => {
             `s-maxage=${MAX_CACHE_AGE}, stale-while-revalidate=${STALE_WHILE_REVALIDATE}`
         )
     }
+
+    /*************************** Pick up in Store ********************/
+    const {selectedStore} = useSelectedStore()
+    const selectedInventoryId = selectedStore?.inventoryId || null
+
+    const {
+        addInventoryIdsToPickupItems,
+        updateShippingMethodIfNeeded,
+        isCurrentShippingMethodPickup,
+        hasPickupItems
+    } = usePickupShipment(basket)
 
     /*************************** Product Detail and Category ********************/
     const {productId} = useParams()
@@ -104,7 +126,8 @@ const ProductDetail = () => {
                     'bundled_products',
                     'page_meta_tags'
                 ],
-                allImages: true
+                allImages: true,
+                ...(selectedInventoryId ? {inventoryIds: selectedInventoryId} : {})
             }
         },
         {
@@ -135,23 +158,28 @@ const ProductDetail = () => {
     const isProductASet = product?.type.set
     const isProductABundle = product?.type.bundle
 
-    let bundleChildVariantIds = ''
+    let bundleChildProductIds = ''
     if (isProductABundle)
-        bundleChildVariantIds = Object.keys(childProductSelection)
-            ?.map((key) => childProductSelection[key].variant.productId)
+        bundleChildProductIds = Object.keys(childProductSelection)
+            ?.map(
+                (key) =>
+                    childProductSelection[key].variant?.productId ||
+                    childProductSelection[key].product?.id
+            )
             .join(',')
 
     const {data: bundleChildrenData} = useProducts(
         {
             parameters: {
-                ids: bundleChildVariantIds,
+                ids: bundleChildProductIds,
                 allImages: false,
                 expand: ['availability', 'variations'],
-                select: '(data.(id,inventory,master))'
+                select: '(data.(id,inventories,inventory,master))',
+                ...(selectedInventoryId ? {inventoryIds: selectedInventoryId} : {})
             }
         },
         {
-            enabled: bundleChildVariantIds?.length > 0,
+            enabled: bundleChildProductIds?.length > 0,
             keepPreviousData: true
         }
     )
@@ -160,7 +188,7 @@ const ProductDetail = () => {
         // Loop through the bundle children and update the inventory for variant selection
         product.bundledProducts.forEach(({product: childProduct}, index) => {
             const matchingChildProduct = bundleChildrenData.data.find(
-                (bundleChild) => bundleChild.master.masterId === childProduct.id
+                (bundleChild) => bundleChild?.master?.masterId === childProduct.id
             )
             if (matchingChildProduct) {
                 product.bundledProducts[index].product = {
@@ -287,31 +315,116 @@ const ProductDetail = () => {
 
     /**************** Add To Cart ****************/
     const showToast = useToast()
-    const showError = () => {
+    const showError = (errorMessage) => {
+        const errorText =
+            typeof errorMessage === 'string' ? errorMessage : formatMessage(API_ERROR_MESSAGE)
+
         showToast({
-            title: formatMessage(API_ERROR_MESSAGE),
+            title: errorText,
             status: 'error'
         })
     }
 
-    const handleAddToCart = async (productSelectionValues) => {
+    const [pickupInStoreMap, setPickupInStoreMap] = useState({})
+
+    const handlePickupInStoreChange = (productId, checked) => {
+        setPickupInStoreMap((prev) => ({
+            ...prev,
+            [productId]: checked
+        }))
+    }
+
+    const handleAddToCart = async (productSelectionValues = []) => {
         try {
-            const productItems = productSelectionValues.map(({variant, quantity}) => ({
-                productId: variant.productId,
-                price: variant.price,
-                quantity
-            }))
+            let productItems = productSelectionValues.map((item) => {
+                const {variant, quantity} = item
+                // Use variant if present, otherwise use the main product
+                const prod = variant || item.product || product
+                return {
+                    productId: prod?.productId || prod?.id, // productId for variant, id for product
+                    price: prod?.price,
+                    quantity
+                }
+            })
+            // Add inventory IDs for pickup items using the hook helper
+            productItems = addInventoryIdsToPickupItems(
+                productItems,
+                pickupInStoreMap,
+                selectedStore
+            )
+            // Defensive check: This block ensures that if, for any reason, pickup is selected for a product but no store (inventoryId) is set,
+            // we show an error. With the current UI logic, this should never be reached, but it guards against unexpected state.
+            if (
+                productItems.some(
+                    (item) =>
+                        item.inventoryId === undefined &&
+                        pickupInStoreMap[item.productId || item.id]
+                )
+            ) {
+                showError(
+                    formatMessage({
+                        id: 'product_view.error.no_store_selected_for_pickup',
+                        defaultMessage: 'No valid store or inventory found for pickup'
+                    })
+                )
+                return
+            }
 
-            await addItemToNewOrExistingBasket(productItems)
+            // Check if any products have pickup selected
+            const hasAnyPickupSelected = hasPickupItems(
+                productSelectionValues,
+                pickupInStoreMap,
+                product
+            )
 
-            einstein.sendAddToCart(productItems)
+            const currentShippingMethodIsPickup = isCurrentShippingMethodPickup(
+                basket?.shipments?.[0]?.shippingMethod
+            )
+            // Only perform the check if the basket exists and has at least one item
+            if (basket && basket.productItems?.length > 0) {
+                if (hasAnyPickupSelected && !currentShippingMethodIsPickup) {
+                    throw new Error(
+                        formatMessage({
+                            id: 'product_view.error.select_ship_to_address',
+                            defaultMessage:
+                                "Select 'Ship to Address' to match the delivery method for the items in your cart."
+                        })
+                    )
+                }
+                if (!hasAnyPickupSelected && currentShippingMethodIsPickup) {
+                    throw new Error(
+                        formatMessage({
+                            id: 'product_view.error.select_pickup_in_store',
+                            defaultMessage:
+                                "Select 'Pick Up in Store' to match the delivery method for the items in your cart."
+                        })
+                    )
+                }
+            }
 
-            // If the items were successfully added, set the return value to be used
-            // by the add to cart modal.
+            const basketResponse = await addItemToNewOrExistingBasket(productItems)
+
+            // Configure shipping method based on pickup selection
+            await updateShippingMethodIfNeeded(
+                basketResponse,
+                productItems,
+                hasAnyPickupSelected,
+                selectedStore
+            )
+
+            const productItemsForEinstein = productSelectionValues.map(
+                ({product, variant, quantity}) => ({
+                    product,
+                    productId: variant?.productId || product?.id,
+                    price: variant?.price || product?.price,
+                    quantity
+                })
+            )
+            einstein.sendAddToCart(productItemsForEinstein)
+
             return productSelectionValues
         } catch (error) {
-            console.log('error', error)
-            showError(error)
+            showError(error.message)
         }
     }
 
@@ -324,10 +437,16 @@ const ProductDetail = () => {
         })
 
         // Using ot state for which child products are selected, scroll to the first
-        // one that isn't selected.
+        // one that isn't selected and requires a variant selection.
         const selectedProductIds = Object.keys(childProductSelection)
-        const firstUnselectedProduct = comboProduct.childProducts.find(
-            ({product: childProduct}) => !selectedProductIds.includes(childProduct.id)
+        const firstUnselectedProduct = comboProduct.childProducts?.find(
+            ({product: childProduct}) => {
+                // Skip validation for standard products (no variations)
+                if (childProduct.type?.item) {
+                    return false
+                }
+                return !selectedProductIds.includes(childProduct.id)
+            }
         )?.product
 
         if (firstUnselectedProduct) {
@@ -348,6 +467,9 @@ const ProductDetail = () => {
     }, [product, childProductSelection])
 
     /**************** Product Set Handlers ****************/
+    // 1. Gather the selected child products from state.
+    // 2. Call handleAddToCart with the selected products.
+    // 3. The add-to-cart modal will be opened in handleAddToCart.
     const handleProductSetAddToCart = () => {
         // Get all the selected products, and pass them to the addToCart handler which
         // accepts an array.
@@ -357,11 +479,54 @@ const ProductDetail = () => {
 
     /**************** Product Bundle Handlers ****************/
     // Top level bundle does not have variants
-    const handleProductBundleAddToCart = async (variant, selectedQuantity) => {
+    const handleProductBundleAddToCart = async ([{quantity: selectedQuantity}]) => {
         try {
             const childProductSelections = Object.values(childProductSelection)
+            // Check if any products have pickup selected (including main product and bundle items)
+            const bundleSelectionValues = [
+                {product, variant: null, selectedQuantity},
+                ...childProductSelections
+            ]
+            const hasAnyPickupSelected = hasPickupItems(
+                bundleSelectionValues,
+                pickupInStoreMap,
+                product
+            )
 
-            const productItems = [
+            // Check for delivery method conflicts before adding to cart
+            if (basket && basket.productItems?.length > 0) {
+                const currentShippingMethod = basket?.shipments?.[0]?.shippingMethod
+                const currentShippingMethodIsPickup =
+                    isCurrentShippingMethodPickup(currentShippingMethod)
+
+                // If there's no shipping method, treat it as non-pickup (ship to address)
+                if (
+                    hasAnyPickupSelected &&
+                    (!currentShippingMethod || !currentShippingMethodIsPickup)
+                ) {
+                    throw new Error(
+                        formatMessage({
+                            id: 'product_view.error.select_ship_to_address',
+                            defaultMessage:
+                                "Select 'Ship to Address' to match the delivery method for the items in your cart."
+                        })
+                    )
+                } else if (
+                    !hasAnyPickupSelected &&
+                    currentShippingMethod &&
+                    currentShippingMethodIsPickup
+                ) {
+                    throw new Error(
+                        formatMessage({
+                            id: 'product_view.error.select_pickup_in_store',
+                            defaultMessage:
+                                "Select 'Pick Up in Store' to match the delivery method for the items in your cart."
+                        })
+                    )
+                }
+            }
+
+            let productItems = [
                 {
                     productId: product.id,
                     price: product.price,
@@ -371,12 +536,19 @@ const ProductDetail = () => {
                     // with the chosen variant selections
                     bundledProductItems: childProductSelections.map((child) => {
                         return {
-                            productId: child.variant.productId,
+                            productId: child.variant?.productId || child.product?.id,
                             quantity: child.quantity
                         }
                     })
                 }
             ]
+
+            // Add inventory IDs for pickup items using the hook helper
+            productItems = addInventoryIdsToPickupItems(
+                productItems,
+                pickupInStoreMap,
+                selectedStore
+            )
 
             const res = await addItemToNewOrExistingBasket(productItems)
 
@@ -412,6 +584,14 @@ const ProductDetail = () => {
                     body: itemsToBeUpdated
                 })
             }
+
+            // Configure shipping method based on pickup selection
+            await updateShippingMethodIfNeeded(
+                res,
+                productItems,
+                hasAnyPickupSelected,
+                selectedStore
+            )
 
             einstein.sendAddToCart(productItems)
 
@@ -475,22 +655,31 @@ const ProductDetail = () => {
             <Stack spacing={16}>
                 {isProductASet || isProductABundle ? (
                     <Fragment>
-                        <ProductView
-                            product={product}
-                            category={primaryCategory?.parentCategoryTree || []}
-                            addToCart={
-                                isProductASet
-                                    ? handleProductSetAddToCart
-                                    : handleProductBundleAddToCart
-                            }
-                            addToWishlist={handleAddToWishlist}
-                            isProductLoading={isProductLoading}
-                            isBasketLoading={isBasketLoading}
-                            isWishlistLoading={isWishlistLoading}
-                            validateOrderability={handleChildProductValidation}
-                            childProductOrderability={childProductOrderability}
-                            setSelectedBundleQuantity={setSelectedBundleQuantity}
-                        />
+                        <Island hydrateOn={'visible'}>
+                            <ProductView
+                                product={product}
+                                category={primaryCategory?.parentCategoryTree || []}
+                                addToCart={
+                                    isProductASet
+                                        ? handleProductSetAddToCart
+                                        : handleProductBundleAddToCart
+                                }
+                                addToWishlist={handleAddToWishlist}
+                                isProductLoading={isProductLoading}
+                                isBasketLoading={isBasketLoading}
+                                isWishlistLoading={isWishlistLoading}
+                                validateOrderability={handleChildProductValidation}
+                                childProductOrderability={childProductOrderability}
+                                setSelectedBundleQuantity={setSelectedBundleQuantity}
+                                selectedBundleParentQuantity={selectedBundleQuantity}
+                                pickupInStore={!!pickupInStoreMap[product?.id]}
+                                setPickupInStore={(checked) =>
+                                    product && handlePickupInStoreChange(product.id, checked)
+                                }
+                                onOpenStoreLocator={onOpenStoreLocator}
+                                showDeliveryOptions={STORE_LOCATOR_IS_ENABLED}
+                            />
+                        </Island>
 
                         <hr />
 
@@ -517,14 +706,8 @@ const ProductDetail = () => {
                                             selectedBundleParentQuantity={selectedBundleQuantity}
                                             addToCart={
                                                 isProductASet
-                                                    ? (variant, quantity) =>
-                                                          handleAddToCart([
-                                                              {
-                                                                  product: childProduct,
-                                                                  variant,
-                                                                  quantity
-                                                              }
-                                                          ])
+                                                    ? (productSelectionValues) =>
+                                                          handleAddToCart(productSelectionValues)
                                                     : null
                                             }
                                             addToWishlist={
@@ -543,7 +726,9 @@ const ProductDetail = () => {
                                                         }
                                                     }))
                                                 } else {
-                                                    const selections = {...childProductSelection}
+                                                    const selections = {
+                                                        ...childProductSelection
+                                                    }
                                                     delete selections[product.id]
                                                     setChildProductSelection(selections)
                                                 }
@@ -553,6 +738,15 @@ const ProductDetail = () => {
                                             isWishlistLoading={isWishlistLoading}
                                             setChildProductOrderability={
                                                 setChildProductOrderability
+                                            }
+                                            pickupInStore={!!pickupInStoreMap[childProduct?.id]}
+                                            setPickupInStore={(checked) =>
+                                                childProduct &&
+                                                handlePickupInStoreChange(childProduct.id, checked)
+                                            }
+                                            onOpenStoreLocator={onOpenStoreLocator}
+                                            showDeliveryOptions={
+                                                STORE_LOCATOR_IS_ENABLED && !isProductABundle
                                             }
                                         />
                                         <InformationAccordion product={childProduct} />
@@ -567,65 +761,84 @@ const ProductDetail = () => {
                     </Fragment>
                 ) : (
                     <Fragment>
-                        <ProductView
-                            product={product}
-                            category={primaryCategory?.parentCategoryTree || []}
-                            addToCart={(variant, quantity) =>
-                                handleAddToCart([{product, variant, quantity}])
-                            }
-                            addToWishlist={handleAddToWishlist}
-                            isProductLoading={isProductLoading}
-                            isBasketLoading={isBasketLoading}
-                            isWishlistLoading={isWishlistLoading}
-                        />
-                        <InformationAccordion product={product} />
+                        <Island hydrateOn={'visible'}>
+                            <ProductView
+                                product={product}
+                                category={primaryCategory?.parentCategoryTree || []}
+                                addToCart={handleAddToCart}
+                                addToWishlist={handleAddToWishlist}
+                                isProductLoading={isProductLoading}
+                                isBasketLoading={isBasketLoading}
+                                isWishlistLoading={isWishlistLoading}
+                                childProductOrderability={childProductOrderability}
+                                setChildProductOrderability={setChildProductOrderability}
+                                setSelectedBundleQuantity={setSelectedBundleQuantity}
+                                selectedBundleParentQuantity={selectedBundleQuantity}
+                                pickupInStore={!!pickupInStoreMap[product?.id]}
+                                setPickupInStore={(checked) =>
+                                    product && handlePickupInStoreChange(product.id, checked)
+                                }
+                                onOpenStoreLocator={onOpenStoreLocator}
+                                showDeliveryOptions={STORE_LOCATOR_IS_ENABLED}
+                            />
+                            <InformationAccordion product={product} />
+                        </Island>
                     </Fragment>
                 )}
 
                 {/* Product Recommendations */}
                 <Stack spacing={16}>
                     {!isProductASet && (
+                        <Island hydrateOn={'visible'}>
+                            <RecommendedProducts
+                                title={
+                                    <FormattedMessage
+                                        defaultMessage="Complete the Set"
+                                        id="product_detail.recommended_products.title.complete_set"
+                                    />
+                                }
+                                recommender={EINSTEIN_RECOMMENDERS.PDP_COMPLETE_SET}
+                                products={[product]}
+                                mx={{base: -4, md: -8, lg: 0}}
+                                shouldFetch={() => product?.id}
+                            />
+                        </Island>
+                    )}
+                    <Island hydrateOn={'visible'}>
                         <RecommendedProducts
                             title={
                                 <FormattedMessage
-                                    defaultMessage="Complete the Set"
-                                    id="product_detail.recommended_products.title.complete_set"
+                                    defaultMessage="You might also like"
+                                    id="product_detail.recommended_products.title.might_also_like"
                                 />
                             }
-                            recommender={EINSTEIN_RECOMMENDERS.PDP_COMPLETE_SET}
+                            recommender={EINSTEIN_RECOMMENDERS.PDP_MIGHT_ALSO_LIKE}
                             products={[product]}
                             mx={{base: -4, md: -8, lg: 0}}
                             shouldFetch={() => product?.id}
                         />
-                    )}
-                    <RecommendedProducts
-                        title={
-                            <FormattedMessage
-                                defaultMessage="You might also like"
-                                id="product_detail.recommended_products.title.might_also_like"
-                            />
-                        }
-                        recommender={EINSTEIN_RECOMMENDERS.PDP_MIGHT_ALSO_LIKE}
-                        products={[product]}
-                        mx={{base: -4, md: -8, lg: 0}}
-                        shouldFetch={() => product?.id}
-                    />
+                    </Island>
 
-                    <RecommendedProducts
-                        // The Recently Viewed recommender doesn't use `products`, so instead we
-                        // provide a key to update the recommendations on navigation.
-                        key={location.key}
-                        title={
-                            <FormattedMessage
-                                defaultMessage="Recently Viewed"
-                                id="product_detail.recommended_products.title.recently_viewed"
-                            />
-                        }
-                        recommender={EINSTEIN_RECOMMENDERS.PDP_RECENTLY_VIEWED}
-                        mx={{base: -4, md: -8, lg: 0}}
-                    />
+                    <Island hydrateOn={'visible'}>
+                        <RecommendedProducts
+                            // The Recently Viewed recommender doesn't use `products`, so instead we
+                            // provide a key to update the recommendations on navigation.
+                            key={location.key}
+                            title={
+                                <FormattedMessage
+                                    defaultMessage="Recently Viewed"
+                                    id="product_detail.recommended_products.title.recently_viewed"
+                                />
+                            }
+                            recommender={EINSTEIN_RECOMMENDERS.PDP_RECENTLY_VIEWED}
+                            mx={{base: -4, md: -8, lg: 0}}
+                        />
+                    </Island>
                 </Stack>
             </Stack>
+            {STORE_LOCATOR_IS_ENABLED && (
+                <StoreLocatorModal isOpen={isStoreLocatorOpen} onClose={onCloseStoreLocator} />
+            )}
         </Box>
     )
 }

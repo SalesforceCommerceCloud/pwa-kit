@@ -10,9 +10,17 @@ import {useVariant} from '@salesforce/retail-react-app/app/hooks/use-variant'
 import {useIntl} from 'react-intl'
 import {useVariationParams} from '@salesforce/retail-react-app/app/hooks/use-variation-params'
 import {useVariationAttributes} from '@salesforce/retail-react-app/app/hooks/use-variation-attributes'
+import {useSelectedStore} from '@salesforce/retail-react-app/app/hooks/use-selected-store'
 
 const OUT_OF_STOCK = 'OUT_OF_STOCK'
 const UNFULFILLABLE = 'UNFULFILLABLE'
+
+const getInventoryById = (product, inventoryId) => {
+    if (!inventoryId || !product?.inventories) {
+        return null
+    }
+    return product.inventories.find((inv) => inv.id === inventoryId)
+}
 
 // TODO: This needs to be refactored.
 export const useDerivedProduct = (
@@ -31,6 +39,7 @@ export const useDerivedProduct = (
     const lowestStockLevelProductName = product?.inventory?.lowestStockLevelProductName
     const intl = useIntl()
     const variant = useVariant(product, isProductPartOfSet, isProductPartOfBundle)
+    const isStandardProduct = product?.type?.item
     const variationParams = useVariationParams(product, isProductPartOfSet, isProductPartOfBundle)
     const variationAttributes = useVariationAttributes(
         product,
@@ -38,7 +47,16 @@ export const useDerivedProduct = (
         isProductPartOfBundle
     )
     const [quantity, setQuantity] = useState(initialQuantity)
+    const {selectedStore} = useSelectedStore()
 
+    const selectedStoreInventory = getInventoryById(product, selectedStore?.inventoryId)
+    const selectedStoreStockLevel = selectedStoreInventory?.stockLevel || 0
+    // selectedStoreStockLevel and selectedStoreInventory are already variant specific,
+    // so we don't need to check for variation attributes
+    const isSelectedStoreOutOfStock =
+        !selectedStoreStockLevel ||
+        selectedStoreStockLevel < quantity ||
+        !selectedStoreInventory?.orderable
     // A product is considered out of stock if the stock level is 0 or if we have all our
     // variation attributes selected, but don't have a variant. We do this because the API
     // will sometimes return all the variants even if they are out of stock, but for other
@@ -47,6 +65,7 @@ export const useDerivedProduct = (
         !stockLevel ||
         (!isProductABundle &&
             !variant &&
+            !isStandardProduct &&
             Object.keys(variationParams).length === variationAttributes.length) ||
         (!isProductABundle && variant && !variant.orderable)
     const unfulfillable = stockLevel < quantity
@@ -73,7 +92,8 @@ export const useDerivedProduct = (
     }
 
     // showInventoryMessage controls if add to cart button is disabled
-    const showInventoryMessage = (variant || isProductABundle) && (isOutOfStock || unfulfillable)
+    const showInventoryMessage =
+        (variant || isProductABundle || isStandardProduct) && (isOutOfStock || unfulfillable)
     const inventoryMessage =
         (isOutOfStock && inventoryMessages[OUT_OF_STOCK]) ||
         (unfulfillable && inventoryMessages[UNFULFILLABLE])
@@ -98,6 +118,8 @@ export const useDerivedProduct = (
         variant,
         stockLevel,
         isOutOfStock,
-        unfulfillable
+        unfulfillable,
+        isSelectedStoreOutOfStock,
+        selectedStore
     }
 }

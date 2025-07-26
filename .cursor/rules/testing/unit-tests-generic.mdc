@@ -1,0 +1,57 @@
+---
+description: USE WHEN writing unit tests for components in template packages
+globs: ["packages/template-*/*/components/**/*.test.{js,jsx,ts,tsx}"]
+alwaysApply: false
+---
+USE WHEN writing unit tests for components in template packages
+
+# 🧪 Generic Component Test Rules
+
+## Structure & Best Practices
+- Use `describe` blocks to group tests, `test` for individual cases
+- Use `beforeEach` for setup, clear mocks after each test
+- **Arrange** → **Act** → **Assert** pattern
+- One behavior per test, clear descriptive names
+
+## Queries & Assertions
+- Prefer `getByRole`, `getByLabelText`, `getByTestId`
+- Use `expect().toBeInTheDocument()`, `.toHaveBeenCalledTimes()`, etc.
+- For async: `await waitFor(() => { ... })`
+
+## Mocking
+- `jest.fn()` for handlers, `jest.mock()` for modules
+- Clear mocks/storage after each test
+
+```js
+describe('MyComponent', () => {
+    beforeEach(() => jest.clearAllMocks())
+    
+    test('renders and handles interaction', async () => {
+        const mockHandler = jest.fn()
+        render(<MyComponent onClick={mockHandler} />)
+        
+        await userEvent.click(screen.getByRole('button'))
+        expect(mockHandler).toHaveBeenCalledTimes(1)
+    })
+})
+```
+
+## Running Tests
+After creating unit tests, **ALWAYS run the tests** to verify they pass and provide feedback on test results.
+
+### Command Format:
+```bash
+cd packages/<package-name> && npm run test -- '<relative-path-to-test-file> --coverage=false'
+```
+
+### Examples:
+```bash
+# Run specific test file from packages directory
+cd packages/template-retail-react-app && npm run test -- 'app/components/drawer-menu/drawer-menu.test.js --coverage=false'
+```
+
+### After Running Tests:
+- Report if tests **pass** or **fail**
+- If tests fail, provide the error messages and fix any issues
+- Confirm test coverage is appropriate for the component's core functionality
+- Suggest any additional tests if critical functionality is missing
