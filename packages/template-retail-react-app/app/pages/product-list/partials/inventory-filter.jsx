@@ -16,7 +16,7 @@ const StoreInventoryFilter = ({toggleFilter, selectedFilters}) => {
     const {isOpen, onOpen} = useStoreLocatorModal()
     const {formatMessage} = useIntl()
     const {selectedStore} = useSelectedStore()
-    const modalOpenedFromHere = useRef(false)
+    const storeLocatorModalRef = useRef(false)
 
     const isChecked = selectedFilters?.ilids !== undefined
 
@@ -30,8 +30,8 @@ const StoreInventoryFilter = ({toggleFilter, selectedFilters}) => {
     // Handle when modal closes after being opened from this component
     useEffect(() => {
         // If modal was opened from here and is now closed, apply filter if store is selected
-        if (modalOpenedFromHere.current && !isOpen) {
-            modalOpenedFromHere.current = false
+        if (storeLocatorModalRef.current && !isOpen) {
+            storeLocatorModalRef.current = false
             if (selectedStore?.inventoryId) {
                 toggleFilter({value: selectedStore.inventoryId}, 'ilids', false, false)
             }
@@ -42,7 +42,7 @@ const StoreInventoryFilter = ({toggleFilter, selectedFilters}) => {
         // If no store is selected or no inventoryId, open store locator
         if (!selectedStore?.inventoryId) {
             e.preventDefault()
-            modalOpenedFromHere.current = true
+            storeLocatorModalRef.current = true
             onOpen()
             return
         }
@@ -56,7 +56,7 @@ const StoreInventoryFilter = ({toggleFilter, selectedFilters}) => {
     const handleStoreNameClick = (e) => {
         e.stopPropagation()
         e.preventDefault()
-        modalOpenedFromHere.current = true
+        storeLocatorModalRef.current = true
         onOpen()
     }
 
