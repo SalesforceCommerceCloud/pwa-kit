@@ -28,13 +28,13 @@ import {
 } from '@salesforce/retail-react-app/app/utils/utils'
 import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
 import {HideOnDesktop, HideOnMobile} from '@salesforce/retail-react-app/app/components/responsive'
-import {FormattedMessage} from 'react-intl'
+import {FormattedMessage, useIntl} from 'react-intl'
 import debounce from 'lodash/debounce'
 import {
     RECENT_SEARCH_KEY,
     RECENT_SEARCH_LIMIT,
     RECENT_SEARCH_MIN_LENGTH,
-    PRODUCT_BADGE_CUSTOM_FIELD_NAME
+    PRODUCT_BADGE_DETAILS
 } from '@salesforce/retail-react-app/app/constants'
 import {
     productUrlBuilder,
@@ -42,7 +42,8 @@ import {
     categoryUrlBuilder
 } from '@salesforce/retail-react-app/app/utils/url'
 
-const formatSuggestions = (searchSuggestions) => {
+const formatSuggestions = (searchSuggestions, intl) => {
+    const badgeDetails = PRODUCT_BADGE_DETAILS
     return {
         categorySuggestions: searchSuggestions?.categorySuggestions?.categories?.map(
             (suggestion) => {
@@ -57,6 +58,20 @@ const formatSuggestions = (searchSuggestions) => {
             }
         ),
         productSuggestions: searchSuggestions?.productSuggestions?.products?.map((product) => {
+                // Retrieve product badges
+                const labelsMap = new Map()
+                badgeDetails.forEach((item) => {
+                    if (
+                        item.propertyName &&
+                        typeof product[item.propertyName] === 'boolean' &&
+                        product[item.propertyName] === true
+                    ) {
+                        labelsMap.set(intl.formatMessage(item.label), item.color)
+                    } else if (item.propertyName && product[item.propertyName]) {
+                        labelsMap.set(product[item.propertyName], item.color)
+                    }
+                })
+
             return {
                 type: 'product',
                 currency: product.currency,
@@ -64,7 +79,8 @@ const formatSuggestions = (searchSuggestions) => {
                 productId: product.productId,
                 name: capitalize(product.productName),
                 link: productUrlBuilder({id: product.productId}),
-                image: product.image?.disBaseLink // Add image if available
+                image: product.image?.disBaseLink, // Add image if available
+                labels: labelsMap
             }
         }),
         brandSuggestions: searchSuggestions?.brandSuggestions?.suggestedPhrases?.map((brand) => {
@@ -101,12 +117,15 @@ const Search = (props) => {
     const [isOpen, setIsOpen] = useState(false)
     const [searchQuery, setSearchQuery] = useState('')
     const navigate = useNavigation()
+    const intl = useIntl()
+    // Extract propertyName values from PRODUCT_BADGE_DETAILS as a comma-separated string
+    const productBadgePropertyNamesString = PRODUCT_BADGE_DETAILS.map(item => item.propertyName).join(',')
     const searchSuggestion = useSearchSuggestions(
         {
             parameters: {
                 q: searchQuery,
                 expand: 'images,prices,custom_product_properties',
-                includedCustomProductProperties: PRODUCT_BADGE_CUSTOM_FIELD_NAME
+                includedCustomProductProperties: productBadgePropertyNamesString
             }
         },
         {
@@ -116,8 +135,8 @@ const Search = (props) => {
     const searchInputRef = useRef()
     const recentSearches = getSessionJSONItem(RECENT_SEARCH_KEY)
     const searchSuggestions = useMemo(
-        () => formatSuggestions(searchSuggestion.data),
-        [searchSuggestion]
+        () => formatSuggestions(searchSuggestion.data, intl),
+        [searchSuggestion, intl]
     )
 
     // check if popover should open if we have suggestions
@@ -195,7 +214,7 @@ const Search = (props) => {
         // or we have search suggestions available and have inputed some text (empty text in this scenario should show recent searches)
         if (
             (document.activeElement.id === 'search-input' && recentSearches?.length > 0) ||
-            (searchSuggestionsAvailable && searchInputRef.current.value.length > 0)
+            (searchSuggestionsAvailable && searchInputRef.current?.value?.length > 0)
         ) {
             setIsOpen(true)
         } else {

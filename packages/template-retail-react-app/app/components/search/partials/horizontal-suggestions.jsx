@@ -6,12 +6,15 @@
  */
 import React from 'react'
 import PropTypes from 'prop-types'
-import {Text, Button, Box, Flex, Image} from '@salesforce/retail-react-app/app/components/shared/ui'
+import {Text, Button, Box, Flex, Image, HStack, Badge} from '@salesforce/retail-react-app/app/components/shared/ui'
+import {useMultiStyleConfig} from '@salesforce/retail-react-app/app/components/shared/ui'
 
 const HorizontalSuggestions = ({suggestions, closeAndNavigate}) => {
     if (!suggestions) {
         return null
     }
+
+    const styles = useMultiStyleConfig('SearchSuggestions')
 
     return (
         <Box data-testid="sf-horizontal-product-suggestions">
@@ -40,32 +43,15 @@ const HorizontalSuggestions = ({suggestions, closeAndNavigate}) => {
                                         borderRadius="md"
                                     />
                                 )}
-                                {/* Heart icon for favorites - positioned top right */}
-                                <Box
-                                    position="absolute"
-                                    top="2"
-                                    right="2"
-                                    color="gray.500"
-                                    fontSize="lg"
-                                >
-                                    ♡
-                                </Box>
 
-                                {suggestion.isNew && (
-                                    <Box
-                                        position="absolute"
-                                        top="2"
-                                        left="2"
-                                        bg="blue.500"
-                                        color="white"
-                                        px="2"
-                                        py="1"
-                                        borderRadius="sm"
-                                        fontSize="xs"
-                                        fontWeight="bold"
-                                    >
-                                        New
-                                    </Box>
+                                {suggestion.labels && suggestion.labels.size > 0 && (
+                                    <HStack {...styles.badgeGroup}>
+                                        {Array.from(suggestion.labels.entries()).map(([label, colorScheme]) => (
+                                            <Badge key={label} data-testid="product-badge" colorScheme={colorScheme} size="sm">
+                                                {label}
+                                            </Badge>
+                                        ))}
+                                    </HStack>
                                 )}
                             </Box>
 

@@ -62,8 +62,6 @@ export const PRODUCT_BADGE_DETAILS = [
     }
 ]
 
-export const PRODUCT_BADGE_CUSTOM_FIELD_NAME = 'c_product_badge'
-
 export const cssColorGroups = {
     beige: '#d3bca9',
     black: '#000000',

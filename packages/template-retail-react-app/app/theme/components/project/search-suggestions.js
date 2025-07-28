@@ -72,6 +72,11 @@ export default {
             as: 'span',
             color: 'gray.500',
             fontSize: 'sm'
+        },
+        badgeGroup: {
+            position: 'absolute',
+            top: 2,
+            left: 2
         }
     }
 }
