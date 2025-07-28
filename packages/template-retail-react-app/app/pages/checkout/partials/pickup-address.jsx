@@ -27,6 +27,7 @@ import StoreDisplay from '@salesforce/retail-react-app/app/components/store-disp
 // Hooks
 import {useCheckout} from '@salesforce/retail-react-app/app/pages/checkout/util/checkout-context'
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
+import {useSelectedStore} from '@salesforce/retail-react-app/app/hooks/use-selected-store'
 import {useShopperBasketsMutation, useStores, useProducts} from '@salesforce/commerce-sdk-react'
 import {STORE_LOCATOR_IS_ENABLED} from '@salesforce/retail-react-app/app/constants'
 
@@ -81,6 +82,10 @@ const PickupAddress = () => {
 
     const {hasPickupShipments, hasDeliveryShipments, pickupShipments, allStoreIds} = shipmentData
 
+    // Get selected store inventory ID for product data
+    const {selectedStore} = useSelectedStore()
+    const selectedInventoryId = selectedStore?.inventoryId || null
+
     // Get product data for display
     const productIds = basket?.productItems?.map(({productId}) => productId).join(',') ?? ''
     const {data: products, isLoading: isProductsLoading} = useProducts(
@@ -88,7 +93,8 @@ const PickupAddress = () => {
             parameters: {
                 ids: productIds,
                 allImages: true,
-                perPricebook: true
+                perPricebook: true,
+                ...(selectedInventoryId ? {inventoryIds: selectedInventoryId} : {})
             }
         },
         {
