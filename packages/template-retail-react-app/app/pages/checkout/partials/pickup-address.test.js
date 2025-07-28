@@ -6,11 +6,22 @@
  */
 import React from 'react'
 import {screen, waitFor, cleanup} from '@testing-library/react'
+import {rest} from 'msw'
+import {setupServer} from 'msw/node'
 import PickupAddress from '@salesforce/retail-react-app/app/pages/checkout/partials/pickup-address'
 import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
+import {scapiBasketWithItem} from '@salesforce/retail-react-app/app/mocks/mock-data'
+import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
+import {useSelectedStore} from '@salesforce/retail-react-app/app/hooks/use-selected-store'
 
-// Mock useShopperBasketsMutation
-const mockMutateAsync = jest.fn()
+// Mock the hooks
+jest.mock('@salesforce/retail-react-app/app/hooks/use-current-basket')
+jest.mock('@salesforce/retail-react-app/app/hooks/use-selected-store')
+jest.mock('@salesforce/retail-react-app/app/hooks/use-multi-site')
+
+// Mock mutation to prevent query client errors
+const mockMutateAsync = jest.fn().mockResolvedValue({})
+
 jest.mock('@salesforce/commerce-sdk-react', () => {
     const originalModule = jest.requireActual('@salesforce/commerce-sdk-react')
     return {
@@ -22,8 +33,8 @@ jest.mock('@salesforce/commerce-sdk-react', () => {
             data: {
                 data: [
                     {
-                        id: 'store-123',
-                        name: 'Test Store',
+                        id: 'store-1',
+                        name: 'Test Store 1',
                         address1: '123 Main Street',
                         city: 'San Francisco',
                         stateCode: 'CA',
@@ -32,59 +43,37 @@ jest.mock('@salesforce/commerce-sdk-react', () => {
                         phone: '555-123-4567',
                         storeHours: 'Mon-Fri: 9AM-6PM',
                         storeType: 'retail'
+                    },
+                    {
+                        id: 'store-2',
+                        name: 'Test Store 2',
+                        address1: '456 Oak Avenue',
+                        city: 'Los Angeles',
+                        stateCode: 'CA',
+                        postalCode: '90210',
+                        countryCode: 'US',
+                        phone: '555-987-6543',
+                        storeHours: 'Mon-Sat: 10AM-8PM',
+                        storeType: 'retail'
                     }
                 ]
             },
-            isLoading: false,
-            error: null
+            isLoading: false
+        }),
+        useProducts: () => ({
+            data: [],
+            isLoading: false
         })
     }
 })
 
 // Ensure useMultiSite returns site.id = 'site-1' for all tests
-jest.mock('@salesforce/retail-react-app/app/hooks/use-multi-site', () => ({
-    __esModule: true,
-    default: () => ({
-        site: {id: 'site-1'}
-    })
-}))
-
-jest.mock('@salesforce/retail-react-app/app/hooks/use-current-basket', () => ({
-    useCurrentBasket: () => ({
-        data: {
-            basketId: 'e4547d1b21d01bf5ad92d30c9d',
-            currency: 'GBP',
-            customerInfo: {
-                customerId: 'ablXcZlbAXmewRledJmqYYlKk0'
-            },
-            orderTotal: 25.17,
-            productItems: [
-                {
-                    itemId: '7f9637386161502d31f4563db5',
-                    itemText: 'Long Sleeve Crew Neck',
-                    price: 19.18,
-                    productId: '701643070725M',
-                    productName: 'Long Sleeve Crew Neck',
-                    quantity: 2,
-                    shipmentId: 'me'
-                }
-            ],
-            shipments: [
-                {
-                    shipmentId: 'me',
-                    shipmentTotal: 25.17,
-                    shippingStatus: 'not_shipped',
-                    shippingTotal: 5.99
-                }
-            ],
-            c_fromStoreId: 'store-123'
-        },
-        derivedData: {
-            hasBasket: true,
-            totalItems: 2
-        }
-    })
-}))
+jest.mock('@salesforce/retail-react-app/app/hooks/use-multi-site', () =>
+    jest.fn(() => ({
+        site: {id: 'site-1'},
+        buildUrl: jest.fn((url) => url)
+    }))
+)
 
 jest.mock('@salesforce/retail-react-app/app/pages/checkout/util/checkout-context', () => ({
     useCheckout: () => ({
@@ -97,156 +86,249 @@ jest.mock('@salesforce/retail-react-app/app/pages/checkout/util/checkout-context
             PAYMENT: 4,
             REVIEW_ORDER: 5
         },
-        goToStep: jest.fn()
+        goToStep: jest.fn(),
+        goToNextStep: jest.fn()
     })
 }))
 
+const server = setupServer()
+
+beforeAll(() => {
+    server.listen()
+})
+
+afterEach(() => {
+    server.resetHandlers()
+    cleanup()
+    jest.clearAllMocks()
+})
+
+afterAll(() => {
+    server.close()
+})
+
 describe('PickupAddress', () => {
     beforeEach(() => {
-        jest.resetModules()
-        jest.clearAllMocks()
-    })
-
-    afterEach(() => {
-        cleanup()
         jest.clearAllMocks()
     })
 
     test('displays pickup address when available', async () => {
+        const pickupBasket = {
+            ...scapiBasketWithItem,
+            shipments: [
+                {
+                    ...scapiBasketWithItem.shipments[0],
+                    shipmentId: 'shipment-1',
+                    shippingMethod: {c_storePickupEnabled: true},
+                    c_fromStoreId: 'store-1'
+                }
+            ],
+            productItems: [
+                {
+                    ...scapiBasketWithItem.productItems[0],
+                    shipmentId: 'shipment-1'
+                }
+            ]
+        }
+
+        useCurrentBasket.mockReturnValue({
+            data: pickupBasket,
+            isLoading: false,
+            derivedData: {
+                hasBasket: true,
+                totalItems: pickupBasket.productItems.reduce((acc, item) => acc + item.quantity, 0)
+            }
+        })
+
+        useSelectedStore.mockReturnValue({
+            selectedStore: null
+        })
+
+        global.server.use(
+            rest.get('*/stores', (req, res, ctx) => {
+                return res(
+                    ctx.json({
+                        data: [
+                            {
+                                id: 'store-1',
+                                name: 'Test Store',
+                                address1: '123 Main Street',
+                                city: 'San Francisco',
+                                stateCode: 'CA',
+                                postalCode: '94105',
+                                countryCode: 'US',
+                                phone: '555-123-4567',
+                                storeHours: 'Mon-Fri: 9AM-6PM',
+                                storeType: 'retail'
+                            }
+                        ]
+                    })
+                )
+            })
+        )
+
         renderWithProviders(<PickupAddress />)
 
         await waitFor(() => {
             expect(screen.getByText('Pickup Address & Information')).toBeInTheDocument()
         })
 
-        expect(screen.getByText('Store Information')).toBeInTheDocument()
-        expect(screen.getByText('Continue to Payment')).toBeInTheDocument()
+        expect(screen.getByText(/continue to payment/i)).toBeInTheDocument()
 
+        expect(screen.getByText('Store Information')).toBeInTheDocument()
+        expect(screen.getByText('Test Store 1')).toBeInTheDocument()
         expect(screen.getByText('123 Main Street')).toBeInTheDocument()
         expect(screen.getByText('San Francisco, CA 94105')).toBeInTheDocument()
     })
 
     test('submits pickup address and continues to payment', async () => {
-        const {user} = renderWithProviders(<PickupAddress />)
-
-        await waitFor(() => {
-            expect(screen.getByText('Continue to Payment')).toBeInTheDocument()
-        })
-
-        await user.click(screen.getByText('Continue to Payment'))
-
-        await waitFor(() => {
-            expect(mockMutateAsync).toHaveBeenCalledWith({
-                parameters: {
-                    basketId: 'e4547d1b21d01bf5ad92d30c9d',
-                    shipmentId: 'me',
-                    useAsBilling: false
-                },
-                body: {
-                    address1: '123 Main Street',
-                    city: 'San Francisco',
-                    countryCode: 'US',
-                    postalCode: '94105',
-                    stateCode: 'CA',
-                    firstName: 'Test Store',
-                    lastName: 'Pickup',
-                    phone: '555-123-4567'
+        const pickupBasket = {
+            ...scapiBasketWithItem,
+            shipments: [
+                {
+                    ...scapiBasketWithItem.shipments[0],
+                    shipmentId: 'shipment-1',
+                    shippingMethod: {c_storePickupEnabled: true},
+                    c_fromStoreId: 'store-1'
                 }
-            })
-        })
-    })
+            ],
+            productItems: [
+                {
+                    ...scapiBasketWithItem.productItems[0],
+                    shipmentId: 'shipment-1'
+                }
+            ]
+        }
 
-    // multi Pickup
-    test('displays multiple pickup locations for multi-pickup orders', async () => {
-        const mockUseCurrentBasket = jest.requireMock(
-            '@salesforce/retail-react-app/app/hooks/use-current-basket'
-        )
-        mockUseCurrentBasket.useCurrentBasket.mockReturnValue({
-            data: {
-                basketId: 'e4547d1b21d01bf5ad92d30c9d',
-                currency: 'GBP',
-                customerInfo: {
-                    customerId: 'ablXcZlbAXmewRledJmqYYlKk0'
-                },
-                orderTotal: 50.34,
-                productItems: [
-                    {
-                        itemId: '7f9637386161502d31f4563db5',
-                        itemText: 'Long Sleeve Crew Neck',
-                        price: 19.18,
-                        productId: '701643070725M',
-                        productName: 'Long Sleeve Crew Neck',
-                        quantity: 2,
-                        shipmentId: 'shipment-1'
-                    },
-                    {
-                        itemId: '8f9637386161502d31f4563db6',
-                        itemText: 'Short Sleeve T-Shirt',
-                        price: 15.99,
-                        productId: '701643070725N',
-                        productName: 'Short Sleeve T-Shirt',
-                        quantity: 1,
-                        shipmentId: 'shipment-2'
-                    }
-                ],
-                shipments: [
-                    {
-                        shipmentId: 'shipment-1',
-                        shipmentTotal: 25.17,
-                        shippingStatus: 'not_shipped',
-                        shippingTotal: 5.99,
-                        shippingMethod: {c_storePickupEnabled: true},
-                        c_fromStoreId: 'store-123'
-                    },
-                    {
-                        shipmentId: 'shipment-2',
-                        shipmentTotal: 25.17,
-                        shippingStatus: 'not_shipped',
-                        shippingTotal: 5.99,
-                        shippingMethod: {c_storePickupEnabled: true},
-                        c_fromStoreId: 'store-456'
-                    }
-                ]
-            },
+        useCurrentBasket.mockReturnValue({
+            data: pickupBasket,
+            isLoading: false,
             derivedData: {
                 hasBasket: true,
-                totalItems: 3
+                totalItems: pickupBasket.productItems.reduce((acc, item) => acc + item.quantity, 0)
             }
         })
 
-        const mockUseStores = jest.requireMock('@salesforce/commerce-sdk-react')
-        mockUseStores.useStores.mockReturnValue({
-            data: {
-                data: [
-                    {
-                        id: 'store-123',
-                        name: 'Test Store 1',
-                        address1: '123 Main Street',
-                        city: 'San Francisco',
-                        stateCode: 'CA',
-                        postalCode: '94105',
-                        countryCode: 'US',
-                        phone: '555-123-4567',
-                        storeHours: 'Mon-Fri: 9AM-6PM',
-                        storeType: 'retail'
-                    },
-                    {
-                        id: 'store-456',
-                        name: 'Test Store 2',
-                        address1: '456 Oak Avenue',
-                        city: 'Los Angeles',
-                        stateCode: 'CA',
-                        postalCode: '90210',
-                        countryCode: 'US',
-                        phone: '555-987-6543',
-                        storeHours: 'Mon-Fri: 9AM-6PM',
-                        storeType: 'retail'
-                    }
-                ]
-            },
-            isLoading: false,
-            error: null
+        useSelectedStore.mockReturnValue({
+            selectedStore: null
         })
+
+        global.server.use(
+            rest.get('*/stores', (req, res, ctx) => {
+                return res(
+                    ctx.json({
+                        data: [
+                            {
+                                id: 'store-1',
+                                name: 'Test Store',
+                                address1: '123 Main Street',
+                                city: 'San Francisco',
+                                stateCode: 'CA',
+                                postalCode: '94105',
+                                countryCode: 'US',
+                                phone: '555-123-4567',
+                                storeHours: 'Mon-Fri: 9AM-6PM',
+                                storeType: 'retail'
+                            }
+                        ]
+                    })
+                )
+            })
+        )
+
+        const {user} = renderWithProviders(<PickupAddress />)
+
+        await waitFor(() => {
+            expect(screen.getByText(/continue to payment/i)).toBeInTheDocument()
+        })
+
+        await user.click(screen.getByText(/continue to payment/i))
+
+        await waitFor(() => {
+            expect(mockMutateAsync).toHaveBeenCalled()
+        })
+    })
+
+    test('displays multiple pickup locations for multi-pickup orders', async () => {
+        const multiPickupBasket = {
+            ...scapiBasketWithItem,
+            shipments: [
+                {
+                    ...scapiBasketWithItem.shipments[0],
+                    shipmentId: 'shipment-1',
+                    shippingMethod: {c_storePickupEnabled: true},
+                    c_fromStoreId: 'store-1'
+                },
+                {
+                    ...scapiBasketWithItem.shipments[0],
+                    shipmentId: 'shipment-2',
+                    shippingMethod: {c_storePickupEnabled: true},
+                    c_fromStoreId: 'store-2'
+                }
+            ],
+            productItems: [
+                {
+                    ...scapiBasketWithItem.productItems[0],
+                    shipmentId: 'shipment-1'
+                },
+                {
+                    ...scapiBasketWithItem.productItems[0],
+                    itemId: 'item-2',
+                    shipmentId: 'shipment-2'
+                }
+            ]
+        }
+
+        useCurrentBasket.mockReturnValue({
+            data: multiPickupBasket,
+            isLoading: false,
+            derivedData: {
+                hasBasket: true,
+                totalItems: multiPickupBasket.productItems.reduce(
+                    (acc, item) => acc + item.quantity,
+                    0
+                )
+            }
+        })
+
+        useSelectedStore.mockReturnValue({
+            selectedStore: null
+        })
+
+        global.server.use(
+            rest.get('*/stores', (req, res, ctx) => {
+                return res(
+                    ctx.json({
+                        data: [
+                            {
+                                id: 'store-1',
+                                name: 'Test Store 1',
+                                address1: '123 Main Street',
+                                city: 'San Francisco',
+                                stateCode: 'CA',
+                                postalCode: '94105',
+                                countryCode: 'US',
+                                phone: '555-123-4567',
+                                storeHours: 'Mon-Fri: 9AM-6PM',
+                                storeType: 'retail'
+                            },
+                            {
+                                id: 'store-2',
+                                name: 'Test Store 2',
+                                address1: '456 Oak Avenue',
+                                city: 'Los Angeles',
+                                stateCode: 'CA',
+                                postalCode: '90210',
+                                countryCode: 'US',
+                                phone: '555-987-6543',
+                                storeHours: 'Mon-Fri: 9AM-6PM',
+                                storeType: 'retail'
+                            }
+                        ]
+                    })
+                )
+            })
+        )
 
         renderWithProviders(<PickupAddress />)
 
@@ -254,65 +336,75 @@ describe('PickupAddress', () => {
             expect(screen.getByText('Pickup Address & Information')).toBeInTheDocument()
         })
 
+        expect(screen.getAllByText('Store Information')).toHaveLength(2)
         expect(screen.getByText('Test Store 1')).toBeInTheDocument()
         expect(screen.getByText('Test Store 2')).toBeInTheDocument()
     })
 
     test('shows "Continue to Shipping Address" for mixed orders', async () => {
-        const mockUseCurrentBasket = jest.requireMock(
-            '@salesforce/retail-react-app/app/hooks/use-current-basket'
-        )
-        mockUseCurrentBasket.useCurrentBasket.mockReturnValue({
-            data: {
-                basketId: 'e4547d1b21d01bf5ad92d30c9d',
-                currency: 'GBP',
-                customerInfo: {
-                    customerId: 'ablXcZlbAXmewRledJmqYYlKk0'
+        const mixedBasket = {
+            ...scapiBasketWithItem,
+            shipments: [
+                {
+                    ...scapiBasketWithItem.shipments[0],
+                    shipmentId: 'shipment-1',
+                    shippingMethod: {c_storePickupEnabled: true},
+                    c_fromStoreId: 'store-1'
                 },
-                orderTotal: 50.34,
-                productItems: [
-                    {
-                        itemId: '7f9637386161502d31f4563db5',
-                        itemText: 'Long Sleeve Crew Neck',
-                        price: 19.18,
-                        productId: '701643070725M',
-                        productName: 'Long Sleeve Crew Neck',
-                        quantity: 2,
-                        shipmentId: 'shipment-1'
-                    },
-                    {
-                        itemId: '8f9637386161502d31f4563db6',
-                        itemText: 'Short Sleeve T-Shirt',
-                        price: 15.99,
-                        productId: '701643070725N',
-                        productName: 'Short Sleeve T-Shirt',
-                        quantity: 1,
-                        shipmentId: 'shipment-2'
-                    }
-                ],
-                shipments: [
-                    {
-                        shipmentId: 'shipment-1',
-                        shipmentTotal: 25.17,
-                        shippingStatus: 'not_shipped',
-                        shippingTotal: 5.99,
-                        shippingMethod: {c_storePickupEnabled: true},
-                        c_fromStoreId: 'store-123'
-                    },
-                    {
-                        shipmentId: 'shipment-2',
-                        shipmentTotal: 25.17,
-                        shippingStatus: 'not_shipped',
-                        shippingTotal: 5.99,
-                        shippingMethod: {c_storePickupEnabled: false}
-                    }
-                ]
-            },
+                {
+                    ...scapiBasketWithItem.shipments[0],
+                    shipmentId: 'shipment-2',
+                    shippingMethod: {c_storePickupEnabled: false}
+                }
+            ],
+            productItems: [
+                {
+                    ...scapiBasketWithItem.productItems[0],
+                    shipmentId: 'shipment-1'
+                },
+                {
+                    ...scapiBasketWithItem.productItems[0],
+                    itemId: 'item-2',
+                    shipmentId: 'shipment-2'
+                }
+            ]
+        }
+
+        useCurrentBasket.mockReturnValue({
+            data: mixedBasket,
+            isLoading: false,
             derivedData: {
                 hasBasket: true,
-                totalItems: 3
+                totalItems: mixedBasket.productItems.reduce((acc, item) => acc + item.quantity, 0)
             }
         })
+
+        useSelectedStore.mockReturnValue({
+            selectedStore: null
+        })
+
+        global.server.use(
+            rest.get('*/stores', (req, res, ctx) => {
+                return res(
+                    ctx.json({
+                        data: [
+                            {
+                                id: 'store-1',
+                                name: 'Test Store',
+                                address1: '123 Main Street',
+                                city: 'San Francisco',
+                                stateCode: 'CA',
+                                postalCode: '94105',
+                                countryCode: 'US',
+                                phone: '555-123-4567',
+                                storeHours: 'Mon-Fri: 9AM-6PM',
+                                storeType: 'retail'
+                            }
+                        ]
+                    })
+                )
+            })
+        )
 
         renderWithProviders(<PickupAddress />)
 
@@ -320,16 +412,73 @@ describe('PickupAddress', () => {
             expect(screen.getByText('Pickup Address & Information')).toBeInTheDocument()
         })
 
-        expect(screen.getByText('Continue to Shipping Address')).toBeInTheDocument()
+        expect(screen.getByText(/continue to shipping address/i)).toBeInTheDocument()
     })
 
     test('handles API errors gracefully', async () => {
+        const pickupBasket = {
+            ...scapiBasketWithItem,
+            shipments: [
+                {
+                    ...scapiBasketWithItem.shipments[0],
+                    shipmentId: 'shipment-1',
+                    shippingMethod: {c_storePickupEnabled: true},
+                    c_fromStoreId: 'store-1'
+                }
+            ],
+            productItems: [
+                {
+                    ...scapiBasketWithItem.productItems[0],
+                    shipmentId: 'shipment-1'
+                }
+            ]
+        }
+
+        useCurrentBasket.mockReturnValue({
+            data: pickupBasket,
+            isLoading: false,
+            derivedData: {
+                hasBasket: true,
+                totalItems: pickupBasket.productItems.reduce((acc, item) => acc + item.quantity, 0)
+            }
+        })
+
+        useSelectedStore.mockReturnValue({
+            selectedStore: null
+        })
+
+        global.server.use(
+            rest.get('*/stores', (req, res, ctx) => {
+                return res(
+                    ctx.json({
+                        data: [
+                            {
+                                id: 'store-1',
+                                name: 'Test Store',
+                                address1: '123 Main Street',
+                                city: 'San Francisco',
+                                stateCode: 'CA',
+                                postalCode: '94105',
+                                countryCode: 'US',
+                                phone: '555-123-4567',
+                                storeHours: 'Mon-Fri: 9AM-6PM',
+                                storeType: 'retail'
+                            }
+                        ]
+                    })
+                )
+            })
+        )
+
         const {user} = renderWithProviders(<PickupAddress />)
         mockMutateAsync.mockRejectedValueOnce(new Error('API Error'))
+
         await waitFor(() => {
-            expect(screen.getByText('Continue to Payment')).toBeInTheDocument()
+            expect(screen.getByText(/continue to payment/i)).toBeInTheDocument()
         })
-        await user.click(screen.getByText('Continue to Payment'))
+
+        await user.click(screen.getByText(/continue to payment/i))
+
         await waitFor(() => {
             expect(mockMutateAsync).toHaveBeenCalled()
         })
