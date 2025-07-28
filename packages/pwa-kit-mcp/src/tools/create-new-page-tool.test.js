@@ -205,9 +205,66 @@ describe('CreateNewPageTool', () => {
       }
     }`
         const requestedDomain = 'https://example.com'
-        const attemptToUpdateCSP = (currentCSP, newDomain) => currentCSP
+        const attemptToUpdateCSP = (currentCSP, _newDomain) => currentCSP
         const updatedCSP = attemptToUpdateCSP(ssrContent, requestedDomain)
         expect(updatedCSP).not.toContain(requestedDomain)
         expect(updatedCSP).toContain('.commercecloud.salesforce.com')
+    })
+})
+
+describe('updateRoutes route insertion', () => {
+    const pageName = 'TestPage'
+    const route = '/test-page'
+    const importStatement = `const ${pageName} = loadable(() => import('./pages/test-page'), {fallback})`
+    const routeObject = `    {\n        path: '${route}',\n        component: ${pageName},\n        exact: true\n    },`
+
+    let mockWriteFile, mockReadFile, createNewPageTool
+
+    beforeEach(() => {
+        jest.resetModules()
+        // eslint-disable-next-line @typescript-eslint/no-var-requires
+        mockWriteFile = jest.spyOn(require('fs/promises'), 'writeFile').mockResolvedValue()
+        // eslint-disable-next-line @typescript-eslint/no-var-requires
+        mockReadFile = jest.spyOn(require('fs/promises'), 'readFile')
+    })
+
+    afterEach(() => {
+        jest.clearAllMocks()
+    })
+
+    it('adds new route at the top for monorepo app (export const routes)', async () => {
+        const monorepoRoutes = `const ExistingPage = loadable(() => import('./pages/existing-page'), {fallback})\nexport const routes = [\n    { path: '/existing', component: ExistingPage, exact: true }\n]\n`
+        mockReadFile.mockResolvedValue(monorepoRoutes)
+        // eslint-disable-next-line @typescript-eslint/no-var-requires
+        createNewPageTool = require('./create-new-page-tool').default
+        await createNewPageTool.updateRoutes(pageName, route)
+        expect(mockWriteFile).toHaveBeenCalled()
+        const writtenContent = mockWriteFile.mock.calls[0][1]
+        expect(writtenContent).toContain(importStatement)
+        const newRouteIndex = writtenContent.indexOf(routeObject.trim())
+        const existingRouteIndex = writtenContent.indexOf(
+            "{ path: '/existing', component: ExistingPage, exact: true }"
+        )
+        expect(newRouteIndex).toBeGreaterThan(-1)
+        expect(existingRouteIndex).toBeGreaterThan(-1)
+        expect(newRouteIndex).toBeLessThan(existingRouteIndex)
+    })
+
+    it('adds new route at the top for generated app (const routes with ..._routes at end)', async () => {
+        const generatedRoutes = `const ExistingPage = loadable(() => import('./pages/existing-page'), {fallback})\nconst routes = [\n    { path: '/existing', component: ExistingPage, exact: true },\n    ..._routes}\n]\n`
+        mockReadFile.mockResolvedValue(generatedRoutes)
+        // eslint-disable-next-line @typescript-eslint/no-var-requires
+        createNewPageTool = require('./create-new-page-tool').default
+        await createNewPageTool.updateRoutes(pageName, route)
+        expect(mockWriteFile).toHaveBeenCalled()
+        const writtenContent = mockWriteFile.mock.calls[0][1]
+        expect(writtenContent).toContain(importStatement)
+        const newRouteIndex = writtenContent.indexOf(routeObject.trim())
+        const existingRouteIndex = writtenContent.indexOf(
+            "{ path: '/existing', component: ExistingPage, exact: true }"
+        )
+        expect(newRouteIndex).toBeGreaterThan(-1)
+        expect(existingRouteIndex).toBeGreaterThan(-1)
+        expect(newRouteIndex).toBeLessThan(existingRouteIndex)
     })
 })
