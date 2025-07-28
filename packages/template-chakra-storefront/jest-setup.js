@@ -6,6 +6,14 @@
  */
 /* eslint-env jest */
 /* eslint-disable @typescript-eslint/no-var-requires */
+
+// Mock webpack-injected globals for testing
+Object.defineProperty(global, 'SFDC_EXT_MARKETING_CONSENT_ENABLED', {
+    value: true,
+    writable: true,
+    configurable: true
+})
+
 // fetch polyfill can be removed when node 16 is no longer supported
 require('cross-fetch/polyfill')
 require('raf/polyfill') // fix requestAnimationFrame issue with polyfill
