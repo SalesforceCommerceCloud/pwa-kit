@@ -4,9 +4,9 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import { CreateNewPageTool } from '../tools'
+import createNewPageTool from './create-new-page-tool.js'
 import fs from 'fs/promises'
-import * as utils from './utils'
+import * as utils from '../utils/utils.js'
 
 describe('CreateNewPageTool', () => {
     beforeEach(() => {
@@ -15,7 +15,7 @@ describe('CreateNewPageTool', () => {
     })
 
     it('returns system prompt if required args are missing', async () => {
-        const result = await CreateNewPageTool.handler({})
+        const result = await createNewPageTool.handler({})
         expect(result.role).toBe('system')
         expect(result.content[0].text).toContain(
             'Please ask the user to provide following information'
@@ -26,10 +26,10 @@ describe('CreateNewPageTool', () => {
         jest.spyOn(fs, 'access').mockRejectedValueOnce({code: 'ENOENT'})
         jest.spyOn(fs, 'mkdir').mockResolvedValue()
         jest.spyOn(fs, 'writeFile').mockResolvedValue()
-        jest.spyOn(CreateNewPageTool, 'generatePageContent').mockResolvedValue('test content')
-        jest.spyOn(CreateNewPageTool, 'updateRoutes').mockResolvedValue()
+        jest.spyOn(createNewPageTool, 'generatePageContent').mockResolvedValue('test content')
+        jest.spyOn(createNewPageTool, 'updateRoutes').mockResolvedValue()
         jest.spyOn(utils, 'logMCPMessage').mockImplementation(() => {})
-        const result = await CreateNewPageTool.handler({
+        const result = await createNewPageTool.handler({
             pageName: 'Test',
             componentList: ['Foo'],
             route: '/test'
@@ -41,7 +41,7 @@ describe('CreateNewPageTool', () => {
     it('returns error if page already exists', async () => {
         jest.spyOn(fs, 'access').mockResolvedValue()
         jest.spyOn(utils, 'logMCPMessage').mockImplementation(() => {})
-        const result = await CreateNewPageTool.handler({
+        const result = await createNewPageTool.handler({
             pageName: 'Test',
             componentList: ['Foo'],
             route: '/test'
@@ -61,14 +61,14 @@ describe('CreateNewPageTool', () => {
         })
         jest.spyOn(fs, 'mkdir').mockResolvedValue()
         jest.spyOn(fs, 'writeFile').mockResolvedValue()
-        jest.spyOn(CreateNewPageTool, 'updateRoutes').mockResolvedValue()
+        jest.spyOn(createNewPageTool, 'updateRoutes').mockResolvedValue()
         jest.spyOn(utils, 'logMCPMessage').mockImplementation(() => {})
         // Mock generatePageContent to simulate unfound component
-        jest.spyOn(CreateNewPageTool, 'generatePageContent').mockImplementation(function () {
+        jest.spyOn(createNewPageTool, 'generatePageContent').mockImplementation(function () {
             this.unfoundComponents = ['MissingComponent']
             return Promise.resolve('dummy')
         })
-        const result = await CreateNewPageTool.handler({
+        const result = await createNewPageTool.handler({
             pageName: 'Test',
             componentList: ['MissingComponent'],
             route: '/test'
@@ -81,10 +81,10 @@ describe('CreateNewPageTool', () => {
         jest.spyOn(fs, 'access').mockRejectedValueOnce({code: 'ENOENT'})
         jest.spyOn(fs, 'mkdir').mockResolvedValue()
         jest.spyOn(fs, 'writeFile').mockResolvedValue()
-        jest.spyOn(CreateNewPageTool, 'generatePageContent').mockResolvedValue('dummy')
-        jest.spyOn(CreateNewPageTool, 'updateRoutes').mockResolvedValue()
+        jest.spyOn(createNewPageTool, 'generatePageContent').mockResolvedValue('dummy')
+        jest.spyOn(createNewPageTool, 'updateRoutes').mockResolvedValue()
         jest.spyOn(utils, 'logMCPMessage').mockImplementation(() => {})
-        const result = await CreateNewPageTool.handler({
+        const result = await createNewPageTool.handler({
             pageName: 'Test',
             componentList: ['ProductView'],
             route: '/test'
@@ -97,31 +97,31 @@ describe('CreateNewPageTool', () => {
 
     it('generates a page with product 25592300M and no errors when hook is added', async () => {
         // Simulate generatePageContent returning a page with product 25592300M
-        jest.spyOn(CreateNewPageTool, 'generatePageContent').mockResolvedValue(
+        jest.spyOn(createNewPageTool, 'generatePageContent').mockResolvedValue(
             `const productId = '25592300M';\nexport default function Page() { return <div>{productId}</div>; }`
         )
-        const pageContent = await CreateNewPageTool.generatePageContent('Test', ['ProductView'])
+        const pageContent = await createNewPageTool.generatePageContent('Test', ['ProductView'])
         expect(pageContent).toContain('25592300M')
         expect(pageContent).not.toMatch(/error|exception|fail/i)
     })
 
     it('generates a page with Image component and default image path if Image is in componentList', async () => {
         const imageComponentString = `<Image src={getAssetUrl('static/img/hero.png')} alt="pwa-kit banner" style={{ width: '700px', height: 'auto' }} />`
-        jest.spyOn(CreateNewPageTool, 'generatePageContent').mockResolvedValue(
+        jest.spyOn(createNewPageTool, 'generatePageContent').mockResolvedValue(
             `import Image from 'somewhere';\n${imageComponentString}`
         )
-        const pageContent = await CreateNewPageTool.generatePageContent('Test', ['Image'])
+        const pageContent = await createNewPageTool.generatePageContent('Test', ['Image'])
         expect(pageContent).toContain('Image')
         expect(pageContent).toContain('static/img/hero.png')
     })
 
     it('uses default image path if user answers no to custom image for Image component', async () => {
         const defaultImageString = `<Image src={getAssetUrl('static/img/hero.png')} alt="pwa-kit banner" style={{ width: '700px', height: 'auto' }} />`
-        jest.spyOn(CreateNewPageTool, 'generatePageContent').mockResolvedValue(
+        jest.spyOn(createNewPageTool, 'generatePageContent').mockResolvedValue(
             `import Image from 'somewhere';\n${defaultImageString}`
         )
         // Simulate user says no to custom image (in real flow, this would be a follow-up, here we just check the generated content)
-        const pageContent = await CreateNewPageTool.generatePageContent('Test', ['Image'])
+        const pageContent = await createNewPageTool.generatePageContent('Test', ['Image'])
         expect(pageContent).toContain('static/img/hero.png')
         expect(pageContent).not.toMatch(/https?:\/\//)
     })

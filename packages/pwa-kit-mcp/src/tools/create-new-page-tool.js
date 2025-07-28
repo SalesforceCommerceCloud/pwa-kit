@@ -4,10 +4,10 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import fs from 'fs/promises';
-import path from 'path';
-import { toKebabCase, toPascalCase, logMCPMessage } from '../utils';
-import { z } from 'zod';
+import fs from 'fs/promises'
+import path from 'path'
+import {toKebabCase, toPascalCase, logMCPMessage} from '../utils'
+import {z} from 'zod'
 
 const systemPromptForCreatePage = `You are a smart assistant that can use tools when needed. \
         Please ask the user to provide following information **one at a time**, in a natural and conversational way. \
