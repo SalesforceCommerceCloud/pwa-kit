@@ -20,6 +20,25 @@ packages/template-retail-react-app/                        @SalesforceCommerceCl
 packages/template-typescript-minimal/                      @SalesforceCommerceCloud/mobifyers
 packages/test-commerce-sdk-react/                          @SalesforceCommerceCloud/mobifyers
 
+# Root configuration and documentation files
+/README.md                                                  @SalesforceCommerceCloud/mobifyers
+/CODE_OF_CONDUCT.md                                         @SalesforceCommerceCloud/mobifyers
+/CONTRIBUTING.md                                            @SalesforceCommerceCloud/mobifyers
+/SECURITY.md                                                @SalesforceCommerceCloud/mobifyers
+/STATEMENTS.md                                              @SalesforceCommerceCloud/mobifyers
+/TERMS_OF_USE.md                                            @SalesforceCommerceCloud/mobifyers
+/LICENSE                                                    @SalesforceCommerceCloud/mobifyers
+/.eslintrc.js                                              @SalesforceCommerceCloud/mobifyers
+/.gitattributes                                            @SalesforceCommerceCloud/mobifyers
+/.gitignore                                                @SalesforceCommerceCloud/mobifyers
+/.prettierignore                                           @SalesforceCommerceCloud/mobifyers
+/.prettierrc.yaml                                          @SalesforceCommerceCloud/mobifyers
+/lerna.json                                                @SalesforceCommerceCloud/mobifyers
+/package.json                                              @SalesforceCommerceCloud/mobifyers
+/package-lock.json                                         @SalesforceCommerceCloud/mobifyers
+/playwright.config.js                                      @SalesforceCommerceCloud/mobifyers
+/.git2gus/                                                 @SalesforceCommerceCloud/mobifyers
+
 # Specific feature file ownership (overrides package-level rules above)
 
 # BOPIS (Buy Online Pick up In Store) feature files - PR #2646
