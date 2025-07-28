@@ -6999,20 +6999,6 @@
       "value": "]"
     }
   ],
-  "search.suggestions.brands": [
-    {
-      "type": 0,
-      "value": "["
-    },
-    {
-      "type": 0,
-      "value": "Ɓřȧȧƞḓş"
-    },
-    {
-      "type": 0,
-      "value": "]"
-    }
-  ],
   "search.suggestions.categories": [
     {
       "type": 0,
@@ -7021,6 +7007,20 @@
     {
       "type": 0,
       "value": "Ƈȧȧŧḗḗɠǿǿřīḗḗş"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "search.suggestions.didYouMean": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ḓīḓ ẏǿǿŭŭ ḿḗḗȧȧƞ"
     },
     {
       "type": 0,
@@ -7041,14 +7041,14 @@
       "value": "]"
     }
   ],
-  "search_suggestions.category.in_parent": [
+  "search.suggestions.viewAll": [
     {
       "type": 0,
       "value": "["
     },
     {
       "type": 0,
-      "value": "īƞ"
+      "value": "Ṽīḗḗẇ Ȧŀŀ"
     },
     {
       "type": 0,
