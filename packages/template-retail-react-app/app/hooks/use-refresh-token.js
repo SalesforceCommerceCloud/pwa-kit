@@ -21,16 +21,19 @@ const useRefreshToken = () => {
     const refreshToken = customerType ? auth.get(`refresh_token_${customerType}`) : null
     const [readyToken, setReadyToken] = useState(null)
     
-    // Handle async token retrieval only if no token in storage
+    // Handle async token retrieval only if no token in storage and customerType is available
     useEffect(() => {
-        if (!refreshToken) {
-            const getRefreshTokenWhenReady = () => auth.ready().then(({refresh_token}) => refresh_token)
-            getRefreshTokenWhenReady().then(setReadyToken).catch(() => setReadyToken(null))
+        if (!refreshToken && customerType && auth && auth.ready) {
+            const getRefreshTokenWhenReady = () => auth.ready().then(({refresh_token}) => refresh_token || null)
+            getRefreshTokenWhenReady().then(setReadyToken).catch((error) => {
+                console.error('Failed to get refresh token:', error)
+                setReadyToken(null)
+            })
         }
     }, [auth, customerType, refreshToken])
 
-    // Return refreshToken if available, otherwise return readyToken
-    return refreshToken || readyToken
+    // Return refreshToken if available, otherwise return readyToken, ensuring we never return undefined
+    return refreshToken || readyToken || null
 }
 
 export default useRefreshToken

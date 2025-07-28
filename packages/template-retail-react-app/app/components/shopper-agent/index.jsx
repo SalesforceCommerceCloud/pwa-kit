@@ -206,9 +206,6 @@ const ShopperAgent = ({commerceAgentConfiguration, basketId, locale, basketDoneL
     const {enabled} = commerceAgentConfiguration
     const isShopperAgentEnabled = isEnabled(enabled);
     const refreshToken = useRefreshToken()
-    
-    // Use the refresh token value
-    console.log('Current refresh token:', refreshToken)
 
     return isShopperAgentEnabled &&
         basketDoneLoading &&

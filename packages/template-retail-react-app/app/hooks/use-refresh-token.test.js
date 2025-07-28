@@ -9,23 +9,29 @@ import React from 'react'
 import {renderHook, act} from '@testing-library/react'
 import useRefreshToken from '@salesforce/retail-react-app/app/hooks/use-refresh-token'
 import useAuthContext from '@salesforce/commerce-sdk-react/hooks/useAuthContext'
+import useCustomerType from '@salesforce/commerce-sdk-react/hooks/useCustomerType'
 
-// Mock the useAuthContext hook
+// Mock the hooks
 jest.mock('@salesforce/commerce-sdk-react/hooks/useAuthContext')
+jest.mock('@salesforce/commerce-sdk-react/hooks/useCustomerType')
 
 describe('useRefreshToken', () => {
     let mockAuth
+    let mockGet
     let mockReady
 
     beforeEach(() => {
+        mockGet = jest.fn()
         mockReady = jest.fn()
         
         mockAuth = {
+            get: mockGet,
             ready: mockReady
         }
 
-        // Mock the useAuthContext hook to return our mock auth
+        // Mock the hooks
         useAuthContext.mockReturnValue(mockAuth)
+        useCustomerType.mockReturnValue({customerType: 'guest'})
     })
 
     afterEach(() => {
@@ -33,55 +39,82 @@ describe('useRefreshToken', () => {
     })
 
     describe('when authentication is ready', () => {
-        it('should return refresh token from token response', async () => {
+        it('should return refresh token from storage when available', () => {
             const refreshToken = 'test-refresh-token'
-            const tokenResponse = {
-                refresh_token: refreshToken,
-                access_token: 'test-access-token',
-                customer_id: 'test-customer-id'
-            }
-            mockReady.mockResolvedValue(tokenResponse)
+            mockGet.mockReturnValue(refreshToken)
 
             const {result} = renderHook(() => useRefreshToken())
 
-            // Initially should be null while waiting for auth
+            expect(result.current).toBe(refreshToken)
+            expect(mockGet).toHaveBeenCalledWith('refresh_token_guest')
+        })
+
+        it('should return ready token when storage token is null', async () => {
+            const readyToken = 'ready-refresh-token'
+            mockGet.mockReturnValue(null)
+            mockReady.mockResolvedValue({refresh_token: readyToken})
+
+            const {result} = renderHook(() => useRefreshToken())
+
+            // Initially should return null
             expect(result.current).toBe(null)
 
-            // Wait for the async effect to complete
+            // Wait for async operation
             await act(async () => {
                 await new Promise(resolve => setTimeout(resolve, 0))
             })
 
-            expect(mockReady).toHaveBeenCalledTimes(1)
-            expect(result.current).toBe(refreshToken)
+            // Should return the ready token
+            expect(result.current).toBe(readyToken)
         })
 
         it('should handle authentication errors gracefully', async () => {
-            const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation()
+            mockGet.mockReturnValue(null)
             mockReady.mockRejectedValue(new Error('Auth failed'))
 
             const {result} = renderHook(() => useRefreshToken())
 
+            // Initially should return null
+            expect(result.current).toBe(null)
+
+            // Wait for async operation
             await act(async () => {
                 await new Promise(resolve => setTimeout(resolve, 0))
             })
 
-            expect(mockReady).toHaveBeenCalledTimes(1)
+            // Should still return null after error
             expect(result.current).toBe(null)
-            expect(consoleErrorSpy).toHaveBeenCalledWith('Failed to get refresh token:', expect.any(Error))
+        })
+    })
 
-            consoleErrorSpy.mockRestore()
+    describe('when customer type is registered', () => {
+        it('should get refresh token for registered user', () => {
+            const refreshToken = 'registered-refresh-token'
+            useCustomerType.mockReturnValue({customerType: 'registered'})
+            mockGet.mockReturnValue(refreshToken)
+
+            const {result} = renderHook(() => useRefreshToken())
+
+            expect(result.current).toBe(refreshToken)
+            expect(mockGet).toHaveBeenCalledWith('refresh_token_registered')
+        })
+    })
+
+    describe('when customer type is null', () => {
+        it('should return null when customer type is null', () => {
+            useCustomerType.mockReturnValue({customerType: null})
+
+            const {result} = renderHook(() => useRefreshToken())
+
+            expect(result.current).toBe(null)
+            expect(mockGet).not.toHaveBeenCalled()
         })
     })
 
     describe('when token response has no refresh token', () => {
         it('should return null when refresh_token is undefined', async () => {
-            const tokenResponse = {
-                access_token: 'test-access-token',
-                customer_id: 'test-customer-id'
-                // refresh_token is undefined
-            }
-            mockReady.mockResolvedValue(tokenResponse)
+            mockGet.mockReturnValue(null)
+            mockReady.mockResolvedValue({})
 
             const {result} = renderHook(() => useRefreshToken())
 
@@ -93,12 +126,8 @@ describe('useRefreshToken', () => {
         })
 
         it('should return null when refresh_token is null', async () => {
-            const tokenResponse = {
-                refresh_token: null,
-                access_token: 'test-access-token',
-                customer_id: 'test-customer-id'
-            }
-            mockReady.mockResolvedValue(tokenResponse)
+            mockGet.mockReturnValue(null)
+            mockReady.mockResolvedValue({refresh_token: null})
 
             const {result} = renderHook(() => useRefreshToken())
 
@@ -113,41 +142,48 @@ describe('useRefreshToken', () => {
     describe('dependency changes', () => {
         it('should refetch token when auth object changes', async () => {
             const token1 = 'token-1'
-            const token2 = 'token-2'
-            
-            mockReady.mockResolvedValue({refresh_token: token1})
+            mockGet.mockReturnValue(token1)
 
             const {result, rerender} = renderHook(() => useRefreshToken())
-
-            await act(async () => {
-                await new Promise(resolve => setTimeout(resolve, 0))
-            })
 
             expect(result.current).toBe(token1)
 
             // Create new auth object
             const newMockAuth = {
-                ready: jest.fn().mockResolvedValue({refresh_token: token2})
+                get: jest.fn().mockReturnValue('token-2'),
+                ready: jest.fn()
             }
             useAuthContext.mockReturnValue(newMockAuth)
 
             rerender()
 
-            await act(async () => {
-                await new Promise(resolve => setTimeout(resolve, 0))
-            })
+            expect(result.current).toBe('token-2')
+        })
 
-            expect(newMockAuth.ready).toHaveBeenCalledTimes(1)
-            expect(result.current).toBe(token2)
+        it('should refetch token when customer type changes', async () => {
+            const guestToken = 'guest-token'
+            mockGet.mockReturnValue(guestToken)
+
+            const {result, rerender} = renderHook(() => useRefreshToken())
+
+            expect(result.current).toBe(guestToken)
+
+            // Change customer type
+            useCustomerType.mockReturnValue({customerType: 'registered'})
+            mockGet.mockReturnValue('registered-token')
+
+            rerender()
+
+            expect(result.current).toBe('registered-token')
+            expect(mockGet).toHaveBeenCalledWith('refresh_token_registered')
         })
     })
 
     describe('edge cases', () => {
         it('should handle auth.ready throwing an error', async () => {
             const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation()
-            mockReady.mockImplementation(() => {
-                throw new Error('Unexpected error')
-            })
+            mockGet.mockReturnValue(null)
+            mockReady.mockRejectedValue(new Error('Network error'))
 
             const {result} = renderHook(() => useRefreshToken())
 
