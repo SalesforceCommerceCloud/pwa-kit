@@ -18,7 +18,7 @@ const OrderTypeDisplay = ({
     onChangeStore
 }) => {
     return (
-        <Box layerStyle="cardBordered" p={3}>
+        <Box>
             {isPickupOrder ? (
                 <Box>
                     <Text fontWeight="bold" mb={2}>
@@ -31,13 +31,15 @@ const OrderTypeDisplay = ({
                             }}
                         />
                     </Text>
-                    <StoreDisplay
-                        store={store}
-                        showDistance={true}
-                        textSize="sm"
-                        nameStyle={{fontSize: 'sm', fontWeight: 'semibold'}}
-                        onChangeStore={onChangeStore}
-                    />
+                    <Box layerStyle="cardBordered" p={4} borderRadius="md">
+                        <StoreDisplay
+                            store={store}
+                            showDistance={true}
+                            textSize="sm"
+                            nameStyle={{fontSize: 'sm', fontWeight: 'semibold'}}
+                            onChangeStore={onChangeStore}
+                        />
+                    </Box>
                 </Box>
             ) : (
                 <Text fontWeight="bold">
