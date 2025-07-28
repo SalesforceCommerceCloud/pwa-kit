@@ -623,3 +623,120 @@ test('Can add address during checkout as a registered customer', async () => {
         expect(screen.getByTestId('sf-toggle-card-step-2-content')).not.toBeEmptyDOMElement()
     })
 })
+
+// multi-pickup
+test('Should show pickup address section for pickup-only orders', async () => {
+    const pickupBasket = {
+        ...scapiBasketWithItem,
+        shipments: [
+            {
+                ...scapiBasketWithItem.shipments[0],
+                shippingMethod: {c_storePickupEnabled: true},
+                c_fromStoreId: 'store-1'
+            }
+        ]
+    }
+
+    global.server.use(
+        rest.get('*/baskets', (req, res, ctx) => {
+            const baskets = {
+                baskets: [pickupBasket],
+                total: 1
+            }
+            return res(ctx.json(baskets))
+        })
+    )
+
+    window.history.pushState({}, 'Checkout', createPathWithDefaults('/checkout'))
+    const {user} = renderWithProviders(<WrappedCheckout history={history} />, {
+        wrapperProps: {isGuest: true, siteAlias: 'uk', appConfig: mockConfig.app}
+    })
+
+    await waitFor(() => {
+        expect(screen.getByTestId('sf-checkout-container')).toBeInTheDocument()
+    })
+
+    expect(screen.getByTestId('sf-toggle-card-step-1')).toBeInTheDocument()
+    expect(screen.getByText(/pickup address & information/i)).toBeInTheDocument()
+})
+
+test('Should show both pickup and shipping sections for mixed orders', async () => {
+    const mixedBasket = {
+        ...scapiBasketWithItem,
+        shipments: [
+            {
+                ...scapiBasketWithItem.shipments[0],
+                shippingMethod: {c_storePickupEnabled: true},
+                c_fromStoreId: 'store-1'
+            },
+            {
+                ...scapiBasketWithItem.shipments[0],
+                shipmentId: 'shipment-2',
+                shippingMethod: {c_storePickupEnabled: false}
+            }
+        ]
+    }
+
+    global.server.use(
+        rest.get('*/baskets', (req, res, ctx) => {
+            const baskets = {
+                baskets: [mixedBasket],
+                total: 1
+            }
+            return res(ctx.json(baskets))
+        })
+    )
+
+    window.history.pushState({}, 'Checkout', createPathWithDefaults('/checkout'))
+    const {user} = renderWithProviders(<WrappedCheckout history={history} />, {
+        wrapperProps: {isGuest: true, siteAlias: 'uk', appConfig: mockConfig.app}
+    })
+
+    await waitFor(() => {
+        expect(screen.getByTestId('sf-checkout-container')).toBeInTheDocument()
+    })
+
+    expect(screen.getByTestId('sf-toggle-card-step-1')).toBeInTheDocument()
+    expect(screen.getByText(/pickup address & information/i)).toBeInTheDocument()
+    expect(screen.getByText(/shipping address/i)).toBeInTheDocument()
+})
+
+test('Should not show pickup address when STORE_LOCATOR_IS_ENABLED is false', async () => {
+    const pickupBasket = {
+        ...scapiBasketWithItem,
+        shipments: [
+            {
+                ...scapiBasketWithItem.shipments[0],
+                shippingMethod: {c_storePickupEnabled: true},
+                c_fromStoreId: 'store-1'
+            }
+        ]
+    }
+
+    global.server.use(
+        rest.get('*/baskets', (req, res, ctx) => {
+            const baskets = {
+                baskets: [pickupBasket],
+                total: 1
+            }
+            return res(ctx.json(baskets))
+        })
+    )
+
+    jest.doMock('@salesforce/retail-react-app/app/constants', () => ({
+        STORE_LOCATOR_IS_ENABLED: false,
+        MULTISHIP_IS_ENABLED: true
+    }))
+
+    window.history.pushState({}, 'Checkout', createPathWithDefaults('/checkout'))
+    const {user} = renderWithProviders(<WrappedCheckout history={history} />, {
+        wrapperProps: {isGuest: true, siteAlias: 'uk', appConfig: mockConfig.app}
+    })
+
+    await waitFor(() => {
+        expect(screen.getByTestId('sf-checkout-container')).toBeInTheDocument()
+    })
+
+    expect(screen.queryByText(/pickup address & information/i)).not.toBeInTheDocument()
+    expect(screen.getByText(/shipping address/i)).toBeInTheDocument()
+})
