@@ -8,7 +8,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import {FormattedMessage, useIntl} from 'react-intl'
 import {Text, Skeleton} from '@salesforce/retail-react-app/app/components/shared/ui'
-
+//Test codeowners
 const BonusProductQuantity = ({product}) => {
     const intl = useIntl()
     return (
