@@ -5,7 +5,6 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React from 'react'
 import {renderHook, act} from '@testing-library/react'
 import useRefreshToken from '@salesforce/retail-react-app/app/hooks/use-refresh-token'
 import useAuthContext from '@salesforce/commerce-sdk-react/hooks/useAuthContext'
@@ -23,7 +22,7 @@ describe('useRefreshToken', () => {
     beforeEach(() => {
         mockGet = jest.fn()
         mockReady = jest.fn()
-        
+
         mockAuth = {
             get: mockGet,
             ready: mockReady
@@ -57,11 +56,11 @@ describe('useRefreshToken', () => {
             const {result} = renderHook(() => useRefreshToken())
 
             // Initially should return null
-            expect(result.current).toBe(null)
+            expect(result.current).toBeNull()
 
             // Wait for async operation
             await act(async () => {
-                await new Promise(resolve => setTimeout(resolve, 0))
+                await new Promise((resolve) => setTimeout(resolve, 0))
             })
 
             // Should return the ready token
@@ -75,15 +74,15 @@ describe('useRefreshToken', () => {
             const {result} = renderHook(() => useRefreshToken())
 
             // Initially should return null
-            expect(result.current).toBe(null)
+            expect(result.current).toBeNull()
 
             // Wait for async operation
             await act(async () => {
-                await new Promise(resolve => setTimeout(resolve, 0))
+                await new Promise((resolve) => setTimeout(resolve, 0))
             })
 
             // Should still return null after error
-            expect(result.current).toBe(null)
+            expect(result.current).toBeNull()
         })
     })
 
@@ -106,7 +105,7 @@ describe('useRefreshToken', () => {
 
             const {result} = renderHook(() => useRefreshToken())
 
-            expect(result.current).toBe(null)
+            expect(result.current).toBeNull()
             expect(mockGet).not.toHaveBeenCalled()
         })
     })
@@ -119,10 +118,10 @@ describe('useRefreshToken', () => {
             const {result} = renderHook(() => useRefreshToken())
 
             await act(async () => {
-                await new Promise(resolve => setTimeout(resolve, 0))
+                await new Promise((resolve) => setTimeout(resolve, 0))
             })
 
-            expect(result.current).toBe(null)
+            expect(result.current).toBeNull()
         })
 
         it('should return null when refresh_token is null', async () => {
@@ -132,10 +131,10 @@ describe('useRefreshToken', () => {
             const {result} = renderHook(() => useRefreshToken())
 
             await act(async () => {
-                await new Promise(resolve => setTimeout(resolve, 0))
+                await new Promise((resolve) => setTimeout(resolve, 0))
             })
 
-            expect(result.current).toBe(null)
+            expect(result.current).toBeNull()
         })
     })
 
@@ -188,11 +187,14 @@ describe('useRefreshToken', () => {
             const {result} = renderHook(() => useRefreshToken())
 
             await act(async () => {
-                await new Promise(resolve => setTimeout(resolve, 0))
+                await new Promise((resolve) => setTimeout(resolve, 0))
             })
 
-            expect(result.current).toBe(null)
-            expect(consoleErrorSpy).toHaveBeenCalledWith('Failed to get refresh token:', expect.any(Error))
+            expect(result.current).toBeNull()
+            expect(consoleErrorSpy).toHaveBeenCalledWith(
+                'Failed to get refresh token:',
+                expect.any(Error)
+            )
 
             consoleErrorSpy.mockRestore()
         })
@@ -211,4 +213,4 @@ describe('useRefreshToken', () => {
             consoleErrorSpy.mockRestore()
         })
     })
-}) 
+})

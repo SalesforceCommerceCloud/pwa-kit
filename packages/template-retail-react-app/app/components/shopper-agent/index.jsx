@@ -204,7 +204,7 @@ ShopperAgentWindow.propTypes = {
  */
 const ShopperAgent = ({commerceAgentConfiguration, basketId, locale, basketDoneLoading}) => {
     const {enabled} = commerceAgentConfiguration
-    const isShopperAgentEnabled = isEnabled(enabled);
+    const isShopperAgentEnabled = isEnabled(enabled)
     const refreshToken = useRefreshToken()
 
     return isShopperAgentEnabled &&
