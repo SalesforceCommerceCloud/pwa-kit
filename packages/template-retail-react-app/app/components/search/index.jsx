@@ -58,19 +58,19 @@ const formatSuggestions = (searchSuggestions, intl) => {
             }
         ),
         productSuggestions: searchSuggestions?.productSuggestions?.products?.map((product) => {
-                // Retrieve product badges
-                const labelsMap = new Map()
-                badgeDetails.forEach((item) => {
-                    if (
-                        item.propertyName &&
-                        typeof product[item.propertyName] === 'boolean' &&
-                        product[item.propertyName] === true
-                    ) {
-                        labelsMap.set(intl.formatMessage(item.label), item.color)
-                    } else if (item.propertyName && product[item.propertyName]) {
-                        labelsMap.set(product[item.propertyName], item.color)
-                    }
-                })
+            // Retrieve product badges
+            const labelsMap = new Map()
+            badgeDetails.forEach((item) => {
+                if (
+                    item.propertyName &&
+                    typeof product[item.propertyName] === 'boolean' &&
+                    product[item.propertyName] === true
+                ) {
+                    labelsMap.set(intl.formatMessage(item.label), item.color)
+                } else if (item.propertyName && product[item.propertyName]) {
+                    labelsMap.set(product[item.propertyName], item.color)
+                }
+            })
 
             return {
                 type: 'product',
@@ -119,7 +119,9 @@ const Search = (props) => {
     const navigate = useNavigation()
     const intl = useIntl()
     // Extract propertyName values from PRODUCT_BADGE_DETAILS as a comma-separated string
-    const productBadgePropertyNamesString = PRODUCT_BADGE_DETAILS.map(item => item.propertyName).join(',')
+    const productBadgePropertyNamesString = PRODUCT_BADGE_DETAILS.map(
+        (item) => item.propertyName
+    ).join(',')
     const searchSuggestion = useSearchSuggestions(
         {
             parameters: {

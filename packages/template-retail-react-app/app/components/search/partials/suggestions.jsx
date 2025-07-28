@@ -15,7 +15,6 @@ import {
     Image,
     useMultiStyleConfig
 } from '@salesforce/retail-react-app/app/components/shared/ui'
-import {FormattedMessage} from 'react-intl'
 
 const Suggestions = ({suggestions, closeAndNavigate}) => {
     const styles = useMultiStyleConfig('SearchSuggestions')

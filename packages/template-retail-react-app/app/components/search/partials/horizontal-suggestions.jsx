@@ -6,15 +6,23 @@
  */
 import React from 'react'
 import PropTypes from 'prop-types'
-import {Text, Button, Box, Flex, Image, HStack, Badge} from '@salesforce/retail-react-app/app/components/shared/ui'
+import {
+    Text,
+    Button,
+    Box,
+    Flex,
+    Image,
+    HStack,
+    Badge
+} from '@salesforce/retail-react-app/app/components/shared/ui'
 import {useMultiStyleConfig} from '@salesforce/retail-react-app/app/components/shared/ui'
 
 const HorizontalSuggestions = ({suggestions, closeAndNavigate}) => {
+    const styles = useMultiStyleConfig('SearchSuggestions')
+
     if (!suggestions) {
         return null
     }
-
-    const styles = useMultiStyleConfig('SearchSuggestions')
 
     return (
         <Box data-testid="sf-horizontal-product-suggestions">
@@ -46,11 +54,18 @@ const HorizontalSuggestions = ({suggestions, closeAndNavigate}) => {
 
                                 {suggestion.labels && suggestion.labels.size > 0 && (
                                     <HStack {...styles.badgeGroup}>
-                                        {Array.from(suggestion.labels.entries()).map(([label, colorScheme]) => (
-                                            <Badge key={label} data-testid="product-badge" colorScheme={colorScheme} size="sm">
-                                                {label}
-                                            </Badge>
-                                        ))}
+                                        {Array.from(suggestion.labels.entries()).map(
+                                            ([label, colorScheme]) => (
+                                                <Badge
+                                                    key={label}
+                                                    data-testid="product-badge"
+                                                    colorScheme={colorScheme}
+                                                    size="sm"
+                                                >
+                                                    {label}
+                                                </Badge>
+                                            )
+                                        )}
                                     </HStack>
                                 )}
                             </Box>

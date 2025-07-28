@@ -129,3 +129,199 @@ test('passing undefined to Suggestions returns undefined', async () => {
     )
     expect(suggestions.innerHTML).toBeUndefined()
 })
+
+// Additional tests to improve coverage
+
+test('handles search phrase in formatSuggestions', async () => {
+    const user = userEvent.setup()
+
+    // Mock search results with searchPhrase
+    const mockResultsWithPhrase = {
+        ...mockSearchResults,
+        searchPhrase: 'test search phrase'
+    }
+
+    global.server.use(
+        rest.get('*/search-suggestions', (req, res, ctx) => {
+            return res(ctx.delay(0), ctx.status(200), ctx.json(mockResultsWithPhrase))
+        })
+    )
+
+    renderWithProviders(<SearchInput />)
+    const searchInput = document.querySelector('input[type="search"]')
+
+    await user.type(searchInput, 'test')
+
+    // Wait for suggestions to load with search phrase
+    await waitFor(() => {
+        expect(screen.getByTestId('sf-suggestion-popover')).toBeInTheDocument()
+    })
+})
+
+test('handles product badges in suggestions', async () => {
+    const user = userEvent.setup()
+
+    // Mock search results with product badges
+    const mockResultsWithBadges = {
+        ...mockSearchResults,
+        productSuggestions: {
+            ...mockSearchResults.productSuggestions,
+            products: [
+                {
+                    ...mockSearchResults.productSuggestions.products[0],
+                    c_isNew: true,
+                    c_isSale: false
+                }
+            ]
+        }
+    }
+
+    global.server.use(
+        rest.get('*/search-suggestions', (req, res, ctx) => {
+            return res(ctx.delay(0), ctx.status(200), ctx.json(mockResultsWithBadges))
+        })
+    )
+
+    renderWithProviders(<SearchInput />)
+    const searchInput = document.querySelector('input[type="search"]')
+
+    await user.type(searchInput, 'Dress')
+
+    // Wait for suggestions to load with badges
+    await waitFor(() => {
+        expect(screen.getByTestId('sf-suggestion-popover')).toBeInTheDocument()
+    })
+})
+
+test('handles brand suggestions in formatSuggestions', async () => {
+    const user = userEvent.setup()
+
+    // Mock search results with brand suggestions
+    const mockResultsWithBrands = {
+        ...mockSearchResults,
+        brandSuggestions: {
+            suggestedPhrases: [{phrase: 'Nike'}, {phrase: 'Adidas'}]
+        }
+    }
+
+    global.server.use(
+        rest.get('*/search-suggestions', (req, res, ctx) => {
+            return res(ctx.delay(0), ctx.status(200), ctx.json(mockResultsWithBrands))
+        })
+    )
+
+    renderWithProviders(<SearchInput />)
+    const searchInput = document.querySelector('input[type="search"]')
+
+    await user.type(searchInput, 'Nike')
+
+    // Wait for suggestions to load with brand suggestions
+    await waitFor(() => {
+        expect(screen.getByTestId('sf-suggestion-popover')).toBeInTheDocument()
+    })
+})
+
+test('handles phrase suggestions in formatSuggestions', async () => {
+    const user = userEvent.setup()
+
+    // Mock search results with phrase suggestions
+    const mockResultsWithPhrases = {
+        ...mockSearchResults,
+        productSuggestions: {
+            ...mockSearchResults.productSuggestions,
+            suggestedPhrases: [
+                {phrase: 'running shoes', exactMatch: true},
+                {phrase: 'athletic wear', exactMatch: false}
+            ]
+        }
+    }
+
+    global.server.use(
+        rest.get('*/search-suggestions', (req, res, ctx) => {
+            return res(ctx.delay(0), ctx.status(200), ctx.json(mockResultsWithPhrases))
+        })
+    )
+
+    renderWithProviders(<SearchInput />)
+    const searchInput = document.querySelector('input[type="search"]')
+
+    await user.type(searchInput, 'running')
+
+    // Wait for suggestions to load with phrase suggestions
+    await waitFor(() => {
+        expect(screen.getByTestId('sf-suggestion-popover')).toBeInTheDocument()
+    })
+})
+
+test('handles category suggestions with images and parent categories', async () => {
+    const user = userEvent.setup()
+
+    // Mock search results with category suggestions that have images and parent categories
+    const mockResultsWithCategoryDetails = {
+        ...mockSearchResults,
+        categorySuggestions: {
+            categories: [
+                {
+                    id: 'womens-clothing-dresses',
+                    name: 'Dresses',
+                    parentCategoryName: 'Clothing',
+                    image: {
+                        disBaseLink: 'https://example.com/dress-image.jpg'
+                    }
+                }
+            ]
+        }
+    }
+
+    global.server.use(
+        rest.get('*/search-suggestions', (req, res, ctx) => {
+            return res(ctx.delay(0), ctx.status(200), ctx.json(mockResultsWithCategoryDetails))
+        })
+    )
+
+    renderWithProviders(<SearchInput />)
+    const searchInput = document.querySelector('input[type="search"]')
+
+    await user.type(searchInput, 'Dress')
+
+    // Wait for suggestions to load with detailed category suggestions
+    await waitFor(() => {
+        expect(screen.getByTestId('sf-suggestion-popover')).toBeInTheDocument()
+    })
+})
+
+test('handles product suggestions with images', async () => {
+    const user = userEvent.setup()
+
+    // Mock search results with product suggestions that have images
+    const mockResultsWithProductImages = {
+        ...mockSearchResults,
+        productSuggestions: {
+            ...mockSearchResults.productSuggestions,
+            products: [
+                {
+                    ...mockSearchResults.productSuggestions.products[0],
+                    image: {
+                        disBaseLink: 'https://example.com/product-image.jpg'
+                    }
+                }
+            ]
+        }
+    }
+
+    global.server.use(
+        rest.get('*/search-suggestions', (req, res, ctx) => {
+            return res(ctx.delay(0), ctx.status(200), ctx.json(mockResultsWithProductImages))
+        })
+    )
+
+    renderWithProviders(<SearchInput />)
+    const searchInput = document.querySelector('input[type="search"]')
+
+    await user.type(searchInput, 'Dress')
+
+    // Wait for suggestions to load with product images
+    await waitFor(() => {
+        expect(screen.getByTestId('sf-suggestion-popover')).toBeInTheDocument()
+    })
+})
