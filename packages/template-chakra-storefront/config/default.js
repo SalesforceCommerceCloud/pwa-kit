@@ -22,13 +22,7 @@ module.exports = {
     },
     ssrEnabled: true,
     ssrOnly: ['ssr.js', 'ssr.js.map', 'node_modules/**/*.*'],
-    ssrShared: [
-        'static/favicon.ico',
-        'static/robots.txt',
-        '**/*.js',
-        '**/*.js.map',
-        '**/*.json'
-    ],
+    ssrShared: ['static/favicon.ico', 'static/robots.txt', '**/*.js', '**/*.js.map', '**/*.json'],
     ssrParameters: {
         ssrFunctionNodeVersion: '22.x',
         proxyConfigs: [
