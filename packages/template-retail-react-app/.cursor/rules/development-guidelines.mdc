@@ -1,12 +1,10 @@
-/*
- * Copyright (c) 2025, Salesforce, Inc.
- * All rights reserved.
- * SPDX-License-Identifier: BSD-3-Clause
- * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
- */
-import {EmptyJsonSchema} from './utils'
+---
+description: Salesforce Commerce Composable Storefront Development Guidelines
+globs: 
+alwaysApply: false
+---
 
-const guidelinesText = `# Salesforce Commerce Composable Storefront Development Guidelines
+# Salesforce Commerce Composable Storefront Development Guidelines
 
 ## Overview
 This document offers guidelines in the development of Salesforce Commerce Composable Storefront applications using PWA Kit. The AI should possess a comprehensive understanding of the PWA Kit architecture, sample Retail React App, Chakra UI, and standard React application practices.
@@ -103,14 +101,3 @@ This document offers guidelines in the development of Salesforce Commerce Compos
 - Write comprehensive test coverage.
 - Ensure components are accessible and mobile-friendly.
 - Follow security best practices for all code.
-`
-
-export default {
-    name: 'development_guidelines',
-    description: `You must follow this development guidelines before attempting to analyze/ generate / refactor / modify / fix code.
-    - e.g. "Create a customer service Chat component", "Find bugs in my_script.jsx", "Refactor my_script.jsx to use React Hooks"`,
-    inputSchema: EmptyJsonSchema,
-    fn: async () => ({
-        content: [{type: 'text', text: guidelinesText}]
-    })
-}

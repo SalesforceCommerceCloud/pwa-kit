@@ -111,7 +111,6 @@ const TEMPLATE_SOURCE_BUNDLE = 'bundle'
 
 const BOOTSTRAP_DIR = p.join(__dirname, '..', 'assets', 'bootstrap', 'js')
 const ASSETS_TEMPLATES_DIR = p.join(__dirname, '..', 'assets', 'templates')
-const CURSOR_RULES_FROM_DIR = p.join(__dirname, '..', 'assets', 'cursor-rules')
 const PRIVATE_PRESET_NAMES = PRESETS.filter(({private}) => !!private).map(({id}) => id)
 const PUBLIC_PRESET_NAMES = PRESETS.filter(({private}) => !private).map(({id}) => id)
 const ALL_PRESET_NAMES = PRIVATE_PRESET_NAMES.concat(PUBLIC_PRESET_NAMES)
@@ -235,6 +234,38 @@ const expandObject = (obj = {}) =>
     Object.keys(obj).reduce((acc, curr) => merge(acc, expandKey(curr, obj[curr])), {})
 
 /**
+ * If the generated project is based on a template that includes '.cursor/rules',
+ * this function copies the rules from the installed node_modules into the
+ * top-level of the generated project.
+ * @param {string} outputDir - The directory of the generated project
+ * @private
+ */
+const copyCursorRules = (outputDir) => {
+    const cursorRulesFromDir = p.join(
+        outputDir,
+        'node_modules',
+        '@salesforce',
+        'retail-react-app',
+        '.cursor',
+        'rules'
+    )
+    if (sh.test('-e', cursorRulesFromDir)) {
+        const outputCursorRulesDir = p.join(outputDir, '.cursor', 'rules')
+
+        // Create the directory if it doesn't exist
+        if (!sh.test('-e', outputCursorRulesDir)) {
+            fs.mkdirSync(outputCursorRulesDir, {recursive: true})
+        }
+
+        // Copy the contents of cursorRulesFromDir to outputCursorRulesDir
+        const files = fs.readdirSync(cursorRulesFromDir)
+        files.forEach((file) => {
+            sh.cp('-rf', p.join(cursorRulesFromDir, file), outputCursorRulesDir)
+        })
+    }
+}
+
+/**
  * Envoke the "npm install" command for the provided project directory.
  *
  * @param {*} outputDir
@@ -298,7 +329,7 @@ const processTemplate = (relFile, inputDir, outputDir, context) => {
  * @param {*} answers
  * @param {*} param2
  */
-const runGenerator = (context, {outputDir, templateVersion, verbose}) => {
+const runGenerator = (context, {initGit, outputDir, templateVersion, verbose}) => {
     const {answers, template} = context
     const {id, source} = template
     const {extend = false} = answers.project
@@ -352,6 +383,11 @@ const runGenerator = (context, {outputDir, templateVersion, verbose}) => {
         assets.forEach((asset) => {
             sh.cp('-rf', p.join(packagePath, asset), outputDir)
         })
+        // Install dependencies for the newly minted project.
+        npmInstall(outputDir, {verbose})
+
+        // Extended project does not contain cursor rules and need explicit copy
+        copyCursorRules(outputDir)
     } else {
         console.log('Copying base template from package or npm: ', packagePath, outputDir)
         // Copy the base template either from the package or npm.
@@ -389,26 +425,30 @@ const runGenerator = (context, {outputDir, templateVersion, verbose}) => {
 
         // Clean up
         sh.rm('-rf', tmp)
+
+        // Install dependencies for the newly minted project.
+        npmInstall(outputDir, {verbose})
     }
 
-    // Copy the .cursor/rules directory if it exists
-    if (sh.test('-e', CURSOR_RULES_FROM_DIR)) {
-        const outputCursorRulesDir = p.join(outputDir, '.cursor', 'rules')
-
-        // Create the directory if it doesn't exist
-        if (!sh.test('-e', outputCursorRulesDir)) {
-            fs.mkdirSync(outputCursorRulesDir, {recursive: true})
-        }
-
-        // Copy the contents of CURSOR_RULES_FROM_DIR to outputCursorRulesDir
-        const files = fs.readdirSync(CURSOR_RULES_FROM_DIR)
-        files.forEach((file) => {
-            sh.cp('-rf', p.join(CURSOR_RULES_FROM_DIR, file), outputCursorRulesDir)
-        })
+    // Initialize a git repository if the --initGit flag is provided.
+    if (initGit) {
+        initGitRepo(outputDir)
     }
+}
 
-    // Install dependencies for the newly minted project.
-    npmInstall(outputDir, {verbose})
+/**
+ * Initializes a git repository in the specified directory, adds all files, and checks for git installation.
+ * @param {string} outputDir - The directory in which to initialize the git repository.
+ */
+const initGitRepo = (outputDir) => {
+    if (!sh.which('git')) {
+        console.error(
+            'Error: git is not installed or not found in PATH. Please install git to initialize a repository.'
+        )
+        process.exit(1)
+    }
+    sh.exec(`git init`, {cwd: outputDir})
+    sh.exec(`git add .`, {cwd: outputDir})
 }
 
 const foundNode = process.versions.node
@@ -514,7 +554,7 @@ const main = async (opts) => {
     let isPreset = false
     let answers = {}
     let selectedTemplate
-    let {outputDir, verbose, preset, templateVersion, stdio, displayProgram} = opts
+    let {outputDir, verbose, preset, templateVersion, stdio, displayProgram, initGit} = opts
     const {prompt} = inquirer
     const OUTPUT_DIR_FLAG_ACTIVE = !!outputDir
     const presetId = preset || process.env.GENERATOR_PRESET
@@ -643,7 +683,7 @@ const main = async (opts) => {
     }
 
     // Generate the project.
-    runGenerator(context, {outputDir, templateVersion, verbose})
+    runGenerator(context, {initGit, outputDir, templateVersion, verbose})
 
     // Return the folder in which the project was generated in.
     return outputDir
