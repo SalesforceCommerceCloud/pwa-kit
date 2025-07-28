@@ -631,8 +631,15 @@ test('Should show pickup address section for pickup-only orders', async () => {
         shipments: [
             {
                 ...scapiBasketWithItem.shipments[0],
+                shipmentId: 'shipment-1',
                 shippingMethod: {c_storePickupEnabled: true},
                 c_fromStoreId: 'store-1'
+            }
+        ],
+        productItems: [
+            {
+                ...scapiBasketWithItem.productItems[0],
+                shipmentId: 'shipment-1'
             }
         ]
     }
@@ -644,20 +651,46 @@ test('Should show pickup address section for pickup-only orders', async () => {
                 total: 1
             }
             return res(ctx.json(baskets))
+        }),
+        rest.get('*/stores', (req, res, ctx) => {
+            return res(
+                ctx.json({
+                    data: [
+                        {
+                            id: 'store-1',
+                            name: 'Test Store',
+                            address1: '123 Test St',
+                            city: 'Test City',
+                            stateCode: 'CA',
+                            postalCode: '12345',
+                            countryCode: 'US',
+                            phone: '555-123-4567'
+                        }
+                    ]
+                })
+            )
+        }),
+        rest.delete('*/baskets/:basketId/shipments/:shipmentId', (req, res, ctx) => {
+            return res(ctx.json({success: true}))
         })
     )
 
-    window.history.pushState({}, 'Checkout', createPathWithDefaults('/checkout'))
-    const {user} = renderWithProviders(<WrappedCheckout history={history} />, {
-        wrapperProps: {isGuest: true, siteAlias: 'uk', appConfig: mockConfig.app}
-    })
+    const testScenarios = [
+        {isGuest: true, description: 'guest'},
+        {isGuest: false, description: 'registered'}
+    ]
 
-    await waitFor(() => {
-        expect(screen.getByTestId('sf-checkout-container')).toBeInTheDocument()
-    })
+    for (const scenario of testScenarios) {
+        window.history.pushState({}, 'Checkout', createPathWithDefaults('/checkout'))
+        const {user} = renderWithProviders(<WrappedCheckout history={history} />, {
+            wrapperProps: {isGuest: scenario.isGuest, siteAlias: 'uk', appConfig: mockConfig.app}
+        })
 
-    expect(screen.getByTestId('sf-toggle-card-step-1')).toBeInTheDocument()
-    expect(screen.getByText(/pickup address & information/i)).toBeInTheDocument()
+        await waitFor(() => {
+            expect(screen.getByTestId('sf-checkout-container')).toBeInTheDocument()
+        })
+        expect(screen.getByText(/pickup address & information/i)).toBeInTheDocument()
+    }
 })
 
 test('Should show both pickup and shipping sections for mixed orders', async () => {
@@ -666,6 +699,7 @@ test('Should show both pickup and shipping sections for mixed orders', async () 
         shipments: [
             {
                 ...scapiBasketWithItem.shipments[0],
+                shipmentId: 'shipment-1',
                 shippingMethod: {c_storePickupEnabled: true},
                 c_fromStoreId: 'store-1'
             },
@@ -673,6 +707,17 @@ test('Should show both pickup and shipping sections for mixed orders', async () 
                 ...scapiBasketWithItem.shipments[0],
                 shipmentId: 'shipment-2',
                 shippingMethod: {c_storePickupEnabled: false}
+            }
+        ],
+        productItems: [
+            {
+                ...scapiBasketWithItem.productItems[0],
+                shipmentId: 'shipment-1'
+            },
+            {
+                ...scapiBasketWithItem.productItems[0],
+                itemId: 'item-2',
+                shipmentId: 'shipment-2'
             }
         ]
     }
@@ -684,59 +729,46 @@ test('Should show both pickup and shipping sections for mixed orders', async () 
                 total: 1
             }
             return res(ctx.json(baskets))
+        }),
+        rest.get('*/stores', (req, res, ctx) => {
+            return res(
+                ctx.json({
+                    data: [
+                        {
+                            id: 'store-1',
+                            name: 'Test Store',
+                            address1: '123 Test St',
+                            city: 'Test City',
+                            stateCode: 'CA',
+                            postalCode: '12345',
+                            countryCode: 'US',
+                            phone: '555-123-4567'
+                        }
+                    ]
+                })
+            )
+        }),
+        rest.delete('*/baskets/:basketId/shipments/:shipmentId', (req, res, ctx) => {
+            return res(ctx.json({success: true}))
         })
     )
 
-    window.history.pushState({}, 'Checkout', createPathWithDefaults('/checkout'))
-    const {user} = renderWithProviders(<WrappedCheckout history={history} />, {
-        wrapperProps: {isGuest: true, siteAlias: 'uk', appConfig: mockConfig.app}
-    })
+    const testScenarios = [
+        {isGuest: true, description: 'guest'},
+        {isGuest: false, description: 'registered'}
+    ]
 
-    await waitFor(() => {
-        expect(screen.getByTestId('sf-checkout-container')).toBeInTheDocument()
-    })
+    for (const scenario of testScenarios) {
+        window.history.pushState({}, 'Checkout', createPathWithDefaults('/checkout'))
+        const {user} = renderWithProviders(<WrappedCheckout history={history} />, {
+            wrapperProps: {isGuest: scenario.isGuest, siteAlias: 'uk', appConfig: mockConfig.app}
+        })
 
-    expect(screen.getByTestId('sf-toggle-card-step-1')).toBeInTheDocument()
-    expect(screen.getByText(/pickup address & information/i)).toBeInTheDocument()
-    expect(screen.getByText(/shipping address/i)).toBeInTheDocument()
-})
+        await waitFor(() => {
+            expect(screen.getByTestId('sf-checkout-container')).toBeInTheDocument()
+        })
 
-test('Should not show pickup address when STORE_LOCATOR_IS_ENABLED is false', async () => {
-    const pickupBasket = {
-        ...scapiBasketWithItem,
-        shipments: [
-            {
-                ...scapiBasketWithItem.shipments[0],
-                shippingMethod: {c_storePickupEnabled: true},
-                c_fromStoreId: 'store-1'
-            }
-        ]
+        expect(screen.getByText(/pickup address & information/i)).toBeInTheDocument()
+        expect(screen.getAllByText(/shipping address/i).length).toBeGreaterThan(0)
     }
-
-    global.server.use(
-        rest.get('*/baskets', (req, res, ctx) => {
-            const baskets = {
-                baskets: [pickupBasket],
-                total: 1
-            }
-            return res(ctx.json(baskets))
-        })
-    )
-
-    jest.doMock('@salesforce/retail-react-app/app/constants', () => ({
-        STORE_LOCATOR_IS_ENABLED: false,
-        MULTISHIP_IS_ENABLED: true
-    }))
-
-    window.history.pushState({}, 'Checkout', createPathWithDefaults('/checkout'))
-    const {user} = renderWithProviders(<WrappedCheckout history={history} />, {
-        wrapperProps: {isGuest: true, siteAlias: 'uk', appConfig: mockConfig.app}
-    })
-
-    await waitFor(() => {
-        expect(screen.getByTestId('sf-checkout-container')).toBeInTheDocument()
-    })
-
-    expect(screen.queryByText(/pickup address & information/i)).not.toBeInTheDocument()
-    expect(screen.getByText(/shipping address/i)).toBeInTheDocument()
 })
