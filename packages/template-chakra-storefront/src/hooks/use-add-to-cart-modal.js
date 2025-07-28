@@ -316,6 +316,7 @@ export const AddToCartModal = () => {
                                         to="/checkout"
                                         width="100%"
                                         variant="outline-gray"
+                                        size="sm"
                                     >
                                         Select Bonus Products
                                     </Button>
