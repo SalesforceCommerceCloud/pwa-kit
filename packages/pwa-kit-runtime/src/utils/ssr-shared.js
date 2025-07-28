@@ -29,6 +29,7 @@ export const validProxyProtocols = ['http', 'https']
 // specific functions.
 let _packageMobify
 export const getPackageMobify = () => _packageMobify || {}
+// TODO
 export const getSSRParameters = () => (_packageMobify && _packageMobify.ssrParameters) || {}
 
 /**
@@ -176,6 +177,7 @@ export const updatePackageMobify = (newValue) => {
     }
 
     // Clear and reset the ssrFiles array
+    // TODO
     ssrFiles = (_packageMobify.ssrOnly || []).concat(_packageMobify.ssrShared || [])
 }
 

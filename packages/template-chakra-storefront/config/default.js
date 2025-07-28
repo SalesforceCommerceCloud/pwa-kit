@@ -14,35 +14,33 @@ module.exports = {
     commerceAPI: {
         proxyPath: '/mobify/proxy/api',
         parameters: {
-            clientId: 'c9c45bfd-0ed3-4aa2-9971-40f88962b836',
+            clientId: '083859f2-5d93-4209-b999-a112266d63a0',
             organizationId: 'f_ecom_zzrf_001',
             shortCode: '8o7m175y',
             siteId: 'RefArchGlobal'
         }
     },
-    mobify: {
-        ssrEnabled: true,
-        ssrOnly: ['ssr.js', 'ssr.js.map', 'node_modules/**/*.*'],
-        ssrShared: [
-            'static/favicon.ico',
-            'static/robots.txt',
-            '**/*.js',
-            '**/*.js.map',
-            '**/*.json'
-        ],
-        ssrParameters: {
-            ssrFunctionNodeVersion: '22.x',
-            proxyConfigs: [
-                {
-                    host: 'kv7kzm78.api.commercecloud.salesforce.com',
-                    path: 'api'
-                },
-                {
-                    host: 'zzrf-001.dx.commercecloud.salesforce.com',
-                    path: 'ocapi'
-                }
-            ]
-        }
+    ssrEnabled: true,
+    ssrOnly: ['ssr.js', 'ssr.js.map', 'node_modules/**/*.*'],
+    ssrShared: [
+        'static/favicon.ico',
+        'static/robots.txt',
+        '**/*.js',
+        '**/*.js.map',
+        '**/*.json'
+    ],
+    ssrParameters: {
+        ssrFunctionNodeVersion: '22.x',
+        proxyConfigs: [
+            {
+                host: 'kv7kzm78.api.commercecloud.salesforce.com',
+                path: 'api'
+            },
+            {
+                host: 'zzrf-001.dx.commercecloud.salesforce.com',
+                path: 'ocapi'
+            }
+        ]
     },
     defaultSite: 'RefArchGlobal',
     defaultAppLocale: 'en-US',
