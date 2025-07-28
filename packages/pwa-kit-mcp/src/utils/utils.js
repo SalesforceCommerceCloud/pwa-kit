@@ -11,8 +11,7 @@ import {zodToJsonSchema} from 'zod-to-json-schema'
 import {z} from 'zod'
 
 // CONSTANTS
-// const CREATE_APP_VERSION = 'latest'
-const CREATE_APP_VERSION = '3.11.0-nightly-20250710080214'
+const CREATE_APP_VERSION = 'latest'
 
 // Private schema used to generate the JSON schema
 const emptySchema = z.object({}).strict()
@@ -84,7 +83,10 @@ export const runCommand = async (command, args = [], options = {}) => {
  * @returns {boolean} True if lerna.json exists in the current workspace, false otherwise.
  */
 export function isMonoRepo() {
-    const lernaPath = path.resolve(process.env.WORKSPACE_FOLDER_PATHS, 'lerna.json')
+    const lernaPath = path.resolve(
+        ...(process.env.WORKSPACE_FOLDER_PATHS ? [process.env.WORKSPACE_FOLDER_PATHS] : []),
+        'lerna.json'
+    )
     return fs.existsSync(lernaPath)
 }
 
