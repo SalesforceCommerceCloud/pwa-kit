@@ -292,7 +292,8 @@ const {handler} = runtime.createHandler(options, (app) => {
                         // Default source for product images - replace with your CDN
                         '*.commercecloud.salesforce.com',
                         '*.demandware.net',
-                        'checkoutshopper-test.adyen.com'
+                        'checkoutshopper-test.adyen.com',
+                        'https://www.gstatic.com'
                     ],
                     'script-src': [
                         // Used by the service worker in /worker/main.js
@@ -308,7 +309,7 @@ const {handler} = runtime.createHandler(options, (app) => {
                         // Connect to SCRT2 URLs
                         '*.salesforce-scrt.com'
                     ],
-                    'frame-src': ['checkoutshopper-test.adyen.com'],
+                    'frame-src': ['checkoutshopper-test.adyen.com', 'https://pay.google.com'],
                     'frame-ancestors': ["'self'"]
                 }
             },

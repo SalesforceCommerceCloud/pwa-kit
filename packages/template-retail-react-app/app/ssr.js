@@ -307,11 +307,16 @@ const {handler} = runtime.createHandler(options, (app) => {
                     'img-src': [
                         // Default source for product images - replace with your CDN
                         '*.commercecloud.salesforce.com',
-                        'checkoutshopper-test.adyen.com'
+                        'checkoutshopper-test.adyen.com',
+                        // Allow Google Pay specific images
+                        'https://www.gstatic.com/'
                     ],
                     'script-src': [
                         // Used by the service worker in /worker/main.js
-                        'storage.googleapis.com'
+                        'storage.googleapis.com',
+                        '*.adyen.com',
+                        'https://checkoutshopper-test.adyen.com',
+                        'https://pay.google.com/gp/p/js/pay.js'
                     ],
                     'connect-src': [
                         // Connect to Einstein APIs
@@ -326,9 +331,11 @@ const {handler} = runtime.createHandler(options, (app) => {
                     'frame-src': [
                         // Allow frames from Salesforce site.com (Needed for MIAW)
                         '*.site.com',
-                        'checkoutshopper-test.adyen.com'
+                        'checkoutshopper-test.adyen.com',
+                        // Allow Google Pay Specific frames
+                        'https://pay.google.com'
                     ],
-                    'frame-ancestors': ["'self'"]
+                    'frame-ancestors': ['self']
                 }
             }
         })
