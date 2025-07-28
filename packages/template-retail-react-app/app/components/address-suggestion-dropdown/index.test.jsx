@@ -20,13 +20,16 @@ describe('AddressSuggestionDropdown', () => {
                 secondary_text: 'New York, NY 10001, USA'
             },
             terms: [
-                {offset: 0, value: '123 Main Street'},
-                {offset: 17, value: 'New York'},
-                {offset: 27, value: 'NY'},
-                {offset: 30, value: '10001'},
-                {offset: 37, value: 'USA'}
+                {value: '123 Main Street'},
+                {value: 'New York'},
+                {value: 'NY'},
+                {value: '10001'},
+                {value: 'USA'}
             ],
-            types: ['street_address']
+            placePrediction: {
+                text: {text: '123 Main Street, New York, NY 10001, USA'},
+                placeId: 'ChIJ1234567890'
+            }
         },
         {
             description: '456 Oak Avenue, Los Angeles, CA 90210, USA',
@@ -36,13 +39,16 @@ describe('AddressSuggestionDropdown', () => {
                 secondary_text: 'Los Angeles, CA 90210, USA'
             },
             terms: [
-                {offset: 0, value: '456 Oak Avenue'},
-                {offset: 16, value: 'Los Angeles'},
-                {offset: 29, value: 'CA'},
-                {offset: 32, value: '90210'},
-                {offset: 39, value: 'USA'}
+                {value: '456 Oak Avenue'},
+                {value: 'Los Angeles'},
+                {value: 'CA'},
+                {value: '90210'},
+                {value: 'USA'}
             ],
-            types: ['street_address']
+            placePrediction: {
+                text: {text: '456 Oak Avenue, Los Angeles, CA 90210, USA'},
+                placeId: 'ChIJ4567890123'
+            }
         }
     ]
 
@@ -91,7 +97,10 @@ describe('AddressSuggestionDropdown', () => {
                             secondary_text: 'dummy'
                         },
                         terms: [],
-                        types: []
+                        placePrediction: {
+                            text: {text: 'dummy'},
+                            placeId: 'dummy'
+                        }
                     }
                 ]}
             />
@@ -229,5 +238,76 @@ describe('AddressSuggestionDropdown', () => {
         // Should not crash on hover
         fireEvent.mouseEnter(firstSuggestion)
         fireEvent.mouseLeave(firstSuggestion)
+    })
+
+    it('should display Google Maps placePrediction data correctly', () => {
+        const googleMapsSuggestions = [
+            {
+                description: '123 Main St, New York, NY 10001, USA',
+                place_id: 'test-place-id',
+                structured_formatting: {
+                    main_text: '123 Main St',
+                    secondary_text: 'New York, NY 10001, USA'
+                },
+                terms: [
+                    {value: '123 Main St'},
+                    {value: 'New York'},
+                    {value: 'NY'},
+                    {value: '10001'},
+                    {value: 'USA'}
+                ],
+                placePrediction: {
+                    text: {text: '123 Main St, New York, NY 10001, USA'},
+                    placeId: 'test-place-id'
+                }
+            }
+        ]
+
+        render(
+            <AddressSuggestionDropdown
+                {...defaultProps}
+                isVisible={true}
+                suggestions={googleMapsSuggestions}
+            />
+        )
+
+        // Should display the main text from structured_formatting
+        expect(screen.getByText('123 Main St')).toBeInTheDocument()
+        // Should also display the secondary text
+        expect(screen.getByText('New York, NY 10001, USA')).toBeInTheDocument()
+    })
+
+    it('should fallback to structured_formatting when placePrediction is not available', () => {
+        const fallbackSuggestions = [
+            {
+                description: '123 Main St, New York, NY 10001, USA',
+                place_id: 'test-place-id',
+                structured_formatting: {
+                    main_text: '123 Main St',
+                    secondary_text: 'New York, NY 10001, USA'
+                },
+                terms: [
+                    {value: '123 Main St'},
+                    {value: 'New York'},
+                    {value: 'NY'},
+                    {value: '10001'},
+                    {value: 'USA'}
+                ]
+                // No placePrediction
+            }
+        ]
+
+        render(
+            <AddressSuggestionDropdown
+                {...defaultProps}
+                isVisible={true}
+                suggestions={fallbackSuggestions}
+            />
+        )
+
+        // Should fallback to structured_formatting.main_text
+        expect(screen.getByText('123 Main St')).toBeInTheDocument()
+        // Should display the secondary text
+        expect(screen.getByText('New York, NY 10001, USA')).toBeInTheDocument()
     })
 })

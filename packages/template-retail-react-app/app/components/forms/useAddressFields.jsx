@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import {useIntl, defineMessages} from 'react-intl'
-import {useState, useRef, useCallback, useEffect} from 'react'
+import {useState, useCallback, useEffect, useRef} from 'react'
 import {formatPhoneNumber} from '@salesforce/retail-react-app/app/utils/phone-utils'
 import {
     stateOptions,
@@ -13,9 +13,10 @@ import {
 } from '@salesforce/retail-react-app/app/components/forms/state-province-options'
 import {SHIPPING_COUNTRY_CODES} from '@salesforce/retail-react-app/app/constants'
 import {
-    getAddressSuggestions,
-    parseAddressSuggestion
-} from '@salesforce/retail-react-app/app/utils/address-suggestions' // TODO: replace with the actual API call to the address service
+    processAddressSuggestion,
+    setAddressFieldValues
+} from '@salesforce/retail-react-app/app/utils/address-suggestions'
+import {useAutocompleteSuggestions} from '@salesforce/retail-react-app/app/hooks/useAutocompleteSuggestions'
 
 const messages = defineMessages({
     required: {defaultMessage: 'Required', id: 'use_address_fields.error.required'},
@@ -48,6 +49,7 @@ export default function useAddressFields({
         watch,
         control,
         setValue,
+        reset,
         formState: {errors}
     },
     prefix = ''
@@ -55,64 +57,62 @@ export default function useAddressFields({
     const {formatMessage} = useIntl()
 
     // Address autocomplete state
-    const [suggestions, setSuggestions] = useState([]) // no suggestions by default
     const [showDropdown, setShowDropdown] = useState(false) // dropdown is initially hidden
     const [isDismissed, setIsDismissed] = useState(false) // user has not dismissed the dropdown
-    const [isLoading, setIsLoading] = useState(false) // loading state for the API call
-
-    // Debounce timeout ref
-    const debounceTimeoutRef = useRef(null)
+    const [currentInput, setCurrentInput] = useState('') // current input value for autocomplete
+    const [isAutocompleted, setIsAutocompleted] = useState(false) // state to track when fields are being set by autocomplete
+    const [previousCountry, setPreviousCountry] = useState(undefined) // state to track previous country code
 
     const countryCode = watch('countryCode')
 
-    // Reset address fields when country changes
-    useEffect(() => {
-        // Clear address fields when country changes
+    // Use the autocomplete suggestions hook
+    const {suggestions, isLoading, resetSession} = useAutocompleteSuggestions(
+        currentInput,
+        countryCode
+    )
+
+    // Method to clear address fields
+    const clearAddressFields = useCallback(() => {
         setValue(`${prefix}address1`, '')
         setValue(`${prefix}city`, '')
         setValue(`${prefix}stateCode`, '')
         setValue(`${prefix}postalCode`, '')
         // Clear autocomplete suggestions
-        setSuggestions([])
+        setCurrentInput('')
         setShowDropdown(false)
         setIsDismissed(false)
-    }, [countryCode, prefix, setValue])
+        resetSession()
+    }, [prefix, setValue, resetSession])
 
-    // Handle address input changes with debouncing
-    const handleAddressInputChange = useCallback(
-        async (value) => {
-            // Clear any existing timeout
-            if (debounceTimeoutRef.current) {
-                clearTimeout(debounceTimeoutRef.current)
-            }
+    // Reset address fields when country changes
+    useEffect(() => {
+        // Only clear fields if we're not currently setting fields by autocomplete
+        if (isAutocompleted) {
+            return
+        }
+        
+        // Only clear fields if the country actually changed from a previous value
+        // and we have a previous value (not initial load)
+        if (countryCode && previousCountry !== undefined && countryCode !== previousCountry) {
+            clearAddressFields()
+        }
+        
+        // Update the previous country after checking for changes
+        setPreviousCountry(countryCode)
+    }, [countryCode, clearAddressFields, isAutocompleted, previousCountry])
 
-            // If input is too short, clear suggestions
-            if (!value || value.length < 3) {
-                setSuggestions([])
-                setShowDropdown(false)
-                return
-            }
+    // Handle address input changes
+    const handleAddressInputChange = useCallback((value) => {
+        setCurrentInput(value)
 
-            // Set loading state
-            setIsLoading(true)
-
-            // Debounce the API call
-            debounceTimeoutRef.current = setTimeout(async () => {
-                try {
-                    const results = await getAddressSuggestions(value, countryCode)
-                    setSuggestions(results)
-                    setShowDropdown(true)
-                    setIsDismissed(false)
-                } catch (error) {
-                    console.error('Error fetching address suggestions:', error)
-                    setSuggestions([])
-                } finally {
-                    setIsLoading(false)
-                }
-            }, 300) // 300ms debounce
-        },
-        [countryCode]
-    )
+        // Show/hide dropdown based on input length
+        if (!value || value.length < 3) {
+            setShowDropdown(false)
+        } else {
+            setShowDropdown(true)
+            setIsDismissed(false)
+        }
+    }, [])
 
     // Handle address field focus when user clicks into the address field
     const handleAddressFocus = useCallback(() => {
@@ -147,7 +147,7 @@ export default function useAddressFields({
             ) {
                 setShowDropdown(false)
                 setIsDismissed(true)
-                setSuggestions([])
+                resetSession()
             }
         }
 
@@ -158,40 +158,44 @@ export default function useAddressFields({
         return () => {
             document.removeEventListener('mousedown', handleClickOutside)
         }
-    }, [prefix, setShowDropdown, setIsDismissed, setSuggestions])
+    }, [prefix, setShowDropdown, setIsDismissed, resetSession])
 
     // Handle dropdown close when user clicks outside the dropdown
     const handleDropdownClose = useCallback(() => {
         setShowDropdown(false)
         setIsDismissed(true)
-        setSuggestions([])
-    }, [setShowDropdown, setIsDismissed, setSuggestions])
+        resetSession()
+    }, [setShowDropdown, setIsDismissed, resetSession])
 
     // Handle suggestion selection
     const handleSuggestionSelect = useCallback(
-        (suggestion) => {
-            // Parse the address suggestion to extract individual fields
-            const parsedFields = parseAddressSuggestion(suggestion)
+        async (suggestion) => {
+            try {
+                // Set flag to prevent country change effect from running
+                setIsAutocompleted(true)
+                
+                // Process address suggestion using unified utility method
+                const addressFields = await processAddressSuggestion(suggestion)
 
-            // Populate all address fields
-            setValue(`${prefix}address1`, parsedFields.address1)
-            if (parsedFields.city) {
-                setValue(`${prefix}city`, parsedFields.city)
+                // Use the utility function to set address fields
+                setAddressFieldValues(setValue, prefix, addressFields)
+                
+                // Reset session token after selecting a place
+                resetSession()
+                setShowDropdown(false)
+                setIsDismissed(true)
+                setCurrentInput('')
+                
+                // Clear the flag after setting fields
+                setTimeout(() => {
+                    setIsAutocompleted(false)
+                }, 100)
+            } catch (error) {
+                console.error('Error parsing address suggestion:', error)
+                setIsAutocompleted(false)
             }
-            if (parsedFields.stateCode) {
-                setValue(`${prefix}stateCode`, parsedFields.stateCode)
-            }
-            if (parsedFields.postalCode) {
-                setValue(`${prefix}postalCode`, parsedFields.postalCode)
-            }
-            if (parsedFields.countryCode) {
-                setValue(`${prefix}countryCode`, parsedFields.countryCode)
-            }
-            setShowDropdown(false)
-            setIsDismissed(true)
-            setSuggestions([])
         },
-        [prefix, setValue]
+        [prefix, setValue, resetSession, setIsAutocompleted]
     )
 
     // Define address fields

@@ -41,6 +41,7 @@ import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
 import LoadingSpinner from '@salesforce/retail-react-app/app/components/loading-spinner'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import {useMultiship} from '@salesforce/retail-react-app/app/hooks/use-multiship'
+import {APIProvider} from '@vis.gl/react-google-maps'
 
 const Checkout = () => {
     const {formatMessage} = useIntl()
@@ -213,6 +214,7 @@ const CheckoutContainer = () => {
     const removeItemFromBasketMutation = useShopperBasketsMutation('removeItemFromBasket')
     const toast = useToast()
     const [isDeletingUnavailableItem, setIsDeletingUnavailableItem] = useState(false)
+    const {googleCloudAPI = {}} = getConfig().app || {}
 
     const handleRemoveItem = async (product) => {
         await removeItemFromBasketMutation.mutateAsync(
@@ -251,15 +253,17 @@ const CheckoutContainer = () => {
     }
 
     return (
-        <CheckoutProvider>
-            {isDeletingUnavailableItem && <LoadingSpinner wrapperStyles={{height: '100vh'}} />}
+        <APIProvider apiKey={googleCloudAPI.apiKey}>
+            <CheckoutProvider>
+                {isDeletingUnavailableItem && <LoadingSpinner wrapperStyles={{height: '100vh'}} />}
 
-            <Checkout />
-            <UnavailableProductConfirmationModal
-                productItems={basket?.productItems}
-                handleUnavailableProducts={handleUnavailableProducts}
-            />
-        </CheckoutProvider>
+                <Checkout />
+                <UnavailableProductConfirmationModal
+                    productItems={basket?.productItems}
+                    handleUnavailableProducts={handleUnavailableProducts}
+                />
+            </CheckoutProvider>
+        </APIProvider>
     )
 }
 
