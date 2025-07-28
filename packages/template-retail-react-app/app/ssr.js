@@ -326,7 +326,7 @@ const {handler} = runtime.createHandler(options, (app) => {
                         'https://api.lab.amplitude.com/sdk/vardata',
                         '*.adyen.com',
                         // Connect to SCRT2 URLs
-                        '*.salesforce-scrt.com',
+                        '*.salesforce-scrt.com'
                     ],
                     'frame-src': [
                         // Allow frames from Salesforce site.com (Needed for MIAW)
@@ -335,9 +335,7 @@ const {handler} = runtime.createHandler(options, (app) => {
                         // Allow Google Pay Specific frames
                         'https://pay.google.com'
                     ],
-                    'frame-ancestors': [
-                        'self'
-                    ]
+                    'frame-ancestors': ['self']
                 }
             }
         })
