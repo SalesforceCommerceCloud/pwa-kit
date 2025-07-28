@@ -7,32 +7,30 @@
 
 import {useEffect, useState} from 'react'
 import useAuthContext from '@salesforce/commerce-sdk-react/hooks/useAuthContext'
+import useCustomerType from '@salesforce/commerce-sdk-react/hooks/useCustomerType'
 
 /**
  * Custom hook that fetches the refresh token from the CommerceApiProvider context.
  * Uses the auth instance from CommerceApiProvider to get the refresh token directly.
  *
- * @returns {string|null} The refresh token or null if not available
+ * @returns {string|null} The refresh token (synchronous value or ready value when available)
  */
 const useRefreshToken = () => {
-    const [refreshToken, setRefreshToken] = useState(null)
     const auth = useAuthContext()
-
+    const {customerType} = useCustomerType()
+    const refreshToken = customerType ? auth.get(`refresh_token_${customerType}`) : null
+    const [readyToken, setReadyToken] = useState(null)
+    
+    // Handle async token retrieval only if no token in storage
     useEffect(() => {
-        const fetchRefreshToken = async () => {
-            try {
-                // Wait for auth to be ready and get the token response
-                const tokenResponse = await auth.ready()
-                setRefreshToken(tokenResponse.refresh_token || null)
-            } catch (error) {
-                console.error('Failed to get refresh token:', error)
-            }
+        if (!refreshToken) {
+            const getRefreshTokenWhenReady = () => auth.ready().then(({refresh_token}) => refresh_token)
+            getRefreshTokenWhenReady().then(setReadyToken).catch(() => setReadyToken(null))
         }
-        
-        fetchRefreshToken()
-    }, [auth])
+    }, [auth, customerType, refreshToken])
 
-    return refreshToken
+    // Return refreshToken if available, otherwise return readyToken
+    return refreshToken || readyToken
 }
 
 export default useRefreshToken
