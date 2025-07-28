@@ -7,7 +7,7 @@
 
 import React, {useState, useRef} from 'react'
 import PropTypes from 'prop-types'
-import {Dialog, Flex, Box, VStack, useBreakpointValue} from '@chakra-ui/react'
+import {Dialog, Flex, Box, VStack, useBreakpointValue, CloseButton} from '@chakra-ui/react'
 import {keepPreviousData} from '@tanstack/react-query'
 import ProductView from '../../components/product-view'
 import {useProductViewModal} from '../../hooks/use-product-view-modal'
@@ -58,16 +58,16 @@ const BundleProductViewModal = ({product: bundle, isOpen, onClose, updateCart, .
 
     return (
         <Dialog.Root
+            lazyMount
             open={isOpen}
             onOpenChange={() => onClose()}
-            size="4xl"
+            size="xl"
             closeOnInteractOutside={false}
         >
             <SafePortal>
                 <Dialog.Backdrop />
                 <Dialog.Positioner>
                     <Dialog.Content data-testid="product-view-modal" aria-label={label}>
-                        <Dialog.CloseTrigger />
                         <Dialog.Body pb={8} bg="white" paddingBottom={6} marginTop={6}>
                             <Flex direction={['column', 'column', 'column', 'row']}>
                                 {/* Due to desktop layout, we'll need to render the image gallery separately, from outside the ProductView */}
@@ -169,6 +169,9 @@ const BundleProductViewModal = ({product: bundle, isOpen, onClose, updateCart, .
                                 </VStack>
                             </Flex>
                         </Dialog.Body>
+                        <Dialog.CloseTrigger asChild>
+                            <CloseButton size="sm" />
+                        </Dialog.CloseTrigger>
                     </Dialog.Content>
                 </Dialog.Positioner>
             </SafePortal>
