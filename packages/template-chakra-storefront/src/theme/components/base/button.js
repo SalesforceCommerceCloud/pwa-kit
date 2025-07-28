@@ -42,6 +42,10 @@ const button = defineRecipe({
                 color: 'blue.600',
                 _hover: {bg: 'gray.50'}
             },
+            'outline-gray': {
+                borderColor: 'gray.500',
+                _hover: {bg: 'gray.50'}
+            },
             footer: {
                 fontSize: 'sm',
                 backgroundColor: 'gray.100',

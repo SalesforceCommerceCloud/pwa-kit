@@ -677,3 +677,34 @@ test('renders product bundle', () => {
         })
     })
 })
+
+test('renders bonus product selection button and text', () => {
+    const MOCK_DATA = {
+        product: MOCK_PRODUCT,
+        itemsAdded: [
+            {
+                product: MOCK_PRODUCT,
+                variant: MOCK_PRODUCT.variants[0],
+                id: '701642811399M',
+                quantity: 1
+            }
+        ]
+    }
+
+    renderWithProviders(
+        <AddToCartModalContext.Provider
+            value={{
+                isOpen: true,
+                data: MOCK_DATA
+            }}
+        >
+            <AddToCartModal />
+        </AddToCartModalContext.Provider>
+    )
+
+    // Check that the promotional message is displayed
+    expect(screen.getByText('Bonus products available!')).toBeInTheDocument() //todo: update test. remove hardcoded text
+    
+    // Check that the "Select Bonus Products" button is displayed
+    expect(screen.getByText('Select Bonus Products')).toBeInTheDocument()
+})
