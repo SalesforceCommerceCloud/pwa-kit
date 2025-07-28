@@ -80,9 +80,10 @@ const AppConfig = ({children, locals = {}}) => {
             headers={memoizedHeaders}
             defaultDnt={defaultDnt}
             logger={memoizedLogger}
-            // Set 'enablePWAKitPrivateClient' to true use SLAS private client login flows.
+            // Uncomment 'enablePWAKitPrivateClient' to use SLAS private client login flows.
             // Make sure to also enable useSLASPrivateClient in ssr.js when enabling this setting.
-            enablePWAKitPrivateClient={true}
+            // enablePWAKitPrivateClient={true}
+
         >
             <MultiSiteProvider site={locals.site} locale={locals.locale} buildUrl={locals.buildUrl}>
                 <ChakraProvider value={theme}>{children}</ChakraProvider>
