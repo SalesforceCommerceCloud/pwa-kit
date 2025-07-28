@@ -26,7 +26,6 @@ const options = {
     defaultCacheTimeSeconds: 600,
 
     // The contents of the config file for the current environment
-    // TODO
     mobify: config,
 
     // The port that the local dev server listens on
@@ -217,7 +216,6 @@ const throwSlasTokenValidationError = (message, code) => {
 
 export const createRemoteJWKSet = (tenantId) => {
     const appOrigin = getAppOrigin()
-    // TODO
     const config = getConfig()
     const shortCode = config.commerceAPI.parameters.shortCode
     const configTenantId = config.commerceAPI.parameters.organizationId.replace(/^f_ecom_/, '')

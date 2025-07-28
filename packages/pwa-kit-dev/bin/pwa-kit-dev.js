@@ -384,7 +384,6 @@ const main = async () => {
 
                 const bundle = await scriptUtils.createBundle({
                     message,
-                    // TODO
                     ssr_parameters: config.ssrParameters,
                     ssr_only: config.ssrOnly,
                     ssr_shared: config.ssrShared,
