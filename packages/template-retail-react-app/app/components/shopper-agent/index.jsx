@@ -11,6 +11,7 @@ import {useUsid} from '@salesforce/commerce-sdk-react'
 import PropTypes from 'prop-types'
 import {useTheme} from '@salesforce/retail-react-app/app/components/shared/ui'
 import useMiaw from '@salesforce/retail-react-app/app/hooks/use-miaw'
+import useRefreshToken from '@salesforce/retail-react-app/app/hooks/use-refresh-token'
 
 const onClient = typeof window !== 'undefined'
 
@@ -204,6 +205,7 @@ ShopperAgentWindow.propTypes = {
 const ShopperAgent = ({commerceAgentConfiguration, basketId, locale, basketDoneLoading}) => {
     const {enabled} = commerceAgentConfiguration
     const isShopperAgentEnabled = isEnabled(enabled)
+    const refreshToken = useRefreshToken()
 
     return isShopperAgentEnabled &&
         basketDoneLoading &&
@@ -212,6 +214,7 @@ const ShopperAgent = ({commerceAgentConfiguration, basketId, locale, basketDoneL
             commerceAgentConfiguration={commerceAgentConfiguration}
             locale={locale}
             basketId={basketId}
+            refreshToken={refreshToken}
         />
     ) : null
 }
