@@ -51,6 +51,7 @@ import Island from '@salesforce/retail-react-app/app/components/island'
 
 // Hooks
 import {AuthModal, useAuthModal} from '@salesforce/retail-react-app/app/hooks/use-auth-modal'
+import {useStoreLocatorModal} from '@salesforce/retail-react-app/app/hooks/use-store-locator'
 import {
     DntNotification,
     useDntNotification
@@ -138,15 +139,15 @@ const App = (props) => {
     const authModal = useAuthModal()
     const dntNotification = useDntNotification()
     const {site, locale, buildUrl} = useMultiSite()
+    const {
+        isOpen: isStoreLocatorOpen,
+        onOpen: onOpenStoreLocator,
+        onClose: onCloseStoreLocator
+    } = useStoreLocatorModal()
 
     const [isOnline, setIsOnline] = useState(true)
     const styles = useStyleConfig('App')
     const {isOpen, onOpen, onClose} = useDisclosure()
-    const {
-        isOpen: isOpenStoreLocator,
-        onOpen: onOpenStoreLocator,
-        onClose: onCloseStoreLocator
-    } = useDisclosure()
 
     const targetLocale = getTargetLocale({
         getUserPreferredLocales: () => {
@@ -359,7 +360,7 @@ const App = (props) => {
                             <SkipNavLink zIndex="skipLink">Skip to Content</SkipNavLink>
                             {STORE_LOCATOR_IS_ENABLED && (
                                 <StoreLocatorModal
-                                    isOpen={isOpenStoreLocator}
+                                    isOpen={isStoreLocatorOpen}
                                     onClose={onCloseStoreLocator}
                                 />
                             )}
