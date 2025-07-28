@@ -40,8 +40,6 @@ packages/template-retail-react-app/app/pages/cart/partials/bonus-products-title.
 # Standard Products feature files - PR #2697
 packages/template-retail-react-app/app/mocks/standard-product.js @SalesforceCommerceCloud/cc-sharks
 packages/template-retail-react-app/app/utils/add-to-cart-utils.js @SalesforceCommerceCloud/cc-sharks
-
-# Default fallback for any other files
-*                                                           @SalesforceCommerceCloud/mobifyers
+                                                        
 
 #ECCN:Open Source
