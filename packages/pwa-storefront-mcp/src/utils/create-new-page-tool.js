@@ -245,23 +245,31 @@ export default ${pageName};
 
             const lastMatch = matches[matches.length - 1]
             const insertPosition = lastMatch.index + lastMatch[0].length
+
+            // Insert the new import after the last one
             let updatedContent =
                 routesContent.slice(0, insertPosition) +
                 `\n${importStatement}` +
                 routesContent.slice(insertPosition)
 
             const routeObject = `    {\n        path: '${route}',\n        component: ${pageName},\n        exact: true\n    },`
+
+            // Find the routes array, works for both export and non-export cases
             const routesArrayRegex = /(export\s+)?const\s+routes\s*=\s*\[([\s\S]*?)\]/m
             const match = updatedContent.match(routesArrayRegex)
             if (!match) {
                 throw new Error('No routes array declaration found.')
             }
+
+            // Find the start and end of the routes array
             const arrayStart = match.index + match[0].indexOf('[') + 1
             const arrayEnd = match.index + match[0].lastIndexOf(']')
             let arrayBody = updatedContent.slice(arrayStart, arrayEnd).trim()
 
+            // Remove leading/trailing commas and whitespace
             arrayBody = arrayBody.replace(/^,|,$/g, '').trim()
 
+            // Remove trailing '}' if present after a spread operator (e.g., ..._routes} in case of generated app)
             arrayBody = arrayBody.replace(/(\.\.\.[^,}\]]+)}\s*$/, '$1')
 
             if (arrayBody) {
@@ -275,6 +283,8 @@ export default ${pageName};
             }
 
             const newArrayBody = `\n${routeObject}\n${arrayBody ? '    ' + arrayBody : ''}\n`
+
+            // Reassemble the file
             updatedContent =
                 updatedContent.slice(0, arrayStart) + newArrayBody + updatedContent.slice(arrayEnd)
 
