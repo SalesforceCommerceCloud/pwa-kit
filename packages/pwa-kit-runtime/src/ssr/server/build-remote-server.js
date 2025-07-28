@@ -224,8 +224,11 @@ export const RemoteServerFactory = {
      * @private
      */
     _getSlasEndpoint(options) {
+        console.log('--- _getSlasEndpoint options', options)
         if (!options.useSLASPrivateClient) return undefined
-        const shortCode = options.mobify?.app?.commerceAPI?.parameters?.shortCode
+        // const shortCode = options.mobify?.app?.commerceAPI?.parameters?.shortCode
+        // TODO
+        const shortCode = options.mobify?.commerceAPI?.parameters?.shortCode
         return `${shortCode}.api.commercecloud.salesforce.com`
     },
 
@@ -691,7 +694,8 @@ export const RemoteServerFactory = {
 
         localDevLog(`Proxying ${slasPrivateProxyPath} to ${options.slasTarget}`)
 
-        const clientId = options.mobify?.app?.commerceAPI?.parameters?.clientId
+        // TODO
+        const clientId = options.mobify?.commerceAPI?.parameters?.clientId
         const clientSecret = process.env.PWA_KIT_SLAS_CLIENT_SECRET
         if (!clientSecret) {
             this._handleMissingSlasPrivateEnvVar(app, slasPrivateProxyPath)

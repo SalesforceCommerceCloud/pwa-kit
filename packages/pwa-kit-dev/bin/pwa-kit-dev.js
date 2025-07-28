@@ -384,9 +384,10 @@ const main = async () => {
 
                 const bundle = await scriptUtils.createBundle({
                     message,
-                    ssr_parameters: config.mobify.ssrParameters,
-                    ssr_only: config.mobify.ssrOnly,
-                    ssr_shared: config.mobify.ssrShared,
+                    // TODO
+                    ssr_parameters: config.ssrParameters,
+                    ssr_only: config.ssrOnly,
+                    ssr_shared: config.ssrShared,
                     buildDirectory,
                     projectSlug
                 })
