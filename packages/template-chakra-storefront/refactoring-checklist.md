@@ -221,7 +221,7 @@ Total files: 222
 - [x] src/pages/product-list/partials/page-header.jsx
 - [x] src/pages/product-list/partials/product-list-banner.jsx
 - [x] src/pages/product-list/partials/product-list-grid.jsx
-- [ ] src/pages/product-list/partials/product-list-header.jsx
+- [x] src/pages/product-list/partials/product-list-header.jsx
 - [ ] src/pages/product-list/partials/product-list-pagination.jsx
 - [ ] src/pages/product-list/partials/product-list-title.jsx
 - [ ] src/pages/product-list/partials/radio-refinements.jsx

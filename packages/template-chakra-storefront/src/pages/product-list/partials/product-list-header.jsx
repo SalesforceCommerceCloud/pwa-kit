@@ -41,6 +41,18 @@ const ProductListHeader = ({
             (option) => option.id === productSearchResult?.selectedSortingOption
         ) ?? sortingOptions?.[0]
 
+    const messages = {
+        sortBy: formatMessage(
+            {
+                id: 'product_list.button.sort_by',
+                defaultMessage: 'Sort By: {sortOption}'
+            },
+            {
+                sortOption: selectedSortingOptionLabel?.label
+            }
+        )
+    }
+
     return (
         <>
             {/* Header for Desktop */}
@@ -225,15 +237,7 @@ const ProductListHeader = ({
                                 color="black"
                                 onClick={() => setSortOpen(true)}
                             >
-                                {formatMessage(
-                                    {
-                                        id: 'product_list.button.sort_by',
-                                        defaultMessage: 'Sort By: {sortOption}'
-                                    },
-                                    {
-                                        sortOption: selectedSortingOptionLabel?.label
-                                    }
-                                )}
+                                {messages.sortBy}
                                 <ChevronDownIcon boxSize={5} />
                             </Button>
                         </Flex>
