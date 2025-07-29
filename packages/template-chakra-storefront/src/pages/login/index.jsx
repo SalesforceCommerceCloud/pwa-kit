@@ -7,7 +7,7 @@
 
 import React, {useEffect, useState} from 'react'
 import PropTypes from 'prop-types'
-import {useIntl, defineMessage} from 'react-intl'
+import {useIntl} from 'react-intl'
 import {keepPreviousData} from '@tanstack/react-query'
 import {Box, Container} from '@chakra-ui/react'
 import {
@@ -38,16 +38,22 @@ import {usePrevious} from '../../hooks/use-previous'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import {isServer} from '../../utils/utils'
 
-const LOGIN_ERROR_MESSAGE = defineMessage({
-    defaultMessage: 'Incorrect username or password, please try again.',
-    id: 'login_page.error.incorrect_username_or_password'
-})
-
 const LOGIN_VIEW = 'login'
 const EMAIL_VIEW = 'email'
 
 const Login = ({initialView = LOGIN_VIEW}) => {
     const {formatMessage} = useIntl()
+    
+    const messages = {
+        loginError: formatMessage({
+            id: 'login_page.error.incorrect_username_or_password',
+            defaultMessage: 'Incorrect username or password, please try again.'
+        }),
+        apiError: formatMessage(API_ERROR_MESSAGE),
+        createAccountFirst: formatMessage(CREATE_ACCOUNT_FIRST_ERROR_MESSAGE),
+        featureUnavailable: formatMessage(FEATURE_UNAVAILABLE_ERROR_MESSAGE),
+        invalidToken: formatMessage(INVALID_TOKEN_ERROR_MESSAGE)
+    }
     const navigate = useNavigation()
     const form = useForm()
     const location = useLocation()
@@ -99,7 +105,7 @@ const Login = ({initialView = LOGIN_VIEW}) => {
             } catch (e) {
                 form.setError('global', {
                     type: 'manual',
-                    message: formatMessage(API_ERROR_MESSAGE)
+                    message: messages.apiError
                 })
             }
         }
@@ -112,10 +118,10 @@ const Login = ({initialView = LOGIN_VIEW}) => {
             setCurrentView(EMAIL_VIEW)
         } catch (error) {
             const message = USER_NOT_FOUND_ERROR.test(error.message)
-                ? formatMessage(CREATE_ACCOUNT_FIRST_ERROR_MESSAGE)
+                ? messages.createAccountFirst
                 : PASSWORDLESS_ERROR_MESSAGES.some((msg) => msg.test(error.message))
-                ? formatMessage(FEATURE_UNAVAILABLE_ERROR_MESSAGE)
-                : formatMessage(API_ERROR_MESSAGE)
+                ? messages.featureUnavailable
+                : messages.apiError
             form.setError('global', {type: 'manual', message})
         }
     }
@@ -135,8 +141,8 @@ const Login = ({initialView = LOGIN_VIEW}) => {
                     await login.mutateAsync({username: data.email, password: data.password})
                 } catch (error) {
                     const message = /Unauthorized/i.test(error.message)
-                        ? formatMessage(LOGIN_ERROR_MESSAGE)
-                        : formatMessage(API_ERROR_MESSAGE)
+                        ? messages.loginError
+                        : messages.apiError
                     form.setError('global', {type: 'manual', message})
                 }
                 handleMergeBasket()
@@ -165,8 +171,8 @@ const Login = ({initialView = LOGIN_VIEW}) => {
                 } catch (e) {
                     const errorData = await e.response?.json()
                     const message = INVALID_TOKEN_ERROR.test(errorData.message)
-                        ? formatMessage(INVALID_TOKEN_ERROR_MESSAGE)
-                        : formatMessage(API_ERROR_MESSAGE)
+                        ? messages.invalidToken
+                        : messages.apiError
                     form.setError('global', {type: 'manual', message})
                 }
             }
