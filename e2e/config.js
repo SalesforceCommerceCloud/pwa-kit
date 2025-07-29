@@ -112,6 +112,7 @@ module.exports = {
   },
   EXPECTED_GENERATED_ARTIFACTS: {
     "retail-app-demo": [
+      ".cursor",
       ".eslintignore",
       ".eslintrc.js",
       ".prettierrc.yaml",
@@ -125,6 +126,7 @@ module.exports = {
       "worker",
     ],
     "retail-app-ext": [
+      ".cursor",
       ".eslintignore",
       ".eslintrc.js",
       ".prettierrc.yaml",
