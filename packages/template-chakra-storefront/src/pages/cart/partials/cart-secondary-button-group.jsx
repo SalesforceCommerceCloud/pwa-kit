@@ -15,7 +15,7 @@ import {
     Stack,
     useDisclosure
 } from '@chakra-ui/react'
-import {defineMessage, FormattedMessage} from 'react-intl'
+import {defineMessage, useIntl} from 'react-intl'
 import {useItemVariant} from '../../../components/item-variant'
 import ConfirmationModal from '../../../components/confirmation-modal/index'
 import {noop} from '../../../utils/utils'
@@ -61,10 +61,30 @@ const CartSecondaryButtonGroup = ({
     onIsAGiftChange = noop,
     isAGift = false
 }) => {
+    const {formatMessage} = useIntl()
     const variant = useItemVariant()
 
     const {data: customer} = useCurrentCustomer()
     const modalProps = useDisclosure()
+
+    const messages = {
+        remove: formatMessage({
+            id: "cart_secondary_button_group.action.remove",
+            defaultMessage: "Remove"
+        }),
+        addToWishlist: formatMessage({
+            id: "cart_secondary_button_group.action.added_to_wishlist",
+            defaultMessage: "Add to Wishlist"
+        }),
+        edit: formatMessage({
+            id: "cart_secondary_button_group.action.edit",
+            defaultMessage: "Edit"
+        }),
+        thisIsGift: formatMessage({
+            id: "cart_secondary_button_group.label.this_is_gift",
+            defaultMessage: "This is a gift."
+        })
+    }
 
     const showRemoveItemConfirmation = () => {
         modalProps.onOpen()
@@ -84,10 +104,7 @@ const CartSecondaryButtonGroup = ({
             >
                 <ButtonGroup gap="6">
                     <Button variant="link-blue" size="sm" onClick={showRemoveItemConfirmation}>
-                        <FormattedMessage
-                            defaultMessage="Remove"
-                            id="cart_secondary_button_group.action.remove"
-                        />
+                        {messages.remove}
                     </Button>
                     {customer.isRegistered && (
                         <Button
@@ -95,17 +112,11 @@ const CartSecondaryButtonGroup = ({
                             size="sm"
                             onClick={() => onAddToWishlistClick(variant)}
                         >
-                            <FormattedMessage
-                                defaultMessage="Add to Wishlist"
-                                id="cart_secondary_button_group.action.added_to_wishlist"
-                            />
+                            {messages.addToWishlist}
                         </Button>
                     )}
                     <Button variant="link-blue" size="sm" onClick={() => onEditClick(variant)}>
-                        <FormattedMessage
-                            defaultMessage="Edit"
-                            id="cart_secondary_button_group.action.edit"
-                        />
+                        {messages.edit}
                     </Button>
                 </ButtonGroup>
                 <Flex alignItems="center">
@@ -121,10 +132,7 @@ const CartSecondaryButtonGroup = ({
                         <Checkbox.HiddenInput />
                         <Checkbox.Control />
                         <Checkbox.Label>
-                            <FormattedMessage
-                                defaultMessage="This is a gift."
-                                id="cart_secondary_button_group.label.this_is_gift"
-                            />
+                            {messages.thisIsGift}
                         </Checkbox.Label>
                     </Checkbox.Root>
                     {/* if you want to provide a link to your gift site, uncomment this section and re-build your translation*/}
