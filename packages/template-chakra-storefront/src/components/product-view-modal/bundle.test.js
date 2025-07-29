@@ -16,7 +16,7 @@ import {
     mockProductBundleWithVariants,
     mockProductBundle
 } from '../../../mocks/product-bundle'
-import {rest} from 'msw'
+import {prependHandlersToServer} from '../../../jest-setup'
 
 const MockComponent = ({updateCart}) => {
     const {open, onOpen, onClose} = useDisclosure()
@@ -40,40 +40,46 @@ MockComponent.propTypes = {
 }
 
 beforeEach(() => {
-    global.server.use(
-        rest.get('*/products/:productId', (req, res, ctx) => {
-            return res(ctx.delay(0), ctx.status(200), ctx.json(mockProductBundle))
-        }),
-        rest.get('*/products', (req, res, ctx) => {
-            const swingTankBlackMediumVariantId = '701643473915M'
-            const swingTankBlackLargeVariantId = '701643473908M'
-            if (req.url.toString().includes(swingTankBlackMediumVariantId)) {
-                mockProductBundleWithVariants.data[1].inventory = {
-                    ...mockProductBundleWithVariants.data[1].inventory,
-                    stockLevel: 0
+    prependHandlersToServer([
+        {
+            path: '*/products/:productId',
+            method: 'get',
+            res: () => mockProductBundle
+        },
+        {
+            path: '*/products',
+            method: 'get',
+            res: (req) => {
+                const swingTankBlackMediumVariantId = '701643473915M'
+                const swingTankBlackLargeVariantId = '701643473908M'
+                if (req.url.toString().includes(swingTankBlackMediumVariantId)) {
+                    mockProductBundleWithVariants.data[1].inventory = {
+                        ...mockProductBundleWithVariants.data[1].inventory,
+                        stockLevel: 0
+                    }
+                } else if (req.url.toString().includes(swingTankBlackLargeVariantId)) {
+                    mockProductBundleWithVariants.data[1].inventory = {
+                        ...mockProductBundleWithVariants.data[1].inventory,
+                        stockLevel: 1
+                    }
                 }
-            } else if (req.url.toString().includes(swingTankBlackLargeVariantId)) {
-                mockProductBundleWithVariants.data[1].inventory = {
-                    ...mockProductBundleWithVariants.data[1].inventory,
-                    stockLevel: 1
-                }
+                return mockProductBundleWithVariants
             }
-            return res(ctx.json(mockProductBundleWithVariants))
-        })
-    )
+        }
+    ])
 })
 
 afterEach(() => {
     jest.resetModules()
     jest.restoreAllMocks()
 })
-//TODO: fix failed tests
-test.skip('renders bundle product view modal', async () => {
-    renderWithProviders(<MockComponent />)
+
+test('renders bundle product view modal', async () => {
+    const {user} = renderWithProviders(<MockComponent />)
     await waitFor(async () => {
         const trigger = screen.getByText(/open modal/i)
         await act(async () => {
-            fireEvent.click(trigger)
+            user.click(trigger)
         })
     })
 
@@ -92,15 +98,14 @@ test.skip('renders bundle product view modal', async () => {
     })
 })
 
-test.skip('renders bundle product view modal with handleUpdateCart handler', async () => {
+test('renders bundle product view modal with handleUpdateCart handler', async () => {
     const handleUpdateCart = jest.fn()
-    renderWithProviders(<MockComponent updateCart={handleUpdateCart} />)
+    const {user} = renderWithProviders(<MockComponent updateCart={handleUpdateCart} />)
 
-    // open the modal
     await waitFor(async () => {
         const trigger = screen.getByText(/open modal/i)
         await act(async () => {
-            fireEvent.click(trigger)
+            user.click(trigger)
         })
     })
 
@@ -115,12 +120,12 @@ test.skip('renders bundle product view modal with handleUpdateCart handler', asy
     expect(handleUpdateCart).toHaveBeenCalledTimes(1)
 })
 
-test.skip('bundle product view modal disables update button when child is out of stock', async () => {
-    renderWithProviders(<MockComponent />)
+test('bundle product view modal disables update button when child is out of stock', async () => {
+    const {user} = renderWithProviders(<MockComponent />)
     await waitFor(async () => {
         const trigger = screen.getByText(/open modal/i)
         await act(async () => {
-            fireEvent.click(trigger)
+            user.click(trigger)
         })
     })
 
@@ -151,13 +156,13 @@ test.skip('bundle product view modal disables update button when child is out of
         expect(screen.getByText('Out of stock')).toBeInTheDocument()
     })
 })
-
+//TODO: fix this failing test
 test.skip('bundle product view modal disables update button when quantity exceeds child inventory', async () => {
-    renderWithProviders(<MockComponent />)
+    const {user} = renderWithProviders(<MockComponent />)
     await waitFor(async () => {
         const trigger = screen.getByText(/open modal/i)
         await act(async () => {
-            fireEvent.click(trigger)
+            user.click(trigger)
         })
     })
 

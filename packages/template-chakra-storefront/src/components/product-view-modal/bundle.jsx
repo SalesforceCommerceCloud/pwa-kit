@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Salesforce, Inc.
+ * Copyright (c) 2025, Salesforce, Inc.
  * All rights reserved.
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
@@ -7,15 +7,19 @@
 
 import React, {useState, useRef} from 'react'
 import PropTypes from 'prop-types'
-import {Dialog, Flex, Box, VStack, useBreakpointValue} from '@chakra-ui/react'
-import {keepPreviousData} from '@tanstack/react-query'
-import ProductView from '../../components/product-view'
-import {useProductViewModal} from '../../hooks/use-product-view-modal'
-import SafePortal from '../safe-portal'
-import {useProducts} from '@salesforce/commerce-sdk-react'
-import ImageGallery, {Skeleton as ImageGallerySkeleton} from '../../components/image-gallery'
-import {useDerivedProduct} from '../../hooks'
 import {useIntl} from 'react-intl'
+import {Box, CloseButton, Dialog, Flex, VStack, useBreakpointValue} from '@chakra-ui/react'
+import {keepPreviousData} from '@tanstack/react-query'
+import {useProducts} from '@salesforce/commerce-sdk-react'
+
+// Project Components
+import ProductView from '../../components/product-view'
+import SafePortal from '../safe-portal'
+import ImageGallery, {Skeleton as ImageGallerySkeleton} from '../../components/image-gallery'
+
+// Project hooks
+import {useProductViewModal} from '../../hooks/use-product-view-modal'
+import {useDerivedProduct} from '../../hooks'
 
 /**
  * A Dialog that contains Product View for product bundle
@@ -58,16 +62,16 @@ const BundleProductViewModal = ({product: bundle, isOpen, onClose, updateCart, .
 
     return (
         <Dialog.Root
+            lazyMount
             open={isOpen}
             onOpenChange={() => onClose()}
-            size="4xl"
+            size="xl"
             closeOnInteractOutside={false}
         >
             <SafePortal>
                 <Dialog.Backdrop />
                 <Dialog.Positioner>
                     <Dialog.Content data-testid="product-view-modal" aria-label={label}>
-                        <Dialog.CloseTrigger />
                         <Dialog.Body pb={8} bg="white" paddingBottom={6} marginTop={6}>
                             <Flex direction={['column', 'column', 'column', 'row']}>
                                 {/* Due to desktop layout, we'll need to render the image gallery separately, from outside the ProductView */}
@@ -169,6 +173,9 @@ const BundleProductViewModal = ({product: bundle, isOpen, onClose, updateCart, .
                                 </VStack>
                             </Flex>
                         </Dialog.Body>
+                        <Dialog.CloseTrigger asChild>
+                            <CloseButton size="sm" />
+                        </Dialog.CloseTrigger>
                     </Dialog.Content>
                 </Dialog.Positioner>
             </SafePortal>
