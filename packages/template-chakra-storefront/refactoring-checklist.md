@@ -124,7 +124,7 @@ Total files: 222
 - [x] src/components/seo/index.tsx
 - [x] src/components/skip-nav/index.tsx
 - [x] src/components/social-icons/index.jsx
-- [ ] src/components/social-login/index.jsx
+- [x] src/components/social-login/index.jsx
 - [x] src/components/standard-login/index.jsx
 - [ ] src/components/store-locator-modal/index.jsx
 - [ ] src/components/store-locator-modal/store-locator-content.jsx

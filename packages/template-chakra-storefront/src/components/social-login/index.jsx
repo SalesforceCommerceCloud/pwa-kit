@@ -52,6 +52,13 @@ const SocialLogin = ({form, idps = []}) => {
     const redirectPath = loginConfig?.social?.redirectURI || ''
     const redirectURI = buildRedirectURI(appOrigin, redirectPath)
 
+    const messages = {
+        errors: {
+            featureUnavailable: formatMessage(FEATURE_UNAVAILABLE_ERROR_MESSAGE),
+            apiError: formatMessage(API_ERROR_MESSAGE)
+        }
+    }
+
     const isIdpValid = (name) => {
         const idp = name.toLowerCase()
         return idp in IDP_CONFIG && IDP_CONFIG[idp]
@@ -79,8 +86,8 @@ const SocialLogin = ({form, idps = []}) => {
             })
         } catch (error) {
             const message = /redirect_uri doesn't match/.test(error.message)
-                ? formatMessage(FEATURE_UNAVAILABLE_ERROR_MESSAGE)
-                : formatMessage(API_ERROR_MESSAGE)
+                ? messages.errors.featureUnavailable
+                : messages.errors.apiError
             form.setError('global', {type: 'manual', message})
         }
     }
@@ -93,7 +100,7 @@ const SocialLogin = ({form, idps = []}) => {
                     .map((name) => {
                         const config = IDP_CONFIG[name.toLowerCase()]
                         const Icon = config?.icon
-                        const message = formatMessage(config?.message)
+                        const idpMessage = formatMessage(config?.message)
                         return (
                             config && (
                                 <Button
@@ -106,7 +113,7 @@ const SocialLogin = ({form, idps = []}) => {
                                     variant="outline"
                                 >
                                     <Icon />
-                                    {message}
+                                    {idpMessage}
                                 </Button>
                             )
                         )
