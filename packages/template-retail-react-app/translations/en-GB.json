@@ -328,6 +328,15 @@
   "checkout_confirmation.message.will_email_shortly": {
     "defaultMessage": "We will send an email to <b>{email}</b> with your confirmation number and receipt shortly."
   },
+  "checkout_contact_info.action.edit": {
+    "defaultMessage": "Edit"
+  },
+  "checkout_contact_info.action.sign_out": {
+    "defaultMessage": "Sign Out"
+  },
+  "checkout_contact_info.title.contact": {
+    "defaultMessage": "Contact"
+  },
   "checkout_footer.link.privacy_policy": {
     "defaultMessage": "Privacy Policy"
   },
@@ -468,6 +477,9 @@
   },
   "contact_info.link.forgot_password": {
     "defaultMessage": "Forgot password?"
+  },
+  "contact_info.message.checking_addresses": {
+    "defaultMessage": "Checking for saved addresses..."
   },
   "contact_info.message.or_login_with": {
     "defaultMessage": "Or Login With"
@@ -1097,13 +1109,22 @@
     "defaultMessage": "Resend code"
   },
   "otp.button.resend_timer": {
-    "defaultMessage": "Resend code"
+    "defaultMessage": "Resend code in {timer}s"
+  },
+  "otp.error.invalid_code": {
+    "defaultMessage": "Invalid or expired code. Please try again."
   },
   "otp.message.enter_code_for_account": {
     "defaultMessage": "To use your account information enter the code sent to your email."
   },
+  "otp.message.verifying": {
+    "defaultMessage": "Verifying code..."
+  },
   "otp.title.confirm_its_you": {
     "defaultMessage": "Confirm it's you"
+  },
+  "otp_modal.header.email_verification": {
+    "defaultMessage": "Email Verification"
   },
   "page_not_found.action.go_back": {
     "defaultMessage": "Back to previous page"
@@ -1439,6 +1460,9 @@
   "shipping_address.label.shipping_address_form": {
     "defaultMessage": "Shipping Address Form"
   },
+  "shipping_address.message.processing_address": {
+    "defaultMessage": "Processing address selection..."
+  },
   "shipping_address.title.shipping_address": {
     "defaultMessage": "Shipping Address"
   },
@@ -1468,6 +1492,9 @@
   },
   "shipping_options.button.continue_to_payment": {
     "defaultMessage": "Continue to Payment"
+  },
+  "shipping_options.message.processing_method": {
+    "defaultMessage": "Processing shipping method selection..."
   },
   "shipping_options.title.shipping_gift_options": {
     "defaultMessage": "Shipping & Gift Options"

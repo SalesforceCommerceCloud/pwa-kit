@@ -867,6 +867,24 @@
       "value": " with your confirmation number and receipt shortly."
     }
   ],
+  "checkout_contact_info.action.edit": [
+    {
+      "type": 0,
+      "value": "Edit"
+    }
+  ],
+  "checkout_contact_info.action.sign_out": [
+    {
+      "type": 0,
+      "value": "Sign Out"
+    }
+  ],
+  "checkout_contact_info.title.contact": [
+    {
+      "type": 0,
+      "value": "Contact"
+    }
+  ],
   "checkout_footer.link.privacy_policy": [
     {
       "type": 0,
@@ -1163,6 +1181,12 @@
     {
       "type": 0,
       "value": "Forgot password?"
+    }
+  ],
+  "contact_info.message.checking_addresses": [
+    {
+      "type": 0,
+      "value": "Checking for saved addresses..."
     }
   ],
   "contact_info.message.or_login_with": [
@@ -2564,7 +2588,21 @@
   "otp.button.resend_timer": [
     {
       "type": 0,
-      "value": "Resend code"
+      "value": "Resend code in "
+    },
+    {
+      "type": 1,
+      "value": "timer"
+    },
+    {
+      "type": 0,
+      "value": "s"
+    }
+  ],
+  "otp.error.invalid_code": [
+    {
+      "type": 0,
+      "value": "Invalid or expired code. Please try again."
     }
   ],
   "otp.message.enter_code_for_account": [
@@ -2573,10 +2611,22 @@
       "value": "To use your account information enter the code sent to your email."
     }
   ],
+  "otp.message.verifying": [
+    {
+      "type": 0,
+      "value": "Verifying code..."
+    }
+  ],
   "otp.title.confirm_its_you": [
     {
       "type": 0,
       "value": "Confirm it's you"
+    }
+  ],
+  "otp_modal.header.email_verification": [
+    {
+      "type": 0,
+      "value": "Email Verification"
     }
   ],
   "page_not_found.action.go_back": [
@@ -3357,6 +3407,12 @@
       "value": "Shipping Address Form"
     }
   ],
+  "shipping_address.message.processing_address": [
+    {
+      "type": 0,
+      "value": "Processing address selection..."
+    }
+  ],
   "shipping_address.title.shipping_address": [
     {
       "type": 0,
@@ -3415,6 +3471,12 @@
     {
       "type": 0,
       "value": "Continue to Payment"
+    }
+  ],
+  "shipping_options.message.processing_method": [
+    {
+      "type": 0,
+      "value": "Processing shipping method selection..."
     }
   ],
   "shipping_options.title.shipping_gift_options": [

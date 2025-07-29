@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React, {useEffect} from 'react'
+import React, {useEffect, useRef, useState} from 'react'
 import {FormattedMessage, FormattedNumber, useIntl} from 'react-intl'
 import {
     Box,
@@ -37,6 +37,8 @@ export default function ShippingOptions() {
     const {data: basket} = useCurrentBasket()
     const {currency} = useCurrency()
     const updateShippingMethod = useShopperBasketsMutation('updateShippingMethodForShipment')
+    const autoProceededRef = useRef(false)
+    const [isLoading, setIsLoading] = useState(false)
     const {data: shippingMethods} = useShippingMethodsForShipment(
         {
             parameters: {
@@ -62,25 +64,77 @@ export default function ShippingOptions() {
     useEffect(() => {
         const defaultMethodId = shippingMethods?.defaultShippingMethodId
         const methodId = form.getValues().shippingMethodId
+        
+        // Auto-select default method if no method is currently selected
         if (!selectedShippingMethod && !methodId && defaultMethodId) {
             form.reset({shippingMethodId: defaultMethodId})
+            
+            // Auto-proceed to payment when default method is selected
+            // Only if we're currently on the shipping options step and haven't already auto-proceeded
+            if (step === STEPS.SHIPPING_OPTIONS && !autoProceededRef.current) {
+                autoProceededRef.current = true
+                setIsLoading(true) // Set loading immediately when auto-proceed starts
+                console.log('Auto-proceeding to payment with default shipping method:', defaultMethodId)
+                
+                // Automatically submit the form with the default method
+                setTimeout(async () => {
+                    try {
+                        await updateShippingMethod.mutateAsync({
+                            parameters: {
+                                basketId: basket.basketId,
+                                shipmentId: 'me'
+                            },
+                            body: {
+                                id: defaultMethodId
+                            }
+                        })
+                        goToNextStep()
+                    } catch (error) {
+                        console.error('Auto-proceed failed:', error)
+                        // Reset auto-proceed flag on error so user can manually continue
+                        autoProceededRef.current = false
+                    } finally {
+                        setIsLoading(false)
+                    }
+                }, 500) // Small delay to ensure form state is updated
+            }
         }
+        
+        // Update form if shipping method changes
         if (selectedShippingMethod && methodId !== selectedShippingMethod.id) {
             form.reset({shippingMethodId: selectedShippingMethod.id})
         }
-    }, [selectedShippingMethod, shippingMethods])
+    }, [selectedShippingMethod, shippingMethods, step, STEPS.SHIPPING_OPTIONS, form, updateShippingMethod, basket?.basketId, goToNextStep])
+
+    // Reset auto-proceed flag when entering the shipping options step
+    useEffect(() => {
+        if (step === STEPS.SHIPPING_OPTIONS) {
+            autoProceededRef.current = false
+            setIsLoading(false) // Reset loading state when entering the step
+        } else {
+            // Clean up loading state when leaving the step
+            setIsLoading(false)
+        }
+    }, [step, STEPS.SHIPPING_OPTIONS])
 
     const submitForm = async ({shippingMethodId}) => {
-        await updateShippingMethod.mutateAsync({
-            parameters: {
-                basketId: basket.basketId,
-                shipmentId: 'me'
-            },
-            body: {
-                id: shippingMethodId
-            }
-        })
-        goToNextStep()
+        setIsLoading(true)
+        try {
+            await updateShippingMethod.mutateAsync({
+                parameters: {
+                    basketId: basket.basketId,
+                    shipmentId: 'me'
+                },
+                body: {
+                    id: shippingMethodId
+                }
+            })
+            goToNextStep()
+        } catch (error) {
+            console.error('Manual shipping method submission failed:', error)
+        } finally {
+            setIsLoading(false)
+        }
     }
 
     const shippingItem = basket?.shippingItems?.[0]
@@ -124,7 +178,7 @@ export default function ShippingOptions() {
                 id: 'shipping_options.title.shipping_gift_options'
             })}
             editing={step === STEPS.SHIPPING_OPTIONS}
-            isLoading={form.formState.isSubmitting}
+            isLoading={form.formState.isSubmitting || isLoading}
             disabled={selectedShippingMethod == null || !selectedShippingAddress}
             onEdit={() => goToStep(STEPS.SHIPPING_OPTIONS)}
             editLabel={formatMessage({
@@ -214,55 +268,66 @@ export default function ShippingOptions() {
                 </form>
             </ToggleCardEdit>
 
-            {selectedShippingMethod && selectedShippingAddress && (
+            {isLoading ? (
                 <ToggleCardSummary>
-                    <Flex justify="space-between" w="full">
-                        <Text>{selectedShippingMethod.name}</Text>
-                        <Flex alignItems="center" aria-label={shippingPriceLabel} role="group">
-                            <Text fontWeight="bold" aria-hidden="true" role="presentation">
-                                {selectedMethodDisplayPrice === 0 ? (
-                                    freeLabel
-                                ) : (
-                                    <FormattedNumber
-                                        value={selectedMethodDisplayPrice}
-                                        style="currency"
-                                        currency={currency}
-                                    />
-                                )}
-                            </Text>
-                            {selectedMethodDisplayPrice !== shippingItem.price && (
-                                <Text
-                                    fontWeight="normal"
-                                    textDecoration="line-through"
-                                    color="gray.600"
-                                    marginLeft={1}
-                                    aria-hidden="true"
-                                    role="presentation"
-                                >
-                                    <FormattedNumber
-                                        style="currency"
-                                        currency={currency}
-                                        value={shippingItem.price}
-                                    />
-                                </Text>
-                            )}
-                        </Flex>
-                    </Flex>
-                    <Text fontSize="sm" color="gray.700">
-                        {selectedShippingMethod.description}
+                    <Text color="blue.500" fontSize="sm" fontStyle="italic">
+                        <FormattedMessage
+                            defaultMessage="Processing shipping method selection..."
+                            id="shipping_options.message.processing_method"
+                        />
                     </Text>
-                    {shippingItem?.priceAdjustments?.map((adjustment) => {
-                        return (
-                            <Text
-                                key={adjustment.priceAdjustmentId}
-                                fontSize="sm"
-                                color="green.600"
-                            >
-                                {adjustment.itemText}
-                            </Text>
-                        )
-                    })}
                 </ToggleCardSummary>
+            ) : (
+                selectedShippingMethod && selectedShippingAddress && (
+                    <ToggleCardSummary>
+                        <Flex justify="space-between" w="full">
+                            <Text>{selectedShippingMethod.name}</Text>
+                            <Flex alignItems="center" aria-label={shippingPriceLabel} role="group">
+                                <Text fontWeight="bold" aria-hidden="true" role="presentation">
+                                    {selectedMethodDisplayPrice === 0 ? (
+                                        freeLabel
+                                    ) : (
+                                        <FormattedNumber
+                                            value={selectedMethodDisplayPrice}
+                                            style="currency"
+                                            currency={currency}
+                                        />
+                                    )}
+                                </Text>
+                                {selectedMethodDisplayPrice !== shippingItem.price && (
+                                    <Text
+                                        fontWeight="normal"
+                                        textDecoration="line-through"
+                                        color="gray.600"
+                                        marginLeft={1}
+                                        aria-hidden="true"
+                                        role="presentation"
+                                    >
+                                        <FormattedNumber
+                                            style="currency"
+                                            currency={currency}
+                                            value={shippingItem.price}
+                                        />
+                                    </Text>
+                                )}
+                            </Flex>
+                        </Flex>
+                        <Text fontSize="sm" color="gray.700">
+                            {selectedShippingMethod.description}
+                        </Text>
+                        {shippingItem?.priceAdjustments?.map((adjustment) => {
+                            return (
+                                <Text
+                                    key={adjustment.priceAdjustmentId}
+                                    fontSize="sm"
+                                    color="green.600"
+                                >
+                                    {adjustment.itemText}
+                                </Text>
+                            )
+                        })}
+                    </ToggleCardSummary>
+                )
             )}
         </ToggleCard>
     )
