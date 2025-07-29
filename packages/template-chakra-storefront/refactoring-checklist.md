@@ -25,7 +25,7 @@ Total files: 27
 - [x] src/hooks/use-add-to-cart-modal.js
 - [x] src/hooks/use-derived-product.js
 - [x] src/hooks/use-product-view-modal.js
-- [ ] src/page-designer/layouts/carousel/index.jsx
+- [x] src/page-designer/layouts/carousel/index.jsx
 - [ ] src/pages/checkout/partials/checkout-footer.jsx
 - [ ] src/pages/checkout/partials/checkout-header.jsx
 - [ ] src/pages/home/index.jsx
