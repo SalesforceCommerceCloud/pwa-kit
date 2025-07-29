@@ -13,7 +13,7 @@ Total files: 27
 - [x] src/components/icons/index.jsx
 - [x] src/components/list-menu/list-menu.jsx
 - [x] src/components/locale-text/index.jsx
-- [ ] src/components/offline-banner/index.jsx
+- [x] src/components/offline-banner/index.jsx
 - [ ] src/components/order-summary/index.jsx
 - [ ] src/components/pagination/index.jsx
 - [ ] src/components/passwordless-login/index.jsx

@@ -18,10 +18,10 @@ import {AlertIcon} from '../../components/icons'
  * A banner component that displays when the user is offline.
  */
 const OfflineBanner = ({...props}) => {
-    const intl = useIntl()
+    const {formatMessage} = useIntl()
 
     const messages = {
-        title: intl.formatMessage({
+        title: formatMessage({
             id: 'offline_banner.description.browsing_offline_mode',
             defaultMessage: "You're currently browsing in offline mode"
         })
