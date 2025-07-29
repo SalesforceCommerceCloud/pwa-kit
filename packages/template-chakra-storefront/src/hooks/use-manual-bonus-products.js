@@ -122,7 +122,7 @@ export const useManualBonusProducts = (basket = null, isPending = false, isRegis
     )
 
     /**
-     * Creates a manual bonus product collection for a single qualifying product (legacy method)
+     * Creates a manual bonus product collection for a single qualifying product
      * @param {string} regularProductId - The ID of the regular product that triggered the bonus
      * @param {Array} bonusProducts - Array of bonus product items from the basket response
      */
