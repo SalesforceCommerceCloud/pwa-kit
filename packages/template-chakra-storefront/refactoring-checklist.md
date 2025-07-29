@@ -208,9 +208,9 @@ Total files: 222
 - [x] src/pages/product-list/hooks/use-product-list-controls.js
 - [x] src/pages/product-list/hooks/use-product-list-data.js
 - [x] src/pages/product-list/index.jsx
-- [ ] src/pages/product-list/page-analytics.jsx
-- [ ] src/pages/product-list/page-cache.jsx
-- [ ] src/pages/product-list/page-metadata.jsx
+- [x] src/pages/product-list/page-analytics.jsx
+- [x] src/pages/product-list/page-cache.jsx
+- [x] src/pages/product-list/page-metadata.jsx
 - [ ] src/pages/product-list/partials/above-page-header.jsx
 - [ ] src/pages/product-list/partials/category-links.jsx
 - [ ] src/pages/product-list/partials/checkbox-refinements.jsx
