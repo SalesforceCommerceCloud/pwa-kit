@@ -177,7 +177,7 @@ Total files: 222
 - [x] src/pages/checkout/confirmation.mock.js
 - [x] src/pages/checkout/index.jsx
 - [x] src/pages/checkout/partials/cc-radio-group.jsx
-- [ ] src/pages/checkout/partials/checkout-footer.jsx
+- [x] src/pages/checkout/partials/checkout-footer.jsx
 - [ ] src/pages/checkout/partials/checkout-header.jsx
 - [ ] src/pages/checkout/partials/checkout-skeleton.jsx
 - [ ] src/pages/checkout/partials/contact-info.jsx

@@ -27,6 +27,21 @@ const CheckoutFooter = ({...otherProps}) => {
     const styles = recipe()
     const intl = useIntl()
 
+    const messages = {
+        shipping: intl.formatMessage({
+            id: 'checkout_footer.link.shipping',
+            defaultMessage: 'Shipping'
+        }),
+        returnsExchanges: intl.formatMessage({
+            id: 'checkout_footer.link.returns_exchanges',
+            defaultMessage: 'Returns & Exchanges'
+        }),
+        copyright: intl.formatMessage({
+            id: 'checkout_footer.message.copyright',
+            defaultMessage: 'Salesforce or its affiliates. All rights reserved. This is a demo store only. Orders made WILL NOT be processed.'
+        })
+    }
+
     return (
         <Box as="footer" css={styles.container} {...otherProps}>
             <Box css={styles.content}>
@@ -34,17 +49,11 @@ const CheckoutFooter = ({...otherProps}) => {
                     links={[
                         {
                             href: '/',
-                            text: intl.formatMessage({
-                                id: 'checkout_footer.link.shipping',
-                                defaultMessage: 'Shipping'
-                            })
+                            text: messages.shipping
                         },
                         {
                             href: '/',
-                            text: intl.formatMessage({
-                                id: 'checkout_footer.link.returns_exchanges',
-                                defaultMessage: 'Returns & Exchanges'
-                            })
+                            text: messages.returnsExchanges
                         }
                     ]}
                     css={styles.customerService}
@@ -58,12 +67,7 @@ const CheckoutFooter = ({...otherProps}) => {
 
                 <Box css={styles.legalSection}>
                     <Text css={styles.copyright}>
-                        &copy; {new Date().getFullYear()}{' '}
-                        {intl.formatMessage({
-                            id: 'checkout_footer.message.copyright',
-                            defaultMessage:
-                                'Salesforce or its affiliates. All rights reserved. This is a demo store only. Orders made WILL NOT be processed.'
-                        })}
+                        &copy; {new Date().getFullYear()} {messages.copyright}
                     </Text>
 
                     <HideOnDesktop>
@@ -87,29 +91,35 @@ export default CheckoutFooter
 const LegalLinks = ({variant}) => {
     const intl = useIntl()
 
+    const messages = {
+        termsConditions: intl.formatMessage({
+            id: 'checkout_footer.link.terms_conditions',
+            defaultMessage: 'Terms & Conditions'
+        }),
+        privacyPolicy: intl.formatMessage({
+            id: 'checkout_footer.link.privacy_policy',
+            defaultMessage: 'Privacy Policy'
+        }),
+        siteMap: intl.formatMessage({
+            id: 'checkout_footer.link.site_map',
+            defaultMessage: 'Site Map'
+        })
+    }
+
     return (
         <LinksList
             links={[
                 {
                     href: '/',
-                    text: intl.formatMessage({
-                        id: 'checkout_footer.link.terms_conditions',
-                        defaultMessage: 'Terms & Conditions'
-                    })
+                    text: messages.termsConditions
                 },
                 {
                     href: '/',
-                    text: intl.formatMessage({
-                        id: 'checkout_footer.link.privacy_policy',
-                        defaultMessage: 'Privacy Policy'
-                    })
+                    text: messages.privacyPolicy
                 },
                 {
                     href: '/',
-                    text: intl.formatMessage({
-                        id: 'checkout_footer.link.site_map',
-                        defaultMessage: 'Site Map'
-                    })
+                    text: messages.siteMap
                 }
             ]}
             color="gray.200"
