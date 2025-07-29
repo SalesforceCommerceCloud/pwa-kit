@@ -7,7 +7,7 @@
 
 import React, {useState} from 'react'
 import PropTypes from 'prop-types'
-import {FormattedMessage} from 'react-intl'
+import {useIntl} from 'react-intl'
 import {Button, Separator, Stack, Text} from '@chakra-ui/react'
 import LoginFields from '../forms/login-fields'
 import StandardLogin from '../standard-login'
@@ -19,7 +19,23 @@ const PasswordlessLogin = ({
     isSocialEnabled = false,
     idps = []
 }) => {
+    const intl = useIntl()
     const [showPasswordView, setShowPasswordView] = useState(false)
+
+    const messages = {
+        continueSecurely: intl.formatMessage({
+            id: 'login_form.button.continue_securely',
+            defaultMessage: 'Continue Securely'
+        }),
+        orLoginWith: intl.formatMessage({
+            id: 'login_form.message.or_login_with',
+            defaultMessage: 'Or Login With'
+        }),
+        password: intl.formatMessage({
+            id: 'login_form.button.password',
+            defaultMessage: 'Password'
+        })
+    }
 
     const handlePasswordButton = async (e) => {
         const isValid = await form.trigger()
@@ -49,17 +65,11 @@ const PasswordlessLogin = ({
                         }}
                         isLoading={form.formState.isSubmitting}
                     >
-                        <FormattedMessage
-                            defaultMessage="Continue Securely"
-                            id="login_form.button.continue_securely"
-                        />
+                        {messages.continueSecurely}
                     </Button>
                     <Separator />
                     <Text textAlign="center" fontSize="sm">
-                        <FormattedMessage
-                            defaultMessage="Or Login With"
-                            id="login_form.message.or_login_with"
-                        />
+                        {messages.orLoginWith}
                     </Text>
                     <Stack gap={4}>
                         <Button
@@ -68,10 +78,7 @@ const PasswordlessLogin = ({
                             color="blue.600"
                             variant="outline"
                         >
-                            <FormattedMessage
-                                defaultMessage="Password"
-                                id="login_form.button.password"
-                            />
+                            {messages.password}
                         </Button>
                         {isSocialEnabled && <SocialLogin form={form} idps={idps} />}
                     </Stack>
