@@ -50,7 +50,7 @@ Total files: 222
 - [x] src/components/field/index.jsx
 - [x] src/components/footer/index.jsx
 - [x] src/components/forms/address-fields.jsx
-- [ ] src/components/forms/credit-card-fields.jsx
+- [x] src/components/forms/credit-card-fields.jsx
 - [ ] src/components/forms/form-action-buttons.jsx
 - [ ] src/components/forms/login-fields.jsx
 - [ ] src/components/forms/password-requirements.jsx
