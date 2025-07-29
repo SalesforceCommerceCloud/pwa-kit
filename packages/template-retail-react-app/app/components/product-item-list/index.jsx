@@ -40,6 +40,11 @@ const ProductItemList = ({
                     <ProductItem
                         key={productItem.itemId}
                         isBonusProduct={isBonusProductItem}
+                        containerStyles={{
+                            borderX: 'none',
+                            borderTop: 'none',
+                            boxShadow: 'none'
+                        }}
                         secondaryActions={
                             renderSecondaryActions
                                 ? renderSecondaryActions({

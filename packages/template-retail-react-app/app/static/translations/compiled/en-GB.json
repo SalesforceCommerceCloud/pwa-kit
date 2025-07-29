@@ -2781,10 +2781,10 @@
       "value": "Store Information"
     }
   ],
-  "pickup_or_delivery.label.delivery": [
+  "pickup_or_delivery.label.choose_delivery_option": [
     {
       "type": 0,
-      "value": "Delivery:"
+      "value": "Choose delivery option"
     }
   ],
   "pickup_or_delivery.label.pickup_in_store": [
@@ -3665,6 +3665,12 @@
     {
       "type": 0,
       "value": " to proceed."
+    }
+  ],
+  "store_display.button.change_store": [
+    {
+      "type": 0,
+      "value": "Change Store"
     }
   ],
   "store_display.format.address_line_2": [

@@ -44,6 +44,35 @@ jest.mock('@salesforce/retail-react-app/app/hooks/use-selected-store', () => ({
     useSelectedStore: () => mockUseSelectedStore()
 }))
 
+// Mock useMultiship hook
+const mockUseMultiship = {
+    handleDeliveryOptionChange: jest.fn().mockResolvedValue(undefined),
+    assignDefaultShippingMethodsToShipments: jest.fn().mockResolvedValue(undefined),
+    changeStoreForPickupShipment: jest.fn().mockResolvedValue(undefined)
+}
+jest.mock('@salesforce/retail-react-app/app/hooks/use-multiship', () => ({
+    useMultiship: () => mockUseMultiship
+}))
+
+// Mock useStoreLocatorModal hook
+const mockStoreLocatorModal = {
+    isOpen: false,
+    onOpen: jest.fn(),
+    onClose: jest.fn()
+}
+jest.mock('@salesforce/retail-react-app/app/hooks/use-store-locator', () => ({
+    useStoreLocatorModal: () => mockStoreLocatorModal
+}))
+
+jest.mock('@salesforce/retail-react-app/app/constants', () => {
+    const original = jest.requireActual('@salesforce/retail-react-app/app/constants')
+    return {
+        ...original,
+        STORE_LOCATOR_IS_ENABLED: true,
+        MULTISHIP_IS_ENABLED: true
+    }
+})
+
 const mockProduct = {
     ...mockVariant,
     id: '750518699660M',
@@ -1412,5 +1441,130 @@ describe('Selected inventory ID tests', function () {
             const url = new URL(lastCall.url)
             expect(url.searchParams.get('inventoryIds')).toBe(mockInventoryId)
         })
+    })
+})
+
+describe('Change store for pickup shipment', () => {
+    const mockProduct = {id: 'product-1', name: 'Test Product'}
+    const mockStore1 = {id: 'store-1', name: 'Old Store'}
+    const mockStore2 = {id: 'store-2', name: 'New Store', inventoryId: 'inventory-2'}
+    const mockBasketWithPickup = {
+        basketId: 'basket-1',
+        currency: 'USD',
+        productItems: [
+            {
+                productId: 'product-1',
+                productName: 'Test Product',
+                itemId: 'item-1',
+                quantity: 1,
+                price: 10,
+                shipmentId: 'pickup-shipment-1'
+            }
+        ],
+        shipments: [
+            {
+                shipmentId: 'pickup-shipment-1',
+                shippingMethod: {
+                    id: 'pickup-method-1',
+                    c_storePickupEnabled: true
+                },
+                c_fromStoreId: 'store-1'
+            }
+        ],
+        orderTotal: 10,
+        productSubTotal: 10,
+        taxTotal: 0
+    }
+
+    beforeEach(() => {
+        jest.clearAllMocks()
+        global.server.use(
+            rest.get('*/customers/:customerId/baskets', (req, res, ctx) => {
+                return res(ctx.delay(0), ctx.json({baskets: [mockBasketWithPickup], total: 1}))
+            }),
+            rest.get('*/products', (req, res, ctx) => {
+                return res(ctx.delay(0), ctx.json({data: [mockProduct]}))
+            }),
+            rest.get('*/stores', (req, res, ctx) => {
+                return res(ctx.delay(0), ctx.json({data: [mockStore1]}))
+            })
+        )
+    })
+
+    test('should call changeStoreForPickupShipment when store is changed via modal', async () => {
+        const {rerender} = renderWithProviders(<Cart />)
+
+        await waitFor(() => {
+            expect(screen.getByText('Change Store')).toBeInTheDocument()
+        })
+
+        // Simulate clicking "Change Store"
+        fireEvent.click(screen.getByText('Change Store'))
+        expect(mockStoreLocatorModal.onOpen).toHaveBeenCalled()
+
+        // Simulate modal opening...
+        mockStoreLocatorModal.isOpen = true
+        rerender(<Cart />)
+
+        // And then closing with a new store selected.
+        mockStoreLocatorModal.isOpen = false
+        mockUseSelectedStore.mockImplementation(() => ({
+            selectedStore: mockStore2
+        }))
+        rerender(<Cart />)
+
+        // Verify that the shipment is updated with the new store.
+        await waitFor(() => {
+            expect(mockUseMultiship.changeStoreForPickupShipment).toHaveBeenCalledWith(
+                'pickup-shipment-1',
+                {
+                    id: mockStore2.id,
+                    inventoryId: mockStore2.inventoryId
+                }
+            )
+        })
+    })
+
+    test('should show error toast when changing store fails', async () => {
+        // Suppress console.error for this test
+        jest.spyOn(console, 'error').mockImplementation(jest.fn())
+
+        mockUseMultiship.changeStoreForPickupShipment.mockRejectedValue(new Error('Update failed'))
+
+        const {rerender} = renderWithProviders(<Cart />)
+
+        await waitFor(() => {
+            expect(screen.getByText('Change Store')).toBeInTheDocument()
+        })
+
+        // Simulate clicking "Change Store"
+        fireEvent.click(screen.getByText('Change Store'))
+        expect(mockStoreLocatorModal.onOpen).toHaveBeenCalled()
+
+        // Simulate modal opening...
+        mockStoreLocatorModal.isOpen = true
+        rerender(<Cart />)
+
+        // And then closing with a new store selected.
+        mockStoreLocatorModal.isOpen = false
+        mockUseSelectedStore.mockImplementation(() => ({
+            selectedStore: mockStore2
+        }))
+        rerender(<Cart />)
+
+        // Verify that an error toast is shown.
+        await waitFor(() => {
+            expect(mockUseMultiship.changeStoreForPickupShipment).toHaveBeenCalledWith(
+                'pickup-shipment-1',
+                {
+                    id: mockStore2.id,
+                    inventoryId: mockStore2.inventoryId
+                }
+            )
+            expect(screen.getByText(/something went wrong/i)).toBeInTheDocument()
+        })
+
+        // Restore console.error
+        console.error.mockRestore()
     })
 })

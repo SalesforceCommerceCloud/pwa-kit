@@ -10,9 +10,15 @@ import {FormattedMessage} from 'react-intl'
 import {Box, Text} from '@salesforce/retail-react-app/app/components/shared/ui'
 import StoreDisplay from '@salesforce/retail-react-app/app/components/store-display'
 
-const OrderTypeDisplay = ({isPickupOrder, store, itemsInShipment, totalItemsInCart}) => {
+const OrderTypeDisplay = ({
+    isPickupOrder,
+    store,
+    itemsInShipment,
+    totalItemsInCart,
+    onChangeStore
+}) => {
     return (
-        <Box layerStyle="cardBordered" p={3}>
+        <Box>
             {isPickupOrder ? (
                 <Box>
                     <Text fontWeight="bold" mb={2}>
@@ -25,12 +31,15 @@ const OrderTypeDisplay = ({isPickupOrder, store, itemsInShipment, totalItemsInCa
                             }}
                         />
                     </Text>
-                    <StoreDisplay
-                        store={store}
-                        showDistance={true}
-                        textSize="sm"
-                        nameStyle={{fontSize: 'sm', fontWeight: 'semibold'}}
-                    />
+                    <Box layerStyle="cardBordered" p={4} borderRadius="md">
+                        <StoreDisplay
+                            store={store}
+                            showDistance={true}
+                            textSize="sm"
+                            nameStyle={{fontSize: 'sm', fontWeight: 'semibold'}}
+                            onChangeStore={onChangeStore}
+                        />
+                    </Box>
                 </Box>
             ) : (
                 <Text fontWeight="bold">
@@ -52,7 +61,8 @@ OrderTypeDisplay.propTypes = {
     isPickupOrder: PropTypes.bool.isRequired,
     store: PropTypes.object,
     itemsInShipment: PropTypes.number.isRequired,
-    totalItemsInCart: PropTypes.number.isRequired
+    totalItemsInCart: PropTypes.number.isRequired,
+    onChangeStore: PropTypes.func
 }
 
 export default OrderTypeDisplay

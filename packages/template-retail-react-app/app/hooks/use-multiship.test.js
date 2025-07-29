@@ -686,12 +686,13 @@ describe('useMultiship', () => {
             mockUpdateItemsInBasket.mockRejectedValue(new Error('API Error'))
 
             await act(async () => {
-                const response = await result.current.moveItemsToDeliveryShipment(
-                    mockProductItems,
-                    'me',
-                    mockDefaultInventoryId
-                )
-                expect(response).toEqual(expect.any(Error))
+                await expect(
+                    result.current.moveItemsToDeliveryShipment(
+                        mockProductItems,
+                        'me',
+                        mockDefaultInventoryId
+                    )
+                ).rejects.toThrow('API Error')
             })
 
             expect(consoleErrorSpy).toHaveBeenCalledWith(
@@ -761,12 +762,13 @@ describe('useMultiship', () => {
             mockUpdateItemsInBasket.mockRejectedValue(new Error('API Error'))
 
             await act(async () => {
-                const response = await result.current.moveItemsToPickupShipment(
-                    mockProductItems,
-                    'pickup-shipment',
-                    'inventory-1'
-                )
-                expect(response).toEqual(expect.any(Error))
+                await expect(
+                    result.current.moveItemsToPickupShipment(
+                        mockProductItems,
+                        'pickup-shipment',
+                        'inventory-1'
+                    )
+                ).rejects.toThrow('API Error')
             })
 
             expect(consoleErrorSpy).toHaveBeenCalledWith(
@@ -1000,6 +1002,276 @@ describe('useMultiship', () => {
                     basketId: 'test-basket-id',
                     shipmentId: 'pickup-shipment'
                 }
+            })
+        })
+    })
+
+    describe('changeStoreForPickupShipment', () => {
+        const mockNewStore = {
+            id: 'new-store-id',
+            inventoryId: 'new-inventory-id'
+        }
+
+        test('should throw error if invalid parameters', async () => {
+            const {result} = renderHook(() => useMultiship(mockBasket))
+
+            await act(async () => {
+                await expect(
+                    result.current.changeStoreForPickupShipment(null, mockNewStore)
+                ).rejects.toThrow('Invalid parameters for changing store')
+            })
+
+            await act(async () => {
+                await expect(
+                    result.current.changeStoreForPickupShipment('shipment-id', null)
+                ).rejects.toThrow('Invalid parameters for changing store')
+            })
+
+            await act(async () => {
+                await expect(
+                    result.current.changeStoreForPickupShipment('shipment-id', {id: 'store-1'})
+                ).rejects.toThrow('Invalid parameters for changing store')
+            })
+        })
+
+        test('should return early if no items in source shipment', async () => {
+            const basketWithNoItems = {
+                ...mockBasket,
+                productItems: []
+            }
+            const {result} = renderHook(() => useMultiship(basketWithNoItems))
+
+            await act(async () => {
+                await result.current.changeStoreForPickupShipment('me', mockNewStore)
+            })
+
+            expect(mockUpdateItemsInBasket).not.toHaveBeenCalled()
+            expect(mockRemoveShipmentFromBasket).not.toHaveBeenCalled()
+        })
+
+        test('should move items to existing pickup shipment for new store', async () => {
+            const basketWithExistingPickupShipment = {
+                ...mockBasket,
+                shipments: [
+                    ...mockBasket.shipments,
+                    {
+                        shipmentId: 'existing-pickup-shipment',
+                        shippingMethod: {id: 'pickup-shipping-method'},
+                        c_fromStoreId: 'new-store-id'
+                    }
+                ],
+                productItems: [
+                    {
+                        itemId: 'item-1',
+                        productId: 'product-1',
+                        quantity: 1,
+                        shipmentId: 'source-shipment'
+                    }
+                ]
+            }
+
+            const {result} = renderHook(() => useMultiship(basketWithExistingPickupShipment))
+
+            mockIsCurrentShippingMethodPickup.mockImplementation((method) => {
+                return method?.id === 'pickup-shipping-method'
+            })
+
+            await act(async () => {
+                await result.current.changeStoreForPickupShipment('source-shipment', mockNewStore)
+            })
+
+            expect(mockUpdateItemsInBasket).toHaveBeenCalledWith({
+                parameters: {
+                    basketId: 'test-basket-id'
+                },
+                body: [
+                    {
+                        itemId: 'item-1',
+                        productId: 'product-1',
+                        quantity: 1,
+                        shipmentId: 'existing-pickup-shipment',
+                        inventoryId: 'new-inventory-id'
+                    }
+                ]
+            })
+
+            expect(mockRemoveShipmentFromBasket).toHaveBeenCalledWith({
+                parameters: {
+                    basketId: 'test-basket-id',
+                    shipmentId: 'source-shipment'
+                }
+            })
+        })
+
+        test('should not remove default shipment even if empty after move', async () => {
+            const basketWithDefaultShipment = {
+                ...mockBasket,
+                shipments: [
+                    {
+                        shipmentId: 'me',
+                        shippingMethod: {id: 'pickup-shipping-method'},
+                        c_fromStoreId: 'old-store-id'
+                    },
+                    {
+                        shipmentId: 'existing-pickup-shipment',
+                        shippingMethod: {id: 'pickup-shipping-method'},
+                        c_fromStoreId: 'new-store-id'
+                    }
+                ],
+                productItems: [
+                    {
+                        itemId: 'item-1',
+                        productId: 'product-1',
+                        quantity: 1,
+                        shipmentId: 'me'
+                    }
+                ]
+            }
+
+            const {result} = renderHook(() => useMultiship(basketWithDefaultShipment))
+
+            mockIsCurrentShippingMethodPickup.mockImplementation((method) => {
+                return method?.id === 'pickup-shipping-method'
+            })
+
+            await act(async () => {
+                await result.current.changeStoreForPickupShipment('me', mockNewStore)
+            })
+
+            expect(mockUpdateItemsInBasket).toHaveBeenCalled()
+            expect(mockRemoveShipmentFromBasket).not.toHaveBeenCalled()
+        })
+
+        test('should create new pickup shipment when none exists for new store', async () => {
+            const basketWithOldPickupShipment = {
+                ...mockBasket,
+                shipments: [
+                    {
+                        shipmentId: 'old-pickup-shipment',
+                        shippingMethod: {id: 'pickup-shipping-method'},
+                        c_fromStoreId: 'old-store-id'
+                    }
+                ],
+                productItems: [
+                    {
+                        itemId: 'item-1',
+                        productId: 'product-1',
+                        quantity: 1,
+                        shipmentId: 'old-pickup-shipment'
+                    }
+                ]
+            }
+
+            const mockNewShipmentResponse = {
+                shipments: [
+                    {
+                        shipmentId: 'new-pickup-shipment',
+                        shippingMethod: {id: 'pickup-shipping-method'},
+                        c_fromStoreId: 'new-store-id'
+                    }
+                ]
+            }
+
+            const {result} = renderHook(() => useMultiship(basketWithOldPickupShipment))
+
+            mockIsCurrentShippingMethodPickup.mockImplementation((method) => {
+                return method?.id === 'pickup-shipping-method'
+            })
+
+            mockCreateShipmentForBasket.mockResolvedValue(mockNewShipmentResponse)
+
+            await act(async () => {
+                await result.current.changeStoreForPickupShipment(
+                    'old-pickup-shipment',
+                    mockNewStore
+                )
+            })
+
+            expect(mockCreateShipmentForBasket).toHaveBeenCalled()
+            expect(mockUpdateItemsInBasket).toHaveBeenCalledWith({
+                parameters: {
+                    basketId: 'test-basket-id'
+                },
+                body: [
+                    {
+                        itemId: 'item-1',
+                        productId: 'product-1',
+                        quantity: 1,
+                        shipmentId: 'new-pickup-shipment',
+                        inventoryId: 'new-inventory-id'
+                    }
+                ]
+            })
+
+            expect(mockRemoveShipmentFromBasket).toHaveBeenCalledWith({
+                parameters: {
+                    basketId: 'test-basket-id',
+                    shipmentId: 'old-pickup-shipment'
+                }
+            })
+        })
+
+        test('should handle multiple items in source shipment', async () => {
+            const basketWithMultipleItems = {
+                ...mockBasket,
+                shipments: [
+                    {
+                        shipmentId: 'source-shipment',
+                        shippingMethod: {id: 'pickup-shipping-method'},
+                        c_fromStoreId: 'old-store-id'
+                    },
+                    {
+                        shipmentId: 'existing-pickup-shipment',
+                        shippingMethod: {id: 'pickup-shipping-method'},
+                        c_fromStoreId: 'new-store-id'
+                    }
+                ],
+                productItems: [
+                    {
+                        itemId: 'item-1',
+                        productId: 'product-1',
+                        quantity: 2,
+                        shipmentId: 'source-shipment'
+                    },
+                    {
+                        itemId: 'item-2',
+                        productId: 'product-2',
+                        quantity: 1,
+                        shipmentId: 'source-shipment'
+                    }
+                ]
+            }
+
+            const {result} = renderHook(() => useMultiship(basketWithMultipleItems))
+
+            mockIsCurrentShippingMethodPickup.mockImplementation((method) => {
+                return method?.id === 'pickup-shipping-method'
+            })
+
+            await act(async () => {
+                await result.current.changeStoreForPickupShipment('source-shipment', mockNewStore)
+            })
+
+            expect(mockUpdateItemsInBasket).toHaveBeenCalledWith({
+                parameters: {
+                    basketId: 'test-basket-id'
+                },
+                body: [
+                    {
+                        itemId: 'item-1',
+                        productId: 'product-1',
+                        quantity: 2,
+                        shipmentId: 'existing-pickup-shipment',
+                        inventoryId: 'new-inventory-id'
+                    },
+                    {
+                        itemId: 'item-2',
+                        productId: 'product-2',
+                        quantity: 1,
+                        shipmentId: 'existing-pickup-shipment',
+                        inventoryId: 'new-inventory-id'
+                    }
+                ]
             })
         })
     })
