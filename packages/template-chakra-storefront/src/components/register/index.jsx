@@ -7,7 +7,7 @@
 
 import React, {Fragment} from 'react'
 import PropTypes from 'prop-types'
-import {FormattedMessage} from 'react-intl'
+import {FormattedMessage, useIntl} from 'react-intl'
 import {Alert, Button, Stack, Text} from '@chakra-ui/react'
 import {AlertIcon, BrandLogo} from '../../components/icons'
 import {noop} from '../../utils/utils'
@@ -15,22 +15,44 @@ import RegistrationFields from '../../components/forms/registration-fields'
 import Link from '../../components/link'
 
 const RegisterForm = ({submitForm, clickSignIn = noop, form}) => {
+    const {formatMessage} = useIntl()
+    
+    const messages = {
+        heading: formatMessage({
+            id: "register_form.heading.lets_get_started",
+            defaultMessage: "Let's get started!"
+        }),
+        description: formatMessage({
+            id: "register_form.message.create_an_account",
+            defaultMessage: "Create an account and get first access to the very best products, inspiration and community."
+        }),
+        createAccount: formatMessage({
+            id: "register_form.button.create_account",
+            defaultMessage: "Create Account"
+        }),
+        alreadyHaveAccount: formatMessage({
+            id: "register_form.message.already_have_account",
+            defaultMessage: "Already have an account?"
+        }),
+        signIn: formatMessage({
+            id: "register_form.action.sign_in",
+            defaultMessage: "Sign in"
+        }),
+        agreeToPolicy: (policy, terms) => formatMessage({
+            id: "register_form.message.agree_to_policy_terms",
+            defaultMessage: "By creating an account, you agree to Salesforce <policy>Privacy Policy</policy> and <terms>Terms & Conditions</terms>"
+        }, {policy, terms})
+    }
     return (
         <Fragment>
             <Stack justifyContent="center" alignItems="center" gap={8}>
                 <BrandLogo width="60px" height="auto" />
                 <Stack gap={2}>
                     <Text textAlign="center" fontSize="xl" fontWeight="semibold">
-                        <FormattedMessage
-                            defaultMessage="Let's get started!"
-                            id="register_form.heading.lets_get_started"
-                        />
+                        {messages.heading}
                     </Text>
                     <Text fontSize="sm" textAlign="center" color="gray.700">
-                        <FormattedMessage
-                            defaultMessage="Create an account and get first access to the very best products, inspiration and community."
-                            id="register_form.message.create_an_account"
-                        />
+                        {messages.description}
                     </Text>
                 </Stack>
             </Stack>
@@ -56,18 +78,12 @@ const RegisterForm = ({submitForm, clickSignIn = noop, form}) => {
                             onClick={() => form.clearErrors('global')}
                             loading={form.formState.isSubmitting}
                         >
-                            <FormattedMessage
-                                defaultMessage="Create Account"
-                                id="register_form.button.create_account"
-                            />
+                            {messages.createAccount}
                         </Button>
 
                         <Stack direction="row" gap={1} justifyContent="center">
                             <Text fontSize="sm">
-                                <FormattedMessage
-                                    defaultMessage="Already have an account?"
-                                    id="register_form.message.already_have_account"
-                                />
+                                {messages.alreadyHaveAccount}
                             </Text>
                             <Button
                                 variant="link-blue"
@@ -75,10 +91,7 @@ const RegisterForm = ({submitForm, clickSignIn = noop, form}) => {
                                 lineHeight="1"
                                 onClick={clickSignIn}
                             >
-                                <FormattedMessage
-                                    defaultMessage="Sign in"
-                                    id="register_form.action.sign_in"
-                                />
+                                {messages.signIn}
                             </Button>
                         </Stack>
 
