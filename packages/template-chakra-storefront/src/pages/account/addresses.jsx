@@ -6,7 +6,7 @@
  */
 
 import React, {useEffect, useRef, useState} from 'react'
-import {defineMessage, FormattedMessage, useIntl} from 'react-intl'
+import {useIntl} from 'react-intl'
 import PropTypes from 'prop-types'
 
 import {
@@ -123,20 +123,6 @@ ShippingAddressForm.propTypes = {
     submitForm: PropTypes.func
 }
 
-const successfullyAddedAddress = defineMessage({
-    defaultMessage: 'New address saved',
-    id: 'account_addresses.info.new_address_saved'
-})
-
-const successfullyUpdatedAddress = defineMessage({
-    defaultMessage: 'Address updated',
-    id: 'account_addresses.info.address_updated'
-})
-
-const successfullyRemovedAddress = defineMessage({
-    defaultMessage: 'Address removed',
-    id: 'account_addresses.info.address_removed'
-})
 const AccountAddresses = () => {
     const {formatMessage} = useIntl()
     const {data: customer, isLoading} = useCurrentCustomer()
@@ -166,7 +152,33 @@ const AccountAddresses = () => {
         addAddressButton: formatMessage({
             id: 'account_addresses.page_action_placeholder.button.add_address',
             defaultMessage: 'Add Address'
-        })
+        }),
+        successfullyAddedAddress: formatMessage({
+            id: 'account_addresses.info.new_address_saved',
+            defaultMessage: 'New address saved'
+        }),
+        successfullyUpdatedAddress: formatMessage({
+            id: 'account_addresses.info.address_updated',
+            defaultMessage: 'Address updated'
+        }),
+        successfullyRemovedAddress: formatMessage({
+            id: 'account_addresses.info.address_removed',
+            defaultMessage: 'Address removed'
+        }),
+        editButtonLabel: (address) => formatMessage(
+            {
+                id: 'shipping_address.label.edit_button',
+                defaultMessage: 'Edit {address}'
+            },
+            {address}
+        ),
+        removeButtonLabel: (address) => formatMessage(
+            {
+                id: 'shipping_address.label.remove_button',
+                defaultMessage: 'Remove {address}'
+            },
+            {address}
+        )
     }
 
     const addCustomerAddress = useShopperCustomersMutation('createCustomerAddress')
@@ -226,8 +238,8 @@ const AccountAddresses = () => {
                 toggleEdit()
                 toast({
                     title: selectedAddressId
-                        ? formatMessage(successfullyUpdatedAddress)
-                        : formatMessage(successfullyAddedAddress),
+                        ? messages.successfullyUpdatedAddress
+                        : messages.successfullyAddedAddress,
                     type: 'success'
                 })
             }
@@ -253,7 +265,7 @@ const AccountAddresses = () => {
                 {
                     onSuccess: () => {
                         toast({
-                            title: formatMessage(successfullyRemovedAddress),
+                            title: messages.successfullyRemovedAddress,
                             type: 'success'
                         })
                         // Move focus to header after we successfully remove address
@@ -340,21 +352,8 @@ const AccountAddresses = () => {
                     )}
 
                     {addresses.map((address) => {
-                        const editLabel = formatMessage(
-                            {
-                                id: 'shipping_address.label.edit_button',
-                                defaultMessage: 'Edit {address}'
-                            },
-                            {address: address.address1}
-                        )
-
-                        const removeLabel = formatMessage(
-                            {
-                                id: 'shipping_address.label.remove_button',
-                                defaultMessage: 'Remove {address}'
-                            },
-                            {address: address.address1}
-                        )
+                        const editLabel = messages.editButtonLabel(address.address1)
+                        const removeLabel = messages.removeButtonLabel(address.address1)
 
                         return (
                             <React.Fragment key={address.addressId}>

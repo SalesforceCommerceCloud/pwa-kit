@@ -6,7 +6,7 @@
  */
 import React from 'react'
 import PropTypes from 'prop-types'
-import {FormattedMessage, useIntl} from 'react-intl'
+import {useIntl} from 'react-intl'
 import {Flex, Text, Stack} from '@chakra-ui/react'
 import {CheckCircleIcon} from '../icons'
 import {validatePassword} from '../../utils/password-utils'

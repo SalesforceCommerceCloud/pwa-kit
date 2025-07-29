@@ -6,7 +6,7 @@
  */
 import React from 'react'
 import PropTypes from 'prop-types'
-import {FormattedMessage, useIntl} from 'react-intl'
+import {useIntl} from 'react-intl'
 import {Stack, Flex, Button} from '@chakra-ui/react'
 import useLoginFields from '../../components/forms/useLoginFields'
 import Field from '../../components/field'
