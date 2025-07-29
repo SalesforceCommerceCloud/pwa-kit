@@ -12,7 +12,7 @@ Total files: 97
 - [x] src/components/drawer-menu/drawer-menu.jsx
 - [x] src/components/email-confirmation/index.jsx
 - [x] src/components/field/index.jsx
-- [ ] src/components/footer/index.jsx
+- [x] src/components/footer/index.jsx
 - [ ] src/components/forms/address-fields.jsx
 - [ ] src/components/forms/credit-card-fields.jsx
 - [ ] src/components/forms/form-action-buttons.jsx

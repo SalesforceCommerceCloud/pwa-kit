@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React, {useEffect, useRef} from 'react'
+import React, {useEffect, useRef, useMemo} from 'react'
 import {defineMessage, useIntl} from 'react-intl'
 import PropTypes from 'prop-types'
 import {Grid, GridItem, SimpleGrid, Stack} from '@chakra-ui/react'
@@ -26,16 +26,17 @@ const AddressFields = ({
 }) => {
     const {data: customer} = useCurrentCustomer()
     const fields = useAddressFields({form, prefix})
-    const {formatMessage} = useIntl()
+    const intl = useIntl()
+    const {formatMessage} = intl
     const addressFormRef = useRef()
     useEffect(() => {
         // Focus on the form when the component mounts for accessibility
         addressFormRef?.current?.focus()
     }, [])
 
-    const messages = {
+    const messages = useMemo(() => ({
         formAriaLabel: formatMessage(formTitleAriaLabel)
-    }
+    }), [intl])
 
     return (
         <Stack
