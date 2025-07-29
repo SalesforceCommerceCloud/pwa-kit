@@ -112,8 +112,8 @@ Total files: 222
 - [x] src/components/radio-card/index.jsx
 - [x] src/components/recommended-products/index.jsx
 - [x] src/components/register/index.jsx
-- [ ] src/components/reset-password/index.jsx
-- [ ] src/components/responsive/index.jsx
+- [x] src/components/reset-password/index.jsx
+- [x] src/components/responsive/index.jsx
 - [ ] src/components/safe-portal/index.jsx
 - [ ] src/components/scroll-to-top/index.jsx
 - [ ] src/components/search/index.jsx
