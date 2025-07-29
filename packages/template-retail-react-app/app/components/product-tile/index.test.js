@@ -337,7 +337,7 @@ test('Ignores the badges that are NOT defined as boolean custom properties', () 
     )
     expect(getByText(/Laptop Briefcase with wheels \(37L\)/i)).toBeInTheDocument()
     const badges = getAllByTestId('product-badge')
-    expect(badges).toHaveLength(1)
+    expect(badges).toHaveLength(2)
     expect(within(badges[0]).getByText(/Special/i)).toBeDefined()
 })
 

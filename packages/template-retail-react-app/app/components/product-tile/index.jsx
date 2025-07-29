@@ -184,7 +184,8 @@ const ProductTile = (props) => {
                     labelsMap.set(intl.formatMessage(item.label), item.color)
                 } else if (
                     item.propertyName &&
-                    typeof productToCheck[item.propertyName] !== 'boolean'
+                    typeof productToCheck[item.propertyName] !== 'boolean' &&
+                    productToCheck[item.propertyName] != null
                 ) {
                     labelsMap.set(productToCheck[item.propertyName], item.color)
                 }
