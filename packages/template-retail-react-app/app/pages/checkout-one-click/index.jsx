@@ -148,7 +148,8 @@ const CheckoutOneClick = () => {
                         firstName: data.firstName,
                         lastName: data.lastName,
                         email: data.email,
-                        login: data.email
+                        login: data.email,
+                        phoneHome: data.phoneHome
                     },
                     password: generatePassword()
                 }
@@ -199,7 +200,8 @@ const CheckoutOneClick = () => {
                 await registerUser({
                     firstName: order.billingAddress.firstName,
                     lastName: order.billingAddress.lastName,
-                    email: order.customerInfo.email
+                    email: order.customerInfo.email,
+                    phoneHome: order.billingAddress.phone
                 })
             }
 
