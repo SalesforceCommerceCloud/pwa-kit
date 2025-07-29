@@ -8,7 +8,7 @@
 import React, {forwardRef, useEffect, useMemo, useRef, useState} from 'react'
 import PropTypes from 'prop-types'
 import {useLocation} from 'react-router-dom'
-import {useIntl, FormattedMessage} from 'react-intl'
+import {useIntl, defineMessages} from 'react-intl'
 
 import {Box, Button, Flex, Heading, Skeleton, Text, VStack} from '@chakra-ui/react'
 import {useCurrency, useDerivedProduct} from '../../hooks'
@@ -29,6 +29,64 @@ import Swatch from '../../components/swatch-group/swatch'
 import SwatchGroup from '../../components/swatch-group'
 import {getPriceData} from '../../utils/product-utils'
 import PromoCallout from '../../components/product-tile/promo-callout'
+
+const messages = defineMessages({
+    inventoryRemainingForProduct: {
+        defaultMessage: 'Only {stockLevel} left for {productName}!',
+        id: 'use_product.message.inventory_remaining_for_product'
+    },
+    outOfStockForProduct: {
+        defaultMessage: 'Out of stock for {productName}',
+        id: 'use_product.message.out_of_stock_for_product'
+    },
+    update: {
+        defaultMessage: 'Update',
+        id: 'product_view.button.update'
+    },
+    addToCart: {
+        defaultMessage: 'Add to Cart',
+        id: 'product_view.button.add_to_cart'
+    },
+    addSetToCart: {
+        defaultMessage: 'Add Set to Cart',
+        id: 'product_view.button.add_set_to_cart'
+    },
+    addBundleToCart: {
+        defaultMessage: 'Add Bundle to Cart',
+        id: 'product_view.button.add_bundle_to_cart'
+    },
+    addToWishlist: {
+        defaultMessage: 'Add to Wishlist',
+        id: 'product_view.button.add_to_wishlist'
+    },
+    addSetToWishlist: {
+        defaultMessage: 'Add Set to Wishlist',
+        id: 'product_view.button.add_set_to_wishlist'
+    },
+    addBundleToWishlist: {
+        defaultMessage: 'Add Bundle to Wishlist',
+        id: 'product_view.button.add_bundle_to_wishlist'
+    },
+    quantity: {
+        defaultMessage: 'Quantity',
+        id: 'product_view.label.quantity'
+    },
+    quantityLabel: {
+        defaultMessage: 'Quantity:',
+        id: 'product_view.label.quantity'
+    },
+    variantType: {
+        defaultMessage: '{variantType}',
+        id: 'product_view.label.variant_type'
+    },
+    selectAllOptions: {
+        defaultMessage: 'Please select all your options above'
+    },
+    seeFullDetails: {
+        id: 'product_view.link.full_details',
+        defaultMessage: 'See full details'
+    }
+})
 
 const ProductViewHeader = ({
     name,
@@ -114,7 +172,7 @@ const ProductView = forwardRef(
     ) => {
         const {currency: activeCurrency} = useCurrency()
         const showError = useErrorHandler()
-        const intl = useIntl()
+        const {formatMessage} = useIntl()
         const location = useLocation()
         const {
             isOpen: isAddToCartModalOpen,
@@ -164,11 +222,8 @@ const ProductView = forwardRef(
                     const unavailableChildProduct =
                         childProductOrderability[unavailableChildProductKey]
                     if (unavailableChildProduct.unfulfillable) {
-                        currentInventoryMsg = intl.formatMessage(
-                            {
-                                defaultMessage: 'Only {stockLevel} left for {productName}!',
-                                id: 'use_product.message.inventory_remaining_for_product'
-                            },
+                        currentInventoryMsg = formatMessage(
+                            messages.inventoryRemainingForProduct,
                             {
                                 stockLevel: unavailableChildProduct.stockLevel,
                                 productName: unavailableChildProduct.productName
@@ -176,11 +231,8 @@ const ProductView = forwardRef(
                         )
                     }
                     if (unavailableChildProduct.isOutOfStock) {
-                        currentInventoryMsg = intl.formatMessage(
-                            {
-                                defaultMessage: 'Out of stock for {productName}',
-                                id: 'use_product.message.out_of_stock_for_product'
-                            },
+                        currentInventoryMsg = formatMessage(
+                            messages.outOfStockForProduct,
                             {productName: unavailableChildProduct.productName}
                         )
                     }
@@ -211,34 +263,13 @@ const ProductView = forwardRef(
         const renderActionButtons = () => {
             const buttons = []
             const buttonText = {
-                update: intl.formatMessage({
-                    defaultMessage: 'Update',
-                    id: 'product_view.button.update'
-                }),
-                addToCart: intl.formatMessage({
-                    defaultMessage: 'Add to Cart',
-                    id: 'product_view.button.add_to_cart'
-                }),
-                addSetToCart: intl.formatMessage({
-                    defaultMessage: 'Add Set to Cart',
-                    id: 'product_view.button.add_set_to_cart'
-                }),
-                addBundleToCart: intl.formatMessage({
-                    defaultMessage: 'Add Bundle to Cart',
-                    id: 'product_view.button.add_bundle_to_cart'
-                }),
-                addToWishlist: intl.formatMessage({
-                    defaultMessage: 'Add to Wishlist',
-                    id: 'product_view.button.add_to_wishlist'
-                }),
-                addSetToWishlist: intl.formatMessage({
-                    defaultMessage: 'Add Set to Wishlist',
-                    id: 'product_view.button.add_set_to_wishlist'
-                }),
-                addBundleToWishlist: intl.formatMessage({
-                    defaultMessage: 'Add Bundle to Wishlist',
-                    id: 'product_view.button.add_bundle_to_wishlist'
-                })
+                update: formatMessage(messages.update),
+                addToCart: formatMessage(messages.addToCart),
+                addSetToCart: formatMessage(messages.addSetToCart),
+                addBundleToCart: formatMessage(messages.addBundleToCart),
+                addToWishlist: formatMessage(messages.addToWishlist),
+                addSetToWishlist: formatMessage(messages.addSetToWishlist),
+                addBundleToWishlist: formatMessage(messages.addBundleToWishlist)
             }
 
             const handleCartItem = async () => {
@@ -411,10 +442,7 @@ const ProductView = forwardRef(
                                                 to={`/product/${product.master.masterId}`}
                                                 color="blue.600"
                                             >
-                                                <FormattedMessage
-                                                    id="product_view.link.full_details"
-                                                    defaultMessage="See full details"
-                                                />
+                                                {formatMessage(messages.seeFullDetails)}
                                             </Link>
                                         )}
                                     </HideOnMobile>
@@ -442,10 +470,7 @@ const ProductView = forwardRef(
                                 <Box>
                                     <Text fontWeight="medium" fontSize="md" aria-label="price">
                                         <label>
-                                            {intl.formatMessage({
-                                                defaultMessage: 'Quantity',
-                                                id: 'product_view.label.quantity'
-                                            })}
+                                            {formatMessage(messages.quantity)}
                                             : {childOfBundleQuantity}
                                         </label>
                                     </Text>
@@ -519,11 +544,8 @@ const ProductView = forwardRef(
                                             key={id}
                                             value={selectedValue?.value}
                                             displayName={selectedValue?.name || ''}
-                                            label={intl.formatMessage(
-                                                {
-                                                    defaultMessage: '{variantType}',
-                                                    id: 'product_view.label.variant_type'
-                                                },
+                                            label={formatMessage(
+                                                messages.variantType,
                                                 {variantType: name}
                                             )}
                                         >
@@ -537,10 +559,7 @@ const ProductView = forwardRef(
                                 <VStack align="stretch" maxWidth={'200px'}>
                                     <Box fontWeight="bold">
                                         <label htmlFor="quantity">
-                                            {intl.formatMessage({
-                                                defaultMessage: 'Quantity:',
-                                                id: 'product_view.label.quantity'
-                                            })}
+                                            {formatMessage(messages.quantityLabel)}
                                         </label>
                                     </Box>
 
@@ -586,10 +605,7 @@ const ProductView = forwardRef(
                                 {!showLoading && showOptionsMessage && (
                                     <Fade in={true}>
                                         <Text color="orange.600" fontWeight={600} marginBottom={8}>
-                                            {intl.formatMessage({
-                                                defaultMessage:
-                                                    'Please select all your options above'
-                                            })}
+                                            {formatMessage(messages.selectAllOptions)}
                                         </Text>
                                     </Fade>
                                 )}
@@ -600,10 +616,7 @@ const ProductView = forwardRef(
                                         to={`/product/${product.master.masterId}`}
                                         color="blue.600"
                                     >
-                                        <FormattedMessage
-                                            id="product_view.link.full_details"
-                                            defaultMessage="See full details"
-                                        />
+                                        {formatMessage(messages.seeFullDetails)}
                                     </Link>
                                 )}
                             </HideOnDesktop>
