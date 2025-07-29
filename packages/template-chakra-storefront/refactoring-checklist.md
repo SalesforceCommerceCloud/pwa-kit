@@ -144,8 +144,8 @@ Total files: 222
 - [x] src/components/with-currency/with-currency.tsx
 - [x] src/components/with-layout/index.js
 - [x] src/components/with-registration/index.jsx
-- [ ] src/components/with-storefront-preview/index.js
-- [ ] src/components/with-storefront-preview/with-storefront-preview.tsx
+- [x] src/components/with-storefront-preview/index.js
+- [x] src/components/with-storefront-preview/with-storefront-preview.tsx
 - [ ] src/pages/account/addresses.jsx
 - [ ] src/pages/account/constant.js
 - [ ] src/pages/account/index.jsx
