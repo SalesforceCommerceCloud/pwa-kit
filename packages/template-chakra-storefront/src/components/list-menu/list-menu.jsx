@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React, {useEffect, useState} from 'react'
+import React, {useEffect, useState, useMemo} from 'react'
 import PropTypes from 'prop-types'
 import {useIntl} from 'react-intl'
 import {Link as RouteLink} from 'react-router-dom'
@@ -41,16 +41,17 @@ const ListMenu = ({
     const recipe = useSlotRecipe({key: 'listMenu'})
     const styles = recipe()
     const [ariaBusy, setAriaBusy] = useState(true)
-    const {formatMessage} = useIntl()
+    const intl = useIntl()
+    const {formatMessage} = intl
 
     const items = root?.[itemsKey]
 
-    const messages = {
+    const messages = useMemo(() => ({
         navLabel: formatMessage({
             id: 'list_menu.nav.assistive_msg',
             defaultMessage: 'Main navigation'
         })
-    }
+    }), [intl])
 
     useEffect(() => {
         setAriaBusy(false)
