@@ -10,7 +10,7 @@ Total files: 97
 - [x] src/components/display-price/current-price.jsx
 - [x] src/components/display-price/list-price.jsx
 - [x] src/components/drawer-menu/drawer-menu.jsx
-- [ ] src/components/email-confirmation/index.jsx
+- [x] src/components/email-confirmation/index.jsx
 - [ ] src/components/field/index.jsx
 - [ ] src/components/footer/index.jsx
 - [ ] src/components/forms/address-fields.jsx

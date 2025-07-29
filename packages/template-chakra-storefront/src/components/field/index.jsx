@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React, {useState} from 'react'
+import React, {useState, useMemo} from 'react'
 import PropTypes from 'prop-types'
 import {Controller} from 'react-hook-form'
 import {
@@ -39,19 +39,18 @@ const Field = ({
     const {formatMessage} = intl
     const [hidePassword, setHidePassword] = useState(true)
 
-    // Group related messages together
-    const messages = {
+    const messages = useMemo(() => ({
         password: {
-            showPassword: formatMessage({
+            showPassword: intl.formatMessage({
                 id: 'field.password.assistive_msg.show_password',
                 defaultMessage: 'Show password'
             }),
-            hidePassword: formatMessage({
+            hidePassword: intl.formatMessage({
                 id: 'field.password.assistive_msg.hide_password',
                 defaultMessage: 'Hide password'
             })
         }
-    }
+    }), [intl])
 
     const PasswordIcon = hidePassword ? VisibilityIcon : VisibilityOffIcon
     const passwordIconLabel = hidePassword
