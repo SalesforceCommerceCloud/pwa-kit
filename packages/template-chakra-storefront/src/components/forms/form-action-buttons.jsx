@@ -24,11 +24,11 @@ const FormActionButtons = ({
     const {formatMessage} = useIntl()
     
     const messages = {
-        save: formatMessage({
+        save: saveButtonLabel ? formatMessage(saveButtonLabel) : formatMessage({
             id: "form_action_buttons.button.save",
             defaultMessage: "Save"
         }),
-        cancel: formatMessage({
+        cancel: cancelButtonLabel ? formatMessage(cancelButtonLabel) : formatMessage({
             id: "form_action_buttons.button.cancel",
             defaultMessage: "Cancel"
         })
@@ -37,10 +37,10 @@ const FormActionButtons = ({
     return (
         <Stack direction={{base: 'column', lg: 'row-reverse'}} gap={4}>
             <Button type="submit" minWidth={28} {...saveButtonProps}>
-                {saveButtonLabel ? formatMessage(saveButtonLabel) : messages.save}
+                {messages.save}
             </Button>
             <Button variant="outline" minWidth={28} onClick={onCancel} {...cancelButtonProps}>
-                {cancelButtonLabel ? formatMessage(cancelButtonLabel) : messages.cancel}
+                {messages.cancel}
             </Button>
         </Stack>
     )
