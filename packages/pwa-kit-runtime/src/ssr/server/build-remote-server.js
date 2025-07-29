@@ -224,7 +224,7 @@ export const RemoteServerFactory = {
      * @private
      */
     _getSlasEndpoint(options) {
-        console.log('--- _getSlasEndpoint options', options)
+        // console.log('--- _getSlasEndpoint options', options)
         if (!options.useSLASPrivateClient) return undefined
         // const shortCode = options.mobify?.app?.commerceAPI?.parameters?.shortCode
         // TODO
