@@ -226,9 +226,7 @@ const ProfileCard = ({allowPasswordChange = false}) => {
                         </Skeleton>
 
                         <Skeleton height="21px" width="120px">
-                            <Text fontSize="sm">
-                                {customer?.phoneHome || messages.notProvided}
-                            </Text>
+                            <Text fontSize="sm">{customer?.phoneHome || messages.notProvided}</Text>
                         </Skeleton>
                     </Box>
                 </SimpleGrid>

@@ -20,14 +20,14 @@ const LoginFields = ({
 }) => {
     const {formatMessage} = useIntl()
     const fields = useLoginFields({form, prefix})
-    
+
     const messages = {
         forgotPassword: formatMessage({
-            id: "login_form.link.forgot_password",
-            defaultMessage: "Forgot password?"
+            id: 'login_form.link.forgot_password',
+            defaultMessage: 'Forgot password?'
         })
     }
-    
+
     return (
         <Stack gap={5}>
             {!hideEmail && <Field {...fields.email} />}

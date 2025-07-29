@@ -14,16 +14,16 @@ import SocialLogin from '../../components/social-login'
 
 const messages = defineMessages({
     signIn: {
-        defaultMessage: "Sign In",
-        id: "login_form.button.sign_in"
+        defaultMessage: 'Sign In',
+        id: 'login_form.button.sign_in'
     },
     orLoginWith: {
-        defaultMessage: "Or Login With",
-        id: "login_form.message.or_login_with"
+        defaultMessage: 'Or Login With',
+        id: 'login_form.message.or_login_with'
     },
     backToSignInOptions: {
-        defaultMessage: "Back to Sign In Options",
-        id: "login_form.button.back"
+        defaultMessage: 'Back to Sign In Options',
+        id: 'login_form.button.back'
     }
 })
 

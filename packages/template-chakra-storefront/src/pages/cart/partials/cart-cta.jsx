@@ -15,8 +15,8 @@ const CartCta = () => {
 
     const messages = {
         checkout: formatMessage({
-            id: "cart_cta.link.checkout",
-            defaultMessage: "Proceed to Checkout"
+            id: 'cart_cta.link.checkout',
+            defaultMessage: 'Proceed to Checkout'
         })
     }
 

@@ -96,9 +96,7 @@ const Pagination = (props) => {
                 isDisabled={!prev}
             >
                 <ChevronLeftIcon boxSize={4} color="black" />
-                <Text css={styles.text}>
-                    {messages.prev}
-                </Text>
+                <Text css={styles.text}>{messages.prev}</Text>
             </Button>
 
             {/* Direct Page Selection */}
@@ -139,9 +137,7 @@ const Pagination = (props) => {
                 variant="link"
                 isDisabled={!next}
             >
-                <Text css={styles.text}>
-                    {messages.next}
-                </Text>
+                <Text css={styles.text}>{messages.next}</Text>
                 <ChevronRightIcon boxSize={4} color="black" />
             </Button>
         </Flex>

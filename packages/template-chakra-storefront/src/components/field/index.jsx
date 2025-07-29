@@ -38,7 +38,7 @@ const Field = ({
     const intl = useIntl()
     const {formatMessage} = intl
     const [hidePassword, setHidePassword] = useState(true)
-    
+
     // Group related messages together
     const messages = {
         password: {
@@ -52,9 +52,11 @@ const Field = ({
             })
         }
     }
-    
+
     const PasswordIcon = hidePassword ? VisibilityIcon : VisibilityOffIcon
-    const passwordIconLabel = hidePassword ? messages.password.showPassword : messages.password.hidePassword
+    const passwordIconLabel = hidePassword
+        ? messages.password.showPassword
+        : messages.password.hidePassword
     const inputType =
         type === 'password' && hidePassword ? 'password' : type === 'password' ? 'text' : type
 

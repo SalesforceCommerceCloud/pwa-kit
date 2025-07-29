@@ -62,17 +62,21 @@ const SearchBar = (props) => {
     const styles = recipe()
     const intl = useIntl()
     const {formatMessage} = intl
-    
+
     const messages = {
         searchPlaceholder: formatMessage({
             id: 'header.field.placeholder.search_for_products',
             defaultMessage: 'Search for products...'
         })
     }
-    
+
     return (
         <Box css={styles.searchContainer}>
-            <Search aria-label={messages.searchPlaceholder} placeholder={messages.searchPlaceholder} {...props} />
+            <Search
+                aria-label={messages.searchPlaceholder}
+                placeholder={messages.searchPlaceholder}
+                {...props}
+            />
         </Box>
     )
 }
@@ -130,7 +134,7 @@ const Header = ({
 
     const recipe = useSlotRecipe({key: 'header'})
     const styles = recipe()
-    
+
     const headerMessages = {
         menu: formatMessage({
             id: 'header.button.assistive_msg.menu',

@@ -14,7 +14,7 @@ export default function useLoginFields({
     prefix = ''
 }) {
     const {formatMessage} = useIntl()
-    
+
     const messages = {
         emailLabel: formatMessage({defaultMessage: 'Email', id: 'use_login_fields.label.email'}),
         passwordLabel: formatMessage({
@@ -30,7 +30,7 @@ export default function useLoginFields({
             id: 'use_login_fields.error.required_password'
         })
     }
-    
+
     const fields = {
         email: {
             name: `${prefix}email`,

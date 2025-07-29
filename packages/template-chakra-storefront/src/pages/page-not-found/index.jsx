@@ -18,7 +18,7 @@ const PageNotFound = () => {
     const intl = useIntl()
     const history = useHistory()
     const {res} = useServerContext()
-    
+
     const messages = {
         pageTitle: intl.formatMessage({
             id: 'page_not_found.title.page_cant_be_found',
@@ -26,7 +26,8 @@ const PageNotFound = () => {
         }),
         suggestionToTry: intl.formatMessage({
             id: 'page_not_found.message.suggestion_to_try',
-            defaultMessage: 'Please try retyping the address, going back to the previous page, or going to the home page.'
+            defaultMessage:
+                'Please try retyping the address, going back to the previous page, or going to the home page.'
         }),
         goBack: intl.formatMessage({
             id: 'page_not_found.action.go_back',
@@ -71,9 +72,7 @@ const PageNotFound = () => {
                     {messages.pageTitle}
                 </Heading>
                 <Box mb={12}>
-                    <Text textAlign="center">
-                        {messages.suggestionToTry}
-                    </Text>
+                    <Text textAlign="center">{messages.suggestionToTry}</Text>
                 </Box>
                 <Stack direction={{base: 'column', md: 'row'}} width={{base: '100%', md: 'auto'}}>
                     <Button

@@ -43,7 +43,7 @@ const EMAIL_VIEW = 'email'
 
 const Login = ({initialView = LOGIN_VIEW}) => {
     const {formatMessage} = useIntl()
-    
+
     const messages = {
         loginError: formatMessage({
             id: 'login_page.error.incorrect_username_or_password',

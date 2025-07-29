@@ -31,10 +31,7 @@ const RadioRefinement = ({value, isSelected}) => {
         >
             <RadioGroup.ItemHiddenInput />
             <RadioGroup.ItemIndicator cursor="pointer" />
-            <RadioGroup.ItemText
-                fontSize="sm"
-                aria-label={messages.ariaLabel}
-            >
+            <RadioGroup.ItemText fontSize="sm" aria-label={messages.ariaLabel}>
                 {value.label}
             </RadioGroup.ItemText>
         </RadioGroup.Item>

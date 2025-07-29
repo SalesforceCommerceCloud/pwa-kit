@@ -55,7 +55,8 @@ const RecommendedProducts = ({zone, recommender, products, title, shouldFetch, .
     const {formatMessage} = useIntl()
 
     const messages = {
-        toastAddedToWishlist: (quantity) => formatMessage(TOAST_MESSAGE_ADDED_TO_WISHLIST, {quantity}),
+        toastAddedToWishlist: (quantity) =>
+            formatMessage(TOAST_MESSAGE_ADDED_TO_WISHLIST, {quantity}),
         toastViewWishlist: formatMessage(TOAST_ACTION_VIEW_WISHLIST),
         toastRemovedFromWishlist: formatMessage(TOAST_MESSAGE_REMOVED_FROM_WISHLIST),
         apiError: formatMessage(API_ERROR_MESSAGE)

@@ -29,8 +29,8 @@ import {useCurrency, useDerivedProduct} from '../../hooks'
 
 const messages = defineMessages({
     quantity: {
-        defaultMessage: "Quantity:",
-        id: "product_item.label.quantity"
+        defaultMessage: 'Quantity:',
+        id: 'product_item.label.quantity'
     },
     quantitySelector: {
         id: 'item_variant.quantity.label',
@@ -91,13 +91,10 @@ const ProductItem = ({
                                     <Text
                                         fontSize="sm"
                                         color="gray.700"
-                                        aria-label={formatMessage(
-                                            messages.quantitySelector,
-                                            {
-                                                quantity: product?.quantity,
-                                                productName: product?.name
-                                            }
-                                        )}
+                                        aria-label={formatMessage(messages.quantitySelector, {
+                                            quantity: product?.quantity,
+                                            productName: product?.name
+                                        })}
                                     >
                                         {formatMessage(messages.quantity)}
                                     </Text>
@@ -132,12 +129,9 @@ const ProductItem = ({
                                     />
                                     <VisuallyHidden role="status">
                                         {product?.name}
-                                        {formatMessage(
-                                            messages.assistiveQuantityMsg,
-                                            {
-                                                quantity: product?.quantity
-                                            }
-                                        )}
+                                        {formatMessage(messages.assistiveQuantityMsg, {
+                                            quantity: product?.quantity
+                                        })}
                                     </VisuallyHidden>
                                 </Stack>
                                 <Stack>

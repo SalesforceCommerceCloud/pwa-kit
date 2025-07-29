@@ -30,10 +30,13 @@ const SwatchGroup = (props) => {
     const {formatMessage} = useIntl()
 
     const messages = {
-        selectedLabel: formatMessage({
-            id: "swatch_group.selected.label",
-            defaultMessage: "{label}:"
-        }, {label})
+        selectedLabel: formatMessage(
+            {
+                id: 'swatch_group.selected.label',
+                defaultMessage: '{label}:'
+            },
+            {label}
+        )
     }
 
     // Handle keyboard navigation.
@@ -97,9 +100,7 @@ const SwatchGroup = (props) => {
             <Flex css={styles.swatchGroup} role="radiogroup" aria-label={ariaLabel || label}>
                 {label && (
                     <HStack css={styles.swatchLabel}>
-                        <Box fontWeight="semibold">
-                            {messages.selectedLabel}
-                        </Box>
+                        <Box fontWeight="semibold">{messages.selectedLabel}</Box>
                         <Box>{displayName}</Box>
                     </HStack>
                 )}

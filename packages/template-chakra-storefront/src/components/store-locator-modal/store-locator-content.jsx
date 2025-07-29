@@ -65,14 +65,18 @@ const StoreLocatorContent = () => {
                 id: 'store_locator.description.no_locations',
                 defaultMessage: 'Sorry, there are no locations in this area'
             }),
-            viewingNearPostalCode: formatMessage({
-                id: 'store_locator.description.viewing_near_postal_code',
-                defaultMessage: 'Viewing stores within {distance}{distanceUnit} of {postalCode} in '
-            }, {
-                distance: STORE_LOCATOR_DISTANCE,
-                distanceUnit: STORE_LOCATOR_DISTANCE_UNIT,
-                postalCode: searchStoresParams.postalCode
-            }),
+            viewingNearPostalCode: formatMessage(
+                {
+                    id: 'store_locator.description.viewing_near_postal_code',
+                    defaultMessage:
+                        'Viewing stores within {distance}{distanceUnit} of {postalCode} in '
+                },
+                {
+                    distance: STORE_LOCATOR_DISTANCE,
+                    distanceUnit: STORE_LOCATOR_DISTANCE_UNIT,
+                    postalCode: searchStoresParams.postalCode
+                }
+            ),
             viewingNearLocation: formatMessage({
                 id: 'store_locator.description.viewing_near_your_location',
                 defaultMessage: 'Viewing stores near your location'
@@ -138,10 +142,8 @@ const StoreLocatorContent = () => {
     }
 
     const displayStoreLocatorStatusMessage = () => {
-        if (storesInfo === undefined)
-            return messages.status.loading
-        if (storesInfo.length === 0)
-            return messages.status.noLocations
+        if (storesInfo === undefined) return messages.status.loading
+        if (storesInfo.length === 0) return messages.status.noLocations
         if (searchStoresParams.postalCode !== undefined)
             return `${messages.status.viewingNearPostalCode}
                 ${
@@ -153,8 +155,7 @@ const StoreLocatorContent = () => {
                           )
                         : formatMessage(DEFAULT_STORE_LOCATOR_COUNTRY.countryName)
                 }`
-        else
-            return messages.status.viewingNearLocation
+        else return messages.status.viewingNearLocation
     }
 
     return (

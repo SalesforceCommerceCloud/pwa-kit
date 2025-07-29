@@ -16,7 +16,7 @@ import {EINSTEIN_RECOMMENDERS} from '../../../../config/constants'
 
 const EmptySearchResults = ({searchQuery, category}) => {
     const intl = useIntl()
-    
+
     const messages = {
         contactUs: intl.formatMessage({
             id: 'empty_search_results.link.contact_us',

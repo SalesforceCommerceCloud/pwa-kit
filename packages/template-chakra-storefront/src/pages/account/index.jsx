@@ -44,12 +44,12 @@ const LogoutButton = ({onClick}) => {
     const recipe = useSlotRecipe({key: 'header'})
     const styles = recipe()
     const {formatMessage} = useIntl()
-    
+
     const logoutText = formatMessage({
         defaultMessage: 'Log Out',
         id: 'account.logout_button.button.log_out'
     })
-    
+
     return (
         <>
             <Separator colorPalette="gray" marginTop="3" />
@@ -83,15 +83,15 @@ const Account = () => {
     const [showLoading, setShowLoading] = useState(false)
 
     const {buildUrl} = useMultiSite()
-    
+
     const accountMessages = {
         myAccount: formatMessage({
-            defaultMessage: "My Account",
-            id: "account.accordion.button.my_account"
+            defaultMessage: 'My Account',
+            id: 'account.accordion.button.my_account'
         }),
         myAccountHeading: formatMessage({
-            defaultMessage: "My Account",
-            id: "account.heading.my_account"
+            defaultMessage: 'My Account',
+            id: 'account.heading.my_account'
         })
     }
 

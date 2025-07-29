@@ -45,14 +45,12 @@ const SocialLoginRedirect = () => {
         redirectLink: formatMessage(
             {
                 id: 'social_login_redirect.message.redirect_link',
-                defaultMessage: 'If you are not automatically redirected, click <link>this link</link> to proceed.'
+                defaultMessage:
+                    'If you are not automatically redirected, click <link>this link</link> to proceed.'
             },
             {
                 link: (chunks) => (
-                    <a
-                        href="/account"
-                        style={{color: '#0176D3', textDecoration: 'underline'}}
-                    >
+                    <a href="/account" style={{color: '#0176D3', textDecoration: 'underline'}}>
                         {chunks}
                     </a>
                 )

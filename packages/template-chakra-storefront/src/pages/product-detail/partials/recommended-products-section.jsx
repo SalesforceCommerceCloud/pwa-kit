@@ -15,7 +15,7 @@ import {useLocation} from 'react-router-dom'
 const RecommendedProductsSection = ({product, isProductASet}) => {
     const location = useLocation()
     const {formatMessage} = useIntl()
-    
+
     const messages = {
         completeSet: formatMessage({
             id: 'product_detail.recommended_products.title.complete_set',

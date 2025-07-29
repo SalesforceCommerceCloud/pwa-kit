@@ -90,8 +90,10 @@ const Home = () => {
             subtitle: intl.formatMessage(
                 {
                     id: 'home.description.shop_products',
-                    defaultMessage: 'This section contains content from the catalog. {docLink} on how to replace it.',
-                    description: '{docLink} is a html button that links the user to https://sfdc.co/business-manager-manage-catalogs'
+                    defaultMessage:
+                        'This section contains content from the catalog. {docLink} on how to replace it.',
+                    description:
+                        '{docLink} is a html button that links the user to https://sfdc.co/business-manager-manage-catalogs'
                 },
                 {
                     docLink: (
@@ -130,7 +132,8 @@ const Home = () => {
             }),
             subtitle: intl.formatMessage({
                 id: 'home.description.features',
-                defaultMessage: 'Out-of-the-box features so that you focus only on adding enhancements.'
+                defaultMessage:
+                    'Out-of-the-box features so that you focus only on adding enhancements.'
             })
         },
         help: {

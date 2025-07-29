@@ -91,20 +91,14 @@ export default function useUpdatePasswordFields({
                 required: messages.newPasswordRequired,
                 validate: {
                     hasMinChars: (val) =>
-                        validatePassword(val).hasMinChars ||
-                        messages.minCharsError,
+                        validatePassword(val).hasMinChars || messages.minCharsError,
                     hasUppercase: (val) =>
-                        validatePassword(val).hasUppercase ||
-                        messages.uppercaseError,
+                        validatePassword(val).hasUppercase || messages.uppercaseError,
                     hasLowercase: (val) =>
-                        validatePassword(val).hasLowercase ||
-                        messages.lowercaseError,
-                    hasNumber: (val) =>
-                        validatePassword(val).hasNumber ||
-                        messages.numberError,
+                        validatePassword(val).hasLowercase || messages.lowercaseError,
+                    hasNumber: (val) => validatePassword(val).hasNumber || messages.numberError,
                     hasSpecialChar: (val) =>
-                        validatePassword(val).hasSpecialChar ||
-                        messages.specialCharError
+                        validatePassword(val).hasSpecialChar || messages.specialCharError
                 }
             },
             error: errors[`${prefix}password`],
@@ -120,8 +114,7 @@ export default function useUpdatePasswordFields({
                 required: messages.confirmPasswordRequired,
                 validate: {
                     matches: (val) =>
-                        val === getValues(`${prefix}password`) ||
-                        messages.passwordMismatchError
+                        val === getValues(`${prefix}password`) || messages.passwordMismatchError
                 }
             },
             error: errors[`${prefix}confirmPassword`],

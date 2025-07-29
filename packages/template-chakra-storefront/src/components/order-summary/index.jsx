@@ -44,13 +44,17 @@ const CartItems = ({basket}) => {
     )
 
     const messages = {
-        itemsInCart: intl.formatMessage({
-            id: "order_summary.cart_items.action.num_of_items_in_cart",
-            defaultMessage: "{itemCount, plural, =0 {0 items} one {# item} other {# items}} in cart"
-        }, {itemCount: totalItems}),
+        itemsInCart: intl.formatMessage(
+            {
+                id: 'order_summary.cart_items.action.num_of_items_in_cart',
+                defaultMessage:
+                    '{itemCount, plural, =0 {0 items} one {# item} other {# items}} in cart'
+            },
+            {itemCount: totalItems}
+        ),
         editCart: intl.formatMessage({
-            id: "order_summary.cart_items.link.edit_cart",
-            defaultMessage: "Edit cart"
+            id: 'order_summary.cart_items.link.edit_cart',
+            defaultMessage: 'Edit cart'
         })
     }
 
@@ -94,9 +98,7 @@ const CartItems = ({basket}) => {
                         })}
 
                         <Button asChild to="/cart" variant="link-blue" width="full">
-                            <Link>
-                                {messages.editCart}
-                            </Link>
+                            <Link>{messages.editCart}</Link>
                         </Button>
                     </Stack>
                 </Accordion.ItemContent>
@@ -127,44 +129,44 @@ const OrderSummary = ({
 
     const messages = {
         orderSummary: intl.formatMessage({
-            id: "order_summary.heading.order_summary",
-            defaultMessage: "Order Summary"
+            id: 'order_summary.heading.order_summary',
+            defaultMessage: 'Order Summary'
         }),
         subtotal: intl.formatMessage({
-            id: "order_summary.label.subtotal",
-            defaultMessage: "Subtotal"
+            id: 'order_summary.label.subtotal',
+            defaultMessage: 'Subtotal'
         }),
         shipping: intl.formatMessage({
-            id: "order_summary.label.shipping",
-            defaultMessage: "Shipping"
+            id: 'order_summary.label.shipping',
+            defaultMessage: 'Shipping'
         }),
         promoApplied: intl.formatMessage({
-            id: "order_summary.label.promo_applied",
-            defaultMessage: "Promotion applied"
+            id: 'order_summary.label.promo_applied',
+            defaultMessage: 'Promotion applied'
         }),
         free: intl.formatMessage({
-            id: "order_summary.label.free",
-            defaultMessage: "Free"
+            id: 'order_summary.label.free',
+            defaultMessage: 'Free'
         }),
         tax: intl.formatMessage({
-            id: "order_summary.label.tax",
-            defaultMessage: "Tax"
+            id: 'order_summary.label.tax',
+            defaultMessage: 'Tax'
         }),
         estimatedTotal: intl.formatMessage({
-            id: "order_summary.label.estimated_total",
-            defaultMessage: "Estimated Total"
+            id: 'order_summary.label.estimated_total',
+            defaultMessage: 'Estimated Total'
         }),
         orderTotal: intl.formatMessage({
-            id: "order_summary.label.order_total",
-            defaultMessage: "Order Total"
+            id: 'order_summary.label.order_total',
+            defaultMessage: 'Order Total'
         }),
         promotionsApplied: intl.formatMessage({
-            id: "order_summary.label.promotions_applied",
-            defaultMessage: "Promotions applied"
+            id: 'order_summary.label.promotions_applied',
+            defaultMessage: 'Promotions applied'
         }),
         removePromo: intl.formatMessage({
-            id: "order_summary.action.remove_promo",
-            defaultMessage: "Remove"
+            id: 'order_summary.action.remove_promo',
+            defaultMessage: 'Remove'
         })
     }
 
@@ -253,9 +255,7 @@ const OrderSummary = ({
                     </Flex>
 
                     <Flex justifyContent="space-between" aria-live="polite" aria-atomic="true">
-                        <Text fontSize={fontSize}>
-                            {messages.tax}
-                        </Text>
+                        <Text fontSize={fontSize}>{messages.tax}</Text>
                         {basket.taxTotal != null ? (
                             <Text fontSize={fontSize}>
                                 <FormattedNumber

@@ -48,7 +48,7 @@ const BundleProductViewModal = ({product: bundle, isOpen, onClose, updateCart, .
     )
 
     const {formatMessage} = useIntl()
-    
+
     const messages = {
         modalLabel: formatMessage(
             {
@@ -69,7 +69,10 @@ const BundleProductViewModal = ({product: bundle, isOpen, onClose, updateCart, .
             <SafePortal>
                 <Dialog.Backdrop />
                 <Dialog.Positioner>
-                    <Dialog.Content data-testid="product-view-modal" aria-label={messages.modalLabel}>
+                    <Dialog.Content
+                        data-testid="product-view-modal"
+                        aria-label={messages.modalLabel}
+                    >
                         <Dialog.CloseTrigger />
                         <Dialog.Body pb={8} bg="white" paddingBottom={6} marginTop={6}>
                             <Flex direction={['column', 'column', 'column', 'row']}>

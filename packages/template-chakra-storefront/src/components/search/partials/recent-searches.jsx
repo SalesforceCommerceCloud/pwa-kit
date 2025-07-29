@@ -17,15 +17,15 @@ import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 const RecentSearches = ({recentSearches, closeAndNavigate}) => {
     const {search: searchConfig} = getConfig()
     const {formatMessage} = useIntl()
-    
+
     const messages = {
         recentSearchesTitle: formatMessage({
-            id: "recent_searches.heading.recent_searches",
-            defaultMessage: "Recent Searches"
+            id: 'recent_searches.heading.recent_searches',
+            defaultMessage: 'Recent Searches'
         }),
         clearRecentSearches: formatMessage({
-            id: "recent_searches.action.clear_searches",
-            defaultMessage: "Clear recent searches"
+            id: 'recent_searches.action.clear_searches',
+            defaultMessage: 'Clear recent searches'
         })
     }
 

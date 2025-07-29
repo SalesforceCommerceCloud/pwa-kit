@@ -206,10 +206,7 @@ const DrawerMenu = ({
             <Dialog.Positioner style={{justifyContent: 'flex-start', alignItems: 'flex-start'}}>
                 <Dialog.Content css={styles.content}>
                     {/* Header Content */}
-                    <Dialog.Header
-                        css={styles.header}
-                        aria-label={messages.header.title}
-                    >
+                    <Dialog.Header css={styles.header} aria-label={messages.header.title}>
                         <IconButton variant="unstyled" onClick={onLogoClick}>
                             <BrandLogo css={styles.logo} />
                         </IconButton>
@@ -324,9 +321,7 @@ const DrawerMenu = ({
                                     <Link to={SIGN_IN_HREF}>
                                         <HStack>
                                             <UserIcon css={styles.icon} />{' '}
-                                            <Text>
-                                                {messages.links.signIn}
-                                            </Text>
+                                            <Text>{messages.links.signIn}</Text>
                                         </HStack>
                                     </Link>
                                 )}

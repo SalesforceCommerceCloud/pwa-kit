@@ -58,7 +58,7 @@ const BoxArrow = () => {
 
 const ShippingAddressForm = ({form, hasAddresses, selectedAddressId, toggleEdit, submitForm}) => {
     const {formatMessage} = useIntl()
-    
+
     const messages = {
         editAddress: formatMessage({
             id: 'shipping_address_form.heading.edit_address',
@@ -69,7 +69,7 @@ const ShippingAddressForm = ({form, hasAddresses, selectedAddressId, toggleEdit,
             defaultMessage: 'Add New Address'
         })
     }
-    
+
     return (
         <Box
             border="1px solid"

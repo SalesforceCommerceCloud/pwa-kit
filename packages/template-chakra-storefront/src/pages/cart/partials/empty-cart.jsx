@@ -13,34 +13,34 @@ import Link from '../../../components/link'
 
 const EmptyCart = ({isRegistered}) => {
     const {formatMessage} = useIntl()
-    
+
     const messages = {
         title: formatMessage({
-            id: "empty_cart.description.empty_cart",
-            defaultMessage: "Your cart is empty."
+            id: 'empty_cart.description.empty_cart',
+            defaultMessage: 'Your cart is empty.'
         }),
         description: {
             registered: formatMessage({
-                id: "empty_cart.message.continue_shopping",
-                defaultMessage: "Continue shopping to add items to your cart."
+                id: 'empty_cart.message.continue_shopping',
+                defaultMessage: 'Continue shopping to add items to your cart.'
             }),
             unregistered: formatMessage({
-                id: "empty_cart.message.sign_in_or_continue_shopping",
-                defaultMessage: "Sign in to retrieve your saved items or continue shopping."
+                id: 'empty_cart.message.sign_in_or_continue_shopping',
+                defaultMessage: 'Sign in to retrieve your saved items or continue shopping.'
             })
         },
         buttons: {
             continueShopping: formatMessage({
-                id: "empty_cart.link.continue_shopping",
-                defaultMessage: "Continue Shopping"
+                id: 'empty_cart.link.continue_shopping',
+                defaultMessage: 'Continue Shopping'
             }),
             signIn: formatMessage({
-                id: "empty_cart.link.sign_in",
-                defaultMessage: "Sign In"
+                id: 'empty_cart.link.sign_in',
+                defaultMessage: 'Sign In'
             })
         }
     }
-    
+
     return (
         <Box data-testid="sf-cart-empty" flex="1" minWidth="100%" width="full" background="gray.50">
             <Center>
@@ -57,7 +57,9 @@ const EmptyCart = ({isRegistered}) => {
                             </Center>
 
                             <Text textAlign="center" fontSize="md" color="gray.700">
-                                {isRegistered ? messages.description.registered : messages.description.unregistered}
+                                {isRegistered
+                                    ? messages.description.registered
+                                    : messages.description.unregistered}
                             </Text>
                         </Stack>
                         <Stack justify="center" direction={['column', 'row']} gap={4}>
@@ -68,9 +70,7 @@ const EmptyCart = ({isRegistered}) => {
                                 width={['343px', '220px']}
                                 asChild
                             >
-                                <Link href={'/'}>
-                                    {messages.buttons.continueShopping}
-                                </Link>
+                                <Link href={'/'}>{messages.buttons.continueShopping}</Link>
                             </Button>
                             {!isRegistered && (
                                 <Button asChild variant="solid">

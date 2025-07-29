@@ -15,7 +15,7 @@ import {REMOVE_FILTER} from './refinements-utils'
 const SelectedRefinements = ({toggleFilter, selectedFilterValues, filters, handleReset}) => {
     const {formatMessage} = useIntl()
     const priceFilterValues = filters?.find((filter) => filter.attributeId === 'price')
-    
+
     const messages = {
         clearAllAriaLabel: formatMessage({
             id: 'selected_refinements.action.assistive_msg.clear_all',

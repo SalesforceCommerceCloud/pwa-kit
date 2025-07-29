@@ -124,17 +124,25 @@ const ShippingAddressSelection = ({
             id: 'shipping_address.title.shipping_address',
             defaultMessage: 'Shipping Address'
         }),
-        editButton: (address) => formatMessage({
-            id: 'shipping_address.label.edit_button',
-            defaultMessage: 'Edit {address}'
-        }, {address}),
-        removeButton: (address) => formatMessage({
-            id: 'shipping_address.label.remove_button',
-            defaultMessage: 'Remove {address}'
-        }, {address}),
+        editButton: (address) =>
+            formatMessage(
+                {
+                    id: 'shipping_address.label.edit_button',
+                    defaultMessage: 'Edit {address}'
+                },
+                {address}
+            ),
+        removeButton: (address) =>
+            formatMessage(
+                {
+                    id: 'shipping_address.label.remove_button',
+                    defaultMessage: 'Remove {address}'
+                },
+                {address}
+            ),
         addNewAddress: formatMessage({
-            id: "shipping_address_selection.button.add_address",
-            defaultMessage: "Add New Address"
+            id: 'shipping_address_selection.button.add_address',
+            defaultMessage: 'Add New Address'
         }),
         editShipping: formatMessage({
             id: 'shipping_address_selection.title.edit_shipping',

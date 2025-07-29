@@ -38,9 +38,7 @@ const ResetPassword = () => {
             await getPasswordResetToken(email)
         } catch (e) {
             const message =
-                e.response?.status === 400
-                    ? messages.featureUnavailableError
-                    : messages.apiError
+                e.response?.status === 400 ? messages.featureUnavailableError : messages.apiError
             form.setError('global', {type: 'manual', message})
         }
     }

@@ -34,8 +34,7 @@ export default function useRegistrationFields({
             id: 'use_registration_fields.label.password'
         }),
         acceptsMarketingLabel: formatMessage({
-            defaultMessage:
-                'Sign me up for Salesforce emails (you can unsubscribe at any time)',
+            defaultMessage: 'Sign me up for Salesforce emails (you can unsubscribe at any time)',
             id: 'use_registration_fields.label.sign_up_to_emails'
         }),
         firstNameRequired: formatMessage({
@@ -123,20 +122,14 @@ export default function useRegistrationFields({
                 required: messages.passwordRequired,
                 validate: {
                     hasMinChars: (val) =>
-                        validatePassword(val).hasMinChars ||
-                        messages.passwordMinChars,
+                        validatePassword(val).hasMinChars || messages.passwordMinChars,
                     hasUppercase: (val) =>
-                        validatePassword(val).hasUppercase ||
-                        messages.passwordUppercase,
+                        validatePassword(val).hasUppercase || messages.passwordUppercase,
                     hasLowercase: (val) =>
-                        validatePassword(val).hasLowercase ||
-                        messages.passwordLowercase,
-                    hasNumber: (val) =>
-                        validatePassword(val).hasNumber ||
-                        messages.passwordNumber,
+                        validatePassword(val).hasLowercase || messages.passwordLowercase,
+                    hasNumber: (val) => validatePassword(val).hasNumber || messages.passwordNumber,
                     hasSpecialChar: (val) =>
-                        validatePassword(val).hasSpecialChar ||
-                        messages.passwordSpecialChar
+                        validatePassword(val).hasSpecialChar || messages.passwordSpecialChar
                 }
             },
             error: errors[`${prefix}password`],

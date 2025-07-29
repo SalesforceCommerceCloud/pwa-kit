@@ -16,16 +16,16 @@ import {noop} from '../../utils/utils'
 
 const messages = defineMessages({
     welcomeBack: {
-        defaultMessage: "Welcome Back",
-        id: "login_form.message.welcome_back"
+        defaultMessage: 'Welcome Back',
+        id: 'login_form.message.welcome_back'
     },
     dontHaveAccount: {
         defaultMessage: "Don't have an account?",
-        id: "login_form.message.dont_have_account"
+        id: 'login_form.message.dont_have_account'
     },
     createAccount: {
-        defaultMessage: "Create account",
-        id: "login_form.action.create_account"
+        defaultMessage: 'Create account',
+        id: 'login_form.action.create_account'
     }
 })
 
@@ -86,9 +86,7 @@ const LoginForm = ({
                     )}
 
                     <Stack direction="row" gap={1} justifyContent="center">
-                        <Text fontSize="sm">
-                            {formatMessage(messages.dontHaveAccount)}
-                        </Text>
+                        <Text fontSize="sm">{formatMessage(messages.dontHaveAccount)}</Text>
                         <Button
                             variant="link-blue"
                             size="sm"

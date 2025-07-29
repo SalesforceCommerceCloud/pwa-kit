@@ -27,7 +27,7 @@ const ItemAttributes = ({includeQuantity, currency, ...props}) => {
     const promotionIds = variant.priceAdjustments?.map((adj) => adj.promotionId) ?? []
     const intl = useIntl()
     const {formatMessage} = intl
-    
+
     const messages = {
         qty: formatMessage({
             defaultMessage: 'Qty',
@@ -133,8 +133,7 @@ const ItemAttributes = ({includeQuantity, currency, ...props}) => {
                                 {product?.name}
                             </Text>
                             <Text fontSize="sm" color="gray.700">
-                                {messages.qty}
-                                : {quantity}
+                                {messages.qty}: {quantity}
                             </Text>
                         </Box>
                     ))}
@@ -144,8 +143,7 @@ const ItemAttributes = ({includeQuantity, currency, ...props}) => {
             {!bundleVariantIsLoading && productBundleVariantData && (
                 <Box>
                     <Text fontSize={15} marginTop={3} fontWeight={500}>
-                        {messages.selectedOptions}
-                        :
+                        {messages.selectedOptions}:
                     </Text>
                     {productBundleVariantData?.map(
                         ({variationValues, name: productName, quantity, id}) => {
@@ -155,8 +153,7 @@ const ItemAttributes = ({includeQuantity, currency, ...props}) => {
                                         {productName}
                                     </Text>
                                     <Text fontSize="sm" color="gray.700">
-                                        {messages.qty}
-                                        : {quantity}
+                                        {messages.qty}: {quantity}
                                     </Text>
                                     {Object.keys(variationValues).map((key) => {
                                         const selectedVariant = `${key}: ${variationValues[key]}`

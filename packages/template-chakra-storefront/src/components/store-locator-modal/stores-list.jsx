@@ -105,9 +105,7 @@ const StoresList = ({storesInfo}) => {
                                             color="blue.700"
                                             sx={{marginTop: '10px', paddingBottom: '0px'}}
                                         >
-                                            <Box fontSize="lg">
-                                                {messages.viewMore}
-                                            </Box>
+                                            <Box fontSize="lg">{messages.viewMore}</Box>
                                             <AccordionIcon />
                                         </AccordionButton>
                                         <AccordionPanel mb={6} mt={4}>

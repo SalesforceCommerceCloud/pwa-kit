@@ -124,52 +124,64 @@ const AccountOrderDetail = () => {
     const paymentCard = order?.paymentInstruments[0]?.paymentCard
     const CardIcon = getCreditCardIcon(paymentCard?.cardType)
     const itemCount = order?.productItems.reduce((count, item) => item.quantity + count, 0) || 0
-    
+
     const messages = {
         backToHistory: formatMessage({
-            defaultMessage: "Back to Order History",
-            id: "account_order_detail.link.back_to_history"
+            defaultMessage: 'Back to Order History',
+            id: 'account_order_detail.link.back_to_history'
         }),
         orderDetails: formatMessage({
-            defaultMessage: "Order Details",
-            id: "account_order_detail.title.order_details"
+            defaultMessage: 'Order Details',
+            id: 'account_order_detail.title.order_details'
         }),
-        orderedDate: (date) => formatMessage({
-            defaultMessage: "Ordered: {date}",
-            id: "account_order_detail.label.ordered_date"
-        }, { date }),
-        orderNumber: (orderNumber) => formatMessage({
-            defaultMessage: "Order Number: {orderNumber}",
-            id: "account_order_detail.label.order_number"
-        }, { orderNumber }),
+        orderedDate: (date) =>
+            formatMessage(
+                {
+                    defaultMessage: 'Ordered: {date}',
+                    id: 'account_order_detail.label.ordered_date'
+                },
+                {date}
+            ),
+        orderNumber: (orderNumber) =>
+            formatMessage(
+                {
+                    defaultMessage: 'Order Number: {orderNumber}',
+                    id: 'account_order_detail.label.order_number'
+                },
+                {orderNumber}
+            ),
         shippingMethod: formatMessage({
-            defaultMessage: "Shipping Method",
-            id: "account_order_detail.heading.shipping_method"
+            defaultMessage: 'Shipping Method',
+            id: 'account_order_detail.heading.shipping_method'
         }),
         paymentMethod: formatMessage({
-            defaultMessage: "Payment Method",
-            id: "account_order_detail.heading.payment_method"
+            defaultMessage: 'Payment Method',
+            id: 'account_order_detail.heading.payment_method'
         }),
         shippingAddress: formatMessage({
-            defaultMessage: "Shipping Address",
-            id: "account_order_detail.heading.shipping_address"
+            defaultMessage: 'Shipping Address',
+            id: 'account_order_detail.heading.shipping_address'
         }),
         billingAddress: formatMessage({
-            defaultMessage: "Billing Address",
-            id: "account_order_detail.heading.billing_address"
+            defaultMessage: 'Billing Address',
+            id: 'account_order_detail.heading.billing_address'
         }),
         trackingNumber: formatMessage({
-            defaultMessage: "Tracking Number",
-            id: "account_order_detail.label.tracking_number"
+            defaultMessage: 'Tracking Number',
+            id: 'account_order_detail.label.tracking_number'
         }),
         pending: formatMessage({
-            defaultMessage: "Pending",
-            id: "account_order_detail.label.pending_tracking_number"
+            defaultMessage: 'Pending',
+            id: 'account_order_detail.label.pending_tracking_number'
         }),
-        itemsCount: (count) => formatMessage({
-            defaultMessage: "{count} items",
-            id: "account_order_detail.heading.num_of_items"
-        }, { count }),
+        itemsCount: (count) =>
+            formatMessage(
+                {
+                    defaultMessage: '{count} items',
+                    id: 'account_order_detail.heading.num_of_items'
+                },
+                {count}
+            ),
         shippingStatuses: {
             not_shipped: formatMessage({
                 defaultMessage: 'Not shipped',
@@ -233,11 +245,13 @@ const AccountOrderDetail = () => {
                             }
                         >
                             <Text fontSize={['sm', 'md']}>
-                                {messages.orderedDate(formatDate(new Date(order.creationDate), {
-                                    year: 'numeric',
-                                    day: 'numeric',
-                                    month: 'short'
-                                }))}
+                                {messages.orderedDate(
+                                    formatDate(new Date(order.creationDate), {
+                                        year: 'numeric',
+                                        day: 'numeric',
+                                        month: 'short'
+                                    })
+                                )}
                             </Text>
                             <Stack direction="row" alignItems="center">
                                 <Text fontSize={['sm', 'md']}>
@@ -375,11 +389,7 @@ const AccountOrderDetail = () => {
             </Box>
 
             <Stack gap="4">
-                {!isPending && (
-                    <Text>
-                        {messages.itemsCount(itemCount)}
-                    </Text>
-                )}
+                {!isPending && <Text>{messages.itemsCount(itemCount)}</Text>}
 
                 <Stack gap="4">
                     {isPending ? (

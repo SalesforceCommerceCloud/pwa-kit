@@ -25,8 +25,8 @@ const PaymentForm = ({form, onSubmit}) => {
             defaultMessage: 'Payment'
         }),
         creditCard: formatMessage({
-            id: "payment_selection.heading.credit_card",
-            defaultMessage: "Credit Card"
+            id: 'payment_selection.heading.credit_card',
+            defaultMessage: 'Credit Card'
         }),
         securePayment: formatMessage({
             id: 'payment_selection.tooltip.secure_payment',
@@ -62,9 +62,7 @@ const PaymentForm = ({form, onSubmit}) => {
                                     <RadioGroup.ItemText flex="1">
                                         <Flex justify="space-between">
                                             <Stack direction="row" align="center">
-                                                <Text fontWeight="bold">
-                                                    {messages.creditCard}
-                                                </Text>
+                                                <Text fontWeight="bold">{messages.creditCard}</Text>
                                                 <Tooltip
                                                     content={messages.securePayment}
                                                     contentProps={{

@@ -83,7 +83,8 @@ const Footer = ({...otherProps}) => {
         }),
         copyright: formatMessage({
             id: 'footer.message.copyright',
-            defaultMessage: 'Salesforce or its affiliates. All rights reserved. This is a demo store only. Orders made WILL NOT be processed.'
+            defaultMessage:
+                'Salesforce or its affiliates. All rights reserved. This is a demo store only. Orders made WILL NOT be processed.'
         })
     }
 
@@ -179,8 +180,7 @@ const Footer = ({...otherProps}) => {
                         <Separator css={styles.horizontalRule} />
                         <Box css={styles.legalSection}>
                             <Text css={styles.copyright}>
-                                &copy; {new Date().getFullYear()}{' '}
-                                {messages.copyright}
+                                &copy; {new Date().getFullYear()} {messages.copyright}
                             </Text>
 
                             <LegalLinks variant={{base: 'vertical', lg: 'horizontal'}} />
@@ -199,7 +199,7 @@ const Subscribe = ({...otherProps}) => {
     const styles = recipe()
     const intl = useIntl()
     const {formatMessage} = intl
-    
+
     const messages = {
         heading: formatMessage({
             id: 'footer.subscribe.heading.first_to_know',
@@ -218,15 +218,13 @@ const Subscribe = ({...otherProps}) => {
             defaultMessage: 'Sign Up'
         })
     }
-    
+
     return (
         <Box css={styles.subscribe} {...otherProps}>
             <Heading as="h1" css={styles.subscribeHeading}>
                 {messages.heading}
             </Heading>
-            <Text css={styles.subscribeMessage}>
-                {messages.description}
-            </Text>
+            <Text css={styles.subscribeMessage}>{messages.description}</Text>
 
             <Box>
                 <Group attached w="full" maxW="sm">
@@ -237,9 +235,7 @@ const Subscribe = ({...otherProps}) => {
                         id="subscribe-email"
                         css={styles.subscribeField}
                     />
-                    <Button variant="footer">
-                        {messages.buttonSignUp}
-                    </Button>
+                    <Button variant="footer">{messages.buttonSignUp}</Button>
                 </Group>
             </Box>
 
@@ -251,7 +247,7 @@ const Subscribe = ({...otherProps}) => {
 const LegalLinks = ({variant}) => {
     const intl = useIntl()
     const {formatMessage} = intl
-    
+
     const messages = {
         termsConditions: formatMessage({
             id: 'footer.link.terms_conditions',
@@ -266,7 +262,7 @@ const LegalLinks = ({variant}) => {
             defaultMessage: 'Site Map'
         })
     }
-    
+
     return (
         <LinksList
             links={[

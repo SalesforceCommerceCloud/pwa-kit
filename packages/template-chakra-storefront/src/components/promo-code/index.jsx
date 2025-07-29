@@ -29,7 +29,8 @@ export const usePromoCode = () => {
         }),
         checkCode: formatMessage({
             id: 'use_promocode.error.check_the_code',
-            defaultMessage: 'Check the code and try again, it may already be applied or the promo has expired.'
+            defaultMessage:
+                'Check the code and try again, it may already be applied or the promo has expired.'
         }),
         promoRemoved: formatMessage({
             id: 'use_promocode.info.promo_removed',
@@ -95,14 +96,14 @@ export const usePromoCode = () => {
 
 export const PromoCode = ({form, submitPromoCode, itemProps}) => {
     const {formatMessage} = useIntl()
-    
+
     const messages = {
         havePromoCode: formatMessage({
             id: 'promocode.accordion.button.have_promocode',
             defaultMessage: 'Do you have a promo code?'
         })
     }
-    
+
     return (
         <Accordion.Root collapsible>
             <Accordion.Item {...itemProps}>

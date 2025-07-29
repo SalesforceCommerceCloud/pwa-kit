@@ -53,29 +53,29 @@ const PasswordRequirements = ({value}) => {
 
     const messages = {
         minChars: formatMessage({
-            id: "password_requirements.error.eight_letter_minimum",
-            defaultMessage: "8 characters minimum",
-            description: "Password requirement"
+            id: 'password_requirements.error.eight_letter_minimum',
+            defaultMessage: '8 characters minimum',
+            description: 'Password requirement'
         }),
         uppercase: formatMessage({
-            id: "password_requirements.error.one_uppercase_letter",
-            defaultMessage: "1 uppercase letter",
-            description: "Password requirement"
+            id: 'password_requirements.error.one_uppercase_letter',
+            defaultMessage: '1 uppercase letter',
+            description: 'Password requirement'
         }),
         lowercase: formatMessage({
-            id: "password_requirements.error.one_lowercase_letter",
-            defaultMessage: "1 lowercase letter",
-            description: "Password requirement"
+            id: 'password_requirements.error.one_lowercase_letter',
+            defaultMessage: '1 lowercase letter',
+            description: 'Password requirement'
         }),
         number: formatMessage({
-            id: "password_requirements.error.one_number",
-            defaultMessage: "1 number",
-            description: "Password requirement"
+            id: 'password_requirements.error.one_number',
+            defaultMessage: '1 number',
+            description: 'Password requirement'
         }),
         specialChar: formatMessage({
-            id: "password_requirements.error.one_special_character",
-            defaultMessage: "1 special character (example: , S ! % #)",
-            description: "Password requirement"
+            id: 'password_requirements.error.one_special_character',
+            defaultMessage: '1 special character (example: , S ! % #)',
+            description: 'Password requirement'
         })
     }
 

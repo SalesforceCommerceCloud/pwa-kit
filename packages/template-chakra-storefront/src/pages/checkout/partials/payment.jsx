@@ -41,24 +41,24 @@ const Payment = () => {
             defaultMessage: 'Edit Payment Info'
         }),
         creditCard: formatMessage({
-            id: "checkout_payment.heading.credit_card",
-            defaultMessage: "Credit Card"
+            id: 'checkout_payment.heading.credit_card',
+            defaultMessage: 'Credit Card'
         }),
         remove: formatMessage({
-            id: "checkout_payment.action.remove",
-            defaultMessage: "Remove"
+            id: 'checkout_payment.action.remove',
+            defaultMessage: 'Remove'
         }),
         billingAddress: formatMessage({
-            id: "checkout_payment.heading.billing_address",
-            defaultMessage: "Billing Address"
+            id: 'checkout_payment.heading.billing_address',
+            defaultMessage: 'Billing Address'
         }),
         sameAsShipping: formatMessage({
-            id: "checkout_payment.label.same_as_shipping",
-            defaultMessage: "Same as shipping address"
+            id: 'checkout_payment.label.same_as_shipping',
+            defaultMessage: 'Same as shipping address'
         }),
         reviewOrder: formatMessage({
-            id: "checkout_payment.button.review_order",
-            defaultMessage: "Review Order"
+            id: 'checkout_payment.button.review_order',
+            defaultMessage: 'Review Order'
         })
     }
 

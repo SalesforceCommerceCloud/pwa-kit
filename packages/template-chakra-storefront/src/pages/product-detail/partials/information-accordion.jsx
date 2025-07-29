@@ -12,7 +12,7 @@ import {useIntl} from 'react-intl'
 
 const InformationAccordion = ({product}) => {
     const {formatMessage} = useIntl()
-    
+
     const messages = {
         productDetail: formatMessage({
             id: 'product_detail.accordion.button.product_detail',
@@ -67,9 +67,7 @@ const InformationAccordion = ({product}) => {
                         <Accordion.ItemIndicator />
                     </Accordion.ItemTrigger>
                     <Accordion.ItemContent>
-                        <Accordion.ItemBody>
-                            {messages.comingSoon}
-                        </Accordion.ItemBody>
+                        <Accordion.ItemBody>{messages.comingSoon}</Accordion.ItemBody>
                     </Accordion.ItemContent>
                 </Accordion.Item>
 
@@ -82,9 +80,7 @@ const InformationAccordion = ({product}) => {
                         <Accordion.ItemIndicator />
                     </Accordion.ItemTrigger>
                     <Accordion.ItemContent>
-                        <Accordion.ItemBody>
-                            {messages.comingSoon}
-                        </Accordion.ItemBody>
+                        <Accordion.ItemBody>{messages.comingSoon}</Accordion.ItemBody>
                     </Accordion.ItemContent>
                 </Accordion.Item>
 
@@ -97,9 +93,7 @@ const InformationAccordion = ({product}) => {
                         <Accordion.ItemIndicator />
                     </Accordion.ItemTrigger>
                     <Accordion.ItemContent>
-                        <Accordion.ItemBody>
-                            {messages.comingSoon}
-                        </Accordion.ItemBody>
+                        <Accordion.ItemBody>{messages.comingSoon}</Accordion.ItemBody>
                     </Accordion.ItemContent>
                 </Accordion.Item>
             </Accordion.Root>

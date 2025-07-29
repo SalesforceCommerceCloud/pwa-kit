@@ -19,8 +19,8 @@ const PromoCodeFields = ({form, prefix = '', ...props}) => {
 
     const messages = {
         apply: formatMessage({
-            id: "promo_code_fields.button.apply",
-            defaultMessage: "Apply"
+            id: 'promo_code_fields.button.apply',
+            defaultMessage: 'Apply'
         })
     }
 

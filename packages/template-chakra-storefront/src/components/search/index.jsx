@@ -77,7 +77,7 @@ const Search = (props) => {
     const navigate = useNavigation()
     const intl = useIntl()
     const {search: searchConfig} = getConfig()
-    
+
     const messages = {
         clearSearch: intl.formatMessage({
             id: 'header.button.assistive_msg.clear_search',

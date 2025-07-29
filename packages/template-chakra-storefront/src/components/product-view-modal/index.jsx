@@ -20,7 +20,7 @@ const ProductViewModal = ({product, isOpen, onClose, ...props}) => {
     const productViewModalData = useProductViewModal(product)
 
     const {formatMessage} = useIntl()
-    
+
     const messages = {
         modalLabel: formatMessage(
             {
@@ -41,7 +41,10 @@ const ProductViewModal = ({product, isOpen, onClose, ...props}) => {
             <SafePortal>
                 <Dialog.Backdrop />
                 <Dialog.Positioner>
-                    <Dialog.Content data-testid="product-view-modal" aria-label={messages.modalLabel}>
+                    <Dialog.Content
+                        data-testid="product-view-modal"
+                        aria-label={messages.modalLabel}
+                    >
                         <Dialog.CloseTrigger />
                         <Dialog.Body pb={8} bg="white" paddingBottom={6} marginTop={6}>
                             <ProductView

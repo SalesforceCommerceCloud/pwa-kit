@@ -17,7 +17,7 @@ import {useIntl} from 'react-intl'
  */
 const PromoPopover = ({header, children, ...props}) => {
     const {formatMessage} = useIntl()
-    
+
     const messages = {
         info: formatMessage({
             id: 'promo_popover.assistive_msg.info',
@@ -28,7 +28,7 @@ const PromoPopover = ({header, children, ...props}) => {
             defaultMessage: 'Promotions Applied'
         })
     }
-    
+
     return (
         <Box position="relative" {...props}>
             <Popover.Root size="xs" lazyMount unmountOnExit positioning={{placement: 'top'}}>

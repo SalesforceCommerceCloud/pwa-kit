@@ -16,32 +16,38 @@ import Link from '../../components/link'
 
 const RegisterForm = ({submitForm, clickSignIn = noop, form}) => {
     const {formatMessage} = useIntl()
-    
+
     const messages = {
         heading: formatMessage({
-            id: "register_form.heading.lets_get_started",
+            id: 'register_form.heading.lets_get_started',
             defaultMessage: "Let's get started!"
         }),
         description: formatMessage({
-            id: "register_form.message.create_an_account",
-            defaultMessage: "Create an account and get first access to the very best products, inspiration and community."
+            id: 'register_form.message.create_an_account',
+            defaultMessage:
+                'Create an account and get first access to the very best products, inspiration and community.'
         }),
         createAccount: formatMessage({
-            id: "register_form.button.create_account",
-            defaultMessage: "Create Account"
+            id: 'register_form.button.create_account',
+            defaultMessage: 'Create Account'
         }),
         alreadyHaveAccount: formatMessage({
-            id: "register_form.message.already_have_account",
-            defaultMessage: "Already have an account?"
+            id: 'register_form.message.already_have_account',
+            defaultMessage: 'Already have an account?'
         }),
         signIn: formatMessage({
-            id: "register_form.action.sign_in",
-            defaultMessage: "Sign in"
+            id: 'register_form.action.sign_in',
+            defaultMessage: 'Sign in'
         }),
-        agreeToPolicy: (policy, terms) => formatMessage({
-            id: "register_form.message.agree_to_policy_terms",
-            defaultMessage: "By creating an account, you agree to Salesforce <policy>Privacy Policy</policy> and <terms>Terms & Conditions</terms>"
-        }, {policy, terms})
+        agreeToPolicy: (policy, terms) =>
+            formatMessage(
+                {
+                    id: 'register_form.message.agree_to_policy_terms',
+                    defaultMessage:
+                        'By creating an account, you agree to Salesforce <policy>Privacy Policy</policy> and <terms>Terms & Conditions</terms>'
+                },
+                {policy, terms}
+            )
     }
     return (
         <Fragment>
@@ -82,9 +88,7 @@ const RegisterForm = ({submitForm, clickSignIn = noop, form}) => {
                         </Button>
 
                         <Stack direction="row" gap={1} justifyContent="center">
-                            <Text fontSize="sm">
-                                {messages.alreadyHaveAccount}
-                            </Text>
+                            <Text fontSize="sm">{messages.alreadyHaveAccount}</Text>
                             <Button
                                 variant="link-blue"
                                 size="sm"

@@ -290,7 +290,9 @@ const ProductTile = (props) => {
                 <Box>
                     <IconButtonWithRegistration
                         data-testid="wishlist-button"
-                        aria-label={isFavourite ? messages.removeFromWishlist : messages.addToWishlist}
+                        aria-label={
+                            isFavourite ? messages.removeFromWishlist : messages.addToWishlist
+                        }
                         variant="unstyled"
                         css={styles.favIcon}
                         onClick={async () => {

@@ -19,8 +19,8 @@ const UpdatePasswordFields = ({form, prefix = ''}) => {
 
     const messages = {
         forgotPassword: formatMessage({
-            id: "update_password_fields.button.forgot_password",
-            defaultMessage: "Forgot Password?"
+            id: 'update_password_fields.button.forgot_password',
+            defaultMessage: 'Forgot Password?'
         })
     }
 

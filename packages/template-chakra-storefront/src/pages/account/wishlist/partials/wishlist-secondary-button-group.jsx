@@ -69,13 +69,14 @@ const WishlistSecondaryButtonGroup = ({
             id: 'wishlist_secondary_button_group.info.item_removed',
             defaultMessage: 'Item removed from wishlist'
         }),
-        removeItemLabel: (productName) => formatMessage(
-            {
-                id: 'wishlist_secondary_button_group.info.item.remove.label',
-                defaultMessage: 'Remove {productName}'
-            },
-            {productName}
-        ),
+        removeItemLabel: (productName) =>
+            formatMessage(
+                {
+                    id: 'wishlist_secondary_button_group.info.item.remove.label',
+                    defaultMessage: 'Remove {productName}'
+                },
+                {productName}
+            ),
         remove: formatMessage({
             id: 'wishlist_secondary_button_group.action.remove',
             defaultMessage: 'Remove'

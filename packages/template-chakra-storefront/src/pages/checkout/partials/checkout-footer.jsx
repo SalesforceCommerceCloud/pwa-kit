@@ -38,7 +38,8 @@ const CheckoutFooter = ({...otherProps}) => {
         }),
         copyright: intl.formatMessage({
             id: 'checkout_footer.message.copyright',
-            defaultMessage: 'Salesforce or its affiliates. All rights reserved. This is a demo store only. Orders made WILL NOT be processed.'
+            defaultMessage:
+                'Salesforce or its affiliates. All rights reserved. This is a demo store only. Orders made WILL NOT be processed.'
         })
     }
 

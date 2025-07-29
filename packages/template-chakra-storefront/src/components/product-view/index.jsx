@@ -222,19 +222,15 @@ const ProductView = forwardRef(
                     const unavailableChildProduct =
                         childProductOrderability[unavailableChildProductKey]
                     if (unavailableChildProduct.unfulfillable) {
-                        currentInventoryMsg = formatMessage(
-                            messages.inventoryRemainingForProduct,
-                            {
-                                stockLevel: unavailableChildProduct.stockLevel,
-                                productName: unavailableChildProduct.productName
-                            }
-                        )
+                        currentInventoryMsg = formatMessage(messages.inventoryRemainingForProduct, {
+                            stockLevel: unavailableChildProduct.stockLevel,
+                            productName: unavailableChildProduct.productName
+                        })
                     }
                     if (unavailableChildProduct.isOutOfStock) {
-                        currentInventoryMsg = formatMessage(
-                            messages.outOfStockForProduct,
-                            {productName: unavailableChildProduct.productName}
-                        )
+                        currentInventoryMsg = formatMessage(messages.outOfStockForProduct, {
+                            productName: unavailableChildProduct.productName
+                        })
                     }
                 }
             }
@@ -470,8 +466,8 @@ const ProductView = forwardRef(
                                 <Box>
                                     <Text fontWeight="medium" fontSize="md" aria-label="price">
                                         <label>
-                                            {formatMessage(messages.quantity)}
-                                            : {childOfBundleQuantity}
+                                            {formatMessage(messages.quantity)}:{' '}
+                                            {childOfBundleQuantity}
                                         </label>
                                     </Text>
                                 </Box>
@@ -544,10 +540,9 @@ const ProductView = forwardRef(
                                             key={id}
                                             value={selectedValue?.value}
                                             displayName={selectedValue?.name || ''}
-                                            label={formatMessage(
-                                                messages.variantType,
-                                                {variantType: name}
-                                            )}
+                                            label={formatMessage(messages.variantType, {
+                                                variantType: name
+                                            })}
                                         >
                                             {swatches}
                                         </SwatchGroup>

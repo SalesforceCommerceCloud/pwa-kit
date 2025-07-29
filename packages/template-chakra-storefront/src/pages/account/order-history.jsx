@@ -100,32 +100,48 @@ const AccountOrderHistory = () => {
     const hasOrders = orders?.length > 0
 
     const pageUrls = usePageUrls({total: paging.total, limit})
-    
+
     const messages = {
         orderHistory: formatMessage({
-            defaultMessage: "Order History",
-            id: "account_order_history.title.order_history"
+            defaultMessage: 'Order History',
+            id: 'account_order_history.title.order_history'
         }),
-        orderedDate: (date) => formatMessage({
-            defaultMessage: "Ordered: {date}",
-            id: "account_order_history.label.ordered_date"
-        }, { date }),
+        orderedDate: (date) =>
+            formatMessage(
+                {
+                    defaultMessage: 'Ordered: {date}',
+                    id: 'account_order_history.label.ordered_date'
+                },
+                {date}
+            ),
         viewDetails: formatMessage({
-            defaultMessage: "View details",
-            id: "account_order_history.link.view_details"
+            defaultMessage: 'View details',
+            id: 'account_order_history.link.view_details'
         }),
-        orderNumber: (orderNumber) => formatMessage({
-            defaultMessage: "Order Number: {orderNumber}",
-            id: "account_order_history.label.order_number"
-        }, { orderNumber }),
-        itemsCount: (count) => formatMessage({
-            defaultMessage: "{count} items",
-            id: "account_order_history.label.num_of_items"
-        }, { count }),
-        shippedTo: (name) => formatMessage({
-            defaultMessage: "Shipped to: {name}",
-            id: "account_order_history.label.shipped_to"
-        }, { name }),
+        orderNumber: (orderNumber) =>
+            formatMessage(
+                {
+                    defaultMessage: 'Order Number: {orderNumber}',
+                    id: 'account_order_history.label.order_number'
+                },
+                {orderNumber}
+            ),
+        itemsCount: (count) =>
+            formatMessage(
+                {
+                    defaultMessage: '{count} items',
+                    id: 'account_order_history.label.num_of_items'
+                },
+                {count}
+            ),
+        shippedTo: (name) =>
+            formatMessage(
+                {
+                    defaultMessage: 'Shipped to: {name}',
+                    id: 'account_order_history.label.shipped_to'
+                },
+                {name}
+            ),
         noOrderHeading: formatMessage({
             defaultMessage: "You haven't placed an order yet.",
             id: 'account_order_history.heading.no_order_yet'
@@ -181,11 +197,13 @@ const AccountOrderHistory = () => {
                                 <Box>
                                     <Flex justifyContent="space-between">
                                         <Text fontWeight="bold" fontSize="lg">
-                                            {messages.orderedDate(formatDate(new Date(order.creationDate), {
-                                                year: 'numeric',
-                                                day: 'numeric',
-                                                month: 'short'
-                                            }))}
+                                            {messages.orderedDate(
+                                                formatDate(new Date(order.creationDate), {
+                                                    year: 'numeric',
+                                                    day: 'numeric',
+                                                    month: 'short'
+                                                })
+                                            )}
                                         </Text>
                                         <Box>
                                             <Button
@@ -202,9 +220,7 @@ const AccountOrderHistory = () => {
                                         </Box>
                                     </Flex>
                                     <Stack direction="row" alignItems="center">
-                                        <Text>
-                                            {messages.orderNumber(order.orderNo)}
-                                        </Text>
+                                        <Text>{messages.orderNumber(order.orderNo)}</Text>
                                         <Badge colorPalette="green" fontWeight="bold">
                                             {order.status?.toUpperCase()}
                                         </Badge>
@@ -226,9 +242,7 @@ const AccountOrderHistory = () => {
                                         />
                                     }
                                 >
-                                    <Text>
-                                        {messages.itemsCount(order.productItems.length)}
-                                    </Text>
+                                    <Text>{messages.itemsCount(order.productItems.length)}</Text>
                                     <Text>
                                         <FormattedNumber
                                             style="currency"
@@ -237,7 +251,9 @@ const AccountOrderHistory = () => {
                                         />
                                     </Text>
                                     <Text>
-                                        {messages.shippedTo(`${order.shipments[0].shippingAddress.firstName} ${order.shipments[0].shippingAddress.lastName}`)}
+                                        {messages.shippedTo(
+                                            `${order.shipments[0].shippingAddress.firstName} ${order.shipments[0].shippingAddress.lastName}`
+                                        )}
                                     </Text>
                                 </Stack>
                             </Stack>

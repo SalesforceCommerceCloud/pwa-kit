@@ -31,7 +31,7 @@ const Sort = ({sortUrls, productSearchResult, basePath, ...otherProps}) => {
                 id: 'product_list.select.sort_by',
                 defaultMessage: 'Sort By: {sortOption}'
             },
-            { sortOption }
+            {sortOption}
         )
     }
 

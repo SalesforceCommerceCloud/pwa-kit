@@ -14,15 +14,15 @@ import DisplayPrice from '../display-price'
 
 const PricePerItem = ({currency, basePrice}) => {
     const {formatMessage} = useIntl()
-    
+
     const messages = {
         each: formatMessage({
-            defaultMessage: "ea",
-            id: "price_per_item.label.each",
+            defaultMessage: 'ea',
+            id: 'price_per_item.label.each',
             description: "Abbreviated 'each', follows price per item, like $10/ea"
         })
     }
-    
+
     return (
         <Text fontSize={{base: '12px', lg: '14px'}}>
             <FormattedNumber style="currency" currency={currency} value={basePrice} />

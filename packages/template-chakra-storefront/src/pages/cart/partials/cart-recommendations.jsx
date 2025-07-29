@@ -21,12 +21,12 @@ const CartRecommendations = ({basket}) => {
 
     const messages = {
         recentlyViewed: formatMessage({
-            id: "cart.recommended_products.title.recently_viewed",
-            defaultMessage: "Recently Viewed"
+            id: 'cart.recommended_products.title.recently_viewed',
+            defaultMessage: 'Recently Viewed'
         }),
         mayAlsoLike: formatMessage({
-            id: "cart.recommended_products.title.may_also_like",
-            defaultMessage: "You May Also Like"
+            id: 'cart.recommended_products.title.may_also_like',
+            defaultMessage: 'You May Also Like'
         })
     }
 

@@ -28,27 +28,33 @@ const QuantityPicker = (props) => {
 
     const {productName, ...rest} = props
     const styles = recipe()
-    
+
     const messages = {
-        decrementLabel: formatMessage({
-            defaultMessage: 'Decrement Quantity for {productName}',
-            id: 'product_view.label.assistive_msg.quantity_decrement'
-        }, {productName}),
+        decrementLabel: formatMessage(
+            {
+                defaultMessage: 'Decrement Quantity for {productName}',
+                id: 'product_view.label.assistive_msg.quantity_decrement'
+            },
+            {productName}
+        ),
         decrementSymbol: formatMessage({
-            id: "product_view.label.quantity_decrement",
+            id: 'product_view.label.quantity_decrement',
             defaultMessage: '\u2212' // HTML &minus;
         }),
         quantityLabel: formatMessage({
             defaultMessage: 'Quantity',
             id: 'product_view.label.quantity'
         }),
-        incrementLabel: formatMessage({
-            defaultMessage: 'Increment Quantity for {productName}',
-            id: 'product_view.label.assistive_msg.quantity_increment'
-        }, {productName}),
+        incrementLabel: formatMessage(
+            {
+                defaultMessage: 'Increment Quantity for {productName}',
+                id: 'product_view.label.assistive_msg.quantity_increment'
+            },
+            {productName}
+        ),
         incrementSymbol: formatMessage({
-            id: "product_view.label.quantity_increment",
-            defaultMessage: "+"
+            id: 'product_view.label.quantity_increment',
+            defaultMessage: '+'
         })
     }
 

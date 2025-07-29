@@ -14,14 +14,18 @@ const CartTitle = () => {
     const {
         derivedData: {totalItems}
     } = useCurrentBasket()
-    
+
     const messages = {
-        title: formatMessage({
-            id: "cart_title.title.cart_num_of_items",
-            defaultMessage: "Cart ({itemCount, plural, =0 {0 items} one {# item} other {# items}})"
-        }, {itemCount: totalItems})
+        title: formatMessage(
+            {
+                id: 'cart_title.title.cart_num_of_items',
+                defaultMessage:
+                    'Cart ({itemCount, plural, =0 {0 items} one {# item} other {# items}})'
+            },
+            {itemCount: totalItems}
+        )
     }
-    
+
     return (
         <Heading as="h1" fontSize={['xl', 'xl', 'xl', '2xl']}>
             {messages.title}

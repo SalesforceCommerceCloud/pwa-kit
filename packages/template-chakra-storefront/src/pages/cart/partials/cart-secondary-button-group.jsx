@@ -69,20 +69,20 @@ const CartSecondaryButtonGroup = ({
 
     const messages = {
         remove: formatMessage({
-            id: "cart_secondary_button_group.action.remove",
-            defaultMessage: "Remove"
+            id: 'cart_secondary_button_group.action.remove',
+            defaultMessage: 'Remove'
         }),
         addToWishlist: formatMessage({
-            id: "cart_secondary_button_group.action.added_to_wishlist",
-            defaultMessage: "Add to Wishlist"
+            id: 'cart_secondary_button_group.action.added_to_wishlist',
+            defaultMessage: 'Add to Wishlist'
         }),
         edit: formatMessage({
-            id: "cart_secondary_button_group.action.edit",
-            defaultMessage: "Edit"
+            id: 'cart_secondary_button_group.action.edit',
+            defaultMessage: 'Edit'
         }),
         thisIsGift: formatMessage({
-            id: "cart_secondary_button_group.label.this_is_gift",
-            defaultMessage: "This is a gift."
+            id: 'cart_secondary_button_group.label.this_is_gift',
+            defaultMessage: 'This is a gift.'
         })
     }
 
@@ -131,9 +131,7 @@ const CartSecondaryButtonGroup = ({
                     >
                         <Checkbox.HiddenInput />
                         <Checkbox.Control />
-                        <Checkbox.Label>
-                            {messages.thisIsGift}
-                        </Checkbox.Label>
+                        <Checkbox.Label>{messages.thisIsGift}</Checkbox.Label>
                     </Checkbox.Root>
                     {/* if you want to provide a link to your gift site, uncomment this section and re-build your translation*/}
                     {/*<Box marginLeft={1}>*/}

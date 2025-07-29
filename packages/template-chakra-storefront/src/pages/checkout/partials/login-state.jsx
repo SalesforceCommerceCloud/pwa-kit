@@ -24,28 +24,28 @@ const LoginState = ({
 
     const messages = {
         orLoginWith: formatMessage({
-            id: "contact_info.message.or_login_with",
-            defaultMessage: "Or Login With"
+            id: 'contact_info.message.or_login_with',
+            defaultMessage: 'Or Login With'
         }),
         secureLink: formatMessage({
-            id: "contact_info.button.secure_link",
-            defaultMessage: "Secure Link"
+            id: 'contact_info.button.secure_link',
+            defaultMessage: 'Secure Link'
         }),
         password: formatMessage({
-            id: "contact_info.button.password",
-            defaultMessage: "Password"
+            id: 'contact_info.button.password',
+            defaultMessage: 'Password'
         }),
         backToSignInOptions: formatMessage({
-            id: "contact_info.button.back_to_sign_in_options",
-            defaultMessage: "Back to Sign In Options"
+            id: 'contact_info.button.back_to_sign_in_options',
+            defaultMessage: 'Back to Sign In Options'
         }),
         alreadyHaveAccount: formatMessage({
-            id: "contact_info.button.already_have_account",
-            defaultMessage: "Already have an account? Log in"
+            id: 'contact_info.button.already_have_account',
+            defaultMessage: 'Already have an account? Log in'
         }),
         checkoutAsGuest: formatMessage({
-            id: "contact_info.button.checkout_as_guest",
-            defaultMessage: "Checkout as Guest"
+            id: 'contact_info.button.checkout_as_guest',
+            defaultMessage: 'Checkout as Guest'
         })
     }
 

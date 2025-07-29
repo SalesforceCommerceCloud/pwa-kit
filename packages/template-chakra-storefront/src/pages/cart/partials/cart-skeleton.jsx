@@ -44,12 +44,12 @@ const CartSkeleton = () => {
 
     const messages = {
         cart: formatMessage({
-            id: "cart_skeleton.title.cart",
-            defaultMessage: "Cart"
+            id: 'cart_skeleton.title.cart',
+            defaultMessage: 'Cart'
         }),
         orderSummary: formatMessage({
-            id: "cart_skeleton.heading.order_summary",
-            defaultMessage: "Order Summary"
+            id: 'cart_skeleton.heading.order_summary',
+            defaultMessage: 'Order Summary'
         })
     }
 

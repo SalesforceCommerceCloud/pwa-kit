@@ -190,11 +190,7 @@ const ContactInfo = ({isSocialEnabled = false, isPasswordlessEnabled = false, id
                     goToStep(STEPS.CONTACT_INFO)
                 }
             }}
-            editLabel={
-                customer.isRegistered
-                    ? messages.signOut
-                    : messages.editContactInfo
-            }
+            editLabel={customer.isRegistered ? messages.signOut : messages.editContactInfo}
         >
             <ToggleCardEdit>
                 <Container variant="form">
@@ -280,7 +276,8 @@ const SignOutConfirmationDialog = ({isOpen, onConfirm, onClose}) => {
         }),
         confirmMessage: formatMessage({
             id: 'signout_confirmation_dialog.message.sure_to_sign_out',
-            defaultMessage: 'Are you sure you want to sign out? You will need to sign back in to proceed with your current order.'
+            defaultMessage:
+                'Are you sure you want to sign out? You will need to sign back in to proceed with your current order.'
         }),
         cancel: formatMessage({
             id: 'signout_confirmation_dialog.button.cancel',
@@ -309,9 +306,7 @@ const SignOutConfirmationDialog = ({isOpen, onConfirm, onClose}) => {
                             </Dialog.Title>
                         </Dialog.Header>
 
-                        <Dialog.Body>
-                            {messages.confirmMessage}
-                        </Dialog.Body>
+                        <Dialog.Body>{messages.confirmMessage}</Dialog.Body>
 
                         <Dialog.Footer>
                             <Dialog.ActionTrigger asChild>
