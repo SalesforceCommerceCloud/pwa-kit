@@ -135,7 +135,7 @@ Total files: 222
 - [x] src/components/toaster/index.jsx
 - [x] src/components/toggle-card/index.jsx
 - [x] src/components/tooltip/index.jsx
-- [ ] src/components/unavailable-product-confirmation-modal/index.jsx
+- [x] src/components/unavailable-product-confirmation-modal/index.jsx
 - [ ] src/components/with-commerce-sdk-react-hook-data/index.js
 - [ ] src/components/with-commerce-sdk-react-hook-data/with-commerce-sdk-react-hook-data.jsx
 - [ ] src/components/with-commerce-sdk-react/index.js
