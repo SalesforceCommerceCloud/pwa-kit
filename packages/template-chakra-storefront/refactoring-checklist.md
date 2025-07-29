@@ -79,7 +79,7 @@ Total files: 222
 - [x] src/components/item-variant/item-attributes.jsx
 - [x] src/components/item-variant/item-image.jsx
 - [x] src/components/item-variant/item-name.jsx
-- [ ] src/components/item-variant/item-price.jsx
+- [x] src/components/item-variant/item-price.jsx
 - [ ] src/components/link/index.jsx
 - [ ] src/components/links-list/index.jsx
 - [ ] src/components/list-menu/index.js
@@ -90,7 +90,7 @@ Total files: 222
 - [ ] src/components/loading-spinner/index.jsx
 - [ ] src/components/locale-selector/index.jsx
 - [ ] src/components/locale-text/index.jsx
-- [ ] src/components/login/index.jsx
+- [x] src/components/login/index.jsx
 - [ ] src/components/nested-accordion/index.jsx
 - [ ] src/components/offline-banner/index.jsx
 - [ ] src/components/offline-boundary/index.jsx
@@ -98,14 +98,14 @@ Total files: 222
 - [ ] src/components/page-action-placeholder/index.jsx
 - [ ] src/components/pagination/index.jsx
 - [ ] src/components/passwordless-login/index.jsx
-- [ ] src/components/product-item/index.jsx
+- [x] src/components/product-item/index.jsx
 - [ ] src/components/product-scroller/index.jsx
 - [ ] src/components/product-tile/index.jsx
 - [ ] src/components/product-tile/promo-callout.jsx
 - [ ] src/components/product-tile/promo-callout.mock.js
 - [ ] src/components/product-view-modal/bundle.jsx
 - [ ] src/components/product-view-modal/index.jsx
-- [ ] src/components/product-view/index.jsx
+- [x] src/components/product-view/index.jsx
 - [ ] src/components/promo-code/index.jsx
 - [ ] src/components/promo-popover/index.jsx
 - [x] src/components/quantity-picker/index.jsx
@@ -125,7 +125,7 @@ Total files: 222
 - [ ] src/components/skip-nav/index.tsx
 - [ ] src/components/social-icons/index.jsx
 - [ ] src/components/social-login/index.jsx
-- [ ] src/components/standard-login/index.jsx
+- [x] src/components/standard-login/index.jsx
 - [ ] src/components/store-locator-modal/index.jsx
 - [ ] src/components/store-locator-modal/store-locator-content.jsx
 - [ ] src/components/store-locator-modal/store-locator-input.jsx
