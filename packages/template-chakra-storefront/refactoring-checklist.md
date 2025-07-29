@@ -42,7 +42,7 @@ Total files: 222
 - [ ] src/components/display-price/index.jsx
 - [ ] src/components/display-price/list-price.jsx
 - [ ] src/components/display-price/messages.js
-- [ ] src/components/drawer-menu/drawer-menu.jsx
+- [x] src/components/drawer-menu/drawer-menu.jsx
 - [ ] src/components/drawer-menu/index.js
 - [ ] src/components/dynamic-image/index.jsx
 - [ ] src/components/email-confirmation/index.jsx
