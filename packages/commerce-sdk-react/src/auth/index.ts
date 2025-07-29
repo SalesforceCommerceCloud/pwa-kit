@@ -508,21 +508,37 @@ class Auth {
             const {isGuest, customerId, usid} = this.parseSlasJWT(sfraAuthToken)
 
             /**
-             * If a token exists, handleTokenResponse will be called to set the data in storage.
-             * The refresh_token_expires_in will already be set based on whether overridesValue, responseValue or defaultValue is set.
-             * We can use this value to set the usid expiration but if the value is missing from storage we need to re-evaluate the correct value.
-             * So we call getRefreshTokenCookieTTLValue again.
+             * This if block is only executed in a hybrid setup when the cc-at cookie is set.
+             * If the login state of the shopper changes on SFRA, the "refresh_token_expires_in"
+             * will change and the updated value is not propagated back to PWA Kit via cookies or cc-at token.
+             * This results in the "refresh_token_expires_in" to be incorrect so we can't read it from localStorage.
+             * We must instead read the login state by decoding the cc-at token and rely on the default values for the guest or registered user.
+             * This in worst cases will cause the usid cookie to expire a few hours after the refreshToken which should be acceptable given
+             * a few hours are insignificant compared tothe overall validty of the refreshToken.
              */
+            const refreshTokenExpiresIn = isGuest
+                ? DEFAULT_SLAS_REFRESH_TOKEN_GUEST_TTL
+                : DEFAULT_SLAS_REFRESH_TOKEN_REGISTERED_TTL
             const refreshTokenTTLValue = this.getRefreshTokenCookieTTLValue(
-                parseInt(this.get('refresh_token_expires_in')),
+                refreshTokenExpiresIn,
                 isGuest
             )
             const expiresDate = this.convertSecondsToDate(refreshTokenTTLValue)
             this.set('access_token', sfraAuthToken)
             this.set('customer_id', customerId)
-            this.set('usid', usid, {
-                expires: expiresDate
-            })
+
+            /**
+             * The usid cookie always set when session bridging in a hybrid setup. This makes resetting the usid
+             * cookie here redundant. However, if the usid cookie is not set, we can have a fallback to read the usid from the accesstoken and set it.
+             * Setting the usid cookie conditionally ensures the usid is always set and minimizes the discrepancy between usid cookie and refresh_token cookie expiration.
+             */
+            const usidCookieValue = this.get('usid')
+            if (!usidCookieValue || usidCookieValue !== usid) {
+                this.set('usid', usid, {
+                    expires: expiresDate
+                })
+            }
+
             this.set('customer_type', isGuest ? 'guest' : 'registered')
 
             accessToken = sfraAuthToken
@@ -787,21 +803,35 @@ class Auth {
             const {isGuest, customerId, usid} = this.parseSlasJWT(this.fetchedToken)
 
             /**
-             * If a token exists, handleTokenResponse will be called to set the data in storage.
-             * The refresh_token_expires_in wil already be set based on whether overridesValue, responseValue or defaultValue is set.
-             * We can use this value to set the usid expiration but if the value is missing from storage we need to re-evaluate the correct value.
-             * So we call getRefreshTokenCookieTTLValue again.
+             * If the login state of the shopper changes on SFRA, the "refresh_token_expires_in"
+             * will change and the updated value is not propagated back to PWA Kit via cookies or cc-at token.
+             * This results in the "refresh_token_expires_in" to be incorrect so we can't read it from localStorage.
+             * We must instead read the login state by decoding the cc-at token and rely on the default values for the guest or registered user.
+             * This in worst cases will cause the usid cookie to expire a few hours after the refreshToken which should be acceptable given
+             * a few hours are insignificant compared tothe overall validty of the refreshToken.
              */
+            const refreshTokenExpiresIn = isGuest
+                ? DEFAULT_SLAS_REFRESH_TOKEN_GUEST_TTL
+                : DEFAULT_SLAS_REFRESH_TOKEN_REGISTERED_TTL
             const refreshTokenTTLValue = this.getRefreshTokenCookieTTLValue(
-                parseInt(this.get('refresh_token_expires_in')),
+                refreshTokenExpiresIn,
                 isGuest
             )
             const expiresDate = this.convertSecondsToDate(refreshTokenTTLValue)
             this.set('access_token', this.fetchedToken)
             this.set('customer_id', customerId)
-            this.set('usid', usid, {
-                expires: expiresDate
-            })
+
+             /**
+             * The usid cookie always set when setting up auth in pure composable env or session bridging in a hybrid setup. This makes resetting the usid
+             * cookie here redundant. However, if the usid cookie is not set, we can have a fallback to read the usid from the accesstoken and set it.
+             * Setting the usid cookie conditionally ensures the usid is always set and minimizes the discrepancy between usid cookie and refresh_token cookie expiration.
+             */
+             const usidCookieValue = this.get('usid')
+             if (!usidCookieValue || usidCookieValue !== usid) {
+                 this.set('usid', usid, {
+                     expires: expiresDate
+                 })
+             }
             this.set('customer_type', isGuest ? 'guest' : 'registered')
             return this.data
         }
