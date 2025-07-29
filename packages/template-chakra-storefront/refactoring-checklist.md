@@ -91,7 +91,7 @@ Total files: 222
 - [x] src/components/locale-selector/index.jsx
 - [x] src/components/locale-text/index.jsx
 - [x] src/components/login/index.jsx
-- [ ] src/components/nested-accordion/index.jsx
+- [x] src/components/nested-accordion/index.jsx
 - [ ] src/components/offline-banner/index.jsx
 - [ ] src/components/offline-boundary/index.jsx
 - [ ] src/components/order-summary/index.jsx
