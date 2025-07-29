@@ -37,8 +37,6 @@ const useRefreshToken = () => {
                 })
         }
     }, [auth, customerType, refreshToken])
-    console.log('readyToken::::', refreshToken, readyToken);
-
     // Return refreshToken if available, otherwise return readyToken, ensuring we never return undefined
     return refreshToken || readyToken
 }
