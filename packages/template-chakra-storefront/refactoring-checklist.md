@@ -13,7 +13,7 @@ Total files: 222
 
 ## Files to refactor:
 
-- [ ] src/components/_app-config/index.jsx
+- [x] src/components/_app-config/index.jsx
 - [ ] src/components/_app/hooks/index.js
 - [ ] src/components/_app/hooks/use-app-analytics.js
 - [ ] src/components/_app/hooks/use-app-auth.js
