@@ -6,7 +6,7 @@
  */
 import React, {useCallback} from 'react'
 import PropTypes from 'prop-types'
-import {FormattedMessage} from 'react-intl'
+import {useIntl} from 'react-intl'
 import {Button, Stack, Text, SimpleGrid, Field} from '@chakra-ui/react'
 import {PlusIcon} from '../../../components/icons'
 import {RadioCard, RadioCardGroup} from '../../../components/radio-card'
@@ -21,7 +21,15 @@ const CCRadioGroup = ({
     togglePaymentEdit = () => null,
     onPaymentIdChange = () => null
 }) => {
+    const {formatMessage} = useIntl()
     const {data: customer} = useCurrentCustomer()
+
+    const messages = {
+        addNewCard: formatMessage({
+            id: 'cc_radio_group.button.add_new_card',
+            defaultMessage: 'Add New Card'
+        })
+    }
 
     const handleValueChange = useCallback(
         (selected) => {
@@ -94,10 +102,7 @@ const CCRadioGroup = ({
                                 onClick={togglePaymentEdit}
                             >
                                 <PlusIcon boxSize="15px" />
-                                <FormattedMessage
-                                    defaultMessage="Add New Card"
-                                    id="cc_radio_group.button.add_new_card"
-                                />
+                                {messages.addNewCard}
                             </Button>
                         )}
                     </SimpleGrid>
