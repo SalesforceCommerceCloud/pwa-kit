@@ -4,6 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
+import React, {useMemo} from 'react'
 import {useIntl} from 'react-intl'
 import {validatePassword} from '../../utils/password-utils'
 
@@ -14,9 +15,10 @@ export default function useRegistrationFields({
     },
     prefix = ''
 }) {
-    const {formatMessage} = useIntl()
+    const intl = useIntl()
+    const {formatMessage} = intl
 
-    const messages = {
+    const messages = useMemo(() => ({
         firstNameLabel: formatMessage({
             defaultMessage: 'First Name',
             id: 'use_registration_fields.label.first_name'
@@ -73,7 +75,7 @@ export default function useRegistrationFields({
             defaultMessage: 'Password must contain at least one special character.',
             id: 'use_registration_fields.error.special_character'
         })
-    }
+    }), [intl])
 
     const fields = {
         firstName: {
