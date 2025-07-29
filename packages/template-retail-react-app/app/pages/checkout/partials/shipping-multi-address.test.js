@@ -66,10 +66,8 @@ const mockGoToStep = jest.fn()
 const mockShowToast = jest.fn()
 
 beforeEach(() => {
-    // Reset all mocks before each test
     jest.clearAllMocks()
 
-    // Setup default mock implementations that are used across all tests
     useCheckout.mockReturnValue({
         STEPS: {
             SHIPPING_OPTIONS: 'SHIPPING_OPTIONS'
@@ -79,7 +77,6 @@ beforeEach(() => {
 
     useToast.mockReturnValue(mockShowToast)
 
-    // You can also add other common mocks here if they're used in most tests
     useMultiship.mockReturnValue({
         findDeliveryShipmentWithSameAddress: jest.fn(),
         createNewDeliveryShipmentWithAddress: jest.fn(),
