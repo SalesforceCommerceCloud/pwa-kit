@@ -348,7 +348,8 @@ const PRESETS = [
             'project.selectedPlugins.SFDC_EXT_WISHLIST': true
         },
         assets: ['translations'],
-        private: true
+        private: true,
+        extensions: ['SFDC_EXT_STORE_LOCATOR']
     },
     {
         id: 'chakra-storefront-private-slas-client',
@@ -905,14 +906,14 @@ const main = async (opts) => {
                 value: key
             }))
 
-            const pluginAnswers = await inquirer.prompt([
-                {
-                    type: 'checkbox',
-                    name: 'selectedPlugins',
-                    message: 'Which extensions would you like to enable?',
-                    choices: pluginChoices
-                }
-            ])
+        const pluginAnswers = context.preset?.extensions ? {selectedPlugins: context.preset.extensions} : await inquirer.prompt([
+            {
+                type: 'checkbox',
+                name: 'selectedPlugins',
+                message: 'Which extensions would you like to enable?',
+                choices: pluginChoices
+            }
+        ])
 
             // Convert selected plugins array to object with true values
             pluginAnswers.selectedPlugins.forEach((plugin) => {
