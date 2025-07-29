@@ -39,7 +39,7 @@ const StoreLocatorContent = () => {
         setUserHasSetManualGeolocation
     } = useContext(StoreLocatorContext)
     const {countryCode, postalCode, latitude, longitude, limit} = searchStoresParams
-    const intl = useIntl()
+    const {formatMessage, locale} = useIntl()
     const form = useForm({
         mode: 'onChange',
         reValidateMode: 'onChange',
@@ -50,6 +50,40 @@ const StoreLocatorContent = () => {
     })
 
     const [numStoresToShow, setNumStoresToShow] = useState(limit)
+
+    const messages = {
+        title: formatMessage({
+            id: 'store_locator.title',
+            defaultMessage: 'Find a Store'
+        }),
+        status: {
+            loading: formatMessage({
+                id: 'store_locator.description.loading_locations',
+                defaultMessage: 'Loading locations...'
+            }),
+            noLocations: formatMessage({
+                id: 'store_locator.description.no_locations',
+                defaultMessage: 'Sorry, there are no locations in this area'
+            }),
+            viewingNearPostalCode: formatMessage({
+                id: 'store_locator.description.viewing_near_postal_code',
+                defaultMessage: 'Viewing stores within {distance}{distanceUnit} of {postalCode} in '
+            }, {
+                distance: STORE_LOCATOR_DISTANCE,
+                distanceUnit: STORE_LOCATOR_DISTANCE_UNIT,
+                postalCode: searchStoresParams.postalCode
+            }),
+            viewingNearLocation: formatMessage({
+                id: 'store_locator.description.viewing_near_your_location',
+                defaultMessage: 'Viewing stores near your location'
+            })
+        },
+        loadMore: formatMessage({
+            id: 'store_locator.pagination.load_more',
+            defaultMessage: 'Load More'
+        })
+    }
+
     // Either the countryCode & postalCode or latitude & longitude are defined, never both
     const {
         data: searchStoresData,
@@ -62,7 +96,7 @@ const StoreLocatorContent = () => {
             postalCode: postalCode,
             latitude: latitude,
             longitude: longitude,
-            locale: intl.locale,
+            locale: locale,
             maxDistance: STORE_LOCATOR_DISTANCE,
             limit: NUM_STORES_PER_REQUEST_API_MAX,
             distanceUnit: STORE_LOCATOR_DISTANCE_UNIT
@@ -105,51 +139,28 @@ const StoreLocatorContent = () => {
 
     const displayStoreLocatorStatusMessage = () => {
         if (storesInfo === undefined)
-            return intl.formatMessage({
-                id: 'store_locator.description.loading_locations',
-                defaultMessage: 'Loading locations...'
-            })
+            return messages.status.loading
         if (storesInfo.length === 0)
-            return intl.formatMessage({
-                id: 'store_locator.description.no_locations',
-                defaultMessage: 'Sorry, there are no locations in this area'
-            })
+            return messages.status.noLocations
         if (searchStoresParams.postalCode !== undefined)
-            return `${intl.formatMessage(
-                {
-                    id: 'store_locator.description.viewing_near_postal_code',
-                    defaultMessage:
-                        'Viewing stores within {distance}{distanceUnit} of {postalCode} in '
-                },
-                {
-                    distance: STORE_LOCATOR_DISTANCE,
-                    distanceUnit: STORE_LOCATOR_DISTANCE_UNIT,
-                    postalCode: searchStoresParams.postalCode
-                }
-            )}
+            return `${messages.status.viewingNearPostalCode}
                 ${
                     SUPPORTED_STORE_LOCATOR_COUNTRIES.length !== 0
-                        ? intl.formatMessage(
+                        ? formatMessage(
                               SUPPORTED_STORE_LOCATOR_COUNTRIES.find(
                                   (o) => o.countryCode === searchStoresParams.countryCode
                               ).countryName
                           )
-                        : intl.formatMessage(DEFAULT_STORE_LOCATOR_COUNTRY.countryName)
+                        : formatMessage(DEFAULT_STORE_LOCATOR_COUNTRY.countryName)
                 }`
         else
-            return intl.formatMessage({
-                id: 'store_locator.description.viewing_near_your_location',
-                defaultMessage: 'Viewing stores near your location'
-            })
+            return messages.status.viewingNearLocation
     }
 
     return (
         <>
             <Heading fontSize="2xl" style={{marginBottom: '25px'}}>
-                {intl.formatMessage({
-                    id: 'store_locator.title',
-                    defaultMessage: 'Find a Store'
-                })}
+                {messages.title}
             </Heading>
             <StoreLocatorInput form={form} submitForm={submitForm}></StoreLocatorInput>
             <Accordion allowMultiple flex={[1, 1, 1, 5]}>
@@ -189,10 +200,7 @@ const StoreLocatorContent = () => {
                         variant="outline"
                         marginBottom={4}
                     >
-                        {intl.formatMessage({
-                            id: 'store_locator.pagination.load_more',
-                            defaultMessage: 'Load More'
-                        })}
+                        {messages.loadMore}
                     </Button>
                 </Box>
             ) : (

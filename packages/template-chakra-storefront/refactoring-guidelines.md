@@ -13,7 +13,7 @@ git commit -m "refactor translations in {RELATIVE_FILE_PATH}"
 
 # when you go over a file and that file requires no changes, do
 git add --all
-git commit -m "update refactoring-checklist.md"
+git commit -m "update refactoring-checklist.md" # do not co-sign the commit or change the commit message
 ```
 
 Here is the task: we are going to standardize the translation implementation inside all React.js components.
