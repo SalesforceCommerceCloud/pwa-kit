@@ -20,22 +20,6 @@ module.exports = {
             siteId: 'RefArchGlobal'
         }
     },
-    ssrEnabled: true,
-    ssrOnly: ['ssr.js', 'ssr.js.map', 'node_modules/**/*.*'],
-    ssrShared: ['static/favicon.ico', 'static/robots.txt', '**/*.js', '**/*.js.map', '**/*.json'],
-    ssrParameters: {
-        ssrFunctionNodeVersion: '22.x',
-        proxyConfigs: [
-            {
-                host: 'kv7kzm78.api.commercecloud.salesforce.com',
-                path: 'api'
-            },
-            {
-                host: 'zzrf-001.dx.commercecloud.salesforce.com',
-                path: 'ocapi'
-            }
-        ]
-    },
     defaultSite: 'RefArchGlobal',
     defaultAppLocale: 'en-US',
     defaultSiteTitle: 'Chakra Storefront',
@@ -203,6 +187,22 @@ module.exports = {
             }
         }
     ],
+    ssrEnabled: true,
+    ssrOnly: ['ssr.js', 'ssr.js.map', 'node_modules/**/*.*'],
+    ssrShared: ['static/favicon.ico', 'static/robots.txt', '**/*.js', '**/*.js.map', '**/*.json'],
+    ssrParameters: {
+        ssrFunctionNodeVersion: '22.x',
+        proxyConfigs: [
+            {
+                host: 'kv7kzm78.api.commercecloud.salesforce.com',
+                path: 'api'
+            },
+            {
+                host: 'zzrf-001.dx.commercecloud.salesforce.com',
+                path: 'ocapi'
+            }
+        ]
+    },
     staleWhileRevalidate: 900,
     url: {
         site: 'path',

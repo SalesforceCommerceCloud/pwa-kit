@@ -20,28 +20,6 @@ module.exports = {
             siteId: '{{answers.project.commerce.siteId}}'
         }
     },
-    ssrEnabled: true,
-    ssrOnly: ['ssr.js', 'ssr.js.map', 'node_modules/**/*.*'],
-    ssrShared: [
-        'static/favicon.ico',
-        'static/robots.txt',
-        '**/*.js',
-        '**/*.js.map',
-        '**/*.json'
-    ],
-    ssrParameters: {
-        ssrFunctionNodeVersion: '22.x',
-        proxyConfigs: [
-            {
-                host: '{{answers.project.commerce.shortCode}}.api.commercecloud.salesforce.com',
-                path: 'api'
-            }{{~#if answers.project.commerce.instanceUrl}},
-            {
-                host: '{{answers.project.commerce.instanceUrl}}',
-                path: 'ocapi'
-            }{{/if}}
-        ]
-    },
     defaultSite: '{{answers.project.commerce.siteId}}',
     defaultAppLocale: 'en-US',
     defaultSiteTitle: 'Chakra Storefront',
@@ -208,6 +186,28 @@ module.exports = {
             {{/if}}
         }
     ],
+    ssrEnabled: true,
+    ssrOnly: ['ssr.js', 'ssr.js.map', 'node_modules/**/*.*'],
+    ssrShared: [
+        'static/favicon.ico',
+        'static/robots.txt',
+        '**/*.js',
+        '**/*.js.map',
+        '**/*.json'
+    ],
+    ssrParameters: {
+        ssrFunctionNodeVersion: '22.x',
+        proxyConfigs: [
+            {
+                host: '{{answers.project.commerce.shortCode}}.api.commercecloud.salesforce.com',
+                path: 'api'
+            }{{~#if answers.project.commerce.instanceUrl}},
+            {
+                host: '{{answers.project.commerce.instanceUrl}}',
+                path: 'ocapi'
+            }{{/if}}
+        ]
+    },
     staleWhileRevalidate: 900,
     url: {
         site: '{{#if answers.project.demo.enableDemoSettings}}path{{else}}none{{/if}}',
@@ -215,4 +215,4 @@ module.exports = {
         showDefaults: {{#if answers.project.demo.enableDemoSettings}}true{{else}}false{{/if}},
         interpretPlusSignAsSpace: false
     }
-} 
+}
