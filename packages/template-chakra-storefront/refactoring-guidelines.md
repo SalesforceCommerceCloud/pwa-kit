@@ -146,6 +146,8 @@ always deconstruct the objects
 const intl = useIntl()
 const { formatMessage } = intl
 
+always call `formatMessage` instead of using `intl.formatMessage`, but use `[intl]` as the dependency array of useMemo
+
 Also, include "useMemo" in your commit message!
 
 Example:

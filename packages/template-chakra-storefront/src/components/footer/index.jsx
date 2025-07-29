@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React, {useState} from 'react'
+import React, {useState, useMemo} from 'react'
 import PropTypes from 'prop-types'
 import {
     Box,
@@ -40,7 +40,7 @@ const Footer = ({...otherProps}) => {
     const supportedLocaleIds = l10n?.supportedLocales.map((locale) => locale.id)
     const showLocaleSelector = supportedLocaleIds?.length > 1
 
-    const messages = {
+    const messages = useMemo(() => ({
         columns: {
             customerSupport: formatMessage({
                 id: 'footer.column.customer_support',
@@ -86,7 +86,7 @@ const Footer = ({...otherProps}) => {
             defaultMessage:
                 'Salesforce or its affiliates. All rights reserved. This is a demo store only. Orders made WILL NOT be processed.'
         })
-    }
+    }), [intl])
 
     const makeOurCompanyLinks = () => {
         const links = []
@@ -200,7 +200,7 @@ const Subscribe = ({...otherProps}) => {
     const intl = useIntl()
     const {formatMessage} = intl
 
-    const messages = {
+    const messages = useMemo(() => ({
         heading: formatMessage({
             id: 'footer.subscribe.heading.first_to_know',
             defaultMessage: 'Be the first to know'
@@ -217,7 +217,7 @@ const Subscribe = ({...otherProps}) => {
             id: 'footer.subscribe.button.sign_up',
             defaultMessage: 'Sign Up'
         })
-    }
+    }), [intl])
 
     return (
         <Box css={styles.subscribe} {...otherProps}>
@@ -248,7 +248,7 @@ const LegalLinks = ({variant}) => {
     const intl = useIntl()
     const {formatMessage} = intl
 
-    const messages = {
+    const messages = useMemo(() => ({
         termsConditions: formatMessage({
             id: 'footer.link.terms_conditions',
             defaultMessage: 'Terms & Conditions'
@@ -261,7 +261,7 @@ const LegalLinks = ({variant}) => {
             id: 'footer.link.site_map',
             defaultMessage: 'Site Map'
         })
-    }
+    }), [intl])
 
     return (
         <LinksList
