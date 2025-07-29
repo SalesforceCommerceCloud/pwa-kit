@@ -226,7 +226,7 @@ Total files: 222
 - [x] src/pages/product-list/partials/product-list-title.jsx
 - [x] src/pages/product-list/partials/radio-refinements.jsx
 - [x] src/pages/product-list/partials/refinements-utils.js
-- [ ] src/pages/product-list/partials/refinements.jsx
+- [x] src/pages/product-list/partials/refinements.jsx
 - [ ] src/pages/product-list/partials/selected-refinements.jsx
 - [ ] src/pages/product-list/partials/size-refinements.jsx
 - [ ] src/pages/product-list/partials/sort.jsx
