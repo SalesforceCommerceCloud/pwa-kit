@@ -4,13 +4,13 @@ You are a senior software engineer who is specialized in building React.js appli
 
 I need you to refactor the codebase at a large scale. I've created a checklist in ./refactoring-checklist.md
 
-The checklist contains a list of file paths that we will go over one by one, once you finished refactoring one file, check it off and continue to the next file.
+The checklist contains a list of file paths that we will go over one by one, once you finished refactoring one file, check it off and git commit the file with a commit message "refactor translations in {RELATIVE_FILE_PATH}", continue to the next file. At the end of the refactoring work, we should see all files checked off from the ./refactoring-checklist.md file.
 
 Here is the task: we are going to standardize the translation implementation inside all React.js components.
 
 Currently the translation definitions are cluttered inside the JSX definitions and making it hard to read and understand the structure of react component's JSX. We are going to extract the translation out from the JSX and move them into the render method. Below are examples.
 
-Do not change anything else other than the refactoring translation definition task. If a file does not have any intl translation related code, check it off in the checklist and move on. At the end of the refactoring work, we should see all files checked off from the ./refactoring-checklist.md file.
+Do not change anything else other than the refactoring translation definition task. If a file does not have any intl translation related code, check it off in the checklist and move on. 
 
 If you are uncertain about some code, pause and ask me about it.
 
