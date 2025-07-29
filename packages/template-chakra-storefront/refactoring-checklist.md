@@ -22,7 +22,7 @@ Total files: 97
 - [x] src/components/forms/promo-code-fields.jsx
 - [x] src/components/forms/update-password-fields.jsx
 - [x] src/components/forms/useLoginFields.jsx
-- [ ] src/components/forms/useProfileFields.jsx
+- [x] src/components/forms/useProfileFields.jsx
 - [ ] src/components/forms/usePromoCodeFields.jsx
 - [ ] src/components/forms/useRegistrationFields.jsx
 - [ ] src/components/forms/useResetPasswordFields.jsx

@@ -4,6 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
+import React, {useMemo} from 'react'
 import {useIntl} from 'react-intl'
 import {formatPhoneNumber} from '../../utils/phone-utils'
 
@@ -14,9 +15,10 @@ export default function useProfileFields({
     },
     prefix = ''
 }) {
-    const {formatMessage} = useIntl()
+    const intl = useIntl()
+    const {formatMessage} = intl
 
-    const messages = {
+    const messages = useMemo(() => ({
         firstNameLabel: formatMessage({
             defaultMessage: 'First Name',
             id: 'use_profile_fields.label.first_name'
@@ -46,7 +48,7 @@ export default function useProfileFields({
             defaultMessage: 'Please enter your phone number.',
             id: 'use_profile_fields.error.required_phone'
         })
-    }
+    }), [intl])
 
     const fields = {
         firstName: {
