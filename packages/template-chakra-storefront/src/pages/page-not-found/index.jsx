@@ -15,25 +15,25 @@ import {useHistory} from 'react-router-dom'
 import Link from '../../components/link'
 
 const PageNotFound = () => {
-    const intl = useIntl()
+    const {formatMessage} = useIntl()
     const history = useHistory()
     const {res} = useServerContext()
 
     const messages = {
-        pageTitle: intl.formatMessage({
+        pageTitle: formatMessage({
             id: 'page_not_found.title.page_cant_be_found',
             defaultMessage: "The page you're looking for can't be found."
         }),
-        suggestionToTry: intl.formatMessage({
+        suggestionToTry: formatMessage({
             id: 'page_not_found.message.suggestion_to_try',
             defaultMessage:
                 'Please try retyping the address, going back to the previous page, or going to the home page.'
         }),
-        goBack: intl.formatMessage({
+        goBack: formatMessage({
             id: 'page_not_found.action.go_back',
             defaultMessage: 'Back to previous page'
         }),
-        goToHomepage: intl.formatMessage({
+        goToHomepage: formatMessage({
             id: 'page_not_found.link.homepage',
             defaultMessage: 'Go to home page'
         })
