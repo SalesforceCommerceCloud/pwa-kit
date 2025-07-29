@@ -8,7 +8,7 @@
 import React, {Children, useCallback, useEffect, useRef, useState} from 'react'
 import PropTypes from 'prop-types'
 import {Box, Flex, HStack, useSlotRecipe} from '@chakra-ui/react'
-import {FormattedMessage} from 'react-intl'
+import {useIntl} from 'react-intl'
 import {noop} from '../../utils/utils'
 
 const DIRECTIONS = {
@@ -27,6 +27,14 @@ const SwatchGroup = (props) => {
     const styles = recipe()
     const [selectedIndex, setSelectedIndex] = useState(0)
     const wrapperRef = useRef(null)
+    const {formatMessage} = useIntl()
+
+    const messages = {
+        selectedLabel: formatMessage({
+            id: "swatch_group.selected.label",
+            defaultMessage: "{label}:"
+        }, {label})
+    }
 
     // Handle keyboard navigation.
     const onKeyDown = useCallback(
@@ -90,11 +98,7 @@ const SwatchGroup = (props) => {
                 {label && (
                     <HStack css={styles.swatchLabel}>
                         <Box fontWeight="semibold">
-                            <FormattedMessage
-                                id="swatch_group.selected.label"
-                                defaultMessage="{label}:"
-                                values={{label}}
-                            />
+                            {messages.selectedLabel}
                         </Box>
                         <Box>{displayName}</Box>
                     </HStack>
