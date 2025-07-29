@@ -205,8 +205,8 @@ Total files: 222
 - [x] src/pages/product-detail/partials/product-details.jsx
 - [x] src/pages/product-detail/partials/recommended-products-section.jsx
 - [x] src/pages/product-detail/use-product-detail-data.js
-- [ ] src/pages/product-list/hooks/use-product-list-controls.js
-- [ ] src/pages/product-list/hooks/use-product-list-data.js
+- [x] src/pages/product-list/hooks/use-product-list-controls.js
+- [x] src/pages/product-list/hooks/use-product-list-data.js
 - [ ] src/pages/product-list/index.jsx
 - [ ] src/pages/product-list/page-analytics.jsx
 - [ ] src/pages/product-list/page-cache.jsx
