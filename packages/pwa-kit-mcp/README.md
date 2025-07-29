@@ -14,7 +14,24 @@ The PWA Storefront MCP Server provides these features.
 
 - `development_guidelines`: Helps developers understand and follow PWA Storefront developer guidelines and best practices.
 - `create_new_sample_component`: Helps developers create a new sample PWA Storefront component. This feature guides developers through a few simple questions and then generates code for the component based on the commerce data model used, layouts, etc.
-- `create_app_guidelines`: Helps developers generate a new PWA Storefront project.
+- `create_app_guidelines`: This tool provides all the information an agent needs to correctly scaffold a new PWA Kit app using the `@salesforce/pwa-kit-create-app` CLI. 
+
+  It returns:
+    - Project creation guidelines for agent behavior
+    - CLI description and available options
+    - Input schemas for presets or templates
+
+    The output enables agents to ask the right questions and use the CLI correctly without ever mixing unsupported options.
+
+    **Example Triggers**
+
+    This tool is automatically used when the user expresses intent to create a project, such as:
+
+    - "Create a new PWA Kit app."
+    - "Start a new storefront using a preset."
+    - "What templates are available for PWA Kit?"
+    - "What PWA-Kit presets are available?"
+    - "Create a PWA-Kit project using the `retail-react-app-demo` preset in the `~/test-project` directory."
 - `run_site_test`: Run site performance or accessibility test for a given site URL (e.g. [https://pwa-kit.mobify-storefront.com](https://pwa-kit.mobify-storefront.com))
 
 ## Setup
@@ -34,11 +51,11 @@ npm ci
 
 2. In the Cursor Menu on the top menu bar, click **Settings** > **Cursor Settings...**. 
 
-<img src="./docs/images/cursor-settings.png" alt="Cursor Settings Screenshot" width="50%" />
+<img src="https://raw.githubusercontent.com/SalesforceCommerceCloud/pwa-kit/refs/heads/develop/packages/pwa-kit-mcp/docs/images/cursor-settings.png" alt="Cursor Settings Screenshot" width="50%" />
 
 3. Click **Tools & Integrations** > **MCP Tools** > **New MCP Server**.
 
-<img src="./docs/images/cursor-mcp-tools.png" alt="Cursor MCP Tools Screenshot" width="50%" />
+<img src="https://raw.githubusercontent.com/SalesforceCommerceCloud/pwa-kit/refs/heads/develop/packages/pwa-kit-mcp/docs/images/cursor-mcp-tools.png" alt="Cursor MCP Tools Screenshot" width="50%" />
 
 The `mcp.json` file opens. Add this definition to your `mcp.json` file and replace {{parent-dir-to-mcp}} and {{path-to-app-directory}} placeholders with correct values.
 
@@ -71,7 +88,7 @@ You can go back to MCP Tools and choose to enable/disable any MCP Server or tool
 1. In the Claude app menu, on the top menu bar, click **Developer** > **Edit Config**.
 The `claude_desktop_config.json` file opens.
 
-<img src="./docs/images/claude-config.png" alt="Claude MCP Config Screenshot" width="50%" />
+<img src="https://raw.githubusercontent.com/SalesforceCommerceCloud/pwa-kit/refs/heads/develop/packages/pwa-kit-mcp/docs/images/claude-config.png" alt="Claude MCP Config Screenshot" width="50%" />
 
 2. Add this server definition to your `claude_desktop_config.json` and replace {{path-to-node}}, {{parent-dir-to-mcp}} and {{path-to-app-directory}} placeholders with correct values.
 
@@ -95,7 +112,7 @@ After you modify the `claude_desktop_config.json` file, Claude will do these act
 - Connect to the MCP server as a client.
 - List available tools.
 
-<img src="./docs/images/claude-list-tools.png" alt="Claude MCP Tools Screenshot" width="40%" />
+<img src="https://raw.githubusercontent.com/SalesforceCommerceCloud/pwa-kit/refs/heads/develop/packages/pwa-kit-mcp/docs/images/claude-list-tools.png" alt="Claude MCP Tools Screenshot" width="40%" />
 
 You can also enable/disable any available tools from here.
 
@@ -138,26 +155,51 @@ The server outputs debug information to stderr and handle MCP protocol messages 
   - package.json
   - package-lock.json
   - README.md
+  - CHANGELOG.md
   - mcp.json
   - claude_desktop_config.json
+  - babel.config.js
+  - jest.config.js
+  - jest-setup.js
+  - .eslintrc.js
+  - .eslintignore
   /src
     /server
       - server.js
+      - server.test.js
+    /tools
+      - index.js
+      - developer-guideline.js
+      - developer-guideline.test.js
+      - create-app-guideline.js
+      - create-app-guideline.test.js
+      - create-new-component.js
+      - create-new-component.test.js
+      - site-test.js
+      - site-test.test.js
+      - site-test-accessibility.js
+      - site-test-performance.js
     /utils
-      - pwa-developer-guideline-tool.js
+      - index.js
       - utils.js
-    /tests
-      - test-mcp.js
+      - utils.test.js
+    /data
+      - CategoryDocument.json
+      - DocumentList.json
+      - ProductDocument.json
   /docs
     /images
         - claude-config.png
         - claude-list-tools.png
-        - cursor-list-tools.png
-        - cursor-settings.pnb
+        - cursor-mcp-tools.png
+        - cursor-settings.png
     - cursor-integration-guide.md
-  /node_modules
+  /dist
 ```
 
 - Server code is in `src/server/`.
-- Utilities/tools are in `src/utils/`.
+- MCP tools are in `src/tools/`.
+- Utilities are in `src/utils/`.
+- Data files are in `src/data/`.
 - Documentation is in `docs/`.
+- Built distribution files are in `dist/`.
