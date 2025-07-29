@@ -161,7 +161,7 @@ Total files: 222
 - [x] src/pages/cart/cart.mock.js
 - [x] src/pages/cart/hooks/use-cart-default-shipping.js
 - [x] src/pages/cart/hooks/use-cart-gift-items.js
-- [ ] src/pages/cart/hooks/use-cart-operations.js
+- [x] src/pages/cart/hooks/use-cart-operations.js
 - [ ] src/pages/cart/hooks/use-cart-products.js
 - [ ] src/pages/cart/index.jsx
 - [ ] src/pages/cart/partials/cart-cta.jsx
