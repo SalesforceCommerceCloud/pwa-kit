@@ -812,20 +812,6 @@ const runGenerator = (
     // Copy the base template either from the package or npm.
     copyAllFiles(packagePath, outputDir)
 
-    // // Convert selected plugins array to object with true values
-    // if (Object.keys(pluginConfig?.plugins || {}).length > 0 && selectedPlugins) {
-    //     trimExtensions(outputDir, selectedPlugins)
-    // }
-
-    // // Compute the checksum of the output directory
-    // const checksums = computeChecksum(outputDir)
-    // const checksumFilePath = p.join(outputDir, 'checksum.json')
-    // const timestamp = new Date().toISOString()
-    // fs.writeFileSync(
-    //     checksumFilePath,
-    //     JSON.stringify({checksums, timestamp, selectedPlugins}, null, 2)
-    // )
-
     // Copy template specific assets over.
     const assetsDir = p.join(ASSETS_TEMPLATES_DIR, id)
     if (sh.test('-e', assetsDir)) {
