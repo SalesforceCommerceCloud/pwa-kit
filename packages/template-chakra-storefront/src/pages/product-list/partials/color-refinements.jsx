@@ -15,7 +15,7 @@ import {
 } from '../../../pages/product-list/partials/refinements-utils'
 
 const ColorRefinements = ({filter, toggleFilter, selectedFilters}) => {
-    const intl = useIntl()
+    const {formatMessage} = useIntl()
     const recipe = useSlotRecipe({
         key: 'swatchGroup',
         variant: 'circle'
@@ -33,11 +33,11 @@ const ColorRefinements = ({filter, toggleFilter, selectedFilters}) => {
                 const styles = recipe({variant: 'circle', selected: isSelected})
 
                 const messages = {
-                    ariaLabel: intl.formatMessage(
+                    ariaLabel: formatMessage(
                         isSelected ? REMOVE_FILTER_HIT_COUNT : ADD_FILTER_HIT_COUNT,
                         value
                     ),
-                    colorHitCount: intl.formatMessage(
+                    colorHitCount: formatMessage(
                         {
                             id: 'colorRefinements.label.hitCount',
                             defaultMessage: '{colorLabel} ({colorHitCount})'

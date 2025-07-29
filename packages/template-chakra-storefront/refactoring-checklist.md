@@ -30,6 +30,6 @@ Total files: 27
 - [x] src/pages/checkout/partials/checkout-header.jsx
 - [x] src/pages/home/index.jsx
 - [x] src/pages/page-not-found/index.jsx
-- [ ] src/pages/product-list/partials/color-refinements.jsx
+- [x] src/pages/product-list/partials/color-refinements.jsx
 - [ ] src/pages/product-list/partials/empty-results.jsx
 - [ ] src/pages/product-list/partials/sort.jsx
