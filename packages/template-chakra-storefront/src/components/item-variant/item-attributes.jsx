@@ -7,7 +7,7 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import {useIntl, FormattedMessage, FormattedNumber} from 'react-intl'
+import {useIntl, FormattedNumber} from 'react-intl'
 import {Flex, Stack, Text, Box} from '@chakra-ui/react'
 import {useItemVariant} from '.'
 import PromoPopover from '../promo-popover'
@@ -36,6 +36,10 @@ const ItemAttributes = ({includeQuantity, currency, ...props}) => {
         selectedOptions: formatMessage({
             defaultMessage: 'Selected Options',
             id: 'item_attributes.label.selected_options'
+        }),
+        promotions: formatMessage({
+            defaultMessage: 'Promotions',
+            id: 'item_attributes.label.promotions'
         })
     }
 
@@ -117,11 +121,13 @@ const ItemAttributes = ({includeQuantity, currency, ...props}) => {
 
             {includeQuantity && (
                 <Text lineHeight={1} color="gray.700" fontSize="sm">
-                    <FormattedMessage
-                        defaultMessage="Quantity: {quantity}"
-                        values={{quantity: variant.quantity}}
-                        id="item_attributes.label.quantity"
-                    />
+                    {formatMessage(
+                        {
+                            id: 'item_attributes.label.quantity',
+                            defaultMessage: 'Quantity: {quantity}'
+                        },
+                        {quantity: variant.quantity}
+                    )}
                 </Text>
             )}
 
@@ -177,10 +183,7 @@ const ItemAttributes = ({includeQuantity, currency, ...props}) => {
             {variant.priceAdjustments?.length > 0 && (
                 <Flex alignItems="center">
                     <Text lineHeight={1} color="gray.700" fontSize="sm">
-                        <FormattedMessage
-                            defaultMessage="Promotions"
-                            id="item_attributes.label.promotions"
-                        />
+                        {messages.promotions}
                         {': '}
                         <Text as="span" color="green.700">
                             <FormattedNumber
