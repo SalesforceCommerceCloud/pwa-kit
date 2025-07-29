@@ -4,6 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
+import React, {useMemo} from 'react'
 import {useIntl} from 'react-intl'
 
 export default function usePromoCodeFields({
@@ -13,9 +14,10 @@ export default function usePromoCodeFields({
     },
     prefix = ''
 }) {
-    const {formatMessage} = useIntl()
+    const intl = useIntl()
+    const {formatMessage} = intl
 
-    const messages = {
+    const messages = useMemo(() => ({
         codeLabel: formatMessage({
             defaultMessage: 'Promo Code',
             id: 'use_promo_code_fields.label.promo_code'
@@ -24,7 +26,7 @@ export default function usePromoCodeFields({
             defaultMessage: 'Please provide a valid promo code.',
             id: 'use_promo_code_fields.error.required_promo_code'
         })
-    }
+    }), [intl])
 
     const fields = {
         code: {
