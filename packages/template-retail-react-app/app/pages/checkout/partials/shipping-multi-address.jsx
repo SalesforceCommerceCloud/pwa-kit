@@ -144,7 +144,6 @@ const ShippingMultiAddress = ({
         removeEmptyShipments
     } = useMultiship(basket)
 
-    const ADD_NEW_ADDRESS_OPTION_VALUE = 'add-new-address'
     const productIds = basket?.productItems?.map((item) => item.productId).join(',')
     const {
         data: productsMap,
