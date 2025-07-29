@@ -131,7 +131,7 @@ Total files: 222
 - [x] src/components/store-locator-modal/store-locator-input.jsx
 - [x] src/components/store-locator-modal/stores-list.jsx
 - [x] src/components/swatch-group/index.jsx
-- [ ] src/components/swatch-group/swatch.jsx
+- [x] src/components/swatch-group/swatch.jsx
 - [ ] src/components/toaster/index.jsx
 - [ ] src/components/toggle-card/index.jsx
 - [ ] src/components/tooltip/index.jsx
