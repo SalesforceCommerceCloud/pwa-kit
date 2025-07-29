@@ -7,7 +7,7 @@
 
 import React, {Fragment} from 'react'
 import PropTypes from 'prop-types'
-import {FormattedMessage, useIntl} from 'react-intl'
+import {useIntl} from 'react-intl'
 import {Alert, Button, Stack, Text} from '@chakra-ui/react'
 import {AlertIcon, BrandLogo} from '../../components/icons'
 import {noop} from '../../utils/utils'
@@ -100,23 +100,18 @@ const RegisterForm = ({submitForm, clickSignIn = noop, form}) => {
                         </Stack>
 
                         <Text fontSize="sm" textAlign="center">
-                            <FormattedMessage
-                                id="register_form.message.agree_to_policy_terms"
-                                defaultMessage="By creating an account, you agree to Salesforce <policy>Privacy Policy</policy> and <terms>Terms & Conditions</terms>"
-                                values={{
-                                    policy: (chunks) => (
-                                        <Link to="/privacy-policy" color="blue.600">
-                                            {chunks}
-                                        </Link>
-                                    ),
-
-                                    terms: (chunks) => (
-                                        <Link to="/terms-conditions" color="blue.600">
-                                            {chunks}
-                                        </Link>
-                                    )
-                                }}
-                            />
+                            {messages.agreeToPolicy(
+                                (chunks) => (
+                                    <Link to="/privacy-policy" color="blue.600">
+                                        {chunks}
+                                    </Link>
+                                ),
+                                (chunks) => (
+                                    <Link to="/terms-conditions" color="blue.600">
+                                        {chunks}
+                                    </Link>
+                                )
+                            )}
                         </Text>
                     </Stack>
                 </Stack>
