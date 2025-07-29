@@ -6,21 +6,27 @@
  */
 import React from 'react'
 import PropTypes from 'prop-types'
-import {FormattedMessage, FormattedNumber} from 'react-intl'
+import {FormattedNumber, useIntl} from 'react-intl'
 import {Stack, Text, useBreakpointValue} from '@chakra-ui/react'
 import {useItemVariant} from '.'
 import {getPriceData} from '../../utils/product-utils'
 import DisplayPrice from '../display-price'
 
 const PricePerItem = ({currency, basePrice}) => {
+    const {formatMessage} = useIntl()
+    
+    const messages = {
+        each: formatMessage({
+            defaultMessage: "ea",
+            id: "price_per_item.label.each",
+            description: "Abbreviated 'each', follows price per item, like $10/ea"
+        })
+    }
+    
     return (
         <Text fontSize={{base: '12px', lg: '14px'}}>
             <FormattedNumber style="currency" currency={currency} value={basePrice} />
-            <FormattedMessage
-                defaultMessage="ea"
-                id="price_per_item.label.each"
-                description="Abbreviated 'each', follows price per item, like $10/ea"
-            />
+            {messages.each}
         </Text>
     )
 }
