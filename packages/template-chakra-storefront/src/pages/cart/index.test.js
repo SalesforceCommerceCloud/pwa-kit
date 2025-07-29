@@ -259,6 +259,8 @@ describe('Product view tests', function () {
             {
                 path: '*/baskets/*/items/*',
                 method: 'patch',
+                // give a bit of delay to get the loading spinner shows up
+                delay: 500,
                 res: () => {
                     // Return updated basket with incremented quantity
                     return {
@@ -305,6 +307,16 @@ describe('Product view tests', function () {
         const updatedCartItem = await screen.findByTestId(
             `sf-cart-item-${mockCustomerBaskets.baskets[0].productItems[0].productId}`
         )
+
+        // Check for loading spinner appearing
+        await waitFor(() => {
+            expect(screen.getByTestId('loading-spinner')).toBeInTheDocument()
+        })
+
+        // Check for loading spinner disappearing
+        await waitFor(() => {
+            expect(screen.queryByTestId('loading-spinner')).not.toBeInTheDocument()
+        })
 
         await waitFor(() => {
             expect(within(updatedCartItem).getByDisplayValue('3')).toBeInTheDocument()
