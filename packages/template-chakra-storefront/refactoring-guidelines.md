@@ -146,6 +146,8 @@ always deconstruct the objects
 const intl = useIntl()
 const { formatMessage } = intl
 
+Also, include "useMemo" in your commit message!
+
 Example:
 
 ```

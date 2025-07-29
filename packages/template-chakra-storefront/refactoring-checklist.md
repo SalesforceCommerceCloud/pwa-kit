@@ -7,7 +7,7 @@ Total files: 97
 ## Files to refactor:
 
 - [x] src/components/action-card/index.jsx
-- [ ] src/components/display-price/current-price.jsx
+- [x] src/components/display-price/current-price.jsx
 - [ ] src/components/display-price/list-price.jsx
 - [ ] src/components/drawer-menu/drawer-menu.jsx
 - [ ] src/components/email-confirmation/index.jsx
