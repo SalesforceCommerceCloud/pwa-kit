@@ -84,7 +84,7 @@ Total files: 222
 - [x] src/components/links-list/index.jsx
 - [ ] src/components/list-menu/index.js
 - [x] src/components/list-menu/list-menu-content.jsx
-- [ ] src/components/list-menu/list-menu-popover.jsx
+- [x] src/components/list-menu/list-menu-popover.jsx
 - [ ] src/components/list-menu/list-menu-trigger.jsx
 - [ ] src/components/list-menu/list-menu.jsx
 - [ ] src/components/loading-spinner/index.jsx
