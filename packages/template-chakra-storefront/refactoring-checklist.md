@@ -62,7 +62,7 @@ Total files: 222
 - [x] src/components/forms/state-province-options.jsx
 - [x] src/components/forms/update-password-fields.jsx
 - [x] src/components/forms/useAddressFields.jsx
-- [ ] src/components/forms/useCreditCardFields.jsx
+- [x] src/components/forms/useCreditCardFields.jsx
 - [ ] src/components/forms/useLoginFields.jsx
 - [ ] src/components/forms/useProfileFields.jsx
 - [ ] src/components/forms/usePromoCodeFields.jsx

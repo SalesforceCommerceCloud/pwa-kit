@@ -14,36 +14,44 @@ export default function useLoginFields({
     prefix = ''
 }) {
     const {formatMessage} = useIntl()
+    
+    const messages = {
+        emailLabel: formatMessage({defaultMessage: 'Email', id: 'use_login_fields.label.email'}),
+        passwordLabel: formatMessage({
+            defaultMessage: 'Password',
+            id: 'use_login_fields.label.password'
+        }),
+        emailRequired: formatMessage({
+            defaultMessage: 'Please enter your email address.',
+            id: 'use_login_fields.error.required_email'
+        }),
+        passwordRequired: formatMessage({
+            defaultMessage: 'Please enter your password.',
+            id: 'use_login_fields.error.required_password'
+        })
+    }
+    
     const fields = {
         email: {
             name: `${prefix}email`,
-            label: formatMessage({defaultMessage: 'Email', id: 'use_login_fields.label.email'}),
+            label: messages.emailLabel,
             placeholder: 'you@email.com',
             defaultValue: '',
             type: 'email',
             autoComplete: 'email',
             rules: {
-                required: formatMessage({
-                    defaultMessage: 'Please enter your email address.',
-                    id: 'use_login_fields.error.required_email'
-                })
+                required: messages.emailRequired
             },
             error: errors?.[`${prefix}email`],
             control
         },
         password: {
             name: `${prefix}password`,
-            label: formatMessage({
-                defaultMessage: 'Password',
-                id: 'use_login_fields.label.password'
-            }),
+            label: messages.passwordLabel,
             defaultValue: '',
             type: 'password',
             rules: {
-                required: formatMessage({
-                    defaultMessage: 'Please enter your password.',
-                    id: 'use_login_fields.error.required_password'
-                })
+                required: messages.passwordRequired
             },
             error: errors?.[`${prefix}password`],
             control
