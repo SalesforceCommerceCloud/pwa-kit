@@ -117,8 +117,8 @@ Total files: 222
 - [x] src/components/safe-portal/index.jsx
 - [x] src/components/scroll-to-top/index.jsx
 - [x] src/components/search/index.jsx
-- [ ] src/components/search/partials/recent-searches.jsx
-- [ ] src/components/search/partials/search-suggestions.jsx
+- [x] src/components/search/partials/recent-searches.jsx
+- [x] src/components/search/partials/search-suggestions.jsx
 - [ ] src/components/search/partials/suggestions.jsx
 - [ ] src/components/section/index.jsx
 - [ ] src/components/seo/index.tsx
