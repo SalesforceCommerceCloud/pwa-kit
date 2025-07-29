@@ -191,7 +191,7 @@ Total files: 222
 - [x] src/pages/home/data.js
 - [x] src/pages/home/index.jsx
 - [x] src/pages/index.tsx
-- [ ] src/pages/login-redirect/index.jsx
+- [x] src/pages/login-redirect/index.jsx
 - [ ] src/pages/login/index.jsx
 - [ ] src/pages/page-not-found/index.jsx
 - [ ] src/pages/product-detail/index.jsx
