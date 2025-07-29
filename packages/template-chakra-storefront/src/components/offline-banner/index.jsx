@@ -19,15 +19,20 @@ import {AlertIcon} from '../../components/icons'
  */
 const OfflineBanner = ({...props}) => {
     const intl = useIntl()
+    
+    const messages = {
+        title: intl.formatMessage({
+            id: 'offline_banner.description.browsing_offline_mode',
+            defaultMessage: "You're currently browsing in offline mode"
+        })
+    }
+    
     return (
         <Alert.Root status="warning" colorPalette="blue" {...props}>
             <Flex align="center">
                 <AlertIcon mr={2} />
                 <Alert.Title>
-                    {intl.formatMessage({
-                        id: 'offline_banner.description.browsing_offline_mode',
-                        defaultMessage: "You're currently browsing in offline mode"
-                    })}
+                    {messages.title}
                 </Alert.Title>
             </Flex>
         </Alert.Root>
