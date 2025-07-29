@@ -6,5 +6,8 @@
  */
 
 module.exports = {
-    extends: [require.resolve('@salesforce/pwa-kit-dev/configs/eslint')]
+    extends: [require.resolve('@salesforce/pwa-kit-dev/configs/eslint')],
+    globals: {
+        SFDC_EXT_STORE_LOCATOR: 'readonly'
+    }
 }

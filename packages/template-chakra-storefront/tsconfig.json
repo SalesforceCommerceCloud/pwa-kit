@@ -32,5 +32,8 @@
         /* Completeness */
         "skipLibCheck": true
     },
-    "exclude": ["node_modules", "src/static"]
+    "exclude": ["node_modules", "src/static"],
+    "files": [
+        "src/types/global.d.ts"
+    ]
 }

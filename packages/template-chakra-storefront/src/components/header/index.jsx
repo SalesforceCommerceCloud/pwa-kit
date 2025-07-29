@@ -123,15 +123,8 @@ const Header = ({
     const {isRegistered} = useCustomerType()
     const logout = useAuthHelper(AuthHelpers.Logout)
     const navigate = useNavigation()
-    // TODO: unwire this from upgradeability, it was calling `useApplicationExtension`
-    const storeLocatorExtension = {
-        isEnabled: false
-    }
-    const isStoreLocatorEnabled = !!storeLocatorExtension && storeLocatorExtension.isEnabled
     const openModal = () => {
-        // TODO: unwire this from upgradeability zustand store slice
-        // onStoreLocatorClick()
-        console.log('openModal')
+        onStoreLocatorClick()
     }
 
     const [showLoading, setShowLoading] = useState(false)
@@ -338,7 +331,6 @@ const Header = ({
                             css={styles.iconButton}
                             variant="unstyled"
                             onClick={() => {
-                                // TODO fix when store locator is ready
                                 openModal()
                             }}
                         >

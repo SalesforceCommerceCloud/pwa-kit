@@ -254,3 +254,5 @@ export const prependHandlersToServer = (handlerConfig) => {
     const handlers = prepareHandlers(handlerConfig)
     global.server.use(...handlers)
 }
+
+global.SFDC_EXT_STORE_LOCATOR = true

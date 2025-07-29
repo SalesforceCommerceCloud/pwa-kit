@@ -10,19 +10,15 @@ import PropTypes from 'prop-types'
 import {AuthModal} from '../../../hooks/use-auth-modal'
 import {DntNotification} from '../../../hooks'
 import Toaster, {toaster} from '../../../components/toaster'
-// import StoreLocatorModal from '../../../components/store-locator-modal'
+import loadable from '@loadable/component'
+const StoreLocatorModal =
+    SFDC_EXT_STORE_LOCATOR && loadable(() => import('../../../pages/store-locator/partial/modal'))
 
 /**
  * AppModals component that renders all app-level modals using React Portals
  * Handles AuthModal, DntNotification, Toaster, and optional StoreLocatorModal
  */
-const AppModals = ({
-    authModal,
-    dntNotification
-    // Uncomment when store locator is enabled
-    // isOpenStoreLocator,
-    // onCloseStoreLocator
-}) => {
+const AppModals = ({authModal, dntNotification, isOpenStoreLocator, onCloseStoreLocator}) => {
     return (
         <>
             {/* Authentication Modal */}
@@ -34,23 +30,18 @@ const AppModals = ({
             {/* Toast Notifications */}
             <Toaster toaster={toaster} />
 
-            {/* Store Locator Modal - Disabled until extension is moved */}
-            {/*
-            <StoreLocatorModal
-                isOpen={isOpenStoreLocator}
-                onClose={onCloseStoreLocator}
-            />
-            */}
+            {SFDC_EXT_STORE_LOCATOR && (
+                <StoreLocatorModal isOpen={isOpenStoreLocator} onClose={onCloseStoreLocator} />
+            )}
         </>
     )
 }
 
 AppModals.propTypes = {
     authModal: PropTypes.object,
-    dntNotification: PropTypes.object
-    // Uncomment when store locator is enabled
-    // isOpenStoreLocator: PropTypes.bool,
-    // onCloseStoreLocator: PropTypes.func
+    dntNotification: PropTypes.object,
+    isOpenStoreLocator: PropTypes.bool,
+    onCloseStoreLocator: PropTypes.func
 }
 
 export default AppModals

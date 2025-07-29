@@ -26,12 +26,6 @@ export const useAppModals = () => {
         onClose: onDrawerMenuClose
     } = useDisclosure()
 
-    const {
-        open: isOpenStoreLocator,
-        onOpen: onOpenStoreLocator,
-        onClose: onCloseStoreLocator
-    } = useDisclosure()
-
     // Automatically close the mobile navigation when the location path changes
     useEffect(() => {
         onDrawerMenuClose()
@@ -42,12 +36,6 @@ export const useAppModals = () => {
         isDrawerMenuOpen,
         onDrawerMenuOpen,
         onDrawerMenuClose,
-
-        // Store locator modal state
-        isOpenStoreLocator,
-        onOpenStoreLocator,
-        onCloseStoreLocator,
-
         // DNT notification state
         dntNotification
     }

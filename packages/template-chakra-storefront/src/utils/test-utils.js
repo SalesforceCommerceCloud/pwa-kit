@@ -21,11 +21,21 @@ import fallbackMessages from '../static/translations/compiled/en-GB.json'
 import mockConfig from '../../config/mocks/mock-config'
 // Contexts
 import {CurrencyProvider, MultiSiteProvider} from '../contexts'
+import {StoreLocatorProvider} from '../pages/store-locator/contexts/provider'
 
 import {createUrlTemplate} from './url'
 import {getSiteByReference} from './site-utils'
 import jwt from 'jsonwebtoken'
 import userEvent from '@testing-library/user-event'
+import {
+    STORE_LOCATOR_RADIUS,
+    STORE_LOCATOR_RADIUS_UNIT,
+    STORE_LOCATOR_DEFAULT_COUNTRY,
+    STORE_LOCATOR_DEFAULT_COUNTRY_CODE,
+    STORE_LOCATOR_DEFAULT_POSTAL_CODE,
+    STORE_LOCATOR_DEFAULT_PAGE_SIZE,
+    STORE_LOCATOR_SUPPORTED_COUNTRIES
+} from '../config/constants'
 // This JWT's payload is special
 // it includes 3 fields that commerce-sdk-react cares:
 // exp, isb and sub
@@ -117,6 +127,15 @@ export const TestProviders = ({
 
     const commerceApiConfig = config.commerceAPI
     const buildUrl = createUrlTemplate(config, site?.alias || site?.id, locale.alias || locale.id)
+    const storeLocatorConfig = {
+        radius: STORE_LOCATOR_RADIUS,
+        radiusUnit: STORE_LOCATOR_RADIUS_UNIT,
+        defaultCountry: STORE_LOCATOR_DEFAULT_COUNTRY,
+        defaultCountryCode: STORE_LOCATOR_DEFAULT_COUNTRY_CODE,
+        defaultPostalCode: STORE_LOCATOR_DEFAULT_POSTAL_CODE,
+        defaultPageSize: STORE_LOCATOR_DEFAULT_PAGE_SIZE,
+        supportedCountries: STORE_LOCATOR_SUPPORTED_COUNTRIES
+    }
 
     return (
         <ServerContext.Provider value={{}}>
@@ -133,11 +152,13 @@ export const TestProviders = ({
                         fetchedToken={bypassAuth ? (isGuest ? guestToken : registerUserToken) : ''}
                     >
                         <CurrencyProvider currency={DEFAULT_CURRENCY}>
-                            <Router>
-                                <ChakraProvider value={theme}>
-                                    <AddToCartModalProvider>{children}</AddToCartModalProvider>
-                                </ChakraProvider>
-                            </Router>
+                            <StoreLocatorProvider config={storeLocatorConfig}>
+                                <Router>
+                                    <ChakraProvider value={theme}>
+                                        <AddToCartModalProvider>{children}</AddToCartModalProvider>
+                                    </ChakraProvider>
+                                </Router>
+                            </StoreLocatorProvider>
                         </CurrencyProvider>
                     </CommerceApiProvider>
                 </MultiSiteProvider>

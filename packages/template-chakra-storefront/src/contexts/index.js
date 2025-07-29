@@ -86,6 +86,8 @@ export const CurrencyProvider = ({currency: initialCurrency, children}) => {
     )
 }
 
+export {StoreLocatorContext, StoreLocatorProvider} from '../pages/store-locator/contexts/provider'
+
 CurrencyProvider.propTypes = {
     children: PropTypes.node.isRequired,
     currency: PropTypes.string
