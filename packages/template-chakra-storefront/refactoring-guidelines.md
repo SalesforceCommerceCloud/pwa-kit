@@ -26,7 +26,7 @@ If you are uncertain about some code, pause and ask me about it.
 
 remember to never change the actual functionality, no renaming of variables or translation labels. Also do not add comments.
 
-Make the code consistent through out the code base, if there are <FormattedMessage > component usage that can be replaced to follow the same pattern, do it, however, never change the react app functionality because we don't want to test the entire app with the changes. Only code style change.
+Make the code consistent through out the code base, if there are <FormattedMessage > component usage that can be replaced to follow the same pattern, do it, however, never change the react app functionality because we don't want to test the entire app with the changes. Only code style change. Replacing `FormattedMessage` component is the only exception for code functionaility change, we want to avoid having two different patterns.
 
 ## BAD EXAMPLE
 

@@ -6,7 +6,7 @@
  */
 import React from 'react'
 import PropTypes from 'prop-types'
-import {FormattedMessage, useIntl} from 'react-intl'
+import {useIntl} from 'react-intl'
 import {Button, Stack} from '@chakra-ui/react'
 import {MESSAGE_PROPTYPE} from '../../utils/locale.js'
 
@@ -37,18 +37,10 @@ const FormActionButtons = ({
     return (
         <Stack direction={{base: 'column', lg: 'row-reverse'}} gap={4}>
             <Button type="submit" minWidth={28} {...saveButtonProps}>
-                {saveButtonLabel ? (
-                    <FormattedMessage {...saveButtonLabel} />
-                ) : (
-                    messages.save
-                )}
+                {saveButtonLabel ? formatMessage(saveButtonLabel) : messages.save}
             </Button>
             <Button variant="outline" minWidth={28} onClick={onCancel} {...cancelButtonProps}>
-                {cancelButtonLabel ? (
-                    <FormattedMessage {...cancelButtonLabel} />
-                ) : (
-                    messages.cancel
-                )}
+                {cancelButtonLabel ? formatMessage(cancelButtonLabel) : messages.cancel}
             </Button>
         </Stack>
     )
