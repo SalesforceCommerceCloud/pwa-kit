@@ -26,18 +26,18 @@ const ActionCard = ({
     ...props
 }) => {
     const [showLoading, setShowLoading] = useState(false)
-    const {formatMessage} = useIntl()
+    const intl = useIntl()
     
     const messages = useMemo(() => ({
-        edit: formatMessage({
+        edit: intl.formatMessage({
             id: 'action_card.action.edit',
             defaultMessage: 'Edit'
         }),
-        remove: formatMessage({
+        remove: intl.formatMessage({
             id: 'action_card.action.remove',
             defaultMessage: 'Remove'
         })
-    }), [formatMessage])
+    }), [intl])
 
     const handleRemove = async () => {
         setShowLoading(true)
