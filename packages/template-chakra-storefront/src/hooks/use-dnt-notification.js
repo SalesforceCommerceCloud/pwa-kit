@@ -6,7 +6,7 @@
  */
 import React, {useEffect} from 'react'
 import PropTypes from 'prop-types'
-import {FormattedMessage, useIntl} from 'react-intl'
+import {useIntl} from 'react-intl'
 import {
     Box,
     Button,
@@ -42,6 +42,39 @@ export const DntNotification = ({isOpen, onOpen, onClose}) => {
         onClose()
     }
 
+    const messages = {
+        title: formatMessage({
+            id: 'dnt_notification.title',
+            defaultMessage: 'Tracking Consent'
+        }),
+        buttons: {
+            decline: formatMessage({
+                id: 'dnt_notification.button.decline',
+                defaultMessage: 'Decline'
+            }),
+            accept: formatMessage({
+                id: 'dnt_notification.button.accept',
+                defaultMessage: 'Accept'
+            }),
+            declineAriaLabel: formatMessage({
+                id: 'dnt_notification.button.assistive_msg.decline',
+                defaultMessage: 'Decline tracking'
+            }),
+            acceptAriaLabel: formatMessage({
+                id: 'dnt_notification.button.assistive_msg.accept',
+                defaultMessage: 'Accept tracking'
+            }),
+            closeAriaLabel: formatMessage({
+                id: 'dnt_notification.button.assistive_msg.close',
+                defaultMessage: 'Close consent tracking form'
+            })
+        },
+        description: formatMessage({
+            id: 'dnt_notification.description',
+            defaultMessage: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.'
+        })
+    }
+
     const buttons = (
         <>
             <Button
@@ -55,12 +88,9 @@ export const DntNotification = ({isOpen, onOpen, onClose}) => {
                     updateDNT(true)
                     onClose()
                 }}
-                aria-label={formatMessage({
-                    id: 'dnt_notification.button.assistive_msg.decline',
-                    defaultMessage: 'Decline tracking'
-                })}
+                aria-label={messages.buttons.declineAriaLabel}
             >
-                <FormattedMessage defaultMessage="Decline" id="dnt_notification.button.decline" />
+                {messages.buttons.decline}
             </Button>
             <Button
                 onClick={() => {
@@ -68,22 +98,16 @@ export const DntNotification = ({isOpen, onOpen, onClose}) => {
                     onClose()
                 }}
                 boxShadow="md"
-                aria-label={formatMessage({
-                    id: 'dnt_notification.button.assistive_msg.accept',
-                    defaultMessage: 'Accept tracking'
-                })}
+                aria-label={messages.buttons.acceptAriaLabel}
             >
-                <FormattedMessage defaultMessage="Accept" id="dnt_notification.button.accept" />
+                {messages.buttons.accept}
             </Button>
         </>
     )
     // Placeholder for the consent tracking form for demonstration purposes
     const description = (
         <Text color="gray.700" fontWeight="500" marginTop="7">
-            <FormattedMessage
-                defaultMessage="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur."
-                id="dnt_notification.description"
-            />
+            {messages.description}
         </Text>
     )
 
@@ -116,18 +140,12 @@ export const DntNotification = ({isOpen, onOpen, onClose}) => {
                                 onClick={onCloseNotification}
                                 colorPalette="gray"
                                 size="xs"
-                                aria-label={formatMessage({
-                                    id: 'dnt_notification.button.assistive_msg.close',
-                                    defaultMessage: 'Close consent tracking form'
-                                })}
+                                aria-label={messages.buttons.closeAriaLabel}
                             />
                         </Dialog.CloseTrigger>
                         <Dialog.Body pb="8" bg="white" paddingBottom="14" marginTop="7">
                             <Heading as="h3" fontSize={25} width="100%">
-                                <FormattedMessage
-                                    defaultMessage="Tracking Consent"
-                                    id="dnt_notification.title"
-                                />
+                                {messages.title}
                             </Heading>
                             <HideOnDesktop>
                                 <Flex direction="column">
