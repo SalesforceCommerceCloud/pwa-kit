@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React, {useState} from 'react'
+import React, {useState, useMemo} from 'react'
 import PropTypes from 'prop-types'
 import {useIntl} from 'react-intl'
 import {
@@ -63,12 +63,12 @@ const SearchBar = (props) => {
     const intl = useIntl()
     const {formatMessage} = intl
 
-    const messages = {
+    const messages = useMemo(() => ({
         searchPlaceholder: formatMessage({
             id: 'header.field.placeholder.search_for_products',
             defaultMessage: 'Search for products...'
         })
-    }
+    }), [intl])
 
     return (
         <Box css={styles.searchContainer}>
@@ -135,7 +135,7 @@ const Header = ({
     const recipe = useSlotRecipe({key: 'header'})
     const styles = recipe()
 
-    const headerMessages = {
+    const headerMessages = useMemo(() => ({
         menu: formatMessage({
             id: 'header.button.assistive_msg.menu',
             defaultMessage: 'Menu'
@@ -171,8 +171,12 @@ const Header = ({
         storeLocator: formatMessage({
             defaultMessage: 'Store Locator',
             id: 'header.button.assistive_msg.store_locator'
-        })
-    }
+        }),
+        myCartWithItems: formatMessage({
+            id: 'header.button.assistive_msg.my_cart_with_num_items',
+            defaultMessage: 'My cart, number of items: {numItems}'
+        }, {numItems: totalItems})
+    }), [intl, totalItems])
     const onSignoutClick = async () => {
         setShowLoading(true)
         await logout.mutateAsync()
@@ -328,13 +332,7 @@ const Header = ({
                         </IconButton>
                     )}
                     <IconButton
-                        aria-label={formatMessage(
-                            {
-                                id: 'header.button.assistive_msg.my_cart_with_num_items',
-                                defaultMessage: 'My cart, number of items: {numItems}'
-                            },
-                            {numItems: totalItems}
-                        )}
+                        aria-label={headerMessages.myCartWithItems}
                         variant="unstyled"
                         css={styles.iconButton}
                         onClick={onMyCartClick}
