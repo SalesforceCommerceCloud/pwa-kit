@@ -7,7 +7,7 @@
 import React, {useContext, useState, useEffect} from 'react'
 import {useLocation} from 'react-router-dom'
 import PropTypes from 'prop-types'
-import {useIntl, FormattedMessage} from 'react-intl'
+import {useIntl} from 'react-intl'
 import {
     AspectRatio,
     Box,
@@ -358,12 +358,10 @@ export const AddToCartModal = () => {
                             </Flex>
                             <Box padding="8" bgColor="gray.50">
                                 <RecommendedProducts
-                                    title={
-                                        <FormattedMessage
-                                            defaultMessage="You Might Also Like"
-                                            id="add_to_cart_modal.recommended_products.title.might_also_like"
-                                        />
-                                    }
+                                    title={intl.formatMessage({
+                                        defaultMessage: 'You Might Also Like',
+                                        id: 'add_to_cart_modal.recommended_products.title.might_also_like'
+                                    })}
                                     recommender={EINSTEIN_RECOMMENDERS.ADD_TO_CART_MODAL}
                                     products={[product]}
                                     mx={{base: -4, md: -8, lg: 0}}
