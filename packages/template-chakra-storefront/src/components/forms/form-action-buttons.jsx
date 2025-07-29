@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React from 'react'
+import React, {useMemo} from 'react'
 import PropTypes from 'prop-types'
 import {useIntl} from 'react-intl'
 import {Button, Stack} from '@chakra-ui/react'
@@ -21,9 +21,10 @@ const FormActionButtons = ({
     cancelButtonLabel,
     onCancel = () => {}
 }) => {
-    const {formatMessage} = useIntl()
+    const intl = useIntl()
+    const {formatMessage} = intl
 
-    const messages = {
+    const messages = useMemo(() => ({
         save: saveButtonLabel
             ? formatMessage(saveButtonLabel)
             : formatMessage({
@@ -36,7 +37,7 @@ const FormActionButtons = ({
                   id: 'form_action_buttons.button.cancel',
                   defaultMessage: 'Cancel'
               })
-    }
+    }), [intl, saveButtonLabel, cancelButtonLabel])
 
     return (
         <Stack direction={{base: 'column', lg: 'row-reverse'}} gap={4}>
