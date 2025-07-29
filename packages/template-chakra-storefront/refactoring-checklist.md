@@ -152,7 +152,7 @@ Total files: 222
 - [x] src/pages/account/order-detail.jsx
 - [x] src/pages/account/order-history.jsx
 - [x] src/pages/account/orders.jsx
-- [ ] src/pages/account/profile.jsx
+- [x] src/pages/account/profile.jsx
 - [ ] src/pages/account/wishlist/index.jsx
 - [ ] src/pages/account/wishlist/index.mock.js
 - [ ] src/pages/account/wishlist/partials/wishlist-primary-action.jsx
