@@ -677,3 +677,4 @@ test('renders product bundle', () => {
         })
     })
 })
+
