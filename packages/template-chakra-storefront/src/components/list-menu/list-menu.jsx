@@ -41,12 +41,12 @@ const ListMenu = ({
     const recipe = useSlotRecipe({key: 'listMenu'})
     const styles = recipe()
     const [ariaBusy, setAriaBusy] = useState(true)
-    const intl = useIntl()
+    const {formatMessage} = useIntl()
 
     const items = root?.[itemsKey]
 
     const messages = {
-        navLabel: intl.formatMessage({
+        navLabel: formatMessage({
             id: 'list_menu.nav.assistive_msg',
             defaultMessage: 'Main navigation'
         })
