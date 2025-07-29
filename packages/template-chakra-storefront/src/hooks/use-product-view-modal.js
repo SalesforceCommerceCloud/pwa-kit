@@ -13,6 +13,7 @@ import useToast from './use-toast'
 import {useIntl} from 'react-intl'
 import {API_ERROR_MESSAGE} from '../../config/constants'
 import {useProduct} from '@salesforce/commerce-sdk-react'
+import {keepPreviousData} from '@tanstack/react-query'
 
 /**
  * This hook is responsible for fetching a product detail based on the variation selection
@@ -35,7 +36,7 @@ export const useProductViewModal = (initialProduct) => {
     } = useProduct(
         {parameters: {id: (variant || product)?.productId}},
         {
-            placeholderData: initialProduct,
+            placeholderData: keepPreviousData,
             select: (data) => {
                 // if the product id is the same as the initial product id,
                 // then merge the data with the initial product to be able to show correct quantity in the modal

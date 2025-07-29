@@ -38,8 +38,7 @@ const CartModals = ({
     basket,
     handleUnavailableProducts
 }) => {
-    const modalProps = useDisclosure()
-
+    const confirmationModalProps = useDisclosure()
     return (
         <Box>
             {/* Product View Modals */}
@@ -71,7 +70,7 @@ const CartModals = ({
                     handleRemoveItem(selectedItem)
                 }}
                 onAlternateAction={() => {}}
-                {...modalProps}
+                {...confirmationModalProps}
             />
 
             {/* Unavailable Product Confirmation Modal */}

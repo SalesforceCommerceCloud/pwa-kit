@@ -45,7 +45,6 @@ const ProductViewModal = ({product, isOpen, onClose, ...props}) => {
                         data-testid="product-view-modal"
                         aria-label={messages.modalLabel}
                     >
-                        <Dialog.CloseTrigger />
                         <Dialog.Body pb={8} bg="white" paddingBottom={6} marginTop={6}>
                             <ProductView
                                 showFullLink={true}

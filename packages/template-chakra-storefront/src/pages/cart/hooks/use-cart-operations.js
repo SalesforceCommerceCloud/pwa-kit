@@ -11,6 +11,7 @@ import {useShopperBasketsMutation} from '@salesforce/commerce-sdk-react'
 import useToast from '../../../hooks/use-toast'
 import {TOAST_MESSAGE_REMOVED_ITEM_FROM_CART} from '../../../../config/constants'
 import {getUpdateBundleChildArray} from '../../../utils/product-utils'
+import {useDisclosure} from '@chakra-ui/react'
 
 const DEBOUNCE_WAIT = 750
 
@@ -25,6 +26,9 @@ export const useCartOperations = (basket, productsByItemId, showError) => {
     const [selectedItem, setSelectedItem] = useState(undefined)
     const [localQuantity, setLocalQuantity] = useState({})
     const [isCartItemLoading, setCartItemLoading] = useState(false)
+
+    // Modal state and actions
+    const {open: isOpen, onOpen, onClose} = useDisclosure()
 
     const {formatMessage} = useIntl()
     const toast = useToast()
@@ -43,6 +47,8 @@ export const useCartOperations = (basket, productsByItemId, showError) => {
         // using try-catch is better than using onError callback since we have many mutation calls logic here
         try {
             setCartItemLoading(true)
+            // close the modal before performing any actions on cart item
+            onClose()
             const productIds = basket.productItems.map(({productId}) => productId)
 
             // The user is selecting different variant, and it has not existed in basket
@@ -92,6 +98,8 @@ export const useCartOperations = (basket, productsByItemId, showError) => {
     const handleUpdateBundle = async (bundle, bundleQuantity, childProducts) => {
         try {
             setCartItemLoading(true)
+            // close the modal before performing any actions on cart item
+            onClose()
             const itemsToBeUpdated = getUpdateBundleChildArray(bundle, childProducts)
 
             // We only update the parent bundle when the quantity changes
@@ -225,6 +233,9 @@ export const useCartOperations = (basket, productsByItemId, showError) => {
     }
 
     return {
+        isOpen,
+        onClose,
+        onOpen,
         selectedItem,
         setSelectedItem,
         localQuantity,
