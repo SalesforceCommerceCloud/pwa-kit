@@ -14,12 +14,30 @@ const Sort = ({sortUrls, productSearchResult, basePath, ...otherProps}) => {
     const intl = useIntl()
     const history = useHistory()
 
+    const messages = {
+        sortByLabel: intl.formatMessage({
+            id: 'product_list.drawer.title.sort_by',
+            defaultMessage: 'Sort By'
+        }),
+        sortProductsLabel: intl.formatMessage({
+            id: 'product_list.sort_by.label.assistive_msg',
+            defaultMessage: 'Sort products by'
+        })
+    }
+
+    const getSortOptionLabel = (sortOption) => {
+        return intl.formatMessage(
+            {
+                id: 'product_list.select.sort_by',
+                defaultMessage: 'Sort By: {sortOption}'
+            },
+            { sortOption }
+        )
+    }
+
     return (
         <Field.Root
-            aria-label={intl.formatMessage({
-                id: 'product_list.drawer.title.sort_by',
-                defaultMessage: 'Sort By'
-            })}
+            aria-label={messages.sortByLabel}
             data-testid="sf-product-list-sort"
             id="page_sort"
             width="auto"
@@ -28,10 +46,7 @@ const Sort = ({sortUrls, productSearchResult, basePath, ...otherProps}) => {
             <NativeSelect.Root>
                 <NativeSelect.Field
                     id="sf-product-list-sort-select"
-                    aria-label={intl.formatMessage({
-                        id: 'product_list.sort_by.label.assistive_msg',
-                        defaultMessage: 'Sort products by'
-                    })}
+                    aria-label={messages.sortProductsLabel}
                     value={basePath.replace(/(offset)=(\d+)/i, '$1=0')}
                     onChange={(e) => {
                         history.push(e.target.value)
@@ -52,15 +67,7 @@ const Sort = ({sortUrls, productSearchResult, basePath, ...otherProps}) => {
                 >
                     {sortUrls.map((href, index) => (
                         <option key={href} value={href}>
-                            {intl.formatMessage(
-                                {
-                                    id: 'product_list.select.sort_by',
-                                    defaultMessage: 'Sort By: {sortOption}'
-                                },
-                                {
-                                    sortOption: productSearchResult?.sortingOptions[index]?.label
-                                }
-                            )}
+                            {getSortOptionLabel(productSearchResult?.sortingOptions[index]?.label)}
                         </option>
                     ))}
                 </NativeSelect.Field>
