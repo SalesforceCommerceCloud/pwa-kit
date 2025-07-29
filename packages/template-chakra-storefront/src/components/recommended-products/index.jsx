@@ -54,6 +54,13 @@ const RecommendedProducts = ({zone, recommender, products, title, shouldFetch, .
     const navigate = useNavigation()
     const {formatMessage} = useIntl()
 
+    const messages = {
+        toastAddedToWishlist: (quantity) => formatMessage(TOAST_MESSAGE_ADDED_TO_WISHLIST, {quantity}),
+        toastViewWishlist: formatMessage(TOAST_ACTION_VIEW_WISHLIST),
+        toastRemovedFromWishlist: formatMessage(TOAST_MESSAGE_REMOVED_FROM_WISHLIST),
+        apiError: formatMessage(API_ERROR_MESSAGE)
+    }
+
     const ref = useRef()
     const isOnScreen = useIntersectionObserver(ref, {useOnce: true})
     const [_products, setProducts] = useState(products)
@@ -137,17 +144,17 @@ const RecommendedProducts = ({zone, recommender, products, title, shouldFetch, .
             })
 
             toast({
-                title: formatMessage(TOAST_MESSAGE_ADDED_TO_WISHLIST, {quantity: 1}),
+                title: messages.toastAddedToWishlist(1),
                 type: 'success',
                 action: (
                     <Button variant="link" onClick={() => navigate('/account/wishlist')}>
-                        {formatMessage(TOAST_ACTION_VIEW_WISHLIST)}
+                        {messages.toastViewWishlist}
                     </Button>
                 )
             })
         } catch {
             toast({
-                title: formatMessage(API_ERROR_MESSAGE),
+                title: messages.apiError,
                 type: 'error'
             })
         }
@@ -169,12 +176,12 @@ const RecommendedProducts = ({zone, recommender, products, title, shouldFetch, .
                 }
             })
             toast({
-                title: formatMessage(TOAST_MESSAGE_REMOVED_FROM_WISHLIST),
+                title: messages.toastRemovedFromWishlist,
                 type: 'success'
             })
         } catch {
             toast({
-                title: formatMessage(API_ERROR_MESSAGE),
+                title: messages.apiError,
                 type: 'error'
             })
         }
