@@ -6,15 +6,23 @@
  */
 import React from 'react'
 import PropTypes from 'prop-types'
-import {FormattedMessage} from 'react-intl'
+import {useIntl} from 'react-intl'
 import {Box, Button} from '@chakra-ui/react'
 import usePromoCodeFields from './usePromoCodeFields'
 import Field from '../field'
 
 const PromoCodeFields = ({form, prefix = '', ...props}) => {
+    const {formatMessage} = useIntl()
     const fields = usePromoCodeFields({form, prefix})
 
     const code = form.watch('code')
+
+    const messages = {
+        apply: formatMessage({
+            id: "promo_code_fields.button.apply",
+            defaultMessage: "Apply"
+        })
+    }
 
     return (
         <Box aria-labelledby="code-feedback" {...props}>
@@ -25,7 +33,7 @@ const PromoCodeFields = ({form, prefix = '', ...props}) => {
                     loading={form.formState.isSubmitting}
                     disabled={code?.length < 3}
                 >
-                    <FormattedMessage defaultMessage="Apply" id="promo_code_fields.button.apply" />
+                    {messages.apply}
                 </Button>
             </Field>
         </Box>

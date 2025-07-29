@@ -56,7 +56,7 @@ Total files: 222
 - [x] src/components/forms/password-requirements.jsx
 - [x] src/components/forms/post-checkout-registration-fields.jsx
 - [x] src/components/forms/profile-fields.jsx
-- [ ] src/components/forms/promo-code-fields.jsx
+- [x] src/components/forms/promo-code-fields.jsx
 - [ ] src/components/forms/registration-fields.jsx
 - [ ] src/components/forms/reset-password-fields.jsx
 - [ ] src/components/forms/state-province-options.jsx
