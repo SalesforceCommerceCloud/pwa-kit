@@ -11,8 +11,7 @@ import {zodToJsonSchema} from 'zod-to-json-schema'
 import {z} from 'zod'
 
 // CONSTANTS
-// const CREATE_APP_VERSION = 'latest'
-const CREATE_APP_VERSION = '3.11.0-nightly-20250710080214'
+const CREATE_APP_VERSION = 'latest'
 
 // Private schema used to generate the JSON schema
 const emptySchema = z.object({}).strict()

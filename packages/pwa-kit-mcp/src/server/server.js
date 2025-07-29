@@ -9,8 +9,12 @@ import {McpServer} from '@modelcontextprotocol/sdk/server/mcp.js'
 import {StdioServerTransport} from '@modelcontextprotocol/sdk/server/stdio.js'
 
 import {z} from 'zod'
-import {CreateAppGuidelinesTool, CreateNewComponentTool, DeveloperGuidelinesTool} from '../utils'
-import {TestWithPlaywrightTool} from '../utils/run-site-test-tool'
+import {
+    CreateAppGuidelinesTool,
+    CreateNewComponentTool,
+    DeveloperGuidelinesTool,
+    TestWithPlaywrightTool
+} from '../tools'
 
 // NOTE: This is a workaround to import JSON files as ES modules.
 // eslint-disable-next-line @typescript-eslint/no-var-requires
