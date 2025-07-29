@@ -144,9 +144,6 @@
   "add_to_cart_modal.recommended_products.title.might_also_like": {
     "defaultMessage": "Es posible que también te interese"
   },
-  "add_to_cart_modal.button.select_bonus_products": {
-    "defaultMessage": "Seleccionar productos bonus"
-  },
   "auth_modal.button.close.assistive_msg": {
     "defaultMessage": "Cerrar formato de inicio de sesión"
   },
