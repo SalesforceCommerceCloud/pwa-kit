@@ -82,7 +82,7 @@ Total files: 222
 - [x] src/components/item-variant/item-price.jsx
 - [x] src/components/link/index.jsx
 - [x] src/components/links-list/index.jsx
-- [ ] src/components/list-menu/index.js
+- [x] src/components/list-menu/index.js
 - [x] src/components/list-menu/list-menu-content.jsx
 - [x] src/components/list-menu/list-menu-popover.jsx
 - [x] src/components/list-menu/list-menu-trigger.jsx
