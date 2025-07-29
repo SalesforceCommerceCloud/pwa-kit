@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React, {useState} from 'react'
+import React, {useState, useMemo} from 'react'
 import PropTypes from 'prop-types'
 import {useIntl} from 'react-intl'
 import {Button, Separator, Stack, Text} from '@chakra-ui/react'
@@ -22,7 +22,7 @@ const PasswordlessLogin = ({
     const intl = useIntl()
     const [showPasswordView, setShowPasswordView] = useState(false)
 
-    const messages = {
+    const messages = useMemo(() => ({
         continueSecurely: intl.formatMessage({
             id: 'login_form.button.continue_securely',
             defaultMessage: 'Continue Securely'
@@ -35,7 +35,7 @@ const PasswordlessLogin = ({
             id: 'login_form.button.password',
             defaultMessage: 'Password'
         })
-    }
+    }), [intl])
 
     const handlePasswordButton = async (e) => {
         const isValid = await form.trigger()
