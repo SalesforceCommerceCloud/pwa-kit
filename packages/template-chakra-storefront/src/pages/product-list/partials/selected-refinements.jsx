@@ -6,7 +6,7 @@
  */
 
 import React from 'react'
-import {FormattedMessage, useIntl} from 'react-intl'
+import {useIntl} from 'react-intl'
 import PropTypes from 'prop-types'
 import {Box, Button, Flex} from '@chakra-ui/react'
 import {CloseIcon} from '../../../components/icons'
@@ -15,6 +15,17 @@ import {REMOVE_FILTER} from './refinements-utils'
 const SelectedRefinements = ({toggleFilter, selectedFilterValues, filters, handleReset}) => {
     const {formatMessage} = useIntl()
     const priceFilterValues = filters?.find((filter) => filter.attributeId === 'price')
+    
+    const messages = {
+        clearAllAriaLabel: formatMessage({
+            id: 'selected_refinements.action.assistive_msg.clear_all',
+            defaultMessage: 'Clear all filters'
+        }),
+        clearAll: formatMessage({
+            id: 'selected_refinements.action.clear_all',
+            defaultMessage: 'Clear All'
+        })
+    }
 
     let selectedFilters = []
     for (const key in selectedFilterValues) {
@@ -77,15 +88,9 @@ const SelectedRefinements = ({toggleFilter, selectedFilterValues, filters, handl
                         variant="plain"
                         size="sm"
                         onClick={handleReset}
-                        aria-label={formatMessage({
-                            id: 'selected_refinements.action.assistive_msg.clear_all',
-                            defaultMessage: 'Clear all filters'
-                        })}
+                        aria-label={messages.clearAllAriaLabel}
                     >
-                        <FormattedMessage
-                            defaultMessage="Clear All"
-                            id="selected_refinements.action.clear_all"
-                        />
+                        {messages.clearAll}
                     </Button>
                 </Box>
             )}
