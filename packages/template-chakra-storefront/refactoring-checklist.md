@@ -218,7 +218,7 @@ Total files: 222
 - [x] src/pages/product-list/partials/empty-results.jsx
 - [x] src/pages/product-list/partials/link-refinements.jsx
 - [x] src/pages/product-list/partials/page-designer-promotional-banner.jsx
-- [ ] src/pages/product-list/partials/page-header.jsx
+- [x] src/pages/product-list/partials/page-header.jsx
 - [x] src/pages/product-list/partials/product-list-banner.jsx
 - [ ] src/pages/product-list/partials/product-list-grid.jsx
 - [ ] src/pages/product-list/partials/product-list-header.jsx
