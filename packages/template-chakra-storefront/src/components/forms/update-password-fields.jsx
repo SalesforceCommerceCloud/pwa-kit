@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React from 'react'
+import React, {useMemo} from 'react'
 import PropTypes from 'prop-types'
 import {useIntl} from 'react-intl'
 import {Box, Button, Stack, StackSeparator} from '@chakra-ui/react'
@@ -13,16 +13,16 @@ import Field from '../../components/field'
 import PasswordRequirements from '../../components/forms/password-requirements'
 
 const UpdatePasswordFields = ({form, prefix = ''}) => {
-    const {formatMessage} = useIntl()
+    const intl = useIntl()
     const fields = useUpdatePasswordFields({form, prefix})
     const password = form.watch('password')
 
-    const messages = {
-        forgotPassword: formatMessage({
+    const messages = useMemo(() => ({
+        forgotPassword: intl.formatMessage({
             id: 'update_password_fields.button.forgot_password',
             defaultMessage: 'Forgot Password?'
         })
-    }
+    }), [intl])
 
     return (
         <Stack gap={5} separator={<StackSeparator borderColor="gray.100" />}>
