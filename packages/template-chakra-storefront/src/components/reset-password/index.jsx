@@ -7,13 +7,52 @@
 
 import React, {Fragment} from 'react'
 import PropTypes from 'prop-types'
-import {FormattedMessage} from 'react-intl'
+import {useIntl} from 'react-intl'
 import {Alert, Button, Stack, Text} from '@chakra-ui/react'
 import {AlertIcon, BrandLogo} from '../../components/icons'
 import {noop} from '../../utils/utils'
 import ResetPasswordFields from '../../components/forms/reset-password-fields'
 
 const ResetPasswordForm = ({submitForm, clickSignIn = noop, form}) => {
+    const {formatMessage} = useIntl()
+    
+    const messages = {
+        title: formatMessage({
+            id: "reset_password_form.title.reset_password",
+            defaultMessage: "Reset Password"
+        }),
+        description: formatMessage({
+            id: "reset_password_form.message.enter_your_email",
+            defaultMessage: "Enter your email to receive instructions on how to reset your password"
+        }),
+        resetPasswordButton: formatMessage({
+            id: "reset_password_form.button.reset_password",
+            defaultMessage: "Reset Password"
+        }),
+        returnToSignIn: formatMessage({
+            id: "reset_password_form.message.return_to_sign_in",
+            defaultMessage: "Or return to"
+        }),
+        signInButton: formatMessage({
+            id: "reset_password_form.action.sign_in",
+            defaultMessage: "Sign in"
+        }),
+        passwordResetSuccess: formatMessage({
+            id: "auth_modal.password_reset_success.title.password_reset",
+            defaultMessage: "Password Reset"
+        }),
+        emailSentMessage: formatMessage({
+            id: "auth_modal.password_reset_success.info.will_email_shortly",
+            defaultMessage: "You will receive an email at <b>{email}</b> with a link to reset your password shortly."
+        }, {
+            email: form.getValues('email'),
+            b: (chunks) => <b>{chunks}</b>
+        }),
+        backToSignInButton: formatMessage({
+            id: "auth_modal.password_reset_success.button.back_to_sign_in",
+            defaultMessage: "Back to Sign In"
+        })
+    }
     return (
         <Fragment>
             {!form.formState.isSubmitSuccessful ? (
@@ -22,16 +61,10 @@ const ResetPasswordForm = ({submitForm, clickSignIn = noop, form}) => {
                         <BrandLogo width="60px" height="auto" />
                         <Stack gap={2}>
                             <Text textAlign="center" fontSize="xl" fontWeight="semibold">
-                                <FormattedMessage
-                                    defaultMessage="Reset Password"
-                                    id="reset_password_form.title.reset_password"
-                                />
+                                {messages.title}
                             </Text>
                             <Text fontSize="sm" textAlign="center" color="gray.700">
-                                <FormattedMessage
-                                    defaultMessage="Enter your email to receive instructions on how to reset your password"
-                                    id="reset_password_form.message.enter_your_email"
-                                />
+                                {messages.description}
                             </Text>
                         </Stack>
                     </Stack>
@@ -54,19 +87,12 @@ const ResetPasswordForm = ({submitForm, clickSignIn = noop, form}) => {
                                     onClick={() => form.clearErrors('global')}
                                     loading={form.formState.isSubmitting}
                                 >
-                                    <FormattedMessage
-                                        defaultMessage="Reset Password"
-                                        id="reset_password_form.button.reset_password"
-                                    />
+                                    {messages.resetPasswordButton}
                                 </Button>
 
                                 <Stack direction="row" gap={1} justify="center">
                                     <Text fontSize="sm">
-                                        <FormattedMessage
-                                            defaultMessage="Or return to"
-                                            id="reset_password_form.message.return_to_sign_in"
-                                            description="Precedes link to return to sign in"
-                                        />
+                                        {messages.returnToSignIn}
                                     </Text>
                                     <Button
                                         variant="link-blue"
@@ -74,10 +100,7 @@ const ResetPasswordForm = ({submitForm, clickSignIn = noop, form}) => {
                                         lineHeight="1"
                                         onClick={clickSignIn}
                                     >
-                                        <FormattedMessage
-                                            defaultMessage="Sign in"
-                                            id="reset_password_form.action.sign_in"
-                                        />
+                                        {messages.signInButton}
                                     </Button>
                                 </Stack>
                             </Stack>
@@ -88,29 +111,15 @@ const ResetPasswordForm = ({submitForm, clickSignIn = noop, form}) => {
                 <Stack justify="center" align="center" gap={6}>
                     <BrandLogo width="60px" height="auto" />
                     <Text textAlign="center" fontSize="xl" fontWeight="semibold">
-                        <FormattedMessage
-                            defaultMessage={'Password Reset'}
-                            id="auth_modal.password_reset_success.title.password_reset"
-                        />
+                        {messages.passwordResetSuccess}
                     </Text>
                     <Stack gap={6} pt={4}>
                         <Text textAlign="center" fontSize="sm">
-                            <FormattedMessage
-                                defaultMessage="You will receive an email at <b>{email}</b> with a link to reset your password shortly."
-                                id="auth_modal.password_reset_success.info.will_email_shortly"
-                                values={{
-                                    email: form.getValues('email'),
-
-                                    b: (chunks) => <b>{chunks}</b>
-                                }}
-                            />
+                            {messages.emailSentMessage}
                         </Text>
 
                         <Button onClick={clickSignIn}>
-                            <FormattedMessage
-                                defaultMessage="Back to Sign In"
-                                id="auth_modal.password_reset_success.button.back_to_sign_in"
-                            />
+                            {messages.backToSignInButton}
                         </Button>
                     </Stack>
                 </Stack>
