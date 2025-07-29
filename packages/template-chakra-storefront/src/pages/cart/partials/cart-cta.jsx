@@ -5,12 +5,21 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React, {Fragment} from 'react'
-import {FormattedMessage} from 'react-intl'
+import {useIntl} from 'react-intl'
 import {Flex, Button} from '@chakra-ui/react'
 import {AmexIcon, DiscoverIcon, LockIcon, MastercardIcon, VisaIcon} from '../../../components/icons'
 import Link from '../../../components/link'
 
 const CartCta = () => {
+    const {formatMessage} = useIntl()
+
+    const messages = {
+        checkout: formatMessage({
+            id: "cart_cta.link.checkout",
+            defaultMessage: "Proceed to Checkout"
+        })
+    }
+
     return (
         <Fragment>
             <Button asChild>
@@ -21,10 +30,7 @@ const CartCta = () => {
                     mb={4}
                     variant="solid"
                 >
-                    <FormattedMessage
-                        defaultMessage="Proceed to Checkout"
-                        id="cart_cta.link.checkout"
-                    />
+                    {messages.checkout}
                     <LockIcon />
                 </Link>
             </Button>
