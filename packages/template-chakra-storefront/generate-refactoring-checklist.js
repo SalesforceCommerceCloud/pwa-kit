@@ -74,11 +74,11 @@ const excludePatterns = [
     '**/__tests__/**'
 ]
 
-// Function to check if file contains intl.formatMessage
-function containsIntlFormatMessage(filePath) {
+// Function to check if file contains 'const messages = {'
+function containsConstMessages(filePath) {
     try {
         const content = fs.readFileSync(filePath, 'utf8')
-        return content.includes('intl.formatMessage')
+        return content.includes('const messages = {')
     } catch (error) {
         return false
     }
@@ -94,7 +94,7 @@ function findFiles() {
             nodir: true
         })
         files.forEach((file) => {
-            if (containsIntlFormatMessage(file)) {
+            if (containsConstMessages(file)) {
                 allFiles.add(file)
             }
         })

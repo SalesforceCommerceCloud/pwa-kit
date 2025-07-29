@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React, {useState} from 'react'
+import React, {useState, useMemo} from 'react'
 import PropTypes from 'prop-types'
 import {Stack, Box, Button} from '@chakra-ui/react'
 import {useIntl} from 'react-intl'
@@ -28,7 +28,7 @@ const ActionCard = ({
     const [showLoading, setShowLoading] = useState(false)
     const {formatMessage} = useIntl()
     
-    const messages = {
+    const messages = useMemo(() => ({
         edit: formatMessage({
             id: 'action_card.action.edit',
             defaultMessage: 'Edit'
@@ -37,7 +37,7 @@ const ActionCard = ({
             id: 'action_card.action.remove',
             defaultMessage: 'Remove'
         })
-    }
+    }), [formatMessage])
 
     const handleRemove = async () => {
         setShowLoading(true)

@@ -1,35 +1,105 @@
 # Refactoring Checklist
 
-Generated on: 2025-07-29T22:25:23.853Z
+Generated on: 2025-07-29T23:29:41.703Z
 
-Total files: 27
+Total files: 97
 
 ## Files to refactor:
 
-- [x] src/components/display-price/current-price.jsx
-- [x] src/components/display-price/list-price.jsx
-- [x] src/components/forms/address-fields.jsx
-- [x] src/components/forms/profile-fields.jsx
-- [x] src/components/icons/index.jsx
-- [x] src/components/list-menu/list-menu.jsx
-- [x] src/components/locale-text/index.jsx
-- [x] src/components/offline-banner/index.jsx
-- [x] src/components/order-summary/index.jsx
-- [x] src/components/pagination/index.jsx
-- [x] src/components/passwordless-login/index.jsx
-- [x] src/components/product-scroller/index.jsx
-- [x] src/components/product-tile/index.jsx
-- [x] src/components/search/index.jsx
-- [x] src/components/store-locator-modal/store-locator-input.jsx
-- [x] src/components/store-locator-modal/stores-list.jsx
-- [x] src/hooks/use-add-to-cart-modal.js
-- [x] src/hooks/use-derived-product.js
-- [x] src/hooks/use-product-view-modal.js
-- [x] src/page-designer/layouts/carousel/index.jsx
-- [x] src/pages/checkout/partials/checkout-footer.jsx
-- [x] src/pages/checkout/partials/checkout-header.jsx
-- [x] src/pages/home/index.jsx
-- [x] src/pages/page-not-found/index.jsx
-- [x] src/pages/product-list/partials/color-refinements.jsx
-- [x] src/pages/product-list/partials/empty-results.jsx
-- [x] src/pages/product-list/partials/sort.jsx
+- [x] src/components/action-card/index.jsx
+- [ ] src/components/display-price/current-price.jsx
+- [ ] src/components/display-price/list-price.jsx
+- [ ] src/components/drawer-menu/drawer-menu.jsx
+- [ ] src/components/email-confirmation/index.jsx
+- [ ] src/components/field/index.jsx
+- [ ] src/components/footer/index.jsx
+- [ ] src/components/forms/address-fields.jsx
+- [ ] src/components/forms/credit-card-fields.jsx
+- [ ] src/components/forms/form-action-buttons.jsx
+- [ ] src/components/forms/login-fields.jsx
+- [ ] src/components/forms/password-requirements.jsx
+- [ ] src/components/forms/profile-fields.jsx
+- [ ] src/components/forms/promo-code-fields.jsx
+- [ ] src/components/forms/update-password-fields.jsx
+- [ ] src/components/forms/useLoginFields.jsx
+- [ ] src/components/forms/useProfileFields.jsx
+- [ ] src/components/forms/usePromoCodeFields.jsx
+- [ ] src/components/forms/useRegistrationFields.jsx
+- [ ] src/components/forms/useResetPasswordFields.jsx
+- [ ] src/components/forms/useUpdatePasswordFields.jsx
+- [ ] src/components/header/index.jsx
+- [ ] src/components/item-variant/item-attributes.jsx
+- [ ] src/components/item-variant/item-image.jsx
+- [ ] src/components/item-variant/item-price.jsx
+- [ ] src/components/list-menu/list-menu.jsx
+- [ ] src/components/offline-banner/index.jsx
+- [ ] src/components/order-summary/index.jsx
+- [ ] src/components/pagination/index.jsx
+- [ ] src/components/passwordless-login/index.jsx
+- [ ] src/components/product-scroller/index.jsx
+- [ ] src/components/product-tile/index.jsx
+- [ ] src/components/product-view-modal/bundle.jsx
+- [ ] src/components/product-view-modal/index.jsx
+- [ ] src/components/promo-code/index.jsx
+- [ ] src/components/promo-popover/index.jsx
+- [ ] src/components/quantity-picker/index.jsx
+- [ ] src/components/recommended-products/index.jsx
+- [ ] src/components/register/index.jsx
+- [ ] src/components/reset-password/index.jsx
+- [ ] src/components/search/index.jsx
+- [ ] src/components/search/partials/recent-searches.jsx
+- [ ] src/components/social-login/index.jsx
+- [ ] src/components/store-locator-modal/store-locator-content.jsx
+- [ ] src/components/store-locator-modal/store-locator-input.jsx
+- [ ] src/components/store-locator-modal/stores-list.jsx
+- [ ] src/components/swatch-group/index.jsx
+- [ ] src/components/toggle-card/index.jsx
+- [ ] src/components/with-registration/index.jsx
+- [ ] src/hooks/use-add-to-cart-modal.js
+- [ ] src/hooks/use-dnt-notification.js
+- [ ] src/hooks/use-product-view-modal.js
+- [ ] src/page-designer/layouts/carousel/index.jsx
+- [ ] src/pages/account/addresses.jsx
+- [ ] src/pages/account/order-detail.jsx
+- [ ] src/pages/account/order-history.jsx
+- [ ] src/pages/account/profile.jsx
+- [ ] src/pages/account/wishlist/index.jsx
+- [ ] src/pages/account/wishlist/partials/wishlist-primary-action.jsx
+- [ ] src/pages/account/wishlist/partials/wishlist-secondary-button-group.jsx
+- [ ] src/pages/cart/hooks/use-cart-operations.js
+- [ ] src/pages/cart/partials/cart-cta.jsx
+- [ ] src/pages/cart/partials/cart-recommendations.jsx
+- [ ] src/pages/cart/partials/cart-secondary-button-group.jsx
+- [ ] src/pages/cart/partials/cart-skeleton.jsx
+- [ ] src/pages/cart/partials/cart-title.jsx
+- [ ] src/pages/cart/partials/empty-cart.jsx
+- [ ] src/pages/checkout/confirmation.jsx
+- [ ] src/pages/checkout/index.jsx
+- [ ] src/pages/checkout/partials/cc-radio-group.jsx
+- [ ] src/pages/checkout/partials/checkout-footer.jsx
+- [ ] src/pages/checkout/partials/checkout-header.jsx
+- [ ] src/pages/checkout/partials/contact-info.jsx
+- [ ] src/pages/checkout/partials/login-state.jsx
+- [ ] src/pages/checkout/partials/payment-form.jsx
+- [ ] src/pages/checkout/partials/payment.jsx
+- [ ] src/pages/checkout/partials/shipping-address-selection.jsx
+- [ ] src/pages/checkout/partials/shipping-address.jsx
+- [ ] src/pages/checkout/partials/shipping-options.jsx
+- [ ] src/pages/home/index.jsx
+- [ ] src/pages/login/index.jsx
+- [ ] src/pages/page-not-found/index.jsx
+- [ ] src/pages/product-detail/partials/information-accordion.jsx
+- [ ] src/pages/product-detail/partials/recommended-products-section.jsx
+- [ ] src/pages/product-list/partials/category-links.jsx
+- [ ] src/pages/product-list/partials/color-refinements.jsx
+- [ ] src/pages/product-list/partials/empty-results.jsx
+- [ ] src/pages/product-list/partials/page-header.jsx
+- [ ] src/pages/product-list/partials/product-list-header.jsx
+- [ ] src/pages/product-list/partials/product-list-title.jsx
+- [ ] src/pages/product-list/partials/radio-refinements.jsx
+- [ ] src/pages/product-list/partials/selected-refinements.jsx
+- [ ] src/pages/product-list/partials/sort.jsx
+- [ ] src/pages/registration/index.jsx
+- [ ] src/pages/reset-password/index.jsx
+- [ ] src/pages/reset-password/reset-password-landing.jsx
+- [ ] src/pages/social-login-redirect/index.jsx

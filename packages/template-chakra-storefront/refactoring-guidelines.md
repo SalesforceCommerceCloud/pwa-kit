@@ -133,3 +133,42 @@ const ProductListModal = ({isOpen, onClose, productCount, onResetFilters}) => {
     )
 }
 ```
+
+===============================================
+The above migration is done. However, we missed a detail that we need to go back and fix again.
+
+We need to wrap the `messages` variable in `useMemo` to improve performance.
+
+Don't forget to import useMemo.
+
+Example:
+
+```
+import React, { useMemo } from 'react'
+
+// example
+const messages = useMemo(() => ({
+        header: {
+            title: intl.formatMessage({
+                id: 'drawer_menu.header.assistive_msg.title',
+                defaultMessage: 'Menu Drawer'
+            })
+        },
+        links: {
+            shopAll: intl.formatMessage({
+                id: 'drawer_menu.link.shop_all',
+                defaultMessage: 'Shop All'
+            }),
+            signIn: intl.formatMessage({
+                id: 'drawer_menu.link.sign_in',
+                defaultMessage: 'Sign In'
+            })
+        },
+        buttons: {
+            logOut: intl.formatMessage({
+                id: 'drawer_menu.button.log_out',
+                defaultMessage: 'Log Out'
+            })
+        }
+    }), [intl])
+```
