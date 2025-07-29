@@ -16,7 +16,7 @@ import {
     Heading,
     Box
 } from '@chakra-ui/react'
-import {FormattedMessage} from 'react-intl'
+import {useIntl} from 'react-intl'
 
 const CartItemSkeleton = () => {
     return (
@@ -40,6 +40,19 @@ const CartItemSkeleton = () => {
 }
 
 const CartSkeleton = () => {
+    const {formatMessage} = useIntl()
+
+    const messages = {
+        cart: formatMessage({
+            id: "cart_skeleton.title.cart",
+            defaultMessage: "Cart"
+        }),
+        orderSummary: formatMessage({
+            id: "cart_skeleton.heading.order_summary",
+            defaultMessage: "Order Summary"
+        })
+    }
+
     return (
         <Box background="gray.50" flex="1" paddingBottom={{base: 20, lg: 55}}>
             <Container
@@ -53,10 +66,7 @@ const CartSkeleton = () => {
                     <GridItem>
                         <Stack paddingTop={4} gap={4}>
                             <Text fontWeight="bold" fontSize={['xl', 'xl', 'xl', '2xl']}>
-                                <FormattedMessage
-                                    defaultMessage="Cart"
-                                    id="cart_skeleton.title.cart"
-                                />
+                                {messages.cart}
                             </Text>
                             <CartItemSkeleton />
                             <CartItemSkeleton />
@@ -65,10 +75,7 @@ const CartSkeleton = () => {
                     <GridItem py={7}>
                         <Stack paddingTop={{base: 0, lg: 8}} gap={3} px={[6, 6, 6, 0]}>
                             <Heading fontSize="lg" pt={1}>
-                                <FormattedMessage
-                                    defaultMessage="Order Summary"
-                                    id="cart_skeleton.heading.order_summary"
-                                />
+                                {messages.orderSummary}
                             </Heading>
                             <Stack gap={3} align="flex-start">
                                 <Skeleton
