@@ -1,6 +1,6 @@
 {
   "name": "pwa-kit-dev",
-  "version": "2.10.0-preview.1",
+  "version": "2.10.0",
   "description": "Build tools for pwa-kit",
   "repository": {
     "type": "git",
@@ -90,7 +90,7 @@
     "minimatch": "3.1.2",
     "open": "^8.4.2",
     "prettier": "^2.8.6",
-    "pwa-kit-runtime": "^2.10.0-preview.1",
+    "pwa-kit-runtime": "^2.10.0",
     "react-refresh": "^0.14.0",
     "replace-in-file": "^6.3.5",
     "request": "^2.88.0",
@@ -111,7 +111,7 @@
   },
   "devDependencies": {
     "@loadable/component": "^5.15.3",
-    "internal-lib-build": "^2.10.0-preview.1",
+    "internal-lib-build": "^2.10.0",
     "nock": "^13.3.0",
     "superagent": "^6.1.0",
     "supertest": "^4.0.2"
@@ -120,8 +120,8 @@
     "@loadable/component": "^5.15.0"
   },
   "engines": {
-    "node": "^14.0.0 || ^16.0.0 || ^18.0.0 || ^20.0.0",
-    "npm": "^6.14.4 || ^7.0.0 || ^8.0.0 || ^9.0.0 || ^10.0.0"
+    "node": "^18.0.0 || ^20.0.0",
+    "npm": "^9.0.0 || ^10.0.0"
   },
   "publishConfig": {
     "directory": "dist"
