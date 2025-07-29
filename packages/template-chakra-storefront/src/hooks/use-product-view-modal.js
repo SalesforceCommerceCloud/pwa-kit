@@ -24,10 +24,14 @@ import {keepPreviousData} from '@tanstack/react-query'
 export const useProductViewModal = (initialProduct) => {
     const location = useLocation()
     const history = useHistory()
-    const intl = useIntl()
+    const {formatMessage} = useIntl()
     const toast = useToast()
     const [product, setProduct] = useState(initialProduct)
     const variant = useVariant(product)
+
+    const messages = {
+        apiError: formatMessage(API_ERROR_MESSAGE)
+    }
 
     const {
         data: currentProduct,
@@ -58,7 +62,7 @@ export const useProductViewModal = (initialProduct) => {
     useEffect(() => {
         if (!isError) return
         toast({
-            title: intl.formatMessage(API_ERROR_MESSAGE),
+            title: messages.apiError,
             type: 'error'
         })
     }, [isError])
