@@ -103,7 +103,7 @@ Total files: 222
 - [x] src/components/product-tile/index.jsx
 - [x] src/components/product-tile/promo-callout.jsx
 - [x] src/components/product-tile/promo-callout.mock.js
-- [ ] src/components/product-view-modal/bundle.jsx
+- [x] src/components/product-view-modal/bundle.jsx
 - [ ] src/components/product-view-modal/index.jsx
 - [x] src/components/product-view/index.jsx
 - [ ] src/components/promo-code/index.jsx
