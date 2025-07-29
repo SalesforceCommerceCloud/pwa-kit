@@ -18,6 +18,8 @@ import useCustomerType from '@salesforce/commerce-sdk-react/hooks/useCustomerTyp
 const useRefreshToken = () => {
     const auth = useAuthContext()
     const {customerType} = useCustomerType()
+    // WARNING: This is a temporary fix to get the refresh token when the customer type is available.
+    // This is internal to the Commerce SDK React and if removed, the refresh token will not be available and might break this functionality.
     const refreshToken = customerType ? auth.get(`refresh_token_${customerType}`) : null
     const [readyToken, setReadyToken] = useState(null)
 
