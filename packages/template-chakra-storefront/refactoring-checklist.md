@@ -123,7 +123,7 @@ Total files: 222
 - [x] src/components/section/index.jsx
 - [x] src/components/seo/index.tsx
 - [x] src/components/skip-nav/index.tsx
-- [ ] src/components/social-icons/index.jsx
+- [x] src/components/social-icons/index.jsx
 - [ ] src/components/social-login/index.jsx
 - [x] src/components/standard-login/index.jsx
 - [ ] src/components/store-locator-modal/index.jsx
