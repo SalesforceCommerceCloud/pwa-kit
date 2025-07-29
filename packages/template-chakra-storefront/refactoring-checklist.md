@@ -47,7 +47,7 @@ Total files: 222
 - [ ] src/components/dynamic-image/index.jsx
 - [ ] src/components/email-confirmation/index.jsx
 - [ ] src/components/fade/index.jsx
-- [ ] src/components/field/index.jsx
+- [x] src/components/field/index.jsx
 - [ ] src/components/footer/index.jsx
 - [ ] src/components/forms/address-fields.jsx
 - [ ] src/components/forms/credit-card-fields.jsx

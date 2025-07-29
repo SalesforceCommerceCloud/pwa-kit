@@ -36,17 +36,25 @@ const Field = ({
     inputRef
 }) => {
     const intl = useIntl()
+    const {formatMessage} = intl
     const [hidePassword, setHidePassword] = useState(true)
+    
+    // Group related messages together
+    const messages = {
+        password: {
+            showPassword: formatMessage({
+                id: 'field.password.assistive_msg.show_password',
+                defaultMessage: 'Show password'
+            }),
+            hidePassword: formatMessage({
+                id: 'field.password.assistive_msg.hide_password',
+                defaultMessage: 'Hide password'
+            })
+        }
+    }
+    
     const PasswordIcon = hidePassword ? VisibilityIcon : VisibilityOffIcon
-    const passwordIconLabel = hidePassword
-        ? intl.formatMessage({
-              id: 'field.password.assistive_msg.show_password',
-              defaultMessage: 'Show password'
-          })
-        : intl.formatMessage({
-              id: 'field.password.assistive_msg.hide_password',
-              defaultMessage: 'Hide password'
-          })
+    const passwordIconLabel = hidePassword ? messages.password.showPassword : messages.password.hidePassword
     const inputType =
         type === 'password' && hidePassword ? 'password' : type === 'password' ? 'text' : type
 
