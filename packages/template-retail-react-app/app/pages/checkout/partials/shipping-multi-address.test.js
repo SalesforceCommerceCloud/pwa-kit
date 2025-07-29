@@ -220,7 +220,8 @@ describe('ShippingMultiAddress', () => {
             }
         })
         useCurrentCustomer.mockReturnValue({
-            data: mockCustomer
+            data: mockCustomer,
+            isLoading: false
         })
         useCurrentBasket.mockReturnValue({
             data: mockBasket
@@ -440,7 +441,8 @@ describe('ShippingMultiAddress', () => {
                             preferred: false
                         }
                     ]
-                }
+                },
+                isLoading: false
             })
 
             renderWithIntl(<ShippingMultiAddress {...defaultProps} />)
@@ -464,7 +466,8 @@ describe('ShippingMultiAddress', () => {
                 data: {
                     customerId: 'customer-1',
                     addresses: []
-                }
+                },
+                isLoading: false
             })
 
             renderWithIntl(<ShippingMultiAddress {...defaultProps} />)
@@ -484,6 +487,69 @@ describe('ShippingMultiAddress', () => {
             // Verify that "Add New Address" buttons are still available
             const addNewAddressButtons = screen.getAllByText('Add New Address')
             expect(addNewAddressButtons).toHaveLength(2)
+        })
+
+        test('should show loading state when customer data is loading', () => {
+            // Mock customer loading state
+            useCurrentCustomer.mockReturnValue({
+                data: null,
+                isLoading: true
+            })
+
+            renderWithIntl(<ShippingMultiAddress {...defaultProps} />)
+
+            // Check that loading message is displayed
+            expect(screen.getByText('Loading customer information...')).toBeInTheDocument()
+        })
+
+        test('should show guest user message when customer is a guest', () => {
+            // Mock guest customer
+            useCurrentCustomer.mockReturnValue({
+                data: {
+                    customerId: 'guest-1',
+                    isGuest: true,
+                    addresses: []
+                },
+                isLoading: false
+            })
+
+            renderWithIntl(<ShippingMultiAddress {...defaultProps} />)
+
+            // Check that guest user message is displayed
+            expect(
+                screen.getByText(
+                    'Guest users cannot use multi-address shipping. Please sign in to continue.'
+                )
+            ).toBeInTheDocument()
+        })
+
+        test('should handle customer data loading and then rendering', async () => {
+            // Test loading state
+            useCurrentCustomer.mockReturnValue({
+                data: null,
+                isLoading: true
+            })
+
+            const {unmount} = renderWithIntl(<ShippingMultiAddress {...defaultProps} />)
+
+            // Check that loading message is displayed
+            expect(screen.getByText('Loading customer information...')).toBeInTheDocument()
+
+            // Clean up
+            unmount()
+
+            // Test loaded state
+            useCurrentCustomer.mockReturnValue({
+                data: mockCustomer,
+                isLoading: false
+            })
+
+            renderWithIntl(<ShippingMultiAddress {...defaultProps} />)
+
+            // Check that normal UI is displayed after loading
+            expect(screen.getByText('Test Product 1')).toBeInTheDocument()
+            expect(screen.getByText('Test Product 2')).toBeInTheDocument()
+            expect(screen.queryByText('Loading customer information...')).not.toBeInTheDocument()
         })
     })
 
@@ -709,7 +775,8 @@ describe('ShippingMultiAddress - handleSubmit', () => {
                 customerId: 'test-customer',
                 addresses: mockAddresses
             },
-            refetch: jest.fn()
+            refetch: jest.fn(),
+            isLoading: false
         })
     })
 

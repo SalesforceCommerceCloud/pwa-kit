@@ -3559,6 +3559,12 @@
       "value": "postalCode"
     }
   ],
+  "shipping_multi_address.guest_user.message": [
+    {
+      "type": 0,
+      "value": "Guest users cannot use multi-address shipping. Please sign in to continue."
+    }
+  ],
   "shipping_multi_address.image.alt": [
     {
       "type": 0,
@@ -3573,6 +3579,12 @@
     {
       "type": 0,
       "value": "Loading products..."
+    }
+  ],
+  "shipping_multi_address.loading_customer.message": [
+    {
+      "type": 0,
+      "value": "Loading customer information..."
     }
   ],
   "shipping_multi_address.no_addresses_available": [

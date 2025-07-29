@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React, {useState} from 'react'
+import React, {useState, useEffect} from 'react'
 import {useIntl, defineMessage} from 'react-intl'
 import PropTypes from 'prop-types'
 import {useForm} from 'react-hook-form'
@@ -164,13 +164,20 @@ const ShippingMultiAddress = ({
             }
         }
     )
-    const {data: customer, refetch: refetchCustomer} = useCurrentCustomer()
+    const {
+        data: customer,
+        refetch: refetchCustomer,
+        isLoading: customerLoading
+    } = useCurrentCustomer()
     const addresses = customer?.addresses || []
 
     // Initialize selected addresses with default addresses
-    const [selectedAddresses, setSelectedAddresses] = useState(() => {
-        const initialSelected = {}
-        if (basket?.productItems) {
+    const [selectedAddresses, setSelectedAddresses] = useState({})
+
+    // Update selected addresses when customer data changes
+    useEffect(() => {
+        if (customer && basket?.productItems) {
+            const initialSelected = {}
             basket.productItems.forEach((item) => {
                 const addressKey = item.itemId
                 // Find preferred address or use first address as default
@@ -179,9 +186,9 @@ const ShippingMultiAddress = ({
                     initialSelected[addressKey] = defaultAddress.addressId
                 }
             })
+            setSelectedAddresses(initialSelected)
         }
-        return initialSelected
-    })
+    }, [customer, basket?.productItems, addresses])
 
     const [showAddAddressForm, setShowAddAddressForm] = useState({})
 
@@ -267,6 +274,40 @@ const ShippingMultiAddress = ({
                     })}
                 </AlertDescription>
             </Alert>
+        )
+    }
+
+    // Handle customer loading state
+    if (customerLoading) {
+        return (
+            <Center p={8} textAlign="center" color="gray.500">
+                <VStack spacing={4}>
+                    <Spinner size="lg" />
+                    <Text>
+                        {formatMessage({
+                            id: 'shipping_multi_address.loading_customer.message',
+                            defaultMessage: 'Loading customer information...'
+                        })}
+                    </Text>
+                </VStack>
+            </Center>
+        )
+    }
+
+    // Handle guest user
+    if (customer && customer.isGuest) {
+        return (
+            <Center p={8} textAlign="center" color="gray.500">
+                <VStack spacing={4}>
+                    <Text fontSize="lg" fontWeight="medium">
+                        {formatMessage({
+                            id: 'shipping_multi_address.guest_user.message',
+                            defaultMessage:
+                                'Guest users cannot use multi-address shipping. Please sign in to continue.'
+                        })}
+                    </Text>
+                </VStack>
+            </Center>
         )
     }
 

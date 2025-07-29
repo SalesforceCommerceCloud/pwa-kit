@@ -7503,6 +7503,20 @@
       "value": "]"
     }
   ],
+  "shipping_multi_address.guest_user.message": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ɠŭŭḗḗşŧ ŭŭşḗḗřş ƈȧȧƞƞǿǿŧ ŭŭşḗḗ ḿŭŭŀŧī-ȧȧḓḓřḗḗşş şħīƥƥīƞɠ. Ƥŀḗḗȧȧşḗḗ şīɠƞ īƞ ŧǿǿ ƈǿǿƞŧīƞŭŭḗḗ."
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
   "shipping_multi_address.image.alt": [
     {
       "type": 0,
@@ -7529,6 +7543,20 @@
     {
       "type": 0,
       "value": "Ŀǿǿȧȧḓīƞɠ ƥřǿǿḓŭŭƈŧş..."
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "shipping_multi_address.loading_customer.message": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ŀǿǿȧȧḓīƞɠ ƈŭŭşŧǿǿḿḗḗř īƞƒǿǿřḿȧȧŧīǿǿƞ..."
     },
     {
       "type": 0,

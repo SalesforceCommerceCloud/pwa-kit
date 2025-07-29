@@ -1493,11 +1493,17 @@
   "shipping_multi_address.format.address_line_2": {
     "defaultMessage": "{city}, {stateCode} {postalCode}"
   },
+  "shipping_multi_address.guest_user.message": {
+    "defaultMessage": "Guest users cannot use multi-address shipping. Please sign in to continue."
+  },
   "shipping_multi_address.image.alt": {
     "defaultMessage": "Product image for {productName}"
   },
   "shipping_multi_address.loading.message": {
     "defaultMessage": "Loading products..."
+  },
+  "shipping_multi_address.loading_customer.message": {
+    "defaultMessage": "Loading customer information..."
   },
   "shipping_multi_address.no_addresses_available": {
     "defaultMessage": "No Address Available"
