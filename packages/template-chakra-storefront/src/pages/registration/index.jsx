@@ -23,6 +23,10 @@ const Registration = () => {
     const form = useForm()
     const register = useAuthHelper(AuthHelpers.Register)
 
+    const messages = {
+        apiError: formatMessage(API_ERROR_MESSAGE)
+    }
+
     const submitForm = async (data) => {
         const body = {
             customer: {
@@ -37,7 +41,7 @@ const Registration = () => {
         try {
             await register.mutateAsync(body, {})
         } catch (e) {
-            form.setError('global', {type: 'manual', message: formatMessage(API_ERROR_MESSAGE)})
+            form.setError('global', {type: 'manual', message: messages.apiError})
         }
     }
 

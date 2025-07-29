@@ -229,7 +229,7 @@ Total files: 222
 - [x] src/pages/product-list/partials/refinements.jsx
 - [x] src/pages/product-list/partials/selected-refinements.jsx
 - [x] src/pages/product-list/partials/size-refinements.jsx
-- [ ] src/pages/product-list/partials/sort.jsx
+- [x] src/pages/product-list/partials/sort.jsx
 - [ ] src/pages/registration/index.jsx
 - [ ] src/pages/reset-password/index.jsx
 - [ ] src/pages/reset-password/reset-password-landing.jsx
