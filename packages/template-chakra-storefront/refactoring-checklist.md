@@ -11,8 +11,8 @@ Total files: 27
 - [x] src/components/forms/address-fields.jsx
 - [x] src/components/forms/profile-fields.jsx
 - [x] src/components/icons/index.jsx
-- [ ] src/components/list-menu/list-menu.jsx
-- [ ] src/components/locale-text/index.jsx
+- [x] src/components/list-menu/list-menu.jsx
+- [x] src/components/locale-text/index.jsx
 - [ ] src/components/offline-banner/index.jsx
 - [ ] src/components/order-summary/index.jsx
 - [ ] src/components/pagination/index.jsx

@@ -11,7 +11,7 @@ import {defineMessages, useIntl} from 'react-intl'
 import logger from '../../utils/logger-instance'
 
 const LocaleText = ({shortCode}) => {
-    const intl = useIntl()
+    const {formatMessage} = useIntl()
     const message = LOCALE_MESSAGES[shortCode]
 
     if (!message) {
@@ -25,7 +25,7 @@ const LocaleText = ({shortCode}) => {
         return <>Unknown {shortCode}</>
     }
 
-    const localizedText = intl.formatMessage(message)
+    const localizedText = formatMessage(message)
 
     return <>{localizedText}</>
 }
