@@ -96,7 +96,7 @@ Total files: 222
 - [x] src/components/offline-boundary/index.jsx
 - [x] src/components/order-summary/index.jsx
 - [x] src/components/page-action-placeholder/index.jsx
-- [ ] src/components/pagination/index.jsx
+- [x] src/components/pagination/index.jsx
 - [ ] src/components/passwordless-login/index.jsx
 - [x] src/components/product-item/index.jsx
 - [ ] src/components/product-scroller/index.jsx

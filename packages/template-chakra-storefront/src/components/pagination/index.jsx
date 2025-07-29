@@ -44,6 +44,36 @@ const Pagination = (props) => {
     const recipe = useSlotRecipe({key: 'pagination'})
     const styles = recipe()
 
+    const messages = {
+        prevAssistive: intl.formatMessage({
+            id: 'pagination.link.prev.assistive_msg',
+            defaultMessage: 'Previous Page'
+        }),
+        prev: intl.formatMessage({
+            id: 'pagination.link.prev',
+            defaultMessage: 'Prev'
+        }),
+        pageNumberSelect: intl.formatMessage({
+            id: 'pagination.field.page_number_select',
+            defaultMessage: 'Select page number'
+        }),
+        numOfPages: intl.formatMessage(
+            {
+                id: 'pagination.field.num_of_pages',
+                defaultMessage: 'of {numOfPages}'
+            },
+            {numOfPages: urls.length}
+        ),
+        nextAssistive: intl.formatMessage({
+            id: 'pagination.link.next.assistive_msg',
+            defaultMessage: 'Next Page'
+        }),
+        next: intl.formatMessage({
+            id: 'pagination.link.next',
+            defaultMessage: 'Next'
+        })
+    }
+
     // Determine the current page index.
     return (
         <Flex
@@ -60,20 +90,14 @@ const Pagination = (props) => {
                 // as intended, the workaround is to use the current url when its disabled.
                 href={prev || currentURL}
                 to={prev || currentURL}
-                aria-label={intl.formatMessage({
-                    id: 'pagination.link.prev.assistive_msg',
-                    defaultMessage: 'Previous Page'
-                })}
+                aria-label={messages.prevAssistive}
                 aria-disabled={!prev}
                 variant="link"
                 isDisabled={!prev}
             >
                 <ChevronLeftIcon boxSize={4} color="black" />
                 <Text css={styles.text}>
-                    {intl.formatMessage({
-                        id: 'pagination.link.prev',
-                        defaultMessage: 'Prev'
-                    })}
+                    {messages.prev}
                 </Text>
             </Button>
 
@@ -87,10 +111,7 @@ const Pagination = (props) => {
                             history.push(e.target.value)
                         }}
                         value={currentURL}
-                        aria-label={intl.formatMessage({
-                            id: 'pagination.field.page_number_select',
-                            defaultMessage: 'Select page number'
-                        })}
+                        aria-label={messages.pageNumberSelect}
                     >
                         {urls.map((href, index) => (
                             <option key={index} value={href}>
@@ -101,13 +122,7 @@ const Pagination = (props) => {
                     <NativeSelect.Indicator css={styles.selectIndicator} />
                 </NativeSelect.Root>
                 <Text css={styles.text} ml={2}>
-                    {intl.formatMessage(
-                        {
-                            id: 'pagination.field.num_of_pages',
-                            defaultMessage: 'of {numOfPages}'
-                        },
-                        {numOfPages: urls.length}
-                    )}
+                    {messages.numOfPages}
                 </Text>
             </Flex>
 
@@ -119,19 +134,13 @@ const Pagination = (props) => {
                 // as intended, the workaround is to use the current url when its disabled.
                 href={next || currentURL}
                 to={next || currentURL}
-                aria-label={intl.formatMessage({
-                    id: 'pagination.link.next.assistive_msg',
-                    defaultMessage: 'Next Page'
-                })}
+                aria-label={messages.nextAssistive}
                 aria-disabled={!next}
                 variant="link"
                 isDisabled={!next}
             >
                 <Text css={styles.text}>
-                    {intl.formatMessage({
-                        id: 'pagination.link.next',
-                        defaultMessage: 'Next'
-                    })}
+                    {messages.next}
                 </Text>
                 <ChevronRightIcon boxSize={4} color="black" />
             </Button>
