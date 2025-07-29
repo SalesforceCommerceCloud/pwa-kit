@@ -92,7 +92,8 @@ import {
     STALE_WHILE_REVALIDATE,
     PRODUCT_LIST_IMAGE_VIEW_TYPE,
     PRODUCT_LIST_SELECTABLE_ATTRIBUTE_ID,
-    STORE_LOCATOR_IS_ENABLED
+    STORE_LOCATOR_IS_ENABLED,
+    PRODUCT_BADGE_DETAILS
 } from '@salesforce/retail-react-app/app/constants'
 import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
 import LoadingSpinner from '@salesforce/retail-react-app/app/components/loading-spinner'
@@ -137,6 +138,8 @@ const ProductList = (props) => {
     let searchQuery = urlParams.get('q')
     const isSearch = !!searchQuery
 
+    const badgeDetails = PRODUCT_BADGE_DETAILS
+
     if (params.categoryId) {
         searchParams._refine.push(`cgid=${params.categoryId}`)
     }
@@ -175,7 +178,9 @@ const ProductList = (props) => {
                     'page_meta_tags',
                     'custom_properties'
                 ],
-                refine
+                refine,
+                allVariationProperties: true,
+                includedCustomVariationProperties: badgeDetails.map(item => item.propertyName).join(',')
             }
         },
         {

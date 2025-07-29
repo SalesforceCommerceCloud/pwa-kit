@@ -340,3 +340,36 @@ test('Ignores the badges that are NOT defined as boolean custom properties', () 
     expect(badges).toHaveLength(1)
     expect(within(badges[0]).getByText(/Special/i)).toBeDefined()
 })
+
+test('renders badges from selected variant when variant has badge properties', () => {
+    // Create a mock product with variants that have different badge properties
+    const mockProductWithVariantBadges = {
+        ...mockProductSearchItem,
+        variants: [
+            {
+                ...mockProductSearchItem.variants[0],
+                c_isNew: true,
+                c_isSale: false
+            },
+            {
+                ...mockProductSearchItem.variants[1],
+                c_isNew: false,
+                c_isSale: true
+            }
+        ],
+        representedProduct: {
+            ...mockProductSearchItem.representedProduct,
+            c_isNew: false,
+            c_isSale: false
+        }
+    }
+
+    const {getAllByTestId} = renderWithProviders(
+        <ProductTile product={mockProductWithVariantBadges} />
+    )
+
+    // Initially should show badges from the represented product (variant1)
+    let badges = getAllByTestId('product-badge')
+    expect(badges).toHaveLength(1)
+    expect(within(badges[0]).getByText(/New/i)).toBeDefined()
+})

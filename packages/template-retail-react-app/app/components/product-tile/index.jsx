@@ -167,19 +167,31 @@ const ProductTile = (props) => {
     // Retrieve product badges
     const filteredLabels = useMemo(() => {
         const labelsMap = new Map()
-        if (product?.representedProduct) {
+        
+        // Get the currently selected variant based on the filtered variants
+        const selectedVariant = productWithFilteredVariants?.variants?.[0]
+        
+        // Check badge details on the selected variant first, then fall back to represented product
+        const productToCheck = selectedVariant || product?.representedProduct
+        
+        if (productToCheck) {
             badgeDetails.forEach((item) => {
                 if (
                     item.propertyName &&
-                    typeof product.representedProduct[item.propertyName] === 'boolean' &&
-                    product.representedProduct[item.propertyName] === true
+                    typeof productToCheck[item.propertyName] === 'boolean' &&
+                    productToCheck[item.propertyName] === true
                 ) {
                     labelsMap.set(intl.formatMessage(item.label), item.color)
+                } else if (
+                    item.propertyName &&
+                    typeof productToCheck[item.propertyName] !== 'boolean'
+                ) {
+                    labelsMap.set(productToCheck[item.propertyName], item.color)
                 }
             })
         }
         return labelsMap
-    }, [product, badgeDetails])
+    }, [productWithFilteredVariants, product, badgeDetails, intl])
 
     return (
         <Box {...styles.container}>
