@@ -80,7 +80,7 @@ Total files: 222
 - [x] src/components/item-variant/item-image.jsx
 - [x] src/components/item-variant/item-name.jsx
 - [x] src/components/item-variant/item-price.jsx
-- [ ] src/components/link/index.jsx
+- [x] src/components/link/index.jsx
 - [ ] src/components/links-list/index.jsx
 - [ ] src/components/list-menu/index.js
 - [ ] src/components/list-menu/list-menu-content.jsx
