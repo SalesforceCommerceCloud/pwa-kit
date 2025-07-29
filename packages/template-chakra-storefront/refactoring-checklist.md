@@ -21,22 +21,22 @@ Total files: 222
 - [x] src/components/_app/hooks/use-app-config.js
 - [x] src/components/_app/hooks/use-app-data.js
 - [x] src/components/_app/hooks/use-app-localization.js
-- [ ] src/components/_app/hooks/use-app-modals.js
-- [ ] src/components/_app/hooks/use-app-navigation.js
-- [ ] src/components/_app/hooks/use-app-online-status.js
-- [ ] src/components/_app/index.jsx
-- [ ] src/components/_app/partials/app-footer.jsx
-- [ ] src/components/_app/partials/app-header.jsx
-- [ ] src/components/_app/partials/app-layout.jsx
-- [ ] src/components/_app/partials/app-mobile-navigation.jsx
-- [ ] src/components/_app/partials/app-modals.jsx
-- [ ] src/components/_app/partials/app-providers.jsx
+- [x] src/components/_app/hooks/use-app-modals.js
+- [x] src/components/_app/hooks/use-app-navigation.js
+- [x] src/components/_app/hooks/use-app-online-status.js
+- [x] src/components/_app/index.jsx
+- [x] src/components/_app/partials/app-footer.jsx
+- [x] src/components/_app/partials/app-header.jsx
+- [x] src/components/_app/partials/app-layout.jsx
+- [x] src/components/_app/partials/app-mobile-navigation.jsx
+- [x] src/components/_app/partials/app-modals.jsx
+- [x] src/components/_app/partials/app-providers.jsx
 - [ ] src/components/_app/partials/app-seo.jsx
 - [ ] src/components/_app/partials/index.js
 - [ ] src/components/_error/index.jsx
 - [ ] src/components/action-card/index.jsx
 - [ ] src/components/address-display/index.jsx
-- [ ] src/components/breadcrumb/index.jsx
+- [x] src/components/breadcrumb/index.jsx
 - [ ] src/components/confirmation-modal/index.jsx
 - [ ] src/components/display-price/current-price.jsx
 - [ ] src/components/display-price/index.jsx
