@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React from 'react'
+import React, { useMemo } from 'react'
 import PropTypes from 'prop-types'
 import {FormattedNumber, useIntl} from 'react-intl'
 import {Box, Flex, Button, Stack, Text, Heading, Separator, Accordion} from '@chakra-ui/react'
@@ -20,7 +20,8 @@ import {useProducts} from '@salesforce/commerce-sdk-react'
 import {BasketIcon} from '../icons'
 
 const CartItems = ({basket}) => {
-    const {formatMessage} = useIntl()
+    const intl = useIntl()
+    const { formatMessage } = intl
     const totalItems = basket?.productItems?.reduce((acc, item) => acc + item.quantity, 0) || 0
     const productIds = basket?.productItems?.map(({productId}) => productId).join(',') ?? ''
     const {data: products} = useProducts(
@@ -43,8 +44,8 @@ const CartItems = ({basket}) => {
         }
     )
 
-    const messages = {
-        itemsInCart: formatMessage(
+    const messages = useMemo(() => ({
+        itemsInCart: intl.formatMessage(
             {
                 id: 'order_summary.cart_items.action.num_of_items_in_cart',
                 defaultMessage:
@@ -52,11 +53,11 @@ const CartItems = ({basket}) => {
             },
             {itemCount: totalItems}
         ),
-        editCart: formatMessage({
+        editCart: intl.formatMessage({
             id: 'order_summary.cart_items.link.edit_cart',
             defaultMessage: 'Edit cart'
         })
-    }
+    }), [intl, totalItems])
 
     return (
         <Accordion.Root w="full" collapsible>
@@ -118,7 +119,8 @@ const OrderSummary = ({
     isEstimate = false,
     fontSize = 'md'
 }) => {
-    const {formatMessage} = useIntl()
+    const intl = useIntl()
+    const { formatMessage } = intl
     const {removePromoCode, ...promoCodeProps} = usePromoCode()
 
     if (!basket?.basketId && !basket?.orderNo) {
@@ -127,48 +129,48 @@ const OrderSummary = ({
     const shippingItem = basket.shippingItems?.[0]
     const hasShippingPromos = shippingItem?.priceAdjustments?.length > 0
 
-    const messages = {
-        orderSummary: formatMessage({
+    const messages = useMemo(() => ({
+        orderSummary: intl.formatMessage({
             id: 'order_summary.heading.order_summary',
             defaultMessage: 'Order Summary'
         }),
-        subtotal: formatMessage({
+        subtotal: intl.formatMessage({
             id: 'order_summary.label.subtotal',
             defaultMessage: 'Subtotal'
         }),
-        shipping: formatMessage({
+        shipping: intl.formatMessage({
             id: 'order_summary.label.shipping',
             defaultMessage: 'Shipping'
         }),
-        promoApplied: formatMessage({
+        promoApplied: intl.formatMessage({
             id: 'order_summary.label.promo_applied',
             defaultMessage: 'Promotion applied'
         }),
-        free: formatMessage({
+        free: intl.formatMessage({
             id: 'order_summary.label.free',
             defaultMessage: 'Free'
         }),
-        tax: formatMessage({
+        tax: intl.formatMessage({
             id: 'order_summary.label.tax',
             defaultMessage: 'Tax'
         }),
-        estimatedTotal: formatMessage({
+        estimatedTotal: intl.formatMessage({
             id: 'order_summary.label.estimated_total',
             defaultMessage: 'Estimated Total'
         }),
-        orderTotal: formatMessage({
+        orderTotal: intl.formatMessage({
             id: 'order_summary.label.order_total',
             defaultMessage: 'Order Total'
         }),
-        promotionsApplied: formatMessage({
+        promotionsApplied: intl.formatMessage({
             id: 'order_summary.label.promotions_applied',
             defaultMessage: 'Promotions applied'
         }),
-        removePromo: formatMessage({
+        removePromo: intl.formatMessage({
             id: 'order_summary.action.remove_promo',
             defaultMessage: 'Remove'
         })
-    }
+    }), [intl])
 
     return (
         <Stack data-testid="sf-order-summary" gap="5">
