@@ -132,9 +132,9 @@ Total files: 222
 - [x] src/components/store-locator-modal/stores-list.jsx
 - [x] src/components/swatch-group/index.jsx
 - [x] src/components/swatch-group/swatch.jsx
-- [ ] src/components/toaster/index.jsx
-- [ ] src/components/toggle-card/index.jsx
-- [ ] src/components/tooltip/index.jsx
+- [x] src/components/toaster/index.jsx
+- [x] src/components/toggle-card/index.jsx
+- [x] src/components/tooltip/index.jsx
 - [ ] src/components/unavailable-product-confirmation-modal/index.jsx
 - [ ] src/components/with-commerce-sdk-react-hook-data/index.js
 - [ ] src/components/with-commerce-sdk-react-hook-data/with-commerce-sdk-react-hook-data.jsx
