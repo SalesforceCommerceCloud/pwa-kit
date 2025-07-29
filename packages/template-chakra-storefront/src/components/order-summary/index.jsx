@@ -20,7 +20,7 @@ import {useProducts} from '@salesforce/commerce-sdk-react'
 import {BasketIcon} from '../icons'
 
 const CartItems = ({basket}) => {
-    const intl = useIntl()
+    const {formatMessage} = useIntl()
     const totalItems = basket?.productItems?.reduce((acc, item) => acc + item.quantity, 0) || 0
     const productIds = basket?.productItems?.map(({productId}) => productId).join(',') ?? ''
     const {data: products} = useProducts(
@@ -44,7 +44,7 @@ const CartItems = ({basket}) => {
     )
 
     const messages = {
-        itemsInCart: intl.formatMessage(
+        itemsInCart: formatMessage(
             {
                 id: 'order_summary.cart_items.action.num_of_items_in_cart',
                 defaultMessage:
@@ -52,7 +52,7 @@ const CartItems = ({basket}) => {
             },
             {itemCount: totalItems}
         ),
-        editCart: intl.formatMessage({
+        editCart: formatMessage({
             id: 'order_summary.cart_items.link.edit_cart',
             defaultMessage: 'Edit cart'
         })
@@ -118,7 +118,7 @@ const OrderSummary = ({
     isEstimate = false,
     fontSize = 'md'
 }) => {
-    const intl = useIntl()
+    const {formatMessage} = useIntl()
     const {removePromoCode, ...promoCodeProps} = usePromoCode()
 
     if (!basket?.basketId && !basket?.orderNo) {
@@ -128,43 +128,43 @@ const OrderSummary = ({
     const hasShippingPromos = shippingItem?.priceAdjustments?.length > 0
 
     const messages = {
-        orderSummary: intl.formatMessage({
+        orderSummary: formatMessage({
             id: 'order_summary.heading.order_summary',
             defaultMessage: 'Order Summary'
         }),
-        subtotal: intl.formatMessage({
+        subtotal: formatMessage({
             id: 'order_summary.label.subtotal',
             defaultMessage: 'Subtotal'
         }),
-        shipping: intl.formatMessage({
+        shipping: formatMessage({
             id: 'order_summary.label.shipping',
             defaultMessage: 'Shipping'
         }),
-        promoApplied: intl.formatMessage({
+        promoApplied: formatMessage({
             id: 'order_summary.label.promo_applied',
             defaultMessage: 'Promotion applied'
         }),
-        free: intl.formatMessage({
+        free: formatMessage({
             id: 'order_summary.label.free',
             defaultMessage: 'Free'
         }),
-        tax: intl.formatMessage({
+        tax: formatMessage({
             id: 'order_summary.label.tax',
             defaultMessage: 'Tax'
         }),
-        estimatedTotal: intl.formatMessage({
+        estimatedTotal: formatMessage({
             id: 'order_summary.label.estimated_total',
             defaultMessage: 'Estimated Total'
         }),
-        orderTotal: intl.formatMessage({
+        orderTotal: formatMessage({
             id: 'order_summary.label.order_total',
             defaultMessage: 'Order Total'
         }),
-        promotionsApplied: intl.formatMessage({
+        promotionsApplied: formatMessage({
             id: 'order_summary.label.promotions_applied',
             defaultMessage: 'Promotions applied'
         }),
-        removePromo: intl.formatMessage({
+        removePromo: formatMessage({
             id: 'order_summary.action.remove_promo',
             defaultMessage: 'Remove'
         })
