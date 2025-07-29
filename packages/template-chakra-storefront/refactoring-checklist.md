@@ -15,12 +15,12 @@ Total files: 222
 
 - [x] src/components/_app-config/index.jsx
 - [x] src/components/_app/hooks/index.js
-- [ ] src/components/_app/hooks/use-app-analytics.js
-- [ ] src/components/_app/hooks/use-app-auth.js
-- [ ] src/components/_app/hooks/use-app-basket.js
-- [ ] src/components/_app/hooks/use-app-config.js
-- [ ] src/components/_app/hooks/use-app-data.js
-- [ ] src/components/_app/hooks/use-app-localization.js
+- [x] src/components/_app/hooks/use-app-analytics.js
+- [x] src/components/_app/hooks/use-app-auth.js
+- [x] src/components/_app/hooks/use-app-basket.js
+- [x] src/components/_app/hooks/use-app-config.js
+- [x] src/components/_app/hooks/use-app-data.js
+- [x] src/components/_app/hooks/use-app-localization.js
 - [ ] src/components/_app/hooks/use-app-modals.js
 - [ ] src/components/_app/hooks/use-app-navigation.js
 - [ ] src/components/_app/hooks/use-app-online-status.js
