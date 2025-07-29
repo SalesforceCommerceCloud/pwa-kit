@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React, {useEffect, useMemo, useRef, useState} from 'react'
-import {FormattedMessage, useIntl} from 'react-intl'
+import {useIntl} from 'react-intl'
 import {
     CloseButton,
     Input,
@@ -77,6 +77,17 @@ const Search = (props) => {
     const navigate = useNavigation()
     const intl = useIntl()
     const {search: searchConfig} = getConfig()
+    
+    const messages = {
+        clearSearch: intl.formatMessage({
+            id: 'header.button.assistive_msg.clear_search',
+            defaultMessage: 'Clear Search'
+        }),
+        cancel: intl.formatMessage({
+            id: 'search.action.cancel',
+            defaultMessage: 'Cancel'
+        })
+    }
     const searchSuggestion = useSearchSuggestions(
         {
             parameters: {
@@ -213,10 +224,7 @@ const Search = (props) => {
                                             size="xs"
                                             css={styles.clearIcon}
                                             variant="unstyled"
-                                            aria-label={intl.formatMessage({
-                                                id: 'header.button.assistive_msg.clear_search',
-                                                defaultMessage: 'Clear Search'
-                                            })}
+                                            aria-label={messages.clearSearch}
                                             onClick={onClearSearch}
                                         />
                                     ) : undefined
@@ -243,10 +251,7 @@ const Search = (props) => {
                                     css={styles.cancelButton}
                                     onMouseDown={() => closeAndNavigate(false)}
                                 >
-                                    <FormattedMessage
-                                        defaultMessage="Cancel"
-                                        id="search.action.cancel"
-                                    />
+                                    {messages.cancel}
                                 </Button>
                             </HideOnDesktop>
                         </HStack>
