@@ -121,7 +121,7 @@ Total files: 222
 - [x] src/components/search/partials/search-suggestions.jsx
 - [x] src/components/search/partials/suggestions.jsx
 - [x] src/components/section/index.jsx
-- [ ] src/components/seo/index.tsx
+- [x] src/components/seo/index.tsx
 - [ ] src/components/skip-nav/index.tsx
 - [ ] src/components/social-icons/index.jsx
 - [ ] src/components/social-login/index.jsx
