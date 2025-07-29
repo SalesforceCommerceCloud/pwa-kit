@@ -148,7 +148,7 @@ Total files: 222
 - [x] src/components/with-storefront-preview/with-storefront-preview.tsx
 - [x] src/pages/account/addresses.jsx
 - [x] src/pages/account/constant.js
-- [ ] src/pages/account/index.jsx
+- [x] src/pages/account/index.jsx
 - [ ] src/pages/account/order-detail.jsx
 - [ ] src/pages/account/order-history.jsx
 - [ ] src/pages/account/orders.jsx

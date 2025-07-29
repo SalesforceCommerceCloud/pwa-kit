@@ -7,7 +7,7 @@
 
 import React, {useState} from 'react'
 import PropTypes from 'prop-types'
-import {FormattedMessage, useIntl} from 'react-intl'
+import {useIntl} from 'react-intl'
 import {Route, Switch, Redirect, useRouteMatch} from 'react-router-dom'
 import {
     Accordion,
@@ -44,16 +44,19 @@ const LogoutButton = ({onClick}) => {
     const recipe = useSlotRecipe({key: 'header'})
     const styles = recipe()
     const {formatMessage} = useIntl()
+    
+    const logoutText = formatMessage({
+        defaultMessage: 'Log Out',
+        id: 'account.logout_button.button.log_out'
+    })
+    
     return (
         <>
             <Separator colorPalette="gray" marginTop="3" />
             <Button variant="ghost" css={styles.signoutButton} onClick={onClick} gap="5">
                 <SignoutIcon aria-hidden={true} boxSize="5" css={styles.signoutIcon} />
                 <Text as="span" css={styles.signoutText}>
-                    {formatMessage({
-                        defaultMessage: 'Log Out',
-                        id: 'account.logout_button.button.log_out'
-                    })}
+                    {logoutText}
                 </Text>
             </Button>
         </>
@@ -80,6 +83,17 @@ const Account = () => {
     const [showLoading, setShowLoading] = useState(false)
 
     const {buildUrl} = useMultiSite()
+    
+    const accountMessages = {
+        myAccount: formatMessage({
+            defaultMessage: "My Account",
+            id: "account.accordion.button.my_account"
+        }),
+        myAccountHeading: formatMessage({
+            defaultMessage: "My Account",
+            id: "account.heading.my_account"
+        })
+    }
 
     const onSignoutClick = async () => {
         setShowLoading(true)
@@ -127,10 +141,7 @@ const Account = () => {
                         >
                             <Flex align="center" justify="center" width="full">
                                 <Heading as="h2" fontSize="16px">
-                                    <FormattedMessage
-                                        defaultMessage="My Account"
-                                        id="account.accordion.button.my_account"
-                                    />
+                                    {accountMessages.myAccount}
                                 </Heading>
                                 <Accordion.ItemIndicator asChild>
                                     <ChevronDownIcon color="inherit" />
@@ -175,10 +186,7 @@ const Account = () => {
                     {showLoading && <LoadingSpinner wrapperStyles={{height: '100vh'}} />}
 
                     <Heading as="h2" fontSize="18px">
-                        <FormattedMessage
-                            defaultMessage="My Account"
-                            id="account.heading.my_account"
-                        />
+                        {accountMessages.myAccountHeading}
                     </Heading>
 
                     <Flex gap="0" as="nav" data-testid="account-detail-nav" direction="column">
