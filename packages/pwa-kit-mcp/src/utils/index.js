@@ -10,7 +10,18 @@ import {
     isMonoRepo,
     runCommand,
     toKebabCase,
-    toPascalCase
+    toPascalCase,
+    logMCPMessage,
+    getCopyrightHeader
 } from './utils'
 
-export {EmptyJsonSchema, getCreateAppCommand, isMonoRepo, runCommand, toKebabCase, toPascalCase}
+export {
+    EmptyJsonSchema,
+    getCreateAppCommand,
+    isMonoRepo,
+    runCommand,
+    toKebabCase,
+    toPascalCase,
+    logMCPMessage,
+    getCopyrightHeader
+}

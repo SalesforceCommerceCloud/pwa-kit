@@ -6,17 +6,7 @@
  */
 import fs from 'fs/promises'
 import path from 'path'
-import {toKebabCase, toPascalCase} from '../utils/utils'
-
-export const getCopyrightHeader = () => {
-    const year = new Date().getFullYear()
-    return `/*
- * Copyright (c) ${year}, Salesforce, Inc.
- * All rights reserved.
- * SPDX-License-Identifier: BSD-3-Clause
- * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
- */`
-}
+import {toKebabCase, toPascalCase, getCopyrightHeader} from '../utils'
 
 // Utility to infer entity from component name
 function inferEntityFromComponentName(componentName) {
