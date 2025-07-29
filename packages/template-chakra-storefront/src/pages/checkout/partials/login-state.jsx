@@ -7,7 +7,7 @@
 import React, {useState} from 'react'
 import PropTypes from 'prop-types'
 import {Button, Separator, Text} from '@chakra-ui/react'
-import {FormattedMessage} from 'react-intl'
+import {useIntl} from 'react-intl'
 import SocialLogin from '../../../components/social-login'
 
 const LoginState = ({
@@ -19,17 +19,42 @@ const LoginState = ({
     showPasswordField,
     togglePasswordField
 }) => {
+    const {formatMessage} = useIntl()
     const [showLoginButtons, setShowLoginButtons] = useState(true)
+
+    const messages = {
+        orLoginWith: formatMessage({
+            id: "contact_info.message.or_login_with",
+            defaultMessage: "Or Login With"
+        }),
+        secureLink: formatMessage({
+            id: "contact_info.button.secure_link",
+            defaultMessage: "Secure Link"
+        }),
+        password: formatMessage({
+            id: "contact_info.button.password",
+            defaultMessage: "Password"
+        }),
+        backToSignInOptions: formatMessage({
+            id: "contact_info.button.back_to_sign_in_options",
+            defaultMessage: "Back to Sign In Options"
+        }),
+        alreadyHaveAccount: formatMessage({
+            id: "contact_info.button.already_have_account",
+            defaultMessage: "Already have an account? Log in"
+        }),
+        checkoutAsGuest: formatMessage({
+            id: "contact_info.button.checkout_as_guest",
+            defaultMessage: "Checkout as Guest"
+        })
+    }
 
     if (isSocialEnabled || isPasswordlessEnabled) {
         return showLoginButtons ? (
             <>
                 <Separator />
                 <Text textAlign="center" fontSize="sm" marginTop={2} marginBottom={2}>
-                    <FormattedMessage
-                        defaultMessage="Or Login With"
-                        id="contact_info.message.or_login_with"
-                    />
+                    {messages.orLoginWith}
                 </Text>
 
                 {/* Passwordless Login */}
@@ -43,10 +68,7 @@ const LoginState = ({
                         }}
                         isLoading={form.formState.isSubmitting}
                     >
-                        <FormattedMessage
-                            defaultMessage="Secure Link"
-                            id="contact_info.button.secure_link"
-                        />
+                        {messages.secureLink}
                     </Button>
                 )}
 
@@ -60,10 +82,7 @@ const LoginState = ({
                             setShowLoginButtons(!showLoginButtons)
                         }}
                     >
-                        <FormattedMessage
-                            defaultMessage="Password"
-                            id="contact_info.button.password"
-                        />
+                        {messages.password}
                     </Button>
                 )}
                 {/* Social Login */}
@@ -78,26 +97,13 @@ const LoginState = ({
                     setShowLoginButtons(!showLoginButtons)
                 }}
             >
-                <FormattedMessage
-                    defaultMessage="Back to Sign In Options"
-                    id="contact_info.button.back_to_sign_in_options"
-                />
+                {messages.backToSignInOptions}
             </Button>
         )
     } else {
         return (
             <Button variant="outline" borderColor="gray.500" onClick={togglePasswordField}>
-                {!showPasswordField ? (
-                    <FormattedMessage
-                        defaultMessage="Already have an account? Log in"
-                        id="contact_info.button.already_have_account"
-                    />
-                ) : (
-                    <FormattedMessage
-                        defaultMessage="Checkout as Guest"
-                        id="contact_info.button.checkout_as_guest"
-                    />
-                )}
+                {!showPasswordField ? messages.alreadyHaveAccount : messages.checkoutAsGuest}
             </Button>
         )
     }
