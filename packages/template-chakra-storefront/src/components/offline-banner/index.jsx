@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React from 'react'
+import React, { useMemo } from 'react'
 import {useIntl} from 'react-intl'
 
 // Components
@@ -18,14 +18,15 @@ import {AlertIcon} from '../../components/icons'
  * A banner component that displays when the user is offline.
  */
 const OfflineBanner = ({...props}) => {
-    const {formatMessage} = useIntl()
+    const intl = useIntl()
+    const { formatMessage } = intl
 
-    const messages = {
-        title: formatMessage({
+    const messages = useMemo(() => ({
+        title: intl.formatMessage({
             id: 'offline_banner.description.browsing_offline_mode',
             defaultMessage: "You're currently browsing in offline mode"
         })
-    }
+    }), [intl])
 
     return (
         <Alert.Root status="warning" colorPalette="blue" {...props}>
