@@ -25,18 +25,18 @@ import {HideOnDesktop, HideOnMobile} from '../../../components/responsive'
 const CheckoutFooter = ({...otherProps}) => {
     const recipe = useSlotRecipe({key: 'checkoutFooter'})
     const styles = recipe()
-    const intl = useIntl()
+    const {formatMessage} = useIntl()
 
     const messages = {
-        shipping: intl.formatMessage({
+        shipping: formatMessage({
             id: 'checkout_footer.link.shipping',
             defaultMessage: 'Shipping'
         }),
-        returnsExchanges: intl.formatMessage({
+        returnsExchanges: formatMessage({
             id: 'checkout_footer.link.returns_exchanges',
             defaultMessage: 'Returns & Exchanges'
         }),
-        copyright: intl.formatMessage({
+        copyright: formatMessage({
             id: 'checkout_footer.message.copyright',
             defaultMessage:
                 'Salesforce or its affiliates. All rights reserved. This is a demo store only. Orders made WILL NOT be processed.'
@@ -90,18 +90,18 @@ const CheckoutFooter = ({...otherProps}) => {
 export default CheckoutFooter
 
 const LegalLinks = ({variant}) => {
-    const intl = useIntl()
+    const {formatMessage} = useIntl()
 
     const messages = {
-        termsConditions: intl.formatMessage({
+        termsConditions: formatMessage({
             id: 'checkout_footer.link.terms_conditions',
             defaultMessage: 'Terms & Conditions'
         }),
-        privacyPolicy: intl.formatMessage({
+        privacyPolicy: formatMessage({
             id: 'checkout_footer.link.privacy_policy',
             defaultMessage: 'Privacy Policy'
         }),
-        siteMap: intl.formatMessage({
+        siteMap: formatMessage({
             id: 'checkout_footer.link.site_map',
             defaultMessage: 'Site Map'
         })
