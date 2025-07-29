@@ -7,7 +7,7 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import {FormattedMessage} from 'react-intl'
+import {useIntl} from 'react-intl'
 
 // Project Components
 import {Accordion, Heading, Stack, Text} from '@chakra-ui/react'
@@ -17,7 +17,15 @@ import Link from '../../../components/link'
 import {noop} from '../../../utils/utils'
 
 const CategoryLinks = ({category = {}, onSelect = noop}) => {
+    const {formatMessage} = useIntl()
     const {categories = []} = category
+
+    const messages = {
+        categoriesHeading: formatMessage({
+            id: 'category_links.button_text',
+            defaultMessage: 'Categories'
+        })
+    }
 
     return (
         <Accordion.Item
@@ -29,7 +37,7 @@ const CategoryLinks = ({category = {}, onSelect = noop}) => {
         >
             <Accordion.ItemTrigger cursor="pointer">
                 <Heading as="h2" flex="1" textAlign="left" fontSize="md" fontWeight={600}>
-                    <FormattedMessage defaultMessage="Categories" id="category_links.button_text" />
+                    {messages.categoriesHeading}
                 </Heading>
                 <Accordion.ItemIndicator />
             </Accordion.ItemTrigger>
