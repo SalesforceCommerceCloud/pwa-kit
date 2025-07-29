@@ -6,7 +6,7 @@
  */
 import React, {useContext, createContext, useEffect, useRef} from 'react'
 import PropTypes from 'prop-types'
-import {FormattedMessage} from 'react-intl'
+import {useIntl} from 'react-intl'
 import {Box, Button, Flex, Heading, Stack} from '@chakra-ui/react'
 import LoadingSpinner from '../../components/loading-spinner'
 
@@ -29,7 +29,15 @@ export const ToggleCard = ({
     children,
     ...props
 }) => {
+    const {formatMessage} = useIntl()
     const titleRef = useRef()
+
+    const messages = {
+        edit: formatMessage({
+            id: 'toggle_card.action.edit',
+            defaultMessage: 'Edit'
+        })
+    }
 
     useEffect(() => {
         if (editing && titleRef.current) {
@@ -65,12 +73,7 @@ export const ToggleCard = ({
                                 onClick={onEdit}
                                 aria-label={editLabel}
                             >
-                                {editLabel || (
-                                    <FormattedMessage
-                                        defaultMessage="Edit"
-                                        id="toggle_card.action.edit"
-                                    />
-                                )}
+                                {editLabel || messages.edit}
                             </Button>
                         )}
                     </Flex>
