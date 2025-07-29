@@ -95,6 +95,7 @@ const ProductTile = (props) => {
     const {imageGroups, productId, representedProduct, variants} = product
 
     const intl = useIntl()
+    const {formatMessage} = intl
     const {currency} = useCurrency()
     const isFavouriteLoading = useRef(false)
     const recipe = useSlotRecipe({key: 'productTile'})
@@ -164,7 +165,7 @@ const ProductTile = (props) => {
     }, [productWithFilteredVariants])
 
     // Message formatting
-    const messages = {
+    const messages = useMemo(() => ({
         removeFromWishlist: intl.formatMessage(
             {
                 id: 'product_tile.assistive_msg.remove_from_wishlist',
@@ -179,7 +180,7 @@ const ProductTile = (props) => {
             },
             {product: localizedProductName}
         )
-    }
+    }), [intl, localizedProductName])
 
     // Retrieve product badges
     const filteredLabels = useMemo(() => {
