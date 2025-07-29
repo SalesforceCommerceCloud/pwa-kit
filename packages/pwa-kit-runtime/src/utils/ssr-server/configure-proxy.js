@@ -10,6 +10,7 @@ import {proxyConfigs} from '../ssr-shared'
 import {processExpressResponse} from './process-express-response'
 import {isRemote, localDevLog, verboseProxyLogging} from './utils'
 import logger from '../logger-instance'
+import { getEnvBasePath } from '../ssr-namespace-paths'
 
 export const ALLOWED_CACHING_PROXY_REQUEST_METHODS = ['HEAD', 'GET', 'OPTIONS']
 
@@ -57,9 +58,7 @@ export const applyProxyRequestHeaders = ({
     const url = incomingRequest.url
     const headers = incomingRequest.headers
     /* istanbul ignore next */
-    if (true) {
-        console.log('In Apply Proxy Request Headers')
-        console.log(url)
+    if (logging) {
         logger.info(
             `Proxy: request for ${proxyPath}${url} => ${targetProtocol}://${targetHost}/${url}`,
             {
@@ -252,7 +251,11 @@ export const configureProxy = ({
 
         // Rewrite the request's path to remove the /mobify/proxy/...
         // prefix.
+        // This cannot be modified by any express middleware
+        // So we need to use the built in pathRewrite to remove the base path
+        // Note: PathRewrite applies the following in order so the order matters
         pathRewrite: {
+            [`^${getEnvBasePath()}${proxyPath}`]: '',
             [`^${proxyPath}`]: ''
         },
 

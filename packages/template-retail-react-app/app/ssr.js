@@ -24,9 +24,9 @@ import path from 'path'
 import {getRuntime} from '@salesforce/pwa-kit-runtime/ssr/server/express'
 import {defaultPwaKitSecurityHeaders} from '@salesforce/pwa-kit-runtime/utils/middleware'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
+import {getAppOrigin} from '@salesforce/pwa-kit-react-sdk/utils/url'
 import {getEnvBasePath} from '@salesforce/pwa-kit-runtime/utils/ssr-namespace-paths'
 import {isRemote} from '@salesforce/pwa-kit-runtime/utils/ssr-server/utils'
-import {useOrigin} from '@salesforce/pwa-kit-react-sdk/ssr/universal/hooks'
 
 const config = getConfig()
 
@@ -232,7 +232,7 @@ const throwSlasTokenValidationError = (message, code) => {
 }
 
 export const createRemoteJWKSet = (tenantId) => {
-    const appOrigin = useOrigin()
+    const appOrigin = getAppOrigin()
     const {app: appConfig} = getConfig()
     const shortCode = appConfig.commerceAPI.parameters.shortCode
     const configTenantId = appConfig.commerceAPI.parameters.organizationId.replace(/^f_ecom_/, '')

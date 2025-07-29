@@ -498,14 +498,10 @@ export const RemoteServerFactory = {
          * @private
          */
         const removeBasePathFromPathMiddleware = (req, res, next) => {
-            // console.log('Before')
-            // console.log(req.url)
             const updatedPath = this._removeBasePathFromPath(req.path)
             const parsed = URL.parse(req.url)
             parsed.pathname = updatedPath
             req.url = URL.format(parsed)
-            // console.log('After')
-            // console.log(req.url)
             next()
         }
         app.use(removeBasePathFromPathMiddleware)
@@ -537,7 +533,6 @@ export const RemoteServerFactory = {
             const options = req.app.options
             // If the request is for a proxy or bundle path, do nothing
             if (this._isBundleOrProxyPath(req.originalUrl)) {
-                console.log('Exiting Request Processor')
                 return
             }
 
@@ -750,7 +745,15 @@ export const RemoteServerFactory = {
             createProxyMiddleware({
                 target: options.slasTarget,
                 changeOrigin: true,
-                pathRewrite: {[slasPrivateProxyPath]: ''},
+                pathRewrite: {
+                    // http-proxy-middleware uses the original incoming request path to determine
+                    // both proxyRequest and incomingRequest paths.
+                    // This cannot be modified by any express middleware
+                    // So we need to use the built in pathRewrite to remove the base path
+                    // Note: PathRewrite applies the following in order so the order matters
+                    [`${getEnvBasePath()}${slasPrivateProxyPath}`]: '',
+                    [slasPrivateProxyPath]: ''
+                },
                 onProxyReq: (proxyRequest, incomingRequest, res) => {
                     applyProxyRequestHeaders({
                         proxyRequest,
