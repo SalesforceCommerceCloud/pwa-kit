@@ -32,6 +32,17 @@ const ProductScroller = forwardRef(
         const intl = useIntl()
         const scrollRef = useRef()
 
+        const messages = {
+            scrollLeft: intl.formatMessage({
+                id: 'product_scroller.assistive_msg.scroll_left',
+                defaultMessage: 'Scroll products left'
+            }),
+            scrollRight: intl.formatMessage({
+                id: 'product_scroller.assistive_msg.scroll_right',
+                defaultMessage: 'Scroll products right'
+            })
+        }
+
         // Renders nothing if we aren't loading and have no products.
         if ((!products || products.length < 1) && !isLoading) {
             return null
@@ -135,10 +146,7 @@ const ProductScroller = forwardRef(
                         >
                             <IconButton
                                 data-testid="product-scroller-nav-left"
-                                aria-label={intl.formatMessage({
-                                    id: 'product_scroller.assistive_msg.scroll_left',
-                                    defaultMessage: 'Scroll products left'
-                                })}
+                                aria-label={messages.scrollLeft}
                                 borderRadius="full"
                                 bg="white/36"
                                 _hover={{bg: 'white/48'}}
@@ -160,10 +168,7 @@ const ProductScroller = forwardRef(
                         >
                             <IconButton
                                 data-testid="product-scroller-nav-right"
-                                aria-label={intl.formatMessage({
-                                    id: 'product_scroller.assistive_msg.scroll_right',
-                                    defaultMessage: 'Scroll products right'
-                                })}
+                                aria-label={messages.scrollRight}
                                 borderRadius="full"
                                 bg="white/36"
                                 _hover={{bg: 'white/48'}}

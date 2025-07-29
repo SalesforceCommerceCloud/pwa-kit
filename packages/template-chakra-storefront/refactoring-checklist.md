@@ -99,7 +99,7 @@ Total files: 222
 - [x] src/components/pagination/index.jsx
 - [x] src/components/passwordless-login/index.jsx
 - [x] src/components/product-item/index.jsx
-- [ ] src/components/product-scroller/index.jsx
+- [x] src/components/product-scroller/index.jsx
 - [ ] src/components/product-tile/index.jsx
 - [ ] src/components/product-tile/promo-callout.jsx
 - [ ] src/components/product-tile/promo-callout.mock.js
