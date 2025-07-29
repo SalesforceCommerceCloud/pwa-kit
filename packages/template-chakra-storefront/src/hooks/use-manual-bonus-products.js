@@ -173,7 +173,6 @@ export const useManualBonusProducts = () => {
         (beforeBasket = {}, afterBasket = {}, changedQualifyingProducts = []) => {
             const beforeBonusDiscountLineItems = beforeBasket.bonusDiscountLineItems || []
             const afterBonusDiscountLineItems = afterBasket.bonusDiscountLineItems || []
-            const beforeProductItems = beforeBasket.productItems || []
             const afterProductItems = afterBasket.productItems || []
 
             // Find all new bonus discount line items after adding/changing qualifying products
