@@ -6,7 +6,7 @@
  */
 
 import React, {useEffect, useRef} from 'react'
-import {FormattedMessage, FormattedNumber, useIntl} from 'react-intl'
+import {FormattedNumber, useIntl} from 'react-intl'
 import {useLocation} from 'react-router-dom'
 import {
     Box,
@@ -100,6 +100,45 @@ const AccountOrderHistory = () => {
     const hasOrders = orders?.length > 0
 
     const pageUrls = usePageUrls({total: paging.total, limit})
+    
+    const messages = {
+        orderHistory: formatMessage({
+            defaultMessage: "Order History",
+            id: "account_order_history.title.order_history"
+        }),
+        orderedDate: (date) => formatMessage({
+            defaultMessage: "Ordered: {date}",
+            id: "account_order_history.label.ordered_date"
+        }, { date }),
+        viewDetails: formatMessage({
+            defaultMessage: "View details",
+            id: "account_order_history.link.view_details"
+        }),
+        orderNumber: (orderNumber) => formatMessage({
+            defaultMessage: "Order Number: {orderNumber}",
+            id: "account_order_history.label.order_number"
+        }, { orderNumber }),
+        itemsCount: (count) => formatMessage({
+            defaultMessage: "{count} items",
+            id: "account_order_history.label.num_of_items"
+        }, { count }),
+        shippedTo: (name) => formatMessage({
+            defaultMessage: "Shipped to: {name}",
+            id: "account_order_history.label.shipped_to"
+        }, { name }),
+        noOrderHeading: formatMessage({
+            defaultMessage: "You haven't placed an order yet.",
+            id: 'account_order_history.heading.no_order_yet'
+        }),
+        noOrderDescription: formatMessage({
+            defaultMessage: 'Once you place an order the details will show up here.',
+            id: 'account_order_history.description.once_you_place_order'
+        }),
+        continueShoppingButton: formatMessage({
+            defaultMessage: 'Continue Shopping',
+            id: 'account_order_history.button.continue_shopping'
+        })
+    }
 
     const headingRef = useRef()
     useEffect(() => {
@@ -115,10 +154,7 @@ const AccountOrderHistory = () => {
         <Stack gap="4" data-testid="account-order-history-page">
             <Stack>
                 <Heading as="h1" fontSize="2xl" tabIndex="0" ref={headingRef}>
-                    <FormattedMessage
-                        defaultMessage="Order History"
-                        id="account_order_history.title.order_history"
-                    />
+                    {messages.orderHistory}
                 </Heading>
             </Stack>
 
@@ -145,17 +181,11 @@ const AccountOrderHistory = () => {
                                 <Box>
                                     <Flex justifyContent="space-between">
                                         <Text fontWeight="bold" fontSize="lg">
-                                            <FormattedMessage
-                                                defaultMessage="Ordered: {date}"
-                                                id="account_order_history.label.ordered_date"
-                                                values={{
-                                                    date: formatDate(new Date(order.creationDate), {
-                                                        year: 'numeric',
-                                                        day: 'numeric',
-                                                        month: 'short'
-                                                    })
-                                                }}
-                                            />
+                                            {messages.orderedDate(formatDate(new Date(order.creationDate), {
+                                                year: 'numeric',
+                                                day: 'numeric',
+                                                month: 'short'
+                                            }))}
                                         </Text>
                                         <Box>
                                             <Button
@@ -165,10 +195,7 @@ const AccountOrderHistory = () => {
                                                 fontSize={{base: 'sm', lg: 'md'}}
                                             >
                                                 <Link to={`/account/orders/${order.orderNo}`}>
-                                                    <FormattedMessage
-                                                        defaultMessage="View details"
-                                                        id="account_order_history.link.view_details"
-                                                    />
+                                                    {messages.viewDetails}
                                                     <ChevronRightIcon boxSize="5" />
                                                 </Link>
                                             </Button>
@@ -176,11 +203,7 @@ const AccountOrderHistory = () => {
                                     </Flex>
                                     <Stack direction="row" alignItems="center">
                                         <Text>
-                                            <FormattedMessage
-                                                defaultMessage="Order Number: {orderNumber}"
-                                                id="account_order_history.label.order_number"
-                                                values={{orderNumber: order.orderNo}}
-                                            />
+                                            {messages.orderNumber(order.orderNo)}
                                         </Text>
                                         <Badge colorPalette="green" fontWeight="bold">
                                             {order.status?.toUpperCase()}
@@ -204,12 +227,7 @@ const AccountOrderHistory = () => {
                                     }
                                 >
                                     <Text>
-                                        <FormattedMessage
-                                            defaultMessage="{count} items"
-                                            id="account_order_history.label.num_of_items"
-                                            description="Number of items in order"
-                                            values={{count: order.productItems.length}}
-                                        />
+                                        {messages.itemsCount(order.productItems.length)}
                                     </Text>
                                     <Text>
                                         <FormattedNumber
@@ -219,13 +237,7 @@ const AccountOrderHistory = () => {
                                         />
                                     </Text>
                                     <Text>
-                                        <FormattedMessage
-                                            defaultMessage="Shipped to: {name}"
-                                            id="account_order_history.label.shipped_to"
-                                            values={{
-                                                name: `${order.shipments[0].shippingAddress.firstName} ${order.shipments[0].shippingAddress.lastName}`
-                                            }}
-                                        />
+                                        {messages.shippedTo(`${order.shipments[0].shippingAddress.firstName} ${order.shipments[0].shippingAddress.lastName}`)}
                                     </Text>
                                 </Stack>
                             </Stack>
@@ -247,19 +259,9 @@ const AccountOrderHistory = () => {
                 <Stack data-testid="account-order-history-place-holder">
                     <PageActionPlaceHolder
                         icon={<ReceiptIcon boxSize="8" />}
-                        heading={formatMessage({
-                            defaultMessage: "You haven't placed an order yet.",
-                            id: 'account_order_history.heading.no_order_yet'
-                        })}
-                        text={formatMessage({
-                            defaultMessage:
-                                'Once you place an order the details will show up here.',
-                            id: 'account_order_history.description.once_you_place_order'
-                        })}
-                        buttonText={formatMessage({
-                            defaultMessage: 'Continue Shopping',
-                            id: 'account_order_history.button.continue_shopping'
-                        })}
+                        heading={messages.noOrderHeading}
+                        text={messages.noOrderDescription}
+                        buttonText={messages.continueShoppingButton}
                         buttonProps={{}}
                         onButtonClick={() => navigate('/')}
                     />

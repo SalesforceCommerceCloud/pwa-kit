@@ -150,7 +150,7 @@ Total files: 222
 - [x] src/pages/account/constant.js
 - [x] src/pages/account/index.jsx
 - [x] src/pages/account/order-detail.jsx
-- [ ] src/pages/account/order-history.jsx
+- [x] src/pages/account/order-history.jsx
 - [ ] src/pages/account/orders.jsx
 - [ ] src/pages/account/profile.jsx
 - [ ] src/pages/account/wishlist/index.jsx
