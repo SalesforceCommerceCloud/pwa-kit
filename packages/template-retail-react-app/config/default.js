@@ -41,9 +41,9 @@ module.exports = {
         commerceAPI: {
             proxyPath: `/mobify/proxy/api`,
             parameters: {
-                clientId: '0841faa5-4e6b-40d6-acc0-5876d7dd7d42',
-                organizationId: 'f_ecom_zzrf_001',
-                shortCode: 'kv7kzm78',
+                clientId: 'e55780e9-9e80-4aa0-8fbc-5fb37bf69001',
+                organizationId: 'f_ecom_bjnl_prd',
+                shortCode: 'performance-001',
                 siteId: 'RefArchGlobal'
             }
         },
@@ -75,11 +75,11 @@ module.exports = {
         ssrFunctionNodeVersion: '22.x',
         proxyConfigs: [
             {
-                host: 'kv7kzm78.api.commercecloud.salesforce.com',
+                host: 'performance-001.api.commercecloud.salesforce.com',
                 path: 'api'
             },
             {
-                host: 'zzrf-001.dx.commercecloud.salesforce.com',
+                host: 'refarchglobal.phased-launch-testing.com',
                 path: 'ocapi'
             }
         ]

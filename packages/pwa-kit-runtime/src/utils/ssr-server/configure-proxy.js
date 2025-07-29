@@ -57,7 +57,9 @@ export const applyProxyRequestHeaders = ({
     const url = incomingRequest.url
     const headers = incomingRequest.headers
     /* istanbul ignore next */
-    if (logging) {
+    if (true) {
+        console.log('In Apply Proxy Request Headers')
+        console.log(url)
         logger.info(
             `Proxy: request for ${proxyPath}${url} => ${targetProtocol}://${targetHost}/${url}`,
             {

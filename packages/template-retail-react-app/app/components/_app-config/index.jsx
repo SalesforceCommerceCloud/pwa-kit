@@ -102,7 +102,7 @@ const AppConfig = ({children, locals = {}}) => {
             defaultDnt={DEFAULT_DNT_STATE}
             // Uncomment 'enablePWAKitPrivateClient' to use SLAS private client login flows.
             // Make sure to also enable useSLASPrivateClient in ssr.js when enabling this setting.
-            enablePWAKitPrivateClient={true}
+            enablePWAKitPrivateClient={false}
             slasPrivateClientProxyEndpoint={slasPrivateClientProxyEndpoint}
             logger={createLogger({packageName: 'commerce-sdk-react'})}
         >

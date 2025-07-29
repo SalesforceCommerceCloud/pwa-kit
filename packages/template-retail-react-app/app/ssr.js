@@ -26,7 +26,7 @@ import {defaultPwaKitSecurityHeaders} from '@salesforce/pwa-kit-runtime/utils/mi
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import {getEnvBasePath} from '@salesforce/pwa-kit-runtime/utils/ssr-namespace-paths'
 import {isRemote} from '@salesforce/pwa-kit-runtime/utils/ssr-server/utils'
-import {getAppOrigin} from '@salesforce/pwa-kit-react-sdk/utils/url'
+import {useOrigin} from '@salesforce/pwa-kit-react-sdk/ssr/universal/hooks'
 
 const config = getConfig()
 
@@ -88,19 +88,6 @@ let marketingCloudTokenExpiration = new Date()
 function generateUniqueId() {
     return crypto.randomBytes(16).toString('hex')
 }
-
-/**
- * Helper function used to apply the base path to callback URIs to non-MRT environments.
- * 
- * TODO: This code is the same as the one in pwa-kit-runtime/ssr/server/build-remote-server.js.
- * We probably want to remove this duplication.
- */
-function applyBasePathToPath(callbackURI) {
-    if (!isRemote()) {
-        return `${getEnvBasePath()}${callbackURI}`
-    }
-    return callbackURI
-}    
 
 /**
  * Sends an email to a specified contact using the Marketing Cloud API. The template email must have a
@@ -245,7 +232,7 @@ const throwSlasTokenValidationError = (message, code) => {
 }
 
 export const createRemoteJWKSet = (tenantId) => {
-    const appOrigin = getAppOrigin()
+    const appOrigin = useOrigin()
     const {app: appConfig} = getConfig()
     const shortCode = appConfig.commerceAPI.parameters.shortCode
     const configTenantId = appConfig.commerceAPI.parameters.organizationId.replace(/^f_ecom_/, '')
@@ -342,7 +329,7 @@ const {handler} = runtime.createHandler(options, (app) => {
     )
 
     // Handle the redirect from SLAS as to avoid error
-    app.get(applyBasePathToPath('/callback?*'), (req, res) => {
+    app.get('/callback?*', (req, res) => {
         // This endpoint does nothing and is not expected to change
         // Thus we cache it for a year to maximize performance
         res.set('Cache-Control', `max-age=31536000`)
@@ -357,7 +344,7 @@ const {handler} = runtime.createHandler(options, (app) => {
     // endpoint sending the email address and passwordless token. Then this endpoint calls
     // the sendMagicLinkEmail function to send an email with the passwordless login magic link.
     // https://developer.salesforce.com/docs/commerce/commerce-api/guide/slas-passwordless-login.html#receive-the-callback
-    app.post(applyBasePathToPath(passwordlessLoginCallback), (req, res) => {
+    app.post(passwordlessLoginCallback, (req, res) => {
         console.log('callback triggered')
         const slasCallbackToken = req.headers['x-slas-callback-token']
         const redirectUrl = req.query.redirectUrl
@@ -376,7 +363,7 @@ const {handler} = runtime.createHandler(options, (app) => {
     // endpoint sending the email address and reset password token. Then this endpoint calls
     // the sendMagicLinkEmail function to send an email with the reset password magic link.
     // https://developer.salesforce.com/docs/commerce/commerce-api/guide/slas-password-reset.html#slas-password-reset-flow
-    app.post(applyBasePathToPath(resetPasswordCallback), (req, res) => {
+    app.post(resetPasswordCallback, (req, res) => {
         const slasCallbackToken = req.headers['x-slas-callback-token']
         validateSlasCallbackToken(slasCallbackToken).then(() => {
             sendMagicLinkEmail(
