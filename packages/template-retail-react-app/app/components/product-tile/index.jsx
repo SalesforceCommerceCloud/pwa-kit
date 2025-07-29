@@ -167,13 +167,13 @@ const ProductTile = (props) => {
     // Retrieve product badges
     const filteredLabels = useMemo(() => {
         const labelsMap = new Map()
-        
+
         // Get the currently selected variant based on the filtered variants
         const selectedVariant = productWithFilteredVariants?.variants?.[0]
-        
+
         // Check badge details on the selected variant first, then fall back to represented product
         const productToCheck = selectedVariant || product?.representedProduct
-        
+
         if (productToCheck) {
             badgeDetails.forEach((item) => {
                 if (

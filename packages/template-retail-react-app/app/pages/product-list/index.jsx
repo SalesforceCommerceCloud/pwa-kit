@@ -179,8 +179,9 @@ const ProductList = (props) => {
                     'custom_properties'
                 ],
                 refine,
-                allVariationProperties: true,
-                includedCustomVariationProperties: badgeDetails.map(item => item.propertyName).join(',')
+                includedCustomVariationProperties: badgeDetails
+                    .map((item) => item.propertyName)
+                    .join(',')
             }
         },
         {
