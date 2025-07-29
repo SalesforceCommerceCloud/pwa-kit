@@ -193,7 +193,7 @@ Total files: 222
 - [x] src/pages/index.tsx
 - [x] src/pages/login-redirect/index.jsx
 - [x] src/pages/login/index.jsx
-- [ ] src/pages/page-not-found/index.jsx
+- [x] src/pages/page-not-found/index.jsx
 - [ ] src/pages/product-detail/index.jsx
 - [ ] src/pages/product-detail/index.mock.js
 - [ ] src/pages/product-detail/page-analytics.jsx

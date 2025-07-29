@@ -18,6 +18,25 @@ const PageNotFound = () => {
     const intl = useIntl()
     const history = useHistory()
     const {res} = useServerContext()
+    
+    const messages = {
+        pageTitle: intl.formatMessage({
+            id: 'page_not_found.title.page_cant_be_found',
+            defaultMessage: "The page you're looking for can't be found."
+        }),
+        suggestionToTry: intl.formatMessage({
+            id: 'page_not_found.message.suggestion_to_try',
+            defaultMessage: 'Please try retyping the address, going back to the previous page, or going to the home page.'
+        }),
+        goBack: intl.formatMessage({
+            id: 'page_not_found.action.go_back',
+            defaultMessage: 'Back to previous page'
+        }),
+        goToHomepage: intl.formatMessage({
+            id: 'page_not_found.link.homepage',
+            defaultMessage: 'Go to home page'
+        })
+    }
 
     if (res) {
         res.status(404)
@@ -31,12 +50,7 @@ const PageNotFound = () => {
             padding={{base: 0, sm: 0, md: 6, lg: 8}}
         >
             <Helmet>
-                <title>
-                    {intl.formatMessage({
-                        defaultMessage: "The page you're looking for can't be found.",
-                        id: 'page_not_found.title.page_cant_be_found'
-                    })}
-                </title>
+                <title>{messages.pageTitle}</title>
             </Helmet>
 
             <Flex
@@ -54,18 +68,11 @@ const PageNotFound = () => {
                     mb={2}
                     textAlign="center"
                 >
-                    {intl.formatMessage({
-                        defaultMessage: "The page you're looking for can't be found.",
-                        id: 'page_not_found.title.page_cant_be_found'
-                    })}
+                    {messages.pageTitle}
                 </Heading>
                 <Box mb={12}>
                     <Text textAlign="center">
-                        {intl.formatMessage({
-                            defaultMessage:
-                                'Please try retyping the address, going back to the previous page, or going to the home page.',
-                            id: 'page_not_found.message.suggestion_to_try'
-                        })}
+                        {messages.suggestionToTry}
                     </Text>
                 </Box>
                 <Stack direction={{base: 'column', md: 'row'}} width={{base: '100%', md: 'auto'}}>
@@ -75,16 +82,10 @@ const PageNotFound = () => {
                         onClick={() => history.goBack()}
                         borderColor="gray.200"
                     >
-                        {intl.formatMessage({
-                            defaultMessage: 'Back to previous page',
-                            id: 'page_not_found.action.go_back'
-                        })}
+                        {messages.goBack}
                     </Button>
                     <Button as={Link} to="/">
-                        {intl.formatMessage({
-                            defaultMessage: 'Go to home page',
-                            id: 'page_not_found.link.homepage'
-                        })}
+                        {messages.goToHomepage}
                     </Button>
                 </Stack>
             </Flex>
