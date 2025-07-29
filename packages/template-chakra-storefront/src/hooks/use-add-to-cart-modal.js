@@ -308,6 +308,18 @@ export const AddToCartModal = () => {
                                                 </Flex>
                                             )
                                         })}
+                                    <Text mb={2} fontSize="md" fontWeight="normal" textAlign="left">
+                                        {'Bonus products available!'}
+                                    </Text>
+                                    <Button
+                                        as={Link}
+                                        to="/checkout"
+                                        width="100%"
+                                        variant="outline-gray"
+                                        size="sm"
+                                    >
+                                        Select Bonus Products
+                                    </Button>
                                 </Box>
                                 <Box
                                     display={['none', 'none', 'none', 'block']}
