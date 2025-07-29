@@ -318,7 +318,10 @@ export const AddToCartModal = () => {
                                         variant="outline-gray"
                                         size="sm"
                                     >
-                                        Select Bonus Products
+                                        {intl.formatMessage({
+                                            defaultMessage: 'Select Bonus Products',
+                                            id: 'add_to_cart_modal.button.select_bonus_products'
+                                        })}
                                     </Button>
                                 </Box>
                                 <Box

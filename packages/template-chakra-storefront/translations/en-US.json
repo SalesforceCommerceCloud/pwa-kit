@@ -126,6 +126,9 @@
   "action_card.action.remove": {
     "defaultMessage": "Remove"
   },
+  "add_to_cart_modal.button.select_bonus_products": {
+    "defaultMessage": "Select Bonus Products"
+  },
   "add_to_cart_modal.info.added_to_cart": {
     "defaultMessage": "{quantity} {quantity, plural, one {item} other {items}} added to cart"
   },
@@ -143,9 +146,6 @@
   },
   "add_to_cart_modal.recommended_products.title.might_also_like": {
     "defaultMessage": "You Might Also Like"
-  },
-  "add_to_cart_modal.button.select_bonus_products": {
-    "defaultMessage": "Select Bonus Products"
   },
   "auth_modal.button.close.assistive_msg": {
     "defaultMessage": "Close login form"

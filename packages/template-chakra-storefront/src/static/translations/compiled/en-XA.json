@@ -615,6 +615,20 @@
       "value": "]"
     }
   ],
+  "add_to_cart_modal.button.select_bonus_products": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Şḗḗŀḗḗƈŧ Ɓǿǿƞŭŭş Ƥřǿǿḓŭŭƈŧş"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
   "add_to_cart_modal.info.added_to_cart": [
     {
       "type": 0,
