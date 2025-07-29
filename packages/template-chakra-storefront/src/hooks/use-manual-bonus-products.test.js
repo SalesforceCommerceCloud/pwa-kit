@@ -12,7 +12,7 @@ describe('useManualBonusProducts', () => {
     let hookResult
 
     beforeEach(() => {
-        const {result} = renderHook(() => useManualBonusProducts())
+        const {result} = renderHook(() => useManualBonusProducts(null, false, true))
         hookResult = result
     })
 

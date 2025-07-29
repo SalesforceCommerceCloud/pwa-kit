@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import {useState, useCallback} from 'react'
+import {useState, useCallback, useEffect, useRef} from 'react'
 
 /**
  * A hook for managing manual bonus product collections.
@@ -14,12 +14,18 @@ import {useState, useCallback} from 'react'
  * was added to the cart. It creates collections mapping regular products to their
  * associated bonus products.
  *
+ * @param {Object} basket - Current basket state
+ * @param {boolean} isPending - Whether basket data is loading
+ * @param {boolean} isRegistered - Whether user is registered (for clearing collections)
  * @returns {object} An object containing manual bonus product collections and management functions
  */
-export const useManualBonusProducts = () => {
+export const useManualBonusProducts = (basket = null, isPending = false, isRegistered = true) => {
     // State to store collections of manual bonus products
     // Structure: { [regularProductId]: [bonusProduct1, bonusProduct2, ...] }
     const [manualBonusProductCollections, setManualBonusProductCollections] = useState({})
+
+    // Store previous basket state for comparison
+    const prevBasketRef = useRef(null)
 
     /**
      * Trims manual bonus product collection for a qualifying product when its quantity decreases
@@ -317,6 +323,63 @@ export const useManualBonusProducts = () => {
         },
         []
     )
+
+    // Effect to detect and track bonus products when basket changes
+    useEffect(() => {
+        if (!basket || isPending) return
+
+        const previousBasket = prevBasketRef.current
+        if (!previousBasket) {
+            prevBasketRef.current = basket
+            return
+        }
+
+        // Analyze changes in qualifying products
+        const qualifyingProductChanges = analyzeQualifyingProductChanges(
+            previousBasket,
+            basket,
+            [] // addedProductIds - this would come from add-to-cart operations
+        )
+
+        if (qualifyingProductChanges.length > 0) {
+            // Detect newly added bonus products
+            const detectionResult = detectNewlyAddedBonusProducts(
+                previousBasket,
+                basket,
+                qualifyingProductChanges
+            )
+
+            // Create/update manual bonus product collections
+            if (detectionResult.qualifyingProductToBonusProducts) {
+                createManualBonusProductCollections(
+                    detectionResult.qualifyingProductToBonusProducts
+                )
+            }
+
+            console.log('Manual Bonus Products Updated:', {
+                qualifyingProductChanges: detectionResult.qualifyingProductChanges,
+                newBonusProducts: detectionResult.newBonusProducts,
+                collections: manualBonusProductCollections
+            })
+        }
+
+        // Update previous basket reference
+        prevBasketRef.current = basket
+    }, [
+        basket,
+        isPending,
+        analyzeQualifyingProductChanges,
+        detectNewlyAddedBonusProducts,
+        createManualBonusProductCollections,
+        manualBonusProductCollections
+    ])
+
+    // Clear collections when basket is empty or customer logs out
+    useEffect(() => {
+        if (!basket?.productItems?.length || !isRegistered) {
+            clearAllManualBonusProductCollections()
+        }
+    }, [basket?.productItems?.length, isRegistered, clearAllManualBonusProductCollections])
 
     return {
         manualBonusProductCollections,
