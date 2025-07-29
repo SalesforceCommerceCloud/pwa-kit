@@ -39,7 +39,7 @@ Total files: 97
 - [x] src/components/product-scroller/index.jsx
 - [x] src/components/product-tile/index.jsx
 - [x] src/components/product-view-modal/bundle.jsx
-- [ ] src/components/product-view-modal/index.jsx
+- [x] src/components/product-view-modal/index.jsx
 - [ ] src/components/promo-code/index.jsx
 - [ ] src/components/promo-popover/index.jsx
 - [ ] src/components/quantity-picker/index.jsx

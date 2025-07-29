@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React from 'react'
+import React, {useMemo} from 'react'
 import PropTypes from 'prop-types'
 import {useIntl} from 'react-intl'
 import {Box, Button, Accordion} from '@chakra-ui/react'
@@ -17,27 +17,28 @@ import {useCurrentBasket} from '../../hooks'
 import useToast from '../../hooks/use-toast'
 
 export const usePromoCode = () => {
-    const {formatMessage} = useIntl()
+    const intl = useIntl()
+    const {formatMessage} = intl
     const {data: basket} = useCurrentBasket()
     const form = useForm()
     const toast = useToast()
 
-    const messages = {
-        promoApplied: formatMessage({
+    const messages = useMemo(() => ({
+        promoApplied: intl.formatMessage({
             id: 'use_promocode.info.promo_applied',
             defaultMessage: 'Promotion applied'
         }),
-        checkCode: formatMessage({
+        checkCode: intl.formatMessage({
             id: 'use_promocode.error.check_the_code',
             defaultMessage:
                 'Check the code and try again, it may already be applied or the promo has expired.'
         }),
-        promoRemoved: formatMessage({
+        promoRemoved: intl.formatMessage({
             id: 'use_promocode.info.promo_removed',
             defaultMessage: 'Promotion removed'
         }),
-        apiError: formatMessage(API_ERROR_MESSAGE)
-    }
+        apiError: intl.formatMessage(API_ERROR_MESSAGE)
+    }), [intl])
 
     const applyPromoCodeMutation = useShopperBasketsMutation('addCouponToBasket')
     const removePromoCodeMutation = useShopperBasketsMutation('removeCouponFromBasket')
@@ -95,14 +96,15 @@ export const usePromoCode = () => {
 }
 
 export const PromoCode = ({form, submitPromoCode, itemProps}) => {
-    const {formatMessage} = useIntl()
+    const intl = useIntl()
+    const {formatMessage} = intl
 
-    const messages = {
-        havePromoCode: formatMessage({
+    const messages = useMemo(() => ({
+        havePromoCode: intl.formatMessage({
             id: 'promocode.accordion.button.have_promocode',
             defaultMessage: 'Do you have a promo code?'
         })
-    }
+    }), [intl])
 
     return (
         <Accordion.Root collapsible>
