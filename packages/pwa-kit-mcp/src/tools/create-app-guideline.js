@@ -6,7 +6,7 @@
  */
 
 // Project dependencies
-import {EmptyJsonSchema, getCreateAppCommand, isMonoRepo, runCommand} from './utils'
+import {EmptyJsonSchema, getCreateAppCommand, isMonoRepo, runCommand} from '../utils/utils'
 
 const CREATE_APP_COMMAND = getCreateAppCommand()
 const DISPLAY_PROGRAM_FLAG = '--displayProgram'
@@ -63,7 +63,17 @@ If the user requests a project using a **template**:
 
 export default {
     name: 'create_app_guidelines',
-    description: `This tool is used to provide the agent with the instructions on how to use the @salesforce/pwa-kit-create-app CLI tool to create a new PWA Kit projects. Do not attempt to create a project without using this tool first.`,
+    description: `
+    
+This tool is used to provide the agent with the instructions on how to use the @salesforce/pwa-kit-create-app CLI tool to create a new PWA Kit projects.
+
+Do not attempt to create a project without using this tool first.
+
+Example Triggers:
+- "Create a new PWA Kit app"
+- "Start a new storefront using a preset"
+- "What templates are available for PWA Kit?"
+- "What presets are available for PWA Kit?"`,
     inputSchema: EmptyJsonSchema,
     fn: async () => {
         // Run the display program and get the output.

@@ -1,4 +1,5 @@
 ## v3.12.0-dev (Jul 22, 2025)
+- Add `--initGit` to automate git repo creation for the generated project [#2817](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2817)
 
 ## v3.11.0 (Jul 22, 2025)
 - Fix the demo instance details in `program.json`[#2800](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2800)
