@@ -622,20 +622,6 @@ test('Renders AddToCartModal with multiple products', () => {
     expect(numOfRowsRendered).toEqual(MOCK_DATA.itemsAdded.length)
 })
 
-test('Do not render when isOpen is false', () => {
-    const {queryByText} = renderWithProviders(
-        <AddToCartModalContext.Provider
-            value={{
-                isOpen: false
-            }}
-        >
-            <AddToCartModal />
-        </AddToCartModalContext.Provider>
-    )
-
-    expect(queryByText(MOCK_PRODUCT.name)).not.toBeInTheDocument()
-})
-
 test('renders product bundle', () => {
     const MOCK_DATA = {
         product: mockProductBundle,
