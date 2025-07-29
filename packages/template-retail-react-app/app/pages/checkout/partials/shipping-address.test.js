@@ -101,26 +101,34 @@ jest.mock(
 )
 
 // Mock the multi-shipping component
-jest.mock('@salesforce/retail-react-app/app/pages/checkout/partials/shipping-multi-address', () => ({
-    __esModule: true,
-    default: ({basket, submitButtonLabel}) => {
-        const {goToStep, STEPS} = require('@salesforce/retail-react-app/app/pages/checkout/util/checkout-context').useCheckout()
-        
-        return (
-            <div data-testid="multi-shipping" role="button" tabIndex={0}>
-                Mock Multi Shipping
-                <button 
-                    data-testid="submit-multi-address" 
-                    onClick={() => {
-                        goToStep(STEPS.SHIPPING_OPTIONS)
-                    }}
-                >
-                    Submit Multi Address
-                </button>
-            </div>
-        )
-    }
-}))
+jest.mock(
+    '@salesforce/retail-react-app/app/pages/checkout/partials/shipping-multi-address',
+    () => ({
+        __esModule: true,
+        default: function MockMultiShipping() {
+            const {
+                useCheckout
+                // eslint-disable-next-line @typescript-eslint/no-var-requires
+            } = require('@salesforce/retail-react-app/app/pages/checkout/util/checkout-context')
+
+            const {goToStep, STEPS} = useCheckout()
+
+            return (
+                <div data-testid="multi-shipping" role="button" tabIndex={0}>
+                    Mock Multi Shipping
+                    <button
+                        data-testid="submit-multi-address"
+                        onClick={() => {
+                            goToStep(STEPS.SHIPPING_OPTIONS)
+                        }}
+                    >
+                        Submit Multi Address
+                    </button>
+                </div>
+            )
+        }
+    })
+)
 
 const mockCustomer = {
     customerId: 'customer-1',

@@ -269,15 +269,15 @@ export const useMultiship = (basket) => {
      * @returns {boolean} True if addresses match
      */
     const areAddressesEqual = (address1, address2) => {
-        if (!address1 || !address2) return false
+        // Normalize falsey values (null, undefined, empty string)
+        const normalize = (value) => (!value ? '' : value)
 
-        // Compare key address fields
         return (
-            address1.address1 === address2.address1 &&
-            address1.city === address2.city &&
-            address1.stateCode === address2.stateCode &&
-            address1.postalCode === address2.postalCode &&
-            address1.countryCode === address2.countryCode
+            normalize(address1.address1) === normalize(address2.address1) &&
+            normalize(address1.city) === normalize(address2.city) &&
+            normalize(address1.stateCode) === normalize(address2.stateCode) &&
+            normalize(address1.postalCode) === normalize(address2.postalCode) &&
+            normalize(address1.countryCode) === normalize(address2.countryCode)
         )
     }
 
@@ -302,10 +302,11 @@ export const useMultiship = (basket) => {
     }
 
     /**
-     * Finds an existing delivery shipment with matching address
+     * Finds the first existing delivery shipment with matching address
+     * Multiple shipments with the same address are not supported
      * @param {Object} basket - The basket object
      * @param {Object} address - The address to match
-     * @returns {string} The matching shipment ID
+     * @returns {string|null} The matching shipment ID or null if not found
      */
     const findDeliveryShipmentWithSameAddress = (basket, address) => {
         if (!basket?.shipments || !address) return null
