@@ -4,6 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
+import {useMemo} from 'react'
 import {useIntl} from 'react-intl'
 
 export default function useLoginFields({
@@ -13,23 +14,23 @@ export default function useLoginFields({
     },
     prefix = ''
 }) {
-    const {formatMessage} = useIntl()
+    const intl = useIntl()
 
-    const messages = {
-        emailLabel: formatMessage({defaultMessage: 'Email', id: 'use_login_fields.label.email'}),
-        passwordLabel: formatMessage({
-            defaultMessage: 'Password',
-            id: 'use_login_fields.label.password'
+    const messages = useMemo(() => ({
+        emailLabel: intl.formatMessage({id: 'use_login_fields.label.email', defaultMessage: 'Email'}),
+        passwordLabel: intl.formatMessage({
+            id: 'use_login_fields.label.password',
+            defaultMessage: 'Password'
         }),
-        emailRequired: formatMessage({
-            defaultMessage: 'Please enter your email address.',
-            id: 'use_login_fields.error.required_email'
+        emailRequired: intl.formatMessage({
+            id: 'use_login_fields.error.required_email',
+            defaultMessage: 'Please enter your email address.'
         }),
-        passwordRequired: formatMessage({
-            defaultMessage: 'Please enter your password.',
-            id: 'use_login_fields.error.required_password'
+        passwordRequired: intl.formatMessage({
+            id: 'use_login_fields.error.required_password',
+            defaultMessage: 'Please enter your password.'
         })
-    }
+    }), [intl])
 
     const fields = {
         email: {
