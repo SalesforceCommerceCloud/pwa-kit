@@ -4,6 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
+import {useMemo} from 'react'
 import {useIntl} from 'react-intl'
 
 export default function useResetPasswordFields({
@@ -13,9 +14,10 @@ export default function useResetPasswordFields({
     },
     prefix = ''
 }) {
-    const {formatMessage} = useIntl()
+    const intl = useIntl()
+    const {formatMessage} = intl
 
-    const messages = {
+    const messages = useMemo(() => ({
         emailLabel: formatMessage({
             defaultMessage: 'Email',
             id: 'use_reset_password_fields.label.email'
@@ -24,7 +26,7 @@ export default function useResetPasswordFields({
             defaultMessage: 'Please enter a valid email address.',
             id: 'use_reset_password_fields.error.required_email'
         })
-    }
+    }), [intl])
 
     const fields = {
         email: {
