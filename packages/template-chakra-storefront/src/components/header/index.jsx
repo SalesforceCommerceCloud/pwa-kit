@@ -61,13 +61,18 @@ const SearchBar = (props) => {
     const recipe = useSlotRecipe({key: 'header'})
     const styles = recipe()
     const intl = useIntl()
-    const placeholder = intl.formatMessage({
-        id: 'header.field.placeholder.search_for_products',
-        defaultMessage: 'Search for products...'
-    })
+    const {formatMessage} = intl
+    
+    const messages = {
+        searchPlaceholder: formatMessage({
+            id: 'header.field.placeholder.search_for_products',
+            defaultMessage: 'Search for products...'
+        })
+    }
+    
     return (
         <Box css={styles.searchContainer}>
-            <Search aria-label={placeholder} placeholder={placeholder} {...props} />
+            <Search aria-label={messages.searchPlaceholder} placeholder={messages.searchPlaceholder} {...props} />
         </Box>
     )
 }
@@ -102,6 +107,7 @@ const Header = ({
     ...props
 }) => {
     const intl = useIntl()
+    const {formatMessage} = intl
     const {
         derivedData: {totalItems},
         data: basket
@@ -124,6 +130,45 @@ const Header = ({
 
     const recipe = useSlotRecipe({key: 'header'})
     const styles = recipe()
+    
+    const headerMessages = {
+        menu: formatMessage({
+            id: 'header.button.assistive_msg.menu',
+            defaultMessage: 'Menu'
+        }),
+        menuOpenDialog: formatMessage({
+            id: 'header.button.assistive_msg.menu.open_dialog',
+            defaultMessage: 'Opens a dialog'
+        }),
+        logo: formatMessage({
+            id: 'header.button.assistive_msg.logo',
+            defaultMessage: 'Logo'
+        }),
+        myAccount: formatMessage({
+            id: 'header.button.assistive_msg.my_account',
+            defaultMessage: 'My Account'
+        }),
+        myAccountMenu: formatMessage({
+            id: 'header.button.assistive_msg.my_account_menu',
+            defaultMessage: 'Open account menu'
+        }),
+        myAccountTitle: formatMessage({
+            defaultMessage: 'My Account',
+            id: 'header.popover.title.my_account'
+        }),
+        logOut: formatMessage({
+            defaultMessage: 'Log out',
+            id: 'header.popover.action.log_out'
+        }),
+        wishlist: formatMessage({
+            defaultMessage: 'Wishlist',
+            id: 'header.button.assistive_msg.wishlist'
+        }),
+        storeLocator: formatMessage({
+            defaultMessage: 'Store Locator',
+            id: 'header.button.assistive_msg.store_locator'
+        })
+    }
     const onSignoutClick = async () => {
         setShowLoading(true)
         await logout.mutateAsync()
@@ -137,14 +182,8 @@ const Header = ({
                 {showLoading && <LoadingSpinner wrapperStyles={{height: '100vh'}} />}
                 <Flex wrap="wrap" alignItems={['baseline', 'baseline', 'baseline', 'center']}>
                     <IconButton
-                        aria-label={intl.formatMessage({
-                            id: 'header.button.assistive_msg.menu',
-                            defaultMessage: 'Menu'
-                        })}
-                        title={intl.formatMessage({
-                            id: 'header.button.assistive_msg.menu.open_dialog',
-                            defaultMessage: 'Opens a dialog'
-                        })}
+                        aria-label={headerMessages.menu}
+                        title={headerMessages.menuOpenDialog}
                         css={styles.iconButton}
                         variant="unstyled"
                         display={{lg: 'none'}}
@@ -153,10 +192,7 @@ const Header = ({
                         <HamburgerIcon />
                     </IconButton>
                     <IconButton
-                        aria-label={intl.formatMessage({
-                            id: 'header.button.assistive_msg.logo',
-                            defaultMessage: 'Logo'
-                        })}
+                        aria-label={headerMessages.logo}
                         css={styles.iconButton}
                         variant="unstyled"
                         onClick={onLogoClick}
@@ -169,10 +205,7 @@ const Header = ({
                     </HideOnMobile>
 
                     <IconButtonWithRegistration
-                        aria-label={intl.formatMessage({
-                            id: 'header.button.assistive_msg.my_account',
-                            defaultMessage: 'My Account'
-                        })}
+                        aria-label={headerMessages.myAccount}
                         variant="unstyled"
                         css={{...styles.iconButton, ...styles.accountIconButton}}
                         onClick={onMyAccountClick}
@@ -191,10 +224,7 @@ const Header = ({
                                 <IconButton
                                     gap={0}
                                     variant="unstyled"
-                                    aria-label={intl.formatMessage({
-                                        id: 'header.button.assistive_msg.my_account_menu',
-                                        defaultMessage: 'Open account menu'
-                                    })}
+                                    aria-label={headerMessages.myAccountMenu}
                                     css={{...styles.iconButton, ...styles.arrowDownButton}}
                                 >
                                     <HideOnMobile>
@@ -210,10 +240,7 @@ const Header = ({
                                         <Popover.Header pb={1}>
                                             <Popover.Title>
                                                 <Heading as="h2" size="lg">
-                                                    {intl.formatMessage({
-                                                        defaultMessage: 'My Account',
-                                                        id: 'header.popover.title.my_account'
-                                                    })}
+                                                    {headerMessages.myAccountTitle}
                                                 </Heading>
                                             </Popover.Title>
                                         </Popover.Header>
@@ -241,7 +268,7 @@ const Header = ({
                                                                             boxSize="5"
                                                                             mr="2"
                                                                         />
-                                                                        {intl.formatMessage(
+                                                                        {formatMessage(
                                                                             messages[link.name]
                                                                         )}
                                                                     </Link>
@@ -266,10 +293,7 @@ const Header = ({
                                                     css={styles.signoutIcon}
                                                 />
                                                 <Text as="span" css={styles.signoutText}>
-                                                    {intl.formatMessage({
-                                                        defaultMessage: 'Log out',
-                                                        id: 'header.popover.action.log_out'
-                                                    })}
+                                                    {headerMessages.logOut}
                                                 </Text>
                                             </Button>
                                         </Popover.Footer>
@@ -279,10 +303,7 @@ const Header = ({
                         </Popover.Root>
                     )}
                     <IconButtonWithRegistration
-                        aria-label={intl.formatMessage({
-                            defaultMessage: 'Wishlist',
-                            id: 'header.button.assistive_msg.wishlist'
-                        })}
+                        aria-label={headerMessages.wishlist}
                         variant="unstyled"
                         css={{...styles.iconButton, ...styles.wishlistIconButton}}
                         onClick={onWishlistClick}
@@ -291,10 +312,7 @@ const Header = ({
                     </IconButtonWithRegistration>
                     {isStoreLocatorEnabled && (
                         <IconButton
-                            aria-label={intl.formatMessage({
-                                defaultMessage: 'Store Locator',
-                                id: 'header.button.assistive_msg.store_locator'
-                            })}
+                            aria-label={headerMessages.storeLocator}
                             css={styles.iconButton}
                             variant="unstyled"
                             onClick={() => {
@@ -306,7 +324,7 @@ const Header = ({
                         </IconButton>
                     )}
                     <IconButton
-                        aria-label={intl.formatMessage(
+                        aria-label={formatMessage(
                             {
                                 id: 'header.button.assistive_msg.my_cart_with_num_items',
                                 defaultMessage: 'My cart, number of items: {numItems}'

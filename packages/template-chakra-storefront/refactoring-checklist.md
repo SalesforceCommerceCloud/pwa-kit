@@ -31,20 +31,20 @@ Total files: 222
 - [x] src/components/_app/partials/app-mobile-navigation.jsx
 - [x] src/components/_app/partials/app-modals.jsx
 - [x] src/components/_app/partials/app-providers.jsx
-- [ ] src/components/_app/partials/app-seo.jsx
-- [ ] src/components/_app/partials/index.js
-- [ ] src/components/_error/index.jsx
-- [ ] src/components/action-card/index.jsx
-- [ ] src/components/address-display/index.jsx
+- [x] src/components/_app/partials/app-seo.jsx
+- [x] src/components/_app/partials/index.js
+- [x] src/components/_error/index.jsx
+- [x] src/components/action-card/index.jsx
+- [x] src/components/address-display/index.jsx
 - [x] src/components/breadcrumb/index.jsx
-- [ ] src/components/confirmation-modal/index.jsx
+- [x] src/components/confirmation-modal/index.jsx
 - [ ] src/components/display-price/current-price.jsx
-- [ ] src/components/display-price/index.jsx
+- [x] src/components/display-price/index.jsx
 - [ ] src/components/display-price/list-price.jsx
-- [ ] src/components/display-price/messages.js
+- [x] src/components/display-price/messages.js
 - [x] src/components/drawer-menu/drawer-menu.jsx
-- [ ] src/components/drawer-menu/index.js
-- [ ] src/components/dynamic-image/index.jsx
+- [x] src/components/drawer-menu/index.js
+- [x] src/components/dynamic-image/index.jsx
 - [ ] src/components/email-confirmation/index.jsx
 - [ ] src/components/fade/index.jsx
 - [x] src/components/field/index.jsx
@@ -69,7 +69,7 @@ Total files: 222
 - [ ] src/components/forms/useRegistrationFields.jsx
 - [ ] src/components/forms/useResetPasswordFields.jsx
 - [ ] src/components/forms/useUpdatePasswordFields.jsx
-- [ ] src/components/header/index.jsx
+- [x] src/components/header/index.jsx
 - [ ] src/components/header/slot-a.jsx
 - [ ] src/components/hero/index.jsx
 - [ ] src/components/icons/index.jsx
