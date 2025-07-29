@@ -61,7 +61,7 @@ export const renderWithRouterAndCommerceAPI = (node) => {
         proxy: undefined
     })
     return renderWithReactIntl(
-        <CommerceAPIProvider value={api}>
+        <CommerceAPIProvider value={{api, site: {id: DEFAULT_SITE}, locale: {id: DEFAULT_LOCALE}}}>
             <Router>{node}</Router>
         </CommerceAPIProvider>
     )
@@ -150,7 +150,7 @@ export const TestProviders = ({
     return (
         <IntlProvider locale={locale.id} defaultLocale={DEFAULT_LOCALE} messages={messages}>
             <MultiSiteProvider site={site} locale={locale} buildUrl={buildUrl}>
-                <CommerceAPIProvider value={api}>
+                <CommerceAPIProvider value={{api, site, locale}}>
                     <CategoriesProvider treeRoot={initialCategories}>
                         <CurrencyProvider currency={DEFAULT_CURRENCY}>
                             <CustomerProvider value={{customer, setCustomer}}>

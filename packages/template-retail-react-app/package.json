@@ -18,15 +18,19 @@
         "@lhci/cli": "^0.9.0",
         "@loadable/component": "^5.15.3",
         "@peculiar/webcrypto": "^1.4.2",
+        "@salesforce/commerce-sdk-react": "3.4.0-nightly-20250626080216",
+        "@tanstack/react-query": "4.28.0",
         "@testing-library/dom": "^9.0.1",
         "@testing-library/jest-dom": "^5.16.5",
-        "@testing-library/react": "^11.2.7",
-        "@testing-library/react-hooks": "^7.0.2",
-        "@testing-library/user-event": "^12.8.3",
+        "@testing-library/react": "^12.1.5",
+        "@testing-library/react-hooks": "^8.0.1",
+        "@testing-library/user-event": "^14.4.3",
+        "ajv": "^8.17.1",
+        "ajv-keywords": "^5.1.0",
         "base64-arraybuffer": "^0.2.0",
         "bundlesize2": "^0.0.31",
         "card-validator": "^8.1.1",
-        "commerce-sdk-isomorphic": "^1.12.0",
+        "commerce-sdk-isomorphic": "^3.3.0",
         "cross-env": "^5.2.1",
         "cross-fetch": "^3.1.5",
         "focus-visible": "^5.2.0",
@@ -35,7 +39,7 @@
         "helmet": "^4.6.0",
         "jest-fetch-mock": "^2.1.2",
         "js-cookie": "^3.0.1",
-        "jwt-decode": "^3.1.2",
+        "jwt-decode": "^4.0.0",
         "lodash": "^4.17.21",
         "msw": "^0.28.1",
         "nanoid": "^3.3.4",
@@ -85,7 +89,7 @@
         },
         {
             "path": "build/vendor.js",
-            "maxSize": "283 kB"
+            "maxSize": "310 kB"
         }
     ],
     "browserslist": [

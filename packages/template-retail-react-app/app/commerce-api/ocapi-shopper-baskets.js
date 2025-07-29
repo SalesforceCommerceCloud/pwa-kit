@@ -8,7 +8,7 @@
 // This class allows integration with OCAPI Baskets Resource
 // https://documentation.b2c.commercecloud.salesforce.com/DOC2/topic/com.demandware.dochelp/OCAPI/current/shop/Resources/Baskets.html
 // This implementations coverts CAPI requests to OCAPI requests as there are fundamental differences between the APIS
-// One major difference is OCAPI uses snake_case and CAPI uses camelCase for this reaso you will see a utility function in here that convert
+// One major difference is OCAPI uses snake_case and CAPI uses camelCase for this reason you will see a utility function in here that converts
 // from camelCase to snake_case - camelCaseKeysToUnderscore
 // createOcapiFetch is another utility function that returns the response from OCAPI in the fromat returned from CAPI
 // Another utility function - checkRequiredParameters is used to check if the parameters or body objects necessary for a call are

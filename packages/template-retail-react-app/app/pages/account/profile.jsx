@@ -71,7 +71,7 @@ const ProfileCard = () => {
             email: customer.email,
             phone: customer.phoneHome
         })
-    }, [customer])
+    }, [customer?.firstName, customer?.lastName, customer?.email, customer?.phoneHome])
 
     const submit = async (values) => {
         try {

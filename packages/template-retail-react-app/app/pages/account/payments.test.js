@@ -43,15 +43,6 @@ afterEach(() => {
 })
 
 test('Allows customer to add and remove payment methods', async () => {
-    global.server.use(
-        rest.post('*/payment-instruments', (req, res, ctx) => res(ctx.delay(0), ctx.status(200))),
-        rest.get('*/customers/:customerId', (req, res, ctx) =>
-            res(ctx.delay(0), ctx.status(200), ctx.json(mockedRegisteredCustomer))
-        )
-    )
-    renderWithProviders(<MockedComponent />)
-    await waitFor(() => expect(screen.getByText('customerid')).toBeInTheDocument())
-
     const updatedCustomer = {...mockedRegisteredCustomer}
     const newPayment = {
         creationDate: '2021-04-01T14:34:56.000Z',
@@ -72,13 +63,24 @@ test('Allows customer to add and remove payment methods', async () => {
         paymentMethodId: 'CREDIT_CARD'
     }
     updatedCustomer.paymentInstruments.push(newPayment)
+
     global.server.use(
-        rest.get('*/customers/:customerId', (req, res, ctx) =>
-            res(ctx.delay(0), ctx.status(200), ctx.json(updatedCustomer))
-        )
+        rest.post('*/payment-instruments', (req, res, ctx) => res(ctx.delay(0), ctx.status(200))),
+        rest.get('*/customers/:customerId', (req, res, ctx) => {
+            // Return updated customer data after payment is added
+            if (req.url.searchParams.get('expand') === 'paymentInstruments') {
+                return res(ctx.delay(0), ctx.status(200), ctx.json(updatedCustomer))
+            }
+            // Return initial customer data for other requests
+            return res(ctx.delay(0), ctx.status(200), ctx.json(mockedRegisteredCustomer))
+        })
     )
 
+    renderWithProviders(<MockedComponent />)
+    await waitFor(() => expect(screen.getByText('customerid')).toBeInTheDocument())
+
     user.click(screen.getByText(/add payment method/i))
+    await screen.findByLabelText(/card number/i)
     user.type(screen.getByLabelText(/card number/i), '4111111111111111')
     user.type(screen.getByLabelText(/name on card/i), 'Test Customer')
     user.type(screen.getByLabelText(/expiration date/i), '1230')
@@ -95,7 +97,7 @@ test('Allows customer to add and remove payment methods', async () => {
     )
     // remove
     user.click(screen.getAllByText(/remove/i)[1])
-    const loadingEl = await screen.getAllByText('Loading...')
+    const loadingEl = await screen.findByTestId('loading')
     waitForElementToBeRemoved(loadingEl).then(() =>
         expect(screen.queryByText('Test Customer')).not.toBeInTheDocument()
     )

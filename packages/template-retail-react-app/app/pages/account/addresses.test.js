@@ -76,27 +76,82 @@ test('Allows customer to add/edit/remove addresses', async () => {
 
     expect(screen.getByText(/no saved addresses/i)).toBeInTheDocument()
 
-    // add
-    user.click(screen.getByText(/add address/i))
-    user.type(screen.getByLabelText('First Name'), 'Tyler')
-    user.type(screen.getByLabelText('Last Name'), 'Glasnow')
-    user.type(screen.getByLabelText('Phone'), '7277277727')
-    user.type(screen.getByLabelText('Address'), 'Tropicana Field')
-    user.type(screen.getByLabelText('City'), 'St Petersburg')
-    user.selectOptions(screen.getByLabelText(/state/i), ['FL'])
-    user.type(screen.getByLabelText('Zip Code'), '33701')
-    user.click(screen.getByText(/^Save$/i))
-    expect(await screen.findByText(/Tropicana Field/i)).toBeInTheDocument()
+    // Click add address button and wait for form
+    await user.click(screen.getByText(/add address/i))
+    await waitFor(() => expect(screen.getByLabelText('First Name')).toBeInTheDocument())
+
+    // Fill out the form fields one by one with proper waiting
+    const firstNameInput = screen.getByLabelText('First Name')
+    const lastNameInput = screen.getByLabelText('Last Name')
+    const phoneInput = screen.getByLabelText('Phone')
+    const addressInput = screen.getByLabelText('Address')
+    const cityInput = screen.getByLabelText('City')
+    const stateInput = screen.getByLabelText(/state/i)
+    const zipInput = screen.getByLabelText('Zip Code')
+
+    // Type into each field and wait for the value to be set
+    await user.clear(firstNameInput)
+    await user.type(firstNameInput, 'Tyler')
+    await waitFor(() => expect(firstNameInput).toHaveValue('Tyler'))
+
+    await user.clear(lastNameInput)
+    await user.type(lastNameInput, 'Glasnow')
+    await waitFor(() => expect(lastNameInput).toHaveValue('Glasnow'))
+
+    await user.clear(phoneInput)
+    await user.type(phoneInput, '7277277727')
+    await waitFor(() => expect(phoneInput).toHaveValue('(727) 727-7727'))
+
+    await user.clear(addressInput)
+    await user.type(addressInput, 'Tropicana Field')
+    await waitFor(() => expect(addressInput).toHaveValue('Tropicana Field'))
+
+    await user.clear(cityInput)
+    await user.type(cityInput, 'St Petersburg')
+    await waitFor(() => expect(cityInput).toHaveValue('St Petersburg'))
+
+    await user.selectOptions(stateInput, ['FL'])
+    await waitFor(() => expect(stateInput).toHaveValue('FL'))
+
+    await user.clear(zipInput)
+    await user.type(zipInput, '33701')
+    await waitFor(() => expect(zipInput).toHaveValue('33701'))
+
+    // Submit the form
+    await user.click(screen.getByText(/^Save$/i))
+
+    // Verify the address was added
+    await waitFor(() => {
+        expect(screen.getByText(/Tropicana Field/i)).toBeInTheDocument()
+    })
 
     // edit
-    user.click(screen.getByText(/edit/i))
-    user.type(screen.getByLabelText('Address'), '333 Main St')
-    user.click(screen.getByLabelText(/set as default/i))
-    user.click(screen.getByText(/Save$/i))
-    expect(await screen.findByText(/333 main st/i)).toBeInTheDocument()
-    expect(await screen.findByText(/default/i)).toBeInTheDocument()
+    await user.click(screen.getByText(/edit/i))
+    await waitFor(() => expect(screen.getByLabelText('Address')).toBeInTheDocument())
+
+    // Get the address input field
+    const addressInputEdit = screen.getByLabelText('Address')
+
+    // Clear and type new address
+    await user.clear(addressInputEdit)
+    await user.type(addressInputEdit, '333 Main St')
+    await waitFor(() => expect(addressInputEdit).toHaveValue('333 Main St'))
+
+    // Click set as default and wait for it to be checked
+    const defaultCheckbox = screen.getByLabelText(/set as default/i)
+    await user.click(defaultCheckbox)
+    await waitFor(() => expect(defaultCheckbox).toBeChecked())
+
+    // Click save and wait for the update
+    await user.click(screen.getByText(/^Save$/i))
+
+    // Verify the changes were saved
+    await waitFor(() => {
+        expect(screen.getByText(/333 main st/i)).toBeInTheDocument()
+        expect(screen.getByText(/default/i)).toBeInTheDocument()
+    })
 
     // remove
-    user.click(screen.getByText(/remove/i))
+    await user.click(screen.getByText(/remove/i))
     expect(await screen.findByText(/no saved addresses/i)).toBeInTheDocument()
 })

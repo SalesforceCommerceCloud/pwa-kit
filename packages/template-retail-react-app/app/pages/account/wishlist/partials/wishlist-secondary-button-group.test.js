@@ -371,7 +371,7 @@ test('can remove item', async () => {
     expect(removeButton).toBeInTheDocument()
     user.click(removeButton)
 
-    const confirmButton = screen.getByRole('button', {name: /yes, remove item/i})
+    const confirmButton = await screen.findByRole('button', {name: /yes, remove item/i})
     await waitFor(() => {
         // Chakra UI renders multiple elements with toast title in DOM for accessibility.
         // We need to assert the actual text within the alert
@@ -379,5 +379,7 @@ test('can remove item', async () => {
     })
 
     user.click(confirmButton)
-    expect(removeItemMock).toHaveBeenCalled()
+    await waitFor(() => {
+        expect(removeItemMock).toHaveBeenCalled()
+    })
 })

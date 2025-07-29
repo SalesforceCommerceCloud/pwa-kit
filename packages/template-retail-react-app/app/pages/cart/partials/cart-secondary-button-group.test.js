@@ -99,7 +99,7 @@ test('renders secondary action component', async () => {
         name: /remove/i
     })
     expect(removeButton).toBeInTheDocument()
-    user.click(removeButton)
+    await user.click(removeButton)
 
     const confirmButton = screen.getByRole('button', {name: /yes, remove item/i})
     await waitFor(() => {
@@ -127,13 +127,13 @@ test('renders secondary with event handlers', async () => {
     })
 
     expect(editButton).toBeInTheDocument()
-    user.click(editButton)
+    await user.click(editButton)
     expect(onEditClick).toHaveBeenCalledTimes(1)
 
     const addToWishlistButton = screen.getByRole('button', {
         name: /Add to wishlist/i
     })
-    user.click(addToWishlistButton)
+    await user.click(addToWishlistButton)
     expect(onAddToWishlistClick).toHaveBeenCalledTimes(1)
 
     const removeButton = screen.getByRole('button', {
@@ -142,7 +142,7 @@ test('renders secondary with event handlers', async () => {
 
     expect(removeButton).toBeInTheDocument()
 
-    user.click(removeButton)
+    await user.click(removeButton)
 
     const confirmButton = screen.getByRole('button', {name: /yes, remove item/i})
     await waitFor(() => {
@@ -150,7 +150,7 @@ test('renders secondary with event handlers', async () => {
         // We need to assert the actual text within the alert
         expect(confirmButton).toBeInTheDocument()
     })
-    user.click(confirmButton)
+    await user.click(confirmButton)
 
     expect(onRemoveItemClick).toHaveBeenCalledTimes(1)
 })

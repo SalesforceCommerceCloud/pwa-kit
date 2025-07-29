@@ -4,44 +4,18 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import jwt from 'njwt'
 import {
     camelCaseKeysToUnderscore,
-    isTokenExpired,
     keysToCamel,
     convertSnakeCaseToSentenceCase,
-    handleAsyncError,
-    hasSFRAAuthStateChanged
+    handleAsyncError
 } from './utils'
-
-const createJwt = (secondsToExp) => {
-    const token = jwt.create({}, 'test')
-    token.setExpiration(new Date().getTime() + secondsToExp * 1000)
-    return token.compact()
-}
 
 jest.mock('./utils', () => {
     const originalModule = jest.requireActual('./utils')
     return {
         ...originalModule
     }
-})
-
-describe('isTokenExpired', () => {
-    test('returns true when no token given', () => {
-        expect(isTokenExpired()).toBe(true)
-    })
-
-    test('returns false for valid token', () => {
-        const token = createJwt(600)
-        const bearerToken = `Bearer ${token}`
-        expect(isTokenExpired(token)).toBe(false)
-        expect(isTokenExpired(bearerToken)).toBe(false)
-    })
-
-    test('returns true if token expires within 60 econds', () => {
-        expect(isTokenExpired(createJwt(59))).toBe(true)
-    })
 })
 
 describe('keysToCamel', () => {
@@ -243,35 +217,5 @@ describe('handleAsyncError', () => {
     test('works even if func is not async', async () => {
         const func = jest.fn().mockReturnValue(1)
         expect(await handleAsyncError(func)()).toBe(1)
-    })
-})
-
-describe('hasSFRAAuthStateChanged', () => {
-    test('returns true when refresh_token keys are different', () => {
-        const storage = new Map()
-        const storageCopy = new Map()
-
-        storage.set('cc-nx-g', 'testRefreshToken1')
-        storageCopy.set('cc-nx', 'testRefreshToken2')
-
-        expect(hasSFRAAuthStateChanged(storage, storageCopy)).toBe(true)
-    })
-    test('returns false when refresh_token keys and values are the same', () => {
-        const storage = new Map()
-        const storageCopy = new Map()
-
-        storage.set('cc-nx', 'testRefreshToken1')
-        storageCopy.set('cc-nx', 'testRefreshToken1')
-
-        expect(hasSFRAAuthStateChanged(storage, storageCopy)).toBe(false)
-    })
-    test('returns true when refresh_token keys are same but values are the different', () => {
-        const storage = new Map()
-        const storageCopy = new Map()
-
-        storage.set('cc-nx-g', 'testRefreshToken1')
-        storageCopy.set('cc-nx-g', 'testRefreshToken2')
-
-        expect(hasSFRAAuthStateChanged(storage, storageCopy)).toBe(true)
     })
 })

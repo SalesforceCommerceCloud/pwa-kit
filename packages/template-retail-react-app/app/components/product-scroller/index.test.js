@@ -5,8 +5,9 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
-import {screen} from '@testing-library/react'
+import {screen, waitFor} from '@testing-library/react'
 import user from '@testing-library/user-event'
+import {act} from 'react-dom/test-utils'
 import ProductScroller from './index'
 import {renderWithProviders} from '../../utils/test-utils'
 
@@ -47,22 +48,40 @@ describe('Product Scroller', () => {
         )
         expect(screen.getByTestId('custom-header')).toBeInTheDocument()
     })
-    test('Renders left/right scroll buttons', () => {
+    test('Renders left/right scroll buttons', async () => {
         renderWithProviders(<ProductScroller title="Scroller Title" products={testProducts} />)
-        user.click(screen.getByTestId('product-scroller-nav-right'))
-        expect(window.HTMLElement.prototype.scrollBy).toHaveBeenCalledWith({
-            top: 0,
-            left: 1024,
-            behavior: 'smooth'
+
+        // Ensure buttons are rendered
+        const rightButton = screen.getByTestId('product-scroller-nav-right')
+        const leftButton = screen.getByTestId('product-scroller-nav-left')
+        expect(rightButton).toBeInTheDocument()
+        expect(leftButton).toBeInTheDocument()
+
+        // Click right button and wait for scroll
+        await act(async () => {
+            await user.click(rightButton)
         })
-        user.click(screen.getByTestId('product-scroller-nav-left'))
-        expect(window.HTMLElement.prototype.scrollBy).toHaveBeenCalledWith({
-            top: 0,
-            left: -1024,
-            behavior: 'smooth'
+
+        await waitFor(() => {
+            expect(window.HTMLElement.prototype.scrollBy).toHaveBeenCalledWith({
+                top: 0,
+                left: 1024,
+                behavior: 'smooth'
+            })
         })
-        expect(screen.getByTestId('product-scroller-nav-left')).toBeInTheDocument()
-        expect(screen.getByTestId('product-scroller-nav-right')).toBeInTheDocument()
+
+        // Click left button and wait for scroll
+        await act(async () => {
+            await user.click(leftButton)
+        })
+
+        await waitFor(() => {
+            expect(window.HTMLElement.prototype.scrollBy).toHaveBeenCalledWith({
+                top: 0,
+                left: -1024,
+                behavior: 'smooth'
+            })
+        })
     })
     test('Does not render left/right scroll buttons when less than 4 products', () => {
         renderWithProviders(
@@ -71,15 +90,19 @@ describe('Product Scroller', () => {
         expect(screen.queryByTestId('product-scroller-nav-left')).not.toBeInTheDocument()
         expect(screen.queryByTestId('product-scroller-nav-right')).not.toBeInTheDocument()
     })
-    test('productTileProps as object', () => {
+    test('productTileProps as object', async () => {
         const onClickMock = jest.fn()
         renderWithProviders(
             <ProductScroller products={testProducts} productTileProps={{onClick: onClickMock}} />
         )
-        user.click(screen.getByText(testProducts[0].productName))
-        expect(onClickMock).toHaveBeenCalled()
+        await act(async () => {
+            await user.click(screen.getByText(testProducts[0].productName))
+        })
+        await waitFor(() => {
+            expect(onClickMock).toHaveBeenCalled()
+        })
     })
-    test('productTileProps as function', () => {
+    test('productTileProps as function', async () => {
         const onClickMock = jest.fn()
         renderWithProviders(
             <ProductScroller
@@ -87,7 +110,11 @@ describe('Product Scroller', () => {
                 productTileProps={() => ({onClick: onClickMock})}
             />
         )
-        user.click(screen.getByText(testProducts[0].productName))
-        expect(onClickMock).toHaveBeenCalled()
+        await act(async () => {
+            await user.click(screen.getByText(testProducts[0].productName))
+        })
+        await waitFor(() => {
+            expect(onClickMock).toHaveBeenCalled()
+        })
     })
 })

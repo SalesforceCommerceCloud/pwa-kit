@@ -27,14 +27,16 @@ class EinsteinAPI {
 
         // If we have an encrypted user id (authenticaed users only) use it as the `userId` otherwise
         // we won't send a `userId` param for guest users.
-        if (this.commerceAPI.auth.encUserId) {
-            body.userId = this.commerceAPI.auth.encUserId
+        const encUserId = this.commerceAPI.auth.get('enc_user_id')
+        if (encUserId) {
+            body.userId = encUserId
         }
 
         // Append the `usid` as the `cookieId` value if present. (It should always be present as long
         // as the user is initilized)
-        if (this.commerceAPI.auth.usid) {
-            body.cookieId = this.commerceAPI.auth.usid
+        const usid = this.commerceAPI.auth.get('usid')
+        if (usid) {
+            body.cookieId = usid
         } else {
             console.warn('Missing `cookieId`. For optimal results this value must be defined.')
         }

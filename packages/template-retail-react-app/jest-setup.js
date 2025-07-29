@@ -45,19 +45,29 @@ export const setupMockServer = () => {
             )
         }),
         rest.post('*/sessions', (req, res, ctx) => res(ctx.delay(0), ctx.status(200))),
-        rest.post('*/oauth2/token', (req, res, ctx) =>
-            res(
+        rest.post('*/oauth2/token', (req, res, ctx) => {
+            return res(
                 ctx.delay(0),
                 ctx.json({
-                    customer_id: 'test',
-                    access_token: 'testtoken',
+                    // FYI decoded token has this payload:
+                    // {
+                    // "sub": "cc-slas::zzrf_001::scid:c9c45bfd-0ed3-4aa2-xxxx-40f88962b836::usid:b4865233-de92-4039-xxxx-aa2dfc8c1ea5",
+                    // "name": "John Doe",
+                    // "exp": 2673911261,
+                    // "iat": 2673909461,
+                    // "isb": "uido:ecom::upn:Guest||xxxEmailxxx::uidn:FirstName LastName::gcid:xxxGuestCustomerIdxxx::rcid:xxxRegisteredCustomerIdxxx::chid:xxxSiteIdxxx"
+                    // }
+                    access_token:
+                        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjYy1zbGFzOjp6enJmXzAwMTo6c2NpZDpjOWM0NWJmZC0wZWQzLTRhYTIteHh4eC00MGY4ODk2MmI4MzY6OnVzaWQ6YjQ4NjUyMzMtZGU5Mi00MDM5LXh4eHgtYWEyZGZjOGMxZWE1IiwibmFtZSI6IkpvaG4gRG9lIiwiZXhwIjoyNjczOTExMjYxLCJpYXQiOjI2NzM5MDk0NjEsImlzYiI6InVpZG86ZWNvbTo6dXBuOkd1ZXN0fHx4eHhFbWFpbHh4eDo6dWlkbjpGaXJzdE5hbWUgTGFzdE5hbWU6OmdjaWQ6eHh4R3Vlc3RDdXN0b21lcklkeHh4OjpyY2lkOnh4eFJlZ2lzdGVyZWRDdXN0b21lcklkeHh4OjpjaGlkOnh4eFNpdGVJZHh4eCJ9.CQpejPFNav6NLc_csSImVcDxeY8GVzBHblE9lu7RtGM',
+
+                    customer_id: 'customerid',
                     refresh_token: 'testrefeshtoken',
                     usid: 'testusid',
                     enc_user_id: 'testEncUserId',
                     id_token: 'testIdToken'
                 })
             )
-        ),
+        }),
         rest.get('*/categories/:categoryId', (req, res, ctx) =>
             res(ctx.delay(0), ctx.status(200), ctx.json(mockCategory))
         ),
@@ -68,7 +78,11 @@ export const setupMockServer = () => {
 global.server = setupMockServer()
 
 beforeAll(() => {
-    global.server.listen()
+    global.server.listen({
+        onUnhandledRequest(req) {
+            console.error('Found an unhandled %s request to %s', req.method, req.url.href)
+        }
+    })
 })
 afterEach(() => {
     global.server.resetHandlers()
@@ -81,15 +95,6 @@ afterAll(() => {
 jest.mock('pwa-kit-runtime/utils/ssr-config', () => {
     return {
         getConfig: () => mockConfig
-    }
-})
-
-// Mock isTokenExpired globally
-jest.mock('./app/commerce-api/utils', () => {
-    const originalModule = jest.requireActual('./app/commerce-api/utils')
-    return {
-        ...originalModule,
-        isTokenExpired: jest.fn().mockReturnValue(false)
     }
 })
 
@@ -145,4 +150,53 @@ Object.defineProperty(window, 'matchMedia', {
         removeEventListener: jest.fn(),
         dispatchEvent: jest.fn()
     }))
+})
+
+jest.mock('@salesforce/commerce-sdk-react', () => {
+    return {
+        CommerceApiProvider: ({children}) => children,
+        AuthHelpers: {
+            LoginRegisteredUserB2C: 'LoginRegisteredUserB2C',
+            Logout: 'Logout'
+        },
+        useAuthHelper: jest.fn().mockReturnValue({
+            mutateAsync: jest.fn().mockResolvedValue({})
+        }),
+        useAccessToken: jest.fn().mockReturnValue('mock-access-token'),
+        useCustomerId: jest.fn().mockReturnValue('mock-customer-id'),
+        useEncUserId: jest.fn().mockReturnValue('mock-enc-user-id')
+    }
+})
+
+jest.mock('@salesforce/commerce-sdk-react/auth', () => {
+    return class MockAuth {
+        login() {
+            return {}
+        }
+        getAccessToken() {
+            return 'access_token'
+        }
+        handleTokenResponse() {
+            return Promise.resolve({})
+        }
+        clearStorage() {
+            return Promise.resolve()
+        }
+        ready() {
+            return Promise.resolve()
+        }
+        get(key) {
+            return key
+        }
+    }
+})
+
+jest.mock('@salesforce/commerce-sdk-react/utils', () => {
+    return {
+        getDefaultCookieAttributes: jest.fn().mockReturnValue({}),
+        getParentOrigin: jest.fn().mockReturnValue('http://localhost'),
+        isOriginTrusted: jest.fn().mockReturnValue(true),
+        onClient: jest.fn().mockReturnValue(true),
+        transformSDKClient: jest.fn().mockImplementation((sdkClient) => sdkClient)
+    }
 })

@@ -5,6 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 export const basketWithProductSet = {
+    _productItemsDetail: {},
     _v: '21.3',
     _type: 'basket',
     _resource_state: '9fdc9a8aeaea84a84a9dfed115ad37a0a32c86df4693cc7a9f62afc3395527c7',

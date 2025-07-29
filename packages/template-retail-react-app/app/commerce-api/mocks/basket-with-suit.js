@@ -5,6 +5,13 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 export default {
+    _productItemsDetail: {
+        '750518699578M': {
+            inventory: {
+                stockLevel: 10
+            }
+        }
+    },
     _v: '21.3',
     _type: 'basket',
     _resource_state: '1d75bb3f6c79c4f367326378db1223fa865bd8a05301829e6478239889d7ea7c',

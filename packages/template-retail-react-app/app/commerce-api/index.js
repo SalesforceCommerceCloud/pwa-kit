@@ -11,9 +11,10 @@ import {getAppOrigin} from 'pwa-kit-react-sdk/utils/url'
 import {detectStorefrontPreview} from 'pwa-kit-react-sdk/ssr/universal/components/storefront-preview/utils'
 import ShopperBaskets from './shopper-baskets'
 import OcapiShopperOrders from './ocapi-shopper-orders'
-import {isError} from './utils'
-import Auth from './auth'
 import EinsteinAPI from './einstein'
+import Auth from '@salesforce/commerce-sdk-react/auth'
+import {DWSID_HEADER_KEY} from './constants'
+import {transformSDKClient} from '@salesforce/commerce-sdk-react/utils'
 
 /**
  * The configuration details for the connecting to the API.
@@ -58,7 +59,16 @@ class CommerceAPI {
 
         this._config = {proxy, ...restConfig}
 
-        this.auth = new Auth(this)
+        this._authConfig = {
+            redirectURI: `${getAppOrigin()}/callback`,
+            proxy,
+            locale: this._config.locale,
+            currency: this._config.currency,
+            ...this._config.parameters,
+            ...this._config.headers
+        }
+
+        this.auth = new Auth(this._authConfig)
 
         if (this._config.einsteinConfig?.einsteinId) {
             this.einstein = new EinsteinAPI(this)
@@ -103,58 +113,94 @@ class CommerceAPI {
             }
         }
 
-        // Instantiate the SDK class proxies and create getters from our api mapping.
-        // The proxy handlers are called when accessing any of the mapped SDK class
-        // proxies, executing various pre-defined hooks for tapping into or modifying
-        // the outgoing method parameters and/or incoming SDK responses
+        /* Instantiate the SDK class proxies and create getters from our api mapping.
+         * @salesforce/commerce-sdk-react introduces a utility `transformSDKClient`
+         * that wraps any Commerce SDK client instance in a JavaScript Proxy,
+         * allowing you to intercept and transform method arguments, headers, parameters,
+         * and other options before each SDK call is made.
+         * `transformSDKClient` takes an SDK client instance and a configuration object. The configuration can include:
+         * - `props`: Arbitrary props/config you want to pass to your transformer.
+         * - `transformer`: A function that receives the props, method name, and original function args (options), and returns the transformed options.
+         * - `onError`: (Optional) A function to handle errors thrown by SDK methods.
+         * Every method call on the proxied client will pass through your transformer before being executed.
+         */
         const self = this
         Object.keys(apiConfigs).forEach((key) => {
             const SdkClass = apiConfigs[key].api
+            const sdkClient = new SdkClass(this._config)
             self._sdkInstances = {
                 ...self._sdkInstances,
-                [key]: new Proxy(new SdkClass(this._config), {
-                    get: function (obj, prop) {
-                        if (typeof obj[prop] === 'function') {
-                            return (...args) => {
-                                const fetchOptions = args[0]
-                                const {locale, currency} = self._config
+                [key]: transformSDKClient(sdkClient, {
+                    props: this._config,
+                    transformer: async (_, methodName, options) => {
+                        const {fetchOptions = {}} = options
+                        if (fetchOptions.ignoreHooks) {
+                            return options
+                        }
 
-                                if (fetchOptions.ignoreHooks) {
-                                    return obj[prop](...args)
-                                }
+                        const {locale, currency} = this._config
 
-                                // Inject the locale and currency to the API call via its parameters.
-                                //
-                                // NOTE: The commerce sdk isomorphic will complain if you pass parameters to
-                                // it that it doesn't expect, this is why we only add the locale and currency
-                                // to some of the API calls.
+                        // Inject the locale and currency to the API call via its parameters.
+                        // NOTE: The commerce sdk isomorphic will complain if you pass parameters to
+                        // it that it doesn't expect, this is why we only add the locale and currency
+                        // to some of the API calls.
+                        // By default we send the locale param and don't send the currency param.
+                        const {sendLocale = true, sendCurrency = false} = apiConfigs[key]
 
-                                // By default we send the locale param and don't send the currency param.
-                                const {sendLocale = true, sendCurrency = false} = apiConfigs[key]
+                        const includeGlobalLocale = Array.isArray(sendLocale)
+                            ? sendLocale.includes(methodName)
+                            : !!sendLocale
 
-                                const includeGlobalLocale = Array.isArray(sendLocale)
-                                    ? sendLocale.includes(prop)
-                                    : !!sendLocale
+                        const includeGlobalCurrency = Array.isArray(sendCurrency)
+                            ? sendCurrency.includes(methodName)
+                            : !!sendCurrency
 
-                                const includeGlobalCurrency = Array.isArray(sendCurrency)
-                                    ? sendCurrency.includes(prop)
-                                    : !!sendCurrency
+                        fetchOptions['parameters'] = {
+                            ...(includeGlobalLocale ? {locale} : {}),
+                            ...(includeGlobalCurrency ? {currency} : {}),
+                            ...fetchOptions?.parameters
+                        }
 
-                                fetchOptions.parameters = {
-                                    ...(includeGlobalLocale ? {locale} : {}),
-                                    ...(includeGlobalCurrency ? {currency} : {}),
-                                    // Allowing individual API calls to override the global locale/currency
-                                    ...fetchOptions.parameters
-                                }
-
-                                return self.willSendRequest(prop, ...args).then((newArgs) => {
-                                    return obj[prop](...newArgs).then((res) =>
-                                        self.didReceiveResponse(res, newArgs)
-                                    )
-                                })
+                        // Handle auth logic (replacing willSendRequest functionality)
+                        let dwsidHeader = {}
+                        const dwsid = self.auth.get('dwsid')
+                        if (dwsid) {
+                            dwsidHeader = {
+                                [DWSID_HEADER_KEY]: dwsid
                             }
                         }
-                        return obj[prop]
+
+                        // Special handling for auth methods
+                        if (
+                            methodName === 'authenticateCustomer' ||
+                            methodName === 'authorizeCustomer' ||
+                            methodName === 'getAccessToken'
+                        ) {
+                            return {
+                                ...options.parameters,
+                                headers: {
+                                    ...options.headers,
+                                    ...fetchOptions.headers
+                                },
+                                credentials: 'same-origin', // Required for SLAS calls to set dwsid cookie
+                                ...fetchOptions
+                            }
+                        }
+
+                        const {access_token: token} = await self.auth.ready()
+                        return {
+                            ...options,
+                            headers: {
+                                ...options.headers,
+                                ...dwsidHeader,
+                                Authorization: `Bearer ${token}`
+                            },
+                            // Add cache breaker for Storefront Preview
+                            parameters: {
+                                ...options.parameters,
+                                ...(this.isStorefrontPreview ? {c_cache_breaker: Date.now()} : {})
+                            }
+                        }
                     }
                 })
             }
@@ -173,70 +219,6 @@ class CommerceAPI {
      */
     getConfig() {
         return this._config
-    }
-
-    /**
-     * Executed before every proxied method call to the SDK. Provides the method
-     * name and arguments. This can be overidden in a subclass to perform any
-     * logging or modifications to arguments before the request is sent.
-     * @param {string} methodName - The name of the sdk method that will be called.
-     * @param {...*} args - Original arguments for the SDK method.
-     * @returns {Promise<Array>} - Updated arguments that will be passed to the SDK method
-     */
-    async willSendRequest(methodName, ...params) {
-        // We never need to modify auth request headers for these methods
-        if (
-            methodName === 'authenticateCustomer' ||
-            methodName === 'authorizeCustomer' ||
-            methodName === 'getAccessToken'
-        ) {
-            return params
-        }
-
-        // If a login promise exists, we don't proceed unless it is resolved.
-        const pendingLogin = this.auth.pendingLogin
-        if (pendingLogin) {
-            await pendingLogin
-        }
-
-        // If the token is invalid (missing, past/nearing expiration), we issue
-        //  a login call, which will attempt to refresh the token or get a new
-        //  guest token. Once login is complete, we can proceed.
-        if (!this.auth.isTokenValid) {
-            // NOTE: Login will update `this.auth.authToken` with a fresh token
-            await this.auth.login()
-        }
-
-        // Apply the appropriate auth headers and return new options
-        const [fetchOptions, ...restParams] = params
-        const newFetchOptions = {
-            ...fetchOptions,
-            headers: {...fetchOptions.headers, Authorization: this.auth.authToken},
-            // In Storefront Preview mode, add cache breaker for all SCAPI's requests.
-            // Otherwise, it's possible to get stale responses after the Shopper Context is set.
-            // (i.e. in this case, we optimize for accurate data, rather than performance/caching)
-            parameters: {
-                ...fetchOptions.parameters,
-                ...(this.isStorefrontPreview ? {c_cache_breaker: Date.now()} : {})
-            }
-        }
-        return [newFetchOptions, ...restParams]
-    }
-
-    /**
-     * Executed when receiving a response from an SDK request. The response data
-     * can be mutated or inspected before being passed back to the caller. Should
-     * be overidden in a subclass.
-     * @param {*} response - The response from the SDK method call.
-     * @param {Array} args - Original arguments for the SDK method.
-     * @returns {*} - The response to be passed back to original caller.
-     */
-    didReceiveResponse(response, args) {
-        if (isError(response)) {
-            return {...response, isError: true, message: response.detail}
-        }
-
-        return response
     }
 }
 

@@ -4,14 +4,83 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React, {createContext, useContext, useReducer} from 'react'
+import React, {createContext, useReducer, useContext} from 'react'
+import {CommerceApiProvider as CommerceSDKReactProvider} from '@salesforce/commerce-sdk-react'
+import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
+import {getAppOrigin} from 'pwa-kit-react-sdk/utils/url'
+import {isServer} from '../utils/utils'
+
+// Recommended settings for PWA-Kit usages.
+// NOTE: they will be applied on both server and client side.
+// retry is always disabled on server side regardless of the value from the options
+const queryClientOptions = {
+    queryClientConfig: {
+        defaultOptions: {
+            queries: {
+                retry: false,
+                refetchOnWindowFocus: false,
+                staleTime: 10 * 1000,
+                ...(isServer ? {retryOnMount: false} : {})
+            },
+            mutations: {
+                retry: false
+            }
+        }
+    },
+    beforeHydrate: (data) => {
+        const now = Date.now()
+
+        // Helper to reset the data timestamp to time of app load.
+        const updateQueryTimeStamp = ({state}) => {
+            state.dataUpdatedAt = now
+        }
+
+        // Update serialized mutations and queries to ensure that the cached data is
+        // considered fresh on first load.
+        data?.mutations?.forEach(updateQueryTimeStamp)
+        data?.queries?.forEach(updateQueryTimeStamp)
+
+        return data
+    }
+}
+
+const queryClient = new QueryClient(queryClientOptions)
 
 /**
  * Provider and associated hook for accessing the Commerce API in React components.
  */
 export const CommerceAPIContext = createContext()
-export const CommerceAPIProvider = CommerceAPIContext.Provider
 export const useCommerceAPI = () => useContext(CommerceAPIContext)
+
+/* eslint-disable react/prop-types */
+export const CommerceAPIProvider = ({value, children}) => {
+    const {api, site, locale} = value
+    const apiClients = api._sdkInstances
+
+    const {shortCode, clientId, organizationId} = api.getConfig().parameters
+    const {proxy} = api.getConfig()
+
+    return (
+        <CommerceAPIContext.Provider value={api}>
+            <QueryClientProvider client={queryClient}>
+                <CommerceSDKReactProvider
+                    shortCode={shortCode}
+                    clientId={clientId}
+                    organizationId={organizationId}
+                    siteId={site?.id}
+                    locale={locale?.id}
+                    currency={locale?.preferredCurrency}
+                    redirectURI={`${getAppOrigin()}/callback`}
+                    proxy={proxy}
+                    apiClients={apiClients}
+                    disableAuthInit={true}
+                >
+                    {children}
+                </CommerceSDKReactProvider>
+            </QueryClientProvider>
+        </CommerceAPIContext.Provider>
+    )
+}
 
 /**
  * There are a few sources of global state in the react retail storefront.

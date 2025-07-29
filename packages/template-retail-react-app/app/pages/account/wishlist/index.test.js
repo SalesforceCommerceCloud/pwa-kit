@@ -10,6 +10,7 @@ import {renderWithProviders} from '../../../utils/test-utils'
 import {screen} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import useWishlist from '../../../hooks/use-wishlist'
+import {waitFor} from '@testing-library/react'
 
 const mockData = {
     creationDate: '2021-09-13T23:29:23.396Z',
@@ -359,7 +360,7 @@ test('Renders wishlist page', () => {
 })
 
 test('Can remove item from the wishlist', async () => {
-    const removeItemMock = jest.fn()
+    const removeItemMock = jest.fn().mockResolvedValue(true)
     useWishlist.mockReturnValue({
         isInitialized: true,
         isEmpty: false,
@@ -374,8 +375,13 @@ test('Can remove item from the wishlist', async () => {
         'sf-wishlist-remove-98ca9a3a9c8ee803543dc45cdc'
     )
     userEvent.click(wishlistRemoveButton)
-    userEvent.click(screen.getByRole('button', {name: /yes, remove item/i}))
-    expect(removeItemMock).toBeCalled()
+
+    const confirmButton = await screen.findByRole('button', {name: /yes, remove item/i})
+    userEvent.click(confirmButton)
+
+    await waitFor(() => {
+        expect(removeItemMock).toBeCalled()
+    })
 })
 
 test('renders no wishlist items for empty wishlist', () => {
