@@ -6,7 +6,7 @@
  */
 import React from 'react'
 import PropTypes from 'prop-types'
-import {FormattedMessage} from 'react-intl'
+import {FormattedMessage, useIntl} from 'react-intl'
 import {Stack, Flex, Button} from '@chakra-ui/react'
 import useLoginFields from '../../components/forms/useLoginFields'
 import Field from '../../components/field'
@@ -18,7 +18,16 @@ const LoginFields = ({
     hideEmail = false,
     hidePassword = false
 }) => {
+    const {formatMessage} = useIntl()
     const fields = useLoginFields({form, prefix})
+    
+    const messages = {
+        forgotPassword: formatMessage({
+            id: "login_form.link.forgot_password",
+            defaultMessage: "Forgot password?"
+        })
+    }
+    
     return (
         <Stack gap={5}>
             {!hideEmail && <Field {...fields.email} />}
@@ -32,10 +41,7 @@ const LoginFields = ({
                                 size="sm"
                                 onClick={handleForgotPasswordClick}
                             >
-                                <FormattedMessage
-                                    defaultMessage="Forgot password?"
-                                    id="login_form.link.forgot_password"
-                                />
+                                {messages.forgotPassword}
                             </Button>
                         </Flex>
                     )}
