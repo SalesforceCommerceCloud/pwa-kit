@@ -108,7 +108,7 @@ Total files: 222
 - [ ] src/components/product-view/index.jsx
 - [ ] src/components/promo-code/index.jsx
 - [ ] src/components/promo-popover/index.jsx
-- [ ] src/components/quantity-picker/index.jsx
+- [x] src/components/quantity-picker/index.jsx
 - [ ] src/components/radio-card/index.jsx
 - [ ] src/components/recommended-products/index.jsx
 - [ ] src/components/register/index.jsx
