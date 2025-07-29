@@ -195,7 +195,7 @@ Total files: 222
 - [x] src/pages/login/index.jsx
 - [x] src/pages/page-not-found/index.jsx
 - [x] src/pages/product-detail/index.jsx
-- [ ] src/pages/product-detail/index.mock.js
+- [x] src/pages/product-detail/index.mock.js
 - [ ] src/pages/product-detail/page-analytics.jsx
 - [ ] src/pages/product-detail/page-cache.jsx
 - [ ] src/pages/product-detail/page-metadata.jsx
