@@ -157,7 +157,7 @@ Total files: 222
 - [x] src/pages/account/wishlist/index.mock.js
 - [x] src/pages/account/wishlist/partials/wishlist-primary-action.jsx
 - [x] src/pages/account/wishlist/partials/wishlist-primary-action.mock.js
-- [ ] src/pages/account/wishlist/partials/wishlist-secondary-button-group.jsx
+- [x] src/pages/account/wishlist/partials/wishlist-secondary-button-group.jsx
 - [ ] src/pages/cart/cart.mock.js
 - [ ] src/pages/cart/hooks/use-cart-default-shipping.js
 - [ ] src/pages/cart/hooks/use-cart-gift-items.js

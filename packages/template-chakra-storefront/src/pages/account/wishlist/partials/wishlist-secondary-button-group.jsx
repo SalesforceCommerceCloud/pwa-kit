@@ -7,7 +7,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import {Button, ButtonGroup, useDisclosure} from '@chakra-ui/react'
-import {useIntl, defineMessage, FormattedMessage} from 'react-intl'
+import {useIntl, defineMessage} from 'react-intl'
 import {useShopperCustomersMutation} from '@salesforce/commerce-sdk-react'
 
 import useToast from '../../../../hooks/use-toast'
@@ -64,6 +64,24 @@ const WishlistSecondaryButtonGroup = ({
     const toast = useToast()
     const {formatMessage} = useIntl()
 
+    const messages = {
+        itemRemoved: formatMessage({
+            id: 'wishlist_secondary_button_group.info.item_removed',
+            defaultMessage: 'Item removed from wishlist'
+        }),
+        removeItemLabel: (productName) => formatMessage(
+            {
+                id: 'wishlist_secondary_button_group.info.item.remove.label',
+                defaultMessage: 'Remove {productName}'
+            },
+            {productName}
+        ),
+        remove: formatMessage({
+            id: 'wishlist_secondary_button_group.action.remove',
+            defaultMessage: 'Remove'
+        })
+    }
+
     const showRemoveItemConfirmation = () => {
         modalProps.onOpen()
     }
@@ -86,10 +104,7 @@ const WishlistSecondaryButtonGroup = ({
             await promise
 
             toast({
-                title: formatMessage({
-                    defaultMessage: 'Item removed from wishlist',
-                    id: 'wishlist_secondary_button_group.info.item_removed'
-                }),
+                title: messages.itemRemoved,
                 type: 'success'
             })
 
@@ -109,18 +124,9 @@ const WishlistSecondaryButtonGroup = ({
                     size="sm"
                     onClick={showRemoveItemConfirmation}
                     data-testid={`sf-wishlist-remove-${productListItemId}`}
-                    aria-label={formatMessage(
-                        {
-                            defaultMessage: 'Remove {productName}',
-                            id: 'wishlist_secondary_button_group.info.item.remove.label'
-                        },
-                        {productName}
-                    )}
+                    aria-label={messages.removeItemLabel(productName)}
                 >
-                    <FormattedMessage
-                        defaultMessage="Remove"
-                        id="wishlist_secondary_button_group.action.remove"
-                    />
+                    {messages.remove}
                 </Button>
                 {/* <Button variant="link" size="sm" onClick={onItemEdit}>
             <FormattedMessage defaultMessage="Edit" />
