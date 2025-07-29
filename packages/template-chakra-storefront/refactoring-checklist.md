@@ -171,7 +171,7 @@ Total files: 222
 - [x] src/pages/cart/partials/cart-secondary-button-group.jsx
 - [x] src/pages/cart/partials/cart-skeleton.jsx
 - [x] src/pages/cart/partials/cart-summary-section.jsx
-- [ ] src/pages/cart/partials/cart-title.jsx
+- [x] src/pages/cart/partials/cart-title.jsx
 - [ ] src/pages/cart/partials/empty-cart.jsx
 - [ ] src/pages/checkout/confirmation.jsx
 - [ ] src/pages/checkout/confirmation.mock.js
