@@ -6,7 +6,7 @@
  */
 
 import React, {useEffect, useRef} from 'react'
-import {FormattedMessage, useIntl} from 'react-intl'
+import {useIntl} from 'react-intl'
 import {useHistory, useRouteMatch} from 'react-router-dom'
 import {
     Badge,
@@ -124,6 +124,67 @@ const AccountOrderDetail = () => {
     const paymentCard = order?.paymentInstruments[0]?.paymentCard
     const CardIcon = getCreditCardIcon(paymentCard?.cardType)
     const itemCount = order?.productItems.reduce((count, item) => item.quantity + count, 0) || 0
+    
+    const messages = {
+        backToHistory: formatMessage({
+            defaultMessage: "Back to Order History",
+            id: "account_order_detail.link.back_to_history"
+        }),
+        orderDetails: formatMessage({
+            defaultMessage: "Order Details",
+            id: "account_order_detail.title.order_details"
+        }),
+        orderedDate: (date) => formatMessage({
+            defaultMessage: "Ordered: {date}",
+            id: "account_order_detail.label.ordered_date"
+        }, { date }),
+        orderNumber: (orderNumber) => formatMessage({
+            defaultMessage: "Order Number: {orderNumber}",
+            id: "account_order_detail.label.order_number"
+        }, { orderNumber }),
+        shippingMethod: formatMessage({
+            defaultMessage: "Shipping Method",
+            id: "account_order_detail.heading.shipping_method"
+        }),
+        paymentMethod: formatMessage({
+            defaultMessage: "Payment Method",
+            id: "account_order_detail.heading.payment_method"
+        }),
+        shippingAddress: formatMessage({
+            defaultMessage: "Shipping Address",
+            id: "account_order_detail.heading.shipping_address"
+        }),
+        billingAddress: formatMessage({
+            defaultMessage: "Billing Address",
+            id: "account_order_detail.heading.billing_address"
+        }),
+        trackingNumber: formatMessage({
+            defaultMessage: "Tracking Number",
+            id: "account_order_detail.label.tracking_number"
+        }),
+        pending: formatMessage({
+            defaultMessage: "Pending",
+            id: "account_order_detail.label.pending_tracking_number"
+        }),
+        itemsCount: (count) => formatMessage({
+            defaultMessage: "{count} items",
+            id: "account_order_detail.heading.num_of_items"
+        }, { count }),
+        shippingStatuses: {
+            not_shipped: formatMessage({
+                defaultMessage: 'Not shipped',
+                id: 'account_order_detail.shipping_status.not_shipped'
+            }),
+            part_shipped: formatMessage({
+                defaultMessage: 'Partially shipped',
+                id: 'account_order_detail.shipping_status.part_shipped'
+            }),
+            shipped: formatMessage({
+                defaultMessage: 'Shipped',
+                id: 'account_order_detail.shipping_status.shipped'
+            })
+        }
+    }
 
     const headingRef = useRef()
     useEffect(() => {
@@ -148,20 +209,14 @@ const AccountOrderDetail = () => {
                     >
                         <Link to={'/account/orders'}>
                             <ChevronLeftIcon boxSize="6" />
-                            <FormattedMessage
-                                defaultMessage="Back to Order History"
-                                id="account_order_detail.link.back_to_history"
-                            />
+                            {messages.backToHistory}
                         </Link>
                     </Button>
                 </Box>
 
                 <Stack gap={['1', '2']}>
                     <Heading as="h1" fontSize={['lg', '2xl']} tabIndex="0" ref={headingRef}>
-                        <FormattedMessage
-                            defaultMessage="Order Details"
-                            id="account_order_detail.title.order_details"
-                        />
+                        {messages.orderDetails}
                     </Heading>
 
                     {!isPending ? (
@@ -178,25 +233,15 @@ const AccountOrderDetail = () => {
                             }
                         >
                             <Text fontSize={['sm', 'md']}>
-                                <FormattedMessage
-                                    defaultMessage="Ordered: {date}"
-                                    id="account_order_detail.label.ordered_date"
-                                    values={{
-                                        date: formatDate(new Date(order.creationDate), {
-                                            year: 'numeric',
-                                            day: 'numeric',
-                                            month: 'short'
-                                        })
-                                    }}
-                                />
+                                {messages.orderedDate(formatDate(new Date(order.creationDate), {
+                                    year: 'numeric',
+                                    day: 'numeric',
+                                    month: 'short'
+                                }))}
                             </Text>
                             <Stack direction="row" alignItems="center">
                                 <Text fontSize={['sm', 'md']}>
-                                    <FormattedMessage
-                                        defaultMessage="Order Number: {orderNumber}"
-                                        id="account_order_detail.label.order_number"
-                                        values={{orderNumber: order.orderNo}}
-                                    />
+                                    {messages.orderNumber(order.orderNo)}
                                 </Text>
                                 <Badge colorPalette="green" fontWeight="bold">
                                     {order.status?.toUpperCase()}
@@ -243,52 +288,22 @@ const AccountOrderDetail = () => {
                             <>
                                 <Stack gap="1">
                                     <Heading as="h2" fontSize="sm" pt="1">
-                                        <FormattedMessage
-                                            defaultMessage="Shipping Method"
-                                            id="account_order_detail.heading.shipping_method"
-                                        />
+                                        {messages.shippingMethod}
                                     </Heading>
                                     <Box>
                                         <Text fontSize="sm" textTransform="titlecase">
-                                            {
-                                                {
-                                                    not_shipped: formatMessage({
-                                                        defaultMessage: 'Not shipped',
-                                                        id: 'account_order_detail.shipping_status.not_shipped'
-                                                    }),
-
-                                                    part_shipped: formatMessage({
-                                                        defaultMessage: 'Partially shipped',
-                                                        id: 'account_order_detail.shipping_status.part_shipped'
-                                                    }),
-                                                    shipped: formatMessage({
-                                                        defaultMessage: 'Shipped',
-                                                        id: 'account_order_detail.shipping_status.shipped'
-                                                    })
-                                                }[shippingStatus]
-                                            }
+                                            {messages.shippingStatuses[shippingStatus]}
                                         </Text>
                                         <Text fontSize="sm">{shippingMethod.name}</Text>
                                         <Text fontSize="sm">
-                                            <FormattedMessage
-                                                defaultMessage="Tracking Number"
-                                                id="account_order_detail.label.tracking_number"
-                                            />
-                                            :{' '}
-                                            {trackingNumber ||
-                                                formatMessage({
-                                                    defaultMessage: 'Pending',
-                                                    id: 'account_order_detail.label.pending_tracking_number'
-                                                })}
+                                            {messages.trackingNumber}:{' '}
+                                            {trackingNumber || messages.pending}
                                         </Text>
                                     </Box>
                                 </Stack>
                                 <Stack gap="1">
                                     <Heading as="h2" fontSize="sm" pt="1">
-                                        <FormattedMessage
-                                            defaultMessage="Payment Method"
-                                            id="account_order_detail.heading.payment_method"
-                                        />
+                                        {messages.paymentMethod}
                                     </Heading>
                                     <Stack direction="row">
                                         {CardIcon && (
@@ -311,10 +326,7 @@ const AccountOrderDetail = () => {
                                 </Stack>
                                 <Stack gap="1">
                                     <Heading as="h2" fontSize="sm" pt="1">
-                                        <FormattedMessage
-                                            defaultMessage="Shipping Address"
-                                            id="account_order_detail.heading.shipping_address"
-                                        />
+                                        {messages.shippingAddress}
                                     </Heading>
                                     <Box>
                                         <Text fontSize="sm">
@@ -329,10 +341,7 @@ const AccountOrderDetail = () => {
                                 </Stack>
                                 <Stack gap="1">
                                     <Heading as="h2" fontSize="sm" pt="1">
-                                        <FormattedMessage
-                                            defaultMessage="Billing Address"
-                                            id="account_order_detail.heading.billing_address"
-                                        />
+                                        {messages.billingAddress}
                                     </Heading>
                                     <Box>
                                         <Text fontSize="sm">
@@ -368,11 +377,7 @@ const AccountOrderDetail = () => {
             <Stack gap="4">
                 {!isPending && (
                     <Text>
-                        <FormattedMessage
-                            defaultMessage="{count} items"
-                            values={{count: itemCount}}
-                            id="account_order_detail.heading.num_of_items"
-                        />
+                        {messages.itemsCount(itemCount)}
                     </Text>
                 )}
 
