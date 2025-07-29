@@ -16,7 +16,7 @@ Total files: 97
 - [x] src/components/forms/address-fields.jsx
 - [x] src/components/forms/credit-card-fields.jsx
 - [x] src/components/forms/form-action-buttons.jsx
-- [ ] src/components/forms/login-fields.jsx
+- [x] src/components/forms/login-fields.jsx
 - [ ] src/components/forms/password-requirements.jsx
 - [ ] src/components/forms/profile-fields.jsx
 - [ ] src/components/forms/promo-code-fields.jsx
