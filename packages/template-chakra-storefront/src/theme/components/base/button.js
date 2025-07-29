@@ -42,6 +42,10 @@ const button = defineRecipe({
                 color: 'blue.600',
                 _hover: {bg: 'gray.50'}
             },
+            'outline-gray': {
+                borderColor: 'gray.200',
+                _hover: {bg: 'gray.50'}
+            },
             footer: {
                 fontSize: 'sm',
                 backgroundColor: 'gray.100',
@@ -50,6 +54,11 @@ const button = defineRecipe({
                 _active: {bg: 'gray.300'},
                 paddingLeft: 3,
                 paddingRight: 3
+            },
+            sm: {
+                height: 9,
+                minWidth: 11,
+                textStyle: 'sm'
             },
             'link-red': {
                 ...baseLinkStyles,
