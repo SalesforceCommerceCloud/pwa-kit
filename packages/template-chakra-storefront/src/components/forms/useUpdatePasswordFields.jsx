@@ -4,6 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
+import {useMemo} from 'react'
 import {useIntl} from 'react-intl'
 import {validatePassword} from '../../utils/password-utils'
 
@@ -15,9 +16,10 @@ export default function useUpdatePasswordFields({
     },
     prefix = ''
 }) {
-    const {formatMessage} = useIntl()
+    const intl = useIntl()
+    const {formatMessage} = intl
 
-    const messages = {
+    const messages = useMemo(() => ({
         currentPasswordLabel: formatMessage({
             defaultMessage: 'Current Password',
             id: 'use_update_password_fields.label.current_password'
@@ -66,7 +68,7 @@ export default function useUpdatePasswordFields({
             defaultMessage: 'Passwords do not match.',
             id: 'use_update_password_fields.error.password_mismatch'
         })
-    }
+    }), [intl])
 
     const fields = {
         currentPassword: {
