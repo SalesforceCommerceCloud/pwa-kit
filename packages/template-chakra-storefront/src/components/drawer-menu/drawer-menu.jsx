@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React, {useState, useEffect} from 'react'
+import React, {useState, useEffect, useMemo} from 'react'
 import PropTypes from 'prop-types'
 import {useIntl} from 'react-intl'
 
@@ -94,89 +94,88 @@ const DrawerMenu = ({
     const recipe = useSlotRecipe({key: 'drawerMenu'})
     const styles = recipe()
 
-    // Group related messages together
-    const messages = {
+    const messages = useMemo(() => ({
         header: {
-            title: formatMessage({
+            title: intl.formatMessage({
                 id: 'drawer_menu.header.assistive_msg.title',
                 defaultMessage: 'Menu Drawer'
             })
         },
         links: {
-            shopAll: formatMessage({
+            shopAll: intl.formatMessage({
                 id: 'drawer_menu.link.shop_all',
                 defaultMessage: 'Shop All'
             }),
-            signIn: formatMessage({
+            signIn: intl.formatMessage({
                 id: 'drawer_menu.link.sign_in',
                 defaultMessage: 'Sign In'
             })
         },
         buttons: {
-            logOut: formatMessage({
+            logOut: intl.formatMessage({
                 id: 'drawer_menu.button.log_out',
                 defaultMessage: 'Log Out'
             }),
-            myAccount: formatMessage({
+            myAccount: intl.formatMessage({
                 id: 'drawer_menu.button.my_account',
                 defaultMessage: 'My Account'
             }),
-            accountDetails: formatMessage({
+            accountDetails: intl.formatMessage({
                 id: 'drawer_menu.button.account_details',
                 defaultMessage: 'Account Details'
             }),
-            orderHistory: formatMessage({
+            orderHistory: intl.formatMessage({
                 id: 'drawer_menu.button.order_history',
                 defaultMessage: 'Order History'
             }),
-            addresses: formatMessage({
+            addresses: intl.formatMessage({
                 id: 'drawer_menu.button.addresses',
                 defaultMessage: 'Addresses'
             })
         },
         customerSupport: {
-            title: formatMessage({
+            title: intl.formatMessage({
                 id: 'drawer_menu.link.customer_support',
                 defaultMessage: 'Customer Support'
             }),
-            contactUs: formatMessage({
+            contactUs: intl.formatMessage({
                 id: 'drawer_menu.link.customer_support.contact_us',
                 defaultMessage: 'Contact Us'
             }),
-            shippingAndReturns: formatMessage({
+            shippingAndReturns: intl.formatMessage({
                 id: 'drawer_menu.link.customer_support.shipping_and_returns',
                 defaultMessage: 'Shipping & Returns'
             })
         },
         ourCompany: {
-            title: formatMessage({
+            title: intl.formatMessage({
                 id: 'drawer_menu.link.our_company',
                 defaultMessage: 'Our Company'
             }),
-            aboutUs: formatMessage({
+            aboutUs: intl.formatMessage({
                 id: 'drawer_menu.link.about_us',
                 defaultMessage: 'About Us'
             })
         },
         privacyAndSecurity: {
-            title: formatMessage({
+            title: intl.formatMessage({
                 id: 'drawer_menu.link.privacy_and_security',
                 defaultMessage: 'Privacy & Security'
             }),
-            termsAndConditions: formatMessage({
+            termsAndConditions: intl.formatMessage({
                 id: 'drawer_menu.link.terms_and_conditions',
                 defaultMessage: 'Terms & Conditions'
             }),
-            privacyPolicy: formatMessage({
+            privacyPolicy: intl.formatMessage({
                 id: 'drawer_menu.link.privacy_policy',
                 defaultMessage: 'Privacy Policy'
             }),
-            siteMap: formatMessage({
+            siteMap: intl.formatMessage({
                 id: 'drawer_menu.link.site_map',
                 defaultMessage: 'Site Map'
             })
         }
-    }
+    }), [intl])
 
     const onSignoutClick = async () => {
         setShowLoading(true)
