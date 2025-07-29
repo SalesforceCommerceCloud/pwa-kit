@@ -34,7 +34,7 @@ Total files: 97
 - [x] src/components/list-menu/list-menu.jsx
 - [x] src/components/offline-banner/index.jsx
 - [x] src/components/order-summary/index.jsx
-- [ ] src/components/pagination/index.jsx
+- [x] src/components/pagination/index.jsx
 - [ ] src/components/passwordless-login/index.jsx
 - [ ] src/components/product-scroller/index.jsx
 - [ ] src/components/product-tile/index.jsx
