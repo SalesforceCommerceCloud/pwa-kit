@@ -136,12 +136,12 @@ Total files: 222
 - [x] src/components/toggle-card/index.jsx
 - [x] src/components/tooltip/index.jsx
 - [x] src/components/unavailable-product-confirmation-modal/index.jsx
-- [ ] src/components/with-commerce-sdk-react-hook-data/index.js
-- [ ] src/components/with-commerce-sdk-react-hook-data/with-commerce-sdk-react-hook-data.jsx
-- [ ] src/components/with-commerce-sdk-react/index.js
-- [ ] src/components/with-commerce-sdk-react/with-commerce-sdk-react.jsx
-- [ ] src/components/with-currency/index.js
-- [ ] src/components/with-currency/with-currency.tsx
+- [x] src/components/with-commerce-sdk-react-hook-data/index.js
+- [x] src/components/with-commerce-sdk-react-hook-data/with-commerce-sdk-react-hook-data.jsx
+- [x] src/components/with-commerce-sdk-react/index.js
+- [x] src/components/with-commerce-sdk-react/with-commerce-sdk-react.jsx
+- [x] src/components/with-currency/index.js
+- [x] src/components/with-currency/with-currency.tsx
 - [ ] src/components/with-layout/index.js
 - [ ] src/components/with-registration/index.jsx
 - [ ] src/components/with-storefront-preview/index.js
