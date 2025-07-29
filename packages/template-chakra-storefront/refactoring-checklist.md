@@ -28,7 +28,7 @@ Total files: 27
 - [x] src/page-designer/layouts/carousel/index.jsx
 - [x] src/pages/checkout/partials/checkout-footer.jsx
 - [x] src/pages/checkout/partials/checkout-header.jsx
-- [ ] src/pages/home/index.jsx
+- [x] src/pages/home/index.jsx
 - [ ] src/pages/page-not-found/index.jsx
 - [ ] src/pages/product-list/partials/color-refinements.jsx
 - [ ] src/pages/product-list/partials/empty-results.jsx

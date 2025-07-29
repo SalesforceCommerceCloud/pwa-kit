@@ -46,7 +46,7 @@ import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
  * categories and products, data is from local file.
  */
 const Home = () => {
-    const intl = useIntl()
+    const {formatMessage} = useIntl()
     const {
         pages: {
             home: {productLimit: HOME_PRODUCT_LIMIT, mainCategory: HOME_MAIN_CATEGORY}
@@ -74,20 +74,24 @@ const Home = () => {
     })
 
     const messages = {
-        heroTitle: intl.formatMessage({
+        heroTitle: formatMessage({
             id: 'home.title.react_starter_store',
             defaultMessage: 'The React PWA Starter Store for Retail'
         }),
-        getStarted: intl.formatMessage({
+        getStarted: formatMessage({
             id: 'home.link.get_started',
             defaultMessage: 'Get started'
         }),
         shopProducts: {
-            title: intl.formatMessage({
+            title: formatMessage({
                 id: 'home.heading.shop_products',
                 defaultMessage: 'Shop Products'
             }),
-            subtitle: intl.formatMessage(
+            readDocs: formatMessage({
+                id: 'home.link.read_docs',
+                defaultMessage: 'Read docs'
+            }),
+            subtitle: formatMessage(
                 {
                     id: 'home.description.shop_products',
                     defaultMessage:
@@ -116,40 +120,37 @@ const Home = () => {
                             }}
                             _hover={{textDecoration: 'none'}}
                         >
-                            {intl.formatMessage({
-                                id: 'home.link.read_docs',
-                                defaultMessage: 'Read docs'
-                            })}
+                            {messages.shopProducts.readDocs}
                         </Link>
                     )
                 }
             )
         },
         features: {
-            title: intl.formatMessage({
+            title: formatMessage({
                 id: 'home.heading.features',
                 defaultMessage: 'Features'
             }),
-            subtitle: intl.formatMessage({
+            subtitle: formatMessage({
                 id: 'home.description.features',
                 defaultMessage:
                     'Out-of-the-box features so that you focus only on adding enhancements.'
             })
         },
         help: {
-            title: intl.formatMessage({
+            title: formatMessage({
                 id: 'home.heading.here_to_help',
                 defaultMessage: "We're here to help"
             }),
-            description: intl.formatMessage({
+            description: formatMessage({
                 id: 'home.description.here_to_help',
                 defaultMessage: 'Contact our support staff.'
             }),
-            descriptionLine2: intl.formatMessage({
+            descriptionLine2: formatMessage({
                 id: 'home.description.here_to_help_line_2',
                 defaultMessage: 'They will get you to the right place.'
             }),
-            contactUs: intl.formatMessage({
+            contactUs: formatMessage({
                 id: 'home.link.contact_us',
                 defaultMessage: 'Contact Us'
             })
@@ -210,6 +211,7 @@ const Home = () => {
                 >
                     {heroFeatures.map((feature, index) => {
                         const featureMessage = feature.message
+                        const featureTitle = formatMessage(featureMessage.title)
                         return (
                             <Link key={index} target="_blank" href={feature.href}>
                                 <Box
@@ -228,7 +230,7 @@ const Home = () => {
                                             {feature.icon}
                                         </Flex>
                                         <Text fontWeight="700">
-                                            {intl.formatMessage(featureMessage.title)}
+                                            {featureTitle}
                                         </Text>
                                     </HStack>
                                 </Box>
@@ -264,6 +266,8 @@ const Home = () => {
                     <SimpleGrid columns={{base: 1, md: 2, lg: 3}} gap={10}>
                         {features.map((feature, index) => {
                             const featureMessage = feature.message
+                            const featureTitle = formatMessage(featureMessage.title)
+                            const featureText = formatMessage(featureMessage.text)
                             return (
                                 <HStack key={index} align="top">
                                     <VStack align="start">
@@ -277,10 +281,10 @@ const Home = () => {
                                             {feature.icon}
                                         </Flex>
                                         <Text as="h3" color="black" fontWeight="700" fontSize="xl">
-                                            {intl.formatMessage(featureMessage.title)}
+                                            {featureTitle}
                                         </Text>
                                         <Text color="black">
-                                            {intl.formatMessage(featureMessage.text)}
+                                            {featureText}
                                         </Text>
                                     </VStack>
                                 </HStack>
