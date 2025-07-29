@@ -29,7 +29,7 @@ export const useDerivedProduct = (
 
     // used for product bundles when there are multiple products
     const lowestStockLevelProductName = product?.inventory?.lowestStockLevelProductName
-    const intl = useIntl()
+    const {formatMessage} = useIntl()
     const variant = useVariant(product, isProductPartOfSet, isProductPartOfBundle)
     const variationParams = useVariationParams(product, isProductPartOfSet, isProductPartOfBundle)
     const variationAttributes = useVariationAttributes(
@@ -50,23 +50,24 @@ export const useDerivedProduct = (
             Object.keys(variationParams).length === variationAttributes.length) ||
         (!isProductABundle && variant && !variant.orderable)
     const unfulfillable = stockLevel < quantity
+    
     const inventoryMessages = {
-        [OUT_OF_STOCK]: intl.formatMessage({
-            defaultMessage: 'Out of stock',
-            id: 'use_product.message.out_of_stock'
+        [OUT_OF_STOCK]: formatMessage({
+            id: 'use_product.message.out_of_stock',
+            defaultMessage: 'Out of stock'
         }),
         [UNFULFILLABLE]: lowestStockLevelProductName
-            ? intl.formatMessage(
+            ? formatMessage(
                   {
-                      defaultMessage: 'Only {stockLevel} left for {productName}!',
-                      id: 'use_product.message.inventory_remaining_for_product'
+                      id: 'use_product.message.inventory_remaining_for_product',
+                      defaultMessage: 'Only {stockLevel} left for {productName}!'
                   },
                   {stockLevel, productName: lowestStockLevelProductName}
               )
-            : intl.formatMessage(
+            : formatMessage(
                   {
-                      defaultMessage: 'Only {stockLevel} left!',
-                      id: 'use_product.message.inventory_remaining'
+                      id: 'use_product.message.inventory_remaining',
+                      defaultMessage: 'Only {stockLevel} left!'
                   },
                   {stockLevel}
               )

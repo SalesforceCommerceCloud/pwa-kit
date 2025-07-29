@@ -23,7 +23,7 @@ Total files: 27
 - [x] src/components/store-locator-modal/store-locator-input.jsx
 - [x] src/components/store-locator-modal/stores-list.jsx
 - [x] src/hooks/use-add-to-cart-modal.js
-- [ ] src/hooks/use-derived-product.js
+- [x] src/hooks/use-derived-product.js
 - [ ] src/hooks/use-product-view-modal.js
 - [ ] src/page-designer/layouts/carousel/index.jsx
 - [ ] src/pages/checkout/partials/checkout-footer.jsx
