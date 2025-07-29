@@ -98,6 +98,7 @@ const AddressForm = ({item, form, onSubmit, onCancel}) => {
         <Box position="relative" bg="white" padding={6} width="100%">
             {form.formState.isSubmitting && <LoadingSpinner />}
             <form
+                data-testid="address-form"
                 onSubmit={form.handleSubmit(async (data) => {
                     await onSubmit(data, form, item.itemId)
                 })}
@@ -601,7 +602,7 @@ const ShippingMultiAddress = ({
                                             position="relative"
                                             mt={4}
                                             width="100%"
-                                            data-testid="address-form"
+                                            data-testid="address-form-container"
                                         >
                                             <AddressForm
                                                 item={item}
