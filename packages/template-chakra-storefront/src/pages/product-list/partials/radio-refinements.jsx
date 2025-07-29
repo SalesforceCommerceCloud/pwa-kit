@@ -13,6 +13,11 @@ import {ADD_FILTER, REMOVE_FILTER} from '../../../pages/product-list/partials/re
 
 const RadioRefinement = ({value, isSelected}) => {
     const {formatMessage} = useIntl()
+
+    const messages = {
+        ariaLabel: formatMessage(isSelected ? REMOVE_FILTER : ADD_FILTER, value)
+    }
+
     // Because choosing a refinement is equivalent to a form submission, the best semantic choice
     // for the refinement is a button or a link, rather than a radio input. The radio element here
     // is purely for visual purposes, and should probably be replaced with a simple icon.
@@ -28,7 +33,7 @@ const RadioRefinement = ({value, isSelected}) => {
             <RadioGroup.ItemIndicator cursor="pointer" />
             <RadioGroup.ItemText
                 fontSize="sm"
-                aria-label={formatMessage(isSelected ? REMOVE_FILTER : ADD_FILTER, value)}
+                aria-label={messages.ariaLabel}
             >
                 {value.label}
             </RadioGroup.ItemText>
