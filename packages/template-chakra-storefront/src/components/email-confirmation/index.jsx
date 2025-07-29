@@ -5,21 +5,22 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React from 'react'
+import React, {useMemo} from 'react'
 import PropTypes from 'prop-types'
 import {useIntl} from 'react-intl'
 import {Button, Stack, Text} from '@chakra-ui/react'
 import {BrandLogo} from '../../components/icons'
 
 const PasswordlessEmailConfirmation = ({form, submitForm, email = ''}) => {
-    const {formatMessage} = useIntl()
+    const intl = useIntl()
+    const {formatMessage} = intl
     
-    const messages = {
-        title: formatMessage({
+    const messages = useMemo(() => ({
+        title: intl.formatMessage({
             id: 'auth_modal.check_email.title.check_your_email',
             defaultMessage: 'Check Your Email'
         }),
-        justSent: formatMessage(
+        justSent: intl.formatMessage(
             {
                 id: 'auth_modal.check_email.description.just_sent',
                 defaultMessage: 'We just sent a login link to <b>{email}</b>'
@@ -29,15 +30,15 @@ const PasswordlessEmailConfirmation = ({form, submitForm, email = ''}) => {
                 b: (chunks) => <b>{chunks}</b>
             }
         ),
-        checkSpam: formatMessage({
+        checkSpam: intl.formatMessage({
             id: 'auth_modal.check_email.description.check_spam_folder',
             defaultMessage: "The link may take a few minutes to arrive, check your spam folder if you're having trouble finding it"
         }),
-        resendLink: formatMessage({
+        resendLink: intl.formatMessage({
             id: 'auth_modal.check_email.button.resend_link',
             defaultMessage: 'Resend Link'
         })
-    }
+    }), [intl])
     
     return (
         <form
