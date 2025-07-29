@@ -671,6 +671,7 @@ test('renders product bundle', () => {
             variant.variationValues
         )
 
+        // add a test comment
         // Looks for text displaying variant ('Color: Black' or 'Size: S') in modal
         Object.entries(variationAttributeValues).forEach(([name, value]) => {
             expect(screen.getAllByText(`${name}: ${value}`)[0]).toBeInTheDocument()
