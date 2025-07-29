@@ -69,6 +69,7 @@ export const useMultiship = (basket) => {
         if (shipmentsWithoutMethod.length === 0) {
             return
         }
+        
         try {
             // Get shipping methods (using main shipment as reference)
             // Note: This is a limitation - all shipments will get the same options
@@ -767,6 +768,7 @@ export const useMultiship = (basket) => {
     return {
         assignDefaultShippingMethodsToShipments,
         handleDeliveryOptionChange,
+        isCurrentShippingMethodPickup,
         removeEmptyShipments,
         findExistingDeliveryShipment,
         findExistingPickupShipment,
