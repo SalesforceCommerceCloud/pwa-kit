@@ -45,6 +45,13 @@ const ListMenu = ({
 
     const items = root?.[itemsKey]
 
+    const messages = {
+        navLabel: intl.formatMessage({
+            id: 'list_menu.nav.assistive_msg',
+            defaultMessage: 'Main navigation'
+        })
+    }
+
     useEffect(() => {
         setAriaBusy(false)
     }, [])
@@ -52,10 +59,7 @@ const ListMenu = ({
     return (
         <nav
             id="list-menu"
-            aria-label={intl.formatMessage({
-                id: 'list_menu.nav.assistive_msg',
-                defaultMessage: 'Main navigation'
-            })}
+            aria-label={messages.navLabel}
             aria-live="polite"
             aria-busy={ariaBusy}
             aria-atomic="true"
