@@ -173,8 +173,8 @@ Total files: 222
 - [x] src/pages/cart/partials/cart-summary-section.jsx
 - [x] src/pages/cart/partials/cart-title.jsx
 - [x] src/pages/cart/partials/empty-cart.jsx
-- [ ] src/pages/checkout/confirmation.jsx
-- [ ] src/pages/checkout/confirmation.mock.js
+- [x] src/pages/checkout/confirmation.jsx
+- [x] src/pages/checkout/confirmation.mock.js
 - [ ] src/pages/checkout/index.jsx
 - [ ] src/pages/checkout/partials/cc-radio-group.jsx
 - [ ] src/pages/checkout/partials/checkout-footer.jsx
