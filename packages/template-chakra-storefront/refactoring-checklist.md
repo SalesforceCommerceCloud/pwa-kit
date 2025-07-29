@@ -31,5 +31,5 @@ Total files: 27
 - [x] src/pages/home/index.jsx
 - [x] src/pages/page-not-found/index.jsx
 - [x] src/pages/product-list/partials/color-refinements.jsx
-- [ ] src/pages/product-list/partials/empty-results.jsx
+- [x] src/pages/product-list/partials/empty-results.jsx
 - [ ] src/pages/product-list/partials/sort.jsx

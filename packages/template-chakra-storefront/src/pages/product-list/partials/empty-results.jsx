@@ -15,21 +15,61 @@ import RecommendedProducts from '../../../components/recommended-products'
 import {EINSTEIN_RECOMMENDERS} from '../../../../config/constants'
 
 const EmptySearchResults = ({searchQuery, category}) => {
-    const intl = useIntl()
+    const {formatMessage} = useIntl()
+
+    const contactUsText = formatMessage({
+        id: 'empty_search_results.link.contact_us',
+        defaultMessage: 'Contact Us'
+    })
 
     const messages = {
-        contactUs: intl.formatMessage({
-            id: 'empty_search_results.link.contact_us',
-            defaultMessage: 'Contact Us'
-        }),
-        topSellers: intl.formatMessage({
+        contactUs: contactUsText,
+        topSellers: formatMessage({
             id: 'empty_search_results.recommended_products.title.top_sellers',
             defaultMessage: 'Top Sellers'
         }),
-        mostViewed: intl.formatMessage({
+        mostViewed: formatMessage({
             id: 'empty_search_results.recommended_products.title.most_viewed',
             defaultMessage: 'Most Viewed'
-        })
+        }),
+        cantFindAnythingForCategory: formatMessage(
+            {
+                id: 'empty_search_results.info.cant_find_anything_for_category',
+                defaultMessage:
+                    'We couldn't find anything for {category}. Try searching for a product or {link}.'
+            },
+            {
+                category: category?.name,
+                link: (
+                    <Link as={RouteLink} to={'/'}>
+                        {contactUsText}
+                    </Link>
+                )
+            }
+        ),
+        cantFindAnythingForQuery: formatMessage(
+            {
+                id: 'empty_search_results.info.cant_find_anything_for_query',
+                defaultMessage: 'We couldn't find anything for "{searchQuery}".'
+            },
+            {
+                searchQuery: searchQuery
+            }
+        ),
+        doubleCheckSpelling: formatMessage(
+            {
+                id: 'empty_search_results.info.double_check_spelling',
+                defaultMessage:
+                    'Double-check your spelling and try again or {link}.'
+            },
+            {
+                link: (
+                    <Button variant="link" to={'/'}>
+                        {contactUsText}
+                    </Button>
+                )
+            }
+        )
     }
     return (
         <Flex
@@ -45,51 +85,16 @@ const EmptySearchResults = ({searchQuery, category}) => {
                 <Fragment>
                     {' '}
                     <Text fontSize={['l', 'l', 'xl', '2xl']} fontWeight="700" marginBottom={2}>
-                        {intl.formatMessage(
-                            {
-                                id: 'empty_search_results.info.cant_find_anything_for_category',
-                                defaultMessage:
-                                    'We couldn’t find anything for {category}. Try searching for a product or {link}.'
-                            },
-                            {
-                                category: category?.name,
-                                link: (
-                                    <Link as={RouteLink} to={'/'}>
-                                        {messages.contactUs}
-                                    </Link>
-                                )
-                            }
-                        )}
+                        {messages.cantFindAnythingForCategory}
                     </Text>{' '}
                 </Fragment>
             ) : (
                 <Fragment>
                     <Text fontSize={['lg', 'lg', 'xl', '3xl']} fontWeight="700" marginBottom={2}>
-                        {intl.formatMessage(
-                            {
-                                id: 'empty_search_results.info.cant_find_anything_for_query',
-                                defaultMessage: 'We couldn’t find anything for "{searchQuery}".'
-                            },
-                            {
-                                searchQuery: searchQuery
-                            }
-                        )}
+                        {messages.cantFindAnythingForQuery}
                     </Text>
                     <Text fontSize={['md', 'md', 'md', 'md']} fontWeight="400">
-                        {intl.formatMessage(
-                            {
-                                id: 'empty_search_results.info.double_check_spelling',
-                                defaultMessage:
-                                    'Double-check your spelling and try again or {link}.'
-                            },
-                            {
-                                link: (
-                                    <Button variant="link" to={'/'}>
-                                        {messages.contactUs}
-                                    </Button>
-                                )
-                            }
-                        )}
+                        {messages.doubleCheckSpelling}
                     </Text>
                     <Stack gap={16} marginTop={32}>
                         <RecommendedProducts
