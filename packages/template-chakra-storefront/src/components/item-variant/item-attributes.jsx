@@ -26,6 +26,18 @@ const ItemAttributes = ({includeQuantity, currency, ...props}) => {
     const {currency: activeCurrency} = useCurrency()
     const promotionIds = variant.priceAdjustments?.map((adj) => adj.promotionId) ?? []
     const intl = useIntl()
+    const {formatMessage} = intl
+    
+    const messages = {
+        qty: formatMessage({
+            defaultMessage: 'Qty',
+            id: 'add_to_cart_modal.label.quantity'
+        }),
+        selectedOptions: formatMessage({
+            defaultMessage: 'Selected Options',
+            id: 'item_attributes.label.selected_options'
+        })
+    }
 
     // Fetch all the promotions given by price adjustments. We display this info in
     // the promotion info popover when applicable.
@@ -121,10 +133,7 @@ const ItemAttributes = ({includeQuantity, currency, ...props}) => {
                                 {product?.name}
                             </Text>
                             <Text fontSize="sm" color="gray.700">
-                                {intl.formatMessage({
-                                    defaultMessage: 'Qty',
-                                    id: 'add_to_cart_modal.label.quantity'
-                                })}
+                                {messages.qty}
                                 : {quantity}
                             </Text>
                         </Box>
@@ -135,10 +144,7 @@ const ItemAttributes = ({includeQuantity, currency, ...props}) => {
             {!bundleVariantIsLoading && productBundleVariantData && (
                 <Box>
                     <Text fontSize={15} marginTop={3} fontWeight={500}>
-                        {intl.formatMessage({
-                            defaultMessage: 'Selected Options',
-                            id: 'item_attributes.label.selected_options'
-                        })}
+                        {messages.selectedOptions}
                         :
                     </Text>
                     {productBundleVariantData?.map(
@@ -149,10 +155,7 @@ const ItemAttributes = ({includeQuantity, currency, ...props}) => {
                                         {productName}
                                     </Text>
                                     <Text fontSize="sm" color="gray.700">
-                                        {intl.formatMessage({
-                                            defaultMessage: 'Qty',
-                                            id: 'add_to_cart_modal.label.quantity'
-                                        })}
+                                        {messages.qty}
                                         : {quantity}
                                     </Text>
                                     {Object.keys(variationValues).map((key) => {

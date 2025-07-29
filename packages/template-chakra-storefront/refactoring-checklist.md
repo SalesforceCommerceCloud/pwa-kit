@@ -72,11 +72,11 @@ Total files: 222
 - [x] src/components/header/index.jsx
 - [x] src/components/header/slot-a.jsx
 - [x] src/components/hero/index.jsx
-- [ ] src/components/icons/index.jsx
+- [x] src/components/icons/index.jsx
 - [ ] src/components/image-gallery/index.jsx
 - [ ] src/components/item-variant/data.mock.js
 - [ ] src/components/item-variant/index.jsx
-- [ ] src/components/item-variant/item-attributes.jsx
+- [x] src/components/item-variant/item-attributes.jsx
 - [ ] src/components/item-variant/item-image.jsx
 - [ ] src/components/item-variant/item-name.jsx
 - [ ] src/components/item-variant/item-price.jsx
