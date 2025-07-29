@@ -126,7 +126,7 @@ Total files: 222
 - [x] src/components/social-icons/index.jsx
 - [x] src/components/social-login/index.jsx
 - [x] src/components/standard-login/index.jsx
-- [ ] src/components/store-locator-modal/index.jsx
+- [x] src/components/store-locator-modal/index.jsx
 - [ ] src/components/store-locator-modal/store-locator-content.jsx
 - [ ] src/components/store-locator-modal/store-locator-input.jsx
 - [ ] src/components/store-locator-modal/stores-list.jsx
