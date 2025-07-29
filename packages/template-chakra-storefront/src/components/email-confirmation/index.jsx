@@ -7,11 +7,38 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import {FormattedMessage} from 'react-intl'
+import {useIntl} from 'react-intl'
 import {Button, Stack, Text} from '@chakra-ui/react'
 import {BrandLogo} from '../../components/icons'
 
 const PasswordlessEmailConfirmation = ({form, submitForm, email = ''}) => {
+    const {formatMessage} = useIntl()
+    
+    const messages = {
+        title: formatMessage({
+            id: 'auth_modal.check_email.title.check_your_email',
+            defaultMessage: 'Check Your Email'
+        }),
+        justSent: formatMessage(
+            {
+                id: 'auth_modal.check_email.description.just_sent',
+                defaultMessage: 'We just sent a login link to <b>{email}</b>'
+            },
+            {
+                email: email,
+                b: (chunks) => <b>{chunks}</b>
+            }
+        ),
+        checkSpam: formatMessage({
+            id: 'auth_modal.check_email.description.check_spam_folder',
+            defaultMessage: "The link may take a few minutes to arrive, check your spam folder if you're having trouble finding it"
+        }),
+        resendLink: formatMessage({
+            id: 'auth_modal.check_email.button.resend_link',
+            defaultMessage: 'Resend Link'
+        })
+    }
+    
     return (
         <form
             onSubmit={form.handleSubmit(submitForm)}
@@ -21,35 +48,19 @@ const PasswordlessEmailConfirmation = ({form, submitForm, email = ''}) => {
                 <Stack justify="center" align="center" gap={6} role="alert">
                     <BrandLogo width="60px" height="auto" aria-hidden={true} />
                     <Text textAlign="center" fontSize="xl" fontWeight="semibold">
-                        <FormattedMessage
-                            defaultMessage="Check Your Email"
-                            id="auth_modal.check_email.title.check_your_email"
-                        />
+                        {messages.title}
                     </Text>
                     <Stack gap={10}>
                         <Text textAlign="center" fontSize="md">
-                            <FormattedMessage
-                                defaultMessage="We just sent a login link to <b>{email}</b>"
-                                id="auth_modal.check_email.description.just_sent"
-                                values={{
-                                    email: email,
-                                    b: (chunks) => <b>{chunks}</b>
-                                }}
-                            />
+                            {messages.justSent}
                         </Text>
                         <Text textAlign="center" fontSize="sm">
-                            <FormattedMessage
-                                defaultMessage="The link may take a few minutes to arrive, check your spam folder if you're having trouble finding it"
-                                id="auth_modal.check_email.description.check_spam_folder"
-                            />
+                            {messages.checkSpam}
                         </Text>
                     </Stack>
                 </Stack>
                 <Button type="submit">
-                    <FormattedMessage
-                        defaultMessage="Resend Link"
-                        id="auth_modal.check_email.button.resend_link"
-                    />
+                    {messages.resendLink}
                 </Button>
             </Stack>
         </form>
