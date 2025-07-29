@@ -27,7 +27,7 @@ Total files: 97
 - [x] src/components/forms/useRegistrationFields.jsx
 - [x] src/components/forms/useResetPasswordFields.jsx
 - [x] src/components/forms/useUpdatePasswordFields.jsx
-- [ ] src/components/header/index.jsx
+- [x] src/components/header/index.jsx
 - [ ] src/components/item-variant/item-attributes.jsx
 - [ ] src/components/item-variant/item-image.jsx
 - [ ] src/components/item-variant/item-price.jsx

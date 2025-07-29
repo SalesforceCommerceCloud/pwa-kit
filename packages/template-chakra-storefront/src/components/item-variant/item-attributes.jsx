@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React from 'react'
+import React, {useMemo} from 'react'
 import PropTypes from 'prop-types'
 import {useIntl, FormattedNumber} from 'react-intl'
 import {Flex, Stack, Text, Box} from '@chakra-ui/react'
@@ -28,7 +28,7 @@ const ItemAttributes = ({includeQuantity, currency, ...props}) => {
     const intl = useIntl()
     const {formatMessage} = intl
 
-    const messages = {
+    const messages = useMemo(() => ({
         qty: formatMessage({
             defaultMessage: 'Qty',
             id: 'add_to_cart_modal.label.quantity'
@@ -40,8 +40,12 @@ const ItemAttributes = ({includeQuantity, currency, ...props}) => {
         promotions: formatMessage({
             defaultMessage: 'Promotions',
             id: 'item_attributes.label.promotions'
-        })
-    }
+        }),
+        quantity: formatMessage({
+            id: 'item_attributes.label.quantity',
+            defaultMessage: 'Quantity: {quantity}'
+        }, {quantity: variant.quantity})
+    }), [intl, variant.quantity])
 
     // Fetch all the promotions given by price adjustments. We display this info in
     // the promotion info popover when applicable.
@@ -121,13 +125,7 @@ const ItemAttributes = ({includeQuantity, currency, ...props}) => {
 
             {includeQuantity && (
                 <Text lineHeight={1} color="gray.700" fontSize="sm">
-                    {formatMessage(
-                        {
-                            id: 'item_attributes.label.quantity',
-                            defaultMessage: 'Quantity: {quantity}'
-                        },
-                        {quantity: variant.quantity}
-                    )}
+                    {messages.quantity}
                 </Text>
             )}
 
