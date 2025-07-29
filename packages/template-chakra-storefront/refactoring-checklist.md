@@ -200,7 +200,7 @@ Total files: 222
 - [x] src/pages/product-detail/page-cache.jsx
 - [x] src/pages/product-detail/page-metadata.jsx
 - [x] src/pages/product-detail/partials/information-accordion.jsx
-- [ ] src/pages/product-detail/partials/product-details-composite.jsx
+- [x] src/pages/product-detail/partials/product-details-composite.jsx
 - [ ] src/pages/product-detail/partials/product-details-simple.jsx
 - [ ] src/pages/product-detail/partials/product-details.jsx
 - [ ] src/pages/product-detail/partials/recommended-products-section.jsx
