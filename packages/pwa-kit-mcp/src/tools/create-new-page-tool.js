@@ -144,7 +144,6 @@ class CreateNewPageTool {
     generatePageContent(pageName, componentList) {
         const imports = [
             `import React from 'react'`,
-            `import {useIntl} from 'react-intl'`,
             `import {Box} from '@salesforce/retail-react-app/app/components/shared/ui'`,
             `import Seo from '@salesforce/retail-react-app/app/components/seo'`
         ]
@@ -202,7 +201,6 @@ ${imports.join('\n')}
  * @returns {React.JSX.Element}
  */
 const ${pageName} = () => {
-    const intl = useIntl();
 
     return (
         <Box data-testid="${pageName.toLowerCase()}-page" layerStyle="page" display="flex">
@@ -226,7 +224,6 @@ export default ${pageName};
         const routesPath = path.join(process.env.PWA_STOREFRONT_APP_PATH, 'routes.jsx')
         try {
             const routesContent = await fs.readFile(routesPath, 'utf8')
-            // Debugging output to log the routesContent
 
             const importStatement = `const ${pageName} = loadable(() => import('./pages/${toKebabCase(
                 pageName
