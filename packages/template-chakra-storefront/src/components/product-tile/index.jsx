@@ -163,6 +163,24 @@ const ProductTile = (props) => {
         return getPriceData(productWithFilteredVariants)
     }, [productWithFilteredVariants])
 
+    // Message formatting
+    const messages = {
+        removeFromWishlist: intl.formatMessage(
+            {
+                id: 'product_tile.assistive_msg.remove_from_wishlist',
+                defaultMessage: 'Remove {product} from wishlist'
+            },
+            {product: localizedProductName}
+        ),
+        addToWishlist: intl.formatMessage(
+            {
+                id: 'product_tile.assistive_msg.add_to_wishlist',
+                defaultMessage: 'Add {product} to wishlist'
+            },
+            {product: localizedProductName}
+        )
+    }
+
     // Retrieve product badges
     const filteredLabels = useMemo(() => {
         const labelsMap = new Map()
@@ -272,23 +290,7 @@ const ProductTile = (props) => {
                 <Box>
                     <IconButtonWithRegistration
                         data-testid="wishlist-button"
-                        aria-label={
-                            isFavourite
-                                ? intl.formatMessage(
-                                      {
-                                          id: 'product_tile.assistive_msg.remove_from_wishlist',
-                                          defaultMessage: 'Remove {product} from wishlist'
-                                      },
-                                      {product: localizedProductName}
-                                  )
-                                : intl.formatMessage(
-                                      {
-                                          id: 'product_tile.assistive_msg.add_to_wishlist',
-                                          defaultMessage: 'Add {product} to wishlist'
-                                      },
-                                      {product: localizedProductName}
-                                  )
-                        }
+                        aria-label={isFavourite ? messages.removeFromWishlist : messages.addToWishlist}
                         variant="unstyled"
                         css={styles.favIcon}
                         onClick={async () => {
