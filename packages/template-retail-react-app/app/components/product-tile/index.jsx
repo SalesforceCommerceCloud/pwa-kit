@@ -192,7 +192,7 @@ const ProductTile = (props) => {
             })
         }
         return labelsMap
-    }, [productWithFilteredVariants, product, badgeDetails, intl])
+    }, [productWithFilteredVariants, product])
 
     return (
         <Box {...styles.container}>
