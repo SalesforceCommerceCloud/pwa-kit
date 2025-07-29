@@ -6,7 +6,7 @@
  */
 import React from 'react'
 import PropTypes from 'prop-types'
-import {FormattedMessage} from 'react-intl'
+import {FormattedMessage, useIntl} from 'react-intl'
 import {Button, Stack} from '@chakra-ui/react'
 import {MESSAGE_PROPTYPE} from '../../utils/locale.js'
 
@@ -21,23 +21,33 @@ const FormActionButtons = ({
     cancelButtonLabel,
     onCancel = () => {}
 }) => {
+    const {formatMessage} = useIntl()
+    
+    const messages = {
+        save: formatMessage({
+            id: "form_action_buttons.button.save",
+            defaultMessage: "Save"
+        }),
+        cancel: formatMessage({
+            id: "form_action_buttons.button.cancel",
+            defaultMessage: "Cancel"
+        })
+    }
+    
     return (
         <Stack direction={{base: 'column', lg: 'row-reverse'}} gap={4}>
             <Button type="submit" minWidth={28} {...saveButtonProps}>
                 {saveButtonLabel ? (
                     <FormattedMessage {...saveButtonLabel} />
                 ) : (
-                    <FormattedMessage defaultMessage="Save" id="form_action_buttons.button.save" />
+                    messages.save
                 )}
             </Button>
             <Button variant="outline" minWidth={28} onClick={onCancel} {...cancelButtonProps}>
                 {cancelButtonLabel ? (
                     <FormattedMessage {...cancelButtonLabel} />
                 ) : (
-                    <FormattedMessage
-                        id="form_action_buttons.button.cancel"
-                        defaultMessage="Cancel"
-                    />
+                    messages.cancel
                 )}
             </Button>
         </Stack>
