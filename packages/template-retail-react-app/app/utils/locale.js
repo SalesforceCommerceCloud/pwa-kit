@@ -7,7 +7,7 @@
 
 import PropTypes from 'prop-types'
 import {getAssetUrl} from '@salesforce/pwa-kit-react-sdk/ssr/universal/utils'
-import {getAppOrigin} from '@salesforce/pwa-kit-react-sdk/utils/url'
+import {useAppOrigin} from '@salesforce/retail-react-app/app/hooks/use-app-origin'
 import logger from '@salesforce/retail-react-app/app/utils/logger-instance'
 import fetch from 'cross-fetch'
 
@@ -27,7 +27,7 @@ export const fetchTranslations = async (locale, origin) => {
             : locale
 
     try {
-        const file = `${origin || getAppOrigin()}${getAssetUrl(
+        const file = `${origin || useAppOrigin()}${getAssetUrl(
             `static/translations/compiled/${targetLocale}.json`
         )}`
         const response = await fetch(file)
