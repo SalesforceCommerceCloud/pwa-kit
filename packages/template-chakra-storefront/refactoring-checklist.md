@@ -28,8 +28,8 @@ Total files: 97
 - [x] src/components/forms/useResetPasswordFields.jsx
 - [x] src/components/forms/useUpdatePasswordFields.jsx
 - [x] src/components/header/index.jsx
-- [ ] src/components/item-variant/item-attributes.jsx
-- [ ] src/components/item-variant/item-image.jsx
+- [x] src/components/item-variant/item-attributes.jsx
+- [x] src/components/item-variant/item-image.jsx
 - [ ] src/components/item-variant/item-price.jsx
 - [ ] src/components/list-menu/list-menu.jsx
 - [ ] src/components/offline-banner/index.jsx

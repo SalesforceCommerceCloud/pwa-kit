@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React from 'react'
+import React, {useMemo} from 'react'
 import PropTypes from 'prop-types'
 import {AspectRatio, Box, Badge, Image} from '@chakra-ui/react'
 import {useItemVariant} from '.'
@@ -21,7 +21,8 @@ import {findImageGroupBy} from '../../utils/image-groups-utils'
  */
 const ItemImage = ({imageProps, ratio = 1, ...props}) => {
     const variant = useItemVariant()
-    const {formatMessage} = useIntl()
+    const intl = useIntl()
+    const {formatMessage} = intl
 
     // We find the 'small' images in the variant's image groups based on variationValues and pick the first one
     const image = findImageGroupBy(variant?.imageGroups, {
@@ -29,7 +30,7 @@ const ItemImage = ({imageProps, ratio = 1, ...props}) => {
         selectedVariationAttributes: variant?.variationValues
     })?.images?.[0]
 
-    const messages = {
+    const messages = useMemo(() => ({
         sale: formatMessage({
             id: 'item_image.label.sale',
             defaultMessage: 'Sale'
@@ -38,7 +39,7 @@ const ItemImage = ({imageProps, ratio = 1, ...props}) => {
             id: 'item_image.label.unavailable',
             defaultMessage: 'Unavailable'
         })
-    }
+    }), [intl])
 
     return (
         <Box width="84px" backgroundColor="gray.100" {...props}>
