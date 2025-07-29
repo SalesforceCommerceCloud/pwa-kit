@@ -69,7 +69,6 @@ export const useMultiship = (basket) => {
         if (shipmentsWithoutMethod.length === 0) {
             return
         }
-
         try {
             // Get shipping methods (using main shipment as reference)
             // Note: This is a limitation - all shipments will get the same options
@@ -260,6 +259,94 @@ export const useMultiship = (basket) => {
                 c_fromStoreId: storeInfo.id
             }
         })
+    }
+
+    /**
+     * Compares two addresses to determine if they are the same
+     * @param {Object} address1 - First address object
+     * @param {Object} address2 - Second address object
+     * @returns {boolean} True if addresses match
+     */
+    const areAddressesEqual = (address1, address2) => {
+        if (!address1 || !address2) return false
+
+        // Compare key address fields
+        return (
+            address1.address1 === address2.address1 &&
+            address1.city === address2.city &&
+            address1.stateCode === address2.stateCode &&
+            address1.postalCode === address2.postalCode &&
+            address1.countryCode === address2.countryCode
+        )
+    }
+
+    /**
+     * Extracts only valid OrderAddress fields from an address object
+     * @param {Object} address - The address object (may contain extra fields from customer address)
+     * @returns {Object} Clean address object with only OrderAddress fields
+     */
+    const cleanAddressForOrder = (address) => {
+        if (!address) return null
+
+        return {
+            address1: address.address1,
+            city: address.city,
+            countryCode: address.countryCode,
+            firstName: address.firstName,
+            lastName: address.lastName,
+            phone: address.phone,
+            postalCode: address.postalCode,
+            stateCode: address.stateCode
+        }
+    }
+
+    /**
+     * Finds an existing delivery shipment with matching address
+     * @param {Object} basket - The basket object
+     * @param {Object} address - The address to match
+     * @returns {string} The matching shipment ID
+     */
+    const findDeliveryShipmentWithSameAddress = (basket, address) => {
+        if (!basket?.shipments || !address) return null
+
+        const foundShipment = basket.shipments.find((shipment) => {
+            // Must be a delivery shipment (not pickup)
+            if (isCurrentShippingMethodPickup(shipment.shippingMethod)) {
+                return false
+            }
+
+            // Check if shipment has a shipping address that matches
+            return shipment.shippingAddress && areAddressesEqual(shipment.shippingAddress, address)
+        })
+        return foundShipment?.shipmentId
+    }
+
+    /**
+     * Creates a new delivery shipment with the specified address
+     * @param {Object} basket - The basket object
+     * @param {Object} address - The address to use for the shipment
+     * @returns {Promise<string>} The created shipment ID
+     */
+    const createNewDeliveryShipmentWithAddress = async (basket, address) => {
+        if (!basket?.basketId || !address) return null
+
+        const shippingAddress = cleanAddressForOrder(address)
+
+        const response = await createShipmentForBasketMutation.mutateAsync({
+            parameters: {
+                basketId: basket.basketId
+            },
+            body: {
+                shippingAddress: shippingAddress
+            }
+        })
+
+        // Find the newly created shipment by matching the address
+        return response?.shipments?.find(
+            (shipment) =>
+                !isCurrentShippingMethodPickup(shipment.shippingMethod) &&
+                areAddressesEqual(shipment.shippingAddress, shippingAddress)
+        )?.shipmentId
     }
 
     /**
@@ -684,11 +771,13 @@ export const useMultiship = (basket) => {
         findExistingDeliveryShipment,
         findExistingPickupShipment,
         createNewDeliveryShipment,
+        createNewDeliveryShipmentWithAddress,
         createNewPickupShipment,
         moveItemToDeliveryShipment,
         moveItemsToDeliveryShipment,
         moveItemToPickupShipment,
         moveItemsToPickupShipment,
+        findDeliveryShipmentWithSameAddress,
         findOrCreateDeliveryShipment,
         findOrCreatePickupShipment,
         getShipmentForItems,

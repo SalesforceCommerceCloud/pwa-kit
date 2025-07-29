@@ -181,7 +181,6 @@ export default function ShippingAddress() {
                 ) : (
                     <ShippingMultiAddress
                         basket={basket}
-                        onSubmit={submitAndContinue}
                         submitButtonLabel={submitButtonMessage}
                         addNewAddressLabel={addNewAddressLabel}
                         noItemsInBasketMessage={noItemsInBasketMessage}

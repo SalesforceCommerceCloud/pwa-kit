@@ -12,6 +12,10 @@ import {useProducts} from '@salesforce/commerce-sdk-react'
 import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
 import {CurrencyProvider} from '@salesforce/retail-react-app/app/contexts'
+import {useMultiship} from '@salesforce/retail-react-app/app/hooks/use-multiship'
+import {useCheckout} from '@salesforce/retail-react-app/app/pages/checkout/util/checkout-context'
+import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
+import userEvent from '@testing-library/user-event'
 
 jest.mock('@salesforce/commerce-sdk-react', () => ({
     useProducts: jest.fn(),
@@ -36,6 +40,10 @@ jest.mock('@salesforce/retail-react-app/app/hooks/use-current-basket', () => ({
     useCurrentBasket: jest.fn()
 }))
 
+jest.mock('@salesforce/retail-react-app/app/hooks/use-multiship')
+jest.mock('@salesforce/retail-react-app/app/pages/checkout/util/checkout-context')
+jest.mock('@salesforce/retail-react-app/app/hooks/use-toast')
+
 jest.mock('@salesforce/retail-react-app/app/utils/image-groups-utils', () => ({
     findImageGroupBy: jest.fn((imageGroups) => {
         if (
@@ -53,6 +61,32 @@ jest.mock('@salesforce/retail-react-app/app/utils/image-groups-utils', () => ({
         return {images: [{disBaseLink: 'https://test-image.jpg'}]}
     })
 }))
+
+const mockGoToStep = jest.fn()
+const mockShowToast = jest.fn()
+
+beforeEach(() => {
+    // Reset all mocks before each test
+    jest.clearAllMocks()
+
+    // Setup default mock implementations that are used across all tests
+    useCheckout.mockReturnValue({
+        STEPS: {
+            SHIPPING_OPTIONS: 'SHIPPING_OPTIONS'
+        },
+        goToStep: mockGoToStep
+    })
+
+    useToast.mockReturnValue(mockShowToast)
+
+    // You can also add other common mocks here if they're used in most tests
+    useMultiship.mockReturnValue({
+        findDeliveryShipmentWithSameAddress: jest.fn(),
+        createNewDeliveryShipmentWithAddress: jest.fn(),
+        moveItemsToDeliveryShipment: jest.fn(),
+        removeEmptyShipments: jest.fn()
+    })
+})
 
 const mockBasket = {
     productItems: [
@@ -244,12 +278,13 @@ describe('ShippingMultiAddress', () => {
         expect(dropdowns.length).toBeGreaterThan(0)
     })
 
-    test('should call onSubmit when continue button is clicked', () => {
-        const mockOnSubmit = jest.fn()
-        renderWithIntl(<ShippingMultiAddress {...defaultProps} onSubmit={mockOnSubmit} />)
+    test('should call onSubmit when continue button is clicked', async () => {
+        renderWithIntl(<ShippingMultiAddress {...defaultProps} />)
 
         fireEvent.click(screen.getByText('Continue'))
-        expect(mockOnSubmit).toHaveBeenCalledTimes(1)
+        await waitFor(() => {
+            expect(screen.queryByText('Setting up shipments...')).toBeInTheDocument()
+        })
     })
 
     test('should handle empty product data gracefully', () => {
@@ -395,21 +430,21 @@ describe('ShippingMultiAddress', () => {
     })
 
     describe('Continue to Shipping Method Button', () => {
-        test('should be enabled when no address forms are open', () => {
-            const mockOnSubmit = jest.fn()
-            renderWithIntl(<ShippingMultiAddress {...defaultProps} onSubmit={mockOnSubmit} />)
+        test('should be enabled when no address forms are open', async () => {
+            renderWithIntl(<ShippingMultiAddress {...defaultProps} />)
 
             const continueButton = screen.getByText('Continue')
             expect(continueButton).toBeInTheDocument()
 
             // Click the button to verify it's functional
             fireEvent.click(continueButton)
-            expect(mockOnSubmit).toHaveBeenCalledTimes(1)
+            await waitFor(() => {
+                expect(screen.queryByText('Setting up shipments...')).toBeInTheDocument()
+            })
         })
 
         test('should be disabled when "Add New Address" is selected', async () => {
-            const mockOnSubmit = jest.fn()
-            renderWithIntl(<ShippingMultiAddress {...defaultProps} onSubmit={mockOnSubmit} />)
+            renderWithIntl(<ShippingMultiAddress {...defaultProps} />)
 
             const selectElements = screen.getAllByRole('combobox')
             const firstSelect = selectElements[0]
@@ -425,12 +460,13 @@ describe('ShippingMultiAddress', () => {
             // Try to click the button (should not call onSubmit)
             const continueButton = screen.getByText('Continue')
             fireEvent.click(continueButton)
-            expect(mockOnSubmit).not.toHaveBeenCalled()
+            await waitFor(() => {
+                expect(screen.queryByText('Setting up shipments...')).not.toBeInTheDocument()
+            })
         })
 
         test('should be re-enabled when address form is cancelled', async () => {
-            const mockOnSubmit = jest.fn()
-            renderWithIntl(<ShippingMultiAddress {...defaultProps} onSubmit={mockOnSubmit} />)
+            renderWithIntl(<ShippingMultiAddress {...defaultProps} />)
 
             const selectElements = screen.getAllByRole('combobox')
             const firstSelect = selectElements[0]
@@ -446,7 +482,9 @@ describe('ShippingMultiAddress', () => {
             // Try to click the button (should not call onSubmit)
             const continueButton = screen.getByText('Continue')
             fireEvent.click(continueButton)
-            expect(mockOnSubmit).not.toHaveBeenCalled()
+            await waitFor(() => {
+                expect(screen.queryByText('Setting up shipments...')).not.toBeInTheDocument()
+            })
 
             // Click Cancel button
             fireEvent.click(screen.getByText('Cancel'))
@@ -458,12 +496,13 @@ describe('ShippingMultiAddress', () => {
 
             // Button should now be enabled
             fireEvent.click(continueButton)
-            expect(mockOnSubmit).toHaveBeenCalledTimes(1)
+            await waitFor(() => {
+                expect(screen.queryByText('Setting up shipments...')).toBeInTheDocument()
+            })
         })
 
         test('should be re-enabled when address form is saved', async () => {
-            const mockOnSubmit = jest.fn()
-            renderWithIntl(<ShippingMultiAddress {...defaultProps} onSubmit={mockOnSubmit} />)
+            renderWithIntl(<ShippingMultiAddress {...defaultProps} />)
 
             const selectElements = screen.getAllByRole('combobox')
             const firstSelect = selectElements[0]
@@ -479,7 +518,9 @@ describe('ShippingMultiAddress', () => {
             // Try to click the button (should not call onSubmit)
             const continueButton = screen.getByText('Continue')
             fireEvent.click(continueButton)
-            expect(mockOnSubmit).not.toHaveBeenCalled()
+            await waitFor(() => {
+                expect(screen.queryByText('Setting up shipments...')).not.toBeInTheDocument()
+            })
 
             // Fill out the form
             fireEvent.change(screen.getByLabelText('First Name'), {target: {value: 'John'}})
@@ -500,12 +541,13 @@ describe('ShippingMultiAddress', () => {
 
             // Button should now be enabled
             fireEvent.click(continueButton)
-            expect(mockOnSubmit).toHaveBeenCalledTimes(1)
+            await waitFor(() => {
+                expect(screen.queryByText('Setting up shipments...')).toBeInTheDocument()
+            })
         })
 
         test('should handle mixed state - some forms open, some closed', async () => {
-            const mockOnSubmit = jest.fn()
-            renderWithIntl(<ShippingMultiAddress {...defaultProps} onSubmit={mockOnSubmit} />)
+            renderWithIntl(<ShippingMultiAddress {...defaultProps} />)
 
             const selectElements = screen.getAllByRole('combobox')
 
@@ -523,7 +565,9 @@ describe('ShippingMultiAddress', () => {
             // Try to click the button (should not call onSubmit)
             const continueButton = screen.getByText('Continue')
             fireEvent.click(continueButton)
-            expect(mockOnSubmit).not.toHaveBeenCalled()
+            await waitFor(() => {
+                expect(screen.queryByText('Setting up shipments...')).not.toBeInTheDocument()
+            })
 
             // Cancel the first form
             fireEvent.click(screen.getByText('Cancel'))
@@ -535,7 +579,250 @@ describe('ShippingMultiAddress', () => {
 
             // Button should now be enabled
             fireEvent.click(continueButton)
-            expect(mockOnSubmit).toHaveBeenCalledTimes(1)
+            await waitFor(() => {
+                expect(screen.queryByText('Setting up shipments...')).toBeInTheDocument()
+            })
+        })
+    })
+})
+
+describe('ShippingMultiAddress - handleSubmit', () => {
+    let mockFindDeliveryShipmentWithSameAddress
+    let mockCreateNewDeliveryShipmentWithAddress
+    let mockMoveItemsToDeliveryShipment
+    let mockRemoveEmptyShipments
+
+    const mockBasket = {
+        basketId: 'test-basket-123',
+        productItems: [
+            {
+                itemId: 'item-1',
+                productId: 'prod-1',
+                productName: 'Test Product 1',
+                quantity: 1,
+                shipmentId: 'me'
+            },
+            {
+                itemId: 'item-2',
+                productId: 'prod-2',
+                productName: 'Test Product 2',
+                quantity: 2,
+                shipmentId: 'me'
+            }
+        ],
+        shipments: [
+            {
+                shipmentId: 'me',
+                shippingAddress: {}
+            }
+        ]
+    }
+
+    const mockAddresses = [
+        {
+            addressId: 'addr-1',
+            firstName: 'John',
+            lastName: 'Doe',
+            address1: '123 Main St',
+            city: 'Boston',
+            stateCode: 'MA',
+            postalCode: '02101'
+        },
+        {
+            addressId: 'addr-2',
+            firstName: 'Jane',
+            lastName: 'Smith',
+            address1: '456 Oak Ave',
+            city: 'Cambridge',
+            stateCode: 'MA',
+            postalCode: '02139'
+        }
+    ]
+
+    beforeEach(() => {
+        mockFindDeliveryShipmentWithSameAddress = jest.fn().mockReturnValue(null)
+        mockCreateNewDeliveryShipmentWithAddress = jest.fn().mockResolvedValue('new-shipment-1')
+        mockMoveItemsToDeliveryShipment = jest.fn().mockResolvedValue()
+        mockRemoveEmptyShipments = jest.fn().mockResolvedValue()
+
+        useMultiship.mockReturnValue({
+            findDeliveryShipmentWithSameAddress: mockFindDeliveryShipmentWithSameAddress,
+            createNewDeliveryShipmentWithAddress: mockCreateNewDeliveryShipmentWithAddress,
+            moveItemsToDeliveryShipment: mockMoveItemsToDeliveryShipment,
+            removeEmptyShipments: mockRemoveEmptyShipments
+        })
+
+        useCurrentCustomer.mockReturnValue({
+            data: {
+                customerId: 'test-customer',
+                addresses: mockAddresses
+            },
+            refetch: jest.fn()
+        })
+    })
+
+    test('should handle successful submission with items going to different addresses', async () => {
+        const user = userEvent.setup()
+
+        renderWithIntl(<ShippingMultiAddress {...defaultProps} basket={mockBasket} />)
+
+        // Select different addresses for each item
+        const selects = screen.getAllByRole('combobox')
+        await user.selectOptions(selects[0], 'addr-1') // First item to address 1
+        await user.selectOptions(selects[1], 'addr-2') // Second item to address 2
+
+        // Click continue button
+        const continueButton = screen.getByTestId('continue-to-shipping-button')
+        await user.click(continueButton)
+
+        await waitFor(() => {
+            // Should create two new shipments (one for each address)
+            expect(mockCreateNewDeliveryShipmentWithAddress).toHaveBeenCalledTimes(2)
+            expect(mockCreateNewDeliveryShipmentWithAddress).toHaveBeenCalledWith(
+                mockBasket,
+                mockAddresses[0]
+            )
+            expect(mockCreateNewDeliveryShipmentWithAddress).toHaveBeenCalledWith(
+                mockBasket,
+                mockAddresses[1]
+            )
+
+            // Should move items to their respective shipments
+            expect(mockMoveItemsToDeliveryShipment).toHaveBeenCalledTimes(2)
+
+            // Should remove empty shipments
+            expect(mockRemoveEmptyShipments).toHaveBeenCalled()
+
+            // Should navigate to next step
+            expect(mockGoToStep).toHaveBeenCalledWith('SHIPPING_OPTIONS')
+        })
+    })
+
+    test('should reuse existing shipment with same address', async () => {
+        // Mock that a shipment already exists for address 1
+        mockFindDeliveryShipmentWithSameAddress.mockImplementation((basket, address) => {
+            if (address.addressId === 'addr-1') {
+                return 'existing-shipment-1'
+            }
+            return null
+        })
+
+        const user = userEvent.setup()
+
+        renderWithIntl(<ShippingMultiAddress {...defaultProps} basket={mockBasket} />)
+
+        // Select same address for both items
+        const selects = screen.getAllByRole('combobox')
+        await user.selectOptions(selects[0], 'addr-1')
+        await user.selectOptions(selects[1], 'addr-1')
+
+        const continueButton = screen.getByTestId('continue-to-shipping-button')
+        await user.click(continueButton)
+
+        await waitFor(() => {
+            // Should NOT create new shipment since one exists
+            expect(mockCreateNewDeliveryShipmentWithAddress).not.toHaveBeenCalled()
+
+            // Should move items to existing shipment
+            expect(mockMoveItemsToDeliveryShipment).toHaveBeenCalledWith(
+                expect.arrayContaining([
+                    expect.objectContaining({itemId: 'item-1'}),
+                    expect.objectContaining({itemId: 'item-2'})
+                ]),
+                'existing-shipment-1'
+            )
+        })
+    })
+
+    test('should handle errors gracefully', async () => {
+        // Mock an error during shipment creation
+        mockCreateNewDeliveryShipmentWithAddress.mockRejectedValue(
+            new Error('Failed to create shipment')
+        )
+
+        const user = userEvent.setup()
+
+        renderWithIntl(<ShippingMultiAddress {...defaultProps} basket={mockBasket} />)
+
+        const selects = screen.getAllByRole('combobox')
+        await user.selectOptions(selects[0], 'addr-1')
+
+        const continueButton = screen.getByTestId('continue-to-shipping-button')
+        await user.click(continueButton)
+
+        await waitFor(() => {
+            // Should show error toast
+            expect(mockShowToast).toHaveBeenCalledWith({
+                title: expect.stringContaining('Error setting up shipments'),
+                status: 'error'
+            })
+
+            // Should NOT navigate to next step
+            expect(mockGoToStep).not.toHaveBeenCalled()
+        })
+    })
+
+    test('should not move items that are already in correct shipment', async () => {
+        // Mock items already in correct shipments
+        const basketWithExistingShipments = {
+            ...mockBasket,
+            productItems: [
+                {
+                    ...mockBasket.productItems[0],
+                    shipmentId: 'existing-shipment-1'
+                },
+                {
+                    ...mockBasket.productItems[1],
+                    shipmentId: 'me'
+                }
+            ]
+        }
+
+        mockFindDeliveryShipmentWithSameAddress.mockImplementation((basket, address) => {
+            if (address.addressId === 'addr-1') {
+                return 'existing-shipment-1'
+            }
+            return null
+        })
+
+        const user = userEvent.setup()
+
+        renderWithIntl(
+            <ShippingMultiAddress {...defaultProps} basket={basketWithExistingShipments} />
+        )
+
+        const selects = screen.getAllByRole('combobox')
+        await user.selectOptions(selects[0], 'addr-1') // Item already in this shipment
+        await user.selectOptions(selects[1], 'addr-2') // Item needs to move
+
+        const continueButton = screen.getByTestId('continue-to-shipping-button')
+        await user.click(continueButton)
+
+        await waitFor(() => {
+            // Should only move the second item
+            expect(mockMoveItemsToDeliveryShipment).toHaveBeenCalledTimes(1)
+            expect(mockMoveItemsToDeliveryShipment).toHaveBeenCalledWith(
+                expect.arrayContaining([expect.objectContaining({itemId: 'item-2'})]),
+                expect.any(String)
+            )
+        })
+    })
+
+    test('should use first address as default if no address selected', async () => {
+        const user = userEvent.setup()
+
+        renderWithIntl(<ShippingMultiAddress {...defaultProps} basket={mockBasket} />)
+
+        // Don't select any addresses, just click continue
+        const continueButton = screen.getByTestId('continue-to-shipping-button')
+        await user.click(continueButton)
+
+        await waitFor(() => {
+            // Should use first address for all items
+            expect(mockCreateNewDeliveryShipmentWithAddress).toHaveBeenCalledWith(
+                mockBasket,
+                mockAddresses[0] // First address as default
+            )
         })
     })
 })
