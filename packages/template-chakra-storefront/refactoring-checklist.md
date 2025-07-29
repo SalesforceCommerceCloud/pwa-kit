@@ -36,7 +36,7 @@ Total files: 97
 - [x] src/components/order-summary/index.jsx
 - [x] src/components/pagination/index.jsx
 - [x] src/components/passwordless-login/index.jsx
-- [ ] src/components/product-scroller/index.jsx
+- [x] src/components/product-scroller/index.jsx
 - [ ] src/components/product-tile/index.jsx
 - [ ] src/components/product-view-modal/bundle.jsx
 - [ ] src/components/product-view-modal/index.jsx
