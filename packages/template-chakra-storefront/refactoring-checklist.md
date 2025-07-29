@@ -18,7 +18,7 @@ Total files: 27
 - [x] src/components/pagination/index.jsx
 - [x] src/components/passwordless-login/index.jsx
 - [x] src/components/product-scroller/index.jsx
-- [ ] src/components/product-tile/index.jsx
+- [x] src/components/product-tile/index.jsx
 - [ ] src/components/search/index.jsx
 - [ ] src/components/store-locator-modal/store-locator-input.jsx
 - [ ] src/components/store-locator-modal/stores-list.jsx
