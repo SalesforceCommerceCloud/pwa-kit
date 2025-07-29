@@ -27,7 +27,7 @@ Total files: 27
 - [x] src/hooks/use-product-view-modal.js
 - [x] src/page-designer/layouts/carousel/index.jsx
 - [x] src/pages/checkout/partials/checkout-footer.jsx
-- [ ] src/pages/checkout/partials/checkout-header.jsx
+- [x] src/pages/checkout/partials/checkout-header.jsx
 - [ ] src/pages/home/index.jsx
 - [ ] src/pages/page-not-found/index.jsx
 - [ ] src/pages/product-list/partials/color-refinements.jsx

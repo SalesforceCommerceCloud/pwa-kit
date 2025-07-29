@@ -13,7 +13,7 @@ import {useCurrentBasket} from '../../../hooks/use-current-basket'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 
 const CheckoutHeader = () => {
-    const intl = useIntl()
+    const {formatMessage} = useIntl()
     const {
         derivedData: {totalItems}
     } = useCurrentBasket()
@@ -22,11 +22,11 @@ const CheckoutHeader = () => {
     } = getConfig()
 
     const messages = {
-        backToCart: intl.formatMessage({
+        backToCart: formatMessage({
             id: 'checkout_header.link.cart',
             defaultMessage: 'Back to cart'
         }),
-        cartAriaLabel: intl.formatMessage(
+        cartAriaLabel: formatMessage(
             {
                 id: 'checkout_header.link.assistive_msg.cart',
                 defaultMessage: 'Back to cart, number of items: {numItems}'
