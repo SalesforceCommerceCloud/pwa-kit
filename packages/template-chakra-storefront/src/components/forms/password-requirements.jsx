@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React from 'react'
+import React, {useMemo} from 'react'
 import PropTypes from 'prop-types'
 import {useIntl} from 'react-intl'
 import {Flex, Text, Stack} from '@chakra-ui/react'
@@ -48,36 +48,36 @@ PasswordRequirement.propTypes = {
  * state when the given password value meets the associated critieria.
  */
 const PasswordRequirements = ({value}) => {
-    const {formatMessage} = useIntl()
+    const intl = useIntl()
     const pwValidations = validatePassword(value)
 
-    const messages = {
-        minChars: formatMessage({
+    const messages = useMemo(() => ({
+        minChars: intl.formatMessage({
             id: 'password_requirements.error.eight_letter_minimum',
             defaultMessage: '8 characters minimum',
             description: 'Password requirement'
         }),
-        uppercase: formatMessage({
+        uppercase: intl.formatMessage({
             id: 'password_requirements.error.one_uppercase_letter',
             defaultMessage: '1 uppercase letter',
             description: 'Password requirement'
         }),
-        lowercase: formatMessage({
+        lowercase: intl.formatMessage({
             id: 'password_requirements.error.one_lowercase_letter',
             defaultMessage: '1 lowercase letter',
             description: 'Password requirement'
         }),
-        number: formatMessage({
+        number: intl.formatMessage({
             id: 'password_requirements.error.one_number',
             defaultMessage: '1 number',
             description: 'Password requirement'
         }),
-        specialChar: formatMessage({
+        specialChar: intl.formatMessage({
             id: 'password_requirements.error.one_special_character',
             defaultMessage: '1 special character (example: , S ! % #)',
             description: 'Password requirement'
         })
-    }
+    }), [intl])
 
     return (
         <Stack gap={2}>
