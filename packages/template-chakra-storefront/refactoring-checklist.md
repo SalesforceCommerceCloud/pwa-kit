@@ -207,7 +207,7 @@ Total files: 222
 - [x] src/pages/product-detail/use-product-detail-data.js
 - [x] src/pages/product-list/hooks/use-product-list-controls.js
 - [x] src/pages/product-list/hooks/use-product-list-data.js
-- [ ] src/pages/product-list/index.jsx
+- [x] src/pages/product-list/index.jsx
 - [ ] src/pages/product-list/page-analytics.jsx
 - [ ] src/pages/product-list/page-cache.jsx
 - [ ] src/pages/product-list/page-metadata.jsx
