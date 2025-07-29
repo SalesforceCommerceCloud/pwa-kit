@@ -215,7 +215,7 @@ Total files: 222
 - [ ] src/pages/product-list/partials/category-links.jsx
 - [ ] src/pages/product-list/partials/checkbox-refinements.jsx
 - [ ] src/pages/product-list/partials/color-refinements.jsx
-- [ ] src/pages/product-list/partials/empty-results.jsx
+- [x] src/pages/product-list/partials/empty-results.jsx
 - [ ] src/pages/product-list/partials/link-refinements.jsx
 - [ ] src/pages/product-list/partials/page-designer-promotional-banner.jsx
 - [ ] src/pages/product-list/partials/page-header.jsx

@@ -9,18 +9,28 @@ import React, {Fragment} from 'react'
 import {Button, Text, Flex, Stack, Link} from '@chakra-ui/react'
 import PropTypes from 'prop-types'
 import {Link as RouteLink} from 'react-router-dom'
-import {defineMessage, FormattedMessage, useIntl} from 'react-intl'
+import {useIntl} from 'react-intl'
 import {SearchIcon} from '../../../components/icons'
 import RecommendedProducts from '../../../components/recommended-products'
 import {EINSTEIN_RECOMMENDERS} from '../../../../config/constants'
 
-const contactUsMessage = defineMessage({
-    id: 'empty_search_results.link.contact_us',
-    defaultMessage: 'Contact Us'
-})
-
 const EmptySearchResults = ({searchQuery, category}) => {
     const intl = useIntl()
+    
+    const messages = {
+        contactUs: intl.formatMessage({
+            id: 'empty_search_results.link.contact_us',
+            defaultMessage: 'Contact Us'
+        }),
+        topSellers: intl.formatMessage({
+            id: 'empty_search_results.recommended_products.title.top_sellers',
+            defaultMessage: 'Top Sellers'
+        }),
+        mostViewed: intl.formatMessage({
+            id: 'empty_search_results.recommended_products.title.most_viewed',
+            defaultMessage: 'Most Viewed'
+        })
+    }
     return (
         <Flex
             data-testid="sf-product-empty-list-page"
@@ -45,7 +55,7 @@ const EmptySearchResults = ({searchQuery, category}) => {
                                 category: category?.name,
                                 link: (
                                     <Link as={RouteLink} to={'/'}>
-                                        {intl.formatMessage(contactUsMessage)}
+                                        {messages.contactUs}
                                     </Link>
                                 )
                             }
@@ -75,7 +85,7 @@ const EmptySearchResults = ({searchQuery, category}) => {
                             {
                                 link: (
                                     <Button variant="link" to={'/'}>
-                                        {intl.formatMessage(contactUsMessage)}
+                                        {messages.contactUs}
                                     </Button>
                                 )
                             }
@@ -83,23 +93,13 @@ const EmptySearchResults = ({searchQuery, category}) => {
                     </Text>
                     <Stack gap={16} marginTop={32}>
                         <RecommendedProducts
-                            title={
-                                <FormattedMessage
-                                    defaultMessage="Top Sellers"
-                                    id="empty_search_results.recommended_products.title.top_sellers"
-                                />
-                            }
+                            title={messages.topSellers}
                             recommender={EINSTEIN_RECOMMENDERS.EMPTY_SEARCH_RESULTS_TOP_SELLERS}
                             mx={{base: -4, md: -8, lg: 0}}
                         />
 
                         <RecommendedProducts
-                            title={
-                                <FormattedMessage
-                                    defaultMessage="Most Viewed"
-                                    id="empty_search_results.recommended_products.title.most_viewed"
-                                />
-                            }
+                            title={messages.mostViewed}
                             recommender={EINSTEIN_RECOMMENDERS.EMPTY_SEARCH_RESULTS_MOST_VIEWED}
                             mx={{base: -4, md: -8, lg: 0}}
                         />
