@@ -24,6 +24,8 @@ Do not change anything else other than the refactoring translation definition ta
 
 If you are uncertain about some code, pause and ask me about it.
 
+remember to never change the actual functionality, no renaming of variables or translation labels. Also do not add comments.
+
 ## BAD EXAMPLE
 
 ```jsx
