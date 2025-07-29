@@ -11,22 +11,22 @@ import {useIntl} from 'react-intl'
 import {Field, NativeSelect} from '@chakra-ui/react'
 
 const Sort = ({sortUrls, productSearchResult, basePath, ...otherProps}) => {
-    const intl = useIntl()
+    const {formatMessage} = useIntl()
     const history = useHistory()
 
     const messages = {
-        sortByLabel: intl.formatMessage({
+        sortByLabel: formatMessage({
             id: 'product_list.drawer.title.sort_by',
             defaultMessage: 'Sort By'
         }),
-        sortProductsLabel: intl.formatMessage({
+        sortProductsLabel: formatMessage({
             id: 'product_list.sort_by.label.assistive_msg',
             defaultMessage: 'Sort products by'
         })
     }
 
     const getSortOptionLabel = (sortOption) => {
-        return intl.formatMessage(
+        return formatMessage(
             {
                 id: 'product_list.select.sort_by',
                 defaultMessage: 'Sort By: {sortOption}'
