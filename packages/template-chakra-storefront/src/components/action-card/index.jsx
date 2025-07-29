@@ -7,7 +7,7 @@
 import React, {useState} from 'react'
 import PropTypes from 'prop-types'
 import {Stack, Box, Button} from '@chakra-ui/react'
-import {FormattedMessage} from 'react-intl'
+import {useIntl} from 'react-intl'
 import LoadingSpinner from '../../components/loading-spinner'
 
 /**
@@ -26,6 +26,18 @@ const ActionCard = ({
     ...props
 }) => {
     const [showLoading, setShowLoading] = useState(false)
+    const {formatMessage} = useIntl()
+    
+    const messages = {
+        edit: formatMessage({
+            id: 'action_card.action.edit',
+            defaultMessage: 'Edit'
+        }),
+        remove: formatMessage({
+            id: 'action_card.action.remove',
+            defaultMessage: 'Remove'
+        })
+    }
 
     const handleRemove = async () => {
         setShowLoading(true)
@@ -57,7 +69,7 @@ const ActionCard = ({
                             ref={editBtnRef}
                             aria-label={editBtnLabel}
                         >
-                            <FormattedMessage defaultMessage="Edit" id="action_card.action.edit" />
+                            {messages.edit}
                         </Button>
                     )}
                     {onRemove && (
@@ -67,10 +79,7 @@ const ActionCard = ({
                             onClick={handleRemove}
                             aria-label={removeBtnLabel}
                         >
-                            <FormattedMessage
-                                defaultMessage="Remove"
-                                id="action_card.action.remove"
-                            />
+                            {messages.remove}
                         </Button>
                     )}
                 </Stack>
