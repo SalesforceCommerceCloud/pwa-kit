@@ -10,12 +10,24 @@ import {Text, Button, Box} from '@chakra-ui/react'
 
 import {clearSessionJSONItem} from '../../../utils/utils'
 
-import {FormattedMessage} from 'react-intl'
+import {useIntl} from 'react-intl'
 import {searchUrlBuilder} from '../../../utils/url'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 
 const RecentSearches = ({recentSearches, closeAndNavigate}) => {
     const {search: searchConfig} = getConfig()
+    const {formatMessage} = useIntl()
+    
+    const messages = {
+        recentSearchesTitle: formatMessage({
+            id: "recent_searches.heading.recent_searches",
+            defaultMessage: "Recent Searches"
+        }),
+        clearRecentSearches: formatMessage({
+            id: "recent_searches.action.clear_searches",
+            defaultMessage: "Clear recent searches"
+        })
+    }
 
     const clearSearches = () => {
         clearSessionJSONItem(searchConfig.recentSearchKey)
@@ -26,10 +38,7 @@ const RecentSearches = ({recentSearches, closeAndNavigate}) => {
             {recentSearches?.length > 0 && (
                 <Box>
                     <Text fontWeight="700" fontSize={'md'} data-testid="sf-suggestion-recent">
-                        <FormattedMessage
-                            defaultMessage="Recent Searches"
-                            id="recent_searches.heading.recent_searches"
-                        />
+                        {messages.recentSearchesTitle}
                     </Text>
                     <Box mx={'-16px'}>
                         {recentSearches.map((recentSearch, idx) => (
@@ -57,10 +66,7 @@ const RecentSearches = ({recentSearches, closeAndNavigate}) => {
                             variant="menu-link"
                         >
                             <Text fontWeight="400" color="blue.600" fontSize={'md'}>
-                                <FormattedMessage
-                                    defaultMessage="Clear recent searches"
-                                    id="recent_searches.action.clear_searches"
-                                />
+                                {messages.clearRecentSearches}
                             </Text>
                         </Button>
                     </Box>
