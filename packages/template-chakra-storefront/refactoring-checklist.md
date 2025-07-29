@@ -38,15 +38,15 @@ Total files: 222
 - [x] src/components/address-display/index.jsx
 - [x] src/components/breadcrumb/index.jsx
 - [x] src/components/confirmation-modal/index.jsx
-- [ ] src/components/display-price/current-price.jsx
+- [x] src/components/display-price/current-price.jsx
 - [x] src/components/display-price/index.jsx
-- [ ] src/components/display-price/list-price.jsx
+- [x] src/components/display-price/list-price.jsx
 - [x] src/components/display-price/messages.js
 - [x] src/components/drawer-menu/drawer-menu.jsx
 - [x] src/components/drawer-menu/index.js
 - [x] src/components/dynamic-image/index.jsx
-- [ ] src/components/email-confirmation/index.jsx
-- [ ] src/components/fade/index.jsx
+- [x] src/components/email-confirmation/index.jsx
+- [x] src/components/fade/index.jsx
 - [x] src/components/field/index.jsx
 - [x] src/components/footer/index.jsx
 - [ ] src/components/forms/address-fields.jsx
@@ -70,8 +70,8 @@ Total files: 222
 - [ ] src/components/forms/useResetPasswordFields.jsx
 - [ ] src/components/forms/useUpdatePasswordFields.jsx
 - [x] src/components/header/index.jsx
-- [ ] src/components/header/slot-a.jsx
-- [ ] src/components/hero/index.jsx
+- [x] src/components/header/slot-a.jsx
+- [x] src/components/hero/index.jsx
 - [ ] src/components/icons/index.jsx
 - [ ] src/components/image-gallery/index.jsx
 - [ ] src/components/item-variant/data.mock.js
