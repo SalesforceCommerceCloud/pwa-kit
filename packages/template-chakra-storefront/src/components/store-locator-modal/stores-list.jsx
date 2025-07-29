@@ -30,6 +30,21 @@ const StoresList = ({storesInfo}) => {
     const storeInfoKey = `store_${site.id}`
     const [selectedStore, setSelectedStore] = useState('')
 
+    const messages = {
+        away: intl.formatMessage({
+            id: 'store_locator.description.away',
+            defaultMessage: 'away'
+        }),
+        phone: intl.formatMessage({
+            id: 'store_locator.description.phone',
+            defaultMessage: 'Phone:'
+        }),
+        viewMore: intl.formatMessage({
+            id: 'store_locator.action.viewMore',
+            defaultMessage: 'View More'
+        })
+    }
+
     useEffect(() => {
         setSelectedStore(JSON.parse(window.localStorage.getItem(storeInfoKey))?.id || '')
     }, [storeInfoKey])
@@ -71,11 +86,7 @@ const StoresList = ({storesInfo}) => {
                                     <>
                                         <br />
                                         <Box fontSize="md" color="gray.600">
-                                            {store.distance} {store.distanceUnit}{' '}
-                                            {intl.formatMessage({
-                                                id: 'store_locator.description.away',
-                                                defaultMessage: 'away'
-                                            })}
+                                            {store.distance} {store.distanceUnit} {messages.away}
                                         </Box>
                                     </>
                                 )}
@@ -83,11 +94,7 @@ const StoresList = ({storesInfo}) => {
                                     <>
                                         <br />
                                         <Box fontSize="md" color="gray.600">
-                                            {intl.formatMessage({
-                                                id: 'store_locator.description.phone',
-                                                defaultMessage: 'Phone:'
-                                            })}{' '}
-                                            {store.phone}
+                                            {messages.phone} {store.phone}
                                         </Box>
                                     </>
                                 )}
@@ -99,10 +106,7 @@ const StoresList = ({storesInfo}) => {
                                             sx={{marginTop: '10px', paddingBottom: '0px'}}
                                         >
                                             <Box fontSize="lg">
-                                                {intl.formatMessage({
-                                                    id: 'store_locator.action.viewMore',
-                                                    defaultMessage: 'View More'
-                                                })}
+                                                {messages.viewMore}
                                             </Box>
                                             <AccordionIcon />
                                         </AccordionButton>
