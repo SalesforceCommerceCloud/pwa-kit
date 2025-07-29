@@ -189,8 +189,8 @@ Total files: 222
 - [x] src/pages/checkout/partials/shipping-options.jsx
 - [x] src/pages/checkout/util/checkout-context.js
 - [x] src/pages/home/data.js
-- [ ] src/pages/home/index.jsx
-- [ ] src/pages/index.tsx
+- [x] src/pages/home/index.jsx
+- [x] src/pages/index.tsx
 - [ ] src/pages/login-redirect/index.jsx
 - [ ] src/pages/login/index.jsx
 - [ ] src/pages/page-not-found/index.jsx
