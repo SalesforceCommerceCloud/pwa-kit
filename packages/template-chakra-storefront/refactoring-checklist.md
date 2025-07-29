@@ -165,7 +165,7 @@ Total files: 222
 - [x] src/pages/cart/hooks/use-cart-products.js
 - [x] src/pages/cart/index.jsx
 - [x] src/pages/cart/partials/cart-cta.jsx
-- [ ] src/pages/cart/partials/cart-modals.jsx
+- [x] src/pages/cart/partials/cart-modals.jsx
 - [ ] src/pages/cart/partials/cart-product-list.jsx
 - [ ] src/pages/cart/partials/cart-recommendations.jsx
 - [ ] src/pages/cart/partials/cart-secondary-button-group.jsx
