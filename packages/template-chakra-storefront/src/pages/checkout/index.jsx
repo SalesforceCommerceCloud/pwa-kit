@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React, {useEffect, useState} from 'react'
-import {FormattedMessage, useIntl} from 'react-intl'
+import {useIntl} from 'react-intl'
 import {Alert, Box, Button, Container, Grid, GridItem, Stack} from '@chakra-ui/react'
 import useNavigation from '../../hooks/use-navigation'
 import {CheckoutProvider, useCheckout} from './util/checkout-context'
@@ -37,6 +37,17 @@ const Checkout = () => {
     const isPasswordlessEnabled = !!loginConfig?.passwordless?.enabled
     const idps = loginConfig?.social?.idps || []
 
+    const messages = {
+        placeOrder: formatMessage({
+            id: 'checkout.button.place_order',
+            defaultMessage: 'Place Order'
+        }),
+        genericError: formatMessage({
+            id: 'checkout.message.generic_error',
+            defaultMessage: 'An unexpected error occurred during checkout.'
+        })
+    }
+
     useEffect(() => {
         if (error || step === 4) {
             window.scrollTo({top: 0})
@@ -51,11 +62,7 @@ const Checkout = () => {
             })
             navigate(`/checkout/confirmation/${order.orderNo}`)
         } catch (error) {
-            const message = formatMessage({
-                id: 'checkout.message.generic_error',
-                defaultMessage: 'An unexpected error occurred during checkout.'
-            })
-            setError(message)
+            setError(messages.genericError)
         } finally {
             setIsLoading(false)
         }
@@ -99,10 +106,7 @@ const Checkout = () => {
                                             isLoading={isLoading}
                                             data-testid="sf-checkout-place-order-btn"
                                         >
-                                            <FormattedMessage
-                                                defaultMessage="Place Order"
-                                                id="checkout.button.place_order"
-                                            />
+                                            {messages.placeOrder}
                                         </Button>
                                     </Container>
                                 </Box>
@@ -120,10 +124,7 @@ const Checkout = () => {
                         {step === 4 && (
                             <Box display={{base: 'none', lg: 'block'}} pt={2}>
                                 <Button w="full" onClick={submitOrder} loading={isLoading}>
-                                    <FormattedMessage
-                                        defaultMessage="Place Order"
-                                        id="checkout.button.place_order"
-                                    />
+                                    {messages.placeOrder}
                                 </Button>
                             </Box>
                         )}
@@ -145,10 +146,7 @@ const Checkout = () => {
                 >
                     <Container variant="form">
                         <Button w="full" onClick={submitOrder} isLoading={isLoading}>
-                            <FormattedMessage
-                                defaultMessage="Place Order"
-                                id="checkout.button.place_order"
-                            />
+                            {messages.placeOrder}
                         </Button>
                     </Container>
                 </Box>
