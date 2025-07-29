@@ -28,14 +28,19 @@ const ResetPassword = () => {
     const {getPasswordResetToken} = usePasswordReset()
     const {login: loginConfig} = getConfig()
 
+    const messages = {
+        featureUnavailableError: formatMessage(FEATURE_UNAVAILABLE_ERROR_MESSAGE),
+        apiError: formatMessage(API_ERROR_MESSAGE)
+    }
+
     const submitForm = async ({email}) => {
         try {
             await getPasswordResetToken(email)
         } catch (e) {
             const message =
                 e.response?.status === 400
-                    ? formatMessage(FEATURE_UNAVAILABLE_ERROR_MESSAGE)
-                    : formatMessage(API_ERROR_MESSAGE)
+                    ? messages.featureUnavailableError
+                    : messages.apiError
             form.setError('global', {type: 'manual', message})
         }
     }
