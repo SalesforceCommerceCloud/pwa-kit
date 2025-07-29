@@ -6,7 +6,7 @@
  */
 import React from 'react'
 import PropTypes from 'prop-types'
-import {FormattedMessage, useIntl} from 'react-intl'
+import {useIntl, defineMessages} from 'react-intl'
 
 // Chakra Components
 import {Box, Flex, Stack, Text, VisuallyHidden} from '@chakra-ui/react'
@@ -27,6 +27,21 @@ import {noop} from '../../utils/utils'
 // Hooks
 import {useCurrency, useDerivedProduct} from '../../hooks'
 
+const messages = defineMessages({
+    quantity: {
+        defaultMessage: "Quantity:",
+        id: "product_item.label.quantity"
+    },
+    quantitySelector: {
+        id: 'item_variant.quantity.label',
+        defaultMessage: 'Quantity selector for {productName}. Selected quantity is {quantity}'
+    },
+    assistiveQuantityMsg: {
+        id: 'item_variant.assistive_msg.quantity',
+        defaultMessage: 'Quantity {quantity}'
+    }
+})
+
 /**
  * Component representing a product item usually in a list with details about the product - name, variant, pricing, etc.
  * @param {Object} product Product to be represented in the list item.
@@ -46,7 +61,7 @@ const ProductItem = ({
     const {stepQuantity, showInventoryMessage, inventoryMessage, quantity, setQuantity} =
         useDerivedProduct(product)
     const {currency: activeCurrency} = useCurrency()
-    const intl = useIntl()
+    const {formatMessage} = useIntl()
     return (
         <Box
             position="relative"
@@ -76,22 +91,15 @@ const ProductItem = ({
                                     <Text
                                         fontSize="sm"
                                         color="gray.700"
-                                        aria-label={intl.formatMessage(
-                                            {
-                                                id: 'item_variant.quantity.label',
-                                                defaultMessage:
-                                                    'Quantity selector for {productName}. Selected quantity is {quantity}'
-                                            },
+                                        aria-label={formatMessage(
+                                            messages.quantitySelector,
                                             {
                                                 quantity: product?.quantity,
                                                 productName: product?.name
                                             }
                                         )}
                                     >
-                                        <FormattedMessage
-                                            defaultMessage="Quantity:"
-                                            id="product_item.label.quantity"
-                                        />
+                                        {formatMessage(messages.quantity)}
                                     </Text>
                                     <QuantityPicker
                                         step={stepQuantity}
@@ -124,11 +132,8 @@ const ProductItem = ({
                                     />
                                     <VisuallyHidden role="status">
                                         {product?.name}
-                                        {intl.formatMessage(
-                                            {
-                                                id: 'item_variant.assistive_msg.quantity',
-                                                defaultMessage: 'Quantity {quantity}'
-                                            },
+                                        {formatMessage(
+                                            messages.assistiveQuantityMsg,
                                             {
                                                 quantity: product?.quantity
                                             }
