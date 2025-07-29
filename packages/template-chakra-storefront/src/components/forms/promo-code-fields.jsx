@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React from 'react'
+import React, {useMemo} from 'react'
 import PropTypes from 'prop-types'
 import {useIntl} from 'react-intl'
 import {Box, Button} from '@chakra-ui/react'
@@ -12,17 +12,17 @@ import usePromoCodeFields from './usePromoCodeFields'
 import Field from '../field'
 
 const PromoCodeFields = ({form, prefix = '', ...props}) => {
-    const {formatMessage} = useIntl()
+    const intl = useIntl()
     const fields = usePromoCodeFields({form, prefix})
 
     const code = form.watch('code')
 
-    const messages = {
-        apply: formatMessage({
+    const messages = useMemo(() => ({
+        apply: intl.formatMessage({
             id: 'promo_code_fields.button.apply',
             defaultMessage: 'Apply'
         })
-    }
+    }), [intl])
 
     return (
         <Box aria-labelledby="code-feedback" {...props}>
