@@ -65,7 +65,7 @@ const path = require('path')
 const glob = require('glob')
 
 // Define the patterns to search for files
-const patterns = ['src/components/**/*.{js,jsx,ts,tsx}', 'src/pages/**/*.{js,jsx,ts,tsx}']
+const patterns = ['src/components/**/*.{js,jsx,ts,tsx}', 'src/pages/**/*.{js,jsx,ts,tsx}', 'src/hooks/**/*.{js,jsx,ts,tsx}', 'src/page-designer/**/*.{js,jsx,ts,tsx}']
 
 // Define patterns to exclude (test files)
 const excludePatterns = [
@@ -73,6 +73,16 @@ const excludePatterns = [
     '**/*.spec.{js,jsx,ts,tsx}',
     '**/__tests__/**'
 ]
+
+// Function to check if file contains intl.formatMessage
+function containsIntlFormatMessage(filePath) {
+    try {
+        const content = fs.readFileSync(filePath, 'utf8')
+        return content.includes('intl.formatMessage')
+    } catch (error) {
+        return false
+    }
+}
 
 // Function to find files
 function findFiles() {
@@ -83,7 +93,11 @@ function findFiles() {
             ignore: excludePatterns,
             nodir: true
         })
-        files.forEach((file) => allFiles.add(file))
+        files.forEach((file) => {
+            if (containsIntlFormatMessage(file)) {
+                allFiles.add(file)
+            }
+        })
     })
 
     return Array.from(allFiles).sort()
