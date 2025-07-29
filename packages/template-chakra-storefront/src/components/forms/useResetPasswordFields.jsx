@@ -15,22 +15,27 @@ export default function useResetPasswordFields({
 }) {
     const {formatMessage} = useIntl()
 
+    const messages = {
+        emailLabel: formatMessage({
+            defaultMessage: 'Email',
+            id: 'use_reset_password_fields.label.email'
+        }),
+        emailRequired: formatMessage({
+            defaultMessage: 'Please enter a valid email address.',
+            id: 'use_reset_password_fields.error.required_email'
+        })
+    }
+
     const fields = {
         email: {
             name: `${prefix}email`,
-            label: formatMessage({
-                defaultMessage: 'Email',
-                id: 'use_reset_password_fields.label.email'
-            }),
+            label: messages.emailLabel,
             placeholder: 'you@email.com',
             defaultValue: '',
             type: 'email',
             autoComplete: 'email',
             rules: {
-                required: formatMessage({
-                    defaultMessage: 'Please enter a valid email address.',
-                    id: 'use_reset_password_fields.error.required_email'
-                })
+                required: messages.emailRequired
             },
             error: errors[`${prefix}email`],
             control
