@@ -6,8 +6,7 @@
  */
 import React from 'react'
 import {Route, Switch} from 'react-router-dom'
-import {screen, waitFor, within} from '@testing-library/react'
-import {rest} from 'msw'
+import {screen, act, waitFor, within} from '@testing-library/react'
 import {renderWithProviders, createPathWithDefaults, guestToken} from '../../utils/test-utils'
 import {
     mockOrderHistory,
@@ -20,6 +19,7 @@ import Account from '../../pages/account/index'
 import Login from '../../pages/login'
 import mockConfig from '../../../config/mocks/mock-config'
 import {useCustomerType} from '@salesforce/commerce-sdk-react'
+import {prependHandlersToServer} from '../../../jest-setup'
 
 jest.setTimeout(60000)
 jest.mock('@salesforce/commerce-sdk-react', () => ({
@@ -44,25 +44,33 @@ const MockedComponent = () => {
 
 // Set up and clean up
 beforeEach(() => {
-    global.server.use(
-        rest.get('*/products', (req, res, ctx) => res(ctx.delay(0), ctx.json(mockOrderProducts))),
-        rest.get('*/customers/:customerId/orders', (req, res, ctx) =>
-            res(ctx.delay(0), ctx.json(mockOrderHistory))
-        ),
-        rest.post('*/oauth2/token', (req, res, ctx) =>
-            res(
-                ctx.delay(0),
-                ctx.json({
-                    customer_id: 'customerid',
-                    access_token: guestToken,
-                    refresh_token: 'testrefeshtoken',
-                    usid: 'testusid',
-                    enc_user_id: 'testEncUserId',
-                    id_token: 'testIdToken'
-                })
-            )
-        )
-    )
+    prependHandlersToServer([
+        {
+            path: '*/products',
+            method: 'get',
+            delay: 0,
+            res: () => mockOrderProducts
+        },
+        {
+            path: '*/customers/:customerId/orders',
+            method: 'get',
+            delay: 0,
+            res: () => mockOrderHistory
+        },
+        {
+            path: '*/oauth2/token',
+            method: 'post',
+            delay: 0,
+            res: () => ({
+                customer_id: 'customerid',
+                access_token: guestToken,
+                refresh_token: 'testrefeshtoken',
+                usid: 'testusid',
+                enc_user_id: 'testEncUserId',
+                id_token: 'testIdToken'
+            })
+        }
+    ])
 
     // Since we're testing some navigation logic, we are using a simple Router
     // around our component. We need to initialize the default route/path here.
@@ -74,56 +82,73 @@ afterEach(() => {
 })
 
 const expectedBasePath = '/uk/en-GB'
-describe.skip('Test redirects', function () {
+describe('Test redirects', function () {
     beforeEach(() => {
-        global.server.use(
-            rest.get('*/customers/:customerId', (req, res, ctx) => {
-                return res(ctx.delay(0), ctx.status(200), ctx.json(mockedGuestCustomer))
-            })
-        )
+        prependHandlersToServer([
+            {
+                path: '*/customers/:customerId',
+                method: 'get',
+                delay: 0,
+                status: 200,
+                res: () => mockedGuestCustomer
+            }
+        ])
     })
     test('Redirects to login page if the customer is not logged in', async () => {
         useCustomerType.mockReturnValue({isRegistered: false, isGuest: true})
         renderWithProviders(<MockedComponent />, {
-            wrapperProps: {siteAlias: 'uk', appConfig: mockConfig.app, isGuest: true}
+            wrapperProps: {siteAlias: 'uk', config: mockConfig, isGuest: true}
         })
         await waitFor(() => expect(window.location.pathname).toBe(`${expectedBasePath}/login`))
     })
 })
-describe.skip('Page Navigation', () => {
+describe('Page Navigation', () => {
     test('works for subpages', async () => {
         useCustomerType.mockReturnValue({isRegistered: true, isGuest: false})
-        global.server.use(
-            rest.get('*/products', (req, res, ctx) => {
-                return res(ctx.delay(0), ctx.json(mockOrderProducts))
-            }),
-            rest.get('*/customers/:customerId/orders', (req, res, ctx) => {
-                return res(ctx.delay(0), ctx.json(mockOrderHistory))
-            })
-        )
+        prependHandlersToServer([
+            {
+                path: '*/products',
+                method: 'get',
+                delay: 0,
+                res: () => mockOrderProducts
+            },
+            {
+                path: '*/customers/:customerId/orders',
+                method: 'get',
+                delay: 0,
+                res: () => mockOrderHistory
+            }
+        ])
         const {user} = renderWithProviders(<MockedComponent />, {
-            wrapperProps: {siteAlias: 'uk', appConfig: mockConfig.app}
+            wrapperProps: {siteAlias: 'uk', config: mockConfig}
         })
         expect(await screen.findByTestId('account-page')).toBeInTheDocument()
 
         const nav = within(screen.getByTestId('account-detail-nav'))
-        await user.click(nav.getByText('Addresses'))
+        await act(async () => {
+            await user.click(nav.getByText('Addresses'))
+        })
         await waitFor(() =>
             expect(window.location.pathname).toBe(`${expectedBasePath}/account/addresses`)
         )
-        await user.click(nav.getByText('Order History'))
+        await act(async () => {
+            await user.click(nav.getByText('Order History'))
+        })
         await waitFor(() =>
             expect(window.location.pathname).toBe(`${expectedBasePath}/account/orders`)
         )
     })
 })
 
-describe.skip('Render and logs out', function () {
+describe('Render and logs out', function () {
     test('Renders account detail page by default for logged-in customer, and can log out', async () => {
-        useCustomerType.mockReturnValue({isRegistered: true, isGuest: false})
+        useCustomerType.mockReturnValue({
+            isRegistered: true,
+            isGuest: false,
+            customerType: 'registered'
+        })
 
         const {user} = renderWithProviders(<MockedComponent />)
-
         // Render user profile page
         await waitFor(() => {
             expect(window.location.pathname).toBe(`${expectedBasePath}/account`)
@@ -135,10 +160,13 @@ describe.skip('Render and logs out', function () {
             expect(logOutIcons[0]).toHaveAttribute('aria-hidden', 'true')
             expect(logOutIcons[1]).toHaveAttribute('aria-hidden', 'true')
         })
+        useCustomerType.mockReturnValue({isRegistered: false, isGuest: true, customerType: 'guest'})
 
-        await user.click(screen.getAllByText(/Log Out/)[0])
-        useCustomerType.mockReturnValue({isRegistered: false, isGuest: true})
+        await act(async () => {
+            await user.click(screen.getAllByText(/Log Out/)[0])
+        })
 
+        // Check that logout redirects to login page
         await waitFor(() => {
             expect(window.location.pathname).toBe(`${expectedBasePath}/login`)
             expect(screen.getByTestId('login-page')).toBeInTheDocument()
@@ -146,19 +174,20 @@ describe.skip('Render and logs out', function () {
     })
 })
 
-describe.skip('updating profile', function () {
+describe('updating profile', function () {
     beforeEach(() => {
-        global.server.use(
-            rest.patch('*/customers/:customerId', (req, res, ctx) => {
-                return res(
-                    ctx.json({
-                        ...mockedRegisteredCustomer,
-                        firstName: 'Geordi',
-                        phoneHome: '(567) 123-5585'
-                    })
-                )
-            })
-        )
+        useCustomerType.mockReturnValue({isRegistered: true, isExternal: false})
+        prependHandlersToServer([
+            {
+                path: '*/customers/:customerId',
+                method: 'patch',
+                res: () => ({
+                    ...mockedRegisteredCustomer,
+                    firstName: 'Geordi',
+                    phoneHome: '(567) 123-5585'
+                })
+            }
+        ])
     })
     test('Allows customer to edit profile details', async () => {
         useCustomerType.mockReturnValue({isRegistered: true, isExternal: false})
@@ -171,83 +200,120 @@ describe.skip('updating profile', function () {
         })
         const el = within(screen.getByTestId('sf-toggle-card-my-profile'))
 
-        await user.click(el.getByText(/edit/i))
+        await act(async () => {
+            await user.click(el.getByText(/edit/i))
+        })
+        await act(async () => {
+            await user.type(el.getByLabelText(/first name/i), 'Geordi')
+            await user.type(el.getByLabelText(/Phone Number/i), '5671235585')
+        })
 
-        await user.type(el.getByLabelText(/first name/i), 'Geordi')
-        await user.type(el.getByLabelText(/Phone Number/i), '5671235585')
-
-        await user.click(el.getByText(/save/i))
+        await act(async () => {
+            await user.click(el.getByText(/save/i))
+        })
 
         expect(await screen.findByText('Geordi Tester')).toBeInTheDocument()
         expect(await screen.findByText('(567) 123-5585')).toBeInTheDocument()
     })
 })
 
-describe.skip('updating password', function () {
+describe('updating password', function () {
     beforeEach(() => {
         useCustomerType.mockReturnValue({isRegistered: true, isExternal: false})
-        global.server.use(
-            rest.post('*/oauth2/token', (req, res, ctx) =>
-                res(
-                    ctx.delay(0),
-                    ctx.json({
-                        customer_id: 'customerid',
-                        access_token: guestToken,
-                        refresh_token: 'testrefeshtoken',
-                        usid: 'testusid',
-                        enc_user_id: 'testEncUserId',
-                        id_token: 'testIdToken'
-                    })
-                )
-            )
-        )
+        prependHandlersToServer([
+            {
+                path: '*/oauth2/token',
+                method: 'post',
+                delay: 0,
+                res: () => ({
+                    customer_id: 'customerid',
+                    access_token: guestToken,
+                    refresh_token: 'testrefeshtoken',
+                    usid: 'testusid',
+                    enc_user_id: 'testEncUserId',
+                    id_token: 'testIdToken'
+                })
+            }
+        ])
     })
+
+    afterEach(() => {
+        jest.restoreAllMocks()
+    })
+
     test('Password update form is rendered correctly', async () => {
         const {user} = renderWithProviders(<MockedComponent />)
         expect(await screen.findByTestId('account-page')).toBeInTheDocument()
         expect(await screen.findByTestId('account-detail-page')).toBeInTheDocument()
 
         const el = within(screen.getByTestId('sf-toggle-card-password'))
-        await user.click(el.getByText(/edit/i))
+        await act(async () => {
+            await user.click(el.getByText(/edit/i))
+        })
 
-        expect(el.getByLabelText(/current password/i)).toBeInTheDocument()
-        expect(el.getByLabelText(/new password/i)).toBeInTheDocument()
-        expect(el.getByText(/forgot password/i)).toBeInTheDocument()
+        await waitFor(() => {
+            expect(el.getByText(/current password/i)).toBeInTheDocument()
+            expect(el.getByText('New Password')).toBeInTheDocument()
+            expect(el.getByText('Confirm New Password')).toBeInTheDocument()
+            expect(el.getByText(/forgot password/i)).toBeInTheDocument()
+        })
     })
 
-    // TODO: Fix test
     test('Allows customer to update password', async () => {
-        global.server.use(
-            rest.put('*/password', (req, res, ctx) => res(ctx.status(204), ctx.json()))
-        )
+        prependHandlersToServer([
+            {
+                path: '*/password',
+                method: 'put',
+                status: 204,
+                res: () => ({})
+            }
+        ])
 
         const {user} = renderWithProviders(<MockedComponent />)
 
         const el = within(screen.getByTestId('sf-toggle-card-password'))
-        await user.click(el.getByText(/edit/i))
-        await user.type(el.getByLabelText(/current password/i), 'Password!12345')
-        await user.type(el.getByLabelText(/new password/i), 'Password!98765')
-        await user.click(el.getByText(/Forgot password/i))
-        await user.click(el.getByText(/save/i))
-
-        // expect(await screen.findByText('••••••••')).toBeInTheDocument()
+        await act(async () => {
+            await user.click(el.getByText(/edit/i))
+        })
+        await act(async () => {
+            await user.type(el.getByLabelText(/current password/i), 'Password!12345')
+            await user.type(el.getByLabelText('New Password'), 'Password!98765')
+            await user.type(el.getByLabelText('Confirm New Password'), 'Password!98765')
+        })
+        await act(async () => {
+            await user.click(el.getByText(/save/i))
+        })
+        // Verify the form is no longer in edit mode and shows masked password
+        await waitFor(() => {
+            expect(el.queryByText(/save/i)).not.toBeInTheDocument()
+            expect(el.getByText('••••••••')).toBeInTheDocument()
+        })
     })
 
     test('Warns customer when updating password with invalid current password', async () => {
-        global.server.use(
-            rest.put('*/password', (req, res, ctx) =>
-                res(ctx.status(401), ctx.json(mockPasswordUpdateFalure))
-            )
-        )
+        prependHandlersToServer([
+            {
+                path: '*/password',
+                method: 'put',
+                status: 401,
+                res: () => mockPasswordUpdateFalure
+            }
+        ])
 
         const {user} = renderWithProviders(<MockedComponent />)
 
         const el = within(screen.getByTestId('sf-toggle-card-password'))
-        await user.click(el.getByText(/edit/i))
-        await user.type(el.getByLabelText(/current password/i), 'Password!123456')
-        await user.type(el.getByLabelText(/new password/i), 'Password!98765')
-        await user.click(el.getByText(/Forgot password/i))
-        await user.click(el.getByText(/save/i))
+        await act(async () => {
+            await user.click(el.getByText(/edit/i))
+        })
+        await act(async () => {
+            await user.type(el.getByLabelText(/current password/i), 'Password!123456')
+            await user.type(el.getByLabelText('New Password'), 'Password!98765')
+            await user.type(el.getByLabelText('Confirm New Password'), 'Password!98765')
+        })
+        await act(async () => {
+            await user.click(el.getByText(/save/i))
+        })
 
         expect(await screen.findByTestId('password-update-error')).toBeInTheDocument()
     })

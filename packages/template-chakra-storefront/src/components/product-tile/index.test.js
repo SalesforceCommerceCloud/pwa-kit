@@ -54,8 +54,7 @@ test('Renders PricingAndPromotionsSkeleton when isRefetching is true', async () 
     expect(queryByTestId('sf-product-tile-skeleton')).not.toBeInTheDocument()
 })
 
-//TODO: Enable when PLP/PDP are migrated
-test.skip('Remove from wishlist cannot be muti-clicked', async () => {
+test('Remove from wishlist cannot be muti-clicked', async () => {
     const onClick = jest.fn()
 
     const {getByTestId} = renderWithProviders(

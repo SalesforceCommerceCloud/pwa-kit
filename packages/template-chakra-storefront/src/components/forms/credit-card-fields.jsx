@@ -48,7 +48,7 @@ const CreditCardFields = ({form, prefix = ''}) => {
                 <Field
                     {...fields.number}
                     formLabel={
-                        <Flex justify="space-between" align="center" w="full">
+                        <ChakraField.Label justify="space-between" align="center" w="full">
                             <Box>{fields.number.label}</Box>
                             <Stack direction="row" gap={1}>
                                 <VisaIcon layerStyle="ccIcon" />
@@ -56,7 +56,7 @@ const CreditCardFields = ({form, prefix = ''}) => {
                                 <AmexIcon layerStyle="ccIcon" />
                                 <DiscoverIcon layerStyle="ccIcon" />
                             </Stack>
-                        </Flex>
+                        </ChakraField.Label>
                     }
                     inputProps={({onChange}) => ({
                         ...fields.number.inputProps,
