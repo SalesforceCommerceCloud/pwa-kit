@@ -141,12 +141,19 @@ We need to wrap the `messages` variable in `useMemo` to improve performance. It 
 
 Don't forget to import useMemo.
 
+always deconstruct the objects 
+
+const intl = useIntl()
+const { formatMessage } = intl
+
 Example:
 
 ```
 import React, { useMemo } from 'react'
 
 // example
+const intl = useIntl()
+const { formatMessage } = intl
 const messages = useMemo(() => ({
         header: {
             title: intl.formatMessage({

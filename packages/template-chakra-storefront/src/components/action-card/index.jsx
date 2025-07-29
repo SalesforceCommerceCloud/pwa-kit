@@ -27,6 +27,7 @@ const ActionCard = ({
 }) => {
     const [showLoading, setShowLoading] = useState(false)
     const intl = useIntl()
+    const {formatMessage} = intl
     
     const messages = useMemo(() => ({
         edit: intl.formatMessage({
