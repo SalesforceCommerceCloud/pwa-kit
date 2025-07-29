@@ -211,7 +211,7 @@ Total files: 222
 - [x] src/pages/product-list/page-analytics.jsx
 - [x] src/pages/product-list/page-cache.jsx
 - [x] src/pages/product-list/page-metadata.jsx
-- [ ] src/pages/product-list/partials/above-page-header.jsx
+- [x] src/pages/product-list/partials/above-page-header.jsx
 - [ ] src/pages/product-list/partials/category-links.jsx
 - [ ] src/pages/product-list/partials/checkbox-refinements.jsx
 - [ ] src/pages/product-list/partials/color-refinements.jsx
