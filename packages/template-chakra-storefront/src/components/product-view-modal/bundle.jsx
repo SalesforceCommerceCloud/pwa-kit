@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React, {useState, useRef} from 'react'
+import React, {useState, useRef, useMemo} from 'react'
 import PropTypes from 'prop-types'
 import {useIntl} from 'react-intl'
 import {Box, CloseButton, Dialog, Flex, VStack, useBreakpointValue} from '@chakra-ui/react'
@@ -51,17 +51,18 @@ const BundleProductViewModal = ({product: bundle, isOpen, onClose, updateCart, .
         }
     )
 
-    const {formatMessage} = useIntl()
+    const intl = useIntl()
+    const {formatMessage} = intl
 
-    const messages = {
-        modalLabel: formatMessage(
+    const messages = useMemo(() => ({
+        modalLabel: intl.formatMessage(
             {
                 id: 'cart.product_edit_modal.modal_label',
                 defaultMessage: 'Edit modal for {productName}'
             },
             {productName: productViewModalData?.product?.name}
         )
-    }
+    }), [intl])
 
     return (
         <Dialog.Root
