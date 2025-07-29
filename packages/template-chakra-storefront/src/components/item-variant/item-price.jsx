@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React from 'react'
+import React, {useMemo} from 'react'
 import PropTypes from 'prop-types'
 import {FormattedNumber, useIntl} from 'react-intl'
 import {Stack, Text, useBreakpointValue} from '@chakra-ui/react'
@@ -13,15 +13,16 @@ import {getPriceData} from '../../utils/product-utils'
 import DisplayPrice from '../display-price'
 
 const PricePerItem = ({currency, basePrice}) => {
-    const {formatMessage} = useIntl()
+    const intl = useIntl()
+    const {formatMessage} = intl
 
-    const messages = {
+    const messages = useMemo(() => ({
         each: formatMessage({
             defaultMessage: 'ea',
             id: 'price_per_item.label.each',
             description: "Abbreviated 'each', follows price per item, like $10/ea"
         })
-    }
+    }), [intl])
 
     return (
         <Text fontSize={{base: '12px', lg: '14px'}}>
