@@ -30,6 +30,8 @@ Make the code consistent through out the code base, if there are <FormattedMessa
 
 Also, no `formatMessage` inside the JSX code, always extract them out.
 
+always use `const {formatMessage} = useIntl()` to deconstruct intl object, instead of calling intl.formatMessage every where.
+
 ## BAD EXAMPLE
 
 ```jsx

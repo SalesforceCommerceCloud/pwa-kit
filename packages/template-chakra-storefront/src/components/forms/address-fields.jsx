@@ -26,17 +26,21 @@ const AddressFields = ({
 }) => {
     const {data: customer} = useCurrentCustomer()
     const fields = useAddressFields({form, prefix})
-    const intl = useIntl()
+    const {formatMessage} = useIntl()
     const addressFormRef = useRef()
     useEffect(() => {
         // Focus on the form when the component mounts for accessibility
         addressFormRef?.current?.focus()
     }, [])
 
+    const messages = {
+        formAriaLabel: formatMessage(formTitleAriaLabel)
+    }
+
     return (
         <Stack
             gap={5}
-            aria-label={intl.formatMessage(formTitleAriaLabel)}
+            aria-label={messages.formAriaLabel}
             tabIndex="0"
             ref={addressFormRef}
         >
