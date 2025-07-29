@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React from 'react'
+import React, {useMemo} from 'react'
 import PropTypes from 'prop-types'
 import {Text, VisuallyHidden} from '@chakra-ui/react'
 import {useIntl} from 'react-intl'
@@ -21,22 +21,23 @@ import msg from './messages'
  * @returns {JSX.Element}
  */
 const ListPrice = ({labelForA11y, price, isRange = false, as = 's', currency, ...extraProps}) => {
-    const {formatMessage, formatNumber} = useIntl()
+    const intl = useIntl()
+    const {formatMessage, formatNumber} = intl
     const listPriceText = formatNumber(price, {
         style: 'currency',
         currency
     })
 
-    const messages = {
+    const messages = useMemo(() => ({
         ariaLabels: {
-            listPrice: formatMessage(msg.ariaLabelListPrice, {
+            listPrice: intl.formatMessage(msg.ariaLabelListPrice, {
                 listPrice: listPriceText || ''
             }),
-            listPriceWithRange: formatMessage(msg.ariaLabelListPriceWithRange, {
+            listPriceWithRange: intl.formatMessage(msg.ariaLabelListPriceWithRange, {
                 listPrice: listPriceText || ''
             })
         }
-    }
+    }), [intl, listPriceText])
 
     return (
         <>

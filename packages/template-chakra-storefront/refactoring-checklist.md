@@ -8,7 +8,7 @@ Total files: 97
 
 - [x] src/components/action-card/index.jsx
 - [x] src/components/display-price/current-price.jsx
-- [ ] src/components/display-price/list-price.jsx
+- [x] src/components/display-price/list-price.jsx
 - [ ] src/components/drawer-menu/drawer-menu.jsx
 - [ ] src/components/email-confirmation/index.jsx
 - [ ] src/components/field/index.jsx
