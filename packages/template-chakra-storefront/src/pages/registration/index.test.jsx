@@ -82,7 +82,7 @@ test('Allows customer to create an account', async () => {
         wrapperProps: {
             siteAlias: 'uk',
             locale: {id: 'en-GB'},
-            appConfig: mockConfig.app,
+            config: mockConfig,
             bypassAuth: false
         }
     })

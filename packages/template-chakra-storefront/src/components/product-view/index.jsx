@@ -574,7 +574,9 @@ const ProductView = forwardRef(
                                             // This is useful for mobile devices, this allows the user to pop open the keyboard and set the
                                             // new quantity with one click. NOTE: This is something that can be refactored into the parent
                                             // component, potentially as a prop called `selectInputOnFocus`.
-                                            e.target.select()
+                                            if (e.target.select) {
+                                                e.target.select()
+                                            }
                                         }}
                                         productName={product?.name}
                                     />
