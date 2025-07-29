@@ -21,11 +21,22 @@ import msg from './messages'
  * @returns {JSX.Element}
  */
 const ListPrice = ({labelForA11y, price, isRange = false, as = 's', currency, ...extraProps}) => {
-    const intl = useIntl()
-    const listPriceText = intl.formatNumber(price, {
+    const {formatMessage, formatNumber} = useIntl()
+    const listPriceText = formatNumber(price, {
         style: 'currency',
         currency
     })
+
+    const messages = {
+        ariaLabels: {
+            listPrice: formatMessage(msg.ariaLabelListPrice, {
+                listPrice: listPriceText || ''
+            }),
+            listPriceWithRange: formatMessage(msg.ariaLabelListPriceWithRange, {
+                listPrice: listPriceText || ''
+            })
+        }
+    }
 
     return (
         <>
@@ -33,9 +44,7 @@ const ListPrice = ({labelForA11y, price, isRange = false, as = 's', currency, ..
                 <Text
                     as={as}
                     {...extraProps}
-                    aria-label={intl.formatMessage(msg.ariaLabelListPriceWithRange, {
-                        listPrice: listPriceText || ''
-                    })}
+                    aria-label={messages.ariaLabels.listPriceWithRange}
                     color="gray.600"
                 >
                     {listPriceText}
@@ -44,9 +53,7 @@ const ListPrice = ({labelForA11y, price, isRange = false, as = 's', currency, ..
                 <Text
                     as={as}
                     {...extraProps}
-                    aria-label={intl.formatMessage(msg.ariaLabelListPrice, {
-                        listPrice: listPriceText || ''
-                    })}
+                    aria-label={messages.ariaLabels.listPrice}
                     color="gray.600"
                 >
                     {listPriceText}
@@ -55,9 +62,7 @@ const ListPrice = ({labelForA11y, price, isRange = false, as = 's', currency, ..
             {/*For screen reader, we want to make sure the product name is announced before the price to avoid confusion*/}
             <VisuallyHidden aria-live="polite" aria-atomic={true}>
                 {labelForA11y}
-                {intl.formatMessage(msg.ariaLabelListPrice, {
-                    listPrice: listPriceText || ''
-                })}
+                {messages.ariaLabels.listPrice}
             </VisuallyHidden>
         </>
     )

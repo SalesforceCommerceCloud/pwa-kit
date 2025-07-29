@@ -6,7 +6,7 @@ Total files: 27
 
 ## Files to refactor:
 
-- [ ] src/components/display-price/current-price.jsx
+- [x] src/components/display-price/current-price.jsx
 - [ ] src/components/display-price/list-price.jsx
 - [ ] src/components/forms/address-fields.jsx
 - [ ] src/components/forms/profile-fields.jsx
