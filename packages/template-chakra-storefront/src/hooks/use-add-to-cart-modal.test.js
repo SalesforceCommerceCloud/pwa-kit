@@ -677,3 +677,17 @@ test('renders product bundle', () => {
         })
     })
 })
+
+test('Dont render when isOpen is false', () => {
+    const {queryByText} = renderWithProviders(
+        <AddToCartModalContext.Provider
+            value={{
+                isOpen: false
+            }}
+        >
+            <AddToCartModal />
+        </AddToCartModalContext.Provider>
+    )
+
+    expect(queryByText(MOCK_PRODUCT.name)).not.toBeInTheDocument()
+})
