@@ -48,14 +48,12 @@ const CheckoutOneClick = () => {
     const {formatMessage} = useIntl()
     const navigate = useNavigation()
     const {step} = useCheckout()
-    const [error] = useState()
     const showToast = useToast()
-
     const [isLoading, setIsLoading] = useState(false)
     const [enableUserRegistration, setEnableUserRegistration] = useState(false)
-
     const {data: basket} = useCurrentBasket()
-
+    const [error, setError] = useState()
+    const [isProcessingAddressLogic, setIsProcessingAddressLogic] = useState(false)
     const {passwordless = {}, social = {}} = getConfig().app.login || {}
     const idps = social?.idps
     const isSocialEnabled = !!social?.enabled
@@ -261,8 +259,14 @@ const CheckoutOneClick = () => {
                                 isSocialEnabled={isSocialEnabled}
                                 isPasswordlessEnabled={isPasswordlessEnabled}
                                 idps={idps}
+                                isProcessingAddressLogic={isProcessingAddressLogic}
+                                setIsProcessingAddressLogic={setIsProcessingAddressLogic}
                             />
-                            {isPickupOrder ? <PickupAddress /> : <ShippingAddress />}
+                            {isPickupOrder ? <PickupAddress /> : (
+                                <ShippingAddress 
+                                    isProcessingAddressLogic={isProcessingAddressLogic}
+                                />
+                            )}
                             {!isPickupOrder && <ShippingOptions />}
                             <Payment
                                 enableUserRegistration={enableUserRegistration}

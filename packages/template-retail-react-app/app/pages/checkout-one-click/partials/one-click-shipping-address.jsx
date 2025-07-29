@@ -6,13 +6,14 @@
  */
 import React, {useState} from 'react'
 import {nanoid} from 'nanoid'
-import {defineMessage, useIntl} from 'react-intl'
+import {defineMessage, useIntl, FormattedMessage} from 'react-intl'
 import {useCheckout} from '@salesforce/retail-react-app/app/pages/checkout-container/util/checkout-context'
 import {
     ToggleCard,
     ToggleCardEdit,
     ToggleCardSummary
 } from '@salesforce/retail-react-app/app/components/toggle-card'
+import {Stack, Text} from '@salesforce/retail-react-app/app/components/shared/ui'
 import ShippingAddressSelection from '@salesforce/retail-react-app/app/pages/checkout-one-click/partials/one-click-shipping-address-selection'
 import AddressDisplay from '@salesforce/retail-react-app/app/components/address-display'
 import {
@@ -21,6 +22,7 @@ import {
 } from '@salesforce/commerce-sdk-react'
 import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
+import PropTypes from 'prop-types'
 
 const submitButtonMessage = defineMessage({
     defaultMessage: 'Continue to Shipping Method',
@@ -31,7 +33,7 @@ const shippingAddressAriaLabel = defineMessage({
     id: 'shipping_address.label.shipping_address_form'
 })
 
-export default function ShippingAddress() {
+export default function ShippingAddress({isProcessingAddressLogic = false}) {
     const {formatMessage} = useIntl()
     const [isLoading, setIsLoading] = useState()
     const {data: customer} = useCurrentCustomer()
@@ -116,7 +118,7 @@ export default function ShippingAddress() {
                 id: 'shipping_address.title.shipping_address'
             })}
             editing={step === STEPS.SHIPPING_ADDRESS}
-            isLoading={isLoading}
+            isLoading={isLoading || isProcessingAddressLogic}
             disabled={step === STEPS.CONTACT_INFO && !selectedShippingAddress}
             onEdit={() => goToStep(STEPS.SHIPPING_ADDRESS)}
             editLabel={formatMessage({
@@ -132,11 +134,26 @@ export default function ShippingAddress() {
                     formTitleAriaLabel={shippingAddressAriaLabel}
                 />
             </ToggleCardEdit>
-            {isAddressFilled && (
+            {isProcessingAddressLogic ? (
                 <ToggleCardSummary>
-                    <AddressDisplay address={selectedShippingAddress} />
+                    <Text color="blue.500" fontSize="sm" fontStyle="italic">
+                        <FormattedMessage
+                            defaultMessage="Processing address selection..."
+                            id="shipping_address.message.processing_address"
+                        />
+                    </Text>
                 </ToggleCardSummary>
+            ) : (
+                isAddressFilled && (
+                    <ToggleCardSummary>
+                        <AddressDisplay address={selectedShippingAddress} />
+                    </ToggleCardSummary>
+                )
             )}
         </ToggleCard>
     )
+}
+
+ShippingAddress.propTypes = {
+    isProcessingAddressLogic: PropTypes.bool
 }
