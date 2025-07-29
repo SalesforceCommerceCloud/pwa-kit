@@ -25,7 +25,9 @@ const LocaleText = ({shortCode}) => {
         return <>Unknown {shortCode}</>
     }
 
-    return <>{intl.formatMessage(message)}</>
+    const localizedText = intl.formatMessage(message)
+
+    return <>{localizedText}</>
 }
 
 LocaleText.displayName = 'LocaleText'

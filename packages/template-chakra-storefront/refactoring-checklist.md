@@ -89,7 +89,7 @@ Total files: 222
 - [x] src/components/list-menu/list-menu.jsx
 - [x] src/components/loading-spinner/index.jsx
 - [x] src/components/locale-selector/index.jsx
-- [ ] src/components/locale-text/index.jsx
+- [x] src/components/locale-text/index.jsx
 - [x] src/components/login/index.jsx
 - [ ] src/components/nested-accordion/index.jsx
 - [ ] src/components/offline-banner/index.jsx
