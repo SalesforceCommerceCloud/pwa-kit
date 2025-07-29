@@ -6,15 +6,23 @@
  */
 import React from 'react'
 import PropTypes from 'prop-types'
-import {FormattedMessage} from 'react-intl'
+import {useIntl} from 'react-intl'
 import {Box, Button, Stack, StackSeparator} from '@chakra-ui/react'
 import useUpdatePasswordFields from '../../components/forms/useUpdatePasswordFields'
 import Field from '../../components/field'
 import PasswordRequirements from '../../components/forms/password-requirements'
 
 const UpdatePasswordFields = ({form, prefix = ''}) => {
+    const {formatMessage} = useIntl()
     const fields = useUpdatePasswordFields({form, prefix})
     const password = form.watch('password')
+
+    const messages = {
+        forgotPassword: formatMessage({
+            id: "update_password_fields.button.forgot_password",
+            defaultMessage: "Forgot Password?"
+        })
+    }
 
     return (
         <Stack gap={5} separator={<StackSeparator borderColor="gray.100" />}>
@@ -22,10 +30,7 @@ const UpdatePasswordFields = ({form, prefix = ''}) => {
                 <Field {...fields.currentPassword} />
                 <Box>
                     <Button variant="link" size="sm" onClick={() => null}>
-                        <FormattedMessage
-                            defaultMessage="Forgot Password?"
-                            id="update_password_fields.button.forgot_password"
-                        />
+                        {messages.forgotPassword}
                     </Button>
                 </Box>
             </Stack>
