@@ -166,7 +166,22 @@ const ShippingMultiAddress = ({
     )
     const {data: customer, refetch: refetchCustomer} = useCurrentCustomer()
     const addresses = customer?.addresses || []
-    const [selectedAddresses, setSelectedAddresses] = useState({})
+
+    // Initialize selected addresses with default addresses
+    const [selectedAddresses, setSelectedAddresses] = useState(() => {
+        const initialSelected = {}
+        if (basket?.productItems) {
+            basket.productItems.forEach((item) => {
+                const addressKey = item.itemId
+                // Find preferred address or use first address as default
+                const defaultAddress = addresses.find((addr) => addr.preferred) || addresses[0]
+                if (defaultAddress) {
+                    initialSelected[addressKey] = defaultAddress.addressId
+                }
+            })
+        }
+        return initialSelected
+    })
 
     const [showAddAddressForm, setShowAddAddressForm] = useState({})
 
@@ -389,7 +404,6 @@ const ShippingMultiAddress = ({
                             })?.images?.[0]
                             const imageUrl = image?.disBaseLink || image?.link || ''
                             const addressKey = item.itemId
-                            const selectedAddressId = selectedAddresses[addressKey]
 
                             return (
                                 <Box
@@ -492,23 +506,11 @@ const ShippingMultiAddress = ({
                                             </Text>
 
                                             <Box w="100%" mb={6}>
-                                                <Select
-                                                    value={
-                                                        showAddAddressForm[addressKey]
-                                                            ? ADD_NEW_ADDRESS_OPTION_VALUE
-                                                            : selectedAddressId || ''
-                                                    }
-                                                    onChange={(e) => {
-                                                        const value = e.target.value
-
-                                                        if (
-                                                            value === ADD_NEW_ADDRESS_OPTION_VALUE
-                                                        ) {
-                                                            setShowAddAddressForm((prev) => ({
-                                                                ...prev,
-                                                                [addressKey]: true
-                                                            }))
-                                                        } else {
+                                                <VStack spacing={3} align="stretch">
+                                                    <Select
+                                                        value={selectedAddresses[addressKey] || ''}
+                                                        onChange={(e) => {
+                                                            const value = e.target.value
                                                             setShowAddAddressForm((prev) => ({
                                                                 ...prev,
                                                                 [addressKey]: false
@@ -517,42 +519,65 @@ const ShippingMultiAddress = ({
                                                                 ...prev,
                                                                 [addressKey]: value
                                                             }))
-                                                        }
-                                                    }}
-                                                    aria-labelledby={`delivery-address-label-${addressKey}`}
-                                                    borderColor="gray.300"
-                                                    _hover={{borderColor: 'gray.400'}}
-                                                    _focus={{
-                                                        borderColor: 'blue.500',
-                                                        boxShadow:
-                                                            '0 0 0 1px var(--chakra-colors-blue-500)'
-                                                    }}
-                                                >
-                                                    {addresses.map((addr) => (
-                                                        <option
-                                                            key={addr.addressId}
-                                                            value={addr.addressId}
-                                                        >
-                                                            {addr.firstName} {addr.lastName} -{' '}
-                                                            {addr.address1},{' '}
-                                                            {formatMessage(
-                                                                {
-                                                                    id: 'shipping_multi_address.format.address_line_2',
+                                                        }}
+                                                        aria-labelledby={`delivery-address-label-${addressKey}`}
+                                                        borderColor="gray.300"
+                                                        _hover={{borderColor: 'gray.400'}}
+                                                        _focus={{
+                                                            borderColor: 'blue.500',
+                                                            boxShadow:
+                                                                '0 0 0 1px var(--chakra-colors-blue-500)'
+                                                        }}
+                                                    >
+                                                        {addresses.length === 0 ? (
+                                                            <option value="">
+                                                                {formatMessage({
+                                                                    id: 'shipping_multi_address.no_addresses_available',
                                                                     defaultMessage:
-                                                                        '{city}, {stateCode} {postalCode}'
-                                                                },
-                                                                {
-                                                                    city: addr.city,
-                                                                    stateCode: addr.stateCode || '',
-                                                                    postalCode: addr.postalCode
-                                                                }
-                                                            )}
-                                                        </option>
-                                                    ))}
-                                                    <option value={ADD_NEW_ADDRESS_OPTION_VALUE}>
-                                                        + {formatMessage(addNewAddressLabel)}
-                                                    </option>
-                                                </Select>
+                                                                        'No Address Available'
+                                                                })}
+                                                            </option>
+                                                        ) : (
+                                                            addresses.map((addr) => (
+                                                                <option
+                                                                    key={addr.addressId}
+                                                                    value={addr.addressId}
+                                                                >
+                                                                    {addr.firstName} {addr.lastName}{' '}
+                                                                    - {addr.address1},{' '}
+                                                                    {formatMessage(
+                                                                        {
+                                                                            id: 'shipping_multi_address.format.address_line_2',
+                                                                            defaultMessage:
+                                                                                '{city}, {stateCode} {postalCode}'
+                                                                        },
+                                                                        {
+                                                                            city: addr.city,
+                                                                            stateCode:
+                                                                                addr.stateCode ||
+                                                                                '',
+                                                                            postalCode:
+                                                                                addr.postalCode
+                                                                        }
+                                                                    )}
+                                                                </option>
+                                                            ))
+                                                        )}
+                                                    </Select>
+                                                    <Button
+                                                        variant="outline"
+                                                        size="sm"
+                                                        onClick={() => {
+                                                            setShowAddAddressForm((prev) => ({
+                                                                ...prev,
+                                                                [addressKey]: true
+                                                            }))
+                                                        }}
+                                                        leftIcon={<Box as="span">+</Box>}
+                                                    >
+                                                        {formatMessage(addNewAddressLabel)}
+                                                    </Button>
+                                                </VStack>
                                             </Box>
 
                                             <Box
@@ -573,7 +598,12 @@ const ShippingMultiAddress = ({
 
                                     {/* Add New Address Form - appears inside the product card */}
                                     {showAddAddressForm[addressKey] && (
-                                        <Box position="relative" mt={4} width="100%">
+                                        <Box
+                                            position="relative"
+                                            mt={4}
+                                            width="100%"
+                                            data-testid="address-form"
+                                        >
                                             <AddressForm
                                                 item={item}
                                                 form={addressForm}

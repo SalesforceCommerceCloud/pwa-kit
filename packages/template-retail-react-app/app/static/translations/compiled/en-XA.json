@@ -7535,6 +7535,20 @@
       "value": "]"
     }
   ],
+  "shipping_multi_address.no_addresses_available": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ƞǿǿ Ȧḓḓřḗḗşş Ȧṽȧȧīŀȧȧƀŀḗḗ"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
   "shipping_multi_address.product_attributes.label": [
     {
       "type": 0,

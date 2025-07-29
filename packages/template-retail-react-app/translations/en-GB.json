@@ -1499,6 +1499,9 @@
   "shipping_multi_address.loading.message": {
     "defaultMessage": "Loading products..."
   },
+  "shipping_multi_address.no_addresses_available": {
+    "defaultMessage": "No Address Available"
+  },
   "shipping_multi_address.product_attributes.label": {
     "defaultMessage": "Product attributes"
   },
