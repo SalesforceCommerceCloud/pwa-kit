@@ -6,7 +6,7 @@
  */
 import React, {useState} from 'react'
 import {Button, useDisclosure} from '@chakra-ui/react'
-import {FormattedMessage, useIntl} from 'react-intl'
+import {useIntl} from 'react-intl'
 import {useItemVariant} from '../../../../components/item-variant'
 import ProductViewModal from '../../../../components/product-view-modal'
 import useToast from '../../../../hooks/use-toast'
@@ -30,6 +30,60 @@ const WishlistPrimaryAction = () => {
     const [isLoading, setIsLoading] = useState(false)
     const {open, onOpen, onClose} = useDisclosure()
 
+    const messages = {
+        addedToCart: (quantity, isAddingASet, item) => formatMessage(
+            {
+                defaultMessage: '{quantity} {quantity, plural, one {item} other {items}} added to cart',
+                id: 'wishlist_primary_action.info.added_to_cart'
+            },
+            {quantity: isAddingASet ? quantity * item.setProducts.length : quantity}
+        ),
+        viewOptions: formatMessage({
+            defaultMessage: 'View Options',
+            id: 'wishlist_primary_action.button.view_options'
+        }),
+        viewFullDetails: formatMessage({
+            defaultMessage: 'View Full Details',
+            id: 'wishlist_primary_action.button.view_full_details'
+        }),
+        addToCart: formatMessage({
+            defaultMessage: 'Add to Cart',
+            id: 'wishlist_primary_action.button.add_to_cart'
+        }),
+        addSetToCart: formatMessage({
+            defaultMessage: 'Add Set to Cart',
+            id: 'wishlist_primary_action.button.add_set_to_cart'
+        }),
+        addSetToCartLabel: (productName) => formatMessage(
+            {
+                id: 'wishlist_primary_action.button.addSetToCart.label',
+                defaultMessage: 'Add {productName} set to cart'
+            },
+            {productName}
+        ),
+        viewFullDetailsLabel: (productName) => formatMessage(
+            {
+                id: 'wishlist_primary_action.button.viewFullDetails.label',
+                defaultMessage: 'View full details for {productName}'
+            },
+            {productName}
+        ),
+        viewOptionsLabel: (productName) => formatMessage(
+            {
+                id: 'wishlist_primary_action.button.view_options.label',
+                defaultMessage: 'View Options for {productName}'
+            },
+            {productName}
+        ),
+        addToCartLabel: (productName) => formatMessage(
+            {
+                id: 'wishlist_primary_action.button.addToCart.label',
+                defaultMessage: 'Add {productName} to cart'
+            },
+            {productName}
+        )
+    }
+
     const handleAddToCart = async (item, quantity) => {
         setIsLoading(true)
 
@@ -51,14 +105,7 @@ const WishlistPrimaryAction = () => {
         try {
             await addItemToNewOrExistingBasket(productItems)
             toast({
-                title: formatMessage(
-                    {
-                        defaultMessage:
-                            '{quantity} {quantity, plural, one {item} other {items}} added to cart',
-                        id: 'wishlist_primary_action.info.added_to_cart'
-                    },
-                    {quantity: isAddingASet ? quantity * item.setProducts.length : quantity}
-                ),
+                title: messages.addedToCart(quantity, isAddingASet, item),
                 type: 'success'
             })
             onClose()
@@ -72,32 +119,6 @@ const WishlistPrimaryAction = () => {
         }
     }
 
-    const buttonText = {
-        viewOptions: (
-            <FormattedMessage
-                defaultMessage="View Options"
-                id="wishlist_primary_action.button.view_options"
-            />
-        ),
-        viewFullDetails: (
-            <FormattedMessage
-                defaultMessage="View Full Details"
-                id="wishlist_primary_action.button.view_full_details"
-            />
-        ),
-        addToCart: (
-            <FormattedMessage
-                defaultMessage="Add to Cart"
-                id="wishlist_primary_action.button.add_to_cart"
-            />
-        ),
-        addSetToCart: (
-            <FormattedMessage
-                defaultMessage="Add Set to Cart"
-                id="wishlist_primary_action.button.add_set_to_cart"
-            />
-        )
-    }
 
     if (isProductASet) {
         if (variant.setProducts?.every((child) => !hasVariants(child))) {
@@ -107,15 +128,9 @@ const WishlistPrimaryAction = () => {
                     onClick={() => handleAddToCart(variant, variant.quantity)}
                     size="md"
                     loading={isLoading}
-                    aria-label={formatMessage(
-                        {
-                            id: 'wishlist_primary_action.button.addSetToCart.label',
-                            defaultMessage: 'Add {productName} set to cart'
-                        },
-                        {productName: variant.name}
-                    )}
+                    aria-label={messages.addSetToCartLabel(variant.name)}
                 >
-                    {buttonText.addSetToCart}
+                    {messages.addSetToCart}
                 </Button>
             )
         } else {
@@ -125,15 +140,9 @@ const WishlistPrimaryAction = () => {
                     size="md"
                     variant="solid"
                     _hover={{textDecoration: 'none'}}
-                    aria-label={formatMessage(
-                        {
-                            id: 'wishlist_primary_action.button.viewFullDetails.label',
-                            defaultMessage: 'View full details for {productName}'
-                        },
-                        {productName: variant.name}
-                    )}
+                    aria-label={messages.viewFullDetailsLabel(variant.name)}
                 >
-                    <Link href={`/product/${variant.id}`}>{buttonText.viewFullDetails}</Link>
+                    <Link href={`/product/${variant.id}`}>{messages.viewFullDetails}</Link>
                 </Button>
             )
         }
@@ -144,15 +153,9 @@ const WishlistPrimaryAction = () => {
                 size="md"
                 variant="solid"
                 _hover={{textDecoration: 'none'}}
-                aria-label={formatMessage(
-                    {
-                        id: 'wishlist_primary_action.button.viewFullDetails.label',
-                        defaultMessage: 'View full details for {productName}'
-                    },
-                    {productName: variant.name}
-                )}
+                aria-label={messages.viewFullDetailsLabel(variant.name)}
             >
-                <Link href={`/product/${variant.id}`}>{buttonText.viewFullDetails}</Link>
+                <Link href={`/product/${variant.id}`}>{messages.viewFullDetails}</Link>
             </Button>
         )
     } else {
@@ -160,20 +163,14 @@ const WishlistPrimaryAction = () => {
             return (
                 <>
                     <Button
-                        aria-label={formatMessage(
-                            {
-                                id: 'wishlist_primary_action.button.view_options.label',
-                                defaultMessage: 'View Options for {productName}'
-                            },
-                            {productName: variant.name}
-                        )}
+                        aria-label={messages.viewOptionsLabel(variant.name)}
                         size="md"
                         variant="solid"
                         onClick={() => {
                             onOpen()
                         }}
                     >
-                        {buttonText.viewOptions}
+                        {messages.viewOptions}
                     </Button>
                     {open && (
                         <ProductViewModal
@@ -193,15 +190,9 @@ const WishlistPrimaryAction = () => {
                     onClick={() => handleAddToCart(variant, variant.quantity)}
                     size="md"
                     loading={isLoading}
-                    aria-label={formatMessage(
-                        {
-                            id: 'wishlist_primary_action.button.addToCart.label',
-                            defaultMessage: 'Add {productName} to cart'
-                        },
-                        {productName: variant.name}
-                    )}
+                    aria-label={messages.addToCartLabel(variant.name)}
                 >
-                    {buttonText.addToCart}
+                    {messages.addToCart}
                 </Button>
             )
         }
