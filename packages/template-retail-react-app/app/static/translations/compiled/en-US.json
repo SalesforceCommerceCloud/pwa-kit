@@ -3531,6 +3531,12 @@
       "value": "Failed to save address"
     }
   ],
+  "shipping_multi_address.error.submit_failed": [
+    {
+      "type": 0,
+      "value": "Error setting up shipments. Please try again."
+    }
+  ],
   "shipping_multi_address.format.address_line_2": [
     {
       "type": 1,
@@ -3590,7 +3596,7 @@
   "shipping_multi_address.submit.loading": [
     {
       "type": 0,
-      "value": "Saving address..."
+      "value": "Setting up shipments..."
     }
   ],
   "shipping_multi_address.success.address_saved": [

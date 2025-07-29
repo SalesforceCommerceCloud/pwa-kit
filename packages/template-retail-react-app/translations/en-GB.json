@@ -1487,6 +1487,9 @@
   "shipping_multi_address.error.save_failed": {
     "defaultMessage": "Failed to save address"
   },
+  "shipping_multi_address.error.submit_failed": {
+    "defaultMessage": "Error setting up shipments. Please try again."
+  },
   "shipping_multi_address.format.address_line_2": {
     "defaultMessage": "{city}, {stateCode} {postalCode}"
   },
@@ -1506,7 +1509,7 @@
     "defaultMessage": "Continue to next step with selected delivery addresses"
   },
   "shipping_multi_address.submit.loading": {
-    "defaultMessage": "Saving address..."
+    "defaultMessage": "Setting up shipments..."
   },
   "shipping_multi_address.success.address_saved": {
     "defaultMessage": "Address saved successfully"

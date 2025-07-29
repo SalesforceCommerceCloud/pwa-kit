@@ -7459,6 +7459,20 @@
       "value": "]"
     }
   ],
+  "shipping_multi_address.error.submit_failed": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ḗřřǿǿř şḗḗŧŧīƞɠ ŭŭƥ şħīƥḿḗḗƞŧş. Ƥŀḗḗȧȧşḗḗ ŧřẏ ȧȧɠȧȧīƞ."
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
   "shipping_multi_address.format.address_line_2": [
     {
       "type": 0,
@@ -7570,7 +7584,7 @@
     },
     {
       "type": 0,
-      "value": "Şȧȧṽīƞɠ ȧȧḓḓřḗḗşş..."
+      "value": "Şḗḗŧŧīƞɠ ŭŭƥ şħīƥḿḗḗƞŧş..."
     },
     {
       "type": 0,
