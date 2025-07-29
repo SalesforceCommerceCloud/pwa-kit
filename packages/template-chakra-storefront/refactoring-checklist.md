@@ -233,5 +233,5 @@ Total files: 222
 - [x] src/pages/registration/index.jsx
 - [x] src/pages/reset-password/index.jsx
 - [x] src/pages/reset-password/reset-password-landing.jsx
-- [ ] src/pages/social-login-redirect/index.jsx
+- [x] src/pages/social-login-redirect/index.jsx
 - [ ] src/pages/store-locator/index.jsx
