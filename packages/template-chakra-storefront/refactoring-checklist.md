@@ -198,7 +198,7 @@ Total files: 222
 - [x] src/pages/product-detail/index.mock.js
 - [x] src/pages/product-detail/page-analytics.jsx
 - [x] src/pages/product-detail/page-cache.jsx
-- [ ] src/pages/product-detail/page-metadata.jsx
+- [x] src/pages/product-detail/page-metadata.jsx
 - [ ] src/pages/product-detail/partials/information-accordion.jsx
 - [ ] src/pages/product-detail/partials/product-details-composite.jsx
 - [ ] src/pages/product-detail/partials/product-details-simple.jsx
