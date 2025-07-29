@@ -17,7 +17,7 @@ const LoadingSpinner = ({wrapperStyles = {}, spinnerStyles = {}}) => {
             left="0"
             right="0"
             bottom="0"
-            data-testid='loading-spinner'
+            data-testid="loading-spinner"
             background="whiteAlpha.800"
             {...wrapperStyles}
         >
