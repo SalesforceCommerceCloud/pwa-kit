@@ -2469,6 +2469,12 @@
       "value": "Tax"
     }
   ],
+  "page_header.search_results_for": [
+    {
+      "type": 0,
+      "value": "Search Results for"
+    }
+  ],
   "page_not_found.action.go_back": [
     {
       "type": 0,
@@ -2491,6 +2497,12 @@
     {
       "type": 0,
       "value": "The page you're looking for can't be found."
+    }
+  ],
+  "page_title.search_results_for": [
+    {
+      "type": 0,
+      "value": "Search Results for"
     }
   ],
   "pagination.field.num_of_pages": [

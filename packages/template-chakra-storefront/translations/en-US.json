@@ -90,8 +90,7 @@
     "defaultMessage": "You haven't placed an order yet."
   },
   "account_order_history.label.num_of_items": {
-    "defaultMessage": "{count} items",
-    "description": "Number of items in order"
+    "defaultMessage": "{count} items"
   },
   "account_order_history.label.order_number": {
     "defaultMessage": "Order Number: {orderNumber}"
@@ -295,8 +294,7 @@
     "defaultMessage": "This email already has an account."
   },
   "checkout_confirmation.message.num_of_items_in_order": {
-    "defaultMessage": "{itemCount, plural, =0 {0 items} one {# item} other {# items}}",
-    "description": "# item(s) in order"
+    "defaultMessage": "{itemCount, plural, =0 {0 items} one {# item} other {# items}}"
   },
   "checkout_confirmation.message.will_email_shortly": {
     "defaultMessage": "We will send an email to <b>{email}</b> with your confirmation number and receipt shortly."
@@ -1021,8 +1019,7 @@
     "defaultMessage": "Remove"
   },
   "order_summary.cart_items.action.num_of_items_in_cart": {
-    "defaultMessage": "{itemCount, plural, =0 {0 items} one {# item} other {# items}} in cart",
-    "description": "clicking it would expand/show the items in cart"
+    "defaultMessage": "{itemCount, plural, =0 {0 items} one {# item} other {# items}} in cart"
   },
   "order_summary.cart_items.link.edit_cart": {
     "defaultMessage": "Edit cart"
@@ -1054,6 +1051,9 @@
   "order_summary.label.tax": {
     "defaultMessage": "Tax"
   },
+  "page_header.search_results_for": {
+    "defaultMessage": "Search Results for"
+  },
   "page_not_found.action.go_back": {
     "defaultMessage": "Back to previous page"
   },
@@ -1065,6 +1065,9 @@
   },
   "page_not_found.title.page_cant_be_found": {
     "defaultMessage": "The page you're looking for can't be found."
+  },
+  "page_title.search_results_for": {
+    "defaultMessage": "Search Results for"
   },
   "pagination.field.num_of_pages": {
     "defaultMessage": "of {numOfPages}"
@@ -1319,8 +1322,7 @@
     "defaultMessage": "Enter your email to receive instructions on how to reset your password"
   },
   "reset_password_form.message.return_to_sign_in": {
-    "defaultMessage": "Or return to",
-    "description": "Precedes link to return to sign in"
+    "defaultMessage": "Or return to"
   },
   "reset_password_form.title.reset_password": {
     "defaultMessage": "Reset Password"
