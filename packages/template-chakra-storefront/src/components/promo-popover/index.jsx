@@ -8,7 +8,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import {Box, CloseButton, Flex, IconButton, Popover, Text} from '@chakra-ui/react'
 import {InfoIcon} from '../icons'
-import {FormattedMessage, useIntl} from 'react-intl'
+import {useIntl} from 'react-intl'
 
 /**
  * This component renders a small info icon and displays a popover when hovered. It could be adapted
@@ -16,7 +16,19 @@ import {FormattedMessage, useIntl} from 'react-intl'
  * promotions applied to products and/or orders on cart, checkout, order confirmation and order history.
  */
 const PromoPopover = ({header, children, ...props}) => {
-    const intl = useIntl()
+    const {formatMessage} = useIntl()
+    
+    const messages = {
+        info: formatMessage({
+            id: 'promo_popover.assistive_msg.info',
+            defaultMessage: 'Info'
+        }),
+        promoApplied: formatMessage({
+            id: 'promo_popover.heading.promo_applied',
+            defaultMessage: 'Promotions Applied'
+        })
+    }
+    
     return (
         <Box position="relative" {...props}>
             <Popover.Root size="xs" lazyMount unmountOnExit positioning={{placement: 'top'}}>
@@ -29,10 +41,7 @@ const PromoPopover = ({header, children, ...props}) => {
                         minWidth="auto"
                         position="relative"
                         variant="unstyled"
-                        aria-label={intl.formatMessage({
-                            id: 'promo_popover.assistive_msg.info',
-                            defaultMessage: 'Info'
-                        })}
+                        aria-label={messages.info}
                     >
                         <InfoIcon
                             display="block"
@@ -51,10 +60,7 @@ const PromoPopover = ({header, children, ...props}) => {
                             <Flex justifyContent="space-between" alignItems="baseline">
                                 {header || (
                                     <Text fontWeight="bold" fontSize="md">
-                                        <FormattedMessage
-                                            defaultMessage="Promotions Applied"
-                                            id="promo_popover.heading.promo_applied"
-                                        />
+                                        {messages.promoApplied}
                                     </Text>
                                 )}
                                 <Popover.CloseTrigger asChild>
