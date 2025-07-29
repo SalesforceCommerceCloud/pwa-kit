@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React from 'react'
+import React, {useMemo} from 'react'
 import PropTypes from 'prop-types'
 import {Dialog, CloseButton} from '@chakra-ui/react'
 import ProductView from '../../components/product-view'
@@ -19,17 +19,18 @@ import {useIntl} from 'react-intl'
 const ProductViewModal = ({product, isOpen, onClose, ...props}) => {
     const productViewModalData = useProductViewModal(product)
 
-    const {formatMessage} = useIntl()
+    const intl = useIntl()
+    const {formatMessage} = intl
 
-    const messages = {
-        modalLabel: formatMessage(
+    const messages = useMemo(() => ({
+        modalLabel: intl.formatMessage(
             {
                 id: 'cart.product_edit_modal.modal_label',
                 defaultMessage: 'Edit modal for {productName}'
             },
             {productName: productViewModalData?.product?.name}
         )
-    }
+    }), [intl])
     return (
         <Dialog.Root
             lazyMount
