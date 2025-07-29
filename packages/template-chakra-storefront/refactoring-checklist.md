@@ -185,7 +185,7 @@ Total files: 222
 - [x] src/pages/checkout/partials/payment-form.jsx
 - [x] src/pages/checkout/partials/payment.jsx
 - [x] src/pages/checkout/partials/shipping-address-selection.jsx
-- [ ] src/pages/checkout/partials/shipping-address.jsx
+- [x] src/pages/checkout/partials/shipping-address.jsx
 - [ ] src/pages/checkout/partials/shipping-options.jsx
 - [ ] src/pages/checkout/util/checkout-context.js
 - [ ] src/pages/home/data.js

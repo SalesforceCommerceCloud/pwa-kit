@@ -33,6 +33,17 @@ export default function ShippingAddress() {
     const {data: basket} = useCurrentBasket()
     const selectedShippingAddress = basket?.shipments && basket?.shipments[0]?.shippingAddress
     const {step, STEPS, goToStep, goToNextStep} = useCheckout()
+
+    const messages = {
+        shippingAddress: formatMessage({
+            id: 'shipping_address.title.shipping_address',
+            defaultMessage: 'Shipping Address'
+        }),
+        editShippingAddress: formatMessage({
+            id: 'toggle_card.action.editShippingAddress',
+            defaultMessage: 'Edit Shipping Address'
+        })
+    }
     const createCustomerAddress = useShopperCustomersMutation('createCustomerAddress')
     const updateCustomerAddress = useShopperCustomersMutation('updateCustomerAddress')
     const updateShippingAddressForShipment = useShopperBasketsMutation(
@@ -105,18 +116,12 @@ export default function ShippingAddress() {
     return (
         <ToggleCard
             id="step-1"
-            title={formatMessage({
-                defaultMessage: 'Shipping Address',
-                id: 'shipping_address.title.shipping_address'
-            })}
+            title={messages.shippingAddress}
             editing={step === STEPS.SHIPPING_ADDRESS}
             isLoading={isLoading}
             disabled={step === STEPS.CONTACT_INFO && !selectedShippingAddress}
             onEdit={() => goToStep(STEPS.SHIPPING_ADDRESS)}
-            editLabel={formatMessage({
-                defaultMessage: 'Edit Shipping Address',
-                id: 'toggle_card.action.editShippingAddress'
-            })}
+            editLabel={messages.editShippingAddress}
         >
             <ToggleCardEdit>
                 <ShippingAddressSelection
