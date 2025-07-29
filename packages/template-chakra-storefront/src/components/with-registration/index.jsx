@@ -33,16 +33,20 @@ const withRegistration = (
         const location = useLocation()
         const {formatMessage, locale} = useIntl()
 
+        const messages = {
+            pleaseSignIn: formatMessage({
+                id: 'with_registration.info.please_sign_in',
+                defaultMessage: 'Please sign in to continue!'
+            })
+        }
+
         const handleClick = (e) => {
             e.preventDefault()
             if (!customer.isRegistered) {
                 // Do not show auth modal if users is already on the login page
                 if (isLoginPage(location, locale)) {
                     toast({
-                        title: formatMessage({
-                            defaultMessage: 'Please sign in to continue!',
-                            id: 'with_registration.info.please_sign_in'
-                        }),
+                        title: messages.pleaseSignIn,
                         type: 'info'
                     })
                 } else {
