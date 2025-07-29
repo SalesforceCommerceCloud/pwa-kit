@@ -15,20 +15,25 @@ export default function usePromoCodeFields({
 }) {
     const {formatMessage} = useIntl()
 
+    const messages = {
+        codeLabel: formatMessage({
+            defaultMessage: 'Promo Code',
+            id: 'use_promo_code_fields.label.promo_code'
+        }),
+        codeRequired: formatMessage({
+            defaultMessage: 'Please provide a valid promo code.',
+            id: 'use_promo_code_fields.error.required_promo_code'
+        })
+    }
+
     const fields = {
         code: {
             name: `${prefix}code`,
-            label: formatMessage({
-                defaultMessage: 'Promo Code',
-                id: 'use_promo_code_fields.label.promo_code'
-            }),
+            label: messages.codeLabel,
             type: 'text',
             defaultValue: '',
             rules: {
-                required: formatMessage({
-                    defaultMessage: 'Please provide a valid promo code.',
-                    id: 'use_promo_code_fields.error.required_promo_code'
-                })
+                required: messages.codeRequired
             },
             error: errors[`${prefix}code`],
             control

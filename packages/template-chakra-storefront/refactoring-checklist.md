@@ -64,7 +64,7 @@ Total files: 222
 - [x] src/components/forms/useAddressFields.jsx
 - [x] src/components/forms/useCreditCardFields.jsx
 - [x] src/components/forms/useLoginFields.jsx
-- [ ] src/components/forms/useProfileFields.jsx
+- [x] src/components/forms/useProfileFields.jsx
 - [ ] src/components/forms/usePromoCodeFields.jsx
 - [ ] src/components/forms/useRegistrationFields.jsx
 - [ ] src/components/forms/useResetPasswordFields.jsx
