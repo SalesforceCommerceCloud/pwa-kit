@@ -13,14 +13,18 @@ import Field from '../field'
 
 const ProfileFields = ({form, prefix = ''}) => {
     const fields = useProfileFields({form, prefix})
-    const intl = useIntl()
+    const {formatMessage} = useIntl()
     const formTitleAriaLabel = defineMessage({
         defaultMessage: 'Profile Form',
         id: 'profile_fields.label.profile_form'
     })
 
+    const messages = {
+        formAriaLabel: formatMessage(formTitleAriaLabel)
+    }
+
     return (
-        <Stack spacing={5} aria-label={intl.formatMessage(formTitleAriaLabel)}>
+        <Stack spacing={5} aria-label={messages.formAriaLabel}>
             <SimpleGrid columns={[1, 1, 1, 2]} spacing={5}>
                 <Field {...fields.firstName} />
                 <Field {...fields.lastName} />

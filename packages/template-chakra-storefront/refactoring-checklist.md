@@ -8,7 +8,7 @@ Total files: 27
 
 - [x] src/components/display-price/current-price.jsx
 - [x] src/components/display-price/list-price.jsx
-- [ ] src/components/forms/address-fields.jsx
+- [x] src/components/forms/address-fields.jsx
 - [ ] src/components/forms/profile-fields.jsx
 - [ ] src/components/icons/index.jsx
 - [ ] src/components/list-menu/list-menu.jsx
