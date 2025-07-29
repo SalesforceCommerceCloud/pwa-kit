@@ -13,7 +13,7 @@ Total files: 97
 - [x] src/components/email-confirmation/index.jsx
 - [x] src/components/field/index.jsx
 - [x] src/components/footer/index.jsx
-- [ ] src/components/forms/address-fields.jsx
+- [x] src/components/forms/address-fields.jsx
 - [ ] src/components/forms/credit-card-fields.jsx
 - [ ] src/components/forms/form-action-buttons.jsx
 - [ ] src/components/forms/login-fields.jsx
