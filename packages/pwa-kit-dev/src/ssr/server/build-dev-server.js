@@ -152,7 +152,6 @@ export const DevServerMixin = {
         if (fs.existsSync(projectWebpackPath)) {
             config = require(projectWebpackPath)
         }
-
         app.__compiler = webpack(config)
         app.__devMiddleware = webpackDevMiddleware(app.__compiler, {serverSideRender: true})
         app.__isInitialBuild = true

@@ -497,6 +497,7 @@ export const RemoteServerFactory = {
          * @param req {express.req} the incoming request - modified in-place
          * @private
          */
+        // TODO - we might want to scope this to /mobify paths for now?
         const removeBasePathFromPathMiddleware = (req, res, next) => {
             console.log('Before')
             console.log(req.url)

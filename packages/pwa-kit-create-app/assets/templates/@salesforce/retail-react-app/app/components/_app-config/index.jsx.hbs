@@ -19,7 +19,7 @@ import {
     resolveLocaleFromUrl
 } from '@salesforce/retail-react-app/app/utils/site-utils'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
-import {getEnvBasePath, getProxyBasePath} from '@salesforce/pwa-kit-runtime/utils/ssr-paths'
+import {getEnvBasePath, slasPrivateProxyPath} from '@salesforce/pwa-kit-runtime/utils/ssr-paths'
 import {createUrlTemplate} from '@salesforce/retail-react-app/app/utils/url'
 import createLogger from '@salesforce/pwa-kit-runtime/utils/logger-factory'
 
@@ -68,8 +68,14 @@ const AppConfig = ({children, locals = {}}) => {
         supportedCountries: STORE_LOCATOR_SUPPORTED_COUNTRIES
     }
 
-    const redirectURI = `${appOrigin}/callback`
+    // Set absolute uris for CommerceApiProvider proxies and callbacks
+    const redirectURI = `${appOrigin}/callback` // if base path is added here, the SLAS client redirectURI will need to be updated as well
+    // const redirectURI = `${appOrigin}${getEnvBasePath()}/callback`
     const proxy = `${appOrigin}${getEnvBasePath()}${commerceApiConfig.proxyPath}`
+    const slasPrivateClientProxyEndpoint = `${appOrigin}${getEnvBasePath()}${slasPrivateProxyPath}`
+    const passwordlessLoginCallbackURI = isAbsoluteURL(passwordlessCallback)
+        ? passwordlessCallback
+        : `${appOrigin}${getEnvBasePath()}${passwordlessCallback}`
 
     return (
         <CommerceApiProvider
@@ -90,6 +96,7 @@ const AppConfig = ({children, locals = {}}) => {
             // Make sure to also enable useSLASPrivateClient in ssr.js when enabling this setting.
             enablePWAKitPrivateClient={true}
             {{/if}}
+            slasPrivateClientProxyEndpoint={slasPrivateClientProxyEndpoint}
         >
             <MultiSiteProvider site={locals.site} locale={locals.locale} buildUrl={locals.buildUrl}>
                 <StoreLocatorProvider config={storeLocatorConfig}>
