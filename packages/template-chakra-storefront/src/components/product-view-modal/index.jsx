@@ -39,7 +39,6 @@ const ProductViewModal = ({product, isOpen, onClose, ...props}) => {
                 <Dialog.Backdrop />
                 <Dialog.Positioner>
                     <Dialog.Content data-testid="product-view-modal" aria-label={label}>
-                        <Dialog.CloseTrigger />
                         <Dialog.Body pb={8} bg="white" paddingBottom={6} marginTop={6}>
                             <ProductView
                                 showFullLink={true}
