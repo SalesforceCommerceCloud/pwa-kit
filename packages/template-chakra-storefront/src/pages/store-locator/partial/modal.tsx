@@ -17,7 +17,7 @@ interface StoreLocatorModalProps {
 
 const StoreLocatorModal: React.FC<StoreLocatorModalProps> = ({isOpen, onClose}) => {
     const isDesktopView = useBreakpointValue({base: false, lg: true})
-    
+
     return (
         <Dialog.Root
             lazyMount

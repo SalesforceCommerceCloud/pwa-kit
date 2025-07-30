@@ -906,14 +906,16 @@ const main = async (opts) => {
                 value: key
             }))
 
-        const pluginAnswers = context.preset?.extensions ? {selectedPlugins: context.preset.extensions} : await inquirer.prompt([
-            {
-                type: 'checkbox',
-                name: 'selectedPlugins',
-                message: 'Which extensions would you like to enable?',
-                choices: pluginChoices
-            }
-        ])
+        const pluginAnswers = context.preset?.extensions
+            ? {selectedPlugins: context.preset.extensions}
+            : await inquirer.prompt([
+                  {
+                      type: 'checkbox',
+                      name: 'selectedPlugins',
+                      message: 'Which extensions would you like to enable?',
+                      choices: pluginChoices
+                  }
+              ])
 
             // Convert selected plugins array to object with true values
             pluginAnswers.selectedPlugins.forEach((plugin) => {

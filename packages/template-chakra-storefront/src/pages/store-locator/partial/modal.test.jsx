@@ -62,10 +62,10 @@ describe('StoreLocatorModal', () => {
     it('calls onClose when close button is clicked', async () => {
         const onClose = jest.fn()
         renderWithProviders(<StoreLocatorModal isOpen={true} onClose={onClose} />)
-        
-        const closeButton = screen.getByRole('button', { name: /close/i })
+
+        const closeButton = screen.getByRole('button', {name: /close/i})
         closeButton.click()
-        
+
         // Wait for the async onOpenChange callback to be triggered
         await waitFor(() => {
             expect(onClose).toHaveBeenCalled()

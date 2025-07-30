@@ -15,16 +15,19 @@ jest.mock('./use-store-locator', () => ({
 }))
 
 // Mock the StoreLocatorModal component
-jest.mock('../partial/modal', () => 
+jest.mock('../partial/modal', () => {
     // eslint-disable-next-line react/prop-types
-    ({isOpen, onClose}) =>
+    const MockStoreLocatorModal = ({isOpen, onClose}) =>
         isOpen ? (
             <div data-testid="store-locator-modal">
                 Modal Content
                 <button onClick={onClose}>Close</button>
             </div>
         ) : null
-)
+
+    MockStoreLocatorModal.displayName = 'MockStoreLocatorModal'
+    return MockStoreLocatorModal
+})
 
 describe('withStoreLocator', () => {
     const mockConfig = {

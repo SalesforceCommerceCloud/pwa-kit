@@ -115,7 +115,7 @@ describe('useAppModals', () => {
         // Verify functions exist and are callable
         expect(result.current.onDrawerMenuOpen).toEqual(expect.any(Function))
         expect(result.current.onDrawerMenuClose).toEqual(expect.any(Function))
-        
+
         // Verify they can be called without errors
         expect(() => {
             result.current.onDrawerMenuOpen()
