@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import {renderHook, act} from '@testing-library/react'
+import {renderHook} from '@testing-library/react'
 import useRefreshToken from '@salesforce/retail-react-app/app/hooks/use-refresh-token'
 import useAuthContext from '@salesforce/commerce-sdk-react/hooks/useAuthContext'
 import useCustomerType from '@salesforce/commerce-sdk-react/hooks/useCustomerType'
@@ -17,15 +17,11 @@ jest.mock('@salesforce/commerce-sdk-react/hooks/useCustomerType')
 describe('useRefreshToken', () => {
     let mockAuth
     let mockGet
-    let mockReady
 
     beforeEach(() => {
         mockGet = jest.fn()
-        mockReady = jest.fn()
-
         mockAuth = {
-            get: mockGet,
-            ready: mockReady
+            get: mockGet
         }
 
         // Mock the hooks
@@ -48,41 +44,49 @@ describe('useRefreshToken', () => {
             expect(mockGet).toHaveBeenCalledWith('refresh_token_guest')
         })
 
-        it('should return ready token when storage token is null', async () => {
-            const readyToken = 'ready-refresh-token'
-            mockGet.mockReturnValue(null)
-            mockReady.mockResolvedValue({refresh_token: readyToken})
+        it('should return empty string when storage token is not available', () => {
+            mockGet.mockReturnValue('')
 
             const {result} = renderHook(() => useRefreshToken())
 
-            // Initially should return null
-            expect(result.current).toBeNull()
-
-            // Wait for async operation
-            await act(async () => {
-                await new Promise((resolve) => setTimeout(resolve, 0))
-            })
-
-            // Should return the ready token
-            expect(result.current).toBe(readyToken)
+            expect(result.current).toBe('')
+            expect(mockGet).toHaveBeenCalledWith('refresh_token_guest')
         })
 
-        it('should handle authentication errors gracefully', async () => {
+        it('should return null when storage token is null', () => {
             mockGet.mockReturnValue(null)
-            mockReady.mockRejectedValue(new Error('Auth failed'))
 
             const {result} = renderHook(() => useRefreshToken())
 
-            // Initially should return null
             expect(result.current).toBeNull()
+            expect(mockGet).toHaveBeenCalledWith('refresh_token_guest')
+        })
 
-            // Wait for async operation
-            await act(async () => {
-                await new Promise((resolve) => setTimeout(resolve, 0))
-            })
+        it('should return undefined when storage token is undefined', () => {
+            mockGet.mockReturnValue(undefined)
 
-            // Should still return null after error
-            expect(result.current).toBeNull()
+            const {result} = renderHook(() => useRefreshToken())
+
+            expect(result.current).toBeUndefined()
+            expect(mockGet).toHaveBeenCalledWith('refresh_token_guest')
+        })
+
+        it('should return false when storage token is false', () => {
+            mockGet.mockReturnValue(false)
+
+            const {result} = renderHook(() => useRefreshToken())
+
+            expect(result.current).toBe(false)
+            expect(mockGet).toHaveBeenCalledWith('refresh_token_guest')
+        })
+
+        it('should return 0 when storage token is 0', () => {
+            mockGet.mockReturnValue(0)
+
+            const {result} = renderHook(() => useRefreshToken())
+
+            expect(result.current).toBe(0)
+            expect(mockGet).toHaveBeenCalledWith('refresh_token_guest')
         })
     })
 
@@ -110,36 +114,49 @@ describe('useRefreshToken', () => {
         })
     })
 
-    describe('when token response has no refresh token', () => {
-        it('should return null when refresh_token is undefined', async () => {
-            mockGet.mockReturnValue(null)
-            mockReady.mockResolvedValue({})
+    describe('when customer type is undefined', () => {
+        it('should return null when customer type is undefined', () => {
+            useCustomerType.mockReturnValue({customerType: undefined})
 
             const {result} = renderHook(() => useRefreshToken())
 
-            await act(async () => {
-                await new Promise((resolve) => setTimeout(resolve, 0))
-            })
+            expect(result.current).toBeNull()
+            expect(mockGet).not.toHaveBeenCalled()
+        })
+    })
+
+    describe('when customer type is falsy or invalid', () => {
+        it('should return null when customer type is empty string', () => {
+            useCustomerType.mockReturnValue({customerType: ''})
+
+            const {result} = renderHook(() => useRefreshToken())
 
             expect(result.current).toBeNull()
+            expect(mockGet).not.toHaveBeenCalled()
         })
 
-        it('should return null when refresh_token is null', async () => {
-            mockGet.mockReturnValue(null)
-            mockReady.mockResolvedValue({refresh_token: null})
+        it('should return null when customer type is false', () => {
+            useCustomerType.mockReturnValue({customerType: false})
 
             const {result} = renderHook(() => useRefreshToken())
 
-            await act(async () => {
-                await new Promise((resolve) => setTimeout(resolve, 0))
-            })
-
             expect(result.current).toBeNull()
+            expect(mockGet).not.toHaveBeenCalled()
+        })
+
+        it('should call auth.get with invalid customer type', () => {
+            useCustomerType.mockReturnValue({customerType: 'invalid'})
+            mockGet.mockReturnValue('some-token')
+
+            const {result} = renderHook(() => useRefreshToken())
+
+            expect(result.current).toBe('some-token')
+            expect(mockGet).toHaveBeenCalledWith('refresh_token_invalid')
         })
     })
 
     describe('dependency changes', () => {
-        it('should refetch token when auth object changes', async () => {
+        it('should refetch token when auth object changes', () => {
             const token1 = 'token-1'
             mockGet.mockReturnValue(token1)
 
@@ -149,8 +166,7 @@ describe('useRefreshToken', () => {
 
             // Create new auth object
             const newMockAuth = {
-                get: jest.fn().mockReturnValue('token-2'),
-                ready: jest.fn()
+                get: jest.fn().mockReturnValue('token-2')
             }
             useAuthContext.mockReturnValue(newMockAuth)
 
@@ -159,7 +175,7 @@ describe('useRefreshToken', () => {
             expect(result.current).toBe('token-2')
         })
 
-        it('should refetch token when customer type changes', async () => {
+        it('should refetch token when customer type changes', () => {
             const guestToken = 'guest-token'
             mockGet.mockReturnValue(guestToken)
 
@@ -176,41 +192,69 @@ describe('useRefreshToken', () => {
             expect(result.current).toBe('registered-token')
             expect(mockGet).toHaveBeenCalledWith('refresh_token_registered')
         })
+
+        it('should handle customer type changing from valid to null', () => {
+            const guestToken = 'guest-token'
+            mockGet.mockReturnValue(guestToken)
+
+            const {result, rerender} = renderHook(() => useRefreshToken())
+
+            expect(result.current).toBe(guestToken)
+
+            // Change customer type to null
+            useCustomerType.mockReturnValue({customerType: null})
+
+            rerender()
+
+            expect(result.current).toBeNull()
+            expect(mockGet).not.toHaveBeenCalled()
+        })
+
+        it('should handle customer type changing from null to valid', () => {
+            useCustomerType.mockReturnValue({customerType: null})
+
+            const {result, rerender} = renderHook(() => useRefreshToken())
+
+            expect(result.current).toBeNull()
+
+            // Change customer type to valid
+            useCustomerType.mockReturnValue({customerType: 'guest'})
+            mockGet.mockReturnValue('guest-token')
+
+            rerender()
+
+            expect(result.current).toBe('guest-token')
+            expect(mockGet).toHaveBeenCalledWith('refresh_token_guest')
+        })
     })
 
     describe('edge cases', () => {
-        it('should handle auth.ready throwing an error', async () => {
-            const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation()
-            mockGet.mockReturnValue(null)
-            mockReady.mockRejectedValue(new Error('Network error'))
+        it('should handle auth object being null', () => {
+            useAuthContext.mockReturnValue(null)
 
             const {result} = renderHook(() => useRefreshToken())
 
-            await act(async () => {
-                await new Promise((resolve) => setTimeout(resolve, 0))
-            })
-
-            expect(result.current).toBeNull()
-            expect(consoleErrorSpy).toHaveBeenCalledWith(
-                'Failed to get refresh token:',
-                expect.any(Error)
-            )
-
-            consoleErrorSpy.mockRestore()
+            // This will throw an error when trying to call auth.get, but React will catch it
+            // The test will fail if the hook doesn't handle this gracefully
+            expect(() => result.current).toThrow()
         })
 
-        it('should handle useAuthContext throwing an error', async () => {
-            const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation()
-            useAuthContext.mockImplementation(() => {
-                throw new Error('Missing CommerceApiProvider')
-            })
+        it('should handle auth object being undefined', () => {
+            useAuthContext.mockReturnValue(undefined)
 
-            // The hook will throw an error when useAuthContext fails
-            expect(() => {
-                renderHook(() => useRefreshToken())
-            }).toThrow('Missing CommerceApiProvider')
+            const {result} = renderHook(() => useRefreshToken())
 
-            consoleErrorSpy.mockRestore()
+            // This will throw an error when trying to call auth.get, but React will catch it
+            expect(() => result.current).toThrow()
+        })
+
+        it('should handle auth.get being undefined', () => {
+            mockAuth.get = undefined
+
+            const {result} = renderHook(() => useRefreshToken())
+
+            // This will throw an error when trying to call auth.get, but React will catch it
+            expect(() => result.current).toThrow()
         })
     })
 })
