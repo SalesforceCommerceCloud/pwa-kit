@@ -61,7 +61,7 @@ Total files: 97
 - [x] src/page-designer/layouts/carousel/index.jsx
 - [x] src/pages/account/addresses.jsx
 - [x] src/pages/account/order-detail.jsx
-- [ ] src/pages/account/order-history.jsx
+- [x] src/pages/account/order-history.jsx
 - [ ] src/pages/account/profile.jsx
 - [ ] src/pages/account/wishlist/index.jsx
 - [ ] src/pages/account/wishlist/partials/wishlist-primary-action.jsx

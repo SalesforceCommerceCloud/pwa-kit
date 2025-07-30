@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React, {useEffect, useRef} from 'react'
+import React, {useEffect, useRef, useMemo} from 'react'
 import {FormattedNumber, useIntl} from 'react-intl'
 import {useLocation} from 'react-router-dom'
 import {
@@ -78,7 +78,8 @@ OrderProductImages.propTypes = {
 const onClient = typeof window !== 'undefined'
 const AccountOrderHistory = () => {
     const location = useLocation()
-    const {formatMessage, formatDate} = useIntl()
+    const intl = useIntl()
+    const {formatMessage, formatDate} = intl
     const navigate = useNavigation()
     const {
         pages: {account: accountConfig}
@@ -101,7 +102,7 @@ const AccountOrderHistory = () => {
 
     const pageUrls = usePageUrls({total: paging.total, limit})
 
-    const messages = {
+    const messages = useMemo(() => ({
         orderHistory: formatMessage({
             defaultMessage: 'Order History',
             id: 'account_order_history.title.order_history'
@@ -154,7 +155,7 @@ const AccountOrderHistory = () => {
             defaultMessage: 'Continue Shopping',
             id: 'account_order_history.button.continue_shopping'
         })
-    }
+    }), [intl])
 
     const headingRef = useRef()
     useEffect(() => {
