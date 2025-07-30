@@ -35,6 +35,7 @@ import CartItemVariantPrice from '@salesforce/retail-react-app/app/components/it
 import CancelOrderModal from '@salesforce/retail-react-app/app/components/cancel-order-modal'
 import PropTypes from 'prop-types'
 import OrderStatusBar from '@salesforce/retail-react-app/app/components/order-status-bar/index'
+import {getOrderStatusColorScheme} from '@salesforce/retail-react-app/app/pages/account/order-history'
 
 const onClient = typeof window !== 'undefined'
 
@@ -216,7 +217,13 @@ const AccountOrderDetail = () => {
                                         values={{orderNumber: order.orderNo}}
                                     />
                                 </Text>
-                                <Badge colorScheme="green">{order.status}</Badge>
+                                <Badge
+                                    bg={getOrderStatusColorScheme(order.status).bg}
+                                    color={getOrderStatusColorScheme(order.status).color}
+                                    variant="solid"
+                                >
+                                    {order.status}
+                                </Badge>
                             </Stack>
                         </Stack>
                     ) : (
