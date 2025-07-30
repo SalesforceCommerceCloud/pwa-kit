@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React, {useEffect, useState} from 'react'
+import React, {useEffect, useState, useMemo} from 'react'
 import {useIntl} from 'react-intl'
 import PropTypes from 'prop-types'
 
@@ -26,9 +26,28 @@ import useMultiSite from '../../hooks/use-multi-site'
 
 const StoresList = ({storesInfo}) => {
     const intl = useIntl()
+    const {formatMessage} = intl
     const {site} = useMultiSite()
     const storeInfoKey = `store_${site.id}`
     const [selectedStore, setSelectedStore] = useState('')
+
+    const messages = useMemo(
+        () => ({
+            away: formatMessage({
+                id: 'store_locator.description.away',
+                defaultMessage: 'away'
+            }),
+            phone: formatMessage({
+                id: 'store_locator.description.phone',
+                defaultMessage: 'Phone:'
+            }),
+            viewMore: formatMessage({
+                id: 'store_locator.action.viewMore',
+                defaultMessage: 'View More'
+            })
+        }),
+        [intl]
+    )
 
     useEffect(() => {
         setSelectedStore(JSON.parse(window.localStorage.getItem(storeInfoKey))?.id || '')
@@ -71,11 +90,7 @@ const StoresList = ({storesInfo}) => {
                                     <>
                                         <br />
                                         <Box fontSize="md" color="gray.600">
-                                            {store.distance} {store.distanceUnit}{' '}
-                                            {intl.formatMessage({
-                                                id: 'store_locator.description.away',
-                                                defaultMessage: 'away'
-                                            })}
+                                            {store.distance} {store.distanceUnit} {messages.away}
                                         </Box>
                                     </>
                                 )}
@@ -83,11 +98,7 @@ const StoresList = ({storesInfo}) => {
                                     <>
                                         <br />
                                         <Box fontSize="md" color="gray.600">
-                                            {intl.formatMessage({
-                                                id: 'store_locator.description.phone',
-                                                defaultMessage: 'Phone:'
-                                            })}{' '}
-                                            {store.phone}
+                                            {messages.phone} {store.phone}
                                         </Box>
                                     </>
                                 )}
@@ -98,12 +109,7 @@ const StoresList = ({storesInfo}) => {
                                             color="blue.700"
                                             sx={{marginTop: '10px', paddingBottom: '0px'}}
                                         >
-                                            <Box fontSize="lg">
-                                                {intl.formatMessage({
-                                                    id: 'store_locator.action.viewMore',
-                                                    defaultMessage: 'View More'
-                                                })}
-                                            </Box>
+                                            <Box fontSize="lg">{messages.viewMore}</Box>
                                             <AccordionIcon />
                                         </AccordionButton>
                                         <AccordionPanel mb={6} mt={4}>

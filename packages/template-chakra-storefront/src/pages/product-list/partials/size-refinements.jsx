@@ -18,6 +18,10 @@ const SizeRefinements = ({filter, toggleFilter, selectedFilters}) => {
     })
     const styles = recipe()
 
+    const getAriaLabel = (isSelected, value) => {
+        return formatMessage(isSelected ? REMOVE_FILTER : ADD_FILTER, value)
+    }
+
     return (
         <SimpleGrid templateColumns="repeat(auto-fit, 44px)" gap={4} mt={1}>
             {filter.values?.map((value, idx) => {
@@ -40,7 +44,7 @@ const SizeRefinements = ({filter, toggleFilter, selectedFilters}) => {
                         variant="outline"
                         marginBottom={0}
                         marginRight={0}
-                        aria-label={formatMessage(isSelected ? REMOVE_FILTER : ADD_FILTER, value)}
+                        aria-label={getAriaLabel(isSelected, value)}
                     >
                         <Center css={styles.swatchButton}>{value.label}</Center>
                     </Button>

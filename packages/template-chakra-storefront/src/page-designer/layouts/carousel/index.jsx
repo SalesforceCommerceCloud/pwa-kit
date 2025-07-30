@@ -39,6 +39,7 @@ import {useIntl} from 'react-intl'
  */
 export const Carousel = (props = {}) => {
     const intl = useIntl()
+    const {formatMessage} = intl
     const scrollRef = useRef()
     const breakpoint = useBreakpoint()
     const [hasOverflow, setHasOverflow] = useState(false)
@@ -93,6 +94,20 @@ export const Carousel = (props = {}) => {
 
     const components = regions[0]?.components || []
     const itemCount = components.length
+
+    const messages = useMemo(
+        () => ({
+            scrollLeft: formatMessage({
+                id: 'carousel.button.scroll_left.assistive_msg',
+                defaultMessage: 'Scroll carousel left'
+            }),
+            scrollRight: formatMessage({
+                id: 'carousel.button.scroll_right.assistive_msg',
+                defaultMessage: 'Scroll carousel right'
+            })
+        }),
+        [intl]
+    )
 
     // Scroll the container left or right by 100%. Passing no args or `1`
     // scrolls to the right, and passing `-1` scrolls left.
@@ -174,10 +189,7 @@ export const Carousel = (props = {}) => {
                     {/* boxShadow requires !important --> https://github.com/chakra-ui/chakra-ui/issues/3553 */}
                     <IconButton
                         data-testid="carousel-nav-left"
-                        aria-label={intl.formatMessage({
-                            id: 'carousel.button.scroll_left.assistive_msg',
-                            defaultMessage: 'Scroll carousel left'
-                        })}
+                        aria-label={messages.scrollLeft}
                         icon={<ChevronLeftIcon color="black" />}
                         borderRadius="full"
                         colorScheme="whiteAlpha"
@@ -196,10 +208,7 @@ export const Carousel = (props = {}) => {
                     {/* boxShadow requires !important --> https://github.com/chakra-ui/chakra-ui/issues/3553 */}
                     <IconButton
                         data-testid="carousel-nav-right"
-                        aria-label={intl.formatMessage({
-                            id: 'carousel.button.scroll_right.assistive_msg',
-                            defaultMessage: 'Scroll carousel right'
-                        })}
+                        aria-label={messages.scrollRight}
                         icon={<ChevronRightIcon color="black" />}
                         borderRadius="full"
                         colorScheme="whiteAlpha"

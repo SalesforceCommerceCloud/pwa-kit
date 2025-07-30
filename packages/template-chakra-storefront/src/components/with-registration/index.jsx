@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React from 'react'
+import React, {useMemo} from 'react'
 import {AuthModal, useAuthModal} from '../../hooks/use-auth-modal'
 import PropTypes from 'prop-types'
 import {noop} from '../../utils/utils'
@@ -31,7 +31,18 @@ const withRegistration = (
         const authModal = useAuthModal()
         const toast = useToast()
         const location = useLocation()
-        const {formatMessage, locale} = useIntl()
+        const intl = useIntl()
+        const {formatMessage, locale} = intl
+
+        const messages = useMemo(
+            () => ({
+                pleaseSignIn: formatMessage({
+                    id: 'with_registration.info.please_sign_in',
+                    defaultMessage: 'Please sign in to continue!'
+                })
+            }),
+            [intl]
+        )
 
         const handleClick = (e) => {
             e.preventDefault()
@@ -39,10 +50,7 @@ const withRegistration = (
                 // Do not show auth modal if users is already on the login page
                 if (isLoginPage(location, locale)) {
                     toast({
-                        title: formatMessage({
-                            defaultMessage: 'Please sign in to continue!',
-                            id: 'with_registration.info.please_sign_in'
-                        }),
+                        title: messages.pleaseSignIn,
                         type: 'info'
                     })
                 } else {

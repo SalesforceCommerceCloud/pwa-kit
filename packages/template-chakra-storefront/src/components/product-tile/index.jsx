@@ -95,6 +95,7 @@ const ProductTile = (props) => {
     const {imageGroups, productId, representedProduct, variants} = product
 
     const intl = useIntl()
+    const {formatMessage} = intl
     const {currency} = useCurrency()
     const isFavouriteLoading = useRef(false)
     const recipe = useSlotRecipe({key: 'productTile'})
@@ -163,6 +164,27 @@ const ProductTile = (props) => {
         return getPriceData(productWithFilteredVariants)
     }, [productWithFilteredVariants])
 
+    // Message formatting
+    const messages = useMemo(
+        () => ({
+            removeFromWishlist: formatMessage(
+                {
+                    id: 'product_tile.assistive_msg.remove_from_wishlist',
+                    defaultMessage: 'Remove {product} from wishlist'
+                },
+                {product: localizedProductName}
+            ),
+            addToWishlist: formatMessage(
+                {
+                    id: 'product_tile.assistive_msg.add_to_wishlist',
+                    defaultMessage: 'Add {product} to wishlist'
+                },
+                {product: localizedProductName}
+            )
+        }),
+        [intl, localizedProductName]
+    )
+
     // Retrieve product badges
     const filteredLabels = useMemo(() => {
         const labelsMap = new Map()
@@ -173,7 +195,7 @@ const ProductTile = (props) => {
                     typeof product.representedProduct[item.propertyName] === 'boolean' &&
                     product.representedProduct[item.propertyName] === true
                 ) {
-                    labelsMap.set(intl.formatMessage(item.label), item.color)
+                    labelsMap.set(formatMessage(item.label), item.color)
                 }
             })
         }
@@ -273,21 +295,7 @@ const ProductTile = (props) => {
                     <IconButtonWithRegistration
                         data-testid="wishlist-button"
                         aria-label={
-                            isFavourite
-                                ? intl.formatMessage(
-                                      {
-                                          id: 'product_tile.assistive_msg.remove_from_wishlist',
-                                          defaultMessage: 'Remove {product} from wishlist'
-                                      },
-                                      {product: localizedProductName}
-                                  )
-                                : intl.formatMessage(
-                                      {
-                                          id: 'product_tile.assistive_msg.add_to_wishlist',
-                                          defaultMessage: 'Add {product} to wishlist'
-                                      },
-                                      {product: localizedProductName}
-                                  )
+                            isFavourite ? messages.removeFromWishlist : messages.addToWishlist
                         }
                         variant="unstyled"
                         css={styles.favIcon}

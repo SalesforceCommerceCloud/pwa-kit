@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React from 'react'
+import React, {useMemo} from 'react'
 import {useIntl} from 'react-intl'
 import PropTypes from 'prop-types'
 import {Box, Container} from '@chakra-ui/react'
@@ -21,21 +21,28 @@ import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import {API_ERROR_MESSAGE, FEATURE_UNAVAILABLE_ERROR_MESSAGE} from '../../../config/constants'
 
 const ResetPassword = () => {
-    const {formatMessage} = useIntl()
+    const intl = useIntl()
+    const {formatMessage} = intl
     const form = useForm()
     const navigate = useNavigation()
     const {path} = useRouteMatch()
     const {getPasswordResetToken} = usePasswordReset()
     const {login: loginConfig} = getConfig()
 
+    const messages = useMemo(
+        () => ({
+            featureUnavailableError: formatMessage(FEATURE_UNAVAILABLE_ERROR_MESSAGE),
+            apiError: formatMessage(API_ERROR_MESSAGE)
+        }),
+        [intl]
+    )
+
     const submitForm = async ({email}) => {
         try {
             await getPasswordResetToken(email)
         } catch (e) {
             const message =
-                e.response?.status === 400
-                    ? formatMessage(FEATURE_UNAVAILABLE_ERROR_MESSAGE)
-                    : formatMessage(API_ERROR_MESSAGE)
+                e.response?.status === 400 ? messages.featureUnavailableError : messages.apiError
             form.setError('global', {type: 'manual', message})
         }
     }

@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import {useEffect, useState} from 'react'
+import {useEffect, useState, useMemo} from 'react'
 import {removeQueryParamsFromPath} from '../utils/url'
 import {useHistory, useLocation} from 'react-router-dom'
 import {useVariant} from './use-variant'
@@ -25,9 +25,17 @@ export const useProductViewModal = (initialProduct) => {
     const location = useLocation()
     const history = useHistory()
     const intl = useIntl()
+    const {formatMessage} = intl
     const toast = useToast()
     const [product, setProduct] = useState(initialProduct)
     const variant = useVariant(product)
+
+    const messages = useMemo(
+        () => ({
+            apiError: formatMessage(API_ERROR_MESSAGE)
+        }),
+        [intl]
+    )
 
     const {
         data: currentProduct,
@@ -58,7 +66,7 @@ export const useProductViewModal = (initialProduct) => {
     useEffect(() => {
         if (!isError) return
         toast({
-            title: intl.formatMessage(API_ERROR_MESSAGE),
+            title: messages.apiError,
             type: 'error'
         })
     }, [isError])

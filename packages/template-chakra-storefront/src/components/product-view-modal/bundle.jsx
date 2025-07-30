@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React, {useState, useRef} from 'react'
+import React, {useState, useRef, useMemo} from 'react'
 import PropTypes from 'prop-types'
 import {useIntl} from 'react-intl'
 import {Box, CloseButton, Dialog, Flex, VStack, useBreakpointValue} from '@chakra-ui/react'
@@ -52,12 +52,19 @@ const BundleProductViewModal = ({product: bundle, isOpen, onClose, updateCart, .
     )
 
     const intl = useIntl()
-    const label = intl.formatMessage(
-        {
-            defaultMessage: 'Edit modal for {productName}',
-            id: 'cart.product_edit_modal.modal_label'
-        },
-        {productName: productViewModalData?.product?.name}
+    const {formatMessage} = intl
+
+    const messages = useMemo(
+        () => ({
+            modalLabel: formatMessage(
+                {
+                    id: 'cart.product_edit_modal.modal_label',
+                    defaultMessage: 'Edit modal for {productName}'
+                },
+                {productName: productViewModalData?.product?.name}
+            )
+        }),
+        [intl]
     )
 
     return (
@@ -71,7 +78,10 @@ const BundleProductViewModal = ({product: bundle, isOpen, onClose, updateCart, .
             <SafePortal>
                 <Dialog.Backdrop />
                 <Dialog.Positioner>
-                    <Dialog.Content data-testid="product-view-modal" aria-label={label}>
+                    <Dialog.Content
+                        data-testid="product-view-modal"
+                        aria-label={messages.modalLabel}
+                    >
                         <Dialog.Body pb={8} bg="white" paddingBottom={6} marginTop={6}>
                             <Flex direction={['column', 'column', 'column', 'row']}>
                                 {/* Due to desktop layout, we'll need to render the image gallery separately, from outside the ProductView */}
