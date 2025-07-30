@@ -132,7 +132,8 @@ const AccountOrderHistory = () => {
                 formatMessage(
                     {
                         defaultMessage: '{count} items',
-                        id: 'account_order_history.label.num_of_items'
+                        id: 'account_order_history.label.num_of_items',
+                        description: 'Number of items in the order'
                     },
                     {count}
                 ),

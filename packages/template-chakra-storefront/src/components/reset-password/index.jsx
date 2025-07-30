@@ -34,7 +34,8 @@ const ResetPasswordForm = ({submitForm, clickSignIn = noop, form}) => {
             }),
             returnToSignIn: formatMessage({
                 id: 'reset_password_form.message.return_to_sign_in',
-                defaultMessage: 'Or return to'
+                defaultMessage: 'Or return to',
+                description: 'Precedes link to return to sign in'
             }),
             signInButton: formatMessage({
                 id: 'reset_password_form.action.sign_in',

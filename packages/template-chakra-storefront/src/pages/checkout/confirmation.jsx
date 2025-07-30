@@ -122,7 +122,9 @@ const CheckoutConfirmation = () => {
             itemCount: formatMessage(
                 {
                     id: 'checkout_confirmation.message.num_of_items_in_order',
-                    defaultMessage: '{itemCount, plural, =0 {0 items} one {# item} other {# items}}'
+                    defaultMessage:
+                        '{itemCount, plural, =0 {0 items} one {# item} other {# items}}',
+                    description: '# item(s) in order'
                 },
                 {
                     itemCount: order?.productItems?.reduce((a, b) => a + b.quantity, 0) || 0

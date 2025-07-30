@@ -50,7 +50,8 @@ const CartItems = ({basket}) => {
                 {
                     id: 'order_summary.cart_items.action.num_of_items_in_cart',
                     defaultMessage:
-                        '{itemCount, plural, =0 {0 items} one {# item} other {# items}} in cart'
+                        '{itemCount, plural, =0 {0 items} one {# item} other {# items}} in cart',
+                    description: 'clicking it would expand/show the items in cart'
                 },
                 {itemCount: totalItems}
             ),

@@ -34,11 +34,13 @@ const ItemImage = ({imageProps, ratio = 1, ...props}) => {
         () => ({
             sale: formatMessage({
                 id: 'item_image.label.sale',
-                defaultMessage: 'Sale'
+                defaultMessage: 'Sale',
+                description: 'A sale badge placed on top of a product image'
             }),
             unavailable: formatMessage({
                 id: 'item_image.label.unavailable',
-                defaultMessage: 'Unavailable'
+                defaultMessage: 'Unavailable',
+                description: 'A unavailable badge placed on top of a product image'
             })
         }),
         [intl]
