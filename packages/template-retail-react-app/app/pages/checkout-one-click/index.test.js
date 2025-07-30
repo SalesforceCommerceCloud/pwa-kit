@@ -1255,7 +1255,8 @@ test('Can register account during checkout as a guest', async () => {
             firstName: 'John',
             lastName: 'Smith',
             email: 'customer@test.com',
-            login: 'customer@test.com'
+            login: 'customer@test.com',
+            phoneHome: '(727) 555-1234'
         },
         password: expect.any(String)
     })
