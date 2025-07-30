@@ -301,12 +301,10 @@ test('Renders error when given incorrect login credentials', async () => {
         await user.click(signInButton)
     })
     // give it some time to show the error in the form
-    await waitFor(
-        () => {
-            // wait for login error alert to appear
-            expect(screen.getByText(/Something went wrong. Try again!/i)).toBeInTheDocument()
-        }
-    )
+    await waitFor(() => {
+        // wait for login error alert to appear
+        expect(screen.getByText(/Something went wrong. Try again!/i)).toBeInTheDocument()
+    })
 })
 
 test('Allows customer to create an account', async () => {
@@ -392,13 +390,11 @@ test('Allows customer to create an account', async () => {
         expect(form).not.toBeInTheDocument()
     })
     // wait for success state to appear
-    await waitFor(
-        () => {
-            expect(window.location.pathname).toBe('/uk/en-GB/account')
-            const myAccount = screen.getAllByText(/My Account/)
-            expect(myAccount).toHaveLength(2)
-        }
-    )
+    await waitFor(() => {
+        expect(window.location.pathname).toBe('/uk/en-GB/account')
+        const myAccount = screen.getAllByText(/My Account/)
+        expect(myAccount).toHaveLength(2)
+    })
 })
 
 test('Allows customer to sign in to their account', async () => {
@@ -436,13 +432,11 @@ test('Allows customer to sign in to their account', async () => {
     })
 
     // allow time to transition to account page
-    await waitFor(
-        () => {
-            expect(window.location.pathname).toBe('/uk/en-GB/account')
-            const myAccount = screen.getAllByText(/My Account/)
-            expect(myAccount).toHaveLength(2)
-        }
-    )
+    await waitFor(() => {
+        expect(window.location.pathname).toBe('/uk/en-GB/account')
+        const myAccount = screen.getAllByText(/My Account/)
+        expect(myAccount).toHaveLength(2)
+    })
 })
 
 describe('Reset password', function () {
@@ -477,13 +471,11 @@ describe('Reset password', function () {
         })
 
         // wait for success state
-        await waitFor(
-            () => {
-                expect(mockGetPasswordResetToken).toHaveBeenCalledWith('foo@test.com')
-                expect(screen.getByText(/password reset/i)).toBeInTheDocument()
-                expect(screen.getByText(/foo@test.com/i)).toBeInTheDocument()
-            }
-        )
+        await waitFor(() => {
+            expect(mockGetPasswordResetToken).toHaveBeenCalledWith('foo@test.com')
+            expect(screen.getByText(/password reset/i)).toBeInTheDocument()
+            expect(screen.getByText(/foo@test.com/i)).toBeInTheDocument()
+        })
     })
 
     test('Allows customer to open generate password token modal from everywhere', async () => {
