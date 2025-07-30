@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React, {Fragment} from 'react'
+import React, {Fragment, useMemo} from 'react'
 import {Button, Text, Flex, Stack, Link} from '@chakra-ui/react'
 import PropTypes from 'prop-types'
 import {Link as RouteLink} from 'react-router-dom'
@@ -15,14 +15,15 @@ import RecommendedProducts from '../../../components/recommended-products'
 import {EINSTEIN_RECOMMENDERS} from '../../../../config/constants'
 
 const EmptySearchResults = ({searchQuery, category}) => {
-    const {formatMessage} = useIntl()
+    const intl = useIntl()
+    const {formatMessage} = intl
 
     const contactUsText = formatMessage({
         id: 'empty_search_results.link.contact_us',
         defaultMessage: 'Contact Us'
     })
 
-    const messages = {
+    const messages = useMemo(() => ({
         contactUs: contactUsText,
         topSellers: formatMessage({
             id: 'empty_search_results.recommended_products.title.top_sellers',
@@ -36,7 +37,7 @@ const EmptySearchResults = ({searchQuery, category}) => {
             {
                 id: 'empty_search_results.info.cant_find_anything_for_category',
                 defaultMessage:
-                    'We couldn't find anything for {category}. Try searching for a product or {link}.'
+                    `We couldn't find anything for {category}. Try searching for a product or {link}.`
             },
             {
                 category: category?.name,
@@ -50,7 +51,7 @@ const EmptySearchResults = ({searchQuery, category}) => {
         cantFindAnythingForQuery: formatMessage(
             {
                 id: 'empty_search_results.info.cant_find_anything_for_query',
-                defaultMessage: 'We couldn't find anything for "{searchQuery}".'
+                defaultMessage: `We couldn't find anything for "{searchQuery}".`
             },
             {
                 searchQuery: searchQuery
@@ -70,7 +71,8 @@ const EmptySearchResults = ({searchQuery, category}) => {
                 )
             }
         )
-    }
+    }), [intl])
+
     return (
         <Flex
             data-testid="sf-product-empty-list-page"

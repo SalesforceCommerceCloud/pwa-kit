@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React, {useEffect, useContext} from 'react'
+import React, {useEffect, useContext, useMemo} from 'react'
 import {useIntl} from 'react-intl'
 import PropTypes from 'prop-types'
 
@@ -77,8 +77,9 @@ const StoreLocatorInput = ({form, submitForm}) => {
     const getUserGeolocation = useGeolocation()
     const {control} = form
     const intl = useIntl()
+    const {formatMessage} = intl
 
-    const messages = {
+    const messages = useMemo(() => ({
         errors: {
             selectCountry: intl.formatMessage({
                 id: 'store_locator.error.please_select_a_country',
@@ -117,7 +118,7 @@ const StoreLocatorInput = ({form, submitForm}) => {
             id: 'store_locator.description.or',
             defaultMessage: 'Or'
         })
-    }
+    }), [intl])
     return (
         <form id="store-locator-form" onSubmit={form.handleSubmit(submitForm)}>
             <InputGroup>
