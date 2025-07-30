@@ -44,7 +44,7 @@ Total files: 97
 - [x] src/components/promo-popover/index.jsx
 - [x] src/components/quantity-picker/index.jsx
 - [x] src/components/recommended-products/index.jsx
-- [ ] src/components/register/index.jsx
+- [x] src/components/register/index.jsx
 - [ ] src/components/reset-password/index.jsx
 - [ ] src/components/search/index.jsx
 - [ ] src/components/search/partials/recent-searches.jsx
@@ -101,5 +101,5 @@ Total files: 97
 - [ ] src/pages/product-list/partials/sort.jsx
 - [ ] src/pages/registration/index.jsx
 - [ ] src/pages/reset-password/index.jsx
-- [ ] src/pages/reset-password/reset-password-landing.jsx
-- [ ] src/pages/social-login-redirect/index.jsx
+- [x] src/pages/reset-password/reset-password-landing.jsx
+- [x] src/pages/social-login-redirect/index.jsx

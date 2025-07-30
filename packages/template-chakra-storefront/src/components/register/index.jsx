@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React, {Fragment} from 'react'
+import React, {Fragment, useMemo} from 'react'
 import PropTypes from 'prop-types'
 import {useIntl} from 'react-intl'
 import {Alert, Button, Stack, Text} from '@chakra-ui/react'
@@ -15,9 +15,10 @@ import RegistrationFields from '../../components/forms/registration-fields'
 import Link from '../../components/link'
 
 const RegisterForm = ({submitForm, clickSignIn = noop, form}) => {
-    const {formatMessage} = useIntl()
+    const intl = useIntl()
+    const {formatMessage} = intl
 
-    const messages = {
+    const messages = useMemo(() => ({
         heading: formatMessage({
             id: 'register_form.heading.lets_get_started',
             defaultMessage: "Let's get started!"
@@ -48,7 +49,7 @@ const RegisterForm = ({submitForm, clickSignIn = noop, form}) => {
                 },
                 {policy, terms}
             )
-    }
+    }), [intl])
     return (
         <Fragment>
             <Stack justifyContent="center" alignItems="center" gap={8}>

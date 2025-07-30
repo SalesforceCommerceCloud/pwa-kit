@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React from 'react'
+import React, {useMemo} from 'react'
 import PropTypes from 'prop-types'
 import {useForm} from 'react-hook-form'
 import {useLocation} from 'react-router-dom'
@@ -25,7 +25,8 @@ import {
 
 const ResetPasswordLanding = () => {
     const form = useForm()
-    const {formatMessage} = useIntl()
+    const intl = useIntl()
+    const {formatMessage} = intl
     const {search} = useLocation()
     const navigate = useNavigation()
     const queryParams = new URLSearchParams(search)
@@ -35,7 +36,7 @@ const ResetPasswordLanding = () => {
     const password = form.watch('password')
     const {resetPassword} = usePasswordReset()
 
-    const messages = {
+    const messages = useMemo(() => ({
         title: formatMessage({
             id: 'reset_password_form.title.reset_password',
             defaultMessage: 'Reset Password'
@@ -46,7 +47,7 @@ const ResetPasswordLanding = () => {
         }),
         invalidTokenError: formatMessage(INVALID_TOKEN_ERROR_MESSAGE),
         apiError: formatMessage(API_ERROR_MESSAGE)
-    }
+    }), [intl])
 
     const submit = async (values) => {
         form.clearErrors()
