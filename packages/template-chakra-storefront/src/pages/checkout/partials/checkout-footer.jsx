@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React from 'react'
+import React, {useMemo} from 'react'
 import PropTypes from 'prop-types'
 import {useIntl} from 'react-intl'
 import {
@@ -25,9 +25,10 @@ import {HideOnDesktop, HideOnMobile} from '../../../components/responsive'
 const CheckoutFooter = ({...otherProps}) => {
     const recipe = useSlotRecipe({key: 'checkoutFooter'})
     const styles = recipe()
-    const {formatMessage} = useIntl()
+    const intl = useIntl()
+    const {formatMessage} = intl
 
-    const messages = {
+    const messages = useMemo(() => ({
         shipping: formatMessage({
             id: 'checkout_footer.link.shipping',
             defaultMessage: 'Shipping'
@@ -41,7 +42,7 @@ const CheckoutFooter = ({...otherProps}) => {
             defaultMessage:
                 'Salesforce or its affiliates. All rights reserved. This is a demo store only. Orders made WILL NOT be processed.'
         })
-    }
+    }), [intl])
 
     return (
         <Box as="footer" css={styles.container} {...otherProps}>

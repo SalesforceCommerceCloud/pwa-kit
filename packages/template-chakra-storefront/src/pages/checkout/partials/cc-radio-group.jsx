@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React, {useCallback} from 'react'
+import React, {useCallback, useMemo} from 'react'
 import PropTypes from 'prop-types'
 import {useIntl} from 'react-intl'
 import {Button, Stack, Text, SimpleGrid, Field} from '@chakra-ui/react'
@@ -21,15 +21,16 @@ const CCRadioGroup = ({
     togglePaymentEdit = () => null,
     onPaymentIdChange = () => null
 }) => {
-    const {formatMessage} = useIntl()
+    const intl = useIntl()
+    const {formatMessage} = intl
     const {data: customer} = useCurrentCustomer()
 
-    const messages = {
+    const messages = useMemo(() => ({
         addNewCard: formatMessage({
             id: 'cc_radio_group.button.add_new_card',
             defaultMessage: 'Add New Card'
         })
-    }
+    }), [intl])
 
     const handleValueChange = useCallback(
         (selected) => {
