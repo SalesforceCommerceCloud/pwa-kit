@@ -308,6 +308,7 @@ export const AddToCartModal = () => {
                                                 </Flex>
                                             )
                                         })}
+                                    {/* TODO: replace with text fetched from promotion */}
                                     <Text mb={2} fontSize="md" fontWeight="normal" textAlign="left">
                                         {'Bonus products available!'}
                                     </Text>
@@ -316,7 +317,10 @@ export const AddToCartModal = () => {
                                         to="/checkout"
                                         width="100%"
                                         variant="outline-gray"
-                                        size="sm"
+                                        size="md"
+                                        height={9}
+                                        minWidth={11}
+                                        textStyle="sm"
                                     >
                                         {intl.formatMessage({
                                             defaultMessage: 'Select Bonus Products',

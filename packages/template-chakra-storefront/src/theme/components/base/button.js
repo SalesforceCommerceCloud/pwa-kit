@@ -105,11 +105,6 @@ const button = defineRecipe({
             }
         },
         size: {
-            sm: {
-                height: 9,
-                minWidth: 11,
-                textStyle: 'sm'
-            },
             md: {
                 height: 11,
                 minWidth: 11,
