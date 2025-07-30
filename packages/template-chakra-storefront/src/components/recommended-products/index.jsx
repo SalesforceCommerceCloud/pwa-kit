@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React, {useEffect, useRef, useState} from 'react'
+import React, {useEffect, useRef, useState, useMemo} from 'react'
 import PropTypes from 'prop-types'
 import {useIntl} from 'react-intl'
 import {Button} from '@chakra-ui/react'
@@ -52,15 +52,16 @@ const RecommendedProducts = ({zone, recommender, products, title, shouldFetch, .
     )
     const toast = useToast()
     const navigate = useNavigation()
-    const {formatMessage} = useIntl()
+    const intl = useIntl()
+    const {formatMessage} = intl
 
-    const messages = {
+    const messages = useMemo(() => ({
         toastAddedToWishlist: (quantity) =>
             formatMessage(TOAST_MESSAGE_ADDED_TO_WISHLIST, {quantity}),
         toastViewWishlist: formatMessage(TOAST_ACTION_VIEW_WISHLIST),
         toastRemovedFromWishlist: formatMessage(TOAST_MESSAGE_REMOVED_FROM_WISHLIST),
         apiError: formatMessage(API_ERROR_MESSAGE)
-    }
+    }), [intl])
 
     const ref = useRef()
     const isOnScreen = useIntersectionObserver(ref, {useOnce: true})

@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React, {useEffect, useState} from 'react'
+import React, {useEffect, useState, useMemo} from 'react'
 import {useIntl} from 'react-intl'
 import {Alert, Box, Container, Stack, Text, Spinner} from '@chakra-ui/react'
 
@@ -21,7 +21,8 @@ import {API_ERROR_MESSAGE} from '../../../config/constants'
 import {AlertIcon} from '../../components/icons'
 
 const SocialLoginRedirect = () => {
-    const {formatMessage} = useIntl()
+    const intl = useIntl()
+    const {formatMessage} = intl
     const navigate = useNavigation()
     const [searchParams] = useSearchParams()
     const loginIDPUser = useAuthHelper(AuthHelpers.LoginIDPUser)
@@ -36,7 +37,7 @@ const SocialLoginRedirect = () => {
     const mergeBasket = useShopperBasketsMutation('mergeBasket')
     const [error, setError] = useState('')
 
-    const messages = {
+    const messages = useMemo(() => ({
         apiError: formatMessage(API_ERROR_MESSAGE),
         authenticating: formatMessage({
             id: 'social_login_redirect.message.authenticating',
@@ -56,7 +57,7 @@ const SocialLoginRedirect = () => {
                 )
             }
         )
-    }
+    }), [intl])
 
     // Runs after successful 3rd-party IDP authorization, processing query parameters
     useEffect(() => {

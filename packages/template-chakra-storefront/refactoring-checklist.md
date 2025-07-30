@@ -43,7 +43,7 @@ Total files: 97
 - [x] src/components/promo-code/index.jsx
 - [x] src/components/promo-popover/index.jsx
 - [x] src/components/quantity-picker/index.jsx
-- [ ] src/components/recommended-products/index.jsx
+- [x] src/components/recommended-products/index.jsx
 - [ ] src/components/register/index.jsx
 - [ ] src/components/reset-password/index.jsx
 - [ ] src/components/search/index.jsx
