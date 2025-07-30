@@ -45,7 +45,7 @@ Total files: 97
 - [x] src/components/quantity-picker/index.jsx
 - [x] src/components/recommended-products/index.jsx
 - [x] src/components/register/index.jsx
-- [ ] src/components/reset-password/index.jsx
+- [x] src/components/reset-password/index.jsx
 - [ ] src/components/search/index.jsx
 - [ ] src/components/search/partials/recent-searches.jsx
 - [ ] src/components/social-login/index.jsx

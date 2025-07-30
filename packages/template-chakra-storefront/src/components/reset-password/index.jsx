@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React, {Fragment} from 'react'
+import React, {Fragment, useMemo} from 'react'
 import PropTypes from 'prop-types'
 import {useIntl} from 'react-intl'
 import {Alert, Button, Stack, Text} from '@chakra-ui/react'
@@ -14,9 +14,10 @@ import {noop} from '../../utils/utils'
 import ResetPasswordFields from '../../components/forms/reset-password-fields'
 
 const ResetPasswordForm = ({submitForm, clickSignIn = noop, form}) => {
-    const {formatMessage} = useIntl()
+    const intl = useIntl()
+    const {formatMessage} = intl
 
-    const messages = {
+    const messages = useMemo(() => ({
         title: formatMessage({
             id: 'reset_password_form.title.reset_password',
             defaultMessage: 'Reset Password'
@@ -56,7 +57,7 @@ const ResetPasswordForm = ({submitForm, clickSignIn = noop, form}) => {
             id: 'auth_modal.password_reset_success.button.back_to_sign_in',
             defaultMessage: 'Back to Sign In'
         })
-    }
+    }), [intl])
     return (
         <Fragment>
             {!form.formState.isSubmitSuccessful ? (

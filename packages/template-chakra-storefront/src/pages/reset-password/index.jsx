@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React from 'react'
+import React, {useMemo} from 'react'
 import {useIntl} from 'react-intl'
 import PropTypes from 'prop-types'
 import {Box, Container} from '@chakra-ui/react'
@@ -21,17 +21,18 @@ import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import {API_ERROR_MESSAGE, FEATURE_UNAVAILABLE_ERROR_MESSAGE} from '../../../config/constants'
 
 const ResetPassword = () => {
-    const {formatMessage} = useIntl()
+    const intl = useIntl()
+    const {formatMessage} = intl
     const form = useForm()
     const navigate = useNavigation()
     const {path} = useRouteMatch()
     const {getPasswordResetToken} = usePasswordReset()
     const {login: loginConfig} = getConfig()
 
-    const messages = {
+    const messages = useMemo(() => ({
         featureUnavailableError: formatMessage(FEATURE_UNAVAILABLE_ERROR_MESSAGE),
         apiError: formatMessage(API_ERROR_MESSAGE)
-    }
+    }), [intl])
 
     const submitForm = async ({email}) => {
         try {
