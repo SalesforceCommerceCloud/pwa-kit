@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React, {Children, useCallback, useEffect, useRef, useState} from 'react'
+import React, {Children, useCallback, useEffect, useRef, useState, useMemo} from 'react'
 import PropTypes from 'prop-types'
 import {Box, Flex, HStack, useSlotRecipe} from '@chakra-ui/react'
 import {useIntl} from 'react-intl'
@@ -27,17 +27,18 @@ const SwatchGroup = (props) => {
     const styles = recipe()
     const [selectedIndex, setSelectedIndex] = useState(0)
     const wrapperRef = useRef(null)
-    const {formatMessage} = useIntl()
+    const intl = useIntl()
+    const {formatMessage} = intl
 
-    const messages = {
-        selectedLabel: formatMessage(
+    const messages = useMemo(() => ({
+        selectedLabel: intl.formatMessage(
             {
                 id: 'swatch_group.selected.label',
                 defaultMessage: '{label}:'
             },
             {label}
         )
-    }
+    }), [intl, label])
 
     // Handle keyboard navigation.
     const onKeyDown = useCallback(

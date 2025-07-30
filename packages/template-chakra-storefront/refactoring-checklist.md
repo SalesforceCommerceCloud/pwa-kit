@@ -52,7 +52,7 @@ Total files: 97
 - [x] src/components/store-locator-modal/store-locator-content.jsx
 - [x] src/components/store-locator-modal/store-locator-input.jsx
 - [x] src/components/store-locator-modal/stores-list.jsx
-- [ ] src/components/swatch-group/index.jsx
+- [x] src/components/swatch-group/index.jsx
 - [ ] src/components/toggle-card/index.jsx
 - [ ] src/components/with-registration/index.jsx
 - [ ] src/hooks/use-add-to-cart-modal.js
@@ -92,7 +92,7 @@ Total files: 97
 - [ ] src/pages/product-detail/partials/recommended-products-section.jsx
 - [ ] src/pages/product-list/partials/category-links.jsx
 - [ ] src/pages/product-list/partials/color-refinements.jsx
-- [ ] src/pages/product-list/partials/empty-results.jsx
+- [x] src/pages/product-list/partials/empty-results.jsx
 - [x] src/pages/product-list/partials/page-header.jsx
 - [x] src/pages/product-list/partials/product-list-header.jsx
 - [x] src/pages/product-list/partials/product-list-title.jsx
