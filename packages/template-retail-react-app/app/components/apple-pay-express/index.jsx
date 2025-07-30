@@ -110,7 +110,7 @@ export const getAppleButtonConfig = (
         
         // For PDP flows, create temporary basket if needed (and SKU is available)
         if (isPdpMode && sku && setTempBasket) {
-            const newBasket = await createTemporaryBasket(sku, authToken, site, quantity)
+            const newBasket = await createTemporaryBasket(sku, authToken, site, 1)
             sharedBasketRef = newBasket  // Update shared reference immediately
             setTempBasket(newBasket)     // Update React state for re-renders
             return newBasket

@@ -48,22 +48,13 @@ function Express() {
             // In production, you might want to restrict this to specific origins
             
             if (event.data && typeof event.data === 'object') {
-                const {type, sku, quantity} = event.data
+                const {type, sku} = event.data
                 
                 // Handle SKU update messages
                 if (type === 'UPDATE_SKU' && typeof sku === 'string') {
                     setCurrentSku(sku)
-                    // Reset quantity to 1 when SKU changes (unless specified)
-                    if (typeof quantity === 'number' && quantity > 0) {
-                        setCurrentQuantity(quantity)
-                    } else {
-                        setCurrentQuantity(1)
-                    }
-                }
-                
-                // Handle quantity-only updates
-                if (type === 'UPDATE_QUANTITY' && typeof quantity === 'number' && quantity > 0) {
-                    setCurrentQuantity(quantity)
+                    // Always set quantity to 1 when SKU changes
+                    setCurrentQuantity(1)
                 }
                 
                 // Handle SKU clear messages (for regular checkout)
