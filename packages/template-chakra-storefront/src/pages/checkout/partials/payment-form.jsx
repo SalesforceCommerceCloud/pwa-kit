@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React from 'react'
+import React, {useMemo} from 'react'
 import {FormattedNumber, useIntl} from 'react-intl'
 import PropTypes from 'prop-types'
 import {Box, Flex, RadioGroup, Stack, Text} from '@chakra-ui/react'
@@ -19,7 +19,7 @@ const PaymentForm = ({form, onSubmit}) => {
     const {data: basket} = useCurrentBasket()
     const {currency} = useCurrency()
 
-    const messages = {
+    const messages = useMemo(() => ({
         paymentRadioGroup: formatMessage({
             id: 'payment_selection.radio_group.assistive_msg',
             defaultMessage: 'Payment'
@@ -32,7 +32,7 @@ const PaymentForm = ({form, onSubmit}) => {
             id: 'payment_selection.tooltip.secure_payment',
             defaultMessage: 'This is a secure SSL encrypted payment.'
         })
-    }
+    }), [intl])
 
     return (
         <form onSubmit={form.handleSubmit(onSubmit)}>

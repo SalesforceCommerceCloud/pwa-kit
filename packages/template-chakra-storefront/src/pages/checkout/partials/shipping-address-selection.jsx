@@ -69,7 +69,7 @@ const ShippingAddressEditForm = ({
 
                     {hasSavedAddresses && !hideSubmitButton ? (
                         <FormActionButtons
-                            saveButtonLabel={saveButtonMessage}
+                            saveButtonLabel={messages.saveButton}
                             onCancel={toggleAddressEdit}
                         />
                     ) : (

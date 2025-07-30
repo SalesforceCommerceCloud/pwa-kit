@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React, {useState} from 'react'
+import React, {useState, useMemo} from 'react'
 import {Button, useDisclosure} from '@chakra-ui/react'
 import {useIntl} from 'react-intl'
 import {useItemVariant} from '../../../../components/item-variant'
@@ -22,7 +22,8 @@ import {useShopperBasketsMutationHelper} from '@salesforce/commerce-sdk-react'
 const WishlistPrimaryAction = () => {
     const variant = useItemVariant()
     const {addItemToNewOrExistingBasket} = useShopperBasketsMutationHelper()
-    const {formatMessage} = useIntl()
+    const intl = useIntl()
+    const {formatMessage} = intl
     const isMasterProduct = variant?.type?.master || false
     const isProductASet = variant?.type?.set
     const isProductABundle = variant?.type?.bundle
@@ -30,9 +31,9 @@ const WishlistPrimaryAction = () => {
     const [isLoading, setIsLoading] = useState(false)
     const {open, onOpen, onClose} = useDisclosure()
 
-    const messages = {
+    const messages = useMemo(() => ({
         addedToCart: (quantity, isAddingASet, item) =>
-            formatMessage(
+            intl.formatMessage(
                 {
                     defaultMessage:
                         '{quantity} {quantity, plural, one {item} other {items}} added to cart',
@@ -40,24 +41,24 @@ const WishlistPrimaryAction = () => {
                 },
                 {quantity: isAddingASet ? quantity * item.setProducts.length : quantity}
             ),
-        viewOptions: formatMessage({
+        viewOptions: intl.formatMessage({
             defaultMessage: 'View Options',
             id: 'wishlist_primary_action.button.view_options'
         }),
-        viewFullDetails: formatMessage({
+        viewFullDetails: intl.formatMessage({
             defaultMessage: 'View Full Details',
             id: 'wishlist_primary_action.button.view_full_details'
         }),
-        addToCart: formatMessage({
+        addToCart: intl.formatMessage({
             defaultMessage: 'Add to Cart',
             id: 'wishlist_primary_action.button.add_to_cart'
         }),
-        addSetToCart: formatMessage({
+        addSetToCart: intl.formatMessage({
             defaultMessage: 'Add Set to Cart',
             id: 'wishlist_primary_action.button.add_set_to_cart'
         }),
         addSetToCartLabel: (productName) =>
-            formatMessage(
+            intl.formatMessage(
                 {
                     id: 'wishlist_primary_action.button.addSetToCart.label',
                     defaultMessage: 'Add {productName} set to cart'
@@ -65,7 +66,7 @@ const WishlistPrimaryAction = () => {
                 {productName}
             ),
         viewFullDetailsLabel: (productName) =>
-            formatMessage(
+            intl.formatMessage(
                 {
                     id: 'wishlist_primary_action.button.viewFullDetails.label',
                     defaultMessage: 'View full details for {productName}'
@@ -73,7 +74,7 @@ const WishlistPrimaryAction = () => {
                 {productName}
             ),
         viewOptionsLabel: (productName) =>
-            formatMessage(
+            intl.formatMessage(
                 {
                     id: 'wishlist_primary_action.button.view_options.label',
                     defaultMessage: 'View Options for {productName}'
@@ -81,14 +82,14 @@ const WishlistPrimaryAction = () => {
                 {productName}
             ),
         addToCartLabel: (productName) =>
-            formatMessage(
+            intl.formatMessage(
                 {
                     id: 'wishlist_primary_action.button.addToCart.label',
                     defaultMessage: 'Add {productName} to cart'
                 },
                 {productName}
             )
-    }
+    }), [intl])
 
     const handleAddToCart = async (item, quantity) => {
         setIsLoading(true)
@@ -117,7 +118,7 @@ const WishlistPrimaryAction = () => {
             onClose()
         } catch (e) {
             toast({
-                title: formatMessage(API_ERROR_MESSAGE),
+                title: intl.formatMessage(API_ERROR_MESSAGE),
                 type: 'error'
             })
         } finally {

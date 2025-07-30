@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React, {useState} from 'react'
+import React, {useState, useMemo} from 'react'
 import PropTypes from 'prop-types'
 import {defineMessage, useIntl} from 'react-intl'
 import {Box, Button, Checkbox, Container, Heading, Stack, Text, Separator} from '@chakra-ui/react'
@@ -25,13 +25,14 @@ import {PromoCode, usePromoCode} from '../../../components/promo-code'
 import {useErrorHandler} from '../../../hooks/use-errors'
 
 const Payment = () => {
-    const {formatMessage} = useIntl()
+    const intl = useIntl()
+    const {formatMessage} = intl
     const {data: basket} = useCurrentBasket()
     const selectedShippingAddress = basket?.shipments && basket?.shipments[0]?.shippingAddress
     const selectedBillingAddress = basket?.billingAddress
     const appliedPayment = basket?.paymentInstruments && basket?.paymentInstruments[0]
 
-    const messages = {
+    const messages = useMemo(() => ({
         payment: formatMessage({
             id: 'checkout_payment.title.payment',
             defaultMessage: 'Payment'
@@ -60,7 +61,7 @@ const Payment = () => {
             id: 'checkout_payment.button.review_order',
             defaultMessage: 'Review Order'
         })
-    }
+    }), [intl])
 
     const [billingSameAsShipping, setBillingSameAsShipping] = useState(true) // By default, have billing addr to be the same as shipping
     const {mutateAsync: addPaymentInstrumentToBasket} = useShopperBasketsMutation(
