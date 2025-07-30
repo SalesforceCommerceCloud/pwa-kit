@@ -174,4 +174,4 @@ export const createCleanupFunction = (
     setTempBasket
 ) => {
     return () => cleanupTemporaryBasket(isPdpMode, sharedBasketRef, authToken, site, setTempBasket)
-}
+} 

@@ -21,7 +21,7 @@ export class ApiClient {
             ...(options?.queryParams || {})
         }
         const fullUrl = `${this.url}?${new URLSearchParams(queryParams)}`
-        return fetch(fullUrl, {
+        const requestConfig = {
             method: method,
             body: options?.body || null,
             headers: {
@@ -29,7 +29,8 @@ export class ApiClient {
                 authorization: `Bearer ${this.token}`,
                 ...options?.headers
             }
-        })
+        }
+        return fetch(fullUrl, requestConfig)
     }
 
     get(options) {
