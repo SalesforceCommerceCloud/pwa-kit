@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React from 'react'
+import React, {useMemo} from 'react'
 import PropTypes from 'prop-types'
 import {Button, ButtonGroup, useDisclosure} from '@chakra-ui/react'
 import {useIntl, defineMessage} from 'react-intl'
@@ -62,26 +62,27 @@ const WishlistSecondaryButtonGroup = ({
     const {data: wishList} = useWishList()
     const modalProps = useDisclosure()
     const toast = useToast()
-    const {formatMessage} = useIntl()
+    const intl = useIntl()
+    const {formatMessage} = intl
 
-    const messages = {
-        itemRemoved: formatMessage({
+    const messages = useMemo(() => ({
+        itemRemoved: intl.formatMessage({
             id: 'wishlist_secondary_button_group.info.item_removed',
             defaultMessage: 'Item removed from wishlist'
         }),
         removeItemLabel: (productName) =>
-            formatMessage(
+            intl.formatMessage(
                 {
                     id: 'wishlist_secondary_button_group.info.item.remove.label',
                     defaultMessage: 'Remove {productName}'
                 },
                 {productName}
             ),
-        remove: formatMessage({
+        remove: intl.formatMessage({
             id: 'wishlist_secondary_button_group.action.remove',
             defaultMessage: 'Remove'
         })
-    }
+    }), [intl])
 
     const showRemoveItemConfirmation = () => {
         modalProps.onOpen()
@@ -113,7 +114,7 @@ const WishlistSecondaryButtonGroup = ({
             // we need to place focus to the next logical place for accessibility
             focusElementOnRemove?.current?.focus()
         } catch {
-            toast({title: formatMessage(API_ERROR_MESSAGE), type: 'error'})
+            toast({title: intl.formatMessage(API_ERROR_MESSAGE), type: 'error'})
         }
     }
 

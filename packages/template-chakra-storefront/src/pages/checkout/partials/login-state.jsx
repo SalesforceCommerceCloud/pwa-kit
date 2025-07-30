@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React, {useState} from 'react'
+import React, {useState, useMemo} from 'react'
 import PropTypes from 'prop-types'
 import {Button, Separator, Text} from '@chakra-ui/react'
 import {useIntl} from 'react-intl'
@@ -19,10 +19,11 @@ const LoginState = ({
     showPasswordField,
     togglePasswordField
 }) => {
-    const {formatMessage} = useIntl()
+    const intl = useIntl()
+    const {formatMessage} = intl
     const [showLoginButtons, setShowLoginButtons] = useState(true)
 
-    const messages = {
+    const messages = useMemo(() => ({
         orLoginWith: formatMessage({
             id: 'contact_info.message.or_login_with',
             defaultMessage: 'Or Login With'
@@ -47,7 +48,7 @@ const LoginState = ({
             id: 'contact_info.button.checkout_as_guest',
             defaultMessage: 'Checkout as Guest'
         })
-    }
+    }), [intl])
 
     if (isSocialEnabled || isPasswordlessEnabled) {
         return showLoginButtons ? (
