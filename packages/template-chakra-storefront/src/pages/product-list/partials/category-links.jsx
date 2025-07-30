@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React from 'react'
+import React, {useMemo} from 'react'
 import PropTypes from 'prop-types'
 import {useIntl} from 'react-intl'
 
@@ -17,15 +17,16 @@ import Link from '../../../components/link'
 import {noop} from '../../../utils/utils'
 
 const CategoryLinks = ({category = {}, onSelect = noop}) => {
-    const {formatMessage} = useIntl()
+    const intl = useIntl()
+    const {formatMessage} = intl
     const {categories = []} = category
 
-    const messages = {
+    const messages = useMemo(() => ({
         categoriesHeading: formatMessage({
             id: 'category_links.button_text',
             defaultMessage: 'Categories'
         })
-    }
+    }), [intl])
 
     return (
         <Accordion.Item

@@ -91,7 +91,7 @@ Total files: 97
 - [ ] src/pages/product-detail/partials/information-accordion.jsx
 - [ ] src/pages/product-detail/partials/recommended-products-section.jsx
 - [ ] src/pages/product-list/partials/category-links.jsx
-- [ ] src/pages/product-list/partials/color-refinements.jsx
+- [x] src/pages/product-list/partials/color-refinements.jsx
 - [x] src/pages/product-list/partials/empty-results.jsx
 - [x] src/pages/product-list/partials/page-header.jsx
 - [x] src/pages/product-list/partials/product-list-header.jsx
