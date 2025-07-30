@@ -73,14 +73,15 @@ const DEBOUNCE_WAIT = 750
 const Cart = () => {
     const {data: basket, isLoading} = useCurrentBasket()
 
-    // Pickup in Store - collect all unique store IDs from all shipments
+    // Pickup in Store - inventory at current store and all unique store IDs from all shipments
+    const {selectedStore} = useSelectedStore()
+    const selectedInventoryId = selectedStore?.inventoryId || null
     const allStoreIds =
         basket?.shipments
             ?.map((shipment) => shipment.c_fromStoreId)
             .filter(Boolean)
             .filter((id, index, array) => array.indexOf(id) === index) // Remove duplicates
             .join(',') || ''
-
     const {data: storeData} = useStores(
         {
             parameters: {
@@ -91,9 +92,14 @@ const Cart = () => {
             enabled: !!allStoreIds && STORE_LOCATOR_IS_ENABLED
         }
     )
+    const uniqueInventoryIds = [
+        ...new Set(
+            [selectedInventoryId]
+                .concat(storeData?.data?.map((store) => store.inventoryId))
+                .filter(Boolean)
+        )
+    ].join(',')
 
-    const {selectedStore} = useSelectedStore()
-    const selectedInventoryId = selectedStore?.inventoryId || null
     const {
         handleDeliveryOptionChange,
         assignDefaultShippingMethodsToShipments,
@@ -106,7 +112,7 @@ const Cart = () => {
                 ids: productIds,
                 allImages: true,
                 perPricebook: true,
-                ...(selectedInventoryId ? {inventoryIds: selectedInventoryId} : {})
+                ...(uniqueInventoryIds ? {inventoryIds: uniqueInventoryIds} : {})
             }
         },
         {
@@ -137,9 +143,9 @@ const Cart = () => {
             parameters: {
                 ids: bundleChildVariantIds?.join(','),
                 allImages: false,
+                ...(uniqueInventoryIds ? {inventoryIds: uniqueInventoryIds} : {}),
                 expand: ['availability', 'variations'],
-                select: '(data.(id,inventory))',
-                ...(selectedInventoryId ? {inventoryIds: selectedInventoryId} : {})
+                select: '(data.(id,inventory,inventories,master))'
             }
         },
         {

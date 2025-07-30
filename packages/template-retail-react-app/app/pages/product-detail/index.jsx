@@ -175,8 +175,9 @@ const ProductDetail = () => {
             parameters: {
                 ids: bundleChildProductIds,
                 allImages: false,
+                ...(selectedInventoryId ? {inventoryIds: selectedInventoryId} : {}),
                 expand: ['availability', 'variations'],
-                select: '(data.(id,inventory,master))'
+                select: '(data.(id,inventory,inventories,master))'
             }
         },
         {
