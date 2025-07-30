@@ -14,13 +14,13 @@ module.exports = {
     commerceAPI: {
         proxyPath: '/mobify/proxy/api',
         parameters: {
-            clientId: 'c9c45bfd-0ed3-4aa2-9971-40f88962b836',
-            organizationId: 'f_ecom_zzrf_001',
-            shortCode: '8o7m175y',
-            siteId: 'RefArchGlobal'
+            clientId: '{{answers.project.commerce.clientId}}',
+            organizationId: '{{answers.project.commerce.organizationId}}',
+            shortCode: '{{answers.project.commerce.shortCode}}',
+            siteId: '{{answers.project.commerce.siteId}}'
         }
     },
-    defaultSite: 'RefArchGlobal',
+    defaultSite: '{{answers.project.commerce.siteId}}',
     defaultAppLocale: 'en-US',
     defaultSiteTitle: 'Chakra Storefront',
     pages: {
@@ -80,23 +80,22 @@ module.exports = {
     defaultDnt: true,
     einsteinAPI: {
         host: 'https://api.cquotient.com',
-        einsteinId: '1ea06c6e-c936-4324-bcf0-fada93f83bb1',
-        siteId: 'aaij-MobileFirst',
+        einsteinId: '{{answers.project.einstein.clientId}}',
+        siteId: '{{answers.project.einstein.siteId}}',
         isProduction: false
     },
     dataCloudAPI: {
-        appSourceId: 'fb81edab-24c6-4b40-8684-b67334dfdf32',
-        tenantId: 'mmyw8zrxhfsg09lfmzrd1zjqmg'
+        appSourceId: '{{answers.project.dataCloud.appSourceId}}',
+        tenantId: '{{answers.project.dataCloud.tenantId}}'
     },
     login: {
         passwordless: {
-            enabled: false,
-            callbackURI:
-                process.env.PASSWORDLESS_LOGIN_CALLBACK_URI || '/passwordless-login-callback',
+            enabled: {{#if answers.project.demo.enableDemoSettings}}true{{else}}false{{/if}},
+            callbackURI: process.env.PASSWORDLESS_LOGIN_CALLBACK_URI || '/passwordless-login-callback',
             landingPath: '/passwordless-login-landing'
         },
         social: {
-            enabled: false,
+            enabled: {{#if answers.project.demo.enableDemoSettings}}true{{else}}false{{/if}},
             idps: ['google', 'apple'],
             redirectURI: process.env.SOCIAL_LOGIN_REDIRECT_URI || '/social-callback'
         },
@@ -119,9 +118,10 @@ module.exports = {
     },
     sites: [
         {
-            id: 'RefArch',
+            id: '{{answers.project.commerce.siteId}}',
+            {{#if answers.project.demo.enableDemoSettings}}
             l10n: {
-                supportedCurrencies: ['USD'],
+                supportedCurrencies: ['USD', 'GBP', 'EUR', 'CNY', 'JPY'],
                 defaultCurrency: 'USD',
                 defaultLocale: 'en-US',
                 supportedLocales: [
@@ -130,25 +130,12 @@ module.exports = {
                         preferredCurrency: 'USD'
                     },
                     {
-                        id: 'en-CA',
-                        preferredCurrency: 'USD'
-                    }
-                ]
-            }
-        },
-        {
-            id: 'RefArchGlobal',
-            l10n: {
-                supportedCurrencies: ['GBP', 'EUR', 'CNY', 'JPY'],
-                defaultCurrency: 'GBP',
-                supportedLocales: [
+                        id: 'en-GB',
+                        preferredCurrency: 'GBP'
+                    },
                     {
                         id: 'de-DE',
                         preferredCurrency: 'EUR'
-                    },
-                    {
-                        id: 'en-GB',
-                        preferredCurrency: 'GBP'
                     },
                     {
                         id: 'es-MX',
@@ -182,32 +169,50 @@ module.exports = {
                         id: 'zh-TW',
                         preferredCurrency: 'TWD'
                     }
-                ],
-                defaultLocale: 'en-GB'
+                ]
             }
+            {{else}}
+            l10n: {
+                supportedCurrencies: ['USD'],
+                defaultCurrency: 'USD',
+                defaultLocale: 'en-US',
+                supportedLocales: [
+                    {
+                        id: 'en-US',
+                        preferredCurrency: 'USD'
+                    }
+                ]
+            }
+            {{/if}}
         }
     ],
     ssrEnabled: true,
     ssrOnly: ['ssr.js', 'ssr.js.map', 'node_modules/**/*.*'],
-    ssrShared: ['static/favicon.ico', 'static/robots.txt', '**/*.js', '**/*.js.map', '**/*.json'],
+    ssrShared: [
+        'static/favicon.ico',
+        'static/robots.txt',
+        '**/*.js',
+        '**/*.js.map',
+        '**/*.json'
+    ],
     ssrParameters: {
         ssrFunctionNodeVersion: '22.x',
         proxyConfigs: [
             {
-                host: 'kv7kzm78.api.commercecloud.salesforce.com',
+                host: '{{answers.project.commerce.shortCode}}.api.commercecloud.salesforce.com',
                 path: 'api'
-            },
+            }{{~#if answers.project.commerce.instanceUrl}},
             {
-                host: 'zzrf-001.dx.commercecloud.salesforce.com',
+                host: '{{answers.project.commerce.instanceUrl}}',
                 path: 'ocapi'
-            }
+            }{{/if}}
         ]
     },
     staleWhileRevalidate: 900,
     url: {
-        site: 'path',
-        locale: 'path',
-        showDefaults: true,
+        site: '{{#if answers.project.demo.enableDemoSettings}}path{{else}}none{{/if}}',
+        locale: '{{#if answers.project.demo.enableDemoSettings}}path{{else}}none{{/if}}',
+        showDefaults: {{#if answers.project.demo.enableDemoSettings}}true{{else}}false{{/if}},
         interpretPlusSignAsSpace: false
     }
 }
