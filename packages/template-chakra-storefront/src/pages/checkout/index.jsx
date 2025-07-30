@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React, {useEffect, useState} from 'react'
+import React, {useEffect, useState, useMemo} from 'react'
 import {useIntl} from 'react-intl'
 import {Alert, Box, Button, Container, Grid, GridItem, Stack} from '@chakra-ui/react'
 import useNavigation from '../../hooks/use-navigation'
@@ -25,7 +25,8 @@ import LoadingSpinner from '../../components/loading-spinner'
 import {AlertIcon} from '../../components/icons'
 
 const Checkout = () => {
-    const {formatMessage} = useIntl()
+    const intl = useIntl()
+    const {formatMessage} = intl
     const navigate = useNavigation()
     const {step} = useCheckout()
     const [error, setError] = useState()
@@ -37,16 +38,16 @@ const Checkout = () => {
     const isPasswordlessEnabled = !!loginConfig?.passwordless?.enabled
     const idps = loginConfig?.social?.idps || []
 
-    const messages = {
-        placeOrder: formatMessage({
+    const messages = useMemo(() => ({
+        placeOrder: intl.formatMessage({
             id: 'checkout.button.place_order',
             defaultMessage: 'Place Order'
         }),
-        genericError: formatMessage({
+        genericError: intl.formatMessage({
             id: 'checkout.message.generic_error',
             defaultMessage: 'An unexpected error occurred during checkout.'
         })
-    }
+    }), [intl])
 
     useEffect(() => {
         if (error || step === 4) {
@@ -158,7 +159,8 @@ const Checkout = () => {
 const CheckoutContainer = () => {
     const {data: customer} = useCurrentCustomer()
     const {data: basket} = useCurrentBasket()
-    const {formatMessage} = useIntl()
+    const intl = useIntl()
+    const {formatMessage} = intl
     const removeItemFromBasketMutation = useShopperBasketsMutation('removeItemFromBasket')
     const toast = useToast()
     const [isDeletingUnavailableItem, setIsDeletingUnavailableItem] = useState(false)
@@ -171,13 +173,13 @@ const CheckoutContainer = () => {
             {
                 onSuccess: () => {
                     toast({
-                        title: formatMessage(TOAST_MESSAGE_REMOVED_ITEM_FROM_CART, {quantity: 1}),
+                        title: intl.formatMessage(TOAST_MESSAGE_REMOVED_ITEM_FROM_CART, {quantity: 1}),
                         type: 'success'
                     })
                 },
                 onError: () => {
                     toast({
-                        title: formatMessage(API_ERROR_MESSAGE),
+                        title: intl.formatMessage(API_ERROR_MESSAGE),
                         type: 'error'
                     })
                 }
