@@ -376,6 +376,9 @@
   "checkout_payment.title.payment": {
     "defaultMessage": "Payment"
   },
+  "checkout_product_item.label.quantity_static": {
+    "defaultMessage": "Qty: {quantity}"
+  },
   "colorRefinements.label.hitCount": {
     "defaultMessage": "{colorLabel} ({colorHitCount})"
   },
@@ -1161,8 +1164,14 @@
   "payment_selection.tooltip.secure_payment": {
     "defaultMessage": "This is a secure SSL encrypted payment."
   },
+  "pickup_address.bonus_products.title": {
+    "defaultMessage": "Bonus Items"
+  },
   "pickup_address.button.continue_to_payment": {
     "defaultMessage": "Continue to Payment"
+  },
+  "pickup_address.button.continue_to_shipping_address": {
+    "defaultMessage": "Continue to Shipping Address"
   },
   "pickup_address.title.pickup_address": {
     "defaultMessage": "Pickup Address & Information"
