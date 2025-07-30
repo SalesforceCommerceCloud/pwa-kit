@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React, {Fragment, useEffect} from 'react'
+import React, {Fragment, useEffect, useMemo} from 'react'
 import {useIntl, FormattedNumber} from 'react-intl'
 import {
     Box,
@@ -41,7 +41,8 @@ import {AlertIcon} from '../../components/icons'
 const onClient = typeof window !== 'undefined'
 
 const CheckoutConfirmation = () => {
-    const {formatMessage} = useIntl()
+    const intl = useIntl()
+    const {formatMessage} = intl
     const {orderNo} = useParams()
     const navigate = useNavigation()
     const {data: customer} = useCurrentCustomer()
@@ -73,16 +74,16 @@ const CheckoutConfirmation = () => {
         return null
     }
 
-    const messages = {
-        thankYou: formatMessage({
+    const messages = useMemo(() => ({
+        thankYou: intl.formatMessage({
             id: 'checkout_confirmation.heading.thank_you_for_order',
             defaultMessage: 'Thank you for your order!'
         }),
-        orderNumber: formatMessage({
+        orderNumber: intl.formatMessage({
             id: 'checkout_confirmation.label.order_number',
             defaultMessage: 'Order Number'
         }),
-        emailConfirmation: formatMessage(
+        emailConfirmation: intl.formatMessage(
             {
                 id: 'checkout_confirmation.message.will_email_shortly',
                 defaultMessage:
@@ -90,83 +91,83 @@ const CheckoutConfirmation = () => {
             },
             {
                 b: (chunks) => <b>{chunks}</b>,
-                email: order.customerInfo.email
+                email: order?.customerInfo?.email
             }
         ),
-        continueShopping: formatMessage({
+        continueShopping: intl.formatMessage({
             id: 'checkout_confirmation.link.continue_shopping',
             defaultMessage: 'Continue Shopping'
         }),
-        createAccount: formatMessage({
+        createAccount: intl.formatMessage({
             id: 'checkout_confirmation.heading.create_account',
             defaultMessage: 'Create an account for faster checkout'
         }),
-        createAccountButton: formatMessage({
+        createAccountButton: intl.formatMessage({
             id: 'checkout_confirmation.button.create_account',
             defaultMessage: 'Create Account'
         }),
-        deliveryDetails: formatMessage({
+        deliveryDetails: intl.formatMessage({
             id: 'checkout_confirmation.heading.delivery_details',
             defaultMessage: 'Delivery Details'
         }),
-        shippingAddress: formatMessage({
+        shippingAddress: intl.formatMessage({
             id: 'checkout_confirmation.heading.shipping_address',
             defaultMessage: 'Shipping Address'
         }),
-        shippingMethod: formatMessage({
+        shippingMethod: intl.formatMessage({
             id: 'checkout_confirmation.heading.shipping_method',
             defaultMessage: 'Shipping Method'
         }),
-        orderSummary: formatMessage({
+        orderSummary: intl.formatMessage({
             id: 'checkout_confirmation.heading.order_summary',
             defaultMessage: 'Order Summary'
         }),
-        itemCount: formatMessage(
+        itemCount: intl.formatMessage(
             {
                 id: 'checkout_confirmation.message.num_of_items_in_order',
                 defaultMessage: '{itemCount, plural, =0 {0 items} one {# item} other {# items}}'
             },
             {
-                itemCount: order.productItems.reduce((a, b) => a + b.quantity, 0)
+                itemCount: order?.productItems?.reduce((a, b) => a + b.quantity, 0) || 0
             }
         ),
-        subtotal: formatMessage({
+        subtotal: intl.formatMessage({
             id: 'checkout_confirmation.label.subtotal',
             defaultMessage: 'Subtotal'
         }),
-        shipping: formatMessage({
+        shipping: intl.formatMessage({
             id: 'checkout_confirmation.label.shipping',
             defaultMessage: 'Shipping'
         }),
-        promoApplied: formatMessage({
+        promoApplied: intl.formatMessage({
             id: 'checkout_confirmation.label.promo_applied',
             defaultMessage: 'Promotion applied'
         }),
-        free: formatMessage({
+        free: intl.formatMessage({
             id: 'checkout_confirmation.label.free',
             defaultMessage: 'Free'
         }),
-        tax: formatMessage({
+        tax: intl.formatMessage({
             id: 'checkout_confirmation.label.tax',
             defaultMessage: 'Tax'
         }),
-        orderTotal: formatMessage({
+        orderTotal: intl.formatMessage({
             id: 'checkout_confirmation.label.order_total',
             defaultMessage: 'Order Total'
         }),
-        paymentDetails: formatMessage({
+        paymentDetails: intl.formatMessage({
             id: 'checkout_confirmation.heading.payment_details',
             defaultMessage: 'Payment Details'
         }),
-        billingAddress: formatMessage({
+        billingAddress: intl.formatMessage({
             id: 'checkout_confirmation.heading.billing_address',
             defaultMessage: 'Billing Address'
         }),
-        creditCard: formatMessage({
+        creditCard: intl.formatMessage({
             id: 'checkout_confirmation.heading.credit_card',
             defaultMessage: 'Credit Card'
         })
-    }
+    }), [intl, order])
 
     const CardIcon = getCreditCardIcon(order.paymentInstruments[0].paymentCard?.cardType)
 
@@ -186,17 +187,17 @@ const CheckoutConfirmation = () => {
             navigate(`/account`)
         } catch (error) {
             if (!error.response) {
-                form.setError('global', {type: 'manual', message: API_ERROR_MESSAGE})
+                form.setError('global', {type: 'manual', message: intl.formatMessage(API_ERROR_MESSAGE)})
                 return
             }
             const json = await error.response.json()
 
-            const messages = {
-                accountExists: formatMessage({
+            const errorMessages = {
+                accountExists: intl.formatMessage({
                     id: 'checkout_confirmation.message.already_has_account',
                     defaultMessage: 'This email already has an account.'
                 }),
-                loginLink: formatMessage({
+                loginLink: intl.formatMessage({
                     id: 'checkout_confirmation.link.login',
                     defaultMessage: 'Log in here'
                 })
@@ -204,17 +205,17 @@ const CheckoutConfirmation = () => {
 
             const existingAccountMessage = (
                 <Fragment>
-                    {messages.accountExists}
+                    {errorMessages.accountExists}
                     &nbsp;
                     <Link to="/login" color="blue.600">
-                        {messages.loginLink}
+                        {errorMessages.loginLink}
                     </Link>
                 </Fragment>
             )
 
             const message = /the login is already in use/i.test(json.detail)
                 ? existingAccountMessage
-                : API_ERROR_MESSAGE
+                : intl.formatMessage(API_ERROR_MESSAGE)
 
             form.setError('global', {type: 'manual', message})
         }
