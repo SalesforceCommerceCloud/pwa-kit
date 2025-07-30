@@ -535,7 +535,13 @@ const ShippingMultiAddress = ({
                                                 <VStack spacing={3} align="stretch">
                                                     {customerLoading ? (
                                                         <Box p={4} textAlign="center">
-                                                            <Text color="gray.500">Loading addresses...</Text>
+                                                            <Text color="gray.500">
+                                                                {formatMessage({
+                                                                        id: 'shipping_multi_address.loading_addresses',
+                                                                        defaultMessage:
+                                                                            'Loading addresses...'
+                                                                    })}
+                                                            </Text>
                                                         </Box>
                                                     ) : (
                                                         <Select

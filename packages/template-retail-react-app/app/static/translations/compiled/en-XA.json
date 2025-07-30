@@ -7613,6 +7613,20 @@
       "value": "]"
     }
   ],
+  "shipping_multi_address.loading_addresses": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ŀǿǿȧȧḓīƞɠ ȧȧḓḓřḗḗşşḗḗş..."
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
   "shipping_multi_address.no_addresses_available": [
     {
       "type": 0,
