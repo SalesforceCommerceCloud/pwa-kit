@@ -301,6 +301,9 @@ const {handler} = runtime.createHandler(options, (app) => {
                         'api.cquotient.com',
                         '*.c360a.salesforce.com'
                     ]
+                },
+                referrerPolicy: {
+                    policy: 'strict-origin-when-cross-origin'
                 }
             }
         })
