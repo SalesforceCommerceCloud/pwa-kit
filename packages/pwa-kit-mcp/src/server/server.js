@@ -13,7 +13,8 @@ import {
     CreateAppGuidelinesTool,
     CreateNewComponentTool,
     DeveloperGuidelinesTool,
-    TestWithPlaywrightTool
+    TestWithPlaywrightTool,
+    CreateNewPageTool
 } from '../tools'
 
 // NOTE: This is a workaround to import JSON files as ES modules.
@@ -86,6 +87,13 @@ class PwaStorefrontMCPServerHighLevel {
                 answer: z.string().optional().describe('User answer to the current question')
             },
             (args) => this.handleCreateNewSampleComponent(args)
+        )
+
+        this.server.tool(
+            CreateNewPageTool.name,
+            CreateNewPageTool.description,
+            CreateNewPageTool.inputSchema,
+            CreateNewPageTool.handler
         )
     }
 
