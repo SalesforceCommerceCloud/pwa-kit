@@ -26,6 +26,7 @@ import {defaultPwaKitSecurityHeaders} from '@salesforce/pwa-kit-runtime/utils/mi
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import {getAppOrigin} from '@salesforce/pwa-kit-react-sdk/utils/url'
 import {registerAdyenEndpoints} from '@adyen/adyen-salesforce-pwa/dist/ssr/index.js'
+import standalonePaymentMethodsHandler from './api/adyen/paymentMethods/standalone.js'
 
 const config = getConfig()
 
@@ -417,6 +418,20 @@ const {handler} = runtime.createHandler(options, (app) => {
      * }
      */
     registerAdyenEndpoints(app, runtime)
+
+    // Register standalone payment methods endpoint for Apple Pay "Buy Now" flows
+    app.get('/api/adyen/paymentMethods/standalone', async (req, res) => {
+        try {
+            await standalonePaymentMethodsHandler(req, res)
+        } catch (error) {
+            console.error('Error in standalone payment methods endpoint:', error)
+            res.status(500).json({
+                error: 'Internal server error',
+                message: error.message
+            })
+        }
+    })
+
     app.get('*', runtime.render)
 })
 // SSR requires that we export a single handler function called 'get', that
