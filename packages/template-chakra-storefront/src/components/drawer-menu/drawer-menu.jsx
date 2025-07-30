@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React, {useState, useEffect} from 'react'
+import React, {useState, useEffect, useMemo} from 'react'
 import PropTypes from 'prop-types'
 import {useIntl} from 'react-intl'
 
@@ -81,6 +81,7 @@ const DrawerMenu = ({
     itemComponent
 }) => {
     const intl = useIntl()
+    const {formatMessage} = intl
     const {isRegistered} = useCustomerType()
     const navigate = useNavigation()
     const drawerSize = useBreakpointValue({sm: PHONE_DRAWER_SIZE, md: TABLET_DRAWER_SIZE})
@@ -92,6 +93,92 @@ const DrawerMenu = ({
     const logout = useAuthHelper(AuthHelpers.Logout)
     const recipe = useSlotRecipe({key: 'drawerMenu'})
     const styles = recipe()
+
+    const messages = useMemo(
+        () => ({
+            header: {
+                title: formatMessage({
+                    id: 'drawer_menu.header.assistive_msg.title',
+                    defaultMessage: 'Menu Drawer'
+                })
+            },
+            links: {
+                shopAll: formatMessage({
+                    id: 'drawer_menu.link.shop_all',
+                    defaultMessage: 'Shop All'
+                }),
+                signIn: formatMessage({
+                    id: 'drawer_menu.link.sign_in',
+                    defaultMessage: 'Sign In'
+                })
+            },
+            buttons: {
+                logOut: formatMessage({
+                    id: 'drawer_menu.button.log_out',
+                    defaultMessage: 'Log Out'
+                }),
+                myAccount: formatMessage({
+                    id: 'drawer_menu.button.my_account',
+                    defaultMessage: 'My Account'
+                }),
+                accountDetails: formatMessage({
+                    id: 'drawer_menu.button.account_details',
+                    defaultMessage: 'Account Details'
+                }),
+                orderHistory: formatMessage({
+                    id: 'drawer_menu.button.order_history',
+                    defaultMessage: 'Order History'
+                }),
+                addresses: formatMessage({
+                    id: 'drawer_menu.button.addresses',
+                    defaultMessage: 'Addresses'
+                })
+            },
+            customerSupport: {
+                title: formatMessage({
+                    id: 'drawer_menu.link.customer_support',
+                    defaultMessage: 'Customer Support'
+                }),
+                contactUs: formatMessage({
+                    id: 'drawer_menu.link.customer_support.contact_us',
+                    defaultMessage: 'Contact Us'
+                }),
+                shippingAndReturns: formatMessage({
+                    id: 'drawer_menu.link.customer_support.shipping_and_returns',
+                    defaultMessage: 'Shipping & Returns'
+                })
+            },
+            ourCompany: {
+                title: formatMessage({
+                    id: 'drawer_menu.link.our_company',
+                    defaultMessage: 'Our Company'
+                }),
+                aboutUs: formatMessage({
+                    id: 'drawer_menu.link.about_us',
+                    defaultMessage: 'About Us'
+                })
+            },
+            privacyAndSecurity: {
+                title: formatMessage({
+                    id: 'drawer_menu.link.privacy_and_security',
+                    defaultMessage: 'Privacy & Security'
+                }),
+                termsAndConditions: formatMessage({
+                    id: 'drawer_menu.link.terms_and_conditions',
+                    defaultMessage: 'Terms & Conditions'
+                }),
+                privacyPolicy: formatMessage({
+                    id: 'drawer_menu.link.privacy_policy',
+                    defaultMessage: 'Privacy Policy'
+                }),
+                siteMap: formatMessage({
+                    id: 'drawer_menu.link.site_map',
+                    defaultMessage: 'Site Map'
+                })
+            }
+        }),
+        [intl]
+    )
 
     const onSignoutClick = async () => {
         setShowLoading(true)
@@ -121,13 +208,7 @@ const DrawerMenu = ({
             <Dialog.Positioner style={{justifyContent: 'flex-start', alignItems: 'flex-start'}}>
                 <Dialog.Content css={styles.content}>
                     {/* Header Content */}
-                    <Dialog.Header
-                        css={styles.header}
-                        aria-label={intl.formatMessage({
-                            id: 'drawer_menu.header.assistive_msg.title',
-                            defaultMessage: 'Menu Drawer'
-                        })}
-                    >
+                    <Dialog.Header css={styles.header} aria-label={messages.header.title}>
                         <IconButton variant="unstyled" onClick={onLogoClick}>
                             <BrandLogo css={styles.logo} />
                         </IconButton>
@@ -166,10 +247,7 @@ const DrawerMenu = ({
                                                               fontWeight={FONT_WEIGHTS[depth]}
                                                               color="black"
                                                           >
-                                                              {intl.formatMessage({
-                                                                  id: 'drawer_menu.link.shop_all',
-                                                                  defaultMessage: 'Shop All'
-                                                              })}
+                                                              {messages.links.shopAll}
                                                           </Accordion.ItemTrigger>
                                                       </Accordion.Item>
                                                   ]
@@ -209,10 +287,7 @@ const DrawerMenu = ({
                                                         css={styles.signoutIcon}
                                                     />
                                                     <Text css={styles.signoutText} as="span">
-                                                        {intl.formatMessage({
-                                                            id: 'drawer_menu.button.log_out',
-                                                            defaultMessage: 'Log Out'
-                                                        })}
+                                                        {messages.buttons.logOut}
                                                     </Text>
                                                 </Button>
                                             )
@@ -222,34 +297,22 @@ const DrawerMenu = ({
                                             items: [
                                                 {
                                                     id: 'my-account',
-                                                    name: intl.formatMessage({
-                                                        id: 'drawer_menu.button.my_account',
-                                                        defaultMessage: 'My Account'
-                                                    }),
+                                                    name: messages.buttons.myAccount,
                                                     items: [
                                                         {
                                                             id: 'profile',
                                                             path: '',
-                                                            name: intl.formatMessage({
-                                                                id: 'drawer_menu.button.account_details',
-                                                                defaultMessage: 'Account Details'
-                                                            })
+                                                            name: messages.buttons.accountDetails
                                                         },
                                                         {
                                                             id: 'orders',
                                                             path: '/orders',
-                                                            name: intl.formatMessage({
-                                                                id: 'drawer_menu.button.order_history',
-                                                                defaultMessage: 'Order History'
-                                                            })
+                                                            name: messages.buttons.orderHistory
                                                         },
                                                         {
                                                             id: 'addresses',
                                                             path: '/addresses',
-                                                            name: intl.formatMessage({
-                                                                id: 'drawer_menu.button.addresses',
-                                                                defaultMessage: 'Addresses'
-                                                            })
+                                                            name: messages.buttons.addresses
                                                         }
                                                     ]
                                                 }
@@ -260,12 +323,7 @@ const DrawerMenu = ({
                                     <Link to={SIGN_IN_HREF}>
                                         <HStack>
                                             <UserIcon css={styles.icon} />{' '}
-                                            <Text>
-                                                {intl.formatMessage({
-                                                    id: 'drawer_menu.link.sign_in',
-                                                    defaultMessage: 'Sign In'
-                                                })}
-                                            </Text>
+                                            <Text>{messages.links.signIn}</Text>
                                         </HStack>
                                     </Link>
                                 )}
@@ -302,69 +360,42 @@ const DrawerMenu = ({
                                         items: [
                                             {
                                                 id: 'contactus',
-                                                name: intl.formatMessage({
-                                                    id: 'drawer_menu.link.customer_support.contact_us',
-                                                    defaultMessage: 'Contact Us'
-                                                })
+                                                name: messages.customerSupport.contactUs
                                             },
                                             {
                                                 id: 'shippingandreturns',
-                                                name: intl.formatMessage({
-                                                    id: 'drawer_menu.link.customer_support.shipping_and_returns',
-                                                    defaultMessage: 'Shipping & Returns'
-                                                })
+                                                name: messages.customerSupport.shippingAndReturns
                                             }
                                         ],
-                                        name: intl.formatMessage({
-                                            id: 'drawer_menu.link.customer_support',
-                                            defaultMessage: 'Customer Support'
-                                        })
+                                        name: messages.customerSupport.title
                                     },
                                     {
                                         id: 'ourcompany',
                                         items: [
                                             {
                                                 id: 'aboutus',
-                                                name: intl.formatMessage({
-                                                    id: 'drawer_menu.link.about_us',
-                                                    defaultMessage: 'About Us'
-                                                })
+                                                name: messages.ourCompany.aboutUs
                                             }
                                         ],
-                                        name: intl.formatMessage({
-                                            id: 'drawer_menu.link.our_company',
-                                            defaultMessage: 'Our Company'
-                                        })
+                                        name: messages.ourCompany.title
                                     },
                                     {
                                         id: 'privacyandsecurity',
                                         items: [
                                             {
                                                 id: 'termsandconditions',
-                                                name: intl.formatMessage({
-                                                    id: 'drawer_menu.link.terms_and_conditions',
-                                                    defaultMessage: 'Terms & Conditions'
-                                                })
+                                                name: messages.privacyAndSecurity.termsAndConditions
                                             },
                                             {
                                                 id: 'privacypolicy',
-                                                name: intl.formatMessage({
-                                                    id: 'drawer_menu.link.privacy_policy',
-                                                    defaultMessage: 'Privacy Policy'
-                                                })
+                                                name: messages.privacyAndSecurity.privacyPolicy
                                             },
                                             {
                                                 id: 'sitemap',
-                                                name: intl.formatMessage({
-                                                    id: 'drawer_menu.link.site_map',
-                                                    defaultMessage: 'Site Map'
-                                                })
+                                                name: messages.privacyAndSecurity.siteMap
                                             }
                                         ],
-                                        name: intl.formatMessage({
-                                            id: 'drawer_menu.link.privacy_and_security',
-                                            defaultMessage: 'Privacy & Security'
-                                        })
+                                        name: messages.privacyAndSecurity.title
                                     }
                                 ]
                             }}

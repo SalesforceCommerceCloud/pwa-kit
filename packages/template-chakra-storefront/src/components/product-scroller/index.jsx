@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React, {forwardRef, useRef} from 'react'
+import React, {forwardRef, useRef, useMemo} from 'react'
 import PropTypes from 'prop-types'
 import {AspectRatio, Box, Heading, IconButton, Skeleton, Stack} from '@chakra-ui/react'
 import ProductTile from '../../components/product-tile'
@@ -30,7 +30,22 @@ const ProductScroller = forwardRef(
         ref
     ) => {
         const intl = useIntl()
+        const {formatMessage} = intl
         const scrollRef = useRef()
+
+        const messages = useMemo(
+            () => ({
+                scrollLeft: formatMessage({
+                    id: 'product_scroller.assistive_msg.scroll_left',
+                    defaultMessage: 'Scroll products left'
+                }),
+                scrollRight: formatMessage({
+                    id: 'product_scroller.assistive_msg.scroll_right',
+                    defaultMessage: 'Scroll products right'
+                })
+            }),
+            [intl]
+        )
 
         // Renders nothing if we aren't loading and have no products.
         if ((!products || products.length < 1) && !isLoading) {
@@ -135,10 +150,7 @@ const ProductScroller = forwardRef(
                         >
                             <IconButton
                                 data-testid="product-scroller-nav-left"
-                                aria-label={intl.formatMessage({
-                                    id: 'product_scroller.assistive_msg.scroll_left',
-                                    defaultMessage: 'Scroll products left'
-                                })}
+                                aria-label={messages.scrollLeft}
                                 borderRadius="full"
                                 bg="white/36"
                                 _hover={{bg: 'white/48'}}
@@ -160,10 +172,7 @@ const ProductScroller = forwardRef(
                         >
                             <IconButton
                                 data-testid="product-scroller-nav-right"
-                                aria-label={intl.formatMessage({
-                                    id: 'product_scroller.assistive_msg.scroll_right',
-                                    defaultMessage: 'Scroll products right'
-                                })}
+                                aria-label={messages.scrollRight}
                                 borderRadius="full"
                                 bg="white/36"
                                 _hover={{bg: 'white/48'}}

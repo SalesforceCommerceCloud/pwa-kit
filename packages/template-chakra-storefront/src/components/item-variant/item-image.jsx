@@ -4,11 +4,11 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React from 'react'
+import React, {useMemo} from 'react'
 import PropTypes from 'prop-types'
 import {AspectRatio, Box, Badge, Image} from '@chakra-ui/react'
 import {useItemVariant} from '.'
-import {FormattedMessage} from 'react-intl'
+import {useIntl} from 'react-intl'
 import {findImageGroupBy} from '../../utils/image-groups-utils'
 
 /**
@@ -21,12 +21,30 @@ import {findImageGroupBy} from '../../utils/image-groups-utils'
  */
 const ItemImage = ({imageProps, ratio = 1, ...props}) => {
     const variant = useItemVariant()
+    const intl = useIntl()
+    const {formatMessage} = intl
 
     // We find the 'small' images in the variant's image groups based on variationValues and pick the first one
     const image = findImageGroupBy(variant?.imageGroups, {
         viewType: 'small',
         selectedVariationAttributes: variant?.variationValues
     })?.images?.[0]
+
+    const messages = useMemo(
+        () => ({
+            sale: formatMessage({
+                id: 'item_image.label.sale',
+                defaultMessage: 'Sale',
+                description: 'A sale badge placed on top of a product image'
+            }),
+            unavailable: formatMessage({
+                id: 'item_image.label.unavailable',
+                defaultMessage: 'Unavailable',
+                description: 'A unavailable badge placed on top of a product image'
+            })
+        }),
+        [intl]
+    )
 
     return (
         <Box width="84px" backgroundColor="gray.100" {...props}>
@@ -43,11 +61,7 @@ const ItemImage = ({imageProps, ratio = 1, ...props}) => {
                             variant="solid"
                             colorScheme="blue"
                         >
-                            <FormattedMessage
-                                defaultMessage="Sale"
-                                id="item_image.label.sale"
-                                description="A sale badge placed on top of a product image"
-                            />
+                            {messages.sale}
                         </Badge>
                     )}
                     {variant.isProductUnavailable && (
@@ -61,11 +75,7 @@ const ItemImage = ({imageProps, ratio = 1, ...props}) => {
                             variant="solid"
                             colorScheme="red"
                         >
-                            <FormattedMessage
-                                defaultMessage="Unavailable"
-                                id="item_image.label.unavailable"
-                                description="A unavailable badge placed on top of a product image"
-                            />
+                            {messages.unavailable}
                         </Badge>
                     )}
 

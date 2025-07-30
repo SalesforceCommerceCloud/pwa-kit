@@ -4,13 +4,26 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React, {Fragment} from 'react'
-import {FormattedMessage} from 'react-intl'
+import React, {Fragment, useMemo} from 'react'
+import {useIntl} from 'react-intl'
 import {Flex, Button} from '@chakra-ui/react'
 import {AmexIcon, DiscoverIcon, LockIcon, MastercardIcon, VisaIcon} from '../../../components/icons'
 import Link from '../../../components/link'
 
 const CartCta = () => {
+    const intl = useIntl()
+    const {formatMessage} = intl
+
+    const messages = useMemo(
+        () => ({
+            checkout: formatMessage({
+                id: 'cart_cta.link.checkout',
+                defaultMessage: 'Proceed to Checkout'
+            })
+        }),
+        [intl]
+    )
+
     return (
         <Fragment>
             <Button asChild>
@@ -21,10 +34,7 @@ const CartCta = () => {
                     mb={4}
                     variant="solid"
                 >
-                    <FormattedMessage
-                        defaultMessage="Proceed to Checkout"
-                        id="cart_cta.link.checkout"
-                    />
+                    {messages.checkout}
                     <LockIcon />
                 </Link>
             </Button>

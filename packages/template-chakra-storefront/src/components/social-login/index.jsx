@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React, {useEffect} from 'react'
+import React, {useEffect, useMemo} from 'react'
 import PropTypes from 'prop-types'
 import {defineMessage, useIntl} from 'react-intl'
 import {Button} from '@chakra-ui/react'
@@ -43,7 +43,8 @@ const IDP_CONFIG = {
  * @returns
  */
 const SocialLogin = ({form, idps = []}) => {
-    const {formatMessage} = useIntl()
+    const intl = useIntl()
+    const {formatMessage} = intl
     const authorizeIDP = useAuthHelper(AuthHelpers.AuthorizeIDP)
 
     // Build redirectURI from config values
@@ -51,6 +52,20 @@ const SocialLogin = ({form, idps = []}) => {
     const {login: loginConfig} = getConfig()
     const redirectPath = loginConfig?.social?.redirectURI || ''
     const redirectURI = buildRedirectURI(appOrigin, redirectPath)
+
+    const messages = useMemo(
+        () => ({
+            errors: {
+                featureUnavailable: formatMessage(FEATURE_UNAVAILABLE_ERROR_MESSAGE),
+                apiError: formatMessage(API_ERROR_MESSAGE)
+            },
+            idp: {
+                apple: formatMessage(IDP_CONFIG.apple.message),
+                google: formatMessage(IDP_CONFIG.google.message)
+            }
+        }),
+        [intl]
+    )
 
     const isIdpValid = (name) => {
         const idp = name.toLowerCase()
@@ -79,8 +94,8 @@ const SocialLogin = ({form, idps = []}) => {
             })
         } catch (error) {
             const message = /redirect_uri doesn't match/.test(error.message)
-                ? formatMessage(FEATURE_UNAVAILABLE_ERROR_MESSAGE)
-                : formatMessage(API_ERROR_MESSAGE)
+                ? messages.errors.featureUnavailable
+                : messages.errors.apiError
             form.setError('global', {type: 'manual', message})
         }
     }
@@ -93,7 +108,7 @@ const SocialLogin = ({form, idps = []}) => {
                     .map((name) => {
                         const config = IDP_CONFIG[name.toLowerCase()]
                         const Icon = config?.icon
-                        const message = formatMessage(config?.message)
+                        const idpMessage = messages.idp[name.toLowerCase()]
                         return (
                             config && (
                                 <Button
@@ -106,7 +121,7 @@ const SocialLogin = ({form, idps = []}) => {
                                     variant="outline"
                                 >
                                     <Icon />
-                                    {message}
+                                    {idpMessage}
                                 </Button>
                             )
                         )

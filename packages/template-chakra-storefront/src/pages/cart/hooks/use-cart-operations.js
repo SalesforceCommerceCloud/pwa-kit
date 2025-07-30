@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import {useState} from 'react'
+import {useState, useMemo} from 'react'
 import {useIntl} from 'react-intl'
 import debounce from 'lodash/debounce'
 import {useShopperBasketsMutation} from '@salesforce/commerce-sdk-react'
@@ -30,8 +30,18 @@ export const useCartOperations = (basket, productsByItemId, showError) => {
     // Modal state and actions
     const {open: isOpen, onOpen, onClose} = useDisclosure()
 
-    const {formatMessage} = useIntl()
+    const intl = useIntl()
+    const {formatMessage} = intl
     const toast = useToast()
+
+    const messages = useMemo(
+        () => ({
+            removedItemFromCart: formatMessage(TOAST_MESSAGE_REMOVED_ITEM_FROM_CART, {
+                quantity: 1
+            })
+        }),
+        [intl]
+    )
 
     /*****************Basket Mutations************************/
     const updateItemInBasketMutation = useShopperBasketsMutation('updateItemInBasket')
@@ -217,7 +227,7 @@ export const useCartOperations = (basket, productsByItemId, showError) => {
                 },
                 onSuccess: () => {
                     toast({
-                        title: formatMessage(TOAST_MESSAGE_REMOVED_ITEM_FROM_CART, {quantity: 1}),
+                        title: messages.removedItemFromCart,
                         type: 'success'
                     })
                 },

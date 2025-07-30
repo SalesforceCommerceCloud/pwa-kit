@@ -1120,12 +1120,10 @@ describe('SLAS private client proxy', () => {
         const app = RemoteServerFactory._createApp(
             opts({
                 mobify: {
-                    app: {
-                        commerceAPI: {
-                            parameters: {
-                                clientId: 'clientId',
-                                shortCode: 'shortCode'
-                            }
+                    commerceAPI: {
+                        parameters: {
+                            clientId: 'clientId',
+                            shortCode: 'shortCode'
                         }
                     }
                 },
@@ -1151,12 +1149,10 @@ describe('SLAS private client proxy', () => {
         const app = RemoteServerFactory._createApp(
             opts({
                 mobify: {
-                    app: {
-                        commerceAPI: {
-                            parameters: {
-                                clientId: 'clientId',
-                                shortCode: 'shortCode'
-                            }
+                    commerceAPI: {
+                        parameters: {
+                            clientId: 'clientId',
+                            shortCode: 'shortCode'
                         }
                     }
                 },
@@ -1182,12 +1178,10 @@ describe('SLAS private client proxy', () => {
         const app = RemoteServerFactory._createApp(
             opts({
                 mobify: {
-                    app: {
-                        commerceAPI: {
-                            parameters: {
-                                clientId: 'clientId',
-                                shortCode: 'shortCode'
-                            }
+                    commerceAPI: {
+                        parameters: {
+                            clientId: 'clientId',
+                            shortCode: 'shortCode'
                         }
                     }
                 },
@@ -1211,12 +1205,10 @@ describe('SLAS private client proxy', () => {
         const app = RemoteServerFactory._createApp(
             opts({
                 mobify: {
-                    app: {
-                        commerceAPI: {
-                            parameters: {
-                                clientId: 'clientId',
-                                shortCode: 'shortCode'
-                            }
+                    commerceAPI: {
+                        parameters: {
+                            clientId: 'clientId',
+                            shortCode: 'shortCode'
                         }
                     }
                 },

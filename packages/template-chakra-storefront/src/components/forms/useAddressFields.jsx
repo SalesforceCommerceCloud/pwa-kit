@@ -49,6 +49,43 @@ export default function useAddressFields({
     } = getConfig()
     const countryCode = watch('countryCode')
 
+    const errorMessages = {
+        firstNameRequired: formatMessage({
+            defaultMessage: 'Please enter your first name.',
+            id: 'use_address_fields.error.please_enter_first_name'
+        }),
+        lastNameRequired: formatMessage({
+            defaultMessage: 'Please enter your last name.',
+            id: 'use_address_fields.error.please_enter_last_name'
+        }),
+        phoneRequired: formatMessage({
+            defaultMessage: 'Please enter your phone number.',
+            id: 'use_address_fields.error.please_enter_phone_number'
+        }),
+        countryRequired: formatMessage({
+            defaultMessage: 'Please select your country.',
+            id: 'use_address_fields.error.please_select_your_country'
+        }),
+        addressRequired: formatMessage({
+            defaultMessage: 'Please enter your address.',
+            id: 'use_address_fields.error.please_select_your_address'
+        }),
+        cityRequired: formatMessage({
+            defaultMessage: 'Please enter your city.',
+            id: 'use_address_fields.error.please_select_your_city'
+        }),
+        stateRequired: formatMessage({
+            defaultMessage: 'Please select your state.',
+            id: 'use_address_fields.error.please_select_your_state_or_province',
+            description: 'Error message for a blank state (US-specific checkout)'
+        }),
+        zipCodeRequired: formatMessage({
+            defaultMessage: 'Please enter your zip code.',
+            id: 'use_address_fields.error.please_enter_your_postal_or_zip',
+            description: 'Error message for a blank zip code (US-specific checkout)'
+        })
+    }
+
     const fields = {
         firstName: {
             name: `${prefix}firstName`,
@@ -57,10 +94,7 @@ export default function useAddressFields({
             type: 'text',
             autoComplete: 'given-name',
             rules: {
-                required: formatMessage({
-                    defaultMessage: 'Please enter your first name.',
-                    id: 'use_address_fields.error.please_enter_first_name'
-                })
+                required: errorMessages.firstNameRequired
             },
             error: errors[`${prefix}firstName`],
             control
@@ -72,10 +106,7 @@ export default function useAddressFields({
             type: 'text',
             autoComplete: 'family-name',
             rules: {
-                required: formatMessage({
-                    defaultMessage: 'Please enter your last name.',
-                    id: 'use_address_fields.error.please_enter_last_name'
-                })
+                required: errorMessages.lastNameRequired
             },
             error: errors[`${prefix}lastName`],
             control
@@ -87,10 +118,7 @@ export default function useAddressFields({
             type: 'tel',
             autoComplete: 'tel',
             rules: {
-                required: formatMessage({
-                    defaultMessage: 'Please enter your phone number.',
-                    id: 'use_address_fields.error.please_enter_phone_number'
-                })
+                required: errorMessages.phoneRequired
             },
             error: errors[`${prefix}phone`],
             inputProps: ({onChange}) => ({
@@ -108,10 +136,7 @@ export default function useAddressFields({
             type: 'select',
             options: checkoutConfig.shippingCountryCode,
             rules: {
-                required: formatMessage({
-                    defaultMessage: 'Please select your country.',
-                    id: 'use_address_fields.error.please_select_your_country'
-                })
+                required: errorMessages.countryRequired
             },
             error: errors[`${prefix}countryCode`],
             control
@@ -123,10 +148,7 @@ export default function useAddressFields({
             type: 'text',
             autoComplete: 'address-line1',
             rules: {
-                required: formatMessage({
-                    defaultMessage: 'Please enter your address.',
-                    id: 'use_address_fields.error.please_select_your_address'
-                })
+                required: errorMessages.addressRequired
             },
             error: errors[`${prefix}address1`],
             control
@@ -137,10 +159,7 @@ export default function useAddressFields({
             defaultValue: '',
             type: 'text',
             rules: {
-                required: formatMessage({
-                    defaultMessage: 'Please enter your city.',
-                    id: 'use_address_fields.error.please_select_your_city'
-                })
+                required: errorMessages.cityRequired
             },
             error: errors[`${prefix}city`],
             control
@@ -158,11 +177,7 @@ export default function useAddressFields({
                 required:
                     countryCode === 'CA'
                         ? 'Please select your province.' // FYI we won't translate this
-                        : formatMessage({
-                              defaultMessage: 'Please select your state.',
-                              id: 'use_address_fields.error.please_select_your_state_or_province',
-                              description: 'Error message for a blank state (US-specific checkout)'
-                          })
+                        : errorMessages.stateRequired
             },
             error: errors[`${prefix}stateCode`],
             control
@@ -177,12 +192,7 @@ export default function useAddressFields({
                 required:
                     countryCode === 'CA'
                         ? 'Please enter your postal code.' // FYI we won't translate this
-                        : formatMessage({
-                              defaultMessage: 'Please enter your zip code.',
-                              id: 'use_address_fields.error.please_enter_your_postal_or_zip',
-                              description:
-                                  'Error message for a blank zip code (US-specific checkout)'
-                          })
+                        : errorMessages.zipCodeRequired
             },
             error: errors[`${prefix}postalCode`],
             control

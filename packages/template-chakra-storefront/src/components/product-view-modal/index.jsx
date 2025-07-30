@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React from 'react'
+import React, {useMemo} from 'react'
 import PropTypes from 'prop-types'
 import {Dialog, CloseButton} from '@chakra-ui/react'
 import ProductView from '../../components/product-view'
@@ -20,12 +20,19 @@ const ProductViewModal = ({product, isOpen, onClose, ...props}) => {
     const productViewModalData = useProductViewModal(product)
 
     const intl = useIntl()
-    const label = intl.formatMessage(
-        {
-            defaultMessage: 'Edit modal for {productName}',
-            id: 'cart.product_edit_modal.modal_label'
-        },
-        {productName: productViewModalData?.product?.name}
+    const {formatMessage} = intl
+
+    const messages = useMemo(
+        () => ({
+            modalLabel: formatMessage(
+                {
+                    id: 'cart.product_edit_modal.modal_label',
+                    defaultMessage: 'Edit modal for {productName}'
+                },
+                {productName: productViewModalData?.product?.name}
+            )
+        }),
+        [intl]
     )
     return (
         <Dialog.Root
@@ -38,7 +45,10 @@ const ProductViewModal = ({product, isOpen, onClose, ...props}) => {
             <SafePortal>
                 <Dialog.Backdrop />
                 <Dialog.Positioner>
-                    <Dialog.Content data-testid="product-view-modal" aria-label={label}>
+                    <Dialog.Content
+                        data-testid="product-view-modal"
+                        aria-label={messages.modalLabel}
+                    >
                         <Dialog.Body pb={8} bg="white" paddingBottom={6} marginTop={6}>
                             <ProductView
                                 showFullLink={true}

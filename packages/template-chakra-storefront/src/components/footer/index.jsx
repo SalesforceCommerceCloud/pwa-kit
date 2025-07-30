@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React, {useState} from 'react'
+import React, {useState, useMemo} from 'react'
 import PropTypes from 'prop-types'
 import {
     Box,
@@ -33,20 +33,69 @@ const Footer = ({...otherProps}) => {
     const recipe = useSlotRecipe({key: 'footer'})
     const styles = recipe()
     const intl = useIntl()
+    const {formatMessage} = intl
     const [locale, setLocale] = useState(intl.locale)
     const {site, buildUrl} = useMultiSite()
     const {l10n} = site
     const supportedLocaleIds = l10n?.supportedLocales.map((locale) => locale.id)
     const showLocaleSelector = supportedLocaleIds?.length > 1
 
+    const messages = useMemo(
+        () => ({
+            columns: {
+                customerSupport: formatMessage({
+                    id: 'footer.column.customer_support',
+                    defaultMessage: 'Customer Support'
+                }),
+                account: formatMessage({
+                    id: 'footer.column.account',
+                    defaultMessage: 'Account'
+                }),
+                ourCompany: formatMessage({
+                    id: 'footer.column.our_company',
+                    defaultMessage: 'Our Company'
+                })
+            },
+            links: {
+                aboutUs: formatMessage({
+                    id: 'footer.link.about_us',
+                    defaultMessage: 'About Us'
+                }),
+                contactUs: formatMessage({
+                    id: 'footer.link.contact_us',
+                    defaultMessage: 'Contact Us'
+                }),
+                shipping: formatMessage({
+                    id: 'footer.link.shipping',
+                    defaultMessage: 'Shipping'
+                }),
+                orderStatus: formatMessage({
+                    id: 'footer.link.order_status',
+                    defaultMessage: 'Order Status'
+                }),
+                signinCreateAccount: formatMessage({
+                    id: 'footer.link.signin_create_account',
+                    defaultMessage: 'Sign in or create account'
+                })
+            },
+            localeSelector: formatMessage({
+                id: 'footer.locale_selector.assistive_msg',
+                defaultMessage: 'Select Language'
+            }),
+            copyright: formatMessage({
+                id: 'footer.message.copyright',
+                defaultMessage:
+                    'Salesforce or its affiliates. All rights reserved. This is a demo store only. Orders made WILL NOT be processed.'
+            })
+        }),
+        [intl]
+    )
+
     const makeOurCompanyLinks = () => {
         const links = []
         links.push({
             href: '/',
-            text: intl.formatMessage({
-                id: 'footer.link.about_us',
-                defaultMessage: 'About Us'
-            })
+            text: messages.links.aboutUs
         })
         return links
     }
@@ -64,54 +113,33 @@ const Footer = ({...otherProps}) => {
                                     display={{base: 'none', lg: 'grid'}}
                                 >
                                     <LinksList
-                                        heading={intl.formatMessage({
-                                            id: 'footer.column.customer_support',
-                                            defaultMessage: 'Customer Support'
-                                        })}
+                                        heading={messages.columns.customerSupport}
                                         links={[
                                             {
                                                 href: '/',
-                                                text: intl.formatMessage({
-                                                    id: 'footer.link.contact_us',
-                                                    defaultMessage: 'Contact Us'
-                                                })
+                                                text: messages.links.contactUs
                                             },
                                             {
                                                 href: '/',
-                                                text: intl.formatMessage({
-                                                    id: 'footer.link.shipping',
-                                                    defaultMessage: 'Shipping'
-                                                })
+                                                text: messages.links.shipping
                                             }
                                         ]}
                                     />
                                     <LinksList
-                                        heading={intl.formatMessage({
-                                            id: 'footer.column.account',
-                                            defaultMessage: 'Account'
-                                        })}
+                                        heading={messages.columns.account}
                                         links={[
                                             {
                                                 href: '/',
-                                                text: intl.formatMessage({
-                                                    id: 'footer.link.order_status',
-                                                    defaultMessage: 'Order Status'
-                                                })
+                                                text: messages.links.orderStatus
                                             },
                                             {
                                                 href: '/',
-                                                text: intl.formatMessage({
-                                                    id: 'footer.link.signin_create_account',
-                                                    defaultMessage: 'Sign in or create account'
-                                                })
+                                                text: messages.links.signinCreateAccount
                                             }
                                         ]}
                                     />
                                     <LinksList
-                                        heading={intl.formatMessage({
-                                            id: 'footer.column.our_company',
-                                            defaultMessage: 'Our Company'
-                                        })}
+                                        heading={messages.columns.ourCompany}
                                         links={makeOurCompanyLinks()}
                                     />
                                 </SimpleGrid>
@@ -131,10 +159,7 @@ const Footer = ({...otherProps}) => {
                                     <NativeSelect.Field
                                         css={styles.localeSelectorField}
                                         defaultValue={locale}
-                                        aria-label={intl.formatMessage({
-                                            id: 'footer.locale_selector.assistive_msg',
-                                            defaultMessage: 'Select Language'
-                                        })}
+                                        aria-label={messages.localeSelector}
                                         onChange={(e) => {
                                             const newLocale = e.currentTarget.value
                                             setLocale(newLocale)
@@ -158,12 +183,7 @@ const Footer = ({...otherProps}) => {
                         <Separator css={styles.horizontalRule} />
                         <Box css={styles.legalSection}>
                             <Text css={styles.copyright}>
-                                &copy; {new Date().getFullYear()}{' '}
-                                {intl.formatMessage({
-                                    id: 'footer.message.copyright',
-                                    defaultMessage:
-                                        'Salesforce or its affiliates. All rights reserved. This is a demo store only. Orders made WILL NOT be processed.'
-                                })}
+                                &copy; {new Date().getFullYear()} {messages.copyright}
                             </Text>
 
                             <LegalLinks variant={{base: 'vertical', lg: 'horizontal'}} />
@@ -181,39 +201,47 @@ const Subscribe = ({...otherProps}) => {
     const recipe = useSlotRecipe({key: 'footer'})
     const styles = recipe()
     const intl = useIntl()
+    const {formatMessage} = intl
+
+    const messages = useMemo(
+        () => ({
+            heading: formatMessage({
+                id: 'footer.subscribe.heading.first_to_know',
+                defaultMessage: 'Be the first to know'
+            }),
+            description: formatMessage({
+                id: 'footer.subscribe.description.sign_up',
+                defaultMessage: 'Sign up to stay in the loop about the hottest deals'
+            }),
+            emailAriaLabel: formatMessage({
+                id: 'footer.subscribe.email.assistive_msg',
+                defaultMessage: 'Email address for newsletter'
+            }),
+            buttonSignUp: formatMessage({
+                id: 'footer.subscribe.button.sign_up',
+                defaultMessage: 'Sign Up'
+            })
+        }),
+        [intl]
+    )
+
     return (
         <Box css={styles.subscribe} {...otherProps}>
             <Heading as="h1" css={styles.subscribeHeading}>
-                {intl.formatMessage({
-                    id: 'footer.subscribe.heading.first_to_know',
-                    defaultMessage: 'Be the first to know'
-                })}
+                {messages.heading}
             </Heading>
-            <Text css={styles.subscribeMessage}>
-                {intl.formatMessage({
-                    id: 'footer.subscribe.description.sign_up',
-                    defaultMessage: 'Sign up to stay in the loop about the hottest deals'
-                })}
-            </Text>
+            <Text css={styles.subscribeMessage}>{messages.description}</Text>
 
             <Box>
                 <Group attached w="full" maxW="sm">
                     <Input
                         type="email"
                         placeholder="you@email.com"
-                        aria-label={intl.formatMessage({
-                            id: 'footer.subscribe.email.assistive_msg',
-                            defaultMessage: 'Email address for newsletter'
-                        })}
+                        aria-label={messages.emailAriaLabel}
                         id="subscribe-email"
                         css={styles.subscribeField}
                     />
-                    <Button variant="footer">
-                        {intl.formatMessage({
-                            id: 'footer.subscribe.button.sign_up',
-                            defaultMessage: 'Sign Up'
-                        })}
-                    </Button>
+                    <Button variant="footer">{messages.buttonSignUp}</Button>
                 </Group>
             </Box>
 
@@ -224,29 +252,40 @@ const Subscribe = ({...otherProps}) => {
 
 const LegalLinks = ({variant}) => {
     const intl = useIntl()
+    const {formatMessage} = intl
+
+    const messages = useMemo(
+        () => ({
+            termsConditions: formatMessage({
+                id: 'footer.link.terms_conditions',
+                defaultMessage: 'Terms & Conditions'
+            }),
+            privacyPolicy: formatMessage({
+                id: 'footer.link.privacy_policy',
+                defaultMessage: 'Privacy Policy'
+            }),
+            siteMap: formatMessage({
+                id: 'footer.link.site_map',
+                defaultMessage: 'Site Map'
+            })
+        }),
+        [intl]
+    )
+
     return (
         <LinksList
             links={[
                 {
                     href: '/',
-                    text: intl.formatMessage({
-                        id: 'footer.link.terms_conditions',
-                        defaultMessage: 'Terms & Conditions'
-                    })
+                    text: messages.termsConditions
                 },
                 {
                     href: '/',
-                    text: intl.formatMessage({
-                        id: 'footer.link.privacy_policy',
-                        defaultMessage: 'Privacy Policy'
-                    })
+                    text: messages.privacyPolicy
                 },
                 {
                     href: '/',
-                    text: intl.formatMessage({
-                        id: 'footer.link.site_map',
-                        defaultMessage: 'Site Map'
-                    })
+                    text: messages.siteMap
                 }
             ]}
             color="gray.200"

@@ -5,22 +5,75 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React, {Fragment} from 'react'
+import React, {Fragment, useMemo} from 'react'
 import {Button, Text, Flex, Stack, Link} from '@chakra-ui/react'
 import PropTypes from 'prop-types'
 import {Link as RouteLink} from 'react-router-dom'
-import {defineMessage, FormattedMessage, useIntl} from 'react-intl'
+import {useIntl} from 'react-intl'
 import {SearchIcon} from '../../../components/icons'
 import RecommendedProducts from '../../../components/recommended-products'
 import {EINSTEIN_RECOMMENDERS} from '../../../../config/constants'
 
-const contactUsMessage = defineMessage({
-    id: 'empty_search_results.link.contact_us',
-    defaultMessage: 'Contact Us'
-})
-
 const EmptySearchResults = ({searchQuery, category}) => {
     const intl = useIntl()
+    const {formatMessage} = intl
+
+    const contactUsText = formatMessage({
+        id: 'empty_search_results.link.contact_us',
+        defaultMessage: 'Contact Us'
+    })
+
+    const messages = useMemo(
+        () => ({
+            contactUs: contactUsText,
+            topSellers: formatMessage({
+                id: 'empty_search_results.recommended_products.title.top_sellers',
+                defaultMessage: 'Top Sellers'
+            }),
+            mostViewed: formatMessage({
+                id: 'empty_search_results.recommended_products.title.most_viewed',
+                defaultMessage: 'Most Viewed'
+            }),
+            cantFindAnythingForCategory: formatMessage(
+                {
+                    id: 'empty_search_results.info.cant_find_anything_for_category',
+                    defaultMessage: `We couldn't find anything for {category}. Try searching for a product or {link}.`
+                },
+                {
+                    category: category?.name,
+                    link: (
+                        <Link as={RouteLink} to={'/'}>
+                            {contactUsText}
+                        </Link>
+                    )
+                }
+            ),
+            cantFindAnythingForQuery: formatMessage(
+                {
+                    id: 'empty_search_results.info.cant_find_anything_for_query',
+                    defaultMessage: `We couldn't find anything for "{searchQuery}".`
+                },
+                {
+                    searchQuery: searchQuery
+                }
+            ),
+            doubleCheckSpelling: formatMessage(
+                {
+                    id: 'empty_search_results.info.double_check_spelling',
+                    defaultMessage: 'Double-check your spelling and try again or {link}.'
+                },
+                {
+                    link: (
+                        <Button variant="link" to={'/'}>
+                            {contactUsText}
+                        </Button>
+                    )
+                }
+            )
+        }),
+        [intl]
+    )
+
     return (
         <Flex
             data-testid="sf-product-empty-list-page"
@@ -35,71 +88,26 @@ const EmptySearchResults = ({searchQuery, category}) => {
                 <Fragment>
                     {' '}
                     <Text fontSize={['l', 'l', 'xl', '2xl']} fontWeight="700" marginBottom={2}>
-                        {intl.formatMessage(
-                            {
-                                id: 'empty_search_results.info.cant_find_anything_for_category',
-                                defaultMessage:
-                                    'We couldn’t find anything for {category}. Try searching for a product or {link}.'
-                            },
-                            {
-                                category: category?.name,
-                                link: (
-                                    <Link as={RouteLink} to={'/'}>
-                                        {intl.formatMessage(contactUsMessage)}
-                                    </Link>
-                                )
-                            }
-                        )}
+                        {messages.cantFindAnythingForCategory}
                     </Text>{' '}
                 </Fragment>
             ) : (
                 <Fragment>
                     <Text fontSize={['lg', 'lg', 'xl', '3xl']} fontWeight="700" marginBottom={2}>
-                        {intl.formatMessage(
-                            {
-                                id: 'empty_search_results.info.cant_find_anything_for_query',
-                                defaultMessage: 'We couldn’t find anything for "{searchQuery}".'
-                            },
-                            {
-                                searchQuery: searchQuery
-                            }
-                        )}
+                        {messages.cantFindAnythingForQuery}
                     </Text>
                     <Text fontSize={['md', 'md', 'md', 'md']} fontWeight="400">
-                        {intl.formatMessage(
-                            {
-                                id: 'empty_search_results.info.double_check_spelling',
-                                defaultMessage:
-                                    'Double-check your spelling and try again or {link}.'
-                            },
-                            {
-                                link: (
-                                    <Button variant="link" to={'/'}>
-                                        {intl.formatMessage(contactUsMessage)}
-                                    </Button>
-                                )
-                            }
-                        )}
+                        {messages.doubleCheckSpelling}
                     </Text>
                     <Stack gap={16} marginTop={32}>
                         <RecommendedProducts
-                            title={
-                                <FormattedMessage
-                                    defaultMessage="Top Sellers"
-                                    id="empty_search_results.recommended_products.title.top_sellers"
-                                />
-                            }
+                            title={messages.topSellers}
                             recommender={EINSTEIN_RECOMMENDERS.EMPTY_SEARCH_RESULTS_TOP_SELLERS}
                             mx={{base: -4, md: -8, lg: 0}}
                         />
 
                         <RecommendedProducts
-                            title={
-                                <FormattedMessage
-                                    defaultMessage="Most Viewed"
-                                    id="empty_search_results.recommended_products.title.most_viewed"
-                                />
-                            }
+                            title={messages.mostViewed}
                             recommender={EINSTEIN_RECOMMENDERS.EMPTY_SEARCH_RESULTS_MOST_VIEWED}
                             mx={{base: -4, md: -8, lg: 0}}
                         />
