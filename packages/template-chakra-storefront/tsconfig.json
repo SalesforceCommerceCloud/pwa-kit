@@ -33,7 +33,4 @@
         "skipLibCheck": true
     },
     "exclude": ["node_modules", "src/static"],
-    "files": [
-        "src/types/global.d.ts"
-    ]
 }
