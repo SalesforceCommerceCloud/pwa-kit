@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React from 'react'
+import React, {useMemo} from 'react'
 import PropTypes from 'prop-types'
 import {useIntl} from 'react-intl'
 import {Box, Button, Stack, Center, Text} from '@chakra-ui/react'
@@ -12,34 +12,35 @@ import {AccountIcon, BasketIcon} from '../../../components/icons'
 import Link from '../../../components/link'
 
 const EmptyCart = ({isRegistered}) => {
-    const {formatMessage} = useIntl()
+    const intl = useIntl()
+    const {formatMessage} = intl
 
-    const messages = {
-        title: formatMessage({
+    const messages = useMemo(() => ({
+        title: intl.formatMessage({
             id: 'empty_cart.description.empty_cart',
             defaultMessage: 'Your cart is empty.'
         }),
         description: {
-            registered: formatMessage({
+            registered: intl.formatMessage({
                 id: 'empty_cart.message.continue_shopping',
                 defaultMessage: 'Continue shopping to add items to your cart.'
             }),
-            unregistered: formatMessage({
+            unregistered: intl.formatMessage({
                 id: 'empty_cart.message.sign_in_or_continue_shopping',
                 defaultMessage: 'Sign in to retrieve your saved items or continue shopping.'
             })
         },
         buttons: {
-            continueShopping: formatMessage({
+            continueShopping: intl.formatMessage({
                 id: 'empty_cart.link.continue_shopping',
                 defaultMessage: 'Continue Shopping'
             }),
-            signIn: formatMessage({
+            signIn: intl.formatMessage({
                 id: 'empty_cart.link.sign_in',
                 defaultMessage: 'Sign In'
             })
         }
-    }
+    }), [intl])
 
     return (
         <Box data-testid="sf-cart-empty" flex="1" minWidth="100%" width="full" background="gray.50">

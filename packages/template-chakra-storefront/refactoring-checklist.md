@@ -72,7 +72,7 @@ Total files: 97
 - [x] src/pages/cart/partials/cart-secondary-button-group.jsx
 - [x] src/pages/cart/partials/cart-skeleton.jsx
 - [x] src/pages/cart/partials/cart-title.jsx
-- [ ] src/pages/cart/partials/empty-cart.jsx
+- [x] src/pages/cart/partials/empty-cart.jsx
 - [ ] src/pages/checkout/confirmation.jsx
 - [ ] src/pages/checkout/index.jsx
 - [x] src/pages/checkout/partials/cc-radio-group.jsx
