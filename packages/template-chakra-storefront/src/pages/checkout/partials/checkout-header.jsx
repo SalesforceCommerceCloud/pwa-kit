@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React from 'react'
+import React, {useMemo} from 'react'
 import {useIntl} from 'react-intl'
 import {Badge, Box, Button, Flex, Center} from '@chakra-ui/react'
 import Link from '../../../components/link'
@@ -13,7 +13,8 @@ import {useCurrentBasket} from '../../../hooks/use-current-basket'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 
 const CheckoutHeader = () => {
-    const {formatMessage} = useIntl()
+    const intl = useIntl()
+    const {formatMessage} = intl
     const {
         derivedData: {totalItems}
     } = useCurrentBasket()
@@ -21,7 +22,7 @@ const CheckoutHeader = () => {
         pages: {home: homeConfig}
     } = getConfig()
 
-    const messages = {
+    const messages = useMemo(() => ({
         backToCart: formatMessage({
             id: 'checkout_header.link.cart',
             defaultMessage: 'Back to cart'
@@ -33,7 +34,7 @@ const CheckoutHeader = () => {
             },
             {numItems: totalItems}
         )
-    }
+    }), [intl])
 
     return (
         <Box px={[4, 4, 8]} bg="white" borderBottom="1px" borderColor="gray.100">

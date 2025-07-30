@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React, {useEffect, useRef, useState} from 'react'
+import React, {useEffect, useRef, useState, useMemo} from 'react'
 import PropTypes from 'prop-types'
 import {Alert, Box, Button, Container, Dialog, Stack, Text} from '@chakra-ui/react'
 import {useForm} from 'react-hook-form'
@@ -33,7 +33,8 @@ import {
 } from '../../../../config/constants'
 
 const ContactInfo = ({isSocialEnabled = false, isPasswordlessEnabled = false, idps = []}) => {
-    const {formatMessage} = useIntl()
+    const intl = useIntl()
+    const {formatMessage} = intl
     const navigate = useNavigation()
     const {data: customer} = useCurrentCustomer()
     const {data: basket} = useCurrentBasket()
@@ -84,7 +85,7 @@ const ContactInfo = ({isSocialEnabled = false, isPasswordlessEnabled = false, id
         }
     }
 
-    const messages = {
+    const messages = useMemo(() => ({
         contactInfoTitle: formatMessage({
             id: 'contact_info.title.contact_info',
             defaultMessage: 'Contact Info'
@@ -113,7 +114,7 @@ const ContactInfo = ({isSocialEnabled = false, isPasswordlessEnabled = false, id
             id: 'contact_info.error.incorrect_username_or_password',
             defaultMessage: 'Incorrect username or password, please try again.'
         })
-    }
+    }), [intl])
 
     const submitForm = async (data) => {
         setError(null)

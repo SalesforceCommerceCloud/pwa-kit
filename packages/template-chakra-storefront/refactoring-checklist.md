@@ -66,7 +66,7 @@ Total files: 97
 - [x] src/pages/account/wishlist/index.jsx
 - [x] src/pages/account/wishlist/partials/wishlist-primary-action.jsx
 - [x] src/pages/account/wishlist/partials/wishlist-secondary-button-group.jsx
-- [ ] src/pages/cart/hooks/use-cart-operations.js
+- [x] src/pages/cart/hooks/use-cart-operations.js
 - [ ] src/pages/cart/partials/cart-cta.jsx
 - [ ] src/pages/cart/partials/cart-recommendations.jsx
 - [ ] src/pages/cart/partials/cart-secondary-button-group.jsx
@@ -77,8 +77,8 @@ Total files: 97
 - [ ] src/pages/checkout/index.jsx
 - [ ] src/pages/checkout/partials/cc-radio-group.jsx
 - [ ] src/pages/checkout/partials/checkout-footer.jsx
-- [ ] src/pages/checkout/partials/checkout-header.jsx
-- [ ] src/pages/checkout/partials/contact-info.jsx
+- [x] src/pages/checkout/partials/checkout-header.jsx
+- [x] src/pages/checkout/partials/contact-info.jsx
 - [x] src/pages/checkout/partials/login-state.jsx
 - [x] src/pages/checkout/partials/payment-form.jsx
 - [x] src/pages/checkout/partials/payment.jsx
