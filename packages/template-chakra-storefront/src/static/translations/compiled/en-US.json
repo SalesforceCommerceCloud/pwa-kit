@@ -279,12 +279,6 @@
       "value": "Remove"
     }
   ],
-  "add_to_cart_modal.button.select_bonus_products": [
-    {
-      "type": 0,
-      "value": "Select Bonus Products"
-    }
-  ],
   "add_to_cart_modal.info.added_to_cart": [
     {
       "type": 1,

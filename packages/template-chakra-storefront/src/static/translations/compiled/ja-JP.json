@@ -279,12 +279,6 @@
       "value": "削除"
     }
   ],
-  "add_to_cart_modal.button.select_bonus_products": [
-    {
-      "type": 0,
-      "value": "ボーナス商品を選択"
-    }
-  ],
   "add_to_cart_modal.info.added_to_cart": [
     {
       "type": 1,
