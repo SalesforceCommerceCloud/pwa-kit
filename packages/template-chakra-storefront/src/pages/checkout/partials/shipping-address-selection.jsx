@@ -20,6 +20,11 @@ import {MESSAGE_PROPTYPE} from '../../../utils/locale'
 import {useCurrentCustomer} from '../../../hooks/use-current-customer'
 import {useShopperCustomersMutation} from '@salesforce/commerce-sdk-react'
 
+const saveButtonMessage = defineMessage({
+    defaultMessage: 'Save & Continue to Shipping Method',
+    id: 'shipping_address_edit_form.button.save_and_continue'
+})
+
 const ShippingAddressEditForm = ({
     title,
     hasSavedAddresses,
@@ -35,10 +40,7 @@ const ShippingAddressEditForm = ({
 
     const messages = useMemo(
         () => ({
-            saveButton: formatMessage({
-                defaultMessage: 'Save & Continue to Shipping Method',
-                id: 'shipping_address_edit_form.button.save_and_continue'
-            })
+            saveButton: formatMessage(saveButtonMessage)
         }),
         [intl]
     )
@@ -72,7 +74,7 @@ const ShippingAddressEditForm = ({
 
                     {hasSavedAddresses && !hideSubmitButton ? (
                         <FormActionButtons
-                            saveButtonLabel={messages.saveButton}
+                            saveButtonLabel={saveButtonMessage}
                             onCancel={toggleAddressEdit}
                         />
                     ) : (

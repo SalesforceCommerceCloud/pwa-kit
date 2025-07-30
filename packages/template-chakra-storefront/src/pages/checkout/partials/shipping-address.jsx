@@ -6,7 +6,7 @@
  */
 import React, {useState, useMemo} from 'react'
 import {nanoid} from 'nanoid'
-import {useIntl} from 'react-intl'
+import {defineMessage, useIntl} from 'react-intl'
 import {useCheckout} from '../util/checkout-context'
 import {ToggleCard, ToggleCardEdit, ToggleCardSummary} from '../../../components/toggle-card'
 import ShippingAddressSelection from './shipping-address-selection'
@@ -16,6 +16,15 @@ import {
     useShopperBasketsMutation
 } from '@salesforce/commerce-sdk-react'
 import {useCurrentCustomer, useCurrentBasket} from '../../../hooks'
+
+const submitButtonMessage = defineMessage({
+    defaultMessage: 'Continue to Shipping Method',
+    id: 'shipping_address.button.continue_to_shipping'
+})
+const shippingAddressAriaLabel = defineMessage({
+    defaultMessage: 'Shipping Address Form',
+    id: 'shipping_address.label.shipping_address_form'
+})
 
 export default function ShippingAddress() {
     const intl = useIntl()
@@ -28,14 +37,6 @@ export default function ShippingAddress() {
 
     const messages = useMemo(
         () => ({
-            submitButton: formatMessage({
-                id: 'shipping_address.button.continue_to_shipping',
-                defaultMessage: 'Continue to Shipping Method'
-            }),
-            shippingAddressAriaLabel: formatMessage({
-                id: 'shipping_address.label.shipping_address_form',
-                defaultMessage: 'Shipping Address Form'
-            }),
             shippingAddress: formatMessage({
                 id: 'shipping_address.title.shipping_address',
                 defaultMessage: 'Shipping Address'
@@ -130,9 +131,9 @@ export default function ShippingAddress() {
             <ToggleCardEdit>
                 <ShippingAddressSelection
                     selectedAddress={selectedShippingAddress}
-                    submitButtonLabel={messages.submitButton}
+                    submitButtonLabel={submitButtonMessage}
                     onSubmit={submitAndContinue}
-                    formTitleAriaLabel={messages.shippingAddressAriaLabel}
+                    formTitleAriaLabel={shippingAddressAriaLabel}
                 />
             </ToggleCardEdit>
             {selectedShippingAddress && (
