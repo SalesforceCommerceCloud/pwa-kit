@@ -1,0 +1,155 @@
+---
+description: Use when applying styles to website template
+alwaysApply: false
+---
+# Comprehensive Header Theming Rule
+
+When applying a theme to the header, navigation, dropdowns, and badges, ALL related components MUST be updated together to maintain visual consistency and brand coherence.
+
+## 🎯 **Components That Must Be Updated Together**
+
+### 1. **Header Component**
+**File**: `packages/template-retail-react-app/app/theme/components/project/header.js`
+**Elements to Update**:
+- Container background color
+- Text and icon colors
+- Logo styling
+- Search input styling
+- Account and cart icon colors
+
+### 2. **List Menu Navigation**
+**File**: `packages/template-retail-react-app/app/theme/foundations/list-menu-styles.js`
+**Elements to Update**:
+- Primary navigation colors and fonts
+- Secondary navigation styling
+- Dropdown menu backgrounds and text
+- Hover and active states
+- Icon colors (chevrons, etc.)
+
+### 3. **Dropdown Menus**
+**Files**: 
+- `packages/template-retail-react-app/app/theme/foundations/list-menu-styles.js`
+- `packages/template-retail-react-app/app/theme/components/project/list-menu.js`
+**Elements to Update**:
+- Dropdown background colors
+- Dropdown text colors
+- Hover states
+- Border colors
+- Shadow effects
+
+### 4. **Badges (Shopping Cart, Notifications)**
+**File**: `packages/template-retail-react-app/app/theme/components/base/badge.js`
+**Elements to Update**:
+- Notification badge background color
+- Badge text color
+- Border colors
+- Size and positioning
+
+## 🔧 **Implementation Checklist**
+
+### ✅ **Color Updates**
+- [ ] Header background color
+- [ ] Header text and icon colors
+- [ ] Navigation link colors (default, hover, active)
+- [ ] Dropdown background and text colors
+- [ ] Badge background and text colors
+- [ ] Search input styling
+- [ ] Focus states and borders
+
+### ✅ **Typography Updates**
+- [ ] Header text font sizes and weights
+- [ ] Navigation link typography
+- [ ] Dropdown text typography
+- [ ] Badge text styling
+- [ ] Consistent font families
+
+### ✅ **Interactive States**
+- [ ] Hover effects for all clickable elements
+- [ ] Active/focused states
+- [ ] Disabled states
+- [ ] Loading states
+
+## 📋 **Required File Updates**
+
+### **Primary Theme Files**:
+1. `packages/template-retail-react-app/app/theme/foundations/colors.js` - Define brand colors
+2. `packages/template-retail-react-app/app/theme/components/project/header.js` - Header styling
+3. `packages/template-retail-react-app/app/theme/foundations/list-menu-styles.js` - Navigation styles
+4. `packages/template-retail-react-app/app/theme/components/base/badge.js` - Badge styling
+5. `packages/template-retail-react-app/app/theme/components/base/input.js` - Search input styling
+
+### **Component Files**:
+1. `packages/template-retail-react-app/app/components/header/index.jsx` - Header component
+2. `packages/template-retail-react-app/app/components/drawer-menu/drawer-menu.jsx` - Mobile menu
+3. `packages/template-retail-react-app/app/components/icons/custom-brand-logo.jsx` - Logo component
+
+## 🎨 **Color Scheme Implementation**
+
+### **Example Implementation**:
+```javascript
+// 1. Define colors in colors.js
+const colors = {
+    brand: {
+        accent: '#7d98c1',
+        dark: '#000000',
+        light: '#ffffff'
+    }
+}
+
+// 2. Update header.js
+container: {
+    backgroundColor: 'brand.dark'
+},
+content: {
+    color: 'brand.light'
+}
+
+// 3. Update list-menu-styles.js
+primary: {
+    default: { color: 'brand.light' },
+    hover: { color: 'brand.accent' }
+},
+dropdown: {
+    background: 'brand.light',
+    text: { color: 'brand.dark' }
+}
+
+// 4. Update badge.js
+notification: {
+    backgroundColor: 'brand.accent',
+    color: 'white'
+}
+```
+
+## 🔍 **Verification Steps**
+
+After applying theme changes, verify:
+1. ✅ Header background and text colors are consistent
+2. ✅ Navigation links use proper brand colors
+3. ✅ Dropdown menus have correct background/text colors
+4. ✅ Badges use brand accent color
+5. ✅ Search input styling matches theme
+6. ✅ All hover and active states work correctly
+7. ✅ Mobile menu styling is consistent
+8. ✅ Accessibility contrast ratios are maintained
+
+## ❌ **Common Mistakes to Avoid**
+
+1. **Incomplete Updates**: Don't update only header without updating navigation
+2. **Inconsistent Colors**: Don't mix brand colors with default colors
+3. **Missing States**: Don't forget hover, active, and focus states
+4. **Ignoring Mobile**: Don't forget mobile menu styling
+5. **Badge Overlook**: Don't forget to update notification badges
+
+## 📱 **Responsive Considerations**
+
+- Ensure theme works on all screen sizes
+- Test mobile navigation styling
+- Verify dropdown positioning and styling
+- Check badge positioning on different devices
+
+This rule ensures comprehensive theming that maintains visual consistency across all header-related components and provides a cohesive user experience.
+description:
+globs:
+alwaysApply: false
+---
