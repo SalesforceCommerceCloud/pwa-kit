@@ -296,7 +296,8 @@ export const getGoogleButtonConfig = (
     return buttonConfig
 }
 
-export const GooglePayExpress = () => {
+export const GooglePayExpress = ({manager}) => {
+    console.log('[GooglePayExpress] Confirming manager is available', manager)
     const {
         adyenEnvironment,
         adyenPaymentMethods,
@@ -319,9 +320,10 @@ export const GooglePayExpress = () => {
             }
 
             const handleGooglePayUnavailable = () => {
-                sendExpressMessage(EXPRESS_MESSAGES.PAYMENT_UNAVAILABLE, {
-                    PAYMENT_METHOD
-                })
+                if (manager) {
+                    console.log('[GooglePayExpress] Google Pay unavailable, setting manager to unavailable')
+                    manager.setPaymentMethodUnavailable(PAYMENT_METHOD)
+                }
             }
 
             try {
@@ -375,13 +377,16 @@ export const GooglePayExpress = () => {
 
                 try {
                     await googlePayButton.mount(paymentContainer.current)
-                    sendExpressMessage(EXPRESS_MESSAGES.PAYMENT_AVAILABLE, {
-                        PAYMENT_METHOD
-                    })
+                    if (manager) {
+                        console.log('[GooglePayExpress] Google Pay available, setting manager to available')
+                        manager.setPaymentMethodAvailable(PAYMENT_METHOD)
+                    }
                 } catch (error) {
                     handleGooglePayUnavailable()
                 }
             } catch (err) {
+                console.log('BROWSER SPECIFIC err', err)
+                
                 const isMissingOrderTotalError =
                     err instanceof TypeError &&
                     (/undefined is not an object \(evaluating '[a-z]\.orderTotal'\)/.test(
@@ -420,5 +425,6 @@ export const GooglePayExpress = () => {
 }
 
 GooglePayExpress.propTypes = {
-    shippingMethods: PropTypes.array
+    shippingMethods: PropTypes.array,
+    manager: PropTypes.object
 }
