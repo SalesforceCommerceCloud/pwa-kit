@@ -143,10 +143,7 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], isPasswordlessEnabled 
         const isValid = await form.trigger()
         // Manually trigger the browser native form validations
         if (isValid) {
-            // Open OTP modal with small delay to ensure proper event handling
-            setTimeout(() => {
-                onOtpModalOpen()
-            }, 100)
+            // Try to send OTP first, only open modal if successful
             await handleSendEmailOtp(email)
         } else {
             form.reportValidity()
@@ -173,15 +170,28 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], isPasswordlessEnabled 
                 userid: email,
                 callbackURI: `${callbackURL}?mode=otp_email`
             })
+            // Only open modal and set OTP view if API call succeeds
             setShowOtpView(true)
+            onOtpModalOpen()
         } catch (error) {
-            console.error('error: ', error);
-            const message = USER_NOT_FOUND_ERROR.test(error.message)
-                ? formatMessage(CREATE_ACCOUNT_FIRST_ERROR_MESSAGE)
-                : PASSWORDLESS_ERROR_MESSAGES.some((msg) => msg.test(error.message))
-                ? formatMessage(FEATURE_UNAVAILABLE_ERROR_MESSAGE)
-                : formatMessage(API_ERROR_MESSAGE)
-            setError(message)
+            setShowOtpView(false)
+            // No need to close modal since it never opened
+            
+            // Handle specific error types
+            console.error('Passwordless authorization failed:', error)
+            
+            // // Check if it's a 404 (user not found) or other specific errors
+            // if (error.response?.status === 404) {
+            //     // User not found - they should register or checkout as guest
+            //     const message = formatMessage(CREATE_ACCOUNT_FIRST_ERROR_MESSAGE)
+            //     setError(message)
+            // } else {
+            //     // Other errors - show appropriate message
+            //     const message = PASSWORDLESS_ERROR_MESSAGES.some((msg) => msg.test(error.message))
+            //         ? formatMessage(FEATURE_UNAVAILABLE_ERROR_MESSAGE)
+            //         : formatMessage(API_ERROR_MESSAGE)
+            //     setError(message)
+            // }
         }
     }
 
@@ -556,11 +566,11 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], isPasswordlessEnabled 
                     </Container>
                 </ToggleCardEdit>
 
-                {customer?.email && (
+                {(customer?.email || form.getValues('email')) && (
                     <ToggleCardSummary>
                         {isProcessingAddressLogic ? (
                             <Stack spacing={2}>
-                                <Text>{customer.email}</Text>
+                                <Text>{customer?.email || form.getValues('email')}</Text>
                                 <Text color="blue.500" fontSize="sm" fontStyle="italic">
                                     <FormattedMessage
                                         defaultMessage="Checking for saved addresses..."
@@ -569,7 +579,7 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], isPasswordlessEnabled 
                                 </Text>
                             </Stack>
                         ) : (
-                            <Text>{customer.email}</Text>
+                            <Text>{customer?.email || form.getValues('email')}</Text>
                         )}
                     </ToggleCardSummary>
                 )}
