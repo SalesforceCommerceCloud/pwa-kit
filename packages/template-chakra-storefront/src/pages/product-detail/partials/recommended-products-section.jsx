@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React from 'react'
+import React, {useMemo} from 'react'
 import PropTypes from 'prop-types'
 import {useIntl} from 'react-intl'
 import {Stack} from '@chakra-ui/react'
@@ -16,7 +16,7 @@ const RecommendedProductsSection = ({product, isProductASet}) => {
     const location = useLocation()
     const {formatMessage} = useIntl()
 
-    const messages = {
+    const messages = useMemo(() => ({
         completeSet: formatMessage({
             id: 'product_detail.recommended_products.title.complete_set',
             defaultMessage: 'Complete the Set'
@@ -29,7 +29,7 @@ const RecommendedProductsSection = ({product, isProductASet}) => {
             id: 'product_detail.recommended_products.title.recently_viewed',
             defaultMessage: 'Recently Viewed'
         })
-    }
+    }), [intl])
 
     return (
         <Stack gap={16}>

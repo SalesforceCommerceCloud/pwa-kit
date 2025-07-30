@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React, {useContext, useState, useEffect} from 'react'
+import React, {useContext, useState, useEffect, useMemo} from 'react'
 import {useLocation} from 'react-router-dom'
 import PropTypes from 'prop-types'
 import {useIntl} from 'react-intl'
@@ -57,7 +57,8 @@ export const AddToCartModal = () => {
     const {product, itemsAdded = [], selectedQuantity} = data || {}
     const isProductABundle = !!product?.type.bundle
 
-    const {formatMessage} = useIntl()
+    const intl = useIntl()
+    const {formatMessage} = intl
     const {
         data: basket = {},
         derivedData: {totalItems}
@@ -68,15 +69,7 @@ export const AddToCartModal = () => {
         ? selectedQuantity
         : itemsAdded.reduce((acc, {quantity}) => acc + quantity, 0)
 
-    if (!isOpen) {
-        return null
-    }
-
-    const bundleImage = findImageGroupBy(product.imageGroups, {
-        viewType: 'small'
-    })?.images?.[0]
-
-    const messages = {
+    const messages = useMemo(() => ({
         addedToCart: formatMessage(
             {
                 id: 'add_to_cart_modal.info.added_to_cart',
@@ -107,7 +100,15 @@ export const AddToCartModal = () => {
             id: 'add_to_cart_modal.recommended_products.title.might_also_like',
             defaultMessage: 'You Might Also Like'
         })
+    }), [intl, numberOfItemsAdded, totalItems])
+
+    if (!isOpen) {
+        return null
     }
+
+    const bundleImage = findImageGroupBy(product.imageGroups, {
+        viewType: 'small'
+    })?.images?.[0]
 
     const dialogTitleId = 'add-to-cart-modal-title'
 
@@ -131,7 +132,7 @@ export const AddToCartModal = () => {
                     >
                         <Dialog.Header paddingY="8" bgColor="white">
                             <Heading as="h1" fontSize="2xl" id={dialogTitleId}>
-                                {dialogTitle}
+                                {messages.addedToCart}
                             </Heading>
                         </Dialog.Header>
                         <Dialog.Body bgColor="white" padding="0" marginBottom={{base: 40, lg: 0}}>

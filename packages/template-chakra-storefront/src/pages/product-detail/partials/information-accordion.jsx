@@ -5,15 +5,16 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React from 'react'
+import React, {useMemo} from 'react'
 import PropTypes from 'prop-types'
 import {Accordion, Box, Span, Stack} from '@chakra-ui/react'
 import {useIntl} from 'react-intl'
 
 const InformationAccordion = ({product}) => {
-    const {formatMessage} = useIntl()
+    const intl = useIntl()
+    const {formatMessage} = intl
 
-    const messages = {
+    const messages = useMemo(() => ({
         productDetail: formatMessage({
             id: 'product_detail.accordion.button.product_detail',
             defaultMessage: 'Product Detail'
@@ -34,7 +35,7 @@ const InformationAccordion = ({product}) => {
             id: 'product_detail.accordion.message.coming_soon',
             defaultMessage: 'Coming Soon'
         })
-    }
+    }), [intl])
 
     return (
         <Stack direction="row" gap={[0, 0, 0, 16]}>
