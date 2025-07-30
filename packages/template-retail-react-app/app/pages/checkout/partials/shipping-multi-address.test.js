@@ -190,8 +190,8 @@ const defaultProps = {
         id: 'checkout.button.continue'
     },
     addNewAddressLabel: {
-        defaultMessage: 'Add New Address',
-        id: 'checkout.button.add_new_address'
+        defaultMessage: '+ Add New Address',
+        id: 'shipping_address.button.add_new_address'
     },
     noItemsInBasketMessage: {
         defaultMessage: 'No items in basket.',
@@ -217,7 +217,9 @@ describe('ShippingMultiAddress', () => {
             data: {
                 'product-1': mockProducts.data[0],
                 'product-2': mockProducts.data[1]
-            }
+            },
+            isLoading: false,
+            error: null
         })
         useCurrentCustomer.mockReturnValue({
             data: mockCustomer,
@@ -317,7 +319,7 @@ describe('ShippingMultiAddress', () => {
             renderWithIntl(<ShippingMultiAddress {...defaultProps} />)
 
             // Check that "Add New Address" buttons are present (should be 2, one for each item)
-            const addNewAddressButtons = screen.getAllByText('Add New Address')
+            const addNewAddressButtons = screen.getAllByText('+ Add New Address')
             expect(addNewAddressButtons).toHaveLength(2)
         })
 
@@ -325,7 +327,7 @@ describe('ShippingMultiAddress', () => {
             renderWithIntl(<ShippingMultiAddress {...defaultProps} />)
 
             // Get all "Add New Address" buttons and click the first one
-            const addNewAddressButtons = screen.getAllByText('Add New Address')
+            const addNewAddressButtons = screen.getAllByText('+ Add New Address')
             expect(addNewAddressButtons).toHaveLength(2) // Should have 2 buttons (one for each item)
 
             fireEvent.click(addNewAddressButtons[0])
@@ -340,7 +342,7 @@ describe('ShippingMultiAddress', () => {
             renderWithIntl(<ShippingMultiAddress {...defaultProps} />)
 
             // Get all "Add New Address" buttons and click the first one
-            const addNewAddressButtons = screen.getAllByText('Add New Address')
+            const addNewAddressButtons = screen.getAllByText('+ Add New Address')
             fireEvent.click(addNewAddressButtons[0])
 
             // Wait for the form to appear and check for buttons
@@ -355,7 +357,7 @@ describe('ShippingMultiAddress', () => {
             renderWithIntl(<ShippingMultiAddress {...defaultProps} />)
 
             // Get all "Add New Address" buttons and click the first one
-            const addNewAddressButtons = screen.getAllByText('Add New Address')
+            const addNewAddressButtons = screen.getAllByText('+ Add New Address')
             fireEvent.click(addNewAddressButtons[0])
 
             // Wait for the form to appear
@@ -376,7 +378,7 @@ describe('ShippingMultiAddress', () => {
             renderWithIntl(<ShippingMultiAddress {...defaultProps} />)
 
             // Get all "Add New Address" buttons and click the first one
-            const addNewAddressButtons = screen.getAllByText('Add New Address')
+            const addNewAddressButtons = screen.getAllByText('+ Add New Address')
             fireEvent.click(addNewAddressButtons[0])
 
             // Wait for the form to appear
@@ -458,6 +460,10 @@ describe('ShippingMultiAddress', () => {
             // Check that the second dropdown also shows the first address as selected
             const secondSelect = selectElements[1]
             expect(secondSelect).toHaveValue('addr-1') // First address should be selected by default
+
+            // Check that dropdowns are enabled when addresses are available
+            expect(firstSelect).toBeEnabled()
+            expect(secondSelect).toBeEnabled()
         })
 
         test('should show "No Address Available" when no addresses exist', () => {
@@ -484,8 +490,12 @@ describe('ShippingMultiAddress', () => {
             const secondSelect = selectElements[1]
             expect(secondSelect).toHaveTextContent('No Address Available')
 
+            // Check that dropdowns are disabled when no addresses are available
+            expect(firstSelect).toBeDisabled()
+            expect(secondSelect).toBeDisabled()
+
             // Verify that "Add New Address" buttons are still available
-            const addNewAddressButtons = screen.getAllByText('Add New Address')
+            const addNewAddressButtons = screen.getAllByText('+ Add New Address')
             expect(addNewAddressButtons).toHaveLength(2)
         })
 
@@ -498,8 +508,10 @@ describe('ShippingMultiAddress', () => {
 
             renderWithIntl(<ShippingMultiAddress {...defaultProps} />)
 
-            // Check that loading message is displayed
-            expect(screen.getByText('Loading customer information...')).toBeInTheDocument()
+            // Check that main content is not displayed during loading
+            expect(screen.queryByText('Test Product 1')).not.toBeInTheDocument()
+            expect(screen.queryByText('Test Product 2')).not.toBeInTheDocument()
+            expect(screen.queryByText('+ Add New Address')).not.toBeInTheDocument()
         })
 
         test('should show guest user message when customer is a guest', () => {
@@ -532,8 +544,9 @@ describe('ShippingMultiAddress', () => {
 
             const {unmount} = renderWithIntl(<ShippingMultiAddress {...defaultProps} />)
 
-            // Check that loading message is displayed
-            expect(screen.getByText('Loading customer information...')).toBeInTheDocument()
+            // Check that main content is not displayed during loading
+            expect(screen.queryByText('Test Product 1')).not.toBeInTheDocument()
+            expect(screen.queryByText('Test Product 2')).not.toBeInTheDocument()
 
             // Clean up
             unmount()
@@ -549,7 +562,7 @@ describe('ShippingMultiAddress', () => {
             // Check that normal UI is displayed after loading
             expect(screen.getByText('Test Product 1')).toBeInTheDocument()
             expect(screen.getByText('Test Product 2')).toBeInTheDocument()
-            expect(screen.queryByText('Loading customer information...')).not.toBeInTheDocument()
+            expect(screen.getAllByText('+ Add New Address')).toHaveLength(2)
         })
     })
 
@@ -571,7 +584,7 @@ describe('ShippingMultiAddress', () => {
             renderWithIntl(<ShippingMultiAddress {...defaultProps} />)
 
             // Click "Add New Address" button
-            const addNewAddressButtons = screen.getAllByText('Add New Address')
+            const addNewAddressButtons = screen.getAllByText('+ Add New Address')
             fireEvent.click(addNewAddressButtons[0])
 
             // Wait for the form to appear
@@ -591,7 +604,7 @@ describe('ShippingMultiAddress', () => {
             renderWithIntl(<ShippingMultiAddress {...defaultProps} />)
 
             // Click "Add New Address" button
-            const addNewAddressButtons = screen.getAllByText('Add New Address')
+            const addNewAddressButtons = screen.getAllByText('+ Add New Address')
             fireEvent.click(addNewAddressButtons[0])
 
             // Wait for the form to appear
@@ -625,7 +638,7 @@ describe('ShippingMultiAddress', () => {
             renderWithIntl(<ShippingMultiAddress {...defaultProps} />)
 
             // Click "Add New Address" button
-            const addNewAddressButtons = screen.getAllByText('Add New Address')
+            const addNewAddressButtons = screen.getAllByText('+ Add New Address')
             fireEvent.click(addNewAddressButtons[0])
 
             // Wait for the form to appear
@@ -668,7 +681,7 @@ describe('ShippingMultiAddress', () => {
             renderWithIntl(<ShippingMultiAddress {...defaultProps} />)
 
             // Click "Add New Address" button for first product
-            const addNewAddressButtons = screen.getAllByText('Add New Address')
+            const addNewAddressButtons = screen.getAllByText('+ Add New Address')
             fireEvent.click(addNewAddressButtons[0])
 
             // Wait for first form to appear

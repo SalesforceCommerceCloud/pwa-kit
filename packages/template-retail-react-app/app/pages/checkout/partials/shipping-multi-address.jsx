@@ -38,7 +38,6 @@ import {
     AlertTitle,
     AlertDescription,
     Center,
-    Spinner,
     Stack
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 import {useMultiship} from '@salesforce/retail-react-app/app/hooks/use-multiship'
@@ -213,6 +212,9 @@ const ShippingMultiAddress = ({
     const isAddressFormOpen =
         Object.keys(showAddAddressForm).filter((key) => showAddAddressForm[key])?.length > 0
 
+    // Unified loading state - check if either customer or products are loading
+    const isLoading = customerLoading || productsLoading
+
     if (!basket?.productItems?.length) {
         return (
             <Center
@@ -226,22 +228,6 @@ const ShippingMultiAddress = ({
                 <VStack spacing={4}>
                     <Text fontSize="lg" fontWeight="medium">
                         {formatMessage(noItemsInBasketMessage)}
-                    </Text>
-                </VStack>
-            </Center>
-        )
-    }
-
-    if (productsLoading) {
-        return (
-            <Center p={8} textAlign="center" color="gray.500">
-                <VStack spacing={4}>
-                    <Spinner size="lg" />
-                    <Text>
-                        {formatMessage({
-                            id: 'shipping_multi_address.loading.message',
-                            defaultMessage: 'Loading products...'
-                        })}
                     </Text>
                 </VStack>
             </Center>
@@ -277,23 +263,6 @@ const ShippingMultiAddress = ({
         )
     }
 
-    // Handle customer loading state
-    if (customerLoading) {
-        return (
-            <Center p={8} textAlign="center" color="gray.500">
-                <VStack spacing={4}>
-                    <Spinner size="lg" />
-                    <Text>
-                        {formatMessage({
-                            id: 'shipping_multi_address.loading_customer.message',
-                            defaultMessage: 'Loading customer information...'
-                        })}
-                    </Text>
-                </VStack>
-            </Center>
-        )
-    }
-
     // Handle guest user
     if (customer && customer.isGuest) {
         return (
@@ -304,6 +273,22 @@ const ShippingMultiAddress = ({
                             id: 'shipping_multi_address.guest_user.message',
                             defaultMessage:
                                 'Guest users cannot use multi-address shipping. Please sign in to continue.'
+                        })}
+                    </Text>
+                </VStack>
+            </Center>
+        )
+    }
+
+    // Show loading message when loading
+    if (isLoading) {
+        return (
+            <Center p={8} textAlign="center" color="gray.500">
+                <VStack spacing={4}>
+                    <Text fontSize="lg" fontWeight="medium">
+                        {formatMessage({
+                            id: 'shipping_multi_address.loading.message',
+                            defaultMessage: 'Loading...'
                         })}
                     </Text>
                 </VStack>
@@ -529,11 +514,11 @@ const ShippingMultiAddress = ({
                                         <VStack
                                             align="flex-start"
                                             w="100%"
-                                            flex={{base: 'none', md: '0 0 auto'}}
+                                            flex={{base: 'none', md: '1'}}
                                             minW={{base: '100%', md: '280px'}}
                                             maxW={{base: '100%', md: '400px'}}
                                             pt={0}
-                                            spacing={3}
+                                            spacing={1}
                                             mt={{base: 4, md: 0}}
                                         >
                                             <Text
@@ -541,7 +526,7 @@ const ShippingMultiAddress = ({
                                                 data-testid={`delivery-address-label-${addressKey}`}
                                                 fontWeight="medium"
                                                 fontSize="sm"
-                                                mb={2}
+                                                mb={1}
                                             >
                                                 {formatMessage(deliveryAddressLabel)}
                                             </Text>
@@ -552,15 +537,22 @@ const ShippingMultiAddress = ({
                                                         value={selectedAddresses[addressKey] || ''}
                                                         onChange={(e) => {
                                                             const value = e.target.value
+                                                            // Hide the address form when an existing address is selected
                                                             setShowAddAddressForm((prev) => ({
                                                                 ...prev,
                                                                 [addressKey]: false
                                                             }))
-                                                            setSelectedAddresses((prev) => ({
-                                                                ...prev,
-                                                                [addressKey]: value
-                                                            }))
+                                                            setSelectedAddresses((prev) => {
+                                                                const newState = {...prev}
+                                                                if (value === '') {
+                                                                    delete newState[addressKey]
+                                                                } else {
+                                                                    newState[addressKey] = value
+                                                                }
+                                                                return newState
+                                                            })
                                                         }}
+                                                        disabled={addresses.length === 0}
                                                         aria-labelledby={`delivery-address-label-${addressKey}`}
                                                         borderColor="gray.300"
                                                         _hover={{borderColor: 'gray.400'}}
@@ -606,7 +598,7 @@ const ShippingMultiAddress = ({
                                                         )}
                                                     </Select>
                                                     <Button
-                                                        variant="outline"
+                                                        variant="link"
                                                         size="sm"
                                                         onClick={() => {
                                                             setShowAddAddressForm((prev) => ({
@@ -614,7 +606,17 @@ const ShippingMultiAddress = ({
                                                                 [addressKey]: true
                                                             }))
                                                         }}
-                                                        leftIcon={<Box as="span">+</Box>}
+                                                        alignSelf="flex-start"
+                                                        aria-label={formatMessage(
+                                                            {
+                                                                id: 'shipping_multi_address.add_new_address.aria_label',
+                                                                defaultMessage:
+                                                                    'Add new delivery address for {productName}'
+                                                            },
+                                                            {
+                                                                productName: item.productName
+                                                            }
+                                                        )}
                                                     >
                                                         {formatMessage(addNewAddressLabel)}
                                                     </Button>
@@ -639,12 +641,7 @@ const ShippingMultiAddress = ({
 
                                     {/* Add New Address Form - appears inside the product card */}
                                     {showAddAddressForm[addressKey] && (
-                                        <Box
-                                            position="relative"
-                                            mt={4}
-                                            width="100%"
-                                            data-testid="address-form-container"
-                                        >
+                                        <Box position="relative" mt={4} width="100%">
                                             <AddressForm
                                                 item={item}
                                                 form={addressForm}
