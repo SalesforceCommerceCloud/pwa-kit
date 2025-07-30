@@ -55,7 +55,7 @@ Total files: 97
 - [x] src/components/swatch-group/index.jsx
 - [x] src/components/toggle-card/index.jsx
 - [x] src/components/with-registration/index.jsx
-- [ ] src/hooks/use-add-to-cart-modal.js
+- [x] src/hooks/use-add-to-cart-modal.js
 - [ ] src/hooks/use-dnt-notification.js
 - [ ] src/hooks/use-product-view-modal.js
 - [ ] src/page-designer/layouts/carousel/index.jsx
@@ -87,7 +87,7 @@ Total files: 97
 - [ ] src/pages/checkout/partials/shipping-options.jsx
 - [ ] src/pages/home/index.jsx
 - [ ] src/pages/login/index.jsx
-- [ ] src/pages/page-not-found/index.jsx
+- [x] src/pages/page-not-found/index.jsx
 - [x] src/pages/product-detail/partials/information-accordion.jsx
 - [x] src/pages/product-detail/partials/recommended-products-section.jsx
 - [x] src/pages/product-list/partials/category-links.jsx

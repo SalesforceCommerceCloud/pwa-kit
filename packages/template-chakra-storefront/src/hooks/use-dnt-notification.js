@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React, {useEffect} from 'react'
+import React, {useEffect, useMemo} from 'react'
 import PropTypes from 'prop-types'
 import {useIntl} from 'react-intl'
 import {
@@ -26,7 +26,8 @@ import {useLocation} from 'react-router-dom'
 
 export const DntNotification = ({isOpen, onOpen, onClose}) => {
     const {selectedDnt, updateDNT} = useDNT()
-    const {formatMessage} = useIntl()
+    const intl = useIntl()
+    const {formatMessage} = intl
     const location = useLocation()
 
     useEffect(() => {
@@ -42,7 +43,7 @@ export const DntNotification = ({isOpen, onOpen, onClose}) => {
         onClose()
     }
 
-    const messages = {
+    const messages = useMemo(() => ({
         title: formatMessage({
             id: 'dnt_notification.title',
             defaultMessage: 'Tracking Consent'
@@ -73,7 +74,7 @@ export const DntNotification = ({isOpen, onOpen, onClose}) => {
             id: 'dnt_notification.description',
             defaultMessage: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.'
         })
-    }
+    }), [intl])
 
     const buttons = (
         <>

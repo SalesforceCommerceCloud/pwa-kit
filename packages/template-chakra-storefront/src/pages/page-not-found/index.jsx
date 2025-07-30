@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React from 'react'
+import React, {useMemo} from 'react'
 import {Box, Heading, Flex, Button, Stack, Text} from '@chakra-ui/react'
 import {Helmet} from 'react-helmet'
 import {useIntl} from 'react-intl'
@@ -19,7 +19,7 @@ const PageNotFound = () => {
     const history = useHistory()
     const {res} = useServerContext()
 
-    const messages = {
+    const messages = useMemo(() => ({
         pageTitle: formatMessage({
             id: 'page_not_found.title.page_cant_be_found',
             defaultMessage: "The page you're looking for can't be found."
@@ -37,7 +37,7 @@ const PageNotFound = () => {
             id: 'page_not_found.link.homepage',
             defaultMessage: 'Go to home page'
         })
-    }
+    }), [intl])
 
     if (res) {
         res.status(404)
