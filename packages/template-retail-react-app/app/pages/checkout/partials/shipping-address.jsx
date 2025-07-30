@@ -13,6 +13,11 @@ import {
     ToggleCardEdit,
     ToggleCardSummary
 } from '@salesforce/retail-react-app/app/components/toggle-card'
+import {
+    Box,
+    Text,
+    VStack
+} from '@salesforce/retail-react-app/app/components/shared/ui'
 import ShippingAddressSelection from '@salesforce/retail-react-app/app/pages/checkout/partials/shipping-address-selection'
 import AddressDisplay from '@salesforce/retail-react-app/app/components/address-display'
 import {
@@ -33,7 +38,7 @@ const shippingAddressAriaLabel = defineMessage({
     id: 'shipping_address.label.shipping_address_form'
 })
 const addNewAddressLabel = defineMessage({
-    defaultMessage: '+ Add New Address',
+    defaultMessage: 'Add New Address',
     id: 'shipping_address.button.add_new_address'
 })
 const noItemsInBasketMessage = defineMessage({
@@ -61,6 +66,12 @@ export default function ShippingAddress() {
     const {data: basket} = useCurrentBasket()
     const selectedShippingAddress = basket?.shipments && basket?.shipments[0]?.shippingAddress
     const isAddressFilled = selectedShippingAddress?.address1 && selectedShippingAddress?.city
+    
+    // Check if there are multiple delivery shipments (multi-shipping was used)
+    const deliveryShipments = basket?.shipments?.filter(
+        shipment => shipment.shippingAddress
+    ) || []
+    const hasMultipleDeliveryShipments = deliveryShipments.length > 1
     const {step, STEPS, goToStep} = useCheckout()
     const createCustomerAddress = useShopperCustomersMutation('createCustomerAddress')
     const updateCustomerAddress = useShopperCustomersMutation('updateCustomerAddress')
@@ -190,7 +201,16 @@ export default function ShippingAddress() {
             </ToggleCardEdit>
             {isAddressFilled && (
                 <ToggleCardSummary>
-                    <AddressDisplay address={selectedShippingAddress} />
+                    {hasMultipleDeliveryShipments ? (
+                        <Text>
+                            {formatMessage({
+                                defaultMessage: 'Your items are being delivered to multiple addresses. See details below.',
+                                id: 'shipping_address.summary.multiple_addresses'
+                            })}
+                        </Text>
+                    ) : (
+                        <AddressDisplay address={selectedShippingAddress} />
+                    )}
                 </ToggleCardSummary>
             )}
         </ToggleCard>
