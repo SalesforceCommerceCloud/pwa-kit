@@ -1,3 +1,6 @@
+## v2.10.0 (Jul 29, 2025)
+- Integrate commerce-sdk-react with PWA Kit v2.x and implement Hybrid Auth support [#2510](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2510)
+
 ## v2.9.0 (Jan 21, 2025)
 - Support Node 20 and NPM 10 in PWA Kit v2 [#2189](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2189)
 - Update Auth class to pass required `channel_id` to SLAS [#2189](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2189)
