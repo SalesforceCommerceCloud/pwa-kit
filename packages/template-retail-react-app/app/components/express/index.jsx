@@ -10,6 +10,7 @@ import {useLocation} from 'react-router-dom'
 import {useAccessToken, useCustomerId} from '@salesforce/commerce-sdk-react'
 import {AdyenExpressCheckoutProvider} from '@adyen/adyen-salesforce-pwa'
 
+import {ApplePayExpress} from '@salesforce/retail-react-app/app/components/apple-pay-express/index'
 import {GooglePayExpress} from '@salesforce/retail-react-app/app/components/google-pay-express/index'
 import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
 import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
