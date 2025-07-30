@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React, {useContext, createContext, useEffect, useRef} from 'react'
+import React, {useContext, createContext, useEffect, useRef, useMemo} from 'react'
 import PropTypes from 'prop-types'
 import {useIntl} from 'react-intl'
 import {Box, Button, Flex, Heading, Stack} from '@chakra-ui/react'
@@ -29,15 +29,16 @@ export const ToggleCard = ({
     children,
     ...props
 }) => {
-    const {formatMessage} = useIntl()
+    const intl = useIntl()
+    const {formatMessage} = intl
     const titleRef = useRef()
 
-    const messages = {
-        edit: formatMessage({
+    const messages = useMemo(() => ({
+        edit: intl.formatMessage({
             id: 'toggle_card.action.edit',
             defaultMessage: 'Edit'
         })
-    }
+    }), [intl])
 
     useEffect(() => {
         if (editing && titleRef.current) {

@@ -53,7 +53,7 @@ Total files: 97
 - [x] src/components/store-locator-modal/store-locator-input.jsx
 - [x] src/components/store-locator-modal/stores-list.jsx
 - [x] src/components/swatch-group/index.jsx
-- [ ] src/components/toggle-card/index.jsx
+- [x] src/components/toggle-card/index.jsx
 - [ ] src/components/with-registration/index.jsx
 - [ ] src/hooks/use-add-to-cart-modal.js
 - [ ] src/hooks/use-dnt-notification.js
