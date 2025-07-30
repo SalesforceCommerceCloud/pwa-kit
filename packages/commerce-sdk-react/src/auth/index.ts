@@ -821,17 +821,17 @@ class Auth {
             this.set('access_token', this.fetchedToken)
             this.set('customer_id', customerId)
 
-             /**
+            /**
              * The usid cookie always set when setting up auth in pure composable env or session bridging in a hybrid setup. This makes resetting the usid
              * cookie here redundant. However, if the usid cookie is not set, we can have a fallback to read the usid from the accesstoken and set it.
              * Setting the usid cookie conditionally ensures the usid is always set and minimizes the discrepancy between usid cookie and refresh_token cookie expiration.
              */
-             const usidCookieValue = this.get('usid')
-             if (!usidCookieValue || usidCookieValue !== usid) {
-                 this.set('usid', usid, {
-                     expires: expiresDate
-                 })
-             }
+            const usidCookieValue = this.get('usid')
+            if (!usidCookieValue || usidCookieValue !== usid) {
+                this.set('usid', usid, {
+                    expires: expiresDate
+                })
+            }
             this.set('customer_type', isGuest ? 'guest' : 'registered')
             return this.data
         }
