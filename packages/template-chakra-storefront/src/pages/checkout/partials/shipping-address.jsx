@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React, {useState} from 'react'
+import React, {useState, useMemo} from 'react'
 import {nanoid} from 'nanoid'
 import {defineMessage, useIntl} from 'react-intl'
 import {useCheckout} from '../util/checkout-context'
@@ -17,24 +17,24 @@ import {
 } from '@salesforce/commerce-sdk-react'
 import {useCurrentCustomer, useCurrentBasket} from '../../../hooks'
 
-const submitButtonMessage = defineMessage({
-    defaultMessage: 'Continue to Shipping Method',
-    id: 'shipping_address.button.continue_to_shipping'
-})
-const shippingAddressAriaLabel = defineMessage({
-    defaultMessage: 'Shipping Address Form',
-    id: 'shipping_address.label.shipping_address_form'
-})
-
 export default function ShippingAddress() {
-    const {formatMessage} = useIntl()
+    const intl = useIntl()
+    const {formatMessage} = intl
     const [isLoading, setIsLoading] = useState()
     const {data: customer} = useCurrentCustomer()
     const {data: basket} = useCurrentBasket()
     const selectedShippingAddress = basket?.shipments && basket?.shipments[0]?.shippingAddress
     const {step, STEPS, goToStep, goToNextStep} = useCheckout()
 
-    const messages = {
+    const messages = useMemo(() => ({
+        submitButton: formatMessage({
+            id: 'shipping_address.button.continue_to_shipping',
+            defaultMessage: 'Continue to Shipping Method'
+        }),
+        shippingAddressAriaLabel: formatMessage({
+            id: 'shipping_address.label.shipping_address_form',
+            defaultMessage: 'Shipping Address Form'
+        }),
         shippingAddress: formatMessage({
             id: 'shipping_address.title.shipping_address',
             defaultMessage: 'Shipping Address'
@@ -43,7 +43,8 @@ export default function ShippingAddress() {
             id: 'toggle_card.action.editShippingAddress',
             defaultMessage: 'Edit Shipping Address'
         })
-    }
+    }), [intl])
+
     const createCustomerAddress = useShopperCustomersMutation('createCustomerAddress')
     const updateCustomerAddress = useShopperCustomersMutation('updateCustomerAddress')
     const updateShippingAddressForShipment = useShopperBasketsMutation(
@@ -126,9 +127,9 @@ export default function ShippingAddress() {
             <ToggleCardEdit>
                 <ShippingAddressSelection
                     selectedAddress={selectedShippingAddress}
-                    submitButtonLabel={submitButtonMessage}
+                    submitButtonLabel={messages.submitButton}
                     onSubmit={submitAndContinue}
-                    formTitleAriaLabel={shippingAddressAriaLabel}
+                    formTitleAriaLabel={messages.shippingAddressAriaLabel}
                 />
             </ToggleCardEdit>
             {selectedShippingAddress && (

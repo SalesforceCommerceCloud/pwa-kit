@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React, {forwardRef, useEffect, useRef, useState} from 'react'
+import React, {forwardRef, useEffect, useRef, useState, useMemo} from 'react'
 import PropTypes from 'prop-types'
 import {useIntl} from 'react-intl'
 import {
@@ -59,7 +59,8 @@ const Skeleton = forwardRef(({children, height, width, ...rest}, ref) => {
 Skeleton.displayName = 'Skeleton'
 
 const ProfileCard = ({allowPasswordChange = false}) => {
-    const {formatMessage} = useIntl()
+    const intl = useIntl()
+    const {formatMessage} = intl
     const headingRef = useRef(null)
     const {data: customer} = useCurrentCustomer()
     const {isRegistered, customerId} = customer
@@ -69,7 +70,7 @@ const ProfileCard = ({allowPasswordChange = false}) => {
     const toast = useToast()
     const [isEditing, setIsEditing] = useState(false)
 
-    const messages = {
+    const messages = useMemo(() => ({
         title: formatMessage({
             defaultMessage: 'My Profile',
             id: 'profile_card.title.my_profile'
@@ -94,7 +95,7 @@ const ProfileCard = ({allowPasswordChange = false}) => {
             defaultMessage: 'Not provided',
             id: 'profile_card.message.not_provided'
         })
-    }
+    }), [intl])
 
     const form = useForm({
         defaultValues: {
@@ -240,7 +241,8 @@ ProfileCard.propTypes = {
 }
 
 const PasswordCard = () => {
-    const {formatMessage} = useIntl()
+    const intl = useIntl()
+    const {formatMessage} = intl
     const headingRef = useRef(null)
     const {data: customer} = useCurrentCustomer()
     const {isRegistered} = customer
@@ -251,7 +253,7 @@ const PasswordCard = () => {
     const toast = useToast()
     const [isEditing, setIsEditing] = useState(false)
 
-    const messages = {
+    const messages = useMemo(() => ({
         title: formatMessage({
             defaultMessage: 'Password',
             id: 'password_card.title.password'
@@ -264,7 +266,7 @@ const PasswordCard = () => {
             defaultMessage: 'Password',
             id: 'password_card.label.password'
         })
-    }
+    }), [intl])
 
     const form = useForm()
 
@@ -353,7 +355,8 @@ const PasswordCard = () => {
 }
 
 const AccountDetail = () => {
-    const {formatMessage} = useIntl()
+    const intl = useIntl()
+    const {formatMessage} = intl
     const headingRef = useRef()
     useEffect(() => {
         // Focus the 'Account Details' header when the component mounts for accessibility
@@ -362,12 +365,12 @@ const AccountDetail = () => {
 
     const {isExternal} = useCustomerType()
 
-    const messages = {
+    const messages = useMemo(() => ({
         title: formatMessage({
             defaultMessage: 'Account Details',
             id: 'account_detail.title.account_details'
         })
-    }
+    }), [intl])
 
     return (
         <Stack data-testid="account-detail-page" gap="6">
