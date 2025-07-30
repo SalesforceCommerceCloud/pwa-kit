@@ -537,15 +537,17 @@ const ShippingMultiAddress = ({
                                                         <Box p={4} textAlign="center">
                                                             <Text color="gray.500">
                                                                 {formatMessage({
-                                                                        id: 'shipping_multi_address.loading_addresses',
-                                                                        defaultMessage:
-                                                                            'Loading addresses...'
-                                                                    })}
+                                                                    id: 'shipping_multi_address.loading_addresses',
+                                                                    defaultMessage:
+                                                                        'Loading addresses...'
+                                                                })}
                                                             </Text>
                                                         </Box>
                                                     ) : (
                                                         <Select
-                                                            value={selectedAddresses[addressKey] || ''}
+                                                            value={
+                                                                selectedAddresses[addressKey] || ''
+                                                            }
                                                             onChange={(e) => {
                                                                 const value = e.target.value
                                                                 // Hide the address form when an existing address is selected
@@ -563,7 +565,10 @@ const ShippingMultiAddress = ({
                                                                     return newState
                                                                 })
                                                             }}
-                                                            disabled={addresses.length === 0 || customerLoading}
+                                                            disabled={
+                                                                addresses.length === 0 ||
+                                                                customerLoading
+                                                            }
                                                             aria-labelledby={`delivery-address-label-${addressKey}`}
                                                             borderColor="gray.300"
                                                             _hover={{borderColor: 'gray.400'}}
@@ -589,8 +594,9 @@ const ShippingMultiAddress = ({
                                                                         value={addr.addressId}
                                                                         data-testid={`address-option-${addr.addressId}`}
                                                                     >
-                                                                        {addr.firstName} {addr.lastName}{' '}
-                                                                        - {addr.address1},{' '}
+                                                                        {addr.firstName}{' '}
+                                                                        {addr.lastName} -{' '}
+                                                                        {addr.address1},{' '}
                                                                         {formatMessage(
                                                                             {
                                                                                 id: 'shipping_multi_address.format.address_line_2',
