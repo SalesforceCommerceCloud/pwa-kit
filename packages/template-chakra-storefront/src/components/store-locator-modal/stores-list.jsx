@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React, {useEffect, useState} from 'react'
+import React, {useEffect, useState, useMemo} from 'react'
 import {useIntl} from 'react-intl'
 import PropTypes from 'prop-types'
 
@@ -26,11 +26,12 @@ import useMultiSite from '../../hooks/use-multi-site'
 
 const StoresList = ({storesInfo}) => {
     const intl = useIntl()
+    const {formatMessage} = intl
     const {site} = useMultiSite()
     const storeInfoKey = `store_${site.id}`
     const [selectedStore, setSelectedStore] = useState('')
 
-    const messages = {
+    const messages = useMemo(() => ({
         away: intl.formatMessage({
             id: 'store_locator.description.away',
             defaultMessage: 'away'
@@ -43,7 +44,7 @@ const StoresList = ({storesInfo}) => {
             id: 'store_locator.action.viewMore',
             defaultMessage: 'View More'
         })
-    }
+    }), [intl])
 
     useEffect(() => {
         setSelectedStore(JSON.parse(window.localStorage.getItem(storeInfoKey))?.id || '')

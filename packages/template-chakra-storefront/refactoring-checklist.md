@@ -51,7 +51,7 @@ Total files: 97
 - [x] src/components/social-login/index.jsx
 - [x] src/components/store-locator-modal/store-locator-content.jsx
 - [x] src/components/store-locator-modal/store-locator-input.jsx
-- [ ] src/components/store-locator-modal/stores-list.jsx
+- [x] src/components/store-locator-modal/stores-list.jsx
 - [ ] src/components/swatch-group/index.jsx
 - [ ] src/components/toggle-card/index.jsx
 - [ ] src/components/with-registration/index.jsx

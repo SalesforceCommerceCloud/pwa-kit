@@ -18,13 +18,11 @@ const EmptySearchResults = ({searchQuery, category}) => {
     const intl = useIntl()
     const {formatMessage} = intl
 
-    const contactUsText = formatMessage({
-        id: 'empty_search_results.link.contact_us',
-        defaultMessage: 'Contact Us'
-    })
-
     const messages = useMemo(() => ({
-        contactUs: contactUsText,
+        contactUs: formatMessage({
+            id: 'empty_search_results.link.contact_us',
+            defaultMessage: 'Contact Us'
+        }),
         topSellers: formatMessage({
             id: 'empty_search_results.recommended_products.title.top_sellers',
             defaultMessage: 'Top Sellers'
