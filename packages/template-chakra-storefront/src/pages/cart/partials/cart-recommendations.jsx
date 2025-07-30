@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React from 'react'
+import React, {useMemo} from 'react'
 import PropTypes from 'prop-types'
 import {useIntl} from 'react-intl'
 import {Stack} from '@chakra-ui/react'
@@ -17,18 +17,19 @@ import {EINSTEIN_RECOMMENDERS} from '../../../../config/constants'
  * @returns {JSX.Element} The cart recommendations component
  */
 const CartRecommendations = ({basket}) => {
-    const {formatMessage} = useIntl()
+    const intl = useIntl()
+    const {formatMessage} = intl
 
-    const messages = {
-        recentlyViewed: formatMessage({
+    const messages = useMemo(() => ({
+        recentlyViewed: intl.formatMessage({
             id: 'cart.recommended_products.title.recently_viewed',
             defaultMessage: 'Recently Viewed'
         }),
-        mayAlsoLike: formatMessage({
+        mayAlsoLike: intl.formatMessage({
             id: 'cart.recommended_products.title.may_also_like',
             defaultMessage: 'You May Also Like'
         })
-    }
+    }), [intl])
 
     return (
         <Stack gap={16}>

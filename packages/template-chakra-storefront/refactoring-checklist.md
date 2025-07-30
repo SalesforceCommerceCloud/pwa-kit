@@ -68,7 +68,7 @@ Total files: 97
 - [x] src/pages/account/wishlist/partials/wishlist-secondary-button-group.jsx
 - [x] src/pages/cart/hooks/use-cart-operations.js
 - [x] src/pages/cart/partials/cart-cta.jsx
-- [ ] src/pages/cart/partials/cart-recommendations.jsx
+- [x] src/pages/cart/partials/cart-recommendations.jsx
 - [ ] src/pages/cart/partials/cart-secondary-button-group.jsx
 - [ ] src/pages/cart/partials/cart-skeleton.jsx
 - [ ] src/pages/cart/partials/cart-title.jsx
