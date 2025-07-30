@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React, {useEffect, useRef} from 'react'
+import React, {useEffect, useRef, useMemo} from 'react'
 import {useIntl} from 'react-intl'
 import {useHistory, useRouteMatch} from 'react-router-dom'
 import {
@@ -108,7 +108,8 @@ OrderProducts.propTypes = {
 const AccountOrderDetail = () => {
     const {params} = useRouteMatch()
     const history = useHistory()
-    const {formatMessage, formatDate} = useIntl()
+    const intl = useIntl()
+    const {formatMessage, formatDate} = intl
 
     const {data: order, isPending: isOrderLoading} = useOrder(
         {
@@ -125,7 +126,7 @@ const AccountOrderDetail = () => {
     const CardIcon = getCreditCardIcon(paymentCard?.cardType)
     const itemCount = order?.productItems.reduce((count, item) => item.quantity + count, 0) || 0
 
-    const messages = {
+    const messages = useMemo(() => ({
         backToHistory: formatMessage({
             defaultMessage: 'Back to Order History',
             id: 'account_order_detail.link.back_to_history'
@@ -196,7 +197,7 @@ const AccountOrderDetail = () => {
                 id: 'account_order_detail.shipping_status.shipped'
             })
         }
-    }
+    }), [intl])
 
     const headingRef = useRef()
     useEffect(() => {
