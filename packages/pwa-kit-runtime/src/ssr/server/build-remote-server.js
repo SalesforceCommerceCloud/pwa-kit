@@ -228,8 +228,8 @@ export const RemoteServerFactory = {
     },
     
     _removeBasePathFromPath(path) {
-        const regex = new RegExp(`^${getEnvBasePath()}`)
-        return path.replace(regex, '')
+        const regex = new RegExp(`^${getEnvBasePath()}(\/|$)`)
+        return path.replace(regex, '/')
     },
 
     /**
@@ -498,10 +498,14 @@ export const RemoteServerFactory = {
          * @private
          */
         const removeBasePathFromPathMiddleware = (req, res, next) => {
+            console.log('Before')
+            console.log(req.url)
             const updatedPath = this._removeBasePathFromPath(req.path)
             const parsed = URL.parse(req.url)
             parsed.pathname = updatedPath
             req.url = URL.format(parsed)
+            console.log('After')
+            console.log(req.url)
             next()
         }
         app.use(removeBasePathFromPathMiddleware)
@@ -701,7 +705,9 @@ export const RemoteServerFactory = {
      */
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     _setupProxying(app, options) {
-        app.all(`${proxyBasePath}/*`, (_, res) => {
+        app.all(`${proxyBasePath}/*`, (req, res) => {
+            console.log('In Proxy Setup Error')
+            console.log(req.url)
             return res.status(501).json({
                 message:
                     'Environment proxies are not set: https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/proxying-requests.html'
@@ -745,15 +751,21 @@ export const RemoteServerFactory = {
             createProxyMiddleware({
                 target: options.slasTarget,
                 changeOrigin: true,
-                pathRewrite: {
-                    // http-proxy-middleware uses the original incoming request path to determine
-                    // both proxyRequest and incomingRequest paths.
-                    // This cannot be modified by any express middleware
-                    // So we need to use the built in pathRewrite to remove the base path
-                    // Note: PathRewrite applies the following in order so the order matters
-                    [`${getEnvBasePath()}${slasPrivateProxyPath}`]: '',
-                    [slasPrivateProxyPath]: ''
+                pathRewrite:  (path) => {
+                    const regex = new RegExp(`^${getEnvBasePath()}?${slasPrivateProxyPath}`)
+                    return path.replace(regex, '')
                 },
+                
+                // {
+                //     // http-proxy-middleware uses the original incoming request path to determine
+                //     // both proxyRequest and incomingRequest paths.
+                //     // This cannot be modified by any express middleware
+                //     // So we need to use the built in pathRewrite to remove the base path
+                //     // Note: PathRewrite applies the following in order so the order matters
+                //     [`${getEnvBasePath()}${slasPrivateProxyPath}`]: '',
+                //     [slasPrivateProxyPath]: ''
+                    
+                // },
                 onProxyReq: (proxyRequest, incomingRequest, res) => {
                     applyProxyRequestHeaders({
                         proxyRequest,

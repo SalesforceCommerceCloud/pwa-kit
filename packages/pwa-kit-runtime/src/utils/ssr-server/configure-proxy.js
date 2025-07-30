@@ -254,10 +254,14 @@ export const configureProxy = ({
         // This cannot be modified by any express middleware
         // So we need to use the built in pathRewrite to remove the base path
         // Note: PathRewrite applies the following in order so the order matters
-        pathRewrite: {
-            [`^${getEnvBasePath()}${proxyPath}`]: '',
-            [`^${proxyPath}`]: ''
+        pathRewrite: (path) => {
+            const regex = new RegExp(`^${getEnvBasePath()}?${proxyPath}`)
+            return path.replace(regex, '')
         },
+        // {
+        //     `^${getEnvBasePath()}${proxyPath}`: '',
+        //     `^${proxyPath}`: ''
+        // },
 
         // The origin (protocol + host) to which we proxy
         target: targetOrigin
