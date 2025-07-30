@@ -21,11 +21,11 @@ const RecentSearches = ({recentSearches, closeAndNavigate}) => {
 
     const messages = useMemo(
         () => ({
-            recentSearchesTitle: intl.formatMessage({
+            recentSearchesTitle: formatMessage({
                 id: 'recent_searches.heading.recent_searches',
                 defaultMessage: 'Recent Searches'
             }),
-            clearRecentSearches: intl.formatMessage({
+            clearRecentSearches: formatMessage({
                 id: 'recent_searches.action.clear_searches',
                 defaultMessage: 'Clear recent searches'
             })

@@ -34,7 +34,7 @@ const WishlistPrimaryAction = () => {
     const messages = useMemo(
         () => ({
             addedToCart: (quantity, isAddingASet, item) =>
-                intl.formatMessage(
+                formatMessage(
                     {
                         defaultMessage:
                             '{quantity} {quantity, plural, one {item} other {items}} added to cart',
@@ -42,24 +42,24 @@ const WishlistPrimaryAction = () => {
                     },
                     {quantity: isAddingASet ? quantity * item.setProducts.length : quantity}
                 ),
-            viewOptions: intl.formatMessage({
+            viewOptions: formatMessage({
                 defaultMessage: 'View Options',
                 id: 'wishlist_primary_action.button.view_options'
             }),
-            viewFullDetails: intl.formatMessage({
+            viewFullDetails: formatMessage({
                 defaultMessage: 'View Full Details',
                 id: 'wishlist_primary_action.button.view_full_details'
             }),
-            addToCart: intl.formatMessage({
+            addToCart: formatMessage({
                 defaultMessage: 'Add to Cart',
                 id: 'wishlist_primary_action.button.add_to_cart'
             }),
-            addSetToCart: intl.formatMessage({
+            addSetToCart: formatMessage({
                 defaultMessage: 'Add Set to Cart',
                 id: 'wishlist_primary_action.button.add_set_to_cart'
             }),
             addSetToCartLabel: (productName) =>
-                intl.formatMessage(
+                formatMessage(
                     {
                         id: 'wishlist_primary_action.button.addSetToCart.label',
                         defaultMessage: 'Add {productName} set to cart'
@@ -67,7 +67,7 @@ const WishlistPrimaryAction = () => {
                     {productName}
                 ),
             viewFullDetailsLabel: (productName) =>
-                intl.formatMessage(
+                formatMessage(
                     {
                         id: 'wishlist_primary_action.button.viewFullDetails.label',
                         defaultMessage: 'View full details for {productName}'
@@ -75,7 +75,7 @@ const WishlistPrimaryAction = () => {
                     {productName}
                 ),
             viewOptionsLabel: (productName) =>
-                intl.formatMessage(
+                formatMessage(
                     {
                         id: 'wishlist_primary_action.button.view_options.label',
                         defaultMessage: 'View Options for {productName}'
@@ -83,7 +83,7 @@ const WishlistPrimaryAction = () => {
                     {productName}
                 ),
             addToCartLabel: (productName) =>
-                intl.formatMessage(
+                formatMessage(
                     {
                         id: 'wishlist_primary_action.button.addToCart.label',
                         defaultMessage: 'Add {productName} to cart'
@@ -121,7 +121,7 @@ const WishlistPrimaryAction = () => {
             onClose()
         } catch (e) {
             toast({
-                title: intl.formatMessage(API_ERROR_MESSAGE),
+                title: formatMessage(API_ERROR_MESSAGE),
                 type: 'error'
             })
         } finally {

@@ -70,21 +70,17 @@ const CheckoutConfirmation = () => {
         })
     }, [order])
 
-    if (!order || !order.orderNo) {
-        return null
-    }
-
     const messages = useMemo(
         () => ({
-            thankYou: intl.formatMessage({
+            thankYou: formatMessage({
                 id: 'checkout_confirmation.heading.thank_you_for_order',
                 defaultMessage: 'Thank you for your order!'
             }),
-            orderNumber: intl.formatMessage({
+            orderNumber: formatMessage({
                 id: 'checkout_confirmation.label.order_number',
                 defaultMessage: 'Order Number'
             }),
-            emailConfirmation: intl.formatMessage(
+            emailConfirmation: formatMessage(
                 {
                     id: 'checkout_confirmation.message.will_email_shortly',
                     defaultMessage:
@@ -95,35 +91,35 @@ const CheckoutConfirmation = () => {
                     email: order?.customerInfo?.email
                 }
             ),
-            continueShopping: intl.formatMessage({
+            continueShopping: formatMessage({
                 id: 'checkout_confirmation.link.continue_shopping',
                 defaultMessage: 'Continue Shopping'
             }),
-            createAccount: intl.formatMessage({
+            createAccount: formatMessage({
                 id: 'checkout_confirmation.heading.create_account',
                 defaultMessage: 'Create an account for faster checkout'
             }),
-            createAccountButton: intl.formatMessage({
+            createAccountButton: formatMessage({
                 id: 'checkout_confirmation.button.create_account',
                 defaultMessage: 'Create Account'
             }),
-            deliveryDetails: intl.formatMessage({
+            deliveryDetails: formatMessage({
                 id: 'checkout_confirmation.heading.delivery_details',
                 defaultMessage: 'Delivery Details'
             }),
-            shippingAddress: intl.formatMessage({
+            shippingAddress: formatMessage({
                 id: 'checkout_confirmation.heading.shipping_address',
                 defaultMessage: 'Shipping Address'
             }),
-            shippingMethod: intl.formatMessage({
+            shippingMethod: formatMessage({
                 id: 'checkout_confirmation.heading.shipping_method',
                 defaultMessage: 'Shipping Method'
             }),
-            orderSummary: intl.formatMessage({
+            orderSummary: formatMessage({
                 id: 'checkout_confirmation.heading.order_summary',
                 defaultMessage: 'Order Summary'
             }),
-            itemCount: intl.formatMessage(
+            itemCount: formatMessage(
                 {
                     id: 'checkout_confirmation.message.num_of_items_in_order',
                     defaultMessage: '{itemCount, plural, =0 {0 items} one {# item} other {# items}}'
@@ -132,45 +128,49 @@ const CheckoutConfirmation = () => {
                     itemCount: order?.productItems?.reduce((a, b) => a + b.quantity, 0) || 0
                 }
             ),
-            subtotal: intl.formatMessage({
+            subtotal: formatMessage({
                 id: 'checkout_confirmation.label.subtotal',
                 defaultMessage: 'Subtotal'
             }),
-            shipping: intl.formatMessage({
+            shipping: formatMessage({
                 id: 'checkout_confirmation.label.shipping',
                 defaultMessage: 'Shipping'
             }),
-            promoApplied: intl.formatMessage({
+            promoApplied: formatMessage({
                 id: 'checkout_confirmation.label.promo_applied',
                 defaultMessage: 'Promotion applied'
             }),
-            free: intl.formatMessage({
+            free: formatMessage({
                 id: 'checkout_confirmation.label.free',
                 defaultMessage: 'Free'
             }),
-            tax: intl.formatMessage({
+            tax: formatMessage({
                 id: 'checkout_confirmation.label.tax',
                 defaultMessage: 'Tax'
             }),
-            orderTotal: intl.formatMessage({
+            orderTotal: formatMessage({
                 id: 'checkout_confirmation.label.order_total',
                 defaultMessage: 'Order Total'
             }),
-            paymentDetails: intl.formatMessage({
+            paymentDetails: formatMessage({
                 id: 'checkout_confirmation.heading.payment_details',
                 defaultMessage: 'Payment Details'
             }),
-            billingAddress: intl.formatMessage({
+            billingAddress: formatMessage({
                 id: 'checkout_confirmation.heading.billing_address',
                 defaultMessage: 'Billing Address'
             }),
-            creditCard: intl.formatMessage({
+            creditCard: formatMessage({
                 id: 'checkout_confirmation.heading.credit_card',
                 defaultMessage: 'Credit Card'
             })
         }),
         [intl, order]
     )
+
+    if (!order || !order.orderNo) {
+        return null
+    }
 
     const CardIcon = getCreditCardIcon(order.paymentInstruments[0].paymentCard?.cardType)
 
@@ -192,18 +192,18 @@ const CheckoutConfirmation = () => {
             if (!error.response) {
                 form.setError('global', {
                     type: 'manual',
-                    message: intl.formatMessage(API_ERROR_MESSAGE)
+                    message: formatMessage(API_ERROR_MESSAGE)
                 })
                 return
             }
             const json = await error.response.json()
 
             const errorMessages = {
-                accountExists: intl.formatMessage({
+                accountExists: formatMessage({
                     id: 'checkout_confirmation.message.already_has_account',
                     defaultMessage: 'This email already has an account.'
                 }),
-                loginLink: intl.formatMessage({
+                loginLink: formatMessage({
                     id: 'checkout_confirmation.link.login',
                     defaultMessage: 'Log in here'
                 })
@@ -221,7 +221,7 @@ const CheckoutConfirmation = () => {
 
             const message = /the login is already in use/i.test(json.detail)
                 ? existingAccountMessage
-                : intl.formatMessage(API_ERROR_MESSAGE)
+                : formatMessage(API_ERROR_MESSAGE)
 
             form.setError('global', {type: 'manual', message})
         }

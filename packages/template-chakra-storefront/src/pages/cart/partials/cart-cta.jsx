@@ -16,7 +16,7 @@ const CartCta = () => {
 
     const messages = useMemo(
         () => ({
-            checkout: intl.formatMessage({
+            checkout: formatMessage({
                 id: 'cart_cta.link.checkout',
                 defaultMessage: 'Proceed to Checkout'
             })

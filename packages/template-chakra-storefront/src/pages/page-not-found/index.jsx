@@ -15,7 +15,8 @@ import {useHistory} from 'react-router-dom'
 import Link from '../../components/link'
 
 const PageNotFound = () => {
-    const {formatMessage} = useIntl()
+    const intl = useIntl()
+    const {formatMessage} = intl
     const history = useHistory()
     const {res} = useServerContext()
 

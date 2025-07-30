@@ -17,26 +17,26 @@ const EmptyCart = ({isRegistered}) => {
 
     const messages = useMemo(
         () => ({
-            title: intl.formatMessage({
+            title: formatMessage({
                 id: 'empty_cart.description.empty_cart',
                 defaultMessage: 'Your cart is empty.'
             }),
             description: {
-                registered: intl.formatMessage({
+                registered: formatMessage({
                     id: 'empty_cart.message.continue_shopping',
                     defaultMessage: 'Continue shopping to add items to your cart.'
                 }),
-                unregistered: intl.formatMessage({
+                unregistered: formatMessage({
                     id: 'empty_cart.message.sign_in_or_continue_shopping',
                     defaultMessage: 'Sign in to retrieve your saved items or continue shopping.'
                 })
             },
             buttons: {
-                continueShopping: intl.formatMessage({
+                continueShopping: formatMessage({
                     id: 'empty_cart.link.continue_shopping',
                     defaultMessage: 'Continue Shopping'
                 }),
-                signIn: intl.formatMessage({
+                signIn: formatMessage({
                     id: 'empty_cart.link.sign_in',
                     defaultMessage: 'Sign In'
                 })

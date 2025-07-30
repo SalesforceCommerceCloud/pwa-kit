@@ -34,7 +34,7 @@ const PaymentForm = ({form, onSubmit}) => {
                 defaultMessage: 'This is a secure SSL encrypted payment.'
             })
         }),
-        [intl]
+        [formatMessage]
     )
 
     return (

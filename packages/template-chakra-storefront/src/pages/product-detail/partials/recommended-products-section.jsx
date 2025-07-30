@@ -31,7 +31,7 @@ const RecommendedProductsSection = ({product, isProductASet}) => {
                 defaultMessage: 'Recently Viewed'
             })
         }),
-        [intl]
+        [formatMessage]
     )
 
     return (

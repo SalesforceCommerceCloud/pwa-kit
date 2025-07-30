@@ -56,12 +56,12 @@ const SocialLogin = ({form, idps = []}) => {
     const messages = useMemo(
         () => ({
             errors: {
-                featureUnavailable: intl.formatMessage(FEATURE_UNAVAILABLE_ERROR_MESSAGE),
-                apiError: intl.formatMessage(API_ERROR_MESSAGE)
+                featureUnavailable: formatMessage(FEATURE_UNAVAILABLE_ERROR_MESSAGE),
+                apiError: formatMessage(API_ERROR_MESSAGE)
             },
             idp: {
-                apple: intl.formatMessage(IDP_CONFIG.apple.message),
-                google: intl.formatMessage(IDP_CONFIG.google.message)
+                apple: formatMessage(IDP_CONFIG.apple.message),
+                google: formatMessage(IDP_CONFIG.google.message)
             }
         }),
         [intl]

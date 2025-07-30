@@ -31,11 +31,11 @@ const ActionCard = ({
 
     const messages = useMemo(
         () => ({
-            edit: intl.formatMessage({
+            edit: formatMessage({
                 id: 'action_card.action.edit',
                 defaultMessage: 'Edit'
             }),
-            remove: intl.formatMessage({
+            remove: formatMessage({
                 id: 'action_card.action.remove',
                 defaultMessage: 'Remove'
             })

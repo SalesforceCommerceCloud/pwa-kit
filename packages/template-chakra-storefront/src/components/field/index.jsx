@@ -42,11 +42,11 @@ const Field = ({
     const messages = useMemo(
         () => ({
             password: {
-                showPassword: intl.formatMessage({
+                showPassword: formatMessage({
                     id: 'field.password.assistive_msg.show_password',
                     defaultMessage: 'Show password'
                 }),
-                hidePassword: intl.formatMessage({
+                hidePassword: formatMessage({
                     id: 'field.password.assistive_msg.hide_password',
                     defaultMessage: 'Hide password'
                 })

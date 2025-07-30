@@ -167,14 +167,14 @@ const ProductTile = (props) => {
     // Message formatting
     const messages = useMemo(
         () => ({
-            removeFromWishlist: intl.formatMessage(
+            removeFromWishlist: formatMessage(
                 {
                     id: 'product_tile.assistive_msg.remove_from_wishlist',
                     defaultMessage: 'Remove {product} from wishlist'
                 },
                 {product: localizedProductName}
             ),
-            addToWishlist: intl.formatMessage(
+            addToWishlist: formatMessage(
                 {
                     id: 'product_tile.assistive_msg.add_to_wishlist',
                     defaultMessage: 'Add {product} to wishlist'
@@ -195,7 +195,7 @@ const ProductTile = (props) => {
                     typeof product.representedProduct[item.propertyName] === 'boolean' &&
                     product.representedProduct[item.propertyName] === true
                 ) {
-                    labelsMap.set(intl.formatMessage(item.label), item.color)
+                    labelsMap.set(formatMessage(item.label), item.color)
                 }
             })
         }

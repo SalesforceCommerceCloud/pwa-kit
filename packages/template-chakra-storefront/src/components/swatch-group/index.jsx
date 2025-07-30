@@ -32,7 +32,7 @@ const SwatchGroup = (props) => {
 
     const messages = useMemo(
         () => ({
-            selectedLabel: intl.formatMessage(
+            selectedLabel: formatMessage(
                 {
                     id: 'swatch_group.selected.label',
                     defaultMessage: '{label}:'

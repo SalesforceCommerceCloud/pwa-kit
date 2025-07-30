@@ -23,7 +23,7 @@ const OfflineBanner = ({...props}) => {
 
     const messages = useMemo(
         () => ({
-            title: intl.formatMessage({
+            title: formatMessage({
                 id: 'offline_banner.description.browsing_offline_mode',
                 defaultMessage: "You're currently browsing in offline mode"
             })

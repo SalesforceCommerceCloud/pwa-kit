@@ -67,19 +67,19 @@ const WishlistSecondaryButtonGroup = ({
 
     const messages = useMemo(
         () => ({
-            itemRemoved: intl.formatMessage({
+            itemRemoved: formatMessage({
                 id: 'wishlist_secondary_button_group.info.item_removed',
                 defaultMessage: 'Item removed from wishlist'
             }),
             removeItemLabel: (productName) =>
-                intl.formatMessage(
+                formatMessage(
                     {
                         id: 'wishlist_secondary_button_group.info.item.remove.label',
                         defaultMessage: 'Remove {productName}'
                     },
                     {productName}
                 ),
-            remove: intl.formatMessage({
+            remove: formatMessage({
                 id: 'wishlist_secondary_button_group.action.remove',
                 defaultMessage: 'Remove'
             })
@@ -117,7 +117,7 @@ const WishlistSecondaryButtonGroup = ({
             // we need to place focus to the next logical place for accessibility
             focusElementOnRemove?.current?.focus()
         } catch {
-            toast({title: intl.formatMessage(API_ERROR_MESSAGE), type: 'error'})
+            toast({title: formatMessage(API_ERROR_MESSAGE), type: 'error'})
         }
     }
 

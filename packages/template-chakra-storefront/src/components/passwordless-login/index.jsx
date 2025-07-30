@@ -20,19 +20,20 @@ const PasswordlessLogin = ({
     idps = []
 }) => {
     const intl = useIntl()
+    const {formatMessage} = intl
     const [showPasswordView, setShowPasswordView] = useState(false)
 
     const messages = useMemo(
         () => ({
-            continueSecurely: intl.formatMessage({
+            continueSecurely: formatMessage({
                 id: 'login_form.button.continue_securely',
                 defaultMessage: 'Continue Securely'
             }),
-            orLoginWith: intl.formatMessage({
+            orLoginWith: formatMessage({
                 id: 'login_form.message.or_login_with',
                 defaultMessage: 'Or Login With'
             }),
-            password: intl.formatMessage({
+            password: formatMessage({
                 id: 'login_form.button.password',
                 defaultMessage: 'Password'
             })

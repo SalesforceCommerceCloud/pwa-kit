@@ -24,7 +24,7 @@ const ProductViewModal = ({product, isOpen, onClose, ...props}) => {
 
     const messages = useMemo(
         () => ({
-            modalLabel: intl.formatMessage(
+            modalLabel: formatMessage(
                 {
                     id: 'cart.product_edit_modal.modal_label',
                     defaultMessage: 'Edit modal for {productName}'

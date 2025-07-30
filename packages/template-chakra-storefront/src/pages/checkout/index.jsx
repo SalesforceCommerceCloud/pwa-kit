@@ -40,11 +40,11 @@ const Checkout = () => {
 
     const messages = useMemo(
         () => ({
-            placeOrder: intl.formatMessage({
+            placeOrder: formatMessage({
                 id: 'checkout.button.place_order',
                 defaultMessage: 'Place Order'
             }),
-            genericError: intl.formatMessage({
+            genericError: formatMessage({
                 id: 'checkout.message.generic_error',
                 defaultMessage: 'An unexpected error occurred during checkout.'
             })
@@ -176,7 +176,7 @@ const CheckoutContainer = () => {
             {
                 onSuccess: () => {
                     toast({
-                        title: intl.formatMessage(TOAST_MESSAGE_REMOVED_ITEM_FROM_CART, {
+                        title: formatMessage(TOAST_MESSAGE_REMOVED_ITEM_FROM_CART, {
                             quantity: 1
                         }),
                         type: 'success'
@@ -184,7 +184,7 @@ const CheckoutContainer = () => {
                 },
                 onError: () => {
                     toast({
-                        title: intl.formatMessage(API_ERROR_MESSAGE),
+                        title: formatMessage(API_ERROR_MESSAGE),
                         type: 'error'
                     })
                 }

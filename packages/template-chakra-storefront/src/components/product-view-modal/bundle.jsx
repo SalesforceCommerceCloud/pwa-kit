@@ -56,7 +56,7 @@ const BundleProductViewModal = ({product: bundle, isOpen, onClose, updateCart, .
 
     const messages = useMemo(
         () => ({
-            modalLabel: intl.formatMessage(
+            modalLabel: formatMessage(
                 {
                     id: 'cart.product_edit_modal.modal_label',
                     defaultMessage: 'Edit modal for {productName}'

@@ -45,11 +45,11 @@ const CartSkeleton = () => {
 
     const messages = useMemo(
         () => ({
-            cart: intl.formatMessage({
+            cart: formatMessage({
                 id: 'cart_skeleton.title.cart',
                 defaultMessage: 'Cart'
             }),
-            orderSummary: intl.formatMessage({
+            orderSummary: formatMessage({
                 id: 'cart_skeleton.heading.order_summary',
                 defaultMessage: 'Order Summary'
             })

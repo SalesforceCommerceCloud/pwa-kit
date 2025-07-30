@@ -54,20 +54,20 @@ const StoreLocatorContent = () => {
 
     const messages = useMemo(
         () => ({
-            title: intl.formatMessage({
+            title: formatMessage({
                 id: 'store_locator.title',
                 defaultMessage: 'Find a Store'
             }),
             status: {
-                loading: intl.formatMessage({
+                loading: formatMessage({
                     id: 'store_locator.description.loading_locations',
                     defaultMessage: 'Loading locations...'
                 }),
-                noLocations: intl.formatMessage({
+                noLocations: formatMessage({
                     id: 'store_locator.description.no_locations',
                     defaultMessage: 'Sorry, there are no locations in this area'
                 }),
-                viewingNearPostalCode: intl.formatMessage(
+                viewingNearPostalCode: formatMessage(
                     {
                         id: 'store_locator.description.viewing_near_postal_code',
                         defaultMessage:
@@ -79,12 +79,12 @@ const StoreLocatorContent = () => {
                         postalCode: searchStoresParams.postalCode
                     }
                 ),
-                viewingNearLocation: intl.formatMessage({
+                viewingNearLocation: formatMessage({
                     id: 'store_locator.description.viewing_near_your_location',
                     defaultMessage: 'Viewing stores near your location'
                 })
             },
-            loadMore: intl.formatMessage({
+            loadMore: formatMessage({
                 id: 'store_locator.pagination.load_more',
                 defaultMessage: 'Load More'
             })
@@ -152,12 +152,12 @@ const StoreLocatorContent = () => {
             return `${messages.status.viewingNearPostalCode}
                 ${
                     SUPPORTED_STORE_LOCATOR_COUNTRIES.length !== 0
-                        ? intl.formatMessage(
+                        ? formatMessage(
                               SUPPORTED_STORE_LOCATOR_COUNTRIES.find(
                                   (o) => o.countryCode === searchStoresParams.countryCode
                               ).countryName
                           )
-                        : intl.formatMessage(DEFAULT_STORE_LOCATOR_COUNTRY.countryName)
+                        : formatMessage(DEFAULT_STORE_LOCATOR_COUNTRY.countryName)
                 }`
         else return messages.status.viewingNearLocation
     }

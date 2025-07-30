@@ -70,19 +70,19 @@ const CartSecondaryButtonGroup = ({
 
     const messages = useMemo(
         () => ({
-            remove: intl.formatMessage({
+            remove: formatMessage({
                 id: 'cart_secondary_button_group.action.remove',
                 defaultMessage: 'Remove'
             }),
-            addToWishlist: intl.formatMessage({
+            addToWishlist: formatMessage({
                 id: 'cart_secondary_button_group.action.added_to_wishlist',
                 defaultMessage: 'Add to Wishlist'
             }),
-            edit: intl.formatMessage({
+            edit: formatMessage({
                 id: 'cart_secondary_button_group.action.edit',
                 defaultMessage: 'Edit'
             }),
-            thisIsGift: intl.formatMessage({
+            thisIsGift: formatMessage({
                 id: 'cart_secondary_button_group.label.this_is_gift',
                 defaultMessage: 'This is a gift.'
             })

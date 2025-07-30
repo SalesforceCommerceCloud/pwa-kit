@@ -76,15 +76,16 @@ const Search = (props) => {
     const [searchQuery, setSearchQuery] = useState('')
     const navigate = useNavigation()
     const intl = useIntl()
+    const {formatMessage} = intl
     const {search: searchConfig} = getConfig()
 
     const messages = useMemo(
         () => ({
-            clearSearch: intl.formatMessage({
+            clearSearch: formatMessage({
                 id: 'header.button.assistive_msg.clear_search',
                 defaultMessage: 'Clear Search'
             }),
-            cancel: intl.formatMessage({
+            cancel: formatMessage({
                 id: 'search.action.cancel',
                 defaultMessage: 'Cancel'
             })

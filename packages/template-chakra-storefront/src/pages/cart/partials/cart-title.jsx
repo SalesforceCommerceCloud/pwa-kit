@@ -18,7 +18,7 @@ const CartTitle = () => {
 
     const messages = useMemo(
         () => ({
-            title: intl.formatMessage(
+            title: formatMessage(
                 {
                     id: 'cart_title.title.cart_num_of_items',
                     defaultMessage:

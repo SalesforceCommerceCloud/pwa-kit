@@ -31,14 +31,14 @@ const CurrentPrice = ({labelForA11y, price, as, isRange = false, currency, ...ex
 
     const messages = useMemo(
         () => ({
-            currentPriceWithRange: intl.formatMessage(msg.currentPriceWithRange, {
+            currentPriceWithRange: formatMessage(msg.currentPriceWithRange, {
                 currentPrice: currentPriceText
             }),
             ariaLabels: {
-                currentPrice: intl.formatMessage(msg.ariaLabelCurrentPrice, {
+                currentPrice: formatMessage(msg.ariaLabelCurrentPrice, {
                     currentPrice: currentPriceText
                 }),
-                currentPriceWithRange: intl.formatMessage(msg.ariaLabelCurrentPriceWithRange, {
+                currentPriceWithRange: formatMessage(msg.ariaLabelCurrentPriceWithRange, {
                     currentPrice: currentPriceText
                 })
             }

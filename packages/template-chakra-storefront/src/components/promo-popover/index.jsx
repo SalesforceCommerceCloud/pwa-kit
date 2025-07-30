@@ -21,11 +21,11 @@ const PromoPopover = ({header, children, ...props}) => {
 
     const messages = useMemo(
         () => ({
-            info: intl.formatMessage({
+            info: formatMessage({
                 id: 'promo_popover.assistive_msg.info',
                 defaultMessage: 'Info'
             }),
-            promoApplied: intl.formatMessage({
+            promoApplied: formatMessage({
                 id: 'promo_popover.heading.promo_applied',
                 defaultMessage: 'Promotions Applied'
             })

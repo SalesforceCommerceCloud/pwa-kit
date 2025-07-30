@@ -47,30 +47,30 @@ const Pagination = (props) => {
 
     const messages = useMemo(
         () => ({
-            prevAssistive: intl.formatMessage({
+            prevAssistive: formatMessage({
                 id: 'pagination.link.prev.assistive_msg',
                 defaultMessage: 'Previous Page'
             }),
-            prev: intl.formatMessage({
+            prev: formatMessage({
                 id: 'pagination.link.prev',
                 defaultMessage: 'Prev'
             }),
-            pageNumberSelect: intl.formatMessage({
+            pageNumberSelect: formatMessage({
                 id: 'pagination.field.page_number_select',
                 defaultMessage: 'Select page number'
             }),
-            numOfPages: intl.formatMessage(
+            numOfPages: formatMessage(
                 {
                     id: 'pagination.field.num_of_pages',
                     defaultMessage: 'of {numOfPages}'
                 },
                 {numOfPages: urls.length}
             ),
-            nextAssistive: intl.formatMessage({
+            nextAssistive: formatMessage({
                 id: 'pagination.link.next.assistive_msg',
                 defaultMessage: 'Next Page'
             }),
-            next: intl.formatMessage({
+            next: formatMessage({
                 id: 'pagination.link.next',
                 defaultMessage: 'Next'
             })

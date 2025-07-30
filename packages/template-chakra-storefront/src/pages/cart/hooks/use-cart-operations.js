@@ -36,7 +36,7 @@ export const useCartOperations = (basket, productsByItemId, showError) => {
 
     const messages = useMemo(
         () => ({
-            removedItemFromCart: intl.formatMessage(TOAST_MESSAGE_REMOVED_ITEM_FROM_CART, {
+            removedItemFromCart: formatMessage(TOAST_MESSAGE_REMOVED_ITEM_FROM_CART, {
                 quantity: 1
             })
         }),

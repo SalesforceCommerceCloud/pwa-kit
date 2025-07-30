@@ -17,11 +17,11 @@ const PasswordlessEmailConfirmation = ({form, submitForm, email = ''}) => {
 
     const messages = useMemo(
         () => ({
-            title: intl.formatMessage({
+            title: formatMessage({
                 id: 'auth_modal.check_email.title.check_your_email',
                 defaultMessage: 'Check Your Email'
             }),
-            justSent: intl.formatMessage(
+            justSent: formatMessage(
                 {
                     id: 'auth_modal.check_email.description.just_sent',
                     defaultMessage: 'We just sent a login link to <b>{email}</b>'
@@ -31,12 +31,12 @@ const PasswordlessEmailConfirmation = ({form, submitForm, email = ''}) => {
                     b: (chunks) => <b>{chunks}</b>
                 }
             ),
-            checkSpam: intl.formatMessage({
+            checkSpam: formatMessage({
                 id: 'auth_modal.check_email.description.check_spam_folder',
                 defaultMessage:
                     "The link may take a few minutes to arrive, check your spam folder if you're having trouble finding it"
             }),
-            resendLink: intl.formatMessage({
+            resendLink: formatMessage({
                 id: 'auth_modal.check_email.button.resend_link',
                 defaultMessage: 'Resend Link'
             })

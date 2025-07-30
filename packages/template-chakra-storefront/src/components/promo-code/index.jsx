@@ -25,20 +25,20 @@ export const usePromoCode = () => {
 
     const messages = useMemo(
         () => ({
-            promoApplied: intl.formatMessage({
+            promoApplied: formatMessage({
                 id: 'use_promocode.info.promo_applied',
                 defaultMessage: 'Promotion applied'
             }),
-            checkCode: intl.formatMessage({
+            checkCode: formatMessage({
                 id: 'use_promocode.error.check_the_code',
                 defaultMessage:
                     'Check the code and try again, it may already be applied or the promo has expired.'
             }),
-            promoRemoved: intl.formatMessage({
+            promoRemoved: formatMessage({
                 id: 'use_promocode.info.promo_removed',
                 defaultMessage: 'Promotion removed'
             }),
-            apiError: intl.formatMessage(API_ERROR_MESSAGE)
+            apiError: formatMessage(API_ERROR_MESSAGE)
         }),
         [intl]
     )
@@ -104,7 +104,7 @@ export const PromoCode = ({form, submitPromoCode, itemProps}) => {
 
     const messages = useMemo(
         () => ({
-            havePromoCode: intl.formatMessage({
+            havePromoCode: formatMessage({
                 id: 'promocode.accordion.button.have_promocode',
                 defaultMessage: 'Do you have a promo code?'
             })

@@ -35,7 +35,7 @@ export const ToggleCard = ({
 
     const messages = useMemo(
         () => ({
-            edit: intl.formatMessage({
+            edit: formatMessage({
                 id: 'toggle_card.action.edit',
                 defaultMessage: 'Edit'
             })

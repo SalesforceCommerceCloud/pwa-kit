@@ -22,11 +22,11 @@ const CartRecommendations = ({basket}) => {
 
     const messages = useMemo(
         () => ({
-            recentlyViewed: intl.formatMessage({
+            recentlyViewed: formatMessage({
                 id: 'cart.recommended_products.title.recently_viewed',
                 defaultMessage: 'Recently Viewed'
             }),
-            mayAlsoLike: intl.formatMessage({
+            mayAlsoLike: formatMessage({
                 id: 'cart.recommended_products.title.may_also_like',
                 defaultMessage: 'You May Also Like'
             })

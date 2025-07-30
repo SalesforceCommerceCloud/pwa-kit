@@ -35,11 +35,11 @@ const ProductScroller = forwardRef(
 
         const messages = useMemo(
             () => ({
-                scrollLeft: intl.formatMessage({
+                scrollLeft: formatMessage({
                     id: 'product_scroller.assistive_msg.scroll_left',
                     defaultMessage: 'Scroll products left'
                 }),
-                scrollRight: intl.formatMessage({
+                scrollRight: formatMessage({
                     id: 'product_scroller.assistive_msg.scroll_right',
                     defaultMessage: 'Scroll products right'
                 })

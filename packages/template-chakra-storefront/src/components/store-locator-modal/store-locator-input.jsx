@@ -82,40 +82,40 @@ const StoreLocatorInput = ({form, submitForm}) => {
     const messages = useMemo(
         () => ({
             errors: {
-                selectCountry: intl.formatMessage({
+                selectCountry: formatMessage({
                     id: 'store_locator.error.please_select_a_country',
                     defaultMessage: 'Please select a country.'
                 }),
-                enterPostalCode: intl.formatMessage({
+                enterPostalCode: formatMessage({
                     id: 'store_locator.error.please_enter_a_postal_code',
                     defaultMessage: 'Please enter a postal code.'
                 }),
-                shareLocation: intl.formatMessage({
+                shareLocation: formatMessage({
                     id: 'store_locator.error.agree_to_share_your_location',
                     defaultMessage: 'Please agree to share your location'
                 })
             },
             placeholders: {
-                selectCountry: intl.formatMessage({
+                selectCountry: formatMessage({
                     id: 'store_locator.action.select_a_country',
                     defaultMessage: 'Select a country'
                 }),
-                enterPostalCode: intl.formatMessage({
+                enterPostalCode: formatMessage({
                     id: 'store_locator.field.placeholder.enter_postal_code',
                     defaultMessage: 'Enter postal code'
                 })
             },
             actions: {
-                find: intl.formatMessage({
+                find: formatMessage({
                     id: 'store_locator.action.find',
                     defaultMessage: 'Find'
                 }),
-                useMyLocation: intl.formatMessage({
+                useMyLocation: formatMessage({
                     id: 'store_locator.action.use_my_location',
                     defaultMessage: 'Use My Location'
                 })
             },
-            separator: intl.formatMessage({
+            separator: formatMessage({
                 id: 'store_locator.description.or',
                 defaultMessage: 'Or'
             })
@@ -148,7 +148,7 @@ const StoreLocatorInput = ({form, submitForm}) => {
                                             ({countryCode, countryName}) => {
                                                 return (
                                                     <option value={countryCode} key={countryCode}>
-                                                        {intl.formatMessage(countryName)}
+                                                        {formatMessage(countryName)}
                                                     </option>
                                                 )
                                             }

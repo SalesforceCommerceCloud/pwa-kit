@@ -97,81 +97,81 @@ const DrawerMenu = ({
     const messages = useMemo(
         () => ({
             header: {
-                title: intl.formatMessage({
+                title: formatMessage({
                     id: 'drawer_menu.header.assistive_msg.title',
                     defaultMessage: 'Menu Drawer'
                 })
             },
             links: {
-                shopAll: intl.formatMessage({
+                shopAll: formatMessage({
                     id: 'drawer_menu.link.shop_all',
                     defaultMessage: 'Shop All'
                 }),
-                signIn: intl.formatMessage({
+                signIn: formatMessage({
                     id: 'drawer_menu.link.sign_in',
                     defaultMessage: 'Sign In'
                 })
             },
             buttons: {
-                logOut: intl.formatMessage({
+                logOut: formatMessage({
                     id: 'drawer_menu.button.log_out',
                     defaultMessage: 'Log Out'
                 }),
-                myAccount: intl.formatMessage({
+                myAccount: formatMessage({
                     id: 'drawer_menu.button.my_account',
                     defaultMessage: 'My Account'
                 }),
-                accountDetails: intl.formatMessage({
+                accountDetails: formatMessage({
                     id: 'drawer_menu.button.account_details',
                     defaultMessage: 'Account Details'
                 }),
-                orderHistory: intl.formatMessage({
+                orderHistory: formatMessage({
                     id: 'drawer_menu.button.order_history',
                     defaultMessage: 'Order History'
                 }),
-                addresses: intl.formatMessage({
+                addresses: formatMessage({
                     id: 'drawer_menu.button.addresses',
                     defaultMessage: 'Addresses'
                 })
             },
             customerSupport: {
-                title: intl.formatMessage({
+                title: formatMessage({
                     id: 'drawer_menu.link.customer_support',
                     defaultMessage: 'Customer Support'
                 }),
-                contactUs: intl.formatMessage({
+                contactUs: formatMessage({
                     id: 'drawer_menu.link.customer_support.contact_us',
                     defaultMessage: 'Contact Us'
                 }),
-                shippingAndReturns: intl.formatMessage({
+                shippingAndReturns: formatMessage({
                     id: 'drawer_menu.link.customer_support.shipping_and_returns',
                     defaultMessage: 'Shipping & Returns'
                 })
             },
             ourCompany: {
-                title: intl.formatMessage({
+                title: formatMessage({
                     id: 'drawer_menu.link.our_company',
                     defaultMessage: 'Our Company'
                 }),
-                aboutUs: intl.formatMessage({
+                aboutUs: formatMessage({
                     id: 'drawer_menu.link.about_us',
                     defaultMessage: 'About Us'
                 })
             },
             privacyAndSecurity: {
-                title: intl.formatMessage({
+                title: formatMessage({
                     id: 'drawer_menu.link.privacy_and_security',
                     defaultMessage: 'Privacy & Security'
                 }),
-                termsAndConditions: intl.formatMessage({
+                termsAndConditions: formatMessage({
                     id: 'drawer_menu.link.terms_and_conditions',
                     defaultMessage: 'Terms & Conditions'
                 }),
-                privacyPolicy: intl.formatMessage({
+                privacyPolicy: formatMessage({
                     id: 'drawer_menu.link.privacy_policy',
                     defaultMessage: 'Privacy Policy'
                 }),
-                siteMap: intl.formatMessage({
+                siteMap: formatMessage({
                     id: 'drawer_menu.link.site_map',
                     defaultMessage: 'Site Map'
                 })

@@ -6,7 +6,7 @@
  */
 import React, {useState, useMemo} from 'react'
 import {nanoid} from 'nanoid'
-import {defineMessage, useIntl} from 'react-intl'
+import {useIntl} from 'react-intl'
 import {useCheckout} from '../util/checkout-context'
 import {ToggleCard, ToggleCardEdit, ToggleCardSummary} from '../../../components/toggle-card'
 import ShippingAddressSelection from './shipping-address-selection'

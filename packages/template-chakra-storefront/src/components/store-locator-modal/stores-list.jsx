@@ -33,15 +33,15 @@ const StoresList = ({storesInfo}) => {
 
     const messages = useMemo(
         () => ({
-            away: intl.formatMessage({
+            away: formatMessage({
                 id: 'store_locator.description.away',
                 defaultMessage: 'away'
             }),
-            phone: intl.formatMessage({
+            phone: formatMessage({
                 id: 'store_locator.description.phone',
                 defaultMessage: 'Phone:'
             }),
-            viewMore: intl.formatMessage({
+            viewMore: formatMessage({
                 id: 'store_locator.action.viewMore',
                 defaultMessage: 'View More'
             })
