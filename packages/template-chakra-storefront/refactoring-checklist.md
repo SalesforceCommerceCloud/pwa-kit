@@ -49,7 +49,7 @@ Total files: 97
 - [x] src/components/search/index.jsx
 - [x] src/components/search/partials/recent-searches.jsx
 - [x] src/components/social-login/index.jsx
-- [ ] src/components/store-locator-modal/store-locator-content.jsx
+- [x] src/components/store-locator-modal/store-locator-content.jsx
 - [ ] src/components/store-locator-modal/store-locator-input.jsx
 - [ ] src/components/store-locator-modal/stores-list.jsx
 - [ ] src/components/swatch-group/index.jsx
@@ -93,9 +93,9 @@ Total files: 97
 - [ ] src/pages/product-list/partials/category-links.jsx
 - [ ] src/pages/product-list/partials/color-refinements.jsx
 - [ ] src/pages/product-list/partials/empty-results.jsx
-- [ ] src/pages/product-list/partials/page-header.jsx
-- [ ] src/pages/product-list/partials/product-list-header.jsx
-- [ ] src/pages/product-list/partials/product-list-title.jsx
+- [x] src/pages/product-list/partials/page-header.jsx
+- [x] src/pages/product-list/partials/product-list-header.jsx
+- [x] src/pages/product-list/partials/product-list-title.jsx
 - [x] src/pages/product-list/partials/radio-refinements.jsx
 - [x] src/pages/product-list/partials/selected-refinements.jsx
 - [x] src/pages/product-list/partials/sort.jsx

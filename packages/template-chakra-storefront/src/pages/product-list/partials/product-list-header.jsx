@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React, {useState} from 'react'
+import React, {useState, useMemo} from 'react'
 import PropTypes from 'prop-types'
 import {useHistory} from 'react-router-dom'
 import {useIntl} from 'react-intl'
@@ -31,7 +31,8 @@ const ProductListHeader = ({
     basePath,
     searchParams
 }) => {
-    const {formatMessage} = useIntl()
+    const intl = useIntl()
+    const {formatMessage} = intl
     const history = useHistory()
     const [sortOpen, setSortOpen] = useState(false)
 
@@ -41,7 +42,7 @@ const ProductListHeader = ({
             (option) => option.id === productSearchResult?.selectedSortingOption
         ) ?? sortingOptions?.[0]
 
-    const messages = {
+    const messages = useMemo(() => ({
         sortBy: formatMessage(
             {
                 id: 'product_list.button.sort_by',
@@ -71,7 +72,7 @@ const ProductListHeader = ({
             id: 'product_list.drawer.title.sort_by',
             defaultMessage: 'Sort By'
         })
-    }
+    }), [intl])
 
     return (
         <>

@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React from 'react'
+import React, {useMemo} from 'react'
 import PropTypes from 'prop-types'
 import {useIntl} from 'react-intl'
 // Components
@@ -16,14 +16,15 @@ import Fade from '../../../components/fade'
 import Breadcrumb from '../../../components/breadcrumb'
 
 const PageTitle = ({category, productSearchResult, isLoading, searchQuery, ...otherProps}) => {
-    const {formatMessage} = useIntl()
+    const intl = useIntl()
+    const {formatMessage} = intl
 
-    const messages = {
+    const messages = useMemo(() => ({
         searchResultsFor: formatMessage({
             id: 'page_title.search_results_for',
             defaultMessage: 'Search Results for'
         })
-    }
+    }), [intl])
 
     return (
         <Box {...otherProps} data-testid="sf-product-list-breadcrumb">

@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React, {useState, useContext} from 'react'
+import React, {useState, useContext, useMemo} from 'react'
 import {useIntl} from 'react-intl'
 
 // Components
@@ -39,7 +39,8 @@ const StoreLocatorContent = () => {
         setUserHasSetManualGeolocation
     } = useContext(StoreLocatorContext)
     const {countryCode, postalCode, latitude, longitude, limit} = searchStoresParams
-    const {formatMessage, locale} = useIntl()
+    const intl = useIntl()
+    const {formatMessage, locale} = intl
     const form = useForm({
         mode: 'onChange',
         reValidateMode: 'onChange',
@@ -51,21 +52,21 @@ const StoreLocatorContent = () => {
 
     const [numStoresToShow, setNumStoresToShow] = useState(limit)
 
-    const messages = {
-        title: formatMessage({
+    const messages = useMemo(() => ({
+        title: intl.formatMessage({
             id: 'store_locator.title',
             defaultMessage: 'Find a Store'
         }),
         status: {
-            loading: formatMessage({
+            loading: intl.formatMessage({
                 id: 'store_locator.description.loading_locations',
                 defaultMessage: 'Loading locations...'
             }),
-            noLocations: formatMessage({
+            noLocations: intl.formatMessage({
                 id: 'store_locator.description.no_locations',
                 defaultMessage: 'Sorry, there are no locations in this area'
             }),
-            viewingNearPostalCode: formatMessage(
+            viewingNearPostalCode: intl.formatMessage(
                 {
                     id: 'store_locator.description.viewing_near_postal_code',
                     defaultMessage:
@@ -77,16 +78,16 @@ const StoreLocatorContent = () => {
                     postalCode: searchStoresParams.postalCode
                 }
             ),
-            viewingNearLocation: formatMessage({
+            viewingNearLocation: intl.formatMessage({
                 id: 'store_locator.description.viewing_near_your_location',
                 defaultMessage: 'Viewing stores near your location'
             })
         },
-        loadMore: formatMessage({
+        loadMore: intl.formatMessage({
             id: 'store_locator.pagination.load_more',
             defaultMessage: 'Load More'
         })
-    }
+    }), [intl])
 
     // Either the countryCode & postalCode or latitude & longitude are defined, never both
     const {
@@ -148,12 +149,12 @@ const StoreLocatorContent = () => {
             return `${messages.status.viewingNearPostalCode}
                 ${
                     SUPPORTED_STORE_LOCATOR_COUNTRIES.length !== 0
-                        ? formatMessage(
+                        ? intl.formatMessage(
                               SUPPORTED_STORE_LOCATOR_COUNTRIES.find(
                                   (o) => o.countryCode === searchStoresParams.countryCode
                               ).countryName
                           )
-                        : formatMessage(DEFAULT_STORE_LOCATOR_COUNTRY.countryName)
+                        : intl.formatMessage(DEFAULT_STORE_LOCATOR_COUNTRY.countryName)
                 }`
         else return messages.status.viewingNearLocation
     }
