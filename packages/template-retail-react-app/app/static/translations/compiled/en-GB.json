@@ -3428,7 +3428,7 @@
   "shipping_address.button.add_new_address": [
     {
       "type": 0,
-      "value": "Add New Address"
+      "value": "+ Add New Address"
     }
   ],
   "shipping_address.button.continue_to_shipping": [
@@ -3535,6 +3535,16 @@
       "value": "Edit Shipping Address"
     }
   ],
+  "shipping_multi_address.add_new_address.aria_label": [
+    {
+      "type": 0,
+      "value": "Add new delivery address for "
+    },
+    {
+      "type": 1,
+      "value": "productName"
+    }
+  ],
   "shipping_multi_address.error.label": [
     {
       "type": 0,
@@ -3581,6 +3591,12 @@
       "value": "postalCode"
     }
   ],
+  "shipping_multi_address.guest_user.message": [
+    {
+      "type": 0,
+      "value": "Guest users cannot use multi-address shipping. Please sign in to continue."
+    }
+  ],
   "shipping_multi_address.image.alt": [
     {
       "type": 0,
@@ -3594,7 +3610,13 @@
   "shipping_multi_address.loading.message": [
     {
       "type": 0,
-      "value": "Loading products..."
+      "value": "Loading..."
+    }
+  ],
+  "shipping_multi_address.no_addresses_available": [
+    {
+      "type": 0,
+      "value": "No Address Available"
     }
   ],
   "shipping_multi_address.product_attributes.label": [

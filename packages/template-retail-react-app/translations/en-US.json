@@ -1437,7 +1437,7 @@
     "defaultMessage": "Ship Items to One Address"
   },
   "shipping_address.button.add_new_address": {
-    "defaultMessage": "Add New Address"
+    "defaultMessage": "+ Add New Address"
   },
   "shipping_address.button.continue_to_shipping": {
     "defaultMessage": "Continue to Shipping Method"
@@ -1487,6 +1487,9 @@
   "shipping_address_selection.title.edit_shipping": {
     "defaultMessage": "Edit Shipping Address"
   },
+  "shipping_multi_address.add_new_address.aria_label": {
+    "defaultMessage": "Add new delivery address for {productName}"
+  },
   "shipping_multi_address.error.label": {
     "defaultMessage": "Error loading products"
   },
@@ -1502,11 +1505,17 @@
   "shipping_multi_address.format.address_line_2": {
     "defaultMessage": "{city}, {stateCode} {postalCode}"
   },
+  "shipping_multi_address.guest_user.message": {
+    "defaultMessage": "Guest users cannot use multi-address shipping. Please sign in to continue."
+  },
   "shipping_multi_address.image.alt": {
     "defaultMessage": "Product image for {productName}"
   },
   "shipping_multi_address.loading.message": {
-    "defaultMessage": "Loading products..."
+    "defaultMessage": "Loading..."
+  },
+  "shipping_multi_address.no_addresses_available": {
+    "defaultMessage": "No Address Available"
   },
   "shipping_multi_address.product_attributes.label": {
     "defaultMessage": "Product attributes"
