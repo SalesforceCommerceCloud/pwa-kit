@@ -28,6 +28,7 @@ import ConfirmationModal from '@salesforce/retail-react-app/app/components/confi
 import EmptyCart from '@salesforce/retail-react-app/app/pages/cart/partials/empty-cart'
 import OrderSummary from '@salesforce/retail-react-app/app/components/order-summary'
 import OrderTypeDisplay from '@salesforce/retail-react-app/app/pages/cart/partials/order-type-display'
+import PickupOrDelivery from '@salesforce/retail-react-app/app/components/pickup-or-delivery'
 import ProductItemList from '@salesforce/retail-react-app/app/components/product-item-list'
 import ProductViewModal from '@salesforce/retail-react-app/app/components/product-view-modal'
 import BundleProductViewModal from '@salesforce/retail-react-app/app/components/product-view-modal/bundle'
@@ -729,6 +730,63 @@ const Cart = () => {
         return result
     }, [basket?.shipments, basket?.productItems, storeData])
 
+    /***************************** Delivery Options **************************/
+
+    const onDeliveryOptionChange = async (productItem, selectedDeliveryOption) => {
+        try {
+            setCartItemLoading(true)
+            setSelectedItem(productItem)
+
+            const selectedPickup = selectedDeliveryOption === DELIVERY_OPTIONS.PICKUP
+
+            // If the user selects pickup and no store is selected, open the store locator modal
+            if (selectedPickup && !selectedStore) {
+                storeLocatorModal.onOpen()
+                return
+            }
+
+            // Get default inventory ID from product data - throw error if not available
+            const productData = products?.[productItem.productId]
+            const defaultInventoryId = productData?.inventory?.id
+
+            if (!defaultInventoryId) {
+                throw new Error(`No inventory ID found for product ${productItem.productId}`)
+            }
+
+            await handleDeliveryOptionChange(
+                productItem,
+                selectedPickup,
+                selectedStore,
+                defaultInventoryId
+            )
+        } catch (error) {
+            console.error('Error changing delivery option:', error)
+            showError()
+        } finally {
+            setCartItemLoading(false)
+            setSelectedItem(undefined)
+        }
+    }
+
+    // Function to render deliveryActions
+    const renderDeliveryActions = (productItem, shipmentInfo) => {
+        const showDeliveryOptions = STORE_LOCATOR_IS_ENABLED && MULTISHIP_IS_ENABLED
+        if (!showDeliveryOptions) {
+            return null
+        }
+
+        const deliveryOption = shipmentInfo.isPickupOrder
+            ? DELIVERY_OPTIONS.PICKUP
+            : DELIVERY_OPTIONS.SHIP
+
+        return (
+            <PickupOrDelivery
+                value={deliveryOption}
+                onChange={(selectedValue) => onDeliveryOptionChange(productItem, selectedValue)}
+            />
+        )
+    }
+
     // Function to render secondary actions for product items
     const renderSecondaryActions = ({isAGift}) => (
         <CartSecondaryButtonGroup
@@ -742,49 +800,6 @@ const Cart = () => {
             onRemoveItemClick={handleRemoveItem}
         />
     )
-
-    // Function to create deliveryActions
-    const createDeliveryActions = (isPickupOrder) => {
-        return {
-            showDeliveryOptions: STORE_LOCATOR_IS_ENABLED && MULTISHIP_IS_ENABLED,
-            deliveryOption: isPickupOrder ? DELIVERY_OPTIONS.PICKUP : DELIVERY_OPTIONS.SHIP,
-            //
-            // TODO: Maybe instead of disabling we should pop open the store locator modal?
-            //
-            isPickupDisabled: !selectedStore && !isPickupOrder,
-            onDeliveryOptionChange: async (productItem, selectedDeliveryOption) => {
-                try {
-                    setCartItemLoading(true)
-                    setSelectedItem(productItem)
-
-                    const selectedPickup = selectedDeliveryOption === DELIVERY_OPTIONS.PICKUP
-
-                    // Get default inventory ID from product data - throw error if not available
-                    const productData = products?.[productItem.productId]
-                    const defaultInventoryId = productData?.inventory?.id
-
-                    if (!defaultInventoryId) {
-                        throw new Error(
-                            `No inventory ID found for product ${productItem.productId}`
-                        )
-                    }
-
-                    await handleDeliveryOptionChange(
-                        productItem,
-                        selectedPickup,
-                        selectedStore,
-                        defaultInventoryId
-                    )
-                } catch (error) {
-                    console.error('Error changing delivery option:', error)
-                    showError()
-                } finally {
-                    setCartItemLoading(false)
-                    setSelectedItem(undefined)
-                }
-            }
-        }
-    }
 
     /********* Rendering  UI **********/
     if (isLoading) {
@@ -857,9 +872,9 @@ const Cart = () => {
                                                 onItemQuantityChange={handleChangeItemQuantity}
                                                 onRemoveItemClick={handleRemoveItem}
                                                 renderSecondaryActions={renderSecondaryActions}
-                                                deliveryActions={createDeliveryActions(
-                                                    shipmentInfo.isPickupOrder
-                                                )}
+                                                renderDeliveryActions={(productItem) =>
+                                                    renderDeliveryActions(productItem, shipmentInfo)
+                                                }
                                             />
                                             {/* Bonus Products */}
                                             {shipmentInfo.categorizedProducts.bonusProducts.length >
@@ -884,9 +899,12 @@ const Cart = () => {
                                                         renderSecondaryActions={
                                                             renderSecondaryActions
                                                         }
-                                                        deliveryActions={createDeliveryActions(
-                                                            shipmentInfo.isPickupOrder
-                                                        )}
+                                                        renderDeliveryActions={(productItem) =>
+                                                            renderDeliveryActions(
+                                                                productItem,
+                                                                shipmentInfo
+                                                            )
+                                                        }
                                                     />
                                                 </>
                                             )}
