@@ -72,10 +72,11 @@ const ShippingAddressEditForm = ({
                         />
                     ) : (
                         !hideSubmitButton && (
-                            <Box {...styles.submitButtonContainer}>
+                            <Box>
                                 <Container variant="form">
                                     <Button
-                                        {...styles.submitButton}
+                                        type="submit"
+                                        width="full"
                                         disabled={form.formState.isSubmitting}
                                     >
                                         {formatMessage(submitButtonLabel)}
