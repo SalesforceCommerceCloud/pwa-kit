@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React, {useEffect} from 'react'
+import React, {useEffect, useMemo} from 'react'
 import {FormattedNumber, useIntl} from 'react-intl'
 import {Box, Button, Container, Flex, HStack, RadioGroup, Stack, Text} from '@chakra-ui/react'
 import {useForm, Controller} from 'react-hook-form'
@@ -19,7 +19,8 @@ import {useCurrentBasket} from '../../../hooks/use-current-basket'
 import {useCurrency} from '../../../hooks'
 
 export default function ShippingOptions() {
-    const {formatMessage} = useIntl()
+    const intl = useIntl()
+    const {formatMessage} = intl
     const {step, STEPS, goToStep, goToNextStep} = useCheckout()
     const {data: basket} = useCurrentBasket()
     const {currency} = useCurrency()
@@ -77,7 +78,7 @@ export default function ShippingOptions() {
         shippingItem?.priceAfterItemDiscount || 0
     )
 
-    const messages = {
+    const messages = useMemo(() => ({
         free: formatMessage({
             id: 'checkout_confirmation.label.free',
             defaultMessage: 'Free'
@@ -98,7 +99,7 @@ export default function ShippingOptions() {
             id: 'shipping_options.button.continue_to_payment',
             defaultMessage: 'Continue to Payment'
         })
-    }
+    }), [intl])
 
     let shippingPriceLabel = selectedMethodDisplayPrice
     if (selectedMethodDisplayPrice !== shippingItem?.price) {

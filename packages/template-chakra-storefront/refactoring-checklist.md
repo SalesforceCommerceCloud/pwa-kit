@@ -56,8 +56,8 @@ Total files: 97
 - [x] src/components/toggle-card/index.jsx
 - [x] src/components/with-registration/index.jsx
 - [x] src/hooks/use-add-to-cart-modal.js
-- [ ] src/hooks/use-dnt-notification.js
-- [ ] src/hooks/use-product-view-modal.js
+- [x] src/hooks/use-dnt-notification.js
+- [x] src/hooks/use-product-view-modal.js
 - [ ] src/page-designer/layouts/carousel/index.jsx
 - [ ] src/pages/account/addresses.jsx
 - [ ] src/pages/account/order-detail.jsx
@@ -84,8 +84,8 @@ Total files: 97
 - [ ] src/pages/checkout/partials/payment.jsx
 - [ ] src/pages/checkout/partials/shipping-address-selection.jsx
 - [ ] src/pages/checkout/partials/shipping-address.jsx
-- [ ] src/pages/checkout/partials/shipping-options.jsx
-- [ ] src/pages/home/index.jsx
+- [x] src/pages/checkout/partials/shipping-options.jsx
+- [x] src/pages/home/index.jsx
 - [x] src/pages/login/index.jsx
 - [x] src/pages/page-not-found/index.jsx
 - [x] src/pages/product-detail/partials/information-accordion.jsx
