@@ -16,6 +16,9 @@ const systemPromptForCreatePage = `You are a smart assistant that can use tools 
         - What is the name of the new page to create? \
         - List the components to include on the page, separated by commas (e.g., Image, ProductView) \
         - What is the URL route for this page? (e.g., /new-home, /my-products) \
+        - In case any component is **not found**, please ask the user to provide the full path of the component and import it on the page if not present already. \
+        - **Do not** create a new component, unless requested explicitly by the user. \
+        - If the newly added component requires any additional input requirements, please ask the user for the same. \
         Collect answers to these questions, then call the tool with the collected information as input parameters.`
 
 const systemPromptForProductHook = `User have added the ProductView component to the new page. Please ask user: \
@@ -50,11 +53,6 @@ const systemPromptForImageComponent = `User has added the Image component to the
         Note:
         If the automation cannot detect the Image component but you know it exists and works as intended, proceed with the above steps as if the component is available. Do not block or alter the workflow due to the detection issue. Clearly communicate to the user that the Image component will be used, even if it was not detected by the automation.
         `
-
-const systemPromptForUnfoundComponents = (unfoundComponents) =>
-    `The following components were not found: ${unfoundComponents.join(', ')}. \
-        If the component is not found, **Please** suggest changes to the newly generated page file based on the components not found.`
-
 class CreateNewPageTool {
     constructor() {
         this.name = 'create_sample_storefront_page'
@@ -123,10 +121,6 @@ class CreateNewPageTool {
             if (componentList.includes('Image')) {
                 messages.push(systemPromptForImageComponent)
             }
-            logMCPMessage(`Unfound components: ${this.unfoundComponents}`)
-            if (this.unfoundComponents.length != 0) {
-                messages.push(systemPromptForUnfoundComponents(this.unfoundComponents))
-            }
             logMCPMessage(messages.join('\n'))
             return {
                 role: 'system',
@@ -168,9 +162,13 @@ class CreateNewPageTool {
                 `?????? importing ${componentName} from '@salesforce/retail-react-app/app/components/${componentDir}'`
             )
             imports.push(
-                `import {getAssetUrl} from '@salesforce/pwa-kit-react-sdk/ssr/universal/utils'`,
                 `import ${componentName} from '@salesforce/retail-react-app/app/components/${componentDir}'`
             )
+            if (componentName === 'Image') {
+                imports.push(
+                    `import {getAssetUrl} from '@salesforce/pwa-kit-react-sdk/ssr/universal/utils'`
+                )
+            }
         })
 
         return Promise.all(accessPromises).then(() => {
@@ -203,7 +201,7 @@ ${imports.join('\n')}
 const ${pageName} = () => {
 
     return (
-        <Box data-testid="${pageName.toLowerCase()}-page" layerStyle="page" display="flex">
+        <Box data-testid="${pageName.toLowerCase()}-page" layerStyle="page">
             <Seo
                 title="${pageName}"
                 description="${pageName} Page"
