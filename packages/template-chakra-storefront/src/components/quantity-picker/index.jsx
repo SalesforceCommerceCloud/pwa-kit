@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React from 'react'
+import React, {useMemo} from 'react'
 
 import {Button, HStack, NumberInput, useSlotRecipe} from '@chakra-ui/react'
 import {useIntl} from 'react-intl'
@@ -23,13 +23,14 @@ import PropTypes from 'prop-types'
  * @returns
  */
 const QuantityPicker = (props) => {
-    const {formatMessage} = useIntl()
+    const intl = useIntl()
+    const {formatMessage} = intl
     const recipe = useSlotRecipe({key: 'quantityPicker'})
 
     const {productName, ...rest} = props
     const styles = recipe()
 
-    const messages = {
+    const messages = useMemo(() => ({
         decrementLabel: formatMessage(
             {
                 defaultMessage: 'Decrement Quantity for {productName}',
@@ -56,7 +57,7 @@ const QuantityPicker = (props) => {
             id: 'product_view.label.quantity_increment',
             defaultMessage: '+'
         })
-    }
+    }), [intl])
 
     return (
         <NumberInput.Root
