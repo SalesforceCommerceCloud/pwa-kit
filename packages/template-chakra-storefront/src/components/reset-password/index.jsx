@@ -51,7 +51,7 @@ const ResetPasswordForm = ({submitForm, clickSignIn = noop, form}) => {
                         'You will receive an email at <b>{email}</b> with a link to reset your password shortly.'
                 },
                 {
-                    email: form.getValues('email'),
+                    email: form.getValues('email') || '',
                     b: (chunks) => <b>{chunks}</b>
                 }
             ),
@@ -60,7 +60,7 @@ const ResetPasswordForm = ({submitForm, clickSignIn = noop, form}) => {
                 defaultMessage: 'Back to Sign In'
             })
         }),
-        [intl]
+        [intl, form.getValues('email')]
     )
     return (
         <Fragment>

@@ -74,8 +74,13 @@ const Home = () => {
         }
     })
 
-    const messages = useMemo(
-        () => ({
+    const messages = useMemo(() => {
+        const readDocsText = formatMessage({
+            id: 'home.link.read_docs',
+            defaultMessage: 'Read docs'
+        })
+
+        return {
             heroTitle: formatMessage({
                 id: 'home.title.react_starter_store',
                 defaultMessage: 'The React PWA Starter Store for Retail'
@@ -89,10 +94,7 @@ const Home = () => {
                     id: 'home.heading.shop_products',
                     defaultMessage: 'Shop Products'
                 }),
-                readDocs: formatMessage({
-                    id: 'home.link.read_docs',
-                    defaultMessage: 'Read docs'
-                }),
+                readDocs: readDocsText,
                 subtitle: formatMessage(
                     {
                         id: 'home.description.shop_products',
@@ -122,7 +124,7 @@ const Home = () => {
                                 }}
                                 _hover={{textDecoration: 'none'}}
                             >
-                                {messages.shopProducts.readDocs}
+                                {readDocsText}
                             </Link>
                         )
                     }
@@ -157,9 +159,8 @@ const Home = () => {
                     defaultMessage: 'Contact Us'
                 })
             }
-        }),
-        [intl]
-    )
+        }
+    }, [intl])
 
     return (
         <Box data-testid="home-page" layerStyle="page">
