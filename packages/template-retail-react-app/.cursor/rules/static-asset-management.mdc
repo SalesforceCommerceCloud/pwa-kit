@@ -1,0 +1,149 @@
+---
+description: Rule for managing hero and logo images as static resources
+alwaysApply: false
+---
+# Static Asset Management Rule
+
+When hero images, logos, or other brand assets are provided via external URLs, they MUST be downloaded and used as static resources for optimal performance and reliability.
+
+## 🎯 **Scope**
+
+This rule applies to:
+- Hero banner images
+- Brand logos
+- Favicon and app icons
+- Any other brand-related images provided via external URLs
+
+## 📥 **Download Process**
+
+### 1. **Asset Download**
+When an external image URL is provided:
+```bash
+# Download hero banner
+curl -o app/static/img/hero-banner.jpeg "https://external-url.com/hero-image.jpeg"
+
+# Download brand logo
+curl -o app/static/img/global/brand-logo.jpeg "https://external-url.com/logo.jpeg"
+
+# Download favicon/app icons
+curl -o app/static/img/global/favicon.ico "https://external-url.com/favicon.ico"
+```
+
+### 2. **File Organization**
+- **Hero Images**: `app/static/img/hero-*.{jpg,jpeg,png,webp}`
+- **Brand Logos**: `app/static/img/global/brand-logo.{jpg,jpeg,png,webp}`
+- **App Icons**: `app/static/img/global/app-icon-*.{png,ico}`
+- **Favicons**: `app/static/img/global/favicon.ico`
+
+## 🔧 **Implementation Steps**
+
+### Step 1: Download Asset
+```bash
+# Example: Download hero banner
+curl -o app/static/img/hero-banner.jpeg "https://asset.brandfetch.io/idU1xpCZ0s/idQcl8dhCh.jpeg"
+
+# Example: Download brand logo
+curl -o app/static/img/global/brand-logo.jpeg "https://asset.brandfetch.io/idU1xpCZ0s/idRPVayok8.jpeg"
+```
+
+### Step 2: Update Component to Use Local Asset
+```javascript
+// BEFORE: Using external URL
+const Hero = ({img}) => (
+    <Image src="https://external-url.com/hero-image.jpeg" />
+)
+
+// AFTER: Using local asset
+import {getAssetUrl} from '@salesforce/pwa-kit-react-sdk/ssr/universal/utils'
+
+const Hero = ({img}) => (
+    <Image src={getAssetUrl('static/img/hero-banner.jpeg')} />
+)
+```
+
+### Step 3: Update Logo Component
+```javascript
+// BEFORE: Using external URL
+const CustomBrandLogo = () => (
+    <Image src="https://external-url.com/logo.jpeg" />
+)
+
+// AFTER: Using local asset
+import {getAssetUrl} from '@salesforce/pwa-kit-react-sdk/ssr/universal/utils'
+
+const CustomBrandLogo = () => (
+    <Image src={getAssetUrl('static/img/global/brand-logo.jpeg')} />
+)
+```
+
+## 📋 **Required File Updates**
+
+### **Primary Files to Update**:
+1. **`app/pages/home/index.jsx`** - Hero image source
+2. **`app/components/icons/custom-brand-logo.jsx`** - Brand logo source
+3. **`app/components/hero/index.jsx`** - Hero component implementation
+4. **`app/static/img/`** - Asset storage directory
+
+### **Component Integration**:
+1. **Header Component**: Update to use CustomBrandLogo
+2. **Drawer Menu**: Update to use CustomBrandLogo
+3. **Homepage**: Update hero image source
+4. **Any other components**: Replace external URLs with local assets
+
+## ✅ **Verification Checklist**
+
+Before completing asset management work, verify:
+- [ ] External image has been downloaded to appropriate static directory
+- [ ] Component uses `getAssetUrl()` with correct local path
+- [ ] No external URLs remain in the codebase
+- [ ] Image displays correctly in development
+- [ ] File permissions are correct (readable)
+- [ ] Image format is optimized (JPEG for photos, PNG for logos with transparency)
+
+## 🎨 **Asset Optimization**
+
+### **Image Formats**:
+- **Hero Banners**: JPEG for photos, WebP for better compression
+- **Logos**: PNG for transparency, SVG for scalability
+- **Icons**: PNG for raster, SVG for vector
+
+### **File Naming Convention**:
+- **Hero**: `hero-banner.{ext}`, `hero-main.{ext}`
+- **Logo**: `brand-logo.{ext}`, `company-logo.{ext}`
+- **Icons**: `app-icon-{size}.{ext}`, `favicon.{ext}`
+
+## ❌ **Common Mistakes to Avoid**
+
+1. **Using External URLs**: Don't reference external URLs directly in components
+2. **Missing Downloads**: Don't forget to download the asset before updating code
+3. **Incorrect Paths**: Don't use wrong asset paths in `getAssetUrl()`
+4. **Missing Imports**: Don't forget to import `getAssetUrl` utility
+5. **File Permissions**: Don't forget to ensure downloaded files are readable
+
+## 🔍 **Performance Benefits**
+
+### **Why Use Local Assets**:
+- **Faster Loading**: No external HTTP requests
+- **Better Caching**: Browser can cache local assets more effectively
+- **Reliability**: No dependency on external CDN availability
+- **Security**: No external domain dependencies
+- **SEO**: Better Core Web Vitals scores
+
+## 📱 **Responsive Considerations**
+
+- Ensure images work on all screen sizes
+- Use appropriate image formats for different devices
+- Consider multiple sizes for app icons
+- Test image loading on slow connections
+
+## 🚀 **Deployment Notes**
+
+- Local assets are automatically included in builds
+- No additional configuration needed for production
+- Assets are optimized during build process
+- CDN integration works seamlessly with local assets
+
+This rule ensures consistent, performant, and reliable asset management across the PWA Kit application.
+description: Rule for managing hero and logo images as static resources
+globs: ["**/*.{js,jsx}", "**/*.{ts,tsx}"]
+
