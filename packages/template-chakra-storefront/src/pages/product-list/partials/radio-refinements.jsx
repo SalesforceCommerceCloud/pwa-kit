@@ -17,7 +17,7 @@ const RadioRefinement = ({value, isSelected}) => {
 
     const messages = useMemo(
         () => ({
-            ariaLabel: formatMessage(isSelected ? REMOVE_FILTER : ADD_FILTER, value)
+            itemTextAriaLabel: formatMessage(isSelected ? REMOVE_FILTER : ADD_FILTER, value)
         }),
         [intl]
     )

@@ -33,7 +33,7 @@ const ColorRefinements = ({filter, toggleFilter, selectedFilters}) => {
                 const styles = recipe({variant: 'circle', selected: isSelected})
 
                 const messages = {
-                    ariaLabel: formatMessage(
+                    colotHitariaLabel: formatMessage(
                         isSelected ? REMOVE_FILTER_HIT_COUNT : ADD_FILTER_HIT_COUNT,
                         value
                     ),
@@ -51,7 +51,7 @@ const ColorRefinements = ({filter, toggleFilter, selectedFilters}) => {
                         <HStack gap={1} cursor="pointer">
                             <Button
                                 css={styles.swatch}
-                                aria-label={messages.ariaLabel}
+                                aria-label={messages.colotHitariaLabel}
                                 aria-checked={isSelected}
                                 data-state={isSelected ? 'selected' : undefined}
                                 variant="outline"
