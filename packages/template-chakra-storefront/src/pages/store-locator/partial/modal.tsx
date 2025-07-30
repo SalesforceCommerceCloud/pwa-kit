@@ -23,7 +23,7 @@ const StoreLocatorModal: React.FC<StoreLocatorModalProps> = ({isOpen, onClose}) 
             lazyMount
             open={isOpen}
             onOpenChange={() => onClose()}
-            size="4xl"
+            size="xl"
             closeOnInteractOutside={false}
         >
             <SafePortal>

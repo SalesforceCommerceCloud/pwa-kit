@@ -42,11 +42,12 @@ const ProductDetail = loadable(() => import('../src/pages/product-detail'), {fal
 const ProductList = loadable(() => import('../src/pages/product-list'), {
     fallback
 })
-const StoreLocator =
-    SFDC_EXT_STORE_LOCATOR &&
-    loadable(() => import('../src/pages/store-locator'), {
-        fallback
-    })
+const StoreLocator = SFDC_EXT_STORE_LOCATOR
+    ? loadable(() => import('../src/pages/store-locator'), {
+          fallback
+      })
+    : null
+
 //@sfdc-extension-line SFDC_EXT_SOCIAL_LOGIN
 const SocialLoginRedirect = loadable(() => import('../src/pages/social-login-redirect'), {fallback})
 
