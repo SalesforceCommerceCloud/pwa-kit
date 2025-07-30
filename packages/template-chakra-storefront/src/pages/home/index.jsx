@@ -74,89 +74,92 @@ const Home = () => {
         }
     })
 
-    const messages = useMemo(() => ({
-        heroTitle: formatMessage({
-            id: 'home.title.react_starter_store',
-            defaultMessage: 'The React PWA Starter Store for Retail'
-        }),
-        getStarted: formatMessage({
-            id: 'home.link.get_started',
-            defaultMessage: 'Get started'
-        }),
-        shopProducts: {
-            title: formatMessage({
-                id: 'home.heading.shop_products',
-                defaultMessage: 'Shop Products'
+    const messages = useMemo(
+        () => ({
+            heroTitle: formatMessage({
+                id: 'home.title.react_starter_store',
+                defaultMessage: 'The React PWA Starter Store for Retail'
             }),
-            readDocs: formatMessage({
-                id: 'home.link.read_docs',
-                defaultMessage: 'Read docs'
+            getStarted: formatMessage({
+                id: 'home.link.get_started',
+                defaultMessage: 'Get started'
             }),
-            subtitle: formatMessage(
-                {
-                    id: 'home.description.shop_products',
+            shopProducts: {
+                title: formatMessage({
+                    id: 'home.heading.shop_products',
+                    defaultMessage: 'Shop Products'
+                }),
+                readDocs: formatMessage({
+                    id: 'home.link.read_docs',
+                    defaultMessage: 'Read docs'
+                }),
+                subtitle: formatMessage(
+                    {
+                        id: 'home.description.shop_products',
+                        defaultMessage:
+                            'This section contains content from the catalog. {docLink} on how to replace it.',
+                        description:
+                            '{docLink} is a html button that links the user to https://sfdc.co/business-manager-manage-catalogs'
+                    },
+                    {
+                        docLink: (
+                            <Link
+                                target="_blank"
+                                href={'https://sfdc.co/business-manager-manage-catalogs'}
+                                textDecoration={'none'}
+                                position={'relative'}
+                                css={{
+                                    '&::after': {
+                                        position: 'absolute',
+                                        content: '""',
+                                        height: '2px',
+                                        bottom: '-2px',
+                                        margin: '0 auto',
+                                        left: 0,
+                                        right: 0,
+                                        background: 'gray.700'
+                                    }
+                                }}
+                                _hover={{textDecoration: 'none'}}
+                            >
+                                {messages.shopProducts.readDocs}
+                            </Link>
+                        )
+                    }
+                )
+            },
+            features: {
+                title: formatMessage({
+                    id: 'home.heading.features',
+                    defaultMessage: 'Features'
+                }),
+                subtitle: formatMessage({
+                    id: 'home.description.features',
                     defaultMessage:
-                        'This section contains content from the catalog. {docLink} on how to replace it.',
-                    description:
-                        '{docLink} is a html button that links the user to https://sfdc.co/business-manager-manage-catalogs'
-                },
-                {
-                    docLink: (
-                        <Link
-                            target="_blank"
-                            href={'https://sfdc.co/business-manager-manage-catalogs'}
-                            textDecoration={'none'}
-                            position={'relative'}
-                            css={{
-                                '&::after': {
-                                    position: 'absolute',
-                                    content: '""',
-                                    height: '2px',
-                                    bottom: '-2px',
-                                    margin: '0 auto',
-                                    left: 0,
-                                    right: 0,
-                                    background: 'gray.700'
-                                }
-                            }}
-                            _hover={{textDecoration: 'none'}}
-                        >
-                            {messages.shopProducts.readDocs}
-                        </Link>
-                    )
-                }
-            )
-        },
-        features: {
-            title: formatMessage({
-                id: 'home.heading.features',
-                defaultMessage: 'Features'
-            }),
-            subtitle: formatMessage({
-                id: 'home.description.features',
-                defaultMessage:
-                    'Out-of-the-box features so that you focus only on adding enhancements.'
-            })
-        },
-        help: {
-            title: formatMessage({
-                id: 'home.heading.here_to_help',
-                defaultMessage: "We're here to help"
-            }),
-            description: formatMessage({
-                id: 'home.description.here_to_help',
-                defaultMessage: 'Contact our support staff.'
-            }),
-            descriptionLine2: formatMessage({
-                id: 'home.description.here_to_help_line_2',
-                defaultMessage: 'They will get you to the right place.'
-            }),
-            contactUs: formatMessage({
-                id: 'home.link.contact_us',
-                defaultMessage: 'Contact Us'
-            })
-        }
-    }), [intl])
+                        'Out-of-the-box features so that you focus only on adding enhancements.'
+                })
+            },
+            help: {
+                title: formatMessage({
+                    id: 'home.heading.here_to_help',
+                    defaultMessage: "We're here to help"
+                }),
+                description: formatMessage({
+                    id: 'home.description.here_to_help',
+                    defaultMessage: 'Contact our support staff.'
+                }),
+                descriptionLine2: formatMessage({
+                    id: 'home.description.here_to_help_line_2',
+                    defaultMessage: 'They will get you to the right place.'
+                }),
+                contactUs: formatMessage({
+                    id: 'home.link.contact_us',
+                    defaultMessage: 'Contact Us'
+                })
+            }
+        }),
+        [intl]
+    )
 
     return (
         <Box data-testid="home-page" layerStyle="page">
@@ -230,9 +233,7 @@ const Home = () => {
                                         >
                                             {feature.icon}
                                         </Flex>
-                                        <Text fontWeight="700">
-                                            {featureTitle}
-                                        </Text>
+                                        <Text fontWeight="700">{featureTitle}</Text>
                                     </HStack>
                                 </Box>
                             </Link>
@@ -284,9 +285,7 @@ const Home = () => {
                                         <Text as="h3" color="black" fontWeight="700" fontSize="xl">
                                             {featureTitle}
                                         </Text>
-                                        <Text color="black">
-                                            {featureText}
-                                        </Text>
+                                        <Text color="black">{featureText}</Text>
                                     </VStack>
                                 </HStack>
                             )

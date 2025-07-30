@@ -30,9 +30,12 @@ export const useProductViewModal = (initialProduct) => {
     const [product, setProduct] = useState(initialProduct)
     const variant = useVariant(product)
 
-    const messages = useMemo(() => ({
-        apiError: formatMessage(API_ERROR_MESSAGE)
-    }), [intl])
+    const messages = useMemo(
+        () => ({
+            apiError: formatMessage(API_ERROR_MESSAGE)
+        }),
+        [intl]
+    )
 
     const {
         data: currentProduct,

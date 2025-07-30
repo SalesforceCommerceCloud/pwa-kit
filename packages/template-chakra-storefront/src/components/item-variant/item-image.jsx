@@ -30,16 +30,19 @@ const ItemImage = ({imageProps, ratio = 1, ...props}) => {
         selectedVariationAttributes: variant?.variationValues
     })?.images?.[0]
 
-    const messages = useMemo(() => ({
-        sale: formatMessage({
-            id: 'item_image.label.sale',
-            defaultMessage: 'Sale'
+    const messages = useMemo(
+        () => ({
+            sale: formatMessage({
+                id: 'item_image.label.sale',
+                defaultMessage: 'Sale'
+            }),
+            unavailable: formatMessage({
+                id: 'item_image.label.unavailable',
+                defaultMessage: 'Unavailable'
+            })
         }),
-        unavailable: formatMessage({
-            id: 'item_image.label.unavailable',
-            defaultMessage: 'Unavailable'
-        })
-    }), [intl])
+        [intl]
+    )
 
     return (
         <Box width="84px" backgroundColor="gray.100" {...props}>

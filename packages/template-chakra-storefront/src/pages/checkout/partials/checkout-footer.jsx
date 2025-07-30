@@ -28,21 +28,24 @@ const CheckoutFooter = ({...otherProps}) => {
     const intl = useIntl()
     const {formatMessage} = intl
 
-    const messages = useMemo(() => ({
-        shipping: formatMessage({
-            id: 'checkout_footer.link.shipping',
-            defaultMessage: 'Shipping'
+    const messages = useMemo(
+        () => ({
+            shipping: formatMessage({
+                id: 'checkout_footer.link.shipping',
+                defaultMessage: 'Shipping'
+            }),
+            returnsExchanges: formatMessage({
+                id: 'checkout_footer.link.returns_exchanges',
+                defaultMessage: 'Returns & Exchanges'
+            }),
+            copyright: formatMessage({
+                id: 'checkout_footer.message.copyright',
+                defaultMessage:
+                    'Salesforce or its affiliates. All rights reserved. This is a demo store only. Orders made WILL NOT be processed.'
+            })
         }),
-        returnsExchanges: formatMessage({
-            id: 'checkout_footer.link.returns_exchanges',
-            defaultMessage: 'Returns & Exchanges'
-        }),
-        copyright: formatMessage({
-            id: 'checkout_footer.message.copyright',
-            defaultMessage:
-                'Salesforce or its affiliates. All rights reserved. This is a demo store only. Orders made WILL NOT be processed.'
-        })
-    }), [intl])
+        [intl]
+    )
 
     return (
         <Box as="footer" css={styles.container} {...otherProps}>

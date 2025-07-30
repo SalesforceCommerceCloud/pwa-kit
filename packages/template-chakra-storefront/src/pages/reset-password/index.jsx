@@ -29,10 +29,13 @@ const ResetPassword = () => {
     const {getPasswordResetToken} = usePasswordReset()
     const {login: loginConfig} = getConfig()
 
-    const messages = useMemo(() => ({
-        featureUnavailableError: formatMessage(FEATURE_UNAVAILABLE_ERROR_MESSAGE),
-        apiError: formatMessage(API_ERROR_MESSAGE)
-    }), [intl])
+    const messages = useMemo(
+        () => ({
+            featureUnavailableError: formatMessage(FEATURE_UNAVAILABLE_ERROR_MESSAGE),
+            apiError: formatMessage(API_ERROR_MESSAGE)
+        }),
+        [intl]
+    )
 
     const submitForm = async ({email}) => {
         try {

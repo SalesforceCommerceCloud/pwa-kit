@@ -40,24 +40,27 @@ const AccountWishlist = () => {
     const [selectedItem, setSelectedItem] = useState(undefined)
     const [isWishlistItemLoading, setWishlistItemLoading] = useState(false)
 
-    const messages = useMemo(() => ({
-        title: formatMessage({
-            defaultMessage: 'Wishlist',
-            id: 'account_wishlist.title.wishlist'
+    const messages = useMemo(
+        () => ({
+            title: formatMessage({
+                defaultMessage: 'Wishlist',
+                id: 'account_wishlist.title.wishlist'
+            }),
+            noWishlistItems: formatMessage({
+                defaultMessage: 'No Wishlist Items',
+                id: 'account_wishlist.heading.no_wishlist'
+            }),
+            continueShopping: formatMessage({
+                defaultMessage: 'Continue shopping and add items to your wishlist.',
+                id: 'account_wishlist.description.continue_shopping'
+            }),
+            continueShoppingButton: formatMessage({
+                defaultMessage: 'Continue Shopping',
+                id: 'account_wishlist.button.continue_shopping'
+            })
         }),
-        noWishlistItems: formatMessage({
-            defaultMessage: 'No Wishlist Items',
-            id: 'account_wishlist.heading.no_wishlist'
-        }),
-        continueShopping: formatMessage({
-            defaultMessage: 'Continue shopping and add items to your wishlist.',
-            id: 'account_wishlist.description.continue_shopping'
-        }),
-        continueShoppingButton: formatMessage({
-            defaultMessage: 'Continue Shopping',
-            id: 'account_wishlist.button.continue_shopping'
-        })
-    }), [intl])
+        [intl]
+    )
 
     const {data: wishListData, isPending: isWishListLoading} = useWishList()
     const productIds = wishListData?.customerProductListItems?.map((item) => item.productId)

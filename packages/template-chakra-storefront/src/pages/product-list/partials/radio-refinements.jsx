@@ -15,9 +15,12 @@ const RadioRefinement = ({value, isSelected}) => {
     const intl = useIntl()
     const {formatMessage} = intl
 
-    const messages = useMemo(() => ({
-        ariaLabel: formatMessage(isSelected ? REMOVE_FILTER : ADD_FILTER, value)
-    }), [intl])
+    const messages = useMemo(
+        () => ({
+            ariaLabel: formatMessage(isSelected ? REMOVE_FILTER : ADD_FILTER, value)
+        }),
+        [intl]
+    )
 
     // Because choosing a refinement is equivalent to a form submission, the best semantic choice
     // for the refinement is a button or a link, rather than a radio input. The radio element here

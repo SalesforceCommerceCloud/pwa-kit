@@ -24,20 +24,23 @@ const FormActionButtons = ({
     const intl = useIntl()
     const {formatMessage} = intl
 
-    const messages = useMemo(() => ({
-        save: saveButtonLabel
-            ? formatMessage(saveButtonLabel)
-            : formatMessage({
-                  id: 'form_action_buttons.button.save',
-                  defaultMessage: 'Save'
-              }),
-        cancel: cancelButtonLabel
-            ? formatMessage(cancelButtonLabel)
-            : formatMessage({
-                  id: 'form_action_buttons.button.cancel',
-                  defaultMessage: 'Cancel'
-              })
-    }), [intl, saveButtonLabel, cancelButtonLabel])
+    const messages = useMemo(
+        () => ({
+            save: saveButtonLabel
+                ? formatMessage(saveButtonLabel)
+                : formatMessage({
+                      id: 'form_action_buttons.button.save',
+                      defaultMessage: 'Save'
+                  }),
+            cancel: cancelButtonLabel
+                ? formatMessage(cancelButtonLabel)
+                : formatMessage({
+                      id: 'form_action_buttons.button.cancel',
+                      defaultMessage: 'Cancel'
+                  })
+        }),
+        [intl, saveButtonLabel, cancelButtonLabel]
+    )
 
     return (
         <Stack direction={{base: 'column', lg: 'row-reverse'}} gap={4}>

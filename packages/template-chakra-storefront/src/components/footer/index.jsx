@@ -40,53 +40,56 @@ const Footer = ({...otherProps}) => {
     const supportedLocaleIds = l10n?.supportedLocales.map((locale) => locale.id)
     const showLocaleSelector = supportedLocaleIds?.length > 1
 
-    const messages = useMemo(() => ({
-        columns: {
-            customerSupport: formatMessage({
-                id: 'footer.column.customer_support',
-                defaultMessage: 'Customer Support'
+    const messages = useMemo(
+        () => ({
+            columns: {
+                customerSupport: formatMessage({
+                    id: 'footer.column.customer_support',
+                    defaultMessage: 'Customer Support'
+                }),
+                account: formatMessage({
+                    id: 'footer.column.account',
+                    defaultMessage: 'Account'
+                }),
+                ourCompany: formatMessage({
+                    id: 'footer.column.our_company',
+                    defaultMessage: 'Our Company'
+                })
+            },
+            links: {
+                aboutUs: formatMessage({
+                    id: 'footer.link.about_us',
+                    defaultMessage: 'About Us'
+                }),
+                contactUs: formatMessage({
+                    id: 'footer.link.contact_us',
+                    defaultMessage: 'Contact Us'
+                }),
+                shipping: formatMessage({
+                    id: 'footer.link.shipping',
+                    defaultMessage: 'Shipping'
+                }),
+                orderStatus: formatMessage({
+                    id: 'footer.link.order_status',
+                    defaultMessage: 'Order Status'
+                }),
+                signinCreateAccount: formatMessage({
+                    id: 'footer.link.signin_create_account',
+                    defaultMessage: 'Sign in or create account'
+                })
+            },
+            localeSelector: formatMessage({
+                id: 'footer.locale_selector.assistive_msg',
+                defaultMessage: 'Select Language'
             }),
-            account: formatMessage({
-                id: 'footer.column.account',
-                defaultMessage: 'Account'
-            }),
-            ourCompany: formatMessage({
-                id: 'footer.column.our_company',
-                defaultMessage: 'Our Company'
+            copyright: formatMessage({
+                id: 'footer.message.copyright',
+                defaultMessage:
+                    'Salesforce or its affiliates. All rights reserved. This is a demo store only. Orders made WILL NOT be processed.'
             })
-        },
-        links: {
-            aboutUs: formatMessage({
-                id: 'footer.link.about_us',
-                defaultMessage: 'About Us'
-            }),
-            contactUs: formatMessage({
-                id: 'footer.link.contact_us',
-                defaultMessage: 'Contact Us'
-            }),
-            shipping: formatMessage({
-                id: 'footer.link.shipping',
-                defaultMessage: 'Shipping'
-            }),
-            orderStatus: formatMessage({
-                id: 'footer.link.order_status',
-                defaultMessage: 'Order Status'
-            }),
-            signinCreateAccount: formatMessage({
-                id: 'footer.link.signin_create_account',
-                defaultMessage: 'Sign in or create account'
-            })
-        },
-        localeSelector: formatMessage({
-            id: 'footer.locale_selector.assistive_msg',
-            defaultMessage: 'Select Language'
         }),
-        copyright: formatMessage({
-            id: 'footer.message.copyright',
-            defaultMessage:
-                'Salesforce or its affiliates. All rights reserved. This is a demo store only. Orders made WILL NOT be processed.'
-        })
-    }), [intl])
+        [intl]
+    )
 
     const makeOurCompanyLinks = () => {
         const links = []
@@ -200,24 +203,27 @@ const Subscribe = ({...otherProps}) => {
     const intl = useIntl()
     const {formatMessage} = intl
 
-    const messages = useMemo(() => ({
-        heading: formatMessage({
-            id: 'footer.subscribe.heading.first_to_know',
-            defaultMessage: 'Be the first to know'
+    const messages = useMemo(
+        () => ({
+            heading: formatMessage({
+                id: 'footer.subscribe.heading.first_to_know',
+                defaultMessage: 'Be the first to know'
+            }),
+            description: formatMessage({
+                id: 'footer.subscribe.description.sign_up',
+                defaultMessage: 'Sign up to stay in the loop about the hottest deals'
+            }),
+            emailAriaLabel: formatMessage({
+                id: 'footer.subscribe.email.assistive_msg',
+                defaultMessage: 'Email address for newsletter'
+            }),
+            buttonSignUp: formatMessage({
+                id: 'footer.subscribe.button.sign_up',
+                defaultMessage: 'Sign Up'
+            })
         }),
-        description: formatMessage({
-            id: 'footer.subscribe.description.sign_up',
-            defaultMessage: 'Sign up to stay in the loop about the hottest deals'
-        }),
-        emailAriaLabel: formatMessage({
-            id: 'footer.subscribe.email.assistive_msg',
-            defaultMessage: 'Email address for newsletter'
-        }),
-        buttonSignUp: formatMessage({
-            id: 'footer.subscribe.button.sign_up',
-            defaultMessage: 'Sign Up'
-        })
-    }), [intl])
+        [intl]
+    )
 
     return (
         <Box css={styles.subscribe} {...otherProps}>
@@ -248,20 +254,23 @@ const LegalLinks = ({variant}) => {
     const intl = useIntl()
     const {formatMessage} = intl
 
-    const messages = useMemo(() => ({
-        termsConditions: formatMessage({
-            id: 'footer.link.terms_conditions',
-            defaultMessage: 'Terms & Conditions'
+    const messages = useMemo(
+        () => ({
+            termsConditions: formatMessage({
+                id: 'footer.link.terms_conditions',
+                defaultMessage: 'Terms & Conditions'
+            }),
+            privacyPolicy: formatMessage({
+                id: 'footer.link.privacy_policy',
+                defaultMessage: 'Privacy Policy'
+            }),
+            siteMap: formatMessage({
+                id: 'footer.link.site_map',
+                defaultMessage: 'Site Map'
+            })
         }),
-        privacyPolicy: formatMessage({
-            id: 'footer.link.privacy_policy',
-            defaultMessage: 'Privacy Policy'
-        }),
-        siteMap: formatMessage({
-            id: 'footer.link.site_map',
-            defaultMessage: 'Site Map'
-        })
-    }), [intl])
+        [intl]
+    )
 
     return (
         <LinksList

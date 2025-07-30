@@ -23,32 +23,35 @@ const LoginState = ({
     const {formatMessage} = intl
     const [showLoginButtons, setShowLoginButtons] = useState(true)
 
-    const messages = useMemo(() => ({
-        orLoginWith: formatMessage({
-            id: 'contact_info.message.or_login_with',
-            defaultMessage: 'Or Login With'
+    const messages = useMemo(
+        () => ({
+            orLoginWith: formatMessage({
+                id: 'contact_info.message.or_login_with',
+                defaultMessage: 'Or Login With'
+            }),
+            secureLink: formatMessage({
+                id: 'contact_info.button.secure_link',
+                defaultMessage: 'Secure Link'
+            }),
+            password: formatMessage({
+                id: 'contact_info.button.password',
+                defaultMessage: 'Password'
+            }),
+            backToSignInOptions: formatMessage({
+                id: 'contact_info.button.back_to_sign_in_options',
+                defaultMessage: 'Back to Sign In Options'
+            }),
+            alreadyHaveAccount: formatMessage({
+                id: 'contact_info.button.already_have_account',
+                defaultMessage: 'Already have an account? Log in'
+            }),
+            checkoutAsGuest: formatMessage({
+                id: 'contact_info.button.checkout_as_guest',
+                defaultMessage: 'Checkout as Guest'
+            })
         }),
-        secureLink: formatMessage({
-            id: 'contact_info.button.secure_link',
-            defaultMessage: 'Secure Link'
-        }),
-        password: formatMessage({
-            id: 'contact_info.button.password',
-            defaultMessage: 'Password'
-        }),
-        backToSignInOptions: formatMessage({
-            id: 'contact_info.button.back_to_sign_in_options',
-            defaultMessage: 'Back to Sign In Options'
-        }),
-        alreadyHaveAccount: formatMessage({
-            id: 'contact_info.button.already_have_account',
-            defaultMessage: 'Already have an account? Log in'
-        }),
-        checkoutAsGuest: formatMessage({
-            id: 'contact_info.button.checkout_as_guest',
-            defaultMessage: 'Checkout as Guest'
-        })
-    }), [intl])
+        [intl]
+    )
 
     if (isSocialEnabled || isPasswordlessEnabled) {
         return showLoginButtons ? (

@@ -16,20 +16,23 @@ const RecommendedProductsSection = ({product, isProductASet}) => {
     const location = useLocation()
     const {formatMessage} = useIntl()
 
-    const messages = useMemo(() => ({
-        completeSet: formatMessage({
-            id: 'product_detail.recommended_products.title.complete_set',
-            defaultMessage: 'Complete the Set'
+    const messages = useMemo(
+        () => ({
+            completeSet: formatMessage({
+                id: 'product_detail.recommended_products.title.complete_set',
+                defaultMessage: 'Complete the Set'
+            }),
+            mightAlsoLike: formatMessage({
+                id: 'product_detail.recommended_products.title.might_also_like',
+                defaultMessage: 'You might also like'
+            }),
+            recentlyViewed: formatMessage({
+                id: 'product_detail.recommended_products.title.recently_viewed',
+                defaultMessage: 'Recently Viewed'
+            })
         }),
-        mightAlsoLike: formatMessage({
-            id: 'product_detail.recommended_products.title.might_also_like',
-            defaultMessage: 'You might also like'
-        }),
-        recentlyViewed: formatMessage({
-            id: 'product_detail.recommended_products.title.recently_viewed',
-            defaultMessage: 'Recently Viewed'
-        })
-    }), [intl])
+        [intl]
+    )
 
     return (
         <Stack gap={16}>

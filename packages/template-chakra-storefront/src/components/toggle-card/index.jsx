@@ -33,12 +33,15 @@ export const ToggleCard = ({
     const {formatMessage} = intl
     const titleRef = useRef()
 
-    const messages = useMemo(() => ({
-        edit: intl.formatMessage({
-            id: 'toggle_card.action.edit',
-            defaultMessage: 'Edit'
-        })
-    }), [intl])
+    const messages = useMemo(
+        () => ({
+            edit: intl.formatMessage({
+                id: 'toggle_card.action.edit',
+                defaultMessage: 'Edit'
+            })
+        }),
+        [intl]
+    )
 
     useEffect(() => {
         if (editing && titleRef.current) {

@@ -18,12 +18,15 @@ const PageHeader = ({category, productSearchResult, isLoading, searchQuery, ...o
     const intl = useIntl()
     const {formatMessage} = intl
 
-    const messages = useMemo(() => ({
-        searchResultsFor: formatMessage({
-            id: 'page_header.search_results_for',
-            defaultMessage: 'Search Results for'
-        })
-    }), [intl])
+    const messages = useMemo(
+        () => ({
+            searchResultsFor: formatMessage({
+                id: 'page_header.search_results_for',
+                defaultMessage: 'Search Results for'
+            })
+        }),
+        [intl]
+    )
 
     return (
         <Box {...otherProps} data-testid="sf-product-list-breadcrumb">

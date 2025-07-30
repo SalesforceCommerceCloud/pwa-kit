@@ -20,16 +20,19 @@ const CartRecommendations = ({basket}) => {
     const intl = useIntl()
     const {formatMessage} = intl
 
-    const messages = useMemo(() => ({
-        recentlyViewed: intl.formatMessage({
-            id: 'cart.recommended_products.title.recently_viewed',
-            defaultMessage: 'Recently Viewed'
+    const messages = useMemo(
+        () => ({
+            recentlyViewed: intl.formatMessage({
+                id: 'cart.recommended_products.title.recently_viewed',
+                defaultMessage: 'Recently Viewed'
+            }),
+            mayAlsoLike: intl.formatMessage({
+                id: 'cart.recommended_products.title.may_also_like',
+                defaultMessage: 'You May Also Like'
+            })
         }),
-        mayAlsoLike: intl.formatMessage({
-            id: 'cart.recommended_products.title.may_also_like',
-            defaultMessage: 'You May Also Like'
-        })
-    }), [intl])
+        [intl]
+    )
 
     return (
         <Stack gap={16}>

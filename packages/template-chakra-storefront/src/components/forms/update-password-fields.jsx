@@ -17,12 +17,15 @@ const UpdatePasswordFields = ({form, prefix = ''}) => {
     const fields = useUpdatePasswordFields({form, prefix})
     const password = form.watch('password')
 
-    const messages = useMemo(() => ({
-        forgotPassword: intl.formatMessage({
-            id: 'update_password_fields.button.forgot_password',
-            defaultMessage: 'Forgot Password?'
-        })
-    }), [intl])
+    const messages = useMemo(
+        () => ({
+            forgotPassword: intl.formatMessage({
+                id: 'update_password_fields.button.forgot_password',
+                defaultMessage: 'Forgot Password?'
+            })
+        }),
+        [intl]
+    )
 
     return (
         <Stack gap={5} separator={<StackSeparator borderColor="gray.100" />}>

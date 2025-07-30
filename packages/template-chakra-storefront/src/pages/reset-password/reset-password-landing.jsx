@@ -36,18 +36,21 @@ const ResetPasswordLanding = () => {
     const password = form.watch('password')
     const {resetPassword} = usePasswordReset()
 
-    const messages = useMemo(() => ({
-        title: formatMessage({
-            id: 'reset_password_form.title.reset_password',
-            defaultMessage: 'Reset Password'
+    const messages = useMemo(
+        () => ({
+            title: formatMessage({
+                id: 'reset_password_form.title.reset_password',
+                defaultMessage: 'Reset Password'
+            }),
+            resetPasswordButton: formatMessage({
+                id: 'reset_password_form.button.reset_password',
+                defaultMessage: 'Reset Password'
+            }),
+            invalidTokenError: formatMessage(INVALID_TOKEN_ERROR_MESSAGE),
+            apiError: formatMessage(API_ERROR_MESSAGE)
         }),
-        resetPasswordButton: formatMessage({
-            id: 'reset_password_form.button.reset_password',
-            defaultMessage: 'Reset Password'
-        }),
-        invalidTokenError: formatMessage(INVALID_TOKEN_ERROR_MESSAGE),
-        apiError: formatMessage(API_ERROR_MESSAGE)
-    }), [intl])
+        [intl]
+    )
 
     const submit = async (values) => {
         form.clearErrors()

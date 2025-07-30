@@ -17,16 +17,19 @@ const SelectedRefinements = ({toggleFilter, selectedFilterValues, filters, handl
     const {formatMessage} = intl
     const priceFilterValues = filters?.find((filter) => filter.attributeId === 'price')
 
-    const messages = useMemo(() => ({
-        clearAllAriaLabel: formatMessage({
-            id: 'selected_refinements.action.assistive_msg.clear_all',
-            defaultMessage: 'Clear all filters'
+    const messages = useMemo(
+        () => ({
+            clearAllAriaLabel: formatMessage({
+                id: 'selected_refinements.action.assistive_msg.clear_all',
+                defaultMessage: 'Clear all filters'
+            }),
+            clearAll: formatMessage({
+                id: 'selected_refinements.action.clear_all',
+                defaultMessage: 'Clear All'
+            })
         }),
-        clearAll: formatMessage({
-            id: 'selected_refinements.action.clear_all',
-            defaultMessage: 'Clear All'
-        })
-    }), [intl])
+        [intl]
+    )
 
     let selectedFilters = []
     for (const key in selectedFilterValues) {

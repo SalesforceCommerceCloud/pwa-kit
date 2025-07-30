@@ -18,38 +18,41 @@ const RegisterForm = ({submitForm, clickSignIn = noop, form}) => {
     const intl = useIntl()
     const {formatMessage} = intl
 
-    const messages = useMemo(() => ({
-        heading: formatMessage({
-            id: 'register_form.heading.lets_get_started',
-            defaultMessage: "Let's get started!"
+    const messages = useMemo(
+        () => ({
+            heading: formatMessage({
+                id: 'register_form.heading.lets_get_started',
+                defaultMessage: "Let's get started!"
+            }),
+            description: formatMessage({
+                id: 'register_form.message.create_an_account',
+                defaultMessage:
+                    'Create an account and get first access to the very best products, inspiration and community.'
+            }),
+            createAccount: formatMessage({
+                id: 'register_form.button.create_account',
+                defaultMessage: 'Create Account'
+            }),
+            alreadyHaveAccount: formatMessage({
+                id: 'register_form.message.already_have_account',
+                defaultMessage: 'Already have an account?'
+            }),
+            signIn: formatMessage({
+                id: 'register_form.action.sign_in',
+                defaultMessage: 'Sign in'
+            }),
+            agreeToPolicy: (policy, terms) =>
+                formatMessage(
+                    {
+                        id: 'register_form.message.agree_to_policy_terms',
+                        defaultMessage:
+                            'By creating an account, you agree to Salesforce <policy>Privacy Policy</policy> and <terms>Terms & Conditions</terms>'
+                    },
+                    {policy, terms}
+                )
         }),
-        description: formatMessage({
-            id: 'register_form.message.create_an_account',
-            defaultMessage:
-                'Create an account and get first access to the very best products, inspiration and community.'
-        }),
-        createAccount: formatMessage({
-            id: 'register_form.button.create_account',
-            defaultMessage: 'Create Account'
-        }),
-        alreadyHaveAccount: formatMessage({
-            id: 'register_form.message.already_have_account',
-            defaultMessage: 'Already have an account?'
-        }),
-        signIn: formatMessage({
-            id: 'register_form.action.sign_in',
-            defaultMessage: 'Sign in'
-        }),
-        agreeToPolicy: (policy, terms) =>
-            formatMessage(
-                {
-                    id: 'register_form.message.agree_to_policy_terms',
-                    defaultMessage:
-                        'By creating an account, you agree to Salesforce <policy>Privacy Policy</policy> and <terms>Terms & Conditions</terms>'
-                },
-                {policy, terms}
-            )
-    }), [intl])
+        [intl]
+    )
     return (
         <Fragment>
             <Stack justifyContent="center" alignItems="center" gap={8}>

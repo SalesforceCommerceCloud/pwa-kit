@@ -54,15 +54,18 @@ const BundleProductViewModal = ({product: bundle, isOpen, onClose, updateCart, .
     const intl = useIntl()
     const {formatMessage} = intl
 
-    const messages = useMemo(() => ({
-        modalLabel: intl.formatMessage(
-            {
-                id: 'cart.product_edit_modal.modal_label',
-                defaultMessage: 'Edit modal for {productName}'
-            },
-            {productName: productViewModalData?.product?.name}
-        )
-    }), [intl])
+    const messages = useMemo(
+        () => ({
+            modalLabel: intl.formatMessage(
+                {
+                    id: 'cart.product_edit_modal.modal_label',
+                    defaultMessage: 'Edit modal for {productName}'
+                },
+                {productName: productViewModalData?.product?.name}
+            )
+        }),
+        [intl]
+    )
 
     return (
         <Dialog.Root

@@ -85,36 +85,39 @@ const ContactInfo = ({isSocialEnabled = false, isPasswordlessEnabled = false, id
         }
     }
 
-    const messages = useMemo(() => ({
-        contactInfoTitle: formatMessage({
-            id: 'contact_info.title.contact_info',
-            defaultMessage: 'Contact Info'
+    const messages = useMemo(
+        () => ({
+            contactInfoTitle: formatMessage({
+                id: 'contact_info.title.contact_info',
+                defaultMessage: 'Contact Info'
+            }),
+            signOut: formatMessage({
+                id: 'contact_info.action.sign_out',
+                defaultMessage: 'Sign Out'
+            }),
+            editContactInfo: formatMessage({
+                id: 'toggle_card.action.editContactInfo',
+                defaultMessage: 'Edit Contact Info'
+            }),
+            forgotPassword: formatMessage({
+                id: 'contact_info.link.forgot_password',
+                defaultMessage: 'Forgot password?'
+            }),
+            checkoutAsGuest: formatMessage({
+                id: 'contact_info.button.checkout_as_guest',
+                defaultMessage: 'Checkout as Guest'
+            }),
+            logIn: formatMessage({
+                id: 'contact_info.button.login',
+                defaultMessage: 'Log In'
+            }),
+            incorrectCredentials: formatMessage({
+                id: 'contact_info.error.incorrect_username_or_password',
+                defaultMessage: 'Incorrect username or password, please try again.'
+            })
         }),
-        signOut: formatMessage({
-            id: 'contact_info.action.sign_out',
-            defaultMessage: 'Sign Out'
-        }),
-        editContactInfo: formatMessage({
-            id: 'toggle_card.action.editContactInfo',
-            defaultMessage: 'Edit Contact Info'
-        }),
-        forgotPassword: formatMessage({
-            id: 'contact_info.link.forgot_password',
-            defaultMessage: 'Forgot password?'
-        }),
-        checkoutAsGuest: formatMessage({
-            id: 'contact_info.button.checkout_as_guest',
-            defaultMessage: 'Checkout as Guest'
-        }),
-        logIn: formatMessage({
-            id: 'contact_info.button.login',
-            defaultMessage: 'Log In'
-        }),
-        incorrectCredentials: formatMessage({
-            id: 'contact_info.error.incorrect_username_or_password',
-            defaultMessage: 'Incorrect username or password, please try again.'
-        })
-    }), [intl])
+        [intl]
+    )
 
     const submitForm = async (data) => {
         setError(null)

@@ -26,24 +26,27 @@ export default function ShippingAddress() {
     const selectedShippingAddress = basket?.shipments && basket?.shipments[0]?.shippingAddress
     const {step, STEPS, goToStep, goToNextStep} = useCheckout()
 
-    const messages = useMemo(() => ({
-        submitButton: formatMessage({
-            id: 'shipping_address.button.continue_to_shipping',
-            defaultMessage: 'Continue to Shipping Method'
+    const messages = useMemo(
+        () => ({
+            submitButton: formatMessage({
+                id: 'shipping_address.button.continue_to_shipping',
+                defaultMessage: 'Continue to Shipping Method'
+            }),
+            shippingAddressAriaLabel: formatMessage({
+                id: 'shipping_address.label.shipping_address_form',
+                defaultMessage: 'Shipping Address Form'
+            }),
+            shippingAddress: formatMessage({
+                id: 'shipping_address.title.shipping_address',
+                defaultMessage: 'Shipping Address'
+            }),
+            editShippingAddress: formatMessage({
+                id: 'toggle_card.action.editShippingAddress',
+                defaultMessage: 'Edit Shipping Address'
+            })
         }),
-        shippingAddressAriaLabel: formatMessage({
-            id: 'shipping_address.label.shipping_address_form',
-            defaultMessage: 'Shipping Address Form'
-        }),
-        shippingAddress: formatMessage({
-            id: 'shipping_address.title.shipping_address',
-            defaultMessage: 'Shipping Address'
-        }),
-        editShippingAddress: formatMessage({
-            id: 'toggle_card.action.editShippingAddress',
-            defaultMessage: 'Edit Shipping Address'
-        })
-    }), [intl])
+        [intl]
+    )
 
     const createCustomerAddress = useShopperCustomersMutation('createCustomerAddress')
     const updateCustomerAddress = useShopperCustomersMutation('updateCustomerAddress')

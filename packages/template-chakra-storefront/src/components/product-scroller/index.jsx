@@ -33,16 +33,19 @@ const ProductScroller = forwardRef(
         const {formatMessage} = intl
         const scrollRef = useRef()
 
-        const messages = useMemo(() => ({
-            scrollLeft: intl.formatMessage({
-                id: 'product_scroller.assistive_msg.scroll_left',
-                defaultMessage: 'Scroll products left'
+        const messages = useMemo(
+            () => ({
+                scrollLeft: intl.formatMessage({
+                    id: 'product_scroller.assistive_msg.scroll_left',
+                    defaultMessage: 'Scroll products left'
+                }),
+                scrollRight: intl.formatMessage({
+                    id: 'product_scroller.assistive_msg.scroll_right',
+                    defaultMessage: 'Scroll products right'
+                })
             }),
-            scrollRight: intl.formatMessage({
-                id: 'product_scroller.assistive_msg.scroll_right',
-                defaultMessage: 'Scroll products right'
-            })
-        }), [intl])
+            [intl]
+        )
 
         // Renders nothing if we aren't loading and have no products.
         if ((!products || products.length < 1) && !isLoading) {

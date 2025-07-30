@@ -46,12 +46,15 @@ const ListMenu = ({
 
     const items = root?.[itemsKey]
 
-    const messages = useMemo(() => ({
-        navLabel: formatMessage({
-            id: 'list_menu.nav.assistive_msg',
-            defaultMessage: 'Main navigation'
-        })
-    }), [intl])
+    const messages = useMemo(
+        () => ({
+            navLabel: formatMessage({
+                id: 'list_menu.nav.assistive_msg',
+                defaultMessage: 'Main navigation'
+            })
+        }),
+        [intl]
+    )
 
     useEffect(() => {
         setAriaBusy(false)

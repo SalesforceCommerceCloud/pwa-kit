@@ -14,32 +14,36 @@ import {BrandLogo} from '../../components/icons'
 const PasswordlessEmailConfirmation = ({form, submitForm, email = ''}) => {
     const intl = useIntl()
     const {formatMessage} = intl
-    
-    const messages = useMemo(() => ({
-        title: intl.formatMessage({
-            id: 'auth_modal.check_email.title.check_your_email',
-            defaultMessage: 'Check Your Email'
+
+    const messages = useMemo(
+        () => ({
+            title: intl.formatMessage({
+                id: 'auth_modal.check_email.title.check_your_email',
+                defaultMessage: 'Check Your Email'
+            }),
+            justSent: intl.formatMessage(
+                {
+                    id: 'auth_modal.check_email.description.just_sent',
+                    defaultMessage: 'We just sent a login link to <b>{email}</b>'
+                },
+                {
+                    email: email,
+                    b: (chunks) => <b>{chunks}</b>
+                }
+            ),
+            checkSpam: intl.formatMessage({
+                id: 'auth_modal.check_email.description.check_spam_folder',
+                defaultMessage:
+                    "The link may take a few minutes to arrive, check your spam folder if you're having trouble finding it"
+            }),
+            resendLink: intl.formatMessage({
+                id: 'auth_modal.check_email.button.resend_link',
+                defaultMessage: 'Resend Link'
+            })
         }),
-        justSent: intl.formatMessage(
-            {
-                id: 'auth_modal.check_email.description.just_sent',
-                defaultMessage: 'We just sent a login link to <b>{email}</b>'
-            },
-            {
-                email: email,
-                b: (chunks) => <b>{chunks}</b>
-            }
-        ),
-        checkSpam: intl.formatMessage({
-            id: 'auth_modal.check_email.description.check_spam_folder',
-            defaultMessage: "The link may take a few minutes to arrive, check your spam folder if you're having trouble finding it"
-        }),
-        resendLink: intl.formatMessage({
-            id: 'auth_modal.check_email.button.resend_link',
-            defaultMessage: 'Resend Link'
-        })
-    }), [intl])
-    
+        [intl]
+    )
+
     return (
         <form
             onSubmit={form.handleSubmit(submitForm)}
@@ -60,9 +64,7 @@ const PasswordlessEmailConfirmation = ({form, submitForm, email = ''}) => {
                         </Text>
                     </Stack>
                 </Stack>
-                <Button type="submit">
-                    {messages.resendLink}
-                </Button>
+                <Button type="submit">{messages.resendLink}</Button>
             </Stack>
         </form>
     )

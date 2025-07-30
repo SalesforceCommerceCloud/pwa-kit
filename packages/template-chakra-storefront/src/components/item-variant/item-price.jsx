@@ -16,13 +16,16 @@ const PricePerItem = ({currency, basePrice}) => {
     const intl = useIntl()
     const {formatMessage} = intl
 
-    const messages = useMemo(() => ({
-        each: formatMessage({
-            defaultMessage: 'ea',
-            id: 'price_per_item.label.each',
-            description: "Abbreviated 'each', follows price per item, like $10/ea"
-        })
-    }), [intl])
+    const messages = useMemo(
+        () => ({
+            each: formatMessage({
+                defaultMessage: 'ea',
+                id: 'price_per_item.label.each',
+                description: "Abbreviated 'each', follows price per item, like $10/ea"
+            })
+        }),
+        [intl]
+    )
 
     return (
         <Text fontSize={{base: '12px', lg: '14px'}}>

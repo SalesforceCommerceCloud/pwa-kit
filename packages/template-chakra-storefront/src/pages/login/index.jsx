@@ -45,16 +45,19 @@ const Login = ({initialView = LOGIN_VIEW}) => {
     const intl = useIntl()
     const {formatMessage} = intl
 
-    const messages = useMemo(() => ({
-        loginError: formatMessage({
-            id: 'login_page.error.incorrect_username_or_password',
-            defaultMessage: 'Incorrect username or password, please try again.'
+    const messages = useMemo(
+        () => ({
+            loginError: formatMessage({
+                id: 'login_page.error.incorrect_username_or_password',
+                defaultMessage: 'Incorrect username or password, please try again.'
+            }),
+            apiError: formatMessage(API_ERROR_MESSAGE),
+            createAccountFirst: formatMessage(CREATE_ACCOUNT_FIRST_ERROR_MESSAGE),
+            featureUnavailable: formatMessage(FEATURE_UNAVAILABLE_ERROR_MESSAGE),
+            invalidToken: formatMessage(INVALID_TOKEN_ERROR_MESSAGE)
         }),
-        apiError: formatMessage(API_ERROR_MESSAGE),
-        createAccountFirst: formatMessage(CREATE_ACCOUNT_FIRST_ERROR_MESSAGE),
-        featureUnavailable: formatMessage(FEATURE_UNAVAILABLE_ERROR_MESSAGE),
-        invalidToken: formatMessage(INVALID_TOKEN_ERROR_MESSAGE)
-    }), [intl])
+        [intl]
+    )
     const navigate = useNavigation()
     const form = useForm()
     const location = useLocation()

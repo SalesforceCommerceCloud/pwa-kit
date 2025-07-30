@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React, { useMemo } from 'react'
+import React, {useMemo} from 'react'
 import PropTypes from 'prop-types'
 import {FormattedNumber, useIntl} from 'react-intl'
 import {Box, Flex, Button, Stack, Text, Heading, Separator, Accordion} from '@chakra-ui/react'
@@ -21,7 +21,7 @@ import {BasketIcon} from '../icons'
 
 const CartItems = ({basket}) => {
     const intl = useIntl()
-    const { formatMessage } = intl
+    const {formatMessage} = intl
     const totalItems = basket?.productItems?.reduce((acc, item) => acc + item.quantity, 0) || 0
     const productIds = basket?.productItems?.map(({productId}) => productId).join(',') ?? ''
     const {data: products} = useProducts(
@@ -44,20 +44,23 @@ const CartItems = ({basket}) => {
         }
     )
 
-    const messages = useMemo(() => ({
-        itemsInCart: intl.formatMessage(
-            {
-                id: 'order_summary.cart_items.action.num_of_items_in_cart',
-                defaultMessage:
-                    '{itemCount, plural, =0 {0 items} one {# item} other {# items}} in cart'
-            },
-            {itemCount: totalItems}
-        ),
-        editCart: intl.formatMessage({
-            id: 'order_summary.cart_items.link.edit_cart',
-            defaultMessage: 'Edit cart'
-        })
-    }), [intl, totalItems])
+    const messages = useMemo(
+        () => ({
+            itemsInCart: formatMessage(
+                {
+                    id: 'order_summary.cart_items.action.num_of_items_in_cart',
+                    defaultMessage:
+                        '{itemCount, plural, =0 {0 items} one {# item} other {# items}} in cart'
+                },
+                {itemCount: totalItems}
+            ),
+            editCart: formatMessage({
+                id: 'order_summary.cart_items.link.edit_cart',
+                defaultMessage: 'Edit cart'
+            })
+        }),
+        [intl, totalItems]
+    )
 
     return (
         <Accordion.Root w="full" collapsible>
@@ -120,57 +123,60 @@ const OrderSummary = ({
     fontSize = 'md'
 }) => {
     const intl = useIntl()
-    const { formatMessage } = intl
+    const {formatMessage} = intl
     const {removePromoCode, ...promoCodeProps} = usePromoCode()
+
+    const messages = useMemo(
+        () => ({
+            orderSummary: formatMessage({
+                id: 'order_summary.heading.order_summary',
+                defaultMessage: 'Order Summary'
+            }),
+            subtotal: formatMessage({
+                id: 'order_summary.label.subtotal',
+                defaultMessage: 'Subtotal'
+            }),
+            shipping: formatMessage({
+                id: 'order_summary.label.shipping',
+                defaultMessage: 'Shipping'
+            }),
+            promoApplied: formatMessage({
+                id: 'order_summary.label.promo_applied',
+                defaultMessage: 'Promotion applied'
+            }),
+            free: formatMessage({
+                id: 'order_summary.label.free',
+                defaultMessage: 'Free'
+            }),
+            tax: formatMessage({
+                id: 'order_summary.label.tax',
+                defaultMessage: 'Tax'
+            }),
+            estimatedTotal: formatMessage({
+                id: 'order_summary.label.estimated_total',
+                defaultMessage: 'Estimated Total'
+            }),
+            orderTotal: formatMessage({
+                id: 'order_summary.label.order_total',
+                defaultMessage: 'Order Total'
+            }),
+            promotionsApplied: formatMessage({
+                id: 'order_summary.label.promotions_applied',
+                defaultMessage: 'Promotions applied'
+            }),
+            removePromo: formatMessage({
+                id: 'order_summary.action.remove_promo',
+                defaultMessage: 'Remove'
+            })
+        }),
+        [intl]
+    )
 
     if (!basket?.basketId && !basket?.orderNo) {
         return null
     }
     const shippingItem = basket.shippingItems?.[0]
     const hasShippingPromos = shippingItem?.priceAdjustments?.length > 0
-
-    const messages = useMemo(() => ({
-        orderSummary: intl.formatMessage({
-            id: 'order_summary.heading.order_summary',
-            defaultMessage: 'Order Summary'
-        }),
-        subtotal: intl.formatMessage({
-            id: 'order_summary.label.subtotal',
-            defaultMessage: 'Subtotal'
-        }),
-        shipping: intl.formatMessage({
-            id: 'order_summary.label.shipping',
-            defaultMessage: 'Shipping'
-        }),
-        promoApplied: intl.formatMessage({
-            id: 'order_summary.label.promo_applied',
-            defaultMessage: 'Promotion applied'
-        }),
-        free: intl.formatMessage({
-            id: 'order_summary.label.free',
-            defaultMessage: 'Free'
-        }),
-        tax: intl.formatMessage({
-            id: 'order_summary.label.tax',
-            defaultMessage: 'Tax'
-        }),
-        estimatedTotal: intl.formatMessage({
-            id: 'order_summary.label.estimated_total',
-            defaultMessage: 'Estimated Total'
-        }),
-        orderTotal: intl.formatMessage({
-            id: 'order_summary.label.order_total',
-            defaultMessage: 'Order Total'
-        }),
-        promotionsApplied: intl.formatMessage({
-            id: 'order_summary.label.promotions_applied',
-            defaultMessage: 'Promotions applied'
-        }),
-        removePromo: intl.formatMessage({
-            id: 'order_summary.action.remove_promo',
-            defaultMessage: 'Remove'
-        })
-    }), [intl])
 
     return (
         <Stack data-testid="sf-order-summary" gap="5">

@@ -31,65 +31,68 @@ const WishlistPrimaryAction = () => {
     const [isLoading, setIsLoading] = useState(false)
     const {open, onOpen, onClose} = useDisclosure()
 
-    const messages = useMemo(() => ({
-        addedToCart: (quantity, isAddingASet, item) =>
-            intl.formatMessage(
-                {
-                    defaultMessage:
-                        '{quantity} {quantity, plural, one {item} other {items}} added to cart',
-                    id: 'wishlist_primary_action.info.added_to_cart'
-                },
-                {quantity: isAddingASet ? quantity * item.setProducts.length : quantity}
-            ),
-        viewOptions: intl.formatMessage({
-            defaultMessage: 'View Options',
-            id: 'wishlist_primary_action.button.view_options'
+    const messages = useMemo(
+        () => ({
+            addedToCart: (quantity, isAddingASet, item) =>
+                intl.formatMessage(
+                    {
+                        defaultMessage:
+                            '{quantity} {quantity, plural, one {item} other {items}} added to cart',
+                        id: 'wishlist_primary_action.info.added_to_cart'
+                    },
+                    {quantity: isAddingASet ? quantity * item.setProducts.length : quantity}
+                ),
+            viewOptions: intl.formatMessage({
+                defaultMessage: 'View Options',
+                id: 'wishlist_primary_action.button.view_options'
+            }),
+            viewFullDetails: intl.formatMessage({
+                defaultMessage: 'View Full Details',
+                id: 'wishlist_primary_action.button.view_full_details'
+            }),
+            addToCart: intl.formatMessage({
+                defaultMessage: 'Add to Cart',
+                id: 'wishlist_primary_action.button.add_to_cart'
+            }),
+            addSetToCart: intl.formatMessage({
+                defaultMessage: 'Add Set to Cart',
+                id: 'wishlist_primary_action.button.add_set_to_cart'
+            }),
+            addSetToCartLabel: (productName) =>
+                intl.formatMessage(
+                    {
+                        id: 'wishlist_primary_action.button.addSetToCart.label',
+                        defaultMessage: 'Add {productName} set to cart'
+                    },
+                    {productName}
+                ),
+            viewFullDetailsLabel: (productName) =>
+                intl.formatMessage(
+                    {
+                        id: 'wishlist_primary_action.button.viewFullDetails.label',
+                        defaultMessage: 'View full details for {productName}'
+                    },
+                    {productName}
+                ),
+            viewOptionsLabel: (productName) =>
+                intl.formatMessage(
+                    {
+                        id: 'wishlist_primary_action.button.view_options.label',
+                        defaultMessage: 'View Options for {productName}'
+                    },
+                    {productName}
+                ),
+            addToCartLabel: (productName) =>
+                intl.formatMessage(
+                    {
+                        id: 'wishlist_primary_action.button.addToCart.label',
+                        defaultMessage: 'Add {productName} to cart'
+                    },
+                    {productName}
+                )
         }),
-        viewFullDetails: intl.formatMessage({
-            defaultMessage: 'View Full Details',
-            id: 'wishlist_primary_action.button.view_full_details'
-        }),
-        addToCart: intl.formatMessage({
-            defaultMessage: 'Add to Cart',
-            id: 'wishlist_primary_action.button.add_to_cart'
-        }),
-        addSetToCart: intl.formatMessage({
-            defaultMessage: 'Add Set to Cart',
-            id: 'wishlist_primary_action.button.add_set_to_cart'
-        }),
-        addSetToCartLabel: (productName) =>
-            intl.formatMessage(
-                {
-                    id: 'wishlist_primary_action.button.addSetToCart.label',
-                    defaultMessage: 'Add {productName} set to cart'
-                },
-                {productName}
-            ),
-        viewFullDetailsLabel: (productName) =>
-            intl.formatMessage(
-                {
-                    id: 'wishlist_primary_action.button.viewFullDetails.label',
-                    defaultMessage: 'View full details for {productName}'
-                },
-                {productName}
-            ),
-        viewOptionsLabel: (productName) =>
-            intl.formatMessage(
-                {
-                    id: 'wishlist_primary_action.button.view_options.label',
-                    defaultMessage: 'View Options for {productName}'
-                },
-                {productName}
-            ),
-        addToCartLabel: (productName) =>
-            intl.formatMessage(
-                {
-                    id: 'wishlist_primary_action.button.addToCart.label',
-                    defaultMessage: 'Add {productName} to cart'
-                },
-                {productName}
-            )
-    }), [intl])
+        [intl]
+    )
 
     const handleAddToCart = async (item, quantity) => {
         setIsLoading(true)

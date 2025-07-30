@@ -25,12 +25,15 @@ const CCRadioGroup = ({
     const {formatMessage} = intl
     const {data: customer} = useCurrentCustomer()
 
-    const messages = useMemo(() => ({
-        addNewCard: formatMessage({
-            id: 'cc_radio_group.button.add_new_card',
-            defaultMessage: 'Add New Card'
-        })
-    }), [intl])
+    const messages = useMemo(
+        () => ({
+            addNewCard: formatMessage({
+                id: 'cc_radio_group.button.add_new_card',
+                defaultMessage: 'Add New Card'
+            })
+        }),
+        [intl]
+    )
 
     const handleValueChange = useCallback(
         (selected) => {

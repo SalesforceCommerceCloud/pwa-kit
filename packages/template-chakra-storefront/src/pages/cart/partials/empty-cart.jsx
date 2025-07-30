@@ -15,32 +15,35 @@ const EmptyCart = ({isRegistered}) => {
     const intl = useIntl()
     const {formatMessage} = intl
 
-    const messages = useMemo(() => ({
-        title: intl.formatMessage({
-            id: 'empty_cart.description.empty_cart',
-            defaultMessage: 'Your cart is empty.'
+    const messages = useMemo(
+        () => ({
+            title: intl.formatMessage({
+                id: 'empty_cart.description.empty_cart',
+                defaultMessage: 'Your cart is empty.'
+            }),
+            description: {
+                registered: intl.formatMessage({
+                    id: 'empty_cart.message.continue_shopping',
+                    defaultMessage: 'Continue shopping to add items to your cart.'
+                }),
+                unregistered: intl.formatMessage({
+                    id: 'empty_cart.message.sign_in_or_continue_shopping',
+                    defaultMessage: 'Sign in to retrieve your saved items or continue shopping.'
+                })
+            },
+            buttons: {
+                continueShopping: intl.formatMessage({
+                    id: 'empty_cart.link.continue_shopping',
+                    defaultMessage: 'Continue Shopping'
+                }),
+                signIn: intl.formatMessage({
+                    id: 'empty_cart.link.sign_in',
+                    defaultMessage: 'Sign In'
+                })
+            }
         }),
-        description: {
-            registered: intl.formatMessage({
-                id: 'empty_cart.message.continue_shopping',
-                defaultMessage: 'Continue shopping to add items to your cart.'
-            }),
-            unregistered: intl.formatMessage({
-                id: 'empty_cart.message.sign_in_or_continue_shopping',
-                defaultMessage: 'Sign in to retrieve your saved items or continue shopping.'
-            })
-        },
-        buttons: {
-            continueShopping: intl.formatMessage({
-                id: 'empty_cart.link.continue_shopping',
-                defaultMessage: 'Continue Shopping'
-            }),
-            signIn: intl.formatMessage({
-                id: 'empty_cart.link.sign_in',
-                defaultMessage: 'Sign In'
-            })
-        }
-    }), [intl])
+        [intl]
+    )
 
     return (
         <Box data-testid="sf-cart-empty" flex="1" minWidth="100%" width="full" background="gray.50">

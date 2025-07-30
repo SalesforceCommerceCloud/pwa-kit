@@ -43,16 +43,19 @@ const CartSkeleton = () => {
     const intl = useIntl()
     const {formatMessage} = intl
 
-    const messages = useMemo(() => ({
-        cart: intl.formatMessage({
-            id: 'cart_skeleton.title.cart',
-            defaultMessage: 'Cart'
+    const messages = useMemo(
+        () => ({
+            cart: intl.formatMessage({
+                id: 'cart_skeleton.title.cart',
+                defaultMessage: 'Cart'
+            }),
+            orderSummary: intl.formatMessage({
+                id: 'cart_skeleton.heading.order_summary',
+                defaultMessage: 'Order Summary'
+            })
         }),
-        orderSummary: intl.formatMessage({
-            id: 'cart_skeleton.heading.order_summary',
-            defaultMessage: 'Order Summary'
-        })
-    }), [intl])
+        [intl]
+    )
 
     return (
         <Box background="gray.50" flex="1" paddingBottom={{base: 20, lg: 55}}>

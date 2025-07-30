@@ -19,25 +19,28 @@ const PageNotFound = () => {
     const history = useHistory()
     const {res} = useServerContext()
 
-    const messages = useMemo(() => ({
-        pageTitle: formatMessage({
-            id: 'page_not_found.title.page_cant_be_found',
-            defaultMessage: "The page you're looking for can't be found."
+    const messages = useMemo(
+        () => ({
+            pageTitle: formatMessage({
+                id: 'page_not_found.title.page_cant_be_found',
+                defaultMessage: "The page you're looking for can't be found."
+            }),
+            suggestionToTry: formatMessage({
+                id: 'page_not_found.message.suggestion_to_try',
+                defaultMessage:
+                    'Please try retyping the address, going back to the previous page, or going to the home page.'
+            }),
+            goBack: formatMessage({
+                id: 'page_not_found.action.go_back',
+                defaultMessage: 'Back to previous page'
+            }),
+            goToHomepage: formatMessage({
+                id: 'page_not_found.link.homepage',
+                defaultMessage: 'Go to home page'
+            })
         }),
-        suggestionToTry: formatMessage({
-            id: 'page_not_found.message.suggestion_to_try',
-            defaultMessage:
-                'Please try retyping the address, going back to the previous page, or going to the home page.'
-        }),
-        goBack: formatMessage({
-            id: 'page_not_found.action.go_back',
-            defaultMessage: 'Back to previous page'
-        }),
-        goToHomepage: formatMessage({
-            id: 'page_not_found.link.homepage',
-            defaultMessage: 'Go to home page'
-        })
-    }), [intl])
+        [intl]
+    )
 
     if (res) {
         res.status(404)

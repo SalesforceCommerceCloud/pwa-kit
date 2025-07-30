@@ -78,28 +78,31 @@ export default function ShippingOptions() {
         shippingItem?.priceAfterItemDiscount || 0
     )
 
-    const messages = useMemo(() => ({
-        free: formatMessage({
-            id: 'checkout_confirmation.label.free',
-            defaultMessage: 'Free'
+    const messages = useMemo(
+        () => ({
+            free: formatMessage({
+                id: 'checkout_confirmation.label.free',
+                defaultMessage: 'Free'
+            }),
+            title: formatMessage({
+                id: 'shipping_options.title.shipping_gift_options',
+                defaultMessage: 'Shipping & Gift Options'
+            }),
+            editLabel: formatMessage({
+                id: 'toggle_card.action.editShippingOptions',
+                defaultMessage: 'Edit Shipping Options'
+            }),
+            sendAsGift: formatMessage({
+                id: 'shipping_options.action.send_as_a_gift',
+                defaultMessage: 'Do you want to send this as a gift?'
+            }),
+            continueToPayment: formatMessage({
+                id: 'shipping_options.button.continue_to_payment',
+                defaultMessage: 'Continue to Payment'
+            })
         }),
-        title: formatMessage({
-            id: 'shipping_options.title.shipping_gift_options',
-            defaultMessage: 'Shipping & Gift Options'
-        }),
-        editLabel: formatMessage({
-            id: 'toggle_card.action.editShippingOptions',
-            defaultMessage: 'Edit Shipping Options'
-        }),
-        sendAsGift: formatMessage({
-            id: 'shipping_options.action.send_as_a_gift',
-            defaultMessage: 'Do you want to send this as a gift?'
-        }),
-        continueToPayment: formatMessage({
-            id: 'shipping_options.button.continue_to_payment',
-            defaultMessage: 'Continue to Payment'
-        })
-    }), [intl])
+        [intl]
+    )
 
     let shippingPriceLabel = selectedMethodDisplayPrice
     if (selectedMethodDisplayPrice !== shippingItem?.price) {

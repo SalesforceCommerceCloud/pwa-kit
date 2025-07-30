@@ -19,56 +19,59 @@ export default function useUpdatePasswordFields({
     const intl = useIntl()
     const {formatMessage} = intl
 
-    const messages = useMemo(() => ({
-        currentPasswordLabel: formatMessage({
-            defaultMessage: 'Current Password',
-            id: 'use_update_password_fields.label.current_password'
+    const messages = useMemo(
+        () => ({
+            currentPasswordLabel: formatMessage({
+                defaultMessage: 'Current Password',
+                id: 'use_update_password_fields.label.current_password'
+            }),
+            newPasswordLabel: formatMessage({
+                defaultMessage: 'New Password',
+                id: 'use_update_password_fields.label.new_password'
+            }),
+            confirmPasswordLabel: formatMessage({
+                defaultMessage: 'Confirm New Password',
+                id: 'use_update_password_fields.label.confirm_new_password'
+            }),
+            currentPasswordRequired: formatMessage({
+                defaultMessage: 'Please enter your password.',
+                id: 'use_update_password_fields.error.required_password'
+            }),
+            newPasswordRequired: formatMessage({
+                defaultMessage: 'Please provide a new password.',
+                id: 'use_update_password_fields.error.required_new_password'
+            }),
+            confirmPasswordRequired: formatMessage({
+                defaultMessage: 'Please confirm your password.',
+                id: 'use_update_password_fields.error.required_confirm_password'
+            }),
+            minCharsError: formatMessage({
+                defaultMessage: 'Password must contain at least 8 characters.',
+                id: 'use_update_password_fields.error.minimum_characters'
+            }),
+            uppercaseError: formatMessage({
+                defaultMessage: 'Password must contain at least one uppercase letter.',
+                id: 'use_update_password_fields.error.uppercase_letter'
+            }),
+            lowercaseError: formatMessage({
+                defaultMessage: 'Password must contain at least one lowercase letter.',
+                id: 'use_update_password_fields.error.lowercase_letter'
+            }),
+            numberError: formatMessage({
+                defaultMessage: 'Password must contain at least one number.',
+                id: 'use_update_password_fields.error.contain_number'
+            }),
+            specialCharError: formatMessage({
+                defaultMessage: 'Password must contain at least one special character.',
+                id: 'use_update_password_fields.error.special_character'
+            }),
+            passwordMismatchError: formatMessage({
+                defaultMessage: 'Passwords do not match.',
+                id: 'use_update_password_fields.error.password_mismatch'
+            })
         }),
-        newPasswordLabel: formatMessage({
-            defaultMessage: 'New Password',
-            id: 'use_update_password_fields.label.new_password'
-        }),
-        confirmPasswordLabel: formatMessage({
-            defaultMessage: 'Confirm New Password',
-            id: 'use_update_password_fields.label.confirm_new_password'
-        }),
-        currentPasswordRequired: formatMessage({
-            defaultMessage: 'Please enter your password.',
-            id: 'use_update_password_fields.error.required_password'
-        }),
-        newPasswordRequired: formatMessage({
-            defaultMessage: 'Please provide a new password.',
-            id: 'use_update_password_fields.error.required_new_password'
-        }),
-        confirmPasswordRequired: formatMessage({
-            defaultMessage: 'Please confirm your password.',
-            id: 'use_update_password_fields.error.required_confirm_password'
-        }),
-        minCharsError: formatMessage({
-            defaultMessage: 'Password must contain at least 8 characters.',
-            id: 'use_update_password_fields.error.minimum_characters'
-        }),
-        uppercaseError: formatMessage({
-            defaultMessage: 'Password must contain at least one uppercase letter.',
-            id: 'use_update_password_fields.error.uppercase_letter'
-        }),
-        lowercaseError: formatMessage({
-            defaultMessage: 'Password must contain at least one lowercase letter.',
-            id: 'use_update_password_fields.error.lowercase_letter'
-        }),
-        numberError: formatMessage({
-            defaultMessage: 'Password must contain at least one number.',
-            id: 'use_update_password_fields.error.contain_number'
-        }),
-        specialCharError: formatMessage({
-            defaultMessage: 'Password must contain at least one special character.',
-            id: 'use_update_password_fields.error.special_character'
-        }),
-        passwordMismatchError: formatMessage({
-            defaultMessage: 'Passwords do not match.',
-            id: 'use_update_password_fields.error.password_mismatch'
-        })
-    }), [intl])
+        [intl]
+    )
 
     const fields = {
         currentPassword: {

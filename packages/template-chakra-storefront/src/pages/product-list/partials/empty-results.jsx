@@ -23,55 +23,56 @@ const EmptySearchResults = ({searchQuery, category}) => {
         defaultMessage: 'Contact Us'
     })
 
-    const messages = useMemo(() => ({
-        contactUs: contactUsText,
-        topSellers: formatMessage({
-            id: 'empty_search_results.recommended_products.title.top_sellers',
-            defaultMessage: 'Top Sellers'
+    const messages = useMemo(
+        () => ({
+            contactUs: contactUsText,
+            topSellers: formatMessage({
+                id: 'empty_search_results.recommended_products.title.top_sellers',
+                defaultMessage: 'Top Sellers'
+            }),
+            mostViewed: formatMessage({
+                id: 'empty_search_results.recommended_products.title.most_viewed',
+                defaultMessage: 'Most Viewed'
+            }),
+            cantFindAnythingForCategory: formatMessage(
+                {
+                    id: 'empty_search_results.info.cant_find_anything_for_category',
+                    defaultMessage: `We couldn't find anything for {category}. Try searching for a product or {link}.`
+                },
+                {
+                    category: category?.name,
+                    link: (
+                        <Link as={RouteLink} to={'/'}>
+                            {contactUsText}
+                        </Link>
+                    )
+                }
+            ),
+            cantFindAnythingForQuery: formatMessage(
+                {
+                    id: 'empty_search_results.info.cant_find_anything_for_query',
+                    defaultMessage: `We couldn't find anything for "{searchQuery}".`
+                },
+                {
+                    searchQuery: searchQuery
+                }
+            ),
+            doubleCheckSpelling: formatMessage(
+                {
+                    id: 'empty_search_results.info.double_check_spelling',
+                    defaultMessage: 'Double-check your spelling and try again or {link}.'
+                },
+                {
+                    link: (
+                        <Button variant="link" to={'/'}>
+                            {contactUsText}
+                        </Button>
+                    )
+                }
+            )
         }),
-        mostViewed: formatMessage({
-            id: 'empty_search_results.recommended_products.title.most_viewed',
-            defaultMessage: 'Most Viewed'
-        }),
-        cantFindAnythingForCategory: formatMessage(
-            {
-                id: 'empty_search_results.info.cant_find_anything_for_category',
-                defaultMessage:
-                    `We couldn't find anything for {category}. Try searching for a product or {link}.`
-            },
-            {
-                category: category?.name,
-                link: (
-                    <Link as={RouteLink} to={'/'}>
-                        {contactUsText}
-                    </Link>
-                )
-            }
-        ),
-        cantFindAnythingForQuery: formatMessage(
-            {
-                id: 'empty_search_results.info.cant_find_anything_for_query',
-                defaultMessage: `We couldn't find anything for "{searchQuery}".`
-            },
-            {
-                searchQuery: searchQuery
-            }
-        ),
-        doubleCheckSpelling: formatMessage(
-            {
-                id: 'empty_search_results.info.double_check_spelling',
-                defaultMessage:
-                    'Double-check your spelling and try again or {link}.'
-            },
-            {
-                link: (
-                    <Button variant="link" to={'/'}>
-                        {contactUsText}
-                    </Button>
-                )
-            }
-        )
-    }), [intl])
+        [intl]
+    )
 
     return (
         <Flex

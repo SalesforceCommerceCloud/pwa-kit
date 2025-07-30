@@ -79,46 +79,49 @@ const StoreLocatorInput = ({form, submitForm}) => {
     const intl = useIntl()
     const {formatMessage} = intl
 
-    const messages = useMemo(() => ({
-        errors: {
-            selectCountry: intl.formatMessage({
-                id: 'store_locator.error.please_select_a_country',
-                defaultMessage: 'Please select a country.'
-            }),
-            enterPostalCode: intl.formatMessage({
-                id: 'store_locator.error.please_enter_a_postal_code',
-                defaultMessage: 'Please enter a postal code.'
-            }),
-            shareLocation: intl.formatMessage({
-                id: 'store_locator.error.agree_to_share_your_location',
-                defaultMessage: 'Please agree to share your location'
+    const messages = useMemo(
+        () => ({
+            errors: {
+                selectCountry: intl.formatMessage({
+                    id: 'store_locator.error.please_select_a_country',
+                    defaultMessage: 'Please select a country.'
+                }),
+                enterPostalCode: intl.formatMessage({
+                    id: 'store_locator.error.please_enter_a_postal_code',
+                    defaultMessage: 'Please enter a postal code.'
+                }),
+                shareLocation: intl.formatMessage({
+                    id: 'store_locator.error.agree_to_share_your_location',
+                    defaultMessage: 'Please agree to share your location'
+                })
+            },
+            placeholders: {
+                selectCountry: intl.formatMessage({
+                    id: 'store_locator.action.select_a_country',
+                    defaultMessage: 'Select a country'
+                }),
+                enterPostalCode: intl.formatMessage({
+                    id: 'store_locator.field.placeholder.enter_postal_code',
+                    defaultMessage: 'Enter postal code'
+                })
+            },
+            actions: {
+                find: intl.formatMessage({
+                    id: 'store_locator.action.find',
+                    defaultMessage: 'Find'
+                }),
+                useMyLocation: intl.formatMessage({
+                    id: 'store_locator.action.use_my_location',
+                    defaultMessage: 'Use My Location'
+                })
+            },
+            separator: intl.formatMessage({
+                id: 'store_locator.description.or',
+                defaultMessage: 'Or'
             })
-        },
-        placeholders: {
-            selectCountry: intl.formatMessage({
-                id: 'store_locator.action.select_a_country',
-                defaultMessage: 'Select a country'
-            }),
-            enterPostalCode: intl.formatMessage({
-                id: 'store_locator.field.placeholder.enter_postal_code',
-                defaultMessage: 'Enter postal code'
-            })
-        },
-        actions: {
-            find: intl.formatMessage({
-                id: 'store_locator.action.find',
-                defaultMessage: 'Find'
-            }),
-            useMyLocation: intl.formatMessage({
-                id: 'store_locator.action.use_my_location',
-                defaultMessage: 'Use My Location'
-            })
-        },
-        separator: intl.formatMessage({
-            id: 'store_locator.description.or',
-            defaultMessage: 'Or'
-        })
-    }), [intl])
+        }),
+        [intl]
+    )
     return (
         <form id="store-locator-form" onSubmit={form.handleSubmit(submitForm)}>
             <InputGroup>

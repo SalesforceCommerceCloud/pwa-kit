@@ -28,24 +28,30 @@ const ItemAttributes = ({includeQuantity, currency, ...props}) => {
     const intl = useIntl()
     const {formatMessage} = intl
 
-    const messages = useMemo(() => ({
-        qty: formatMessage({
-            defaultMessage: 'Qty',
-            id: 'add_to_cart_modal.label.quantity'
+    const messages = useMemo(
+        () => ({
+            qty: formatMessage({
+                defaultMessage: 'Qty',
+                id: 'add_to_cart_modal.label.quantity'
+            }),
+            selectedOptions: formatMessage({
+                defaultMessage: 'Selected Options',
+                id: 'item_attributes.label.selected_options'
+            }),
+            promotions: formatMessage({
+                defaultMessage: 'Promotions',
+                id: 'item_attributes.label.promotions'
+            }),
+            quantity: formatMessage(
+                {
+                    id: 'item_attributes.label.quantity',
+                    defaultMessage: 'Quantity: {quantity}'
+                },
+                {quantity: variant.quantity}
+            )
         }),
-        selectedOptions: formatMessage({
-            defaultMessage: 'Selected Options',
-            id: 'item_attributes.label.selected_options'
-        }),
-        promotions: formatMessage({
-            defaultMessage: 'Promotions',
-            id: 'item_attributes.label.promotions'
-        }),
-        quantity: formatMessage({
-            id: 'item_attributes.label.quantity',
-            defaultMessage: 'Quantity: {quantity}'
-        }, {quantity: variant.quantity})
-    }), [intl, variant.quantity])
+        [intl, variant.quantity]
+    )
 
     // Fetch all the promotions given by price adjustments. We display this info in
     // the promotion info popover when applicable.

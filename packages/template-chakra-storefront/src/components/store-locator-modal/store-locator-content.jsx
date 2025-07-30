@@ -52,42 +52,45 @@ const StoreLocatorContent = () => {
 
     const [numStoresToShow, setNumStoresToShow] = useState(limit)
 
-    const messages = useMemo(() => ({
-        title: intl.formatMessage({
-            id: 'store_locator.title',
-            defaultMessage: 'Find a Store'
-        }),
-        status: {
-            loading: intl.formatMessage({
-                id: 'store_locator.description.loading_locations',
-                defaultMessage: 'Loading locations...'
+    const messages = useMemo(
+        () => ({
+            title: intl.formatMessage({
+                id: 'store_locator.title',
+                defaultMessage: 'Find a Store'
             }),
-            noLocations: intl.formatMessage({
-                id: 'store_locator.description.no_locations',
-                defaultMessage: 'Sorry, there are no locations in this area'
-            }),
-            viewingNearPostalCode: intl.formatMessage(
-                {
-                    id: 'store_locator.description.viewing_near_postal_code',
-                    defaultMessage:
-                        'Viewing stores within {distance}{distanceUnit} of {postalCode} in '
-                },
-                {
-                    distance: STORE_LOCATOR_DISTANCE,
-                    distanceUnit: STORE_LOCATOR_DISTANCE_UNIT,
-                    postalCode: searchStoresParams.postalCode
-                }
-            ),
-            viewingNearLocation: intl.formatMessage({
-                id: 'store_locator.description.viewing_near_your_location',
-                defaultMessage: 'Viewing stores near your location'
+            status: {
+                loading: intl.formatMessage({
+                    id: 'store_locator.description.loading_locations',
+                    defaultMessage: 'Loading locations...'
+                }),
+                noLocations: intl.formatMessage({
+                    id: 'store_locator.description.no_locations',
+                    defaultMessage: 'Sorry, there are no locations in this area'
+                }),
+                viewingNearPostalCode: intl.formatMessage(
+                    {
+                        id: 'store_locator.description.viewing_near_postal_code',
+                        defaultMessage:
+                            'Viewing stores within {distance}{distanceUnit} of {postalCode} in '
+                    },
+                    {
+                        distance: STORE_LOCATOR_DISTANCE,
+                        distanceUnit: STORE_LOCATOR_DISTANCE_UNIT,
+                        postalCode: searchStoresParams.postalCode
+                    }
+                ),
+                viewingNearLocation: intl.formatMessage({
+                    id: 'store_locator.description.viewing_near_your_location',
+                    defaultMessage: 'Viewing stores near your location'
+                })
+            },
+            loadMore: intl.formatMessage({
+                id: 'store_locator.pagination.load_more',
+                defaultMessage: 'Load More'
             })
-        },
-        loadMore: intl.formatMessage({
-            id: 'store_locator.pagination.load_more',
-            defaultMessage: 'Load More'
-        })
-    }), [intl])
+        }),
+        [intl]
+    )
 
     // Either the countryCode & postalCode or latitude & longitude are defined, never both
     const {

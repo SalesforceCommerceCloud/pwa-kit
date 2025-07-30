@@ -43,38 +43,42 @@ export const DntNotification = ({isOpen, onOpen, onClose}) => {
         onClose()
     }
 
-    const messages = useMemo(() => ({
-        title: formatMessage({
-            id: 'dnt_notification.title',
-            defaultMessage: 'Tracking Consent'
-        }),
-        buttons: {
-            decline: formatMessage({
-                id: 'dnt_notification.button.decline',
-                defaultMessage: 'Decline'
+    const messages = useMemo(
+        () => ({
+            title: formatMessage({
+                id: 'dnt_notification.title',
+                defaultMessage: 'Tracking Consent'
             }),
-            accept: formatMessage({
-                id: 'dnt_notification.button.accept',
-                defaultMessage: 'Accept'
-            }),
-            declineAriaLabel: formatMessage({
-                id: 'dnt_notification.button.assistive_msg.decline',
-                defaultMessage: 'Decline tracking'
-            }),
-            acceptAriaLabel: formatMessage({
-                id: 'dnt_notification.button.assistive_msg.accept',
-                defaultMessage: 'Accept tracking'
-            }),
-            closeAriaLabel: formatMessage({
-                id: 'dnt_notification.button.assistive_msg.close',
-                defaultMessage: 'Close consent tracking form'
+            buttons: {
+                decline: formatMessage({
+                    id: 'dnt_notification.button.decline',
+                    defaultMessage: 'Decline'
+                }),
+                accept: formatMessage({
+                    id: 'dnt_notification.button.accept',
+                    defaultMessage: 'Accept'
+                }),
+                declineAriaLabel: formatMessage({
+                    id: 'dnt_notification.button.assistive_msg.decline',
+                    defaultMessage: 'Decline tracking'
+                }),
+                acceptAriaLabel: formatMessage({
+                    id: 'dnt_notification.button.assistive_msg.accept',
+                    defaultMessage: 'Accept tracking'
+                }),
+                closeAriaLabel: formatMessage({
+                    id: 'dnt_notification.button.assistive_msg.close',
+                    defaultMessage: 'Close consent tracking form'
+                })
+            },
+            description: formatMessage({
+                id: 'dnt_notification.description',
+                defaultMessage:
+                    'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.'
             })
-        },
-        description: formatMessage({
-            id: 'dnt_notification.description',
-            defaultMessage: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.'
-        })
-    }), [intl])
+        }),
+        [intl]
+    )
 
     const buttons = (
         <>

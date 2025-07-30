@@ -18,37 +18,43 @@ export default function useProfileFields({
     const intl = useIntl()
     const {formatMessage} = intl
 
-    const messages = useMemo(() => ({
-        firstNameLabel: formatMessage({
-            defaultMessage: 'First Name',
-            id: 'use_profile_fields.label.first_name'
+    const messages = useMemo(
+        () => ({
+            firstNameLabel: formatMessage({
+                defaultMessage: 'First Name',
+                id: 'use_profile_fields.label.first_name'
+            }),
+            lastNameLabel: formatMessage({
+                defaultMessage: 'Last Name',
+                id: 'use_profile_fields.label.last_name'
+            }),
+            emailLabel: formatMessage({
+                defaultMessage: 'Email',
+                id: 'use_profile_fields.label.email'
+            }),
+            phoneLabel: formatMessage({
+                defaultMessage: 'Phone Number',
+                id: 'use_profile_fields.label.phone'
+            }),
+            firstNameRequired: formatMessage({
+                defaultMessage: 'Please enter your first name.',
+                id: 'use_profile_fields.error.required_first_name'
+            }),
+            lastNameRequired: formatMessage({
+                defaultMessage: 'Please enter your last name.',
+                id: 'use_profile_fields.error.required_last_name'
+            }),
+            emailRequired: formatMessage({
+                defaultMessage: 'Please enter a valid email address.',
+                id: 'use_profile_fields.error.required_email'
+            }),
+            phoneRequired: formatMessage({
+                defaultMessage: 'Please enter your phone number.',
+                id: 'use_profile_fields.error.required_phone'
+            })
         }),
-        lastNameLabel: formatMessage({
-            defaultMessage: 'Last Name',
-            id: 'use_profile_fields.label.last_name'
-        }),
-        emailLabel: formatMessage({defaultMessage: 'Email', id: 'use_profile_fields.label.email'}),
-        phoneLabel: formatMessage({
-            defaultMessage: 'Phone Number',
-            id: 'use_profile_fields.label.phone'
-        }),
-        firstNameRequired: formatMessage({
-            defaultMessage: 'Please enter your first name.',
-            id: 'use_profile_fields.error.required_first_name'
-        }),
-        lastNameRequired: formatMessage({
-            defaultMessage: 'Please enter your last name.',
-            id: 'use_profile_fields.error.required_last_name'
-        }),
-        emailRequired: formatMessage({
-            defaultMessage: 'Please enter a valid email address.',
-            id: 'use_profile_fields.error.required_email'
-        }),
-        phoneRequired: formatMessage({
-            defaultMessage: 'Please enter your phone number.',
-            id: 'use_profile_fields.error.required_phone'
-        })
-    }), [intl])
+        [intl]
+    )
 
     const fields = {
         firstName: {

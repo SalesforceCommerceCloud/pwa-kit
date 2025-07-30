@@ -22,20 +22,23 @@ const PasswordlessLogin = ({
     const intl = useIntl()
     const [showPasswordView, setShowPasswordView] = useState(false)
 
-    const messages = useMemo(() => ({
-        continueSecurely: intl.formatMessage({
-            id: 'login_form.button.continue_securely',
-            defaultMessage: 'Continue Securely'
+    const messages = useMemo(
+        () => ({
+            continueSecurely: intl.formatMessage({
+                id: 'login_form.button.continue_securely',
+                defaultMessage: 'Continue Securely'
+            }),
+            orLoginWith: intl.formatMessage({
+                id: 'login_form.message.or_login_with',
+                defaultMessage: 'Or Login With'
+            }),
+            password: intl.formatMessage({
+                id: 'login_form.button.password',
+                defaultMessage: 'Password'
+            })
         }),
-        orLoginWith: intl.formatMessage({
-            id: 'login_form.message.or_login_with',
-            defaultMessage: 'Or Login With'
-        }),
-        password: intl.formatMessage({
-            id: 'login_form.button.password',
-            defaultMessage: 'Password'
-        })
-    }), [intl])
+        [intl]
+    )
 
     const handlePasswordButton = async (e) => {
         const isValid = await form.trigger()

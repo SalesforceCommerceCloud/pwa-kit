@@ -21,12 +21,15 @@ const LoginFields = ({
     const intl = useIntl()
     const fields = useLoginFields({form, prefix})
 
-    const messages = useMemo(() => ({
-        forgotPassword: intl.formatMessage({
-            id: 'login_form.link.forgot_password',
-            defaultMessage: 'Forgot password?'
-        })
-    }), [intl])
+    const messages = useMemo(
+        () => ({
+            forgotPassword: intl.formatMessage({
+                id: 'login_form.link.forgot_password',
+                defaultMessage: 'Forgot password?'
+            })
+        }),
+        [intl]
+    )
 
     return (
         <Stack gap={5}>

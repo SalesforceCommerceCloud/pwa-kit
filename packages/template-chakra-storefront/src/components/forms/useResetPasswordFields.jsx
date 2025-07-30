@@ -17,16 +17,19 @@ export default function useResetPasswordFields({
     const intl = useIntl()
     const {formatMessage} = intl
 
-    const messages = useMemo(() => ({
-        emailLabel: formatMessage({
-            defaultMessage: 'Email',
-            id: 'use_reset_password_fields.label.email'
+    const messages = useMemo(
+        () => ({
+            emailLabel: formatMessage({
+                defaultMessage: 'Email',
+                id: 'use_reset_password_fields.label.email'
+            }),
+            emailRequired: formatMessage({
+                defaultMessage: 'Please enter a valid email address.',
+                id: 'use_reset_password_fields.error.required_email'
+            })
         }),
-        emailRequired: formatMessage({
-            defaultMessage: 'Please enter a valid email address.',
-            id: 'use_reset_password_fields.error.required_email'
-        })
-    }), [intl])
+        [intl]
+    )
 
     const fields = {
         email: {

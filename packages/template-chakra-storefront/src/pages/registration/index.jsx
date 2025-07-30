@@ -24,9 +24,12 @@ const Registration = () => {
     const form = useForm()
     const register = useAuthHelper(AuthHelpers.Register)
 
-    const messages = useMemo(() => ({
-        apiError: formatMessage(API_ERROR_MESSAGE)
-    }), [intl])
+    const messages = useMemo(
+        () => ({
+            apiError: formatMessage(API_ERROR_MESSAGE)
+        }),
+        [intl]
+    )
 
     const submitForm = async (data) => {
         const body = {

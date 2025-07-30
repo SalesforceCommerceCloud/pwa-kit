@@ -38,16 +38,19 @@ const Checkout = () => {
     const isPasswordlessEnabled = !!loginConfig?.passwordless?.enabled
     const idps = loginConfig?.social?.idps || []
 
-    const messages = useMemo(() => ({
-        placeOrder: intl.formatMessage({
-            id: 'checkout.button.place_order',
-            defaultMessage: 'Place Order'
+    const messages = useMemo(
+        () => ({
+            placeOrder: intl.formatMessage({
+                id: 'checkout.button.place_order',
+                defaultMessage: 'Place Order'
+            }),
+            genericError: intl.formatMessage({
+                id: 'checkout.message.generic_error',
+                defaultMessage: 'An unexpected error occurred during checkout.'
+            })
         }),
-        genericError: intl.formatMessage({
-            id: 'checkout.message.generic_error',
-            defaultMessage: 'An unexpected error occurred during checkout.'
-        })
-    }), [intl])
+        [intl]
+    )
 
     useEffect(() => {
         if (error || step === 4) {
@@ -173,7 +176,9 @@ const CheckoutContainer = () => {
             {
                 onSuccess: () => {
                     toast({
-                        title: intl.formatMessage(TOAST_MESSAGE_REMOVED_ITEM_FROM_CART, {quantity: 1}),
+                        title: intl.formatMessage(TOAST_MESSAGE_REMOVED_ITEM_FROM_CART, {
+                            quantity: 1
+                        }),
                         type: 'success'
                     })
                 },

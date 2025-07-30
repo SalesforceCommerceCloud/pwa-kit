@@ -22,19 +22,22 @@ const CheckoutHeader = () => {
         pages: {home: homeConfig}
     } = getConfig()
 
-    const messages = useMemo(() => ({
-        backToCart: formatMessage({
-            id: 'checkout_header.link.cart',
-            defaultMessage: 'Back to cart'
+    const messages = useMemo(
+        () => ({
+            backToCart: formatMessage({
+                id: 'checkout_header.link.cart',
+                defaultMessage: 'Back to cart'
+            }),
+            cartAriaLabel: formatMessage(
+                {
+                    id: 'checkout_header.link.assistive_msg.cart',
+                    defaultMessage: 'Back to cart, number of items: {numItems}'
+                },
+                {numItems: totalItems}
+            )
         }),
-        cartAriaLabel: formatMessage(
-            {
-                id: 'checkout_header.link.assistive_msg.cart',
-                defaultMessage: 'Back to cart, number of items: {numItems}'
-            },
-            {numItems: totalItems}
-        )
-    }), [intl])
+        [intl]
+    )
 
     return (
         <Box px={[4, 4, 8]} bg="white" borderBottom="1px" borderColor="gray.100">

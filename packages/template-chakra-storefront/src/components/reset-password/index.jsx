@@ -17,47 +17,51 @@ const ResetPasswordForm = ({submitForm, clickSignIn = noop, form}) => {
     const intl = useIntl()
     const {formatMessage} = intl
 
-    const messages = useMemo(() => ({
-        title: formatMessage({
-            id: 'reset_password_form.title.reset_password',
-            defaultMessage: 'Reset Password'
-        }),
-        description: formatMessage({
-            id: 'reset_password_form.message.enter_your_email',
-            defaultMessage: 'Enter your email to receive instructions on how to reset your password'
-        }),
-        resetPasswordButton: formatMessage({
-            id: 'reset_password_form.button.reset_password',
-            defaultMessage: 'Reset Password'
-        }),
-        returnToSignIn: formatMessage({
-            id: 'reset_password_form.message.return_to_sign_in',
-            defaultMessage: 'Or return to'
-        }),
-        signInButton: formatMessage({
-            id: 'reset_password_form.action.sign_in',
-            defaultMessage: 'Sign in'
-        }),
-        passwordResetSuccess: formatMessage({
-            id: 'auth_modal.password_reset_success.title.password_reset',
-            defaultMessage: 'Password Reset'
-        }),
-        emailSentMessage: formatMessage(
-            {
-                id: 'auth_modal.password_reset_success.info.will_email_shortly',
+    const messages = useMemo(
+        () => ({
+            title: formatMessage({
+                id: 'reset_password_form.title.reset_password',
+                defaultMessage: 'Reset Password'
+            }),
+            description: formatMessage({
+                id: 'reset_password_form.message.enter_your_email',
                 defaultMessage:
-                    'You will receive an email at <b>{email}</b> with a link to reset your password shortly.'
-            },
-            {
-                email: form.getValues('email'),
-                b: (chunks) => <b>{chunks}</b>
-            }
-        ),
-        backToSignInButton: formatMessage({
-            id: 'auth_modal.password_reset_success.button.back_to_sign_in',
-            defaultMessage: 'Back to Sign In'
-        })
-    }), [intl])
+                    'Enter your email to receive instructions on how to reset your password'
+            }),
+            resetPasswordButton: formatMessage({
+                id: 'reset_password_form.button.reset_password',
+                defaultMessage: 'Reset Password'
+            }),
+            returnToSignIn: formatMessage({
+                id: 'reset_password_form.message.return_to_sign_in',
+                defaultMessage: 'Or return to'
+            }),
+            signInButton: formatMessage({
+                id: 'reset_password_form.action.sign_in',
+                defaultMessage: 'Sign in'
+            }),
+            passwordResetSuccess: formatMessage({
+                id: 'auth_modal.password_reset_success.title.password_reset',
+                defaultMessage: 'Password Reset'
+            }),
+            emailSentMessage: formatMessage(
+                {
+                    id: 'auth_modal.password_reset_success.info.will_email_shortly',
+                    defaultMessage:
+                        'You will receive an email at <b>{email}</b> with a link to reset your password shortly.'
+                },
+                {
+                    email: form.getValues('email'),
+                    b: (chunks) => <b>{chunks}</b>
+                }
+            ),
+            backToSignInButton: formatMessage({
+                id: 'auth_modal.password_reset_success.button.back_to_sign_in',
+                defaultMessage: 'Back to Sign In'
+            })
+        }),
+        [intl]
+    )
     return (
         <Fragment>
             {!form.formState.isSubmitSuccessful ? (

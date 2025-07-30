@@ -34,17 +34,15 @@ const AddressFields = ({
         addressFormRef?.current?.focus()
     }, [])
 
-    const messages = useMemo(() => ({
-        formAriaLabel: formatMessage(formTitleAriaLabel)
-    }), [intl])
+    const messages = useMemo(
+        () => ({
+            formAriaLabel: formatMessage(formTitleAriaLabel)
+        }),
+        [intl]
+    )
 
     return (
-        <Stack
-            gap={5}
-            aria-label={messages.formAriaLabel}
-            tabIndex="0"
-            ref={addressFormRef}
-        >
+        <Stack gap={5} aria-label={messages.formAriaLabel} tabIndex="0" ref={addressFormRef}>
             <SimpleGrid columns={[1, 1, 2]} gap={5}>
                 <Field {...fields.firstName} />
                 <Field {...fields.lastName} />

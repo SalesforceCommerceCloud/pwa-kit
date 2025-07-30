@@ -102,60 +102,63 @@ const AccountOrderHistory = () => {
 
     const pageUrls = usePageUrls({total: paging.total, limit})
 
-    const messages = useMemo(() => ({
-        orderHistory: formatMessage({
-            defaultMessage: 'Order History',
-            id: 'account_order_history.title.order_history'
+    const messages = useMemo(
+        () => ({
+            orderHistory: formatMessage({
+                defaultMessage: 'Order History',
+                id: 'account_order_history.title.order_history'
+            }),
+            orderedDate: (date) =>
+                formatMessage(
+                    {
+                        defaultMessage: 'Ordered: {date}',
+                        id: 'account_order_history.label.ordered_date'
+                    },
+                    {date}
+                ),
+            viewDetails: formatMessage({
+                defaultMessage: 'View details',
+                id: 'account_order_history.link.view_details'
+            }),
+            orderNumber: (orderNumber) =>
+                formatMessage(
+                    {
+                        defaultMessage: 'Order Number: {orderNumber}',
+                        id: 'account_order_history.label.order_number'
+                    },
+                    {orderNumber}
+                ),
+            itemsCount: (count) =>
+                formatMessage(
+                    {
+                        defaultMessage: '{count} items',
+                        id: 'account_order_history.label.num_of_items'
+                    },
+                    {count}
+                ),
+            shippedTo: (name) =>
+                formatMessage(
+                    {
+                        defaultMessage: 'Shipped to: {name}',
+                        id: 'account_order_history.label.shipped_to'
+                    },
+                    {name}
+                ),
+            noOrderHeading: formatMessage({
+                defaultMessage: "You haven't placed an order yet.",
+                id: 'account_order_history.heading.no_order_yet'
+            }),
+            noOrderDescription: formatMessage({
+                defaultMessage: 'Once you place an order the details will show up here.',
+                id: 'account_order_history.description.once_you_place_order'
+            }),
+            continueShoppingButton: formatMessage({
+                defaultMessage: 'Continue Shopping',
+                id: 'account_order_history.button.continue_shopping'
+            })
         }),
-        orderedDate: (date) =>
-            formatMessage(
-                {
-                    defaultMessage: 'Ordered: {date}',
-                    id: 'account_order_history.label.ordered_date'
-                },
-                {date}
-            ),
-        viewDetails: formatMessage({
-            defaultMessage: 'View details',
-            id: 'account_order_history.link.view_details'
-        }),
-        orderNumber: (orderNumber) =>
-            formatMessage(
-                {
-                    defaultMessage: 'Order Number: {orderNumber}',
-                    id: 'account_order_history.label.order_number'
-                },
-                {orderNumber}
-            ),
-        itemsCount: (count) =>
-            formatMessage(
-                {
-                    defaultMessage: '{count} items',
-                    id: 'account_order_history.label.num_of_items'
-                },
-                {count}
-            ),
-        shippedTo: (name) =>
-            formatMessage(
-                {
-                    defaultMessage: 'Shipped to: {name}',
-                    id: 'account_order_history.label.shipped_to'
-                },
-                {name}
-            ),
-        noOrderHeading: formatMessage({
-            defaultMessage: "You haven't placed an order yet.",
-            id: 'account_order_history.heading.no_order_yet'
-        }),
-        noOrderDescription: formatMessage({
-            defaultMessage: 'Once you place an order the details will show up here.',
-            id: 'account_order_history.description.once_you_place_order'
-        }),
-        continueShoppingButton: formatMessage({
-            defaultMessage: 'Continue Shopping',
-            id: 'account_order_history.button.continue_shopping'
-        })
-    }), [intl])
+        [intl]
+    )
 
     const headingRef = useRef()
     useEffect(() => {

@@ -19,16 +19,19 @@ const PromoPopover = ({header, children, ...props}) => {
     const intl = useIntl()
     const {formatMessage} = intl
 
-    const messages = useMemo(() => ({
-        info: intl.formatMessage({
-            id: 'promo_popover.assistive_msg.info',
-            defaultMessage: 'Info'
+    const messages = useMemo(
+        () => ({
+            info: intl.formatMessage({
+                id: 'promo_popover.assistive_msg.info',
+                defaultMessage: 'Info'
+            }),
+            promoApplied: intl.formatMessage({
+                id: 'promo_popover.heading.promo_applied',
+                defaultMessage: 'Promotions Applied'
+            })
         }),
-        promoApplied: intl.formatMessage({
-            id: 'promo_popover.heading.promo_applied',
-            defaultMessage: 'Promotions Applied'
-        })
-    }), [intl])
+        [intl]
+    )
 
     return (
         <Box position="relative" {...props}>

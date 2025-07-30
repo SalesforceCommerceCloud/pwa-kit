@@ -21,12 +21,15 @@ const CategoryLinks = ({category = {}, onSelect = noop}) => {
     const {formatMessage} = intl
     const {categories = []} = category
 
-    const messages = useMemo(() => ({
-        categoriesHeading: formatMessage({
-            id: 'category_links.button_text',
-            defaultMessage: 'Categories'
-        })
-    }), [intl])
+    const messages = useMemo(
+        () => ({
+            categoriesHeading: formatMessage({
+                id: 'category_links.button_text',
+                defaultMessage: 'Categories'
+            })
+        }),
+        [intl]
+    )
 
     return (
         <Accordion.Item

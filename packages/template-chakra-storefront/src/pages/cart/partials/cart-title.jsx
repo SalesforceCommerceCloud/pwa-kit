@@ -16,16 +16,19 @@ const CartTitle = () => {
         derivedData: {totalItems}
     } = useCurrentBasket()
 
-    const messages = useMemo(() => ({
-        title: intl.formatMessage(
-            {
-                id: 'cart_title.title.cart_num_of_items',
-                defaultMessage:
-                    'Cart ({itemCount, plural, =0 {0 items} one {# item} other {# items}})'
-            },
-            {itemCount: totalItems}
-        )
-    }), [intl, totalItems])
+    const messages = useMemo(
+        () => ({
+            title: intl.formatMessage(
+                {
+                    id: 'cart_title.title.cart_num_of_items',
+                    defaultMessage:
+                        'Cart ({itemCount, plural, =0 {0 items} one {# item} other {# items}})'
+                },
+                {itemCount: totalItems}
+            )
+        }),
+        [intl, totalItems]
+    )
 
     return (
         <Heading as="h1" fontSize={['xl', 'xl', 'xl', '2xl']}>

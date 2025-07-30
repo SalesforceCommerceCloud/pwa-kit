@@ -28,17 +28,20 @@ const ActionCard = ({
     const [showLoading, setShowLoading] = useState(false)
     const intl = useIntl()
     const {formatMessage} = intl
-    
-    const messages = useMemo(() => ({
-        edit: intl.formatMessage({
-            id: 'action_card.action.edit',
-            defaultMessage: 'Edit'
+
+    const messages = useMemo(
+        () => ({
+            edit: intl.formatMessage({
+                id: 'action_card.action.edit',
+                defaultMessage: 'Edit'
+            }),
+            remove: intl.formatMessage({
+                id: 'action_card.action.remove',
+                defaultMessage: 'Remove'
+            })
         }),
-        remove: intl.formatMessage({
-            id: 'action_card.action.remove',
-            defaultMessage: 'Remove'
-        })
-    }), [intl])
+        [intl]
+    )
 
     const handleRemove = async () => {
         setShowLoading(true)

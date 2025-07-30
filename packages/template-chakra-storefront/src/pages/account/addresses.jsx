@@ -60,16 +60,19 @@ const ShippingAddressForm = ({form, hasAddresses, selectedAddressId, toggleEdit,
     const intl = useIntl()
     const {formatMessage} = intl
 
-    const messages = useMemo(() => ({
-        editAddress: formatMessage({
-            id: 'shipping_address_form.heading.edit_address',
-            defaultMessage: 'Edit Address'
+    const messages = useMemo(
+        () => ({
+            editAddress: formatMessage({
+                id: 'shipping_address_form.heading.edit_address',
+                defaultMessage: 'Edit Address'
+            }),
+            newAddress: formatMessage({
+                id: 'shipping_address_form.heading.new_address',
+                defaultMessage: 'Add New Address'
+            })
         }),
-        newAddress: formatMessage({
-            id: 'shipping_address_form.heading.new_address',
-            defaultMessage: 'Add New Address'
-        })
-    }), [intl])
+        [intl]
+    )
 
     return (
         <Box
@@ -130,58 +133,63 @@ const AccountAddresses = () => {
     const {data: customer, isLoading} = useCurrentCustomer()
     const {isRegistered, addresses, customerId} = customer
 
-    const messages = useMemo(() => ({
-        addresses: formatMessage({
-            id: 'account_addresses.title.addresses',
-            defaultMessage: 'Addresses'
+    const messages = useMemo(
+        () => ({
+            addresses: formatMessage({
+                id: 'account_addresses.title.addresses',
+                defaultMessage: 'Addresses'
+            }),
+            addAddress: formatMessage({
+                id: 'account_addresses.button.add_address',
+                defaultMessage: 'Add Address'
+            }),
+            default: formatMessage({
+                id: 'account_addresses.badge.default',
+                defaultMessage: 'Default'
+            }),
+            noSavedAddresses: formatMessage({
+                id: 'account_addresses.page_action_placeholder.heading.no_saved_addresses',
+                defaultMessage: 'No Saved Addresses'
+            }),
+            addNewAddressMessage: formatMessage({
+                id: 'account_addresses.page_action_placeholder.message.add_new_address',
+                defaultMessage: 'Add a new address method for faster checkout.'
+            }),
+            addAddressButton: formatMessage({
+                id: 'account_addresses.page_action_placeholder.button.add_address',
+                defaultMessage: 'Add Address'
+            }),
+            successfullyAddedAddress: formatMessage({
+                id: 'account_addresses.info.new_address_saved',
+                defaultMessage: 'New address saved'
+            }),
+            successfullyUpdatedAddress: formatMessage({
+                id: 'account_addresses.info.address_updated',
+                defaultMessage: 'Address updated'
+            }),
+            successfullyRemovedAddress: formatMessage({
+                id: 'account_addresses.info.address_removed',
+                defaultMessage: 'Address removed'
+            }),
+            editButtonLabel: (address) =>
+                formatMessage(
+                    {
+                        id: 'shipping_address.label.edit_button',
+                        defaultMessage: 'Edit {address}'
+                    },
+                    {address}
+                ),
+            removeButtonLabel: (address) =>
+                formatMessage(
+                    {
+                        id: 'shipping_address.label.remove_button',
+                        defaultMessage: 'Remove {address}'
+                    },
+                    {address}
+                )
         }),
-        addAddress: formatMessage({
-            id: 'account_addresses.button.add_address',
-            defaultMessage: 'Add Address'
-        }),
-        default: formatMessage({
-            id: 'account_addresses.badge.default',
-            defaultMessage: 'Default'
-        }),
-        noSavedAddresses: formatMessage({
-            id: 'account_addresses.page_action_placeholder.heading.no_saved_addresses',
-            defaultMessage: 'No Saved Addresses'
-        }),
-        addNewAddressMessage: formatMessage({
-            id: 'account_addresses.page_action_placeholder.message.add_new_address',
-            defaultMessage: 'Add a new address method for faster checkout.'
-        }),
-        addAddressButton: formatMessage({
-            id: 'account_addresses.page_action_placeholder.button.add_address',
-            defaultMessage: 'Add Address'
-        }),
-        successfullyAddedAddress: formatMessage({
-            id: 'account_addresses.info.new_address_saved',
-            defaultMessage: 'New address saved'
-        }),
-        successfullyUpdatedAddress: formatMessage({
-            id: 'account_addresses.info.address_updated',
-            defaultMessage: 'Address updated'
-        }),
-        successfullyRemovedAddress: formatMessage({
-            id: 'account_addresses.info.address_removed',
-            defaultMessage: 'Address removed'
-        }),
-        editButtonLabel: (address) => formatMessage(
-            {
-                id: 'shipping_address.label.edit_button',
-                defaultMessage: 'Edit {address}'
-            },
-            {address}
-        ),
-        removeButtonLabel: (address) => formatMessage(
-            {
-                id: 'shipping_address.label.remove_button',
-                defaultMessage: 'Remove {address}'
-            },
-            {address}
-        )
-    }), [intl])
+        [intl]
+    )
 
     const addCustomerAddress = useShopperCustomersMutation('createCustomerAddress')
     const updateSavedAddress = useShopperCustomersMutation('updateCustomerAddress')

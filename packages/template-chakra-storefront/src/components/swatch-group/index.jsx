@@ -30,15 +30,18 @@ const SwatchGroup = (props) => {
     const intl = useIntl()
     const {formatMessage} = intl
 
-    const messages = useMemo(() => ({
-        selectedLabel: intl.formatMessage(
-            {
-                id: 'swatch_group.selected.label',
-                defaultMessage: '{label}:'
-            },
-            {label}
-        )
-    }), [intl, label])
+    const messages = useMemo(
+        () => ({
+            selectedLabel: intl.formatMessage(
+                {
+                    id: 'swatch_group.selected.label',
+                    defaultMessage: '{label}:'
+                },
+                {label}
+            )
+        }),
+        [intl, label]
+    )
 
     // Handle keyboard navigation.
     const onKeyDown = useCallback(

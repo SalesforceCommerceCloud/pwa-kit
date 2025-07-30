@@ -165,22 +165,25 @@ const ProductTile = (props) => {
     }, [productWithFilteredVariants])
 
     // Message formatting
-    const messages = useMemo(() => ({
-        removeFromWishlist: intl.formatMessage(
-            {
-                id: 'product_tile.assistive_msg.remove_from_wishlist',
-                defaultMessage: 'Remove {product} from wishlist'
-            },
-            {product: localizedProductName}
-        ),
-        addToWishlist: intl.formatMessage(
-            {
-                id: 'product_tile.assistive_msg.add_to_wishlist',
-                defaultMessage: 'Add {product} to wishlist'
-            },
-            {product: localizedProductName}
-        )
-    }), [intl, localizedProductName])
+    const messages = useMemo(
+        () => ({
+            removeFromWishlist: intl.formatMessage(
+                {
+                    id: 'product_tile.assistive_msg.remove_from_wishlist',
+                    defaultMessage: 'Remove {product} from wishlist'
+                },
+                {product: localizedProductName}
+            ),
+            addToWishlist: intl.formatMessage(
+                {
+                    id: 'product_tile.assistive_msg.add_to_wishlist',
+                    defaultMessage: 'Add {product} to wishlist'
+                },
+                {product: localizedProductName}
+            )
+        }),
+        [intl, localizedProductName]
+    )
 
     // Retrieve product badges
     const filteredLabels = useMemo(() => {

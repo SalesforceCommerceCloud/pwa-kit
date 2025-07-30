@@ -53,16 +53,19 @@ const SocialLogin = ({form, idps = []}) => {
     const redirectPath = loginConfig?.social?.redirectURI || ''
     const redirectURI = buildRedirectURI(appOrigin, redirectPath)
 
-    const messages = useMemo(() => ({
-        errors: {
-            featureUnavailable: intl.formatMessage(FEATURE_UNAVAILABLE_ERROR_MESSAGE),
-            apiError: intl.formatMessage(API_ERROR_MESSAGE)
-        },
-        idp: {
-            apple: intl.formatMessage(IDP_CONFIG.apple.message),
-            google: intl.formatMessage(IDP_CONFIG.google.message)
-        }
-    }), [intl])
+    const messages = useMemo(
+        () => ({
+            errors: {
+                featureUnavailable: intl.formatMessage(FEATURE_UNAVAILABLE_ERROR_MESSAGE),
+                apiError: intl.formatMessage(API_ERROR_MESSAGE)
+            },
+            idp: {
+                apple: intl.formatMessage(IDP_CONFIG.apple.message),
+                google: intl.formatMessage(IDP_CONFIG.google.message)
+            }
+        }),
+        [intl]
+    )
 
     const isIdpValid = (name) => {
         const idp = name.toLowerCase()

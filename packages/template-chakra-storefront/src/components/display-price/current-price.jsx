@@ -29,19 +29,22 @@ const CurrentPrice = ({labelForA11y, price, as, isRange = false, currency, ...ex
         currency
     })
 
-    const messages = useMemo(() => ({
-        currentPriceWithRange: intl.formatMessage(msg.currentPriceWithRange, {
-            currentPrice: currentPriceText
-        }),
-        ariaLabels: {
-            currentPrice: intl.formatMessage(msg.ariaLabelCurrentPrice, {
+    const messages = useMemo(
+        () => ({
+            currentPriceWithRange: intl.formatMessage(msg.currentPriceWithRange, {
                 currentPrice: currentPriceText
             }),
-            currentPriceWithRange: intl.formatMessage(msg.ariaLabelCurrentPriceWithRange, {
-                currentPrice: currentPriceText
-            })
-        }
-    }), [intl, currentPriceText])
+            ariaLabels: {
+                currentPrice: intl.formatMessage(msg.ariaLabelCurrentPrice, {
+                    currentPrice: currentPriceText
+                }),
+                currentPriceWithRange: intl.formatMessage(msg.ariaLabelCurrentPriceWithRange, {
+                    currentPrice: currentPriceText
+                })
+            }
+        }),
+        [intl, currentPriceText]
+    )
 
     return (
         <>
@@ -55,11 +58,7 @@ const CurrentPrice = ({labelForA11y, price, as, isRange = false, currency, ...ex
                     {messages.currentPriceWithRange}
                 </Text>
             ) : (
-                <Text
-                    as={as}
-                    {...extraProps}
-                    aria-label={messages.ariaLabels.currentPrice}
-                >
+                <Text as={as} {...extraProps} aria-label={messages.ariaLabels.currentPrice}>
                     {currentPriceText}
                 </Text>
             )}

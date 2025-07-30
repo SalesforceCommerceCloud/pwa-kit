@@ -15,12 +15,15 @@ const ProfileFields = ({form, prefix = ''}) => {
     const fields = useProfileFields({form, prefix})
     const intl = useIntl()
 
-    const messages = useMemo(() => ({
-        formAriaLabel: intl.formatMessage({
-            id: 'profile_fields.label.profile_form',
-            defaultMessage: 'Profile Form'
-        })
-    }), [intl])
+    const messages = useMemo(
+        () => ({
+            formAriaLabel: intl.formatMessage({
+                id: 'profile_fields.label.profile_form',
+                defaultMessage: 'Profile Form'
+            })
+        }),
+        [intl]
+    )
 
     return (
         <Stack spacing={5} aria-label={messages.formAriaLabel}>

@@ -34,12 +34,15 @@ const withRegistration = (
         const intl = useIntl()
         const {formatMessage, locale} = intl
 
-        const messages = useMemo(() => ({
-            pleaseSignIn: formatMessage({
-                id: 'with_registration.info.please_sign_in',
-                defaultMessage: 'Please sign in to continue!'
-            })
-        }), [intl])
+        const messages = useMemo(
+            () => ({
+                pleaseSignIn: formatMessage({
+                    id: 'with_registration.info.please_sign_in',
+                    defaultMessage: 'Please sign in to continue!'
+                })
+            }),
+            [intl]
+        )
 
         const handleClick = (e) => {
             e.preventDefault()

@@ -95,16 +95,19 @@ export const Carousel = (props = {}) => {
     const components = regions[0]?.components || []
     const itemCount = components.length
 
-    const messages = useMemo(() => ({
-        scrollLeft: formatMessage({
-            id: 'carousel.button.scroll_left.assistive_msg',
-            defaultMessage: 'Scroll carousel left'
+    const messages = useMemo(
+        () => ({
+            scrollLeft: formatMessage({
+                id: 'carousel.button.scroll_left.assistive_msg',
+                defaultMessage: 'Scroll carousel left'
+            }),
+            scrollRight: formatMessage({
+                id: 'carousel.button.scroll_right.assistive_msg',
+                defaultMessage: 'Scroll carousel right'
+            })
         }),
-        scrollRight: formatMessage({
-            id: 'carousel.button.scroll_right.assistive_msg',
-            defaultMessage: 'Scroll carousel right'
-        })
-    }), [intl])
+        [intl]
+    )
 
     // Scroll the container left or right by 100%. Passing no args or `1`
     // scrolls to the right, and passing `-1` scrolls left.

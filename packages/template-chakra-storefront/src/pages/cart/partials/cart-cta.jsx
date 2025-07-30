@@ -14,12 +14,15 @@ const CartCta = () => {
     const intl = useIntl()
     const {formatMessage} = intl
 
-    const messages = useMemo(() => ({
-        checkout: intl.formatMessage({
-            id: 'cart_cta.link.checkout',
-            defaultMessage: 'Proceed to Checkout'
-        })
-    }), [intl])
+    const messages = useMemo(
+        () => ({
+            checkout: intl.formatMessage({
+                id: 'cart_cta.link.checkout',
+                defaultMessage: 'Proceed to Checkout'
+            })
+        }),
+        [intl]
+    )
 
     return (
         <Fragment>

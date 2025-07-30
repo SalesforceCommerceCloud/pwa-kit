@@ -19,20 +19,23 @@ const PaymentForm = ({form, onSubmit}) => {
     const {data: basket} = useCurrentBasket()
     const {currency} = useCurrency()
 
-    const messages = useMemo(() => ({
-        paymentRadioGroup: formatMessage({
-            id: 'payment_selection.radio_group.assistive_msg',
-            defaultMessage: 'Payment'
+    const messages = useMemo(
+        () => ({
+            paymentRadioGroup: formatMessage({
+                id: 'payment_selection.radio_group.assistive_msg',
+                defaultMessage: 'Payment'
+            }),
+            creditCard: formatMessage({
+                id: 'payment_selection.heading.credit_card',
+                defaultMessage: 'Credit Card'
+            }),
+            securePayment: formatMessage({
+                id: 'payment_selection.tooltip.secure_payment',
+                defaultMessage: 'This is a secure SSL encrypted payment.'
+            })
         }),
-        creditCard: formatMessage({
-            id: 'payment_selection.heading.credit_card',
-            defaultMessage: 'Credit Card'
-        }),
-        securePayment: formatMessage({
-            id: 'payment_selection.tooltip.secure_payment',
-            defaultMessage: 'This is a secure SSL encrypted payment.'
-        })
-    }), [intl])
+        [intl]
+    )
 
     return (
         <form onSubmit={form.handleSubmit(onSubmit)}>

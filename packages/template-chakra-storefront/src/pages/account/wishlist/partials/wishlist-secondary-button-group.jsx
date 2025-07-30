@@ -65,24 +65,27 @@ const WishlistSecondaryButtonGroup = ({
     const intl = useIntl()
     const {formatMessage} = intl
 
-    const messages = useMemo(() => ({
-        itemRemoved: intl.formatMessage({
-            id: 'wishlist_secondary_button_group.info.item_removed',
-            defaultMessage: 'Item removed from wishlist'
+    const messages = useMemo(
+        () => ({
+            itemRemoved: intl.formatMessage({
+                id: 'wishlist_secondary_button_group.info.item_removed',
+                defaultMessage: 'Item removed from wishlist'
+            }),
+            removeItemLabel: (productName) =>
+                intl.formatMessage(
+                    {
+                        id: 'wishlist_secondary_button_group.info.item.remove.label',
+                        defaultMessage: 'Remove {productName}'
+                    },
+                    {productName}
+                ),
+            remove: intl.formatMessage({
+                id: 'wishlist_secondary_button_group.action.remove',
+                defaultMessage: 'Remove'
+            })
         }),
-        removeItemLabel: (productName) =>
-            intl.formatMessage(
-                {
-                    id: 'wishlist_secondary_button_group.info.item.remove.label',
-                    defaultMessage: 'Remove {productName}'
-                },
-                {productName}
-            ),
-        remove: intl.formatMessage({
-            id: 'wishlist_secondary_button_group.action.remove',
-            defaultMessage: 'Remove'
-        })
-    }), [intl])
+        [intl]
+    )
 
     const showRemoveItemConfirmation = () => {
         modalProps.onOpen()

@@ -63,12 +63,15 @@ const SearchBar = (props) => {
     const intl = useIntl()
     const {formatMessage} = intl
 
-    const messages = useMemo(() => ({
-        searchPlaceholder: formatMessage({
-            id: 'header.field.placeholder.search_for_products',
-            defaultMessage: 'Search for products...'
-        })
-    }), [intl])
+    const messages = useMemo(
+        () => ({
+            searchPlaceholder: formatMessage({
+                id: 'header.field.placeholder.search_for_products',
+                defaultMessage: 'Search for products...'
+            })
+        }),
+        [intl]
+    )
 
     return (
         <Box css={styles.searchContainer}>
@@ -135,48 +138,54 @@ const Header = ({
     const recipe = useSlotRecipe({key: 'header'})
     const styles = recipe()
 
-    const headerMessages = useMemo(() => ({
-        menu: formatMessage({
-            id: 'header.button.assistive_msg.menu',
-            defaultMessage: 'Menu'
+    const headerMessages = useMemo(
+        () => ({
+            menu: formatMessage({
+                id: 'header.button.assistive_msg.menu',
+                defaultMessage: 'Menu'
+            }),
+            menuOpenDialog: formatMessage({
+                id: 'header.button.assistive_msg.menu.open_dialog',
+                defaultMessage: 'Opens a dialog'
+            }),
+            logo: formatMessage({
+                id: 'header.button.assistive_msg.logo',
+                defaultMessage: 'Logo'
+            }),
+            myAccount: formatMessage({
+                id: 'header.button.assistive_msg.my_account',
+                defaultMessage: 'My Account'
+            }),
+            myAccountMenu: formatMessage({
+                id: 'header.button.assistive_msg.my_account_menu',
+                defaultMessage: 'Open account menu'
+            }),
+            myAccountTitle: formatMessage({
+                defaultMessage: 'My Account',
+                id: 'header.popover.title.my_account'
+            }),
+            logOut: formatMessage({
+                defaultMessage: 'Log out',
+                id: 'header.popover.action.log_out'
+            }),
+            wishlist: formatMessage({
+                defaultMessage: 'Wishlist',
+                id: 'header.button.assistive_msg.wishlist'
+            }),
+            storeLocator: formatMessage({
+                defaultMessage: 'Store Locator',
+                id: 'header.button.assistive_msg.store_locator'
+            }),
+            myCartWithItems: formatMessage(
+                {
+                    id: 'header.button.assistive_msg.my_cart_with_num_items',
+                    defaultMessage: 'My cart, number of items: {numItems}'
+                },
+                {numItems: totalItems}
+            )
         }),
-        menuOpenDialog: formatMessage({
-            id: 'header.button.assistive_msg.menu.open_dialog',
-            defaultMessage: 'Opens a dialog'
-        }),
-        logo: formatMessage({
-            id: 'header.button.assistive_msg.logo',
-            defaultMessage: 'Logo'
-        }),
-        myAccount: formatMessage({
-            id: 'header.button.assistive_msg.my_account',
-            defaultMessage: 'My Account'
-        }),
-        myAccountMenu: formatMessage({
-            id: 'header.button.assistive_msg.my_account_menu',
-            defaultMessage: 'Open account menu'
-        }),
-        myAccountTitle: formatMessage({
-            defaultMessage: 'My Account',
-            id: 'header.popover.title.my_account'
-        }),
-        logOut: formatMessage({
-            defaultMessage: 'Log out',
-            id: 'header.popover.action.log_out'
-        }),
-        wishlist: formatMessage({
-            defaultMessage: 'Wishlist',
-            id: 'header.button.assistive_msg.wishlist'
-        }),
-        storeLocator: formatMessage({
-            defaultMessage: 'Store Locator',
-            id: 'header.button.assistive_msg.store_locator'
-        }),
-        myCartWithItems: formatMessage({
-            id: 'header.button.assistive_msg.my_cart_with_num_items',
-            defaultMessage: 'My cart, number of items: {numItems}'
-        }, {numItems: totalItems})
-    }), [intl, totalItems])
+        [intl, totalItems]
+    )
     const onSignoutClick = async () => {
         setShowLoading(true)
         await logout.mutateAsync()

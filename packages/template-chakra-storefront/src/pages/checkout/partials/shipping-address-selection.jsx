@@ -33,12 +33,15 @@ const ShippingAddressEditForm = ({
     const intl = useIntl()
     const {formatMessage} = intl
 
-    const messages = useMemo(() => ({
-        saveButton: formatMessage({
-            defaultMessage: 'Save & Continue to Shipping Method',
-            id: 'shipping_address_edit_form.button.save_and_continue'
-        })
-    }), [intl])
+    const messages = useMemo(
+        () => ({
+            saveButton: formatMessage({
+                defaultMessage: 'Save & Continue to Shipping Method',
+                id: 'shipping_address_edit_form.button.save_and_continue'
+            })
+        }),
+        [intl]
+    )
 
     return (
         <Box

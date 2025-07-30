@@ -68,24 +68,27 @@ const CartSecondaryButtonGroup = ({
     const {data: customer} = useCurrentCustomer()
     const modalProps = useDisclosure()
 
-    const messages = useMemo(() => ({
-        remove: intl.formatMessage({
-            id: 'cart_secondary_button_group.action.remove',
-            defaultMessage: 'Remove'
+    const messages = useMemo(
+        () => ({
+            remove: intl.formatMessage({
+                id: 'cart_secondary_button_group.action.remove',
+                defaultMessage: 'Remove'
+            }),
+            addToWishlist: intl.formatMessage({
+                id: 'cart_secondary_button_group.action.added_to_wishlist',
+                defaultMessage: 'Add to Wishlist'
+            }),
+            edit: intl.formatMessage({
+                id: 'cart_secondary_button_group.action.edit',
+                defaultMessage: 'Edit'
+            }),
+            thisIsGift: intl.formatMessage({
+                id: 'cart_secondary_button_group.label.this_is_gift',
+                defaultMessage: 'This is a gift.'
+            })
         }),
-        addToWishlist: intl.formatMessage({
-            id: 'cart_secondary_button_group.action.added_to_wishlist',
-            defaultMessage: 'Add to Wishlist'
-        }),
-        edit: intl.formatMessage({
-            id: 'cart_secondary_button_group.action.edit',
-            defaultMessage: 'Edit'
-        }),
-        thisIsGift: intl.formatMessage({
-            id: 'cart_secondary_button_group.label.this_is_gift',
-            defaultMessage: 'This is a gift.'
-        })
-    }), [intl])
+        [intl]
+    )
 
     const showRemoveItemConfirmation = () => {
         modalProps.onOpen()

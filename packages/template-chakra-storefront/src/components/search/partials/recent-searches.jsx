@@ -19,16 +19,19 @@ const RecentSearches = ({recentSearches, closeAndNavigate}) => {
     const intl = useIntl()
     const {formatMessage} = intl
 
-    const messages = useMemo(() => ({
-        recentSearchesTitle: intl.formatMessage({
-            id: 'recent_searches.heading.recent_searches',
-            defaultMessage: 'Recent Searches'
+    const messages = useMemo(
+        () => ({
+            recentSearchesTitle: intl.formatMessage({
+                id: 'recent_searches.heading.recent_searches',
+                defaultMessage: 'Recent Searches'
+            }),
+            clearRecentSearches: intl.formatMessage({
+                id: 'recent_searches.action.clear_searches',
+                defaultMessage: 'Clear recent searches'
+            })
         }),
-        clearRecentSearches: intl.formatMessage({
-            id: 'recent_searches.action.clear_searches',
-            defaultMessage: 'Clear recent searches'
-        })
-    }), [intl])
+        [intl]
+    )
 
     const clearSearches = () => {
         clearSessionJSONItem(searchConfig.recentSearchKey)

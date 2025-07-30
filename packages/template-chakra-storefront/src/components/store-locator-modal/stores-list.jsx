@@ -31,20 +31,23 @@ const StoresList = ({storesInfo}) => {
     const storeInfoKey = `store_${site.id}`
     const [selectedStore, setSelectedStore] = useState('')
 
-    const messages = useMemo(() => ({
-        away: intl.formatMessage({
-            id: 'store_locator.description.away',
-            defaultMessage: 'away'
+    const messages = useMemo(
+        () => ({
+            away: intl.formatMessage({
+                id: 'store_locator.description.away',
+                defaultMessage: 'away'
+            }),
+            phone: intl.formatMessage({
+                id: 'store_locator.description.phone',
+                defaultMessage: 'Phone:'
+            }),
+            viewMore: intl.formatMessage({
+                id: 'store_locator.action.viewMore',
+                defaultMessage: 'View More'
+            })
         }),
-        phone: intl.formatMessage({
-            id: 'store_locator.description.phone',
-            defaultMessage: 'Phone:'
-        }),
-        viewMore: intl.formatMessage({
-            id: 'store_locator.action.viewMore',
-            defaultMessage: 'View More'
-        })
-    }), [intl])
+        [intl]
+    )
 
     useEffect(() => {
         setSelectedStore(JSON.parse(window.localStorage.getItem(storeInfoKey))?.id || '')

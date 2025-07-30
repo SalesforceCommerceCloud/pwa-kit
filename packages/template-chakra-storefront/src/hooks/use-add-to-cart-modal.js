@@ -69,38 +69,42 @@ export const AddToCartModal = () => {
         ? selectedQuantity
         : itemsAdded.reduce((acc, {quantity}) => acc + quantity, 0)
 
-    const messages = useMemo(() => ({
-        addedToCart: formatMessage(
-            {
-                id: 'add_to_cart_modal.info.added_to_cart',
-                defaultMessage: '{quantity} {quantity, plural, one {item} other {items}} added to cart'
-            },
-            {quantity: numberOfItemsAdded}
-        ),
-        quantity: formatMessage({
-            id: 'add_to_cart_modal.label.quantity',
-            defaultMessage: 'Qty'
+    const messages = useMemo(
+        () => ({
+            addedToCart: formatMessage(
+                {
+                    id: 'add_to_cart_modal.info.added_to_cart',
+                    defaultMessage:
+                        '{quantity} {quantity, plural, one {item} other {items}} added to cart'
+                },
+                {quantity: numberOfItemsAdded}
+            ),
+            quantity: formatMessage({
+                id: 'add_to_cart_modal.label.quantity',
+                defaultMessage: 'Qty'
+            }),
+            cartSubtotal: formatMessage(
+                {
+                    id: 'add_to_cart_modal.label.cart_subtotal',
+                    defaultMessage: 'Cart Subtotal ({itemAccumulatedCount} item)'
+                },
+                {itemAccumulatedCount: totalItems}
+            ),
+            viewCart: formatMessage({
+                id: 'add_to_cart_modal.link.view_cart',
+                defaultMessage: 'View Cart'
+            }),
+            checkout: formatMessage({
+                id: 'add_to_cart_modal.link.checkout',
+                defaultMessage: 'Proceed to Checkout'
+            }),
+            mightAlsoLike: formatMessage({
+                id: 'add_to_cart_modal.recommended_products.title.might_also_like',
+                defaultMessage: 'You Might Also Like'
+            })
         }),
-        cartSubtotal: formatMessage(
-            {
-                id: 'add_to_cart_modal.label.cart_subtotal',
-                defaultMessage: 'Cart Subtotal ({itemAccumulatedCount} item)'
-            },
-            {itemAccumulatedCount: totalItems}
-        ),
-        viewCart: formatMessage({
-            id: 'add_to_cart_modal.link.view_cart',
-            defaultMessage: 'View Cart'
-        }),
-        checkout: formatMessage({
-            id: 'add_to_cart_modal.link.checkout',
-            defaultMessage: 'Proceed to Checkout'
-        }),
-        mightAlsoLike: formatMessage({
-            id: 'add_to_cart_modal.recommended_products.title.might_also_like',
-            defaultMessage: 'You Might Also Like'
-        })
-    }), [intl, numberOfItemsAdded, totalItems])
+        [intl, numberOfItemsAdded, totalItems]
+    )
 
     if (!isOpen) {
         return null
@@ -178,7 +182,8 @@ export const AddToCartModal = () => {
                                                         fontWeight="400"
                                                     >
                                                         <Text>
-                                                            {messages.quantity}: {numberOfItemsAdded}
+                                                            {messages.quantity}:{' '}
+                                                            {numberOfItemsAdded}
                                                         </Text>
                                                     </Box>
                                                     <Flex
@@ -335,9 +340,7 @@ export const AddToCartModal = () => {
                                     paddingY={{base: '4', lg: '0'}}
                                 >
                                     <Flex justifyContent="space-between" marginBottom="8">
-                                        <Text fontWeight="700">
-                                            {messages.cartSubtotal}
-                                        </Text>
+                                        <Text fontWeight="700">{messages.cartSubtotal}</Text>
                                         <Text alignSelf="flex-end" fontWeight="600">
                                             {productSubTotal &&
                                                 intl.formatNumber(productSubTotal, {
@@ -382,9 +385,7 @@ export const AddToCartModal = () => {
                             bottom={0}
                         >
                             <Flex justifyContent="space-between" marginBottom="4">
-                                <Text fontWeight="700">
-                                    {messages.cartSubtotal}
-                                </Text>
+                                <Text fontWeight="700">{messages.cartSubtotal}</Text>
                                 <Text alignSelf="flex-end" fontWeight="600">
                                     {productSubTotal &&
                                         intl.formatNumber(productSubTotal, {

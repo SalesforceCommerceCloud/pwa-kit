@@ -32,36 +32,39 @@ const Payment = () => {
     const selectedBillingAddress = basket?.billingAddress
     const appliedPayment = basket?.paymentInstruments && basket?.paymentInstruments[0]
 
-    const messages = useMemo(() => ({
-        payment: formatMessage({
-            id: 'checkout_payment.title.payment',
-            defaultMessage: 'Payment'
+    const messages = useMemo(
+        () => ({
+            payment: formatMessage({
+                id: 'checkout_payment.title.payment',
+                defaultMessage: 'Payment'
+            }),
+            editPaymentInfo: formatMessage({
+                id: 'toggle_card.action.editPaymentInfo',
+                defaultMessage: 'Edit Payment Info'
+            }),
+            creditCard: formatMessage({
+                id: 'checkout_payment.heading.credit_card',
+                defaultMessage: 'Credit Card'
+            }),
+            remove: formatMessage({
+                id: 'checkout_payment.action.remove',
+                defaultMessage: 'Remove'
+            }),
+            billingAddress: formatMessage({
+                id: 'checkout_payment.heading.billing_address',
+                defaultMessage: 'Billing Address'
+            }),
+            sameAsShipping: formatMessage({
+                id: 'checkout_payment.label.same_as_shipping',
+                defaultMessage: 'Same as shipping address'
+            }),
+            reviewOrder: formatMessage({
+                id: 'checkout_payment.button.review_order',
+                defaultMessage: 'Review Order'
+            })
         }),
-        editPaymentInfo: formatMessage({
-            id: 'toggle_card.action.editPaymentInfo',
-            defaultMessage: 'Edit Payment Info'
-        }),
-        creditCard: formatMessage({
-            id: 'checkout_payment.heading.credit_card',
-            defaultMessage: 'Credit Card'
-        }),
-        remove: formatMessage({
-            id: 'checkout_payment.action.remove',
-            defaultMessage: 'Remove'
-        }),
-        billingAddress: formatMessage({
-            id: 'checkout_payment.heading.billing_address',
-            defaultMessage: 'Billing Address'
-        }),
-        sameAsShipping: formatMessage({
-            id: 'checkout_payment.label.same_as_shipping',
-            defaultMessage: 'Same as shipping address'
-        }),
-        reviewOrder: formatMessage({
-            id: 'checkout_payment.button.review_order',
-            defaultMessage: 'Review Order'
-        })
-    }), [intl])
+        [intl]
+    )
 
     const [billingSameAsShipping, setBillingSameAsShipping] = useState(true) // By default, have billing addr to be the same as shipping
     const {mutateAsync: addPaymentInstrumentToBasket} = useShopperBasketsMutation(

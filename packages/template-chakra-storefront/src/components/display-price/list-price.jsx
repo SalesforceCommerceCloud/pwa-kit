@@ -28,16 +28,19 @@ const ListPrice = ({labelForA11y, price, isRange = false, as = 's', currency, ..
         currency
     })
 
-    const messages = useMemo(() => ({
-        ariaLabels: {
-            listPrice: intl.formatMessage(msg.ariaLabelListPrice, {
-                listPrice: listPriceText || ''
-            }),
-            listPriceWithRange: intl.formatMessage(msg.ariaLabelListPriceWithRange, {
-                listPrice: listPriceText || ''
-            })
-        }
-    }), [intl, listPriceText])
+    const messages = useMemo(
+        () => ({
+            ariaLabels: {
+                listPrice: intl.formatMessage(msg.ariaLabelListPrice, {
+                    listPrice: listPriceText || ''
+                }),
+                listPriceWithRange: intl.formatMessage(msg.ariaLabelListPriceWithRange, {
+                    listPrice: listPriceText || ''
+                })
+            }
+        }),
+        [intl, listPriceText]
+    )
 
     return (
         <>

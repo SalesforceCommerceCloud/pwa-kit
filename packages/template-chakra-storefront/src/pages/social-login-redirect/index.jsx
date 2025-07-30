@@ -37,27 +37,30 @@ const SocialLoginRedirect = () => {
     const mergeBasket = useShopperBasketsMutation('mergeBasket')
     const [error, setError] = useState('')
 
-    const messages = useMemo(() => ({
-        apiError: formatMessage(API_ERROR_MESSAGE),
-        authenticating: formatMessage({
-            id: 'social_login_redirect.message.authenticating',
-            defaultMessage: 'Authenticating...'
+    const messages = useMemo(
+        () => ({
+            apiError: formatMessage(API_ERROR_MESSAGE),
+            authenticating: formatMessage({
+                id: 'social_login_redirect.message.authenticating',
+                defaultMessage: 'Authenticating...'
+            }),
+            redirectLink: formatMessage(
+                {
+                    id: 'social_login_redirect.message.redirect_link',
+                    defaultMessage:
+                        'If you are not automatically redirected, click <link>this link</link> to proceed.'
+                },
+                {
+                    link: (chunks) => (
+                        <a href="/account" style={{color: '#0176D3', textDecoration: 'underline'}}>
+                            {chunks}
+                        </a>
+                    )
+                }
+            )
         }),
-        redirectLink: formatMessage(
-            {
-                id: 'social_login_redirect.message.redirect_link',
-                defaultMessage:
-                    'If you are not automatically redirected, click <link>this link</link> to proceed.'
-            },
-            {
-                link: (chunks) => (
-                    <a href="/account" style={{color: '#0176D3', textDecoration: 'underline'}}>
-                        {chunks}
-                    </a>
-                )
-            }
-        )
-    }), [intl])
+        [intl]
+    )
 
     // Runs after successful 3rd-party IDP authorization, processing query parameters
     useEffect(() => {

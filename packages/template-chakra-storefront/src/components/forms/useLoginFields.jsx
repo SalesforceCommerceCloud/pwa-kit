@@ -16,21 +16,27 @@ export default function useLoginFields({
 }) {
     const intl = useIntl()
 
-    const messages = useMemo(() => ({
-        emailLabel: intl.formatMessage({id: 'use_login_fields.label.email', defaultMessage: 'Email'}),
-        passwordLabel: intl.formatMessage({
-            id: 'use_login_fields.label.password',
-            defaultMessage: 'Password'
+    const messages = useMemo(
+        () => ({
+            emailLabel: intl.formatMessage({
+                id: 'use_login_fields.label.email',
+                defaultMessage: 'Email'
+            }),
+            passwordLabel: intl.formatMessage({
+                id: 'use_login_fields.label.password',
+                defaultMessage: 'Password'
+            }),
+            emailRequired: intl.formatMessage({
+                id: 'use_login_fields.error.required_email',
+                defaultMessage: 'Please enter your email address.'
+            }),
+            passwordRequired: intl.formatMessage({
+                id: 'use_login_fields.error.required_password',
+                defaultMessage: 'Please enter your password.'
+            })
         }),
-        emailRequired: intl.formatMessage({
-            id: 'use_login_fields.error.required_email',
-            defaultMessage: 'Please enter your email address.'
-        }),
-        passwordRequired: intl.formatMessage({
-            id: 'use_login_fields.error.required_password',
-            defaultMessage: 'Please enter your password.'
-        })
-    }), [intl])
+        [intl]
+    )
 
     const fields = {
         email: {

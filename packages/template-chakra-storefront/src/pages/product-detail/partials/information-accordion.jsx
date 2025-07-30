@@ -14,28 +14,31 @@ const InformationAccordion = ({product}) => {
     const intl = useIntl()
     const {formatMessage} = intl
 
-    const messages = useMemo(() => ({
-        productDetail: formatMessage({
-            id: 'product_detail.accordion.button.product_detail',
-            defaultMessage: 'Product Detail'
+    const messages = useMemo(
+        () => ({
+            productDetail: formatMessage({
+                id: 'product_detail.accordion.button.product_detail',
+                defaultMessage: 'Product Detail'
+            }),
+            sizeFit: formatMessage({
+                id: 'product_detail.accordion.button.size_fit',
+                defaultMessage: 'Size & Fit'
+            }),
+            reviews: formatMessage({
+                id: 'product_detail.accordion.button.reviews',
+                defaultMessage: 'Reviews'
+            }),
+            questions: formatMessage({
+                id: 'product_detail.accordion.button.questions',
+                defaultMessage: 'Questions'
+            }),
+            comingSoon: formatMessage({
+                id: 'product_detail.accordion.message.coming_soon',
+                defaultMessage: 'Coming Soon'
+            })
         }),
-        sizeFit: formatMessage({
-            id: 'product_detail.accordion.button.size_fit',
-            defaultMessage: 'Size & Fit'
-        }),
-        reviews: formatMessage({
-            id: 'product_detail.accordion.button.reviews',
-            defaultMessage: 'Reviews'
-        }),
-        questions: formatMessage({
-            id: 'product_detail.accordion.button.questions',
-            defaultMessage: 'Questions'
-        }),
-        comingSoon: formatMessage({
-            id: 'product_detail.accordion.message.coming_soon',
-            defaultMessage: 'Coming Soon'
-        })
-    }), [intl])
+        [intl]
+    )
 
     return (
         <Stack direction="row" gap={[0, 0, 0, 16]}>

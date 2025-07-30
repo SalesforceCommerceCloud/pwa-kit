@@ -15,16 +15,19 @@ const Sort = ({sortUrls, productSearchResult, basePath, ...otherProps}) => {
     const {formatMessage} = intl
     const history = useHistory()
 
-    const messages = useMemo(() => ({
-        sortByLabel: formatMessage({
-            id: 'product_list.drawer.title.sort_by',
-            defaultMessage: 'Sort By'
+    const messages = useMemo(
+        () => ({
+            sortByLabel: formatMessage({
+                id: 'product_list.drawer.title.sort_by',
+                defaultMessage: 'Sort By'
+            }),
+            sortProductsLabel: formatMessage({
+                id: 'product_list.sort_by.label.assistive_msg',
+                defaultMessage: 'Sort products by'
+            })
         }),
-        sortProductsLabel: formatMessage({
-            id: 'product_list.sort_by.label.assistive_msg',
-            defaultMessage: 'Sort products by'
-        })
-    }), [intl])
+        [intl]
+    )
 
     const getSortOptionLabel = (sortOption) => {
         return formatMessage(

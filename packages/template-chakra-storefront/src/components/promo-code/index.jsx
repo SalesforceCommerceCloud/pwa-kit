@@ -23,22 +23,25 @@ export const usePromoCode = () => {
     const form = useForm()
     const toast = useToast()
 
-    const messages = useMemo(() => ({
-        promoApplied: intl.formatMessage({
-            id: 'use_promocode.info.promo_applied',
-            defaultMessage: 'Promotion applied'
+    const messages = useMemo(
+        () => ({
+            promoApplied: intl.formatMessage({
+                id: 'use_promocode.info.promo_applied',
+                defaultMessage: 'Promotion applied'
+            }),
+            checkCode: intl.formatMessage({
+                id: 'use_promocode.error.check_the_code',
+                defaultMessage:
+                    'Check the code and try again, it may already be applied or the promo has expired.'
+            }),
+            promoRemoved: intl.formatMessage({
+                id: 'use_promocode.info.promo_removed',
+                defaultMessage: 'Promotion removed'
+            }),
+            apiError: intl.formatMessage(API_ERROR_MESSAGE)
         }),
-        checkCode: intl.formatMessage({
-            id: 'use_promocode.error.check_the_code',
-            defaultMessage:
-                'Check the code and try again, it may already be applied or the promo has expired.'
-        }),
-        promoRemoved: intl.formatMessage({
-            id: 'use_promocode.info.promo_removed',
-            defaultMessage: 'Promotion removed'
-        }),
-        apiError: intl.formatMessage(API_ERROR_MESSAGE)
-    }), [intl])
+        [intl]
+    )
 
     const applyPromoCodeMutation = useShopperBasketsMutation('addCouponToBasket')
     const removePromoCodeMutation = useShopperBasketsMutation('removeCouponFromBasket')
@@ -99,12 +102,15 @@ export const PromoCode = ({form, submitPromoCode, itemProps}) => {
     const intl = useIntl()
     const {formatMessage} = intl
 
-    const messages = useMemo(() => ({
-        havePromoCode: intl.formatMessage({
-            id: 'promocode.accordion.button.have_promocode',
-            defaultMessage: 'Do you have a promo code?'
-        })
-    }), [intl])
+    const messages = useMemo(
+        () => ({
+            havePromoCode: intl.formatMessage({
+                id: 'promocode.accordion.button.have_promocode',
+                defaultMessage: 'Do you have a promo code?'
+            })
+        }),
+        [intl]
+    )
 
     return (
         <Accordion.Root collapsible>

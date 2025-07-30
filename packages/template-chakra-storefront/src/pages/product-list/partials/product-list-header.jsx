@@ -42,37 +42,44 @@ const ProductListHeader = ({
             (option) => option.id === productSearchResult?.selectedSortingOption
         ) ?? sortingOptions?.[0]
 
-    const messages = useMemo(() => ({
-        sortBy: formatMessage(
-            {
-                id: 'product_list.button.sort_by',
-                defaultMessage: 'Sort By: {sortOption}'
-            },
-            {
-                sortOption: selectedSortingOptionLabel?.label
-            }
-        ),
-        filter: formatMessage({
-            id: 'product_list.button.filter',
-            defaultMessage: 'Filter'
+    const messages = useMemo(
+        () => ({
+            sortBy: formatMessage(
+                {
+                    id: 'product_list.button.sort_by',
+                    defaultMessage: 'Sort By: {sortOption}'
+                },
+                {
+                    sortOption: selectedSortingOptionLabel?.label
+                }
+            ),
+            filter: formatMessage({
+                id: 'product_list.button.filter',
+                defaultMessage: 'Filter'
+            }),
+            filterTitle: formatMessage({
+                id: 'product_list.modal.title.filter',
+                defaultMessage: 'Filter'
+            }),
+            viewItems: (count) =>
+                formatMessage(
+                    {
+                        id: 'product_list.modal.btn.view_items',
+                        defaultMessage: 'View {count} Items'
+                    },
+                    {count}
+                ),
+            clearFilters: formatMessage({
+                id: 'product_list.modal.btn.clear_filters',
+                defaultMessage: 'Clear Filters'
+            }),
+            sortByTitle: formatMessage({
+                id: 'product_list.drawer.title.sort_by',
+                defaultMessage: 'Sort By'
+            })
         }),
-        filterTitle: formatMessage({
-            id: 'product_list.modal.title.filter',
-            defaultMessage: 'Filter'
-        }),
-        viewItems: (count) => formatMessage({
-            id: 'product_list.modal.btn.view_items',
-            defaultMessage: 'View {count} Items'
-        }, {count}),
-        clearFilters: formatMessage({
-            id: 'product_list.modal.btn.clear_filters',
-            defaultMessage: 'Clear Filters'
-        }),
-        sortByTitle: formatMessage({
-            id: 'product_list.drawer.title.sort_by',
-            defaultMessage: 'Sort By'
-        })
-    }), [intl])
+        [intl]
+    )
 
     return (
         <>
@@ -209,7 +216,9 @@ const ProductListHeader = ({
                                                             size="lg"
                                                             position="static"
                                                         >
-                                                            {messages.viewItems(productSearchResult?.total || 0)}
+                                                            {messages.viewItems(
+                                                                productSearchResult?.total || 0
+                                                            )}
                                                         </Button>
                                                     </Dialog.CloseTrigger>
                                                     <Dialog.CloseTrigger asChild>

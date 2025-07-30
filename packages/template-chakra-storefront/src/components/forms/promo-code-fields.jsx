@@ -17,12 +17,15 @@ const PromoCodeFields = ({form, prefix = '', ...props}) => {
 
     const code = form.watch('code')
 
-    const messages = useMemo(() => ({
-        apply: intl.formatMessage({
-            id: 'promo_code_fields.button.apply',
-            defaultMessage: 'Apply'
-        })
-    }), [intl])
+    const messages = useMemo(
+        () => ({
+            apply: intl.formatMessage({
+                id: 'promo_code_fields.button.apply',
+                defaultMessage: 'Apply'
+            })
+        }),
+        [intl]
+    )
 
     return (
         <Box aria-labelledby="code-feedback" {...props}>

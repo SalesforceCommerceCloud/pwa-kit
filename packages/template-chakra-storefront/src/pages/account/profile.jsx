@@ -70,32 +70,35 @@ const ProfileCard = ({allowPasswordChange = false}) => {
     const toast = useToast()
     const [isEditing, setIsEditing] = useState(false)
 
-    const messages = useMemo(() => ({
-        title: formatMessage({
-            defaultMessage: 'My Profile',
-            id: 'profile_card.title.my_profile'
+    const messages = useMemo(
+        () => ({
+            title: formatMessage({
+                defaultMessage: 'My Profile',
+                id: 'profile_card.title.my_profile'
+            }),
+            profileUpdated: formatMessage({
+                defaultMessage: 'Profile updated',
+                id: 'profile_card.info.profile_updated'
+            }),
+            fullName: formatMessage({
+                defaultMessage: 'Full Name',
+                id: 'profile_card.label.full_name'
+            }),
+            email: formatMessage({
+                defaultMessage: 'Email',
+                id: 'profile_card.label.email'
+            }),
+            phone: formatMessage({
+                defaultMessage: 'Phone Number',
+                id: 'profile_card.label.phone'
+            }),
+            notProvided: formatMessage({
+                defaultMessage: 'Not provided',
+                id: 'profile_card.message.not_provided'
+            })
         }),
-        profileUpdated: formatMessage({
-            defaultMessage: 'Profile updated',
-            id: 'profile_card.info.profile_updated'
-        }),
-        fullName: formatMessage({
-            defaultMessage: 'Full Name',
-            id: 'profile_card.label.full_name'
-        }),
-        email: formatMessage({
-            defaultMessage: 'Email',
-            id: 'profile_card.label.email'
-        }),
-        phone: formatMessage({
-            defaultMessage: 'Phone Number',
-            id: 'profile_card.label.phone'
-        }),
-        notProvided: formatMessage({
-            defaultMessage: 'Not provided',
-            id: 'profile_card.message.not_provided'
-        })
-    }), [intl])
+        [intl]
+    )
 
     const form = useForm({
         defaultValues: {
@@ -253,20 +256,23 @@ const PasswordCard = () => {
     const toast = useToast()
     const [isEditing, setIsEditing] = useState(false)
 
-    const messages = useMemo(() => ({
-        title: formatMessage({
-            defaultMessage: 'Password',
-            id: 'password_card.title.password'
+    const messages = useMemo(
+        () => ({
+            title: formatMessage({
+                defaultMessage: 'Password',
+                id: 'password_card.title.password'
+            }),
+            passwordUpdated: formatMessage({
+                defaultMessage: 'Password updated',
+                id: 'password_card.info.password_updated'
+            }),
+            passwordLabel: formatMessage({
+                defaultMessage: 'Password',
+                id: 'password_card.label.password'
+            })
         }),
-        passwordUpdated: formatMessage({
-            defaultMessage: 'Password updated',
-            id: 'password_card.info.password_updated'
-        }),
-        passwordLabel: formatMessage({
-            defaultMessage: 'Password',
-            id: 'password_card.label.password'
-        })
-    }), [intl])
+        [intl]
+    )
 
     const form = useForm()
 
@@ -365,12 +371,15 @@ const AccountDetail = () => {
 
     const {isExternal} = useCustomerType()
 
-    const messages = useMemo(() => ({
-        title: formatMessage({
-            defaultMessage: 'Account Details',
-            id: 'account_detail.title.account_details'
-        })
-    }), [intl])
+    const messages = useMemo(
+        () => ({
+            title: formatMessage({
+                defaultMessage: 'Account Details',
+                id: 'account_detail.title.account_details'
+            })
+        }),
+        [intl]
+    )
 
     return (
         <Stack data-testid="account-detail-page" gap="6">

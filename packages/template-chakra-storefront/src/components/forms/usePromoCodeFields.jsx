@@ -17,16 +17,19 @@ export default function usePromoCodeFields({
     const intl = useIntl()
     const {formatMessage} = intl
 
-    const messages = useMemo(() => ({
-        codeLabel: formatMessage({
-            defaultMessage: 'Promo Code',
-            id: 'use_promo_code_fields.label.promo_code'
+    const messages = useMemo(
+        () => ({
+            codeLabel: formatMessage({
+                defaultMessage: 'Promo Code',
+                id: 'use_promo_code_fields.label.promo_code'
+            }),
+            codeRequired: formatMessage({
+                defaultMessage: 'Please provide a valid promo code.',
+                id: 'use_promo_code_fields.error.required_promo_code'
+            })
         }),
-        codeRequired: formatMessage({
-            defaultMessage: 'Please provide a valid promo code.',
-            id: 'use_promo_code_fields.error.required_promo_code'
-        })
-    }), [intl])
+        [intl]
+    )
 
     const fields = {
         code: {

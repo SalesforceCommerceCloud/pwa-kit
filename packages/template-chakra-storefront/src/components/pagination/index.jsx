@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React, { useMemo } from 'react'
+import React, {useMemo} from 'react'
 import PropTypes from 'prop-types'
 import {useIntl} from 'react-intl'
 import {Link as RouteLink, useHistory} from 'react-router-dom'
@@ -34,7 +34,7 @@ const SELECT_ID = 'pagination'
  */
 const Pagination = (props) => {
     const intl = useIntl()
-    const { formatMessage } = intl
+    const {formatMessage} = intl
     const history = useHistory()
     const {urls, currentURL, ...rest} = props
 
@@ -45,35 +45,38 @@ const Pagination = (props) => {
     const recipe = useSlotRecipe({key: 'pagination'})
     const styles = recipe()
 
-    const messages = useMemo(() => ({
-        prevAssistive: intl.formatMessage({
-            id: 'pagination.link.prev.assistive_msg',
-            defaultMessage: 'Previous Page'
+    const messages = useMemo(
+        () => ({
+            prevAssistive: intl.formatMessage({
+                id: 'pagination.link.prev.assistive_msg',
+                defaultMessage: 'Previous Page'
+            }),
+            prev: intl.formatMessage({
+                id: 'pagination.link.prev',
+                defaultMessage: 'Prev'
+            }),
+            pageNumberSelect: intl.formatMessage({
+                id: 'pagination.field.page_number_select',
+                defaultMessage: 'Select page number'
+            }),
+            numOfPages: intl.formatMessage(
+                {
+                    id: 'pagination.field.num_of_pages',
+                    defaultMessage: 'of {numOfPages}'
+                },
+                {numOfPages: urls.length}
+            ),
+            nextAssistive: intl.formatMessage({
+                id: 'pagination.link.next.assistive_msg',
+                defaultMessage: 'Next Page'
+            }),
+            next: intl.formatMessage({
+                id: 'pagination.link.next',
+                defaultMessage: 'Next'
+            })
         }),
-        prev: intl.formatMessage({
-            id: 'pagination.link.prev',
-            defaultMessage: 'Prev'
-        }),
-        pageNumberSelect: intl.formatMessage({
-            id: 'pagination.field.page_number_select',
-            defaultMessage: 'Select page number'
-        }),
-        numOfPages: intl.formatMessage(
-            {
-                id: 'pagination.field.num_of_pages',
-                defaultMessage: 'of {numOfPages}'
-            },
-            {numOfPages: urls.length}
-        ),
-        nextAssistive: intl.formatMessage({
-            id: 'pagination.link.next.assistive_msg',
-            defaultMessage: 'Next Page'
-        }),
-        next: intl.formatMessage({
-            id: 'pagination.link.next',
-            defaultMessage: 'Next'
-        })
-    }), [intl, urls.length])
+        [intl, urls.length]
+    )
 
     // Determine the current page index.
     return (
