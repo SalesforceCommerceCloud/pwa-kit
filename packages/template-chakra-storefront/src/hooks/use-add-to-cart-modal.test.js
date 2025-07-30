@@ -622,7 +622,7 @@ test('Renders AddToCartModal properly', () => {
     expect(numOfRowsRendered).toEqual(MOCK_DATA.itemsAdded.length)
 
     // Check that the promotional message is displayed
-    expect(screen.getByText('Bonus products available!')).toBeInTheDocument()
+    expect(screen.getByText('Bonus products available!')).toBeInTheDocument() //todo: update tests after static text is removed
 
     // Check that the "Select Bonus Products" button is displayed
     expect(screen.getByText('Select Bonus Products')).toBeInTheDocument()
