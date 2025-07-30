@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React from 'react'
+import React, {useMemo} from 'react'
 import PropTypes from 'prop-types'
 import {
     Button,
@@ -61,30 +61,31 @@ const CartSecondaryButtonGroup = ({
     onIsAGiftChange = noop,
     isAGift = false
 }) => {
-    const {formatMessage} = useIntl()
+    const intl = useIntl()
+    const {formatMessage} = intl
     const variant = useItemVariant()
 
     const {data: customer} = useCurrentCustomer()
     const modalProps = useDisclosure()
 
-    const messages = {
-        remove: formatMessage({
+    const messages = useMemo(() => ({
+        remove: intl.formatMessage({
             id: 'cart_secondary_button_group.action.remove',
             defaultMessage: 'Remove'
         }),
-        addToWishlist: formatMessage({
+        addToWishlist: intl.formatMessage({
             id: 'cart_secondary_button_group.action.added_to_wishlist',
             defaultMessage: 'Add to Wishlist'
         }),
-        edit: formatMessage({
+        edit: intl.formatMessage({
             id: 'cart_secondary_button_group.action.edit',
             defaultMessage: 'Edit'
         }),
-        thisIsGift: formatMessage({
+        thisIsGift: intl.formatMessage({
             id: 'cart_secondary_button_group.label.this_is_gift',
             defaultMessage: 'This is a gift.'
         })
-    }
+    }), [intl])
 
     const showRemoveItemConfirmation = () => {
         modalProps.onOpen()
