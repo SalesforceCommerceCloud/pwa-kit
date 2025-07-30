@@ -78,7 +78,7 @@ const Search = (props) => {
     const intl = useIntl()
     const {search: searchConfig} = getConfig()
 
-    const messages = {
+    const messages = useMemo(() => ({
         clearSearch: intl.formatMessage({
             id: 'header.button.assistive_msg.clear_search',
             defaultMessage: 'Clear Search'
@@ -87,7 +87,7 @@ const Search = (props) => {
             id: 'search.action.cancel',
             defaultMessage: 'Cancel'
         })
-    }
+    }), [intl])
     const searchSuggestion = useSearchSuggestions(
         {
             parameters: {

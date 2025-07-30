@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React from 'react'
+import React, {useMemo} from 'react'
 import {useIntl} from 'react-intl'
 import PropTypes from 'prop-types'
 import {Box, Button, Flex} from '@chakra-ui/react'
@@ -13,10 +13,11 @@ import {CloseIcon} from '../../../components/icons'
 import {REMOVE_FILTER} from './refinements-utils'
 
 const SelectedRefinements = ({toggleFilter, selectedFilterValues, filters, handleReset}) => {
-    const {formatMessage} = useIntl()
+    const intl = useIntl()
+    const {formatMessage} = intl
     const priceFilterValues = filters?.find((filter) => filter.attributeId === 'price')
 
-    const messages = {
+    const messages = useMemo(() => ({
         clearAllAriaLabel: formatMessage({
             id: 'selected_refinements.action.assistive_msg.clear_all',
             defaultMessage: 'Clear all filters'
@@ -25,7 +26,7 @@ const SelectedRefinements = ({toggleFilter, selectedFilterValues, filters, handl
             id: 'selected_refinements.action.clear_all',
             defaultMessage: 'Clear All'
         })
-    }
+    }), [intl])
 
     let selectedFilters = []
     for (const key in selectedFilterValues) {

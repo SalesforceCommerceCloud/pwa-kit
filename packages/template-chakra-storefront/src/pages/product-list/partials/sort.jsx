@@ -4,17 +4,18 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React from 'react'
+import React, {useMemo} from 'react'
 import PropTypes from 'prop-types'
 import {useHistory} from 'react-router-dom'
 import {useIntl} from 'react-intl'
 import {Field, NativeSelect} from '@chakra-ui/react'
 
 const Sort = ({sortUrls, productSearchResult, basePath, ...otherProps}) => {
-    const {formatMessage} = useIntl()
+    const intl = useIntl()
+    const {formatMessage} = intl
     const history = useHistory()
 
-    const messages = {
+    const messages = useMemo(() => ({
         sortByLabel: formatMessage({
             id: 'product_list.drawer.title.sort_by',
             defaultMessage: 'Sort By'
@@ -23,7 +24,7 @@ const Sort = ({sortUrls, productSearchResult, basePath, ...otherProps}) => {
             id: 'product_list.sort_by.label.assistive_msg',
             defaultMessage: 'Sort products by'
         })
-    }
+    }), [intl])
 
     const getSortOptionLabel = (sortOption) => {
         return formatMessage(

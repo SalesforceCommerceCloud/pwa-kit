@@ -46,7 +46,7 @@ Total files: 97
 - [x] src/components/recommended-products/index.jsx
 - [x] src/components/register/index.jsx
 - [x] src/components/reset-password/index.jsx
-- [ ] src/components/search/index.jsx
+- [x] src/components/search/index.jsx
 - [ ] src/components/search/partials/recent-searches.jsx
 - [ ] src/components/social-login/index.jsx
 - [ ] src/components/store-locator-modal/store-locator-content.jsx
@@ -98,8 +98,8 @@ Total files: 97
 - [ ] src/pages/product-list/partials/product-list-title.jsx
 - [ ] src/pages/product-list/partials/radio-refinements.jsx
 - [ ] src/pages/product-list/partials/selected-refinements.jsx
-- [ ] src/pages/product-list/partials/sort.jsx
-- [ ] src/pages/registration/index.jsx
-- [ ] src/pages/reset-password/index.jsx
+- [x] src/pages/product-list/partials/sort.jsx
+- [x] src/pages/registration/index.jsx
+- [x] src/pages/reset-password/index.jsx
 - [x] src/pages/reset-password/reset-password-landing.jsx
 - [x] src/pages/social-login-redirect/index.jsx
