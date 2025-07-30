@@ -25,7 +25,7 @@ export const listMenuStyles = {
             fontWeight: 700
         }
     },
-    
+
     // Secondary navigation styles
     secondary: {
         default: {
@@ -44,7 +44,7 @@ export const listMenuStyles = {
             fontWeight: 600
         }
     },
-    
+
     // Dropdown menu styles
     dropdown: {
         background: 'white',
@@ -60,7 +60,7 @@ export const listMenuStyles = {
             fontWeight: 400
         }
     },
-    
+
     // Icon styles
     icons: {
         chevron: {
@@ -72,7 +72,7 @@ export const listMenuStyles = {
             fontSize: 'sm'
         }
     },
-    
+
     // Active state styles
     active: {
         underline: {
@@ -110,4 +110,4 @@ export const listMenuColors = {
     }
 }
 
-export default listMenuStyles 
+export default listMenuStyles

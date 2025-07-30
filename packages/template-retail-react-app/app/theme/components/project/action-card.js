@@ -5,13 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 export default {
-    parts: [
-        'container',
-        'content',
-        'actionsContainer',
-        'editButton',
-        'removeButton'
-    ],
+    parts: ['container', 'content', 'actionsContainer', 'editButton', 'removeButton'],
     baseStyle: {
         container: {
             spacing: 4,
@@ -37,4 +31,4 @@ export default {
             color: 'red.600'
         }
     }
-} 
+}

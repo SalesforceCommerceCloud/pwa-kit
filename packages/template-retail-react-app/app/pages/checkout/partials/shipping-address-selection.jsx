@@ -48,14 +48,14 @@ const ShippingAddressEditForm = ({
 
     return (
         <Box
-            {...(hasSavedAddresses && !isBillingAddress ? styles.editFormExpanded : styles.editForm)}
+            {...(hasSavedAddresses && !isBillingAddress
+                ? styles.editFormExpanded
+                : styles.editForm)}
             data-testid="sf-shipping-address-edit-form"
         >
             <Stack spacing={6}>
                 {hasSavedAddresses && !isBillingAddress && (
-                    <Heading {...styles.editFormTitle}>
-                        {title}
-                    </Heading>
+                    <Heading {...styles.editFormTitle}>{title}</Heading>
                 )}
 
                 <Stack spacing={6}>

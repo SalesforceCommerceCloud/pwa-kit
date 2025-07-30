@@ -9,14 +9,7 @@ import Header from '@salesforce/retail-react-app/app/theme/components/project/he
 const {baseStyle} = Header
 
 export default {
-    parts: [
-        'container',
-        'content',
-        'flexContainer',
-        'logo',
-        'cartButton',
-        'cartButtonIcon'
-    ],
+    parts: ['container', 'content', 'flexContainer', 'logo', 'cartButton', 'cartButtonIcon'],
     baseStyle: {
         container: {
             ...baseStyle.container,
@@ -44,4 +37,4 @@ export default {
             height: 11
         }
     }
-} 
+}
