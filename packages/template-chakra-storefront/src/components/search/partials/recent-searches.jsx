@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React from 'react'
+import React, {useMemo} from 'react'
 import PropTypes from 'prop-types'
 import {Text, Button, Box} from '@chakra-ui/react'
 
@@ -16,18 +16,19 @@ import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 
 const RecentSearches = ({recentSearches, closeAndNavigate}) => {
     const {search: searchConfig} = getConfig()
-    const {formatMessage} = useIntl()
+    const intl = useIntl()
+    const {formatMessage} = intl
 
-    const messages = {
-        recentSearchesTitle: formatMessage({
+    const messages = useMemo(() => ({
+        recentSearchesTitle: intl.formatMessage({
             id: 'recent_searches.heading.recent_searches',
             defaultMessage: 'Recent Searches'
         }),
-        clearRecentSearches: formatMessage({
+        clearRecentSearches: intl.formatMessage({
             id: 'recent_searches.action.clear_searches',
             defaultMessage: 'Clear recent searches'
         })
-    }
+    }), [intl])
 
     const clearSearches = () => {
         clearSessionJSONItem(searchConfig.recentSearchKey)

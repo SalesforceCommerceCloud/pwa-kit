@@ -5,18 +5,19 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React from 'react'
+import React, {useMemo} from 'react'
 import PropTypes from 'prop-types'
 import {useIntl} from 'react-intl'
 import {RadioGroup, Stack} from '@chakra-ui/react'
 import {ADD_FILTER, REMOVE_FILTER} from '../../../pages/product-list/partials/refinements-utils'
 
 const RadioRefinement = ({value, isSelected}) => {
-    const {formatMessage} = useIntl()
+    const intl = useIntl()
+    const {formatMessage} = intl
 
-    const messages = {
+    const messages = useMemo(() => ({
         ariaLabel: formatMessage(isSelected ? REMOVE_FILTER : ADD_FILTER, value)
-    }
+    }), [intl])
 
     // Because choosing a refinement is equivalent to a form submission, the best semantic choice
     // for the refinement is a button or a link, rather than a radio input. The radio element here
