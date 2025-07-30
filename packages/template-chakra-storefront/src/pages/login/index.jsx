@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React, {useEffect, useState} from 'react'
+import React, {useEffect, useState, useMemo} from 'react'
 import PropTypes from 'prop-types'
 import {useIntl} from 'react-intl'
 import {keepPreviousData} from '@tanstack/react-query'
@@ -42,9 +42,10 @@ const LOGIN_VIEW = 'login'
 const EMAIL_VIEW = 'email'
 
 const Login = ({initialView = LOGIN_VIEW}) => {
-    const {formatMessage} = useIntl()
+    const intl = useIntl()
+    const {formatMessage} = intl
 
-    const messages = {
+    const messages = useMemo(() => ({
         loginError: formatMessage({
             id: 'login_page.error.incorrect_username_or_password',
             defaultMessage: 'Incorrect username or password, please try again.'
@@ -53,7 +54,7 @@ const Login = ({initialView = LOGIN_VIEW}) => {
         createAccountFirst: formatMessage(CREATE_ACCOUNT_FIRST_ERROR_MESSAGE),
         featureUnavailable: formatMessage(FEATURE_UNAVAILABLE_ERROR_MESSAGE),
         invalidToken: formatMessage(INVALID_TOKEN_ERROR_MESSAGE)
-    }
+    }), [intl])
     const navigate = useNavigation()
     const form = useForm()
     const location = useLocation()

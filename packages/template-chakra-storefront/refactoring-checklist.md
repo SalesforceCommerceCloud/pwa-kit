@@ -86,7 +86,7 @@ Total files: 97
 - [ ] src/pages/checkout/partials/shipping-address.jsx
 - [ ] src/pages/checkout/partials/shipping-options.jsx
 - [ ] src/pages/home/index.jsx
-- [ ] src/pages/login/index.jsx
+- [x] src/pages/login/index.jsx
 - [x] src/pages/page-not-found/index.jsx
 - [x] src/pages/product-detail/partials/information-accordion.jsx
 - [x] src/pages/product-detail/partials/recommended-products-section.jsx

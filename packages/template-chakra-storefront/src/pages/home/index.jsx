@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React from 'react'
+import React, {useMemo} from 'react'
 import {useIntl} from 'react-intl'
 
 // Components
@@ -46,7 +46,8 @@ import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
  * categories and products, data is from local file.
  */
 const Home = () => {
-    const {formatMessage} = useIntl()
+    const intl = useIntl()
+    const {formatMessage} = intl
     const {
         pages: {
             home: {productLimit: HOME_PRODUCT_LIMIT, mainCategory: HOME_MAIN_CATEGORY}
@@ -73,7 +74,7 @@ const Home = () => {
         }
     })
 
-    const messages = {
+    const messages = useMemo(() => ({
         heroTitle: formatMessage({
             id: 'home.title.react_starter_store',
             defaultMessage: 'The React PWA Starter Store for Retail'
@@ -155,7 +156,7 @@ const Home = () => {
                 defaultMessage: 'Contact Us'
             })
         }
-    }
+    }), [intl])
 
     return (
         <Box data-testid="home-page" layerStyle="page">
