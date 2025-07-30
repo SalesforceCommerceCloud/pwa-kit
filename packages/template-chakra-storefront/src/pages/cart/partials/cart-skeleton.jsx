@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React from 'react'
+import React, {useMemo} from 'react'
 import {
     Flex,
     Stack,
@@ -40,18 +40,19 @@ const CartItemSkeleton = () => {
 }
 
 const CartSkeleton = () => {
-    const {formatMessage} = useIntl()
+    const intl = useIntl()
+    const {formatMessage} = intl
 
-    const messages = {
-        cart: formatMessage({
+    const messages = useMemo(() => ({
+        cart: intl.formatMessage({
             id: 'cart_skeleton.title.cart',
             defaultMessage: 'Cart'
         }),
-        orderSummary: formatMessage({
+        orderSummary: intl.formatMessage({
             id: 'cart_skeleton.heading.order_summary',
             defaultMessage: 'Order Summary'
         })
-    }
+    }), [intl])
 
     return (
         <Box background="gray.50" flex="1" paddingBottom={{base: 20, lg: 55}}>
