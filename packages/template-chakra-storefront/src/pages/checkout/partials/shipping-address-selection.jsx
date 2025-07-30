@@ -35,15 +35,7 @@ const ShippingAddressEditForm = ({
     formTitleAriaLabel,
     isBillingAddress = false
 }) => {
-    const intl = useIntl()
     const {formatMessage} = intl
-
-    const messages = useMemo(
-        () => ({
-            saveButton: formatMessage(saveButtonMessage)
-        }),
-        [intl]
-    )
 
     return (
         <Box
