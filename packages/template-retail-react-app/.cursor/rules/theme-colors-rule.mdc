@@ -1,0 +1,110 @@
+---
+description: Rule should be used when applying styles, themes or branding
+alwaysApply: false
+---
+# Theme Colors Rule
+
+When theming PWA Kit applications, ALL custom colors MUST be added to the colors.js file before being used in theme components.
+
+## 🎨 Color Definition Process
+
+### 1. **Always Define Colors First**
+Before using any custom colors in theme components, add them to:
+```
+packages/template-retail-react-app/app/theme/foundations/colors.js
+```
+
+### 2. **Color Structure**
+Add colors in the following format:
+```javascript
+const colors = {
+    // ... existing colors ...
+    
+    // Custom brand colors
+    brand: {
+        primary: '#hexcode',
+        secondary: '#hexcode',
+        accent: '#hexcode',
+        dark: '#hexcode',
+        light: '#hexcode'
+    },
+    
+    // Or as individual color objects
+    custom: {
+        50: '#lightest',
+        100: '#lighter',
+        500: '#base',
+        900: '#darkest'
+    }
+}
+```
+
+### 3. **Naming Conventions**
+- Use descriptive names: `brand.primary`, `brand.accent`, `brand.dark`
+- Use semantic names: `success`, `warning`, `error`, `info`
+- Use scale names: `gray`, `blue`, `red` with numbered variants (50-900)
+
+## 🔧 Implementation Steps
+
+### Step 1: Add to colors.js
+```javascript
+// packages/template-retail-react-app/app/theme/foundations/colors.js
+const colors = {
+    // ... existing colors ...
+    
+    // NEW: Add your custom colors here
+    brand: {
+        accent: '#7d98c1',
+        dark: '#000000',
+        light: '#ffffff'
+    }
+}
+```
+
+### Step 2: Use in Theme Components
+```javascript
+// packages/template-retail-react-app/app/theme/components/project/header.js
+export default {
+    baseStyle: {
+        container: {
+            backgroundColor: 'brand.dark'  // ✅ Use defined color
+        }
+    }
+}
+```
+
+## ❌ Common Mistakes to Avoid
+
+1. **Using Direct Hex Values**: Don't use `backgroundColor: '#000000'` directly
+2. **Undefined Colors**: Don't reference colors that aren't in colors.js
+3. **Inconsistent Naming**: Don't mix naming conventions
+
+## ✅ Best Practices
+
+1. **Define First**: Always add colors to colors.js before using them
+2. **Use References**: Reference colors as `'brand.accent'` not `'#7d98c1'`
+3. **Group Related Colors**: Keep related colors together (e.g., `brand.*`)
+4. **Document Colors**: Add comments explaining color usage
+5. **Test Changes**: Verify colors work in both light and dark contexts
+
+## 🔍 Verification Checklist
+
+Before completing theming work, verify:
+- [ ] All custom colors are defined in colors.js
+- [ ] No direct hex values are used in theme components
+- [ ] Color names are descriptive and consistent
+- [ ] Colors are properly grouped and organized
+- [ ] Theme components reference defined colors correctly
+
+## 📁 Files to Update
+
+When adding new colors, always update:
+1. `packages/template-retail-react-app/app/theme/foundations/colors.js` - Add color definitions
+2. Theme component files - Use color references
+3. Any related documentation - Update color guides
+
+This rule ensures consistent color management and prevents theme inconsistencies across the PWA Kit application.
+description:
+globs:
+alwaysApply: false
+---
