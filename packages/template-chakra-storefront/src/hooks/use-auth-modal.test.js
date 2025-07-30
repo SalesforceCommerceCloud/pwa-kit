@@ -16,8 +16,6 @@ import * as ReactHookForm from 'react-hook-form'
 import {AuthHelpers} from '@salesforce/commerce-sdk-react'
 import {prependHandlersToServer} from '../../jest-setup'
 
-jest.setTimeout(60000)
-
 const mockMergedBasket = {
     basketId: 'a10ff320829cb0eef93ca5310a',
     currency: 'USD',
@@ -307,9 +305,6 @@ test('Renders error when given incorrect login credentials', async () => {
         () => {
             // wait for login error alert to appear
             expect(screen.getByText(/Something went wrong. Try again!/i)).toBeInTheDocument()
-        },
-        {
-            timeout: 1000
         }
     )
 })
@@ -402,9 +397,6 @@ test('Allows customer to create an account', async () => {
             expect(window.location.pathname).toBe('/uk/en-GB/account')
             const myAccount = screen.getAllByText(/My Account/)
             expect(myAccount).toHaveLength(2)
-        },
-        {
-            timeout: 5000
         }
     )
 })
@@ -449,8 +441,7 @@ test('Allows customer to sign in to their account', async () => {
             expect(window.location.pathname).toBe('/uk/en-GB/account')
             const myAccount = screen.getAllByText(/My Account/)
             expect(myAccount).toHaveLength(2)
-        },
-        {timeout: 5000}
+        }
     )
 })
 
@@ -491,8 +482,7 @@ describe('Reset password', function () {
                 expect(mockGetPasswordResetToken).toHaveBeenCalledWith('foo@test.com')
                 expect(screen.getByText(/password reset/i)).toBeInTheDocument()
                 expect(screen.getByText(/foo@test.com/i)).toBeInTheDocument()
-            },
-            {timeout: 5000}
+            }
         )
     })
 
