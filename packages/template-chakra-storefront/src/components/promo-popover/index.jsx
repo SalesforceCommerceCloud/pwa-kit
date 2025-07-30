@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React from 'react'
+import React, {useMemo} from 'react'
 import PropTypes from 'prop-types'
 import {Box, CloseButton, Flex, IconButton, Popover, Text} from '@chakra-ui/react'
 import {InfoIcon} from '../icons'
@@ -16,18 +16,19 @@ import {useIntl} from 'react-intl'
  * promotions applied to products and/or orders on cart, checkout, order confirmation and order history.
  */
 const PromoPopover = ({header, children, ...props}) => {
-    const {formatMessage} = useIntl()
+    const intl = useIntl()
+    const {formatMessage} = intl
 
-    const messages = {
-        info: formatMessage({
+    const messages = useMemo(() => ({
+        info: intl.formatMessage({
             id: 'promo_popover.assistive_msg.info',
             defaultMessage: 'Info'
         }),
-        promoApplied: formatMessage({
+        promoApplied: intl.formatMessage({
             id: 'promo_popover.heading.promo_applied',
             defaultMessage: 'Promotions Applied'
         })
-    }
+    }), [intl])
 
     return (
         <Box position="relative" {...props}>
