@@ -39,7 +39,11 @@ import Breadcrumb from '@salesforce/retail-react-app/app/theme/components/projec
 import Header from '@salesforce/retail-react-app/app/theme/components/project/header'
 import ListMenu from '@salesforce/retail-react-app/app/theme/components/project/list-menu'
 import Footer from '@salesforce/retail-react-app/app/theme/components/project/footer'
+import CheckoutHeader from '@salesforce/retail-react-app/app/theme/components/project/checkout-header'
 import CheckoutFooter from '@salesforce/retail-react-app/app/theme/components/project/checkout-footer'
+import ActionCard from '@salesforce/retail-react-app/app/theme/components/project/action-card'
+import RadioCard from '@salesforce/retail-react-app/app/theme/components/project/radio-card'
+import StoreDisplay from '@salesforce/retail-react-app/app/theme/components/project/store-display'
 import LinksList from '@salesforce/retail-react-app/app/theme/components/project/links-list'
 import DrawerMenu from '@salesforce/retail-react-app/app/theme/components/project/drawer-menu'
 import NestedAccordion from '@salesforce/retail-react-app/app/theme/components/project/nested-accordion'
@@ -83,8 +87,10 @@ export const overrides = {
 
         // project components
         App,
+        ActionCard,
         Breadcrumb,
         Header,
+        CheckoutHeader,
         Footer,
         CheckoutFooter,
         LinksList,
@@ -96,6 +102,8 @@ export const overrides = {
         SocialIcons,
         Pagination,
         ProductTile,
+        RadioCard,
+        StoreDisplay,
         SwatchGroup,
         ImageGallery
     }

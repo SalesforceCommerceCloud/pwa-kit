@@ -6,7 +6,12 @@
  */
 import React, {useState} from 'react'
 import PropTypes from 'prop-types'
-import {Stack, Box, Button} from '@salesforce/retail-react-app/app/components/shared/ui'
+import {
+    Stack,
+    Box,
+    Button,
+    useMultiStyleConfig
+} from '@salesforce/retail-react-app/app/components/shared/ui'
 import {FormattedMessage} from 'react-intl'
 import LoadingSpinner from '@salesforce/retail-react-app/app/components/loading-spinner'
 
@@ -26,6 +31,7 @@ const ActionCard = ({
     ...props
 }) => {
     const [showLoading, setShowLoading] = useState(false)
+    const styles = useMultiStyleConfig('ActionCard')
 
     const handleRemove = async () => {
         setShowLoading(true)
@@ -37,38 +43,26 @@ const ActionCard = ({
     }
 
     return (
-        <Box
-            spacing={4}
-            p={4}
-            position="relative"
-            border="1px solid"
-            borderColor="gray.100"
-            borderRadius="base"
-            {...props}
-        >
+        <Box {...styles.container} {...props}>
             {showLoading && <LoadingSpinner />}
             <Stack spacing={3}>
-                <Box>{children}</Box>
-                <Stack direction="row" spacing={4}>
+                <Box {...styles.content}>{children}</Box>
+                <Stack {...styles.actionsContainer}>
                     {onEdit && (
                         <Button
                             onClick={onEdit}
-                            variant="link"
-                            size="sm"
                             ref={editBtnRef}
                             aria-label={editBtnLabel}
+                            {...styles.editButton}
                         >
                             <FormattedMessage defaultMessage="Edit" id="action_card.action.edit" />
                         </Button>
                     )}
                     {onRemove && (
                         <Button
-                            variant="link"
-                            size="sm"
-                            colorScheme="red"
                             onClick={handleRemove}
-                            color="red.600"
                             aria-label={removeBtnLabel}
+                            {...styles.removeButton}
                         >
                             <FormattedMessage
                                 defaultMessage="Remove"

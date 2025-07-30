@@ -1,0 +1,118 @@
+---
+description: Rule should be used when applying styles to header component or website template
+alwaysApply: false
+---
+# Header Typography Consistency Rule
+
+When changing header font styles, ALWAYS update the corresponding ListMenu and dropdown font styles to maintain consistency across the navigation system.
+
+## Required Updates Checklist
+
+### 1. Header Font Changes
+When modifying header typography in `packages/template-retail-react-app/app/theme/components/project/header.js`:
+
+### 2. ListMenu Primary Navigation
+**File**: `packages/template-retail-react-app/app/theme/foundations/list-menu-styles.js`
+**Section**: `primary.default`, `primary.hover`, `primary.active`
+
+**Always update these properties to match header changes:**
+- `fontSize`
+- `fontWeight` 
+- `fontFamily`
+- `letterSpacing`
+- `textTransform`
+- `lineHeight`
+
+### 3. ListMenu Dropdown Styles
+**File**: `packages/template-retail-react-app/app/theme/foundations/list-menu-styles.js`
+**Section**: `dropdown.text`, `dropdown.hover`
+
+**Always update these properties to match header changes:**
+- `fontSize`
+- `fontWeight`
+- `fontFamily`
+- `letterSpacing`
+- `textTransform`
+
+### 4. LinksList Component
+**File**: `packages/template-retail-react-app/app/theme/components/project/links-list.js`
+**Section**: `baseStyle.heading`, `baseStyle.list`
+
+**Always update these properties:**
+- `fontSize`
+- `fontWeight`
+- `color`
+
+## Implementation Pattern
+
+When header font styles are modified, follow this pattern:
+
+```javascript
+// 1. Update header styles
+header.js: {
+    // ... header font changes
+}
+
+// 2. Update ListMenu primary navigation
+list-menu-styles.js: {
+    primary: {
+        default: {
+            fontSize: 'MATCH_HEADER_SIZE',
+            fontWeight: 'MATCH_HEADER_WEIGHT',
+            fontFamily: 'MATCH_HEADER_FAMILY',
+            // ... other properties
+        }
+    }
+}
+
+// 3. Update ListMenu dropdown
+list-menu-styles.js: {
+    dropdown: {
+        text: {
+            fontSize: 'MATCH_HEADER_SIZE',
+            fontWeight: 'MATCH_HEADER_WEIGHT',
+            fontFamily: 'MATCH_HEADER_FAMILY',
+            // ... other properties
+        }
+    }
+}
+
+// 4. Update LinksList component
+links-list.js: {
+    baseStyle: {
+        heading: {
+            fontSize: 'MATCH_HEADER_SIZE',
+            fontWeight: 'MATCH_HEADER_WEIGHT',
+            // ... other properties
+        }
+    }
+}
+```
+
+## Common Font Properties to Sync
+
+- **Font Size**: Ensure consistent sizing across all navigation elements
+- **Font Weight**: Maintain visual hierarchy with consistent weights
+- **Font Family**: Use the same font stack throughout
+- **Letter Spacing**: Keep consistent spacing for brand consistency
+- **Text Transform**: Maintain consistent text casing (uppercase, title case, etc.)
+- **Line Height**: Ensure proper readability across all elements
+
+## Verification Steps
+
+After making changes, verify:
+1. ✅ Header navigation matches ListMenu primary styles
+2. ✅ ListMenu dropdowns match header typography
+3. ✅ LinksList components use consistent fonts
+4. ✅ All font properties are synchronized
+5. ✅ Responsive behavior is maintained
+6. ✅ Accessibility standards are preserved
+
+## Files to Always Check
+
+- `packages/template-retail-react-app/app/theme/components/project/header.js`
+- `packages/template-retail-react-app/app/theme/foundations/list-menu-styles.js`
+- `packages/template-retail-react-app/app/theme/components/project/list-menu.js`
+- `packages/template-retail-react-app/app/theme/components/project/links-list.js`
+
+This rule ensures typography consistency across the entire navigation system and prevents visual inconsistencies between header and dropdown elements.
