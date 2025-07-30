@@ -2781,10 +2781,10 @@
       "value": "Store Information"
     }
   ],
-  "pickup_or_delivery.label.delivery": [
+  "pickup_or_delivery.label.choose_delivery_option": [
     {
       "type": 0,
-      "value": "Delivery:"
+      "value": "Choose delivery option"
     }
   ],
   "pickup_or_delivery.label.pickup_in_store": [
@@ -3531,6 +3531,12 @@
       "value": "Failed to save address"
     }
   ],
+  "shipping_multi_address.error.submit_failed": [
+    {
+      "type": 0,
+      "value": "Error setting up shipments. Please try again."
+    }
+  ],
   "shipping_multi_address.format.address_line_2": [
     {
       "type": 1,
@@ -3590,7 +3596,7 @@
   "shipping_multi_address.submit.loading": [
     {
       "type": 0,
-      "value": "Saving address..."
+      "value": "Setting up shipments..."
     }
   ],
   "shipping_multi_address.success.address_saved": [
@@ -3665,6 +3671,12 @@
     {
       "type": 0,
       "value": " to proceed."
+    }
+  ],
+  "store_display.button.change_store": [
+    {
+      "type": 0,
+      "value": "Change Store"
     }
   ],
   "store_display.format.address_line_2": [

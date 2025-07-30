@@ -18,8 +18,6 @@ jest.mock('@salesforce/retail-react-app/app/components/shared/ui', () => ({
     // eslint-disable-next-line react/prop-types
     Box: ({children, ...props}) => <div {...props}>{children}</div>,
     // eslint-disable-next-line react/prop-types
-    Text: ({children, ...props}) => <span {...props}>{children}</span>,
-    // eslint-disable-next-line react/prop-types
     Select: ({children, onChange, size, ...props}) => (
         <select onChange={onChange} data-size={size} {...props}>
             {children}
@@ -48,24 +46,9 @@ describe('PickupOrDelivery', () => {
         expect(select).toBeInTheDocument()
         expect(select).toHaveValue(DELIVERY_OPTIONS.SHIP)
 
-        // Should not show labels by default
-        expect(screen.queryByText('Delivery:')).not.toBeInTheDocument()
-
         // Should have both options
         expect(screen.getByText('Ship to Address')).toBeInTheDocument()
         expect(screen.getByText('Pick Up in Store')).toBeInTheDocument()
-    })
-
-    test('renders with showLabels=true', () => {
-        renderWithIntl(<PickupOrDelivery showLabels={true} />)
-
-        expect(screen.getByText('Delivery:')).toBeInTheDocument()
-    })
-
-    test('renders with showLabels=false', () => {
-        renderWithIntl(<PickupOrDelivery showLabels={false} />)
-
-        expect(screen.queryByText('Delivery:')).not.toBeInTheDocument()
     })
 
     test('renders with pickup selected', () => {
@@ -75,13 +58,18 @@ describe('PickupOrDelivery', () => {
         expect(select).toHaveValue(DELIVERY_OPTIONS.PICKUP)
     })
 
-    test('passes size prop to Select component', () => {
-        renderWithIntl(<PickupOrDelivery size="md" />)
+    test('has accessibility aria-label', () => {
+        renderWithIntl(<PickupOrDelivery />)
 
         const select = screen.getByTestId('delivery-option-select')
-        expect(select).toBeInTheDocument()
-        // Check that size is passed as a data attribute
-        expect(select).toHaveAttribute('data-size', 'md')
+        expect(select).toHaveAttribute('aria-label', 'Choose delivery option')
+    })
+
+    test('has small size hardcoded', () => {
+        renderWithIntl(<PickupOrDelivery />)
+
+        const select = screen.getByTestId('delivery-option-select')
+        expect(select).toHaveAttribute('data-size', 'sm')
     })
 
     test('disables ship option when isShipDisabled=true', () => {
@@ -171,16 +159,13 @@ describe('PickupOrDelivery', () => {
                 onChange={mockOnChange}
                 isPickupDisabled={true}
                 isShipDisabled={false}
-                showLabels={true}
-                size="lg"
             />
         )
 
         const select = screen.getByTestId('delivery-option-select')
         expect(select).toHaveValue(DELIVERY_OPTIONS.PICKUP)
-        expect(select).toHaveAttribute('data-size', 'lg')
-
-        expect(screen.getByText('Delivery:')).toBeInTheDocument()
+        expect(select).toHaveAttribute('data-size', 'sm')
+        expect(select).toHaveAttribute('aria-label', 'Choose delivery option')
 
         const shipOption = screen.getByRole('option', {name: 'Ship to Address'})
         expect(shipOption).not.toBeDisabled()

@@ -5869,14 +5869,14 @@
       "value": "]"
     }
   ],
-  "pickup_or_delivery.label.delivery": [
+  "pickup_or_delivery.label.choose_delivery_option": [
     {
       "type": 0,
       "value": "["
     },
     {
       "type": 0,
-      "value": "Ḓḗḗŀīṽḗḗřẏ:"
+      "value": "Ƈħǿǿǿǿşḗḗ ḓḗḗŀīṽḗḗřẏ ǿǿƥŧīǿǿƞ"
     },
     {
       "type": 0,
@@ -7459,6 +7459,20 @@
       "value": "]"
     }
   ],
+  "shipping_multi_address.error.submit_failed": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ḗřřǿǿř şḗḗŧŧīƞɠ ŭŭƥ şħīƥḿḗḗƞŧş. Ƥŀḗḗȧȧşḗḗ ŧřẏ ȧȧɠȧȧīƞ."
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
   "shipping_multi_address.format.address_line_2": [
     {
       "type": 0,
@@ -7570,7 +7584,7 @@
     },
     {
       "type": 0,
-      "value": "Şȧȧṽīƞɠ ȧȧḓḓřḗḗşş..."
+      "value": "Şḗḗŧŧīƞɠ ŭŭƥ şħīƥḿḗḗƞŧş..."
     },
     {
       "type": 0,
@@ -7725,6 +7739,20 @@
     {
       "type": 0,
       "value": " ŧǿǿ ƥřǿǿƈḗḗḗḗḓ."
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "store_display.button.change_store": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ƈħȧȧƞɠḗḗ Şŧǿǿřḗḗ"
     },
     {
       "type": 0,

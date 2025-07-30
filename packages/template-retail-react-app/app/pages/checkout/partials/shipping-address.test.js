@@ -101,33 +101,34 @@ jest.mock(
 )
 
 // Mock the multi-shipping component
-jest.mock('@salesforce/retail-react-app/app/pages/checkout/partials/shipping-multi-address', () => {
-    // eslint-disable-next-line react/prop-types
-    function MockShippingMultiAddress({onSubmit}) {
-        const mockAddresses = [
-            {
-                addressId: 'addr-1',
-                address1: '123 Test St',
-                city: 'Test City',
-                countryCode: 'US',
-                firstName: 'John',
-                lastName: 'Doe',
-                phone: '555-555-5555',
-                postalCode: '12345',
-                stateCode: 'CA'
-            }
-        ]
-        return (
-            <div data-testid="multi-shipping" role="button" tabIndex={0}>
-                Mock Multi Shipping
-                <button data-testid="submit-multi-address" onClick={() => onSubmit(mockAddresses)}>
-                    Submit Multi Address
-                </button>
-            </div>
-        )
-    }
-    return MockShippingMultiAddress
-})
+jest.mock(
+    '@salesforce/retail-react-app/app/pages/checkout/partials/shipping-multi-address',
+    () => ({
+        __esModule: true,
+        default: function MockMultiShipping() {
+            const {
+                useCheckout
+                // eslint-disable-next-line @typescript-eslint/no-var-requires
+            } = require('@salesforce/retail-react-app/app/pages/checkout/util/checkout-context')
+
+            const {goToStep, STEPS} = useCheckout()
+
+            return (
+                <div data-testid="multi-shipping" role="button" tabIndex={0}>
+                    Mock Multi Shipping
+                    <button
+                        data-testid="submit-multi-address"
+                        onClick={() => {
+                            goToStep(STEPS.SHIPPING_OPTIONS)
+                        }}
+                    >
+                        Submit Multi Address
+                    </button>
+                </div>
+            )
+        }
+    })
+)
 
 const mockCustomer = {
     customerId: 'customer-1',

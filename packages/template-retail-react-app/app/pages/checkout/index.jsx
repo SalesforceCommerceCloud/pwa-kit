@@ -85,12 +85,13 @@ const Checkout = () => {
         }
     }, [error, step])
 
-    // Remove empty shipments when there are multiple shipments
+    // Remove any empty shipments whenever navigating to the checkout page
+    // Using basketId ensures that the basket is in a valid state before removing empty shipments
     useEffect(() => {
-        if (basket?.shipments?.length > 1 && removeEmptyShipments) {
+        if (basket?.shipments?.length > 1) {
             removeEmptyShipments()
         }
-    }, [basket?.shipments?.length])
+    }, [basket?.basketId])
 
     const submitOrder = async () => {
         setIsLoading(true)
