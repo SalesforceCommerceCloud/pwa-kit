@@ -4,6 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
+import {useMemo} from 'react'
 import {useIntl} from 'react-intl'
 
 export default function useLoginFields({
@@ -13,37 +14,52 @@ export default function useLoginFields({
     },
     prefix = ''
 }) {
-    const {formatMessage} = useIntl()
+    const intl = useIntl()
+    const {formatMessage} = intl
+
+    const messages = useMemo(
+        () => ({
+            emailLabel: formatMessage({
+                id: 'use_login_fields.label.email',
+                defaultMessage: 'Email'
+            }),
+            passwordLabel: formatMessage({
+                id: 'use_login_fields.label.password',
+                defaultMessage: 'Password'
+            }),
+            emailRequired: formatMessage({
+                id: 'use_login_fields.error.required_email',
+                defaultMessage: 'Please enter your email address.'
+            }),
+            passwordRequired: formatMessage({
+                id: 'use_login_fields.error.required_password',
+                defaultMessage: 'Please enter your password.'
+            })
+        }),
+        [intl]
+    )
+
     const fields = {
         email: {
             name: `${prefix}email`,
-            label: formatMessage({defaultMessage: 'Email', id: 'use_login_fields.label.email'}),
+            label: messages.emailLabel,
             placeholder: 'you@email.com',
             defaultValue: '',
             type: 'email',
             autoComplete: 'email',
             rules: {
-                required: formatMessage({
-                    defaultMessage: 'Please enter your email address.',
-                    id: 'use_login_fields.error.required_email'
-                })
+                required: messages.emailRequired
             },
             error: errors?.[`${prefix}email`],
             control
         },
         password: {
             name: `${prefix}password`,
-            label: formatMessage({
-                defaultMessage: 'Password',
-                id: 'use_login_fields.label.password'
-            }),
+            label: messages.passwordLabel,
             defaultValue: '',
             type: 'password',
             rules: {
-                required: formatMessage({
-                    defaultMessage: 'Please enter your password.',
-                    id: 'use_login_fields.error.required_password'
-                })
+                required: messages.passwordRequired
             },
             error: errors?.[`${prefix}password`],
             control

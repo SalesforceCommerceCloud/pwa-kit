@@ -7,12 +7,27 @@
 
 import React, {Fragment} from 'react'
 import PropTypes from 'prop-types'
-import {FormattedMessage} from 'react-intl'
+import {useIntl, defineMessages} from 'react-intl'
 import {Alert, Button, Stack, Text} from '@chakra-ui/react'
 import {AlertIcon, BrandLogo} from '../../components/icons'
 import StandardLogin from '../../components/standard-login'
 import PasswordlessLogin from '../../components/passwordless-login'
 import {noop} from '../../utils/utils'
+
+const messages = defineMessages({
+    welcomeBack: {
+        defaultMessage: 'Welcome Back',
+        id: 'login_form.message.welcome_back'
+    },
+    dontHaveAccount: {
+        defaultMessage: "Don't have an account?",
+        id: 'login_form.message.dont_have_account'
+    },
+    createAccount: {
+        defaultMessage: 'Create account',
+        id: 'login_form.action.create_account'
+    }
+})
 
 const LoginForm = ({
     submitForm,
@@ -23,6 +38,7 @@ const LoginForm = ({
     isSocialEnabled = false,
     idps = []
 }) => {
+    const {formatMessage} = useIntl()
     return (
         <Fragment>
             <Stack
@@ -34,10 +50,7 @@ const LoginForm = ({
             >
                 <BrandLogo width="60px" height="auto" />
                 <Text textAlign="center" fontSize="xl" fontWeight="semibold">
-                    <FormattedMessage
-                        defaultMessage="Welcome Back"
-                        id="login_form.message.welcome_back"
-                    />
+                    {formatMessage(messages.welcomeBack)}
                 </Text>
             </Stack>
             <form
@@ -73,22 +86,14 @@ const LoginForm = ({
                     )}
 
                     <Stack direction="row" gap={1} justifyContent="center">
-                        <Text fontSize="sm">
-                            <FormattedMessage
-                                defaultMessage="Don't have an account?"
-                                id="login_form.message.dont_have_account"
-                            />
-                        </Text>
+                        <Text fontSize="sm">{formatMessage(messages.dontHaveAccount)}</Text>
                         <Button
                             variant="link-blue"
                             size="sm"
                             lineHeight="1"
                             onClick={clickCreateAccount}
                         >
-                            <FormattedMessage
-                                defaultMessage="Create account"
-                                id="login_form.action.create_account"
-                            />
+                            {formatMessage(messages.createAccount)}
                         </Button>
                     </Stack>
                 </Stack>

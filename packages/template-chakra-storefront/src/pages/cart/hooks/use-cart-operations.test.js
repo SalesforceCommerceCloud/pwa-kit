@@ -26,7 +26,10 @@ jest.mock('react-intl', () => ({
     defineMessages: jest.fn(),
     defineMessage: jest.fn(),
     useIntl: jest.fn(() => ({
-        formatMessage: jest.fn((message) => message.defaultMessage || message.id)
+        formatMessage: jest.fn((message, values) => {
+            if (!message) return ''
+            return message.defaultMessage || message.id || ''
+        })
     }))
 }))
 

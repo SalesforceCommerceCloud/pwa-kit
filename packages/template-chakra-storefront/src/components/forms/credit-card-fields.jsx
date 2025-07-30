@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React from 'react'
+import React, {useMemo} from 'react'
 import PropTypes from 'prop-types'
 import ccValidator from 'card-validator'
 import {useIntl} from 'react-intl'
@@ -16,7 +16,8 @@ import Field from '../field'
 import {AmexIcon, DiscoverIcon, MastercardIcon, VisaIcon, InfoIcon} from '../icons'
 
 const CreditCardFields = ({form, prefix = ''}) => {
-    const {formatMessage} = useIntl()
+    const intl = useIntl()
+    const {formatMessage} = intl
     const fields = useCreditCardFields({form, prefix})
 
     // Rerender the fields when we `cardType` changes so the detected
@@ -26,21 +27,35 @@ const CreditCardFields = ({form, prefix = ''}) => {
 
     const CardIcon = getCreditCardIcon(form.getValues().cardType)
 
+    const messages = useMemo(
+        () => ({
+            securityCode: {
+                tooltip: formatMessage({
+                    id: 'credit_card_fields.tool_tip.security_code',
+                    defaultMessage: 'This 3-digit code can be found on the back of your card.',
+                    description: 'Generic credit card security code help text'
+                }),
+                tooltipAmex: formatMessage({
+                    id: 'credit_card_fields.tool_tip.security_code.american_express',
+                    defaultMessage: 'This 4-digit code can be found on the front of your card.',
+                    description: 'American Express security code help text'
+                }),
+                ariaLabel: formatMessage({
+                    id: 'credit_card_fields.tool_tip.security_code_aria_label',
+                    defaultMessage: 'Security code info'
+                })
+            }
+        }),
+        [intl]
+    )
+
     // Note: The ternary should NOT be placed inside a call to `formatMessage`. The message
     // extraction script (`npm run extract-default-translations`) only works when `formatMessage` is
     // used with object literals.
     const securityCodeTooltipLabel =
         cardType === 'american-express'
-            ? formatMessage({
-                  id: 'credit_card_fields.tool_tip.security_code.american_express',
-                  defaultMessage: 'This 4-digit code can be found on the front of your card.',
-                  description: 'American Express security code help text'
-              })
-            : formatMessage({
-                  id: 'credit_card_fields.tool_tip.security_code',
-                  defaultMessage: 'This 3-digit code can be found on the back of your card.',
-                  description: 'Generic credit card security code help text'
-              })
+            ? messages.securityCode.tooltipAmex
+            : messages.securityCode.tooltip
 
     return (
         <Box>
@@ -124,10 +139,7 @@ const CreditCardFields = ({form, prefix = ''}) => {
                                     >
                                         <Box
                                             as="button"
-                                            aria-label={formatMessage({
-                                                id: 'credit_card_fields.tool_tip.security_code_aria_label',
-                                                defaultMessage: 'Security code info'
-                                            })}
+                                            aria-label={messages.securityCode.ariaLabel}
                                         >
                                             <InfoIcon
                                                 boxSize={4}

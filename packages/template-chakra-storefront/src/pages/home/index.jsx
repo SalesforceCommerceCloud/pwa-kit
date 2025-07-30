@@ -5,8 +5,8 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React from 'react'
-import {useIntl, FormattedMessage} from 'react-intl'
+import React, {useMemo} from 'react'
+import {useIntl} from 'react-intl'
 
 // Components
 import {
@@ -47,6 +47,7 @@ import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
  */
 const Home = () => {
     const intl = useIntl()
+    const {formatMessage} = intl
     const {
         pages: {
             home: {productLimit: HOME_PRODUCT_LIMIT, mainCategory: HOME_MAIN_CATEGORY}
@@ -73,6 +74,94 @@ const Home = () => {
         }
     })
 
+    const messages = useMemo(() => {
+        const readDocsText = formatMessage({
+            id: 'home.link.read_docs',
+            defaultMessage: 'Read docs'
+        })
+
+        return {
+            heroTitle: formatMessage({
+                id: 'home.title.react_starter_store',
+                defaultMessage: 'The React PWA Starter Store for Retail'
+            }),
+            getStarted: formatMessage({
+                id: 'home.link.get_started',
+                defaultMessage: 'Get started'
+            }),
+            shopProducts: {
+                title: formatMessage({
+                    id: 'home.heading.shop_products',
+                    defaultMessage: 'Shop Products'
+                }),
+                readDocs: readDocsText,
+                subtitle: formatMessage(
+                    {
+                        id: 'home.description.shop_products',
+                        defaultMessage:
+                            'This section contains content from the catalog. {docLink} on how to replace it.',
+                        description:
+                            '{docLink} is a html button that links the user to https://sfdc.co/business-manager-manage-catalogs'
+                    },
+                    {
+                        docLink: (
+                            <Link
+                                target="_blank"
+                                href={'https://sfdc.co/business-manager-manage-catalogs'}
+                                textDecoration={'none'}
+                                position={'relative'}
+                                css={{
+                                    '&::after': {
+                                        position: 'absolute',
+                                        content: '""',
+                                        height: '2px',
+                                        bottom: '-2px',
+                                        margin: '0 auto',
+                                        left: 0,
+                                        right: 0,
+                                        background: 'gray.700'
+                                    }
+                                }}
+                                _hover={{textDecoration: 'none'}}
+                            >
+                                {readDocsText}
+                            </Link>
+                        )
+                    }
+                )
+            },
+            features: {
+                title: formatMessage({
+                    id: 'home.heading.features',
+                    defaultMessage: 'Features'
+                }),
+                subtitle: formatMessage({
+                    id: 'home.description.features',
+                    defaultMessage:
+                        'Out-of-the-box features so that you focus only on adding enhancements.'
+                })
+            },
+            help: {
+                title: formatMessage({
+                    id: 'home.heading.here_to_help',
+                    defaultMessage: "We're here to help"
+                }),
+                description: formatMessage({
+                    id: 'home.description.here_to_help',
+                    defaultMessage: 'Contact our support staff.'
+                }),
+                descriptionLine2: formatMessage({
+                    id: 'home.description.here_to_help_line_2',
+                    defaultMessage: 'They will get you to the right place.'
+                }),
+                contactUs: formatMessage({
+                    id: 'home.link.contact_us',
+                    defaultMessage: 'Contact Us'
+                })
+            }
+        }
+    }, [intl])
+
     return (
         <Box data-testid="home-page" layerStyle="page">
             <Seo
@@ -82,10 +171,7 @@ const Home = () => {
             />
 
             <Hero
-                title={intl.formatMessage({
-                    defaultMessage: 'The React PWA Starter Store for Retail',
-                    id: 'home.title.react_starter_store'
-                })}
+                title={messages.heroTitle}
                 img={{
                     src: getStaticAssetUrl('img/hero.png', {
                         appExtensionPackageName: '@salesforce/template-chakra-storefront'
@@ -104,10 +190,7 @@ const Home = () => {
                             fontSize={{base: 'sm', md: 'md'}}
                             fontWeight={{base: 'medium', md: 'semibold'}}
                         >
-                            <FormattedMessage
-                                defaultMessage="Get started"
-                                id="home.link.get_started"
-                            />
+                            {messages.getStarted}
                         </Button>
                     </Stack>
                 }
@@ -133,6 +216,7 @@ const Home = () => {
                 >
                     {heroFeatures.map((feature, index) => {
                         const featureMessage = feature.message
+                        const featureTitle = formatMessage(featureMessage.title)
                         return (
                             <Link key={index} target="_blank" href={feature.href}>
                                 <Box
@@ -150,9 +234,7 @@ const Home = () => {
                                         >
                                             {feature.icon}
                                         </Flex>
-                                        <Text fontWeight="700">
-                                            {intl.formatMessage(featureMessage.title)}
-                                        </Text>
+                                        <Text fontWeight="700">{featureTitle}</Text>
                                     </HStack>
                                 </Box>
                             </Link>
@@ -165,47 +247,8 @@ const Home = () => {
                 <Section
                     padding={4}
                     paddingTop={16}
-                    title={intl.formatMessage({
-                        defaultMessage: 'Shop Products',
-                        id: 'home.heading.shop_products'
-                    })}
-                    subtitle={intl.formatMessage(
-                        {
-                            defaultMessage:
-                                'This section contains content from the catalog. {docLink} on how to replace it.',
-                            id: 'home.description.shop_products',
-                            description:
-                                '{docLink} is a html button that links the user to https://sfdc.co/business-manager-manage-catalogs'
-                        },
-                        {
-                            docLink: (
-                                <Link
-                                    target="_blank"
-                                    href={'https://sfdc.co/business-manager-manage-catalogs'}
-                                    textDecoration={'none'}
-                                    position={'relative'}
-                                    css={{
-                                        '&::after': {
-                                            position: 'absolute',
-                                            content: '""',
-                                            height: '2px',
-                                            bottom: '-2px',
-                                            margin: '0 auto',
-                                            left: 0,
-                                            right: 0,
-                                            background: 'gray.700'
-                                        }
-                                    }}
-                                    _hover={{textDecoration: 'none'}}
-                                >
-                                    {intl.formatMessage({
-                                        defaultMessage: 'Read docs',
-                                        id: 'home.link.read_docs'
-                                    })}
-                                </Link>
-                            )
-                        }
-                    )}
+                    title={messages.shopProducts.title}
+                    subtitle={messages.shopProducts.subtitle}
                 >
                     <Stack pt={8} gap={16}>
                         <ProductScroller
@@ -219,20 +262,15 @@ const Home = () => {
             <Section
                 padding={4}
                 paddingTop={32}
-                title={intl.formatMessage({
-                    defaultMessage: 'Features',
-                    id: 'home.heading.features'
-                })}
-                subtitle={intl.formatMessage({
-                    defaultMessage:
-                        'Out-of-the-box features so that you focus only on adding enhancements.',
-                    id: 'home.description.features'
-                })}
+                title={messages.features.title}
+                subtitle={messages.features.subtitle}
             >
                 <Container maxW="6xl" marginTop={10}>
                     <SimpleGrid columns={{base: 1, md: 2, lg: 3}} gap={10}>
                         {features.map((feature, index) => {
                             const featureMessage = feature.message
+                            const featureTitle = formatMessage(featureMessage.title)
+                            const featureText = formatMessage(featureMessage.text)
                             return (
                                 <HStack key={index} align="top">
                                     <VStack align="start">
@@ -246,11 +284,9 @@ const Home = () => {
                                             {feature.icon}
                                         </Flex>
                                         <Text as="h3" color="black" fontWeight="700" fontSize="xl">
-                                            {intl.formatMessage(featureMessage.title)}
+                                            {featureTitle}
                                         </Text>
-                                        <Text color="black">
-                                            {intl.formatMessage(featureMessage.text)}
-                                        </Text>
+                                        <Text color="black">{featureText}</Text>
                                     </VStack>
                                 </HStack>
                             )
@@ -262,25 +298,12 @@ const Home = () => {
             <Section
                 padding={4}
                 paddingTop={32}
-                title={intl.formatMessage({
-                    defaultMessage: "We're here to help",
-                    id: 'home.heading.here_to_help'
-                })}
+                title={messages.help.title}
                 subtitle={
                     <>
-                        <>
-                            {intl.formatMessage({
-                                defaultMessage: 'Contact our support staff.',
-                                id: 'home.description.here_to_help'
-                            })}
-                        </>
+                        <>{messages.help.description}</>
                         <br />
-                        <>
-                            {intl.formatMessage({
-                                defaultMessage: 'They will get you to the right place.',
-                                id: 'home.description.here_to_help_line_2'
-                            })}
-                        </>
+                        <>{messages.help.descriptionLine2}</>
                     </>
                 }
                 actions={
@@ -294,7 +317,7 @@ const Home = () => {
                         fontWeight={{base: 'medium', md: 'semibold'}}
                         _hover={{textDecoration: 'none'}}
                     >
-                        <FormattedMessage defaultMessage="Contact Us" id="home.link.contact_us" />
+                        {messages.help.contactUs}
                     </Button>
                 }
                 maxWidth="xl"

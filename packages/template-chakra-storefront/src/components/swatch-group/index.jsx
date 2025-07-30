@@ -5,10 +5,10 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React, {Children, useCallback, useEffect, useRef, useState} from 'react'
+import React, {Children, useCallback, useEffect, useRef, useState, useMemo} from 'react'
 import PropTypes from 'prop-types'
 import {Box, Flex, HStack, useSlotRecipe} from '@chakra-ui/react'
-import {FormattedMessage} from 'react-intl'
+import {useIntl} from 'react-intl'
 import {noop} from '../../utils/utils'
 
 const DIRECTIONS = {
@@ -27,6 +27,21 @@ const SwatchGroup = (props) => {
     const styles = recipe()
     const [selectedIndex, setSelectedIndex] = useState(0)
     const wrapperRef = useRef(null)
+    const intl = useIntl()
+    const {formatMessage} = intl
+
+    const messages = useMemo(
+        () => ({
+            selectedLabel: formatMessage(
+                {
+                    id: 'swatch_group.selected.label',
+                    defaultMessage: '{label}:'
+                },
+                {label}
+            )
+        }),
+        [intl, label]
+    )
 
     // Handle keyboard navigation.
     const onKeyDown = useCallback(
@@ -89,13 +104,7 @@ const SwatchGroup = (props) => {
             <Flex css={styles.swatchGroup} role="radiogroup" aria-label={ariaLabel || label}>
                 {label && (
                     <HStack css={styles.swatchLabel}>
-                        <Box fontWeight="semibold">
-                            <FormattedMessage
-                                id="swatch_group.selected.label"
-                                defaultMessage="{label}:"
-                                values={{label}}
-                            />
-                        </Box>
+                        <Box fontWeight="semibold">{messages.selectedLabel}</Box>
                         <Box>{displayName}</Box>
                     </HStack>
                 )}
