@@ -4,19 +4,17 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
+/* eslint-disable react/prop-types */
 import React from 'react'
-import PropTypes from 'prop-types'
 import {render} from '@testing-library/react'
 import Seo from './index'
 
-// Mock the getConfig function
 jest.mock('@salesforce/pwa-kit-runtime/utils/ssr-config', () => ({
     getConfig: jest.fn(() => ({
         defaultSiteTitle: 'Test Site'
     }))
 }))
 
-// Mock react-helmet
 jest.mock('react-helmet', () => {
     const MockHelmet = ({children, ...props}) => (
         <div data-testid="helmet" {...props}>
@@ -24,9 +22,6 @@ jest.mock('react-helmet', () => {
         </div>
     )
     MockHelmet.displayName = 'Helmet'
-    MockHelmet.propTypes = {
-        children: PropTypes.node
-    }
     return MockHelmet
 })
 
