@@ -63,7 +63,7 @@ Total files: 97
 - [x] src/pages/account/order-detail.jsx
 - [x] src/pages/account/order-history.jsx
 - [x] src/pages/account/profile.jsx
-- [ ] src/pages/account/wishlist/index.jsx
+- [x] src/pages/account/wishlist/index.jsx
 - [ ] src/pages/account/wishlist/partials/wishlist-primary-action.jsx
 - [ ] src/pages/account/wishlist/partials/wishlist-secondary-button-group.jsx
 - [ ] src/pages/cart/hooks/use-cart-operations.js

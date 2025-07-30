@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React, {useState, useEffect, useRef} from 'react'
+import React, {useState, useEffect, useRef, useMemo} from 'react'
 import {useIntl} from 'react-intl'
 import {Box, Stack, Heading, Flex, Skeleton} from '@chakra-ui/react'
 import {useProducts, useShopperCustomersMutation} from '@salesforce/commerce-sdk-react'
@@ -27,7 +27,8 @@ const numberOfSkeletonItems = 3
 
 const AccountWishlist = () => {
     const navigate = useNavigation()
-    const {formatMessage} = useIntl()
+    const intl = useIntl()
+    const {formatMessage} = intl
     const toast = useToast()
 
     const headingRef = useRef()
@@ -39,7 +40,7 @@ const AccountWishlist = () => {
     const [selectedItem, setSelectedItem] = useState(undefined)
     const [isWishlistItemLoading, setWishlistItemLoading] = useState(false)
 
-    const messages = {
+    const messages = useMemo(() => ({
         title: formatMessage({
             defaultMessage: 'Wishlist',
             id: 'account_wishlist.title.wishlist'
@@ -56,7 +57,7 @@ const AccountWishlist = () => {
             defaultMessage: 'Continue Shopping',
             id: 'account_wishlist.button.continue_shopping'
         })
-    }
+    }), [intl])
 
     const {data: wishListData, isPending: isWishListLoading} = useWishList()
     const productIds = wishListData?.customerProductListItems?.map((item) => item.productId)
