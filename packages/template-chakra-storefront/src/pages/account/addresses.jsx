@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React, {useEffect, useRef, useState} from 'react'
+import React, {useEffect, useRef, useState, useMemo} from 'react'
 import {useIntl} from 'react-intl'
 import PropTypes from 'prop-types'
 
@@ -57,9 +57,10 @@ const BoxArrow = () => {
 }
 
 const ShippingAddressForm = ({form, hasAddresses, selectedAddressId, toggleEdit, submitForm}) => {
-    const {formatMessage} = useIntl()
+    const intl = useIntl()
+    const {formatMessage} = intl
 
-    const messages = {
+    const messages = useMemo(() => ({
         editAddress: formatMessage({
             id: 'shipping_address_form.heading.edit_address',
             defaultMessage: 'Edit Address'
@@ -68,7 +69,7 @@ const ShippingAddressForm = ({form, hasAddresses, selectedAddressId, toggleEdit,
             id: 'shipping_address_form.heading.new_address',
             defaultMessage: 'Add New Address'
         })
-    }
+    }), [intl])
 
     return (
         <Box
@@ -124,11 +125,12 @@ ShippingAddressForm.propTypes = {
 }
 
 const AccountAddresses = () => {
-    const {formatMessage} = useIntl()
+    const intl = useIntl()
+    const {formatMessage} = intl
     const {data: customer, isLoading} = useCurrentCustomer()
     const {isRegistered, addresses, customerId} = customer
 
-    const messages = {
+    const messages = useMemo(() => ({
         addresses: formatMessage({
             id: 'account_addresses.title.addresses',
             defaultMessage: 'Addresses'
@@ -179,7 +181,7 @@ const AccountAddresses = () => {
             },
             {address}
         )
-    }
+    }), [intl])
 
     const addCustomerAddress = useShopperCustomersMutation('createCustomerAddress')
     const updateSavedAddress = useShopperCustomersMutation('updateCustomerAddress')

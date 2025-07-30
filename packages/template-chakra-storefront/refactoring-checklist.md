@@ -58,7 +58,7 @@ Total files: 97
 - [x] src/hooks/use-add-to-cart-modal.js
 - [x] src/hooks/use-dnt-notification.js
 - [x] src/hooks/use-product-view-modal.js
-- [ ] src/page-designer/layouts/carousel/index.jsx
+- [x] src/page-designer/layouts/carousel/index.jsx
 - [ ] src/pages/account/addresses.jsx
 - [ ] src/pages/account/order-detail.jsx
 - [ ] src/pages/account/order-history.jsx
