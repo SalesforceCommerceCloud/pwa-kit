@@ -35,7 +35,8 @@ import UnavailableProductConfirmationModal from '@salesforce/retail-react-app/ap
 import {
     API_ERROR_MESSAGE,
     TOAST_MESSAGE_REMOVED_ITEM_FROM_CART,
-    STORE_LOCATOR_IS_ENABLED
+    STORE_LOCATOR_IS_ENABLED,
+    MULTISHIP_IS_ENABLED
 } from '@salesforce/retail-react-app/app/constants'
 import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
 import LoadingSpinner from '@salesforce/retail-react-app/app/components/loading-spinner'
@@ -56,10 +57,27 @@ const Checkout = () => {
     const isPasswordlessEnabled = !!passwordless?.enabled
     const {removeEmptyShipments} = useMultiship(basket)
 
-    // Only enable BOPIS functionality if the feature toggle is on
-    const isPickupOrder = STORE_LOCATOR_IS_ENABLED
-        ? basket?.shipments[0]?.shippingMethod?.c_storePickupEnabled === true
+    // cart has both pickup and delivery orders
+    const isDeliveryAndPickupOrder =
+        STORE_LOCATOR_IS_ENABLED && MULTISHIP_IS_ENABLED
+            ? basket?.shipments?.some(
+                  (shipment) => shipment?.shippingMethod?.c_storePickupEnabled === true
+              ) &&
+              basket?.shipments?.some((shipment) => !shipment?.shippingMethod?.c_storePickupEnabled)
+            : false
+
+    // Check if there are pickup shipments
+    const hasPickupShipments = STORE_LOCATOR_IS_ENABLED
+        ? basket?.shipments?.some(
+              (shipment) => shipment?.shippingMethod?.c_storePickupEnabled === true
+          )
         : false
+
+    // Only enable BOPIS functionality if the feature toggle is on
+    const isPickupOrderOnly =
+        STORE_LOCATOR_IS_ENABLED && !isDeliveryAndPickupOrder
+            ? basket?.shipments[0]?.shippingMethod?.c_storePickupEnabled === true
+            : false
 
     useEffect(() => {
         if (error || step === 4) {
@@ -116,8 +134,16 @@ const Checkout = () => {
                                 isPasswordlessEnabled={isPasswordlessEnabled}
                                 idps={idps}
                             />
-                            {isPickupOrder ? <PickupAddress /> : <ShippingAddress />}
-                            {!isPickupOrder && <ShippingOptions />}
+
+                            {isPickupOrderOnly ? (
+                                <PickupAddress />
+                            ) : (
+                                <>
+                                    {hasPickupShipments && <PickupAddress />}
+                                    <ShippingAddress />
+                                    <ShippingOptions />
+                                </>
+                            )}
                             <Payment />
 
                             {step === 5 && (

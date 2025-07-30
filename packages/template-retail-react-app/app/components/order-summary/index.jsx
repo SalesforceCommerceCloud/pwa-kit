@@ -80,7 +80,7 @@ const CartItems = ({basket}) => {
                             }
                             return (
                                 <ItemVariantProvider
-                                    key={product.productId}
+                                    key={`order-summary-item-${product.productId}-${product.itemId}`}
                                     index={idx}
                                     variant={variant}
                                 >

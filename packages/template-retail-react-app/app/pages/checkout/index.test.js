@@ -623,3 +623,152 @@ test('Can add address during checkout as a registered customer', async () => {
         expect(screen.getByTestId('sf-toggle-card-step-2-content')).not.toBeEmptyDOMElement()
     })
 })
+
+// multi-pickup
+test('Should show pickup address section for pickup-only orders', async () => {
+    const pickupBasket = {
+        ...scapiBasketWithItem,
+        shipments: [
+            {
+                ...scapiBasketWithItem.shipments[0],
+                shipmentId: 'shipment-1',
+                shippingMethod: {c_storePickupEnabled: true},
+                c_fromStoreId: 'store-1'
+            }
+        ],
+        productItems: [
+            {
+                ...scapiBasketWithItem.productItems[0],
+                shipmentId: 'shipment-1'
+            }
+        ]
+    }
+
+    global.server.use(
+        rest.get('*/baskets', (req, res, ctx) => {
+            const baskets = {
+                baskets: [pickupBasket],
+                total: 1
+            }
+            return res(ctx.json(baskets))
+        }),
+        rest.get('*/stores', (req, res, ctx) => {
+            return res(
+                ctx.json({
+                    data: [
+                        {
+                            id: 'store-1',
+                            name: 'Test Store',
+                            address1: '123 Test St',
+                            city: 'Test City',
+                            stateCode: 'CA',
+                            postalCode: '12345',
+                            countryCode: 'US',
+                            phone: '555-123-4567'
+                        }
+                    ]
+                })
+            )
+        }),
+        rest.delete('*/baskets/:basketId/shipments/:shipmentId', (req, res, ctx) => {
+            return res(ctx.json({success: true}))
+        })
+    )
+
+    const testScenarios = [
+        {isGuest: true, description: 'guest'},
+        {isGuest: false, description: 'registered'}
+    ]
+
+    for (const scenario of testScenarios) {
+        window.history.pushState({}, 'Checkout', createPathWithDefaults('/checkout'))
+        const {user} = renderWithProviders(<WrappedCheckout history={history} />, {
+            wrapperProps: {isGuest: scenario.isGuest, siteAlias: 'uk', appConfig: mockConfig.app}
+        })
+
+        await waitFor(() => {
+            expect(screen.getByTestId('sf-checkout-container')).toBeInTheDocument()
+        })
+        expect(screen.getByText(/pickup address & information/i)).toBeInTheDocument()
+    }
+})
+
+test('Should show both pickup and shipping sections for mixed orders', async () => {
+    const mixedBasket = {
+        ...scapiBasketWithItem,
+        shipments: [
+            {
+                ...scapiBasketWithItem.shipments[0],
+                shipmentId: 'shipment-1',
+                shippingMethod: {c_storePickupEnabled: true},
+                c_fromStoreId: 'store-1'
+            },
+            {
+                ...scapiBasketWithItem.shipments[0],
+                shipmentId: 'shipment-2',
+                shippingMethod: {c_storePickupEnabled: false}
+            }
+        ],
+        productItems: [
+            {
+                ...scapiBasketWithItem.productItems[0],
+                shipmentId: 'shipment-1'
+            },
+            {
+                ...scapiBasketWithItem.productItems[0],
+                itemId: 'item-2',
+                shipmentId: 'shipment-2'
+            }
+        ]
+    }
+
+    global.server.use(
+        rest.get('*/baskets', (req, res, ctx) => {
+            const baskets = {
+                baskets: [mixedBasket],
+                total: 1
+            }
+            return res(ctx.json(baskets))
+        }),
+        rest.get('*/stores', (req, res, ctx) => {
+            return res(
+                ctx.json({
+                    data: [
+                        {
+                            id: 'store-1',
+                            name: 'Test Store',
+                            address1: '123 Test St',
+                            city: 'Test City',
+                            stateCode: 'CA',
+                            postalCode: '12345',
+                            countryCode: 'US',
+                            phone: '555-123-4567'
+                        }
+                    ]
+                })
+            )
+        }),
+        rest.delete('*/baskets/:basketId/shipments/:shipmentId', (req, res, ctx) => {
+            return res(ctx.json({success: true}))
+        })
+    )
+
+    const testScenarios = [
+        {isGuest: true, description: 'guest'},
+        {isGuest: false, description: 'registered'}
+    ]
+
+    for (const scenario of testScenarios) {
+        window.history.pushState({}, 'Checkout', createPathWithDefaults('/checkout'))
+        const {user} = renderWithProviders(<WrappedCheckout history={history} />, {
+            wrapperProps: {isGuest: scenario.isGuest, siteAlias: 'uk', appConfig: mockConfig.app}
+        })
+
+        await waitFor(() => {
+            expect(screen.getByTestId('sf-checkout-container')).toBeInTheDocument()
+        })
+
+        expect(screen.getByText(/pickup address & information/i)).toBeInTheDocument()
+        expect(screen.getAllByText(/shipping address/i).length).toBeGreaterThan(0)
+    }
+})

@@ -1045,6 +1045,16 @@
       "value": "Payment"
     }
   ],
+  "checkout_product_item.label.quantity_static": [
+    {
+      "type": 0,
+      "value": "Qty: "
+    },
+    {
+      "type": 1,
+      "value": "quantity"
+    }
+  ],
   "colorRefinements.label.hitCount": [
     {
       "type": 1,
@@ -2763,10 +2773,22 @@
       "value": "This is a secure SSL encrypted payment."
     }
   ],
+  "pickup_address.bonus_products.title": [
+    {
+      "type": 0,
+      "value": "Bonus Items"
+    }
+  ],
   "pickup_address.button.continue_to_payment": [
     {
       "type": 0,
       "value": "Continue to Payment"
+    }
+  ],
+  "pickup_address.button.continue_to_shipping_address": [
+    {
+      "type": 0,
+      "value": "Continue to Shipping Address"
     }
   ],
   "pickup_address.title.pickup_address": [
