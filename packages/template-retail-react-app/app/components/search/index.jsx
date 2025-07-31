@@ -61,14 +61,16 @@ const formatSuggestions = (searchSuggestions, intl) => {
             // Retrieve product badges
             const labelsMap = new Map()
             badgeDetails.forEach((item) => {
-                if (
-                    item.propertyName &&
-                    typeof product[item.propertyName] === 'boolean' &&
-                    product[item.propertyName] === true
-                ) {
-                    labelsMap.set(intl.formatMessage(item.label), item.color)
-                } else if (item.propertyName && product[item.propertyName]) {
-                    labelsMap.set(product[item.propertyName], item.color)
+                if (item.propertyName) {
+                    // Currently only boolean and string are supported
+                    if (
+                        typeof product[item.propertyName] === 'boolean' &&
+                        product[item.propertyName] === true
+                    ) {
+                        labelsMap.set(intl.formatMessage(item.label), item.color)
+                    } else if (typeof product[item.propertyName] === 'string') {
+                        labelsMap.set(product[item.propertyName], item.color)
+                    }
                 }
             })
 
