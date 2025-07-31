@@ -271,23 +271,6 @@ const ShippingMultiAddress = ({
         )
     }
 
-    // Handle guest user
-    if (customer && customer.isGuest) {
-        return (
-            <Center p={8} textAlign="center" color="gray.500">
-                <VStack spacing={4}>
-                    <Text fontSize="lg" fontWeight="medium">
-                        {formatMessage({
-                            id: 'shipping_multi_address.guest_user.message',
-                            defaultMessage:
-                                'Guest users cannot use multi-address shipping. Please sign in to continue.'
-                        })}
-                    </Text>
-                </VStack>
-            </Center>
-        )
-    }
-
     // Show loading message when loading
     if (isLoading) {
         return (
