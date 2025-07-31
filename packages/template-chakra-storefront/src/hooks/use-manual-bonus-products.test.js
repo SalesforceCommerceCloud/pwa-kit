@@ -31,7 +31,9 @@ describe('useManualBonusProducts', () => {
                 removeManualBonusProductCollection,
                 clearAllManualBonusProductCollections,
                 detectNewlyAddedBonusProducts,
-                analyzeQualifyingProductChanges
+                analyzeQualifyingProductChanges,
+                getQualifyingProductItemId,
+                findQualifyingProductIdFromCollections
             } = hookResult.current
 
             expect(manualBonusProductCollections).toBeDefined()
@@ -43,6 +45,8 @@ describe('useManualBonusProducts', () => {
             expect(clearAllManualBonusProductCollections).toBeInstanceOf(Function)
             expect(detectNewlyAddedBonusProducts).toBeInstanceOf(Function)
             expect(analyzeQualifyingProductChanges).toBeInstanceOf(Function)
+            expect(getQualifyingProductItemId).toBeInstanceOf(Function)
+            expect(findQualifyingProductIdFromCollections).toBeInstanceOf(Function)
         })
     })
 
@@ -325,6 +329,475 @@ describe('useManualBonusProducts', () => {
             })
 
             expect(hookResult.current.manualBonusProductCollections).toEqual({})
+        })
+    })
+
+    describe('findQualifyingProductIdFromCollections', () => {
+        test('should find qualifying product ID when bonus product exists in collections', () => {
+            const collections = {
+                'product-123': [
+                    {
+                        itemId: 'bonus-item-1',
+                        productId: 'bonus-product-1',
+                        promotionId: 'promo-1',
+                        bonusDiscountLineItemId: 'bonus-discount-1'
+                    }
+                ]
+            }
+
+            const bonusProduct = {
+                itemId: 'bonus-item-1',
+                productId: 'bonus-product-1',
+                promotionId: 'promo-1'
+            }
+
+            const basket = {
+                productItems: [
+                    {
+                        itemId: 'qualifying-item-456',
+                        productId: 'product-123',
+                        bonusProductLineItem: false
+                    }
+                ]
+            }
+
+            const result = hookResult.current.findQualifyingProductIdFromCollections(
+                bonusProduct,
+                basket,
+                collections
+            )
+            expect(result).toBe('qualifying-item-456')
+        })
+
+        test('should return regularProductId when basket is not provided', () => {
+            const collections = {
+                'product-123': [
+                    {
+                        itemId: 'bonus-item-1',
+                        productId: 'bonus-product-1',
+                        promotionId: 'promo-1'
+                    }
+                ]
+            }
+
+            const bonusProduct = {
+                itemId: 'bonus-item-1',
+                productId: 'bonus-product-1',
+                promotionId: 'promo-1'
+            }
+
+            const result = hookResult.current.findQualifyingProductIdFromCollections(
+                bonusProduct,
+                null,
+                collections
+            )
+            expect(result).toBe('product-123')
+        })
+
+        test('should return null when bonus product not found in collections', () => {
+            const collections = {
+                'product-123': [
+                    {
+                        itemId: 'different-bonus-item',
+                        productId: 'different-bonus-product',
+                        promotionId: 'different-promo'
+                    }
+                ]
+            }
+
+            const bonusProduct = {
+                itemId: 'unknown-bonus-item',
+                productId: 'unknown-bonus-product',
+                promotionId: 'unknown-promo'
+            }
+
+            const result = hookResult.current.findQualifyingProductIdFromCollections(
+                bonusProduct,
+                null,
+                collections
+            )
+            expect(result).toBeNull()
+        })
+
+        test('should match by productId and promotion fields when itemId is not available', () => {
+            const collections = {
+                'product-123': [
+                    {
+                        productId: 'bonus-product-1',
+                        promotionId: 'promo-1',
+                        bonusDiscountLineItemId: 'bonus-discount-1'
+                        // No itemId
+                    }
+                ]
+            }
+
+            const bonusProduct = {
+                productId: 'bonus-product-1',
+                promotionId: 'promo-1',
+                bonusDiscountLineItemId: 'bonus-discount-1'
+                // No itemId
+            }
+
+            const basket = {
+                productItems: [
+                    {
+                        itemId: 'qualifying-item-789',
+                        productId: 'product-123',
+                        bonusProductLineItem: false
+                    }
+                ]
+            }
+
+            const result = hookResult.current.findQualifyingProductIdFromCollections(
+                bonusProduct,
+                basket,
+                collections
+            )
+            expect(result).toBe('qualifying-item-789')
+        })
+
+        test('should handle empty collections', () => {
+            const bonusProduct = {
+                itemId: 'bonus-item-1',
+                productId: 'bonus-product-1'
+            }
+
+            const result = hookResult.current.findQualifyingProductIdFromCollections(
+                bonusProduct,
+                null,
+                {}
+            )
+            expect(result).toBeNull()
+        })
+
+        test('should prefer itemId match over productId match', () => {
+            const collections = {
+                'product-123': [
+                    {
+                        itemId: 'bonus-item-1',
+                        productId: 'bonus-product-1',
+                        promotionId: 'promo-1'
+                    },
+                    {
+                        itemId: 'different-item',
+                        productId: 'bonus-product-1', // Same productId
+                        promotionId: 'promo-1'       // Same promotionId
+                    }
+                ]
+            }
+
+            const bonusProduct = {
+                itemId: 'bonus-item-1',
+                productId: 'bonus-product-1',
+                promotionId: 'promo-1'
+            }
+
+            const basket = {
+                productItems: [
+                    {
+                        itemId: 'qualifying-item-123',
+                        productId: 'product-123',
+                        bonusProductLineItem: false
+                    }
+                ]
+            }
+
+            const result = hookResult.current.findQualifyingProductIdFromCollections(
+                bonusProduct,
+                basket,
+                collections
+            )
+            expect(result).toBe('qualifying-item-123')
+        })
+    })
+
+    describe('getQualifyingProductItemId', () => {
+        test('should return qualifyingProductItemId when it exists on bonus product', () => {
+            const bonusProduct = {
+                itemId: 'bonus-item-1',
+                productId: 'bonus-product-1',
+                qualifyingProductItemId: 'qualifying-item-123',
+                promotionId: 'promo-1'
+            }
+
+            const result = hookResult.current.getQualifyingProductItemId(bonusProduct)
+            expect(result).toBe('qualifying-item-123')
+        })
+
+        test('should fallback to manual collections when qualifyingProductItemId is undefined', () => {
+            const regularProductId = 'product-123'
+            const bonusProducts = [
+                {
+                    itemId: 'bonus-item-1',
+                    productId: 'bonus-product-1',
+                    productName: 'Bonus Product 1',
+                    quantity: 1,
+                    promotionId: 'promo-1',
+                    bonusDiscountLineItemId: 'bonus-discount-1'
+                }
+            ]
+
+            // First create a manual bonus product collection
+            act(() => {
+                hookResult.current.createManualBonusProductCollection(
+                    regularProductId,
+                    bonusProducts
+                )
+            })
+
+            const bonusProduct = {
+                itemId: 'bonus-item-1',
+                productId: 'bonus-product-1',
+                promotionId: 'promo-1',
+                bonusDiscountLineItemId: 'bonus-discount-1'
+                // No qualifyingProductItemId
+            }
+
+            const basket = {
+                productItems: [
+                    {
+                        itemId: 'qualifying-item-456',
+                        productId: 'product-123',
+                        bonusProductLineItem: false,
+                        quantity: 2
+                    }
+                ]
+            }
+
+            const result = hookResult.current.getQualifyingProductItemId(bonusProduct, basket)
+            expect(result).toBe('qualifying-item-456')
+        })
+
+        test('should fallback to manual collections when qualifyingProductItemId is empty string', () => {
+            const regularProductId = 'product-123'
+            const bonusProducts = [
+                {
+                    itemId: 'bonus-item-1',
+                    productId: 'bonus-product-1',
+                    productName: 'Bonus Product 1',
+                    quantity: 1,
+                    promotionId: 'promo-1',
+                    bonusDiscountLineItemId: 'bonus-discount-1'
+                }
+            ]
+
+            // First create a manual bonus product collection
+            act(() => {
+                hookResult.current.createManualBonusProductCollection(
+                    regularProductId,
+                    bonusProducts
+                )
+            })
+
+            const bonusProduct = {
+                itemId: 'bonus-item-1',
+                productId: 'bonus-product-1',
+                promotionId: 'promo-1',
+                bonusDiscountLineItemId: 'bonus-discount-1',
+                qualifyingProductItemId: '' // Empty string
+            }
+
+            const basket = {
+                productItems: [
+                    {
+                        itemId: 'qualifying-item-789',
+                        productId: 'product-123',
+                        bonusProductLineItem: false,
+                        quantity: 1
+                    }
+                ]
+            }
+
+            const result = hookResult.current.getQualifyingProductItemId(bonusProduct, basket)
+            expect(result).toBe('qualifying-item-789')
+        })
+
+        test('should match bonus product by productId and promotion fields when itemId is not available', () => {
+            const regularProductId = 'product-123'
+            const bonusProducts = [
+                {
+                    productId: 'bonus-product-1',
+                    productName: 'Bonus Product 1',
+                    quantity: 1,
+                    promotionId: 'promo-1',
+                    bonusDiscountLineItemId: 'bonus-discount-1'
+                    // No itemId
+                }
+            ]
+
+            // First create a manual bonus product collection
+            act(() => {
+                hookResult.current.createManualBonusProductCollection(
+                    regularProductId,
+                    bonusProducts
+                )
+            })
+
+            const bonusProduct = {
+                productId: 'bonus-product-1',
+                promotionId: 'promo-1',
+                bonusDiscountLineItemId: 'bonus-discount-1'
+                // No itemId or qualifyingProductItemId
+            }
+
+            const basket = {
+                productItems: [
+                    {
+                        itemId: 'qualifying-item-999',
+                        productId: 'product-123',
+                        bonusProductLineItem: false,
+                        quantity: 1
+                    }
+                ]
+            }
+
+            const result = hookResult.current.getQualifyingProductItemId(bonusProduct, basket)
+            expect(result).toBe('qualifying-item-999')
+        })
+
+        test('should return regularProductId when basket is not provided', () => {
+            const regularProductId = 'product-123'
+            const bonusProducts = [
+                {
+                    itemId: 'bonus-item-1',
+                    productId: 'bonus-product-1',
+                    productName: 'Bonus Product 1',
+                    quantity: 1,
+                    promotionId: 'promo-1'
+                }
+            ]
+
+            // First create a manual bonus product collection
+            act(() => {
+                hookResult.current.createManualBonusProductCollection(
+                    regularProductId,
+                    bonusProducts
+                )
+            })
+
+            const bonusProduct = {
+                itemId: 'bonus-item-1',
+                productId: 'bonus-product-1',
+                promotionId: 'promo-1'
+                // No qualifyingProductItemId
+            }
+
+            const result = hookResult.current.getQualifyingProductItemId(bonusProduct)
+            expect(result).toBe('product-123')
+        })
+
+        test('should return null when bonus product is not found in collections', () => {
+            const bonusProduct = {
+                itemId: 'unknown-bonus-item',
+                productId: 'unknown-bonus-product',
+                promotionId: 'unknown-promo'
+                // No qualifyingProductItemId
+            }
+
+            const result = hookResult.current.getQualifyingProductItemId(bonusProduct)
+            expect(result).toBeNull()
+        })
+
+        test('should return null when bonus product and basket are null/undefined', () => {
+            expect(hookResult.current.getQualifyingProductItemId(null)).toBeNull()
+            expect(hookResult.current.getQualifyingProductItemId(undefined)).toBeNull()
+        })
+
+        test('should handle multiple collections and find correct match', () => {
+            const regularProductId1 = 'product-123'
+            const regularProductId2 = 'product-456'
+            
+            const bonusProducts1 = [
+                {
+                    itemId: 'bonus-item-1',
+                    productId: 'bonus-product-1',
+                    promotionId: 'promo-1'
+                }
+            ]
+            
+            const bonusProducts2 = [
+                {
+                    itemId: 'bonus-item-2',
+                    productId: 'bonus-product-2',
+                    promotionId: 'promo-2'
+                }
+            ]
+
+            // Create multiple collections
+            act(() => {
+                hookResult.current.createManualBonusProductCollection(
+                    regularProductId1,
+                    bonusProducts1
+                )
+                hookResult.current.createManualBonusProductCollection(
+                    regularProductId2,
+                    bonusProducts2
+                )
+            })
+
+            const bonusProduct = {
+                itemId: 'bonus-item-2',
+                productId: 'bonus-product-2',
+                promotionId: 'promo-2'
+                // No qualifyingProductItemId
+            }
+
+            const basket = {
+                productItems: [
+                    {
+                        itemId: 'qualifying-item-123',
+                        productId: 'product-123',
+                        bonusProductLineItem: false
+                    },
+                    {
+                        itemId: 'qualifying-item-456',
+                        productId: 'product-456',
+                        bonusProductLineItem: false
+                    }
+                ]
+            }
+
+            const result = hookResult.current.getQualifyingProductItemId(bonusProduct, basket)
+            expect(result).toBe('qualifying-item-456')
+        })
+
+        test('should return null when qualifying product is not found in basket', () => {
+            const regularProductId = 'product-123'
+            const bonusProducts = [
+                {
+                    itemId: 'bonus-item-1',
+                    productId: 'bonus-product-1',
+                    promotionId: 'promo-1'
+                }
+            ]
+
+            // First create a manual bonus product collection
+            act(() => {
+                hookResult.current.createManualBonusProductCollection(
+                    regularProductId,
+                    bonusProducts
+                )
+            })
+
+            const bonusProduct = {
+                itemId: 'bonus-item-1',
+                productId: 'bonus-product-1',
+                promotionId: 'promo-1'
+                // No qualifyingProductItemId
+            }
+
+            const basket = {
+                productItems: [
+                    {
+                        itemId: 'different-item-999',
+                        productId: 'different-product-999',
+                        bonusProductLineItem: false
+                    }
+                ]
+            }
+
+            const result = hookResult.current.getQualifyingProductItemId(bonusProduct, basket)
+            expect(result).toBe('product-123') // Falls back to regularProductId
         })
     })
 

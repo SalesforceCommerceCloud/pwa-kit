@@ -257,6 +257,74 @@ export const useManualBonusProducts = (basket = null, isPending = false, isRegis
     )
 
     /**
+     * Finds qualifying product ID from manual bonus product collections
+     * @param {Object} bonusProduct - The bonus product to find the qualifying product item ID for
+     * @param {Object} basket - Current basket state (optional, for additional lookup)
+     * @param {Object} collections - Manual bonus product collections to search through
+     * @returns {string|null} The qualifying product item ID, or null if not found
+     */
+    const findQualifyingProductIdFromCollections = useCallback(
+        (bonusProduct, basket = null, collections = {}) => {
+            // Search through manual bonus product collections
+            for (const [regularProductId, bonusProducts] of Object.entries(collections)) {
+                const foundBonusProduct = bonusProducts.find(
+                    (collectionBonusProduct) => {
+                        // Match by itemId if available
+                        if (bonusProduct.itemId && collectionBonusProduct.itemId) {
+                            return collectionBonusProduct.itemId === bonusProduct.itemId
+                        }
+                        // Otherwise match by productId and other identifying fields
+                        return (
+                            collectionBonusProduct.productId === bonusProduct.productId &&
+                            collectionBonusProduct.promotionId === bonusProduct.promotionId &&
+                            collectionBonusProduct.bonusDiscountLineItemId === bonusProduct.bonusDiscountLineItemId
+                        )
+                    }
+                )
+
+                if (foundBonusProduct) {
+                    // Find the corresponding qualifying product item in the basket
+                    if (basket?.productItems) {
+                        const qualifyingProductItem = basket.productItems.find(
+                            (item) => 
+                                item.productId === regularProductId && 
+                                !item.bonusProductLineItem
+                        )
+                        if (qualifyingProductItem) {
+                            return qualifyingProductItem.itemId
+                        }
+                    }
+                    
+                    // If basket is not available, return the regularProductId as fallback
+                    return regularProductId
+                }
+            }
+
+            return null
+        },
+        []
+    )
+
+    /**
+     * Gets the qualifying product item ID for a bonus product, with fallback to manual collections
+     * @param {Object} bonusProduct - The bonus product to find the qualifying product item ID for
+     * @param {Object} basket - Current basket state (optional, for additional lookup)
+     * @returns {string|null} The qualifying product item ID, or null if not found
+     */
+    const getQualifyingProductItemId = useCallback(
+        (bonusProduct, basket = null) => {
+            // First check if the bonus product already has a qualifyingProductItemId
+            if (bonusProduct?.qualifyingProductItemId) {
+                return bonusProduct.qualifyingProductItemId
+            }
+
+            // Fallback: search through manual bonus product collections
+            return findQualifyingProductIdFromCollections(bonusProduct, basket, manualBonusProductCollections)
+        },
+        [manualBonusProductCollections, findQualifyingProductIdFromCollections]
+    )
+
+    /**
      * Analyzes changes in qualifying products between before and after basket states
      * @param {Object} beforeBasket - Basket state before changes
      * @param {Object} afterBasket - Basket state after changes
@@ -390,6 +458,8 @@ export const useManualBonusProducts = (basket = null, isPending = false, isRegis
         removeManualBonusProductCollection,
         clearAllManualBonusProductCollections,
         detectNewlyAddedBonusProducts,
-        analyzeQualifyingProductChanges
+        analyzeQualifyingProductChanges,
+        getQualifyingProductItemId,
+        findQualifyingProductIdFromCollections
     }
 }
