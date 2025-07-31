@@ -8,7 +8,7 @@ An MCP server that brings AI-assisted coding to **PWA Kit** storefront app devel
 
 It allows AI agents to query context-aware services like this server to help developers build better software, faster.
 
-👉 **[Read more at modelcontext.org](https://modelcontext.org)**
+👉 **[Read more at modelcontextprotocol.io](https://modelcontextprotocol.io/)**
 
 
 ## 🧰 Features
