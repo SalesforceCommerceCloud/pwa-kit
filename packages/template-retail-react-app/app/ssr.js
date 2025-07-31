@@ -53,7 +53,7 @@ const options = {
     // Set this to false if using a SLAS public client
     // When setting this to true, make sure to also set the PWA_KIT_SLAS_CLIENT_SECRET
     // environment variable as this endpoint will return HTTP 501 if it is not set
-    useSLASPrivateClient: true,
+    useSLASPrivateClient: false,
 
     // If you wish to use additional SLAS endpoints that require private clients,
     // customize this regex to include the additional endpoints the custom SLAS
@@ -209,8 +209,6 @@ async function sendMagicLinkEmail(req, res, landingPath, emailTemplate, redirect
     if (landingPath === config.app.login?.passwordless?.landingPath && redirectUrl) {
         magicLink += `&redirect_url=${encodeURIComponent(redirectUrl)}`
     }
-
-    console.log(magicLink)
 
     // Call the emailLink function to send an email with the magic link using Marketing Cloud
     const emailLinkResponse = await emailLink(email_id, emailTemplate, magicLink)
