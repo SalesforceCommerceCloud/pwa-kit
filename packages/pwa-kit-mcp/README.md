@@ -15,7 +15,7 @@ It allows AI agents to query context-aware services like this server to help dev
 
 The PWA Kit MCP Server offers the following intelligent tools tailored to Salesforce Commerce Cloud PWA development:
 
-* **`create_app_guidelines`**
+* **`create_app_guidelines`**:
   Guides agents and developers through creating a new PWA Kit project with `@salesforce/pwa-kit-create-app`.
 
 * **`create_new_sample_component`**:
