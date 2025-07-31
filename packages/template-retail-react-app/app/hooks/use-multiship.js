@@ -269,6 +269,15 @@ export const useMultiship = (basket) => {
      * @returns {boolean} True if addresses match
      */
     const areAddressesEqual = (address1, address2) => {
+        // Add debugging
+        console.log('areAddressesEqual called with:', { address1, address2 })
+        
+        // Check for undefined addresses
+        if (!address1 || !address2) {
+            console.log('One or both addresses are undefined/null')
+            return false
+        }
+        
         // Normalize falsey values (null, undefined, empty string)
         const normalize = (value) => (!value ? '' : value)
 
@@ -318,7 +327,12 @@ export const useMultiship = (basket) => {
             }
 
             // Check if shipment has a shipping address that matches
-            return shipment.shippingAddress && areAddressesEqual(shipment.shippingAddress, address)
+            // Skip shipments without shipping addresses
+            if (!shipment.shippingAddress) {
+                return false
+            }
+            
+            return areAddressesEqual(shipment.shippingAddress, address)
         })
         return foundShipment?.shipmentId
     }

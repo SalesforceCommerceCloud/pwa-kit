@@ -131,7 +131,8 @@ const ShippingMultiAddress = ({
     submitButtonLabel,
     addNewAddressLabel,
     noItemsInBasketMessage,
-    deliveryAddressLabel
+    deliveryAddressLabel,
+    onProceedSuccess
 }) => {
     const {formatMessage} = useIntl()
     const {currency} = useCurrency()
@@ -143,6 +144,8 @@ const ShippingMultiAddress = ({
         moveItemsToDeliveryShipment,
         removeEmptyShipments
     } = useMultiship(basket)
+    
+
 
     const productIds = basket?.productItems?.map((item) => item.productId).join(',')
     const {
@@ -168,26 +171,96 @@ const ShippingMultiAddress = ({
         refetch: refetchCustomer,
         isLoading: customerLoading
     } = useCurrentCustomer()
-    const addresses = customer?.addresses || []
+    
+    // Get addresses from customer profile for registered users, or use memory storage for guests
+    const customerAddresses = customer?.addresses || []
+    
+    // Memory storage for guest user addresses - persist in sessionStorage
+    const [guestAddresses, setGuestAddresses] = useState(() => {
+        const saved = sessionStorage.getItem('pwa-kit-multiship-guest-addresses')
+        return saved ? JSON.parse(saved) : []
+    })
+    
+    // Persist guest addresses to sessionStorage whenever they change
+    useEffect(() => {
+        if (customer?.isGuest) {
+            sessionStorage.setItem('pwa-kit-multiship-guest-addresses', JSON.stringify(guestAddresses))
+        }
+    }, [guestAddresses, customer?.isGuest])
+    
+    // Check if there's a previously saved address from the single address flow
+    const existingBasketAddress = basket?.shipments?.[0]?.shippingAddress
+    
+    // Convert basket address to our address format if it exists
+    const basketAddress = existingBasketAddress ? {
+        addressId: 'basket-address',
+        address1: existingBasketAddress.address1,
+        city: existingBasketAddress.city,
+        countryCode: existingBasketAddress.countryCode,
+        firstName: existingBasketAddress.firstName,
+        lastName: existingBasketAddress.lastName,
+        phone: existingBasketAddress.phone,
+        postalCode: existingBasketAddress.postalCode,
+        stateCode: existingBasketAddress.stateCode,
+        preferred: true // Mark as preferred since it was previously selected
+    } : null
+    
+    // Use customer addresses for registered users, guest addresses for guest users
+    // Include basket address if it exists
+    const baseAddresses = customer?.isGuest ? guestAddresses : customerAddresses
+    const addresses = basketAddress ? [basketAddress, ...baseAddresses] : baseAddresses
 
-    // Initialize selected addresses with default addresses
-    const [selectedAddresses, setSelectedAddresses] = useState({})
+    // Initialize selected addresses with default addresses - persist in sessionStorage
+    const [selectedAddresses, setSelectedAddresses] = useState(() => {
+        const saved = sessionStorage.getItem('pwa-kit-multiship-selected-addresses')
+        return saved ? JSON.parse(saved) : {}
+    })
+    
+    // Persist selected addresses to sessionStorage whenever they change
+    useEffect(() => {
+        sessionStorage.setItem('pwa-kit-multiship-selected-addresses', JSON.stringify(selectedAddresses))
+    }, [selectedAddresses])
 
     // Update selected addresses when customer data changes
     useEffect(() => {
-        if (customer && basket?.productItems) {
+        if (basket?.productItems && addresses.length > 0) {
             const initialSelected = {}
+            const existingSelections = Object.values(selectedAddresses)
+            
             basket.productItems.forEach((item) => {
                 const addressKey = item.itemId
-                // Find preferred address or use first address as default
-                const defaultAddress = addresses.find((addr) => addr.preferred) || addresses[0]
-                if (defaultAddress) {
-                    initialSelected[addressKey] = defaultAddress.addressId
+                // Only set default if no address is currently selected for this item
+                if (!selectedAddresses[addressKey]) {
+                    // For new products, try to use the same address as existing products
+                    // If no existing selections, use preferred address or first address
+                    let defaultAddress = null
+                    
+                    if (existingSelections.length > 0) {
+                        // Use the first existing selection as default for new products
+                        const firstExistingAddressId = existingSelections[0]
+                        defaultAddress = addresses.find(addr => addr.addressId === firstExistingAddressId)
+                    }
+                    
+                    // If no existing selections or address not found, use preferred or first address
+                    if (!defaultAddress) {
+                        defaultAddress = addresses.find((addr) => addr.preferred) || addresses[0]
+                    }
+                    
+                    if (defaultAddress) {
+                        initialSelected[addressKey] = defaultAddress.addressId
+                    }
                 }
             })
-            setSelectedAddresses(initialSelected)
+            // Only update if we have new selections to make
+            if (Object.keys(initialSelected).length > 0) {
+                setSelectedAddresses(prev => ({...prev, ...initialSelected}))
+            }
         }
     }, [customer, basket?.productItems, addresses])
+
+    // For guest users, we don't need to wait for customer data to load
+    const isGuestUser = customer?.isGuest
+    const shouldShowLoading = isGuestUser ? productsLoading : (customerLoading || productsLoading)
 
     const [showAddAddressForm, setShowAddAddressForm] = useState({})
 
@@ -213,7 +286,7 @@ const ShippingMultiAddress = ({
         Object.keys(showAddAddressForm).filter((key) => showAddAddressForm[key])?.length > 0
 
     // Unified loading state - check if either customer or products are loading
-    const isLoading = customerLoading || productsLoading
+    const isLoading = shouldShowLoading
 
     if (!basket?.productItems?.length) {
         return (
@@ -263,23 +336,6 @@ const ShippingMultiAddress = ({
         )
     }
 
-    // Handle guest user
-    if (customer && customer.isGuest) {
-        return (
-            <Center p={8} textAlign="center" color="gray.500">
-                <VStack spacing={4}>
-                    <Text fontSize="lg" fontWeight="medium">
-                        {formatMessage({
-                            id: 'shipping_multi_address.guest_user.message',
-                            defaultMessage:
-                                'Guest users cannot use multi-address shipping. Please sign in to continue.'
-                        })}
-                    </Text>
-                </VStack>
-            </Center>
-        )
-    }
-
     // Show loading message when loading
     if (isLoading) {
         return (
@@ -313,30 +369,55 @@ const ShippingMultiAddress = ({
                 addressId: nanoid()
             }
 
-            const createdAddress = await createCustomerAddress.mutateAsync({
-                body: newAddress,
-                parameters: {customerId: customer.customerId}
-            })
+            if (customer?.isGuest) {
+                // For guest users, store address in memory
+                const updatedGuestAddresses = [...guestAddresses, newAddress]
+                setGuestAddresses(updatedGuestAddresses)
+                
+                setShowAddAddressForm((prev) => ({...prev, [addressKey]: false}))
+                form.reset()
+                form.clearErrors()
 
-            setShowAddAddressForm((prev) => ({...prev, [addressKey]: false}))
-            form.reset()
+                // Automatically assign the new address to the product that triggered the form
+                setSelectedAddresses((prev) => ({
+                    ...prev,
+                    [addressKey]: newAddress.addressId
+                }))
 
-            form.clearErrors()
+                showToast({
+                    title: formatMessage({
+                        id: 'shipping_multi_address.success.address_saved',
+                        defaultMessage: 'Address saved successfully'
+                    }),
+                    status: 'success'
+                })
+            } else {
+                // For registered users, save to customer profile
+                const createdAddress = await createCustomerAddress.mutateAsync({
+                    body: newAddress,
+                    parameters: {customerId: customer.customerId}
+                })
 
-            await refetchCustomer()
+                setShowAddAddressForm((prev) => ({...prev, [addressKey]: false}))
+                form.reset()
+                form.clearErrors()
 
-            setSelectedAddresses((prev) => ({
-                ...prev,
-                [addressKey]: createdAddress.addressId
-            }))
+                await refetchCustomer()
 
-            showToast({
-                title: formatMessage({
-                    id: 'shipping_multi_address.success.address_saved',
-                    defaultMessage: 'Address saved successfully'
-                }),
-                status: 'success'
-            })
+                // Automatically assign the new address to the product that triggered the form
+                setSelectedAddresses((prev) => ({
+                    ...prev,
+                    [addressKey]: createdAddress.addressId
+                }))
+
+                showToast({
+                    title: formatMessage({
+                        id: 'shipping_multi_address.success.address_saved',
+                        defaultMessage: 'Address saved successfully'
+                    }),
+                    status: 'success'
+                })
+            }
         } catch (error) {
             showToast({
                 title: formatMessage({
@@ -351,6 +432,9 @@ const ShippingMultiAddress = ({
     const handleSubmit = async () => {
         setIsSubmitting(true)
         try {
+            console.log('handleSubmit - selectedAddresses:', selectedAddresses)
+            console.log('handleSubmit - addresses:', addresses)
+            
             // Based on the shopper's selected addresses, create a map of unique addressIds and their associated items
             const addressToItemsMap = {}
 
@@ -358,6 +442,15 @@ const ShippingMultiAddress = ({
                 // Defaults to the first address if no address is selected
                 const addressId = selectedAddresses[item.itemId] || addresses[0]?.addressId
                 const address = addresses.find((addr) => addr.addressId === addressId)
+                
+                console.log('Processing item:', item.itemId, 'addressId:', addressId, 'address:', address)
+                console.log('Available addresses:', addresses)
+
+                // Skip if no address found
+                if (!address) {
+                    console.error('No address found for item:', item.itemId, 'addressId:', addressId)
+                    return
+                }
 
                 // If there is an existing shipment with the same address, use it in the next step
                 const shipmentIdWithSameAddress = findDeliveryShipmentWithSameAddress(
@@ -374,29 +467,66 @@ const ShippingMultiAddress = ({
                 }
                 addressToItemsMap[addressId].items.push(item)
             })
+            
+
 
             for (const [addressId, data] of Object.entries(addressToItemsMap)) {
                 const {address, items, shipmentId: existingShipmentId} = data
+                
+                console.log('Processing addressId:', addressId, 'data:', data)
 
                 // For each unique address, if there is no existing shipment with the same address, create a new one.
                 if (!existingShipmentId) {
+                    console.log('Creating new shipment for address:', address)
                     addressToItemsMap[addressId].shipmentId =
                         await createNewDeliveryShipmentWithAddress(basket, address)
+                    console.log('Created shipment ID:', addressToItemsMap[addressId].shipmentId)
+                } else {
+                    console.log('Using existing shipment ID:', existingShipmentId)
                 }
 
                 // Move items to the new shipment if needed.
                 const targetShipmentId = addressToItemsMap[addressId].shipmentId
                 const itemsToMove = items.filter((item) => item.shipmentId !== targetShipmentId)
+                console.log('Items to move:', itemsToMove, 'targetShipmentId:', targetShipmentId)
+                
                 if (itemsToMove.length > 0) {
-                    await moveItemsToDeliveryShipment(itemsToMove, targetShipmentId)
+                    // Get default inventory ID from the first item that has one, or from basket items
+                    const defaultInventoryId = itemsToMove.find(item => item.inventoryId)?.inventoryId || 
+                        basket.productItems.find(item => item.inventoryId)?.inventoryId || 
+                        'default'
+                    console.log('Moving items with defaultInventoryId:', defaultInventoryId)
+                    await moveItemsToDeliveryShipment(itemsToMove, targetShipmentId, defaultInventoryId)
+                    console.log('Successfully moved items to shipment:', targetShipmentId)
                 }
             }
 
             // Remove any empty shipments. TODO: Need to handle swapping over addresses if default is empty
             await removeEmptyShipments()
 
+            // Mark multi-shipping as completed after successful proceed
+            sessionStorage.setItem('pwa-kit-multiship-completed', 'true')
+            console.log('Marked multi-shipping as completed')
+            
+            // Call the callback to update parent state
+            if (onProceedSuccess) {
+                onProceedSuccess()
+            }
+
+            console.log('Going to shipping options step:', STEPS.SHIPPING_OPTIONS)
+            console.log('Basket state after multi-shipping:', {
+                shipments: basket.shipments,
+                shippingMethods: basket.shipments?.map(s => s.shippingMethod),
+                hasShippingMethods: basket.shipments?.some(s => s.shippingMethod)
+            })
             goToStep(STEPS.SHIPPING_OPTIONS)
         } catch (error) {
+            console.error('handleSubmit error:', error)
+            console.error('Error details:', {
+                message: error.message,
+                stack: error.stack,
+                response: error.response
+            })
             showToast({
                 title: formatMessage({
                     defaultMessage: 'Error setting up shipments. Please try again.',
