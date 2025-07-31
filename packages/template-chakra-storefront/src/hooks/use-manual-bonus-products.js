@@ -267,34 +267,32 @@ export const useManualBonusProducts = (basket = null, isPending = false, isRegis
         (bonusProduct, basket = null, collections = {}) => {
             // Search through manual bonus product collections
             for (const [regularProductId, bonusProducts] of Object.entries(collections)) {
-                const foundBonusProduct = bonusProducts.find(
-                    (collectionBonusProduct) => {
-                        // Match by itemId if available
-                        if (bonusProduct.itemId && collectionBonusProduct.itemId) {
-                            return collectionBonusProduct.itemId === bonusProduct.itemId
-                        }
-                        // Otherwise match by productId and other identifying fields
-                        return (
-                            collectionBonusProduct.productId === bonusProduct.productId &&
-                            collectionBonusProduct.promotionId === bonusProduct.promotionId &&
-                            collectionBonusProduct.bonusDiscountLineItemId === bonusProduct.bonusDiscountLineItemId
-                        )
+                const foundBonusProduct = bonusProducts.find((collectionBonusProduct) => {
+                    // Match by itemId if available
+                    if (bonusProduct.itemId && collectionBonusProduct.itemId) {
+                        return collectionBonusProduct.itemId === bonusProduct.itemId
                     }
-                )
+                    // Otherwise match by productId and other identifying fields
+                    return (
+                        collectionBonusProduct.productId === bonusProduct.productId &&
+                        collectionBonusProduct.promotionId === bonusProduct.promotionId &&
+                        collectionBonusProduct.bonusDiscountLineItemId ===
+                            bonusProduct.bonusDiscountLineItemId
+                    )
+                })
 
                 if (foundBonusProduct) {
                     // Find the corresponding qualifying product item in the basket
                     if (basket?.productItems) {
                         const qualifyingProductItem = basket.productItems.find(
-                            (item) => 
-                                item.productId === regularProductId && 
-                                !item.bonusProductLineItem
+                            (item) =>
+                                item.productId === regularProductId && !item.bonusProductLineItem
                         )
                         if (qualifyingProductItem) {
                             return qualifyingProductItem.itemId
                         }
                     }
-                    
+
                     // If basket is not available, return the regularProductId as fallback
                     return regularProductId
                 }
@@ -319,7 +317,11 @@ export const useManualBonusProducts = (basket = null, isPending = false, isRegis
             }
 
             // Fallback: search through manual bonus product collections
-            return findQualifyingProductIdFromCollections(bonusProduct, basket, manualBonusProductCollections)
+            return findQualifyingProductIdFromCollections(
+                bonusProduct,
+                basket,
+                manualBonusProductCollections
+            )
         },
         [manualBonusProductCollections, findQualifyingProductIdFromCollections]
     )

@@ -481,7 +481,7 @@ describe('useManualBonusProducts', () => {
                     {
                         itemId: 'different-item',
                         productId: 'bonus-product-1', // Same productId
-                        promotionId: 'promo-1'       // Same promotionId
+                        promotionId: 'promo-1' // Same promotionId
                     }
                 ]
             }
@@ -706,7 +706,7 @@ describe('useManualBonusProducts', () => {
         test('should handle multiple collections and find correct match', () => {
             const regularProductId1 = 'product-123'
             const regularProductId2 = 'product-456'
-            
+
             const bonusProducts1 = [
                 {
                     itemId: 'bonus-item-1',
@@ -714,7 +714,7 @@ describe('useManualBonusProducts', () => {
                     promotionId: 'promo-1'
                 }
             ]
-            
+
             const bonusProducts2 = [
                 {
                     itemId: 'bonus-item-2',
