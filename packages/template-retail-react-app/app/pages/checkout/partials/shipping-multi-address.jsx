@@ -18,6 +18,7 @@ import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-cur
 import {useCurrency} from '@salesforce/retail-react-app/app/hooks'
 import ItemVariantProvider from '@salesforce/retail-react-app/app/components/item-variant'
 import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
+import {getSessionJSONItem, setSessionJSONItem} from '@salesforce/retail-react-app/app/utils/utils'
 
 import AddressFields from '@salesforce/retail-react-app/app/components/forms/address-fields'
 import FormActionButtons from '@salesforce/retail-react-app/app/components/forms/form-action-buttons'
@@ -272,12 +273,38 @@ const ShippingMultiAddress = ({
     }
 
     if (customer && customer.isGuest) {
-        // For guest users, we'll use empty addresses array and manage addresses in session storage
-        const guestAddresses = [] // TODO: Load from session storage
+        // For guest users, manage addresses in session storage
+        const [guestAddresses, setGuestAddresses] = useState([])
         const addresses = guestAddresses
+
+        // Load guest addresses from session storage on mount
+        useEffect(() => {
+            const storedAddresses = getSessionJSONItem('guest_addresses') || []
+            setGuestAddresses(storedAddresses)
+        }, [])
+
+        // Save guest addresses to session storage whenever they change
+        useEffect(() => {
+            if (guestAddresses.length > 0) {
+                setSessionJSONItem('guest_addresses', guestAddresses)
+            }
+        }, [guestAddresses])
 
         // Initialize selected addresses for guest users
         const [selectedAddresses, setSelectedAddresses] = useState({})
+
+        // Load selected addresses from session storage on mount
+        useEffect(() => {
+            const storedSelectedAddresses = getSessionJSONItem('selected_addresses') || {}
+            setSelectedAddresses(storedSelectedAddresses)
+        }, [])
+
+        // Save selected addresses to session storage whenever they change
+        useEffect(() => {
+            if (Object.keys(selectedAddresses).length > 0) {
+                setSessionJSONItem('selected_addresses', selectedAddresses)
+            }
+        }, [selectedAddresses])
 
         // Update selected addresses when delivery items change
         useEffect(() => {
@@ -285,13 +312,19 @@ const ShippingMultiAddress = ({
                 const initialSelected = {}
                 deliveryItems.forEach((item) => {
                     const addressKey = item.itemId
-                    // Use first address as default for guest users
-                    const defaultAddress = addresses[0]
-                    if (defaultAddress) {
-                        initialSelected[addressKey] = defaultAddress.addressId
+                    // Only set default if no address is already selected for this item
+                    if (!selectedAddresses[addressKey]) {
+                        // Use first address as default for guest users
+                        const defaultAddress = addresses[0]
+                        if (defaultAddress) {
+                            initialSelected[addressKey] = defaultAddress.addressId
+                        }
                     }
                 })
-                setSelectedAddresses(initialSelected)
+                // Only update if we have new selections
+                if (Object.keys(initialSelected).length > 0) {
+                    setSelectedAddresses(prev => ({...prev, ...initialSelected}))
+                }
             }
         }, [deliveryItems.length, addresses.length])
 
@@ -335,8 +368,8 @@ const ShippingMultiAddress = ({
                     addressId: nanoid()
                 }
 
-                // TODO: Add to session storage
-                // setGuestAddresses(prev => [...prev, createdAddress])
+                // Add to guest addresses state (which will save to session storage)
+                setGuestAddresses(prev => [...prev, createdAddress])
 
                 setShowAddAddressForm((prev) => ({...prev, [addressKey]: false}))
                 form.reset()
@@ -368,15 +401,64 @@ const ShippingMultiAddress = ({
         const handleSubmit = async () => {
             setIsSubmitting(true)
             try {
-                // TODO: Implement guest multi-shipping submit logic
-                // For now, just proceed to next step
+                // Based on the shopper's selected addresses, create a map of unique addressIds and their associated items
+                const addressToItemsMap = {}
+
+                deliveryItems.forEach((item) => {
+                    // Defaults to the first address if no address is selected
+                    const addressId = selectedAddresses[item.itemId] || addresses[0]?.addressId
+                    const address = addresses.find((addr) => addr.addressId === addressId)
+
+                    if (!address) {
+                        throw new Error('No address available for item')
+                    }
+
+                    // If there is an existing shipment with the same address, use it in the next step
+                    const shipmentIdWithSameAddress = findDeliveryShipmentWithSameAddress(
+                        basket,
+                        address
+                    )
+
+                    if (!addressToItemsMap[addressId]) {
+                        addressToItemsMap[addressId] = {
+                            address: address,
+                            items: [],
+                            shipmentId: shipmentIdWithSameAddress
+                        }
+                    }
+                    addressToItemsMap[addressId].items.push(item)
+                })
+
+                for (const [addressId, data] of Object.entries(addressToItemsMap)) {
+                    const {address, items, shipmentId: existingShipmentId} = data
+
+                    // For each unique address, if there is no existing shipment with the same address, create a new one.
+                    if (!existingShipmentId) {
+                        addressToItemsMap[addressId].shipmentId =
+                            await createNewDeliveryShipmentWithAddress(basket, address)
+                    }
+
+                    // Move items to the new shipment if needed.
+                    const targetShipmentId = addressToItemsMap[addressId].shipmentId
+                    const itemsToMove = items.filter((item) => item.shipmentId !== targetShipmentId)
+                    if (itemsToMove.length > 0) {
+                        await moveItemsToDeliveryShipment(itemsToMove, targetShipmentId)
+                    }
+                }
+
+                // Remove any empty shipments. TODO: Need to handle swapping over addresses if default is empty
+                await removeEmptyShipments()
+
                 goToStep(STEPS.SHIPPING_OPTIONS)
             } catch (error) {
+                // Show specific error message if available, otherwise show generic message
+                const errorMessage = error.message || formatMessage({
+                    defaultMessage: 'Error setting up shipments. Please try again.',
+                    id: 'shipping_multi_address.error.submit_failed'
+                })
+                
                 showToast({
-                    title: formatMessage({
-                        defaultMessage: 'Error setting up shipments. Please try again.',
-                        id: 'shipping_multi_address.error.submit_failed'
-                    }),
+                    title: errorMessage,
                     status: 'error'
                 })
             } finally {
