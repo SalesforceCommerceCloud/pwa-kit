@@ -28,7 +28,7 @@ The PWA Kit MCP Server offers the following intelligent tools tailored to Salesf
   Provides best practices and guidance for building PWA Kit storefronts.
 
 * **`run_site_test`**:
-  Runs performance and accessibility audits on a provided site URL
+  Runs performance and accessibility audits on a provided site URL.
   *Example: `https://pwa-kit.mobify-storefront.com`*
 
 
