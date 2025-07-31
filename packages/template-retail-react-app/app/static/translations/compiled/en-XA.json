@@ -7203,6 +7203,20 @@
       "value": "]"
     }
   ],
+  "shipping_address.action.edit": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ḗḓīŧ"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
   "shipping_address.action.ship_to_one_address": [
     {
       "type": 0,
@@ -7331,6 +7345,34 @@
     {
       "type": 0,
       "value": "Ƞǿǿ īŧḗḗḿş īƞ ƀȧȧşķḗḗŧ."
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "shipping_address.summary.delivering_to_multiple": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ḓḗḗŀīṽḗḗřīƞɠ ŧǿǿ Ḿŭŭŀŧīƥŀḗḗ Ȧḓḓřḗḗşşḗḗş"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "shipping_address.summary.multiple_addresses_description": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ẏǿǿŭŭř īŧḗḗḿş ȧȧřḗḗ ƀḗḗīƞɠ ḓḗḗŀīṽḗḗřḗḗḓ ŧǿǿ ḿŭŭŀŧīƥŀḗḗ ȧȧḓḓřḗḗşşḗḗş. Şḗḗḗḗ ḓḗḗŧȧȧīŀş ƀḗḗŀǿǿẇ"
     },
     {
       "type": 0,
@@ -7561,20 +7603,6 @@
     {
       "type": 1,
       "value": "postalCode"
-    },
-    {
-      "type": 0,
-      "value": "]"
-    }
-  ],
-  "shipping_multi_address.guest_user.message": [
-    {
-      "type": 0,
-      "value": "["
-    },
-    {
-      "type": 0,
-      "value": "Ɠŭŭḗḗşŧ ŭŭşḗḗřş ƈȧȧƞƞǿǿŧ ŭŭşḗḗ ḿŭŭŀŧī-ȧȧḓḓřḗḗşş şħīƥƥīƞɠ. Ƥŀḗḗȧȧşḗḗ şīɠƞ īƞ ŧǿǿ ƈǿǿƞŧīƞŭŭḗḗ."
     },
     {
       "type": 0,

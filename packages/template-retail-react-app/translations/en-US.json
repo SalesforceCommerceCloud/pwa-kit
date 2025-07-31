@@ -1433,6 +1433,9 @@
   "shipping_address.action.deliver_to_multiple_addresses": {
     "defaultMessage": "Deliver to Multiple Addresses"
   },
+  "shipping_address.action.edit": {
+    "defaultMessage": "Edit"
+  },
   "shipping_address.action.ship_to_one_address": {
     "defaultMessage": "Ship Items to One Address"
   },
@@ -1459,6 +1462,12 @@
   },
   "shipping_address.message.no_items_in_basket": {
     "defaultMessage": "No items in basket."
+  },
+  "shipping_address.summary.delivering_to_multiple": {
+    "defaultMessage": "Delivering to Multiple Addresses"
+  },
+  "shipping_address.summary.multiple_addresses_description": {
+    "defaultMessage": "Your items are being delivered to multiple addresses. See details below"
   },
   "shipping_address.title.shipping_address": {
     "defaultMessage": "Shipping Address"
@@ -1504,9 +1513,6 @@
   },
   "shipping_multi_address.format.address_line_2": {
     "defaultMessage": "{city}, {stateCode} {postalCode}"
-  },
-  "shipping_multi_address.guest_user.message": {
-    "defaultMessage": "Guest users cannot use multi-address shipping. Please sign in to continue."
   },
   "shipping_multi_address.image.alt": {
     "defaultMessage": "Product image for {productName}"
