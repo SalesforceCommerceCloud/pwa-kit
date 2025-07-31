@@ -183,21 +183,67 @@ const ShippingMultiAddress = ({
     // Initialize selected addresses with default addresses
     const [selectedAddresses, setSelectedAddresses] = useState({})
 
-    // Update selected addresses when customer data changes
+    // Update selected addresses when customer data changes or when basket shipments exist
     useEffect(() => {
-        if (customer && deliveryItems.length > 0 && addresses.length > 0) {
+        if (customer && basket?.productItems) {
             const initialSelected = {}
-            deliveryItems.forEach((item) => {
-                const addressKey = item.itemId
-                // Find preferred address or use first address as default
-                const defaultAddress = addresses.find((addr) => addr.preferred) || addresses[0]
-                if (defaultAddress) {
-                    initialSelected[addressKey] = defaultAddress.addressId
-                }
-            })
+
+            // If there are existing shipments with addresses, try to match with customer addresses
+            const existingShipments =
+                basket.shipments?.filter((shipment) => shipment.shippingAddress) || []
+
+            if (existingShipments.length > 0) {
+                // Initialize based on existing shipments using item.shipmentId
+                basket.productItems.forEach((item) => {
+                    const addressKey = item.itemId
+                    const shipment = existingShipments.find((s) => s.shipmentId === item.shipmentId)
+
+                    if (shipment && shipment.shippingAddress) {
+                        // Try to find a matching customer address
+                        const matchingAddress = addresses.find(
+                            (addr) =>
+                                addr.firstName === shipment.shippingAddress.firstName &&
+                                addr.lastName === shipment.shippingAddress.lastName &&
+                                addr.address1 === shipment.shippingAddress.address1 &&
+                                addr.city === shipment.shippingAddress.city
+                        )
+
+                        if (matchingAddress) {
+                            initialSelected[addressKey] = matchingAddress.addressId
+                        } else if (addresses.length > 0) {
+                            // Fall back to first customer address if no match found
+                            initialSelected[addressKey] = addresses[0].addressId
+                        }
+                    } else {
+                        // Only set default for items that don't have a shipment assignment
+                        if (addresses.length > 0) {
+                            const defaultAddress =
+                                addresses.find((addr) => addr.preferred) || addresses[0]
+                            if (defaultAddress) {
+                                initialSelected[addressKey] = defaultAddress.addressId
+                            }
+                        }
+                    }
+                })
+            } else if (addresses.length > 0) {
+                // Fall back to customer addresses if no existing shipments
+                basket.productItems.forEach((item) => {
+                    const addressKey = item.itemId
+                    // Find preferred address or use first address as default
+                    const defaultAddress = addresses.find((addr) => addr.preferred) || addresses[0]
+                    if (defaultAddress) {
+                        initialSelected[addressKey] = defaultAddress.addressId
+                    }
+                })
+            }
             setSelectedAddresses(initialSelected)
         }
-    }, [customer?.customerId, deliveryItems.length, addresses.length])
+    }, [
+        customer?.customerId,
+        basket?.productItems?.length,
+        addresses.length,
+        basket?.shipments?.length
+    ])
 
     const [showAddAddressForm, setShowAddAddressForm] = useState({})
 

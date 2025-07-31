@@ -303,9 +303,6 @@
   "checkout_confirmation.label.shipping": {
     "defaultMessage": "Shipping"
   },
-  "checkout_confirmation.label.shipping.strikethrough.price": {
-    "defaultMessage": "Originally {originalPrice}, now {newPrice}"
-  },
   "checkout_confirmation.label.subtotal": {
     "defaultMessage": "Subtotal"
   },
@@ -1440,7 +1437,7 @@
     "defaultMessage": "Ship Items to One Address"
   },
   "shipping_address.button.add_new_address": {
-    "defaultMessage": "+ Add New Address"
+    "defaultMessage": "Add New Address"
   },
   "shipping_address.button.continue_to_shipping": {
     "defaultMessage": "Continue to Shipping Method"
@@ -1462,6 +1459,9 @@
   },
   "shipping_address.message.no_items_in_basket": {
     "defaultMessage": "No items in basket."
+  },
+  "shipping_address.summary.multiple_addresses": {
+    "defaultMessage": "Your items are being delivered to multiple addresses. See details below."
   },
   "shipping_address.title.shipping_address": {
     "defaultMessage": "Shipping Address"
@@ -1538,11 +1538,29 @@
   "shipping_multi_address.success.address_saved": {
     "defaultMessage": "Address saved successfully"
   },
-  "shipping_options.action.send_as_a_gift": {
-    "defaultMessage": "Do you want to send this as a gift?"
-  },
   "shipping_options.button.continue_to_payment": {
     "defaultMessage": "Continue to Payment"
+  },
+  "shipping_options.free": {
+    "defaultMessage": "Free"
+  },
+  "shipping_options.image.alt": {
+    "defaultMessage": "Product image for {productName}"
+  },
+  "shipping_options.label.delivering_to": {
+    "defaultMessage": "Delivering to {name}"
+  },
+  "shipping_options.label.no_method_selected": {
+    "defaultMessage": "No shipping method selected"
+  },
+  "shipping_options.label.total_shipping": {
+    "defaultMessage": "Total Shipping"
+  },
+  "shipping_options.product_attributes.label": {
+    "defaultMessage": "Product attributes"
+  },
+  "shipping_options.quantity.label": {
+    "defaultMessage": "Quantity"
   },
   "shipping_options.title.shipping_gift_options": {
     "defaultMessage": "Shipping & Gift Options"

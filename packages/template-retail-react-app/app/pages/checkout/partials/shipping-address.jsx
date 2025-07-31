@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React, {useState} from 'react'
+import React, {useState, useEffect} from 'react'
 import {nanoid} from 'nanoid'
 import {defineMessage, useIntl} from 'react-intl'
 import {useCheckout} from '@salesforce/retail-react-app/app/pages/checkout/util/checkout-context'
@@ -13,11 +13,7 @@ import {
     ToggleCardEdit,
     ToggleCardSummary
 } from '@salesforce/retail-react-app/app/components/toggle-card'
-import {
-    Box,
-    Text,
-    VStack
-} from '@salesforce/retail-react-app/app/components/shared/ui'
+import {Text} from '@salesforce/retail-react-app/app/components/shared/ui'
 import ShippingAddressSelection from '@salesforce/retail-react-app/app/pages/checkout/partials/shipping-address-selection'
 import AddressDisplay from '@salesforce/retail-react-app/app/components/address-display'
 import {
@@ -61,17 +57,18 @@ const deliverToMultipleAddressesLabel = defineMessage({
 export default function ShippingAddress() {
     const {formatMessage} = useIntl()
     const [isLoading, setIsLoading] = useState()
-    const [isMultiShipping, setIsMultiShipping] = useState(false)
     const {data: customer} = useCurrentCustomer()
     const {data: basket} = useCurrentBasket()
     const selectedShippingAddress = basket?.shipments && basket?.shipments[0]?.shippingAddress
     const isAddressFilled = selectedShippingAddress?.address1 && selectedShippingAddress?.city
-    
+
     // Check if there are multiple delivery shipments (multi-shipping was used)
-    const deliveryShipments = basket?.shipments?.filter(
-        shipment => shipment.shippingAddress
-    ) || []
+    const deliveryShipments =
+        basket?.shipments?.filter((shipment) => shipment.shippingAddress) || []
     const hasMultipleDeliveryShipments = deliveryShipments.length > 1
+
+    // Initialize multi-shipping state based on existing basket shipments
+    const [isMultiShipping, setIsMultiShipping] = useState(hasMultipleDeliveryShipments)
     const {step, STEPS, goToStep} = useCheckout()
     const createCustomerAddress = useShopperCustomersMutation('createCustomerAddress')
     const updateCustomerAddress = useShopperCustomersMutation('updateCustomerAddress')
@@ -79,6 +76,11 @@ export default function ShippingAddress() {
         'updateShippingAddressForShipment'
     )
     const showToast = useToast()
+
+    // Keep multi-shipping state in sync with basket shipments
+    useEffect(() => {
+        setIsMultiShipping(hasMultipleDeliveryShipments)
+    }, [hasMultipleDeliveryShipments])
 
     const submitAndContinue = async (address) => {
         setIsLoading(true)
@@ -204,7 +206,8 @@ export default function ShippingAddress() {
                     {hasMultipleDeliveryShipments ? (
                         <Text>
                             {formatMessage({
-                                defaultMessage: 'Your items are being delivered to multiple addresses. See details below.',
+                                defaultMessage:
+                                    'Your items are being delivered to multiple addresses. See details below.',
                                 id: 'shipping_address.summary.multiple_addresses'
                             })}
                         </Text>

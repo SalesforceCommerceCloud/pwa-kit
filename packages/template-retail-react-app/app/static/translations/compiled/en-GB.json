@@ -837,24 +837,6 @@
       "value": "Shipping"
     }
   ],
-  "checkout_confirmation.label.shipping.strikethrough.price": [
-    {
-      "type": 0,
-      "value": "Originally "
-    },
-    {
-      "type": 1,
-      "value": "originalPrice"
-    },
-    {
-      "type": 0,
-      "value": ", now "
-    },
-    {
-      "type": 1,
-      "value": "newPrice"
-    }
-  ],
   "checkout_confirmation.label.subtotal": [
     {
       "type": 0,
@@ -3434,7 +3416,7 @@
   "shipping_address.button.add_new_address": [
     {
       "type": 0,
-      "value": "+ Add New Address"
+      "value": "Add New Address"
     }
   ],
   "shipping_address.button.continue_to_shipping": [
@@ -3485,6 +3467,12 @@
     {
       "type": 0,
       "value": "No items in basket."
+    }
+  ],
+  "shipping_address.summary.multiple_addresses": [
+    {
+      "type": 0,
+      "value": "Your items are being delivered to multiple addresses. See details below."
     }
   ],
   "shipping_address.title.shipping_address": [
@@ -3661,16 +3649,60 @@
       "value": "Address saved successfully"
     }
   ],
-  "shipping_options.action.send_as_a_gift": [
-    {
-      "type": 0,
-      "value": "Do you want to send this as a gift?"
-    }
-  ],
   "shipping_options.button.continue_to_payment": [
     {
       "type": 0,
       "value": "Continue to Payment"
+    }
+  ],
+  "shipping_options.free": [
+    {
+      "type": 0,
+      "value": "Free"
+    }
+  ],
+  "shipping_options.image.alt": [
+    {
+      "type": 0,
+      "value": "Product image for "
+    },
+    {
+      "type": 1,
+      "value": "productName"
+    }
+  ],
+  "shipping_options.label.delivering_to": [
+    {
+      "type": 0,
+      "value": "Delivering to "
+    },
+    {
+      "type": 1,
+      "value": "name"
+    }
+  ],
+  "shipping_options.label.no_method_selected": [
+    {
+      "type": 0,
+      "value": "No shipping method selected"
+    }
+  ],
+  "shipping_options.label.total_shipping": [
+    {
+      "type": 0,
+      "value": "Total Shipping"
+    }
+  ],
+  "shipping_options.product_attributes.label": [
+    {
+      "type": 0,
+      "value": "Product attributes"
+    }
+  ],
+  "shipping_options.quantity.label": [
+    {
+      "type": 0,
+      "value": "Quantity"
     }
   ],
   "shipping_options.title.shipping_gift_options": [
