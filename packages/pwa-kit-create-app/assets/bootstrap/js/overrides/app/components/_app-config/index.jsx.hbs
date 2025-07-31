@@ -77,7 +77,6 @@ const AppConfig = ({children, locals = {}}) => {
         ? passwordlessCallback
         : `${appOrigin}${getEnvBasePath()}${passwordlessCallback}`
 
-
     return (
         <CommerceApiProvider
             shortCode={commerceApiConfig.parameters.shortCode}
