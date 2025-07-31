@@ -314,6 +314,9 @@ export const GooglePayExpress = () => {
     useEffect(() => {
         let isCanceled = false
 
+        console.log('parent basket', basket)
+        console.log('parent basket id', basket?.basketId)
+
         const createCheckout = async () => {
             if (isCanceled) {
                 return
@@ -339,6 +342,7 @@ export const GooglePayExpress = () => {
                         }
                     })
                 } catch (ex) {
+                    console.log('createCheckout error: google pay unavailable', ex)
                     handleGooglePayUnavailable()
                     return
                 }
