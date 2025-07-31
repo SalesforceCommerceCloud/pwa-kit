@@ -1,12 +1,13 @@
 # 🚀 PWA Kit MCP Server
 
-An MCP server that brings AI-assisted coding to **PWA Kit** storefront app development inside your IDE.
+An MCP server that enhances the entire development lifecycle of PWA Kit storefront apps — from project creation and management to AI-assisted coding, testing, and implementation of best practices — all within your IDE.
 
 ## 🔍 What is MCP?
 
 **Model Context Protocol (MCP)** is an open protocol that enables secure, structured communication between host applications (like [Cursor IDE](https://www.cursor.so/) or other AI development tools) and external tools or data sources.
 
 It allows AI agents to query context-aware services like this server to help developers build better software, faster.
+
 
 👉 **[Read more at modelcontextprotocol.io](https://modelcontextprotocol.io/)**
 
