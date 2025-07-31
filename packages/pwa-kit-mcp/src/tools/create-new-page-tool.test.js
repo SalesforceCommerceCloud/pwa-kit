@@ -50,6 +50,33 @@ describe('CreateNewPageTool', () => {
         expect(result.content[0].text).toContain('Error creating page')
     })
 
+    it('returns system prompt for unfound components', async () => {
+        jest.spyOn(fs, 'access').mockImplementation((p) => {
+            if (String(p).includes('components')) {
+                const err = new Error('not found')
+                err.code = 'ENOENT'
+                return Promise.reject(err)
+            }
+            return Promise.reject({code: 'ENOENT'})
+        })
+        jest.spyOn(fs, 'mkdir').mockResolvedValue()
+        jest.spyOn(fs, 'writeFile').mockResolvedValue()
+        jest.spyOn(createNewPageTool, 'updateRoutes').mockResolvedValue()
+        jest.spyOn(utils, 'logMCPMessage').mockImplementation(() => {})
+        // Mock generatePageContent to simulate unfound component
+        jest.spyOn(createNewPageTool, 'generatePageContent').mockImplementation(function () {
+            this.unfoundComponents = ['MissingComponent']
+            return Promise.resolve('dummy')
+        })
+        const result = await createNewPageTool.handler({
+            pageName: 'Test',
+            componentList: ['MissingComponent'],
+            route: '/test'
+        })
+        expect(result.role).toBe('system')
+        expect(result.content[0].text).toContain('MissingComponent')
+    })
+
     it('includes product hook prompt if ProductView is in componentList', async () => {
         jest.spyOn(fs, 'access').mockRejectedValueOnce({code: 'ENOENT'})
         jest.spyOn(fs, 'mkdir').mockResolvedValue()
@@ -122,8 +149,11 @@ describe('CreateNewPageTool', () => {
             route: '/test'
         })
         expect(result.role).toBe('system')
-        expect(result.content[0].text).toContain('Created page Test')
-        expect(result.content[0].text).toContain('Added route /test')
+        expect(result.content[0].text).toContain('ImageSpliter')
+        expect(result.content[0].text).toMatch(/not found/i)
+        expect(result.content[0].text).toMatch(
+            /suggest changes to the newly generated page file based on the components not found/i
+        )
     })
     it('allows image from internet if domain is already present in CSP', async () => {
         const customSrc =
@@ -180,33 +210,6 @@ describe('CreateNewPageTool', () => {
         expect(updatedCSP).not.toContain(requestedDomain)
         expect(updatedCSP).toContain('.commercecloud.salesforce.com')
     })
-
-    it('asks the user to provide the full path of the component if not found', async () => {
-        jest.spyOn(fs, 'access').mockImplementation((p) => {
-            if (String(p).includes('components')) {
-                const err = new Error('not found')
-                err.code = 'ENOENT'
-                return Promise.reject(err)
-            }
-            return Promise.reject({code: 'ENOENT'})
-        })
-        jest.spyOn(fs, 'mkdir').mockResolvedValue()
-        jest.spyOn(fs, 'writeFile').mockResolvedValue()
-        jest.spyOn(createNewPageTool, 'updateRoutes').mockResolvedValue()
-        jest.spyOn(utils, 'logMCPMessage').mockImplementation(() => {})
-        jest.spyOn(createNewPageTool, 'generatePageContent').mockImplementation(function () {
-            this.unfoundComponents = ['CustomWidget']
-            return Promise.resolve('dummy')
-        })
-        const result = await createNewPageTool.handler({
-            pageName: 'Test',
-            componentList: ['CustomWidget'],
-            route: '/test'
-        })
-        expect(result.role).toBe('system')
-        expect(result.content[0].text).toContain('Created page Test')
-        expect(result.content[0].text).toContain('Added route /test')
-    })
 })
 
 describe('updateRoutes route insertion', () => {
@@ -219,7 +222,6 @@ describe('updateRoutes route insertion', () => {
 
     beforeEach(() => {
         jest.resetModules()
-        jest.clearAllMocks()
         // eslint-disable-next-line @typescript-eslint/no-var-requires
         mockWriteFile = jest.spyOn(require('fs/promises'), 'writeFile').mockResolvedValue()
         // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -237,12 +239,7 @@ describe('updateRoutes route insertion', () => {
         createNewPageTool = require('./create-new-page-tool').default
         await createNewPageTool.updateRoutes(pageName, route)
         expect(mockWriteFile).toHaveBeenCalled()
-        // Only check the call that writes the routes file (should contain 'loadable')
-        const calls = mockWriteFile.mock.calls.filter(
-            (call) => typeof call[1] === 'string' && call[1].includes('loadable')
-        )
-        expect(calls.length).toBeGreaterThan(0)
-        const writtenContent = calls[0][1]
+        const writtenContent = mockWriteFile.mock.calls[0][1]
         expect(writtenContent).toContain(importStatement)
         const newRouteIndex = writtenContent.indexOf(routeObject.trim())
         const existingRouteIndex = writtenContent.indexOf(
@@ -260,12 +257,7 @@ describe('updateRoutes route insertion', () => {
         createNewPageTool = require('./create-new-page-tool').default
         await createNewPageTool.updateRoutes(pageName, route)
         expect(mockWriteFile).toHaveBeenCalled()
-        // Only check the call that writes the routes file (should contain 'loadable')
-        const calls = mockWriteFile.mock.calls.filter(
-            (call) => typeof call[1] === 'string' && call[1].includes('loadable')
-        )
-        expect(calls.length).toBeGreaterThan(0)
-        const writtenContent = calls[0][1]
+        const writtenContent = mockWriteFile.mock.calls[0][1]
         expect(writtenContent).toContain(importStatement)
         const newRouteIndex = writtenContent.indexOf(routeObject.trim())
         const existingRouteIndex = writtenContent.indexOf(
