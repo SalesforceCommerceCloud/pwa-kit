@@ -24,7 +24,7 @@ The PWA Kit MCP Server offers the following intelligent tools tailored to Salesf
 * **`create_sample_storefront_page`**
   Interactive tool to generate a new PWA storefront page with custom routing and components.
 
-* **`development_guidelines`**
+* **`development_guidelines`**:
   Provides best practices and guidance for building PWA Kit storefronts.
 
 * **`run_site_test`**:
