@@ -42,7 +42,7 @@ const ProductList = () => {
         filtersLoading,
         handleProductClick,
         isFetched,
-        isLoading,
+        isPending,
         isRefetching,
         isSearch,
         productSearchResult,
@@ -83,7 +83,7 @@ const ProductList = () => {
                             searchQuery={searchQuery}
                             category={category}
                             productSearchResult={productSearchResult}
-                            isLoading={isLoading}
+                            isLoading={isPending}
                             filtersLoading={filtersLoading}
                             toggleFilter={toggleFilter}
                             resetFilters={resetFilters}

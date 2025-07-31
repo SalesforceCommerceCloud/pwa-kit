@@ -75,7 +75,7 @@ test('Allows customer to edit phone number', async () => {
         )
     )
     const {user} = renderWithProviders(<MockedComponent />, {
-        wrapperProps: {siteAlias: 'uk', appConfig: mockConfig}
+        wrapperProps: {siteAlias: 'uk', config: mockConfig}
     })
 
     await waitFor(() => {
@@ -119,7 +119,7 @@ test('Non ECOM user cannot see the password card', async () => {
         )
     )
     renderWithProviders(<MockedComponent />, {
-        wrapperProps: {siteAlias: 'uk', appConfig: mockConfig}
+        wrapperProps: {siteAlias: 'uk', config: mockConfig}
     })
 
     await waitFor(() => {

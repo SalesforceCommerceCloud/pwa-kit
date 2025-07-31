@@ -39,7 +39,7 @@ export const useProductListData = () => {
     const {_refine, ...restOfParams} = searchParams
 
     const {
-        isLoading,
+        isPending,
         isFetched,
         isRefetching,
         data: productSearchResult
@@ -65,7 +65,6 @@ export const useProductListData = () => {
             placeholderData: keepPreviousData
         }
     )
-
     const {error, data: category} = useCategory(
         {
             parameters: {
@@ -100,7 +99,7 @@ export const useProductListData = () => {
         setFiltersLoading(isRefetching)
     }, [isRefetching])
 
-    const showNoResults = !isLoading && productSearchResult && !productSearchResult?.hits
+    const showNoResults = !isPending && productSearchResult && !productSearchResult?.hits
 
     const handleProductClick = (product) => {
         if (searchQuery) {
@@ -115,7 +114,7 @@ export const useProductListData = () => {
         filtersLoading,
         handleProductClick,
         isFetched,
-        isLoading,
+        isPending,
         isRefetching,
         isSearch,
         productSearchResult,

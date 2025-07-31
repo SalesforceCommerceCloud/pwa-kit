@@ -21,6 +21,7 @@ afterEach(() => {
     // Restore `window.location` to the `jsdom` `Location` object
     window.location = originalLocation
 
+    jest.clearAllMocks()
     jest.resetModules()
 })
 
@@ -29,16 +30,13 @@ test('renders a link with locale prepended', () => {
     delete window.location
     window.location = new URL('/us/en-US', 'https://www.example.com')
     const {getByText} = renderWithProviders(<Link href="/mypage">My Page</Link>, {
-        wrapperProps: {locale: {id: 'en-US'}, siteAlias: 'us', appConfig: mockConfig.app}
+        wrapperProps: {locale: {id: 'en-US'}, siteAlias: 'us', config: mockConfig}
     })
     expect(getByText(/My Page/i)).toHaveAttribute('href', '/us/en-US/mypage')
 })
 
-// TODO: This test needs to be fixed. I behaves differently than the others where mocking the getConfig was enough, this
-// uses the multi-site context that would have to be mocked.
-
-test.skip('renders a link with locale and site as query param', () => {
-    getConfig.mockImplementation(() => ({
+test('renders a link with locale and site as query param', () => {
+    const newConfig = {
         ...mockConfig,
         locale: {id: 'en-US'},
         siteAlias: 'us',
@@ -47,11 +45,12 @@ test.skip('renders a link with locale and site as query param', () => {
             locale: 'query_param',
             showDefaults: true
         }
-    }))
+    }
+    getConfig.mockImplementation(() => newConfig)
     delete window.location
     window.location = new URL('https://www.example.com/women/dresses?site=us&locale=en-US')
     const {getByText} = renderWithProviders(<Link href="/mypage">My Page</Link>, {
-        wrapperProps: {}
+        wrapperProps: {locale: {id: 'en-US'}, siteAlias: 'us', config: newConfig}
     })
 
     expect(getByText(/My Page/i)).toHaveAttribute('href', `/mypage?site=us&locale=en-US`)

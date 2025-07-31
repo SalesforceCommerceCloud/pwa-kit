@@ -7,12 +7,12 @@
 import React from 'react'
 import {act, screen, waitFor} from '@testing-library/react'
 import {createPathWithDefaults, renderWithProviders} from '../../utils/test-utils'
-import {rest} from 'msw'
 import AccountAddresses from '../../pages/account/addresses'
 import {
     mockedRegisteredCustomerWithNoAddress,
     mockedRegisteredCustomer
 } from '../../../mocks/mock-data'
+import {prependHandlersToServer} from '../../../jest-setup'
 
 import {Route, Switch} from 'react-router-dom'
 import mockConfig from '../../../config/mocks/mock-config'
@@ -32,20 +32,29 @@ const MockedComponent = () => {
 const helperAddNewAddress = async (user) => {
     await act(async () => {
         await user.click(screen.getByText(/add address/i))
+    })
+    await act(async () => {
         await user.type(screen.getByLabelText('First Name'), 'Test')
         await user.type(screen.getByLabelText('Last Name'), 'McTester')
         await user.type(screen.getByLabelText('Phone'), '7275551234')
         await user.type(screen.getByLabelText('Address'), '123 Main St')
         await user.type(screen.getByLabelText('City'), 'Tampa')
+    })
+
+    await act(async () => {
         await user.selectOptions(screen.getByLabelText(/state/i), ['FL'])
         await user.type(screen.getByLabelText('Zip Code'), '33712')
     })
 
-    global.server.use(
-        rest.get('*/customers/:customerId', (req, res, ctx) =>
-            res(ctx.delay(0), ctx.status(200), ctx.json(mockedRegisteredCustomer))
-        )
-    )
+    prependHandlersToServer([
+        {
+            path: '*/customers/:customerId',
+            method: 'get',
+            delay: 0,
+            status: 200,
+            res: () => mockedRegisteredCustomer
+        }
+    ])
     await act(async () => {
         await user.click(screen.getByText(/^Save$/i))
     })
@@ -63,23 +72,45 @@ beforeEach(() => {
         lastName: 'Keane',
         login: 'jkeane@64labs.com'
     }
-    global.server.use(
-        rest.get('*/customers/:customerId', (req, res, ctx) =>
-            res(ctx.delay(0), ctx.status(200), ctx.json(mockedRegisteredCustomer))
-        ),
-        rest.post('*/customers/:customerId/addresses', (req, res, ctx) => {
-            mockCustomer.addresses = [req.body]
-            return res(ctx.delay(0), ctx.status(200), ctx.json(req.body))
-        }),
-        rest.patch('*/customers/:customerId/addresses/:addressName', (req, res, ctx) => {
-            mockCustomer.addresses[0] = req.body
-            return res(ctx.delay(0), ctx.status(200), ctx.json(req.body))
-        }),
-        rest.delete('*/customers/:customerId/addresses/:addressName', (req, res, ctx) => {
-            mockCustomer.addresses = undefined
-            return res(ctx.delay(0), ctx.status(200))
-        })
-    )
+    prependHandlersToServer([
+        {
+            path: '*/customers/:customerId',
+            method: 'get',
+            delay: 0,
+            status: 200,
+            res: () => mockedRegisteredCustomer
+        },
+        {
+            path: '*/customers/:customerId/addresses',
+            method: 'post',
+            delay: 0,
+            status: 200,
+            res: (req) => {
+                mockCustomer.addresses = [req.body]
+                return req.body
+            }
+        },
+        {
+            path: '*/customers/:customerId/addresses/:addressName',
+            method: 'patch',
+            delay: 0,
+            status: 200,
+            res: (req) => {
+                mockCustomer.addresses[0] = req.body
+                return req.body
+            }
+        },
+        {
+            path: '*/customers/:customerId/addresses/:addressName',
+            method: 'delete',
+            delay: 0,
+            status: 200,
+            res: () => {
+                mockCustomer.addresses = undefined
+                return {}
+            }
+        }
+    ])
     window.history.pushState({}, 'Account', createPathWithDefaults('/account/addresses'))
 })
 afterEach(() => {
@@ -88,13 +119,17 @@ afterEach(() => {
 })
 
 test('Allows customer to add addresses', async () => {
-    global.server.use(
-        rest.get('*/customers/:customerId', (req, res, ctx) =>
-            res(ctx.delay(0), ctx.status(200), ctx.json(mockedRegisteredCustomerWithNoAddress))
-        )
-    )
+    prependHandlersToServer([
+        {
+            path: '*/customers/:customerId',
+            method: 'get',
+            delay: 0,
+            status: 200,
+            res: () => mockedRegisteredCustomerWithNoAddress
+        }
+    ])
     const {user} = renderWithProviders(<MockedComponent />, {
-        wrapperProps: {siteAlias: 'uk', appConfig: mockConfig.app}
+        wrapperProps: {siteAlias: 'uk', config: mockConfig}
     })
 
     await waitFor(() => {
@@ -118,11 +153,15 @@ test('Allows customer to add addresses', async () => {
         await user.type(screen.getByLabelText('Zip Code'), '33712')
     })
 
-    global.server.use(
-        rest.get('*/customers/:customerId', (req, res, ctx) =>
-            res(ctx.delay(0), ctx.status(200), ctx.json(mockedRegisteredCustomer))
-        )
-    )
+    prependHandlersToServer([
+        {
+            path: '*/customers/:customerId',
+            method: 'get',
+            delay: 0,
+            status: 200,
+            res: () => mockedRegisteredCustomer
+        }
+    ])
     await waitFor(async () => {
         await user.click(screen.getByText(/^Save$/i))
     })
@@ -131,19 +170,27 @@ test('Allows customer to add addresses', async () => {
 })
 
 test('Allows customer to remove addresses', async () => {
-    global.server.use(
-        rest.get('*/customers/:customerId', (req, res, ctx) =>
-            res(ctx.delay(0), ctx.status(200), ctx.json(mockedRegisteredCustomer))
-        )
-    )
+    prependHandlersToServer([
+        {
+            path: '*/customers/:customerId',
+            method: 'get',
+            delay: 0,
+            status: 200,
+            res: () => mockedRegisteredCustomer
+        }
+    ])
     const {user} = renderWithProviders(<MockedComponent />)
     await waitFor(() => expect(screen.getByText('123 Main St')).toBeInTheDocument())
 
-    global.server.use(
-        rest.get('*/customers/:customerId', (req, res, ctx) =>
-            res(ctx.delay(0), ctx.status(200), ctx.json(mockedRegisteredCustomerWithNoAddress))
-        )
-    )
+    prependHandlersToServer([
+        {
+            path: '*/customers/:customerId',
+            method: 'get',
+            delay: 0,
+            status: 200,
+            res: () => mockedRegisteredCustomerWithNoAddress
+        }
+    ])
 
     await act(async () => {
         await user.click(screen.getByText(/remove/i))
@@ -151,15 +198,18 @@ test('Allows customer to remove addresses', async () => {
     expect(await screen.findByText(/no saved addresses/i)).toBeInTheDocument()
 })
 
-// TODO fix failing tests
-test.skip('Handles focus for cancel/save buttons in address form correctly', async () => {
-    global.server.use(
-        rest.get('*/customers/:customerId', (req, res, ctx) =>
-            res(ctx.delay(0), ctx.status(200), ctx.json(mockedRegisteredCustomerWithNoAddress))
-        )
-    )
+test('Handles focus for cancel/save buttons in address form correctly', async () => {
+    prependHandlersToServer([
+        {
+            path: '*/customers/:customerId',
+            method: 'get',
+            delay: 0,
+            status: 200,
+            res: () => mockedRegisteredCustomerWithNoAddress
+        }
+    ])
     const {user} = renderWithProviders(<MockedComponent />, {
-        wrapperProps: {siteAlias: 'uk', appConfig: mockConfig.app}
+        wrapperProps: {siteAlias: 'uk', config: mockConfig}
     })
 
     await waitFor(() => {
@@ -176,6 +226,8 @@ test.skip('Handles focus for cancel/save buttons in address form correctly', asy
     await act(async () => {
         // hitting cancel button on edit form brings focus back to edit button
         await user.click(editBtn)
+    })
+    await act(async () => {
         await user.click(screen.getByRole('button', {name: /cancel/i}))
     })
     expect(document.activeElement).toBe(editBtn)
@@ -183,6 +235,8 @@ test.skip('Handles focus for cancel/save buttons in address form correctly', asy
     await act(async () => {
         // hitting save button on edit form brings focus back to edit button
         await user.click(editBtn)
+    })
+    await act(async () => {
         await user.click(screen.getByRole('button', {name: /save/i}))
     })
     expect(document.activeElement).toBe(editBtn)
