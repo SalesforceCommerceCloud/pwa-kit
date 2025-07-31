@@ -115,35 +115,6 @@ The server logs to `stderr` and communicates using MCP via `stdio`. You can view
 the output on "MCP Logs".
 
 
-## 📁 Key Files & Project Structure
-
-```text
-/ (root)
-├── package.json
-├── mcp.json
-├── README.md
-├── /src
-│   ├── /server
-│   │   └── server.js
-│   ├── /tools
-│   │   ├── create-new-component.js
-│   │   ├── create-app-guideline.js
-│   │   ├── developer-guideline.js
-│   │   ├── site-test.js
-│   │   └── ...
-│   ├── /utils
-│   │   └── utils.js
-│   └── /data
-│       ├── CategoryDocument.json
-│       ├── DocumentList.json
-│       └── ProductDocument.json
-├── /docs
-│   ├── /images
-│   │   └── (used in README & guides)
-│   └── cursor-integration-guide.md
-└── /dist
-```
-
 ### 🔹 File & Folder Overview
 
 | Location       | Purpose                                                               |
