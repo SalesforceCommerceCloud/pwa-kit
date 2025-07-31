@@ -6,9 +6,12 @@
  */
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const sites = require('./sites.js')
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const {parseCommerceAgentSettings} = require('./utils.js')
 
 module.exports = {
     app: {
+        commerceAgent: parseCommerceAgentSettings(process.env.COMMERCE_AGENT_SETTINGS),
         url: {
             site: 'path',
             locale: 'path',

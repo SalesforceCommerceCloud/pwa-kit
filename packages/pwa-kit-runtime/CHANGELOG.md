@@ -1,5 +1,7 @@
 ## v3.12.0-dev (Jul 22, 2025)
 - Add support for environment level base paths [#1970](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/1970)
+- This feature introduces an AI-powered shopping assistant that integrates Salesforce Embedded Messaging Service with PWA Kit applications. The shopper agent provides real-time chat support, search assistance, and personalized shopping guidance directly within the e-commerce experience. [#2658](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2658)
+
 
 ## v3.11.0 (Jul 22, 2025)
 - Fix the logger so that it will now print out details of the given Error object [#2486](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2486)

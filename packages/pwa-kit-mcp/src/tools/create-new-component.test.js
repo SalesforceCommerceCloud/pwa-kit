@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import CreateNewComponentTool from './create-new-component-tool.js'
+import CreateNewComponentTool from './create-new-component.js'
 import * as fs from 'fs/promises'
 
 // Mock fs/promises to avoid actual file operations
