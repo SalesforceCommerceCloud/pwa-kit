@@ -3416,7 +3416,7 @@
   "shipping_address.button.add_new_address": [
     {
       "type": 0,
-      "value": "Add New Address"
+      "value": "+ Add New Address"
     }
   ],
   "shipping_address.button.continue_to_shipping": [

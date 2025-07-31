@@ -1437,7 +1437,7 @@
     "defaultMessage": "Ship Items to One Address"
   },
   "shipping_address.button.add_new_address": {
-    "defaultMessage": "Add New Address"
+    "defaultMessage": "+ Add New Address"
   },
   "shipping_address.button.continue_to_shipping": {
     "defaultMessage": "Continue to Shipping Method"

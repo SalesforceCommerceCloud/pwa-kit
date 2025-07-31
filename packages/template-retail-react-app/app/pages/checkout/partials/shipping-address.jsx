@@ -34,7 +34,7 @@ const shippingAddressAriaLabel = defineMessage({
     id: 'shipping_address.label.shipping_address_form'
 })
 const addNewAddressLabel = defineMessage({
-    defaultMessage: 'Add New Address',
+    defaultMessage: '+ Add New Address',
     id: 'shipping_address.button.add_new_address'
 })
 const noItemsInBasketMessage = defineMessage({
