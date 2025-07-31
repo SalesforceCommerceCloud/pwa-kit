@@ -18,7 +18,7 @@ const systemPromptForCreatePage = `You are a smart assistant that can use tools 
         - What is the URL route for this page? (e.g., /new-home, /my-products) \
         - In case any component is **not found**, please ask the user to provide the full path of the component and import it on the page if not present already. \
         - **Do not** create a new component, unless requested explicitly by the user. \
-        - If the newly added component requires any additional input requirements, please ask the user for the same. \
+        - If the newly added component requires any additional input properties, please ask the user for the same. \
         Collect answers to these questions, then call the tool with the collected information as input parameters.`
 
 const systemPromptForProductHook = `User have added the ProductView component to the new page. Please ask user: \
@@ -164,6 +164,7 @@ class CreateNewPageTool {
             imports.push(
                 `import ${componentName} from '@salesforce/retail-react-app/app/components/${componentDir}'`
             )
+            // Import getAssetUrl for displaying image source if Image component is used
             if (componentName === 'Image') {
                 imports.push(
                     `import {getAssetUrl} from '@salesforce/pwa-kit-react-sdk/ssr/universal/utils'`
