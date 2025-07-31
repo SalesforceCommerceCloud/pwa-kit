@@ -176,18 +176,16 @@ const ProductTile = (props) => {
 
         if (productToCheck) {
             badgeDetails.forEach((item) => {
-                if (
-                    item.propertyName &&
-                    typeof productToCheck[item.propertyName] === 'boolean' &&
-                    productToCheck[item.propertyName] === true
-                ) {
-                    labelsMap.set(intl.formatMessage(item.label), item.color)
-                } else if (
-                    item.propertyName &&
-                    typeof productToCheck[item.propertyName] !== 'boolean' &&
-                    productToCheck[item.propertyName] != null
-                ) {
-                    labelsMap.set(productToCheck[item.propertyName], item.color)
+                if (item.propertyName) {
+                    // Currently only boolean and string response property values are supported
+                    if (
+                        typeof productToCheck[item.propertyName] === 'boolean' &&
+                        productToCheck[item.propertyName] === true
+                    ) {
+                        labelsMap.set(intl.formatMessage(item.label), item.color)
+                    } else if (typeof productToCheck[item.propertyName] === 'string') {
+                        labelsMap.set(productToCheck[item.propertyName], item.color)
+                    }
                 }
             })
         }
