@@ -471,7 +471,8 @@ const PRESETS = [
             type: TEMPLATE_SOURCE_BUNDLE,
             id: 'typescript-minimal'
         },
-        private: true
+        private: true,
+        extensions: ['SFDC_EXT_STORE_LOCATOR']
     },
     {
         id: 'typescript-minimal',
