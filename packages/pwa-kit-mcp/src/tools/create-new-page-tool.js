@@ -83,6 +83,20 @@ class CreateNewPageTool {
         }
     }
 
+    async findProjectRoot(startDir) {
+        let dir = startDir
+        const {existsSync} = await import('fs')
+        const {join, dirname} = await import('path')
+        while (!existsSync(join(dir, 'package.json'))) {
+            const parent = dirname(dir)
+            if (parent === dir) {
+                throw new Error('No package.json found in any parent directory')
+            }
+            dir = parent
+        }
+        return dir
+    }
+
     /**
      * Checks if a component exists in the project or in node_modules/@salesforce/retail-react-app/app/components/.
      * Returns the import path if found, otherwise null.
@@ -102,9 +116,11 @@ class CreateNewPageTool {
         } catch (err) {
             // Not found locally, check node_modules
         }
+
+        // Dynamically find the project root
+        const projectRoot = await this.findProjectRoot(process.env.PWA_STOREFRONT_APP_PATH)
         const salesforceComponentPath = path.join(
-            process.env.PWA_STOREFRONT_APP_PATH,
-            '..', // up to retail-react-app root
+            projectRoot,
             'node_modules',
             '@salesforce',
             'retail-react-app',
@@ -118,7 +134,7 @@ class CreateNewPageTool {
             // Salesforce node_modules import
             return `@salesforce/retail-react-app/app/components/${componentDir}`
         } catch (err) {
-            // Not found in node_modules
+            // Not found
         }
         return null
     }
