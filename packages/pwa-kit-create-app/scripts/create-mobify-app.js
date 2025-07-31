@@ -501,7 +501,8 @@ const PRESETS = [
         answers: {
             'project.name': 'express-minimal'
         },
-        private: true
+        private: true,
+        extensions: ['SFDC_EXT_STORE_LOCATOR']
     },
     {
         id: 'express-minimal',
