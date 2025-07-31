@@ -1,5 +1,6 @@
-## v7.1.0-dev (July 22, 2025)
+## v7.1.0-dev (July 28, 2025)
 
+- This feature introduces an AI-powered shopping assistant that integrates Salesforce Embedded Messaging Service with PWA Kit applications. The shopper agent provides real-time chat support, search assistance, and personalized shopping guidance directly within the e-commerce experience. [#2658](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2658)
 
 ## v7.0.0 (July 22, 2025)
 
