@@ -308,6 +308,25 @@ export const AddToCartModal = () => {
                                                 </Flex>
                                             )
                                         })}
+                                    {/* TODO: replace with text fetched from promotion */}
+                                    <Text mb={2} fontSize="md" fontWeight="normal" textAlign="left">
+                                        {'Bonus products available!'}
+                                    </Text>
+                                    <Button
+                                        as={Link}
+                                        to="/checkout"
+                                        width="100%"
+                                        variant="outline-gray"
+                                        size="md"
+                                        height={9}
+                                        minWidth={11}
+                                        textStyle="sm"
+                                    >
+                                        {intl.formatMessage({
+                                            defaultMessage: 'Select Bonus Products',
+                                            id: 'add_to_cart_modal.button.select_bonus_products'
+                                        })}
+                                    </Button>
                                 </Box>
                                 <Box
                                     display={['none', 'none', 'none', 'block']}
