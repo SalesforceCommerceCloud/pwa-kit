@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React, {useState, useEffect} from 'react'
+import React, {useState, useEffect, useMemo} from 'react'
 import PropTypes from 'prop-types'
 import {useHistory, useLocation} from 'react-router-dom'
 import {StorefrontPreview} from '@salesforce/commerce-sdk-react/components'
@@ -19,6 +19,7 @@ import {
 } from '@salesforce/commerce-sdk-react'
 import logger from '@salesforce/retail-react-app/app/utils/logger-instance'
 import {useAppOrigin} from '@salesforce/retail-react-app/app/hooks/use-app-origin'
+import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 
 // Chakra
 import {
@@ -81,6 +82,7 @@ import {
 } from '@salesforce/retail-react-app/app/constants'
 
 import Seo from '@salesforce/retail-react-app/app/components/seo'
+import ShopperAgent from '@salesforce/retail-react-app/app/components/shopper-agent'
 import {getPathWithLocale} from '@salesforce/retail-react-app/app/utils/url'
 
 const PlaceholderComponent = () => (
@@ -196,7 +198,8 @@ const App = (props) => {
     // Handle creating a new basket if there isn't one already assigned to the current
     // customer.
     const {data: customer} = useCurrentCustomer()
-    const {data: basket} = useCurrentBasket()
+    const {data: basket, dataUpdatedAt: basketQueryLastUpdateTime} = useCurrentBasket()
+    const config = getConfig()
 
     const updateBasket = useShopperBasketsMutation('updateBasket')
     const updateCustomerForBasket = useShopperBasketsMutation('updateCustomerForBasket')
@@ -210,6 +213,10 @@ const App = (props) => {
             })
         }
     }, [basket?.currency])
+
+    const commerceAgentConfiguration = useMemo(() => {
+        return config.app.commerceAgent
+    }, [config?.app])
 
     useEffect(() => {
         // update the basket customer email
@@ -352,6 +359,16 @@ const App = (props) => {
                             {/* A wider fallback for user locales that the app does not support */}
                             <link rel="alternate" hrefLang="x-default" href={`${appOrigin}/`} />
                         </Seo>
+
+                        {commerceAgentConfiguration?.enabled === 'true' && (
+                            <ShopperAgent
+                                commerceAgentConfiguration={commerceAgentConfiguration}
+                                domainUrl={`${appOrigin}${buildUrl(location.pathname)}`}
+                                locale={locale?.id}
+                                basketId={basket?.basketId}
+                                basketDoneLoading={basketQueryLastUpdateTime > 0}
+                            />
+                        )}
 
                         <ScrollToTop />
 

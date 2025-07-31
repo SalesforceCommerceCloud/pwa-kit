@@ -329,7 +329,7 @@ const processTemplate = (relFile, inputDir, outputDir, context) => {
  * @param {*} answers
  * @param {*} param2
  */
-const runGenerator = (context, {outputDir, templateVersion, verbose}) => {
+const runGenerator = (context, {initGit, outputDir, templateVersion, verbose}) => {
     const {answers, template} = context
     const {id, source} = template
     const {extend = false} = answers.project
@@ -429,6 +429,26 @@ const runGenerator = (context, {outputDir, templateVersion, verbose}) => {
         // Install dependencies for the newly minted project.
         npmInstall(outputDir, {verbose})
     }
+
+    // Initialize a git repository if the --initGit flag is provided.
+    if (initGit) {
+        initGitRepo(outputDir)
+    }
+}
+
+/**
+ * Initializes a git repository in the specified directory, adds all files, and checks for git installation.
+ * @param {string} outputDir - The directory in which to initialize the git repository.
+ */
+const initGitRepo = (outputDir) => {
+    if (!sh.which('git')) {
+        console.error(
+            'Error: git is not installed or not found in PATH. Please install git to initialize a repository.'
+        )
+        process.exit(1)
+    }
+    sh.exec(`git init`, {cwd: outputDir})
+    sh.exec(`git add .`, {cwd: outputDir})
 }
 
 const foundNode = process.versions.node
@@ -534,7 +554,7 @@ const main = async (opts) => {
     let isPreset = false
     let answers = {}
     let selectedTemplate
-    let {outputDir, verbose, preset, templateVersion, stdio, displayProgram} = opts
+    let {outputDir, verbose, preset, templateVersion, stdio, displayProgram, initGit} = opts
     const {prompt} = inquirer
     const OUTPUT_DIR_FLAG_ACTIVE = !!outputDir
     const presetId = preset || process.env.GENERATOR_PRESET
@@ -663,7 +683,7 @@ const main = async (opts) => {
     }
 
     // Generate the project.
-    runGenerator(context, {outputDir, templateVersion, verbose})
+    runGenerator(context, {initGit, outputDir, templateVersion, verbose})
 
     // Return the folder in which the project was generated in.
     return outputDir

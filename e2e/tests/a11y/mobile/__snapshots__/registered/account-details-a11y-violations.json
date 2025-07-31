@@ -7,10 +7,10 @@
     "helpUrl": "https://dequeuniversity.com/rules/axe/4.10/aria-allowed-attr?application=playwright",
     "nodes": [
       {
-        "html": "<form id=\"...\" aria-haspopup=\"dialog\" aria-expanded=\"false\" aria-controls=\"popover-content-:rl:\">",
+        "html": "<form id=\"...\" aria-haspopup=\"dialog\" aria-expanded=\"false\" aria-controls=\"popover-content-...\">",
         "failureSummary": "Fix all of the following:\n  ARIA attribute is not allowed: aria-expanded=\"false\"",
         "target": [
-          "#popover-trigger-\\:rl\\:"
+          "#popover-trigger-\\-..."
         ]
       }
     ]
@@ -26,7 +26,7 @@
         "html": "<ul class=\"...\" >",
         "failureSummary": "Fix all of the following:\n  List element has direct children that are not allowed: hr, button",
         "target": [
-          ".css-165casq"
+          ".css-..."
         ]
       }
     ]
