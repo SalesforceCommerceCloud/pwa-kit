@@ -29,6 +29,12 @@ jest.mock('@salesforce/commerce-sdk-react', () => ({
             stateCode: 'TX',
             postalCode: '55555'
         })
+    })),
+    useShopperBasketsMutation: jest.fn(() => ({
+        mutateAsync: jest.fn().mockResolvedValue({})
+    })),
+    useShippingMethodsForShipment: jest.fn(() => ({
+        refetch: jest.fn()
     }))
 }))
 
@@ -43,6 +49,11 @@ jest.mock('@salesforce/retail-react-app/app/hooks/use-current-basket', () => ({
 jest.mock('@salesforce/retail-react-app/app/hooks/use-multiship')
 jest.mock('@salesforce/retail-react-app/app/pages/checkout/util/checkout-context')
 jest.mock('@salesforce/retail-react-app/app/hooks/use-toast')
+jest.mock('@salesforce/retail-react-app/app/hooks/use-pickup-shipment', () => ({
+    usePickupShipment: jest.fn(() => ({
+        isCurrentShippingMethodPickup: jest.fn(() => false)
+    }))
+}))
 
 jest.mock('@salesforce/retail-react-app/app/utils/image-groups-utils', () => ({
     findImageGroupBy: jest.fn((imageGroups) => {
