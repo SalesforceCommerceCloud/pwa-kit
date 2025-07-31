@@ -51,4 +51,4 @@ export const useStandalonePaymentMethods = (authToken, site, locale, enabled = t
         loading,
         error
     }
-} 
+}

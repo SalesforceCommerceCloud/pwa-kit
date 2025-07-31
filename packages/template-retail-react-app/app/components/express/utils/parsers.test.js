@@ -170,9 +170,9 @@ describe('parsers', () => {
                 ],
                 defaultShippingMethodId: 'shipping-1'
             }
-    
+
             const result = getGPShippingOptionParameters(shippingMethods)
-    
+
             expect(result).toEqual({
                 defaultSelectedOptionId: 'shipping-1',
                 shippingOptions: [
@@ -189,7 +189,7 @@ describe('parsers', () => {
                 ]
             })
         })
-    
+
         it('should handle shipping methods without prices', () => {
             const shippingMethods = {
                 applicableShippingMethods: [
@@ -207,9 +207,9 @@ describe('parsers', () => {
                 ],
                 defaultShippingMethodId: 'shipping-1'
             }
-    
+
             const result = getGPShippingOptionParameters(shippingMethods)
-    
+
             expect(result).toEqual({
                 defaultSelectedOptionId: 'shipping-1',
                 shippingOptions: [
@@ -226,27 +226,26 @@ describe('parsers', () => {
                 ]
             })
         })
-    
+
         it('should handle empty applicable shipping methods', () => {
             const shippingMethods = {
                 defaultShippingMethodId: 'method-1',
                 applicableShippingMethods: []
             }
-    
+
             const result = getGPShippingOptionParameters(shippingMethods)
-    
+
             expect(result).toBeUndefined()
         })
-    
+
         it('should handle null/undefined shipping methods', () => {
             const result = getGPShippingOptionParameters(null)
             expect(result).toBeUndefined()
         })
-    
+
         it('should handle undefined shipping methods', () => {
             const result = getGPShippingOptionParameters(undefined)
             expect(result).toBeUndefined()
         })
     })
-    
 })

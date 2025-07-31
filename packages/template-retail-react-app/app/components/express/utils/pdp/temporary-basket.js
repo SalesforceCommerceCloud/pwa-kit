@@ -28,52 +28,48 @@ export const createTemporaryBasket = async (sku, authToken, site, quantity = 1) 
         throw new Error('Site ID is required')
     }
 
-    try {
-        // Get the organizationId from the commerce API configuration
-        const {
-            app: {commerceAPI: config}
-        } = getConfig()
-        const {organizationId} = config.parameters
+    // Get the organizationId from the commerce API configuration
+    const {
+        app: {commerceAPI: config}
+    } = getConfig()
+    const {organizationId} = config.parameters
 
-        if (!organizationId) {
-            throw new Error('Organization ID is required and not found in configuration')
-        }
-
-        const requestBody = {
-            productItems: [
-                {
-                    productId: sku,
-                    quantity: quantity
-                }
-            ]
-        }
-
-        const requestUrl = `/mobify/proxy/api/checkout/shopper-baskets/v2/organizations/${organizationId}/baskets?siteId=${site.id}&temporary=true`
-
-        const response = await fetch(requestUrl, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                Authorization: `Bearer ${authToken}`
-            },
-            body: JSON.stringify(requestBody)
-        })
-
-        if (!response.ok) {
-            const errorText = await response.text()
-            throw new Error(`HTTP error! status: ${response.status}, message: ${errorText}`)
-        }
-
-        const tempBasket = await response.json()
-
-        if (!tempBasket || !tempBasket.basketId) {
-            throw new Error('Invalid temporary basket response')
-        }
-
-        return tempBasket
-    } catch (error) {
-        throw error
+    if (!organizationId) {
+        throw new Error('Organization ID is required and not found in configuration')
     }
+
+    const requestBody = {
+        productItems: [
+            {
+                productId: sku,
+                quantity: quantity
+            }
+        ]
+    }
+
+    const requestUrl = `/mobify/proxy/api/checkout/shopper-baskets/v2/organizations/${organizationId}/baskets?siteId=${site.id}&temporary=true`
+
+    const response = await fetch(requestUrl, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${authToken}`
+        },
+        body: JSON.stringify(requestBody)
+    })
+
+    if (!response.ok) {
+        const errorText = await response.text()
+        throw new Error(`HTTP error! status: ${response.status}, message: ${errorText}`)
+    }
+
+    const tempBasket = await response.json()
+
+    if (!tempBasket || !tempBasket.basketId) {
+        throw new Error('Invalid temporary basket response')
+    }
+
+    return tempBasket
 }
 
 /**
@@ -174,4 +170,4 @@ export const createCleanupFunction = (
     setTempBasket
 ) => {
     return () => cleanupTemporaryBasket(isPdpMode, sharedBasketRef, authToken, site, setTempBasket)
-} 
+}
