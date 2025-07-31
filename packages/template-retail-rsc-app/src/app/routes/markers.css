@@ -1,0 +1,25 @@
+[data-sfdc-origin="client"] {
+    background-color: #fcc;
+}
+
+[data-sfdc-origin="client"] [data-sfdc-origin="server"] {
+    background-color: white;
+    background-image: repeating-linear-gradient(
+            135deg,
+            transparent,
+            transparent 4px,
+            rgba(0, 0, 0, .1) 4px,
+            rgba(0, 0, 0, .1) 8px
+    );
+}
+
+[data-sfdc-origin="server"] [data-sfdc-origin="client"] {
+    background-color: #fcc;
+    background-image: repeating-linear-gradient(
+            135deg,
+            transparent,
+            transparent 4px,
+            rgba(0, 0, 0, .1) 4px,
+            rgba(0, 0, 0, .1) 8px
+    );
+}
