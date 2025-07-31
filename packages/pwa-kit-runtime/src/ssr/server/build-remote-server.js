@@ -226,11 +226,6 @@ export const RemoteServerFactory = {
     _isBundleOrProxyPath(url) {
         return url.includes(proxyBasePath) || url.includes(bundleBasePath)
     },
-    
-    _removeBasePathFromPath(path) {
-        const regex = new RegExp(`^${getEnvBasePath()}(\/|$)`)
-        return path.replace(regex, '/')
-    },
 
     /**
      * @private
@@ -489,6 +484,12 @@ export const RemoteServerFactory = {
      * @private
      */
     _setupRemoveBasePathFromPathMiddleware(app) {
+        const removeBasePathFromPath = (path) => {
+            if (!getEnvBasePath()) return path
+            const regex = new RegExp(`^${getEnvBasePath()}(/|$)`)
+            return path.replace(regex, '/')
+        }
+
         /**
          * Very early request processing.
          *
@@ -499,14 +500,10 @@ export const RemoteServerFactory = {
          */
         // TODO - we might want to scope this to /mobify paths for now?
         const removeBasePathFromPathMiddleware = (req, res, next) => {
-            console.log('Before')
-            console.log(req.url)
-            const updatedPath = this._removeBasePathFromPath(req.path)
+            const updatedPath = removeBasePathFromPath(req.path)
             const parsed = URL.parse(req.url)
             parsed.pathname = updatedPath
             req.url = URL.format(parsed)
-            console.log('After')
-            console.log(req.url)
             next()
         }
         app.use(removeBasePathFromPathMiddleware)
@@ -752,11 +749,12 @@ export const RemoteServerFactory = {
             createProxyMiddleware({
                 target: options.slasTarget,
                 changeOrigin: true,
-                pathRewrite:  (path) => {
-                    const regex = new RegExp(`^${getEnvBasePath()}?${slasPrivateProxyPath}`)
+                pathRewrite: (path) => {
+                    const basePathRegexEntry = getEnvBasePath() ? `${getEnvBasePath()}?` : ''
+                    const regex = new RegExp(`^${basePathRegexEntry}${slasPrivateProxyPath}`)
                     return path.replace(regex, '')
                 },
-                
+
                 // {
                 //     // http-proxy-middleware uses the original incoming request path to determine
                 //     // both proxyRequest and incomingRequest paths.
@@ -765,7 +763,7 @@ export const RemoteServerFactory = {
                 //     // Note: PathRewrite applies the following in order so the order matters
                 //     [`${getEnvBasePath()}${slasPrivateProxyPath}`]: '',
                 //     [slasPrivateProxyPath]: ''
-                    
+
                 // },
                 onProxyReq: (proxyRequest, incomingRequest, res) => {
                     applyProxyRequestHeaders({

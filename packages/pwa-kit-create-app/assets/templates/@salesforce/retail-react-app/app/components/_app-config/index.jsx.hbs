@@ -69,8 +69,7 @@ const AppConfig = ({children, locals = {}}) => {
     }
 
     // Set absolute uris for CommerceApiProvider proxies and callbacks
-    const redirectURI = `${appOrigin}/callback` // if base path is added here, the SLAS client redirectURI will need to be updated as well
-    // const redirectURI = `${appOrigin}${getEnvBasePath()}/callback`
+    const redirectURI = `${appOrigin}${getEnvBasePath()}/callback`
     const proxy = `${appOrigin}${getEnvBasePath()}${commerceApiConfig.proxyPath}`
     const slasPrivateClientProxyEndpoint = `${appOrigin}${getEnvBasePath()}${slasPrivateProxyPath}`
     const passwordlessLoginCallbackURI = isAbsoluteURL(passwordlessCallback)

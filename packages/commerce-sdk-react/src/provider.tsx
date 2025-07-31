@@ -41,7 +41,7 @@ export interface CommerceApiProviderProps extends ApiClientConfigParams {
     headers?: Record<string, string>
     fetchedToken?: string
     enablePWAKitPrivateClient?: boolean
-    privateClientProxyEndpoint?: string 
+    privateClientProxyEndpoint?: string
     clientSecret?: string
     silenceWarnings?: boolean
     logger?: Logger
@@ -259,9 +259,9 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
                 ...config,
                 proxy: enablePWAKitPrivateClient
                     ? privateClientProxyEndpoint
-                        ? privateClientProxyEndpoint 
+                        ? privateClientProxyEndpoint
                         : privateClientEndpoint
-                    : config.proxy,
+                    : config.proxy
             }),
             shopperOrders: new ShopperOrders(config),
             shopperProducts: new ShopperProducts(config),

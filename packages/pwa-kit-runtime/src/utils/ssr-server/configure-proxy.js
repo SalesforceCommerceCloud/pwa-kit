@@ -10,7 +10,7 @@ import {proxyConfigs} from '../ssr-shared'
 import {processExpressResponse} from './process-express-response'
 import {isRemote, localDevLog, verboseProxyLogging} from './utils'
 import logger from '../logger-instance'
-import { getEnvBasePath } from '../ssr-namespace-paths'
+import {getEnvBasePath} from '../ssr-namespace-paths'
 
 export const ALLOWED_CACHING_PROXY_REQUEST_METHODS = ['HEAD', 'GET', 'OPTIONS']
 
@@ -255,7 +255,8 @@ export const configureProxy = ({
         // So we need to use the built in pathRewrite to remove the base path
         // Note: PathRewrite applies the following in order so the order matters
         pathRewrite: (path) => {
-            const regex = new RegExp(`^${getEnvBasePath()}?${proxyPath}`)
+            const basePathRegexEntry = getEnvBasePath() ? `${getEnvBasePath()}?` : ''
+            const regex = new RegExp(`^${basePathRegexEntry}${proxyPath}`)
             return path.replace(regex, '')
         },
         // {

@@ -255,9 +255,9 @@ class Auth {
         this.client = new ShopperLogin({
             proxy: config.enablePWAKitPrivateClient
                 ? config.privateClientProxyEndpoint
-                    ? config.privateClientProxyEndpoint 
+                    ? config.privateClientProxyEndpoint
                     : privateClientEndpoint
-                 : config.proxy,
+                : config.proxy,
             parameters: {
                 clientId: config.clientId,
                 organizationId: config.organizationId,
@@ -345,9 +345,9 @@ class Auth {
         this.passwordlessLoginCallbackURI = passwordlessLoginCallbackURI
             ? isAbsoluteUrl(passwordlessLoginCallbackURI)
                 ? passwordlessLoginCallbackURI
-                // This fallback does not take into account the envBasePath feature
-                // To set an env base path, config.passwordlessLoginCallbackURI must be an absolute url
-                : `${baseUrl}${passwordlessLoginCallbackURI}`
+                : // This fallback does not take into account the envBasePath feature
+                  // To set an env base path, config.passwordlessLoginCallbackURI must be an absolute url
+                  `${baseUrl}${passwordlessLoginCallbackURI}`
             : ''
     }
 

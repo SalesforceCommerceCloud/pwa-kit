@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import {useAppOrigin} from '@salesforce/retail-react-app/app/hooks/use-app-origin'
+import {getAppOrigin} from '@salesforce/pwa-kit-react-sdk/utils/url'
 import {
     getLocaleByReference,
     getParamsFromPath,
@@ -23,7 +23,8 @@ import {HOME_HREF, urlPartPositions} from '@salesforce/retail-react-app/app/cons
  * @returns {string} - The fully qualified URL as a string.
  */
 export const absoluteUrl = (path, appOrigin) => {
-    return new URL(path, appOrigin || useAppOrigin()).toString()
+    // absoluteUrl is not a react hook so we cannot use the useAppOrigin hook here
+    return new URL(path, appOrigin || getAppOrigin()).toString()
 }
 
 /**

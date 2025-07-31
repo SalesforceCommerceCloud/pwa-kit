@@ -28,7 +28,10 @@ import {
     resolveLocaleFromUrl
 } from '@salesforce/retail-react-app/app/utils/site-utils'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
-import {getEnvBasePath, slasPrivateProxyPath} from '@salesforce/pwa-kit-runtime/utils/ssr-namespace-paths'
+import {
+    getEnvBasePath,
+    slasPrivateProxyPath
+} from '@salesforce/pwa-kit-runtime/utils/ssr-namespace-paths'
 import {createUrlTemplate} from '@salesforce/retail-react-app/app/utils/url'
 import createLogger from '@salesforce/pwa-kit-runtime/utils/logger-factory'
 import {isAbsoluteURL} from '@salesforce/retail-react-app/app/page-designer/utils' // TODO - move this to a more general location
@@ -79,8 +82,7 @@ const AppConfig = ({children, locals = {}}) => {
     }
 
     // Set absolute uris for CommerceApiProvider proxies and callbacks
-    const redirectURI = `${appOrigin}/callback` // if base path is added here, the SLAS client redirectURI will need to be updated as well
-    // const redirectURI = `${appOrigin}${getEnvBasePath()}/callback`
+    const redirectURI = `${appOrigin}${getEnvBasePath()}/callback`
     const proxy = `${appOrigin}${getEnvBasePath()}${commerceApiConfig.proxyPath}`
     const slasPrivateClientProxyEndpoint = `${appOrigin}${getEnvBasePath()}${slasPrivateProxyPath}`
     const passwordlessLoginCallbackURI = isAbsoluteURL(passwordlessCallback)
