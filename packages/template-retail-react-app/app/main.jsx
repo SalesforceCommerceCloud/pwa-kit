@@ -9,7 +9,7 @@ import {getEnvBasePath} from '@salesforce/pwa-kit-runtime/utils/ssr-namespace-pa
 
 const main = () => {
     // The path to your service worker should match what is set up in ssr.js
-    return Promise.all([start(), registerServiceWorker(`${getEnvBasePath()}/worker.js`)]) // might need to add base path here
+    return Promise.all([start(), registerServiceWorker(`${getEnvBasePath()}/worker.js`)])
 }
 
 main()

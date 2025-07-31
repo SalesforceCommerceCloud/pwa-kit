@@ -20,13 +20,13 @@ module.exports = {
         },
         login: {
             passwordless: {
-                enabled: true,
+                enabled: false,
                 callbackURI:
                     process.env.PASSWORDLESS_LOGIN_CALLBACK_URI || '/passwordless-login-callback',
                 landingPath: '/passwordless-login-landing'
             },
             social: {
-                enabled: true,
+                enabled: false,
                 idps: ['google', 'apple'],
                 redirectURI: process.env.SOCIAL_LOGIN_REDIRECT_URI || '/social-callback'
             },
@@ -44,9 +44,9 @@ module.exports = {
         commerceAPI: {
             proxyPath: `/mobify/proxy/api`,
             parameters: {
-                clientId: 'e55780e9-9e80-4aa0-8fbc-5fb37bf69001',
-                organizationId: 'f_ecom_bjnl_prd',
-                shortCode: 'performance-001',
+                clientId: 'c9c45bfd-0ed3-4aa2-9971-40f88962b836',
+                organizationId: 'f_ecom_zzrf_001',
+                shortCode: '8o7m175y',
                 siteId: 'RefArchGlobal'
             }
         },
@@ -78,11 +78,11 @@ module.exports = {
         ssrFunctionNodeVersion: '22.x',
         proxyConfigs: [
             {
-                host: 'performance-001.api.commercecloud.salesforce.com',
+                host: 'kv7kzm78.api.commercecloud.salesforce.com',
                 path: 'api'
             },
             {
-                host: 'refarchglobal.phased-launch-testing.com',
+                host: 'zzrf-001.dx.commercecloud.salesforce',
                 path: 'ocapi'
             }
         ]

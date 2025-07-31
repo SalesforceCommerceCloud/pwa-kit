@@ -747,22 +747,17 @@ export const RemoteServerFactory = {
             createProxyMiddleware({
                 target: options.slasTarget,
                 changeOrigin: true,
+
+                // http-proxy-middleware uses the original incoming request path to determine
+                // both proxyRequest and incomingRequest paths.
+                // This cannot be modified by any express middleware
+                // So we need to use the built in pathRewrite to remove the base path
                 pathRewrite: (path) => {
                     const basePathRegexEntry = getEnvBasePath() ? `${getEnvBasePath()}?` : ''
                     const regex = new RegExp(`^${basePathRegexEntry}${slasPrivateProxyPath}`)
                     return path.replace(regex, '')
                 },
 
-                // {
-                //     // http-proxy-middleware uses the original incoming request path to determine
-                //     // both proxyRequest and incomingRequest paths.
-                //     // This cannot be modified by any express middleware
-                //     // So we need to use the built in pathRewrite to remove the base path
-                //     // Note: PathRewrite applies the following in order so the order matters
-                //     [`${getEnvBasePath()}${slasPrivateProxyPath}`]: '',
-                //     [slasPrivateProxyPath]: ''
-
-                // },
                 onProxyReq: (proxyRequest, incomingRequest, res) => {
                     applyProxyRequestHeaders({
                         proxyRequest,
