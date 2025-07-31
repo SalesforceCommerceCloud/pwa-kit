@@ -125,11 +125,11 @@ class CreateNewPageTool {
 
     async createPage(pageName, componentList, route) {
         logMCPMessage(
-            `========== Creating page ${pageName} with layout 'flex' and components ${componentList} and route ${route}`
+            `========== Creating page ${pageName} and components ${componentList} and route ${route}`
         )
         this.unfoundComponents = []
         await logMCPMessage(
-            `Creating page ${pageName} with layout 'flex' and components ${componentList} and route ${route}`
+            `Creating page ${pageName} and components ${componentList} and route ${route}`
         )
 
         try {
