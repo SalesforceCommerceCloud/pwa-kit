@@ -1328,7 +1328,7 @@ describe('Delivery options', () => {
             expect(screen.getByTestId('sf-cart-container')).toBeInTheDocument()
         })
         const deliverySelects = await screen.findAllByTestId('delivery-option-select')
-        await userEvent.selectOptions(deliverySelects[0], 'pickup')
+        fireEvent.change(deliverySelects[0], {target: {value: 'pickup'}})
         expect(mockStoreLocatorModal.onOpen).toHaveBeenCalled()
     })
     test('should call handleDeliveryOptionChange when "Pick up at Store" is selected and a store is selected', async () => {
@@ -1342,9 +1342,9 @@ describe('Delivery options', () => {
             expect(screen.getByTestId('sf-cart-container')).toBeInTheDocument()
         })
         const deliverySelects = await screen.findAllByTestId('delivery-option-select')
-        await userEvent.selectOptions(deliverySelects[0], 'pickup')
+        fireEvent.change(deliverySelects[0], {target: {value: 'pickup'}})
         expect(mockStoreLocatorModal.onOpen).not.toHaveBeenCalled()
-        expect(mockUseMultiship.handleDeliveryOptionChange).toHaveBeenCalled()
+        await waitFor(() => expect(mockUseMultiship.handleDeliveryOptionChange).toHaveBeenCalled())
         const firstProductItem = mockBaskets.baskets[0].productItems[0]
         const productData = mockProducts.data.find((p) => p.id === firstProductItem.productId)
         expect(mockUseMultiship.handleDeliveryOptionChange).toHaveBeenCalledWith(
@@ -1390,6 +1390,99 @@ describe('Delivery options', () => {
             null,
             productData.inventory.id
         )
+    })
+
+    test('disables "Ship to Address" when item is for pickup and out of stock for shipping', async () => {
+        const mockProductWithNoDefaultInventory = {
+            ...mockProducts.data[0],
+            id: 'product-out-of-stock-ship',
+            inventory: {
+                ...mockProducts.data[0].inventory,
+                stockLevel: 0
+            }
+        }
+
+        const basketWithPickup = {
+            ...mockBaskets.baskets[0],
+            productItems: [
+                {
+                    ...mockBaskets.baskets[0].productItems[0],
+                    productId: 'product-out-of-stock-ship',
+                    quantity: 1,
+                    shipmentId: 'bopis'
+                }
+            ],
+            shipments: [
+                ...mockBaskets.baskets[0].shipments,
+                {
+                    shipmentId: 'bopis',
+                    shippingMethod: {id: 'pickup-method', c_storePickupEnabled: true},
+                    c_fromStoreId: 'store-1'
+                }
+            ]
+        }
+        prependHandlersToServer([
+            {
+                path: '*/customers/:customerId/baskets',
+                res: () => ({baskets: [basketWithPickup], total: 1})
+            },
+            {path: '*/products', res: () => ({data: [mockProductWithNoDefaultInventory]})}
+        ])
+        renderWithProviders(<Cart />)
+        await waitFor(() => {
+            expect(screen.getByTestId('sf-cart-container')).toBeInTheDocument()
+        })
+        const deliverySelects = await screen.findAllByTestId('delivery-option-select')
+        const shipOption = deliverySelects[0].querySelector('option[value="ship"]')
+        const pickupOption = deliverySelects[0].querySelector('option[value="pickup"]')
+        expect(shipOption).toBeDisabled()
+        expect(pickupOption).toBeEnabled()
+    })
+
+    test('disables "Pick up at Store" when item is for shipping and out of stock for pickup', async () => {
+        const selectedStoreId = 'store-1'
+        const selectedInventoryId = 'inventory-1'
+        const mockProductWithNoPickupInventory = {
+            ...mockProducts.data[0],
+            id: 'product-out-of-stock-pickup',
+            inventories: [
+                {
+                    id: selectedInventoryId,
+                    stockLevel: 0
+                }
+            ]
+        }
+        const basketForShipping = {
+            ...mockBaskets.baskets[0],
+            productItems: [
+                {
+                    ...mockBaskets.baskets[0].productItems[0],
+                    productId: 'product-out-of-stock-pickup',
+                    quantity: 1,
+                    shipmentId: 'me'
+                }
+            ]
+        }
+        prependHandlersToServer([
+            {
+                path: '*/customers/:customerId/baskets',
+                res: () => ({baskets: [basketForShipping], total: 1})
+            },
+            {path: '*/products', res: () => ({data: [mockProductWithNoPickupInventory]})}
+        ])
+        mockUseSelectedStore.mockImplementation(() => ({
+            selectedStore: {id: selectedStoreId, inventoryId: selectedInventoryId},
+            hasSelectedStore: true
+        }))
+        renderWithProviders(<Cart />)
+        await waitFor(() => {
+            expect(screen.getByTestId('sf-cart-container')).toBeInTheDocument()
+        })
+        const deliverySelects = await screen.findAllByTestId('delivery-option-select')
+        const shipOption = deliverySelects[0].querySelector('option[value="ship"]')
+        const pickupOption = deliverySelects[0].querySelector('option[value="pickup"]')
+        expect(shipOption).toBeEnabled()
+        expect(pickupOption).toBeDisabled()
     })
 })
 

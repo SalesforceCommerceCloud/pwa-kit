@@ -790,8 +790,19 @@ const Cart = () => {
             ? DELIVERY_OPTIONS.PICKUP
             : DELIVERY_OPTIONS.SHIP
 
+        const selectedStoreInventoryAvailable =
+            productsByItemId?.[productItem.itemId]?.inventories?.find(
+                (inventory) => inventory.id === selectedInventoryId
+            )?.stockLevel >= productItem.quantity
+        const defaultInventoryAvailable =
+            productsByItemId?.[productItem.itemId]?.inventory?.stockLevel >= productItem.quantity
+        const isPickupDisabled = !shipmentInfo.isPickupOrder && !selectedStoreInventoryAvailable
+        const isShipDisabled = shipmentInfo.isPickupOrder && !defaultInventoryAvailable
+
         return (
             <PickupOrDelivery
+                isPickupDisabled={isPickupDisabled}
+                isShipDisabled={isShipDisabled}
                 value={deliveryOption}
                 onChange={(selectedValue) => onDeliveryOptionChange(productItem, selectedValue)}
             />
