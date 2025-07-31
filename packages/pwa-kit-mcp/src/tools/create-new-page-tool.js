@@ -16,9 +16,6 @@ const systemPromptForCreatePage = `You are a smart assistant that can use tools 
         - What is the name of the new page to create? \
         - List the components to include on the page, separated by commas (e.g., Image, ProductView) \
         - What is the URL route for this page? (e.g., /new-home, /my-products) \
-        - In case any component is **not found**, please ask the user to provide the full path of the component and import it on the page if not present already. \
-        - **Do not** create a new component, unless requested explicitly by the user. \
-        - If the newly added component requires any additional input properties, please ask the user for the same. \
         Collect answers to these questions, then call the tool with the collected information as input parameters.`
 
 const systemPromptForProductHook = `User have added the ProductView component to the new page. Please ask user: \
@@ -53,6 +50,11 @@ const systemPromptForImageComponent = `User has added the Image component to the
         Note:
         If the automation cannot detect the Image component but you know it exists and works as intended, proceed with the above steps as if the component is available. Do not block or alter the workflow due to the detection issue. Clearly communicate to the user that the Image component will be used, even if it was not detected by the automation.
         `
+
+const systemPromptForUnfoundComponents = (unfoundComponents) =>
+    `The following components were not found: ${unfoundComponents.join(', ')}. \
+        If the component is not found, **Please** suggest changes to the newly generated page file based on the components not found.`
+
 class CreateNewPageTool {
     constructor() {
         this.name = 'create_sample_storefront_page'
@@ -83,69 +85,13 @@ class CreateNewPageTool {
         }
     }
 
-    async findProjectRoot(startDir) {
-        let dir = startDir
-        const {existsSync} = await import('fs')
-        const {join, dirname} = await import('path')
-        while (!existsSync(join(dir, 'package.json'))) {
-            const parent = dirname(dir)
-            if (parent === dir) {
-                throw new Error('No package.json found in any parent directory')
-            }
-            dir = parent
-        }
-        return dir
-    }
-
-    /**
-     * Checks if a component exists in the project or in node_modules/@salesforce/retail-react-app/app/components/.
-     * Returns the import path if found, otherwise null.
-     * @param {string} componentDir - kebab-case directory name of the component
-     */
-    async _findComponentImportPath(componentDir) {
-        const localComponentPath = path.join(
-            process.env.PWA_STOREFRONT_APP_PATH,
-            'components',
-            componentDir,
-            'index.jsx'
-        )
-        try {
-            await fs.access(localComponentPath)
-            // Local project import
-            return `app/components/${componentDir}`
-        } catch (err) {
-            // Not found locally, check node_modules
-        }
-
-        // Dynamically find the project root
-        const projectRoot = await this.findProjectRoot(process.env.PWA_STOREFRONT_APP_PATH)
-        const salesforceComponentPath = path.join(
-            projectRoot,
-            'node_modules',
-            '@salesforce',
-            'retail-react-app',
-            'app',
-            'components',
-            componentDir,
-            'index.jsx'
-        )
-        try {
-            await fs.access(salesforceComponentPath)
-            // Salesforce node_modules import
-            return `@salesforce/retail-react-app/app/components/${componentDir}`
-        } catch (err) {
-            // Not found
-        }
-        return null
-    }
-
     async createPage(pageName, componentList, route) {
         logMCPMessage(
-            `========== Creating page ${pageName} and components ${componentList} and route ${route}`
+            `========== Creating page ${pageName} with components ${componentList} and route ${route}`
         )
         this.unfoundComponents = []
         await logMCPMessage(
-            `Creating page ${pageName} and components ${componentList} and route ${route}`
+            `Creating page ${pageName} with components ${componentList} and route ${route}`
         )
 
         try {
@@ -177,6 +123,10 @@ class CreateNewPageTool {
             if (componentList.includes('Image')) {
                 messages.push(systemPromptForImageComponent)
             }
+            logMCPMessage(`Unfound components: ${this.unfoundComponents}`)
+            if (this.unfoundComponents.length != 0) {
+                messages.push(systemPromptForUnfoundComponents(this.unfoundComponents))
+            }
             logMCPMessage(messages.join('\n'))
             return {
                 role: 'system',
@@ -191,48 +141,58 @@ class CreateNewPageTool {
         }
     }
 
-    async generatePageContent(pageName, componentList) {
+    generatePageContent(pageName, componentList) {
         const imports = [
             `import React from 'react'`,
             `import {Box} from '@salesforce/retail-react-app/app/components/shared/ui'`,
             `import Seo from '@salesforce/retail-react-app/app/components/seo'`
         ]
-        this.unfoundComponents = []
+
         // Add component imports
         const accessPromises = componentList.map(async (component) => {
             component = toPascalCase(component)
             const componentName = component.charAt(0).toUpperCase() + component.slice(1)
             const componentDir = toKebabCase(componentName)
-            const importPath = await this._findComponentImportPath(componentDir)
-            if (importPath) {
-                logMCPMessage(`?????? importing ${componentName} from '${importPath}'`)
-                imports.push(`import ${componentName} from '${importPath}'`)
-                // Import getAssetUrl for displaying image source if Image component is used
-                if (componentName === 'Image') {
-                    imports.push(
-                        `import {getAssetUrl} from '@salesforce/pwa-kit-react-sdk/ssr/universal/utils'`
-                    )
+            try {
+                await fs.access(
+                    path.join(process.env.PWA_STOREFRONT_APP_PATH, 'components', componentDir)
+                )
+            } catch (err) {
+                if (err.code === 'ENOENT') {
+                    this.unfoundComponents.push(component)
+                } else {
+                    throw err
                 }
-            } else {
-                this.unfoundComponents.push(component)
+            }
+            logMCPMessage(
+                `?????? importing ${componentName} from '@salesforce/retail-react-app/app/components/${componentDir}'`
+            )
+            imports.push(
+                `import {getAssetUrl} from '@salesforce/pwa-kit-react-sdk/ssr/universal/utils'`,
+                `import ${componentName} from '@salesforce/retail-react-app/app/components/${componentDir}'`
+            )
+            if (componentName === 'Image') {
+                imports.push(
+                    `import {getAssetUrl} from '@salesforce/pwa-kit-react-sdk/ssr/universal/utils'`
+                )
             }
         })
 
-        await Promise.all(accessPromises)
-        logMCPMessage(`?????? imports ${imports.join('\n')}`)
+        return Promise.all(accessPromises).then(() => {
+            logMCPMessage(`?????? imports ${imports.join('\n')}`)
 
-        const componentJsx = componentList
-            .map((component) => {
-                component = toPascalCase(component)
-                const componentName = component.charAt(0).toUpperCase() + component.slice(1)
-                if (componentName === 'Image') {
-                    return ` <Image src={getAssetUrl('static/img/hero.png')} alt="pwa-kit banner" style={{ width: '700px', height: 'auto' }} />`
-                }
-                return `                <${componentName} />`
-            })
-            .join('\n')
+            const componentJsx = componentList
+                .map((component) => {
+                    component = toPascalCase(component)
+                    const componentName = component.charAt(0).toUpperCase() + component.slice(1)
+                    if (componentName === 'Image') {
+                        return ` <Image src={getAssetUrl('static/img/hero.png')} alt="pwa-kit banner" style={{ width: '700px', height: 'auto' }} />`
+                    }
+                    return `                <${componentName} />`
+                })
+                .join('\n')
 
-        return `/*
+            return `/*
  * Copyright (c) ${new Date().getFullYear()}, Salesforce, Inc.
  * All rights reserved.
  * SPDX-License-Identifier: BSD-3-Clause
@@ -262,6 +222,7 @@ ${componentJsx}
 
 export default ${pageName};
         `
+        })
     }
 
     async updateRoutes(pageName, route) {
