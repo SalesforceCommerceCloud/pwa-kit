@@ -340,3 +340,150 @@ describe('Cancel Order Button and Modal', () => {
         })
     })
 })
+
+describe('Order Status Badge', () => {
+    test('should render order status badge with correct text for created status', async () => {
+        global.server.use(
+            rest.get('*/orders/:orderNo', (req, res, ctx) => {
+                return res(ctx.delay(0), ctx.json(mockOrderHistory.data[0]))
+            }),
+            rest.get('*/customers/:customerId/orders', (req, res, ctx) => {
+                return res(ctx.delay(0), ctx.json(mockOrderHistory))
+            }),
+            rest.get('*/products', (req, res, ctx) => {
+                return res(ctx.delay(0), ctx.json(mockOrderProducts))
+            })
+        )
+
+        const {user} = renderWithProviders(<MockedComponent history={history} />, {
+            wrapperProps: {siteAlias: 'uk', appConfig: mockConfig.app}
+        })
+
+        expect(await screen.findByTestId('account-order-history-page')).toBeInTheDocument()
+
+        // Navigate to order detail page
+        await user.click((await screen.findAllByText(/view details/i))[0])
+        expect(await screen.findByTestId('account-order-details-page')).toBeInTheDocument()
+
+        // Check that the badge is rendered with the correct status
+        const badge = screen.getByText('Created')
+        expect(badge).toBeInTheDocument()
+    })
+
+    test('should render order status badge with correct text for cancelled status', async () => {
+        // Create a modified order with cancelled status
+        const cancelledOrder = {
+            ...mockOrderHistory.data[0],
+            status: 'cancelled'
+        }
+
+        const mockOrderHistoryWithCancelledOrder = {
+            ...mockOrderHistory,
+            data: [cancelledOrder]
+        }
+
+        global.server.use(
+            rest.get('*/orders/:orderNo', (req, res, ctx) => {
+                return res(ctx.delay(0), ctx.json(cancelledOrder))
+            }),
+            rest.get('*/customers/:customerId/orders', (req, res, ctx) => {
+                return res(ctx.delay(0), ctx.json(mockOrderHistoryWithCancelledOrder))
+            }),
+            rest.get('*/products', (req, res, ctx) => {
+                return res(ctx.delay(0), ctx.json(mockOrderProducts))
+            })
+        )
+
+        const {user} = renderWithProviders(<MockedComponent history={history} />, {
+            wrapperProps: {siteAlias: 'uk', appConfig: mockConfig.app}
+        })
+
+        expect(await screen.findByTestId('account-order-history-page')).toBeInTheDocument()
+
+        // Navigate to order detail page
+        await user.click((await screen.findAllByText(/view details/i))[0])
+        expect(await screen.findByTestId('account-order-details-page')).toBeInTheDocument()
+
+        // Check that the badge is rendered with the correct status
+        const badge = screen.getByText('Cancelled')
+        expect(badge).toBeInTheDocument()
+    })
+
+    test('should render order status badge with correct text for unknown status', async () => {
+        // Create a modified order with unknown status
+        const unknownStatusOrder = {
+            ...mockOrderHistory.data[0],
+            status: 'unknown_status'
+        }
+
+        const mockOrderHistoryWithUnknownStatus = {
+            ...mockOrderHistory,
+            data: [unknownStatusOrder]
+        }
+
+        global.server.use(
+            rest.get('*/orders/:orderNo', (req, res, ctx) => {
+                return res(ctx.delay(0), ctx.json(unknownStatusOrder))
+            }),
+            rest.get('*/customers/:customerId/orders', (req, res, ctx) => {
+                return res(ctx.delay(0), ctx.json(mockOrderHistoryWithUnknownStatus))
+            }),
+            rest.get('*/products', (req, res, ctx) => {
+                return res(ctx.delay(0), ctx.json(mockOrderProducts))
+            })
+        )
+
+        const {user} = renderWithProviders(<MockedComponent history={history} />, {
+            wrapperProps: {siteAlias: 'uk', appConfig: mockConfig.app}
+        })
+
+        expect(await screen.findByTestId('account-order-history-page')).toBeInTheDocument()
+
+        // Navigate to order detail page
+        await user.click((await screen.findAllByText(/view details/i))[0])
+        expect(await screen.findByTestId('account-order-details-page')).toBeInTheDocument()
+
+        // Check that the badge is rendered with the correct status
+        const badge = screen.getByText('unknown_status')
+        expect(badge).toBeInTheDocument()
+    })
+
+    test('should handle case insensitive status values', async () => {
+        // Create a modified order with uppercase status
+        const uppercaseStatusOrder = {
+            ...mockOrderHistory.data[0],
+            status: 'CANCELLED'
+        }
+
+        const mockOrderHistoryWithUppercaseStatus = {
+            ...mockOrderHistory,
+            data: [uppercaseStatusOrder]
+        }
+
+        global.server.use(
+            rest.get('*/orders/:orderNo', (req, res, ctx) => {
+                return res(ctx.delay(0), ctx.json(uppercaseStatusOrder))
+            }),
+            rest.get('*/customers/:customerId/orders', (req, res, ctx) => {
+                return res(ctx.delay(0), ctx.json(mockOrderHistoryWithUppercaseStatus))
+            }),
+            rest.get('*/products', (req, res, ctx) => {
+                return res(ctx.delay(0), ctx.json(mockOrderProducts))
+            })
+        )
+
+        const {user} = renderWithProviders(<MockedComponent history={history} />, {
+            wrapperProps: {siteAlias: 'uk', appConfig: mockConfig.app}
+        })
+
+        expect(await screen.findByTestId('account-order-history-page')).toBeInTheDocument()
+
+        // Navigate to order detail page
+        await user.click((await screen.findAllByText(/view details/i))[0])
+        expect(await screen.findByTestId('account-order-details-page')).toBeInTheDocument()
+
+        // Check that the badge is rendered with the correct status
+        const badge = screen.getByText('Cancelled')
+        expect(badge).toBeInTheDocument()
+    })
+})

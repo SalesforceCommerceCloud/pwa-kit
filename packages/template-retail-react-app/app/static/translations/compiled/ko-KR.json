@@ -167,6 +167,18 @@
       "value": "출고됨"
     }
   ],
+  "account_order_detail.status.cancelled": [
+    {
+      "type": 0,
+      "value": "취소됨"
+    }
+  ],
+  "account_order_detail.status.created": [
+    {
+      "type": 0,
+      "value": "생성됨"
+    }
+  ],
   "account_order_detail.title.order_details": [
     {
       "type": 0,

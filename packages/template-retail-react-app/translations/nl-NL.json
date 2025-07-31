@@ -77,6 +77,12 @@
   "account_order_detail.shipping_status.shipped": {
     "defaultMessage": "Verzonden"
   },
+  "account_order_detail.status.cancelled": {
+    "defaultMessage": "Geannuleerd"
+  },
+  "account_order_detail.status.created": {
+    "defaultMessage": "Aangemaakt"
+  },
   "account_order_detail.title.order_details": {
     "defaultMessage": "Ordergegevens"
   },
