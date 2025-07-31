@@ -48,7 +48,7 @@ The PWA Kit MCP Server offers the following intelligent tools tailored to Salesf
 ```json
 {
   "mcpServers": {
-    "pwa-kit-mcp": {
+    "pwa-kit": {
       "command": "npx",
       "args": ["-y", "@salesforce/pwa-kit-mcp"],
       "env": {
@@ -87,19 +87,31 @@ Then send JSON-RPC requests like:
 
 ## 👩‍💻 Development
 
-To run in development mode (with debug logs):
+If you are actively developing features for the MCP server and want to get immediate feedback during testing, follow the below steps.
 
-```bash
-npm start
+1. Update your Cursor IDE MCP server configuration so that you are referencing the local server. This can be done by opening the "View: Open MCP Settings" 
+from the command pallet and editing your `pwa-kit` entry to look like the entry below.
+```json
+{
+  "mcpServers": {
+    "pwa-kit": {
+      "command": "node",
+      "args": ["{{path-to-app-mono-repo}}/packages/pwa-kit-mcp/dist/server/server.js"],
+      "env": {
+        "PWA_STOREFRONT_APP_PATH": "{{path-to-app-directory}}"
+      }
+    }
+  }
+}
 ```
 
-If you wish to rebuild the server whenever changes are made you can do so by running the following command:
-
+2. Ensure that your server is built and will rebuild whenever changes are made you by running the following command in the `/pwa-kit-mcp` folder:
 ```bash
 npm run build:watch
 ```
 
-The server logs to `stderr` and communicates using MCP via `stdio`.
+The server logs to `stderr` and communicates using MCP via `stdio`. You can view these logs in the `Output` section (shift + command + U) and filtering
+the output on "MCP Logs".
 
 
 ## 📁 Key Files & Project Structure
