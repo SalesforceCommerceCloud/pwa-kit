@@ -19,7 +19,7 @@ import {HOME_HREF, urlPartPositions} from '@salesforce/retail-react-app/app/cons
  *
  * @param {string} path - The relative URL path to be appended to the origin.
  * @param {string} [appOrigin] - The optional application origin (e.g., "https://example.com").
- *                                If not provided, the function will call `useAppOrigin()`.
+ *                                If not provided, the function will call `getAppOrigin()`.
  * @returns {string} - The fully qualified URL as a string.
  */
 export const absoluteUrl = (path, appOrigin) => {

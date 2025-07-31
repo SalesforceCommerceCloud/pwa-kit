@@ -704,8 +704,6 @@ export const RemoteServerFactory = {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     _setupProxying(app, options) {
         app.all(`${proxyBasePath}/*`, (req, res) => {
-            console.log('In Proxy Setup Error')
-            console.log(req.url)
             return res.status(501).json({
                 message:
                     'Environment proxies are not set: https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/proxying-requests.html'
