@@ -18,7 +18,7 @@ The PWA Kit MCP Server offers the following intelligent tools tailored to Salesf
 * **`create_app_guidelines`**
   Guides agents and developers through creating a new PWA Kit project with `@salesforce/pwa-kit-create-app`.
 
-* **`create_new_sample_component`**
+* **`create_new_sample_component`**:
   Walks developers through a brief Q\&A to scaffold a component using the commerce data model, layout, and structure.
 
 * **`create_sample_storefront_page`**
