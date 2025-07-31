@@ -28,8 +28,8 @@ export class AdyenPaymentsService {
         if (res.status >= 300) {
             const errorBody = await res.text()
             throw new Error(`Request failed with status ${res.status}: ${errorBody}`)
-        } else {
-            return res.json()
         }
+
+        return res.json()
     }
 }

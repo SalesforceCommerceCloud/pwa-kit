@@ -15,9 +15,9 @@ import {
     getCustomerBillingDetails,
     getAppleButtonConfig
 } from '@salesforce/retail-react-app/app/components/apple-pay-express/index'
-import {AdyenPaymentsService} from '@salesforce/retail-react-app/app/components/apple-pay-express/utils/payments'
-import {AdyenShippingAddressService} from '@salesforce/retail-react-app/app/components/apple-pay-express/utils/shipping-address'
-import {AdyenShippingMethodsService} from '@salesforce/retail-react-app/app/components/apple-pay-express/utils/shipping-methods'
+import {AdyenPaymentsService} from '@salesforce/retail-react-app/app/components/express/utils/payments'
+import {AdyenShippingAddressService} from '@salesforce/retail-react-app/app/components/express/utils/shipping-address'
+import {AdyenShippingMethodsService} from '@salesforce/retail-react-app/app/components/express/utils/shipping-methods'
 
 // Mock the AdyenCheckout module
 jest.mock('@adyen/adyen-web', () => ({
@@ -31,14 +31,14 @@ jest.mock('@adyen/adyen-salesforce-pwa', () => ({
 }))
 
 // Mock the utility services
-jest.mock('@salesforce/retail-react-app/app/components/apple-pay-express/utils/payments', () => ({
+jest.mock('@salesforce/retail-react-app/app/components/express/utils/payments', () => ({
     AdyenPaymentsService: jest.fn().mockImplementation(() => ({
         submitPayment: jest.fn()
     }))
 }))
 
 jest.mock(
-    '@salesforce/retail-react-app/app/components/apple-pay-express/utils/shipping-address',
+    '@salesforce/retail-react-app/app/components/express/utils/shipping-address',
     () => ({
         AdyenShippingAddressService: jest.fn().mockImplementation(() => ({
             updateShippingAddress: jest.fn()
@@ -47,7 +47,7 @@ jest.mock(
 )
 
 jest.mock(
-    '@salesforce/retail-react-app/app/components/apple-pay-express/utils/shipping-methods',
+    '@salesforce/retail-react-app/app/components/express/utils/shipping-methods',
     () => ({
         AdyenShippingMethodsService: jest.fn().mockImplementation(() => ({
             updateShippingMethod: jest.fn()

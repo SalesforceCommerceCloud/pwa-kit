@@ -5,9 +5,10 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import {AdyenPaymentsService} from '@salesforce/retail-react-app/app/components/express/utils/payments'
+import {ApiClient} from '@salesforce/retail-react-app/app/components/express/utils/api'
 
 // Mock the ApiClient
-jest.mock('./api')
+jest.mock('@salesforce/retail-react-app/app/components/apple-pay-express/utils/api')
 
 describe('AdyenPaymentsService', () => {
     let paymentsService
@@ -15,15 +16,11 @@ describe('AdyenPaymentsService', () => {
     const mockToken = 'test-token'
     const mockSite = {id: 'test-site'}
 
-    beforeEach(async () => {
+    beforeEach(() => {
         mockApiClient = {
             post: jest.fn()
         }
-
-        // Mock the ApiClient constructor
-        const {ApiClient} = await import('./api')
         ApiClient.mockImplementation(() => mockApiClient)
-
         paymentsService = new AdyenPaymentsService(mockToken, mockSite)
     })
 
@@ -32,36 +29,25 @@ describe('AdyenPaymentsService', () => {
     })
 
     describe('constructor', () => {
-        it('should initialize with correct base URL', () => {
+        it('should initialize with correct baseUrl', () => {
             expect(paymentsService.baseUrl).toBe('/api/adyen/payments')
         })
 
-        it('should create ApiClient with correct parameters', async () => {
-            const {ApiClient} = await import('./api')
+        it('should create ApiClient with correct parameters', () => {
             expect(ApiClient).toHaveBeenCalledWith('/api/adyen/payments', mockToken, mockSite)
         })
     })
 
     describe('submitPayment', () => {
-        const mockAdyenStateData = {
-            paymentType: 'express',
-            paymentMethod: {
-                type: 'googlepay',
-                googlePayToken: 'test-token'
-            }
-        }
-        const mockBasketId = 'test-basket-id'
-        const mockCustomerId = 'test-customer-id'
+        const mockAdyenStateData = {paymentMethod: 'applepay'}
+        const mockBasketId = 'basket-123'
+        const mockCustomerId = 'customer-456'
+        const mockResponseData = {result: 'success'}
 
         it('should submit payment successfully', async () => {
             const mockResponse = {
                 status: 200,
-                json: () =>
-                    Promise.resolve({
-                        isFinal: true,
-                        isSuccessful: true,
-                        merchantReference: 'order-123'
-                    })
+                json: jest.fn().mockResolvedValue(mockResponseData)
             }
             mockApiClient.post.mockResolvedValue(mockResponse)
 
@@ -80,33 +66,56 @@ describe('AdyenPaymentsService', () => {
                     basketid: mockBasketId
                 }
             })
-
-            expect(result).toEqual({
-                isFinal: true,
-                isSuccessful: true,
-                merchantReference: 'order-123'
-            })
+            expect(result).toEqual(mockResponseData)
         })
 
-        it('should throw error on failed request', async () => {
+        it('should handle error response (status >= 300)', async () => {
+            const errorMessage = 'Payment failed'
             const mockResponse = {
                 status: 400,
-                text: () => Promise.resolve('Bad Request')
+                text: jest.fn().mockResolvedValue(errorMessage)
             }
             mockApiClient.post.mockResolvedValue(mockResponse)
 
             await expect(
                 paymentsService.submitPayment(mockAdyenStateData, mockBasketId, mockCustomerId)
-            ).rejects.toThrow('Request failed with status 400: Bad Request')
+            ).rejects.toThrow(`Request failed with status 400: ${errorMessage}`)
+
+            expect(mockApiClient.post).toHaveBeenCalledWith({
+                body: JSON.stringify({
+                    data: mockAdyenStateData
+                }),
+                headers: {
+                    customerid: mockCustomerId,
+                    basketid: mockBasketId
+                }
+            })
         })
 
-        it('should throw error on network error', async () => {
-            const networkError = new Error('Network error')
-            mockApiClient.post.mockRejectedValue(networkError)
+        it('should handle 500 error response', async () => {
+            const errorMessage = 'Internal server error'
+            const mockResponse = {
+                status: 500,
+                text: jest.fn().mockResolvedValue(errorMessage)
+            }
+            mockApiClient.post.mockResolvedValue(mockResponse)
 
             await expect(
                 paymentsService.submitPayment(mockAdyenStateData, mockBasketId, mockCustomerId)
-            ).rejects.toThrow('Network error')
+            ).rejects.toThrow(`Request failed with status 500: ${errorMessage}`)
+        })
+
+        it('should handle 404 error response', async () => {
+            const errorMessage = 'Not found'
+            const mockResponse = {
+                status: 404,
+                text: jest.fn().mockResolvedValue(errorMessage)
+            }
+            mockApiClient.post.mockResolvedValue(mockResponse)
+
+            await expect(
+                paymentsService.submitPayment(mockAdyenStateData, mockBasketId, mockCustomerId)
+            ).rejects.toThrow(`Request failed with status 404: ${errorMessage}`)
         })
     })
 })
