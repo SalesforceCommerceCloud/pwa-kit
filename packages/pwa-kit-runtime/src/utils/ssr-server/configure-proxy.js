@@ -249,20 +249,14 @@ export const configureProxy = ({
             }
         },
 
-        // Rewrite the request's path to remove the /mobify/proxy/...
-        // prefix.
+        // Rewrite the request's path to remove the /mobify/proxy/... prefix.
         // This cannot be modified by any express middleware
-        // So we need to use the built in pathRewrite to remove the base path
-        // Note: PathRewrite applies the following in order so the order matters
+        // So we need to use the built in pathRewrite to remove the base path if present
         pathRewrite: (path) => {
             const basePathRegexEntry = getEnvBasePath() ? `${getEnvBasePath()}?` : ''
             const regex = new RegExp(`^${basePathRegexEntry}${proxyPath}`)
             return path.replace(regex, '')
         },
-        // {
-        //     `^${getEnvBasePath()}${proxyPath}`: '',
-        //     `^${proxyPath}`: ''
-        // },
 
         // The origin (protocol + host) to which we proxy
         target: targetOrigin

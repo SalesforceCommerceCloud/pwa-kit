@@ -791,6 +791,7 @@ describe('DevServer serveStaticFile', () => {
 
 describe('SLAS private client proxy', () => {
     test('should throw error if PWA_KIT_SLAS_CLIENT_SECRET env var not set', () => {
+        delete process.env.PWA_KIT_SLAS_CLIENT_SECRET
         expect(() => {
             NoWebpackDevServerFactory._createApp(opts({useSLASPrivateClient: true}))
         }).toThrow()

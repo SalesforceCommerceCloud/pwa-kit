@@ -25,7 +25,6 @@ const AppConfig = (props: AppConfigProps): ReactElement => {
     const [locale, setLocale] = useState(defaultLocale)
     const anotherSite = siteId === defaultSiteId ? 'RefArch' : defaultSiteId
     const anotherLocale = locale === defaultLocale ? 'en-CA' : defaultLocale
-
     return (
         <CommerceApiProvider
             siteId={siteId}

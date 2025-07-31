@@ -20,6 +20,7 @@ import {CachedResponse} from '../../utils/ssr-server'
 // We need to mock isRemote in some tests, so we need to import it directly from
 // the file it was defined in, because of the way jest works.
 import * as ssrServerUtils from '../../utils/ssr-server/utils'
+import * as ssrConfig from '../../utils/ssr-config'
 import {RemoteServerFactory, REMOTE_REQUIRED_ENV_VARS} from './build-remote-server'
 import {X_MOBIFY_QUERYSTRING} from './constants'
 import {
@@ -32,12 +33,6 @@ import {
     getRuntime
 } from './express'
 import {randomUUID} from 'crypto'
-
-jest.mock('../../utils/ssr-config', () => {
-    return {
-        getConfig: () => {}
-    }
-})
 
 // Mock static assets (require path is relative to the 'ssr' directory)
 const mockStaticAssets = {}
@@ -103,6 +98,8 @@ const opts = (overrides = {}) => {
 const mkdtempSync = () => fse.mkdtempSync(path.resolve(os.tmpdir(), 'ssr-server-tests-'))
 
 beforeAll(() => {
+    jest.spyOn(ssrConfig, 'getConfig').mockReturnValue({})
+
     // The SSR app applies patches on creation. Those patches are specific to an
     // environment (Lambda or not) and we need to ensure that the non-lambda patches
     // are applied for testing. Creating and immediately discarding an app in
@@ -1097,6 +1094,7 @@ describe('SLAS private client proxy', () => {
     const slasTarget = `http://localhost:${proxyPort}${proxyPath}`
 
     beforeAll(() => {
+        jest.spyOn(ssrConfig, 'getConfig').mockReturnValue({})
         // by setting slasTarget, rather than forwarding the request to SLAS,
         // we send the proxy request here so we can return the request headers
         proxyApp = express()
@@ -1120,6 +1118,7 @@ describe('SLAS private client proxy', () => {
     })
 
     test('should return HTTP 501 if PWA_KIT_SLAS_CLIENT_SECRET env var not set', () => {
+        delete process.env.PWA_KIT_SLAS_CLIENT_SECRET
         const app = RemoteServerFactory._createApp(opts({useSLASPrivateClient: true}))
         return request(app).get('/mobify/slas/private').expect(501)
     })
@@ -1268,5 +1267,19 @@ describe('SLAS private client proxy', () => {
         return await request(app)
             .get('/mobify/slas/private/shopper/auth-admin/v1/other-path')
             .expect(403)
+    }, 15000)
+})
+
+describe('Base path tests', () => {
+    test('Base Path is removed from request path and still gets through to /mobify endpoint', async () => {
+        jest.spyOn(ssrConfig, 'getConfig').mockReturnValue({envBasePath: '/basepath'})
+
+        const app = RemoteServerFactory._createApp(opts())
+
+        return request(app)
+            .get('/basepath/mobify/ping')
+            .then((response) => {
+                expect(response.status).toBe(200)
+            })
     }, 15000)
 })
