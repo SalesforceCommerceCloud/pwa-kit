@@ -167,25 +167,48 @@ const Cart = () => {
     // variant selection of the bundle children can be different,
     // and require unique references to each product bundle
     const productsByItemId = useMemo(() => {
+        const getLowestStockInfo = (
+            parentProduct,
+            productItem,
+            bundleChildProductData,
+            inventoryId = null
+        ) => {
+            const isDefaultInventory = !inventoryId
+            const parentInventory = isDefaultInventory
+                ? parentProduct.inventory
+                : parentProduct.inventories?.find((inv) => inv.id === inventoryId)
+
+            let lowestStockLevel = parentInventory?.stockLevel ?? Number.MAX_SAFE_INTEGER
+            let productWithLowestInventory = ''
+
+            productItem.bundledProductItems.forEach((bundleChild) => {
+                const childProduct = bundleChildProductData[bundleChild.productId]
+                const childInventory = isDefaultInventory
+                    ? childProduct?.inventory
+                    : childProduct?.inventories?.find((inv) => inv.id === inventoryId)
+                const childStockLevel = childInventory?.stockLevel ?? Number.MAX_SAFE_INTEGER
+
+                if (childStockLevel < lowestStockLevel) {
+                    lowestStockLevel = childStockLevel
+                    productWithLowestInventory = bundleChild.productName
+                }
+            })
+
+            return {lowestStockLevel, productWithLowestInventory}
+        }
+
         const updateProductsByItemId = {}
         basket?.productItems?.forEach((productItem) => {
             let currentProduct = products?.[productItem?.productId]
 
-            // calculate inventory for product bundles based on availability of children
-            if (productItem?.bundledProductItems && bundleChildProductData) {
-                let lowestStockLevel =
-                    currentProduct?.inventory?.stockLevel ?? Number.MAX_SAFE_INTEGER
-                let productWithLowestInventory = ''
-                productItem?.bundledProductItems.forEach((bundleChild) => {
-                    const bundleChildStockLevel =
-                        bundleChildProductData?.[bundleChild.productId]?.inventory?.stockLevel ??
-                        Number.MAX_SAFE_INTEGER
-                    lowestStockLevel = Math.min(lowestStockLevel, bundleChildStockLevel)
-                    if (lowestStockLevel === bundleChildStockLevel)
-                        productWithLowestInventory = bundleChild.productName
-                })
-
-                if (currentProduct?.inventory) {
+            if (currentProduct && productItem?.bundledProductItems && bundleChildProductData) {
+                // Calculate and update the default inventory for the bundle.
+                if (currentProduct.inventory) {
+                    const {lowestStockLevel, productWithLowestInventory} = getLowestStockInfo(
+                        currentProduct,
+                        productItem,
+                        bundleChildProductData
+                    )
                     currentProduct = {
                         ...currentProduct,
                         inventory: {
@@ -196,45 +219,29 @@ const Cart = () => {
                     }
                 }
 
-                // Update in-store inventories for the selected store with the lowest stock level and product name
-                if (selectedInventoryId) {
-                    let selectedStoreInventory = currentProduct?.inventories?.find(
-                        (inventory) => inventory.id === selectedInventoryId
-                    )
-                    let lowestInStoreStockLevel =
-                        selectedStoreInventory?.stockLevel ?? Number.MAX_SAFE_INTEGER
-                    let productWithLowestInventory = ''
-                    productItem?.bundledProductItems.forEach((bundleChild) => {
-                        const bundleChildInstoreInventory = bundleChildProductData?.[
-                            bundleChild.productId
-                        ]?.inventories?.find((inventory) => inventory.id === selectedInventoryId)
-                        const bundleChildInstoreStockLevel =
-                            bundleChildInstoreInventory?.stockLevel ?? Number.MAX_SAFE_INTEGER
-                        lowestInStoreStockLevel = Math.min(
-                            lowestInStoreStockLevel,
-                            bundleChildInstoreStockLevel
+                // Calculate and update in-store inventories for the bundle.
+                if (currentProduct.inventories) {
+                    const updatedInventories = currentProduct.inventories.map((inventory) => {
+                        const {
+                            lowestStockLevel: lowestInStoreStockLevel,
+                            productWithLowestInventory: productWithLowestInventoryForStore
+                        } = getLowestStockInfo(
+                            currentProduct,
+                            productItem,
+                            bundleChildProductData,
+                            inventory.id
                         )
-                        if (lowestInStoreStockLevel === bundleChildInstoreStockLevel)
-                            productWithLowestInventory = bundleChild.productName
+
+                        return {
+                            ...inventory,
+                            stockLevel: lowestInStoreStockLevel,
+                            lowestStockLevelProductName: productWithLowestInventoryForStore
+                        }
                     })
 
-                    // Update in-store inventories for the selected store with the lowest stock level and product name
-                    if (selectedStoreInventory) {
-                        const updatedInventories = currentProduct.inventories.map((inventory) => {
-                            if (inventory.id === selectedInventoryId) {
-                                return {
-                                    ...inventory,
-                                    stockLevel: lowestInStoreStockLevel,
-                                    lowestStockLevelProductName: productWithLowestInventory
-                                }
-                            }
-                            return inventory
-                        })
-
-                        currentProduct = {
-                            ...currentProduct,
-                            inventories: updatedInventories
-                        }
+                    currentProduct = {
+                        ...currentProduct,
+                        inventories: updatedInventories
                     }
                 }
             }
@@ -590,7 +597,11 @@ const Cart = () => {
     }, DEBOUNCE_WAIT)
 
     const handleChangeItemQuantity = async (product, value) => {
-        const stockLevel = productsByItemId?.[product.itemId]?.inventory?.stockLevel ?? 1
+        const productItemInventory =
+            productsByItemId?.[product.itemId]?.inventories?.find(
+                (inventory) => inventory.id === product.inventoryId
+            ) || productsByItemId?.[product.itemId]?.inventory
+        const stockLevel = productItemInventory?.stockLevel ?? 1
 
         // Handle removing of the items when 0 is selected.
         if (value === 0) {
