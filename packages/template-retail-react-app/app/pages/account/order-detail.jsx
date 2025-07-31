@@ -36,6 +36,7 @@ import CancelOrderModal from '@salesforce/retail-react-app/app/components/cancel
 import PropTypes from 'prop-types'
 import OrderStatusBar from '@salesforce/retail-react-app/app/components/order-status-bar/index'
 import {getOrderStatusColorScheme} from '@salesforce/retail-react-app/app/pages/account/order-history'
+import {getLocalizedOrderStatus} from '@salesforce/retail-react-app/app/pages/account/order-history'
 
 const onClient = typeof window !== 'undefined'
 
@@ -222,7 +223,7 @@ const AccountOrderDetail = () => {
                                     color={getOrderStatusColorScheme(order.status).color}
                                     variant="solid"
                                 >
-                                    {order.status}
+                                    {getLocalizedOrderStatus(order.status, formatMessage)}
                                 </Badge>
                             </Stack>
                         </Stack>

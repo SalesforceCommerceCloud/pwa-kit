@@ -167,6 +167,18 @@
       "value": "已发货"
     }
   ],
+  "account_order_detail.status.cancelled": [
+    {
+      "type": 0,
+      "value": "已取消"
+    }
+  ],
+  "account_order_detail.status.created": [
+    {
+      "type": 0,
+      "value": "已创建"
+    }
+  ],
   "account_order_detail.title.order_details": [
     {
       "type": 0,

@@ -167,6 +167,18 @@
       "value": "Afsendt"
     }
   ],
+  "account_order_detail.status.cancelled": [
+    {
+      "type": 0,
+      "value": "Annulleret"
+    }
+  ],
+  "account_order_detail.status.created": [
+    {
+      "type": 0,
+      "value": "Oprettet"
+    }
+  ],
   "account_order_detail.title.order_details": [
     {
       "type": 0,

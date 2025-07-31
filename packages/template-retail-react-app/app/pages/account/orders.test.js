@@ -366,7 +366,7 @@ describe('Order Status Badge', () => {
         expect(await screen.findByTestId('account-order-details-page')).toBeInTheDocument()
 
         // Check that the badge is rendered with the correct status
-        const badge = screen.getByText('created')
+        const badge = screen.getByText('Created')
         expect(badge).toBeInTheDocument()
     })
 
@@ -405,7 +405,7 @@ describe('Order Status Badge', () => {
         expect(await screen.findByTestId('account-order-details-page')).toBeInTheDocument()
 
         // Check that the badge is rendered with the correct status
-        const badge = screen.getByText('cancelled')
+        const badge = screen.getByText('Cancelled')
         expect(badge).toBeInTheDocument()
     })
 
@@ -483,7 +483,7 @@ describe('Order Status Badge', () => {
         expect(await screen.findByTestId('account-order-details-page')).toBeInTheDocument()
 
         // Check that the badge is rendered with the correct status
-        const badge = screen.getByText('CANCELLED')
+        const badge = screen.getByText('Cancelled')
         expect(badge).toBeInTheDocument()
     })
 })

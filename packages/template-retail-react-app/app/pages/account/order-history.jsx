@@ -47,6 +47,23 @@ export const getOrderStatusColorScheme = (status) => {
     }
 }
 
+export const getLocalizedOrderStatus = (status, formatMessage) => {
+    switch (status?.toLowerCase()) {
+        case 'created':
+            return formatMessage({
+                id: 'account_order_detail.status.created',
+                defaultMessage: 'Created'
+            })
+        case 'cancelled':
+            return formatMessage({
+                id: 'account_order_detail.status.cancelled',
+                defaultMessage: 'Cancelled'
+            })
+        default:
+            return status || ''
+    }
+}
+
 const OrderProductImages = ({productItems}) => {
     const ids = productItems.map((item) => item.productId).join(',') ?? ''
     const {data: {data: products} = {}, isLoading} = useProducts({
@@ -200,7 +217,7 @@ const AccountOrderHistory = () => {
                                             color={getOrderStatusColorScheme(order.status).color}
                                             variant="solid"
                                         >
-                                            {order.status}
+                                            {getLocalizedOrderStatus(order.status, formatMessage)}
                                         </Badge>
                                     </Stack>
                                 </Box>

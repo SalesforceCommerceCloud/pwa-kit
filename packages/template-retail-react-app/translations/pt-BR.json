@@ -77,6 +77,12 @@
   "account_order_detail.shipping_status.shipped": {
     "defaultMessage": "Enviado"
   },
+  "account_order_detail.status.cancelled": {
+    "defaultMessage": "Cancelado"
+  },
+  "account_order_detail.status.created": {
+    "defaultMessage": "Criado"
+  },
   "account_order_detail.title.order_details": {
     "defaultMessage": "Detalhes do pedido"
   },

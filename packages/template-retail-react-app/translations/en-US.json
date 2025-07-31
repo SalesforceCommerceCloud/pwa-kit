@@ -80,6 +80,12 @@
   "account_order_detail.shipping_status.shipped": {
     "defaultMessage": "Shipped"
   },
+  "account_order_detail.status.cancelled": {
+    "defaultMessage": "Cancelled"
+  },
+  "account_order_detail.status.created": {
+    "defaultMessage": "Created"
+  },
   "account_order_detail.title.order_details": {
     "defaultMessage": "Order Details"
   },
