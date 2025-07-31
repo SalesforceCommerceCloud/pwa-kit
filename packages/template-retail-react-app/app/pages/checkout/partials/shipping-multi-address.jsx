@@ -215,6 +215,11 @@ const ShippingMultiAddress = ({
     // Unified loading state - check if either customer or products are loading
     const isLoading = customerLoading || productsLoading
 
+    // Check if all product items have an address selected
+    const allShipmentsHaveAddress = basket.productItems.every(
+        (item) => selectedAddresses[item.itemId]
+    )
+
     if (!basket?.productItems?.length) {
         return (
             <Center
@@ -679,6 +684,8 @@ const ShippingMultiAddress = ({
                     type="button"
                     width="full"
                     mt={2}
+                    opacity={!allShipmentsHaveAddress || isAddressFormOpen ? 0.8 : 1}
+                    cursor={!allShipmentsHaveAddress || isAddressFormOpen ? 'not-allowed' : 'pointer'}
                     isLoading={addressForm.formState.isSubmitting || isSubmitting}
                     {...(isAddressFormOpen && {disabled: true})}
                     data-testid="continue-to-shipping-button"
@@ -691,7 +698,7 @@ const ShippingMultiAddress = ({
                         defaultMessage: 'Continue to next step with selected delivery addresses'
                     })}
                     onClick={() => {
-                        if (!isAddressFormOpen) {
+                        if (!isAddressFormOpen && allShipmentsHaveAddress) {
                             handleSubmit()
                         }
                     }}
