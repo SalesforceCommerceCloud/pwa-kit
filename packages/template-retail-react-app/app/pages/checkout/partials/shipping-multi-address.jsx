@@ -42,6 +42,7 @@ import {
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 import {useMultiship} from '@salesforce/retail-react-app/app/hooks/use-multiship'
 import {useCheckout} from '@salesforce/retail-react-app/app/pages/checkout/util/checkout-context'
+import {usePickupShipment} from '@salesforce/retail-react-app/app/hooks/use-pickup-shipment'
 
 const MultiShippingItemAttributes = ({variant, includeQuantity = true}) => {
     const {formatMessage} = useIntl()
@@ -137,6 +138,7 @@ const ShippingMultiAddress = ({
     const {currency} = useCurrency()
     const {STEPS, goToStep} = useCheckout()
     const showToast = useToast()
+    const {isCurrentShippingMethodPickup} = usePickupShipment(basket)
     const {
         findDeliveryShipmentWithSameAddress,
         createNewDeliveryShipmentWithAddress,
@@ -144,7 +146,13 @@ const ShippingMultiAddress = ({
         removeEmptyShipments
     } = useMultiship(basket)
 
-    const productIds = basket?.productItems?.map((item) => item.productId).join(',')
+    // Filter out pickup items - only show delivery items
+    const deliveryItems =
+        basket?.productItems?.filter((item) => {
+            const shipment = basket?.shipments?.find((s) => s.shipmentId === item.shipmentId)
+            return !isCurrentShippingMethodPickup(shipment?.shippingMethod)
+        }) || []
+    const productIds = deliveryItems.map((item) => item.productId).join(',')
     const {
         data: productsMap,
         isLoading: productsLoading,
@@ -175,9 +183,9 @@ const ShippingMultiAddress = ({
 
     // Update selected addresses when customer data changes
     useEffect(() => {
-        if (customer && basket?.productItems && addresses.length > 0) {
+        if (customer && deliveryItems.length > 0 && addresses.length > 0) {
             const initialSelected = {}
-            basket.productItems.forEach((item) => {
+            deliveryItems.forEach((item) => {
                 const addressKey = item.itemId
                 // Find preferred address or use first address as default
                 const defaultAddress = addresses.find((addr) => addr.preferred) || addresses[0]
@@ -187,7 +195,7 @@ const ShippingMultiAddress = ({
             })
             setSelectedAddresses(initialSelected)
         }
-    }, [customer?.customerId, basket?.productItems?.length, addresses.length])
+    }, [customer?.customerId, deliveryItems.length, addresses.length])
 
     const [showAddAddressForm, setShowAddAddressForm] = useState({})
 
@@ -220,7 +228,7 @@ const ShippingMultiAddress = ({
         (item) => selectedAddresses[item.itemId]
     )
 
-    if (!basket?.productItems?.length) {
+    if (!deliveryItems.length) {
         return (
             <Center
                 p={8}
@@ -359,7 +367,7 @@ const ShippingMultiAddress = ({
             // Based on the shopper's selected addresses, create a map of unique addressIds and their associated items
             const addressToItemsMap = {}
 
-            basket.productItems.forEach((item) => {
+            deliveryItems.forEach((item) => {
                 // Defaults to the first address if no address is selected
                 const addressId = selectedAddresses[item.itemId] || addresses[0]?.addressId
                 const address = addresses.find((addr) => addr.addressId === addressId)
@@ -426,7 +434,7 @@ const ShippingMultiAddress = ({
                     w="100%"
                 >
                     <VStack spacing={2} w="100%" h="100%">
-                        {basket.productItems.map((item) => {
+                        {deliveryItems.map((item) => {
                             const productDetail = productsMap?.[item.productId] || {}
                             const variant = {...item, ...productDetail}
                             const image = findImageGroupBy(productDetail.imageGroups, {
