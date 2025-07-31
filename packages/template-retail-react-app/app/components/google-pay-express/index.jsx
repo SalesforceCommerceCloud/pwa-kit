@@ -365,10 +365,6 @@ export const GooglePayExpress = () => {
                 try {
                     isGooglePayButtonAvailable = await googlePayButton.isAvailable()
                 } catch (ex) {
-                    console.error(
-                        '[GooglePayExpress] Error checking Google Pay button availability:',
-                        ex
-                    )
                     isGooglePayButtonAvailable = false
                 }
 
