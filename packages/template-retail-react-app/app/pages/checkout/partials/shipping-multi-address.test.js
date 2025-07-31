@@ -714,6 +714,46 @@ describe('ShippingMultiAddress', () => {
                 expect(screen.queryByText('Setting up shipments...')).toBeInTheDocument()
             })
         })
+        test('should be disabled when no addresses are selected for any product', () => {
+            // Mock customer with no addresses
+            useCurrentCustomer.mockReturnValue({
+                data: {...mockCustomer, addresses: []},
+                isLoading: false
+            })
+
+            renderWithIntl(<ShippingMultiAddress {...defaultProps} />)
+
+            const continueButton = screen.getByTestId('continue-to-shipping-button')
+            expect(continueButton).toBeDisabled()
+
+            // Clicking should not trigger the loading state
+            fireEvent.click(continueButton)
+            expect(screen.queryByText('Setting up shipments...')).not.toBeInTheDocument()
+        })
+
+        test('should be disabled when add new address form is open', async () => {
+            renderWithIntl(<ShippingMultiAddress {...defaultProps} />)
+
+            const addNewAddressButtons = screen.getAllByText('+ Add New Address')
+            fireEvent.click(addNewAddressButtons[0])
+
+            await waitFor(() => {
+                expect(screen.getByTestId('address-form')).toBeInTheDocument()
+            })
+
+            const continueButton = screen.getByTestId('continue-to-shipping-button')
+            expect(continueButton).toBeDisabled()
+
+            // Clicking should not trigger the loading state
+            fireEvent.click(continueButton)
+            expect(screen.queryByText('Setting up shipments...')).not.toBeInTheDocument()
+        })
+
+        test('should be enabled when all products have an address asscoiated with them in multiship view', () => {
+            renderWithIntl(<ShippingMultiAddress {...defaultProps} />);
+            const continueButton = screen.getByTestId('continue-to-shipping-button');
+            expect(continueButton).toBeEnabled();
+        })
     })
 })
 

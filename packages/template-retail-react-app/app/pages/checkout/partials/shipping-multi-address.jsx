@@ -687,7 +687,7 @@ const ShippingMultiAddress = ({
                     opacity={!allShipmentsHaveAddress || isAddressFormOpen ? 0.8 : 1}
                     cursor={!allShipmentsHaveAddress || isAddressFormOpen ? 'not-allowed' : 'pointer'}
                     isLoading={addressForm.formState.isSubmitting || isSubmitting}
-                    {...(isAddressFormOpen && {disabled: true})}
+                    isDisabled={!allShipmentsHaveAddress || isAddressFormOpen}
                     data-testid="continue-to-shipping-button"
                     loadingText={formatMessage({
                         id: 'shipping_multi_address.submit.loading',
