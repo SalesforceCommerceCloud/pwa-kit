@@ -189,12 +189,8 @@ class CreateNewPageTool {
             const componentDir = toKebabCase(componentName)
             const importPath = await this._findComponentImportPath(componentDir)
             if (importPath) {
-                logMCPMessage(
-                    `?????? importing ${componentName} from '${importPath}'`
-                )
-                imports.push(
-                    `import ${componentName} from '${importPath}'`
-                )
+                logMCPMessage(`?????? importing ${componentName} from '${importPath}'`)
+                imports.push(`import ${componentName} from '${importPath}'`)
                 // Import getAssetUrl for displaying image source if Image component is used
                 if (componentName === 'Image') {
                     imports.push(
