@@ -76,6 +76,40 @@ const CustomBrandLogo = () => (
 )
 ```
 
+## 🛣️ **Import Path Requirements**
+
+### **CRITICAL: Use Absolute Paths**
+When importing custom components that use static assets, **ALWAYS use absolute import paths** to comply with project linting rules and prevent build errors.
+
+```javascript
+// ❌ INCORRECT - Relative import (will cause linting errors)
+import CustomBrandLogo from './custom-brand-logo'
+
+// ❌ INCORRECT - Malformed absolute path (will cause build errors)
+import CustomBrandLogo from '@salesforce/retail-react-app/../../app/components/icons/custom-brand-logo'
+
+// ✅ CORRECT - Proper absolute import path
+import CustomBrandLogo from '@salesforce/retail-react-app/app/components/icons/custom-brand-logo'
+```
+
+### **Why Absolute Paths Are Required**:
+- **Linting Compliance**: Project ESLint rules require absolute imports
+- **Build Reliability**: Prevents webpack module resolution errors
+- **Code Consistency**: Maintains uniform import patterns across the codebase
+- **IDE Support**: Better autocomplete and refactoring support
+
+### **Common Import Patterns**:
+```javascript
+// For components in the same package
+import CustomComponent from '@salesforce/retail-react-app/app/components/custom-component'
+
+// For utilities
+import {getAssetUrl} from '@salesforce/pwa-kit-react-sdk/ssr/universal/utils'
+
+// For shared UI components
+import {Image, Box} from '@salesforce/retail-react-app/app/components/shared/ui'
+```
+
 ## 📋 **Required File Updates**
 
 ### **Primary Files to Update**:
@@ -95,10 +129,13 @@ const CustomBrandLogo = () => (
 Before completing asset management work, verify:
 - [ ] External image has been downloaded to appropriate static directory
 - [ ] Component uses `getAssetUrl()` with correct local path
+- [ ] **Import statements use absolute paths** (no relative imports)
 - [ ] No external URLs remain in the codebase
 - [ ] Image displays correctly in development
 - [ ] File permissions are correct (readable)
 - [ ] Image format is optimized (JPEG for photos, PNG for logos with transparency)
+- [ ] **Build completes without import errors**
+- [ ] **Linting passes without import path violations**
 
 ## 🎨 **Asset Optimization**
 
@@ -119,6 +156,8 @@ Before completing asset management work, verify:
 3. **Incorrect Paths**: Don't use wrong asset paths in `getAssetUrl()`
 4. **Missing Imports**: Don't forget to import `getAssetUrl` utility
 5. **File Permissions**: Don't forget to ensure downloaded files are readable
+6. **Relative Imports**: Don't use relative imports for custom components
+7. **Malformed Absolute Paths**: Don't use incorrect absolute path syntax
 
 ## 🔍 **Performance Benefits**
 
@@ -144,6 +183,4 @@ Before completing asset management work, verify:
 - CDN integration works seamlessly with local assets
 
 This rule ensures consistent, performant, and reliable asset management across the PWA Kit application.
-description: Rule for managing hero and logo images as static resources
-globs: ["**/*.{js,jsx}", "**/*.{ts,tsx}"]
 
