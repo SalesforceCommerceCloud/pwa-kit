@@ -7,7 +7,7 @@
     "bump-version:commerce-sdk-react": "node ./scripts/bump-version/index.js --package=@salesforce/commerce-sdk-react",
     "publish-to-npm": "node ./scripts/publish-to-npm.js",
     "format": "lerna run --stream format",
-    "preinstall": "node ./scripts/check-version.js && npm run sync-eslint-to-root",
+    "preinstall": "node ./scripts/check-version.js && npm run check-eslint-deps",
     "postinstall": "node ./scripts/bootstrap.js && node ./scripts/check-lockfiles.mjs && npm run check-dep-version",
     "lerna": "lerna",
     "lint": "lerna run --stream lint",
@@ -21,7 +21,7 @@
     "test": "lerna run --stream --concurrency=1 test",
     "test:max-file-size": "lerna run --stream test:max-file-size",
     "check-dep-version": "syncpack list-mismatches --types prod,dev",
-    "sync-eslint-to-root": "node scripts/sync-eslint-to-root.js",
+    "check-eslint-deps": "node scripts/check-eslint-deps.js",
     "test:e2e:extra_features": "npx playwright test --project=extra-features-desktop --project=extra-features-mobile"
   },
   "devDependencies": {
