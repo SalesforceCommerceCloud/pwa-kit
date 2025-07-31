@@ -1514,6 +1514,9 @@
   "shipping_multi_address.loading.message": {
     "defaultMessage": "Loading..."
   },
+  "shipping_multi_address.loading_addresses": {
+    "defaultMessage": "Loading addresses..."
+  },
   "shipping_multi_address.no_addresses_available": {
     "defaultMessage": "No Address Available"
   },
