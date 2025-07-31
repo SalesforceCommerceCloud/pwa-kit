@@ -171,6 +171,7 @@ class CreateNewPageTool {
                 `import {getAssetUrl} from '@salesforce/pwa-kit-react-sdk/ssr/universal/utils'`,
                 `import ${componentName} from '@salesforce/retail-react-app/app/components/${componentDir}'`
             )
+            // Import getAssetUrl for displaying image source if Image component is used
             if (componentName === 'Image') {
                 imports.push(
                     `import {getAssetUrl} from '@salesforce/pwa-kit-react-sdk/ssr/universal/utils'`
