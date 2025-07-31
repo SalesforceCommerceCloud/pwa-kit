@@ -46,7 +46,9 @@ const StoreLocator = SFDC_EXT_STORE_LOCATOR
     ? loadable(() => import('../src/pages/store-locator'), {
           fallback
       })
-    : null
+    : loadable(() => Promise.resolve({default: () => null}), {
+          fallback
+      })
 
 //@sfdc-extension-line SFDC_EXT_SOCIAL_LOGIN
 const SocialLoginRedirect = loadable(() => import('../src/pages/social-login-redirect'), {fallback})
