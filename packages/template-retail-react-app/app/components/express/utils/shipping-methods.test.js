@@ -7,7 +7,7 @@
 import {AdyenShippingMethodsService} from '@salesforce/retail-react-app/app/components/express/utils/shipping-methods'
 
 // Mock the ApiClient
-jest.mock('./api')
+jest.mock('@salesforce/retail-react-app/app/components/express/utils/api')
 
 describe('AdyenShippingMethodsService', () => {
     let shippingMethodsService
@@ -22,7 +22,7 @@ describe('AdyenShippingMethodsService', () => {
         }
 
         // Mock the ApiClient constructor
-        const {ApiClient} = await import('./api')
+        const {ApiClient} = await import('@salesforce/retail-react-app/app/components/express/utils/api')
         ApiClient.mockImplementation(() => mockApiClient)
 
         shippingMethodsService = new AdyenShippingMethodsService(mockToken, mockSite)

@@ -16,13 +16,12 @@ import {
 import {AdyenShippingMethodsService} from '@salesforce/retail-react-app/app/components/express/utils/shipping-methods'
 import {AdyenShippingAddressService} from '@salesforce/retail-react-app/app/components/express/utils/shipping-address'
 import {AdyenPaymentsService} from '@salesforce/retail-react-app/app/components/express/utils/payments'
+import {
+    PAYMENT_METHODS,
+    EXPRESS_MESSAGES
+} from '@salesforce/retail-react-app/app/components/express/utils/constants'
 
-const PAYMENT_METHOD = 'googlepay'
-const EXPRESS_PAYMENT_AVAILABLE = 'express.payment.available'
-const EXPRESS_PAYMENT_UNAVAILABLE = 'express.payment.unavailable'
-const EXPRESS_PAYMENT_SUCCESS = 'express.payment.success'
-const EXPRESS_PAYMENT_FAILURE = 'express.payment.failure'
-const EXPRESS_PAYMENT_CANCEL = 'express.payment.cancel'
+const PAYMENT_METHOD = PAYMENT_METHODS.GOOGLE_PAY
 
 const sendExpressMessage = (type, payload = {}) => {
     window.parent.postMessage(
@@ -229,17 +228,17 @@ export const getGoogleButtonConfig = (
 
                 if (paymentsResponse?.isFinal && paymentsResponse?.isSuccessful) {
                     var orderId = paymentsResponse?.merchantReference
-                    sendExpressMessage(EXPRESS_PAYMENT_SUCCESS, {
+                    sendExpressMessage(EXPRESS_MESSAGES.PAYMENT_SUCCESS, {
                         orderId,
                         PAYMENT_METHOD
                     })
                 } else {
-                    sendExpressMessage(EXPRESS_PAYMENT_FAILURE, {
+                    sendExpressMessage(EXPRESS_MESSAGES.PAYMENT_FAILURE, {
                         PAYMENT_METHOD
                     })
                 }
             } catch (err) {
-                sendExpressMessage(EXPRESS_PAYMENT_FAILURE, {
+                sendExpressMessage(EXPRESS_MESSAGES.PAYMENT_FAILURE, {
                     PAYMENT_METHOD
                 })
             }
@@ -284,11 +283,11 @@ export const getGoogleButtonConfig = (
 
         onError: (error) => {
             if (error.name === 'CANCEL') {
-                sendExpressMessage(EXPRESS_PAYMENT_CANCEL, {
+                sendExpressMessage(EXPRESS_MESSAGES.PAYMENT_CANCEL, {
                     PAYMENT_METHOD
                 })
             } else {
-                sendExpressMessage(EXPRESS_PAYMENT_FAILURE, {
+                sendExpressMessage(EXPRESS_MESSAGES.PAYMENT_FAILURE, {
                     PAYMENT_METHOD
                 })
             }
@@ -320,7 +319,7 @@ export const GooglePayExpress = () => {
             }
 
             const handleGooglePayUnavailable = () => {
-                sendExpressMessage(EXPRESS_PAYMENT_UNAVAILABLE, {
+                sendExpressMessage(EXPRESS_MESSAGES.PAYMENT_UNAVAILABLE, {
                     PAYMENT_METHOD
                 })
             }
@@ -376,7 +375,7 @@ export const GooglePayExpress = () => {
 
                 try {
                     await googlePayButton.mount(paymentContainer.current)
-                    sendExpressMessage(EXPRESS_PAYMENT_AVAILABLE, {
+                    sendExpressMessage(EXPRESS_MESSAGES.PAYMENT_AVAILABLE, {
                         PAYMENT_METHOD
                     })
                 } catch (error) {

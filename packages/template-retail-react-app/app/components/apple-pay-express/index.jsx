@@ -9,23 +9,22 @@ import AdyenCheckout from '@adyen/adyen-web'
 import '@adyen/adyen-web/dist/adyen.css'
 import PropTypes from 'prop-types'
 import {useAdyenExpressCheckout} from '@adyen/adyen-salesforce-pwa'
-import {getCurrencyValueForApi} from '@salesforce/retail-react-app/app/components/apple-pay-express/utils/parsers'
-import {AdyenShippingMethodsService} from '@salesforce/retail-react-app/app/components/apple-pay-express/utils/shipping-methods'
-import {AdyenShippingAddressService} from '@salesforce/retail-react-app/app/components/apple-pay-express/utils/shipping-address'
-import {AdyenPaymentsService} from '@salesforce/retail-react-app/app/components/apple-pay-express/utils/payments'
-import {createTemporaryBasket, deleteTemporaryBasket, cleanupTemporaryBasket} from '@salesforce/retail-react-app/app/components/apple-pay-express/utils/temporary-basket'
-import {getBasketWithTotals, forceOrderCalculation} from '@salesforce/retail-react-app/app/components/apple-pay-express/utils/basket-calculation'
-import {useStandalonePaymentMethods} from '@salesforce/retail-react-app/app/components/apple-pay-express/hooks/use-standalone-payment-methods'
+import {getCurrencyValueForApi} from '@salesforce/retail-react-app/app/components/express/utils/parsers'
+import {AdyenShippingMethodsService} from '@salesforce/retail-react-app/app/components/express/utils/shipping-methods'
+import {AdyenShippingAddressService} from '@salesforce/retail-react-app/app/components/express/utils/shipping-address'
+import {AdyenPaymentsService} from '@salesforce/retail-react-app/app/components/express/utils/payments'
+import {createTemporaryBasket, deleteTemporaryBasket, cleanupTemporaryBasket} from '@salesforce/retail-react-app/app/components/express/utils/pdp/temporary-basket'
+import {getBasketWithTotals, forceOrderCalculation} from '@salesforce/retail-react-app/app/components/express/utils/pdp/basket-calculation'
+import {useStandalonePaymentMethods} from '@salesforce/retail-react-app/app/components/express/hooks/use-standalone-payment-methods'
 import {useAccessToken} from '@salesforce/commerce-sdk-react'
 import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
 import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
+import {
+    PAYMENT_METHODS,
+    EXPRESS_MESSAGES
+} from '@salesforce/retail-react-app/app/components/express/utils/constants'
 
-const PAYMENT_METHOD = 'applepay'
-const EXPRESS_PAYMENT_AVAILABLE = 'express.payment.available'
-const EXPRESS_PAYMENT_UNAVAILABLE = 'express.payment.unavailable'
-const EXPRESS_PAYMENT_SUCCESS = 'express.payment.success'
-const EXPRESS_PAYMENT_FAILURE = 'express.payment.failure'
-const EXPRESS_PAYMENT_CANCEL = 'express.payment.cancel'
+const PAYMENT_METHOD = PAYMENT_METHODS.APPLE_PAY
 
 const sendExpressMessage = (type, payload = {}) => {
     window.parent.postMessage(
@@ -193,7 +192,7 @@ export const getAppleButtonConfig = (
                 if (!currentBasket || !currentBasket.basketId) {
                     await cleanupTemporaryBasket(isPdpMode, sharedBasketRef, authToken, site, setTempBasket)
                     reject()
-                    sendExpressMessage(EXPRESS_PAYMENT_FAILURE, {
+                    sendExpressMessage(EXPRESS_MESSAGES.PAYMENT_FAILURE, {
                         PAYMENT_METHOD
                     })
                     return
@@ -214,7 +213,7 @@ export const getAppleButtonConfig = (
                     if (currentBasket.orderTotal === null || currentBasket.orderTotal === undefined) {
                         await cleanupTemporaryBasket(isPdpMode, sharedBasketRef, authToken, site, setTempBasket)
                         reject()
-                        sendExpressMessage(EXPRESS_PAYMENT_FAILURE, {
+                        sendExpressMessage(EXPRESS_MESSAGES.PAYMENT_FAILURE, {
                             PAYMENT_METHOD
                         })
                         return
@@ -224,7 +223,7 @@ export const getAppleButtonConfig = (
                     // This is a critical error - we cannot proceed without order total
                     await cleanupTemporaryBasket(isPdpMode, sharedBasketRef, authToken, site, setTempBasket)
                     reject()
-                    sendExpressMessage(EXPRESS_PAYMENT_FAILURE, {
+                    sendExpressMessage(EXPRESS_MESSAGES.PAYMENT_FAILURE, {
                         PAYMENT_METHOD
                     })
                     return
@@ -254,7 +253,7 @@ export const getAppleButtonConfig = (
 
                     var orderId = paymentsResponse?.merchantReference
 
-                    sendExpressMessage(EXPRESS_PAYMENT_SUCCESS, {
+                    sendExpressMessage(EXPRESS_MESSAGES.PAYMENT_SUCCESS, {
                         orderId,
                         PAYMENT_METHOD
                     })
@@ -262,7 +261,7 @@ export const getAppleButtonConfig = (
                     // Clean up temporary basket on payment failure
                     await cleanupTemporaryBasket(isPdpMode, sharedBasketRef, authToken, site, setTempBasket)
                     reject()
-                    sendExpressMessage(EXPRESS_PAYMENT_FAILURE, {
+                    sendExpressMessage(EXPRESS_MESSAGES.PAYMENT_FAILURE, {
                         PAYMENT_METHOD
                     })
                 }
@@ -270,7 +269,7 @@ export const getAppleButtonConfig = (
                 // Clean up temporary basket on any unexpected error
                 await cleanupTemporaryBasket(isPdpMode, sharedBasketRef, authToken, site, setTempBasket)
                 reject()
-                sendExpressMessage(EXPRESS_PAYMENT_FAILURE, {
+                sendExpressMessage(EXPRESS_MESSAGES.PAYMENT_FAILURE, {
                     PAYMENT_METHOD
                 })
             }
@@ -431,12 +430,12 @@ export const getAppleButtonConfig = (
             // Clean up temporary basket when Apple Pay is cancelled or fails            
             if (error.name === 'CANCEL') {
                 cleanupTemporaryBasket(isPdpMode, sharedBasketRef, authToken, site, setTempBasket)
-                sendExpressMessage(EXPRESS_PAYMENT_CANCEL, {
+                sendExpressMessage(EXPRESS_MESSAGES.PAYMENT_CANCEL, {
                     PAYMENT_METHOD
                 })
             } else {
                 cleanupTemporaryBasket(isPdpMode, sharedBasketRef, authToken, site, setTempBasket)
-                sendExpressMessage(EXPRESS_PAYMENT_FAILURE, {
+                sendExpressMessage(EXPRESS_MESSAGES.PAYMENT_FAILURE, {
                     PAYMENT_METHOD
                 })
             }
@@ -523,7 +522,7 @@ export const ApplePayExpress = ({sku, quantity = 1, isPdpMode = false}) => {
                 }
                 if (standaloneError) {
                     console.error('Standalone payment methods error:', standaloneError)
-                    sendExpressMessage(EXPRESS_PAYMENT_UNAVAILABLE, {
+                    sendExpressMessage(EXPRESS_MESSAGES.PAYMENT_UNAVAILABLE, {
                         PAYMENT_METHOD
                     })
                     return
@@ -535,12 +534,11 @@ export const ApplePayExpress = ({sku, quantity = 1, isPdpMode = false}) => {
             }
 
             if (!adyenEnvironment) {
-                console.warn('Adyen environment not available')
                 return
             }
 
             const handleApplePayUnavailable = () => {
-                sendExpressMessage(EXPRESS_PAYMENT_UNAVAILABLE, {
+                sendExpressMessage(EXPRESS_MESSAGES.PAYMENT_UNAVAILABLE, {
                     PAYMENT_METHOD
                 })
             }
@@ -609,7 +607,7 @@ export const ApplePayExpress = ({sku, quantity = 1, isPdpMode = false}) => {
 
                 try {
                     await applePayButton.mount(paymentContainer.current)
-                    sendExpressMessage(EXPRESS_PAYMENT_AVAILABLE, {
+                    sendExpressMessage(EXPRESS_MESSAGES.PAYMENT_AVAILABLE, {
                         PAYMENT_METHOD
                     })
                 } catch (error) {
