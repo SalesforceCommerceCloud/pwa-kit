@@ -1229,4 +1229,23 @@ test('Can register account during checkout as a guest', async () => {
         },
         password: expect.any(String)
     })
+
+    // Check that the shipping address is saved
+    expect(mockUseShopperCustomersMutation).toHaveBeenCalledWith({
+        body: {
+            addressId: expect.any(String),
+            address1: '123 Main St',
+            city: 'Tampa',
+            countryCode: 'US',
+            firstName: 'Test',
+            fullName: 'Test McTester',
+            lastName: 'McTester',
+            phone: '(727) 555-1234',
+            postalCode: '33712',
+            stateCode: 'FL'
+        },
+        parameters: {
+            customerId: 'test-customer-id'
+        }
+    })
 })
