@@ -32,7 +32,7 @@ const initEmbeddedMessaging = (
             window.embeddedservice_bootstrap.settings
         ) {
             window.embeddedservice_bootstrap.settings.language = locale
-            window.embeddedservice_bootstrap.settings.disableStreamingResponses = false
+            window.embeddedservice_bootstrap.settings.disableStreamingResponses = true
             window.embeddedservice_bootstrap.init(
                 salesforceOrgId,
                 embeddedServiceDeploymentName,
