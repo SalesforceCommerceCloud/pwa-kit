@@ -544,7 +544,9 @@ export const RemoteServerFactory = {
                     const expressRoutes = app._router.stack
                         // specifically omit the generic wildcard from the express routes we want to
                         // remove the base path from since it is mapped to the app render
-                        .filter((layer) => layer.route && layer.route.path && layer.route.path !== '*')
+                        .filter(
+                            (layer) => layer.route && layer.route.path && layer.route.path !== '*'
+                        )
                         .map((layer) => layer.route.path)
 
                     for (const route of expressRoutes) {
