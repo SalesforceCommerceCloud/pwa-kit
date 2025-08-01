@@ -50,10 +50,6 @@ jobs:
   codeowners-validation:
     if: (github.event_name == 'push' || github.event.pull_request.head.repo.full_name == github.repository)
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      pull-requests: read
-      # Note: read:org is NOT available to GITHUB_TOKEN
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -61,7 +57,7 @@ jobs:
       - name: Validate CODEOWNERS
         uses: mszostok/codeowners-validator@v0.7.4
         with:
-          checks: "files,owners,duppatterns,syntax"
+          checks: "files,duppatterns,syntax"
           experimental_checks: "notowned"
           github_access_token: "${{ secrets.GITHUB_TOKEN }}"
 
