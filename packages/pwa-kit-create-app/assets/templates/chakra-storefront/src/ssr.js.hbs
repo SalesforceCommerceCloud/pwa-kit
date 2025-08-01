@@ -18,7 +18,6 @@ import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import {getAppOrigin} from '@salesforce/pwa-kit-react-sdk/utils/url'
 
 const config = getConfig()
-
 const options = {
     // The build directory (an absolute path)
     buildDir: path.resolve(process.cwd(), 'build'),
@@ -43,6 +42,13 @@ const options = {
     // When setting this to true, make sure to also set the PWA_KIT_SLAS_CLIENT_SECRET
     // environment variable as this endpoint will return HTTP 501 if it is not set
     useSLASPrivateClient: {{answers.project.commerce.isSlasPrivate}},
+
+    // If you wish to use additional SLAS endpoints that require private clients,
+    // customize this regex to include the additional endpoints the custom SLAS
+    // private client secret handler will inject an Authorization header.
+    // The default regex is defined in this file: https://github.com/SalesforceCommerceCloud/pwa-kit/blob/develop/packages/pwa-kit-runtime/src/ssr/server/build-remote-server.js
+    // applySLASPrivateClientToEndpoints:
+    //     /\/oauth2\/(token|passwordless\/(login|token)|password\/(reset|action))/,
 
     // If this is enabled, any HTTP header that has a non ASCII value will be URI encoded
     // If there any HTTP headers that have been encoded, an additional header will be
@@ -166,8 +172,7 @@ export async function emailLink(emailId, templateId, magicLink) {
     return await sendMarketingCloudEmail(emailId, marketingCloudConfig)
 }
 
-const resetPasswordCallback =
-    config.login?.resetPassword?.callbackURI || '/reset-password-callback'
+const resetPasswordCallback = config.login?.resetPassword?.callbackURI || '/reset-password-callback'
 const passwordlessLoginCallback =
     config.login?.passwordless?.callbackURI || '/passwordless-login-callback'
 
@@ -211,9 +216,9 @@ const throwSlasTokenValidationError = (message, code) => {
 
 export const createRemoteJWKSet = (tenantId) => {
     const appOrigin = getAppOrigin()
-    const {app: appConfig} = getConfig()
-    const shortCode = appConfig.commerceAPI.parameters.shortCode
-    const configTenantId = appConfig.commerceAPI.parameters.organizationId.replace(/^f_ecom_/, '')
+    const config = getConfig()
+    const shortCode = config.commerceAPI.parameters.shortCode
+    const configTenantId = config.commerceAPI.parameters.organizationId.replace(/^f_ecom_/, '')
     if (tenantId !== configTenantId) {
         throw new Error(
             `The tenant ID in your PWA Kit configuration ("${configTenantId}") does not match the tenant ID in the SLAS callback token ("${tenantId}").`
@@ -298,6 +303,7 @@ const {handler} = runtime.createHandler(options, (app) => {
                     'connect-src': [
                         // Connect to Einstein APIs
                         'api.cquotient.com',
+                        // Connect to DataCloud APIs
                         '*.c360a.salesforce.com'
                     ]
                 }
