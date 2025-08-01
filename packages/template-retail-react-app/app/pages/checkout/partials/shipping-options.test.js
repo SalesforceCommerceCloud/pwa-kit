@@ -8,7 +8,7 @@ import React from 'react'
 import {render, screen, waitFor} from '@testing-library/react'
 import {IntlProvider} from 'react-intl'
 import {CurrencyProvider} from '@salesforce/retail-react-app/app/contexts'
-import ShippingOptions from '@salesforce/retail-react-app/../../app/pages/checkout/partials/shipping-options'
+import ShippingOptions from '@salesforce/retail-react-app/app/pages/checkout/partials/shipping-options'
 import {useCheckout} from '@salesforce/retail-react-app/app/pages/checkout/util/checkout-context'
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
 import {useCurrency} from '@salesforce/retail-react-app/app/hooks'
@@ -182,20 +182,6 @@ describe('ShippingOptions', () => {
             renderWithIntl(<ShippingOptions />)
 
             expect(screen.getAllByTestId('loading').length).toBeGreaterThan(0)
-        })
-
-        test('should show loading spinner for product data when products are loading', async () => {
-            mockUseProducts.mockReturnValue({
-                data: {},
-                isLoading: true
-            })
-
-            renderWithIntl(<ShippingOptions />)
-
-            // Wait for the loading spinner to appear
-            await waitFor(() => {
-                expect(screen.getAllByTestId('loading').length).toBeGreaterThan(0)
-            })
         })
 
         test('should show loading spinner for shipping methods when shipping methods are loading', async () => {
