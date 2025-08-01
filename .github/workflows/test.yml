@@ -59,6 +59,7 @@ jobs:
         with:
           checks: "files,owners,duppatterns,syntax"
           experimental_checks: "notowned"
+          github_access_token: "${{ secrets.GITHUB_TOKEN }}"
 
   pwa-kit:
     needs: changelog-check
