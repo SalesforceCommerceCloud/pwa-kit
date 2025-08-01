@@ -1,69 +1,55 @@
-# PWA Storefront MCP Server
+# 🚀 PWA Kit MCP Server
 
-A Model Context Protocol (MCP) server that provides AI coding assistance for developing  PWA-kit-based storefront apps in an IDE.
+An MCP server that enhances the entire development lifecycle of PWA Kit storefront apps — from project creation and management to AI-assisted coding, testing, and implementation of best practices — all within your IDE.
 
-Install and run this MCP server as a local MCP server or run locally via `npx` (when it's available on `npm` in feature).
+## 🔍 What is MCP?
 
-## What is MCP?
+**Model Context Protocol (MCP)** is an open protocol that enables secure, structured communication between host applications (like [Cursor IDE](https://www.cursor.so/) or other AI development tools) and external tools or data sources.
 
-The Model Context Protocol (MCP) is an open protocol that enables secure connections between host applications, such as Claude Desktop or other AI assistants, and external data sources and tools.
+It allows AI agents to query context-aware services like this server to help developers build better software, faster.
 
-## Features
 
-The PWA Storefront MCP Server provides these features.
+👉 **[Read more at modelcontextprotocol.io](https://modelcontextprotocol.io/)**
 
-- `development_guidelines`: Helps developers understand and follow PWA Storefront developer guidelines and best practices.
-- `create_new_sample_component`: Helps developers create a new sample PWA Storefront component. This feature guides developers through a few simple questions and then generates code for the component based on the commerce data model used, layouts, etc.
-- `create_app_guidelines`: This tool provides all the information an agent needs to correctly scaffold a new PWA Kit app using the `@salesforce/pwa-kit-create-app` CLI. 
 
-  It returns:
-    - Project creation guidelines for agent behavior
-    - CLI description and available options
-    - Input schemas for presets or templates
+## 🧰 Features
 
-    The output enables agents to ask the right questions and use the CLI correctly without ever mixing unsupported options.
+The PWA Kit MCP Server offers the following intelligent tools tailored to Salesforce Commerce Cloud PWA development:
 
-    **Example Triggers**
+* **`create_app_guidelines`**:
+  Guides agents and developers through creating a new PWA Kit project with `@salesforce/pwa-kit-create-app`.
 
-    This tool is automatically used when the user expresses intent to create a project, such as:
+* **`create_new_sample_component`**:
+  Walks developers through a brief Q\&A to scaffold a component using the commerce data model, layout, and structure.
 
-    - "Create a new PWA Kit app."
-    - "Start a new storefront using a preset."
-    - "What templates are available for PWA Kit?"
-    - "What PWA-Kit presets are available?"
-    - "Create a PWA-Kit project using the `retail-react-app-demo` preset in the `~/test-project` directory."
-- `run_site_test`: Run site performance or accessibility test for a given site URL (e.g. [https://pwa-kit.mobify-storefront.com](https://pwa-kit.mobify-storefront.com))
--`create_sample_storefront_page`: Helps developers create a new sample PWA Storefront page. This feature guides develoopers through a few simple questions and then generates code for the page based on the name of the page, components included, and route.
+* **`create_sample_storefront_page`**:
+  Interactive tool to generate a new PWA storefront page with custom routing and components.
 
-## Setup
+* **`development_guidelines`**:
+  Provides best practices and guidance for building PWA Kit storefronts.
 
-Install dependencies and build under `pwa-kit` root directory:
+* **`run_site_test`**:
+  Runs performance and accessibility audits on a provided site URL.
+  *Example: `https://pwa-kit.mobify-storefront.com`*
 
-```bash
-cd {{pwa-kit root directory}}
-npm ci
-```
 
-## Run the MCP Server
+## ▶️ Running the MCP Server
 
-### Method 1: Run MCP Server from Cursor
+### 🖥️ From Cursor IDE
 
-1. Open the Cursor application.
+1. Open **Cursor**.
 
-2. In the Cursor Menu on the top menu bar, click **Settings** > **Cursor Settings...**. 
+2. Navigate to **Settings > Cursor Settings...**
+![](https://raw.githubusercontent.com/SalesforceCommerceCloud/pwa-kit/refs/heads/develop/packages/pwa-kit-mcp/docs/images/cursor-settings.png)
 
-<img src="https://raw.githubusercontent.com/SalesforceCommerceCloud/pwa-kit/refs/heads/develop/packages/pwa-kit-mcp/docs/images/cursor-settings.png" alt="Cursor Settings Screenshot" width="50%" />
+3. Go to **Tools & Integrations > MCP Tools > New MCP Server**
+![](https://raw.githubusercontent.com/SalesforceCommerceCloud/pwa-kit/refs/heads/develop/packages/pwa-kit-mcp/docs/images/cursor-mcp-tools.png)
 
-3. Click **Tools & Integrations** > **MCP Tools** > **New MCP Server**.
-
-<img src="https://raw.githubusercontent.com/SalesforceCommerceCloud/pwa-kit/refs/heads/develop/packages/pwa-kit-mcp/docs/images/cursor-mcp-tools.png" alt="Cursor MCP Tools Screenshot" width="50%" />
-
-The `mcp.json` file opens. Add this definition to your `mcp.json` file and replace {{parent-dir-to-mcp}} and {{path-to-app-directory}} placeholders with correct values.
-
+4. Update your `mcp.json` like this (edit the placeholders as needed):
 ```json
 {
   "mcpServers": {
-    "pwa-kit-mcp": {
+    "pwa-kit": {
       "command": "npx",
       "args": ["-y", "@salesforce/pwa-kit-mcp"],
       "env": {
@@ -71,136 +57,75 @@ The `mcp.json` file opens. Add this definition to your `mcp.json` file and repla
       }
     }
   }
-} 
+}
 ```
+_NOTE: Replace `{{path-to-app-directory}}` with the absolute path to your generated project's `app` subfolder. For example: `"/Users/username/mcp-server-folder/mystorefront/app"`._
 
-After you modify the `mcp.json` file, cursor will do these actions.
+Once saved, Cursor will:
 
-- Start the MCP server.
-- Connect to the MCP server as a client.
-- List available tools.
+* Launch the MCP server
+* Connect to it as a client
+* Display the available tools in the UI and how you can invoke them
 
-You can go back to MCP Tools and choose to enable/disable any MCP Server or tools.
+You can return to **MCP Tools** anytime to enable or disable specific tools or servers.
 
-### Method 2: Run MCP Server from Claude
+### 🧪 From Other MCP Clients
 
-#### Using Claude Desktop
-
-1. In the Claude app menu, on the top menu bar, click **Developer** > **Edit Config**.
-The `claude_desktop_config.json` file opens.
-
-<img src="https://raw.githubusercontent.com/SalesforceCommerceCloud/pwa-kit/refs/heads/develop/packages/pwa-kit-mcp/docs/images/claude-config.png" alt="Claude MCP Config Screenshot" width="50%" />
-
-2. Add this server definition to your `claude_desktop_config.json` and replace {{path-to-node}}, {{parent-dir-to-mcp}} and {{path-to-app-directory}} placeholders with correct values.
-
-```json
-{
-  "mcpServers": {
-    "pwa-kit-mcp": {
-      "command": "npx",
-      "args": ["-y", "@salesforce/pwa-kit-mcp"],
-      "env": {
-        "PWA_STOREFRONT_APP_PATH": "{{path-to-app-directory}}"
-      }
-    }
-  }
-}  
-```
-
-After you modify the `claude_desktop_config.json` file, Claude will do these actions.
-
-- Start the MCP server.
-- Connect to the MCP server as a client.
-- List available tools.
-
-<img src="https://raw.githubusercontent.com/SalesforceCommerceCloud/pwa-kit/refs/heads/develop/packages/pwa-kit-mcp/docs/images/claude-list-tools.png" alt="Claude MCP Tools Screenshot" width="40%" />
-
-You can also enable/disable any available tools from here.
-
-#### Using other MCP clients
-The server runs on stdio, so you can test it with any MCP-compatible client.
-
-### Method 3: Manually start MCP Server
-
-You can also manually start the server from command line and sending JSON-RPC messages:
+We currently only support Cursor IDE, but if you wish to try it out with your AI agent enabled IDE, you can manually run the server be following the below steps. **NOTE:** This server communicates via **stdio**, so it is important to ensure your IDE can communicate in this manner.
 
 ```bash
 cd {{dir-to-mcp}}
-# Start the server
 npm run start
+```
 
-# Then send JSON-RPC requests to stdin:
+Then send JSON-RPC requests like:
+
+```json
 {"jsonrpc": "2.0", "id": 1, "method": "tools/list", "params": {}}
 {"jsonrpc": "2.0", "id": 2, "method": "tools/call", "params": {"name": "create_new_component", "arguments": {}}}
 ```
 
-## Files
+---
 
-- `server.js` - Main MCP server implementation
-- `mcp.json` - MCP configuration file for clients
-- `package.json` - Node.js dependencies and scripts
+## 👩‍💻 Development
 
-## Development
+If you are actively developing features for the MCP server and want to get immediate feedback during testing, follow the below steps.
 
-To run the server in development mode:
+1. Update your Cursor IDE MCP server configuration so that you are referencing the local server. This can be done by opening the "View: Open MCP Settings" 
+from the command pallet and editing your `pwa-kit` entry to look like the entry below.
+```json
+{
+  "mcpServers": {
+    "pwa-kit": {
+      "command": "node",
+      "args": ["{{path-to-app-mono-repo}}/packages/pwa-kit-mcp/dist/server/server.js"],
+      "env": {
+        "PWA_STOREFRONT_APP_PATH": "{{path-to-app-directory}}"
+      }
+    }
+  }
+}
+```
+
+2. Ensure that your server is built and will rebuild whenever changes are made you by running the following command in the `/pwa-kit-mcp` folder:
 ```bash
-npm start
+npm run build:watch
 ```
 
-The server outputs debug information to stderr and handle MCP protocol messages via stdio.
+The server logs to `stderr` and communicates using MCP via `stdio`. You can view these logs in the `Output` section (shift + command + U) and filtering
+the output on "MCP Logs".
 
-# Project Structure
 
-```
-/ (root)
-  - package.json
-  - package-lock.json
-  - README.md
-  - CHANGELOG.md
-  - mcp.json
-  - claude_desktop_config.json
-  - babel.config.js
-  - jest.config.js
-  - jest-setup.js
-  - .eslintrc.js
-  - .eslintignore
-  /src
-    /server
-      - server.js
-      - server.test.js
-    /tools
-      - index.js
-      - developer-guideline.js
-      - developer-guideline.test.js
-      - create-app-guideline.js
-      - create-app-guideline.test.js
-      - create-new-component.js
-      - create-new-component.test.js
-      - site-test.js
-      - site-test.test.js
-      - site-test-accessibility.js
-      - site-test-performance.js
-    /utils
-      - index.js
-      - utils.js
-      - utils.test.js
-    /data
-      - CategoryDocument.json
-      - DocumentList.json
-      - ProductDocument.json
-  /docs
-    /images
-        - claude-config.png
-        - claude-list-tools.png
-        - cursor-mcp-tools.png
-        - cursor-settings.png
-    - cursor-integration-guide.md
-  /dist
-```
+### 🔹 File & Folder Overview
 
-- Server code is in `src/server/`.
-- MCP tools are in `src/tools/`.
-- Utilities are in `src/utils/`.
-- Data files are in `src/data/`.
-- Documentation is in `docs/`.
-- Built distribution files are in `dist/`.
+| Location       | Purpose                                                               |
+| -------------- | --------------------------------------------------------------------- |
+| `package.json` | Node.js dependencies and project scripts                              |
+| `mcp.json`     | MCP client configuration (used by Cursor or other IDEs)               |
+| `src/server/`  | Main server entry point (`server.js`)                                 |
+| `src/tools/`   | Contains all MCP tools like `create-app-guideline`, `site-test`, etc. |
+| `src/utils/`   | Shared utility functions                                              |
+| `src/data/`    | Static documents (e.g., product/category data models) used by tools   |
+| `docs/`        | Documentation and images for integration guides                       |
+| `dist/`        | Compiled output when building the package                             |
+
