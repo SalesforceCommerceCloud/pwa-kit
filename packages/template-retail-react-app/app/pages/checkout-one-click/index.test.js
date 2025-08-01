@@ -35,12 +35,17 @@ jest.mock('@salesforce/pwa-kit-runtime/utils/ssr-config', () => {
 })
 
 const mockUseAuthHelper = jest.fn()
+mockUseAuthHelper.mockResolvedValue({customerId: 'test-customer-id'})
+const mockUseShopperCustomersMutation = jest.fn()
 jest.mock('@salesforce/commerce-sdk-react', () => {
     const originalModule = jest.requireActual('@salesforce/commerce-sdk-react')
     return {
         ...originalModule,
         useAuthHelper: () => ({
             mutateAsync: mockUseAuthHelper
+        }),
+        useShopperCustomersMutation: () => ({
+            mutateAsync: mockUseShopperCustomersMutation
         })
     }
 })
@@ -204,7 +209,28 @@ beforeEach(() => {
                 ...currentBasket,
                 ...scapiOrderResponse,
                 customerInfo: {...scapiOrderResponse.customerInfo, email: 'customer@test.com'},
-                status: 'created'
+                status: 'created',
+                shipments: [
+                    {
+                        shippingAddress: {
+                            address1: '123 Main St',
+                            city: 'Tampa',
+                            countryCode: 'US',
+                            firstName: 'Test',
+                            fullName: 'Test McTester',
+                            id: '047b18d4aaaf4138f693a4b931',
+                            lastName: 'McTester',
+                            phone: '(727) 555-1234',
+                            postalCode: '33712',
+                            stateCode: 'FL'
+                        }
+                    }
+                ],
+                billingAddress: {
+                    firstName: 'John',
+                    lastName: 'Smith',
+                    phone: '(727) 555-1234'
+                }
             }
             return res(ctx.json(response))
         }),
@@ -694,5 +720,24 @@ test('Can register account during checkout as a guest', async () => {
             phoneHome: '(727) 555-1234'
         },
         password: expect.any(String)
+    })
+
+    // Check that the shipping address is saved
+    expect(mockUseShopperCustomersMutation).toHaveBeenCalledWith({
+        body: {
+            addressId: expect.any(String),
+            address1: '123 Main St',
+            city: 'Tampa',
+            countryCode: 'US',
+            firstName: 'Test',
+            fullName: 'Test McTester',
+            lastName: 'McTester',
+            phone: '(727) 555-1234',
+            postalCode: '33712',
+            stateCode: 'FL'
+        },
+        parameters: {
+            customerId: 'test-customer-id'
+        }
     })
 })
