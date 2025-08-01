@@ -198,14 +198,9 @@ test('bundle product view modal disables update button when quantity exceeds chi
             path: '*/products',
             method: 'get',
             res: (req) => {
-                const swingTankBlackMediumVariantId = '701643473915M'
+                // set up the mock data to the swing tank Black LG to be low stock
                 const swingTankBlackLargeVariantId = '701643473908M'
-                if (req.url.toString().includes(swingTankBlackMediumVariantId)) {
-                    mockProductBundleWithVariants.data[1].inventory = {
-                        ...mockProductBundleWithVariants.data[1].inventory,
-                        stockLevel: 0
-                    }
-                } else if (req.url.toString().includes(swingTankBlackLargeVariantId)) {
+                if (req.url.toString().includes(swingTankBlackLargeVariantId)) {
                     mockProductBundleWithVariants.data[1].inventory = {
                         ...mockProductBundleWithVariants.data[1].inventory,
                         stockLevel: 1
