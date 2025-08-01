@@ -672,7 +672,7 @@ const Cart = () => {
                 onSuccess: () => {
                     toast({
                         title: formatMessage(TOAST_MESSAGE_REMOVED_ITEM_FROM_CART, {quantity: 1}),
-                        status: 'success'
+                        status: 'warning'
                     })
                 },
                 onError: () => {
@@ -810,7 +810,7 @@ const Cart = () => {
 
         const deliveryOption = shipmentInfo.isPickupOrder
             ? DELIVERY_OPTIONS.PICKUP
-            : DELIVERY_OPTIONS.SHIP
+            : DELIVERY_OPTIONS.DELIVERY
 
         const selectedStoreInventoryAvailable =
             productsByItemId?.[productItem.itemId]?.inventories?.find(
