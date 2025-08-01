@@ -507,6 +507,9 @@ export const RemoteServerFactory = {
                 .replace(/\\\[\\\^\/\\\]\\\+/g, '[^/]+')
                 .replace(/\\\/\\\.\\\*/g, '/.*')
                 .replace(/\\\.\\\*/g, '.*')
+                .replace(/\\\(/g, '(')
+                .replace(/\\\)/g, ')')
+                .replace(/\\\?/g, '?')
 
             return new RegExp(`^${regexPattern}$`)
         }
@@ -520,10 +523,10 @@ export const RemoteServerFactory = {
          * @private
          */
         const removeBasePathFromPathMiddleware = (req, res, next) => {
-            // Scope base path removal to /mobify routes and routes defined by the express app
+            // Scope base path removal to /mobify routes and routes defined by the express app (ie. worker.js)
             // This is to avoid affecting other paths where a base path might be present if it happens to
             // be equal to a site id.
-            // For example, if you have a base path of /us and a site id of /us you don't want
+            // For example, if you have a base path of /us and a site id of /us we don't want
             // to remove the /us from www.example.com/us/en-US/category/...
 
             const basePath = getEnvBasePath()
@@ -539,14 +542,15 @@ export const RemoteServerFactory = {
                     // Routes are dynamically checked since we want to ensure that any express route
                     // defined after the app is created, such as routes defined in ssr.js are included.
                     const expressRoutes = app._router.stack
-                        .filter((layer) => layer.route)
+                        // specifically omit the generic wildcard from the express routes we want to
+                        // remove the base path from since it is mapped to the app render
+                        .filter((layer) => layer.route && layer.route.path && layer.route.path !== '*')
                         .map((layer) => layer.route.path)
 
                     for (const route of expressRoutes) {
                         if (route) {
                             const routeRegex = _convertExpressRouteToRegex(route)
                             if (routeRegex) {
-                                // Remove base path from the request path for matching
                                 const pathWithoutBase = req.path.replace(
                                     new RegExp(`^${basePath}`),
                                     ''
