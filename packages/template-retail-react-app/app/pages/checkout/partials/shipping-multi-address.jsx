@@ -224,12 +224,9 @@ const ShippingMultiAddress = ({
     const isLoading = customerLoading || productsLoading
 
     // Check if all product items have an address selected
-    const allShipmentsHaveAddress = basket.productItems.every(
+    const allShipmentsHaveAddress = (basket.productItems ?? []).every(
         (item) => selectedAddresses[item.itemId]
     )
-
-    // Check if the "Continue to Shipping Method" button should be disabled
-    const isButtonDisabled = !allShipmentsHaveAddress || isAddressFormOpen
 
     if (!deliveryItems.length) {
         return (
@@ -695,10 +692,12 @@ const ShippingMultiAddress = ({
                     type="button"
                     width="full"
                     mt={2}
-                    opacity={isButtonDisabled ? 0.8 : 1}
-                    cursor={isButtonDisabled ? 'not-allowed' : 'pointer'}
+                    opacity={!allShipmentsHaveAddress || isAddressFormOpen ? 0.8 : 1}
+                    cursor={
+                        !allShipmentsHaveAddress || isAddressFormOpen ? 'not-allowed' : 'pointer'
+                    }
                     isLoading={addressForm.formState.isSubmitting || isSubmitting}
-                    isDisabled={isButtonDisabled}
+                    isDisabled={!allShipmentsHaveAddress || isAddressFormOpen}
                     data-testid="continue-to-shipping-button"
                     loadingText={formatMessage({
                         id: 'shipping_multi_address.submit.loading',
