@@ -64,7 +64,7 @@ export const useShopperConsentMutation = (params: ShopperConsentsApiParams) => {
             setError(null)
 
             try {
-                return await apiClient.createSubscription(consentItem)
+                return await apiClient.upsertSubscription(consentItem)
             } catch (err) {
                 const errorMessage = err instanceof Error ? err.message : 'Failed to submit consent'
                 setError(errorMessage)

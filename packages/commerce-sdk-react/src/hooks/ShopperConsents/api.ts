@@ -15,6 +15,7 @@ export interface ShopperConsentsApiParams {
     organizationId: string
     siteId: string
     locale: string
+    tags: string
 }
 
 /**
@@ -25,9 +26,6 @@ export interface ConsentItem {
     contactPointValue: string
     channel: string
     status: string
-    title?: string
-    subtitle?: string
-    tags?: string[]
 }
 
 /**
@@ -36,9 +34,9 @@ export interface ConsentItem {
  */
 export const useShopperConsentsApiClient = (params: ShopperConsentsApiParams) => {
     const {getTokenWhenReady} = useAccessToken()
-    const {organizationId, siteId, locale} = params
+    const {organizationId, siteId, locale, tags} = params
 
-    const apiCall = useCallback(
+    const apiCallout = useCallback(
         async (endpoint: string, method = 'GET', body: any = null) => {
             const token = await getTokenWhenReady()
             const baseUrl = `/mobify/proxy/api/shopper/shopper-consents/v1/organizations/${organizationId}`
@@ -52,11 +50,12 @@ export const useShopperConsentsApiClient = (params: ShopperConsentsApiParams) =>
                 ...(body && {body: JSON.stringify(body)})
             })
 
+            const responseJson: string = await response.json()
             if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`)
+                throw new Error(`HTTP error! status: ${response.status}, body: ${responseJson}`)
             }
 
-            return await response.json()
+            return responseJson
         },
         [getTokenWhenReady, organizationId]
     )
@@ -70,21 +69,22 @@ export const useShopperConsentsApiClient = (params: ShopperConsentsApiParams) =>
                 const queryParams = new URLSearchParams({
                     siteId,
                     locale,
+                    tags,
                     ...options
                 })
-                return apiCall(`/subscriptions?${queryParams.toString()}`)
+                return apiCallout(`/subscriptions?${queryParams.toString()}`)
             },
-            [apiCall, siteId, locale]
+            [apiCallout, siteId, locale, tags]
         ),
 
         /**
          * Create or update a subscription consent
          */
-        createSubscription: useCallback(
+        upsertSubscription: useCallback(
             async (consentItem: ConsentItem) => {
-                return apiCall('/subscriptions', 'POST', consentItem)
+                return apiCallout('/subscriptions', 'POST', consentItem)
             },
-            [apiCall]
+            [apiCallout]
         )
     }
 }
