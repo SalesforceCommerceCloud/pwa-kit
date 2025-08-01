@@ -103,7 +103,6 @@ AppConfig.restore = (locals = {}) => {
     const site = resolveSiteFromUrl(path)
     const locale = resolveLocaleFromUrl(path)
 
-    // TODO: understand why this fails, getConfig should be implicit via server context in SSR
     const appConfig = getConfig()
     const apiConfig = {
         ...appConfig.commerceAPI,
@@ -125,7 +124,6 @@ AppConfig.extraGetPropsArgs = (locals = {}) => {
         buildUrl: locals.buildUrl,
         site: locals.site,
         locale: locals.locale
-        // appConfig: locals.appConfig
     }
 }
 
