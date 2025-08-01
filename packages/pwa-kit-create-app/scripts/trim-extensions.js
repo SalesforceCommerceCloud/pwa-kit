@@ -8,20 +8,21 @@
 const fs = require('fs')
 const parser = require('@babel/parser')
 const traverse = require('@babel/traverse').default
-const generate = require('@babel/generator').default
 const path = require('path')
 const pluginConfig = require('../assets/plugin-config')
-const {execSync} = require('child_process')
 
 const removeComponentCandidates = new Set() // List of files that are candidates for removal, as a result of trimming.
 const SEPARATOR = path.sep // Use OS-specific path separator
 const COMPONENT_SCAN_PATHS = [
-    `${SEPARATOR}src${SEPARATOR}components${SEPARATOR}`,
-    `${SEPARATOR}src${SEPARATOR}pages${SEPARATOR}`,
-    `${SEPARATOR}src${SEPARATOR}hooks${SEPARATOR}`,
-    `${SEPARATOR}src${SEPARATOR}routes.tsx`,
-    `${SEPARATOR}config${SEPARATOR}constants.js`
+    path.join(SEPARATOR, 'src', 'components', SEPARATOR),
+    path.join(SEPARATOR, 'src', 'pages', SEPARATOR),
+    path.join(SEPARATOR, 'src', 'hooks', SEPARATOR),
+    path.join(SEPARATOR, 'src', 'routes.tsx'),
+    path.join(SEPARATOR, 'config', 'constants.js')
 ]
+const SINGLE_LINE_MARKER = 'sfdc-extension-line'
+const BLOCK_MARKER_START = 'sfdc-extension-block-start'
+const BLOCK_MARKER_END = 'sfdc-extension-block-end'
 
 /**
  * Trim the directory to remove unused components and unused plugins.
@@ -72,191 +73,115 @@ function trimExtensions(directory, generatedPlugins) {
 }
 
 function processFile(filePath, plugins) {
+    let modified = false // flag to indicate if the file was modified
+    let blockMarkers = [] // stack of block markers
+    let removedBlocks = [] // list of blocks that were removed
+    let skippingBlock = false // flag to indicate if we are skipping a block
+
     // Read source file
     const source = fs.readFileSync(filePath, 'utf-8')
 
     // Search file content for plugin references
-    const pluginPositions = []
     const pluginRegex = new RegExp(Object.keys(plugins).join('|'), 'g')
-    let match
-    while ((match = pluginRegex.exec(source)) !== null) {
-        pluginPositions.push({
-            start: match.index,
-            end: match.index + match[0].length,
-            name: match[0] // store which plugin was found
-        })
-    }
-    if (pluginPositions.length === 0) {
-        // No plugins found in file, return early
-        return false
-    }
-
-    // Parse into AST
-    const ast = parser.parse(source, {
-        sourceType: 'module',
-        plugins: ['jsx', 'typescript']
-    })
-
-    // Track if we made any changes
-    let modified = false
-
-    // Shared helper to evaluate boolean expressions with plugins
-    const evaluateLogicalExpression = (node) => {
-        if (node.type === 'Identifier' && Object.keys(plugins).includes(node.name)) {
-            return plugins[node.name]
-        }
-        if (node.type === 'LogicalExpression') {
-            const left = evaluateLogicalExpression(node.left)
-            const right = evaluateLogicalExpression(node.right)
-            if (node.operator === '&&') {
-                return left && right
-            }
-            if (node.operator === '||') {
-                return left || right
-            }
-        }
-        return true // Non-plugin expressions evaluate to true
-    }
-
-    const findRightmostExpression = (node) => {
-        if (node.type === 'LogicalExpression') {
-            return findRightmostExpression(node.right)
-        }
-        return node
-    }
-
-    // Helper to process plugin-guarded LogicalExpressions
-    const processPluginLogicalExpression = (path) => {
-        if (path.node.type === 'LogicalExpression') {
-            const shouldKeep = evaluateLogicalExpression(path.node)
-            if (!shouldKeep) {
-                path.parentPath.remove()
-            } else {
-                path.parentPath.replaceWith(findRightmostExpression(path.node))
-            }
-            modified = true
-        }
-    }
-
-    const nodeContainsPluginReferences = (node) => {
-        // Check if any plugin reference falls within the node's range
-        return pluginPositions.some((pos) => pos.start >= node.start && pos.start < node.end)
-    }
-
-    // Traverse AST and remove nodes guarded by plugin flags
-    traverse(ast, {
-        // Handle variable declarations like:
-        // const HelloWorld = PLUGIN_NAME && loadable(...)
-        VariableDeclaration(nodePath) {
-            if (nodeContainsPluginReferences(nodePath.node)) {
-                nodePath.node.declarations.forEach((declaration) => {
-                    if (declaration.init && declaration.init.type === 'LogicalExpression') {
-                        const shouldKeep = evaluateLogicalExpression(declaration.init)
-                        if (!shouldKeep) {
-                            // Extract import path if declaration is an import statement
-                            if (
-                                declaration.init.right &&
-                                declaration.init.right.type === 'CallExpression' &&
-                                declaration.init.right.callee &&
-                                declaration.init.right.callee.type === 'Identifier' &&
-                                declaration.init.right.callee.name === 'loadable'
-                            ) {
-                                // Extract the import path from the loadable call expression and add it to the list of candidates for removal later.
-                                const importArg = declaration.init.right.arguments[0]
-                                if (
-                                    importArg.type === 'ArrowFunctionExpression' &&
-                                    importArg.body.type === 'CallExpression' &&
-                                    importArg.body.callee.type === 'Import'
-                                ) {
-                                    const importPath = importArg.body.arguments[0].value
-                                    removeComponentCandidates.add(
-                                        path.resolve(path.join(path.dirname(filePath), importPath))
-                                    )
-                                }
-                            }
-                            nodePath.remove()
-                        } else {
-                            declaration.init = findRightmostExpression(declaration.init)
-                        }
-                        modified = true
-                    } else if (declaration?.init?.type === 'ConditionalExpression') {
-                        const testValue = evaluateLogicalExpression(declaration.init.test)
-                        if (testValue === true) {
-                            declaration.init = declaration.init.consequent
-                        } else {
-                            declaration.init = declaration.init.alternate
-                        }
-                        modified = true
-                    }
-                })
-            }
-        },
-
-        // Handle conditional expressions like:
-        // {PLUGIN_NAME && [statement]}
-        LogicalExpression(path) {
-            if (nodeContainsPluginReferences(path.node)) {
-                processPluginLogicalExpression(path)
-            }
-        },
-
-        // Handle JSX elements in return statements that are guarded by plugin flags
-        ReturnStatement(path) {
-            if (nodeContainsPluginReferences(path.node)) {
-                if (path.node.argument && path.node.argument.type === 'JSXElement') {
-                    // Find JSX children that are guarded by plugin flags
-                    const children = path.get('argument').get('children')
-                    children.forEach((child) => {
-                        if (child.node.type === 'JSXExpressionContainer') {
-                            const expr = child.node.expression
-                            if (
-                                expr.type === 'LogicalExpression' ||
-                                expr.type === 'ConditionalExpression'
-                            ) {
-                                const exprPath = child.get('expression')
-                                try {
-                                    processPluginLogicalExpression(exprPath)
-                                } catch (e) {
-                                    console.error(
-                                        `Error processing plugin logical expression: ${exprPath}`
-                                    )
-                                }
-                            }
-                        }
-                    })
-                } else if (
-                    path.node.argument &&
-                    path.node.argument.type === 'ConditionalExpression'
-                ) {
-                    // Handle top-level ternary in return statement
-                    const testValue = evaluateLogicalExpression(path.node.argument.test)
-                    if (testValue === true) {
-                        path.node.argument = path.node.argument.consequent
-                    } else {
-                        path.node.argument = path.node.argument.alternate
-                    }
+    if (pluginRegex.test(source)) {
+        const lines = source.split('\n')
+        const newLines = []
+        let i = 0
+        while (i < lines.length) {
+            const line = lines[i]
+            if (line.includes(SINGLE_LINE_MARKER)) {
+                const matchingPlugin = Object.keys(plugins).find((plugin) => line.includes(plugin))
+                if (matchingPlugin && plugins[matchingPlugin] === false) {
+                    removedBlocks.push(lines[i + 1]) // add the line that was removed to the list of removed blocks
+                    i += 2 // skip this line and the next
                     modified = true
+                    continue
+                }
+            } else if (line.includes(BLOCK_MARKER_START)) {
+                const matchingPlugin = Object.keys(plugins).find((plugin) => line.includes(plugin))
+                if (matchingPlugin) {
+                    // push a new block marker, if the plugin is false, we will start skipping the block
+                    blockMarkers.push({plugin: matchingPlugin, line: i})
+                    skippingBlock = plugins[matchingPlugin] === false
+                }
+            } else if (line.includes(BLOCK_MARKER_END)) {
+                const plugin = Object.keys(plugins).find((p) => line.includes(p))
+                // check if we have any start markers
+                if (blockMarkers.length === 0) {
+                    throw new Error(
+                        `Block marker mismatch in ${filePath}, encountered end marker ${plugin} without a matching start marker at line ${i}:\n${lines[i]}`
+                    )
+                }
+                const startMarker = blockMarkers.pop()
+                if (startMarker.plugin !== plugin) {
+                    throw new Error(
+                        `Block marker mismatch in ${filePath}, expected end marker for ${startMarker.plugin} but got ${plugin} at line ${i}:\n${lines[i]}`
+                    )
+                }
+                if (plugins[plugin] === false) {
+                    // Push the removed block (from startMarker.line to current line) into removedBlocks
+                    const removedBlock = lines.slice(startMarker.line, i + 1).join('\n')
+                    removedBlocks.push(removedBlock)
+                    modified = true
+                    skippingBlock = false
+                    i++
+                    continue
                 }
             }
+            if (!skippingBlock) {
+                newLines.push(line)
+            }
+            i++
         }
-    })
-
-    // Only write output if we made changes
-    if (modified) {
-        try {
-            // Generate code from modified AST
-            const output = generate(ast, {
-                retainLines: true,
-                compact: false
-            }).code
-            // Replace the original file with the trimmed version
-            fs.writeFileSync(filePath, output)
-            // prettify the file
-            execSync(`npx prettier --write ${filePath}`)
-            console.log(`Updated file ${filePath}`)
-        } catch (e) {
-            console.error(`Error updating file ${filePath}: ${e.message}`)
-            throw e
+        if (blockMarkers.length > 0) {
+            throw new Error(
+                `Unclosed end marker found in ${filePath}: ${
+                    blockMarkers[blockMarkers.length - 1].plugin
+                }`
+            )
+        }
+        if (modified) {
+            const newSource = newLines.join('\n')
+            try {
+                fs.writeFileSync(filePath, newSource)
+                console.log(`Updated file ${filePath}`)
+            } catch (e) {
+                console.error(`Error updating file ${filePath}: ${e.message}`)
+                throw e
+            }
+            // walk through the removed blocks, parse them into ASTs, extract the import statements, and add them to the list of candidates for removal later.
+            removedBlocks.forEach((block) => {
+                if (block.includes('import')) {
+                    const ast = parser.parse(block, {
+                        sourceType: 'module',
+                        plugins: ['jsx', 'typescript']
+                    })
+                    traverse(ast, {
+                        VariableDeclaration(nodePath) {
+                            // Extract import path from variable declarations like: const X = import('./path')
+                            nodePath.node.declarations.forEach((declaration) => {
+                                if (
+                                    declaration.init &&
+                                    declaration.init.type === 'CallExpression' &&
+                                    declaration.init.callee.type === 'Import'
+                                ) {
+                                    const importArg = declaration.init.arguments[0]
+                                    if (importArg && importArg.type === 'StringLiteral') {
+                                        const importPath = importArg.value
+                                        if (importPath.startsWith('.')) {
+                                            let absoluteImportPath = path.resolve(
+                                                path.dirname(filePath),
+                                                importPath
+                                            )
+                                            removeComponentCandidates.add(absoluteImportPath)
+                                        }
+                                    }
+                                }
+                            })
+                        }
+                    })
+                }
+            })
         }
     }
 }
