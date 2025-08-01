@@ -13,55 +13,32 @@ import {
     Flex,
     Stack,
     Text,
-    VStack,
-    Radio,
-    RadioGroup
+    VStack
 } from '@salesforce/retail-react-app/app/components/shared/ui'
-import {useForm, Controller} from 'react-hook-form'
+import {useForm} from 'react-hook-form'
 import {useCheckout} from '@salesforce/retail-react-app/app/pages/checkout/util/checkout-context'
 import {
     ToggleCard,
     ToggleCardEdit,
     ToggleCardSummary
 } from '@salesforce/retail-react-app/app/components/toggle-card'
-import {
-    useShopperBasketsMutation,
-    useShippingMethodsForShipment
-} from '@salesforce/commerce-sdk-react'
+import {useShopperBasketsMutation} from '@salesforce/commerce-sdk-react'
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
 import {useCurrency} from '@salesforce/retail-react-app/app/hooks'
 import LoadingSpinner from '@salesforce/retail-react-app/app/components/loading-spinner'
 import PropTypes from 'prop-types'
 
-// Import the new components
+// Import the components
 import ShippingProductCards from '@salesforce/retail-react-app/app/pages/checkout/partials/shipping-product-cards'
 import ShippingOptionsOnly from '@salesforce/retail-react-app/app/pages/checkout/partials/shipping-options-only'
 
 // Component to handle combined product cards and shipping options for multiship
 const ShipmentOptionsWithProducts = ({shipment, basketId, currency, control, basket}) => {
     const {formatMessage} = useIntl()
-    const {data: shippingMethods, isLoading: isShippingMethodsLoading} =
-        useShippingMethodsForShipment(
-            {
-                parameters: {
-                    basketId: basketId,
-                    shipmentId: shipment.shipmentId
-                }
-            },
-            {
-                enabled: Boolean(basketId && shipment.shipmentId && shipment.shippingAddress)
-            }
-        )
 
     if (!shipment.shippingAddress) {
         return null
     }
-
-    const fieldName = `shippingMethodId_${shipment.shipmentId}`
-    const defaultValue =
-        (shipment.shippingMethod && shipment.shippingMethod.id) ||
-        (shippingMethods && shippingMethods.defaultShippingMethodId) ||
-        ''
 
     return (
         <VStack spacing={6} align="stretch">
@@ -99,108 +76,12 @@ const ShipmentOptionsWithProducts = ({shipment, basketId, currency, control, bas
                     <ShippingProductCards shipment={shipment} basket={basket} />
 
                     {/* Shipping Options */}
-                    {isShippingMethodsLoading ? (
-                        <Box display="flex" justifyContent="center" alignItems="center" py={8}>
-                            <LoadingSpinner />
-                        </Box>
-                    ) : (
-                        shippingMethods &&
-                        shippingMethods.applicableShippingMethods && (
-                            <Box px={4}>
-                                <Controller
-                                    name={fieldName}
-                                    control={control}
-                                    defaultValue={defaultValue}
-                                    rules={{required: true}}
-                                    render={({field}) => (
-                                        <RadioGroup
-                                            {...field}
-                                            name={`shipping-options-radiogroup-${shipment.shipmentId}`}
-                                        >
-                                            <Stack spacing={2}>
-                                                {(
-                                                    shippingMethods &&
-                                                    shippingMethods.applicableShippingMethods
-                                                ).map((opt) => (
-                                                    <Radio value={opt.id} key={opt.id}>
-                                                        <Box w="full">
-                                                            <Flex
-                                                                justify="space-between"
-                                                                w="full"
-                                                                align="flex-start"
-                                                            >
-                                                                <Box flex={1}>
-                                                                    <Text
-                                                                        fontSize="sm"
-                                                                        fontWeight="medium"
-                                                                    >
-                                                                        {opt.name}
-                                                                    </Text>
-                                                                    <Text
-                                                                        fontSize="xs"
-                                                                        color="gray.600"
-                                                                        mt={0.5}
-                                                                    >
-                                                                        {opt.description}
-                                                                    </Text>
-                                                                </Box>
-                                                                <Text
-                                                                    fontWeight="bold"
-                                                                    fontSize="sm"
-                                                                    ml={2}
-                                                                >
-                                                                    {opt.price === 0 ? (
-                                                                        <Text color="green.600">
-                                                                            {formatMessage({
-                                                                                defaultMessage:
-                                                                                    'Free',
-                                                                                id: 'shipping_options.free'
-                                                                            })}
-                                                                        </Text>
-                                                                    ) : (
-                                                                        <FormattedNumber
-                                                                            value={opt.price}
-                                                                            style="currency"
-                                                                            currency={currency}
-                                                                        />
-                                                                    )}
-                                                                </Text>
-                                                            </Flex>
-                                                            {opt.shippingPromotions &&
-                                                                opt.shippingPromotions.length >
-                                                                    0 && (
-                                                                    <VStack
-                                                                        spacing={0.5}
-                                                                        mt={1}
-                                                                        align="flex-start"
-                                                                    >
-                                                                        {opt.shippingPromotions.map(
-                                                                            (promo) => (
-                                                                                <Text
-                                                                                    key={
-                                                                                        promo.promotionId
-                                                                                    }
-                                                                                    fontSize="xs"
-                                                                                    color="green.600"
-                                                                                >
-                                                                                    {
-                                                                                        promo.calloutMsg
-                                                                                    }
-                                                                                </Text>
-                                                                            )
-                                                                        )}
-                                                                    </VStack>
-                                                                )}
-                                                        </Box>
-                                                    </Radio>
-                                                ))}
-                                            </Stack>
-                                        </RadioGroup>
-                                    )}
-                                />
-                            </Box>
-                        )
-                    )}
+                    <ShippingOptionsOnly
+                        shipment={shipment}
+                        basketId={basketId}
+                        currency={currency}
+                        control={control}
+                    />
                 </VStack>
             </Box>
         </VStack>
