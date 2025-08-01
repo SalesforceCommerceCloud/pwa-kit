@@ -201,10 +201,21 @@ test('bundle product view modal disables update button when quantity exceeds chi
                 // set up the mock data to the swing tank Black LG to be low stock
                 const swingTankBlackLargeVariantId = '701643473908M'
                 if (req.url.toString().includes(swingTankBlackLargeVariantId)) {
-                    mockProductBundleWithVariants.data[1].inventory = {
-                        ...mockProductBundleWithVariants.data[1].inventory,
-                        stockLevel: 1
+                    const data = {
+                        ...mockProductBundleWithVariants,
+                        data: [
+                            mockProductBundleWithVariants.data[0],
+                            {
+                                ...mockProductBundleWithVariants.data[1],
+                                inventory: {
+                                    ...mockProductBundleWithVariants.data[1].inventory,
+                                    stockLevel: 1
+                                }
+                            },
+                            mockProductBundleWithVariants.data[2]
+                        ]
                     }
+                    return data
                 }
                 return mockProductBundleWithVariants
             }
