@@ -90,7 +90,7 @@ const ShippingOptionsOnly = ({shipment, basketId, currency, control}) => {
                                                                         {opt.description}
                                                                     </Text>
                                                                 </Box>
-                                                                <Text
+                                                                <Box
                                                                     fontWeight="bold"
                                                                     fontSize="sm"
                                                                     ml={2}
@@ -110,7 +110,7 @@ const ShippingOptionsOnly = ({shipment, basketId, currency, control}) => {
                                                                             currency={currency}
                                                                         />
                                                                     )}
-                                                                </Text>
+                                                                </Box>
                                                             </Flex>
                                                             {opt.shippingPromotions &&
                                                                 opt.shippingPromotions.length >
