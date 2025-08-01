@@ -67,7 +67,7 @@ const ShipmentOptionsWithProducts = ({shipment, basketId, currency, control, bas
                 borderColor="gray.200"
                 borderRadius="lg"
                 pt={2}
-                pb={6}
+                pb={4}
                 px={2}
                 bg="white"
             >
@@ -361,23 +361,6 @@ export default function ShippingOptions() {
                                     <Box key={shipment.shipmentId}>
                                         <Flex justify="space-between" w="full">
                                             <Box flex="1">
-                                                <Text fontWeight="semibold">
-                                                    {formatMessage(
-                                                        {
-                                                            defaultMessage: 'Delivering to {name}',
-                                                            id: 'shipping_options.label.delivering_to'
-                                                        },
-                                                        {
-                                                            name: `${shipment.shippingAddress.firstName} ${shipment.shippingAddress.lastName}`
-                                                        }
-                                                    )}
-                                                </Text>
-                                                <Text>
-                                                    {shipment.shippingAddress.address1},{' '}
-                                                    {shipment.shippingAddress.city},{' '}
-                                                    {shipment.shippingAddress.stateCode}{' '}
-                                                    {shipment.shippingAddress.postalCode}
-                                                </Text>
                                                 {shipment.shippingMethod ? (
                                                     <>
                                                         <Text mt={2}>

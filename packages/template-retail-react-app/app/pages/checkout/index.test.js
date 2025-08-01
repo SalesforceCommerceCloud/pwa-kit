@@ -503,7 +503,7 @@ test('Can proceed through checkout as registered customer', async () => {
 
     // Submit selected shipping method - click the first non-Edit button on the page
     const allButtons = Array.from(document.querySelectorAll('button'))
-    const nextButton = allButtons.find(btn => !/edit/i.test(btn.textContent))
+    const nextButton = allButtons.find((btn) => !/edit/i.test(btn.textContent))
     expect(nextButton).toBeDefined()
     await user.click(nextButton)
 

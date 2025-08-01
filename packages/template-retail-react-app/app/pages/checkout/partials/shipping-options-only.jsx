@@ -46,35 +46,8 @@ const ShippingOptionsOnly = ({shipment, basketId, currency, control}) => {
 
     return (
         <VStack spacing={6} align="stretch">
-            {/* Delivery Address */}
-            <Box>
-                <Text fontWeight="bold" fontSize="md" mb={1}>
-                    {formatMessage(
-                        {
-                            defaultMessage: 'Delivering to {name}',
-                            id: 'shipping_options.label.delivering_to'
-                        },
-                        {
-                            name: `${shipment.shippingAddress.firstName} ${shipment.shippingAddress.lastName}`
-                        }
-                    )}
-                </Text>
-                <Text fontSize="sm" color="gray.600">
-                    {shipment.shippingAddress.address1}, {shipment.shippingAddress.city},{' '}
-                    {shipment.shippingAddress.stateCode} {shipment.shippingAddress.postalCode}
-                </Text>
-            </Box>
-
             {/* Shipping Options Only */}
-            <Box
-                border="1px solid"
-                borderColor="gray.200"
-                borderRadius="lg"
-                pt={2}
-                pb={6}
-                px={2}
-                bg="white"
-            >
+            <Box pt={2} pb={6} px={2}>
                 {isShippingMethodsLoading ? (
                     <Box display="flex" justifyContent="center" alignItems="center" py={8}>
                         <LoadingSpinner />

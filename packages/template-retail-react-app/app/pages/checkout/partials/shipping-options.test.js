@@ -223,7 +223,6 @@ describe('ShippingOptions', () => {
             renderWithIntl(<ShippingOptions />)
 
             expect(screen.getByText('Shipping & Gift Options')).toBeInTheDocument()
-            expect(screen.getByText('Delivering to John Doe')).toBeInTheDocument()
             expect(screen.getByText('Standard Shipping')).toBeInTheDocument()
             expect(screen.getByText('Express Shipping')).toBeInTheDocument()
         })
@@ -327,8 +326,8 @@ describe('ShippingOptions', () => {
 
             renderWithIntl(<ShippingOptions />)
 
-            expect(screen.getAllByText('Delivering to John Doe').length).toBeGreaterThan(0)
-            expect(screen.getAllByText('Delivering to Jane Smith').length).toBeGreaterThan(0)
+            expect(screen.getByText('Standard Shipping')).toBeInTheDocument()
+            expect(screen.getByText('Express Shipping')).toBeInTheDocument()
         })
     })
 
@@ -435,7 +434,7 @@ describe('ShippingOptions', () => {
                 expect(screen.queryAllByTestId('loading')).toHaveLength(0)
             })
 
-            expect(screen.getByText('Delivering to John Doe')).toBeInTheDocument()
+            expect(screen.getByText('Standard Shipping')).toBeInTheDocument()
         })
     })
 })
