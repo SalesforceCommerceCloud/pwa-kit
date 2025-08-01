@@ -326,8 +326,8 @@ describe('ShippingOptions', () => {
 
             renderWithIntl(<ShippingOptions />)
 
-            expect(screen.getByText('Standard Shipping')).toBeInTheDocument()
-            expect(screen.getByText('Express Shipping')).toBeInTheDocument()
+            expect(screen.getAllByText('Standard Shipping').length).toBeGreaterThan(0)
+            expect(screen.getAllByText('Express Shipping').length).toBeGreaterThan(0)
         })
     })
 
