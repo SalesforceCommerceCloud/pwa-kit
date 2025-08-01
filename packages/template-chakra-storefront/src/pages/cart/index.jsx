@@ -42,6 +42,9 @@ const Cart = () => {
 
     // Cart operations
     const {
+        isOpen: isProductViewModalOpen,
+        onClose: onProductViewModalClose,
+        onOpen: onProductViewModalOpen,
         selectedItem,
         setSelectedItem,
         localQuantity,
@@ -69,18 +72,15 @@ const Cart = () => {
     // Shipping
     useCartDefaultShipping(basket)
 
-    // Modal state
-    const {open: isOpen, onOpen, onClose} = useDisclosure()
-
     // Handle edit click
     const handleEditClick = (product) => {
         setSelectedItem(product)
-        onOpen()
+        onProductViewModalOpen()
     }
 
     // Handle modal close
     const handleModalClose = () => {
-        onClose()
+        onProductViewModalClose()
         setSelectedItem(undefined)
     }
 
@@ -141,8 +141,8 @@ const Cart = () => {
 
             {/* Modals */}
             <CartModals
-                isOpen={isOpen}
-                onOpen={onOpen}
+                isOpen={isProductViewModalOpen}
+                onOpen={onProductViewModalOpen}
                 onClose={handleModalClose}
                 selectedItem={selectedItem}
                 handleUpdateCart={handleUpdateCart}

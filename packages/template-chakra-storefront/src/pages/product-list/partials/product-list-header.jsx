@@ -4,10 +4,10 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React, {useState} from 'react'
+import React, {useState, useMemo} from 'react'
 import PropTypes from 'prop-types'
 import {useHistory} from 'react-router-dom'
-import {FormattedMessage, useIntl} from 'react-intl'
+import {useIntl} from 'react-intl'
 import {Box, Button, Dialog, Drawer, Flex, Heading, Stack, Text} from '@chakra-ui/react'
 import {FilterIcon, ChevronDownIcon} from '../../../components/icons'
 import SafePortal from '../../../components/safe-portal'
@@ -31,7 +31,8 @@ const ProductListHeader = ({
     basePath,
     searchParams
 }) => {
-    const {formatMessage} = useIntl()
+    const intl = useIntl()
+    const {formatMessage} = intl
     const history = useHistory()
     const [sortOpen, setSortOpen] = useState(false)
 
@@ -40,6 +41,45 @@ const ProductListHeader = ({
         sortingOptions?.find(
             (option) => option.id === productSearchResult?.selectedSortingOption
         ) ?? sortingOptions?.[0]
+
+    const messages = useMemo(
+        () => ({
+            sortBy: formatMessage(
+                {
+                    id: 'product_list.button.sort_by',
+                    defaultMessage: 'Sort By: {sortOption}'
+                },
+                {
+                    sortOption: selectedSortingOptionLabel?.label
+                }
+            ),
+            filter: formatMessage({
+                id: 'product_list.button.filter',
+                defaultMessage: 'Filter'
+            }),
+            filterTitle: formatMessage({
+                id: 'product_list.modal.title.filter',
+                defaultMessage: 'Filter'
+            }),
+            viewItems: (count) =>
+                formatMessage(
+                    {
+                        id: 'product_list.modal.btn.view_items',
+                        defaultMessage: 'View {count} Items'
+                    },
+                    {count}
+                ),
+            clearFilters: formatMessage({
+                id: 'product_list.modal.btn.clear_filters',
+                defaultMessage: 'Clear Filters'
+            }),
+            sortByTitle: formatMessage({
+                id: 'product_list.drawer.title.sort_by',
+                defaultMessage: 'Sort By'
+            })
+        }),
+        [intl]
+    )
 
     return (
         <>
@@ -109,10 +149,7 @@ const ProductListHeader = ({
                                         color="black"
                                     >
                                         <FilterIcon boxSize={5} />
-                                        <FormattedMessage
-                                            defaultMessage="Filter"
-                                            id="product_list.button.filter"
-                                        />
+                                        {messages.filter}
                                     </Button>
                                 </Dialog.Trigger>
                                 <SafePortal>
@@ -136,10 +173,7 @@ const ProductListHeader = ({
                                                         fontWeight="bold"
                                                         fontSize="2xl"
                                                     >
-                                                        <FormattedMessage
-                                                            defaultMessage="Filter"
-                                                            id="product_list.modal.title.filter"
-                                                        />
+                                                        {messages.filterTitle}
                                                     </Heading>
                                                 </Dialog.Title>
                                                 <Dialog.CloseTrigger asChild>
@@ -182,15 +216,9 @@ const ProductListHeader = ({
                                                             size="lg"
                                                             position="static"
                                                         >
-                                                            <FormattedMessage
-                                                                defaultMessage="View {count} Items"
-                                                                id="product_list.modal.btn.view_items"
-                                                                values={{
-                                                                    count:
-                                                                        productSearchResult?.total ||
-                                                                        0
-                                                                }}
-                                                            />
+                                                            {messages.viewItems(
+                                                                productSearchResult?.total || 0
+                                                            )}
                                                         </Button>
                                                     </Dialog.CloseTrigger>
                                                     <Dialog.CloseTrigger asChild>
@@ -201,10 +229,7 @@ const ProductListHeader = ({
                                                             position="static"
                                                             onClick={resetFilters}
                                                         >
-                                                            <FormattedMessage
-                                                                defaultMessage="Clear Filters"
-                                                                id="product_list.modal.btn.clear_filters"
-                                                            />
+                                                            {messages.clearFilters}
                                                         </Button>
                                                     </Dialog.CloseTrigger>
                                                 </Stack>
@@ -225,15 +250,7 @@ const ProductListHeader = ({
                                 color="black"
                                 onClick={() => setSortOpen(true)}
                             >
-                                {formatMessage(
-                                    {
-                                        id: 'product_list.button.sort_by',
-                                        defaultMessage: 'Sort By: {sortOption}'
-                                    },
-                                    {
-                                        sortOption: selectedSortingOptionLabel?.label
-                                    }
-                                )}
+                                {messages.sortBy}
                                 <ChevronDownIcon boxSize={5} />
                             </Button>
                         </Flex>
@@ -263,10 +280,7 @@ const ProductListHeader = ({
                             <Drawer.Header>
                                 <Drawer.Title>
                                     <Text fontWeight="bold" fontSize="2xl">
-                                        <FormattedMessage
-                                            defaultMessage="Sort By"
-                                            id="product_list.drawer.title.sort_by"
-                                        />
+                                        {messages.sortByTitle}
                                     </Text>
                                 </Drawer.Title>
                                 <Drawer.CloseTrigger asChild>

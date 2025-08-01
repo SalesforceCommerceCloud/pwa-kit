@@ -4,8 +4,8 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React from 'react'
-import {FormattedMessage, FormattedNumber, useIntl} from 'react-intl'
+import React, {useMemo} from 'react'
+import {FormattedNumber, useIntl} from 'react-intl'
 import PropTypes from 'prop-types'
 import {Box, Flex, RadioGroup, Stack, Text} from '@chakra-ui/react'
 import Tooltip from '../../../components/tooltip'
@@ -19,6 +19,24 @@ const PaymentForm = ({form, onSubmit}) => {
     const {data: basket} = useCurrentBasket()
     const {currency} = useCurrency()
 
+    const messages = useMemo(
+        () => ({
+            paymentRadioGroup: formatMessage({
+                id: 'payment_selection.radio_group.assistive_msg',
+                defaultMessage: 'Payment'
+            }),
+            creditCard: formatMessage({
+                id: 'payment_selection.heading.credit_card',
+                defaultMessage: 'Credit Card'
+            }),
+            securePayment: formatMessage({
+                id: 'payment_selection.tooltip.secure_payment',
+                defaultMessage: 'This is a secure SSL encrypted payment.'
+            })
+        }),
+        [formatMessage]
+    )
+
     return (
         <form onSubmit={form.handleSubmit(onSubmit)}>
             <Stack gap={8}>
@@ -26,10 +44,7 @@ const PaymentForm = ({form, onSubmit}) => {
                     <Box border="1px solid" borderColor="gray.100" rounded="base" overflow="hidden">
                         <RadioGroup.Root
                             value="cc"
-                            aria-label={formatMessage({
-                                defaultMessage: 'Payment',
-                                id: 'payment_selection.radio_group.assistive_msg'
-                            })}
+                            aria-label={messages.paymentRadioGroup}
                             name="payment-selection"
                         >
                             <Box
@@ -50,18 +65,9 @@ const PaymentForm = ({form, onSubmit}) => {
                                     <RadioGroup.ItemText flex="1">
                                         <Flex justify="space-between">
                                             <Stack direction="row" align="center">
-                                                <Text fontWeight="bold">
-                                                    <FormattedMessage
-                                                        defaultMessage="Credit Card"
-                                                        id="payment_selection.heading.credit_card"
-                                                    />
-                                                </Text>
+                                                <Text fontWeight="bold">{messages.creditCard}</Text>
                                                 <Tooltip
-                                                    content={formatMessage({
-                                                        defaultMessage:
-                                                            'This is a secure SSL encrypted payment.',
-                                                        id: 'payment_selection.tooltip.secure_payment'
-                                                    })}
+                                                    content={messages.securePayment}
                                                     contentProps={{
                                                         css: {'--tooltip-bg': 'colors.blue.800'}
                                                     }}

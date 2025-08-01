@@ -15,20 +15,118 @@ Several **npm scripts** are available to you that make it easier to use the CLI 
 
 ## Formatting Messages
 
-For all the hardcoded translations in your site, write them...
+For all the hardcoded translations in your site, follow these guidelines:
 
-- _inline_ in the components, so it’s easier to see where in the page or component that they get used in
-- and in the _default/fallback locale_ (for example, in English)
+### Translation Pattern
 
-For example, in your React component, you can add formatted messages like `intl.formatMessage({defaultMessage: '...'})` or `<FormattedMessage defaultMessage="..." />`
+To improve code readability and maintainability, extract all translations from JSX and organize them at the beginning of your component:
+
+```jsx
+const MyComponent = () => {
+    const {formatMessage} = useIntl()
+    
+    // Group all messages together
+    const messages = {
+        title: formatMessage({
+            id: 'my_component.title',
+            defaultMessage: 'Welcome'
+        }),
+        description: formatMessage({
+            id: 'my_component.description',
+            defaultMessage: 'This is a description'
+        }),
+        button: {
+            save: formatMessage({
+                id: 'my_component.button.save',
+                defaultMessage: 'Save'
+            }),
+            cancel: formatMessage({
+                id: 'my_component.button.cancel',
+                defaultMessage: 'Cancel'
+            })
+        }
+    }
+    
+    // Clean JSX without inline translations
+    return (
+        <div>
+            <h1>{messages.title}</h1>
+            <p>{messages.description}</p>
+            <button>{messages.button.save}</button>
+            <button>{messages.button.cancel}</button>
+        </div>
+    )
+}
+```
+
+### Best Practices
+
+- **Always use `formatMessage`** instead of `<FormattedMessage />` component
+- **Extract all translations** to a `messages` object at the beginning of your component
+- **Group related messages** together (e.g., all button labels under `messages.buttons`)
+- **Never use `defineMessage`** - use `formatMessage` directly in the messages object
+- **Keep JSX clean** - no inline `formatMessage` calls in the JSX
+
+### Special Cases
+
+#### Messages with Parameters
+
+For messages that need dynamic values:
+
+```jsx
+const messages = {
+    itemCount: (count) => formatMessage(
+        {
+            id: 'cart.item_count',
+            defaultMessage: 'You have {count} items in your cart'
+        },
+        {count}
+    ),
+    greeting: (name) => formatMessage(
+        {
+            id: 'user.greeting',
+            defaultMessage: 'Welcome back, {name}!'
+        },
+        {name}
+    )
+}
+
+// Usage
+<p>{messages.itemCount(5)}</p>
+<h1>{messages.greeting(userName)}</h1>
+```
+
+#### Messages with Rich Text
+
+For messages that need embedded JSX elements (like links):
+
+```jsx
+const messages = {
+    termsAndConditions: (policy, terms) => formatMessage(
+        {
+            id: 'register.terms',
+            defaultMessage: 'By signing up, you agree to our <policy>Privacy Policy</policy> and <terms>Terms & Conditions</terms>'
+        },
+        {policy, terms}
+    )
+}
+
+// Usage
+<p>
+    {messages.termsAndConditions(
+        (chunks) => <Link to="/privacy">{chunks}</Link>,
+        (chunks) => <Link to="/terms">{chunks}</Link>
+    )}
+</p>
+```
 
 ### Adding Message Id
 
-At the minimum, only defaultMessage is the required parameter. The message id is optional. If you don’t specify it, the id is auto-generated for you.
+The message id is optional but recommended for better organization. If you don't specify it, the id is auto-generated for you. Always include both `id` and `defaultMessage` for clarity.
 
 ## Testing with a Pseudo Locale
 
-To check whether you’ve wrapped all the hardcoded strings with either `intl.formatMessage()` or `<FormattedMessage />` , there’s a quick way to test that by running `npm run start:pseudolocale`. It runs your local dev server with the locale forced to the pseudo locale.
+To check whether you've wrapped all the hardcoded strings with `formatMessage()`, there's a quick way to test that by running `npm run start:pseudolocale`. It runs your local dev server with the locale forced to the pseudo locale.
 
 Loading the site in your browser, you can quickly see that those messages that have been formatted would look like this: `[!! Ṕŕíííṿâćććẏ ṔṔṔŏĺíííćẏ !!]`
 

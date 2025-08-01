@@ -4,8 +4,8 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React, {Fragment, useEffect} from 'react'
-import {FormattedMessage, FormattedNumber} from 'react-intl'
+import React, {Fragment, useEffect, useMemo} from 'react'
+import {useIntl, FormattedNumber} from 'react-intl'
 import {
     Box,
     Button,
@@ -41,6 +41,8 @@ import {AlertIcon} from '../../components/icons'
 const onClient = typeof window !== 'undefined'
 
 const CheckoutConfirmation = () => {
+    const intl = useIntl()
+    const {formatMessage} = intl
     const {orderNo} = useParams()
     const navigate = useNavigation()
     const {data: customer} = useCurrentCustomer()
@@ -68,6 +70,106 @@ const CheckoutConfirmation = () => {
         })
     }, [order])
 
+    const messages = useMemo(
+        () => ({
+            thankYou: formatMessage({
+                id: 'checkout_confirmation.heading.thank_you_for_order',
+                defaultMessage: 'Thank you for your order!'
+            }),
+            orderNumber: formatMessage({
+                id: 'checkout_confirmation.label.order_number',
+                defaultMessage: 'Order Number'
+            }),
+            emailConfirmation: formatMessage(
+                {
+                    id: 'checkout_confirmation.message.will_email_shortly',
+                    defaultMessage:
+                        'We will send an email to <b>{email}</b> with your confirmation number and receipt shortly.'
+                },
+                {
+                    b: (chunks) => <b>{chunks}</b>,
+                    email: order?.customerInfo?.email
+                }
+            ),
+            continueShopping: formatMessage({
+                id: 'checkout_confirmation.link.continue_shopping',
+                defaultMessage: 'Continue Shopping'
+            }),
+            createAccount: formatMessage({
+                id: 'checkout_confirmation.heading.create_account',
+                defaultMessage: 'Create an account for faster checkout'
+            }),
+            createAccountButton: formatMessage({
+                id: 'checkout_confirmation.button.create_account',
+                defaultMessage: 'Create Account'
+            }),
+            deliveryDetails: formatMessage({
+                id: 'checkout_confirmation.heading.delivery_details',
+                defaultMessage: 'Delivery Details'
+            }),
+            shippingAddress: formatMessage({
+                id: 'checkout_confirmation.heading.shipping_address',
+                defaultMessage: 'Shipping Address'
+            }),
+            shippingMethod: formatMessage({
+                id: 'checkout_confirmation.heading.shipping_method',
+                defaultMessage: 'Shipping Method'
+            }),
+            orderSummary: formatMessage({
+                id: 'checkout_confirmation.heading.order_summary',
+                defaultMessage: 'Order Summary'
+            }),
+            itemCount: formatMessage(
+                {
+                    id: 'checkout_confirmation.message.num_of_items_in_order',
+                    defaultMessage:
+                        '{itemCount, plural, =0 {0 items} one {# item} other {# items}}',
+                    description: '# item(s) in order'
+                },
+                {
+                    itemCount: order?.productItems?.reduce((a, b) => a + b.quantity, 0) || 0
+                }
+            ),
+            subtotal: formatMessage({
+                id: 'checkout_confirmation.label.subtotal',
+                defaultMessage: 'Subtotal'
+            }),
+            shipping: formatMessage({
+                id: 'checkout_confirmation.label.shipping',
+                defaultMessage: 'Shipping'
+            }),
+            promoApplied: formatMessage({
+                id: 'checkout_confirmation.label.promo_applied',
+                defaultMessage: 'Promotion applied'
+            }),
+            free: formatMessage({
+                id: 'checkout_confirmation.label.free',
+                defaultMessage: 'Free'
+            }),
+            tax: formatMessage({
+                id: 'checkout_confirmation.label.tax',
+                defaultMessage: 'Tax'
+            }),
+            orderTotal: formatMessage({
+                id: 'checkout_confirmation.label.order_total',
+                defaultMessage: 'Order Total'
+            }),
+            paymentDetails: formatMessage({
+                id: 'checkout_confirmation.heading.payment_details',
+                defaultMessage: 'Payment Details'
+            }),
+            billingAddress: formatMessage({
+                id: 'checkout_confirmation.heading.billing_address',
+                defaultMessage: 'Billing Address'
+            }),
+            creditCard: formatMessage({
+                id: 'checkout_confirmation.heading.credit_card',
+                defaultMessage: 'Credit Card'
+            })
+        }),
+        [intl, order]
+    )
+
     if (!order || !order.orderNo) {
         return null
     }
@@ -90,30 +192,38 @@ const CheckoutConfirmation = () => {
             navigate(`/account`)
         } catch (error) {
             if (!error.response) {
-                form.setError('global', {type: 'manual', message: API_ERROR_MESSAGE})
+                form.setError('global', {
+                    type: 'manual',
+                    message: formatMessage(API_ERROR_MESSAGE)
+                })
                 return
             }
             const json = await error.response.json()
 
+            const errorMessages = {
+                accountExists: formatMessage({
+                    id: 'checkout_confirmation.message.already_has_account',
+                    defaultMessage: 'This email already has an account.'
+                }),
+                loginLink: formatMessage({
+                    id: 'checkout_confirmation.link.login',
+                    defaultMessage: 'Log in here'
+                })
+            }
+
             const existingAccountMessage = (
                 <Fragment>
-                    <FormattedMessage
-                        defaultMessage="This email already has an account."
-                        id="checkout_confirmation.message.already_has_account"
-                    />
+                    {errorMessages.accountExists}
                     &nbsp;
                     <Link to="/login" color="blue.600">
-                        <FormattedMessage
-                            defaultMessage="Log in here"
-                            id="checkout_confirmation.link.login"
-                        />
+                        {errorMessages.loginLink}
                     </Link>
                 </Fragment>
             )
 
             const message = /the login is already in use/i.test(json.detail)
                 ? existingAccountMessage
-                : API_ERROR_MESSAGE
+                : formatMessage(API_ERROR_MESSAGE)
 
             form.setError('global', {type: 'manual', message})
         }
@@ -131,43 +241,24 @@ const CheckoutConfirmation = () => {
                     <Box layerStyle="card" rounded={[0, 0, 'base']} px={[4, 4, 6]} py={[6, 6, 8]}>
                         <Stack gap="6">
                             <Heading textAlign="center" fontSize={['2xl']}>
-                                <FormattedMessage
-                                    defaultMessage="Thank you for your order!"
-                                    id="checkout_confirmation.heading.thank_you_for_order"
-                                />
+                                {messages.thankYou}
                             </Heading>
 
                             <Box>
                                 <Container variant="form">
                                     <Stack gap="3">
                                         <Text textAlign="center">
-                                            <FormattedMessage
-                                                defaultMessage="Order Number"
-                                                id="checkout_confirmation.label.order_number"
-                                            />
-                                            :{' '}
+                                            {messages.orderNumber}:{' '}
                                             <Text as="span" fontWeight="bold">
                                                 {order.orderNo}
                                             </Text>
                                         </Text>
-                                        <Text textAlign="center">
-                                            <FormattedMessage
-                                                defaultMessage="We will send an email to <b>{email}</b> with your confirmation number and receipt shortly."
-                                                id="checkout_confirmation.message.will_email_shortly"
-                                                values={{
-                                                    b: (chunks) => <b>{chunks}</b>,
-                                                    email: order.customerInfo.email
-                                                }}
-                                            />
-                                        </Text>
+                                        <Text textAlign="center">{messages.emailConfirmation}</Text>
 
                                         <Spacer />
 
                                         <Button as={Link} href="/" variant="outline">
-                                            <FormattedMessage
-                                                defaultMessage="Continue Shopping"
-                                                id="checkout_confirmation.link.continue_shopping"
-                                            />
+                                            {messages.continueShopping}
                                         </Button>
                                     </Stack>
                                 </Container>
@@ -184,10 +275,7 @@ const CheckoutConfirmation = () => {
                         >
                             <Container variant="form">
                                 <Heading fontSize="lg" marginBottom={6}>
-                                    <FormattedMessage
-                                        defaultMessage="Create an account for faster checkout"
-                                        id="checkout_confirmation.heading.create_account"
-                                    />
+                                    {messages.createAccount}
                                 </Heading>
 
                                 <form onSubmit={form.handleSubmit(submitForm)}>
@@ -211,10 +299,7 @@ const CheckoutConfirmation = () => {
                                             onClick={() => form.clearErrors('global')}
                                             isLoading={form.formState.isSubmitting}
                                         >
-                                            <FormattedMessage
-                                                defaultMessage="Create Account"
-                                                id="checkout_confirmation.button.create_account"
-                                            />
+                                            {messages.createAccountButton}
                                         </Button>
                                     </Stack>
                                 </form>
@@ -225,20 +310,12 @@ const CheckoutConfirmation = () => {
                     <Box layerStyle="card" rounded={[0, 0, 'base']} px={[4, 4, 6]} py={[6, 6, 8]}>
                         <Container variant="form">
                             <Stack gap="6">
-                                <Heading fontSize="lg">
-                                    <FormattedMessage
-                                        defaultMessage="Delivery Details"
-                                        id="checkout_confirmation.heading.delivery_details"
-                                    />
-                                </Heading>
+                                <Heading fontSize="lg">{messages.deliveryDetails}</Heading>
 
                                 <SimpleGrid columns={[1, 1, 2]} gap="6">
                                     <Stack gap="1">
                                         <Heading as="h3" fontSize="sm">
-                                            <FormattedMessage
-                                                defaultMessage="Shipping Address"
-                                                id="checkout_confirmation.heading.shipping_address"
-                                            />
+                                            {messages.shippingAddress}
                                         </Heading>
                                         <AddressDisplay
                                             address={order.shipments[0].shippingAddress}
@@ -247,10 +324,7 @@ const CheckoutConfirmation = () => {
 
                                     <Stack gap="1">
                                         <Heading as="h3" fontSize="sm">
-                                            <FormattedMessage
-                                                defaultMessage="Shipping Method"
-                                                id="checkout_confirmation.heading.shipping_method"
-                                            />
+                                            {messages.shippingMethod}
                                         </Heading>
                                         <Box>
                                             <Text>{order.shipments[0].shippingMethod.name}</Text>
@@ -267,27 +341,10 @@ const CheckoutConfirmation = () => {
                     <Box layerStyle="card" rounded={[0, 0, 'base']} px={[4, 4, 6]} py={[6, 6, 8]}>
                         <Container variant="form">
                             <Stack gap="6">
-                                <Heading fontSize="lg">
-                                    <FormattedMessage
-                                        defaultMessage="Order Summary"
-                                        id="checkout_confirmation.heading.order_summary"
-                                    />
-                                </Heading>
+                                <Heading fontSize="lg">{messages.orderSummary}</Heading>
 
                                 <Stack gap="4">
-                                    <Text>
-                                        <FormattedMessage
-                                            description="# item(s) in order"
-                                            defaultMessage="{itemCount, plural, =0 {0 items} one {# item} other {# items}}"
-                                            values={{
-                                                itemCount: order.productItems.reduce(
-                                                    (a, b) => a + b.quantity,
-                                                    0
-                                                )
-                                            }}
-                                            id="checkout_confirmation.message.num_of_items_in_order"
-                                        />
-                                    </Text>
+                                    <Text>{messages.itemCount}</Text>
 
                                     <Stack
                                         gap="5"
@@ -342,12 +399,7 @@ const CheckoutConfirmation = () => {
 
                                         <Stack w="full" py={4} borderY="1px" borderColor="gray.200">
                                             <Flex justify="space-between">
-                                                <Text fontWeight="bold">
-                                                    <FormattedMessage
-                                                        defaultMessage="Subtotal"
-                                                        id="checkout_confirmation.label.subtotal"
-                                                    />
-                                                </Text>
+                                                <Text fontWeight="bold">{messages.subtotal}</Text>
                                                 <Text fontWeight="bold">
                                                     <FormattedNumber
                                                         style="currency"
@@ -374,19 +426,11 @@ const CheckoutConfirmation = () => {
                                             <Flex justify="space-between">
                                                 <Flex alignItems="center">
                                                     <Text lineHeight={1}>
-                                                        <FormattedMessage
-                                                            defaultMessage="Shipping"
-                                                            id="checkout_confirmation.label.shipping"
-                                                        />
+                                                        {messages.shipping}
                                                         {order.shippingItems[0].priceAdjustments
                                                             ?.length > 0 && (
                                                             <Text as="span" ml={1}>
-                                                                (
-                                                                <FormattedMessage
-                                                                    defaultMessage="Promotion applied"
-                                                                    id="checkout_confirmation.label.promo_applied"
-                                                                />
-                                                                )
+                                                                ({messages.promoApplied})
                                                             </Text>
                                                         )}
                                                     </Text>
@@ -420,10 +464,7 @@ const CheckoutConfirmation = () => {
                                                         color="green.500"
                                                         textTransform="uppercase"
                                                     >
-                                                        <FormattedMessage
-                                                            defaultMessage="Free"
-                                                            id="checkout_confirmation.label.free"
-                                                        />
+                                                        {messages.free}
                                                     </Text>
                                                 ) : (
                                                     <Text>
@@ -436,12 +477,7 @@ const CheckoutConfirmation = () => {
                                                 )}
                                             </Flex>
                                             <Flex justify="space-between">
-                                                <Text>
-                                                    <FormattedMessage
-                                                        defaultMessage="Tax"
-                                                        id="checkout_confirmation.label.tax"
-                                                    />
-                                                </Text>
+                                                <Text>{messages.tax}</Text>
                                                 <Text>
                                                     <FormattedNumber
                                                         value={order.taxTotal}
@@ -453,12 +489,7 @@ const CheckoutConfirmation = () => {
                                         </Stack>
 
                                         <Flex w="full" justify="space-between">
-                                            <Text fontWeight="bold">
-                                                <FormattedMessage
-                                                    defaultMessage="Order Total"
-                                                    id="checkout_confirmation.label.order_total"
-                                                />
-                                            </Text>
+                                            <Text fontWeight="bold">{messages.orderTotal}</Text>
                                             <Text fontWeight="bold">
                                                 <FormattedNumber
                                                     style="currency"
@@ -476,30 +507,19 @@ const CheckoutConfirmation = () => {
                     <Box layerStyle="card" rounded={[0, 0, 'base']} px={[4, 4, 6]} py={[6, 6, 8]}>
                         <Container variant="form">
                             <Stack gap="6">
-                                <Heading fontSize="lg">
-                                    <FormattedMessage
-                                        defaultMessage="Payment Details"
-                                        id="checkout_confirmation.heading.payment_details"
-                                    />
-                                </Heading>
+                                <Heading fontSize="lg">{messages.paymentDetails}</Heading>
 
                                 <SimpleGrid columns={[1, 1, 2]} gap="6">
                                     <Stack gap="1">
                                         <Heading as="h3" fontSize="sm">
-                                            <FormattedMessage
-                                                defaultMessage="Billing Address"
-                                                id="checkout_confirmation.heading.billing_address"
-                                            />
+                                            {messages.billingAddress}
                                         </Heading>
                                         <AddressDisplay address={order.billingAddress} />
                                     </Stack>
 
                                     <Stack gap="1">
                                         <Heading as="h3" fontSize="sm">
-                                            <FormattedMessage
-                                                defaultMessage="Credit Card"
-                                                id="checkout_confirmation.heading.credit_card"
-                                            />
+                                            {messages.creditCard}
                                         </Heading>
 
                                         <Stack direction="row">

@@ -5,10 +5,10 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React from 'react'
+import React, {useMemo} from 'react'
 
 import {Button, HStack, NumberInput, useSlotRecipe} from '@chakra-ui/react'
-import {FormattedMessage, useIntl} from 'react-intl'
+import {useIntl} from 'react-intl'
 import PropTypes from 'prop-types'
 
 /**
@@ -24,10 +24,43 @@ import PropTypes from 'prop-types'
  */
 const QuantityPicker = (props) => {
     const intl = useIntl()
+    const {formatMessage} = intl
     const recipe = useSlotRecipe({key: 'quantityPicker'})
 
     const {productName, ...rest} = props
     const styles = recipe()
+
+    const messages = useMemo(
+        () => ({
+            decrementLabel: formatMessage(
+                {
+                    defaultMessage: 'Decrement Quantity for {productName}',
+                    id: 'product_view.label.assistive_msg.quantity_decrement'
+                },
+                {productName}
+            ),
+            decrementSymbol: formatMessage({
+                id: 'product_view.label.quantity_decrement',
+                defaultMessage: '\u2212' // HTML &minus;
+            }),
+            quantityLabel: formatMessage({
+                defaultMessage: 'Quantity',
+                id: 'product_view.label.quantity'
+            }),
+            incrementLabel: formatMessage(
+                {
+                    defaultMessage: 'Increment Quantity for {productName}',
+                    id: 'product_view.label.assistive_msg.quantity_increment'
+                },
+                {productName}
+            ),
+            incrementSymbol: formatMessage({
+                id: 'product_view.label.quantity_increment',
+                defaultMessage: '+'
+            })
+        }),
+        [intl]
+    )
 
     return (
         <NumberInput.Root
@@ -61,26 +94,14 @@ const QuantityPicker = (props) => {
                         data-testid="quantity-decrement"
                         variant="outline"
                         tabIndex={0}
-                        ariaLabel={intl.formatMessage(
-                            {
-                                defaultMessage: 'Decrement Quantity for {productName}',
-                                id: 'product_view.label.assistive_msg.quantity_decrement'
-                            },
-                            {productName}
-                        )}
+                        ariaLabel={messages.decrementLabel}
                     >
-                        <FormattedMessage
-                            id="product_view.label.quantity_decrement"
-                            defaultMessage={'\u2212'} // HTML &minus;
-                        />
+                        {messages.decrementSymbol}
                     </Button>
                 </NumberInput.DecrementTrigger>
                 <NumberInput.Input
                     css={styles.input}
-                    aria-label={intl.formatMessage({
-                        defaultMessage: 'Quantity',
-                        id: 'product_view.label.quantity'
-                    })}
+                    aria-label={messages.quantityLabel}
                     maxWidth={'44px'}
                     textAlign="center"
                 />
@@ -94,18 +115,9 @@ const QuantityPicker = (props) => {
                         data-testid="quantity-increment"
                         variant="outline"
                         tabIndex={0}
-                        ariaLabel={intl.formatMessage(
-                            {
-                                defaultMessage: 'Increment Quantity for {productName}',
-                                id: 'product_view.label.assistive_msg.quantity_increment'
-                            },
-                            {productName}
-                        )}
+                        ariaLabel={messages.incrementLabel}
                     >
-                        <FormattedMessage
-                            id="product_view.label.quantity_increment"
-                            defaultMessage="+"
-                        />
+                        {messages.incrementSymbol}
                     </Button>
                 </NumberInput.IncrementTrigger>
             </HStack>

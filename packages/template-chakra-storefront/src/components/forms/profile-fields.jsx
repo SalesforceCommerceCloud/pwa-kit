@@ -4,9 +4,9 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React from 'react'
+import React, {useMemo} from 'react'
 import PropTypes from 'prop-types'
-import {defineMessage, useIntl} from 'react-intl'
+import {useIntl} from 'react-intl'
 import {SimpleGrid, Stack} from '@chakra-ui/react'
 import useProfileFields from './useProfileFields'
 import Field from '../field'
@@ -14,13 +14,19 @@ import Field from '../field'
 const ProfileFields = ({form, prefix = ''}) => {
     const fields = useProfileFields({form, prefix})
     const intl = useIntl()
-    const formTitleAriaLabel = defineMessage({
-        defaultMessage: 'Profile Form',
-        id: 'profile_fields.label.profile_form'
-    })
+
+    const messages = useMemo(
+        () => ({
+            formAriaLabel: intl.formatMessage({
+                id: 'profile_fields.label.profile_form',
+                defaultMessage: 'Profile Form'
+            })
+        }),
+        [intl]
+    )
 
     return (
-        <Stack spacing={5} aria-label={intl.formatMessage(formTitleAriaLabel)}>
+        <Stack spacing={5} aria-label={messages.formAriaLabel}>
             <SimpleGrid columns={[1, 1, 1, 2]} spacing={5}>
                 <Field {...fields.firstName} />
                 <Field {...fields.lastName} />

@@ -4,8 +4,8 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React, {useEffect, useState} from 'react'
-import {FormattedMessage, useIntl} from 'react-intl'
+import React, {useEffect, useState, useMemo} from 'react'
+import {useIntl} from 'react-intl'
 import {Alert, Box, Button, Container, Grid, GridItem, Stack} from '@chakra-ui/react'
 import useNavigation from '../../hooks/use-navigation'
 import {CheckoutProvider, useCheckout} from './util/checkout-context'
@@ -25,7 +25,8 @@ import LoadingSpinner from '../../components/loading-spinner'
 import {AlertIcon} from '../../components/icons'
 
 const Checkout = () => {
-    const {formatMessage} = useIntl()
+    const intl = useIntl()
+    const {formatMessage} = intl
     const navigate = useNavigation()
     const {step} = useCheckout()
     const [error, setError] = useState()
@@ -36,6 +37,20 @@ const Checkout = () => {
     const isSocialEnabled = !!loginConfig?.social?.enabled
     const isPasswordlessEnabled = !!loginConfig?.passwordless?.enabled
     const idps = loginConfig?.social?.idps || []
+
+    const messages = useMemo(
+        () => ({
+            placeOrder: formatMessage({
+                id: 'checkout.button.place_order',
+                defaultMessage: 'Place Order'
+            }),
+            genericError: formatMessage({
+                id: 'checkout.message.generic_error',
+                defaultMessage: 'An unexpected error occurred during checkout.'
+            })
+        }),
+        [intl]
+    )
 
     useEffect(() => {
         if (error || step === 4) {
@@ -51,11 +66,7 @@ const Checkout = () => {
             })
             navigate(`/checkout/confirmation/${order.orderNo}`)
         } catch (error) {
-            const message = formatMessage({
-                id: 'checkout.message.generic_error',
-                defaultMessage: 'An unexpected error occurred during checkout.'
-            })
-            setError(message)
+            setError(messages.genericError)
         } finally {
             setIsLoading(false)
         }
@@ -99,10 +110,7 @@ const Checkout = () => {
                                             isLoading={isLoading}
                                             data-testid="sf-checkout-place-order-btn"
                                         >
-                                            <FormattedMessage
-                                                defaultMessage="Place Order"
-                                                id="checkout.button.place_order"
-                                            />
+                                            {messages.placeOrder}
                                         </Button>
                                     </Container>
                                 </Box>
@@ -120,10 +128,7 @@ const Checkout = () => {
                         {step === 4 && (
                             <Box display={{base: 'none', lg: 'block'}} pt={2}>
                                 <Button w="full" onClick={submitOrder} loading={isLoading}>
-                                    <FormattedMessage
-                                        defaultMessage="Place Order"
-                                        id="checkout.button.place_order"
-                                    />
+                                    {messages.placeOrder}
                                 </Button>
                             </Box>
                         )}
@@ -145,10 +150,7 @@ const Checkout = () => {
                 >
                     <Container variant="form">
                         <Button w="full" onClick={submitOrder} isLoading={isLoading}>
-                            <FormattedMessage
-                                defaultMessage="Place Order"
-                                id="checkout.button.place_order"
-                            />
+                            {messages.placeOrder}
                         </Button>
                     </Container>
                 </Box>
@@ -160,7 +162,8 @@ const Checkout = () => {
 const CheckoutContainer = () => {
     const {data: customer} = useCurrentCustomer()
     const {data: basket} = useCurrentBasket()
-    const {formatMessage} = useIntl()
+    const intl = useIntl()
+    const {formatMessage} = intl
     const removeItemFromBasketMutation = useShopperBasketsMutation('removeItemFromBasket')
     const toast = useToast()
     const [isDeletingUnavailableItem, setIsDeletingUnavailableItem] = useState(false)
@@ -173,7 +176,9 @@ const CheckoutContainer = () => {
             {
                 onSuccess: () => {
                     toast({
-                        title: formatMessage(TOAST_MESSAGE_REMOVED_ITEM_FROM_CART, {quantity: 1}),
+                        title: formatMessage(TOAST_MESSAGE_REMOVED_ITEM_FROM_CART, {
+                            quantity: 1
+                        }),
                         type: 'success'
                     })
                 },

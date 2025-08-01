@@ -70,8 +70,11 @@ export const withReactQuery = (Wrapped, options = {}) => {
 
             res.__performanceTimer.mark(PERFORMANCE_MARKS.reactQueryPrerender, 'start')
             // Use `ssrPrepass` to collect all uses of `useQuery`.
+            // NOTE: See a workaround in 'ssr/server/react-rendering.js' file that we had to implement,
+            // so that prepass would ignore React's useInsertionEffect hook.
             await ssrPrepass(appJSX)
             res.__performanceTimer.mark(PERFORMANCE_MARKS.reactQueryPrerender, 'end')
+
             const queryCache = queryClient.getQueryCache()
             const queries = queryCache.getAll().filter((q) => q.options.enabled !== false)
             await Promise.all(

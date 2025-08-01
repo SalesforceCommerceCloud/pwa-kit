@@ -4,10 +4,10 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React, {useContext, useState, useEffect} from 'react'
+import React, {useContext, useState, useEffect, useMemo} from 'react'
 import {useLocation} from 'react-router-dom'
 import PropTypes from 'prop-types'
-import {useIntl, FormattedMessage} from 'react-intl'
+import {useIntl} from 'react-intl'
 import {
     AspectRatio,
     Box,
@@ -58,6 +58,7 @@ export const AddToCartModal = () => {
     const isProductABundle = !!product?.type.bundle
 
     const intl = useIntl()
+    const {formatMessage} = intl
     const {
         data: basket = {},
         derivedData: {totalItems}
@@ -68,6 +69,43 @@ export const AddToCartModal = () => {
         ? selectedQuantity
         : itemsAdded.reduce((acc, {quantity}) => acc + quantity, 0)
 
+    const messages = useMemo(
+        () => ({
+            addedToCart: formatMessage(
+                {
+                    id: 'add_to_cart_modal.info.added_to_cart',
+                    defaultMessage:
+                        '{quantity} {quantity, plural, one {item} other {items}} added to cart'
+                },
+                {quantity: numberOfItemsAdded}
+            ),
+            quantity: formatMessage({
+                id: 'add_to_cart_modal.label.quantity',
+                defaultMessage: 'Qty'
+            }),
+            cartSubtotal: formatMessage(
+                {
+                    id: 'add_to_cart_modal.label.cart_subtotal',
+                    defaultMessage: 'Cart Subtotal ({itemAccumulatedCount} item)'
+                },
+                {itemAccumulatedCount: totalItems}
+            ),
+            viewCart: formatMessage({
+                id: 'add_to_cart_modal.link.view_cart',
+                defaultMessage: 'View Cart'
+            }),
+            checkout: formatMessage({
+                id: 'add_to_cart_modal.link.checkout',
+                defaultMessage: 'Proceed to Checkout'
+            }),
+            mightAlsoLike: formatMessage({
+                id: 'add_to_cart_modal.recommended_products.title.might_also_like',
+                defaultMessage: 'You Might Also Like'
+            })
+        }),
+        [intl, numberOfItemsAdded, totalItems]
+    )
+
     if (!isOpen) {
         return null
     }
@@ -77,13 +115,6 @@ export const AddToCartModal = () => {
     })?.images?.[0]
 
     const dialogTitleId = 'add-to-cart-modal-title'
-    const dialogTitle = intl.formatMessage(
-        {
-            defaultMessage: '{quantity} {quantity, plural, one {item} other {items}} added to cart',
-            id: 'add_to_cart_modal.info.added_to_cart'
-        },
-        {quantity: numberOfItemsAdded}
-    )
 
     return (
         <Dialog.Root
@@ -105,7 +136,7 @@ export const AddToCartModal = () => {
                     >
                         <Dialog.Header paddingY="8" bgColor="white">
                             <Heading as="h1" fontSize="2xl" id={dialogTitleId}>
-                                {dialogTitle}
+                                {messages.addedToCart}
                             </Heading>
                         </Dialog.Header>
                         <Dialog.Body bgColor="white" padding="0" marginBottom={{base: 40, lg: 0}}>
@@ -151,11 +182,8 @@ export const AddToCartModal = () => {
                                                         fontWeight="400"
                                                     >
                                                         <Text>
-                                                            {intl.formatMessage({
-                                                                defaultMessage: 'Qty',
-                                                                id: 'add_to_cart_modal.label.quantity'
-                                                            })}
-                                                            : {numberOfItemsAdded}
+                                                            {messages.quantity}:{' '}
+                                                            {numberOfItemsAdded}
                                                         </Text>
                                                     </Box>
                                                     <Flex
@@ -284,11 +312,7 @@ export const AddToCartModal = () => {
                                                                     )
                                                                 })}
                                                                 <Text>
-                                                                    {intl.formatMessage({
-                                                                        defaultMessage: 'Qty',
-                                                                        id: 'add_to_cart_modal.label.quantity'
-                                                                    })}
-                                                                    : {quantity}
+                                                                    {messages.quantity}: {quantity}
                                                                 </Text>
                                                             </Box>
                                                         </Box>
@@ -335,16 +359,7 @@ export const AddToCartModal = () => {
                                     paddingY={{base: '4', lg: '0'}}
                                 >
                                     <Flex justifyContent="space-between" marginBottom="8">
-                                        <Text fontWeight="700">
-                                            {intl.formatMessage(
-                                                {
-                                                    defaultMessage:
-                                                        'Cart Subtotal ({itemAccumulatedCount} item)',
-                                                    id: 'add_to_cart_modal.label.cart_subtotal'
-                                                },
-                                                {itemAccumulatedCount: totalItems}
-                                            )}
-                                        </Text>
+                                        <Text fontWeight="700">{messages.cartSubtotal}</Text>
                                         <Text alignSelf="flex-end" fontWeight="600">
                                             {productSubTotal &&
                                                 intl.formatNumber(productSubTotal, {
@@ -356,19 +371,13 @@ export const AddToCartModal = () => {
                                     <Stack gap="4">
                                         <Button asChild variant="solid">
                                             <Link to="/cart" width="100%">
-                                                {intl.formatMessage({
-                                                    defaultMessage: 'View Cart',
-                                                    id: 'add_to_cart_modal.link.view_cart'
-                                                })}
+                                                {messages.viewCart}
                                             </Link>
                                         </Button>
 
                                         <Button asChild variant="outline">
                                             <Link to="/checkout" width="100%">
-                                                {intl.formatMessage({
-                                                    defaultMessage: 'Proceed to Checkout',
-                                                    id: 'add_to_cart_modal.link.checkout'
-                                                })}
+                                                {messages.checkout}
                                                 <LockIcon />
                                             </Link>
                                         </Button>
@@ -377,12 +386,7 @@ export const AddToCartModal = () => {
                             </Flex>
                             <Box padding="8" bgColor="gray.50">
                                 <RecommendedProducts
-                                    title={
-                                        <FormattedMessage
-                                            defaultMessage="You Might Also Like"
-                                            id="add_to_cart_modal.recommended_products.title.might_also_like"
-                                        />
-                                    }
+                                    title={messages.mightAlsoLike}
                                     recommender={EINSTEIN_RECOMMENDERS.ADD_TO_CART_MODAL}
                                     products={[product]}
                                     mx={{base: -4, md: -8, lg: 0}}
@@ -400,16 +404,7 @@ export const AddToCartModal = () => {
                             bottom={0}
                         >
                             <Flex justifyContent="space-between" marginBottom="4">
-                                <Text fontWeight="700">
-                                    {intl.formatMessage(
-                                        {
-                                            defaultMessage:
-                                                'Cart Subtotal ({itemAccumulatedCount} item)',
-                                            id: 'add_to_cart_modal.label.cart_subtotal'
-                                        },
-                                        {itemAccumulatedCount: totalItems}
-                                    )}
-                                </Text>
+                                <Text fontWeight="700">{messages.cartSubtotal}</Text>
                                 <Text alignSelf="flex-end" fontWeight="600">
                                     {productSubTotal &&
                                         intl.formatNumber(productSubTotal, {
@@ -421,19 +416,13 @@ export const AddToCartModal = () => {
                             <Stack gap="4">
                                 <Button asChild variant="solid">
                                     <Link to="/cart" width="100%">
-                                        {intl.formatMessage({
-                                            defaultMessage: 'View Cart',
-                                            id: 'add_to_cart_modal.link.view_cart'
-                                        })}
+                                        {messages.viewCart}
                                     </Link>
                                 </Button>
 
                                 <Button asChild variant="outline">
                                     <Link to="/checkout" width="100%">
-                                        {intl.formatMessage({
-                                            defaultMessage: 'Proceed to Checkout',
-                                            id: 'add_to_cart_modal.link.checkout'
-                                        })}
+                                        {messages.checkout}
                                         <LockIcon />
                                     </Link>
                                 </Button>

@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React, {useEffect} from 'react'
+import React, {useEffect, useMemo} from 'react'
 import PropTypes from 'prop-types'
 import {useIntl} from 'react-intl'
 import {Box, Container} from '@chakra-ui/react'
@@ -17,11 +17,19 @@ import useNavigation from '../../hooks/use-navigation'
 import {API_ERROR_MESSAGE} from '../../../config/constants'
 
 const Registration = () => {
-    const {formatMessage} = useIntl()
+    const intl = useIntl()
+    const {formatMessage} = intl
     const navigate = useNavigation()
     const {isRegistered} = useCustomerType()
     const form = useForm()
     const register = useAuthHelper(AuthHelpers.Register)
+
+    const messages = useMemo(
+        () => ({
+            apiError: formatMessage(API_ERROR_MESSAGE)
+        }),
+        [intl]
+    )
 
     const submitForm = async (data) => {
         const body = {
@@ -37,7 +45,7 @@ const Registration = () => {
         try {
             await register.mutateAsync(body, {})
         } catch (e) {
-            form.setError('global', {type: 'manual', message: formatMessage(API_ERROR_MESSAGE)})
+            form.setError('global', {type: 'manual', message: messages.apiError})
         }
     }
 

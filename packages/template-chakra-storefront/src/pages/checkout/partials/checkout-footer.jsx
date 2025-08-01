@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React from 'react'
+import React, {useMemo} from 'react'
 import PropTypes from 'prop-types'
 import {useIntl} from 'react-intl'
 import {
@@ -26,6 +26,26 @@ const CheckoutFooter = ({...otherProps}) => {
     const recipe = useSlotRecipe({key: 'checkoutFooter'})
     const styles = recipe()
     const intl = useIntl()
+    const {formatMessage} = intl
+
+    const messages = useMemo(
+        () => ({
+            shipping: formatMessage({
+                id: 'checkout_footer.link.shipping',
+                defaultMessage: 'Shipping'
+            }),
+            returnsExchanges: formatMessage({
+                id: 'checkout_footer.link.returns_exchanges',
+                defaultMessage: 'Returns & Exchanges'
+            }),
+            copyright: formatMessage({
+                id: 'checkout_footer.message.copyright',
+                defaultMessage:
+                    'Salesforce or its affiliates. All rights reserved. This is a demo store only. Orders made WILL NOT be processed.'
+            })
+        }),
+        [intl]
+    )
 
     return (
         <Box as="footer" css={styles.container} {...otherProps}>
@@ -34,17 +54,11 @@ const CheckoutFooter = ({...otherProps}) => {
                     links={[
                         {
                             href: '/',
-                            text: intl.formatMessage({
-                                id: 'checkout_footer.link.shipping',
-                                defaultMessage: 'Shipping'
-                            })
+                            text: messages.shipping
                         },
                         {
                             href: '/',
-                            text: intl.formatMessage({
-                                id: 'checkout_footer.link.returns_exchanges',
-                                defaultMessage: 'Returns & Exchanges'
-                            })
+                            text: messages.returnsExchanges
                         }
                     ]}
                     css={styles.customerService}
@@ -58,12 +72,7 @@ const CheckoutFooter = ({...otherProps}) => {
 
                 <Box css={styles.legalSection}>
                     <Text css={styles.copyright}>
-                        &copy; {new Date().getFullYear()}{' '}
-                        {intl.formatMessage({
-                            id: 'checkout_footer.message.copyright',
-                            defaultMessage:
-                                'Salesforce or its affiliates. All rights reserved. This is a demo store only. Orders made WILL NOT be processed.'
-                        })}
+                        &copy; {new Date().getFullYear()} {messages.copyright}
                     </Text>
 
                     <HideOnDesktop>
@@ -85,31 +94,37 @@ const CheckoutFooter = ({...otherProps}) => {
 export default CheckoutFooter
 
 const LegalLinks = ({variant}) => {
-    const intl = useIntl()
+    const {formatMessage} = useIntl()
+
+    const messages = {
+        termsConditions: formatMessage({
+            id: 'checkout_footer.link.terms_conditions',
+            defaultMessage: 'Terms & Conditions'
+        }),
+        privacyPolicy: formatMessage({
+            id: 'checkout_footer.link.privacy_policy',
+            defaultMessage: 'Privacy Policy'
+        }),
+        siteMap: formatMessage({
+            id: 'checkout_footer.link.site_map',
+            defaultMessage: 'Site Map'
+        })
+    }
 
     return (
         <LinksList
             links={[
                 {
                     href: '/',
-                    text: intl.formatMessage({
-                        id: 'checkout_footer.link.terms_conditions',
-                        defaultMessage: 'Terms & Conditions'
-                    })
+                    text: messages.termsConditions
                 },
                 {
                     href: '/',
-                    text: intl.formatMessage({
-                        id: 'checkout_footer.link.privacy_policy',
-                        defaultMessage: 'Privacy Policy'
-                    })
+                    text: messages.privacyPolicy
                 },
                 {
                     href: '/',
-                    text: intl.formatMessage({
-                        id: 'checkout_footer.link.site_map',
-                        defaultMessage: 'Site Map'
-                    })
+                    text: messages.siteMap
                 }
             ]}
             color="gray.200"

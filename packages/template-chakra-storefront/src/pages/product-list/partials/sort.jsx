@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React from 'react'
+import React, {useMemo} from 'react'
 import PropTypes from 'prop-types'
 import {useHistory} from 'react-router-dom'
 import {useIntl} from 'react-intl'
@@ -12,14 +12,36 @@ import {Field, NativeSelect} from '@chakra-ui/react'
 
 const Sort = ({sortUrls, productSearchResult, basePath, ...otherProps}) => {
     const intl = useIntl()
+    const {formatMessage} = intl
     const history = useHistory()
+
+    const messages = useMemo(
+        () => ({
+            sortByLabel: formatMessage({
+                id: 'product_list.drawer.title.sort_by',
+                defaultMessage: 'Sort By'
+            }),
+            sortProductsLabel: formatMessage({
+                id: 'product_list.sort_by.label.assistive_msg',
+                defaultMessage: 'Sort products by'
+            })
+        }),
+        [intl]
+    )
+
+    const getSortOptionLabel = (sortOption) => {
+        return formatMessage(
+            {
+                id: 'product_list.select.sort_by',
+                defaultMessage: 'Sort By: {sortOption}'
+            },
+            {sortOption}
+        )
+    }
 
     return (
         <Field.Root
-            aria-label={intl.formatMessage({
-                id: 'product_list.drawer.title.sort_by',
-                defaultMessage: 'Sort By'
-            })}
+            aria-label={messages.sortByLabel}
             data-testid="sf-product-list-sort"
             id="page_sort"
             width="auto"
@@ -28,10 +50,7 @@ const Sort = ({sortUrls, productSearchResult, basePath, ...otherProps}) => {
             <NativeSelect.Root>
                 <NativeSelect.Field
                     id="sf-product-list-sort-select"
-                    aria-label={intl.formatMessage({
-                        id: 'product_list.sort_by.label.assistive_msg',
-                        defaultMessage: 'Sort products by'
-                    })}
+                    aria-label={messages.sortProductsLabel}
                     value={basePath.replace(/(offset)=(\d+)/i, '$1=0')}
                     onChange={(e) => {
                         history.push(e.target.value)
@@ -52,15 +71,7 @@ const Sort = ({sortUrls, productSearchResult, basePath, ...otherProps}) => {
                 >
                     {sortUrls.map((href, index) => (
                         <option key={href} value={href}>
-                            {intl.formatMessage(
-                                {
-                                    id: 'product_list.select.sort_by',
-                                    defaultMessage: 'Sort By: {sortOption}'
-                                },
-                                {
-                                    sortOption: productSearchResult?.sortingOptions[index]?.label
-                                }
-                            )}
+                            {getSortOptionLabel(productSearchResult?.sortingOptions[index]?.label)}
                         </option>
                     ))}
                 </NativeSelect.Field>

@@ -4,9 +4,9 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React from 'react'
+import React, {useMemo} from 'react'
 import PropTypes from 'prop-types'
-import {FormattedMessage, useIntl} from 'react-intl'
+import {useIntl} from 'react-intl'
 import {Box, Button, Accordion} from '@chakra-ui/react'
 import {useForm} from 'react-hook-form'
 import {ChevronDownIcon} from '../icons'
@@ -17,10 +17,31 @@ import {useCurrentBasket} from '../../hooks'
 import useToast from '../../hooks/use-toast'
 
 export const usePromoCode = () => {
-    const {formatMessage} = useIntl()
+    const intl = useIntl()
+    const {formatMessage} = intl
     const {data: basket} = useCurrentBasket()
     const form = useForm()
     const toast = useToast()
+
+    const messages = useMemo(
+        () => ({
+            promoApplied: formatMessage({
+                id: 'use_promocode.info.promo_applied',
+                defaultMessage: 'Promotion applied'
+            }),
+            checkCode: formatMessage({
+                id: 'use_promocode.error.check_the_code',
+                defaultMessage:
+                    'Check the code and try again, it may already be applied or the promo has expired.'
+            }),
+            promoRemoved: formatMessage({
+                id: 'use_promocode.info.promo_removed',
+                defaultMessage: 'Promotion removed'
+            }),
+            apiError: formatMessage(API_ERROR_MESSAGE)
+        }),
+        [intl]
+    )
 
     const applyPromoCodeMutation = useShopperBasketsMutation('addCouponToBasket')
     const removePromoCodeMutation = useShopperBasketsMutation('removeCouponFromBasket')
@@ -37,10 +58,7 @@ export const usePromoCode = () => {
             form.reset({code: ''})
 
             toast({
-                title: formatMessage({
-                    defaultMessage: 'Promotion applied',
-                    id: 'use_promocode.info.promo_applied'
-                }),
+                title: messages.promoApplied,
                 type: 'success'
             })
         } catch (e) {
@@ -48,11 +66,7 @@ export const usePromoCode = () => {
                 'code',
                 {
                     type: 'manual',
-                    message: formatMessage({
-                        defaultMessage:
-                            'Check the code and try again, it may already be applied or the promo has expired.',
-                        id: 'use_promocode.error.check_the_code'
-                    })
+                    message: messages.checkCode
                 },
                 {shouldFocus: true}
             )
@@ -67,16 +81,13 @@ export const usePromoCode = () => {
             {
                 onSuccess: () => {
                     toast({
-                        title: formatMessage({
-                            defaultMessage: 'Promotion removed',
-                            id: 'use_promocode.info.promo_removed'
-                        }),
+                        title: messages.promoRemoved,
                         type: 'success'
                     })
                 },
                 onError: () => {
                     toast({
-                        title: formatMessage(API_ERROR_MESSAGE),
+                        title: messages.apiError,
                         type: 'error'
                     })
                 }
@@ -88,6 +99,19 @@ export const usePromoCode = () => {
 }
 
 export const PromoCode = ({form, submitPromoCode, itemProps}) => {
+    const intl = useIntl()
+    const {formatMessage} = intl
+
+    const messages = useMemo(
+        () => ({
+            havePromoCode: formatMessage({
+                id: 'promocode.accordion.button.have_promocode',
+                defaultMessage: 'Do you have a promo code?'
+            })
+        }),
+        [intl]
+    )
+
     return (
         <Accordion.Root collapsible>
             <Accordion.Item {...itemProps}>
@@ -102,10 +126,7 @@ export const PromoCode = ({form, submitPromoCode, itemProps}) => {
                         fw="400"
                         pl="0"
                     >
-                        <FormattedMessage
-                            defaultMessage="Do you have a promo code?"
-                            id="promocode.accordion.button.have_promocode"
-                        />
+                        {messages.havePromoCode}
                         <Accordion.ItemIndicator asChild>
                             <ChevronDownIcon color="blue.700" />
                         </Accordion.ItemIndicator>

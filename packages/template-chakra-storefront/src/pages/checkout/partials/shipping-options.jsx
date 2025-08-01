@@ -4,8 +4,8 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React, {useEffect} from 'react'
-import {FormattedMessage, FormattedNumber, useIntl} from 'react-intl'
+import React, {useEffect, useMemo} from 'react'
+import {FormattedNumber, useIntl} from 'react-intl'
 import {Box, Button, Container, Flex, HStack, RadioGroup, Stack, Text} from '@chakra-ui/react'
 import {useForm, Controller} from 'react-hook-form'
 import {useCheckout} from '../util/checkout-context'
@@ -19,7 +19,8 @@ import {useCurrentBasket} from '../../../hooks/use-current-basket'
 import {useCurrency} from '../../../hooks'
 
 export default function ShippingOptions() {
-    const {formatMessage} = useIntl()
+    const intl = useIntl()
+    const {formatMessage} = intl
     const {step, STEPS, goToStep, goToNextStep} = useCheckout()
     const {data: basket} = useCurrentBasket()
     const {currency} = useCurrency()
@@ -77,20 +78,41 @@ export default function ShippingOptions() {
         shippingItem?.priceAfterItemDiscount || 0
     )
 
-    const freeLabel = formatMessage({
-        defaultMessage: 'Free',
-        id: 'checkout_confirmation.label.free'
-    })
+    const messages = useMemo(
+        () => ({
+            free: formatMessage({
+                id: 'checkout_confirmation.label.free',
+                defaultMessage: 'Free'
+            }),
+            title: formatMessage({
+                id: 'shipping_options.title.shipping_gift_options',
+                defaultMessage: 'Shipping & Gift Options'
+            }),
+            editLabel: formatMessage({
+                id: 'toggle_card.action.editShippingOptions',
+                defaultMessage: 'Edit Shipping Options'
+            }),
+            sendAsGift: formatMessage({
+                id: 'shipping_options.action.send_as_a_gift',
+                defaultMessage: 'Do you want to send this as a gift?'
+            }),
+            continueToPayment: formatMessage({
+                id: 'shipping_options.button.continue_to_payment',
+                defaultMessage: 'Continue to Payment'
+            })
+        }),
+        [intl]
+    )
 
     let shippingPriceLabel = selectedMethodDisplayPrice
     if (selectedMethodDisplayPrice !== shippingItem?.price) {
         const currentPrice =
-            selectedMethodDisplayPrice === 0 ? freeLabel : selectedMethodDisplayPrice
+            selectedMethodDisplayPrice === 0 ? messages.free : selectedMethodDisplayPrice
 
         shippingPriceLabel = formatMessage(
             {
-                defaultMessage: 'Originally {originalPrice}, now {newPrice}',
-                id: 'checkout_confirmation.label.shipping.strikethrough.price'
+                id: 'checkout_confirmation.label.shipping.strikethrough.price',
+                defaultMessage: 'Originally {originalPrice}, now {newPrice}'
             },
             {
                 originalPrice: shippingItem?.price,
@@ -106,18 +128,12 @@ export default function ShippingOptions() {
     return (
         <ToggleCard
             id="step-2"
-            title={formatMessage({
-                defaultMessage: 'Shipping & Gift Options',
-                id: 'shipping_options.title.shipping_gift_options'
-            })}
+            title={messages.title}
             editing={step === STEPS.SHIPPING_OPTIONS}
             isLoading={form.formState.isSubmitting}
             disabled={selectedShippingMethod == null || !selectedShippingAddress}
             onEdit={() => goToStep(STEPS.SHIPPING_OPTIONS)}
-            editLabel={formatMessage({
-                defaultMessage: 'Edit Shipping Options',
-                id: 'toggle_card.action.editShippingOptions'
-            })}
+            editLabel={messages.editLabel}
         >
             <ToggleCardEdit>
                 <form
@@ -194,20 +210,14 @@ export default function ShippingOptions() {
 
                         <Box>
                             <Button variant="link-blue" size="sm">
-                                <FormattedMessage
-                                    defaultMessage="Do you want to send this as a gift?"
-                                    id="shipping_options.action.send_as_a_gift"
-                                />
+                                {messages.sendAsGift}
                                 <ChevronDownIcon />
                             </Button>
                         </Box>
                         <Box>
                             <Container variant="form">
                                 <Button w="full" type="submit">
-                                    <FormattedMessage
-                                        defaultMessage="Continue to Payment"
-                                        id="shipping_options.button.continue_to_payment"
-                                    />
+                                    {messages.continueToPayment}
                                 </Button>
                             </Container>
                         </Box>
@@ -222,7 +232,7 @@ export default function ShippingOptions() {
                         <Flex alignItems="center" aria-label={shippingPriceLabel} role="group">
                             <Text fontWeight="bold" aria-hidden="true" role="presentation">
                                 {selectedMethodDisplayPrice === 0 ? (
-                                    freeLabel
+                                    messages.free
                                 ) : (
                                     <FormattedNumber
                                         value={selectedMethodDisplayPrice}

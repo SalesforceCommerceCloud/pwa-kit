@@ -4,9 +4,9 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React, {useContext, createContext, useEffect, useRef} from 'react'
+import React, {useContext, createContext, useEffect, useRef, useMemo} from 'react'
 import PropTypes from 'prop-types'
-import {FormattedMessage} from 'react-intl'
+import {useIntl} from 'react-intl'
 import {Box, Button, Flex, Heading, Stack} from '@chakra-ui/react'
 import LoadingSpinner from '../../components/loading-spinner'
 
@@ -29,7 +29,19 @@ export const ToggleCard = ({
     children,
     ...props
 }) => {
+    const intl = useIntl()
+    const {formatMessage} = intl
     const titleRef = useRef()
+
+    const messages = useMemo(
+        () => ({
+            edit: formatMessage({
+                id: 'toggle_card.action.edit',
+                defaultMessage: 'Edit'
+            })
+        }),
+        [intl]
+    )
 
     useEffect(() => {
         if (editing && titleRef.current) {
@@ -65,12 +77,7 @@ export const ToggleCard = ({
                                 onClick={onEdit}
                                 aria-label={editLabel}
                             >
-                                {editLabel || (
-                                    <FormattedMessage
-                                        defaultMessage="Edit"
-                                        id="toggle_card.action.edit"
-                                    />
-                                )}
+                                {editLabel || messages.edit}
                             </Button>
                         )}
                     </Flex>

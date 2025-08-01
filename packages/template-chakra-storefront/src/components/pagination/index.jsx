@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React from 'react'
+import React, {useMemo} from 'react'
 import PropTypes from 'prop-types'
 import {useIntl} from 'react-intl'
 import {Link as RouteLink, useHistory} from 'react-router-dom'
@@ -34,6 +34,7 @@ const SELECT_ID = 'pagination'
  */
 const Pagination = (props) => {
     const intl = useIntl()
+    const {formatMessage} = intl
     const history = useHistory()
     const {urls, currentURL, ...rest} = props
 
@@ -43,6 +44,39 @@ const Pagination = (props) => {
 
     const recipe = useSlotRecipe({key: 'pagination'})
     const styles = recipe()
+
+    const messages = useMemo(
+        () => ({
+            prevAssistive: formatMessage({
+                id: 'pagination.link.prev.assistive_msg',
+                defaultMessage: 'Previous Page'
+            }),
+            prev: formatMessage({
+                id: 'pagination.link.prev',
+                defaultMessage: 'Prev'
+            }),
+            pageNumberSelect: formatMessage({
+                id: 'pagination.field.page_number_select',
+                defaultMessage: 'Select page number'
+            }),
+            numOfPages: formatMessage(
+                {
+                    id: 'pagination.field.num_of_pages',
+                    defaultMessage: 'of {numOfPages}'
+                },
+                {numOfPages: urls.length}
+            ),
+            nextAssistive: formatMessage({
+                id: 'pagination.link.next.assistive_msg',
+                defaultMessage: 'Next Page'
+            }),
+            next: formatMessage({
+                id: 'pagination.link.next',
+                defaultMessage: 'Next'
+            })
+        }),
+        [intl, urls.length]
+    )
 
     // Determine the current page index.
     return (
@@ -60,21 +94,13 @@ const Pagination = (props) => {
                 // as intended, the workaround is to use the current url when its disabled.
                 href={prev || currentURL}
                 to={prev || currentURL}
-                aria-label={intl.formatMessage({
-                    id: 'pagination.link.prev.assistive_msg',
-                    defaultMessage: 'Previous Page'
-                })}
+                aria-label={messages.prevAssistive}
                 aria-disabled={!prev}
                 variant="link"
                 isDisabled={!prev}
             >
                 <ChevronLeftIcon boxSize={4} color="black" />
-                <Text css={styles.text}>
-                    {intl.formatMessage({
-                        id: 'pagination.link.prev',
-                        defaultMessage: 'Prev'
-                    })}
-                </Text>
+                <Text css={styles.text}>{messages.prev}</Text>
             </Button>
 
             {/* Direct Page Selection */}
@@ -87,10 +113,7 @@ const Pagination = (props) => {
                             history.push(e.target.value)
                         }}
                         value={currentURL}
-                        aria-label={intl.formatMessage({
-                            id: 'pagination.field.page_number_select',
-                            defaultMessage: 'Select page number'
-                        })}
+                        aria-label={messages.pageNumberSelect}
                     >
                         {urls.map((href, index) => (
                             <option key={index} value={href}>
@@ -101,13 +124,7 @@ const Pagination = (props) => {
                     <NativeSelect.Indicator css={styles.selectIndicator} />
                 </NativeSelect.Root>
                 <Text css={styles.text} ml={2}>
-                    {intl.formatMessage(
-                        {
-                            id: 'pagination.field.num_of_pages',
-                            defaultMessage: 'of {numOfPages}'
-                        },
-                        {numOfPages: urls.length}
-                    )}
+                    {messages.numOfPages}
                 </Text>
             </Flex>
 
@@ -119,20 +136,12 @@ const Pagination = (props) => {
                 // as intended, the workaround is to use the current url when its disabled.
                 href={next || currentURL}
                 to={next || currentURL}
-                aria-label={intl.formatMessage({
-                    id: 'pagination.link.next.assistive_msg',
-                    defaultMessage: 'Next Page'
-                })}
+                aria-label={messages.nextAssistive}
                 aria-disabled={!next}
                 variant="link"
                 isDisabled={!next}
             >
-                <Text css={styles.text}>
-                    {intl.formatMessage({
-                        id: 'pagination.link.next',
-                        defaultMessage: 'Next'
-                    })}
-                </Text>
+                <Text css={styles.text}>{messages.next}</Text>
                 <ChevronRightIcon boxSize={4} color="black" />
             </Button>
         </Flex>

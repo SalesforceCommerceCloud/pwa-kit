@@ -91,7 +91,7 @@
   },
   "account_order_history.label.num_of_items": {
     "defaultMessage": "{count} items",
-    "description": "Number of items in order"
+    "description": "Number of items in the order"
   },
   "account_order_history.label.order_number": {
     "defaultMessage": "Order Number: {orderNumber}"
@@ -559,10 +559,10 @@
     "defaultMessage": "Sign in to retrieve your saved items or continue shopping."
   },
   "empty_search_results.info.cant_find_anything_for_category": {
-    "defaultMessage": "We couldn’t find anything for {category}. Try searching for a product or {link}."
+    "defaultMessage": "We couldn't find anything for {category}. Try searching for a product or {link}."
   },
   "empty_search_results.info.cant_find_anything_for_query": {
-    "defaultMessage": "We couldn’t find anything for \"{searchQuery}\"."
+    "defaultMessage": "We couldn't find anything for \"{searchQuery}\"."
   },
   "empty_search_results.info.double_check_spelling": {
     "defaultMessage": "Double-check your spelling and try again or {link}."
@@ -1057,6 +1057,9 @@
   "order_summary.label.tax": {
     "defaultMessage": "Tax"
   },
+  "page_header.search_results_for": {
+    "defaultMessage": "Search Results for"
+  },
   "page_not_found.action.go_back": {
     "defaultMessage": "Back to previous page"
   },
@@ -1068,6 +1071,9 @@
   },
   "page_not_found.title.page_cant_be_found": {
     "defaultMessage": "The page you're looking for can't be found."
+  },
+  "page_title.search_results_for": {
+    "defaultMessage": "Search Results for"
   },
   "pagination.field.num_of_pages": {
     "defaultMessage": "of {numOfPages}"

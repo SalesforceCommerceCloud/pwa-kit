@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React, {useEffect, useContext} from 'react'
+import React, {useEffect, useContext, useMemo} from 'react'
 import {useIntl} from 'react-intl'
 import PropTypes from 'prop-types'
 
@@ -77,6 +77,51 @@ const StoreLocatorInput = ({form, submitForm}) => {
     const getUserGeolocation = useGeolocation()
     const {control} = form
     const intl = useIntl()
+    const {formatMessage} = intl
+
+    const messages = useMemo(
+        () => ({
+            errors: {
+                selectCountry: formatMessage({
+                    id: 'store_locator.error.please_select_a_country',
+                    defaultMessage: 'Please select a country.'
+                }),
+                enterPostalCode: formatMessage({
+                    id: 'store_locator.error.please_enter_a_postal_code',
+                    defaultMessage: 'Please enter a postal code.'
+                }),
+                shareLocation: formatMessage({
+                    id: 'store_locator.error.agree_to_share_your_location',
+                    defaultMessage: 'Please agree to share your location'
+                })
+            },
+            placeholders: {
+                selectCountry: formatMessage({
+                    id: 'store_locator.action.select_a_country',
+                    defaultMessage: 'Select a country'
+                }),
+                enterPostalCode: formatMessage({
+                    id: 'store_locator.field.placeholder.enter_postal_code',
+                    defaultMessage: 'Enter postal code'
+                })
+            },
+            actions: {
+                find: formatMessage({
+                    id: 'store_locator.action.find',
+                    defaultMessage: 'Find'
+                }),
+                useMyLocation: formatMessage({
+                    id: 'store_locator.action.use_my_location',
+                    defaultMessage: 'Use My Location'
+                })
+            },
+            separator: formatMessage({
+                id: 'store_locator.description.or',
+                defaultMessage: 'Or'
+            })
+        }),
+        [intl]
+    )
     return (
         <form id="store-locator-form" onSubmit={form.handleSubmit(submitForm)}>
             <InputGroup>
@@ -88,10 +133,7 @@ const StoreLocatorInput = ({form, submitForm}) => {
                             userHasSetManualGeolocation ? searchStoresParams?.countryCode : ''
                         }
                         rules={{
-                            required: intl.formatMessage({
-                                id: 'store_locator.error.please_select_a_country',
-                                defaultMessage: 'Please select a country.'
-                            })
+                            required: messages.errors.selectCountry
                         }}
                         render={({field}) => {
                             return SUPPORTED_STORE_LOCATOR_COUNTRIES.length !== 0 ? (
@@ -99,17 +141,14 @@ const StoreLocatorInput = ({form, submitForm}) => {
                                     <Select
                                         {...field}
                                         marginBottom="10px"
-                                        placeholder={intl.formatMessage({
-                                            id: 'store_locator.action.select_a_country',
-                                            defaultMessage: 'Select a country'
-                                        })}
+                                        placeholder={messages.placeholders.selectCountry}
                                         borderColor="gray.500"
                                     >
                                         {SUPPORTED_STORE_LOCATOR_COUNTRIES.map(
                                             ({countryCode, countryName}) => {
                                                 return (
                                                     <option value={countryCode} key={countryCode}>
-                                                        {intl.formatMessage(countryName)}
+                                                        {formatMessage(countryName)}
                                                     </option>
                                                 )
                                             }
@@ -137,10 +176,7 @@ const StoreLocatorInput = ({form, submitForm}) => {
                     name="postalCode"
                     control={control}
                     rules={{
-                        required: intl.formatMessage({
-                            id: 'store_locator.error.please_enter_a_postal_code',
-                            defaultMessage: 'Please enter a postal code.'
-                        })
+                        required: messages.errors.enterPostalCode
                     }}
                     defaultValue={userHasSetManualGeolocation ? searchStoresParams?.postalCode : ''}
                     render={({field}) => {
@@ -148,10 +184,7 @@ const StoreLocatorInput = ({form, submitForm}) => {
                             <FormControl isInvalid={form.formState.errors.postalCode}>
                                 <Input
                                     {...field}
-                                    placeholder={intl.formatMessage({
-                                        id: 'store_locator.field.placeholder.enter_postal_code',
-                                        defaultMessage: 'Enter postal code'
-                                    })}
+                                    placeholder={messages.placeholders.enterPostalCode}
                                 />
                                 {form.formState.errors.postalCode && (
                                     <FormErrorMessage sx={{top: '-20px'}} color="red.600">
@@ -173,20 +206,14 @@ const StoreLocatorInput = ({form, submitForm}) => {
                     marginLeft={2}
                     variant="solid"
                 >
-                    {intl.formatMessage({
-                        id: 'store_locator.action.find',
-                        defaultMessage: 'Find'
-                    })}
+                    {messages.actions.find}
                 </Button>
             </InputGroup>
             <Box
                 style={{display: 'flex', justifyContent: 'center', alignItems: 'center'}}
                 margin="10px"
             >
-                {intl.formatMessage({
-                    id: 'store_locator.description.or',
-                    defaultMessage: 'Or'
-                })}
+                {messages.separator}
             </Box>
             <Button
                 key="use-my-location-button"
@@ -199,10 +226,7 @@ const StoreLocatorInput = ({form, submitForm}) => {
                 fontWeight="bold"
                 marginBottom={4}
             >
-                {intl.formatMessage({
-                    id: 'store_locator.action.use_my_location',
-                    defaultMessage: 'Use My Location'
-                })}
+                {messages.actions.useMyLocation}
             </Button>
             <FormControl isInvalid={automaticGeolocationHasFailed && userWantsToShareLocation}>
                 <FormErrorMessage
@@ -212,10 +236,7 @@ const StoreLocatorInput = ({form, submitForm}) => {
                     marginBottom={4}
                 >
                     <AlertIcon aria-hidden="true" mr={2} />
-                    {intl.formatMessage({
-                        id: 'store_locator.error.agree_to_share_your_location',
-                        defaultMessage: 'Please agree to share your location'
-                    })}
+                    {messages.errors.shareLocation}
                 </FormErrorMessage>
             </FormControl>
         </form>
