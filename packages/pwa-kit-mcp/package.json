@@ -1,0 +1,68 @@
+{
+  "name": "@salesforce/pwa-kit-mcp",
+  "version": "0.1.0-preview.3",
+  "private": false,
+  "description": "MCP server that helps you build Salesforce Commerce Cloud PWA Kit Composable Storefront",
+  "main": "dist/server/server.js",
+  "files": [
+    "CHANGELOG.md",
+    "LICENSE",
+    "dist/**/*.{js,d.ts,json}",
+    "docs/",
+    "!dist/CHANGELOG.md",
+    "!dist/README.md",
+    "!**/*.test.{ts,js}"
+  ],
+  "scripts": {
+    "build": "cross-env NODE_ENV=production internal-lib-build build",
+    "build:watch": "nodemon --watch 'src/**' --ext 'js,ts' --exec  'npm run build'",
+    "format": "pwa-kit-dev format \"**/*.{js,jsx}\"",
+    "lint": "npm run lint:js",
+    "lint:fix": "npm run lint:js -- --fix",
+    "lint:js": "pwa-kit-dev lint \"**/*.{js,ts}\"",
+    "prepare": "npm run build",
+    "test": "internal-lib-build test",
+    "test:inspect": "node --inspect-brk jest --runInBand",
+    "test:watch": "npm test -- --watch",
+    "start": "node dist/server/server.js"
+  },
+  "keywords": [
+    "mcp",
+    "server",
+    "pwa",
+    "salesforce",
+    "commerce",
+    "commerce cloud",
+    "pwa kit",
+    "composable storefront"
+  ],
+  "author": "Spark Team",
+  "bin": {
+    "pwa-kit-mcp": "dist/server/server.js"
+  },
+  "license": "ISC",
+  "dependencies": {
+    "@axe-core/playwright": "^4.10.1",
+    "@babel/runtime": "^7.21.0",
+    "@modelcontextprotocol/sdk": "^1.13.2",
+    "axe-core": "^4.10.3",
+    "cross-spawn": "^7.0.6",
+    "playwright": "^1.49.0",
+    "zod": "^3.25.56"
+  },
+  "devDependencies": {
+    "@babel/node": "^7.22.5",
+    "@playwright/test": "^1.49.0",
+    "@salesforce/pwa-kit-dev": "3.12.0-dev",
+    "cross-env": "^5.2.1",
+    "internal-lib-build": "3.12.0-dev",
+    "nodemon": "^2.0.22"
+  },
+  "engines": {
+    "node": "^16.11.0 || ^18.0.0 || ^20.0.0 || ^22.0.0",
+    "npm": "^8.0.0 || ^9.0.0 || ^10.0.0 || ^11.0.0"
+  },
+  "publishConfig": {
+    "directory": "dist"
+  }
+}

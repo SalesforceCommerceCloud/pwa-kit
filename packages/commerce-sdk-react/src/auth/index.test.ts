@@ -620,6 +620,189 @@ describe('Auth', () => {
         }
     )
 
+    describe('USID expiry matches refresh token expiry', () => {
+        let setSpy: jest.SpyInstance
+
+        beforeEach(() => {
+            setSpy = jest.spyOn(Auth.prototype as any, 'set')
+        })
+
+        afterEach(() => {
+            setSpy.mockRestore()
+        })
+
+        test('USID is set with expiry matching guest refresh token expiry', async () => {
+            const customTTL = 1800 // 30 minutes
+            const auth = new Auth({...config, refreshTokenGuestCookieTTL: customTTL})
+
+            // Mock the helper to return token response
+            const tokenResponse: ShopperLoginTypes.TokenResponse = {
+                ...TOKEN_RESPONSE,
+                refresh_token_expires_in: customTTL
+            }
+            ;(helpers.loginGuestUser as jest.Mock).mockResolvedValueOnce(tokenResponse)
+
+            await auth.loginGuestUser()
+
+            // Verify USID was set with expiry
+            const usidSetCall = setSpy.mock.calls.find((call) => call[0] === 'usid')
+            expect(usidSetCall).toBeDefined()
+            expect(usidSetCall[1]).toBe(tokenResponse.usid)
+            expect(usidSetCall[2]).toMatchObject({
+                expires: expect.any(Date)
+            })
+
+            // Verify the expiry date matches the refresh token expiry
+            const refreshTokenSetCall = setSpy.mock.calls.find(
+                (call) => call[0] === 'refresh_token_guest'
+            )
+            expect(refreshTokenSetCall).toBeDefined()
+            expect(refreshTokenSetCall[2]).toMatchObject({
+                expires: expect.any(Date)
+            })
+
+            // Both should have the same expiry date
+            expect(usidSetCall[2].expires).toEqual(refreshTokenSetCall[2].expires)
+        })
+
+        test('USID is set with expiry matching registered refresh token expiry', async () => {
+            const customTTL = 7200 // 2 hours
+            const auth = new Auth({...config, refreshTokenRegisteredCookieTTL: customTTL})
+
+            // Mock the helper to return token response
+            const tokenResponse: ShopperLoginTypes.TokenResponse = {
+                ...TOKEN_RESPONSE,
+                refresh_token_expires_in: customTTL
+            }
+            ;(helpers.loginRegisteredUserB2C as jest.Mock).mockResolvedValueOnce(tokenResponse)
+
+            await auth.loginRegisteredUserB2C({username: 'test', password: 'test'})
+
+            // Verify USID was set with expiry
+            const usidSetCall = setSpy.mock.calls.find((call) => call[0] === 'usid')
+            expect(usidSetCall).toBeDefined()
+            expect(usidSetCall[1]).toBe(tokenResponse.usid)
+            expect(usidSetCall[2]).toMatchObject({
+                expires: expect.any(Date)
+            })
+
+            // Verify the expiry date matches the refresh token expiry
+            const refreshTokenSetCall = setSpy.mock.calls.find(
+                (call) => call[0] === 'refresh_token_registered'
+            )
+            expect(refreshTokenSetCall).toBeDefined()
+            expect(refreshTokenSetCall[2]).toMatchObject({
+                expires: expect.any(Date)
+            })
+
+            // Both should have the same expiry date
+            expect(usidSetCall[2].expires).toEqual(refreshTokenSetCall[2].expires)
+        })
+
+        test('USID expiry uses default guest TTL when no override is provided', async () => {
+            const auth = new Auth(config)
+
+            // Mock the helper to return token response with no refresh_token_expires_in
+            const tokenResponse: ShopperLoginTypes.TokenResponse = {
+                ...TOKEN_RESPONSE,
+                refresh_token_expires_in: undefined
+            }
+            ;(helpers.loginGuestUser as jest.Mock).mockResolvedValueOnce(tokenResponse)
+
+            await auth.loginGuestUser()
+
+            // Verify USID was set with expiry
+            const usidSetCall = setSpy.mock.calls.find((call) => call[0] === 'usid')
+            expect(usidSetCall).toBeDefined()
+            expect(usidSetCall[2]).toMatchObject({
+                expires: expect.any(Date)
+            })
+
+            // Verify the expiry date matches the default guest TTL
+            const expectedExpiryDate = new Date(
+                Date.now() + DEFAULT_SLAS_REFRESH_TOKEN_GUEST_TTL * 1000
+            )
+            expect(usidSetCall[2].expires.getTime()).toBeCloseTo(expectedExpiryDate.getTime(), -2) // Within 100ms
+        })
+
+        test('USID expiry uses default registered TTL when no override is provided', async () => {
+            const auth = new Auth(config)
+
+            // Mock the helper to return token response with no refresh_token_expires_in
+            const tokenResponse: ShopperLoginTypes.TokenResponse = {
+                ...TOKEN_RESPONSE,
+                refresh_token_expires_in: undefined
+            }
+            ;(helpers.loginRegisteredUserB2C as jest.Mock).mockResolvedValueOnce(tokenResponse)
+
+            await auth.loginRegisteredUserB2C({username: 'test', password: 'test'})
+
+            // Verify USID was set with expiry
+            const usidSetCall = setSpy.mock.calls.find((call) => call[0] === 'usid')
+            expect(usidSetCall).toBeDefined()
+            expect(usidSetCall[2]).toMatchObject({
+                expires: expect.any(Date)
+            })
+
+            // Verify the expiry date matches the default registered TTL
+            const expectedExpiryDate = new Date(
+                Date.now() + DEFAULT_SLAS_REFRESH_TOKEN_REGISTERED_TTL * 1000
+            )
+            expect(usidSetCall[2].expires.getTime()).toBeCloseTo(expectedExpiryDate.getTime(), -2) // Within 100ms
+        })
+
+        test('USID expiry uses response TTL when provided and no override', async () => {
+            const responseTTL = 3600 // 1 hour
+            const auth = new Auth(config)
+
+            // Mock the helper to return token response with custom refresh_token_expires_in
+            const tokenResponse: ShopperLoginTypes.TokenResponse = {
+                ...TOKEN_RESPONSE,
+                refresh_token_expires_in: responseTTL
+            }
+            ;(helpers.loginGuestUser as jest.Mock).mockResolvedValueOnce(tokenResponse)
+
+            await auth.loginGuestUser()
+
+            // Verify USID was set with expiry
+            const usidSetCall = setSpy.mock.calls.find((call) => call[0] === 'usid')
+            expect(usidSetCall).toBeDefined()
+            expect(usidSetCall[2]).toMatchObject({
+                expires: expect.any(Date)
+            })
+
+            // Verify the expiry date matches the response TTL
+            const expectedExpiryDate = new Date(Date.now() + responseTTL * 1000)
+            expect(usidSetCall[2].expires.getTime()).toBeCloseTo(expectedExpiryDate.getTime(), -2) // Within 100ms
+        })
+
+        test('USID expiry respects override TTL when provided', async () => {
+            const overrideTTL = 900 // 15 minutes
+            const responseTTL = 3600 // 1 hour (should be ignored)
+            const auth = new Auth({...config, refreshTokenGuestCookieTTL: overrideTTL})
+
+            // Mock the helper to return token response with different refresh_token_expires_in
+            const tokenResponse: ShopperLoginTypes.TokenResponse = {
+                ...TOKEN_RESPONSE,
+                refresh_token_expires_in: responseTTL
+            }
+            ;(helpers.loginGuestUser as jest.Mock).mockResolvedValueOnce(tokenResponse)
+
+            await auth.loginGuestUser()
+
+            // Verify USID was set with expiry
+            const usidSetCall = setSpy.mock.calls.find((call) => call[0] === 'usid')
+            expect(usidSetCall).toBeDefined()
+            expect(usidSetCall[2]).toMatchObject({
+                expires: expect.any(Date)
+            })
+
+            // Verify the expiry date matches the override TTL, not the response TTL
+            const expectedExpiryDate = new Date(Date.now() + overrideTTL * 1000)
+            expect(usidSetCall[2].expires.getTime()).toBeCloseTo(expectedExpiryDate.getTime(), -2) // Within 100ms
+        })
+    })
+
     test('loginGuestUser with slas private', async () => {
         const auth = new Auth(configSLASPrivate)
         await auth.loginGuestUser()

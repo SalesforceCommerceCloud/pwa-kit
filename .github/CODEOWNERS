@@ -1,9 +1,64 @@
 # https://help.github.com/en/enterprise/2.17/user/articles/about-code-owners
 
-# These owners will be the default owners for everything in
-# the repo. Unless a later match takes precedence,
-# @global-owner1 and @global-owner2 will be requested for
-# review when someone opens a pull request.
+# Global directories
+.cursor/                                                    @SalesforceCommerceCloud/mobifyers
+.github/                                                    @SalesforceCommerceCloud/mobifyers
+e2e/                                                        @SalesforceCommerceCloud/mobifyers
+scripts/                                                    @SalesforceCommerceCloud/mobifyers
 
-*       @SalesforceCommerceCloud/mobifyers
+# Package-specific ownership
+packages/commerce-sdk-react/                               @SalesforceCommerceCloud/mobifyers
+packages/internal-lib-build/                               @SalesforceCommerceCloud/mobifyers
+packages/pwa-kit-create-app/                               @SalesforceCommerceCloud/mobifyers
+packages/pwa-kit-dev/                                      @SalesforceCommerceCloud/mobifyers
+packages/pwa-kit-mcp/                                      @SalesforceCommerceCloud/mobifyers
+packages/pwa-kit-react-sdk/                                @SalesforceCommerceCloud/mobifyers
+packages/pwa-kit-runtime/                                  @SalesforceCommerceCloud/mobifyers
+packages/template-express-minimal/                         @SalesforceCommerceCloud/mobifyers
+packages/template-mrt-reference-app/                       @SalesforceCommerceCloud/mobifyers
+packages/template-retail-react-app/                        @SalesforceCommerceCloud/mobifyers
+packages/template-typescript-minimal/                      @SalesforceCommerceCloud/mobifyers
+packages/test-commerce-sdk-react/                          @SalesforceCommerceCloud/mobifyers
+
+# Root configuration and documentation files
+/README.md                                                  @SalesforceCommerceCloud/mobifyers
+/CODE_OF_CONDUCT.md                                         @SalesforceCommerceCloud/mobifyers
+/CONTRIBUTING.md                                            @SalesforceCommerceCloud/mobifyers
+/SECURITY.md                                                @SalesforceCommerceCloud/mobifyers
+/STATEMENTS.md                                              @SalesforceCommerceCloud/mobifyers
+/TERMS_OF_USE.md                                            @SalesforceCommerceCloud/mobifyers
+/LICENSE                                                    @SalesforceCommerceCloud/mobifyers
+/.eslintrc.js                                              @SalesforceCommerceCloud/mobifyers
+/.gitattributes                                            @SalesforceCommerceCloud/mobifyers
+/.gitignore                                                @SalesforceCommerceCloud/mobifyers
+/.prettierignore                                           @SalesforceCommerceCloud/mobifyers
+/.prettierrc.yaml                                          @SalesforceCommerceCloud/mobifyers
+/lerna.json                                                @SalesforceCommerceCloud/mobifyers
+/package.json                                              @SalesforceCommerceCloud/mobifyers
+/package-lock.json                                         @SalesforceCommerceCloud/mobifyers
+/playwright.config.js                                      @SalesforceCommerceCloud/mobifyers
+/.git2gus/                                                 @SalesforceCommerceCloud/mobifyers
+
+# Specific feature file ownership (overrides package-level rules above)
+
+# BOPIS (Buy Online Pick up In Store) feature files - PR #2646
+packages/template-retail-react-app/app/components/store-display/ @SalesforceCommerceCloud/cc-spark
+packages/template-retail-react-app/app/hooks/use-selected-store.js @SalesforceCommerceCloud/cc-spark
+packages/template-retail-react-app/app/hooks/use-pickup-shipment.js @SalesforceCommerceCloud/cc-spark
+packages/template-retail-react-app/app/hooks/use-pickup-shipment.test.js @SalesforceCommerceCloud/cc-spark
+e2e/tests/desktop/bopis.spec.js @SalesforceCommerceCloud/cc-spark
+
+# Bonus Products feature files - PR #2704
+packages/template-retail-react-app/app/components/product-item/bonus-product-quantity.jsx @SalesforceCommerceCloud/cc-sharks
+packages/template-retail-react-app/app/components/product-item/bonus-product-quantity.test.jsx @SalesforceCommerceCloud/cc-sharks
+packages/template-retail-react-app/app/components/product-item/product-quantity-picker.jsx @SalesforceCommerceCloud/cc-sharks
+packages/template-retail-react-app/app/components/product-item/product-quantity-picker.test.jsx @SalesforceCommerceCloud/cc-sharks
+packages/template-retail-react-app/app/pages/cart/partials/bonus-products-title.jsx @SalesforceCommerceCloud/cc-sharks
+packages/template-retail-react-app/app/pages/cart/partials/bonus-products-title.test.js @SalesforceCommerceCloud/cc-sharks
+
+# Standard Products feature files - PR #2697
+packages/template-retail-react-app/app/mocks/standard-product.js @SalesforceCommerceCloud/cc-sharks
+packages/template-retail-react-app/app/utils/add-to-cart-utils.js @SalesforceCommerceCloud/cc-sharks
+                                                        
+
 #ECCN:Open Source
