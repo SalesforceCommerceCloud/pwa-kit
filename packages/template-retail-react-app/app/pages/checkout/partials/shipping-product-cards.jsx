@@ -83,18 +83,7 @@ const ProductItem = ({item, currency, productsMap}) => {
         selectedVariationAttributes: variant.variationValues
     })?.images?.[0]
 
-    // Use the exact same approach as shipping-multi-address
     const imageSrc = image?.disBaseLink || image?.link || ''
-
-    // Debug logging to understand image data
-    console.log('Product Image Debug:', {
-        productId: item.productId,
-        productName: item.productName,
-        image: image,
-        imageSrc: imageSrc,
-        productDetail: productDetail,
-        itemImages: item.images
-    })
 
     const priceData = getPriceData(variant)
 
@@ -206,15 +195,6 @@ const ShippingProductCards = ({shipment, basket}) => {
             }
         }
     )
-
-    // Debug logging for product fetching
-    console.log('ProductCards Debug:', {
-        shipmentId: shipment.shipmentId,
-        shipmentItems: shipmentItems,
-        productIds: productIds,
-        productsMap: productsMap,
-        isProductLoading: isProductLoading
-    })
 
     if (isProductLoading) {
         return (

@@ -97,9 +97,7 @@ export default function ShippingAddress() {
         moveItemsToDeliveryShipment = multishipHook?.moveItemsToDeliveryShipment
         removeEmptyShipments = multishipHook?.removeEmptyShipments
     } catch (error) {
-        // In test environment, the Commerce API client might not be available
-        // This is expected and we can proceed without the multiship functionality
-        console.warn('Multiship hook not available in test environment:', error.message)
+        // Ignore
     }
 
     // Keep multi-shipping state in sync with basket shipments
@@ -243,7 +241,6 @@ export default function ShippingAddress() {
                             await removeEmptyShipments()
                         }
                     } catch (error) {
-                        console.error('Error consolidating shipments:', error)
                         showToast({
                             title: formatMessage({
                                 defaultMessage:
