@@ -12,6 +12,8 @@ import {mergeOptions, omitNullableParameters, pickValidParams} from '../utils'
 import * as queryKeyHelpers from './queryKeyHelpers'
 import {CLIENT_KEYS} from '../../constant'
 import useCommerceApi from '../useCommerceApi'
+import pkg from "commerce-sdk-isomorphic";
+const { helpers } = pkg;
 
 const CLIENT_KEY = CLIENT_KEYS.SHOPPER_CUSTOMERS
 type Client = NonNullable<ApiClients[typeof CLIENT_KEY]>
@@ -232,6 +234,48 @@ export const useCustomerOrders = (
         queryKey,
         requiredParameters
     })
+}
+
+export const useSomOrder = () => {
+    const clientConfig = {
+        parameters: {
+          clientId: "<your-client-id>",
+          organizationId: "<your-org-id>",
+          shortCode: "kv7kzm78",
+          siteId: "<your-site-id>",
+        },
+        // If not provided, it'll use the default production URI:
+        // 'https://{shortCode}.api.commercecloud.salesforce.com/custom/{apiName}/{apiVersion}'
+        // path parameters should be wrapped in curly braces like the default production URI
+        baseUri: "https://kv7kzm78.api.commercecloud.salesforce.com/custom/orders/v1",
+      };
+      
+      // Required params: apiName, endpointPath, shortCode, organizaitonId
+      // Required path params can be passed into:
+      // options.customApiPathParameters or clientConfig.parameters
+      const customApiPathParameters = {
+        apiName: "orders",
+        apiVersion: "v1", // defaults to v1 if not provided
+        endpointPath: "getOrder",
+      };
+
+      const accessToken = "eyJ2ZXIiOiIxLjAiLCJqa3UiOiJzbGFzL3Byb2QvenpyZl8wMTciLCJraWQiOiJmNmFhN2Q3MS00Nzc0LTRhNjMtYmNmNS05ZTBlN2QxZjQ5N2MiLCJ0eXAiOiJqd3QiLCJjbHYiOiJKMi4zLjQiLCJhbGciOiJFUzI1NiJ9.eyJhdXQiOiJHVUlEIiwic2NwIjoic2ZjYy5zaG9wcGVyLW15YWNjb3VudC5iYXNrZXRzIHNmY2Muc2hvcHBlci1kaXNjb3Zlcnktc2VhcmNoIHNmY2Muc2hvcHBlci1wcm9kdWN0cyBjX29yZGVycyBzZmNjLnNob3BwZXItbXlhY2NvdW50LnJ3IHNmY2Muc2hvcHBlci1jdXN0b21lcnMubG9naW4gc2ZjYy5zaG9wcGVyLXN0b3JlcyBjX3Jldmlld3Mgc2ZjYy5zaG9wcGVyLW15YWNjb3VudC5vcmRlcnMgc2ZjYy5zaG9wcGVyLWN1c3RvbWVycy5yZWdpc3RlciBzZmNjLnNob3BwZXItbXlhY2NvdW50LmFkZHJlc3Nlcy5ydyBzZmNjLnNob3BwZXItbXlhY2NvdW50LnByb2R1Y3RsaXN0cy5ydyBzZmNjLnNob3BwZXItcHJvZHVjdGxpc3RzIHNmY2Muc2hvcHBlci1wcm9tb3Rpb25zIHNmY2Muc2hvcHBlci1iYXNrZXRzLW9yZGVycy5ydyBzZmNjLnNob3BwZXItZ2lmdC1jZXJ0aWZpY2F0ZXMgc2ZjYy5zaG9wcGVyLW15YWNjb3VudC5wYXltZW50aW5zdHJ1bWVudHMucncgc2ZjYy5zaG9wcGVyLXByb2R1Y3Qtc2VhcmNoIHNmY2Muc2hvcHBlci1jYXRlZ29yaWVzIiwic3ViIjoiY2Mtc2xhczo6enpyZl8wMTc6OnNjaWQ6YmMwM2E3OTYtMjhjNS00MGExLWFjMGMtNWEwY2NkMTBjMTZiOjp1c2lkOjg5ZmU4OGQzLWQxOWUtNDVlNS04ZDFkLTllYmI5ODg4MDEyMSIsImN0eCI6InNsYXMiLCJpc3MiOiJzbGFzL3Byb2QvenpyZl8wMTciLCJpc3QiOjEsImRudCI6IjAiLCJhdWQiOiJjb21tZXJjZWNsb3VkL3Byb2QvenpyZl8wMTciLCJuYmYiOjE3NTQwNzY2MzAsInN0eSI6IlVzZXIiLCJpc2IiOiJ1aWRvOnNsYXM6OnVwbjpHdWVzdDo6dWlkbjpHdWVzdCBVc2VyOjpnY2lkOmFibWJKS3hyRTJ4YmtSeGJjM3hxWVlsdXNaOjpjaGlkOlJlZkFyY2giLCJleHAiOjE3NTQwNzg0NjAsImlhdCI6MTc1NDA3NjY2MCwianRpIjoiQzJDNDg1NjIwMjIzMC0xODkwNjc4ODY2MzI3NTExNjE0OTg1NTk1NjQifQ.EG4xg_lqM2S-pCnxCrlq3PyU9X7rQAVjDhM0jn0X7QkzwG4QTSh_kyK77AOZOSHT6vLJmk_LerKUyl7vLncu2g";
+
+    return helpers.callCustomEndpoint({
+    options: {
+        method: "GET",
+        parameters: {
+        queryParameter: "queryParameter1",
+        },
+        headers: {
+        // Content-Type is defaulted to application/json if not provided
+        "Content-Type": "application/json",
+        authorization: `Bearer ${accessToken}`,
+        },
+        customApiPathParameters,
+    },
+    clientConfig,
+    });
 }
 /**
  * Retrieves a customer's payment instrument by its ID.
