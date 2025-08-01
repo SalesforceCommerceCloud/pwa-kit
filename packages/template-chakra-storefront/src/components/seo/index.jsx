@@ -1,25 +1,17 @@
 /*
- * Copyright (c) 2024, salesforce.com, inc.
+ * Copyright (c) 2025, salesforce.com, inc.
  * All rights reserved.
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
+import PropTypes from 'prop-types'
 import Helmet from 'react-helmet'
-import {UserConfig} from '../../types/config'
 
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 
-interface SeoProps {
-    title?: string
-    description?: string
-    noIndex?: boolean
-    keywords?: string
-    children?: React.ReactNode
-}
-
-const Seo: React.FC<SeoProps> = ({title, description, noIndex, keywords, children, ...props}) => {
-    const {defaultSiteTitle} = getConfig() as UserConfig
+const Seo = ({title, description, noIndex, keywords, children, ...props}) => {
+    const {defaultSiteTitle} = getConfig()
     const fullTitle = title ? `${title} | ${defaultSiteTitle}` : defaultSiteTitle
 
     return (
@@ -31,6 +23,14 @@ const Seo: React.FC<SeoProps> = ({title, description, noIndex, keywords, childre
             {children}
         </Helmet>
     )
+}
+
+Seo.propTypes = {
+    title: PropTypes.string,
+    description: PropTypes.string,
+    noIndex: PropTypes.bool,
+    keywords: PropTypes.string,
+    children: PropTypes.node
 }
 
 export default Seo
