@@ -761,9 +761,9 @@ describe('ShippingMultiAddress', () => {
         })
 
         test('should be enabled when all products have an address asscoiated with them in multiship view', () => {
-            renderWithIntl(<ShippingMultiAddress {...defaultProps} />);
-            const continueButton = screen.getByTestId('continue-to-shipping-button');
-            expect(continueButton).toBeEnabled();
+            renderWithIntl(<ShippingMultiAddress {...defaultProps} />)
+            const continueButton = screen.getByTestId('continue-to-shipping-button')
+            expect(continueButton).toBeEnabled()
         })
     })
 })
