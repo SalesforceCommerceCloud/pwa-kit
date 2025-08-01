@@ -16,7 +16,6 @@ import {AdyenPaymentsService} from '@salesforce/retail-react-app/app/components/
 import {createTemporaryBasket, deleteTemporaryBasket, cleanupTemporaryBasket} from '@salesforce/retail-react-app/app/components/express/utils/pdp/temporary-basket'
 import {getBasketWithTotals, forceOrderCalculation} from '@salesforce/retail-react-app/app/components/express/utils/pdp/basket-calculation'
 import {useStandalonePaymentMethods} from '@salesforce/retail-react-app/app/components/express/hooks/use-standalone-payment-methods'
-import {useAccessToken} from '@salesforce/commerce-sdk-react'
 import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
 import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
 import {
@@ -445,14 +444,24 @@ export const getAppleButtonConfig = (
 }
 
 export const ApplePayExpress = ({sku, quantity = 1, isPdpMode = false}) => {
-    const {getTokenWhenReady} = useAccessToken()
     const {locale, site} = useMultiSite()
     const navigate = useNavigation()
     
-    const [authToken, setAuthToken] = useState()
     const [tempBasket, setTempBasket] = useState(null)
     const [currentSku, setCurrentSku] = useState(sku)
     const paymentContainer = useRef(null)
+
+    // Use useAdyenExpressCheckout as the single source for auth token
+    const regularAdyenData = useAdyenExpressCheckout()
+    const authToken = regularAdyenData.authToken
+
+    // For PDP mode, use standalone payment methods
+    // For regular mode, use the standard Adyen hook data
+    const {
+        paymentMethods: standalonePaymentMethods,
+        loading: standaloneLoading,
+        error: standaloneError
+    } = useStandalonePaymentMethods(authToken, site, locale, isPdpMode && !!authToken)
 
     // Handle SKU prop changes (for postMessage updates)
     useEffect(() => {
@@ -466,25 +475,6 @@ export const ApplePayExpress = ({sku, quantity = 1, isPdpMode = false}) => {
             setCurrentSku(sku)
         }
     }, [sku, currentSku, tempBasket?.basketId, authToken, site])
-
-    // Get auth token
-    useEffect(() => {
-        const getToken = async () => {
-            const token = await getTokenWhenReady()
-            setAuthToken(token)
-        }
-        getToken()
-    }, [])
-
-    // For PDP mode, use standalone payment methods
-    // For regular mode, use the standard Adyen hook
-    const {
-        paymentMethods: standalonePaymentMethods,
-        loading: standaloneLoading,
-        error: standaloneError
-    } = useStandalonePaymentMethods(authToken, site, locale, isPdpMode && !!authToken)
-
-    const regularAdyenData = useAdyenExpressCheckout()
 
     const adyenEnvironment = isPdpMode ? 
         standalonePaymentMethods?.environment : 
