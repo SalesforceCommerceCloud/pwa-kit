@@ -21,7 +21,11 @@ import {
     useAuthHelper,
     AuthHelpers,
     useShopperBasketsMutation,
-    useShopperOrdersMutation
+    useShopperOrdersMutation,
+    useShopperCustomersMutation,
+    ShopperCustomersMutations,
+    ShopperBasketsMutations,
+    ShopperOrdersMutations
 } from '@salesforce/commerce-sdk-react'
 import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
 import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
@@ -43,6 +47,7 @@ import {
     getMaskCreditCardNumber
 } from '@salesforce/retail-react-app/app/utils/cc-utils'
 import {generatePassword} from '@salesforce/retail-react-app/app/utils/password-utils'
+import {nanoid} from 'nanoid'
 
 const CheckoutOneClick = () => {
     const {formatMessage} = useIntl()
@@ -71,13 +76,16 @@ const CheckoutOneClick = () => {
     const appliedPayment = basket?.paymentInstruments && basket?.paymentInstruments[0]
 
     const {mutateAsync: addPaymentInstrumentToBasket} = useShopperBasketsMutation(
-        'addPaymentInstrumentToBasket'
+        ShopperBasketsMutations.AddPaymentInstrumentToBasket
     )
     const {mutateAsync: updateBillingAddressForBasket} = useShopperBasketsMutation(
-        'updateBillingAddressForBasket'
+        ShopperBasketsMutations.UpdateBillingAddressForBasket
     )
-    const {mutateAsync: createOrder} = useShopperOrdersMutation('createOrder')
+    const {mutateAsync: createOrder} = useShopperOrdersMutation(ShopperOrdersMutations.CreateOrder)
     const {mutateAsync: register} = useAuthHelper(AuthHelpers.Register)
+    const {mutateAsync: createCustomerAddress} = useShopperCustomersMutation(
+        ShopperCustomersMutations.CreateCustomerAddress
+    )
 
     const showError = (message) => {
         showToast({
@@ -141,6 +149,17 @@ const CheckoutOneClick = () => {
     }
 
     const submitOrder = async () => {
+        const saveShippingAddress = async (customerId, address) => {
+            try {
+                await createCustomerAddress({
+                    body: address,
+                    parameters: {customerId: customerId}
+                })
+            } catch (error) {
+                // Fail silently
+            }
+        }
+
         const registerUser = async (data) => {
             try {
                 const body = {
@@ -153,7 +172,10 @@ const CheckoutOneClick = () => {
                     },
                     password: generatePassword()
                 }
-                await register(body)
+                const customer = await register(body)
+
+                // Save the shipping address from this order, should not block account creation
+                await saveShippingAddress(customer.customerId, data.address)
 
                 showToast({
                     variant: 'subtle',
@@ -197,11 +219,16 @@ const CheckoutOneClick = () => {
             })
 
             if (enableUserRegistration) {
+                // Remove the id property from the address
+                const {id, ...address} = order.shipments[0].shippingAddress
+                address.addressId = nanoid()
+
                 await registerUser({
                     firstName: order.billingAddress.firstName,
                     lastName: order.billingAddress.lastName,
                     email: order.customerInfo.email,
-                    phoneHome: order.billingAddress.phone
+                    phoneHome: order.billingAddress.phone,
+                    address: address
                 })
             }
 
