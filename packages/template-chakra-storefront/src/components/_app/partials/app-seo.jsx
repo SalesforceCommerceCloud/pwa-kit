@@ -32,6 +32,12 @@ const AppSEO = ({appConfig, appOrigin, themeColor, site, locale, buildUrl, locat
             <meta name="theme-color" content={themeColor} />
             <meta name="apple-mobile-web-app-title" content={appConfig.defaultSiteTitle} />
 
+            <link
+                rel="apple-touch-icon"
+                href={getAssetUrl('static/img/global/apple-touch-icon.png')}
+            />
+            <link rel="manifest" href={getAssetUrl('static/manifest.json')} />
+
             {/* Urls for all localized versions of this page (including current page)
                 For more details on hrefLang, see
                 https://developers.google.com/search/docs/advanced/crawling/localized-versions
