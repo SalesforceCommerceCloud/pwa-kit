@@ -6,6 +6,7 @@
  */
 /* eslint-disable @typescript-eslint/no-var-requires */
 const {Volume} = require('memfs')
+const path = require('path')
 
 // Mock plugin config to simulate different plugin states
 let mockedPluginConfig = {
@@ -294,10 +295,18 @@ describe('trim-extensions', () => {
             // sfdc-extension-block-end SFDC_EXT_featureB
         `
         vol.writeFileSync('/mock/dir/src/components/featureComponent.jsx', code)
+        const filePath = path.join(
+            path.sep,
+            'mock',
+            'dir',
+            'src',
+            'components',
+            'featureComponent.jsx'
+        )
         expect(() =>
             trimExtensions('/mock/dir', {SFDC_EXT_featureA: true, SFDC_EXT_featureB: false})
         ).toThrow(
-            'Block marker mismatch in /mock/dir/src/components/featureComponent.jsx, expected end marker for SFDC_EXT_featureA but got SFDC_EXT_featureB at line 3'
+            `Block marker mismatch in ${filePath}, expected end marker for SFDC_EXT_featureA but got SFDC_EXT_featureB at line 3`
         )
     })
 
@@ -307,8 +316,16 @@ describe('trim-extensions', () => {
             const featureAVar = 'Feature A variable 1';
         `
         vol.writeFileSync('/mock/dir/src/components/featureComponent.jsx', code)
+        const filePath = path.join(
+            path.sep,
+            'mock',
+            'dir',
+            'src',
+            'components',
+            'featureComponent.jsx'
+        )
         expect(() => trimExtensions('/mock/dir', {SFDC_EXT_featureA: false})).toThrow(
-            'Unclosed end marker found in /mock/dir/src/components/featureComponent.jsx: SFDC_EXT_featureA'
+            `Unclosed end marker found in ${filePath}: SFDC_EXT_featureA`
         )
     })
 
@@ -317,8 +334,16 @@ describe('trim-extensions', () => {
             // sfdc-extension-block-end SFDC_EXT_featureA
         `
         vol.writeFileSync('/mock/dir/src/components/featureComponent.jsx', code)
+        const filePath = path.join(
+            path.sep,
+            'mock',
+            'dir',
+            'src',
+            'components',
+            'featureComponent.jsx'
+        )
         expect(() => trimExtensions('/mock/dir', {SFDC_EXT_featureA: false})).toThrow(
-            'Block marker mismatch in /mock/dir/src/components/featureComponent.jsx, encountered end marker SFDC_EXT_featureA without a matching start marker at line 1'
+            `Block marker mismatch in ${filePath}, encountered end marker SFDC_EXT_featureA without a matching start marker at line 1`
         )
     })
 
@@ -332,10 +357,18 @@ describe('trim-extensions', () => {
             // sfdc-extension-block-end SFDC_EXT_featureB
         `
         vol.writeFileSync('/mock/dir/src/components/featureComponent.jsx', code)
+        const filePath = path.join(
+            path.sep,
+            'mock',
+            'dir',
+            'src',
+            'components',
+            'featureComponent.jsx'
+        )
         expect(() =>
             trimExtensions('/mock/dir', {SFDC_EXT_featureA: true, SFDC_EXT_featureB: false})
         ).toThrow(
-            'Block marker mismatch in /mock/dir/src/components/featureComponent.jsx, expected end marker for SFDC_EXT_featureB but got SFDC_EXT_featureA at line 5:'
+            `Block marker mismatch in ${filePath}, expected end marker for SFDC_EXT_featureB but got SFDC_EXT_featureA at line 5:`
         )
     })
 
