@@ -19,15 +19,13 @@ import {getPathWithLocale} from '../../../utils/url'
 const AppSEO = ({appConfig, appOrigin, themeColor, site, locale, buildUrl, location}) => {
     return (
         <Seo>
-            <Helmet>
-                {appConfig.activeDataEnabled && (
-                    <script
-                        src={getAssetUrl('static/head-active_data.js')}
-                        id="headActiveData"
-                        type="text/javascript"
-                    ></script>
-                )}
-            </Helmet>
+            {appConfig.activeDataEnabled && (
+                <script
+                    src={getAssetUrl('static/head-active_data.js')}
+                    id="headActiveData"
+                    type="text/javascript"
+                ></script>
+            )}
 
             <meta name="theme-color" content={themeColor} />
             <meta name="apple-mobile-web-app-title" content={appConfig.defaultSiteTitle} />
