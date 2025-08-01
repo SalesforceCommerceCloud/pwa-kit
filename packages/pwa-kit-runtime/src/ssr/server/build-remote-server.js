@@ -490,6 +490,27 @@ export const RemoteServerFactory = {
             return path.replace(regex, '/')
         }
 
+        const _convertExpressRouteToRegex = (routePattern) => {
+            if (!routePattern) return null
+
+            // Replace route parameters like :id with regex capture groups
+            let regexPattern = routePattern
+                .replace(/:[^/]+/g, '[^/]+')
+                .replace(/\/\*/g, '/.*')
+                .replace(/\*/g, '.*')
+
+            // Escape other regex special characters except those we just handled
+            regexPattern = regexPattern.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+
+            // Unescape the patterns we want to keep
+            regexPattern = regexPattern
+                .replace(/\\\[\\\^\/\\\]\\\+/g, '[^/]+')
+                .replace(/\\\/\\\.\\\*/g, '/.*')
+                .replace(/\\\.\\\*/g, '.*')
+
+            return new RegExp(`^${regexPattern}$`)
+        }
+
         /**
          * Very early request processing.
          *
@@ -498,12 +519,55 @@ export const RemoteServerFactory = {
          * @param req {express.req} the incoming request - modified in-place
          * @private
          */
-        // TODO - we might want to scope this to /mobify paths for now?
         const removeBasePathFromPathMiddleware = (req, res, next) => {
-            const updatedPath = removeBasePathFromPath(req.path)
-            const parsed = URL.parse(req.url)
-            parsed.pathname = updatedPath
-            req.url = URL.format(parsed)
+            // Scope base path removal to /mobify routes and routes defined by the express app
+            // This is to avoid affecting other paths where a base path might be present if it happens to
+            // be equal to a site id.
+            // For example, if you have a base path of /us and a site id of /us you don't want
+            // to remove the /us from www.example.com/us/en-US/category/...
+
+            const basePath = getEnvBasePath()
+            let shouldRemoveBasePath = false
+
+            if (basePath) {
+                if (req.path.startsWith(`${basePath}/mobify`)) {
+                    shouldRemoveBasePath = true
+                }
+
+                // Check if path matches any existing express route with base path prepended
+                if (!shouldRemoveBasePath) {
+                    // Routes are dynamically checked since we want to ensure that any express route
+                    // defined after the app is created, such as routes defined in ssr.js are included.
+                    const expressRoutes = app._router.stack
+                        .filter((layer) => layer.route)
+                        .map((layer) => layer.route.path)
+
+                    for (const route of expressRoutes) {
+                        if (route) {
+                            const routeRegex = _convertExpressRouteToRegex(route)
+                            if (routeRegex) {
+                                // Remove base path from the request path for matching
+                                const pathWithoutBase = req.path.replace(
+                                    new RegExp(`^${basePath}`),
+                                    ''
+                                )
+                                if (routeRegex.test(pathWithoutBase)) {
+                                    shouldRemoveBasePath = true
+                                    break
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            if (shouldRemoveBasePath) {
+                const updatedPath = removeBasePathFromPath(req.path)
+                const parsed = URL.parse(req.url)
+                parsed.pathname = updatedPath
+                req.url = URL.format(parsed)
+            }
+
             next()
         }
         app.use(removeBasePathFromPathMiddleware)
@@ -703,7 +767,7 @@ export const RemoteServerFactory = {
      */
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     _setupProxying(app, options) {
-        app.all(`${proxyBasePath}/*`, (req, res) => {
+        app.all(`${proxyBasePath}/*`, (_, res) => {
             return res.status(501).json({
                 message:
                     'Environment proxies are not set: https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/guide/proxying-requests.html'

@@ -34,7 +34,7 @@ import {
 } from '@salesforce/pwa-kit-runtime/utils/ssr-namespace-paths'
 import {createUrlTemplate} from '@salesforce/retail-react-app/app/utils/url'
 import createLogger from '@salesforce/pwa-kit-runtime/utils/logger-factory'
-import {isAbsoluteURL} from '@salesforce/retail-react-app/app/page-designer/utils' // TODO - move this to a more general location
+import {isAbsoluteURL} from '@salesforce/retail-react-app/app/page-designer/utils'
 
 import {CommerceApiProvider} from '@salesforce/commerce-sdk-react'
 import {withReactQuery} from '@salesforce/pwa-kit-react-sdk/ssr/universal/components/with-react-query'

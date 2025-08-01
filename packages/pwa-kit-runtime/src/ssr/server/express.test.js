@@ -1271,7 +1271,7 @@ describe('SLAS private client proxy', () => {
 })
 
 describe('Base path tests', () => {
-    test('Base Path is removed from request path and still gets through to /mobify endpoint', async () => {
+    test('Base path is removed from /mobify request path and still gets through to /mobify endpoint', async () => {
         jest.spyOn(ssrConfig, 'getConfig').mockReturnValue({envBasePath: '/basepath'})
 
         const app = RemoteServerFactory._createApp(opts())
@@ -1280,6 +1280,58 @@ describe('Base path tests', () => {
             .get('/basepath/mobify/ping')
             .then((response) => {
                 expect(response.status).toBe(200)
+            })
+    }, 15000)
+
+    test('should not remove base path from non /mobify non-express routes', async () => {
+        jest.spyOn(ssrConfig, 'getConfig').mockReturnValue({envBasePath: '/basepath'})
+
+        const app = RemoteServerFactory._createApp(opts())
+
+        // Add a route that doesn't match the request
+        app.get('/api/other', (req, res) => {
+            res.status(200).json({message: 'other'})
+        })
+
+        return request(app)
+            .get('/basepath/api/unknown')
+            .then((response) => {
+                // Should get a 404 since the route doesn't exist
+                expect(response.status).toBe(404)
+            })
+    }, 15000)
+
+    test('should remove base path from routes with path parameters', async () => {
+        jest.spyOn(ssrConfig, 'getConfig').mockReturnValue({envBasePath: '/basepath'})
+
+        const app = RemoteServerFactory._createApp(opts())
+
+        app.get('/api/users/:id', (req, res) => {
+            res.status(200).json({userId: req.params.id})
+        })
+
+        return request(app)
+            .get('/basepath/api/users/123')
+            .then((response) => {
+                expect(response.status).toBe(200)
+                expect(response.body.userId).toBe('123')
+            })
+    }, 15000)
+
+    test('remove base path can handle complex base paths', async () => {
+        jest.spyOn(ssrConfig, 'getConfig').mockReturnValue({envBasePath: '/my/base/path'})
+
+        const app = RemoteServerFactory._createApp(opts())
+
+        app.get('/api/test', (req, res) => {
+            res.status(200).json({message: 'test'})
+        })
+
+        return request(app)
+            .get('/my/base/path/api/test')
+            .then((response) => {
+                expect(response.status).toBe(200)
+                expect(response.body.message).toBe('test')
             })
     }, 15000)
 })
