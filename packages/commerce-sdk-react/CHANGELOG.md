@@ -1,3 +1,6 @@
+## v3.5.0-nightly-20250801080218 (Aug 01, 2025)
+## v3.5.0-dev (Aug 01, 2025)
+## v3.12.0-nightly-20250801080218 (Aug 01, 2025)
 ## v3.5.0-dev (Jul 22, 2025)
 
 - Update USID expiry to match SLAS refresh token expiry[#2854](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2854)
