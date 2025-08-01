@@ -50,6 +50,7 @@ import {
     TOAST_MESSAGE_ADDED_TO_WISHLIST,
     TOAST_MESSAGE_REMOVED_ITEM_FROM_CART,
     TOAST_MESSAGE_ALREADY_IN_WISHLIST,
+    TOAST_MESSAGE_STORE_INSUFFICIENT_INVENTORY,
     STORE_LOCATOR_IS_ENABLED
 } from '@salesforce/retail-react-app/app/constants'
 import {REMOVE_CART_ITEM_CONFIRMATION_DIALOG_CONFIG} from '@salesforce/retail-react-app/app/pages/cart/partials/cart-secondary-button-group'
@@ -104,7 +105,9 @@ const Cart = () => {
     const {
         handleDeliveryOptionChange,
         assignDefaultShippingMethodsToShipments,
-        changeStoreForPickupShipment
+        getItemsForShipment,
+        findOrCreatePickupShipment,
+        moveItemsToPickupShipment
     } = useMultiship(basket)
     const productIds = basket?.productItems?.map(({productId}) => productId).join(',') ?? ''
     const {data: products, isLoading: isProductsLoading} = useProducts(
@@ -273,17 +276,16 @@ const Cart = () => {
     // Handle when modal closes after being opened from cart's "Change Store" button
     useEffect(() => {
         // If modal was opened from cart and is now closed, check if store changed
-        if (modalOpenedFromCart.current && !storeLocatorModal.isOpen) {
+        if (!isProductsLoading && modalOpenedFromCart.current && !storeLocatorModal.isOpen) {
             const originalStoreId = modalOpenedFromCart.current.storeId
             const shipmentId = modalOpenedFromCart.current.shipmentId
-            const newStoreId = selectedStore?.id
 
             // Reset the ref
             modalOpenedFromCart.current = null
 
             // Only run action if store actually changed and all required data is available
             if (
-                originalStoreId !== newStoreId &&
+                originalStoreId !== selectedStore?.id &&
                 selectedStore?.id &&
                 selectedStore?.inventoryId &&
                 shipmentId
@@ -291,10 +293,30 @@ const Cart = () => {
                 const changeStore = async () => {
                     try {
                         setCartItemLoading(true)
-                        await changeStoreForPickupShipment(shipmentId, {
-                            id: selectedStore.id,
-                            inventoryId: selectedStore.inventoryId
-                        })
+
+                        // Get all items from the source shipment that have inventory at the new store
+                        const itemsInShipment = getItemsForShipment(basket, shipmentId)
+                        const itemsToMove = itemsInShipment.filter(
+                            (productItem) =>
+                                productsByItemId?.[productItem.itemId]?.inventories?.find(
+                                    (inventory) => inventory.id === selectedStore?.inventoryId
+                                )?.stockLevel >= productItem.quantity
+                        )
+                        if (itemsToMove.length) {
+                            const targetShipmentId = await findOrCreatePickupShipment(selectedStore)
+                            await moveItemsToPickupShipment(
+                                itemsToMove,
+                                targetShipmentId,
+                                selectedStore.inventoryId
+                            )
+                        }
+
+                        if (itemsInShipment.length !== itemsToMove.length) {
+                            toast({
+                                title: formatMessage(TOAST_MESSAGE_STORE_INSUFFICIENT_INVENTORY),
+                                status: 'error'
+                            })
+                        }
                     } catch (error) {
                         console.error('Failed to change store for pickup shipment:', error)
                         showError()
@@ -305,7 +327,7 @@ const Cart = () => {
                 changeStore()
             }
         }
-    }, [storeLocatorModal.isOpen, selectedStore?.id])
+    }, [storeLocatorModal.isOpen, selectedStore?.id, isProductsLoading])
 
     // Custom handler for opening store locator from cart's "Change Store" button
     const handleChangeStoreFromCart = (shipmentInfo) => {

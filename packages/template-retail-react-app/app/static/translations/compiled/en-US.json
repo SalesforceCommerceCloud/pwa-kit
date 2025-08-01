@@ -1805,6 +1805,12 @@
       "value": "Item removed from wishlist"
     }
   ],
+  "global.info.store_insufficient_inventory": [
+    {
+      "type": 0,
+      "value": "Some items aren't available for pickup at this store"
+    }
+  ],
   "global.link.added_to_wishlist.view_wishlist": [
     {
       "type": 0,

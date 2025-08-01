@@ -48,7 +48,9 @@ jest.mock('@salesforce/retail-react-app/app/hooks/use-selected-store', () => ({
 const mockUseMultiship = {
     handleDeliveryOptionChange: jest.fn().mockResolvedValue(undefined),
     assignDefaultShippingMethodsToShipments: jest.fn().mockResolvedValue(undefined),
-    changeStoreForPickupShipment: jest.fn().mockResolvedValue(undefined)
+    findOrCreatePickupShipment: jest.fn().mockResolvedValue('pickup-shipment-2'),
+    moveItemsToPickupShipment: jest.fn().mockResolvedValue(undefined),
+    getItemsForShipment: jest.fn(() => [])
 }
 jest.mock('@salesforce/retail-react-app/app/hooks/use-multiship', () => ({
     useMultiship: () => mockUseMultiship
@@ -1656,7 +1658,8 @@ describe('Change store for pickup shipment', () => {
                 itemId: 'item-1',
                 quantity: 1,
                 price: 10,
-                shipmentId: 'pickup-shipment-1'
+                shipmentId: 'pickup-shipment-1',
+                inventoryId: mockStore2.inventoryId
             }
         ],
         shipments: [
@@ -1676,12 +1679,17 @@ describe('Change store for pickup shipment', () => {
 
     beforeEach(() => {
         jest.clearAllMocks()
+        const mockProductWithInventory = {
+            ...mockProduct,
+            inventories: [{id: mockStore2.inventoryId, stockLevel: 10}]
+        }
+        mockUseMultiship.getItemsForShipment.mockReturnValue(mockBasketWithPickup.productItems)
         global.server.use(
             rest.get('*/customers/:customerId/baskets', (req, res, ctx) => {
                 return res(ctx.delay(0), ctx.json({baskets: [mockBasketWithPickup], total: 1}))
             }),
             rest.get('*/products', (req, res, ctx) => {
-                return res(ctx.delay(0), ctx.json({data: [mockProduct]}))
+                return res(ctx.delay(0), ctx.json({data: [mockProductWithInventory]}))
             }),
             rest.get('*/stores', (req, res, ctx) => {
                 return res(ctx.delay(0), ctx.json({data: [mockStore1]}))
@@ -1689,7 +1697,7 @@ describe('Change store for pickup shipment', () => {
         )
     })
 
-    test('should call changeStoreForPickupShipment when store is changed via modal', async () => {
+    test('should move items to new pickup shipment when store is changed via modal', async () => {
         const {rerender} = renderWithProviders(<Cart />)
 
         await waitFor(() => {
@@ -1713,21 +1721,21 @@ describe('Change store for pickup shipment', () => {
 
         // Verify that the shipment is updated with the new store.
         await waitFor(() => {
-            expect(mockUseMultiship.changeStoreForPickupShipment).toHaveBeenCalledWith(
-                'pickup-shipment-1',
-                {
-                    id: mockStore2.id,
-                    inventoryId: mockStore2.inventoryId
-                }
+            expect(mockUseMultiship.findOrCreatePickupShipment).toHaveBeenCalledWith(mockStore2)
+            const mockProductItem = mockBasketWithPickup.productItems[0]
+            expect(mockUseMultiship.moveItemsToPickupShipment).toHaveBeenCalledWith(
+                [expect.objectContaining({itemId: mockProductItem.itemId})],
+                'pickup-shipment-2',
+                mockStore2.inventoryId
             )
         })
     })
 
-    test('should show error toast when changing store fails', async () => {
+    test('should show error toast when moving items fails', async () => {
         // Suppress console.error for this test
         jest.spyOn(console, 'error').mockImplementation(jest.fn())
 
-        mockUseMultiship.changeStoreForPickupShipment.mockRejectedValue(new Error('Update failed'))
+        mockUseMultiship.moveItemsToPickupShipment.mockRejectedValue(new Error('Update failed'))
 
         const {rerender} = renderWithProviders(<Cart />)
 
@@ -1752,13 +1760,7 @@ describe('Change store for pickup shipment', () => {
 
         // Verify that an error toast is shown.
         await waitFor(() => {
-            expect(mockUseMultiship.changeStoreForPickupShipment).toHaveBeenCalledWith(
-                'pickup-shipment-1',
-                {
-                    id: mockStore2.id,
-                    inventoryId: mockStore2.inventoryId
-                }
-            )
+            expect(mockUseMultiship.findOrCreatePickupShipment).toHaveBeenCalledWith(mockStore2)
             expect(screen.getByText(/something went wrong/i)).toBeInTheDocument()
         })
 
