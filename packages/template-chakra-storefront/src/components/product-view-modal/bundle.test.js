@@ -49,20 +49,8 @@ beforeEach(() => {
         {
             path: '*/products',
             method: 'get',
-            res: (req) => {
-                const swingTankBlackMediumVariantId = '701643473915M'
-                const swingTankBlackLargeVariantId = '701643473908M'
-                if (req.url.toString().includes(swingTankBlackMediumVariantId)) {
-                    mockProductBundleWithVariants.data[1].inventory = {
-                        ...mockProductBundleWithVariants.data[1].inventory,
-                        stockLevel: 0
-                    }
-                } else if (req.url.toString().includes(swingTankBlackLargeVariantId)) {
-                    mockProductBundleWithVariants.data[1].inventory = {
-                        ...mockProductBundleWithVariants.data[1].inventory,
-                        stockLevel: 1
-                    }
-                }
+            res: () => {
+                // by default these bundle child are all in stock
                 return mockProductBundleWithVariants
             }
         }
@@ -70,7 +58,6 @@ beforeEach(() => {
 })
 
 afterEach(() => {
-    jest.resetModules()
     jest.restoreAllMocks()
 })
 
@@ -79,7 +66,7 @@ test('renders bundle product view modal', async () => {
     await waitFor(async () => {
         const trigger = screen.getByText(/open modal/i)
         await act(async () => {
-            user.click(trigger)
+            await user.click(trigger)
         })
     })
 
@@ -105,7 +92,7 @@ test('renders bundle product view modal with handleUpdateCart handler', async ()
     await waitFor(async () => {
         const trigger = screen.getByText(/open modal/i)
         await act(async () => {
-            user.click(trigger)
+            await user.click(trigger)
         })
     })
 
@@ -121,11 +108,20 @@ test('renders bundle product view modal with handleUpdateCart handler', async ()
 })
 
 test('bundle product view modal disables update button when child is out of stock', async () => {
+    prependHandlersToServer([
+        {
+            path: '*/products',
+            method: 'get',
+            res: () => {
+                return mockProductBundleWithVariants
+            }
+        }
+    ])
     const {user} = renderWithProviders(<MockComponent />)
     await waitFor(async () => {
         const trigger = screen.getByText(/open modal/i)
         await act(async () => {
-            user.click(trigger)
+            await user.click(trigger)
         })
     })
 
@@ -141,12 +137,60 @@ test('bundle product view modal disables update button when child is out of stoc
     expect(swingTankProductView).toBeInTheDocument()
 
     const updateBtn = screen.getByRole('button', {name: /update/i})
+    // this is enabled since all bundle child are all in stock
     expect(updateBtn).toBeEnabled()
 
     let sizeSelectBtn = within(swingTankProductView).getByLabelText('M')
+
     expect(sizeSelectBtn).toBeInTheDocument()
+    // Set up specific handlers to make size M (9MD) out of stock
+    prependHandlersToServer([
+        {
+            path: '*/products',
+            method: 'get',
+            res: () => {
+                // Set up inventory so that Swing Tank product M (9MD) black is out of stock
+                const data = {
+                    ...mockProductBundleWithVariants,
+                    data: [
+                        mockProductBundleWithVariants.data[0],
+                        {
+                            // reuse some mock data
+                            ...mockProductBundleWithVariants.data[1],
+                            // set up the swing tank black Medium to have out of stock inventory
+                            id: '701643473915M',
+                            type: {
+                                variant: true
+                            },
+                            inventory: {
+                                ats: 0,
+                                backorderable: false,
+                                id: 'inventory_m',
+                                orderable: false,
+                                preorderable: false,
+                                stockLevel: 0
+                            },
+                            variationValues: {
+                                color: 'JJ169XX',
+                                size: '9MD'
+                            },
+                            c_color: 'JJ169XX',
+                            c_isNewtest: true,
+                            c_refinementColor: 'black',
+                            c_size: '9MD',
+                            c_width: 'Z'
+                        },
+                        mockProductBundleWithVariants.data[2]
+                    ]
+                }
+
+                return data
+            }
+        }
+    ])
     await act(async () => {
-        fireEvent.click(sizeSelectBtn)
+        // click swing tank M size
+        await user.click(sizeSelectBtn)
     })
 
     await waitFor(() => {
@@ -156,13 +200,35 @@ test('bundle product view modal disables update button when child is out of stoc
         expect(screen.getByText('Out of stock')).toBeInTheDocument()
     })
 })
-//TODO: fix this failing test
-test.skip('bundle product view modal disables update button when quantity exceeds child inventory', async () => {
+
+test('bundle product view modal disables update button when quantity exceeds child inventory', async () => {
+    prependHandlersToServer([
+        {
+            path: '*/products',
+            method: 'get',
+            res: (req) => {
+                const swingTankBlackMediumVariantId = '701643473915M'
+                const swingTankBlackLargeVariantId = '701643473908M'
+                if (req.url.toString().includes(swingTankBlackMediumVariantId)) {
+                    mockProductBundleWithVariants.data[1].inventory = {
+                        ...mockProductBundleWithVariants.data[1].inventory,
+                        stockLevel: 0
+                    }
+                } else if (req.url.toString().includes(swingTankBlackLargeVariantId)) {
+                    mockProductBundleWithVariants.data[1].inventory = {
+                        ...mockProductBundleWithVariants.data[1].inventory,
+                        stockLevel: 1
+                    }
+                }
+                return mockProductBundleWithVariants
+            }
+        }
+    ])
     const {user} = renderWithProviders(<MockComponent />)
     await waitFor(async () => {
         const trigger = screen.getByText(/open modal/i)
         await act(async () => {
-            user.click(trigger)
+            await user.click(trigger)
         })
     })
 
@@ -187,11 +253,12 @@ test.skip('bundle product view modal disables update button when quantity exceed
     })
 
     await act(async () => {
-        // Set product bundle quantity selection to 4
-        fireEvent.change(quantityInput, {target: {value: '4'}})
-        fireEvent.keyDown(quantityInput, {key: 'Enter', code: 'Enter', charCode: 13})
+        await user.clear(quantityInput)
+        await user.type(quantityInput, '4')
+    })
 
-        fireEvent.click(sizeSelectBtn)
+    await act(async () => {
+        await user.click(sizeSelectBtn)
     })
 
     await waitFor(() => {
