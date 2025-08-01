@@ -5,9 +5,9 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React, {forwardRef, useEffect, useRef, useState} from 'react'
+import React, {forwardRef, useEffect, useRef, useState, useMemo} from 'react'
 import PropTypes from 'prop-types'
-import {FormattedMessage, useIntl} from 'react-intl'
+import {useIntl} from 'react-intl'
 import {
     Alert,
     Box,
@@ -59,7 +59,8 @@ const Skeleton = forwardRef(({children, height, width, ...rest}, ref) => {
 Skeleton.displayName = 'Skeleton'
 
 const ProfileCard = ({allowPasswordChange = false}) => {
-    const {formatMessage} = useIntl()
+    const intl = useIntl()
+    const {formatMessage} = intl
     const headingRef = useRef(null)
     const {data: customer} = useCurrentCustomer()
     const {isRegistered, customerId} = customer
@@ -68,6 +69,36 @@ const ProfileCard = ({allowPasswordChange = false}) => {
 
     const toast = useToast()
     const [isEditing, setIsEditing] = useState(false)
+
+    const messages = useMemo(
+        () => ({
+            title: formatMessage({
+                defaultMessage: 'My Profile',
+                id: 'profile_card.title.my_profile'
+            }),
+            profileUpdated: formatMessage({
+                defaultMessage: 'Profile updated',
+                id: 'profile_card.info.profile_updated'
+            }),
+            fullName: formatMessage({
+                defaultMessage: 'Full Name',
+                id: 'profile_card.label.full_name'
+            }),
+            email: formatMessage({
+                defaultMessage: 'Email',
+                id: 'profile_card.label.email'
+            }),
+            phone: formatMessage({
+                defaultMessage: 'Phone Number',
+                id: 'profile_card.label.phone'
+            }),
+            notProvided: formatMessage({
+                defaultMessage: 'Not provided',
+                id: 'profile_card.message.not_provided'
+            })
+        }),
+        [intl]
+    )
 
     const form = useForm({
         defaultValues: {
@@ -111,10 +142,7 @@ const ProfileCard = ({allowPasswordChange = false}) => {
                     onSuccess: () => {
                         setIsEditing(false)
                         toast({
-                            title: formatMessage({
-                                defaultMessage: 'Profile updated',
-                                id: 'profile_card.info.profile_updated'
-                            }),
+                            title: messages.profileUpdated,
                             type: 'success'
                         })
                         headingRef?.current?.focus()
@@ -131,10 +159,7 @@ const ProfileCard = ({allowPasswordChange = false}) => {
             id="my-profile"
             title={
                 <Skeleton ref={headingRef} tabIndex="-1" height="30px" width="120px">
-                    <FormattedMessage
-                        defaultMessage="My Profile"
-                        id="profile_card.title.my_profile"
-                    />
+                    {messages.title}
                 </Skeleton>
             }
             editing={isEditing}
@@ -176,10 +201,7 @@ const ProfileCard = ({allowPasswordChange = false}) => {
                     <Box>
                         <Skeleton height="21px" width="84px" marginBottom="2">
                             <Text fontSize="sm" fontWeight="bold">
-                                <FormattedMessage
-                                    defaultMessage="Full Name"
-                                    id="profile_card.label.full_name"
-                                />
+                                {messages.fullName}
                             </Text>
                         </Skeleton>
 
@@ -192,10 +214,7 @@ const ProfileCard = ({allowPasswordChange = false}) => {
                     <Box>
                         <Skeleton height="21px" width="120px" marginBottom="2">
                             <Text fontSize="sm" fontWeight="bold">
-                                <FormattedMessage
-                                    defaultMessage="Email"
-                                    id="profile_card.label.email"
-                                />
+                                {messages.email}
                             </Text>
                         </Skeleton>
 
@@ -206,22 +225,12 @@ const ProfileCard = ({allowPasswordChange = false}) => {
                     <Box>
                         <Skeleton height="21px" width="80px" marginBottom="2">
                             <Text fontSize="sm" fontWeight="bold">
-                                <FormattedMessage
-                                    defaultMessage="Phone Number"
-                                    id="profile_card.label.phone"
-                                />
+                                {messages.phone}
                             </Text>
                         </Skeleton>
 
                         <Skeleton height="21px" width="120px">
-                            <Text fontSize="sm">
-                                {customer?.phoneHome || (
-                                    <FormattedMessage
-                                        defaultMessage="Not provided"
-                                        id="profile_card.message.not_provided"
-                                    />
-                                )}
-                            </Text>
+                            <Text fontSize="sm">{customer?.phoneHome || messages.notProvided}</Text>
                         </Skeleton>
                     </Box>
                 </SimpleGrid>
@@ -235,7 +244,8 @@ ProfileCard.propTypes = {
 }
 
 const PasswordCard = () => {
-    const {formatMessage} = useIntl()
+    const intl = useIntl()
+    const {formatMessage} = intl
     const headingRef = useRef(null)
     const {data: customer} = useCurrentCustomer()
     const {isRegistered} = customer
@@ -245,6 +255,24 @@ const PasswordCard = () => {
     const updateCustomerPassword = useAuthHelper(AuthHelpers.UpdateCustomerPassword)
     const toast = useToast()
     const [isEditing, setIsEditing] = useState(false)
+
+    const messages = useMemo(
+        () => ({
+            title: formatMessage({
+                defaultMessage: 'Password',
+                id: 'password_card.title.password'
+            }),
+            passwordUpdated: formatMessage({
+                defaultMessage: 'Password updated',
+                id: 'password_card.info.password_updated'
+            }),
+            passwordLabel: formatMessage({
+                defaultMessage: 'Password',
+                id: 'password_card.label.password'
+            })
+        }),
+        [intl]
+    )
 
     const form = useForm()
 
@@ -259,10 +287,7 @@ const PasswordCard = () => {
             })
             setIsEditing(false)
             toast({
-                title: formatMessage({
-                    defaultMessage: 'Password updated',
-                    id: 'password_card.info.password_updated'
-                }),
+                title: messages.passwordUpdated,
                 type: 'success'
             })
             headingRef?.current?.focus()
@@ -278,7 +303,7 @@ const PasswordCard = () => {
             id="password"
             title={
                 <Skeleton ref={headingRef} tabIndex="-1" height="30px" width="120px">
-                    <FormattedMessage defaultMessage="Password" id="password_card.title.password" />
+                    {messages.title}
                 </Skeleton>
             }
             editing={isEditing}
@@ -319,10 +344,7 @@ const PasswordCard = () => {
                     <Box>
                         <Skeleton height="21px" width="84px" marginBottom="2">
                             <Text fontSize="sm" fontWeight="bold">
-                                <FormattedMessage
-                                    defaultMessage="Password"
-                                    id="password_card.label.password"
-                                />
+                                {messages.passwordLabel}
                             </Text>
                         </Skeleton>
 
@@ -339,6 +361,8 @@ const PasswordCard = () => {
 }
 
 const AccountDetail = () => {
+    const intl = useIntl()
+    const {formatMessage} = intl
     const headingRef = useRef()
     useEffect(() => {
         // Focus the 'Account Details' header when the component mounts for accessibility
@@ -347,13 +371,20 @@ const AccountDetail = () => {
 
     const {isExternal} = useCustomerType()
 
+    const messages = useMemo(
+        () => ({
+            title: formatMessage({
+                defaultMessage: 'Account Details',
+                id: 'account_detail.title.account_details'
+            })
+        }),
+        [intl]
+    )
+
     return (
         <Stack data-testid="account-detail-page" gap="6">
             <Heading as="h1" fontSize="24px" tabIndex="0" ref={headingRef}>
-                <FormattedMessage
-                    defaultMessage="Account Details"
-                    id="account_detail.title.account_details"
-                />
+                {messages.title}
             </Heading>
 
             <Stack gap="4">

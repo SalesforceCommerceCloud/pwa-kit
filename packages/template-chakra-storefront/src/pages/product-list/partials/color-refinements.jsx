@@ -15,7 +15,7 @@ import {
 } from '../../../pages/product-list/partials/refinements-utils'
 
 const ColorRefinements = ({filter, toggleFilter, selectedFilters}) => {
-    const intl = useIntl()
+    const {formatMessage} = useIntl()
     const recipe = useSlotRecipe({
         key: 'swatchGroup',
         variant: 'circle'
@@ -32,15 +32,26 @@ const ColorRefinements = ({filter, toggleFilter, selectedFilters}) => {
 
                 const styles = recipe({variant: 'circle', selected: isSelected})
 
+                const messages = {
+                    colotHitariaLabel: formatMessage(
+                        isSelected ? REMOVE_FILTER_HIT_COUNT : ADD_FILTER_HIT_COUNT,
+                        value
+                    ),
+                    colorHitCount: formatMessage(
+                        {
+                            id: 'colorRefinements.label.hitCount',
+                            defaultMessage: '{colorLabel} ({colorHitCount})'
+                        },
+                        {colorLabel: value.label, colorHitCount: value.hitCount}
+                    )
+                }
+
                 return (
                     <Box key={idx}>
                         <HStack gap={1} cursor="pointer">
                             <Button
                                 css={styles.swatch}
-                                aria-label={intl.formatMessage(
-                                    isSelected ? REMOVE_FILTER_HIT_COUNT : ADD_FILTER_HIT_COUNT,
-                                    value
-                                )}
+                                aria-label={messages.colotHitariaLabel}
                                 aria-checked={isSelected}
                                 data-state={isSelected ? 'selected' : undefined}
                                 variant="outline"
@@ -83,13 +94,7 @@ const ColorRefinements = ({filter, toggleFilter, selectedFilters}) => {
                                 cursor="pointer"
                                 aria-hidden="true" // avoid redundant readout since swatch has aria label
                             >
-                                {intl.formatMessage(
-                                    {
-                                        id: 'colorRefinements.label.hitCount',
-                                        defaultMessage: '{colorLabel} ({colorHitCount})'
-                                    },
-                                    {colorLabel: value.label, colorHitCount: value.hitCount}
-                                )}
+                                {messages.colorHitCount}
                             </Text>
                         </HStack>
                     </Box>

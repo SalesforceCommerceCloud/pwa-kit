@@ -7,10 +7,25 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import {FormattedMessage} from 'react-intl'
+import {useIntl, defineMessages} from 'react-intl'
 import {Button, Separator, Stack, Text} from '@chakra-ui/react'
 import LoginFields from '../../components/forms/login-fields'
 import SocialLogin from '../../components/social-login'
+
+const messages = defineMessages({
+    signIn: {
+        defaultMessage: 'Sign In',
+        id: 'login_form.button.sign_in'
+    },
+    orLoginWith: {
+        defaultMessage: 'Or Login With',
+        id: 'login_form.message.or_login_with'
+    },
+    backToSignInOptions: {
+        defaultMessage: 'Back to Sign In Options',
+        id: 'login_form.button.back'
+    }
+})
 
 const StandardLogin = ({
     form,
@@ -20,6 +35,7 @@ const StandardLogin = ({
     setShowPasswordView,
     idps = []
 }) => {
+    const {formatMessage} = useIntl()
     return (
         <Stack gap={8} paddingLeft={4} paddingRight={4}>
             <Stack>
@@ -37,17 +53,14 @@ const StandardLogin = ({
                     }}
                     isLoading={form.formState.isSubmitting}
                 >
-                    <FormattedMessage defaultMessage="Sign In" id="login_form.button.sign_in" />
+                    {formatMessage(messages.signIn)}
                 </Button>
                 {isSocialEnabled && idps.length > 0 && (
                     <>
                         <Stack gap={6} paddingTop={2} paddingBottom={2}>
                             <Separator />
                             <Text align="center" fontSize="sm">
-                                <FormattedMessage
-                                    defaultMessage="Or Login With"
-                                    id="login_form.message.or_login_with"
-                                />
+                                {formatMessage(messages.orLoginWith)}
                             </Text>
                         </Stack>
                         <SocialLogin form={form} idps={idps} />
@@ -63,10 +76,7 @@ const StandardLogin = ({
                         color="blue.600"
                         variant="outline"
                     >
-                        <FormattedMessage
-                            defaultMessage="Back to Sign In Options"
-                            id="login_form.button.back"
-                        />
+                        {formatMessage(messages.backToSignInOptions)}
                     </Button>
                 )}
             </Stack>

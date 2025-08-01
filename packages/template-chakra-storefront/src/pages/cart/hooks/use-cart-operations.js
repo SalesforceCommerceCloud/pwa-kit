@@ -4,13 +4,14 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import {useState} from 'react'
+import {useState, useMemo} from 'react'
 import {useIntl} from 'react-intl'
 import debounce from 'lodash/debounce'
 import {useShopperBasketsMutation} from '@salesforce/commerce-sdk-react'
 import useToast from '../../../hooks/use-toast'
 import {TOAST_MESSAGE_REMOVED_ITEM_FROM_CART} from '../../../../config/constants'
 import {getUpdateBundleChildArray} from '../../../utils/product-utils'
+import {useDisclosure} from '@chakra-ui/react'
 
 const DEBOUNCE_WAIT = 750
 
@@ -26,8 +27,21 @@ export const useCartOperations = (basket, productsByItemId, showError) => {
     const [localQuantity, setLocalQuantity] = useState({})
     const [isCartItemLoading, setCartItemLoading] = useState(false)
 
-    const {formatMessage} = useIntl()
+    // Modal state and actions
+    const {open: isOpen, onOpen, onClose} = useDisclosure()
+
+    const intl = useIntl()
+    const {formatMessage} = intl
     const toast = useToast()
+
+    const messages = useMemo(
+        () => ({
+            removedItemFromCart: formatMessage(TOAST_MESSAGE_REMOVED_ITEM_FROM_CART, {
+                quantity: 1
+            })
+        }),
+        [intl]
+    )
 
     /*****************Basket Mutations************************/
     const updateItemInBasketMutation = useShopperBasketsMutation('updateItemInBasket')
@@ -39,6 +53,8 @@ export const useCartOperations = (basket, productsByItemId, showError) => {
         // using try-catch is better than using onError callback since we have many mutation calls logic here
         try {
             setCartItemLoading(true)
+            // close the modal before performing any actions on cart item
+            onClose()
             const productIds = basket.productItems.map(({productId}) => productId)
 
             // The user is selecting different variant, and it has not existed in basket
@@ -88,6 +104,8 @@ export const useCartOperations = (basket, productsByItemId, showError) => {
     const handleUpdateBundle = async (bundle, bundleQuantity, childProducts) => {
         try {
             setCartItemLoading(true)
+            // close the modal before performing any actions on cart item
+            onClose()
             const itemsToBeUpdated = getUpdateBundleChildArray(bundle, childProducts)
 
             // We only update the parent bundle when the quantity changes
@@ -209,7 +227,7 @@ export const useCartOperations = (basket, productsByItemId, showError) => {
                 },
                 onSuccess: () => {
                     toast({
-                        title: formatMessage(TOAST_MESSAGE_REMOVED_ITEM_FROM_CART, {quantity: 1}),
+                        title: messages.removedItemFromCart,
                         type: 'success'
                     })
                 },
@@ -221,6 +239,9 @@ export const useCartOperations = (basket, productsByItemId, showError) => {
     }
 
     return {
+        isOpen,
+        onClose,
+        onOpen,
         selectedItem,
         setSelectedItem,
         localQuantity,

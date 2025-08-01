@@ -5,8 +5,8 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React, {useEffect, useState} from 'react'
-import {FormattedMessage, useIntl} from 'react-intl'
+import React, {useEffect, useState, useMemo} from 'react'
+import {useIntl} from 'react-intl'
 import {Alert, Box, Container, Stack, Text, Spinner} from '@chakra-ui/react'
 
 // Hooks
@@ -21,7 +21,8 @@ import {API_ERROR_MESSAGE} from '../../../config/constants'
 import {AlertIcon} from '../../components/icons'
 
 const SocialLoginRedirect = () => {
-    const {formatMessage} = useIntl()
+    const intl = useIntl()
+    const {formatMessage} = intl
     const navigate = useNavigation()
     const [searchParams] = useSearchParams()
     const loginIDPUser = useAuthHelper(AuthHelpers.LoginIDPUser)
@@ -36,6 +37,31 @@ const SocialLoginRedirect = () => {
     const mergeBasket = useShopperBasketsMutation('mergeBasket')
     const [error, setError] = useState('')
 
+    const messages = useMemo(
+        () => ({
+            apiError: formatMessage(API_ERROR_MESSAGE),
+            authenticating: formatMessage({
+                id: 'social_login_redirect.message.authenticating',
+                defaultMessage: 'Authenticating...'
+            }),
+            redirectLink: formatMessage(
+                {
+                    id: 'social_login_redirect.message.redirect_link',
+                    defaultMessage:
+                        'If you are not automatically redirected, click <link>this link</link> to proceed.'
+                },
+                {
+                    link: (chunks) => (
+                        <a href="/account" style={{color: '#0176D3', textDecoration: 'underline'}}>
+                            {chunks}
+                        </a>
+                    )
+                }
+            )
+        }),
+        [intl]
+    )
+
     // Runs after successful 3rd-party IDP authorization, processing query parameters
     useEffect(() => {
         if (!searchParams.code) {
@@ -49,7 +75,7 @@ const SocialLoginRedirect = () => {
                     ...(searchParams.usid && {usid: searchParams.usid})
                 })
             } catch (error) {
-                const message = formatMessage(API_ERROR_MESSAGE)
+                const message = messages.apiError
                 setError(message)
             }
         }
@@ -103,26 +129,10 @@ const SocialLoginRedirect = () => {
                 <Stack justify="center" align="center" gap={8} marginBottom={8}>
                     <Spinner opacity={0.85} color="blue.600" animationDuration="0.8s" size="lg" />
                     <Text textAlign="center" fontSize="xl" fontWeight="semibold">
-                        <FormattedMessage
-                            id="social_login_redirect.message.authenticating"
-                            defaultMessage="Authenticating..."
-                        />
+                        {messages.authenticating}
                     </Text>
                     <Text textAlign="center" fontSize="m">
-                        <FormattedMessage
-                            id="social_login_redirect.message.redirect_link"
-                            defaultMessage="If you are not automatically redirected, click <link>this link</link> to proceed."
-                            values={{
-                                link: (chunks) => (
-                                    <a
-                                        href="/account"
-                                        style={{color: '#0176D3', textDecoration: 'underline'}}
-                                    >
-                                        {chunks}
-                                    </a>
-                                )
-                            }}
-                        />
+                        {messages.redirectLink}
                     </Text>
                 </Stack>
             </Container>

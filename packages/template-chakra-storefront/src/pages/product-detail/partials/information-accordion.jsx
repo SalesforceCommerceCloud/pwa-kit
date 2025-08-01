@@ -5,13 +5,40 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React from 'react'
+import React, {useMemo} from 'react'
 import PropTypes from 'prop-types'
 import {Accordion, Box, Span, Stack} from '@chakra-ui/react'
 import {useIntl} from 'react-intl'
 
 const InformationAccordion = ({product}) => {
-    const {formatMessage} = useIntl()
+    const intl = useIntl()
+    const {formatMessage} = intl
+
+    const messages = useMemo(
+        () => ({
+            productDetail: formatMessage({
+                id: 'product_detail.accordion.button.product_detail',
+                defaultMessage: 'Product Detail'
+            }),
+            sizeFit: formatMessage({
+                id: 'product_detail.accordion.button.size_fit',
+                defaultMessage: 'Size & Fit'
+            }),
+            reviews: formatMessage({
+                id: 'product_detail.accordion.button.reviews',
+                defaultMessage: 'Reviews'
+            }),
+            questions: formatMessage({
+                id: 'product_detail.accordion.button.questions',
+                defaultMessage: 'Questions'
+            }),
+            comingSoon: formatMessage({
+                id: 'product_detail.accordion.message.coming_soon',
+                defaultMessage: 'Coming Soon'
+            })
+        }),
+        [intl]
+    )
 
     return (
         <Stack direction="row" gap={[0, 0, 0, 16]}>
@@ -20,10 +47,7 @@ const InformationAccordion = ({product}) => {
                 <Accordion.Item key="details" value="details">
                     <Accordion.ItemTrigger height="64px">
                         <Span flex="1" textAlign="left" fontWeight="bold" fontSize="lg">
-                            {formatMessage({
-                                defaultMessage: 'Product Detail',
-                                id: 'product_detail.accordion.button.product_detail'
-                            })}
+                            {messages.productDetail}
                         </Span>
                         <Accordion.ItemIndicator />
                     </Accordion.ItemTrigger>
@@ -42,20 +66,12 @@ const InformationAccordion = ({product}) => {
                 <Accordion.Item key="size&fit" value="size&fit">
                     <Accordion.ItemTrigger height="64px">
                         <Span flex="1" textAlign="left" fontWeight="bold" fontSize="lg">
-                            {formatMessage({
-                                defaultMessage: 'Size & Fit',
-                                id: 'product_detail.accordion.button.size_fit'
-                            })}
+                            {messages.sizeFit}
                         </Span>
                         <Accordion.ItemIndicator />
                     </Accordion.ItemTrigger>
                     <Accordion.ItemContent>
-                        <Accordion.ItemBody>
-                            {formatMessage({
-                                defaultMessage: 'Coming Soon',
-                                id: 'product_detail.accordion.message.coming_soon'
-                            })}
-                        </Accordion.ItemBody>
+                        <Accordion.ItemBody>{messages.comingSoon}</Accordion.ItemBody>
                     </Accordion.ItemContent>
                 </Accordion.Item>
 
@@ -63,20 +79,12 @@ const InformationAccordion = ({product}) => {
                 <Accordion.Item key="reviews" value="reviews">
                     <Accordion.ItemTrigger height="64px">
                         <Span flex="1" textAlign="left" fontWeight="bold" fontSize="lg">
-                            {formatMessage({
-                                defaultMessage: 'Reviews',
-                                id: 'product_detail.accordion.button.reviews'
-                            })}
+                            {messages.reviews}
                         </Span>
                         <Accordion.ItemIndicator />
                     </Accordion.ItemTrigger>
                     <Accordion.ItemContent>
-                        <Accordion.ItemBody>
-                            {formatMessage({
-                                defaultMessage: 'Coming Soon',
-                                id: 'product_detail.accordion.message.coming_soon'
-                            })}
-                        </Accordion.ItemBody>
+                        <Accordion.ItemBody>{messages.comingSoon}</Accordion.ItemBody>
                     </Accordion.ItemContent>
                 </Accordion.Item>
 
@@ -84,20 +92,12 @@ const InformationAccordion = ({product}) => {
                 <Accordion.Item key="questions" value="questions">
                     <Accordion.ItemTrigger height="64px">
                         <Span flex="1" textAlign="left" fontWeight="bold" fontSize="lg">
-                            {formatMessage({
-                                defaultMessage: 'Questions',
-                                id: 'product_detail.accordion.button.questions'
-                            })}
+                            {messages.questions}
                         </Span>
                         <Accordion.ItemIndicator />
                     </Accordion.ItemTrigger>
                     <Accordion.ItemContent>
-                        <Accordion.ItemBody>
-                            {formatMessage({
-                                defaultMessage: 'Coming Soon',
-                                id: 'product_detail.accordion.message.coming_soon'
-                            })}
-                        </Accordion.ItemBody>
+                        <Accordion.ItemBody>{messages.comingSoon}</Accordion.ItemBody>
                     </Accordion.ItemContent>
                 </Accordion.Item>
             </Accordion.Root>
