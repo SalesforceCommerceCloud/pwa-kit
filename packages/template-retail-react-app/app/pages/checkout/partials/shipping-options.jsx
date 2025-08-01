@@ -11,15 +11,11 @@ import {
     Button,
     Container,
     Flex,
-    Radio,
-    RadioGroup,
     Stack,
     Text,
     VStack,
-    HStack,
-    Image,
-    List,
-    ListItem
+    Radio,
+    RadioGroup
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 import {useForm, Controller} from 'react-hook-form'
 import {useCheckout} from '@salesforce/retail-react-app/app/pages/checkout/util/checkout-context'
@@ -29,184 +25,20 @@ import {
     ToggleCardSummary
 } from '@salesforce/retail-react-app/app/components/toggle-card'
 import {
-    useShippingMethodsForShipment,
-    useShopperBasketsMutation
+    useShopperBasketsMutation,
+    useShippingMethodsForShipment
 } from '@salesforce/commerce-sdk-react'
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
 import {useCurrency} from '@salesforce/retail-react-app/app/hooks'
-import DisplayPrice from '@salesforce/retail-react-app/app/components/display-price'
-import {getPriceData} from '@salesforce/retail-react-app/app/utils/product-utils'
-import PropTypes from 'prop-types'
 import LoadingSpinner from '@salesforce/retail-react-app/app/components/loading-spinner'
+import PropTypes from 'prop-types'
 
-import {findImageGroupBy} from '@salesforce/retail-react-app/app/utils/image-groups-utils'
-import {useProducts} from '@salesforce/commerce-sdk-react'
-import ItemVariantProvider from '@salesforce/retail-react-app/app/components/item-variant'
+// Import the new components
+import ShippingProductCards from '@salesforce/retail-react-app/app/pages/checkout/partials/shipping-product-cards'
+import ShippingOptionsOnly from '@salesforce/retail-react-app/app/pages/checkout/partials/shipping-options-only'
 
-// Component to display product attributes (variants)
-const ProductAttributes = ({variant, includeQuantity = true}) => {
-    const {formatMessage} = useIntl()
-    const variationAttributes = variant?.variationAttributes || []
-    const variationValues = variant?.variationValues || {}
-
-    return (
-        <List
-            spacing={1.5}
-            flex={1}
-            aria-label={formatMessage({
-                id: 'shipping_options.product_attributes.label',
-                defaultMessage: 'Product attributes'
-            })}
-        >
-            {variationAttributes &&
-                variationAttributes.length > 0 &&
-                variationAttributes.map((attr) => {
-                    const value = attr.values?.find((v) => v.value === variationValues[attr.id])
-                    return (
-                        <ListItem key={attr.id}>
-                            <Text lineHeight={1} color="gray.700" fontSize="sm">
-                                {attr.name || attr.id}: {value?.name || value?.value || ''}
-                            </Text>
-                        </ListItem>
-                    )
-                })}
-            {includeQuantity && (
-                <ListItem>
-                    <Text lineHeight={1} color="gray.700" fontSize="sm">
-                        {formatMessage({
-                            id: 'shipping_options.quantity.label',
-                            defaultMessage: 'Quantity'
-                        })}
-                        : {variant.quantity}
-                    </Text>
-                </ListItem>
-            )}
-        </List>
-    )
-}
-
-ProductAttributes.propTypes = {
-    variant: PropTypes.object.isRequired,
-    includeQuantity: PropTypes.bool
-}
-
-// Component to display a single product item
-const ProductItem = ({item, currency, productsMap}) => {
-    const {formatMessage} = useIntl()
-
-    // Get product details and image using the exact same approach as shipping-multi-address
-    const productDetail = productsMap?.[item.productId] || {}
-    const variant = {...item, ...productDetail}
-    const image = findImageGroupBy(productDetail.imageGroups, {
-        viewType: 'small',
-        selectedVariationAttributes: variant.variationValues
-    })?.images?.[0]
-    const imageUrl = image?.disBaseLink || image?.link || ''
-
-    return (
-        <Box border="1px solid" borderColor="gray.200" borderRadius="md" p={4} bg="white">
-            <Flex
-                direction={{base: 'column', md: 'row'}}
-                align="flex-start"
-                w="100%"
-                h="100%"
-                gap={{base: 4, md: 6}}
-            >
-                <Flex direction="row" align="flex-start" flex={1} minW={0}>
-                    <HStack align="flex-start" spacing={3} w="100%">
-                        <Box
-                            flexShrink={0}
-                            borderRadius="md"
-                            bg="gray.100"
-                            overflow="hidden"
-                            position="relative"
-                            maxW={{base: '60px', md: '80px'}}
-                            w="100%"
-                            aspectRatio="1"
-                        >
-                            <Image
-                                src={imageUrl}
-                                alt={formatMessage(
-                                    {
-                                        id: 'shipping_options.image.alt',
-                                        defaultMessage: 'Product image for {productName}'
-                                    },
-                                    {
-                                        productName: item.productName
-                                    }
-                                )}
-                                objectFit="cover"
-                                w="100%"
-                                h="100%"
-                            />
-                        </Box>
-                        <ItemVariantProvider variant={variant}>
-                            <VStack
-                                justify="flex-start"
-                                minW={0}
-                                flex={1}
-                                pt={0}
-                                align="flex-start"
-                            >
-                                <Text
-                                    fontWeight="medium"
-                                    fontSize={{base: 'sm', md: 'md'}}
-                                    mb={1}
-                                    color="gray.900"
-                                    textAlign="left"
-                                >
-                                    {item.productName}
-                                </Text>
-                                <Box>
-                                    <ProductAttributes variant={variant} includeQuantity={true} />
-                                </Box>
-                            </VStack>
-                        </ItemVariantProvider>
-                    </HStack>
-                </Flex>
-
-                <Box
-                    w="100%"
-                    flex={{base: 'none', md: '1'}}
-                    minW={{base: '100%', md: '280px'}}
-                    maxW={{base: '100%', md: '400px'}}
-                    pt={0}
-                    mt={{base: 4, md: 0}}
-                    display="flex"
-                    justifyContent="flex-end"
-                    alignItems="flex-start"
-                >
-                    <DisplayPrice
-                        priceData={getPriceData(item)}
-                        currency={currency}
-                        labelForA11y={item.productName}
-                    />
-                </Box>
-            </Flex>
-        </Box>
-    )
-}
-
-ProductItem.propTypes = {
-    item: PropTypes.shape({
-        itemId: PropTypes.string.isRequired,
-        productId: PropTypes.string,
-        productName: PropTypes.string,
-        name: PropTypes.string,
-        image: PropTypes.string,
-        imageUrl: PropTypes.string,
-        primaryImage: PropTypes.string,
-        images: PropTypes.array,
-        quantity: PropTypes.number,
-        variationValues: PropTypes.object,
-        variations: PropTypes.object
-    }).isRequired,
-    currency: PropTypes.string.isRequired,
-    productsMap: PropTypes.object
-}
-
-// Component to handle shipping options for a single shipment
-const ShipmentOptions = ({shipment, basketId, currency, control, basket}) => {
+// Component to handle combined product cards and shipping options for multiship
+const ShipmentOptionsWithProducts = ({shipment, basketId, currency, control, basket}) => {
     const {formatMessage} = useIntl()
     const {data: shippingMethods, isLoading: isShippingMethodsLoading} =
         useShippingMethodsForShipment(
@@ -221,34 +53,15 @@ const ShipmentOptions = ({shipment, basketId, currency, control, basket}) => {
             }
         )
 
-    // Get all items for this shipment
-    const shipmentItems =
-        basket?.productItems?.filter((item) => item.shipmentId === shipment.shipmentId) || []
-
-    // Fetch product details using the exact same approach as shipping-multi-address
-    const productIds = shipmentItems.map((item) => item.productId).join(',')
-    const {data: productsMap, isLoading: isProductLoading} = useProducts(
-        {parameters: {ids: productIds, allImages: true}},
-        {
-            enabled: Boolean(productIds),
-            select: (data) => {
-                return (
-                    data?.data?.reduce((acc, p) => {
-                        acc[p.id] = p
-                        return acc
-                    }, {}) || {}
-                )
-            }
-        }
-    )
-
     if (!shipment.shippingAddress) {
         return null
     }
 
     const fieldName = `shippingMethodId_${shipment.shipmentId}`
     const defaultValue =
-        shipment.shippingMethod?.id || shippingMethods?.defaultShippingMethodId || ''
+        (shipment.shippingMethod && shipment.shippingMethod.id) ||
+        (shippingMethods && shippingMethods.defaultShippingMethodId) ||
+        ''
 
     return (
         <VStack spacing={6} align="stretch">
@@ -281,29 +94,19 @@ const ShipmentOptions = ({shipment, basketId, currency, control, basket}) => {
                 px={2}
                 bg="white"
             >
-                <VStack spacing={2} align="stretch">
+                <VStack spacing={4} align="stretch">
                     {/* Product Cards */}
-                    {isProductLoading ? (
-                        <LoadingSpinner />
-                    ) : (
-                        shipmentItems.map((item) => (
-                            <ProductItem
-                                key={item.itemId}
-                                item={item}
-                                currency={currency}
-                                productsMap={productsMap}
-                            />
-                        ))
-                    )}
+                    <ShippingProductCards shipment={shipment} basket={basket} />
 
-                    {/* Shipping Methods */}
+                    {/* Shipping Options */}
                     {isShippingMethodsLoading ? (
-                        <Box mt={4} px={4}>
+                        <Box display="flex" justifyContent="center" alignItems="center" py={8}>
                             <LoadingSpinner />
                         </Box>
                     ) : (
-                        shippingMethods?.applicableShippingMethods && (
-                            <Box mt={4} px={4}>
+                        shippingMethods &&
+                        shippingMethods.applicableShippingMethods && (
+                            <Box px={4}>
                                 <Controller
                                     name={fieldName}
                                     control={control}
@@ -315,81 +118,82 @@ const ShipmentOptions = ({shipment, basketId, currency, control, basket}) => {
                                             name={`shipping-options-radiogroup-${shipment.shipmentId}`}
                                         >
                                             <Stack spacing={2}>
-                                                {shippingMethods.applicableShippingMethods.map(
-                                                    (opt) => (
-                                                        <Radio value={opt.id} key={opt.id}>
-                                                            <Box w="full">
-                                                                <Flex
-                                                                    justify="space-between"
-                                                                    w="full"
-                                                                    align="flex-start"
-                                                                >
-                                                                    <Box flex={1}>
-                                                                        <Text
-                                                                            fontSize="sm"
-                                                                            fontWeight="medium"
-                                                                        >
-                                                                            {opt.name}
-                                                                        </Text>
-                                                                        <Text
-                                                                            fontSize="xs"
-                                                                            color="gray.600"
-                                                                            mt={0.5}
-                                                                        >
-                                                                            {opt.description}
-                                                                        </Text>
-                                                                    </Box>
+                                                {(
+                                                    shippingMethods &&
+                                                    shippingMethods.applicableShippingMethods
+                                                ).map((opt) => (
+                                                    <Radio value={opt.id} key={opt.id}>
+                                                        <Box w="full">
+                                                            <Flex
+                                                                justify="space-between"
+                                                                w="full"
+                                                                align="flex-start"
+                                                            >
+                                                                <Box flex={1}>
                                                                     <Text
-                                                                        fontWeight="bold"
                                                                         fontSize="sm"
-                                                                        ml={2}
+                                                                        fontWeight="medium"
                                                                     >
-                                                                        {opt.price === 0 ? (
-                                                                            <Text color="green.600">
-                                                                                {formatMessage({
-                                                                                    defaultMessage:
-                                                                                        'Free',
-                                                                                    id: 'shipping_options.free'
-                                                                                })}
-                                                                            </Text>
-                                                                        ) : (
-                                                                            <FormattedNumber
-                                                                                value={opt.price}
-                                                                                style="currency"
-                                                                                currency={currency}
-                                                                            />
-                                                                        )}
+                                                                        {opt.name}
                                                                     </Text>
-                                                                </Flex>
-                                                                {opt.shippingPromotions &&
-                                                                    opt.shippingPromotions.length >
-                                                                        0 && (
-                                                                        <VStack
-                                                                            spacing={0.5}
-                                                                            mt={1}
-                                                                            align="flex-start"
-                                                                        >
-                                                                            {opt.shippingPromotions.map(
-                                                                                (promo) => (
-                                                                                    <Text
-                                                                                        key={
-                                                                                            promo.promotionId
-                                                                                        }
-                                                                                        fontSize="xs"
-                                                                                        color="green.600"
-                                                                                    >
-                                                                                        {
-                                                                                            promo.calloutMsg
-                                                                                        }
-                                                                                    </Text>
-                                                                                )
-                                                                            )}
-                                                                        </VStack>
+                                                                    <Text
+                                                                        fontSize="xs"
+                                                                        color="gray.600"
+                                                                        mt={0.5}
+                                                                    >
+                                                                        {opt.description}
+                                                                    </Text>
+                                                                </Box>
+                                                                <Text
+                                                                    fontWeight="bold"
+                                                                    fontSize="sm"
+                                                                    ml={2}
+                                                                >
+                                                                    {opt.price === 0 ? (
+                                                                        <Text color="green.600">
+                                                                            {formatMessage({
+                                                                                defaultMessage:
+                                                                                    'Free',
+                                                                                id: 'shipping_options.free'
+                                                                            })}
+                                                                        </Text>
+                                                                    ) : (
+                                                                        <FormattedNumber
+                                                                            value={opt.price}
+                                                                            style="currency"
+                                                                            currency={currency}
+                                                                        />
                                                                     )}
-                                                            </Box>
-                                                        </Radio>
-                                                    )
-                                                )}
+                                                                </Text>
+                                                            </Flex>
+                                                            {opt.shippingPromotions &&
+                                                                opt.shippingPromotions.length >
+                                                                    0 && (
+                                                                    <VStack
+                                                                        spacing={0.5}
+                                                                        mt={1}
+                                                                        align="flex-start"
+                                                                    >
+                                                                        {opt.shippingPromotions.map(
+                                                                            (promo) => (
+                                                                                <Text
+                                                                                    key={
+                                                                                        promo.promotionId
+                                                                                    }
+                                                                                    fontSize="xs"
+                                                                                    color="green.600"
+                                                                                >
+                                                                                    {
+                                                                                        promo.calloutMsg
+                                                                                    }
+                                                                                </Text>
+                                                                            )
+                                                                        )}
+                                                                    </VStack>
+                                                                )}
+                                                        </Box>
+                                                    </Radio>
+                                                ))}
                                             </Stack>
                                         </RadioGroup>
                                     )}
@@ -403,7 +207,7 @@ const ShipmentOptions = ({shipment, basketId, currency, control, basket}) => {
     )
 }
 
-ShipmentOptions.propTypes = {
+ShipmentOptionsWithProducts.propTypes = {
     shipment: PropTypes.shape({
         shipmentId: PropTypes.string.isRequired,
         shippingAddress: PropTypes.shape({
@@ -448,13 +252,36 @@ export default function ShippingOptions() {
 
     // Get all shipments that have shipping addresses
     const shipmentsWithAddresses =
-        basket?.shipments?.filter((shipment) => shipment.shippingAddress) || []
+        (basket &&
+            basket.shipments &&
+            basket.shipments.filter((shipment) => shipment.shippingAddress)) ||
+        []
+
+    // Determine if this is multiship or single ship
+    // We need to check for shipments with different addresses, not just multiple shipments
+    const deliveryShipments =
+        (basket &&
+            basket.shipments &&
+            basket.shipments.filter((shipment) => shipment.shippingAddress)) ||
+        []
+
+    // Check if there are multiple shipments with different addresses
+    const uniqueAddresses = new Set()
+    deliveryShipments.forEach((shipment) => {
+        if (shipment.shippingAddress) {
+            const addressKey = `${shipment.shippingAddress.address1}-${shipment.shippingAddress.city}-${shipment.shippingAddress.postalCode}`
+            uniqueAddresses.add(addressKey)
+        }
+    })
+
+    const hasMultipleDeliveryShipments = uniqueAddresses.size > 1
 
     // Build initial form values
     const getInitialValues = () => {
         const values = {}
         shipmentsWithAddresses.forEach((shipment) => {
-            values[`shippingMethodId_${shipment.shipmentId}`] = shipment.shippingMethod?.id || ''
+            values[`shippingMethodId_${shipment.shipmentId}`] =
+                (shipment.shippingMethod && shipment.shippingMethod.id) || ''
         })
         return values
     }
@@ -500,9 +327,12 @@ export default function ShippingOptions() {
 
     // Calculate total shipping info
     const totalShippingCost =
-        basket?.shippingItems?.reduce((total, item) => {
-            return total + (item.priceAfterItemDiscount || item.price || 0)
-        }, 0) || 0
+        (basket &&
+            basket.shippingItems &&
+            basket.shippingItems.reduce((total, item) => {
+                return total + (item.priceAfterItemDiscount || item.price || 0)
+            }, 0)) ||
+        0
 
     const freeLabel = formatMessage({
         defaultMessage: 'Free',
@@ -514,7 +344,8 @@ export default function ShippingOptions() {
         shipmentsWithAddresses.length > 0 && shipmentsWithAddresses.every((s) => s.shippingAddress)
 
     const isFormValid =
-        form.formState.isValid || shipmentsWithAddresses.every((s) => s.shippingMethod?.id)
+        form.formState.isValid ||
+        shipmentsWithAddresses.every((s) => s.shippingMethod && s.shippingMethod.id)
 
     // Show loading spinner if basket is loading
     if (isBasketLoading) {
@@ -568,13 +399,24 @@ export default function ShippingOptions() {
                         {/* Dynamically create shipping method options for each shipment */}
                         {shipmentsWithAddresses.map((shipment) => (
                             <Box key={shipment.shipmentId}>
-                                <ShipmentOptions
-                                    shipment={shipment}
-                                    basketId={basket.basketId}
-                                    currency={currency}
-                                    control={form.control}
-                                    basket={basket}
-                                />
+                                {hasMultipleDeliveryShipments ? (
+                                    // Multiship: Show both product cards and shipping options
+                                    <ShipmentOptionsWithProducts
+                                        shipment={shipment}
+                                        basketId={basket.basketId}
+                                        currency={currency}
+                                        control={form.control}
+                                        basket={basket}
+                                    />
+                                ) : (
+                                    // Single ship: Show only shipping options
+                                    <ShippingOptionsOnly
+                                        shipment={shipment}
+                                        basketId={basket.basketId}
+                                        currency={currency}
+                                        control={form.control}
+                                    />
+                                )}
                             </Box>
                         ))}
 
@@ -623,11 +465,16 @@ export default function ShippingOptions() {
                         // Multiple shipments summary
                         <Stack spacing={2}>
                             {shipmentsWithAddresses.map((shipment) => {
-                                const shippingItem = basket.shippingItems?.find(
-                                    (item) => item.shipmentId === shipment.shipmentId
-                                )
+                                const shippingItem =
+                                    basket &&
+                                    basket.shippingItems &&
+                                    basket.shippingItems.find(
+                                        (item) => item.shipmentId === shipment.shipmentId
+                                    )
                                 const itemCost =
-                                    shippingItem?.priceAfterItemDiscount || shippingItem?.price || 0
+                                    (shippingItem && shippingItem.priceAfterItemDiscount) ||
+                                    (shippingItem && shippingItem.price) ||
+                                    0
 
                                 return (
                                     <Box key={shipment.shipmentId}>

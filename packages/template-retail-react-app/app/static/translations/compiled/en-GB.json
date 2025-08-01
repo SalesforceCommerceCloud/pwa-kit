@@ -3425,6 +3425,12 @@
       "value": "Continue to Shipping Method"
     }
   ],
+  "shipping_address.error.switch_failed": [
+    {
+      "type": 0,
+      "value": "Error switching to single address. Please try again."
+    }
+  ],
   "shipping_address.error.update_failed": [
     {
       "type": 0,
@@ -3661,16 +3667,6 @@
       "value": "Free"
     }
   ],
-  "shipping_options.image.alt": [
-    {
-      "type": 0,
-      "value": "Product image for "
-    },
-    {
-      "type": 1,
-      "value": "productName"
-    }
-  ],
   "shipping_options.label.delivering_to": [
     {
       "type": 0,
@@ -3691,6 +3687,12 @@
     {
       "type": 0,
       "value": "Total Shipping"
+    }
+  ],
+  "shipping_options.no_image": [
+    {
+      "type": 0,
+      "value": "No Image"
     }
   ],
   "shipping_options.product_attributes.label": [

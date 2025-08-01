@@ -1442,6 +1442,9 @@
   "shipping_address.button.continue_to_shipping": {
     "defaultMessage": "Continue to Shipping Method"
   },
+  "shipping_address.error.switch_failed": {
+    "defaultMessage": "Error switching to single address. Please try again."
+  },
   "shipping_address.error.update_failed": {
     "defaultMessage": "Error updating shipping address. Please try again."
   },
@@ -1544,9 +1547,6 @@
   "shipping_options.free": {
     "defaultMessage": "Free"
   },
-  "shipping_options.image.alt": {
-    "defaultMessage": "Product image for {productName}"
-  },
   "shipping_options.label.delivering_to": {
     "defaultMessage": "Delivering to {name}"
   },
@@ -1555,6 +1555,9 @@
   },
   "shipping_options.label.total_shipping": {
     "defaultMessage": "Total Shipping"
+  },
+  "shipping_options.no_image": {
+    "defaultMessage": "No Image"
   },
   "shipping_options.product_attributes.label": {
     "defaultMessage": "Product attributes"
