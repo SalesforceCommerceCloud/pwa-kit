@@ -125,7 +125,6 @@ export const getCommerceApiToken = async (
                             typeof commitSession,
                             ApiTokenStatus
                         ] => {
-                            console.log('Retrieved new access token:', response.access_token)
                             updateSession(session, response)
                             return [session, commitSession, 'new']
                         }

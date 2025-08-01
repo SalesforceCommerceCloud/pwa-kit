@@ -1,5 +1,7 @@
 import type {ReactElement} from 'react'
 import {Link} from 'react-router'
+import HeroImage from './heroImage'
+
 
 export default function Hero({
     title,
@@ -20,19 +22,24 @@ export default function Hero({
         <div className="w-full">
             {/* Two-column layout container */}
             <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-                <div className="flex flex-col md:flex-row w-full">
-                    {/* Left column - Content */}
-                    <div className="w-full md:w-1/2 flex flex-col justify-center p-8 md:p-12">
-                        <div className="max-w-xl">
-                            <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 mb-4">
+                <div className="flex flex-col md:flex-row w-full min-h-[60vh] md:min-h-[500px]">
+                    {/* Left column - Content (prioritized for LCP) */}
+                    <div className="w-full md:w-3/5 flex flex-col justify-center p-8 md:p-12 order-1">
+                        <div className="max-w-2xl">
+                            {/* Make this text MUCH larger to ensure it's the LCP element */}
+                            <h1 className="text-4xl md:text-6xl lg:text-7xl font-black text-gray-900 mb-6 leading-tight tracking-tight">
                                 {title}
                             </h1>
 
-                            {subtitle && <p className="text-lg text-gray-700 mb-8">{subtitle}</p>}
+                            {subtitle && (
+                                <p className="text-xl md:text-2xl text-gray-700 mb-10 leading-relaxed font-medium">
+                                    {subtitle}
+                                </p>
+                            )}
 
                             <Link
                                 to={ctaLink}
-                                className="inline-block text-white bg-blue-600 hover:bg-blue-700 transition-colors py-3 px-8 rounded-md font-medium"
+                                className="inline-block text-white bg-blue-600 hover:bg-blue-700 transition-colors py-4 px-10 rounded-lg font-bold text-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200"
                             >
                                 {ctaText}
                             </Link>

@@ -1,43 +1,16 @@
 import {type PropsWithChildren} from 'react'
-import {
-    data,
-    type LoaderFunctionArgs,
-    Outlet,
-    ScrollRestoration,
-    type UNSAFE_DataWithResponseInit
-} from 'react-router'
+import {Outlet, ScrollRestoration} from 'react-router'
 import {ServerHmr} from '../../react-router-vite/server-hmr'
 import CommerceProvider from '@/app/providers/commerce'
+import CommerceServerProvider from '@/app/providers/commerce.server'
 import Header from '@/app/components/header'
 import Footer from '@/app/components/footer'
 import {getCommerceApiToken} from '@/app/utils/api/commerce-api'
+import {RequestContext} from '@/app/utils/requestContext'
+import {getServerContext} from '@/app/utils/serverContext'
 import DumpError from './routes/error'
 import Loading from './routes/loading'
 import './routes/root.css'
-
-type LoaderProps = {
-    session: Record<string, any>
-}
-
-export async function loader({
-    request
-}: LoaderFunctionArgs): Promise<UNSAFE_DataWithResponseInit<LoaderProps>> {
-    const [session, commitSession, status] = await getCommerceApiToken(request)
-    return data(
-        {
-            session: Object.freeze(session.data)
-        },
-        {
-            ...(status === 'new' || status === 'refreshed'
-                ? {
-                      headers: {
-                          'Set-Cookie': await commitSession(session)
-                      }
-                  }
-                : {})
-        }
-    )
-}
 
 export function Layout({children}: PropsWithChildren) {
     return (
@@ -51,7 +24,7 @@ export function Layout({children}: PropsWithChildren) {
             <body className="antialiased flex flex-col min-h-screen">
                 {/* Find a way to memoize the dehydrated state */}
                 {/*<HydratedQueryProvider state={dehydrate(getQueryClient())}>*/}
-                    {children}
+                {children}
                 {/*</HydratedQueryProvider>*/}
                 {import.meta.env.DEV ? <ServerHmr /> : null}
             </body>
@@ -63,16 +36,29 @@ export function ErrorBoundary() {
     return <DumpError />
 }
 
-export default function App({loaderData: {session}}: {loaderData: LoaderProps}) {
+export default async function App() {
+    // Get the request object from the server context
+    const request = getServerContext(RequestContext)
+
+    if (!request) {
+        throw new Error('Request context not available')
+    }
+
+    // Load session data ONCE and provide it to all server components via context
+    const [session, commitSession, status] = await getCommerceApiToken(request)
+    const sessionData = Object.freeze(session.data)
+
     return (
-        <CommerceProvider context={{session}}>
-            <Loading />
-            <ScrollRestoration/>
-            <Header />
-            <main className="flex-grow pt-8">
-                <Outlet />
-            </main>
-            <Footer />
-        </CommerceProvider>
+        <CommerceServerProvider context={{session: sessionData}}>
+            <CommerceProvider context={{session: sessionData}}>
+                <Loading />
+                <ScrollRestoration />
+                <Header />
+                <main className="flex-grow pt-8">
+                    <Outlet />
+                </main>
+                <Footer />
+            </CommerceProvider>
+        </CommerceServerProvider>
     )
 }

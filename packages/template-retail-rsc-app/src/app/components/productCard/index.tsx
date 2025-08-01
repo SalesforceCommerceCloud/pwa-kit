@@ -17,7 +17,11 @@ export default function ProductCard({
                     <img
                         src={`${product.image?.disBaseLink ?? product.image?.link}?sw=300&q=60`}
                         alt={product.productName}
-                        className="object-cover transition-transform group-hover:scale-105"
+                        loading="lazy"
+                        width={300}
+                        height={300}
+                        className="object-cover w-full h-full transition-transform group-hover:scale-105"
+                        style={{aspectRatio: '1/1'}}
                     />
                 </Link>
 
