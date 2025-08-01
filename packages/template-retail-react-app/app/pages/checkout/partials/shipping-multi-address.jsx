@@ -343,74 +343,8 @@ const ShippingMultiAddress = ({
         }
 
         const handleSubmit = async () => {
-            setIsSubmitting(true)
-            try {
-                // Based on the shopper's selected addresses, create a map of unique addressIds and their associated items
-                const addressToItemsMap = {}
-
-                deliveryItems.forEach((item) => {
-                    // Defaults to the first address if no address is selected
-                    const addressId =
-                        currentSelectedAddresses[item.itemId] || addresses[0]?.addressId
-                    const address = addresses.find((addr) => addr.addressId === addressId)
-
-                    if (!address) {
-                        throw new Error('No address available for item')
-                    }
-
-                    // If there is an existing shipment with the same address, use it in the next step
-                    const shipmentIdWithSameAddress = findDeliveryShipmentWithSameAddress(
-                        basket,
-                        address
-                    )
-
-                    if (!addressToItemsMap[addressId]) {
-                        addressToItemsMap[addressId] = {
-                            address: address,
-                            items: [],
-                            shipmentId: shipmentIdWithSameAddress
-                        }
-                    }
-                    addressToItemsMap[addressId].items.push(item)
-                })
-
-                for (const [addressId, data] of Object.entries(addressToItemsMap)) {
-                    const {address, items, shipmentId: existingShipmentId} = data
-
-                    // For each unique address, if there is no existing shipment with the same address, create a new one.
-                    if (!existingShipmentId) {
-                        addressToItemsMap[addressId].shipmentId =
-                            await createNewDeliveryShipmentWithAddress(basket, address)
-                    }
-
-                    // Move items to the new shipment if needed.
-                    const targetShipmentId = addressToItemsMap[addressId].shipmentId
-                    const itemsToMove = items.filter((item) => item.shipmentId !== targetShipmentId)
-                    if (itemsToMove.length > 0) {
-                        await moveItemsToDeliveryShipment(itemsToMove, targetShipmentId)
-                    }
-                }
-
-                // Remove any empty shipments. TODO: Need to handle swapping over addresses if default is empty
-                await removeEmptyShipments()
-
-                goToStep(STEPS.SHIPPING_OPTIONS)
-            } catch (error) {
-                // Show specific error message if available, otherwise show generic message
-                const errorMessage =
-                    error.message ||
-                    formatMessage({
-                        defaultMessage: 'Error setting up shipments. Please try again.',
-                        id: 'shipping_multi_address.error.submit_failed'
-                    })
-
-                showToast({
-                    title: errorMessage,
-                    status: 'error'
-                })
-            } finally {
-                setIsSubmitting(false)
-            }
+            //TODO: handle shipment creation with guest addressses
+            console.log('Guest user submit clicked!')
         }
 
         return (
