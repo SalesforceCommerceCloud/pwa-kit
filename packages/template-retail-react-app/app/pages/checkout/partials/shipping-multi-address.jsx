@@ -18,7 +18,6 @@ import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-cur
 import {useCurrency} from '@salesforce/retail-react-app/app/hooks'
 import ItemVariantProvider from '@salesforce/retail-react-app/app/components/item-variant'
 import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
-import {getSessionJSONItem, setSessionJSONItem} from '@salesforce/retail-react-app/app/utils/utils'
 
 import AddressFields from '@salesforce/retail-react-app/app/components/forms/address-fields'
 import FormActionButtons from '@salesforce/retail-react-app/app/components/forms/form-action-buttons'
@@ -177,7 +176,15 @@ const ShippingMultiAddress = ({
         refetch: refetchCustomer,
         isLoading: customerLoading
     } = useCurrentCustomer()
-    const addresses = customer?.addresses || []
+
+    // Guest address management with useState
+    const [guestAddresses, setGuestAddresses] = useState([])
+    const [guestSelectedAddresses, setGuestSelectedAddresses] = useState({})
+
+    // Use appropriate address source based on user type
+    const addresses = customer && customer.isGuest ? guestAddresses : customer?.addresses || []
+    const currentSelectedAddresses =
+        customer && customer.isGuest ? guestSelectedAddresses : selectedAddresses
 
     // Initialize selected addresses with default addresses
     const [selectedAddresses, setSelectedAddresses] = useState({})
@@ -194,7 +201,16 @@ const ShippingMultiAddress = ({
                     initialSelected[addressKey] = defaultAddress.addressId
                 }
             })
-            setSelectedAddresses(initialSelected)
+            // Use appropriate setter based on user type
+            if (customer && customer.isGuest) {
+                // For guest users, only set default if no addresses are currently selected
+                setGuestSelectedAddresses((prev) => {
+                    const hasExistingSelections = Object.keys(prev).length > 0
+                    return hasExistingSelections ? prev : initialSelected
+                })
+            } else {
+                setSelectedAddresses(initialSelected)
+            }
         }
     }, [customer?.customerId, deliveryItems.length, addresses.length])
 
@@ -273,79 +289,7 @@ const ShippingMultiAddress = ({
     }
 
     if (customer && customer.isGuest) {
-        // For guest users, manage addresses in session storage
-        const [guestAddresses, setGuestAddresses] = useState([])
-        const addresses = guestAddresses
-
-        // Load guest addresses from session storage on mount
-        useEffect(() => {
-            const storedAddresses = getSessionJSONItem('guest_addresses') || []
-            setGuestAddresses(storedAddresses)
-        }, [])
-
-        // Save guest addresses to session storage whenever they change
-        useEffect(() => {
-            if (guestAddresses.length > 0) {
-                setSessionJSONItem('guest_addresses', guestAddresses)
-            }
-        }, [guestAddresses])
-
-        // Initialize selected addresses for guest users
-        const [selectedAddresses, setSelectedAddresses] = useState({})
-
-        // Load selected addresses from session storage on mount
-        useEffect(() => {
-            const storedSelectedAddresses = getSessionJSONItem('selected_addresses') || {}
-            setSelectedAddresses(storedSelectedAddresses)
-        }, [])
-
-        // Save selected addresses to session storage whenever they change
-        useEffect(() => {
-            if (Object.keys(selectedAddresses).length > 0) {
-                setSessionJSONItem('selected_addresses', selectedAddresses)
-            }
-        }, [selectedAddresses])
-
-        // Update selected addresses when delivery items change
-        useEffect(() => {
-            if (deliveryItems.length > 0 && addresses.length > 0) {
-                const initialSelected = {}
-                deliveryItems.forEach((item) => {
-                    const addressKey = item.itemId
-                    // Only set default if no address is already selected for this item
-                    if (!selectedAddresses[addressKey]) {
-                        // Use first address as default for guest users
-                        const defaultAddress = addresses[0]
-                        if (defaultAddress) {
-                            initialSelected[addressKey] = defaultAddress.addressId
-                        }
-                    }
-                })
-                // Only update if we have new selections
-                if (Object.keys(initialSelected).length > 0) {
-                    setSelectedAddresses(prev => ({...prev, ...initialSelected}))
-                }
-            }
-        }, [deliveryItems.length, addresses.length])
-
-        const [showAddAddressForm, setShowAddAddressForm] = useState({})
-
-        const addressForm = useForm({
-            mode: 'onSubmit',
-            defaultValues: {
-                firstName: '',
-                lastName: '',
-                phone: '',
-                countryCode: 'US',
-                address1: '',
-                city: '',
-                stateCode: '',
-                postalCode: '',
-                preferred: false
-            }
-        })
-
-        const [isSubmitting, setIsSubmitting] = useState(false)
+        // Guest user logic - use guest addresses and selected addresses
 
         const isAddressFormOpen =
             Object.keys(showAddAddressForm).filter((key) => showAddAddressForm[key])?.length > 0
@@ -368,14 +312,14 @@ const ShippingMultiAddress = ({
                     addressId: nanoid()
                 }
 
-                // Add to guest addresses state (which will save to session storage)
-                setGuestAddresses(prev => [...prev, createdAddress])
+                // Add to guest addresses state
+                setGuestAddresses((prev) => [...prev, createdAddress])
 
                 setShowAddAddressForm((prev) => ({...prev, [addressKey]: false}))
                 form.reset()
                 form.clearErrors()
 
-                setSelectedAddresses((prev) => ({
+                setGuestSelectedAddresses((prev) => ({
                     ...prev,
                     [addressKey]: createdAddress.addressId
                 }))
@@ -406,7 +350,8 @@ const ShippingMultiAddress = ({
 
                 deliveryItems.forEach((item) => {
                     // Defaults to the first address if no address is selected
-                    const addressId = selectedAddresses[item.itemId] || addresses[0]?.addressId
+                    const addressId =
+                        currentSelectedAddresses[item.itemId] || addresses[0]?.addressId
                     const address = addresses.find((addr) => addr.addressId === addressId)
 
                     if (!address) {
@@ -452,11 +397,13 @@ const ShippingMultiAddress = ({
                 goToStep(STEPS.SHIPPING_OPTIONS)
             } catch (error) {
                 // Show specific error message if available, otherwise show generic message
-                const errorMessage = error.message || formatMessage({
-                    defaultMessage: 'Error setting up shipments. Please try again.',
-                    id: 'shipping_multi_address.error.submit_failed'
-                })
-                
+                const errorMessage =
+                    error.message ||
+                    formatMessage({
+                        defaultMessage: 'Error setting up shipments. Please try again.',
+                        id: 'shipping_multi_address.error.submit_failed'
+                    })
+
                 showToast({
                     title: errorMessage,
                     status: 'error'
@@ -506,7 +453,12 @@ const ShippingMultiAddress = ({
                                             h="100%"
                                             gap={{base: 4, md: 6}}
                                         >
-                                            <Flex direction="row" align="flex-start" flex={1} minW={0}>
+                                            <Flex
+                                                direction="row"
+                                                align="flex-start"
+                                                flex={1}
+                                                minW={0}
+                                            >
                                                 <HStack align="flex-start" spacing={3} w="100%">
                                                     <Box
                                                         flexShrink={0}
@@ -592,7 +544,9 @@ const ShippingMultiAddress = ({
                                                     <VStack spacing={3} align="stretch">
                                                         <Select
                                                             value={
-                                                                selectedAddresses[addressKey] || ''
+                                                                currentSelectedAddresses[
+                                                                    addressKey
+                                                                ] || ''
                                                             }
                                                             onChange={(e) => {
                                                                 const value = e.target.value
@@ -600,15 +554,20 @@ const ShippingMultiAddress = ({
                                                                     ...prev,
                                                                     [addressKey]: false
                                                                 }))
-                                                                setSelectedAddresses((prev) => {
-                                                                    const newState = {...prev}
-                                                                    if (value === '') {
-                                                                        delete newState[addressKey]
-                                                                    } else {
-                                                                        newState[addressKey] = value
+                                                                setGuestSelectedAddresses(
+                                                                    (prev) => {
+                                                                        const newState = {...prev}
+                                                                        if (value === '') {
+                                                                            delete newState[
+                                                                                addressKey
+                                                                            ]
+                                                                        } else {
+                                                                            newState[addressKey] =
+                                                                                value
+                                                                        }
+                                                                        return newState
                                                                     }
-                                                                    return newState
-                                                                })
+                                                                )
                                                             }}
                                                             disabled={addresses.length === 0}
                                                             aria-labelledby={`delivery-address-label-${addressKey}`}
@@ -707,7 +666,9 @@ const ShippingMultiAddress = ({
                                                     item={item}
                                                     form={addressForm}
                                                     onSubmit={handleCreateAddress}
-                                                    onCancel={() => handleCancelAddressForm(addressKey)}
+                                                    onCancel={() =>
+                                                        handleCancelAddressForm(addressKey)
+                                                    }
                                                 />
                                             </Box>
                                         )}
