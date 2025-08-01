@@ -3,7 +3,6 @@
 import {type JSX, type ReactElement, useMemo} from 'react'
 import {Link} from 'react-router'
 import type {ShopperProductsTypes} from 'commerce-sdk-isomorphic'
-import {useProductsGetCategory} from '@/app/utils/api/commerce-client.client'
 
 const COLUMNS_MAX = 5
 
@@ -49,48 +48,23 @@ const CategoryLinks = ({category}: CategoryLinksProps): ReactElement => {
     )
 }
 
-const LoadingIndicator = (): ReactElement => (
-    <div className="min-w-0 flex-[0_0_21%] animate-pulse">
-        <div className="h-5 bg-gray-200 rounded mb-2"></div>
-        <div className="space-y-3">
-            <div className="h-4 bg-gray-100 rounded"></div>
-            <div className="h-4 bg-gray-100 rounded"></div>
-            <div className="h-4 bg-gray-100 rounded"></div>
-        </div>
-    </div>
-)
-
-export default function NavigationDesktopDropdown({
-    category
+export default function NavigationDesktopDropdownClient({
+    categoryData
 }: {
-    category: ShopperProductsTypes.Category
+    categoryData: ShopperProductsTypes.Category
 }): JSX.Element | null {
-    // Fetch detailed subcategories for the hovered/active category
-    const {
-        data: searchResult,
-        isLoading,
-        isFetching
-    } = useProductsGetCategory(
-        {
-            id: category.id,
-            levels: 2 // Fetch 2 additional levels of subcategories
-        },
-        {
-            enabled: category?.id?.length > 0 && category?.onlineSubCategoriesCount > 0
-        }
-    )
-
     const subCategories = useMemo(() => {
         // Filter categories that should show in menu
-        return (searchResult?.categories ?? []).filter(
+        return (categoryData?.categories ?? []).filter(
             (c: ShopperProductsTypes.Category) => c.c_showInMenu
         )
-    }, [searchResult])
+    }, [categoryData])
+
     const columnsToShow = useMemo(() => {
         return subCategories.length > COLUMNS_MAX ? COLUMNS_MAX : subCategories.length
     }, [subCategories])
 
-    if (subCategories.length === 0 && !isLoading && !isFetching) {
+    if (subCategories.length === 0) {
         return null
     }
 
@@ -102,15 +76,9 @@ export default function NavigationDesktopDropdown({
             }}
             data-sfdc-origin="client"
         >
-            {isLoading || isFetching
-                ? // Show loading placeholders
-                  Array.from({length: Math.max(columnsToShow, 2)}).map((_, index) => (
-                      <LoadingIndicator key={`loading-${index}`} />
-                  ))
-                : // Show actual subcategories
-                  subCategories.map((subCategory) => (
-                      <CategoryLinks key={subCategory.id} category={subCategory} />
-                  ))}
+            {subCategories.map((subCategory) => (
+                <CategoryLinks key={subCategory.id} category={subCategory} />
+            ))}
         </div>
     )
 }

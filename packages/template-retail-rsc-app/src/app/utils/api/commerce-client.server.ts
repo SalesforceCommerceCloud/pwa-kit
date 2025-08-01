@@ -2,19 +2,10 @@ import 'server-only'
 
 import type {ShopperProductsTypes, ShopperSearchTypes} from 'commerce-sdk-isomorphic'
 import type {SessionData} from '@/app/utils/api/commerce-api'
-import {createQueryClient} from '@/app/utils/api/commerce-client'
 import {
-    createProductsGetCategoryQuery,
-    createSearchProductsQuery
-} from '@/app/utils/api/commerce-client-queries'
-
-export const getQueryClient = () => createQueryClient()
-
-// export async function dehydrateQuery(query: FetchQueryOptions<any>): Promise<DehydratedState> {
-//     const queryClient = getQueryClient()
-//     await queryClient.prefetchQuery(query)
-//     return dehydrate(queryClient)
-// }
+    createShopperProductsClient,
+    createShopperSearchClient
+} from '@/app/utils/api/commerce-client'
 
 export const fetchProductsGetCategory = (
     session: SessionData,
@@ -22,8 +13,15 @@ export const fetchProductsGetCategory = (
         id: string | null
         levels?: number
     }
-): Promise<ShopperProductsTypes.Category> =>
-    getQueryClient().fetchQuery(createProductsGetCategoryQuery(session, parameters))
+): Promise<ShopperProductsTypes.Category> => {
+    const client = createShopperProductsClient(session)
+    return client.getCategory({
+        parameters: {
+            ...parameters,
+            id: parameters.id ?? ''
+        }
+    })
+}
 
 export const fetchSearchProducts = (
     session: SessionData,
@@ -42,5 +40,38 @@ export const fetchSearchProducts = (
         // allVariationProperties?: boolean
         // perPricebook?: boolean
     }
-): Promise<ShopperSearchTypes.ProductSearchResult> =>
-    getQueryClient().fetchQuery(createSearchProductsQuery(session, parameters))
+): Promise<ShopperSearchTypes.ProductSearchResult> => {
+    const {
+        categoryId,
+        q = '',
+        filters,
+        sort = '',
+        limit = 24,
+        page = 0,
+        expand = ['custom_properties', 'images', 'prices', 'promotions', 'variations'],
+        refine = []
+    } = parameters || {}
+
+    // Build refinements for product search
+    const refineSet = new Set<string>(refine)
+    categoryId && refineSet.add(`cgid=${categoryId}`)
+    if (filters) {
+        Object.entries(filters).forEach(([key, values]) => {
+            values.forEach((value) => {
+                refineSet.add(`${key}=${value}`)
+            })
+        })
+    }
+
+    const client = createShopperSearchClient(session)
+    return client.productSearch({
+        parameters: {
+            q,
+            sort,
+            limit,
+            expand,
+            refine: [...refineSet],
+            offset: page * limit
+        }
+    }) as unknown as Promise<ShopperSearchTypes.ProductSearchResult>
+}
