@@ -59,6 +59,7 @@ The PWA Kit MCP Server offers the following intelligent tools tailored to Salesf
   }
 }
 ```
+_NOTE: `{{path-to-app-directory}}` should be replaced with the absolute path to your generated project. For example: "/Users/username/mcp-server-folder/mystorefront/app"._
 
 Once saved, Cursor will:
 
