@@ -1,4 +1,3 @@
-'use client'
 /*
  * Copyright (c) 2022, Salesforce, Inc.
  * All rights reserved.

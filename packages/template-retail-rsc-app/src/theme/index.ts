@@ -1,0 +1,141 @@
+/*
+ * Copyright (c) 2021, salesforce.com, inc.
+ * All rights reserved.
+ * SPDX-License-Identifier: BSD-3-Clause
+ * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
+ */
+
+import {createSystem, defaultConfig, defineConfig} from '@chakra-ui/react'
+
+// Foundational style overrides
+import styles from './foundations/styles'
+import colors from './foundations/colors'
+import gradients from './foundations/gradients'
+import sizes from './foundations/sizes'
+import layerStyles from './foundations/layerStyles'
+import shadows from './foundations/shadows'
+
+// Base component style overrides
+import alert from './components/base/alert'
+import accordion from './components/base/accordion'
+import badge from './components/base/badge'
+import button from './components/base/button'
+import checkbox from './components/base/checkbox'
+import container from './components/base/container'
+import drawer from './components/base/drawer'
+import formLabel from './components/base/formLabel'
+import heading from './components/base/heading'
+import icon from './components/base/icon'
+import input from './components/base/input'
+import modal from './components/base/modal'
+import radio from './components/base/radio'
+import radioCard from './components/base/radioCard'
+import nativeSelect from './components/base/native-select'
+import skeleton from './components/base/skeleton'
+import tooltip from './components/base/tooltip'
+import popover from './components/base/popover'
+
+// Project Component style overrides
+import app from './components/project/_app'
+import breadcrumb from './components/project/breadcrumb'
+import listMenu from './components/project/list-menu'
+import checkoutFooter from './components/project/checkout-footer'
+import drawerMenu from './components/project/drawer-menu'
+import footer from './components/project/footer'
+import imageGallery from './components/project/image-gallery'
+import header from './components/project/header'
+import linkList from './components/project/links-list'
+import localeSelector from './components/project/locale-selector'
+import nestedAccordion from './components/project/nested-accordion'
+import offlineBanner from './components/project/offline-banner'
+import pagination from './components/project/pagination'
+import productTile from './components/project/product-tile'
+import quantityPicker from './components/project/quantity-picker'
+import search from './components/project/search'
+import socialIcons from './components/project/social-icons'
+import swatchGroup from './components/project/swatch-group'
+import skipNav from './components/project/skip-nav'
+
+// Please refer to the Chakra-Ui theme customization docs found
+// here https://chakra-ui.com/docs/theming/customize-theme to learn
+// more about extending and overriding themes for your project.
+
+export const breakpoints = {
+    base: '0em',
+    sm: '30em',
+    md: '48em',
+    lg: '62em',
+    xl: '80em',
+    '2xl': '96em'
+}
+
+export const overrides = defineConfig({
+    ...styles,
+    preflight: false, // this is important and prevents global chakra styles
+    theme: {
+        layerStyles,
+        tokens: {
+            colors,
+            sizes,
+            gradients,
+            shadows,
+            fonts: {
+                heading: `-apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"`,
+                body: `-apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"`,
+                mono: `SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace`
+            },
+            breakpoints
+        },
+        semanticTokens: {
+            shadows
+        },
+        recipes: {
+            // Built-in components
+            badge,
+            button,
+            container,
+            formLabel,
+            heading,
+            icon,
+            input,
+            modal,
+            radio,
+            skeleton,
+            popover
+        },
+        slotRecipes: {
+            // Built-in components
+            alert,
+            accordion,
+            drawer,
+            checkbox,
+            tooltip,
+            nativeSelect,
+            radioCard,
+
+            // project components
+            app,
+            breadcrumb,
+            checkoutFooter,
+            drawerMenu,
+            footer,
+            header,
+            imageGallery,
+            linkList,
+            listMenu,
+            localeSelector,
+            nestedAccordion,
+            offlineBanner,
+            pagination,
+            productTile,
+            quantityPicker,
+            socialIcons,
+            swatchGroup,
+            search,
+            skipNav
+        }
+    }
+})
+
+const system = createSystem(defaultConfig, overrides)
+export default system

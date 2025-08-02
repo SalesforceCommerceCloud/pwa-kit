@@ -1,8 +1,82 @@
 import 'client-only'
 import {useContext, useState, useCallback} from 'react'
-import type {ShopperProductsTypes} from 'commerce-sdk-isomorphic'
+import type {ShopperProductsTypes, ShopperSearchTypes} from 'commerce-sdk-isomorphic'
 import {CommerceClientContext} from '@/app/providers/commerce.client'
-import {createShopperProductsClient} from '@/app/utils/api/commerce-client'
+import {
+    createShopperProductsClient,
+    createShopperSearchClient
+} from '@/app/utils/api/commerce-client'
+
+/**
+ * Client-side hook for fetching product search data on-demand using commerce-sdk-isomorphic directly.
+ * This hook provides a simple interface for fetching product search results when needed.
+ */
+export const useClientSideProductSearch = () => {
+    const {session} = useContext(CommerceClientContext)
+    const [loading, setLoading] = useState(false)
+    const [products, setProducts] = useState<ShopperSearchTypes.ProductSearchHit[]>([])
+    const [error, setError] = useState<string | null>(null)
+
+    const fetchProducts = useCallback(
+        async (
+            parameters: {
+                categoryId?: string
+                q?: string
+                limit?: number
+                expand?: string[]
+            } = {}
+        ): Promise<ShopperSearchTypes.ProductSearchHit[]> => {
+            if (!session) {
+                console.error('No session available for product search')
+                setError('No session available')
+                return []
+            }
+
+            try {
+                setLoading(true)
+                setError(null)
+
+                const {categoryId, q = '', limit = 8, expand = ['images', 'prices']} = parameters
+
+                // Build refinements for product search
+                const refine: string[] = []
+                if (categoryId) {
+                    refine.push(`cgid=${categoryId}`)
+                }
+
+                const client = createShopperSearchClient(session)
+                const searchResult = await client.productSearch({
+                    parameters: {
+                        q,
+                        limit,
+                        expand,
+                        refine,
+                        offset: 0
+                    }
+                })
+
+                const productHits = searchResult.hits || []
+                setProducts(productHits)
+                return productHits
+            } catch (err) {
+                console.error('Failed to fetch products:', err)
+                const errorMessage = err instanceof Error ? err.message : 'Failed to fetch products'
+                setError(errorMessage)
+                return []
+            } finally {
+                setLoading(false)
+            }
+        },
+        [session]
+    )
+
+    return {
+        fetchProducts,
+        products,
+        loading,
+        error
+    }
+}
 
 /**
  * Client-side hook for fetching category data on-demand using commerce-sdk-isomorphic directly.

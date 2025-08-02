@@ -4,8 +4,8 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-
-// Server component wrapper - imports the client-only wrapper
-import ChakraProductScrollerClientOnly from './client-only'
-
-export default ChakraProductScrollerClientOnly
+export default {
+    imageBackground: {
+        value: 'linear(270deg, #E6E5EA, #EEEEEE)'
+    }
+}

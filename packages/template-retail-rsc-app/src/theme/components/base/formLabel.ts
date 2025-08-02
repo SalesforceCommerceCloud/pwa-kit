@@ -5,7 +5,12 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-// Server component wrapper - imports the client-only wrapper
-import ChakraProductScrollerClientOnly from './client-only'
+import {defineRecipe} from '@chakra-ui/react'
 
-export default ChakraProductScrollerClientOnly
+export default defineRecipe({
+    base: {
+        marginBottom: 1,
+        fontSize: 'sm',
+        fontWeight: 'semibold'
+    }
+})

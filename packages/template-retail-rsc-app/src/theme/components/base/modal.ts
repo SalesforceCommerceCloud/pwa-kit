@@ -4,8 +4,10 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
+import {defineRecipe} from '@chakra-ui/react'
 
-// Server component wrapper - imports the client-only wrapper
-import ChakraProductScrollerClientOnly from './client-only'
-
-export default ChakraProductScrollerClientOnly
+export default defineRecipe({
+    base: {
+        dialog: {borderRadius: 'sm'}
+    }
+})
