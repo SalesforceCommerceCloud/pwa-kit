@@ -32,7 +32,7 @@ const CONFIG = {
 const renderWithProviders = (ui, options = {}) => {
     // eslint-disable-next-line react/prop-types
     const Wrapper = ({children}) => (
-        <ChakraProvider theme={{}}>
+        <ChakraProvider value={{}}>
             <StoreLocatorProvider config={CONFIG}>{children}</StoreLocatorProvider>
         </ChakraProvider>
     )

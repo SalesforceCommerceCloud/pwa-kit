@@ -211,7 +211,7 @@ const Subscribe = ({...otherProps}) => {
     const [messageType, setMessageType] = useState('success')
     const {fetchConsentItems, submitConsent, isLoading} = useMarketingConsent()
     const PAGE_TAG = CONSENT_TAGS.HOMEPAGE_BANNER
-    const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    const EMAIL_REGEX = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9]+(\.[a-zA-Z0-9]+)*\.[a-zA-Z]{2,}$/
 
     const handleSignUp = async () => {
         if (!email) {
