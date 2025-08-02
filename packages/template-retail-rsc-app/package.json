@@ -9,6 +9,7 @@
         "typecheck": "tsc --noEmit"
     },
     "dependencies": {
+        "@chakra-ui/react": "^3.24.0",
         "client-only": "latest",
         "commerce-sdk-isomorphic": "^3.3.0",
         "react": "^19.1.0",

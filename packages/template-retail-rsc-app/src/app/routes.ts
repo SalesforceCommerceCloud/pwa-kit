@@ -2,6 +2,7 @@ import {type RouteConfig, index, route} from '@react-router/dev/routes'
 
 export default [
     index('routes/home/index.tsx'),
+    route('home-chakra', 'routes/home-chakra/index.tsx'),
     route('search', 'routes/search/index.tsx'),
     route('category/:categoryId', 'routes/category/index.tsx'),
     route('product/:productId', 'routes/product/index.tsx'),
