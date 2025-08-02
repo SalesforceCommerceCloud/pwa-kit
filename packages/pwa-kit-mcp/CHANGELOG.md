@@ -1,4 +1,4 @@
-## v3.12.0-agents-and-basepaths-preview.0 (Aug 01, 2025)
+## v3.12.0-preview.0 (Aug 01, 2025)
 
 - Clean up readme [#](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/)
 - Add `create_app_guidelines` MCP tool  [#2663](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2663)

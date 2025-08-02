@@ -1,6 +1,6 @@
 {
   "name": "@salesforce/pwa-kit-mcp",
-  "version": "3.12.0-agents-and-basepaths-preview.0",
+  "version": "3.12.0-preview.0",
   "private": false,
   "description": "MCP server that helps you build Salesforce Commerce Cloud PWA Kit Composable Storefront",
   "main": "dist/server/server.js",
@@ -53,9 +53,9 @@
   "devDependencies": {
     "@babel/node": "^7.22.5",
     "@playwright/test": "^1.49.0",
-    "@salesforce/pwa-kit-dev": "3.12.0-agents-and-basepaths-preview.0",
+    "@salesforce/pwa-kit-dev": "3.12.0-preview.0",
     "cross-env": "^5.2.1",
-    "internal-lib-build": "3.12.0-agents-and-basepaths-preview.0",
+    "internal-lib-build": "3.12.0-preview.0",
     "nodemon": "^2.0.22"
   },
   "engines": {
