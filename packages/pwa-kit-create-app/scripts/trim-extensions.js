@@ -13,12 +13,14 @@ const path = require('path')
 const pluginConfig = require('../assets/plugin-config')
 const {execSync} = require('child_process')
 
-const removeComponentCandidates = [] // List of files that are candidates for removal, as a result of trimming.
+const removeComponentCandidates = new Set() // List of files that are candidates for removal, as a result of trimming.
 const SEPARATOR = path.sep // Use OS-specific path separator
 const COMPONENT_SCAN_PATHS = [
     `${SEPARATOR}src${SEPARATOR}components${SEPARATOR}`,
     `${SEPARATOR}src${SEPARATOR}pages${SEPARATOR}`,
-    `${SEPARATOR}src${SEPARATOR}hooks${SEPARATOR}`
+    `${SEPARATOR}src${SEPARATOR}hooks${SEPARATOR}`,
+    `${SEPARATOR}src${SEPARATOR}routes.tsx`,
+    `${SEPARATOR}config${SEPARATOR}constants.js`
 ]
 
 /**
@@ -28,6 +30,8 @@ const COMPONENT_SCAN_PATHS = [
  * @returns {void}
  */
 function trimExtensions(directory, generatedPlugins) {
+    // clear removeComponentCandidates for each run
+    removeComponentCandidates.clear()
     // read plugins from config file
     const configPlugins = pluginConfig.plugins || {}
     const plugins = {}
@@ -47,17 +51,23 @@ function trimExtensions(directory, generatedPlugins) {
             const filePath = path.join(dir, file)
             const stats = fs.statSync(filePath)
 
-            if (stats.isDirectory() && !filePath.includes('node_modules')) {
-                processDirectory(filePath)
-            } else if (file.endsWith('.jsx') || file.endsWith('.tsx')) {
-                processFile(filePath, plugins)
+            if (!filePath.includes('node_modules')) {
+                if (stats.isDirectory()) {
+                    processDirectory(filePath)
+                } else if (
+                    file.endsWith('.jsx') ||
+                    file.endsWith('.tsx') ||
+                    file.endsWith('.js') ||
+                    file.endsWith('.ts')
+                ) {
+                    processFile(filePath, plugins)
+                }
             }
         })
     }
 
     // Start recursive processing from root directory
     processDirectory(directory)
-
     removeUnusedComponents(directory)
 }
 
@@ -66,9 +76,17 @@ function processFile(filePath, plugins) {
     const source = fs.readFileSync(filePath, 'utf-8')
 
     // Search file content for plugin references
-    const pluginRegex = new RegExp(Object.keys(plugins).join('|'))
-    const hasPluginReferences = pluginRegex.test(source)
-    if (!hasPluginReferences) {
+    const pluginPositions = []
+    const pluginRegex = new RegExp(Object.keys(plugins).join('|'), 'g')
+    let match
+    while ((match = pluginRegex.exec(source)) !== null) {
+        pluginPositions.push({
+            start: match.index,
+            end: match.index + match[0].length,
+            name: match[0] // store which plugin was found
+        })
+    }
+    if (pluginPositions.length === 0) {
         // No plugins found in file, return early
         return false
     }
@@ -120,91 +138,105 @@ function processFile(filePath, plugins) {
         }
     }
 
+    const nodeContainsPluginReferences = (node) => {
+        // Check if any plugin reference falls within the node's range
+        return pluginPositions.some((pos) => pos.start >= node.start && pos.start < node.end)
+    }
+
     // Traverse AST and remove nodes guarded by plugin flags
     traverse(ast, {
         // Handle variable declarations like:
         // const HelloWorld = PLUGIN_NAME && loadable(...)
         VariableDeclaration(nodePath) {
-            nodePath.node.declarations.forEach((declaration) => {
-                if (declaration.init && declaration.init.type === 'LogicalExpression') {
-                    const shouldKeep = evaluateLogicalExpression(declaration.init)
-                    if (!shouldKeep) {
-                        // Extract import path if declaration is an import statement
-                        if (
-                            declaration.init.right &&
-                            declaration.init.right.type === 'CallExpression' &&
-                            declaration.init.right.callee &&
-                            declaration.init.right.callee.type === 'Identifier' &&
-                            declaration.init.right.callee.name === 'loadable'
-                        ) {
-                            // Extract the import path from the loadable call expression and add it to the list of candidates for removal later.
-                            const importArg = declaration.init.right.arguments[0]
+            if (nodeContainsPluginReferences(nodePath.node)) {
+                nodePath.node.declarations.forEach((declaration) => {
+                    if (declaration.init && declaration.init.type === 'LogicalExpression') {
+                        const shouldKeep = evaluateLogicalExpression(declaration.init)
+                        if (!shouldKeep) {
+                            // Extract import path if declaration is an import statement
                             if (
-                                importArg.type === 'ArrowFunctionExpression' &&
-                                importArg.body.type === 'CallExpression' &&
-                                importArg.body.callee.type === 'Import'
+                                declaration.init.right &&
+                                declaration.init.right.type === 'CallExpression' &&
+                                declaration.init.right.callee &&
+                                declaration.init.right.callee.type === 'Identifier' &&
+                                declaration.init.right.callee.name === 'loadable'
                             ) {
-                                const importPath = importArg.body.arguments[0].value
-                                removeComponentCandidates.push(
-                                    path.resolve(path.join(path.dirname(filePath), importPath))
-                                )
+                                // Extract the import path from the loadable call expression and add it to the list of candidates for removal later.
+                                const importArg = declaration.init.right.arguments[0]
+                                if (
+                                    importArg.type === 'ArrowFunctionExpression' &&
+                                    importArg.body.type === 'CallExpression' &&
+                                    importArg.body.callee.type === 'Import'
+                                ) {
+                                    const importPath = importArg.body.arguments[0].value
+                                    removeComponentCandidates.add(
+                                        path.resolve(path.join(path.dirname(filePath), importPath))
+                                    )
+                                }
                             }
+                            nodePath.remove()
+                        } else {
+                            declaration.init = findRightmostExpression(declaration.init)
                         }
-                        nodePath.remove()
-                    } else {
-                        declaration.init = findRightmostExpression(declaration.init)
+                        modified = true
+                    } else if (declaration?.init?.type === 'ConditionalExpression') {
+                        const testValue = evaluateLogicalExpression(declaration.init.test)
+                        if (testValue === true) {
+                            declaration.init = declaration.init.consequent
+                        } else {
+                            declaration.init = declaration.init.alternate
+                        }
+                        modified = true
                     }
-                    modified = true
-                } else if (declaration?.init?.type === 'ConditionalExpression') {
-                    const testValue = evaluateLogicalExpression(declaration.init.test)
-                    if (testValue === true) {
-                        declaration.init = declaration.init.consequent
-                    } else {
-                        declaration.init = declaration.init.alternate
-                    }
-                    modified = true
-                }
-            })
+                })
+            }
         },
 
         // Handle conditional expressions like:
         // {PLUGIN_NAME && [statement]}
         LogicalExpression(path) {
-            processPluginLogicalExpression(path)
+            if (nodeContainsPluginReferences(path.node)) {
+                processPluginLogicalExpression(path)
+            }
         },
 
         // Handle JSX elements in return statements that are guarded by plugin flags
         ReturnStatement(path) {
-            if (path.node.argument && path.node.argument.type === 'JSXElement') {
-                // Find JSX children that are guarded by plugin flags
-                const children = path.get('argument').get('children')
-                children.forEach((child) => {
-                    if (child.node.type === 'JSXExpressionContainer') {
-                        const expr = child.node.expression
-                        if (
-                            expr.type === 'LogicalExpression' ||
-                            expr.type === 'ConditionalExpression'
-                        ) {
-                            const exprPath = child.get('expression')
-                            try {
-                                processPluginLogicalExpression(exprPath)
-                            } catch (e) {
-                                console.error(
-                                    `Error processing plugin logical expression: ${exprPath}`
-                                )
+            if (nodeContainsPluginReferences(path.node)) {
+                if (path.node.argument && path.node.argument.type === 'JSXElement') {
+                    // Find JSX children that are guarded by plugin flags
+                    const children = path.get('argument').get('children')
+                    children.forEach((child) => {
+                        if (child.node.type === 'JSXExpressionContainer') {
+                            const expr = child.node.expression
+                            if (
+                                expr.type === 'LogicalExpression' ||
+                                expr.type === 'ConditionalExpression'
+                            ) {
+                                const exprPath = child.get('expression')
+                                try {
+                                    processPluginLogicalExpression(exprPath)
+                                } catch (e) {
+                                    console.error(
+                                        `Error processing plugin logical expression: ${exprPath}`
+                                    )
+                                }
                             }
                         }
+                    })
+                } else if (
+                    path.node.argument &&
+                    path.node.argument.type === 'ConditionalExpression'
+                ) {
+                    // Handle top-level ternary in return statement
+                    const testValue = evaluateLogicalExpression(path.node.argument.test)
+                    if (testValue === true) {
+                        path.node.argument = path.node.argument.consequent
+                    } else {
+                        path.node.argument = path.node.argument.alternate
                     }
-                })
-            } else if (path.node.argument && path.node.argument.type === 'ConditionalExpression') {
-                // Handle top-level ternary in return statement
-                const testValue = evaluateLogicalExpression(path.node.argument.test)
-                if (testValue === true) {
-                    path.node.argument = path.node.argument.consequent
-                } else {
-                    path.node.argument = path.node.argument.alternate
+                    modified = true
                 }
-                modified = true
             }
         }
     })
@@ -319,8 +351,11 @@ function removeUnusedComponents(directory) {
                                 // Go up one level so that we can compare the parent directory path
                                 absoluteImportPath = path.resolve(path.dirname(absoluteImportPath))
                             }
-                            // If this import matches any exported file, remove it from the set
-                            if (exportedFiles.has(absoluteImportPath)) {
+                            // If this import matches any exported file and it's not from one of the component candidates, remove it from the set
+                            const isCandidate = Array.from(removeComponentCandidates).find(
+                                (candidate) => candidate === path.resolve(path.dirname(filePath))
+                            )
+                            if (exportedFiles.has(absoluteImportPath) && !isCandidate) {
                                 exportedFiles.delete(absoluteImportPath)
                             }
                         }
@@ -353,9 +388,7 @@ function removeUnusedComponents(directory) {
         })
 
     // Output results
-    const filesToRemove = unusedFiles.filter((filePath) =>
-        removeComponentCandidates.includes(filePath)
-    )
+    const filesToRemove = unusedFiles.filter((filePath) => removeComponentCandidates.has(filePath))
     if (filesToRemove.length > 0) {
         console.log('\nDeleting unused components:')
         filesToRemove.forEach((file) => {

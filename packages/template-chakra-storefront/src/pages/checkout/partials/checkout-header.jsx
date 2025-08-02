@@ -4,8 +4,8 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React from 'react'
-import {FormattedMessage, useIntl} from 'react-intl'
+import React, {useMemo} from 'react'
+import {useIntl} from 'react-intl'
 import {Badge, Box, Button, Flex, Center} from '@chakra-ui/react'
 import Link from '../../../components/link'
 import {BasketIcon, BrandLogo} from '../../../components/icons'
@@ -14,12 +14,31 @@ import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 
 const CheckoutHeader = () => {
     const intl = useIntl()
+    const {formatMessage} = intl
     const {
         derivedData: {totalItems}
     } = useCurrentBasket()
     const {
         pages: {home: homeConfig}
     } = getConfig()
+
+    const messages = useMemo(
+        () => ({
+            backToCart: formatMessage({
+                id: 'checkout_header.link.cart',
+                defaultMessage: 'Back to cart'
+            }),
+            cartAriaLabel: formatMessage(
+                {
+                    id: 'checkout_header.link.assistive_msg.cart',
+                    defaultMessage: 'Back to cart, number of items: {numItems}'
+                },
+                {numItems: totalItems}
+            )
+        }),
+        [intl]
+    )
+
     return (
         <Box px={[4, 4, 8]} bg="white" borderBottom="1px" borderColor="gray.100">
             <Box maxWidth="container.xxxl" marginLeft="auto" marginRight="auto">
@@ -33,28 +52,21 @@ const CheckoutHeader = () => {
 
                     <Button
                         as={Link}
+                        padding={0}
                         href="/cart"
                         display="inline-flex"
                         variant="unstyled"
                         color="gray.900"
-                        rightIcon={
-                            <Center position="relative" width={11} height={11}>
-                                <BasketIcon position="absolute" left="0px" />
-                                <Badge variant="notification">{totalItems}</Badge>
-                            </Center>
-                        }
-                        aria-label={intl.formatMessage(
-                            {
-                                id: 'checkout_header.link.assistive_msg.cart',
-                                defaultMessage: 'Back to cart, number of items: {numItems}'
-                            },
-                            {numItems: totalItems}
-                        )}
+                        fontWeight="semibold"
+                        aria-label={messages.cartAriaLabel}
                     >
-                        <FormattedMessage
-                            defaultMessage="Back to cart"
-                            id="checkout_header.link.cart"
-                        />
+                        {messages.backToCart}
+                        <Center position="relative" width={11} height={11}>
+                            <BasketIcon position="absolute" left="0px" />
+                            <Badge variant="notification" padding={0}>
+                                {totalItems}
+                            </Badge>
+                        </Center>
                     </Button>
                 </Flex>
             </Box>

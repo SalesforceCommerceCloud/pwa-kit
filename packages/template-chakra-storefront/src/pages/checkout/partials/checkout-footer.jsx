@@ -4,80 +4,88 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React from 'react'
+import React, {useMemo} from 'react'
 import PropTypes from 'prop-types'
 import {useIntl} from 'react-intl'
 import {
     Box,
-    StylesProvider,
-    useMultiStyleConfig,
-    Divider,
-    Text,
-    HStack,
     Flex,
+    HStack,
     Spacer,
-    useStyles
+    Separator,
+    Text,
+
+    // hooks
+    useSlotRecipe
 } from '@chakra-ui/react'
 import LinksList from '../../../components/links-list'
 import {VisaIcon, MastercardIcon, AmexIcon, DiscoverIcon} from '../../../components/icons'
 import {HideOnDesktop, HideOnMobile} from '../../../components/responsive'
 
 const CheckoutFooter = ({...otherProps}) => {
-    const styles = useMultiStyleConfig('CheckoutFooter')
+    const recipe = useSlotRecipe({key: 'checkoutFooter'})
+    const styles = recipe()
     const intl = useIntl()
+    const {formatMessage} = intl
+
+    const messages = useMemo(
+        () => ({
+            shipping: formatMessage({
+                id: 'checkout_footer.link.shipping',
+                defaultMessage: 'Shipping'
+            }),
+            returnsExchanges: formatMessage({
+                id: 'checkout_footer.link.returns_exchanges',
+                defaultMessage: 'Returns & Exchanges'
+            }),
+            copyright: formatMessage({
+                id: 'checkout_footer.message.copyright',
+                defaultMessage:
+                    'Salesforce or its affiliates. All rights reserved. This is a demo store only. Orders made WILL NOT be processed.'
+            })
+        }),
+        [intl]
+    )
 
     return (
-        <Box as="footer" {...styles.container} {...otherProps}>
-            <Box {...styles.content}>
-                <StylesProvider value={styles}>
-                    <LinksList
-                        links={[
-                            {
-                                href: '/',
-                                text: intl.formatMessage({
-                                    id: 'checkout_footer.link.shipping',
-                                    defaultMessage: 'Shipping'
-                                })
-                            },
-                            {
-                                href: '/',
-                                text: intl.formatMessage({
-                                    id: 'checkout_footer.link.returns_exchanges',
-                                    defaultMessage: 'Returns & Exchanges'
-                                })
-                            }
-                        ]}
-                        {...styles.customerService}
-                    />
+        <Box as="footer" css={styles.container} {...otherProps}>
+            <Box css={styles.content}>
+                <LinksList
+                    links={[
+                        {
+                            href: '/',
+                            text: messages.shipping
+                        },
+                        {
+                            href: '/',
+                            text: messages.returnsExchanges
+                        }
+                    ]}
+                    css={styles.customerService}
+                />
+
+                <HideOnDesktop>
+                    <CreditCardIcons marginTop={4} marginBottom={4} />
+                </HideOnDesktop>
+
+                <Separator css={styles.horizontalRule} />
+
+                <Box css={styles.legalSection}>
+                    <Text css={styles.copyright}>
+                        &copy; {new Date().getFullYear()} {messages.copyright}
+                    </Text>
 
                     <HideOnDesktop>
-                        <CreditCardIcons marginTop={4} marginBottom={4} />
+                        <LegalLinks variant="vertical" />
                     </HideOnDesktop>
-
-                    <Divider {...styles.horizontalRule} />
-
-                    <Box {...styles.bottomHalf}>
-                        <Text {...styles.copyright}>
-                            &copy; {new Date().getFullYear()}{' '}
-                            {intl.formatMessage({
-                                id: 'checkout_footer.message.copyright',
-                                defaultMessage:
-                                    'Salesforce or its affiliates. All rights reserved. This is a demo store only. Orders made WILL NOT be processed.'
-                            })}
-                        </Text>
-
-                        <HideOnDesktop>
-                            <LegalLinks variant="vertical" />
-                        </HideOnDesktop>
-                        <HideOnMobile>
-                            <Flex>
-                                <LegalLinks variant="horizontal" />
-                                <Spacer />
-                                <CreditCardIcons />
-                            </Flex>
-                        </HideOnMobile>
-                    </Box>
-                </StylesProvider>
+                    <HideOnMobile>
+                        <Flex>
+                            <LegalLinks variant="horizontal" />
+                            <Spacer />
+                            <CreditCardIcons />
+                        </Flex>
+                    </HideOnMobile>
+                </Box>
             </Box>
         </Box>
     )
@@ -86,31 +94,37 @@ const CheckoutFooter = ({...otherProps}) => {
 export default CheckoutFooter
 
 const LegalLinks = ({variant}) => {
-    const intl = useIntl()
+    const {formatMessage} = useIntl()
+
+    const messages = {
+        termsConditions: formatMessage({
+            id: 'checkout_footer.link.terms_conditions',
+            defaultMessage: 'Terms & Conditions'
+        }),
+        privacyPolicy: formatMessage({
+            id: 'checkout_footer.link.privacy_policy',
+            defaultMessage: 'Privacy Policy'
+        }),
+        siteMap: formatMessage({
+            id: 'checkout_footer.link.site_map',
+            defaultMessage: 'Site Map'
+        })
+    }
 
     return (
         <LinksList
             links={[
                 {
                     href: '/',
-                    text: intl.formatMessage({
-                        id: 'checkout_footer.link.terms_conditions',
-                        defaultMessage: 'Terms & Conditions'
-                    })
+                    text: messages.termsConditions
                 },
                 {
                     href: '/',
-                    text: intl.formatMessage({
-                        id: 'checkout_footer.link.privacy_policy',
-                        defaultMessage: 'Privacy Policy'
-                    })
+                    text: messages.privacyPolicy
                 },
                 {
                     href: '/',
-                    text: intl.formatMessage({
-                        id: 'checkout_footer.link.site_map',
-                        defaultMessage: 'Site Map'
-                    })
+                    text: messages.siteMap
                 }
             ]}
             color="gray.200"
@@ -123,13 +137,14 @@ LegalLinks.propTypes = {
 }
 
 const CreditCardIcons = (props) => {
-    const styles = useStyles()
+    const recipe = useSlotRecipe({key: 'checkoutFooter'})
+    const styles = recipe()
     return (
         <HStack sizing={2} {...props}>
-            <VisaIcon {...styles.creditCardIcon} />
-            <MastercardIcon {...styles.creditCardIcon} />
-            <AmexIcon {...styles.creditCardIcon} />
-            <DiscoverIcon {...styles.creditCardIcon} />
+            <VisaIcon css={styles.creditCardIcon} />
+            <MastercardIcon css={styles.creditCardIcon} />
+            <AmexIcon css={styles.creditCardIcon} />
+            <DiscoverIcon css={styles.creditCardIcon} />
         </HStack>
     )
 }

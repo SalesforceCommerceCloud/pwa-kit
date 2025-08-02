@@ -26,7 +26,7 @@ const options = {
     defaultCacheTimeSeconds: 600,
 
     // The contents of the config file for the current environment
-    mobify: config.mobify,
+    mobify: config,
 
     // The port that the local dev server listens on
     port: 3000,
@@ -216,9 +216,9 @@ const throwSlasTokenValidationError = (message, code) => {
 
 export const createRemoteJWKSet = (tenantId) => {
     const appOrigin = getAppOrigin()
-    const {app: appConfig} = getConfig()
-    const shortCode = appConfig.commerceAPI.parameters.shortCode
-    const configTenantId = appConfig.commerceAPI.parameters.organizationId.replace(/^f_ecom_/, '')
+    const config = getConfig()
+    const shortCode = config.commerceAPI.parameters.shortCode
+    const configTenantId = config.commerceAPI.parameters.organizationId.replace(/^f_ecom_/, '')
     if (tenantId !== configTenantId) {
         throw new Error(
             `The tenant ID in your PWA Kit configuration ("${configTenantId}") does not match the tenant ID in the SLAS callback token ("${tenantId}").`
@@ -357,8 +357,8 @@ const {handler} = runtime.createHandler(options, (app) => {
         })
     })
 
-    app.get('/robots.txt', runtime.serveStaticFile('../../static/robots.txt'))
-    app.get('/favicon.ico', runtime.serveStaticFile('../../static/ico/favicon.ico'))
+    app.get('/robots.txt', runtime.serveStaticFile('static/robots.txt'))
+    app.get('/favicon.ico', runtime.serveStaticFile('static/ico/favicon.ico'))
 
     app.get('/worker.js(.map)?', runtime.serveServiceWorker)
     app.get('*', runtime.render)

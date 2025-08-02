@@ -8,13 +8,27 @@
 import {renderHook, act} from '@testing-library/react'
 import {useMarketingConsent} from './use-marketing-consent'
 import {CONSENT_STATUS, CONSENT_CHANNELS, CONSENT_TAGS} from '../constants/marketing-consent'
-import fetchMock from 'jest-fetch-mock'
+import {
+    useShopperConsent,
+    useShopperConsentMutation
+} from '@salesforce/commerce-sdk-react/hooks/ShopperConsents'
 
-// Mock dependencies
-jest.mock('@salesforce/commerce-sdk-react', () => ({
-    useAccessToken: () => ({
-        getTokenWhenReady: jest.fn().mockResolvedValue('mock-token')
-    })
+// Mock ShopperConsents hooks
+const mockFetchConsentItems = jest.fn()
+const mockSubmitConsent = jest.fn()
+
+jest.mock('@salesforce/commerce-sdk-react/hooks/ShopperConsents', () => ({
+    useShopperConsent: jest.fn(() => ({
+        data: null,
+        isLoading: false,
+        error: null,
+        fetchConsentItems: mockFetchConsentItems
+    })),
+    useShopperConsentMutation: jest.fn(() => ({
+        isLoading: false,
+        error: null,
+        submitConsent: mockSubmitConsent
+    }))
 }))
 
 jest.mock('@salesforce/pwa-kit-runtime/utils/ssr-config', () => ({
@@ -30,8 +44,8 @@ jest.mock('@salesforce/pwa-kit-runtime/utils/ssr-config', () => ({
 jest.mock('./use-multi-site', () => ({
     __esModule: true,
     default: () => ({
-        site: {id: 'test-site'},
-        locale: {id: 'en-US'}
+        site: {id: mockSiteId},
+        locale: {id: mockLocale}
     })
 }))
 
@@ -39,43 +53,32 @@ jest.mock('../utils/logger-instance', () => ({
     error: jest.fn()
 }))
 
+// Create typed mock references
+const mockUseShopperConsent = jest.mocked(useShopperConsent)
+const mockUseShopperConsentMutation = jest.mocked(useShopperConsentMutation)
+
+const mockSiteId = 'test-site'
+const mockLocale = 'en-US'
+
 const mockApiResponse = {
     data: [
         {
-            subscriptionId: 'api-newsletter',
-            contactPointValue: 'api@test.com',
+            subscriptionId: 'mock-api-newsletter',
+            contactPointValue: 'mock-api@test.com',
             channel: CONSENT_CHANNELS.EMAIL,
             status: CONSENT_STATUS.OPT_IN,
-            title: 'API Newsletter',
-            subtitle: 'Newsletter from API',
-            tags: [CONSENT_TAGS.HOMEPAGE_BANNER]
-        },
-        {
-            subscriptionId: 'weekly-newsletter',
-            contactPointValue: 'test@test.com',
-            channel: CONSENT_CHANNELS.EMAIL,
-            status: CONSENT_STATUS.OPT_IN,
-            title: 'Weekly Newsletter',
-            subtitle: 'Get our weekly newsletter with the latest updates.',
+            title: 'Mock Promotion Newsletter',
+            subtitle: 'Promotion from Mock',
             tags: [CONSENT_TAGS.HOMEPAGE_BANNER, CONSENT_TAGS.USER_PROFILE]
         },
         {
-            subscriptionId: 'weekly-newsletter',
-            contactPointValue: '+1 555 321 7654',
-            channel: CONSENT_CHANNELS.WHATSAPP,
+            subscriptionId: 'mock-weekly-newsletter',
+            contactPointValue: 'mock-test@test.com',
+            channel: CONSENT_CHANNELS.EMAIL,
             status: CONSENT_STATUS.OPT_IN,
-            title: 'Weekly Newsletter',
+            title: 'Mock Weekly Newsletter',
             subtitle: 'Get our weekly newsletter with the latest updates.',
-            tags: [CONSENT_TAGS.USER_PROFILE]
-        },
-        {
-            subscriptionId: 'promotional-offers',
-            contactPointValue: '+1 555 123 4567',
-            channel: CONSENT_CHANNELS.SMS,
-            status: CONSENT_STATUS.OPT_OUT,
-            title: 'Promotional Offers',
-            subtitle: 'Receive special promotional offers.',
-            tags: [CONSENT_TAGS.CHECKOUT_PAGE]
+            tags: [CONSENT_TAGS.HOMEPAGE_BANNER, CONSENT_TAGS.USER_PROFILE]
         }
     ]
 }
@@ -91,66 +94,64 @@ const mockSubmitResponse = {
 }
 
 describe('useMarketingConsent', () => {
-    const fetchOriginal = global.fetch
-
     beforeEach(() => {
-        global.fetch = fetchMock
-        fetchMock.resetMocks()
-    })
-
-    afterAll(() => {
-        global.fetch = fetchOriginal
+        mockFetchConsentItems.mockReset()
+        mockSubmitConsent.mockReset()
+        mockUseShopperConsent.mockClear()
+        mockUseShopperConsentMutation.mockClear()
     })
 
     describe('fetchConsentItems', () => {
         test('returns API data on successful fetch', async () => {
-            fetchMock.mockResponseOnce(JSON.stringify(mockApiResponse))
+            mockFetchConsentItems.mockResolvedValueOnce(mockApiResponse)
 
             const {result} = renderHook(() => useMarketingConsent())
 
             let fetchResult
             await act(async () => {
-                fetchResult = await result.current.fetchConsentItems('HOMEPAGE_BANNER')
+                fetchResult = await result.current.fetchConsentItems(CONSENT_TAGS.HOMEPAGE_BANNER)
             })
 
             expect(fetchResult).toEqual(mockApiResponse)
-            expect(result.current.isLoading).toBe(false)
-            expect(result.current.error).toBeNull()
+            expect(mockFetchConsentItems).toHaveBeenCalledWith(CONSENT_TAGS.HOMEPAGE_BANNER)
         })
 
         test('returns stub data when API fails', async () => {
-            fetchMock.mockRejectOnce(new Error('API Error'))
+            const error = new Error('API Error')
+            mockFetchConsentItems.mockRejectedValueOnce(error)
 
             const {result} = renderHook(() => useMarketingConsent())
 
+            let fetchResult
             await act(async () => {
-                try {
-                    await result.current.fetchConsentItems('HOMEPAGE_BANNER')
-                } catch (error) {
-                    // Expected to throw
-                }
+                fetchResult = await result.current.fetchConsentItems(CONSENT_TAGS.HOMEPAGE_BANNER)
             })
 
-            expect(result.current.error).toBe('API Error')
-        })
-
-        test('includes tags in query params when provided', async () => {
-            fetchMock.mockResponseOnce(JSON.stringify(mockApiResponse))
-
-            const {result} = renderHook(() => useMarketingConsent())
-
-            await act(async () => {
-                await result.current.fetchConsentItems('HOMEPAGE_BANNER')
-            })
-
-            expect(fetchMock).toHaveBeenCalledWith(
-                expect.stringContaining('tags=HOMEPAGE_BANNER'),
-                expect.any(Object)
+            expect(mockFetchConsentItems).toHaveBeenCalledWith(CONSENT_TAGS.HOMEPAGE_BANNER)
+            expect(fetchResult.data).toHaveLength(3)
+            // Should return the submit stub data
+            expect(fetchResult.data[0]).toEqual(
+                expect.objectContaining({
+                    subscriptionId: 'weekly-newsletter',
+                    contactPointValue: 'test@test.com'
+                })
             )
         })
 
-        test('excludes tags from query params when not provided', async () => {
-            fetchMock.mockResponseOnce(JSON.stringify(mockApiResponse))
+        test('calls fetchConsentItems with correct parameters', async () => {
+            mockFetchConsentItems.mockResolvedValueOnce(mockApiResponse)
+
+            const {result} = renderHook(() => useMarketingConsent())
+
+            await act(async () => {
+                await result.current.fetchConsentItems(CONSENT_TAGS.HOMEPAGE_BANNER)
+            })
+
+            expect(mockFetchConsentItems).toHaveBeenCalledWith(CONSENT_TAGS.HOMEPAGE_BANNER)
+        })
+
+        test('calls fetchConsentItems without tags when not provided', async () => {
+            mockFetchConsentItems.mockResolvedValueOnce(mockApiResponse)
 
             const {result} = renderHook(() => useMarketingConsent())
 
@@ -158,24 +159,7 @@ describe('useMarketingConsent', () => {
                 await result.current.fetchConsentItems()
             })
 
-            expect(fetchMock).toHaveBeenCalledWith(
-                expect.not.stringContaining('tags='),
-                expect.any(Object)
-            )
-        })
-
-        test('returns stub data when API returns error status', async () => {
-            fetchMock.mockResponseOnce('', {status: 404})
-
-            const {result} = renderHook(() => useMarketingConsent())
-
-            let fetchResult
-            await act(async () => {
-                fetchResult = await result.current.fetchConsentItems('HOMEPAGE_BANNER')
-            })
-
-            expect(fetchResult).toBeDefined()
-            expect(fetchResult.data).toHaveLength(3) // stub data has 3 items
+            expect(mockFetchConsentItems).toHaveBeenCalledWith(undefined)
         })
     })
 
@@ -184,11 +168,11 @@ describe('useMarketingConsent', () => {
             subscriptionId: 'weekly-newsletter',
             contactPointValue: 'user@test.com',
             channel: CONSENT_CHANNELS.EMAIL,
-            consent: CONSENT_STATUS.OPT_IN
+            status: CONSENT_STATUS.OPT_IN
         }
 
         test('returns API response on successful submission', async () => {
-            fetchMock.mockResponseOnce(JSON.stringify(mockSubmitResponse))
+            mockSubmitConsent.mockResolvedValueOnce(mockSubmitResponse)
 
             const {result} = renderHook(() => useMarketingConsent())
 
@@ -198,12 +182,11 @@ describe('useMarketingConsent', () => {
             })
 
             expect(submitResult).toEqual(mockSubmitResponse)
-            expect(result.current.isLoading).toBe(false)
-            expect(result.current.error).toBeNull()
+            expect(mockSubmitConsent).toHaveBeenCalledWith(mockConsentItem)
         })
 
-        test('sends correct request body', async () => {
-            fetchMock.mockResponseOnce(JSON.stringify(mockSubmitResponse))
+        test('calls submitConsent with correct parameters', async () => {
+            mockSubmitConsent.mockResolvedValueOnce(mockSubmitResponse)
 
             const {result} = renderHook(() => useMarketingConsent())
 
@@ -211,37 +194,12 @@ describe('useMarketingConsent', () => {
                 await result.current.submitConsent(mockConsentItem)
             })
 
-            expect(fetchMock).toHaveBeenCalledWith(
-                expect.stringContaining('/subscriptions'),
-                expect.objectContaining({
-                    method: 'POST',
-                    headers: expect.objectContaining({
-                        Authorization: 'Bearer mock-token',
-                        'Content-Type': 'application/json'
-                    }),
-                    body: JSON.stringify(mockConsentItem)
-                })
-            )
+            expect(mockSubmitConsent).toHaveBeenCalledWith(mockConsentItem)
         })
 
         test('returns stub data when API fails', async () => {
-            fetchMock.mockRejectOnce(new Error('Submit Error'))
-
-            const {result} = renderHook(() => useMarketingConsent())
-
-            await act(async () => {
-                try {
-                    await result.current.submitConsent(mockConsentItem)
-                } catch (error) {
-                    // Expected to throw
-                }
-            })
-
-            expect(result.current.error).toBe('Submit Error')
-        })
-
-        test('returns stub data when API returns error status', async () => {
-            fetchMock.mockResponseOnce('', {status: 400})
+            const error = new Error('Submit Error')
+            mockSubmitConsent.mockRejectedValueOnce(error)
 
             const {result} = renderHook(() => useMarketingConsent())
 
@@ -250,63 +208,85 @@ describe('useMarketingConsent', () => {
                 submitResult = await result.current.submitConsent(mockConsentItem)
             })
 
+            // Should return the submit stub data
             expect(submitResult).toEqual(
                 expect.objectContaining({
                     subscriptionId: 'weekly-newsletter',
                     status: CONSENT_STATUS.OPT_IN
                 })
             )
+            expect(mockSubmitConsent).toHaveBeenCalledWith(mockConsentItem)
         })
     })
 
-    describe('loading states', () => {
-        test('sets loading state during fetchConsentItems', async () => {
-            let resolvePromise
-            const promise = new Promise((resolve) => {
-                resolvePromise = resolve
+    describe('loading and error states', () => {
+        test('reflects loading state from consent items hook', () => {
+            mockUseShopperConsent.mockReturnValueOnce({
+                data: null,
+                isLoading: true,
+                error: null,
+                fetchConsentItems: mockFetchConsentItems
             })
-            fetchMock.mockReturnValueOnce(promise)
 
             const {result} = renderHook(() => useMarketingConsent())
 
-            act(() => {
-                result.current.fetchConsentItems('HOMEPAGE_BANNER')
-            })
-
             expect(result.current.isLoading).toBe(true)
-
-            await act(async () => {
-                resolvePromise(new Response(JSON.stringify(mockApiResponse)))
-            })
-
-            expect(result.current.isLoading).toBe(false)
         })
 
-        test('sets loading state during submitConsent', async () => {
-            let resolvePromise
-            const promise = new Promise((resolve) => {
-                resolvePromise = resolve
+        test('reflects loading state from create consent hook', () => {
+            mockUseShopperConsentMutation.mockReturnValueOnce({
+                isLoading: true,
+                error: null,
+                submitConsent: mockSubmitConsent
             })
-            fetchMock.mockReturnValueOnce(promise)
 
             const {result} = renderHook(() => useMarketingConsent())
 
-            act(() => {
-                result.current.submitConsent({
-                    subscriptionId: 'test',
-                    contactPointValue: 'test@test.com',
-                    channel: CONSENT_CHANNELS.EMAIL,
-                    consent: CONSENT_STATUS.OPT_IN
-                })
+            expect(result.current.isLoading).toBe(true)
+        })
+
+        test('reflects error state from consent items hook', () => {
+            mockUseShopperConsent.mockReturnValueOnce({
+                data: null,
+                isLoading: false,
+                error: 'Fetch Error',
+                fetchConsentItems: mockFetchConsentItems
             })
+
+            const {result} = renderHook(() => useMarketingConsent())
+
+            expect(result.current.error).toBe('Fetch Error')
+        })
+
+        test('reflects error state from create consent hook', () => {
+            mockUseShopperConsentMutation.mockReturnValueOnce({
+                isLoading: false,
+                error: 'Create Error',
+                submitConsent: mockSubmitConsent
+            })
+
+            const {result} = renderHook(() => useMarketingConsent())
+
+            expect(result.current.error).toBe('Create Error')
+        })
+
+        test('combines loading states from both hooks', () => {
+            mockUseShopperConsent.mockReturnValueOnce({
+                data: null,
+                isLoading: true,
+                error: null,
+                fetchConsentItems: mockFetchConsentItems
+            })
+
+            mockUseShopperConsentMutation.mockReturnValueOnce({
+                isLoading: false,
+                error: null,
+                submitConsent: mockSubmitConsent
+            })
+
+            const {result} = renderHook(() => useMarketingConsent())
 
             expect(result.current.isLoading).toBe(true)
-
-            await act(async () => {
-                resolvePromise(new Response(JSON.stringify(mockSubmitResponse)))
-            })
-
-            expect(result.current.isLoading).toBe(false)
         })
     })
 
@@ -318,6 +298,24 @@ describe('useMarketingConsent', () => {
             expect(result.current.error).toBeNull()
             expect(typeof result.current.fetchConsentItems).toBe('function')
             expect(typeof result.current.submitConsent).toBe('function')
+        })
+    })
+
+    describe('hook configuration', () => {
+        test('configures ShopperConsents hooks with correct parameters', () => {
+            renderHook(() => useMarketingConsent())
+
+            expect(mockUseShopperConsent).toHaveBeenCalledWith({
+                organizationId: 'test-org-id',
+                siteId: mockSiteId,
+                locale: mockLocale
+            })
+
+            expect(mockUseShopperConsentMutation).toHaveBeenCalledWith({
+                organizationId: 'test-org-id',
+                siteId: mockSiteId,
+                locale: mockLocale
+            })
         })
     })
 })

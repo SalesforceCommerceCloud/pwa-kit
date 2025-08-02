@@ -9,8 +9,8 @@ import Cookies from 'js-cookie'
 import logger from '../utils/logger-instance'
 import {initDataCloudSdk} from '@salesforce/cc-datacloud-typescript'
 import {useUsid, useCustomerType, useDNT} from '@salesforce/commerce-sdk-react'
-import useMultiSite from './use-multi-site'
-import {useCurrentCustomer} from './use-current-customer'
+import useMultiSite from '../hooks/use-multi-site'
+import {useCurrentCustomer} from '../hooks/use-current-customer'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 
 export class DataCloudApi {

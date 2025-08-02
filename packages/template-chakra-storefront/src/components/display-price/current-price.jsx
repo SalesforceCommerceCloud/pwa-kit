@@ -5,11 +5,11 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React from 'react'
+import React, {useMemo} from 'react'
 import PropTypes from 'prop-types'
 import {Text, VisuallyHidden} from '@chakra-ui/react'
 import {useIntl} from 'react-intl'
-import msg from './messages'
+import msg from '../../components/display-price/messages'
 
 /**
  * Component that displays current price of a product with a11y
@@ -23,33 +23,42 @@ import msg from './messages'
  */
 const CurrentPrice = ({labelForA11y, price, as, isRange = false, currency, ...extraProps}) => {
     const intl = useIntl()
-    const currentPriceText = intl.formatNumber(price, {
+    const {formatMessage, formatNumber} = intl
+    const currentPriceText = formatNumber(price, {
         style: 'currency',
         currency
     })
+
+    const messages = useMemo(
+        () => ({
+            currentPriceWithRange: formatMessage(msg.currentPriceWithRange, {
+                currentPrice: currentPriceText
+            }),
+            ariaLabels: {
+                currentPrice: formatMessage(msg.ariaLabelCurrentPrice, {
+                    currentPrice: currentPriceText
+                }),
+                currentPriceWithRange: formatMessage(msg.ariaLabelCurrentPriceWithRange, {
+                    currentPrice: currentPriceText
+                })
+            }
+        }),
+        [intl, currentPriceText]
+    )
+
     return (
         <>
             {isRange ? (
                 <Text
                     as={as}
                     {...extraProps}
-                    aria-live={'polite'}
-                    aria-label={intl.formatMessage(msg.ariaLabelCurrentPriceWithRange, {
-                        currentPrice: currentPriceText
-                    })}
+                    aria-live="polite"
+                    aria-label={messages.ariaLabels.currentPriceWithRange}
                 >
-                    {intl.formatMessage(msg.currentPriceWithRange, {
-                        currentPrice: currentPriceText
-                    })}
+                    {messages.currentPriceWithRange}
                 </Text>
             ) : (
-                <Text
-                    as={as}
-                    {...extraProps}
-                    aria-label={intl.formatMessage(msg.ariaLabelCurrentPrice, {
-                        currentPrice: currentPriceText
-                    })}
-                >
+                <Text as={as} {...extraProps} aria-label={messages.ariaLabels.currentPrice}>
                     {currentPriceText}
                 </Text>
             )}
@@ -57,12 +66,8 @@ const CurrentPrice = ({labelForA11y, price, as, isRange = false, currency, ...ex
             <VisuallyHidden aria-live="polite" aria-atomic={true}>
                 {labelForA11y}
                 {isRange
-                    ? intl.formatMessage(msg.ariaLabelCurrentPriceWithRange, {
-                          currentPrice: currentPriceText
-                      })
-                    : intl.formatMessage(msg.ariaLabelCurrentPrice, {
-                          currentPrice: currentPriceText
-                      })}
+                    ? messages.ariaLabels.currentPriceWithRange
+                    : messages.ariaLabels.currentPrice}
             </VisuallyHidden>
         </>
     )

@@ -1,50 +1,33 @@
 /*
- * Copyright (c) 2021, salesforce.com, inc.
+ * Copyright (c) 2025, salesforce.com, inc.
  * All rights reserved.
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-const mdSize = {height: 11, borderRadius: 'base'}
+import {defineRecipe} from '@chakra-ui/react'
 
-export default {
-    sizes: {
-        md: {
-            field: {...mdSize, px: 3},
-            addon: mdSize
-        }
-    },
-    baseStyle: {
-        field: {
-            _focus: {
-                borderColor: 'blue.600'
-            }
+export default defineRecipe({
+    base: {
+        _focusVisible: {
+            background: 'transparent',
+            borderColor: 'blue.500',
+            focusRingColor: 'blue.500'
         }
     },
     variants: {
-        outline: {
-            field: {
+        variant: {
+            outline: {
                 borderColor: 'gray.500'
-            }
-        },
-        filled: {
-            // we use filled variant for
-            // search input
-            field: {
-                borderColor: 'gray.600',
-                backgroundColor: 'gray.100',
-                _focus: {
-                    backgroundColor: 'white'
-                },
-                _hover: {
-                    backgroundColor: 'gray.100',
-                    _focus: {
-                        backgroundColor: 'white'
-                    }
-                },
-                _placeholder: {
-                    color: 'gray.700'
-                }
+            },
+            // Note: Chakra v3 input has removed filled variant
+            // we added it back to preserve the style in the template
+            filled: {
+                border: '1px solid {colors.gray.600}',
+                backgroundColor: 'gray.100'
             }
         }
+    },
+    defaultVariants: {
+        size: 'lg'
     }
-}
+})

@@ -31,7 +31,7 @@ const MarketingConsentCard = () => {
             title={
                 <Skeleton ref={headingRef}>
                     <FormattedMessage
-                        defaultMessage="Messaging Preferences"
+                        defaultMessage="Marketing Communication Preferences"
                         id="consent_card.title.my_communications"
                     />
                 </Skeleton>

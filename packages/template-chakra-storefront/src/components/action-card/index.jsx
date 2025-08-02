@@ -4,11 +4,11 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React, {useState} from 'react'
+import React, {useState, useMemo} from 'react'
 import PropTypes from 'prop-types'
 import {Stack, Box, Button} from '@chakra-ui/react'
-import {FormattedMessage} from 'react-intl'
-import LoadingSpinner from '../loading-spinner'
+import {useIntl} from 'react-intl'
+import LoadingSpinner from '../../components/loading-spinner'
 
 /**
  * Renders a card-style box with optional edit and remove buttons. Used for
@@ -26,6 +26,22 @@ const ActionCard = ({
     ...props
 }) => {
     const [showLoading, setShowLoading] = useState(false)
+    const intl = useIntl()
+    const {formatMessage} = intl
+
+    const messages = useMemo(
+        () => ({
+            edit: formatMessage({
+                id: 'action_card.action.edit',
+                defaultMessage: 'Edit'
+            }),
+            remove: formatMessage({
+                id: 'action_card.action.remove',
+                defaultMessage: 'Remove'
+            })
+        }),
+        [intl]
+    )
 
     const handleRemove = async () => {
         setShowLoading(true)
@@ -38,42 +54,36 @@ const ActionCard = ({
 
     return (
         <Box
-            spacing={4}
-            p={4}
+            p="4"
             position="relative"
             border="1px solid"
             borderColor="gray.100"
-            borderRadius="base"
+            rounded="md"
             {...props}
         >
             {showLoading && <LoadingSpinner />}
-            <Stack spacing={3}>
+            <Stack gap="3">
                 <Box>{children}</Box>
-                <Stack direction="row" spacing={4}>
+                <Stack direction="row" gap="4">
                     {onEdit && (
                         <Button
                             onClick={onEdit}
-                            variant="link"
+                            variant="link-blue"
                             size="sm"
                             ref={editBtnRef}
                             aria-label={editBtnLabel}
                         >
-                            <FormattedMessage defaultMessage="Edit" id="action_card.action.edit" />
+                            {messages.edit}
                         </Button>
                     )}
                     {onRemove && (
                         <Button
-                            variant="link"
+                            variant="link-red"
                             size="sm"
-                            colorScheme="red"
                             onClick={handleRemove}
-                            color="red.600"
                             aria-label={removeBtnLabel}
                         >
-                            <FormattedMessage
-                                defaultMessage="Remove"
-                                id="action_card.action.remove"
-                            />
+                            {messages.remove}
                         </Button>
                     )}
                 </Stack>

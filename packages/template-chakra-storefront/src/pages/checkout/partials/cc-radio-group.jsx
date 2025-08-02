@@ -4,14 +4,15 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React from 'react'
+import React, {useCallback, useMemo} from 'react'
 import PropTypes from 'prop-types'
-import {FormattedMessage} from 'react-intl'
-import {Box, Button, Stack, Text, SimpleGrid, FormControl, FormErrorMessage} from '@chakra-ui/react'
-import {PlusIcon} from '../../components/icons'
-import {RadioCard, RadioCardGroup} from '../../components/radio-card'
-import {getCreditCardIcon} from '../../utils/cc-utils'
-import {useCurrentCustomer} from '../../hooks/use-current-customer'
+import {useIntl} from 'react-intl'
+import {Button, Stack, Text, SimpleGrid, Field} from '@chakra-ui/react'
+import {PlusIcon} from '../../../components/icons'
+import {RadioCard, RadioCardGroup} from '../../../components/radio-card'
+import ActionCard from '../../../components/action-card'
+import {getCreditCardIcon} from '../../../utils/cc-utils'
+import {useCurrentCustomer} from '../../../hooks/use-current-customer'
 
 const CCRadioGroup = ({
     form,
@@ -20,57 +21,73 @@ const CCRadioGroup = ({
     togglePaymentEdit = () => null,
     onPaymentIdChange = () => null
 }) => {
+    const intl = useIntl()
+    const {formatMessage} = intl
     const {data: customer} = useCurrentCustomer()
 
+    const messages = useMemo(
+        () => ({
+            addNewCard: formatMessage({
+                id: 'cc_radio_group.button.add_new_card',
+                defaultMessage: 'Add New Card'
+            })
+        }),
+        [intl]
+    )
+
+    const handleValueChange = useCallback(
+        (selected) => {
+            // Chakra v3 radio returns the selected id in an object with a value property
+            onPaymentIdChange(selected.value)
+        },
+        [onPaymentIdChange]
+    )
+
     return (
-        <FormControl
+        <Field.Root
             id="paymentInstrumentId"
             isInvalid={form.formState.errors.paymentInstrumentId}
             isRequired={!isEditingPayment}
         >
             {form.formState.errors.paymentInstrumentId && (
-                <FormErrorMessage marginTop={0} marginBottom={4}>
+                <Field.ErrorText marginTop="0" marginBottom="4">
                     {form.formState.errors.paymentInstrumentId.message}
-                </FormErrorMessage>
+                </Field.ErrorText>
             )}
 
-            <RadioCardGroup value={value} onChange={onPaymentIdChange}>
-                <Stack spacing={4}>
-                    <SimpleGrid columns={[1, 1, 2]} spacing={4}>
-                        {customer.paymentInstruments?.map((payment) => {
+            <RadioCardGroup value={value} onValueChange={handleValueChange}>
+                <Stack gap={4}>
+                    <SimpleGrid columns={[1, 1, 2]} gap="4">
+                        {customer.paymentInstruments?.map((payment, index) => {
                             const CardIcon = getCreditCardIcon(payment.paymentCard?.cardType)
                             return (
                                 <RadioCard
                                     key={payment.paymentInstrumentId}
                                     value={payment.paymentInstrumentId}
+                                    isSelected={payment.paymentInstrumentId === value}
                                 >
                                     <Stack direction="row">
                                         {CardIcon && <CardIcon layerStyle="ccIcon" />}
-                                        <Stack spacing={4}>
-                                            <Stack spacing={1}>
-                                                <Text>{payment.paymentCard?.cardType}</Text>
-                                                <Stack direction="row">
-                                                    <Text>
-                                                        &bull;&bull;&bull;&bull;{' '}
-                                                        {payment.paymentCard?.numberLastDigits}
-                                                    </Text>
-                                                    <Text>
-                                                        {payment.paymentCard?.expirationMonth}/
-                                                        {payment.paymentCard?.expirationYear}
-                                                    </Text>
-                                                </Stack>
-                                                <Text>{payment.paymentCard.holder}</Text>
+                                        <ActionCard
+                                            padding={0}
+                                            border="none"
+                                            onRemove={() => {}}
+                                            data-testid={`sf-checkout-payment-option-${index}`}
+                                            removeBtnLabel={'Remove payment option'}
+                                        >
+                                            <Text>{payment.paymentCard?.cardType}</Text>
+                                            <Stack direction="row">
+                                                <Text>
+                                                    &bull;&bull;&bull;&bull;{' '}
+                                                    {payment.paymentCard?.numberLastDigits}
+                                                </Text>
+                                                <Text>
+                                                    {payment.paymentCard?.expirationMonth}/
+                                                    {payment.paymentCard?.expirationYear}
+                                                </Text>
                                             </Stack>
-
-                                            <Box>
-                                                <Button variant="link" size="sm" colorScheme="red">
-                                                    <FormattedMessage
-                                                        defaultMessage="Remove"
-                                                        id="cc_radio_group.action.remove"
-                                                    />
-                                                </Button>
-                                            </Box>
-                                        </Stack>
+                                            <Text>{payment.paymentCard.holder}</Text>
+                                        </ActionCard>
                                     </Stack>
                                 </RadioCard>
                             )
@@ -86,19 +103,16 @@ const CCRadioGroup = ({
                                 minHeight={['44px', '44px', '154px']}
                                 rounded="base"
                                 fontWeight="medium"
-                                leftIcon={<PlusIcon boxSize={'15px'} />}
                                 onClick={togglePaymentEdit}
                             >
-                                <FormattedMessage
-                                    defaultMessage="Add New Card"
-                                    id="cc_radio_group.button.add_new_card"
-                                />
+                                <PlusIcon boxSize="15px" />
+                                {messages.addNewCard}
                             </Button>
                         )}
                     </SimpleGrid>
                 </Stack>
             </RadioCardGroup>
-        </FormControl>
+        </Field.Root>
     )
 }
 

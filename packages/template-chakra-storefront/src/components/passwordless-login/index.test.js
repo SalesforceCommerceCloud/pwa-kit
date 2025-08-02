@@ -7,8 +7,8 @@
 import React from 'react'
 import {renderWithProviders} from '../../utils/test-utils'
 import {useForm} from 'react-hook-form'
-import PasswordlessLogin from '.'
-import {screen} from '@testing-library/react'
+import PasswordlessLogin from '../../components/passwordless-login'
+import {act, screen} from '@testing-library/react'
 
 const WrapperComponent = ({...props}) => {
     const form = useForm()
@@ -18,6 +18,16 @@ const WrapperComponent = ({...props}) => {
         </form>
     )
 }
+jest.mock('../../hooks/use-datacloud', () => ({
+    __esModule: true,
+    default: jest.fn(() => ({
+        sendViewPage: jest.fn(),
+        sendViewProduct: jest.fn(),
+        sendViewCategory: jest.fn(),
+        sendViewSearchResults: jest.fn(),
+        sendViewRecommendations: jest.fn()
+    }))
+}))
 
 describe('PasswordlessLogin component', () => {
     test('renders properly', () => {
@@ -34,8 +44,10 @@ describe('PasswordlessLogin component', () => {
         const mockSetLoginType = jest.fn()
         const {user} = renderWithProviders(<WrapperComponent setLoginType={mockSetLoginType} />)
 
-        await user.type(screen.getByLabelText('Email'), 'myemail@test.com')
-        await user.click(screen.getByRole('button', {name: 'Password'}))
+        await act(async () => {
+            await user.type(screen.getByLabelText('Email'), 'myemail@test.com')
+            await user.click(screen.getByRole('button', {name: 'Password'}))
+        })
         expect(screen.queryByLabelText('Email')).not.toBeInTheDocument()
         expect(screen.getByLabelText('Password')).toBeInTheDocument()
         expect(screen.getByRole('button', {name: 'Sign In'})).toBeInTheDocument()
@@ -45,8 +57,10 @@ describe('PasswordlessLogin component', () => {
         const mockSetLoginType = jest.fn()
         const {user} = renderWithProviders(<WrapperComponent setLoginType={mockSetLoginType} />)
 
-        await user.type(screen.getByLabelText('Email'), 'badEmail')
-        await user.click(screen.getByRole('button', {name: 'Password'}))
+        await act(async () => {
+            await user.type(screen.getByLabelText('Email'), 'badEmail')
+            await user.click(screen.getByRole('button', {name: 'Password'}))
+        })
         expect(screen.getByLabelText('Email')).toBeInTheDocument()
         expect(screen.queryByLabelText('Password')).not.toBeInTheDocument()
     })

@@ -5,10 +5,10 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React, {Children, useCallback, useEffect, useRef, useState} from 'react'
+import React, {Children, useCallback, useEffect, useRef, useState, useMemo} from 'react'
 import PropTypes from 'prop-types'
-import {Flex, Box, HStack, useStyleConfig} from '@chakra-ui/react'
-import {FormattedMessage} from 'react-intl'
+import {Box, Flex, HStack, useSlotRecipe} from '@chakra-ui/react'
+import {useIntl} from 'react-intl'
 import {noop} from '../../utils/utils'
 
 const DIRECTIONS = {
@@ -23,9 +23,25 @@ const DIRECTIONS = {
 const SwatchGroup = (props) => {
     const {ariaLabel, displayName, children, label = '', value, handleChange = noop} = props
 
-    const styles = useStyleConfig('SwatchGroup')
+    const recipe = useSlotRecipe({key: 'swatchGroup'})
+    const styles = recipe()
     const [selectedIndex, setSelectedIndex] = useState(0)
     const wrapperRef = useRef(null)
+    const intl = useIntl()
+    const {formatMessage} = intl
+
+    const messages = useMemo(
+        () => ({
+            selectedLabel: formatMessage(
+                {
+                    id: 'swatch_group.selected.label',
+                    defaultMessage: '{label}:'
+                },
+                {label}
+            )
+        }),
+        [intl, label]
+    )
 
     // Handle keyboard navigation.
     const onKeyDown = useCallback(
@@ -85,20 +101,14 @@ const SwatchGroup = (props) => {
 
     return (
         <Box onKeyDown={onKeyDown}>
-            <Flex {...styles.swatchGroup} role="radiogroup" aria-label={ariaLabel || label}>
+            <Flex css={styles.swatchGroup} role="radiogroup" aria-label={ariaLabel || label}>
                 {label && (
-                    <HStack {...styles.swatchLabel}>
-                        <Box fontWeight="semibold">
-                            <FormattedMessage
-                                id="swatch_group.selected.label"
-                                defaultMessage="{label}:"
-                                values={{label}}
-                            />
-                        </Box>
+                    <HStack css={styles.swatchLabel}>
+                        <Box fontWeight="semibold">{messages.selectedLabel}</Box>
                         <Box>{displayName}</Box>
                     </HStack>
                 )}
-                <Flex ref={wrapperRef} {...styles.swatchesWrapper}>
+                <Flex ref={wrapperRef} css={styles.swatchesWrapper}>
                     {Children.toArray(children).map((child, index) => {
                         const selected = child.props.value === value
                         return React.cloneElement(child, {

@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React, {useEffect, useRef, useState} from 'react'
+import React, {useEffect, useRef, useState, useMemo} from 'react'
 import PropTypes from 'prop-types'
 import {useIntl} from 'react-intl'
 import {Button} from '@chakra-ui/react'
@@ -16,7 +16,7 @@ import {useCurrentCustomer} from '../../hooks/use-current-customer'
 import useIntersectionObserver from '../../hooks/use-intersection-observer'
 import {useWishList} from '../../hooks/use-wish-list'
 
-import {useToast} from '../../hooks/use-toast'
+import useToast from '../../hooks/use-toast'
 import useNavigation from '../../hooks/use-navigation'
 import {
     API_ERROR_MESSAGE,
@@ -52,7 +52,19 @@ const RecommendedProducts = ({zone, recommender, products, title, shouldFetch, .
     )
     const toast = useToast()
     const navigate = useNavigation()
-    const {formatMessage} = useIntl()
+    const intl = useIntl()
+    const {formatMessage} = intl
+
+    const messages = useMemo(
+        () => ({
+            toastAddedToWishlist: (quantity) =>
+                formatMessage(TOAST_MESSAGE_ADDED_TO_WISHLIST, {quantity}),
+            toastViewWishlist: formatMessage(TOAST_ACTION_VIEW_WISHLIST),
+            toastRemovedFromWishlist: formatMessage(TOAST_MESSAGE_REMOVED_FROM_WISHLIST),
+            apiError: formatMessage(API_ERROR_MESSAGE)
+        }),
+        [intl]
+    )
 
     const ref = useRef()
     const isOnScreen = useIntersectionObserver(ref, {useOnce: true})
@@ -137,23 +149,18 @@ const RecommendedProducts = ({zone, recommender, products, title, shouldFetch, .
             })
 
             toast({
-                title: formatMessage(TOAST_MESSAGE_ADDED_TO_WISHLIST, {quantity: 1}),
-                status: 'success',
+                title: messages.toastAddedToWishlist(1),
+                type: 'success',
                 action: (
-                    // it would be better if we could use <Button as={Link}>
-                    // but unfortunately the Link component is not compatible
-                    // with Chakra Toast, since the ToastManager is rendered via portal
-                    // and the toast doesn't have access to intl provider, which is a
-                    // requirement of the Link component.
                     <Button variant="link" onClick={() => navigate('/account/wishlist')}>
-                        {formatMessage(TOAST_ACTION_VIEW_WISHLIST)}
+                        {messages.toastViewWishlist}
                     </Button>
                 )
             })
         } catch {
             toast({
-                title: formatMessage(API_ERROR_MESSAGE),
-                status: 'error'
+                title: messages.apiError,
+                type: 'error'
             })
         }
     }
@@ -174,14 +181,13 @@ const RecommendedProducts = ({zone, recommender, products, title, shouldFetch, .
                 }
             })
             toast({
-                title: formatMessage(TOAST_MESSAGE_REMOVED_FROM_WISHLIST),
-                status: 'success',
-                id: product.productId
+                title: messages.toastRemovedFromWishlist,
+                type: 'success'
             })
         } catch {
             toast({
-                title: formatMessage(API_ERROR_MESSAGE),
-                status: 'error'
+                title: messages.apiError,
+                type: 'error'
             })
         }
     }

@@ -4,27 +4,26 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-export default {
-    baseStyle: {
-        container: {},
-        socialsContainer: {
-            flex: 1,
-            justifyContent: 'flex-start'
-        },
-        icon: {
-            color: 'gray.900',
-            width: 5,
-            height: 5
-        },
-        logo: {
-            width: 12,
-            height: 8
-        },
-        socialsItem: {
-            textAlign: 'center',
-            paddingLeft: 2,
-            paddingRight: 2
-        },
+import {defineSlotRecipe} from '@chakra-ui/react'
+
+export default defineSlotRecipe({
+    slots: [
+        'actions',
+        'actionsItem',
+        'backdrop',
+        'body',
+        'content',
+        'footer',
+        'header',
+        'icon',
+        'localeSelector',
+        'logo',
+        'signoutButton',
+        'signoutText',
+        'signoutIcon',
+        'socialsItem'
+    ],
+    base: {
         actions: {
             paddingLeft: 4,
             paddingRight: 4
@@ -33,34 +32,72 @@ export default {
             paddingTop: 3,
             paddingBottom: 3
         },
+        body: {
+            flex: 1,
+            overflowY: 'auto',
+            padding: 4
+        },
+        closeButton: {},
+        content: {
+            borderRadius: '0px',
+            width: '100%',
+            height: '100%',
+            maxHeight: '100%',
+            maxWidth: '320px',
+            bg: 'white',
+            display: 'flex',
+            flexDirection: 'column'
+        },
+        footer: {
+            paddingTop: 6,
+            paddingBottom: 11,
+            paddingLeft: 4,
+            paddingRight: 4
+        },
+        header: {
+            boxShadow: 'sm',
+            paddingTop: 1,
+            paddingBottom: 1,
+            paddingLeft: 4,
+            paddingRight: 4
+        },
+        icon: {
+            color: 'gray.900',
+            width: 5,
+            height: 5
+        },
         localeSelector: {
             paddingTop: 1,
             paddingBottom: 1
         },
-        signout: {
+        logo: {
+            width: 12,
+            height: 8
+        },
+        signoutButton: {
+            display: 'flex',
+            justifyContent: 'flex-start',
             width: '100%',
-            paddingLeft: 8,
-            paddingTop: 2,
-            paddingBottom: 2,
-            _focus: {
-                borderRadius: 0,
-                boxShadow: 'outline'
+            color: 'gray.900',
+            fontWeight: 400,
+            fontSize: 'sm',
+            borderRadius: '4px',
+            height: 11,
+            padding: 4,
+            py: 3,
+            gap: 1,
+            pl: 8,
+            marginTop: 1,
+            _hover: {
+                background: 'gray.50'
             }
         },
         signoutText: {
-            marginLeft: 2,
-            fontSize: 14,
             fontWeight: 'normal'
-        }
-    },
-    parts: [
-        'actions',
-        'actionsItem',
-        'container',
-        'icon',
-        'localeSelector',
-        'socials',
-        'socialsItem',
-        'signout'
-    ]
-}
+        },
+        signoutIcon: {
+            marginRight: 1
+        },
+        socialsItem: {}
+    }
+})

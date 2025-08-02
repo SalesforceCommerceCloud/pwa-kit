@@ -1,16 +1,17 @@
 /*
- * Copyright (c) 2023, Salesforce, Inc.
+ * Copyright (c) 2025, Salesforce, Inc.
  * All rights reserved.
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
+
 import React from 'react'
-import {fireEvent, screen, waitFor, within} from '@testing-library/react'
+import {act, screen, fireEvent, waitFor, within} from '@testing-library/react'
 import {mockCustomerBaskets, mockedCustomerProductLists} from '../../../mocks/mock-data'
 import {Route, Switch} from 'react-router-dom'
-import {rest} from 'msw'
 import ProductDetail from '.'
 import {renderWithProviders} from '../../utils/test-utils'
+import {prependHandlersToServer} from '../../../jest-setup'
 import {
     basketWithProductSet,
     mockWishlistWithItem,
@@ -24,58 +25,64 @@ import {
     basketWithProductBundle,
     bundleProductItemsForPDP
 } from '../../../mocks/product-bundle'
+import Toaster, {toaster} from '../../components/toaster'
 
-jest.setTimeout(60000)
-
-jest.useFakeTimers()
-
-const mockAddToWishlist = jest.fn()
-jest.mock('@salesforce/commerce-sdk-react', () => {
-    const originalModule = jest.requireActual('@salesforce/commerce-sdk-react')
-    return {
-        ...originalModule,
-        useShopperCustomersMutation: (mutation) => {
-            if (mutation === 'createCustomerProductListItem') {
-                return {mutate: mockAddToWishlist}
-            } else {
-                return originalModule.useShopperCustomersMutation(mutation)
-            }
-        }
-    }
-})
+jest.mock('../../hooks/use-datacloud', () => ({
+    __esModule: true,
+    default: jest.fn(() => ({
+        sendViewPage: jest.fn(),
+        sendViewProduct: jest.fn(),
+        sendViewCategory: jest.fn(),
+        sendViewSearchResults: jest.fn(),
+        sendViewRecommendations: jest.fn()
+    }))
+}))
 
 const MockedComponent = () => {
     return (
-        <Switch>
-            <Route
-                path="/uk/en-GB/product/:productId"
-                render={(props) => <ProductDetail {...props} />}
-            />
-        </Switch>
+        <>
+            <Switch>
+                <Route
+                    path="/uk/en-GB/product/:productId"
+                    render={(props) => <ProductDetail {...props} />}
+                />
+            </Switch>
+            <Toaster toaster={toaster} />
+        </>
     )
 }
 
 beforeEach(() => {
     jest.resetModules()
 
-    global.server.use(
-        // By default, the page will be rendered with a product set
-        rest.get('*/products/:productId', (req, res, ctx) => {
-            return res(ctx.delay(0), ctx.status(200), ctx.json(mockedProductSet))
-        }),
-        rest.get('*/customers/:customerId/baskets', (req, res, ctx) => {
-            return res(ctx.delay(0), ctx.status(200), ctx.json(mockCustomerBaskets))
-        }),
-        rest.get('*/customers/:customerId/product-lists', (req, res, ctx) => {
-            return res(ctx.delay(0), ctx.status(200), ctx.json(mockedCustomerProductLists))
-        }),
-        rest.get('*/products', (req, res, ctx) => {
-            return res(ctx.json(productsForEinstein))
-        }),
-        rest.post('*/v3/personalization/recs/EinsteinTestSite/*', (req, res, ctx) => {
-            return res(ctx.delay(0), ctx.status(200), ctx.json(einsteinRecommendation))
-        })
-    )
+    prependHandlersToServer([
+        {
+            // By default, the page will be rendered with a product set
+            path: '*/products/:productId',
+            method: 'get',
+            res: () => mockedProductSet
+        },
+        {
+            path: '*/customers/:customerId/baskets',
+            method: 'get',
+            res: () => mockCustomerBaskets
+        },
+        {
+            path: '*/customers/:customerId/product-lists',
+            method: 'get',
+            res: () => mockedCustomerProductLists
+        },
+        {
+            path: '*/products',
+            method: 'get',
+            res: () => productsForEinstein
+        },
+        {
+            path: '*/v3/personalization/recs/EinsteinTestSite/*',
+            method: 'post',
+            res: () => einsteinRecommendation
+        }
+    ])
 
     // Since we're testing some navigation logic, we are using a simple Router
     // around our component. We need to initialize the default route/path here.
@@ -87,87 +94,124 @@ afterEach(() => {
     jest.clearAllMocks()
 })
 
-test('should render product details page', async () => {
-    global.server.use(
-        // Use a single product (and not a product set)
-        rest.get('*/products/:productId', (req, res, ctx) => {
-            return res(ctx.json(masterProduct))
+describe('product detail', () => {
+    test('should render product details page', async () => {
+        prependHandlersToServer([
+            {
+                // Use a single product (and not a product set)
+                path: '*/products/:productId',
+                method: 'get',
+                res: () => masterProduct
+            }
+        ])
+
+        renderWithProviders(<MockedComponent />)
+
+        expect(await screen.findByTestId('product-details-page')).toBeInTheDocument()
+        await waitFor(() => {
+            expect(screen.getByRole('link', {name: /mens/i})).toBeInTheDocument()
+            expect(screen.getAllByText(/Long Sleeve Crew Neck/)).toHaveLength(2)
+            expect(screen.getAllByText(/from £9\.59/i)).toHaveLength(2)
+            expect(screen.getAllByText(/£15\.36/i)).toHaveLength(4)
+            expect(screen.getAllByText(/Add to Cart/)).toHaveLength(2)
+            expect(screen.getAllByText(/Add to Wishlist/)).toHaveLength(2)
+            expect(screen.getAllByTestId('product-view')).toHaveLength(1)
+            expect(screen.getByText(/You might also like/i)).toBeInTheDocument()
         })
-    )
-
-    renderWithProviders(<MockedComponent />)
-
-    expect(await screen.findByTestId('product-details-page')).toBeInTheDocument()
-    await waitFor(() => {
-        expect(screen.getByRole('link', {name: /mens/i})).toBeInTheDocument()
-        expect(screen.getAllByText(/Long Sleeve Crew Neck/)).toHaveLength(2)
-        expect(screen.getAllByText(/from £9\.59/i)).toHaveLength(2)
-        expect(screen.getAllByText(/£15\.36/i)).toHaveLength(4)
-        expect(screen.getAllByText(/Add to Cart/)).toHaveLength(2)
-        expect(screen.getAllByText(/Add to Wishlist/)).toHaveLength(2)
-        expect(screen.getAllByTestId('product-view')).toHaveLength(1)
-        expect(screen.getByText(/You might also like/i)).toBeInTheDocument()
     })
-})
 
-test('should add to wishlist', async () => {
-    global.server.use(
-        // Use a single product (and not a product set)
-        rest.get('*/products/:productId', (req, res, ctx) => {
-            return res(ctx.json(masterProduct))
+    test('should add to wishlist', async () => {
+        prependHandlersToServer([
+            {
+                // Use a single product (and not a product set)
+                path: '*/products/:productId',
+                method: 'get',
+                res: () => masterProduct
+            },
+            {
+                // Mock the API call for adding items to wishlist
+                path: '*/customers/:customerId/product-lists/:productListId/items',
+                method: 'post',
+                res: () => ({
+                    ...mockWishlistWithItem.data[0],
+                    customerProductListItems: [
+                        ...mockWishlistWithItem.data[0].customerProductListItems,
+                        {
+                            id: 'new-item-id',
+                            productId: '25517823M',
+                            priority: 1,
+                            quantity: 1,
+                            public: false,
+                            type: 'product'
+                        }
+                    ]
+                })
+            }
+        ])
+
+        const {user} = renderWithProviders(<MockedComponent />)
+        expect(await screen.findByTestId('product-details-page')).toBeInTheDocument()
+        // wait for data to fully loaded before taking any action
+        await waitFor(() => {
+            expect(screen.getByRole('link', {name: /mens/i})).toBeInTheDocument()
+            expect(screen.getAllByText(/Long Sleeve Crew Neck/)).toHaveLength(2)
+            expect(screen.getByText(/You might also like/i)).toBeInTheDocument()
         })
-    )
-
-    renderWithProviders(<MockedComponent />)
-    expect(await screen.findByTestId('product-details-page')).toBeInTheDocument()
-    // wait for data to fully loaded before taking any action
-    await waitFor(() => {
-        expect(screen.getByRole('link', {name: /mens/i})).toBeInTheDocument()
-        expect(screen.getAllByText(/Long Sleeve Crew Neck/)).toHaveLength(2)
-        expect(screen.getByText(/You might also like/i)).toBeInTheDocument()
-    })
-    const wishlistButton = await screen.findByRole('button', {name: 'Add to Wishlist'})
-
-    fireEvent.click(wishlistButton)
-    await waitFor(() => {
-        expect(mockAddToWishlist).toHaveBeenCalledTimes(1)
-    })
-})
-
-test('should not add to wishlist if item is already in wishlist', async () => {
-    global.server.use(
-        // Use a product that is already in the wishlist
-        rest.get('*/products/:productId', (req, res, ctx) => {
-            return res(ctx.json(masterProduct))
-        }),
-        rest.get('*/customers/:customerId/product-lists', (req, res, ctx) => {
-            return res(ctx.delay(0), ctx.status(200), ctx.json(mockWishlistWithItem))
+        const wishlistButton = await screen.findByRole('button', {name: 'Add to Wishlist'})
+        await act(async () => {
+            await user.click(wishlistButton)
         })
-    )
-
-    renderWithProviders(<MockedComponent />)
-    // wait for data to fully loaded before taking any action
-    await waitFor(() => {
-        expect(screen.getByRole('link', {name: /mens/i})).toBeInTheDocument()
-        expect(screen.getAllByText(/Long Sleeve Crew Neck/)).toHaveLength(2)
-        expect(screen.getByText(/You might also like/i)).toBeInTheDocument()
+        await waitFor(() => {
+            expect(screen.getByText(/item added to wishlist/i)).toBeInTheDocument()
+        })
     })
-    const wishlistButton = await screen.findByRole('button', {name: 'Add to Wishlist'})
 
-    fireEvent.click(wishlistButton)
-    await waitFor(() => {
-        expect(mockAddToWishlist).toHaveBeenCalledTimes(0)
+    test('should not add to wishlist if item is already in wishlist', async () => {
+        prependHandlersToServer([
+            {
+                // Use a product that is already in the wishlist
+                path: '*/products/:productId',
+                method: 'get',
+                res: () => masterProduct
+            },
+            {
+                path: '*/customers/:customerId/product-lists',
+                method: 'get',
+                res: () => mockWishlistWithItem
+            }
+        ])
+
+        const {user} = renderWithProviders(<MockedComponent />)
+        // wait for data to fully loaded before taking any action
+        await waitFor(() => {
+            expect(screen.getByRole('link', {name: /mens/i})).toBeInTheDocument()
+            expect(screen.getAllByText(/Long Sleeve Crew Neck/)).toHaveLength(2)
+            expect(screen.getByText(/You might also like/i)).toBeInTheDocument()
+        })
+
+        const wishlistButton = await screen.findByRole('button', {name: 'Add to Wishlist'})
+
+        await act(async () => {
+            await user.click(wishlistButton)
+        })
+        await waitFor(() => {
+            expect(screen.getByText(/item is already in wishlist/i)).toBeInTheDocument()
+        })
     })
 })
 
 describe('product set', () => {
     beforeEach(() => {
-        global.server.use(
-            // For adding items to basket
-            rest.post('*/baskets/:basketId/items', (req, res, ctx) => {
-                return res(ctx.json(basketWithProductSet))
-            })
-        )
+        window.history.pushState({}, 'ProductDetail', '/uk/en-GB/product/winter-lookM')
+
+        prependHandlersToServer([
+            {
+                // For adding items to basket
+                path: '*/baskets/:basketId/items',
+                method: 'post',
+                res: () => basketWithProductSet
+            }
+        ])
     })
 
     test('render multi-product layout', async () => {
@@ -209,7 +253,9 @@ describe('product set', () => {
         )
 
         const buttons = await screen.findAllByText(/add set to cart/i)
-        fireEvent.click(buttons[0])
+        await act(async () => {
+            fireEvent.click(buttons[0])
+        })
 
         await waitFor(
             () => {
@@ -263,23 +309,18 @@ describe('product set', () => {
 
 describe('Recommended Products', () => {
     test('Recently Viewed gets updated when navigating between products', async () => {
-        global.server.use(
-            // Use a single product (and not a product set)
-            rest.get('*/products/:productId', (req, res, ctx) => {
-                return res(ctx.json(masterProduct))
-            })
-        )
+        prependHandlersToServer([
+            {
+                // Use a single product (and not a product set)
+                path: '*/products/:productId',
+                method: 'get',
+                res: () => masterProduct
+            }
+        ])
         // const user = userEvent.setup({advanceTimers: jest.advanceTimersByTime})
         renderWithProviders(<MockedComponent />)
 
-        // If we poll for updates immediately, the test output is flooded with errors:
-        // "Warning: An update to WrappedComponent inside a test was not wrapped in act(...)."
-        // If we wait to poll until the component is updated, then the errors disappear. Using a
-        // timeout is clearly a suboptimal solution, but I don't know the "correct" way to fix it.
-        // let done = false
-        // setTimeout(() => (done = true), 200)
-        // await waitFor(() => expect(done).toBeTruthy())
-
+        // wait for data to fully loaded before asserting
         await waitFor(() => {
             expect(screen.getByRole('link', {name: /mens/i})).toBeInTheDocument()
             expect(screen.getByText(/You might also like/i)).toBeInTheDocument()
@@ -292,54 +333,75 @@ describe('Recommended Products', () => {
 describe('product bundles', () => {
     let hasUpdatedBundleChildren = false
     beforeEach(() => {
+        window.history.pushState({}, 'ProductDetail', '/uk/en-GB/product/test-bundle')
         hasUpdatedBundleChildren = false
-        global.server.use(
-            // Use product bundle instead of product set
-            rest.get('*/products/:productId', (req, res, ctx) => {
-                return res(ctx.delay(0), ctx.status(200), ctx.json(mockProductBundle))
-            }),
-            rest.get('*/products', (req, res, ctx) => {
-                let inventoryLevel = 0
-                let bundleChildVariantId = '701643473915M'
-                if (req.url.toString().includes('701643473908M')) {
-                    bundleChildVariantId = '701643473908M'
-                    inventoryLevel = 3
-                }
-                const bundleChildVariantData = {
-                    data: [
-                        {
-                            id: bundleChildVariantId,
-                            inventory: {
-                                ats: inventoryLevel,
-                                backorderable: false,
-                                id: 'inventory_m',
-                                orderable: false,
-                                preorderable: false,
-                                stockLevel: inventoryLevel
-                            },
-                            master: {
-                                masterId: '25565139M',
-                                orderable: true
+
+        prependHandlersToServer([
+            {
+                // Use product bundle instead of product set
+                path: '*/products/:productId',
+                method: 'get',
+                res: () => mockProductBundle
+            },
+            {
+                path: '*/products',
+                method: 'get',
+                res: (req) => {
+                    const url = req.url.toString()
+                    // use for all 3 recommendations, "you might also like", "complete the set", and "recently viewed"
+                    if (url.includes('ids=11736753M%2C22951021M%2C25592770M%2C25752986M')) {
+                        return productsForEinstein
+                    }
+                    let inventoryLevel = 0
+                    let bundleChildVariantId = '701643473915M'
+                    if (req.url.toString().includes('701643473908M')) {
+                        bundleChildVariantId = '701643473908M'
+                        inventoryLevel = 3
+                    }
+                    const bundleChildVariantData = {
+                        data: [
+                            {
+                                id: bundleChildVariantId,
+                                inventory: {
+                                    ats: inventoryLevel,
+                                    backorderable: false,
+                                    id: 'inventory_m',
+                                    orderable: false,
+                                    preorderable: false,
+                                    stockLevel: inventoryLevel
+                                },
+                                master: {
+                                    masterId: '25565139M',
+                                    orderable: true
+                                }
                             }
-                        }
-                    ]
+                        ]
+                    }
+                    return bundleChildVariantData
                 }
-                return res(ctx.delay(0), ctx.status(200), ctx.json(bundleChildVariantData))
-            }),
-            // For adding items to basket
-            rest.post('*/baskets/:basketId/items', (req, res, ctx) => {
-                const basketWithBundle = {
-                    ...basketWithProductBundle,
-                    productItems: bundleProductItemsForPDP
+            },
+            {
+                // For adding items to basket
+                path: '*/baskets/:basketId/items',
+                method: 'post',
+                res: () => {
+                    const basketWithBundle = {
+                        ...basketWithProductBundle,
+                        productItems: bundleProductItemsForPDP
+                    }
+                    return basketWithBundle
                 }
-                return res(ctx.json(basketWithBundle))
-            }),
-            // Follow up call to update child bundle variant selections
-            rest.patch('*/baskets/:basketId/items', (req, res, ctx) => {
-                hasUpdatedBundleChildren = true
-                return res(ctx.json(basketWithProductBundle))
-            })
-        )
+            },
+            {
+                // Follow up call to update child bundle variant selections
+                path: '*/baskets/:basketId/items',
+                method: 'patch',
+                res: () => {
+                    hasUpdatedBundleChildren = true
+                    return basketWithProductBundle
+                }
+            }
+        ])
     })
 
     test('renders multi-product layout', async () => {
@@ -347,22 +409,33 @@ describe('product bundles', () => {
 
         await waitFor(() => {
             expect(screen.getAllByTestId('product-view')).toHaveLength(4) // 1 parent + 3 children
+            expect(screen.getByRole('heading', {name: /swing Tank/i})).toBeInTheDocument()
+            expect(screen.getByRole('heading', {name: /Pull On Neutral Pant/i})).toBeInTheDocument()
+            expect(
+                screen.getByRole('heading', {name: /Sleeveless Pleated Floral Front Blouse/i})
+            ).toBeInTheDocument()
+
+            expect(screen.getByText(/Recently Viewed/i)).toBeInTheDocument()
+            expect(screen.getByText(/Complete the set/i)).toBeInTheDocument()
+            expect(screen.getByText(/You might also like/i)).toBeInTheDocument()
+            // For 3 recommendation sections, complete the set, recently viewed, You also might like sections
+            expect(screen.getAllByText(/summer bomber jacket/i)).toHaveLength(3)
+            expect(screen.getAllByText(/classic wrap/i)).toHaveLength(3)
         })
     })
 
     test('add the bundle to cart successfully', async () => {
+        // make sure the bundle children are all in stock and orderable
         const urlPathAfterSelectingAllVariants = `uk/en-GB/product/test-bundle?${new URLSearchParams(
             {
                 '25592770M': 'color=JJGN9A0&size=006',
-                '25565139M': 'color=JJ169XX&size=9SM',
+                '25565139M': 'color=JJ169XX&size=9LG',
                 '25565094M': 'color=JJ0CZXX&size=9XS'
             }
         )}`
         window.history.pushState({}, 'ProductDetail', urlPathAfterSelectingAllVariants)
 
-        // Initial basket is necessary to add items to it
-        const initialBasket = {basketId: 'valid_id'}
-        renderWithProviders(<MockedComponent />, {wrapperProps: {initialBasket}})
+        const {user} = renderWithProviders(<MockedComponent />)
 
         await waitFor(() => {
             expect(screen.getAllByText("Women's clothing test bundle")[0]).toBeInTheDocument()
@@ -370,7 +443,10 @@ describe('product bundles', () => {
         })
 
         const buttons = await screen.findAllByText(/add bundle to cart/i)
-        fireEvent.click(buttons[0])
+        expect(buttons[0]).toBeEnabled()
+        await act(async () => {
+            await user.click(buttons[0])
+        })
 
         await waitFor(
             () => {
@@ -384,14 +460,16 @@ describe('product bundles', () => {
     })
 
     test('add the bundle to cart with error messages', async () => {
-        renderWithProviders(<MockedComponent />)
+        const {user} = renderWithProviders(<MockedComponent />)
 
         await waitFor(() => {
             expect(screen.getAllByText("Women's clothing test bundle")[0]).toBeInTheDocument()
         })
 
         const buttons = await screen.findAllByText(/add bundle to cart/i)
-        fireEvent.click(buttons[0])
+        await act(async () => {
+            await user.click(buttons[0])
+        })
 
         await waitFor(() => {
             // Show error when users have not selected all the variants yet
@@ -406,6 +484,22 @@ describe('product bundles', () => {
 
         const childProducts = await screen.findAllByTestId('child-product')
 
+        // make sure the page is finishing rendering all data from api before checking
+        await waitFor(() => {
+            expect(screen.getAllByTestId('product-view')).toHaveLength(4) // 1 parent + 3 children
+            expect(screen.getByRole('heading', {name: /swing Tank/i})).toBeInTheDocument()
+            expect(screen.getByRole('heading', {name: /Pull On Neutral Pant/i})).toBeInTheDocument()
+            expect(
+                screen.getByRole('heading', {name: /Sleeveless Pleated Floral Front Blouse/i})
+            ).toBeInTheDocument()
+
+            expect(screen.getByText(/Recently Viewed/i)).toBeInTheDocument()
+            expect(screen.getByText(/Complete the set/i)).toBeInTheDocument()
+            expect(screen.getByText(/You might also like/i)).toBeInTheDocument()
+            // For 3 recommendation sections, complete the set, recently viewed, You also might like sections
+            expect(screen.getAllByText(/summer bomber jacket/i)).toHaveLength(3)
+            expect(screen.getAllByText(/classic wrap/i)).toHaveLength(3)
+        })
         childProducts.forEach((child) => {
             const heroImage = within(child).getAllByRole('img')[0]
             expect(heroImage.getAttribute('loading')).toBe('lazy')
@@ -413,7 +507,7 @@ describe('product bundles', () => {
     })
 
     test('add to cart button is disabled when child is out of stock', async () => {
-        renderWithProviders(<MockedComponent />)
+        const {user} = renderWithProviders(<MockedComponent />)
         await waitFor(() => {
             expect(screen.getAllByText("Women's clothing test bundle")[0]).toBeInTheDocument()
         })
@@ -428,8 +522,12 @@ describe('product bundles', () => {
         expect(colorSelectionBtn).toBeInTheDocument()
         expect(sizeSelectionBtn).toBeInTheDocument()
 
-        fireEvent.click(colorSelectionBtn)
-        fireEvent.click(sizeSelectionBtn)
+        await act(async () => {
+            await user.click(colorSelectionBtn)
+        })
+        await act(async () => {
+            await user.click(sizeSelectionBtn)
+        })
 
         await waitFor(() => {
             expect(screen.getByText('Out of stock')).toBeInTheDocument()
@@ -440,23 +538,41 @@ describe('product bundles', () => {
     })
 
     test('add to cart button is disabled when quantity exceeds child stock level', async () => {
-        renderWithProviders(<MockedComponent />)
+        // Initial basket is necessary to add items to it
+        const initialBasket = {basketId: 'valid_id'}
+        const {user} = renderWithProviders(<MockedComponent />, {wrapperProps: {initialBasket}})
         await waitFor(() => {
             expect(screen.getAllByText("Women's clothing test bundle")[0]).toBeInTheDocument()
         })
         const childProducts = screen.getAllByTestId('child-product')
         expect(childProducts).toHaveLength(3)
 
+        // Select variants for all 3 child products to enable the "Add Bundle to Cart" button
+
+        // Child product 0: Sleeveless Pleated Floral Front Blouse (only one color available)
+        const blouseProduct = childProducts[0]
+        const blouseSizeBtn = within(blouseProduct).getByLabelText('6')
+        await act(async () => {
+            await user.click(blouseSizeBtn)
+        })
+        //
+        // Child product 1: Swing Tank - Select Black + L (this has 3 inventory)
         const swingTankProduct = childProducts[1]
         const colorSelectionBtn = within(swingTankProduct).getByLabelText('Black')
         const sizeSelectionBtn = within(swingTankProduct).getByLabelText('L')
+        await act(async () => {
+            await user.click(sizeSelectionBtn)
+        })
 
-        expect(swingTankProduct).toBeInTheDocument()
-        expect(colorSelectionBtn).toBeInTheDocument()
-        expect(sizeSelectionBtn).toBeInTheDocument()
-
-        fireEvent.click(colorSelectionBtn)
-        fireEvent.click(sizeSelectionBtn)
+        await act(async () => {
+            await user.click(colorSelectionBtn)
+        })
+        // Child product 2: Pull On Neutral Pant (only one color available)
+        const pantProduct = childProducts[2]
+        const pantSizeBtn = within(pantProduct).getByLabelText('S')
+        await act(async () => {
+            await user.click(pantSizeBtn)
+        })
 
         const addBundleToCartBtn = screen.getByRole('button', {name: /add bundle to cart/i})
 
@@ -467,12 +583,15 @@ describe('product bundles', () => {
 
         // Set product bundle quantity selection to 4
         const quantityInput = screen.getByRole('spinbutton', {name: /quantity/i})
-        quantityInput.focus()
-        fireEvent.change(quantityInput, {target: {value: '4'}})
+        await act(async () => {
+            await user.clear(quantityInput)
+            await user.type(quantityInput, '4')
+        })
 
         await waitFor(() => {
             expect(screen.getByRole('spinbutton', {name: /quantity/i})).toHaveValue('4')
             expect(screen.getByText('Only 3 left!')).toBeInTheDocument()
+            const addBundleToCartBtn = screen.getByRole('button', {name: /add bundle to cart/i})
             expect(addBundleToCartBtn).toBeDisabled()
         })
     })

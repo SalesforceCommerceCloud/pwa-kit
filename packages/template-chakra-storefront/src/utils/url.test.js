@@ -18,7 +18,7 @@ import {
     removeSiteLocaleFromPath
 } from './url'
 import {getUrlConfig} from './site-utils'
-import mockConfig from '../../mock-config'
+import mockConfig from '../../config/mocks/mock-config'
 
 afterEach(() => {
     jest.clearAllMocks()

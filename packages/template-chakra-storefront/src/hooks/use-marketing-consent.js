@@ -5,20 +5,30 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import {useCallback, useMemo, useState} from 'react'
-import {useAccessToken} from '@salesforce/commerce-sdk-react'
+import {useCallback, useMemo} from 'react'
+import {
+    useShopperConsent,
+    useShopperConsentMutation
+} from '@salesforce/commerce-sdk-react/hooks/ShopperConsents'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import useMultiSite from './use-multi-site'
 import logger from '../utils/logger-instance'
 import {CONSENT_CHANNELS, CONSENT_STATUS, CONSENT_TAGS} from '../constants/marketing-consent'
 
 export const useMarketingConsent = () => {
-    const [isLoading, setIsLoading] = useState(false)
-    const [error, setError] = useState(null)
-    const {getTokenWhenReady} = useAccessToken()
     const {site, locale} = useMultiSite()
     const {commerceAPI: config} = getConfig()
     const {organizationId} = config.parameters
+
+    // Configure the ShopperConsents hooks
+    const apiParams = {
+        organizationId,
+        siteId: site.id,
+        locale: locale.id
+    }
+
+    const getShopperConsentHook = useShopperConsent(apiParams)
+    const submitShopperConsentHook = useShopperConsentMutation(apiParams)
 
     // Fallback stub data for development/testing when API is not available
     // TODO: remove these stubs once SCAPI APIs are functional on test instances.
@@ -37,7 +47,7 @@ export const useMarketingConsent = () => {
                 {
                     subscriptionId: 'weekly-newsletter',
                     contactPointValue: '+1 555 321 7654',
-                    channel: CONSENT_CHANNELS.WHATSAPP,
+                    channel: CONSENT_CHANNELS.SMS,
                     status: CONSENT_STATUS.OPT_IN,
                     title: 'Weekly Newsletter',
                     subtitle: 'Get our weekly newsletter with the latest updates.',
@@ -71,77 +81,28 @@ export const useMarketingConsent = () => {
 
     const fetchConsentItems = useCallback(
         async (tags) => {
-            setIsLoading(true)
-            setError(null)
-
             try {
-                const token = await getTokenWhenReady()
-                const queryParams = new URLSearchParams({
-                    siteId: site.id,
-                    locale: locale.id,
-                    ...(tags && {tags})
-                })
-                const url = `/mobify/proxy/api/shopper/shopper-consents/v1/organizations/${organizationId}/subscriptions?${queryParams}`
-
-                const response = await fetch(url, {
-                    method: 'GET',
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                        'Content-Type': 'application/json'
-                    }
-                })
-
-                if (!response.ok) {
-                    // TODO: remove this stub when we have a real API
-                    return fetchStubData
-                    //throw new Error(`HTTP error! status: ${response.status}`)
-                }
-
-                return await response.json()
+                return await getShopperConsentHook.fetchConsentItems(tags)
             } catch (err) {
                 logger.error('Failed to fetch consent items', {
                     namespace: 'useMarketingConsent.fetchConsentItems',
                     additionalProperties: {
                         error: err.message,
-                        tags,
-                        siteId: site.id,
-                        locale: locale.id
+                        tags
                     }
                 })
-                setError(err.message || 'Failed to fetch consent items')
-                throw err
-            } finally {
-                setIsLoading(false)
+
+                // TODO: remove this stub when we have a real API
+                return fetchStubData
             }
         },
-        [getTokenWhenReady, site.id, locale.id, organizationId]
+        [getShopperConsentHook, fetchStubData]
     )
 
     const submitConsent = useCallback(
         async (consentItem) => {
-            setIsLoading(true)
-            setError(null)
-
             try {
-                const token = await getTokenWhenReady()
-                const url = `/mobify/proxy/api/shopper/shopper-consents/v1/organizations/${organizationId}/subscriptions`
-
-                const response = await fetch(url, {
-                    method: 'POST',
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(consentItem)
-                })
-
-                if (!response.ok) {
-                    // TODO: remove this stub when we have a real API
-                    return submitStubData
-                    // throw new Error(`HTTP error! status: ${response.status}`)
-                }
-
-                return await response.json()
+                return await submitShopperConsentHook.submitConsent(consentItem)
             } catch (err) {
                 logger.error('Failed to submit consent', {
                     namespace: 'useMarketingConsent.submitConsent',
@@ -150,18 +111,17 @@ export const useMarketingConsent = () => {
                         subscriptionId: consentItem?.subscriptionId
                     }
                 })
-                setError(err.message || 'Failed to submit consent')
-                throw err
-            } finally {
-                setIsLoading(false)
+
+                // TODO: remove this stub when we have a real API
+                return submitStubData
             }
         },
-        [getTokenWhenReady, organizationId]
+        [submitShopperConsentHook, submitStubData]
     )
 
     return {
-        isLoading,
-        error,
+        isLoading: getShopperConsentHook.isLoading || submitShopperConsentHook.isLoading,
+        error: getShopperConsentHook.error || submitShopperConsentHook.error,
         fetchConsentItems,
         submitConsent
     }

@@ -8,27 +8,85 @@
 import React, {forwardRef, useEffect, useMemo, useRef, useState} from 'react'
 import PropTypes from 'prop-types'
 import {useLocation} from 'react-router-dom'
-import {useIntl, FormattedMessage} from 'react-intl'
+import {useIntl, defineMessages} from 'react-intl'
 
-import {Flex, Heading, Button, Skeleton, Box, Text, VStack, Fade, useTheme} from '@chakra-ui/react'
+import {Box, Button, Flex, Heading, Skeleton, Text, VStack} from '@chakra-ui/react'
 import {useCurrency, useDerivedProduct} from '../../hooks'
 import {useAddToCartModalContext} from '../../hooks/use-add-to-cart-modal'
 
 // project components
-import ImageGallery from '../image-gallery'
-import Breadcrumb from '../breadcrumb'
-import Link from '../link'
-import withRegistration from '../with-registration'
-import {Skeleton as ImageGallerySkeleton} from '../image-gallery'
-import {HideOnDesktop, HideOnMobile} from '../responsive'
-import QuantityPicker from '../quantity-picker'
-import {useToast} from '../../hooks/use-toast'
-import {API_ERROR_MESSAGE} from '../../../config/constants'
-import DisplayPrice from '../display-price'
-import Swatch from '../swatch-group/swatch'
-import SwatchGroup from '../swatch-group'
+import ImageGallery from '../../components/image-gallery'
+import Breadcrumb from '../../components/breadcrumb'
+import Fade from '../../components/fade'
+import Link from '../../components/link'
+import withRegistration from '../../components/with-registration'
+import {Skeleton as ImageGallerySkeleton} from '../../components/image-gallery'
+import {HideOnDesktop, HideOnMobile} from '../../components/responsive'
+import QuantityPicker from '../../components/quantity-picker'
+import {useErrorHandler} from '../../hooks/use-errors'
+import DisplayPrice from '../../components/display-price'
+import Swatch from '../../components/swatch-group/swatch'
+import SwatchGroup from '../../components/swatch-group'
 import {getPriceData} from '../../utils/product-utils'
-import PromoCallout from '../product-tile/promo-callout'
+import PromoCallout from '../../components/product-tile/promo-callout'
+
+const messages = defineMessages({
+    inventoryRemainingForProduct: {
+        defaultMessage: 'Only {stockLevel} left for {productName}!',
+        id: 'use_product.message.inventory_remaining_for_product'
+    },
+    outOfStockForProduct: {
+        defaultMessage: 'Out of stock for {productName}',
+        id: 'use_product.message.out_of_stock_for_product'
+    },
+    update: {
+        defaultMessage: 'Update',
+        id: 'product_view.button.update'
+    },
+    addToCart: {
+        defaultMessage: 'Add to Cart',
+        id: 'product_view.button.add_to_cart'
+    },
+    addSetToCart: {
+        defaultMessage: 'Add Set to Cart',
+        id: 'product_view.button.add_set_to_cart'
+    },
+    addBundleToCart: {
+        defaultMessage: 'Add Bundle to Cart',
+        id: 'product_view.button.add_bundle_to_cart'
+    },
+    addToWishlist: {
+        defaultMessage: 'Add to Wishlist',
+        id: 'product_view.button.add_to_wishlist'
+    },
+    addSetToWishlist: {
+        defaultMessage: 'Add Set to Wishlist',
+        id: 'product_view.button.add_set_to_wishlist'
+    },
+    addBundleToWishlist: {
+        defaultMessage: 'Add Bundle to Wishlist',
+        id: 'product_view.button.add_bundle_to_wishlist'
+    },
+    quantity: {
+        defaultMessage: 'Quantity',
+        id: 'product_view.label.quantity'
+    },
+    quantityLabel: {
+        defaultMessage: 'Quantity:',
+        id: 'product_view.label.quantity'
+    },
+    variantType: {
+        defaultMessage: '{variantType}',
+        id: 'product_view.label.variant_type'
+    },
+    selectAllOptions: {
+        defaultMessage: 'Please select all your options above'
+    },
+    seeFullDetails: {
+        id: 'product_view.link.full_details',
+        defaultMessage: 'See full details'
+    }
+})
 
 const ProductViewHeader = ({
     name,
@@ -39,27 +97,27 @@ const ProductViewHeader = ({
     isProductPartOfBundle
 }) => {
     return (
-        <VStack mr={4} spacing={2} align="flex-start" marginBottom={[4, 4, 4, 0, 0]}>
+        <VStack mr={4} gap={2} align="flex-start" marginBottom={[4, 4, 4, 0, 0]}>
             {category && (
-                <Skeleton isLoaded={category} minWidth={64}>
+                <Skeleton loading={!category} minWidth={64}>
                     <Breadcrumb categories={category} />
                 </Skeleton>
             )}
 
             {/* Title */}
-            <Skeleton isLoaded={name}>
+            <Skeleton loading={!name}>
                 <Heading fontSize="2xl">{`${name}`}</Heading>
             </Skeleton>
 
             {!isProductPartOfBundle && (
                 <>
-                    <Skeleton isLoaded={priceData?.currentPrice}>
+                    <Skeleton loading={!priceData?.currentPrice}>
                         {priceData?.currentPrice && (
                             <DisplayPrice priceData={priceData} currency={currency} />
                         )}
                     </Skeleton>
 
-                    <Skeleton isLoaded={product}>
+                    <Skeleton loading={!product}>
                         {product?.productPromotions && <PromoCallout product={product} />}
                     </Skeleton>
                 </>
@@ -113,15 +171,14 @@ const ProductView = forwardRef(
         ref
     ) => {
         const {currency: activeCurrency} = useCurrency()
-        const showToast = useToast()
-        const intl = useIntl()
+        const showError = useErrorHandler()
+        const {formatMessage} = useIntl()
         const location = useLocation()
         const {
             isOpen: isAddToCartModalOpen,
             onOpen: onAddToCartModalOpen,
             onClose: onAddToCartModalClose
         } = useAddToCartModalContext()
-        const theme = useTheme()
         const [showOptionsMessage, toggleShowOptionsMessage] = useState(false)
         const {
             showLoading,
@@ -165,25 +222,15 @@ const ProductView = forwardRef(
                     const unavailableChildProduct =
                         childProductOrderability[unavailableChildProductKey]
                     if (unavailableChildProduct.unfulfillable) {
-                        currentInventoryMsg = intl.formatMessage(
-                            {
-                                defaultMessage: 'Only {stockLevel} left for {productName}!',
-                                id: 'use_product.message.inventory_remaining_for_product'
-                            },
-                            {
-                                stockLevel: unavailableChildProduct.stockLevel,
-                                productName: unavailableChildProduct.productName
-                            }
-                        )
+                        currentInventoryMsg = formatMessage(messages.inventoryRemainingForProduct, {
+                            stockLevel: unavailableChildProduct.stockLevel,
+                            productName: unavailableChildProduct.productName
+                        })
                     }
                     if (unavailableChildProduct.isOutOfStock) {
-                        currentInventoryMsg = intl.formatMessage(
-                            {
-                                defaultMessage: 'Out of stock for {productName}',
-                                id: 'use_product.message.out_of_stock_for_product'
-                            },
-                            {productName: unavailableChildProduct.productName}
-                        )
+                        currentInventoryMsg = formatMessage(messages.outOfStockForProduct, {
+                            productName: unavailableChildProduct.productName
+                        })
                     }
                 }
             }
@@ -194,10 +241,10 @@ const ProductView = forwardRef(
             const {scrollErrorIntoView = true} = opts
             // Validate that all attributes are selected before proceeding.
             const hasValidSelection = validateOrderability(variant, quantity, stockLevel)
-            const showError = !isProductASet && !isProductABundle && !hasValidSelection
-            const scrollToError = showError && scrollErrorIntoView
+            const hasError = !isProductASet && !isProductABundle && !hasValidSelection
+            const scrollToError = hasError && scrollErrorIntoView
 
-            toggleShowOptionsMessage(showError)
+            toggleShowOptionsMessage(hasError)
 
             if (scrollToError) {
                 errorContainerRef.current.scrollIntoView({
@@ -212,41 +259,13 @@ const ProductView = forwardRef(
         const renderActionButtons = () => {
             const buttons = []
             const buttonText = {
-                update: intl.formatMessage({
-                    defaultMessage: 'Update',
-                    id: 'product_view.button.update'
-                }),
-                addToCart: intl.formatMessage({
-                    defaultMessage: 'Add to Cart',
-                    id: 'product_view.button.add_to_cart'
-                }),
-                addSetToCart: intl.formatMessage({
-                    defaultMessage: 'Add Set to Cart',
-                    id: 'product_view.button.add_set_to_cart'
-                }),
-                addBundleToCart: intl.formatMessage({
-                    defaultMessage: 'Add Bundle to Cart',
-                    id: 'product_view.button.add_bundle_to_cart'
-                }),
-                addToWishlist: intl.formatMessage({
-                    defaultMessage: 'Add to Wishlist',
-                    id: 'product_view.button.add_to_wishlist'
-                }),
-                addSetToWishlist: intl.formatMessage({
-                    defaultMessage: 'Add Set to Wishlist',
-                    id: 'product_view.button.add_set_to_wishlist'
-                }),
-                addBundleToWishlist: intl.formatMessage({
-                    defaultMessage: 'Add Bundle to Wishlist',
-                    id: 'product_view.button.add_bundle_to_wishlist'
-                })
-            }
-
-            const showError = () => {
-                showToast({
-                    title: intl.formatMessage(API_ERROR_MESSAGE),
-                    status: 'error'
-                })
+                update: formatMessage(messages.update),
+                addToCart: formatMessage(messages.addToCart),
+                addSetToCart: formatMessage(messages.addSetToCart),
+                addBundleToCart: formatMessage(messages.addBundleToCart),
+                addToWishlist: formatMessage(messages.addToWishlist),
+                addSetToWishlist: formatMessage(messages.addSetToWishlist),
+                addBundleToWishlist: formatMessage(messages.addBundleToWishlist)
             }
 
             const handleCartItem = async () => {
@@ -293,8 +312,8 @@ const ProductView = forwardRef(
                     <Button
                         key="cart-button"
                         onClick={handleCartItem}
-                        isDisabled={disableButton}
-                        isLoading={isBasketLoading}
+                        disabled={disableButton}
+                        loading={isBasketLoading}
                         width="100%"
                         variant="solid"
                         marginBottom={4}
@@ -317,7 +336,7 @@ const ProductView = forwardRef(
                         key="wishlist-button"
                         onClick={handleWishlistItem}
                         disabled={isWishlistLoading || !canAddToWishlist}
-                        isLoading={isWishlistLoading}
+                        loading={isWishlistLoading}
                         width="100%"
                         variant="outline"
                         marginBottom={4}
@@ -419,10 +438,7 @@ const ProductView = forwardRef(
                                                 to={`/product/${product.master.masterId}`}
                                                 color="blue.600"
                                             >
-                                                <FormattedMessage
-                                                    id="product_view.link.full_details"
-                                                    defaultMessage="See full details"
-                                                />
+                                                {formatMessage(messages.seeFullDetails)}
                                             </Link>
                                         )}
                                     </HideOnMobile>
@@ -434,7 +450,7 @@ const ProductView = forwardRef(
                     )}
 
                     {/* Variations & Quantity Selector & CTA buttons */}
-                    <VStack align="stretch" spacing={8} flex={1}>
+                    <VStack align="stretch" gap={8} flex={1}>
                         <Box display={['none', 'none', 'none', 'block']}>
                             <ProductViewHeader
                                 name={product?.name}
@@ -445,16 +461,13 @@ const ProductView = forwardRef(
                                 isProductPartOfBundle={isProductPartOfBundle}
                             />
                         </Box>
-                        <VStack align="stretch" spacing={4}>
+                        <VStack align="stretch" gap={4}>
                             {isProductPartOfBundle && (
                                 <Box>
                                     <Text fontWeight="medium" fontSize="md" aria-label="price">
                                         <label>
-                                            {intl.formatMessage({
-                                                defaultMessage: 'Quantity',
-                                                id: 'product_view.label.quantity'
-                                            })}
-                                            : {childOfBundleQuantity}
+                                            {formatMessage(messages.quantity)}:{' '}
+                                            {childOfBundleQuantity}
                                         </label>
                                     </Text>
                                 </Box>
@@ -527,13 +540,9 @@ const ProductView = forwardRef(
                                             key={id}
                                             value={selectedValue?.value}
                                             displayName={selectedValue?.name || ''}
-                                            label={intl.formatMessage(
-                                                {
-                                                    defaultMessage: '{variantType}',
-                                                    id: 'product_view.label.variant_type'
-                                                },
-                                                {variantType: name}
-                                            )}
+                                            label={formatMessage(messages.variantType, {
+                                                variantType: name
+                                            })}
                                         >
                                             {swatches}
                                         </SwatchGroup>
@@ -545,10 +554,7 @@ const ProductView = forwardRef(
                                 <VStack align="stretch" maxWidth={'200px'}>
                                     <Box fontWeight="bold">
                                         <label htmlFor="quantity">
-                                            {intl.formatMessage({
-                                                defaultMessage: 'Quantity:',
-                                                id: 'product_view.label.quantity'
-                                            })}
+                                            {formatMessage(messages.quantityLabel)}
                                         </label>
                                     </Box>
 
@@ -557,16 +563,16 @@ const ProductView = forwardRef(
                                         step={stepQuantity}
                                         value={quantity}
                                         min={minOrderQuantity}
-                                        onChange={(stringValue, numberValue) => {
+                                        onValueChange={({value, valueAsNumber}) => {
                                             // Set the Quantity of product to value of input if value number
-                                            if (numberValue >= 0) {
-                                                setQuantity(numberValue)
+                                            if (valueAsNumber >= 0) {
+                                                setQuantity(valueAsNumber)
                                                 if (isProductABundle)
-                                                    setSelectedBundleQuantity(numberValue)
-                                            } else if (stringValue === '') {
+                                                    setSelectedBundleQuantity(valueAsNumber)
+                                            } else if (value === '') {
                                                 // We want to allow the use to clear the input to start a new input so here we set the quantity to '' so NAN is not displayed
                                                 // User will not be able to add '' qauntity to the cart due to the add to cart button enablement rules
-                                                setQuantity(stringValue)
+                                                setQuantity(value)
                                             }
                                         }}
                                         onBlur={(e) => {
@@ -582,7 +588,9 @@ const ProductView = forwardRef(
                                             // This is useful for mobile devices, this allows the user to pop open the keyboard and set the
                                             // new quantity with one click. NOTE: This is something that can be refactored into the parent
                                             // component, potentially as a prop called `selectInputOnFocus`.
-                                            e.target.select()
+                                            if (e.target.select) {
+                                                e.target.select()
+                                            }
                                         }}
                                         productName={product?.name}
                                     />
@@ -592,10 +600,7 @@ const ProductView = forwardRef(
                                 {!showLoading && showOptionsMessage && (
                                     <Fade in={true}>
                                         <Text color="orange.600" fontWeight={600} marginBottom={8}>
-                                            {intl.formatMessage({
-                                                defaultMessage:
-                                                    'Please select all your options above'
-                                            })}
+                                            {formatMessage(messages.selectAllOptions)}
                                         </Text>
                                     </Fade>
                                 )}
@@ -606,10 +611,7 @@ const ProductView = forwardRef(
                                         to={`/product/${product.master.masterId}`}
                                         color="blue.600"
                                     >
-                                        <FormattedMessage
-                                            id="product_view.link.full_details"
-                                            defaultMessage="See full details"
-                                        />
+                                        {formatMessage(messages.seeFullDetails)}
                                     </Link>
                                 )}
                             </HideOnDesktop>
@@ -656,7 +658,7 @@ const ProductView = forwardRef(
                     left={0}
                     bottom={0}
                     zIndex={2}
-                    boxShadow={theme.shadows.top}
+                    boxShadow="top"
                 >
                     {renderActionButtons()}
                 </Box>

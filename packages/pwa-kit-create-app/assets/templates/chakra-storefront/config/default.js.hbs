@@ -1,0 +1,218 @@
+/*
+ * Copyright (c) 2025, salesforce.com, inc.
+ * All rights reserved.
+ * SPDX-License-Identifier: BSD-3-Clause
+ * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
+ */
+module.exports = {
+    enabled: true,
+    activeDataEnabled: false,
+    categoryNav: {
+        defaultNavSsrDepth: 1,
+        defaultRootCategory: 'root'
+    },
+    commerceAPI: {
+        proxyPath: '/mobify/proxy/api',
+        parameters: {
+            clientId: '{{answers.project.commerce.clientId}}',
+            organizationId: '{{answers.project.commerce.organizationId}}',
+            shortCode: '{{answers.project.commerce.shortCode}}',
+            siteId: '{{answers.project.commerce.siteId}}'
+        }
+    },
+    defaultSite: '{{answers.project.commerce.siteId}}',
+    defaultAppLocale: 'en-US',
+    defaultSiteTitle: 'Chakra Storefront',
+    pages: {
+        account: {
+            path: '/account',
+            orderSearchParam: {limit: 10, offset: 0, sort: 'best-matches', refine: []}
+        },
+        cart: {
+            path: '/cart'
+        },
+        checkout: {
+            path: '/checkout',
+            shippingCountryCode: [
+                {value: 'CA', label: 'Canada'},
+                {value: 'US', label: 'United States'}
+            ]
+        },
+        checkoutConfirmation: {
+            path: '/checkout/confirmation/:orderNo'
+        },
+        home: {
+            path: '/',
+            productLimit: 10,
+            mainCategory: 'newarrivals'
+        },
+        login: {
+            path: '/login'
+        },
+        registration: {
+            path: '/registration'
+        },
+        resetPassword: {
+            path: '/reset-password'
+        },
+        resetPasswordLanding: {
+            path: '/reset-password-landing'
+        },
+        loginRedirect: {
+            path: '/callback'
+        },
+        passwordlessLoginLanding: {
+            path: '/passwordless-login-landing'
+        },
+        productDetail: {
+            path: '/product/:productId'
+        },
+        productList: {
+            path: ['/search', '/category/:categoryId'],
+            imageViewType: 'large',
+            selectableAttributeId: 'color',
+            filterAccordionSate: 'filters-expanded-index'
+        },
+        socialRedirect: {
+            path: '/social-redirect'
+        }
+    },
+    defaultDnt: true,
+    einsteinAPI: {
+        host: 'https://api.cquotient.com',
+        einsteinId: '{{answers.project.einstein.clientId}}',
+        siteId: '{{answers.project.einstein.siteId}}',
+        isProduction: false
+    },
+    dataCloudAPI: {
+        appSourceId: '{{answers.project.dataCloud.appSourceId}}',
+        tenantId: '{{answers.project.dataCloud.tenantId}}'
+    },
+    login: {
+        passwordless: {
+            enabled: {{#if answers.project.demo.enableDemoSettings}}true{{else}}false{{/if}},
+            callbackURI: process.env.PASSWORDLESS_LOGIN_CALLBACK_URI || '/passwordless-login-callback',
+            landingPath: '/passwordless-login-landing'
+        },
+        social: {
+            enabled: {{#if answers.project.demo.enableDemoSettings}}true{{else}}false{{/if}},
+            idps: ['google', 'apple'],
+            redirectURI: process.env.SOCIAL_LOGIN_REDIRECT_URI || '/social-callback'
+        },
+        resetPassword: {
+            callbackURI: process.env.RESET_PASSWORD_CALLBACK_URI || '/reset-password-callback',
+            landingPath: '/reset-password-landing'
+        }
+    },
+    maxCacheAge: 900,
+    search: {
+        defaultLimitValues: [25, 50, 100],
+        defaultSearchParams: {limit: 25, offset: 0, sort: 'best-matches', refine: []},
+        recentSearchKey: 'recent-search-key',
+        recentSearchLimit: 5,
+        recentSearchMinLength: 3
+    },
+    siteAliases: {
+        RefArch: 'us',
+        RefArchGlobal: 'global'
+    },
+    sites: [
+        {
+            id: '{{answers.project.commerce.siteId}}',
+            {{#if answers.project.demo.enableDemoSettings}}
+            l10n: {
+                supportedCurrencies: ['USD', 'GBP', 'EUR', 'CNY', 'JPY'],
+                defaultCurrency: 'USD',
+                defaultLocale: 'en-US',
+                supportedLocales: [
+                    {
+                        id: 'en-US',
+                        preferredCurrency: 'USD'
+                    },
+                    {
+                        id: 'en-GB',
+                        preferredCurrency: 'GBP'
+                    },
+                    {
+                        id: 'de-DE',
+                        preferredCurrency: 'EUR'
+                    },
+                    {
+                        id: 'es-MX',
+                        preferredCurrency: 'MXN'
+                    },
+                    {
+                        id: 'fr-FR',
+                        preferredCurrency: 'EUR'
+                    },
+                    {
+                        id: 'it-IT',
+                        preferredCurrency: 'EUR'
+                    },
+                    {
+                        id: 'ja-JP',
+                        preferredCurrency: 'JPY'
+                    },
+                    {
+                        id: 'ko-KR',
+                        preferredCurrency: 'KRW'
+                    },
+                    {
+                        id: 'pt-BR',
+                        preferredCurrency: 'BRL'
+                    },
+                    {
+                        id: 'zh-CN',
+                        preferredCurrency: 'CNY'
+                    },
+                    {
+                        id: 'zh-TW',
+                        preferredCurrency: 'TWD'
+                    }
+                ]
+            }
+            {{else}}
+            l10n: {
+                supportedCurrencies: ['USD'],
+                defaultCurrency: 'USD',
+                defaultLocale: 'en-US',
+                supportedLocales: [
+                    {
+                        id: 'en-US',
+                        preferredCurrency: 'USD'
+                    }
+                ]
+            }
+            {{/if}}
+        }
+    ],
+    ssrEnabled: true,
+    ssrOnly: ['ssr.js', 'ssr.js.map', 'node_modules/**/*.*'],
+    ssrShared: [
+        'static/favicon.ico',
+        'static/robots.txt',
+        '**/*.js',
+        '**/*.js.map',
+        '**/*.json'
+    ],
+    ssrParameters: {
+        ssrFunctionNodeVersion: '22.x',
+        proxyConfigs: [
+            {
+                host: '{{answers.project.commerce.shortCode}}.api.commercecloud.salesforce.com',
+                path: 'api'
+            }{{~#if answers.project.commerce.instanceUrl}},
+            {
+                host: '{{answers.project.commerce.instanceUrl}}',
+                path: 'ocapi'
+            }{{/if}}
+        ]
+    },
+    staleWhileRevalidate: 900,
+    url: {
+        site: '{{#if answers.project.demo.enableDemoSettings}}path{{else}}none{{/if}}',
+        locale: '{{#if answers.project.demo.enableDemoSettings}}path{{else}}none{{/if}}',
+        showDefaults: {{#if answers.project.demo.enableDemoSettings}}true{{else}}false{{/if}},
+        interpretPlusSignAsSpace: false
+    }
+}

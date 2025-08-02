@@ -4,193 +4,193 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React, {useState} from 'react'
+import React, {useState, useMemo} from 'react'
 import PropTypes from 'prop-types'
 import {
     Box,
-    Text,
-    Divider,
-    SimpleGrid,
-    useMultiStyleConfig,
-    Select as ChakraSelect,
+    Button,
+    GridItem,
+    Group,
     Heading,
     Input,
-    InputGroup,
-    InputRightElement,
-    createStylesContext,
-    Button,
-    FormControl,
-    Alert,
-    AlertIcon,
-    AlertTitle,
-    AlertDescription
+    Separator,
+    SimpleGrid,
+    NativeSelect,
+    Text,
+
+    // hooks
+    useSlotRecipe
 } from '@chakra-ui/react'
 import {useIntl} from 'react-intl'
 
-import LinksList from '../links-list'
-import SocialIcons from '../social-icons'
-import {HideOnDesktop, HideOnMobile} from '../responsive'
+import LinksList from '../../components/links-list'
+import SocialIcons from '../../components/social-icons'
 import {getPathWithLocale} from '../../utils/url'
-import LocaleText from '../locale-text'
+import LocaleText from '../../components/locale-text'
 import useMultiSite from '../../hooks/use-multi-site'
-import {useMarketingConsent} from '../../hooks/use-marketing-consent'
-import {CONSENT_STATUS, CONSENT_CHANNELS, CONSENT_TAGS} from '../../constants/marketing-consent'
-import styled from '@emotion/styled'
 
-const [StylesProvider, useStyles] = createStylesContext('Footer')
 const Footer = ({...otherProps}) => {
-    const styles = useMultiStyleConfig('Footer')
+    const recipe = useSlotRecipe({key: 'footer'})
+    const styles = recipe()
     const intl = useIntl()
+    const {formatMessage} = intl
     const [locale, setLocale] = useState(intl.locale)
     const {site, buildUrl} = useMultiSite()
     const {l10n} = site
     const supportedLocaleIds = l10n?.supportedLocales.map((locale) => locale.id)
     const showLocaleSelector = supportedLocaleIds?.length > 1
 
-    // NOTE: this is a workaround to fix hydration error, by making sure that the `option.selected` property is set.
-    // For some reason, adding some styles prop (to the option element) prevented `selected` from being set.
-    // So now we add the styling to the parent element instead.
-    const Select = styled(ChakraSelect)({
-        // Targeting the child element
-        option: styles.localeDropdownOption
-    })
+    const messages = useMemo(
+        () => ({
+            columns: {
+                customerSupport: formatMessage({
+                    id: 'footer.column.customer_support',
+                    defaultMessage: 'Customer Support'
+                }),
+                account: formatMessage({
+                    id: 'footer.column.account',
+                    defaultMessage: 'Account'
+                }),
+                ourCompany: formatMessage({
+                    id: 'footer.column.our_company',
+                    defaultMessage: 'Our Company'
+                })
+            },
+            links: {
+                aboutUs: formatMessage({
+                    id: 'footer.link.about_us',
+                    defaultMessage: 'About Us'
+                }),
+                contactUs: formatMessage({
+                    id: 'footer.link.contact_us',
+                    defaultMessage: 'Contact Us'
+                }),
+                shipping: formatMessage({
+                    id: 'footer.link.shipping',
+                    defaultMessage: 'Shipping'
+                }),
+                orderStatus: formatMessage({
+                    id: 'footer.link.order_status',
+                    defaultMessage: 'Order Status'
+                }),
+                signinCreateAccount: formatMessage({
+                    id: 'footer.link.signin_create_account',
+                    defaultMessage: 'Sign in or create account'
+                })
+            },
+            localeSelector: formatMessage({
+                id: 'footer.locale_selector.assistive_msg',
+                defaultMessage: 'Select Language'
+            }),
+            copyright: formatMessage({
+                id: 'footer.message.copyright',
+                defaultMessage:
+                    'Salesforce or its affiliates. All rights reserved. This is a demo store only. Orders made WILL NOT be processed.'
+            })
+        }),
+        [intl]
+    )
+
     const makeOurCompanyLinks = () => {
         const links = []
         links.push({
             href: '/',
-            text: intl.formatMessage({
-                id: 'footer.link.about_us',
-                defaultMessage: 'About Us'
-            })
+            text: messages.links.aboutUs
         })
         return links
     }
 
     return (
-        <Box as="footer" {...styles.container} {...otherProps}>
-            <Box {...styles.content} as="section">
-                <StylesProvider value={styles}>
-                    <HideOnMobile>
-                        <SimpleGrid columns={4} spacing={3}>
-                            <LinksList
-                                heading={intl.formatMessage({
-                                    id: 'footer.column.customer_support',
-                                    defaultMessage: 'Customer Support'
-                                })}
-                                links={[
-                                    {
-                                        href: '/',
-                                        text: intl.formatMessage({
-                                            id: 'footer.link.contact_us',
-                                            defaultMessage: 'Contact Us'
-                                        })
-                                    },
-                                    {
-                                        href: '/',
-                                        text: intl.formatMessage({
-                                            id: 'footer.link.shipping',
-                                            defaultMessage: 'Shipping'
-                                        })
-                                    }
-                                ]}
-                            />
-                            <LinksList
-                                heading={intl.formatMessage({
-                                    id: 'footer.column.account',
-                                    defaultMessage: 'Account'
-                                })}
-                                links={[
-                                    {
-                                        href: '/',
-                                        text: intl.formatMessage({
-                                            id: 'footer.link.order_status',
-                                            defaultMessage: 'Order Status'
-                                        })
-                                    },
-                                    {
-                                        href: '/',
-                                        text: intl.formatMessage({
-                                            id: 'footer.link.signin_create_account',
-                                            defaultMessage: 'Sign in or create account'
-                                        })
-                                    }
-                                ]}
-                            />
-                            <LinksList
-                                heading={intl.formatMessage({
-                                    id: 'footer.column.our_company',
-                                    defaultMessage: 'Our Company'
-                                })}
-                                links={makeOurCompanyLinks()}
-                            />
-                            <Box>
+        <Box asChild css={styles.container} {...otherProps}>
+            <footer>
+                <Box css={styles.content} asChild>
+                    <section>
+                        <SimpleGrid columns={{base: 1, lg: 4}} gap={{base: 0, lg: 3}}>
+                            <GridItem colSpan={{base: 1, md: 3}}>
+                                <SimpleGrid
+                                    columns={{base: 1, lg: 3}}
+                                    gap={{base: 0, lg: 3}}
+                                    display={{base: 'none', lg: 'grid'}}
+                                >
+                                    <LinksList
+                                        heading={messages.columns.customerSupport}
+                                        links={[
+                                            {
+                                                href: '/',
+                                                text: messages.links.contactUs
+                                            },
+                                            {
+                                                href: '/',
+                                                text: messages.links.shipping
+                                            }
+                                        ]}
+                                    />
+                                    <LinksList
+                                        heading={messages.columns.account}
+                                        links={[
+                                            {
+                                                href: '/',
+                                                text: messages.links.orderStatus
+                                            },
+                                            {
+                                                href: '/',
+                                                text: messages.links.signinCreateAccount
+                                            }
+                                        ]}
+                                    />
+                                    <LinksList
+                                        heading={messages.columns.ourCompany}
+                                        links={makeOurCompanyLinks()}
+                                    />
+                                </SimpleGrid>
+                            </GridItem>
+                            <GridItem colSpan={{base: 1, md: 1}}>
                                 <Subscribe />
-                            </Box>
+                            </GridItem>
                         </SimpleGrid>
-                    </HideOnMobile>
-
-                    <HideOnDesktop>
-                        <Subscribe />
-                    </HideOnDesktop>
-
-                    {showLocaleSelector && (
-                        <Box {...styles.localeSelector}>
-                            <FormControl
+                        {showLocaleSelector && (
+                            <Box
                                 data-testid="sf-footer-locale-selector"
                                 id="locale_selector"
-                                width="auto"
+                                css={styles.localeSelectorWrapper}
                                 {...otherProps}
                             >
-                                <Select
-                                    defaultValue={locale}
-                                    onChange={({target}) => {
-                                        setLocale(target.value)
+                                <NativeSelect.Root css={styles.localeSelectorRoot} variant="filled">
+                                    <NativeSelect.Field
+                                        css={styles.localeSelectorField}
+                                        defaultValue={locale}
+                                        aria-label={messages.localeSelector}
+                                        onChange={(e) => {
+                                            const newLocale = e.currentTarget.value
+                                            setLocale(newLocale)
+                                            // Update the `locale` in the URL.
+                                            const newUrl = getPathWithLocale(newLocale, buildUrl, {
+                                                disallowParams: ['refine']
+                                            })
+                                            window.location = newUrl
+                                        }}
+                                    >
+                                        {supportedLocaleIds.map((locale) => (
+                                            <option key={locale} value={locale}>
+                                                <LocaleText shortCode={locale} />
+                                            </option>
+                                        ))}
+                                    </NativeSelect.Field>
+                                    <NativeSelect.Indicator />
+                                </NativeSelect.Root>
+                            </Box>
+                        )}
+                        <Separator css={styles.horizontalRule} />
+                        <Box css={styles.legalSection}>
+                            <Text css={styles.copyright}>
+                                &copy; {new Date().getFullYear()} {messages.copyright}
+                            </Text>
 
-                                        // Update the `locale` in the URL.
-                                        const newUrl = getPathWithLocale(target.value, buildUrl, {
-                                            disallowParams: ['refine']
-                                        })
-
-                                        window.location = newUrl
-                                    }}
-                                    variant="filled"
-                                    aria-label={intl.formatMessage({
-                                        id: 'footer.locale_selector.assistive_msg',
-                                        defaultMessage: 'Select Language'
-                                    })}
-                                    {...styles.localeDropdown}
-                                >
-                                    {supportedLocaleIds.map((locale) => (
-                                        <option key={locale} value={locale}>
-                                            <LocaleText shortCode={locale} />
-                                        </option>
-                                    ))}
-                                </Select>
-                            </FormControl>
+                            <LegalLinks variant={{base: 'vertical', lg: 'horizontal'}} />
                         </Box>
-                    )}
-
-                    <Divider {...styles.horizontalRule} />
-
-                    <Box {...styles.bottomHalf}>
-                        <Text {...styles.copyright}>
-                            &copy; {new Date().getFullYear()}{' '}
-                            {intl.formatMessage({
-                                id: 'footer.message.copyright',
-                                defaultMessage:
-                                    'Salesforce or its affiliates. All rights reserved. This is a demo store only. Orders made WILL NOT be processed.'
-                            })}
-                        </Text>
-
-                        <HideOnDesktop>
-                            <LegalLinks variant="vertical" />
-                        </HideOnDesktop>
-                        <HideOnMobile>
-                            <LegalLinks variant="horizontal" />
-                        </HideOnMobile>
-                    </Box>
-                </StylesProvider>
-            </Box>
+                    </section>
+                </Box>
+            </footer>
         </Box>
     )
 }
@@ -198,165 +198,94 @@ const Footer = ({...otherProps}) => {
 export default Footer
 
 const Subscribe = ({...otherProps}) => {
-    const styles = useStyles()
+    const recipe = useSlotRecipe({key: 'footer'})
+    const styles = recipe()
     const intl = useIntl()
-    const [email, setEmail] = useState('')
-    const [message, setMessage] = useState(null)
-    const [messageType, setMessageType] = useState('success')
-    const {fetchConsentItems, submitConsent, isLoading} = useMarketingConsent()
-    const PAGE_TAG = CONSENT_TAGS.HOMEPAGE_BANNER
-    const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    const {formatMessage} = intl
 
-    const handleSignUp = async () => {
-        if (!email) {
-            setMessage('Please enter your email address')
-            setMessageType('error')
-            return
-        }
-
-        // Basic email validation
-        if (!EMAIL_REGEX.test(email)) {
-            setMessage('Please enter a valid email address')
-            setMessageType('error')
-            return
-        }
-
-        try {
-            setMessage(null)
-
-            // Fetch consent items with HOMEPAGE_BANNER tag
-            const consentData = await fetchConsentItems(PAGE_TAG)
-
-            // Filter items that have HOMEPAGE_BANNER in their tags
-            const homepageBannerItems =
-                consentData.data?.filter((item) => item.tags?.includes(PAGE_TAG)) || []
-
-            if (homepageBannerItems.length === 0) {
-                setMessage('No subscription options available at this time')
-                setMessageType('error')
-                return
-            }
-
-            // Use the first available consent item for submission
-            // (There may be one or more subscriptionIds available for a single channel.)
-            const firstConsentItem = homepageBannerItems[0]
-            const consentItem = {
-                subscriptionId: firstConsentItem.subscriptionId,
-                contactPointValue: email,
-                channel: CONSENT_CHANNELS.EMAIL,
-                consent: CONSENT_STATUS.OPT_IN
-            }
-
-            // Submit the consent
-            const result = await submitConsent(consentItem)
-
-            // Check if the submission was successful
-            if (result?.status === CONSENT_STATUS.OPT_IN) {
-                setMessage('Thank you for subscribing! You will receive our latest updates.')
-                setMessageType('success')
-                setEmail('')
-            } else {
-                setMessage('Subscription failed. Please try again later.')
-                setMessageType('error')
-            }
-        } catch (error) {
-            console.error('Subscription error:', error)
-            setMessage('Something went wrong. Please try again later.')
-            setMessageType('error')
-        }
-    }
+    const messages = useMemo(
+        () => ({
+            heading: formatMessage({
+                id: 'footer.subscribe.heading.first_to_know',
+                defaultMessage: 'Be the first to know'
+            }),
+            description: formatMessage({
+                id: 'footer.subscribe.description.sign_up',
+                defaultMessage: 'Sign up to stay in the loop about the hottest deals'
+            }),
+            emailAriaLabel: formatMessage({
+                id: 'footer.subscribe.email.assistive_msg',
+                defaultMessage: 'Email address for newsletter'
+            }),
+            buttonSignUp: formatMessage({
+                id: 'footer.subscribe.button.sign_up',
+                defaultMessage: 'Sign Up'
+            })
+        }),
+        [intl]
+    )
 
     return (
-        <Box {...styles.subscribe} {...otherProps}>
-            <Heading as="h1" {...styles.subscribeHeading}>
-                {intl.formatMessage({
-                    id: 'footer.subscribe.heading.first_to_know',
-                    defaultMessage: 'Be the first to know'
-                })}
+        <Box css={styles.subscribe} {...otherProps}>
+            <Heading as="h1" css={styles.subscribeHeading}>
+                {messages.heading}
             </Heading>
-            <Text {...styles.subscribeMessage}>
-                {intl.formatMessage({
-                    id: 'footer.subscribe.description.sign_up',
-                    defaultMessage: 'Sign up to stay in the loop about the hottest deals'
-                })}
-            </Text>
-
-            {message && (
-                <Alert status={messageType} mb={4} borderRadius="md">
-                    <AlertIcon />
-                    <AlertDescription>{message}</AlertDescription>
-                </Alert>
-            )}
+            <Text css={styles.subscribeMessage}>{messages.description}</Text>
 
             <Box>
-                <InputGroup>
-                    {/* Had to swap the following InputRightElement and Input
-                        to avoid the hydration error due to mismatched html between server and client side.
-                        This is a workaround for Lastpass plugin that automatically injects its icon for input fields.
-                    */}
-                    <InputRightElement {...styles.subscribeButtonContainer}>
-                        <Button
-                            variant="footer"
-                            onClick={handleSignUp}
-                            isLoading={isLoading}
-                            loadingText="Signing Up"
-                        >
-                            {intl.formatMessage({
-                                id: 'footer.subscribe.button.sign_up',
-                                defaultMessage: 'Sign Up'
-                            })}
-                        </Button>
-                    </InputRightElement>
+                <Group attached w="full" maxW="sm">
                     <Input
                         type="email"
                         placeholder="you@email.com"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        onKeyDown={(e) => {
-                            if (e.key === 'Enter') {
-                                handleSignUp()
-                            }
-                        }}
-                        aria-label={intl.formatMessage({
-                            id: 'footer.subscribe.email.assistive_msg',
-                            defaultMessage: 'Email address for newsletter'
-                        })}
+                        aria-label={messages.emailAriaLabel}
                         id="subscribe-email"
-                        {...styles.subscribeField}
+                        css={styles.subscribeField}
                     />
-                </InputGroup>
+                    <Button variant="footer">{messages.buttonSignUp}</Button>
+                </Group>
             </Box>
 
-            <SocialIcons variant="flex-start" pinterestInnerColor="black" {...styles.socialIcons} />
+            <SocialIcons variant="flex-start" pinterestInnerColor="black" />
         </Box>
     )
 }
 
 const LegalLinks = ({variant}) => {
     const intl = useIntl()
+    const {formatMessage} = intl
+
+    const messages = useMemo(
+        () => ({
+            termsConditions: formatMessage({
+                id: 'footer.link.terms_conditions',
+                defaultMessage: 'Terms & Conditions'
+            }),
+            privacyPolicy: formatMessage({
+                id: 'footer.link.privacy_policy',
+                defaultMessage: 'Privacy Policy'
+            }),
+            siteMap: formatMessage({
+                id: 'footer.link.site_map',
+                defaultMessage: 'Site Map'
+            })
+        }),
+        [intl]
+    )
+
     return (
         <LinksList
             links={[
                 {
                     href: '/',
-                    text: intl.formatMessage({
-                        id: 'footer.link.terms_conditions',
-                        defaultMessage: 'Terms & Conditions'
-                    })
+                    text: messages.termsConditions
                 },
                 {
                     href: '/',
-                    text: intl.formatMessage({
-                        id: 'footer.link.privacy_policy',
-                        defaultMessage: 'Privacy Policy'
-                    })
+                    text: messages.privacyPolicy
                 },
                 {
                     href: '/',
-                    text: intl.formatMessage({
-                        id: 'footer.link.site_map',
-                        defaultMessage: 'Site Map'
-                    })
+                    text: messages.siteMap
                 }
             ]}
             color="gray.200"
@@ -365,5 +294,5 @@ const LegalLinks = ({variant}) => {
     )
 }
 LegalLinks.propTypes = {
-    variant: PropTypes.oneOf(['vertical', 'horizontal'])
+    variant: PropTypes.oneOfType([PropTypes.oneOf(['vertical', 'horizontal']), PropTypes.object])
 }

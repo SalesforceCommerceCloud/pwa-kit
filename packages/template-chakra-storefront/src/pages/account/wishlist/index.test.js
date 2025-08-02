@@ -8,25 +8,29 @@ import React from 'react'
 import AccountWishlist from '.'
 import {renderWithProviders} from '../../../utils/test-utils'
 import {screen, waitFor} from '@testing-library/react'
-import {rest} from 'msw'
 import {
     mockedNullWishList,
     mockedEmptyWishList,
     mockedProductLists,
     mockedWishListProducts
 } from './index.mock'
+import {prependHandlersToServer} from '../../../../jest-setup'
 
 beforeEach(() => {
     jest.resetModules()
 
-    global.server.use(
-        rest.get('*/products', (req, res, ctx) => {
-            return res(ctx.delay(0), ctx.status(200), ctx.json(mockedWishListProducts))
-        }),
-        rest.get('*/customers/:customerId/product-lists', (req, res, ctx) => {
-            return res(ctx.delay(0), ctx.status(200), ctx.json(mockedProductLists))
-        })
-    )
+    prependHandlersToServer([
+        {
+            path: '*/products',
+            method: 'get',
+            res: () => mockedWishListProducts
+        },
+        {
+            path: '*/customers/:customerId/product-lists',
+            method: 'get',
+            res: () => mockedProductLists
+        }
+    ])
 })
 
 test('Renders wishlist page', async () => {
@@ -38,11 +42,13 @@ test('Renders wishlist page', async () => {
 })
 
 test('renders no wishlist items for null data in wishlist', async () => {
-    global.server.use(
-        rest.get('*/customers/:customerId/product-lists', (req, res, ctx) => {
-            return res(ctx.delay(0), ctx.status(200), ctx.json(mockedNullWishList))
-        })
-    )
+    prependHandlersToServer([
+        {
+            path: '*/customers/:customerId/product-lists',
+            method: 'get',
+            res: () => mockedNullWishList
+        }
+    ])
 
     renderWithProviders(<AccountWishlist />)
     await waitFor(() => {
@@ -52,11 +58,13 @@ test('renders no wishlist items for null data in wishlist', async () => {
 })
 
 test('renders no wishlist items for empty data in wishlist', async () => {
-    global.server.use(
-        rest.get('*/customers/:customerId/product-lists', (req, res, ctx) => {
-            return res(ctx.delay(0), ctx.status(200), ctx.json(mockedEmptyWishList))
-        })
-    )
+    prependHandlersToServer([
+        {
+            path: '*/customers/:customerId/product-lists',
+            method: 'get',
+            res: () => mockedEmptyWishList
+        }
+    ])
 
     renderWithProviders(<AccountWishlist />)
     await waitFor(() => {

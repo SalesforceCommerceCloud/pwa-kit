@@ -16,7 +16,7 @@ import {
     ModalContent,
     useBreakpointValue
 } from '@chakra-ui/react'
-import StoreLocatorContent from './store-locator-content'
+import StoreLocatorContent from '../../components/store-locator-modal/store-locator-content'
 
 // Others
 import {

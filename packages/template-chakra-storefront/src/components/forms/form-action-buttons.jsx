@@ -4,9 +4,9 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React from 'react'
+import React, {useMemo} from 'react'
 import PropTypes from 'prop-types'
-import {FormattedMessage} from 'react-intl'
+import {useIntl} from 'react-intl'
 import {Button, Stack} from '@chakra-ui/react'
 import {MESSAGE_PROPTYPE} from '../../utils/locale.js'
 
@@ -21,24 +21,34 @@ const FormActionButtons = ({
     cancelButtonLabel,
     onCancel = () => {}
 }) => {
+    const intl = useIntl()
+    const {formatMessage} = intl
+
+    const messages = useMemo(
+        () => ({
+            save: saveButtonLabel
+                ? formatMessage(saveButtonLabel)
+                : formatMessage({
+                      id: 'form_action_buttons.button.save',
+                      defaultMessage: 'Save'
+                  }),
+            cancel: cancelButtonLabel
+                ? formatMessage(cancelButtonLabel)
+                : formatMessage({
+                      id: 'form_action_buttons.button.cancel',
+                      defaultMessage: 'Cancel'
+                  })
+        }),
+        [intl, saveButtonLabel, cancelButtonLabel]
+    )
+
     return (
-        <Stack direction={{base: 'column', lg: 'row-reverse'}} spacing={4}>
+        <Stack direction={{base: 'column', lg: 'row-reverse'}} gap={4}>
             <Button type="submit" minWidth={28} {...saveButtonProps}>
-                {saveButtonLabel ? (
-                    <FormattedMessage {...saveButtonLabel} />
-                ) : (
-                    <FormattedMessage defaultMessage="Save" id="form_action_buttons.button.save" />
-                )}
+                {messages.save}
             </Button>
             <Button variant="outline" minWidth={28} onClick={onCancel} {...cancelButtonProps}>
-                {cancelButtonLabel ? (
-                    <FormattedMessage {...cancelButtonLabel} />
-                ) : (
-                    <FormattedMessage
-                        id="form_action_buttons.button.cancel"
-                        defaultMessage="Cancel"
-                    />
-                )}
+                {messages.cancel}
             </Button>
         </Stack>
     )

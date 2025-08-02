@@ -5,9 +5,9 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React from 'react'
+import React, {useMemo} from 'react'
 import PropTypes from 'prop-types'
-import {useIntl, FormattedMessage, FormattedNumber} from 'react-intl'
+import {useIntl, FormattedNumber} from 'react-intl'
 import {Flex, Stack, Text, Box} from '@chakra-ui/react'
 import {useItemVariant} from '.'
 import PromoPopover from '../promo-popover'
@@ -26,6 +26,32 @@ const ItemAttributes = ({includeQuantity, currency, ...props}) => {
     const {currency: activeCurrency} = useCurrency()
     const promotionIds = variant.priceAdjustments?.map((adj) => adj.promotionId) ?? []
     const intl = useIntl()
+    const {formatMessage} = intl
+
+    const messages = useMemo(
+        () => ({
+            qty: formatMessage({
+                defaultMessage: 'Qty',
+                id: 'add_to_cart_modal.label.quantity'
+            }),
+            selectedOptions: formatMessage({
+                defaultMessage: 'Selected Options',
+                id: 'item_attributes.label.selected_options'
+            }),
+            promotions: formatMessage({
+                defaultMessage: 'Promotions',
+                id: 'item_attributes.label.promotions'
+            }),
+            quantity: formatMessage(
+                {
+                    id: 'item_attributes.label.quantity',
+                    defaultMessage: 'Quantity: {quantity}'
+                },
+                {quantity: variant.quantity}
+            )
+        }),
+        [intl, variant.quantity]
+    )
 
     // Fetch all the promotions given by price adjustments. We display this info in
     // the promotion info popover when applicable.
@@ -90,7 +116,7 @@ const ItemAttributes = ({includeQuantity, currency, ...props}) => {
     )
 
     return (
-        <Stack spacing={1.5} flex={1} {...props}>
+        <Stack gap={1.5} flex={1} {...props}>
             {variationValues &&
                 Object.keys(variationValues).map((key) => (
                     <Text
@@ -105,11 +131,7 @@ const ItemAttributes = ({includeQuantity, currency, ...props}) => {
 
             {includeQuantity && (
                 <Text lineHeight={1} color="gray.700" fontSize="sm">
-                    <FormattedMessage
-                        defaultMessage="Quantity: {quantity}"
-                        values={{quantity: variant.quantity}}
-                        id="item_attributes.label.quantity"
-                    />
+                    {messages.quantity}
                 </Text>
             )}
 
@@ -121,11 +143,7 @@ const ItemAttributes = ({includeQuantity, currency, ...props}) => {
                                 {product?.name}
                             </Text>
                             <Text fontSize="sm" color="gray.700">
-                                {intl.formatMessage({
-                                    defaultMessage: 'Qty',
-                                    id: 'add_to_cart_modal.label.quantity'
-                                })}
-                                : {quantity}
+                                {messages.qty}: {quantity}
                             </Text>
                         </Box>
                     ))}
@@ -135,11 +153,7 @@ const ItemAttributes = ({includeQuantity, currency, ...props}) => {
             {!bundleVariantIsLoading && productBundleVariantData && (
                 <Box>
                     <Text fontSize={15} marginTop={3} fontWeight={500}>
-                        {intl.formatMessage({
-                            defaultMessage: 'Selected Options',
-                            id: 'item_attributes.label.selected_options'
-                        })}
-                        :
+                        {messages.selectedOptions}:
                     </Text>
                     {productBundleVariantData?.map(
                         ({variationValues, name: productName, quantity, id}) => {
@@ -149,11 +163,7 @@ const ItemAttributes = ({includeQuantity, currency, ...props}) => {
                                         {productName}
                                     </Text>
                                     <Text fontSize="sm" color="gray.700">
-                                        {intl.formatMessage({
-                                            defaultMessage: 'Qty',
-                                            id: 'add_to_cart_modal.label.quantity'
-                                        })}
-                                        : {quantity}
+                                        {messages.qty}: {quantity}
                                     </Text>
                                     {Object.keys(variationValues).map((key) => {
                                         const selectedVariant = `${key}: ${variationValues[key]}`
@@ -177,10 +187,7 @@ const ItemAttributes = ({includeQuantity, currency, ...props}) => {
             {variant.priceAdjustments?.length > 0 && (
                 <Flex alignItems="center">
                     <Text lineHeight={1} color="gray.700" fontSize="sm">
-                        <FormattedMessage
-                            defaultMessage="Promotions"
-                            id="item_attributes.label.promotions"
-                        />
+                        {messages.promotions}
                         {': '}
                         <Text as="span" color="green.700">
                             <FormattedNumber

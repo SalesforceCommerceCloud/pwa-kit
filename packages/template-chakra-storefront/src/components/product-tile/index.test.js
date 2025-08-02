@@ -5,9 +5,9 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
-import ProductTile, {Skeleton} from './index'
+import ProductTile, {Skeleton} from '../../components/product-tile/index'
 import {renderWithProviders} from '../../utils/test-utils'
-import {fireEvent, waitFor, within, screen} from '@testing-library/react'
+import {fireEvent, waitFor, within, screen, act} from '@testing-library/react'
 import {
     mockMasterProductHitWithMultipleVariants,
     mockMasterProductHitWithOneVariant,
@@ -54,7 +54,7 @@ test('Renders PricingAndPromotionsSkeleton when isRefetching is true', async () 
     expect(queryByTestId('sf-product-tile-skeleton')).not.toBeInTheDocument()
 })
 
-test('Remove from wishlist cannot be muti-clicked', () => {
+test('Remove from wishlist cannot be muti-clicked', async () => {
     const onClick = jest.fn()
 
     const {getByTestId} = renderWithProviders(
@@ -64,10 +64,12 @@ test('Remove from wishlist cannot be muti-clicked', () => {
             onFavouriteToggle={onClick}
         />
     )
-    const wishlistButton = getByTestId('wishlist-button')
 
-    fireEvent.click(wishlistButton)
-    fireEvent.click(wishlistButton)
+    await act(async () => {
+        const wishlistButton = getByTestId('wishlist-button')
+        fireEvent.click(wishlistButton)
+        fireEvent.click(wishlistButton)
+    })
     expect(onClick).toHaveBeenCalledTimes(1)
 })
 
@@ -93,9 +95,11 @@ test('Renders variant details based on the selected swatch', async () => {
     expect(strikethroughPriceTag).toHaveLength(1)
     expect(within(strikethroughPriceTag[0]).getByText(/£320\.00/i)).toBeDefined()
 
-    // Navigating to different color swatch changes the image & price.
-    // Default selected swatch is swatches[1] as it is the represented product.
-    fireEvent.mouseOver(swatches[0])
+    await act(async () => {
+        // Navigating to different color swatch changes the image & price.
+        // Default selected swatch is swatches[1] as it is the represented product.
+        fireEvent.mouseOver(swatches[0])
+    })
     await waitFor(() => screen.getByTestId('product-tile-image'))
     expect(productImage.firstChild.getAttribute('src')).toBe(
         'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw29b7f226/images/large/PG.52002RUBN4Q.NAVYWL.PZ.jpg'
@@ -129,9 +133,11 @@ test('Renders variant details based on the selected swatch on mobile', async () 
     expect(strikethroughPriceTag).toHaveLength(1)
     expect(within(strikethroughPriceTag[0]).getByText(/£320\.00/i)).toBeDefined()
 
-    // Navigating to different color swatch changes the image & price.
-    // Default selected swatch is swatches[1] as it is the represented product.
-    fireEvent.click(swatches[0])
+    await act(async () => {
+        // Navigating to different color swatch changes the image & price.
+        // Default selected swatch is swatches[1] as it is the represented product.
+        fireEvent.click(swatches[0])
+    })
     await waitFor(() => screen.getByTestId('product-tile-image'))
     expect(productImage.firstChild.getAttribute('src')).toBe(
         'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw29b7f226/images/large/PG.52002RUBN4Q.NAVYWL.PZ.jpg'
@@ -165,8 +171,10 @@ test('Renders price range with starting price and strikethrough price for master
 
     // Navigating to different color swatch changes the image but keeps the same price range.
     const swatches = getAllByRole('radio')
-    // Default selected swatch is swatches[1] as it is the represented product.
-    fireEvent.mouseOver(swatches[0])
+    await act(async () => {
+        // Default selected swatch is swatches[1] as it is the represented product.
+        fireEvent.mouseOver(swatches[0])
+    })
     await waitFor(() => screen.getByTestId('product-tile-image'))
     expect(productImage.firstChild.getAttribute('src')).toBe(
         'https://edge.disstg.commercecloud.salesforce.com/dw/image/v2/ZZRF_001/on/demandware.static/-/Sites-apparel-m-catalog/default/dw7e4c00a0/images/large/PG.10217069.JJ5QZXX.PZ.jpg'

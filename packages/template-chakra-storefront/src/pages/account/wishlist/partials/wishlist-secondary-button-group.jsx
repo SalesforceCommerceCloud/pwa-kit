@@ -4,13 +4,13 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React from 'react'
+import React, {useMemo} from 'react'
 import PropTypes from 'prop-types'
 import {Button, ButtonGroup, useDisclosure} from '@chakra-ui/react'
-import {useIntl, defineMessage, FormattedMessage} from 'react-intl'
+import {useIntl, defineMessage} from 'react-intl'
 import {useShopperCustomersMutation} from '@salesforce/commerce-sdk-react'
 
-import {useToast} from '../../../../hooks/use-toast'
+import useToast from '../../../../hooks/use-toast'
 import {useCurrentCustomer} from '../../../../hooks/use-current-customer'
 import {useWishList} from '../../../../hooks/use-wish-list'
 
@@ -62,7 +62,30 @@ const WishlistSecondaryButtonGroup = ({
     const {data: wishList} = useWishList()
     const modalProps = useDisclosure()
     const toast = useToast()
-    const {formatMessage} = useIntl()
+    const intl = useIntl()
+    const {formatMessage} = intl
+
+    const messages = useMemo(
+        () => ({
+            itemRemoved: formatMessage({
+                id: 'wishlist_secondary_button_group.info.item_removed',
+                defaultMessage: 'Item removed from wishlist'
+            }),
+            removeItemLabel: (productName) =>
+                formatMessage(
+                    {
+                        id: 'wishlist_secondary_button_group.info.item.remove.label',
+                        defaultMessage: 'Remove {productName}'
+                    },
+                    {productName}
+                ),
+            remove: formatMessage({
+                id: 'wishlist_secondary_button_group.action.remove',
+                defaultMessage: 'Remove'
+            })
+        }),
+        [intl]
+    )
 
     const showRemoveItemConfirmation = () => {
         modalProps.onOpen()
@@ -86,18 +109,15 @@ const WishlistSecondaryButtonGroup = ({
             await promise
 
             toast({
-                title: formatMessage({
-                    defaultMessage: 'Item removed from wishlist',
-                    id: 'wishlist_secondary_button_group.info.item_removed'
-                }),
-                status: 'success'
+                title: messages.itemRemoved,
+                type: 'success'
             })
 
             // After we remove an item from the wishlist
             // we need to place focus to the next logical place for accessibility
             focusElementOnRemove?.current?.focus()
         } catch {
-            toast({title: formatMessage(API_ERROR_MESSAGE), status: 'error'})
+            toast({title: formatMessage(API_ERROR_MESSAGE), type: 'error'})
         }
     }
 
@@ -105,22 +125,13 @@ const WishlistSecondaryButtonGroup = ({
         <>
             <ButtonGroup spacing="6">
                 <Button
-                    variant="link"
+                    variant="link-blue"
                     size="sm"
                     onClick={showRemoveItemConfirmation}
                     data-testid={`sf-wishlist-remove-${productListItemId}`}
-                    aria-label={formatMessage(
-                        {
-                            defaultMessage: 'Remove {productName}',
-                            id: 'wishlist_secondary_button_group.info.item.remove.label'
-                        },
-                        {productName}
-                    )}
+                    aria-label={messages.removeItemLabel(productName)}
                 >
-                    <FormattedMessage
-                        defaultMessage="Remove"
-                        id="wishlist_secondary_button_group.action.remove"
-                    />
+                    {messages.remove}
                 </Button>
                 {/* <Button variant="link" size="sm" onClick={onItemEdit}>
             <FormattedMessage defaultMessage="Edit" />

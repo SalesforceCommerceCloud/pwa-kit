@@ -4,28 +4,29 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React, {useEffect, useState} from 'react'
-import {FormattedMessage, useIntl} from 'react-intl'
-import {Alert, AlertIcon, Box, Button, Container, Grid, GridItem, Stack} from '@chakra-ui/react'
+import React, {useEffect, useState, useMemo} from 'react'
+import {useIntl} from 'react-intl'
+import {Alert, Box, Button, Container, Grid, GridItem, Stack} from '@chakra-ui/react'
 import useNavigation from '../../hooks/use-navigation'
 import {CheckoutProvider, useCheckout} from './util/checkout-context'
-import ContactInfo from './partials/contact-info'
-import ShippingAddress from './partials/shipping-address'
-import ShippingOptions from './partials/shipping-options'
-import Payment from './partials/payment'
+import ContactInfo from '../../pages/checkout/partials/contact-info'
+import ShippingAddress from '../../pages/checkout/partials/shipping-address'
+import ShippingOptions from '../../pages/checkout/partials/shipping-options'
+import Payment from '../../pages/checkout/partials/payment'
 import OrderSummary from '../../components/order-summary'
-import {useCurrentCustomer} from '../../hooks/use-current-customer'
-import {useCurrentBasket} from '../../hooks/use-current-basket'
-import CheckoutSkeleton from './partials/checkout-skeleton'
+import {useCurrentCustomer, useCurrentBasket} from '../../hooks'
+import CheckoutSkeleton from '../../pages/checkout/partials/checkout-skeleton'
 import {useShopperOrdersMutation, useShopperBasketsMutation} from '@salesforce/commerce-sdk-react'
 import UnavailableProductConfirmationModal from '../../components/unavailable-product-confirmation-modal'
 import {API_ERROR_MESSAGE, TOAST_MESSAGE_REMOVED_ITEM_FROM_CART} from '../../../config/constants'
-import {useToast} from '../../hooks/use-toast'
+import useToast from '../../hooks/use-toast'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import LoadingSpinner from '../../components/loading-spinner'
+import {AlertIcon} from '../../components/icons'
 
 const Checkout = () => {
-    const {formatMessage} = useIntl()
+    const intl = useIntl()
+    const {formatMessage} = intl
     const navigate = useNavigation()
     const {step} = useCheckout()
     const [error, setError] = useState()
@@ -36,6 +37,20 @@ const Checkout = () => {
     const isSocialEnabled = !!loginConfig?.social?.enabled
     const isPasswordlessEnabled = !!loginConfig?.passwordless?.enabled
     const idps = loginConfig?.social?.idps || []
+
+    const messages = useMemo(
+        () => ({
+            placeOrder: formatMessage({
+                id: 'checkout.button.place_order',
+                defaultMessage: 'Place Order'
+            }),
+            genericError: formatMessage({
+                id: 'checkout.message.generic_error',
+                defaultMessage: 'An unexpected error occurred during checkout.'
+            })
+        }),
+        [intl]
+    )
 
     useEffect(() => {
         if (error || step === 4) {
@@ -51,11 +66,7 @@ const Checkout = () => {
             })
             navigate(`/checkout/confirmation/${order.orderNo}`)
         } catch (error) {
-            const message = formatMessage({
-                id: 'checkout.message.generic_error',
-                defaultMessage: 'An unexpected error occurred during checkout.'
-            })
-            setError(message)
+            setError(messages.genericError)
         } finally {
             setIsLoading(false)
         }
@@ -71,12 +82,14 @@ const Checkout = () => {
             >
                 <Grid templateColumns={{base: '1fr', lg: '66% 1fr'}} gap={{base: 10, xl: 20}}>
                     <GridItem>
-                        <Stack spacing={4}>
+                        <Stack gap={4}>
                             {error && (
-                                <Alert status="error" variant="left-accent">
-                                    <AlertIcon />
-                                    {error}
-                                </Alert>
+                                <Alert.Root status="error" colorPalette="red">
+                                    <Alert.Indicator>
+                                        <AlertIcon color="red.500" boxSize={4} />
+                                    </Alert.Indicator>
+                                    <Alert.Description>{error}</Alert.Description>
+                                </Alert.Root>
                             )}
 
                             <ContactInfo
@@ -97,10 +110,7 @@ const Checkout = () => {
                                             isLoading={isLoading}
                                             data-testid="sf-checkout-place-order-btn"
                                         >
-                                            <FormattedMessage
-                                                defaultMessage="Place Order"
-                                                id="checkout.button.place_order"
-                                            />
+                                            {messages.placeOrder}
                                         </Button>
                                     </Container>
                                 </Box>
@@ -117,11 +127,8 @@ const Checkout = () => {
 
                         {step === 4 && (
                             <Box display={{base: 'none', lg: 'block'}} pt={2}>
-                                <Button w="full" onClick={submitOrder} isLoading={isLoading}>
-                                    <FormattedMessage
-                                        defaultMessage="Place Order"
-                                        id="checkout.button.place_order"
-                                    />
+                                <Button w="full" onClick={submitOrder} loading={isLoading}>
+                                    {messages.placeOrder}
                                 </Button>
                             </Box>
                         )}
@@ -143,10 +150,7 @@ const Checkout = () => {
                 >
                     <Container variant="form">
                         <Button w="full" onClick={submitOrder} isLoading={isLoading}>
-                            <FormattedMessage
-                                defaultMessage="Place Order"
-                                id="checkout.button.place_order"
-                            />
+                            {messages.placeOrder}
                         </Button>
                     </Container>
                 </Box>
@@ -158,7 +162,8 @@ const Checkout = () => {
 const CheckoutContainer = () => {
     const {data: customer} = useCurrentCustomer()
     const {data: basket} = useCurrentBasket()
-    const {formatMessage} = useIntl()
+    const intl = useIntl()
+    const {formatMessage} = intl
     const removeItemFromBasketMutation = useShopperBasketsMutation('removeItemFromBasket')
     const toast = useToast()
     const [isDeletingUnavailableItem, setIsDeletingUnavailableItem] = useState(false)
@@ -171,14 +176,16 @@ const CheckoutContainer = () => {
             {
                 onSuccess: () => {
                     toast({
-                        title: formatMessage(TOAST_MESSAGE_REMOVED_ITEM_FROM_CART, {quantity: 1}),
-                        status: 'success'
+                        title: formatMessage(TOAST_MESSAGE_REMOVED_ITEM_FROM_CART, {
+                            quantity: 1
+                        }),
+                        type: 'success'
                     })
                 },
                 onError: () => {
                     toast({
                         title: formatMessage(API_ERROR_MESSAGE),
-                        status: 'error'
+                        type: 'error'
                     })
                 }
             }

@@ -4,38 +4,51 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
+import {defineLayerStyles} from '@chakra-ui/react'
+
 const card = {
-    py: 6,
-    px: 4,
-    backgroundColor: 'white',
-    rounded: 'base',
-    boxShadow: 'base'
+    defineLayerStyles: 'Cart layout styles',
+    value: {
+        py: 6,
+        px: 4,
+        backgroundColor: 'white',
+        rounded: 'base',
+        boxShadow: 'xs'
+    }
 }
 
 const cardBordered = {
-    ...card,
-    px: [4, 4, 5, 6],
-    border: '1px solid',
-    borderColor: 'gray.50'
+    description: 'Card border layout styles',
+    value: {
+        ...card.value,
+        px: [4, 4, 5, 6],
+        border: '1px solid',
+        borderColor: 'gray.50'
+    }
 }
 
-export default {
+export default defineLayerStyles({
     card,
-
     cardBordered,
 
     ccIcon: {
-        width: '34px',
-        height: '22px'
+        description: 'Credit card icon',
+        value: {
+            width: '34px',
+            height: '22px'
+        }
     },
 
     page: {
-        px: [4, 4, 6, 6, 8],
-        paddingTop: [4, 4, 6, 6, 8],
-        paddingBottom: 32,
-        width: '100%',
-        maxWidth: 'container.xxxl',
-        marginLeft: 'auto',
-        marginRight: 'auto'
+        description: 'Page layout styles',
+        value: {
+            px: [4, 4, 6, 6, 8],
+            paddingTop: [4, 4, 6, 6, 8],
+            paddingBottom: 32,
+            width: '100%',
+            maxWidth: 'container.xxxl',
+            marginLeft: 'auto',
+            marginRight: 'auto'
+        }
     }
-}
+})

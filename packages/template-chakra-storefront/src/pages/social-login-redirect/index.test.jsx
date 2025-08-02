@@ -7,14 +7,8 @@
 import React from 'react'
 import {screen} from '@testing-library/react'
 import {renderWithProviders} from '../../utils/test-utils'
-import SocialLoginRedirect from './index'
-jest.mock('@salesforce/pwa-kit-runtime/utils/ssr-config', () => {
-    const original = jest.requireActual('@salesforce/pwa-kit-runtime/utils/ssr-config')
-    return {
-        ...original,
-        getConfig: jest.fn(() => require('../../../mock-config'))
-    }
-})
+import SocialLoginRedirect from '../../pages/social-login-redirect/index'
+
 test('Social Login Redirect renders without errors', () => {
     renderWithProviders(<SocialLoginRedirect />)
     expect(screen.getByText('Authenticating...')).toBeInTheDocument()

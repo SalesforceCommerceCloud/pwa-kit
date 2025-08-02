@@ -376,7 +376,7 @@ const main = async () => {
                     throw new Error(`Supplied "buildDirectory" does not exist!`)
                 }
 
-                const mobify = getConfig({buildDirectory}) || {}
+                const config = getConfig({buildDirectory}) || {}
 
                 if (!projectSlug) {
                     projectSlug = await getProjectName()
@@ -384,9 +384,9 @@ const main = async () => {
 
                 const bundle = await scriptUtils.createBundle({
                     message,
-                    ssr_parameters: mobify.ssrParameters,
-                    ssr_only: mobify.ssrOnly,
-                    ssr_shared: mobify.ssrShared,
+                    ssr_parameters: config.ssrParameters,
+                    ssr_only: config.ssrOnly,
+                    ssr_shared: config.ssrShared,
                     buildDirectory,
                     projectSlug
                 })

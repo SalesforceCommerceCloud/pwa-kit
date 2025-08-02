@@ -5,14 +5,24 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
-import {screen, within, waitFor} from '@testing-library/react'
+import {screen, within, waitFor, act} from '@testing-library/react'
 import {guestToken, registerUserToken, renderWithProviders} from '../../utils/test-utils'
 import Registration from '.'
 import {BrowserRouter as Router, Route} from 'react-router-dom'
 import Account from '../account'
-import mockConfig from '../../../mock-config'
+import mockConfig from '../../../config/mocks/mock-config'
 import {rest} from 'msw'
 import {mockedRegisteredCustomer} from '../../../mocks/mock-data'
+jest.mock('../../hooks/use-datacloud', () => ({
+    __esModule: true,
+    default: jest.fn(() => ({
+        sendViewPage: jest.fn(),
+        sendViewProduct: jest.fn(),
+        sendViewCategory: jest.fn(),
+        sendViewSearchResults: jest.fn(),
+        sendViewRecommendations: jest.fn()
+    }))
+}))
 
 const MockedComponent = () => {
     const match = {
@@ -72,7 +82,7 @@ test('Allows customer to create an account', async () => {
         wrapperProps: {
             siteAlias: 'uk',
             locale: {id: 'en-GB'},
-            appConfig: mockConfig.app,
+            config: mockConfig,
             bypassAuth: false
         }
     })
@@ -83,10 +93,12 @@ test('Allows customer to create an account', async () => {
     // fill out form and submit
     const withinForm = within(form)
 
-    await user.type(withinForm.getByLabelText('First Name'), 'Tester')
-    await user.type(withinForm.getByLabelText('Last Name'), 'Tester')
-    await user.type(withinForm.getByPlaceholderText(/you@email.com/i), 'customer@test.com')
-    await user.type(withinForm.getAllByLabelText(/password/i)[0], 'Password!1')
+    await act(async () => {
+        await user.type(withinForm.getByLabelText('First Name'), 'Tester')
+        await user.type(withinForm.getByLabelText('Last Name'), 'Tester')
+        await user.type(withinForm.getByPlaceholderText(/you@email.com/i), 'customer@test.com')
+        await user.type(withinForm.getAllByLabelText(/password/i)[0], 'Password!1')
+    })
 
     // login with credentials
     global.server.use(
@@ -111,8 +123,9 @@ test('Allows customer to create an account', async () => {
         })
     )
 
-    await user.click(withinForm.getByText(/create account/i))
-
+    await act(async () => {
+        await user.click(withinForm.getByText(/create account/i))
+    })
     // wait for success state to appear
     const myAccount = await screen.findAllByText(/My Account/)
 

@@ -7,33 +7,50 @@
 
 import React, {Fragment} from 'react'
 import PropTypes from 'prop-types'
-import {FormattedMessage} from 'react-intl'
+import {useIntl, defineMessages} from 'react-intl'
 import {Alert, Button, Stack, Text} from '@chakra-ui/react'
-import {AlertIcon, BrandLogo} from '../icons'
-import StandardLogin from '../standard-login'
-import PasswordlessLogin from '../passwordless-login'
+import {AlertIcon, BrandLogo} from '../../components/icons'
+import StandardLogin from '../../components/standard-login'
+import PasswordlessLogin from '../../components/passwordless-login'
 import {noop} from '../../utils/utils'
+
+const messages = defineMessages({
+    welcomeBack: {
+        defaultMessage: 'Welcome Back',
+        id: 'login_form.message.welcome_back'
+    },
+    dontHaveAccount: {
+        defaultMessage: "Don't have an account?",
+        id: 'login_form.message.dont_have_account'
+    },
+    createAccount: {
+        defaultMessage: 'Create account',
+        id: 'login_form.action.create_account'
+    }
+})
 
 const LoginForm = ({
     submitForm,
     handleForgotPasswordClick,
-    handlePasswordlessLoginClick,
     clickCreateAccount = noop,
     form,
     isPasswordlessEnabled = false,
     isSocialEnabled = false,
-    idps = [],
-    setLoginType
+    idps = []
 }) => {
+    const {formatMessage} = useIntl()
     return (
         <Fragment>
-            <Stack justify="center" align="center" spacing={8} marginBottom={8}>
+            <Stack
+                justifyContent="center"
+                alignItems="center"
+                gap={8}
+                marginTop={8}
+                marginBottom={8}
+            >
                 <BrandLogo width="60px" height="auto" />
-                <Text align="center" fontSize="xl" fontWeight="semibold">
-                    <FormattedMessage
-                        defaultMessage="Welcome Back"
-                        id="login_form.message.welcome_back"
-                    />
+                <Text textAlign="center" fontSize="xl" fontWeight="semibold">
+                    {formatMessage(messages.welcomeBack)}
                 </Text>
             </Stack>
             <form
@@ -42,22 +59,22 @@ const LoginForm = ({
                 data-testid="sf-auth-modal-form"
             >
                 {form.formState.errors?.global && (
-                    <Alert status="error" marginBottom={8}>
-                        <AlertIcon color="red.500" boxSize={4} />
-                        <Text fontSize="sm" ml={3}>
+                    <Alert.Root status="error" marginBottom={8}>
+                        <Alert.Indicator>
+                            <AlertIcon color="red.500" boxSize={4} />
+                        </Alert.Indicator>
+                        <Alert.Description fontSize="sm">
                             {form.formState.errors.global.message}
-                        </Text>
-                    </Alert>
+                        </Alert.Description>
+                    </Alert.Root>
                 )}
-                <Stack spacing={6}>
+                <Stack gap={6}>
                     {isPasswordlessEnabled ? (
                         <PasswordlessLogin
                             form={form}
                             handleForgotPasswordClick={handleForgotPasswordClick}
-                            handlePasswordlessLoginClick={handlePasswordlessLoginClick}
                             isSocialEnabled={isSocialEnabled}
                             idps={idps}
-                            setLoginType={setLoginType}
                         />
                     ) : (
                         <StandardLogin
@@ -68,18 +85,15 @@ const LoginForm = ({
                         />
                     )}
 
-                    <Stack direction="row" spacing={1} justify="center">
-                        <Text fontSize="sm">
-                            <FormattedMessage
-                                defaultMessage="Don't have an account?"
-                                id="login_form.message.dont_have_account"
-                            />
-                        </Text>
-                        <Button variant="link" size="sm" onClick={clickCreateAccount}>
-                            <FormattedMessage
-                                defaultMessage="Create account"
-                                id="login_form.action.create_account"
-                            />
+                    <Stack direction="row" gap={1} justifyContent="center">
+                        <Text fontSize="sm">{formatMessage(messages.dontHaveAccount)}</Text>
+                        <Button
+                            variant="link-blue"
+                            size="sm"
+                            lineHeight="1"
+                            onClick={clickCreateAccount}
+                        >
+                            {formatMessage(messages.createAccount)}
                         </Button>
                     </Stack>
                 </Stack>
@@ -92,12 +106,10 @@ LoginForm.propTypes = {
     submitForm: PropTypes.func,
     handleForgotPasswordClick: PropTypes.func,
     clickCreateAccount: PropTypes.func,
-    handlePasswordlessLoginClick: PropTypes.func,
     form: PropTypes.object,
     isPasswordlessEnabled: PropTypes.bool,
     isSocialEnabled: PropTypes.bool,
-    idps: PropTypes.arrayOf(PropTypes.string),
-    setLoginType: PropTypes.func
+    idps: PropTypes.arrayOf(PropTypes.string)
 }
 
 export default LoginForm
