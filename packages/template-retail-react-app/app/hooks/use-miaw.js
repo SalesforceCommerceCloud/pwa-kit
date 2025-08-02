@@ -63,7 +63,8 @@ const useMiaw = (
     embeddedServiceDeploymentName,
     embeddedServiceDeploymentUrl,
     scrt2Url,
-    locale
+    locale,
+    refreshToken
 ) => {
     useEffect(() => {
         if (scriptLoadStatus.loaded && !scriptLoadStatus.error) {
@@ -72,7 +73,8 @@ const useMiaw = (
                 embeddedServiceDeploymentName,
                 embeddedServiceDeploymentUrl,
                 scrt2Url,
-                locale
+                locale,
+                refreshToken
             )
         }
     }, [
@@ -81,7 +83,8 @@ const useMiaw = (
         embeddedServiceDeploymentName,
         embeddedServiceDeploymentUrl,
         scrt2Url,
-        locale
+        locale,
+        refreshToken
     ])
 }
 
