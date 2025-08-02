@@ -180,13 +180,6 @@ export const SHOPPER_CONTEXT_SEARCH_PARAMS = {
     }
 }
 
-// Constants for Login
-export const LOGIN_TYPES = {
-    PASSWORD: 'password',
-    PASSWORDLESS: 'passwordless',
-    SOCIAL: 'social'
-}
-
 export const PASSWORDLESS_ERROR_MESSAGES = [
     /callback_uri doesn't match/i,
     /passwordless permissions error/i,

@@ -4,34 +4,21 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React, {useEffect, useRef, useState} from 'react'
+import React, {useEffect, useRef, useState, useMemo} from 'react'
 import PropTypes from 'prop-types'
-import {
-    Alert,
-    AlertDialog,
-    AlertDialogBody,
-    AlertDialogContent,
-    AlertDialogFooter,
-    AlertDialogHeader,
-    AlertDialogOverlay,
-    AlertIcon,
-    Box,
-    Button,
-    Container,
-    Stack,
-    Text
-} from '@chakra-ui/react'
+import {Alert, Box, Button, Container, Dialog, Stack, Text} from '@chakra-ui/react'
 import {useForm} from 'react-hook-form'
-import {FormattedMessage, useIntl} from 'react-intl'
+import {useIntl} from 'react-intl'
 import {useCheckout} from '../util/checkout-context'
 import useLoginFields from '../../../components/forms/useLoginFields'
 import {ToggleCard, ToggleCardEdit, ToggleCardSummary} from '../../../components/toggle-card'
 import Field from '../../../components/field'
-import LoginState from './login-state'
+import SafePortal from '../../../components/safe-portal'
+import {AlertIcon} from '../../../components/icons'
+import LoginState from '../../../pages/checkout/partials/login-state'
 import {AuthModal, EMAIL_VIEW, PASSWORD_VIEW, useAuthModal} from '../../../hooks/use-auth-modal'
 import useNavigation from '../../../hooks/use-navigation'
-import {useCurrentCustomer} from '../../../hooks/use-current-customer'
-import {useCurrentBasket} from '../../../hooks/use-current-basket'
+import {useCurrentCustomer, useCurrentBasket} from '../../../hooks'
 import {isAbsoluteURL} from '../../../page-designer/utils'
 import {useAppOrigin} from '../../../hooks/use-app-origin'
 import {AuthHelpers, useAuthHelper, useShopperBasketsMutation} from '@salesforce/commerce-sdk-react'
@@ -46,7 +33,8 @@ import {
 } from '../../../../config/constants'
 
 const ContactInfo = ({isSocialEnabled = false, isPasswordlessEnabled = false, idps = []}) => {
-    const {formatMessage} = useIntl()
+    const intl = useIntl()
+    const {formatMessage} = intl
     const navigate = useNavigation()
     const {data: customer} = useCurrentCustomer()
     const {data: basket} = useCurrentBasket()
@@ -73,7 +61,6 @@ const ContactInfo = ({isSocialEnabled = false, isPasswordlessEnabled = false, id
 
     const [authModalView, setAuthModalView] = useState(PASSWORD_VIEW)
     const authModal = useAuthModal(authModalView)
-    const [isPasswordlessLoginClicked, setIsPasswordlessLoginClicked] = useState(false)
     const passwordlessConfigCallback = config.login?.passwordless?.callbackURI
     const callbackURL = isAbsoluteURL(passwordlessConfigCallback)
         ? passwordlessConfigCallback
@@ -98,13 +85,42 @@ const ContactInfo = ({isSocialEnabled = false, isPasswordlessEnabled = false, id
         }
     }
 
+    const messages = useMemo(
+        () => ({
+            contactInfoTitle: formatMessage({
+                id: 'contact_info.title.contact_info',
+                defaultMessage: 'Contact Info'
+            }),
+            signOut: formatMessage({
+                id: 'contact_info.action.sign_out',
+                defaultMessage: 'Sign Out'
+            }),
+            editContactInfo: formatMessage({
+                id: 'toggle_card.action.editContactInfo',
+                defaultMessage: 'Edit Contact Info'
+            }),
+            forgotPassword: formatMessage({
+                id: 'contact_info.link.forgot_password',
+                defaultMessage: 'Forgot password?'
+            }),
+            checkoutAsGuest: formatMessage({
+                id: 'contact_info.button.checkout_as_guest',
+                defaultMessage: 'Checkout as Guest'
+            }),
+            logIn: formatMessage({
+                id: 'contact_info.button.login',
+                defaultMessage: 'Log In'
+            }),
+            incorrectCredentials: formatMessage({
+                id: 'contact_info.error.incorrect_username_or_password',
+                defaultMessage: 'Incorrect username or password, please try again.'
+            })
+        }),
+        [intl]
+    )
+
     const submitForm = async (data) => {
         setError(null)
-        if (isPasswordlessLoginClicked) {
-            handlePasswordlessLogin(data.email)
-            setIsPasswordlessLoginClicked(false)
-            return
-        }
         try {
             if (!data.password) {
                 await updateCustomerForBasket.mutateAsync({
@@ -126,12 +142,7 @@ const ContactInfo = ({isSocialEnabled = false, isPasswordlessEnabled = false, id
             goToNextStep()
         } catch (error) {
             if (/Unauthorized/i.test(error.message)) {
-                setError(
-                    formatMessage({
-                        defaultMessage: 'Incorrect username or password, please try again.',
-                        id: 'contact_info.error.incorrect_username_or_password'
-                    })
-                )
+                setError(messages.incorrectCredentials)
             } else {
                 setError(error.message)
             }
@@ -159,17 +170,21 @@ const ContactInfo = ({isSocialEnabled = false, isPasswordlessEnabled = false, id
         }
     }, [showPasswordField])
 
-    const onPasswordlessLoginClick = async () => {
-        setIsPasswordlessLoginClicked(true)
+    const onPasswordlessLoginClick = async (e) => {
+        const isValid = await form.trigger('email')
+        const domForm = e.target.closest('form')
+        if (isValid && domForm.checkValidity()) {
+            const email = form.getValues().email
+            await handlePasswordlessLogin(email)
+        } else {
+            domForm.reportValidity()
+        }
     }
 
     return (
         <ToggleCard
             id="step-0"
-            title={formatMessage({
-                defaultMessage: 'Contact Info',
-                id: 'contact_info.title.contact_info'
-            })}
+            title={messages.contactInfoTitle}
             editing={step === STEPS.CONTACT_INFO}
             isLoading={form.formState.isSubmitting}
             onEdit={() => {
@@ -179,30 +194,22 @@ const ContactInfo = ({isSocialEnabled = false, isPasswordlessEnabled = false, id
                     goToStep(STEPS.CONTACT_INFO)
                 }
             }}
-            editLabel={
-                customer.isRegistered
-                    ? formatMessage({
-                          defaultMessage: 'Sign Out',
-                          id: 'contact_info.action.sign_out'
-                      })
-                    : formatMessage({
-                          defaultMessage: 'Edit Contact Info',
-                          id: 'toggle_card.action.editContactInfo'
-                      })
-            }
+            editLabel={customer.isRegistered ? messages.signOut : messages.editContactInfo}
         >
             <ToggleCardEdit>
                 <Container variant="form">
                     <form onSubmit={form.handleSubmit(submitForm)}>
-                        <Stack spacing={6}>
+                        <Stack gap={6}>
                             {error && (
-                                <Alert status="error">
-                                    <AlertIcon />
-                                    {error}
-                                </Alert>
+                                <Alert.Root status="error">
+                                    <Alert.Indicator>
+                                        <AlertIcon color="red.500" boxSize="4" />
+                                    </Alert.Indicator>
+                                    <Alert.Title>{error}</Alert.Title>
+                                </Alert.Root>
                             )}
 
-                            <Stack spacing={5} position="relative">
+                            <Stack gap={5} position="relative">
                                 <Field {...fields.email} inputRef={emailRef} />
                                 {showPasswordField && (
                                     <Stack>
@@ -213,29 +220,16 @@ const ContactInfo = ({isSocialEnabled = false, isPasswordlessEnabled = false, id
                                                 size="sm"
                                                 onClick={onForgotPasswordClick}
                                             >
-                                                <FormattedMessage
-                                                    defaultMessage="Forgot password?"
-                                                    id="contact_info.link.forgot_password"
-                                                />
+                                                {messages.forgotPassword}
                                             </Button>
                                         </Box>
                                     </Stack>
                                 )}
                             </Stack>
 
-                            <Stack spacing={3}>
+                            <Stack gap={3}>
                                 <Button type="submit">
-                                    {!showPasswordField ? (
-                                        <FormattedMessage
-                                            defaultMessage="Checkout as Guest"
-                                            id="contact_info.button.checkout_as_guest"
-                                        />
-                                    ) : (
-                                        <FormattedMessage
-                                            defaultMessage="Log In"
-                                            id="contact_info.button.login"
-                                        />
-                                    )}
+                                    {!showPasswordField ? messages.checkoutAsGuest : messages.logIn}
                                 </Button>
                                 <LoginState
                                     form={form}
@@ -276,44 +270,62 @@ ContactInfo.propTypes = {
 }
 
 const SignOutConfirmationDialog = ({isOpen, onConfirm, onClose}) => {
+    const {formatMessage} = useIntl()
     const cancelRef = useRef()
 
+    const messages = {
+        signOutTitle: formatMessage({
+            id: 'signout_confirmation_dialog.heading.sign_out',
+            defaultMessage: 'Sign Out'
+        }),
+        confirmMessage: formatMessage({
+            id: 'signout_confirmation_dialog.message.sure_to_sign_out',
+            defaultMessage:
+                'Are you sure you want to sign out? You will need to sign back in to proceed with your current order.'
+        }),
+        cancel: formatMessage({
+            id: 'signout_confirmation_dialog.button.cancel',
+            defaultMessage: 'Cancel'
+        }),
+        signOut: formatMessage({
+            id: 'signout_confirmation_dialog.button.sign_out',
+            defaultMessage: 'Sign Out'
+        })
+    }
+
     return (
-        <AlertDialog isOpen={isOpen} leastDestructiveRef={cancelRef} onClose={onClose}>
-            <AlertDialogOverlay>
-                <AlertDialogContent>
-                    <AlertDialogHeader fontSize="lg" fontWeight="bold">
-                        <FormattedMessage
-                            defaultMessage="Sign Out"
-                            id="signout_confirmation_dialog.heading.sign_out"
-                        />
-                    </AlertDialogHeader>
+        <Dialog.Root
+            role="alertdialog"
+            initialFocusEl={cancelRef}
+            open={isOpen}
+            onOpenChange={(details) => !details.open && onClose()}
+        >
+            <SafePortal>
+                <Dialog.Backdrop />
+                <Dialog.Positioner>
+                    <Dialog.Content>
+                        <Dialog.Header>
+                            <Dialog.Title fontSize="lg" fontWeight="bold">
+                                {messages.signOutTitle}
+                            </Dialog.Title>
+                        </Dialog.Header>
 
-                    <AlertDialogBody>
-                        <FormattedMessage
-                            defaultMessage="Are you sure you want to sign out? You will need to sign back in to proceed
-                        with your current order."
-                            id="signout_confirmation_dialog.message.sure_to_sign_out"
-                        />
-                    </AlertDialogBody>
+                        <Dialog.Body>{messages.confirmMessage}</Dialog.Body>
 
-                    <AlertDialogFooter>
-                        <Button ref={cancelRef} variant="outline" onClick={onClose}>
-                            <FormattedMessage
-                                defaultMessage="Cancel"
-                                id="signout_confirmation_dialog.button.cancel"
-                            />
-                        </Button>
-                        <Button colorScheme="red" onClick={onConfirm} ml={3}>
-                            <FormattedMessage
-                                defaultMessage="Sign Out"
-                                id="signout_confirmation_dialog.button.sign_out"
-                            />
-                        </Button>
-                    </AlertDialogFooter>
-                </AlertDialogContent>
-            </AlertDialogOverlay>
-        </AlertDialog>
+                        <Dialog.Footer>
+                            <Dialog.ActionTrigger asChild>
+                                <Button ref={cancelRef} variant="outline">
+                                    {messages.cancel}
+                                </Button>
+                            </Dialog.ActionTrigger>
+                            <Button colorPalette="red" onClick={onConfirm} ml={3}>
+                                {messages.signOut}
+                            </Button>
+                        </Dialog.Footer>
+                    </Dialog.Content>
+                </Dialog.Positioner>
+            </SafePortal>
+        </Dialog.Root>
     )
 }
 

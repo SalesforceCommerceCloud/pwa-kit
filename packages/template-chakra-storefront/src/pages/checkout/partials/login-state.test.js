@@ -5,9 +5,10 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
-import LoginState from './login-state'
+import LoginState from '../../../pages/checkout/partials/login-state'
 import {renderWithProviders} from '../../../utils/test-utils'
 import {useForm} from 'react-hook-form'
+import {act} from '@testing-library/react'
 
 const mockTogglePasswordField = jest.fn()
 const idps = ['apple', 'google']
@@ -21,14 +22,18 @@ describe('LoginState', () => {
     test('shows login button when showPasswordField is false', async () => {
         const {getByRole, user} = renderWithProviders(<WrapperComponent />)
         const trigger = getByRole('button', {name: /Already have an account\? Log in/i})
-        await user.click(trigger)
+        await act(async () => {
+            await user.click(trigger)
+        })
         expect(mockTogglePasswordField).toHaveBeenCalled()
     })
 
     test('shows checkout as guest button when showPasswordField is true', async () => {
         const {getByRole, user} = renderWithProviders(<WrapperComponent showPasswordField={true} />)
         const trigger = getByRole('button', {name: /Checkout as Guest/i})
-        await user.click(trigger)
+        await act(async () => {
+            await user.click(trigger)
+        })
         expect(mockTogglePasswordField).toHaveBeenCalled()
     })
 
@@ -39,7 +44,9 @@ describe('LoginState', () => {
         expect(getByText('Or Login With')).toBeInTheDocument()
         expect(getByRole('button', {name: 'Secure Link'})).toBeInTheDocument()
         const trigger = getByRole('button', {name: 'Password'})
-        await user.click(trigger)
+        await act(async () => {
+            await user.click(trigger)
+        })
         expect(mockTogglePasswordField).toHaveBeenCalled()
         expect(getByRole('button', {name: 'Back to Sign In Options'})).toBeInTheDocument()
     })
@@ -60,7 +67,9 @@ describe('LoginState', () => {
         expect(getByRole('button', {name: /Google/i})).toBeInTheDocument()
         expect(getByRole('button', {name: /Apple/i})).toBeInTheDocument()
         const trigger = getByRole('button', {name: 'Password'})
-        await user.click(trigger)
+        await act(async () => {
+            await user.click(trigger)
+        })
         expect(mockTogglePasswordField).toHaveBeenCalled()
         expect(getByRole('button', {name: 'Back to Sign In Options'})).toBeInTheDocument()
     })

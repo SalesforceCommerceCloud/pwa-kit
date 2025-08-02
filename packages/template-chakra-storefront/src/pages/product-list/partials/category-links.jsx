@@ -5,38 +5,48 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React from 'react'
+import React, {useMemo} from 'react'
 import PropTypes from 'prop-types'
-import {FormattedMessage} from 'react-intl'
+import {useIntl} from 'react-intl'
 
 // Project Components
-import {
-    AccordionItem,
-    AccordionButton,
-    AccordionPanel,
-    AccordionIcon,
-    Heading,
-    Stack,
-    Text
-} from '@chakra-ui/react'
+import {Accordion, Heading, Stack, Text} from '@chakra-ui/react'
 import Link from '../../../components/link'
 
 // Others
 import {noop} from '../../../utils/utils'
 
 const CategoryLinks = ({category = {}, onSelect = noop}) => {
+    const intl = useIntl()
+    const {formatMessage} = intl
     const {categories = []} = category
 
+    const messages = useMemo(
+        () => ({
+            categoriesHeading: formatMessage({
+                id: 'category_links.button_text',
+                defaultMessage: 'Categories'
+            })
+        }),
+        [intl]
+    )
+
     return (
-        <AccordionItem paddingBottom={6} borderTop="none" key="show-all">
-            <AccordionButton>
+        <Accordion.Item
+            value="categories"
+            paddingBottom={6}
+            borderTop="none"
+            borderBottom="none"
+            key="show-all"
+        >
+            <Accordion.ItemTrigger cursor="pointer">
                 <Heading as="h2" flex="1" textAlign="left" fontSize="md" fontWeight={600}>
-                    <FormattedMessage defaultMessage="Categories" id="category_links.button_text" />
+                    {messages.categoriesHeading}
                 </Heading>
-                <AccordionIcon />
-            </AccordionButton>
-            <AccordionPanel>
-                <Stack spacing={1}>
+                <Accordion.ItemIndicator />
+            </Accordion.ItemTrigger>
+            <Accordion.ItemContent>
+                <Stack gap={1} paddingLeft={4}>
                     {categories.map(({id, name}) => {
                         return (
                             <Link
@@ -53,8 +63,8 @@ const CategoryLinks = ({category = {}, onSelect = noop}) => {
                         )
                     })}
                 </Stack>
-            </AccordionPanel>
-        </AccordionItem>
+            </Accordion.ItemContent>
+        </Accordion.Item>
     )
 }
 

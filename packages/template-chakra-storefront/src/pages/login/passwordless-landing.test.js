@@ -6,13 +6,11 @@
  */
 import React from 'react'
 import {waitFor} from '@testing-library/react'
-import {rest} from 'msw'
 import {renderWithProviders, createPathWithDefaults} from '../../utils/test-utils'
 import Login from '.'
 import {BrowserRouter as Router, Route} from 'react-router-dom'
-import Account from '../account'
-import mockConfig from '../../../mock-config'
-import {mockedRegisteredCustomer} from '../../../mocks/mock-data'
+import Account from '../../pages/account'
+import mockConfig from '../../../config/mocks/mock-config'
 import {AuthHelpers} from '@salesforce/commerce-sdk-react'
 
 const mockMergedBasket = {
@@ -67,28 +65,6 @@ jest.mock('@salesforce/commerce-sdk-react', () => {
     }
 })
 
-// Set up and clean up
-beforeEach(() => {
-    global.server.use(
-        rest.post('*/customers', (req, res, ctx) => {
-            return res(ctx.delay(0), ctx.status(200), ctx.json(mockedRegisteredCustomer))
-        }),
-        rest.get('*/customers/:customerId', (req, res, ctx) => {
-            const {customerId} = req.params
-            if (customerId === 'customerId') {
-                return res(
-                    ctx.delay(0),
-                    ctx.status(200),
-                    ctx.json({
-                        authType: 'guest',
-                        customerId: 'customerid'
-                    })
-                )
-            }
-            return res(ctx.delay(0), ctx.status(200), ctx.json(mockedRegisteredCustomer))
-        })
-    )
-})
 afterEach(() => {
     jest.resetModules()
 })

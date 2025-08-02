@@ -4,9 +4,9 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React, {useState, useEffect} from 'react'
+import React, {useState, useEffect, useMemo} from 'react'
 import PropTypes from 'prop-types'
-import {defineMessage, FormattedMessage, useIntl} from 'react-intl'
+import {defineMessage, useIntl} from 'react-intl'
 import {Box, Button, Container, Heading, SimpleGrid, Stack} from '@chakra-ui/react'
 import {useForm, Controller} from 'react-hook-form'
 import {shallowEquals} from '../../../utils/utils'
@@ -50,14 +50,14 @@ const ShippingAddressEditForm = ({
                 })}
             data-testid="sf-shipping-address-edit-form"
         >
-            <Stack spacing={6}>
+            <Stack gap={6}>
                 {hasSavedAddresses && !isBillingAddress && (
                     <Heading as="h3" size="sm">
                         {title}
                     </Heading>
                 )}
 
-                <Stack spacing={6}>
+                <Stack gap={6}>
                     <AddressFields
                         form={form}
                         formTitleAriaLabel={formTitleAriaLabel}
@@ -119,6 +119,41 @@ const ShippingAddressSelection = ({
     const {data: customer, isLoading, isFetching} = useCurrentCustomer()
     const isLoadingRegisteredCustomer = isLoading && isFetching
 
+    const messages = {
+        shippingAddress: formatMessage({
+            id: 'shipping_address.title.shipping_address',
+            defaultMessage: 'Shipping Address'
+        }),
+        editButton: (address) =>
+            formatMessage(
+                {
+                    id: 'shipping_address.label.edit_button',
+                    defaultMessage: 'Edit {address}'
+                },
+                {address}
+            ),
+        removeButton: (address) =>
+            formatMessage(
+                {
+                    id: 'shipping_address.label.remove_button',
+                    defaultMessage: 'Remove {address}'
+                },
+                {address}
+            ),
+        addNewAddress: formatMessage({
+            id: 'shipping_address_selection.button.add_address',
+            defaultMessage: 'Add New Address'
+        }),
+        editShipping: formatMessage({
+            id: 'shipping_address_selection.title.edit_shipping',
+            defaultMessage: 'Edit Shipping Address'
+        }),
+        addAddress: formatMessage({
+            id: 'shipping_address_selection.title.add_address',
+            defaultMessage: 'Add New Address'
+        })
+    }
+
     const hasSavedAddresses = customer.addresses?.length > 0
     const [isEditingAddress, setIsEditingAddress] = useState(false)
     const [selectedAddressId, setSelectedAddressId] = useState(undefined)
@@ -154,7 +189,21 @@ const ShippingAddressSelection = ({
 
     useEffect(() => {
         if (isBillingAddress) {
-            form.reset({...selectedAddress})
+            // For billing address, use default values if no selectedAddress
+            const defaultValues = selectedAddress
+                ? {...selectedAddress}
+                : {
+                      firstName: '',
+                      lastName: '',
+                      phone: '',
+                      countryCode: 'US',
+                      address1: '',
+                      city: '',
+                      stateCode: '',
+                      postalCode: '',
+                      addressId: ''
+                  }
+            form.reset(defaultValues)
             return
         }
         // Automatically select the customer's default/preferred shipping address
@@ -208,14 +257,10 @@ const ShippingAddressSelection = ({
         }
 
         const address = customer.addresses.find((addr) => addr.addressId === addressId)
-
         form.reset({...address})
     }
 
-    const headingText = formatMessage({
-        defaultMessage: 'Shipping Address',
-        id: 'shipping_address.title.shipping_address'
-    })
+    const headingText = messages.shippingAddress
     const shippingAddressHeading = Array.from(document.querySelectorAll('h2')).find(
         (element) => element.textContent === headingText
     )
@@ -270,39 +315,31 @@ const ShippingAddressSelection = ({
     }
     return (
         <form onSubmit={form.handleSubmit(submitForm)}>
-            <Stack spacing={4}>
+            <Stack gap={4}>
                 {hasSavedAddresses && !isBillingAddress && (
                     <Controller
                         name="addressId"
                         defaultValue=""
                         control={form.control}
                         rules={{required: !isEditingAddress}}
-                        render={({field: {value}}) => (
-                            <RadioCardGroup value={value} onChange={handleAddressIdSelection}>
-                                <SimpleGrid
-                                    columns={[1, 1, 2]}
-                                    spacing={4}
-                                    gridAutoFlow="row dense"
-                                >
+                        render={({field: {value, onChange}}) => (
+                            <RadioCardGroup
+                                value={value}
+                                onValueChange={(selected) => {
+                                    onChange(selected.value)
+                                    handleAddressIdSelection(selected.value)
+                                }}
+                            >
+                                <SimpleGrid columns={[1, 1, 2]} gap={4} gridAutoFlow="row dense">
                                     {customer.addresses?.map((address, index) => {
-                                        const editLabel = formatMessage(
-                                            {
-                                                defaultMessage: 'Edit {address}',
-                                                id: 'shipping_address.label.edit_button'
-                                            },
-                                            {address: address.address1}
-                                        )
-
-                                        const removeLabel = formatMessage(
-                                            {
-                                                defaultMessage: 'Remove {address}',
-                                                id: 'shipping_address.label.remove_button'
-                                            },
-                                            {address: address.address1}
-                                        )
+                                        const editLabel = messages.editButton(address.address1)
+                                        const removeLabel = messages.removeButton(address.address1)
                                         return (
                                             <React.Fragment key={address.addressId}>
-                                                <RadioCard value={address.addressId}>
+                                                <RadioCard
+                                                    value={address.addressId}
+                                                    isSelected={address.addressId === value}
+                                                >
                                                     <ActionCard
                                                         padding={0}
                                                         border="none"
@@ -337,11 +374,7 @@ const ShippingAddressSelection = ({
                                                 {isEditingAddress &&
                                                     address.addressId === selectedAddressId && (
                                                         <ShippingAddressEditForm
-                                                            title={formatMessage({
-                                                                defaultMessage:
-                                                                    'Edit Shipping Address',
-                                                                id: 'shipping_address_selection.title.edit_shipping'
-                                                            })}
+                                                            title={messages.editShipping}
                                                             hasSavedAddresses={hasSavedAddresses}
                                                             toggleAddressEdit={toggleAddressEdit}
                                                             hideSubmitButton={hideSubmitButton}
@@ -361,14 +394,11 @@ const ShippingAddressSelection = ({
                                         color="blue.600"
                                         height={['44px', '44px', '167px']}
                                         rounded="base"
-                                        fontWeight="medium"
-                                        leftIcon={<PlusIcon boxSize={'15px'} />}
+                                        fontWeight="semibold"
                                         onClick={toggleAddressEdit}
                                     >
-                                        <FormattedMessage
-                                            defaultMessage="Add New Address"
-                                            id="shipping_address_selection.button.add_address"
-                                        />
+                                        <PlusIcon boxSize={'15px'} />
+                                        {messages.addNewAddress}
                                         {/*Arrow up icon pointing to the new address that is being added*/}
                                         {isEditingAddress && !selectedAddressId && (
                                             <Box
@@ -395,10 +425,7 @@ const ShippingAddressSelection = ({
                     (isEditingAddress && !selectedAddressId) ||
                     isBillingAddress) && (
                     <ShippingAddressEditForm
-                        title={formatMessage({
-                            defaultMessage: 'Add New Address',
-                            id: 'shipping_address_selection.title.add_address'
-                        })}
+                        title={messages.addAddress}
                         hasSavedAddresses={hasSavedAddresses}
                         toggleAddressEdit={toggleAddressEdit}
                         hideSubmitButton={hideSubmitButton}

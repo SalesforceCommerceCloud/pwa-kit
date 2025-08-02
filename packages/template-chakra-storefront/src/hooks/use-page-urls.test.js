@@ -14,7 +14,7 @@ jest.mock('@salesforce/pwa-kit-runtime/utils/ssr-config', () => {
     const original = jest.requireActual('@salesforce/pwa-kit-runtime/utils/ssr-config')
     return {
         ...original,
-        getConfig: jest.fn(() => require('../../mock-config'))
+        getConfig: jest.fn(() => require('../../config/mocks/mock-config'))
     }
 })
 const MockComponent = () => {

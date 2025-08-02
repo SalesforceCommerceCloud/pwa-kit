@@ -5,13 +5,12 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React, {useEffect, useRef, useState} from 'react'
-import {defineMessage, FormattedMessage, useIntl} from 'react-intl'
+import React, {useEffect, useRef, useState, useMemo} from 'react'
+import {useIntl} from 'react-intl'
 import PropTypes from 'prop-types'
 
 import {
     Alert,
-    AlertIcon,
     Badge,
     Box,
     Button,
@@ -24,7 +23,7 @@ import {
 } from '@chakra-ui/react'
 import FormActionButtons from '../../components/forms/form-action-buttons'
 import {useForm} from 'react-hook-form'
-import {useToast} from '../../hooks/use-toast'
+import useToast from '../../hooks/use-toast'
 
 import LoadingSpinner from '../../components/loading-spinner'
 import {LocationIcon, PlusIcon} from '../../components/icons'
@@ -35,15 +34,15 @@ import PageActionPlaceHolder from '../../components/page-action-placeholder'
 import {useCurrentCustomer} from '../../hooks/use-current-customer'
 import {useShopperCustomersMutation} from '@salesforce/commerce-sdk-react'
 import {nanoid} from 'nanoid'
-import {API_ERROR_MESSAGE} from '../../../config/constants'
+import {useErrorHandler} from '../../hooks/use-errors'
 
 const DEFAULT_SKELETON_COUNT = 3
 
 const BoxArrow = () => {
     return (
         <Box
-            width={3}
-            height={3}
+            width={4}
+            height={4}
             borderLeft="1px solid"
             borderTop="1px solid"
             borderColor="blue.600"
@@ -58,47 +57,56 @@ const BoxArrow = () => {
 }
 
 const ShippingAddressForm = ({form, hasAddresses, selectedAddressId, toggleEdit, submitForm}) => {
+    const intl = useIntl()
+    const {formatMessage} = intl
+
+    const messages = useMemo(
+        () => ({
+            editAddress: formatMessage({
+                id: 'shipping_address_form.heading.edit_address',
+                defaultMessage: 'Edit Address'
+            }),
+            newAddress: formatMessage({
+                id: 'shipping_address_form.heading.new_address',
+                defaultMessage: 'Add New Address'
+            })
+        }),
+        [intl]
+    )
+
     return (
         <Box
             border="1px solid"
             borderColor="gray.200"
-            borderRadius="base"
+            rounded="md"
             position="relative"
             {...(hasAddresses && {
                 gridColumn: [1, 'span 2', 'span 2', 'span 2', 'span 3'],
-                paddingX: [4, 4, 6],
-                paddingY: 6,
-                rounded: 'base',
+                px: [4, 4, 6],
+                py: 6,
+                rounded: 'md',
                 border: '1px solid',
                 borderColor: 'blue.600'
             })}
         >
             {form.formState.isSubmitting && <LoadingSpinner />}
-            <Stack spacing={6} padding={6}>
+            <Stack gap={6} p={6}>
                 <Heading as="h3" size="sm">
-                    {selectedAddressId ? (
-                        <FormattedMessage
-                            defaultMessage="Edit Address"
-                            id="shipping_address_form.heading.edit_address"
-                        />
-                    ) : (
-                        <FormattedMessage
-                            defaultMessage="Add New Address"
-                            id="shipping_address_form.heading.new_address"
-                        />
-                    )}
+                    {selectedAddressId ? messages.editAddress : messages.newAddress}
                 </Heading>
                 <Box>
                     <Container variant="form">
                         <form onSubmit={form.handleSubmit(submitForm)}>
-                            <Stack spacing={6}>
+                            <Stack gap={6}>
                                 {form.formState.errors?.global && (
-                                    <Alert status="error">
-                                        <AlertIcon color="red.600" boxSize={4} />
-                                        <Text fontSize="sm" ml={3}>
-                                            {form.formState.errors.global.message}
-                                        </Text>
-                                    </Alert>
+                                    <Alert.Root colorPalette="red">
+                                        <Alert.Indicator />
+                                        <Alert.Content>
+                                            <Text fontSize="sm">
+                                                {form.formState.errors.global.message}
+                                            </Text>
+                                        </Alert.Content>
+                                    </Alert.Root>
                                 )}
                                 <AddressFields form={form} />
                                 <FormActionButtons onCancel={toggleEdit} />
@@ -119,24 +127,69 @@ ShippingAddressForm.propTypes = {
     submitForm: PropTypes.func
 }
 
-const successfullyAddedAddress = defineMessage({
-    defaultMessage: 'New address saved',
-    id: 'account_addresses.info.new_address_saved'
-})
-
-const successfullyUpdatedAddress = defineMessage({
-    defaultMessage: 'Address updated',
-    id: 'account_addresses.info.address_updated'
-})
-
-const successfullyRemovedAddress = defineMessage({
-    defaultMessage: 'Address removed',
-    id: 'account_addresses.info.address_removed'
-})
 const AccountAddresses = () => {
-    const {formatMessage} = useIntl()
+    const intl = useIntl()
+    const {formatMessage} = intl
     const {data: customer, isLoading} = useCurrentCustomer()
     const {isRegistered, addresses, customerId} = customer
+
+    const messages = useMemo(
+        () => ({
+            addresses: formatMessage({
+                id: 'account_addresses.title.addresses',
+                defaultMessage: 'Addresses'
+            }),
+            addAddress: formatMessage({
+                id: 'account_addresses.button.add_address',
+                defaultMessage: 'Add Address'
+            }),
+            default: formatMessage({
+                id: 'account_addresses.badge.default',
+                defaultMessage: 'Default'
+            }),
+            noSavedAddresses: formatMessage({
+                id: 'account_addresses.page_action_placeholder.heading.no_saved_addresses',
+                defaultMessage: 'No Saved Addresses'
+            }),
+            addNewAddressMessage: formatMessage({
+                id: 'account_addresses.page_action_placeholder.message.add_new_address',
+                defaultMessage: 'Add a new address method for faster checkout.'
+            }),
+            addAddressButton: formatMessage({
+                id: 'account_addresses.page_action_placeholder.button.add_address',
+                defaultMessage: 'Add Address'
+            }),
+            successfullyAddedAddress: formatMessage({
+                id: 'account_addresses.info.new_address_saved',
+                defaultMessage: 'New address saved'
+            }),
+            successfullyUpdatedAddress: formatMessage({
+                id: 'account_addresses.info.address_updated',
+                defaultMessage: 'Address updated'
+            }),
+            successfullyRemovedAddress: formatMessage({
+                id: 'account_addresses.info.address_removed',
+                defaultMessage: 'Address removed'
+            }),
+            editButtonLabel: (address) =>
+                formatMessage(
+                    {
+                        id: 'shipping_address.label.edit_button',
+                        defaultMessage: 'Edit {address}'
+                    },
+                    {address}
+                ),
+            removeButtonLabel: (address) =>
+                formatMessage(
+                    {
+                        id: 'shipping_address.label.remove_button',
+                        defaultMessage: 'Remove {address}'
+                    },
+                    {address}
+                )
+        }),
+        [intl]
+    )
 
     const addCustomerAddress = useShopperCustomersMutation('createCustomerAddress')
     const updateSavedAddress = useShopperCustomersMutation('updateCustomerAddress')
@@ -144,8 +197,9 @@ const AccountAddresses = () => {
 
     const [isEditing, setIsEditing] = useState(false)
     const [selectedAddressId, setSelectedAddressId] = useState(false)
-    const showToast = useToast()
+    const toast = useToast()
     const form = useForm()
+    const showError = useErrorHandler()
 
     const headingRef = useRef()
     useEffect(() => {
@@ -164,12 +218,6 @@ const AccountAddresses = () => {
     }, [addresses])
 
     const hasAddresses = addresses?.length > 0
-    const showError = () => {
-        showToast({
-            title: formatMessage(API_ERROR_MESSAGE),
-            status: 'error'
-        })
-    }
     const submitForm = async (address) => {
         try {
             let data
@@ -198,12 +246,11 @@ const AccountAddresses = () => {
             }
             if (data) {
                 toggleEdit()
-                showToast({
+                toast({
                     title: selectedAddressId
-                        ? formatMessage(successfullyUpdatedAddress)
-                        : formatMessage(successfullyAddedAddress),
-                    status: 'success',
-                    isClosable: true
+                        ? messages.successfullyUpdatedAddress
+                        : messages.successfullyAddedAddress,
+                    type: 'success'
                 })
             }
         } catch (error) {
@@ -227,10 +274,9 @@ const AccountAddresses = () => {
                 },
                 {
                     onSuccess: () => {
-                        showToast({
-                            title: formatMessage(successfullyRemovedAddress),
-                            status: 'success',
-                            isClosable: true
+                        toast({
+                            title: messages.successfullyRemovedAddress,
+                            type: 'success'
                         })
                         // Move focus to header after we successfully remove address
                         headingRef?.current?.focus()
@@ -260,25 +306,22 @@ const AccountAddresses = () => {
     }
 
     return (
-        <Stack spacing={4} data-testid="account-addresses-page">
+        <Stack gap={4} data-testid="account-addresses-page">
             <Heading as="h1" fontSize="2xl" tabIndex="0" ref={headingRef}>
-                <FormattedMessage
-                    defaultMessage="Addresses"
-                    id="account_addresses.title.addresses"
-                />
+                {messages.addresses}
             </Heading>
 
             {isLoading && (
-                <SimpleGrid columns={[1, 2, 2, 2, 3]} spacing={4}>
+                <SimpleGrid columns={[1, 2, 2, 2, 3]} gap={4}>
                     {new Array(DEFAULT_SKELETON_COUNT).fill().map((_, index) => {
                         return (
                             <ActionCard key={index}>
-                                <Stack spacing={2} marginBottom={7}>
-                                    <Skeleton height="23px" width="120px" />
+                                <Stack gap={2} mb={7}>
+                                    <Skeleton height={6} width={30} />
 
-                                    <Skeleton height="23px" width="84px" />
+                                    <Skeleton height={6} width={21} />
 
-                                    <Skeleton height="23px" width="104px" />
+                                    <Skeleton height={6} width={26} />
                                 </Stack>
                             </ActionCard>
                         )
@@ -287,7 +330,7 @@ const AccountAddresses = () => {
             )}
 
             {hasAddresses && (
-                <SimpleGrid columns={[1, 2, 2, 2, 3]} spacing={4} gridAutoFlow="row dense">
+                <SimpleGrid columns={[1, 2, 2, 2, 3]} gap={4} gridAutoFlow="row dense">
                     {
                         <Button
                             variant="outline"
@@ -296,15 +339,12 @@ const AccountAddresses = () => {
                             color="blue.600"
                             height={{lg: 'full'}}
                             minHeight={11}
-                            rounded="base"
+                            rounded="md"
                             fontWeight="medium"
-                            leftIcon={<PlusIcon display="block" boxSize={'15px'} />}
+                            leftIcon={<PlusIcon display="block" boxSize={4} />}
                             onClick={() => toggleEdit()}
                         >
-                            <FormattedMessage
-                                defaultMessage="Add Address"
-                                id="account_addresses.button.add_address"
-                            />
+                            {messages.addAddress}
                             {isEditing && !selectedAddressId && <BoxArrow />}
                         </Button>
                     }
@@ -322,21 +362,8 @@ const AccountAddresses = () => {
                     )}
 
                     {addresses.map((address) => {
-                        const editLabel = formatMessage(
-                            {
-                                defaultMessage: 'Edit {address}',
-                                id: 'shipping_address.label.edit_button'
-                            },
-                            {address: address.address1}
-                        )
-
-                        const removeLabel = formatMessage(
-                            {
-                                defaultMessage: 'Remove {address}',
-                                id: 'shipping_address.label.remove_button'
-                            },
-                            {address: address.address1}
-                        )
+                        const editLabel = messages.editButtonLabel(address.address1)
+                        const removeLabel = messages.removeButtonLabel(address.address1)
 
                         return (
                             <React.Fragment key={address.addressId}>
@@ -352,16 +379,12 @@ const AccountAddresses = () => {
                                     {address.preferred && (
                                         <Badge
                                             position="absolute"
-                                            fontSize="xs"
                                             right={4}
                                             variant="solid"
                                             bg="gray.100"
                                             color="gray.900"
                                         >
-                                            <FormattedMessage
-                                                defaultMessage="Default"
-                                                id="account_addresses.badge.default"
-                                            />
+                                            {messages.default}
                                         </Badge>
                                     )}
                                     <AddressDisplay address={address} />
@@ -390,18 +413,9 @@ const AccountAddresses = () => {
                     {!isEditing && isRegistered && (
                         <PageActionPlaceHolder
                             icon={<LocationIcon boxSize={8} />}
-                            heading={formatMessage({
-                                defaultMessage: 'No Saved Addresses',
-                                id: 'account_addresses.page_action_placeholder.heading.no_saved_addresses'
-                            })}
-                            text={formatMessage({
-                                defaultMessage: 'Add a new address method for faster checkout.',
-                                id: 'account_addresses.page_action_placeholder.message.add_new_address'
-                            })}
-                            buttonText={formatMessage({
-                                defaultMessage: 'Add Address',
-                                id: 'account_addresses.page_action_placeholder.button.add_address'
-                            })}
+                            heading={messages.noSavedAddresses}
+                            text={messages.addNewAddressMessage}
+                            buttonText={messages.addAddressButton}
                             onButtonClick={() => toggleEdit()}
                         />
                     )}

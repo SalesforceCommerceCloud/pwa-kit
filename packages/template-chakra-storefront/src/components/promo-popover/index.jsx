@@ -4,22 +4,11 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React from 'react'
+import React, {useMemo} from 'react'
 import PropTypes from 'prop-types'
-import {
-    Box,
-    IconButton,
-    Popover,
-    PopoverArrow,
-    PopoverBody,
-    PopoverCloseButton,
-    PopoverContent,
-    PopoverHeader,
-    PopoverTrigger,
-    Text
-} from '@chakra-ui/react'
+import {Box, CloseButton, Flex, IconButton, Popover, Text} from '@chakra-ui/react'
 import {InfoIcon} from '../icons'
-import {FormattedMessage, useIntl} from 'react-intl'
+import {useIntl} from 'react-intl'
 
 /**
  * This component renders a small info icon and displays a popover when hovered. It could be adapted
@@ -28,20 +17,27 @@ import {FormattedMessage, useIntl} from 'react-intl'
  */
 const PromoPopover = ({header, children, ...props}) => {
     const intl = useIntl()
+    const {formatMessage} = intl
+
+    const messages = useMemo(
+        () => ({
+            info: formatMessage({
+                id: 'promo_popover.assistive_msg.info',
+                defaultMessage: 'Info'
+            }),
+            promoApplied: formatMessage({
+                id: 'promo_popover.heading.promo_applied',
+                defaultMessage: 'Promotions Applied'
+            })
+        }),
+        [intl]
+    )
+
     return (
         <Box position="relative" {...props}>
-            <Popover isLazy placement="top" boundary="scrollParent" trigger="hover" variant="small">
-                <PopoverTrigger>
+            <Popover.Root size="xs" lazyMount unmountOnExit positioning={{placement: 'top'}}>
+                <Popover.Trigger asChild>
                     <IconButton
-                        icon={
-                            <InfoIcon
-                                display="block"
-                                boxSize="18px"
-                                mt="-2px"
-                                ml="-1px"
-                                color="gray.600"
-                            />
-                        }
                         display="block"
                         size="xs"
                         height="14px"
@@ -49,30 +45,37 @@ const PromoPopover = ({header, children, ...props}) => {
                         minWidth="auto"
                         position="relative"
                         variant="unstyled"
-                        aria-label={intl.formatMessage({
-                            id: 'promo_popover.assistive_msg.info',
-                            defaultMessage: 'Info'
-                        })}
-                    />
-                </PopoverTrigger>
-                <PopoverContent border="none" borderRadius="base">
-                    <Box boxShadow="lg">
-                        <PopoverArrow />
-                        <PopoverCloseButton />
-                        <PopoverHeader borderBottom="none">
-                            {header || (
-                                <Text fontWeight="bold" fontSize="md">
-                                    <FormattedMessage
-                                        defaultMessage="Promotions Applied"
-                                        id="promo_popover.heading.promo_applied"
-                                    />
-                                </Text>
-                            )}
-                        </PopoverHeader>
-                        <PopoverBody pt={0}>{children}</PopoverBody>
-                    </Box>
-                </PopoverContent>
-            </Popover>
+                        aria-label={messages.info}
+                    >
+                        <InfoIcon
+                            display="block"
+                            boxSize="18px"
+                            mt="-2px"
+                            ml="-1px"
+                            color="gray.600"
+                        />
+                    </IconButton>
+                </Popover.Trigger>
+                <Popover.Positioner>
+                    <Popover.Content border="none" borderRadius="sm" boxShadow="lg">
+                        <Popover.Arrow />
+
+                        <Popover.Header borderBottom="none" pb={3}>
+                            <Flex justifyContent="space-between" alignItems="baseline">
+                                {header || (
+                                    <Text fontWeight="bold" fontSize="md">
+                                        {messages.promoApplied}
+                                    </Text>
+                                )}
+                                <Popover.CloseTrigger asChild>
+                                    <CloseButton size="2xs" />
+                                </Popover.CloseTrigger>
+                            </Flex>
+                        </Popover.Header>
+                        <Popover.Body pt={0}>{children}</Popover.Body>
+                    </Popover.Content>
+                </Popover.Positioner>
+            </Popover.Root>
         </Box>
     )
 }

@@ -5,52 +5,66 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React from 'react'
+import React, {useMemo} from 'react'
 import PropTypes from 'prop-types'
-import {FormattedMessage} from 'react-intl'
+import {useIntl} from 'react-intl'
 import {Button, Stack, Text} from '@chakra-ui/react'
-import {BrandLogo} from '../icons'
+import {BrandLogo} from '../../components/icons'
 
 const PasswordlessEmailConfirmation = ({form, submitForm, email = ''}) => {
+    const intl = useIntl()
+    const {formatMessage} = intl
+
+    const messages = useMemo(
+        () => ({
+            title: formatMessage({
+                id: 'auth_modal.check_email.title.check_your_email',
+                defaultMessage: 'Check Your Email'
+            }),
+            justSent: formatMessage(
+                {
+                    id: 'auth_modal.check_email.description.just_sent',
+                    defaultMessage: 'We just sent a login link to <b>{email}</b>'
+                },
+                {
+                    email: email,
+                    b: (chunks) => <b>{chunks}</b>
+                }
+            ),
+            checkSpam: formatMessage({
+                id: 'auth_modal.check_email.description.check_spam_folder',
+                defaultMessage:
+                    "The link may take a few minutes to arrive, check your spam folder if you're having trouble finding it"
+            }),
+            resendLink: formatMessage({
+                id: 'auth_modal.check_email.button.resend_link',
+                defaultMessage: 'Resend Link'
+            })
+        }),
+        [intl]
+    )
+
     return (
         <form
             onSubmit={form.handleSubmit(submitForm)}
             data-testid="sf-form-resend-passwordless-email"
         >
-            <Stack spacing={6}>
-                <Stack justify="center" align="center" spacing={6} role="alert">
+            <Stack gap={6}>
+                <Stack justify="center" align="center" gap={6} role="alert">
                     <BrandLogo width="60px" height="auto" aria-hidden={true} />
-                    <Text align="center" fontSize="xl" fontWeight="semibold">
-                        <FormattedMessage
-                            defaultMessage="Check Your Email"
-                            id="auth_modal.check_email.title.check_your_email"
-                        />
+                    <Text textAlign="center" fontSize="xl" fontWeight="semibold">
+                        {messages.title}
                     </Text>
-                    <Stack spacing={10}>
-                        <Text align="center" fontSize="md">
-                            <FormattedMessage
-                                defaultMessage="We just sent a login link to <b>{email}</b>"
-                                id="auth_modal.check_email.description.just_sent"
-                                values={{
-                                    email: email,
-                                    b: (chunks) => <b>{chunks}</b>
-                                }}
-                            />
+                    <Stack gap={10}>
+                        <Text textAlign="center" fontSize="md">
+                            {messages.justSent}
                         </Text>
-                        <Text align="center" fontSize="sm">
-                            <FormattedMessage
-                                defaultMessage="The link may take a few minutes to arrive, check your spam folder if you're having trouble finding it"
-                                id="auth_modal.check_email.description.check_spam_folder"
-                            />
+                        <Text textAlign="center" fontSize="sm">
+                            {messages.checkSpam}
                         </Text>
                     </Stack>
                 </Stack>
-                <Button type="submit">
-                    <FormattedMessage
-                        defaultMessage="Resend Link"
-                        id="auth_modal.check_email.button.resend_link"
-                    />
-                </Button>
+                <Button type="submit">{messages.resendLink}</Button>
             </Stack>
         </form>
     )

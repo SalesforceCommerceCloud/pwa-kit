@@ -5,21 +5,21 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React, {useEffect, useRef} from 'react'
-import {FormattedMessage, useIntl} from 'react-intl'
+import React, {useEffect, useRef, useMemo} from 'react'
+import {useIntl} from 'react-intl'
 import {useHistory, useRouteMatch} from 'react-router-dom'
 import {
-    Box,
-    Heading,
-    Text,
-    Stack,
     Badge,
-    Flex,
+    Box,
     Button,
-    Divider,
+    Flex,
     Grid,
+    Heading,
+    Separator,
+    Skeleton,
     SimpleGrid,
-    Skeleton
+    Stack,
+    Text
 } from '@chakra-ui/react'
 import {getCreditCardIcon} from '../../utils/cc-utils'
 import {useOrder, useProducts} from '@salesforce/commerce-sdk-react'
@@ -36,7 +36,7 @@ const onClient = typeof window !== 'undefined'
 
 const OrderProducts = ({productItems, currency}) => {
     const orderProductIds = productItems.map((product) => product.productId)
-    const {data: products, isLoading} = useProducts(
+    const {data: products, isPending} = useProducts(
         {
             parameters: {
                 ids: orderProductIds
@@ -64,11 +64,11 @@ const OrderProducts = ({productItems, currency}) => {
 
     return (
         <>
-            {!isLoading &&
+            {!isPending &&
                 variants?.map((variant, index) => {
                     return (
                         <Box
-                            p={[4, 6]}
+                            p={['4', '6']}
                             key={index}
                             border="1px solid"
                             borderColor="gray.100"
@@ -76,8 +76,8 @@ const OrderProducts = ({productItems, currency}) => {
                         >
                             <ItemVariantProvider variant={variant} currency={currency}>
                                 <Flex width="full" alignItems="flex-start">
-                                    <CartItemVariantImage width={['88px', 36]} mr={4} />
-                                    <Stack spacing={1} marginTop="-3px" flex={1}>
+                                    <CartItemVariantImage width={['88px', '36']} mr="4" />
+                                    <Stack gap="1" marginTop="-3px" flex="1">
                                         <CartItemVariantName />
                                         <Flex
                                             width="full"
@@ -108,9 +108,10 @@ OrderProducts.propTypes = {
 const AccountOrderDetail = () => {
     const {params} = useRouteMatch()
     const history = useHistory()
-    const {formatMessage, formatDate} = useIntl()
+    const intl = useIntl()
+    const {formatMessage, formatDate} = intl
 
-    const {data: order, isLoading: isOrderLoading} = useOrder(
+    const {data: order, isPending: isOrderLoading} = useOrder(
         {
             parameters: {orderNo: params.orderNo}
         },
@@ -118,12 +119,88 @@ const AccountOrderDetail = () => {
             enabled: onClient && !!params.orderNo
         }
     )
-    const isLoading = isOrderLoading || !order
+    const isPending = isOrderLoading || !order
     const shipment = order?.shipments[0]
     const {shippingAddress, shippingMethod, shippingStatus, trackingNumber} = shipment || {}
     const paymentCard = order?.paymentInstruments[0]?.paymentCard
     const CardIcon = getCreditCardIcon(paymentCard?.cardType)
     const itemCount = order?.productItems.reduce((count, item) => item.quantity + count, 0) || 0
+
+    const messages = useMemo(
+        () => ({
+            backToHistory: formatMessage({
+                defaultMessage: 'Back to Order History',
+                id: 'account_order_detail.link.back_to_history'
+            }),
+            orderDetails: formatMessage({
+                defaultMessage: 'Order Details',
+                id: 'account_order_detail.title.order_details'
+            }),
+            orderedDate: (date) =>
+                formatMessage(
+                    {
+                        defaultMessage: 'Ordered: {date}',
+                        id: 'account_order_detail.label.ordered_date'
+                    },
+                    {date}
+                ),
+            orderNumber: (orderNumber) =>
+                formatMessage(
+                    {
+                        defaultMessage: 'Order Number: {orderNumber}',
+                        id: 'account_order_detail.label.order_number'
+                    },
+                    {orderNumber}
+                ),
+            shippingMethod: formatMessage({
+                defaultMessage: 'Shipping Method',
+                id: 'account_order_detail.heading.shipping_method'
+            }),
+            paymentMethod: formatMessage({
+                defaultMessage: 'Payment Method',
+                id: 'account_order_detail.heading.payment_method'
+            }),
+            shippingAddress: formatMessage({
+                defaultMessage: 'Shipping Address',
+                id: 'account_order_detail.heading.shipping_address'
+            }),
+            billingAddress: formatMessage({
+                defaultMessage: 'Billing Address',
+                id: 'account_order_detail.heading.billing_address'
+            }),
+            trackingNumber: formatMessage({
+                defaultMessage: 'Tracking Number',
+                id: 'account_order_detail.label.tracking_number'
+            }),
+            pending: formatMessage({
+                defaultMessage: 'Pending',
+                id: 'account_order_detail.label.pending_tracking_number'
+            }),
+            itemsCount: (count) =>
+                formatMessage(
+                    {
+                        defaultMessage: '{count} items',
+                        id: 'account_order_detail.heading.num_of_items'
+                    },
+                    {count}
+                ),
+            shippingStatuses: {
+                not_shipped: formatMessage({
+                    defaultMessage: 'Not shipped',
+                    id: 'account_order_detail.shipping_status.not_shipped'
+                }),
+                part_shipped: formatMessage({
+                    defaultMessage: 'Partially shipped',
+                    id: 'account_order_detail.shipping_status.part_shipped'
+                }),
+                shipped: formatMessage({
+                    defaultMessage: 'Shipped',
+                    id: 'account_order_detail.shipping_status.shipped'
+                })
+            }
+        }),
+        [intl]
+    )
 
     const headingRef = useRef()
     useEffect(() => {
@@ -132,14 +209,12 @@ const AccountOrderDetail = () => {
     }, [])
 
     return (
-        <Stack spacing={6} data-testid="account-order-details-page">
+        <Stack gap="6" data-testid="account-order-details-page">
             <Stack>
                 <Box>
                     <Button
-                        as={Link}
-                        to={'/account/orders'}
-                        variant="link"
-                        leftIcon={<ChevronLeftIcon />}
+                        asChild
+                        variant="link-blue"
                         size="sm"
                         onClick={(e) => {
                             if (history.action === 'PUSH') {
@@ -148,56 +223,47 @@ const AccountOrderDetail = () => {
                             }
                         }}
                     >
-                        <FormattedMessage
-                            defaultMessage="Back to Order History"
-                            id="account_order_detail.link.back_to_history"
-                        />
+                        <Link to={'/account/orders'}>
+                            <ChevronLeftIcon boxSize="6" />
+                            {messages.backToHistory}
+                        </Link>
                     </Button>
                 </Box>
 
-                <Stack spacing={[1, 2]}>
+                <Stack gap={['1', '2']}>
                     <Heading as="h1" fontSize={['lg', '2xl']} tabIndex="0" ref={headingRef}>
-                        <FormattedMessage
-                            defaultMessage="Order Details"
-                            id="account_order_detail.title.order_details"
-                        />
+                        {messages.orderDetails}
                     </Heading>
 
-                    {!isLoading ? (
+                    {!isPending ? (
                         <Stack
                             direction={['column', 'row']}
                             alignItems={['flex-start', 'center']}
-                            spacing={[0, 3]}
-                            divider={
-                                <Divider
+                            gap={['0', '3']}
+                            separator={
+                                <Separator
                                     visibility={{base: 'visible'}}
                                     orientation="vertical"
-                                    h={[0, 4]}
+                                    h={['0', '4']}
                                 />
                             }
                         >
                             <Text fontSize={['sm', 'md']}>
-                                <FormattedMessage
-                                    defaultMessage="Ordered: {date}"
-                                    id="account_order_detail.label.ordered_date"
-                                    values={{
-                                        date: formatDate(new Date(order.creationDate), {
-                                            year: 'numeric',
-                                            day: 'numeric',
-                                            month: 'short'
-                                        })
-                                    }}
-                                />
+                                {messages.orderedDate(
+                                    formatDate(new Date(order.creationDate), {
+                                        year: 'numeric',
+                                        day: 'numeric',
+                                        month: 'short'
+                                    })
+                                )}
                             </Text>
                             <Stack direction="row" alignItems="center">
                                 <Text fontSize={['sm', 'md']}>
-                                    <FormattedMessage
-                                        defaultMessage="Order Number: {orderNumber}"
-                                        id="account_order_detail.label.order_number"
-                                        values={{orderNumber: order.orderNo}}
-                                    />
+                                    {messages.orderNumber(order.orderNo)}
                                 </Text>
-                                <Badge colorScheme="green">{order.status}</Badge>
+                                <Badge colorPalette="green" fontWeight="bold">
+                                    {order.status?.toUpperCase()}
+                                </Badge>
                             </Stack>
                         </Stack>
                     ) : (
@@ -207,9 +273,14 @@ const AccountOrderDetail = () => {
             </Stack>
 
             <Box layerStyle="cardBordered">
-                <Grid templateColumns={{base: '1fr', xl: '60% 1fr'}} gap={{base: 6, xl: 2}}>
-                    <SimpleGrid columns={{base: 1, sm: 2}} columnGap={4} rowGap={5} py={{xl: 6}}>
-                        {isLoading ? (
+                <Grid templateColumns={{base: '1fr', xl: '60% 1fr'}} gap={{base: '6', xl: '2'}}>
+                    <SimpleGrid
+                        columns={{base: '1', sm: '2'}}
+                        columnGap="4"
+                        rowGap="5"
+                        py={{xl: '6'}}
+                    >
+                        {isPending ? (
                             <>
                                 <Stack>
                                     <Skeleton h="20px" w="84px" />
@@ -233,54 +304,24 @@ const AccountOrderDetail = () => {
                             </>
                         ) : (
                             <>
-                                <Stack spacing={1}>
-                                    <Heading as="h2" fontSize="sm" pt={1}>
-                                        <FormattedMessage
-                                            defaultMessage="Shipping Method"
-                                            id="account_order_detail.heading.shipping_method"
-                                        />
+                                <Stack gap="1">
+                                    <Heading as="h2" fontSize="sm" pt="1">
+                                        {messages.shippingMethod}
                                     </Heading>
                                     <Box>
                                         <Text fontSize="sm" textTransform="titlecase">
-                                            {
-                                                {
-                                                    not_shipped: formatMessage({
-                                                        defaultMessage: 'Not shipped',
-                                                        id: 'account_order_detail.shipping_status.not_shipped'
-                                                    }),
-
-                                                    part_shipped: formatMessage({
-                                                        defaultMessage: 'Partially shipped',
-                                                        id: 'account_order_detail.shipping_status.part_shipped'
-                                                    }),
-                                                    shipped: formatMessage({
-                                                        defaultMessage: 'Shipped',
-                                                        id: 'account_order_detail.shipping_status.shipped'
-                                                    })
-                                                }[shippingStatus]
-                                            }
+                                            {messages.shippingStatuses[shippingStatus]}
                                         </Text>
                                         <Text fontSize="sm">{shippingMethod.name}</Text>
                                         <Text fontSize="sm">
-                                            <FormattedMessage
-                                                defaultMessage="Tracking Number"
-                                                id="account_order_detail.label.tracking_number"
-                                            />
-                                            :{' '}
-                                            {trackingNumber ||
-                                                formatMessage({
-                                                    defaultMessage: 'Pending',
-                                                    id: 'account_order_detail.label.pending_tracking_number'
-                                                })}
+                                            {messages.trackingNumber}:{' '}
+                                            {trackingNumber || messages.pending}
                                         </Text>
                                     </Box>
                                 </Stack>
-                                <Stack spacing={1}>
-                                    <Heading as="h2" fontSize="sm" pt={1}>
-                                        <FormattedMessage
-                                            defaultMessage="Payment Method"
-                                            id="account_order_detail.heading.payment_method"
-                                        />
+                                <Stack gap="1">
+                                    <Heading as="h2" fontSize="sm" pt="1">
+                                        {messages.paymentMethod}
                                     </Heading>
                                     <Stack direction="row">
                                         {CardIcon && (
@@ -301,12 +342,9 @@ const AccountOrderDetail = () => {
                                         </Box>
                                     </Stack>
                                 </Stack>
-                                <Stack spacing={1}>
-                                    <Heading as="h2" fontSize="sm" pt={1}>
-                                        <FormattedMessage
-                                            defaultMessage="Shipping Address"
-                                            id="account_order_detail.heading.shipping_address"
-                                        />
+                                <Stack gap="1">
+                                    <Heading as="h2" fontSize="sm" pt="1">
+                                        {messages.shippingAddress}
                                     </Heading>
                                     <Box>
                                         <Text fontSize="sm">
@@ -319,12 +357,9 @@ const AccountOrderDetail = () => {
                                         </Text>
                                     </Box>
                                 </Stack>
-                                <Stack spacing={1}>
-                                    <Heading as="h2" fontSize="sm" pt={1}>
-                                        <FormattedMessage
-                                            defaultMessage="Billing Address"
-                                            id="account_order_detail.heading.billing_address"
-                                        />
+                                <Stack gap="1">
+                                    <Heading as="h2" fontSize="sm" pt="1">
+                                        {messages.billingAddress}
                                     </Heading>
                                     <Box>
                                         <Text fontSize="sm">
@@ -342,11 +377,10 @@ const AccountOrderDetail = () => {
                             </>
                         )}
                     </SimpleGrid>
-
-                    {!isLoading ? (
+                    {!isPending ? (
                         <Box
-                            py={{base: 6}}
-                            px={{base: 6, xl: 8}}
+                            py={{base: '6'}}
+                            px={{base: '6', xl: '8'}}
                             background="gray.50"
                             borderRadius="base"
                         >
@@ -358,31 +392,23 @@ const AccountOrderDetail = () => {
                 </Grid>
             </Box>
 
-            <Stack spacing={4}>
-                {!isLoading && (
-                    <Text>
-                        <FormattedMessage
-                            defaultMessage="{count} items"
-                            values={{count: itemCount}}
-                            id="account_order_detail.heading.num_of_items"
-                        />
-                    </Text>
-                )}
+            <Stack gap="4">
+                {!isPending && <Text>{messages.itemsCount(itemCount)}</Text>}
 
-                <Stack spacing={4}>
-                    {isLoading ? (
+                <Stack gap="4">
+                    {isPending ? (
                         [1, 2, 3].map((i) => (
                             <Box
                                 key={i}
-                                p={[4, 6]}
+                                p={['4', '6']}
                                 border="1px solid"
                                 borderColor="gray.100"
                                 borderRadius="base"
                             >
                                 <Flex width="full" align="flex-start">
-                                    <Skeleton boxSize={['88px', 36]} mr={4} />
+                                    <Skeleton boxSize={['88', '36']} mr="4" />
 
-                                    <Stack spacing={2}>
+                                    <Stack gap="2">
                                         <Skeleton h="20px" w="112px" />
                                         <Skeleton h="20px" w="84px" />
                                         <Skeleton h="20px" w="140px" />

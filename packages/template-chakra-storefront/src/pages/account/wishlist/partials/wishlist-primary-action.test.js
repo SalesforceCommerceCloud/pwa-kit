@@ -9,22 +9,34 @@ import {mockWishListDetails} from './wishlist-primary-action.mock'
 import ItemVariantProvider from '../../../../components/item-variant'
 import {renderWithProviders} from '../../../../utils/test-utils'
 import WishlistPrimaryAction from './wishlist-primary-action'
-import {screen, waitFor} from '@testing-library/react'
+import {screen, waitFor, act} from '@testing-library/react'
 import PropTypes from 'prop-types'
-import {rest} from 'msw'
 import {basketWithProductSet} from '../../../product-detail/index.mock'
 import {mockProductBundle} from '../../../../../mocks/product-bundle'
+import {prependHandlersToServer} from '../../../../../jest-setup'
+import Toaster, {toaster} from '../../../../components/toaster'
 
 const MockedComponent = ({variant}) => {
     return (
         <ItemVariantProvider variant={variant}>
             <WishlistPrimaryAction />
+            <Toaster toaster={toaster} />
         </ItemVariantProvider>
     )
 }
 MockedComponent.propTypes = {
     variant: PropTypes.object
 }
+
+// Mock the useShopperBasketsMutationHelper hook
+const mockAddItemToNewOrExistingBasket = jest.fn()
+
+jest.mock('@salesforce/commerce-sdk-react', () => ({
+    ...jest.requireActual('@salesforce/commerce-sdk-react'),
+    useShopperBasketsMutationHelper: jest.fn(() => ({
+        addItemToNewOrExistingBasket: mockAddItemToNewOrExistingBasket
+    }))
+}))
 
 jest.mock('../../../../hooks/use-current-basket', () => {
     return {
@@ -40,22 +52,41 @@ jest.mock('../../../../hooks/use-current-basket', () => {
 beforeEach(() => {
     jest.resetModules()
 
-    global.server.use(
-        // For adding items to basket
-        rest.post('*/baskets/:basketId/items', (req, res, ctx) => {
-            return res(ctx.json(basketWithProductSet))
-        })
-    )
+    prependHandlersToServer([
+        {
+            path: '*/baskets/:basketId/items',
+            method: 'post',
+            res: () => basketWithProductSet
+        }
+    ])
+})
+
+afterEach(() => {
+    jest.restoreAllMocks()
 })
 
 test('the Add To Cart button', async () => {
+    // 701642884934M
     const variant = mockWishListDetails.data[3]
+
     const {user} = renderWithProviders(<MockedComponent variant={variant} />)
 
     const addToCartButton = await screen.findByRole('button', {
         name: new RegExp(`Add ${variant.name} to cart`, 'i')
     })
-    await user.click(addToCartButton)
+
+    mockAddItemToNewOrExistingBasket.mockResolvedValue({
+        basketId: 'basket_id',
+        productItems: [
+            {
+                productId: variant.id,
+                productName: variant.name
+            }
+        ]
+    })
+    await act(async () => {
+        await user.click(addToCartButton)
+    })
 
     await waitFor(() => {
         expect(screen.getByText(/1 item added to cart/i)).toBeInTheDocument()
@@ -65,10 +96,26 @@ test('the Add To Cart button', async () => {
 test('the Add Set To Cart button', async () => {
     const productSetWithoutVariants = mockWishListDetails.data[1]
     const {user} = renderWithProviders(<MockedComponent variant={productSetWithoutVariants} />)
-    const button = await screen.findByRole('button', {
+    const addSetToCartButton = await screen.findByRole('button', {
         name: new RegExp(`Add ${productSetWithoutVariants.name} set to cart`, 'i')
     })
-    await user.click(button)
+    // set product children being added to cart
+    mockAddItemToNewOrExistingBasket.mockResolvedValue({
+        basketId: 'basket_id',
+        productItems: [
+            {
+                productId: productSetWithoutVariants.setProducts[0].id,
+                productName: productSetWithoutVariants.setProducts[0].name
+            },
+            {
+                productId: productSetWithoutVariants.setProducts[0].id,
+                productName: productSetWithoutVariants.setProducts[0].name
+            }
+        ]
+    })
+    await act(async () => {
+        await user.click(addSetToCartButton)
+    })
 
     await waitFor(() => {
         expect(screen.getByText(/2 items added to cart/i)).toBeInTheDocument()
@@ -87,8 +134,10 @@ test('the View Options button', async () => {
     const masterProduct = mockWishListDetails.data[2]
     const {user} = renderWithProviders(<MockedComponent variant={masterProduct} />)
 
-    const button = await screen.findByRole('button', {name: /view options/i})
-    await user.click(button)
+    const viewOptionsButton = await screen.findByRole('button', {name: /view options/i})
+    await act(async () => {
+        await user.click(viewOptionsButton)
+    })
 
     await waitFor(
         () => {
@@ -98,7 +147,7 @@ test('the View Options button', async () => {
         // Seems like rendering the modal takes a bit more time
         {timeout: 5000}
     )
-}, 30000)
+})
 
 test('bundle in wishlist renders the View Full Details button', async () => {
     renderWithProviders(<MockedComponent variant={mockProductBundle} />)

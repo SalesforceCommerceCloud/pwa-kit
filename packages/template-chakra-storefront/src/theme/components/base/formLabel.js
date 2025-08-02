@@ -4,10 +4,13 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-export default {
-    baseStyle: {
+
+import {defineRecipe} from '@chakra-ui/react'
+
+export default defineRecipe({
+    base: {
         marginBottom: 1,
         fontSize: 'sm',
         fontWeight: 'semibold'
     }
-}
+})

@@ -4,21 +4,21 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React, {useEffect} from 'react'
+import React, {useEffect, useMemo} from 'react'
 import PropTypes from 'prop-types'
-import {FormattedMessage, useIntl} from 'react-intl'
+import {useIntl} from 'react-intl'
 import {
+    Box,
     Button,
-    Modal,
-    ModalContent,
-    ModalBody,
-    ModalCloseButton,
-    useDisclosure,
+    CloseButton,
+    Dialog,
+    Flex,
     Heading,
     Stack,
     Text,
-    Box,
-    Flex
+
+    //hooks
+    useDisclosure
 } from '@chakra-ui/react'
 import {HideOnDesktop, HideOnMobile} from '../components/responsive'
 import {useDNT} from '@salesforce/commerce-sdk-react'
@@ -26,7 +26,8 @@ import {useLocation} from 'react-router-dom'
 
 export const DntNotification = ({isOpen, onOpen, onClose}) => {
     const {selectedDnt, updateDNT} = useDNT()
-    const {formatMessage} = useIntl()
+    const intl = useIntl()
+    const {formatMessage} = intl
     const location = useLocation()
 
     useEffect(() => {
@@ -42,6 +43,43 @@ export const DntNotification = ({isOpen, onOpen, onClose}) => {
         onClose()
     }
 
+    const messages = useMemo(
+        () => ({
+            title: formatMessage({
+                id: 'dnt_notification.title',
+                defaultMessage: 'Tracking Consent'
+            }),
+            buttons: {
+                decline: formatMessage({
+                    id: 'dnt_notification.button.decline',
+                    defaultMessage: 'Decline'
+                }),
+                accept: formatMessage({
+                    id: 'dnt_notification.button.accept',
+                    defaultMessage: 'Accept'
+                }),
+                declineAriaLabel: formatMessage({
+                    id: 'dnt_notification.button.assistive_msg.decline',
+                    defaultMessage: 'Decline tracking'
+                }),
+                acceptAriaLabel: formatMessage({
+                    id: 'dnt_notification.button.assistive_msg.accept',
+                    defaultMessage: 'Accept tracking'
+                }),
+                closeAriaLabel: formatMessage({
+                    id: 'dnt_notification.button.assistive_msg.close',
+                    defaultMessage: 'Close consent tracking form'
+                })
+            },
+            description: formatMessage({
+                id: 'dnt_notification.description',
+                defaultMessage:
+                    'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.'
+            })
+        }),
+        [intl]
+    )
+
     const buttons = (
         <>
             <Button
@@ -55,13 +93,9 @@ export const DntNotification = ({isOpen, onOpen, onClose}) => {
                     updateDNT(true)
                     onClose()
                 }}
-                aria-label={formatMessage({
-                    id: 'dnt_notification.button.assistive_msg.decline',
-                    defaultMessage: 'Decline tracking'
-                })}
-                width="100%"
+                aria-label={messages.buttons.declineAriaLabel}
             >
-                <FormattedMessage defaultMessage="Decline" id="dnt_notification.button.decline" />
+                {messages.buttons.decline}
             </Button>
             <Button
                 onClick={() => {
@@ -69,91 +103,82 @@ export const DntNotification = ({isOpen, onOpen, onClose}) => {
                     onClose()
                 }}
                 boxShadow="md"
-                width="100%"
-                aria-label={formatMessage({
-                    id: 'dnt_notification.button.assistive_msg.accept',
-                    defaultMessage: 'Accept tracking'
-                })}
+                aria-label={messages.buttons.acceptAriaLabel}
             >
-                <FormattedMessage defaultMessage="Accept" id="dnt_notification.button.accept" />
+                {messages.buttons.accept}
             </Button>
         </>
     )
     // Placeholder for the consent tracking form for demonstration purposes
     const description = (
-        <Text color={'gray.700'} fontWeight={500} marginTop={7}>
-            <FormattedMessage
-                defaultMessage="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur."
-                id="dnt_notification.description"
-            />
+        <Text color="gray.700" fontWeight="500" marginTop="7">
+            {messages.description}
         </Text>
     )
 
     return (
-        <Modal
+        <Dialog.Root
             size="sm"
             data-testid="sf-dnt-notification"
-            blockScrollOnMount={false}
-            closeOnOverlayClick={false}
+            closeOnInteractOutside={false}
             trapFocus={false}
-            isOpen={isOpen}
-            onOpen={onOpen}
-            onClose={onCloseNotification}
+            modal={false}
+            open={isOpen}
+            preventScroll={false}
+            onOpenChange={isOpen ? onClose : onOpen}
+            placement="bottom"
         >
-            <ModalContent
-                width="100%"
-                maxWidth="100%"
-                position="absolute"
-                bottom={0}
-                left={0}
-                right={0}
-                pointerEvents="all"
-                containerProps={{
-                    pointerEvents: 'none'
-                }}
-                margin="0"
-                borderTopRadius="md"
-            >
-                <Box boxShadow="0 12px 48px rgba(0, 0, 0, 0.3)">
-                    <ModalCloseButton
-                        aria-label={formatMessage({
-                            id: 'dnt_notification.button.assistive_msg.close',
-                            defaultMessage: 'Close consent tracking form'
-                        })}
-                    />
-                    <ModalBody pb={8} bg="white" paddingBottom={14} marginTop={7}>
-                        <Heading as="h3" fontSize={25} width="100%">
-                            <FormattedMessage
-                                defaultMessage="Tracking Consent"
-                                id="dnt_notification.title"
+            <Dialog.Positioner pointerEvents="none">
+                <Dialog.Content
+                    width="100%"
+                    maxWidth="100%"
+                    position="absolute"
+                    bottom="0"
+                    left="0"
+                    right="0"
+                    margin="0"
+                    borderTopRadius="md"
+                >
+                    <Box boxShadow="0 12px 48px rgba(0, 0, 0, 0.3)">
+                        <Dialog.CloseTrigger asChild>
+                            <CloseButton
+                                onClick={onCloseNotification}
+                                colorPalette="gray"
+                                size="xs"
+                                aria-label={messages.buttons.closeAriaLabel}
                             />
-                        </Heading>
-                        <HideOnDesktop>
-                            <Flex direction="column">
-                                {description}
-                                <Stack direction="column" spacing={4} mt={4} align="flex-end">
-                                    {buttons}
-                                </Stack>
-                            </Flex>
-                        </HideOnDesktop>
-                        <HideOnMobile>
-                            <Flex align="center">
-                                {description}
-                                <Stack
-                                    direction="row"
-                                    spacing={4}
-                                    mt={4}
-                                    marginLeft={6}
-                                    align="flex-end"
-                                >
-                                    {buttons}
-                                </Stack>
-                            </Flex>
-                        </HideOnMobile>
-                    </ModalBody>
-                </Box>
-            </ModalContent>
-        </Modal>
+                        </Dialog.CloseTrigger>
+                        <Dialog.Body pb="8" bg="white" paddingBottom="14" marginTop="7">
+                            <Heading as="h3" fontSize={25} width="100%">
+                                {messages.title}
+                            </Heading>
+                            <HideOnDesktop>
+                                <Flex direction="column">
+                                    {description}
+                                    <Stack direction="column" gap="4" mt="4" alignItems="flex-end">
+                                        {buttons}
+                                    </Stack>
+                                </Flex>
+                            </HideOnDesktop>
+                            <HideOnMobile>
+                                <Flex align="center">
+                                    {description}
+                                    <Stack
+                                        direction="row"
+                                        gap="4"
+                                        mt="4"
+                                        marginLeft="6"
+                                        alignItems="flex-end"
+                                    >
+                                        {buttons}
+                                    </Stack>
+                                </Flex>
+                            </HideOnMobile>
+                        </Dialog.Body>
+                    </Box>
+                </Dialog.Content>
+            </Dialog.Positioner>
+        </Dialog.Root>
     )
 }
 
@@ -168,10 +193,10 @@ DntNotification.propTypes = {
  * @returns {Object} - Object props to be passed into the DntNotification component
  */
 export const useDntNotification = () => {
-    const {isOpen, onOpen, onClose} = useDisclosure()
+    const {open, onOpen, onClose} = useDisclosure()
 
     return {
-        isOpen,
+        isOpen: open,
         onOpen,
         onClose
     }

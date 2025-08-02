@@ -4,33 +4,68 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React, {useState} from 'react'
+import React, {useState, useMemo} from 'react'
 import PropTypes from 'prop-types'
-import {defineMessage, FormattedMessage, useIntl} from 'react-intl'
-import {Box, Button, Checkbox, Container, Heading, Stack, Text, Divider} from '@chakra-ui/react'
+import {defineMessage, useIntl} from 'react-intl'
+import {Box, Button, Checkbox, Container, Heading, Stack, Text, Separator} from '@chakra-ui/react'
 import {useForm} from 'react-hook-form'
-import {useToast} from '../../../hooks/use-toast'
 import {useShopperBasketsMutation} from '@salesforce/commerce-sdk-react'
 import {useCurrentBasket} from '../../../hooks/use-current-basket'
-import {useCheckout} from '../util/checkout-context'
+import {useCheckout} from '../../../pages/checkout/util/checkout-context'
 import {
     getPaymentInstrumentCardType,
     getMaskCreditCardNumber,
     getCreditCardIcon
 } from '../../../utils/cc-utils'
 import {ToggleCard, ToggleCardEdit, ToggleCardSummary} from '../../../components/toggle-card'
-import PaymentForm from './payment-form'
-import ShippingAddressSelection from './shipping-address-selection'
+import PaymentForm from '../../../pages/checkout/partials/payment-form'
+import ShippingAddressSelection from '../../../pages/checkout/partials/shipping-address-selection'
 import AddressDisplay from '../../../components/address-display'
 import {PromoCode, usePromoCode} from '../../../components/promo-code'
-import {API_ERROR_MESSAGE} from '../../../../config/constants'
+import {useErrorHandler} from '../../../hooks/use-errors'
 
 const Payment = () => {
-    const {formatMessage} = useIntl()
+    const intl = useIntl()
+    const {formatMessage} = intl
     const {data: basket} = useCurrentBasket()
     const selectedShippingAddress = basket?.shipments && basket?.shipments[0]?.shippingAddress
     const selectedBillingAddress = basket?.billingAddress
     const appliedPayment = basket?.paymentInstruments && basket?.paymentInstruments[0]
+
+    const messages = useMemo(
+        () => ({
+            payment: formatMessage({
+                id: 'checkout_payment.title.payment',
+                defaultMessage: 'Payment'
+            }),
+            editPaymentInfo: formatMessage({
+                id: 'toggle_card.action.editPaymentInfo',
+                defaultMessage: 'Edit Payment Info'
+            }),
+            creditCard: formatMessage({
+                id: 'checkout_payment.heading.credit_card',
+                defaultMessage: 'Credit Card'
+            }),
+            remove: formatMessage({
+                id: 'checkout_payment.action.remove',
+                defaultMessage: 'Remove'
+            }),
+            billingAddress: formatMessage({
+                id: 'checkout_payment.heading.billing_address',
+                defaultMessage: 'Billing Address'
+            }),
+            sameAsShipping: formatMessage({
+                id: 'checkout_payment.label.same_as_shipping',
+                defaultMessage: 'Same as shipping address'
+            }),
+            reviewOrder: formatMessage({
+                id: 'checkout_payment.button.review_order',
+                defaultMessage: 'Review Order'
+            })
+        }),
+        [intl]
+    )
+
     const [billingSameAsShipping, setBillingSameAsShipping] = useState(true) // By default, have billing addr to be the same as shipping
     const {mutateAsync: addPaymentInstrumentToBasket} = useShopperBasketsMutation(
         'addPaymentInstrumentToBasket'
@@ -41,13 +76,7 @@ const Payment = () => {
     const {mutateAsync: removePaymentInstrumentFromBasket} = useShopperBasketsMutation(
         'removePaymentInstrumentFromBasket'
     )
-    const showToast = useToast()
-    const showError = () => {
-        showToast({
-            title: formatMessage(API_ERROR_MESSAGE),
-            status: 'error'
-        })
-    }
+    const showError = useErrorHandler()
 
     const {step, STEPS, goToStep, goToNextStep} = useCheckout()
 
@@ -90,6 +119,7 @@ const Payment = () => {
         if (!isFormValid) {
             return
         }
+
         const billingAddress = billingSameAsShipping
             ? selectedShippingAddress
             : billingAddressForm.getValues()
@@ -136,74 +166,65 @@ const Payment = () => {
     return (
         <ToggleCard
             id="step-3"
-            title={formatMessage({defaultMessage: 'Payment', id: 'checkout_payment.title.payment'})}
+            title={messages.payment}
             editing={step === STEPS.PAYMENT}
             isLoading={
                 paymentMethodForm.formState.isSubmitting ||
                 billingAddressForm.formState.isSubmitting
             }
             disabled={appliedPayment == null}
-            onEdit={() => goToStep(STEPS.PAYMENT)}
-            editLabel={formatMessage({
-                defaultMessage: 'Edit Payment Info',
-                id: 'toggle_card.action.editPaymentInfo'
-            })}
+            onEdit={() => {
+                goToStep(STEPS.PAYMENT)
+            }}
+            editLabel={messages.editPaymentInfo}
         >
             <ToggleCardEdit>
                 <Box mt={-2} mb={4}>
                     <PromoCode {...promoCodeProps} itemProps={{border: 'none'}} />
                 </Box>
 
-                <Stack spacing={6}>
+                <Stack gap={6}>
                     {!appliedPayment?.paymentCard ? (
                         <PaymentForm form={paymentMethodForm} onSubmit={onPaymentSubmit} />
                     ) : (
-                        <Stack spacing={3}>
+                        <Stack gap={3}>
                             <Heading as="h3" fontSize="md">
-                                <FormattedMessage
-                                    defaultMessage="Credit Card"
-                                    id="checkout_payment.heading.credit_card"
-                                />
+                                {messages.creditCard}
                             </Heading>
-                            <Stack direction="row" spacing={4}>
+                            <Stack direction="row" gap={4}>
                                 <PaymentCardSummary payment={appliedPayment} />
                                 <Button
-                                    variant="link"
+                                    variant="link-red"
                                     size="sm"
-                                    colorScheme="red"
+                                    colorPalette="red"
                                     onClick={onPaymentRemoval}
                                 >
-                                    <FormattedMessage
-                                        defaultMessage="Remove"
-                                        id="checkout_payment.action.remove"
-                                    />
+                                    {messages.remove}
                                 </Button>
                             </Stack>
                         </Stack>
                     )}
 
-                    <Divider borderColor="gray.100" />
+                    <Separator borderColor="gray.100" />
 
-                    <Stack spacing={2}>
+                    <Stack gap={2}>
                         <Heading as="h3" fontSize="md">
-                            <FormattedMessage
-                                defaultMessage="Billing Address"
-                                id="checkout_payment.heading.billing_address"
-                            />
+                            {messages.billingAddress}
                         </Heading>
 
-                        <Checkbox
+                        <Checkbox.Root
                             name="billingSameAsShipping"
-                            isChecked={billingSameAsShipping}
-                            onChange={(e) => setBillingSameAsShipping(e.target.checked)}
+                            checked={billingSameAsShipping}
+                            onCheckedChange={(e) => setBillingSameAsShipping(e.checked)}
                         >
-                            <Text fontSize="sm" color="gray.700">
-                                <FormattedMessage
-                                    defaultMessage="Same as shipping address"
-                                    id="checkout_payment.label.same_as_shipping"
-                                />
-                            </Text>
-                        </Checkbox>
+                            <Checkbox.HiddenInput />
+                            <Checkbox.Control colorPalette="blue" />
+                            <Checkbox.Label>
+                                <Text fontSize="sm" color="gray.700">
+                                    {messages.sameAsShipping}
+                                </Text>
+                            </Checkbox.Label>
+                        </Checkbox.Root>
 
                         {billingSameAsShipping && selectedShippingAddress && (
                             <Box pl={7}>
@@ -225,10 +246,7 @@ const Payment = () => {
                     <Box pt={3}>
                         <Container variant="form">
                             <Button w="full" onClick={onSubmit}>
-                                <FormattedMessage
-                                    defaultMessage="Review Order"
-                                    id="checkout_payment.button.review_order"
-                                />
+                                {messages.reviewOrder}
                             </Button>
                         </Container>
                     </Box>
@@ -236,28 +254,22 @@ const Payment = () => {
             </ToggleCardEdit>
 
             <ToggleCardSummary>
-                <Stack spacing={6}>
+                <Stack gap={6}>
                     {appliedPayment && (
-                        <Stack spacing={3}>
+                        <Stack gap={3}>
                             <Heading as="h3" fontSize="md">
-                                <FormattedMessage
-                                    defaultMessage="Credit Card"
-                                    id="checkout_payment.heading.credit_card"
-                                />
+                                {messages.creditCard}
                             </Heading>
                             <PaymentCardSummary payment={appliedPayment} />
                         </Stack>
                     )}
 
-                    <Divider borderColor="gray.100" />
+                    <Separator borderColor="gray.100" />
 
                     {selectedBillingAddress && (
-                        <Stack spacing={2}>
+                        <Stack gap={2}>
                             <Heading as="h3" fontSize="md">
-                                <FormattedMessage
-                                    defaultMessage="Billing Address"
-                                    id="checkout_payment.heading.billing_address"
-                                />
+                                {messages.billingAddress}
                             </Heading>
                             <AddressDisplay address={selectedBillingAddress} />
                         </Stack>
@@ -271,7 +283,7 @@ const Payment = () => {
 const PaymentCardSummary = ({payment}) => {
     const CardIcon = getCreditCardIcon(payment?.paymentCard?.cardType)
     return (
-        <Stack direction="row" alignItems="center" spacing={3}>
+        <Stack direction="row" alignItems="center" gap={3}>
             {CardIcon && <CardIcon layerStyle="ccIcon" />}
 
             <Stack direction="row">

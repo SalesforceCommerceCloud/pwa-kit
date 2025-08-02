@@ -7,29 +7,22 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import {Box, Button, Stack, Text} from '@chakra-ui/react'
-import {PlusIcon} from '../icons'
+import {Box, Button, Stack, Text, Flex} from '@chakra-ui/react'
+import {PlusIcon} from '../../components/icons'
 
 const PageActionPlaceHolder = ({heading, text, icon, buttonText, buttonProps, onButtonClick}) => {
     return (
-        <Stack
-            spacing={2}
-            py={12}
-            px={4}
-            alignItems="center"
-            borderRadius="base"
-            background="gray.50"
-        >
+        <Stack gap="2" py="12" px="4" alignItems="center" rounded="md" background="gray.50">
             <Box>{icon}</Box>
-            <Stack spacing={6} alignItems="center">
-                <Box>
+            <Stack gap="6" alignItems="center">
+                <Flex direction="column" alignItems="center">
                     <Text align="center" fontSize="lg" fontWeight="bold">
                         {heading}
                     </Text>
                     <Text align="center" fontSize="md" color="gray.700">
                         {text}
                     </Text>
-                </Box>
+                </Flex>
                 <Button onClick={onButtonClick} leftIcon={<PlusIcon />} {...buttonProps}>
                     {buttonText}
                 </Button>

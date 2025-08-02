@@ -5,35 +5,39 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React from 'react'
+import React, {useMemo} from 'react'
 import {useIntl} from 'react-intl'
 
 // Components
-import {
-    Alert,
-    Text,
-
-    // Hooks
-    useStyleConfig
-} from '@chakra-ui/react'
+import {Alert, Flex} from '@chakra-ui/react'
 
 // Icons
-import {AlertIcon} from '../icons'
+import {AlertIcon} from '../../components/icons'
 
-const OfflineBanner = () => {
+/**
+ * A banner component that displays when the user is offline.
+ */
+const OfflineBanner = ({...props}) => {
     const intl = useIntl()
-    const style = useStyleConfig('OfflineBanner')
+    const {formatMessage} = intl
+
+    const messages = useMemo(
+        () => ({
+            title: formatMessage({
+                id: 'offline_banner.description.browsing_offline_mode',
+                defaultMessage: "You're currently browsing in offline mode"
+            })
+        }),
+        [intl]
+    )
 
     return (
-        <Alert status="info" {...style.container}>
-            <AlertIcon {...style.icon} />
-            <Text {...style.message}>
-                {intl.formatMessage({
-                    id: 'offline_banner.description.browsing_offline_mode',
-                    defaultMessage: "You're currently browsing in offline mode"
-                })}
-            </Text>
-        </Alert>
+        <Alert.Root status="warning" colorPalette="blue" {...props}>
+            <Flex align="center">
+                <AlertIcon mr={2} />
+                <Alert.Title>{messages.title}</Alert.Title>
+            </Flex>
+        </Alert.Root>
     )
 }
 

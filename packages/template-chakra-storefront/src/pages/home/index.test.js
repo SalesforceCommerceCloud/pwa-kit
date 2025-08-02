@@ -6,9 +6,19 @@
  */
 import React from 'react'
 import {renderWithProviders} from '../../utils/test-utils'
-import HomePage from '.'
+import HomePage from '../../pages/home'
 import {rest} from 'msw'
 import {mockProductSearch} from '../../../mocks/mock-data'
+jest.mock('../../hooks/use-datacloud', () => ({
+    __esModule: true,
+    default: jest.fn(() => ({
+        sendViewPage: jest.fn(),
+        sendViewProduct: jest.fn(),
+        sendViewCategory: jest.fn(),
+        sendViewSearchResults: jest.fn(),
+        sendViewRecommendations: jest.fn()
+    }))
+}))
 
 test('Home Page renders without errors', async () => {
     global.server.use(

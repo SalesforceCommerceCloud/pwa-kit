@@ -5,8 +5,8 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
-import {render, waitFor} from '@testing-library/react'
-import ScrollToTop from './index'
+import {act, render, waitFor} from '@testing-library/react'
+import ScrollToTop from '../../components/scroll-to-top/index'
 import {Router} from 'react-router-dom'
 import {createMemoryHistory} from 'history'
 
@@ -31,13 +31,17 @@ describe('ScrollToTop', () => {
         expect(global.scrollTo).toHaveBeenCalledTimes(1)
         expect(global.scrollTo).toHaveBeenCalledWith(0, 0)
 
-        history.push('/new-url')
+        await act(async () => {
+            history.push('/new-url')
+        })
         await waitFor(() => {
             expect(global.scrollTo).toHaveBeenCalledTimes(2)
         })
         expect(global.scrollTo).toHaveBeenCalledWith(0, 0)
+        await act(async () => {
+            history.push('/new-url2')
+        })
 
-        history.push('/new-url2')
         await waitFor(() => {
             expect(global.scrollTo).toHaveBeenCalledTimes(3)
         })

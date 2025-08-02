@@ -7,10 +7,25 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import {FormattedMessage} from 'react-intl'
-import {Button, Divider, Stack, Text} from '@chakra-ui/react'
-import LoginFields from '../forms/login-fields'
-import SocialLogin from '../social-login'
+import {useIntl, defineMessages} from 'react-intl'
+import {Button, Separator, Stack, Text} from '@chakra-ui/react'
+import LoginFields from '../../components/forms/login-fields'
+import SocialLogin from '../../components/social-login'
+
+const messages = defineMessages({
+    signIn: {
+        defaultMessage: 'Sign In',
+        id: 'login_form.button.sign_in'
+    },
+    orLoginWith: {
+        defaultMessage: 'Or Login With',
+        id: 'login_form.message.or_login_with'
+    },
+    backToSignInOptions: {
+        defaultMessage: 'Back to Sign In Options',
+        id: 'login_form.button.back'
+    }
+})
 
 const StandardLogin = ({
     form,
@@ -20,8 +35,9 @@ const StandardLogin = ({
     setShowPasswordView,
     idps = []
 }) => {
+    const {formatMessage} = useIntl()
     return (
-        <Stack spacing={8} paddingLeft={4} paddingRight={4}>
+        <Stack gap={8} paddingLeft={4} paddingRight={4}>
             <Stack>
                 <LoginFields
                     form={form}
@@ -29,7 +45,7 @@ const StandardLogin = ({
                     handleForgotPasswordClick={handleForgotPasswordClick}
                 />
             </Stack>
-            <Stack spacing={4}>
+            <Stack gap={4}>
                 <Button
                     type="submit"
                     onClick={() => {
@@ -37,17 +53,14 @@ const StandardLogin = ({
                     }}
                     isLoading={form.formState.isSubmitting}
                 >
-                    <FormattedMessage defaultMessage="Sign In" id="login_form.button.sign_in" />
+                    {formatMessage(messages.signIn)}
                 </Button>
                 {isSocialEnabled && idps.length > 0 && (
                     <>
-                        <Stack spacing={6} paddingTop={2} paddingBottom={2}>
-                            <Divider />
+                        <Stack gap={6} paddingTop={2} paddingBottom={2}>
+                            <Separator />
                             <Text align="center" fontSize="sm">
-                                <FormattedMessage
-                                    defaultMessage="Or Login With"
-                                    id="login_form.message.or_login_with"
-                                />
+                                {formatMessage(messages.orLoginWith)}
                             </Text>
                         </Stack>
                         <SocialLogin form={form} idps={idps} />
@@ -55,15 +68,15 @@ const StandardLogin = ({
                 )}
                 {hideEmail && (
                     <Button
-                        onClick={() => setShowPasswordView(false)}
+                        onClick={() => {
+                            form.resetField('password')
+                            setShowPasswordView(false)
+                        }}
                         borderColor="gray.500"
                         color="blue.600"
                         variant="outline"
                     >
-                        <FormattedMessage
-                            defaultMessage="Back to Sign In Options"
-                            id="login_form.button.back"
-                        />
+                        {formatMessage(messages.backToSignInOptions)}
                     </Button>
                 )}
             </Stack>

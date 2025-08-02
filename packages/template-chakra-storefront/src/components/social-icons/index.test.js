@@ -7,7 +7,7 @@
 import React from 'react'
 import SocialIcons from './index'
 import {renderWithProviders} from '../../utils/test-utils'
-import {fireEvent} from '@testing-library/react'
+import {act, fireEvent} from '@testing-library/react'
 
 describe('Social Icons Component', () => {
     test('Renders SocialIcons', () => {
@@ -18,13 +18,15 @@ describe('Social Icons Component', () => {
         expect(links.length).toBeGreaterThan(0)
     })
 
-    test('should open a new windown when an icon is clicked', () => {
+    test('should open a new windown when an icon is clicked', async () => {
         window.open = jest.fn()
         renderWithProviders(<SocialIcons />)
 
         const links = document.querySelectorAll('button')
-        // click the first link
-        fireEvent.click(links[0])
+        await act(async () => {
+            // click the first link
+            fireEvent.click(links[0])
+        })
         expect(global.open).toHaveBeenCalled()
     })
 })

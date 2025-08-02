@@ -4,12 +4,12 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React, {useState} from 'react'
+import React, {useState, useMemo} from 'react'
 import {Button, useDisclosure} from '@chakra-ui/react'
-import {FormattedMessage, useIntl} from 'react-intl'
+import {useIntl} from 'react-intl'
 import {useItemVariant} from '../../../../components/item-variant'
 import ProductViewModal from '../../../../components/product-view-modal'
-import {useToast} from '../../../../hooks/use-toast'
+import useToast from '../../../../hooks/use-toast'
 import {API_ERROR_MESSAGE} from '../../../../../config/constants'
 import Link from '../../../../components/link'
 import {useShopperBasketsMutationHelper} from '@salesforce/commerce-sdk-react'
@@ -22,13 +22,77 @@ import {useShopperBasketsMutationHelper} from '@salesforce/commerce-sdk-react'
 const WishlistPrimaryAction = () => {
     const variant = useItemVariant()
     const {addItemToNewOrExistingBasket} = useShopperBasketsMutationHelper()
-    const {formatMessage} = useIntl()
+    const intl = useIntl()
+    const {formatMessage} = intl
     const isMasterProduct = variant?.type?.master || false
     const isProductASet = variant?.type?.set
     const isProductABundle = variant?.type?.bundle
-    const showToast = useToast()
+    const toast = useToast()
     const [isLoading, setIsLoading] = useState(false)
-    const {isOpen, onOpen, onClose} = useDisclosure()
+    const {open, onOpen, onClose} = useDisclosure()
+
+    const messages = useMemo(
+        () => ({
+            addedToCart: (quantity, isAddingASet, item) =>
+                formatMessage(
+                    {
+                        defaultMessage:
+                            '{quantity} {quantity, plural, one {item} other {items}} added to cart',
+                        id: 'wishlist_primary_action.info.added_to_cart'
+                    },
+                    {quantity: isAddingASet ? quantity * item.setProducts.length : quantity}
+                ),
+            viewOptions: formatMessage({
+                defaultMessage: 'View Options',
+                id: 'wishlist_primary_action.button.view_options'
+            }),
+            viewFullDetails: formatMessage({
+                defaultMessage: 'View Full Details',
+                id: 'wishlist_primary_action.button.view_full_details'
+            }),
+            addToCart: formatMessage({
+                defaultMessage: 'Add to Cart',
+                id: 'wishlist_primary_action.button.add_to_cart'
+            }),
+            addSetToCart: formatMessage({
+                defaultMessage: 'Add Set to Cart',
+                id: 'wishlist_primary_action.button.add_set_to_cart'
+            }),
+            addSetToCartLabel: (productName) =>
+                formatMessage(
+                    {
+                        id: 'wishlist_primary_action.button.addSetToCart.label',
+                        defaultMessage: 'Add {productName} set to cart'
+                    },
+                    {productName}
+                ),
+            viewFullDetailsLabel: (productName) =>
+                formatMessage(
+                    {
+                        id: 'wishlist_primary_action.button.viewFullDetails.label',
+                        defaultMessage: 'View full details for {productName}'
+                    },
+                    {productName}
+                ),
+            viewOptionsLabel: (productName) =>
+                formatMessage(
+                    {
+                        id: 'wishlist_primary_action.button.view_options.label',
+                        defaultMessage: 'View Options for {productName}'
+                    },
+                    {productName}
+                ),
+            addToCartLabel: (productName) =>
+                formatMessage(
+                    {
+                        id: 'wishlist_primary_action.button.addToCart.label',
+                        defaultMessage: 'Add {productName} to cart'
+                    },
+                    {productName}
+                )
+        }),
+        [intl]
+    )
 
     const handleAddToCart = async (item, quantity) => {
         setIsLoading(true)
@@ -50,111 +114,57 @@ const WishlistPrimaryAction = () => {
 
         try {
             await addItemToNewOrExistingBasket(productItems)
-            showToast({
-                title: formatMessage(
-                    {
-                        defaultMessage:
-                            '{quantity} {quantity, plural, one {item} other {items}} added to cart',
-                        id: 'wishlist_primary_action.info.added_to_cart'
-                    },
-                    {quantity: isAddingASet ? quantity * item.setProducts.length : quantity}
-                ),
-                status: 'success'
+            toast({
+                title: messages.addedToCart(quantity, isAddingASet, item),
+                type: 'success'
             })
             onClose()
         } catch (e) {
-            showToast({
+            toast({
                 title: formatMessage(API_ERROR_MESSAGE),
-                status: 'error'
+                type: 'error'
             })
         } finally {
             setIsLoading(false)
         }
     }
 
-    const buttonText = {
-        viewOptions: (
-            <FormattedMessage
-                defaultMessage="View Options"
-                id="wishlist_primary_action.button.view_options"
-            />
-        ),
-        viewFullDetails: (
-            <FormattedMessage
-                defaultMessage="View Full Details"
-                id="wishlist_primary_action.button.view_full_details"
-            />
-        ),
-        addToCart: (
-            <FormattedMessage
-                defaultMessage="Add to Cart"
-                id="wishlist_primary_action.button.add_to_cart"
-            />
-        ),
-        addSetToCart: (
-            <FormattedMessage
-                defaultMessage="Add Set to Cart"
-                id="wishlist_primary_action.button.add_set_to_cart"
-            />
-        )
-    }
-
     if (isProductASet) {
         if (variant.setProducts?.every((child) => !hasVariants(child))) {
             return (
                 <Button
-                    variant={'solid'}
+                    variant="solid"
                     onClick={() => handleAddToCart(variant, variant.quantity)}
-                    w={'full'}
-                    isLoading={isLoading}
-                    aria-label={formatMessage(
-                        {
-                            id: 'wishlist_primary_action.button.addSetToCart.label',
-                            defaultMessage: 'Add {productName} set to cart'
-                        },
-                        {productName: variant.name}
-                    )}
+                    size="md"
+                    loading={isLoading}
+                    aria-label={messages.addSetToCartLabel(variant.name)}
                 >
-                    {buttonText.addSetToCart}
+                    {messages.addSetToCart}
                 </Button>
             )
         } else {
             return (
                 <Button
-                    as={Link}
-                    href={`/product/${variant.id}`}
-                    w={'full'}
-                    variant={'solid'}
+                    asChild
+                    size="md"
+                    variant="solid"
                     _hover={{textDecoration: 'none'}}
-                    aria-label={formatMessage(
-                        {
-                            id: 'wishlist_primary_action.button.viewFullDetails.label',
-                            defaultMessage: 'View full details for {productName}'
-                        },
-                        {productName: variant.name}
-                    )}
+                    aria-label={messages.viewFullDetailsLabel(variant.name)}
                 >
-                    {buttonText.viewFullDetails}
+                    <Link href={`/product/${variant.id}`}>{messages.viewFullDetails}</Link>
                 </Button>
             )
         }
     } else if (isProductABundle) {
         return (
             <Button
-                as={Link}
-                href={`/product/${variant.id}`}
-                w={'full'}
-                variant={'solid'}
+                asChild
+                size="md"
+                variant="solid"
                 _hover={{textDecoration: 'none'}}
-                aria-label={formatMessage(
-                    {
-                        id: 'wishlist_primary_action.button.viewFullDetails.label',
-                        defaultMessage: 'View full details for {productName}'
-                    },
-                    {productName: variant.name}
-                )}
+                aria-label={messages.viewFullDetailsLabel(variant.name)}
             >
-                {buttonText.viewFullDetails}
+                <Link href={`/product/${variant.id}`}>{messages.viewFullDetails}</Link>
             </Button>
         )
     } else {
@@ -162,22 +172,18 @@ const WishlistPrimaryAction = () => {
             return (
                 <>
                     <Button
-                        aria-label={formatMessage(
-                            {
-                                id: 'wishlist_primary_action.button.view_options.label',
-                                defaultMessage: 'View Options for {productName}'
-                            },
-                            {productName: variant.name}
-                        )}
-                        w={'full'}
-                        variant={'solid'}
-                        onClick={onOpen}
+                        aria-label={messages.viewOptionsLabel(variant.name)}
+                        size="md"
+                        variant="solid"
+                        onClick={() => {
+                            onOpen()
+                        }}
                     >
-                        {buttonText.viewOptions}
+                        {messages.viewOptions}
                     </Button>
-                    {isOpen && (
+                    {open && (
                         <ProductViewModal
-                            isOpen={isOpen}
+                            isOpen={open}
                             onOpen={onOpen}
                             onClose={onClose}
                             product={variant}
@@ -189,19 +195,13 @@ const WishlistPrimaryAction = () => {
         } else {
             return (
                 <Button
-                    variant={'solid'}
+                    variant="solid"
                     onClick={() => handleAddToCart(variant, variant.quantity)}
-                    w={'full'}
-                    isLoading={isLoading}
-                    aria-label={formatMessage(
-                        {
-                            id: 'wishlist_primary_action.button.addToCart.label',
-                            defaultMessage: 'Add {productName} to cart'
-                        },
-                        {productName: variant.name}
-                    )}
+                    size="md"
+                    loading={isLoading}
+                    aria-label={messages.addToCartLabel(variant.name)}
                 >
-                    {buttonText.addToCart}
+                    {messages.addToCart}
                 </Button>
             )
         }

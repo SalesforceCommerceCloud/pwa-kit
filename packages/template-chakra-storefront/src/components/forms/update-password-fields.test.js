@@ -7,7 +7,7 @@
 import React from 'react'
 import {useForm} from 'react-hook-form'
 import UpdatePasswordFields from './update-password-fields'
-import {screen, waitFor} from '@testing-library/react'
+import {screen, waitFor, act} from '@testing-library/react'
 import PropTypes from 'prop-types'
 import {renderWithProviders} from '../../utils/test-utils'
 
@@ -49,14 +49,20 @@ describe('UpdatePasswordFields component', () => {
         const newPasswordInput = screen.getByLabelText('New Password')
         const confirmNewPasswordInput = screen.getByLabelText('Confirm New Password')
 
-        await user.type(newPasswordInput, 'Password123!')
-        await user.type(confirmNewPasswordInput, 'DifferentPassword123!')
+        await act(async () => {
+            await user.type(newPasswordInput, 'Password123!')
+        })
 
-        // Submit the form
-        await user.click(screen.getByRole('button', {name: 'Submit'}))
+        await act(async () => {
+            await user.type(confirmNewPasswordInput, 'DifferentPassword123!')
+        })
+
+        await act(async () => {
+            await user.click(screen.getByRole('button', {name: 'Submit'}))
+        })
 
         await waitFor(() => {
-            expect(screen.getByText('Passwords do not match.')).toBeInTheDocument()
+            expect(screen.getByText(/Passwords do not match/i)).toBeInTheDocument()
         })
         expect(onSubmit).not.toHaveBeenCalled()
     })

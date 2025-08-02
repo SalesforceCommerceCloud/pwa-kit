@@ -21,10 +21,6 @@ import {Skeleton} from '@chakra-ui/react'
 import {configureRoutes} from '../src/utils/routes-utils'
 
 const fallback = <Skeleton height="75vh" width="100%" />
-const socialRedirectURI = getConfig()?.login?.social?.redirectURI
-const resetPasswordLandingPath = getConfig()?.login?.resetPassword?.landingPath
-const passwordlessLoginLandingPath = getConfig()?.login?.passwordless?.landingPath
-
 // Pages
 const Home = loadable(() => import('../src/pages/home'), {fallback})
 const Login = loadable(() => import('../src/pages/login'), {fallback})
@@ -46,9 +42,9 @@ const ProductDetail = loadable(() => import('../src/pages/product-detail'), {fal
 const ProductList = loadable(() => import('../src/pages/product-list'), {
     fallback
 })
-const StoreLocator = loadable(() => import('../src/pages/store-locator'), {
-    fallback
-})
+// const StoreLocator = loadable(() => import('../src/pages/store-locator'), {
+//     fallback
+// })
 const Wishlist = loadable(() => import('../src/pages/account/wishlist'), {
     fallback
 })
@@ -129,10 +125,10 @@ export const routes = [
         path: '/account/wishlist',
         component: Wishlist
     },
-    {
-        path: '/store-locator',
-        component: StoreLocator
-    },
+    // {
+    //     path: '/store-locator',
+    //     component: StoreLocator
+    // },
     {
         path: '*',
         component: PageNotFound

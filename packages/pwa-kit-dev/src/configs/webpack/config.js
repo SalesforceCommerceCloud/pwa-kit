@@ -276,7 +276,7 @@ const withChunking = (config) => {
 const staticFolderCopyPlugin = new CopyPlugin({
     patterns: [
         {
-            from: 'static',
+            from: 'src/static',
             to: 'static/',
             noErrorOnMissing: true
         }

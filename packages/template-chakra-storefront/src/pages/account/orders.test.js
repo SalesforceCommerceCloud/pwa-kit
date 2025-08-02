@@ -1,22 +1,22 @@
 /*
- * Copyright (c) 2023, salesforce.com, inc.
+ * Copyright (c) 2025, salesforce.com, inc.
  * All rights reserved.
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
 import {Route, Switch} from 'react-router-dom'
-import {screen} from '@testing-library/react'
+import {act, screen} from '@testing-library/react'
 import {rest} from 'msw'
 import {renderWithProviders, createPathWithDefaults} from '../../utils/test-utils'
 import {mockCustomerBaskets, mockOrderHistory, mockOrderProducts} from '../../../mocks/mock-data'
 import Orders from './orders'
-import mockConfig from '../../../mock-config'
+import mockConfig from '../../../config/mocks/mock-config'
 jest.mock('@salesforce/pwa-kit-runtime/utils/ssr-config', () => {
     const original = jest.requireActual('@salesforce/pwa-kit-runtime/utils/ssr-config')
     return {
         ...original,
-        getConfig: jest.fn(() => require('../../../mock-config'))
+        getConfig: jest.fn(() => require('../../../config/mocks/mock-config'))
     }
 })
 const MockedComponent = () => {
@@ -57,7 +57,7 @@ test('Renders order history and details', async () => {
         })
     )
     const {user} = renderWithProviders(<MockedComponent history={history} />, {
-        wrapperProps: {siteAlias: 'uk', appConfig: mockConfig.app}
+        wrapperProps: {siteAlias: 'uk', config: mockConfig}
     })
     expect(await screen.findByTestId('account-order-history-page')).toBeInTheDocument()
     expect(await screen.findAllByText(/Ordered: /i)).toHaveLength(3)
@@ -68,8 +68,10 @@ test('Renders order history and details', async () => {
             {timeout: 15000}
         )
     ).toHaveLength(3)
+    await act(async () => {
+        await user.click((await screen.findAllByText(/view details/i))[0])
+    })
 
-    await user.click((await screen.findAllByText(/view details/i))[0])
     expect(await screen.findByTestId('account-order-details-page')).toBeInTheDocument()
     expect(await screen.findByText(/order number: 00028011/i)).toBeInTheDocument()
     expect(
@@ -87,7 +89,7 @@ test('Renders order history place holder when no orders', async () => {
         })
     )
     await renderWithProviders(<MockedComponent history={history} />, {
-        wrapperProps: {siteAlias: 'uk', appConfig: mockConfig.app}
+        wrapperProps: {siteAlias: 'uk', config: mockConfig}
     })
 
     expect(await screen.findByTestId('account-order-history-place-holder')).toBeInTheDocument()

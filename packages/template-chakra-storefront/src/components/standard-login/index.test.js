@@ -7,7 +7,7 @@
 import React from 'react'
 import {renderWithProviders} from '../../utils/test-utils'
 import {useForm} from 'react-hook-form'
-import StandardLogin from '.'
+import StandardLogin from '../../components/standard-login'
 import {screen} from '@testing-library/react'
 
 const WrapperComponent = ({...props}) => {

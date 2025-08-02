@@ -18,7 +18,7 @@ Object.defineProperty(global, 'SFDC_EXT_MARKETING_CONSENT_ENABLED', {
 require('cross-fetch/polyfill')
 require('raf/polyfill') // fix requestAnimationFrame issue with polyfill
 require('@testing-library/jest-dom/extend-expect')
-const mockConfig = require('./mock-config')
+const mockConfig = require('./config/mocks/mock-config')
 
 const mockAppConfig = {
     app: {
@@ -141,10 +141,42 @@ jest.mock('@salesforce/cc-datacloud-typescript', () => ({
     initDataCloudSdk: jest.fn()
 }))
 
+jest.mock('@salesforce/cc-datacloud-typescript', () => ({
+    initDataCloudSdk: jest.fn()
+}))
+
 // TextEncoder is a web API, need to import it
 // from nodejs util in testing environment.
 global.TextEncoder = require('util').TextEncoder
 global.TextDecoder = require('util').TextDecoder
+
+// Add ResizeObserver polyfill for Chakra UI testing
+global.ResizeObserver = jest.fn().mockImplementation(() => ({
+    observe: jest.fn(),
+    unobserve: jest.fn(),
+    disconnect: jest.fn()
+}))
+
+// JSDOM environment doesn't natively implement this modern Web API function.
+// Chakra v3 is using it, so we need to mock it here
+global.structuredClone = (val) => {
+    if (val === undefined) return undefined
+
+    if (val === null) return null
+
+    if (typeof val !== 'object' && typeof val !== 'function') {
+        return val
+    }
+
+    try {
+        return JSON.parse(JSON.stringify(val))
+    } catch (e) {
+        // Fallback for values that can't be JSON serialized
+        // This is a simplified version that won't handle all cases
+        // but should work for most Chakra UI scenarios
+        return {...val}
+    }
+}
 
 // This file consists of global mocks for jsdom.
 class StorageMock {
@@ -203,7 +235,7 @@ const prepareHandlers = (handlerConfig = []) => {
     return handlerConfig.map((config) => {
         return rest[config.method?.toLowerCase() || 'get'](config.path, (req, res, ctx) => {
             return res(
-                ctx.delay(0),
+                ctx.delay(config.delay || 0),
                 ctx.status(config.status || 200),
                 config.res && ctx.json(config.res(req, res, ctx))
             )

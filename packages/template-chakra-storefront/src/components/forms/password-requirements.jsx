@@ -4,9 +4,9 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React from 'react'
+import React, {useMemo} from 'react'
 import PropTypes from 'prop-types'
-import {FormattedMessage} from 'react-intl'
+import {useIntl} from 'react-intl'
 import {Flex, Text, Stack} from '@chakra-ui/react'
 import {CheckCircleIcon} from '../icons'
 import {validatePassword} from '../../utils/password-utils'
@@ -28,7 +28,7 @@ const PasswordRequirement = ({isValid, children}) => {
     return (
         <Flex align="center">
             <CheckCircleIcon {...iconStyles} />
-            <Text fontSize="sm" lineHeight={4}>
+            <Text fontSize="sm" lineHeight="1rem">
                 {children}
             </Text>
         </Flex>
@@ -48,44 +48,57 @@ PasswordRequirement.propTypes = {
  * state when the given password value meets the associated critieria.
  */
 const PasswordRequirements = ({value}) => {
+    const intl = useIntl()
+    const {formatMessage} = intl
     const pwValidations = validatePassword(value)
 
+    const messages = useMemo(
+        () => ({
+            minChars: formatMessage({
+                id: 'password_requirements.error.eight_letter_minimum',
+                defaultMessage: '8 characters minimum',
+                description: 'Password requirement'
+            }),
+            uppercase: formatMessage({
+                id: 'password_requirements.error.one_uppercase_letter',
+                defaultMessage: '1 uppercase letter',
+                description: 'Password requirement'
+            }),
+            lowercase: formatMessage({
+                id: 'password_requirements.error.one_lowercase_letter',
+                defaultMessage: '1 lowercase letter',
+                description: 'Password requirement'
+            }),
+            number: formatMessage({
+                id: 'password_requirements.error.one_number',
+                defaultMessage: '1 number',
+                description: 'Password requirement'
+            }),
+            specialChar: formatMessage({
+                id: 'password_requirements.error.one_special_character',
+                defaultMessage: '1 special character (example: , S ! % #)',
+                description: 'Password requirement'
+            })
+        }),
+        [intl]
+    )
+
     return (
-        <Stack spacing={2}>
+        <Stack gap={2}>
             <PasswordRequirement isValid={pwValidations.hasMinChars}>
-                <FormattedMessage
-                    id="password_requirements.error.eight_letter_minimum"
-                    defaultMessage="8 characters minimum"
-                    description="Password requirement"
-                />
+                {messages.minChars}
             </PasswordRequirement>
             <PasswordRequirement isValid={pwValidations.hasUppercase}>
-                <FormattedMessage
-                    id="password_requirements.error.one_uppercase_letter"
-                    defaultMessage="1 uppercase letter"
-                    description="Password requirement"
-                />
+                {messages.uppercase}
             </PasswordRequirement>
             <PasswordRequirement isValid={pwValidations.hasLowercase}>
-                <FormattedMessage
-                    id="password_requirements.error.one_lowercase_letter"
-                    defaultMessage="1 lowercase letter"
-                    description="Password requirement"
-                />
+                {messages.lowercase}
             </PasswordRequirement>
             <PasswordRequirement isValid={pwValidations.hasNumber}>
-                <FormattedMessage
-                    defaultMessage="1 number"
-                    description="Password requirement"
-                    id="password_requirements.error.one_number"
-                />
+                {messages.number}
             </PasswordRequirement>
             <PasswordRequirement isValid={pwValidations.hasSpecialChar}>
-                <FormattedMessage
-                    id="password_requirements.error.one_special_character"
-                    defaultMessage="1 special character (example: , S ! % #)"
-                    description="Password requirement"
-                />
+                {messages.specialChar}
             </PasswordRequirement>
         </Stack>
     )

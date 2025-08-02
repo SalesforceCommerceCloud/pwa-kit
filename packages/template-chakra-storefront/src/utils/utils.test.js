@@ -111,6 +111,34 @@ describe('shallow', function () {
     })
 })
 
+describe('normalizeProductId', () => {
+    test('returns variant productId when available', () => {
+        const product = {id: 'prod1', productId: 'prod_p_id'}
+        const variant = {productId: 'variant_p_id'}
+        expect(utils.normalizeProductId(product, variant)).toBe('variant_p_id')
+    })
+    test('returns product productId when variant productId is not available', () => {
+        const product = {id: 'prod1', productId: 'prod_p_id'}
+        const variant = {}
+        expect(utils.normalizeProductId(product, variant)).toBe('prod_p_id')
+    })
+    test('returns product id when product and variant productIds are not available', () => {
+        const product = {id: 'prod1'}
+        const variant = {}
+        expect(utils.normalizeProductId(product, variant)).toBe('prod1')
+    })
+    test('returns undefined when no id is available', () => {
+        const product = {}
+        const variant = {}
+        expect(utils.normalizeProductId(product, variant)).toBeUndefined()
+    })
+    test('handles undefined inputs', () => {
+        expect(utils.normalizeProductId(undefined, undefined)).toBeUndefined()
+        expect(utils.normalizeProductId({}, undefined)).toBeUndefined()
+        expect(utils.normalizeProductId(undefined, {})).toBeUndefined()
+    })
+})
+
 describe('keysToCamel', () => {
     test('converts object keys to camelcase', () => {
         const input = {

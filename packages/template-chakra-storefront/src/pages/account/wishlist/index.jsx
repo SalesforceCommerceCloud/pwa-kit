@@ -4,13 +4,13 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React, {useState, useEffect, useRef} from 'react'
-import {FormattedMessage, useIntl} from 'react-intl'
+import React, {useState, useEffect, useRef, useMemo} from 'react'
+import {useIntl} from 'react-intl'
 import {Box, Stack, Heading, Flex, Skeleton} from '@chakra-ui/react'
 import {useProducts, useShopperCustomersMutation} from '@salesforce/commerce-sdk-react'
 
 import useNavigation from '../../../hooks/use-navigation'
-import {useToast} from '../../../hooks/use-toast'
+import useToast from '../../../hooks/use-toast'
 import {useWishList} from '../../../hooks/use-wish-list'
 
 import PageActionPlaceHolder from '../../../components/page-action-placeholder'
@@ -27,7 +27,8 @@ const numberOfSkeletonItems = 3
 
 const AccountWishlist = () => {
     const navigate = useNavigation()
-    const {formatMessage} = useIntl()
+    const intl = useIntl()
+    const {formatMessage} = intl
     const toast = useToast()
 
     const headingRef = useRef()
@@ -39,7 +40,29 @@ const AccountWishlist = () => {
     const [selectedItem, setSelectedItem] = useState(undefined)
     const [isWishlistItemLoading, setWishlistItemLoading] = useState(false)
 
-    const {data: wishListData, isLoading: isWishListLoading} = useWishList()
+    const messages = useMemo(
+        () => ({
+            title: formatMessage({
+                defaultMessage: 'Wishlist',
+                id: 'account_wishlist.title.wishlist'
+            }),
+            noWishlistItems: formatMessage({
+                defaultMessage: 'No Wishlist Items',
+                id: 'account_wishlist.heading.no_wishlist'
+            }),
+            continueShopping: formatMessage({
+                defaultMessage: 'Continue shopping and add items to your wishlist.',
+                id: 'account_wishlist.description.continue_shopping'
+            }),
+            continueShoppingButton: formatMessage({
+                defaultMessage: 'Continue Shopping',
+                id: 'account_wishlist.button.continue_shopping'
+            })
+        }),
+        [intl]
+    )
+
+    const {data: wishListData, isPending: isWishListLoading} = useWishList()
     const productIds = wishListData?.customerProductListItems?.map((item) => item.productId)
 
     const {data: productsData, isLoading: isProductsLoading} = useProducts(
@@ -127,7 +150,7 @@ const AccountWishlist = () => {
         } catch (err) {
             toast({
                 title: formatMessage(API_ERROR_MESSAGE),
-                status: 'error'
+                type: 'error'
             })
         }
 
@@ -140,9 +163,9 @@ const AccountWishlist = () => {
     const isPageLoading = hasWishlistItems ? isProductsLoading : isWishListLoading
 
     return (
-        <Stack spacing={4} data-testid="account-wishlist-page">
+        <Stack gap="4" data-testid="account-wishlist-page">
             <Heading as="h1" fontSize="2xl" tabIndex="0" ref={headingRef}>
-                <FormattedMessage defaultMessage="Wishlist" id="account_wishlist.title.wishlist" />
+                {messages.title}
             </Heading>
 
             {isPageLoading && (
@@ -150,16 +173,15 @@ const AccountWishlist = () => {
                     {new Array(numberOfSkeletonItems).fill(0).map((i, idx) => (
                         <Box
                             key={idx}
-                            p={[4, 6]}
-                            my={4}
+                            p={['4', '6']}
+                            my="4"
                             border="1px solid"
                             borderColor="gray.100"
                             borderRadius="base"
                         >
-                            <Flex width="full" align="flex-start">
-                                <Skeleton boxSize={['88px', 36]} mr={4} />
-
-                                <Stack spacing={2}>
+                            <Flex w="full" align="flex-start">
+                                <Skeleton boxSize={['88px', '36']} mr="4" />
+                                <Stack gap="2">
                                     <Skeleton h="20px" w="112px" />
                                     <Skeleton h="20px" w="84px" />
                                     <Skeleton h="20px" w="140px" />
@@ -174,18 +196,9 @@ const AccountWishlist = () => {
                 <PageActionPlaceHolder
                     data-testid="empty-wishlist"
                     icon={<HeartIcon boxSize={8} />}
-                    heading={formatMessage({
-                        defaultMessage: 'No Wishlist Items',
-                        id: 'account_wishlist.heading.no_wishlist'
-                    })}
-                    text={formatMessage({
-                        defaultMessage: 'Continue shopping and add items to your wishlist.',
-                        id: 'account_wishlist.description.continue_shopping'
-                    })}
-                    buttonText={formatMessage({
-                        defaultMessage: 'Continue Shopping',
-                        id: 'account_wishlist.button.continue_shopping'
-                    })}
+                    heading={messages.noWishlistItems}
+                    text={messages.continueShopping}
+                    buttonText={messages.continueShoppingButton}
                     buttonProps={{leftIcon: undefined}}
                     onButtonClick={() => navigate('/')}
                 />

@@ -1,18 +1,30 @@
 /*
- * Copyright (c) 2021, salesforce.com, inc.
+ * Copyright (c) 2025, salesforce.com, inc.
  * All rights reserved.
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-export default {
-    baseStyle: {
+import {defineSlotRecipe} from '@chakra-ui/react'
+
+export default defineSlotRecipe({
+    slots: [
+        'container',
+        'stackContainer',
+        'popoverBody',
+        'popoverContent',
+        'popoverContainer',
+        'listMenuTriggerContainer',
+        'listMenuTriggerLink',
+        'listMenuTriggerLinkActive',
+        'listMenuTriggerLinkIcon'
+    ],
+    base: {
         container: {
             minWidth: 'xs',
             width: 'full',
             flexDirection: 'row',
             justifyContent: 'flex-start',
             alignItems: 'flex-start',
-            paddingLeft: 4,
             display: {base: 'none', lg: 'flex'}
         },
         stackContainer: {
@@ -20,11 +32,16 @@ export default {
             flexWrap: 'wrap'
         },
         popoverContent: {
-            marginLeft: 'auto',
-            marginRight: 'auto',
-            border: 0,
-            minWidth: '100%',
-            position: 'absolute'
+            backgroundColor: 'white',
+            // The ArkUI component has a bug where the x-axis offset is always 8px
+            // attempted to fix it by setting the offset but didn't work
+            // Thus, we are manually setting the width and marginLeft for the offset
+            marginLeft: -8,
+            minWidth: 'calc(100vw + 8px)',
+            position: 'relative',
+            left: 0,
+            top: 0,
+            zIndex: 'sticky'
         },
         popoverBody: {
             boxShadow: 'xl',
@@ -60,7 +77,21 @@ export default {
             }
         },
         listMenuTriggerLinkActive: {
+            display: 'block',
+            whiteSpace: 'nowrap',
+            position: 'relative',
+            paddingTop: 3,
+            paddingRight: 1,
+            paddingBottom: 2,
+            paddingLeft: 1,
+            marginLeft: 3,
+            fontSize: 'md',
+            fontWeight: 700,
+            color: 'gray.900',
             textDecoration: 'none',
+            _hover: {
+                textDecoration: 'none'
+            },
             _before: {
                 position: 'absolute',
                 backgroundColor: 'black',
@@ -87,19 +118,10 @@ export default {
             marginRight: 3,
             marginBottom: 2,
             marginLeft: 0,
+            cursor: 'pointer',
             _hover: {
                 textDecoration: 'none'
             }
         }
-    },
-    parts: [
-        'container',
-        'stackContainer',
-        'popoverContent',
-        'popoverContainer',
-        'listMenuTriggerContainer',
-        'listMenuTriggerLink',
-        'listMenuTriggerLinkActive',
-        'listMenuTriggerIcon'
-    ]
-}
+    }
+})

@@ -5,22 +5,12 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React, {useEffect, useState} from 'react'
+import React, {useEffect, useState, useMemo} from 'react'
 import PropTypes from 'prop-types'
 import {useIntl} from 'react-intl'
 import {Link as RouteLink} from 'react-router-dom'
 
-// Components
-import {
-    Box,
-    Center,
-    Flex,
-    Spinner,
-    Stack,
-
-    // Hooks
-    useTheme
-} from '@chakra-ui/react'
+import {Box, Center, Flex, Spinner, Stack, useSlotRecipe} from '@chakra-ui/react'
 
 // Project Components
 import {ListMenuPopover} from './list-menu-popover'
@@ -48,13 +38,23 @@ const ListMenu = ({
     itemsCountKey,
     maxColumns = MAXIMUM_NUMBER_COLUMNS
 }) => {
-    const theme = useTheme()
+    const recipe = useSlotRecipe({key: 'listMenu'})
+    const styles = recipe()
     const [ariaBusy, setAriaBusy] = useState(true)
-    const [activeLink, setActiveLink] = useState()
     const intl = useIntl()
+    const {formatMessage} = intl
 
-    const {baseStyle} = theme.components.ListMenu
     const items = root?.[itemsKey]
+
+    const messages = useMemo(
+        () => ({
+            navLabel: formatMessage({
+                id: 'list_menu.nav.assistive_msg',
+                defaultMessage: 'Main navigation'
+            })
+        }),
+        [intl]
+    )
 
     useEffect(() => {
         setAriaBusy(false)
@@ -63,17 +63,14 @@ const ListMenu = ({
     return (
         <nav
             id="list-menu"
-            aria-label={intl.formatMessage({
-                id: 'list_menu.nav.assistive_msg',
-                defaultMessage: 'Main navigation'
-            })}
+            aria-label={messages.navLabel}
             aria-live="polite"
             aria-busy={ariaBusy}
             aria-atomic="true"
         >
-            <Flex {...baseStyle.container}>
+            <Flex css={styles.container}>
                 {items ? (
-                    <Stack direction={'row'} spacing={0} {...baseStyle.stackContainer}>
+                    <Stack direction={'row'} gap={0} css={styles.stackContainer}>
                         {items?.map?.((item) => {
                             const {id, name} = item
                             const itemsCount = item[itemsCountKey] || item[itemsKey]?.length || 0
@@ -94,13 +91,8 @@ const ListMenu = ({
                                         <Link
                                             as={RouteLink}
                                             to={categoryUrlBuilder(item)}
-                                            onMouseOver={setActiveLink.bind(this, id)}
-                                            onMouseOut={setActiveLink.bind(this)}
-                                            {...baseStyle.listMenuTriggerLink}
+                                            css={styles.listMenuTriggerLink}
                                             {...{name: name + ' __'}}
-                                            {...(activeLink === id
-                                                ? baseStyle.listMenuTriggerlessLinkActive
-                                                : {})}
                                         >
                                             {name}
                                         </Link>

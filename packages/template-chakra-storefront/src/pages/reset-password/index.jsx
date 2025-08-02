@@ -5,51 +5,47 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React, {useEffect} from 'react'
+import React, {useMemo} from 'react'
 import {useIntl} from 'react-intl'
 import PropTypes from 'prop-types'
 import {Box, Container} from '@chakra-ui/react'
 import {useForm} from 'react-hook-form'
 import Seo from '../../components/seo'
 import ResetPasswordForm from '../../components/reset-password'
-import ResetPasswordLanding from './reset-password-landing'
+import ResetPasswordLanding from '../../pages/reset-password/reset-password-landing'
 import useNavigation from '../../hooks/use-navigation'
-import useEinstein from '../../hooks/use-einstein'
-import useDataCloud from '../../hooks/use-datacloud'
-import {useLocation, useRouteMatch} from 'react-router-dom'
+import {useRouteMatch} from 'react-router-dom'
 import {usePasswordReset} from '../../hooks/use-password-reset'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 
 import {API_ERROR_MESSAGE, FEATURE_UNAVAILABLE_ERROR_MESSAGE} from '../../../config/constants'
 
 const ResetPassword = () => {
-    const {formatMessage} = useIntl()
+    const intl = useIntl()
+    const {formatMessage} = intl
     const form = useForm()
     const navigate = useNavigation()
-    const einstein = useEinstein()
-    const dataCloud = useDataCloud()
-    const {pathname} = useLocation()
     const {path} = useRouteMatch()
     const {getPasswordResetToken} = usePasswordReset()
     const {login: loginConfig} = getConfig()
+
+    const messages = useMemo(
+        () => ({
+            featureUnavailableError: formatMessage(FEATURE_UNAVAILABLE_ERROR_MESSAGE),
+            apiError: formatMessage(API_ERROR_MESSAGE)
+        }),
+        [intl]
+    )
 
     const submitForm = async ({email}) => {
         try {
             await getPasswordResetToken(email)
         } catch (e) {
             const message =
-                e.response?.status === 400
-                    ? formatMessage(FEATURE_UNAVAILABLE_ERROR_MESSAGE)
-                    : formatMessage(API_ERROR_MESSAGE)
+                e.response?.status === 400 ? messages.featureUnavailableError : messages.apiError
             form.setError('global', {type: 'manual', message})
         }
     }
-
-    /**************** Einstein ****************/
-    useEffect(() => {
-        einstein.sendViewPage(pathname)
-        dataCloud.sendViewPage(pathname)
-    }, [])
 
     return (
         <Box data-testid="reset-password-page" bg="gray.50" py={[8, 16]}>

@@ -7,18 +7,23 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import {useIntl} from 'react-intl'
-import {SimpleGrid, Button, Center, useMultiStyleConfig} from '@chakra-ui/react'
-import {ADD_FILTER, REMOVE_FILTER} from './refinements-utils'
+import {SimpleGrid, Button, Center, useSlotRecipe} from '@chakra-ui/react'
+import {ADD_FILTER, REMOVE_FILTER} from '../../../pages/product-list/partials/refinements-utils'
 
 const SizeRefinements = ({filter, toggleFilter, selectedFilters}) => {
     const {formatMessage} = useIntl()
-    const styles = useMultiStyleConfig('SwatchGroup', {
-        variant: 'square',
-        disabled: false
+    const recipe = useSlotRecipe({
+        key: 'swatchGroup',
+        variant: 'square'
     })
+    const styles = recipe()
+
+    const getAriaLabel = (isSelected, value) => {
+        return formatMessage(isSelected ? REMOVE_FILTER : ADD_FILTER, value)
+    }
 
     return (
-        <SimpleGrid templateColumns="repeat(auto-fit, 44px)" spacing={4} mt={1}>
+        <SimpleGrid templateColumns="repeat(auto-fit, 44px)" gap={4} mt={1}>
             {filter.values?.map((value, idx) => {
                 // Note the loose comparison, for "string == number" checks.
                 const isSelected = selectedFilters.some((filterValue) => filterValue == value.value)
@@ -29,7 +34,7 @@ const SizeRefinements = ({filter, toggleFilter, selectedFilters}) => {
                 return (
                     <Button
                         key={idx}
-                        {...styles.swatch}
+                        css={styles.swatch}
                         borderColor={isSelected ? 'black' : 'gray.200'}
                         backgroundColor={isSelected ? 'black' : 'white'}
                         color={isSelected ? 'white' : 'gray.900'}
@@ -39,9 +44,9 @@ const SizeRefinements = ({filter, toggleFilter, selectedFilters}) => {
                         variant="outline"
                         marginBottom={0}
                         marginRight={0}
-                        aria-label={formatMessage(isSelected ? REMOVE_FILTER : ADD_FILTER, value)}
+                        aria-label={getAriaLabel(isSelected, value)}
                     >
-                        <Center {...styles.swatchButton}>{value.label}</Center>
+                        <Center css={styles.swatchButton}>{value.label}</Center>
                     </Button>
                 )
             })}
