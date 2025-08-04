@@ -236,12 +236,12 @@ const ShippingMultiAddress = ({
                     }
                 })
             }
-            
+
             // Only update selectedAddresses if it's empty or if we have new items that aren't selected yet
             setSelectedAddresses((prev) => {
                 const newState = {...prev}
                 let hasChanges = false
-                
+
                 basket.productItems.forEach((item) => {
                     const addressKey = item.itemId
                     if (!prev[addressKey] && initialSelected[addressKey]) {
@@ -249,7 +249,7 @@ const ShippingMultiAddress = ({
                         hasChanges = true
                     }
                 })
-                
+
                 return hasChanges ? newState : prev
             })
         }
