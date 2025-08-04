@@ -727,6 +727,14 @@
             {
                 "name": "--displayProgram",
                 "description": "Display the program.json file detailing the program schema/data and exit"
+            },
+            {
+                "name": "--initGit",
+                "description": "Initializes a git repository and stages the files in the generated project",
+                "_ai": {
+                    "instruction": "CRITICAL: Before executing ANY project creation command, you MUST check if the '--initGit' flag is provided in the user's request. If NOT provided, STOP and ask: 'Would you like to initialize a Git repository for this project?' Wait for explicit yes/no answer. Only then proceed with project creation. FAILURE TO FOLLOW THIS STEP IS A CRITICAL ERROR. This check must happen AFTER preset/template selection but BEFORE command execution. DO NOT proceed with project creation until this question is answered.",
+                    "expectedUse": "Used to determine if a Git repository should be initialized in the generated project. This flag must be explicitly set by the user or confirmed via a direct question. The agent MUST wait for user confirmation before proceeding."
+                }
             }
         ],
         "examples": [

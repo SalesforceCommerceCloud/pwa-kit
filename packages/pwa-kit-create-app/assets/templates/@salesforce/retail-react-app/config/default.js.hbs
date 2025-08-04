@@ -6,8 +6,16 @@
  */
 /* eslint-disable @typescript-eslint/no-var-requires */
 const sites = require('./sites.js')
+const {parseCommerceAgentSettings} = require('./utils.js')
+
 module.exports = {
     app: {
+        // Commerce shopping agent configuration for embedded messaging service
+        // This enables an agentic shopping experience in the application
+        // This property accepts either a JSON string or a plain JavaScript object.
+        // The value is set from the COMMERCE_AGENT_SETTINGS environment variable.
+        // If the COMMERCE_AGENT_SETTINGS environment variable is not set, the feature is disabled.
+        commerceAgent: parseCommerceAgentSettings(process.env.COMMERCE_AGENT_SETTINGS),
         // Customize settings for your url
         url: {
             {{#if answers.project.demo.enableDemoSettings}}

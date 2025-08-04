@@ -23,7 +23,7 @@ const HorizontalSuggestions = ({suggestions, closeAndNavigate, dynamicImageProps
                         data-testid="product-tile"
                         to={suggestion.link}
                         key={idx}
-                        onClick={() => closeAndNavigate(true)}
+                        onClick={() => closeAndNavigate(suggestion.link)}
                     >
                         <Box>
                             {/* Product Image */}

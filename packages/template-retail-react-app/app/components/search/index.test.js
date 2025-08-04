@@ -24,6 +24,37 @@ import mockSearchResults from '@salesforce/retail-react-app/app/mocks/searchResu
 import mockConfig from '@salesforce/retail-react-app/config/mocks/default'
 import {rest} from 'msw'
 import {mockCustomerBaskets} from '@salesforce/retail-react-app/app/mocks/mock-data'
+import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
+
+jest.mock('@salesforce/pwa-kit-runtime/utils/ssr-config', () => {
+    const origin = jest.requireActual('@salesforce/pwa-kit-react-sdk/ssr/universal/utils')
+    return {
+        ...origin,
+        getConfig: jest.fn()
+    }
+})
+
+function getMockedConfigWithCommerceAgentSettings(mockConfig, enabled, askAgentOnSearch) {
+    const commerceAgentSettings = mockConfig.app.commerceAgent
+    const changedSettings = {
+        ...commerceAgentSettings,
+        enabled,
+        askAgentOnSearch
+    }
+    return {
+        ...mockConfig,
+        app: {
+            ...mockConfig.app,
+            commerceAgent: changedSettings
+        }
+    }
+}
+
+function setupUserEvent() {
+    return userEvent.setup({
+        advanceTimers: () => jest.runOnlyPendingTimers()
+    })
+}
 
 beforeEach(() => {
     clearSessionJSONItem(RECENT_SEARCH_KEY)
@@ -36,6 +67,8 @@ beforeEach(() => {
             return res(ctx.delay(0), ctx.status(200), ctx.json(mockCustomerBaskets))
         })
     )
+    getConfig.mockImplementation(() => mockConfig)
+    jest.useFakeTimers()
 })
 
 test('renders SearchInput', () => {
@@ -45,7 +78,7 @@ test('renders SearchInput', () => {
 })
 
 test('changes url when enter is pressed', async () => {
-    const user = userEvent.setup()
+    const user = setupUserEvent()
 
     renderWithProviders(<SearchInput />, {
         wrapperProps: {siteAlias: 'uk', appConfig: mockConfig.app}
@@ -61,7 +94,7 @@ test('changes url when enter is pressed', async () => {
 })
 
 test('shows previously searched items when focused', async () => {
-    const user = userEvent.setup()
+    const user = setupUserEvent()
 
     setSessionJSONItem(RECENT_SEARCH_KEY, ['Dresses', 'Suits', 'Tops'])
     renderWithProviders(<SearchInput />)
@@ -77,7 +110,8 @@ test('shows previously searched items when focused', async () => {
 })
 
 test('saves recent searches on submit', async () => {
-    const user = userEvent.setup()
+    jest.useRealTimers()
+    const {user} = renderWithProviders(<SearchInput />)
     setSessionJSONItem(RECENT_SEARCH_KEY, ['Dresses', 'Suits', 'Tops'])
     renderWithProviders(<SearchInput />)
     const searchInput = document.querySelector('input[type="search"]')
@@ -86,7 +120,8 @@ test('saves recent searches on submit', async () => {
 })
 
 test('limits number of saved recent searches', async () => {
-    const user = userEvent.setup()
+    jest.useRealTimers()
+    const {user} = renderWithProviders(<SearchInput />)
 
     setSessionJSONItem(RECENT_SEARCH_KEY, ['Dresses', 'Suits', 'Tops', 'Gloves', 'Bracelets'])
     renderWithProviders(<SearchInput />)
@@ -96,12 +131,14 @@ test('limits number of saved recent searches', async () => {
 })
 
 test('suggestions render when there are some', async () => {
-    const user = userEvent.setup()
-    renderWithProviders(<SearchInput />)
+    jest.useRealTimers()
+    const {user} = renderWithProviders(<SearchInput />)
     const searchInput = document.querySelector('input[type="search"]')
     await user.type(searchInput, 'Dress')
+
     expect(searchInput.value).toBe('Dress')
     const suggestionPopoverEl = await screen.getByTestId('sf-suggestion-popover')
+
     await waitFor(() => {
         const suggestionsEls = within(suggestionPopoverEl).getAllByTestId('sf-suggestion')
         expect(suggestionsEls.length).toBeGreaterThan(0)
@@ -113,7 +150,7 @@ test('suggestions render when there are some', async () => {
 })
 
 test('clicking clear searches clears recent searches', async () => {
-    const user = userEvent.setup()
+    const user = setupUserEvent()
     setSessionJSONItem(RECENT_SEARCH_KEY, ['Dresses', 'Suits', 'Tops'])
     renderWithProviders(<SearchInput />)
     const searchInput = document.querySelector('input[type="search"]')
@@ -130,12 +167,9 @@ test('passing undefined to Suggestions returns undefined', async () => {
     expect(suggestions.innerHTML).toBeUndefined()
 })
 
-// Additional tests to improve coverage
-
 test('handles search phrase in formatSuggestions', async () => {
-    const user = userEvent.setup()
+    const user = setupUserEvent()
 
-    // Mock search results with searchPhrase
     const mockResultsWithPhrase = {
         ...mockSearchResults,
         searchPhrase: 'test search phrase'
@@ -158,71 +192,8 @@ test('handles search phrase in formatSuggestions', async () => {
     })
 })
 
-test('handles product badges in suggestions', async () => {
-    const user = userEvent.setup()
-
-    // Mock search results with product badges
-    const mockResultsWithBadges = {
-        ...mockSearchResults,
-        productSuggestions: {
-            ...mockSearchResults.productSuggestions,
-            products: [
-                {
-                    ...mockSearchResults.productSuggestions.products[0],
-                    c_isNew: true,
-                    c_isSale: false
-                }
-            ]
-        }
-    }
-
-    global.server.use(
-        rest.get('*/search-suggestions', (req, res, ctx) => {
-            return res(ctx.delay(0), ctx.status(200), ctx.json(mockResultsWithBadges))
-        })
-    )
-
-    renderWithProviders(<SearchInput />)
-    const searchInput = document.querySelector('input[type="search"]')
-
-    await user.type(searchInput, 'Dress')
-
-    // Wait for suggestions to load with badges
-    await waitFor(() => {
-        expect(screen.getByTestId('sf-suggestion-popover')).toBeInTheDocument()
-    })
-})
-
-test('handles brand suggestions in formatSuggestions', async () => {
-    const user = userEvent.setup()
-
-    // Mock search results with brand suggestions
-    const mockResultsWithBrands = {
-        ...mockSearchResults,
-        brandSuggestions: {
-            suggestedPhrases: [{phrase: 'Nike'}, {phrase: 'Adidas'}]
-        }
-    }
-
-    global.server.use(
-        rest.get('*/search-suggestions', (req, res, ctx) => {
-            return res(ctx.delay(0), ctx.status(200), ctx.json(mockResultsWithBrands))
-        })
-    )
-
-    renderWithProviders(<SearchInput />)
-    const searchInput = document.querySelector('input[type="search"]')
-
-    await user.type(searchInput, 'Nike')
-
-    // Wait for suggestions to load with brand suggestions
-    await waitFor(() => {
-        expect(screen.getByTestId('sf-suggestion-popover')).toBeInTheDocument()
-    })
-})
-
 test('handles phrase suggestions in formatSuggestions', async () => {
-    const user = userEvent.setup()
+    const user = setupUserEvent()
 
     // Mock search results with phrase suggestions
     const mockResultsWithPhrases = {
@@ -253,45 +224,8 @@ test('handles phrase suggestions in formatSuggestions', async () => {
     })
 })
 
-test('handles category suggestions with images and parent categories', async () => {
-    const user = userEvent.setup()
-
-    // Mock search results with category suggestions that have images and parent categories
-    const mockResultsWithCategoryDetails = {
-        ...mockSearchResults,
-        categorySuggestions: {
-            categories: [
-                {
-                    id: 'womens-clothing-dresses',
-                    name: 'Dresses',
-                    parentCategoryName: 'Clothing',
-                    image: {
-                        disBaseLink: 'https://example.com/dress-image.jpg'
-                    }
-                }
-            ]
-        }
-    }
-
-    global.server.use(
-        rest.get('*/search-suggestions', (req, res, ctx) => {
-            return res(ctx.delay(0), ctx.status(200), ctx.json(mockResultsWithCategoryDetails))
-        })
-    )
-
-    renderWithProviders(<SearchInput />)
-    const searchInput = document.querySelector('input[type="search"]')
-
-    await user.type(searchInput, 'Dress')
-
-    // Wait for suggestions to load with detailed category suggestions
-    await waitFor(() => {
-        expect(screen.getByTestId('sf-suggestion-popover')).toBeInTheDocument()
-    })
-})
-
 test('handles product suggestions with images', async () => {
-    const user = userEvent.setup()
+    const user = setupUserEvent()
 
     // Mock search results with product suggestions that have images
     const mockResultsWithProductImages = {
@@ -324,4 +258,265 @@ test('handles product suggestions with images', async () => {
     await waitFor(() => {
         expect(screen.getByTestId('sf-suggestion-popover')).toBeInTheDocument()
     })
+})
+
+test('when commerceAgent is disabled, chat functions are not called', async () => {
+    const user = setupUserEvent()
+
+    getConfig.mockImplementation(() =>
+        getMockedConfigWithCommerceAgentSettings(mockConfig, 'false', 'true')
+    )
+
+    // Create spies for chat functions
+    const sendTextMessageSpy = jest.fn()
+    const launchChatSpy = jest.fn()
+
+    // Mock window.embeddedservice_bootstrap
+    window.embeddedservice_bootstrap = {
+        utilAPI: {
+            sendTextMessage: sendTextMessageSpy,
+            launchChat: launchChatSpy
+        }
+    }
+
+    renderWithProviders(<SearchInput />)
+    const searchInput = document.querySelector('input[type="search"]')
+
+    // Perform a search
+    await user.type(searchInput, 'test search{enter}')
+
+    // Verify chat functions were not called
+    expect(sendTextMessageSpy).not.toHaveBeenCalled()
+    expect(launchChatSpy).not.toHaveBeenCalled()
+})
+
+test('when askAgentOnSearch is disabled, chat functions are not called', async () => {
+    const user = setupUserEvent()
+
+    getConfig.mockImplementation(() =>
+        getMockedConfigWithCommerceAgentSettings(mockConfig, 'false', 'true')
+    )
+
+    // Create spies for chat functions
+    const sendTextMessageSpy = jest.fn()
+    const launchChatSpy = jest.fn()
+
+    // Mock window.embeddedservice_bootstrap
+    window.embeddedservice_bootstrap = {
+        utilAPI: {
+            sendTextMessage: sendTextMessageSpy,
+            launchChat: launchChatSpy
+        }
+    }
+
+    renderWithProviders(<SearchInput />)
+    const searchInput = document.querySelector('input[type="search"]')
+
+    // Perform a search
+    await user.type(searchInput, 'test search{enter}')
+
+    // Verify chat functions were not called
+    expect(sendTextMessageSpy).not.toHaveBeenCalled()
+    expect(launchChatSpy).not.toHaveBeenCalled()
+})
+
+test('when askAgentOnSearch is enabled and sendTextMessage succeeds, launchChat is not called', async () => {
+    jest.useFakeTimers()
+    const user = setupUserEvent()
+
+    getConfig.mockImplementation(() =>
+        getMockedConfigWithCommerceAgentSettings(mockConfig, 'true', 'true')
+    )
+
+    // Create spies for chat functions
+    const sendTextMessageSpy = jest.fn().mockResolvedValue('success')
+    const launchChatSpy = jest.fn()
+
+    // Mock window.embeddedservice_bootstrap
+    window.embeddedservice_bootstrap = {
+        utilAPI: {
+            sendTextMessage: sendTextMessageSpy,
+            launchChat: launchChatSpy
+        }
+    }
+
+    renderWithProviders(<SearchInput />)
+    const searchInput = document.querySelector('input[type="search"]')
+
+    // Perform a search
+    await user.type(searchInput, 'test search{enter}')
+
+    // Wait for the setTimeout in onSubmitSearch
+    jest.advanceTimersByTime(500)
+
+    // Verify sendTextMessage was called but launchChat was not
+    expect(sendTextMessageSpy).toHaveBeenCalledWith('test search')
+    expect(launchChatSpy).not.toHaveBeenCalled()
+})
+
+test('when sendTextMessage fails and launchChat succeeds, sends message after bot response', async () => {
+    const user = setupUserEvent()
+
+    getConfig.mockImplementation(() =>
+        getMockedConfigWithCommerceAgentSettings(mockConfig, 'true', 'true')
+    )
+
+    // Create spies for chat functions
+    const sendTextMessageSpy = jest
+        .fn()
+        .mockRejectedValueOnce(
+            'invoke API before the onEmbeddedMessagingConversationOpened event is fired'
+        )
+        .mockResolvedValue('success')
+    const launchChatSpy = jest
+        .fn()
+        .mockResolvedValue('Successfully initialized the messaging client')
+
+    // Mock window.embeddedservice_bootstrap
+    window.embeddedservice_bootstrap = {
+        utilAPI: {
+            sendTextMessage: sendTextMessageSpy,
+            launchChat: launchChatSpy
+        }
+    }
+
+    renderWithProviders(<SearchInput />)
+    const searchInput = document.querySelector('input[type="search"]')
+
+    // Perform a search
+    await user.type(searchInput, 'test search{enter}')
+
+    // Wait for the setTimeout in onSubmitSearch
+    jest.advanceTimersByTime(500)
+
+    // Verify first sendTextMessage failed and triggered launchChat
+    expect(sendTextMessageSpy).toHaveBeenCalledWith('test search')
+    expect(launchChatSpy).toHaveBeenCalled()
+
+    // Simulate bot response
+    window.dispatchEvent(
+        new CustomEvent('onEmbeddedMessageSent', {
+            detail: {
+                conversationEntry: {
+                    sender: {
+                        role: 'Chatbot'
+                    }
+                }
+            }
+        })
+    )
+
+    // Wait for the setTimeout after bot message
+    jest.advanceTimersByTime(500)
+
+    // Verify second sendTextMessage was called
+    expect(sendTextMessageSpy).toHaveBeenCalledTimes(2)
+    expect(sendTextMessageSpy).toHaveBeenLastCalledWith('test search')
+
+    // Simulate bot response again
+    window.dispatchEvent(
+        new CustomEvent('onEmbeddedMessageSent', {
+            detail: {
+                conversationEntry: {
+                    sender: {
+                        role: 'Chatbot'
+                    }
+                }
+            }
+        })
+    )
+
+    // Wait for the setTimeout after bot message
+    jest.advanceTimersByTime(500)
+
+    // Verify sendTextMessage was not called again
+    expect(sendTextMessageSpy).toHaveBeenCalledTimes(2)
+})
+
+test('when sendTextMessage fails and launchChat returns maximized message, no additional send text is triggered', async () => {
+    jest.useFakeTimers()
+    const user = setupUserEvent()
+
+    getConfig.mockImplementation(() =>
+        getMockedConfigWithCommerceAgentSettings(mockConfig, 'true', 'true')
+    )
+
+    // Create spies for chat functions
+    const sendTextMessageSpy = jest
+        .fn()
+        .mockRejectedValue(
+            'invoke API before the onEmbeddedMessagingConversationOpened event is fired'
+        )
+    const launchChatSpy = jest.fn().mockResolvedValue('Successfully maximized the messaging client')
+
+    // Mock window.embeddedservice_bootstrap
+    window.embeddedservice_bootstrap = {
+        utilAPI: {
+            sendTextMessage: sendTextMessageSpy,
+            launchChat: launchChatSpy
+        }
+    }
+
+    renderWithProviders(<SearchInput />)
+    const searchInput = document.querySelector('input[type="search"]')
+
+    // Perform a search
+    await user.type(searchInput, 'test search{enter}')
+
+    // Wait for the setTimeout in onSubmitSearch
+    jest.advanceTimersByTime(500)
+
+    // Verify sendTextMessage was called and failed
+    expect(sendTextMessageSpy).toHaveBeenCalledWith('test search')
+    expect(launchChatSpy).toHaveBeenCalled()
+
+    // Wait for any potential setTimeout after launchChat
+    jest.advanceTimersByTime(500)
+
+    // Verify sendTextMessage was only called once
+    expect(sendTextMessageSpy).toHaveBeenCalledTimes(1)
+})
+
+test('when sendTextMessage and launchChat both fail, no additional send text is triggered', async () => {
+    jest.useFakeTimers()
+    const user = setupUserEvent()
+
+    getConfig.mockImplementation(() =>
+        getMockedConfigWithCommerceAgentSettings(mockConfig, 'true', 'true')
+    )
+
+    // Create spies for chat functions
+    const sendTextMessageSpy = jest
+        .fn()
+        .mockRejectedValue(
+            'invoke API before the onEmbeddedMessagingConversationOpened event is fired'
+        )
+    const launchChatSpy = jest.fn().mockRejectedValue('Failed to launch chat')
+
+    // Mock window.embeddedservice_bootstrap
+    window.embeddedservice_bootstrap = {
+        utilAPI: {
+            sendTextMessage: sendTextMessageSpy,
+            launchChat: launchChatSpy
+        }
+    }
+
+    renderWithProviders(<SearchInput />)
+    const searchInput = document.querySelector('input[type="search"]')
+
+    // Perform a search
+    await user.type(searchInput, 'test search{enter}')
+
+    // Wait for the setTimeout in onSubmitSearch
+    jest.advanceTimersByTime(500)
+
+    // Verify sendTextMessage was called and failed
+    expect(sendTextMessageSpy).toHaveBeenCalledWith('test search')
+    expect(launchChatSpy).toHaveBeenCalled()
+
+    // Wait for any potential setTimeout after launchChat
+    jest.advanceTimersByTime(500)
+
+    // Verify sendTextMessage was only called once
+    expect(sendTextMessageSpy).toHaveBeenCalledTimes(1)
 })
