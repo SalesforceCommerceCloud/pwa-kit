@@ -52,12 +52,10 @@ const CheckoutOneClick = () => {
     const [isLoading, setIsLoading] = useState(false)
     const [enableUserRegistration, setEnableUserRegistration] = useState(false)
     const {data: basket} = useCurrentBasket()
-    const [error, setError] = useState()
-    const [isProcessingAddressLogic, setIsProcessingAddressLogic] = useState(false)
-    const {passwordless = {}, social = {}} = getConfig().app.login || {}
+    const [error] = useState()
+    const {social = {}} = getConfig().app.login || {}
     const idps = social?.idps
     const isSocialEnabled = !!social?.enabled
-    const isPasswordlessEnabled = !!passwordless?.enabled
 
     // Only enable BOPIS functionality if the feature toggle is on
     const isPickupOrder = STORE_LOCATOR_IS_ENABLED
@@ -257,18 +255,8 @@ const CheckoutOneClick = () => {
                                 </Alert>
                             )}
 
-                            <ContactInfo
-                                isSocialEnabled={isSocialEnabled}
-                                isPasswordlessEnabled={isPasswordlessEnabled}
-                                idps={idps}
-                                isProcessingAddressLogic={isProcessingAddressLogic}
-                                setIsProcessingAddressLogic={setIsProcessingAddressLogic}
-                            />
-                            {isPickupOrder ? <PickupAddress /> : (
-                                <ShippingAddress 
-                                    isProcessingAddressLogic={isProcessingAddressLogic}
-                                />
-                            )}
+                            <ContactInfo isSocialEnabled={isSocialEnabled} idps={idps} />
+                            {isPickupOrder ? <PickupAddress /> : <ShippingAddress />}
                             {!isPickupOrder && <ShippingOptions />}
                             <Payment
                                 enableUserRegistration={enableUserRegistration}

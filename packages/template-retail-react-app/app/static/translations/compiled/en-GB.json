@@ -1183,12 +1183,6 @@
       "value": "Forgot password?"
     }
   ],
-  "contact_info.message.checking_addresses": [
-    {
-      "type": 0,
-      "value": "Checking for saved addresses..."
-    }
-  ],
   "contact_info.message.or_login_with": [
     {
       "type": 0,
@@ -2623,12 +2617,6 @@
       "value": "Confirm it's you"
     }
   ],
-  "otp_modal.header.email_verification": [
-    {
-      "type": 0,
-      "value": "Email Verification"
-    }
-  ],
   "page_not_found.action.go_back": [
     {
       "type": 0,
@@ -3407,12 +3395,6 @@
       "value": "Shipping Address Form"
     }
   ],
-  "shipping_address.message.processing_address": [
-    {
-      "type": 0,
-      "value": "Processing address selection..."
-    }
-  ],
   "shipping_address.title.shipping_address": [
     {
       "type": 0,
@@ -3471,12 +3453,6 @@
     {
       "type": 0,
       "value": "Continue to Payment"
-    }
-  ],
-  "shipping_options.message.processing_method": [
-    {
-      "type": 0,
-      "value": "Processing shipping method selection..."
     }
   ],
   "shipping_options.title.shipping_gift_options": [

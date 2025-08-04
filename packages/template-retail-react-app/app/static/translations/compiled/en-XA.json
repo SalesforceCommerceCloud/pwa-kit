@@ -2455,20 +2455,6 @@
       "value": "]"
     }
   ],
-  "contact_info.message.checking_addresses": [
-    {
-      "type": 0,
-      "value": "["
-    },
-    {
-      "type": 0,
-      "value": "Ƈħḗḗƈķīƞɠ ƒǿǿř şȧȧṽḗḗḓ ȧȧḓḓřḗḗşşḗḗş..."
-    },
-    {
-      "type": 0,
-      "value": "]"
-    }
-  ],
   "contact_info.message.or_login_with": [
     {
       "type": 0,
@@ -5599,20 +5585,6 @@
       "value": "]"
     }
   ],
-  "otp_modal.header.email_verification": [
-    {
-      "type": 0,
-      "value": "["
-    },
-    {
-      "type": 0,
-      "value": "Ḗḿȧȧīŀ Ṽḗḗřīƒīƈȧȧŧīǿǿƞ"
-    },
-    {
-      "type": 0,
-      "value": "]"
-    }
-  ],
   "page_not_found.action.go_back": [
     {
       "type": 0,
@@ -7263,20 +7235,6 @@
       "value": "]"
     }
   ],
-  "shipping_address.message.processing_address": [
-    {
-      "type": 0,
-      "value": "["
-    },
-    {
-      "type": 0,
-      "value": "Ƥřǿǿƈḗḗşşīƞɠ ȧȧḓḓřḗḗşş şḗḗŀḗḗƈŧīǿǿƞ..."
-    },
-    {
-      "type": 0,
-      "value": "]"
-    }
-  ],
   "shipping_address.title.shipping_address": [
     {
       "type": 0,
@@ -7411,20 +7369,6 @@
     {
       "type": 0,
       "value": "Ƈǿǿƞŧīƞŭŭḗḗ ŧǿǿ Ƥȧȧẏḿḗḗƞŧ"
-    },
-    {
-      "type": 0,
-      "value": "]"
-    }
-  ],
-  "shipping_options.message.processing_method": [
-    {
-      "type": 0,
-      "value": "["
-    },
-    {
-      "type": 0,
-      "value": "Ƥřǿǿƈḗḗşşīƞɠ şħīƥƥīƞɠ ḿḗḗŧħǿǿḓ şḗḗŀḗḗƈŧīǿǿƞ..."
     },
     {
       "type": 0,

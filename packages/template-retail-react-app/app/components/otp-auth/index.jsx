@@ -9,14 +9,13 @@ import React, {useState, useRef, useEffect} from 'react'
 import PropTypes from 'prop-types'
 import {FormattedMessage} from 'react-intl'
 import {
-    Button, 
-    Input, 
-    SimpleGrid, 
-    Stack, 
-    Text, 
-    Heading, 
-    Icon, 
-    Flex, 
+    Button,
+    Input,
+    SimpleGrid,
+    Stack,
+    Text,
+    Icon,
+    Flex,
     HStack,
     Modal,
     ModalBody,
@@ -27,7 +26,7 @@ import {
 } from '../shared/ui'
 import {PhoneIcon} from '@chakra-ui/icons'
 
-const OtpAuth = ({isOpen, onClose, form, setShowOtpView, handleSendEmailOtp, handleOtpVerification}) => {
+const OtpAuth = ({isOpen, onClose, form, handleSendEmailOtp, handleOtpVerification}) => {
     const [otpValues, setOtpValues] = useState(['', '', '', '', '', '', '', ''])
     const [resendTimer, setResendTimer] = useState(0)
     const [isVerifying, setIsVerifying] = useState(false)
@@ -72,8 +71,8 @@ const OtpAuth = ({isOpen, onClose, form, setShowOtpView, handleSendEmailOtp, han
             setIsVerifying(true)
             const result = await handleOtpVerification(otpString)
             setIsVerifying(false)
-            
-            if (!result.success) {
+
+            if (result && !result.success) {
                 setVerificationError(result.error)
                 // Clear the OTP fields so user can try again
                 setOtpValues(['', '', '', '', '', '', '', ''])
@@ -97,19 +96,19 @@ const OtpAuth = ({isOpen, onClose, form, setShowOtpView, handleSendEmailOtp, han
         if (pastedData.length === 8) {
             // Clear any previous verification error
             setVerificationError('')
-            
+
             const newOtpValues = pastedData.split('')
             setOtpValues(newOtpValues)
             form.setValue('otp', pastedData)
             inputRefs.current[7]?.focus()
-            
+
             // Automatically verify the pasted OTP
             if (!isVerifying) {
                 setIsVerifying(true)
                 const result = await handleOtpVerification(pastedData)
                 setIsVerifying(false)
-                
-                if (!result.success) {
+
+                if (result && !result.success) {
                     setVerificationError(result.error)
                     // Clear the OTP fields so user can try again
                     setOtpValues(['', '', '', '', '', '', '', ''])
@@ -132,44 +131,28 @@ const OtpAuth = ({isOpen, onClose, form, setShowOtpView, handleSendEmailOtp, han
     }
 
     const handleCheckoutAsGuest = () => {
-        setShowOtpView(false)
         onClose()
     }
 
     return (
-        <Modal 
-            isOpen={isOpen} 
-            isCentered
-            size="lg"
-            closeOnOverlayClick={false}
-        >
+        <Modal isOpen={isOpen} isCentered size="lg" closeOnOverlayClick={false}>
             <ModalOverlay />
             <ModalContent>
                 <ModalHeader>
                     <FormattedMessage
-                        defaultMessage="Email Verification"
-                        id="otp_modal.header.email_verification"
+                        defaultMessage="Confirm it's you"
+                        id="otp.title.confirm_its_you"
                     />
                 </ModalHeader>
                 <ModalCloseButton onClick={onClose} disabled={isVerifying} />
                 <ModalBody pb={6}>
-                    <Stack spacing={8} paddingLeft={4} paddingRight={4} alignItems="center">
-                        {/* Header with title */}
-                        <Stack spacing={6} alignItems="center" textAlign="center">
-                            <Heading fontSize="2xl" fontWeight="normal" color="gray.700">
-                                <FormattedMessage
-                                    defaultMessage="Confirm it's you"
-                                    id="otp.title.confirm_its_you"
-                                />
-                            </Heading>
-
-                            <Text fontSize="md" color="gray.600" maxWidth="300px">
-                                <FormattedMessage
-                                    defaultMessage="To use your account information enter the code sent to your email."
-                                    id="otp.message.enter_code_for_account"
-                                />
-                            </Text>
-                        </Stack>
+                    <Stack spacing={12} paddingLeft={4} paddingRight={4} alignItems="center">
+                        <Text fontSize="md" maxWidth="300px" textAlign="center">
+                            <FormattedMessage
+                                defaultMessage="To use your account information enter the code sent to your email."
+                                id="otp.message.enter_code_for_account"
+                            />
+                        </Text>
 
                         {/* OTP Input with Phone Icon */}
                         <Flex alignItems="center" spacing={4}>
@@ -237,8 +220,8 @@ const OtpAuth = ({isOpen, onClose, form, setShowOtpView, handleSendEmailOtp, han
                                 borderColor="gray.300"
                                 color="gray.600"
                                 _hover={{
-                                    backgroundColor: "gray.50",
-                                    borderColor: "gray.400"
+                                    backgroundColor: 'gray.50',
+                                    borderColor: 'gray.400'
                                 }}
                             >
                                 <FormattedMessage
@@ -256,11 +239,11 @@ const OtpAuth = ({isOpen, onClose, form, setShowOtpView, handleSendEmailOtp, han
                                 minWidth="160px"
                                 disabled={resendTimer > 0 || isVerifying}
                                 _hover={{
-                                    backgroundColor: "blue.600"
+                                    backgroundColor: 'blue.600'
                                 }}
                                 _disabled={{
-                                    backgroundColor: "gray.300",
-                                    color: "gray.500"
+                                    backgroundColor: 'gray.300',
+                                    color: 'gray.500'
                                 }}
                             >
                                 {resendTimer > 0 ? (
@@ -288,7 +271,6 @@ OtpAuth.propTypes = {
     isOpen: PropTypes.bool.isRequired,
     onClose: PropTypes.func.isRequired,
     form: PropTypes.object.isRequired,
-    setShowOtpView: PropTypes.func.isRequired,
     handleSendEmailOtp: PropTypes.func.isRequired,
     handleOtpVerification: PropTypes.func.isRequired
 }
