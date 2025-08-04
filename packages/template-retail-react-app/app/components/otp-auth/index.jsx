@@ -27,7 +27,8 @@ import {
 import {PhoneIcon} from '@chakra-ui/icons'
 
 const OtpAuth = ({isOpen, onClose, form, handleSendEmailOtp, handleOtpVerification}) => {
-    const [otpValues, setOtpValues] = useState(['', '', '', '', '', '', '', ''])
+    const OTP_LENGTH = 8
+    const [otpValues, setOtpValues] = useState(new Array(OTP_LENGTH).fill(''))
     const [resendTimer, setResendTimer] = useState(0)
     const [isVerifying, setIsVerifying] = useState(false)
     const [verificationError, setVerificationError] = useState('')
@@ -35,7 +36,7 @@ const OtpAuth = ({isOpen, onClose, form, handleSendEmailOtp, handleOtpVerificati
 
     // Initialize refs array
     useEffect(() => {
-        inputRefs.current = inputRefs.current.slice(0, 8)
+        inputRefs.current = inputRefs.current.slice(0, OTP_LENGTH)
     }, [])
 
     // Handle resend timer
@@ -46,9 +47,30 @@ const OtpAuth = ({isOpen, onClose, form, handleSendEmailOtp, handleOtpVerificati
         }
     }, [resendTimer])
 
+    // Validation function to check if value contains only digits
+    const isNumericValue = (value) => {
+        return /^\d*$/.test(value)
+    }
+
+    // Function to verify OTP and handle the result
+    const verifyOtpCode = async (otpCode) => {
+        setIsVerifying(true)
+        const result = await handleOtpVerification(otpCode)
+        setIsVerifying(false)
+
+        if (result && !result.success) {
+            setVerificationError(result.error)
+            // Clear the OTP fields so user can try again
+            setOtpValues(new Array(OTP_LENGTH).fill(''))
+            form.setValue('otp', '')
+            // Focus first input
+            inputRefs.current[0]?.focus()
+        }
+    }
+
     const handleOtpChange = async (index, value) => {
         // Only allow digits
-        if (!/^\d*$/.test(value)) return
+        if (!isNumericValue(value)) return
 
         // Clear any previous verification error
         setVerificationError('')
@@ -62,24 +84,13 @@ const OtpAuth = ({isOpen, onClose, form, handleSendEmailOtp, handleOtpVerificati
         form.setValue('otp', otpString)
 
         // Auto-focus next input
-        if (value && index < 7) {
+        if (value && index < OTP_LENGTH - 1) {
             inputRefs.current[index + 1]?.focus()
         }
 
-        // If all 8 digits are entered, automatically verify OTP
-        if (otpString.length === 8 && !isVerifying) {
-            setIsVerifying(true)
-            const result = await handleOtpVerification(otpString)
-            setIsVerifying(false)
-
-            if (result && !result.success) {
-                setVerificationError(result.error)
-                // Clear the OTP fields so user can try again
-                setOtpValues(['', '', '', '', '', '', '', ''])
-                form.setValue('otp', '')
-                // Focus first input
-                inputRefs.current[0]?.focus()
-            }
+        // If all digits are entered, automatically verify OTP
+        if (otpString.length === OTP_LENGTH && !isVerifying) {
+            await verifyOtpCode(otpString)
         }
     }
 
@@ -92,8 +103,8 @@ const OtpAuth = ({isOpen, onClose, form, handleSendEmailOtp, handleOtpVerificati
 
     const handlePaste = async (e) => {
         e.preventDefault()
-        const pastedData = e.clipboardData.getData('text').replace(/\D/g, '').slice(0, 8)
-        if (pastedData.length === 8) {
+        const pastedData = e.clipboardData.getData('text').replace(/\D/g, '').slice(0, OTP_LENGTH)
+        if (pastedData.length === OTP_LENGTH) {
             // Clear any previous verification error
             setVerificationError('')
 
@@ -104,18 +115,7 @@ const OtpAuth = ({isOpen, onClose, form, handleSendEmailOtp, handleOtpVerificati
 
             // Automatically verify the pasted OTP
             if (!isVerifying) {
-                setIsVerifying(true)
-                const result = await handleOtpVerification(pastedData)
-                setIsVerifying(false)
-
-                if (result && !result.success) {
-                    setVerificationError(result.error)
-                    // Clear the OTP fields so user can try again
-                    setOtpValues(['', '', '', '', '', '', '', ''])
-                    form.setValue('otp', '')
-                    // Focus first input
-                    inputRefs.current[0]?.focus()
-                }
+                await verifyOtpCode(pastedData)
             }
         }
     }
@@ -157,7 +157,7 @@ const OtpAuth = ({isOpen, onClose, form, handleSendEmailOtp, handleOtpVerificati
                         {/* OTP Input with Phone Icon */}
                         <Flex alignItems="center" spacing={4}>
                             <Icon as={PhoneIcon} color="blue.500" boxSize={5} mr={4} />
-                            <SimpleGrid columns={8} spacing={3}>
+                            <SimpleGrid columns={OTP_LENGTH} spacing={3}>
                                 {otpValues.map((value, index) => (
                                     <Input
                                         key={index}
