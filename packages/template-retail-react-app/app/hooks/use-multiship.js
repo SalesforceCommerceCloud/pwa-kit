@@ -816,7 +816,6 @@ export const useMultiship = (basket) => {
     return {
         assignDefaultShippingMethodsToShipments,
         handleDeliveryOptionChange,
-        isCurrentShippingMethodPickup,
         removeEmptyShipments,
         findExistingDeliveryShipment,
         findExistingPickupShipment,
@@ -834,7 +833,6 @@ export const useMultiship = (basket) => {
         findEmptyShipments,
         findShipmentToConsolidate,
         getItemsForShipment,
-        changeStoreForPickupShipment,
         findUnusedDeliveryShipment,
         updateDeliveryAddressForShipment
     }
