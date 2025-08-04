@@ -754,10 +754,12 @@ export const useMultiship = (basket) => {
         if (!defaultShipment) {
             return null
         }
+
         const sourceShipment = findShipmentToConsolidate(basket)
         if (!sourceShipment) {
             return null
         }
+
         const itemsToMove = getItemsForShipment(basket, sourceShipment.shipmentId)
         if (itemsToMove.length === 0) {
             return null
@@ -767,6 +769,7 @@ export const useMultiship = (basket) => {
             sourceShipment,
             itemsToMove
         )
+        
         if (consolidationSuccessful) {
             await removeShipment(sourceShipment.shipmentId)
             return sourceShipment.shipmentId

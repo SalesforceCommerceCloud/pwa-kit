@@ -397,32 +397,23 @@ const ShippingMultiAddress = ({
 
                 let targetShipmentId = existingShipmentId
                 if (!targetShipmentId) {
-                    const targetShipment = findUnusedDeliveryShipment(
-                        basket,
-                        Object.values(addressToItemsMap).map((d) => d.shipmentId)
-                    )
+                    const targetShipment = findUnusedDeliveryShipment(basket, Object.values(addressToItemsMap).map((d) => d.shipmentId))
                     targetShipmentId = targetShipment?.shipmentId
                     if (targetShipmentId) {
                         await updateDeliveryAddressForShipment(targetShipmentId, address)
                     } else {
-                        targetShipmentId = await createNewDeliveryShipmentWithAddress(
-                            basket,
-                            address
-                        )
+                        targetShipmentId = await createNewDeliveryShipmentWithAddress(basket, address)
                     }
                 }
-
-                // Move items to the new shipment if needed.
+                // Set the shipmentId for the unique address
                 addressToItemsMap[addressId].shipmentId = targetShipmentId
+                // Move items to the new shipment if needed. 
                 const itemsToMove = items.filter((item) => item.shipmentId !== targetShipmentId)
                 if (itemsToMove.length > 0) {
-                    basketAfterItemMoves = await moveItemsToDeliveryShipment(
-                        itemsToMove,
-                        targetShipmentId
-                    )
+                    basketAfterItemMoves = await moveItemsToDeliveryShipment(itemsToMove, targetShipmentId)
                 }
             }
-            // Remove any empty shipments.
+            // Remove any empty shipments. 
             await removeEmptyShipments(basketAfterItemMoves || basket)
 
             goToStep(STEPS.SHIPPING_OPTIONS)

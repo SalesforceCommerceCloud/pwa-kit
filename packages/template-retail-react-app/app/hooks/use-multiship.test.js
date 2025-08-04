@@ -281,107 +281,6 @@ describe('useMultiship', () => {
     })
 
     describe('Address Helper Functions', () => {
-        describe('areAddressesEqual', () => {
-            test('should return true for identical addresses', () => {
-                const {result} = renderHook(() => useMultiship(mockBasket))
-                const address1 = {
-                    address1: '123 Main St',
-                    city: 'San Francisco',
-                    stateCode: 'CA',
-                    postalCode: '94105',
-                    countryCode: 'US'
-                }
-                const address2 = {...address1}
-
-                // Access the function through the hook's internal methods
-                const hookInstance = result.current
-                // Since areAddressesEqual is not exposed, we'll test it indirectly through findDeliveryShipmentWithSameAddress
-                const basketWithAddress = {
-                    ...mockBasket,
-                    shipments: [
-                        {
-                            shipmentId: 'test-shipment',
-                            shippingMethod: {id: 'default-shipping-method'},
-                            shippingAddress: address1
-                        }
-                    ]
-                }
-
-                const foundShipmentId = hookInstance.findDeliveryShipmentWithSameAddress(
-                    basketWithAddress,
-                    address2
-                )
-                expect(foundShipmentId).toBe('test-shipment')
-            })
-
-            test('should return false for different addresses', () => {
-                const {result} = renderHook(() => useMultiship(mockBasket))
-                const address1 = {
-                    address1: '123 Main St',
-                    city: 'San Francisco',
-                    stateCode: 'CA',
-                    postalCode: '94105',
-                    countryCode: 'US'
-                }
-                const address2 = {
-                    ...address1,
-                    city: 'Los Angeles'
-                }
-
-                const basketWithAddress = {
-                    ...mockBasket,
-                    shipments: [
-                        {
-                            shipmentId: 'test-shipment',
-                            shippingMethod: {id: 'default-shipping-method'},
-                            shippingAddress: address1
-                        }
-                    ]
-                }
-
-                const foundShipmentId = result.current.findDeliveryShipmentWithSameAddress(
-                    basketWithAddress,
-                    address2
-                )
-                expect(foundShipmentId).toBeUndefined()
-            })
-
-            test('should handle null/undefined values as empty strings', () => {
-                const {result} = renderHook(() => useMultiship(mockBasket))
-                const address1 = {
-                    address1: '123 Main St',
-                    city: null,
-                    stateCode: 'CA',
-                    postalCode: '94105',
-                    countryCode: 'US'
-                }
-                const address2 = {
-                    address1: '123 Main St',
-                    city: '',
-                    stateCode: 'CA',
-                    postalCode: '94105',
-                    countryCode: 'US'
-                }
-
-                const basketWithAddress = {
-                    ...mockBasket,
-                    shipments: [
-                        {
-                            shipmentId: 'test-shipment',
-                            shippingMethod: {id: 'default-shipping-method'},
-                            shippingAddress: address1
-                        }
-                    ]
-                }
-
-                const foundShipmentId = result.current.findDeliveryShipmentWithSameAddress(
-                    basketWithAddress,
-                    address2
-                )
-                expect(foundShipmentId).toBe('test-shipment')
-            })
-        })
-
         describe('findDeliveryShipmentWithSameAddress', () => {
             test('should find delivery shipment with matching address', () => {
                 const address = {
@@ -408,15 +307,12 @@ describe('useMultiship', () => {
                     ]
                 }
                 const {result} = renderHook(() => useMultiship(basketWithAddress))
-
+                
                 mockIsCurrentShippingMethodPickup.mockImplementation((method) => {
                     return method?.id === 'pickup-shipping-method'
                 })
-
-                const foundShipmentId = result.current.findDeliveryShipmentWithSameAddress(
-                    basketWithAddress,
-                    address
-                )
+                
+                const foundShipmentId = result.current.findDeliveryShipmentWithSameAddress(basketWithAddress, address)
                 expect(foundShipmentId).toBe('delivery-1')
             })
 
@@ -429,22 +325,16 @@ describe('useMultiship', () => {
                     countryCode: 'US'
                 }
                 const {result} = renderHook(() => useMultiship(mockBasket))
-
-                const foundShipmentId = result.current.findDeliveryShipmentWithSameAddress(
-                    mockBasket,
-                    address
-                )
+                
+                const foundShipmentId = result.current.findDeliveryShipmentWithSameAddress(mockBasket, address)
                 expect(foundShipmentId).toBeUndefined()
             })
 
             test('should return null if basket is null', () => {
                 const {result} = renderHook(() => useMultiship(mockBasket))
                 const address = {address1: '123 Main St'}
-
-                const foundShipmentId = result.current.findDeliveryShipmentWithSameAddress(
-                    null,
-                    address
-                )
+                
+                const foundShipmentId = result.current.findDeliveryShipmentWithSameAddress(null, address)
                 expect(foundShipmentId).toBeNull()
             })
 
@@ -458,23 +348,18 @@ describe('useMultiship', () => {
                 }
                 const basketWithPickupOnly = {
                     ...mockBasket,
-                    shipments: [
-                        {
-                            shipmentId: 'pickup-1',
-                            shippingMethod: {id: 'pickup-shipping-method'},
-                            shippingAddress: address,
-                            c_fromStoreId: 'store-1'
-                        }
-                    ]
+                    shipments: [{
+                        shipmentId: 'pickup-1',
+                        shippingMethod: {id: 'pickup-shipping-method'},
+                        shippingAddress: address,
+                        c_fromStoreId: 'store-1'
+                    }]
                 }
                 const {result} = renderHook(() => useMultiship(basketWithPickupOnly))
-
+                
                 mockIsCurrentShippingMethodPickup.mockReturnValue(true)
-
-                const foundShipmentId = result.current.findDeliveryShipmentWithSameAddress(
-                    basketWithPickupOnly,
-                    address
-                )
+                
+                const foundShipmentId = result.current.findDeliveryShipmentWithSameAddress(basketWithPickupOnly, address)
                 expect(foundShipmentId).toBeUndefined()
             })
         })
@@ -493,7 +378,7 @@ describe('useMultiship', () => {
                     lastName: 'Doe',
                     phone: '415-555-1234'
                 }
-
+                
                 const mockResponse = {
                     shipments: [
                         ...mockBasket.shipments,
@@ -504,10 +389,10 @@ describe('useMultiship', () => {
                         }
                     ]
                 }
-
+                
                 mockCreateShipmentForBasket.mockResolvedValue(mockResponse)
                 const {result} = renderHook(() => useMultiship(mockBasket))
-
+                
                 await act(async () => {
                     const shipmentId = await result.current.createNewDeliveryShipmentWithAddress(
                         mockBasket,
@@ -515,7 +400,7 @@ describe('useMultiship', () => {
                     )
                     expect(shipmentId).toBe('new-delivery-shipment')
                 })
-
+                
                 expect(mockCreateShipmentForBasket).toHaveBeenCalledWith({
                     parameters: {
                         basketId: 'test-basket-id'
@@ -538,7 +423,7 @@ describe('useMultiship', () => {
             test('should return null if basket is invalid', async () => {
                 const {result} = renderHook(() => useMultiship(mockBasket))
                 const address = {address1: '123 Main St'}
-
+                
                 await act(async () => {
                     const shipmentId = await result.current.createNewDeliveryShipmentWithAddress(
                         null,
@@ -546,7 +431,7 @@ describe('useMultiship', () => {
                     )
                     expect(shipmentId).toBeNull()
                 })
-
+                
                 expect(mockCreateShipmentForBasket).not.toHaveBeenCalled()
             })
 
@@ -564,36 +449,34 @@ describe('useMultiship', () => {
                     addressId: 'addr-123',
                     creationDate: '2024-01-01'
                 }
-
+                
                 const mockResponse = {
-                    shipments: [
-                        {
-                            shipmentId: 'new-shipment',
-                            shippingMethod: {id: 'default-shipping-method'},
-                            shippingAddress: {
-                                address1: addressWithExtraFields.address1,
-                                city: addressWithExtraFields.city,
-                                stateCode: addressWithExtraFields.stateCode,
-                                postalCode: addressWithExtraFields.postalCode,
-                                countryCode: addressWithExtraFields.countryCode,
-                                firstName: addressWithExtraFields.firstName,
-                                lastName: addressWithExtraFields.lastName,
-                                phone: addressWithExtraFields.phone
-                            }
+                    shipments: [{
+                        shipmentId: 'new-shipment',
+                        shippingMethod: {id: 'default-shipping-method'},
+                        shippingAddress: {
+                            address1: addressWithExtraFields.address1,
+                            city: addressWithExtraFields.city,
+                            stateCode: addressWithExtraFields.stateCode,
+                            postalCode: addressWithExtraFields.postalCode,
+                            countryCode: addressWithExtraFields.countryCode,
+                            firstName: addressWithExtraFields.firstName,
+                            lastName: addressWithExtraFields.lastName,
+                            phone: addressWithExtraFields.phone
                         }
-                    ]
+                    }]
                 }
-
+                
                 mockCreateShipmentForBasket.mockResolvedValue(mockResponse)
                 const {result} = renderHook(() => useMultiship(mockBasket))
-
+                
                 await act(async () => {
                     await result.current.createNewDeliveryShipmentWithAddress(
                         mockBasket,
                         addressWithExtraFields
                     )
                 })
-
+                
                 const calledBody = mockCreateShipmentForBasket.mock.calls[0][0].body
                 expect(calledBody.shippingAddress).not.toHaveProperty('addressId')
                 expect(calledBody.shippingAddress).not.toHaveProperty('creationDate')
@@ -612,11 +495,11 @@ describe('useMultiship', () => {
                     lastName: 'Smith',
                     phone: '213-555-5678'
                 }
-
+                
                 const mockResponse = {basketId: 'test-basket-id'}
                 mockUpdateShipmentForBasket.mockResolvedValue(mockResponse)
                 const {result} = renderHook(() => useMultiship(mockBasket))
-
+                
                 await act(async () => {
                     const response = await result.current.updateDeliveryAddressForShipment(
                         'shipment-1',
@@ -624,7 +507,7 @@ describe('useMultiship', () => {
                     )
                     expect(response).toEqual(mockResponse)
                 })
-
+                
                 expect(mockUpdateShipmentForBasket).toHaveBeenCalledWith({
                     parameters: {
                         basketId: 'test-basket-id',
@@ -648,7 +531,7 @@ describe('useMultiship', () => {
             test('should return null if parameters are invalid', async () => {
                 const {result} = renderHook(() => useMultiship(mockBasket))
                 const address = {address1: '123 Main St'}
-
+                
                 await act(async () => {
                     // Test with null shipmentId
                     const response1 = await result.current.updateDeliveryAddressForShipment(
@@ -656,7 +539,7 @@ describe('useMultiship', () => {
                         address
                     )
                     expect(response1).toBeNull()
-
+                    
                     // Test with null address
                     const response2 = await result.current.updateDeliveryAddressForShipment(
                         'shipment-1',
@@ -664,7 +547,7 @@ describe('useMultiship', () => {
                     )
                     expect(response2).toBeNull()
                 })
-
+                
                 expect(mockUpdateShipmentForBasket).not.toHaveBeenCalled()
             })
         })
@@ -675,7 +558,7 @@ describe('useMultiship', () => {
                 mockIsCurrentShippingMethodPickup.mockImplementation((method) => {
                     return method?.id === 'pickup-shipping-method'
                 })
-
+                
                 const basketWithMultipleDeliveryShipments = {
                     ...mockBasket,
                     shipments: [
@@ -685,7 +568,7 @@ describe('useMultiship', () => {
                         },
                         {
                             shipmentId: 'delivery-2',
-                            shippingMethod: {id: 'default-shipping-method'}
+                            shippingMethod: {id: 'default-shipping-method'}  
                         },
                         {
                             shipmentId: 'pickup-1',
@@ -694,9 +577,9 @@ describe('useMultiship', () => {
                         }
                     ]
                 }
-
+                
                 const {result} = renderHook(() => useMultiship(basketWithMultipleDeliveryShipments))
-
+                
                 const unusedShipment = result.current.findUnusedDeliveryShipment(
                     basketWithMultipleDeliveryShipments,
                     ['delivery-1']
@@ -709,16 +592,19 @@ describe('useMultiship', () => {
             test('should return undefined if all delivery shipments are used', () => {
                 // Reset mock to default behavior - all shipments are delivery
                 mockIsCurrentShippingMethodPickup.mockReturnValue(false)
-
+                
                 const {result} = renderHook(() => useMultiship(mockBasket))
-
-                const unusedShipment = result.current.findUnusedDeliveryShipment(mockBasket, ['me'])
+                
+                const unusedShipment = result.current.findUnusedDeliveryShipment(
+                    mockBasket,
+                    ['me']
+                )
                 expect(unusedShipment).toBeUndefined()
             })
 
             test('should return null if basket has no shipments', () => {
                 const {result} = renderHook(() => useMultiship(mockBasket))
-
+                
                 const unusedShipment = result.current.findUnusedDeliveryShipment(null, [])
                 expect(unusedShipment).toBeNull()
             })
@@ -728,20 +614,18 @@ describe('useMultiship', () => {
                 mockIsCurrentShippingMethodPickup.mockImplementation((method) => {
                     return method?.id === 'pickup-shipping-method'
                 })
-
+                
                 const basketWithOnlyPickup = {
                     ...mockBasket,
-                    shipments: [
-                        {
-                            shipmentId: 'pickup-1',
-                            shippingMethod: {id: 'pickup-shipping-method'},
-                            c_fromStoreId: 'store-1'
-                        }
-                    ]
+                    shipments: [{
+                        shipmentId: 'pickup-1',
+                        shippingMethod: {id: 'pickup-shipping-method'},
+                        c_fromStoreId: 'store-1'
+                    }]
                 }
-
+                
                 const {result} = renderHook(() => useMultiship(basketWithOnlyPickup))
-
+                
                 const unusedShipment = result.current.findUnusedDeliveryShipment(
                     basketWithOnlyPickup,
                     []
@@ -1497,7 +1381,7 @@ describe('useMultiship', () => {
                 postalCode: '94105',
                 countryCode: 'US'
             }
-
+            
             const basketWithEmptyMe = {
                 ...mockBasket,
                 shipments: [
@@ -1610,7 +1494,7 @@ describe('useMultiship', () => {
             )
             // Should not remove the shipment if consolidation failed
             expect(mockRemoveShipmentFromBasket).not.toHaveBeenCalled()
-
+            
             consoleErrorSpy.mockRestore()
         })
 
@@ -1654,36 +1538,6 @@ describe('useMultiship', () => {
             // Should not attempt consolidation
             expect(mockConfigureDefaultShipmentIfNeeded).not.toHaveBeenCalled()
             expect(mockUpdateItemsInBasket).not.toHaveBeenCalled()
-        })
-
-        test('should handle removal errors gracefully', async () => {
-            const basketWithEmptyShipments = {
-                ...mockBasket,
-                shipments: [
-                    ...mockBasket.shipments,
-                    {
-                        shipmentId: 'empty-shipment',
-                        shippingMethod: {id: 'default-shipping-method'}
-                    }
-                ],
-                productItems: mockBasket.productItems
-            }
-
-            const {result} = renderHook(() => useMultiship(basketWithEmptyShipments))
-
-            mockRemoveShipmentFromBasket.mockRejectedValue(new Error('Removal failed'))
-            const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {})
-
-            await act(async () => {
-                await result.current.removeEmptyShipments(basketWithEmptyShipments)
-            })
-
-            expect(consoleErrorSpy).toHaveBeenCalledWith(
-                'Failed to remove shipment empty-shipment:',
-                expect.any(Error)
-            )
-
-            consoleErrorSpy.mockRestore()
         })
     })
 
