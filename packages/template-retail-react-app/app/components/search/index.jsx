@@ -114,7 +114,8 @@ const Search = (props) => {
     const searchSuggestion = useSearchSuggestions(
         {
             parameters: {
-                q: searchQuery
+                q: searchQuery,
+                expand: 'images,prices'
             }
         },
         {
