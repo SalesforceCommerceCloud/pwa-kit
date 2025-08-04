@@ -29,6 +29,23 @@ import {getPriceData, getDisplayVariationValues} from '../utils/product-utils'
 import {EINSTEIN_RECOMMENDERS} from '../../config/constants'
 import DisplayPrice from '../components/display-price'
 import SafePortal from '../components/safe-portal'
+import {addToCartModalTheme} from '../theme/components/project/add-to-cart-modal'
+
+/**
+ * Local configuration for component-specific styling
+ * These styles are kept local as they are specific to this component's layout
+ */
+const localStyles = {
+    recommendations: {
+        padding: '8',
+        marginX: {base: -4, md: -8, lg: 0}
+    },
+    productItem: {
+        borderBottomWidth: {base: '1px', lg: '0px'},
+        borderColor: 'gray.200',
+        borderStyle: 'solid'
+    }
+}
 
 /**
  * This is the context for managing the AddToCartModal.
@@ -63,7 +80,7 @@ export const AddToCartModal = () => {
         data: basket = {},
         derivedData: {totalItems}
     } = useCurrentBasket()
-    const size = useBreakpointValue({base: 'full', lg: 'lg', xl: 'xl'})
+    const size = useBreakpointValue(addToCartModalTheme.modal.size)
     const {currency, productSubTotal} = basket
     const numberOfItemsAdded = isProductABundle
         ? selectedQuantity
@@ -121,47 +138,62 @@ export const AddToCartModal = () => {
             size={size}
             open={isOpen}
             onOpenChange={onClose}
-            scrollBehavior="inside"
-            placement="center"
+            scrollBehavior={addToCartModalTheme.modal.scrollBehavior}
+            placement={addToCartModalTheme.modal.placement}
         >
             <SafePortal>
                 <Dialog.Backdrop />
                 <Dialog.Positioner>
                     <Dialog.Content
-                        margin="0"
-                        borderRadius={{base: 'none', md: 'base'}}
-                        bgColor="gray.50"
+                        margin={addToCartModalTheme.layout.content.margin}
+                        borderRadius={addToCartModalTheme.layout.content.borderRadius}
+                        bgColor={addToCartModalTheme.colors.background}
                         data-testid="add-to-cart-modal"
                         aria-labelledby={dialogTitleId}
                     >
-                        <Dialog.Header paddingY="8" bgColor="white">
+                        <Dialog.Header
+                            paddingY={addToCartModalTheme.layout.header.paddingY}
+                            bgColor={addToCartModalTheme.colors.contentBackground}
+                        >
                             <Heading as="h1" fontSize="2xl" id={dialogTitleId}>
                                 {messages.addedToCart}
                             </Heading>
                         </Dialog.Header>
-                        <Dialog.Body bgColor="white" padding="0" marginBottom={{base: 40, lg: 0}}>
+                        <Dialog.Body
+                            bgColor={addToCartModalTheme.colors.contentBackground}
+                            padding={addToCartModalTheme.layout.body.padding}
+                            marginBottom={addToCartModalTheme.layout.body.marginBottom}
+                        >
                             <Flex
-                                flexDirection={{base: 'column', lg: 'row'}}
+                                flexDirection={
+                                    addToCartModalTheme.layout.mainContainer.flexDirection
+                                }
                                 justifyContent="space-between"
-                                paddingBottom={{base: '0', lg: '8'}}
-                                paddingX="4"
+                                paddingBottom={
+                                    addToCartModalTheme.layout.mainContainer.paddingBottom
+                                }
+                                paddingX={addToCartModalTheme.layout.mainContainer.paddingX}
                             >
                                 <Box
                                     flex="1"
-                                    paddingX={{lg: '4', xl: '8'}}
+                                    paddingX={addToCartModalTheme.layout.section.paddingX}
                                     // divider style
-                                    borderRightWidth={{lg: '1px'}}
-                                    borderColor="gray.200"
-                                    borderStyle="solid"
+                                    borderRightWidth={
+                                        addToCartModalTheme.layout.divider.borderRightWidth
+                                    }
+                                    borderColor={addToCartModalTheme.layout.divider.borderColor}
+                                    borderStyle={addToCartModalTheme.layout.divider.borderStyle}
                                 >
                                     {isProductABundle && (
                                         <Flex
                                             key={product.id}
                                             justifyContent="space-between"
                                             paddingBottom={4}
-                                            borderBottomWidth={{base: '1px', lg: '0px'}}
-                                            borderColor="gray.200"
-                                            borderStyle="solid"
+                                            borderBottomWidth={
+                                                localStyles.productItem.borderBottomWidth
+                                            }
+                                            borderColor={localStyles.productItem.borderColor}
+                                            borderStyle={localStyles.productItem.borderStyle}
                                             data-testid="product-added"
                                         >
                                             <Flex gridGap="4">
@@ -273,9 +305,15 @@ export const AddToCartModal = () => {
                                                     justifyContent="space-between"
                                                     marginBottom={index < itemsAdded - 1 ? 0 : 4}
                                                     paddingBottom={4}
-                                                    borderBottomWidth={{base: '1px', lg: '0px'}}
-                                                    borderColor="gray.200"
-                                                    borderStyle="solid"
+                                                    borderBottomWidth={
+                                                        localStyles.productItem.borderBottomWidth
+                                                    }
+                                                    borderColor={
+                                                        localStyles.productItem.borderColor
+                                                    }
+                                                    borderStyle={
+                                                        localStyles.productItem.borderStyle
+                                                    }
                                                     data-testid="product-added"
                                                 >
                                                     <Flex gridGap="4">
@@ -355,8 +393,8 @@ export const AddToCartModal = () => {
                                 <Box
                                     display={['none', 'none', 'none', 'block']}
                                     flex="1"
-                                    paddingX={{lg: '4', xl: '8'}}
-                                    paddingY={{base: '4', lg: '0'}}
+                                    paddingX={addToCartModalTheme.layout.section.paddingX}
+                                    paddingY={addToCartModalTheme.layout.section.paddingY}
                                 >
                                     <Flex justifyContent="space-between" marginBottom="8">
                                         <Text fontWeight="700">{messages.cartSubtotal}</Text>
@@ -384,24 +422,27 @@ export const AddToCartModal = () => {
                                     </Stack>
                                 </Box>
                             </Flex>
-                            <Box padding="8" bgColor="gray.50">
+                            <Box
+                                padding={localStyles.recommendations.padding}
+                                bgColor={addToCartModalTheme.colors.background}
+                            >
                                 <RecommendedProducts
                                     title={messages.mightAlsoLike}
                                     recommender={EINSTEIN_RECOMMENDERS.ADD_TO_CART_MODAL}
                                     products={[product]}
-                                    mx={{base: -4, md: -8, lg: 0}}
+                                    mx={localStyles.recommendations.marginX}
                                     shouldFetch={() => product?.id}
                                 />
                             </Box>
                         </Dialog.Body>
                         <Dialog.Footer
-                            position="fixed"
-                            bg="white"
-                            width="100%"
-                            display={['block', 'block', 'block', 'none']}
-                            p={[4, 4, 6]}
-                            left={0}
-                            bottom={0}
+                            position={addToCartModalTheme.layout.footer.position}
+                            bg={addToCartModalTheme.colors.contentBackground}
+                            width={addToCartModalTheme.layout.footer.width}
+                            display={addToCartModalTheme.layout.footer.display}
+                            p={addToCartModalTheme.layout.footer.padding}
+                            left={addToCartModalTheme.layout.footer.left}
+                            bottom={addToCartModalTheme.layout.footer.bottom}
                         >
                             <Flex justifyContent="space-between" marginBottom="4">
                                 <Text fontWeight="700">{messages.cartSubtotal}</Text>
