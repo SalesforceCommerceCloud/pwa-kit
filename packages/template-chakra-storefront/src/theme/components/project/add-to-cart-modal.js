@@ -8,16 +8,16 @@
 /**
  * Theme configuration for AddToCartModal
  * Centralizes modal positioning, sizing, spacing, and color values
- * 
+ *
  * This theme object provides a single source of truth for:
  * - Modal size breakpoints and placement
  * - Layout spacing (padding, margins) for core sections
  * - Border styling for dividers
  * - Color scheme for backgrounds
- * 
+ *
  * Usage: Import and reference theme properties instead of hardcoded values
  * Example: paddingX={addToCartModalTheme.layout.section.paddingX}
- * 
+ *
  * To customize: Modify values in this theme object rather than individual components
  * Example: Change modal.size to {base: 'lg', lg: 'xl', xl: '2xl'} for larger modals
  */
@@ -28,7 +28,7 @@ export const addToCartModalTheme = {
         placement: 'center',
         scrollBehavior: 'inside'
     },
-    
+
     // Layout spacing and positioning
     layout: {
         content: {
@@ -65,7 +65,7 @@ export const addToCartModalTheme = {
             bottom: 0
         }
     },
-    
+
     // Color scheme
     colors: {
         background: 'gray.50',

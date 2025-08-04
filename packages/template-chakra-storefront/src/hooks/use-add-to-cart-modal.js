@@ -165,16 +165,22 @@ export const AddToCartModal = () => {
                             marginBottom={addToCartModalTheme.layout.body.marginBottom}
                         >
                             <Flex
-                                flexDirection={addToCartModalTheme.layout.mainContainer.flexDirection}
+                                flexDirection={
+                                    addToCartModalTheme.layout.mainContainer.flexDirection
+                                }
                                 justifyContent="space-between"
-                                paddingBottom={addToCartModalTheme.layout.mainContainer.paddingBottom}
+                                paddingBottom={
+                                    addToCartModalTheme.layout.mainContainer.paddingBottom
+                                }
                                 paddingX={addToCartModalTheme.layout.mainContainer.paddingX}
                             >
                                 <Box
                                     flex="1"
                                     paddingX={addToCartModalTheme.layout.section.paddingX}
                                     // divider style
-                                    borderRightWidth={addToCartModalTheme.layout.divider.borderRightWidth}
+                                    borderRightWidth={
+                                        addToCartModalTheme.layout.divider.borderRightWidth
+                                    }
                                     borderColor={addToCartModalTheme.layout.divider.borderColor}
                                     borderStyle={addToCartModalTheme.layout.divider.borderStyle}
                                 >
@@ -183,7 +189,9 @@ export const AddToCartModal = () => {
                                             key={product.id}
                                             justifyContent="space-between"
                                             paddingBottom={4}
-                                            borderBottomWidth={localStyles.productItem.borderBottomWidth}
+                                            borderBottomWidth={
+                                                localStyles.productItem.borderBottomWidth
+                                            }
                                             borderColor={localStyles.productItem.borderColor}
                                             borderStyle={localStyles.productItem.borderStyle}
                                             data-testid="product-added"
@@ -297,9 +305,15 @@ export const AddToCartModal = () => {
                                                     justifyContent="space-between"
                                                     marginBottom={index < itemsAdded - 1 ? 0 : 4}
                                                     paddingBottom={4}
-                                                    borderBottomWidth={localStyles.productItem.borderBottomWidth}
-                                                    borderColor={localStyles.productItem.borderColor}
-                                                    borderStyle={localStyles.productItem.borderStyle}
+                                                    borderBottomWidth={
+                                                        localStyles.productItem.borderBottomWidth
+                                                    }
+                                                    borderColor={
+                                                        localStyles.productItem.borderColor
+                                                    }
+                                                    borderStyle={
+                                                        localStyles.productItem.borderStyle
+                                                    }
                                                     data-testid="product-added"
                                                 >
                                                     <Flex gridGap="4">
