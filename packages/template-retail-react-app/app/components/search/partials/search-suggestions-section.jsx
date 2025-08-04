@@ -68,7 +68,7 @@ const SuggestionSection = ({searchSuggestions, closeAndNavigate, styles}) => {
             </HideOnDesktop>
             {/* Desktop - Vertical and Horizontal alignment */}
             <HideOnMobile>
-                <Box display="flex" gap="5" minH="280px">
+                <Box display="flex" gap="5">
                     <Box flex="1">
                         {hasPhraseSuggestions &&
                             searchSuggestions?.phraseSuggestions[0].exactMatch === false && (
@@ -108,7 +108,7 @@ const SuggestionSection = ({searchSuggestions, closeAndNavigate, styles}) => {
                                     closeAndNavigate={closeAndNavigate}
                                     suggestions={searchSuggestions?.productSuggestions}
                                     dynamicImageProps={{
-                                        widths: ['20vw', '20vw', '16vw']
+                                        widths: ['50vw', '50vw', '16vw']
                                     }}
                                 />
                             </Fragment>

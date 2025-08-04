@@ -6,7 +6,7 @@
  */
 import React from 'react'
 import PropTypes from 'prop-types'
-import {Text, Button, Box, Flex} from '@salesforce/retail-react-app/app/components/shared/ui'
+import {Text, Box, Flex} from '@salesforce/retail-react-app/app/components/shared/ui'
 import DynamicImage from '@salesforce/retail-react-app/app/components/dynamic-image'
 import Link from '@salesforce/retail-react-app/app/components/link'
 
@@ -19,7 +19,7 @@ const HorizontalSuggestions = ({suggestions, closeAndNavigate, dynamicImageProps
         <Box data-testid="sf-horizontal-product-suggestions">
             <Flex gap="4" overflowX="auto" pb="2">
                 {suggestions.map((suggestion, idx) => (
-                    <Link data-testid="product-tile" to={suggestion.link}>
+                    <Link data-testid="product-tile" to={suggestion.link} key={idx} onClick={() => closeAndNavigate(true)}>
                         <Box>
                             {/* Product Image */}
                             <Box position="relative" mb="2" minH="200px">
@@ -28,12 +28,8 @@ const HorizontalSuggestions = ({suggestions, closeAndNavigate, dynamicImageProps
                                         src={`${suggestion.image}[?sw={width}&q=60]`}
                                         widths={dynamicImageProps?.widths}
                                         imageProps={{
-                                            // treat img as a decorative item, we don't need to pass `image.alt`
-                                            // since it is the same as product name
-                                            // which can cause confusion for individuals who uses screen readers
                                             alt: '',
-                                            loading: 'lazy',
-                                            ...dynamicImageProps?.imageProps
+                                            loading: 'eager'
                                         }}
                                     />
                                 )}
