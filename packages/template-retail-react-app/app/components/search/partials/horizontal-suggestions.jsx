@@ -8,6 +8,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import {Text, Button, Box, Flex} from '@salesforce/retail-react-app/app/components/shared/ui'
 import DynamicImage from '@salesforce/retail-react-app/app/components/dynamic-image'
+import Link from '@salesforce/retail-react-app/app/components/link'
 
 const HorizontalSuggestions = ({suggestions, closeAndNavigate, dynamicImageProps}) => {
     if (!suggestions) {
@@ -18,16 +19,7 @@ const HorizontalSuggestions = ({suggestions, closeAndNavigate, dynamicImageProps
         <Box data-testid="sf-horizontal-product-suggestions">
             <Flex gap="4" overflowX="auto" pb="2">
                 {suggestions.map((suggestion, idx) => (
-                    <Button
-                        key={idx}
-                        variant="unstyled"
-                        onMouseDown={() => closeAndNavigate(suggestion.link)}
-                        minW="30wv"
-                        maxW="30wv"
-                        textAlign="left"
-                        p="0"
-                        minH="280px"
-                    >
+                    <Link data-testid="product-tile" to={suggestion.link}>
                         <Box>
                             {/* Product Image */}
                             <Box position="relative" mb="2" minH="200px">
@@ -63,7 +55,7 @@ const HorizontalSuggestions = ({suggestions, closeAndNavigate, dynamicImageProps
                                 </Text>
                             )}
                         </Box>
-                    </Button>
+                        </Link>
                 ))}
             </Flex>
         </Box>
