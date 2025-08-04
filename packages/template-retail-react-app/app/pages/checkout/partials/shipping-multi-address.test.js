@@ -90,7 +90,9 @@ beforeEach(() => {
 
     useMultiship.mockReturnValue({
         findDeliveryShipmentWithSameAddress: jest.fn(),
+        findUnusedDeliveryShipment: jest.fn(),
         createNewDeliveryShipmentWithAddress: jest.fn(),
+        updateDeliveryAddressForShipment: jest.fn(),
         moveItemsToDeliveryShipment: jest.fn(),
         removeEmptyShipments: jest.fn()
     })
@@ -770,7 +772,9 @@ describe('ShippingMultiAddress', () => {
 
 describe('ShippingMultiAddress - handleSubmit', () => {
     let mockFindDeliveryShipmentWithSameAddress
+    let mockFindUnusedDeliveryShipment
     let mockCreateNewDeliveryShipmentWithAddress
+    let mockUpdateDeliveryAddressForShipment
     let mockMoveItemsToDeliveryShipment
     let mockRemoveEmptyShipments
 
@@ -823,13 +827,22 @@ describe('ShippingMultiAddress - handleSubmit', () => {
 
     beforeEach(() => {
         mockFindDeliveryShipmentWithSameAddress = jest.fn().mockReturnValue(null)
+        mockFindUnusedDeliveryShipment = jest.fn().mockReturnValue(null)
         mockCreateNewDeliveryShipmentWithAddress = jest.fn().mockResolvedValue('new-shipment-1')
-        mockMoveItemsToDeliveryShipment = jest.fn().mockResolvedValue()
+        mockUpdateDeliveryAddressForShipment = jest.fn().mockResolvedValue()
+        mockMoveItemsToDeliveryShipment = jest.fn().mockResolvedValue({
+            basketId: 'test-basket-123',
+            // Return updated basket
+            productItems: mockBasket.productItems,
+            shipments: mockBasket.shipments
+        })
         mockRemoveEmptyShipments = jest.fn().mockResolvedValue()
 
         useMultiship.mockReturnValue({
             findDeliveryShipmentWithSameAddress: mockFindDeliveryShipmentWithSameAddress,
+            findUnusedDeliveryShipment: mockFindUnusedDeliveryShipment,
             createNewDeliveryShipmentWithAddress: mockCreateNewDeliveryShipmentWithAddress,
+            updateDeliveryAddressForShipment: mockUpdateDeliveryAddressForShipment,
             moveItemsToDeliveryShipment: mockMoveItemsToDeliveryShipment,
             removeEmptyShipments: mockRemoveEmptyShipments
         })

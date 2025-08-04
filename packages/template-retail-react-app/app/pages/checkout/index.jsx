@@ -89,7 +89,7 @@ const Checkout = () => {
     // Using basketId ensures that the basket is in a valid state before removing empty shipments
     useEffect(() => {
         if (basket?.shipments?.length > 1) {
-            removeEmptyShipments()
+            removeEmptyShipments(basket)
         }
     }, [basket?.basketId])
 

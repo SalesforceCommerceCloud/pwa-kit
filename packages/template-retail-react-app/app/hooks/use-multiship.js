@@ -33,6 +33,7 @@ export const useMultiship = (basket) => {
         'updateShippingMethodForShipment'
     )
     const updateItemsInBasketMutation = useShopperBasketsMutation('updateItemsInBasket')
+    const updateShipmentForBasketMutation = useShopperBasketsMutation('updateShipmentForBasket')
 
     // Hook for shipping methods for the main shipment - we'll use this as a fallback
     //
@@ -112,6 +113,22 @@ export const useMultiship = (basket) => {
 
         return basket.shipments.find(
             (shipment) => !isCurrentShippingMethodPickup(shipment.shippingMethod)
+        )
+    }
+
+    /**
+     * Finds the first delivery shipment that is not in the provided list of shipment IDs
+     * @param {Object} basket - The basket object
+     * @param {Array} usedShipmentIds - Array of shipment IDs to exclude from search
+     * @returns {Object|null} The unused delivery shipment object or null if not found
+     */
+    const findUnusedDeliveryShipment = (basket, usedShipmentIds = []) => {
+        if (!basket?.shipments) return null
+
+        return basket.shipments.find(
+            (shipment) =>
+                !isCurrentShippingMethodPickup(shipment.shippingMethod) &&
+                !usedShipmentIds.includes(shipment.shipmentId)
         )
     }
 
@@ -273,11 +290,11 @@ export const useMultiship = (basket) => {
         const normalize = (value) => (!value ? '' : value)
 
         return (
-            normalize(address1.address1) === normalize(address2.address1) &&
-            normalize(address1.city) === normalize(address2.city) &&
-            normalize(address1.stateCode) === normalize(address2.stateCode) &&
-            normalize(address1.postalCode) === normalize(address2.postalCode) &&
-            normalize(address1.countryCode) === normalize(address2.countryCode)
+            normalize(address1?.address1) === normalize(address2?.address1) &&
+            normalize(address1?.city) === normalize(address2?.city) &&
+            normalize(address1?.stateCode) === normalize(address2?.stateCode) &&
+            normalize(address1?.postalCode) === normalize(address2?.postalCode) &&
+            normalize(address1?.countryCode) === normalize(address2?.countryCode)
         )
     }
 
@@ -349,6 +366,30 @@ export const useMultiship = (basket) => {
                 !isCurrentShippingMethodPickup(shipment.shippingMethod) &&
                 areAddressesEqual(shipment.shippingAddress, shippingAddress)
         )?.shipmentId
+    }
+
+    /**
+     * Updates the delivery address for a specific shipment
+     * @param {string} shipmentId - The shipment ID to update
+     * @param {Object} address - The new address to set for the shipment
+     * @returns {Promise<Object>} The updated basket response
+     */
+    const updateDeliveryAddressForShipment = async (shipmentId, address) => {
+        if (!basket?.basketId || !shipmentId || !address) {
+            return null
+        }
+
+        const shippingAddress = cleanAddressForOrder(address)
+
+        return await updateShipmentForBasketMutation.mutateAsync({
+            parameters: {
+                basketId: basket.basketId,
+                shipmentId: shipmentId
+            },
+            body: {
+                shippingAddress: shippingAddress
+            }
+        })
     }
 
     /**
@@ -622,7 +663,7 @@ export const useMultiship = (basket) => {
             if (isSourcePickup) {
                 return await consolidatePickupShipment(sourceShipment, itemsToMove)
             } else {
-                return await consolidateDeliveryShipment(itemsToMove)
+                return await consolidateDeliveryShipment(sourceShipment, itemsToMove)
             }
         } catch (error) {
             console.error(`Failed to consolidate shipment ${sourceShipment.shipmentId}:`, error)
@@ -655,13 +696,15 @@ export const useMultiship = (basket) => {
 
     /**
      * Consolidates a delivery shipment into the default shipment
+     * @param {Object} sourceShipment - The delivery shipment to consolidate
      * @param {Array} itemsToMove - The items to move
      * @returns {Promise<boolean>} True if successful
      */
-    const consolidateDeliveryShipment = async (itemsToMove) => {
+    const consolidateDeliveryShipment = async (sourceShipment, itemsToMove) => {
         const defaultInventoryId = itemsToMove[0]?.inventoryId
 
         await configureDefaultShipmentIfNeeded(basket, DEFAULT_SHIPMENT_ID, false, null)
+        await updateDeliveryAddressForShipment(DEFAULT_SHIPMENT_ID, sourceShipment.shippingAddress)
         await moveItemsToDeliveryShipment(itemsToMove, DEFAULT_SHIPMENT_ID, defaultInventoryId)
 
         return true
@@ -699,10 +742,11 @@ export const useMultiship = (basket) => {
 
     /**
      * Handles consolidation when the default shipment is empty
+     * @param {Object} basket - The basket object
      * @param {Array} emptyShipments - Array of empty shipments
      * @returns {Promise<string|null>} The shipment ID that was consolidated, or null
      */
-    const handleDefaultShipmentConsolidation = async (emptyShipments) => {
+    const handleDefaultShipmentConsolidation = async (basket, emptyShipments) => {
         const defaultShipment = emptyShipments.find(
             (shipment) => shipment.shipmentId === DEFAULT_SHIPMENT_ID
         )
@@ -740,7 +784,7 @@ export const useMultiship = (basket) => {
      * transfers items to "me" and reconfigures it appropriately, then removes the original shipment
      * @returns {Promise<void>}
      */
-    const removeEmptyShipments = async () => {
+    const removeEmptyShipments = async (basket) => {
         if (!basket?.basketId || !basket?.shipments?.length) {
             return
         }
@@ -751,7 +795,10 @@ export const useMultiship = (basket) => {
         }
 
         // Handle default shipment consolidation first
-        const consolidatedShipmentId = await handleDefaultShipmentConsolidation(emptyShipments)
+        const consolidatedShipmentId = await handleDefaultShipmentConsolidation(
+            basket,
+            emptyShipments
+        )
 
         // Remove remaining empty shipments (excluding "me" and any that were consolidated)
         const shipmentsToRemove = emptyShipments.filter((shipment) => {
@@ -769,7 +816,6 @@ export const useMultiship = (basket) => {
     return {
         assignDefaultShippingMethodsToShipments,
         handleDeliveryOptionChange,
-        isCurrentShippingMethodPickup,
         removeEmptyShipments,
         findExistingDeliveryShipment,
         findExistingPickupShipment,
@@ -786,6 +832,8 @@ export const useMultiship = (basket) => {
         getShipmentForItems,
         findEmptyShipments,
         findShipmentToConsolidate,
-        getItemsForShipment
+        getItemsForShipment,
+        findUnusedDeliveryShipment,
+        updateDeliveryAddressForShipment
     }
 }
