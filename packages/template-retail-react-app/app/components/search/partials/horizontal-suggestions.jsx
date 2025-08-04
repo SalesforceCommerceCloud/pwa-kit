@@ -19,7 +19,12 @@ const HorizontalSuggestions = ({suggestions, closeAndNavigate, dynamicImageProps
         <Box data-testid="sf-horizontal-product-suggestions">
             <Flex gap="4" overflowX="auto" pb="2">
                 {suggestions.map((suggestion, idx) => (
-                    <Link data-testid="product-tile" to={suggestion.link} key={idx} onClick={() => closeAndNavigate(true)}>
+                    <Link
+                        data-testid="product-tile"
+                        to={suggestion.link}
+                        key={idx}
+                        onClick={() => closeAndNavigate(true)}
+                    >
                         <Box>
                             {/* Product Image */}
                             <Box position="relative" mb="2" minH="200px">
@@ -51,7 +56,7 @@ const HorizontalSuggestions = ({suggestions, closeAndNavigate, dynamicImageProps
                                 </Text>
                             )}
                         </Box>
-                        </Link>
+                    </Link>
                 ))}
             </Flex>
         </Box>
