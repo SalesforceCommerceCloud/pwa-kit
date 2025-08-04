@@ -27,7 +27,7 @@ import {
 
 // Constants
 const DELIVERY_OPTIONS = {
-    SHIP: 'ship',
+    DELIVERY: 'delivery',
     PICKUP: 'pickup'
 }
 import {useCurrency, useDerivedProduct} from '@salesforce/retail-react-app/app/hooks'
@@ -706,14 +706,14 @@ const ProductView = forwardRef(
                                                 value={
                                                     pickupInStore
                                                         ? DELIVERY_OPTIONS.PICKUP
-                                                        : DELIVERY_OPTIONS.SHIP
+                                                        : DELIVERY_OPTIONS.DELIVERY
                                                 }
                                                 onChange={handleDeliveryOptionChange}
                                                 mb={1}
                                             >
                                                 <Stack direction="column" spacing={2}>
                                                     <Radio
-                                                        value={DELIVERY_OPTIONS.SHIP}
+                                                        value={DELIVERY_OPTIONS.DELIVERY}
                                                         isDisabled={disableButton}
                                                     >
                                                         <FormattedMessage

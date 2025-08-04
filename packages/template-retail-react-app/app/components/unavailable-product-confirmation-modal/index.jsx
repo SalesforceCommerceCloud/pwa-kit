@@ -61,14 +61,14 @@ const UnavailableProductConfirmationModal = ({
                         // wishlist item will have the property type
                         const isWishlist = !!productItem?.type
                         // inventory for the product's pickup store or the delivery inventory
-                        const productInventory =
+                        const productItemInventory =
                             inventories?.find((entry) => entry.id === productItem.inventoryId) ||
                             inventory
                         if (
                             !isWishlist &&
-                            (!productInventory?.orderable ||
-                                (productInventory?.orderable &&
-                                    productItem?.quantity > productInventory.stockLevel))
+                            (!productItemInventory?.orderable ||
+                                (productItemInventory?.orderable &&
+                                    productItem?.quantity > productItemInventory.stockLevel))
                         ) {
                             unOrderableIds.push(id)
                         }

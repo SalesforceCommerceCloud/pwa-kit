@@ -708,6 +708,9 @@
   "global.info.removed_from_wishlist": {
     "defaultMessage": "Item removed from wishlist"
   },
+  "global.info.store_insufficient_inventory": {
+    "defaultMessage": "Some items aren't available for pickup at this store"
+  },
   "global.link.added_to_wishlist.view_wishlist": {
     "defaultMessage": "View"
   },
