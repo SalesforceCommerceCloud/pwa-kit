@@ -6,20 +6,10 @@
  */
 import React from 'react'
 import PropTypes from 'prop-types'
-import {
-    Text,
-    Button,
-    Box,
-    Flex,
-    Image,
-    HStack,
-    Badge
-} from '@salesforce/retail-react-app/app/components/shared/ui'
-import {useMultiStyleConfig} from '@salesforce/retail-react-app/app/components/shared/ui'
+import {Text, Button, Box, Flex} from '@salesforce/retail-react-app/app/components/shared/ui'
+import DynamicImage from '@salesforce/retail-react-app/app/components/dynamic-image'
 
-const HorizontalSuggestions = ({suggestions, closeAndNavigate}) => {
-    const styles = useMultiStyleConfig('SearchSuggestions')
-
+const HorizontalSuggestions = ({suggestions, closeAndNavigate, dynamicImageProps}) => {
     if (!suggestions) {
         return null
     }
@@ -32,8 +22,8 @@ const HorizontalSuggestions = ({suggestions, closeAndNavigate}) => {
                         key={idx}
                         variant="unstyled"
                         onMouseDown={() => closeAndNavigate(suggestion.link)}
-                        minW="200px"
-                        maxW="200px"
+                        minW="30wv"
+                        maxW="30wv"
                         textAlign="left"
                         p="0"
                         minH="280px"
@@ -42,31 +32,18 @@ const HorizontalSuggestions = ({suggestions, closeAndNavigate}) => {
                             {/* Product Image */}
                             <Box position="relative" mb="2" minH="200px">
                                 {suggestion.image && (
-                                    <Image
-                                        src={suggestion.image}
-                                        alt={suggestion.name}
-                                        width="200px"
-                                        height="200px"
-                                        objectFit="cover"
-                                        borderRadius="md"
+                                    <DynamicImage
+                                        src={`${suggestion.image}[?sw={width}&q=60]`}
+                                        widths={dynamicImageProps?.widths}
+                                        imageProps={{
+                                            // treat img as a decorative item, we don't need to pass `image.alt`
+                                            // since it is the same as product name
+                                            // which can cause confusion for individuals who uses screen readers
+                                            alt: '',
+                                            loading: 'lazy',
+                                            ...dynamicImageProps?.imageProps
+                                        }}
                                     />
-                                )}
-
-                                {suggestion.labels && suggestion.labels.size > 0 && (
-                                    <HStack {...styles.badgeGroup}>
-                                        {Array.from(suggestion.labels.entries()).map(
-                                            ([label, colorScheme]) => (
-                                                <Badge
-                                                    key={label}
-                                                    data-testid="product-badge"
-                                                    colorScheme={colorScheme}
-                                                    size="sm"
-                                                >
-                                                    {label}
-                                                </Badge>
-                                            )
-                                        )}
-                                    </HStack>
                                 )}
                             </Box>
 
@@ -95,7 +72,8 @@ const HorizontalSuggestions = ({suggestions, closeAndNavigate}) => {
 
 HorizontalSuggestions.propTypes = {
     suggestions: PropTypes.array,
-    closeAndNavigate: PropTypes.func
+    closeAndNavigate: PropTypes.func,
+    dynamicImageProps: PropTypes.object
 }
 
 export default HorizontalSuggestions

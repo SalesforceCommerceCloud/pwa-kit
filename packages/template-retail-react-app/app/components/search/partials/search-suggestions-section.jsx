@@ -107,6 +107,9 @@ const SuggestionSection = ({searchSuggestions, closeAndNavigate, styles}) => {
                                 <HorizontalSuggestions
                                     closeAndNavigate={closeAndNavigate}
                                     suggestions={searchSuggestions?.productSuggestions}
+                                    dynamicImageProps={{
+                                        widths: ['20vw', '20vw', '16vw']
+                                    }}
                                 />
                             </Fragment>
                         )}
