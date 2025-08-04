@@ -33,8 +33,7 @@ import debounce from 'lodash/debounce'
 import {
     RECENT_SEARCH_KEY,
     RECENT_SEARCH_LIMIT,
-    RECENT_SEARCH_MIN_LENGTH,
-    PRODUCT_BADGE_CUSTOM_FIELD_NAME
+    RECENT_SEARCH_MIN_LENGTH
 } from '@salesforce/retail-react-app/app/constants'
 import {
     productUrlBuilder,
@@ -82,15 +81,17 @@ const formatSuggestions = (searchSuggestions) => {
                 link: searchUrlBuilder(brand.phrase)
             }
         }),
-        phraseSuggestions: searchSuggestions?.categorySuggestions?.suggestedPhrases?.map(
+        phraseSuggestions: searchSuggestions?.productSuggestions?.suggestedPhrases?.map(
             (phrase) => {
                 return {
                     type: 'phrase',
-                    name: capitalize(phrase.phrase),
-                    link: searchUrlBuilder(phrase.phrase)
+                    name: phrase.phrase,
+                    link: searchUrlBuilder(phrase.phrase),
+                    exactMatch: phrase.exactMatch
                 }
             }
-        )
+        ),
+        searchPhrase: searchSuggestions?.searchPhrase
     }
 }
 
@@ -109,12 +110,12 @@ const Search = (props) => {
     const [isOpen, setIsOpen] = useState(false)
     const [searchQuery, setSearchQuery] = useState('')
     const navigate = useNavigation()
+
     const searchSuggestion = useSearchSuggestions(
         {
             parameters: {
                 q: searchQuery,
-                expand: 'images,prices,custom_product_properties',
-                includedCustomProductProperties: PRODUCT_BADGE_CUSTOM_FIELD_NAME
+                expand: 'images,prices'
             }
         },
         {
@@ -266,7 +267,7 @@ const Search = (props) => {
         // or we have search suggestions available and have inputed some text (empty text in this scenario should show recent searches)
         if (
             (document.activeElement.id === 'search-input' && recentSearches?.length > 0) ||
-            (searchSuggestionsAvailable && searchInputRef.current.value.length > 0)
+            (searchSuggestionsAvailable && searchInputRef.current?.value?.length > 0)
         ) {
             setIsOpen(true)
         } else {
@@ -319,7 +320,15 @@ const Search = (props) => {
                 </PopoverTrigger>
 
                 <HideOnMobile>
-                    <PopoverContent data-testid="sf-suggestion-popover">
+                    <PopoverContent
+                        data-testid="sf-suggestion-popover"
+                        width="100vw"
+                        maxWidth="100vw"
+                        left={0}
+                        right={0}
+                        marginLeft={0}
+                        marginRight={0}
+                    >
                         <SearchSuggestions
                             closeAndNavigate={closeAndNavigate}
                             recentSearches={recentSearches}

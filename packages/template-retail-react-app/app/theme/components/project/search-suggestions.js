@@ -18,13 +18,17 @@ export default {
             fontSize: 'sm',
             lineHeight: 1.2
         },
+        phraseContainer: {
+            margin: '2 0 1 0',
+            paddingLeft: 12
+        },
         suggestionsContainer: {
             spacing: 0
         },
         suggestionsBox: {
-            mx: '-16px',
-            borderBottom: '1px solid',
-            borderColor: 'gray.200'
+            mx: '-16px'
+            // borderBottom: '1px solid',
+            // borderColor: 'gray.200'
         },
         suggestionButton: {
             width: 'full',
@@ -68,6 +72,11 @@ export default {
             as: 'span',
             color: 'gray.500',
             fontSize: 'sm'
+        },
+        badgeGroup: {
+            position: 'absolute',
+            top: 2,
+            left: 2
         }
     }
 }

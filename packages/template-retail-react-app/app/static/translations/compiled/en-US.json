@@ -3311,16 +3311,16 @@
       "value": "Cancel"
     }
   ],
-  "search.suggestions.brands": [
-    {
-      "type": 0,
-      "value": "Brands"
-    }
-  ],
   "search.suggestions.categories": [
     {
       "type": 0,
       "value": "Categories"
+    }
+  ],
+  "search.suggestions.didYouMean": [
+    {
+      "type": 0,
+      "value": "Did you mean"
     }
   ],
   "search.suggestions.products": [
@@ -3329,10 +3329,10 @@
       "value": "Products"
     }
   ],
-  "search_suggestions.category.in_parent": [
+  "search.suggestions.viewAll": [
     {
       "type": 0,
-      "value": "in"
+      "value": "View All"
     }
   ],
   "selected_refinements.action.assistive_msg.clear_all": [
