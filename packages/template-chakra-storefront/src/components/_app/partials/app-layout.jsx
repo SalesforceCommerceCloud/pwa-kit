@@ -13,6 +13,7 @@ import ScrollToTop from '../../scroll-to-top'
 import OfflineBanner from '../../offline-banner'
 import OfflineBoundary from '../../offline-boundary'
 import {AddToCartModalProvider} from '../../../hooks/use-add-to-cart-modal'
+import {BonusProductModalProvider} from '../../../hooks/use-bonus-product-modal'
 
 /**
  * AppLayout component that provides the main layout structure
@@ -37,33 +38,35 @@ const AppLayout = ({
                 {/* Offline Banner */}
                 {isOnline === false && <OfflineBanner isOnline={isOnline} />}
 
-                <AddToCartModalProvider>
-                    <SkipNavContent
-                        css={{
-                            display: 'flex',
-                            flexDirection: 'column',
-                            flex: 1,
-                            outline: 0
-                        }}
-                    >
-                        <Box
-                            as="main"
-                            id="app-main"
-                            role="main"
-                            display="flex"
-                            flexDirection="column"
-                            flex="1"
+                <BonusProductModalProvider>
+                    <AddToCartModalProvider>
+                        <SkipNavContent
+                            css={{
+                                display: 'flex',
+                                flexDirection: 'column',
+                                flex: 1,
+                                outline: 0
+                            }}
                         >
-                            <OfflineBoundary isOnline={isOnline}>{children}</OfflineBoundary>
-                        </Box>
-                    </SkipNavContent>
+                            <Box
+                                as="main"
+                                id="app-main"
+                                role="main"
+                                display="flex"
+                                flexDirection="column"
+                                flex="1"
+                            >
+                                <OfflineBoundary isOnline={isOnline}>{children}</OfflineBoundary>
+                            </Box>
+                        </SkipNavContent>
 
-                    {/* Footer */}
-                    {footerComponent}
+                        {/* Footer */}
+                        {footerComponent}
 
-                    {/* Modals */}
-                    {modalsComponent}
-                </AddToCartModalProvider>
+                        {/* Modals */}
+                        {modalsComponent}
+                    </AddToCartModalProvider>
+                </BonusProductModalProvider>
             </Box>
         </>
     )

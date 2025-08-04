@@ -21,6 +21,7 @@ import {
     useBreakpointValue
 } from '@chakra-ui/react'
 import {useCurrentBasket} from './use-current-basket'
+import {usePromotions} from '@salesforce/commerce-sdk-react'
 import Link from '../components/link'
 import RecommendedProducts from '../components/recommended-products'
 import {LockIcon} from '../components/icons'
@@ -29,6 +30,7 @@ import {getPriceData, getDisplayVariationValues} from '../utils/product-utils'
 import {EINSTEIN_RECOMMENDERS} from '../../config/constants'
 import DisplayPrice from '../components/display-price'
 import SafePortal from '../components/safe-portal'
+import {useBonusProductModalContext} from './use-bonus-product-modal'
 
 /**
  * This is the context for managing the AddToCartModal.
@@ -52,10 +54,24 @@ AddToCartModalProvider.propTypes = {
 /**
  * Visual feedback (a modal) for adding item to the cart.
  */
-export const AddToCartModal = () => {
+export const AddToCartModal = ({ onSelectBonusProductsClick }) => {
     const {isOpen, onClose, data} = useAddToCartModalContext()
-    const {product, itemsAdded = [], selectedQuantity} = data || {}
+    const bonusProductContext = useBonusProductModalContext()
+    const {onOpen: onOpenBonusModal} = bonusProductContext || {}
+    const {product, itemsAdded = [], selectedQuantity, bonusDiscountLineItems = []} = data || {}
     const isProductABundle = !!product?.type.bundle
+    
+    // Extract unique promotion IDs
+    const promotionIds = [...new Set(
+        bonusDiscountLineItems.map(item => item.promotionId).filter(Boolean)
+    )];
+    // Fetch promotion details
+    const { data: promotions, isLoading: isPromotionsLoading } = usePromotions(
+        { parameters: { ids: promotionIds.join(',') } },
+        { enabled: promotionIds.length > 0 }
+    );
+    // Get the first promotion's details
+    const promotionText = promotions?.data?.[0]?.details || '';
 
     const intl = useIntl()
     const {formatMessage} = intl
@@ -332,25 +348,36 @@ export const AddToCartModal = () => {
                                                 </Flex>
                                             )
                                         })}
-                                    {/* TODO: replace with text fetched from promotion */}
-                                    <Text mb={2} fontSize="md" fontWeight="normal" textAlign="left">
-                                        {'Bonus products available!'}
-                                    </Text>
-                                    <Button
-                                        as={Link}
-                                        to="/checkout"
-                                        width="100%"
-                                        variant="outline-gray"
-                                        size="md"
-                                        height={9}
-                                        minWidth={11}
-                                        textStyle="sm"
-                                    >
-                                        {intl.formatMessage({
-                                            defaultMessage: 'Select Bonus Products',
-                                            id: 'add_to_cart_modal.button.select_bonus_products'
-                                        })}
-                                    </Button>
+                                    {bonusDiscountLineItems && bonusDiscountLineItems.length > 0 && (
+                                        <>
+                                            <Text mb={2} fontSize="md" fontWeight="normal" textAlign="left">
+                                                {promotionText}
+                                            </Text>
+                                            <Button
+                                                onClick={() => {
+                                                    if (onOpenBonusModal) {
+                                                        onOpenBonusModal({
+                                                            bonusDiscountLineItems,
+                                                            product,
+                                                            itemsAdded
+                                                        })
+                                                    }
+                                                    onClose() // Close the AddToCartModal
+                                                }}
+                                                width="100%"
+                                                variant="outline-gray"
+                                                size="md"
+                                                height={9}
+                                                minWidth={11}
+                                                textStyle="sm"
+                                            >
+                                                {intl.formatMessage({
+                                                    defaultMessage: 'Select Bonus Products',
+                                                    id: 'add_to_cart_modal.button.select_bonus_products'
+                                                })}
+                                            </Button>
+                                        </>
+                                    )}
                                 </Box>
                                 <Box
                                     display={['none', 'none', 'none', 'block']}
@@ -450,6 +477,7 @@ AddToCartModal.propTypes = {
     quantity: PropTypes.number,
     isOpen: PropTypes.bool,
     onClose: PropTypes.func,
+    onSelectBonusProductsClick: PropTypes.func,
     children: PropTypes.any
 }
 
