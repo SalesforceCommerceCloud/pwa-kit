@@ -93,12 +93,20 @@ describe('logMCPMessage', () => {
     beforeEach(async () => {
         process.env.DEBUG = '1'
         // Remove log file if it exists
-        try { await fs.promises.unlink(logFilePath) } catch {}
+        try {
+            await fs.promises.unlink(logFilePath)
+        } catch (e) {
+            // File does not exist, nothing to clean up
+        }
     })
 
     afterEach(async () => {
         // Clean up log file
-        try { await fs.promises.unlink(logFilePath) } catch {}
+        try {
+            await fs.promises.unlink(logFilePath)
+        } catch (e) {
+            // File does not exist, nothing to clean up
+        }
         delete process.env.DEBUG
     })
 
