@@ -20,6 +20,7 @@ import ProductItem from '@salesforce/retail-react-app/app/components/product-ite
 const ProductItemList = ({
     productItems = [],
     renderSecondaryActions,
+    renderDeliveryActions,
     onItemQuantityChange,
     onRemoveItemClick,
     // Optional props with defaults
@@ -28,8 +29,7 @@ const ProductItemList = ({
     localQuantity = {},
     localIsGiftItems = {},
     isCartItemLoading = false,
-    selectedItem = null,
-    deliveryActions = null
+    selectedItem = null
 }) => {
     return (
         <Stack spacing={4}>
@@ -55,7 +55,9 @@ const ProductItemList = ({
                                   })
                                 : null
                         }
-                        deliveryActions={deliveryActions}
+                        deliveryActions={
+                            renderDeliveryActions ? renderDeliveryActions(productItem) : null
+                        }
                         product={{
                             ...productItem,
                             ...(productsByItemId && productsByItemId[productItem.itemId]),
@@ -82,7 +84,7 @@ const ProductItemList = ({
 ProductItemList.propTypes = {
     productItems: PropTypes.arrayOf(PropTypes.object),
     renderSecondaryActions: PropTypes.func,
-    deliveryActions: PropTypes.object,
+    renderDeliveryActions: PropTypes.func,
     onItemQuantityChange: PropTypes.func.isRequired,
     onRemoveItemClick: PropTypes.func,
     productsByItemId: PropTypes.object,

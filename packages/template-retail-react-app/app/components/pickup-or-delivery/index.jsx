@@ -14,7 +14,7 @@ import {Box, Select} from '@salesforce/retail-react-app/app/components/shared/ui
 
 // Constants
 const DELIVERY_OPTIONS = {
-    SHIP: 'ship',
+    DELIVERY: 'delivery',
     PICKUP: 'pickup'
 }
 
@@ -27,7 +27,7 @@ const DELIVERY_OPTIONS = {
  * @returns A JSX element representing the pickup or delivery selection
  */
 const PickupOrDelivery = ({
-    value = DELIVERY_OPTIONS.SHIP,
+    value = DELIVERY_OPTIONS.DELIVERY,
     onChange,
     isPickupDisabled = false,
     isShipDisabled = false
@@ -52,7 +52,7 @@ const PickupOrDelivery = ({
                     id: 'pickup_or_delivery.label.choose_delivery_option'
                 })}
             >
-                <option value={DELIVERY_OPTIONS.SHIP} disabled={isShipDisabled}>
+                <option value={DELIVERY_OPTIONS.DELIVERY} disabled={isShipDisabled}>
                     {intl.formatMessage({
                         defaultMessage: 'Ship to Address',
                         id: 'pickup_or_delivery.label.ship_to_address'
@@ -70,7 +70,7 @@ const PickupOrDelivery = ({
 }
 
 PickupOrDelivery.propTypes = {
-    value: PropTypes.oneOf([DELIVERY_OPTIONS.SHIP, DELIVERY_OPTIONS.PICKUP]),
+    value: PropTypes.oneOf([DELIVERY_OPTIONS.DELIVERY, DELIVERY_OPTIONS.PICKUP]),
     onChange: PropTypes.func,
     isPickupDisabled: PropTypes.bool,
     isShipDisabled: PropTypes.bool

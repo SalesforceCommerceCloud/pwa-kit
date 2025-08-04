@@ -144,6 +144,11 @@ export const TOAST_MESSAGE_REMOVED_FROM_WISHLIST = defineMessage({
     defaultMessage: 'Item removed from wishlist'
 })
 
+export const TOAST_MESSAGE_STORE_INSUFFICIENT_INVENTORY = defineMessage({
+    id: 'global.info.store_insufficient_inventory',
+    defaultMessage: "Some items aren't available for pickup at this store"
+})
+
 // Einstein recommender constants used in <RecommendedProducts/>
 export const EINSTEIN_RECOMMENDERS = {
     ADD_TO_CART_MODAL: 'pdp-similar-items',
