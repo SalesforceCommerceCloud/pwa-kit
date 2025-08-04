@@ -156,7 +156,6 @@ describe('useMultiship', () => {
             expect(result.current).toHaveProperty('findEmptyShipments')
             expect(result.current).toHaveProperty('findShipmentToConsolidate')
             expect(result.current).toHaveProperty('getItemsForShipment')
-            expect(result.current).toHaveProperty('changeStoreForPickupShipment')
             expect(result.current).toHaveProperty('findDeliveryShipmentWithSameAddress')
             expect(result.current).toHaveProperty('createNewDeliveryShipmentWithAddress')
             expect(result.current).toHaveProperty('findUnusedDeliveryShipment')
