@@ -90,8 +90,8 @@ export const getAppleButtonConfig = (
     isPdpMode = false
 ) => {
     // For PDP mode, prioritize temporary basket creation over existing basket
-    // For regular mode, use existing basket
-    const currentBasket = isPdpMode ? tempBasket : (tempBasket || basket)
+    // For regular mode, use existing basket 
+    const currentBasket = isPdpMode ? tempBasket : basket
     let applePayAmount = currentBasket?.orderTotal || 0
     
     // Shared basket reference to prevent multiple basket creation
@@ -443,13 +443,22 @@ export const getAppleButtonConfig = (
     return buttonConfig
 }
 
-export const ApplePayExpress = ({sku, quantity = 1, isPdpMode = false}) => {
+export const ApplePayExpress = ({sku, quantity = 1, isPdpMode = false, basketData}) => {
     const {locale, site} = useMultiSite()
     const navigate = useNavigation()
     
     const [tempBasket, setTempBasket] = useState(null)
     const [currentSku, setCurrentSku] = useState(sku)
+
+    // Check if we have the minimum required basket data (from basket only)
+    const hasRequiredBasketData =
+        basketData &&
+        basketData.orderTotal &&
+        basketData.currency &&
+        basketData.basketId
+
     const paymentContainer = useRef(null)
+    const prevDepsRef = useRef({})
 
     // Use useAdyenExpressCheckout as the single source for auth token
     const regularAdyenData = useAdyenExpressCheckout()
@@ -481,7 +490,7 @@ export const ApplePayExpress = ({sku, quantity = 1, isPdpMode = false}) => {
         regularAdyenData.adyenEnvironment
     
     const adyenPaymentMethods = isPdpMode ? standalonePaymentMethods : regularAdyenData.adyenPaymentMethods
-    const basket = isPdpMode ? null : regularAdyenData.basket
+    const basket = isPdpMode ? null : basketData
     const shippingMethods = isPdpMode ? null : regularAdyenData.shippingMethods
     const fetchShippingMethods = isPdpMode ? null : regularAdyenData.fetchShippingMethods
 
@@ -498,6 +507,45 @@ export const ApplePayExpress = ({sku, quantity = 1, isPdpMode = false}) => {
 
     useEffect(() => {
         let isCanceled = false
+
+        // Compare with previous dependencies to see what changed
+        // Only track dependencies that are actually in the dependency array
+        const baseDeps = {
+            adyenEnvironment,
+            adyenPaymentMethods,
+            basket,
+            isPdpMode,
+            hasRequiredBasketData
+        }
+
+        const pdpDeps = isPdpMode ? {
+            tempBasket,
+            currentSku,
+            shippingMethods,
+            standalonePaymentMethods,
+            standaloneLoading,
+            standaloneError
+        } : {}
+
+        const currentDeps = { ...baseDeps, ...pdpDeps }
+
+        const prevDeps = prevDepsRef.current
+        const changedDeps = []
+
+        Object.keys(currentDeps).forEach(key => {
+            if (prevDeps[key] !== currentDeps[key]) {
+                changedDeps.push(`${key}: ${prevDeps[key]} → ${currentDeps[key]}`)
+            }
+        })
+
+        if (changedDeps.length > 0) {
+            console.log('🔄 Changed dependencies:', changedDeps)
+        } else {
+            console.log('🔄 No dependencies changed (effect triggered by initial render)')
+        }
+
+        // Store current deps for next comparison
+        prevDepsRef.current = currentDeps
 
         const createCheckout = async () => {
             if (isCanceled) {
@@ -518,7 +566,8 @@ export const ApplePayExpress = ({sku, quantity = 1, isPdpMode = false}) => {
                     return
                 }
             } else {
-                if (!basket) {
+                // Validate required basket properties
+                if (!hasRequiredBasketData) {
                     return
                 }
             }
@@ -563,8 +612,8 @@ export const ApplePayExpress = ({sku, quantity = 1, isPdpMode = false}) => {
                 const appleButtonConfig = getAppleButtonConfig(
                     authToken,
                     site,
-                    basket,
-                    shippingMethods?.applicableShippingMethods,
+                    basketData,
+                    shippingMethods?.applicableShippingMethods || [],
                     applePaymentMethodConfig,
                     navigate,
                     fetchShippingMethods,
@@ -624,7 +673,12 @@ export const ApplePayExpress = ({sku, quantity = 1, isPdpMode = false}) => {
         return () => {
             isCanceled = true
         }
-    }, [adyenEnvironment, adyenPaymentMethods, tempBasket, basket, shippingMethods, standalonePaymentMethods, standaloneLoading, standaloneError, currentSku, isPdpMode])
+    }, [
+        adyenEnvironment,
+        adyenPaymentMethods,
+        isPdpMode,
+        ...(isPdpMode ? [tempBasket, currentSku, shippingMethods, standalonePaymentMethods, standaloneLoading, standaloneError,] : [])
+    ])
 
     return <div ref={paymentContainer}></div>
 }
@@ -633,5 +687,6 @@ ApplePayExpress.propTypes = {
     shippingMethods: PropTypes.array,
     sku: PropTypes.string,
     quantity: PropTypes.number,
-    isPdpMode: PropTypes.bool
+    isPdpMode: PropTypes.bool,
+    basketData: PropTypes.object
 }

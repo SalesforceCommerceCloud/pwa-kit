@@ -14,14 +14,13 @@ import {ApplePayExpress} from '@salesforce/retail-react-app/app/components/apple
 import {GooglePayExpress} from '@salesforce/retail-react-app/app/components/google-pay-express/index'
 import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
 import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
-import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
 
 function Express() {
     const {getTokenWhenReady} = useAccessToken()
     const customerId = useCustomerId()
     const navigate = useNavigation()
     const {locale, site} = useMultiSite()
-    const {data: basket} = useCurrentBasket()
+    const [basket, setBasketData] = useState(null)
     const location = useLocation()
 
     const [authToken, setAuthToken] = useState()
@@ -64,11 +63,22 @@ function Express() {
                     setCurrentSku(null)
                     setCurrentQuantity(1) // Reset quantity when clearing
                 }
+
+                // Handle basket data messages
+                if (type === 'basketDataAvailable') {
+                    const basketData = event.data.data.basketData
+                    setBasketData(basketData)
+                }
             }
         }
 
         // Add event listener
         window.addEventListener('message', handleMessage)
+
+        // Request basket data from parent with a small delay to ensure listener is active
+        setTimeout(() => {
+            window.parent.postMessage({type: 'basketDataRequested'}, '*')
+        }, 200)
 
         // Cleanup event listener on unmount
         return () => {
@@ -82,17 +92,19 @@ function Express() {
 
     return (
         <div>
-            <AdyenExpressCheckoutProvider
-                authToken={authToken}
-                customerId={customerId}
-                locale={locale}
-                site={site}
-                basket={basket}
-                navigate={navigate}
-            >
-                <ApplePayExpress sku={currentSku} quantity={currentQuantity} isPdpMode={isPdpMode} />
-                {/* <GooglePayExpress /> */}
-            </AdyenExpressCheckoutProvider>
+            {((!isPdpMode && basket) || isPdpMode) && (
+                <AdyenExpressCheckoutProvider
+                    authToken={authToken}
+                    customerId={customerId}
+                    locale={locale}
+                    site={site}
+                    basket={basket}
+                    navigate={navigate}
+                >
+                    <ApplePayExpress sku={currentSku} quantity={currentQuantity} isPdpMode={isPdpMode} basketData={basket} />
+                    {/* <GooglePayExpress /> */}
+                </AdyenExpressCheckoutProvider>
+            )}
         </div>
     )
 }
