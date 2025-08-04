@@ -43,7 +43,8 @@ const MockedComponent = ({
     product = mockProduct,
     onItemQuantityChange = async () => {},
     showLoading = false,
-    containerStyles
+    containerStyles,
+    deliveryActions
 }) => {
     return (
         <ProductItem
@@ -52,6 +53,7 @@ const MockedComponent = ({
             showLoading={showLoading}
             primaryAction={<button>Primary Action</button>}
             secondaryActions={<button>Secondary Action</button>}
+            deliveryActions={deliveryActions}
             containerStyles={containerStyles}
         />
     )
@@ -61,7 +63,8 @@ MockedComponent.propTypes = {
     product: PropTypes.object,
     onItemQuantityChange: PropTypes.func,
     showLoading: PropTypes.bool,
-    containerStyles: PropTypes.object
+    containerStyles: PropTypes.object,
+    deliveryActions: PropTypes.node
 }
 
 describe('ProductItem Component', () => {
@@ -85,6 +88,13 @@ describe('ProductItem Component', () => {
         const stackContainer = productItem.firstChild
         expect(stackContainer).toHaveStyle('background: blue')
         expect(stackContainer).toHaveStyle('border: 1px solid red')
+    })
+
+    test('renders delivery actions when passed', () => {
+        renderWithProviders(<MockedComponent deliveryActions={<button>Delivery Action</button>} />)
+        const deliveryActions = screen.getAllByText(/Delivery Action/i)
+        expect(deliveryActions).toHaveLength(2)
+        deliveryActions.forEach((action) => expect(action).toBeInTheDocument())
     })
 
     test('renders bonus product without quantity picker', () => {

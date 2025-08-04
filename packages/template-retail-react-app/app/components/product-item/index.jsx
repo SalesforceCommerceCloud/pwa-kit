@@ -20,7 +20,6 @@ import CartItemVariantPrice from '@salesforce/retail-react-app/app/components/it
 import LoadingSpinner from '@salesforce/retail-react-app/app/components/loading-spinner'
 import BonusProductQuantity from '@salesforce/retail-react-app/app/components/product-item/bonus-product-quantity'
 import ProductQuantityPicker from '@salesforce/retail-react-app/app/components/product-item/product-quantity-picker'
-import PickupOrDelivery from '@salesforce/retail-react-app/app/components/pickup-or-delivery'
 
 // Utilities
 import {noop} from '@salesforce/retail-react-app/app/utils/utils'
@@ -33,6 +32,7 @@ import {useCurrency, useDerivedProduct} from '@salesforce/retail-react-app/app/h
  * @param {Object} product Product to be represented in the list item.
  * @param {node} primaryAction Child component representing the most prominent action to be performed by the user.
  * @param {node} secondaryActions Child component representing the other actions relevant to the product to be performed by the user.
+ * @param {node} deliveryActions Child component representing the delivery actions relevant to the product to be performed by the user.
  * @param {func} onItemQuantityChange callback function to be invoked whenever item quantity changes.
  * @param {boolean} showLoading Renders a loading spinner with overlay if set to true.
  * @returns A JSX element representing product item in a list (eg: wishlist, cart, etc).
@@ -41,9 +41,9 @@ const ProductItem = ({
     product,
     primaryAction,
     secondaryActions,
+    deliveryActions,
     onItemQuantityChange = noop,
     showLoading = false,
-    deliveryActions,
     containerStyles = {}
 }) => {
     const {stepQuantity, showInventoryMessage, inventoryMessage, quantity, setQuantity} =
@@ -73,36 +73,10 @@ const ProductItem = ({
                                         </Box>
                                     </HideOnDesktop>
                                 </Stack>
-                                {deliveryActions?.showDeliveryOptions && (
-                                    <HideOnMobile>
-                                        <PickupOrDelivery
-                                            isPickupDisabled={deliveryActions.isPickupDisabled}
-                                            value={deliveryActions.deliveryOption}
-                                            onChange={(selectedValue) =>
-                                                deliveryActions.onDeliveryOptionChange(
-                                                    product,
-                                                    selectedValue
-                                                )
-                                            }
-                                        />
-                                    </HideOnMobile>
-                                )}
+                                {deliveryActions && <HideOnMobile>{deliveryActions}</HideOnMobile>}
                             </Flex>
 
-                            {deliveryActions?.showDeliveryOptions && (
-                                <HideOnDesktop>
-                                    <PickupOrDelivery
-                                        isPickupDisabled={deliveryActions.isPickupDisabled}
-                                        value={deliveryActions.deliveryOption}
-                                        onChange={(selectedValue) =>
-                                            deliveryActions.onDeliveryOptionChange(
-                                                product,
-                                                selectedValue
-                                            )
-                                        }
-                                    />
-                                </HideOnDesktop>
-                            )}
+                            {deliveryActions && <HideOnDesktop>{deliveryActions}</HideOnDesktop>}
 
                             <Flex align="flex-end" justify="space-between">
                                 <Stack spacing={1}>
@@ -159,13 +133,8 @@ ProductItem.propTypes = {
     isWishlistItem: PropTypes.bool,
     primaryAction: PropTypes.node,
     secondaryActions: PropTypes.node,
-    containerStyles: PropTypes.object,
-    deliveryActions: PropTypes.shape({
-        showDeliveryOptions: PropTypes.bool,
-        isPickupDisabled: PropTypes.bool,
-        deliveryOption: PropTypes.string,
-        onDeliveryOptionChange: PropTypes.func
-    })
+    deliveryActions: PropTypes.node,
+    containerStyles: PropTypes.object
 }
 
 export default ProductItem

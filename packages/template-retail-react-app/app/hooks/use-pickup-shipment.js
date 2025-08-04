@@ -218,11 +218,18 @@ export const usePickupShipment = (basket) => {
             return
         }
 
-        const currentShippingMethod = basketResponse.shipments[0].shippingMethod
+        const currentShipment =
+            basketResponse.shipments.find((shipment) => shipment.shipmentId === targetShipmentId) ||
+            basketResponse.shipments[0]
+        const currentShippingMethod = currentShipment.shippingMethod
         const isCurrentlyPickup = isCurrentShippingMethodPickup(currentShippingMethod)
+        const currentStore = currentShipment.c_fromStoreId
 
         // Only configure if there's a mismatch between pickup selection and current method
-        if (Boolean(selectedPickup) !== Boolean(isCurrentlyPickup)) {
+        if (
+            selectedPickup !== isCurrentlyPickup ||
+            (isCurrentlyPickup && currentStore !== selectedStore.id)
+        ) {
             // Fetch shipping methods to get available options
             const {data: fetchedShippingMethods} = await refetchShippingMethods()
 

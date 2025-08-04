@@ -146,7 +146,9 @@ const ShippingMultiAddress = ({
     const {isCurrentShippingMethodPickup} = usePickupShipment(basket)
     const {
         findDeliveryShipmentWithSameAddress,
+        findUnusedDeliveryShipment,
         createNewDeliveryShipmentWithAddress,
+        updateDeliveryAddressForShipment,
         moveItemsToDeliveryShipment,
         removeEmptyShipments
     } = useMultiship(basket)
@@ -242,6 +244,11 @@ const ShippingMultiAddress = ({
 
     // Unified loading state - check if either customer or products are loading
     const isLoading = customerLoading || productsLoading
+
+    // Check if all product items have an address selected
+    const allShipmentsHaveAddress = (basket.productItems ?? []).every(
+        (item) => selectedAddresses[item.itemId]
+    )
 
     if (!deliveryItems.length) {
         return (
@@ -726,6 +733,7 @@ const ShippingMultiAddress = ({
         try {
             // Based on the shopper's selected addresses, create a map of unique addressIds and their associated items
             const addressToItemsMap = {}
+            let basketAfterItemMoves = null
 
             deliveryItems.forEach((item) => {
                 // Defaults to the first address if no address is selected
@@ -748,25 +756,39 @@ const ShippingMultiAddress = ({
                 addressToItemsMap[addressId].items.push(item)
             })
 
+            // For each unique address, if there is no usable existing shipment, create a new one.
             for (const [addressId, data] of Object.entries(addressToItemsMap)) {
                 const {address, items, shipmentId: existingShipmentId} = data
 
-                // For each unique address, if there is no existing shipment with the same address, create a new one.
-                if (!existingShipmentId) {
-                    addressToItemsMap[addressId].shipmentId =
-                        await createNewDeliveryShipmentWithAddress(basket, address)
+                let targetShipmentId = existingShipmentId
+                if (!targetShipmentId) {
+                    const targetShipment = findUnusedDeliveryShipment(
+                        basket,
+                        Object.values(addressToItemsMap).map((d) => d.shipmentId)
+                    )
+                    targetShipmentId = targetShipment?.shipmentId
+                    if (targetShipmentId) {
+                        await updateDeliveryAddressForShipment(targetShipmentId, address)
+                    } else {
+                        targetShipmentId = await createNewDeliveryShipmentWithAddress(
+                            basket,
+                            address
+                        )
+                    }
                 }
-
+                // Set the shipmentId for the unique address
+                addressToItemsMap[addressId].shipmentId = targetShipmentId
                 // Move items to the new shipment if needed.
-                const targetShipmentId = addressToItemsMap[addressId].shipmentId
                 const itemsToMove = items.filter((item) => item.shipmentId !== targetShipmentId)
                 if (itemsToMove.length > 0) {
-                    await moveItemsToDeliveryShipment(itemsToMove, targetShipmentId)
+                    basketAfterItemMoves = await moveItemsToDeliveryShipment(
+                        itemsToMove,
+                        targetShipmentId
+                    )
                 }
             }
-
-            // Remove any empty shipments. TODO: Need to handle swapping over addresses if default is empty
-            await removeEmptyShipments()
+            // Remove any empty shipments.
+            await removeEmptyShipments(basketAfterItemMoves || basket)
 
             goToStep(STEPS.SHIPPING_OPTIONS)
         } catch (error) {
@@ -1052,8 +1074,12 @@ const ShippingMultiAddress = ({
                     type="button"
                     width="full"
                     mt={2}
+                    opacity={!allShipmentsHaveAddress || isAddressFormOpen ? 0.8 : 1}
+                    cursor={
+                        !allShipmentsHaveAddress || isAddressFormOpen ? 'not-allowed' : 'pointer'
+                    }
                     isLoading={addressForm.formState.isSubmitting || isSubmitting}
-                    {...(isAddressFormOpen && {disabled: true})}
+                    isDisabled={!allShipmentsHaveAddress || isAddressFormOpen}
                     data-testid="continue-to-shipping-button"
                     loadingText={formatMessage({
                         id: 'shipping_multi_address.submit.loading',
@@ -1064,7 +1090,7 @@ const ShippingMultiAddress = ({
                         defaultMessage: 'Continue to next step with selected delivery addresses'
                     })}
                     onClick={() => {
-                        if (!isAddressFormOpen) {
+                        if (!isAddressFormOpen && allShipmentsHaveAddress) {
                             handleSubmit()
                         }
                     }}

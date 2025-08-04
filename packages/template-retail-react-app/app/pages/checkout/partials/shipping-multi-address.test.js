@@ -90,7 +90,9 @@ beforeEach(() => {
 
     useMultiship.mockReturnValue({
         findDeliveryShipmentWithSameAddress: jest.fn(),
+        findUnusedDeliveryShipment: jest.fn(),
         createNewDeliveryShipmentWithAddress: jest.fn(),
+        updateDeliveryAddressForShipment: jest.fn(),
         moveItemsToDeliveryShipment: jest.fn(),
         removeEmptyShipments: jest.fn()
     })
@@ -725,12 +727,54 @@ describe('ShippingMultiAddress', () => {
                 expect(screen.queryByText('Setting up shipments...')).toBeInTheDocument()
             })
         })
+        test('should be disabled when no addresses are selected for any product', () => {
+            // Mock customer with no addresses
+            useCurrentCustomer.mockReturnValue({
+                data: {...mockCustomer, addresses: []},
+                isLoading: false
+            })
+
+            renderWithIntl(<ShippingMultiAddress {...defaultProps} />)
+
+            const continueButton = screen.getByTestId('continue-to-shipping-button')
+            expect(continueButton).toBeDisabled()
+
+            // Clicking should not trigger the loading state
+            fireEvent.click(continueButton)
+            expect(screen.queryByText('Setting up shipments...')).not.toBeInTheDocument()
+        })
+
+        test('should be disabled when add new address form is open', async () => {
+            renderWithIntl(<ShippingMultiAddress {...defaultProps} />)
+
+            const addNewAddressButtons = screen.getAllByText('+ Add New Address')
+            fireEvent.click(addNewAddressButtons[0])
+
+            await waitFor(() => {
+                expect(screen.getByTestId('address-form')).toBeInTheDocument()
+            })
+
+            const continueButton = screen.getByTestId('continue-to-shipping-button')
+            expect(continueButton).toBeDisabled()
+
+            // Clicking should not trigger the loading state
+            fireEvent.click(continueButton)
+            expect(screen.queryByText('Setting up shipments...')).not.toBeInTheDocument()
+        })
+
+        test('should be enabled when all products have an address asscoiated with them in multiship view', () => {
+            renderWithIntl(<ShippingMultiAddress {...defaultProps} />)
+            const continueButton = screen.getByTestId('continue-to-shipping-button')
+            expect(continueButton).toBeEnabled()
+        })
     })
 })
 
 describe('ShippingMultiAddress - handleSubmit', () => {
     let mockFindDeliveryShipmentWithSameAddress
+    let mockFindUnusedDeliveryShipment
     let mockCreateNewDeliveryShipmentWithAddress
+    let mockUpdateDeliveryAddressForShipment
     let mockMoveItemsToDeliveryShipment
     let mockRemoveEmptyShipments
 
@@ -783,13 +827,22 @@ describe('ShippingMultiAddress - handleSubmit', () => {
 
     beforeEach(() => {
         mockFindDeliveryShipmentWithSameAddress = jest.fn().mockReturnValue(null)
+        mockFindUnusedDeliveryShipment = jest.fn().mockReturnValue(null)
         mockCreateNewDeliveryShipmentWithAddress = jest.fn().mockResolvedValue('new-shipment-1')
-        mockMoveItemsToDeliveryShipment = jest.fn().mockResolvedValue()
+        mockUpdateDeliveryAddressForShipment = jest.fn().mockResolvedValue()
+        mockMoveItemsToDeliveryShipment = jest.fn().mockResolvedValue({
+            basketId: 'test-basket-123',
+            // Return updated basket
+            productItems: mockBasket.productItems,
+            shipments: mockBasket.shipments
+        })
         mockRemoveEmptyShipments = jest.fn().mockResolvedValue()
 
         useMultiship.mockReturnValue({
             findDeliveryShipmentWithSameAddress: mockFindDeliveryShipmentWithSameAddress,
+            findUnusedDeliveryShipment: mockFindUnusedDeliveryShipment,
             createNewDeliveryShipmentWithAddress: mockCreateNewDeliveryShipmentWithAddress,
+            updateDeliveryAddressForShipment: mockUpdateDeliveryAddressForShipment,
             moveItemsToDeliveryShipment: mockMoveItemsToDeliveryShipment,
             removeEmptyShipments: mockRemoveEmptyShipments
         })
