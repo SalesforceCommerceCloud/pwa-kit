@@ -42,6 +42,7 @@ import http from 'http'
 import https from 'https'
 import {proxyConfigs, updatePackageMobify} from '../../utils/ssr-shared'
 import {
+    getEnvBasePath,
     proxyBasePath,
     bundleBasePath,
     healthCheckPath,
@@ -223,7 +224,7 @@ export const RemoteServerFactory = {
      * @private
      */
     _isBundleOrProxyPath(url) {
-        return url.startsWith(proxyBasePath) || url.startsWith(bundleBasePath)
+        return url.includes(proxyBasePath) || url.includes(bundleBasePath)
     },
 
     /**
@@ -361,6 +362,12 @@ export const RemoteServerFactory = {
         this._setCompression(app)
         this._setRequestId(app)
         // this._addEventContext(app)
+
+        // We want to remove any base paths that have made it this far.
+        // Base paths are used to route requests to the correct server.
+        // If the request has reached the server, it is no longer needed.
+        this._setupRemoveBasePathFromPathMiddleware(app)
+
         // Ordering of the next two calls are vital - we don't
         // want request-processors applied to development views.
         this._addSDKInternalHandlers(app)
@@ -471,6 +478,105 @@ export const RemoteServerFactory = {
 
             next()
         })
+    },
+
+    /**
+     * @private
+     */
+    _setupRemoveBasePathFromPathMiddleware(app) {
+        const removeBasePathFromPath = (path) => {
+            if (!getEnvBasePath()) return path
+            const regex = new RegExp(`^${getEnvBasePath()}(/|$)`)
+            return path.replace(regex, '/')
+        }
+
+        const _convertExpressRouteToRegex = (routePattern) => {
+            if (!routePattern) return null
+
+            // Replace route parameters like :id with regex capture groups
+            let regexPattern = routePattern
+                .replace(/:[^/]+/g, '[^/]+')
+                .replace(/\/\*/g, '/.*')
+                .replace(/\*/g, '.*')
+
+            // Escape other regex special characters except those we just handled
+            regexPattern = regexPattern.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+
+            // Unescape the patterns we want to keep
+            regexPattern = regexPattern
+                .replace(/\\\[\\\^\/\\\]\\\+/g, '[^/]+')
+                .replace(/\\\/\\\.\\\*/g, '/.*')
+                .replace(/\\\.\\\*/g, '.*')
+                .replace(/\\\(/g, '(')
+                .replace(/\\\)/g, ')')
+                .replace(/\\\?/g, '?')
+
+            return new RegExp(`^${regexPattern}$`)
+        }
+
+        /**
+         * Very early request processing.
+         *
+         * If the server receives a request containing the base path, remove it before allowing it through
+         *
+         * @param req {express.req} the incoming request - modified in-place
+         * @private
+         */
+        const removeBasePathFromPathMiddleware = (req, res, next) => {
+            // Scope base path removal to /mobify routes and routes defined by the express app (ie. worker.js)
+            // This is to avoid affecting other paths where a base path might be present if it happens to
+            // be equal to a site id.
+            // For example, if you have a base path of /us and a site id of /us we don't want
+            // to remove the /us from www.example.com/us/en-US/category/...
+
+            const basePath = getEnvBasePath()
+            let shouldRemoveBasePath = false
+
+            if (basePath) {
+                if (req.path.startsWith(`${basePath}/mobify`)) {
+                    shouldRemoveBasePath = true
+                }
+
+                // Check if path matches any existing express route with base path prepended
+                if (!shouldRemoveBasePath) {
+                    // Routes are dynamically checked since we want to ensure that any express route
+                    // defined after the app is created, such as routes defined in ssr.js are included.
+                    const expressRoutes = app._router.stack
+                        // specifically omit the generic wildcard from the express routes we want to
+                        // remove the base path from since it is mapped to the app render
+                        .filter(
+                            (layer) => layer.route && layer.route.path && layer.route.path !== '*'
+                        )
+                        .map((layer) => layer.route.path)
+
+                    for (const route of expressRoutes) {
+                        if (route) {
+                            const routeRegex = _convertExpressRouteToRegex(route)
+                            if (routeRegex) {
+                                const pathWithoutBase = req.path.replace(
+                                    new RegExp(`^${basePath}`),
+                                    ''
+                                )
+                                if (routeRegex.test(pathWithoutBase)) {
+                                    shouldRemoveBasePath = true
+                                    break
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            if (shouldRemoveBasePath) {
+                const updatedPath = removeBasePathFromPath(req.path)
+                const parsed = URL.parse(req.url)
+                parsed.pathname = updatedPath
+                req.url = URL.format(parsed)
+            }
+
+            next()
+        }
+        app.use(removeBasePathFromPathMiddleware)
     },
 
     /**
@@ -678,7 +784,7 @@ export const RemoteServerFactory = {
     /**
      * @private
      */
-    _handleMissingSlasPrivateEnvVar(app) {
+    _handleMissingSlasPrivateEnvVar(app, slasPrivateProxyPath) {
         app.use(slasPrivateProxyPath, (_, res) => {
             return res.status(501).json({
                 message:
@@ -711,7 +817,17 @@ export const RemoteServerFactory = {
             createProxyMiddleware({
                 target: options.slasTarget,
                 changeOrigin: true,
-                pathRewrite: {[slasPrivateProxyPath]: ''},
+
+                // http-proxy-middleware uses the original incoming request path to determine
+                // both proxyRequest and incomingRequest paths.
+                // This cannot be modified by any express middleware
+                // So we need to use the built in pathRewrite to remove the base path
+                pathRewrite: (path) => {
+                    const basePathRegexEntry = getEnvBasePath() ? `${getEnvBasePath()}?` : ''
+                    const regex = new RegExp(`^${basePathRegexEntry}${slasPrivateProxyPath}`)
+                    return path.replace(regex, '')
+                },
+
                 onProxyReq: (proxyRequest, incomingRequest, res) => {
                     applyProxyRequestHeaders({
                         proxyRequest,

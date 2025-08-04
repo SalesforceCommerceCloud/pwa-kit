@@ -1,3 +1,10 @@
+## v3.12.0-preview.0 (Aug 01, 2025)
+
+- Add support for environment level base paths on /mobify routes [#2892](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2892)
+- Add `--initGit` to automate git repo creation for the generated project [#2817](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2817)
+- This feature introduces an AI-powered shopping assistant that integrates Salesforce Embedded Messaging Service with PWA Kit applications. The shopper agent provides real-time chat support, search assistance, and personalized shopping guidance directly within the e-commerce experience. [#2658](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2658)
+
+
 ## v3.11.0 (Jul 22, 2025)
 - Fix the demo instance details in `program.json`[#2800](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2800)
 - Fix exiting before `program.json` content can be flushed [#2699](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2699)
@@ -8,6 +15,7 @@
 - Add `StoreLocatorProvider` to the `AppConfig` template to support BOPIS [#2753](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2753)
 - Remove search constants overrides so more than 3 products at a time can be fetched [#2819](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2819)
 - Update Data Cloud configurations [#2843](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2843) [#2811](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2811)
+- Remove the need of redundant assets/cursor_rules [#2820](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2820)
 
 ## v3.10.0 (May 22, 2025)
 - Add Data Cloud API configuration to `default.js`. [#2318](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2318)

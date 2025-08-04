@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "pwa-kit-mcp": {
+      "command": "{{path-to-node}}/node",
+      "transport": "stdio",
+      "args": ["{{parent-dir-to-mcp}}}/pwa-kit-mcp/dist/server/server.js"],
+      "env": {
+        "PWA_STOREFRONT_APP_PATH": "{{path-to-app-directory}}"
+      }
+    }
+  }
+}

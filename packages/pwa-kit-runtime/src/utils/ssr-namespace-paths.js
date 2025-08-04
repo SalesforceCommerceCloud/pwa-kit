@@ -1,17 +1,22 @@
 /*
- * Copyright (c) 2024, salesforce.com, inc.
+ * Copyright (c) 2025, salesforce.com, inc.
  * All rights reserved.
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
+import {getConfig} from './ssr-config'
+import logger from './logger-instance'
+
 /**
  * This file defines the /mobify paths used to set up our Express endpoints.
  *
- * If a namespace for the /mobify paths is defined, the methods in here will return the
- * namespaced path. ie. /namespace/mobify/...
+ * If a base path for the /mobify paths is defined, the methods in here will return the
+ * basepath. ie. /basepath/mobify/...
  */
 
+// The MOBIFY_PATH is defined separately in preparation for the future eventual removal or
+// replacement of the 'mobify' part of these paths
 const MOBIFY_PATH = '/mobify'
 const PROXY_PATH_BASE = `${MOBIFY_PATH}/proxy`
 const BUNDLE_PATH_BASE = `${MOBIFY_PATH}/bundle`
@@ -19,25 +24,29 @@ const CACHING_PATH_BASE = `${MOBIFY_PATH}/caching`
 const HEALTHCHECK_PATH = `${MOBIFY_PATH}/ping`
 const SLAS_PRIVATE_CLIENT_PROXY_PATH = `${MOBIFY_PATH}/slas/private`
 
-/**
- * @private
+/*
+ * Returns the base path. This is prepended to a /mobify path.
  */
-const _getNamespace = () => {
-    // TODO - namespaces for /mobify path will be implemented at a later date.
-    // Returns an empty string for now.
-    // Below is an example of what this implementation might look like.
-    /*
-        let {namespace = ""} = getConfig()
-        namespace = typeof namespace === 'function' ? namespace() : namespace
-        return namespace
-    */
-    return ''
+export const getEnvBasePath = () => {
+    const config = getConfig()
+    let basePath = config?.envBasePath || ''
+
+    if (typeof basePath !== 'string') {
+        logger.warn('Invalid envBasePath configuration. No base path is applied.')
+        return ''
+    }
+
+    return basePath.replace(/\/$/, '')
 }
 
-export const ssrNamespace = _getNamespace()
+export const proxyBasePath = PROXY_PATH_BASE
+export const bundleBasePath = BUNDLE_PATH_BASE
+export const cachingBasePath = CACHING_PATH_BASE
+export const healthCheckPath = HEALTHCHECK_PATH
+export const slasPrivateProxyPath = SLAS_PRIVATE_CLIENT_PROXY_PATH
 
-export const proxyBasePath = `${ssrNamespace}${PROXY_PATH_BASE}`
-export const bundleBasePath = `${ssrNamespace}${BUNDLE_PATH_BASE}`
-export const cachingBasePath = `${ssrNamespace}${CACHING_PATH_BASE}`
-export const healthCheckPath = `${ssrNamespace}${HEALTHCHECK_PATH}`
-export const slasPrivateProxyPath = `${ssrNamespace}${SLAS_PRIVATE_CLIENT_PROXY_PATH}`
+/**
+ * @deprecated This variable is no longer used. This variable has always been an empty string.
+ * Use getEnvBasePath() instead. Import from @salesforce/pwa-kit-runtime/utils/ssr-namespace-paths
+ */
+export const ssrNamespace = ''
