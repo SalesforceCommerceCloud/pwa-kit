@@ -82,6 +82,7 @@ import {
 import Seo from '@salesforce/retail-react-app/app/components/seo'
 import ShopperAgent from '@salesforce/retail-react-app/app/components/shopper-agent'
 import {getPathWithLocale} from '@salesforce/retail-react-app/app/utils/url'
+import {useExpressPaymentHeight} from '../express/hooks/use-express-payment-manager'
 
 const PlaceholderComponent = () => (
     <Center p="2">
@@ -190,6 +191,9 @@ const App = (props) => {
     const isCheckout = /\/checkout$/.test(location?.pathname)
     const isExpress = /\/express$/.test(location?.pathname)
 
+    // Get dynamic height for express payments
+    const expressPaymentHeight = isExpress ? useExpressPaymentHeight() : 0
+
     const {l10n} = site
     // Get the current currency to be used through out the app
     const currency = locale.preferredCurrency || l10n.defaultCurrency
@@ -290,7 +294,7 @@ const App = (props) => {
 
     return isExpress ? (
         <OfflineBoundary isOnline={false}>
-            <div style={{width: '100%', height: '40px', overflowY: 'hidden'}}>{children}</div>
+            <div style={{width: '100%', height: `${expressPaymentHeight}px`, overflowY: 'hidden'}}>{children}</div>
         </OfflineBoundary>
     ) : (
         <Box className="sf-app" {...styles.container}>

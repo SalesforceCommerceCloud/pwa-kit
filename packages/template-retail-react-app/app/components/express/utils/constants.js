@@ -13,9 +13,14 @@ export const PAYMENT_METHODS = {
 
 // Express payment message types
 export const EXPRESS_MESSAGES = {
-    PAYMENT_AVAILABLE: 'express.payment.available',
+    //PAYMENT_AVAILABLE: 'express.payment.available',
+    PAYMENT_DONE: 'express.payment.done', // TODO: rename to something that makes more sense -- back to available probably?
     PAYMENT_UNAVAILABLE: 'express.payment.unavailable',
     PAYMENT_SUCCESS: 'express.payment.success',
     PAYMENT_FAILURE: 'express.payment.failure',
     PAYMENT_CANCEL: 'express.payment.cancel'
 }
+
+// Express button constants
+export const EXPRESS_BUTTON_HEIGHT = 40
+export const EXPRESS_BUTTON_GAP = 8

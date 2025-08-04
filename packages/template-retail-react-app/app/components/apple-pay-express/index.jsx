@@ -555,6 +555,11 @@ export const ApplePayExpress = ({sku, quantity = 1, isPdpMode = false, basketDat
                 return
             }
 
+            const handleApplePayUnavailable = () => {
+                console.log('[ApplePayExpress] Apple Pay unavailable, setting manager to unavailable')
+                manager.setPaymentMethodUnavailable(PAYMENT_METHOD)
+            }
+
             // For PDP mode, we don't need a basket initially but we do need payment methods
             // For regular mode, we need a basket to continue
             if (isPdpMode) {
@@ -562,10 +567,7 @@ export const ApplePayExpress = ({sku, quantity = 1, isPdpMode = false, basketDat
                     return
                 }
                 if (standaloneError) {
-                    console.error('Standalone payment methods error:', standaloneError)
-                    sendExpressMessage(EXPRESS_MESSAGES.PAYMENT_UNAVAILABLE, {
-                        PAYMENT_METHOD
-                    })
+                    handleApplePayUnavailable()
                     return
                 }
             } else {
@@ -578,20 +580,6 @@ export const ApplePayExpress = ({sku, quantity = 1, isPdpMode = false, basketDat
             if (!adyenEnvironment) {
                 return
             }
-
-            const handleApplePayUnavailable = () => {
-                if (manager) {
-                    console.log('[ApplePayExpress] Apple Pay unavailable, setting manager to unavailable')
-                    manager.setPaymentMethodUnavailable(PAYMENT_METHOD)
-                }
-            }
-
-            // MARK UNAVAILABLE IMMEDIATELY -- see if we are rendering correctly
-            // if (manager) {
-            //     console.log('!!!!!!!!!!!! [ApplePayExpress] Manager is available, marking Apple Pay as unavailable immediately')
-            //     handleApplePayUnavailable()
-            //     return;
-            // }
 
             try {
                 let checkout
@@ -657,9 +645,7 @@ export const ApplePayExpress = ({sku, quantity = 1, isPdpMode = false, basketDat
 
                 try {
                     await applePayButton.mount(paymentContainer.current)
-                    if (manager) {
-                        manager.setPaymentMethodAvailable(PAYMENT_METHOD)
-                    }
+                    manager.setPaymentMethodAvailable(PAYMENT_METHOD)
                 } catch (error) {
                     console.error('Failed to mount Apple Pay button:', error)
                     handleApplePayUnavailable()

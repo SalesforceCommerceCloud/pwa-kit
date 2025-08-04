@@ -15,7 +15,7 @@ import {GooglePayExpress} from '@salesforce/retail-react-app/app/components/goog
 import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
 import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
-import {useExpressPaymentManager} from '@salesforce/retail-react-app/app/components/express/utils/use-express-payment-manager'
+import {useExpressPaymentManager} from '@salesforce/retail-react-app/app/components/express/hooks/use-express-payment-manager'
 
 // Define the payment methods we will attempt to load
 const PAYMENT_METHODS = ['applepay', 'googlepay']
@@ -34,18 +34,15 @@ function Express() {
     // Check for PDP mode flag in URL
     const urlParams = new URLSearchParams(location.search)
     const isPdpMode = urlParams.get('pdp') === 'true'
-
+    
     // State to track current SKU and quantity (will be set via postMessage)
     const [currentSku, setCurrentSku] = useState(null)
     const [currentQuantity, setCurrentQuantity] = useState(1)
 
     // Initialize the express payment manager
     console.log('[Express] Initializing express payment manager with methods:', PAYMENT_METHODS)
-    
-    console.log('[Express] About to call useExpressPaymentManager...')
-    const {manager} = useExpressPaymentManager(PAYMENT_METHODS)
-    console.log('[Express] Manager instance received:', manager)
-    
+    const {manager, error} = useExpressPaymentManager(PAYMENT_METHODS)
+    console.log('[Express] Manager instance received:', manager, 'Error:', error)
 
     useEffect(() => {
         const getToken = async () => {
@@ -57,7 +54,7 @@ function Express() {
     }, [])
 
     // PostMessage listener for SKU updates
-    useEffect(() => {    
+    useEffect(() => {
         const handleMessage = (event) => {
             // Basic security check - accept messages from any origin for now
             // In production, you might want to restrict this to specific origins
@@ -104,12 +101,10 @@ function Express() {
         return null
     }
 
-    console.log('[Express] Rendering express payment components with:', {
-        isPdpMode,
-        currentSku,
-        currentQuantity,
-        manager
-    })
+    if (error) { // Do not render express payment components if there's an error with the manager
+        console.error('[Express] Error with express payment manager, not rendering express components:', error)
+        return null
+    }
 
     return (
         <div>

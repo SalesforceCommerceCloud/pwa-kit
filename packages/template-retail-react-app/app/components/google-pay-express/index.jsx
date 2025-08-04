@@ -320,10 +320,8 @@ export const GooglePayExpress = ({manager}) => {
             }
 
             const handleGooglePayUnavailable = () => {
-                if (manager) {
-                    console.log('[GooglePayExpress] Google Pay unavailable, setting manager to unavailable')
-                    manager.setPaymentMethodUnavailable(PAYMENT_METHOD)
-                }
+                console.log('[GooglePayExpress] Google Pay unavailable, setting manager to unavailable')
+                manager.setPaymentMethodUnavailable(PAYMENT_METHOD)
             }
 
             try {
@@ -377,16 +375,12 @@ export const GooglePayExpress = ({manager}) => {
 
                 try {
                     await googlePayButton.mount(paymentContainer.current)
-                    if (manager) {
-                        console.log('[GooglePayExpress] Google Pay available, setting manager to available')
-                        manager.setPaymentMethodAvailable(PAYMENT_METHOD)
-                    }
+                    console.log('[GooglePayExpress] Google Pay available, setting manager to available')
+                    manager.setPaymentMethodAvailable(PAYMENT_METHOD)
                 } catch (error) {
                     handleGooglePayUnavailable()
                 }
             } catch (err) {
-                console.log('BROWSER SPECIFIC err', err)
-                
                 const isMissingOrderTotalError =
                     err instanceof TypeError &&
                     (/undefined is not an object \(evaluating '[a-z]\.orderTotal'\)/.test(
