@@ -879,10 +879,10 @@
       "value": "Sign Out"
     }
   ],
-  "checkout_contact_info.title.contact": [
+  "checkout_contact_info.title.contact_info": [
     {
       "type": 0,
-      "value": "Contact"
+      "value": "Contact Info"
     }
   ],
   "checkout_footer.link.privacy_policy": [

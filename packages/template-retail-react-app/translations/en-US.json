@@ -334,8 +334,8 @@
   "checkout_contact_info.action.sign_out": {
     "defaultMessage": "Sign Out"
   },
-  "checkout_contact_info.title.contact": {
-    "defaultMessage": "Contact"
+  "checkout_contact_info.title.contact_info": {
+    "defaultMessage": "Contact Info"
   },
   "checkout_footer.link.privacy_policy": {
     "defaultMessage": "Privacy Policy"
