@@ -8,7 +8,11 @@
 import React from 'react'
 import {screen, act} from '@testing-library/react'
 import {renderWithChakraProvider} from '../utils/test-utils'
-import {useBonusProductModal, BonusProductModalProvider, useBonusProductModalContext} from './use-bonus-product-modal'
+import {
+    useBonusProductModal,
+    BonusProductModalProvider,
+    useBonusProductModalContext
+} from './use-bonus-product-modal'
 
 // Mock react-router-dom
 jest.mock('react-router-dom', () => ({
@@ -17,7 +21,7 @@ jest.mock('react-router-dom', () => ({
 
 const BonusProductSelectionModal = () => {
     const {isOpen, onOpen, onClose, data} = useBonusProductModalContext()
-    
+
     return (
         <div>
             <div data-testid="is-open">{isOpen.toString()}</div>
@@ -45,7 +49,7 @@ describe('useBonusProductModal', () => {
         }
 
         renderWithChakraProvider(<TestHook />)
-        
+
         expect(screen.getByTestId('is-open')).toHaveTextContent('false')
         expect(screen.getByTestId('data')).toHaveTextContent('null')
     })
@@ -75,16 +79,16 @@ describe('useBonusProductModal', () => {
 
         const openButton = screen.getByTestId('open-button')
         const closeButton = screen.getByTestId('close-button')
-        
+
         await act(async () => {
             openButton.click()
         })
         expect(screen.getByTestId('is-open')).toHaveTextContent('true')
-        
+
         await act(async () => {
             closeButton.click()
         })
         expect(screen.getByTestId('is-open')).toHaveTextContent('false')
         expect(screen.getByTestId('data')).toHaveTextContent('null')
     })
-}) 
+})

@@ -8,13 +8,7 @@
 import React, {useContext, useState, useEffect} from 'react'
 import {useLocation} from 'react-router-dom'
 import PropTypes from 'prop-types'
-import {
-    Dialog,
-    Button,
-    Text,
-    Box,
-    useBreakpointValue
-} from '@chakra-ui/react'
+import {Dialog, Button, Text, Box, useBreakpointValue} from '@chakra-ui/react'
 
 /**
  * Context for managing the BonusProductModal.
@@ -76,11 +70,7 @@ export const BonusProductModal = () => {
                         )}
                     </Dialog.Body>
                     <Dialog.Footer bgColor="white" padding="8">
-                        <Button
-                            onClick={onClose}
-                            variant="solid"
-                            width="100%"
-                        >
+                        <Button onClick={onClose} variant="solid" width="100%">
                             Close
                         </Button>
                     </Dialog.Footer>
@@ -122,4 +112,4 @@ export const useBonusProductModal = () => {
             })
         }
     }
-} 
+}

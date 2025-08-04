@@ -54,24 +54,24 @@ AddToCartModalProvider.propTypes = {
 /**
  * Visual feedback (a modal) for adding item to the cart.
  */
-export const AddToCartModal = ({ onSelectBonusProductsClick }) => {
+export const AddToCartModal = ({onSelectBonusProductsClick}) => {
     const {isOpen, onClose, data} = useAddToCartModalContext()
     const bonusProductContext = useBonusProductModalContext()
     const {onOpen: onOpenBonusModal} = bonusProductContext || {}
     const {product, itemsAdded = [], selectedQuantity, bonusDiscountLineItems = []} = data || {}
     const isProductABundle = !!product?.type.bundle
-    
+
     // Extract unique promotion IDs
-    const promotionIds = [...new Set(
-        bonusDiscountLineItems.map(item => item.promotionId).filter(Boolean)
-    )];
+    const promotionIds = [
+        ...new Set(bonusDiscountLineItems.map((item) => item.promotionId).filter(Boolean))
+    ]
     // Fetch promotion details
-    const { data: promotions, isLoading: isPromotionsLoading } = usePromotions(
-        { parameters: { ids: promotionIds.join(',') } },
-        { enabled: promotionIds.length > 0 }
-    );
+    const {data: promotions, isLoading: isPromotionsLoading} = usePromotions(
+        {parameters: {ids: promotionIds.join(',')}},
+        {enabled: promotionIds.length > 0}
+    )
     // Get the first promotion's details
-    const promotionText = promotions?.data?.[0]?.details || '';
+    const promotionText = promotions?.data?.[0]?.details || ''
 
     const intl = useIntl()
     const {formatMessage} = intl
@@ -348,36 +348,42 @@ export const AddToCartModal = ({ onSelectBonusProductsClick }) => {
                                                 </Flex>
                                             )
                                         })}
-                                    {bonusDiscountLineItems && bonusDiscountLineItems.length > 0 && (
-                                        <>
-                                            <Text mb={2} fontSize="md" fontWeight="normal" textAlign="left">
-                                                {promotionText}
-                                            </Text>
-                                            <Button
-                                                onClick={() => {
-                                                    if (onOpenBonusModal) {
-                                                        onOpenBonusModal({
-                                                            bonusDiscountLineItems,
-                                                            product,
-                                                            itemsAdded
-                                                        })
-                                                    }
-                                                    onClose() // Close the AddToCartModal
-                                                }}
-                                                width="100%"
-                                                variant="outline-gray"
-                                                size="md"
-                                                height={9}
-                                                minWidth={11}
-                                                textStyle="sm"
-                                            >
-                                                {intl.formatMessage({
-                                                    defaultMessage: 'Select Bonus Products',
-                                                    id: 'add_to_cart_modal.button.select_bonus_products'
-                                                })}
-                                            </Button>
-                                        </>
-                                    )}
+                                    {bonusDiscountLineItems &&
+                                        bonusDiscountLineItems.length > 0 && (
+                                            <>
+                                                <Text
+                                                    mb={2}
+                                                    fontSize="md"
+                                                    fontWeight="normal"
+                                                    textAlign="left"
+                                                >
+                                                    {promotionText}
+                                                </Text>
+                                                <Button
+                                                    onClick={() => {
+                                                        if (onOpenBonusModal) {
+                                                            onOpenBonusModal({
+                                                                bonusDiscountLineItems,
+                                                                product,
+                                                                itemsAdded
+                                                            })
+                                                        }
+                                                        onClose() // Close the AddToCartModal
+                                                    }}
+                                                    width="100%"
+                                                    variant="outline-gray"
+                                                    size="md"
+                                                    height={9}
+                                                    minWidth={11}
+                                                    textStyle="sm"
+                                                >
+                                                    {intl.formatMessage({
+                                                        defaultMessage: 'Select Bonus Products',
+                                                        id: 'add_to_cart_modal.button.select_bonus_products'
+                                                    })}
+                                                </Button>
+                                            </>
+                                        )}
                                 </Box>
                                 <Box
                                     display={['none', 'none', 'none', 'block']}
