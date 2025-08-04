@@ -141,7 +141,9 @@ const ShippingMultiAddress = ({
     const {isCurrentShippingMethodPickup} = usePickupShipment(basket)
     const {
         findDeliveryShipmentWithSameAddress,
+        findUnusedDeliveryShipment,
         createNewDeliveryShipmentWithAddress,
+        updateDeliveryAddressForShipment,
         moveItemsToDeliveryShipment,
         removeEmptyShipments
     } = useMultiship(basket)
@@ -366,6 +368,7 @@ const ShippingMultiAddress = ({
         try {
             // Based on the shopper's selected addresses, create a map of unique addressIds and their associated items
             const addressToItemsMap = {}
+            let basketAfterItemMoves = null
 
             deliveryItems.forEach((item) => {
                 // Defaults to the first address if no address is selected
@@ -388,25 +391,39 @@ const ShippingMultiAddress = ({
                 addressToItemsMap[addressId].items.push(item)
             })
 
+            // For each unique address, if there is no usable existing shipment, create a new one.
             for (const [addressId, data] of Object.entries(addressToItemsMap)) {
                 const {address, items, shipmentId: existingShipmentId} = data
 
-                // For each unique address, if there is no existing shipment with the same address, create a new one.
-                if (!existingShipmentId) {
-                    addressToItemsMap[addressId].shipmentId =
-                        await createNewDeliveryShipmentWithAddress(basket, address)
+                let targetShipmentId = existingShipmentId
+                if (!targetShipmentId) {
+                    const targetShipment = findUnusedDeliveryShipment(
+                        basket,
+                        Object.values(addressToItemsMap).map((d) => d.shipmentId)
+                    )
+                    targetShipmentId = targetShipment?.shipmentId
+                    if (targetShipmentId) {
+                        await updateDeliveryAddressForShipment(targetShipmentId, address)
+                    } else {
+                        targetShipmentId = await createNewDeliveryShipmentWithAddress(
+                            basket,
+                            address
+                        )
+                    }
                 }
 
                 // Move items to the new shipment if needed.
-                const targetShipmentId = addressToItemsMap[addressId].shipmentId
+                addressToItemsMap[addressId].shipmentId = targetShipmentId
                 const itemsToMove = items.filter((item) => item.shipmentId !== targetShipmentId)
                 if (itemsToMove.length > 0) {
-                    await moveItemsToDeliveryShipment(itemsToMove, targetShipmentId)
+                    basketAfterItemMoves = await moveItemsToDeliveryShipment(
+                        itemsToMove,
+                        targetShipmentId
+                    )
                 }
             }
-
-            // Remove any empty shipments. TODO: Need to handle swapping over addresses if default is empty
-            await removeEmptyShipments()
+            // Remove any empty shipments.
+            await removeEmptyShipments(basketAfterItemMoves || basket)
 
             goToStep(STEPS.SHIPPING_OPTIONS)
         } catch (error) {

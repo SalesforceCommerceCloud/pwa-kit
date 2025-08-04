@@ -90,7 +90,9 @@ beforeEach(() => {
 
     useMultiship.mockReturnValue({
         findDeliveryShipmentWithSameAddress: jest.fn(),
+        findUnusedDeliveryShipment: jest.fn(),
         createNewDeliveryShipmentWithAddress: jest.fn(),
+        updateDeliveryAddressForShipment: jest.fn(),
         moveItemsToDeliveryShipment: jest.fn(),
         removeEmptyShipments: jest.fn()
     })
@@ -770,7 +772,9 @@ describe('ShippingMultiAddress', () => {
 
 describe('ShippingMultiAddress - handleSubmit', () => {
     let mockFindDeliveryShipmentWithSameAddress
+    let mockFindUnusedDeliveryShipment
     let mockCreateNewDeliveryShipmentWithAddress
+    let mockUpdateDeliveryAddressForShipment
     let mockMoveItemsToDeliveryShipment
     let mockRemoveEmptyShipments
 
@@ -823,13 +827,22 @@ describe('ShippingMultiAddress - handleSubmit', () => {
 
     beforeEach(() => {
         mockFindDeliveryShipmentWithSameAddress = jest.fn().mockReturnValue(null)
+        mockFindUnusedDeliveryShipment = jest.fn().mockReturnValue(null)
         mockCreateNewDeliveryShipmentWithAddress = jest.fn().mockResolvedValue('new-shipment-1')
-        mockMoveItemsToDeliveryShipment = jest.fn().mockResolvedValue()
+        mockUpdateDeliveryAddressForShipment = jest.fn().mockResolvedValue()
+        mockMoveItemsToDeliveryShipment = jest.fn().mockResolvedValue({
+            basketId: 'test-basket-123',
+            // Return updated basket
+            productItems: mockBasket.productItems,
+            shipments: mockBasket.shipments
+        })
         mockRemoveEmptyShipments = jest.fn().mockResolvedValue()
 
         useMultiship.mockReturnValue({
             findDeliveryShipmentWithSameAddress: mockFindDeliveryShipmentWithSameAddress,
+            findUnusedDeliveryShipment: mockFindUnusedDeliveryShipment,
             createNewDeliveryShipmentWithAddress: mockCreateNewDeliveryShipmentWithAddress,
+            updateDeliveryAddressForShipment: mockUpdateDeliveryAddressForShipment,
             moveItemsToDeliveryShipment: mockMoveItemsToDeliveryShipment,
             removeEmptyShipments: mockRemoveEmptyShipments
         })
@@ -1006,6 +1019,96 @@ describe('ShippingMultiAddress - handleSubmit', () => {
                 mockBasket,
                 mockAddresses[0] // First address as default
             )
+        })
+    })
+
+    test('should reuse unused delivery shipment when available', async () => {
+        // Mock that there's an unused shipment available only for the first call
+        mockFindUnusedDeliveryShipment
+            .mockReturnValueOnce('unused-shipment-1')
+            .mockReturnValueOnce(null) // No more unused shipments
+
+        const user = userEvent.setup()
+
+        renderWithIntl(<ShippingMultiAddress {...defaultProps} basket={mockBasket} />)
+
+        // Select different addresses for each item
+        const selects = screen.getAllByRole('combobox')
+        await user.selectOptions(selects[0], 'addr-1')
+        await user.selectOptions(selects[1], 'addr-2')
+
+        const continueButton = screen.getByTestId('continue-to-shipping-button')
+        await user.click(continueButton)
+
+        await waitFor(() => {
+            // Should find unused shipment
+            expect(mockFindUnusedDeliveryShipment).toHaveBeenCalled()
+
+            // Should update the unused shipment's address instead of creating new
+            expect(mockUpdateDeliveryAddressForShipment).toHaveBeenCalledWith(
+                'unused-shipment-1',
+                mockAddresses[0]
+            )
+
+            // Should only create one new shipment (for the second address)
+            expect(mockCreateNewDeliveryShipmentWithAddress).toHaveBeenCalledTimes(1)
+            expect(mockCreateNewDeliveryShipmentWithAddress).toHaveBeenCalledWith(
+                mockBasket,
+                mockAddresses[1]
+            )
+        })
+    })
+
+    test('should exclude already assigned delivery shipments when finding unused ones', async () => {
+        // Mock scenario where multiple items go to different addresses
+        mockFindUnusedDeliveryShipment.mockImplementation((basket, excludedShipmentIds) => {
+            // First call should have empty or null values
+            if (!excludedShipmentIds || excludedShipmentIds.filter((id) => id).length === 0) {
+                return 'unused-shipment-1'
+            }
+            // Second call should exclude the first unused shipment
+            if (excludedShipmentIds.includes('unused-shipment-1')) {
+                return 'unused-shipment-2'
+            }
+            return null
+        })
+
+        // Need to return different shipment IDs for createNewDeliveryShipmentWithAddress
+        mockCreateNewDeliveryShipmentWithAddress
+            .mockResolvedValueOnce('new-shipment-1')
+            .mockResolvedValueOnce('new-shipment-2')
+
+        const user = userEvent.setup()
+
+        renderWithIntl(<ShippingMultiAddress {...defaultProps} basket={mockBasket} />)
+
+        const selects = screen.getAllByRole('combobox')
+        await user.selectOptions(selects[0], 'addr-1')
+        await user.selectOptions(selects[1], 'addr-2')
+
+        const continueButton = screen.getByTestId('continue-to-shipping-button')
+        await user.click(continueButton)
+
+        await waitFor(() => {
+            // Should be called twice
+            expect(mockFindUnusedDeliveryShipment).toHaveBeenCalledTimes(2)
+
+            // First call should have null values in the array (no shipments assigned yet)
+            expect(mockFindUnusedDeliveryShipment).toHaveBeenNthCalledWith(
+                1,
+                mockBasket,
+                expect.arrayContaining([null]) // Initial state has null values
+            )
+
+            // Second call should exclude the first assigned shipment
+            expect(mockFindUnusedDeliveryShipment).toHaveBeenNthCalledWith(
+                2,
+                mockBasket,
+                expect.arrayContaining(['unused-shipment-1'])
+            )
+
+            // Should update both unused shipments
+            expect(mockUpdateDeliveryAddressForShipment).toHaveBeenCalledTimes(2)
         })
     })
 })
