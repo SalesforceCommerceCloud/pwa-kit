@@ -53,12 +53,30 @@ const deliverToMultipleAddressesLabel = defineMessage({
     defaultMessage: 'Deliver to Multiple Addresses',
     id: 'shipping_address.action.deliver_to_multiple_addresses'
 })
+const multiShippingTitleLabel = defineMessage({
+    defaultMessage: 'Delivering to multiple addresses',
+    id: 'shipping_address.title.multi_shipping'
+})
+const shippingAddressTitleLabel = defineMessage({
+    defaultMessage: 'Shipping Address',
+    id: 'shipping_address.title.shipping_address'
+})
+const editShippingAddressLabel = defineMessage({
+    defaultMessage: 'Edit Shipping Address',
+    id: 'toggle_card.action.editShippingAddress'
+})
+const editMultiShippingLabel = defineMessage({
+    defaultMessage: 'Edit',
+    id: 'toggle_card.action.editMultiShipping'
+})
 
 export default function ShippingAddress() {
     const {formatMessage} = useIntl()
     const [isLoading, setIsLoading] = useState()
     const [isMultiShipping, setIsMultiShipping] = useState(false)
     const [isGuestMultiShippingSummary, setIsGuestMultiShippingSummary] = useState(false)
+    const [guestAddresses, setGuestAddresses] = useState([])
+    const [guestSelectedAddresses, setGuestSelectedAddresses] = useState({})
     const {data: customer} = useCurrentCustomer()
     const {data: basket} = useCurrentBasket()
     const selectedShippingAddress = basket?.shipments && basket?.shipments[0]?.shippingAddress
@@ -151,18 +169,18 @@ export default function ShippingAddress() {
     return (
         <ToggleCard
             id="step-1"
-            title={formatMessage({
-                defaultMessage: 'Shipping Address',
-                id: 'shipping_address.title.shipping_address'
-            })}
+            title={formatMessage(
+                isMultiShipping && isGuestMultiShippingSummary
+                    ? multiShippingTitleLabel
+                    : shippingAddressTitleLabel
+            )}
             editing={isEditingShippingAddress}
             isLoading={isLoading}
             disabled={step === STEPS.CONTACT_INFO && !selectedShippingAddress}
             onEdit={() => goToStep(STEPS.SHIPPING_ADDRESS)}
-            editLabel={formatMessage({
-                defaultMessage: 'Edit Shipping Address',
-                id: 'toggle_card.action.editShippingAddress'
-            })}
+            editLabel={formatMessage(
+                isMultiShipping ? editMultiShippingLabel : editShippingAddressLabel
+            )}
             editAction={
                 isMultiShipping
                     ? formatMessage(shipToOneAddressLabel)
@@ -188,6 +206,10 @@ export default function ShippingAddress() {
                         noItemsInBasketMessage={noItemsInBasketMessage}
                         deliveryAddressLabel={deliveryAddressLabel}
                         onGuestSubmit={() => setIsGuestMultiShippingSummary(true)}
+                        guestAddresses={guestAddresses}
+                        setGuestAddresses={setGuestAddresses}
+                        guestSelectedAddresses={guestSelectedAddresses}
+                        setGuestSelectedAddresses={setGuestSelectedAddresses}
                     />
                 )}
             </ToggleCardEdit>

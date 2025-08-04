@@ -133,7 +133,11 @@ const ShippingMultiAddress = ({
     addNewAddressLabel,
     noItemsInBasketMessage,
     deliveryAddressLabel,
-    onGuestSubmit
+    onGuestSubmit,
+    guestAddresses,
+    setGuestAddresses,
+    guestSelectedAddresses,
+    setGuestSelectedAddresses
 }) => {
     const {formatMessage} = useIntl()
     const {currency} = useCurrency()
@@ -178,9 +182,7 @@ const ShippingMultiAddress = ({
         isLoading: customerLoading
     } = useCurrentCustomer()
 
-    // Guest address management with useState
-    const [guestAddresses, setGuestAddresses] = useState([])
-    const [guestSelectedAddresses, setGuestSelectedAddresses] = useState({})
+    // Guest address management - now passed as props from parent
 
     // Use appropriate address source based on user type
     const addresses = customer && customer.isGuest ? guestAddresses : customer?.addresses || []
@@ -1080,7 +1082,11 @@ ShippingMultiAddress.propTypes = {
     addNewAddressLabel: PropTypes.object.isRequired,
     noItemsInBasketMessage: PropTypes.object.isRequired,
     deliveryAddressLabel: PropTypes.object.isRequired,
-    onGuestSubmit: PropTypes.func
+    onGuestSubmit: PropTypes.func,
+    guestAddresses: PropTypes.array,
+    setGuestAddresses: PropTypes.func,
+    guestSelectedAddresses: PropTypes.object,
+    setGuestSelectedAddresses: PropTypes.func
 }
 
 export default ShippingMultiAddress
