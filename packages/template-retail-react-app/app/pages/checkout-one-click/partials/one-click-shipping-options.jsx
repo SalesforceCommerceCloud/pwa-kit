@@ -66,7 +66,6 @@ export default function ShippingOptions() {
             form.reset({shippingMethodId: defaultMethodId})
         }
 
-        // Update form if shipping method changes
         if (selectedShippingMethod && methodId !== selectedShippingMethod.id) {
             form.reset({shippingMethodId: selectedShippingMethod.id})
         }
