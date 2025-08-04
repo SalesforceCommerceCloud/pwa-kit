@@ -15,6 +15,7 @@ import {
 } from '@salesforce/retail-react-app/app/components/toggle-card'
 import ShippingAddressSelection from '@salesforce/retail-react-app/app/pages/checkout/partials/shipping-address-selection'
 import AddressDisplay from '@salesforce/retail-react-app/app/components/address-display'
+import {Text} from '@salesforce/retail-react-app/app/components/shared/ui'
 import {
     useShopperCustomersMutation,
     useShopperBasketsMutation
@@ -57,6 +58,7 @@ export default function ShippingAddress() {
     const {formatMessage} = useIntl()
     const [isLoading, setIsLoading] = useState()
     const [isMultiShipping, setIsMultiShipping] = useState(false)
+    const [isGuestMultiShippingSummary, setIsGuestMultiShippingSummary] = useState(false)
     const {data: customer} = useCurrentCustomer()
     const {data: basket} = useCurrentBasket()
     const selectedShippingAddress = basket?.shipments && basket?.shipments[0]?.shippingAddress
@@ -185,12 +187,24 @@ export default function ShippingAddress() {
                         addNewAddressLabel={addNewAddressLabel}
                         noItemsInBasketMessage={noItemsInBasketMessage}
                         deliveryAddressLabel={deliveryAddressLabel}
+                        onGuestSubmit={() => setIsGuestMultiShippingSummary(true)}
                     />
                 )}
             </ToggleCardEdit>
-            {isAddressFilled && (
+            {isAddressFilled && !isMultiShipping && (
                 <ToggleCardSummary>
                     <AddressDisplay address={selectedShippingAddress} />
+                </ToggleCardSummary>
+            )}
+            {isMultiShipping && isGuestMultiShippingSummary && (
+                <ToggleCardSummary>
+                    <Text fontSize="md" color="gray.700">
+                        {formatMessage({
+                            id: 'shipping_multi_address.summary.message',
+                            defaultMessage:
+                                'Your items are being delivered to multiple addresses. See details below.'
+                        })}
+                    </Text>
                 </ToggleCardSummary>
             )}
         </ToggleCard>

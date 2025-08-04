@@ -132,7 +132,8 @@ const ShippingMultiAddress = ({
     submitButtonLabel,
     addNewAddressLabel,
     noItemsInBasketMessage,
-    deliveryAddressLabel
+    deliveryAddressLabel,
+    onGuestSubmit
 }) => {
     const {formatMessage} = useIntl()
     const {currency} = useCurrency()
@@ -345,6 +346,17 @@ const ShippingMultiAddress = ({
         const handleSubmit = async () => {
             //TODO: handle shipment creation with guest addressses
             console.log('Guest user submit clicked!')
+            console.log('Guest addresses:', guestAddresses)
+            console.log('Guest selected addresses:', guestSelectedAddresses)
+            console.log('Delivery items:', deliveryItems)
+
+            // Call the callback to set summary mode in parent
+            if (onGuestSubmit) {
+                onGuestSubmit()
+            }
+
+            // Navigate to next step
+            goToStep(STEPS.SHIPPING_OPTIONS)
         }
 
         return (
@@ -1067,7 +1079,8 @@ ShippingMultiAddress.propTypes = {
     submitButtonLabel: PropTypes.object.isRequired,
     addNewAddressLabel: PropTypes.object.isRequired,
     noItemsInBasketMessage: PropTypes.object.isRequired,
-    deliveryAddressLabel: PropTypes.object.isRequired
+    deliveryAddressLabel: PropTypes.object.isRequired,
+    onGuestSubmit: PropTypes.func
 }
 
 export default ShippingMultiAddress
