@@ -82,9 +82,13 @@ export const useShopperConsentsApiClient = (params: ShopperConsentsApiParams) =>
          */
         upsertSubscription: useCallback(
             async (consentItem: ConsentItem) => {
-                return apiCallout('/subscriptions', 'POST', consentItem)
+                const queryParams = new URLSearchParams({
+                    siteId,
+                    locale
+                })
+                return apiCallout(`/subscriptions?${queryParams.toString()}`, 'POST', consentItem)
             },
-            [apiCallout]
+            [apiCallout, siteId, locale]
         )
     }
 }
