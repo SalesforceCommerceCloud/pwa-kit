@@ -112,8 +112,18 @@ afterAll(() => {
 })
 
 describe('ApplePayExpress', () => {
+    const mockBasket = {
+        basketId: 'test-basket',
+        orderTotal: 100,
+        currency: 'USD',
+        customerInfo: {
+            customerId: 'test-customer'
+        }
+    }
+
     const mockProps = {
-        shippingMethods: []
+        shippingMethods: [],
+        basketData: mockBasket
     }
 
     const mockAdyenEnvironment = {
@@ -131,15 +141,6 @@ describe('ApplePayExpress', () => {
             }
         ],
         applicationInfo: {}
-    }
-
-    const mockBasket = {
-        basketId: 'test-basket',
-        orderTotal: 100,
-        currency: 'USD',
-        customerInfo: {
-            customerId: 'test-customer'
-        }
     }
 
     beforeEach(() => {
@@ -166,7 +167,7 @@ describe('ApplePayExpress', () => {
         useAdyenExpressCheckout.mockReturnValue({
             adyenEnvironment: mockAdyenEnvironment,
             adyenPaymentMethods: mockAdyenPaymentMethods,
-            basket: mockBasket,
+            basket: mockProps.basketData,
             locale: {id: 'en-US'},
             site: 'test-site',
             authToken: 'test-token',
@@ -189,7 +190,7 @@ describe('ApplePayExpress', () => {
     })
 
     it('initializes AdyenCheckout with correct configuration', async () => {
-        render(<ApplePayExpress {...mockProps} basketData={mockBasket} />)
+        render(<ApplePayExpress {...mockProps} />)
 
         await waitFor(() => {
             expect(AdyenCheckout).toHaveBeenCalledWith({
@@ -213,7 +214,7 @@ describe('ApplePayExpress', () => {
         const mockPostMessage = jest.fn()
         window.postMessage = mockPostMessage
 
-        render(<ApplePayExpress {...mockProps} basketData={mockBasket} />)
+        render(<ApplePayExpress {...mockProps} />)
 
         await waitFor(() => {
             expect(mockPostMessage).toHaveBeenCalledWith(
@@ -229,7 +230,7 @@ describe('ApplePayExpress', () => {
     })
 
     it('mounts Apple Pay button when available', async () => {
-        render(<ApplePayExpress {...mockProps} basketData={mockBasket} />)
+        render(<ApplePayExpress {...mockProps} />)
 
         await waitFor(() => {
             expect(AdyenCheckout).toHaveBeenCalled()
@@ -619,17 +620,17 @@ describe('getAppleButtonConfig', () => {
 })
 
 describe('ApplePayExpress error and edge cases', () => {
-    const mockProps = {shippingMethods: []}
-    const mockAdyenEnvironment = {ADYEN_ENVIRONMENT: 'test', ADYEN_CLIENT_KEY: 'test_key'}
-    const mockAdyenPaymentMethods = {
-        paymentMethods: [{type: 'applepay', configuration: {merchantName: 'Test Merchant'}}],
-        applicationInfo: {}
-    }
     const mockBasket = {
         basketId: 'test-basket',
         orderTotal: 100,
         currency: 'USD',
         customerInfo: {customerId: 'test-customer'}
+    }
+    const mockProps = {shippingMethods: [], basketData: mockBasket}
+    const mockAdyenEnvironment = {ADYEN_ENVIRONMENT: 'test', ADYEN_CLIENT_KEY: 'test_key'}
+    const mockAdyenPaymentMethods = {
+        paymentMethods: [{type: 'applepay', configuration: {merchantName: 'Test Merchant'}}],
+        applicationInfo: {}
     }
     let originalPostMessage
     beforeEach(() => {
@@ -656,7 +657,7 @@ describe('ApplePayExpress error and edge cases', () => {
         useAdyenExpressCheckout.mockReturnValue({
             adyenEnvironment: mockAdyenEnvironment,
             adyenPaymentMethods: mockAdyenPaymentMethods,
-            basket: mockBasket,
+            basket: mockProps.basketData,
             locale: {id: 'en-US'},
             site: 'test-site',
             authToken: 'test-token',
@@ -672,7 +673,7 @@ describe('ApplePayExpress error and edge cases', () => {
         AdyenCheckout.mockImplementation(() => {
             throw new Error('fail')
         })
-        render(<ApplePayExpress {...mockProps} basketData={mockBasket} />)
+        render(<ApplePayExpress {...mockProps} />)
         await waitFor(() => {
             expect(window.postMessage).toHaveBeenCalledWith(
                 expect.objectContaining({type: 'express.payment.unavailable'}),
@@ -686,7 +687,7 @@ describe('ApplePayExpress error and edge cases', () => {
                 throw new Error('fail create')
             })
         })
-        render(<ApplePayExpress {...mockProps} basketData={mockBasket} />)
+        render(<ApplePayExpress {...mockProps} />)
         await waitFor(() => {
             expect(window.postMessage).toHaveBeenCalledWith(
                 expect.objectContaining({type: 'express.payment.unavailable'}),
@@ -703,7 +704,7 @@ describe('ApplePayExpress error and edge cases', () => {
                 mount: jest.fn()
             })
         })
-        render(<ApplePayExpress {...mockProps} basketData={mockBasket} />)
+        render(<ApplePayExpress {...mockProps} />)
         await waitFor(() => {
             expect(window.postMessage).toHaveBeenCalledWith(
                 expect.objectContaining({type: 'express.payment.unavailable'}),
@@ -718,7 +719,7 @@ describe('ApplePayExpress error and edge cases', () => {
                 mount: jest.fn()
             })
         })
-        render(<ApplePayExpress {...mockProps} basketData={mockBasket} />)
+        render(<ApplePayExpress {...mockProps} />)
         await waitFor(() => {
             expect(window.postMessage).toHaveBeenCalledWith(
                 expect.objectContaining({type: 'express.payment.unavailable'}),
@@ -735,7 +736,7 @@ describe('ApplePayExpress error and edge cases', () => {
                 })
             })
         })
-        render(<ApplePayExpress {...mockProps} basketData={mockBasket} />)
+        render(<ApplePayExpress {...mockProps} />)
         await waitFor(() => {
             expect(window.postMessage).toHaveBeenCalledWith(
                 expect.objectContaining({type: 'express.payment.unavailable'}),
@@ -755,7 +756,8 @@ describe('ApplePayExpress error and edge cases', () => {
             shippingMethods: {applicableShippingMethods: []},
             fetchShippingMethods: jest.fn()
         })
-        render(<ApplePayExpress {...mockProps} basketData={null} />)
+        const propsWithoutBasket = {...mockProps, basketData: null}
+        render(<ApplePayExpress {...propsWithoutBasket} />)
         // Should not call AdyenCheckout when basket data is missing in regular mode
         await new Promise(resolve => setTimeout(resolve, 100))
         expect(AdyenCheckout).not.toHaveBeenCalled()
@@ -778,7 +780,7 @@ describe('ApplePayExpress error and edge cases', () => {
                 mount: jest.fn()
             })
         })
-        render(<ApplePayExpress {...mockProps} basketData={mockBasket} />)
+        render(<ApplePayExpress {...mockProps} />)
         await waitFor(() => {
             expect(AdyenCheckout).toHaveBeenCalled()
         })
