@@ -51,7 +51,7 @@ const options = {
     // Set this to false if using a SLAS public client
     // When setting this to true, make sure to also set the PWA_KIT_SLAS_CLIENT_SECRET
     // environment variable as this endpoint will return HTTP 501 if it is not set
-    useSLASPrivateClient: false,
+    useSLASPrivateClient: true,
 
     // If you wish to use additional SLAS endpoints that require private clients,
     // customize this regex to include the additional endpoints the custom SLAS
@@ -139,7 +139,7 @@ async function sendMarketingCloudEmail(emailId, marketingCloudConfig) {
             recipient: {
                 contactKey: emailId,
                 to: emailId,
-                attributes: {'magic-link': marketingCloudConfig.magicLink}
+                attributes: attributes
             }
         })
     })
@@ -159,7 +159,7 @@ async function sendMarketingCloudEmail(emailId, marketingCloudConfig) {
  *
  * @return {Promise<object>} A promise that resolves to the response object received from the Marketing Cloud API.
  */
-export async function emailLink(emailId, templateId, magicLink) {
+export async function emailLink(emailId, templateId, attributes) {
     if (!process.env.MARKETING_CLOUD_CLIENT_ID) {
         console.warn('MARKETING_CLOUD_CLIENT_ID is not set in the environment variables.')
     }
@@ -179,7 +179,7 @@ export async function emailLink(emailId, templateId, magicLink) {
         subdomain: process.env.MARKETING_CLOUD_SUBDOMAIN,
         templateId: templateId
     }
-    return await sendMarketingCloudEmail(emailId, marketingCloudConfig)
+    return await sendMarketingCloudEmail(emailId, marketingCloudConfig, attributes)
 }
 
 const resetPasswordCallback =
@@ -207,7 +207,20 @@ async function sendMagicLinkEmail(req, res, landingPath, emailTemplate, redirect
     }
 
     // Call the emailLink function to send an email with the magic link using Marketing Cloud
-    const emailLinkResponse = await emailLink(email_id, emailTemplate, magicLink)
+    const emailLinkResponse = await emailLink(email_id, emailTemplate, {magicLink: magicLink})
+
+    // Send the response
+    res.send(emailLinkResponse)
+}
+
+// Reusable function to handle sending an OTP email
+// By default, this implementation uses Marketing Cloud.
+async function sendOtpEmail(req, res, emailTemplate) {
+    // Extract the email_id and token from the request body
+    const {email_id, token} = req.body
+
+    // Call the emailLink function to send an email with the magic link using Marketing Cloud
+    const emailLinkResponse = await emailLink(email_id, emailTemplate, {token: token})
 
     // Send the response
     res.send(emailLinkResponse)
@@ -305,7 +318,8 @@ const {handler} = runtime.createHandler(options, (app) => {
                 directives: {
                     'img-src': [
                         // Default source for product images - replace with your CDN
-                        '*.commercecloud.salesforce.com'
+                        '*.commercecloud.salesforce.com',
+                        "*.demandware.net"
                     ],
                     'script-src': [
                         // Used by the service worker in /worker/main.js
@@ -347,14 +361,23 @@ const {handler} = runtime.createHandler(options, (app) => {
     app.post(passwordlessLoginCallback, (req, res) => {
         const slasCallbackToken = req.headers['x-slas-callback-token']
         const redirectUrl = req.query.redirectUrl
+        const mode = req.query.mode
         validateSlasCallbackToken(slasCallbackToken).then(() => {
-            sendMagicLinkEmail(
-                req,
-                res,
-                config.app.login?.passwordless?.landingPath,
-                process.env.MARKETING_CLOUD_PASSWORDLESS_LOGIN_TEMPLATE,
-                redirectUrl
-            )
+            if (mode === 'magic_link') {
+                sendMagicLinkEmail(
+                    req,
+                    res,
+                    config.app.login?.passwordless?.landingPath,
+                    process.env.MARKETING_CLOUD_PASSWORDLESS_LOGIN_TEMPLATE,
+                    redirectUrl
+                )
+            } else if (mode === 'otp_email') {
+                sendOtpEmail(
+                    req,
+                    res,
+                    process.env.MARKETING_CLOUD_OTP_EMAIL_TEMPLATE
+                )
+            }
         })
     })
 
