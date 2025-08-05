@@ -87,11 +87,11 @@ class CreateNewPageTool {
 
     async createPage(pageName, componentList, route) {
         logMCPMessage(
-            `========== Creating page ${pageName} with layout 'flex' and components ${componentList} and route ${route}`
+            `========== Creating page ${pageName} with components ${componentList} and route ${route}`
         )
         this.unfoundComponents = []
         await logMCPMessage(
-            `Creating page ${pageName} with layout 'flex' and components ${componentList} and route ${route}`
+            `Creating page ${pageName} with components ${componentList} and route ${route}`
         )
 
         try {
@@ -171,6 +171,12 @@ class CreateNewPageTool {
                 `import {getAssetUrl} from '@salesforce/pwa-kit-react-sdk/ssr/universal/utils'`,
                 `import ${componentName} from '@salesforce/retail-react-app/app/components/${componentDir}'`
             )
+            // Import getAssetUrl for displaying image source if Image component is used
+            if (componentName === 'Image') {
+                imports.push(
+                    `import {getAssetUrl} from '@salesforce/pwa-kit-react-sdk/ssr/universal/utils'`
+                )
+            }
         })
 
         return Promise.all(accessPromises).then(() => {
@@ -203,7 +209,7 @@ ${imports.join('\n')}
 const ${pageName} = () => {
 
     return (
-        <Box data-testid="${pageName.toLowerCase()}-page" layerStyle="page" display="flex">
+        <Box data-testid="${pageName.toLowerCase()}-page" layerStyle="page">
             <Seo
                 title="${pageName}"
                 description="${pageName} Page"
