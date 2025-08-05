@@ -135,8 +135,8 @@ const ShippingMultiAddress = ({
     deliveryAddressLabel,
     guestAddresses,
     setGuestAddresses,
-    selectedAddresses,
-    setSelectedAddresses
+    selectedGuestAddresses,
+    setSelectedGuestAddresses
 }) => {
     const {formatMessage} = useIntl()
     const {currency} = useCurrency()
@@ -185,7 +185,7 @@ const ShippingMultiAddress = ({
     const addresses = customer?.addresses || []
 
     // Initialize selected addresses with default addresses
-    const [selectedAddresses, setSelectedAddresses] = useState({})
+    const [selectedRegisteredUserAddresses, setSelectedRegisteredUserAddresses] = useState({})
 
     useEffect(() => {
         if (customer && basket?.productItems) {
@@ -240,8 +240,8 @@ const ShippingMultiAddress = ({
                 })
             }
 
-            // Only update selectedAddresses if it's empty or if we have new items that aren't selected yet
-            setSelectedAddresses((prev) => {
+            // Only update selectedRegisteredUserAddresses if it's empty or if we have new items that aren't selected yet
+            setSelectedRegisteredUserAddresses((prev) => {
                 const newState = {...prev}
                 let hasChanges = false
 
@@ -294,7 +294,7 @@ const ShippingMultiAddress = ({
 
     // Check if all product items have an address selected
     const allShipmentsHaveAddress = (basket.productItems ?? []).every(
-        (item) => selectedAddresses[item.itemId]
+        (item) => selectedRegisteredUserAddresses[item.itemId]
     )
 
     if (!deliveryItems.length) {
@@ -391,10 +391,10 @@ const ShippingMultiAddress = ({
                             const itemKey = item.itemId
                             initialSelected[itemKey] = newAddress.addressId
                         })
-                        setSelectedAddresses(initialSelected)
+                        setSelectedGuestAddresses(initialSelected)
                     } else {
                         // For subsequent addresses, only assign to the current item
-                        setSelectedAddresses((prev) => ({
+                        setSelectedGuestAddresses((prev) => ({
                             ...prev,
                             [addressKey]: newAddress.addressId
                         }))
@@ -442,7 +442,7 @@ const ShippingMultiAddress = ({
 
                 await refetchCustomer()
 
-                setSelectedAddresses((prev) => ({
+                setSelectedGuestAddresses((prev) => ({
                     ...prev,
                     [addressKey]: createdAddress.addressId
                 }))
@@ -475,7 +475,8 @@ const ShippingMultiAddress = ({
 
             deliveryItems.forEach((item) => {
                 // Defaults to the first address if no address is selected
-                const addressId = selectedAddresses[item.itemId] || finalAddresses[0]?.addressId
+                const addressId =
+                    selectedRegisteredUserAddresses[item.itemId] || finalAddresses[0]?.addressId
                 const address = finalAddresses.find((addr) => addr.addressId === addressId)
 
                 // If there is an existing shipment with the same address, use it in the next step
@@ -679,7 +680,9 @@ const ShippingMultiAddress = ({
                                                     ) : (
                                                         <Select
                                                             value={
-                                                                selectedAddresses[addressKey] || ''
+                                                                selectedGuestAddresses[
+                                                                    addressKey
+                                                                ] || ''
                                                             }
                                                             onChange={(e) => {
                                                                 const value = e.target.value
@@ -688,15 +691,20 @@ const ShippingMultiAddress = ({
                                                                     ...prev,
                                                                     [addressKey]: false
                                                                 }))
-                                                                setSelectedAddresses((prev) => {
-                                                                    const newState = {...prev}
-                                                                    if (value === '') {
-                                                                        delete newState[addressKey]
-                                                                    } else {
-                                                                        newState[addressKey] = value
+                                                                setSelectedRegisteredUserAddresses(
+                                                                    (prev) => {
+                                                                        const newState = {...prev}
+                                                                        if (value === '') {
+                                                                            delete newState[
+                                                                                addressKey
+                                                                            ]
+                                                                        } else {
+                                                                            newState[addressKey] =
+                                                                                value
+                                                                        }
+                                                                        return newState
                                                                     }
-                                                                    return newState
-                                                                })
+                                                                )
                                                             }}
                                                             disabled={
                                                                 finalAddresses.length === 0 ||
@@ -849,8 +857,8 @@ ShippingMultiAddress.propTypes = {
     deliveryAddressLabel: PropTypes.object.isRequired,
     guestAddresses: PropTypes.array,
     setGuestAddresses: PropTypes.func,
-    selectedAddresses: PropTypes.object,
-    setSelectedAddresses: PropTypes.func
+    selectedGuestAddresses: PropTypes.object,
+    setSelectedGuestAddresses: PropTypes.func
 }
 
 export default ShippingMultiAddress
