@@ -22,7 +22,7 @@ import {createUrlTemplate} from '../../utils/url'
 import createLogger from '@salesforce/pwa-kit-runtime/utils/logger-factory'
 import {isServer} from '../../utils/utils'
 
-import {CommerceApiProvider} from '@salesforce/commerce-sdk-react'
+import {CommerceApiProvider, resetDehydratedStateTimeStamp} from '@salesforce/commerce-sdk-react'
 import {withReactQuery} from '@salesforce/pwa-kit-react-sdk/ssr/universal/components/with-react-query'
 import {useCorrelationId} from '@salesforce/pwa-kit-react-sdk/ssr/universal/hooks'
 import {ReactQueryDevtools} from '@tanstack/react-query-devtools'
@@ -149,21 +149,7 @@ const options = {
             }
         }
     },
-    beforeHydrate: (data) => {
-        const now = Date.now()
-
-        // Helper to reset the data timestamp to time of app load.
-        const updateQueryTimeStamp = ({state}) => {
-            state.dataUpdatedAt = now
-        }
-
-        // Update serialized mutations and queries to ensure that the cached data is
-        // considered fresh on first load.
-        data?.mutations?.forEach(updateQueryTimeStamp)
-        data?.queries?.forEach(updateQueryTimeStamp)
-
-        return data
-    }
+    beforeHydrate: resetDehydratedStateTimeStamp
 }
 
 export default withReactQuery(AppConfig, options)
