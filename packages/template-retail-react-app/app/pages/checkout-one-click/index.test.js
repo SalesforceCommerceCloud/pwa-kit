@@ -1191,6 +1191,11 @@ test('Can proceed through checkout as registered customer', async () => {
 })
 
 test('Can register account during checkout as a guest', async () => {
+    // Mock authorizePasswordlessLogin to fail with 404 (unregistered user)
+    mockUseAuthHelper.mockRejectedValueOnce({
+        response: {status: 404}
+    })
+
     // Set the initial browser router path and render our component tree.
     window.history.pushState({}, 'Checkout', createPathWithDefaults('/checkout'))
     const {user} = renderWithProviders(<WrappedCheckout history={history} />, {
@@ -1204,11 +1209,15 @@ test('Can register account during checkout as a guest', async () => {
 
     await screen.findByText(/contact info/i)
 
-    const emailInput = screen.getByLabelText(/email/i)
-    const continueBtn = screen.getByText(/continue to shipping address/i)
+    const emailInput = await screen.findByLabelText(/email/i)
     await user.type(emailInput, 'test@test.com')
-    await user.click(continueBtn)
 
+    // Blur the email field to trigger the authorizePasswordlessLogin call
+    await user.tab()
+
+    // Wait for the continue button to appear after the 404 response
+    const continueBtn = await screen.findByText(/continue to shipping address/i)
+    await user.click(continueBtn)
     await waitFor(() => {
         expect(screen.getByTestId('sf-toggle-card-step-1-content')).not.toBeEmptyDOMElement()
     })

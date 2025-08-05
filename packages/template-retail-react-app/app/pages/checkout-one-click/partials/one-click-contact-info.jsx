@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React, {useRef, useState} from 'react'
+import React, {useRef, useState, useEffect} from 'react'
 import PropTypes from 'prop-types'
 import {
     Alert,
@@ -67,6 +67,38 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
     const loginPasswordless = useAuthHelper(AuthHelpers.LoginPasswordlessUser)
 
     const {step, STEPS, goToStep, goToNextStep} = useCheckout()
+
+    // Helper function to directly read customer type from localStorage
+    // This bypasses React state staleness after login
+    const getCustomerTypeFromStorage = () => {
+        if (typeof window !== 'undefined') {
+            const customerTypeKey = `customer_type_${config.siteId}`
+            return localStorage.getItem(customerTypeKey)
+        }
+        return null
+    }
+
+    // Helper function to directly read customer ID from localStorage
+    const getCustomerIdFromStorage = () => {
+        if (typeof window !== 'undefined') {
+            const customerIdKey = `customer_id_${config.siteId}`
+            return localStorage.getItem(customerIdKey)
+        }
+        return null
+    }
+
+    // Helper function to extract basket ID from either structure
+    const getBasketId = (basketData) => {
+        // Handle individual basket structure: {basketId: "...", productItems: [...]}
+        if (basketData?.basketId) {
+            return basketData.basketId
+        }
+        // Handle baskets collection structure: {baskets: [{basketId: "..."}], total: 1}
+        if (basketData?.baskets?.[0]?.basketId) {
+            return basketData.baskets[0].basketId
+        }
+        return null
+    }
 
     const form = useForm({
         defaultValues: {
