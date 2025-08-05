@@ -59,7 +59,7 @@ module.exports = {
             tenantId: 'mmydmztgh04dczjzmnsw0zd0g8.pc-rnd'
         },
         googleCloudAPI: {
-            apiKey: process.env.GOOGLE_CLOUD_API_KEY,
+            apiKey: process.env.GOOGLE_CLOUD_API_KEY
         }
     },
     externals: [],
