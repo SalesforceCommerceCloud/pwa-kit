@@ -293,7 +293,7 @@ const CheckoutOneClick = () => {
                             />
 
                             {/* Place Order Button */}
-                            <Box display="flex" bottom="0" px={4} pt={6} pb={11}>
+                            <Box display="flex" bottom="0" px={4} pt={2} pb={4}>
                                 <Container variant="form">
                                     <Button
                                         w="full"
