@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import {useEffect, useState} from 'react'
-import {expressPaymentManager} from '../utils/express-payment-manager'
+import {expressPaymentManager} from '@salesforce/retail-react-app/app/components/express/utils/express-payment-manager'
 
 /**
  * Hook to get the height to use for express payment boundary
@@ -13,24 +13,23 @@ import {expressPaymentManager} from '../utils/express-payment-manager'
  */
 export function useExpressPaymentHeight() {
     const [height, setHeight] = useState(0)
-    
+
     useEffect(() => {
         // Set initial height
         setHeight(expressPaymentManager.getCurrentHeight())
-        
+
         // Add listener for height changes
         const handleHeightChange = (newHeight) => {
-            console.log('[useExpressPaymentHeight] Height changed to:', newHeight)
             setHeight(newHeight)
         }
         expressPaymentManager.addHeightListener(handleHeightChange)
-        
+
         // Cleanup listener on unmount
         return () => {
             expressPaymentManager.removeHeightListener(handleHeightChange)
         }
     }, [])
-    
+
     return height
 }
 
@@ -41,28 +40,23 @@ export function useExpressPaymentHeight() {
  */
 export function useExpressPaymentManager(paymentMethodIds) {
     const [error, setError] = useState(null)
-    
+
     useEffect(() => {
-        console.log('[useExpressPaymentManager] Initializing manager with payment methods:', paymentMethodIds)
-        
         try {
             if (Array.isArray(paymentMethodIds) && paymentMethodIds.length > 0) {
-                console.log('[useExpressPaymentManager] About to call expressPaymentManager.initialize...')
                 expressPaymentManager.initialize(paymentMethodIds)
-                console.log('[useExpressPaymentManager] expressPaymentManager.initialize called successfully')
                 setError(null)
             } else {
                 const error = new Error('No payment method IDs provided or invalid array')
                 setError(error)
             }
         } catch (err) {
-            console.error('[useExpressPaymentManager] Error initializing manager:', err)
             setError(err)
         }
     }, [])
-    
+
     return {
         manager: expressPaymentManager,
         error
     }
-} 
+}

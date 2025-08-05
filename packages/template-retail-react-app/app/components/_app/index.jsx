@@ -192,7 +192,7 @@ const App = (props) => {
     const isExpress = /\/express$/.test(location?.pathname)
 
     // Get dynamic height for express payments
-    const expressPaymentHeight = isExpress ? useExpressPaymentHeight() : 0
+    const expressPaymentHeight = useExpressPaymentHeight()
 
     const {l10n} = site
     // Get the current currency to be used through out the app
@@ -294,7 +294,9 @@ const App = (props) => {
 
     return isExpress ? (
         <OfflineBoundary isOnline={false}>
-            <div style={{width: '100%', height: `${expressPaymentHeight}px`, overflowY: 'hidden'}}>{children}</div>
+            <div style={{width: '100%', height: `${expressPaymentHeight}px`, overflowY: 'hidden'}}>
+                {children}
+            </div>
         </OfflineBoundary>
     ) : (
         <Box className="sf-app" {...styles.container}>

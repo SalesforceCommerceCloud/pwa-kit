@@ -5,7 +5,11 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import {EXPRESS_MESSAGES, EXPRESS_BUTTON_HEIGHT, EXPRESS_BUTTON_GAP} from './constants'
+import {
+    EXPRESS_MESSAGES,
+    EXPRESS_BUTTON_HEIGHT,
+    EXPRESS_BUTTON_GAP
+} from '@salesforce/retail-react-app/app/components/express/utils/constants'
 
 /**
  * Sends a message to the parent window
@@ -30,9 +34,9 @@ function sendExpressMessage(type, payload) {
 function calculateExpressPaymentHeight(availableCount) {
     if (availableCount <= 0) return 0
     if (availableCount === 1) return EXPRESS_BUTTON_HEIGHT
-    
+
     // For multiple buttons:
-    return (EXPRESS_BUTTON_HEIGHT * availableCount) + (EXPRESS_BUTTON_GAP * (availableCount - 1))
+    return EXPRESS_BUTTON_HEIGHT * availableCount + EXPRESS_BUTTON_GAP * (availableCount - 1)
 }
 
 /**
@@ -75,9 +79,8 @@ class ExpressPaymentManager {
      */
     notifyHeightListeners() {
         const height = this.getCurrentHeight()
-        console.log('[ExpressPaymentManager] Notifying height listeners of new height:', height)
-        this.heightListeners.forEach(listener => {
-            listener(height)            
+        this.heightListeners.forEach((listener) => {
+            listener(height)
         })
     }
 
@@ -105,9 +108,8 @@ class ExpressPaymentManager {
      * @param {string} paymentMethod - Payment method identifier
      */
     setPaymentMethodAvailable(paymentMethod) {
-        console.log('[ExpressPaymentManager] Setting payment method as available:', paymentMethod)
         const currentStatus = this.paymentMethods.get(paymentMethod)
-        
+
         // currentStatus should always be pending here, but confirming
         if (currentStatus === 'pending') {
             this.paymentMethods.set(paymentMethod, 'available')
@@ -121,11 +123,10 @@ class ExpressPaymentManager {
      * @param {string} paymentMethod - Payment method identifier
      */
     setPaymentMethodUnavailable(paymentMethod) {
-        console.log('[ExpressPaymentManager] Setting payment method as unavailable:', paymentMethod)
         const currentStatus = this.paymentMethods.get(paymentMethod)
-        
+
         // currentStatus should always be pending here, but confirming
-        if (currentStatus === 'pending') { 
+        if (currentStatus === 'pending') {
             this.paymentMethods.set(paymentMethod, 'unavailable')
         }
         this.checkIfDone()
@@ -135,30 +136,19 @@ class ExpressPaymentManager {
      * Checks if all payment methods have reported their status
      */
     checkIfDone() {
-        console.log('[ExpressPaymentManager] Checking if done. Current state:', {
-            totalAttempted: this.totalAttempted,
-            availableCount: this.availableCount,
-            isDone: this.isDone,
-            paymentMethods: Object.fromEntries(this.paymentMethods)
-        })
-        
         if (this.isDone) {
-            console.log('[ExpressPaymentManager] Already done, skipping check')
             return
         }
-        
+
         // Check if all registered payment methods have reported their status
-        const allReported = Array.from(this.paymentMethods.values()).every(status => 
-            status === 'available' || status === 'unavailable'
+        const allReported = Array.from(this.paymentMethods.values()).every(
+            (status) => status === 'available' || status === 'unavailable'
         )
-        
+
         if (allReported && this.totalAttempted > 0) {
-            console.log('[ExpressPaymentManager] All payment methods have reported status. Sending completion message.')
             this.isDone = true
             this.notifyHeightListeners()
             this.sendDoneMessage()
-        } else {
-            console.log('[ExpressPaymentManager] Not all payment methods have reported status yet')
         }
     }
 
@@ -174,7 +164,7 @@ class ExpressPaymentManager {
             .filter(([, status]) => status === 'unavailable')
             .map(([method]) => method)
         const allMethods = Array.from(this.paymentMethods.keys())
-        
+
         const payload = {
             height,
             availableCount: this.availableCount,
@@ -183,15 +173,13 @@ class ExpressPaymentManager {
             unavailableMethods,
             allMethods
         }
-        
+
         if (this.availableCount == 0) {
-            console.log('[ExpressPaymentManager] No available payment methods, sending unavailable message')
             sendExpressMessage(EXPRESS_MESSAGES.PAYMENT_UNAVAILABLE, payload)
-            return;
+            return
         }
 
-        console.log('[ExpressPaymentManager] Completion message payload:', payload)
-        sendExpressMessage(EXPRESS_MESSAGES.PAYMENT_DONE, payload)
+        sendExpressMessage(EXPRESS_MESSAGES.PAYMENT_AVAILABLE, payload)
     }
 
     /**
@@ -202,12 +190,12 @@ class ExpressPaymentManager {
         if (this.isInitialized) {
             return
         }
-        
+
         // Register each payment method
-        paymentMethods.forEach(method => {
+        paymentMethods.forEach((method) => {
             this.registerPaymentMethod(method)
         })
-        
+
         this.isInitialized = true
     }
 
@@ -230,4 +218,4 @@ class ExpressPaymentManager {
 export const expressPaymentManager = new ExpressPaymentManager()
 
 // Export utility functions for testing
-export {sendExpressMessage, calculateExpressPaymentHeight, ExpressPaymentManager} 
+export {sendExpressMessage, calculateExpressPaymentHeight, ExpressPaymentManager}

@@ -185,7 +185,7 @@ export const getGoogleButtonConfig = (
 
     const buttonConfig = {
         showPayButton: true,
-        buttonType: 'buy',
+        buttonType: 'plain',
         isExpress: true,
         shippingAddressRequired: true,
         // shippingAddressParameters: {"allowedCountryCodes": ["US"]}, // If you want to restrict country codes, you can do that here
@@ -297,7 +297,6 @@ export const getGoogleButtonConfig = (
 }
 
 export const GooglePayExpress = ({manager}) => {
-    console.log('[GooglePayExpress] Confirming manager is available', manager)
     const {
         adyenEnvironment,
         adyenPaymentMethods,
@@ -320,7 +319,6 @@ export const GooglePayExpress = ({manager}) => {
             }
 
             const handleGooglePayUnavailable = () => {
-                console.log('[GooglePayExpress] Google Pay unavailable, setting manager to unavailable')
                 manager.setPaymentMethodUnavailable(PAYMENT_METHOD)
             }
 
@@ -375,7 +373,6 @@ export const GooglePayExpress = ({manager}) => {
 
                 try {
                     await googlePayButton.mount(paymentContainer.current)
-                    console.log('[GooglePayExpress] Google Pay available, setting manager to available')
                     manager.setPaymentMethodAvailable(PAYMENT_METHOD)
                 } catch (error) {
                     handleGooglePayUnavailable()
