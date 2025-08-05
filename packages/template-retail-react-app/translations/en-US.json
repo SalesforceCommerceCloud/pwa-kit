@@ -334,6 +334,15 @@
   "checkout_confirmation.message.will_email_shortly": {
     "defaultMessage": "We will send an email to <b>{email}</b> with your confirmation number and receipt shortly."
   },
+  "checkout_contact_info.action.edit": {
+    "defaultMessage": "Edit"
+  },
+  "checkout_contact_info.action.sign_out": {
+    "defaultMessage": "Sign Out"
+  },
+  "checkout_contact_info.title.contact_info": {
+    "defaultMessage": "Contact Info"
+  },
   "checkout_footer.link.privacy_policy": {
     "defaultMessage": "Privacy Policy"
   },
@@ -1106,10 +1115,16 @@
     "defaultMessage": "Resend code"
   },
   "otp.button.resend_timer": {
-    "defaultMessage": "Resend code"
+    "defaultMessage": "Resend code in {timer}s"
+  },
+  "otp.error.invalid_code": {
+    "defaultMessage": "Invalid or expired code. Please try again."
   },
   "otp.message.enter_code_for_account": {
     "defaultMessage": "To use your account information enter the code sent to your email."
+  },
+  "otp.message.verifying": {
+    "defaultMessage": "Verifying code..."
   },
   "otp.title.confirm_its_you": {
     "defaultMessage": "Confirm it's you"
