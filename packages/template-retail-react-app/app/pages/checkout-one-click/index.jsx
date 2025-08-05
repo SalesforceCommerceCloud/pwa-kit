@@ -53,18 +53,14 @@ const CheckoutOneClick = () => {
     const {formatMessage} = useIntl()
     const navigate = useNavigation()
     const {step} = useCheckout()
-    const [error] = useState()
     const showToast = useToast()
-
     const [isLoading, setIsLoading] = useState(false)
     const [enableUserRegistration, setEnableUserRegistration] = useState(false)
-
     const {data: basket} = useCurrentBasket()
-
-    const {passwordless = {}, social = {}} = getConfig().app.login || {}
+    const [error] = useState()
+    const {social = {}} = getConfig().app.login || {}
     const idps = social?.idps
     const isSocialEnabled = !!social?.enabled
-    const isPasswordlessEnabled = !!passwordless?.enabled
 
     // Only enable BOPIS functionality if the feature toggle is on
     const isPickupOrder = STORE_LOCATOR_IS_ENABLED
@@ -286,11 +282,7 @@ const CheckoutOneClick = () => {
                                 </Alert>
                             )}
 
-                            <ContactInfo
-                                isSocialEnabled={isSocialEnabled}
-                                isPasswordlessEnabled={isPasswordlessEnabled}
-                                idps={idps}
-                            />
+                            <ContactInfo isSocialEnabled={isSocialEnabled} idps={idps} />
                             {isPickupOrder ? <PickupAddress /> : <ShippingAddress />}
                             {!isPickupOrder && <ShippingOptions />}
                             <Payment
