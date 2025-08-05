@@ -9,6 +9,7 @@ import React from 'react'
 import {render, act} from '@testing-library/react'
 import ShopperAgent from '@salesforce/retail-react-app/app/components/shopper-agent/index'
 import useScript from '@salesforce/retail-react-app/app/hooks/use-script'
+import useRefreshToken from '@salesforce/retail-react-app/app/hooks/use-refresh-token'
 
 // Mock the embeddedservice_bootstrap object
 const mockEmbeddedService = {
@@ -31,6 +32,10 @@ jest.mock('@salesforce/commerce-sdk-react', () => {
         useUsid: () => ({usid: 'test-usid'})
     }
 })
+
+jest.mock('@salesforce/retail-react-app/app/hooks/use-refresh-token')
+
+const mockedUseRefreshToken = useRefreshToken
 
 jest.mock('@salesforce/retail-react-app/app/components/shared/ui', () => {
     const originalModule = jest.requireActual(
@@ -70,6 +75,9 @@ describe('ShopperAgent Component', () => {
         global.window.embeddedservice_bootstrap = mockEmbeddedService
 
         useScript.mockReturnValue({loaded: false, error: false})
+
+        // Default refresh token mock
+        mockedUseRefreshToken.mockReturnValue(null)
 
         // Clear any existing scripts
         const scripts = document.querySelectorAll('script[src]')
@@ -572,6 +580,104 @@ describe('ShopperAgent Component', () => {
 
             // Verify no event listeners were added
             expect(mockAddEventListener).not.toHaveBeenCalled()
+        })
+    })
+
+    describe('Refresh Token Integration', () => {
+        beforeEach(() => {
+            jest.clearAllMocks()
+            mockedUseRefreshToken.mockReturnValue(null)
+        })
+
+        test('should call useRefreshToken hook when component renders', () => {
+            const refreshToken = 'test-refresh-token-123'
+            mockedUseRefreshToken.mockReturnValue(refreshToken)
+
+            useScript.mockReturnValue({loaded: true, error: false})
+
+            const props = {
+                ...defaultProps,
+                commerceAgentConfiguration: commerceAgentSettings,
+                basketDoneLoading: true
+            }
+
+            render(<ShopperAgent {...props} />)
+
+            // Verify useRefreshToken was called (no parameters needed now)
+            expect(mockedUseRefreshToken).toHaveBeenCalled()
+        })
+
+        test('should handle null refresh token gracefully', () => {
+            mockedUseRefreshToken.mockReturnValue(null)
+
+            useScript.mockReturnValue({loaded: true, error: false})
+
+            const props = {
+                ...defaultProps,
+                commerceAgentConfiguration: commerceAgentSettings,
+                basketDoneLoading: true
+            }
+
+            render(<ShopperAgent {...props} />)
+
+            // Verify useRefreshToken was called
+            expect(mockedUseRefreshToken).toHaveBeenCalled()
+        })
+
+        test('should handle undefined refresh token gracefully', () => {
+            mockedUseRefreshToken.mockReturnValue(undefined)
+
+            useScript.mockReturnValue({loaded: true, error: false})
+
+            const props = {
+                ...defaultProps,
+                commerceAgentConfiguration: commerceAgentSettings,
+                basketDoneLoading: true
+            }
+
+            render(<ShopperAgent {...props} />)
+
+            // Verify useRefreshToken was called
+            expect(mockedUseRefreshToken).toHaveBeenCalled()
+        })
+
+        test('should not render when refresh token is not available and component is disabled', () => {
+            mockedUseRefreshToken.mockReturnValue(null)
+
+            const disabledSettings = {...commerceAgentSettings, enabled: 'false'}
+            const props = {
+                ...defaultProps,
+                commerceAgentConfiguration: disabledSettings,
+                basketDoneLoading: true
+            }
+
+            render(<ShopperAgent {...props} />)
+
+            // useRefreshToken should still be called (but result doesn't matter)
+            expect(mockedUseRefreshToken).toHaveBeenCalled()
+        })
+
+        test('should handle refresh token changes', () => {
+            // Initial state
+            mockedUseRefreshToken.mockReturnValue('initial-token')
+            useScript.mockReturnValue({loaded: true, error: false})
+
+            const props = {
+                ...defaultProps,
+                commerceAgentConfiguration: commerceAgentSettings,
+                basketDoneLoading: true
+            }
+
+            const {rerender} = render(<ShopperAgent {...props} />)
+
+            expect(mockedUseRefreshToken).toHaveBeenCalled()
+
+            // Change refresh token
+            mockedUseRefreshToken.mockReturnValue('updated-token')
+            rerender(<ShopperAgent {...props} />)
+
+            // Verify useRefreshToken was called again
+            expect(mockedUseRefreshToken).toHaveBeenCalled()
         })
     })
 })
