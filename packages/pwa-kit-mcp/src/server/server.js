@@ -83,8 +83,18 @@ class PwaStorefrontMCPServerHighLevel {
             'create_new_sample_component',
             'Conversationally collect parameters and create a new sample React component.',
             {
-                sessionId: z.string().optional().describe('Session ID for the conversational flow'),
-                answer: z.string().optional().describe('User answer to the current question')
+                sessionId: z
+                    .string()
+                    .optional()
+                    .describe(
+                        'Session ID for the conversational flow. Session ID is not required for initializing the conversational flow.'
+                    ),
+                answer: z
+                    .string()
+                    .optional()
+                    .describe(
+                        'User answer to the current question. Answer is not required for initializing the conversational flow.'
+                    )
             },
             (args) => this.handleCreateNewSampleComponent(args)
         )
@@ -107,7 +117,7 @@ class PwaStorefrontMCPServerHighLevel {
             this.sessions[sessionId] = {step: 1, answers: {}}
         }
         const session = this.sessions[sessionId]
-        const {step} = session
+        const step = session?.step || 1
         const answer = args.answer?.trim()
         switch (step) {
             case 1:
