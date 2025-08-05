@@ -925,6 +925,24 @@
       "value": " with your confirmation number and receipt shortly."
     }
   ],
+  "checkout_contact_info.action.edit": [
+    {
+      "type": 0,
+      "value": "Edit"
+    }
+  ],
+  "checkout_contact_info.action.sign_out": [
+    {
+      "type": 0,
+      "value": "Sign Out"
+    }
+  ],
+  "checkout_contact_info.title.contact_info": [
+    {
+      "type": 0,
+      "value": "Contact Info"
+    }
+  ],
   "checkout_footer.link.privacy_policy": [
     {
       "type": 0,
@@ -2628,13 +2646,33 @@
   "otp.button.resend_timer": [
     {
       "type": 0,
-      "value": "Resend code"
+      "value": "Resend code in "
+    },
+    {
+      "type": 1,
+      "value": "timer"
+    },
+    {
+      "type": 0,
+      "value": "s"
+    }
+  ],
+  "otp.error.invalid_code": [
+    {
+      "type": 0,
+      "value": "Invalid or expired code. Please try again."
     }
   ],
   "otp.message.enter_code_for_account": [
     {
       "type": 0,
       "value": "To use your account information enter the code sent to your email."
+    }
+  ],
+  "otp.message.verifying": [
+    {
+      "type": 0,
+      "value": "Verifying code..."
     }
   ],
   "otp.title.confirm_its_you": [
