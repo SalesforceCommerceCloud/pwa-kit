@@ -85,3 +85,48 @@ describe('Utils', () => {
         })
     })
 })
+
+describe('logMCPMessage', () => {
+    const logFilePath = path.join(__dirname, 'mcp-debug.log')
+    const testMessage = 'Test log message'
+
+    beforeEach(async () => {
+        process.env.DEBUG = '1'
+        // Remove log file if it exists
+        try {
+            await fs.promises.unlink(logFilePath)
+        } catch (e) {
+            // File does not exist, nothing to clean up
+        }
+    })
+
+    afterEach(async () => {
+        // Clean up log file
+        try {
+            await fs.promises.unlink(logFilePath)
+        } catch (e) {
+            // File does not exist, nothing to clean up
+        }
+        delete process.env.DEBUG
+    })
+
+    it('writes a log message to mcp-debug.log when DEBUG is set', async () => {
+        const {logMCPMessage} = await import('./utils')
+        await logMCPMessage(testMessage)
+        const content = await fs.promises.readFile(logFilePath, 'utf8')
+        expect(content).toContain(testMessage)
+    })
+
+    it('does not write log if DEBUG is not set', async () => {
+        delete process.env.DEBUG
+        const {logMCPMessage} = await import('./utils')
+        await logMCPMessage('Should not log')
+        let exists = true
+        try {
+            await fs.promises.access(logFilePath)
+        } catch {
+            exists = false
+        }
+        expect(exists).toBe(false)
+    })
+})

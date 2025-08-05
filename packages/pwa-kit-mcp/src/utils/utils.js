@@ -162,10 +162,10 @@ export async function logMCPMessage(message) {
         const logMessage = `[${timestamp}] ${message}\n`
         try {
             // Ensure the log file exists, create it if it doesn't
-            await fs.access(logFilePath).catch(async () => {
-                await fs.writeFile(logFilePath, '', 'utf8')
+            await fsPromises.access(logFilePath).catch(async () => {
+                await fsPromises.writeFile(logFilePath, '', 'utf8')
             })
-            await fs.appendFile(logFilePath, logMessage, 'utf8')
+            await fsPromises.appendFile(logFilePath, logMessage, 'utf8')
         } catch (error) {
             console.error(`Failed to write to log file: ${error.message}`)
         }
