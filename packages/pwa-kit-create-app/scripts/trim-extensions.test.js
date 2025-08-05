@@ -466,6 +466,62 @@ describe('trim-extensions', () => {
         expect(result).not.toContain('<ComponentB />')
     })
 
+    it('handles ternary expressions in JSX return statements correctly', () => {
+        const code = `
+            function test() {
+                return (
+                    <div>
+                        {SFDC_EXT_featureA ? <ComponentA /> : <ComponentB />}
+                    </div>
+                );
+            }
+        `
+        vol.writeFileSync('/mock/dir/src/components/featureComponent.jsx', code)
+
+        trimExtensions('/mock/dir', {SFDC_EXT_featureA: true, SFDC_EXT_featureB: false})
+
+        const expected = `
+            function test() {
+                return (
+                    <div>
+                        <ComponentA />
+                    </div>);
+            }
+        `
+        const result = readFile('/mock/dir/src/components/featureComponent.jsx')
+        expect(result).toEqualTrimmedLines(expected)
+    })
+
+    it('handles ternary expressions in nested JSX return statements correctly', () => {
+        const code = `
+            function test() {
+                return (
+                    <div>
+                        <ChakraProvider theme={theme}>
+                            {SFDC_EXT_featureA ? <ComponentA /> : <ComponentB />}
+                        </ChakraProvider>
+                    </div>
+                );
+            }
+        `
+        vol.writeFileSync('/mock/dir/src/components/featureComponent.jsx', code)
+
+        trimExtensions('/mock/dir', {SFDC_EXT_featureA: true, SFDC_EXT_featureB: false})
+
+        const expected = `
+            function test() {
+                return (
+                    <div>
+                        <ChakraProvider theme={theme}>
+                            <ComponentA />
+                        </ChakraProvider>
+                    </div>);
+            }
+        `
+        const result = readFile('/mock/dir/src/components/featureComponent.jsx')
+        expect(result).toEqualTrimmedLines(expected)
+    })
+
     it('does not remove referenced imports', () => {
         const code = `import { FeatureA } from './featureAComponent'`
 

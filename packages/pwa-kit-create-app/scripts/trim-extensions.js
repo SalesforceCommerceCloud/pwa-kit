@@ -345,13 +345,13 @@ function removeUnusedComponents(directory) {
 }
 
 // // Allow running from command line - keeping this for manual testing purposes
-// if (require.main === module) {
-//     const directory = process.argv[2];
-//     if (!directory) {
-//         console.error('Please provide a directory path');
-//         process.exit(1);
-//     }
-//     trimExtensions(directory, {});
-// }
+if (require.main === module) {
+    const directory = process.argv[2];
+    if (!directory) {
+        console.error('Please provide a directory path');
+        process.exit(1);
+    }
+    trimExtensions(directory, {SFDC_EXT_STORE_LOCATOR: false});
+}
 
 module.exports = trimExtensions

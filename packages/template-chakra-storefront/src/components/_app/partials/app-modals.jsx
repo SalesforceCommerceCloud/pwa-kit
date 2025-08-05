@@ -18,7 +18,10 @@ const StoreLocatorModal =
  * AppModals component that renders all app-level modals using React Portals
  * Handles AuthModal, DntNotification, Toaster, and optional StoreLocatorModal
  */
-const AppModals = ({authModal, dntNotification, isOpenStoreLocator, onCloseStoreLocator}) => {
+const AppModals = (context) => {
+    const {authModal, dntNotification} = context
+    const isOpenStoreLocator = SFDC_EXT_STORE_LOCATOR && context.isOpenStoreLocator
+    const onCloseStoreLocator = SFDC_EXT_STORE_LOCATOR && context.onCloseStoreLocator
     return (
         <>
             {/* Authentication Modal */}
@@ -37,11 +40,15 @@ const AppModals = ({authModal, dntNotification, isOpenStoreLocator, onCloseStore
     )
 }
 
-AppModals.propTypes = {
+const propTypes = {
     authModal: PropTypes.object,
     dntNotification: PropTypes.object,
-    isOpenStoreLocator: PropTypes.bool,
-    onCloseStoreLocator: PropTypes.func
 }
 
+SFDC_EXT_STORE_LOCATOR && (
+    propTypes.isOpenStoreLocator = PropTypes.bool,
+    propTypes.onCloseStoreLocator = PropTypes.func
+)
+
+AppModals.propTypes = propTypes
 export default AppModals

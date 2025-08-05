@@ -123,9 +123,9 @@ const Header = ({
     const {isRegistered} = useCustomerType()
     const logout = useAuthHelper(AuthHelpers.Logout)
     const navigate = useNavigation()
-    const openModal = () => {
+    const openModal = SFDC_EXT_STORE_LOCATOR && (() => {
         onStoreLocatorClick()
-    }
+    })
 
     const [showLoading, setShowLoading] = useState(false)
 
@@ -359,7 +359,7 @@ const Header = ({
     )
 }
 
-Header.propTypes = {
+const propTypes = {
     children: PropTypes.node,
     onMenuClick: PropTypes.func,
     onLogoClick: PropTypes.func,
@@ -367,11 +367,14 @@ Header.propTypes = {
     //@sfdc-extension-line SFDC_EXT_WISHLIST
     onWishlistClick: PropTypes.func,
     onMyCartClick: PropTypes.func,
-    onStoreLocatorClick: PropTypes.func,
     searchInputRef: PropTypes.oneOfType([
         PropTypes.func,
         PropTypes.shape({current: PropTypes.elementType})
     ])
 }
+SFDC_EXT_STORE_LOCATOR && (
+    propTypes.onStoreLocatorClick = PropTypes.func
+)
+Header.propTypes = propTypes
 
 export default Header

@@ -42,11 +42,7 @@ const ProductDetail = loadable(() => import('../src/pages/product-detail'), {fal
 const ProductList = loadable(() => import('../src/pages/product-list'), {
     fallback
 })
-const StoreLocator = SFDC_EXT_STORE_LOCATOR
-    ? loadable(() => import('../src/pages/store-locator'), {
-          fallback
-      })
-    : loadable(() => Promise.resolve({default: () => null}), {
+const StoreLocator = SFDC_EXT_STORE_LOCATOR && loadable(() => import('../src/pages/store-locator'), {
           fallback
       })
 

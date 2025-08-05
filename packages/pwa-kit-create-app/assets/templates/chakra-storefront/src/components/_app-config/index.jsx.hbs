@@ -12,7 +12,12 @@ import {ChakraProvider} from '@chakra-ui/react'
 import 'focus-visible/dist/focus-visible'
 
 import theme from '../../../src/theme'
-import {MultiSiteProvider} from '../../contexts'
+
+{{#if selectedPlugins.SFDC_EXT_STORE_LOCATOR}}
+import {MultiSiteProvider, StoreLocatorProvider} from '../../../src/contexts'
+{{else}}
+import {MultiSiteProvider} from '../../../src/contexts'
+{{/if}}
 import {useAppOrigin} from '../../hooks/use-app-origin'
 import {resolveSiteFromUrl, resolveLocaleFromUrl} from '../../utils/site-utils'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'

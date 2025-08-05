@@ -931,6 +931,8 @@ const main = async (opts) => {
         context = merge(context, {
             answers: expandObject(answers)
         })
+        // add selectedPlugins to context for Handlebars templates
+        context.selectedPlugins = selectedPlugins
     }
 
     // load plugin selected answer from context object to selectedPlugins (which used for code trimming process)
