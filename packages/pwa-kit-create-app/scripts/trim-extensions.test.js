@@ -25,9 +25,9 @@ jest.mock('../assets/plugin-config', () => ({
 // Test data constants
 const TEST_CODES = {
     BASIC_COMPONENT: `
-        // sfdc-extension-line SFDC_EXT_featureA
+        // @sfdc-extension-line SFDC_EXT_featureA
         const ComponentA = import('./featureAComponent')
-        // sfdc-extension-line SFDC_EXT_featureB
+        // @sfdc-extension-line SFDC_EXT_featureB
         const ComponentB = import('./featureBComponent')
     `,
     BASIC_COMPONENT_TRIMMED: `
@@ -37,13 +37,13 @@ const TEST_CODES = {
     COMPONENT_B: `export default ComponentB`,
     FEATURE_B_PAGE: `export const FeatureBPage = 'FeatureBPage'`,
     COMPONENT_B_WITH_PAGE_REF: `
-        // sfdc-extension-line SFDC_EXT_featureB
+        // @sfdc-extension-line SFDC_EXT_featureB
         const pageB = import('../../pages/featureBPage')
         export default ComponentB
     `,
     COMPONENT_B_WITH_PAGE_REF_TRIMMED: `export default ComponentB`,
     FEATURE_B_PAGE_WITH_COMPONENT_REF: `
-        // sfdc-extension-line SFDC_EXT_featureB
+        // @sfdc-extension-line SFDC_EXT_featureB
         const ComponentB = import('../../components/featureBComponent')
         export const FeatureBPage = 'FeatureBPage'
     `,
@@ -174,7 +174,7 @@ describe('trim-extensions with nested directories', () => {
         // Create file system with nested structure
         createTestFileSystem({
             additional: {
-                '/mock/dir/src/route.jsx': `// sfdc-extension-line SFDC_EXT_featureA
+                '/mock/dir/src/route.jsx': `// @sfdc-extension-line SFDC_EXT_featureA
                 const storeLocatorPage = import('./pages/store-locator')`,
                 '/mock/dir/src/pages/store-locator/index.jsx': `import { Modal } from './partial/modal' 
                     export default StoreLocator = 'StoreLocatorModal'`,
@@ -208,7 +208,7 @@ describe('trim-extensions', () => {
     it('leaves code untouched if no plugins are referenced', () => {
         const code = `
         const test = () => {
-            // sfdc-extension-line SFDC_EXT_featureA
+            // @sfdc-extension-line SFDC_EXT_featureA
             const featureA = 'Feature A';
             const categories = flatten(categoriesTree || {}, 'categories');
             const currency = locale.preferredCurrency || l10n.defaultCurrency;
@@ -234,10 +234,10 @@ describe('trim-extensions', () => {
 
     it('removes code blocks that are guarded by plugin flags', () => {
         const code = `
-            // sfdc-extension-block-start SFDC_EXT_featureA
+            // @sfdc-extension-block-start SFDC_EXT_featureA
             const featureAVar1 = 'Feature A variable 1';
             const featureAVar2 = 'Feature A variable 2';
-            // sfdc-extension-block-end SFDC_EXT_featureA
+            // @sfdc-extension-block-end SFDC_EXT_featureA
             const anotherVar = 'Another variable';
         `
         const expected = `
@@ -251,17 +251,17 @@ describe('trim-extensions', () => {
 
     it('removes nested code blocks that are guarded by plugin flags', () => {
         const code = `
-            // sfdc-extension-block-start SFDC_EXT_featureA
+            // @sfdc-extension-block-start SFDC_EXT_featureA
             const featureAVar = 'Feature A variable 1';
-            // sfdc-extension-block-start SFDC_EXT_featureB
+            // @sfdc-extension-block-start SFDC_EXT_featureB
             const featureBVar = 'Feature B variable 1';
-            // sfdc-extension-block-end SFDC_EXT_featureB
-            // sfdc-extension-block-end SFDC_EXT_featureA
+            // @sfdc-extension-block-end SFDC_EXT_featureB
+            // @sfdc-extension-block-end SFDC_EXT_featureA
         `
         const expected = `
-            // sfdc-extension-block-start SFDC_EXT_featureA
+            // @sfdc-extension-block-start SFDC_EXT_featureA
             const featureAVar = 'Feature A variable 1';
-            // sfdc-extension-block-end SFDC_EXT_featureA
+            // @sfdc-extension-block-end SFDC_EXT_featureA
         `
         vol.writeFileSync('/mock/dir/src/components/featureComponent.jsx', code)
         trimExtensions('/mock/dir', {SFDC_EXT_featureA: true, SFDC_EXT_featureB: false})
@@ -271,16 +271,16 @@ describe('trim-extensions', () => {
 
     it('removes nested line that are guarded by plugin flags', () => {
         const code = `
-            // sfdc-extension-block-start SFDC_EXT_featureA
+            // @sfdc-extension-block-start SFDC_EXT_featureA
             const featureAVar = 'Feature A variable 1';
-            // sfdc-extension-line SFDC_EXT_featureB
+            // @sfdc-extension-line SFDC_EXT_featureB
             const featureBVar = 'Feature B variable 2';
-            // sfdc-extension-block-end SFDC_EXT_featureA
+            // @sfdc-extension-block-end SFDC_EXT_featureA
         `
         const expected = `
-            // sfdc-extension-block-start SFDC_EXT_featureA
+            // @sfdc-extension-block-start SFDC_EXT_featureA
             const featureAVar = 'Feature A variable 1';
-            // sfdc-extension-block-end SFDC_EXT_featureA
+            // @sfdc-extension-block-end SFDC_EXT_featureA
         `
         vol.writeFileSync('/mock/dir/src/components/featureComponent.jsx', code)
         trimExtensions('/mock/dir', {SFDC_EXT_featureA: true, SFDC_EXT_featureB: false})
@@ -290,9 +290,9 @@ describe('trim-extensions', () => {
 
     it('fails when mismatching block markers are found', () => {
         const code = `
-            // sfdc-extension-block-start SFDC_EXT_featureA
+            // @sfdc-extension-block-start SFDC_EXT_featureA
             const featureAVar = 'Feature A variable 1';
-            // sfdc-extension-block-end SFDC_EXT_featureB
+            // @sfdc-extension-block-end SFDC_EXT_featureB
         `
         vol.writeFileSync('/mock/dir/src/components/featureComponent.jsx', code)
         const filePath = path.join(
@@ -312,7 +312,7 @@ describe('trim-extensions', () => {
 
     it('fails when block marker is not closed', () => {
         const code = `
-            // sfdc-extension-block-start SFDC_EXT_featureA
+            // @sfdc-extension-block-start SFDC_EXT_featureA
             const featureAVar = 'Feature A variable 1';
         `
         vol.writeFileSync('/mock/dir/src/components/featureComponent.jsx', code)
@@ -331,7 +331,7 @@ describe('trim-extensions', () => {
 
     it('fails when start marker is missing', () => {
         const code = `
-            // sfdc-extension-block-end SFDC_EXT_featureA
+            // @sfdc-extension-block-end SFDC_EXT_featureA
         `
         vol.writeFileSync('/mock/dir/src/components/featureComponent.jsx', code)
         const filePath = path.join(
@@ -349,12 +349,12 @@ describe('trim-extensions', () => {
 
     it('fails when nested block markers are not closed in the correct order', () => {
         const code = `
-            // sfdc-extension-block-start SFDC_EXT_featureA
+            // @sfdc-extension-block-start SFDC_EXT_featureA
             const featureAVar = 'Feature A variable 1';
-            // sfdc-extension-block-start SFDC_EXT_featureB
+            // @sfdc-extension-block-start SFDC_EXT_featureB
             const featureBVar = 'Feature B variable 1';
-            // sfdc-extension-block-end SFDC_EXT_featureA
-            // sfdc-extension-block-end SFDC_EXT_featureB
+            // @sfdc-extension-block-end SFDC_EXT_featureA
+            // @sfdc-extension-block-end SFDC_EXT_featureB
         `
         vol.writeFileSync('/mock/dir/src/components/featureComponent.jsx', code)
         const filePath = path.join(
@@ -377,9 +377,9 @@ describe('trim-extensions', () => {
             MyClass.PropTypes = {
                 name: PropTypes.string,
                 description: PropTypes.string,
-                // sfdc-extension-line SFDC_EXT_featureA
+                // @sfdc-extension-line SFDC_EXT_featureA
                 featureAProp: PropTypes.string,
-                // sfdc-extension-line SFDC_EXT_featureB
+                // @sfdc-extension-line SFDC_EXT_featureB
                 featureBProp: PropTypes.string,
             };
         `
@@ -392,7 +392,7 @@ describe('trim-extensions', () => {
             MyClass.PropTypes = {
                 name: PropTypes.string,
                 description: PropTypes.string,
-                // sfdc-extension-line SFDC_EXT_featureA
+                // @sfdc-extension-line SFDC_EXT_featureA
                 featureAProp: PropTypes.string,
             };
         `
@@ -406,9 +406,9 @@ describe('trim-extensions', () => {
             function test() {
                 return (
                     <div>
-                        {/* sfdc-extension-line SFDC_EXT_featureA */}
+                        {/* @sfdc-extension-line SFDC_EXT_featureA */}
                         <ComponentA />
-                        {/* sfdc-extension-line SFDC_EXT_featureB */}
+                        {/* @sfdc-extension-line SFDC_EXT_featureB */}
                         <ComponentB />
                     </div>
                 );
@@ -423,7 +423,7 @@ describe('trim-extensions', () => {
             function test() {
                 return (
                     <div>
-                        {/* sfdc-extension-line SFDC_EXT_featureA */}
+                        {/* @sfdc-extension-line SFDC_EXT_featureA */}
                         <ComponentA />
                     </div>
                 );
@@ -439,10 +439,10 @@ describe('trim-extensions', () => {
             function test() {
                 return (
                     <div>
-                        {/* sfdc-extension-line SFDC_EXT_featureA */}
+                        {/* @sfdc-extension-line SFDC_EXT_featureA */}
                         <ComponentA>
                             <ChildComponent />
-                        {/* sfdc-extension-line SFDC_EXT_featureA */}
+                        {/* @sfdc-extension-line SFDC_EXT_featureA */}
                         </ComponentA>
                     </div>
                 );
@@ -500,7 +500,7 @@ describe('trim-extensions', () => {
         // Create a read-only file to simulate write failure
         vol.writeFileSync(
             '/mock/dir/src/components/featureComponent.jsx',
-            `// sfdc-extension-line SFDC_EXT_featureA
+            `// @sfdc-extension-line SFDC_EXT_featureA
             const feature = Feature_A;`
         )
         vol.writeFileSync = (...args) => {

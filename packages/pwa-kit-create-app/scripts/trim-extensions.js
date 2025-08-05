@@ -20,9 +20,9 @@ const COMPONENT_SCAN_PATHS = [
     path.join(SEPARATOR, 'src', 'routes.tsx'),
     path.join(SEPARATOR, 'config', 'constants.js')
 ]
-const SINGLE_LINE_MARKER = 'sfdc-extension-line'
-const BLOCK_MARKER_START = 'sfdc-extension-block-start'
-const BLOCK_MARKER_END = 'sfdc-extension-block-end'
+const SINGLE_LINE_MARKER = '@sfdc-extension-line'
+const BLOCK_MARKER_START = '@sfdc-extension-block-start'
+const BLOCK_MARKER_END = '@sfdc-extension-block-end'
 
 /**
  * Trim the directory to remove unused components and unused plugins.
