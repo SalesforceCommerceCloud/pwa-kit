@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
-import {Box, Stack, Grid, GridItem, Container, useDisclosure} from '@chakra-ui/react'
+import {Box, Stack, Grid, GridItem, Container} from '@chakra-ui/react'
 import {useCurrentBasket, useCurrentCustomer} from '../../hooks/'
 
 // Custom Cart Hooks
