@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React, {useRef, useState} from 'react'
+import React, {useRef, useState, useEffect} from 'react'
 import PropTypes from 'prop-types'
 import {
     Alert,
@@ -17,8 +17,12 @@ import {
     AlertIcon,
     Button,
     Container,
+    InputGroup,
+    InputRightElement,
+    Spinner,
     Stack,
-    Text
+    Text,
+    useDisclosure
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 import {useForm} from 'react-hook-form'
 import {FormattedMessage, useIntl} from 'react-intl'
@@ -31,6 +35,7 @@ import {
 } from '@salesforce/retail-react-app/app/components/toggle-card'
 import Field from '@salesforce/retail-react-app/app/components/field'
 import LoginState from '@salesforce/retail-react-app/app/pages/checkout-one-click/partials/one-click-login-state'
+import OtpAuth from '@salesforce/retail-react-app/app/components/otp-auth'
 import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
 import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
@@ -49,6 +54,7 @@ import {isValidEmail} from '@salesforce/retail-react-app/app/utils/email-utils'
 const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseGuest}) => {
     const {formatMessage} = useIntl()
     const navigate = useNavigation()
+    const appOrigin = useAppOrigin()
     const {data: customer} = useCurrentCustomer()
     const currentBasketQuery = useCurrentBasket()
     const {data: basket} = currentBasketQuery
@@ -58,11 +64,49 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
     const logout = useAuthHelper(AuthHelpers.Logout)
     const updateCustomerForBasket = useShopperBasketsMutation('updateCustomerForBasket')
     const mergeBasket = useShopperBasketsMutation('mergeBasket')
+    const authorizePasswordlessLogin = useAuthHelper(AuthHelpers.AuthorizePasswordless)
+    const loginPasswordless = useAuthHelper(AuthHelpers.LoginPasswordlessUser)
 
     const {step, STEPS, goToStep, goToNextStep} = useCheckout()
 
+    // Helper function to directly read customer type from localStorage
+    // This bypasses React state staleness after login
+    const getCustomerTypeFromStorage = () => {
+        if (typeof window !== 'undefined') {
+            const customerTypeKey = `customer_type_${config.siteId}`
+            return localStorage.getItem(customerTypeKey)
+        }
+        return null
+    }
+
+    // Helper function to directly read customer ID from localStorage
+    const getCustomerIdFromStorage = () => {
+        if (typeof window !== 'undefined') {
+            const customerIdKey = `customer_id_${config.siteId}`
+            return localStorage.getItem(customerIdKey)
+        }
+        return null
+    }
+
+    // Helper function to extract basket ID from either structure
+    const getBasketId = (basketData) => {
+        // Handle individual basket structure: {basketId: "...", productItems: [...]}
+        if (basketData?.basketId) {
+            return basketData.basketId
+        }
+        // Handle baskets collection structure: {baskets: [{basketId: "..."}], total: 1}
+        if (basketData?.baskets?.[0]?.basketId) {
+            return basketData.baskets[0].basketId
+        }
+        return null
+    }
+
     const form = useForm({
-        defaultValues: {email: customer?.email || basket?.customerInfo?.email || '', password: ''}
+        defaultValues: {
+            email: customer?.email || basket?.customerInfo?.email || '',
+            password: '',
+            otp: ''
+        }
     })
 
     const fields = useLoginFields({form})
@@ -70,7 +114,7 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
     // Single-flight guard for OTP authorization to avoid duplicate sends
     const otpSendPromiseRef = useRef(null)
 
-    const [error, setError] = useState(null)
+    const [error, setError] = useState()
     const [signOutConfirmDialogIsOpen, setSignOutConfirmDialogIsOpen] = useState(false)
     const [showContinueButton, setShowContinueButton] = useState(true)
     const [isCheckingEmail, setIsCheckingEmail] = useState(false)
@@ -401,19 +445,32 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
     }
 
     return (
-        <ToggleCard
-            id="step-0"
-            title={formatMessage({
-                defaultMessage: 'Contact Info',
-                id: 'contact_info.title.contact_info'
-            })}
-            editing={step === STEPS.CONTACT_INFO}
-            isLoading={form.formState.isSubmitting}
-            onEdit={() => {
-                if (customer.isRegistered) {
-                    setSignOutConfirmDialogIsOpen(true)
-                } else {
-                    goToStep(STEPS.CONTACT_INFO)
+        <>
+            <ToggleCard
+                id="step-0"
+                title={formatMessage({
+                    defaultMessage: 'Contact Info',
+                    id: 'checkout_contact_info.title.contact_info'
+                })}
+                editing={step === STEPS.CONTACT_INFO}
+                isLoading={form.formState.isSubmitting}
+                onEdit={() => {
+                    if (isRegistered) {
+                        setSignOutConfirmDialogIsOpen(true)
+                    } else {
+                        goToStep(STEPS.CONTACT_INFO)
+                    }
+                }}
+                editLabel={
+                    isRegistered
+                        ? formatMessage({
+                              defaultMessage: 'Sign Out',
+                              id: 'checkout_contact_info.action.sign_out'
+                          })
+                        : formatMessage({
+                              defaultMessage: 'Edit',
+                              id: 'checkout_contact_info.action.edit'
+                          })
                 }
             >
                 <ToggleCardEdit>
@@ -500,17 +557,36 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
                     </Container>
                 </ToggleCardEdit>
 
-                <SignOutConfirmationDialog
-                    isOpen={signOutConfirmDialogIsOpen}
-                    onClose={() => setSignOutConfirmDialogIsOpen(false)}
-                    onConfirm={async () => {
-                        await logout.mutateAsync()
-                        navigate('/login')
-                        setSignOutConfirmDialogIsOpen(false)
-                    }}
-                />
-            </ToggleCardSummary>
-        </ToggleCard>
+                            {/* OTP Auth Modal */}
+                            <OtpAuth
+                                isOpen={isOtpModalOpen}
+                                onClose={handleOtpModalClose}
+                                form={form}
+                                handleSendEmailOtp={handleSendEmailOtp}
+                                handleOtpVerification={handleOtpVerification}
+                            />
+                        </form>
+                    </Container>
+                </ToggleCardEdit>
+
+                {(customer?.email || form.getValues('email')) && (
+                    <ToggleCardSummary>
+                        <Text>{customer?.email || form.getValues('email')}</Text>
+                    </ToggleCardSummary>
+                )}
+            </ToggleCard>
+
+            {/* Sign Out Confirmation Dialog */}
+            <SignOutConfirmationDialog
+                isOpen={signOutConfirmDialogIsOpen}
+                onClose={() => setSignOutConfirmDialogIsOpen(false)}
+                onConfirm={async () => {
+                    await logout.mutateAsync()
+                    setSignOutConfirmDialogIsOpen(false)
+                    navigate('/')
+                }}
+            />
+        </>
     )
 }
 
