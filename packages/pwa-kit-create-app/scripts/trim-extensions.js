@@ -278,7 +278,8 @@ function removeUnusedComponents(directory) {
                             }
                             // If this import matches any exported file and it's not from one of the component candidates, remove it from the set
                             const isCandidate = Array.from(removeComponentCandidates).find(
-                                (candidate) => candidate === path.resolve(path.dirname(filePath))
+                                (candidate) => 
+                                    path.resolve(filePath).startsWith(candidate + path.sep)
                             )
                             if (exportedFiles.has(absoluteImportPath) && !isCandidate) {
                                 exportedFiles.delete(absoluteImportPath)
@@ -344,14 +345,14 @@ function removeUnusedComponents(directory) {
     return unusedFiles
 }
 
-// // Allow running from command line - keeping this for manual testing purposes
-if (require.main === module) {
-    const directory = process.argv[2];
-    if (!directory) {
-        console.error('Please provide a directory path');
-        process.exit(1);
-    }
-    trimExtensions(directory, {SFDC_EXT_STORE_LOCATOR: false});
-}
+// Allow running from command line - keeping this for manual testing purposes
+// if (require.main === module) {
+//     const directory = process.argv[2]
+//     if (!directory) {
+//         console.error('Please provide a directory path')
+//         process.exit(1)
+//     }
+//     trimExtensions(directory, {SFDC_EXT_STORE_LOCATOR: false})
+// }
 
 module.exports = trimExtensions
