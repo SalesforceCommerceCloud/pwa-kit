@@ -408,6 +408,8 @@ const ShopperAgent = ({commerceAgentConfiguration, basketDoneLoading}) => {
 
     // Check if agent is enabled and running on client side
     const isShopperAgentEnabled = isEnabled(enabled)
+    // use refresh token to set the refresh token for the embedded messaging service
+    const refreshToken = useRefreshToken()
 
     // Conditional rendering: only render when all conditions are met
     // 1. Agent is enabled and running on client
