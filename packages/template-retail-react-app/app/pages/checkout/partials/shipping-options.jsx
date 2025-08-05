@@ -132,8 +132,6 @@ export default function ShippingOptions() {
     const {isCurrentShippingMethodPickup} = usePickupShipment(basket)
     const updateShippingMethod = useShopperBasketsMutation('updateShippingMethodForShipment')
 
-    // Determine if this is multiship or single ship
-    // We need to check for shipments with different addresses, not just multiple shipments
     const deliveryShipments =
         (basket &&
             basket.shipments &&
