@@ -294,7 +294,13 @@ const ShippingMultiAddress = ({
 
     // Check if all product items have an address selected
     const allShipmentsHaveAddress = (basket.productItems ?? []).every(
-        (item) => selectedRegisteredUserAddresses[item.itemId]
+        (item) => {
+            if (customer && customer.isGuest) {
+                return selectedGuestAddresses[item.itemId]
+            } else {
+                return selectedRegisteredUserAddresses[item.itemId]
+            }
+        }
     )
 
     if (!deliveryItems.length) {
