@@ -17,6 +17,8 @@ import {
     AlertIcon,
     Button,
     Container,
+    InputGroup,
+    InputRightElement,
     Spinner,
     Stack,
     Text,
@@ -321,29 +323,36 @@ const ContactInfo = ({isSocialEnabled = false, idps = []}) => {
                                     </Alert>
                                 )}
 
-                                <Stack spacing={5} position="relative">
-                                    <Field
-                                        {...fields.email}
-                                        inputRef={emailRef}
-                                        inputProps={{
-                                            onBlur: handleEmailBlur,
-                                            onFocus: handleEmailFocus,
-                                            paddingRight: isCheckingEmail ? '3rem' : undefined,
-                                            ...fields.email.inputProps
-                                        }}
-                                        rightElement={
-                                            isCheckingEmail && (
+                                <Stack spacing={5}>
+                                    <InputGroup>
+                                        <Field
+                                            {...fields.email}
+                                            inputRef={emailRef}
+                                            inputProps={{
+                                                onBlur: handleEmailBlur,
+                                                onFocus: handleEmailFocus,
+                                                paddingRight: isCheckingEmail
+                                                    ? '2.5rem'
+                                                    : undefined,
+                                                ...fields.email.inputProps
+                                            }}
+                                        />
+                                        {isCheckingEmail && (
+                                            <InputRightElement
+                                                height="100%"
+                                                display="flex"
+                                                alignItems="center"
+                                                justifyContent="center"
+                                                paddingTop="25px"
+                                            >
                                                 <Spinner
-                                                    size="sm"
+                                                    size="md"
                                                     color="blue.500"
-                                                    position="absolute"
-                                                    right="12px"
-                                                    top="50%"
-                                                    transform="translateY(-50%)"
+                                                    borderWidth="2px"
                                                 />
-                                            )
-                                        }
-                                    />
+                                            </InputRightElement>
+                                        )}
+                                    </InputGroup>
                                 </Stack>
 
                                 <Stack spacing={3}>
