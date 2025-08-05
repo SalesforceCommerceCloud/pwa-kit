@@ -14,7 +14,7 @@ const MockComponent = () => {
     return (
         <QuantityPicker
             value={quantity}
-            onValueChange={({value, valueAsNumber}) => setQuantity(valueAsNumber)}
+            onValueChange={({valueAsNumber}) => setQuantity(valueAsNumber)}
         />
     )
 }

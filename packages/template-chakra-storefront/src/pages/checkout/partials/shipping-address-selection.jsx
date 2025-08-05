@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React, {useState, useEffect, useMemo} from 'react'
+import React, {useState, useEffect} from 'react'
 import PropTypes from 'prop-types'
 import {defineMessage, useIntl} from 'react-intl'
 import {Box, Button, Container, Heading, SimpleGrid, Stack} from '@chakra-ui/react'
@@ -17,7 +17,7 @@ import AddressDisplay from '../../../components/address-display'
 import AddressFields from '../../../components/forms/address-fields'
 import FormActionButtons from '../../../components/forms/form-action-buttons'
 import {MESSAGE_PROPTYPE} from '../../../utils/locale'
-import {useCurrentCustomer} from '../../../hooks/use-current-customer'
+import {useCurrentCustomer} from '../../../hooks'
 import {useShopperCustomersMutation} from '@salesforce/commerce-sdk-react'
 
 const saveButtonMessage = defineMessage({
