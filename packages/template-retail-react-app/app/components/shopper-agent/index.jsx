@@ -95,6 +95,7 @@ const isEnabled = (enabled) => {
  * @param {Object} props.commerceAgentConfiguration - Commerce agent configuration
  * @param {string} props.locale - The locale for the embedded messaging script
  * @param {string} props.basketId - The basket ID for the embedded messaging script
+ * @param {string} props.refreshToken - The refresh token for the embedded messaging script
  * @returns {null} This component doesn't render any visible UI
  */
 const ShopperAgentWindow = ({commerceAgentConfiguration, locale, basketId, refreshToken}) => {

@@ -56,6 +56,7 @@ const initEmbeddedMessaging = (
  * @param {string} embeddedServiceDeploymentUrl - URL of the embedded service deployment
  * @param {string} scrt2Url - SCRT2 URL for the embedded messaging service
  * @param {string} locale - Locale for the embedded messaging service
+ * @param {string} refreshToken - Refresh token for the embedded messaging service
  */
 const useMiaw = (
     scriptLoadStatus,
