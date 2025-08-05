@@ -293,15 +293,13 @@ const ShippingMultiAddress = ({
     const isLoading = (customer && customer.isGuest ? false : customerLoading) || productsLoading
 
     // Check if all product items have an address selected
-    const allShipmentsHaveAddress = (basket.productItems ?? []).every(
-        (item) => {
-            if (customer && customer.isGuest) {
-                return selectedGuestAddresses[item.itemId]
-            } else {
-                return selectedRegisteredUserAddresses[item.itemId]
-            }
+    const allShipmentsHaveAddress = (basket.productItems ?? []).every((item) => {
+        if (customer && customer.isGuest) {
+            return selectedGuestAddresses[item.itemId]
+        } else {
+            return selectedRegisteredUserAddresses[item.itemId]
         }
-    )
+    })
 
     if (!deliveryItems.length) {
         return (
@@ -480,9 +478,13 @@ const ShippingMultiAddress = ({
             let basketAfterItemMoves = null
 
             deliveryItems.forEach((item) => {
+                const selectedAddresses =
+                    customer && customer.isGuest
+                        ? selectedGuestAddresses
+                        : selectedRegisteredUserAddresses
+
                 // Defaults to the first address if no address is selected
-                const addressId =
-                    selectedRegisteredUserAddresses[item.itemId] || finalAddresses[0]?.addressId
+                const addressId = selectedAddresses[item.itemId] || finalAddresses[0]?.addressId
                 const address = finalAddresses.find((addr) => addr.addressId === addressId)
 
                 // If there is an existing shipment with the same address, use it in the next step
@@ -501,6 +503,7 @@ const ShippingMultiAddress = ({
                 addressToItemsMap[addressId].items.push(item)
             })
 
+            console.log(addressToItemsMap)
             // For each unique address, if there is no usable existing shipment, create a new one.
             for (const [addressId, data] of Object.entries(addressToItemsMap)) {
                 const {address, items, shipmentId: existingShipmentId} = data
