@@ -265,22 +265,21 @@ const PRESETS = [
             type: TEMPLATE_SOURCE_BUNDLE,
             id: 'chakra-storefront'
         },
-        getQuestions: () =>
-            createRetailReactAppQuestions({
-                'project.hybrid': false,
-                'project.name': 'demo-storefront',
-                'project.commerce.instanceUrl': 'https://zzte-053.dx.commercecloud.salesforce.com',
-                'project.commerce.clientId': '1d763261-6522-4913-9d52-5d947d3b94c4',
-                'project.commerce.siteId': 'RefArch',
-                'project.commerce.organizationId': 'f_ecom_zzte_053',
-                'project.commerce.shortCode': 'kv7kzm78',
-                'project.commerce.isSlasPrivate': false,
-                'project.einstein.clientId': '1ea06c6e-c936-4324-bcf0-fada93f83bb1',
-                'project.einstein.siteId': 'aaij-MobileFirst',
-                'project.dataCloud.appSourceId': 'fb81edab-24c6-4b40-8684-b67334dfdf32',
-                'project.dataCloud.tenantId': 'mmyw8zrxhfsg09lfmzrd1zjqmg',
-                'project.demo.enableDemoSettings': false
-            }),
+        answers: {
+            'project.hybrid': false,
+            'project.name': 'demo-storefront',
+            'project.commerce.instanceUrl': 'https://zzte-053.dx.commercecloud.salesforce.com',
+            'project.commerce.clientId': '1d763261-6522-4913-9d52-5d947d3b94c4',
+            'project.commerce.siteId': 'RefArch',
+            'project.commerce.organizationId': 'f_ecom_zzte_053',
+            'project.commerce.shortCode': 'kv7kzm78',
+            'project.commerce.isSlasPrivate': false,
+            'project.einstein.clientId': '1ea06c6e-c936-4324-bcf0-fada93f83bb1',
+            'project.einstein.siteId': 'aaij-MobileFirst',
+            'project.dataCloud.appSourceId': 'fb81edab-24c6-4b40-8684-b67334dfdf32',
+            'project.dataCloud.tenantId': 'mmyw8zrxhfsg09lfmzrd1zjqmg',
+            'project.demo.enableDemoSettings': false
+        },
         assets: ['translations'],
         private: false
     },
@@ -327,22 +326,21 @@ const PRESETS = [
             type: TEMPLATE_SOURCE_BUNDLE,
             id: 'typescript-minimal'
         },
-        getQuestions: () =>
-            createRetailReactAppQuestions({
-                'project.hybrid': false,
-                'project.name': 'chakra-storefront',
-                'project.commerce.instanceUrl': 'https://zzrf-001.dx.commercecloud.salesforce.com',
-                'project.commerce.clientId': 'c9c45bfd-0ed3-4aa2-9971-40f88962b836',
-                'project.commerce.siteId': 'RefArch',
-                'project.commerce.organizationId': 'f_ecom_zzrf_001',
-                'project.commerce.shortCode': 'kv7kzm78',
-                'project.commerce.isSlasPrivate': false,
-                'project.einstein.clientId': '1ea06c6e-c936-4324-bcf0-fada93f83bb1',
-                'project.einstein.siteId': 'aaij-MobileFirst',
-                'project.dataCloud.appSourceId': 'fb81edab-24c6-4b40-8684-b67334dfdf32',
-                'project.dataCloud.tenantId': 'mmyw8zrxhfsg09lfmzrd1zjqmg',
-                'project.demo.enableDemoSettings': false
-            }),
+        answers: {
+            'project.hybrid': false,
+            'project.name': 'chakra-storefront',
+            'project.commerce.instanceUrl': 'https://zzrf-001.dx.commercecloud.salesforce.com',
+            'project.commerce.clientId': 'c9c45bfd-0ed3-4aa2-9971-40f88962b836',
+            'project.commerce.siteId': 'RefArch',
+            'project.commerce.organizationId': 'f_ecom_zzrf_001',
+            'project.commerce.shortCode': 'kv7kzm78',
+            'project.commerce.isSlasPrivate': false,
+            'project.einstein.clientId': '1ea06c6e-c936-4324-bcf0-fada93f83bb1',
+            'project.einstein.siteId': 'aaij-MobileFirst',
+            'project.dataCloud.appSourceId': 'fb81edab-24c6-4b40-8684-b67334dfdf32',
+            'project.dataCloud.tenantId': 'mmyw8zrxhfsg09lfmzrd1zjqmg',
+            'project.demo.enableDemoSettings': false
+        },
         assets: ['translations'],
         private: true
     },
@@ -354,22 +352,21 @@ const PRESETS = [
             type: TEMPLATE_SOURCE_BUNDLE,
             id: 'chakra-storefront'
         },
-        getQuestions: () =>
-            createRetailReactAppQuestions({
-                'project.hybrid': false,
-                'project.name': 'chakra-storefront',
-                'project.commerce.instanceUrl': 'https://zzrf-002.dx.commercecloud.salesforce.com',
-                'project.commerce.clientId': '89655706-9a0d-49ba-a1e5-18bb2d616374',
-                'project.commerce.siteId': 'RefArch',
-                'project.commerce.organizationId': 'f_ecom_zzrf_002',
-                'project.commerce.shortCode': 'kv7kzm78',
-                'project.commerce.isSlasPrivate': true,
-                'project.einstein.clientId': '1ea06c6e-c936-4324-bcf0-fada93f83bb1',
-                'project.einstein.siteId': 'aaij-MobileFirst',
-                'project.dataCloud.appSourceId': 'fb81edab-24c6-4b40-8684-b67334dfdf32',
-                'project.dataCloud.tenantId': 'mmyw8zrxhfsg09lfmzrd1zjqmg',
-                'project.demo.enableDemoSettings': false
-            }),
+        answers: {
+            'project.hybrid': false,
+            'project.name': 'chakra-storefront',
+            'project.commerce.instanceUrl': 'https://zzrf-002.dx.commercecloud.salesforce.com',
+            'project.commerce.clientId': '89655706-9a0d-49ba-a1e5-18bb2d616374',
+            'project.commerce.siteId': 'RefArch',
+            'project.commerce.organizationId': 'f_ecom_zzrf_002',
+            'project.commerce.shortCode': 'kv7kzm78',
+            'project.commerce.isSlasPrivate': true,
+            'project.einstein.clientId': '1ea06c6e-c936-4324-bcf0-fada93f83bb1',
+            'project.einstein.siteId': 'aaij-MobileFirst',
+            'project.dataCloud.appSourceId': 'fb81edab-24c6-4b40-8684-b67334dfdf32',
+            'project.dataCloud.tenantId': 'mmyw8zrxhfsg09lfmzrd1zjqmg',
+            'project.demo.enableDemoSettings': false
+        },
         assets: ['translations'],
         private: true
     },
@@ -381,22 +378,21 @@ const PRESETS = [
             type: TEMPLATE_SOURCE_BUNDLE,
             id: 'chakra-storefront'
         },
-        getQuestions: () =>
-            createRetailReactAppQuestions({
-                'project.hybrid': false,
-                'project.name': 'chakra-storefront',
-                'project.commerce.instanceUrl': 'https://zzec-006.dx.commercecloud.salesforce.com',
-                'project.commerce.clientId': 'b56e7ad3-2237-42c9-8f55-41e63ebca420',
-                'project.commerce.siteId': 'RefArch',
-                'project.commerce.organizationId': 'f_ecom_zzec_006',
-                'project.commerce.shortCode': 'staging-001',
-                'project.einstein.clientId': '1ea06c6e-c936-4324-bcf0-fada93f83bb1',
-                'project.einstein.siteId': 'aaij-MobileFirst',
-                'project.dataCloud.appSourceId': 'fb81edab-24c6-4b40-8684-b67334dfdf32',
-                'project.dataCloud.tenantId': 'mmyw8zrxhfsg09lfmzrd1zjqmg',
-                'project.commerce.isSlasPrivate': true,
-                'project.demo.enableDemoSettings': false
-            }),
+        answers: {
+            'project.hybrid': false,
+            'project.name': 'chakra-storefront',
+            'project.commerce.instanceUrl': 'https://zzec-006.dx.commercecloud.salesforce.com',
+            'project.commerce.clientId': 'b56e7ad3-2237-42c9-8f55-41e63ebca420',
+            'project.commerce.siteId': 'RefArch',
+            'project.commerce.organizationId': 'f_ecom_zzec_006',
+            'project.commerce.shortCode': 'staging-001',
+            'project.einstein.clientId': '1ea06c6e-c936-4324-bcf0-fada93f83bb1',
+            'project.einstein.siteId': 'aaij-MobileFirst',
+            'project.dataCloud.appSourceId': 'fb81edab-24c6-4b40-8684-b67334dfdf32',
+            'project.dataCloud.tenantId': 'mmyw8zrxhfsg09lfmzrd1zjqmg',
+            'project.commerce.isSlasPrivate': true,
+            'project.demo.enableDemoSettings': false
+        },
         assets: ['translations'],
         private: true
     },
@@ -408,24 +404,21 @@ const PRESETS = [
             type: TEMPLATE_SOURCE_BUNDLE,
             id: 'chakra-storefront'
         },
-        getQuestions: () => [
-            ...HYBRID_QUESTIONS,
-            ...createRetailReactAppQuestions({
-                'project.hybrid': true,
-                'project.name': 'chakra-storefront',
-                'project.commerce.instanceUrl': 'https://test.phased-launch-testing.com/',
-                'project.commerce.clientId': '99b4e081-00cf-454a-95b0-26ac2b824931',
-                'project.commerce.siteId': 'RefArch',
-                'project.commerce.organizationId': 'f_ecom_bdpx_dev',
-                'project.commerce.shortCode': 'xitgmcd3',
-                'project.einstein.clientId': '1ea06c6e-c936-4324-bcf0-fada93f83bb1',
-                'project.einstein.siteId': 'aaij-MobileFirst',
-                'project.commerce.isSlasPrivate': true,
-                'project.dataCloud.appSourceId': 'fb81edab-24c6-4b40-8684-b67334dfdf32',
-                'project.dataCloud.tenantId': 'mmyw8zrxhfsg09lfmzrd1zjqmg',
-                'project.demo.enableDemoSettings': false
-            })
-        ],
+        answers: {
+            'project.hybrid': true,
+            'project.name': 'chakra-storefront',
+            'project.commerce.instanceUrl': 'https://test.phased-launch-testing.com/',
+            'project.commerce.clientId': '99b4e081-00cf-454a-95b0-26ac2b824931',
+            'project.commerce.siteId': 'RefArch',
+            'project.commerce.organizationId': 'f_ecom_bdpx_dev',
+            'project.commerce.shortCode': 'xitgmcd3',
+            'project.einstein.clientId': '1ea06c6e-c936-4324-bcf0-fada93f83bb1',
+            'project.einstein.siteId': 'aaij-MobileFirst',
+            'project.commerce.isSlasPrivate': true,
+            'project.dataCloud.appSourceId': 'fb81edab-24c6-4b40-8684-b67334dfdf32',
+            'project.dataCloud.tenantId': 'mmyw8zrxhfsg09lfmzrd1zjqmg',
+            'project.demo.enableDemoSettings': false
+        },
         assets: ['translations'],
         private: true
     },
@@ -437,24 +430,21 @@ const PRESETS = [
             type: TEMPLATE_SOURCE_BUNDLE,
             id: 'chakra-storefront'
         },
-        getQuestions: () => [
-            ...HYBRID_QUESTIONS,
-            ...createRetailReactAppQuestions({
-                'project.hybrid': true,
-                'project.name': 'chakra-storefront',
-                'project.commerce.instanceUrl': 'https://www.phased-launch-testing.com/',
-                'project.commerce.clientId': 'e7e22b7f-a904-4f3a-8022-49dbee696485',
-                'project.commerce.siteId': 'RefArch',
-                'project.commerce.organizationId': 'f_ecom_bjnl_prd',
-                'project.commerce.shortCode': 'performance-001',
-                'project.einstein.clientId': '1ea06c6e-c936-4324-bcf0-fada93f83bb1',
-                'project.einstein.siteId': 'aaij-MobileFirst',
-                'project.commerce.isSlasPrivate': false,
-                'project.dataCloud.appSourceId': 'fb81edab-24c6-4b40-8684-b67334dfdf32',
-                'project.dataCloud.tenantId': 'mmyw8zrxhfsg09lfmzrd1zjqmg',
-                'project.demo.enableDemoSettings': false
-            })
-        ],
+        answers: {
+            'project.hybrid': true,
+            'project.name': 'chakra-storefront',
+            'project.commerce.instanceUrl': 'https://www.phased-launch-testing.com/',
+            'project.commerce.clientId': 'e7e22b7f-a904-4f3a-8022-49dbee696485',
+            'project.commerce.siteId': 'RefArch',
+            'project.commerce.organizationId': 'f_ecom_bjnl_prd',
+            'project.commerce.shortCode': 'performance-001',
+            'project.einstein.clientId': '1ea06c6e-c936-4324-bcf0-fada93f83bb1',
+            'project.einstein.siteId': 'aaij-MobileFirst',
+            'project.commerce.isSlasPrivate': false,
+            'project.dataCloud.appSourceId': 'fb81edab-24c6-4b40-8684-b67334dfdf32',
+            'project.dataCloud.tenantId': 'mmyw8zrxhfsg09lfmzrd1zjqmg',
+            'project.demo.enableDemoSettings': false
+        },
         assets: ['translations'],
         private: true
     },
@@ -493,9 +483,8 @@ const PRESETS = [
             type: TEMPLATE_SOURCE_BUNDLE,
             id: 'express-minimal'
         },
-        getQuestions: () => EXPRESS_MINIMAL_QUESTIONS,
         answers: {
-            ['project.name']: 'express-minimal'
+            'project.name': 'express-minimal'
         },
         private: true
     },
@@ -512,6 +501,7 @@ const PRESETS = [
             type: TEMPLATE_SOURCE_BUNDLE,
             id: 'express-minimal'
         },
+        interactive: true,
         getQuestions: () => EXPRESS_MINIMAL_QUESTIONS,
         private: true
     },
@@ -523,9 +513,8 @@ const PRESETS = [
             type: TEMPLATE_SOURCE_BUNDLE,
             id: 'mrt-reference-app'
         },
-        getQuestions: () => MRT_REFERENCE_QUESTIONS,
         answers: {
-            ['project.name']: 'mrt-reference-app'
+            'project.name': 'mrt-reference-app'
         },
         private: true
     }
