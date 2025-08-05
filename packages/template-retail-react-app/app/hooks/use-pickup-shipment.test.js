@@ -626,6 +626,7 @@ describe('usePickupShipment', () => {
                 basketId: 'basket-123',
                 shipments: [
                     {
+                        shipmentId: 'me',
                         shippingMethod: {
                             id: 'standard-shipping'
                         }
@@ -669,6 +670,7 @@ describe('usePickupShipment', () => {
                 basketId: 'basket-123',
                 shipments: [
                     {
+                        shipmentId: 'me',
                         shippingMethod: {
                             id: 'pickup-method-123',
                             c_storePickupEnabled: true
@@ -744,10 +746,12 @@ describe('usePickupShipment', () => {
                 basketId: 'basket-123',
                 shipments: [
                     {
+                        shipmentId: 'me',
                         shippingMethod: {
                             id: 'pickup-method-123',
                             c_storePickupEnabled: true
-                        }
+                        },
+                        c_fromStoreId: 'store-1'
                     }
                 ]
             }
@@ -773,10 +777,12 @@ describe('usePickupShipment', () => {
                 basketId: 'basket-123',
                 shipments: [
                     {
+                        shipmentId: 'me',
                         shippingMethod: {
                             id: 'standard-shipping',
                             c_storePickupEnabled: false
-                        }
+                        },
+                        c_fromStoreId: null
                     }
                 ]
             }
@@ -793,6 +799,48 @@ describe('usePickupShipment', () => {
 
             expect(mockMutateAsync).not.toHaveBeenCalled()
             expect(mockRefetchShippingMethods).not.toHaveBeenCalled()
+        })
+
+        test('configures pickup shipment when store is different', async () => {
+            const {result} = renderHook(() => usePickupShipment())
+            const basketResponse = {
+                basketId: 'basket-123',
+                shipments: [
+                    {
+                        shipmentId: 'me',
+                        shippingMethod: {
+                            id: 'pickup-method-123',
+                            c_storePickupEnabled: true
+                        },
+                        c_fromStoreId: 'store-1'
+                    }
+                ]
+            }
+            const targetShipmentId = 'me'
+            const hasAnyPickupSelected = true
+            const selectedStore = {id: 'store-2', inventoryId: 'inv-2'}
+            await result.current.configureDefaultShipmentIfNeeded(
+                basketResponse,
+                targetShipmentId,
+                hasAnyPickupSelected,
+                selectedStore
+            )
+            // Should fetch shipping methods
+            expect(mockRefetchShippingMethods).toHaveBeenCalled()
+            // Should configure pickup shipment with the new store
+            expect(mockMutateAsync).toHaveBeenCalledWith({
+                parameters: {
+                    basketId: 'basket-123',
+                    shipmentId: 'me'
+                },
+                body: {
+                    shippingMethod: {
+                        id: 'pickup-method-123'
+                    },
+                    c_fromStoreId: 'store-2',
+                    shippingAddress: {}
+                }
+            })
         })
 
         test('handles case when no pickup shipping method is found', async () => {
@@ -814,6 +862,7 @@ describe('usePickupShipment', () => {
                 basketId: 'basket-123',
                 shipments: [
                     {
+                        shipmentId: 'me',
                         shippingMethod: {
                             id: 'standard-shipping',
                             c_storePickupEnabled: false
@@ -869,6 +918,7 @@ describe('usePickupShipment', () => {
                 basketId: 'basket-123',
                 shipments: [
                     {
+                        shipmentId: 'me',
                         shippingMethod: {
                             id: 'pickup-method-123',
                             c_storePickupEnabled: true

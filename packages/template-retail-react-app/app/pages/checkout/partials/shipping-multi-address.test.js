@@ -90,7 +90,9 @@ beforeEach(() => {
 
     useMultiship.mockReturnValue({
         findDeliveryShipmentWithSameAddress: jest.fn(),
+        findUnusedDeliveryShipment: jest.fn(),
         createNewDeliveryShipmentWithAddress: jest.fn(),
+        updateDeliveryAddressForShipment: jest.fn(),
         moveItemsToDeliveryShipment: jest.fn(),
         removeEmptyShipments: jest.fn()
     })
@@ -770,7 +772,9 @@ describe('ShippingMultiAddress', () => {
 
 describe('ShippingMultiAddress - handleSubmit', () => {
     let mockFindDeliveryShipmentWithSameAddress
+    let mockFindUnusedDeliveryShipment
     let mockCreateNewDeliveryShipmentWithAddress
+    let mockUpdateDeliveryAddressForShipment
     let mockMoveItemsToDeliveryShipment
     let mockRemoveEmptyShipments
 
@@ -823,13 +827,22 @@ describe('ShippingMultiAddress - handleSubmit', () => {
 
     beforeEach(() => {
         mockFindDeliveryShipmentWithSameAddress = jest.fn().mockReturnValue(null)
+        mockFindUnusedDeliveryShipment = jest.fn().mockReturnValue(null)
         mockCreateNewDeliveryShipmentWithAddress = jest.fn().mockResolvedValue('new-shipment-1')
-        mockMoveItemsToDeliveryShipment = jest.fn().mockResolvedValue()
+        mockUpdateDeliveryAddressForShipment = jest.fn().mockResolvedValue()
+        mockMoveItemsToDeliveryShipment = jest.fn().mockResolvedValue({
+            basketId: 'test-basket-123',
+            // Return updated basket
+            productItems: mockBasket.productItems,
+            shipments: mockBasket.shipments
+        })
         mockRemoveEmptyShipments = jest.fn().mockResolvedValue()
 
         useMultiship.mockReturnValue({
             findDeliveryShipmentWithSameAddress: mockFindDeliveryShipmentWithSameAddress,
+            findUnusedDeliveryShipment: mockFindUnusedDeliveryShipment,
             createNewDeliveryShipmentWithAddress: mockCreateNewDeliveryShipmentWithAddress,
+            updateDeliveryAddressForShipment: mockUpdateDeliveryAddressForShipment,
             moveItemsToDeliveryShipment: mockMoveItemsToDeliveryShipment,
             removeEmptyShipments: mockRemoveEmptyShipments
         })
@@ -1006,6 +1019,441 @@ describe('ShippingMultiAddress - handleSubmit', () => {
                 mockBasket,
                 mockAddresses[0] // First address as default
             )
+        })
+    })
+
+    // Tests for address persistence functionality
+    describe('Address Persistence', () => {
+        const mockBasketWithShipments = {
+            ...mockBasket,
+            productItems: [
+                {
+                    ...mockBasket.productItems[0],
+                    itemId: 'item-1',
+                    shipmentId: 'shipment-1'
+                },
+                {
+                    ...mockBasket.productItems[1],
+                    itemId: 'item-2',
+                    shipmentId: 'shipment-2'
+                }
+            ],
+            shipments: [
+                {
+                    shipmentId: 'shipment-1',
+                    shippingAddress: {
+                        firstName: 'John',
+                        lastName: 'Doe',
+                        address1: '123 Main St',
+                        city: 'New York',
+                        stateCode: 'NY',
+                        postalCode: '10001'
+                    }
+                },
+                {
+                    shipmentId: 'shipment-2',
+                    shippingAddress: {
+                        firstName: 'Jane',
+                        lastName: 'Smith',
+                        address1: '456 Oak Ave',
+                        city: 'Los Angeles',
+                        stateCode: 'CA',
+                        postalCode: '90210'
+                    }
+                }
+            ]
+        }
+
+        const mockCustomerWithMatchingAddresses = {
+            ...mockCustomer,
+            addresses: [
+                {
+                    addressId: 'addr-1',
+                    firstName: 'John',
+                    lastName: 'Doe',
+                    address1: '123 Main St',
+                    city: 'New York',
+                    stateCode: 'NY',
+                    postalCode: '10001'
+                },
+                {
+                    addressId: 'addr-2',
+                    firstName: 'Jane',
+                    lastName: 'Smith',
+                    address1: '456 Oak Ave',
+                    city: 'Los Angeles',
+                    stateCode: 'CA',
+                    postalCode: '90210'
+                },
+                {
+                    addressId: 'addr-3',
+                    firstName: 'Bob',
+                    lastName: 'Johnson',
+                    address1: '789 Pine St',
+                    city: 'Chicago',
+                    stateCode: 'IL',
+                    postalCode: '60601'
+                }
+            ]
+        }
+
+        test('should initialize selected addresses based on existing shipments when addresses match customer addresses', () => {
+            useCurrentCustomer.mockReturnValue({
+                data: mockCustomerWithMatchingAddresses,
+                isLoading: false
+            })
+
+            useCurrentBasket.mockReturnValue({
+                data: mockBasketWithShipments
+            })
+
+            renderWithIntl(
+                <ShippingMultiAddress {...defaultProps} basket={mockBasketWithShipments} />
+            )
+
+            // Check that the address dropdowns show the correct selected addresses
+            const dropdowns = screen.getAllByRole('combobox')
+            expect(dropdowns[0]).toHaveValue('addr-1') // John Doe's address
+            expect(dropdowns[1]).toHaveValue('addr-2') // Jane Smith's address
+        })
+
+        test('should fall back to first customer address when shipment address does not match any customer address', () => {
+            const mockCustomerWithNonMatchingAddresses = {
+                ...mockCustomer,
+                addresses: [
+                    {
+                        addressId: 'addr-1',
+                        firstName: 'Alice',
+                        lastName: 'Wonder',
+                        address1: '999 Different St',
+                        city: 'Different City',
+                        stateCode: 'TX',
+                        postalCode: '12345'
+                    }
+                ]
+            }
+
+            useCurrentCustomer.mockReturnValue({
+                data: mockCustomerWithNonMatchingAddresses,
+                isLoading: false
+            })
+
+            useCurrentBasket.mockReturnValue({
+                data: mockBasketWithShipments
+            })
+
+            renderWithIntl(
+                <ShippingMultiAddress {...defaultProps} basket={mockBasketWithShipments} />
+            )
+
+            // Check that the address dropdowns fall back to the first customer address
+            const dropdowns = screen.getAllByRole('combobox')
+            expect(dropdowns[0]).toHaveValue('addr-1') // Fall back to first address
+            expect(dropdowns[1]).toHaveValue('addr-1') // Fall back to first address
+        })
+
+        test('should handle partial address matches correctly', () => {
+            const mockCustomerWithPartialMatches = {
+                ...mockCustomer,
+                addresses: [
+                    {
+                        addressId: 'addr-1',
+                        firstName: 'John',
+                        lastName: 'Doe',
+                        address1: '123 Main St',
+                        city: 'New York',
+                        stateCode: 'NY',
+                        postalCode: '10001'
+                    },
+                    {
+                        addressId: 'addr-2',
+                        firstName: 'Different',
+                        lastName: 'Person',
+                        address1: '456 Oak Ave',
+                        city: 'Los Angeles',
+                        stateCode: 'CA',
+                        postalCode: '90210'
+                    }
+                ]
+            }
+
+            useCurrentCustomer.mockReturnValue({
+                data: mockCustomerWithPartialMatches,
+                isLoading: false
+            })
+
+            useCurrentBasket.mockReturnValue({
+                data: mockBasketWithShipments
+            })
+
+            renderWithIntl(
+                <ShippingMultiAddress {...defaultProps} basket={mockBasketWithShipments} />
+            )
+
+            // Check that the first item matches correctly, second falls back
+            const dropdowns = screen.getAllByRole('combobox')
+            expect(dropdowns[0]).toHaveValue('addr-1') // John Doe matches
+            expect(dropdowns[1]).toHaveValue('addr-1') // Jane Smith falls back to first address
+        })
+
+        test('should handle items without shipment assignments by using default address', () => {
+            const mockBasketWithUnassignedItems = {
+                ...mockBasket,
+                productItems: [
+                    {
+                        ...mockBasket.productItems[0],
+                        itemId: 'item-1',
+                        shipmentId: 'shipment-1'
+                    },
+                    {
+                        ...mockBasket.productItems[1],
+                        itemId: 'item-2'
+                        // No shipmentId - unassigned item
+                    }
+                ],
+                shipments: [
+                    {
+                        shipmentId: 'shipment-1',
+                        shippingAddress: {
+                            firstName: 'John',
+                            lastName: 'Doe',
+                            address1: '123 Main St',
+                            city: 'New York',
+                            stateCode: 'NY',
+                            postalCode: '10001'
+                        }
+                    }
+                ]
+            }
+
+            useCurrentCustomer.mockReturnValue({
+                data: mockCustomerWithMatchingAddresses,
+                isLoading: false
+            })
+
+            useCurrentBasket.mockReturnValue({
+                data: mockBasketWithUnassignedItems
+            })
+
+            renderWithIntl(
+                <ShippingMultiAddress {...defaultProps} basket={mockBasketWithUnassignedItems} />
+            )
+
+            // Check that assigned item gets correct address, unassigned gets default
+            const dropdowns = screen.getAllByRole('combobox')
+            expect(dropdowns[0]).toHaveValue('addr-1') // Assigned item gets correct address
+            expect(dropdowns[1]).toHaveValue('addr-1') // Unassigned item gets default (first address)
+        })
+
+        test('should handle shipments without addresses gracefully', () => {
+            const mockBasketWithShipmentsWithoutAddresses = {
+                ...mockBasket,
+                productItems: [
+                    {
+                        ...mockBasket.productItems[0],
+                        itemId: 'item-1',
+                        shipmentId: 'shipment-1'
+                    },
+                    {
+                        ...mockBasket.productItems[1],
+                        itemId: 'item-2',
+                        shipmentId: 'shipment-2'
+                    }
+                ],
+                shipments: [
+                    {
+                        shipmentId: 'shipment-1'
+                        // No shippingAddress
+                    },
+                    {
+                        shipmentId: 'shipment-2',
+                        shippingAddress: {
+                            firstName: 'Jane',
+                            lastName: 'Smith',
+                            address1: '456 Oak Ave',
+                            city: 'Los Angeles',
+                            stateCode: 'CA',
+                            postalCode: '90210'
+                        }
+                    }
+                ]
+            }
+
+            useCurrentCustomer.mockReturnValue({
+                data: mockCustomerWithMatchingAddresses,
+                isLoading: false
+            })
+
+            useCurrentBasket.mockReturnValue({
+                data: mockBasketWithShipmentsWithoutAddresses
+            })
+
+            renderWithIntl(
+                <ShippingMultiAddress
+                    {...defaultProps}
+                    basket={mockBasketWithShipmentsWithoutAddresses}
+                />
+            )
+
+            // Check that items in shipments without addresses get default
+            const dropdowns = screen.getAllByRole('combobox')
+            expect(dropdowns[0]).toHaveValue('addr-1') // No address in shipment, gets default
+            expect(dropdowns[1]).toHaveValue('addr-2') // Has address in shipment, gets correct address
+        })
+
+        test('should handle empty customer addresses gracefully', () => {
+            const mockCustomerWithNoAddresses = {
+                ...mockCustomer,
+                addresses: []
+            }
+
+            useCurrentCustomer.mockReturnValue({
+                data: mockCustomerWithNoAddresses,
+                isLoading: false
+            })
+
+            useCurrentBasket.mockReturnValue({
+                data: mockBasketWithShipments
+            })
+
+            renderWithIntl(
+                <ShippingMultiAddress {...defaultProps} basket={mockBasketWithShipments} />
+            )
+
+            // Check that dropdowns show "No Address Available" when no customer addresses
+            const dropdowns = screen.getAllByRole('combobox')
+            dropdowns.forEach((dropdown) => {
+                expect(dropdown).toHaveValue('')
+            })
+
+            // Check that "No Address Available" option is present
+            expect(screen.getAllByText('No Address Available')).toHaveLength(2)
+        })
+
+        test('should handle case-sensitive address matching correctly', () => {
+            const mockCustomerWithCaseSensitiveAddresses = {
+                ...mockCustomer,
+                addresses: [
+                    {
+                        addressId: 'addr-1',
+                        firstName: 'JOHN',
+                        lastName: 'DOE',
+                        address1: '123 MAIN ST',
+                        city: 'NEW YORK',
+                        stateCode: 'NY',
+                        postalCode: '10001'
+                    }
+                ]
+            }
+
+            useCurrentCustomer.mockReturnValue({
+                data: mockCustomerWithCaseSensitiveAddresses,
+                isLoading: false
+            })
+
+            useCurrentBasket.mockReturnValue({
+                data: mockBasketWithShipments
+            })
+
+            renderWithIntl(
+                <ShippingMultiAddress {...defaultProps} basket={mockBasketWithShipments} />
+            )
+
+            // Check that case-sensitive matching doesn't work (as expected)
+            const dropdowns = screen.getAllByRole('combobox')
+            expect(dropdowns[0]).toHaveValue('addr-1') // Falls back to first address due to case mismatch
+        })
+
+        test('should handle basket with no shipments correctly', () => {
+            const mockBasketWithNoShipments = {
+                ...mockBasket,
+                productItems: [
+                    {
+                        ...mockBasket.productItems[0],
+                        itemId: 'item-1'
+                        // No shipmentId
+                    },
+                    {
+                        ...mockBasket.productItems[1],
+                        itemId: 'item-2'
+                        // No shipmentId
+                    }
+                ],
+                shipments: []
+            }
+
+            useCurrentCustomer.mockReturnValue({
+                data: mockCustomerWithMatchingAddresses,
+                isLoading: false
+            })
+
+            useCurrentBasket.mockReturnValue({
+                data: mockBasketWithNoShipments
+            })
+
+            renderWithIntl(
+                <ShippingMultiAddress {...defaultProps} basket={mockBasketWithNoShipments} />
+            )
+
+            // Check that all items get default addresses when no shipments exist
+            const dropdowns = screen.getAllByRole('combobox')
+            expect(dropdowns[0]).toHaveValue('addr-1') // Gets default (first address)
+            expect(dropdowns[1]).toHaveValue('addr-1') // Gets default (first address)
+        })
+
+        test('should update selected addresses when customer data changes', () => {
+            // Initially with matching addresses
+            useCurrentCustomer.mockReturnValue({
+                data: mockCustomerWithMatchingAddresses,
+                isLoading: false
+            })
+
+            useCurrentBasket.mockReturnValue({
+                data: mockBasketWithShipments
+            })
+
+            const {rerender} = renderWithIntl(
+                <ShippingMultiAddress {...defaultProps} basket={mockBasketWithShipments} />
+            )
+
+            let dropdowns = screen.getAllByRole('combobox')
+            expect(dropdowns[0]).toHaveValue('addr-1')
+            expect(dropdowns[1]).toHaveValue('addr-2')
+
+            // Change customer data to have different addresses
+            const newCustomerData = {
+                ...mockCustomer,
+                addresses: [
+                    {
+                        addressId: 'addr-new-1',
+                        firstName: 'New',
+                        lastName: 'Customer',
+                        address1: '999 New St',
+                        city: 'New City',
+                        stateCode: 'TX',
+                        postalCode: '12345'
+                    }
+                ]
+            }
+
+            useCurrentCustomer.mockReturnValue({
+                data: newCustomerData,
+                isLoading: false
+            })
+
+            // Re-render with proper context
+            rerender(
+                <CurrencyProvider currency="USD">
+                    <IntlProvider locale="en">
+                        <ShippingMultiAddress {...defaultProps} basket={mockBasketWithShipments} />
+                    </IntlProvider>
+                </CurrencyProvider>
+            )
+
+            // Should fall back to new default address
+            dropdowns = screen.getAllByRole('combobox')
+            expect(dropdowns[0]).toHaveValue('addr-new-1')
+            expect(dropdowns[1]).toHaveValue('addr-new-1')
         })
     })
 })

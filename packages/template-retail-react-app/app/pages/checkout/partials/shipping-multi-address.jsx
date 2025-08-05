@@ -145,7 +145,9 @@ const ShippingMultiAddress = ({
     const {isCurrentShippingMethodPickup} = usePickupShipment(basket)
     const {
         findDeliveryShipmentWithSameAddress,
+        findUnusedDeliveryShipment,
         createNewDeliveryShipmentWithAddress,
+        updateDeliveryAddressForShipment,
         moveItemsToDeliveryShipment,
         removeEmptyShipments
     } = useMultiship(basket)
@@ -182,21 +184,84 @@ const ShippingMultiAddress = ({
     } = useCurrentCustomer()
     const addresses = customer?.addresses || []
 
-    // Update selected addresses when customer data changes
+    // Initialize selected addresses with default addresses
+    const [selectedAddresses, setSelectedAddresses] = useState({})
+
     useEffect(() => {
-        if (customer && deliveryItems.length > 0 && addresses.length > 0) {
+        if (customer && basket?.productItems) {
             const initialSelected = {}
-            deliveryItems.forEach((item) => {
-                const addressKey = item.itemId
-                // Find preferred address or use first address as default
-                const defaultAddress = addresses.find((addr) => addr.preferred) || addresses[0]
-                if (defaultAddress) {
-                    initialSelected[addressKey] = defaultAddress.addressId
-                }
+
+            // If there are existing shipments with addresses, try to match with customer addresses
+            const existingShipments =
+                basket.shipments?.filter((shipment) => shipment.shippingAddress) || []
+
+            if (existingShipments.length > 0) {
+                // Initialize based on existing shipments using item.shipmentId
+                basket.productItems.forEach((item) => {
+                    const addressKey = item.itemId
+                    const shipment = existingShipments.find((s) => s.shipmentId === item.shipmentId)
+
+                    if (shipment && shipment.shippingAddress) {
+                        // Try to find a matching customer address
+                        const matchingAddress = addresses.find(
+                            (addr) =>
+                                addr.firstName === shipment.shippingAddress.firstName &&
+                                addr.lastName === shipment.shippingAddress.lastName &&
+                                addr.address1 === shipment.shippingAddress.address1 &&
+                                addr.city === shipment.shippingAddress.city
+                        )
+
+                        if (matchingAddress) {
+                            initialSelected[addressKey] = matchingAddress.addressId
+                        } else if (addresses.length > 0) {
+                            // Fall back to first customer address if no match found
+                            initialSelected[addressKey] = addresses[0].addressId
+                        }
+                    } else {
+                        // Only set default for items that don't have a shipment assignment
+                        if (addresses.length > 0) {
+                            const defaultAddress =
+                                addresses.find((addr) => addr.preferred) || addresses[0]
+                            if (defaultAddress) {
+                                initialSelected[addressKey] = defaultAddress.addressId
+                            }
+                        }
+                    }
+                })
+            } else if (addresses.length > 0) {
+                // Fall back to customer addresses if no existing shipments
+                basket.productItems.forEach((item) => {
+                    const addressKey = item.itemId
+                    // Find preferred address or use first address as default
+                    const defaultAddress = addresses.find((addr) => addr.preferred) || addresses[0]
+                    if (defaultAddress) {
+                        initialSelected[addressKey] = defaultAddress.addressId
+                    }
+                })
+            }
+
+            // Only update selectedAddresses if it's empty or if we have new items that aren't selected yet
+            setSelectedAddresses((prev) => {
+                const newState = {...prev}
+                let hasChanges = false
+
+                basket.productItems.forEach((item) => {
+                    const addressKey = item.itemId
+                    if (!prev[addressKey] && initialSelected[addressKey]) {
+                        newState[addressKey] = initialSelected[addressKey]
+                        hasChanges = true
+                    }
+                })
+
+                return hasChanges ? newState : prev
             })
-            setSelectedAddresses(initialSelected)
         }
-    }, [customer?.customerId, deliveryItems.length, addresses.length])
+    }, [
+        customer?.customerId,
+        basket?.productItems?.length,
+        addresses.length,
+        basket?.shipments?.length
+    ])
 
     const [showAddAddressForm, setShowAddAddressForm] = useState({})
 
@@ -406,6 +471,7 @@ const ShippingMultiAddress = ({
         try {
             // Based on the shopper's selected addresses, create a map of unique addressIds and their associated items
             const addressToItemsMap = {}
+            let basketAfterItemMoves = null
 
             deliveryItems.forEach((item) => {
                 // Defaults to the first address if no address is selected
@@ -428,25 +494,39 @@ const ShippingMultiAddress = ({
                 addressToItemsMap[addressId].items.push(item)
             })
 
+            // For each unique address, if there is no usable existing shipment, create a new one.
             for (const [addressId, data] of Object.entries(addressToItemsMap)) {
                 const {address, items, shipmentId: existingShipmentId} = data
 
-                // For each unique address, if there is no existing shipment with the same address, create a new one.
-                if (!existingShipmentId) {
-                    addressToItemsMap[addressId].shipmentId =
-                        await createNewDeliveryShipmentWithAddress(basket, address)
+                let targetShipmentId = existingShipmentId
+                if (!targetShipmentId) {
+                    const targetShipment = findUnusedDeliveryShipment(
+                        basket,
+                        Object.values(addressToItemsMap).map((d) => d.shipmentId)
+                    )
+                    targetShipmentId = targetShipment?.shipmentId
+                    if (targetShipmentId) {
+                        await updateDeliveryAddressForShipment(targetShipmentId, address)
+                    } else {
+                        targetShipmentId = await createNewDeliveryShipmentWithAddress(
+                            basket,
+                            address
+                        )
+                    }
                 }
-
+                // Set the shipmentId for the unique address
+                addressToItemsMap[addressId].shipmentId = targetShipmentId
                 // Move items to the new shipment if needed.
-                const targetShipmentId = addressToItemsMap[addressId].shipmentId
                 const itemsToMove = items.filter((item) => item.shipmentId !== targetShipmentId)
                 if (itemsToMove.length > 0) {
-                    await moveItemsToDeliveryShipment(itemsToMove, targetShipmentId)
+                    basketAfterItemMoves = await moveItemsToDeliveryShipment(
+                        itemsToMove,
+                        targetShipmentId
+                    )
                 }
             }
-
-            // Remove any empty shipments. TODO: Need to handle swapping over addresses if default is empty
-            await removeEmptyShipments()
+            // Remove any empty shipments.
+            await removeEmptyShipments(basketAfterItemMoves || basket)
 
             goToStep(STEPS.SHIPPING_OPTIONS)
         } catch (error) {

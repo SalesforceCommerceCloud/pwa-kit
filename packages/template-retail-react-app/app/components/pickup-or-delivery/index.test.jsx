@@ -44,7 +44,7 @@ describe('PickupOrDelivery', () => {
 
         const select = screen.getByTestId('delivery-option-select')
         expect(select).toBeInTheDocument()
-        expect(select).toHaveValue(DELIVERY_OPTIONS.SHIP)
+        expect(select).toHaveValue(DELIVERY_OPTIONS.DELIVERY)
 
         // Should have both options
         expect(screen.getByText('Ship to Address')).toBeInTheDocument()
@@ -122,10 +122,10 @@ describe('PickupOrDelivery', () => {
         renderWithIntl(<PickupOrDelivery value={DELIVERY_OPTIONS.PICKUP} onChange={mockOnChange} />)
 
         const select = screen.getByTestId('delivery-option-select')
-        await user.selectOptions(select, DELIVERY_OPTIONS.SHIP)
+        await user.selectOptions(select, DELIVERY_OPTIONS.DELIVERY)
 
         expect(mockOnChange).toHaveBeenCalledTimes(1)
-        expect(mockOnChange).toHaveBeenCalledWith(DELIVERY_OPTIONS.SHIP)
+        expect(mockOnChange).toHaveBeenCalledWith(DELIVERY_OPTIONS.DELIVERY)
     })
 
     test('does not call onChange when no onChange handler provided', () => {
@@ -176,7 +176,7 @@ describe('PickupOrDelivery', () => {
 
     test('exports DELIVERY_OPTIONS constants', () => {
         expect(DELIVERY_OPTIONS).toBeDefined()
-        expect(DELIVERY_OPTIONS.SHIP).toBe('ship')
+        expect(DELIVERY_OPTIONS.DELIVERY).toBe('delivery')
         expect(DELIVERY_OPTIONS.PICKUP).toBe('pickup')
     })
 })

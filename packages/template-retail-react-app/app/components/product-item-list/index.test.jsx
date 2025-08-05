@@ -118,6 +118,20 @@ describe('ProductItemList Component', () => {
         )
     })
 
+    test('renders with custom delivery actions', () => {
+        const mockRenderDeliveryActions = jest.fn(({key}) => (
+            <div key={key}>Custom Delivery Actions</div>
+        ))
+        renderWithProviders(
+            <ProductItemList {...defaultProps} renderDeliveryActions={mockRenderDeliveryActions} />
+        )
+
+        expect(mockRenderDeliveryActions).toHaveBeenCalledWith(mockProductItems[0])
+        expect(mockRenderDeliveryActions).toHaveBeenCalledWith(mockProductItems[1])
+        const deliveryActions = screen.getAllByText('Custom Delivery Actions')
+        expect(deliveryActions.length).toBeGreaterThan(0)
+    })
+
     test('handles bonus products correctly', () => {
         const bonusProductItems = [
             {
