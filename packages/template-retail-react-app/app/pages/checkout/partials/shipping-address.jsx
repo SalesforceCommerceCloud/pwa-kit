@@ -57,6 +57,8 @@ export default function ShippingAddress() {
     const {formatMessage} = useIntl()
     const [isLoading, setIsLoading] = useState()
     const [isMultiShipping, setIsMultiShipping] = useState(false)
+    const [guestAddresses, setGuestAddresses] = useState([])
+    const [selectedAddresses, setSelectedAddresses] = useState({})
     const {data: customer} = useCurrentCustomer()
     const {data: basket} = useCurrentBasket()
     const selectedShippingAddress = basket?.shipments && basket?.shipments[0]?.shippingAddress
@@ -173,7 +175,13 @@ export default function ShippingAddress() {
             <ToggleCardEdit>
                 {!isMultiShipping ? (
                     <ShippingAddressSelection
-                        selectedAddress={selectedShippingAddress}
+                        selectedAddress={
+                            customer && customer.isGuest
+                                ? guestAddresses.length > 0
+                                    ? guestAddresses[0]
+                                    : null
+                                : selectedShippingAddress
+                        }
                         submitButtonLabel={submitButtonMessage}
                         onSubmit={submitAndContinue}
                         formTitleAriaLabel={shippingAddressAriaLabel}
@@ -185,6 +193,10 @@ export default function ShippingAddress() {
                         addNewAddressLabel={addNewAddressLabel}
                         noItemsInBasketMessage={noItemsInBasketMessage}
                         deliveryAddressLabel={deliveryAddressLabel}
+                        guestAddresses={guestAddresses}
+                        setGuestAddresses={setGuestAddresses}
+                        selectedAddresses={selectedAddresses}
+                        setSelectedAddresses={setSelectedAddresses}
                     />
                 )}
             </ToggleCardEdit>

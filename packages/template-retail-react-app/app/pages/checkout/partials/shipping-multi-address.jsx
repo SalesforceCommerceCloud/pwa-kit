@@ -132,7 +132,11 @@ const ShippingMultiAddress = ({
     submitButtonLabel,
     addNewAddressLabel,
     noItemsInBasketMessage,
-    deliveryAddressLabel
+    deliveryAddressLabel,
+    guestAddresses,
+    setGuestAddresses,
+    selectedAddresses,
+    setSelectedAddresses
 }) => {
     const {formatMessage} = useIntl()
     const {currency} = useCurrency()
@@ -178,9 +182,6 @@ const ShippingMultiAddress = ({
     } = useCurrentCustomer()
     const addresses = customer?.addresses || []
 
-    // Initialize selected addresses with default addresses
-    const [selectedAddresses, setSelectedAddresses] = useState({})
-
     // Update selected addresses when customer data changes
     useEffect(() => {
         if (customer && deliveryItems.length > 0 && addresses.length > 0) {
@@ -220,8 +221,11 @@ const ShippingMultiAddress = ({
     const isAddressFormOpen =
         Object.keys(showAddAddressForm).filter((key) => showAddAddressForm[key])?.length > 0
 
-    // Unified loading state - check if either customer or products are loading
-    const isLoading = customerLoading || productsLoading
+    // guest addresses for guests & customer addresses for registered users
+    const finalAddresses = customer && customer.isGuest ? guestAddresses : addresses
+
+    // Unified loading state - for guests, only check products loading since they may n't have addresses
+    const isLoading = (customer && customer.isGuest ? false : customerLoading) || productsLoading
 
     // Check if all product items have an address selected
     const allShipmentsHaveAddress = (basket.productItems ?? []).every(
@@ -276,23 +280,6 @@ const ShippingMultiAddress = ({
         )
     }
 
-    // Handle guest user
-    if (customer && customer.isGuest) {
-        return (
-            <Center p={8} textAlign="center" color="gray.500">
-                <VStack spacing={4}>
-                    <Text fontSize="lg" fontWeight="medium">
-                        {formatMessage({
-                            id: 'shipping_multi_address.guest_user.message',
-                            defaultMessage:
-                                'Guest users cannot use multi-address shipping. Please sign in to continue.'
-                        })}
-                    </Text>
-                </VStack>
-            </Center>
-        )
-    }
-
     // Show loading message when loading
     if (isLoading) {
         return (
@@ -320,44 +307,97 @@ const ShippingMultiAddress = ({
     const handleCreateAddress = async (addressData, form, itemId) => {
         const addressKey = itemId
 
-        try {
-            const newAddress = {
-                ...addressData,
-                addressId: nanoid()
+        if (customer && customer.isGuest) {
+            // store address in component state
+            try {
+                const newAddress = {
+                    ...addressData,
+                    addressId: `guest_${nanoid()}`,
+                    isGuestAddress: true
+                }
+
+                setGuestAddresses((prev) => {
+                    const updatedAddresses = [...prev, newAddress]
+
+                    // If this is the first address, apply it to all delivery items
+                    if (prev.length === 0) {
+                        const initialSelected = {}
+                        deliveryItems.forEach((item) => {
+                            const itemKey = item.itemId
+                            initialSelected[itemKey] = newAddress.addressId
+                        })
+                        setSelectedAddresses(initialSelected)
+                    } else {
+                        // For subsequent addresses, only assign to the current item
+                        setSelectedAddresses((prev) => ({
+                            ...prev,
+                            [addressKey]: newAddress.addressId
+                        }))
+                    }
+
+                    return updatedAddresses
+                })
+
+                setShowAddAddressForm((prev) => ({...prev, [addressKey]: false}))
+                form.reset()
+                form.clearErrors()
+
+                showToast({
+                    title: formatMessage({
+                        id: 'shipping_multi_address.success.address_saved',
+                        defaultMessage: 'Address saved successfully'
+                    }),
+                    status: 'success'
+                })
+            } catch (error) {
+                showToast({
+                    title: formatMessage({
+                        id: 'shipping_multi_address.error.save_failed',
+                        defaultMessage: 'Failed to save address'
+                    }),
+                    status: 'error'
+                })
             }
+        } else {
+            // For registered users, save to customer address book
+            try {
+                const newAddress = {
+                    ...addressData,
+                    addressId: nanoid()
+                }
 
-            const createdAddress = await createCustomerAddress.mutateAsync({
-                body: newAddress,
-                parameters: {customerId: customer.customerId}
-            })
+                const createdAddress = await createCustomerAddress.mutateAsync({
+                    body: newAddress,
+                    parameters: {customerId: customer.customerId}
+                })
 
-            setShowAddAddressForm((prev) => ({...prev, [addressKey]: false}))
-            form.reset()
+                setShowAddAddressForm((prev) => ({...prev, [addressKey]: false}))
+                form.reset()
+                form.clearErrors()
 
-            form.clearErrors()
+                await refetchCustomer()
 
-            await refetchCustomer()
+                setSelectedAddresses((prev) => ({
+                    ...prev,
+                    [addressKey]: createdAddress.addressId
+                }))
 
-            setSelectedAddresses((prev) => ({
-                ...prev,
-                [addressKey]: createdAddress.addressId
-            }))
-
-            showToast({
-                title: formatMessage({
-                    id: 'shipping_multi_address.success.address_saved',
-                    defaultMessage: 'Address saved successfully'
-                }),
-                status: 'success'
-            })
-        } catch (error) {
-            showToast({
-                title: formatMessage({
-                    id: 'shipping_multi_address.error.save_failed',
-                    defaultMessage: 'Failed to save address'
-                }),
-                status: 'error'
-            })
+                showToast({
+                    title: formatMessage({
+                        id: 'shipping_multi_address.success.address_saved',
+                        defaultMessage: 'Address saved successfully'
+                    }),
+                    status: 'success'
+                })
+            } catch (error) {
+                showToast({
+                    title: formatMessage({
+                        id: 'shipping_multi_address.error.save_failed',
+                        defaultMessage: 'Failed to save address'
+                    }),
+                    status: 'error'
+                })
+            }
         }
     }
 
@@ -369,8 +409,8 @@ const ShippingMultiAddress = ({
 
             deliveryItems.forEach((item) => {
                 // Defaults to the first address if no address is selected
-                const addressId = selectedAddresses[item.itemId] || addresses[0]?.addressId
-                const address = addresses.find((addr) => addr.addressId === addressId)
+                const addressId = selectedAddresses[item.itemId] || finalAddresses[0]?.addressId
+                const address = finalAddresses.find((addr) => addr.addressId === addressId)
 
                 // If there is an existing shipment with the same address, use it in the next step
                 const shipmentIdWithSameAddress = findDeliveryShipmentWithSameAddress(
@@ -546,7 +586,7 @@ const ShippingMultiAddress = ({
 
                                             <Box w="100%" mb={6}>
                                                 <VStack spacing={3} align="stretch">
-                                                    {customerLoading ? (
+                                                    {!customer?.isGuest && customerLoading ? (
                                                         <Box p={4} textAlign="center">
                                                             <Text color="gray.500">
                                                                 {formatMessage({
@@ -579,8 +619,9 @@ const ShippingMultiAddress = ({
                                                                 })
                                                             }}
                                                             disabled={
-                                                                addresses.length === 0 ||
-                                                                customerLoading
+                                                                finalAddresses.length === 0 ||
+                                                                (!customer?.isGuest &&
+                                                                    customerLoading)
                                                             }
                                                             aria-labelledby={`delivery-address-label-${addressKey}`}
                                                             borderColor="gray.300"
@@ -592,7 +633,7 @@ const ShippingMultiAddress = ({
                                                             }}
                                                             data-testid={`address-dropdown-${addressKey}`}
                                                         >
-                                                            {addresses.length === 0 ? (
+                                                            {finalAddresses.length === 0 ? (
                                                                 <option value="">
                                                                     {formatMessage({
                                                                         id: 'shipping_multi_address.no_addresses_available',
@@ -601,7 +642,7 @@ const ShippingMultiAddress = ({
                                                                     })}
                                                                 </option>
                                                             ) : (
-                                                                addresses.map((addr) => (
+                                                                finalAddresses.map((addr) => (
                                                                     <option
                                                                         key={addr.addressId}
                                                                         value={addr.addressId}
@@ -725,7 +766,11 @@ ShippingMultiAddress.propTypes = {
     submitButtonLabel: PropTypes.object.isRequired,
     addNewAddressLabel: PropTypes.object.isRequired,
     noItemsInBasketMessage: PropTypes.object.isRequired,
-    deliveryAddressLabel: PropTypes.object.isRequired
+    deliveryAddressLabel: PropTypes.object.isRequired,
+    guestAddresses: PropTypes.array,
+    setGuestAddresses: PropTypes.func,
+    selectedAddresses: PropTypes.object,
+    setSelectedAddresses: PropTypes.func
 }
 
 export default ShippingMultiAddress
