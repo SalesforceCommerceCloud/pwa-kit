@@ -123,9 +123,11 @@ const Header = ({
     const {isRegistered} = useCustomerType()
     const logout = useAuthHelper(AuthHelpers.Logout)
     const navigate = useNavigation()
-    const openModal = SFDC_EXT_STORE_LOCATOR && (() => {
-        onStoreLocatorClick()
-    })
+    const openModal =
+        SFDC_EXT_STORE_LOCATOR &&
+        (() => {
+            onStoreLocatorClick()
+        })
 
     const [showLoading, setShowLoading] = useState(false)
 
@@ -372,9 +374,7 @@ const propTypes = {
         PropTypes.shape({current: PropTypes.elementType})
     ])
 }
-SFDC_EXT_STORE_LOCATOR && (
-    propTypes.onStoreLocatorClick = PropTypes.func
-)
+SFDC_EXT_STORE_LOCATOR && (propTypes.onStoreLocatorClick = PropTypes.func)
 Header.propTypes = propTypes
 
 export default Header

@@ -42,13 +42,12 @@ const AppModals = (context) => {
 
 const propTypes = {
     authModal: PropTypes.object,
-    dntNotification: PropTypes.object,
+    dntNotification: PropTypes.object
 }
 
-SFDC_EXT_STORE_LOCATOR && (
-    propTypes.isOpenStoreLocator = PropTypes.bool,
-    propTypes.onCloseStoreLocator = PropTypes.func
-)
+SFDC_EXT_STORE_LOCATOR &&
+    ((propTypes.isOpenStoreLocator = PropTypes.bool),
+    (propTypes.onCloseStoreLocator = PropTypes.func))
 
 AppModals.propTypes = propTypes
 export default AppModals

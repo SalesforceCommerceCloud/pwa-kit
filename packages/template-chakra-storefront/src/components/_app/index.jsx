@@ -88,7 +88,7 @@ const App = (props) => {
         onMyAccountClick: onAccountClick,
         //@sfdc-extension-line SFDC_EXT_WISHLIST
         onWishlistClick,
-        mobileNavigationProps,
+        mobileNavigationProps
     }
 
     SFDC_EXT_STORE_LOCATOR && (headerProps.onStoreLocatorClick = onOpenStoreLocator)
