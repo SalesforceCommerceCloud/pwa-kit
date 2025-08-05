@@ -25,12 +25,12 @@ import {
 import {useShopperBasketsMutation} from '@salesforce/commerce-sdk-react'
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
 import {useCurrency} from '@salesforce/retail-react-app/app/hooks'
+import {usePickupShipment} from '@salesforce/retail-react-app/app/hooks/use-pickup-shipment'
 import LoadingSpinner from '@salesforce/retail-react-app/app/components/loading-spinner'
 import PropTypes from 'prop-types'
 
-// Import the components
 import ShippingProductCards from '@salesforce/retail-react-app/app/pages/checkout/partials/shipping-product-cards'
-import ShippingOptionsOnly from '@salesforce/retail-react-app/app/pages/checkout/partials/shipping-options-only'
+import ShippingOptionsList from '@salesforce/retail-react-app/app/pages/checkout/partials/shipping-options-list'
 
 // Component to handle combined product cards and shipping options for multiship
 const ShipmentOptionsWithProducts = ({shipment, basketId, currency, control, basket}) => {
@@ -76,7 +76,7 @@ const ShipmentOptionsWithProducts = ({shipment, basketId, currency, control, bas
                     <ShippingProductCards shipment={shipment} basket={basket} />
 
                     {/* Shipping Options */}
-                    <ShippingOptionsOnly
+                    <ShippingOptionsList
                         shipment={shipment}
                         basketId={basketId}
                         currency={currency}
@@ -129,38 +129,25 @@ export default function ShippingOptions() {
     const {step, STEPS, goToStep, goToNextStep} = useCheckout()
     const {data: basket, isLoading: isBasketLoading} = useCurrentBasket()
     const {currency} = useCurrency()
+    const {isCurrentShippingMethodPickup} = usePickupShipment(basket)
     const updateShippingMethod = useShopperBasketsMutation('updateShippingMethodForShipment')
 
-    // Get all shipments that have shipping addresses
-    const shipmentsWithAddresses =
-        (basket &&
-            basket.shipments &&
-            basket.shipments.filter((shipment) => shipment.shippingAddress)) ||
-        []
-
-    // Determine if this is multiship or single ship
-    // We need to check for shipments with different addresses, not just multiple shipments
     const deliveryShipments =
         (basket &&
             basket.shipments &&
-            basket.shipments.filter((shipment) => shipment.shippingAddress)) ||
+            basket.shipments.filter(
+                (shipment) =>
+                    shipment.shippingAddress &&
+                    !isCurrentShippingMethodPickup(shipment.shippingMethod)
+            )) ||
         []
 
-    // Check if there are multiple shipments with different addresses
-    const uniqueAddresses = new Set()
-    deliveryShipments.forEach((shipment) => {
-        if (shipment.shippingAddress) {
-            const addressKey = `${shipment.shippingAddress.address1}-${shipment.shippingAddress.city}-${shipment.shippingAddress.postalCode}`
-            uniqueAddresses.add(addressKey)
-        }
-    })
-
-    const hasMultipleDeliveryShipments = uniqueAddresses.size > 1
+    const hasMultipleDeliveryShipments = deliveryShipments.size > 1
 
     // Build initial form values
     const getInitialValues = () => {
         const values = {}
-        shipmentsWithAddresses.forEach((shipment) => {
+        deliveryShipments.forEach((shipment) => {
             values[`shippingMethodId_${shipment.shipmentId}`] =
                 (shipment.shippingMethod && shipment.shippingMethod.id) || ''
         })
@@ -182,11 +169,11 @@ export default function ShippingOptions() {
         if (hasNewFields) {
             form.reset(newDefaults)
         }
-    }, [shipmentsWithAddresses.length])
+    }, [deliveryShipments.length])
 
     const submitForm = async (formData) => {
         // Submit shipping method for each shipment
-        const promises = shipmentsWithAddresses.map((shipment) => {
+        const promises = deliveryShipments.map((shipment) => {
             const methodId = formData[`shippingMethodId_${shipment.shipmentId}`]
             if (methodId) {
                 return updateShippingMethod.mutateAsync({
@@ -222,11 +209,11 @@ export default function ShippingOptions() {
 
     // Check if all shipments have valid shipping info
     const hasValidShippingInfo =
-        shipmentsWithAddresses.length > 0 && shipmentsWithAddresses.every((s) => s.shippingAddress)
+        deliveryShipments.length > 0 && deliveryShipments.every((s) => s.shippingAddress)
 
     const isFormValid =
         form.formState.isValid ||
-        shipmentsWithAddresses.every((s) => s.shippingMethod && s.shippingMethod.id)
+        deliveryShipments.every((s) => s.shippingMethod && s.shippingMethod.id)
 
     // Show loading spinner if basket is loading
     if (isBasketLoading) {
@@ -278,7 +265,7 @@ export default function ShippingOptions() {
                 >
                     <Stack spacing={6}>
                         {/* Dynamically create shipping method options for each shipment */}
-                        {shipmentsWithAddresses.map((shipment) => (
+                        {deliveryShipments.map((shipment) => (
                             <Box key={shipment.shipmentId}>
                                 {hasMultipleDeliveryShipments ? (
                                     // Multiship: Show both product cards and shipping options
@@ -291,7 +278,7 @@ export default function ShippingOptions() {
                                     />
                                 ) : (
                                     // Single ship: Show only shipping options
-                                    <ShippingOptionsOnly
+                                    <ShippingOptionsList
                                         shipment={shipment}
                                         basketId={basket.basketId}
                                         currency={currency}
@@ -317,13 +304,13 @@ export default function ShippingOptions() {
 
             {hasValidShippingInfo && (
                 <ToggleCardSummary>
-                    {shipmentsWithAddresses.length === 1 ? (
+                    {deliveryShipments.length === 1 ? (
                         // Single shipment summary
                         <Box>
-                            {shipmentsWithAddresses[0].shippingMethod && (
+                            {deliveryShipments[0].shippingMethod && (
                                 <>
                                     <Flex justify="space-between" w="full">
-                                        <Text>{shipmentsWithAddresses[0].shippingMethod.name}</Text>
+                                        <Text>{deliveryShipments[0].shippingMethod.name}</Text>
                                         <Text fontWeight="bold">
                                             {totalShippingCost === 0 ? (
                                                 freeLabel
@@ -337,7 +324,7 @@ export default function ShippingOptions() {
                                         </Text>
                                     </Flex>
                                     <Text fontSize="sm" color="gray.700">
-                                        {shipmentsWithAddresses[0].shippingMethod.description}
+                                        {deliveryShipments[0].shippingMethod.description}
                                     </Text>
                                 </>
                             )}
@@ -345,7 +332,7 @@ export default function ShippingOptions() {
                     ) : (
                         // Multiple shipments summary
                         <Stack spacing={2}>
-                            {shipmentsWithAddresses.map((shipment) => {
+                            {deliveryShipments.map((shipment) => {
                                 const shippingItem =
                                     basket &&
                                     basket.shippingItems &&
@@ -395,7 +382,7 @@ export default function ShippingOptions() {
                                     </Box>
                                 )
                             })}
-                            {shipmentsWithAddresses.length > 1 && (
+                            {deliveryShipments.length > 1 && (
                                 <Box borderTopWidth="1px" pt={2} mt={2}>
                                     <Flex justify="space-between" w="full">
                                         <Text fontWeight="semibold">

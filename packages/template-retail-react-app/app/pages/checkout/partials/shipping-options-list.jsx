@@ -21,7 +21,7 @@ import PropTypes from 'prop-types'
 import LoadingSpinner from '@salesforce/retail-react-app/app/components/loading-spinner'
 
 // Component to handle shipping options for a single shipment (without product cards)
-const ShippingOptionsOnly = ({shipment, basketId, currency, control}) => {
+const ShippingOptionsList = ({shipment, basketId, currency, control}) => {
     const {formatMessage} = useIntl()
     const {data: shippingMethods, isLoading: isShippingMethodsLoading} =
         useShippingMethodsForShipment(
@@ -153,7 +153,7 @@ const ShippingOptionsOnly = ({shipment, basketId, currency, control}) => {
     )
 }
 
-ShippingOptionsOnly.propTypes = {
+ShippingOptionsList.propTypes = {
     shipment: PropTypes.shape({
         shipmentId: PropTypes.string.isRequired,
         shippingAddress: PropTypes.shape({
@@ -173,4 +173,4 @@ ShippingOptionsOnly.propTypes = {
     control: PropTypes.object.isRequired
 }
 
-export default ShippingOptionsOnly
+export default ShippingOptionsList
