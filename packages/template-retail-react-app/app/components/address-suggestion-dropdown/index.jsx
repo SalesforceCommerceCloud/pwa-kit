@@ -13,7 +13,9 @@ import {
     Flex,
     Text,
     IconButton,
-    Spinner
+    Spinner,
+    Stack,
+    Spacer
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 import {CloseIcon, LocationIcon} from '@salesforce/retail-react-app/app/components/icons'
 
@@ -91,69 +93,58 @@ const AddressSuggestionDropdown = ({
             boxShadow="md"
             mt={1}
         >
-            <Flex
-                px={4}
-                pr={4}
-                pt={2}
-                pb={2}
-                h="34px"
-                borderRadius="6px"
-                justifyContent="space-between"
-                alignItems="center"
-            >
+            <Flex px={4} pr={0} py={2} alignItems="center">
                 <Text fontSize="sm" fontWeight="medium" color="gray.600">
                     <FormattedMessage 
                         defaultMessage="SUGGESTED"
                         id="addressSuggestionDropdown.suggested" 
                     />
                 </Text>
+                <Spacer />
                 <IconButton
                     size="sm"
                     variant="ghost"
                     icon={<CloseIcon boxSize={4} color="gray.600" />}
                     onClick={onClose}
                     aria-label="Close suggestions"
-                    p={0.5}
-                    mr={-4}
-                    mt={0.5}
                 />
             </Flex>
-            {suggestions.map((suggestion, index) => (
-                <Box
-                    key={index}
-                    px={4}
-                    py={4}
-                    h="50px"
-                    cursor="pointer"
-                    _hover={{bg: 'gray.50'}}
-                    onClick={() => onSelectSuggestion(suggestion)}
-                    role="button"
-                    tabIndex={0}
-                    onKeyDown={(e) => {
-                        if (e.key === 'Enter' || e.key === ' ') {
-                            onSelectSuggestion(suggestion)
-                        }
-                    }}
-                >
-                    <Flex alignItems="center" gap={2}>
-                        {/* Location Icon */}
-                        <LocationIcon boxSize={4} color="black" />
+            <Stack spacing={0}>
+                {suggestions.map((suggestion, index) => (
+                    <Box
+                        key={index}
+                        px={4}
+                        py={3}
+                        cursor="pointer"
+                        _hover={{bg: 'gray.50'}}
+                        onClick={() => onSelectSuggestion(suggestion)}
+                        role="button"
+                        tabIndex={0}
+                        onKeyDown={(e) => {
+                            if (e.key === 'Enter' || e.key === ' ') {
+                                onSelectSuggestion(suggestion)
+                            }
+                        }}
+                    >
+                        <Flex alignItems="center" gap={2}>
+                            {/* Location Icon */}
+                            <LocationIcon boxSize={4} color="black" />
 
-                        {/* Address Text */}
-                        <Box flex={1}>
-                            <Text fontSize="sm" noOfLines={1}>
-                                {suggestion.description || `${suggestion.structured_formatting?.main_text}, ${suggestion.structured_formatting?.secondary_text}`}
-                            </Text>
-                        </Box>
-                    </Flex>
-                </Box>
-            ))}
+                            {/* Address Text */}
+                            <Box flex={1}>
+                                <Text fontSize="sm" noOfLines={1}>
+                                    {suggestion.description || `${suggestion.structured_formatting?.main_text}, ${suggestion.structured_formatting?.secondary_text}`}
+                                </Text>
+                            </Box>
+                        </Flex>
+                    </Box>
+                ))}
+            </Stack>
             
             {/* Google Maps Attribution */}
             <Box
                 px={4}
-                py={4}
-                h="50px"
+                py={3}
                 display="flex"
                 alignItems="center"
             >
