@@ -934,9 +934,6 @@ describe('ApplePayExpress PDP Mode', () => {
     })
 
     it('cleans up temporary basket when SKU changes', async () => {
-        // Test the cleanup flow by simulating the conditions where cleanup should occur
-        // We'll test this through the getAppleButtonConfig function which manages the shared basket ref
-        
         const mockTempBasket = {
             basketId: 'temp-basket-123',
             orderTotal: 29.99,
@@ -960,8 +957,7 @@ describe('ApplePayExpress PDP Mode', () => {
             null, // no initial temp basket
             true // isPdpMode
         )
-        
-        // Simulate the onClick that creates a temporary basket
+
         const mockResolve = jest.fn()
         const mockReject = jest.fn()
         await buttonConfig.onClick(mockResolve, mockReject)
@@ -969,9 +965,7 @@ describe('ApplePayExpress PDP Mode', () => {
         // Verify temporary basket was created
         expect(createTemporaryBasket).toHaveBeenCalledWith('OLD-SKU', 'test-token', {id: 'test-site'}, 1)
         expect(mockResolve).toHaveBeenCalled()
-        
-        // Now test the cleanup when SKU changes by simulating the useEffect logic
-        // This represents what happens when the component's useEffect runs with a new SKU
+ 
         const currentSku = 'OLD-SKU'
         const newSku = 'NEW-SKU'
         const tempBasket = mockTempBasket
@@ -995,8 +989,6 @@ describe('ApplePayExpress PDP Mode', () => {
             currency: 'USD'
         }
         
-        // Test the unmount cleanup logic directly
-        // This represents what happens in the component's useEffect cleanup function
         const isPdpMode = true
         const currentSku = 'TEST-SKU'
         const tempBasket = mockTempBasket
@@ -1023,8 +1015,7 @@ describe('ApplePayExpress PDP Mode', () => {
 
         // Simulate component unmount when no temporary basket exists
         unmount()
-
-        // In the test environment, no temporary basket was actually created, so no cleanup should occur
+        
         expect(deleteTemporaryBasket).not.toHaveBeenCalled()
     })
 })
