@@ -278,7 +278,7 @@ function removeUnusedComponents(directory) {
                             }
                             // If this import matches any exported file and it's not from one of the component candidates, remove it from the set
                             const isCandidate = Array.from(removeComponentCandidates).find(
-                                (candidate) => 
+                                (candidate) =>
                                     path.resolve(filePath).startsWith(candidate + path.sep)
                             )
                             if (exportedFiles.has(absoluteImportPath) && !isCandidate) {
