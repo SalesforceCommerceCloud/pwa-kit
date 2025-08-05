@@ -18,14 +18,14 @@ import {
 } from '@salesforce/commerce-sdk-react'
 import {useHistory, useLocation, useParams} from 'react-router-dom'
 
-import {useCurrentBasket, useVariant} from '../../hooks'
-import useEinstein from '../../hooks/use-einstein'
-import {useWishList} from '../../hooks/use-wish-list'
+import {useCurrentBasket, useVariant} from '../../../hooks'
+import useEinstein from '../../../hooks/use-einstein'
+import {useWishList} from '../../../hooks/use-wish-list'
 
-import {normalizeSetBundleProduct, getUpdateBundleChildArray} from '../../utils/product-utils'
-import {useErrorHandler} from '../../hooks/use-errors'
+import {normalizeSetBundleProduct, getUpdateBundleChildArray} from '../../../utils/product-utils'
+import {useErrorHandler} from '../../../hooks/use-errors'
 
-import {rebuildPathWithParams} from '../../utils/url'
+import {rebuildPathWithParams} from '../../../utils/url'
 
 export const useProductDetailData = () => {
     const history = useHistory()
