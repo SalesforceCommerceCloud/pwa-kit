@@ -35,6 +35,7 @@ import CartItemVariantPrice from '@salesforce/retail-react-app/app/components/it
 import CancelOrderModal from '@salesforce/retail-react-app/app/components/cancel-order-modal'
 import PropTypes from 'prop-types'
 import OrderStatusBar from '@salesforce/retail-react-app/app/components/order-status-bar/index'
+import {useSomOrder} from '@salesforce/commerce-sdk-react'
 
 const onClient = typeof window !== 'undefined'
 
@@ -128,6 +129,8 @@ const AccountOrderDetail = () => {
             enabled: onClient && !!params.orderNo
         }
     )
+    const {data: somOrder} = useSomOrder()
+    console.log("somOrder", somOrder)
     const isLoading = isOrderLoading || !order
     const shipment = order?.shipments[0]
     const {shippingAddress, shippingMethod, shippingStatus, trackingNumber} = shipment || {}
