@@ -296,8 +296,6 @@ describe('Temporary Basket', () => {
             )
 
             expect(global.fetch).toHaveBeenCalledTimes(1)
-            // setTempBasket should not be called since it's null
-            // This tests the false branch of "if (setTempBasket)"
         })
     })
 
