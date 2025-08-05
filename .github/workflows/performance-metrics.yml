@@ -22,22 +22,21 @@ jobs:
 
             - name: Install Monorepo Dependencies
               run: |-
-                  # Install node dependencies
-                  node ./scripts/gtime.js monorepo_install npm ci
+                  npm ci
 
             - name: Get Template Version
               run: |-
                   version=`jq -r ".version" packages/template-retail-react-app/package.json`
                   echo "retail_app_template_version=$version" >> "$GITHUB_ENV"
 
-            # TODO: This is set to generate an app with extensibility using a SLAS private client which I don't know is what they'll be running tests on.
-            # TODO: Change this to generate an app with the performance metrics template.
+            # TODO: use the other generate_app action that has more flexibility
             - name: Generate Retail App Private Client
               uses: ./.github/actions/e2e_generate_app
               with:
                   PROJECT_KEY: 'retail-app-private-client'
                   TEMPLATE_VERSION: ${{ env.retail_app_template_version }}
 
+            # TODO: is this step still needed? I think it expects a project key
             - name: Validate Generated Retail App Private Client
               uses: ./.github/actions/e2e_validate_generated_app
               with:
@@ -58,8 +57,8 @@ jobs:
                   FLAGS: --wait
 
             # TODO: Remove this if not needed or change this to whatever storefront is used for performance metrics.
-            - name: Set Retail App Private Client Home
-              run: export RETAIL_APP_HOME=https://scaffold-pwa-e2e-pwa-kit-private.mobify-storefront.com/
+            # - name: Set Retail App Private Client Home
+            #   run: export RETAIL_APP_HOME=https://scaffold-pwa-e2e-pwa-kit-private.mobify-storefront.com/
 
             # TODO: This step is not needed. We don't need to worry about calling it from the workflow. What we need to worry about is the build and deploy to MRT.
             # - name: Run Performance Metrics
