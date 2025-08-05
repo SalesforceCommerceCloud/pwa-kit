@@ -20,6 +20,7 @@ import {resolveSiteFromUrl, resolveLocaleFromUrl} from '../../utils/site-utils'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import {createUrlTemplate} from '../../utils/url'
 import createLogger from '@salesforce/pwa-kit-runtime/utils/logger-factory'
+import {isServer} from '../../utils/utils'
 
 import {CommerceApiProvider} from '@salesforce/commerce-sdk-react'
 import {withReactQuery} from '@salesforce/pwa-kit-react-sdk/ssr/universal/components/with-react-query'
@@ -131,7 +132,6 @@ AppConfig.propTypes = {
     locals: PropTypes.object
 }
 
-const isServerSide = typeof window === 'undefined'
 // Recommended settings for PWA-Kit usages.
 // NOTE: they will be applied on both server and client side.
 // retry is always disabled on server side regardless of the value from the options
@@ -142,7 +142,7 @@ const options = {
                 retry: false,
                 refetchOnWindowFocus: false,
                 staleTime: 10 * 1000,
-                ...(isServerSide ? {retryOnMount: false} : {})
+                ...(isServer ? {retryOnMount: false} : {})
             },
             mutations: {
                 retry: false
