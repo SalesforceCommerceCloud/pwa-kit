@@ -107,6 +107,43 @@ export default function ShippingAddress() {
         setIsMultiShipping(hasMultipleDeliveryShipments)
     }, [hasMultipleDeliveryShipments])
 
+    useEffect(() => {
+        if (customer?.isGuest && basket?.shipments) {
+            const addresses = []
+            const selectedAddresses = {}
+
+            basket.shipments.forEach((shipment, index) => {
+                if (shipment.shippingAddress) {
+                    const addressId = `guest_${shipment.shipmentId}`
+                    const address = {
+                        addressId,
+                        firstName: shipment.shippingAddress.firstName,
+                        lastName: shipment.shippingAddress.lastName,
+                        address1: shipment.shippingAddress.address1,
+                        city: shipment.shippingAddress.city,
+                        stateCode: shipment.shippingAddress.stateCode,
+                        postalCode: shipment.shippingAddress.postalCode,
+                        countryCode: shipment.shippingAddress.countryCode,
+                        phone: shipment.shippingAddress.phone,
+                        isGuestAddress: true,
+                        originalShipmentId: shipment.shipmentId
+                    }
+                    addresses.push(address)
+
+                    // Assign this address to items in this shipment
+                    basket.productItems?.forEach((item) => {
+                        if (item.shipmentId === shipment.shipmentId) {
+                            selectedAddresses[item.itemId] = addressId
+                        }
+                    })
+                }
+            })
+
+            setGuestAddresses(addresses)
+            setSelectedGuestAddresses(selectedAddresses)
+        }
+    }, [basket?.shipments, customer?.isGuest])
+
     const submitAndContinue = async (address) => {
         setIsLoading(true)
         try {
