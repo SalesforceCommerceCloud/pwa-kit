@@ -283,6 +283,12 @@ function removeUnusedComponents(directory) {
                             )
                             if (exportedFiles.has(absoluteImportPath) && !isCandidate) {
                                 exportedFiles.delete(absoluteImportPath)
+                                // Traverse up the parents of absoluteImportPath and delete them from exportedFiles too
+                                let parentPath = absoluteImportPath
+                                while (parentPath !== path.resolve(directory)) {
+                                    parentPath = path.dirname(parentPath)
+                                    exportedFiles.delete(parentPath)
+                                }
                             }
                         }
                     }
