@@ -58,7 +58,6 @@ const deliverToMultipleAddressesLabel = defineMessage({
 export default function ShippingAddress() {
     const {formatMessage} = useIntl()
     const [isLoading, setIsLoading] = useState()
-    const [isMultiShipping, setIsMultiShipping] = useState(false)
     const [guestAddresses, setGuestAddresses] = useState([])
     const [selectedAddresses, setSelectedAddresses] = useState({})
     const {data: customer} = useCurrentCustomer()
