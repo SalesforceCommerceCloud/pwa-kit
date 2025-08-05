@@ -344,7 +344,7 @@ const {handler} = runtime.createHandler(options, (app) => {
             const accessToken = "eyJ2ZXIiOiIxLjAiLCJqa3UiOiJzbGFzL3Byb2QvenpyZl8wMTciLCJraWQiOiJmNmFhN2Q3MS00Nzc0LTRhNjMtYmNmNS05ZTBlN2QxZjQ5N2MiLCJ0eXAiOiJqd3QiLCJjbHYiOiJKMi4zLjQiLCJhbGciOiJFUzI1NiJ9.eyJhdXQiOiJHVUlEIiwic2NwIjoic2ZjYy5zaG9wcGVyLW15YWNjb3VudC5iYXNrZXRzIHNmY2Muc2hvcHBlci1kaXNjb3Zlcnktc2VhcmNoIHNmY2Muc2hvcHBlci1wcm9kdWN0cyBjX29yZGVycyBzZmNjLnNob3BwZXItbXlhY2NvdW50LnJ3IHNmY2Muc2hvcHBlci1jdXN0b21lcnMubG9naW4gc2ZjYy5zaG9wcGVyLXN0b3JlcyBjX3Jldmlld3Mgc2ZjYy5zaG9wcGVyLW15YWNjb3VudC5vcmRlcnMgc2ZjYy5zaG9wcGVyLWN1c3RvbWVycy5yZWdpc3RlciBzZmNjLnNob3BwZXItbXlhY2NvdW50LmFkZHJlc3Nlcy5ydyBzZmNjLnNob3BwZXItbXlhY2NvdW50LnByb2R1Y3RsaXN0cy5ydyBzZmNjLnNob3BwZXItcHJvZHVjdGxpc3RzIHNmY2Muc2hvcHBlci1wcm9tb3Rpb25zIHNmY2Muc2hvcHBlci1iYXNrZXRzLW9yZGVycy5ydyBzZmNjLnNob3BwZXItZ2lmdC1jZXJ0aWZpY2F0ZXMgc2ZjYy5zaG9wcGVyLW15YWNjb3VudC5wYXltZW50aW5zdHJ1bWVudHMucncgc2ZjYy5zaG9wcGVyLXByb2R1Y3Qtc2VhcmNoIHNmY2Muc2hvcHBlci1jYXRlZ29yaWVzIiwic3ViIjoiY2Mtc2xhczo6enpyZl8wMTc6OnNjaWQ6YmMwM2E3OTYtMjhjNS00MGExLWFjMGMtNWEwY2NkMTBjMTZiOjp1c2lkOjdmYWFhMmMzLWRjNDYtNDhmYi1hOThmLTg0NWEzMjRhNDQ0MiIsImN0eCI6InNsYXMiLCJpc3MiOiJzbGFzL3Byb2QvenpyZl8wMTciLCJpc3QiOjEsImRudCI6IjAiLCJhdWQiOiJjb21tZXJjZWNsb3VkL3Byb2QvenpyZl8wMTciLCJuYmYiOjE3NTQzNTUxMDgsInN0eSI6IlVzZXIiLCJpc2IiOiJ1aWRvOnNsYXM6OnVwbjpHdWVzdDo6dWlkbjpHdWVzdCBVc2VyOjpnY2lkOmFibDB4Rnd1Y1d3WGtSeGVrWWxHWVltZXhHOjpjaGlkOlJlZkFyY2giLCJleHAiOjE3NTQzNTY5MzgsImlhdCI6MTc1NDM1NTEzOCwianRpIjoiQzJDNDg1NjIwMjIzMC0xODkwNjc4ODY2MzMwMjk5MTQ4NDU2OTg1MDYifQ.PE0a8nsQ7ZFmV69dIaPycsYedTQFFrsmnZtDeSJFedqJHq7OMx_nfXqeVgiUH8br4ryA2j-OcRLWiKR3Ha-QBQ";
 
             // Direct HTTP request to the custom API endpoint
-            const apiUrl = "https://kv7kzm78.api.commercecloud.salesforce.com/custom/orders/v1/getOrder?c_orderNumber=00000101&c_emailId=unandyala%40salesforce.com";
+            const apiUrl = "https://kv7kzm78.api.commercecloud.salesforce.com/custom/orders/v1/organizations/f_ecom_zzrf_017/order?siteId=RefArch&c_orderNumber=00000101&c_emailId=unandyala%40salesforce.com";
             
             console.log('📤 Server API: Making request to:', apiUrl);
 
@@ -357,8 +357,13 @@ const {handler} = runtime.createHandler(options, (app) => {
                 }
             });
 
+            console.log('🔍 Server API: Response status:', response.status);
+            console.log('🔍 Server API: Response headers:', Object.fromEntries(response.headers.entries()));
+
             if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
+                const errorText = await response.text();
+                console.error('❌ Server API: Error response body:', errorText);
+                throw new Error(`HTTP error! status: ${response.status}, body: ${errorText}`);
             }
 
             const result = await response.json();
