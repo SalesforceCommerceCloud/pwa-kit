@@ -12,7 +12,7 @@ import RecommendedProductsSection from './partials/recommended-products-section'
 import PageMetadata from './page-metadata'
 import PageCache from './page-cache'
 import PageAnalytics from './page-analytics'
-import {useProductDetailData} from './use-product-detail-data'
+import {useProductDetailData} from './hooks/use-product-detail-data'
 
 const ProductDetail = () => {
     const {
