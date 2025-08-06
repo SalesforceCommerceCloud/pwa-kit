@@ -293,17 +293,20 @@ const CheckoutOneClick = () => {
                             />
 
                             {/* Place Order Button */}
-                            <Box display="flex" bottom="0" px={4} pt={2} pb={4}>
+                            <Box
+                                display={{lg: 'none'}}
+                                position="sticky"
+                                bottom="0"
+                                px={4}
+                                pt={6}
+                                pb={11}
+                                background="white"
+                                borderTop="1px solid"
+                                borderColor="gray.100"
+                            >
                                 <Container variant="form">
-                                    <Button
-                                        w="full"
-                                        onClick={onPlaceOrder}
-                                        isLoading={isLoading}
-                                        data-testid="place-order-button"
-                                        size="lg"
-                                        px={8}
-                                        minW="200px"
-                                    >
+                                    <Button w="full" onClick={onPlaceOrder}  isLoading={isLoading} data-testid="place-order-button"                          
+                                >
                                         <FormattedMessage
                                             defaultMessage="Place Order"
                                             id="checkout_payment.button.place_order"
