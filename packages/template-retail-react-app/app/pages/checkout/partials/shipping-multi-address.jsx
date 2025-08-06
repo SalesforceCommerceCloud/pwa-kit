@@ -201,7 +201,7 @@ const ShippingMultiAddress = ({
                     const addressKey = item.itemId
                     const shipment = existingShipments.find((s) => s.shipmentId === item.shipmentId)
 
-                    if (shipment && shipment.shippingAddress) 
+                    if (shipment && shipment.shippingAddress) {
                         // Try to find a matching customer address using areAddressesEqual
                         const matchingAddress = registeredUserAddresses.find(
                             (addr) =>
