@@ -17,8 +17,8 @@ module.exports = {
         // SFDC_EXT_HELLO_WORLD_ENABLED: {
         //     description: 'The Hello World Extension'
         // },
-        // SFDC_EXT_SOCIAL_LOGIN: {
-        //     description: 'Social login Extension'
-        // },
+        SFDC_EXT_SOCIAL_LOGIN: {
+            description: 'Social login Extension'
+        }
     }
 }
