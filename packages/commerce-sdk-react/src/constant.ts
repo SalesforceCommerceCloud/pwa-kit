@@ -33,8 +33,6 @@ export const LOCAL_BUNDLE_PATH = `${MOBIFY_PATH}/bundle/development`
  */
 export const SLAS_PRIVATE_PROXY_PATH = `${MOBIFY_PATH}/slas/private`
 
-
-
 export const SLAS_SECRET_WARNING_MSG =
     'You are potentially exposing SLAS secret on browser. Make sure to keep it safe and secure!'
 
