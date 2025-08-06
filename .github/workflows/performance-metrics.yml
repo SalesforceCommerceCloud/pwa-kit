@@ -30,18 +30,32 @@ jobs:
                   echo "retail_app_template_version=$version" >> "$GITHUB_ENV"
 
             # TODO: use the other generate_app action that has more flexibility
+            # - name: Generate Retail App Private Client
+            #   uses: ./.github/actions/e2e_generate_app
+            #   with:
+            #       PROJECT_KEY: 'retail-app-private-client'
+            #       TEMPLATE_VERSION: ${{ env.retail_app_template_version }}
+
             - name: Generate Retail App Private Client
-              uses: ./.github/actions/e2e_generate_app
+              uses: ./.github/actions/generate_app
               with:
-                  PROJECT_KEY: 'retail-app-private-client'
-                  TEMPLATE_VERSION: ${{ env.retail_app_template_version }}
+                  use_extensibility: false
+                  is_private_client: true
+                  setup_hybrid: false
+                  project_dir: 'build'
+                  project_id: 'FOOOOOOOOOOOOOOOOOO'
+                  org_id: 'f_ecom_tbbn_prd'
+                  short_code: 'performance-001'
+                  client_id: '9629ef22-f8b8-4987-90ac-b815be3940c8'
+                  site_id: 'SiteNemesis'
+                  instance_url: 'zzrf-001.dx.commercecloud.salesforce.com' # this doesn't matter because the OCAPI proxy in Runtime Admin will take precedence
 
             # TODO: is this step still needed? I think it expects a project key
-            - name: Validate Generated Retail App Private Client
-              uses: ./.github/actions/e2e_validate_generated_app
-              with:
-                  PROJECT_KEY: 'retail-app-private-client'
-                  TEMPLATE_VERSION: ${{ env.retail_app_template_version }}
+            # - name: Validate Generated Retail App Private Client
+            #   uses: ./.github/actions/e2e_validate_generated_app
+            #   with:
+            #       PROJECT_KEY: 'retail-app-private-client'
+            #       TEMPLATE_VERSION: ${{ env.retail_app_template_version }}
 
             - name: Create MRT credentials file
               uses: './.github/actions/create_mrt'
@@ -65,21 +79,21 @@ jobs:
             #   run: npm run test:performance-metrics # TODO: Replace with whatever command is used for performance metrics.
 
     # Optionally send Slack notifications for performance metrics.
-    notify-slack-performance-metrics:
-        needs: [run-performance-metrics] # Makes sure the performance metrics job has completed before running this job.
-        if: ${{ always() }} # Runs this job even if the performance metrics job fails.
-        runs-on: ubuntu-latest
-        steps:
-            - name: Send GitHub Action data to Slack workflow (Generated)
-              id: slack-success
-              if: ${{ github.event_name == 'schedule' && needs.run-performance-metrics.result == 'success' }}
-              uses: slackapi/slack-github-action@v1.23.0
-              with:
-                  payload: |
-                      {
-                          "message": "✅ All PWA Kit Private Client Performance Metrics tests passed!"
-                      }
-              env:
-                  # TODO: Create a new slack webhook from the performance metrics slack channel.
-                  # Add the webhook url to the repository secrets with as SLACK_PERFORMANCE_METRICS_WEBHOOK_URL key.
-                  SLACK_WEBHOOK_URL: ${{ secrets.SLACK_PERFORMANCE_METRICS_WEBHOOK_URL }}
+    # notify-slack-performance-metrics:
+    #     needs: [run-performance-metrics] # Makes sure the performance metrics job has completed before running this job.
+    #     if: ${{ always() }} # Runs this job even if the performance metrics job fails.
+    #     runs-on: ubuntu-latest
+    #     steps:
+    #         - name: Send GitHub Action data to Slack workflow (Generated)
+    #           id: slack-success
+    #           if: ${{ github.event_name == 'schedule' && needs.run-performance-metrics.result == 'success' }}
+    #           uses: slackapi/slack-github-action@v1.23.0
+    #           with:
+    #               payload: |
+    #                   {
+    #                       "message": "✅ All PWA Kit Private Client Performance Metrics tests passed!"
+    #                   }
+    #           env:
+    #               # TODO: Create a new slack webhook from the performance metrics slack channel.
+    #               # Add the webhook url to the repository secrets with as SLACK_PERFORMANCE_METRICS_WEBHOOK_URL key.
+    #               SLACK_WEBHOOK_URL: ${{ secrets.SLACK_PERFORMANCE_METRICS_WEBHOOK_URL }}
