@@ -7,7 +7,7 @@
 import {UseQueryResult} from '@tanstack/react-query'
 import {ShopperCustomers} from 'commerce-sdk-isomorphic'
 import {ApiClients, ApiQueryOptions, Argument, DataType, NullableParameters} from '../types'
-import {useQuery} from '../useQuery'
+import {useQuery, useCustomQuery} from '../useQuery'
 import {mergeOptions, omitNullableParameters, pickValidParams} from '../utils'
 import * as queryKeyHelpers from './queryKeyHelpers'
 import {CLIENT_KEYS} from '../../constant'
@@ -237,22 +237,39 @@ export const useCustomerOrders = (
 }
 
 /**
- * Custom order endpoint hook for SOM orders using useCustomMutation.
+ * Custom order endpoint hook for SOM orders using useCustomQuery.
  * @group ShopperCustomers
  * @category Query
- * @returns A useCustomMutation hook for the SOM order endpoint.
+ * @parameter apiOptions - Options to pass through to the custom API endpoint.
+ * @parameter queryOptions - TanStack Query query options.
+ * @returns A TanStack Query query hook for the SOM order endpoint.
  */
-export const useSomOrder = () => {
-    return useCustomMutation({
+export const useSomOrder = (
+    apiOptions: {
+        parameters: {
+            siteId: string
+            c_orderNumber: string
+            c_emailId: string
+        }
+    },
+    queryOptions?: {
+        enabled?: boolean
+        onSuccess?: (data: any) => void
+        onError?: (error: any) => void
+    }
+) => {
+    return useCustomQuery({
         options: {
             method: 'GET',
             customApiPathParameters: {
                 endpointPath: 'order',
-                apiName: 'orders'
-            }
-        },
-        rawResponse: false
-    });
+                apiName: 'orders',
+                apiVersion: 'v1',
+                organizationId: 'f_ecom_zzrf_017'
+            },
+            parameters: apiOptions.parameters
+        }
+    }, queryOptions);
 }
 /**
  * Retrieves a customer's payment instrument by its ID.
