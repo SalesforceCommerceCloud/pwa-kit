@@ -7233,20 +7233,6 @@
       "value": "]"
     }
   ],
-  "shipping_address.error.switch_failed": [
-    {
-      "type": 0,
-      "value": "["
-    },
-    {
-      "type": 0,
-      "value": "Ḗřřǿǿř şẇīŧƈħīƞɠ ŧǿǿ şīƞɠŀḗḗ ȧȧḓḓřḗḗşş. Ƥŀḗḗȧȧşḗḗ ŧřẏ ȧȧɠȧȧīƞ."
-    },
-    {
-      "type": 0,
-      "value": "]"
-    }
-  ],
   "shipping_address.error.update_failed": [
     {
       "type": 0,
