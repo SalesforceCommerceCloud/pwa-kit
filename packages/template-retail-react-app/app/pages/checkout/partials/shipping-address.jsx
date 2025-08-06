@@ -58,7 +58,6 @@ const deliverToMultipleAddressesLabel = defineMessage({
 export default function ShippingAddress() {
     const {formatMessage} = useIntl()
     const [isLoading, setIsLoading] = useState()
-
     const {data: customer} = useCurrentCustomer()
     const {data: basket} = useCurrentBasket()
     const selectedShippingAddress = basket?.shipments && basket?.shipments[0]?.shippingAddress
