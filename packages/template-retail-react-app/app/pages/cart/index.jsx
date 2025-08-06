@@ -64,11 +64,15 @@ import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-cur
 import UnavailableProductConfirmationModal from '@salesforce/retail-react-app/app/components/unavailable-product-confirmation-modal'
 import {getUpdateBundleChildArray} from '@salesforce/retail-react-app/app/utils/product-utils'
 import {useSelectedStore} from '@salesforce/retail-react-app/app/hooks/use-selected-store'
+import {useSomOrderMutation, useSomOrderQuery} from '@salesforce/retail-react-app/app/hooks/use-client-side-custom-order'
 
 const DEBOUNCE_WAIT = 750
 
 const Cart = () => {
     const {data: basket, isLoading} = useCurrentBasket()
+
+    const somOrderMutation = useSomOrderMutation()
+    const somOrderQuery = useSomOrderQuery()
 
     // Pickup in Store - only enabled if feature toggle is on
     const isPickupOrder = STORE_LOCATOR_IS_ENABLED
