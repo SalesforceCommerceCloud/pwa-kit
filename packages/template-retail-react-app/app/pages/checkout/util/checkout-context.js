@@ -9,6 +9,7 @@ import PropTypes from 'prop-types'
 import useEinstein from '@salesforce/retail-react-app/app/hooks/use-einstein'
 import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
+import {useMultiship} from '@salesforce/retail-react-app/app/hooks/use-multiship'
 import {STORE_LOCATOR_IS_ENABLED} from '@salesforce/retail-react-app/app/constants'
 
 const CheckoutContext = React.createContext()
@@ -18,6 +19,10 @@ export const CheckoutProvider = ({children}) => {
     const {data: basket} = useCurrentBasket()
     const einstein = useEinstein()
     const [step, setStep] = useState()
+    const {findExistingDeliveryShipment, findExistingPickupShipment} = useMultiship(basket)
+
+    const deliveryShipment = findExistingDeliveryShipment(basket)
+    const pickupShipment = findExistingPickupShipment(basket)
 
     const CHECKOUT_STEPS_LIST = [
         'CONTACT_INFO',
@@ -40,13 +45,12 @@ export const CheckoutProvider = ({children}) => {
 
         if (customer.isGuest && !basket.customerInfo?.email) {
             step = STEPS.CONTACT_INFO
-        } else if (!basket.shipments[0]?.shippingAddress?.address1) {
+        } else if (!deliveryShipment?.shippingAddress?.address1) {
             // Check if it's a pickup order - only if BOPIS is enabled
-            const isPickupOrder =
-                STORE_LOCATOR_IS_ENABLED &&
-                basket?.shipments[0]?.shippingMethod?.c_storePickupEnabled === true
+            const isPickupOrder = STORE_LOCATOR_IS_ENABLED && pickupShipment
+
             step = isPickupOrder ? STEPS.PICKUP_ADDRESS : STEPS.SHIPPING_ADDRESS
-        } else if (!basket.shipments[0]?.shippingMethod) {
+        } else if (!deliveryShipment?.shippingMethod) {
             step = STEPS.SHIPPING_OPTIONS
         } else if (!basket.paymentInstruments || !basket.billingAddress) {
             step = STEPS.PAYMENT
@@ -56,8 +60,8 @@ export const CheckoutProvider = ({children}) => {
     }, [
         customer?.isGuest,
         basket?.customerInfo?.email,
-        basket?.shipments[0]?.shippingAddress,
-        basket?.shipments[0]?.shippingMethod,
+        deliveryShipment?.shippingAddress,
+        deliveryShipment?.shippingMethod,
         basket?.paymentInstruments,
         basket?.billingAddress
     ])

@@ -25,6 +25,8 @@ import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-curre
 import ShippingMultiAddress from '@salesforce/retail-react-app/app/pages/checkout/partials/shipping-multi-address'
 import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
 import {useMultiship} from '@salesforce/retail-react-app/app/hooks/use-multiship'
+import {usePickupShipment} from '@salesforce/retail-react-app/app/hooks/use-pickup-shipment'
+import {DEFAULT_SHIPMENT_ID} from '@salesforce/retail-react-app/app/constants'
 
 const submitButtonMessage = defineMessage({
     defaultMessage: 'Continue to Shipping Method',
@@ -60,24 +62,25 @@ export default function ShippingAddress() {
     const [isLoading, setIsLoading] = useState()
     const {data: customer} = useCurrentCustomer()
     const {data: basket} = useCurrentBasket()
-    const selectedShippingAddress = basket?.shipments && basket?.shipments[0]?.shippingAddress
+    const {isCurrentShippingMethodPickup} = usePickupShipment(basket)
+    const {findExistingDeliveryShipment, moveItemsToDeliveryShipment, removeEmptyShipments} =
+        useMultiship(basket)
+    const selectedShipment = findExistingDeliveryShipment(basket)
+    const selectedShippingAddress = selectedShipment?.shippingAddress
     const isAddressFilled = selectedShippingAddress?.address1 && selectedShippingAddress?.city
 
     // Check if there are multiple delivery shipments (multi-shipping was used)
-    // We need to check for shipments with different addresses, not just multiple shipments
     const deliveryShipments =
-        basket?.shipments?.filter((shipment) => shipment.shippingAddress) || []
+        basket?.shipments?.filter(
+            (shipment) => !isCurrentShippingMethodPickup(shipment?.shippingMethod)
+        ) || []
 
-    // Check if there are multiple shipments with different addresses
-    const uniqueAddresses = new Set()
-    deliveryShipments.forEach((shipment) => {
-        if (shipment.shippingAddress) {
-            const addressKey = `${shipment.shippingAddress.address1}-${shipment.shippingAddress.city}-${shipment.shippingAddress.postalCode}`
-            uniqueAddresses.add(addressKey)
-        }
-    })
+    const deliveryItems =
+        basket?.productItems?.filter((item) =>
+            deliveryShipments.some((shipment) => shipment.shipmentId === item.shipmentId)
+        ) || []
 
-    const hasMultipleDeliveryShipments = uniqueAddresses.size > 1
+    const hasMultipleDeliveryShipments = deliveryShipments.length > 1
 
     // Initialize multi-shipping state based on existing basket shipments
     const [isMultiShipping, setIsMultiShipping] = useState(hasMultipleDeliveryShipments)
@@ -88,17 +91,6 @@ export default function ShippingAddress() {
         'updateShippingAddressForShipment'
     )
     const showToast = useToast()
-
-    // Get multiship functions for moving items to default shipment
-    let moveItemsToDeliveryShipment = null
-    let removeEmptyShipments = null
-    try {
-        const multishipHook = useMultiship(basket)
-        moveItemsToDeliveryShipment = multishipHook?.moveItemsToDeliveryShipment
-        removeEmptyShipments = multishipHook?.removeEmptyShipments
-    } catch (error) {
-        // Ignore
-    }
 
     // Keep multi-shipping state in sync with basket shipments
     useEffect(() => {
@@ -119,10 +111,14 @@ export default function ShippingAddress() {
                 postalCode,
                 stateCode
             } = address
+            const targetShipment = findExistingDeliveryShipment(basket)
+            const targetShipmentId = targetShipment?.shipmentId || DEFAULT_SHIPMENT_ID
+            let basketAfterItemMoves = null
+
             await updateShippingAddressForShipment.mutateAsync({
                 parameters: {
                     basketId: basket.basketId,
-                    shipmentId: 'me',
+                    shipmentId: targetShipmentId,
                     useAsBilling: false
                 },
                 body: {
@@ -164,23 +160,16 @@ export default function ShippingAddress() {
                     }
                 })
             }
-
-            // Ensure all items are assigned to the default shipment for single address mode
-            if (basket?.productItems?.length > 0 && moveItemsToDeliveryShipment) {
-                const itemsNotInDefaultShipment = basket.productItems.filter(
-                    (item) => item.shipmentId !== 'me'
+            // Move items to the new shipment if needed.
+            const itemsToMove = deliveryItems.filter((item) => item.shipmentId !== targetShipmentId)
+            if (itemsToMove.length > 0) {
+                basketAfterItemMoves = await moveItemsToDeliveryShipment(
+                    itemsToMove,
+                    targetShipmentId
                 )
-
-                if (itemsNotInDefaultShipment.length > 0) {
-                    await moveItemsToDeliveryShipment(itemsNotInDefaultShipment, 'me')
-                }
-
-                // In single ship mode, remove all empty shipments to consolidate to one shipment
-                // In multiship mode, only remove empty shipments if there are multiple delivery shipments
-                if (removeEmptyShipments && (!isMultiShipping || hasMultipleDeliveryShipments)) {
-                    await removeEmptyShipments()
-                }
             }
+            // Remove any empty shipments.
+            await removeEmptyShipments(basketAfterItemMoves || basket)
 
             goToStep(STEPS.SHIPPING_OPTIONS)
         } catch (e) {
@@ -220,37 +209,7 @@ export default function ShippingAddress() {
                     : formatMessage(deliverToMultipleAddressesLabel)
             }
             onEditActionClick={async () => {
-                const newMultiShippingState = !isMultiShipping
-                setIsMultiShipping(newMultiShippingState)
-
-                // If switching from multiship to single ship, consolidate all items to the default shipment
-                if (
-                    !newMultiShippingState &&
-                    hasMultipleDeliveryShipments &&
-                    moveItemsToDeliveryShipment
-                ) {
-                    try {
-                        // Move all items to the default shipment ('me')
-                        const allItems = basket?.productItems || []
-                        if (allItems.length > 0) {
-                            await moveItemsToDeliveryShipment(allItems, 'me')
-                        }
-
-                        // Remove empty shipments after consolidation
-                        if (removeEmptyShipments) {
-                            await removeEmptyShipments()
-                        }
-                    } catch (error) {
-                        showToast({
-                            title: formatMessage({
-                                defaultMessage:
-                                    'Error switching to single address. Please try again.',
-                                id: 'shipping_address.error.switch_failed'
-                            }),
-                            status: 'error'
-                        })
-                    }
-                }
+                setIsMultiShipping(!isMultiShipping)
             }}
         >
             <ToggleCardEdit>

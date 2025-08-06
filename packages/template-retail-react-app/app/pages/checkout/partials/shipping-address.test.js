@@ -12,12 +12,18 @@ import ShippingAddress from '@salesforce/retail-react-app/app/pages/checkout/par
 import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
 import {useCheckout} from '@salesforce/retail-react-app/app/pages/checkout/util/checkout-context'
+import {useMultiship} from '@salesforce/retail-react-app/app/hooks/use-multiship'
+import {usePickupShipment} from '@salesforce/retail-react-app/app/hooks/use-pickup-shipment'
 
 // Mock the hooks
 jest.mock('@salesforce/retail-react-app/app/pages/checkout/util/checkout-context')
 jest.mock('@salesforce/retail-react-app/app/hooks/use-current-customer')
 jest.mock('@salesforce/retail-react-app/app/hooks/use-current-basket')
 jest.mock('@salesforce/retail-react-app/app/hooks/use-toast')
+
+// Mock the new multiship and pickup hooks
+jest.mock('@salesforce/retail-react-app/app/hooks/use-multiship')
+jest.mock('@salesforce/retail-react-app/app/hooks/use-pickup-shipment')
 
 // Mock mutation hooks to prevent QueryClient errors
 const mockMutateAsync = jest.fn().mockResolvedValue({})
@@ -161,12 +167,34 @@ const mockBasket = {
         {
             productId: 'product-1',
             productName: 'Test Product 1',
-            quantity: 2
+            quantity: 2,
+            itemId: 'item-1',
+            shipmentId: 'me'
         },
         {
             productId: 'product-2',
             productName: 'Test Product 2',
-            quantity: 1
+            quantity: 1,
+            itemId: 'item-2',
+            shipmentId: 'me'
+        }
+    ],
+    shipments: [
+        {
+            shipmentId: 'me',
+            shippingMethod: {
+                id: 'standard-shipping',
+                c_storePickupEnabled: false
+            },
+            shippingAddress: {
+                address1: '123 Test St',
+                city: 'Test City',
+                stateCode: 'CA',
+                postalCode: '12345',
+                countryCode: 'US',
+                firstName: 'John',
+                lastName: 'Doe'
+            }
         }
     ]
 }
@@ -217,6 +245,24 @@ describe('ShippingAddress', () => {
             data: mockBasket
         })
         useCheckout.mockReturnValue(mockCheckoutContext)
+
+        // Mock useMultiship hook
+        const useMultiship =
+            // eslint-disable-next-line @typescript-eslint/no-var-requires
+            require('@salesforce/retail-react-app/app/hooks/use-multiship').useMultiship
+        useMultiship.mockReturnValue({
+            findExistingDeliveryShipment: jest.fn().mockReturnValue(mockBasket.shipments[0]),
+            moveItemsToDeliveryShipment: jest.fn().mockResolvedValue(mockBasket),
+            removeEmptyShipments: jest.fn().mockResolvedValue()
+        })
+
+        // Mock usePickupShipment hook
+        const usePickupShipment =
+            // eslint-disable-next-line @typescript-eslint/no-var-requires
+            require('@salesforce/retail-react-app/app/hooks/use-pickup-shipment').usePickupShipment
+        usePickupShipment.mockReturnValue({
+            isCurrentShippingMethodPickup: jest.fn().mockReturnValue(false)
+        })
 
         // Mock useToast hook
         // eslint-disable-next-line @typescript-eslint/no-var-requires
