@@ -9,6 +9,7 @@ import React, {useContext, useState, useEffect} from 'react'
 import {useLocation} from 'react-router-dom'
 import PropTypes from 'prop-types'
 import {Dialog, Button, Text, Box, useBreakpointValue} from '@chakra-ui/react'
+import {addToCartModalTheme} from '../theme/components/project/add-to-cart-modal'
 
 /**
  * Context for managing the BonusProductModal.
@@ -36,7 +37,7 @@ BonusProductModalProvider.propTypes = {
  */
 export const BonusProductModal = () => {
     const {isOpen, onClose, data} = useBonusProductModalContext()
-    const size = useBreakpointValue({base: 'full', lg: 'lg', xl: 'xl'})
+    const size = useBreakpointValue(addToCartModalTheme.modal.size)
 
     if (!isOpen) {
         return null
@@ -48,13 +49,21 @@ export const BonusProductModal = () => {
             size={size}
             open={isOpen}
             onOpenChange={onClose}
-            scrollBehavior="inside"
-            placement="center"
+            scrollBehavior={addToCartModalTheme.modal.scrollBehavior}
+            placement={addToCartModalTheme.modal.placement}
         >
             <Dialog.Backdrop />
             <Dialog.Positioner>
-                <Dialog.Content>
-                    <Dialog.Body bgColor="white" padding="8">
+                <Dialog.Content
+                    margin={addToCartModalTheme.layout.content.margin}
+                    borderRadius={addToCartModalTheme.layout.content.borderRadius}
+                    bgColor={addToCartModalTheme.colors.background}
+                >
+                    <Dialog.Body 
+                        bgColor={addToCartModalTheme.colors.contentBackground} 
+                        padding={addToCartModalTheme.layout.body.padding}
+                        marginBottom={addToCartModalTheme.layout.body.marginBottom}
+                    >
                         <Text fontSize="md" mb="4">
                             Bonus Product Modal
                         </Text>
@@ -68,12 +77,10 @@ export const BonusProductModal = () => {
                                 </Text>
                             </Box>
                         )}
-                    </Dialog.Body>
-                    <Dialog.Footer bgColor="white" padding="8">
-                        <Button onClick={onClose} variant="solid" width="100%">
+                        <Button onClick={onClose} variant="solid" width="100%" mt="4">
                             Close
                         </Button>
-                    </Dialog.Footer>
+                    </Dialog.Body>
                 </Dialog.Content>
             </Dialog.Positioner>
         </Dialog.Root>
