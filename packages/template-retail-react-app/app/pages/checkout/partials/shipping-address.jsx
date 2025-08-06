@@ -58,8 +58,7 @@ const deliverToMultipleAddressesLabel = defineMessage({
 export default function ShippingAddress() {
     const {formatMessage} = useIntl()
     const [isLoading, setIsLoading] = useState()
-    const [guestAddresses, setGuestAddresses] = useState([])
-    const [selectedGuestAddresses, setSelectedGuestAddresses] = useState({})
+
     const {data: customer} = useCurrentCustomer()
     const {data: basket} = useCurrentBasket()
     const selectedShippingAddress = basket?.shipments && basket?.shipments[0]?.shippingAddress
@@ -106,43 +105,6 @@ export default function ShippingAddress() {
     useEffect(() => {
         setIsMultiShipping(hasMultipleDeliveryShipments)
     }, [hasMultipleDeliveryShipments])
-
-    useEffect(() => {
-        if (customer?.isGuest && basket?.shipments) {
-            const addresses = []
-            const selectedAddresses = {}
-
-            basket.shipments.forEach((shipment, index) => {
-                if (shipment.shippingAddress) {
-                    const addressId = `guest_${shipment.shipmentId}`
-                    const address = {
-                        addressId,
-                        firstName: shipment.shippingAddress.firstName,
-                        lastName: shipment.shippingAddress.lastName,
-                        address1: shipment.shippingAddress.address1,
-                        city: shipment.shippingAddress.city,
-                        stateCode: shipment.shippingAddress.stateCode,
-                        postalCode: shipment.shippingAddress.postalCode,
-                        countryCode: shipment.shippingAddress.countryCode,
-                        phone: shipment.shippingAddress.phone,
-                        isGuestAddress: true,
-                        originalShipmentId: shipment.shipmentId
-                    }
-                    addresses.push(address)
-
-                    // Assign this address to items in this shipment
-                    basket.productItems?.forEach((item) => {
-                        if (item.shipmentId === shipment.shipmentId) {
-                            selectedAddresses[item.itemId] = addressId
-                        }
-                    })
-                }
-            })
-
-            setGuestAddresses(addresses)
-            setSelectedGuestAddresses(selectedAddresses)
-        }
-    }, [basket?.shipments, customer?.isGuest])
 
     const submitAndContinue = async (address) => {
         setIsLoading(true)
@@ -295,13 +257,7 @@ export default function ShippingAddress() {
             <ToggleCardEdit>
                 {!isMultiShipping ? (
                     <ShippingAddressSelection
-                        selectedAddress={
-                            customer && customer.isGuest
-                                ? guestAddresses.length > 0
-                                    ? guestAddresses[0]
-                                    : null
-                                : selectedShippingAddress
-                        }
+                        selectedAddress={selectedShippingAddress}
                         submitButtonLabel={submitButtonMessage}
                         onSubmit={submitAndContinue}
                         formTitleAriaLabel={shippingAddressAriaLabel}
@@ -313,10 +269,6 @@ export default function ShippingAddress() {
                         addNewAddressLabel={addNewAddressLabel}
                         noItemsInBasketMessage={noItemsInBasketMessage}
                         deliveryAddressLabel={deliveryAddressLabel}
-                        guestAddresses={guestAddresses}
-                        setGuestAddresses={setGuestAddresses}
-                        selectedGuestAddresses={selectedGuestAddresses}
-                        setSelectedGuestAddresses={setSelectedGuestAddresses}
                     />
                 )}
             </ToggleCardEdit>

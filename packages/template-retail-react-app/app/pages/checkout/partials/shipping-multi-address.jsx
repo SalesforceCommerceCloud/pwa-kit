@@ -132,11 +132,7 @@ const ShippingMultiAddress = ({
     submitButtonLabel,
     addNewAddressLabel,
     noItemsInBasketMessage,
-    deliveryAddressLabel,
-    guestAddresses,
-    setGuestAddresses,
-    selectedGuestAddresses,
-    setSelectedGuestAddresses
+    deliveryAddressLabel
 }) => {
     const {formatMessage} = useIntl()
     const {currency} = useCurrency()
@@ -182,13 +178,16 @@ const ShippingMultiAddress = ({
         refetch: refetchCustomer,
         isLoading: customerLoading
     } = useCurrentCustomer()
-    const addresses = customer?.addresses || []
+
+    const registeredUserAddresses = customer?.addresses || []
+    const [guestAddresses, setGuestAddresses] = useState([])
+    const [selectedGuestAddresses, setSelectedGuestAddresses] = useState({})
 
     // Initialize selected addresses with default addresses
     const [selectedRegisteredUserAddresses, setSelectedRegisteredUserAddresses] = useState({})
 
     useEffect(() => {
-        if (customer && basket?.productItems) {
+        if (customer && !customer.isGuest && basket?.productItems) {
             const initialSelected = {}
 
             // If there are existing shipments with addresses, try to match with customer addresses
@@ -203,7 +202,7 @@ const ShippingMultiAddress = ({
 
                     if (shipment && shipment.shippingAddress) {
                         // Try to find a matching customer address
-                        const matchingAddress = addresses.find(
+                        const matchingAddress = registeredUserAddresses.find(
                             (addr) =>
                                 addr.firstName === shipment.shippingAddress.firstName &&
                                 addr.lastName === shipment.shippingAddress.lastName &&
@@ -213,27 +212,30 @@ const ShippingMultiAddress = ({
 
                         if (matchingAddress) {
                             initialSelected[addressKey] = matchingAddress.addressId
-                        } else if (addresses.length > 0) {
+                        } else if (registeredUserAddresses.length > 0) {
                             // Fall back to first customer address if no match found
-                            initialSelected[addressKey] = addresses[0].addressId
+                            initialSelected[addressKey] = registeredUserAddresses[0].addressId
                         }
                     } else {
                         // Only set default for items that don't have a shipment assignment
-                        if (addresses.length > 0) {
+                        if (registeredUserAddresses.length > 0) {
                             const defaultAddress =
-                                addresses.find((addr) => addr.preferred) || addresses[0]
+                                registeredUserAddresses.find((addr) => addr.preferred) ||
+                                registeredUserAddresses[0]
                             if (defaultAddress) {
                                 initialSelected[addressKey] = defaultAddress.addressId
                             }
                         }
                     }
                 })
-            } else if (addresses.length > 0) {
+            } else if (registeredUserAddresses.length > 0) {
                 // Fall back to customer addresses if no existing shipments
                 basket.productItems.forEach((item) => {
                     const addressKey = item.itemId
                     // Find preferred address or use first address as default
-                    const defaultAddress = addresses.find((addr) => addr.preferred) || addresses[0]
+                    const defaultAddress =
+                        registeredUserAddresses.find((addr) => addr.preferred) ||
+                        registeredUserAddresses[0]
                     if (defaultAddress) {
                         initialSelected[addressKey] = defaultAddress.addressId
                     }
@@ -259,9 +261,52 @@ const ShippingMultiAddress = ({
     }, [
         customer?.customerId,
         basket?.productItems?.length,
-        addresses.length,
+        registeredUserAddresses.length,
         basket?.shipments?.length
     ])
+
+    useEffect(() => {
+        if (customer && customer.isGuest && basket?.productItems) {
+            const existingShipments =
+                basket.shipments?.filter((shipment) => shipment.shippingAddress) || []
+
+            if (existingShipments.length > 0) {
+                basket.productItems.forEach((item) => {
+                    const addressKey = item.itemId
+                    const shipment = existingShipments.find((s) => s.shipmentId === item.shipmentId)
+
+                    if (shipment && shipment.shippingAddress) {
+                        const addressId = `guest_${shipment.shipmentId}`
+                        const address = {
+                            addressId,
+                            firstName: shipment.shippingAddress.firstName,
+                            lastName: shipment.shippingAddress.lastName,
+                            address1: shipment.shippingAddress.address1,
+                            city: shipment.shippingAddress.city,
+                            stateCode: shipment.shippingAddress.stateCode,
+                            postalCode: shipment.shippingAddress.postalCode,
+                            countryCode: shipment.shippingAddress.countryCode,
+                            phone: shipment.shippingAddress.phone,
+                            isGuestAddress: true,
+                            originalShipmentId: shipment.shipmentId
+                        }
+
+                        // add guest address if not present
+                        setGuestAddresses((prev) => {
+                            const exists = prev.find((addr) => addr.addressId === addressId)
+                            return exists ? prev : [...prev, address]
+                        })
+
+                        // assign to product
+                        setSelectedGuestAddresses((prev) => ({
+                            ...prev,
+                            [addressKey]: addressId
+                        }))
+                    }
+                })
+            }
+        }
+    }, [customer?.isGuest, basket?.productItems?.length, basket?.shipments?.length])
 
     const [showAddAddressForm, setShowAddAddressForm] = useState({})
 
@@ -287,7 +332,7 @@ const ShippingMultiAddress = ({
         Object.keys(showAddAddressForm).filter((key) => showAddAddressForm[key])?.length > 0
 
     // guest addresses for guests & customer addresses for registered users
-    const finalAddresses = customer && customer.isGuest ? guestAddresses : addresses
+    const finalAddresses = customer && customer.isGuest ? guestAddresses : registeredUserAddresses
 
     // Unified loading state - for guests, only check products loading since they may n't have addresses
     const isLoading = (customer && customer.isGuest ? false : customerLoading) || productsLoading
@@ -503,7 +548,6 @@ const ShippingMultiAddress = ({
                 addressToItemsMap[addressId].items.push(item)
             })
 
-            console.log(addressToItemsMap)
             // For each unique address, if there is no usable existing shipment, create a new one.
             for (const [addressId, data] of Object.entries(addressToItemsMap)) {
                 const {address, items, shipmentId: existingShipmentId} = data
