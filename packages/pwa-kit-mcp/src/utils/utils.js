@@ -84,6 +84,69 @@ export function isMonoRepo() {
 }
 
 /**
+ * Check if the component is the base component under node_modules/@salesforce/retail-react-app/app/components
+ *
+ * @param {string} componentName - The name of the component to check.
+ * @returns {boolean} True if the component is the base component, false otherwise.
+ */
+export const isBaseComponent = (componentName) => {
+    if (!process.env.WORKSPACE_FOLDER_PATHS) {
+        throw new Error(
+            'WORKSPACE_FOLDER_PATHS environment variable is not set. Please set it to the root of the workspace.'
+        )
+    }
+    const baseComponentPath = path.join(
+        process.env.WORKSPACE_FOLDER_PATHS,
+        'node_modules/@salesforce/retail-react-app/app/components',
+        componentName
+    )
+    logMCPMessage(`?????? baseComponentPath: ${baseComponentPath}`)
+    return fs.existsSync(baseComponentPath)
+}
+
+/**
+ * Check if the component is the shared UI base component under node_modules/@salesforce/retail-react-app/app/components/shared/ui
+ *
+ * @param {string} componentName - The name of the component to check.
+ * @returns {boolean} True if the component is the shared UI base component, false otherwise.
+ */
+export const isSharedUIBaseComponent = (componentName) => {
+    if (!process.env.WORKSPACE_FOLDER_PATHS) {
+        throw new Error(
+            'WORKSPACE_FOLDER_PATHS environment variable is not set. Please set it to the root of the workspace.'
+        )
+    }
+    const baseComponentPath = path.join(
+        process.env.WORKSPACE_FOLDER_PATHS,
+        'node_modules/@salesforce/retail-react-app/app/components/shared/ui',
+        componentName
+    )
+    logMCPMessage(`?????? baseComponentPath: ${baseComponentPath}`)
+    return fs.existsSync(baseComponentPath)
+}
+
+/**
+ * Check if the component is the local component under components folder
+ *
+ * @param {string} componentName - The name of the component to check.
+ * @returns {boolean} True if the component is the local component, false otherwise.
+ */
+export const isLocalComponent = (componentName) => {
+    if (!process.env.PWA_STOREFRONT_APP_PATH) {
+        throw new Error(
+            'PWA_STOREFRONT_APP_PATH environment variable is not set. Please set it to the root of the app folder.'
+        )
+    }
+    const localComponentPath = path.join(
+        process.env.PWA_STOREFRONT_APP_PATH,
+        'components',
+        toKebabCase(componentName)
+    )
+    logMCPMessage(`?????? localComponentPath: ${localComponentPath}`)
+    return fs.existsSync(localComponentPath)
+}
+
+/**
  * Returns the command or path to use for creating a new PWA Kit app.
  *
  * If the project is a monorepo (detected by the presence of lerna.json),
@@ -170,4 +233,16 @@ export async function logMCPMessage(message) {
             console.error(`Failed to write to log file: ${error.message}`)
         }
     }
+}
+
+export function getComponentImportPath(componentName, componentDir, checks) {
+    if (checks.isLocal) {
+        return `'../../components/${componentDir}'`
+    } else if (checks.isBase) {
+        return `'@salesforce/retail-react-app/app/components/${componentName}'`
+    } else if (checks.isSharedUI) {
+        return `'@salesforce/retail-react-app/app/components/shared/ui/${componentName}'`
+    }
+    // Fallback
+    return `'../../components/${componentDir}'`
 }
