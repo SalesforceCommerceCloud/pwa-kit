@@ -10,9 +10,8 @@ import PropTypes from 'prop-types'
 import {AuthModal} from '../../../hooks/use-auth-modal'
 import {DntNotification} from '../../../hooks'
 import Toaster, {toaster} from '../../../components/toaster'
-import loadable from '@loadable/component'
-const StoreLocatorModal =
-    SFDC_EXT_STORE_LOCATOR && loadable(() => import('../../../pages/store-locator/partial/modal'))
+/* @sfdc-extension-line SFDC_EXT_STORE_LOCATOR */
+import StoreLocatorModal from '../../../pages/store-locator/partial/modal'
 
 /**
  * AppModals component that renders all app-level modals using React Portals
