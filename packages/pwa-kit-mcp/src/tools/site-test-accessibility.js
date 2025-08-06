@@ -18,5 +18,12 @@ export async function runAccessibilityTest(siteUrl) {
 
     await browser.close()
 
-    return results
+    return {
+        content: [
+            {
+                type: 'text',
+                text: JSON.stringify(results)
+            }
+        ]
+    }
 }
