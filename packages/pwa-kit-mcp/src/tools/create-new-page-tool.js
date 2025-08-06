@@ -8,10 +8,11 @@ import fs from 'fs/promises'
 import path from 'path'
 import {toKebabCase, toPascalCase, logMCPMessage} from '../utils'
 import {
-    getComponentImportPath,
+    generateBaseComponentImportStatement,
     isBaseComponent,
     isSharedUIBaseComponent,
-    isLocalComponent
+    isLocalComponent,
+    isLocalSharedUIComponent
 } from '../utils/utils'
 import {z} from 'zod'
 
@@ -150,38 +151,49 @@ class CreateNewPageTool {
     generatePageContent(pageName, componentList) {
         const imports = [
             `import React from 'react'`,
-            `import {Box} from '@salesforce/retail-react-app/app/components/shared/ui'`,
             `import Seo from '@salesforce/retail-react-app/app/components/seo'`
         ]
-
+        const sharedUIComponents = ['Box']
         // Add component imports
         const accessPromises = componentList.map(async (component) => {
             component = toPascalCase(component)
             const componentName = component.charAt(0).toUpperCase() + component.slice(1)
             const isLocal = isLocalComponent(componentName)
+            const isLocalSharedUI = isLocalSharedUIComponent(componentName)
             const isBase = isBaseComponent(componentName)
             const isSharedUI = isSharedUIBaseComponent(componentName)
-            if (!isLocal && !isBase && !isSharedUI) {
+            if (!isLocal && !isLocalSharedUI && !isBase && !isSharedUI) {
                 this.unfoundComponents.push(component)
             }
-            // If the component name is the same as the page name, add 'Component' to the component name to avoid conflict with the page name
-            const importComponentName =
-                componentName === pageName ? componentName + 'Component' : componentName
-            const importComponentPath = getComponentImportPath(
-                componentName,
-                toKebabCase(componentName),
-                {isLocal, isBase, isSharedUI}
-            )
-
-            logMCPMessage(`?????? importing ${importComponentName} from ${importComponentPath}`)
-            imports.push(`import ${importComponentName} from ${importComponentPath}`)
             // Import getAssetUrl for displaying image source if Image component is used
             if (componentName === 'Image') {
                 imports.push(
                     `import {getAssetUrl} from '@salesforce/pwa-kit-react-sdk/ssr/universal/utils'`
                 )
             }
+            if (isLocalSharedUI || isSharedUI) {
+                sharedUIComponents.push(componentName)
+                return
+            }
+            // If the component name is the same as the page name, add 'Component' to the component name to avoid conflict with the page name
+            const importComponentName =
+                componentName === pageName ? componentName + 'Component' : componentName
+            const importComponentPath = generateBaseComponentImportStatement(
+                importComponentName,
+                toKebabCase(componentName),
+                isLocal,
+                isBase
+            )
+            imports.push(importComponentPath)
         })
+
+        // Import all shared UI components in a single import statement
+        if (sharedUIComponents.length > 0) {
+            const importSharedUIComponents = sharedUIComponents.join(', ')
+            imports.push(
+                `import {${importSharedUIComponents}} from '@salesforce/retail-react-app/app/components/shared/ui'`
+            )
+        }
 
         return Promise.all(accessPromises).then(() => {
             logMCPMessage(`?????? imports ${imports.join('\n')}`)
