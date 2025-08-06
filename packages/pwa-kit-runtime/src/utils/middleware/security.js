@@ -19,7 +19,7 @@ import {isRemote} from '../ssr-server'
 export const defaultPwaKitSecurityHeaders = (req, res, next) => {
     /** CSP-compatible origin for Runtime Admin. */
     // localhost doesn't include a protocol because different browsers behave differently :\
-    const runtimeAdmin = isRemote() ? 'https://runtime.commercecloud.com' : 'localhost:*'
+    const runtimeAdmin = isRemote() ? 'https://runtime-admin-hf-ecom-dev.mobify-storefront.com' : 'localhost:*'
     const siteDotCom = '*.site.com'
     /**
      * Map of directive names/values that are required for PWA Kit to work. Array values will be
