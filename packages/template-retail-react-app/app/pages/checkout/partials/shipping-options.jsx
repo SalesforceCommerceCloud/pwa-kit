@@ -27,10 +27,11 @@ import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-curre
 import {useCurrency} from '@salesforce/retail-react-app/app/hooks'
 import LoadingSpinner from '@salesforce/retail-react-app/app/components/loading-spinner'
 import PropTypes from 'prop-types'
+import {usePickupShipment} from '@salesforce/retail-react-app/app/hooks/use-pickup-shipment'
 
 // Import the components
 import ShippingProductCards from '@salesforce/retail-react-app/app/pages/checkout/partials/shipping-product-cards'
-import ShippingOptionsOnly from '@salesforce/retail-react-app/app/pages/checkout/partials/shipping-options-only'
+import ShippingOptionsList from '@salesforce/retail-react-app/app/pages/checkout/partials/shipping-options-list'
 
 // Component to handle combined product cards and shipping options for multiship
 const ShipmentOptionsWithProducts = ({shipment, basketId, currency, control, basket}) => {
@@ -76,7 +77,7 @@ const ShipmentOptionsWithProducts = ({shipment, basketId, currency, control, bas
                     <ShippingProductCards shipment={shipment} basket={basket} />
 
                     {/* Shipping Options */}
-                    <ShippingOptionsOnly
+                    <ShippingOptionsList
                         shipment={shipment}
                         basketId={basketId}
                         currency={currency}
@@ -130,12 +131,16 @@ export default function ShippingOptions() {
     const {data: basket, isLoading: isBasketLoading} = useCurrentBasket()
     const {currency} = useCurrency()
     const updateShippingMethod = useShopperBasketsMutation('updateShippingMethodForShipment')
+    const {isCurrentShippingMethodPickup} = usePickupShipment(basket)
 
-    // Get all shipments that have shipping addresses
+    // Get all shipments that have shipping addresses and filter out pickup shipments
     const shipmentsWithAddresses =
         (basket &&
             basket.shipments &&
-            basket.shipments.filter((shipment) => shipment.shippingAddress)) ||
+            basket.shipments.filter((shipment) => 
+                shipment.shippingAddress && 
+                !isCurrentShippingMethodPickup(shipment.shippingMethod)
+            )) ||
         []
 
     // Determine if this is multiship or single ship
@@ -143,7 +148,10 @@ export default function ShippingOptions() {
     const deliveryShipments =
         (basket &&
             basket.shipments &&
-            basket.shipments.filter((shipment) => shipment.shippingAddress)) ||
+            basket.shipments.filter((shipment) => 
+                shipment.shippingAddress && 
+                !isCurrentShippingMethodPickup(shipment.shippingMethod)
+            )) ||
         []
 
     // Check if there are multiple shipments with different addresses
@@ -291,11 +299,12 @@ export default function ShippingOptions() {
                                     />
                                 ) : (
                                     // Single ship: Show only shipping options
-                                    <ShippingOptionsOnly
+                                    <ShippingOptionsList
                                         shipment={shipment}
                                         basketId={basket.basketId}
                                         currency={currency}
                                         control={form.control}
+                                        basket={basket}
                                     />
                                 )}
                             </Box>
