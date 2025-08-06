@@ -185,41 +185,47 @@ const PickupAddress = () => {
     const isPickupDataReady = pickupShipmentItems.length > 0 && !isStoreDataLoading
 
     // For single pickup, use the first store
-    const store =
+    const singlePickupStore =
         pickupShipmentItems.length === 1 ? pickupShipmentItems[0]?.store : storeData?.data?.[0]
-    const pickupAddress = {
-        address1: store?.address1,
-        city: store?.city,
-        countryCode: store?.countryCode,
-        postalCode: store?.postalCode,
-        stateCode: store?.stateCode,
-        firstName: store?.name,
+    const singlePickupAddress = {
+        address1: singlePickupStore?.address1,
+        city: singlePickupStore?.city,
+        countryCode: singlePickupStore?.countryCode,
+        postalCode: singlePickupStore?.postalCode,
+        stateCode: singlePickupStore?.stateCode,
+        firstName: singlePickupStore?.name,
         lastName: 'Pickup',
-        phone: store?.phone
+        phone: singlePickupStore?.phone
     }
-
-    const submitAndContinue = async (address) => {
+    const submitAndContinue = async () => {
         setIsLoading(true)
         try {
-            const {address1, city, countryCode, firstName, lastName, phone, postalCode, stateCode} =
-                address
-            await updateShippingAddressForShipment.mutateAsync({
-                parameters: {
-                    basketId: basket.basketId,
-                    shipmentId: 'me',
-                    useAsBilling: false
-                },
-                body: {
-                    address1,
-                    city,
-                    countryCode,
-                    firstName,
-                    lastName,
-                    phone,
-                    postalCode,
-                    stateCode
+            // Update shipping address for each pickup shipment with its own store address
+            const updatePromises = pickupShipmentItems.map((shipmentInfo) => {
+                const store = shipmentInfo.store
+                const shipmentAddress = {
+                    address1: store?.address1,
+                    city: store?.city,
+                    countryCode: store?.countryCode,
+                    postalCode: store?.postalCode,
+                    stateCode: store?.stateCode,
+                    firstName: store?.name,
+                    lastName: 'pickup',
+                    phone: store?.phone
                 }
+
+                return updateShippingAddressForShipment.mutateAsync({
+                    parameters: {
+                        basketId: basket.basketId,
+                        shipmentId: shipmentInfo.shipment.shipmentId,
+                        useAsBilling: false
+                    },
+                    body: shipmentAddress
+                })
             })
+
+            await Promise.all(updatePromises)
+
             setIsLoading(false)
             goToNextStep()
         } catch (error) {
@@ -256,9 +262,9 @@ const PickupAddress = () => {
                                                     id="pickup_address.title.store_information"
                                                 />
                                             </Text>
-                                            {store && (
+                                            {singlePickupStore && (
                                                 <StoreDisplay
-                                                    store={store}
+                                                    store={singlePickupStore}
                                                     showDistance={false}
                                                     showStoreHours={false}
                                                     showPhone={false}
@@ -358,7 +364,7 @@ const PickupAddress = () => {
 
                     <Box pt={3}>
                         <Container variant="form">
-                            <Button w="full" onClick={() => submitAndContinue(pickupAddress)}>
+                            <Button w="full" onClick={() => submitAndContinue()}>
                                 {hasDeliveryShipments ? (
                                     <FormattedMessage
                                         defaultMessage="Continue to Shipping Address"
@@ -389,7 +395,7 @@ const PickupAddress = () => {
                                             id="pickup_address.title.store_information"
                                         />
                                     </Text>
-                                    <AddressDisplay address={pickupAddress} />
+                                    <AddressDisplay address={singlePickupAddress} />
                                 </>
                             )}
 
