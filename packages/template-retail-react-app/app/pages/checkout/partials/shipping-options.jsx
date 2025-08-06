@@ -283,6 +283,7 @@ export default function ShippingOptions() {
                                         basketId={basket.basketId}
                                         currency={currency}
                                         control={form.control}
+                                        basket={basket}
                                     />
                                 )}
                             </Box>

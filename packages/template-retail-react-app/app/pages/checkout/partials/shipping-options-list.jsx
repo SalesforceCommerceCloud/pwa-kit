@@ -46,7 +46,7 @@ const ShippingOptionsList = ({shipment, basketId, currency, control}) => {
 
     return (
         <VStack spacing={6} align="stretch">
-            {/* Shipping Options Only */}
+            {/* Shipping Options List */}
             <Box pt={2} pb={6} px={2}>
                 {isShippingMethodsLoading ? (
                     <Box display="flex" justifyContent="center" alignItems="center" py={8}>
