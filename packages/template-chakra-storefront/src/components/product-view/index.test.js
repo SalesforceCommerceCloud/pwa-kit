@@ -256,7 +256,7 @@ describe('ProductView Component', () => {
     })
 
     describe('Loading States', () => {
-        test.skip('disables add to cart button when basket is loading', async () => {
+        test('disables add to cart button when basket is loading', async () => {
             renderWithProviders(
                 <MockComponent
                     product={mockProductDetail}
@@ -265,9 +265,10 @@ describe('ProductView Component', () => {
                 />
             )
 
-            await waitFor(() => {
-                expect(screen.getByTestId('add-to-cart-button')).toBeDisabled()
-            })
+            // In Chakra UI v3, when a Button has loading={true}, the button text is hidden with a loading spinner.
+            // A data-loading attribute is automatically added to the DOM element
+            const addToCartButton = document.querySelector('[data-loading]')
+            expect(addToCartButton).toBeDisabled()
         })
 
         test('enables add to cart button when basket is not loading', async () => {
