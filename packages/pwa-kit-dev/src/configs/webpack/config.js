@@ -187,8 +187,7 @@ const baseConfig = (target) => {
                         DEBUG,
                         NODE_ENV: `'${process.env.NODE_ENV}'`,
                         WEBPACK_TARGET: `'${target}'`,
-                        ['global.GENTLY']: false,
-                        SFDC_EXT_STORE_LOCATOR: true
+                        ['global.GENTLY']: false
                     }),
                     mode === development && new webpack.NoEmitOnErrorsPlugin(),
 

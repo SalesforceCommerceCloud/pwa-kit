@@ -18,10 +18,14 @@ const StoreLocatorModal =
  * AppModals component that renders all app-level modals using React Portals
  * Handles AuthModal, DntNotification, Toaster, and optional StoreLocatorModal
  */
-const AppModals = (context) => {
-    const {authModal, dntNotification} = context
-    const isOpenStoreLocator = SFDC_EXT_STORE_LOCATOR && context.isOpenStoreLocator
-    const onCloseStoreLocator = SFDC_EXT_STORE_LOCATOR && context.onCloseStoreLocator
+const AppModals = ({
+    authModal,
+    dntNotification,
+    /* @sfdc-extension-block-start SFDC_EXT_STORE_LOCATOR */
+    isOpenStoreLocator,
+    onCloseStoreLocator
+    /* @sfdc-extension-block-end SFDC_EXT_STORE_LOCATOR */
+}) => {
     return (
         <>
             {/* Authentication Modal */}
@@ -33,21 +37,19 @@ const AppModals = (context) => {
             {/* Toast Notifications */}
             <Toaster toaster={toaster} />
 
-            {SFDC_EXT_STORE_LOCATOR && (
-                <StoreLocatorModal isOpen={isOpenStoreLocator} onClose={onCloseStoreLocator} />
-            )}
+            {/* @sfdc-extension-line SFDC_EXT_STORE_LOCATOR */}
+            <StoreLocatorModal isOpen={isOpenStoreLocator} onClose={onCloseStoreLocator} />
         </>
     )
 }
 
-const propTypes = {
+AppModals.propTypes = {
     authModal: PropTypes.object,
-    dntNotification: PropTypes.object
+    dntNotification: PropTypes.object,
+    /* @sfdc-extension-block-start SFDC_EXT_STORE_LOCATOR */
+    isOpenStoreLocator: PropTypes.bool,
+    onCloseStoreLocator: PropTypes.func
+    /* @sfdc-extension-block-end SFDC_EXT_STORE_LOCATOR */
 }
 
-SFDC_EXT_STORE_LOCATOR &&
-    ((propTypes.isOpenStoreLocator = PropTypes.bool),
-    (propTypes.onCloseStoreLocator = PropTypes.func))
-
-AppModals.propTypes = propTypes
 export default AppModals

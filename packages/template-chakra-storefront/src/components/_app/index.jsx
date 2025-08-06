@@ -57,12 +57,13 @@ const App = (props) => {
     } = useAppNavigation()
     const {isDrawerMenuOpen, onDrawerMenuOpen, onDrawerMenuClose, dntNotification} = useAppModals()
 
-    /* eslint-disable react-hooks/rules-of-hooks */
+    /* @sfdc-extension-block-start SFDC_EXT_STORE_LOCATOR */
     const {
         open: isOpenStoreLocator,
         onOpen: onOpenStoreLocator,
         onClose: onCloseStoreLocator
-    } = SFDC_EXT_STORE_LOCATOR && useDisclosure()
+    } = useDisclosure()
+    /* @sfdc-extension-block-end SFDC_EXT_STORE_LOCATOR */
 
     useAppBasket(basket, customer, currency)
     const {isOnline} = useAppOnlineStatus()
@@ -88,10 +89,10 @@ const App = (props) => {
         onMyAccountClick: onAccountClick,
         //@sfdc-extension-line SFDC_EXT_WISHLIST
         onWishlistClick,
-        mobileNavigationProps
+        mobileNavigationProps,
+        /* @sfdc-extension-line SFDC_EXT_STORE_LOCATOR */
+        onStoreLocatorClick: onOpenStoreLocator
     }
-
-    SFDC_EXT_STORE_LOCATOR && (headerProps.onStoreLocatorClick = onOpenStoreLocator)
 
     const seoProps = {
         appConfig,
@@ -105,11 +106,12 @@ const App = (props) => {
 
     const modalProps = {
         authModal,
-        dntNotification
+        dntNotification,
+        /* @sfdc-extension-block-start SFDC_EXT_STORE_LOCATOR */
+        isOpenStoreLocator,
+        onCloseStoreLocator
+        /* @sfdc-extension-block-end SFDC_EXT_STORE_LOCATOR */
     }
-
-    SFDC_EXT_STORE_LOCATOR && (modalProps.isOpenStoreLocator = isOpenStoreLocator)
-    SFDC_EXT_STORE_LOCATOR && (modalProps.onCloseStoreLocator = onCloseStoreLocator)
 
     return (
         <Box className="sf-app" css={styles.container}>

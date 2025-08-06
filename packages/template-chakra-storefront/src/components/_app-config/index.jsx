@@ -28,13 +28,15 @@ import {useCorrelationId} from '@salesforce/pwa-kit-react-sdk/ssr/universal/hook
 import {ReactQueryDevtools} from '@tanstack/react-query-devtools'
 import {
     DEFAULT_DNT_STATE,
+    /* @sfdc-extension-block-start SFDC_EXT_STORE_LOCATOR */
     STORE_LOCATOR_RADIUS,
     STORE_LOCATOR_RADIUS_UNIT,
     STORE_LOCATOR_DEFAULT_COUNTRY,
     STORE_LOCATOR_DEFAULT_COUNTRY_CODE,
     STORE_LOCATOR_DEFAULT_POSTAL_CODE,
     STORE_LOCATOR_DEFAULT_PAGE_SIZE,
-    STORE_LOCATOR_SUPPORTED_COUNTRIES
+    STORE_LOCATOR_SUPPORTED_COUNTRIES,
+    /* @sfdc-extension-block-end SFDC_EXT_STORE_LOCATOR */
 } from '../../../src/config/constants'
 
 /**
@@ -77,10 +79,9 @@ const AppConfig = ({children, locals = {}}) => {
     const passwordlessLoginCallbackURI = useMemo(() => passwordlessCallback, [passwordlessCallback])
     const defaultDnt = useMemo(() => locals.appConfig.dnt, [locals.appConfig.dnt])
 
-    /* eslint-disable react-hooks/rules-of-hooks */
+    /* @sfdc-extension-block-start SFDC_EXT_STORE_LOCATOR */
     const storeLocatorConfig =
-        SFDC_EXT_STORE_LOCATOR &&
-        useMemo(
+            useMemo(
             () => ({
                 radius: STORE_LOCATOR_RADIUS,
                 radiusUnit: STORE_LOCATOR_RADIUS_UNIT,
@@ -92,6 +93,7 @@ const AppConfig = ({children, locals = {}}) => {
             }),
             []
         )
+    /* @sfdc-extension-block-end SFDC_EXT_STORE_LOCATOR */
 
     return (
         <CommerceApiProvider
@@ -112,8 +114,10 @@ const AppConfig = ({children, locals = {}}) => {
             // enablePWAKitPrivateClient={true}
         >
             <MultiSiteProvider site={locals.site} locale={locals.locale} buildUrl={locals.buildUrl}>
+                {/* @sfdc-extension-line SFDC_EXT_STORE_LOCATOR */}
                 <StoreLocatorProvider config={storeLocatorConfig}>
                     <ChakraProvider value={theme}>{children}</ChakraProvider>
+                {/* @sfdc-extension-line SFDC_EXT_STORE_LOCATOR */}
                 </StoreLocatorProvider>
             </MultiSiteProvider>
             <ReactQueryDevtools />
