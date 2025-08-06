@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React, {useState} from 'react'
+import React, {useState, useRef} from 'react'
 import PropTypes from 'prop-types'
 import {FormattedMessage, useIntl} from 'react-intl'
 import {
@@ -48,6 +48,7 @@ const onClient = typeof window !== 'undefined'
 const CancelOrderModal = ({isOpen, onClose, order, onCancel}) => {
     const intl = useIntl()
     const [selectedReason, setSelectedReason] = useState('')
+    const headerRef = useRef(null)
 
     // Fetch product data for order items
     const productIds = order?.productItems?.map((product) => product.productId) || []
@@ -106,13 +107,14 @@ const CancelOrderModal = ({isOpen, onClose, order, onCancel}) => {
         <Modal
             isOpen={isOpen}
             onClose={onClose}
+            initialFocusRef={headerRef}
             size={modalSize}
             isCentered
             scrollBehavior="inside"
         >
             <ModalOverlay />
             <ModalContent>
-                <ModalHeader>
+                <ModalHeader ref={headerRef} tabIndex={-1}>
                     <FormattedMessage {...messages.requestCancellation} />
                 </ModalHeader>
                 <ModalCloseButton />
