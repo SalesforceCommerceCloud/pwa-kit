@@ -42,11 +42,11 @@ const ProductDetail = loadable(() => import('../src/pages/product-detail'), {fal
 const ProductList = loadable(() => import('../src/pages/product-list'), {
     fallback
 })
-const StoreLocator: any =
-    SFDC_EXT_STORE_LOCATOR &&
-    loadable(() => import('../src/pages/store-locator'), {
-        fallback
-    })
+/* @sfdc-extension-block-start SFDC_EXT_STORE_LOCATOR */
+const StoreLocator = loadable(() => import('../src/pages/store-locator'), {
+    fallback
+})
+/* @sfdc-extension-block-end SFDC_EXT_STORE_LOCATOR */
 
 //@sfdc-extension-line SFDC_EXT_SOCIAL_LOGIN
 const SocialLoginRedirect = loadable(() => import('../src/pages/social-login-redirect'), {fallback})
@@ -132,20 +132,19 @@ export const routes = [
     {
         path: '/account/wishlist',
         component: Wishlist
-    }
+    },
     // @sfdc-extension-block-end SFDC_EXT_WISHLIST
-]
-
-SFDC_EXT_STORE_LOCATOR &&
-    routes.push({
+    // @sfdc-extension-block-start SFDC_EXT_STORE_LOCATOR
+    {
         path: '/store-locator',
         component: StoreLocator
-    })
-
-routes.push({
-    path: '*',
-    component: PageNotFound
-})
+    },
+    // @sfdc-extension-block-end SFDC_EXT_STORE_LOCATOR
+    {
+        path: '*',
+        component: PageNotFound
+    }
+]
 
 export default () => {
     const config = getConfig()
