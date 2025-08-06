@@ -138,9 +138,8 @@ const AccountOrderDetail = () => {
             somOrderMutation.mutate({
                 parameters: {
                     siteId: 'RefArch',
-                    orderNumber: '00000201',
-                    email: 'madhuri.uppu@salesforce.com'
-                }
+                    orderNumber: '00000101',
+                    email: 'unandyala@salesforce.com'
             }, {
                 onSuccess: (data) => {
                     console.log("✅ somOrder mutation successful:", data)
