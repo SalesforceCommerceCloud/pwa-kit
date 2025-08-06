@@ -732,9 +732,13 @@ const ShippingMultiAddress = ({
                                                     ) : (
                                                         <Select
                                                             value={
-                                                                selectedGuestAddresses[
-                                                                    addressKey
-                                                                ] || ''
+                                                                customer && customer.isGuest
+                                                                    ? selectedGuestAddresses[
+                                                                          addressKey
+                                                                      ] || ''
+                                                                    : selectedRegisteredUserAddresses[
+                                                                          addressKey
+                                                                      ] || ''
                                                             }
                                                             onChange={(e) => {
                                                                 const value = e.target.value
@@ -743,20 +747,44 @@ const ShippingMultiAddress = ({
                                                                     ...prev,
                                                                     [addressKey]: false
                                                                 }))
-                                                                setSelectedRegisteredUserAddresses(
-                                                                    (prev) => {
-                                                                        const newState = {...prev}
-                                                                        if (value === '') {
-                                                                            delete newState[
-                                                                                addressKey
-                                                                            ]
-                                                                        } else {
-                                                                            newState[addressKey] =
-                                                                                value
+
+                                                                if (customer && customer.isGuest) {
+                                                                    setSelectedGuestAddresses(
+                                                                        (prev) => {
+                                                                            const newState = {
+                                                                                ...prev
+                                                                            }
+                                                                            if (value === '') {
+                                                                                delete newState[
+                                                                                    addressKey
+                                                                                ]
+                                                                            } else {
+                                                                                newState[
+                                                                                    addressKey
+                                                                                ] = value
+                                                                            }
+                                                                            return newState
                                                                         }
-                                                                        return newState
-                                                                    }
-                                                                )
+                                                                    )
+                                                                } else {
+                                                                    setSelectedRegisteredUserAddresses(
+                                                                        (prev) => {
+                                                                            const newState = {
+                                                                                ...prev
+                                                                            }
+                                                                            if (value === '') {
+                                                                                delete newState[
+                                                                                    addressKey
+                                                                                ]
+                                                                            } else {
+                                                                                newState[
+                                                                                    addressKey
+                                                                                ] = value
+                                                                            }
+                                                                            return newState
+                                                                        }
+                                                                    )
+                                                                }
                                                             }}
                                                             disabled={
                                                                 finalAddresses.length === 0 ||
