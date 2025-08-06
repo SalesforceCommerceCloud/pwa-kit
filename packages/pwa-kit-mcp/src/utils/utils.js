@@ -100,7 +100,6 @@ export const isBaseComponent = (componentName) => {
         'node_modules/@salesforce/retail-react-app/app/components',
         componentName
     )
-    logMCPMessage(`?????? baseComponentPath: ${baseComponentPath}`)
     return fs.existsSync(baseComponentPath)
 }
 
@@ -121,7 +120,6 @@ export const isSharedUIBaseComponent = (componentName) => {
         'node_modules/@salesforce/retail-react-app/app/components/shared/ui',
         componentName
     )
-    logMCPMessage(`?????? baseComponentPath: ${baseComponentPath}`)
     return fs.existsSync(baseComponentPath)
 }
 
@@ -142,8 +140,29 @@ export const isLocalComponent = (componentName) => {
         'components',
         toKebabCase(componentName)
     )
-    logMCPMessage(`?????? localComponentPath: ${localComponentPath}`)
     return fs.existsSync(localComponentPath)
+}
+
+/**
+ * Check if the component is a local shared UI component under components/shared/ui folder
+ *
+ * @param {string} componentName - The name of the component to check.
+ * @returns {boolean} True if the component is a local shared UI component, false otherwise.
+ */
+export const isLocalSharedUIComponent = (componentName) => {
+    if (!process.env.PWA_STOREFRONT_APP_PATH) {
+        throw new Error(
+            'PWA_STOREFRONT_APP_PATH environment variable is not set. Please set it to the root of the app folder.'
+        )
+    }
+    const localSharedUIComponentPath = path.join(
+        process.env.PWA_STOREFRONT_APP_PATH,
+        'components',
+        'shared',
+        'ui',
+        componentName
+    )
+    return fs.existsSync(localSharedUIComponentPath)
 }
 
 /**
@@ -235,14 +254,26 @@ export async function logMCPMessage(message) {
     }
 }
 
-export function getComponentImportPath(componentName, componentDir, checks) {
-    if (checks.isLocal) {
-        return `'../../components/${componentDir}'`
-    } else if (checks.isBase) {
-        return `'@salesforce/retail-react-app/app/components/${componentName}'`
-    } else if (checks.isSharedUI) {
-        return `'@salesforce/retail-react-app/app/components/shared/ui/${componentName}'`
+/**
+ * Returns the import statement for a component
+ * @param {string} componentName - The name of the component to import.
+ * @param {string} componentDir - The directory of the component to import.
+ * @param {boolean} isLocal - Whether the component is a local component.
+ * @param {boolean} isBase - Whether the component is a base component.
+ * @returns {string} The import statement for the component.
+ */
+export function generateBaseComponentImportStatement(componentName, componentDir, isLocal, isBase) {
+    if (isLocal) {
+        logMCPMessage(
+            `?????? isLocal componentName: ${componentName}, componentDir: ${componentDir}, isLocal: ${isLocal}, isBase: ${isBase}`
+        )
+        return `import ${componentName} from '../../components/${componentDir}'`
+    } else if (isBase) {
+        logMCPMessage(
+            `?????? isBase componentName: ${componentName}, componentDir: ${componentDir}, isLocal: ${isLocal}, isBase: ${isBase}`
+        )
+        return `import ${componentName} from '@salesforce/retail-react-app/app/components/${componentDir}'`
     }
     // Fallback
-    return `'../../components/${componentDir}'`
+    return `import ${componentName} from '../../components/${componentDir}'`
 }

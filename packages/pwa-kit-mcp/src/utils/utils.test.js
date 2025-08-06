@@ -11,7 +11,8 @@ import {
     isBaseComponent,
     isSharedUIBaseComponent,
     isLocalComponent,
-    getComponentImportPath
+    getComponentImportStatement,
+    generateBaseComponentImportStatement
 } from './utils'
 import fs from 'fs'
 import path from 'path'
@@ -189,36 +190,35 @@ describe('Utils', () => {
         })
     })
 
-    describe('getComponentImportPath', () => {
-        const componentName = 'TestComponent'
-        const componentDir = 'test-component'
-
-        test('returns local import path if isLocal is true', () => {
-            const checks = {isLocal: true, isBase: false, isSharedUI: false}
-            expect(getComponentImportPath(componentName, componentDir, checks)).toBe(
-                `'../../components/${componentDir}'`
+    describe('generateBaseComponentImportStatement', () => {
+        it('returns local import statement when isLocal is true', () => {
+            const result = generateBaseComponentImportStatement(
+                'MyComponent',
+                'my-component',
+                true,
+                false
+            )
+            expect(result).toBe("import MyComponent from '../../components/my-component'")
+        })
+        it('returns base import statement when isBase is true and isLocal is false', () => {
+            const result = generateBaseComponentImportStatement(
+                'MyComponent',
+                'my-component',
+                false,
+                true
+            )
+            expect(result).toBe(
+                "import MyComponent from '@salesforce/retail-react-app/app/components/my-component'"
             )
         })
-
-        test('returns base import path if isBase is true', () => {
-            const checks = {isLocal: false, isBase: true, isSharedUI: false}
-            expect(getComponentImportPath(componentName, componentDir, checks)).toBe(
-                `'@salesforce/retail-react-app/app/components/${componentName}'`
+        it('returns local import statement as fallback when both isLocal and isBase are false', () => {
+            const result = generateBaseComponentImportStatement(
+                'MyComponent',
+                'my-component',
+                false,
+                false
             )
-        })
-
-        test('returns shared UI import path if isSharedUI is true', () => {
-            const checks = {isLocal: false, isBase: false, isSharedUI: true}
-            expect(getComponentImportPath(componentName, componentDir, checks)).toBe(
-                `'@salesforce/retail-react-app/app/components/shared/ui/${componentName}'`
-            )
-        })
-
-        test('returns fallback import path if none are true', () => {
-            const checks = {isLocal: false, isBase: false, isSharedUI: false}
-            expect(getComponentImportPath(componentName, componentDir, checks)).toBe(
-                `'../../components/${componentDir}'`
-            )
+            expect(result).toBe("import MyComponent from '../../components/my-component'")
         })
     })
 })
