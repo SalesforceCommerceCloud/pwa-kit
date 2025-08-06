@@ -463,4 +463,372 @@ describe('PickupAddress', () => {
 
         expect(screen.getByText(/continue to shipping address/i)).toBeInTheDocument()
     })
+
+    test('updates address for each pickup shipment with correct store address when multi pickup', async () => {
+        const multiPickupBasket = {
+            ...scapiBasketWithItem,
+            shipments: [
+                {
+                    ...scapiBasketWithItem.shipments[0],
+                    shipmentId: 'shipment-1',
+                    shippingMethod: {c_storePickupEnabled: true},
+                    c_fromStoreId: 'store-1'
+                },
+                {
+                    ...scapiBasketWithItem.shipments[0],
+                    shipmentId: 'shipment-2',
+                    shippingMethod: {c_storePickupEnabled: true},
+                    c_fromStoreId: 'store-2'
+                }
+            ],
+            productItems: [
+                {
+                    ...scapiBasketWithItem.productItems[0],
+                    itemId: 'item-1',
+                    shipmentId: 'shipment-1',
+                    productId: 'product-1',
+                    quantity: 2,
+                    productName: 'Test Product 1'
+                },
+                {
+                    ...scapiBasketWithItem.productItems[0],
+                    itemId: 'item-2',
+                    shipmentId: 'shipment-2',
+                    productId: 'product-2',
+                    quantity: 1,
+                    productName: 'Test Product 2'
+                }
+            ]
+        }
+
+        useCurrentBasket.mockReturnValue({
+            data: multiPickupBasket,
+            isLoading: false,
+            derivedData: {
+                hasBasket: true,
+                totalItems: multiPickupBasket.productItems.reduce(
+                    (acc, item) => acc + item.quantity,
+                    0
+                )
+            }
+        })
+
+        useSelectedStore.mockReturnValue({
+            selectedStore: null
+        })
+
+        global.server.use(
+            rest.get('*/stores', (req, res, ctx) => {
+                return res(
+                    ctx.json({
+                        data: [
+                            {
+                                id: 'store-1',
+                                name: 'Test Store 1',
+                                address1: '123 Main Street',
+                                city: 'San Francisco',
+                                stateCode: 'CA',
+                                postalCode: '94105',
+                                countryCode: 'US',
+                                phone: '555-123-4567',
+                                storeHours: 'Mon-Fri: 9AM-6PM',
+                                storeType: 'retail'
+                            },
+                            {
+                                id: 'store-2',
+                                name: 'Test Store 2',
+                                address1: '456 Oak Avenue',
+                                city: 'Los Angeles',
+                                stateCode: 'CA',
+                                postalCode: '90210',
+                                countryCode: 'US',
+                                phone: '555-987-6543',
+                                storeHours: 'Mon-Sat: 10AM-8PM',
+                                storeType: 'retail'
+                            }
+                        ]
+                    })
+                )
+            })
+        )
+
+        const {user} = renderWithProviders(<PickupAddress />)
+
+        await waitFor(() => {
+            expect(screen.getByText(/continue to payment/i)).toBeInTheDocument()
+        })
+        await user.click(screen.getByText(/continue to payment/i))
+        await waitFor(() => {
+            expect(mockMutateAsync).toHaveBeenCalledTimes(2)
+        })
+
+        // verify first shipment
+        expect(mockMutateAsync).toHaveBeenNthCalledWith(1, {
+            parameters: {
+                basketId: multiPickupBasket.basketId,
+                shipmentId: 'shipment-1',
+                useAsBilling: false
+            },
+            body: {
+                address1: '123 Main Street',
+                city: 'San Francisco',
+                countryCode: 'US',
+                postalCode: '94105',
+                stateCode: 'CA',
+                firstName: 'Test Store 1',
+                lastName: 'pickup',
+                phone: '555-123-4567'
+            }
+        })
+
+        // Verify second shipment
+        expect(mockMutateAsync).toHaveBeenNthCalledWith(2, {
+            parameters: {
+                basketId: multiPickupBasket.basketId,
+                shipmentId: 'shipment-2',
+                useAsBilling: false
+            },
+            body: {
+                address1: '456 Oak Avenue',
+                city: 'Los Angeles',
+                countryCode: 'US',
+                postalCode: '90210',
+                stateCode: 'CA',
+                firstName: 'Test Store 2',
+                lastName: 'pickup',
+                phone: '555-987-6543'
+            }
+        })
+    })
+
+    test('updates single pickup shipment with correct store address', async () => {
+        const singlePickupBasket = {
+            ...scapiBasketWithItem,
+            shipments: [
+                {
+                    ...scapiBasketWithItem.shipments[0],
+                    shipmentId: 'shipment-1',
+                    shippingMethod: {c_storePickupEnabled: true},
+                    c_fromStoreId: 'store-1'
+                }
+            ],
+            productItems: [
+                {
+                    ...scapiBasketWithItem.productItems[0],
+                    shipmentId: 'shipment-1'
+                }
+            ]
+        }
+
+        useCurrentBasket.mockReturnValue({
+            data: singlePickupBasket,
+            isLoading: false,
+            derivedData: {
+                hasBasket: true,
+                totalItems: singlePickupBasket.productItems.reduce(
+                    (acc, item) => acc + item.quantity,
+                    0
+                )
+            }
+        })
+
+        useSelectedStore.mockReturnValue({
+            selectedStore: null
+        })
+
+        global.server.use(
+            rest.get('*/stores', (req, res, ctx) => {
+                return res(
+                    ctx.json({
+                        data: [
+                            {
+                                id: 'store-1',
+                                name: 'Test Store 1',
+                                address1: '123 Main Street',
+                                city: 'San Francisco',
+                                stateCode: 'CA',
+                                postalCode: '94105',
+                                countryCode: 'US',
+                                phone: '555-123-4567',
+                                storeHours: 'Mon-Fri: 9AM-6PM',
+                                storeType: 'retail'
+                            }
+                        ]
+                    })
+                )
+            })
+        )
+
+        const {user} = renderWithProviders(<PickupAddress />)
+
+        await waitFor(() => {
+            expect(screen.getByText(/continue to payment/i)).toBeInTheDocument()
+        })
+        await user.click(screen.getByText(/continue to payment/i))
+        await waitFor(() => {
+            expect(mockMutateAsync).toHaveBeenCalledTimes(1)
+        })
+
+        expect(mockMutateAsync).toHaveBeenCalledWith({
+            parameters: {
+                basketId: singlePickupBasket.basketId,
+                shipmentId: 'shipment-1',
+                useAsBilling: false
+            },
+            body: {
+                address1: '123 Main Street',
+                city: 'San Francisco',
+                countryCode: 'US',
+                postalCode: '94105',
+                stateCode: 'CA',
+                firstName: 'Test Store 1',
+                lastName: 'pickup',
+                phone: '555-123-4567'
+            }
+        })
+    })
+
+    test('handles mixed pickup and delivery shipments correctly', async () => {
+        const mixedBasket = {
+            ...scapiBasketWithItem,
+            shipments: [
+                {
+                    ...scapiBasketWithItem.shipments[0],
+                    shipmentId: 'shipment-1',
+                    shippingMethod: {c_storePickupEnabled: true},
+                    c_fromStoreId: 'store-1'
+                },
+                {
+                    ...scapiBasketWithItem.shipments[0],
+                    shipmentId: 'shipment-2',
+                    shippingMethod: {c_storePickupEnabled: true},
+                    c_fromStoreId: 'store-2'
+                },
+                {
+                    ...scapiBasketWithItem.shipments[0],
+                    shipmentId: 'shipment-3',
+                    shippingMethod: {c_storePickupEnabled: false}
+                }
+            ],
+            productItems: [
+                {
+                    ...scapiBasketWithItem.productItems[0],
+                    itemId: 'item-1',
+                    shipmentId: 'shipment-1',
+                    productId: 'product-1',
+                    quantity: 1,
+                    productName: 'Pickup Product 1'
+                },
+                {
+                    ...scapiBasketWithItem.productItems[0],
+                    itemId: 'item-2',
+                    shipmentId: 'shipment-2',
+                    productId: 'product-2',
+                    quantity: 1,
+                    productName: 'Pickup Product 2'
+                },
+                {
+                    ...scapiBasketWithItem.productItems[0],
+                    itemId: 'item-3',
+                    shipmentId: 'shipment-3',
+                    productId: 'product-3',
+                    quantity: 1,
+                    productName: 'Delivery Product'
+                }
+            ]
+        }
+
+        useCurrentBasket.mockReturnValue({
+            data: mixedBasket,
+            isLoading: false,
+            derivedData: {
+                hasBasket: true,
+                totalItems: mixedBasket.productItems.reduce((acc, item) => acc + item.quantity, 0)
+            }
+        })
+
+        useSelectedStore.mockReturnValue({
+            selectedStore: null
+        })
+
+        global.server.use(
+            rest.get('*/stores', (req, res, ctx) => {
+                return res(
+                    ctx.json({
+                        data: [
+                            {
+                                id: 'store-1',
+                                name: 'Test Store 1',
+                                address1: '123 Main Street',
+                                city: 'San Francisco',
+                                stateCode: 'CA',
+                                postalCode: '94105',
+                                countryCode: 'US',
+                                phone: '555-123-4567',
+                                storeHours: 'Mon-Fri: 9AM-6PM',
+                                storeType: 'retail'
+                            },
+                            {
+                                id: 'store-2',
+                                name: 'Test Store 2',
+                                address1: '456 Oak Avenue',
+                                city: 'Los Angeles',
+                                stateCode: 'CA',
+                                postalCode: '90210',
+                                countryCode: 'US',
+                                phone: '555-987-6543',
+                                storeHours: 'Mon-Sat: 10AM-8PM',
+                                storeType: 'retail'
+                            }
+                        ]
+                    })
+                )
+            })
+        )
+
+        const {user} = renderWithProviders(<PickupAddress />)
+        await waitFor(() => {
+            expect(screen.getByText(/continue to shipping address/i)).toBeInTheDocument()
+        })
+        await user.click(screen.getByText(/continue to shipping address/i))
+        await waitFor(() => {
+            expect(mockMutateAsync).toHaveBeenCalledTimes(2)
+        })
+
+        // verify only pickup shipments get address update
+        expect(mockMutateAsync).toHaveBeenNthCalledWith(1, {
+            parameters: {
+                basketId: mixedBasket.basketId,
+                shipmentId: 'shipment-1',
+                useAsBilling: false
+            },
+            body: {
+                address1: '123 Main Street',
+                city: 'San Francisco',
+                countryCode: 'US',
+                postalCode: '94105',
+                stateCode: 'CA',
+                firstName: 'Test Store 1',
+                lastName: 'pickup',
+                phone: '555-123-4567'
+            }
+        })
+        expect(mockMutateAsync).toHaveBeenNthCalledWith(2, {
+            parameters: {
+                basketId: mixedBasket.basketId,
+                shipmentId: 'shipment-2',
+                useAsBilling: false
+            },
+            body: {
+                address1: '456 Oak Avenue',
+                city: 'Los Angeles',
+                countryCode: 'US',
+                postalCode: '90210',
+                stateCode: 'CA',
+                firstName: 'Test Store 2',
+                lastName: 'pickup',
+                phone: '555-987-6543'
+            }
+        })
+    })
 })

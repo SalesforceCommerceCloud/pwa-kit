@@ -187,6 +187,7 @@ const PickupAddress = () => {
     // For single pickup, use the first store
     const singlePickupStore =
         pickupShipmentItems.length === 1 ? pickupShipmentItems[0]?.store : storeData?.data?.[0]
+
     const singlePickupAddress = {
         address1: singlePickupStore?.address1,
         city: singlePickupStore?.city,
@@ -200,7 +201,6 @@ const PickupAddress = () => {
     const submitAndContinue = async () => {
         setIsLoading(true)
         try {
-            // Update shipping address for each pickup shipment with its own store address
             const updatePromises = pickupShipmentItems.map((shipmentInfo) => {
                 const store = shipmentInfo.store
                 const shipmentAddress = {
@@ -223,9 +223,7 @@ const PickupAddress = () => {
                     body: shipmentAddress
                 })
             })
-
             await Promise.all(updatePromises)
-
             setIsLoading(false)
             goToNextStep()
         } catch (error) {
