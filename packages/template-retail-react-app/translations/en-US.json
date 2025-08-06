@@ -1511,9 +1511,6 @@
   "shipping_multi_address.format.address_line_2": {
     "defaultMessage": "{city}, {stateCode} {postalCode}"
   },
-  "shipping_multi_address.guest_user.message": {
-    "defaultMessage": "Guest users cannot use multi-address shipping. Please sign in to continue."
-  },
   "shipping_multi_address.image.alt": {
     "defaultMessage": "Product image for {productName}"
   },
