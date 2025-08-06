@@ -137,9 +137,10 @@ export default function ShippingOptions() {
     const shipmentsWithAddresses =
         (basket &&
             basket.shipments &&
-            basket.shipments.filter((shipment) => 
-                shipment.shippingAddress && 
-                !isCurrentShippingMethodPickup(shipment.shippingMethod)
+            basket.shipments.filter(
+                (shipment) =>
+                    shipment.shippingAddress &&
+                    !isCurrentShippingMethodPickup(shipment.shippingMethod)
             )) ||
         []
 
@@ -293,7 +294,6 @@ export default function ShippingOptions() {
                                         basketId={basket.basketId}
                                         currency={currency}
                                         control={form.control}
-                                        basket={basket}
                                     />
                                 )}
                             </Box>
