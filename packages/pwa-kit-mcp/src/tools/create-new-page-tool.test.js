@@ -9,9 +9,14 @@ import fs from 'fs/promises'
 import * as utils from '../utils/utils.js'
 
 describe('CreateNewPageTool', () => {
+    const originalEnv = process.env
     beforeEach(() => {
         jest.clearAllMocks()
         process.env.PWA_STOREFRONT_APP_PATH = '/mock/app'
+        process.env.WORKSPACE_FOLDER_PATHS = '/mock/workspace'
+    })
+    afterEach(() => {
+        process.env = originalEnv
     })
 
     it('returns system prompt if required args are missing', async () => {
@@ -126,6 +131,15 @@ describe('CreateNewPageTool', () => {
         expect(pageContent).not.toMatch(/https?:\/\//)
     })
 
+    it('uses component name with Component suffix if component name is the same as the page name', async () => {
+        if (createNewPageTool.generatePageContent.mockRestore) {
+            createNewPageTool.generatePageContent.mockRestore()
+        }
+        const pageContent = await createNewPageTool.generatePageContent('Test', ['Test'])
+        expect(pageContent).toContain('import TestComponent from')
+        expect(pageContent).toContain('<TestComponent />')
+    })
+
     it('responds with message listing unknown component and suggests changes to page file', async () => {
         jest.spyOn(fs, 'access').mockImplementation((p) => {
             if (String(p).includes('components')) {
@@ -205,7 +219,7 @@ describe('CreateNewPageTool', () => {
       }
     }`
         const requestedDomain = 'https://example.com'
-        const attemptToUpdateCSP = (currentCSP, _newDomain) => currentCSP
+        const attemptToUpdateCSP = (currentCSP) => currentCSP
         const updatedCSP = attemptToUpdateCSP(ssrContent, requestedDomain)
         expect(updatedCSP).not.toContain(requestedDomain)
         expect(updatedCSP).toContain('.commercecloud.salesforce.com')

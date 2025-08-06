@@ -7,6 +7,12 @@
 import fs from 'fs/promises'
 import path from 'path'
 import {toKebabCase, toPascalCase, logMCPMessage} from '../utils'
+import {
+    getComponentImportPath,
+    isBaseComponent,
+    isSharedUIBaseComponent,
+    isLocalComponent
+} from '../utils/utils'
 import {z} from 'zod'
 
 const systemPromptForCreatePage = `You are a smart assistant that can use tools when needed. \
@@ -152,25 +158,23 @@ class CreateNewPageTool {
         const accessPromises = componentList.map(async (component) => {
             component = toPascalCase(component)
             const componentName = component.charAt(0).toUpperCase() + component.slice(1)
-            const componentDir = toKebabCase(componentName)
-            try {
-                await fs.access(
-                    path.join(process.env.PWA_STOREFRONT_APP_PATH, 'components', componentDir)
-                )
-            } catch (err) {
-                if (err.code === 'ENOENT') {
-                    this.unfoundComponents.push(component)
-                } else {
-                    throw err
-                }
+            const isLocal = isLocalComponent(componentName)
+            const isBase = isBaseComponent(componentName)
+            const isSharedUI = isSharedUIBaseComponent(componentName)
+            if (!isLocal && !isBase && !isSharedUI) {
+                this.unfoundComponents.push(component)
             }
-            logMCPMessage(
-                `?????? importing ${componentName} from '@salesforce/retail-react-app/app/components/${componentDir}'`
+            // If the component name is the same as the page name, add 'Component' to the component name to avoid conflict with the page name
+            const importComponentName =
+                componentName === pageName ? componentName + 'Component' : componentName
+            const importComponentPath = getComponentImportPath(
+                componentName,
+                toKebabCase(componentName),
+                {isLocal, isBase, isSharedUI}
             )
-            imports.push(
-                `import {getAssetUrl} from '@salesforce/pwa-kit-react-sdk/ssr/universal/utils'`,
-                `import ${componentName} from '@salesforce/retail-react-app/app/components/${componentDir}'`
-            )
+
+            logMCPMessage(`?????? importing ${importComponentName} from ${importComponentPath}`)
+            imports.push(`import ${importComponentName} from ${importComponentPath}`)
             // Import getAssetUrl for displaying image source if Image component is used
             if (componentName === 'Image') {
                 imports.push(
@@ -186,10 +190,13 @@ class CreateNewPageTool {
                 .map((component) => {
                     component = toPascalCase(component)
                     const componentName = component.charAt(0).toUpperCase() + component.slice(1)
+                    // If the component name is the same as the page name, add 'Component' to the component name
+                    const importComponentName =
+                        componentName === pageName ? componentName + 'Component' : componentName
                     if (componentName === 'Image') {
                         return ` <Image src={getAssetUrl('static/img/hero.png')} alt="pwa-kit banner" style={{ width: '700px', height: 'auto' }} />`
                     }
-                    return `                <${componentName} />`
+                    return `                <${importComponentName} />`
                 })
                 .join('\n')
 
