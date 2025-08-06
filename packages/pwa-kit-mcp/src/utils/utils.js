@@ -264,14 +264,8 @@ export async function logMCPMessage(message) {
  */
 export function generateBaseComponentImportStatement(componentName, componentDir, isLocal, isBase) {
     if (isLocal) {
-        logMCPMessage(
-            `?????? isLocal componentName: ${componentName}, componentDir: ${componentDir}, isLocal: ${isLocal}, isBase: ${isBase}`
-        )
         return `import ${componentName} from '../../components/${componentDir}'`
     } else if (isBase) {
-        logMCPMessage(
-            `?????? isBase componentName: ${componentName}, componentDir: ${componentDir}, isLocal: ${isLocal}, isBase: ${isBase}`
-        )
         return `import ${componentName} from '@salesforce/retail-react-app/app/components/${componentDir}'`
     }
     // Fallback
