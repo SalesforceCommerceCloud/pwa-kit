@@ -35,8 +35,8 @@ runs:
         else
          use_extensibility_value=1
         fi
-        echo "USE_EXTENSIBILITY_VALUE=$use_extensibility_value" >> $GITHUB_ENV 
-        
+        echo "USE_EXTENSIBILITY_VALUE=$use_extensibility_value" >> $GITHUB_ENV
+
         is_private_client_input="${{ inputs.is_private_client }}"
         if [ "$is_private_client_input" = "true" ]; then
          is_private_client_value=1
@@ -44,7 +44,7 @@ runs:
           is_private_client_value=2
         fi
         echo "IS_PRIVATE_CLIENT_VALUE=$is_private_client_value" >> $GITHUB_ENV
-        
+
         setup_hybrid_input="${{ inputs.setup_hybrid }}"
         if [ "$setup_hybrid_input" = "true" ]; then
           setup_hybrid_value=2
@@ -56,6 +56,7 @@ runs:
     - name: Build project generator inputs
       id: build_generator_inputs
       shell: bash
+      # TODO: how to best create this json file? /tmp/something.json... how about windows?
       run: |
         echo '{
          "projectDir":"${{ inputs.project_dir }}",
@@ -100,19 +101,11 @@ runs:
               "expectedPrompt": "Do you wish to set up a phased headless rollout?",
               "response": "${{ env.SETUP_HYBRID_VALUE }}\n"
             }
-        ] }' > generator-responses.json
+        ] }' > /tmp/generator-responses.json
 
     - name: Generate project
       id: generate_project
       run: |
-        cat generator-responses.json
-        node e2e/scripts/generate-project.js --project-config "$(jq -c . generator-responses.json)"
-      shell: bash
-
-    - name: Build generated project
-      id: build_generated_project
-      working-directory: ../generated-projects/${{ inputs.project_dir }}
-      run: |-
-        npm ci
-        npm run build
+        cat /tmp/generator-responses.json
+        node e2e/scripts/generate-project.js --project-config "$(jq -c . /tmp/generator-responses.json)"
       shell: bash
