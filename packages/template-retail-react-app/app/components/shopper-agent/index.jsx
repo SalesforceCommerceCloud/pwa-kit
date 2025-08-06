@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React, {useEffect} from 'react'
+import React, {useEffect, useRef} from 'react'
 import useScript from '@salesforce/retail-react-app/app/hooks/use-script'
 import {useUsid} from '@salesforce/commerce-sdk-react'
 import PropTypes from 'prop-types'
@@ -109,6 +109,8 @@ const ShopperAgentWindow = ({commerceAgentConfiguration, locale, basketId}) => {
     } = commerceAgentConfiguration
 
     const {usid} = useUsid()
+    const fabClickedRef = useRef(false)
+    const utteranceSentRef = useRef(false)
 
     useEffect(() => {
         const handleEmbeddedMessagingReady = () => {
@@ -168,6 +170,53 @@ const ShopperAgentWindow = ({commerceAgentConfiguration, locale, basketId}) => {
             )
         }
     }, [basketId])
+
+    // Handle FAB click utterance functionality
+    useEffect(() => {
+        const handleFabClickTracking = () => {
+            // Track that FAB was clicked
+            if (!fabClickedRef.current) {
+                fabClickedRef.current = true
+            }
+            
+            // Reset utterance flag on every FAB click to allow new conversations
+            utteranceSentRef.current = false
+        }
+
+        const handleEmbeddedMessageSent = (e) => {
+            // Send utterance on the first bot message (welcome message)
+            if (fabClickedRef.current && 
+                !utteranceSentRef.current && 
+                e.detail.conversationEntry?.sender?.role === 'Chatbot') {
+                
+                utteranceSentRef.current = true
+                
+                setTimeout(() => {
+                    window.embeddedservice_bootstrap.utilAPI
+                        .sendTextMessage('get me access token')
+                        .catch((err) => {
+                            console.error('Failed to send utterance after welcome message:', err)
+                        })
+                }, 500)
+            }
+        }
+
+        const handleEmbeddedMessagingConversationEnded = () => {
+            // Reset both flags when conversation ends
+            fabClickedRef.current = false
+            utteranceSentRef.current = false
+        }
+
+        window.addEventListener('onEmbeddedMessagingButtonClicked', handleFabClickTracking)
+        window.addEventListener('onEmbeddedMessageSent', handleEmbeddedMessageSent)
+        window.addEventListener('onEmbeddedMessagingConversationEnded', handleEmbeddedMessagingConversationEnded)
+
+        return () => {
+            window.removeEventListener('onEmbeddedMessagingButtonClicked', handleFabClickTracking)
+            window.removeEventListener('onEmbeddedMessageSent', handleEmbeddedMessageSent)
+            window.removeEventListener('onEmbeddedMessagingConversationEnded', handleEmbeddedMessagingConversationEnded)
+        }
+    }, [])
 
     // Load the embedded messaging script
     const scriptLoadStatus = useScript(scriptSourceUrl)
