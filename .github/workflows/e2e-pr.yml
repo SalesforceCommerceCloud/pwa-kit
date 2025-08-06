@@ -8,6 +8,8 @@ on:
             - develop
             - 'release-*'
 
+
+
 permissions:
     id-token: write
     contents: read
@@ -16,9 +18,9 @@ jobs:
     test_e2e_private:
         runs-on: ubuntu-latest
         env:
-            AWS_S3_BUCKET: ${{ vars.AWS_S3_BUCKET }}
-            AWS_REGION: ${{ vars.AWS_REGION }}
-            AWS_S3_POOL_DATA_FILE_KEY: ${{ vars.AWS_S3_POOL_DATA_FILE_KEY }}
+            # 🦕 GRUG SIMPLE: These will be set dynamically by the SQLite queue
+            MRT_TARGET_SLUG: ""
+            MRT_TARGET_URL: ""
 
         steps:
             - name: Checkout
@@ -52,31 +54,88 @@ jobs:
                   # Install node dependencies
                   node ./scripts/gtime.js monorepo_install npm ci
 
-            # Check central resource allocation on AWS and get a lock on an available environment from the pool.
-            # Returns the MRT target ID if lock is acquired, otherwise returns an error state.
-            - name: Configure AWS Credentials
+            # 🦕 GRUG SIMPLE: SQLite-based environment queue (no AWS complexity!)
+            - name: Download Environment Queue Database
               if: ${{ env.SKIP_WORKFLOW != 'true' }}
-              uses: aws-actions/configure-aws-credentials@v4
+              uses: actions/download-artifact@v4
               with:
-                  role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
-                  aws-region: ${{ vars.AWS_REGION }}
-                  role-session-name: 'GithubActions-E2E-CI'
+                  name: environment-queue-db
+                  path: .
+              continue-on-error: true
 
-            - name: Get MRT Target lock
-              id: get_mrt_target_lock
-              if: ${{ env.SKIP_WORKFLOW != 'true' }}
-              uses: ./.github/actions/e2e_acquire_mrt_target
-              with:
-                  BRANCH: ${{ github.ref_name }}
-                  RUN_ID: ${{ github.run_id }}
-                  PR_NUMBER: ${{ github.event.pull_request.number }}
-
-            # Skipping the rest of the workflow for now
-            - name: Print MRT Target Details and Skip Workflow
+            - name: Acquire MRT Environment
               if: ${{ env.SKIP_WORKFLOW != 'true' }}
               run: |
-                  cat e2e/mrt-target/mrt-target-details.json
-                  echo "SKIP_WORKFLOW=true" >> "$GITHUB_ENV"
+                  # Create SQLite database with environment pool if it doesn't exist
+                  sqlite3 env_queue.db << 'EOF'
+                  CREATE TABLE IF NOT EXISTS environments (
+                    slug TEXT PRIMARY KEY,
+                    url TEXT NOT NULL,
+                    status TEXT DEFAULT 'available',
+                    pr_number INTEGER,
+                    acquired_at DATETIME,
+                    acquired_by TEXT
+                  );
+                  
+                  -- Insert available MRT environments (add more as needed)
+                  INSERT OR IGNORE INTO environments (slug, url) VALUES 
+                  ('e2e-tests-pwa-kit', 'https://scaffold-pwa-e2e-tests-pwa-kit.mobify-storefront.com'),
+                  ('e2e-tests-pwa-kit-2', 'https://scaffold-pwa-e2e-tests-pwa-kit-2.mobify-storefront.com'),
+                  ('e2e-tests-pwa-kit-3', 'https://scaffold-pwa-e2e-tests-pwa-kit-3.mobify-storefront.com');
+                  EOF
+                  
+                  # Atomic environment acquisition with retry logic
+                  for attempt in {1..10}; do
+                    echo "🔄 Attempt $attempt to acquire environment..."
+                    
+                    RESULT=$(sqlite3 env_queue.db << 'EOF'
+                  BEGIN IMMEDIATE;
+                  UPDATE environments 
+                  SET status = 'in-use', 
+                      pr_number = ${{ github.event.pull_request.number || 0 }},
+                      acquired_at = datetime('now'),
+                      acquired_by = '${{ github.run_id }}'
+                  WHERE slug = (
+                    SELECT slug FROM environments 
+                    WHERE status = 'available' 
+                    ORDER BY slug
+                    LIMIT 1
+                  );
+                  
+                  SELECT slug || '|' || url FROM environments 
+                  WHERE acquired_by = '${{ github.run_id }}' 
+                  AND status = 'in-use';
+                  COMMIT;
+                  EOF
+                  )
+                    
+                    if [ -n "$RESULT" ]; then
+                      ENV_SLUG=$(echo "$RESULT" | cut -d'|' -f1)
+                      ENV_URL=$(echo "$RESULT" | cut -d'|' -f2)
+                      echo "✅ Acquired environment: $ENV_SLUG"
+                      echo "🌐 Environment URL: $ENV_URL"
+                      echo "MRT_TARGET_SLUG=$ENV_SLUG" >> $GITHUB_ENV
+                      echo "MRT_TARGET_URL=$ENV_URL" >> $GITHUB_ENV
+                      break
+                    fi
+                    
+                    if [ $attempt -eq 10 ]; then
+                      echo "❌ No environments available after 10 attempts"
+                      echo "📊 Current environment status:"
+                      sqlite3 env_queue.db "SELECT slug, status, pr_number, acquired_at FROM environments ORDER BY slug;"
+                      exit 1
+                    fi
+                    
+                    echo "⏳ No environments available, waiting 30 seconds..."
+                    sleep 30
+                  done
+
+            - name: Upload Environment Queue Database
+              if: ${{ env.SKIP_WORKFLOW != 'true' }}
+              uses: actions/upload-artifact@v4
+              with:
+                  name: environment-queue-db
+                  path: env_queue.db
 
             - name: Get Template Version
               if: ${{ env.SKIP_WORKFLOW != 'true' }}
@@ -111,8 +170,8 @@ jobs:
               uses: './.github/actions/push_to_mrt'
               with:
                   CWD: '../generated-projects/retail-app-no-ext'
-                  # TODO: Use the MRT target ID from the target lock step above.
-                  TARGET: e2e-tests-pwa-kit
+                  # 🦕 GRUG SIMPLE: Use environment variable instead of complex locking
+                  TARGET: ${{ env.MRT_TARGET_SLUG }}
                   FLAGS: --wait
 
             - name: Install Playwright Browsers
@@ -127,7 +186,40 @@ jobs:
               if: ${{ env.SKIP_WORKFLOW != 'true' }}
               run: npm run test:e2e:a11y
 
-            - name: Release MRT Target Lock
-              if: always() # Always release the target lock back to the pool even if the tests fail.
+            # 🦕 GRUG SIMPLE: Release environment back to the pool
+            - name: Download Environment Queue for Cleanup
+              if: always()
+              uses: actions/download-artifact@v4
+              with:
+                  name: environment-queue-db
+                  path: .
+              continue-on-error: true
+
+            - name: Release MRT Environment
+              if: always() # Always release even if tests fail
               run: |
-                  echo "TODO: Implement .github/actions/release_mrt_target_lock"
+                  if [ -n "${{ env.MRT_TARGET_SLUG }}" ] && [ -f "env_queue.db" ]; then
+                    echo "🔓 Releasing environment: ${{ env.MRT_TARGET_SLUG }}"
+                    sqlite3 env_queue.db << 'EOF'
+                    UPDATE environments 
+                    SET status = 'available', 
+                        pr_number = NULL,
+                        acquired_at = NULL,
+                        acquired_by = NULL
+                    WHERE acquired_by = '${{ github.run_id }}';
+                    EOF
+                    
+                    echo "✅ Environment ${{ env.MRT_TARGET_SLUG }} released back to pool"
+                    echo "📊 Final environment status:"
+                    sqlite3 env_queue.db "SELECT slug, status, pr_number FROM environments ORDER BY slug;"
+                  else
+                    echo "ℹ️ No environment to release or database not found"
+                  fi
+
+            - name: Upload Final Environment Queue State
+              if: always()
+              uses: actions/upload-artifact@v4
+              with:
+                  name: environment-queue-db
+                  path: env_queue.db
+              continue-on-error: true
