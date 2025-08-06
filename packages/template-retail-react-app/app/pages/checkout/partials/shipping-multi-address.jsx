@@ -193,7 +193,11 @@ const ShippingMultiAddress = ({
 
             // If there are existing shipments with addresses, try to match with customer addresses
             const existingShipments =
-                basket.shipments?.filter((shipment) => shipment.shippingAddress) || []
+                basket.shipments?.filter(
+                    (shipment) =>
+                        shipment.shippingAddress &&
+                        !isCurrentShippingMethodPickup(shipment?.shippingMethod)
+                ) || []
 
             if (existingShipments.length > 0) {
                 // Initialize based on existing shipments using item.shipmentId
@@ -265,12 +269,16 @@ const ShippingMultiAddress = ({
     ])
 
     useEffect(() => {
-        if (customer && customer.isGuest && basket?.productItems) {
+        if (customer && customer.isGuest && deliveryItems) {
             const existingShipments =
-                basket.shipments?.filter((shipment) => shipment.shippingAddress) || []
+                basket.shipments?.filter(
+                    (shipment) =>
+                        shipment.shippingAddress &&
+                        !isCurrentShippingMethodPickup(shipment?.shippingMethod)
+                ) || []
 
             if (existingShipments.length > 0) {
-                basket.productItems.forEach((item) => {
+                deliveryItems.forEach((item) => {
                     const addressKey = item.itemId
                     const shipment = existingShipments.find((s) => s.shipmentId === item.shipmentId)
 
@@ -337,7 +345,7 @@ const ShippingMultiAddress = ({
     const isLoading = (customer && customer.isGuest ? false : customerLoading) || productsLoading
 
     // Check if all product items have an address selected
-    const allShipmentsHaveAddress = (basket.productItems ?? []).every((item) => {
+    const allShipmentsHaveAddress = (deliveryItems ?? []).every((item) => {
         if (customer && customer.isGuest) {
             return selectedGuestAddresses[item.itemId]
         } else {
