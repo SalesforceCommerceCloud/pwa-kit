@@ -24,11 +24,11 @@ function Express() {
     const location = useLocation()
 
     const [authToken, setAuthToken] = useState()
-    
+
     // Check for PDP mode flag in URL
     const urlParams = new URLSearchParams(location.search)
     const isPdpMode = urlParams.get('pdp') === 'true'
-    
+
     // State to track current SKU and quantity (will be set via postMessage)
     const [currentSku, setCurrentSku] = useState(null)
     const [currentQuantity, setCurrentQuantity] = useState(1)
@@ -47,17 +47,17 @@ function Express() {
         const handleMessage = (event) => {
             // Basic security check - accept messages from any origin for now
             // In production, you might want to restrict this to specific origins
-            
+
             if (event.data && typeof event.data === 'object') {
                 const {type, sku} = event.data
-                
+
                 // Handle SKU update messages
                 if (type === 'UPDATE_SKU' && typeof sku === 'string') {
                     setCurrentSku(sku)
                     // Always set quantity to 1 when SKU changes
                     setCurrentQuantity(1)
                 }
-                
+
                 // Handle SKU clear messages (for regular checkout)
                 if (type === 'CLEAR_SKU') {
                     setCurrentSku(null)
@@ -90,21 +90,23 @@ function Express() {
         return null
     }
 
+    console.log('==authToken sent to adyen==', authToken)
+    console.log('==customerId sent to adyen==', customerId)
+    console.log('==basket sent to adyen==', basket)
+
     return (
         <div>
-            {((!isPdpMode && basket) || isPdpMode) && (
-                <AdyenExpressCheckoutProvider
-                    authToken={authToken}
-                    customerId={customerId}
-                    locale={locale}
-                    site={site}
-                    basket={basket}
-                    navigate={navigate}
-                >
-                    <ApplePayExpress sku={currentSku} quantity={currentQuantity} isPdpMode={isPdpMode} basketData={basket} />
-                    {/* <GooglePayExpress /> */}
-                </AdyenExpressCheckoutProvider>
-            )}
+            <AdyenExpressCheckoutProvider
+                authToken={authToken}
+                customerId={customerId}
+                locale={locale}
+                site={site}
+                basket={basket}
+                navigate={navigate}
+            >
+                {/*<ApplePayExpress sku={currentSku} quantity={currentQuantity} isPdpMode={isPdpMode} />*/}
+                <GooglePayExpress />
+            </AdyenExpressCheckoutProvider>
         </div>
     )
 }

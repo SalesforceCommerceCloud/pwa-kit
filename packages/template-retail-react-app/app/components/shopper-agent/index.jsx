@@ -109,6 +109,44 @@ const ShopperAgentWindow = ({commerceAgentConfiguration, locale, basketId}) => {
 
     const {usid} = useUsid()
 
+    const sendExpressMessage = (type, payload = {}) => {
+        const embeddedMessagingFrame = document.querySelector('div.embedded-messaging iframe')
+        console.log('==embeddedMessagingFrame==', embeddedMessagingFrame)
+        const eventData = {
+            type,
+            payload
+        }
+        console.log('==eventData==', eventData)
+        embeddedMessagingFrame.contentWindow.postMessage(eventData, '*')
+    }
+
+    const handleMiawEvent = (event) => {
+        if (event.source && event.source !== window) {
+            try {
+                if (event.data.type === 'lwc.getCustomerData') {
+                    console.log('==lwc.getCustomerData==', event)
+                    const customerId = localStorage.getItem(`customer_id_${siteId}`)
+                    const authToken = localStorage.getItem(`access_token_${siteId}`)
+                    console.log('==customer id from pwa parent context==', customerId)
+                    console.log('==auth token from pwa parent context==', authToken)
+                    sendExpressMessage('express.actualCustomerData', {
+                        customerId,
+                        authToken
+                    })
+                }
+            } catch (error) {
+                console.error('Error handling Miaw event:', error)
+            }
+        }
+    }
+
+    useEffect(() => {
+        window.addEventListener('message', handleMiawEvent)
+        return () => {
+            window.removeEventListener('message', handleMiawEvent)
+        }
+    })
+
     useEffect(() => {
         const handleEmbeddedMessagingReady = () => {
             window.embeddedservice_bootstrap.prechatAPI.setHiddenPrechatFields({
