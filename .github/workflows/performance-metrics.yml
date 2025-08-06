@@ -42,13 +42,13 @@ jobs:
                   use_extensibility: false
                   is_private_client: true
                   setup_hybrid: false
-                  project_dir: 'build'
-                  project_id: 'FOOOOOOOOOOOOOOOOOO'
+                  project_dir: 'storefront'
+                  project_id: 'storefront'
                   org_id: 'f_ecom_tbbn_prd'
                   short_code: 'performance-001'
                   client_id: '9629ef22-f8b8-4987-90ac-b815be3940c8'
                   site_id: 'SiteNemesis'
-                  instance_url: 'zzrf-001.dx.commercecloud.salesforce.com' # this doesn't matter because the OCAPI proxy in Runtime Admin will take precedence
+                  instance_url: 'https://zzrf-001.dx.commercecloud.salesforce.com' # this doesn't matter because the OCAPI proxy in Runtime Admin will take precedence
 
             # TODO: is this step still needed? I think it expects a project key
             # - name: Validate Generated Retail App Private Client
@@ -63,6 +63,7 @@ jobs:
                   mobify_user: ${{ secrets.MOBIFY_CLIENT_USER }}
                   mobify_api_key: ${{ secrets.MOBIFY_CLIENT_API_KEY }}
 
+            # TODO: how did Rob run his push command?
             - name: Push Bundle to MRT
               uses: './.github/actions/push_to_mrt'
               with:
