@@ -160,7 +160,7 @@ export default function ShippingAddress() {
                     }
                 })
             }
-            // Move items to the new shipment if needed.
+            // Move all items to the single target delivery shipment.
             const itemsToMove = deliveryItems.filter((item) => item.shipmentId !== targetShipmentId)
             if (itemsToMove.length > 0) {
                 basketAfterItemMoves = await moveItemsToDeliveryShipment(
