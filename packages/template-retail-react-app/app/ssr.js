@@ -25,8 +25,6 @@ import {getRuntime} from '@salesforce/pwa-kit-runtime/ssr/server/express'
 import {defaultPwaKitSecurityHeaders} from '@salesforce/pwa-kit-runtime/utils/middleware'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import {getAppOrigin} from '@salesforce/pwa-kit-react-sdk/utils/url'
-import {getEnvBasePath} from '@salesforce/pwa-kit-runtime/utils/ssr-namespace-paths'
-import {isRemote} from '@salesforce/pwa-kit-runtime/utils/ssr-server/utils'
 
 const config = getConfig()
 
@@ -199,8 +197,6 @@ async function sendMagicLinkEmail(req, res, landingPath, emailTemplate, redirect
     const {email_id, token} = req.body
 
     // Construct the magic link URL
-    // TODO: The landing path needs to take into account the top level app base path since this is the link
-    // included in the email
     let magicLink = `${base}${landingPath}?token=${encodeURIComponent(token)}`
     if (landingPath === config.app.login?.resetPassword?.landingPath) {
         // Add email query parameter for reset password flow

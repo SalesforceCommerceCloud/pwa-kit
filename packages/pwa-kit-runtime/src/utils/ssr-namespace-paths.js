@@ -26,6 +26,7 @@ const SLAS_PRIVATE_CLIENT_PROXY_PATH = `${MOBIFY_PATH}/slas/private`
 
 /*
  * Returns the base path. This is prepended to a /mobify path.
+ * Returns an empty string if the base path is not set or is '/'.
  */
 export const getEnvBasePath = () => {
     const config = getConfig()
