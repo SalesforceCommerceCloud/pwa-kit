@@ -834,6 +834,7 @@ export const useMultiship = (basket) => {
         findShipmentToConsolidate,
         getItemsForShipment,
         findUnusedDeliveryShipment,
-        updateDeliveryAddressForShipment
+        updateDeliveryAddressForShipment,
+        areAddressesEqual
     }
 }

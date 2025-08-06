@@ -145,7 +145,8 @@ const ShippingMultiAddress = ({
         createNewDeliveryShipmentWithAddress,
         updateDeliveryAddressForShipment,
         moveItemsToDeliveryShipment,
-        removeEmptyShipments
+        removeEmptyShipments,
+        areAddressesEqual
     } = useMultiship(basket)
 
     // Filter out pickup items - only show delivery items
@@ -187,7 +188,7 @@ const ShippingMultiAddress = ({
     const [selectedRegisteredUserAddresses, setSelectedRegisteredUserAddresses] = useState({})
 
     useEffect(() => {
-        if (customer && !customer.isGuest && basket?.productItems) {
+        if (customer && !customer.isGuest && deliveryItems) {
             const initialSelected = {}
 
             // If there are existing shipments with addresses, try to match with customer addresses
@@ -196,18 +197,16 @@ const ShippingMultiAddress = ({
 
             if (existingShipments.length > 0) {
                 // Initialize based on existing shipments using item.shipmentId
-                basket.productItems.forEach((item) => {
+                deliveryItems.forEach((item) => {
                     const addressKey = item.itemId
                     const shipment = existingShipments.find((s) => s.shipmentId === item.shipmentId)
 
-                    if (shipment && shipment.shippingAddress) {
-                        // Try to find a matching customer address
+                    if (shipment && shipment.shippingAddress) 
+                        // Try to find a matching customer address using areAddressesEqual
                         const matchingAddress = registeredUserAddresses.find(
                             (addr) =>
-                                addr.firstName === shipment.shippingAddress.firstName &&
-                                addr.lastName === shipment.shippingAddress.lastName &&
-                                addr.address1 === shipment.shippingAddress.address1 &&
-                                addr.city === shipment.shippingAddress.city
+                                areAddressesEqual &&
+                                areAddressesEqual(addr, shipment.shippingAddress)
                         )
 
                         if (matchingAddress) {
@@ -230,7 +229,7 @@ const ShippingMultiAddress = ({
                 })
             } else if (registeredUserAddresses.length > 0) {
                 // Fall back to customer addresses if no existing shipments
-                basket.productItems.forEach((item) => {
+                deliveryItems.forEach((item) => {
                     const addressKey = item.itemId
                     // Find preferred address or use first address as default
                     const defaultAddress =
@@ -247,7 +246,7 @@ const ShippingMultiAddress = ({
                 const newState = {...prev}
                 let hasChanges = false
 
-                basket.productItems.forEach((item) => {
+                deliveryItems.forEach((item) => {
                     const addressKey = item.itemId
                     if (!prev[addressKey] && initialSelected[addressKey]) {
                         newState[addressKey] = initialSelected[addressKey]
