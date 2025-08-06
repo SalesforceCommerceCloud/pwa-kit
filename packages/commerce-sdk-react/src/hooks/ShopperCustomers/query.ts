@@ -12,7 +12,8 @@ import {mergeOptions, omitNullableParameters, pickValidParams} from '../utils'
 import * as queryKeyHelpers from './queryKeyHelpers'
 import {CLIENT_KEYS} from '../../constant'
 import useCommerceApi from '../useCommerceApi'
-import { helpers } from "commerce-sdk-isomorphic";
+import { helpers } from "commerce-sdk-isomorphic"
+import { useCustomMutation } from '../useMutation'
 
 const CLIENT_KEY = CLIENT_KEYS.SHOPPER_CUSTOMERS
 type Client = NonNullable<ApiClients[typeof CLIENT_KEY]>
@@ -236,25 +237,22 @@ export const useCustomerOrders = (
 }
 
 /**
- * Custom order endpoint hook for SOM orders.
+ * Custom order endpoint hook for SOM orders using useCustomMutation.
  * @group ShopperCustomers
  * @category Query
- * @returns A Promise that resolves to the custom order data.
+ * @returns A useCustomMutation hook for the SOM order endpoint.
  */
-export const useSomOrder = (): Promise<unknown> => {
-    
-    return fetch('/api/som-order', {
-        method: 'GET',
-        headers: {
-            'Content-Type': 'application/json'
-        }
-    }).then(response => {
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`)
-        }
-        console.log('🔍 useSomOrder: Response:', response)
-        return response.json()
-    })
+export const useSomOrder = () => {
+    return useCustomMutation({
+        options: {
+            method: 'GET',
+            customApiPathParameters: {
+                endpointPath: 'order',
+                apiName: 'orders'
+            }
+        },
+        rawResponse: false
+    });
 }
 /**
  * Retrieves a customer's payment instrument by its ID.

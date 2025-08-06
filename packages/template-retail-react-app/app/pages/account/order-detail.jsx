@@ -129,8 +129,43 @@ const AccountOrderDetail = () => {
             enabled: onClient && !!params.orderNo
         }
     )
-    const {data: somOrder} = useSomOrder()
-    console.log("somOrder", somOrder)
+    const somOrderMutation = useSomOrder()
+    
+    // Call the mutation when component mounts
+    useEffect(() => {
+        if (onClient) {
+            console.log("🧪 Calling somOrder mutation...")
+            somOrderMutation.mutate({
+                parameters: {
+                    siteId: 'RefArch',
+                    orderNumber: '00000201',
+                    email: 'madhuri.uppu@salesforce.com'
+                }
+            }, {
+                onSuccess: (data) => {
+                    console.log("✅ somOrder mutation successful:", data)
+                },
+                onError: (error) => {
+                    console.error("❌ somOrder mutation failed:", error)
+                    console.error("Error details:", {
+                        message: error.message,
+                        stack: error.stack,
+                        response: error.response
+                    })
+                },
+                onSettled: () => {
+                    console.log("🏁 somOrder mutation settled")
+                }
+            })
+        }
+    }, [onClient, somOrderMutation])
+    
+    console.log("somOrder mutation state:", {
+        data: somOrderMutation.data,
+        isLoading: somOrderMutation.isLoading,
+        error: somOrderMutation.error,
+        isSuccess: somOrderMutation.isSuccess
+    })
     const isLoading = isOrderLoading || !order
     const shipment = order?.shipments[0]
     const {shippingAddress, shippingMethod, shippingStatus, trackingNumber} = shipment || {}
