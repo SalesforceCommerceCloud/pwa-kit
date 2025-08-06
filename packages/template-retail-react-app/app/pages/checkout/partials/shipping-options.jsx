@@ -143,20 +143,9 @@ export default function ShippingOptions() {
             )) ||
         []
 
-    // Determine if this is multiship or single ship
-    // We need to check for shipments with different addresses, not just multiple shipments
-    const deliveryShipments =
-        (basket &&
-            basket.shipments &&
-            basket.shipments.filter((shipment) => 
-                shipment.shippingAddress && 
-                !isCurrentShippingMethodPickup(shipment.shippingMethod)
-            )) ||
-        []
-
     // Check if there are multiple shipments with different addresses
     const uniqueAddresses = new Set()
-    deliveryShipments.forEach((shipment) => {
+    shipmentsWithAddresses.forEach((shipment) => {
         if (shipment.shippingAddress) {
             const addressKey = `${shipment.shippingAddress.address1}-${shipment.shippingAddress.city}-${shipment.shippingAddress.postalCode}`
             uniqueAddresses.add(addressKey)
