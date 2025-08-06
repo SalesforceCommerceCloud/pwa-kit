@@ -538,27 +538,6 @@ describe('ShippingMultiAddress', () => {
             expect(screen.queryByText('+ Add New Address')).not.toBeInTheDocument()
         })
 
-        test('should show guest user message when customer is a guest', () => {
-            // Mock guest customer
-            useCurrentCustomer.mockReturnValue({
-                data: {
-                    customerId: 'guest-1',
-                    isGuest: true,
-                    addresses: []
-                },
-                isLoading: false
-            })
-
-            renderWithIntl(<ShippingMultiAddress {...defaultProps} />)
-
-            // Check that guest user message is displayed
-            expect(
-                screen.getByText(
-                    'Guest users cannot use multi-address shipping. Please sign in to continue.'
-                )
-            ).toBeInTheDocument()
-        })
-
         test('should handle customer data loading and then rendering', async () => {
             // Test loading state
             useCurrentCustomer.mockReturnValue({
@@ -1465,6 +1444,146 @@ describe('ShippingMultiAddress - handleSubmit', () => {
             dropdowns = screen.getAllByRole('combobox')
             expect(dropdowns[0]).toHaveValue('addr-new-1')
             expect(dropdowns[1]).toHaveValue('addr-new-1')
+        })
+    })
+
+    describe('Guest shopper', () => {
+        beforeEach(() => {
+            useCurrentCustomer.mockReturnValue({
+                data: {
+                    customerId: 'guest-1',
+                    isGuest: true,
+                    addresses: []
+                },
+                isLoading: false
+            })
+        })
+
+        test('should render multi-ship UI for guest users', () => {
+            renderWithIntl(<ShippingMultiAddress {...defaultProps} />)
+            expect(screen.getByText('Test Product 1')).toBeInTheDocument()
+            expect(screen.getByText('Test Product 2')).toBeInTheDocument()
+            expect(screen.getAllByText('+ Add New Address')).toHaveLength(2)
+            expect(screen.getByText('Continue')).toBeInTheDocument()
+        })
+
+        test('should show empty dropdowns for guest users at start checkout', () => {
+            renderWithIntl(<ShippingMultiAddress {...defaultProps} />)
+            const selectElements = screen.getAllByRole('combobox')
+            expect(selectElements).toHaveLength(2)
+
+            selectElements.forEach((select) => {
+                expect(select).toHaveValue('')
+                expect(select).toBeDisabled()
+            })
+        })
+
+        test('should store new addresses in component state for guests', async () => {
+            renderWithIntl(<ShippingMultiAddress {...defaultProps} />)
+
+            const addNewAddressButtons = screen.getAllByText('+ Add New Address')
+            fireEvent.click(addNewAddressButtons[0])
+            fireEvent.change(screen.getByLabelText('First Name'), {target: {value: 'Guest'}})
+            fireEvent.change(screen.getByLabelText('Last Name'), {target: {value: 'User'}})
+            fireEvent.change(screen.getByLabelText('Phone'), {target: {value: '1234567890'}})
+            fireEvent.change(screen.getByLabelText('Address'), {target: {value: '123 Guest St'}})
+            fireEvent.change(screen.getByLabelText('City'), {target: {value: 'Guest City'}})
+            fireEvent.change(screen.getByLabelText('State'), {target: {value: 'CA'}})
+            fireEvent.change(screen.getByLabelText('Zip Code'), {target: {value: '12345'}})
+
+            fireEvent.click(screen.getByText('Save'))
+
+            await waitFor(() => {
+                // Verify address is added to local state (should appear in dropdown)
+                const dropdowns = screen.getAllByRole('combobox')
+                expect(dropdowns[0].value).toMatch(/^guest_/)
+            })
+        })
+
+        test('should auto-assign first address to all products for guests', async () => {
+            renderWithIntl(<ShippingMultiAddress {...defaultProps} />)
+
+            const addNewAddressButtons = screen.getAllByText('+ Add New Address')
+            fireEvent.click(addNewAddressButtons[0])
+            fireEvent.change(screen.getByLabelText('First Name'), {target: {value: 'First'}})
+            fireEvent.change(screen.getByLabelText('Last Name'), {target: {value: 'Guest'}})
+            fireEvent.change(screen.getByLabelText('Phone'), {target: {value: '1234567890'}})
+            fireEvent.change(screen.getByLabelText('Address'), {target: {value: '123 First St'}})
+            fireEvent.change(screen.getByLabelText('City'), {target: {value: 'First City'}})
+            fireEvent.change(screen.getByLabelText('State'), {target: {value: 'CA'}})
+            fireEvent.change(screen.getByLabelText('Zip Code'), {target: {value: '12345'}})
+
+            fireEvent.click(screen.getByText('Save'))
+
+            await waitFor(() => {
+                // Verify first address is auto-assigned to all products
+                const dropdowns = screen.getAllByRole('combobox')
+                const firstDropdownValue = dropdowns[0].value
+                expect(firstDropdownValue).toMatch(/^guest_/) // guest_ id prefix
+
+                // Both dropdowns should have the same address value (same guest ID)
+                dropdowns.forEach((dropdown) => {
+                    expect(dropdown).toHaveValue(firstDropdownValue)
+                })
+
+                // Verify the address text shows the same address details
+                const addressOptions = screen.getAllByText(
+                    /First Guest - 123 First St, First City, CA 12345/
+                )
+                expect(addressOptions).toHaveLength(2) // Should have 2 options with same address text
+            })
+        })
+
+        test('should enable continue button when all products have addresses', async () => {
+            renderWithIntl(<ShippingMultiAddress {...defaultProps} />)
+
+            const addNewAddressButtons = screen.getAllByText('+ Add New Address')
+            fireEvent.click(addNewAddressButtons[0])
+
+            fireEvent.change(screen.getByLabelText('First Name'), {target: {value: 'Guest'}})
+            fireEvent.change(screen.getByLabelText('Last Name'), {target: {value: 'User'}})
+            fireEvent.change(screen.getByLabelText('Phone'), {target: {value: '1234567890'}})
+            fireEvent.change(screen.getByLabelText('Address'), {target: {value: '123 Guest St'}})
+            fireEvent.change(screen.getByLabelText('City'), {target: {value: 'Guest City'}})
+            fireEvent.change(screen.getByLabelText('State'), {target: {value: 'CA'}})
+            fireEvent.change(screen.getByLabelText('Zip Code'), {target: {value: '12345'}})
+
+            fireEvent.click(screen.getByText('Save'))
+
+            await waitFor(() => {
+                // Continue button should be enabled when all products have addresses
+                const continueButton = screen.getByText('Continue')
+                expect(continueButton).toBeEnabled()
+            })
+        })
+
+        test('should create guest shipments when proceed is clicked', async () => {
+            renderWithIntl(<ShippingMultiAddress {...defaultProps} />)
+
+            // Add address for first product
+            const addNewAddressButtons = screen.getAllByText('+ Add New Address')
+            fireEvent.click(addNewAddressButtons[0])
+
+            fireEvent.change(screen.getByLabelText('First Name'), {target: {value: 'Guest'}})
+            fireEvent.change(screen.getByLabelText('Last Name'), {target: {value: 'User'}})
+            fireEvent.change(screen.getByLabelText('Phone'), {target: {value: '1234567890'}})
+            fireEvent.change(screen.getByLabelText('Address'), {target: {value: '123 Guest St'}})
+            fireEvent.change(screen.getByLabelText('City'), {target: {value: 'Guest City'}})
+            fireEvent.change(screen.getByLabelText('State'), {target: {value: 'CA'}})
+            fireEvent.change(screen.getByLabelText('Zip Code'), {target: {value: '12345'}})
+
+            fireEvent.click(screen.getByText('Save'))
+
+            await waitFor(() => {
+                const continueButton = screen.getByText('Continue')
+                expect(continueButton).toBeEnabled()
+            })
+
+            fireEvent.click(screen.getByText('Continue'))
+
+            await waitFor(() => {
+                expect(screen.getByText('Setting up shipments...')).toBeInTheDocument()
+            })
         })
     })
 })
