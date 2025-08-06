@@ -3591,12 +3591,6 @@
       "value": "postalCode"
     }
   ],
-  "shipping_multi_address.guest_user.message": [
-    {
-      "type": 0,
-      "value": "Guest users cannot use multi-address shipping. Please sign in to continue."
-    }
-  ],
   "shipping_multi_address.image.alt": [
     {
       "type": 0,

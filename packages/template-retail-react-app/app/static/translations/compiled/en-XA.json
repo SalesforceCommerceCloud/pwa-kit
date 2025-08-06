@@ -7583,20 +7583,6 @@
       "value": "]"
     }
   ],
-  "shipping_multi_address.guest_user.message": [
-    {
-      "type": 0,
-      "value": "["
-    },
-    {
-      "type": 0,
-      "value": "Ɠŭŭḗḗşŧ ŭŭşḗḗřş ƈȧȧƞƞǿǿŧ ŭŭşḗḗ ḿŭŭŀŧī-ȧȧḓḓřḗḗşş şħīƥƥīƞɠ. Ƥŀḗḗȧȧşḗḗ şīɠƞ īƞ ŧǿǿ ƈǿǿƞŧīƞŭŭḗḗ."
-    },
-    {
-      "type": 0,
-      "value": "]"
-    }
-  ],
   "shipping_multi_address.image.alt": [
     {
       "type": 0,
