@@ -177,6 +177,9 @@ export const RemoteServerFactory = {
             `${options.slasApiPath.source}(${options.applySLASPrivateClientToEndpoints.source})`
         )
 
+        // Extra check to disallow the priate client proxy from certain endpoints
+        options.doNotApplyPrivateClientSecretToEndpoints = /\/oauth2\/trusted-system/
+
         return options
     },
 
@@ -722,14 +725,25 @@ export const RemoteServerFactory = {
                     })
 
                     // We pattern match and add client secrets only to endpoints that
-                    // match the regex specified by options.applySLASPrivateClientToEndpoints
+                    // match the regex specified by options.applySLASPrivateClientToEndpoints and are
+                    // not disallowed by doNotApplyPrivateClientSecretToEndpoints
                     // (see option defaults at the top of this file).
                     // Other SLAS endpoints, ie. SLAS authenticate (/oauth2/login) and
                     // SLAS logout (/oauth2/logout), use the Authorization header for a different
                     // purpose so we don't want to overwrite the header for those calls.
-                    if (incomingRequest.path?.match(options.applySLASPrivateClientToEndpoints)) {
+                    if (
+                        incomingRequest.path?.match(options.applySLASPrivateClientToEndpoints) &&
+                        !incomingRequest.path?.match(
+                            options.doNotApplyPrivateClientSecretToEndpoints
+                        )
+                    ) {
                         proxyRequest.setHeader('Authorization', `Basic ${encodedSlasCredentials}`)
-                    } else if (!incomingRequest.path?.match(options.slasApiPath)) {
+                    } else if (
+                        !incomingRequest.path?.match(options.slasApiPath) ||
+                        incomingRequest.path?.match(
+                            options.doNotApplyPrivateClientSecretToEndpoints
+                        )
+                    ) {
                         const message = `Request to ${incomingRequest.path} is not allowed through the SLAS Private Client Proxy`
                         logger.error(message)
                         return res.status(403).json({

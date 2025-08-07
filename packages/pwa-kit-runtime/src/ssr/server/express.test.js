@@ -1263,4 +1263,29 @@ describe('SLAS private client proxy', () => {
             .get('/mobify/slas/private/shopper/auth-admin/v1/other-path')
             .expect(403)
     }, 15000)
+
+    test('returns 403 if request is for /oauth2/trusted-agent/* endpoint', async () => {
+        process.env.PWA_KIT_SLAS_CLIENT_SECRET = 'a secret'
+
+        const app = RemoteServerFactory._createApp(
+            opts({
+                mobify: {
+                    app: {
+                        commerceAPI: {
+                            parameters: {
+                                clientId: 'clientId',
+                                shortCode: 'shortCode'
+                            }
+                        }
+                    }
+                },
+                useSLASPrivateClient: true,
+                slasTarget: slasTarget
+            })
+        )
+
+        return await request(app)
+            .get('/mobify/slas/private/shopper/auth/v1/oauth2/trusted-system/token')
+            .expect(403)
+    }, 15000)
 })
