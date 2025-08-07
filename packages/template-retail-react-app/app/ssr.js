@@ -315,9 +315,7 @@ const {handler} = runtime.createHandler(options, (app) => {
                         // Connect to Einstein APIs
                         'api.cquotient.com',
                         // Connect to DataCloud APIs
-                        '*.c360a.salesforce.com',
-                        // Connect to custom SOM order API
-                        '*.api.commercecloud.salesforce.com'
+                        '*.c360a.salesforce.com'
                     ]
                 }
             }
@@ -335,52 +333,6 @@ const {handler} = runtime.createHandler(options, (app) => {
     app.get('/:shortCode/:tenantId/oauth2/jwks', (req, res) => {
         jwksCaching(req, res, {shortCode: req.params.shortCode, tenantId: req.params.tenantId})
     })
-
-    // SOM Order API route - handles custom order requests server-side
-    app.get('/api/som-order', async (req, res) => {
-        try {
-            console.log('🔍 Server API: Starting SOM order request...');
-            
-            const accessToken = "eyJ2ZXIiOiIxLjAiLCJqa3UiOiJzbGFzL3Byb2QvenpyZl8wMTciLCJraWQiOiJmNmFhN2Q3MS00Nzc0LTRhNjMtYmNmNS05ZTBlN2QxZjQ5N2MiLCJ0eXAiOiJqd3QiLCJjbHYiOiJKMi4zLjQiLCJhbGciOiJFUzI1NiJ9.eyJhdXQiOiJHVUlEIiwic2NwIjoic2ZjYy5zaG9wcGVyLW15YWNjb3VudC5iYXNrZXRzIHNmY2Muc2hvcHBlci1kaXNjb3Zlcnktc2VhcmNoIHNmY2Muc2hvcHBlci1wcm9kdWN0cyBjX29yZGVycyBzZmNjLnNob3BwZXItbXlhY2NvdW50LnJ3IHNmY2Muc2hvcHBlci1jdXN0b21lcnMubG9naW4gc2ZjYy5zaG9wcGVyLXN0b3JlcyBjX3Jldmlld3Mgc2ZjYy5zaG9wcGVyLW15YWNjb3VudC5vcmRlcnMgc2ZjYy5zaG9wcGVyLWN1c3RvbWVycy5yZWdpc3RlciBzZmNjLnNob3BwZXItbXlhY2NvdW50LmFkZHJlc3Nlcy5ydyBzZmNjLnNob3BwZXItbXlhY2NvdW50LnByb2R1Y3RsaXN0cy5ydyBzZmNjLnNob3BwZXItcHJvZHVjdGxpc3RzIHNmY2Muc2hvcHBlci1wcm9tb3Rpb25zIHNmY2Muc2hvcHBlci1iYXNrZXRzLW9yZGVycy5ydyBzZmNjLnNob3BwZXItZ2lmdC1jZXJ0aWZpY2F0ZXMgc2ZjYy5zaG9wcGVyLW15YWNjb3VudC5wYXltZW50aW5zdHJ1bWVudHMucncgc2ZjYy5zaG9wcGVyLXByb2R1Y3Qtc2VhcmNoIHNmY2Muc2hvcHBlci1jYXRlZ29yaWVzIiwic3ViIjoiY2Mtc2xhczo6enpyZl8wMTc6OnNjaWQ6YmMwM2E3OTYtMjhjNS00MGExLWFjMGMtNWEwY2NkMTBjMTZiOjp1c2lkOjdmYWFhMmMzLWRjNDYtNDhmYi1hOThmLTg0NWEzMjRhNDQ0MiIsImN0eCI6InNsYXMiLCJpc3MiOiJzbGFzL3Byb2QvenpyZl8wMTciLCJpc3QiOjEsImRudCI6IjAiLCJhdWQiOiJjb21tZXJjZWNsb3VkL3Byb2QvenpyZl8wMTciLCJuYmYiOjE3NTQzNTUxMDgsInN0eSI6IlVzZXIiLCJpc2IiOiJ1aWRvOnNsYXM6OnVwbjpHdWVzdDo6dWlkbjpHdWVzdCBVc2VyOjpnY2lkOmFibDB4Rnd1Y1d3WGtSeGVrWWxHWVltZXhHOjpjaGlkOlJlZkFyY2giLCJleHAiOjE3NTQzNTY5MzgsImlhdCI6MTc1NDM1NTEzOCwianRpIjoiQzJDNDg1NjIwMjIzMC0xODkwNjc4ODY2MzMwMjk5MTQ4NDU2OTg1MDYifQ.PE0a8nsQ7ZFmV69dIaPycsYedTQFFrsmnZtDeSJFedqJHq7OMx_nfXqeVgiUH8br4ryA2j-OcRLWiKR3Ha-QBQ";
-
-            // Direct HTTP request to the custom API endpoint
-            const apiUrl = "https://kv7kzm78.api.commercecloud.salesforce.com/custom/orders/v1/organizations/f_ecom_zzrf_017/order?siteId=RefArch&c_orderNumber=00000101&c_emailId=unandyala%40salesforce.com";
-            
-            console.log('📤 Server API: Making request to:', apiUrl);
-
-            const response = await fetch(apiUrl, {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${accessToken}`,
-                    'User-Agent': 'PWA-Kit-Server/1.0'
-                }
-            });
-
-            console.log('🔍 Server API: Response status:', response.status);
-            console.log('🔍 Server API: Response headers:', Object.fromEntries(response.headers.entries()));
-
-            if (!response.ok) {
-                const errorText = await response.text();
-                console.error('❌ Server API: Error response body:', errorText);
-                throw new Error(`HTTP error! status: ${response.status}, body: ${errorText}`);
-            }
-
-            const result = await response.json();
-            
-            console.log('✅ Server API: API call successful!');
-            console.log('📊 Server API: Response data:', JSON.stringify(result, null, 2));
-
-            res.status(200).json(result);
-        } catch (error) {
-            console.error('❌ Server API: API call failed!');
-            console.error('🚨 Server API: Error details:', error);
-            res.status(500).json({ 
-                error: 'Failed to fetch SOM order',
-                message: error.message 
-            });
-        }
-    });
 
     // Handles the passwordless login callback route. SLAS makes a POST request to this
     // endpoint sending the email address and passwordless token. Then this endpoint calls
