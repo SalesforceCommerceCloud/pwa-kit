@@ -125,9 +125,9 @@ const Header = ({
     const logout = useAuthHelper(AuthHelpers.Logout)
     const navigate = useNavigation()
     /* @sfdc-extension-block-start SFDC_EXT_STORE_LOCATOR */
-    const openModal = (() => {
-            onStoreLocatorClick()
-        })
+    const openModal = () => {
+        onStoreLocatorClick()
+    }
     /* @sfdc-extension-block-end SFDC_EXT_STORE_LOCATOR */
     const [showLoading, setShowLoading] = useState(false)
 

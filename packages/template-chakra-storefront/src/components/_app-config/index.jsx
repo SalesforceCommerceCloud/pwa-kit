@@ -35,7 +35,7 @@ import {
     STORE_LOCATOR_DEFAULT_COUNTRY_CODE,
     STORE_LOCATOR_DEFAULT_POSTAL_CODE,
     STORE_LOCATOR_DEFAULT_PAGE_SIZE,
-    STORE_LOCATOR_SUPPORTED_COUNTRIES,
+    STORE_LOCATOR_SUPPORTED_COUNTRIES
     /* @sfdc-extension-block-end SFDC_EXT_STORE_LOCATOR */
 } from '../../../src/config/constants'
 
@@ -80,19 +80,18 @@ const AppConfig = ({children, locals = {}}) => {
     const defaultDnt = useMemo(() => locals.appConfig.dnt, [locals.appConfig.dnt])
 
     /* @sfdc-extension-block-start SFDC_EXT_STORE_LOCATOR */
-    const storeLocatorConfig =
-            useMemo(
-            () => ({
-                radius: STORE_LOCATOR_RADIUS,
-                radiusUnit: STORE_LOCATOR_RADIUS_UNIT,
-                defaultCountry: STORE_LOCATOR_DEFAULT_COUNTRY,
-                defaultCountryCode: STORE_LOCATOR_DEFAULT_COUNTRY_CODE,
-                defaultPostalCode: STORE_LOCATOR_DEFAULT_POSTAL_CODE,
-                defaultPageSize: STORE_LOCATOR_DEFAULT_PAGE_SIZE,
-                supportedCountries: STORE_LOCATOR_SUPPORTED_COUNTRIES
-            }),
-            []
-        )
+    const storeLocatorConfig = useMemo(
+        () => ({
+            radius: STORE_LOCATOR_RADIUS,
+            radiusUnit: STORE_LOCATOR_RADIUS_UNIT,
+            defaultCountry: STORE_LOCATOR_DEFAULT_COUNTRY,
+            defaultCountryCode: STORE_LOCATOR_DEFAULT_COUNTRY_CODE,
+            defaultPostalCode: STORE_LOCATOR_DEFAULT_POSTAL_CODE,
+            defaultPageSize: STORE_LOCATOR_DEFAULT_PAGE_SIZE,
+            supportedCountries: STORE_LOCATOR_SUPPORTED_COUNTRIES
+        }),
+        []
+    )
     /* @sfdc-extension-block-end SFDC_EXT_STORE_LOCATOR */
 
     return (
@@ -117,7 +116,7 @@ const AppConfig = ({children, locals = {}}) => {
                 {/* @sfdc-extension-line SFDC_EXT_STORE_LOCATOR */}
                 <StoreLocatorProvider config={storeLocatorConfig}>
                     <ChakraProvider value={theme}>{children}</ChakraProvider>
-                {/* @sfdc-extension-line SFDC_EXT_STORE_LOCATOR */}
+                    {/* @sfdc-extension-line SFDC_EXT_STORE_LOCATOR */}
                 </StoreLocatorProvider>
             </MultiSiteProvider>
             <ReactQueryDevtools />
