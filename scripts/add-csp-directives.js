@@ -7,7 +7,10 @@
  */
 
 /**
- * Simple script to update the CSP directives in ssr.js by merging in the new configuration
+ * Script to add new CSP directive values to existing configuration in ssr.js
+ * 
+ * This script only adds new values - it cannot remove or modify existing directives.
+ * It preserves existing comments and prevents duplicate values.
  */
 
 const fs = require('fs')
@@ -79,9 +82,9 @@ function getCurrentCSPConfig(ssrFilePath = DEFAULT_SSR_FILE_PATH) {
 }
 
 /**
- * Merge new CSP configuration with existing configuration
+ * Add new CSP directive values to existing configuration
  */
-function mergeCSPConfig(existingConfig, newConfig) {
+function addCSPDirectives(existingConfig, newConfig) {
     const mergedConfig = {...existingConfig}
 
     Object.entries(newConfig).forEach(([directiveName, newEntries]) => {
@@ -179,7 +182,7 @@ function parseInputFromStdin() {
 }
 
 /**
- * Update ssr.js with new CSP configuration
+ * Update ssr.js file with the enhanced CSP configuration
  */
 function updateSSRFile(config, ssrFilePath = DEFAULT_SSR_FILE_PATH) {
     const content = fs.readFileSync(ssrFilePath, 'utf8')
@@ -191,7 +194,7 @@ function updateSSRFile(config, ssrFilePath = DEFAULT_SSR_FILE_PATH) {
     )
 
     fs.writeFileSync(ssrFilePath, newContent, 'utf8')
-    console.log('✅ Successfully updated CSP directives in ssr.js')
+    console.log('✅ Successfully added CSP directives to ssr.js')
 }
 
 /**
@@ -207,25 +210,31 @@ async function main() {
     if (filteredArgs.length === 0 && process.stdin.isTTY) {
         console.log(`
 Usage:
-  node scripts/update-csp-directives-simple.js <config.json>
-  echo '{"img-src": ["*.example.com"]}' | node scripts/update-csp-directives-simple.js
+  node scripts/add-csp-directives.js <config.json>
+  echo '{"img-src": ["*.example.com"]}' | node scripts/add-csp-directives.js
+
+Description:
+  Adds new CSP directive values to existing configuration in ssr.js
+  - Preserves existing comments and values
+  - Prevents duplicate values
+  - Cannot remove or modify existing directives
 
 Options:
   --ssr-path <path>    - Custom path to ssr.js file (default: packages/template-retail-react-app/app/ssr.js)
 
 Examples:
-  # Merge CSP from configuration file
-  node scripts/update-csp-directives-simple.js csp-config.json
+  # Add CSP directives from configuration file
+  node scripts/add-csp-directives.js csp-config.json
 
-  # Merge CSP from JSON via stdin/pipe
-  echo '{"img-src": ["*.example.com"]}' | node scripts/update-csp-directives-simple.js
-  cat csp-config.json | node scripts/update-csp-directives-simple.js
+  # Add CSP directives from JSON via stdin/pipe
+  echo '{"img-src": ["*.example.com"]}' | node scripts/add-csp-directives.js
+  cat csp-config.json | node scripts/add-csp-directives.js
 
   # Use custom ssr.js path
-  node scripts/update-csp-directives-simple.js --ssr-path custom/path/ssr.js csp-config.json
-  echo '{"script-src": ["cdn.example.com"]}' | node scripts/update-csp-directives-simple.js --ssr-path custom/path/ssr.js
+  node scripts/add-csp-directives.js --ssr-path custom/path/ssr.js csp-config.json
+  echo '{"script-src": ["cdn.example.com"]}' | node scripts/add-csp-directives.js --ssr-path custom/path/ssr.js
 
-Config JSON Format:
+Config JSON Format (simplified - just arrays of strings):
 {
   "img-src": [
     "*.commercecloud.salesforce.com",
@@ -268,12 +277,14 @@ Config JSON Format:
             })
         })
 
-        // Get current configuration and merge with new configuration
+        // Get current configuration and add new directives to it
         const currentConfig = getCurrentCSPConfig(ssrFilePath)
-        const mergedConfig = mergeCSPConfig(currentConfig, newConfig)
+        const mergedConfig = addCSPDirectives(currentConfig, newConfig)
 
         updateSSRFile(mergedConfig, ssrFilePath)
-        console.log(`✅ Merged CSP directives successfully`)
+        console.log(`✅ Added CSP directives successfully`)
+
+        // TODO: Fix any linting errors by `npm run lint:fix` from the folder containing the ssr.js file
     } catch (error) {
         console.error('❌ Error:', error.message)
         process.exit(1)
@@ -290,7 +301,7 @@ if (require.main === module) {
 
 module.exports = {
     getCurrentCSPConfig,
-    mergeCSPConfig,
+    addCSPDirectives,
     generateCSPDirectives,
     updateSSRFile,
     getSSRFilePath,
