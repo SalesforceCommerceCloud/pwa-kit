@@ -1,6 +1,6 @@
 {
-  "name": "{{preset.id}}",
-  "short_name": "{{preset.id}}",
+  "name": "example.com",
+  "short_name": "example.com",
   "start_url": "/?homescreen=1",
   "background_color": "#fff",
   "theme_color": "#4e439b",
