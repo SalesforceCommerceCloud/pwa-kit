@@ -31,9 +31,9 @@ runs:
       run: |
         use_extensibility_input="${{ inputs.use_extensibility }}"
         if [ "use_extensibility_input" = "true" ]; then
-         use_extensibility_value=2
-        else
          use_extensibility_value=1
+        else
+         use_extensibility_value=2
         fi
         echo "USE_EXTENSIBILITY_VALUE=$use_extensibility_value" >> $GITHUB_ENV
 
