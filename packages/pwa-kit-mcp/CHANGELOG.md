@@ -4,7 +4,4 @@
 - Add `create_new_sample_component` MCP tool. [#2651](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2651)
 - Add `create_app_guidelines` MCP tool. [#2599](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2599)
 - Add `run_site_test` MCP tool [#2645](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2645):
-- Add `create_sample_storefront_page` MCP tool [#2899] (https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2899)
-- fix `logMCPMessage` and add a test for this debugging util. [#2989] (https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2989)
-- fix `run_site_test` accessibility tool response format. [#3003] (https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3003)
-- fix `create-new-page-tool` MCP tool components import statement. [#3014] (https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3014)
+- Add `create_sample_storefront_page` MCP tool [#2899](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2899)
