@@ -1,0 +1,84 @@
+# .github/workflows/rebase-express-payments.yml
+
+name: 'Auto Rebase adyenExpressPaymentsDreamForceTestAlertBranch'
+
+# This action will trigger on every push to the develop branch.
+on:
+  push:
+    branches:
+      - develop
+  workflow_dispatch:
+
+jobs:
+  rebase:
+    name: Rebase adyenExpressPaymentsDreamForceTestAlertBranch on develop
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Check out the repository's code.
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Fetches all history for all branches and tags
+
+      # Step 2: Set up the Node.js environment to use npm and npx.
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22' # Or your project's specific Node.js version
+          cache: 'npm' # Caches npm dependencies for faster runs
+
+      # Step 3: Configure Git with a user name and email.
+      - name: Set up Git
+        run: |
+          git config --global user.name 'GitHub Actions'
+          git config --global user.email 'actions@github.com'
+
+      # Step 4: Switch to the adyenExpressPaymentsDreamForceTestAlertBranch branch.
+      - name: Switch to adyenExpressPaymentsDreamForceTestAlertBranch branch
+        run: git checkout adyenExpressPaymentsDreamForceTestAlertBranch 
+
+      # Step 5: Delete all package-lock.json files before the rebase.
+      - name: Delete package-lock.json files
+        run: |
+          find . -name "package-lock.json" -type f -delete
+          # We must commit this change so the rebase can proceed cleanly.
+          # The 'if' statement prevents an error if no lock files were found.
+          if [[ -n $(git status -s) ]]; then
+            git add .
+            git commit -m "chore: remove package-lock.json files before rebase"
+          else
+            echo "No package-lock.json files found to delete."
+          fi
+
+      # Step 6: Attempt to rebase the branch. The job will fail if this step fails.
+      - name: Rebase adyenExpressPaymentsDreamForceTestAlertBranch with develop
+        run: |
+          if ! git rebase origin/develop; then
+            echo "Rebase failed due to conflicts. Aborting."
+            git rebase --abort
+            exit 1
+          fi
+
+      # Step 7: Install dependencies after a successful rebase.
+      # The '--yes' flag for lerna is crucial for non-interactive environments.
+      - name: Install Dependencies
+        run: npx lerna clean --yes && npm i
+
+      # Step 8: Push the changes only if all previous steps were successful.
+      - name: Push Changes
+        run: git push origin adyenExpressPaymentsDreamForceTestAlertBranch --force-with-lease
+
+      # Step 9: This notification step will run if any of the above steps fail.
+      - name: Notify on Failure
+        if: failure()
+        uses: slackapi/slack-github-action@v1.26.0
+        with:
+          # The channel or user ID to send the notification to.
+          channel-id: '${{ secrets.AGENT_CHECKOUT_ALERT_SLACK_CHANNEL_ID }}'
+          # A custom message for the Slack notification.
+          slack-message: "🚨 Automatic rebase of `adyenExpressPaymentsDreamForceTestAlertBranch` failed. Manual intervention is required. Link to failed action: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+        env:
+          # You must store your Slack Bot Token as a secret in your repository settings.
+          SLACK_BOT_TOKEN: '${{ secrets.AGENT_CHECKOUT_SLACK_BOT_TOKEN }}'
+          # Forcing a re-index
