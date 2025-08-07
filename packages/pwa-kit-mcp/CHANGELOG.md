@@ -3,5 +3,5 @@
 - Add `create_app_guidelines` MCP tool  [#2663](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2663)
 - Add `create_new_sample_component` MCP tool. [#2651](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2651)
 - Add `create_app_guidelines` MCP tool. [#2599](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2599)
-- Add `run_site_test` MCP tool [#2645](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2645):
-- Add `create_sample_storefront_page` MCP tool [#2899](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2899)
+- Add `run_site_test` MCP tool [#2989](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2989) [#2645](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2645) [#3003](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3003)
+- Add `create_sample_storefront_page` MCP tool [#2899](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2899) [#3014](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3014)
