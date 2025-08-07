@@ -19,6 +19,7 @@ import {Controller} from 'react-hook-form'
 import {useShippingMethodsForShipment} from '@salesforce/commerce-sdk-react'
 import PropTypes from 'prop-types'
 import LoadingSpinner from '@salesforce/retail-react-app/app/components/loading-spinner'
+import {STORE_LOCATOR_IS_ENABLED} from '@salesforce/retail-react-app/app/constants'
 
 // Component to handle shipping options for a single shipment (without product cards)
 const ShippingOptionsList = ({shipment, basketId, currency, control}) => {
@@ -44,6 +45,13 @@ const ShippingOptionsList = ({shipment, basketId, currency, control}) => {
     const defaultValue =
         shipment.shippingMethod?.id || shippingMethods?.defaultShippingMethodId || ''
 
+    // Filter out pickup shipping methods only if store locator/BOPIS is enabled
+    const applicableShippingMethods = STORE_LOCATOR_IS_ENABLED
+        ? shippingMethods?.applicableShippingMethods?.filter(
+              (method) => !method.c_storePickupEnabled
+          ) || []
+        : shippingMethods?.applicableShippingMethods || []
+
     return (
         <VStack spacing={6} align="stretch">
             {/* Shipping Options Only */}
@@ -53,7 +61,7 @@ const ShippingOptionsList = ({shipment, basketId, currency, control}) => {
                         <LoadingSpinner />
                     </Box>
                 ) : (
-                    shippingMethods?.applicableShippingMethods && (
+                    applicableShippingMethods.length > 0 && (
                         <Box px={4}>
                             <Controller
                                 name={fieldName}
@@ -66,81 +74,75 @@ const ShippingOptionsList = ({shipment, basketId, currency, control}) => {
                                         name={`shipping-options-radiogroup-${shipment.shipmentId}`}
                                     >
                                         <Stack spacing={2}>
-                                            {shippingMethods.applicableShippingMethods.map(
-                                                (opt) => (
-                                                    <Radio value={opt.id} key={opt.id}>
-                                                        <Box w="full">
-                                                            <Flex
-                                                                justify="space-between"
-                                                                w="full"
-                                                                align="flex-start"
-                                                            >
-                                                                <Box flex={1}>
-                                                                    <Text
-                                                                        fontSize="sm"
-                                                                        fontWeight="medium"
-                                                                    >
-                                                                        {opt.name}
-                                                                    </Text>
-                                                                    <Text
-                                                                        fontSize="xs"
-                                                                        color="gray.600"
-                                                                        mt={0.5}
-                                                                    >
-                                                                        {opt.description}
-                                                                    </Text>
-                                                                </Box>
-                                                                <Box
-                                                                    fontWeight="bold"
+                                            {applicableShippingMethods.map((opt) => (
+                                                <Radio value={opt.id} key={opt.id}>
+                                                    <Box w="full">
+                                                        <Flex
+                                                            justify="space-between"
+                                                            w="full"
+                                                            align="flex-start"
+                                                        >
+                                                            <Box flex={1}>
+                                                                <Text
                                                                     fontSize="sm"
-                                                                    ml={2}
+                                                                    fontWeight="medium"
                                                                 >
-                                                                    {opt.price === 0 ? (
-                                                                        <Text color="green.600">
-                                                                            {formatMessage({
-                                                                                defaultMessage:
-                                                                                    'Free',
-                                                                                id: 'shipping_options.free'
-                                                                            })}
-                                                                        </Text>
-                                                                    ) : (
-                                                                        <FormattedNumber
-                                                                            value={opt.price}
-                                                                            style="currency"
-                                                                            currency={currency}
-                                                                        />
-                                                                    )}
-                                                                </Box>
-                                                            </Flex>
-                                                            {opt.shippingPromotions &&
-                                                                opt.shippingPromotions.length >
-                                                                    0 && (
-                                                                    <VStack
-                                                                        spacing={0.5}
-                                                                        mt={1}
-                                                                        align="flex-start"
-                                                                    >
-                                                                        {opt.shippingPromotions.map(
-                                                                            (promo) => (
-                                                                                <Text
-                                                                                    key={
-                                                                                        promo.promotionId
-                                                                                    }
-                                                                                    fontSize="xs"
-                                                                                    color="green.600"
-                                                                                >
-                                                                                    {
-                                                                                        promo.calloutMsg
-                                                                                    }
-                                                                                </Text>
-                                                                            )
-                                                                        )}
-                                                                    </VStack>
+                                                                    {opt.name}
+                                                                </Text>
+                                                                <Text
+                                                                    fontSize="xs"
+                                                                    color="gray.600"
+                                                                    mt={0.5}
+                                                                >
+                                                                    {opt.description}
+                                                                </Text>
+                                                            </Box>
+                                                            <Box
+                                                                fontWeight="bold"
+                                                                fontSize="sm"
+                                                                ml={2}
+                                                            >
+                                                                {opt.price === 0 ? (
+                                                                    <Text color="green.600">
+                                                                        {formatMessage({
+                                                                            defaultMessage: 'Free',
+                                                                            id: 'shipping_options.free'
+                                                                        })}
+                                                                    </Text>
+                                                                ) : (
+                                                                    <FormattedNumber
+                                                                        value={opt.price}
+                                                                        style="currency"
+                                                                        currency={currency}
+                                                                    />
                                                                 )}
-                                                        </Box>
-                                                    </Radio>
-                                                )
-                                            )}
+                                                            </Box>
+                                                        </Flex>
+                                                        {opt.shippingPromotions &&
+                                                            opt.shippingPromotions.length > 0 && (
+                                                                <VStack
+                                                                    spacing={0.5}
+                                                                    mt={1}
+                                                                    align="flex-start"
+                                                                >
+                                                                    {opt.shippingPromotions.map(
+                                                                        (promo) => (
+                                                                            <Text
+                                                                                key={
+                                                                                    promo.promotionId
+                                                                                }
+                                                                                fontSize="xs"
+                                                                                color="green.600"
+                                                                            >
+                                                                                {promo.calloutMsg}
+                                                                            </Text>
+                                                                        )
+                                                                    )}
+                                                                </VStack>
+                                                            )}
+                                                    </Box>
+                                                </Radio>
+                                            ))}
                                         </Stack>
                                     </RadioGroup>
                                 )}
