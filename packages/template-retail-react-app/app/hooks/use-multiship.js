@@ -10,8 +10,7 @@ import {
     useShippingMethodsForShipment
 } from '@salesforce/commerce-sdk-react'
 import {usePickupShipment} from '@salesforce/retail-react-app/app/hooks/use-pickup-shipment'
-
-const DEFAULT_SHIPMENT_ID = 'me'
+import {DEFAULT_SHIPMENT_ID} from '@salesforce/retail-react-app/app/constants'
 
 /**
  * Custom hook to handle multiship functionality for cart items

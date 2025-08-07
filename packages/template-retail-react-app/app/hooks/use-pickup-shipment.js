@@ -9,8 +9,7 @@ import {
     useShopperBasketsMutation,
     useShippingMethodsForShipment
 } from '@salesforce/commerce-sdk-react'
-
-const DEFAULT_SHIPMENT_ID = 'me'
+import {DEFAULT_SHIPMENT_ID} from '@salesforce/retail-react-app/app/constants'
 
 /**
  * Custom hook to handle pickup in store shipment configuration
