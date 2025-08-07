@@ -3,9 +3,10 @@ name: SalesforceCommerceCloud/pwa-kit/performance-metrics
 on:
     workflow_dispatch: # Allows you to manually run the workflow on any branch.
     schedule:
-        # Run every day at 12am (PST) - cron uses UTC times.
+        # Run every day at 7pm (PST) - cron uses UTC times.
+        # We want to run it before the performance tests are scheduled to run.
         # Runs on the default branch.
-        # - cron: '0 8 * * *'
+        - cron: '0 3 * * *'
 
 jobs:
     run-performance-metrics:
