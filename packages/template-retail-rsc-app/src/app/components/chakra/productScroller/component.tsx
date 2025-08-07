@@ -1,3 +1,5 @@
+'use client'
+
 /*
  * Copyright (c) 2021, salesforce.com, inc.
  * All rights reserved.
@@ -5,14 +7,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React, {forwardRef, useRef} from 'react'
-import {
-    AspectRatio,
-    Box,
-    Heading,
-    IconButton,
-    Skeleton,
-    Stack
-} from '@chakra-ui/react'
+import {AspectRatio, Box, Heading, IconButton, Stack} from '@chakra-ui/react'
 import type {ShopperSearchTypes} from 'commerce-sdk-isomorphic'
 import ProductTile from './productTile'
 import {ChevronLeft, ChevronRight} from '@/app/components/icons'
@@ -25,7 +20,9 @@ interface ProductScrollerProps {
     isLoading?: boolean
     scrollProps?: Record<string, any>
     itemWidth?: Record<string, string> | string
-    productTileProps?: Record<string, any> | ((product: ShopperSearchTypes.ProductSearchHit) => Record<string, any>)
+    productTileProps?:
+        | Record<string, any>
+        | ((product: ShopperSearchTypes.ProductSearchHit) => Record<string, any>)
     [key: string]: any
 }
 
@@ -70,121 +67,124 @@ const ProductScroller = forwardRef<HTMLDivElement, ProductScrollerProps>(
         }
 
         return (
-            <Box position="relative" {...props} ref={ref}>
-                {/* Header */}
-                <Stack direction="row" align="center" justify="space-between" mb={6}>
-                    {header || (
-                        <Heading as="h2" size="lg" fontWeight="bold">
-                            {title}
-                        </Heading>
-                    )}
-                </Stack>
+            <>
+                <Box position="relative" {...props} ref={ref}>
+                    {/* Header */}
+                    <Stack direction="row" align="center" justify="space-between" mb={6}>
+                        {header || (
+                            <Heading as="h2" size="lg" fontWeight="bold">
+                                {title}
+                            </Heading>
+                        )}
+                    </Stack>
 
-                {/* Product List */}
-                <Box
-                    ref={scrollRef}
-                    overflowX="auto"
-                    css={{
-                        scrollSnapType: 'x mandatory',
-                        scrollbarWidth: 'none',
-                        '&::-webkit-scrollbar': {
-                            display: 'none'
-                        }
-                    }}
-                    {...scrollProps}
-                >
-                    <Stack
-                        direction="row"
-                        gap={4}
-                        align="stretch"
-                        minWidth="fit-content"
-                        pb={2}
+                    {/* Product List */}
+                    <Box
+                        ref={scrollRef}
+                        overflowX="auto"
+                        css={{
+                            scrollSnapType: 'x mandatory',
+                            scrollbarWidth: 'none',
+                            '&::-webkit-scrollbar': {
+                                display: 'none'
+                            }
+                        }}
+                        {...scrollProps}
                     >
-                        {isLoading
-                            ? // Loading skeletons
-                              Array.from({length: 4}).map((_, index) => (
-                                  <Box
-                                      key={index}
-                                      flex="none"
-                                      width={itemWidth}
-                                      css={{scrollSnapAlign: 'start'}}
-                                  >
-                                      <AspectRatio ratio={1}>
-                                          <Skeleton borderRadius="md" />
-                                      </AspectRatio>
-                                      <Skeleton height="20px" mt={3} />
-                                      <Skeleton height="20px" mt={2} width="60%" />
-                                  </Box>
-                              ))
-                            : // Actual products
-                              products?.map((product) => {
-                                  const tileProps =
-                                      typeof productTileProps === 'function'
-                                          ? productTileProps(product)
-                                          : productTileProps
-                                  return (
+                        <Stack
+                            direction="row"
+                            gap={4}
+                            align="stretch"
+                            minWidth="fit-content"
+                            pb={2}
+                        >
+                            {isLoading
+                                ? // Loading skeletons
+                                  Array.from({length: 4}).map((_, index) => (
                                       <Box
-                                          key={product.productId}
+                                          key={index}
                                           flex="none"
                                           width={itemWidth}
                                           css={{scrollSnapAlign: 'start'}}
                                       >
-                                          <ProductTile product={product} {...tileProps} />
+                                          <AspectRatio ratio={1}>
+                                              <div>...skeleton</div>
+                                              <div>...skeleton</div>
+                                          </AspectRatio>
+                                          <div>...skeleton</div>
+                                          <div>...skeleton</div>
                                       </Box>
-                                  )
-                              })}
-                    </Stack>
+                                  ))
+                                : // Actual products
+                                  products?.map((product) => {
+                                      const tileProps =
+                                          typeof productTileProps === 'function'
+                                              ? productTileProps(product)
+                                              : productTileProps
+                                      return (
+                                          <Box
+                                              key={product.productId}
+                                              flex="none"
+                                              width={itemWidth}
+                                              css={{scrollSnapAlign: 'start'}}
+                                          >
+                                              <ProductTile product={product} {...tileProps} />
+                                          </Box>
+                                      )
+                                  })}
+                        </Stack>
+                    </Box>
+
+                    {/* Navigation buttons */}
+                    {!isLoading && products && products.length > 3 && (
+                        <>
+                            <Box
+                                display={{
+                                    base: 'none',
+                                    lg: 'block'
+                                }}
+                                position="absolute"
+                                top="50%"
+                                left={{base: 0, lg: 4}}
+                                transform="translateY(-50%)"
+                            >
+                                <IconButton
+                                    data-testid="product-scroller-nav-left"
+                                    aria-label={messages.scrollLeft}
+                                    borderRadius="full"
+                                    bg="white/36"
+                                    _hover={{bg: 'white/48'}}
+                                    onClick={() => scroll(-1)}
+                                >
+                                    <ChevronLeft color="black" />
+                                </IconButton>
+                            </Box>
+
+                            <Box
+                                display={{
+                                    base: 'none',
+                                    lg: 'block'
+                                }}
+                                position="absolute"
+                                top="50%"
+                                right={{base: 0, lg: 4}}
+                                transform="translateY(-50%)"
+                            >
+                                <IconButton
+                                    data-testid="product-scroller-nav-right"
+                                    aria-label={messages.scrollRight}
+                                    borderRadius="full"
+                                    bg="white/36"
+                                    _hover={{bg: 'white/48'}}
+                                    onClick={() => scroll(1)}
+                                >
+                                    <ChevronRight color="black" />
+                                </IconButton>
+                            </Box>
+                        </>
+                    )}
                 </Box>
-
-                {/* Navigation buttons */}
-                {!isLoading && products && products.length > 3 && (
-                    <>
-                        <Box
-                            display={{
-                                base: 'none',
-                                lg: 'block'
-                            }}
-                            position="absolute"
-                            top="50%"
-                            left={{base: 0, lg: 4}}
-                            transform="translateY(-50%)"
-                        >
-                            <IconButton
-                                data-testid="product-scroller-nav-left"
-                                aria-label={messages.scrollLeft}
-                                borderRadius="full"
-                                bg="white/36"
-                                _hover={{bg: 'white/48'}}
-                                onClick={() => scroll(-1)}
-                            >
-                                <ChevronLeft color="black" />
-                            </IconButton>
-                        </Box>
-
-                        <Box
-                            display={{
-                                base: 'none',
-                                lg: 'block'
-                            }}
-                            position="absolute"
-                            top="50%"
-                            right={{base: 0, lg: 4}}
-                            transform="translateY(-50%)"
-                        >
-                            <IconButton
-                                data-testid="product-scroller-nav-right"
-                                aria-label={messages.scrollRight}
-                                borderRadius="full"
-                                bg="white/36"
-                                _hover={{bg: 'white/48'}}
-                                onClick={() => scroll(1)}
-                            >
-                                <ChevronRight color="black" />
-                            </IconButton>
-                        </Box>
-                    </>
-                )}
-            </Box>
+            </>
         )
     }
 )

@@ -1,6 +1,6 @@
 import type {ReactElement} from 'react'
 import Hero from '@/app/components/hero'
-import ChakraProductScrollerIsland from '@/app/components/chakra/productScroller'
+import ChakraProductScrollerIsland from '@/app/components/chakra/productScroller/island'
 import Features from '../home/features'
 import Help from '../home/help'
 

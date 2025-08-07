@@ -1,27 +1,27 @@
 'use client'
-/*
- * Copyright (c) 2021, salesforce.com, inc.
- * All rights reserved.
- * SPDX-License-Identifier: BSD-3-Clause
- * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
- */
-import React, {useState, useEffect} from 'react'
 
-// Client-only wrapper that conditionally imports Chakra components
-const ChakraProductScrollerClientOnly = (props: {title?: string; [key: string]: any}) => {
+import React, {useEffect, useState} from 'react'
+import {ChakraProvider} from '@chakra-ui/react'
+import theme from '../../../../theme/index'
+import type {ShopperSearchTypes} from 'commerce-sdk-isomorphic'
+import ProductScroller from './component'
+
+interface ProductScrollerClientWrapperProps {
+    products: ShopperSearchTypes.ProductSearchHit[]
+    isLoading: boolean
+    title?: string
+    [key: string]: any
+}
+
+const ProductScrollerClientWrapper = (props: ProductScrollerClientWrapperProps) => {
     const [isClient, setIsClient] = useState(false)
-    const [ChakraComponent, setChakraComponent] = useState<React.ComponentType<any> | null>(null)
 
     useEffect(() => {
         setIsClient(true)
-        // Dynamically import the Chakra island only on the client
-        import('./island').then((module) => {
-            setChakraComponent(() => module.default)
-        })
     }, [])
 
-    // Don't render anything until we're on the client
-    if (!isClient || !ChakraComponent) {
+    // Don't render anything on the server side
+    if (!isClient) {
         return (
             <div className="py-16">
                 <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -46,9 +46,11 @@ const ChakraProductScrollerClientOnly = (props: {title?: string; [key: string]: 
         )
     }
 
-    return <ChakraComponent {...props} />
+    return (
+        <ChakraProvider value={theme}>
+            <ProductScroller {...props} />
+        </ChakraProvider>
+    )
 }
 
-ChakraProductScrollerClientOnly.displayName = 'ChakraProductScrollerClientOnly'
-
-export default ChakraProductScrollerClientOnly
+export default ProductScrollerClientWrapper

@@ -1,3 +1,5 @@
+'use client'
+
 /*
  * Copyright (c) 2022, Salesforce, Inc.
  * All rights reserved.
@@ -5,7 +7,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React, {useMemo} from 'react'
+import {useMemo} from 'react'
 import type {ShopperSearchTypes} from 'commerce-sdk-isomorphic'
 import {AspectRatio, Box, Text, Stack} from '@chakra-ui/react'
 import {Link} from 'react-router'
