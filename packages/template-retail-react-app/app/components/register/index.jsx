@@ -19,6 +19,7 @@ import {AlertIcon, BrandLogo} from '@salesforce/retail-react-app/app/components/
 import {noop} from '@salesforce/retail-react-app/app/utils/utils'
 import RegistrationFields from '@salesforce/retail-react-app/app/components/forms/registration-fields'
 import Link from '@salesforce/retail-react-app/app/components/link'
+import { withComponentTag } from '../with-component-tag.js';
 
 const RegisterForm = ({submitForm, clickSignIn = noop, form}) => {
     return (
@@ -117,4 +118,4 @@ RegisterForm.propTypes = {
     form: PropTypes.object
 }
 
-export default RegisterForm
+export default withComponentTag(RegisterForm)

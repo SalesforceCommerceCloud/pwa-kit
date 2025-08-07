@@ -13,6 +13,7 @@ import {AlertIcon, BrandLogo} from '@salesforce/retail-react-app/app/components/
 import StandardLogin from '@salesforce/retail-react-app/app/components/standard-login'
 import PasswordlessLogin from '@salesforce/retail-react-app/app/components/passwordless-login'
 import {noop} from '@salesforce/retail-react-app/app/utils/utils'
+import { withComponentTag } from '../with-component-tag.js';
 
 const LoginForm = ({
     submitForm,
@@ -100,4 +101,4 @@ LoginForm.propTypes = {
     setLoginType: PropTypes.func
 }
 
-export default LoginForm
+export default withComponentTag(LoginForm)

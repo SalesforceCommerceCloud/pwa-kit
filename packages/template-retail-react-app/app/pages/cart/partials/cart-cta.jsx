@@ -15,6 +15,7 @@ import {
     VisaIcon
 } from '@salesforce/retail-react-app/app/components/icons'
 import Link from '@salesforce/retail-react-app/app/components/link'
+import { withComponentTag } from '@salesforce/retail-react-app/app/components/with-component-tag.js';
 
 const CartCta = () => {
     return (
@@ -43,4 +44,4 @@ const CartCta = () => {
     )
 }
 
-export default CartCta
+export default withComponentTag(CartCta)

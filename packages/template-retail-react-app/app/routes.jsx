@@ -54,7 +54,20 @@ const StoreLocator = loadable(() => import('./pages/store-locator'), {
 const Wishlist = loadable(() => import('./pages/account/wishlist'), {
     fallback
 })
+const ComponentShowcase = loadable(() => import('./pages/component-showcase'), {
+    fallback
+})
+const HooksShowcase = loadable(() => import('./pages/hooks-showcase'), {
+    fallback
+})
+const PageShowcase = loadable(() => import('./pages/page-showcase'), {fallback})
 const PageNotFound = loadable(() => import('./pages/page-not-found'))
+const ComponentBuilder = loadable(() => import('./pages/component-builder/index'), {
+    fallback
+})
+const Home2 = loadable(() => import('./pages/home2'), {fallback})
+const FeatureHub = loadable(() => import('./pages/feature-hub'), {fallback})
+const StoreConfig = loadable(() => import('./pages/store-config'), {fallback})
 
 export const routes = [
     {
@@ -134,6 +147,46 @@ export const routes = [
     {
         path: '/store-locator',
         component: StoreLocator
+    },
+    {
+        path: '/_dev/component-showcase',
+        component: ComponentShowcase,
+        exact: true
+    },
+    {
+        path: '/_dev/hooks-showcase',
+        component: HooksShowcase,
+        exact: true
+    },
+    {
+        path: '/_dev/page-showcase',
+        component: PageShowcase,
+        exact: true
+    },
+    {
+        path: '/_dev/component-builder',
+        component: ComponentBuilder,
+        exact: true
+    },
+    {
+        path: '/_dev/feature-hub',
+        component: FeatureHub,
+        exact: true
+    },
+    {
+        path: '/_dev/store-config',
+        component: StoreConfig,
+        exact: true
+    },
+    {
+        path: '/_dev',
+        component: PageShowcase,
+        exact: true
+    },
+    {
+        path: '/home2',
+        component: Home2,
+        exact: true
     },
     {
         path: '*',

@@ -8,6 +8,7 @@ import React from 'react'
 import {FormattedMessage} from 'react-intl'
 import {Heading} from '@salesforce/retail-react-app/app/components/shared/ui'
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
+import { withComponentTag } from '@salesforce/retail-react-app/app/components/with-component-tag.js';
 
 const CartTitle = () => {
     const {
@@ -24,4 +25,4 @@ const CartTitle = () => {
     )
 }
 
-export default CartTitle
+export default withComponentTag(CartTitle)

@@ -26,6 +26,7 @@ import {
     DiscoverIcon
 } from '@salesforce/retail-react-app/app/components/icons'
 import {HideOnDesktop, HideOnMobile} from '@salesforce/retail-react-app/app/components/responsive'
+import { withComponentTag } from '@salesforce/retail-react-app/app/components/with-component-tag.js';
 
 const CheckoutFooter = ({...otherProps}) => {
     const styles = useMultiStyleConfig('CheckoutFooter')
@@ -88,7 +89,7 @@ const CheckoutFooter = ({...otherProps}) => {
     )
 }
 
-export default CheckoutFooter
+export default withComponentTag(CheckoutFooter)
 
 const LegalLinks = ({variant}) => {
     const intl = useIntl()

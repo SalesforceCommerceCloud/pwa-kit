@@ -37,6 +37,7 @@ import ShippingAddressSelection from '@salesforce/retail-react-app/app/pages/che
 import AddressDisplay from '@salesforce/retail-react-app/app/components/address-display'
 import {PromoCode, usePromoCode} from '@salesforce/retail-react-app/app/components/promo-code'
 import {API_ERROR_MESSAGE} from '@salesforce/retail-react-app/app/constants'
+import { withComponentTag } from '@salesforce/retail-react-app/app/components/with-component-tag.js';
 
 const Payment = () => {
     const {formatMessage} = useIntl()
@@ -304,4 +305,4 @@ const PaymentCardSummary = ({payment}) => {
 
 PaymentCardSummary.propTypes = {payment: PropTypes.object}
 
-export default Payment
+export default withComponentTag(Payment)

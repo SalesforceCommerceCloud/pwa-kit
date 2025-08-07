@@ -21,6 +21,7 @@ import {
 } from '@salesforce/commerce-sdk-react'
 import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
+import { withComponentTag } from '@salesforce/retail-react-app/app/components/with-component-tag.js';
 
 const submitButtonMessage = defineMessage({
     defaultMessage: 'Continue to Shipping Method',
@@ -31,7 +32,7 @@ const shippingAddressAriaLabel = defineMessage({
     id: 'shipping_address.label.shipping_address_form'
 })
 
-export default function ShippingAddress() {
+function ShippingAddress() {
     const {formatMessage} = useIntl()
     const [isLoading, setIsLoading] = useState()
     const {data: customer} = useCurrentCustomer()
@@ -140,3 +141,5 @@ export default function ShippingAddress() {
         </ToggleCard>
     )
 }
+
+export default withComponentTag(ShippingAddress);

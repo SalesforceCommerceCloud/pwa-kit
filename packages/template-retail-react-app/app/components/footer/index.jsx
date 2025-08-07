@@ -31,6 +31,7 @@ import LocaleText from '@salesforce/retail-react-app/app/components/locale-text'
 import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
 import styled from '@emotion/styled'
 import {STORE_LOCATOR_IS_ENABLED} from '@salesforce/retail-react-app/app/constants'
+import { withComponentTag } from '../with-component-tag.js';
 
 const [StylesProvider, useStyles] = createStylesContext('Footer')
 const Footer = ({...otherProps}) => {
@@ -198,7 +199,7 @@ const Footer = ({...otherProps}) => {
     )
 }
 
-export default Footer
+export default withComponentTag(Footer)
 
 const Subscribe = ({...otherProps}) => {
     const styles = useStyles()

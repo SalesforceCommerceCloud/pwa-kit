@@ -39,7 +39,7 @@ const options = {
     mobify: config,
 
     // The port that the local dev server listens on
-    port: 3000,
+    port: 3001,
 
     // The protocol on which the development Express app listens.
     // Note that http://localhost is treated as a secure context for development,
@@ -372,8 +372,17 @@ const {handler} = runtime.createHandler(options, (app) => {
     app.get('/favicon.ico', runtime.serveStaticFile('static/ico/favicon.ico'))
 
     app.get('/worker.js(.map)?', runtime.serveServiceWorker)
+
     app.get('*', runtime.render)
 })
+
 // SSR requires that we export a single handler function called 'get', that
-// supports AWS use of the server that we created above.
+// supports AWS use of ALB, as well as Express.
 export const get = handler
+
+// Production
+// This function is called by the ajax-proxy in production.
+// It is used to get the non-gzipped size of assets to set the HTTP header for streaming.
+export const size = (name) => {
+    return runtime.assetSize(name)
+}

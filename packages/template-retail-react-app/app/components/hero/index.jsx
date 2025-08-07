@@ -15,6 +15,7 @@ import {
     Stack
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 import Image from '@salesforce/retail-react-app/app/components/image'
+import { withComponentTag } from '../with-component-tag.js';
 
 const Hero = ({title, img, actions, ...props}) => {
     const imageProps = {
@@ -28,8 +29,10 @@ const Hero = ({title, img, actions, ...props}) => {
     return (
         <Box
             marginBottom={{base: 0, md: 10}}
-            height={{lg: 'xl'}}
+            height={{lg: '2xl'}}  // Increased height
+            width={{lg: '100%'}}  // Added width
             position={{lg: 'relative'}}
+            padding={4}           // Added padding
             {...props}
         >
             <Stack
@@ -87,4 +90,4 @@ Hero.propTypes = {
     actions: PropTypes.element
 }
 
-export default Hero
+export default withComponentTag(Hero)

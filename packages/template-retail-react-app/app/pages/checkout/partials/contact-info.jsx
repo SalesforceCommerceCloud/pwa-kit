@@ -52,6 +52,7 @@ import {
     PASSWORDLESS_ERROR_MESSAGES,
     USER_NOT_FOUND_ERROR
 } from '@salesforce/retail-react-app/app/constants'
+import { withComponentTag } from '@salesforce/retail-react-app/app/components/with-component-tag.js';
 
 const ContactInfo = ({isSocialEnabled = false, isPasswordlessEnabled = false, idps = []}) => {
     const {formatMessage} = useIntl()
@@ -331,4 +332,4 @@ SignOutConfirmationDialog.propTypes = {
     onConfirm: PropTypes.func
 }
 
-export default ContactInfo
+export default withComponentTag(ContactInfo)
