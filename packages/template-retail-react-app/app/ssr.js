@@ -298,35 +298,7 @@ const {handler} = runtime.createHandler(options, (app) => {
     // Set default HTTP security headers required by PWA Kit
     app.use(defaultPwaKitSecurityHeaders)
     // Set custom HTTP security headers
-    app.use(
-        helmet({
-            contentSecurityPolicy: {
-                useDefaults: true,
-                directives: {
-                    'img-src': [
-                        // Default source for product images - replace with your CDN
-                        '*.commercecloud.salesforce.com'
-                    ],
-                    'script-src': [
-                        // Used by the service worker in /worker/main.js
-                        'storage.googleapis.com'
-                    ],
-                    'connect-src': [
-                        // Connect to Einstein APIs
-                        'api.cquotient.com',
-                        // Connect to DataCloud APIs
-                        '*.c360a.salesforce.com',
-                        // Connect to SCRT2 URLs
-                        '*.salesforce-scrt.com'
-                    ],
-                    'frame-src': [
-                        // Allow frames from Salesforce site.com (Needed for MIAW)
-                        '*.site.com'
-                    ]
-                }
-            }
-        })
-    )
+    app.use(helmet({contentSecurityPolicy: config.app?.contentSecurityPolicy}))
 
     // Handle the redirect from SLAS as to avoid error
     app.get('/callback?*', (req, res) => {

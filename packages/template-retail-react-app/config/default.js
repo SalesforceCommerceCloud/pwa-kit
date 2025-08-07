@@ -19,6 +19,31 @@ module.exports = {
             showDefaults: true,
             interpretPlusSignAsSpace: false
         },
+        contentSecurityPolicy: {
+            useDefaults: true,
+            directives: {
+                'img-src': [
+                    // Default source for product images - replace with your CDN
+                    '*.commercecloud.salesforce.com'
+                ],
+                'script-src': [
+                    // Used by the service worker in /worker/main.js
+                    'storage.googleapis.com'
+                ],
+                'connect-src': [
+                    // Connect to Einstein APIs
+                    'api.cquotient.com',
+                    // Connect to DataCloud APIs
+                    '*.c360a.salesforce.com',
+                    // Connect to SCRT2 URLs
+                    '*.salesforce-scrt.com'
+                ],
+                'frame-src': [
+                    // Allow frames from Salesforce site.com (Needed for MIAW)
+                    '*.site.com'
+                ]
+            }
+        },
         login: {
             passwordless: {
                 enabled: false,
