@@ -14,6 +14,7 @@ const SimpleProductDetails = ({
     primaryCategory,
     isProductLoading,
     isBasketLoading,
+    //@sfdc-extension-line SFDC_EXT_WISHLIST
     isWishlistLoading,
     handleAddToWishlist,
     handleAddToCart
@@ -24,9 +25,11 @@ const SimpleProductDetails = ({
                 product={product}
                 category={primaryCategory?.parentCategoryTree || []}
                 addToCart={(variant, quantity) => handleAddToCart([{product, variant, quantity}])}
+                //@sfdc-extension-line SFDC_EXT_WISHLIST
                 addToWishlist={handleAddToWishlist}
                 isProductLoading={isProductLoading}
                 isBasketLoading={isBasketLoading}
+                //@sfdc-extension-line SFDC_EXT_WISHLIST
                 isWishlistLoading={isWishlistLoading}
             />
             <InformationAccordion product={product} />
@@ -39,7 +42,9 @@ SimpleProductDetails.propTypes = {
     primaryCategory: PropTypes.object,
     isProductLoading: PropTypes.bool,
     isBasketLoading: PropTypes.bool,
+    //@sfdc-extension-line SFDC_EXT_WISHLIST
     isWishlistLoading: PropTypes.bool,
+    //@sfdc-extension-line SFDC_EXT_WISHLIST
     handleAddToWishlist: PropTypes.func,
     handleAddToCart: PropTypes.func
 }

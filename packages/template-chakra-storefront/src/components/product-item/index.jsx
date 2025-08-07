@@ -172,6 +172,7 @@ ProductItem.propTypes = {
     onItemQuantityChange: PropTypes.func,
     onAddItemToCart: PropTypes.func,
     showLoading: PropTypes.bool,
+    //@sfdc-extension-line SFDC_EXT_WISHLIST
     isWishlistItem: PropTypes.bool,
     primaryAction: PropTypes.node,
     secondaryActions: PropTypes.node

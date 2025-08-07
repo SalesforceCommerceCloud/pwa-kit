@@ -45,6 +45,7 @@ const ProductList = loadable(() => import('../src/pages/product-list'), {
 // const StoreLocator = loadable(() => import('../src/pages/store-locator'), {
 //     fallback
 // })
+//@sfdc-extension-line SFDC_EXT_WISHLIST
 const Wishlist = loadable(() => import('../src/pages/account/wishlist'), {
     fallback
 })
@@ -121,10 +122,12 @@ export const routes = [
         path: '/category/:categoryId',
         component: ProductList
     },
+    //@sfdc-extension-block-start SFDC_EXT_WISHLIST
     {
         path: '/account/wishlist',
         component: Wishlist
     },
+    //@sfdc-extension-block-end SFDC_EXT_WISHLIST
     // {
     //     path: '/store-locator',
     //     component: StoreLocator

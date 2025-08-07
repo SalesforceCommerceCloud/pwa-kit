@@ -55,6 +55,7 @@ const messages = defineMessages({
         defaultMessage: 'Add Bundle to Cart',
         id: 'product_view.button.add_bundle_to_cart'
     },
+    //@sfdc-extension-block-start SFDC_EXT_WISHLIST
     addToWishlist: {
         defaultMessage: 'Add to Wishlist',
         id: 'product_view.button.add_to_wishlist'
@@ -67,6 +68,7 @@ const messages = defineMessages({
         defaultMessage: 'Add Bundle to Wishlist',
         id: 'product_view.button.add_bundle_to_wishlist'
     },
+    //@sfdc-extension-block-end SFDC_EXT_WISHLIST
     quantity: {
         defaultMessage: 'Quantity',
         id: 'product_view.label.quantity'

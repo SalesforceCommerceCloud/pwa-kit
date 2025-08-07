@@ -58,6 +58,7 @@ export const urlPartPositions = {
 // definitions to a common location (here), so that each message is only defined
 // once.
 
+//@sfdc-extension-block-start SFDC_EXT_WISHLIST
 export const TOAST_MESSAGE_ADDED_TO_WISHLIST = defineMessage({
     id: 'global.info.added_to_wishlist',
     defaultMessage: '{quantity} {quantity, plural, one {item} other {items}} added to wishlist'
@@ -82,6 +83,7 @@ export const TOAST_MESSAGE_REMOVED_FROM_WISHLIST = defineMessage({
     id: 'global.info.removed_from_wishlist',
     defaultMessage: 'Item removed from wishlist'
 })
+//@sfdc-extension-block-end SFDC_EXT_WISHLIST
 
 // Einstein recommender constants used in <RecommendedProducts/>
 export const EINSTEIN_RECOMMENDERS = {
