@@ -257,5 +257,7 @@ export function generateComponentImportStatement(
         return `import ${componentName} from '@salesforce/retail-react-app/app/components/${componentDir}'`
     }
     // Use local relative path for other cases
-    return `import ${componentName} from '${relativePath}'`
+    // Normalize path separators to forward slashes for ES6 imports
+    const normalizedPath = relativePath.replace(/\\/g, '/')
+    return `import ${componentName} from '${normalizedPath}'`
 }
