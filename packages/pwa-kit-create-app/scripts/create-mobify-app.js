@@ -278,7 +278,8 @@ const PRESETS = [
             'project.einstein.siteId': 'aaij-MobileFirst',
             'project.dataCloud.appSourceId': '7ae070a6-f4ec-4def-a383-d9cacc3f20a1',
             'project.dataCloud.tenantId': 'g82wgnrvm-ywk9dggrrw8mtggy.pc-rnd',
-            'project.demo.enableDemoSettings': false
+            'project.demo.enableDemoSettings': false,
+            'project.selectedPlugins.ext_social_login': false
         },
         assets: ['translations'],
         private: false
@@ -313,7 +314,8 @@ const PRESETS = [
             ['project.einstein.siteId']: 'aaij-MobileFirst',
             ['project.dataCloud.appSourceId']: 'fb81edab-24c6-4b40-8684-b67334dfdf32',
             ['project.dataCloud.tenantId']: 'mmyw8zrxhfsg09lfmzrd1zjqmg',
-            ['project.demo.enableDemoSettings']: true // True only for presets deployed to demo environments like pwa-kit.mobify-storefront.com
+            ['project.demo.enableDemoSettings']: true, // True only for presets deployed to demo environments like pwa-kit.mobify-storefront.com
+            ['project.selectedPlugins.ext_social_login']: false
         },
         assets: ['translations'],
         private: true
@@ -339,7 +341,8 @@ const PRESETS = [
             'project.einstein.siteId': 'aaij-MobileFirst',
             'project.dataCloud.appSourceId': 'fb81edab-24c6-4b40-8684-b67334dfdf32',
             'project.dataCloud.tenantId': 'mmyw8zrxhfsg09lfmzrd1zjqmg',
-            'project.demo.enableDemoSettings': false
+            'project.demo.enableDemoSettings': false,
+            'project.selectedPlugins.ext_social_login': true
         },
         assets: ['translations'],
         private: true
@@ -365,7 +368,8 @@ const PRESETS = [
             'project.einstein.siteId': 'aaij-MobileFirst',
             'project.dataCloud.appSourceId': 'fb81edab-24c6-4b40-8684-b67334dfdf32',
             'project.dataCloud.tenantId': 'mmyw8zrxhfsg09lfmzrd1zjqmg',
-            'project.demo.enableDemoSettings': false
+            'project.demo.enableDemoSettings': false,
+            'project.selectedPlugins.ext_social_login': false
         },
         assets: ['translations'],
         private: true
@@ -391,7 +395,8 @@ const PRESETS = [
             'project.dataCloud.appSourceId': 'fb81edab-24c6-4b40-8684-b67334dfdf32',
             'project.dataCloud.tenantId': 'mmyw8zrxhfsg09lfmzrd1zjqmg',
             'project.commerce.isSlasPrivate': true,
-            'project.demo.enableDemoSettings': false
+            'project.demo.enableDemoSettings': false,
+            'project.selectedPlugins.ext_social_login': false
         },
         assets: ['translations'],
         private: true
@@ -417,7 +422,8 @@ const PRESETS = [
             'project.commerce.isSlasPrivate': true,
             'project.dataCloud.appSourceId': 'fb81edab-24c6-4b40-8684-b67334dfdf32',
             'project.dataCloud.tenantId': 'mmyw8zrxhfsg09lfmzrd1zjqmg',
-            'project.demo.enableDemoSettings': false
+            'project.demo.enableDemoSettings': false,
+            'project.selectedPlugins.ext_social_login': false
         },
         assets: ['translations'],
         private: true
@@ -443,7 +449,8 @@ const PRESETS = [
             'project.commerce.isSlasPrivate': false,
             'project.dataCloud.appSourceId': 'fb81edab-24c6-4b40-8684-b67334dfdf32',
             'project.dataCloud.tenantId': 'mmyw8zrxhfsg09lfmzrd1zjqmg',
-            'project.demo.enableDemoSettings': false
+            'project.demo.enableDemoSettings': false,
+            'project.selectedPlugins.ext_social_login': false
         },
         assets: ['translations'],
         private: true
