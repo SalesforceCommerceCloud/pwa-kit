@@ -42,6 +42,9 @@ export const HOME_SHOP_PRODUCTS_LIMIT = 10
 export const CAT_MENU_DEFAULT_NAV_SSR_DEPTH = 1
 export const CAT_MENU_DEFAULT_ROOT_CATEGORY = 'root'
 
+// Constants for shipments
+export const DEFAULT_SHIPMENT_ID = 'me'
+
 // Default details of badge labels and the corresponding product custom properties that enable badges.
 export const PRODUCT_BADGE_DETAILS = [
     {
