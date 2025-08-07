@@ -330,7 +330,6 @@ const ProductView = forwardRef(
                         width="100%"
                         variant="solid"
                         marginBottom={4}
-                        data-testid="add-to-cart-button"
                     >
                         {updateCart
                             ? buttonText.update
