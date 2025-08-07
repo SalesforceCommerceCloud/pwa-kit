@@ -15,7 +15,9 @@ import {
     getCopyrightHeader,
     isBaseComponent,
     isSharedUIBaseComponent,
-    getComponentImportPath
+    isLocalComponent,
+    isLocalSharedUIComponent,
+    generateComponentImportStatement
 } from './utils'
 
 export {
@@ -29,5 +31,7 @@ export {
     getCopyrightHeader,
     isBaseComponent,
     isSharedUIBaseComponent,
-    getComponentImportPath
+    isLocalComponent,
+    isLocalSharedUIComponent,
+    generateComponentImportStatement
 }
