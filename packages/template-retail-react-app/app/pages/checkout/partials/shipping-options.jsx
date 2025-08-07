@@ -142,7 +142,7 @@ export default function ShippingOptions() {
             )) ||
         []
 
-    const hasMultipleDeliveryShipments = deliveryShipments.size > 1
+    const hasMultipleDeliveryShipments = deliveryShipments.length > 1
 
     // Build initial form values
     const getInitialValues = () => {
