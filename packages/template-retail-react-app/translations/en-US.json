@@ -1442,9 +1442,6 @@
   "shipping_address.button.continue_to_shipping": {
     "defaultMessage": "Continue to Shipping Method"
   },
-  "shipping_address.error.switch_failed": {
-    "defaultMessage": "Error switching to single address. Please try again."
-  },
   "shipping_address.error.update_failed": {
     "defaultMessage": "Error updating shipping address. Please try again."
   },

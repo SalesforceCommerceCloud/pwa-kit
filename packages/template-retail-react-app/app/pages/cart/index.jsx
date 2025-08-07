@@ -672,7 +672,7 @@ const Cart = () => {
                 onSuccess: () => {
                     toast({
                         title: formatMessage(TOAST_MESSAGE_REMOVED_ITEM_FROM_CART, {quantity: 1}),
-                        status: 'warning'
+                        status: 'success'
                     })
                 },
                 onError: () => {
