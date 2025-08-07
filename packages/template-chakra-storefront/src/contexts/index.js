@@ -86,6 +86,7 @@ export const CurrencyProvider = ({currency: initialCurrency, children}) => {
     )
 }
 
+/** @sfdc-extension-line SFDC_EXT_STORE_LOCATOR */
 export {StoreLocatorContext, StoreLocatorProvider} from '../pages/store-locator/contexts/provider'
 
 CurrencyProvider.propTypes = {
