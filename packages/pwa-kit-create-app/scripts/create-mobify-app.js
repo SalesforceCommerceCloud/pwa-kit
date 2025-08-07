@@ -900,7 +900,7 @@ const main = async (opts) => {
         })
     }
 
-    // load answer fron context from preset if available
+    // load answer from context in preset object if available
     // otherwise, prompt users to select extensions
     if (context.answers.project?.selectedPlugins) {
         Object.entries(context.answers.project.selectedPlugins).forEach(([pluginKey, enabled]) => {
