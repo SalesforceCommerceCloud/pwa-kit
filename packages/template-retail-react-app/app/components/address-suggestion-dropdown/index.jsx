@@ -6,14 +6,18 @@
  */
 import React, {useEffect, useRef} from 'react'
 import PropTypes from 'prop-types'
+import {FormattedMessage} from 'react-intl'
+import {getAssetUrl} from '@salesforce/pwa-kit-react-sdk/ssr/universal/utils'
 import {
     Box,
     Flex,
     Text,
     IconButton,
-    Spinner
+    Spinner,
+    Stack,
+    Spacer
 } from '@salesforce/retail-react-app/app/components/shared/ui'
-import {CloseIcon} from '@salesforce/retail-react-app/app/components/icons'
+import {CloseIcon, LocationIcon} from '@salesforce/retail-react-app/app/components/icons'
 
 /**
  * Address Suggestion Dropdown Component
@@ -88,82 +92,68 @@ const AddressSuggestionDropdown = ({
             borderRadius="md"
             boxShadow="md"
             mt={1}
-            maxH="300px"
-            overflowY="auto"
         >
-            <Flex
-                px={4}
-                py={2}
-                borderBottom="1px solid"
-                borderColor="gray.200"
-                justifyContent="space-between"
-                alignItems="center"
-            >
+            <Flex px={4} pr={0} py={2} alignItems="center">
                 <Text fontSize="sm" fontWeight="medium" color="gray.600">
-                    Suggested
+                    <FormattedMessage 
+                        defaultMessage="SUGGESTED"
+                        id="addressSuggestionDropdown.suggested" 
+                    />
                 </Text>
+                <Spacer />
                 <IconButton
-                    aria-label="Close suggestions"
-                    icon={<CloseIcon />}
-                    variant="ghost"
                     size="sm"
+                    variant="ghost"
+                    icon={<CloseIcon boxSize={4} color="gray.600" />}
                     onClick={onClose}
+                    aria-label="Close suggestions"
                 />
             </Flex>
-            {suggestions.map((suggestion, index) => (
-                <Box
-                    key={index}
-                    px={4}
-                    py={2}
-                    cursor="pointer"
-                    _hover={{bg: 'gray.50'}}
-                    onClick={() => onSelectSuggestion(suggestion)}
-                    role="button"
-                    tabIndex={0}
-                    onKeyDown={(e) => {
-                        if (e.key === 'Enter' || e.key === ' ') {
-                            onSelectSuggestion(suggestion)
-                        }
-                    }}
-                >
-                    <Flex alignItems="center" gap={2}>
-                        {/* Location Marker */}
-                        <Box position="relative" w={4} h={4}>
-                            <Box
-                                position="absolute"
-                                top={0}
-                                left={0}
-                                w={4}
-                                h={4}
-                                bg="blue.500"
-                                borderRadius="full"
-                                opacity={0.2}
-                            />
-                            <Box
-                                position="absolute"
-                                top={1}
-                                left={1}
-                                w={2}
-                                h={2}
-                                bg="blue.500"
-                                borderRadius="full"
-                            />
-                        </Box>
+            <Stack spacing={0}>
+                {suggestions.map((suggestion, index) => (
+                    <Box
+                        key={index}
+                        px={4}
+                        py={3}
+                        cursor="pointer"
+                        _hover={{bg: 'gray.50'}}
+                        onClick={() => onSelectSuggestion(suggestion)}
+                        role="button"
+                        tabIndex={0}
+                        onKeyDown={(e) => {
+                            if (e.key === 'Enter' || e.key === ' ') {
+                                onSelectSuggestion(suggestion)
+                            }
+                        }}
+                    >
+                        <Flex alignItems="center" gap={2}>
+                            {/* Location Icon */}
+                            <LocationIcon boxSize={4} color="black" />
 
-                        {/* Address Text */}
-                        <Box flex={1}>
-                            <Text fontSize="sm" noOfLines={1}>
-                                {suggestion.structured_formatting?.main_text}
-                            </Text>
-                            {suggestion.structured_formatting?.secondary_text && (
-                                <Text fontSize="xs" color="gray.500" noOfLines={1}>
-                                    {suggestion.structured_formatting.secondary_text}
+                            {/* Address Text */}
+                            <Box flex={1}>
+                                <Text fontSize="sm" noOfLines={1}>
+                                    {suggestion.description || `${suggestion.structured_formatting?.main_text}, ${suggestion.structured_formatting?.secondary_text}`}
                                 </Text>
-                            )}
-                        </Box>
-                    </Flex>
-                </Box>
-            ))}
+                            </Box>
+                        </Flex>
+                    </Box>
+                ))}
+            </Stack>
+            
+            {/* Google Maps Attribution */}
+            <Box
+                px={4}
+                py={3}
+                display="flex"
+                alignItems="center"
+            >
+                <img 
+                    src={getAssetUrl('static/img/GoogleMaps_Logo_Gray_4x.png')}
+                    alt="Google Maps"
+                    style={{ width: '98px', height: '18px' }}
+                />
+            </Box>
         </Box>
     )
 }

@@ -839,6 +839,20 @@
       "value": "]"
     }
   ],
+  "addressSuggestionDropdown.suggested": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "ŞŬƓƓḖŞŦḖḒ"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
   "auth_modal.button.close.assistive_msg": [
     {
       "type": 0,

@@ -407,6 +407,12 @@
       "value": "You Might Also Like"
     }
   ],
+  "addressSuggestionDropdown.suggested": [
+    {
+      "type": 0,
+      "value": "SUGGESTED"
+    }
+  ],
   "auth_modal.button.close.assistive_msg": [
     {
       "type": 0,

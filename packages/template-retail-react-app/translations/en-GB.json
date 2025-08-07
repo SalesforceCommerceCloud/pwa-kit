@@ -162,6 +162,9 @@
   "add_to_cart_modal.recommended_products.title.might_also_like": {
     "defaultMessage": "You Might Also Like"
   },
+  "addressSuggestionDropdown.suggested": {
+    "defaultMessage": "SUGGESTED"
+  },
   "auth_modal.button.close.assistive_msg": {
     "defaultMessage": "Close login form"
   },
