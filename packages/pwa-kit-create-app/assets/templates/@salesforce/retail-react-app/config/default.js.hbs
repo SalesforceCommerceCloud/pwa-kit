@@ -10,6 +10,8 @@ const {parseCommerceAgentSettings} = require('./utils.js')
 
 module.exports = {
     app: {
+        // Enable or disable partial hydration (Islands) support
+        partialHydrationEnabled: false,
         // Commerce shopping agent configuration for embedded messaging service
         // This enables an agentic shopping experience in the application
         // This property accepts either a JSON string or a plain JavaScript object.
@@ -35,6 +37,32 @@ module.exports = {
             {{/if}}
             // This boolean value dictates whether the plus sign (+) is interpreted as space for query param string. Defaults to: false
             interpretPlusSignAsSpace: false
+        },
+        // Content Security Policy directives used by helmet in app/ssr.js
+        contentSecurityPolicy: {
+            useDefaults: true,
+            directives: {
+                'img-src': [
+                    // Default source for product images - replace with your CDN
+                    '*.commercecloud.salesforce.com'
+                ],
+                'script-src': [
+                    // Used by the service worker in /worker/main.js
+                    'storage.googleapis.com'
+                ],
+                'connect-src': [
+                    // Connect to Einstein APIs
+                    'api.cquotient.com',
+                    // Connect to DataCloud APIs
+                    '*.c360a.salesforce.com',
+                    // Connect to SCRT2 URLs
+                    '*.salesforce-scrt.com'
+                ],
+                'frame-src': [
+                    // Allow frames from Salesforce site.com (Needed for MIAW)
+                    '*.site.com'
+                ]
+            }
         },
         login: {
             passwordless: {
