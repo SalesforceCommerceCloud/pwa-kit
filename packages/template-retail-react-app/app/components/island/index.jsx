@@ -18,7 +18,7 @@ import React, {
 } from 'react'
 import PropTypes from 'prop-types'
 import {isServer} from '@salesforce/retail-react-app/app/components/island/utils'
-import {PARTIAL_HYDRATION_ENABLED} from '@salesforce/retail-react-app/app/constants'
+import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 
 const IslandContext = createContext(null)
 
@@ -43,8 +43,7 @@ function findChildren(children, componentType) {
 /**
  * This component is intended to give developers explicit and fine-granular control over the
  * hydration behavior of their experiences. The influence of the `<Island/>` components on the
- * hydration behavior can be activated or deactivated using the {@link PARTIAL_HYDRATION_ENABLED}
- * constant.
+ * hydration behavior can be activated or deactivated using the `partialHydrationEnabled` in config file.
  * @param {Object} props
  * @param {ReactNode} [props.children] The child tree
  * @param {('load' | 'idle' | 'visible' | 'off')} [props.hydrateOn='load'] The island's hydration strategy
@@ -84,7 +83,7 @@ function findChildren(children, componentType) {
  */
 function Island(props) {
     const {children} = props
-    if (!PARTIAL_HYDRATION_ENABLED) {
+    if (!getConfig()?.app?.partialHydrationEnabled) {
         return <>{children}</>
     }
 

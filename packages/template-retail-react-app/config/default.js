@@ -11,6 +11,7 @@ const {parseCommerceAgentSettings} = require('./utils.js')
 
 module.exports = {
     app: {
+        partialHydrationEnabled: false,
         commerceAgent: parseCommerceAgentSettings(process.env.COMMERCE_AGENT_SETTINGS),
         url: {
             site: 'path',

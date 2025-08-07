@@ -26,6 +26,7 @@ const commerceAgentSettings = {
 
 module.exports = {
     app: {
+        partialHydrationEnabled: false,
         commerceAgent: commerceAgentSettings,
         url: {
             locale: 'path',

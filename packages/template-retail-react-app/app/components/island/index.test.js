@@ -10,7 +10,16 @@ import {act, render, screen} from '@testing-library/react'
 import {renderToString} from 'react-dom/server'
 import Island from '@salesforce/retail-react-app/app/components/island'
 import {isServer} from '@salesforce/retail-react-app/app/components/island/utils'
-import * as constants from '@salesforce/retail-react-app/app/constants'
+import mockConfig from '@salesforce/retail-react-app/config/mocks/default'
+import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
+
+jest.mock('@salesforce/pwa-kit-runtime/utils/ssr-config', () => {
+    const origin = jest.requireActual('@salesforce/pwa-kit-react-sdk/ssr/universal/utils')
+    return {
+        ...origin,
+        getConfig: jest.fn()
+    }
+})
 
 jest.mock('@salesforce/retail-react-app/app/components/island/utils', () => ({
     ...jest.requireActual('@salesforce/retail-react-app/app/components/island/utils'),
@@ -46,15 +55,9 @@ function renderServerComponent(component) {
 }
 
 describe('Island Component', () => {
-    let originalFlagValue
-
-    beforeAll(() => (originalFlagValue = constants.PARTIAL_HYDRATION_ENABLED))
-
-    afterAll(() => Reflect.set(constants, 'PARTIAL_HYDRATION_ENABLED', originalFlagValue))
-
     beforeEach(() => {
         jest.clearAllMocks()
-        Reflect.set(constants, 'PARTIAL_HYDRATION_ENABLED', true)
+        getConfig.mockImplementation(() => ({...mockConfig, app: {...mockConfig.app, partialHydrationEnabled: true}}))
         global.requestIdleCallback = mockRequestIdleCallback
         global.cancelIdleCallback = mockCancelIdleCallback
         global.IntersectionObserver = mockIntersectionObserver
@@ -70,8 +73,8 @@ describe('Island Component', () => {
             isServer.mockReturnValue(true)
         })
 
-        test('should not render an island at all if constant "PARTIAL_HYDRATION_ENABLED" is false', () => {
-            Reflect.set(constants, 'PARTIAL_HYDRATION_ENABLED', false)
+        test('should not render an island at all if config "app.partialHydrationEnabled" is false', () => {
+            getConfig.mockImplementation(() => ({...mockConfig, app: {...mockConfig.app, partialHydrationEnabled: false}}))
 
             const {container} = render(
                 <Island>
@@ -120,8 +123,8 @@ describe('Island Component', () => {
     })
 
     describe('Client-Side Rendering (CSR)', () => {
-        test('should not render an island at all if constant "PARTIAL_HYDRATION_ENABLED" is false', () => {
-            Reflect.set(constants, 'PARTIAL_HYDRATION_ENABLED', false)
+        test('should not render an island at all if config "app.partialHydrationEnabled" is false', () => {
+            getConfig.mockImplementation(() => ({...mockConfig, app: {...mockConfig.app, partialHydrationEnabled: false}}))
 
             const {container} = render(
                 <Island>
