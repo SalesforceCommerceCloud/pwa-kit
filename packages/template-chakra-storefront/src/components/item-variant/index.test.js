@@ -62,6 +62,7 @@ describe('ItemPrice', function () {
         expect(getByText(/^£0\.00$/i)).toBeInTheDocument()
     })
 
+    //@sfdc-extension-block-start SFDC_EXT_WISHLIST
     test('should display product prices if variant is for wishlist page on desktop', () => {
         useMediaQuery.mockReturnValue([true])
         const {getByText, container, getAllByText} = renderWithProviders(
@@ -95,4 +96,5 @@ describe('ItemPrice', function () {
         const strikethroughPriceTag = container.querySelector('s')
         expect(within(strikethroughPriceTag).getByText(/£476\.80/i)).toBeInTheDocument()
     })
+    //@sfdc-extension-block-end SFDC_EXT_WISHLIST
 })
