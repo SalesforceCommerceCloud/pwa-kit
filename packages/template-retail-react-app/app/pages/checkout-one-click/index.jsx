@@ -300,7 +300,10 @@ const CheckoutOneClick = () => {
                                             w="full"
                                             onClick={onPlaceOrder}
                                             isLoading={isLoading}
-                                            isDisabled={!appliedPayment && !paymentMethodForm.formState.isValid}
+                                            isDisabled={
+                                                !paymentMethodForm.formState.isValid &&
+                                                !appliedPayment
+                                            }
                                             data-testid="place-order-button"
                                             size="lg"
                                             px={8}
