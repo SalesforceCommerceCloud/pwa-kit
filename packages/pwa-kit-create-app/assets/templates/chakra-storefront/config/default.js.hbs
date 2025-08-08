@@ -91,7 +91,8 @@ module.exports = {
     login: {
         passwordless: {
             enabled: {{#if answers.project.demo.enableDemoSettings}}true{{else}}false{{/if}},
-            callbackURI: process.env.PASSWORDLESS_LOGIN_CALLBACK_URI || '/passwordless-login-callback',
+            callbackURI:
+                process.env.PASSWORDLESS_LOGIN_CALLBACK_URI || '/passwordless-login-callback',
             landingPath: '/passwordless-login-landing'
         },
         {{#if selectedPlugins.SFDC_EXT_SOCIAL_LOGIN}}
