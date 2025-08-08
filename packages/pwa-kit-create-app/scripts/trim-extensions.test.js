@@ -26,25 +26,25 @@ jest.mock('../assets/plugin-config', () => ({
 const TEST_CODES = {
     BASIC_COMPONENT: `
         // @sfdc-extension-line SFDC_EXT_featureA
-        const ComponentA = import('./featureAComponent')
+        import ComponentA from './featureAComponent'
         // @sfdc-extension-line SFDC_EXT_featureB
-        const ComponentB = import('./featureBComponent')
+        import ComponentB from './featureBComponent'
     `,
     BASIC_COMPONENT_TRIMMED: `
-        const ComponentA = import('./featureAComponent')
+        import ComponentA from './featureAComponent'
     `,
     COMPONENT_A: `export default ComponentA`,
     COMPONENT_B: `export default ComponentB`,
     FEATURE_B_PAGE: `export const FeatureBPage = 'FeatureBPage'`,
     COMPONENT_B_WITH_PAGE_REF: `
         // @sfdc-extension-line SFDC_EXT_featureB
-        const pageB = import('../../pages/featureBPage')
+        const pageB = loadable(() => import('../../pages/featureBPage'))
         export default ComponentB
     `,
     COMPONENT_B_WITH_PAGE_REF_TRIMMED: `export default ComponentB`,
     FEATURE_B_PAGE_WITH_COMPONENT_REF: `
         // @sfdc-extension-line SFDC_EXT_featureB
-        const ComponentB = import('../../components/featureBComponent')
+        import ComponentB from '../../components/featureBComponent'
         export const FeatureBPage = 'FeatureBPage'
     `,
     FEATURE_B_PAGE_WITH_COMPONENT_REF_TRIMMED: `export const FeatureBPage = 'FeatureBPage'`
@@ -175,7 +175,7 @@ describe('trim-extensions with nested directories', () => {
         createTestFileSystem({
             additional: {
                 '/mock/dir/src/route.jsx': `// @sfdc-extension-line SFDC_EXT_featureA
-                const storeLocatorPage = import('./pages/store-locator')`,
+                import storeLocatorPage from './pages/store-locator'`,
                 '/mock/dir/src/pages/store-locator/index.jsx': `import { Modal } from './partial/modal' 
                     export default StoreLocator = 'StoreLocatorModal'`,
                 '/mock/dir/src/pages/store-locator/partial/modal.jsx': `export const StoreLocator = 'StoreLocatorModal'`

@@ -18,6 +18,7 @@ const COMPONENT_SCAN_PATHS = [
     path.join(SEPARATOR, 'src', 'pages', SEPARATOR),
     path.join(SEPARATOR, 'src', 'hooks', SEPARATOR),
     path.join(SEPARATOR, 'src', 'routes.tsx'),
+    path.join(SEPARATOR, 'src', 'utils', SEPARATOR),
     path.join(SEPARATOR, 'config', 'constants.js')
 ]
 const SINGLE_LINE_MARKER = '@sfdc-extension-line'
@@ -149,6 +150,18 @@ function processFile(filePath, plugins) {
                 console.error(`Error updating file ${filePath}: ${e.message}`)
                 throw e
             }
+
+            const addToRemoveComponentCandidates = (importPath) => {
+                if (importPath.startsWith('.')) {
+                    let absoluteImportPath = path.resolve(
+                        path.dirname(filePath),
+                        importPath
+                    )
+                    console.log('adding to removeComponentCandidates', absoluteImportPath)  
+                    removeComponentCandidates.add(absoluteImportPath)
+                }
+            }
+
             // walk through the removed blocks, parse them into ASTs, extract the import statements, and add them to the list of candidates for removal later.
             removedBlocks.forEach((block) => {
                 if (block.includes('import')) {
@@ -157,23 +170,32 @@ function processFile(filePath, plugins) {
                         plugins: ['jsx', 'typescript']
                     })
                     traverse(ast, {
+                        // for trimmed import statements like: import X from './path', add the path to the list of candidates for removal later.
+                        ImportDeclaration(nodePath) {
+                            addToRemoveComponentCandidates(nodePath.node.source.value)
+                        },
+                        // for trimmed import statements like: const X = loadable(() => import('./path')), add the path to the list of candidates for removal later.
                         VariableDeclaration(nodePath) {
-                            // Extract import path from variable declarations like: const X = import('./path')
                             nodePath.node.declarations.forEach((declaration) => {
                                 if (
                                     declaration.init &&
                                     declaration.init.type === 'CallExpression' &&
-                                    declaration.init.callee.type === 'Import'
+                                    declaration.init.callee.type === 'Identifier' &&
+                                    declaration.init.callee.name === 'loadable' &&
+                                    declaration.init.arguments.length > 0
                                 ) {
-                                    const importArg = declaration.init.arguments[0]
-                                    if (importArg && importArg.type === 'StringLiteral') {
-                                        const importPath = importArg.value
-                                        if (importPath.startsWith('.')) {
-                                            let absoluteImportPath = path.resolve(
-                                                path.dirname(filePath),
-                                                importPath
-                                            )
-                                            removeComponentCandidates.add(absoluteImportPath)
+                                    const firstArg = declaration.init.arguments[0]
+                                    // Check for arrow function: () => import('./path')
+                                    if (
+                                        firstArg.type === 'ArrowFunctionExpression' &&
+                                        firstArg.body &&
+                                        firstArg.body.type === 'CallExpression' &&
+                                        firstArg.body.callee.type === 'Import' &&
+                                        firstArg.body.arguments.length > 0
+                                    ) {
+                                        const importArg = firstArg.body.arguments[0]
+                                        if (importArg.type === 'StringLiteral') {
+                                            addToRemoveComponentCandidates(importArg.value)
                                         }
                                     }
                                 }
