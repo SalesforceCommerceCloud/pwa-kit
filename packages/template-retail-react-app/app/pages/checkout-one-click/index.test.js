@@ -516,6 +516,11 @@ test('Can proceed through checkout as registered customer', async () => {
 
     // Default shipping option should be selected
     const shippingOptionsForm = screen.getByTestId('sf-checkout-shipping-options-form')
+    await waitFor(() =>
+        expect(shippingOptionsForm).toHaveFormValues({
+            'shipping-options-radiogroup': mockShippingMethods.defaultShippingMethodId
+        })
+    )
 
     // Submit selected shipping method
     await user.click(screen.getByText(/continue to payment/i))
@@ -584,21 +589,29 @@ test('Can edit address during checkout as a registered customer', async () => {
         expect(screen.getByTestId('sf-checkout-shipping-address-0')).toBeInTheDocument()
     })
 
-    // Click the "Edit 123 Main St" button to edit the specific address
-    const editButton = screen.getByRole('button', {name: /edit 123 main st/i})
-    await user.click(editButton)
+    const firstAddress = screen.getByTestId('sf-checkout-shipping-address-0')
+    await user.click(within(firstAddress).getByText(/edit/i))
 
-    await waitFor(() => {
-        const nameElements = screen.getAllByText('Test McTester')
-        const addressElements = screen.getAllByText('123 Main St')
-        expect(nameElements.length).toBeGreaterThan(0)
-        expect(addressElements.length).toBeGreaterThan(0)
-    })
+    // Wait for the edit address form to render
+    await waitFor(() =>
+        expect(screen.getByTestId('sf-shipping-address-edit-form')).not.toBeEmptyDOMElement()
+    )
+
+    // Shipping Address Form must be present
+    expect(screen.getByLabelText('Shipping Address Form')).toBeInTheDocument()
+    expect(screen.getByLabelText(/first name/i)).toBeInTheDocument()
+
+    // Edit and save the address
+    await user.clear(screen.getByLabelText('Address'))
+    await user.type(screen.getByLabelText('Address'), '369 Main Street')
+    await user.click(screen.getByText(/save & continue to shipping method/i))
 
     // Wait for next step to render
     await waitFor(() => {
         expect(screen.getByTestId('sf-toggle-card-step-2-content')).not.toBeEmptyDOMElement()
     })
+
+    expect(screen.getByText('369 Main Street')).toBeInTheDocument()
 })
 
 test('Can add address during checkout as a registered customer', async () => {
@@ -615,24 +628,34 @@ test('Can add address during checkout as a registered customer', async () => {
         }
     })
 
-    await waitFor(() => {
-        expect(screen.getByTestId('sf-checkout-shipping-address-0')).toBeInTheDocument()
-    })
+    global.server.use(
+        rest.post('*/customers/:customerId/addresses', (req, res, ctx) => {
+            return res(ctx.delay(0), ctx.status(200), ctx.json(req.body))
+        })
+    )
 
+    await waitFor(() => {
+        expect(screen.getByText(/add new address/i)).toBeInTheDocument()
+    })
     // Add address
     await user.click(screen.getByText(/add new address/i))
 
-    // Wait for the shipping address section to load with the saved address
-    await waitFor(() => {
-        const addressElements = screen.getAllByText('Test McTester')
-        expect(addressElements.length).toBeGreaterThan(0)
-    })
+    // Shipping Address Form must be present
+    expect(screen.getByLabelText('Shipping Address Form')).toBeInTheDocument()
 
-    // Verify the saved address is displayed (automatically selected in one-click checkout)
-    const addressElements = screen.getAllByText('123 Main St')
-    expect(addressElements.length).toBeGreaterThan(0)
+    const firstName = await screen.findByLabelText(/first name/i)
+    await user.type(firstName, 'Test2')
+    await user.type(screen.getByLabelText(/last name/i), 'McTester')
+    await user.type(screen.getByLabelText(/phone/i), '7275551234')
+    await user.selectOptions(screen.getByLabelText(/country/i), ['US'])
+    await user.type(screen.getAllByLabelText(/address/i)[0], 'Tropicana Field')
+    await user.type(screen.getByLabelText(/city/i), 'Tampa')
+    await user.selectOptions(screen.getByLabelText(/state/i), ['FL'])
+    await user.type(screen.getByLabelText(/zip code/i), '33712')
 
-    // Verify the shipping options step is available (checkout progressed automatically)
+    await user.click(screen.getByText(/save & continue to shipping method/i))
+
+    // Wait for next step to render
     await waitFor(() => {
         expect(screen.getByTestId('sf-toggle-card-step-2-content')).not.toBeEmptyDOMElement()
     })
@@ -741,16 +764,16 @@ test('Can register account during checkout as a guest', async () => {
 test('Place Order button is disabled when payment form is invalid', async () => {
     // Mock authorizePasswordlessLogin to fail with 404 (unregistered user)
     mockUseAuthHelper.mockRejectedValueOnce({
-        response: {status: 404}
+        response: { status: 404 }
     })
 
     // Set the initial browser router path and render our component tree.
     window.history.pushState({}, 'Checkout', createPathWithDefaults('/checkout'))
-    const {user} = renderWithProviders(<WrappedCheckout history={history} />, {
+    const { user } = renderWithProviders(<WrappedCheckout history={history} />, {
         wrapperProps: {
             isGuest: true,
             siteAlias: 'uk',
-            locale: {id: 'en-GB'},
+            locale: { id: 'en-GB' },
             appConfig: mockConfig.app
         }
     })
@@ -807,19 +830,21 @@ test('Place Order button is disabled when payment form is invalid', async () => 
     })
 })
 
+
+
 test('Place Order button does not display on steps 2 or 3', async () => {
     // Mock authorizePasswordlessLogin to fail with 404 (unregistered user)
     mockUseAuthHelper.mockRejectedValueOnce({
-        response: {status: 404}
+        response: { status: 404 }
     })
 
     // Set the initial browser router path and render our component tree.
     window.history.pushState({}, 'Checkout', createPathWithDefaults('/checkout'))
-    const {user} = renderWithProviders(<WrappedCheckout history={history} />, {
+    const { user } = renderWithProviders(<WrappedCheckout history={history} />, {
         wrapperProps: {
             isGuest: true,
             siteAlias: 'uk',
-            locale: {id: 'en-GB'},
+            locale: { id: 'en-GB' },
             appConfig: mockConfig.app
         }
     })
