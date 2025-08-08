@@ -922,7 +922,7 @@ const main = async (opts) => {
         console.log('context', JSON.stringify(context, null, 2))
     }
     // load plugin selected answer from context object to selectedPlugins (which used for code trimming process)
-    Object.entries(context.answers.project.selectedPlugins).forEach(([pluginKey, enabled]) => {
+    Object.entries(context.answers?.project?.selectedPlugins).forEach(([pluginKey, enabled]) => {
         if (pluginConfig?.plugins?.[pluginKey]) {
             selectedPlugins[pluginKey] = enabled
         }
