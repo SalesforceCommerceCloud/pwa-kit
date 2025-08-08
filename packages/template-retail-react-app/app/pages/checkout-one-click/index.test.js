@@ -760,3 +760,142 @@ test('Can register account during checkout as a guest', async () => {
         }
     })
 })
+
+test('Place Order button is disabled when payment form is invalid', async () => {
+    // Mock authorizePasswordlessLogin to fail with 404 (unregistered user)
+    mockUseAuthHelper.mockRejectedValueOnce({
+        response: { status: 404 }
+    })
+
+    // Set the initial browser router path and render our component tree.
+    window.history.pushState({}, 'Checkout', createPathWithDefaults('/checkout'))
+    const { user } = renderWithProviders(<WrappedCheckout history={history} />, {
+        wrapperProps: {
+            isGuest: true,
+            siteAlias: 'uk',
+            locale: { id: 'en-GB' },
+            appConfig: mockConfig.app
+        }
+    })
+
+    // Wait for checkout to load
+    await screen.findByText(/contact info/i)
+
+    // Fill out contact info
+    const emailInput = await screen.findByLabelText(/email/i)
+    await user.type(emailInput, 'test@test.com')
+    await user.tab()
+
+    const continueBtn = await screen.findByText(/continue to shipping address/i)
+    await user.click(continueBtn)
+
+    // Fill out shipping address
+    await waitFor(() => {
+        expect(screen.getByTestId('sf-toggle-card-step-1-content')).not.toBeEmptyDOMElement()
+    })
+
+    await user.type(screen.getByLabelText(/first name/i), 'Tester')
+    await user.type(screen.getByLabelText(/last name/i), 'McTesting')
+    await user.type(screen.getByLabelText(/phone/i), '(727) 555-1234')
+    await user.type(screen.getAllByLabelText(/address/i)[0], '123 Main St')
+    await user.type(screen.getByLabelText(/city/i), 'Tampa')
+    await user.selectOptions(screen.getByLabelText(/state/i), ['FL'])
+    await user.type(screen.getByLabelText(/zip code/i), '33610')
+    await user.click(screen.getByText(/continue to shipping method/i))
+
+    // Fill out shipping options
+    await waitFor(() => {
+        expect(screen.getByTestId('sf-toggle-card-step-2-content')).not.toBeEmptyDOMElement()
+    })
+    await user.click(screen.getByText(/continue to payment/i))
+
+    // Wait for payment step to load
+    await waitFor(() => {
+        expect(screen.getByTestId('sf-toggle-card-step-3-content')).not.toBeEmptyDOMElement()
+    })
+
+    // Check that Place Order button is disabled when payment form is empty
+    const placeOrderBtn = await screen.findByTestId('place-order-button')
+    expect(placeOrderBtn).toBeDisabled()
+
+    // Fill out payment form with valid data
+    await user.type(screen.getByLabelText(/card number/i), '4111111111111111')
+    await user.type(screen.getByLabelText(/name on card/i), 'Testy McTester')
+    await user.type(screen.getByLabelText(/expiration date/i), '0140')
+    await user.type(screen.getByLabelText(/^security code$/i), '123')
+
+    // Check that Place Order button is now enabled
+    await waitFor(() => {
+        expect(placeOrderBtn).toBeEnabled()
+    })
+})
+
+
+
+test('Place Order button does not display on steps 2 or 3', async () => {
+    // Mock authorizePasswordlessLogin to fail with 404 (unregistered user)
+    mockUseAuthHelper.mockRejectedValueOnce({
+        response: { status: 404 }
+    })
+
+    // Set the initial browser router path and render our component tree.
+    window.history.pushState({}, 'Checkout', createPathWithDefaults('/checkout'))
+    const { user } = renderWithProviders(<WrappedCheckout history={history} />, {
+        wrapperProps: {
+            isGuest: true,
+            siteAlias: 'uk',
+            locale: { id: 'en-GB' },
+            appConfig: mockConfig.app
+        }
+    })
+
+    // Wait for checkout to load
+    await screen.findByText(/contact info/i)
+
+    // Fill out contact info
+    const emailInput = await screen.findByLabelText(/email/i)
+    await user.type(emailInput, 'test@test.com')
+    await user.tab()
+
+    const continueBtn = await screen.findByText(/continue to shipping address/i)
+    await user.click(continueBtn)
+
+    // Step 2: Shipping Address - Check that Place Order button is NOT present
+    await waitFor(() => {
+        expect(screen.getByTestId('sf-toggle-card-step-1-content')).not.toBeEmptyDOMElement()
+    })
+
+    // Verify Place Order button is not displayed on step 2
+    expect(screen.queryByTestId('place-order-button')).not.toBeInTheDocument()
+
+    // Fill out shipping address
+    await user.type(screen.getByLabelText(/first name/i), 'Tester')
+    await user.type(screen.getByLabelText(/last name/i), 'McTesting')
+    await user.type(screen.getByLabelText(/phone/i), '(727) 555-1234')
+    await user.type(screen.getAllByLabelText(/address/i)[0], '123 Main St')
+    await user.type(screen.getByLabelText(/city/i), 'Tampa')
+    await user.selectOptions(screen.getByLabelText(/state/i), ['FL'])
+    await user.type(screen.getByLabelText(/zip code/i), '33610')
+    await user.click(screen.getByText(/continue to shipping method/i))
+
+    // Step 3: Shipping Options - Check that Place Order button is NOT present
+    await waitFor(() => {
+        expect(screen.getByTestId('sf-toggle-card-step-2-content')).not.toBeEmptyDOMElement()
+    })
+
+    // Verify Place Order button is not displayed on step 3
+    expect(screen.queryByTestId('place-order-button')).not.toBeInTheDocument()
+
+    // Continue to payment step
+    await user.click(screen.getByText(/continue to payment/i))
+
+    // Step 4: Payment - Now the Place Order button should appear
+    await waitFor(() => {
+        expect(screen.getByTestId('sf-toggle-card-step-3-content')).not.toBeEmptyDOMElement()
+    })
+
+    // Verify Place Order button is now displayed on step 4
+    const placeOrderBtn = await screen.findByTestId('place-order-button')
+    expect(placeOrderBtn).toBeInTheDocument()
+    expect(placeOrderBtn).toBeDisabled() // Should be disabled until payment form is filled
+})
