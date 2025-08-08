@@ -183,7 +183,7 @@ export const useProductDetailData = () => {
 
     const handleAddToCart = async (productSelectionValues) => {
         try {
-            const productItems = productSelectionValues.map(({variant, product, quantity}) => ({
+            const productItems = productSelectionValues.map(({product, variant, quantity}) => ({
                 productId: variant?.productId || product?.id,
                 price: variant?.price || product?.price,
                 quantity
