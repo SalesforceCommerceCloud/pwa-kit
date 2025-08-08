@@ -40,7 +40,7 @@ class VersionControlGitTool {
                     content: [
                         {
                             type: 'text',
-                            text: 'Git repository initialized and initial commit created.'
+                            text: 'Git version control initialized and committed locally.'
                         }
                     ]
                 }
