@@ -169,11 +169,12 @@ const Header = ({
                 defaultMessage: 'Log out',
                 id: 'header.popover.action.log_out'
             }),
-            //@sfdc-extension-line SFDC_EXT_WISHLIST
+            //@sfdc-extension-block-start SFDC_EXT_WISHLIST
             wishlist: formatMessage({
                 defaultMessage: 'Wishlist',
                 id: 'header.button.assistive_msg.wishlist'
             }),
+            //@sfdc-extension-block-end SFDC_EXT_WISHLIST
             storeLocator: formatMessage({
                 defaultMessage: 'Store Locator',
                 id: 'header.button.assistive_msg.store_locator'
