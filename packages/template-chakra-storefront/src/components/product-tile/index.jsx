@@ -164,6 +164,7 @@ const ProductTile = (props) => {
         return getPriceData(productWithFilteredVariants)
     }, [productWithFilteredVariants])
 
+    //@sfdc-extension-block-start SFDC_EXT_WISHLIST
     // Message formatting
     const messages = useMemo(
         () => ({
@@ -184,6 +185,7 @@ const ProductTile = (props) => {
         }),
         [intl, localizedProductName]
     )
+    //@sfdc-extension-block-end SFDC_EXT_WISHLIST
 
     // Retrieve product badges
     const filteredLabels = useMemo(() => {
@@ -290,6 +292,7 @@ const ProductTile = (props) => {
                     </>
                 )}
             </Link>
+            {/* @sfdc-extension-block-start SFDC_EXT_WISHLIST */}
             {enableFavourite && (
                 <Box>
                     <IconButtonWithRegistration
@@ -311,6 +314,7 @@ const ProductTile = (props) => {
                     </IconButtonWithRegistration>
                 </Box>
             )}
+            {/* @sfdc-extension-block-end SFDC_EXT_WISHLIST */}
             {filteredLabels.size > 0 && (
                 <HStack css={styles.badgeGroup}>
                     {Array.from(filteredLabels.entries()).map(([label, colorScheme]) => (
