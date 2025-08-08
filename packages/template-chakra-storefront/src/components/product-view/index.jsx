@@ -162,8 +162,21 @@ const ProductView = forwardRef(
             setChildProductOrderability,
             isBasketLoading = false,
             onVariantSelected = () => {},
-            validateOrderability = (variant, quantity, stockLevel) =>
-                !isProductLoading && variant?.orderable && quantity > 0 && quantity <= stockLevel,
+            validateOrderability = (product, variant, quantity, stockLevel) => {
+                if (isProductLoading) return false
+
+                // If product has variations, a variant must be selected
+                if (product?.variationAttributes?.length > 0 && !variant) {
+                    return false
+                }
+
+                // Check if product (either variant or standard) is orderable and if quantity is valid
+                return (
+                    (variant?.orderable || product?.inventory?.orderable) &&
+                    quantity > 0 &&
+                    quantity <= stockLevel
+                )
+            },
             showImageGallery = true,
             setSelectedBundleQuantity = () => {},
             selectedBundleParentQuantity = 1
@@ -199,8 +212,8 @@ const ProductView = forwardRef(
             return getPriceData(product, {quantity})
         }, [product, quantity])
         const canAddToWishlist = !isProductLoading
-        const isProductASet = product?.type.set
-        const isProductABundle = product?.type.bundle
+        const isProductASet = product?.type?.set
+        const isProductABundle = product?.type?.bundle
         const errorContainerRef = useRef(null)
 
         const {disableButton, customInventoryMessage} = useMemo(() => {
@@ -240,7 +253,7 @@ const ProductView = forwardRef(
         const validateAndShowError = (opts = {}) => {
             const {scrollErrorIntoView = true} = opts
             // Validate that all attributes are selected before proceeding.
-            const hasValidSelection = validateOrderability(variant, quantity, stockLevel)
+            const hasValidSelection = validateOrderability(product, variant, quantity, stockLevel)
             const hasError = !isProductASet && !isProductABundle && !hasValidSelection
             const scrollToError = hasError && scrollErrorIntoView
 
@@ -379,7 +392,7 @@ const ProductView = forwardRef(
             if (
                 !isProductASet &&
                 !isProductABundle &&
-                validateOrderability(variant, quantity, stockLevel)
+                validateOrderability(product, variant, quantity, stockLevel)
             ) {
                 toggleShowOptionsMessage(false)
             }

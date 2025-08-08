@@ -25,6 +25,7 @@ import {
     basketWithProductBundle,
     bundleProductItemsForPDP
 } from '../../../mocks/product-bundle'
+import {mockStandardProductOrderable} from '../../../mocks/standard-product'
 import Toaster, {toaster} from '../../components/toaster'
 
 jest.mock('../../hooks/use-datacloud', () => ({
@@ -593,6 +594,103 @@ describe('product bundles', () => {
             expect(screen.getByText('Only 3 left!')).toBeInTheDocument()
             const addBundleToCartBtn = screen.getByRole('button', {name: /add bundle to cart/i})
             expect(addBundleToCartBtn).toBeDisabled()
+        })
+    })
+})
+
+describe('standard product', () => {
+    let mockAddToCart = jest.fn()
+
+    beforeEach(() => {
+        mockAddToCart = jest.fn()
+        prependHandlersToServer([
+            {
+                // Use standard product without variants
+                path: '*/products/:productId',
+                method: 'get',
+                res: () => mockStandardProductOrderable
+            },
+            {
+                // Mock the add to cart API call to capture the request
+                path: '*/baskets/:basketId/items',
+                method: 'post',
+                res: (req) => {
+                    const requestBody = req.body
+                    mockAddToCart(requestBody)
+                    return {
+                        basketId: 'test-basket-id',
+                        productItems: [
+                            {
+                                productId: requestBody[0].productId,
+                                price: requestBody[0].price,
+                                quantity: requestBody[0].quantity
+                            }
+                        ]
+                    }
+                }
+            }
+        ])
+    })
+
+    test('should be successfully added to cart', async () => {
+        window.history.pushState({}, 'ProductDetail', '/uk/en-GB/product/a-standard-dress')
+
+        const initialBasket = {basketId: 'test-basket-id'}
+        const {user} = renderWithProviders(<MockedComponent />, {wrapperProps: {initialBasket}})
+
+        await waitFor(() => {
+            expect(screen.getAllByText('White and Black Tone')[0]).toBeInTheDocument()
+            expect(screen.getByRole('button', {name: /add to cart/i})).toBeInTheDocument()
+        })
+
+        const addToCartButton = screen.getByRole('button', {name: /add to cart/i})
+        await act(async () => {
+            await user.click(addToCartButton)
+        })
+
+        await waitFor(() => {
+            expect(mockAddToCart).toHaveBeenCalledWith([
+                {
+                    productId: mockStandardProductOrderable.id,
+                    price: mockStandardProductOrderable.price,
+                    quantity: 1
+                }
+            ])
+        })
+    })
+
+    test('should handle quantity change before adding to cart', async () => {
+        window.history.pushState({}, 'ProductDetail', '/uk/en-GB/product/a-standard-dress')
+
+        const initialBasket = {basketId: 'test-basket-id'}
+        const {user} = renderWithProviders(<MockedComponent />, {wrapperProps: {initialBasket}})
+
+        await waitFor(() => {
+            expect(screen.getAllByText('White and Black Tone')[0]).toBeInTheDocument()
+            expect(screen.getByRole('spinbutton', {name: /quantity/i})).toBeInTheDocument()
+        })
+
+        // Change quantity to 3
+        const quantityInput = screen.getByRole('spinbutton', {name: /quantity/i})
+        await act(async () => {
+            await user.clear(quantityInput)
+            await user.type(quantityInput, '3')
+        })
+
+        const addToCartButton = screen.getByRole('button', {name: /add to cart/i})
+        await act(async () => {
+            await user.click(addToCartButton)
+        })
+
+        await waitFor(() => {
+            // Verify that the correct quantity is passed when variant is undefined
+            expect(mockAddToCart).toHaveBeenCalledWith([
+                {
+                    productId: mockStandardProductOrderable.id,
+                    price: mockStandardProductOrderable.price,
+                    quantity: 3
+                }
+            ])
         })
     })
 })

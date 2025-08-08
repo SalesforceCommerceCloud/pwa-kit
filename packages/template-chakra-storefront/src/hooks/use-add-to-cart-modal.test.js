@@ -569,6 +569,57 @@ const MOCK_PRODUCT = {
     c_size: '9LG',
     c_width: 'Z'
 }
+
+// Mock data for testing individual products with missing image data
+const MOCK_PRODUCT_NO_IMAGE_LINK = {
+    ...MOCK_PRODUCT,
+    price: 29.99,
+    currency: 'USD',
+    imageGroups: [
+        {
+            viewType: 'small',
+            images: [
+                {
+                    alt: 'Test product image',
+                    disBaseLink: 'https://example.com/image.jpg'
+                }
+            ]
+        }
+    ]
+}
+
+const MOCK_PRODUCT_NO_IMAGE_GROUPS = {
+    ...MOCK_PRODUCT,
+    price: 29.99,
+    currency: 'USD',
+    imageGroups: []
+}
+
+// Mock data for testing bundle products with missing image data
+const MOCK_BUNDLE_NO_IMAGE_LINK = {
+    ...mockProductBundle,
+    price: 59.99,
+    currency: 'USD',
+    imageGroups: [
+        {
+            viewType: 'small',
+            images: [
+                {
+                    alt: 'Bundle product image',
+                    disBaseLink: 'https://example.com/bundle-image.jpg'
+                }
+            ]
+        }
+    ]
+}
+
+const MOCK_BUNDLE_NO_IMAGE_GROUPS = {
+    ...mockProductBundle,
+    price: 59.99,
+    currency: 'USD',
+    imageGroups: []
+}
+
 beforeEach(() => {
     jest.resetModules()
 
@@ -676,4 +727,104 @@ test('renders product bundle', () => {
             expect(screen.getAllByText(`${name}: ${value}`)[0]).toBeInTheDocument()
         })
     })
+})
+
+test('renders individual product image correctly when there is no image link', async () => {
+    const MOCK_DATA_NO_IMAGE = {
+        product: MOCK_PRODUCT_NO_IMAGE_LINK,
+        itemsAdded: [
+            {
+                product: MOCK_PRODUCT_NO_IMAGE_LINK,
+                variant: MOCK_PRODUCT.variants[0], // Provide a variant to avoid undefined errors
+                quantity: 1
+            }
+        ],
+        selectedQuantity: 1
+    }
+
+    renderWithProviders(
+        <AddToCartModalContext.Provider
+            value={{
+                isOpen: true,
+                data: MOCK_DATA_NO_IMAGE
+            }}
+        >
+            <AddToCartModal />
+        </AddToCartModalContext.Provider>
+    )
+
+    expect(screen.getByRole('dialog')).toBeInTheDocument()
+    expect(screen.getByText(MOCK_PRODUCT.name)).toBeInTheDocument()
+})
+
+test('renders individual product image when image object is not provided', async () => {
+    const MOCK_DATA_NO_IMAGE_OBJECT = {
+        product: MOCK_PRODUCT_NO_IMAGE_GROUPS,
+        itemsAdded: [
+            {
+                product: MOCK_PRODUCT_NO_IMAGE_GROUPS,
+                variant: MOCK_PRODUCT.variants[0],
+                quantity: 1
+            }
+        ],
+        selectedQuantity: 1
+    }
+
+    renderWithProviders(
+        <AddToCartModalContext.Provider
+            value={{
+                isOpen: true,
+                data: MOCK_DATA_NO_IMAGE_OBJECT
+            }}
+        >
+            <AddToCartModal />
+        </AddToCartModalContext.Provider>
+    )
+
+    expect(screen.getByRole('dialog')).toBeInTheDocument()
+    expect(screen.getByText(MOCK_PRODUCT.name)).toBeInTheDocument()
+})
+
+test('renders bundle product image correctly when there is no image link', async () => {
+    const MOCK_BUNDLE_DATA_NO_IMAGE = {
+        product: MOCK_BUNDLE_NO_IMAGE_LINK,
+        itemsAdded: mockBundleItemsAdded,
+        selectedQuantity: 1
+    }
+
+    renderWithProviders(
+        <AddToCartModalContext.Provider
+            value={{
+                isOpen: true,
+                data: MOCK_BUNDLE_DATA_NO_IMAGE
+            }}
+        >
+            <AddToCartModal />
+        </AddToCartModalContext.Provider>
+    )
+
+    expect(screen.getByRole('dialog')).toBeInTheDocument()
+    expect(screen.getByText(mockProductBundle.name)).toBeInTheDocument()
+})
+
+test('renders bundle product image when image object is not provided', async () => {
+    const MOCK_BUNDLE_DATA_NO_IMAGE_OBJECT = {
+        product: MOCK_BUNDLE_NO_IMAGE_GROUPS,
+        itemsAdded: mockBundleItemsAdded,
+        selectedQuantity: 1
+    }
+
+    renderWithProviders(
+        <AddToCartModalContext.Provider
+            value={{
+                isOpen: true,
+                data: MOCK_BUNDLE_DATA_NO_IMAGE_OBJECT
+            }}
+        >
+            <AddToCartModal />
+        </AddToCartModalContext.Provider>
+    )
+
+    expect(screen.getByRole('dialog')).toBeInTheDocument()
+    expect(screen.getByText(mockProductBundle.name)).toBeInTheDocument()
 })
