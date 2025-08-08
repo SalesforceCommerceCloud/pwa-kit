@@ -32,6 +32,9 @@ The PWA Kit MCP Server offers the following intelligent tools tailored to Salesf
   Runs performance and accessibility audits on a provided site URL.
   *Example: `https://pwa-kit.mobify-storefront.com`*
 
+* **`git_version_control`**:
+  Performs version control through git including the git initialization and doing the initial local commit.
+
 
 ## ▶️ Running the MCP Server
 
