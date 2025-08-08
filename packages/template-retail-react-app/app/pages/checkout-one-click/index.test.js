@@ -764,16 +764,16 @@ test('Can register account during checkout as a guest', async () => {
 test('Place Order button is disabled when payment form is invalid', async () => {
     // Mock authorizePasswordlessLogin to fail with 404 (unregistered user)
     mockUseAuthHelper.mockRejectedValueOnce({
-        response: { status: 404 }
+        response: {status: 404}
     })
 
     // Set the initial browser router path and render our component tree.
     window.history.pushState({}, 'Checkout', createPathWithDefaults('/checkout'))
-    const { user } = renderWithProviders(<WrappedCheckout history={history} />, {
+    const {user} = renderWithProviders(<WrappedCheckout history={history} />, {
         wrapperProps: {
             isGuest: true,
             siteAlias: 'uk',
-            locale: { id: 'en-GB' },
+            locale: {id: 'en-GB'},
             appConfig: mockConfig.app
         }
     })
@@ -830,21 +830,19 @@ test('Place Order button is disabled when payment form is invalid', async () => 
     })
 })
 
-
-
 test('Place Order button does not display on steps 2 or 3', async () => {
     // Mock authorizePasswordlessLogin to fail with 404 (unregistered user)
     mockUseAuthHelper.mockRejectedValueOnce({
-        response: { status: 404 }
+        response: {status: 404}
     })
 
     // Set the initial browser router path and render our component tree.
     window.history.pushState({}, 'Checkout', createPathWithDefaults('/checkout'))
-    const { user } = renderWithProviders(<WrappedCheckout history={history} />, {
+    const {user} = renderWithProviders(<WrappedCheckout history={history} />, {
         wrapperProps: {
             isGuest: true,
             siteAlias: 'uk',
-            locale: { id: 'en-GB' },
+            locale: {id: 'en-GB'},
             appConfig: mockConfig.app
         }
     })
