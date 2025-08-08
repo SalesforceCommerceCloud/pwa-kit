@@ -256,20 +256,22 @@ export const AddToCartModal = () => {
                                     )}
                                     {!isProductABundle &&
                                         itemsAdded.map(({product, variant, quantity}, index) => {
+                                            const productId = variant?.productId || product?.id
                                             const image = findImageGroupBy(product.imageGroups, {
                                                 viewType: 'small',
-                                                selectedVariationAttributes: variant.variationValues
+                                                selectedVariationAttributes:
+                                                    variant?.variationValues
                                             })?.images?.[0]
                                             const priceData = getPriceData(product, {quantity})
                                             const variationAttributeValues =
                                                 getDisplayVariationValues(
                                                     product.variationAttributes,
-                                                    variant.variationValues
+                                                    variant?.variationValues
                                                 )
 
                                             return (
                                                 <Flex
-                                                    key={variant.productId}
+                                                    key={productId}
                                                     justifyContent="space-between"
                                                     marginBottom={index < itemsAdded - 1 ? 0 : 4}
                                                     paddingBottom={4}
