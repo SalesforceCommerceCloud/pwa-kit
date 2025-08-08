@@ -109,6 +109,7 @@ const Header = ({
     onMyAccountClick = noop,
     onLogoClick = noop,
     onMyCartClick = noop,
+    //@sfdc-extension-line SFDC_EXT_WISHLIST
     onWishlistClick = noop,
     onStoreLocatorClick = noop,
     ...props
@@ -168,10 +169,12 @@ const Header = ({
                 defaultMessage: 'Log out',
                 id: 'header.popover.action.log_out'
             }),
+            //@sfdc-extension-block-start SFDC_EXT_WISHLIST
             wishlist: formatMessage({
                 defaultMessage: 'Wishlist',
                 id: 'header.button.assistive_msg.wishlist'
             }),
+            //@sfdc-extension-block-end SFDC_EXT_WISHLIST
             storeLocator: formatMessage({
                 defaultMessage: 'Store Locator',
                 id: 'header.button.assistive_msg.store_locator'
@@ -319,6 +322,7 @@ const Header = ({
                             </Popover.Positioner>
                         </Popover.Root>
                     )}
+                    {/* @sfdc-extension-block-start SFDC_EXT_WISHLIST */}
                     <IconButtonWithRegistration
                         aria-label={headerMessages.wishlist}
                         variant="unstyled"
@@ -327,6 +331,7 @@ const Header = ({
                     >
                         <HeartIcon boxSize="6" />
                     </IconButtonWithRegistration>
+                    {/* @sfdc-extension-block-end SFDC_EXT_WISHLIST */}
                     {isStoreLocatorEnabled && (
                         <IconButton
                             aria-label={headerMessages.storeLocator}
@@ -367,6 +372,7 @@ Header.propTypes = {
     onMenuClick: PropTypes.func,
     onLogoClick: PropTypes.func,
     onMyAccountClick: PropTypes.func,
+    //@sfdc-extension-line SFDC_EXT_WISHLIST
     onWishlistClick: PropTypes.func,
     onMyCartClick: PropTypes.func,
     onStoreLocatorClick: PropTypes.func,
