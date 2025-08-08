@@ -21,11 +21,13 @@ export const navLinks = [
         path: '',
         icon: AccountIcon
     },
+    //@sfdc-extension-block-start SFDC_EXT_WISHLIST
     {
         name: 'wishlist',
         path: '/wishlist',
         icon: HeartIcon
     },
+    //@sfdc-extension-block-end SFDC_EXT_WISHLIST
     {
         name: 'orders',
         path: '/orders',
