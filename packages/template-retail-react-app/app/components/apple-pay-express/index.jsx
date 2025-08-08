@@ -443,7 +443,7 @@ export const getAppleButtonConfig = (
     return buttonConfig
 }
 
-export const ApplePayExpress = ({sku, quantity = 1, isPdpMode = false, basketData}) => {
+export const ApplePayExpress = ({sku, quantity = 1, isPdpMode = false, basketData, authToken: providedAuthToken}) => {
     const {locale, site} = useMultiSite()
     const navigate = useNavigation()
     
@@ -460,9 +460,17 @@ export const ApplePayExpress = ({sku, quantity = 1, isPdpMode = false, basketDat
     const paymentContainer = useRef(null)
     const prevDepsRef = useRef({})
 
-    // Use useAdyenExpressCheckout as the single source for auth token
-    const regularAdyenData = useAdyenExpressCheckout()
-    const authToken = regularAdyenData.authToken
+    // Get Adyen data from provider context (will be empty object if no provider)
+    let regularAdyenData = {}
+    try {
+        regularAdyenData = useAdyenExpressCheckout()
+    } catch (error) {
+        // If no provider context (PDP mode), use empty object
+        regularAdyenData = {}
+    }
+    
+    // Use provided auth token for PDP mode, or fallback to provider token for regular mode
+    const authToken = isPdpMode ? providedAuthToken : (regularAdyenData?.authToken || providedAuthToken)
 
     // For PDP mode, use standalone payment methods
     // For regular mode, use the standard Adyen hook data
@@ -688,5 +696,6 @@ ApplePayExpress.propTypes = {
     sku: PropTypes.string,
     quantity: PropTypes.number,
     isPdpMode: PropTypes.bool,
-    basketData: PropTypes.object
+    basketData: PropTypes.object,
+    authToken: PropTypes.string
 }

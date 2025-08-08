@@ -863,7 +863,8 @@ describe('ApplePayExpress PDP Mode', () => {
         const pdpProps = {
             sku: 'TEST-SKU-123',
             quantity: 1,
-            isPdpMode: true
+            isPdpMode: true,
+            authToken: 'test-token'
         }
 
         render(<ApplePayExpress {...pdpProps} />)
