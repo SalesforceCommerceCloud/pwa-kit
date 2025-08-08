@@ -127,6 +127,13 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
     // Only run post-auth recovery for OTP flows initiated from this Contact Info step
     const otpFromContactRef = useRef(false)
 
+    // Helper function to validate email format
+    const isValidEmail = (email) => {
+        const emailRegex =
+            /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/
+        return emailRegex.test(email)
+    }
+
     // Handle email field blur/focus events
     const handleEmailBlur = async (e) => {
         // Call original React Hook Form blur handler if it exists
@@ -157,6 +164,14 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
             await handleSendEmailOtp(email)
             setIsBlurChecking(false)
         }
+
+        if (!isValidEmail(email)) {
+            setEmailError('Please enter a valid email address.')
+            return
+        }
+
+        // Email is valid, proceed with OTP check
+        await handleSendEmailOtp(email)
     }
 
     const handleEmailFocus = (e) => {

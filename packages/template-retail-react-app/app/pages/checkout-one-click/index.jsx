@@ -136,26 +136,11 @@ const CheckoutOneClick = () => {
             }
         }
 
-        shopperPaymentInstrument = {
-            holder: formValue.holder,
-            number: formValue.number,
-            cardType: getPaymentInstrumentCardType(formValue.cardType),
-            expirationMonth: parseInt(expirationMonth),
-            expirationYear: parseInt(`20${expirationYear}`)
-        }
-
         return addPaymentInstrumentToBasket({
             parameters: {basketId: basket?.basketId},
             body: paymentInstrument
         })
     }
-
-    // Reset guest checkout flag when step changes (user goes back to edit)
-    useEffect(() => {
-        if (step === 0) {
-            setRegisteredUserChoseGuest(false)
-        }
-    }, [step])
 
     const onBillingSubmit = async () => {
         const isFormValid = await billingAddressForm.trigger()
@@ -407,11 +392,7 @@ const CheckoutOneClick = () => {
                                 </Alert>
                             )}
 
-                            <ContactInfo
-                                isSocialEnabled={isSocialEnabled}
-                                idps={idps}
-                                onRegisteredUserChoseGuest={setRegisteredUserChoseGuest}
-                            />
+                            <ContactInfo isSocialEnabled={isSocialEnabled} idps={idps} />
                             {isPickupOrder ? <PickupAddress /> : <ShippingAddress />}
                             {!isPickupOrder && <ShippingOptions />}
                             <Payment
