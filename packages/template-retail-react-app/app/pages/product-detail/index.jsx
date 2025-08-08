@@ -160,20 +160,19 @@ const ProductDetail = () => {
     const isProductASet = product?.type.set
     const isProductABundle = product?.type.bundle
 
-    let bundleChildProductIds = ''
-    if (isProductABundle)
-        bundleChildProductIds = Object.keys(childProductSelection)
-            ?.map(
-                (key) =>
-                    childProductSelection[key].variant?.productId ||
-                    childProductSelection[key].product?.id
-            )
-            .join(',')
+    const childVariantIds =
+        isProductABundle || isProductASet
+            ? Object.keys(childProductSelection)?.map(
+                  (key) =>
+                      childProductSelection[key].variant?.productId ||
+                      childProductSelection[key].product?.id
+              )
+            : []
 
-    const {data: bundleChildrenData} = useProducts(
+    const {data: variantProductData} = useProducts(
         {
             parameters: {
-                ids: bundleChildProductIds,
+                ids: childVariantIds.join(','),
                 allImages: false,
                 ...(selectedInventoryId ? {inventoryIds: selectedInventoryId} : {}),
                 expand: ['availability', 'variations'],
@@ -181,27 +180,65 @@ const ProductDetail = () => {
             }
         },
         {
-            enabled: bundleChildProductIds?.length > 0,
+            enabled: childVariantIds.length > 0,
             keepPreviousData: true
         }
     )
 
-    if (isProductABundle && bundleChildrenData) {
-        // Loop through the bundle children and update the inventory for variant selection
-        product.bundledProducts.forEach(({product: childProduct}, index) => {
-            const matchingChildProduct = bundleChildrenData.data.find(
-                (bundleChild) => bundleChild?.master?.masterId === childProduct.id
-            )
-            if (matchingChildProduct) {
-                product.bundledProducts[index].product = {
-                    ...childProduct,
-                    inventory: matchingChildProduct.inventory
-                }
-            }
-        })
-    }
-
     const comboProduct = isProductASet || isProductABundle ? normalizeSetBundleProduct(product) : {}
+    if (comboProduct.childProducts) {
+        if (variantProductData) {
+            // Loop through the bundle or set children and update the inventory for variant selection
+            comboProduct.childProducts.forEach(({product: childProduct}, index) => {
+                const matchingChildProduct = variantProductData.data.find(
+                    (variantChild) => variantChild?.master?.masterId === childProduct.id
+                )
+                if (matchingChildProduct) {
+                    comboProduct.childProducts[index].product = {
+                        ...childProduct,
+                        inventory: matchingChildProduct.inventory,
+                        inventories: matchingChildProduct.inventories
+                    }
+                }
+            })
+        }
+
+        if (isProductASet) {
+            // for product sets we use the lowest stock level product inventory as the inventory for the set
+            // we also need to update the inventory for the selected store
+            let lowestInventory
+            let missingInventory = false
+            let lowestStoreInventory
+            let missingStoreInventory = false
+            comboProduct.childProducts.forEach(({product: childProduct}) => {
+                if (!childProduct.inventory) {
+                    missingInventory = true
+                } else if (!(lowestInventory?.stockLevel < childProduct.inventory.stockLevel)) {
+                    lowestInventory = childProduct.inventory
+                    lowestInventory.lowestStockLevelProductName = childProduct.name
+                }
+
+                const selectedStoreInventory = childProduct.inventories?.find(
+                    (inventory) => inventory.id === selectedInventoryId
+                )
+                if (!selectedStoreInventory) {
+                    missingStoreInventory = true
+                } else if (
+                    !(lowestStoreInventory?.stockLevel < selectedStoreInventory.stockLevel)
+                ) {
+                    lowestStoreInventory = selectedStoreInventory
+                    lowestStoreInventory.lowestStockLevelProductName = childProduct.name
+                }
+            })
+
+            if (!missingInventory && lowestInventory) {
+                product.inventory = lowestInventory
+            }
+            if (!missingStoreInventory && lowestStoreInventory) {
+                product.inventories = [lowestStoreInventory]
+            }
+        }
+    }
 
     /**************** Error Handling ****************/
 
@@ -769,16 +806,24 @@ const ProductDetail = () => {
                                                 setChildProductOrderability={
                                                     setChildProductOrderability
                                                 }
-                                                pickupInStore={!!pickupInStoreMap[childProduct?.id]}
+                                                pickupInStore={
+                                                    !!pickupInStoreMap[
+                                                        childProductSelection[childProduct?.id]
+                                                            ?.variant?.productId
+                                                    ]
+                                                }
                                                 setPickupInStore={(checked) =>
                                                     childProduct &&
                                                     handlePickupInStoreChange(
-                                                        childProduct.id,
+                                                        childProductSelection[childProduct?.id]
+                                                            ?.variant?.productId,
                                                         checked
                                                     )
                                                 }
                                                 onOpenStoreLocator={onOpenStoreLocator}
-                                                showDeliveryOptions={STORE_LOCATOR_IS_ENABLED}
+                                                showDeliveryOptions={
+                                                    STORE_LOCATOR_IS_ENABLED && !isProductABundle
+                                                }
                                             />
                                             <InformationAccordion product={childProduct} />
 
@@ -817,8 +862,7 @@ const ProductDetail = () => {
                         </Island>
                     </Fragment>
                 )}
-
-                {/* Product Recommendations */}
+                {/*                 Product Recommendations
                 <Stack spacing={16}>
                     {!isProductASet && (
                         <Island hydrateOn={'visible'}>
@@ -867,6 +911,7 @@ const ProductDetail = () => {
                         />
                     </Island>
                 </Stack>
+ */}{' '}
             </Stack>
         </Box>
     )
