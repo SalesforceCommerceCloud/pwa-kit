@@ -326,7 +326,7 @@ const PRESETS = [
         description: '',
         templateSource: {
             type: TEMPLATE_SOURCE_BUNDLE,
-            id: 'typescript-minimal'
+            id: 'chakra-storefront'
         },
         answers: {
             'project.hybrid': false,
