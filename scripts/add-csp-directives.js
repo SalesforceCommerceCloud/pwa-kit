@@ -16,7 +16,6 @@
 
 const fs = require('fs')
 const path = require('path')
-const {execSync} = require('child_process')
 
 // Default path to the config default.js file
 const DEFAULT_CONFIG_FILE_PATH = path.join(
@@ -200,29 +199,6 @@ function updateConfigFile(config, configFilePath = DEFAULT_CONFIG_FILE_PATH) {
 }
 
 /**
- * Run lint fix on the config file to ensure proper formatting
- */
-function runLintFix(configFilePath) {
-    try {
-        const configDir = path.dirname(configFilePath)
-        console.log('🔧 Running lint fix to ensure proper formatting...')
-
-        // Try to run lint fix from the config file's directory
-        execSync('npm run lint:fix', {
-            cwd: configDir,
-            stdio: 'pipe'
-        })
-
-        console.log('✅ Lint fix completed successfully')
-    } catch (error) {
-        console.error(
-            '⚠️  Could not run lint fix automatically. Please run `npm run lint:fix` manually to fix any formatting issues.',
-            error
-        )
-    }
-}
-
-/**
  * Main function
  */
 async function main() {
@@ -307,7 +283,6 @@ Config JSON Format (simplified - just arrays of strings):
         const mergedConfig = addCSPDirectives(currentConfig, newConfig)
 
         updateConfigFile(mergedConfig, configFilePath)
-        runLintFix(configFilePath)
         console.log(`✅ Added CSP directives successfully`)
     } catch (error) {
         console.error('❌ Error:', error.message)
@@ -328,7 +303,6 @@ module.exports = {
     addCSPDirectives,
     generateCSPDirectives,
     updateConfigFile,
-    runLintFix,
     getConfigFilePath,
     parseInputFile,
     parseInputFromStdin

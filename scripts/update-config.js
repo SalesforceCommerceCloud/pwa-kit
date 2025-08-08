@@ -16,7 +16,6 @@
 
 const fs = require('fs')
 const path = require('path')
-const {execSync} = require('child_process')
 
 // Default path to the config default.js file
 const DEFAULT_CONFIG_FILE_PATH = path.join(
@@ -85,6 +84,13 @@ function parseValue(valueString) {
 }
 
 /**
+ * Escape a string for safe usage inside a RegExp pattern
+ */
+function escapeForRegExp(input) {
+    return input.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+}
+
+/**
  * Convert value to JavaScript code representation
  */
 function valueToCode(value) {
@@ -116,56 +122,24 @@ function updateConfigProperty(configFilePath, propertyPath, newValue) {
     const content = fs.readFileSync(configFilePath, 'utf8')
     const pathParts = propertyPath.split('.')
 
-    let indentLevel = 1
+    // Compute expected indentation for the final property line based on nesting depth
+    const finalPropertyName = pathParts[pathParts.length - 1]
+    const indent = '    '.repeat(pathParts.length)
 
-    // TODO: is it possible to convert to array iteration? If there's a clearer, more functional way of doing it, please do that.
-    for (let i = 0; i < pathParts.length; i++) {
-        const part = pathParts[i]
-        const isLast = i === pathParts.length - 1
+    // Build a regex that matches the final property at the expected indentation
+    const propertyPattern = new RegExp(
+        `(${escapeForRegExp(indent)}${escapeForRegExp(finalPropertyName)}\\s*:\\s*)([^,\\n}]+)(,?)`,
+        'g'
+    )
 
-        if (isLast) {
-            // Match the final property and its value
-            const indent = '    '.repeat(indentLevel)
-            const propertyPattern = new RegExp(`(${indent}${part}\\s*:\\s*)([^,\\n}]+)(,?)`, 'g')
+    const replacement = `$1${valueToCode(newValue)}$3`
+    const newContent = content.replace(propertyPattern, replacement)
 
-            const replacement = `$1${valueToCode(newValue)}$3`
-            const newContent = content.replace(propertyPattern, replacement)
-
-            if (newContent === content) {
-                throw new Error(`Property '${propertyPath}' not found in config file`)
-            }
-
-            return newContent
-        } else {
-            // This is an intermediate object property
-            indentLevel++
-        }
+    if (newContent === content) {
+        throw new Error(`Property '${propertyPath}' not found in config file`)
     }
 
-    return content
-}
-
-/**
- * Run lint fix on the config file to ensure proper formatting
- */
-function runLintFix(configFilePath) {
-    try {
-        const configDir = path.dirname(configFilePath)
-        console.log('🔧 Running lint fix to ensure proper formatting...')
-
-        // Try to run lint fix from the config file's directory
-        // TODO: run lint fix for the config file only <- also make the change in the other similar script scripts/add-csp-directives.js
-        execSync('npm run lint:fix', {
-            cwd: configDir,
-            stdio: 'pipe'
-        })
-
-        console.log('✅ Lint fix completed successfully')
-    } catch (error) {
-        console.error(
-            '⚠️  Could not run lint fix automatically. Please run `npm run lint:fix` manually to fix any formatting issues.'
-        )
-    }
+    return newContent
 }
 
 /**
@@ -179,7 +153,6 @@ function main() {
 
     // Show help if insufficient arguments
     if (filteredArgs.length < 2) {
-        // TODO: does it matter if user passes in a string with a single vs double quotes?
         console.log(`
 Usage:
   node scripts/update-config.js <property-path> <value> [--config-path <path>]
@@ -210,7 +183,7 @@ Examples:
 Supported Value Types:
   - Booleans: true, false
   - Numbers: 42, 3.14
-  - Strings: "hello" or hello (quotes optional for simple strings)
+  - Strings: hello, 'hello', or "hello" (quotes optional; both single and double quotes are supported)
   - Arrays: ["item1", "item2"] (JSON format)
   - Objects: {"key": "value"} (JSON format)
   - Null: null
@@ -238,9 +211,6 @@ Supported Value Types:
         fs.writeFileSync(configFilePath, updatedContent, 'utf8')
 
         console.log(`✅ Successfully updated ${propertyPath} in ${configFilePath}`)
-
-        // Run lint fix
-        runLintFix(configFilePath)
     } catch (error) {
         console.error('❌ Error:', error.message)
         process.exit(1)
@@ -256,6 +226,5 @@ module.exports = {
     updateConfigProperty,
     parseValue,
     valueToCode,
-    getConfigFilePath,
-    runLintFix
+    getConfigFilePath
 }
