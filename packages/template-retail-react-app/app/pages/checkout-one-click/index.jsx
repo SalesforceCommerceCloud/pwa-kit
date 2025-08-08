@@ -319,8 +319,7 @@ const CheckoutOneClick = () => {
                     <Button
                         w="full"
                         onClick={onPlaceOrder}
-                        i
-                        sLoading={isLoading}
+                        isLoading={isLoading}
                         data-testid="place-order-button"
                     >
                         <FormattedMessage
