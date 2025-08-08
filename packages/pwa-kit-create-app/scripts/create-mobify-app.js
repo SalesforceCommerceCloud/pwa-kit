@@ -667,7 +667,7 @@ const expandKey = (key, value) =>
  * const expandedObj = expand({'coolthings.babynames': 'Preseley', 'coolthings.cars': 'bmws'})
  * console.log(expandedObj) // {coolthings: { babynames: 'Presley', cars: 'bmws'}}
  *
- * @param {Object} answers
+ * @param {Object} answer
  * @returns {Object} The expanded object.
  *
  */
@@ -772,7 +772,6 @@ const runGenerator = (
     // downloading from NPM or copying from the template bundle folder.
     const tmp = fs.mkdtempSync(p.resolve(os.tmpdir(), 'extract-template'))
     const packagePath = p.join(tmp, 'package')
-    console.log('packagePath', packagePath)
     const {id, type} = templateSource
     let tarPath
 
