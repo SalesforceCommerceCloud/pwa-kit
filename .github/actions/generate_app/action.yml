@@ -22,6 +22,11 @@ inputs:
   project_dir:
     description: Project Directory
 
+outputs:
+  project_path:
+    description: Full path to the generated project directory
+    value: ${{ steps.set_project_path.outputs.project_path }}
+
 runs:
   using: composite
   steps:
@@ -109,3 +114,11 @@ runs:
         cat /tmp/generator-responses.json
         node e2e/scripts/generate-project.js --project-config "$(jq -c . /tmp/generator-responses.json)"
       shell: bash
+
+    - name: Set project path output
+      id: set_project_path
+      shell: bash
+      run: |
+        GENERATED_PROJECTS_DIR=$(node -e "console.log(require('./e2e/config.js').GENERATED_PROJECTS_DIR)")
+        PROJECT_PATH="${GENERATED_PROJECTS_DIR}/${{ inputs.project_dir }}"
+        echo "project_path=$PROJECT_PATH" >> $GITHUB_OUTPUT

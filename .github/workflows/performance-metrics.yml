@@ -38,6 +38,7 @@ jobs:
             #       TEMPLATE_VERSION: ${{ env.retail_app_template_version }}
 
             - name: Generate Retail App Private Client
+              id: generate_app
               uses: ./.github/actions/generate_app
               with:
                   use_extensibility: false
@@ -50,6 +51,18 @@ jobs:
                   client_id: '9629ef22-f8b8-4987-90ac-b815be3940c8'
                   site_id: 'SiteNemesis'
                   instance_url: 'https://zzrf-001.dx.commercecloud.salesforce.com' # this doesn't matter because the OCAPI proxy in Runtime Admin will take precedence
+
+            - name: Customize Generated Project CSP Directives
+              run: |-
+                  CSP_DIRECTIVES='{
+                    "img-src": ["*.sfcc-store-internal.net"],
+                    "script-src": ["*.sfcc-store-internal.net"],
+                    "connect-src": ["*.sfcc-store-internal.net"]
+                  }'
+                  echo "$CSP_DIRECTIVES" | node scripts/add-csp-directives.js --config-path "${{ steps.generate_app.outputs.project_path }}/config/default.js"
+
+
+
 
             # TODO: is this step still needed? I think it expects a project key
             # - name: Validate Generated Retail App Private Client
@@ -68,7 +81,7 @@ jobs:
             - name: Push Bundle to MRT
               uses: './.github/actions/push_to_mrt'
               with:
-                  CWD: '../generated-projects/retail-app-private-client'
+                  CWD: '${{ steps.generate_app.outputs.project_path }}'
                   TARGET: e2e-pwa-kit-private
                   FLAGS: --wait
 
