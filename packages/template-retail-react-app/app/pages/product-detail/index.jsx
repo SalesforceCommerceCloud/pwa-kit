@@ -780,7 +780,6 @@ const ProductDetail = () => {
 
                         <hr />
 
-                        {/* TODO: consider `childProduct.belongsToSet` */}
                         {
                             // Render the child products
                             comboProduct.childProducts?.map(
@@ -900,7 +899,7 @@ const ProductDetail = () => {
                         </Island>
                     </Fragment>
                 )}
-                {/*                 Product Recommendations
+                {/* Product Recommendations */}
                 <Stack spacing={16}>
                     {!isProductASet && (
                         <Island hydrateOn={'visible'}>
@@ -949,7 +948,6 @@ const ProductDetail = () => {
                         />
                     </Island>
                 </Stack>
- */}{' '}
             </Stack>
         </Box>
     )
