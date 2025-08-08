@@ -919,7 +919,6 @@ const main = async (opts) => {
         context = merge(context, {
             answers: expandObject(answers)
         })
-        console.log('context', JSON.stringify(context, null, 2))
     }
     // load plugin selected answer from context object to selectedPlugins (which used for code trimming process)
     Object.entries(context.answers?.project?.selectedPlugins).forEach(([pluginKey, enabled]) => {
@@ -927,6 +926,7 @@ const main = async (opts) => {
             selectedPlugins[pluginKey] = enabled
         }
     })
+    console.log('context', JSON.stringify(context, null, 2))
 
     if (!OUTPUT_DIR_FLAG_ACTIVE) {
         // For extension projects, use the extension name as the output directory
