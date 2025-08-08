@@ -17,7 +17,7 @@ module.exports = {
         },
         login: {
             passwordless: {
-                enabled: false,
+                enabled: true,
                 callbackURI:
                     process.env.PASSWORDLESS_LOGIN_CALLBACK_URI || '/passwordless-login-callback',
                 landingPath: '/passwordless-login-landing'
@@ -41,9 +41,9 @@ module.exports = {
         commerceAPI: {
             proxyPath: `/mobify/proxy/api`,
             parameters: {
-                clientId: 'c9c45bfd-0ed3-4aa2-9971-40f88962b836',
-                organizationId: 'f_ecom_zzrf_001',
-                shortCode: '8o7m175y',
+                clientId: '6b996c35-61bd-4268-abde-4edc86159563',
+                organizationId: 'f_ecom_bhbg_stg',
+                shortCode: 'sandbox-001',
                 siteId: 'RefArchGlobal'
             }
         },
@@ -57,6 +57,12 @@ module.exports = {
         dataCloudAPI: {
             appSourceId: 'f22ae831-ac03-4bf6-afc1-3a0b19f1ea8e',
             tenantId: 'mmydmztgh04dczjzmnsw0zd0g8.pc-rnd'
+<<<<<<< Updated upstream
+=======
+        },
+        oneClickCheckout: {
+            enabled: true
+>>>>>>> Stashed changes
         }
     },
     externals: [],
@@ -74,11 +80,11 @@ module.exports = {
         ssrFunctionNodeVersion: '22.x',
         proxyConfigs: [
             {
-                host: 'kv7kzm78.api.commercecloud.salesforce.com',
+                host: 'sandbox-001.api.commercecloud.salesforce.com',
                 path: 'api'
             },
             {
-                host: 'zzrf-001.dx.commercecloud.salesforce.com',
+                host: 'bhbg-stg.dx.commercecloud.salesforce.com',
                 path: 'ocapi'
             }
         ]

@@ -78,10 +78,10 @@ module.exports = {
         commerceAPI: {
             proxyPath: `/mobify/proxy/api`,
             parameters: {
-                clientId: 'c9c45bfd-0ed3-4aa2-9971-40f88962b836',
-                organizationId: 'f_ecom_zzrf_001',
-                shortCode: '11111111',
-                siteId: 'site-1'
+                clientId: '6b996c35-61bd-4268-abde-4edc86159563',
+                organizationId: 'f_ecom_bhbg_stg',
+                shortCode: 'sandbox-001',
+                siteId: 'RefArchGlobal'
             }
         },
         einsteinAPI: {

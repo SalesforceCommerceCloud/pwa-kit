@@ -59,7 +59,7 @@
     "@types/react-dom": "~18.2.1",
     "@types/react-helmet": "~6.1.6",
     "@types/react-router-dom": "~5.3.3",
-    "cross-env": "^5.2.1",
+    "cross-env": "^10.0.0",
     "internal-lib-build": "3.11.0-dev.0",
     "jsonwebtoken": "^9.0.0",
     "nock": "^13.3.0",

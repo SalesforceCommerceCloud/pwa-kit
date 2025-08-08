@@ -23,8 +23,8 @@
     "check-dep-version": "syncpack list-mismatches --types prod,dev"
   },
   "devDependencies": {
-    "@playwright/test": "^1.49.0",
     "@axe-core/playwright": "^4.10.1",
+    "@playwright/test": "^1.49.0",
     "commander": "^9.5.0",
     "eslint-plugin-header": "^3.1.1",
     "eslint-plugin-no-relative-import-paths": "^1.5.3",
@@ -39,6 +39,7 @@
     "npm": "^8.0.0 || ^9.0.0 || ^10.0.0 || ^11.0.0"
   },
   "dependencies": {
+    "cross-env": "^10.0.0",
     "node-fetch": "^2.6.9"
   }
 }
