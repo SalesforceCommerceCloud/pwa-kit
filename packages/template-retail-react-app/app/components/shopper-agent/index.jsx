@@ -119,7 +119,8 @@ const ShopperAgentWindow = ({commerceAgentConfiguration, locale, basketId, refre
                 Locale: locale,
                 OrganizationId: commerceOrgId,
                 UsId: usid,
-                IsCartMgmtSupported: 'true'
+                IsCartMgmtSupported: 'true',
+                RefreshToken: refreshToken
             })
         }
 
@@ -147,13 +148,14 @@ const ShopperAgentWindow = ({commerceAgentConfiguration, locale, basketId, refre
                 handleEmbeddedMessagingWindowMaximized
             )
         }
-    }, [commerceAgentConfiguration, usid, theme.zIndices.sticky])
+    }, [commerceAgentConfiguration, usid, theme.zIndices.sticky, refreshToken])
 
     // whenever the basketId changes, update the hidden prechat fields
     useEffect(() => {
         const handleEmbeddedMessagingButtonClicked = () => {
             window.embeddedservice_bootstrap.prechatAPI.setHiddenPrechatFields({
-                BasketId: basketId
+                BasketId: basketId,
+                RefreshToken: refreshToken
             })
         }
 
@@ -169,7 +171,7 @@ const ShopperAgentWindow = ({commerceAgentConfiguration, locale, basketId, refre
                 handleEmbeddedMessagingButtonClicked
             )
         }
-    }, [basketId])
+    }, [basketId, refreshToken])
 
     // Load the embedded messaging script
     const scriptLoadStatus = useScript(scriptSourceUrl)
