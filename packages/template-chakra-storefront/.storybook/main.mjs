@@ -18,9 +18,18 @@ const config = {
     autodocs: 'tag',
   },
   viteFinal: async (config) => {
-    // Add any custom Vite configuration here
+    // Only add minimal necessary configuration
+    config.define = {
+      ...config.define,
+      'process.env': {}
+    };
+    
     return config;
+  },
+  typescript: {
+    check: false,
+    reactDocgen: false,
   },
 };
 
-module.exports = config;
+export default config;
