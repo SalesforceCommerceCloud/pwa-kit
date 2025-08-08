@@ -772,6 +772,7 @@ const runGenerator = (
     // downloading from NPM or copying from the template bundle folder.
     const tmp = fs.mkdtempSync(p.resolve(os.tmpdir(), 'extract-template'))
     const packagePath = p.join(tmp, 'package')
+    console.log('packagePath', packagePath)
     const {id, type} = templateSource
     let tarPath
 
@@ -891,8 +892,8 @@ const main = async (opts) => {
     if (interactive) {
         const questions = getQuestions ? getQuestions() : []
         const projectAnswers = await prompt(questions, answers)
+        // Only prompt for plugin selection on interactive presets
         if (Object.keys(pluginConfig?.plugins || {}).length > 0) {
-            // Only prompt for plugin selection on interactive presets
             const pluginChoices = Object.entries(pluginConfig.plugins).map(([key, config]) => ({
                 name: config.description,
                 value: key
@@ -921,42 +922,12 @@ const main = async (opts) => {
         })
         console.log('context', JSON.stringify(context, null, 2))
     }
-    // load answer from context in preset object if available
+    // load plugin selected answer from context object to selectedPlugins (which used for code trimming process)
     Object.entries(context.answers.project.selectedPlugins).forEach(([pluginKey, enabled]) => {
         if (pluginConfig?.plugins?.[pluginKey]) {
             selectedPlugins[pluginKey] = enabled
         }
     })
-
-    //
-    // // otherwise, prompt users to select extensions only for interactive presets
-    // if (context.answers.project?.selectedPlugins) {
-    //     Object.entries(context.answers.project.selectedPlugins).forEach(([pluginKey, enabled]) => {
-    //         if (pluginConfig?.plugins?.[pluginKey]) {
-    //             selectedPlugins[pluginKey] = enabled
-    //         }
-    //     })
-    // } else if (Object.keys(pluginConfig?.plugins || {}).length > 0) {
-    //     // Only prompt for plugin selection on interactive presets
-    //     const pluginChoices = Object.entries(pluginConfig.plugins).map(([key, config]) => ({
-    //         name: config.description,
-    //         value: key
-    //     }))
-    //
-    //     const pluginAnswers = await inquirer.prompt([
-    //         {
-    //             type: 'checkbox',
-    //             name: 'selectedPlugins',
-    //             message: 'Which extensions would you like to enable?',
-    //             choices: pluginChoices
-    //         }
-    //     ])
-    //
-    //     // Convert selected plugins array to object with true values
-    //     pluginAnswers.selectedPlugins.forEach((plugin) => {
-    //         selectedPlugins[plugin] = true
-    //     })
-    // }
 
     if (!OUTPUT_DIR_FLAG_ACTIVE) {
         // For extension projects, use the extension name as the output directory
