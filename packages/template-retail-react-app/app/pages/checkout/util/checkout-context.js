@@ -17,6 +17,13 @@ export const CheckoutProvider = ({children}) => {
     const {data: basket} = useCurrentBasket()
     const einstein = useEinstein()
     const [step, setStep] = useState()
+    const [googleMapsLoaded, setGoogleMapsLoaded] = useState(false)
+
+    useEffect(() => {
+        globalThis.onGoogleMapsLoaded = () => {
+            setGoogleMapsLoaded(true)
+        }
+    }, [])
 
     const CHECKOUT_STEPS_LIST = [
         'CONTACT_INFO',
@@ -75,7 +82,8 @@ export const CheckoutProvider = ({children}) => {
         step,
         STEPS,
         goToNextStep: () => setStep(step + 1),
-        goToStep: (step) => setStep(step)
+        goToStep: (step) => setStep(step),
+        googleMapsLoaded
     }
 
     return <CheckoutContext.Provider value={value}>{children}</CheckoutContext.Provider>

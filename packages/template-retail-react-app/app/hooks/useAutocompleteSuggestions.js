@@ -5,10 +5,11 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import {useState, useRef, useCallback, useEffect} from 'react'
-import {useMapsLibrary} from '@vis.gl/react-google-maps'
+import {useState, useRef, useCallback, useEffect, useContext} from 'react'
+import {useMapsLibrary } from '@vis.gl/react-google-maps'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import {convertGoogleMapsSuggestions} from '../utils/address-suggestions'
+import {useCheckout} from '../pages/checkout/util/checkout-context'
 
 const DEBOUNCE_DELAY = 300
 
@@ -24,9 +25,7 @@ export const useAutocompleteSuggestions = (
     countryCode = '',
     requestOptions = {}
 ) => {
-    const places = useMapsLibrary('places')
-    const {googleCloudAPI = {}} = getConfig().app || {}
-    const apiKey = googleCloudAPI.apiKey
+    const {googleMapsLoaded} = useCheckout()
 
     // stores the current sessionToken - REUSED across multiple calls
     const sessionTokenRef = useRef(null)
@@ -43,7 +42,7 @@ export const useAutocompleteSuggestions = (
     // Fetch suggestions from Google Maps API
     const fetchSuggestions = useCallback(
         async (input) => {
-            if (!places || !apiKey || !input || input.length < 3) {
+            if (!googleMapsLoaded || !input || input.length < 3) {
                 setSuggestions([])
                 return
             }
@@ -51,7 +50,7 @@ export const useAutocompleteSuggestions = (
             setIsLoading(true)
 
             try {
-                const {AutocompleteSessionToken, AutocompleteSuggestion} = places
+                const {AutocompleteSessionToken, AutocompleteSuggestion} = google.maps.places
 
                 // Create a new session token if one doesn't exist - REUSE SESSION
                 if (!sessionTokenRef.current) {
@@ -84,7 +83,7 @@ export const useAutocompleteSuggestions = (
                 setIsLoading(false)
             }
         },
-        [places, apiKey, countryCode]
+        [googleMapsLoaded, countryCode]
     )
 
     // Reset session and clear suggestions

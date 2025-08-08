@@ -38,7 +38,7 @@ import {
 import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
 import LoadingSpinner from '@salesforce/retail-react-app/app/components/loading-spinner'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
-import {APIProvider} from '@vis.gl/react-google-maps'
+import {Helmet} from 'react-helmet'
 
 const Checkout = () => {
     const {formatMessage} = useIntl()
@@ -217,17 +217,22 @@ const CheckoutContainer = () => {
     }
 
     return (
-        <APIProvider apiKey={googleCloudAPI.apiKey}>
-            <CheckoutProvider>
-                {isDeletingUnavailableItem && <LoadingSpinner wrapperStyles={{height: '100vh'}} />}
+        <CheckoutProvider>
+            <Helmet>
+                <script
+                    src="/mobify/proxy/ocapi/s/RefArch/dw/shop/v99_9/autocomplete/sdk.js?client_id=cd669706-3638-4dd1-a8b2-310ab900ca53"
+                    id="google-maps-js"
+                    type="text/javascript">
+                    </script>
+            </Helmet>
+            {isDeletingUnavailableItem && <LoadingSpinner wrapperStyles={{height: '100vh'}} />}
 
-                <Checkout />
-                <UnavailableProductConfirmationModal
-                    productItems={basket?.productItems}
-                    handleUnavailableProducts={handleUnavailableProducts}
-                />
-            </CheckoutProvider>
-        </APIProvider>
+            <Checkout />
+            <UnavailableProductConfirmationModal
+                productItems={basket?.productItems}
+                handleUnavailableProducts={handleUnavailableProducts}
+            />
+        </CheckoutProvider>
     )
 }
 
