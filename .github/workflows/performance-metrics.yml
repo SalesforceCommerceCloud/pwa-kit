@@ -25,19 +25,7 @@ jobs:
               run: |-
                   npm ci
 
-            - name: Get Template Version
-              run: |-
-                  version=`jq -r ".version" packages/template-retail-react-app/package.json`
-                  echo "retail_app_template_version=$version" >> "$GITHUB_ENV"
-
-            # TODO: use the other generate_app action that has more flexibility
-            # - name: Generate Retail App Private Client
-            #   uses: ./.github/actions/e2e_generate_app
-            #   with:
-            #       PROJECT_KEY: 'retail-app-private-client'
-            #       TEMPLATE_VERSION: ${{ env.retail_app_template_version }}
-
-            - name: Generate Retail App Private Client
+            - name: Generate Project
               id: generate_app
               uses: ./.github/actions/generate_app
               with:
@@ -52,7 +40,7 @@ jobs:
                   site_id: 'SiteNemesis'
                   instance_url: 'https://zzrf-001.dx.commercecloud.salesforce.com' # this doesn't matter because the OCAPI proxy in Runtime Admin will take precedence
 
-            - name: Customize Generated Project CSP Directives
+            - name: Add CSP Directives
               run: |-
                   CSP_DIRECTIVES='{
                     "img-src": ["*.sfcc-store-internal.net"],
@@ -61,54 +49,20 @@ jobs:
                   }'
                   echo "$CSP_DIRECTIVES" | node scripts/add-csp-directives.js --config-path "${{ steps.generate_app.outputs.project_path }}/config/default.js"
 
-
-
-
-            # TODO: is this step still needed? I think it expects a project key
-            # - name: Validate Generated Retail App Private Client
-            #   uses: ./.github/actions/e2e_validate_generated_app
-            #   with:
-            #       PROJECT_KEY: 'retail-app-private-client'
-            #       TEMPLATE_VERSION: ${{ env.retail_app_template_version }}
+            - name: Enable Partial Hydration
+              run: |-
+                  node scripts/update-config.js app.partialHydrationEnabled true --config-path "${{ steps.generate_app.outputs.project_path }}/config/default.js"
 
             - name: Create MRT credentials file
               uses: './.github/actions/create_mrt'
               with:
-                  mobify_user: ${{ secrets.MOBIFY_CLIENT_USER }}
-                  mobify_api_key: ${{ secrets.MOBIFY_CLIENT_API_KEY }}
+                  mobify_user: ${{ secrets.MOBIFY_STG_CLIENT_USER }}
+                  mobify_api_key: ${{ secrets.MOBIFY_STG_CLIENT_API_KEY }}
 
-            # TODO: how did Rob run his push command?
             - name: Push Bundle to MRT
               uses: './.github/actions/push_to_mrt'
               with:
                   CWD: '${{ steps.generate_app.outputs.project_path }}'
-                  TARGET: e2e-pwa-kit-private
-                  FLAGS: --wait
-
-            # TODO: Remove this if not needed or change this to whatever storefront is used for performance metrics.
-            # - name: Set Retail App Private Client Home
-            #   run: export RETAIL_APP_HOME=https://scaffold-pwa-e2e-pwa-kit-private.mobify-storefront.com/
-
-            # TODO: This step is not needed. We don't need to worry about calling it from the workflow. What we need to worry about is the build and deploy to MRT.
-            # - name: Run Performance Metrics
-            #   run: npm run test:performance-metrics # TODO: Replace with whatever command is used for performance metrics.
-
-    # Optionally send Slack notifications for performance metrics.
-    # notify-slack-performance-metrics:
-    #     needs: [run-performance-metrics] # Makes sure the performance metrics job has completed before running this job.
-    #     if: ${{ always() }} # Runs this job even if the performance metrics job fails.
-    #     runs-on: ubuntu-latest
-    #     steps:
-    #         - name: Send GitHub Action data to Slack workflow (Generated)
-    #           id: slack-success
-    #           if: ${{ github.event_name == 'schedule' && needs.run-performance-metrics.result == 'success' }}
-    #           uses: slackapi/slack-github-action@v1.23.0
-    #           with:
-    #               payload: |
-    #                   {
-    #                       "message": "✅ All PWA Kit Private Client Performance Metrics tests passed!"
-    #                   }
-    #           env:
-    #               # TODO: Create a new slack webhook from the performance metrics slack channel.
-    #               # Add the webhook url to the repository secrets with as SLACK_PERFORMANCE_METRICS_WEBHOOK_URL key.
-    #               SLACK_WEBHOOK_URL: ${{ secrets.SLACK_PERFORMANCE_METRICS_WEBHOOK_URL }}
+                  PROJECT: q4-pwa-perf-develop
+                  TARGET: production
+                  FLAGS: --wait --cloud-origin https://cloud-testing.mobify-staging.com
