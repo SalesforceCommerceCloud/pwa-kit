@@ -460,16 +460,10 @@ export const ApplePayExpress = ({sku, quantity = 1, isPdpMode = false, basketDat
     const paymentContainer = useRef(null)
     const prevDepsRef = useRef({})
 
-    // Get Adyen data from provider context (will be empty object if no provider)
-    let regularAdyenData = {}
-    try {
-        regularAdyenData = useAdyenExpressCheckout()
-    } catch (error) {
-        // If no provider context (PDP mode), use empty object
-        regularAdyenData = {}
-    }
+    // In PDP mode, we simply ignore the data since we don't have a provider
+    const regularAdyenData = useAdyenExpressCheckout()
     
-    // Use provided auth token for PDP mode, or fallback to provider token for regular mode
+    // Use provided auth token for PDP mode, or provider token for regular mode
     const authToken = isPdpMode ? providedAuthToken : (regularAdyenData?.authToken || providedAuthToken)
 
     // For PDP mode, use standalone payment methods
