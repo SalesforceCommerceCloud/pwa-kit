@@ -891,27 +891,8 @@ const main = async (opts) => {
     if (interactive) {
         const questions = getQuestions ? getQuestions() : []
         const projectAnswers = await prompt(questions, answers)
-        context = merge(context, {
-            answers: expandObject(projectAnswers)
-        })
-    } else {
-        context = merge(context, {
-            answers: expandObject(answers)
-        })
-    }
-
-    // load answer from context in preset object if available
-    // otherwise, prompt users to select extensions
-    if (context.answers.project?.selectedPlugins) {
-        Object.entries(context.answers.project.selectedPlugins).forEach(([pluginKey, enabled]) => {
-            if (pluginConfig?.plugins?.[pluginKey]) {
-                selectedPlugins[pluginKey] = enabled
-            }
-        })
-        console.log('selectedPlugins', selectedPlugins)
-    } else {
-        // Prompt user for plugin selection
         if (Object.keys(pluginConfig?.plugins || {}).length > 0) {
+            // Only prompt for plugin selection on interactive presets
             const pluginChoices = Object.entries(pluginConfig.plugins).map(([key, config]) => ({
                 name: config.description,
                 value: key
@@ -931,7 +912,45 @@ const main = async (opts) => {
                 selectedPlugins[plugin] = true
             })
         }
+        context = merge(context, {
+            answers: expandObject(projectAnswers)
+        })
+    } else {
+        context = merge(context, {
+            answers: expandObject(answers)
+        })
     }
+    console.log('context', context)
+
+    // // load answer from context in preset object if available
+    // // otherwise, prompt users to select extensions only for interactive presets
+    // if (context.answers.project?.selectedPlugins) {
+    //     Object.entries(context.answers.project.selectedPlugins).forEach(([pluginKey, enabled]) => {
+    //         if (pluginConfig?.plugins?.[pluginKey]) {
+    //             selectedPlugins[pluginKey] = enabled
+    //         }
+    //     })
+    // } else if (Object.keys(pluginConfig?.plugins || {}).length > 0) {
+    //     // Only prompt for plugin selection on interactive presets
+    //     const pluginChoices = Object.entries(pluginConfig.plugins).map(([key, config]) => ({
+    //         name: config.description,
+    //         value: key
+    //     }))
+    //
+    //     const pluginAnswers = await inquirer.prompt([
+    //         {
+    //             type: 'checkbox',
+    //             name: 'selectedPlugins',
+    //             message: 'Which extensions would you like to enable?',
+    //             choices: pluginChoices
+    //         }
+    //     ])
+    //
+    //     // Convert selected plugins array to object with true values
+    //     pluginAnswers.selectedPlugins.forEach((plugin) => {
+    //         selectedPlugins[plugin] = true
+    //     })
+    // }
 
     if (!OUTPUT_DIR_FLAG_ACTIVE) {
         // For extension projects, use the extension name as the output directory
