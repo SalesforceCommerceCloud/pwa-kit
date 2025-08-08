@@ -211,6 +211,8 @@ describe('ShopperAgent Component', () => {
     })
 
     test('should set prechat fields correctly on different events', async () => {
+        const refreshToken = 'test-refresh-token-123'
+        mockedUseRefreshToken.mockReturnValue(refreshToken)
         useScript.mockReturnValue({loaded: true, error: false})
         render(<ShopperAgent {...defaultProps} />)
 
@@ -224,7 +226,8 @@ describe('ShopperAgent Component', () => {
             Locale: defaultProps.locale,
             OrganizationId: commerceAgentSettings.commerceOrgId,
             UsId: 'test-usid',
-            IsCartMgmtSupported: 'true'
+            IsCartMgmtSupported: 'true',
+            RefreshToken: refreshToken
         })
 
         // Reset mock to test button click event
@@ -236,7 +239,8 @@ describe('ShopperAgent Component', () => {
         })
 
         expect(mockEmbeddedService.prechatAPI.setHiddenPrechatFields).toHaveBeenCalledWith({
-            BasketId: defaultProps.basketId
+            BasketId: defaultProps.basketId,
+            RefreshToken: refreshToken
         })
     })
 
@@ -450,6 +454,8 @@ describe('ShopperAgent Component', () => {
     })
 
     test('should update prechat fields when commerce agent configuration changes', async () => {
+        const refreshToken = 'test-refresh-token-123'
+        mockedUseRefreshToken.mockReturnValue(refreshToken)
         useScript.mockReturnValue({loaded: true, error: false})
         const {rerender} = render(<ShopperAgent {...defaultProps} />)
 
@@ -463,7 +469,8 @@ describe('ShopperAgent Component', () => {
             Locale: defaultProps.locale,
             OrganizationId: commerceAgentSettings.commerceOrgId,
             UsId: 'test-usid',
-            IsCartMgmtSupported: 'true'
+            IsCartMgmtSupported: 'true',
+            RefreshToken: refreshToken
         })
 
         // Reset mock
@@ -492,7 +499,8 @@ describe('ShopperAgent Component', () => {
             Locale: defaultProps.locale,
             OrganizationId: newCommerceAgentSettings.commerceOrgId,
             UsId: 'test-usid',
-            IsCartMgmtSupported: 'true'
+            IsCartMgmtSupported: 'true',
+            RefreshToken: refreshToken
         })
     })
 
@@ -678,6 +686,82 @@ describe('ShopperAgent Component', () => {
 
             // Verify useRefreshToken was called again
             expect(mockedUseRefreshToken).toHaveBeenCalled()
+        })
+
+        test('should update prechat fields when refresh token changes', async () => {
+            // Initial refresh token
+            mockedUseRefreshToken.mockReturnValue('initial-token')
+            useScript.mockReturnValue({loaded: true, error: false})
+
+            const props = {
+                ...defaultProps,
+                commerceAgentConfiguration: commerceAgentSettings,
+                basketDoneLoading: true
+            }
+
+            const {rerender} = render(<ShopperAgent {...props} />)
+
+            // Trigger initial prechat fields setup
+            await act(async () => {
+                window.dispatchEvent(new Event('onEmbeddedMessagingReady'))
+            })
+
+            expect(mockEmbeddedService.prechatAPI.setHiddenPrechatFields).toHaveBeenCalledWith({
+                SiteId: commerceAgentSettings.siteId,
+                Locale: defaultProps.locale,
+                OrganizationId: commerceAgentSettings.commerceOrgId,
+                UsId: 'test-usid',
+                IsCartMgmtSupported: 'true',
+                RefreshToken: 'initial-token'
+            })
+
+            // Reset mock
+            mockEmbeddedService.prechatAPI.setHiddenPrechatFields.mockClear()
+
+            // Change refresh token and re-render
+            mockedUseRefreshToken.mockReturnValue('updated-token')
+            rerender(<ShopperAgent {...props} />)
+
+            // Trigger prechat fields setup with updated token
+            await act(async () => {
+                window.dispatchEvent(new Event('onEmbeddedMessagingReady'))
+            })
+
+            expect(mockEmbeddedService.prechatAPI.setHiddenPrechatFields).toHaveBeenCalledWith({
+                SiteId: commerceAgentSettings.siteId,
+                Locale: defaultProps.locale,
+                OrganizationId: commerceAgentSettings.commerceOrgId,
+                UsId: 'test-usid',
+                IsCartMgmtSupported: 'true',
+                RefreshToken: 'updated-token'
+            })
+        })
+
+        test('should handle null refresh token in prechat fields', async () => {
+            mockedUseRefreshToken.mockReturnValue(null)
+            useScript.mockReturnValue({loaded: true, error: false})
+
+            const props = {
+                ...defaultProps,
+                commerceAgentConfiguration: commerceAgentSettings,
+                basketDoneLoading: true
+            }
+
+            render(<ShopperAgent {...props} />)
+
+            // Trigger prechat fields setup
+            await act(async () => {
+                window.dispatchEvent(new Event('onEmbeddedMessagingReady'))
+            })
+
+            expect(mockEmbeddedService.prechatAPI.setHiddenPrechatFields).toHaveBeenCalledWith({
+                SiteId: commerceAgentSettings.siteId,
+                Locale: defaultProps.locale,
+                OrganizationId: commerceAgentSettings.commerceOrgId,
+                UsId: 'test-usid',
+                IsCartMgmtSupported: 'true',
+                RefreshToken: null
+            })
         })
     })
 })
