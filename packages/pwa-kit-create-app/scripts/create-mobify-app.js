@@ -919,10 +919,16 @@ const main = async (opts) => {
         context = merge(context, {
             answers: expandObject(answers)
         })
+        console.log('context', JSON.stringify(context, null, 2))
     }
-    console.log('context', context)
+    // load answer from context in preset object if available
+    Object.entries(context.answers.project.selectedPlugins).forEach(([pluginKey, enabled]) => {
+        if (pluginConfig?.plugins?.[pluginKey]) {
+            selectedPlugins[pluginKey] = enabled
+        }
+    })
 
-    // // load answer from context in preset object if available
+    //
     // // otherwise, prompt users to select extensions only for interactive presets
     // if (context.answers.project?.selectedPlugins) {
     //     Object.entries(context.answers.project.selectedPlugins).forEach(([pluginKey, enabled]) => {
