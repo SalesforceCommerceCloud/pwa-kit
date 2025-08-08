@@ -54,14 +54,15 @@ const OrderStatusPage = () => {
                 </Heading>
             </Container>
             <Container maxW="container.lg" px={4} mt={8} pb={{base: 8, md: 16}}>
-                <Grid
-                    templateColumns={{base: '1fr', md: '1fr 1fr'}}
-                    gap={8}
-                    justifyContent="center"
-                    alignItems="flex-start"
-                >
-                    {/* Sign In Card - Only show if user is not registered */}
-                    {shouldShowSignInForm && (
+                {shouldShowSignInForm ? (
+                    // Two-column layout when sign-in form is present
+                    <Grid
+                        templateColumns={{base: '1fr', md: '1fr 1fr'}}
+                        gap={8}
+                        justifyContent="center"
+                        alignItems="flex-start"
+                    >
+                        {/* Sign In Card */}
                         <Box
                             bg="white"
                             borderRadius="md"
@@ -92,11 +93,16 @@ const OrderStatusPage = () => {
                                 </Button>
                             </Stack>
                         </Box>
-                    )}
 
-                    {/* Order Lookup Card */}
-                    <OrderLookup onSubmit={handleOrderLookup} />
-                </Grid>
+                        {/* Order Lookup Card */}
+                        <OrderLookup onSubmit={handleOrderLookup} />
+                    </Grid>
+                ) : (
+                    // Centered single-column layout when sign-in form is not present
+                    <Box display="flex" justifyContent="center">
+                        <OrderLookup onSubmit={handleOrderLookup} />
+                    </Box>
+                )}
             </Container>
         </Box>
     )
