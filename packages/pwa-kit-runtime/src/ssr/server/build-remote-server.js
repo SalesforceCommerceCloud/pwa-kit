@@ -495,6 +495,8 @@ export const RemoteServerFactory = {
 
             const _convertExpressRouteToRegex = (routePattern) => {
                 if (!routePattern) return null
+                if (routePattern instanceof RegExp) return routePattern
+                if (typeof routePattern !== 'string') return null
 
                 // Replace route parameters like :id with regex capture groups
                 let regexPattern = routePattern
@@ -543,7 +545,7 @@ export const RemoteServerFactory = {
                     // Check if path matches any existing express route with base path prepended
                     if (!shouldRemoveBasePath) {
                         // Routes are dynamically checked since we want to ensure that any express route
-                        // defined after the app is created, such as routes defined in ssr.js are included.
+                        // defined after the app is created, such as routes defined in ssr.js, are included.
                         const expressRoutes = app._router.stack
                             // specifically omit the generic wildcard from the express routes we want to
                             // remove the base path from since it is mapped to the app render
