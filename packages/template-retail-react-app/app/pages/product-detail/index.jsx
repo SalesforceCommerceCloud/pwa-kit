@@ -185,13 +185,10 @@ const ProductDetail = () => {
         }
     )
 
-    const [comboProduct, setComboProduct] = useState({})
-
     // Optimize combo product inventory calculations with useEffect
     const [product, setProduct] = useState(productResponse)
     useEffect(() => {
         if (!isProductASet && !isProductABundle) {
-            setComboProduct({})
             setProduct(productResponse)
             return
         }
@@ -199,28 +196,21 @@ const ProductDetail = () => {
         const normalizedProduct = normalizeSetBundleProduct(productResponse)
 
         if (!normalizedProduct.childProducts) {
-            setComboProduct(normalizedProduct)
-            setProduct(productResponse)
+            setProduct(normalizedProduct)
             return
         }
 
-        // Create a deep copy to avoid mutating the original data
-        const updatedComboProduct = {
-            ...normalizedProduct,
-            childProducts: normalizedProduct.childProducts.map((child) => ({
-                ...child,
-                product: {...child.product}
-            }))
-        }
+        // normalizeSetBundleProduct already creates deep clones for safe mutation
+        const updatedChildProducts = normalizedProduct.childProducts
 
-        // Update inventory for variant selections
+        // Update base product inventory to inventory variant selections
         if (variantProductData?.data) {
-            updatedComboProduct.childProducts.forEach(({product: childProduct}, index) => {
+            updatedChildProducts.forEach(({product: childProduct}, index) => {
                 const matchingChildProduct = variantProductData.data.find(
                     (variantChild) => variantChild?.master?.masterId === childProduct.id
                 )
                 if (matchingChildProduct) {
-                    updatedComboProduct.childProducts[index].product = {
+                    updatedChildProducts[index].product = {
                         ...childProduct,
                         inventory: matchingChildProduct.inventory,
                         inventories: matchingChildProduct.inventories
@@ -229,16 +219,13 @@ const ProductDetail = () => {
             })
         }
 
-        // Create derived product with calculated inventory (without mutating original)
-        let productWithInventory = {...productResponse}
-
-        // Calculate lowest inventory for product sets
+        // Calculate lowest inventory for product sets and update normalizedProduct directly
         if (isProductASet) {
             let lowestInventory
             let missingInventory = false
             let lowestStoreInventory
             let missingStoreInventory = false
-            updatedComboProduct.childProducts.forEach(({product: childProduct}) => {
+            updatedChildProducts.forEach(({product: childProduct}) => {
                 if (!childProduct.inventory) {
                     missingInventory = true
                 } else if (!(lowestInventory?.stockLevel < childProduct.inventory.stockLevel)) {
@@ -259,23 +246,16 @@ const ProductDetail = () => {
                 }
             })
 
-            // Update the derived product inventory with the lowest values (no mutation)
+            // Update normalizedProduct directly with the lowest values
             if (!missingInventory && lowestInventory) {
-                productWithInventory = {
-                    ...productWithInventory,
-                    inventory: lowestInventory
-                }
+                normalizedProduct.inventory = lowestInventory
             }
             if (!missingStoreInventory && lowestStoreInventory) {
-                productWithInventory = {
-                    ...productWithInventory,
-                    inventories: [lowestStoreInventory]
-                }
+                normalizedProduct.inventories = [lowestStoreInventory]
             }
         }
 
-        setComboProduct(updatedComboProduct)
-        setProduct(productWithInventory)
+        setProduct(normalizedProduct)
     }, [productResponse, variantProductData, selectedInventoryId, isProductASet, isProductABundle])
 
     /**************** Error Handling ****************/
@@ -526,15 +506,13 @@ const ProductDetail = () => {
         // Using ot state for which child products are selected, scroll to the first
         // one that isn't selected and requires a variant selection.
         const selectedProductIds = Object.keys(childProductSelection)
-        const firstUnselectedProduct = comboProduct.childProducts?.find(
-            ({product: childProduct}) => {
-                // Skip validation for standard products (no variations)
-                if (childProduct.type?.item) {
-                    return false
-                }
-                return !selectedProductIds.includes(childProduct.id)
+        const firstUnselectedProduct = product?.childProducts?.find(({product: childProduct}) => {
+            // Skip validation for standard products (no variations)
+            if (childProduct.type?.item) {
+                return false
             }
-        )?.product
+            return !selectedProductIds.includes(childProduct.id)
+        })?.product
 
         if (firstUnselectedProduct) {
             // Get the reference to the product view and scroll to it.
@@ -782,7 +760,7 @@ const ProductDetail = () => {
 
                         {
                             // Render the child products
-                            comboProduct.childProducts?.map(
+                            product?.childProducts?.map(
                                 ({product: childProduct, quantity: childQuantity}) => (
                                     <Island hydrateOn={'visible'} key={childProduct.id}>
                                         <Box data-testid="child-product">
@@ -899,6 +877,7 @@ const ProductDetail = () => {
                         </Island>
                     </Fragment>
                 )}
+
                 {/* Product Recommendations */}
                 <Stack spacing={16}>
                     {!isProductASet && (
