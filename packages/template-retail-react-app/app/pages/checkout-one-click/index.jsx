@@ -292,25 +292,30 @@ const CheckoutOneClick = () => {
                                 billingAddressForm={billingAddressForm}
                             />
 
-                            {/* Place Order Button */}
-                            <Box display="flex" bottom="0" px={4} pt={2} pb={4}>
-                                <Container variant="form">
-                                    <Button
-                                        w="full"
-                                        onClick={onPlaceOrder}
-                                        isLoading={isLoading}
-                                        data-testid="place-order-button"
-                                        size="lg"
-                                        px={8}
-                                        minW="200px"
-                                    >
-                                        <FormattedMessage
-                                            defaultMessage="Place Order"
-                                            id="checkout_payment.button.place_order"
-                                        />
-                                    </Button>
-                                </Container>
-                            </Box>
+                            {step === 4 && (
+                                <Box display="flex" bottom="0" px={4} pt={2} pb={4}>
+                                    <Container variant="form">
+                                        <Button
+                                            w="full"
+                                            onClick={onPlaceOrder}
+                                            isLoading={isLoading}
+                                            isDisabled={
+                                                !paymentMethodForm.formState.isValid &&
+                                                !appliedPayment
+                                            }
+                                            data-testid="place-order-button"
+                                            size="lg"
+                                            px={8}
+                                            minW="200px"
+                                        >
+                                            <FormattedMessage
+                                                defaultMessage="Place Order"
+                                                id="checkout_payment.button.place_order"
+                                            />
+                                        </Button>
+                                    </Container>
+                                </Box>
+                            )}
                         </Stack>
                     </GridItem>
 
