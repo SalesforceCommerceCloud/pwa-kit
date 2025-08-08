@@ -34,7 +34,7 @@ The PWA Kit MCP Server offers the following intelligent tools tailored to Salesf
 
 * **`git_version_control`**:
   Manages the version control of your project using git.
-  If the directory is not a git repo, it creates a basic .gitignore, runs git init, adds all files, and makes an initial commit. If already a git repo, it skips initialization and .gitignore creation, and just adds and commits all files locally.
+  If the project is not already a git repo, project files will be committed as a new local git repo together with a basic .gitignore. If the project is already a git repo, just commit the changes in the project.
 
 
 ## ▶️ Running the MCP Server
