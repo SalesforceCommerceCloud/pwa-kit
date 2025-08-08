@@ -187,7 +187,9 @@ describe('DrawerMenu', () => {
         expect(categoryNav).toBeInTheDocument()
     })
 
-    test('renders Order Status menu item with correct link', () => {
+    test('renders Order Status menu item with order status link for guest users', () => {
+        useCustomerType.mockReturnValue({isRegistered: false})
+
         renderWithProviders(<DrawerMenu isOpen={true} root={mockCategories.root} />)
 
         // Find the Order Status link by its accessible name
@@ -196,7 +198,22 @@ describe('DrawerMenu', () => {
         expect(orderStatusLink).toHaveClass('chakra-link')
         expect(orderStatusLink.textContent.toLowerCase()).toContain('order status')
 
-        // Test that the link has the correct href attribute
+        // Test that the link has the correct href attribute for guest users
         expect(orderStatusLink).toHaveAttribute('href', '/order-status')
+    })
+
+    test('renders Order Status menu item with order history link for authenticated users', () => {
+        useCustomerType.mockReturnValue({isRegistered: true})
+
+        renderWithProviders(<DrawerMenu isOpen={true} root={mockCategories.root} />)
+
+        // Find the Order Status link by its accessible name
+        const orderStatusLink = screen.getByRole('link', {name: /order status/i})
+        expect(orderStatusLink).toBeInTheDocument()
+        expect(orderStatusLink).toHaveClass('chakra-link')
+        expect(orderStatusLink.textContent.toLowerCase()).toContain('order status')
+
+        // Test that the link has the correct href attribute for authenticated users
+        expect(orderStatusLink).toHaveAttribute('href', '/account/orders')
     })
 })

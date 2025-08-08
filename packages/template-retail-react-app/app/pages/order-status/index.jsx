@@ -32,6 +32,13 @@ const OrderStatusPage = () => {
         headingRef?.current?.focus()
     }, [])
 
+    // Redirect authenticated users to order history page
+    useEffect(() => {
+        if (customerType !== null && isRegistered) {
+            navigate('/account/orders')
+        }
+    }, [customerType, isRegistered, navigate])
+
     const handleSignInClick = () => {
         navigate('/login')
     }
@@ -40,8 +47,21 @@ const OrderStatusPage = () => {
         // TODO: API integration for order lookup
     }
 
-    // Check if user is not registered and customer data has loaded
-    const shouldShowSignInForm = customerType !== null && !isRegistered
+    // Show loading state while checking authentication status
+    if (customerType === null) {
+        return (
+            <Box
+                data-testid="order-status-page"
+                bg="gray.50"
+                minH="100vh"
+                display="flex"
+                alignItems="center"
+                justifyContent="center"
+            >
+                <Text>Loading...</Text>
+            </Box>
+        )
+    }
 
     return (
         <Box data-testid="order-status-page" bg="gray.50">
@@ -60,39 +80,37 @@ const OrderStatusPage = () => {
                     justifyContent="center"
                     alignItems="flex-start"
                 >
-                    {/* Sign In Card - Only show if user is not registered */}
-                    {shouldShowSignInForm && (
-                        <Box
-                            bg="white"
-                            borderRadius="md"
-                            boxShadow="md"
-                            p={{base: 6, md: 8}}
-                            maxW="md"
-                            width="100%"
-                            mx="auto"
-                        >
-                            <Stack spacing={6} align="center">
-                                <BrandLogo width="60px" height="auto" />
-                                <Text fontSize="lg" fontWeight="medium" textAlign="center">
-                                    <FormattedMessage
-                                        defaultMessage="Sign in with your Account"
-                                        id="order_status_page.sign_in.heading"
-                                    />
-                                </Text>
-                                <Button
-                                    colorScheme="blue"
-                                    size="lg"
-                                    width="100%"
-                                    onClick={handleSignInClick}
-                                >
-                                    <FormattedMessage
-                                        defaultMessage="Sign in"
-                                        id="order_status_page.sign_in.button"
-                                    />
-                                </Button>
-                            </Stack>
-                        </Box>
-                    )}
+                    {/* Sign In Card */}
+                    <Box
+                        bg="white"
+                        borderRadius="md"
+                        boxShadow="md"
+                        p={{base: 6, md: 8}}
+                        maxW="md"
+                        width="100%"
+                        mx="auto"
+                    >
+                        <Stack spacing={6} align="center">
+                            <BrandLogo width="60px" height="auto" />
+                            <Text fontSize="lg" fontWeight="medium" textAlign="center">
+                                <FormattedMessage
+                                    defaultMessage="Sign in with your Account"
+                                    id="order_status_page.sign_in.heading"
+                                />
+                            </Text>
+                            <Button
+                                colorScheme="blue"
+                                size="lg"
+                                width="100%"
+                                onClick={handleSignInClick}
+                            >
+                                <FormattedMessage
+                                    defaultMessage="Sign in"
+                                    id="order_status_page.sign_in.button"
+                                />
+                            </Button>
+                        </Stack>
+                    </Box>
 
                     {/* Order Lookup Card */}
                     <OrderLookup onSubmit={handleOrderLookup} />

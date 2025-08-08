@@ -78,7 +78,6 @@ const DrawerSeparator = () => (
 // CUSTOMIZE YOUR NAVIGATION BY ALTERING THESE VALUES
 const SIGN_IN_HREF = '/login'
 const STORE_LOCATOR_HREF = '/store-locator'
-const ORDER_STATUS_HREF = '/order-status'
 
 /**
  * This is the navigation component used for mobile devices (phone and tablet). It's
@@ -97,6 +96,7 @@ const DrawerMenu = ({
     const intl = useIntl()
     const {isRegistered} = useCustomerType()
     const navigate = useNavigation()
+    const ORDER_STATUS_HREF = isRegistered ? '/account/orders' : '/order-status'
     const styles = useMultiStyleConfig('DrawerMenu')
     const drawerSize = useBreakpointValue({sm: PHONE_DRAWER_SIZE, md: TABLET_DRAWER_SIZE})
     const socialIconVariant = useBreakpointValue({base: 'flex', md: 'flex-start'})

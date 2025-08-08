@@ -29,6 +29,7 @@ import {HideOnDesktop, HideOnMobile} from '@salesforce/retail-react-app/app/comp
 import {getPathWithLocale} from '@salesforce/retail-react-app/app/utils/url'
 import LocaleText from '@salesforce/retail-react-app/app/components/locale-text'
 import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
+import {useCustomerType} from '@salesforce/commerce-sdk-react'
 import styled from '@emotion/styled'
 import {STORE_LOCATOR_IS_ENABLED} from '@salesforce/retail-react-app/app/constants'
 
@@ -38,6 +39,7 @@ const Footer = ({...otherProps}) => {
     const intl = useIntl()
     const [locale, setLocale] = useState(intl.locale)
     const {site, buildUrl} = useMultiSite()
+    const {isRegistered} = useCustomerType()
     const {l10n} = site
     const supportedLocaleIds = l10n?.supportedLocales.map((locale) => locale.id)
     const showLocaleSelector = supportedLocaleIds?.length > 1
@@ -104,7 +106,7 @@ const Footer = ({...otherProps}) => {
                                 })}
                                 links={[
                                     {
-                                        href: '/order-status',
+                                        href: isRegistered ? '/account/orders' : '/order-status',
                                         text: intl.formatMessage({
                                             id: 'footer.link.order_status',
                                             defaultMessage: 'Order Status'
