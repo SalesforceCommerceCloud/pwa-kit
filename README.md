@@ -57,10 +57,6 @@ npm run push -- -m "Message to help you recognize this bundle"
 
 See the [Localization README.md](./packages/template-chakra-storefront/static/translations/README.md) for important setup instructions for localization.
 
-## 📚 Storybook Integration
-
-The PWA Kit includes a complete Storybook + Vite integration for component development and documentation. See the [Storybook README](./packages/template-chakra-storefront/STORYBOOK_README.md) for quick start instructions and the [Developer Guide](./packages/template-chakra-storefront/STORYBOOK_DEVELOPER_GUIDE.md) for comprehensive documentation.
-
 ## ⚠️ License Information
 
 The PWA Kit is licensed under a BSD 3-Clause license. See the [license](./LICENSE) for details.
