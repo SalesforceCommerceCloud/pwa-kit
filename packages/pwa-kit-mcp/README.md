@@ -33,7 +33,8 @@ The PWA Kit MCP Server offers the following intelligent tools tailored to Salesf
   *Example: `https://pwa-kit.mobify-storefront.com`*
 
 * **`git_version_control`**:
-  Performs version control through git including the git initialization and doing the initial local commit.
+  Manages the version control of your project using git.
+  If the directory is not a git repo, it creates a basic .gitignore, runs git init, adds all files, and makes an initial commit. If already a git repo, it skips initialization and .gitignore creation, and just adds and commits all files locally.
 
 
 ## ▶️ Running the MCP Server
@@ -128,7 +129,4 @@ the output on "MCP Logs".
 | `src/server/`  | Main server entry point (`server.js`)                                 |
 | `src/tools/`   | Contains all MCP tools like `create-app-guideline`, `site-test`, etc. |
 | `src/utils/`   | Shared utility functions                                              |
-| `src/data/`    | Static documents (e.g., product/category data models) used by tools   |
-| `docs/`        | Documentation and images for integration guides                       |
-| `dist/`        | Compiled output when building the package                             |
-
+| `
