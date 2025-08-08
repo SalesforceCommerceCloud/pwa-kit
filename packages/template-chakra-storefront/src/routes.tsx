@@ -46,9 +46,7 @@ const ProductList = loadable(() => import('../src/pages/product-list'), {
 //     fallback
 // })
 //@sfdc-extension-line SFDC_EXT_WISHLIST
-const Wishlist = loadable(() => import('../src/pages/account/wishlist'), {
-    fallback
-})
+const Wishlist = loadable(() => import('../src/pages/account/wishlist'), {fallback})
 const PageNotFound = loadable(() => import('../src/pages/page-not-found'))
 
 export const routes = [
