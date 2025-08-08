@@ -33,12 +33,18 @@ const MockedComponent = ({history}) => {
     const onAccountClick = () => {
         history.push(createPathWithDefaults('/account'))
     }
+    //@sfdc-extension-block-start SFDC_EXT_WISHLIST
     const onWishlistClick = () => {
         history.push(createPathWithDefaults('/account/wishlist'))
     }
+    //@sfdc-extension-block-end SFDC_EXT_WISHLIST
     return (
         <div>
-            <Header onMyAccountClick={onAccountClick} onWishlistClick={onWishlistClick} />
+            <Header 
+                onMyAccountClick={onAccountClick} 
+                //@sfdc-extension-line SFDC_EXT_WISHLIST
+                onWishlistClick={onWishlistClick} 
+            />
         </div>
     )
 }
@@ -74,7 +80,7 @@ test('renders Header', async () => {
         expect(logo).toBeInTheDocument()
         expect(account).toBeInTheDocument()
         expect(cart).toBeInTheDocument()
-        // Note: Wishlist button is currently commented out in the header component
+        //@sfdc-extension-line SFDC_EXT_WISHLIST
         // expect(wishlist).toBeInTheDocument()
         expect(searchInput).toBeInTheDocument()
     })
