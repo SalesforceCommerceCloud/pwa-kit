@@ -132,10 +132,15 @@ function updateConfigProperty(configFilePath, propertyPath, newValue) {
         'g'
     )
 
+    // Detect whether the property exists before attempting replacement
+    const hadMatch = propertyPattern.test(content)
+    // Reset lastIndex as we used the regex with global flag
+    propertyPattern.lastIndex = 0
+
     const replacement = `$1${valueToCode(newValue)}$3`
     const newContent = content.replace(propertyPattern, replacement)
 
-    if (newContent === content) {
+    if (!hadMatch) {
         throw new Error(`Property '${propertyPath}' not found in config file`)
     }
 
