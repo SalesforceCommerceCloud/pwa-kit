@@ -304,33 +304,33 @@ const CheckoutOneClick = () => {
                 </Grid>
             </Container>
 
-                    {/* Place Order Button */}
-                    <Box
-                        display={{ lg: 'none' }}
-                        position="sticky"
-                            bottom="0"
-                            px={4}
-                            pt={6}
-                            pb={11}
-                            borderTop="1px solid"
-                        borderColor="gray.100"
+            {/* Place Order Button */}
+            <Box
+                display={{ lg: 'none' }}
+                position="sticky"
+                bottom="0"
+                px={4}
+                pt={6}
+                pb={11}
+                borderTop="1px solid"
+                borderColor="gray.100"
+            >
+                <Container variant="form">
+                    <Button
+                        w="full"
+                        onClick={onPlaceOrder}
+                        i sLoading={isLoading}
+                        data-testid="place-order-button"
                     >
-                        <Container variant="form">
-                            <Button
-                                w="full"
-                                    onClick={onPlaceOrder}
-                                isLoading={isLoading}
-                                data-testid="place-order-button"
-                            >
-                                <FormattedMessage
-                                    defaultMessage="Place Order"
-                                    id="checkout_payment.button.place_order"
-                                />
-                            </Button>
-                        </Container>
-                    </Box>
-                </Box>
-        )
+                        <FormattedMessage
+                            defaultMessage="Place Order"
+                            id="checkout_payment.button.place_order"
+                        />
+                    </Button>
+                </Container>
+            </Box>
+        </Box>
+    )
 }
 
 export default CheckoutOneClick
