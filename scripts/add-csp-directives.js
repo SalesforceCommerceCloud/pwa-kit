@@ -196,7 +196,7 @@ function updateConfigFile(config, configFilePath = DEFAULT_CONFIG_FILE_PATH) {
     )
 
     fs.writeFileSync(configFilePath, newContent, 'utf8')
-    console.log('✅ Successfully added CSP directives to config/default.js')
+    console.log(`✅ Successfully added CSP directives to ${configFilePath}`)
 }
 
 /**
