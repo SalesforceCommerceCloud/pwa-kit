@@ -1,5 +1,6 @@
 ## 0.1.1
 - Show button "Select Bonus Products" when a product is added, that qualifies the cart for a manual selection bonus product. Also show the corresponding promotional message with the button [#2917](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2917)
+- Implemented the "Bonus Product View Modal" [#3043](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3043)
 
 ## 0.1.0-extensibility-preview.5
 - Fix failing tests in pages folder [#2872](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2872)
