@@ -29,9 +29,6 @@ packages/template-chakra-storefront/
 ├── vite.config.js           # Vite configuration
 ├── storybook-static/        # Built Storybook (production)
 ├── STORYBOOK_DEVELOPER_GUIDE.md  # This guide
-├── STORYBOOK_INTEGRATION.md      # Integration details
-├── FINAL_INTEGRATION_STATUS.md   # Integration status
-├── INTEGRATION_SUMMARY.md        # Summary document
 └── src/components/
     └── (ready for your stories)
 ```
@@ -56,96 +53,6 @@ packages/template-chakra-storefront/
 
 3. **Access Storybook:**
    Open http://localhost:6006 in your browser
-
-### Building for Production
-
-```bash
-npm run build-storybook
-```
-
-This creates an optimized static build in `storybook-static/` directory.
-
-## ⚙️ Configuration
-
-### Main Configuration (`.storybook/main.js`)
-```javascript
-/** @type { import('@storybook/react-vite').StorybookConfig } */
-const config = {
-  stories: [
-    '../src/**/*.stories.@(js|jsx|mjs|ts|tsx)',
-    '../src/**/*.mdx'
-  ],
-  addons: [
-    '@storybook/addon-links',
-    '@storybook/addon-essentials',
-    '@storybook/addon-interactions',
-  ],
-  framework: {
-    name: '@storybook/react-vite',
-    options: {},
-  },
-  docs: {
-    autodocs: 'tag',
-  },
-  viteFinal: async (config) => {
-    return config;
-  },
-};
-
-module.exports = config;
-```
-
-### Preview Configuration (`.storybook/preview.jsx`)
-```javascript
-import React from 'react';
-import { ChakraProvider } from '@chakra-ui/react';
-import { BrowserRouter } from 'react-router-dom';
-
-/** @type { import('@storybook/react').Preview } */
-const preview = {
-  parameters: {
-    actions: { argTypesRegex: '^on[A-Z].*' },
-    controls: {
-      matchers: {
-        color: /(background|color)$/i,
-        date: /Date$/,
-      },
-    },
-    layout: 'fullscreen',
-  },
-  decorators: [
-    (Story) => (
-      <ChakraProvider>
-        <BrowserRouter>
-          <Story />
-        </BrowserRouter>
-      </ChakraProvider>
-    ),
-  ],
-};
-
-export default preview;
-```
-
-### Manager Configuration (`.storybook/manager.js`)
-```javascript
-import { addons } from '@storybook/manager-api';
-import { themes } from '@storybook/theming';
-
-addons.setConfig({
-  theme: themes.dark,
-  sidebar: {
-    showRoots: true,
-  },
-  toolbar: {
-    title: { hidden: false },
-    zoom: { hidden: false },
-    eject: { hidden: false },
-    copy: { hidden: false },
-    fullscreen: { hidden: false },
-  },
-});
-```
 
 ## 📝 Creating Stories
 
