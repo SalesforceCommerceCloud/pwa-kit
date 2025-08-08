@@ -1776,5 +1776,11 @@
   },
   "with_registration.info.please_sign_in": {
     "defaultMessage": "Kirjaudu sisään jatkaaksesi!"
+  },
+  "bonus_product_view_modal.modal_label": {
+    "defaultMessage": "Bonustuotteen valinta modal tuotteelle {productName}"
+  },
+  "bonus_product_view_modal.button.view_cart": {
+    "defaultMessage": "Näytä kori"
   }
 }

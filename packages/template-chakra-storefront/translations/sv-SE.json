@@ -1776,5 +1776,11 @@
   },
   "with_registration.info.please_sign_in": {
     "defaultMessage": "Logga in för att fortsätta!"
+  },
+  "bonus_product_view_modal.modal_label": {
+    "defaultMessage": "Bonusproduktval modal för {productName}"
+  },
+  "bonus_product_view_modal.button.view_cart": {
+    "defaultMessage": "Visa kundvagn"
   }
 }

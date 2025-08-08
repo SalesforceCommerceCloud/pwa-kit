@@ -1776,5 +1776,11 @@
   },
   "with_registration.info.please_sign_in": {
     "defaultMessage": "Accedi per continuare!"
+  },
+  "bonus_product_view_modal.modal_label": {
+    "defaultMessage": "Modal di selezione prodotto bonus per {productName}"
+  },
+  "bonus_product_view_modal.button.view_cart": {
+    "defaultMessage": "Visualizza carrello"
   }
 }
