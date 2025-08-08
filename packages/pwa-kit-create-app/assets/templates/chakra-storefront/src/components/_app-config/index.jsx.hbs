@@ -1,10 +1,11 @@
 /*
- * Copyright (c) 2021, salesforce.com, inc.
+ * Copyright (c) 2024, salesforce.com, inc.
  * All rights reserved.
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React from 'react'
+
+import React, {useMemo} from 'react'
 import PropTypes from 'prop-types'
 import {ChakraProvider} from '@chakra-ui/react'
 
@@ -12,22 +13,18 @@ import {ChakraProvider} from '@chakra-ui/react'
 import 'focus-visible/dist/focus-visible'
 
 import theme from '../../../src/theme'
-import {MultiSiteProvider} from '../../../src/contexts'
-import {useAppOrigin} from '../../../src/hooks/use-app-origin'
-import {
-    resolveSiteFromUrl,
-    resolveLocaleFromUrl
-} from '../../../src/utils/site-utils'
+import {MultiSiteProvider} from '../../contexts'
+import {useAppOrigin} from '../../hooks/use-app-origin'
+import {resolveSiteFromUrl, resolveLocaleFromUrl} from '../../utils/site-utils'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
-import {proxyBasePath} from '@salesforce/pwa-kit-runtime/utils/ssr-namespace-paths'
-import {createUrlTemplate} from '../../../src/utils/url'
+import {createUrlTemplate} from '../../utils/url'
 import createLogger from '@salesforce/pwa-kit-runtime/utils/logger-factory'
+import {isServer} from '../../utils/utils'
 
 import {CommerceApiProvider, resetDehydratedStateTimeStamp} from '@salesforce/commerce-sdk-react'
 import {withReactQuery} from '@salesforce/pwa-kit-react-sdk/ssr/universal/components/with-react-query'
 import {useCorrelationId} from '@salesforce/pwa-kit-react-sdk/ssr/universal/hooks'
 import {ReactQueryDevtools} from '@tanstack/react-query-devtools'
-import {DEFAULT_DNT_STATE} from '../../../config/constants'
 
 /**
  * Use the AppConfig component to inject extra arguments into the getProps
@@ -44,33 +41,55 @@ const AppConfig = ({children, locals = {}}) => {
     }
 
     const commerceApiConfig = locals.appConfig.commerceAPI
-
     const appOrigin = useAppOrigin()
-
     const passwordlessCallback = locals.appConfig.login?.passwordless?.callbackURI
+
+    const memoizedHeaders = useMemo(
+        () => headers,
+        [
+            /* dependencies */
+        ]
+    )
+    const memoizedLogger = useMemo(() => createLogger({packageName: 'commerce-sdk-react'}), [])
+
+    const siteId = useMemo(() => locals.site?.id, [locals.site?.id])
+    const locale = useMemo(() => locals.locale?.id, [locals.locale?.id])
+    const currency = useMemo(
+        () => locals.locale?.preferredCurrency,
+        [locals.locale?.preferredCurrency]
+    )
+    const proxy = useMemo(
+        () => `${appOrigin}${commerceApiConfig.proxyPath}`,
+        [appOrigin, commerceApiConfig.proxyPath]
+    )
+    const redirectURI = useMemo(() => `${appOrigin}/callback`, [appOrigin])
+    const passwordlessLoginCallbackURI = useMemo(() => passwordlessCallback, [passwordlessCallback])
+    const defaultDnt = useMemo(() => locals.appConfig.dnt, [locals.appConfig.dnt])
 
     return (
         <CommerceApiProvider
             shortCode={commerceApiConfig.parameters.shortCode}
             clientId={commerceApiConfig.parameters.clientId}
             organizationId={commerceApiConfig.parameters.organizationId}
-            siteId={locals.site?.id}
-            locale={locals.locale?.id}
-            currency={locals.locale?.preferredCurrency}
-            redirectURI={`${appOrigin}/callback`}
-            proxy={`${appOrigin}${commerceApiConfig.proxyPath}`}
-            headers={headers}
-            defaultDnt={DEFAULT_DNT_STATE}
-            logger={createLogger({packageName: 'commerce-sdk-react'})}
-            passwordlessLoginCallbackURI={passwordlessCallback}
-            {{#if answers.project.commerce.isSlasPrivate}}
-            // Set 'enablePWAKitPrivateClient' to true use SLAS private client login flows.
+            siteId={siteId}
+            locale={locale}
+            currency={currency}
+            redirectURI={redirectURI}
+            passwordlessLoginCallbackURI={passwordlessLoginCallbackURI}
+            proxy={proxy}
+            headers={memoizedHeaders}
+            defaultDnt={defaultDnt}
+            logger={memoizedLogger}
+            // Set 'enablePWAKitPrivateClient' to true to use SLAS private client login flows.
             // Make sure to also enable useSLASPrivateClient in ssr.js when enabling this setting.
+            {{#if answers.project.commerce.isSlasPrivate}}
             enablePWAKitPrivateClient={true}
+            {{else}}
+            // enablePWAKitPrivateClient={true}
             {{/if}}
         >
             <MultiSiteProvider site={locals.site} locale={locals.locale} buildUrl={locals.buildUrl}>
-                <ChakraProvider theme={theme}>{children}</ChakraProvider>
+                <ChakraProvider value={theme}>{children}</ChakraProvider>
             </MultiSiteProvider>
             <ReactQueryDevtools />
         </CommerceApiProvider>
@@ -116,13 +135,15 @@ AppConfig.propTypes = {
 
 // Recommended settings for PWA-Kit usages.
 // NOTE: they will be applied on both server and client side.
+// retry is always disabled on server side regardless of the value from the options
 const options = {
     queryClientConfig: {
         defaultOptions: {
             queries: {
                 retry: false,
                 refetchOnWindowFocus: false,
-                staleTime: 10 * 1000
+                staleTime: 10 * 1000,
+                ...(isServer ? {retryOnMount: false} : {})
             },
             mutations: {
                 retry: false
