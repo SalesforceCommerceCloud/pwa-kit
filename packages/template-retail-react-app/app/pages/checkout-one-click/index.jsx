@@ -61,6 +61,10 @@ const CheckoutOneClick = () => {
     const {social = {}} = getConfig().app.login || {}
     const idps = social?.idps
     const isSocialEnabled = !!social?.enabled
+    const createCustomerPaymentInstruments = useShopperCustomersMutation('createCustomerPaymentInstrument')
+    // The last applied payment instrument on the card. We need to track to save it on the customer profile upon registration
+    // as the payment instrument on order only contains the masked number.
+    let shopperPaymentInstrument
 
     // Only enable BOPIS functionality if the feature toggle is on
     const isPickupOrder = STORE_LOCATOR_IS_ENABLED
@@ -116,6 +120,14 @@ const CheckoutOneClick = () => {
             }
         }
 
+        shopperPaymentInstrument = {
+            holder: formValue.holder,
+            number: formValue.number,
+            cardType: getPaymentInstrumentCardType(formValue.cardType),
+            expirationMonth: parseInt(expirationMonth),
+            expirationYear: parseInt(`20${expirationYear}`)
+        }
+
         return addPaymentInstrumentToBasket({
             parameters: {basketId: basket?.basketId},
             body: paymentInstrument
@@ -156,6 +168,28 @@ const CheckoutOneClick = () => {
             }
         }
 
+        const savePaymentInstrument = async (customerId, paymentMethodId) => {
+            try {
+                const paymentInstrument = {
+                    paymentMethodId: paymentMethodId,
+                    paymentCard: {
+                        holder: shopperPaymentInstrument.holder,
+                        number: shopperPaymentInstrument.number,
+                        cardType: shopperPaymentInstrument.cardType,
+                        expirationMonth: shopperPaymentInstrument.expirationMonth,
+                        expirationYear: shopperPaymentInstrument.expirationYear
+                    }
+                }
+
+                await createCustomerPaymentInstruments.mutateAsync({
+                    body: paymentInstrument,
+                    parameters: {customerId: customerId}
+                })
+            } catch (error) {
+                // Fail silently
+            }
+        }
+
         const registerUser = async (data) => {
             try {
                 const body = {
@@ -172,6 +206,9 @@ const CheckoutOneClick = () => {
 
                 // Save the shipping address from this order, should not block account creation
                 await saveShippingAddress(customer.customerId, data.address)
+
+                // Save the payment instrument
+                await savePaymentInstrument(customer.customerId, data.paymentMethodId)
 
                 showToast({
                     variant: 'subtle',
@@ -224,7 +261,8 @@ const CheckoutOneClick = () => {
                     lastName: order.billingAddress.lastName,
                     email: order.customerInfo.email,
                     phoneHome: order.billingAddress.phone,
-                    address: address
+                    address: address,
+                    paymentMethodId: order.paymentInstruments[0].paymentMethodId
                 })
             }
 
