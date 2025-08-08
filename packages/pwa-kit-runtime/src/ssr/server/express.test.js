@@ -1264,7 +1264,7 @@ describe('SLAS private client proxy', () => {
             .expect(403)
     }, 15000)
 
-    test('returns 403 if request is for /oauth2/trusted-agent/* endpoint', async () => {
+    test('returns 403 if request is for /oauth2/trusted-system/* endpoint', async () => {
         process.env.PWA_KIT_SLAS_CLIENT_SECRET = 'a secret'
 
         const app = RemoteServerFactory._createApp(
