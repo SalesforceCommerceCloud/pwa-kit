@@ -4,7 +4,6 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-//@sfdc-extension-block-start SFDC_EXT_WISHLIST
 import React, {useEffect, useCallback} from 'react'
 import {useIntl} from 'react-intl'
 import {Button} from '@chakra-ui/react'
@@ -198,4 +197,3 @@ export const useWishList = ({listId = ''} = {}) => {
         ...restOfQuery
     }
 }
-//@sfdc-extension-block-end SFDC_EXT_WISHLIST
