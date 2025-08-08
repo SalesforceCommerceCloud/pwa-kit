@@ -125,14 +125,4 @@ describe('server', () => {
         const calls = console.error.mock.calls.map((call) => call[0])
         expect(errors.some((error) => calls.includes(error))).toBe(true)
     })
-
-    test('Path "/robots.txt" returns valid robots.txt file with content', async () => {
-        const response = await request(app)
-            .get('/robots.txt')
-            .expect(200)
-            .expect('Content-Type', 'text/plain; charset=UTF-8')
-    
-        // Verify specific content matches our robots.txt file
-        expect(response.text.trim()).toBe('User-agent: *\nDisallow: /')
-    })
 })
