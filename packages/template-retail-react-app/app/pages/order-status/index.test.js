@@ -68,7 +68,7 @@ describe('OrderStatusPage', () => {
         expect(brandLogo).toBeInTheDocument()
     })
 
-    test('hides sign in card completely for registered users', () => {
+    test('redirects authenticated users to their order history', () => {
         // Mock registered user
         mockUseCurrentCustomer.mockReturnValue({
             data: {
@@ -79,13 +79,11 @@ describe('OrderStatusPage', () => {
 
         renderWithProviders(<OrderStatusPage />)
 
-        // Check that sign in card is NOT present
-        expect(screen.queryByText(/sign in with your account/i)).not.toBeInTheDocument()
-        expect(screen.queryByRole('button', {name: /sign in/i})).not.toBeInTheDocument()
-        expect(screen.queryByRole('img', {name: /brand-logo/i})).not.toBeInTheDocument()
+        // Check that navigation was called with correct path
+        expect(mockNavigate).toHaveBeenCalledWith('/account/orders')
     })
 
-    test('hides sign in card when customer data is still loading', () => {
+    test('shows loading message while checking user authentication', () => {
         // Mock loading state (customerType is null)
         mockUseCurrentCustomer.mockReturnValue({
             data: {
@@ -95,6 +93,9 @@ describe('OrderStatusPage', () => {
         })
 
         renderWithProviders(<OrderStatusPage />)
+
+        // Check that loading text is displayed
+        expect(screen.getByText('Loading...')).toBeInTheDocument()
 
         // Check that sign in card is NOT present during loading
         expect(screen.queryByText(/sign in with your account/i)).not.toBeInTheDocument()
@@ -110,7 +111,7 @@ describe('OrderStatusPage', () => {
         expect(mockNavigate).toHaveBeenCalledWith('/login')
     })
 
-    test('displays complete page layout with sign in card for guest users', () => {
+    test('shows complete order status page with sign in form for guest users', () => {
         renderWithProviders(<OrderStatusPage />)
 
         // Check main page structure
@@ -125,8 +126,42 @@ describe('OrderStatusPage', () => {
         expect(screen.getByText(/sign in with your account/i)).toBeInTheDocument()
     })
 
-    test('displays page layout without sign in card for registered users', () => {
-        // Mock registered user
+    test('does not redirect while authentication is being checked', () => {
+        // Mock loading state (customerType is null)
+        mockUseCurrentCustomer.mockReturnValue({
+            data: {
+                isRegistered: true,
+                customerType: null
+            }
+        })
+
+        renderWithProviders(<OrderStatusPage />)
+
+        // Check that navigation was NOT called during loading
+        expect(mockNavigate).not.toHaveBeenCalled()
+
+        // Check that loading text is displayed
+        expect(screen.getByText('Loading...')).toBeInTheDocument()
+    })
+
+    test('shows loading state for unauthenticated users during auth check', () => {
+        // Test loading state for guest users
+        mockUseCurrentCustomer.mockReturnValue({
+            data: {
+                isRegistered: false,
+                customerType: null
+            }
+        })
+
+        renderWithProviders(<OrderStatusPage />)
+
+        // Should show loading for guest users too
+        expect(screen.getByText('Loading...')).toBeInTheDocument()
+        expect(mockNavigate).not.toHaveBeenCalled()
+    })
+
+    test('redirects authenticated users when they visit the page', () => {
+        // Mock authenticated user from the start
         mockUseCurrentCustomer.mockReturnValue({
             data: {
                 isRegistered: true,
@@ -136,15 +171,7 @@ describe('OrderStatusPage', () => {
 
         renderWithProviders(<OrderStatusPage />)
 
-        // Check main page structure
-        const pageBox = screen.getByTestId('order-status-page')
-        expect(pageBox).toBeInTheDocument()
-
-        // Check heading
-        const heading = screen.getByRole('heading', {name: /order status/i})
-        expect(heading).toBeInTheDocument()
-
-        // Check that sign in card is NOT present
-        expect(screen.queryByText(/sign in with your account/i)).not.toBeInTheDocument()
+        // Should redirect immediately
+        expect(mockNavigate).toHaveBeenCalledWith('/account/orders')
     })
 })

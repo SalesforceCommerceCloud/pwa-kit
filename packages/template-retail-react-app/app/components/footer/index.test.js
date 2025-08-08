@@ -10,6 +10,13 @@ import Footer from '@salesforce/retail-react-app/app/components/footer/index'
 import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
 import {useBreakpointValue} from '@chakra-ui/react'
 
+// Mock the useCustomerType hook
+const mockUseCustomerType = jest.fn()
+jest.mock('@salesforce/commerce-sdk-react', () => ({
+    ...jest.requireActual('@salesforce/commerce-sdk-react'),
+    useCustomerType: () => mockUseCustomerType()
+}))
+
 // Mock the Chakra UI hook
 jest.mock('@chakra-ui/react', () => ({
     ...jest.requireActual('@chakra-ui/react'),
@@ -19,6 +26,10 @@ jest.mock('@chakra-ui/react', () => ({
 describe('Footer', () => {
     beforeEach(() => {
         jest.resetAllMocks()
+        // Default mock for guest user
+        mockUseCustomerType.mockReturnValue({
+            isRegistered: false
+        })
     })
 
     test('renders component', () => {
@@ -32,7 +43,7 @@ describe('Footer', () => {
         expect(screen.getByRole('link', {name: 'About Us', hidden: true})).toBeInTheDocument()
     })
 
-    test('renders desktop version (desktop links visible)', () => {
+    test('renders desktop version with order status link for guest users', () => {
         // Mock for desktop view - force all content to be visible
         useBreakpointValue.mockImplementation(() => true)
 
@@ -44,6 +55,26 @@ describe('Footer', () => {
 
         expect(orderStatusLink).toBeInTheDocument()
         expect(orderStatusLink).toHaveAttribute('href', '/uk/en-GB/order-status')
+        expect(screen.getAllByText(/privacy policy/i)[0]).toBeInTheDocument()
+    })
+
+    test('renders desktop version with order history link for authenticated users', () => {
+        // Mock for desktop view - force all content to be visible
+        useBreakpointValue.mockImplementation(() => true)
+
+        // Mock authenticated user
+        mockUseCustomerType.mockReturnValue({
+            isRegistered: true
+        })
+
+        renderWithProviders(<Footer />)
+
+        // Get footer element and search within it
+        const footer = screen.getByRole('contentinfo')
+        const orderStatusLink = within(footer).getByText('Order Status')
+
+        expect(orderStatusLink).toBeInTheDocument()
+        expect(orderStatusLink).toHaveAttribute('href', '/uk/en-GB/account/orders')
         expect(screen.getAllByText(/privacy policy/i)[0]).toBeInTheDocument()
     })
 
