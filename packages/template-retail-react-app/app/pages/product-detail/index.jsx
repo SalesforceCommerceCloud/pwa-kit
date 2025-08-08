@@ -108,7 +108,7 @@ const ProductDetail = () => {
     const {productId} = useParams()
     const urlParams = new URLSearchParams(location.search)
     const {
-        data: product,
+        data: productResponse,
         isLoading: isProductLoading,
         isError: isProductError,
         error: productError
@@ -147,7 +147,7 @@ const ProductDetail = () => {
         error: categoryError
     } = useCategory({
         parameters: {
-            id: product?.primaryCategoryId,
+            id: productResponse?.primaryCategoryId,
             levels: 1
         }
     })
@@ -157,8 +157,8 @@ const ProductDetail = () => {
     const [childProductOrderability, setChildProductOrderability] = useState({})
     const [selectedBundleQuantity, setSelectedBundleQuantity] = useState(1)
     const childProductRefs = React.useRef({})
-    const isProductASet = product?.type.set
-    const isProductABundle = product?.type.bundle
+    const isProductASet = productResponse?.type.set
+    const isProductABundle = productResponse?.type.bundle
 
     const childVariantIds =
         isProductABundle || isProductASet
@@ -185,16 +185,42 @@ const ProductDetail = () => {
         }
     )
 
-    const comboProduct = isProductASet || isProductABundle ? normalizeSetBundleProduct(product) : {}
-    if (comboProduct.childProducts) {
-        if (variantProductData) {
-            // Loop through the bundle or set children and update the inventory for variant selection
-            comboProduct.childProducts.forEach(({product: childProduct}, index) => {
+    const [comboProduct, setComboProduct] = useState({})
+
+    // Optimize combo product inventory calculations with useEffect
+    const [product, setProduct] = useState(productResponse)
+    useEffect(() => {
+        if (!isProductASet && !isProductABundle) {
+            setComboProduct({})
+            setProduct(productResponse)
+            return
+        }
+
+        const normalizedProduct = normalizeSetBundleProduct(productResponse)
+
+        if (!normalizedProduct.childProducts) {
+            setComboProduct(normalizedProduct)
+            setProduct(productResponse)
+            return
+        }
+
+        // Create a deep copy to avoid mutating the original data
+        const updatedComboProduct = {
+            ...normalizedProduct,
+            childProducts: normalizedProduct.childProducts.map((child) => ({
+                ...child,
+                product: {...child.product}
+            }))
+        }
+
+        // Update inventory for variant selections
+        if (variantProductData?.data) {
+            updatedComboProduct.childProducts.forEach(({product: childProduct}, index) => {
                 const matchingChildProduct = variantProductData.data.find(
                     (variantChild) => variantChild?.master?.masterId === childProduct.id
                 )
                 if (matchingChildProduct) {
-                    comboProduct.childProducts[index].product = {
+                    updatedComboProduct.childProducts[index].product = {
                         ...childProduct,
                         inventory: matchingChildProduct.inventory,
                         inventories: matchingChildProduct.inventories
@@ -203,18 +229,20 @@ const ProductDetail = () => {
             })
         }
 
+        // Create derived product with calculated inventory (without mutating original)
+        let productWithInventory = {...productResponse}
+
+        // Calculate lowest inventory for product sets
         if (isProductASet) {
-            // for product sets we use the lowest stock level product inventory as the inventory for the set
-            // we also need to update the inventory for the selected store
             let lowestInventory
             let missingInventory = false
             let lowestStoreInventory
             let missingStoreInventory = false
-            comboProduct.childProducts.forEach(({product: childProduct}) => {
+            updatedComboProduct.childProducts.forEach(({product: childProduct}) => {
                 if (!childProduct.inventory) {
                     missingInventory = true
                 } else if (!(lowestInventory?.stockLevel < childProduct.inventory.stockLevel)) {
-                    lowestInventory = childProduct.inventory
+                    lowestInventory = {...childProduct.inventory}
                     lowestInventory.lowestStockLevelProductName = childProduct.name
                 }
 
@@ -226,19 +254,29 @@ const ProductDetail = () => {
                 } else if (
                     !(lowestStoreInventory?.stockLevel < selectedStoreInventory.stockLevel)
                 ) {
-                    lowestStoreInventory = selectedStoreInventory
+                    lowestStoreInventory = {...selectedStoreInventory}
                     lowestStoreInventory.lowestStockLevelProductName = childProduct.name
                 }
             })
 
+            // Update the derived product inventory with the lowest values (no mutation)
             if (!missingInventory && lowestInventory) {
-                product.inventory = lowestInventory
+                productWithInventory = {
+                    ...productWithInventory,
+                    inventory: lowestInventory
+                }
             }
             if (!missingStoreInventory && lowestStoreInventory) {
-                product.inventories = [lowestStoreInventory]
+                productWithInventory = {
+                    ...productWithInventory,
+                    inventories: [lowestStoreInventory]
+                }
             }
         }
-    }
+
+        setComboProduct(updatedComboProduct)
+        setProduct(productWithInventory)
+    }, [productResponse, variantProductData, selectedInventoryId, isProductASet, isProductABundle])
 
     /**************** Error Handling ****************/
 
@@ -745,7 +783,7 @@ const ProductDetail = () => {
                         {/* TODO: consider `childProduct.belongsToSet` */}
                         {
                             // Render the child products
-                            comboProduct.childProducts.map(
+                            comboProduct.childProducts?.map(
                                 ({product: childProduct, quantity: childQuantity}) => (
                                     <Island hydrateOn={'visible'} key={childProduct.id}>
                                         <Box data-testid="child-product">
