@@ -61,9 +61,7 @@ const CheckoutOneClick = () => {
     const {social = {}} = getConfig().app.login || {}
     const idps = social?.idps
     const isSocialEnabled = !!social?.enabled
-    const createCustomerPaymentInstruments = useShopperCustomersMutation(
-        'createCustomerPaymentInstrument'
-    )
+    const createCustomerPaymentInstruments = useShopperCustomersMutation('createCustomerPaymentInstrument')
     // The last applied payment instrument on the card. We need to track to save it on the customer profile upon registration
     // as the payment instrument on order only contains the masked number.
     let shopperPaymentInstrument
@@ -332,30 +330,25 @@ const CheckoutOneClick = () => {
                                 billingAddressForm={billingAddressForm}
                             />
 
-                            {step === 4 && (
-                                <Box display="flex" bottom="0" px={4} pt={2} pb={4}>
-                                    <Container variant="form">
-                                        <Button
-                                            w="full"
-                                            onClick={onPlaceOrder}
-                                            isLoading={isLoading}
-                                            isDisabled={
-                                                !paymentMethodForm.formState.isValid &&
-                                                !appliedPayment
-                                            }
-                                            data-testid="place-order-button"
-                                            size="lg"
-                                            px={8}
-                                            minW="200px"
-                                        >
-                                            <FormattedMessage
-                                                defaultMessage="Place Order"
-                                                id="checkout_payment.button.place_order"
-                                            />
-                                        </Button>
-                                    </Container>
-                                </Box>
-                            )}
+                            {/* Place Order Button */}
+                            <Box display="flex" bottom="0" px={4} pt={6} pb={11}>
+                                <Container variant="form">
+                                    <Button
+                                        w="full"
+                                        onClick={onPlaceOrder}
+                                        isLoading={isLoading}
+                                        data-testid="place-order-button"
+                                        size="lg"
+                                        px={8}
+                                        minW="200px"
+                                    >
+                                        <FormattedMessage
+                                            defaultMessage="Place Order"
+                                            id="checkout_payment.button.place_order"
+                                        />
+                                    </Button>
+                                </Container>
+                            </Box>
                         </Stack>
                     </GridItem>
 
