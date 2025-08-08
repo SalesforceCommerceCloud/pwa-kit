@@ -256,3 +256,9 @@ export const PASSWORDLESS_ERROR_MESSAGES = [
 export const INVALID_TOKEN_ERROR = /invalid token/i
 
 export const USER_NOT_FOUND_ERROR = /user not found/i
+
+/**
+ * Constant to enable partial hydration capabilities, i.e. `<Island/>` components
+ * @deprecated Set `partialHydrationEnabled` in the config file instead
+ */
+export const PARTIAL_HYDRATION_ENABLED = false
