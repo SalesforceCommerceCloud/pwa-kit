@@ -7,7 +7,6 @@
 
 import {z} from 'zod'
 import shell from 'shelljs'
-import os from 'os'
 import fs from 'fs'
 import path from 'path'
 
@@ -17,7 +16,7 @@ class VersionControlGitTool {
     inputSchema = {
         initGit: z
             .boolean()
-            .describe('Do you want to do a git initialize and commit your files locally?'),
+            .describe('Do you want to commit your files locally through git? (yes/no)'),
         current_project_directory: z
             .string()
             .describe(
@@ -27,27 +26,15 @@ class VersionControlGitTool {
 
     handler = async (args) => {
         try {
-            if (!args || !args.initGit) {
+            if (!args || !args.initGit || !args.current_project_directory) {
                 return {
                     role: 'system',
                     content: []
                 }
             }
             const {initGit, current_project_directory} = args
-            const homeDir = os.homedir()
-            if (current_project_directory === homeDir) {
-                return {
-                    role: 'system',
-                    content: [
-                        {
-                            type: 'text',
-                            text: 'Error: Do not run git init in your home directory. Please run this tool in your project directory.'
-                        }
-                    ]
-                }
-            }
             if (initGit) {
-                await this.checkAndInitGitRepo(current_project_directory)
+                this.handleGitVersionControl(current_project_directory)
                 return {
                     role: 'system',
                     content: [
@@ -58,10 +45,6 @@ class VersionControlGitTool {
                     ]
                 }
             }
-            return {
-                role: 'system',
-                content: []
-            }
         } catch (error) {
             return {
                 role: 'system',
@@ -69,29 +52,41 @@ class VersionControlGitTool {
             }
         }
     }
-
     /**
-     * Checks if git is installed and initializes a git repository in the given directory.
+     * Handles the version control of your project using git.
+     * If the directory is not a git repo, it creates a basic .gitignore, runs git init, adds all files, and makes an initial commit.
+     * If already a git repo, it skips initialization and .gitignore creation, and just adds and commits all files locally.
      * @param {string} directory - The directory to initialize the git repository in.
      */
-    async checkAndInitGitRepo(directory) {
+    handleGitVersionControl(directory) {
         if (!shell.which('git')) {
             throw new Error(
                 'git is not installed or not found in PATH. Please install git to initialize a repository.'
             )
         }
-        this.createBasicGitignore(directory)
+        const isGitRepo = fs.existsSync(path.join(directory, '.git'))
         let result
-
-        result = shell.exec('git init', {cwd: directory, silent: true})
-        if (result.code !== 0) throw new Error(`git init failed: ${result.stderr || result.stdout}`)
-
-        result = shell.exec('git add .', {cwd: directory, silent: true})
-        if (result.code !== 0) throw new Error(`git add failed: ${result.stderr || result.stdout}`)
-
-        result = shell.exec('git commit -m "Initial commit"', {cwd: directory, silent: true})
-        if (result.code !== 0)
-            throw new Error(`git commit failed: ${result.stderr || result.stdout}`)
+        if (isGitRepo) {
+            // Already a git repo: only add and commit
+            result = shell.exec('git add .', {cwd: directory, silent: true})
+            if (result.code !== 0)
+                throw new Error(`git add failed: ${result.stderr || result.stdout}`)
+            result = shell.exec('git commit -m "Initial commit"', {cwd: directory, silent: true})
+            if (result.code !== 0)
+                throw new Error(`git commit failed: ${result.stderr || result.stdout}`)
+        } else {
+            // Not a git repo: create .gitignore, init, add, commit
+            this.createBasicGitignore(directory)
+            result = shell.exec('git init', {cwd: directory, silent: true})
+            if (result.code !== 0)
+                throw new Error(`git init failed: ${result.stderr || result.stdout}`)
+            result = shell.exec('git add .', {cwd: directory, silent: true})
+            if (result.code !== 0)
+                throw new Error(`git add failed: ${result.stderr || result.stdout}`)
+            result = shell.exec('git commit -m "Initial commit"', {cwd: directory, silent: true})
+            if (result.code !== 0)
+                throw new Error(`git commit failed: ${result.stderr || result.stdout}`)
+        }
     }
 
     /**
