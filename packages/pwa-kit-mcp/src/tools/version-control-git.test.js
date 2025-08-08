@@ -44,7 +44,9 @@ describe('VersionControlGitTool', () => {
         jest.spyOn(fs, 'existsSync').mockImplementation((p) => p.endsWith('.git'))
         jest.spyOn(shell, 'exec').mockImplementation(() => ({code: 0, stdout: '', stderr: ''}))
         const result = await tool.handler({initGit: true, current_project_directory: tempDir})
-        expect(result.content[0].text).toMatch(/Git repository initialized/)
+        expect(result.content[0].text).toMatch(
+            /Git version control initialized and committed locally\./
+        )
         shell.exec.mockRestore()
         shell.which.mockRestore()
         fs.existsSync.mockRestore()
@@ -56,7 +58,9 @@ describe('VersionControlGitTool', () => {
         jest.spyOn(shell, 'exec').mockImplementation(() => ({code: 0, stdout: '', stderr: ''}))
         jest.spyOn(tool, 'createBasicGitignore').mockImplementation(() => {})
         const result = await tool.handler({initGit: true, current_project_directory: tempDir})
-        expect(result.content[0].text).toMatch(/Git repository initialized/)
+        expect(result.content[0].text).toMatch(
+            /Git version control initialized and committed locally\./
+        )
         shell.exec.mockRestore()
         shell.which.mockRestore()
         fs.existsSync.mockRestore()
