@@ -1,5 +1,6 @@
 ## v3.12.0-dev (Jul 28, 2025)
 - This feature introduces an AI-powered shopping assistant that integrates Salesforce Embedded Messaging Service with PWA Kit applications. The shopper agent provides real-time chat support, search assistance, and personalized shopping guidance directly within the e-commerce experience. [#2658](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2658)
+- Disallow the SLAS private client proxy from handling trusted system on behalf of requests [#3042](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3042)
 
 ## v3.11.0 (Jul 22, 2025)
 - Fix the logger so that it will now print out details of the given Error object [#2486](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2486)
