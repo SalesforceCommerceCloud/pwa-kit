@@ -32,18 +32,16 @@ class VersionControlGitTool {
                     content: []
                 }
             }
-            const {initGit, current_project_directory} = args
-            if (initGit) {
-                this.handleGitVersionControl(current_project_directory)
-                return {
-                    role: 'system',
-                    content: [
-                        {
-                            type: 'text',
-                            text: 'Git version control initialized and committed locally.'
-                        }
-                    ]
-                }
+            const {current_project_directory} = args
+            this.handleGitVersionControl(current_project_directory)
+            return {
+                role: 'system',
+                content: [
+                    {
+                        type: 'text',
+                        text: 'Git version control initialized and committed locally.'
+                    }
+                ]
             }
         } catch (error) {
             return {
@@ -52,6 +50,7 @@ class VersionControlGitTool {
             }
         }
     }
+
     /**
      * Handles the version control of your project using git.
      * If the directory is not a git repo, it creates a basic .gitignore, runs git init, adds all files, and makes an initial commit.
