@@ -86,6 +86,7 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
     const [showContinueButton, setShowContinueButton] = useState(true)
     const [isCheckingEmail, setIsCheckingEmail] = useState(false)
     const [registeredUserChoseGuest, setRegisteredUserChoseGuest] = useState(false)
+    const [emailError, setEmailError] = useState('')
 
     const passwordlessConfigCallback = getConfig().app.login?.passwordless?.callbackURI
     const callbackURL = isAbsoluteURL(passwordlessConfigCallback)
@@ -109,6 +110,13 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
         onClose: onOtpModalClose
     } = useDisclosure()
 
+    // Helper function to validate email format
+    const isValidEmail = (email) => {
+        const emailRegex =
+            /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/
+        return emailRegex.test(email)
+    }
+
     // Handle email field blur/focus events
     const handleEmailBlur = async (e) => {
         // Call original React Hook Form blur handler if it exists
@@ -117,14 +125,23 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
         }
 
         const email = form.getValues('email')
-        const isValid = await form.trigger()
-        // Manually trigger the browser native form validations
-        if (isValid) {
-            // Try to send OTP first, only open modal if successful
-            await handleSendEmailOtp(email)
-        } else {
-            form.reportValidity()
+
+        // Clear previous email error
+        setEmailError('')
+
+        // Validate email format
+        if (!email) {
+            setEmailError('Please enter your email address.')
+            return
         }
+
+        if (!isValidEmail(email)) {
+            setEmailError('Please enter a valid email address.')
+            return
+        }
+
+        // Email is valid, proceed with OTP check
+        await handleSendEmailOtp(email)
     }
 
     const handleEmailFocus = (e) => {
@@ -140,6 +157,9 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
 
         // Clear email checking state
         setIsCheckingEmail(false)
+
+        // Clear email error when user focuses back on the field
+        setEmailError('')
     }
 
     // Handle sending OTP email
@@ -154,7 +174,10 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
             // Only open modal if API call succeeds
             onOtpModalOpen()
         } catch (error) {
-            //fail silently
+            // Keep continue button visible if email is valid (for unregistered users)
+            if (isValidEmail(email)) {
+                setShowContinueButton(true)
+            }
         } finally {
             setIsCheckingEmail(false)
         }
@@ -233,6 +256,16 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
 
     const submitForm = async (data) => {
         setError(null)
+        // Validate email before proceeding
+        if (!data.email) {
+            setError('Please enter your email address.')
+            return
+        }
+
+        if (!isValidEmail(data.email)) {
+            setError('Please enter a valid email address.')
+            return
+        }
 
         await updateCustomerForBasket.mutateAsync({
             parameters: {basketId: basket.basketId},
@@ -292,6 +325,7 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
                                     <InputGroup>
                                         <Field
                                             {...fields.email}
+                                            error={null}
                                             inputRef={emailRef}
                                             inputProps={{
                                                 onBlur: handleEmailBlur,
@@ -318,6 +352,12 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
                                             </InputRightElement>
                                         )}
                                     </InputGroup>
+
+                                    {emailError && (
+                                        <Text fontSize="sm" color="red.500" mt={2}>
+                                            {emailError}
+                                        </Text>
+                                    )}
                                 </Stack>
 
                                 <Stack spacing={3}>
