@@ -292,7 +292,6 @@ const CheckoutOneClick = () => {
                                 billingAddressForm={billingAddressForm}
                             />
 
-                            {/* Place Order Button */}
                             {step === 4 && (
                                 <Box display="flex" bottom="0" px={4} pt={2} pb={4}>
                                     <Container variant="form">
