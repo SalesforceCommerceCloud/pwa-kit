@@ -165,7 +165,7 @@ export const TestProviders = ({
                                         <AddToCartModalProvider>{children}</AddToCartModalProvider>
                                     </ChakraProvider>
                                 </Router>
-                            {/** @sfdc-extension-line SFDC_EXT_STORE_LOCATOR */}
+                                {/** @sfdc-extension-line SFDC_EXT_STORE_LOCATOR */}
                             </StoreLocatorProvider>
                         </CurrencyProvider>
                     </CommerceApiProvider>

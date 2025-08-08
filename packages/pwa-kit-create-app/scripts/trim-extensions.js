@@ -153,11 +153,8 @@ function processFile(filePath, plugins) {
 
             const addToRemoveComponentCandidates = (importPath) => {
                 if (importPath.startsWith('.')) {
-                    let absoluteImportPath = path.resolve(
-                        path.dirname(filePath),
-                        importPath
-                    )
-                    console.log('adding to removeComponentCandidates', absoluteImportPath)  
+                    let absoluteImportPath = path.resolve(path.dirname(filePath), importPath)
+                    console.log('adding to removeComponentCandidates', absoluteImportPath)
                     removeComponentCandidates.add(absoluteImportPath)
                 }
             }
