@@ -303,10 +303,10 @@ const CheckoutOneClick = () => {
                     </GridItem>
                 </Grid>
             </Container>
-            
+
             {/* Place Order Button */}
             <Box
-                display={{lg: 'none'}}
+                display={{ lg: 'none' }}
                 position="sticky"
                 bottom="0"
                 px={4}
@@ -316,9 +316,9 @@ const CheckoutOneClick = () => {
                 borderColor="gray.100"
             >
                 <Container variant="form">
-                    <Button 
-                        w="full" 
-                        onClick={onPlaceOrder} 
+                    <Button
+                        w="full"
+                        onClick={onPlaceOrder}
                         isLoading={isLoading}
                         data-testid="place-order-button"
                     >
