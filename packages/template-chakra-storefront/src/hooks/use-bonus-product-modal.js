@@ -66,7 +66,7 @@ const BonusProductItem = ({product, productData, foundProductData, onToggle, isL
         }
 
         const variantImages = filterImageGroups(productData.imageGroups, product)
-        
+
         if (variantImages?.length > 0) {
             const largeImage = findImageGroupBy(variantImages, {
                 viewType: 'large'
@@ -101,10 +101,17 @@ const BonusProductItem = ({product, productData, foundProductData, onToggle, isL
                         <DynamicImage
                             src={imageGroup.images[0].disBaseLink || imageGroup.images[0].link}
                             alt={productName}
-                            fallbackSrc={imageGroup.images[0].disBaseLink || imageGroup.images[0].link}
+                            fallbackSrc={
+                                imageGroup.images[0].disBaseLink || imageGroup.images[0].link
+                            }
                         />
                     ) : (
-                        <Box bg="gray.100" display="flex" alignItems="center" justifyContent="center">
+                        <Box
+                            bg="gray.100"
+                            display="flex"
+                            alignItems="center"
+                            justifyContent="center"
+                        >
                             <Text color="gray.500" fontSize="sm">
                                 {intl.formatMessage({
                                     id: 'bonus_product_modal.no_image',
@@ -125,12 +132,7 @@ const BonusProductItem = ({product, productData, foundProductData, onToggle, isL
                         Free
                     </Text>
                 </Box>
-                <Button
-                    size="sm"
-                    variant="outline"
-                    width="162px"
-                    onClick={() => onToggle(product)}
-                >
+                <Button size="sm" variant="outline" width="162px" onClick={() => onToggle(product)}>
                     {intl.formatMessage({
                         id: 'bonus_product_modal.button_select',
                         defaultMessage: 'Select'
@@ -164,8 +166,8 @@ export const BonusProductModal = () => {
 
     // Get product IDs for fetching product data
     const productIds = bonusProducts
-        .flatMap(item => item.bonusProducts || [])
-        .map(product => product.productId)
+        .flatMap((item) => item.bonusProducts || [])
+        .map((product) => product.productId)
         .filter(Boolean)
         .join(',')
 
@@ -229,20 +231,24 @@ export const BonusProductModal = () => {
                         ) : (
                             <VStack spacing="4">
                                 <SimpleGrid columns={{base: 1, md: 3}} spacing="4" width="100%">
-                                    {bonusProducts.flatMap(item => item.bonusProducts || []).map((product) => {
-                                        const foundProductData = productData?.data?.find(p => p.id === product.productId)
-                                        
-                                        return (
-                                            <BonusProductItem
-                                                key={product.productId}
-                                                product={product}
-                                                productData={foundProductData}
-                                                foundProductData={foundProductData}
-                                                onToggle={() => {}}
-                                                isLoading={isLoading}
-                                            />
-                                        )
-                                    })}
+                                    {bonusProducts
+                                        .flatMap((item) => item.bonusProducts || [])
+                                        .map((product) => {
+                                            const foundProductData = productData?.data?.find(
+                                                (p) => p.id === product.productId
+                                            )
+
+                                            return (
+                                                <BonusProductItem
+                                                    key={product.productId}
+                                                    product={product}
+                                                    productData={foundProductData}
+                                                    foundProductData={foundProductData}
+                                                    onToggle={() => {}}
+                                                    isLoading={isLoading}
+                                                />
+                                            )
+                                        })}
                                 </SimpleGrid>
                             </VStack>
                         )}
