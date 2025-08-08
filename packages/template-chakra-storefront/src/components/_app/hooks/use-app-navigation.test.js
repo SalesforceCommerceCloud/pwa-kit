@@ -59,6 +59,7 @@ describe('useAppNavigation', () => {
         expect(result.current.onLogoClick).toEqual(expect.any(Function))
         expect(result.current.onCartClick).toEqual(expect.any(Function))
         expect(result.current.onAccountClick).toEqual(expect.any(Function))
+        //@sfdc-extension-line SFDC_EXT_WISHLIST
         expect(result.current.onWishlistClick).toEqual(expect.any(Function))
     })
 
@@ -89,6 +90,7 @@ describe('useAppNavigation', () => {
         expect(mockHistory.push).toHaveBeenCalledWith('/account')
     })
 
+    //@sfdc-extension-block-start SFDC_EXT_WISHLIST
     test('handles wishlist click navigation', () => {
         const {result} = renderHook(() => useAppNavigation())
 
@@ -97,6 +99,7 @@ describe('useAppNavigation', () => {
         expect(mockLocalization.buildUrl).toHaveBeenCalledWith('/account/wishlist')
         expect(mockHistory.push).toHaveBeenCalledWith('/account/wishlist')
     })
+    //@sfdc-extension-block-end SFDC_EXT_WISHLIST
 
     test('handles multiple navigation calls', () => {
         const {result} = renderHook(() => useAppNavigation())
