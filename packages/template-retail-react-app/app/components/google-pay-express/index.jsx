@@ -15,6 +15,7 @@ import {
 } from '@salesforce/retail-react-app/app/components/express/utils/parsers'
 import {AdyenShippingMethodsService} from '@salesforce/retail-react-app/app/components/express/utils/shipping-methods'
 import {AdyenShippingAddressService} from '@salesforce/retail-react-app/app/components/express/utils/shipping-address'
+import {forceOrderCalculation} from '@salesforce/retail-react-app/app/components/express/utils/pdp/basket-calculation'
 import {AdyenPaymentsService} from '@salesforce/retail-react-app/app/components/express/utils/payments'
 import {
     PAYMENT_METHODS,
@@ -34,6 +35,7 @@ const sendExpressMessage = (type, payload = {}) => {
 }
 
 export const getGooglePaymentMethodConfig = (paymentMethodsResponse) => {
+    console.log('==paymentMethodsResponse in GPayExpress==', paymentMethodsResponse)
     const googlePayPaymentMethod = paymentMethodsResponse?.paymentMethods?.find(
         (pm) => pm.type === PAYMENT_METHOD
     )
@@ -78,6 +80,7 @@ export const updateShippingAddress = async (authToken, site, basket, shippingAdd
             basket.basketId,
             getCustomerShippingDetails(shippingAddress)
         )
+        console.log('==ship address response==', response)
         if (response.error) {
             return {
                 error: {
@@ -134,6 +137,7 @@ export const updateShippingOption = async (
             shippingOptionId,
             basket.basketId
         )
+        console.log('==ship method response==', response)
         if (response.error) {
             return {
                 error: {
@@ -218,6 +222,8 @@ export const getGoogleButtonConfig = (
                     }
                 }
                 const adyenPaymentService = new AdyenPaymentsService(authToken, site)
+                basket = await forceOrderCalculation(basket.basketId, authToken, site)
+                console.log('==basket in GPayExpress after forceOrderCalculation==', basket)
                 const paymentsResponse = await adyenPaymentService.submitPayment(
                     {
                         ...state.data
@@ -307,6 +313,8 @@ export const GooglePayExpress = () => {
         shippingMethods,
         fetchShippingMethods
     } = useAdyenExpressCheckout()
+    console.log('==authToken in GPayExpress==', authToken)
+    console.log('==basket in GPayExpress==', basket)
 
     const paymentContainer = useRef(null)
 
@@ -341,7 +349,7 @@ export const GooglePayExpress = () => {
                     handleGooglePayUnavailable()
                     return
                 }
-
+                console.log('==checkout in GPayExpress==', checkout)
                 const googlePaymentMethodConfig = getGooglePaymentMethodConfig(adyenPaymentMethods)
                 const googleButtonConfig = getGoogleButtonConfig(
                     authToken,

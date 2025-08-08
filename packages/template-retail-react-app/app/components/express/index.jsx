@@ -16,7 +16,7 @@ import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
 import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
 
 function Express() {
-    const {getTokenWhenReady} = useAccessToken()
+    //const {getTokenWhenReady} = useAccessToken()
     const customerId = useCustomerId()
     const navigate = useNavigation()
     const {locale, site} = useMultiSite()
@@ -24,6 +24,7 @@ function Express() {
     const location = useLocation()
 
     const [authToken, setAuthToken] = useState()
+    const [finalCustomerId, setFinalCustomerId] = useState()
 
     // Check for PDP mode flag in URL
     const urlParams = new URLSearchParams(location.search)
@@ -33,14 +34,14 @@ function Express() {
     const [currentSku, setCurrentSku] = useState(null)
     const [currentQuantity, setCurrentQuantity] = useState(1)
 
-    useEffect(() => {
-        const getToken = async () => {
-            const token = await getTokenWhenReady()
-            setAuthToken(token)
-        }
+    // useEffect(() => {
+    //     const getToken = async () => {
+    //         const token = await getTokenWhenReady()
+    //         setAuthToken(token)
+    //     }
 
-        getToken()
-    }, [])
+    //     getToken()
+    // }, [])
 
     // PostMessage listener for SKU updates
     useEffect(() => {
@@ -66,6 +67,10 @@ function Express() {
 
                 // Handle basket data messages
                 if (type === 'basketDataAvailable') {
+                    console.log('==basketDataAvailable==', event)
+                    const authData = event.data.data.authData
+                    setAuthToken(authData.authToken)
+                    setFinalCustomerId(authData.customerId)
                     const basketData = event.data.data.basketData
                     setBasketData(basketData)
                 }
@@ -86,19 +91,20 @@ function Express() {
         }
     }, [])
 
-    if (!authToken) {
+    if (!authToken || !finalCustomerId) {
         return null
     }
 
     console.log('==authToken sent to adyen==', authToken)
-    console.log('==customerId sent to adyen==', customerId)
+    console.log('==customerId==', customerId)
+    console.log('==finalCustomerId sent to adyen==', finalCustomerId)
     console.log('==basket sent to adyen==', basket)
 
     return (
         <div>
             <AdyenExpressCheckoutProvider
                 authToken={authToken}
-                customerId={customerId}
+                customerId={finalCustomerId}
                 locale={locale}
                 site={site}
                 basket={basket}

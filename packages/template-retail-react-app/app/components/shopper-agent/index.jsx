@@ -11,6 +11,7 @@ import {useUsid} from '@salesforce/commerce-sdk-react'
 import PropTypes from 'prop-types'
 import {useTheme} from '@salesforce/retail-react-app/app/components/shared/ui'
 import useMiaw from '@salesforce/retail-react-app/app/hooks/use-miaw'
+import {useAccessToken, useCustomerId} from '@salesforce/commerce-sdk-react'
 
 const onClient = typeof window !== 'undefined'
 
@@ -97,6 +98,8 @@ const isEnabled = (enabled) => {
  */
 const ShopperAgentWindow = ({commerceAgentConfiguration, locale, basketId}) => {
     const theme = useTheme()
+    const {getTokenWhenReady} = useAccessToken()
+    const customerId = useCustomerId()
     const {
         embeddedServiceName,
         embeddedServiceEndpoint,
@@ -120,13 +123,12 @@ const ShopperAgentWindow = ({commerceAgentConfiguration, locale, basketId}) => {
         embeddedMessagingFrame.contentWindow.postMessage(eventData, '*')
     }
 
-    const handleMiawEvent = (event) => {
+    const handleMiawEvent = async (event) => {
         if (event.source && event.source !== window) {
             try {
                 if (event.data.type === 'lwc.getCustomerData') {
                     console.log('==lwc.getCustomerData==', event)
-                    const customerId = localStorage.getItem(`customer_id_${siteId}`)
-                    const authToken = localStorage.getItem(`access_token_${siteId}`)
+                    const authToken = await getTokenWhenReady()
                     console.log('==customer id from pwa parent context==', customerId)
                     console.log('==auth token from pwa parent context==', authToken)
                     sendExpressMessage('express.actualCustomerData', {
