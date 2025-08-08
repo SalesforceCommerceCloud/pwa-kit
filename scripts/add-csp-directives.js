@@ -6,9 +6,10 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
+/* eslint-disable @typescript-eslint/no-var-requires */
 /**
- * Script to add new CSP directive values to existing configuration in ssr.js
- * 
+ * Script to add new CSP directive values to existing configuration in config/default.js (app.contentSecurityPolicy)
+ *
  * This script only adds new values - it cannot remove or modify existing directives.
  * It preserves existing comments and prevents duplicate values.
  */
@@ -16,32 +17,35 @@
 const fs = require('fs')
 const path = require('path')
 
-// Default path to the ssr.js file
-const DEFAULT_SSR_FILE_PATH = path.join(
+// Default path to the config default.js file
+const DEFAULT_CONFIG_FILE_PATH = path.join(
     __dirname,
-    '../packages/template-retail-react-app/app/ssr.js'
+    '../packages/template-retail-react-app/config/default.js'
 )
 
 /**
- * Get the SSR file path from command line args or use default
+ * Get the config file path from command line args or use default
  */
-function getSSRFilePath(args) {
-    const pathIndex = args.indexOf('--ssr-path')
+function getConfigFilePath(args) {
+    const pathIndex = args.indexOf('--config-path')
     if (pathIndex !== -1 && pathIndex + 1 < args.length) {
         return args[pathIndex + 1]
     }
-    return DEFAULT_SSR_FILE_PATH
+    return DEFAULT_CONFIG_FILE_PATH
 }
 
 /**
- * Parse current CSP directives from ssr.js
+ * Parse current CSP directives from config default.js
  */
-function getCurrentCSPConfig(ssrFilePath = DEFAULT_SSR_FILE_PATH) {
-    const content = fs.readFileSync(ssrFilePath, 'utf8')
-    const directivesMatch = content.match(/directives:\s*{([^}]+)}/s)
+function getCurrentCSPConfig(configFilePath = DEFAULT_CONFIG_FILE_PATH) {
+    const content = fs.readFileSync(configFilePath, 'utf8')
+    // Find the directives object under contentSecurityPolicy
+    const directivesMatch = content.match(
+        /contentSecurityPolicy\s*:\s*{[\s\S]*?directives\s*:\s*{([\s\S]*?)}[\s\S]*?}/
+    )
 
     if (!directivesMatch) {
-        throw new Error('Could not find CSP directives in ssr.js')
+        throw new Error('Could not find contentSecurityPolicy.directives in config/default.js')
     }
 
     const directivesContent = directivesMatch[1]
@@ -93,18 +97,15 @@ function addCSPDirectives(existingConfig, newConfig) {
         }
 
         newEntries.forEach((newEntry) => {
-            // Handle both string values and object format for backward compatibility
-            const newValue = typeof newEntry === 'string' ? newEntry : newEntry.value
-
             // Check if value already exists
             const existingEntry = mergedConfig[directiveName].find(
-                (existing) => existing.value === newValue
+                (existing) => existing.value === newEntry
             )
 
             if (!existingEntry) {
-                // Add new entry (no comment since input format is simplified)
+                // Add new entry
                 mergedConfig[directiveName].push({
-                    value: newValue
+                    value: newEntry
                 })
             }
         })
@@ -182,19 +183,19 @@ function parseInputFromStdin() {
 }
 
 /**
- * Update ssr.js file with the enhanced CSP configuration
+ * Update config default.js file with the enhanced CSP configuration
  */
-function updateSSRFile(config, ssrFilePath = DEFAULT_SSR_FILE_PATH) {
-    const content = fs.readFileSync(ssrFilePath, 'utf8')
+function updateConfigFile(config, configFilePath = DEFAULT_CONFIG_FILE_PATH) {
+    const content = fs.readFileSync(configFilePath, 'utf8')
     const directivesString = generateCSPDirectives(config)
 
     const newContent = content.replace(
-        /directives:\s*{[^}]+}/s,
+        /directives:\s*{[\s\S]*?}/s,
         `directives: {\n${directivesString}\n                }`
     )
 
-    fs.writeFileSync(ssrFilePath, newContent, 'utf8')
-    console.log('✅ Successfully added CSP directives to ssr.js')
+    fs.writeFileSync(configFilePath, newContent, 'utf8')
+    console.log('✅ Successfully added CSP directives to config/default.js')
 }
 
 /**
@@ -203,7 +204,7 @@ function updateSSRFile(config, ssrFilePath = DEFAULT_SSR_FILE_PATH) {
 async function main() {
     const args = process.argv.slice(2)
     const filteredArgs = args.filter((arg, index) => {
-        return !(arg === '--ssr-path' || args[index - 1] === '--ssr-path')
+        return !(arg === '--config-path' || args[index - 1] === '--config-path')
     })
 
     // Show help if no file argument and stdin is a TTY (not piped)
@@ -214,13 +215,13 @@ Usage:
   echo '{"img-src": ["*.example.com"]}' | node scripts/add-csp-directives.js
 
 Description:
-  Adds new CSP directive values to existing configuration in ssr.js
+  Adds new CSP directive values to existing configuration in config/default.js under app.contentSecurityPolicy
   - Preserves existing comments and values
   - Prevents duplicate values
   - Cannot remove or modify existing directives
 
 Options:
-  --ssr-path <path>    - Custom path to ssr.js file (default: packages/template-retail-react-app/app/ssr.js)
+  --config-path <path>  - Custom path to config/default.js (default: packages/template-retail-react-app/config/default.js)
 
 Examples:
   # Add CSP directives from configuration file
@@ -230,9 +231,9 @@ Examples:
   echo '{"img-src": ["*.example.com"]}' | node scripts/add-csp-directives.js
   cat csp-config.json | node scripts/add-csp-directives.js
 
-  # Use custom ssr.js path
-  node scripts/add-csp-directives.js --ssr-path custom/path/ssr.js csp-config.json
-  echo '{"script-src": ["cdn.example.com"]}' | node scripts/add-csp-directives.js --ssr-path custom/path/ssr.js
+  # Use custom config path
+  node scripts/add-csp-directives.js --config-path custom/path/default.js csp-config.json
+  echo '{"script-src": ["cdn.example.com"]}' | node scripts/add-csp-directives.js --config-path custom/path/default.js
 
 Config JSON Format (simplified - just arrays of strings):
 {
@@ -249,7 +250,7 @@ Config JSON Format (simplified - just arrays of strings):
         process.exit(1)
     }
 
-    const ssrFilePath = getSSRFilePath(args)
+    const configFilePath = getConfigFilePath(args)
 
     try {
         let newConfig
@@ -271,17 +272,17 @@ Config JSON Format (simplified - just arrays of strings):
             }
 
             entries.forEach((entry) => {
-                if (typeof entry !== 'string' && (typeof entry !== 'object' || !entry.value)) {
-                    throw new Error(`Each entry must be a string or object with 'value' property`)
+                if (typeof entry !== 'string') {
+                    throw new Error(`Each entry must be a string`)
                 }
             })
         })
 
         // Get current configuration and add new directives to it
-        const currentConfig = getCurrentCSPConfig(ssrFilePath)
+        const currentConfig = getCurrentCSPConfig(configFilePath)
         const mergedConfig = addCSPDirectives(currentConfig, newConfig)
 
-        updateSSRFile(mergedConfig, ssrFilePath)
+        updateConfigFile(mergedConfig, configFilePath)
         console.log(`✅ Added CSP directives successfully`)
 
         // TODO: Fix any linting errors by `npm run lint:fix` from the folder containing the ssr.js file
@@ -303,8 +304,8 @@ module.exports = {
     getCurrentCSPConfig,
     addCSPDirectives,
     generateCSPDirectives,
-    updateSSRFile,
-    getSSRFilePath,
+    updateConfigFile,
+    getConfigFilePath,
     parseInputFile,
     parseInputFromStdin
 }
