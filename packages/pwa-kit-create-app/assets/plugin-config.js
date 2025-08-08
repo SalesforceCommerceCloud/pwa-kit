@@ -16,7 +16,7 @@ module.exports = {
     plugins: {
         SFDC_EXT_WISHLIST: {
             description: 'Wishlist Extension'
-        },
+        }
         // SFDC_EXT_HELLO_WORLD_ENABLED: {
         //     description: 'The Hello World Extension'
         // },
