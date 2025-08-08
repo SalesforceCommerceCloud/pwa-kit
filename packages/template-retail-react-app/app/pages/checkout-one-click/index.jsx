@@ -91,7 +91,10 @@ const CheckoutOneClick = () => {
     }
 
     // Form for payment method
-    const paymentMethodForm = useForm()
+    const paymentMethodForm = useForm({
+        mode: 'onChange',
+        shouldUnregister: false
+    })
 
     // Form for billing address
     const billingAddressForm = useForm({
@@ -299,6 +302,7 @@ const CheckoutOneClick = () => {
                                         w="full"
                                         onClick={onPlaceOrder}
                                         isLoading={isLoading}
+                                        isDisabled={(!paymentMethodForm.formState.isValid && !appliedPayment) || paymentMethodForm.formState.isSubmitting}
                                         data-testid="place-order-button"
                                         size="lg"
                                         px={8}
