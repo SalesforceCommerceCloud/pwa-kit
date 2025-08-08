@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-/* eslint-disable no-import-assign */
+
 import React from 'react'
 import {act, render, screen} from '@testing-library/react'
 import {renderToString} from 'react-dom/server'
@@ -57,7 +57,10 @@ function renderServerComponent(component) {
 describe('Island Component', () => {
     beforeEach(() => {
         jest.clearAllMocks()
-        getConfig.mockImplementation(() => ({...mockConfig, app: {...mockConfig.app, partialHydrationEnabled: true}}))
+        getConfig.mockImplementation(() => ({
+            ...mockConfig,
+            app: {...mockConfig.app, partialHydrationEnabled: true}
+        }))
         global.requestIdleCallback = mockRequestIdleCallback
         global.cancelIdleCallback = mockCancelIdleCallback
         global.IntersectionObserver = mockIntersectionObserver
@@ -74,7 +77,10 @@ describe('Island Component', () => {
         })
 
         test('should not render an island at all if config "app.partialHydrationEnabled" is false', () => {
-            getConfig.mockImplementation(() => ({...mockConfig, app: {...mockConfig.app, partialHydrationEnabled: false}}))
+            getConfig.mockImplementation(() => ({
+                ...mockConfig,
+                app: {...mockConfig.app, partialHydrationEnabled: false}
+            }))
 
             const {container} = render(
                 <Island>
@@ -124,7 +130,10 @@ describe('Island Component', () => {
 
     describe('Client-Side Rendering (CSR)', () => {
         test('should not render an island at all if config "app.partialHydrationEnabled" is false', () => {
-            getConfig.mockImplementation(() => ({...mockConfig, app: {...mockConfig.app, partialHydrationEnabled: false}}))
+            getConfig.mockImplementation(() => ({
+                ...mockConfig,
+                app: {...mockConfig.app, partialHydrationEnabled: false}
+            }))
 
             const {container} = render(
                 <Island>
