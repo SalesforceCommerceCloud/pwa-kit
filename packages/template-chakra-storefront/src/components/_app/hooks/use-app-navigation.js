@@ -37,13 +37,13 @@ export const useAppNavigation = () => {
         history?.push(path)
     }, [buildUrl, history])
 
-    //@sfdc-extension-start SFDC_EXT_WISHLIST
+    //@sfdc-extension-block-start SFDC_EXT_WISHLIST
     const onWishlistClick = useCallback(() => {
         // Link to wishlist page if registered; Header component will show auth modal for guest users
         const path = buildUrl('/account/wishlist')
         history?.push(path)
     }, [buildUrl, history])
-    //@sfdc-extension-end SFDC_EXT_WISHLIST
+    //@sfdc-extension-block-end SFDC_EXT_WISHLIST
 
     return {
         onLogoClick,
