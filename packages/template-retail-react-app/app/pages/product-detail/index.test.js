@@ -334,6 +334,74 @@ describe('product set', () => {
             expect(heroImage.getAttribute('loading')).toBe('lazy')
         })
     })
+
+    test('pickup in store radio is enabled when all child products have inventory in selected store', async () => {
+        const inventoryId = 'inventory_m_store_store1'
+        const storeId = 'store-123'
+
+        // Mock useSelectedStore to return a store with inventoryId
+        mockUseSelectedStore.mockImplementation(() => ({
+            selectedStore: {
+                id: storeId,
+                name: 'Test Store',
+                inventoryId: inventoryId
+            },
+            isLoading: false,
+            error: null,
+            hasSelectedStore: true
+        }))
+
+        // Create product set with parent and child products that all have inventory in the selected store
+        const productSetWithInventory = {
+            ...mockedProductSet,
+            setProducts: mockedProductSet.setProducts.map((childProduct) => ({
+                ...childProduct,
+                inventories: [
+                    {
+                        id: inventoryId,
+                        orderable: true,
+                        ats: 10,
+                        stockLevel: 10
+                    }
+                ]
+            }))
+        }
+
+        global.server.use(
+            rest.get('*/products/:productId', (req, res, ctx) => {
+                return res(ctx.json(productSetWithInventory))
+            })
+        )
+
+        renderWithProviders(<MockedComponent />)
+
+        await waitFor(() => {
+            expect(screen.getByRole('link', {name: /mens/i})).toBeInTheDocument()
+        })
+
+        // Wait for child products to load
+        const childProducts = await screen.findAllByTestId('child-product')
+        expect(childProducts).toHaveLength(3) // 3 child products in the winter look set
+
+        // Check that each child product has pickup in store radio enabled
+        for (const childProduct of childProducts) {
+            await waitFor(() => {
+                const pickupRadio = within(childProduct).getByRole('radio', {
+                    name: /pick up in store/i
+                })
+                expect(pickupRadio).toBeEnabled()
+            })
+        }
+
+        // Check that the parent product pickup in store radio is also enabled
+        const allPickupRadios = await screen.findAllByRole('radio', {name: /pick up in store/i})
+        // Should have 4 pickup radios total: 1 parent + 3 children
+        expect(allPickupRadios).toHaveLength(4)
+
+        // The first pickup radio should be the parent product (rendered before child products)
+        const parentPickupRadio = allPickupRadios[0]
+        expect(parentPickupRadio).toBeEnabled()
+    })
 })
 
 describe('Recommended Products', () => {

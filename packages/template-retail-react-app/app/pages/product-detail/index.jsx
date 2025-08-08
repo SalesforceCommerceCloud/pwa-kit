@@ -108,7 +108,7 @@ const ProductDetail = () => {
     const {productId} = useParams()
     const urlParams = new URLSearchParams(location.search)
     const {
-        data: product,
+        data: productResponse,
         isLoading: isProductLoading,
         isError: isProductError,
         error: productError
@@ -147,7 +147,7 @@ const ProductDetail = () => {
         error: categoryError
     } = useCategory({
         parameters: {
-            id: product?.primaryCategoryId,
+            id: productResponse?.primaryCategoryId,
             levels: 1
         }
     })
@@ -157,23 +157,22 @@ const ProductDetail = () => {
     const [childProductOrderability, setChildProductOrderability] = useState({})
     const [selectedBundleQuantity, setSelectedBundleQuantity] = useState(1)
     const childProductRefs = React.useRef({})
-    const isProductASet = product?.type.set
-    const isProductABundle = product?.type.bundle
+    const isProductASet = productResponse?.type.set
+    const isProductABundle = productResponse?.type.bundle
 
-    let bundleChildProductIds = ''
-    if (isProductABundle)
-        bundleChildProductIds = Object.keys(childProductSelection)
-            ?.map(
-                (key) =>
-                    childProductSelection[key].variant?.productId ||
-                    childProductSelection[key].product?.id
-            )
-            .join(',')
+    const childVariantIds =
+        isProductABundle || isProductASet
+            ? Object.keys(childProductSelection)?.map(
+                  (key) =>
+                      childProductSelection[key].variant?.productId ||
+                      childProductSelection[key].product?.id
+              )
+            : []
 
-    const {data: bundleChildrenData} = useProducts(
+    const {data: variantProductData} = useProducts(
         {
             parameters: {
-                ids: bundleChildProductIds,
+                ids: childVariantIds.join(','),
                 allImages: false,
                 ...(selectedInventoryId ? {inventoryIds: selectedInventoryId} : {}),
                 expand: ['availability', 'variations'],
@@ -181,27 +180,83 @@ const ProductDetail = () => {
             }
         },
         {
-            enabled: bundleChildProductIds?.length > 0,
+            enabled: childVariantIds.length > 0,
             keepPreviousData: true
         }
     )
 
-    if (isProductABundle && bundleChildrenData) {
-        // Loop through the bundle children and update the inventory for variant selection
-        product.bundledProducts.forEach(({product: childProduct}, index) => {
-            const matchingChildProduct = bundleChildrenData.data.find(
-                (bundleChild) => bundleChild?.master?.masterId === childProduct.id
-            )
-            if (matchingChildProduct) {
-                product.bundledProducts[index].product = {
-                    ...childProduct,
-                    inventory: matchingChildProduct.inventory
-                }
-            }
-        })
-    }
+    // Optimize combo product inventory calculations with useEffect
+    const [product, setProduct] = useState(productResponse)
+    useEffect(() => {
+        if (!isProductASet && !isProductABundle) {
+            setProduct(productResponse)
+            return
+        }
 
-    const comboProduct = isProductASet || isProductABundle ? normalizeSetBundleProduct(product) : {}
+        const normalizedProduct = normalizeSetBundleProduct(productResponse)
+
+        if (!normalizedProduct.childProducts) {
+            setProduct(normalizedProduct)
+            return
+        }
+
+        // normalizeSetBundleProduct already creates deep clones for safe mutation
+        const updatedChildProducts = normalizedProduct.childProducts
+
+        // Update base product inventory to inventory variant selections
+        if (variantProductData?.data) {
+            updatedChildProducts.forEach(({product: childProduct}, index) => {
+                const matchingChildProduct = variantProductData.data.find(
+                    (variantChild) => variantChild?.master?.masterId === childProduct.id
+                )
+                if (matchingChildProduct) {
+                    updatedChildProducts[index].product = {
+                        ...childProduct,
+                        inventory: matchingChildProduct.inventory,
+                        inventories: matchingChildProduct.inventories
+                    }
+                }
+            })
+        }
+
+        // Calculate lowest inventory for product sets and update normalizedProduct directly
+        if (isProductASet) {
+            let lowestInventory
+            let missingInventory = false
+            let lowestStoreInventory
+            let missingStoreInventory = false
+            updatedChildProducts.forEach(({product: childProduct}) => {
+                if (!childProduct.inventory) {
+                    missingInventory = true
+                } else if (!(lowestInventory?.stockLevel < childProduct.inventory.stockLevel)) {
+                    lowestInventory = {...childProduct.inventory}
+                    lowestInventory.lowestStockLevelProductName = childProduct.name
+                }
+
+                const selectedStoreInventory = childProduct.inventories?.find(
+                    (inventory) => inventory.id === selectedInventoryId
+                )
+                if (!selectedStoreInventory) {
+                    missingStoreInventory = true
+                } else if (
+                    !(lowestStoreInventory?.stockLevel < selectedStoreInventory.stockLevel)
+                ) {
+                    lowestStoreInventory = {...selectedStoreInventory}
+                    lowestStoreInventory.lowestStockLevelProductName = childProduct.name
+                }
+            })
+
+            // Update normalizedProduct directly with the lowest values
+            if (!missingInventory && lowestInventory) {
+                normalizedProduct.inventory = lowestInventory
+            }
+            if (!missingStoreInventory && lowestStoreInventory) {
+                normalizedProduct.inventories = [lowestStoreInventory]
+            }
+        }
+
+        setProduct(normalizedProduct)
+    }, [productResponse, variantProductData, selectedInventoryId, isProductASet, isProductABundle])
 
     /**************** Error Handling ****************/
 
@@ -451,15 +506,13 @@ const ProductDetail = () => {
         // Using ot state for which child products are selected, scroll to the first
         // one that isn't selected and requires a variant selection.
         const selectedProductIds = Object.keys(childProductSelection)
-        const firstUnselectedProduct = comboProduct.childProducts?.find(
-            ({product: childProduct}) => {
-                // Skip validation for standard products (no variations)
-                if (childProduct.type?.item) {
-                    return false
-                }
-                return !selectedProductIds.includes(childProduct.id)
+        const firstUnselectedProduct = product?.childProducts?.find(({product: childProduct}) => {
+            // Skip validation for standard products (no variations)
+            if (childProduct.type?.item) {
+                return false
             }
-        )?.product
+            return !selectedProductIds.includes(childProduct.id)
+        })?.product
 
         if (firstUnselectedProduct) {
             // Get the reference to the product view and scroll to it.
@@ -705,10 +758,9 @@ const ProductDetail = () => {
 
                         <hr />
 
-                        {/* TODO: consider `childProduct.belongsToSet` */}
                         {
                             // Render the child products
-                            comboProduct.childProducts.map(
+                            product?.childProducts?.map(
                                 ({product: childProduct, quantity: childQuantity}) => (
                                     <Island hydrateOn={'visible'} key={childProduct.id}>
                                         <Box data-testid="child-product">
@@ -769,16 +821,24 @@ const ProductDetail = () => {
                                                 setChildProductOrderability={
                                                     setChildProductOrderability
                                                 }
-                                                pickupInStore={!!pickupInStoreMap[childProduct?.id]}
+                                                pickupInStore={
+                                                    !!pickupInStoreMap[
+                                                        childProductSelection[childProduct?.id]
+                                                            ?.variant?.productId
+                                                    ]
+                                                }
                                                 setPickupInStore={(checked) =>
                                                     childProduct &&
                                                     handlePickupInStoreChange(
-                                                        childProduct.id,
+                                                        childProductSelection[childProduct?.id]
+                                                            ?.variant?.productId,
                                                         checked
                                                     )
                                                 }
                                                 onOpenStoreLocator={onOpenStoreLocator}
-                                                showDeliveryOptions={STORE_LOCATOR_IS_ENABLED}
+                                                showDeliveryOptions={
+                                                    STORE_LOCATOR_IS_ENABLED && !isProductABundle
+                                                }
                                             />
                                             <InformationAccordion product={childProduct} />
 

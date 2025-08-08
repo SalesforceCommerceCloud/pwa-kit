@@ -146,7 +146,7 @@ const ProductView = forwardRef(
             pickupInStore = false,
             setPickupInStore = () => {},
             onOpenStoreLocator = () => {},
-            showDeliveryOptions = true
+            showDeliveryOptions = false
         },
         ref
     ) => {
