@@ -97,7 +97,10 @@ const CheckoutOneClick = () => {
     }
 
     // Form for payment method
-    const paymentMethodForm = useForm()
+    const paymentMethodForm = useForm({
+        mode: 'onChange',
+        shouldUnregister: false
+    })
 
     // Form for billing address
     const billingAddressForm = useForm({
