@@ -25,6 +25,7 @@ const SimpleProductDetails = ({
                 product={product}
                 category={primaryCategory?.parentCategoryTree || []}
                 addToCart={(variant, quantity) => handleAddToCart([{product, variant, quantity}])}
+                //@sfdc-extension-line SFDC_EXT_WISHLIST
                 addToWishlist={handleAddToWishlist}
                 isProductLoading={isProductLoading}
                 isBasketLoading={isBasketLoading}
