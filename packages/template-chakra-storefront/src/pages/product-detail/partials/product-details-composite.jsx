@@ -24,6 +24,7 @@ const CompositeProductDetails = ({
     isProductABundle,
     isProductLoading,
     isBasketLoading,
+    //@sfdc-extension-line SFDC_EXT_WISHLIST
     isWishlistLoading,
     handleAddToWishlist,
     handleAddToCart,
