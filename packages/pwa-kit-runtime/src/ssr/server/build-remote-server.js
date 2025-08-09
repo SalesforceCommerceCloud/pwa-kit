@@ -695,8 +695,11 @@ export const RemoteServerFactory = {
             return
         }
 
-        // We explicitly disallow the proxy from handling SLAS /oauth2/trusted-system requests
-        const trustedSystemPath = '/shopper/auth/v1/oauth2/trusted-system'
+        // This is the full path to the SLAS trusted-system endpoint
+        // We want to throw an error if the regex defined options.applySLASPrivateClientToEndpoints
+        // matches this path as an early warning to developers that they should update their regex
+        // in ssr.js to exclude this path.
+        const trustedSystemPath = '/shopper/auth/v1/oauth2/trusted-system/token'
         if (trustedSystemPath.match(options.applySLASPrivateClientToEndpoints)) {
             throw new Error(
                 'It is not allowed to include /oauth2/trusted-system endpoints in `applySLASPrivateClientToEndpoints`'
