@@ -1,5 +1,38 @@
 import React from 'react';
-import { Card, CardHeader, CardBody, CardFooter, Heading, Text, Button, Stack } from '@chakra-ui/react';
+import { Box, Heading, Text, Button, Stack } from '@chakra-ui/react';
+
+// Temporary simple Card implementation for testing
+const Card = ({ children, maxW, variant, size, ...props }) => (
+  <Box 
+    border="1px solid" 
+    borderColor="gray.200" 
+    borderRadius="md" 
+    p={4} 
+    maxW={maxW}
+    shadow={variant === 'elevated' ? 'md' : 'none'}
+    {...props}
+  >
+    {children}
+  </Box>
+);
+
+const CardHeader = ({ children }) => (
+  <Box mb={3}>
+    {children}
+  </Box>
+);
+
+const CardBody = ({ children }) => (
+  <Box mb={3}>
+    {children}
+  </Box>
+);
+
+const CardFooter = ({ children }) => (
+  <Box>
+    {children}
+  </Box>
+);
 
 export default {
   title: 'Chakra UI/Card',

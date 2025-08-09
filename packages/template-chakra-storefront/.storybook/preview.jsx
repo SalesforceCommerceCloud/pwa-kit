@@ -1,6 +1,9 @@
 import React from 'react';
-import { ChakraProvider } from '@chakra-ui/react';
-import theme from '../src/theme';
+import { ChakraProvider, createSystem, defaultConfig } from '@chakra-ui/react';
+import { BrowserRouter } from 'react-router-dom';
+
+// Create a system using the default configuration
+const system = createSystem(defaultConfig);
 
 /** @type { import('@storybook/react').Preview } */
 const preview = {
@@ -16,10 +19,12 @@ const preview = {
   },
   decorators: [
     (Story) => (
-      <ChakraProvider value={theme}>
-        <div style={{ padding: '1rem' }}>
-          <Story />
-        </div>
+      <ChakraProvider value={system}>
+        <BrowserRouter>
+          <div style={{ padding: '1rem' }}>
+            <Story />
+          </div>
+        </BrowserRouter>
       </ChakraProvider>
     ),
   ],

@@ -1,5 +1,65 @@
 import React from 'react';
-import { Input, InputGroup, InputLeftElement, InputRightElement, FormControl, FormLabel, FormHelperText, FormErrorMessage, Stack } from '@chakra-ui/react';
+import { Input, Stack, Box, Text } from '@chakra-ui/react';
+
+// Temporary Form component implementations for testing
+const FormControl = ({ children, isInvalid, ...props }) => (
+  <Box {...props}>
+    {children}
+  </Box>
+);
+
+const FormLabel = ({ children, ...props }) => (
+  <Text as="label" fontSize="sm" fontWeight="medium" mb={1} {...props}>
+    {children}
+  </Text>
+);
+
+const FormHelperText = ({ children, ...props }) => (
+  <Text fontSize="sm" color="gray.600" mt={1} {...props}>
+    {children}
+  </Text>
+);
+
+const FormErrorMessage = ({ children, ...props }) => (
+  <Text fontSize="sm" color="red.500" mt={1} {...props}>
+    {children}
+  </Text>
+);
+
+// Temporary InputGroup component implementations
+const InputGroup = ({ children, ...props }) => (
+  <Box position="relative" {...props}>
+    {children}
+  </Box>
+);
+
+const InputLeftElement = ({ children, pointerEvents, ...props }) => (
+  <Box
+    position="absolute"
+    left={3}
+    top="50%"
+    transform="translateY(-50%)"
+    zIndex={2}
+    pointerEvents={pointerEvents}
+    {...props}
+  >
+    {children}
+  </Box>
+);
+
+const InputRightElement = ({ children, pointerEvents, ...props }) => (
+  <Box
+    position="absolute"
+    right={3}
+    top="50%"
+    transform="translateY(-50%)"
+    zIndex={2}
+    pointerEvents={pointerEvents}
+    {...props}
+  >
+    {children}
+  </Box>
+);
 
 export default {
   title: 'Chakra UI/Input',
