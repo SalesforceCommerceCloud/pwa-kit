@@ -10,7 +10,11 @@ import PropTypes from 'prop-types'
 import {renderWithProviders} from '../../utils/test-utils'
 import ItemVariantProvider from './index'
 import ItemPrice from './item-price'
-import {cartVariant, wishlistVariant} from './data.mock'
+import {
+    cartVariant, 
+    //@sfdc-extension-line SFDC_EXT_WISHLIST
+    wishlistVariant
+} from './data.mock'
 import {within} from '@testing-library/react'
 import {useMediaQuery} from '@chakra-ui/react'
 
