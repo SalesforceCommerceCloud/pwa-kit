@@ -314,6 +314,7 @@ const ProductView = forwardRef(
                 }
                 addToWishlist(product, variant, quantity)
             }
+            //@sfdc-extension-block-end SFDC_EXT_WISHLIST
 
             // child product of bundles do not have add to cart button
             if ((addToCart || updateCart) && !isProductPartOfBundle) {
