@@ -190,6 +190,7 @@ test('route to account page when an authenticated users click on account icon', 
     })
 })
 
+//@sfdc-extension-block-start SFDC_EXT_WISHLIST
 test('route to wishlist page when an authenticated users click on wishlist icon', async () => {
     const history = createMemoryHistory()
     // mock push function
@@ -210,3 +211,4 @@ test('route to wishlist page when an authenticated users click on wishlist icon'
         expect(history.push).toHaveBeenCalledWith(createPathWithDefaults('/account/wishlist'))
     })
 })
+//@sfdc-extension-block-end SFDC_EXT_WISHLIST
