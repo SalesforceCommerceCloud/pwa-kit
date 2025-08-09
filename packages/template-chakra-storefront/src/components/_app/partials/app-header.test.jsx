@@ -92,8 +92,8 @@ describe('AppHeader', () => {
         onMenuClick: jest.fn(),
         onLogoClick: jest.fn(),
         onMyCartClick: jest.fn(),
-        //@sfdc-extension-line SFDC_EXT_WISHLIST
         onMyAccountClick: jest.fn(),
+        //@sfdc-extension-line SFDC_EXT_WISHLIST
         onWishlistClick: jest.fn(),
         onStoreLocatorClick: jest.fn(),
         mobileNavigationProps: {
