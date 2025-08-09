@@ -199,7 +199,7 @@ const RecommendedProducts = ({zone, recommender, products, title, shouldFetch, .
             })
         }
     }
-
+    //@sfdc-extension-block-end SFDC_EXT_WISHLIST
     return (
         <ProductScroller
             ref={ref}
