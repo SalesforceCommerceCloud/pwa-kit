@@ -12,6 +12,7 @@ export const messages = defineMessages({
     profile: {defaultMessage: 'Account Details', id: 'global.account.link.account_details'},
     addresses: {defaultMessage: 'Addresses', id: 'global.account.link.addresses'},
     orders: {defaultMessage: 'Order History', id: 'global.account.link.order_history'},
+    //@sfdc-extension-line SFDC_EXT_WISHLIST
     wishlist: {defaultMessage: 'Wishlist', id: 'global.account.link.wishlist'}
 })
 
