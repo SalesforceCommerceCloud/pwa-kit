@@ -29,7 +29,9 @@ const MockComponent = (props) => {
 MockComponent.propTypes = {
     product: PropTypes.object,
     addToCart: PropTypes.func,
+    //@sfdc-extension-line SFDC_EXT_WISHLIST
     addToWishlist: PropTypes.func,
+    //@sfdc-extension-line SFDC_EXT_WISHLIST
     updateWishlist: PropTypes.func,
     isBasketLoading: PropTypes.bool
 }
@@ -69,6 +71,7 @@ test('ProductView Component renders with addToCart event handler', async () => {
     })
 })
 
+//@sfdc-extension-block-start SFDC_EXT_WISHLIST
 test('ProductView Component renders with addToWishList event handler', async () => {
     const addToWishlist = jest.fn()
 
@@ -87,7 +90,9 @@ test('ProductView Component renders with addToWishList event handler', async () 
     })
     expect(addToWishlist).toHaveBeenCalledTimes(1)
 })
+//@sfdc-extension-block-end SFDC_EXT_WISHLIST
 
+//@sfdc-extension-block-start SFDC_EXT_WISHLIST
 test('ProductView Component renders with updateWishlist event handler', async () => {
     const updateWishlist = jest.fn()
 
@@ -105,6 +110,7 @@ test('ProductView Component renders with updateWishlist event handler', async ()
     })
     expect(updateWishlist).toHaveBeenCalledTimes(1)
 })
+//@sfdc-extension-block-end SFDC_EXT_WISHLIST
 
 test('Product View can update quantity', async () => {
     const user = userEvent.setup()
@@ -132,7 +138,12 @@ test('Product View can update quantity', async () => {
 test('renders a product set properly - parent item', () => {
     const parent = mockProductSet
     renderWithProviders(
-        <MockComponent product={parent} addToCart={() => {}} addToWishlist={() => {}} />
+        <MockComponent 
+            product={parent} 
+            addToCart={() => {}} 
+            //@sfdc-extension-line SFDC_EXT_WISHLIST
+            addToWishlist={() => {}} 
+        />
     )
 
     // NOTE: there can be duplicates of the same element, due to mobile and desktop views
@@ -140,6 +151,7 @@ test('renders a product set properly - parent item', () => {
 
     const fromAtLabel = screen.getAllByText(/from/i)[0]
     const addSetToCartButton = screen.getAllByRole('button', {name: /add set to cart/i})[0]
+    //@sfdc-extension-line SFDC_EXT_WISHLIST
     const addSetToWishlistButton = screen.getAllByRole('button', {name: /add set to wishlist/i})[0]
     const variationAttributes = screen.queryAllByRole('radiogroup') // e.g. sizes, colors
     const quantityPicker = screen.queryByRole('spinbutton', {name: /quantity/i})
@@ -147,6 +159,7 @@ test('renders a product set properly - parent item', () => {
     // What should exist:
     expect(fromAtLabel).toBeInTheDocument()
     expect(addSetToCartButton).toBeInTheDocument()
+    //@sfdc-extension-line SFDC_EXT_WISHLIST
     expect(addSetToWishlistButton).toBeInTheDocument()
 
     // What should _not_ exist:
@@ -157,13 +170,19 @@ test('renders a product set properly - parent item', () => {
 test('renders a product set properly - child item', () => {
     const child = mockProductSet.setProducts[0]
     renderWithProviders(
-        <MockComponent product={child} addToCart={() => {}} addToWishlist={() => {}} />
+        <MockComponent 
+            product={child} 
+            addToCart={() => {}} 
+            //@sfdc-extension-line SFDC_EXT_WISHLIST
+            addToWishlist={() => {}} 
+        />
     )
 
     // NOTE: there can be duplicates of the same element, due to mobile and desktop views
     // (they're hidden with display:none style)
 
     const addToCartButton = screen.getAllByRole('button', {name: /add to cart/i})[0]
+    //@sfdc-extension-line SFDC_EXT_WISHLIST
     const addToWishlistButton = screen.getAllByRole('button', {name: /add to wishlist/i})[0]
     const variationAttributes = screen.getAllByRole('radiogroup') // e.g. sizes, colors
     const quantityPicker = screen.getByRole('spinbutton', {name: /quantity/i})
@@ -171,6 +190,7 @@ test('renders a product set properly - child item', () => {
 
     // What should exist:
     expect(addToCartButton).toBeInTheDocument()
+    //@sfdc-extension-line SFDC_EXT_WISHLIST
     expect(addToWishlistButton).toBeInTheDocument()
     expect(variationAttributes).toHaveLength(2)
     expect(quantityPicker).toBeInTheDocument()
@@ -191,6 +211,7 @@ test('validateOrderability callback is called when adding a set to cart', async 
             product={parent}
             validateOrderability={validateOrderability}
             addToCart={() => {}}
+            //@sfdc-extension-line SFDC_EXT_WISHLIST
             addToWishlist={() => {}}
         />
     )
@@ -215,6 +236,7 @@ test('onVariantSelected callback is called after successfully selected a variant
             product={child}
             onVariantSelected={onVariantSelected}
             addToCart={() => {}}
+            //@sfdc-extension-line SFDC_EXT_WISHLIST
             addToWishlist={() => {}}
         />
     )
@@ -258,20 +280,28 @@ describe('add to cart button loading tests', () => {
 test('renders a product bundle properly - parent item', () => {
     const parent = mockProductBundle
     renderWithProviders(
-        <MockComponent product={parent} addToCart={() => {}} addToWishlist={() => {}} />
+        <MockComponent 
+            product={parent} 
+            addToCart={() => {}} 
+            //@sfdc-extension-line SFDC_EXT_WISHLIST
+            addToWishlist={() => {}} 
+        />
     )
 
     // NOTE: there can be duplicates of the same element, due to mobile and desktop views
     // (they're hidden with display:none style)
     const addBundleToCartButton = screen.getAllByRole('button', {name: /add bundle to cart/i})[0]
+    //@sfdc-extension-block-start SFDC_EXT_WISHLIST
     const addBundleToWishlistButton = screen.getAllByRole('button', {
         name: /add bundle to wishlist/i
     })[0]
+    //@sfdc-extension-block-end SFDC_EXT_WISHLIST
     const quantityPicker = screen.getByRole('spinbutton', {name: /quantity/i})
     const variationAttributes = screen.queryAllByRole('radiogroup') // e.g. sizes, colors
 
     // What should exist:
     expect(addBundleToCartButton).toBeInTheDocument()
+    //@sfdc-extension-line SFDC_EXT_WISHLIST
     expect(addBundleToWishlistButton).toBeInTheDocument()
     expect(quantityPicker).toBeInTheDocument()
 
@@ -285,6 +315,7 @@ test('renders a product bundle properly - child item', () => {
         <MockComponent
             product={child}
             addToCart={() => {}}
+            //@sfdc-extension-line SFDC_EXT_WISHLIST
             addToWishlist={() => {}}
             isProductPartOfBundle={true}
             setChildProductOrderability={() => {}}
@@ -292,6 +323,7 @@ test('renders a product bundle properly - child item', () => {
     )
 
     const addToCartButton = screen.queryByRole('button', {name: /add to cart/i})
+    //@sfdc-extension-line SFDC_EXT_WISHLIST
     const addToWishlistButton = screen.queryByRole('button', {name: /add to wishlist/i})
     const variationAttributes = screen.getAllByRole('radiogroup') // e.g. sizes, colors
     const quantityPicker = screen.queryByRole('spinbutton', {name: /quantity:/i})
@@ -301,6 +333,7 @@ test('renders a product bundle properly - child item', () => {
 
     // What should _not_ exist:
     expect(addToCartButton).toBeNull()
+    //@sfdc-extension-line SFDC_EXT_WISHLIST
     expect(addToWishlistButton).toBeNull()
     expect(quantityPicker).toBeNull()
 })
