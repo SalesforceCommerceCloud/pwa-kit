@@ -1,7 +1,6 @@
 /** @type { import('@storybook/react-vite').StorybookConfig } */
 const config = {
   stories: [
-    // Add your story files here when ready
     '../src/**/*.stories.@(js|jsx|mjs|ts|tsx)',
     '../src/**/*.mdx'
   ],
