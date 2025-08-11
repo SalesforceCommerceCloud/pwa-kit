@@ -26,20 +26,6 @@ const commerceAgentSettings = {
 
 module.exports = {
     app: {
-        partialHydrationEnabled: false,
-        contentSecurityPolicy: {
-            useDefaults: true,
-            directives: {
-                'img-src': ['*.commercecloud.salesforce.com'],
-                'script-src': ['storage.googleapis.com'],
-                'connect-src': [
-                    'api.cquotient.com',
-                    '*.c360a.salesforce.com',
-                    '*.salesforce-scrt.com'
-                ],
-                'frame-src': ['*.site.com']
-            }
-        },
         commerceAgent: commerceAgentSettings,
         url: {
             locale: 'path',
