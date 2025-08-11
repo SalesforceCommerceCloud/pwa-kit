@@ -61,7 +61,9 @@ const CheckoutOneClick = () => {
     const {social = {}} = getConfig().app.login || {}
     const idps = social?.idps
     const isSocialEnabled = !!social?.enabled
-    const createCustomerPaymentInstruments = useShopperCustomersMutation('createCustomerPaymentInstrument')
+    const createCustomerPaymentInstruments = useShopperCustomersMutation(
+        'createCustomerPaymentInstrument'
+    )
     // The last applied payment instrument on the card. We need to track to save it on the customer profile upon registration
     // as the payment instrument on order only contains the masked number.
     let shopperPaymentInstrument
