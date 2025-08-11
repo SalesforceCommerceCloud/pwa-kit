@@ -47,22 +47,6 @@ const OtpAuth = ({isOpen, onClose, form, handleSendEmailOtp, handleOtpVerificati
         }
     }, [resendTimer])
 
-    // Focus first OTP input when modal opens and clear previous values
-    useEffect(() => {
-        if (isOpen) {
-            // Clear previous OTP values
-            setOtpValues(new Array(OTP_LENGTH).fill(''))
-            setVerificationError('')
-            form.setValue('otp', '')
-
-            // Small delay to ensure modal is fully rendered
-            const timer = setTimeout(() => {
-                inputRefs.current[0]?.focus()
-            }, 100)
-            return () => clearTimeout(timer)
-        }
-    }, [isOpen, form])
-
     // Validation function to check if value contains only digits
     const isNumericValue = (value) => {
         return /^\d*$/.test(value)
@@ -151,7 +135,7 @@ const OtpAuth = ({isOpen, onClose, form, handleSendEmailOtp, handleOtpVerificati
     }
 
     return (
-        <Modal isOpen={isOpen} onClose={onClose} isCentered size="lg" closeOnOverlayClick={false}>
+        <Modal isOpen={isOpen} isCentered size="lg" closeOnOverlayClick={false}>
             <ModalOverlay />
             <ModalContent>
                 <ModalHeader>
@@ -160,7 +144,7 @@ const OtpAuth = ({isOpen, onClose, form, handleSendEmailOtp, handleOtpVerificati
                         id="otp.title.confirm_its_you"
                     />
                 </ModalHeader>
-                <ModalCloseButton disabled={isVerifying} />
+                <ModalCloseButton onClick={onClose} disabled={isVerifying} />
                 <ModalBody pb={6}>
                     <Stack spacing={12} paddingLeft={4} paddingRight={4} alignItems="center">
                         <Text fontSize="md" maxWidth="300px" textAlign="center">
