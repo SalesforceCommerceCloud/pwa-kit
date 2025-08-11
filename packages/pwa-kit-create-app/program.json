@@ -732,7 +732,7 @@
                 "name": "Valid Short Code",
                 "description": "Ensures the short code is valid.",
                 "message": "Invalid format. Use docs to find more information about valid configurations: https://developer.salesforce.com/docs/commerce/commerce-api/guide/commerce-api-configuration-values",
-                "regex": "^([0-9A-Z]{8}|(performance|staging|development|sandbox)-\\d\\d\\d)$"
+                "regex": "^([0-9A-Z]{8})$"
             },
             {
                 "id": "validClientId",
