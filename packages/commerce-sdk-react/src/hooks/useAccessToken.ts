@@ -34,7 +34,6 @@ const useAccessToken = (): AccessToken => {
           // eslint-disable-next-line react-hooks/rules-of-hooks
           useLocalStorage(`access_token_${config.siteId}`)
         : auth.get('access_token')
-    console.log('==auth context==', auth)
 
     // NOTE: auth.ready() is to be called later. If you call it immediately in this hook,
     // it'll cause infinite re-renders during testing.
