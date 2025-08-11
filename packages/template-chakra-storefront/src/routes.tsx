@@ -22,12 +22,6 @@ import {configureRoutes} from '../src/utils/routes-utils'
 
 const fallback = <Skeleton height="75vh" width="100%" />
 // Pages
-const Home = loadable(() => import('../src/pages/home'), {fallback})
-const Login = loadable(() => import('../src/pages/login'), {fallback})
-const Registration = loadable(() => import('../src/pages/registration'), {
-    fallback
-})
-const ResetPassword = loadable(() => import('../src/pages/reset-password'), {fallback})
 const Account = loadable(() => import('../src/pages/account'), {fallback})
 const Cart = loadable(() => import('../src/pages/cart'), {fallback})
 const Checkout = loadable(() => import('../src/pages/checkout'), {
@@ -36,12 +30,22 @@ const Checkout = loadable(() => import('../src/pages/checkout'), {
 const CheckoutConfirmation = loadable(() => import('../src/pages/checkout/confirmation'), {
     fallback
 })
-const SocialLoginRedirect = loadable(() => import('../src/pages/social-login-redirect'), {fallback})
+
 const LoginRedirect = loadable(() => import('../src/pages/login-redirect'), {fallback})
+const Login = loadable(() => import('../src/pages/login'), {fallback})
+const Home = loadable(() => import('../src/pages/home'), {fallback})
+const Registration = loadable(() => import('../src/pages/registration'), {
+    fallback
+})
+const ResetPassword = loadable(() => import('../src/pages/reset-password'), {fallback})
 const ProductDetail = loadable(() => import('../src/pages/product-detail'), {fallback})
 const ProductList = loadable(() => import('../src/pages/product-list'), {
     fallback
 })
+
+//@sfdc-extension-line SFDC_EXT_SOCIAL_LOGIN
+const SocialLoginRedirect = loadable(() => import('../src/pages/social-login-redirect'), {fallback})
+
 // const StoreLocator = loadable(() => import('../src/pages/store-locator'), {
 //     fallback
 // })
@@ -98,11 +102,13 @@ export const routes = [
         component: LoginRedirect,
         exact: true
     },
+    //@sfdc-extension-block-start SFDC_EXT_SOCIAL_LOGIN
     {
         path: '/social-callback',
         component: SocialLoginRedirect,
         exact: true
     },
+    //@sfdc-extension-block-end SFDC_EXT_SOCIAL_LOGIN
     {
         path: '/cart',
         component: Cart,

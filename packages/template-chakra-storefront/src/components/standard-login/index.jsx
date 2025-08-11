@@ -31,8 +31,8 @@ const StandardLogin = ({
     form,
     handleForgotPasswordClick,
     hideEmail = false,
-    isSocialEnabled = false,
     setShowPasswordView,
+    //@sfdc-extension-line SFDC_EXT_SOCIAL_LOGIN
     idps = []
 }) => {
     const {formatMessage} = useIntl()
@@ -55,7 +55,8 @@ const StandardLogin = ({
                 >
                     {formatMessage(messages.signIn)}
                 </Button>
-                {isSocialEnabled && idps.length > 0 && (
+                {/* @sfdc-extension-block-start SFDC_EXT_SOCIAL_LOGIN */}
+                {idps.length > 0 && (
                     <>
                         <Stack gap={6} paddingTop={2} paddingBottom={2}>
                             <Separator />
@@ -66,6 +67,7 @@ const StandardLogin = ({
                         <SocialLogin form={form} idps={idps} />
                     </>
                 )}
+                {/* @sfdc-extension-block-end SFDC_EXT_SOCIAL_LOGIN */}
                 {hideEmail && (
                     <Button
                         onClick={() => {
@@ -88,8 +90,8 @@ StandardLogin.propTypes = {
     form: PropTypes.object,
     handleForgotPasswordClick: PropTypes.func,
     hideEmail: PropTypes.bool,
-    isSocialEnabled: PropTypes.bool,
     setShowPasswordView: PropTypes.func,
+    //@sfdc-extension-line SFDC_EXT_SOCIAL_LOGIN
     idps: PropTypes.arrayOf(PropTypes.string)
 }
 

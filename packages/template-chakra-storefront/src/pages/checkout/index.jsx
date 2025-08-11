@@ -34,8 +34,8 @@ const Checkout = () => {
     const [isLoading, setIsLoading] = useState(false)
     const {mutateAsync: createOrder} = useShopperOrdersMutation('createOrder')
     const {login: loginConfig} = getConfig()
-    const isSocialEnabled = !!loginConfig?.social?.enabled
     const isPasswordlessEnabled = !!loginConfig?.passwordless?.enabled
+    //@sfdc-extension-line SFDC_EXT_SOCIAL_LOGIN
     const idps = loginConfig?.social?.idps || []
 
     const messages = useMemo(
@@ -93,8 +93,8 @@ const Checkout = () => {
                             )}
 
                             <ContactInfo
-                                isSocialEnabled={isSocialEnabled}
                                 isPasswordlessEnabled={isPasswordlessEnabled}
+                                //@sfdc-extension-line SFDC_EXT_SOCIAL_LOGIN
                                 idps={idps}
                             />
                             <ShippingAddress />

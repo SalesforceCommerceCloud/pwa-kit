@@ -35,7 +35,7 @@ const LoginForm = ({
     clickCreateAccount = noop,
     form,
     isPasswordlessEnabled = false,
-    isSocialEnabled = false,
+    //@sfdc-extension-line SFDC_EXT_SOCIAL_LOGIN
     idps = []
 }) => {
     const {formatMessage} = useIntl()
@@ -73,14 +73,14 @@ const LoginForm = ({
                         <PasswordlessLogin
                             form={form}
                             handleForgotPasswordClick={handleForgotPasswordClick}
-                            isSocialEnabled={isSocialEnabled}
+                            //@sfdc-extension-line SFDC_EXT_SOCIAL_LOGIN
                             idps={idps}
                         />
                     ) : (
                         <StandardLogin
                             form={form}
                             handleForgotPasswordClick={handleForgotPasswordClick}
-                            isSocialEnabled={isSocialEnabled}
+                            //@sfdc-extension-line SFDC_EXT_SOCIAL_LOGIN
                             idps={idps}
                         />
                     )}
@@ -108,7 +108,7 @@ LoginForm.propTypes = {
     clickCreateAccount: PropTypes.func,
     form: PropTypes.object,
     isPasswordlessEnabled: PropTypes.bool,
-    isSocialEnabled: PropTypes.bool,
+    //@sfdc-extension-line SFDC_EXT_SOCIAL_LOGIN
     idps: PropTypes.arrayOf(PropTypes.string)
 }
 
