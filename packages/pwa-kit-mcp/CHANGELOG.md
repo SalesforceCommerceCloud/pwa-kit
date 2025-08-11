@@ -1,5 +1,10 @@
-## v1.0.0-dev.0 (Jun 26, 2025)
-- Clean up readme [#](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/)
+## v0.2.1-dev (Aug 11, 2025)
+
+## v0.1.1 (Aug 11, 2025)
+- Add missing `shelljs` dependency. [#3053](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3053)
+
+## v0.1.0 (Jun 26, 2025)
+- Clean up readme [#2954](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2954)
 - Add `create_app_guidelines` MCP tool  [#2663](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2663)
 - Add `create_new_sample_component` MCP tool. [#2651](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2651)
 - Add `create_app_guidelines` MCP tool. [#2599](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2599)

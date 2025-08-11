@@ -14,7 +14,8 @@ import {
     CreateNewComponentTool,
     DeveloperGuidelinesTool,
     TestWithPlaywrightTool,
-    CreateNewPageTool
+    CreateNewPageTool,
+    VersionControlGitTool
 } from '../tools'
 
 // NOTE: This is a workaround to import JSON files as ES modules.
@@ -38,6 +39,7 @@ class PwaStorefrontMCPServerHighLevel {
             }
         )
         this.createNewComponentTool = new CreateNewComponentTool()
+        this.versionControlGitTool = new VersionControlGitTool()
         this.testWithPlaywrightTool = new TestWithPlaywrightTool()
         this.setupTools()
     }
@@ -76,6 +78,12 @@ class PwaStorefrontMCPServerHighLevel {
             CreateNewPageTool.description,
             CreateNewPageTool.inputSchema,
             CreateNewPageTool.handler
+        )
+        this.server.tool(
+            this.versionControlGitTool.name,
+            this.versionControlGitTool.description,
+            this.versionControlGitTool.inputSchema,
+            this.versionControlGitTool.handler
         )
     }
 
