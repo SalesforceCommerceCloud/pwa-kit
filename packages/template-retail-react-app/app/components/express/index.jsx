@@ -7,7 +7,6 @@
 import React, {useEffect, useState} from 'react'
 import {useLocation} from 'react-router-dom'
 
-import {useAccessToken, useCustomerId} from '@salesforce/commerce-sdk-react'
 import {AdyenExpressCheckoutProvider} from '@adyen/adyen-salesforce-pwa'
 
 import {ApplePayExpress} from '@salesforce/retail-react-app/app/components/apple-pay-express/index'
@@ -16,8 +15,6 @@ import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
 import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
 
 function Express() {
-    //const {getTokenWhenReady} = useAccessToken()
-    const customerId = useCustomerId()
     const navigate = useNavigation()
     const {locale, site} = useMultiSite()
     const [basket, setBasketData] = useState(null)
@@ -86,22 +83,11 @@ function Express() {
         }
     }, [])
 
-    // useEffect(() => {
-    //     const getToken = async () => {
-    //         const token = await getTokenWhenReady()
-    //         setAuthToken(token)
-    //         console.log('set auth token using local storage')
-    //     }
-
-    //     getToken()
-    // }, [])
-
     if (!authToken) {
         return null
     }
 
     console.log('==authToken sent to adyen==', authToken)
-    console.log('==customerId==', customerId)
     console.log('==finalCustomerId sent to adyen==', finalCustomerId)
     console.log('==basket sent to adyen==', basket)
 
