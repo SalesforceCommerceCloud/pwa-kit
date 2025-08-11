@@ -13,7 +13,7 @@ module.exports = {
   GENERATED_PROJECTS_DIR: "../generated-projects",
   GENERATE_PROJECTS: ["retail-app-demo", "retail-app-ext", "retail-app-no-ext"],
   GENERATOR_CMD:
-    "node packages/pwa-kit-create-app/scripts/create-mobify-app-dev.js --initGit --outputDir",
+    "node packages/pwa-kit-create-app/scripts/create-mobify-app-dev.js --outputDir",
   CLI_RESPONSES: {
     "retail-app-demo": [
       {
@@ -112,8 +112,6 @@ module.exports = {
   },
   EXPECTED_GENERATED_ARTIFACTS: {
     "retail-app-demo": [
-      ".git",
-      ".gitignore",
       ".cursor",
       ".eslintignore",
       ".eslintrc.js",
@@ -128,8 +126,6 @@ module.exports = {
       "worker",
     ],
     "retail-app-ext": [
-      ".git",
-      ".gitignore",
       ".cursor",
       ".eslintignore",
       ".eslintrc.js",

@@ -1,8 +1,0 @@
-
-.DS_Store
-.vscode/
-node_modules/
-build/
-coverage/
-tmp/
-*.log
