@@ -25,33 +25,15 @@ jobs:
               run: |-
                   npm ci
 
-            - name: Generate Project
-              id: generate_app
-              uses: ./.github/actions/generate_app
+            - name: Generate App
+              uses: ./.github/actions/e2e_generate_app
               with:
-                  use_extensibility: false
-                  is_private_client: true
-                  setup_hybrid: false
-                  project_dir: 'storefront'
-                  project_id: 'storefront'
-                  org_id: 'f_ecom_tbbn_prd'
-                  short_code: 'performance-001'
-                  client_id: '9629ef22-f8b8-4987-90ac-b815be3940c8'
-                  site_id: 'SiteNemesis'
-                  instance_url: 'https://zzrf-001.dx.commercecloud.salesforce.com' # this doesn't matter because the OCAPI proxy in Runtime Admin will take precedence
+                PROJECT_KEY: "retail-react-app-performance-tests"
 
-            - name: Add CSP Directives
-              run: |-
-                  CSP_DIRECTIVES='{
-                    "img-src": ["*.sfcc-store-internal.net"],
-                    "script-src": ["*.sfcc-store-internal.net"],
-                    "connect-src": ["*.sfcc-store-internal.net"]
-                  }'
-                  echo "$CSP_DIRECTIVES" | node e2e/scripts/add-csp-directives.js --config-path "${{ steps.generate_app.outputs.project_path }}/config/default.js"
-
-            - name: Enable Partial Hydration
-              run: |-
-                  node e2e/scripts/update-config.js app.partialHydrationEnabled true --config-path "${{ steps.generate_app.outputs.project_path }}/config/default.js"
+            - name: Validate Generated App
+              uses: ./.github/actions/e2e_validate_generated_app
+              with:
+                PROJECT_KEY: "retail-react-app-performance-tests"
 
             - name: Create MRT credentials file
               uses: './.github/actions/create_mrt'
