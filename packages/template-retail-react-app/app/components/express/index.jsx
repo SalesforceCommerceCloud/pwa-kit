@@ -102,17 +102,22 @@ function Express() {
 
     return (
         <div>
-            <AdyenExpressCheckoutProvider
-                authToken={authToken}
-                customerId={finalCustomerId}
-                locale={locale}
-                site={site}
-                basket={basket}
-                navigate={navigate}
-            >
-                {/*<ApplePayExpress sku={currentSku} quantity={currentQuantity} isPdpMode={isPdpMode} />*/}
-                <GooglePayExpress />
-            </AdyenExpressCheckoutProvider>
+            {!isPdpMode && basket && (
+                <AdyenExpressCheckoutProvider
+                    authToken={authToken}
+                    customerId={customerId}
+                    locale={locale}
+                    site={site}
+                    basket={basket}
+                    navigate={navigate}
+                >
+                    <ApplePayExpress sku={currentSku} quantity={currentQuantity} isPdpMode={isPdpMode} basketData={basket} authToken={authToken} />
+                    {/* <GooglePayExpress /> */}
+                </AdyenExpressCheckoutProvider>
+            )}
+            {isPdpMode && (
+                <ApplePayExpress sku={currentSku} quantity={currentQuantity} isPdpMode={isPdpMode} basketData={basket} authToken={authToken} />
+            )}
         </div>
     )
 }
