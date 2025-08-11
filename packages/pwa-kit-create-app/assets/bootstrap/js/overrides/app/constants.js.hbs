@@ -5,10 +5,10 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-/* 
+/*
     Hello there! This is a demonstration of how to override a file from the base template.
-    
-    It's necessary that the module export interface remain consistent, 
+
+    It's necessary that the module export interface remain consistent,
     as other files in the base template rely on constants.js, thus we
     import the underlying constants.js, modifies it and re-export it.
 */
@@ -16,3 +16,10 @@
 export const CUSTOM_HOME_TITLE = '🎉 Hello Extensible React Template!'
 
 export * from '{{template.source.name}}/app/constants'
+
+// Override constants from the base template by re-exporting them with new values
+{{#if answers.project.partialHydrationEnabled}}
+export const PARTIAL_HYDRATION_ENABLED = {{answers.project.partialHydrationEnabled}}
+{{else}}
+export const PARTIAL_HYDRATION_ENABLED = false
+{{/if}}
