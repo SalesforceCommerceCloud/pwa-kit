@@ -35,10 +35,6 @@ function parseValue(valueString) {
     if (valueString.toLowerCase() === 'true') return true
     if (valueString.toLowerCase() === 'false') return false
 
-    // Handle null and undefined
-    if (valueString.toLowerCase() === 'null') return null
-    if (valueString.toLowerCase() === 'undefined') return undefined
-
     // Handle numbers
     if (/^-?\d+$/.test(valueString)) {
         return parseInt(valueString, 10)
@@ -92,12 +88,6 @@ function valueToCode(value) {
     }
     if (typeof value === 'boolean' || typeof value === 'number') {
         return value.toString()
-    }
-    if (value === null) {
-        return 'null'
-    }
-    if (value === undefined) {
-        return 'undefined'
     }
     if (Array.isArray(value)) {
         return JSON.stringify(value, null, 4).replace(/"/g, "'")
@@ -181,7 +171,7 @@ Supported Value Types:
   - Strings: hello, 'hello', or "hello" (quotes optional; both single and double quotes are supported)
   - Arrays: ["item1", "item2"] (JSON format)
   - Objects: {"key": "value"} (JSON format)
-  - Null: null
+
         `)
         process.exit(1)
     }
