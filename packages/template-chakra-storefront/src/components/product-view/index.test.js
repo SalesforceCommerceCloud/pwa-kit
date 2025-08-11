@@ -138,11 +138,11 @@ test('Product View can update quantity', async () => {
 test('renders a product set properly - parent item', () => {
     const parent = mockProductSet
     renderWithProviders(
-        <MockComponent 
-            product={parent} 
-            addToCart={() => {}} 
+        <MockComponent
+            product={parent}
+            addToCart={() => {}}
             //@sfdc-extension-line SFDC_EXT_WISHLIST
-            addToWishlist={() => {}} 
+            addToWishlist={() => {}}
         />
     )
 
@@ -170,11 +170,11 @@ test('renders a product set properly - parent item', () => {
 test('renders a product set properly - child item', () => {
     const child = mockProductSet.setProducts[0]
     renderWithProviders(
-        <MockComponent 
-            product={child} 
-            addToCart={() => {}} 
+        <MockComponent
+            product={child}
+            addToCart={() => {}}
             //@sfdc-extension-line SFDC_EXT_WISHLIST
-            addToWishlist={() => {}} 
+            addToWishlist={() => {}}
         />
     )
 
@@ -280,11 +280,11 @@ describe('add to cart button loading tests', () => {
 test('renders a product bundle properly - parent item', () => {
     const parent = mockProductBundle
     renderWithProviders(
-        <MockComponent 
-            product={parent} 
-            addToCart={() => {}} 
+        <MockComponent
+            product={parent}
+            addToCart={() => {}}
             //@sfdc-extension-line SFDC_EXT_WISHLIST
-            addToWishlist={() => {}} 
+            addToWishlist={() => {}}
         />
     )
 

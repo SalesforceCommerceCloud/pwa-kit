@@ -274,7 +274,6 @@ const ProductView = forwardRef(
                 addSetToWishlist: formatMessage(messages.addSetToWishlist),
                 addBundleToWishlist: formatMessage(messages.addBundleToWishlist)
                 //@sfdc-extension-block-end SFDC_EXT_WISHLIST
-
             }
 
             const handleCartItem = async () => {

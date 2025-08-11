@@ -11,7 +11,7 @@ import {renderWithProviders} from '../../utils/test-utils'
 import ItemVariantProvider from './index'
 import ItemPrice from './item-price'
 import {
-    cartVariant, 
+    cartVariant,
     //@sfdc-extension-line SFDC_EXT_WISHLIST
     wishlistVariant
 } from './data.mock'

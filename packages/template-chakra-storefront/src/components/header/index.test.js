@@ -40,10 +40,10 @@ const MockedComponent = ({history}) => {
     //@sfdc-extension-block-end SFDC_EXT_WISHLIST
     return (
         <div>
-            <Header 
-                onMyAccountClick={onAccountClick} 
+            <Header
+                onMyAccountClick={onAccountClick}
                 //@sfdc-extension-line SFDC_EXT_WISHLIST
-                onWishlistClick={onWishlistClick} 
+                onWishlistClick={onWishlistClick}
             />
         </div>
     )
