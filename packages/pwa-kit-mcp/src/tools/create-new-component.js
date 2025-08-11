@@ -4,126 +4,117 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
+import {z} from 'zod'
 import fs from 'fs/promises'
 import path from 'path'
 import {toKebabCase, toPascalCase, getCopyrightHeader} from '../utils'
 
-// Utility to infer entity from component name
-function inferEntityFromComponentName(componentName) {
-    const name = componentName.toLowerCase()
-    if (name.includes('customer')) return 'customer'
-    if (name.includes('product')) return 'product'
-    if (name.includes('basket')) return 'basket'
-    if (name.includes('category')) return 'category'
-    return null
-}
+const systemPrompt = `
+You are a smart assistant that helps create new React components.
+Please ask the user for the following, one at a time:
+1. What is the name of the new component?
+2. What is the main purpose of this component? Please reply with exactly one of the following options:
+   - Display a single Product
+   - Display a list of Products
+   - Other (please specify)
+**Do not** assume answers. Collect all answers before proceeding.
+Once the answers are provided, execute the createComponent tool with the collected information as input parameters.
+`
+
+const systemPromptForCustomComponent = `
+You have chosen a custom purpose for your component.
+
+Please provide the following details:
+- What is the main purpose of this component?
+- What are the requirements?
+- What type of component is this? (presentational, container, form, etc.)
+
+**Component Generation Guidelines:**
+- Use functional components with hooks
+- Use PascalCase for component names
+- Use kebab-case for directories
+- Start simple, expand only if requested
+- One main purpose per component
+- Components should be created in the components folder under PWA_STOREFRONT_APP_PATH, at: [PWA_STOREFRONT_APP_PATH]/components/[component-name]/index.jsx
+`
+
+const systemPromptForComponentPurpose = `
+What is the main purpose of this component? Reply with exactly one of the following options: "Display a single Product", "Display a list of Products", or "Other (please specify)".`
 
 class CreateNewComponentTool {
     constructor() {
-        this.currentStep = 0
-        this.componentData = {
-            name: null,
-            location: null,
-            entityType: null
+        this.name = 'create_new_component'
+        this.description =
+            'Create a sample React component. Gather information from user for the MCP tool parameters **one at a time**, in a natural and conversational way. Do **not** ask all the questions at once.'
+        this.inputSchema = {
+            componentName: z.string().min(1, 'The name of the new Component to create?'),
+            purpose: z
+                .string()
+                .min(
+                    1,
+                    'The Purpose of the new component (e.g., Display a single Product, Display a list of Products or something else)'
+                )
+                .describe(systemPromptForComponentPurpose),
+            location: z
+                .string()
+                .describe('The location of the component to be created')
+                .default(process.env.PWA_STOREFRONT_APP_PATH)
+        }
+        this.handler = async (args) => {
+            if (!args || !args.componentName || !args.purpose || !args.location) {
+                return {
+                    role: 'system',
+                    content: [{type: 'text', text: systemPrompt}]
+                }
+            }
+            const normalizedPurpose = args.purpose.trim().toLowerCase()
+            const isSingleProduct = normalizedPurpose === 'display a single product'
+            const isProductList = normalizedPurpose === 'display a list of products'
+
+            if (isSingleProduct) {
+                // Proceed with standard component creation
+                return this.createComponent(args.componentName, args.location, 'singleProduct')
+            } else if (isProductList) {
+                return this.createComponent(args.componentName, args.location, 'productList')
+            } else {
+                // Custom purpose: let Cursor take over and ask clarifying questions
+                return {
+                    role: 'system',
+                    content: [{type: 'text', text: systemPromptForCustomComponent}]
+                }
+            }
         }
     }
 
-    /**
-     * Creates the component based on all collected data
-     * @returns {Promise<string>} The result of component creation
-     */
-    async createComponent() {
-        const messages = []
-
-        // Use the provided absolute path directly if available
-        const location = this.componentData.location
-        const componentMessage = await this.createComponentFile(this.componentData.name, location)
-        messages.push(componentMessage)
-
-        // Handle entity type information
-        if (this.componentData.entityType) {
-            messages.push(
-                `\nℹ️ Entity type '${this.componentData.entityType}' ${
-                    inferEntityFromComponentName(this.componentData.name)
-                        ? 'was inferred'
-                        : 'was specified'
-                } for component '${this.componentData.name}'.`
-            )
-        } else {
-            messages.push(
-                `\nℹ️ No entity type was specified or could be inferred for component '${this.componentData.name}'.`
-            )
-        }
-
-        // Always append lint reminder
-        messages.push(
-            "\n💡 After creating or modifying a component, run 'npm run lint -- --fix' to automatically fix formatting and linter issues."
-        )
-
-        // Reset for next use
-        this.reset()
-
-        return messages.join('\n')
-    }
-
-    /**
-     * Resets the tool state for the next component creation
-     */
-    reset() {
-        this.currentStep = 0
-        this.componentData = {
-            name: null,
-            location: null,
-            entityType: null
-        }
-    }
-
-    /**
-     * Creates a new React component file.
-     * @param {string} componentName - Name for the new component.
-     * @param {string} projectDir - The absolute path to the project directory for the new component.
-     */
-    async createComponentFile(componentName, projectDir) {
-        const kebabDirName = toKebabCase(componentName)
-        const pascalComponentName = toPascalCase(componentName)
-        const componentDir = path.join(projectDir, kebabDirName)
+    async createComponent(componentName, location, entityType) {
         try {
-            await fs.mkdir(componentDir, {recursive: true})
-            // Create component file
-            const componentFilePath = path.join(componentDir, 'index.jsx')
-            const codeToWrite = `${getCopyrightHeader()}
-import React from 'react';
-
-const ${pascalComponentName} = () => {
-  return (
-    <div>${pascalComponentName} component</div>
-  );
-};
-
-export default ${pascalComponentName};
-`
-            await fs.writeFile(componentFilePath, codeToWrite, 'utf-8')
-            return `✅ Created ${componentFilePath}`
-        } catch (err) {
-            console.error('Error during file creation:', err)
-            return `❌ Error creating component file at ${componentDir}: ${err.message}`
+            const result = await this.generateComponentFiles(componentName, location, entityType)
+            return {
+                role: 'system',
+                content: [{type: 'text', text: result}]
+            }
+        } catch (error) {
+            return {
+                role: 'developer',
+                content: [{type: 'text', text: `Error creating component: ${error.message}`}]
+            }
         }
     }
 
-    /**
-     * Updates the component file to be a presentational component for the given data model.
-     * @param {string} entityType - The entity type (e.g., 'product').
-     * @param {string} componentName - The component name.
-     * @param {string} location - The absolute path to the component's parent directory.
-     * @param {object} dataModel - The data model schema (properties object).
-     */
-    async updateComponentToPresentational(
-        entityType,
-        componentName,
-        location,
-        dataModel,
-        options = {}
-    ) {
+    async generateComponentFiles(componentName, location, entityType) {
+        const componentsDir = path.join(location, 'components')
+        if (entityType === 'singleProduct' || entityType === 'productList') {
+            // Call updateComponentToPresentational for product-based components
+            return await this.updateComponentToPresentational(
+                'product',
+                componentName,
+                componentsDir,
+                {list: entityType === 'productList'}
+            )
+        }
+    }
+
+    async updateComponentToPresentational(entityType, componentName, location, options = {}) {
         const kebabDirName = toKebabCase(componentName)
         const pascalComponentName = toPascalCase(componentName)
         const componentDir = path.join(location, kebabDirName)

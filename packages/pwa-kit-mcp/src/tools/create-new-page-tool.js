@@ -6,7 +6,16 @@
  */
 import fs from 'fs/promises'
 import path from 'path'
-import {toKebabCase, toPascalCase, logMCPMessage} from '../utils'
+import {
+    toKebabCase,
+    toPascalCase,
+    logMCPMessage,
+    isLocalComponent,
+    isLocalSharedUIComponent,
+    isBaseComponent,
+    isSharedUIBaseComponent,
+    generateComponentImportStatement
+} from '../utils'
 import {z} from 'zod'
 
 const systemPromptForCreatePage = `You are a smart assistant that can use tools when needed. \
@@ -14,8 +23,13 @@ const systemPromptForCreatePage = `You are a smart assistant that can use tools 
         Do **not** ask all the questions at once. \
         Do **not** assume the answers to the questions, especially the URL route. **Always** ask the user for the URL route. \
         - What is the name of the new page to create? \
-        - List the components to include on the page, separated by commas (e.g., Image, ProductView) \
+        - List the components to include on the page, separated by commas. Component names should be in PascalCase (e.g., Image, ProductView) \
         - What is the URL route for this page? (e.g., /new-home, /my-products) \
+        - What is the absolute path to your node_modules directory? \
+        - What is the absolute path to your components directory? \
+        - What is the absolute path to your pages directory? \
+        - What is the absolute path to your routes.jsx file? \
+        - Is ccExtensibility.overridesDir set in your package.json? (true/false) \
         Collect answers to these questions, then call the tool with the collected information as input parameters.`
 
 const systemPromptForProductHook = `User have added the ProductView component to the new page. Please ask user: \
@@ -65,27 +79,50 @@ class CreateNewPageTool {
             componentList: z
                 .array(z.string())
                 .describe(
-                    'The existing components to include on the page, separated by commas (e.g., AddressDisplay, ProductView, Footer)'
+                    'The existing components to include on the page, separated by commas. Component names should be in PascalCase (e.g., AddressDisplay, ProductView, Footer)'
                 ),
             route: z
                 .string()
-                .describe('The URL route for this page? (e.g., /new-home, /my-product-view)')
+                .describe('The URL route for this page? (e.g., /new-home, /my-product-view)'),
+            nodeModulesPath: z.string().describe('The absolute path to the node_modules directory'),
+            componentsPath: z.string().describe('The absolute path to the components directory'),
+            pagesPath: z.string().describe('The absolute path to the pages directory'),
+            routesPath: z.string().describe('The absolute path to the routes.jsx file'),
+            hasOverridesDir: z
+                .boolean()
+                .describe('Whether ccExtensibility.overridesDir is set in package.json')
         }
         this.unfoundComponents = []
 
         this.handler = async (args) => {
             logMCPMessage(`------- Calling CreateNewPageTool handler`)
-            if (!args || !args.pageName || !args.componentList || !args.route) {
+            if (
+                !args ||
+                !args.pageName ||
+                !args.componentList ||
+                !args.route ||
+                !args.nodeModulesPath ||
+                !args.componentsPath ||
+                !args.pagesPath ||
+                !args.routesPath ||
+                args.hasOverridesDir === undefined
+            ) {
                 return {
                     role: 'system',
                     content: [{type: 'text', text: systemPromptForCreatePage}]
                 }
             }
-            return this.createPage(args.pageName, args.componentList, args.route)
+            return this.createPage(args.pageName, args.componentList, args.route, {
+                nodeModulesPath: args.nodeModulesPath,
+                componentsPath: args.componentsPath,
+                pagesPath: args.pagesPath,
+                routesPath: args.routesPath,
+                hasOverridesDir: args.hasOverridesDir
+            })
         }
     }
 
-    async createPage(pageName, componentList, route) {
+    async createPage(pageName, componentList, route, absolutePaths) {
         logMCPMessage(
             `========== Creating page ${pageName} with components ${componentList} and route ${route}`
         )
@@ -96,7 +133,8 @@ class CreateNewPageTool {
 
         try {
             const messages = []
-            const pagesDir = path.join(process.env.PWA_STOREFRONT_APP_PATH, 'pages')
+            // Use the provided absolute path for pages directory
+            const pagesDir = absolutePaths.pagesPath
             pageName = toPascalCase(pageName)
             const pageDir = path.join(pagesDir, toKebabCase(pageName))
             try {
@@ -109,11 +147,15 @@ class CreateNewPageTool {
             if (componentList.length == 0) {
                 componentList.push(pageName)
             }
-            const pageContent = await this.generatePageContent(pageName, componentList)
+            const pageContent = await this.generatePageContent(
+                pageName,
+                componentList,
+                absolutePaths
+            )
             logMCPMessage(`!!!!!! \n pageContent: ${pageContent} \n !!!!!`)
             const indexPath = path.join(pageDir, 'index.jsx')
             await fs.writeFile(indexPath, pageContent, 'utf8')
-            await this.updateRoutes(pageName, route)
+            await this.updateRoutes(pageName, route, absolutePaths)
             messages.push(`Created page ${pageName} at ${pageDir}`)
             messages.push(`Added route ${route}`)
             logMCPMessage(`componentList: ${componentList}`)
@@ -141,43 +183,59 @@ class CreateNewPageTool {
         }
     }
 
-    generatePageContent(pageName, componentList) {
+    generatePageContent(pageName, componentList, absolutePaths) {
         const imports = [
             `import React from 'react'`,
-            `import {Box} from '@salesforce/retail-react-app/app/components/shared/ui'`,
             `import Seo from '@salesforce/retail-react-app/app/components/seo'`
         ]
-
+        const sharedUIComponents = ['Box']
         // Add component imports
         const accessPromises = componentList.map(async (component) => {
             component = toPascalCase(component)
             const componentName = component.charAt(0).toUpperCase() + component.slice(1)
             const componentDir = toKebabCase(componentName)
-            try {
-                await fs.access(
-                    path.join(process.env.PWA_STOREFRONT_APP_PATH, 'components', componentDir)
-                )
-            } catch (err) {
-                if (err.code === 'ENOENT') {
-                    this.unfoundComponents.push(component)
-                } else {
-                    throw err
-                }
+            // Use the provided absolute paths for component detection
+            const isLocal = isLocalComponent(componentDir, absolutePaths.componentsPath)
+            const isLocalSharedUI = isLocalSharedUIComponent(
+                componentDir,
+                absolutePaths.componentsPath
+            )
+            const isBase = isBaseComponent(componentDir, absolutePaths.nodeModulesPath)
+            const isSharedUI = isSharedUIBaseComponent(componentDir, absolutePaths.nodeModulesPath)
+            if (!isLocal && !isLocalSharedUI && !isBase && !isSharedUI) {
+                this.unfoundComponents.push(component)
             }
-            logMCPMessage(
-                `?????? importing ${componentName} from '@salesforce/retail-react-app/app/components/${componentDir}'`
-            )
-            imports.push(
-                `import {getAssetUrl} from '@salesforce/pwa-kit-react-sdk/ssr/universal/utils'`,
-                `import ${componentName} from '@salesforce/retail-react-app/app/components/${componentDir}'`
-            )
             // Import getAssetUrl for displaying image source if Image component is used
             if (componentName === 'Image') {
                 imports.push(
                     `import {getAssetUrl} from '@salesforce/pwa-kit-react-sdk/ssr/universal/utils'`
                 )
             }
+            if (isLocalSharedUI || isSharedUI) {
+                sharedUIComponents.push(componentName)
+                return
+            }
+            // If the component name is the same as the page name, add 'Component' to the component name to avoid conflict with the page name
+            const importComponentName =
+                componentName === pageName ? componentName + 'Component' : componentName
+            const importComponentPath = generateComponentImportStatement(
+                importComponentName,
+                componentDir,
+                isLocal,
+                isBase,
+                absolutePaths,
+                absolutePaths.hasOverridesDir
+            )
+            imports.push(importComponentPath)
         })
+
+        // Import all shared UI components in a single import statement
+        if (sharedUIComponents.length > 0) {
+            const importSharedUIComponents = sharedUIComponents.join(', ')
+            imports.push(
+                `import {${importSharedUIComponents}} from '@salesforce/retail-react-app/app/components/shared/ui'`
+            )
+        }
 
         return Promise.all(accessPromises).then(() => {
             logMCPMessage(`?????? imports ${imports.join('\n')}`)
@@ -186,10 +244,13 @@ class CreateNewPageTool {
                 .map((component) => {
                     component = toPascalCase(component)
                     const componentName = component.charAt(0).toUpperCase() + component.slice(1)
+                    // If the component name is the same as the page name, add 'Component' to the component name
+                    const importComponentName =
+                        componentName === pageName ? componentName + 'Component' : componentName
                     if (componentName === 'Image') {
                         return ` <Image src={getAssetUrl('static/img/hero.png')} alt="pwa-kit banner" style={{ width: '700px', height: 'auto' }} />`
                     }
-                    return `                <${componentName} />`
+                    return `                <${importComponentName} />`
                 })
                 .join('\n')
 
@@ -226,8 +287,9 @@ export default ${pageName};
         })
     }
 
-    async updateRoutes(pageName, route) {
-        const routesPath = path.join(process.env.PWA_STOREFRONT_APP_PATH, 'routes.jsx')
+    async updateRoutes(pageName, route, absolutePaths) {
+        // Use the provided absolute path to the routes.jsx file
+        const routesPath = absolutePaths.routesPath
         try {
             const routesContent = await fs.readFile(routesPath, 'utf8')
 

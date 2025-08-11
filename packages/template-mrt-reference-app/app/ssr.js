@@ -350,6 +350,7 @@ const runtime = getRuntime()
 
 const {handler, app, server} = runtime.createHandler(options, (app) => {
     app.get('/favicon.ico', runtime.serveStaticFile('static/favicon.ico'))
+    app.get('/robots.txt', runtime.serveStaticFile('static/robots.txt'))
 
     // Add middleware to explicitly suppress caching on all responses (done
     // before we invoke the handlers)
