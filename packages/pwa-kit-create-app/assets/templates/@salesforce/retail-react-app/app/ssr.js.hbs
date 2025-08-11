@@ -282,29 +282,50 @@ const {handler} = runtime.createHandler(options, (app) => {
     // Set default HTTP security headers required by PWA Kit
     app.use(defaultPwaKitSecurityHeaders)
     // Set custom HTTP security headers
+    {{#if answers.project.contentSecurityPolicy}}
+    const contentSecurityPolicy = {
+        useDefaults: {{answers.project.contentSecurityPolicy.useDefaults}},
+        directives: {
+            {{#each answers.project.contentSecurityPolicy.directives}}
+            '{{@key}}': [
+                {{#each this}}
+                '{{this}}'{{#unless @last}},{{/unless}}
+                {{/each}}
+            ]{{#unless @last}},{{/unless}}
+            {{/each}}
+        }{{#if answers.project.contentSecurityPolicy.referrerPolicy}},
+        referrerPolicy: {
+            policy: '{{answers.project.contentSecurityPolicy.referrerPolicy.policy}}'
+        }{{/if}}
+    }
+    {{else}}
+    const contentSecurityPolicy = {
+        useDefaults: true,
+        directives: {
+            'img-src': [
+                // Default source for product images - replace with your CDN
+                '*.commercecloud.salesforce.com'
+            ],
+            'script-src': [
+                // Used by the service worker in /worker/main.js
+                'storage.googleapis.com'
+            ],
+            'connect-src': [
+                // Connect to Einstein APIs
+                'api.cquotient.com',
+                '*.c360a.salesforce.com'
+            ]
+        },
+        referrerPolicy: {
+            policy: 'strict-origin-when-cross-origin'
+        }
+    }
+
+    {{/if}}
+
     app.use(
         helmet({
-            contentSecurityPolicy: {
-                useDefaults: true,
-                directives: {
-                    'img-src': [
-                        // Default source for product images - replace with your CDN
-                        '*.commercecloud.salesforce.com'
-                    ],
-                    'script-src': [
-                        // Used by the service worker in /worker/main.js
-                        'storage.googleapis.com'
-                    ],
-                    'connect-src': [
-                        // Connect to Einstein APIs
-                        'api.cquotient.com',
-                        '*.c360a.salesforce.com'
-                    ]
-                },
-                referrerPolicy: {
-                    policy: 'strict-origin-when-cross-origin'
-                }
-            }
+            contentSecurityPolicy
         })
     )
 
