@@ -14,7 +14,8 @@ export const IFRAME_HOST_ALLOW_LIST = Object.freeze([
     'https://runtime-admin-preview.mobify-storefront.com'
 ])
 
-/* The following constants will need to adapt to work with the new envBasePath feature */
+/* Deprecating the following path constants since, outside of storefront preview,
+ * the paths they are used for can be passed in via the provider. */
 /**
  * @deprecated
  */

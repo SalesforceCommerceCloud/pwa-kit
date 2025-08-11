@@ -243,9 +243,10 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
         }
 
         // Special proxy endpoint for injecting SLAS private client secret.
-        // Note: we want to prioritize privateClientProxyEndpoint instead of this since that allows us to use the new envBasePath feature
-        // This is kept here for now to prevent a breaking change.
-        // We should remove this in the next major release so we do not have a hard coded proxy path inside commerce-sdk-react
+        // This is only used by the ShopperLogin API as that is the only one that interacts with SLAS.
+        // We prioritize config.privateClientProxyEndpoint since that allows us to use the new envBasePath feature
+        // The preexisting hard coded privateClientEndpoint is kept here for now to prevent a breaking change.
+        // TODO: We should remove this in the next major release so we do not have a hard coded proxy path inside commerce-sdk-react
         const baseUrl = config.proxy.split(MOBIFY_PATH)[0]
         const privateClientEndpoint = `${baseUrl}${SLAS_PRIVATE_PROXY_PATH}`
 

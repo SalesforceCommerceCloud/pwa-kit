@@ -1330,6 +1330,26 @@ describe('Base path tests', () => {
             })
     }, 15000)
 
+    test('should remove base path from routes defined with regex', async () => {
+        jest.spyOn(ssrConfig, 'getConfig').mockReturnValue({envBasePath: '/basepath'})
+
+        const app = RemoteServerFactory._createApp(opts())
+
+        app.get(/\/api\/users\/\d+/, (req, res) => {
+            // Extract the user ID from the URL path since regex routes don't create req.params automatically
+            const match = req.path.match(/\/api\/users\/(\d+)/)
+            const userId = match ? match[1] : 'unknown'
+            res.status(200).json({userId: userId})
+        })
+
+        return request(app)
+            .get('/basepath/api/users/123')
+            .then((response) => {
+                expect(response.status).toBe(200)
+                expect(response.body.userId).toBe('123')
+            })
+    }, 15000)
+
     test('remove base path can handle complex base paths', async () => {
         jest.spyOn(ssrConfig, 'getConfig').mockReturnValue({envBasePath: '/my/base/path'})
 
