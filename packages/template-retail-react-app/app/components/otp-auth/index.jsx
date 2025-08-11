@@ -268,7 +268,7 @@ const OtpAuth = ({
     const isResendDisabled = resendTimer > 0 || isVerifying
 
     return (
-        <Modal isOpen={isOpen} isCentered size="lg" closeOnOverlayClick={false}>
+        <Modal isOpen={isOpen} onClose={onClose} isCentered size="lg" closeOnOverlayClick={false}>
             <ModalOverlay />
             <ModalContent>
                 <ModalHeader>
@@ -277,7 +277,7 @@ const OtpAuth = ({
                         id="otp.title.confirm_its_you"
                     />
                 </ModalHeader>
-                <ModalCloseButton onClick={onClose} disabled={isVerifying} />
+                <ModalCloseButton disabled={isVerifying} />
                 <ModalBody pb={6}>
                     <Stack spacing={12} paddingLeft={4} paddingRight={4} alignItems="center">
                         <Text fontSize="md" maxWidth="300px" textAlign="center">
