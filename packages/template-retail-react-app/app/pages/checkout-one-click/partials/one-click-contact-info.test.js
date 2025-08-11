@@ -180,7 +180,12 @@ describe('ContactInfo Component', () => {
         expect(screen.queryByText('Please enter your email address.')).not.toBeInTheDocument()
     })
 
-    test('allows guest checkout with valid email', async () => {
+    test('shows continue button for unregistered email', async () => {
+        // Mock the passwordless login to fail (email not found)
+        mockAuthHelperFunctions[AuthHelpers.AuthorizePasswordless].mutateAsync.mockRejectedValue(
+            new Error('Email not found')
+        )
+
         const {user} = renderWithProviders(<ContactInfo />)
 
         const emailInput = screen.getByLabelText('Email')
