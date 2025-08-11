@@ -1,7 +1,7 @@
 ## v0.2.1-dev (Aug 11, 2025)
 
 ## v0.1.1 (Aug 11, 2025)
-- Add missing `shelljs` dependency.
+- Add missing `shelljs` dependency. [#3053](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3053)
 
 ## v0.1.0 (Jun 26, 2025)
 - Clean up readme [#2954](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2954)
