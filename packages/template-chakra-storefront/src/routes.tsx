@@ -48,6 +48,13 @@ const ProductList = loadable(() => import('../src/pages/product-list'), {
 const Wishlist = loadable(() => import('../src/pages/account/wishlist'), {
     fallback
 })
+const BonusProductDebugRebuilt = loadable(
+    () => import('../src/pages/bonus-product-debug-rebuilt'),
+    {
+        fallback
+    }
+)
+
 const PageNotFound = loadable(() => import('../src/pages/page-not-found'))
 
 export const routes = [
@@ -129,6 +136,11 @@ export const routes = [
     //     path: '/store-locator',
     //     component: StoreLocator
     // },
+    {
+        path: '/bonus-product-debug-rebuilt',
+        component: BonusProductDebugRebuilt,
+        exact: true
+    },
     {
         path: '*',
         component: PageNotFound
