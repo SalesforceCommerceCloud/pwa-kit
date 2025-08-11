@@ -69,11 +69,6 @@ export const TOAST_MESSAGE_ALREADY_IN_WISHLIST = defineMessage({
     defaultMessage: 'Item is already in wishlist'
 })
 
-export const TOAST_MESSAGE_REMOVED_ITEM_FROM_CART = defineMessage({
-    defaultMessage: 'Item removed from cart',
-    id: 'cart.info.removed_from_cart'
-})
-
 export const TOAST_ACTION_VIEW_WISHLIST = defineMessage({
     defaultMessage: 'View',
     id: 'global.link.added_to_wishlist.view_wishlist'
@@ -84,6 +79,10 @@ export const TOAST_MESSAGE_REMOVED_FROM_WISHLIST = defineMessage({
     defaultMessage: 'Item removed from wishlist'
 })
 //@sfdc-extension-block-end SFDC_EXT_WISHLIST
+export const TOAST_MESSAGE_REMOVED_ITEM_FROM_CART = defineMessage({
+    defaultMessage: 'Item removed from cart',
+    id: 'cart.info.removed_from_cart'
+})
 
 // Einstein recommender constants used in <RecommendedProducts/>
 export const EINSTEIN_RECOMMENDERS = {
