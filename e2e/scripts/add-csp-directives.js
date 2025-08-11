@@ -11,33 +11,29 @@
  * Script to add new CSP directive values to existing configuration in config/default.js (app.contentSecurityPolicy)
  *
  * This script only adds new values - it cannot remove or modify existing directives.
- * It preserves existing comments and prevents duplicate values.
+ * It prevents duplicate values.
+ *
+ * NOTE: This operation is lossy - existing comments in the CSP configuration will be removed.
  */
 
 const fs = require('fs')
-const path = require('path')
-
-// Default path to the config default.js file
-const DEFAULT_CONFIG_FILE_PATH = path.join(
-    __dirname,
-    '../packages/template-retail-react-app/config/default.js'
-)
 
 /**
- * Get the config file path from command line args or use default
+ * Get the config file path from command line args
  */
 function getConfigFilePath(args) {
     const pathIndex = args.indexOf('--config-path')
     if (pathIndex !== -1 && pathIndex + 1 < args.length) {
         return args[pathIndex + 1]
     }
-    return DEFAULT_CONFIG_FILE_PATH
+    return null
 }
 
 /**
  * Parse current CSP directives from config default.js
+ * NOTE: This function ignores existing comments (lossy operation)
  */
-function getCurrentCSPConfig(configFilePath = DEFAULT_CONFIG_FILE_PATH) {
+function getCurrentCSPConfig(configFilePath) {
     const content = fs.readFileSync(configFilePath, 'utf8')
     // Find the directives object under contentSecurityPolicy
     const directivesMatch = content.match(
@@ -51,7 +47,7 @@ function getCurrentCSPConfig(configFilePath = DEFAULT_CONFIG_FILE_PATH) {
     const directivesContent = directivesMatch[1]
     const config = {}
 
-    // Match each directive and its array
+    // Match each directive and its array (simplified - no comment handling)
     const directiveMatches = directivesContent.matchAll(/'([^']+)':\s*\[([^\]]+)\]/gs)
 
     Array.from(directiveMatches).forEach((match) => {
@@ -60,25 +56,10 @@ function getCurrentCSPConfig(configFilePath = DEFAULT_CONFIG_FILE_PATH) {
 
         config[directiveName] = []
 
-        // Parse values and comments from existing CSP
-        const lines = valuesContent.split('\n')
-        let currentComment = null
-
-        lines.forEach((line) => {
-            const trimmedLine = line.trim()
-
-            if (trimmedLine.startsWith('//')) {
-                currentComment = trimmedLine.substring(2).trim()
-            } else if (trimmedLine.includes("'")) {
-                const valueMatch = trimmedLine.match(/'([^']+)'/)
-                if (valueMatch) {
-                    config[directiveName].push({
-                        comment: currentComment,
-                        value: valueMatch[1]
-                    })
-                    currentComment = null
-                }
-            }
+        // Parse values only (ignore comments)
+        const valueMatches = valuesContent.matchAll(/'([^']+)'/g)
+        Array.from(valueMatches).forEach((valueMatch) => {
+            config[directiveName].push(valueMatch[1])
         })
     })
 
@@ -97,16 +78,9 @@ function addCSPDirectives(existingConfig, newConfig) {
         }
 
         newEntries.forEach((newEntry) => {
-            // Check if value already exists
-            const existingEntry = mergedConfig[directiveName].find(
-                (existing) => existing.value === newEntry
-            )
-
-            if (!existingEntry) {
-                // Add new entry
-                mergedConfig[directiveName].push({
-                    value: newEntry
-                })
+            // Check if value already exists (simplified - direct string comparison)
+            if (!mergedConfig[directiveName].includes(newEntry)) {
+                mergedConfig[directiveName].push(newEntry)
             }
         })
     })
@@ -115,7 +89,7 @@ function addCSPDirectives(existingConfig, newConfig) {
 }
 
 /**
- * Generate CSP directives string from config
+ * Generate CSP directives string from config (simplified - no comments)
  */
 function generateCSPDirectives(config) {
     const directiveLines = []
@@ -123,15 +97,9 @@ function generateCSPDirectives(config) {
     Object.entries(config).forEach(([directiveName, entries]) => {
         if (entries.length === 0) return
 
-        const valueLines = []
-        entries.forEach((entry, i) => {
-            if (entry.comment) {
-                valueLines.push(`                        // ${entry.comment}`)
-            }
-            valueLines.push(
-                `                        '${entry.value}'${i < entries.length - 1 ? ',' : ''}`
-            )
-        })
+        const valueLines = entries.map(
+            (value, i) => `                        '${value}'${i < entries.length - 1 ? ',' : ''}`
+        )
 
         const valuesString = valueLines.join('\n')
         directiveLines.push(
@@ -185,7 +153,7 @@ function parseInputFromStdin() {
 /**
  * Update config default.js file with the enhanced CSP configuration
  */
-function updateConfigFile(config, configFilePath = DEFAULT_CONFIG_FILE_PATH) {
+function updateConfigFile(config, configFilePath) {
     const content = fs.readFileSync(configFilePath, 'utf8')
     const directivesString = generateCSPDirectives(config)
 
@@ -211,29 +179,25 @@ async function main() {
     if (filteredArgs.length === 0 && process.stdin.isTTY) {
         console.log(`
 Usage:
-  node scripts/add-csp-directives.js <config.json>
-  echo '{"img-src": ["*.example.com"]}' | node scripts/add-csp-directives.js
+  node e2e/scripts/add-csp-directives.js <config.json> --config-path <path>
+  echo '{"img-src": ["*.example.com"]}' | node e2e/scripts/add-csp-directives.js --config-path <path>
 
 Description:
   Adds new CSP directive values to existing configuration in config/default.js under app.contentSecurityPolicy
-  - Preserves existing comments and values
   - Prevents duplicate values
   - Cannot remove or modify existing directives
+  - NOTE: This operation is lossy - existing comments will be removed
 
 Options:
-  --config-path <path>  - Custom path to config/default.js (default: packages/template-retail-react-app/config/default.js)
+  --config-path <path>  - Path to config/default.js (REQUIRED)
 
 Examples:
   # Add CSP directives from configuration file
-  node scripts/add-csp-directives.js csp-config.json
+  node e2e/scripts/add-csp-directives.js csp-config.json --config-path storefront/config/default.js
 
   # Add CSP directives from JSON via stdin/pipe
-  echo '{"img-src": ["*.example.com"]}' | node scripts/add-csp-directives.js
-  cat csp-config.json | node scripts/add-csp-directives.js
-
-  # Use custom config path
-  node scripts/add-csp-directives.js --config-path custom/path/default.js csp-config.json
-  echo '{"script-src": ["cdn.example.com"]}' | node scripts/add-csp-directives.js --config-path custom/path/default.js
+  echo '{"img-src": ["*.example.com"]}' | node e2e/scripts/add-csp-directives.js --config-path storefront/config/default.js
+  cat csp-config.json | node e2e/scripts/add-csp-directives.js --config-path storefront/config/default.js
 
 Config JSON Format (simplified - just arrays of strings):
 {
@@ -251,6 +215,23 @@ Config JSON Format (simplified - just arrays of strings):
     }
 
     const configFilePath = getConfigFilePath(args)
+
+    // Check if config path was provided
+    if (!configFilePath) {
+        console.error(`
+❌ Error: --config-path parameter is required.
+
+The --config-path parameter must be provided to specify the location of the config/default.js file.
+
+Usage:
+  node e2e/scripts/add-csp-directives.js <config.json> --config-path <path>
+  echo '{"img-src": ["*.example.com"]}' | node e2e/scripts/add-csp-directives.js --config-path <path>
+
+Example:
+  node e2e/scripts/add-csp-directives.js csp-config.json --config-path storefront/config/default.js
+        `)
+        process.exit(1)
+    }
 
     try {
         let newConfig
