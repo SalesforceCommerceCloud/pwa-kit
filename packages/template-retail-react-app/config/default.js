@@ -35,6 +35,12 @@ module.exports = {
                 landingPath: '/reset-password-landing'
             }
         },
+        // POC: flag for OMS features
+        oms: {
+            cancel: {
+                enabled: true
+            }
+        },
         defaultSite: 'RefArchGlobal',
         siteAliases: {
             RefArch: 'us',

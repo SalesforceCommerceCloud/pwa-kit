@@ -30,6 +30,7 @@ import OrderSummary from '@salesforce/retail-react-app/app/components/order-summ
 import ProductList from '@salesforce/retail-react-app/app/components/product-list'
 import CancelOrderModal from '@salesforce/retail-react-app/app/components/cancel-order-modal'
 import OrderStatusBar from '@salesforce/retail-react-app/app/components/order-status-bar/index'
+import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import {getOrderStatusColorScheme} from '@salesforce/retail-react-app/app/pages/account/order-history'
 import {getLocalizedOrderStatus} from '@salesforce/retail-react-app/app/pages/account/order-history'
 
@@ -60,6 +61,7 @@ const AccountOrderDetail = () => {
     const paymentCard = order?.paymentInstruments[0]?.paymentCard
     const CardIcon = getCreditCardIcon(paymentCard?.cardType)
     const itemCount = order?.productItems.reduce((count, item) => item.quantity + count, 0) || 0
+    const isCancelEnabled = getConfig().app?.oms?.cancel?.enabled
 
     // Fetch product data for order items
     const productIds = order?.productItems?.map((product) => product.productId) || []
@@ -131,13 +133,15 @@ const AccountOrderDetail = () => {
                                 id="account_order_detail.title.order_details"
                             />
                         </Heading>
-                        {/* TODO: addcancel order elligibility logic */}
-                        <Button variant="link" size="sm" onClick={onCancelModalOpen}>
-                            <FormattedMessage
-                                defaultMessage="Cancel order"
-                                id="account_order_detail.button.cancel_order"
-                            />
-                        </Button>
+                        {/* POC: Gate Cancel Order by config flag */}
+                        {isCancelEnabled && (
+                            <Button variant="link" size="sm" onClick={onCancelModalOpen}>
+                                <FormattedMessage
+                                    defaultMessage="Cancel order"
+                                    id="account_order_detail.button.cancel_order"
+                                />
+                            </Button>
+                        )}
                     </Flex>
 
                     {!isLoading ? (
@@ -402,19 +406,20 @@ const AccountOrderDetail = () => {
                 </Stack>
             </Stack>
 
-            <CancelOrderModal
-                isOpen={isCancelModalOpen}
-                onClose={onCancelModalClose}
-                order={order}
-                onCancel={(order, selectedReason) => {
-                    // TODO: Add cancellation logic here
-                    console.log('Requesting cancellation for order:', order?.orderNo)
-                    console.log('Requesting cancellation for email:', order?.customerInfo?.email)
-                    console.log('Customer last name:', order?.billingAddress?.lastName)
-                    console.log('Customer zip code:', order?.billingAddress?.postalCode)
-                    console.log('Cancellation reason:', selectedReason)
-                }}
-            />
+            {isCancelEnabled && (
+                <CancelOrderModal
+                    isOpen={isCancelModalOpen}
+                    onClose={onCancelModalClose}
+                    order={order}
+                    onCancel={(order, selectedReason) => {
+                        // POC: No backend call yet
+                        // eslint-disable-next-line no-console
+                        console.log('Requesting cancellation for order:', order?.orderNo)
+                        // eslint-disable-next-line no-console
+                        console.log('Cancellation reason:', selectedReason)
+                    }}
+                />
+            )}
         </Stack>
     )
 }
