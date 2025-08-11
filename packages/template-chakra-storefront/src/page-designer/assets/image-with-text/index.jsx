@@ -82,17 +82,7 @@ export const ImageWithText = ({ITCLink, ITCText, image, heading, alt}) => {
                                         dangerouslySetInnerHTML={{
                                             __html: heading
                                         }}
-                                        sx={{
-                                            ['h1, h2, h3, h4, h5, h6']: {
-                                                fontSize: 'revert',
-                                                fontWeight: 'revert'
-                                            },
-                                            p: {
-                                                display: 'flex',
-                                                alignItems: 'center',
-                                                justifyContent: 'center'
-                                            }
-                                        }}
+                                        className="sf-page-designer-heading"
                                     />
                                 </Text>
                             </Box>
@@ -106,13 +96,7 @@ export const ImageWithText = ({ITCLink, ITCText, image, heading, alt}) => {
                                         dangerouslySetInnerHTML={{
                                             __html: ITCText
                                         }}
-                                        sx={{
-                                            p: {
-                                                display: 'flex',
-                                                alignItems: 'center',
-                                                justifyContent: 'center'
-                                            }
-                                        }}
+                                        className="sf-page-designer-text"
                                     />
                                 </Text>
                             </Box>

@@ -156,7 +156,7 @@ const StoreLocatorInput = ({form, submitForm}) => {
                                     </Select>
                                     {form.formState.errors.countryCode && (
                                         <FormErrorMessage
-                                            sx={{marginBottom: '10px'}}
+                                            className="sf-mb-2_5"
                                             color="red.600"
                                         >
                                             <AlertIcon aria-hidden="true" mr={2} />
@@ -187,7 +187,7 @@ const StoreLocatorInput = ({form, submitForm}) => {
                                     placeholder={messages.placeholders.enterPostalCode}
                                 />
                                 {form.formState.errors.postalCode && (
-                                    <FormErrorMessage sx={{top: '-20px'}} color="red.600">
+                                    <FormErrorMessage className="sf-form-error-positioned" color="red.600">
                                         <AlertIcon aria-hidden="true" mr={2} />
                                         {form.formState.errors.postalCode.message}
                                     </FormErrorMessage>

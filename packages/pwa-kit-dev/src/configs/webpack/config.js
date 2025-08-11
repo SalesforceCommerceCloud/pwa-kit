@@ -253,10 +253,27 @@ const withChunking = (config) => {
             minimize: mode === production,
             splitChunks: {
                 cacheGroups: {
+                    // Split Chakra UI into separate chunk for better TBT performance
+                    chakra: {
+                        test: /[\\/]node_modules[\\/]@chakra-ui[\\/]/,
+                        name: 'chakra-ui',
+                        chunks: 'all',
+                        priority: 20,
+                        enforce: true
+                    },
+                    // Split Emotion into separate chunk for better performance
+                    emotion: {
+                        test: /[\\/]node_modules[\\/]@emotion[\\/]/,
+                        name: 'emotion',
+                        chunks: 'all',
+                        priority: 15,
+                        enforce: true
+                    },
                     vendor: {
                         test: /(node_modules)|(packages\/.*\/dist)/,
                         name: 'vendor',
-                        chunks: 'all'
+                        chunks: 'all',
+                        priority: 10
                     }
                 }
             }

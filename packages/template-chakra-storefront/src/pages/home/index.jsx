@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React, {useMemo} from 'react'
+import React, {useMemo, memo} from 'react'
 import {useIntl} from 'react-intl'
 
 // Components
@@ -26,7 +26,7 @@ import {
 import Hero from '../../components/hero'
 import Seo from '../../components/seo'
 import Section from '../../components/section'
-import ProductScroller from '../../components/product-scroller'
+import {LazyProductScrollerWithSkeleton as ProductScroller} from '../../components/lazy-components'
 
 // Others
 import {getStaticAssetUrl} from '@salesforce/pwa-kit-react-sdk/ssr/universal/utils'
@@ -328,4 +328,4 @@ const Home = () => {
 
 Home.getTemplateName = () => 'home'
 
-export default Home
+export default memo(Home)

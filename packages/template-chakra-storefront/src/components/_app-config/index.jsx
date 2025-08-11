@@ -12,6 +12,11 @@ import {ChakraProvider} from '@chakra-ui/react'
 // Removes focus for non-keyboard interactions for the whole application
 import 'focus-visible/dist/focus-visible'
 
+// Import performance-optimized utility CSS
+import '../../theme/performance-utilities.css'
+
+
+
 import theme from '../../../src/theme'
 // import {MultiSiteProvider, AppConfigProvider} from '../../../src/contexts'
 import {MultiSiteProvider} from '../../contexts'
@@ -86,7 +91,14 @@ const AppConfig = ({children, locals = {}}) => {
             // enablePWAKitPrivateClient={true}
         >
             <MultiSiteProvider site={locals.site} locale={locals.locale} buildUrl={locals.buildUrl}>
-                <ChakraProvider value={theme}>{children}</ChakraProvider>
+                <ChakraProvider 
+                    value={theme}
+                    // Performance optimizations (minimal config changes only)
+                    resetCSS={false} // Use browser defaults for faster initial render
+                    portalZIndex={1000} // Reduce portal computation overhead
+                >
+                    {children}
+                </ChakraProvider>
             </MultiSiteProvider>
             <ReactQueryDevtools />
         </CommerceApiProvider>

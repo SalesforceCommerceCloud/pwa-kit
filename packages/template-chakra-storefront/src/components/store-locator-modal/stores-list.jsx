@@ -107,7 +107,7 @@ const StoresList = ({storesInfo}) => {
                                         {' '}
                                         <AccordionButton
                                             color="blue.700"
-                                            sx={{marginTop: '10px', paddingBottom: '0px'}}
+                                            className="sf-mt-2_5 sf-pb-0"
                                         >
                                             <Box fontSize="lg">{messages.viewMore}</Box>
                                             <AccordionIcon />

@@ -1,0 +1,190 @@
+/*
+ * Copyright (c) 2024, salesforce.com, inc.
+ * All rights reserved.
+ * SPDX-License-Identifier: BSD-3-Clause
+ * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
+ */
+
+/* Performance-optimized utility CSS classes to replace sx props */
+/* These static classes eliminate runtime CSS generation overhead */
+
+/* Spacing utilities - most common sx prop patterns */
+.sf-mt-2_5 {
+  margin-top: 10px;
+}
+
+.sf-mb-2_5 {
+  margin-bottom: 10px;
+}
+
+.sf-pb-0 {
+  padding-bottom: 0px;
+}
+
+/* Position utilities */
+.sf-relative {
+  position: relative;
+}
+
+.sf-top-neg-5 {
+  top: -20px;
+}
+
+/* Layout utilities for carousel and page designer */
+.sf-aspect-3-2 {
+  aspect-ratio: 3/2;
+}
+
+.sf-aspect-1-1 {
+  aspect-ratio: 1/1;
+}
+
+.sf-aspect-16-9 {
+  aspect-ratio: 16/9;
+}
+
+/* Transform utilities for animations */
+.sf-scale-105 {
+  transform: scale(1.05);
+}
+
+.sf-transition-transform {
+  transition-property: transform;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
+}
+
+/* Overflow utilities */
+.sf-overflow-hidden {
+  overflow: hidden;
+}
+
+/* Border radius utilities */
+.sf-rounded-lg {
+  border-radius: 0.5rem;
+}
+
+.sf-rounded-md {
+  border-radius: 0.375rem;
+}
+
+/* Background utilities */
+.sf-bg-cover {
+  background-size: cover;
+}
+
+.sf-bg-center {
+  background-position: center;
+}
+
+.sf-bg-no-repeat {
+  background-repeat: no-repeat;
+}
+
+/* Flexbox utilities */
+.sf-flex-col {
+  flex-direction: column;
+}
+
+.sf-items-center {
+  align-items: center;
+}
+
+.sf-justify-center {
+  justify-content: center;
+}
+
+/* Text utilities */
+.sf-text-center {
+  text-align: center;
+}
+
+/* Performance optimization: Pre-computed composite classes for common patterns */
+.sf-carousel-item {
+  position: relative;
+  overflow: hidden;
+  border-radius: 0.5rem;
+  aspect-ratio: 3/2;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  transition-property: transform;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
+}
+
+.sf-carousel-item:hover {
+  transform: scale(1.05);
+}
+
+.sf-image-with-text-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.sf-form-error-positioned {
+  position: relative;
+  top: -20px;
+}
+
+/* Responsive utilities - mobile-first approach */
+@media (min-width: 768px) {
+  .sf-md-flex-row {
+    flex-direction: row;
+  }
+  
+  .sf-md-text-left {
+    text-align: left;
+  }
+}
+
+/* Carousel utilities */
+.sf-carousel-container {
+  scroll-padding: 0;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+}
+
+.sf-carousel-item-snap {
+  scroll-snap-align: start;
+}
+
+/* Page Designer utilities */
+.sf-page-designer-heading {
+  /* Reset heading styles to browser defaults */
+}
+
+.sf-page-designer-heading h1,
+.sf-page-designer-heading h2,
+.sf-page-designer-heading h3,
+.sf-page-designer-heading h4,
+.sf-page-designer-heading h5,
+.sf-page-designer-heading h6 {
+  font-size: revert;
+  font-weight: revert;
+}
+
+.sf-page-designer-heading p {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.sf-page-designer-text p {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Dark mode utilities if needed */
+@media (prefers-color-scheme: dark) {
+  .sf-dark-bg-gray-800 {
+    background-color: #1f2937;
+  }
+  
+  .sf-dark-text-white {
+    color: #ffffff;
+  }
+}

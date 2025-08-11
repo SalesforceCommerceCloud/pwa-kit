@@ -150,24 +150,19 @@ export const Carousel = (props = {}) => {
 
                 <Stack
                     ref={scrollRef}
-                    className={'carousel-container-items scroll-indicator'}
+                    className={'carousel-container-items scroll-indicator sf-carousel-container'}
                     data-testid="carousel-container-items"
                     direction="row"
                     gap={itemSpacing}
                     wrap="nowrap"
                     overflowX="scroll"
-                    sx={{
-                        scrollPadding: 0,
-                        scrollSnapType: 'x mandatory',
-                        WebkitOverflowScrolling: 'touch'
-                    }}
                 >
                     {components.map((component, index) => (
                         <Box
                             key={component?.id || index}
                             flex="0 0 auto"
                             width={itemWidth}
-                            style={{scrollSnapAlign: 'start'}}
+                            className="sf-carousel-item-snap"
                         >
                             <AspectRatio ratio={0.75}>
                                 <Component component={component} />

@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React, {forwardRef, useRef, useMemo} from 'react'
+import React, {forwardRef, useRef, useMemo, memo} from 'react'
 import PropTypes from 'prop-types'
 import {AspectRatio, Box, Heading, IconButton, Skeleton, Stack} from '@chakra-ui/react'
 import ProductTile from '../../components/product-tile'
@@ -83,11 +83,10 @@ const ProductScroller = forwardRef(
                         overflowX="scroll"
                         px={{base: 4, md: 8, lg: 0}}
                         py={1}
+                        className="sf-carousel-container"
                         {...scrollProps}
                         css={{
                             scrollPadding: {base: 16, md: 32, lg: 0},
-                            scrollSnapType: 'x mandatory',
-                            WebkitOverflowScrolling: 'touch', // Safari touch scrolling needed for scroll snap
                             ...scrollProps?.css
                         }}
                     >
@@ -200,4 +199,4 @@ ProductScroller.propTypes = {
     productTileProps: PropTypes.oneOfType([PropTypes.func, PropTypes.object])
 }
 
-export default ProductScroller
+export default memo(ProductScroller)
