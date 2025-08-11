@@ -22,7 +22,6 @@ import {useCurrentBasket, useVariant} from '../../../hooks'
 import useEinstein from '../../../hooks/use-einstein'
 import {useWishList} from '../../../hooks/use-wish-list'
 
-
 import {normalizeSetBundleProduct, getUpdateBundleChildArray} from '../../../utils/product-utils'
 import {useErrorHandler} from '../../../hooks/use-errors'
 
@@ -36,11 +35,9 @@ export const useProductDetailData = () => {
     const {addToWishlist, isPending: isWishlistLoading} = useWishList()
 
     /****************************** Basket *********************************/
-    const {data: currentBasket, isLoading: isBasketLoading} = useCurrentBasket()
+    const {isLoading: isBasketLoading} = useCurrentBasket()
     const {addItemToNewOrExistingBasket} = useShopperBasketsMutationHelper()
     const updateItemsInBasketMutation = useShopperBasketsMutation('updateItemsInBasket')
-
-
 
     /*************************** Product Detail and Category ********************/
     const {productId} = useParams()
@@ -193,7 +190,7 @@ export const useProductDetailData = () => {
             }))
 
             // Add items to basket
-            const updatedBasket = await addItemToNewOrExistingBasket(productItems)
+            await addItemToNewOrExistingBasket(productItems)
 
             einstein.sendAddToCart(productItems)
 

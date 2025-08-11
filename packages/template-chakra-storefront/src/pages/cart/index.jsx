@@ -16,7 +16,6 @@ import {useCartGiftItems} from './hooks/use-cart-gift-items'
 import {useCartDefaultShipping} from './hooks/use-cart-default-shipping'
 import {useErrorHandler} from '../../hooks/use-errors'
 
-
 // Cart Components
 import CartTitle from './partials/cart-title'
 import CartProductList from './partials/cart-product-list'
@@ -36,8 +35,6 @@ const Cart = () => {
 
     // Product data and processing
     const {isProductsPending, productsByItemId} = useCartProducts(basket)
-
-
 
     // Cart operations
     const {
