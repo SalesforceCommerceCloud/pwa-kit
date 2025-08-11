@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React, {useEffect} from 'react'
+import React, {useEffect, useState, useMemo} from 'react'
 import {FormattedMessage, FormattedNumber, useIntl} from 'react-intl'
 import {
     Box,
@@ -29,14 +29,18 @@ import {
     useShopperBasketsMutation
 } from '@salesforce/commerce-sdk-react'
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
+import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
 import {useCurrency} from '@salesforce/retail-react-app/app/hooks'
 
 export default function ShippingOptions() {
     const {formatMessage} = useIntl()
     const {step, STEPS, goToStep, goToNextStep} = useCheckout()
     const {data: basket} = useCurrentBasket()
+    const {data: customer} = useCurrentCustomer()
     const {currency} = useCurrency()
     const updateShippingMethod = useShopperBasketsMutation('updateShippingMethodForShipment')
+    const [hasAutoSelected, setHasAutoSelected] = useState(false)
+    const [isLoading, setIsLoading] = useState(false)
     const {data: shippingMethods} = useShippingMethodsForShipment(
         {
             parameters: {
@@ -51,6 +55,22 @@ export default function ShippingOptions() {
 
     const selectedShippingMethod = basket?.shipments?.[0]?.shippingMethod
     const selectedShippingAddress = basket?.shipments?.[0]?.shippingAddress
+
+    // Calculate if we should show loading state immediately for auto-selection
+    const shouldShowInitialLoading = useMemo(() => {
+        return step === STEPS.SHIPPING_OPTIONS && 
+               !hasAutoSelected && 
+               customer?.isRegistered && 
+               !selectedShippingMethod?.id &&
+               shippingMethods?.applicableShippingMethods?.length &&
+               shippingMethods.defaultShippingMethodId &&
+               shippingMethods.applicableShippingMethods.find(
+                   method => method.id === shippingMethods.defaultShippingMethodId
+               )
+    }, [step, hasAutoSelected, customer, selectedShippingMethod, shippingMethods])
+
+    // Use calculated loading state or manual loading state
+    const effectiveIsLoading = isLoading || shouldShowInitialLoading
 
     const form = useForm({
         shouldUnregister: false,
@@ -70,6 +90,69 @@ export default function ShippingOptions() {
             form.reset({shippingMethodId: selectedShippingMethod.id})
         }
     }, [selectedShippingMethod, shippingMethods])
+
+    // Auto-select default shipping method and proceed for authenticated users
+    useEffect(() => {
+        const autoSelectDefaultShippingMethod = async () => {
+            // Only auto-select when on this step and haven't already auto-selected
+            if (step !== STEPS.SHIPPING_OPTIONS || hasAutoSelected || isLoading) {
+                return
+            }
+
+            // Skip if basket already has a shipping method
+            if (selectedShippingMethod?.id) {
+                console.log('✅ Basket already has shipping method, proceeding to next step')
+                setHasAutoSelected(true)
+                goToNextStep()
+                return
+            }
+
+            // Only proceed for authenticated users
+            if (!customer?.isRegistered) {
+                return
+            }
+
+            // Wait for shipping methods to load
+            if (!shippingMethods?.applicableShippingMethods?.length) {
+                return
+            }
+
+            const defaultMethodId = shippingMethods.defaultShippingMethodId
+            const defaultMethod = shippingMethods.applicableShippingMethods.find(
+                method => method.id === defaultMethodId
+            )
+
+            if (defaultMethod) {
+                console.log('🚚 Auto-selecting default shipping method:', defaultMethod.name)
+                setHasAutoSelected(true)
+                setIsLoading(true) // Show loading state immediately
+                
+                try {
+                    // Apply the default shipping method and continue to next step
+                    await updateShippingMethod.mutateAsync({
+                        parameters: {
+                            basketId: basket.basketId,
+                            shipmentId: 'me'
+                        },
+                        body: {
+                            id: defaultMethodId
+                        }
+                    })
+                    console.log('✅ Default shipping method auto-applied successfully')
+                    setIsLoading(false) // Clear loading state before navigation
+                    goToNextStep()
+                } catch (error) {
+                    console.error('❌ Failed to auto-apply default shipping method:', error)
+                    setHasAutoSelected(false) // Reset on error so user can manually select
+                    setIsLoading(false) // Hide loading state on error
+                }
+            } else {
+                console.log('ℹ️ No default shipping method found, user will need to select manually')
+            }
+        }
+
+        autoSelectDefaultShippingMethod()
+    }, [step, selectedShippingMethod, customer, shippingMethods, hasAutoSelected, basket?.basketId])
 
     const submitForm = async ({shippingMethodId}) => {
         await updateShippingMethod.mutateAsync({
@@ -125,8 +208,8 @@ export default function ShippingOptions() {
                 id: 'shipping_options.title.shipping_gift_options'
             })}
             editing={step === STEPS.SHIPPING_OPTIONS}
-            isLoading={form.formState.isSubmitting}
-            disabled={selectedShippingMethod == null || !selectedShippingAddress}
+            isLoading={form.formState.isSubmitting || effectiveIsLoading}
+            disabled={selectedShippingMethod == null || !selectedShippingAddress || effectiveIsLoading}
             onEdit={() => goToStep(STEPS.SHIPPING_OPTIONS)}
             editLabel={formatMessage({
                 defaultMessage: 'Edit Shipping Options',
@@ -215,7 +298,7 @@ export default function ShippingOptions() {
                 </form>
             </ToggleCardEdit>
 
-            {selectedShippingMethod && selectedShippingAddress && (
+            {!effectiveIsLoading && selectedShippingMethod && selectedShippingAddress && (
                 <ToggleCardSummary>
                     <Flex justify="space-between" w="full">
                         <Text>{selectedShippingMethod.name}</Text>
