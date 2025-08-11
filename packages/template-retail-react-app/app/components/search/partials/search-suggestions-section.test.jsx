@@ -15,7 +15,12 @@ jest.mock('@salesforce/retail-react-app/app/components/dynamic-image', () => {
     return function MockDynamicImage(props) {
         const {src, widths, imageProps} = props || {}
         return (
-            <img data-testid="dynamic-image" data-src={src} data-widths={(widths || []).join(',')} alt={imageProps?.alt ?? ''} />
+            <img
+                data-testid="dynamic-image"
+                data-src={src}
+                data-widths={(widths || []).join(',')}
+                alt={imageProps?.alt ?? ''}
+            />
         )
     }
 })
@@ -36,13 +41,15 @@ const makeSearchSuggestions = (overrides = {}) => ({
 
 test('renders "Did you mean" with suggestion link when non-exact phrase exists (mobile and desktop)', () => {
     const searchSuggestions = makeSearchSuggestions({
-        phraseSuggestions: [
-            {name: 'dresses', link: '/search?q=dresses', exactMatch: false}
-        ]
+        phraseSuggestions: [{name: 'dresses', link: '/search?q=dresses', exactMatch: false}]
     })
 
     renderWithProviders(
-        <SuggestionSection searchSuggestions={searchSuggestions} closeAndNavigate={jest.fn()} styles={baseStyles} />
+        <SuggestionSection
+            searchSuggestions={searchSuggestions}
+            closeAndNavigate={jest.fn()}
+            styles={baseStyles}
+        />
     )
 
     // Appears in both mobile and desktop sections
@@ -62,7 +69,11 @@ test('renders Categories header and category suggestions', () => {
     })
 
     renderWithProviders(
-        <SuggestionSection searchSuggestions={searchSuggestions} closeAndNavigate={jest.fn()} styles={baseStyles} />
+        <SuggestionSection
+            searchSuggestions={searchSuggestions}
+            closeAndNavigate={jest.fn()}
+            styles={baseStyles}
+        />
     )
 
     // Header present (could be duplicated for mobile/desktop)
@@ -79,13 +90,23 @@ test('renders horizontal product suggestions and "View All"; clicking a tile cal
 
     const searchSuggestions = makeSearchSuggestions({
         productSuggestions: [
-            {type: 'product', name: 'Product 1', link: '/p1', image: 'https://example.com/p1.jpg', price: '19.99'},
+            {
+                type: 'product',
+                name: 'Product 1',
+                link: '/p1',
+                image: 'https://example.com/p1.jpg',
+                price: '19.99'
+            },
             {type: 'product', name: 'Product 2', link: '/p2'}
         ]
     })
 
     renderWithProviders(
-        <SuggestionSection searchSuggestions={searchSuggestions} closeAndNavigate={closeAndNavigate} styles={baseStyles} />
+        <SuggestionSection
+            searchSuggestions={searchSuggestions}
+            closeAndNavigate={closeAndNavigate}
+            styles={baseStyles}
+        />
     )
 
     // HorizontalSuggestions container
@@ -105,12 +126,14 @@ test('renders nothing when there are no categories, products, or phrase suggesti
     const searchSuggestions = makeSearchSuggestions()
 
     renderWithProviders(
-        <SuggestionSection searchSuggestions={searchSuggestions} closeAndNavigate={jest.fn()} styles={baseStyles} />
+        <SuggestionSection
+            searchSuggestions={searchSuggestions}
+            closeAndNavigate={jest.fn()}
+            styles={baseStyles}
+        />
     )
 
     expect(screen.queryByText('Categories')).not.toBeInTheDocument()
     expect(screen.queryByText('Products')).not.toBeInTheDocument()
     expect(screen.queryByTestId('sf-horizontal-product-suggestions')).not.toBeInTheDocument()
 })
-
-
