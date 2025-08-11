@@ -16,7 +16,9 @@ const validEmail = 'test@salesforce.com'
 const invalidEmail = 'invalidEmail'
 const mockAuthHelperFunctions = {
     [AuthHelpers.LoginRegisteredUserB2C]: {mutateAsync: jest.fn()},
-    [AuthHelpers.Logout]: {mutateAsync: jest.fn()}
+    [AuthHelpers.Logout]: {mutateAsync: jest.fn()},
+    [AuthHelpers.AuthorizePasswordless]: {mutateAsync: jest.fn()},
+    [AuthHelpers.LoginPasswordlessUser]: {mutateAsync: jest.fn()}
 }
 
 const mockUpdateCustomerForBasket = {mutateAsync: jest.fn()}
@@ -178,12 +180,17 @@ describe('ContactInfo Component', () => {
         expect(screen.queryByText('Please enter your email address.')).not.toBeInTheDocument()
     })
 
-    test('allows guest checkout with valid email', async () => {
+    test('shows continue button for unregistered email', async () => {
+        // Mock the passwordless login to fail (email not found)
+        mockAuthHelperFunctions[AuthHelpers.AuthorizePasswordless].mutateAsync.mockRejectedValue(
+            new Error('Email not found')
+        )
+
         const {user} = renderWithProviders(<ContactInfo />)
 
         const emailInput = screen.getByLabelText('Email')
         await user.type(emailInput, validEmail)
-        await user.type(emailInput, '{enter}')
+        fireEvent.blur(emailInput)
 
         await waitFor(() => {
             const continueBtn = screen.getByRole('button', {
@@ -193,15 +200,20 @@ describe('ContactInfo Component', () => {
         })
     })
 
-    test('submits form with valid email', async () => {
+    test('opens OTP modal for registered email on blur', async () => {
+        // Mock successful passwordless login authorization
+        mockAuthHelperFunctions[AuthHelpers.AuthorizePasswordless].mutateAsync.mockResolvedValue({
+            success: true
+        })
+
         const {user} = renderWithProviders(<ContactInfo />)
 
         const emailInput = screen.getByLabelText('Email')
         await user.type(emailInput, validEmail)
-        await user.type(emailInput, '{enter}')
+        fireEvent.blur(emailInput)
 
         await waitFor(() => {
-            expect(mockUpdateCustomerForBasket.mutateAsync).toHaveBeenCalled()
+            expect(screen.getByText("Confirm it's you")).toBeInTheDocument()
         })
     })
 

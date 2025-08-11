@@ -1067,9 +1067,7 @@ test('Can register account during checkout as a guest', async () => {
     await user.selectOptions(screen.getByLabelText(/state/i), ['FL'])
     await user.type(screen.getByLabelText(/zip code/i), '33712')
 
-    await user.click(screen.getByText(/save & continue to shipping method/i))
-
-    // Wait for next step to render
+    // Verify the shipping options step is available (checkout progressed automatically)
     await waitFor(() => {
         expect(screen.getByTestId('sf-toggle-card-step-2-content')).not.toBeEmptyDOMElement()
     })

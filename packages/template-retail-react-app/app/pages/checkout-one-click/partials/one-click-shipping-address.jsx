@@ -36,6 +36,7 @@ export default function ShippingAddress() {
     const {formatMessage} = useIntl()
     const toast = useToast()
     const [isLoading, setIsLoading] = useState()
+    const [hasAutoSelected, setHasAutoSelected] = useState(false)
     const {data: customer} = useCurrentCustomer()
     const {data: basket} = useCurrentBasket()
     const selectedShippingAddress = basket?.shipments && basket?.shipments[0]?.shippingAddress
@@ -51,24 +52,9 @@ export default function ShippingAddress() {
 
     const submitAndContinue = async (address) => {
         setIsLoading(true)
-        const {
-            addressId,
-            address1,
-            city,
-            countryCode,
-            firstName,
-            lastName,
-            phone,
-            postalCode,
-            stateCode
-        } = address
-        await updateShippingAddressForShipment.mutateAsync({
-            parameters: {
-                basketId: basket.basketId,
-                shipmentId: 'me',
-                useAsBilling: false
-            },
-            body: {
+        try {
+            const {
+                addressId,
                 address1,
                 city,
                 countryCode,
@@ -77,33 +63,22 @@ export default function ShippingAddress() {
                 phone,
                 postalCode,
                 stateCode
-            }
-        })
-
-        if (customer.isRegistered && !addressId) {
-            const body = {
-                address1,
-                city,
-                countryCode,
-                firstName,
-                lastName,
-                phone,
-                postalCode,
-                stateCode,
-                addressId: nanoid()
-            }
-            await createCustomerAddress.mutateAsync({
-                body,
-                parameters: {customerId: customer.customerId}
-            })
-        }
-
-        if (customer.isRegistered && addressId) {
-            await updateCustomerAddress.mutateAsync({
-                body: address,
+            } = address
+            await updateShippingAddressForShipment.mutateAsync({
                 parameters: {
-                    customerId: customer.customerId,
-                    addressName: addressId
+                    basketId: basket.basketId,
+                    shipmentId: 'me',
+                    useAsBilling: false
+                },
+                body: {
+                    address1,
+                    city,
+                    countryCode,
+                    firstName,
+                    lastName,
+                    phone,
+                    postalCode,
+                    stateCode
                 }
             })
 
@@ -162,9 +137,8 @@ export default function ShippingAddress() {
             setIsLoading(false)
         }
 
-        goToNextStep()
-        setIsLoading(false)
-    }
+        autoSelectPreferredAddress()
+    }, [step, customer, selectedShippingAddress, hasAutoSelected, isLoading])
 
     // Auto-select and apply preferred shipping address for registered users
     useEffect(() => {

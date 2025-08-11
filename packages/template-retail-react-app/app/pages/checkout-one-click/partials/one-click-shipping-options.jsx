@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React, {useEffect} from 'react'
+import React, {useEffect, useState, useMemo} from 'react'
 import {FormattedMessage, FormattedNumber, useIntl} from 'react-intl'
 import {
     Box,
@@ -29,14 +29,18 @@ import {
     useShopperBasketsMutation
 } from '@salesforce/commerce-sdk-react'
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
+import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
 import {useCurrency} from '@salesforce/retail-react-app/app/hooks'
 
 export default function ShippingOptions() {
     const {formatMessage} = useIntl()
     const {step, STEPS, goToStep, goToNextStep} = useCheckout()
     const {data: basket} = useCurrentBasket()
+    const {data: customer} = useCurrentCustomer()
     const {currency} = useCurrency()
     const updateShippingMethod = useShopperBasketsMutation('updateShippingMethodForShipment')
+    const [hasAutoSelected, setHasAutoSelected] = useState(false)
+    const [isLoading, setIsLoading] = useState(false)
     const {data: shippingMethods} = useShippingMethodsForShipment(
         {
             parameters: {
@@ -204,8 +208,10 @@ export default function ShippingOptions() {
                 id: 'shipping_options.title.shipping_gift_options'
             })}
             editing={step === STEPS.SHIPPING_OPTIONS}
-            isLoading={form.formState.isSubmitting}
-            disabled={selectedShippingMethod == null || !selectedShippingAddress}
+            isLoading={form.formState.isSubmitting || effectiveIsLoading}
+            disabled={
+                selectedShippingMethod == null || !selectedShippingAddress || effectiveIsLoading
+            }
             onEdit={() => goToStep(STEPS.SHIPPING_OPTIONS)}
             editLabel={formatMessage({
                 defaultMessage: 'Edit Shipping Options',
@@ -294,7 +300,7 @@ export default function ShippingOptions() {
                 </form>
             </ToggleCardEdit>
 
-            {selectedShippingMethod && selectedShippingAddress && (
+            {!effectiveIsLoading && selectedShippingMethod && selectedShippingAddress && (
                 <ToggleCardSummary>
                     <Flex justify="space-between" w="full">
                         <Text>{selectedShippingMethod.name}</Text>

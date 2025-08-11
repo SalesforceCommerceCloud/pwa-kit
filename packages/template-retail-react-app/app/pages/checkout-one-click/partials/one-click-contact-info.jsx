@@ -69,38 +69,6 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
 
     const {step, STEPS, goToStep, goToNextStep} = useCheckout()
 
-    // Helper function to directly read customer type from localStorage
-    // This bypasses React state staleness after login
-    const getCustomerTypeFromStorage = () => {
-        if (typeof window !== 'undefined') {
-            const customerTypeKey = `customer_type_${config.siteId}`
-            return localStorage.getItem(customerTypeKey)
-        }
-        return null
-    }
-
-    // Helper function to directly read customer ID from localStorage
-    const getCustomerIdFromStorage = () => {
-        if (typeof window !== 'undefined') {
-            const customerIdKey = `customer_id_${config.siteId}`
-            return localStorage.getItem(customerIdKey)
-        }
-        return null
-    }
-
-    // Helper function to extract basket ID from either structure
-    const getBasketId = (basketData) => {
-        // Handle individual basket structure: {basketId: "...", productItems: [...]}
-        if (basketData?.basketId) {
-            return basketData.basketId
-        }
-        // Handle baskets collection structure: {baskets: [{basketId: "..."}], total: 1}
-        if (basketData?.baskets?.[0]?.basketId) {
-            return basketData.baskets[0].basketId
-        }
-        return null
-    }
-
     const form = useForm({
         defaultValues: {
             email: customer?.email || basket?.customerInfo?.email || '',
@@ -453,7 +421,6 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
                     id: 'checkout_contact_info.title.contact_info'
                 })}
                 editing={step === STEPS.CONTACT_INFO}
-                isLoading={form.formState.isSubmitting}
                 onEdit={() => {
                     if (isRegistered) {
                         setSignOutConfirmDialogIsOpen(true)
