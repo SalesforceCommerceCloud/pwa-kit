@@ -103,7 +103,6 @@ export default function ShippingOptions() {
 
             // Skip if basket already has a shipping method
             if (selectedShippingMethod?.id) {
-                console.log('✅ Basket already has shipping method, proceeding to next step')
                 setHasAutoSelected(true)
                 goToNextStep()
                 return
@@ -125,7 +124,7 @@ export default function ShippingOptions() {
             )
 
             if (defaultMethod) {
-                console.log('🚚 Auto-selecting default shipping method:', defaultMethod.name)
+                //Auto-selecting default shipping method
                 setHasAutoSelected(true)
                 setIsLoading(true) // Show loading state immediately
 
@@ -140,18 +139,14 @@ export default function ShippingOptions() {
                             id: defaultMethodId
                         }
                     })
-                    console.log('✅ Default shipping method auto-applied successfully')
+                    //Default shipping method auto-applied successfully
                     setIsLoading(false) // Clear loading state before navigation
                     goToNextStep()
                 } catch (error) {
-                    console.error('❌ Failed to auto-apply default shipping method:', error)
-                    setHasAutoSelected(false) // Reset on error so user can manually select
+                    // Reset on error so user can manually select
+                    setHasAutoSelected(false)
                     setIsLoading(false) // Hide loading state on error
                 }
-            } else {
-                console.log(
-                    'ℹ️ No default shipping method found, user will need to select manually'
-                )
             }
         }
 
