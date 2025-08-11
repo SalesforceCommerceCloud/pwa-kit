@@ -22,11 +22,6 @@ inputs:
   project_dir:
     description: Project Directory
 
-outputs:
-  project_path:
-    description: Full path to the generated project directory
-    value: ${{ steps.set_project_path.outputs.project_path }}
-
 runs:
   using: composite
   steps:
@@ -58,10 +53,11 @@ runs:
         fi
         echo "SETUP_HYBRID_VALUE=$setup_hybrid_value" >> $GITHUB_ENV
 
+    # TODO: update this to use the standard input feature that Ben created recently
+    # TODO: this action does not finish successfully because of a dirty-workspace error, due to creating this generator-responses.json
     - name: Build project generator inputs
       id: build_generator_inputs
       shell: bash
-      # TODO: how to best create this json file? /tmp/something.json... how about windows?
       run: |
         echo '{
          "projectDir":"${{ inputs.project_dir }}",
@@ -106,19 +102,20 @@ runs:
               "expectedPrompt": "Do you wish to set up a phased headless rollout?",
               "response": "${{ env.SETUP_HYBRID_VALUE }}\n"
             }
-        ] }' > /tmp/generator-responses.json
+        ] }' > generator-responses.json
 
     - name: Generate project
       id: generate_project
       run: |
-        cat /tmp/generator-responses.json
-        node e2e/scripts/generate-project.js --project-config "$(jq -c . /tmp/generator-responses.json)"
+        cat generator-responses.json
+        node e2e/scripts/generate-project.js --project-config "$(jq -c . generator-responses.json)"
       shell: bash
 
-    - name: Set project path output
-      id: set_project_path
+    # TODO: I think we can safely delete this step. We already install the dependencies in the previous step.
+    - name: Build generated project
+      id: build_generated_project
+      working-directory: ../generated-projects/${{ inputs.project_dir }}
+      run: |-
+        npm ci
+        npm run build
       shell: bash
-      run: |
-        GENERATED_PROJECTS_DIR=$(node -e "console.log(require('./e2e/config.js').GENERATED_PROJECTS_DIR)")
-        PROJECT_PATH="${GENERATED_PROJECTS_DIR}/${{ inputs.project_dir }}"
-        echo "project_path=$PROJECT_PATH" >> $GITHUB_OUTPUT
