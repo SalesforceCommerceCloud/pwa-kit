@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React, {useState} from 'react'
+import React, {useState, useEffect} from 'react'
 import {nanoid} from 'nanoid'
 import {defineMessage, useIntl} from 'react-intl'
 import {useCheckout} from '@salesforce/retail-react-app/app/pages/checkout-container/util/checkout-context'
@@ -34,6 +34,7 @@ const shippingAddressAriaLabel = defineMessage({
 export default function ShippingAddress() {
     const {formatMessage} = useIntl()
     const [isLoading, setIsLoading] = useState()
+    const [hasAutoSelected, setHasAutoSelected] = useState(false)
     const {data: customer} = useCurrentCustomer()
     const {data: basket} = useCurrentBasket()
     const selectedShippingAddress = basket?.shipments && basket?.shipments[0]?.shippingAddress
@@ -47,24 +48,9 @@ export default function ShippingAddress() {
 
     const submitAndContinue = async (address) => {
         setIsLoading(true)
-        const {
-            addressId,
-            address1,
-            city,
-            countryCode,
-            firstName,
-            lastName,
-            phone,
-            postalCode,
-            stateCode
-        } = address
-        await updateShippingAddressForShipment.mutateAsync({
-            parameters: {
-                basketId: basket.basketId,
-                shipmentId: 'me',
-                useAsBilling: false
-            },
-            body: {
+        try {
+            const {
+                addressId,
                 address1,
                 city,
                 countryCode,
@@ -73,40 +59,100 @@ export default function ShippingAddress() {
                 phone,
                 postalCode,
                 stateCode
-            }
-        })
-
-        if (customer.isRegistered && !addressId) {
-            const body = {
-                address1,
-                city,
-                countryCode,
-                firstName,
-                lastName,
-                phone,
-                postalCode,
-                stateCode,
-                addressId: nanoid()
-            }
-            await createCustomerAddress.mutateAsync({
-                body,
-                parameters: {customerId: customer.customerId}
-            })
-        }
-
-        if (customer.isRegistered && addressId) {
-            await updateCustomerAddress.mutateAsync({
-                body: address,
+            } = address
+            await updateShippingAddressForShipment.mutateAsync({
                 parameters: {
-                    customerId: customer.customerId,
-                    addressName: addressId
+                    basketId: basket.basketId,
+                    shipmentId: 'me',
+                    useAsBilling: false
+                },
+                body: {
+                    address1,
+                    city,
+                    countryCode,
+                    firstName,
+                    lastName,
+                    phone,
+                    postalCode,
+                    stateCode
                 }
             })
+
+            if (customer.isRegistered && !addressId) {
+                const body = {
+                    address1,
+                    city,
+                    countryCode,
+                    firstName,
+                    lastName,
+                    phone,
+                    postalCode,
+                    stateCode,
+                    addressId: nanoid()
+                }
+                await createCustomerAddress.mutateAsync({
+                    body,
+                    parameters: {customerId: customer.customerId}
+                })
+            }
+
+            if (customer.isRegistered && addressId) {
+                await updateCustomerAddress.mutateAsync({
+                    body: address,
+                    parameters: {
+                        customerId: customer.customerId,
+                        addressName: addressId
+                    }
+                })
+            }
+
+            goToNextStep()
+        } catch (error) {
+            console.error('Error submitting shipping address:', error)
+        } finally {
+            setIsLoading(false)
+        }
+    }
+
+    // Auto-select and apply preferred shipping address when component is on this step
+    useEffect(() => {
+        const autoSelectPreferredAddress = async () => {
+            // Only auto-select when on this step and haven't already auto-selected
+            if (step !== STEPS.SHIPPING_ADDRESS || hasAutoSelected || isLoading) {
+                return
+            }
+
+            // Only proceed if customer is registered and has addresses
+            if (!customer?.isRegistered || !customer?.addresses?.length) {
+                return
+            }
+
+            // Skip to next step if basket already has a shipping address
+            if (selectedShippingAddress?.address1) {
+                setHasAutoSelected(true) // Prevent further attempts
+                goToNextStep()
+                return
+            }
+
+            // Find the preferred address
+            const preferredAddress = customer.addresses.find((addr) => addr.preferred === true)
+
+            //Auto-selecting preferred shipping address
+            if (preferredAddress) {
+                setHasAutoSelected(true)
+
+                try {
+                    // Apply the preferred address and continue to next step
+                    await submitAndContinue(preferredAddress)
+                } catch (error) {
+                    // Reset on error so user can manually select
+                    setHasAutoSelected(false)
+                }
+            }
         }
 
-        goToNextStep()
-        setIsLoading(false)
-    }
+        autoSelectPreferredAddress()
+    }, [step, customer, selectedShippingAddress, hasAutoSelected, isLoading])
 
     return (
         <ToggleCard
