@@ -58,6 +58,7 @@ export const getCookieSameSiteAttribute = () => {
     if (!onClient()) return
     const isLocalHost = window.location.hostname === 'localhost'
     const parentOrigin = getParentOrigin()
+    console.log(!isLocalHost && isOriginTrusted(parentOrigin))
     return !isLocalHost && isOriginTrusted(parentOrigin) ? 'none' : 'Lax'
 }
 

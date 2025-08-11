@@ -224,12 +224,13 @@ export const getGoogleButtonConfig = (
                 const adyenPaymentService = new AdyenPaymentsService(authToken, site)
                 basket = await forceOrderCalculation(basket.basketId, authToken, site)
                 console.log('==basket in GPayExpress after forceOrderCalculation==', basket)
+                const customerId = basket?.customerId || basket?.customerInfo?.customerId
                 const paymentsResponse = await adyenPaymentService.submitPayment(
                     {
                         ...state.data
                     },
                     basket?.basketId,
-                    basket?.customerInfo?.customerId
+                    customerId
                 )
 
                 if (paymentsResponse?.isFinal && paymentsResponse?.isSuccessful) {
@@ -302,7 +303,7 @@ export const getGoogleButtonConfig = (
     return buttonConfig
 }
 
-export const GooglePayExpress = () => {
+export const GooglePayExpress = (overrideAuthToken = null, overrideBasket = null) => {
     const {
         adyenEnvironment,
         adyenPaymentMethods,
@@ -313,8 +314,14 @@ export const GooglePayExpress = () => {
         shippingMethods,
         fetchShippingMethods
     } = useAdyenExpressCheckout()
-    console.log('==authToken in GPayExpress==', authToken)
-    console.log('==basket in GPayExpress==', basket)
+
+    console.log('==input to gpayexpress==', overrideAuthToken)
+    console.log('==basket input to gpayexpress==', overrideAuthToken.basket)
+
+    const finalAuthToken = overrideAuthToken.authToken
+    const finalBasket = overrideAuthToken.basket
+    console.log('==authToken in GPayExpress==', finalAuthToken)
+    console.log('==basket in GPayExpress==', finalBasket)
 
     const paymentContainer = useRef(null)
 
@@ -352,11 +359,11 @@ export const GooglePayExpress = () => {
                 console.log('==checkout in GPayExpress==', checkout)
                 const googlePaymentMethodConfig = getGooglePaymentMethodConfig(adyenPaymentMethods)
                 const googleButtonConfig = getGoogleButtonConfig(
-                    authToken,
+                    finalAuthToken,
                     site,
-                    basket,
-                    !shippingMethods && basket?.basketId
-                        ? await fetchShippingMethods(basket?.basketId, site, authToken)
+                    finalBasket,
+                    !shippingMethods && finalBasket?.basketId
+                        ? await fetchShippingMethods(finalBasket?.basketId, site, finalAuthToken)
                         : shippingMethods,
                     googlePaymentMethodConfig
                 )

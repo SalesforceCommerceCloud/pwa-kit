@@ -11,7 +11,9 @@
 export const IFRAME_HOST_ALLOW_LIST = Object.freeze([
     'https://runtime.commercecloud.com',
     'https://runtime-admin-staging.mobify-storefront.com',
-    'https://runtime-admin-preview.mobify-storefront.com'
+    'https://runtime-admin-preview.mobify-storefront.com',
+    'https://agent-checkout-payme-production.mobify-storefront.com',
+    'https://agentforce-checkout-production.mrt-storefront-staging.com'
 ])
 
 // We hardcode these here since we don't want commerce-sdk-react to have a dependency on pwa-kit-runtime

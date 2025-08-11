@@ -34,15 +34,6 @@ function Express() {
     const [currentSku, setCurrentSku] = useState(null)
     const [currentQuantity, setCurrentQuantity] = useState(1)
 
-    // useEffect(() => {
-    //     const getToken = async () => {
-    //         const token = await getTokenWhenReady()
-    //         setAuthToken(token)
-    //     }
-
-    //     getToken()
-    // }, [])
-
     // PostMessage listener for SKU updates
     useEffect(() => {
         const handleMessage = (event) => {
@@ -72,6 +63,10 @@ function Express() {
                     setAuthToken(authData.authToken)
                     setFinalCustomerId(authData.customerId)
                     const basketData = event.data.data.basketData
+                    // Store values in localStorage
+                    window.localStorage.setItem('access_token_RefArch', authData.authToken)
+                    window.localStorage.setItem('123access_token_RefArch', authData.authToken)
+                    window.localStorage.setItem('customer_id_RefArch', authData.customerId)
                     setBasketData(basketData)
                 }
             }
@@ -91,7 +86,17 @@ function Express() {
         }
     }, [])
 
-    if (!authToken || !finalCustomerId) {
+    // useEffect(() => {
+    //     const getToken = async () => {
+    //         const token = await getTokenWhenReady()
+    //         setAuthToken(token)
+    //         console.log('set auth token using local storage')
+    //     }
+
+    //     getToken()
+    // }, [])
+
+    if (!authToken) {
         return null
     }
 
@@ -111,7 +116,7 @@ function Express() {
                 navigate={navigate}
             >
                 {/*<ApplePayExpress sku={currentSku} quantity={currentQuantity} isPdpMode={isPdpMode} />*/}
-                <GooglePayExpress />
+                <GooglePayExpress authToken={authToken} basket={basket} />
             </AdyenExpressCheckoutProvider>
         </div>
     )

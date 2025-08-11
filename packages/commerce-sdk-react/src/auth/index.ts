@@ -349,6 +349,7 @@ class Auth {
 
     private set(name: AuthDataKeys, value: string, options?: unknown) {
         const {key, storageType} = DATA_MAP[name]
+        console.log('==key==', key, '==value==', value)
         const storage = this.stores[storageType]
         storage.set(key, value, options)
         DATA_MAP[name].callback?.(storage)
@@ -510,6 +511,11 @@ class Auth {
             this.set('customer_id', customerId)
             this.set('usid', usid)
             this.set('customer_type', isGuest ? 'guest' : 'registered')
+
+            console.log('==access_token_sfra==', sfraAuthToken)
+            console.log('==customer_id==', customerId)
+            console.log('==usid==', usid)
+            console.log('==customer_type==', isGuest ? 'guest' : 'registered')
 
             accessToken = sfraAuthToken
             // SFRA -> PWA access token cookie handoff is successful so we clear the SFRA made cookies.
@@ -766,6 +772,7 @@ class Auth {
      * 4. PKCE flow
      */
     async ready() {
+        console.log('==ready==')
         if (this.fetchedToken && this.fetchedToken !== '') {
             const {isGuest, customerId, usid} = this.parseSlasJWT(this.fetchedToken)
             this.set('access_token', this.fetchedToken)
