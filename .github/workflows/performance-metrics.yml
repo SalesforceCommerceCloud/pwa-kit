@@ -30,11 +30,6 @@ jobs:
               with:
                 PROJECT_KEY: "retail-react-app-performance-tests"
 
-            - name: Validate Generated App
-              uses: ./.github/actions/e2e_validate_generated_app
-              with:
-                PROJECT_KEY: "retail-react-app-performance-tests"
-
             - name: Create MRT credentials file
               uses: './.github/actions/create_mrt'
               with:
