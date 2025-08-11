@@ -180,7 +180,7 @@ describe('ContactInfo Component', () => {
         fireEvent.blur(emailInput)
 
         await waitFor(() => {
-            expect(screen.getByText('Confirm it\'s you')).toBeInTheDocument()
+            expect(screen.getByText("Confirm it's you")).toBeInTheDocument()
         })
     })
 
@@ -197,7 +197,7 @@ describe('ContactInfo Component', () => {
         await user.type(emailInput, '{enter}')
 
         await waitFor(() => {
-            expect(screen.getByText('Confirm it\'s you')).toBeInTheDocument()
+            expect(screen.getByText("Confirm it's you")).toBeInTheDocument()
         })
     })
 
@@ -273,11 +273,13 @@ describe('ContactInfo Component', () => {
 
         // Wait for OTP modal to appear
         await waitFor(() => {
-            expect(screen.getByText('Confirm it\'s you')).toBeInTheDocument()
+            expect(screen.getByText("Confirm it's you")).toBeInTheDocument()
         })
 
         // Verify modal content
-        expect(screen.getByText('To use your account information enter the code sent to your email.')).toBeInTheDocument()
+        expect(
+            screen.getByText('To use your account information enter the code sent to your email.')
+        ).toBeInTheDocument()
         expect(screen.getByText('Checkout as a guest')).toBeInTheDocument()
         expect(screen.getByText('Resend code')).toBeInTheDocument()
     })

@@ -135,12 +135,12 @@ export default function ShippingAddress() {
             }
 
             // Find the preferred address
-            const preferredAddress = customer.addresses.find(addr => addr.preferred === true)
-            
+            const preferredAddress = customer.addresses.find((addr) => addr.preferred === true)
+
             //Auto-selecting preferred shipping address
             if (preferredAddress) {
                 setHasAutoSelected(true)
-                
+
                 try {
                     // Apply the preferred address and continue to next step
                     await submitAndContinue(preferredAddress)

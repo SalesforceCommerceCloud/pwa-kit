@@ -54,7 +54,7 @@ const OtpAuth = ({isOpen, onClose, form, handleSendEmailOtp, handleOtpVerificati
             setOtpValues(new Array(OTP_LENGTH).fill(''))
             setVerificationError('')
             form.setValue('otp', '')
-            
+
             // Small delay to ensure modal is fully rendered
             const timer = setTimeout(() => {
                 inputRefs.current[0]?.focus()

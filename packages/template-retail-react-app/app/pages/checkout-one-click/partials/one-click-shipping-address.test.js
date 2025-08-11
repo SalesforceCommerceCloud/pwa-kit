@@ -20,7 +20,8 @@ jest.mock('@salesforce/commerce-sdk-react', () => {
     return {
         ...originalModule,
         useShopperBasketsMutation: jest.fn().mockImplementation((mutationType) => {
-            if (mutationType === 'updateShippingAddressForShipment') return mockUpdateShippingAddress
+            if (mutationType === 'updateShippingAddressForShipment')
+                return mockUpdateShippingAddress
             return {mutateAsync: jest.fn()}
         }),
         useShopperCustomersMutation: jest.fn().mockImplementation((mutationType) => {
@@ -58,9 +59,11 @@ jest.mock('@salesforce/retail-react-app/app/hooks/use-current-basket', () => ({
     useCurrentBasket: () => ({
         data: {
             basketId: 'test-basket-id',
-            shipments: [{
-                shippingAddress: null
-            }]
+            shipments: [
+                {
+                    shippingAddress: null
+                }
+            ]
         },
         derivedData: {
             hasBasket: true,
@@ -69,44 +72,61 @@ jest.mock('@salesforce/retail-react-app/app/hooks/use-current-basket', () => ({
     })
 }))
 
-jest.mock('@salesforce/retail-react-app/app/pages/checkout-container/util/checkout-context', () => ({
-    useCheckout: jest.fn().mockReturnValue({
-        step: 2, // SHIPPING_ADDRESS step
-        STEPS: {
-            CONTACT_INFO: 0,
-            PICKUP_ADDRESS: 1,
-            SHIPPING_ADDRESS: 2,
-            SHIPPING_OPTIONS: 3
-        },
-        goToStep: mockGoToStep,
-        goToNextStep: mockGoToNextStep
+jest.mock(
+    '@salesforce/retail-react-app/app/pages/checkout-container/util/checkout-context',
+    () => ({
+        useCheckout: jest.fn().mockReturnValue({
+            step: 2, // SHIPPING_ADDRESS step
+            STEPS: {
+                CONTACT_INFO: 0,
+                PICKUP_ADDRESS: 1,
+                SHIPPING_ADDRESS: 2,
+                SHIPPING_OPTIONS: 3
+            },
+            goToStep: mockGoToStep,
+            goToNextStep: mockGoToNextStep
+        })
     })
-}))
+)
 
 // Mock the ShippingAddressSelection component
-jest.mock('@salesforce/retail-react-app/app/pages/checkout-one-click/partials/one-click-shipping-address-selection', () => {
-    return function MockShippingAddressSelection({onSubmit, submitButtonLabel}) {
-        return (
-            <div data-testid="shipping-address-selection">
-                <button 
-                    onClick={() => onSubmit({
-                        addressId: 'test-address',
-                        address1: '123 Test St',
-                        city: 'Test City',
-                        countryCode: 'US',
-                        firstName: 'Test',
-                        lastName: 'User',
-                        phone: '555-0123',
-                        postalCode: '12345',
-                        stateCode: 'CA'
-                    })}
-                >
-                    Continue to Shipping Method
-                </button>
-            </div>
-        )
+jest.mock(
+    '@salesforce/retail-react-app/app/pages/checkout-one-click/partials/one-click-shipping-address-selection',
+    () => {
+        // eslint-disable-next-line @typescript-eslint/no-var-requires
+        const PropTypes = require('prop-types')
+
+        function MockShippingAddressSelection({onSubmit}) {
+            return (
+                <div data-testid="shipping-address-selection">
+                    <button
+                        onClick={() =>
+                            onSubmit({
+                                addressId: 'test-address',
+                                address1: '123 Test St',
+                                city: 'Test City',
+                                countryCode: 'US',
+                                firstName: 'Test',
+                                lastName: 'User',
+                                phone: '555-0123',
+                                postalCode: '12345',
+                                stateCode: 'CA'
+                            })
+                        }
+                    >
+                        Continue to Shipping Method
+                    </button>
+                </div>
+            )
+        }
+
+        MockShippingAddressSelection.propTypes = {
+            onSubmit: PropTypes.func
+        }
+
+        return MockShippingAddressSelection
     }
-})
+)
 
 beforeEach(() => {
     jest.clearAllMocks()
@@ -141,11 +161,11 @@ describe('ShippingAddress Component', () => {
         const {user} = renderWithProviders(<ShippingAddress />)
 
         const submitButton = screen.getByText('Continue to Shipping Method')
-        
+
         // Button should be clickable
         expect(submitButton).toBeInTheDocument()
         await user.click(submitButton)
-        
+
         // Component should remain stable after interaction
         expect(screen.getByText('Shipping Address')).toBeInTheDocument()
     })
@@ -187,7 +207,7 @@ describe('ShippingAddress Component', () => {
     test('shows loading state during address submission', async () => {
         // Mock a delayed response
         mockUpdateShippingAddress.mutateAsync.mockImplementation(
-            () => new Promise(resolve => setTimeout(resolve, 100))
+            () => new Promise((resolve) => setTimeout(resolve, 100))
         )
 
         const {user} = renderWithProviders(<ShippingAddress />)

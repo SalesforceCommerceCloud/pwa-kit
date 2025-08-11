@@ -9,11 +9,11 @@ import {screen, waitFor, fireEvent} from '@testing-library/react'
 import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
 import OtpAuth from '@salesforce/retail-react-app/app/components/otp-auth'
 
-    const mockHandleSendEmailOtp = jest.fn()
-    const mockHandleOtpVerification = jest.fn()
+const mockHandleSendEmailOtp = jest.fn()
+const mockHandleOtpVerification = jest.fn()
 const mockOnClose = jest.fn()
 const mockForm = {
-            setValue: jest.fn(),
+    setValue: jest.fn(),
     getValues: jest.fn().mockImplementation((field) => {
         const formData = {email: 'test@example.com'}
         return field ? formData[field] : formData
@@ -21,7 +21,7 @@ const mockForm = {
 }
 
 beforeEach(() => {
-        jest.clearAllMocks()
+    jest.clearAllMocks()
 })
 
 describe('OtpAuth Component', () => {
@@ -36,17 +36,19 @@ describe('OtpAuth Component', () => {
     test('renders OTP modal when open', () => {
         renderWithProviders(<OtpAuth {...defaultProps} />)
 
-        expect(screen.getByText('Confirm it\'s you')).toBeInTheDocument()
-        expect(screen.getByText('To use your account information enter the code sent to your email.')).toBeInTheDocument()
+        expect(screen.getByText("Confirm it's you")).toBeInTheDocument()
+        expect(
+            screen.getByText('To use your account information enter the code sent to your email.')
+        ).toBeInTheDocument()
     })
 
     test('does not render when closed', () => {
         renderWithProviders(<OtpAuth {...defaultProps} isOpen={false} />)
 
-        expect(screen.queryByText('Confirm it\'s you')).not.toBeInTheDocument()
-        })
+        expect(screen.queryByText("Confirm it's you")).not.toBeInTheDocument()
+    })
 
-        test('renders 8 OTP input fields', () => {
+    test('renders 8 OTP input fields', () => {
         renderWithProviders(<OtpAuth {...defaultProps} />)
 
         const inputs = screen.getAllByRole('textbox')
@@ -57,10 +59,10 @@ describe('OtpAuth Component', () => {
         renderWithProviders(<OtpAuth {...defaultProps} />)
 
         const inputs = screen.getAllByRole('textbox')
-        
+
         // Should have 8 OTP input fields
         expect(inputs).toHaveLength(8)
-        inputs.forEach(input => {
+        inputs.forEach((input) => {
             expect(input).toHaveAttribute('maxlength', '1')
             expect(input).toHaveAttribute('inputmode', 'numeric')
         })
@@ -70,9 +72,9 @@ describe('OtpAuth Component', () => {
         const {user} = renderWithProviders(<OtpAuth {...defaultProps} />)
 
         const inputs = screen.getAllByRole('textbox')
-        
+
         await user.type(inputs[0], '1')
-        
+
         await waitFor(() => {
             expect(inputs[1]).toHaveFocus()
         })
@@ -82,14 +84,14 @@ describe('OtpAuth Component', () => {
         const {user} = renderWithProviders(<OtpAuth {...defaultProps} />)
 
         const inputs = screen.getAllByRole('textbox')
-        
+
         // Type in first input to move to second
         await user.type(inputs[0], '1')
-        
+
         // Clear second input and press backspace
         await user.clear(inputs[1])
         fireEvent.keyDown(inputs[1], {key: 'Backspace', code: 'Backspace'})
-        
+
         await waitFor(() => {
             expect(inputs[0]).toHaveFocus()
         })
@@ -99,12 +101,12 @@ describe('OtpAuth Component', () => {
         const {user} = renderWithProviders(<OtpAuth {...defaultProps} />)
 
         const inputs = screen.getAllByRole('textbox')
-        
+
         // Type complete OTP code
         for (let i = 0; i < 8; i++) {
             await user.type(inputs[i], (i + 1).toString())
         }
-        
+
         await waitFor(() => {
             expect(mockHandleOtpVerification).toHaveBeenCalledWith('12345678')
         })
@@ -114,7 +116,7 @@ describe('OtpAuth Component', () => {
         renderWithProviders(<OtpAuth {...defaultProps} />)
 
         const inputs = screen.getAllByRole('textbox')
-        
+
         // Simulate paste event with clipboardData
         const pasteEvent = {
             clipboardData: {
@@ -122,9 +124,9 @@ describe('OtpAuth Component', () => {
             },
             preventDefault: jest.fn()
         }
-        
+
         fireEvent.paste(inputs[0], pasteEvent)
-        
+
         await waitFor(() => {
             expect(mockHandleOtpVerification).toHaveBeenCalledWith('87654321')
         })
@@ -134,9 +136,9 @@ describe('OtpAuth Component', () => {
         const {user} = renderWithProviders(<OtpAuth {...defaultProps} />)
 
         const inputs = screen.getAllByRole('textbox')
-        
+
         await user.type(inputs[0], 'a1b2')
-        
+
         // Should only contain the numeric characters
         expect(inputs[0]).toHaveValue('1')
         expect(inputs[1]).toHaveValue('2')
@@ -151,14 +153,16 @@ describe('OtpAuth Component', () => {
         const {user} = renderWithProviders(<OtpAuth {...defaultProps} />)
 
         const inputs = screen.getAllByRole('textbox')
-        
+
         // Type complete OTP code
         for (let i = 0; i < 8; i++) {
             await user.type(inputs[i], (i + 1).toString())
         }
-        
+
         await waitFor(() => {
-            expect(screen.getByText('Invalid or expired code. Please try again.')).toBeInTheDocument()
+            expect(
+                screen.getByText('Invalid or expired code. Please try again.')
+            ).toBeInTheDocument()
         })
     })
 
@@ -171,24 +175,26 @@ describe('OtpAuth Component', () => {
         const {user} = renderWithProviders(<OtpAuth {...defaultProps} />)
 
         const inputs = screen.getAllByRole('textbox')
-        
+
         // Type complete OTP code to trigger verification
         for (let i = 0; i < 8; i++) {
             await user.type(inputs[i], (i + 1).toString())
         }
-        
+
         // Wait for verification to complete and error to be handled
         await waitFor(() => {
-            expect(screen.getByText('Invalid or expired code. Please try again.')).toBeInTheDocument()
+            expect(
+                screen.getByText('Invalid or expired code. Please try again.')
+            ).toBeInTheDocument()
         })
-        
+
         // Wait for inputs to be cleared
         await waitFor(() => {
-            inputs.forEach(input => {
+            inputs.forEach((input) => {
                 expect(input).toHaveValue('')
             })
         })
-        
+
         // Component should be ready for new input
         expect(inputs[0]).toHaveValue('')
     })
@@ -202,11 +208,11 @@ describe('OtpAuth Component', () => {
     test('calls handleSendEmailOtp when resend button is clicked', async () => {
         const {user} = renderWithProviders(<OtpAuth {...defaultProps} />)
 
-            const resendButton = screen.getByText('Resend code')
-            await user.click(resendButton)
+        const resendButton = screen.getByText('Resend code')
+        await user.click(resendButton)
 
-            expect(mockHandleSendEmailOtp).toHaveBeenCalledWith('test@example.com')
-        })
+        expect(mockHandleSendEmailOtp).toHaveBeenCalledWith('test@example.com')
+    })
 
     test('renders checkout as guest button', () => {
         renderWithProviders(<OtpAuth {...defaultProps} />)
@@ -234,15 +240,18 @@ describe('OtpAuth Component', () => {
 
     test('focuses first input when modal opens', async () => {
         renderWithProviders(<OtpAuth {...defaultProps} isOpen={true} />)
-        
+
         // Wait for focus to be applied (component has a 100ms delay)
         const inputs = screen.getAllByRole('textbox')
-        await waitFor(() => {
-            expect(inputs[0]).toHaveFocus()
-        }, { timeout: 500 })
-        
+        await waitFor(
+            () => {
+                expect(inputs[0]).toHaveFocus()
+            },
+            {timeout: 500}
+        )
+
         // Verify all inputs are initially empty
-        inputs.forEach(input => {
+        inputs.forEach((input) => {
             expect(input).toHaveValue('')
         })
     })
