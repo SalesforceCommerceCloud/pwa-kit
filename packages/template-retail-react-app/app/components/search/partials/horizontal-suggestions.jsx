@@ -25,7 +25,7 @@ const HorizontalSuggestions = ({suggestions, closeAndNavigate, dynamicImageProps
                         key={idx}
                         onClick={() => closeAndNavigate(suggestion.link)}
                     >
-                        <Box width={{base: '50vw', md: '50vw', lg: '15vw'}} flex="0 0 auto">
+                        <Box width={{base: '50vw', md: '50vw', lg: '10vw'}} flex="0 0 auto">
                             {/* Product Image */}
                             <Box mb="2">
                                 {suggestion.image ? (
