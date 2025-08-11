@@ -15,7 +15,7 @@ import {useWishList} from '../../hooks/use-wish-list'
 import {useCartGiftItems} from './hooks/use-cart-gift-items'
 import {useCartDefaultShipping} from './hooks/use-cart-default-shipping'
 import {useErrorHandler} from '../../hooks/use-errors'
-import {useManualBonusProducts} from '../../hooks/use-manual-bonus-products'
+
 
 // Cart Components
 import CartTitle from './partials/cart-title'
@@ -37,8 +37,7 @@ const Cart = () => {
     // Product data and processing
     const {isProductsPending, productsByItemId} = useCartProducts(basket)
 
-    // Initialize manual bonus products hook - handles all processing automatically
-    useManualBonusProducts(basket, isPending, isRegistered)
+
 
     // Cart operations
     const {

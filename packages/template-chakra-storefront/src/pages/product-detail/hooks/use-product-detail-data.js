@@ -21,7 +21,7 @@ import {useHistory, useLocation, useParams} from 'react-router-dom'
 import {useCurrentBasket, useVariant} from '../../../hooks'
 import useEinstein from '../../../hooks/use-einstein'
 import {useWishList} from '../../../hooks/use-wish-list'
-import {useManualBonusProducts} from '../../../hooks/use-manual-bonus-products'
+
 
 import {normalizeSetBundleProduct, getUpdateBundleChildArray} from '../../../utils/product-utils'
 import {useErrorHandler} from '../../../hooks/use-errors'
@@ -40,12 +40,7 @@ export const useProductDetailData = () => {
     const {addItemToNewOrExistingBasket} = useShopperBasketsMutationHelper()
     const updateItemsInBasketMutation = useShopperBasketsMutation('updateItemsInBasket')
 
-    /****************************** Manual Bonus Products *********************************/
-    const {
-        createManualBonusProductCollections,
-        detectNewlyAddedBonusProducts,
-        analyzeQualifyingProductChanges
-    } = useManualBonusProducts()
+
 
     /*************************** Product Detail and Category ********************/
     const {productId} = useParams()
@@ -197,52 +192,8 @@ export const useProductDetailData = () => {
                 quantity
             }))
 
-            // Capture current basket state before adding items
-            const beforeBasket = currentBasket || {}
-
             // Add items to basket
             const updatedBasket = await addItemToNewOrExistingBasket(productItems)
-
-            // Get list of product IDs that were just added
-            const addedProductIds = productItems.map((item) => item.productId)
-
-            // Analyze qualifying product changes
-            const qualifyingProductChanges = analyzeQualifyingProductChanges(
-                beforeBasket,
-                updatedBasket,
-                addedProductIds
-            )
-
-            // Detect newly added bonus products and their associations
-            const detectionResult = detectNewlyAddedBonusProducts(
-                beforeBasket,
-                updatedBasket,
-                qualifyingProductChanges
-            )
-
-            // Create manual bonus product collections based on detection results
-            if (Object.keys(detectionResult.qualifyingProductToBonusProducts).length > 0) {
-                createManualBonusProductCollections(
-                    detectionResult.qualifyingProductToBonusProducts
-                )
-
-                // Debug log to verify functionality
-                console.log('Manual bonus product collections created:', {
-                    addedProducts: addedProductIds,
-                    qualifyingProductChanges: detectionResult.qualifyingProductChanges,
-                    newBonusProducts: detectionResult.newBonusProducts.map((bp) => ({
-                        productId: bp.productId,
-                        productName: bp.productName,
-                        quantity: bp.quantity,
-                        itemId: bp.itemId,
-                        promotionId: bp.promotionId,
-                        bonusDiscountLineItemId: bp.bonusDiscountLineItemId,
-                        bonusDiscountPromotionId: bp.bonusDiscountPromotionId
-                    })),
-                    qualifyingProductToBonusProducts:
-                        detectionResult.qualifyingProductToBonusProducts
-                })
-            }
 
             einstein.sendAddToCart(productItems)
 
@@ -318,46 +269,7 @@ export const useProductDetailData = () => {
                 }
             ]
 
-            // Capture current basket state before adding items
-            const beforeBasket = currentBasket || {}
-
             const res = await addItemToNewOrExistingBasket(productItems)
-
-            // Analyze qualifying product changes for bundle
-            const qualifyingProductChanges = analyzeQualifyingProductChanges(beforeBasket, res, [
-                product.id
-            ])
-
-            // Detect newly added bonus products and their associations
-            const detectionResult = detectNewlyAddedBonusProducts(
-                beforeBasket,
-                res,
-                qualifyingProductChanges
-            )
-
-            // Create manual bonus product collections for the bundle product that was added
-            if (Object.keys(detectionResult.qualifyingProductToBonusProducts).length > 0) {
-                createManualBonusProductCollections(
-                    detectionResult.qualifyingProductToBonusProducts
-                )
-
-                // Debug log to verify functionality
-                console.log('Manual bonus product collection created for bundle:', {
-                    bundleProductId: product.id,
-                    qualifyingProductChanges: detectionResult.qualifyingProductChanges,
-                    newBonusProducts: detectionResult.newBonusProducts.map((bp) => ({
-                        productId: bp.productId,
-                        productName: bp.productName,
-                        quantity: bp.quantity,
-                        itemId: bp.itemId,
-                        promotionId: bp.promotionId,
-                        bonusDiscountLineItemId: bp.bonusDiscountLineItemId,
-                        bonusDiscountPromotionId: bp.bonusDiscountPromotionId
-                    })),
-                    qualifyingProductToBonusProducts:
-                        detectionResult.qualifyingProductToBonusProducts
-                })
-            }
 
             const bundleChildMasterIds = childProductSelections.map((child) => {
                 return child.product.id
