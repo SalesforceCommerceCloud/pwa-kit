@@ -47,11 +47,11 @@ jobs:
                     "script-src": ["*.sfcc-store-internal.net"],
                     "connect-src": ["*.sfcc-store-internal.net"]
                   }'
-                  echo "$CSP_DIRECTIVES" | node scripts/add-csp-directives.js --config-path "${{ steps.generate_app.outputs.project_path }}/config/default.js"
+                  echo "$CSP_DIRECTIVES" | node e2e/scripts/add-csp-directives.js --config-path "${{ steps.generate_app.outputs.project_path }}/config/default.js"
 
             - name: Enable Partial Hydration
               run: |-
-                  node scripts/update-config.js app.partialHydrationEnabled true --config-path "${{ steps.generate_app.outputs.project_path }}/config/default.js"
+                  node e2e/scripts/update-config.js app.partialHydrationEnabled true --config-path "${{ steps.generate_app.outputs.project_path }}/config/default.js"
 
             - name: Create MRT credentials file
               uses: './.github/actions/create_mrt'

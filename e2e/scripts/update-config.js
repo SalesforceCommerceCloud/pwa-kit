@@ -15,23 +15,16 @@
  */
 
 const fs = require('fs')
-const path = require('path')
-
-// Default path to the config default.js file
-const DEFAULT_CONFIG_FILE_PATH = path.join(
-    __dirname,
-    '../packages/template-retail-react-app/config/default.js'
-)
 
 /**
- * Get the config file path from command line args or use default
+ * Get the config file path from command line args
  */
 function getConfigFilePath(args) {
     const pathIndex = args.indexOf('--config-path')
     if (pathIndex !== -1 && pathIndex + 1 < args.length) {
         return args[pathIndex + 1]
     }
-    return DEFAULT_CONFIG_FILE_PATH
+    return null
 }
 
 /**
@@ -160,30 +153,27 @@ function main() {
     if (filteredArgs.length < 2) {
         console.log(`
 Usage:
-  node scripts/update-config.js <property-path> <value> [--config-path <path>]
+  node e2e/scripts/update-config.js <property-path> <value> --config-path <path>
 
 Description:
   Updates configuration properties in config/default.js using dot notation for nested properties.
   Supports strings, numbers, booleans, arrays, and objects.
 
 Options:
-  --config-path <path>  - Custom path to config/default.js (default: packages/template-retail-react-app/config/default.js)
+  --config-path <path>  - Path to config/default.js (REQUIRED)
 
 Examples:
   # Update a boolean property
-  node scripts/update-config.js app.partialHydrationEnabled true
+  node e2e/scripts/update-config.js app.partialHydrationEnabled true --config-path storefront/config/default.js
 
   # Update a string property
-  node scripts/update-config.js app.defaultSite "MyNewSite"
+  node e2e/scripts/update-config.js app.defaultSite "MyNewSite" --config-path storefront/config/default.js
 
   # Update a nested property
-  node scripts/update-config.js app.commerceAPI.parameters.siteId "NewSiteId"
+  node e2e/scripts/update-config.js app.commerceAPI.parameters.siteId "NewSiteId" --config-path storefront/config/default.js
 
   # Update a number
-  node scripts/update-config.js app.someNumber 42
-
-  # Update with custom config path
-  node scripts/update-config.js --config-path custom/path/default.js app.partialHydrationEnabled true
+  node e2e/scripts/update-config.js app.someNumber 42 --config-path storefront/config/default.js
 
 Supported Value Types:
   - Booleans: true, false
@@ -197,6 +187,22 @@ Supported Value Types:
     }
 
     const configFilePath = getConfigFilePath(args)
+
+    // Check if config path was provided
+    if (!configFilePath) {
+        console.error(`
+❌ Error: --config-path parameter is required.
+
+The --config-path parameter must be provided to specify the location of the config/default.js file.
+
+Usage:
+  node e2e/scripts/update-config.js <property-path> <value> --config-path <path>
+
+Example:
+  node e2e/scripts/update-config.js app.partialHydrationEnabled true --config-path storefront/config/default.js
+        `)
+        process.exit(1)
+    }
     const propertyPath = filteredArgs[0]
     const valueString = filteredArgs[1]
 
