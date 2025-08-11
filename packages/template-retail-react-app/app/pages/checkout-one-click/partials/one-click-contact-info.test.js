@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
-import {screen, waitFor} from '@testing-library/react'
+import {screen, waitFor, fireEvent} from '@testing-library/react'
 import ContactInfo from '@salesforce/retail-react-app/app/pages/checkout-one-click/partials/one-click-contact-info'
 import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
 import {rest} from 'msw'
@@ -15,7 +15,9 @@ const validEmail = 'test@salesforce.com'
 const invalidEmail = 'invalidEmail'
 const mockAuthHelperFunctions = {
     [AuthHelpers.LoginRegisteredUserB2C]: {mutateAsync: jest.fn()},
-    [AuthHelpers.Logout]: {mutateAsync: jest.fn()}
+    [AuthHelpers.Logout]: {mutateAsync: jest.fn()},
+    [AuthHelpers.AuthorizePasswordless]: {mutateAsync: jest.fn()},
+    [AuthHelpers.LoginPasswordlessUser]: {mutateAsync: jest.fn()}
 }
 
 const mockUpdateCustomerForBasket = {mutateAsync: jest.fn()}
@@ -148,35 +150,45 @@ describe('ContactInfo Component', () => {
         expect(emailInput).toHaveValue(invalidEmail)
     })
 
-    test('allows guest checkout with valid email', async () => {
+    test('shows continue button for unregistered email', async () => {
+        // Mock the passwordless login to fail (email not found)
+        mockAuthHelperFunctions[AuthHelpers.AuthorizePasswordless].mutateAsync.mockRejectedValue(
+            new Error('Email not found')
+        )
+
         const {user} = renderWithProviders(<ContactInfo />)
 
         const emailInput = screen.getByLabelText('Email')
         await user.type(emailInput, validEmail)
-        await user.type(emailInput, '{enter}')
+        fireEvent.blur(emailInput)
 
         await waitFor(() => {
-            expect(mockUpdateCustomerForBasket.mutateAsync).toHaveBeenCalledWith({
-                parameters: {basketId: 'test-basket-id'},
-                body: {email: validEmail}
-            })
+            expect(screen.getByText('Continue to Shipping Address')).toBeInTheDocument()
         })
     })
 
-    test('submits form with valid email', async () => {
+    test('opens OTP modal for registered email on blur', async () => {
+        // Mock successful passwordless login authorization
+        mockAuthHelperFunctions[AuthHelpers.AuthorizePasswordless].mutateAsync.mockResolvedValue({
+            success: true
+        })
+
         const {user} = renderWithProviders(<ContactInfo />)
 
         const emailInput = screen.getByLabelText('Email')
         await user.type(emailInput, validEmail)
-        await user.type(emailInput, '{enter}')
+        fireEvent.blur(emailInput)
 
         await waitFor(() => {
-            expect(mockUpdateCustomerForBasket.mutateAsync).toHaveBeenCalled()
+            expect(screen.getByText("Confirm it's you")).toBeInTheDocument()
         })
     })
 
-    test('displays error on submission failure', async () => {
-        mockUpdateCustomerForBasket.mutateAsync.mockRejectedValue(new Error('Network error'))
+    test('opens OTP modal for registered email on form submit', async () => {
+        // Mock successful passwordless login authorization
+        mockAuthHelperFunctions[AuthHelpers.AuthorizePasswordless].mutateAsync.mockResolvedValue({
+            success: true
+        })
 
         const {user} = renderWithProviders(<ContactInfo />)
 
@@ -185,7 +197,42 @@ describe('ContactInfo Component', () => {
         await user.type(emailInput, '{enter}')
 
         await waitFor(() => {
-            expect(screen.getByText('Network error')).toBeInTheDocument()
+            expect(screen.getByText("Confirm it's you")).toBeInTheDocument()
+        })
+    })
+
+    test('renders continue button for guest checkout', async () => {
+        // Mock the passwordless login to fail (email not found)
+        mockAuthHelperFunctions[AuthHelpers.AuthorizePasswordless].mutateAsync.mockRejectedValue(
+            new Error('Email not found')
+        )
+
+        const {user} = renderWithProviders(<ContactInfo />)
+
+        const emailInput = screen.getByLabelText('Email')
+        await user.type(emailInput, validEmail)
+        fireEvent.blur(emailInput)
+
+        await waitFor(() => {
+            expect(screen.getByText('Continue to Shipping Address')).toBeInTheDocument()
+        })
+    })
+
+    test('handles OTP authorization failure gracefully', async () => {
+        // Mock the passwordless login to fail
+        mockAuthHelperFunctions[AuthHelpers.AuthorizePasswordless].mutateAsync.mockRejectedValue(
+            new Error('Authorization failed')
+        )
+
+        const {user} = renderWithProviders(<ContactInfo />)
+
+        const emailInput = screen.getByLabelText('Email')
+        await user.type(emailInput, validEmail)
+        fireEvent.blur(emailInput)
+
+        // Should show continue button for guest checkout when OTP fails
+        await waitFor(() => {
+            expect(screen.getByText('Continue to Shipping Address')).toBeInTheDocument()
         })
     })
 
@@ -210,5 +257,30 @@ describe('ContactInfo Component', () => {
         expect(screen.queryByText('Password')).not.toBeInTheDocument()
         expect(screen.queryByText('Already have an account? Log in')).not.toBeInTheDocument()
         expect(screen.queryByText('Back to Sign In Options')).not.toBeInTheDocument()
+    })
+
+    test('renders OTP modal content correctly', async () => {
+        // Mock successful OTP authorization
+        mockAuthHelperFunctions[AuthHelpers.AuthorizePasswordless].mutateAsync.mockResolvedValue({
+            success: true
+        })
+
+        const {user} = renderWithProviders(<ContactInfo />)
+
+        const emailInput = screen.getByLabelText('Email')
+        await user.type(emailInput, validEmail)
+        fireEvent.blur(emailInput)
+
+        // Wait for OTP modal to appear
+        await waitFor(() => {
+            expect(screen.getByText("Confirm it's you")).toBeInTheDocument()
+        })
+
+        // Verify modal content
+        expect(
+            screen.getByText('To use your account information enter the code sent to your email.')
+        ).toBeInTheDocument()
+        expect(screen.getByText('Checkout as a guest')).toBeInTheDocument()
+        expect(screen.getByText('Resend code')).toBeInTheDocument()
     })
 })

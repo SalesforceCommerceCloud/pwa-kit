@@ -44,9 +44,7 @@ import {
     useAuthHelper,
     useShopperBasketsMutation,
     useCustomerType,
-    useConfig,
-    useCustomer,
-    useCustomerId
+    useConfig
 } from '@salesforce/commerce-sdk-react'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import {isAbsoluteURL} from '@salesforce/retail-react-app/app/page-designer/utils'
@@ -63,13 +61,6 @@ const ContactInfo = ({isSocialEnabled = false, idps = []}) => {
     const {isRegistered} = useCustomerType()
     const config = useConfig()
 
-    // Add manual customer fetching capability
-    const customerId = useCustomerId()
-    const manualCustomerQuery = useCustomer(
-        {parameters: {customerId}},
-        {enabled: false} // Disabled initially, we'll manually trigger
-    )
-
     const login = useAuthHelper(AuthHelpers.LoginRegisteredUserB2C)
     const logout = useAuthHelper(AuthHelpers.Logout)
     const updateCustomerForBasket = useShopperBasketsMutation('updateCustomerForBasket')
@@ -78,38 +69,6 @@ const ContactInfo = ({isSocialEnabled = false, idps = []}) => {
     const loginPasswordless = useAuthHelper(AuthHelpers.LoginPasswordlessUser)
 
     const {step, STEPS, goToStep, goToNextStep} = useCheckout()
-
-    // Helper function to directly read customer type from localStorage
-    // This bypasses React state staleness after login
-    const getCustomerTypeFromStorage = () => {
-        if (typeof window !== 'undefined') {
-            const customerTypeKey = `customer_type_${config.siteId}`
-            return localStorage.getItem(customerTypeKey)
-        }
-        return null
-    }
-
-    // Helper function to directly read customer ID from localStorage
-    const getCustomerIdFromStorage = () => {
-        if (typeof window !== 'undefined') {
-            const customerIdKey = `customer_id_${config.siteId}`
-            return localStorage.getItem(customerIdKey)
-        }
-        return null
-    }
-
-    // Helper function to extract basket ID from either structure
-    const getBasketId = (basketData) => {
-        // Handle individual basket structure: {basketId: "...", productItems: [...]}
-        if (basketData?.basketId) {
-            return basketData.basketId
-        }
-        // Handle baskets collection structure: {baskets: [{basketId: "..."}], total: 1}
-        if (basketData?.baskets?.[0]?.basketId) {
-            return basketData.baskets[0].basketId
-        }
-        return null
-    }
 
     const form = useForm({
         defaultValues: {
@@ -138,12 +97,6 @@ const ContactInfo = ({isSocialEnabled = false, idps = []}) => {
         onOpen: onOtpModalOpen,
         onClose: onOtpModalClose
     } = useDisclosure()
-
-    // Helper function to validate email format
-    const isValidEmail = (email) => {
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-        return emailRegex.test(email)
-    }
 
     // Handle email field blur/focus events
     const handleEmailBlur = async (e) => {
@@ -225,61 +178,50 @@ const ContactInfo = ({isSocialEnabled = false, idps = []}) => {
             // Close modal
             handleOtpModalClose()
 
+            goToNextStep()
+
+            // Return success
             return {success: true}
         } catch (error) {
             // Handle 401 Unauthorized - invalid or expired OTP code
-            if (error.response?.status === 401) {
-                const message = formatMessage({
-                    defaultMessage: 'Invalid or expired code. Please try again.',
-                    id: 'otp.error.invalid_code'
-                })
-                return {success: false, error: message}
-            }
+            const message =
+                error.response?.status === 401
+                    ? formatMessage({
+                          defaultMessage: 'Invalid or expired code. Please try again.',
+                          id: 'otp.error.invalid_code'
+                      })
+                    : formatMessage(API_ERROR_MESSAGE)
 
-            // Handle other error types
-            const message = /invalid|expired/i.test(error.message)
-                ? formatMessage({
-                      defaultMessage: 'Invalid or expired code. Please try again.',
-                      id: 'otp.error.invalid_code'
-                  })
-                : formatMessage(API_ERROR_MESSAGE)
+            // Return error for OTP component to handle
             return {success: false, error: message}
         }
     }
 
     const submitForm = async (data) => {
         setError(null)
-        try {
-            if (!data.password) {
-                await updateCustomerForBasket.mutateAsync({
-                    parameters: {basketId: basket.basketId},
-                    body: {email: data.email}
-                })
-            } else {
-                await login.mutateAsync({username: data.email, password: data.password})
 
-                const hasBasketItem = basket.productItems?.length > 0
-                if (hasBasketItem) {
-                    mergeBasket.mutate({
-                        parameters: {
-                            createDestinationBasket: true
-                        }
-                    })
-                }
-            }
-
+        // If continue button is showing, this means it's a guest checkout
+        // Go directly to next step without OTP
+        if (showContinueButton) {
+            await updateCustomerForBasket.mutateAsync({
+                parameters: {basketId: basket.basketId},
+                body: {email: data.email}
+            })
+            setShowContinueButton(false)
             goToNextStep()
-        } catch (error) {
-            if (/Unauthorized/i.test(error.message)) {
-                setError(
-                    formatMessage({
-                        defaultMessage: 'Incorrect username or password, please try again.',
-                        id: 'contact_info.error.incorrect_username_or_password'
-                    })
-                )
-            } else {
-                setError(error.message)
-            }
+            return
+        }
+
+        // Otherwise, this is form submission (Enter key) - trigger OTP flow
+        const email = form.getValues('email')
+        const isValid = await form.trigger()
+
+        // Manually trigger the browser native form validations
+        if (isValid) {
+            // Try to send OTP first, only open modal if successful
+            await handleSendEmailOtp(email)
+        } else {
+            form.reportValidity()
         }
     }
 
@@ -292,7 +234,6 @@ const ContactInfo = ({isSocialEnabled = false, idps = []}) => {
                     id: 'checkout_contact_info.title.contact_info'
                 })}
                 editing={step === STEPS.CONTACT_INFO}
-                isLoading={form.formState.isSubmitting}
                 onEdit={() => {
                     if (isRegistered) {
                         setSignOutConfirmDialogIsOpen(true)
@@ -361,7 +302,7 @@ const ContactInfo = ({isSocialEnabled = false, idps = []}) => {
                                         isSocialEnabled={isSocialEnabled}
                                         idps={idps}
                                     />
-                                    {showContinueButton && (
+                                    {showContinueButton && step === STEPS.CONTACT_INFO && (
                                         <Button type="submit">
                                             <FormattedMessage
                                                 defaultMessage="Continue to Shipping Address"
