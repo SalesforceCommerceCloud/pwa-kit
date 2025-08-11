@@ -181,25 +181,25 @@ const ContactInfo = ({isSocialEnabled = false, idps = []}) => {
             goToNextStep()
 
             // Return success
-            return { success: true }
-
+            return {success: true}
         } catch (error) {
             // Handle 401 Unauthorized - invalid or expired OTP code
-            const message = (error.response?.status === 401) ? 
-                formatMessage({
-                    defaultMessage: 'Invalid or expired code. Please try again.',
-                    id: 'otp.error.invalid_code'
-                })
-                : formatMessage(API_ERROR_MESSAGE)
-            
+            const message =
+                error.response?.status === 401
+                    ? formatMessage({
+                          defaultMessage: 'Invalid or expired code. Please try again.',
+                          id: 'otp.error.invalid_code'
+                      })
+                    : formatMessage(API_ERROR_MESSAGE)
+
             // Return error for OTP component to handle
-            return { success: false, error: message }
+            return {success: false, error: message}
         }
     }
 
     const submitForm = async (data) => {
         setError(null)
-        
+
         // If continue button is showing, this means it's a guest checkout
         // Go directly to next step without OTP
         if (showContinueButton) {
@@ -208,14 +208,14 @@ const ContactInfo = ({isSocialEnabled = false, idps = []}) => {
                 body: {email: data.email}
             })
             setShowContinueButton(false)
-            goToNextStep()   
+            goToNextStep()
             return
         }
-        
+
         // Otherwise, this is form submission (Enter key) - trigger OTP flow
         const email = form.getValues('email')
         const isValid = await form.trigger()
-        
+
         // Manually trigger the browser native form validations
         if (isValid) {
             // Try to send OTP first, only open modal if successful

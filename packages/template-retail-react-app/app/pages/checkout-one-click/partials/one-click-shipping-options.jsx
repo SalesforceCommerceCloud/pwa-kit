@@ -58,15 +58,17 @@ export default function ShippingOptions() {
 
     // Calculate if we should show loading state immediately for auto-selection
     const shouldShowInitialLoading = useMemo(() => {
-        return step === STEPS.SHIPPING_OPTIONS && 
-               !hasAutoSelected && 
-               customer?.isRegistered && 
-               !selectedShippingMethod?.id &&
-               shippingMethods?.applicableShippingMethods?.length &&
-               shippingMethods.defaultShippingMethodId &&
-               shippingMethods.applicableShippingMethods.find(
-                   method => method.id === shippingMethods.defaultShippingMethodId
-               )
+        return (
+            step === STEPS.SHIPPING_OPTIONS &&
+            !hasAutoSelected &&
+            customer?.isRegistered &&
+            !selectedShippingMethod?.id &&
+            shippingMethods?.applicableShippingMethods?.length &&
+            shippingMethods.defaultShippingMethodId &&
+            shippingMethods.applicableShippingMethods.find(
+                (method) => method.id === shippingMethods.defaultShippingMethodId
+            )
+        )
     }, [step, hasAutoSelected, customer, selectedShippingMethod, shippingMethods])
 
     // Use calculated loading state or manual loading state
@@ -119,14 +121,14 @@ export default function ShippingOptions() {
 
             const defaultMethodId = shippingMethods.defaultShippingMethodId
             const defaultMethod = shippingMethods.applicableShippingMethods.find(
-                method => method.id === defaultMethodId
+                (method) => method.id === defaultMethodId
             )
 
             if (defaultMethod) {
                 console.log('🚚 Auto-selecting default shipping method:', defaultMethod.name)
                 setHasAutoSelected(true)
                 setIsLoading(true) // Show loading state immediately
-                
+
                 try {
                     // Apply the default shipping method and continue to next step
                     await updateShippingMethod.mutateAsync({
@@ -147,7 +149,9 @@ export default function ShippingOptions() {
                     setIsLoading(false) // Hide loading state on error
                 }
             } else {
-                console.log('ℹ️ No default shipping method found, user will need to select manually')
+                console.log(
+                    'ℹ️ No default shipping method found, user will need to select manually'
+                )
             }
         }
 
@@ -209,7 +213,9 @@ export default function ShippingOptions() {
             })}
             editing={step === STEPS.SHIPPING_OPTIONS}
             isLoading={form.formState.isSubmitting || effectiveIsLoading}
-            disabled={selectedShippingMethod == null || !selectedShippingAddress || effectiveIsLoading}
+            disabled={
+                selectedShippingMethod == null || !selectedShippingAddress || effectiveIsLoading
+            }
             onEdit={() => goToStep(STEPS.SHIPPING_OPTIONS)}
             editLabel={formatMessage({
                 defaultMessage: 'Edit Shipping Options',

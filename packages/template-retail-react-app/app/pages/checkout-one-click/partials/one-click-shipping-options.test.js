@@ -24,7 +24,7 @@ const mockShippingMethods = {
         },
         {
             id: 'express-shipping',
-            name: 'Express Shipping', 
+            name: 'Express Shipping',
             description: '2-3 business days',
             price: 12.99
         }
@@ -58,17 +58,21 @@ jest.mock('@salesforce/retail-react-app/app/hooks/use-current-basket', () => ({
     useCurrentBasket: () => ({
         data: {
             basketId: 'test-basket-id',
-            shipments: [{
-                shippingAddress: {
-                    address1: '123 Main St',
-                    city: 'Test City'
-                },
-                shippingMethod: null
-            }],
-            shippingItems: [{
-                price: 5.99,
-                priceAdjustments: []
-            }]
+            shipments: [
+                {
+                    shippingAddress: {
+                        address1: '123 Main St',
+                        city: 'Test City'
+                    },
+                    shippingMethod: null
+                }
+            ],
+            shippingItems: [
+                {
+                    price: 5.99,
+                    priceAdjustments: []
+                }
+            ]
         },
         derivedData: {
             hasBasket: true,
@@ -77,20 +81,23 @@ jest.mock('@salesforce/retail-react-app/app/hooks/use-current-basket', () => ({
     })
 }))
 
-jest.mock('@salesforce/retail-react-app/app/pages/checkout-container/util/checkout-context', () => ({
-    useCheckout: jest.fn().mockReturnValue({
-        step: 3, // SHIPPING_OPTIONS step
-        STEPS: {
-            CONTACT_INFO: 0,
-            PICKUP_ADDRESS: 1,
-            SHIPPING_ADDRESS: 2,
-            SHIPPING_OPTIONS: 3,
-            PAYMENT: 4
-        },
-        goToStep: mockGoToStep,
-        goToNextStep: mockGoToNextStep
+jest.mock(
+    '@salesforce/retail-react-app/app/pages/checkout-container/util/checkout-context',
+    () => ({
+        useCheckout: jest.fn().mockReturnValue({
+            step: 3, // SHIPPING_OPTIONS step
+            STEPS: {
+                CONTACT_INFO: 0,
+                PICKUP_ADDRESS: 1,
+                SHIPPING_ADDRESS: 2,
+                SHIPPING_OPTIONS: 3,
+                PAYMENT: 4
+            },
+            goToStep: mockGoToStep,
+            goToNextStep: mockGoToNextStep
+        })
     })
-}))
+)
 
 jest.mock('@salesforce/retail-react-app/app/hooks', () => ({
     useCurrency: () => ({
@@ -154,10 +161,10 @@ describe('ShippingOptions Component', () => {
 
         // Component should still render successfully even if auto-selection fails
         expect(screen.getByText('Shipping & Gift Options')).toBeInTheDocument()
-        
+
         // Wait a bit to let any async operations complete
-        await new Promise(resolve => setTimeout(resolve, 100))
-        
+        await new Promise((resolve) => setTimeout(resolve, 100))
+
         // Component should still be functional
         expect(screen.getByText('Do you want to send this as a gift?')).toBeInTheDocument()
     })
