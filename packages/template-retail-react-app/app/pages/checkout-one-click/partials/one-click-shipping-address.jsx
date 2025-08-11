@@ -145,8 +145,8 @@ export default function ShippingAddress() {
                     // Apply the preferred address and continue to next step
                     await submitAndContinue(preferredAddress)
                 } catch (error) {
-                    console.error('❌ Failed to auto-apply preferred address:', error)
-                    setHasAutoSelected(false) // Reset on error so user can manually select
+                    // Reset on error so user can manually select
+                    setHasAutoSelected(false)
                 }
             }
         }
