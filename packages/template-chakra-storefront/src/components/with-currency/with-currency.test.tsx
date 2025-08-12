@@ -8,7 +8,7 @@ import React from 'react'
 import {render} from '@testing-library/react'
 import '@testing-library/jest-dom'
 import withCurrency from './with-currency'
-import useMultiSite from '../../hooks/use-multi-site'
+import {useMultiSite} from '../../hooks/use-multi-site'
 
 // Mock the `useMultiSite` hook
 jest.mock('../../hooks/use-multi-site', () => ({
