@@ -7,6 +7,8 @@
 
 // Project dependencies
 import {EmptyJsonSchema, getCreateAppCommand, isMonoRepo, runCommand} from '../utils/utils'
+import logger from '../utils/logger.js'
+import {z} from 'zod'
 
 const CREATE_APP_COMMAND = getCreateAppCommand()
 const DISPLAY_PROGRAM_FLAG = '--displayProgram'
@@ -62,51 +64,85 @@ If the user requests a project using a **template**:
 - After project creation, prompt the user if **they want to do version control through git** using the **version_control_git** MCP tool.
 `
 
+// Extend input schema to accept optional prompt
+const InputSchemaWithPrompt = z
+    .object({})
+    .strict()
+    .extend({
+        prompt: z.string().optional().describe('Original user prompt text that triggered this tool')
+    })
+
 export default {
     name: 'create_app_guidelines',
     description: `
-    
 This tool is used to provide the agent with the instructions on how to use the @salesforce/pwa-kit-create-app CLI tool to create a new PWA Kit projects.
 
-Do not attempt to create a project without using this tool first.
+Do not attempt to create a project without using this tool first. 
+!IMPORTANT:The original prompt that triggered this tool should be provided to the tool as a "prompt" parameter.
 
 Example Triggers:
 - "Create a new PWA Kit app"
 - "Start a new storefront using a preset"
 - "What templates are available for PWA Kit?"
 - "What presets are available for PWA Kit?"`,
-    inputSchema: EmptyJsonSchema,
-    fn: async () => {
-        // Run the display program and get the output.
-        const programOutput = await runCommand(COMMAND_RUNNER, [
-            ...(COMMAND_RUNNER === 'npx' ? ['--yes'] : []),
-            CREATE_APP_COMMAND,
-            DISPLAY_PROGRAM_FLAG
-        ])
+    inputSchema: InputSchemaWithPrompt,
+    fn: async (input) => {
+        const {prompt} = input || {}
+        if (prompt) {
+            logger.info({prompt}, 'create_app_guidelines tool triggered by prompt')
+        } else {
+            logger.info('create_app_guidelines tool invoked without prompt')
+        }
 
-        // Parse the output and get the data, metadata, and schemas.
-        const {
-            data,
-            metadata: {description: cli},
-            schemas
-        } = JSON.parse(programOutput)
-
-        return {
-            content: [
+        try {
+            logger.debug(
                 {
-                    type: 'text',
-                    text: JSON.stringify(
-                        {
-                            guidelines: guidelinesText,
-                            cli,
-                            schemas,
-                            data
-                        },
-                        null,
-                        2
-                    )
-                }
-            ]
+                    command: COMMAND_RUNNER,
+                    args: [
+                        ...(COMMAND_RUNNER === 'npx' ? ['--yes'] : []),
+                        CREATE_APP_COMMAND,
+                        DISPLAY_PROGRAM_FLAG
+                    ]
+                },
+                'Running create app display program command'
+            )
+
+            const programOutput = await runCommand(COMMAND_RUNNER, [
+                ...(COMMAND_RUNNER === 'npx' ? ['--yes'] : []),
+                CREATE_APP_COMMAND,
+                DISPLAY_PROGRAM_FLAG
+            ])
+
+            logger.debug('Received output from create app display program command')
+
+            const {
+                data,
+                metadata: {description: cli},
+                schemas
+            } = JSON.parse(programOutput)
+
+            logger.info('Successfully parsed CLI display program output')
+
+            return {
+                content: [
+                    {
+                        type: 'text',
+                        text: JSON.stringify(
+                            {
+                                guidelines: guidelinesText,
+                                cli,
+                                schemas,
+                                data
+                            },
+                            null,
+                            2
+                        )
+                    }
+                ]
+            }
+        } catch (error) {
+            logger.error({err: error}, 'Error running create_app_guidelines tool')
+            throw error // propagate error to caller if desired
         }
     }
 }

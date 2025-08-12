@@ -12,6 +12,7 @@ import {zodToJsonSchema} from 'zod-to-json-schema'
 import {z} from 'zod'
 import os from 'os'
 import {exec} from 'child_process'
+import logger from './logger.js'
 
 // CONSTANTS
 const CREATE_APP_VERSION = 'latest'
@@ -36,6 +37,7 @@ export const toPascalCase = (str) =>
  * @returns {Promise<string>} - Resolves with combined stdout and stderr.
  */
 export const runCommand = async (command, args = [], options = {}) => {
+    logger.info({command, args, options: {cwd: options.cwd}}, 'Running command')
     return new Promise((resolve, reject) => {
         const child = spawn(command, args, {
             ...options,
@@ -54,6 +56,7 @@ export const runCommand = async (command, args = [], options = {}) => {
         })
 
         child.on('error', (err) => {
+            logger.error({command, args, options: {cwd: options.cwd}, err}, 'Command process error')
             reject(err)
         })
 
@@ -64,6 +67,10 @@ export const runCommand = async (command, args = [], options = {}) => {
                 const error = new Error(`Command failed with exit code ${code}`)
                 error.output = output
                 error.code = code
+                logger.error(
+                    {command, args, options: {cwd: options.cwd}, code, output},
+                    'Command exited with non-zero code'
+                )
                 reject(error)
             }
         })
@@ -71,16 +78,58 @@ export const runCommand = async (command, args = [], options = {}) => {
 }
 
 /**
- * Checks if the project is a monorepo by verifying the existence of lerna.json in the root directory.
+ * Finds the nearest ancestor directory (including the current working directory)
+ * whose package.json has a matching name.
  *
- * @returns {boolean} True if lerna.json exists in the current workspace, false otherwise.
+ * @param {string} targetName - The package name to match (e.g., "pwa-kit").
+ * @returns {string|null} The absolute path to the matching directory, or null if not found.
+ */
+export function findRepoRootByPackageName(targetName) {
+    try {
+        let currentDir = process.cwd()
+
+        while (true) {
+            const pkgJsonPath = path.join(currentDir, 'package.json')
+            if (fs.existsSync(pkgJsonPath)) {
+                try {
+                    const pkg = JSON.parse(fs.readFileSync(pkgJsonPath, 'utf8'))
+                    if (pkg && pkg.name === targetName) {
+                        return currentDir
+                    }
+                } catch (err) {
+                    // If parsing fails, continue searching upward
+                    if (logger && typeof logger.warn === 'function') {
+                        logger.warn(
+                            {pkgJsonPath, err},
+                            'Failed to parse package.json while searching for repo root'
+                        )
+                    }
+                }
+            }
+
+            const parentDir = path.dirname(currentDir)
+            if (parentDir === currentDir) {
+                break // reached filesystem root
+            }
+            currentDir = parentDir
+        }
+    } catch (err) {
+        if (logger && typeof logger.error === 'function') {
+            logger.error({err}, 'Error while searching for repo root by package name')
+        }
+    }
+
+    return null
+}
+
+/**
+ * Checks if the current working directory belongs to the PWA Kit monorepo by
+ * searching upward for a package.json with name equal to "pwa-kit".
+ *
+ * @returns {boolean} True if inside the PWA Kit monorepo, false otherwise.
  */
 export function isMonoRepo() {
-    const lernaPath = path.resolve(
-        ...(process.env.WORKSPACE_FOLDER_PATHS ? [process.env.WORKSPACE_FOLDER_PATHS] : []),
-        'lerna.json'
-    )
-    return fs.existsSync(lernaPath)
+    return Boolean(findRepoRootByPackageName('pwa-kit'))
 }
 
 /**
@@ -151,7 +200,8 @@ export const isLocalSharedUIComponent = (componentName, componentsPath) => {
 export const getCreateAppCommand = () => {
     return isMonoRepo()
         ? path.resolve(
-              `${process.env.WORKSPACE_FOLDER_PATHS}/packages/pwa-kit-create-app/scripts/create-mobify-app.js`
+              findRepoRootByPackageName('pwa-kit'),
+              'packages/pwa-kit-create-app/scripts/create-mobify-app.js'
           )
         : `@salesforce/pwa-kit-create-app@${CREATE_APP_VERSION}`
 }

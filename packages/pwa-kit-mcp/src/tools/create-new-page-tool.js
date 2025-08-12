@@ -4,12 +4,12 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
+import logger from '../utils/logger.js'
 import fs from 'fs/promises'
 import path from 'path'
 import {
     toKebabCase,
     toPascalCase,
-    logMCPMessage,
     isLocalComponent,
     isLocalSharedUIComponent,
     isBaseComponent,
@@ -95,7 +95,7 @@ class CreateNewPageTool {
         this.unfoundComponents = []
 
         this.handler = async (args) => {
-            logMCPMessage(`------- Calling CreateNewPageTool handler`)
+            logger.info(`------- Calling CreateNewPageTool handler`)
             if (
                 !args ||
                 !args.pageName ||
@@ -123,13 +123,16 @@ class CreateNewPageTool {
     }
 
     async createPage(pageName, componentList, route, absolutePaths) {
-        logMCPMessage(
-            `========== Creating page ${pageName} with components ${componentList} and route ${route}`
+        logger.info(
+            {
+                pageName,
+                componentList,
+                route
+            },
+            'Creating new page'
         )
         this.unfoundComponents = []
-        await logMCPMessage(
-            `Creating page ${pageName} with components ${componentList} and route ${route}`
-        )
+        logger.debug({absolutePaths}, 'Resolved absolute paths for page creation')
 
         try {
             const messages = []
@@ -152,30 +155,43 @@ class CreateNewPageTool {
                 componentList,
                 absolutePaths
             )
-            logMCPMessage(`!!!!!! \n pageContent: ${pageContent} \n !!!!!`)
+            logger.debug(
+                {
+                    pageContentPreview: pageContent.slice(0, 500),
+                    pageContentLength: pageContent.length
+                },
+                'Generated page content'
+            )
             const indexPath = path.join(pageDir, 'index.jsx')
             await fs.writeFile(indexPath, pageContent, 'utf8')
             await this.updateRoutes(pageName, route, absolutePaths)
             messages.push(`Created page ${pageName} at ${pageDir}`)
             messages.push(`Added route ${route}`)
-            logMCPMessage(`componentList: ${componentList}`)
+            logger.debug({componentList}, 'Components requested for page')
             if (componentList.includes('ProductView')) {
                 messages.push(systemPromptForProductHook)
             }
             if (componentList.includes('Image')) {
                 messages.push(systemPromptForImageComponent)
             }
-            logMCPMessage(`Unfound components: ${this.unfoundComponents}`)
+            if (this.unfoundComponents.length > 0) {
+                logger.warn(
+                    {unfoundComponents: this.unfoundComponents},
+                    'Some components were not found'
+                )
+            } else {
+                logger.debug('All components resolved successfully')
+            }
             if (this.unfoundComponents.length != 0) {
                 messages.push(systemPromptForUnfoundComponents(this.unfoundComponents))
             }
-            logMCPMessage(messages.join('\n'))
+            logger.info({messages}, 'Page creation summary messages')
             return {
                 role: 'system',
                 content: [{type: 'text', text: messages.join('\n')}]
             }
         } catch (error) {
-            logMCPMessage(`Error creating page: ${error.message}`)
+            logger.error({err: error, pageName, route}, 'Error creating page')
             return {
                 role: 'developer',
                 content: [{type: 'text', text: `Error creating page: ${error.message}`}]
@@ -184,6 +200,7 @@ class CreateNewPageTool {
     }
 
     generatePageContent(pageName, componentList, absolutePaths) {
+        logger.debug({pageName, componentList}, 'Starting to generate page content')
         const imports = [
             `import React from 'react'`,
             `import Seo from '@salesforce/retail-react-app/app/components/seo'`
@@ -191,9 +208,14 @@ class CreateNewPageTool {
         const sharedUIComponents = ['Box']
         // Add component imports
         const accessPromises = componentList.map(async (component) => {
+            const originalComponentInput = component
             component = toPascalCase(component)
             const componentName = component.charAt(0).toUpperCase() + component.slice(1)
             const componentDir = toKebabCase(componentName)
+            logger.debug(
+                {originalComponentInput, componentName, componentDir},
+                'Processing component for import resolution'
+            )
             // Use the provided absolute paths for component detection
             const isLocal = isLocalComponent(componentDir, absolutePaths.componentsPath)
             const isLocalSharedUI = isLocalSharedUIComponent(
@@ -202,17 +224,24 @@ class CreateNewPageTool {
             )
             const isBase = isBaseComponent(componentDir, absolutePaths.nodeModulesPath)
             const isSharedUI = isSharedUIBaseComponent(componentDir, absolutePaths.nodeModulesPath)
+            logger.debug(
+                {componentName, isLocal, isLocalSharedUI, isBase, isSharedUI},
+                'Component resolution results'
+            )
             if (!isLocal && !isLocalSharedUI && !isBase && !isSharedUI) {
                 this.unfoundComponents.push(component)
+                logger.debug({componentName}, 'Component not found in local, shared UI, or base')
             }
             // Import getAssetUrl for displaying image source if Image component is used
             if (componentName === 'Image') {
                 imports.push(
                     `import {getAssetUrl} from '@salesforce/pwa-kit-react-sdk/ssr/universal/utils'`
                 )
+                logger.debug('Detected Image component; queued getAssetUrl import')
             }
             if (isLocalSharedUI || isSharedUI) {
                 sharedUIComponents.push(componentName)
+                logger.debug({componentName}, 'Queued shared UI component for grouped import')
                 return
             }
             // If the component name is the same as the page name, add 'Component' to the component name to avoid conflict with the page name
@@ -227,6 +256,10 @@ class CreateNewPageTool {
                 absolutePaths.hasOverridesDir
             )
             imports.push(importComponentPath)
+            logger.debug(
+                {importComponentName, importComponentPath},
+                'Added component import statement'
+            )
         })
 
         // Import all shared UI components in a single import statement
@@ -235,10 +268,11 @@ class CreateNewPageTool {
             imports.push(
                 `import {${importSharedUIComponents}} from '@salesforce/retail-react-app/app/components/shared/ui'`
             )
+            logger.debug({sharedUIComponents}, 'Prepared grouped shared UI import')
         }
 
         return Promise.all(accessPromises).then(() => {
-            logMCPMessage(`?????? imports ${imports.join('\n')}`)
+            logger.debug({imports}, 'Resolved imports for generated page')
 
             const componentJsx = componentList
                 .map((component) => {
@@ -253,6 +287,14 @@ class CreateNewPageTool {
                     return `                <${importComponentName} />`
                 })
                 .join('\n')
+
+            logger.debug(
+                {
+                    componentJsxPreview: componentJsx.slice(0, 300),
+                    componentCount: componentList.length
+                },
+                'Generated component JSX content'
+            )
 
             return `/*
  * Copyright (c) ${new Date().getFullYear()}, Salesforce, Inc.
@@ -297,7 +339,7 @@ export default ${pageName};
                 pageName
             )}'), {fallback})`
 
-            logMCPMessage(`!!!!!!!!!! importStatement: ${importStatement}`)
+            logger.debug({importStatement}, 'Prepared dynamic import statement for routes')
 
             // Match all loadable import statements
             const loadableRegex =
@@ -354,7 +396,9 @@ export default ${pageName};
                 updatedContent.slice(0, arrayStart) + newArrayBody + updatedContent.slice(arrayEnd)
 
             await fs.writeFile(routesPath, updatedContent, 'utf8')
+            logger.info({route, pageName, routesPath}, 'Updated routes file with new page')
         } catch (error) {
+            logger.error({err: error, routesPath, pageName, route}, 'Failed to update routes')
             throw new Error(`Failed to update routes: ${error.message}`)
         }
     }
