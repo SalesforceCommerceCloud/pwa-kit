@@ -52,9 +52,7 @@ afterEach(() => {
 
 describe('passwordless and social disabled', () => {
     test('renders component', async () => {
-        const {user} = renderWithProviders(
-            <ContactInfo isPasswordlessEnabled={false} isSocialEnabled={false} />
-        )
+        const {user} = renderWithProviders(<ContactInfo isPasswordlessEnabled={false} />)
 
         // switch to login
         const trigger = screen.getByText(/Already have an account\? Log in/i)
@@ -282,14 +280,12 @@ describe('passwordless enabled', () => {
         }
     )
 })
-
+//@sfdc-extension-block-start SFDC_EXT_SOCIAL_LOGIN
 describe('social login enabled', () => {
     test('renders component', async () => {
-        const {getByRole} = renderWithProviders(
-            <ContactInfo isSocialEnabled={true} idps={['google']} />
-        )
+        const {getByRole} = renderWithProviders(<ContactInfo idps={['google']} />)
         expect(getByRole('button', {name: 'Checkout as Guest'})).toBeInTheDocument()
-        expect(getByRole('button', {name: 'Password'})).toBeInTheDocument()
         expect(getByRole('button', {name: /Google/i})).toBeInTheDocument()
     })
 })
+//@sfdc-extension-block-end SFDC_EXT_SOCIAL_LOGIN

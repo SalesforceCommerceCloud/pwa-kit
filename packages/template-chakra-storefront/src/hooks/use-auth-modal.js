@@ -60,7 +60,6 @@ export const AuthModal = ({
     onOpen,
     onClose,
     isPasswordlessEnabled = false,
-    isSocialEnabled = false,
     idps = [],
     ...props
 }) => {
@@ -312,7 +311,7 @@ export const AuthModal = ({
                                     clickCreateAccount={() => setCurrentView(REGISTER_VIEW)}
                                     handleForgotPasswordClick={() => setCurrentView(PASSWORD_VIEW)}
                                     isPasswordlessEnabled={isPasswordlessEnabled}
-                                    isSocialEnabled={isSocialEnabled}
+                                    //@sfdc-extension-line SFDC_EXT_SOCIAL_LOGIN
                                     idps={idps}
                                 />
                             )}
@@ -358,7 +357,7 @@ AuthModal.propTypes = {
     onLoginSuccess: PropTypes.func,
     onRegistrationSuccess: PropTypes.func,
     isPasswordlessEnabled: PropTypes.bool,
-    isSocialEnabled: PropTypes.bool,
+    //@sfdc-extension-line SFDC_EXT_SOCIAL_LOGIN
     idps: PropTypes.arrayOf(PropTypes.string)
 }
 
@@ -378,7 +377,7 @@ export const useAuthModal = (initialView = LOGIN_VIEW) => {
         onOpen,
         onClose,
         isPasswordlessEnabled: !!passwordless?.enabled,
-        isSocialEnabled: !!social?.enabled,
+        //@sfdc-extension-line SFDC_EXT_SOCIAL_LOGIN
         idps: social?.idps
     }
 }
