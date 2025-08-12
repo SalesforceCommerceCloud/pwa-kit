@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React, {useState, useMemo} from 'react'
+import React, {useMemo} from 'react'
 import {FormattedMessage, useIntl} from 'react-intl'
 
 // Components
@@ -20,7 +20,6 @@ import {
     ToggleCard,
     ToggleCardSummary
 } from '@salesforce/retail-react-app/app/components/toggle-card'
-import AddressDisplay from '@salesforce/retail-react-app/app/components/address-display'
 import CheckoutProductItemList from '@salesforce/retail-react-app/app/components/product-item-list/checkout-product-item-list'
 import StoreDisplay from '@salesforce/retail-react-app/app/components/store-display'
 
@@ -28,15 +27,11 @@ import StoreDisplay from '@salesforce/retail-react-app/app/components/store-disp
 import {useCheckout} from '@salesforce/retail-react-app/app/pages/checkout/util/checkout-context'
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
 import {useSelectedStore} from '@salesforce/retail-react-app/app/hooks/use-selected-store'
-import {useShopperBasketsMutation, useStores, useProducts} from '@salesforce/commerce-sdk-react'
+import {useStores, useProducts} from '@salesforce/commerce-sdk-react'
 import {STORE_LOCATOR_IS_ENABLED} from '@salesforce/retail-react-app/app/constants'
 
 const PickupAddress = () => {
     const {formatMessage} = useIntl()
-    const [isLoading, setIsLoading] = useState()
-    const updateShippingAddressForShipment = useShopperBasketsMutation(
-        'updateShippingAddressForShipment'
-    )
     const {step, STEPS, goToStep, goToNextStep} = useCheckout()
     const {data: basket} = useCurrentBasket()
 
@@ -184,54 +179,6 @@ const PickupAddress = () => {
 
     const isPickupDataReady = pickupShipmentItems.length > 0 && !isStoreDataLoading
 
-    // For single pickup, use the first store
-    const singlePickupStore =
-        pickupShipmentItems.length === 1 ? pickupShipmentItems[0]?.store : storeData?.data?.[0]
-
-    const singlePickupAddress = {
-        address1: singlePickupStore?.address1,
-        city: singlePickupStore?.city,
-        countryCode: singlePickupStore?.countryCode,
-        postalCode: singlePickupStore?.postalCode,
-        stateCode: singlePickupStore?.stateCode,
-        firstName: singlePickupStore?.name,
-        lastName: 'Pickup',
-        phone: singlePickupStore?.phone
-    }
-    const submitAndContinue = async () => {
-        setIsLoading(true)
-        try {
-            const updatePromises = pickupShipmentItems.map((shipmentInfo) => {
-                const store = shipmentInfo.store
-                const shipmentAddress = {
-                    address1: store?.address1,
-                    city: store?.city,
-                    countryCode: store?.countryCode,
-                    postalCode: store?.postalCode,
-                    stateCode: store?.stateCode,
-                    firstName: store?.name,
-                    lastName: 'pickup',
-                    phone: store?.phone
-                }
-
-                return updateShippingAddressForShipment.mutateAsync({
-                    parameters: {
-                        basketId: basket.basketId,
-                        shipmentId: shipmentInfo.shipment.shipmentId,
-                        useAsBilling: false
-                    },
-                    body: shipmentAddress
-                })
-            })
-            await Promise.all(updatePromises)
-            setIsLoading(false)
-            goToNextStep()
-        } catch (error) {
-            setIsLoading(false)
-            console.error(error)
-        }
-    }
-
     return (
         <ToggleCard
             id="step-1"
@@ -241,7 +188,6 @@ const PickupAddress = () => {
             })}
             editing={step === STEPS.PICKUP_ADDRESS}
             disabled={step === STEPS.CONTACT_INFO}
-            isLoading={isLoading}
             onEdit={() => goToStep(STEPS.PICKUP_ADDRESS)}
         >
             {step === STEPS.PICKUP_ADDRESS && (
@@ -260,9 +206,9 @@ const PickupAddress = () => {
                                                     id="pickup_address.title.store_information"
                                                 />
                                             </Text>
-                                            {singlePickupStore && (
+                                            {pickupShipmentItems[0].store && (
                                                 <StoreDisplay
-                                                    store={singlePickupStore}
+                                                    store={pickupShipmentItems[0].store}
                                                     showDistance={false}
                                                     showStoreHours={false}
                                                     showPhone={false}
@@ -362,7 +308,7 @@ const PickupAddress = () => {
 
                     <Box pt={3}>
                         <Container variant="form">
-                            <Button w="full" onClick={() => submitAndContinue()}>
+                            <Button w="full" onClick={() => goToNextStep()}>
                                 {hasDeliveryShipments ? (
                                     <FormattedMessage
                                         defaultMessage="Continue to Shipping Address"
@@ -382,7 +328,7 @@ const PickupAddress = () => {
             {isPickupDataReady && (
                 <ToggleCardSummary>
                     {/* pickup stores summary view */}
-                    {pickupShipmentItems.length > 0 && !isStoreDataLoading && (
+                    {pickupShipmentItems.length > 0 && pickupShipmentItems[0].store && (
                         <>
                             {/* Single pickup */}
                             {pickupShipmentItems.length === 1 && !shouldShowCartItems && (
@@ -393,7 +339,18 @@ const PickupAddress = () => {
                                             id="pickup_address.title.store_information"
                                         />
                                     </Text>
-                                    <AddressDisplay address={singlePickupAddress} />
+                                    <StoreDisplay
+                                        store={pickupShipmentItems[0].store}
+                                        showDistance={false}
+                                        showStoreHours={false}
+                                        showPhone={false}
+                                        showEmail={false}
+                                        nameStyle={{
+                                            fontSize: 'sm',
+                                            fontWeight: 'normal'
+                                        }}
+                                        textSize="sm"
+                                    />
                                 </>
                             )}
 

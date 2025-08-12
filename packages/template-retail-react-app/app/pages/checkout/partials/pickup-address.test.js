@@ -26,8 +26,8 @@ jest.mock('@salesforce/retail-react-app/app/components/item-variant/item-attribu
     }
 })
 
-// Mock mutation to prevent query client errors
-const mockMutateAsync = jest.fn().mockResolvedValue({})
+// Mock goToNextStep function
+const mockGoToNextStep = jest.fn()
 
 const mockProductsArray = [
     {
@@ -56,9 +56,6 @@ jest.mock('@salesforce/commerce-sdk-react', () => {
     const originalModule = jest.requireActual('@salesforce/commerce-sdk-react')
     return {
         ...originalModule,
-        useShopperBasketsMutation: () => ({
-            mutateAsync: mockMutateAsync
-        }),
         useStores: () => ({
             data: {
                 data: [
@@ -117,7 +114,7 @@ jest.mock('@salesforce/retail-react-app/app/pages/checkout/util/checkout-context
             REVIEW_ORDER: 5
         },
         goToStep: jest.fn(),
-        goToNextStep: jest.fn()
+        goToNextStep: mockGoToNextStep
     })
 }))
 
@@ -140,6 +137,7 @@ afterAll(() => {
 describe('PickupAddress', () => {
     beforeEach(() => {
         jest.clearAllMocks()
+        mockGoToNextStep.mockClear()
     })
 
     test('displays pickup address when available', async () => {
@@ -211,7 +209,7 @@ describe('PickupAddress', () => {
         expect(screen.getByText('San Francisco, CA 94105')).toBeInTheDocument()
     })
 
-    test('submits pickup address and continues to payment', async () => {
+    test('continues to payment when button is clicked', async () => {
         const pickupBasket = {
             ...scapiBasketWithItem,
             shipments: [
@@ -275,7 +273,7 @@ describe('PickupAddress', () => {
         await user.click(screen.getByText(/continue to payment/i))
 
         await waitFor(() => {
-            expect(mockMutateAsync).toHaveBeenCalled()
+            expect(mockGoToNextStep).toHaveBeenCalled()
         })
     })
 
@@ -464,7 +462,7 @@ describe('PickupAddress', () => {
         expect(screen.getByText(/continue to shipping address/i)).toBeInTheDocument()
     })
 
-    test('updates address for each pickup shipment with correct store address when multi pickup', async () => {
+    test('continues to payment for multi pickup orders', async () => {
         const multiPickupBasket = {
             ...scapiBasketWithItem,
             shipments: [
@@ -559,49 +557,11 @@ describe('PickupAddress', () => {
         })
         await user.click(screen.getByText(/continue to payment/i))
         await waitFor(() => {
-            expect(mockMutateAsync).toHaveBeenCalledTimes(2)
-        })
-
-        // verify first shipment
-        expect(mockMutateAsync).toHaveBeenNthCalledWith(1, {
-            parameters: {
-                basketId: multiPickupBasket.basketId,
-                shipmentId: 'shipment-1',
-                useAsBilling: false
-            },
-            body: {
-                address1: '123 Main Street',
-                city: 'San Francisco',
-                countryCode: 'US',
-                postalCode: '94105',
-                stateCode: 'CA',
-                firstName: 'Test Store 1',
-                lastName: 'pickup',
-                phone: '555-123-4567'
-            }
-        })
-
-        // Verify second shipment
-        expect(mockMutateAsync).toHaveBeenNthCalledWith(2, {
-            parameters: {
-                basketId: multiPickupBasket.basketId,
-                shipmentId: 'shipment-2',
-                useAsBilling: false
-            },
-            body: {
-                address1: '456 Oak Avenue',
-                city: 'Los Angeles',
-                countryCode: 'US',
-                postalCode: '90210',
-                stateCode: 'CA',
-                firstName: 'Test Store 2',
-                lastName: 'pickup',
-                phone: '555-987-6543'
-            }
+            expect(mockGoToNextStep).toHaveBeenCalled()
         })
     })
 
-    test('updates single pickup shipment with correct store address', async () => {
+    test('continues to payment for single pickup order', async () => {
         const singlePickupBasket = {
             ...scapiBasketWithItem,
             shipments: [
@@ -666,29 +626,11 @@ describe('PickupAddress', () => {
         })
         await user.click(screen.getByText(/continue to payment/i))
         await waitFor(() => {
-            expect(mockMutateAsync).toHaveBeenCalledTimes(1)
-        })
-
-        expect(mockMutateAsync).toHaveBeenCalledWith({
-            parameters: {
-                basketId: singlePickupBasket.basketId,
-                shipmentId: 'shipment-1',
-                useAsBilling: false
-            },
-            body: {
-                address1: '123 Main Street',
-                city: 'San Francisco',
-                countryCode: 'US',
-                postalCode: '94105',
-                stateCode: 'CA',
-                firstName: 'Test Store 1',
-                lastName: 'pickup',
-                phone: '555-123-4567'
-            }
+            expect(mockGoToNextStep).toHaveBeenCalled()
         })
     })
 
-    test('handles mixed pickup and delivery shipments correctly', async () => {
+    test('continues to shipping address for mixed pickup and delivery orders', async () => {
         const mixedBasket = {
             ...scapiBasketWithItem,
             shipments: [
@@ -792,43 +734,7 @@ describe('PickupAddress', () => {
         })
         await user.click(screen.getByText(/continue to shipping address/i))
         await waitFor(() => {
-            expect(mockMutateAsync).toHaveBeenCalledTimes(2)
-        })
-
-        // verify only pickup shipments get address update
-        expect(mockMutateAsync).toHaveBeenNthCalledWith(1, {
-            parameters: {
-                basketId: mixedBasket.basketId,
-                shipmentId: 'shipment-1',
-                useAsBilling: false
-            },
-            body: {
-                address1: '123 Main Street',
-                city: 'San Francisco',
-                countryCode: 'US',
-                postalCode: '94105',
-                stateCode: 'CA',
-                firstName: 'Test Store 1',
-                lastName: 'pickup',
-                phone: '555-123-4567'
-            }
-        })
-        expect(mockMutateAsync).toHaveBeenNthCalledWith(2, {
-            parameters: {
-                basketId: mixedBasket.basketId,
-                shipmentId: 'shipment-2',
-                useAsBilling: false
-            },
-            body: {
-                address1: '456 Oak Avenue',
-                city: 'Los Angeles',
-                countryCode: 'US',
-                postalCode: '90210',
-                stateCode: 'CA',
-                firstName: 'Test Store 2',
-                lastName: 'pickup',
-                phone: '555-987-6543'
-            }
+            expect(mockGoToNextStep).toHaveBeenCalled()
         })
     })
 })
