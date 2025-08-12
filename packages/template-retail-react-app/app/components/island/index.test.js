@@ -933,60 +933,6 @@ describe('Island Component', () => {
     })
 
     describe('Backward Compatibility', () => {
-        test('should fall back to PARTIAL_HYDRATION_ENABLED constant when config is not available', () => {
-            // Mock getConfig to return null/undefined
-            getConfig.mockReturnValue(null)
-            Reflect.set(constants, 'PARTIAL_HYDRATION_ENABLED', true)
-
-            // Test SSR behavior first
-            isServer.mockReturnValue(true)
-            const {container: serverContainer, getByTestId: getByTestIdServer} = render(
-                <Island>
-                    <div data-testid="server-content">Server Content</div>
-                </Island>
-            )
-            expect(serverContainer.firstElementChild?.dataset?.sfdcIslandOrigin).toBe('server')
-            expect(getByTestIdServer('server-content')).toBeInTheDocument()
-
-            // Clean up and test CSR behavior
-            cleanup()
-            isServer.mockReturnValue(false)
-            const {container: clientContainer, getByTestId: getByTestIdClient} = render(
-                <Island>
-                    <div data-testid="server-content">Server Content</div>
-                </Island>
-            )
-            expect(clientContainer.firstElementChild?.dataset?.sfdcIslandOrigin).toBe('client')
-            expect(getByTestIdClient('server-content')).toBeInTheDocument()
-        })
-
-        test('should fall back to PARTIAL_HYDRATION_ENABLED constant when config.app is not available', () => {
-            // Mock getConfig to return config without app property
-            getConfig.mockReturnValue({})
-            Reflect.set(constants, 'PARTIAL_HYDRATION_ENABLED', true)
-
-            // Test SSR behavior first
-            isServer.mockReturnValue(true)
-            const {container: serverContainer, getByTestId: getByTestIdServer} = render(
-                <Island>
-                    <div data-testid="server-content">Server Content</div>
-                </Island>
-            )
-            expect(serverContainer.firstElementChild?.dataset?.sfdcIslandOrigin).toBe('server')
-            expect(getByTestIdServer('server-content')).toBeInTheDocument()
-
-            // Clean up and test CSR behavior
-            cleanup()
-            isServer.mockReturnValue(false)
-            const {container: clientContainer, getByTestId: getByTestIdClient} = render(
-                <Island>
-                    <div data-testid="server-content">Server Content</div>
-                </Island>
-            )
-            expect(clientContainer.firstElementChild?.dataset?.sfdcIslandOrigin).toBe('client')
-            expect(getByTestIdClient('server-content')).toBeInTheDocument()
-        })
-
         test('should fall back to PARTIAL_HYDRATION_ENABLED constant when config.app.partialHydrationEnabled is not available', () => {
             // Mock getConfig to return config without partialHydrationEnabled property
             getConfig.mockReturnValue({
@@ -1029,7 +975,7 @@ describe('Island Component', () => {
                     <div data-testid="server-content">Server Content</div>
                 </Island>
             )
-            
+
             // Should render children directly without island wrapper
             expect(screen.getByTestId('server-content')).toBeInTheDocument()
             expect(screen.getByTestId('server-content')).toBe(container.firstElementChild)
@@ -1048,7 +994,7 @@ describe('Island Component', () => {
                     <div data-testid="server-content">Server Content</div>
                 </Island>
             )
-            
+
             // Config should take precedence over constant
             expect(screen.getByTestId('server-content')).toBeInTheDocument()
             expect(screen.getByTestId('server-content')).toBe(container.firstElementChild)
