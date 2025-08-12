@@ -303,7 +303,7 @@ export const getGoogleButtonConfig = (
     return buttonConfig
 }
 
-export const GooglePayExpress = ({manager}, overrideAuthToken = null, overrideBasket = null)) => {
+export const GooglePayExpress = ({manager, overrideData = null}) => {
     const {
         adyenEnvironment,
         adyenPaymentMethods,
@@ -315,11 +315,14 @@ export const GooglePayExpress = ({manager}, overrideAuthToken = null, overrideBa
         fetchShippingMethods
     } = useAdyenExpressCheckout()
 
-    console.log('==input to gpayexpress==', overrideAuthToken)
-    console.log('==basket input to gpayexpress==', overrideAuthToken.basket)
+    console.log('==manager in GPayExpress==', manager)
+    console.log('==overrideData input to gpayexpress==', overrideData)
+    console.log('==basket input to gpayexpress==', overrideData?.basket)
+    console.log('==basket input to gpayexpress==', overrideData?.basket?.basketId)
+    console.log('==basket input to gpayexpress==', overrideData?.basket?.customerId)
 
-    const finalAuthToken = overrideAuthToken.authToken
-    const finalBasket = overrideAuthToken.basket
+    const finalAuthToken = overrideData?.authToken
+    const finalBasket = overrideData?.basket
     console.log('==authToken in GPayExpress==', finalAuthToken)
     console.log('==basket in GPayExpress==', finalBasket)
 
@@ -350,11 +353,13 @@ export const GooglePayExpress = ({manager}, overrideAuthToken = null, overrideBa
                             }
                         }
                     })
+                    console.log('== adyen env ==', adyenEnvironment)
+                    console.log('== adyen client key==', adyenEnvironment?.ADYEN_CLIENT_KEY)
                 } catch (ex) {
                     handleGooglePayUnavailable()
                     return
                 }
-                console.log('==checkout in GPayExpress==', checkout)
+
                 const googlePaymentMethodConfig = getGooglePaymentMethodConfig(adyenPaymentMethods)
                 const googleButtonConfig = getGoogleButtonConfig(
                     finalAuthToken,
@@ -365,6 +370,8 @@ export const GooglePayExpress = ({manager}, overrideAuthToken = null, overrideBa
                         : shippingMethods,
                     googlePaymentMethodConfig
                 )
+
+                console.log('==checkout in GPayExpress==', checkout)
 
                 let googlePayButton
                 try {
@@ -385,6 +392,8 @@ export const GooglePayExpress = ({manager}, overrideAuthToken = null, overrideBa
                     handleGooglePayUnavailable()
                     return
                 }
+
+                console.log('==google pay button==', googlePayButton)
 
                 try {
                     await googlePayButton.mount(paymentContainer.current)
@@ -432,5 +441,6 @@ export const GooglePayExpress = ({manager}, overrideAuthToken = null, overrideBa
 
 GooglePayExpress.propTypes = {
     shippingMethods: PropTypes.array,
-    manager: PropTypes.object
+    manager: PropTypes.object,
+    overrideData: PropTypes.object
 }
