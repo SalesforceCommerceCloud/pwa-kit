@@ -24,7 +24,7 @@ import {
 } from '@chakra-ui/react'
 import PropTypes from 'prop-types'
 import {useCustomerOrders, useProducts} from '@salesforce/commerce-sdk-react'
-import useNavigation from '../../hooks/use-navigation'
+import {useNavigation} from '../../hooks/use-navigation'
 import {useCurrentCustomer, usePageUrls, useSearchParams} from '../../hooks'
 import PageActionPlaceHolder from '../../components/page-action-placeholder'
 import Link from '../../components/link'

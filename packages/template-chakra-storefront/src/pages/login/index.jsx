@@ -18,7 +18,7 @@ import {
     useCustomerType,
     useShopperBasketsMutation
 } from '@salesforce/commerce-sdk-react'
-import useNavigation from '../../hooks/use-navigation'
+import {useNavigation} from '../../hooks/use-navigation'
 import Seo from '../../components/seo'
 import {useForm} from 'react-hook-form'
 import {useRouteMatch} from 'react-router-dom'

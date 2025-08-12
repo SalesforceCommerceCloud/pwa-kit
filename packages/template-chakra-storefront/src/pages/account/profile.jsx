@@ -31,7 +31,7 @@ import {
     useCustomerType
 } from '@salesforce/commerce-sdk-react'
 import {useCurrentCustomer} from '../../hooks/use-current-customer'
-import useToast from '../../hooks/use-toast'
+import {useToast} from '../../hooks/use-toast'
 
 /**
  * This is a specialized Skeleton component that which uses the customers authtype as the

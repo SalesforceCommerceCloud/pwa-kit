@@ -11,7 +11,7 @@ import {useCategory, useProductSearch} from '@salesforce/commerce-sdk-react'
 
 // Hooks
 import {useSearchParams} from '../../../hooks'
-import useEinstein from '../../../hooks/use-einstein'
+import {useEinstein} from '../../../hooks/use-einstein'
 
 // Others
 import {HTTPNotFound, HTTPError} from '@salesforce/pwa-kit-react-sdk/ssr/universal/errors'

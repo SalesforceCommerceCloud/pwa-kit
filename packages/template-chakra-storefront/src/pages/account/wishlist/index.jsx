@@ -9,8 +9,8 @@ import {useIntl} from 'react-intl'
 import {Box, Stack, Heading, Flex, Skeleton} from '@chakra-ui/react'
 import {useProducts, useShopperCustomersMutation} from '@salesforce/commerce-sdk-react'
 
-import useNavigation from '../../../hooks/use-navigation'
-import useToast from '../../../hooks/use-toast'
+import {useNavigation} from '../../../hooks/use-navigation'
+import {useToast} from '../../../hooks/use-toast'
 import {useWishList} from '../../../hooks/use-wish-list'
 
 import PageActionPlaceHolder from '../../../components/page-action-placeholder'

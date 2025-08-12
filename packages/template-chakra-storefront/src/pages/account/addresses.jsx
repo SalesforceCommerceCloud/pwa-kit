@@ -23,7 +23,7 @@ import {
 } from '@chakra-ui/react'
 import FormActionButtons from '../../components/forms/form-action-buttons'
 import {useForm} from 'react-hook-form'
-import useToast from '../../hooks/use-toast'
+import {useToast} from '../../hooks/use-toast'
 
 import LoadingSpinner from '../../components/loading-spinner'
 import {LocationIcon, PlusIcon} from '../../components/icons'

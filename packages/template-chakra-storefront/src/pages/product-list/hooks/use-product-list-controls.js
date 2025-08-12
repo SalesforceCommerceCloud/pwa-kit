@@ -6,7 +6,7 @@
  */
 import {useLocation, useParams} from 'react-router-dom'
 import {usePageUrls, useSortUrls, useSearchParams} from '../../../hooks'
-import useNavigation from '../../../hooks/use-navigation'
+import {useNavigation} from '../../../hooks/use-navigation'
 
 /**
  * A hook for managing the controls of a product list page (PLP).

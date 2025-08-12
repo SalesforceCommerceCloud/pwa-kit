@@ -10,7 +10,7 @@ import {Button, ButtonGroup, useDisclosure} from '@chakra-ui/react'
 import {useIntl, defineMessage} from 'react-intl'
 import {useShopperCustomersMutation} from '@salesforce/commerce-sdk-react'
 
-import useToast from '../../../../hooks/use-toast'
+import {useToast} from '../../../../hooks/use-toast'
 import {useCurrentCustomer} from '../../../../hooks/use-current-customer'
 import {useWishList} from '../../../../hooks/use-wish-list'
 
