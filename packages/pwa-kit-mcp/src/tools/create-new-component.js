@@ -8,8 +8,6 @@ import {z} from 'zod'
 import fs from 'fs/promises'
 import path from 'path'
 import {toKebabCase, toPascalCase, getCopyrightHeader} from '../utils'
-<<<<<<< HEAD
-=======
 
 const systemPrompt = `
 You are a smart assistant that helps create new React components.
@@ -22,7 +20,6 @@ Please ask the user for the following, one at a time:
 **Do not** assume answers. Collect all answers before proceeding.
 Once the answers are provided, execute the createComponent tool with the collected information as input parameters.
 `
->>>>>>> develop
 
 const systemPromptForCustomComponent = `
 You have chosen a custom purpose for your component.
