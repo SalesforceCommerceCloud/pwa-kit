@@ -116,6 +116,36 @@ export const AddToCartModal = () => {
 
     const dialogTitleId = 'add-to-cart-modal-title'
 
+    const bundleAddedProducts = () => {
+        return itemsAdded.map(({product, variant, quantity}) => {
+            const variationAttributeValues =
+                product.variationAttributes?.length && variant
+                    ? getDisplayVariationValues(
+                          product.variationAttributes,
+                          variant.variationValues
+                      )
+                    : {}
+            return (
+                <Box key={variant?.productId || product?.id}>
+                    <Text color="gray.700" fontWeight="700" fontSize="sm">
+                        {product.name} {quantity > 1 ? `(${quantity})` : ''}
+                    </Text>
+                    {Object.keys(variationAttributeValues).length > 0 && (
+                        <Box color="gray.600" fontSize="sm" fontWeight="500">
+                            {Object.entries(variationAttributeValues).map(([name, value]) => {
+                                return (
+                                    <Text key={value}>
+                                        {name}: {value}
+                                    </Text>
+                                )
+                            })}
+                        </Box>
+                    )}
+                </Box>
+            )
+        })
+    }
+
     return (
         <Dialog.Root
             size={size}
@@ -192,51 +222,7 @@ export const AddToCartModal = () => {
                                                         marginTop={4}
                                                         gridGap={4}
                                                     >
-                                                        {itemsAdded.map(
-                                                            ({product, variant, quantity}) => {
-                                                                const variationAttributeValues =
-                                                                    getDisplayVariationValues(
-                                                                        product.variationAttributes,
-                                                                        variant.variationValues
-                                                                    )
-                                                                return (
-                                                                    <Box key={variant.productId}>
-                                                                        <Text
-                                                                            color="gray.700"
-                                                                            fontWeight="700"
-                                                                            fontSize="sm"
-                                                                        >
-                                                                            {product.name}{' '}
-                                                                            {quantity > 1
-                                                                                ? `(${quantity})`
-                                                                                : ''}
-                                                                        </Text>
-                                                                        <Box
-                                                                            color="gray.600"
-                                                                            fontSize="sm"
-                                                                            fontWeight="500"
-                                                                        >
-                                                                            {Object.entries(
-                                                                                variationAttributeValues
-                                                                            ).map(
-                                                                                ([name, value]) => {
-                                                                                    return (
-                                                                                        <Text
-                                                                                            key={
-                                                                                                value
-                                                                                            }
-                                                                                        >
-                                                                                            {name}:{' '}
-                                                                                            {value}
-                                                                                        </Text>
-                                                                                    )
-                                                                                }
-                                                                            )}
-                                                                        </Box>
-                                                                    </Box>
-                                                                )
-                                                            }
-                                                        )}
+                                                        {bundleAddedProducts()}
                                                     </Flex>
                                                 </Box>
                                             </Flex>

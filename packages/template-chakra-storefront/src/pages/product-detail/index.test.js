@@ -355,7 +355,7 @@ describe('product bundles', () => {
                     }
                     let inventoryLevel = 0
                     let bundleChildVariantId = '701643473915M'
-                    if (req.url.toString().includes('701643473908M')) {
+                    if (url.includes('701643473908M')) {
                         bundleChildVariantId = '701643473908M'
                         inventoryLevel = 3
                     }
