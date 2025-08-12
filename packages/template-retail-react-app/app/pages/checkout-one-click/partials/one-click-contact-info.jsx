@@ -126,6 +126,7 @@ const ContactInfo = ({isSocialEnabled = false, idps = []}) => {
     const [signOutConfirmDialogIsOpen, setSignOutConfirmDialogIsOpen] = useState(false)
     const [showContinueButton, setShowContinueButton] = useState(false)
     const [isCheckingEmail, setIsCheckingEmail] = useState(false)
+    const [emailError, setEmailError] = useState('')
 
     const passwordlessConfigCallback = getConfig().app.login?.passwordless?.callbackURI
     const callbackURL = isAbsoluteURL(passwordlessConfigCallback)
@@ -151,20 +152,7 @@ const ContactInfo = ({isSocialEnabled = false, idps = []}) => {
         return validDomains.test(email)
     }
 
-    // Watch email field changes for real-time validation
-    useEffect(() => {
-        const subscription = form.watch((value, { name }) => {
-            if (name === 'email') {
-                const email = value.email
-                if (email && email.includes('@') && email.includes('.')) {
-                    setShowContinueButton(true)
-                } else {
-                    setShowContinueButton(false)
-                }
-            }
-        })
-        return () => subscription.unsubscribe()
-    }, [form])
+
 
     // Handle email field blur/focus events
     const handleEmailBlur = async (e) => {
@@ -174,8 +162,28 @@ const ContactInfo = ({isSocialEnabled = false, idps = []}) => {
         }
 
         const email = form.getValues('email')
+
+        // Clear previous email error
+        setEmailError('')
+
+        // Validate email format
+        if (!email) {
+            setEmailError('Please enter your email address.')
+            return
+        }
+
+        if (!isValidEmail(email)) {
+            setEmailError('Please enter a valid email address.')
+            return
+        }
+
+        if (!hasValidDomain(email)) {
+            setEmailError('Please enter a valid email domain.')
+            return
+        }
+
+        // Email is valid, proceed with OTP check
         const isValid = await form.trigger()
-        // Manually trigger the browser native form validations
         if (isValid) {
             // Try to send OTP first, only open modal if successful
             await handleSendEmailOtp(email)
@@ -200,6 +208,9 @@ const ContactInfo = ({isSocialEnabled = false, idps = []}) => {
 
         // Clear email checking state
         setIsCheckingEmail(false)
+
+        // Clear email error when user focuses back on the field
+        setEmailError('')
     }
 
     // Handle sending OTP email
@@ -376,6 +387,12 @@ const ContactInfo = ({isSocialEnabled = false, idps = []}) => {
                                             </InputRightElement>
                                         )}
                                     </InputGroup>
+
+                                    {emailError && (
+                                        <Text fontSize="md" color="red.500" mt={2}>
+                                            {emailError}
+                                        </Text>
+                                    )}
                                 </Stack>
 
                                 <Stack spacing={3}>
