@@ -16,10 +16,3 @@
 export const CUSTOM_HOME_TITLE = '🎉 Hello Extensible React Template!'
 
 export * from '{{template.source.name}}/app/constants'
-
-// Override constants from the base template by re-exporting them with new values
-{{#if answers.project.partialHydrationEnabled}}
-export const PARTIAL_HYDRATION_ENABLED = {{answers.project.partialHydrationEnabled}}
-{{else}}
-export const PARTIAL_HYDRATION_ENABLED = false
-{{/if}}

@@ -115,7 +115,12 @@ module.exports = {
         dataCloudAPI: {
             appSourceId: '{{answers.project.dataCloud.appSourceId}}',
             tenantId: '{{answers.project.dataCloud.tenantId}}'
-        }
+        },
+        {{#if answers.project.partialHydrationEnabled}}
+        partialHydrationEnabled: {{answers.project.partialHydrationEnabled}},
+        {{else}}
+        partialHydrationEnabled: false,
+        {{/if}}
     },
     // This list contains server-side only libraries that you don't want to be compiled by webpack
     externals: [],
