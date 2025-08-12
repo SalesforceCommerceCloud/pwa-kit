@@ -70,7 +70,7 @@ const Login = ({initialView = LOGIN_VIEW}) => {
     const authorizePasswordlessLogin = useAuthHelper(AuthHelpers.AuthorizePasswordless)
     const {passwordless = {}, social = {}} = loginConfig
     const isPasswordlessEnabled = !!passwordless?.enabled
-    const isSocialEnabled = !!social?.enabled
+    //@sfdc-extension-line SFDC_EXT_SOCIAL_LOGIN
     const idps = social?.idps
 
     const customerId = useCustomerId()
@@ -215,7 +215,7 @@ const Login = ({initialView = LOGIN_VIEW}) => {
                         clickCreateAccount={() => navigate('/registration')}
                         handleForgotPasswordClick={() => navigate('/reset-password')}
                         isPasswordlessEnabled={isPasswordlessEnabled}
-                        isSocialEnabled={isSocialEnabled}
+                        //@sfdc-extension-line SFDC_EXT_SOCIAL_LOGIN
                         idps={idps}
                     />
                 )}

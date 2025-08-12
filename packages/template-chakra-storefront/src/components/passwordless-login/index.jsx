@@ -16,7 +16,7 @@ import SocialLogin from '../social-login'
 const PasswordlessLogin = ({
     form,
     handleForgotPasswordClick,
-    isSocialEnabled = false,
+    //@sfdc-extension-line SFDC_EXT_SOCIAL_LOGIN
     idps = []
 }) => {
     const intl = useIntl()
@@ -84,7 +84,9 @@ const PasswordlessLogin = ({
                         >
                             {messages.password}
                         </Button>
-                        {isSocialEnabled && <SocialLogin form={form} idps={idps} />}
+                        {/* @sfdc-extension-block-start SFDC_EXT_SOCIAL_LOGIN */}
+                        <SocialLogin form={form} idps={idps} />
+                        {/* @sfdc-extension-block-endSFDC_EXT_SOCIAL_LOGIN */}
                     </Stack>
                 </Stack>
             )}
@@ -105,9 +107,9 @@ const PasswordlessLogin = ({
 PasswordlessLogin.propTypes = {
     form: PropTypes.object,
     handleForgotPasswordClick: PropTypes.func,
-    isSocialEnabled: PropTypes.bool,
-    idps: PropTypes.arrayOf(PropTypes.string),
-    hideEmail: PropTypes.bool
+    hideEmail: PropTypes.bool,
+    //@sfdc-extension-line SFDC_EXT_SOCIAL_LOGIN
+    idps: PropTypes.arrayOf(PropTypes.string)
 }
 
 export default PasswordlessLogin

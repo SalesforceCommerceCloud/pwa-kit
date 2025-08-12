@@ -91,14 +91,16 @@ module.exports = {
     login: {
         passwordless: {
             enabled: {{#if answers.project.demo.enableDemoSettings}}true{{else}}false{{/if}},
-            callbackURI: process.env.PASSWORDLESS_LOGIN_CALLBACK_URI || '/passwordless-login-callback',
+            callbackURI:
+                process.env.PASSWORDLESS_LOGIN_CALLBACK_URI || '/passwordless-login-callback',
             landingPath: '/passwordless-login-landing'
         },
+        {{#if selectedPlugins.SFDC_EXT_SOCIAL_LOGIN}}
         social: {
-            enabled: {{#if answers.project.demo.enableDemoSettings}}true{{else}}false{{/if}},
             idps: ['google', 'apple'],
             redirectURI: process.env.SOCIAL_LOGIN_REDIRECT_URI || '/social-callback'
         },
+        {{/if}}
         resetPassword: {
             callbackURI: process.env.RESET_PASSWORD_CALLBACK_URI || '/reset-password-callback',
             landingPath: '/reset-password-landing'
@@ -188,13 +190,7 @@ module.exports = {
     ],
     ssrEnabled: true,
     ssrOnly: ['ssr.js', 'ssr.js.map', 'node_modules/**/*.*'],
-    ssrShared: [
-        'static/favicon.ico',
-        'static/robots.txt',
-        '**/*.js',
-        '**/*.js.map',
-        '**/*.json'
-    ],
+    ssrShared: ['static/favicon.ico', 'static/robots.txt', '**/*.js', '**/*.js.map', '**/*.json'],
     ssrParameters: {
         ssrFunctionNodeVersion: '22.x',
         proxyConfigs: [
