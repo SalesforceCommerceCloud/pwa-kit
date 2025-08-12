@@ -82,7 +82,7 @@ import {
 import Seo from '@salesforce/retail-react-app/app/components/seo'
 import ShopperAgent from '@salesforce/retail-react-app/app/components/shopper-agent'
 import {getPathWithLocale} from '@salesforce/retail-react-app/app/utils/url'
-import {useExpressPaymentHeight} from '../express/hooks/use-express-payment-manager'
+import {useExpressPaymentHeight} from '@salesforce/retail-react-app/app/components/express/hooks/use-express-payment-manager'
 
 const PlaceholderComponent = () => (
     <Center p="2">

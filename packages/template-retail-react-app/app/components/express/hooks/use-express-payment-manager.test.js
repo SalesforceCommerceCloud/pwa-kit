@@ -13,7 +13,7 @@ import {
 import {expressPaymentManager} from '@salesforce/retail-react-app/app/components/express/utils/express-payment-manager'
 
 // Mock the expressPaymentManager
-jest.mock('../utils/express-payment-manager', () => ({
+jest.mock('@salesforce/retail-react-app/app/components/express/utils/express-payment-manager', () => ({
     expressPaymentManager: {
         initialize: jest.fn(),
         getCurrentHeight: jest.fn(),
