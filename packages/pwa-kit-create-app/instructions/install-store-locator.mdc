@@ -3,9 +3,9 @@ description:
 globs: 
 alwaysApply: false
 ---
-These are the steps to upgrade an existing store front application (currently opened project) with the "Store Locator" extension by installing the necessary code to the destination application.
+These are the steps to upgrade an existing store front application (currently opened project) with the "Store Locator" extension by installing the necessary code to the destination application. Follow these instructions carefully and precisely, do NOT deviate from them.
 
- # Prerequisites: First make sure the current project has all the necessary files. If any requirement in the prerequisite is not met, abort the rest of this instruction.
+ # Step 1. Prerequisites: First make sure the current project has all the necessary files. If any requirement in the prerequisite is not met, abort the rest of this instruction.
  <Prerequisites>
  - The file `config/constants` exists
  - The file `src/components/_app/index.jsx` exists
@@ -18,34 +18,34 @@ These are the steps to upgrade an existing store front application (currently op
  - The file `src/utils/test-utils.js` exists
  </Prerequisites>
 
- # Preparations: Clone the pwa-kit repo for the specific branch into the tmp folder
+ # Step 2. Preparations: Clone the pwa-kit repo for the specific branch into the tmp folder
  <Preparations>
  - Run `mkdir pwa-kit-tmp` from temp folder
- - Run `git clone -b next https://github.com/SalesforceCommerceCloud/pwa-kit /tmp/pwa-kit-tmp`
+ - Run `git clone -b u/kzheng/store-locator-extension-II https://github.com/SalesforceCommerceCloud/pwa-kit /tmp/pwa-kit-tmp`
  </Preparations>
 
- # Copy:
+ # Step 3. Copy:
  <Copy>
  - From the cloned pwa-kit folder, copy `packages/template-chakra-storefront/src/pages/store-locator` folder into the current directory's `src/pages` folder.
  </Copy>
 
- # Merge. Apply the following code changes to the files specified. Skip a step if the code change has already been applied.
+ # Step 4. Merge. Apply the following code changes to the files specified. Skip a step if the code change has already been applied.
  <Merge>
- - For each of the following files in /tmp/pwa-kit-tmp/pwa-kit/packages/template-chakra-storefront 
-    - `config/constants`
-    - `src/components/_app/index.jsx`
-    - `src/components/_app/partials/app-header.jsx`
-    - `src/components/_app/partials/app-modals.jsx`
-    - `src/components/header/index.jsx`
-    - `src/config/constants.js`
-    - `src/contexts/index.js`
-    - `src/routes.tsx`
-    - `src/utils/test-utils.js`
-    1. locate the code segment marked by a comment line that contains the string "@sfdc-extension-line SFDC_EXT_STORE_LOCATOR", then copy the comment line and the NEXT line and insert them into the same file under the current project. Make sure the location of the insert closely matches the original location from the source file.
-    2. locate the code segment marked by a pair of comment lines that starts with the string "@sfdc-extension-block-start SFDC_EXT_STORE_LOCATOR" and ends with the string "@sfdc-extension-block-end SFDC_EXT_STORE_LOCATOR", then copy the entire code block surrounded by the comment line pairs, including the comment lines and insert them into the same file under the current project. Make sure the location of the insert closely matches the original location from the source file.
+ - Go through following files in /tmp/pwa-kit-tmp/packages/template-chakra-storefront one by one, then perform the following steps: 
+        - `config/constants`
+        - `src/components/_app/index.jsx`
+        - `src/components/_app/partials/app-header.jsx`
+        - `src/components/_app/partials/app-modals.jsx`
+        - `src/components/header/index.jsx`
+        - `src/config/constants.js`
+        - `src/contexts/index.js`
+        - `src/routes.tsx`
+        - `src/utils/test-utils.js`
+    1. Search within the file, find all the code segments marked by a comment line that contains the string "@sfdc-extension-line SFDC_EXT_STORE_LOCATOR", then copy each comment line and the NEXT line and insert them into the same file under the current project. Make sure the location of the insert closely matches the original location from the source file.
+    2. Search within the file, find all the code segments marked by a pair of comment lines that starts with the string "@sfdc-extension-block-start SFDC_EXT_STORE_LOCATOR" and ends with the string "@sfdc-extension-block-end SFDC_EXT_STORE_LOCATOR", then copy each of the entire code block surrounded by the comment line pairs, including the comment lines and insert them into the same file under the current project. Make sure the location of the insert closely matches the original location from the source file.
  </Merge>
 
- # Cleanup: Delete the `pwa-kit-tmp` folder and its contents.
+ # Step 5. Cleanup: Delete the `pwa-kit-tmp` folder and its contents.
  <Cleanup>
- # Step 5. From under the temp folder, delete the `pwa-kit-tmp` folder and its contents.
+ From under the temp folder, delete the `pwa-kit-tmp` folder and its contents.
  </Cleanup>
