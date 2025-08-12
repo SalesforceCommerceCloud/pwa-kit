@@ -145,6 +145,27 @@ const ContactInfo = ({isSocialEnabled = false, idps = []}) => {
         return emailRegex.test(email)
     }
 
+    // Helper function to check if email has a valid domain 
+    const hasValidDomain = (email) => {
+        const validDomains = /\.(com|org|net|edu|gov|mil|int|co|uk|ca|au|de|fr|jp|cn|in|br|ru|it|es|nl|se|no|dk|fi|pl|ch|at|be|pt|ie|nz|sg|my|th|vn|ph|id|kr|tw|hk|mo|my|sg|th|vn|ph|id|kr|tw|hk|mo)$/i
+        return validDomains.test(email)
+    }
+
+    // Watch email field changes for real-time validation
+    useEffect(() => {
+        const subscription = form.watch((value, { name }) => {
+            if (name === 'email') {
+                const email = value.email
+                if (email && email.includes('@') && email.includes('.')) {
+                    setShowContinueButton(true)
+                } else {
+                    setShowContinueButton(false)
+                }
+            }
+        })
+        return () => subscription.unsubscribe()
+    }, [form])
+
     // Handle email field blur/focus events
     const handleEmailBlur = async (e) => {
         // Call original React Hook Form blur handler if it exists
@@ -175,7 +196,7 @@ const ContactInfo = ({isSocialEnabled = false, idps = []}) => {
         }
 
         // Hide continue button when user focuses back on email
-        setShowContinueButton(false)
+        setShowContinueButton(false) 
 
         // Clear email checking state
         setIsCheckingEmail(false)
@@ -195,8 +216,10 @@ const ContactInfo = ({isSocialEnabled = false, idps = []}) => {
             // Hide continue button since user will use OTP flow
             setShowContinueButton(false)
         } catch (error) {
-            // Show continue button when email is not found
-            setShowContinueButton(true)
+            // Keep continue button visible if email is valid (for unregistered users)
+            if (isValidEmail(email) && hasValidDomain(email)) {
+                setShowContinueButton(true)
+            }
         } finally {
             setIsCheckingEmail(false)
         }
