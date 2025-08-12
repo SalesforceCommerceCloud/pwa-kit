@@ -33,6 +33,8 @@ import OrderStatusBar from '@salesforce/retail-react-app/app/components/order-st
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import {getOrderStatusColorScheme} from '@salesforce/retail-react-app/app/pages/account/order-history'
 import {getLocalizedOrderStatus} from '@salesforce/retail-react-app/app/pages/account/order-history'
+import {useCustomerId, useCustomerType} from '@salesforce/commerce-sdk-react'
+import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
 
 const onClient = typeof window !== 'undefined'
 
@@ -61,8 +63,46 @@ const AccountOrderDetail = () => {
     const paymentCard = order?.paymentInstruments[0]?.paymentCard
     const CardIcon = getCreditCardIcon(paymentCard?.cardType)
     const itemCount = order?.productItems.reduce((count, item) => item.quantity + count, 0) || 0
-    const isCancelEnabled = getConfig().app?.oms?.cancel?.enabled
 
+    // Cancel order gating (POC)
+    const customerId = useCustomerId()
+    const {isRegistered} = useCustomerType()
+    const {data: currentCustomer} = useCurrentCustomer()
+
+    const isCancelEnabled = getConfig().app?.oms?.cancel?.enabled
+    const orderStatus = (order?.status || '').toLowerCase()
+    const shipmentStatus = (shippingStatus || '').toLowerCase()
+    const statusEligible = !['cancelled', 'canceled', 'completed', 'failed'].includes(orderStatus)
+    const shippingEligible = shipmentStatus === 'not_shipped'
+    const ownsOrder =
+        (order?.customerInfo?.customerId && order.customerInfo.customerId === customerId) ||
+        (order?.customerInfo?.email &&
+            currentCustomer?.email &&
+            order.customerInfo.email.toLowerCase() === currentCustomer.email.toLowerCase())
+
+    const canCancel =
+        !isLoading &&
+        isCancelEnabled &&
+        isRegistered &&
+        ownsOrder &&
+        statusEligible &&
+        shippingEligible
+
+    // Debug purposes only
+    /*
+    console.groupCollapsed('Cancel Order gating debug')
+    console.log('isCancelEnabled (config flag app.oms.cancel.enabled):', isCancelEnabled)
+    console.log('isRegistered (authenticated user):', isRegistered)
+    console.log('customerId (from useCustomerId):', customerId)
+    console.log('currentCustomerEmail (from useCurrentCustomer):', currentCustomer?.email)
+    console.log('orderStatus (normalized from order.status):', orderStatus)
+    console.log('shipmentStatus (normalized from first shipment shippingStatus):', shipmentStatus)
+    console.log('statusEligible (!cancelled/canceled/completed/failed):', statusEligible)
+    console.log('shippingEligible (shipmentStatus === "not_shipped"): ', shippingEligible)
+    console.log('ownsOrder (customerId match OR email match with current customer):', ownsOrder)
+    console.log('canCancel (final gate):', canCancel)
+    console.groupEnd()
+    */
     // Fetch product data for order items
     const productIds = order?.productItems?.map((product) => product.productId) || []
     const {data: products, isLoading: isProductsLoading} = useProducts(
@@ -134,7 +174,7 @@ const AccountOrderDetail = () => {
                             />
                         </Heading>
                         {/* POC: Gate Cancel Order by config flag */}
-                        {isCancelEnabled && (
+                        {canCancel && (
                             <Button variant="link" size="sm" onClick={onCancelModalOpen}>
                                 <FormattedMessage
                                     defaultMessage="Cancel order"
@@ -406,16 +446,14 @@ const AccountOrderDetail = () => {
                 </Stack>
             </Stack>
 
-            {isCancelEnabled && (
+            {canCancel && (
                 <CancelOrderModal
                     isOpen={isCancelModalOpen}
                     onClose={onCancelModalClose}
                     order={order}
                     onCancel={(order, selectedReason) => {
                         // POC: No backend call yet
-                        // eslint-disable-next-line no-console
                         console.log('Requesting cancellation for order:', order?.orderNo)
-                        // eslint-disable-next-line no-console
                         console.log('Cancellation reason:', selectedReason)
                     }}
                 />
