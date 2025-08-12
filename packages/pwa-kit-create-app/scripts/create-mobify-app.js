@@ -278,7 +278,8 @@ const PRESETS = [
             'project.einstein.siteId': 'aaij-MobileFirst',
             'project.dataCloud.appSourceId': '7ae070a6-f4ec-4def-a383-d9cacc3f20a1',
             'project.dataCloud.tenantId': 'g82wgnrvm-ywk9dggrrw8mtggy.pc-rnd',
-            'project.demo.enableDemoSettings': false
+            'project.demo.enableDemoSettings': false,
+            'project.selectedPlugins.SFDC_EXT_SOCIAL_LOGIN': false
         },
         assets: ['translations'],
         private: false
@@ -313,7 +314,8 @@ const PRESETS = [
             ['project.einstein.siteId']: 'aaij-MobileFirst',
             ['project.dataCloud.appSourceId']: 'fb81edab-24c6-4b40-8684-b67334dfdf32',
             ['project.dataCloud.tenantId']: 'mmyw8zrxhfsg09lfmzrd1zjqmg',
-            ['project.demo.enableDemoSettings']: true // True only for presets deployed to demo environments like pwa-kit.mobify-storefront.com
+            ['project.demo.enableDemoSettings']: true, // True only for presets deployed to demo environments like pwa-kit.mobify-storefront.com
+            ['project.selectedPlugins.SFDC_EXT_SOCIAL_LOGIN']: false
         },
         assets: ['translations'],
         private: true
@@ -324,7 +326,7 @@ const PRESETS = [
         description: '',
         templateSource: {
             type: TEMPLATE_SOURCE_BUNDLE,
-            id: 'typescript-minimal'
+            id: 'chakra-storefront'
         },
         answers: {
             'project.hybrid': false,
@@ -339,7 +341,8 @@ const PRESETS = [
             'project.einstein.siteId': 'aaij-MobileFirst',
             'project.dataCloud.appSourceId': 'fb81edab-24c6-4b40-8684-b67334dfdf32',
             'project.dataCloud.tenantId': 'mmyw8zrxhfsg09lfmzrd1zjqmg',
-            'project.demo.enableDemoSettings': false
+            'project.demo.enableDemoSettings': false,
+            'project.selectedPlugins.SFDC_EXT_SOCIAL_LOGIN': true
         },
         assets: ['translations'],
         private: true
@@ -365,7 +368,8 @@ const PRESETS = [
             'project.einstein.siteId': 'aaij-MobileFirst',
             'project.dataCloud.appSourceId': 'fb81edab-24c6-4b40-8684-b67334dfdf32',
             'project.dataCloud.tenantId': 'mmyw8zrxhfsg09lfmzrd1zjqmg',
-            'project.demo.enableDemoSettings': false
+            'project.demo.enableDemoSettings': false,
+            'project.selectedPlugins.SFDC_EXT_SOCIAL_LOGIN': false
         },
         assets: ['translations'],
         private: true
@@ -391,7 +395,8 @@ const PRESETS = [
             'project.dataCloud.appSourceId': 'fb81edab-24c6-4b40-8684-b67334dfdf32',
             'project.dataCloud.tenantId': 'mmyw8zrxhfsg09lfmzrd1zjqmg',
             'project.commerce.isSlasPrivate': true,
-            'project.demo.enableDemoSettings': false
+            'project.demo.enableDemoSettings': false,
+            'project.selectedPlugins.SFDC_EXT_SOCIAL_LOGIN': false
         },
         assets: ['translations'],
         private: true
@@ -417,7 +422,8 @@ const PRESETS = [
             'project.commerce.isSlasPrivate': true,
             'project.dataCloud.appSourceId': 'fb81edab-24c6-4b40-8684-b67334dfdf32',
             'project.dataCloud.tenantId': 'mmyw8zrxhfsg09lfmzrd1zjqmg',
-            'project.demo.enableDemoSettings': false
+            'project.demo.enableDemoSettings': false,
+            'project.selectedPlugins.SFDC_EXT_SOCIAL_LOGIN': false
         },
         assets: ['translations'],
         private: true
@@ -443,7 +449,8 @@ const PRESETS = [
             'project.commerce.isSlasPrivate': false,
             'project.dataCloud.appSourceId': 'fb81edab-24c6-4b40-8684-b67334dfdf32',
             'project.dataCloud.tenantId': 'mmyw8zrxhfsg09lfmzrd1zjqmg',
-            'project.demo.enableDemoSettings': false
+            'project.demo.enableDemoSettings': false,
+            'project.selectedPlugins.SFDC_EXT_SOCIAL_LOGIN': false
         },
         assets: ['translations'],
         private: true
@@ -660,7 +667,7 @@ const expandKey = (key, value) =>
  * const expandedObj = expand({'coolthings.babynames': 'Preseley', 'coolthings.cars': 'bmws'})
  * console.log(expandedObj) // {coolthings: { babynames: 'Presley', cars: 'bmws'}}
  *
- * @param {Object} answers
+ * @param {Object} answer
  * @returns {Object} The expanded object.
  *
  */
@@ -884,6 +891,27 @@ const main = async (opts) => {
     if (interactive) {
         const questions = getQuestions ? getQuestions() : []
         const projectAnswers = await prompt(questions, answers)
+        // Only prompt for plugin selection on interactive presets
+        if (Object.keys(pluginConfig?.plugins || {}).length > 0) {
+            const pluginChoices = Object.entries(pluginConfig.plugins).map(([key, config]) => ({
+                name: config.description,
+                value: key
+            }))
+
+            const pluginAnswers = await inquirer.prompt([
+                {
+                    type: 'checkbox',
+                    name: 'selectedPlugins',
+                    message: 'Which extensions would you like to enable?',
+                    choices: pluginChoices
+                }
+            ])
+
+            // Convert selected plugins array to object with true values
+            pluginAnswers.selectedPlugins.forEach((plugin) => {
+                selectedPlugins[plugin] = true
+            })
+        }
         context = merge(context, {
             answers: expandObject(projectAnswers)
         })
@@ -892,28 +920,14 @@ const main = async (opts) => {
             answers: expandObject(answers)
         })
     }
-
-    // Prompt user for plugin selection
-    if (Object.keys(pluginConfig?.plugins || {}).length > 0) {
-        const pluginChoices = Object.entries(pluginConfig.plugins).map(([key, config]) => ({
-            name: config.description,
-            value: key
-        }))
-
-        const pluginAnswers = await inquirer.prompt([
-            {
-                type: 'checkbox',
-                name: 'selectedPlugins',
-                message: 'Which extensions would you like to enable?',
-                choices: pluginChoices
+    // load plugin selected answer from context object to selectedPlugins (which used for code trimming process)
+    Object.entries(context.answers?.project?.selectedPlugins || {}).forEach(
+        ([pluginKey, enabled]) => {
+            if (pluginConfig?.plugins?.[pluginKey]) {
+                selectedPlugins[pluginKey] = enabled
             }
-        ])
-
-        // Convert selected plugins array to object with true values
-        pluginAnswers.selectedPlugins.forEach((plugin) => {
-            selectedPlugins[plugin] = true
-        })
-    }
+        }
+    )
 
     if (!OUTPUT_DIR_FLAG_ACTIVE) {
         // For extension projects, use the extension name as the output directory
