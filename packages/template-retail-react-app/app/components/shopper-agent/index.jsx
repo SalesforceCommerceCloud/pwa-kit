@@ -114,12 +114,10 @@ const ShopperAgentWindow = ({commerceAgentConfiguration, locale, basketId}) => {
 
     const sendExpressMessage = (type, payload = {}) => {
         const embeddedMessagingFrame = document.querySelector('div.embedded-messaging iframe')
-        console.log('==embeddedMessagingFrame==', embeddedMessagingFrame)
         const eventData = {
             type,
             payload
         }
-        console.log('==eventData==', eventData)
         embeddedMessagingFrame.contentWindow.postMessage(eventData, '*')
     }
 
@@ -127,10 +125,8 @@ const ShopperAgentWindow = ({commerceAgentConfiguration, locale, basketId}) => {
         if (event.source && event.source !== window) {
             try {
                 if (event.data.type === 'lwc.getCustomerData') {
-                    console.log('==lwc.getCustomerData==', event)
+                    console.log('Recevied request for customer data from MIAW window')
                     const authToken = await getTokenWhenReady()
-                    console.log('==customer id from pwa parent context==', customerId)
-                    console.log('==auth token from pwa parent context==', authToken)
                     sendExpressMessage('express.actualCustomerData', {
                         customerId,
                         authToken

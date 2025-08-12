@@ -35,7 +35,6 @@ const sendExpressMessage = (type, payload = {}) => {
 }
 
 export const getGooglePaymentMethodConfig = (paymentMethodsResponse) => {
-    console.log('==paymentMethodsResponse in GPayExpress==', paymentMethodsResponse)
     const googlePayPaymentMethod = paymentMethodsResponse?.paymentMethods?.find(
         (pm) => pm.type === PAYMENT_METHOD
     )
@@ -80,7 +79,7 @@ export const updateShippingAddress = async (authToken, site, basket, shippingAdd
             basket.basketId,
             getCustomerShippingDetails(shippingAddress)
         )
-        console.log('==ship address response==', response)
+
         if (response.error) {
             return {
                 error: {
@@ -137,7 +136,7 @@ export const updateShippingOption = async (
             shippingOptionId,
             basket.basketId
         )
-        console.log('==ship method response==', response)
+
         if (response.error) {
             return {
                 error: {
@@ -223,7 +222,7 @@ export const getGoogleButtonConfig = (
                 }
                 const adyenPaymentService = new AdyenPaymentsService(authToken, site)
                 basket = await forceOrderCalculation(basket.basketId, authToken, site)
-                console.log('==basket in GPayExpress after forceOrderCalculation==', basket)
+
                 const customerId = basket?.customerId || basket?.customerInfo?.customerId
                 const paymentsResponse = await adyenPaymentService.submitPayment(
                     {
@@ -315,17 +314,8 @@ export const GooglePayExpress = ({manager, overrideData = null}) => {
         fetchShippingMethods
     } = useAdyenExpressCheckout()
 
-    console.log('==manager in GPayExpress==', manager)
-    console.log('==overrideData input to gpayexpress==', overrideData)
-    console.log('==basket input to gpayexpress==', overrideData?.basket)
-    console.log('==basket input to gpayexpress==', overrideData?.basket?.basketId)
-    console.log('==basket input to gpayexpress==', overrideData?.basket?.customerId)
-
     const finalAuthToken = overrideData?.authToken
     const finalBasket = overrideData?.basket
-    console.log('==authToken in GPayExpress==', finalAuthToken)
-    console.log('==basket in GPayExpress==', finalBasket)
-
     const paymentContainer = useRef(null)
 
     useEffect(() => {
@@ -353,8 +343,6 @@ export const GooglePayExpress = ({manager, overrideData = null}) => {
                             }
                         }
                     })
-                    console.log('== adyen env ==', adyenEnvironment)
-                    console.log('== adyen client key==', adyenEnvironment?.ADYEN_CLIENT_KEY)
                 } catch (ex) {
                     handleGooglePayUnavailable()
                     return
@@ -370,8 +358,6 @@ export const GooglePayExpress = ({manager, overrideData = null}) => {
                         : shippingMethods,
                     googlePaymentMethodConfig
                 )
-
-                console.log('==checkout in GPayExpress==', checkout)
 
                 let googlePayButton
                 try {
@@ -392,8 +378,6 @@ export const GooglePayExpress = ({manager, overrideData = null}) => {
                     handleGooglePayUnavailable()
                     return
                 }
-
-                console.log('==google pay button==', googlePayButton)
 
                 try {
                     await googlePayButton.mount(paymentContainer.current)
