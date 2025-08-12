@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import {renderHook} from '@testing-library/react'
-import useToast from './use-toast'
+import {useToast} from './use-toast'
 import {toaster} from '../components/toaster'
 
 // Mock the toaster dependency

@@ -9,7 +9,7 @@ import {useProductListData} from './use-product-list-data'
 import {useParams, useLocation} from 'react-router-dom'
 import {useProductSearch, useCategory} from '@salesforce/commerce-sdk-react'
 import {useSearchParams} from '../../../hooks'
-import useEinstein from '../../../hooks/use-einstein'
+import {useEinstein} from '../../../hooks/use-einstein'
 import {HTTPNotFound, HTTPError} from '@salesforce/pwa-kit-react-sdk/ssr/universal/errors'
 
 jest.mock('react-router-dom', () => ({
@@ -26,7 +26,7 @@ jest.mock('../../../hooks', () => ({
 }))
 jest.mock('../../../hooks/use-einstein', () => ({
     __esModule: true,
-    default: jest.fn()
+    useEinstein: jest.fn()
 }))
 
 const mockProductSearchResult = {

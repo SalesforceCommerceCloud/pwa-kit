@@ -14,7 +14,7 @@ import PropTypes from 'prop-types'
 const mockToast = jest.fn()
 jest.mock('./use-toast', () => ({
     __esModule: true,
-    default: () => mockToast
+    useToast: () => mockToast
 }))
 
 // Mock the constants

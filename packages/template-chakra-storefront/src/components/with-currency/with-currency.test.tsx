@@ -13,7 +13,7 @@ import {useMultiSite} from '../../hooks/use-multi-site'
 // Mock the `useMultiSite` hook
 jest.mock('../../hooks/use-multi-site', () => ({
     __esModule: true,
-    default: jest.fn()
+    useMultiSite: jest.fn()
 }))
 
 const mockUseMultiSite = useMultiSite as jest.MockedFunction<typeof useMultiSite>

@@ -34,7 +34,7 @@ const MockedComponent = () => {
 
 jest.mock('../../hooks/use-datacloud', () => ({
     __esModule: true,
-    default: jest.fn(() => ({
+    useDataCloud: jest.fn(() => ({
         sendViewPage: jest.fn(),
         sendViewProduct: jest.fn(),
         sendViewCategory: jest.fn(),

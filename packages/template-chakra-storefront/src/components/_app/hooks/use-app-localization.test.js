@@ -29,7 +29,7 @@ jest.mock('../../../hooks/use-multi-site', () => {
     const mockUseMultiSite = jest.fn()
     return {
         __esModule: true,
-        default: mockUseMultiSite
+        useMultiSite: mockUseMultiSite
     }
 })
 
@@ -129,7 +129,7 @@ describe('useAppLocalization', () => {
         const {useIntl} = require('react-intl')
         useIntl.mockReturnValue(mockIntl)
 
-        const useMultiSite = require('../../../hooks/use-multi-site').default
+        const {useMultiSite} = require('../../../hooks/use-multi-site')
         useMultiSite.mockReturnValue(mockMultiSite)
 
         const {useAppOrigin} = require('../../../hooks/use-app-origin')
@@ -194,7 +194,7 @@ describe('useAppLocalization', () => {
     })
 
     test('handles different currencies', () => {
-        const useMultiSite = require('../../../hooks/use-multi-site').default
+        const {useMultiSite} = require('../../../hooks/use-multi-site')
         useMultiSite.mockClear()
         useMultiSite.mockReturnValue({
             ...mockMultiSite,
