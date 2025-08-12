@@ -13,7 +13,6 @@ import {ApplePayExpress} from '@salesforce/retail-react-app/app/components/apple
 import {GooglePayExpress} from '@salesforce/retail-react-app/app/components/google-pay-express/index'
 import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
 import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
-import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
 import {useExpressPaymentManager} from '@salesforce/retail-react-app/app/components/express/hooks/use-express-payment-manager'
 
 // Define the payment methods we will attempt to load
@@ -35,6 +34,9 @@ function Express() {
     // State to track current SKU and quantity (will be set via postMessage)
     const [currentSku, setCurrentSku] = useState(null)
     const [currentQuantity, setCurrentQuantity] = useState(1)
+
+    // Initialize the express payment manager
+    const {manager, managerError} = useExpressPaymentManager(PAYMENT_METHODS)
 
     // PostMessage listener for SKU updates
     useEffect(() => {
@@ -60,15 +62,11 @@ function Express() {
 
                 // Handle basket data messages
                 if (type === 'basketDataAvailable') {
-                    console.log('==basketDataAvailable==', event)
                     const authData = event.data.data.authData
                     setAuthToken(authData.authToken)
                     setFinalCustomerId(authData.customerId)
                     const basketData = event.data.data.basketData
                     // Store values in localStorage
-                    window.localStorage.setItem('access_token_RefArch', authData.authToken)
-                    window.localStorage.setItem('123access_token_RefArch', authData.authToken)
-                    window.localStorage.setItem('customer_id_RefArch', authData.customerId)
                     setBasketData(basketData)
                 }
             }
@@ -94,10 +92,6 @@ function Express() {
         return null
     }
 
-    console.log('==authToken sent to adyen==', authToken)
-    console.log('==finalCustomerId sent to adyen==', finalCustomerId)
-    console.log('==basket sent to adyen==', basket)
-
     return (
         <div>
             {!isPdpMode && basket && (
@@ -113,15 +107,21 @@ function Express() {
                         sku={currentSku}
                         quantity={currentQuantity}
                         isPdpMode={isPdpMode}
-                        basketData={basket} 
+                        basketData={basket}
                         authToken={authToken}
                         manager={manager}
                     />
-                    <GooglePayExpress manager={manager} authToken={authToken} basket={basket} />
+                    <GooglePayExpress manager={manager} overrideData={{authToken, basket}} />
                 </AdyenExpressCheckoutProvider>
             )}
             {isPdpMode && (
-                <ApplePayExpress sku={currentSku} quantity={currentQuantity} isPdpMode={isPdpMode} basketData={basket} authToken={authToken} />
+                <ApplePayExpress
+                    sku={currentSku}
+                    quantity={currentQuantity}
+                    isPdpMode={isPdpMode}
+                    basketData={basket}
+                    authToken={authToken}
+                />
             )}
         </div>
     )
