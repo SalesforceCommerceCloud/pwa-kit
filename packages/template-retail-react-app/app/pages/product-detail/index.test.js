@@ -729,7 +729,7 @@ describe('Delivery Options Restrictions', () => {
             hasSelectedStore: true
         }))
 
-        // Track if updatePickupShipment was called
+
         let shipmentUpdateRequest = null
 
         // Mock the product to be a simple master product with inventory
