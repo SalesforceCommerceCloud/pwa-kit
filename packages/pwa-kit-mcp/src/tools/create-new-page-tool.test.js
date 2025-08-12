@@ -9,11 +9,6 @@ import fs from 'fs/promises'
 import * as utils from '../utils/utils.js'
 
 describe('CreateNewPageTool', () => {
-<<<<<<< HEAD
-    beforeEach(() => {
-        jest.clearAllMocks()
-        process.env.PWA_STOREFRONT_APP_PATH = '/mock/app'
-=======
     const originalEnv = process.env
     const mockAbsolutePaths = {
         nodeModulesPath: '/mock/node_modules',
@@ -30,7 +25,6 @@ describe('CreateNewPageTool', () => {
     })
     afterEach(() => {
         process.env = originalEnv
->>>>>>> develop
     })
 
     it('returns system prompt if required args are missing', async () => {
@@ -51,12 +45,8 @@ describe('CreateNewPageTool', () => {
         const result = await createNewPageTool.handler({
             pageName: 'Test',
             componentList: ['Foo'],
-<<<<<<< HEAD
-            route: '/test'
-=======
             route: '/test',
             ...mockAbsolutePaths
->>>>>>> develop
         })
         expect(result.role).toBe('system')
         expect(result.content[0].text).toContain('Created page')
@@ -68,12 +58,8 @@ describe('CreateNewPageTool', () => {
         const result = await createNewPageTool.handler({
             pageName: 'Test',
             componentList: ['Foo'],
-<<<<<<< HEAD
-            route: '/test'
-=======
             route: '/test',
             ...mockAbsolutePaths
->>>>>>> develop
         })
         expect(result.role).toBe('developer')
         expect(result.content[0].text).toContain('Error creating page')
@@ -100,12 +86,8 @@ describe('CreateNewPageTool', () => {
         const result = await createNewPageTool.handler({
             pageName: 'Test',
             componentList: ['MissingComponent'],
-<<<<<<< HEAD
-            route: '/test'
-=======
             route: '/test',
             ...mockAbsolutePaths
->>>>>>> develop
         })
         expect(result.role).toBe('system')
         expect(result.content[0].text).toContain('MissingComponent')
@@ -121,12 +103,8 @@ describe('CreateNewPageTool', () => {
         const result = await createNewPageTool.handler({
             pageName: 'Test',
             componentList: ['ProductView'],
-<<<<<<< HEAD
-            route: '/test'
-=======
             route: '/test',
             ...mockAbsolutePaths
->>>>>>> develop
         })
         expect(result.role).toBe('system')
         expect(result.content[0].text).toContain(
@@ -139,15 +117,11 @@ describe('CreateNewPageTool', () => {
         jest.spyOn(createNewPageTool, 'generatePageContent').mockResolvedValue(
             `const productId = '25592300M';\nexport default function Page() { return <div>{productId}</div>; }`
         )
-<<<<<<< HEAD
-        const pageContent = await createNewPageTool.generatePageContent('Test', ['ProductView'])
-=======
         const pageContent = await createNewPageTool.generatePageContent(
             'Test',
             ['ProductView'],
             mockAbsolutePaths
         )
->>>>>>> develop
         expect(pageContent).toContain('25592300M')
         expect(pageContent).not.toMatch(/error|exception|fail/i)
     })
@@ -157,15 +131,11 @@ describe('CreateNewPageTool', () => {
         jest.spyOn(createNewPageTool, 'generatePageContent').mockResolvedValue(
             `import Image from 'somewhere';\n${imageComponentString}`
         )
-<<<<<<< HEAD
-        const pageContent = await createNewPageTool.generatePageContent('Test', ['Image'])
-=======
         const pageContent = await createNewPageTool.generatePageContent(
             'Test',
             ['Image'],
             mockAbsolutePaths
         )
->>>>>>> develop
         expect(pageContent).toContain('Image')
         expect(pageContent).toContain('static/img/hero.png')
     })
@@ -176,21 +146,15 @@ describe('CreateNewPageTool', () => {
             `import Image from 'somewhere';\n${defaultImageString}`
         )
         // Simulate user says no to custom image (in real flow, this would be a follow-up, here we just check the generated content)
-<<<<<<< HEAD
-        const pageContent = await createNewPageTool.generatePageContent('Test', ['Image'])
-=======
         const pageContent = await createNewPageTool.generatePageContent(
             'Test',
             ['Image'],
             mockAbsolutePaths
         )
->>>>>>> develop
         expect(pageContent).toContain('static/img/hero.png')
         expect(pageContent).not.toMatch(/https?:\/\//)
     })
 
-<<<<<<< HEAD
-=======
     it('uses component name with Component suffix if component name is the same as the page name', async () => {
         if (createNewPageTool.generatePageContent.mockRestore) {
             createNewPageTool.generatePageContent.mockRestore()
@@ -204,7 +168,6 @@ describe('CreateNewPageTool', () => {
         expect(pageContent).toContain('<TestComponent />')
     })
 
->>>>>>> develop
     it('responds with message listing unknown component and suggests changes to page file', async () => {
         jest.spyOn(fs, 'access').mockImplementation((p) => {
             if (String(p).includes('components')) {
@@ -225,12 +188,8 @@ describe('CreateNewPageTool', () => {
         const result = await createNewPageTool.handler({
             pageName: 'Test',
             componentList: ['ImageSpliter'],
-<<<<<<< HEAD
-            route: '/test'
-=======
             route: '/test',
             ...mockAbsolutePaths
->>>>>>> develop
         })
         expect(result.role).toBe('system')
         expect(result.content[0].text).toContain('ImageSpliter')
@@ -254,15 +213,11 @@ describe('CreateNewPageTool', () => {
         imgSrc: ["'self'", "https://edge.disstg.commercecloud.salesforce.com"]
       }
     }`
-<<<<<<< HEAD
-        const pageContent = await createNewPageTool.generatePageContent('Test', ['Image'])
-=======
         const pageContent = await createNewPageTool.generatePageContent(
             'Test',
             ['Image'],
             mockAbsolutePaths
         )
->>>>>>> develop
         expect(pageContent).toContain(customSrc)
         expect(ssrContent).toContain('.commercecloud.salesforce.com')
         const isAllowed = ssrContent.includes('.commercecloud.salesforce.com')
@@ -284,15 +239,11 @@ describe('CreateNewPageTool', () => {
         imgSrc: ["'self'", "https://some-other-domain.com"]
       }
     }`
-<<<<<<< HEAD
-        const pageContent = await createNewPageTool.generatePageContent('Test', ['Image'])
-=======
         const pageContent = await createNewPageTool.generatePageContent(
             'Test',
             ['Image'],
             mockAbsolutePaths
         )
->>>>>>> develop
         const isAllowed = ssrContent.includes('.commercecloud.salesforce.com')
         expect(isAllowed).toBe(false)
         expect(pageContent).toContain(customSrc)
@@ -305,11 +256,7 @@ describe('CreateNewPageTool', () => {
       }
     }`
         const requestedDomain = 'https://example.com'
-<<<<<<< HEAD
-        const attemptToUpdateCSP = (currentCSP, _newDomain) => currentCSP
-=======
         const attemptToUpdateCSP = (currentCSP) => currentCSP
->>>>>>> develop
         const updatedCSP = attemptToUpdateCSP(ssrContent, requestedDomain)
         expect(updatedCSP).not.toContain(requestedDomain)
         expect(updatedCSP).toContain('.commercecloud.salesforce.com')
@@ -321,8 +268,6 @@ describe('updateRoutes route insertion', () => {
     const route = '/test-page'
     const importStatement = `const ${pageName} = loadable(() => import('./pages/test-page'), {fallback})`
     const routeObject = `    {\n        path: '${route}',\n        component: ${pageName},\n        exact: true\n    },`
-<<<<<<< HEAD
-=======
     const mockAbsolutePaths = {
         nodeModulesPath: '/mock/node_modules',
         componentsPath: '/mock/app/components',
@@ -330,7 +275,6 @@ describe('updateRoutes route insertion', () => {
         routesPath: '/mock/app/routes.jsx',
         hasOverridesDir: false
     }
->>>>>>> develop
 
     let mockWriteFile, mockReadFile, createNewPageTool
 
@@ -351,11 +295,7 @@ describe('updateRoutes route insertion', () => {
         mockReadFile.mockResolvedValue(monorepoRoutes)
         // eslint-disable-next-line @typescript-eslint/no-var-requires
         createNewPageTool = require('./create-new-page-tool').default
-<<<<<<< HEAD
-        await createNewPageTool.updateRoutes(pageName, route)
-=======
         await createNewPageTool.updateRoutes(pageName, route, mockAbsolutePaths)
->>>>>>> develop
         expect(mockWriteFile).toHaveBeenCalled()
         const writtenContent = mockWriteFile.mock.calls[0][1]
         expect(writtenContent).toContain(importStatement)
@@ -373,11 +313,7 @@ describe('updateRoutes route insertion', () => {
         mockReadFile.mockResolvedValue(generatedRoutes)
         // eslint-disable-next-line @typescript-eslint/no-var-requires
         createNewPageTool = require('./create-new-page-tool').default
-<<<<<<< HEAD
-        await createNewPageTool.updateRoutes(pageName, route)
-=======
         await createNewPageTool.updateRoutes(pageName, route, mockAbsolutePaths)
->>>>>>> develop
         expect(mockWriteFile).toHaveBeenCalled()
         const writtenContent = mockWriteFile.mock.calls[0][1]
         expect(writtenContent).toContain(importStatement)
