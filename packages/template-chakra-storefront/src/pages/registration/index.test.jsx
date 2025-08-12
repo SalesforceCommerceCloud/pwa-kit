@@ -13,7 +13,7 @@ import Account from '../account'
 import mockConfig from '../../../config/mocks/mock-config'
 import {rest} from 'msw'
 import {mockedRegisteredCustomer} from '../../../mocks/mock-data'
-jest.mock('../../hooks/use-datacloud', () => ({
+jest.mock('../../hooks/use-data-cloud', () => ({
     __esModule: true,
     useDataCloud: jest.fn(() => ({
         sendViewPage: jest.fn(),

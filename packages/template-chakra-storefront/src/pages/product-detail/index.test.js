@@ -27,7 +27,7 @@ import {
 } from '../../../mocks/product-bundle'
 import Toaster, {toaster} from '../../components/toaster'
 
-jest.mock('../../hooks/use-datacloud', () => ({
+jest.mock('../../hooks/use-data-cloud', () => ({
     __esModule: true,
     useDataCloud: jest.fn(() => ({
         sendViewPage: jest.fn(),

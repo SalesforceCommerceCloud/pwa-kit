@@ -9,7 +9,7 @@ import {renderWithProviders} from '../../utils/test-utils'
 import HomePage from '../../pages/home'
 import {rest} from 'msw'
 import {mockProductSearch} from '../../../mocks/mock-data'
-jest.mock('../../hooks/use-datacloud', () => ({
+jest.mock('../../hooks/use-data-cloud', () => ({
     __esModule: true,
     useDataCloud: jest.fn(() => ({
         sendViewPage: jest.fn(),
