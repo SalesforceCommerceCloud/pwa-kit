@@ -729,7 +729,6 @@ describe('Delivery Options Restrictions', () => {
             hasSelectedStore: true
         }))
 
-
         let shipmentUpdateRequest = null
 
         // Mock the product to be a simple master product with inventory
