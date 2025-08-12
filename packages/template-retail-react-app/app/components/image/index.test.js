@@ -83,7 +83,8 @@ describe('Image Component', () => {
             expect(helmet.linkTags[0]).toStrictEqual({
                 as: 'image',
                 href: imageProps.src,
-                rel: 'preload'
+                rel: 'preload',
+                fetchPriority: 'high'
             })
         })
 
@@ -103,7 +104,8 @@ describe('Image Component', () => {
                     expect(helmet.linkTags[0]).toStrictEqual({
                         as: 'image',
                         href: imageProps.src,
-                        rel: 'preload'
+                        rel: 'preload',
+                        fetchPriority: 'high'
                     })
                 } else {
                     expect(helmet.linkTags).toStrictEqual([])
@@ -134,7 +136,8 @@ describe('Image Component', () => {
             expect(helmet.linkTags[0]).toStrictEqual({
                 as: 'image',
                 href: imageProps.src,
-                rel: 'preload'
+                rel: 'preload',
+                fetchPriority: 'high'
             })
         })
 

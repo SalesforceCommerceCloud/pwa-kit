@@ -12,8 +12,21 @@
  * To ensure that feature work correctly, we test our code with multi-site config in mind, so we created this mock config.
  * A single-site, single-locale config is a special case of multi-site case.
  */
+const commerceAgentSettings = {
+    enabled: 'false',
+    askAgentOnSearch: 'false',
+    embeddedServiceName: 'MIAW_Guided_Shopper_production',
+    embeddedServiceEndpoint: 'https://myorg.salesforce.com/ESWMIAWGuidedShopper',
+    scriptSourceUrl: 'https://myorg.salesforce.com/ESWMIAWGuidedShopper/assets/js/bootstrap.min.js',
+    scrt2Url: 'https://myorg.salesforce.com-scrt.com',
+    salesforceOrgId: '00DSB00000MJ7YH',
+    commerceOrgId: 'f_ecom_zzeu_052',
+    siteId: 'RefArchGlobal'
+}
+
 module.exports = {
     app: {
+        commerceAgent: commerceAgentSettings,
         url: {
             locale: 'path',
             site: 'path',
@@ -97,8 +110,8 @@ module.exports = {
             isProduction: false
         },
         dataCloudAPI: {
-            appSourceId: 'f22ae831-ac03-4bf6-afc1-3a0b19f1ea8e',
-            tenantId: 'mmydmztgh04dczjzmnsw0zd0g8.pc-rnd'
+            appSourceId: '7ae070a6-f4ec-4def-a383-d9cacc3f20a1',
+            tenantId: 'g82wgnrvm-ywk9dggrrw8mtggy.pc-rnd'
         }
     },
     // This list contains server-side only libraries that you don't want to be compiled by webpack

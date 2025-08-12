@@ -4,11 +4,13 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
+/* eslint-disable no-import-assign */
 import React from 'react'
 import {act, render, screen} from '@testing-library/react'
 import {renderToString} from 'react-dom/server'
 import Island from '@salesforce/retail-react-app/app/components/island'
 import {isServer} from '@salesforce/retail-react-app/app/components/island/utils'
+import * as constants from '@salesforce/retail-react-app/app/constants'
 
 jest.mock('@salesforce/retail-react-app/app/components/island/utils', () => ({
     ...jest.requireActual('@salesforce/retail-react-app/app/components/island/utils'),
@@ -44,8 +46,15 @@ function renderServerComponent(component) {
 }
 
 describe('Island Component', () => {
+    let originalFlagValue
+
+    beforeAll(() => (originalFlagValue = constants.PARTIAL_HYDRATION_ENABLED))
+
+    afterAll(() => Reflect.set(constants, 'PARTIAL_HYDRATION_ENABLED', originalFlagValue))
+
     beforeEach(() => {
         jest.clearAllMocks()
+        Reflect.set(constants, 'PARTIAL_HYDRATION_ENABLED', true)
         global.requestIdleCallback = mockRequestIdleCallback
         global.cancelIdleCallback = mockCancelIdleCallback
         global.IntersectionObserver = mockIntersectionObserver
@@ -59,6 +68,19 @@ describe('Island Component', () => {
         beforeEach(() => {
             // Mock server environment
             isServer.mockReturnValue(true)
+        })
+
+        test('should not render an island at all if constant "PARTIAL_HYDRATION_ENABLED" is false', () => {
+            Reflect.set(constants, 'PARTIAL_HYDRATION_ENABLED', false)
+
+            const {container} = render(
+                <Island>
+                    <div data-testid="server-content">Server Content</div>
+                </Island>
+            )
+            expect(screen.getByTestId('server-content')).toBeInTheDocument()
+            expect(screen.getByText('Server Content')).toBeInTheDocument()
+            expect(screen.getByTestId('server-content')).toBe(container.firstElementChild)
         })
 
         test('should render children immediately', () => {
@@ -98,6 +120,19 @@ describe('Island Component', () => {
     })
 
     describe('Client-Side Rendering (CSR)', () => {
+        test('should not render an island at all if constant "PARTIAL_HYDRATION_ENABLED" is false', () => {
+            Reflect.set(constants, 'PARTIAL_HYDRATION_ENABLED', false)
+
+            const {container} = render(
+                <Island>
+                    <div data-testid="server-content">Server Content</div>
+                </Island>
+            )
+            expect(screen.getByTestId('server-content')).toBeInTheDocument()
+            expect(screen.getByText('Server Content')).toBeInTheDocument()
+            expect(screen.getByTestId('server-content')).toBe(container.firstElementChild)
+        })
+
         test('should hydrate immediately if no SSR content exists', () => {
             const {container} = renderServerComponent(<Island hydrateOn={'visible'}></Island>)
 

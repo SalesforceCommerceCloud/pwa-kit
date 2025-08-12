@@ -654,16 +654,26 @@ const ProductList = (props) => {
                                                               }}
                                                               dynamicImageProps={{
                                                                   widths: [
-                                                                      '50vw',
-                                                                      '50vw',
-                                                                      '20vw',
-                                                                      '20vw',
-                                                                      '25vw'
+                                                                      // Each product image can take up the full 50% of the screen width
+                                                                      '50vw', // base <= 479px
+                                                                      '50vw', // sm >= 480px ; <= 767px
+                                                                      // Due to the search refinements panel (fixed 280px), the product images
+                                                                      // grid doesn't consume the entire screen. The smaller the images get,
+                                                                      // the more this extra panel impacts the calculation of the responsive
+                                                                      // image dimensions. Thus, to prevent over-fetching, we define smaller
+                                                                      // dimensions than the column definitions might suggest. Due to large
+                                                                      // margins it's also fine to floor the values.
+                                                                      '15vw' // 15vw is generally a good fit for sizes `md` and above:
+                                                                      // md >= 768px ; <= 991px | 280px consume ~28-36% of the entire screen | 4 image columns on ~2/3 of the screen ==> ~16vw
+                                                                      // lg >= 992px ; <= 1279px | 280px consume ~22-28% of the entire screen | 5 image columns on ~3/4 of the screen ==> ~15vw
+                                                                      // xl >= 1280px ; <= 1535px | 280px consume ~18-22% of the entire screen | 5 image columns on ~4/5 of the screen ==> ~16vw
+                                                                      // 2xl >= 1536px | 280px consume less than 18% of the screen | 5 image columns on ~5/6 of the screen ==> ~16vw
                                                                   ],
-                                                                  // The first two product images should render eagerly to
-                                                                  // ensure prioritized loading for above-the-fold images
-                                                                  // on mobile.
-                                                                  ...(index < 2
+                                                                  // For the sake of LCP, load the first three product images
+                                                                  // eagerly to ensure prioritized loading for all plus one
+                                                                  // above-the-fold images on mobile and most above-the-fold
+                                                                  // images on tablet and desktop.
+                                                                  ...(index < 3
                                                                       ? {
                                                                             imageProps: {
                                                                                 loading: 'eager'

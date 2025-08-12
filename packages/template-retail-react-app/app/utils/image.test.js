@@ -6,7 +6,10 @@
  */
 /* eslint-disable jest/no-conditional-expect */
 import {version} from 'react'
-import {getImageAttributes} from '@salesforce/retail-react-app/app/utils/image'
+import {
+    getImageAttributes,
+    getImageLinkAttributes
+} from '@salesforce/retail-react-app/app/utils/image'
 
 const [majorStr] = version.split('.', 1)
 const major = parseInt(majorStr, 10)
@@ -121,6 +124,143 @@ describe('getImageAttributes()', () => {
                     writable: false
                 })
             }
+        })
+    })
+})
+
+describe('getImageLinkAttributes()', () => {
+    test('empty image properties', () => {
+        expect(getImageLinkAttributes({})).toBeUndefined()
+    })
+
+    test('image properties without fetch priority and loading strategy', () => {
+        expect(getImageLinkAttributes(imageProps)).toBeUndefined()
+    })
+
+    test('image properties with fetch priority, without loading strategy, sizes and srcSet', () => {
+        expect(getImageLinkAttributes({...imageProps, fetchPriority: 'high'})).toStrictEqual({
+            rel: 'preload',
+            as: 'image',
+            href: imageProps.src,
+            fetchPriority: 'high'
+        })
+    })
+
+    test('image properties with fetch priority, sizes and srcSet, without loading strategy', () => {
+        expect(
+            getImageLinkAttributes({
+                ...imageProps,
+                fetchPriority: 'high',
+                sizes: '100vw',
+                srcSet: `${imageProps.src} 240w`
+            })
+        ).toStrictEqual({
+            rel: 'preload',
+            as: 'image',
+            href: imageProps.src,
+            fetchPriority: 'high',
+            imageSizes: '100vw',
+            imageSrcSet: `${imageProps.src} 240w`
+        })
+    })
+
+    test('image properties with fetch priority, type and media, without loading strategy, sizes and srcSet', () => {
+        expect(
+            getImageLinkAttributes({
+                ...imageProps,
+                fetchPriority: 'high',
+                type: 'image/jpeg',
+                media: '(min-width: 80em)'
+            })
+        ).toStrictEqual({
+            rel: 'preload',
+            as: 'image',
+            href: imageProps.src,
+            fetchPriority: 'high',
+            type: 'image/jpeg',
+            media: '(min-width: 80em)'
+        })
+    })
+
+    test('image properties with fetch priority, type, media, sizes and srcSet, without loading strategy', () => {
+        expect(
+            getImageLinkAttributes({
+                ...imageProps,
+                fetchPriority: 'high',
+                type: 'image/jpeg',
+                media: '(min-width: 80em)',
+                sizes: '100vw',
+                srcSet: `${imageProps.src} 240w`
+            })
+        ).toStrictEqual({
+            rel: 'preload',
+            as: 'image',
+            href: imageProps.src,
+            fetchPriority: 'high',
+            type: 'image/jpeg',
+            media: '(min-width: 80em)',
+            imageSizes: '100vw',
+            imageSrcSet: `${imageProps.src} 240w`
+        })
+    })
+
+    describe('loading="eager"', () => {
+        test('image properties without fetch priority', () => {
+            expect(getImageLinkAttributes({...imageProps, loading: 'eager'})).toBeUndefined()
+        })
+
+        test('image properties with fetch priority, without loading strategy, sizes and srcSet', () => {
+            expect(
+                getImageLinkAttributes({...imageProps, loading: 'eager', fetchPriority: 'high'})
+            ).toStrictEqual({
+                rel: 'preload',
+                as: 'image',
+                href: imageProps.src,
+                fetchPriority: 'high'
+            })
+        })
+
+        test('image properties with fetch priority, sizes and srcSet', () => {
+            expect(
+                getImageLinkAttributes({
+                    ...imageProps,
+                    loading: 'eager',
+                    fetchPriority: 'high',
+                    sizes: '100vw',
+                    srcSet: `${imageProps.src} 240w`
+                })
+            ).toStrictEqual({
+                rel: 'preload',
+                as: 'image',
+                href: imageProps.src,
+                fetchPriority: 'high',
+                imageSizes: '100vw',
+                imageSrcSet: `${imageProps.src} 240w`
+            })
+        })
+    })
+
+    describe('loading="lazy"', () => {
+        test('image properties without fetch priority', () => {
+            expect(getImageLinkAttributes({...imageProps, loading: 'lazy'})).toBeUndefined()
+        })
+
+        test('image properties with fetch priority', () => {
+            expect(
+                getImageLinkAttributes({...imageProps, loading: 'lazy', fetchPriority: 'high'})
+            ).toBeUndefined()
+        })
+
+        test('image properties with fetch priority, sizes and srcSet', () => {
+            expect(
+                getImageLinkAttributes({
+                    ...imageProps,
+                    loading: 'eager',
+                    fetchPriority: 'lazy',
+                    sizes: '100vw',
+                    srcSet: `${imageProps.src} 240w`
+                })
+            ).toBeUndefined()
         })
     })
 })

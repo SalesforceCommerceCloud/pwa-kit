@@ -42,10 +42,11 @@ const getCreditCardExpiry = (yearsFromNow = 5) => {
  */
 function simplifyViolations(violations) {
     return violations.map((violation) => ({
-        id: violation.id, // Rule ID
-        impact: violation.impact, // Impact (critical, serious, moderate, minor)
-        description: violation.description, // Description of the rule
-        help: violation.help, // Short description
+        id: violation.id,
+        // Severity of violation (critical, serious, moderate, minor)
+        impact: violation.impact,
+        description: violation.description,
+        help: violation.help,
         helpUrl: violation.helpUrl,
         nodes: violation.nodes.map((node) => ({
             // Simplify the HTML to make it more stable for snapshots
@@ -54,7 +55,13 @@ function simplifyViolations(violations) {
             failureSummary: node.failureSummary,
             // Simplify target selectors for stability
             // #app-header[data-v-12345] > .navigation[data-testid="main-nav"] => #app-header > .navigation
-            target: node.target.map((t) => t.split(/\[.*?\]/).join(''))
+            // Also handle Chakra UI dynamic selectors like #popover-trigger-:r5l4v:
+            target: node.target.map((t) =>
+                t
+                    .split(/\[.*?\]/).join('') // Remove data attributes
+                    .replace(/#([^-\s]+(?:-[^:]*)?):([^"\s]*)/g, '#$1-...') // Remove Chakra UI dynamic IDs
+                    .replace(/\.css-[a-zA-Z0-9]+/g, '.css-...') // Simplify Chakra UI CSS classes
+            )
         }))
     }))
 }
@@ -77,6 +84,10 @@ function sanitizeHtml(html) {
             .replace(/style="[^"]*"/g, '')
             // Remove content of script tags
             .replace(/<script\b[^>]*>([\s\S]*?)<\/script>/gi, '<script>...</script>')
+            // Dynamic values - keep stable part:
+            // Before: aria-controls="popover-content-:rn:"
+            // After:  aria-controls="popover-content-..."
+            .replace(/(aria-(?:controls|describedby|labelledby|owns))="([^:]*?)(?::[^"]*)?"/g, '$1="$2..."')
             // Trim whitespace
             .trim()
     )
