@@ -323,17 +323,13 @@ export const GooglePayExpress = ({manager}) => {
         basket,
         locale,
         site,
-        authToken,
-        shippingMethods,
-        fetchShippingMethods
+        authToken
     } = useAdyenExpressCheckout()
 
     console.log('🫥🫥🫥🫥🫥🫥🫥🫥🫥🫥🫥🫥🫥🫥🫥🫥🫥🫥🫥')
     console.log('🔣🔣🔣 adyenEnvironment', adyenEnvironment)
     console.log('🔣🔣🔣 adyenPaymentMethods', adyenPaymentMethods)
     console.log('🔣🔣🔣 basket', basket)
-    console.log('🔣🔣🔣 shippingMethods', shippingMethods)
-    console.log('🔣🔣🔣 fetchShippingMethods', fetchShippingMethods)
     console.log('🔣🔣🔣 locale', locale)
     console.log('🔣🔣🔣 site', site)
     console.log('🔣🔣🔣 authToken', authToken)
