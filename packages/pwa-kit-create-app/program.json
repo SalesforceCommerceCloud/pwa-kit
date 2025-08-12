@@ -499,6 +499,7 @@
                         "directives": {
                             "img-src": [
                                 "*.commercecloud.salesforce.com",
+                                "*.demandware.net",
                                 "*.sfcc-store-internal.net"
                             ],
                             "script-src": [
@@ -514,9 +515,6 @@
                             "frame-src": [
                                 "*.site.com"
                             ]
-                        },
-                        "referrerPolicy": {
-                            "policy": "strict-origin-when-cross-origin"
                         }
                     }
                 },
