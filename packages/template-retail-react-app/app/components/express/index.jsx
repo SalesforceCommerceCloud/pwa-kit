@@ -13,6 +13,11 @@ import {ApplePayExpress} from '@salesforce/retail-react-app/app/components/apple
 import {GooglePayExpress} from '@salesforce/retail-react-app/app/components/google-pay-express/index'
 import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
 import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
+import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
+import {useExpressPaymentManager} from '@salesforce/retail-react-app/app/components/express/hooks/use-express-payment-manager'
+
+// Define the payment methods we will attempt to load
+const PAYMENT_METHODS = ['applepay', 'googlepay']
 
 function Express() {
     const navigate = useNavigation()
@@ -83,7 +88,9 @@ function Express() {
         }
     }, [])
 
-    if (!authToken) {
+    if (!authToken || managerError) {
+        // Do not render express payment components if there is no auth token
+        // or if there was an error setting up the manager
         return null
     }
 
@@ -93,17 +100,29 @@ function Express() {
 
     return (
         <div>
-            <AdyenExpressCheckoutProvider
-                authToken={authToken}
-                customerId={finalCustomerId}
-                locale={locale}
-                site={site}
-                basket={basket}
-                navigate={navigate}
-            >
-                {/*<ApplePayExpress sku={currentSku} quantity={currentQuantity} isPdpMode={isPdpMode} />*/}
-                <GooglePayExpress authToken={authToken} basket={basket} />
-            </AdyenExpressCheckoutProvider>
+            {!isPdpMode && basket && (
+                <AdyenExpressCheckoutProvider
+                    authToken={authToken}
+                    customerId={finalCustomerId}
+                    locale={locale}
+                    site={site}
+                    basket={basket}
+                    navigate={navigate}
+                >
+                    <ApplePayExpress
+                        sku={currentSku}
+                        quantity={currentQuantity}
+                        isPdpMode={isPdpMode}
+                        basketData={basket} 
+                        authToken={authToken}
+                        manager={manager}
+                    />
+                    <GooglePayExpress manager={manager} authToken={authToken} basket={basket} />
+                </AdyenExpressCheckoutProvider>
+            )}
+            {isPdpMode && (
+                <ApplePayExpress sku={currentSku} quantity={currentQuantity} isPdpMode={isPdpMode} basketData={basket} authToken={authToken} />
+            )}
         </div>
     )
 }

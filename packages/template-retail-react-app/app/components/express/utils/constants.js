@@ -19,3 +19,7 @@ export const EXPRESS_MESSAGES = {
     PAYMENT_FAILURE: 'express.payment.failure',
     PAYMENT_CANCEL: 'express.payment.cancel'
 }
+
+// Express button constants
+export const EXPRESS_BUTTON_HEIGHT = 40
+export const EXPRESS_BUTTON_GAP = 8
