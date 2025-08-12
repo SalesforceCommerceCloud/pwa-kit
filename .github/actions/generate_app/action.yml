@@ -22,6 +22,11 @@ inputs:
   project_dir:
     description: Project Directory
 
+outputs:
+  project_path:
+    description: Path to the generated project directory
+    value: ${{ steps.generate_project.outputs.project_path }}
+
 runs:
   using: composite
   steps:
@@ -109,12 +114,16 @@ runs:
       run: |
         cat generator-responses.json
         node e2e/scripts/generate-project.js --project-config "$(jq -c . generator-responses.json)"
+
+        # Return path to the generated project
+        GENERATED_PROJECTS_DIR=$(node -e "console.log(require('./e2e/config.js').GENERATED_PROJECTS_DIR)")
+        echo "project_path=$GENERATED_PROJECTS_DIR/${{ inputs.project_dir }}" >> $GITHUB_OUTPUT
       shell: bash
 
     # TODO: I think we can safely delete this step. We already install the dependencies in the previous step.
     - name: Build generated project
       id: build_generated_project
-      working-directory: ../generated-projects/${{ inputs.project_dir }}
+      working-directory: ${{ steps.generate_project.outputs.project_path }}
       run: |-
         npm ci
         npm run build

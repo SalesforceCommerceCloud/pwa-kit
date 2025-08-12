@@ -26,6 +26,7 @@ jobs:
                   npm ci
 
             - name: Generate App
+              id: generate_app
               uses: ./.github/actions/e2e_generate_app
               with:
                 PROJECT_KEY: "retail-react-app-performance-tests"
