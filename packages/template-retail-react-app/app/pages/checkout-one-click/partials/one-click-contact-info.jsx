@@ -177,7 +177,7 @@ const ContactInfo = ({isSocialEnabled = false, idps = []}) => {
         const isValid = await form.trigger()
         // Manually trigger the browser native form validations
         if (isValid) {
-            // Always check if user is registered (this will show OTP modal if they are)
+            // Try to send OTP first, only open modal if successful
             await handleSendEmailOtp(email)
         } else {
             form.reportValidity()
@@ -201,8 +201,6 @@ const ContactInfo = ({isSocialEnabled = false, idps = []}) => {
         // Clear email checking state
         setIsCheckingEmail(false)
     }
-
-
 
     // Handle sending OTP email
     const handleSendEmailOtp = async (email) => {
