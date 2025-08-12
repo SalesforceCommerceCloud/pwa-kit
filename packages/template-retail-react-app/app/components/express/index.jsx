@@ -49,13 +49,20 @@ function Express() {
             // In production, you might want to restrict this to specific origins
             
             if (event.data && typeof event.data === 'object') {
-                const {type, sku} = event.data
+                const {type, sku, quantity} = event.data
                 
                 // Handle SKU update messages
                 if (type === 'UPDATE_SKU' && typeof sku === 'string') {
                     setCurrentSku(sku)
                     // Always set quantity to 1 when SKU changes
                     setCurrentQuantity(1)
+                }
+                
+                // Handle quantity update messages
+                if (type === 'UPDATE_QUANTITY' && typeof quantity === 'number') {
+                    // Validate quantity is a positive integer with reasonable limits
+                    const validatedQuantity = Math.max(1, Math.min(999, Math.floor(quantity)))
+                    setCurrentQuantity(validatedQuantity)
                 }
                 
                 // Handle SKU clear messages (for regular checkout)

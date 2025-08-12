@@ -87,7 +87,8 @@ export const getAppleButtonConfig = (
     sku = null,
     setTempBasket = null,
     tempBasket = null,
-    isPdpMode = false
+    isPdpMode = false,
+    quantity = 1
 ) => {
     // For PDP mode, prioritize temporary basket creation over existing basket
     // For regular mode, use existing basket 
@@ -108,7 +109,7 @@ export const getAppleButtonConfig = (
         
         // For PDP flows, create temporary basket if needed (and SKU is available)
         if (isPdpMode && sku && setTempBasket) {
-            const newBasket = await createTemporaryBasket(sku, authToken, site, 1)
+            const newBasket = await createTemporaryBasket(sku, authToken, site, quantity)
             sharedBasketRef = newBasket  // Update shared reference immediately
             setTempBasket(newBasket)     // Update React state for re-renders
             return newBasket
@@ -620,7 +621,8 @@ export const ApplePayExpress = ({sku, quantity = 1, isPdpMode = false, basketDat
                     currentSku,
                     setTempBasket,
                     tempBasket,
-                    isPdpMode
+                    isPdpMode,
+                    quantity
                 )
 
                 let applePayButton
