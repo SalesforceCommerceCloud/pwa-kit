@@ -8,7 +8,7 @@ export const APPLICATION_OCTET_STREAM = 'application/octet-stream'
 export const BUILD = 'build'
 export const STATIC_ASSETS = 'static_assets'
 
-/**  * @deprecated Use ssr-namespace-paths.proxyBasePath instead  */
+/**  * @deprecated Use ssr-namespace-paths proxyBasePath instead  */
 export const PROXY_PATH_PREFIX = '/mobify/proxy'
 
 // All these values MUST be lower case

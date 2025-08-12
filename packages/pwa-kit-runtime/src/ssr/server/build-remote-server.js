@@ -484,99 +484,107 @@ export const RemoteServerFactory = {
      * @private
      */
     _setupRemoveBasePathFromPathMiddleware(app) {
-        const removeBasePathFromPath = (path) => {
-            if (!getEnvBasePath()) return path
-            const regex = new RegExp(`^${getEnvBasePath()}(/|$)`)
-            return path.replace(regex, '/')
-        }
+        // Use envBasePath as the feature flag for this middleware
+        // If envBasePath is `/`, '', or undefined when the server starts, we don't need to
+        // initialize this middleware.
+        if (getEnvBasePath()) {
+            const removeBasePathFromPath = (path) => {
+                const regex = new RegExp(`^${getEnvBasePath()}(/|$)`)
+                return path.replace(regex, '/')
+            }
 
-        const _convertExpressRouteToRegex = (routePattern) => {
-            if (!routePattern) return null
+            const _convertExpressRouteToRegex = (routePattern) => {
+                if (!routePattern) return null
+                if (routePattern instanceof RegExp) return routePattern
+                if (typeof routePattern !== 'string') return null
 
-            // Replace route parameters like :id with regex capture groups
-            let regexPattern = routePattern
-                .replace(/:[^/]+/g, '[^/]+')
-                .replace(/\/\*/g, '/.*')
-                .replace(/\*/g, '.*')
+                // Replace route parameters like :id with regex capture groups
+                let regexPattern = routePattern
+                    .replace(/:[^/]+/g, '[^/]+')
+                    .replace(/\/\*/g, '/.*')
+                    .replace(/\*/g, '.*')
 
-            // Escape other regex special characters except those we just handled
-            regexPattern = regexPattern.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+                // Escape other regex special characters except those we just handled
+                regexPattern = regexPattern.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
 
-            // Unescape the patterns we want to keep
-            regexPattern = regexPattern
-                .replace(/\\\[\\\^\/\\\]\\\+/g, '[^/]+')
-                .replace(/\\\/\\\.\\\*/g, '/.*')
-                .replace(/\\\.\\\*/g, '.*')
-                .replace(/\\\(/g, '(')
-                .replace(/\\\)/g, ')')
-                .replace(/\\\?/g, '?')
+                // Unescape the patterns we want to keep
+                regexPattern = regexPattern
+                    .replace(/\\\[\\\^\/\\\]\\\+/g, '[^/]+')
+                    .replace(/\\\/\\\.\\\*/g, '/.*')
+                    .replace(/\\\.\\\*/g, '.*')
+                    .replace(/\\\(/g, '(')
+                    .replace(/\\\)/g, ')')
+                    .replace(/\\\?/g, '?')
 
-            return new RegExp(`^${regexPattern}$`)
-        }
+                return new RegExp(`^${regexPattern}$`)
+            }
 
-        /**
-         * Very early request processing.
-         *
-         * If the server receives a request containing the base path, remove it before allowing it through
-         *
-         * @param req {express.req} the incoming request - modified in-place
-         * @private
-         */
-        const removeBasePathFromPathMiddleware = (req, res, next) => {
-            // Scope base path removal to /mobify routes and routes defined by the express app (ie. worker.js)
-            // This is to avoid affecting other paths where a base path might be present if it happens to
-            // be equal to a site id.
-            // For example, if you have a base path of /us and a site id of /us we don't want
-            // to remove the /us from www.example.com/us/en-US/category/...
+            /**
+             * Very early request processing.
+             *
+             * If the server receives a request containing the base path, remove it before allowing it through
+             *
+             * @param req {express.req} the incoming request - modified in-place
+             * @private
+             */
+            const removeBasePathFromPathMiddleware = (req, res, next) => {
+                // Scope base path removal to /mobify routes and routes defined by the express app (ie. worker.js)
+                // This is to avoid affecting other paths where a base path might be present if it happens to
+                // be equal to a site id.
+                // For example, if you have a base path of /us and a site id of /us we don't want
+                // to remove the /us from www.example.com/us/en-US/category/...
 
-            const basePath = getEnvBasePath()
-            let shouldRemoveBasePath = false
+                const basePath = getEnvBasePath()
+                let shouldRemoveBasePath = false
 
-            if (basePath) {
-                if (req.path.startsWith(`${basePath}/mobify`)) {
-                    shouldRemoveBasePath = true
-                }
+                if (basePath) {
+                    if (req.path.startsWith(`${basePath}/mobify`)) {
+                        shouldRemoveBasePath = true
+                    }
 
-                // Check if path matches any existing express route with base path prepended
-                if (!shouldRemoveBasePath) {
-                    // Routes are dynamically checked since we want to ensure that any express route
-                    // defined after the app is created, such as routes defined in ssr.js are included.
-                    const expressRoutes = app._router.stack
-                        // specifically omit the generic wildcard from the express routes we want to
-                        // remove the base path from since it is mapped to the app render
-                        .filter(
-                            (layer) => layer.route && layer.route.path && layer.route.path !== '*'
-                        )
-                        .map((layer) => layer.route.path)
+                    // Check if path matches any existing express route with base path prepended
+                    if (!shouldRemoveBasePath) {
+                        // Routes are dynamically checked since we want to ensure that any express route
+                        // defined after the app is created, such as routes defined in ssr.js, are included.
+                        const expressRoutes = app._router.stack
+                            // specifically omit the generic wildcard from the express routes we want to
+                            // remove the base path from since it is mapped to the app render
+                            .filter(
+                                (layer) =>
+                                    layer.route && layer.route.path && layer.route.path !== '*'
+                            )
+                            .map((layer) => layer.route.path)
 
-                    for (const route of expressRoutes) {
-                        if (route) {
-                            const routeRegex = _convertExpressRouteToRegex(route)
-                            if (routeRegex) {
-                                const pathWithoutBase = req.path.replace(
-                                    new RegExp(`^${basePath}`),
-                                    ''
-                                )
-                                if (routeRegex.test(pathWithoutBase)) {
-                                    shouldRemoveBasePath = true
-                                    break
+                        for (const route of expressRoutes) {
+                            if (route) {
+                                const routeRegex = _convertExpressRouteToRegex(route)
+                                if (routeRegex) {
+                                    const pathWithoutBase = req.path.replace(
+                                        new RegExp(`^${basePath}`),
+                                        ''
+                                    )
+                                    if (routeRegex.test(pathWithoutBase)) {
+                                        shouldRemoveBasePath = true
+                                        break
+                                    }
                                 }
                             }
                         }
                     }
                 }
+
+                if (shouldRemoveBasePath) {
+                    const updatedPath = removeBasePathFromPath(req.path)
+                    const parsed = URL.parse(req.url)
+                    parsed.pathname = updatedPath
+                    req.url = URL.format(parsed)
+                }
+
+                next()
             }
 
-            if (shouldRemoveBasePath) {
-                const updatedPath = removeBasePathFromPath(req.path)
-                const parsed = URL.parse(req.url)
-                parsed.pathname = updatedPath
-                req.url = URL.format(parsed)
-            }
-
-            next()
+            app.use(removeBasePathFromPathMiddleware)
         }
-        app.use(removeBasePathFromPathMiddleware)
     },
 
     /**
@@ -801,6 +809,17 @@ export const RemoteServerFactory = {
             return
         }
 
+        // This is the full path to the SLAS trusted-system endpoint
+        // We want to throw an error if the regex defined options.applySLASPrivateClientToEndpoints
+        // matches this path as an early warning to developers that they should update their regex
+        // in ssr.js to exclude this path.
+        const trustedSystemPath = '/shopper/auth/v1/oauth2/trusted-system/token'
+        if (trustedSystemPath.match(options.applySLASPrivateClientToEndpoints)) {
+            throw new Error(
+                'It is not allowed to include /oauth2/trusted-system endpoints in `applySLASPrivateClientToEndpoints`'
+            )
+        }
+
         localDevLog(`Proxying ${slasPrivateProxyPath} to ${options.slasTarget}`)
 
         const clientId = options.mobify?.app?.commerceAPI?.parameters?.clientId
@@ -837,15 +856,12 @@ export const RemoteServerFactory = {
                         targetProtocol: 'https'
                     })
 
-                    // We pattern match and add client secrets only to endpoints that
-                    // match the regex specified by options.applySLASPrivateClientToEndpoints
-                    // (see option defaults at the top of this file).
-                    // Other SLAS endpoints, ie. SLAS authenticate (/oauth2/login) and
-                    // SLAS logout (/oauth2/logout), use the Authorization header for a different
-                    // purpose so we don't want to overwrite the header for those calls.
-                    if (incomingRequest.path?.match(options.applySLASPrivateClientToEndpoints)) {
-                        proxyRequest.setHeader('Authorization', `Basic ${encodedSlasCredentials}`)
-                    } else if (!incomingRequest.path?.match(options.slasApiPath)) {
+                    // We don't want the proxy to handle any non-SLAS requests
+                    // or any trusted system requests
+                    if (
+                        !incomingRequest.path?.match(options.slasApiPath) ||
+                        incomingRequest.path?.match(/\/oauth2\/trusted-system/)
+                    ) {
                         const message = `Request to ${incomingRequest.path} is not allowed through the SLAS Private Client Proxy`
                         logger.error(message)
                         return res.status(403).json({
@@ -853,8 +869,17 @@ export const RemoteServerFactory = {
                         })
                     }
 
-                    // /oauth2/trusted-agent/token endpoint requires a different auth header
-                    if (incomingRequest.path?.match(/\/oauth2\/trusted-agent\/token/)) {
+                    // We pattern match and add client secrets only to endpoints that
+                    // match the regex specified by options.applySLASPrivateClientToEndpoints.
+                    //
+                    // Other SLAS endpoints, ie. SLAS authenticate (/oauth2/login) and
+                    // SLAS logout (/oauth2/logout), use the Authorization header for a different
+                    // purpose so we don't want to overwrite the header for those calls.
+                    if (incomingRequest.path?.match(options.applySLASPrivateClientToEndpoints)) {
+                        proxyRequest.setHeader('Authorization', `Basic ${encodedSlasCredentials}`)
+                    } else if (incomingRequest.path?.match(/\/oauth2\/trusted-agent\/token/)) {
+                        // /oauth2/trusted-agent/token endpoint auth header comes from Account Manager
+                        // so the SLAS private client is sent via this special header
                         proxyRequest.setHeader('_sfdc_client_auth', encodedSlasCredentials)
                     }
                 }

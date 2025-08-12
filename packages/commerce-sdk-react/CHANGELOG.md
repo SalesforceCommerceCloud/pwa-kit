@@ -1,5 +1,4 @@
-## v3.5.0-preview.0 (Aug 01, 2025)
-
+## v3.5.0-preview.1 (Aug 11, 2025)
 - Add support for environment level base paths on /mobify routes [#2892](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2892)
 - Update USID expiry to match SLAS refresh token expiry[#2854](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2854)
 
