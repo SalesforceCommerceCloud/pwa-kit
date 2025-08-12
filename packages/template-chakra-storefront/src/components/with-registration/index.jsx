@@ -10,7 +10,7 @@ import PropTypes from 'prop-types'
 import {noop} from '../../utils/utils'
 import {useIntl} from 'react-intl'
 import {useLocation} from 'react-router-dom'
-import useToast from '../../hooks/use-toast'
+import {useToast} from '../../hooks/use-toast'
 import {useCurrentCustomer} from '../../hooks/use-current-customer'
 
 /**

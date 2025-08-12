@@ -19,7 +19,7 @@ import {
 import {useHistory, useLocation, useParams} from 'react-router-dom'
 
 import {useCurrentBasket, useVariant} from '../../../hooks'
-import useEinstein from '../../../hooks/use-einstein'
+import {useEinstein} from '../../../hooks/use-einstein'
 import {useWishList} from '../../../hooks/use-wish-list'
 
 import {normalizeSetBundleProduct, getUpdateBundleChildArray} from '../../../utils/product-utils'

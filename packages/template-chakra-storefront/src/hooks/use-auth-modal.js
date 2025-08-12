@@ -32,8 +32,8 @@ import {
     PASSWORDLESS_ERROR_MESSAGES,
     USER_NOT_FOUND_ERROR
 } from '../../config/constants'
-import useNavigation from './use-navigation'
-import useToast from './use-toast'
+import {useNavigation} from './use-navigation'
+import {useToast} from './use-toast'
 import {usePrevious} from './use-previous'
 import {usePasswordReset} from './use-password-reset'
 import {isServer} from '../utils/utils'

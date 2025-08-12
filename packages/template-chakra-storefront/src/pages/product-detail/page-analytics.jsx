@@ -7,9 +7,9 @@
 
 import {useEffect} from 'react'
 import PropTypes from 'prop-types'
-import useEinstein from '../../hooks/use-einstein'
-import useDataCloud from '../../hooks/use-datacloud'
-import useActiveData from '../../hooks/use-active-data'
+import {useEinstein} from '../../hooks/use-einstein'
+import {useDataCloud} from '../../hooks/use-datacloud'
+import {useActiveData} from '../../hooks/use-active-data'
 import logger from '../../utils/logger-instance'
 
 const PageAnalytics = ({product, category}) => {

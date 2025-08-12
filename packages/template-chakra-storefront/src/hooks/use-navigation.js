@@ -6,7 +6,7 @@
  */
 import {useCallback} from 'react'
 import {useHistory} from 'react-router-dom'
-import useMultiSite from './use-multi-site'
+import {useMultiSite} from './use-multi-site'
 import {removeSiteLocaleFromPath} from '../utils/url'
 
 /**

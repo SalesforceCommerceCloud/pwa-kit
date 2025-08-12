@@ -8,7 +8,7 @@
 import {useLocation} from 'react-router-dom'
 import {useQuery} from '@tanstack/react-query'
 import {useAppOrigin} from '../../../hooks/use-app-origin'
-import useMultiSite from '../../../hooks/use-multi-site'
+import {useMultiSite} from '../../../hooks/use-multi-site'
 import {getTargetLocale, fetchTranslations} from '../../../utils/locale'
 import {isServer} from '../../../utils/utils'
 import {useAppConfig} from './use-app-config'

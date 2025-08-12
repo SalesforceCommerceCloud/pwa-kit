@@ -16,7 +16,7 @@ import {isServer, isHydrated} from '../utils/utils'
 import {useQueryClient} from '@tanstack/react-query'
 
 // Hooks
-import useMultiSite from '../hooks/use-multi-site'
+import {useMultiSite} from '../hooks/use-multi-site'
 
 // Constants
 import {useShopperContextSearchParams} from '../hooks/use-shopper-context-search-params'

@@ -24,7 +24,7 @@ import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 
 import {SearchIcon} from '../icons'
 import {capitalize, boldString, getSessionJSONItem, setSessionJSONItem} from '../../utils/utils'
-import useNavigation from '../../hooks/use-navigation'
+import {useNavigation} from '../../hooks/use-navigation'
 import SearchSuggestions from '../../components/search/partials/search-suggestions'
 import {HideOnDesktop, HideOnMobile} from '../responsive'
 import {productUrlBuilder, searchUrlBuilder, categoryUrlBuilder} from '../../utils/url'

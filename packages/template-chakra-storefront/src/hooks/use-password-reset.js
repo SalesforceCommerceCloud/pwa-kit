@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import {AuthHelpers, useAuthHelper} from '@salesforce/commerce-sdk-react'
-import useToast from './use-toast'
+import {useToast} from './use-toast'
 import {useIntl} from 'react-intl'
 import {useAppOrigin} from './use-app-origin'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'

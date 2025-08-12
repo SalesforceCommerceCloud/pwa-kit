@@ -14,7 +14,7 @@ import PromoCodeFields from '../../components/forms/promo-code-fields'
 import {API_ERROR_MESSAGE} from '../../../config/constants'
 import {useShopperBasketsMutation} from '@salesforce/commerce-sdk-react'
 import {useCurrentBasket} from '../../hooks'
-import useToast from '../../hooks/use-toast'
+import {useToast} from '../../hooks/use-toast'
 
 export const usePromoCode = () => {
     const intl = useIntl()

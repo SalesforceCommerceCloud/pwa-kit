@@ -7,7 +7,7 @@
 
 import {useEffect} from 'react'
 import {useLocation} from 'react-router-dom'
-import useActiveData from '../../../hooks/use-active-data'
+import {useActiveData} from '../../../hooks/use-active-data'
 
 /**
  * Custom hook for managing analytics and page tracking

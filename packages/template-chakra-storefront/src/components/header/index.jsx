@@ -40,7 +40,7 @@ import {
 } from '../icons'
 
 import {navLinks, messages} from '../../pages/account/constant'
-import useNavigation from '../../hooks/use-navigation'
+import {useNavigation} from '../../hooks/use-navigation'
 import LoadingSpinner from '../../components/loading-spinner'
 import {HideOnDesktop, HideOnMobile} from '../responsive'
 import {noop} from '../../utils/utils'
