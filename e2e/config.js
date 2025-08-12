@@ -112,8 +112,6 @@ module.exports = {
   },
   EXPECTED_GENERATED_ARTIFACTS: {
     "retail-app-demo": [
-      ".git",
-      ".gitignore",
       ".cursor",
       ".eslintignore",
       ".eslintrc.js",
@@ -128,8 +126,6 @@ module.exports = {
       "worker",
     ],
     "retail-app-ext": [
-      ".git",
-      ".gitignore",
       ".cursor",
       ".eslintignore",
       ".eslintrc.js",

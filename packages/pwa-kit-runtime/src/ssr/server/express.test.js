@@ -1086,9 +1086,24 @@ describe('SLAS private client proxy', () => {
     const savedEnvironment = Object.assign({}, process.env)
 
     let proxyApp
+    let proxyServer
     const proxyPort = 12345
     const proxyPath = '/shopper/auth/responseHeaders'
     const slasTarget = `http://localhost:${proxyPort}${proxyPath}`
+    const appConfig = {
+        mobify: {
+            app: {
+                commerceAPI: {
+                    parameters: {
+                        clientId: 'clientId',
+                        shortCode: 'shortCode'
+                    }
+                }
+            }
+        },
+        useSLASPrivateClient: true,
+        slasTarget: slasTarget
+    }
 
     beforeAll(() => {
         // by setting slasTarget, rather than forwarding the request to SLAS,
@@ -1097,15 +1112,38 @@ describe('SLAS private client proxy', () => {
         proxyApp.use(proxyPath, (req, res) => {
             res.send(req.headers)
         })
-        proxyApp.listen(proxyPort)
+        proxyServer = proxyApp.listen(proxyPort)
     })
 
     afterEach(() => {
         process.env = savedEnvironment
     })
 
-    afterAll(() => {
-        proxyApp.close()
+    // There is a lot of cleanup done here to ensure the proxy server is closed
+    // after these tests.
+    afterAll(async () => {
+        if (proxyServer) {
+            // Close the server and wait for it to fully close
+            await new Promise((resolve) => {
+                proxyServer.close(() => {
+                    resolve()
+                })
+            })
+
+            // Additional cleanup to ensure all connections are closed
+            proxyServer.unref()
+
+            // Force close any remaining connections
+            if (proxyServer._handle) {
+                proxyServer._handle.close()
+            }
+
+            // Clear any remaining event listeners
+            proxyServer.removeAllListeners()
+        }
+
+        // Clear any remaining timers or intervals
+        jest.clearAllTimers()
     })
 
     test('should not create proxy by default', () => {
@@ -1121,22 +1159,7 @@ describe('SLAS private client proxy', () => {
     test('does not insert client secret if request not for /oauth2/token', async () => {
         process.env.PWA_KIT_SLAS_CLIENT_SECRET = 'a secret'
 
-        const app = RemoteServerFactory._createApp(
-            opts({
-                mobify: {
-                    app: {
-                        commerceAPI: {
-                            parameters: {
-                                clientId: 'clientId',
-                                shortCode: 'shortCode'
-                            }
-                        }
-                    }
-                },
-                useSLASPrivateClient: true,
-                slasTarget: slasTarget
-            })
-        )
+        const app = RemoteServerFactory._createApp(opts(appConfig))
 
         return await request(app)
             .get('/mobify/slas/private/shopper/auth/v1/somePath')
@@ -1152,22 +1175,7 @@ describe('SLAS private client proxy', () => {
 
         const encodedCredentials = Buffer.from('clientId:a secret').toString('base64')
 
-        const app = RemoteServerFactory._createApp(
-            opts({
-                mobify: {
-                    app: {
-                        commerceAPI: {
-                            parameters: {
-                                clientId: 'clientId',
-                                shortCode: 'shortCode'
-                            }
-                        }
-                    }
-                },
-                useSLASPrivateClient: true,
-                slasTarget: slasTarget
-            })
-        )
+        const app = RemoteServerFactory._createApp(opts(appConfig))
 
         return await request(app)
             .get('/mobify/slas/private/shopper/auth/v1/oauth2/token')
@@ -1181,24 +1189,7 @@ describe('SLAS private client proxy', () => {
     test('does not add _sfdc_client_auth header if request not for /oauth2/trusted-agent/token', async () => {
         process.env.PWA_KIT_SLAS_CLIENT_SECRET = 'a secret'
 
-        const encodedCredentials = Buffer.from('clientId:a secret').toString('base64')
-
-        const app = RemoteServerFactory._createApp(
-            opts({
-                mobify: {
-                    app: {
-                        commerceAPI: {
-                            parameters: {
-                                clientId: 'clientId',
-                                shortCode: 'shortCode'
-                            }
-                        }
-                    }
-                },
-                useSLASPrivateClient: true,
-                slasTarget: slasTarget
-            })
-        )
+        const app = RemoteServerFactory._createApp(opts(appConfig))
 
         return await request(app)
             .get('/mobify/slas/private/shopper/auth/v1/oauth2/other-path')
@@ -1242,25 +1233,46 @@ describe('SLAS private client proxy', () => {
     test('returns 403 if request is not for /shopper/auth endpoints', async () => {
         process.env.PWA_KIT_SLAS_CLIENT_SECRET = 'a secret'
 
-        const app = RemoteServerFactory._createApp(
-            opts({
-                mobify: {
-                    app: {
-                        commerceAPI: {
-                            parameters: {
-                                clientId: 'clientId',
-                                shortCode: 'shortCode'
-                            }
-                        }
-                    }
-                },
-                useSLASPrivateClient: true,
-                slasTarget: slasTarget
-            })
-        )
+        const app = RemoteServerFactory._createApp(opts(appConfig))
 
         return await request(app)
             .get('/mobify/slas/private/shopper/auth-admin/v1/other-path')
             .expect(403)
+    }, 15000)
+
+    test('returns 403 if request is for /oauth2/trusted-system/* endpoint', async () => {
+        process.env.PWA_KIT_SLAS_CLIENT_SECRET = 'a secret'
+
+        const app = RemoteServerFactory._createApp(opts(appConfig))
+
+        return await request(app)
+            .get('/mobify/slas/private/shopper/auth/v1/oauth2/trusted-system/token')
+            .expect(403)
+    }, 15000)
+
+    test('throws an error if /oauth2/trusted-system/* is included in applySLASPrivateClientToEndpoints', async () => {
+        process.env.PWA_KIT_SLAS_CLIENT_SECRET = 'a secret'
+
+        expect(() => {
+            RemoteServerFactory._createApp(
+                opts({
+                    mobify: {
+                        app: {
+                            commerceAPI: {
+                                parameters: {
+                                    clientId: 'clientId',
+                                    shortCode: 'shortCode'
+                                }
+                            }
+                        }
+                    },
+                    useSLASPrivateClient: true,
+                    slasTarget: slasTarget,
+                    applySLASPrivateClientToEndpoints: /\/oauth2\/trusted-system/
+                })
+            )
+        }).toThrow(
+            'It is not allowed to include /oauth2/trusted-system endpoints in `applySLASPrivateClientToEndpoints`'
+        )
     }, 15000)
 })

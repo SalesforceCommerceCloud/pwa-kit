@@ -4,7 +4,20 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import {EmptyJsonSchema, getCreateAppCommand, isMonoRepo} from './utils'
+import {
+    EmptyJsonSchema,
+    getCreateAppCommand,
+    isMonoRepo,
+    isBaseComponent,
+    isSharedUIBaseComponent,
+    isLocalComponent,
+    isLocalSharedUIComponent,
+    generateComponentImportStatement,
+    runCommand,
+    toKebabCase,
+    toPascalCase,
+    getCopyrightHeader
+} from './utils'
 import fs from 'fs'
 import path from 'path'
 
@@ -82,6 +95,192 @@ describe('Utils', () => {
             jest.spyOn(fs, 'existsSync').mockReturnValueOnce(false)
             const result = getCreateAppCommand()
             expect(result).toBe(`@salesforce/pwa-kit-create-app@${CREATE_APP_VERSION}`)
+        })
+    })
+
+    describe('isBaseComponent', () => {
+        const componentName = 'TestComponent'
+        const mockNodeModulesPath = '/mock/node_modules'
+        const baseComponentPath = path.join(
+            mockNodeModulesPath,
+            '@salesforce/retail-react-app/app/components',
+            componentName
+        )
+
+        beforeEach(() => {
+            jest.clearAllMocks()
+        })
+
+        afterEach(() => {
+            jest.restoreAllMocks()
+        })
+
+        test('returns true if base component exists', () => {
+            jest.spyOn(fs, 'existsSync').mockImplementation(
+                (inputPath) => inputPath === baseComponentPath
+            )
+            expect(isBaseComponent(componentName, mockNodeModulesPath)).toBe(true)
+        })
+
+        test('returns false if base component does not exist', () => {
+            jest.spyOn(fs, 'existsSync').mockReturnValueOnce(false)
+            expect(isBaseComponent(componentName, mockNodeModulesPath)).toBe(false)
+        })
+    })
+
+    describe('isSharedUIBaseComponent', () => {
+        const componentName = 'SharedComponent'
+        const mockNodeModulesPath = '/mock/node_modules'
+        const sharedUIComponentPath = path.join(
+            mockNodeModulesPath,
+            '@salesforce/retail-react-app/app/components/shared/ui',
+            componentName
+        )
+
+        beforeEach(() => {
+            jest.clearAllMocks()
+        })
+
+        afterEach(() => {
+            jest.restoreAllMocks()
+        })
+
+        test('returns true if shared UI base component exists', () => {
+            jest.spyOn(fs, 'existsSync').mockImplementation(
+                (inputPath) => inputPath === sharedUIComponentPath
+            )
+            expect(isSharedUIBaseComponent(componentName, mockNodeModulesPath)).toBe(true)
+        })
+
+        test('returns false if shared UI base component does not exist', () => {
+            jest.spyOn(fs, 'existsSync').mockReturnValueOnce(false)
+            expect(isSharedUIBaseComponent(componentName, mockNodeModulesPath)).toBe(false)
+        })
+    })
+
+    describe('isLocalComponent', () => {
+        const componentName = 'local-component'
+        const mockComponentsPath = '/mock/app/components'
+        const localComponentPath = path.join(mockComponentsPath, componentName)
+
+        beforeEach(() => {
+            jest.clearAllMocks()
+        })
+
+        afterEach(() => {
+            jest.restoreAllMocks()
+        })
+
+        test('returns true if local component exists', () => {
+            jest.spyOn(fs, 'existsSync').mockImplementation(
+                (inputPath) => inputPath === localComponentPath
+            )
+            expect(isLocalComponent(componentName, mockComponentsPath)).toBe(true)
+        })
+
+        test('returns false if local component does not exist', () => {
+            jest.spyOn(fs, 'existsSync').mockReturnValueOnce(false)
+            expect(isLocalComponent(componentName, mockComponentsPath)).toBe(false)
+        })
+    })
+
+    describe('isLocalSharedUIComponent', () => {
+        const componentName = 'shared-component'
+        const mockComponentsPath = '/mock/app/components'
+        const localSharedUIComponentPath = path.join(
+            mockComponentsPath,
+            'shared',
+            'ui',
+            componentName
+        )
+
+        beforeEach(() => {
+            jest.clearAllMocks()
+        })
+
+        afterEach(() => {
+            jest.restoreAllMocks()
+        })
+
+        test('returns true if local shared UI component exists', () => {
+            jest.spyOn(fs, 'existsSync').mockImplementation(
+                (inputPath) => inputPath === localSharedUIComponentPath
+            )
+            expect(isLocalSharedUIComponent(componentName, mockComponentsPath)).toBe(true)
+        })
+
+        test('returns false if local shared UI component does not exist', () => {
+            jest.spyOn(fs, 'existsSync').mockReturnValueOnce(false)
+            expect(isLocalSharedUIComponent(componentName, mockComponentsPath)).toBe(false)
+        })
+    })
+
+    describe('generateComponentImportStatement', () => {
+        const componentName = 'MyComponent'
+        const componentDir = 'my-component'
+        const absolutePaths = {
+            componentsPath: '/mock/app/components',
+            pagesPath: '/mock/app/pages'
+        }
+
+        beforeEach(() => {
+            jest.clearAllMocks()
+        })
+
+        afterEach(() => {
+            jest.restoreAllMocks()
+        })
+
+        it('returns base import statement when isBase is true and hasOverridesDir is false', () => {
+            const result = generateComponentImportStatement(
+                componentName,
+                componentDir,
+                false, // isLocal
+                true, // isBase
+                absolutePaths,
+                false // hasOverridesDir
+            )
+            expect(result).toBe(
+                "import MyComponent from '@salesforce/retail-react-app/app/components/my-component'"
+            )
+        })
+
+        it('returns base import statement when isLocal is true and hasOverridesDir is false', () => {
+            const result = generateComponentImportStatement(
+                componentName,
+                componentDir,
+                true, // isLocal
+                false, // isBase
+                absolutePaths,
+                false // hasOverridesDir
+            )
+            expect(result).toBe(
+                "import MyComponent from '@salesforce/retail-react-app/app/components/my-component'"
+            )
+        })
+
+        it('returns relative import statement when isLocal is true and hasOverridesDir is true', () => {
+            const result = generateComponentImportStatement(
+                componentName,
+                componentDir,
+                true, // isLocal
+                false, // isBase
+                absolutePaths,
+                true // hasOverridesDir
+            )
+            expect(result).toBe("import MyComponent from '../../components/my-component'")
+        })
+
+        it('returns relative import statement when both isLocal and isBase are false', () => {
+            const result = generateComponentImportStatement(
+                componentName,
+                componentDir,
+                false, // isLocal
+                false, // isBase
+                absolutePaths,
+                true // hasOverridesDir
+            )
+            expect(result).toBe("import MyComponent from '../../components/my-component'")
         })
     })
 })
