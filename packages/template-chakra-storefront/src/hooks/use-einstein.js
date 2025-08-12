@@ -391,7 +391,7 @@ export class EinsteinAPI {
     }
 }
 
-const useEinstein = () => {
+export const useEinstein = () => {
     const api = useCommerceApi()
     const {effectiveDnt} = useDNT()
     const {getTokenWhenReady} = useAccessToken()
@@ -575,5 +575,3 @@ const useEinstein = () => {
         }
     }
 }
-
-export default useEinstein
