@@ -22,8 +22,17 @@ import LoadingSpinner from '@salesforce/retail-react-app/app/components/loading-
 import {STORE_LOCATOR_IS_ENABLED} from '@salesforce/retail-react-app/app/constants'
 
 // Component to handle shipping options for a single shipment (without product cards)
-const ShippingOptionsList = ({shipment, basketId, currency, control}) => {
+const ShippingOptionsList = ({shipment, basketId, currency, control, shippingItem}) => {
     const {formatMessage} = useIntl()
+
+    // get promotional shipping cost from shippingItem
+    const getPromotionalShippingCost = (shippingMethodId) => {
+        if (!shippingItem) return null
+        return shippingItem.priceAfterItemDiscount !== undefined
+            ? shippingItem.priceAfterItemDiscount
+            : shippingItem.price
+    }
+
     const {data: shippingMethods, isLoading: isShippingMethodsLoading} =
         useShippingMethodsForShipment(
             {
@@ -102,20 +111,33 @@ const ShippingOptionsList = ({shipment, basketId, currency, control}) => {
                                                                 fontSize="sm"
                                                                 ml={2}
                                                             >
-                                                                {opt.price === 0 ? (
-                                                                    <Text color="green.600">
-                                                                        {formatMessage({
-                                                                            defaultMessage: 'Free',
-                                                                            id: 'shipping_options.free'
-                                                                        })}
-                                                                    </Text>
-                                                                ) : (
-                                                                    <FormattedNumber
-                                                                        value={opt.price}
-                                                                        style="currency"
-                                                                        currency={currency}
-                                                                    />
-                                                                )}
+                                                                {(() => {
+                                                                    const promotionalCost =
+                                                                        getPromotionalShippingCost(
+                                                                            opt.id
+                                                                        )
+                                                                    const displayCost =
+                                                                        promotionalCost !== null
+                                                                            ? promotionalCost
+                                                                            : opt.price
+                                                                    const isFree = displayCost === 0
+
+                                                                    return isFree ? (
+                                                                        <Text color="green.600">
+                                                                            {formatMessage({
+                                                                                defaultMessage:
+                                                                                    'Free',
+                                                                                id: 'shipping_options.free'
+                                                                            })}
+                                                                        </Text>
+                                                                    ) : (
+                                                                        <FormattedNumber
+                                                                            value={displayCost}
+                                                                            style="currency"
+                                                                            currency={currency}
+                                                                        />
+                                                                    )
+                                                                })()}
                                                             </Box>
                                                         </Flex>
                                                         {opt.shippingPromotions &&
@@ -172,7 +194,8 @@ ShippingOptionsList.propTypes = {
     }).isRequired,
     basketId: PropTypes.string.isRequired,
     currency: PropTypes.string.isRequired,
-    control: PropTypes.object.isRequired
+    control: PropTypes.object.isRequired,
+    shippingItem: PropTypes.object
 }
 
 export default ShippingOptionsList
