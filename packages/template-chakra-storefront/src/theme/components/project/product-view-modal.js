@@ -5,22 +5,6 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-/**
- * Theme configuration for ProductViewModal and BonusProductViewModal
- * Centralizes modal positioning, sizing, spacing, and color values for product view modals
- *
- * This theme object provides a single source of truth for:
- * - Modal size breakpoints and placement optimized for product viewing
- * - Layout spacing (padding, margins) for product content
- * - Color scheme for backgrounds
- * - Content constraints to prevent excessive height
- *
- * Usage: Import and reference theme properties instead of hardcoded values
- * Example: size={productViewModalTheme.modal.size}
- *
- * To customize: Modify values in this theme object rather than individual components
- * Example: Change modal.size to {base: 'full', lg: 'md', xl: 'lg'} for smaller modals
- */
 export const productViewModalTheme = {
     // Modal configuration
     modal: {
