@@ -204,6 +204,14 @@ export default function ShippingOptions() {
         goToNextStep()
     }
 
+    // get promotional shipping cost from shippingItem
+    const getPromotionalShippingCost = (shippingItem) => {
+        if (!shippingItem) return null
+        return shippingItem.priceAfterItemDiscount !== undefined
+            ? shippingItem.priceAfterItemDiscount
+            : shippingItem.price
+    }
+
     const freeLabel = formatMessage({
         defaultMessage: 'Free',
         id: 'checkout_confirmation.label.free'
@@ -321,11 +329,7 @@ export default function ShippingOptions() {
                                                         deliveryShipments[0].shipmentId
                                                 )
                                                 const itemCost =
-                                                    shippingItem &&
-                                                    shippingItem.priceAfterItemDiscount !==
-                                                        undefined
-                                                        ? shippingItem.priceAfterItemDiscount
-                                                        : (shippingItem && shippingItem.price) || 0
+                                                    getPromotionalShippingCost(shippingItem) || 0
 
                                                 return itemCost === 0 ? (
                                                     freeLabel
@@ -355,11 +359,7 @@ export default function ShippingOptions() {
                                     basket.shippingItems.find(
                                         (item) => item.shipmentId === shipment.shipmentId
                                     )
-                                const itemCost =
-                                    shippingItem &&
-                                    shippingItem.priceAfterItemDiscount !== undefined
-                                        ? shippingItem.priceAfterItemDiscount
-                                        : (shippingItem && shippingItem.price) || 0
+                                const itemCost = getPromotionalShippingCost(shippingItem) || 0
 
                                 return (
                                     <Box key={shipment.shipmentId}>
