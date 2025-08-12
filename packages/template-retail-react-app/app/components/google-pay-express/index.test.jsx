@@ -84,7 +84,11 @@ afterAll(() => {
 // Shared test data
 const mockData = {
     props: {
-        shippingMethods: []
+        shippingMethods: [],
+        manager: {
+            setPaymentMethodAvailable: jest.fn(),
+            setPaymentMethodUnavailable: jest.fn()
+        }
     },
     environment: {
         ADYEN_ENVIRONMENT: 'test',
@@ -184,12 +188,8 @@ describe('GooglePayExpress', () => {
         AdyenCheckout.mockRejectedValue(new Error('Google Pay not available'))
         render(<GooglePayExpress {...mockData.props} />)
         await waitFor(() => {
-            expect(mockPostMessage).toHaveBeenCalledWith(
-                expect.objectContaining({
-                    type: 'express.payment.unavailable',
-                    payload: {PAYMENT_METHOD: 'googlepay'}
-                }),
-                '*'
+            expect(mockData.props.manager.setPaymentMethodUnavailable).toHaveBeenCalledWith(
+                'googlepay'
             )
         })
     })
@@ -279,7 +279,7 @@ describe('getGoogleButtonConfig', () => {
             mockData.googlePayConfig
         )
         expect(config.showPayButton).toBe(true)
-        expect(config.buttonType).toBe('buy')
+        expect(config.buttonType).toBe('plain')
         expect(config.isExpress).toBe(true)
         expect(config.configuration).toBe(mockData.googlePayConfig)
         expect(config.amount.currency).toBe('USD')
@@ -743,9 +743,8 @@ describe('GooglePayExpress error and edge cases', () => {
             setup()
             render(<GooglePayExpress {...mockData.props} />)
             await waitFor(() => {
-                expect(mockPostMessage).toHaveBeenCalledWith(
-                    expect.objectContaining({type: 'express.payment.unavailable'}),
-                    '*'
+                expect(mockData.props.manager.setPaymentMethodUnavailable).toHaveBeenCalledWith(
+                    'googlepay'
                 )
             })
         })
@@ -775,10 +774,7 @@ describe('GooglePayExpress error and edge cases', () => {
         })
         render(<GooglePayExpress {...mockData.props} />)
         await waitFor(() => {
-            expect(mockPostMessage).not.toHaveBeenCalledWith(
-                expect.objectContaining({type: 'express.payment.unavailable'}),
-                '*'
-            )
+            expect(mockData.props.manager.setPaymentMethodUnavailable).not.toHaveBeenCalled()
         })
     })
 
@@ -791,10 +787,7 @@ describe('GooglePayExpress error and edge cases', () => {
         })
         render(<GooglePayExpress {...mockData.props} />)
         await waitFor(() => {
-            expect(mockPostMessage).not.toHaveBeenCalledWith(
-                expect.objectContaining({type: 'express.payment.unavailable'}),
-                '*'
-            )
+            expect(mockData.props.manager.setPaymentMethodUnavailable).not.toHaveBeenCalled()
         })
     })
 })
