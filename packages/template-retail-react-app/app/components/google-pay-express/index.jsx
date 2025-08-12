@@ -78,6 +78,7 @@ export const updateShippingAddress = async (authToken, site, basket, shippingAdd
             basket.basketId,
             getCustomerShippingDetails(shippingAddress)
         )
+        console.log('😱😱😱 updateShippingAddress response', response)
         if (response.error) {
             return {
                 error: {
@@ -93,6 +94,7 @@ export const updateShippingAddress = async (authToken, site, basket, shippingAdd
             basket.basketId
         )
         let shippingOptionId = shippingMethodResponse.defaultShippingMethodId
+        console.log('😱😱😱 shippingMethodResponse: ', shippingMethodResponse)
 
         // If the default shipping method is not applicable for this address, update to the first applicable
         if (
@@ -134,6 +136,7 @@ export const updateShippingOption = async (
             shippingOptionId,
             basket.basketId
         )
+        console.log('😱😱😱 updateShippingOption response', response)
         if (response.error) {
             return {
                 error: {
@@ -160,7 +163,10 @@ export const updateShippingOption = async (
                 ...getGPShippingOptionParameters(shippingMethodResponse)
             }
         }
-        return paymentDataRequestUpdate
+        return {
+            paymentDataRequestUpdate: paymentDataRequestUpdate,
+            newBasket: response
+        }
     } catch (error) {
         return {
             error: {
@@ -190,7 +196,7 @@ export const getGoogleButtonConfig = (
         shippingAddressRequired: true,
         // shippingAddressParameters: {"allowedCountryCodes": ["US"]}, // If you want to restrict country codes, you can do that here
         shippingOptionRequired: true,
-        shippingOptionParameters: getGPShippingOptionParameters(shippingMethods),
+        // shippingOptionParameters: getGPShippingOptionParameters(shippingMethods),
         billingAddressRequired: true,
         billingAddressParameters: {format: 'FULL'},
         emailRequired: true,
@@ -203,6 +209,7 @@ export const getGoogleButtonConfig = (
         requiredBillingContactFields: ['postalAddress'],
 
         onAuthorized: async (data) => {
+            console.log('⌛⌛⌛ onAuthorized', data)
             try {
                 const state = {
                     data: {
@@ -217,6 +224,18 @@ export const getGoogleButtonConfig = (
                         )
                     }
                 }
+                console.log('📝📝📝 state', state)
+                console.log('🧺🧺🧺 basket before submitPayment', basket)
+
+                // IF I use the shippingOption response to update basket, I do not need to forceOrderCalculation
+                // console.log('🧺🧺🧺 basket before forceOrderCalculation', basket)
+                // basket = await forceOrderCalculation(
+                //     basket.basketId,
+                //     authToken,
+                //     site
+                // )
+                // console.log('🧺🧺🧺 basket after forceOrderCalculation', basket)
+
                 const adyenPaymentService = new AdyenPaymentsService(authToken, site)
                 const paymentsResponse = await adyenPaymentService.submitPayment(
                     {
@@ -257,22 +276,32 @@ export const getGoogleButtonConfig = (
                             callbackTrigger === 'INITIALIZE' ||
                             callbackTrigger === 'SHIPPING_ADDRESS'
                         ) {
-                            paymentDataRequestUpdate = await updateShippingAddress(
+                            console.log('🔄🔄🔄 updateShippingAddress', shippingAddress)
+                            const updateShippingAddressResponse = await updateShippingAddress(
                                 authToken,
                                 site,
                                 basket,
                                 shippingAddress
                             )
+                            console.log('📝📝📝 updateShippingAddressResponse', updateShippingAddressResponse)
+                            paymentDataRequestUpdate = updateShippingAddressResponse.paymentDataRequestUpdate
+                            basket = updateShippingAddressResponse.newBasket
+                            console.log('🧺‼️‼️ basket after updateShippingAddress', basket)
                         }
                         if (callbackTrigger === 'SHIPPING_OPTION') {
-                            paymentDataRequestUpdate = await updateShippingOption(
+                            console.log('🔄🔄🔄 updateShippingOption', shippingOptionData)
+                            const updateShippingOptionResponse = await updateShippingOption(
                                 authToken,
                                 site,
                                 basket,
                                 shippingOptionData?.id
                             )
+                            console.log('📝📝📝 updateShippingOptionResponse', updateShippingOptionResponse)
+                            paymentDataRequestUpdate = updateShippingOptionResponse.paymentDataRequestUpdate
+                            basket = updateShippingOptionResponse.newBasket
+                            console.log('🧺‼️‼️ basket after updateShippingOption', basket)
                         }
-
+                        console.log('🧗🧗🧗 paymentDataRequestUpdate', paymentDataRequestUpdate)
                         resolve(paymentDataRequestUpdate)
                     }
 
@@ -307,6 +336,17 @@ export const GooglePayExpress = ({manager}) => {
         shippingMethods,
         fetchShippingMethods
     } = useAdyenExpressCheckout()
+
+    console.log('🫥🫥🫥🫥🫥🫥🫥🫥🫥🫥🫥🫥🫥🫥🫥🫥🫥🫥🫥')
+    console.log('🔣🔣🔣 adyenEnvironment', adyenEnvironment)
+    console.log('🔣🔣🔣 adyenPaymentMethods', adyenPaymentMethods)
+    console.log('🔣🔣🔣 basket', basket)
+    console.log('🔣🔣🔣 shippingMethods', shippingMethods)
+    console.log('🔣🔣🔣 fetchShippingMethods', fetchShippingMethods)
+    console.log('🔣🔣🔣 locale', locale)
+    console.log('🔣🔣🔣 site', site)
+    console.log('🔣🔣🔣 authToken', authToken)
+    console.log('🫥🫥🫥🫥🫥🫥🫥🫥🫥🫥🫥🫥🫥🫥🫥🫥🫥🫥🫥')
 
     const paymentContainer = useRef(null)
 
@@ -350,6 +390,7 @@ export const GooglePayExpress = ({manager}) => {
                         : shippingMethods,
                     googlePaymentMethodConfig
                 )
+                console.log('🔲🔲🔲 googleButtonConfig', googleButtonConfig)
 
                 let googlePayButton
                 try {
