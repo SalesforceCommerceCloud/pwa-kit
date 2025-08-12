@@ -182,7 +182,6 @@ export const getGoogleButtonConfig = (
     authToken,
     site,
     basket,
-    shippingMethods,
     googlePayConfig
 ) => {
     // Use productTotal if orderTotal is null, otherwise use orderTotal
@@ -196,7 +195,6 @@ export const getGoogleButtonConfig = (
         shippingAddressRequired: true,
         // shippingAddressParameters: {"allowedCountryCodes": ["US"]}, // If you want to restrict country codes, you can do that here
         shippingOptionRequired: true,
-        // shippingOptionParameters: getGPShippingOptionParameters(shippingMethods),
         billingAddressRequired: true,
         billingAddressParameters: {format: 'FULL'},
         emailRequired: true,
@@ -226,15 +224,6 @@ export const getGoogleButtonConfig = (
                 }
                 console.log('📝📝📝 state', state)
                 console.log('🧺🧺🧺 basket before submitPayment', basket)
-
-                // IF I use the shippingOption response to update basket, I do not need to forceOrderCalculation
-                // console.log('🧺🧺🧺 basket before forceOrderCalculation', basket)
-                // basket = await forceOrderCalculation(
-                //     basket.basketId,
-                //     authToken,
-                //     site
-                // )
-                // console.log('🧺🧺🧺 basket after forceOrderCalculation', basket)
 
                 const adyenPaymentService = new AdyenPaymentsService(authToken, site)
                 const paymentsResponse = await adyenPaymentService.submitPayment(
@@ -285,6 +274,7 @@ export const getGoogleButtonConfig = (
                             )
                             console.log('📝📝📝 updateShippingAddressResponse', updateShippingAddressResponse)
                             paymentDataRequestUpdate = updateShippingAddressResponse.paymentDataRequestUpdate
+                            // Update our basket with the latest data
                             basket = updateShippingAddressResponse.newBasket
                             console.log('🧺‼️‼️ basket after updateShippingAddress', basket)
                         }
@@ -298,6 +288,7 @@ export const getGoogleButtonConfig = (
                             )
                             console.log('📝📝📝 updateShippingOptionResponse', updateShippingOptionResponse)
                             paymentDataRequestUpdate = updateShippingOptionResponse.paymentDataRequestUpdate
+                            // Update our basket with the latest data
                             basket = updateShippingOptionResponse.newBasket
                             console.log('🧺‼️‼️ basket after updateShippingOption', basket)
                         }
@@ -385,9 +376,6 @@ export const GooglePayExpress = ({manager}) => {
                     authToken,
                     site,
                     basket,
-                    !shippingMethods && basket?.basketId
-                        ? await fetchShippingMethods(basket?.basketId, site, authToken)
-                        : shippingMethods,
                     googlePaymentMethodConfig
                 )
                 console.log('🔲🔲🔲 googleButtonConfig', googleButtonConfig)
@@ -457,6 +445,5 @@ export const GooglePayExpress = ({manager}) => {
 }
 
 GooglePayExpress.propTypes = {
-    shippingMethods: PropTypes.array,
     manager: PropTypes.object
 }
