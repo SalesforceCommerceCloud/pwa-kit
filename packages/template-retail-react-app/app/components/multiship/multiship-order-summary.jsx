@@ -51,7 +51,7 @@ const MultiShipOrderSummary = ({order, productItemsMap, currency}) => {
                     <FormattedMessage id={titleId} />
                 </Text>
                 <Stack spacing={4}>
-                    {shipments.map((shipment, shipmentIndex) => {
+                    {shipments.map((shipment) => {
                         const items = getItemsForShipment(shipment.shipmentId)
 
                         return (
