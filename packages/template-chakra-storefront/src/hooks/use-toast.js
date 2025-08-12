@@ -24,7 +24,7 @@ import {toaster} from '../components/toaster'
  *
  * @returns {Function} - A function for creating toasts.
  */
-export default function useToast() {
+export const useToast = () => {
     const createToast = useCallback((options) => {
         return toaster.create(options)
     }, [])

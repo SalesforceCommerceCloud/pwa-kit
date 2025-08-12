@@ -412,7 +412,7 @@ export class DataCloudApi {
  *
  * @returns {object} An object containing methods for sending different Data Cloud events
  */
-const useDataCloud = () => {
+export const useDataCloud = () => {
     const {getUsidWhenReady} = useUsid()
     const {isRegistered} = useCustomerType()
     const {data: customer} = useCurrentCustomer()
@@ -475,5 +475,3 @@ const useDataCloud = () => {
         }
     }
 }
-
-export default useDataCloud

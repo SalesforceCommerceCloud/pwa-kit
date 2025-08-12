@@ -9,7 +9,7 @@ import {proxyBasePath} from '@salesforce/pwa-kit-runtime/utils/ssr-namespace-pat
 import logger from '../utils/logger-instance'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 
-const useActiveData = () => {
+export const useActiveData = () => {
     // Returns true when the feature flag is enabled and the tracking scripts have been executed
     // This MUST be called before using the `dw` variable, otherwise a ReferenceError will be thrown
     const {activeDataEnabled = false} = getConfig()
@@ -111,5 +111,3 @@ const useActiveData = () => {
         }
     }
 }
-
-export default useActiveData
