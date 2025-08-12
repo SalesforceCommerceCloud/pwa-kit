@@ -730,7 +730,6 @@ describe('Delivery Options Restrictions', () => {
         }))
 
         // Track if updatePickupShipment was called
-        let updatePickupShipmentCalled = false
         let shipmentUpdateRequest = null
 
         // Mock the product to be a simple master product with inventory
@@ -756,7 +755,6 @@ describe('Delivery Options Restrictions', () => {
             }),
             // Mock the shipment update call that updatePickupShipment makes
             rest.patch('*/baskets/:basketId/shipments/:shipmentId', async (req, res, ctx) => {
-                updatePickupShipmentCalled = true
                 shipmentUpdateRequest = await req.json()
 
                 // Verify the correct parameters are passed to updatePickupShipment

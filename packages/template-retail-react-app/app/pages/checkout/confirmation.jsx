@@ -26,7 +26,6 @@ import {nanoid} from 'nanoid'
 import {
     useOrder,
     useProducts,
-    useStores,
     useAuthHelper,
     AuthHelpers,
     useShopperCustomersMutation
@@ -36,7 +35,6 @@ import {getCreditCardIcon} from '@salesforce/retail-react-app/app/utils/cc-utils
 // Components
 import Link from '@salesforce/retail-react-app/app/components/link'
 import AddressDisplay from '@salesforce/retail-react-app/app/components/address-display'
-import StoreDisplay from '@salesforce/retail-react-app/app/components/store-display'
 import PostCheckoutRegistrationFields from '@salesforce/retail-react-app/app/components/forms/post-checkout-registration-fields'
 import PromoPopover from '@salesforce/retail-react-app/app/components/promo-popover'
 import ItemVariantProvider from '@salesforce/retail-react-app/app/components/item-variant'
@@ -53,10 +51,7 @@ import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-cur
 import {useCurrency} from '@salesforce/retail-react-app/app/hooks'
 
 // Constants
-import {
-    API_ERROR_MESSAGE,
-    STORE_LOCATOR_IS_ENABLED
-} from '@salesforce/retail-react-app/app/constants'
+import {API_ERROR_MESSAGE} from '@salesforce/retail-react-app/app/constants'
 
 const onClient = typeof window !== 'undefined'
 
@@ -101,7 +96,8 @@ const CheckoutConfirmation = () => {
         const saveShippingAddress = async (customerId) => {
             try {
                 const shippingAddress = order.shipments[0].shippingAddress
-                let {id, ...shippingAddressWithoutId} = shippingAddress
+                // eslint-disable-next-line @typescript-eslint/no-unused-vars
+                const {id, ...shippingAddressWithoutId} = shippingAddress
                 const bodyShippingAddress = {
                     addressId: nanoid(),
                     ...shippingAddressWithoutId
