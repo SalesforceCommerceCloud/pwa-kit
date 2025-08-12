@@ -283,21 +283,7 @@ const {handler} = runtime.createHandler(options, (app) => {
     app.use(defaultPwaKitSecurityHeaders)
     // Set custom HTTP security headers
     {{#if answers.project.contentSecurityPolicy}}
-    const contentSecurityPolicy = {
-        useDefaults: {{answers.project.contentSecurityPolicy.useDefaults}},
-        directives: {
-            {{#each answers.project.contentSecurityPolicy.directives}}
-            '{{@key}}': [
-                {{#each this}}
-                '{{this}}'{{#unless @last}},{{/unless}}
-                {{/each}}
-            ]{{#unless @last}},{{/unless}}
-            {{/each}}
-        }{{#if answers.project.contentSecurityPolicy.referrerPolicy}},
-        referrerPolicy: {
-            policy: '{{answers.project.contentSecurityPolicy.referrerPolicy.policy}}'
-        }{{/if}}
-    }
+    const contentSecurityPolicy = {{{json answers.project.contentSecurityPolicy}}}
     {{else}}
     const contentSecurityPolicy = {
         useDefaults: true,
