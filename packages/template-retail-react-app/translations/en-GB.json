@@ -1069,6 +1069,9 @@
   "order_summary.heading.order_summary": {
     "defaultMessage": "Order Summary"
   },
+  "order_summary.label.delivery_items": {
+    "defaultMessage": "Delivery Items"
+  },
   "order_summary.label.estimated_total": {
     "defaultMessage": "Estimated Total"
   },
@@ -1077,9 +1080,6 @@
   },
   "order_summary.label.order_total": {
     "defaultMessage": "Order Total"
-  },
-  "order_summary.label.delivery_items": {
-    "defaultMessage": "Delivery Items"
   },
   "order_summary.label.pickup_items": {
     "defaultMessage": "Pickup Items"

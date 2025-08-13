@@ -42,13 +42,13 @@ const MultiShipOrderSummary = ({order, productItemsMap, currency}) => {
         return order.productItems.filter((item) => item.shipmentId === shipmentId)
     }
 
-    const renderItemGroup = (shipments, titleId) => {
+    const renderItemGroup = (shipments, titleMessage, titleId) => {
         if (shipments.length === 0) return null
 
         return (
             <Box key={titleId}>
                 <Text fontSize="sm" fontWeight="semibold" mb={3}>
-                    <FormattedMessage id={titleId} />
+                    {titleMessage}
                 </Text>
                 <Stack spacing={4}>
                     {shipments.map((shipment) => {
@@ -109,8 +109,22 @@ const MultiShipOrderSummary = ({order, productItemsMap, currency}) => {
 
     return (
         <Stack spacing={6} width="full">
-            {renderItemGroup(pickupShipments, 'order_summary.label.pickup_items')}
-            {renderItemGroup(deliveryShipments, 'order_summary.label.delivery_items')}
+            {renderItemGroup(
+                pickupShipments,
+                <FormattedMessage
+                    id="order_summary.label.pickup_items"
+                    defaultMessage="Pickup Items"
+                />,
+                'Pickup Items'
+            )}
+            {renderItemGroup(
+                deliveryShipments,
+                <FormattedMessage
+                    id="order_summary.label.delivery_items"
+                    defaultMessage="Delivery Items"
+                />,
+                'Delivery Items'
+            )}
         </Stack>
     )
 }
