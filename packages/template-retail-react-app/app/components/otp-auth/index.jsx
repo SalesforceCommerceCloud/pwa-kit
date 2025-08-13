@@ -138,10 +138,13 @@ const OtpAuth = ({isOpen, onClose, form, handleSendEmailOtp, handleOtpVerificati
 
     const handleResendCode = async () => {
         try {
+            // Start countdown immediately to disable the button while request is in-flight
+            setResendTimer(5)
             const email = form.getValues('email')
             await handleSendEmailOtp(email)
-            setResendTimer(60) // Start 60 second countdown
         } catch (error) {
+            // Reset timer so user can try again
+            setResendTimer(0)
             console.error('Error resending code:', error)
         }
     }
@@ -149,6 +152,8 @@ const OtpAuth = ({isOpen, onClose, form, handleSendEmailOtp, handleOtpVerificati
     const handleCheckoutAsGuest = () => {
         onClose()
     }
+
+    const isResendDisabled = resendTimer > 0 || isVerifying
 
     return (
         <Modal isOpen={isOpen} onClose={onClose} isCentered size="lg" closeOnOverlayClick={false}>
@@ -232,11 +237,11 @@ const OtpAuth = ({isOpen, onClose, form, handleSendEmailOtp, handleOtpVerificati
                                 colorScheme="gray"
                                 size="lg"
                                 minWidth="160px"
-                                disabled={isVerifying}
+                                isDisabled={isVerifying}
                                 borderColor="gray.300"
                                 color="gray.600"
                                 _hover={{
-                                    backgroundColor: 'gray.50',
+                                    bg: 'gray.50',
                                     borderColor: 'gray.400'
                                 }}
                             >
@@ -250,17 +255,12 @@ const OtpAuth = ({isOpen, onClose, form, handleSendEmailOtp, handleOtpVerificati
                                 onClick={handleResendCode}
                                 variant="solid"
                                 size="lg"
-                                colorScheme="blue"
-                                backgroundColor="blue.500"
+                                colorScheme={isResendDisabled ? 'gray' : 'blue'}
+                                bg={isResendDisabled ? 'gray.300' : 'blue.500'}
                                 minWidth="160px"
-                                disabled={resendTimer > 0 || isVerifying}
-                                _hover={{
-                                    backgroundColor: 'blue.600'
-                                }}
-                                _disabled={{
-                                    backgroundColor: 'gray.300',
-                                    color: 'gray.500'
-                                }}
+                                isDisabled={isResendDisabled}
+                                _hover={isResendDisabled ? {} : {bg: 'blue.600'}}
+                                _disabled={{bg: 'gray.300', color: 'gray.600'}}
                             >
                                 {resendTimer > 0 ? (
                                     <FormattedMessage

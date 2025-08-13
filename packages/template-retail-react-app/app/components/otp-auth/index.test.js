@@ -324,7 +324,7 @@ describe('OtpAuth', () => {
             expect(mockOnClose).toHaveBeenCalled()
         })
 
-        test.skip('clicking "Resend code" calls handleSendEmailOtp', async () => {
+        test('clicking "Resend code" calls handleSendEmailOtp', async () => {
             const user = userEvent.setup()
             renderWithProviders(
                 <OtpAuth
@@ -342,7 +342,7 @@ describe('OtpAuth', () => {
             expect(mockHandleSendEmailOtp).toHaveBeenCalledWith('test@example.com')
         })
 
-        test.skip('resend button is disabled during countdown', async () => {
+        test('resend button is disabled during countdown', async () => {
             const user = userEvent.setup()
             renderWithProviders(
                 <OtpAuth
@@ -354,14 +354,16 @@ describe('OtpAuth', () => {
                 />
             )
 
-            const resendButton = screen.getByText('Resend code')
-            await user.click(resendButton)
+            // Click the resend button
+            await user.click(screen.getByText('Resend code'))
 
-            // Button should be disabled after clicking
-            expect(resendButton).toBeDisabled()
+            // Wait for the timer text to appear and assert the parent button is disabled
+            const timerText = await screen.findByText(/Resend code in/i)
+            const disabledResendButton = timerText.closest('button')
+            expect(disabledResendButton).toBeDisabled()
         })
 
-        test.skip('resend button becomes enabled after countdown', async () => {
+        test('resend button becomes enabled after countdown', async () => {
             const user = userEvent.setup()
             renderWithProviders(
                 <OtpAuth
@@ -384,7 +386,7 @@ describe('OtpAuth', () => {
     })
 
     describe('Error Handling', () => {
-        test.skip('handles resend code error gracefully', async () => {
+        test('handles resend code error gracefully', async () => {
             const mockHandleSendEmailOtpError = jest
                 .fn()
                 .mockRejectedValue(new Error('Network error'))
@@ -392,13 +394,16 @@ describe('OtpAuth', () => {
 
             renderWithProviders(
                 <OtpAuth
+                    isOpen={true}
+                    onClose={mockOnClose}
                     form={mockForm}
                     handleOtpVerification={mockHandleOtpVerification}
                     handleSendEmailOtp={mockHandleSendEmailOtpError}
                 />
             )
 
-            const resendButton = screen.getByText('Resend code')
+            // Click the resend button (robust to nested elements)
+            const resendButton = screen.getByRole('button', {name: /resend code/i})
             await user.click(resendButton)
 
             expect(mockHandleSendEmailOtpError).toHaveBeenCalled()
