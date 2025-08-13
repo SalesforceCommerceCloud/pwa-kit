@@ -660,7 +660,7 @@ test('Should show pickup address section for pickup-only orders', async () => {
 
     for (const scenario of testScenarios) {
         window.history.pushState({}, 'Checkout', createPathWithDefaults('/checkout'))
-        const {user} = renderWithProviders(<WrappedCheckout history={history} />, {
+        renderWithProviders(<WrappedCheckout history={history} />, {
             wrapperProps: {isGuest: scenario.isGuest, siteAlias: 'uk', appConfig: mockConfig.app}
         })
 
@@ -738,7 +738,7 @@ test('Should show both pickup and shipping sections for mixed orders', async () 
 
     for (const scenario of testScenarios) {
         window.history.pushState({}, 'Checkout', createPathWithDefaults('/checkout'))
-        const {user} = renderWithProviders(<WrappedCheckout history={history} />, {
+        renderWithProviders(<WrappedCheckout history={history} />, {
             wrapperProps: {isGuest: scenario.isGuest, siteAlias: 'uk', appConfig: mockConfig.app}
         })
 

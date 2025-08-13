@@ -1,0 +1,59 @@
+---
+description: QA Tests for Template Retail React App Test Generation Rules
+globs: ["packages/template-retail-react-app/app/components/**/*-underTest.test.{js,jsx}"]
+alwaysApply: false
+---
+# QA Tests for Template Retail React App Test Patterns
+
+## Purpose
+This file contains test cases to verify that the `unit-tests-template-retail-react-app.mdc` rule effectively guides the creation of consistent and robust React component tests.
+
+## Test Cases
+
+### Test 1: DrawerMenu Component Test Generation
+**Workflow:** Generate → Analyze → Cleanup (NO test execution)
+
+**Steps:**
+1. **Generate:** Create new test file `drawer-menu-underTest.test.js` (colocated with existing drawer-menu component at `packages/template-retail-react-app/app/components/drawer-menu/`)
+2. **Apply Rules:** Use `@/testing` (located at `.cursor/rules/testing/unit-tests-generic.mdc` and `.cursor/rules/testing/unit-tests-template-retail-react-app.mdc`)
+3. **Prompt:** "Write unit test for drawer-menu component"
+4. **Analyze:** Perform static code analysis against verification patterns (see below)
+5. **Cleanup:** Delete the generated test file after validation
+
+**Important:** DO NOT run the test after creation - skip test execution entirely
+
+**Verify that the newly generated test file follows these patterns:**
+1. Test Setup
+   - Uses `renderWithProviders` from `@salesforce/retail-react-app/app/utils/test-utils`
+   - Gets user events from return value: `const {user} = renderWithProviders(...)`
+   - Includes `beforeEach(() => jest.clearAllMocks())`
+
+2. Import Structure
+   - Does NOT import `userEvent` directly
+   - Uses existing mock data from `@salesforce/retail-react-app/app/mocks/`
+   - Imports `screen` from `@testing-library/react`
+
+3. Test Organization
+   - Uses `describe` block with component name
+   - Individual `test` or `it` blocks for different scenarios
+   - Async/await patterns for user interactions
+
+4. API Mocking
+   - Uses `prependHandlersToServer` or `msw` for API mocking when needed
+
+**Failure Indicators:**
+- Direct import of `userEvent` from `@testing-library/user-event`
+- Using custom render function instead of `renderWithProviders`
+- Creating new mock data instead of using existing mocks
+- Missing Commerce SDK context providers
+- Not using async/await for user interactions
+
+**Expected Output:**
+Provide a clear, structured report based on **static code analysis only** (no test execution):
+- ✅ **PASS** or ❌ **FAIL** for each verification point
+- Specific line numbers and code snippets for any failures
+- Summary: `X/Y patterns followed correctly`
+- Overall result: **RULES EFFECTIVE** or **RULES NEED IMPROVEMENT**
+
+**Cleanup:**
+- Delete the generated test file `drawer-menu-underTest.test.js` after QA validation is complete

@@ -49,7 +49,7 @@ const CheckoutProductItem = ({product}) => {
                                         <Text fontSize="sm" color="gray.700">
                                             <FormattedMessage
                                                 defaultMessage="Qty: {quantity}"
-                                                values={{quantity: product.quantity}}
+                                                values={{quantity: quantity}}
                                                 id="checkout_product_item.label.quantity_static"
                                             />
                                         </Text>

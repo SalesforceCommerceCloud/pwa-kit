@@ -12,8 +12,6 @@ import ShippingAddress from '@salesforce/retail-react-app/app/pages/checkout/par
 import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
 import {useCheckout} from '@salesforce/retail-react-app/app/pages/checkout/util/checkout-context'
-import {useMultiship} from '@salesforce/retail-react-app/app/hooks/use-multiship'
-import {usePickupShipment} from '@salesforce/retail-react-app/app/hooks/use-pickup-shipment'
 
 // Mock the hooks
 jest.mock('@salesforce/retail-react-app/app/pages/checkout/util/checkout-context')

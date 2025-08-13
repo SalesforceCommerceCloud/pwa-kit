@@ -977,6 +977,7 @@ const Cart = () => {
                                             updateCart={(product, quantity, childProducts) =>
                                                 handleUpdateBundle(product, quantity, childProducts)
                                             }
+                                            showDeliveryOptions={false}
                                         />
                                     )}
                                 </Box>

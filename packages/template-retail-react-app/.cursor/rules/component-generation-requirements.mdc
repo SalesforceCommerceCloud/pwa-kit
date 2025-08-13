@@ -1,0 +1,29 @@
+---
+description: USE when creating new components manually
+globs: 
+alwaysApply: false
+---
+# Component Generation Requirements
+
+## Process
+1. **Preferred**
+ - Ask user to provide the component name, purpose and requirements.
+ - Determine the appropriate component type (presentational, container, form, etc.).
+ - Collected component information must be displayed and asked for confirmation.
+2. **Default to Simple** - Start with minimal implementation
+3. DO NOT add extra features unless asked
+
+## General Rules
+Create components at the components directory: `**/components/[component-name]/index.jsx`
+
+## Guidelines
+**IMPORTANT** 
+- Use functional components with hooks
+- Use PascalCase for component names
+- Use kebab-case for directories
+- Start simple, expand only if requested
+- One main purpose per component
+
+
+
+
