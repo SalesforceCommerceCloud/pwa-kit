@@ -114,6 +114,7 @@ jobs:
           echo "retail_app_template_version=$version" >> "$GITHUB_ENV"
 
       - name: Generate Retail App Without Extensibility
+        id: generate_app_no_ext
         uses: ./.github/actions/e2e_generate_app
         with:
           PROJECT_KEY: "retail-app-no-ext"
@@ -134,7 +135,7 @@ jobs:
       - name: Push Bundle to MRT (E2E Test PWA Kit)
         uses: "./.github/actions/push_to_mrt"
         with:
-          CWD: "../generated-projects/retail-app-no-ext"
+          CWD: ${{ steps.generate_app_no_ext.outputs.project_path }}
           TARGET: e2e-tests-pwa-kit
           FLAGS: --wait
 
@@ -231,6 +232,7 @@ jobs:
           echo "retail_app_template_version=$version" >> "$GITHUB_ENV"
 
       - name: Generate Retail App With Extensibility
+        id: generate_app_ext
         uses: ./.github/actions/e2e_generate_app
         with:
           PROJECT_KEY: "retail-app-ext"
@@ -251,7 +253,7 @@ jobs:
       - name: Push Bundle to MRT (E2E Test PWA Kit)
         uses: "./.github/actions/push_to_mrt"
         with:
-          CWD: "../generated-projects/retail-app-ext"
+          CWD: ${{ steps.generate_app_ext.outputs.project_path }}
           TARGET: e2e-tests-pwa-kit
           FLAGS: --wait
 
@@ -346,6 +348,7 @@ jobs:
           echo "retail_app_template_version=$version" >> "$GITHUB_ENV"
 
       - name: Generate Retail App Private Client
+        id: generate_app_private_client
         uses: ./.github/actions/e2e_generate_app
         with:
           PROJECT_KEY: "retail-app-private-client"
@@ -366,7 +369,7 @@ jobs:
       - name: Push Bundle to MRT
         uses: "./.github/actions/push_to_mrt"
         with:
-          CWD: "../generated-projects/retail-app-private-client"
+          CWD: ${{ steps.generate_app_private_client.outputs.project_path }}
           TARGET: e2e-pwa-kit-private
           FLAGS: --wait
 

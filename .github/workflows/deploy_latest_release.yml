@@ -70,6 +70,7 @@ jobs:
           node ./scripts/gtime.js monorepo_install npm ci
 
       - name: Generate Retail App Demo
+        id: generate_app
         uses: ./.github/actions/e2e_generate_app
         with:
           PROJECT_KEY: ${{ matrix.environment.project_key }}
@@ -94,7 +95,7 @@ jobs:
       - name: Push Bundle to MRT (${{matrix.environment.name}})
         uses: "./.github/actions/push_to_mrt"
         with:
-          CWD: "../generated-projects/${{ matrix.environment.project_key }}"
+          CWD: ${{ steps.generate_app.outputs.project_path }}
           TARGET: ${{ matrix.environment.target }}
           PROJECT: ${{ matrix.environment.project }}
           MESSAGE: ${{ env.BUNDLE_NAME }})
