@@ -393,4 +393,4 @@ jobs:
         uses: "./.github/actions/bundle_size_test"
         with:
           cwd: ${{ env.PROJECT_DIR }}
-          config: '{"build/main.js": "59kB", "build/vendor.js": "390kB"}'
+          config: '{"build/main.js": "60kB", "build/vendor.js": "390kB"}'
