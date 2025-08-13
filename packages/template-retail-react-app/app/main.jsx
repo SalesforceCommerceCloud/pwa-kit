@@ -8,6 +8,7 @@ import {start, registerServiceWorker} from '@salesforce/pwa-kit-react-sdk/ssr/br
 
 const main = () => {
     // The path to your service worker should match what is set up in ssr.js
+    const unusedVariable = 'this will cause a lint error'
     return Promise.all([start(), registerServiceWorker('/worker.js')])
 }
 
