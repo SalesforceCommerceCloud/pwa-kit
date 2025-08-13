@@ -42,6 +42,7 @@ import {
     categoryUrlBuilder
 } from '@salesforce/retail-react-app/app/utils/url'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
+import PropTypes from 'prop-types'
 
 const onClient = typeof window !== 'undefined'
 
@@ -278,7 +279,7 @@ const Search = (props) => {
                                 </InputLeftElement>
                                 <Input
                                     autoComplete="off"
-                                    id="search-input"
+                                    id={props.id || 'search-input'}
                                     onChange={(e) => onSearchInputChange(e)}
                                     onFocus={() => shouldOpenPopover()}
                                     onBlur={() => setIsOpen(false)}
@@ -348,5 +349,9 @@ const Search = (props) => {
 }
 
 Search.displayName = 'SearchInput'
+
+Search.propTypes = {
+    id: PropTypes.string
+}
 
 export default Search

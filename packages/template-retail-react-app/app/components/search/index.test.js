@@ -77,6 +77,12 @@ test('renders SearchInput', () => {
     expect(searchInput).toBeInTheDocument()
 })
 
+test('renders SearchInput with custom id in the DOM', () => {
+    renderWithProviders(<SearchInput id="search-input-custom" />)
+    const searchInput = document.getElementById('search-input-custom')
+    expect(searchInput).toBeInTheDocument()
+})
+
 test('changes url when enter is pressed', async () => {
     const user = setupUserEvent()
 

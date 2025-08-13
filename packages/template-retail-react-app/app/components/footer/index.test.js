@@ -20,3 +20,9 @@ test('renders mobile version by default', () => {
     // This link is hidden initially, but would be shown for desktop
     expect(screen.getByRole('link', {name: 'About Us', hidden: true})).toBeInTheDocument()
 })
+
+test('Subscribe renders both desktop and mobile inputs in the DOM', () => {
+    renderWithProviders(<Footer />)
+    expect(document.getElementById('subscribe-email-desktop')).toBeInTheDocument()
+    expect(document.getElementById('subscribe-email-mobile')).toBeInTheDocument()
+})

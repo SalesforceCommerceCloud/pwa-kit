@@ -109,8 +109,8 @@ const MultiShipOrderSummary = ({order, productItemsMap, currency}) => {
 
     return (
         <Stack spacing={6} width="full">
-            {renderItemGroup(pickupShipments, 'Pickup Items')}
-            {renderItemGroup(deliveryShipments, 'Delivery Items')}
+            {renderItemGroup(pickupShipments, 'order_summary.label.pickup_items')}
+            {renderItemGroup(deliveryShipments, 'order_summary.label.delivery_items')}
         </Stack>
     )
 }
