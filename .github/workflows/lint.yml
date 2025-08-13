@@ -14,9 +14,6 @@ on:
       - develop
       - 'release-*'
 
-env:
-  IS_NOT_FORK: ${{ github.event_name == 'push' || github.event.pull_request.head.repo.full_name == github.repository }}
-
 jobs:
   pwa-kit-lint:
     runs-on: ubuntu-latest
