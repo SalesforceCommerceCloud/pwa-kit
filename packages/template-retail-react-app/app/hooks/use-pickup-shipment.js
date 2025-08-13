@@ -91,6 +91,17 @@ export const usePickupShipment = (basket) => {
                 return
             }
 
+            const storeAddress = {
+                address1: storeInfo?.address1,
+                city: storeInfo?.city,
+                countryCode: storeInfo?.countryCode,
+                postalCode: storeInfo?.postalCode,
+                stateCode: storeInfo?.stateCode,
+                firstName: storeInfo?.name,
+                lastName: 'pickup',
+                phone: storeInfo?.phone
+            }
+
             // Update shipment to ensure pickup configuration
             return await updateShipmentForBasketMutation.mutateAsync({
                 parameters: {
@@ -102,8 +113,7 @@ export const usePickupShipment = (basket) => {
                         id: pickupShippingMethodId
                     },
                     c_fromStoreId: storeInfo.id,
-                    // Clear shipping address if any. This will be set correctly during checkout
-                    shippingAddress: {}
+                    shippingAddress: storeAddress
                 }
             })
         } catch (error) {
