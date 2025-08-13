@@ -405,6 +405,12 @@ const ProductView = forwardRef(
         }, [variant?.productId, quantity])
 
         useEffect(() => {
+            if (isProductPartOfBundle && product && product.type?.item) {
+                onVariantSelected(product, null, childOfBundleQuantity || quantity)
+            }
+        }, [product, childOfBundleQuantity, quantity, isProductPartOfBundle])
+
+        useEffect(() => {
             if (isProductPartOfBundle || isProductPartOfSet) {
                 const key = product.itemId ?? product.id
                 // when showInventoryMessage is true, it means child product is not orderable

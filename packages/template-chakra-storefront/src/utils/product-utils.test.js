@@ -23,7 +23,12 @@ import {
 import {productSearch, getProduct} from '../components/product-tile/promo-callout.mock'
 import productSetWinterLookM from '../../mocks/product-set-winter-lookM'
 import {mockProductSearch} from '../../mocks/mock-data'
-import {mockProductBundle, mockBundledProductItemsVariant} from '../../mocks/product-bundle.js'
+import {
+    mockProductBundle,
+    mockBundledProductItemsVariant,
+    mockBundleItemsWithMixedProducts,
+    mockBasketWithMixedProducts
+} from '../../mocks/product-bundle.js'
 
 const imageGroups = [
     {
@@ -998,5 +1003,23 @@ describe('getUpdateBundleChildArray', () => {
             modifiedChildProductSelections
         )
         expect(result).toEqual([])
+    })
+
+    test('handles mixed bundle with standard and variant products', () => {
+        const mixedProductSelections = mockBundleItemsWithMixedProducts
+
+        const bundleWithMixedProducts = {
+            bundledProductItems: mockBasketWithMixedProducts.productItems[0].bundledProductItems
+        }
+
+        const result = getUpdateBundleChildArray(bundleWithMixedProducts, mixedProductSelections)
+
+        expect(result).toEqual([
+            {
+                itemId: 'variant-item-1',
+                productId: 'variant-2-id',
+                quantity: 2
+            }
+        ])
     })
 })
