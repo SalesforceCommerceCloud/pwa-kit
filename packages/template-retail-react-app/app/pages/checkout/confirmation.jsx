@@ -72,7 +72,10 @@ const CheckoutConfirmation = () => {
     const {currency} = useCurrency()
     const itemIds = order?.productItems.map((item) => item.productId)
     const {data: products} = useProducts({parameters: {ids: itemIds?.join(',')}})
-    const productItemsMap = products?.data.reduce((map, item) => ({...map, [item.id]: item}), {})
+    const productItemsMap = (products?.data || []).reduce(
+        (map, item) => ({...map, [item.id]: item}),
+        {}
+    )
     const form = useForm()
 
     const hasMultipleShipments = order?.shipments && order.shipments.length > 1

@@ -2577,6 +2577,12 @@
       "value": "Order Summary"
     }
   ],
+  "order_summary.label.delivery_items": [
+    {
+      "type": 0,
+      "value": "Delivery Items"
+    }
+  ],
   "order_summary.label.estimated_total": [
     {
       "type": 0,
@@ -2593,6 +2599,12 @@
     {
       "type": 0,
       "value": "Order Total"
+    }
+  ],
+  "order_summary.label.pickup_items": [
+    {
+      "type": 0,
+      "value": "Pickup Items"
     }
   ],
   "order_summary.label.promo_applied": [
