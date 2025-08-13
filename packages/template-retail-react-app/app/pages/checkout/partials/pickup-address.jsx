@@ -29,11 +29,13 @@ import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-curre
 import {useSelectedStore} from '@salesforce/retail-react-app/app/hooks/use-selected-store'
 import {useStores, useProducts} from '@salesforce/commerce-sdk-react'
 import {STORE_LOCATOR_IS_ENABLED} from '@salesforce/retail-react-app/app/constants'
+import {usePickupShipment} from '@salesforce/retail-react-app/app/hooks/use-pickup-shipment'
 
 const PickupAddress = () => {
     const {formatMessage} = useIntl()
     const {step, STEPS, goToStep, goToNextStep} = useCheckout()
     const {data: basket} = useCurrentBasket()
+    const {isPickupShipment} = usePickupShipment(basket)
 
     const shipmentData = useMemo(() => {
         if (!basket?.shipments) {
@@ -52,9 +54,7 @@ const PickupAddress = () => {
         let hasDeliveryShipments = false
 
         basket.shipments.forEach((shipment) => {
-            const isPickupOrder = STORE_LOCATOR_IS_ENABLED
-                ? shipment?.shippingMethod?.c_storePickupEnabled === true
-                : false
+            const isPickupOrder = STORE_LOCATOR_IS_ENABLED && isPickupShipment(shipment)
 
             if (isPickupOrder) {
                 hasPickupShipments = true
@@ -131,9 +131,7 @@ const PickupAddress = () => {
         const pickupShipments = []
 
         basket.shipments.forEach((shipment) => {
-            const isPickupOrder = STORE_LOCATOR_IS_ENABLED
-                ? shipment?.shippingMethod?.c_storePickupEnabled === true
-                : false
+            const isPickupOrder = STORE_LOCATOR_IS_ENABLED && isPickupShipment(shipment)
 
             if (isPickupOrder) {
                 const storeId = shipment?.c_fromStoreId

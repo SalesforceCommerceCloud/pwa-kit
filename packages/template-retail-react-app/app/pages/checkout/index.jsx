@@ -42,6 +42,7 @@ import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
 import LoadingSpinner from '@salesforce/retail-react-app/app/components/loading-spinner'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import {useMultiship} from '@salesforce/retail-react-app/app/hooks/use-multiship'
+import {usePickupShipment} from '@salesforce/retail-react-app/app/hooks/use-pickup-shipment'
 
 const Checkout = () => {
     const {formatMessage} = useIntl()
@@ -49,6 +50,7 @@ const Checkout = () => {
     const {step} = useCheckout()
     const [error, setError] = useState()
     const {data: basket} = useCurrentBasket()
+    const {isPickupShipment} = usePickupShipment(basket)
     const [isLoading, setIsLoading] = useState(false)
     const {mutateAsync: createOrder} = useShopperOrdersMutation('createOrder')
     const {passwordless = {}, social = {}} = getConfig().app.login || {}
@@ -59,25 +61,21 @@ const Checkout = () => {
 
     // cart has both pickup and delivery orders
     const isDeliveryAndPickupOrder =
-        STORE_LOCATOR_IS_ENABLED && MULTISHIP_IS_ENABLED
-            ? basket?.shipments?.some(
-                  (shipment) => shipment?.shippingMethod?.c_storePickupEnabled === true
-              ) &&
-              basket?.shipments?.some((shipment) => !shipment?.shippingMethod?.c_storePickupEnabled)
-            : false
+        STORE_LOCATOR_IS_ENABLED &&
+        MULTISHIP_IS_ENABLED &&
+        basket?.shipments?.some((shipment) => isPickupShipment(shipment)) &&
+        basket?.shipments?.some((shipment) => !isPickupShipment(shipment))
 
     // Check if there are pickup shipments
-    const hasPickupShipments = STORE_LOCATOR_IS_ENABLED
-        ? basket?.shipments?.some(
-              (shipment) => shipment?.shippingMethod?.c_storePickupEnabled === true
-          )
-        : false
+    const hasPickupShipments =
+        STORE_LOCATOR_IS_ENABLED &&
+        basket?.shipments?.some((shipment) => isPickupShipment(shipment))
 
     // Only enable BOPIS functionality if the feature toggle is on
     const isPickupOrderOnly =
-        STORE_LOCATOR_IS_ENABLED && !isDeliveryAndPickupOrder
-            ? basket?.shipments[0]?.shippingMethod?.c_storePickupEnabled === true
-            : false
+        STORE_LOCATOR_IS_ENABLED &&
+        !isDeliveryAndPickupOrder &&
+        isPickupShipment(basket?.shipments?.[0])
 
     useEffect(() => {
         if (error || step === 4) {
