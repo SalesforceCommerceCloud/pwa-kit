@@ -241,7 +241,7 @@ const OtpAuth = ({isOpen, onClose, form, handleSendEmailOtp, handleOtpVerificati
                                 borderColor="gray.300"
                                 color="gray.600"
                                 _hover={{
-                                    backgroundColor: 'gray.50',
+                                    bg: 'gray.50',
                                     borderColor: 'gray.400'
                                 }}
                             >
@@ -259,7 +259,7 @@ const OtpAuth = ({isOpen, onClose, form, handleSendEmailOtp, handleOtpVerificati
                                 bg={isResendDisabled ? 'gray.300' : 'blue.500'}
                                 minWidth="160px"
                                 isDisabled={isResendDisabled}
-                                _hover={isResendDisabled ? {} : {backgroundColor: 'blue.600'}}
+                                _hover={isResendDisabled ? {} : {bg: 'blue.600'}}
                                 _disabled={{bg: 'gray.300', color: 'gray.600'}}
                             >
                                 {resendTimer > 0 ? (
