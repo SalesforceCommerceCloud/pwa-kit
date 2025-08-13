@@ -20,18 +20,17 @@ import {useStores} from '@salesforce/commerce-sdk-react'
 import AddressDisplay from '@salesforce/retail-react-app/app/components/address-display'
 import StoreDisplay from '@salesforce/retail-react-app/app/components/store-display'
 import {STORE_LOCATOR_IS_ENABLED} from '@salesforce/retail-react-app/app/constants'
+import {usePickupShipment} from '@salesforce/retail-react-app/app/hooks/use-pickup-shipment'
 
 const onClient = typeof window !== 'undefined'
 
 const ShipmentDetails = ({shipments = []}) => {
+    // No need to pass basket here, we're not using it to check if it's a pickup shipment
+    const {isPickupShipment} = usePickupShipment()
     // Get all unique store IDs from pickup shipments
     const storeIds =
         shipments
-            ?.filter(
-                (shipment) =>
-                    STORE_LOCATOR_IS_ENABLED &&
-                    shipment.shippingMethod?.c_storePickupEnabled === true
-            )
+            ?.filter((shipment) => STORE_LOCATOR_IS_ENABLED && isPickupShipment(shipment))
             .map((shipment) => shipment.c_fromStoreId)
             .filter(Boolean) || []
 
@@ -56,8 +55,7 @@ const ShipmentDetails = ({shipments = []}) => {
     const deliveryShipments = []
 
     shipments.forEach((shipment) => {
-        const isPickup =
-            STORE_LOCATOR_IS_ENABLED && shipment.shippingMethod?.c_storePickupEnabled === true
+        const isPickup = STORE_LOCATOR_IS_ENABLED && isPickupShipment(shipment)
 
         if (isPickup) {
             pickupShipments.push(shipment)
