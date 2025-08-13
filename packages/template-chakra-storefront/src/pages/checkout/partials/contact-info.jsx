@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, salesforce.com, inc.
+ * Copyright (c) 2025, salesforce.com, inc.
  * All rights reserved.
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
@@ -32,7 +32,7 @@ import {
     USER_NOT_FOUND_ERROR
 } from '../../../../config/constants'
 
-const ContactInfo = ({isSocialEnabled = false, isPasswordlessEnabled = false, idps = []}) => {
+const ContactInfo = ({isPasswordlessEnabled = false, idps = []}) => {
     const intl = useIntl()
     const {formatMessage} = intl
     const navigate = useNavigation()
@@ -216,7 +216,7 @@ const ContactInfo = ({isSocialEnabled = false, isPasswordlessEnabled = false, id
                                         <Field {...fields.password} />
                                         <Box>
                                             <Button
-                                                variant="link"
+                                                variant="link-blue"
                                                 size="sm"
                                                 onClick={onForgotPasswordClick}
                                             >
@@ -233,12 +233,12 @@ const ContactInfo = ({isSocialEnabled = false, isPasswordlessEnabled = false, id
                                 </Button>
                                 <LoginState
                                     form={form}
-                                    isSocialEnabled={isSocialEnabled}
                                     isPasswordlessEnabled={isPasswordlessEnabled}
-                                    idps={idps}
                                     showPasswordField={showPasswordField}
                                     togglePasswordField={togglePasswordField}
                                     handlePasswordlessLoginClick={onPasswordlessLoginClick}
+                                    //@sfdc-extension-line SFDC_EXT_SOCIAL_LOGIN
+                                    idps={idps}
                                 />
                             </Stack>
                         </Stack>
@@ -264,8 +264,8 @@ const ContactInfo = ({isSocialEnabled = false, isPasswordlessEnabled = false, id
 }
 
 ContactInfo.propTypes = {
-    isSocialEnabled: PropTypes.bool,
     isPasswordlessEnabled: PropTypes.bool,
+    //@sfdc-extension-line SFDC_EXT_SOCIAL_LOGIN
     idps: PropTypes.arrayOf(PropTypes.string)
 }
 
