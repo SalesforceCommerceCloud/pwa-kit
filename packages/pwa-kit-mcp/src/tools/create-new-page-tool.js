@@ -15,7 +15,7 @@ import {
     isBaseComponent,
     isSharedUIBaseComponent,
     generateComponentImportStatement
-} from '../utils'
+} from '../utils/index.js'
 import {z} from 'zod'
 
 const systemPromptForCreatePage = `You are a smart assistant that can use tools when needed. \

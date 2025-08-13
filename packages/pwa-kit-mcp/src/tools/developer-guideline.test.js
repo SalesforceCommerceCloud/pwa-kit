@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import DeveloperGuidelinesTool from './developer-guideline'
-import {EmptyJsonSchema} from '../utils/utils'
+import {EmptyJsonSchema} from '../utils/utils.js'
 
 describe('PWA Development Guidelines', () => {
     describe('DeveloperGuidelinesTool', () => {

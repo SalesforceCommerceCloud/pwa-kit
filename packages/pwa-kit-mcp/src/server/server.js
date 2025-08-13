@@ -17,8 +17,8 @@ import {
 } from '../tools'
 import {Telemetry} from '../utils/telemetry'
 
-// NOTE: This is a workaround to import JSON files as ES modules.
-// eslint-disable-next-line @typescript-eslint/no-var-requires
+import {createRequire} from 'module'
+const require = createRequire(import.meta.url)
 const packageJson = require('../../package.json')
 
 const FALLBACK_VERSION = '0.1.0'
