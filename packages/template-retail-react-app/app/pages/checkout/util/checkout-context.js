@@ -11,20 +11,19 @@ import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-cur
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
 import {useMultiship} from '@salesforce/retail-react-app/app/hooks/use-multiship'
 import {STORE_LOCATOR_IS_ENABLED} from '@salesforce/retail-react-app/app/constants'
-import {usePickupShipment} from '@salesforce/retail-react-app/app/hooks/use-pickup-shipment'
 
 const CheckoutContext = React.createContext()
 
 export const CheckoutProvider = ({children}) => {
     const {data: customer} = useCurrentCustomer()
     const {data: basket} = useCurrentBasket()
-    const {isPickupShipment} = usePickupShipment(basket)
     const einstein = useEinstein()
     const [step, setStep] = useState()
-    const {findExistingDeliveryShipment, findExistingPickupShipment} = useMultiship(basket)
-
-    const deliveryShipment = findExistingDeliveryShipment(basket)
-    const pickupShipment = findExistingPickupShipment(basket)
+    const {
+        findDeliveryShipmentWithoutAddress,
+        findExistingDeliveryShipment,
+        findExistingPickupShipment
+    } = useMultiship(basket)
 
     const CHECKOUT_STEPS_LIST = [
         'CONTACT_INFO',
@@ -43,16 +42,18 @@ export const CheckoutProvider = ({children}) => {
             return
         }
 
+        const allShipmentsHaveAddress = !findDeliveryShipmentWithoutAddress(basket)
+        const allShipmentsHaveAShippingMethod = !basket.shipments.find(
+            (shipment) => !shipment.shippingMethod
+        )
+
         let step = STEPS.REVIEW_ORDER
 
         if (customer.isGuest && !basket.customerInfo?.email) {
             step = STEPS.CONTACT_INFO
-        } else if (!deliveryShipment?.shippingAddress?.address1) {
-            // Check if it's a pickup order - only if BOPIS is enabled
-            const isPickupOrder = STORE_LOCATOR_IS_ENABLED && Boolean(pickupShipment)
-
-            step = isPickupOrder ? STEPS.PICKUP_ADDRESS : STEPS.SHIPPING_ADDRESS
-        } else if (!deliveryShipment?.shippingMethod) {
+        } else if (!allShipmentsHaveAddress) {
+            step = STEPS.SHIPPING_ADDRESS
+        } else if (!allShipmentsHaveAShippingMethod) {
             step = STEPS.SHIPPING_OPTIONS
         } else if (!basket.paymentInstruments || !basket.billingAddress) {
             step = STEPS.PAYMENT
@@ -62,8 +63,7 @@ export const CheckoutProvider = ({children}) => {
     }, [
         customer?.isGuest,
         basket?.customerInfo?.email,
-        deliveryShipment?.shippingAddress,
-        deliveryShipment?.shippingMethod,
+        basket?.shipments,
         basket?.paymentInstruments,
         basket?.billingAddress
     ])
@@ -86,11 +86,13 @@ export const CheckoutProvider = ({children}) => {
     const goToNextStep = () => {
         // Check if current step is CONTACT_INFO
         if (step === STEPS.CONTACT_INFO) {
-            // Determine if it's a pickup order - only if BOPIS is enabled
-            const isPickupOrder =
-                STORE_LOCATOR_IS_ENABLED && isPickupShipment(basket?.shipments?.[0])
+            const hasPickupShipment =
+                STORE_LOCATOR_IS_ENABLED && Boolean(findExistingPickupShipment(basket))
             // Skip to appropriate next step
-            setStep(isPickupOrder ? STEPS.PICKUP_ADDRESS : STEPS.SHIPPING_ADDRESS)
+            setStep(hasPickupShipment ? STEPS.PICKUP_ADDRESS : STEPS.SHIPPING_ADDRESS)
+        } else if (step === STEPS.PICKUP_ADDRESS) {
+            const hasDeliveryShipment = Boolean(findExistingDeliveryShipment(basket))
+            setStep(hasDeliveryShipment ? STEPS.SHIPPING_ADDRESS : STEPS.PAYMENT)
         } else {
             setStep(step + 1)
         }

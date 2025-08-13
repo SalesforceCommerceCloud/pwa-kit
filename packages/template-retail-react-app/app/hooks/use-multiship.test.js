@@ -38,6 +38,7 @@ describe('useMultiship', () => {
     const mockIsCurrentShippingMethodPickup = jest.fn()
     const mockGetDefaultShippingMethodId = jest.fn()
     const mockGetPickupShippingMethodId = jest.fn()
+    const mockGetShippingAddressForStore = jest.fn()
     const mockConfigureDefaultShipmentIfNeeded = jest.fn()
 
     // Mock data
@@ -118,6 +119,7 @@ describe('useMultiship', () => {
             isCurrentShippingMethodPickup: mockIsCurrentShippingMethodPickup,
             getDefaultShippingMethodId: mockGetDefaultShippingMethodId,
             getPickupShippingMethodId: mockGetPickupShippingMethodId,
+            getShippingAddressForStore: mockGetShippingAddressForStore,
             configureDefaultShipmentIfNeeded: mockConfigureDefaultShipmentIfNeeded
         })
 
@@ -125,6 +127,16 @@ describe('useMultiship', () => {
         mockRefetchShippingMethods.mockResolvedValue({data: mockShippingMethods})
         mockGetDefaultShippingMethodId.mockReturnValue('default-shipping-method')
         mockGetPickupShippingMethodId.mockReturnValue('pickup-shipping-method')
+        mockGetShippingAddressForStore.mockReturnValue({
+            address1: 'Test Store Address',
+            city: 'Test City',
+            countryCode: 'US',
+            postalCode: '12345',
+            stateCode: 'CA',
+            firstName: 'Test Store',
+            lastName: 'pickup',
+            phone: '555-0123'
+        })
         mockIsCurrentShippingMethodPickup.mockReturnValue(false)
         mockConfigureDefaultShipmentIfNeeded.mockResolvedValue()
         mockUpdateItemsInBasket.mockResolvedValue({basketId: 'test-basket-id'})
@@ -157,6 +169,7 @@ describe('useMultiship', () => {
             expect(result.current).toHaveProperty('findShipmentToConsolidate')
             expect(result.current).toHaveProperty('getItemsForShipment')
             expect(result.current).toHaveProperty('findDeliveryShipmentWithSameAddress')
+            expect(result.current).toHaveProperty('findDeliveryShipmentWithoutAddress')
             expect(result.current).toHaveProperty('createNewDeliveryShipmentWithAddress')
             expect(result.current).toHaveProperty('findUnusedDeliveryShipment')
             expect(result.current).toHaveProperty('updateDeliveryAddressForShipment')
@@ -374,6 +387,231 @@ describe('useMultiship', () => {
                     address
                 )
                 expect(foundShipmentId).toBeUndefined()
+            })
+        })
+
+        describe('findDeliveryShipmentWithoutAddress', () => {
+            test('should find delivery shipment with no address', () => {
+                const basketWithNoAddress = {
+                    ...mockBasket,
+                    shipments: [
+                        {
+                            shipmentId: 'delivery-no-address',
+                            shippingMethod: {id: 'default-shipping-method'}
+                            // No shippingAddress property
+                        },
+                        {
+                            shipmentId: 'pickup-1',
+                            shippingMethod: {id: 'pickup-shipping-method'},
+                            c_fromStoreId: 'store-1'
+                        }
+                    ]
+                }
+                const {result} = renderHook(() => useMultiship(basketWithNoAddress))
+
+                mockIsCurrentShippingMethodPickup.mockImplementation((method) => {
+                    return method?.id === 'pickup-shipping-method'
+                })
+
+                const foundShipmentId =
+                    result.current.findDeliveryShipmentWithoutAddress(basketWithNoAddress)
+                expect(foundShipmentId).toBe('delivery-no-address')
+            })
+
+            test('should find delivery shipment with empty address (all fields falsey)', () => {
+                const emptyAddress = {
+                    address1: '',
+                    city: null,
+                    countryCode: undefined,
+                    firstName: '',
+                    lastName: null,
+                    phone: undefined,
+                    postalCode: '',
+                    stateCode: null
+                }
+                const basketWithEmptyAddress = {
+                    ...mockBasket,
+                    shipments: [
+                        {
+                            shipmentId: 'delivery-empty-address',
+                            shippingMethod: {id: 'default-shipping-method'},
+                            shippingAddress: emptyAddress
+                        }
+                    ]
+                }
+                const {result} = renderHook(() => useMultiship(basketWithEmptyAddress))
+
+                mockIsCurrentShippingMethodPickup.mockReturnValue(false)
+
+                const foundShipmentId =
+                    result.current.findDeliveryShipmentWithoutAddress(basketWithEmptyAddress)
+                expect(foundShipmentId).toBe('delivery-empty-address')
+            })
+
+            test('should return undefined for delivery shipment with partially empty address (some fields falsey)', () => {
+                const partiallyEmptyAddress = {
+                    address1: '123 Main St',
+                    city: '',
+                    countryCode: 'US',
+                    firstName: null,
+                    lastName: undefined,
+                    phone: '',
+                    postalCode: null,
+                    stateCode: ''
+                }
+                const basketWithPartialAddress = {
+                    ...mockBasket,
+                    shipments: [
+                        {
+                            shipmentId: 'delivery-partial-address',
+                            shippingMethod: {id: 'default-shipping-method'},
+                            shippingAddress: partiallyEmptyAddress
+                        }
+                    ]
+                }
+                const {result} = renderHook(() => useMultiship(basketWithPartialAddress))
+
+                mockIsCurrentShippingMethodPickup.mockReturnValue(false)
+
+                const foundShipmentId =
+                    result.current.findDeliveryShipmentWithoutAddress(basketWithPartialAddress)
+                expect(foundShipmentId).toBeUndefined()
+            })
+
+            test('should return undefined if all delivery shipments have complete addresses', () => {
+                const completeAddress = {
+                    address1: '123 Main St',
+                    city: 'San Francisco',
+                    countryCode: 'US',
+                    firstName: 'John',
+                    lastName: 'Doe',
+                    phone: '415-555-1234',
+                    postalCode: '94105',
+                    stateCode: 'CA'
+                }
+                const basketWithCompleteAddress = {
+                    ...mockBasket,
+                    shipments: [
+                        {
+                            shipmentId: 'delivery-complete-address',
+                            shippingMethod: {id: 'default-shipping-method'},
+                            shippingAddress: completeAddress
+                        }
+                    ]
+                }
+                const {result} = renderHook(() => useMultiship(basketWithCompleteAddress))
+
+                mockIsCurrentShippingMethodPickup.mockReturnValue(false)
+
+                const foundShipmentId =
+                    result.current.findDeliveryShipmentWithoutAddress(basketWithCompleteAddress)
+                expect(foundShipmentId).toBeUndefined()
+            })
+
+            test('should skip pickup shipments when looking for delivery shipments without address', () => {
+                const basketWithPickupOnly = {
+                    ...mockBasket,
+                    shipments: [
+                        {
+                            shipmentId: 'pickup-no-address',
+                            shippingMethod: {id: 'pickup-shipping-method'},
+                            c_fromStoreId: 'store-1'
+                            // No shippingAddress property
+                        }
+                    ]
+                }
+                const {result} = renderHook(() => useMultiship(basketWithPickupOnly))
+
+                mockIsCurrentShippingMethodPickup.mockReturnValue(true)
+
+                const foundShipmentId =
+                    result.current.findDeliveryShipmentWithoutAddress(basketWithPickupOnly)
+                expect(foundShipmentId).toBeUndefined()
+            })
+
+            test('should find first delivery shipment without address when multiple exist', () => {
+                const basketWithMultipleShipments = {
+                    ...mockBasket,
+                    shipments: [
+                        {
+                            shipmentId: 'delivery-with-address',
+                            shippingMethod: {id: 'default-shipping-method'},
+                            shippingAddress: {
+                                address1: '123 Main St',
+                                city: 'San Francisco',
+                                countryCode: 'US'
+                            }
+                        },
+                        {
+                            shipmentId: 'delivery-no-address-1',
+                            shippingMethod: {id: 'default-shipping-method'}
+                            // No shippingAddress property
+                        },
+                        {
+                            shipmentId: 'delivery-no-address-2',
+                            shippingMethod: {id: 'default-shipping-method'}
+                            // No shippingAddress property
+                        }
+                    ]
+                }
+                const {result} = renderHook(() => useMultiship(basketWithMultipleShipments))
+
+                mockIsCurrentShippingMethodPickup.mockReturnValue(false)
+
+                const foundShipmentId = result.current.findDeliveryShipmentWithoutAddress(
+                    basketWithMultipleShipments
+                )
+                expect(foundShipmentId).toBe('delivery-no-address-1')
+            })
+
+            test('should handle mixed address states correctly', () => {
+                const basketWithMixedAddresses = {
+                    ...mockBasket,
+                    shipments: [
+                        {
+                            shipmentId: 'pickup-1',
+                            shippingMethod: {id: 'pickup-shipping-method'},
+                            c_fromStoreId: 'store-1'
+                        },
+                        {
+                            shipmentId: 'delivery-complete',
+                            shippingMethod: {id: 'default-shipping-method'},
+                            shippingAddress: {
+                                address1: '123 Main St',
+                                city: 'San Francisco',
+                                countryCode: 'US',
+                                firstName: 'John',
+                                lastName: 'Doe',
+                                phone: '415-555-1234',
+                                postalCode: '94105',
+                                stateCode: 'CA'
+                            }
+                        },
+                        {
+                            shipmentId: 'delivery-empty',
+                            shippingMethod: {id: 'default-shipping-method'},
+                            shippingAddress: {
+                                address1: '',
+                                city: '',
+                                countryCode: '',
+                                firstName: '',
+                                lastName: '',
+                                phone: '',
+                                postalCode: '',
+                                stateCode: ''
+                            }
+                        }
+                    ]
+                }
+                const {result} = renderHook(() => useMultiship(basketWithMixedAddresses))
+
+                mockIsCurrentShippingMethodPickup.mockImplementation((method) => {
+                    return method?.id === 'pickup-shipping-method'
+                })
+
+                const foundShipmentId =
+                    result.current.findDeliveryShipmentWithoutAddress(basketWithMixedAddresses)
+                expect(foundShipmentId).toBe('delivery-empty')
             })
         })
     })
@@ -867,7 +1105,17 @@ describe('useMultiship', () => {
                     shippingMethod: {
                         id: 'pickup-shipping-method'
                     },
-                    c_fromStoreId: 'store-1'
+                    c_fromStoreId: 'store-1',
+                    shippingAddress: {
+                        address1: 'Test Store Address',
+                        city: 'Test City',
+                        countryCode: 'US',
+                        postalCode: '12345',
+                        stateCode: 'CA',
+                        firstName: 'Test Store',
+                        lastName: 'pickup',
+                        phone: '555-0123'
+                    }
                 }
             })
         })

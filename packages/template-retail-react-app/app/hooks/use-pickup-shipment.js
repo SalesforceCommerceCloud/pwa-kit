@@ -32,6 +32,25 @@ export const usePickupShipment = (basket) => {
     )
 
     /**
+     * Creates a shipping address object from store information
+     * @param {Object} storeInfo - Store information object
+     * @returns {Object} Shipping address object formatted for the basket
+     */
+    const getShippingAddressForStore = (storeInfo) => {
+        return {
+            address1: storeInfo?.address1,
+            city: storeInfo?.city,
+            countryCode: storeInfo?.countryCode,
+            postalCode: storeInfo?.postalCode,
+            stateCode: storeInfo?.stateCode,
+            firstName: storeInfo?.name,
+            // note: lastName is required by the API. We don't use it for pick up in the UI.
+            lastName: 'pickup',
+            phone: storeInfo?.phone
+        }
+    }
+
+    /**
      * Gets the shipping method ID for pickup in store
      * @param {Object} shippingMethods - The shipping methods for the shipment
      * @returns {string|null} The shipping method ID for pickup in store, or null if not found
@@ -100,17 +119,6 @@ export const usePickupShipment = (basket) => {
                 return
             }
 
-            const storeAddress = {
-                address1: storeInfo?.address1,
-                city: storeInfo?.city,
-                countryCode: storeInfo?.countryCode,
-                postalCode: storeInfo?.postalCode,
-                stateCode: storeInfo?.stateCode,
-                firstName: storeInfo?.name,
-                lastName: 'pickup',
-                phone: storeInfo?.phone
-            }
-
             // Update shipment to ensure pickup configuration
             return await updateShipmentForBasketMutation.mutateAsync({
                 parameters: {
@@ -122,7 +130,7 @@ export const usePickupShipment = (basket) => {
                         id: pickupShippingMethodId
                     },
                     c_fromStoreId: storeInfo.id,
-                    shippingAddress: storeAddress
+                    shippingAddress: getShippingAddressForStore(storeInfo)
                 }
             })
         } catch (error) {
@@ -276,6 +284,7 @@ export const usePickupShipment = (basket) => {
         addInventoryIdsToPickupItems,
         getPickupShippingMethodId,
         getDefaultShippingMethodId,
+        getShippingAddressForStore,
         isPickupShipment,
         isCurrentShippingMethodPickup,
         updateShipmentForBasketMutation
