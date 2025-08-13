@@ -11,7 +11,12 @@ import {useLocation} from 'react-router-dom'
 import {useIntl, defineMessages} from 'react-intl'
 
 import {Box, Button, Flex, Heading, Skeleton, Text, VStack} from '@chakra-ui/react'
-import {useCurrency, useDerivedProduct, useAddToCartModalContext, useErrorHandler} from '../../hooks'
+import {
+    useCurrency,
+    useDerivedProduct,
+    useAddToCartModalContext,
+    useErrorHandler
+} from '../../hooks'
 
 // project components
 import ImageGallery from '../../components/image-gallery'

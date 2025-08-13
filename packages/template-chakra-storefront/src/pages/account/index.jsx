@@ -33,7 +33,13 @@ import AccountOrders from '../../pages/account/orders'
 import AccountWishlist from '../../pages/account/wishlist/index'
 
 import {messages, navLinks} from './constant'
-import {useNavigation, useCurrentCustomer, useMultiSite, useAuthHelper, AuthHelpers} from '../../hooks'
+import {
+    useNavigation,
+    useCurrentCustomer,
+    useMultiSite,
+    useAuthHelper,
+    AuthHelpers
+} from '../../hooks'
 import LoadingSpinner from '../../components/loading-spinner'
 import {isHydrated} from '../../utils/utils'
 
