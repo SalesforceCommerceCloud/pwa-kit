@@ -27,8 +27,8 @@ function extractAllClassNames(fileContent) {
 function extractClassDocs(fileContent, className) {
     // Find the class block, allowing for generics, whitespace, and comments (multi-line)
     const classRegex = new RegExp(
-        `declare class ${className}(?:<([\s\S]*?)>)?[\s\S]*?{([\s\S]*?)^}`,
-        'm'
+        `declare class ${className}(?:<(.+?)>)?.*?{(.*?)}\\s*(?:export|declare|$)`,
+        'ms'
     )
     const classMatch = fileContent.match(classRegex)
     if (!classMatch) {
