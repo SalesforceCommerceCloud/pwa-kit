@@ -10,7 +10,7 @@ import {defineMessage, useIntl} from 'react-intl'
 import {Box, Button, Checkbox, Container, Heading, Stack, Text, Separator} from '@chakra-ui/react'
 import {useForm} from 'react-hook-form'
 import {useShopperBasketsMutation} from '@salesforce/commerce-sdk-react'
-import {useCurrentBasket} from '../../../hooks/use-current-basket'
+import {useCurrentBasket, useErrorHandler} from '../../../hooks'
 import {useCheckout} from '../../../pages/checkout/util/checkout-context'
 import {
     getPaymentInstrumentCardType,
@@ -22,7 +22,6 @@ import PaymentForm from '../../../pages/checkout/partials/payment-form'
 import ShippingAddressSelection from '../../../pages/checkout/partials/shipping-address-selection'
 import AddressDisplay from '../../../components/address-display'
 import {PromoCode, usePromoCode} from '../../../components/promo-code'
-import {useErrorHandler} from '../../../hooks/use-errors'
 
 const Payment = () => {
     const intl = useIntl()

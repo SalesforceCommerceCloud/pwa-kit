@@ -7,7 +7,7 @@
 import React, {useMemo} from 'react'
 import {useIntl} from 'react-intl'
 import {Heading} from '@chakra-ui/react'
-import {useCurrentBasket} from '../../../hooks/use-current-basket'
+import {useCurrentBasket} from '../../../hooks'
 
 const CartTitle = () => {
     const intl = useIntl()

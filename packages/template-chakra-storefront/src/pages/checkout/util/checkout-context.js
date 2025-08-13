@@ -6,9 +6,7 @@
  */
 import React, {useEffect, useState} from 'react'
 import PropTypes from 'prop-types'
-import {useEinstein} from '../../../hooks/use-einstein'
-import {useCurrentCustomer} from '../../../hooks/use-current-customer'
-import {useCurrentBasket} from '../../../hooks/use-current-basket'
+import {useEinstein, useCurrentCustomer, useCurrentBasket} from '../../../hooks'
 
 const CheckoutContext = React.createContext()
 

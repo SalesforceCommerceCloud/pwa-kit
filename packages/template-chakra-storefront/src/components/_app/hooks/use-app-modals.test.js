@@ -30,7 +30,7 @@ jest.mock('@chakra-ui/react', () => ({
     useBreakpointValue: jest.fn(() => 'lg')
 }))
 
-jest.mock('../../../hooks/use-dnt-notification', () => ({
+jest.mock('../../../hooks', () => ({
     useDntNotification: jest.fn()
 }))
 
@@ -63,7 +63,7 @@ describe('useAppModals', () => {
 
         const {useLocation} = require('react-router-dom')
         const {useDisclosure} = require('@chakra-ui/react')
-        const {useDntNotification} = require('../../../hooks/use-dnt-notification')
+        const {useDntNotification} = require('../../../hooks')
 
         useLocation.mockReturnValue(mockLocation)
         useDisclosure
@@ -97,7 +97,7 @@ describe('useAppModals', () => {
     })
 
     test('calls useDntNotification for DNT modal state', () => {
-        const {useDntNotification} = require('../../../hooks/use-dnt-notification')
+        const {useDntNotification} = require('../../../hooks')
 
         renderHook(() => useAppModals())
 

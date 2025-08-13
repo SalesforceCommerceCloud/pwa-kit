@@ -8,7 +8,7 @@
 import {useEffect} from 'react'
 import {useLocation} from 'react-router-dom'
 import {useDisclosure} from '@chakra-ui/react'
-import {useDntNotification} from '../../../hooks/use-dnt-notification'
+import {useDntNotification} from '../../../hooks'
 
 /**
  * Custom hook for managing modal states and their interactions

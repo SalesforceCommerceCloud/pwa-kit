@@ -9,7 +9,7 @@ import React, {useMemo} from 'react'
 import PropTypes from 'prop-types'
 import {Dialog, CloseButton} from '@chakra-ui/react'
 import ProductView from '../../components/product-view'
-import {useProductViewModal} from '../../hooks/use-product-view-modal'
+import {useProductViewModal} from '../../hooks'
 import SafePortal from '../safe-portal'
 import {useIntl} from 'react-intl'
 

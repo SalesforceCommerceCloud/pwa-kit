@@ -14,7 +14,7 @@ jest.mock('@salesforce/commerce-sdk-react', () => ({
 }))
 
 // Mock the toast hook
-jest.mock('../../../hooks/use-toast', () => ({
+jest.mock('../../../hooks', () => ({
     __esModule: true,
     useToast: jest.fn(() => ({
         add: jest.fn(),

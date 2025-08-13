@@ -15,8 +15,7 @@ import {AlertIcon, BrandLogo} from '../../components/icons'
 import Field from '../../components/field'
 import PasswordRequirements from '../../components/forms/password-requirements'
 import {useUpdatePasswordFields} from '../../components/forms/useUpdatePasswordFields'
-import {usePasswordReset} from '../../hooks/use-password-reset'
-import {useNavigation} from '../../hooks/use-navigation'
+import {usePasswordReset, useNavigation} from '../../hooks'
 import {
     API_ERROR_MESSAGE,
     INVALID_TOKEN_ERROR,

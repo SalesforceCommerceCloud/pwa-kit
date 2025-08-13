@@ -76,7 +76,7 @@ jest.mock('../../../pages/checkout/partials/checkout-header', () => {
 })
 
 // Mock useCurrentBasket hook
-jest.mock('../../../hooks/use-current-basket', () => ({
+jest.mock('../../../hooks', () => ({
     useCurrentBasket: jest.fn(() => ({
         derivedData: {totalItems: 0}
     }))

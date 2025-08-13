@@ -9,10 +9,9 @@ import {FormattedNumber, useIntl} from 'react-intl'
 import PropTypes from 'prop-types'
 import {Box, Flex, RadioGroup, Stack, Text} from '@chakra-ui/react'
 import Tooltip from '../../../components/tooltip'
-import {useCurrentBasket} from '../../../hooks/use-current-basket'
 import {LockIcon, PaypalIcon} from '../../../components/icons'
 import CreditCardFields from '../../../components/forms/credit-card-fields'
-import {useCurrency} from '../../../hooks'
+import {useCurrency, useCurrentBasket} from '../../../hooks'
 
 const PaymentForm = ({form, onSubmit}) => {
     const {formatMessage} = useIntl()

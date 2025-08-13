@@ -9,9 +9,7 @@ import {useIntl} from 'react-intl'
 import {Box, Stack, Heading, Flex, Skeleton} from '@chakra-ui/react'
 import {useProducts, useShopperCustomersMutation} from '@salesforce/commerce-sdk-react'
 
-import {useNavigation} from '../../../hooks/use-navigation'
-import {useToast} from '../../../hooks/use-toast'
-import {useWishList} from '../../../hooks/use-wish-list'
+import {useNavigation, useToast, useCurrentCustomer, useWishList} from '../../../hooks'
 
 import PageActionPlaceHolder from '../../../components/page-action-placeholder'
 import {HeartIcon} from '../../../components/icons'
@@ -20,7 +18,6 @@ import WishlistPrimaryAction from './partials/wishlist-primary-action'
 import WishlistSecondaryButtonGroup from './partials/wishlist-secondary-button-group'
 
 import {API_ERROR_MESSAGE} from '../../../../config/constants'
-import {useCurrentCustomer} from '../../../hooks/use-current-customer'
 import UnavailableProductConfirmationModal from '../../../components/unavailable-product-confirmation-modal'
 
 const numberOfSkeletonItems = 3

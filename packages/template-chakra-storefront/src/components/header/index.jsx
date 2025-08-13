@@ -23,7 +23,7 @@ import {
 } from '@chakra-ui/react'
 import {AuthHelpers, useAuthHelper, useCustomerType} from '@salesforce/commerce-sdk-react'
 
-import {useCurrentBasket} from '../../hooks'
+import {useCurrentBasket, useNavigation} from '../../hooks'
 
 import Link from '../../components/link'
 import Search from '../../components/search'
@@ -40,7 +40,6 @@ import {
 } from '../icons'
 
 import {navLinks, messages} from '../../pages/account/constant'
-import {useNavigation} from '../../hooks/use-navigation'
 import LoadingSpinner from '../../components/loading-spinner'
 import {HideOnDesktop, HideOnMobile} from '../responsive'
 import {noop} from '../../utils/utils'

@@ -13,7 +13,7 @@ import {AuthHelpers, useAuthHelper, useCustomerType} from '@salesforce/commerce-
 import {useForm} from 'react-hook-form'
 import Seo from '../../components/seo'
 import RegisterForm from '../../components/register'
-import {useNavigation} from '../../hooks/use-navigation'
+import {useNavigation} from '../../hooks'
 import {API_ERROR_MESSAGE} from '../../../config/constants'
 
 const Registration = () => {

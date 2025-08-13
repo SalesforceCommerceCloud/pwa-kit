@@ -27,7 +27,7 @@ import LinksList from '../../components/links-list'
 import SocialIcons from '../../components/social-icons'
 import {getPathWithLocale} from '../../utils/url'
 import LocaleText from '../../components/locale-text'
-import {useMultiSite} from '../../hooks/use-multi-site'
+import {useMultiSite} from '../../hooks'
 
 const Footer = ({...otherProps}) => {
     const recipe = useSlotRecipe({key: 'footer'})

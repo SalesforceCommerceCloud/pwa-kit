@@ -18,8 +18,7 @@ import SafePortal from '../safe-portal'
 import ImageGallery, {Skeleton as ImageGallerySkeleton} from '../../components/image-gallery'
 
 // Project hooks
-import {useProductViewModal} from '../../hooks/use-product-view-modal'
-import {useDerivedProduct} from '../../hooks'
+import {useDerivedProduct, useProductViewModal} from '../../hooks'
 
 /**
  * A Dialog that contains Product View for product bundle

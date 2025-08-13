@@ -23,7 +23,7 @@ import {
 } from '@chakra-ui/react'
 import FormActionButtons from '../../components/forms/form-action-buttons'
 import {useForm} from 'react-hook-form'
-import {useToast} from '../../hooks/use-toast'
+import {useToast, useErrorHandler, useCurrentCustomer} from '../../hooks'
 
 import LoadingSpinner from '../../components/loading-spinner'
 import {LocationIcon, PlusIcon} from '../../components/icons'
@@ -31,10 +31,8 @@ import ActionCard from '../../components/action-card'
 import AddressFields from '../../components/forms/address-fields'
 import AddressDisplay from '../../components/address-display'
 import PageActionPlaceHolder from '../../components/page-action-placeholder'
-import {useCurrentCustomer} from '../../hooks/use-current-customer'
 import {useShopperCustomersMutation} from '@salesforce/commerce-sdk-react'
 import {nanoid} from 'nanoid'
-import {useErrorHandler} from '../../hooks/use-errors'
 
 const DEFAULT_SKELETON_COUNT = 3
 

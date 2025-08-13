@@ -15,8 +15,7 @@ import {
     useShippingMethodsForShipment,
     useShopperBasketsMutation
 } from '@salesforce/commerce-sdk-react'
-import {useCurrentBasket} from '../../../hooks/use-current-basket'
-import {useCurrency} from '../../../hooks'
+import {useCurrency, useCurrentBasket} from '../../../hooks'
 
 export default function ShippingOptions() {
     const intl = useIntl()

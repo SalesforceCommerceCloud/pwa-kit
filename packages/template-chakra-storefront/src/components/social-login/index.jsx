@@ -11,7 +11,7 @@ import {defineMessage, useIntl} from 'react-intl'
 import {Button} from '@chakra-ui/react'
 import logger from '../../utils/logger-instance'
 import {useAuthHelper, AuthHelpers} from '@salesforce/commerce-sdk-react'
-import {useAppOrigin} from '../../hooks/use-app-origin'
+import {useAppOrigin} from '../../hooks'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import {setSessionJSONItem, buildRedirectURI} from '../../utils/utils'
 

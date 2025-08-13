@@ -18,7 +18,7 @@ import {
     useCustomerType,
     useShopperBasketsMutation
 } from '@salesforce/commerce-sdk-react'
-import {useNavigation} from '../../hooks/use-navigation'
+import {useNavigation, usePrevious} from '../../hooks'
 import Seo from '../../components/seo'
 import {useForm} from 'react-hook-form'
 import {useRouteMatch} from 'react-router-dom'
@@ -34,7 +34,6 @@ import {
     PASSWORDLESS_ERROR_MESSAGES,
     USER_NOT_FOUND_ERROR
 } from '../../../config/constants'
-import {usePrevious} from '../../hooks/use-previous'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import {isServer} from '../../utils/utils'
 

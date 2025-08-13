@@ -7,8 +7,7 @@
 import {renderHook} from '@testing-library/react'
 import {useProductListControls} from './use-product-list-controls'
 import {useLocation, useParams} from 'react-router-dom'
-import {usePageUrls, useSortUrls, useSearchParams} from '../../../hooks'
-import {useNavigation} from '../../../hooks/use-navigation'
+import {usePageUrls, useSortUrls, useSearchParams, useNavigation} from '../../../hooks'
 
 jest.mock('react-router-dom', () => ({
     ...jest.requireActual('react-router-dom'),
@@ -19,11 +18,7 @@ jest.mock('react-router-dom', () => ({
 jest.mock('../../../hooks', () => ({
     usePageUrls: jest.fn(),
     useSortUrls: jest.fn(),
-    useSearchParams: jest.fn()
-}))
-
-jest.mock('../../../hooks/use-navigation', () => ({
-    __esModule: true,
+    useSearchParams: jest.fn(),
     useNavigation: jest.fn()
 }))
 

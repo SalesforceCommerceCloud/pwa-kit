@@ -10,11 +10,8 @@ import {useIntl} from 'react-intl'
 import {Alert, Box, Container, Stack, Text, Spinner} from '@chakra-ui/react'
 
 // Hooks
-import {useNavigation} from '../../hooks/use-navigation'
+import {useNavigation, useSearchParams, useCurrentCustomer, useAppOrigin} from '../../hooks'
 import {useAuthHelper, AuthHelpers, useShopperBasketsMutation} from '@salesforce/commerce-sdk-react'
-import {useSearchParams} from '../../hooks'
-import {useCurrentCustomer} from '../../hooks'
-import {useAppOrigin} from '../../hooks/use-app-origin'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import {getSessionJSONItem, clearSessionJSONItem, buildRedirectURI} from '../../utils/utils'
 import {API_ERROR_MESSAGE} from '../../../config/constants'

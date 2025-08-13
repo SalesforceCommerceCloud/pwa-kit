@@ -5,13 +5,11 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React, {useMemo} from 'react'
-import {AuthModal, useAuthModal} from '../../hooks/use-auth-modal'
+import {useToast, useCurrentCustomer, AuthModal, useAuthModal} from '../../hooks'
 import PropTypes from 'prop-types'
 import {noop} from '../../utils/utils'
 import {useIntl} from 'react-intl'
 import {useLocation} from 'react-router-dom'
-import {useToast} from '../../hooks/use-toast'
-import {useCurrentCustomer} from '../../hooks/use-current-customer'
 
 /**
  * Higher-order component that modifies the given component's `onClick` to show the login form if

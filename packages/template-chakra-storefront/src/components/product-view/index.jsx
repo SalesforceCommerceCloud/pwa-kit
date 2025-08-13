@@ -11,8 +11,7 @@ import {useLocation} from 'react-router-dom'
 import {useIntl, defineMessages} from 'react-intl'
 
 import {Box, Button, Flex, Heading, Skeleton, Text, VStack} from '@chakra-ui/react'
-import {useCurrency, useDerivedProduct} from '../../hooks'
-import {useAddToCartModalContext} from '../../hooks/use-add-to-cart-modal'
+import {useCurrency, useDerivedProduct, useAddToCartModalContext, useErrorHandler} from '../../hooks'
 
 // project components
 import ImageGallery from '../../components/image-gallery'
@@ -23,7 +22,6 @@ import withRegistration from '../../components/with-registration'
 import {Skeleton as ImageGallerySkeleton} from '../../components/image-gallery'
 import {HideOnDesktop, HideOnMobile} from '../../components/responsive'
 import QuantityPicker from '../../components/quantity-picker'
-import {useErrorHandler} from '../../hooks/use-errors'
 import DisplayPrice from '../../components/display-price'
 import Swatch from '../../components/swatch-group/swatch'
 import SwatchGroup from '../../components/swatch-group'

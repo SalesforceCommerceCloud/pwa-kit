@@ -8,8 +8,7 @@ import {renderHook, waitFor} from '@testing-library/react'
 import {useProductListData} from './use-product-list-data'
 import {useParams, useLocation} from 'react-router-dom'
 import {useProductSearch, useCategory} from '@salesforce/commerce-sdk-react'
-import {useSearchParams} from '../../../hooks'
-import {useEinstein} from '../../../hooks/use-einstein'
+import {useSearchParams, useEinstein} from '../../../hooks'
 import {HTTPNotFound, HTTPError} from '@salesforce/pwa-kit-react-sdk/ssr/universal/errors'
 
 jest.mock('react-router-dom', () => ({
@@ -22,10 +21,7 @@ jest.mock('@salesforce/commerce-sdk-react', () => ({
     useCategory: jest.fn()
 }))
 jest.mock('../../../hooks', () => ({
-    useSearchParams: jest.fn()
-}))
-jest.mock('../../../hooks/use-einstein', () => ({
-    __esModule: true,
+    useSearchParams: jest.fn(),
     useEinstein: jest.fn()
 }))
 
