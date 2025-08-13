@@ -45,6 +45,7 @@ const Payment = ({
     billingAddressForm,
     enableUserRegistration,
     setEnableUserRegistration,
+    allowAccountRegistration = true,
     registeredUserChoseGuest = false,
     onPaymentMethodSaved,
     onSavePreferenceChange
@@ -56,6 +57,16 @@ const Payment = ({
     const {data: basket} = currentBasketQuery
     const {data: customer, isLoading: isCustomerLoading} = useCurrentCustomer()
     const {isGuest} = useCustomerType()
+    
+    // Debug logging for registration visibility
+    console.log('💳 Payment component render debug:', 
+        'isGuest:', isGuest,
+        'enableUserRegistration:', enableUserRegistration,
+        'allowAccountRegistration:', allowAccountRegistration,
+        'registeredUserChoseGuest:', registeredUserChoseGuest,
+        'shouldShowUserRegistration:', isGuest && allowAccountRegistration
+    )
+    
     const selectedShippingAddress = basket?.shipments && basket?.shipments[0]?.shippingAddress
     const selectedBillingAddress = basket?.billingAddress
     const appliedPayment = basket?.paymentInstruments && basket?.paymentInstruments[0]
@@ -440,11 +451,11 @@ const Payment = ({
                                         isBillingAddress
                                     />
                                 )}
-                                {isGuest && (
+                                {isGuest && allowAccountRegistration && (
                                     <UserRegistration
                                         enableUserRegistration={enableUserRegistration}
                                         setEnableUserRegistration={setEnableUserRegistration}
-                                        isGuestCheckout={registeredUserChoseGuest}
+                                        isGuestCheckout={false}
                                     />
                                 )}
                             </Stack>
@@ -497,11 +508,11 @@ const Payment = ({
                             </Stack>
                         )}
 
-                        {isGuest && (
+                        {isGuest && allowAccountRegistration && (
                             <UserRegistration
                                 enableUserRegistration={enableUserRegistration}
                                 setEnableUserRegistration={setEnableUserRegistration}
-                                isGuestCheckout={registeredUserChoseGuest}
+                                isGuestCheckout={false}
                             />
                         )}
                     </Stack>
@@ -519,6 +530,8 @@ Payment.propTypes = {
     enableUserRegistration: PropTypes.bool,
     /** Callback to set user registration state */
     setEnableUserRegistration: PropTypes.func,
+    /** Whether account registration should be allowed */
+    allowAccountRegistration: PropTypes.bool,
     /** Whether a registered user has chosen guest checkout */
     registeredUserChoseGuest: PropTypes.bool,
     /** Callback when payment method is successfully saved */

@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React, {useRef, useState} from 'react'
+import React, {useRef, useState, useEffect} from 'react'
 import PropTypes from 'prop-types'
 import {
     Alert,
@@ -83,6 +83,11 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
     const [signOutConfirmDialogIsOpen, setSignOutConfirmDialogIsOpen] = useState(false)
     const [registeredUserChoseGuest, setRegisteredUserChoseGuest] = useState(false)
     const [emailError, setEmailError] = useState('')
+    const [allowAccountRegistration, setAllowAccountRegistration] = useState(true) // Track if user should see registration option
+
+    // Note: We don't automatically reset allowAccountRegistration here
+    // because it would override the user's choice from the OTP modal.
+    // The reset happens in the main checkout component when step === 0 (editing contact info)
 
     const passwordlessConfigCallback = getConfig().app.login?.passwordless?.callbackURI
     const callbackURL = isAbsoluteURL(passwordlessConfigCallback)
@@ -129,40 +134,35 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
         setEmailError('')
     }
 
-    // Check if email is valid and show action buttons
-    const isEmailValid = () => {
-        const email = form.getValues('email')
-        return email && isValidEmail(email) && !emailError
-    }
+    // Email validation is now handled in button click handlers
 
-    // Handle email submission - TRUE zero enumeration via server-side proxy
+    // Handle email submission - Direct SLAS integration (uniform UI)
     const handleEmailSubmission = async (email) => {
+        console.log('📨 handleEmailSubmission called with:', email) // Debug
+        
         form.clearErrors('global')
         setEmailError('')
 
         try {
-            // Use uniform OTP send proxy - always returns 200 regardless of registration status
-            const response = await fetch(`${appOrigin}/api/uniform-otp-send`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    email: email,
-                    callbackURI: `${callbackURL}?mode=otp_email`
-                })
+            console.log('🌐 Making SLAS authorizePasswordless call...') // Debug
+            
+            // Use direct SLAS call - this will succeed for registered users, fail for guests
+            await authorizePasswordlessLogin.mutateAsync({
+                userid: email,
+                callbackURI: `${callbackURL}?mode=otp_email`
             })
-
-            // Always gets 200 response - no way to distinguish registered vs guest users
-            const result = await response.json()
-
-            // Always show OTP modal - true zero enumeration achieved
-            onOtpModalOpen()
+            
+            console.log('✅ SLAS call succeeded - registered user') // Debug
 
         } catch (error) {
-            // Even on network error, show OTP modal to maintain uniform behavior
-            onOtpModalOpen()
+            console.log('⚠️ SLAS call failed - likely guest user or other error:', error.message) // Debug
+            // This is expected for guest users - don't treat as error
         }
+
+        // ALWAYS show OTP modal regardless of SLAS success/failure
+        // This creates uniform UI - no way to distinguish registered vs guest users
+        console.log('🎯 Opening OTP modal (uniform behavior)...') // Debug
+        onOtpModalOpen()
     }
 
     // Handle OTP modal close
@@ -172,83 +172,117 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
 
     // Handle "Login with OTP" button click
     const handleLoginWithOtp = async () => {
+        console.log('🔵 Login with OTP button clicked') // Debug
+        
         const email = form.getValues('email')
+        console.log('📧 Email value:', email) // Debug
         
         // Validate email before proceeding
         if (!email) {
+            console.log('❌ No email provided') // Debug
             setEmailError('Please enter your email address.')
+            // Focus email field for better UX
+            if (emailRef.current) {
+                emailRef.current.focus()
+            }
             return
         }
 
         if (!isValidEmail(email)) {
+            console.log('❌ Invalid email format') // Debug
             setEmailError('Please enter a valid email address.')
+            // Focus email field for better UX
+            if (emailRef.current) {
+                emailRef.current.focus()
+            }
             return
         }
+
+        console.log('✅ Email validation passed, proceeding...') // Debug
 
         // Clear any previous errors
         form.clearErrors('global')
         setEmailError('')
-
+        
         // Trigger uniform OTP flow (same for registered and guest users)
-        await handleEmailSubmission(email)
+        try {
+            console.log('🚀 Calling handleEmailSubmission...') // Debug
+            await handleEmailSubmission(email)
+        } catch (error) {
+            console.log('💥 Error in handleEmailSubmission, opening modal as fallback') // Debug
+            // Fallback: Always open modal even if API fails
+            onOtpModalOpen()
+        }
     }
 
-    // Handle "Continue as Guest" button click
+    // Handle "Continue as Guest" button click (main page)
     const handleContinueAsGuest = async () => {
+        console.log('👤 Main "Continue as Guest" clicked - will allow registration during checkout') // Debug
+        
         const email = form.getValues('email')
         
         // Validate email before proceeding
         if (!email) {
             setEmailError('Please enter your email address.')
+            // Focus email field for better UX
+            if (emailRef.current) {
+                emailRef.current.focus()
+            }
             return
         }
 
         if (!isValidEmail(email)) {
             setEmailError('Please enter a valid email address.')
+            // Focus email field for better UX
+            if (emailRef.current) {
+                emailRef.current.focus()
+            }
             return
         }
 
         // Clear any previous errors
         form.clearErrors('global')
         setEmailError('')
-
+        
+        // Set flag to allow account registration during checkout
+        setAllowAccountRegistration(true)
+        console.log('✅ Main "Continue as Guest" - allowAccountRegistration set to TRUE') // Debug
+        
         // Proceed directly as guest without OTP
-        await proceedAsGuest(email)
+        try {
+            await proceedAsGuestWithRegistrationFlag(email, true)
+        } catch (error) {
+            setError(error.message)
+        }
     }
 
-    // Handle OTP send/resend using uniform proxy (prevents enumeration)
+    // Handle OTP send/resend using direct SLAS (uniform UI behavior)
     const handleSendEmailOtp = async (email) => {
         try {
-            // Use uniform OTP send proxy - always returns 200 regardless of registration status
-            const response = await fetch(`${appOrigin}/api/uniform-otp-send`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    email: email || form.getValues('email'),
-                    callbackURI: `${callbackURL}?mode=otp_email`
-                })
+            console.log('📤 Resending OTP via SLAS for:', email || form.getValues('email')) // Debug
+            
+            // Use direct SLAS call - will succeed for registered users, fail for guests
+            await authorizePasswordlessLogin.mutateAsync({
+                userid: email || form.getValues('email'),
+                callbackURI: `${callbackURL}?mode=otp_email`
             })
-
-            // Always gets 200 response - no way to distinguish registered vs guest users
-            const result = await response.json()
-
-            // Return success (even though we can't know if OTP was actually sent)
-            return { success: true, message: result.message }
+            
+            console.log('✅ OTP resend succeeded') // Debug
+            return { success: true, message: "Code sent successfully" }
 
         } catch (error) {
-            // Even on network error, return success to maintain uniform behavior
-            return {
-                success: true,
-                message: "If your email is registered with us, you'll receive a verification code shortly."
+            console.log('⚠️ OTP resend failed (expected for guests):', error.message) // Debug
+            // Return success to maintain uniform behavior - guest users can't tell the difference
+            return { 
+                success: true, 
+                message: "If your email is registered with us, you'll receive a verification code shortly." 
             }
         }
     }
 
 
-    // Helper function to proceed as guest
-    const proceedAsGuest = async (email) => {
+    // Helper function to proceed as guest with explicit registration flag
+    const proceedAsGuestWithRegistrationFlag = async (email, allowRegistration) => {
         try {
             // Update basket with guest email
             await updateCustomerForBasket.mutateAsync({
@@ -259,7 +293,12 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
             // Set the flag that user is proceeding as guest
             setRegisteredUserChoseGuest(true)
             if (onRegisteredUserChoseGuest) {
-                onRegisteredUserChoseGuest(true)
+                // Pass both guest status and registration allowance
+                console.log('📞 Calling onRegisteredUserChoseGuest callback with:', {
+                    isGuest: true,
+                    allowAccountRegistration: allowRegistration
+                }) // Debug
+                onRegisteredUserChoseGuest(true, allowRegistration)
             }
 
             // Proceed to next step
@@ -269,10 +308,24 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
         }
     }
 
+    // Helper function to proceed as guest (uses current state)
+    const proceedAsGuest = async (email) => {
+        await proceedAsGuestWithRegistrationFlag(email, allowAccountRegistration)
+    }
+
     // Handle checkout as guest from OTP modal
     const handleCheckoutAsGuest = async () => {
+        console.log('🚫 OTP Modal "Continue as Guest" clicked - will NOT allow registration during checkout') // Debug
+        
         const email = form.getValues('email')
-        await proceedAsGuest(email)
+        
+        // Set flag to prevent account registration during checkout
+        // User already declined to use their account via OTP
+        setAllowAccountRegistration(false)
+        console.log('🚫 OTP Modal "Continue as Guest" - allowAccountRegistration set to FALSE') // Debug
+        
+        // Use the updated value directly instead of relying on state
+        await proceedAsGuestWithRegistrationFlag(email, false)
     }
 
     // Handle OTP verification
@@ -392,38 +445,27 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
                                         idps={idps}
                                     />
                                     
-                                    {/* Two-button approach for better UX */}
-                                    {isEmailValid() && step === STEPS.CONTACT_INFO && (
+                                    {/* Always show both buttons - better UX with immediate choice visibility */}
+                                    {step === STEPS.CONTACT_INFO && (
                                         <Stack spacing={3}>
-                                            <Text fontSize="sm" color="gray.600" textAlign="center">
-                                                <FormattedMessage
-                                                    defaultMessage="Choose how you'd like to proceed:"
-                                                    id="contact_info.text.choose_option"
-                                                />
-                                            </Text>
-                                            
                                             <Button 
+                                                type="button"
                                                 colorScheme="blue" 
                                                 onClick={handleLoginWithOtp}
                                                 size="lg"
                                                 width="full"
                                             >
-                                                <FormattedMessage
-                                                    defaultMessage="Login with OTP"
-                                                    id="contact_info.button.login_with_otp"
-                                                />
+                                                Login with OTP
                                             </Button>
                                             
                                             <Button 
+                                                type="button"
                                                 variant="outline" 
                                                 onClick={handleContinueAsGuest}
                                                 size="lg"
                                                 width="full"
                                             >
-                                                <FormattedMessage
-                                                    defaultMessage="Continue as Guest"
-                                                    id="contact_info.button.continue_as_guest"
-                                                />
+                                                Continue as Guest
                                             </Button>
                                         </Stack>
                                     )}
