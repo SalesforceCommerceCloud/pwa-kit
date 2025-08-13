@@ -6,7 +6,7 @@
  */
 import React from 'react'
 import PropTypes from 'prop-types'
-import {Text, Box, Flex} from '@salesforce/retail-react-app/app/components/shared/ui'
+import {Text, Box, Flex, AspectRatio} from '@salesforce/retail-react-app/app/components/shared/ui'
 import DynamicImage from '@salesforce/retail-react-app/app/components/dynamic-image'
 import Link from '@salesforce/retail-react-app/app/components/link'
 
@@ -25,19 +25,36 @@ const HorizontalSuggestions = ({suggestions, closeAndNavigate, dynamicImageProps
                         key={idx}
                         onClick={() => closeAndNavigate(suggestion.link)}
                     >
-                        <Box>
+                        <Box width={{base: '50vw', md: '50vw', lg: '10vw'}} flex="0 0 auto">
                             {/* Product Image */}
-                            <Box position="relative" mb="2" minH="200px">
-                                {suggestion.image && (
-                                    <DynamicImage
-                                        src={`${suggestion.image}[?sw={width}&q=60]`}
-                                        widths={dynamicImageProps?.widths}
-                                        imageProps={{
-                                            alt: '',
-                                            loading: 'eager'
-                                        }}
-                                    />
-                                )}
+                            <Box mb="2">
+                                {suggestion.image ? (
+                                    <AspectRatio ratio={1}>
+                                        <DynamicImage
+                                            src={`${suggestion.image}[?sw={width}&q=60]`}
+                                            widths={dynamicImageProps?.widths}
+                                            sx={{
+                                                height: '100%',
+                                                width: '100%',
+                                                '& picture': {
+                                                    display: 'block',
+                                                    height: '100%',
+                                                    width: '100%'
+                                                },
+                                                '& img': {
+                                                    display: 'block',
+                                                    height: '100%',
+                                                    width: '100%',
+                                                    objectFit: 'cover'
+                                                }
+                                            }}
+                                            imageProps={{
+                                                alt: '',
+                                                loading: 'eager'
+                                            }}
+                                        />
+                                    </AspectRatio>
+                                ) : null}
                             </Box>
 
                             <Text
