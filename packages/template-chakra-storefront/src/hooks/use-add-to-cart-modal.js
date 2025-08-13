@@ -30,7 +30,7 @@ import {getPriceData, getDisplayVariationValues} from '../utils/product-utils'
 import {EINSTEIN_RECOMMENDERS} from '../../config/constants'
 import DisplayPrice from '../components/display-price'
 import SafePortal from '../components/safe-portal'
-import {useBonusProductModalContext} from './use-bonus-product-modal'
+import {useBonusProductSelectionModalContext} from './use-bonus-product-selection-modal'
 import {addToCartModalTheme} from '../theme/components/project/add-to-cart-modal'
 
 /**
@@ -73,7 +73,7 @@ AddToCartModalProvider.propTypes = {
  */
 export const AddToCartModal = ({onSelectBonusProductsClick}) => {
     const {isOpen, onClose, data} = useAddToCartModalContext()
-    const bonusProductContext = useBonusProductModalContext()
+    const bonusProductContext = useBonusProductSelectionModalContext()
     const {onOpen: onOpenBonusModal} = bonusProductContext || {}
     const {product, itemsAdded = [], selectedQuantity, bonusDiscountLineItems = []} = data || {}
     const isProductABundle = !!product?.type.bundle

@@ -11,31 +11,32 @@ import PropTypes from 'prop-types'
 import {Dialog, Button, Text, Box, useBreakpointValue} from '@chakra-ui/react'
 
 /**
- * Context for managing the BonusProductModal.
+ * Context for managing the BonusProductSelectionModal.
  * Used in top level App component.
  */
-export const BonusProductModalContext = React.createContext()
-export const useBonusProductModalContext = () => useContext(BonusProductModalContext)
+export const BonusProductSelectionModalContext = React.createContext()
+export const useBonusProductSelectionModalContext = () =>
+    useContext(BonusProductSelectionModalContext)
 
-export const BonusProductModalProvider = ({children}) => {
-    const bonusProductModal = useBonusProductModal()
+export const BonusProductSelectionModalProvider = ({children}) => {
+    const bonusProductSelectionModal = useBonusProductSelectionModal()
     return (
-        <BonusProductModalContext.Provider value={bonusProductModal}>
+        <BonusProductSelectionModalContext.Provider value={bonusProductSelectionModal}>
             {children}
-            <BonusProductModal />
-        </BonusProductModalContext.Provider>
+            <BonusProductSelectionModal />
+        </BonusProductSelectionModalContext.Provider>
     )
 }
 
-BonusProductModalProvider.propTypes = {
+BonusProductSelectionModalProvider.propTypes = {
     children: PropTypes.node.isRequired
 }
 
 /**
  * Modal for selecting from available bonus products.
  */
-export const BonusProductModal = () => {
-    const {isOpen, onClose, data} = useBonusProductModalContext()
+export const BonusProductSelectionModal = () => {
+    const {isOpen, onClose, data} = useBonusProductSelectionModalContext()
     const size = useBreakpointValue({base: 'full', lg: 'lg', xl: 'xl'})
 
     if (!isOpen) {
@@ -80,7 +81,7 @@ export const BonusProductModal = () => {
     )
 }
 
-export const useBonusProductModal = () => {
+export const useBonusProductSelectionModal = () => {
     const [state, setState] = useState({
         isOpen: false,
         data: null

@@ -13,7 +13,7 @@ import ScrollToTop from '../../scroll-to-top'
 import OfflineBanner from '../../offline-banner'
 import OfflineBoundary from '../../offline-boundary'
 import {AddToCartModalProvider} from '../../../hooks/use-add-to-cart-modal'
-import {BonusProductModalProvider} from '../../../hooks/use-bonus-product-modal'
+import {BonusProductSelectionModalProvider} from '../../../hooks/use-bonus-product-selection-modal'
 
 /**
  * AppLayout component that provides the main layout structure
@@ -38,7 +38,7 @@ const AppLayout = ({
                 {/* Offline Banner */}
                 {isOnline === false && <OfflineBanner isOnline={isOnline} />}
 
-                <BonusProductModalProvider>
+                <BonusProductSelectionModalProvider>
                     <AddToCartModalProvider>
                         <SkipNavContent
                             css={{
@@ -66,7 +66,7 @@ const AppLayout = ({
                         {/* Modals */}
                         {modalsComponent}
                     </AddToCartModalProvider>
-                </BonusProductModalProvider>
+                </BonusProductSelectionModalProvider>
             </Box>
         </>
     )

@@ -9,18 +9,18 @@ import React from 'react'
 import {screen, act} from '@testing-library/react'
 import {renderWithChakraProvider} from '../utils/test-utils'
 import {
-    useBonusProductModal,
-    BonusProductModalProvider,
-    useBonusProductModalContext
-} from './use-bonus-product-modal'
+    useBonusProductSelectionModal,
+    BonusProductSelectionModalProvider,
+    useBonusProductSelectionModalContext
+} from './use-bonus-product-selection-modal'
 
 // Mock react-router-dom
 jest.mock('react-router-dom', () => ({
     useLocation: () => ({pathname: '/test'})
 }))
 
-const BonusProductSelectionModal = () => {
-    const {isOpen, onOpen, onClose, data} = useBonusProductModalContext()
+const BonusProductSelectionModalTest = () => {
+    const {isOpen, onOpen, onClose, data} = useBonusProductSelectionModalContext()
 
     return (
         <div>
@@ -36,10 +36,10 @@ const BonusProductSelectionModal = () => {
     )
 }
 
-describe('useBonusProductModal', () => {
+describe('useBonusProductSelectionModal', () => {
     it('should provide initial state', () => {
         const TestHook = () => {
-            const modal = useBonusProductModal()
+            const modal = useBonusProductSelectionModal()
             return (
                 <div>
                     <div data-testid="is-open">{modal.isOpen.toString()}</div>
@@ -56,9 +56,9 @@ describe('useBonusProductModal', () => {
 
     it('should open modal with data', async () => {
         renderWithChakraProvider(
-            <BonusProductModalProvider>
-                <BonusProductSelectionModal />
-            </BonusProductModalProvider>
+            <BonusProductSelectionModalProvider>
+                <BonusProductSelectionModalTest />
+            </BonusProductSelectionModalProvider>
         )
 
         const openButton = screen.getByTestId('open-button')
@@ -72,9 +72,9 @@ describe('useBonusProductModal', () => {
 
     it('should close modal', async () => {
         renderWithChakraProvider(
-            <BonusProductModalProvider>
-                <BonusProductSelectionModal />
-            </BonusProductModalProvider>
+            <BonusProductSelectionModalProvider>
+                <BonusProductSelectionModalTest />
+            </BonusProductSelectionModalProvider>
         )
 
         const openButton = screen.getByTestId('open-button')
