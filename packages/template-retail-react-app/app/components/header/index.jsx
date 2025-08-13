@@ -187,7 +187,7 @@ const Header = ({
                     />
                     <Box {...styles.bodyContainer}>{children}</Box>
                     <HideOnMobile>
-                        <SearchBar id="search-input-header-desktop" />
+                        <SearchBar />
                     </HideOnMobile>
                     <IconButtonWithRegistration
                         icon={<AccountIcon />}
@@ -344,7 +344,7 @@ const Header = ({
                         onClick={onMyCartClick}
                     />
                     <HideOnDesktop display={{base: 'contents', lg: 'none'}}>
-                        <SearchBar id="search-input-header-mobile" />
+                        <SearchBar />
                     </HideOnDesktop>
                 </Flex>
             </Box>

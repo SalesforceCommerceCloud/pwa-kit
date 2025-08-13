@@ -326,9 +326,3 @@ test('handles search functionality', async () => {
     fireEvent.change(searchInput, {target: {value: 'test search'}})
     expect(searchInput.value).toBe('test search')
 })
-
-test('Header with SearchBar renders both desktop and mobile inputs in the DOM', () => {
-    renderWithProviders(<Header />)
-    expect(document.getElementById('search-input-header-desktop')).toBeInTheDocument()
-    expect(document.getElementById('search-input-header-mobile')).toBeInTheDocument()
-})

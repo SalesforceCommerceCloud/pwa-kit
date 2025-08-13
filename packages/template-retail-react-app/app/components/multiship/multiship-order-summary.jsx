@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
-import {FormattedMessage} from 'react-intl'
+import {defineMessages, FormattedMessage} from 'react-intl'
 import PropTypes from 'prop-types'
 import {
     Box,
@@ -26,6 +26,17 @@ const MultiShipOrderSummary = ({order, productItemsMap, currency}) => {
     const pickupShipments = []
     const deliveryShipments = []
 
+    const messages = defineMessages({
+        pickupItems: {
+          id: 'order_summary.label.pickup_items',
+          defaultMessage: 'Pickup Items'
+        },
+        deliveryItems: {
+            id: 'order_summary.label.delivery_items',
+            defaultMessage: 'Delivery Items'
+        }
+      });
+
     order.shipments.forEach((shipment) => {
         const isPickup =
             STORE_LOCATOR_IS_ENABLED && shipment.shippingMethod?.c_storePickupEnabled === true
@@ -42,13 +53,13 @@ const MultiShipOrderSummary = ({order, productItemsMap, currency}) => {
         return order.productItems.filter((item) => item.shipmentId === shipmentId)
     }
 
-    const renderItemGroup = (shipments, titleMessage, titleId) => {
+    const renderItemGroup = (shipments, title) => {
         if (shipments.length === 0) return null
 
         return (
-            <Box key={titleId}>
+            <Box key={title.id}>
                 <Text fontSize="sm" fontWeight="semibold" mb={3}>
-                    {titleMessage}
+                    <FormattedMessage {...title} />
                 </Text>
                 <Stack spacing={4}>
                     {shipments.map((shipment) => {
@@ -111,19 +122,11 @@ const MultiShipOrderSummary = ({order, productItemsMap, currency}) => {
         <Stack spacing={6} width="full">
             {renderItemGroup(
                 pickupShipments,
-                <FormattedMessage
-                    id="order_summary.label.pickup_items"
-                    defaultMessage="Pickup Items"
-                />,
-                'Pickup Items'
+                messages.pickupItems
             )}
             {renderItemGroup(
                 deliveryShipments,
-                <FormattedMessage
-                    id="order_summary.label.delivery_items"
-                    defaultMessage="Delivery Items"
-                />,
-                'Delivery Items'
+                messages.deliveryItems
             )}
         </Stack>
     )

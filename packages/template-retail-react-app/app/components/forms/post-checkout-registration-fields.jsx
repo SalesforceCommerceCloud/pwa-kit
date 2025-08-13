@@ -21,7 +21,7 @@ const PostCheckoutRegistrationFields = ({form, prefix = ''}) => {
                 <Field {...fields.email} />
 
                 <Stack spacing={3} paddingBottom={2}>
-                    <Field {...fields.password} autoComplete="new-password" />
+                    <Field {...fields.password} />
                     <PasswordRequirements value={password} />
                 </Stack>
             </Stack>

@@ -127,13 +127,13 @@ const Footer = ({...otherProps}) => {
                                 links={makeOurCompanyLinks()}
                             />
                             <Box>
-                                <Subscribe id="subscribe-email-desktop" />
+                                <Subscribe />
                             </Box>
                         </SimpleGrid>
                     </HideOnMobile>
 
                     <HideOnDesktop>
-                        <Subscribe id="subscribe-email-mobile" />
+                        <Subscribe />
                     </HideOnDesktop>
 
                     {showLocaleSelector && (
@@ -200,7 +200,7 @@ const Footer = ({...otherProps}) => {
 
 export default Footer
 
-const Subscribe = ({id, ...otherProps}) => {
+const Subscribe = ({...otherProps}) => {
     const styles = useStyles()
     const intl = useIntl()
     return (
@@ -239,7 +239,7 @@ const Subscribe = ({id, ...otherProps}) => {
                             id: 'footer.subscribe.email.assistive_msg',
                             defaultMessage: 'Email address for newsletter'
                         })}
-                        id={id || 'subscribe-email'}
+                        id="subscribe-email"
                         {...styles.subscribeField}
                     />
                 </InputGroup>
@@ -248,10 +248,6 @@ const Subscribe = ({id, ...otherProps}) => {
             <SocialIcons variant="flex-start" pinterestInnerColor="black" {...styles.socialIcons} />
         </Box>
     )
-}
-
-Subscribe.propTypes = {
-    id: PropTypes.string
 }
 
 const LegalLinks = ({variant}) => {
