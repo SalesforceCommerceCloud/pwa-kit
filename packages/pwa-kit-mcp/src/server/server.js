@@ -14,11 +14,12 @@ import {
     CreateNewComponentTool,
     DeveloperGuidelinesTool,
     TestWithPlaywrightTool,
-    CreateNewPageTool
-} from '../tools'
+    CreateNewPageTool,
+    ExploreCommerceAPITool
+} from '../tools/index.js'
 
-// NOTE: This is a workaround to import JSON files as ES modules.
-// eslint-disable-next-line @typescript-eslint/no-var-requires
+import {createRequire} from 'module'
+const require = createRequire(import.meta.url)
 const packageJson = require('../../package.json')
 
 const FALLBACK_VERSION = '0.1.0'
@@ -40,6 +41,7 @@ class PwaStorefrontMCPServerHighLevel {
         this.createNewComponentTool = new CreateNewComponentTool()
         this.createAppGuidelinesTool = new CreateAppGuidelinesTool()
         this.testWithPlaywrightTool = new TestWithPlaywrightTool()
+        this.exploreCommerceAPITool = new ExploreCommerceAPITool()
         this.setupTools()
     }
 
@@ -77,6 +79,18 @@ class PwaStorefrontMCPServerHighLevel {
             CreateNewPageTool.description,
             CreateNewPageTool.inputSchema,
             CreateNewPageTool.handler
+        )
+        this.server.tool(
+            this.versionControlGitTool.name,
+            this.versionControlGitTool.description,
+            this.versionControlGitTool.inputSchema,
+            this.versionControlGitTool.handler
+        )
+        this.server.tool(
+            this.exploreCommerceAPITool.name,
+            this.exploreCommerceAPITool.description,
+            this.exploreCommerceAPITool.inputSchema,
+            this.exploreCommerceAPITool.handler
         )
     }
 
