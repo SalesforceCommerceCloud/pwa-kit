@@ -5409,6 +5409,20 @@
       "value": "]"
     }
   ],
+  "order_summary.label.delivery_items": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ḓḗḗŀīṽḗḗřẏ Īŧḗḗḿş"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
   "order_summary.label.estimated_total": [
     {
       "type": 0,
@@ -5445,6 +5459,20 @@
     {
       "type": 0,
       "value": "Ǿřḓḗḗř Ŧǿǿŧȧȧŀ"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "order_summary.label.pickup_items": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ƥīƈķŭŭƥ Īŧḗḗḿş"
     },
     {
       "type": 0,
