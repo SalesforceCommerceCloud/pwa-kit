@@ -66,21 +66,7 @@ const options = {
     // of the keys of headers that have been encoded
     // There may be a slight performance loss with requests/responses with large number
     // of headers as we loop through all the headers to verify ASCII vs non ASCII
-    encodeNonAsciiHttpHeaders: true,
-
-    // If this is enabled, the hybrid proxy will be enabled.
-    // This is required for SFCC sessions to work.
-    enableHybridProxy: true,
-
-    // The origin of the SFCC instance.
-    // This is required for hybrid proxy to work.
-    sfccOrigin:
-        'https://zzrf-001.dx.commercecloud.salesforce.com/on/demandware.store/Sites-RefArchGlobal-Site',
-
-    // The MRT rules to apply to the hybrid proxy.
-    // This is required for hybrid proxy to work.
-    hybridMRTRule1:
-        'http.request.uri.path eq "/" or http.request.uri.path matches "^/callback" or http.request.uri.path matches "^/mobify" or http.request.uri.path matches "^/worker.js" or http.request.uri.path matches "^/(\\w+)/([-\\w]+)/$" or http.request.uri.path matches "^/(\\w+)/([-\\w]+)/login" or http.request.uri.path matches "^/(\\w+)/([-\\w]+)/cart" or http.request.uri.path matches "^/(\\w+)/([-\\w]+)/reset-password" or http.request.uri.path matches "^/(\\w+)/([-\\w]+)/registration" or http.request.uri.path matches "^/(\\w+)/([-\\w]+)/account" or http.request.uri.path matches "^/(\\w+)/([-\\w]+)/account/orders" or http.request.uri.path matches "^/(\\w+)/([-\\w]+)/account/orders/(\\w+)" or http.request.uri.path matches "^/(\\w+)/([-\\w]+)/account/wishlist" or http.request.uri.path matches "^/(\\w+)/([-\\w]+)/product/(\\w+)" or http.request.uri.path matches "^/(\\w+)/([-\\w]+)/search" or http.request.uri.path matches "^/(\\w+)/([-\\w]+)/category/(\\w+)" or http.request.uri.path matches "^/(\\w+)/([-\\w]+)/order-status" or http.request.uri.path matches "^/(\\w+)/([-\\w]+)/page/(\\w+)" or http.request.uri.path matches "^/(\\w+)/([-\\w]+)/page-viewer/(\\w+)"'
+    encodeNonAsciiHttpHeaders: true
 }
 
 //'http.request.uri.path eq "/" or http.request.uri.path matches "^/callback" or http.request.uri.path matches "^/mobify" or http.request.uri.path matches "^/worker.js" or http.request.uri.path matches "^/(\\w+)/([-\\w]+)/$" or http.request.uri.path matches "^/(\\w+)/([-\\w]+)/login" or http.request.uri.path matches "^/(\\w+)/([-\\w]+)/cart" or http.request.uri.path matches "^/(\\w+)/([-\\w]+)/reset-password" or http.request.uri.path matches "^/(\\w+)/([-\\w]+)/registration" or http.request.uri.path matches "^/(\\w+)/([-\\w]+)/account" or http.request.uri.path matches "^/(\\w+)/([-\\w]+)/account/orders" or http.request.uri.path matches "^/(\\w+)/([-\\w]+)/account/orders/(\\w+)" or http.request.uri.path matches "^/(\\w+)/([-\\w]+)/account/wishlist" or http.request.uri.path matches "^/(\\w+)/([-\\w]+)/product/(\\w+)" or http.request.uri.path matches "^/(\\w+)/([-\\w]+)/search" or http.request.uri.path matches "^/(\\w+)/([-\\w]+)/category/(\\w+)" or http.request.uri.path matches "^/(\\w+)/([-\\w]+)/order-status" or http.request.uri.path matches "^/(\\w+)/([-\\w]+)/page/(\\w+)" or http.request.uri.path matches "^/(\\w+)/([-\\w]+)/page-viewer/(\\w+)"'
