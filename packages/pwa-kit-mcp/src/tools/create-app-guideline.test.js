@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import CreateAppGuidelineTool from './create-app-guideline'
-import {EmptyJsonSchema} from '../utils/utils'
+import {EmptyJsonSchema} from '../utils/utils.js'
 
 jest.mock('../utils/utils', () => {
     const originalModule = jest.requireActual('../utils/utils')
