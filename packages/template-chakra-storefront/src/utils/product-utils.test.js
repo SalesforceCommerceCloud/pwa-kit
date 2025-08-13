@@ -790,6 +790,15 @@ describe('getDisplayVariationValues', function () {
             Width: 'M'
         })
     })
+
+    test('returns empty object when variationAttributes are not provided', () => {
+        const selectedValues = {
+            color: 'TAUPETX',
+            size: '065'
+        }
+        const result = getDisplayVariationValues(undefined, selectedValues)
+        expect(result).toEqual({})
+    })
 })
 
 describe('getPriceData', function () {
