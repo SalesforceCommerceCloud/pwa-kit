@@ -28,14 +28,14 @@ const MultiShipOrderSummary = ({order, productItemsMap, currency}) => {
 
     const messages = defineMessages({
         pickupItems: {
-          id: 'order_summary.label.pickup_items',
-          defaultMessage: 'Pickup Items'
+            id: 'order_summary.label.pickup_items',
+            defaultMessage: 'Pickup Items'
         },
         deliveryItems: {
             id: 'order_summary.label.delivery_items',
             defaultMessage: 'Delivery Items'
         }
-      });
+    })
 
     order.shipments.forEach((shipment) => {
         const isPickup =
@@ -120,14 +120,8 @@ const MultiShipOrderSummary = ({order, productItemsMap, currency}) => {
 
     return (
         <Stack spacing={6} width="full">
-            {renderItemGroup(
-                pickupShipments,
-                messages.pickupItems
-            )}
-            {renderItemGroup(
-                deliveryShipments,
-                messages.deliveryItems
-            )}
+            {renderItemGroup(pickupShipments, messages.pickupItems)}
+            {renderItemGroup(deliveryShipments, messages.deliveryItems)}
         </Stack>
     )
 }
