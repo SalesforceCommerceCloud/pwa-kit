@@ -1109,6 +1109,43 @@ describe('usePickupShipment', () => {
         })
     })
 
+    describe('isPickupShipment', () => {
+        test('returns true when c_storePickupEnabled is true', () => {
+            const {result} = renderHook(() => usePickupShipment())
+
+            const isPickup = result.current.isPickupShipment({
+                shippingMethod: {id: '005', c_storePickupEnabled: true}
+            })
+
+            expect(isPickup).toBe(true)
+        })
+
+        test('returns false when c_storePickupEnabled is false', () => {
+            const {result} = renderHook(() => usePickupShipment())
+
+            const isPickup = result.current.isPickupShipment({
+                shippingMethod: {id: '001', c_storePickupEnabled: false}
+            })
+
+            expect(isPickup).toBe(false)
+        })
+
+        test('returns false when shippingMethod is missing', () => {
+            const {result} = renderHook(() => usePickupShipment())
+
+            const isPickup = result.current.isPickupShipment({shipmentId: 'me'})
+
+            expect(isPickup).toBe(false)
+        })
+
+        test('returns false when shipment is nullish', () => {
+            const {result} = renderHook(() => usePickupShipment())
+
+            expect(result.current.isPickupShipment(null)).toBe(false)
+            expect(result.current.isPickupShipment(undefined)).toBe(false)
+        })
+    })
+
     describe('hook initialization with basket parameter', () => {
         test('initializes hook with basket parameter', () => {
             const basket = {

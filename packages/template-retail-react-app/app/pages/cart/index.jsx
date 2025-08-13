@@ -67,7 +67,7 @@ import {
 import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
 import UnavailableProductConfirmationModal from '@salesforce/retail-react-app/app/components/unavailable-product-confirmation-modal'
 import {getUpdateBundleChildArray} from '@salesforce/retail-react-app/app/utils/product-utils'
-import {isPickupShipment} from '@salesforce/retail-react-app/app/utils/order-utils'
+import {usePickupShipment} from '@salesforce/retail-react-app/app/hooks/use-pickup-shipment'
 import {useSelectedStore} from '@salesforce/retail-react-app/app/hooks/use-selected-store'
 import {useMultiship} from '@salesforce/retail-react-app/app/hooks/use-multiship'
 
@@ -75,6 +75,7 @@ const DEBOUNCE_WAIT = 750
 
 const Cart = () => {
     const {data: basket, isLoading} = useCurrentBasket()
+    const {isPickupShipment} = usePickupShipment(basket)
 
     // Pickup in Store - inventory at current store and all unique store IDs from all shipments
     const {selectedStore} = useSelectedStore()

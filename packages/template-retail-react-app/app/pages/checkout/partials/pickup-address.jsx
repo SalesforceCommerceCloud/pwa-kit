@@ -30,7 +30,7 @@ import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-curre
 import {useSelectedStore} from '@salesforce/retail-react-app/app/hooks/use-selected-store'
 import {useShopperBasketsMutation, useStores, useProducts} from '@salesforce/commerce-sdk-react'
 import {STORE_LOCATOR_IS_ENABLED} from '@salesforce/retail-react-app/app/constants'
-import {isPickupShipment} from '@salesforce/retail-react-app/app/utils/order-utils'
+import {usePickupShipment} from '@salesforce/retail-react-app/app/hooks/use-pickup-shipment'
 
 const PickupAddress = () => {
     const {formatMessage} = useIntl()
@@ -40,6 +40,7 @@ const PickupAddress = () => {
     )
     const {step, STEPS, goToStep, goToNextStep} = useCheckout()
     const {data: basket} = useCurrentBasket()
+    const {isPickupShipment} = usePickupShipment(basket)
 
     const shipmentData = useMemo(() => {
         if (!basket?.shipments) {

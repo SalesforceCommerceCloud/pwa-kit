@@ -11,13 +11,14 @@ import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-cur
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
 import {useMultiship} from '@salesforce/retail-react-app/app/hooks/use-multiship'
 import {STORE_LOCATOR_IS_ENABLED} from '@salesforce/retail-react-app/app/constants'
-import {isPickupShipment} from '@salesforce/retail-react-app/app/utils/order-utils'
+import {usePickupShipment} from '@salesforce/retail-react-app/app/hooks/use-pickup-shipment'
 
 const CheckoutContext = React.createContext()
 
 export const CheckoutProvider = ({children}) => {
     const {data: customer} = useCurrentCustomer()
     const {data: basket} = useCurrentBasket()
+    const {isPickupShipment} = usePickupShipment(basket)
     const einstein = useEinstein()
     const [step, setStep] = useState()
     const {findExistingDeliveryShipment, findExistingPickupShipment} = useMultiship(basket)

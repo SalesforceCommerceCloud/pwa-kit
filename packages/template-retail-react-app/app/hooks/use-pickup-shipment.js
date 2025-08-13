@@ -67,6 +67,15 @@ export const usePickupShipment = (basket) => {
     }
 
     /**
+     * Checks if a shipment is configured as a pickup (BOPIS) shipment
+     * @param {Object} shipment - The shipment object
+     * @returns {boolean} True if the shipment's shipping method is pickup-enabled
+     */
+    const isPickupShipment = (shipment) => {
+        return Boolean(shipment?.shippingMethod?.c_storePickupEnabled)
+    }
+
+    /**
      * Configures pickup shipment for the basket
      * @param {string} basketId - The basket ID
      * @param {Object} storeInfo - Store information object
@@ -257,6 +266,7 @@ export const usePickupShipment = (basket) => {
         addInventoryIdsToPickupItems,
         getPickupShippingMethodId,
         getDefaultShippingMethodId,
+        isPickupShipment,
         isCurrentShippingMethodPickup,
         updateShipmentForBasketMutation
     }
