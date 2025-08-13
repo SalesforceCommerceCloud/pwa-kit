@@ -33,8 +33,8 @@
   "devDependencies": {
     "@chakra-ui/react": "3.22.0",
     "@emotion/react": "^11.14.0",
-    "@loadable/component": "^5.15.3",
     "@formatjs/cli": "^6.0.4",
+    "@loadable/component": "^5.15.3",
     "@peculiar/webcrypto": "^1.4.2",
     "@salesforce/cc-datacloud-typescript": "^1.0.10",
     "@salesforce/commerce-sdk-react": "4.0.0-extensibility-preview.5",
@@ -55,6 +55,7 @@
     "@types/react-helmet": "^6.1.11",
     "@types/react-router-dom": "^5.3.3",
     "card-validator": "^8.1.1",
+    "cross-env": "^10.0.0",
     "cross-fetch": "^3.1.4",
     "express": "^4.19.2",
     "focus-visible": "^5.2.0",
