@@ -416,7 +416,7 @@ describe('OtpAuth', () => {
             expect(mockHandleSendEmailOtp).toHaveBeenCalledWith('test@example.com')
         })
 
-        test.skip('resend button is disabled during countdown', async () => {
+        test('resend button is disabled during countdown', async () => {
             const user = userEvent.setup()
             renderWithProviders(
                 <OtpAuth
@@ -437,7 +437,7 @@ describe('OtpAuth', () => {
             expect(disabledResendButton).toBeDisabled()
         })
 
-        test.skip('resend button becomes enabled after countdown', async () => {
+        test('resend button becomes enabled after countdown', async () => {
             const user = userEvent.setup()
             renderWithProviders(
                 <OtpAuth
@@ -460,7 +460,7 @@ describe('OtpAuth', () => {
     })
 
     describe('Error Handling', () => {
-        test.skip('handles resend code error gracefully', async () => {
+        test('handles resend code error gracefully', async () => {
             const mockHandleSendEmailOtpError = jest
                 .fn()
                 .mockRejectedValue(new Error('Network error'))
