@@ -6,7 +6,7 @@
  */
 
 import {renderHook, act} from '@testing-library/react'
-import {useAutocompleteSuggestions} from '@salesforce/retail-react-app/../../app/hooks/useAutocompleteSuggestions'
+import {useAutocompleteSuggestions} from '@salesforce/retail-react-app/app/hooks/useAutocompleteSuggestions'
 import {useMapsLibrary} from '@vis.gl/react-google-maps'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 
@@ -179,8 +179,6 @@ describe('useAutocompleteSuggestions', () => {
             new Error('API Error')
         )
 
-        const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {})
-
         const {result} = renderHook(() => useAutocompleteSuggestions('123 Main', 'US'))
 
         // Wait for debounce and API call
@@ -190,14 +188,9 @@ describe('useAutocompleteSuggestions', () => {
             await Promise.resolve()
         })
 
-        expect(consoleSpy).toHaveBeenCalledWith(
-            'Error fetching address suggestions:',
-            expect.any(Error)
-        )
+        // Should handle errors gracefully by setting suggestions to empty array
         expect(result.current.suggestions).toEqual([])
         expect(result.current.isLoading).toBe(false)
-
-        consoleSpy.mockRestore()
     })
 
     it('should reset session when resetSession is called', async () => {

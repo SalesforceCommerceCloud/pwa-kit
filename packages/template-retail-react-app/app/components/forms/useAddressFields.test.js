@@ -7,7 +7,10 @@
 
 import {renderHook, act} from '@testing-library/react'
 import useAddressFields from '../forms/useAddressFields'
-import {parseAddressSuggestion} from '@salesforce/retail-react-app/app/utils/address-suggestions'
+import {
+    processAddressSuggestion,
+    setAddressFieldValues
+} from '@salesforce/retail-react-app/app/utils/address-suggestions'
 import {useAutocompleteSuggestions} from '@salesforce/retail-react-app/app/hooks/useAutocompleteSuggestions'
 
 // Mock the address service
@@ -78,12 +81,29 @@ describe('useAddressFields', () => {
 
         useAutocompleteSuggestions.mockReturnValue(mockUseAutocompleteSuggestions)
 
-        parseAddressSuggestion.mockResolvedValue({
+        processAddressSuggestion.mockResolvedValue({
             address1: '123 Main Street',
             city: 'New York',
             stateCode: 'NY',
             postalCode: '10001',
             countryCode: 'US'
+        })
+
+        // Mock setAddressFieldValues
+        setAddressFieldValues.mockImplementation((setValue, prefix, addressFields) => {
+            setValue(`${prefix}address1`, addressFields.address1)
+            if (addressFields.city) {
+                setValue(`${prefix}city`, addressFields.city)
+            }
+            if (addressFields.stateCode) {
+                setValue(`${prefix}stateCode`, addressFields.stateCode)
+            }
+            if (addressFields.postalCode) {
+                setValue(`${prefix}postalCode`, addressFields.postalCode)
+            }
+            if (addressFields.countryCode) {
+                setValue(`${prefix}countryCode`, addressFields.countryCode)
+            }
         })
     })
 
@@ -148,19 +168,21 @@ describe('useAddressFields', () => {
             await result.current.address1.autocomplete.onSelectSuggestion(suggestion)
         })
 
-        expect(parseAddressSuggestion).toHaveBeenCalledWith(suggestion)
-        expect(mockSetValue).toHaveBeenCalledWith('address1', '123 Main Street')
-        expect(mockSetValue).toHaveBeenCalledWith('city', 'New York')
-        expect(mockSetValue).toHaveBeenCalledWith('stateCode', 'NY')
-        expect(mockSetValue).toHaveBeenCalledWith('postalCode', '10001')
-        expect(mockSetValue).toHaveBeenCalledWith('countryCode', 'US')
+        expect(processAddressSuggestion).toHaveBeenCalledWith(suggestion)
+        expect(setAddressFieldValues).toHaveBeenCalledWith(mockSetValue, '', {
+            address1: '123 Main Street',
+            city: 'New York',
+            stateCode: 'NY',
+            postalCode: '10001',
+            countryCode: 'US'
+        })
     })
 
     it('should handle partial address data when some fields are missing', async () => {
         const {result} = renderHook(() => useAddressFields({form: mockForm}))
 
-        // Mock parseAddressSuggestion to return partial data
-        parseAddressSuggestion.mockResolvedValue({
+        // Mock processAddressSuggestion to return partial data
+        processAddressSuggestion.mockResolvedValue({
             address1: '456 Oak Avenue',
             city: 'Toronto'
             // Missing stateCode, postalCode, and countryCode
@@ -176,12 +198,11 @@ describe('useAddressFields', () => {
             await result.current.address1.autocomplete.onSelectSuggestion(suggestion)
         })
 
-        expect(parseAddressSuggestion).toHaveBeenCalledWith(suggestion)
-        expect(mockSetValue).toHaveBeenCalledWith('address1', '456 Oak Avenue')
-        expect(mockSetValue).toHaveBeenCalledWith('city', 'Toronto')
-        expect(mockSetValue).toHaveBeenCalledWith('stateCode', '')
-        expect(mockSetValue).toHaveBeenCalledWith('postalCode', '')
-        // No expectation for countryCode
+        expect(processAddressSuggestion).toHaveBeenCalledWith(suggestion)
+        expect(setAddressFieldValues).toHaveBeenCalledWith(mockSetValue, '', {
+            address1: '456 Oak Avenue',
+            city: 'Toronto'
+        })
     })
 
     it('should handle address focus correctly', () => {
@@ -225,9 +246,17 @@ describe('useAddressFields', () => {
     })
 
     it('should handle country change and reset address fields', () => {
-        mockWatch.mockReturnValue('CA') // Simulate country change to Canada
+        // Mock watch to return different country values on subsequent calls
+        let callCount = 0
+        mockWatch.mockImplementation(() => {
+            callCount++
+            return callCount === 1 ? 'US' : 'CA' // First call returns US, second returns CA
+        })
 
-        const {result} = renderHook(() => useAddressFields({form: mockForm}))
+        const {result, rerender} = renderHook(() => useAddressFields({form: mockForm}))
+
+        // Trigger a rerender to simulate country change
+        rerender()
 
         // When country changes, address fields should be reset
         expect(mockSetValue).toHaveBeenCalledWith('address1', '')

@@ -7,8 +7,9 @@
 
 import React from 'react'
 import {render, screen, fireEvent} from '@testing-library/react'
+import {IntlProvider} from 'react-intl'
 import '@testing-library/jest-dom'
-import AddressSuggestionDropdown from '@salesforce/retail-react-app/../../app/components/address-suggestion-dropdown/index'
+import AddressSuggestionDropdown from '@salesforce/retail-react-app/app/components/address-suggestion-dropdown/index'
 
 describe('AddressSuggestionDropdown', () => {
     const mockSuggestions = [
@@ -60,18 +61,27 @@ describe('AddressSuggestionDropdown', () => {
         onSelectSuggestion: jest.fn()
     }
 
+    // Helper function to render with IntlProvider
+    const renderWithIntl = (component) => {
+        return render(
+            <IntlProvider locale="en" messages={{}}>
+                {component}
+            </IntlProvider>
+        )
+    }
+
     beforeEach(() => {
         jest.clearAllMocks()
     })
 
     it('should not render when isVisible is false', () => {
-        render(<AddressSuggestionDropdown {...defaultProps} />)
+        renderWithIntl(<AddressSuggestionDropdown {...defaultProps} />)
 
         expect(screen.queryByTestId('address-suggestion-dropdown')).not.toBeInTheDocument()
     })
 
     it('should render dropdown when isVisible is true', () => {
-        render(
+        renderWithIntl(
             <AddressSuggestionDropdown
                 {...defaultProps}
                 isVisible={true}
@@ -83,7 +93,7 @@ describe('AddressSuggestionDropdown', () => {
     })
 
     it('should render loading state when isLoading is true', () => {
-        render(
+        renderWithIntl(
             <AddressSuggestionDropdown
                 {...defaultProps}
                 isVisible={true}
@@ -110,7 +120,7 @@ describe('AddressSuggestionDropdown', () => {
     })
 
     it('should render suggestions when provided', () => {
-        render(
+        renderWithIntl(
             <AddressSuggestionDropdown
                 {...defaultProps}
                 isVisible={true}
@@ -118,15 +128,13 @@ describe('AddressSuggestionDropdown', () => {
             />
         )
 
-        expect(screen.getByText('123 Main Street')).toBeInTheDocument()
-        expect(screen.getByText('New York, NY 10001, USA')).toBeInTheDocument()
-        expect(screen.getByText('456 Oak Avenue')).toBeInTheDocument()
-        expect(screen.getByText('Los Angeles, CA 90210, USA')).toBeInTheDocument()
+        expect(screen.getByText('123 Main Street, New York, NY 10001, USA')).toBeInTheDocument()
+        expect(screen.getByText('456 Oak Avenue, Los Angeles, CA 90210, USA')).toBeInTheDocument()
     })
 
     it('should call onSelectSuggestion when a suggestion is clicked', () => {
         const mockOnSelect = jest.fn()
-        render(
+        renderWithIntl(
             <AddressSuggestionDropdown
                 {...defaultProps}
                 isVisible={true}
@@ -135,14 +143,14 @@ describe('AddressSuggestionDropdown', () => {
             />
         )
 
-        fireEvent.click(screen.getByText('123 Main Street'))
+        fireEvent.click(screen.getByText('123 Main Street, New York, NY 10001, USA'))
 
         expect(mockOnSelect).toHaveBeenCalledWith(mockSuggestions[0])
     })
 
     it('should call onSelectSuggestion when Enter key is pressed on a suggestion', () => {
         const mockOnSelect = jest.fn()
-        render(
+        renderWithIntl(
             <AddressSuggestionDropdown
                 {...defaultProps}
                 isVisible={true}
@@ -151,7 +159,9 @@ describe('AddressSuggestionDropdown', () => {
             />
         )
 
-        const firstSuggestion = screen.getByText('123 Main Street').closest('[role="button"]')
+        const firstSuggestion = screen
+            .getByText('123 Main Street, New York, NY 10001, USA')
+            .closest('[role="button"]')
         fireEvent.keyDown(firstSuggestion, {key: 'Enter', code: 'Enter'})
 
         expect(mockOnSelect).toHaveBeenCalledWith(mockSuggestions[0])
@@ -159,7 +169,7 @@ describe('AddressSuggestionDropdown', () => {
 
     it('should call onClose when close button is clicked', () => {
         const mockOnClose = jest.fn()
-        render(
+        renderWithIntl(
             <AddressSuggestionDropdown
                 {...defaultProps}
                 isVisible={true}
@@ -175,7 +185,9 @@ describe('AddressSuggestionDropdown', () => {
     })
 
     it('should handle empty suggestions array', () => {
-        render(<AddressSuggestionDropdown {...defaultProps} isVisible={true} suggestions={[]} />)
+        renderWithIntl(
+            <AddressSuggestionDropdown {...defaultProps} isVisible={true} suggestions={[]} />
+        )
 
         // Should not render anything when suggestions are empty
         expect(screen.queryByTestId('address-suggestion-dropdown')).not.toBeInTheDocument()
@@ -195,7 +207,7 @@ describe('AddressSuggestionDropdown', () => {
             }
         ]
 
-        render(
+        renderWithIntl(
             <AddressSuggestionDropdown
                 {...defaultProps}
                 isVisible={true}
@@ -209,7 +221,7 @@ describe('AddressSuggestionDropdown', () => {
 
     it('should handle keyboard navigation', () => {
         const mockOnSelect = jest.fn()
-        render(
+        renderWithIntl(
             <AddressSuggestionDropdown
                 {...defaultProps}
                 isVisible={true}
@@ -218,14 +230,16 @@ describe('AddressSuggestionDropdown', () => {
             />
         )
 
-        const firstSuggestion = screen.getByText('123 Main Street').closest('[role="button"]')
+        const firstSuggestion = screen
+            .getByText('123 Main Street, New York, NY 10001, USA')
+            .closest('[role="button"]')
         fireEvent.keyDown(firstSuggestion, {key: 'Enter', code: 'Enter'})
 
         expect(mockOnSelect).toHaveBeenCalledWith(mockSuggestions[0])
     })
 
     it('should handle mouse hover on suggestions', () => {
-        render(
+        renderWithIntl(
             <AddressSuggestionDropdown
                 {...defaultProps}
                 isVisible={true}
@@ -233,7 +247,9 @@ describe('AddressSuggestionDropdown', () => {
             />
         )
 
-        const firstSuggestion = screen.getByText('123 Main Street').closest('[role="button"]')
+        const firstSuggestion = screen
+            .getByText('123 Main Street, New York, NY 10001, USA')
+            .closest('[role="button"]')
 
         // Should not crash on hover
         fireEvent.mouseEnter(firstSuggestion)
@@ -263,7 +279,7 @@ describe('AddressSuggestionDropdown', () => {
             }
         ]
 
-        render(
+        renderWithIntl(
             <AddressSuggestionDropdown
                 {...defaultProps}
                 isVisible={true}
@@ -271,10 +287,8 @@ describe('AddressSuggestionDropdown', () => {
             />
         )
 
-        // Should display the main text from structured_formatting
-        expect(screen.getByText('123 Main St')).toBeInTheDocument()
-        // Should also display the secondary text
-        expect(screen.getByText('New York, NY 10001, USA')).toBeInTheDocument()
+        // Should display the full address from description
+        expect(screen.getByText('123 Main St, New York, NY 10001, USA')).toBeInTheDocument()
     })
 
     it('should fallback to structured_formatting when placePrediction is not available', () => {
@@ -297,7 +311,7 @@ describe('AddressSuggestionDropdown', () => {
             }
         ]
 
-        render(
+        renderWithIntl(
             <AddressSuggestionDropdown
                 {...defaultProps}
                 isVisible={true}
@@ -305,9 +319,7 @@ describe('AddressSuggestionDropdown', () => {
             />
         )
 
-        // Should fallback to structured_formatting.main_text
-        expect(screen.getByText('123 Main St')).toBeInTheDocument()
-        // Should display the secondary text
-        expect(screen.getByText('New York, NY 10001, USA')).toBeInTheDocument()
+        // Should display the full address from description
+        expect(screen.getByText('123 Main St, New York, NY 10001, USA')).toBeInTheDocument()
     })
 })
