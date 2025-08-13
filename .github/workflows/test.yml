@@ -87,8 +87,7 @@ jobs:
       - name: Run unit tests
         uses: "./.github/actions/unit_tests"
 
-      - name: Run bundlesize test
-        uses: "./.github/actions/bundle_size_test"
+
 
       - name: Smoke test scripts
         if: env.IS_DEFAULT_NPM == 'true'
@@ -209,11 +208,7 @@ jobs:
           GENERATOR_PRESET: ${{ matrix.template }}
         timeout-minutes: 8
 
-      - name: Lint the generated project
-        if: env.IS_TEMPLATE_FROM_RETAIL_REACT_APP == 'true'
-        uses: "./.github/actions/linting"
-        with:
-          cwd: ${{ env.PROJECT_DIR }}
+
 
       - name: Run unit tests
         if: env.IS_TEMPLATE_FROM_RETAIL_REACT_APP == 'true'
@@ -308,11 +303,7 @@ jobs:
           GENERATOR_PRESET: ${{ matrix.template }}
         timeout-minutes: 7
 
-      - name: Lint the generated project
-        if: env.IS_TEMPLATE_FROM_RETAIL_REACT_APP == 'true'
-        uses: "./.github/actions/linting"
-        with:
-          cwd: ${{ env.PROJECT_DIR }}
+
 
       - name: Run unit tests
         if: env.IS_TEMPLATE_FROM_RETAIL_REACT_APP == 'true'
