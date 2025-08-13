@@ -25,17 +25,14 @@ jest.mock('react-intl', () => ({
     defineMessage: jest.fn((message) => message)
 }))
 
-jest.mock('../../../hooks/use-multi-site', () => {
+jest.mock('../../../hooks', () => {
     const mockUseMultiSite = jest.fn()
     return {
         __esModule: true,
-        useMultiSite: mockUseMultiSite
+        useMultiSite: mockUseMultiSite,
+        useAppOrigin: jest.fn()
     }
 })
-
-jest.mock('../../../hooks/use-app-origin', () => ({
-    useAppOrigin: jest.fn()
-}))
 
 jest.mock('../../../utils/url', () => ({
     buildUrl: jest.fn()
