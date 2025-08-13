@@ -126,10 +126,10 @@ describe('useAppLocalization', () => {
         const {useIntl} = require('react-intl')
         useIntl.mockReturnValue(mockIntl)
 
-        const {useMultiSite} = require('../../../hooks/use-multi-site')
+        const {useMultiSite} = require('../../../hooks')
         useMultiSite.mockReturnValue(mockMultiSite)
 
-        const {useAppOrigin} = require('../../../hooks/use-app-origin')
+        const {useAppOrigin} = require('../../../hooks')
         useAppOrigin.mockReturnValue(mockAppOrigin)
 
         const {buildUrl} = require('../../../utils/url')
@@ -175,7 +175,7 @@ describe('useAppLocalization', () => {
     })
 
     test('handles missing window origin', () => {
-        const {useAppOrigin} = require('../../../hooks/use-app-origin')
+        const {useAppOrigin} = require('../../../hooks')
         useAppOrigin.mockReturnValue({origin: null})
 
         const {result} = renderHook(() => useAppLocalization())
@@ -191,7 +191,7 @@ describe('useAppLocalization', () => {
     })
 
     test('handles different currencies', () => {
-        const {useMultiSite} = require('../../../hooks/use-multi-site')
+        const {useMultiSite} = require('../../../hooks')
         useMultiSite.mockClear()
         useMultiSite.mockReturnValue({
             ...mockMultiSite,

@@ -23,6 +23,7 @@ import {
     // hooks
     useSlotRecipe
 } from '@chakra-ui/react'
+import {useAuthHelper, AuthHelpers} from '@salesforce/commerce-sdk-react'
 import Seo from '../../components/seo'
 import Link from '../../components/link'
 import {ChevronDownIcon, SignoutIcon} from '../../components/icons'
@@ -33,13 +34,7 @@ import AccountOrders from '../../pages/account/orders'
 import AccountWishlist from '../../pages/account/wishlist/index'
 
 import {messages, navLinks} from './constant'
-import {
-    useNavigation,
-    useCurrentCustomer,
-    useMultiSite,
-    useAuthHelper,
-    AuthHelpers
-} from '../../hooks'
+import {useNavigation, useCurrentCustomer, useMultiSite} from '../../hooks'
 import LoadingSpinner from '../../components/loading-spinner'
 import {isHydrated} from '../../utils/utils'
 
