@@ -10,7 +10,7 @@ import {Alert, Box, Button, Container, Dialog, Stack, Text} from '@chakra-ui/rea
 import {useForm} from 'react-hook-form'
 import {useIntl} from 'react-intl'
 import {useCheckout} from '../util/checkout-context'
-import useLoginFields from '../../../components/forms/useLoginFields'
+import {useLoginFields} from '../../../components/forms/useLoginFields'
 import {ToggleCard, ToggleCardEdit, ToggleCardSummary} from '../../../components/toggle-card'
 import Field from '../../../components/field'
 import SafePortal from '../../../components/safe-portal'

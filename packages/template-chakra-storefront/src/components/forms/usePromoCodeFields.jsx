@@ -7,7 +7,7 @@
 import {useMemo} from 'react'
 import {useIntl} from 'react-intl'
 
-export default function usePromoCodeFields({
+export function usePromoCodeFields({
     form: {
         control,
         formState: {errors}

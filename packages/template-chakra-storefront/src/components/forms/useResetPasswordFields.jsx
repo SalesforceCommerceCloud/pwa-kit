@@ -7,7 +7,7 @@
 import {useMemo} from 'react'
 import {useIntl} from 'react-intl'
 
-export default function useResetPasswordFields({
+export function useResetPasswordFields({
     form: {
         control,
         formState: {errors}

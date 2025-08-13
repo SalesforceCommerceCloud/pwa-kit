@@ -14,7 +14,7 @@ import {Alert, Button, Container, Stack, Text} from '@chakra-ui/react'
 import {AlertIcon, BrandLogo} from '../../components/icons'
 import Field from '../../components/field'
 import PasswordRequirements from '../../components/forms/password-requirements'
-import useUpdatePasswordFields from '../../components/forms/useUpdatePasswordFields'
+import {useUpdatePasswordFields} from '../../components/forms/useUpdatePasswordFields'
 import {usePasswordReset} from '../../hooks/use-password-reset'
 import {useNavigation} from '../../hooks/use-navigation'
 import {
