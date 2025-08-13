@@ -173,3 +173,71 @@ test('handles gift checkbox change', async () => {
 
     expect(giftCheckbox).toBeChecked()
 })
+
+// Helper to render with a custom variant
+const renderWithVariant = (variant, props = {}) => {
+    return renderWithProviders(
+        <ItemVariantProvider variant={variant}>
+            <CartSecondaryButtonGroup {...props} />
+        </ItemVariantProvider>
+    )
+}
+
+describe('CartSecondaryButtonGroup Edit button conditional rendering', () => {
+    test('shows Edit button for a variation product', () => {
+        const variantProduct = {
+            id: 'test-variant-123',
+            itemId: '123',
+            type: {item: false},
+            variationAttributes: [{id: 'color', values: [{value: 'red'}]}]
+        }
+        renderWithVariant(variantProduct)
+        expect(screen.getByRole('button', {name: /edit/i})).toBeInTheDocument()
+    })
+
+    test('does NOT show Edit button for a bundle product without variation attributes', () => {
+        const bundleProduct = {
+            id: 'test-variant-123',
+            itemId: '456',
+            bundledProductItems: [{productId: 'bundle-item-1', quantity: 1}]
+        }
+        renderWithVariant(bundleProduct)
+        expect(screen.queryByRole('button', {name: /edit/i})).not.toBeInTheDocument()
+    })
+
+    test('shows Edit button for a product with variation attributes and bundled items', () => {
+        const bundleVariationProduct = {
+            id: 'test-variant-123',
+            itemId: '789',
+            type: {item: false},
+            variationAttributes: [{id: 'color', values: [{value: 'blue'}]}],
+            bundledProductItems: [{productId: 'bundle-item-2', quantity: 2}]
+        }
+        renderWithVariant(bundleVariationProduct)
+        expect(screen.getByRole('button', {name: /edit/i})).toBeInTheDocument()
+    })
+
+    test('does NOT show Edit button for a standard product', () => {
+        const standardProduct = {
+            id: 'test-variant-123',
+            itemId: '101',
+            type: {item: true}
+        }
+        renderWithVariant(standardProduct)
+        expect(screen.queryByRole('button', {name: /edit/i})).not.toBeInTheDocument()
+    })
+
+    test('does NOT show Edit button for a product bundle that has children, but none with variants', () => {
+        const nonVariantChildrenBundle = {
+            id: 'test-variant-124',
+            itemId: '104',
+            bundledProductItems: [
+                {productId: 'child-1', quantity: 1},
+                {productId: 'child-2', quantity: 2, variationAttributes: []},
+                {productId: 'child-3', quantity: 1, hasVariants: false}
+            ]
+        }
+        renderWithVariant(nonVariantChildrenBundle)
+        expect(screen.queryByRole('button', {name: /edit/i})).not.toBeInTheDocument()
+    })
+})
