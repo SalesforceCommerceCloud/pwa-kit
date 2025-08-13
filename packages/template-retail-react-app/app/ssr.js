@@ -69,8 +69,6 @@ const options = {
     encodeNonAsciiHttpHeaders: true
 }
 
-//'http.request.uri.path eq "/" or http.request.uri.path matches "^/callback" or http.request.uri.path matches "^/mobify" or http.request.uri.path matches "^/worker.js" or http.request.uri.path matches "^/(\\w+)/([-\\w]+)/$" or http.request.uri.path matches "^/(\\w+)/([-\\w]+)/login" or http.request.uri.path matches "^/(\\w+)/([-\\w]+)/cart" or http.request.uri.path matches "^/(\\w+)/([-\\w]+)/reset-password" or http.request.uri.path matches "^/(\\w+)/([-\\w]+)/registration" or http.request.uri.path matches "^/(\\w+)/([-\\w]+)/account" or http.request.uri.path matches "^/(\\w+)/([-\\w]+)/account/orders" or http.request.uri.path matches "^/(\\w+)/([-\\w]+)/account/orders/(\\w+)" or http.request.uri.path matches "^/(\\w+)/([-\\w]+)/account/wishlist" or http.request.uri.path matches "^/(\\w+)/([-\\w]+)/product/(\\w+)" or http.request.uri.path matches "^/(\\w+)/([-\\w]+)/search" or http.request.uri.path matches "^/(\\w+)/([-\\w]+)/category/(\\w+)" or http.request.uri.path matches "^/(\\w+)/([-\\w]+)/order-status" or http.request.uri.path matches "^/(\\w+)/([-\\w]+)/page/(\\w+)" or http.request.uri.path matches "^/(\\w+)/([-\\w]+)/page-viewer/(\\w+)"'
-
 const runtime = getRuntime()
 
 /**
