@@ -47,7 +47,13 @@ const App = (props) => {
     const {getTokenWhenReady, authModal} = useAppAuth()
     const {targetLocale, messages, site, locale, buildUrl, currency, appOrigin} =
         useAppLocalization()
-    const {onLogoClick, onCartClick, onAccountClick, onWishlistClick} = useAppNavigation()
+    const {
+        onLogoClick,
+        onCartClick,
+        onAccountClick,
+        //@sfdc-extension-line SFDC_EXT_WISHLIST
+        onWishlistClick
+    } = useAppNavigation()
     const {
         isDrawerMenuOpen,
         onDrawerMenuOpen,
@@ -81,6 +87,7 @@ const App = (props) => {
         onLogoClick,
         onMyCartClick: onCartClick,
         onMyAccountClick: onAccountClick,
+        //@sfdc-extension-line SFDC_EXT_WISHLIST
         onWishlistClick,
         // TODO: Will be enabled when store locator feature is ready
         // onStoreLocatorClick: onOpenStoreLocator,

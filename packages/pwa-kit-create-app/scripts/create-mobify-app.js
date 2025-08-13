@@ -279,7 +279,8 @@ const PRESETS = [
             'project.dataCloud.appSourceId': '7ae070a6-f4ec-4def-a383-d9cacc3f20a1',
             'project.dataCloud.tenantId': 'g82wgnrvm-ywk9dggrrw8mtggy.pc-rnd',
             'project.demo.enableDemoSettings': false,
-            'project.selectedPlugins.SFDC_EXT_SOCIAL_LOGIN': false
+            'project.selectedPlugins.SFDC_EXT_SOCIAL_LOGIN': false,
+            'project.selectedPlugins.SFDC_EXT_WISHLIST': false
         },
         assets: ['translations'],
         private: false
@@ -315,7 +316,8 @@ const PRESETS = [
             ['project.dataCloud.appSourceId']: 'fb81edab-24c6-4b40-8684-b67334dfdf32',
             ['project.dataCloud.tenantId']: 'mmyw8zrxhfsg09lfmzrd1zjqmg',
             ['project.demo.enableDemoSettings']: true, // True only for presets deployed to demo environments like pwa-kit.mobify-storefront.com
-            ['project.selectedPlugins.SFDC_EXT_SOCIAL_LOGIN']: false
+            ['project.selectedPlugins.SFDC_EXT_SOCIAL_LOGIN']: false,
+            ['project.selectedPlugins.SFDC_EXT_WISHLIST']: false
         },
         assets: ['translations'],
         private: true
@@ -342,7 +344,8 @@ const PRESETS = [
             'project.dataCloud.appSourceId': 'fb81edab-24c6-4b40-8684-b67334dfdf32',
             'project.dataCloud.tenantId': 'mmyw8zrxhfsg09lfmzrd1zjqmg',
             'project.demo.enableDemoSettings': false,
-            'project.selectedPlugins.SFDC_EXT_SOCIAL_LOGIN': true
+            'project.selectedPlugins.SFDC_EXT_SOCIAL_LOGIN': true,
+            'project.selectedPlugins.SFDC_EXT_WISHLIST': true
         },
         assets: ['translations'],
         private: true
@@ -369,7 +372,8 @@ const PRESETS = [
             'project.dataCloud.appSourceId': 'fb81edab-24c6-4b40-8684-b67334dfdf32',
             'project.dataCloud.tenantId': 'mmyw8zrxhfsg09lfmzrd1zjqmg',
             'project.demo.enableDemoSettings': false,
-            'project.selectedPlugins.SFDC_EXT_SOCIAL_LOGIN': false
+            'project.selectedPlugins.SFDC_EXT_SOCIAL_LOGIN': false,
+            'project.selectedPlugins.SFDC_EXT_WISHLIST': false
         },
         assets: ['translations'],
         private: true
@@ -396,7 +400,8 @@ const PRESETS = [
             'project.dataCloud.tenantId': 'mmyw8zrxhfsg09lfmzrd1zjqmg',
             'project.commerce.isSlasPrivate': true,
             'project.demo.enableDemoSettings': false,
-            'project.selectedPlugins.SFDC_EXT_SOCIAL_LOGIN': false
+            'project.selectedPlugins.SFDC_EXT_SOCIAL_LOGIN': false,
+            'project.selectedPlugins.SFDC_EXT_WISHLIST': false
         },
         assets: ['translations'],
         private: true
@@ -423,7 +428,8 @@ const PRESETS = [
             'project.dataCloud.appSourceId': 'fb81edab-24c6-4b40-8684-b67334dfdf32',
             'project.dataCloud.tenantId': 'mmyw8zrxhfsg09lfmzrd1zjqmg',
             'project.demo.enableDemoSettings': false,
-            'project.selectedPlugins.SFDC_EXT_SOCIAL_LOGIN': false
+            'project.selectedPlugins.SFDC_EXT_SOCIAL_LOGIN': false,
+            'project.selectedPlugins.SFDC_EXT_WISHLIST': false
         },
         assets: ['translations'],
         private: true
@@ -450,7 +456,8 @@ const PRESETS = [
             'project.dataCloud.appSourceId': 'fb81edab-24c6-4b40-8684-b67334dfdf32',
             'project.dataCloud.tenantId': 'mmyw8zrxhfsg09lfmzrd1zjqmg',
             'project.demo.enableDemoSettings': false,
-            'project.selectedPlugins.SFDC_EXT_SOCIAL_LOGIN': false
+            'project.selectedPlugins.SFDC_EXT_SOCIAL_LOGIN': false,
+            'project.selectedPlugins.SFDC_EXT_WISHLIST': false
         },
         assets: ['translations'],
         private: true
@@ -920,6 +927,7 @@ const main = async (opts) => {
             answers: expandObject(answers)
         })
     }
+
     // load plugin selected answer from context object to selectedPlugins (which used for code trimming process)
     Object.entries(context.answers?.project?.selectedPlugins || {}).forEach(
         ([pluginKey, enabled]) => {

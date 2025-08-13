@@ -3,6 +3,7 @@
 - Deprecate V3 Extensibility and experimental V4 Extensibility (#2573)
 - Move extensibility logic to generator (#2573)
 - Apply prettier to trimmed files (#2688)
+- Add Wishlist feature extension flag [#3046](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3046)
 - Convert Social Login feature into an extension [#3017](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3017)
 
 ## v3.10.0 (Feb 18, 2025)
