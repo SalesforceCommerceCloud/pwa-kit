@@ -6,7 +6,7 @@
  */
 
 // Project dependencies
-import {EmptyJsonSchema, getCreateAppCommand, isMonoRepo, runCommand} from '../utils/utils'
+import {EmptyJsonSchema, getCreateAppCommand, isMonoRepo, runCommand} from '../utils/utils.js'
 
 const CREATE_APP_COMMAND = getCreateAppCommand()
 const DISPLAY_PROGRAM_FLAG = '--displayProgram'

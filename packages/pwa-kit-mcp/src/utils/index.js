@@ -18,7 +18,7 @@ import {
     isLocalComponent,
     isLocalSharedUIComponent,
     generateComponentImportStatement
-} from './utils'
+} from './utils.js'
 
 export {
     EmptyJsonSchema,
