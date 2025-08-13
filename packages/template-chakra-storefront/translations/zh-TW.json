@@ -1776,5 +1776,11 @@
   },
   "with_registration.info.please_sign_in": {
     "defaultMessage": "請登入以繼續。"
+  },
+  "bonus_product_view_modal.modal_label": {
+    "defaultMessage": "{productName}的獎勵產品選擇模態框"
+  },
+  "bonus_product_view_modal.button.view_cart": {
+    "defaultMessage": "查看購物車"
   }
 }

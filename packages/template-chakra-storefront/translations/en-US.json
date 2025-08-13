@@ -1779,5 +1779,11 @@
   },
   "with_registration.info.please_sign_in": {
     "defaultMessage": "Please sign in to continue!"
+  },
+  "bonus_product_view_modal.modal_label": {
+    "defaultMessage": "Bonus product selection modal for {productName}"
+  },
+  "bonus_product_view_modal.button.view_cart": {
+    "defaultMessage": "View Cart"
   }
 }

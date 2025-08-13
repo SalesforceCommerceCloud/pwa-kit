@@ -1776,5 +1776,11 @@
   },
   "with_registration.info.please_sign_in": {
     "defaultMessage": "계속하려면 로그인하십시오."
+  },
+  "bonus_product_view_modal.modal_label": {
+    "defaultMessage": "{productName}의 보너스 제품 선택 모달"
+  },
+  "bonus_product_view_modal.button.view_cart": {
+    "defaultMessage": "장바구니 보기"
   }
 }
