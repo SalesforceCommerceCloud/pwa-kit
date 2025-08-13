@@ -12,8 +12,8 @@
 
 // Country code mapping for address parsing
 const COUNTRY_CODE_MAP = {
-    'USA': 'US',
-    'Canada': 'CA',
+    USA: 'US',
+    Canada: 'CA'
 }
 
 /**
@@ -148,15 +148,15 @@ export const parseFormattedAddress = (formattedAddress) => {
     }
 
     // Split by comma
-    const parts = formattedAddress.split(',').map(part => part.trim())
-    
+    const parts = formattedAddress.split(',').map((part) => part.trim())
+
     // Initialize with microformat structure following adr specification
     const addressFields = {
         'street-address': parts[0] || '', // street-address (adr microformat)
-        'locality': '',                   // locality (adr microformat)
-        'region': '',                     // region (adr microformat)
-        'postal-code': '',                // postal-code (adr microformat)
-        'country-name': ''                // country-name (adr microformat)
+        locality: '', // locality (adr microformat)
+        region: '', // region (adr microformat)
+        'postal-code': '', // postal-code (adr microformat)
+        'country-name': '' // country-name (adr microformat)
     }
 
     // Map parts to microformat fields based on adr specification
@@ -165,7 +165,7 @@ export const parseFormattedAddress = (formattedAddress) => {
         addressFields['locality'] = parts[1] // City
         const statePostalPart = parts[2]
         const statePostalSplit = statePostalPart.split(' ')
-        
+
         if (statePostalSplit.length >= 2) {
             // Has both state and postal code
             addressFields['region'] = statePostalSplit[0] // State (first part)
@@ -179,7 +179,7 @@ export const parseFormattedAddress = (formattedAddress) => {
         // Format: "123 Main St, New York, NY" or "123 Main St, New York, USA"
         addressFields['locality'] = parts[1]
         const lastPart = parts[2]
-        
+
         if (lastPart === 'USA' || lastPart === 'Canada') {
             addressFields['country-name'] = lastPart
         } else {

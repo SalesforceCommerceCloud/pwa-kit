@@ -95,9 +95,9 @@ const AddressSuggestionDropdown = ({
         >
             <Flex px={4} pr={0} py={2} alignItems="center">
                 <Text fontSize="sm" fontWeight="medium" color="gray.600">
-                    <FormattedMessage 
+                    <FormattedMessage
                         defaultMessage="SUGGESTED"
-                        id="addressSuggestionDropdown.suggested" 
+                        id="addressSuggestionDropdown.suggested"
                     />
                 </Text>
                 <Spacer />
@@ -133,25 +133,21 @@ const AddressSuggestionDropdown = ({
                             {/* Address Text */}
                             <Box flex={1}>
                                 <Text fontSize="sm" noOfLines={1}>
-                                    {suggestion.description || `${suggestion.structured_formatting?.main_text}, ${suggestion.structured_formatting?.secondary_text}`}
+                                    {suggestion.description ||
+                                        `${suggestion.structured_formatting?.main_text}, ${suggestion.structured_formatting?.secondary_text}`}
                                 </Text>
                             </Box>
                         </Flex>
                     </Box>
                 ))}
             </Stack>
-            
+
             {/* Google Maps Attribution */}
-            <Box
-                px={4}
-                py={3}
-                display="flex"
-                alignItems="center"
-            >
-                <img 
+            <Box px={4} py={3} display="flex" alignItems="center">
+                <img
                     src={getAssetUrl('static/img/GoogleMaps_Logo_Gray_4x.png')}
                     alt="Google Maps"
-                    style={{ width: '98px', height: '18px' }}
+                    style={{width: '98px', height: '18px'}}
                 />
             </Box>
         </Box>

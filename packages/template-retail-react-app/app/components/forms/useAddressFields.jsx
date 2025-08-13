@@ -90,13 +90,13 @@ export default function useAddressFields({
         if (isAutocompleted) {
             return
         }
-        
+
         // Only clear fields if the country actually changed from a previous value
         // and we have a previous value (not initial load)
         if (countryCode && previousCountry !== undefined && countryCode !== previousCountry) {
             clearAddressFields()
         }
-        
+
         // Update the previous country after checking for changes
         setPreviousCountry(countryCode)
     }, [countryCode, clearAddressFields, isAutocompleted, previousCountry])
@@ -173,19 +173,19 @@ export default function useAddressFields({
             try {
                 // Set flag to prevent country change effect from running
                 setIsAutocompleted(true)
-                
+
                 // Process address suggestion using unified utility method
                 const addressFields = await processAddressSuggestion(suggestion)
 
                 // Use the utility function to set address fields
                 setAddressFieldValues(setValue, prefix, addressFields)
-                
+
                 // Reset session token after selecting a place
                 resetSession()
                 setShowDropdown(false)
                 setIsDismissed(true)
                 setCurrentInput('')
-                
+
                 // Clear the flag after setting fields
                 setTimeout(() => {
                     setIsAutocompleted(false)
