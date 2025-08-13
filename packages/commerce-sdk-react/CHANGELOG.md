@@ -1,11 +1,8 @@
 ## v3.5.0-dev (Jul 22, 2025)
-<<<<<<< HEAD
-=======
 
 - Update USID expiry to match SLAS refresh token expiry[#2854](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2854)
 
 ## v3.4.0 (Jul 22, 2025)
->>>>>>> origin/develop
 
 - Update USID expiry to match SLAS refresh token expiry[#2854](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2854)
 
