@@ -20,6 +20,8 @@ import {useHistory, useLocation, useParams} from 'react-router-dom'
 
 import {useCurrentBasket, useVariant} from '../../../hooks'
 import {useEinstein} from '../../../hooks/use-einstein'
+
+//@sfdc-extension-line SFDC_EXT_WISHLIST
 import {useWishList} from '../../../hooks/use-wish-list'
 
 import {normalizeSetBundleProduct, getUpdateBundleChildArray} from '../../../utils/product-utils'
@@ -32,6 +34,7 @@ export const useProductDetailData = () => {
     const location = useLocation()
     const einstein = useEinstein()
     const showError = useErrorHandler()
+    //@sfdc-extension-line SFDC_EXT_WISHLIST
     const {addToWishlist, isPending: isWishlistLoading} = useWishList()
 
     /****************************** Basket *********************************/
@@ -323,11 +326,13 @@ export const useProductDetailData = () => {
         selectedBundleQuantity,
         setSelectedBundleQuantity,
         handleAddToCart,
+        //@sfdc-extension-line SFDC_EXT_WISHLIST
         handleAddToWishlist: addToWishlist,
         handleProductSetAddToCart,
         handleProductBundleAddToCart,
         handleChildProductValidation,
         isBasketLoading,
+        //@sfdc-extension-line SFDC_EXT_WISHLIST
         isWishlistLoading
     }
 }

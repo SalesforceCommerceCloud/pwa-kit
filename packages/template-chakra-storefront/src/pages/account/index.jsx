@@ -29,6 +29,7 @@ import {ChevronDownIcon, SignoutIcon} from '../../components/icons'
 import AccountDetail from '../../pages/account/profile'
 import AccountAddresses from '../../pages/account/addresses'
 import AccountOrders from '../../pages/account/orders'
+// @sfdc-extension-line SFDC_EXT_WISHLIST
 import AccountWishlist from '../../pages/account/wishlist/index'
 
 import {messages, navLinks} from './constant'
@@ -217,9 +218,11 @@ const Account = () => {
                     <Route exact path={path}>
                         <AccountDetail />
                     </Route>
+                    {/* @sfdc-extension-block-start SFDC_EXT_WISHLIST */}
                     <Route exact path={`${path}/wishlist`}>
                         <AccountWishlist />
                     </Route>
+                    {/* @sfdc-extension-block-end SFDC_EXT_WISHLIST */}
                     <Route exact path={`${path}/addresses`}>
                         <AccountAddresses />
                     </Route>

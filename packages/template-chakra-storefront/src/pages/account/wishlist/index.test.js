@@ -5,6 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
+// @sfdc-extension-line SFDC_EXT_WISHLIST
 import AccountWishlist from '.'
 import {renderWithProviders} from '../../../utils/test-utils'
 import {screen, waitFor} from '@testing-library/react'

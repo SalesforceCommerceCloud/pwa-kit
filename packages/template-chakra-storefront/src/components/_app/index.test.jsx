@@ -41,6 +41,7 @@ jest.mock('./hooks', () => ({
         onLogoClick: jest.fn(),
         onCartClick: jest.fn(),
         onAccountClick: jest.fn(),
+        //@sfdc-extension-line SFDC_EXT_WISHLIST
         onWishlistClick: jest.fn()
     })),
     useAppModals: jest.fn(() => ({

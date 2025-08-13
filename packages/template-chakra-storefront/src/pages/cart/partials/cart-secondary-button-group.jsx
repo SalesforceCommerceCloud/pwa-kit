@@ -74,10 +74,12 @@ const CartSecondaryButtonGroup = ({
                 id: 'cart_secondary_button_group.action.remove',
                 defaultMessage: 'Remove'
             }),
+            //@sfdc-extension-block-start SFDC_EXT_WISHLIST
             addToWishlist: formatMessage({
                 id: 'cart_secondary_button_group.action.added_to_wishlist',
                 defaultMessage: 'Add to Wishlist'
             }),
+            //@sfdc-extension-block-end SFDC_EXT_WISHLIST
             edit: formatMessage({
                 id: 'cart_secondary_button_group.action.edit',
                 defaultMessage: 'Edit'
@@ -110,6 +112,7 @@ const CartSecondaryButtonGroup = ({
                     <Button variant="link-blue" size="sm" onClick={showRemoveItemConfirmation}>
                         {messages.remove}
                     </Button>
+                    {/*@sfdc-extension-block-start SFDC_EXT_WISHLIST*/}
                     {customer.isRegistered && (
                         <Button
                             variant="link-blue"
@@ -119,6 +122,7 @@ const CartSecondaryButtonGroup = ({
                             {messages.addToWishlist}
                         </Button>
                     )}
+                    {/*@sfdc-extension-block-end SFDC_EXT_WISHLIST*/}
                     <Button variant="link-blue" size="sm" onClick={() => onEditClick(variant)}>
                         {messages.edit}
                     </Button>
@@ -160,6 +164,7 @@ const CartSecondaryButtonGroup = ({
 CartSecondaryButtonGroup.propTypes = {
     onClick: PropTypes.func,
     onEditClick: PropTypes.func,
+    //@sfdc-extension-line SFDC_EXT_WISHLIST
     onAddToWishlistClick: PropTypes.func,
     onRemoveItemClick: PropTypes.func,
     onIsAGiftChange: PropTypes.func,

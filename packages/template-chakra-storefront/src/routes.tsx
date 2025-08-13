@@ -49,10 +49,8 @@ const SocialLoginRedirect = loadable(() => import('../src/pages/social-login-red
 // const StoreLocator = loadable(() => import('../src/pages/store-locator'), {
 //     fallback
 // })
-const Wishlist = loadable(() => import('../src/pages/account/wishlist'), {
-    fallback
-})
-
+// @sfdc-extension-line SFDC_EXT_WISHLIST
+const Wishlist = loadable(() => import('../src/pages/account/wishlist'), {fallback})
 const PageNotFound = loadable(() => import('../src/pages/page-not-found'))
 
 export const routes = [
@@ -128,10 +126,12 @@ export const routes = [
         path: '/category/:categoryId',
         component: ProductList
     },
+    // @sfdc-extension-block-start SFDC_EXT_WISHLIST
     {
         path: '/account/wishlist',
         component: Wishlist
     },
+    // @sfdc-extension-block-end SFDC_EXT_WISHLIST
     // {
     //     path: '/store-locator',
     //     component: StoreLocator

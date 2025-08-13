@@ -24,8 +24,10 @@ jest.mock('../../header', () => {
                 typeof props.onMyCartClick === 'function' ? 'function' : props.onMyCartClick,
             onMyAccountClick:
                 typeof props.onMyAccountClick === 'function' ? 'function' : props.onMyAccountClick,
+            //@sfdc-extension-block-start SFDC_EXT_WISHLIST
             onWishlistClick:
                 typeof props.onWishlistClick === 'function' ? 'function' : props.onWishlistClick,
+            //@sfdc-extension-block-end SFDC_EXT_WISHLIST
             onStoreLocatorClick:
                 typeof props.onStoreLocatorClick === 'function'
                     ? 'function'
@@ -91,6 +93,7 @@ describe('AppHeader', () => {
         onLogoClick: jest.fn(),
         onMyCartClick: jest.fn(),
         onMyAccountClick: jest.fn(),
+        //@sfdc-extension-line SFDC_EXT_WISHLIST
         onWishlistClick: jest.fn(),
         onStoreLocatorClick: jest.fn(),
         mobileNavigationProps: {
@@ -134,6 +137,7 @@ describe('AppHeader', () => {
         expect(headerProps.onLogoClick).toBe('function')
         expect(headerProps.onMyCartClick).toBe('function')
         expect(headerProps.onMyAccountClick).toBe('function')
+        //@sfdc-extension-line SFDC_EXT_WISHLIST
         expect(headerProps.onWishlistClick).toBe('function')
     })
 

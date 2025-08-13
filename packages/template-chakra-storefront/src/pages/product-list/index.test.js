@@ -165,6 +165,7 @@ describe('Product List renders properly', () => {
     })
 })
 
+//@sfdc-extension-block-start SFDC_EXT_WISHLIST
 test('show login modal when an unauthenticated user tries to add an item to wishlist', async () => {
     prependHandlersToServer([
         {
@@ -198,6 +199,7 @@ test('show login modal when an unauthenticated user tries to add an item to wish
         expect(screen.getByText(/^password$/i)).toBeInTheDocument()
     })
 })
+//@sfdc-extension-block-end SFDC_EXT_WISHLIST
 
 test('clicking a filter will change url', async () => {
     window.history.pushState({}, 'ProductList', '/uk/en-GB/category/mens-clothing-jackets')
