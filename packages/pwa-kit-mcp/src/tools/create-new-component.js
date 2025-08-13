@@ -7,7 +7,7 @@
 import {z} from 'zod'
 import fs from 'fs/promises'
 import path from 'path'
-import {toKebabCase, toPascalCase} from '../utils'
+import {toKebabCase, toPascalCase} from '../utils/index.js'
 
 const systemPrompt = `
 You are a smart assistant that helps create new React components.
