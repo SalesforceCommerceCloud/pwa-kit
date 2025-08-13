@@ -37,6 +37,7 @@ import ShippingAddressSelection from '@salesforce/retail-react-app/app/pages/che
 import AddressDisplay from '@salesforce/retail-react-app/app/components/address-display'
 import {PromoCode, usePromoCode} from '@salesforce/retail-react-app/app/components/promo-code'
 import {API_ERROR_MESSAGE} from '@salesforce/retail-react-app/app/constants'
+import {isPickupShipment} from '@salesforce/retail-react-app/app/utils/order-utils'
 
 const Payment = () => {
     const {formatMessage} = useIntl()
@@ -45,7 +46,7 @@ const Payment = () => {
     const selectedBillingAddress = basket?.billingAddress
     const appliedPayment = basket?.paymentInstruments && basket?.paymentInstruments[0]
 
-    const isPickupOrder = basket?.shipments[0]?.shippingMethod?.c_storePickupEnabled === true
+    const isPickupOrder = isPickupShipment(basket?.shipments?.[0])
     const [billingSameAsShipping, setBillingSameAsShipping] = useState(!isPickupOrder)
     const {mutateAsync: addPaymentInstrumentToBasket} = useShopperBasketsMutation(
         'addPaymentInstrumentToBasket'

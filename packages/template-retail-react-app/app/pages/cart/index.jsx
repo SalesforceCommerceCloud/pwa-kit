@@ -67,6 +67,7 @@ import {
 import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
 import UnavailableProductConfirmationModal from '@salesforce/retail-react-app/app/components/unavailable-product-confirmation-modal'
 import {getUpdateBundleChildArray} from '@salesforce/retail-react-app/app/utils/product-utils'
+import {isPickupShipment} from '@salesforce/retail-react-app/app/utils/order-utils'
 import {useSelectedStore} from '@salesforce/retail-react-app/app/hooks/use-selected-store'
 import {useMultiship} from '@salesforce/retail-react-app/app/hooks/use-multiship'
 
@@ -691,9 +692,7 @@ const Cart = () => {
 
         // Separate pickup and delivery shipments
         basket.shipments.forEach((shipment) => {
-            const isPickupOrder = STORE_LOCATOR_IS_ENABLED
-                ? shipment?.shippingMethod?.c_storePickupEnabled === true
-                : false
+            const isPickupOrder = STORE_LOCATOR_IS_ENABLED && isPickupShipment(shipment)
             const storeId = shipment?.c_fromStoreId
             const store = storeData?.data?.find((store) => store.id === storeId)
 
