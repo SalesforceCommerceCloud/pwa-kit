@@ -54,6 +54,7 @@ test('Renders PricingAndPromotionsSkeleton when isRefetching is true', async () 
     expect(queryByTestId('sf-product-tile-skeleton')).not.toBeInTheDocument()
 })
 
+//@sfdc-extension-block-start SFDC_EXT_WISHLIST
 test('Remove from wishlist cannot be muti-clicked', async () => {
     const onClick = jest.fn()
 
@@ -72,6 +73,7 @@ test('Remove from wishlist cannot be muti-clicked', async () => {
     })
     expect(onClick).toHaveBeenCalledTimes(1)
 })
+//@sfdc-extension-block-end SFDC_EXT_WISHLIST
 
 test('Renders variant details based on the selected swatch', async () => {
     useBreakpointValue.mockReturnValue(true)

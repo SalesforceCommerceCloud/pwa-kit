@@ -428,6 +428,7 @@ export const cartVariant = {
     isProductUnavailable: false
 }
 
+//@sfdc-extension-block-start SFDC_EXT_WISHLIST
 export const wishlistVariant = {
     currency: 'GBP',
     id: '701643563814M',
@@ -762,3 +763,4 @@ export const wishlistVariant = {
     c_width: 'Z',
     quantity: 5
 }
+//@sfdc-extension-block-end SFDC_EXT_WISHLIST

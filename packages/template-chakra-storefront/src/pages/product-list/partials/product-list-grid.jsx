@@ -16,6 +16,7 @@ const ProductListGrid = ({
     isFetched,
     searchParams,
     productListConfig,
+    //@sfdc-extension-line SFDC_EXT_WISHLIST
     isItemInWishlist,
     onFavouriteToggle,
     onClickProduct
@@ -31,13 +32,16 @@ const ProductListGrid = ({
                       .fill(0)
                       .map((_, index) => <ProductTileSkeleton key={index} />)
                 : productSearchResult?.hits?.map((product) => {
+                      //@sfdc-extension-line SFDC_EXT_WISHLIST
                       const isInWishlist = isItemInWishlist(product)
                       return (
                           <ProductTile
                               data-testid={`sf-product-tile-${product.productId}`}
                               key={product.productId}
                               product={product}
+                              //@sfdc-extension-line SFDC_EXT_WISHLIST
                               enableFavourite={true}
+                              //@sfdc-extension-line SFDC_EXT_WISHLIST
                               isFavourite={isInWishlist}
                               isRefreshingData={isRefetching && isFetched}
                               imageViewType={productListConfig.imageViewType}

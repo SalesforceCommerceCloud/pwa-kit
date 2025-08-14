@@ -26,7 +26,9 @@ ProductDetails.propTypes = {
     isProductABundle: PropTypes.bool,
     isProductLoading: PropTypes.bool,
     isBasketLoading: PropTypes.bool,
+    //@sfdc-extension-line SFDC_EXT_WISHLIST
     isWishlistLoading: PropTypes.bool,
+    //@sfdc-extension-line SFDC_EXT_WISHLIST
     handleAddToWishlist: PropTypes.func,
     handleAddToCart: PropTypes.func,
     handleProductSetAddToCart: PropTypes.func,

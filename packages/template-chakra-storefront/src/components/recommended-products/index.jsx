@@ -14,14 +14,18 @@ import useEinstein from '../../hooks/use-einstein'
 import useDataCloud from '../../hooks/use-datacloud'
 import {useCurrentCustomer} from '../../hooks/use-current-customer'
 import useIntersectionObserver from '../../hooks/use-intersection-observer'
+//@sfdc-extension-line SFDC_EXT_WISHLIST
 import {useWishList} from '../../hooks/use-wish-list'
 
 import useToast from '../../hooks/use-toast'
 import useNavigation from '../../hooks/use-navigation'
 import {
     API_ERROR_MESSAGE,
+    //@sfdc-extension-line SFDC_EXT_WISHLIST
     TOAST_ACTION_VIEW_WISHLIST,
+    //@sfdc-extension-line SFDC_EXT_WISHLIST
     TOAST_MESSAGE_ADDED_TO_WISHLIST,
+    //@sfdc-extension-line SFDC_EXT_WISHLIST
     TOAST_MESSAGE_REMOVED_FROM_WISHLIST
 } from '../../../config/constants'
 import {useShopperCustomersMutation} from '@salesforce/commerce-sdk-react'
@@ -41,6 +45,7 @@ const RecommendedProducts = ({zone, recommender, products, title, shouldFetch, .
     } = useEinstein()
     const {data: customer} = useCurrentCustomer()
     const {customerId} = customer
+    //@sfdc-extension-line SFDC_EXT_WISHLIST
     const {data: wishlist} = useWishList()
     const dataCloud = useDataCloud()
 
@@ -57,10 +62,12 @@ const RecommendedProducts = ({zone, recommender, products, title, shouldFetch, .
 
     const messages = useMemo(
         () => ({
+            //@sfdc-extension-block-start SFDC_EXT_WISHLIST
             toastAddedToWishlist: (quantity) =>
                 formatMessage(TOAST_MESSAGE_ADDED_TO_WISHLIST, {quantity}),
             toastViewWishlist: formatMessage(TOAST_ACTION_VIEW_WISHLIST),
             toastRemovedFromWishlist: formatMessage(TOAST_MESSAGE_REMOVED_FROM_WISHLIST),
+            //@sfdc-extension-block-end SFDC_EXT_WISHLIST
             apiError: formatMessage(API_ERROR_MESSAGE)
         }),
         [intl]
@@ -128,6 +135,7 @@ const RecommendedProducts = ({zone, recommender, products, title, shouldFetch, .
         return null
     }
 
+    //@sfdc-extension-block-start SFDC_EXT_WISHLIST
     // TODO: DRY this handler when intl provider is available globally
     const addItemToWishlist = async (product) => {
         try {
@@ -191,7 +199,7 @@ const RecommendedProducts = ({zone, recommender, products, title, shouldFetch, .
             })
         }
     }
-
+    //@sfdc-extension-block-end SFDC_EXT_WISHLIST
     return (
         <ProductScroller
             ref={ref}
@@ -209,6 +217,7 @@ const RecommendedProducts = ({zone, recommender, products, title, shouldFetch, .
                     )
                 },
                 enableFavourite: true,
+                //@sfdc-extension-block-start SFDC_EXT_WISHLIST
                 isFavourite: wishlist?.customerProductListItems?.some(
                     (item) => item.productId === product?.productId
                 ),
@@ -216,6 +225,7 @@ const RecommendedProducts = ({zone, recommender, products, title, shouldFetch, .
                     const action = toBeFavourite ? addItemToWishlist : removeItemFromWishlist
                     return action(product)
                 }
+                //@sfdc-extension-block-end SFDC_EXT_WISHLIST
             })}
             {...props}
         />

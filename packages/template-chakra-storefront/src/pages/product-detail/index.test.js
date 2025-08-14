@@ -14,6 +14,7 @@ import {renderWithProviders} from '../../utils/test-utils'
 import {prependHandlersToServer} from '../../../jest-setup'
 import {
     basketWithProductSet,
+    //@sfdc-extension-line SFDC_EXT_WISHLIST
     mockWishlistWithItem,
     einsteinRecommendation,
     masterProduct,
@@ -114,12 +115,14 @@ describe('product detail', () => {
             expect(screen.getAllByText(/from £9\.59/i)).toHaveLength(2)
             expect(screen.getAllByText(/£15\.36/i)).toHaveLength(4)
             expect(screen.getAllByText(/Add to Cart/)).toHaveLength(2)
+            //@sfdc-extension-line SFDC_EXT_WISHLIST
             expect(screen.getAllByText(/Add to Wishlist/)).toHaveLength(2)
             expect(screen.getAllByTestId('product-view')).toHaveLength(1)
             expect(screen.getByText(/You might also like/i)).toBeInTheDocument()
         })
     })
 
+    //@sfdc-extension-block-start SFDC_EXT_WISHLIST
     test('should add to wishlist', async () => {
         prependHandlersToServer([
             {
@@ -165,7 +168,9 @@ describe('product detail', () => {
             expect(screen.getByText(/item added to wishlist/i)).toBeInTheDocument()
         })
     })
+    //@sfdc-extension-block-end SFDC_EXT_WISHLIST
 
+    //@sfdc-extension-block-start SFDC_EXT_WISHLIST
     test('should not add to wishlist if item is already in wishlist', async () => {
         prependHandlersToServer([
             {
@@ -198,6 +203,7 @@ describe('product detail', () => {
             expect(screen.getByText(/item is already in wishlist/i)).toBeInTheDocument()
         })
     })
+    //@sfdc-extension-block-end SFDC_EXT_WISHLIST
 })
 
 describe('product set', () => {
