@@ -83,7 +83,7 @@ const ContactInfo = ({isSocialEnabled = false, idps = []}) => {
 
     const [error, setError] = useState()
     const [signOutConfirmDialogIsOpen, setSignOutConfirmDialogIsOpen] = useState(false)
-    const [showContinueButton, setShowContinueButton] = useState(false)
+    const [showContinueButton, setShowContinueButton] = useState(true)
     const [isCheckingEmail, setIsCheckingEmail] = useState(false)
 
     const passwordlessConfigCallback = getConfig().app.login?.passwordless?.callbackURI
@@ -127,9 +127,6 @@ const ContactInfo = ({isSocialEnabled = false, idps = []}) => {
             onOtpModalClose()
         }
 
-        // Hide continue button when user focuses back on email
-        setShowContinueButton(false)
-
         // Clear email checking state
         setIsCheckingEmail(false)
     }
@@ -145,11 +142,8 @@ const ContactInfo = ({isSocialEnabled = false, idps = []}) => {
             })
             // Only open modal if API call succeeds
             onOtpModalOpen()
-            // Hide continue button since user will use OTP flow
-            setShowContinueButton(false)
         } catch (error) {
-            // Show continue button when email is not found
-            setShowContinueButton(true)
+            //fail silently
         } finally {
             setIsCheckingEmail(false)
         }
@@ -200,29 +194,12 @@ const ContactInfo = ({isSocialEnabled = false, idps = []}) => {
     const submitForm = async (data) => {
         setError(null)
 
-        // If continue button is showing, this means it's a guest checkout
-        // Go directly to next step without OTP
-        if (showContinueButton) {
-            await updateCustomerForBasket.mutateAsync({
-                parameters: {basketId: basket.basketId},
-                body: {email: data.email}
-            })
-            setShowContinueButton(false)
-            goToNextStep()
-            return
-        }
-
-        // Otherwise, this is form submission (Enter key) - trigger OTP flow
-        const email = form.getValues('email')
-        const isValid = await form.trigger()
-
-        // Manually trigger the browser native form validations
-        if (isValid) {
-            // Try to send OTP first, only open modal if successful
-            await handleSendEmailOtp(email)
-        } else {
-            form.reportValidity()
-        }
+        await updateCustomerForBasket.mutateAsync({
+            parameters: {basketId: basket.basketId},
+            body: {email: data.email}
+        })
+        setShowContinueButton(false)
+        goToNextStep()
     }
 
     return (
