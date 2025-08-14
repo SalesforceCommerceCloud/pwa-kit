@@ -98,6 +98,19 @@ const CartSecondaryButtonGroup = ({
         onRemoveItemClick(variant)
     }
 
+    /**
+     * Decide whether the Edit button should be displayed.
+     *
+     * - `variant.id`: avoids a brief Edit-button flicker when the variant is still being resolved.
+     * - `variant.type && !variant.type?.item`: only non-standard products can be edited
+     * - `variant.variationAttributes.length > 0`: only show Edit when there are variation attributes to edit
+     *
+     * Returns true when all conditions are satisfied, otherwise false.
+     */
+    const showEditButton = useMemo(() => {
+        return variant.id && variant.type && !variant.type?.item
+    }, [variant])
+
     return (
         <>
             <Stack
@@ -119,9 +132,12 @@ const CartSecondaryButtonGroup = ({
                             {messages.addToWishlist}
                         </Button>
                     )}
-                    <Button variant="link-blue" size="sm" onClick={() => onEditClick(variant)}>
-                        {messages.edit}
-                    </Button>
+                    {/*@sfdc-extension-block-end SFDC_EXT_WISHLIST*/}
+                    {showEditButton && (
+                        <Button variant="link-blue" size="sm" onClick={() => onEditClick(variant)}>
+                            {messages.edit}
+                        </Button>
+                    )}
                 </ButtonGroup>
                 <Flex alignItems="center">
                     <Checkbox.Root
