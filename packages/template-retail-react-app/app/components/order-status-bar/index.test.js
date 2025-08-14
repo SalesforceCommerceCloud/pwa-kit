@@ -16,7 +16,7 @@ describe('OrderStatusBar', () => {
         renderWithProviders(<OrderStatusBar />)
 
         expect(screen.getByText('Ordered')).toBeInTheDocument()
-        expect(screen.getByText('Dispatched')).toBeInTheDocument()
+        expect(screen.getByText('Shipped')).toBeInTheDocument()
         expect(screen.getByText('Out for delivery')).toBeInTheDocument()
         expect(screen.getByText('Delivered')).toBeInTheDocument()
     })
@@ -24,7 +24,7 @@ describe('OrderStatusBar', () => {
     test('renders step labels with responsive font sizes and word wrapping', () => {
         renderWithProviders(<OrderStatusBar />)
 
-        const labels = screen.getAllByText(/Ordered|Dispatched|Out for delivery|Delivered/)
+        const labels = screen.getAllByText(/Ordered|Shipped|Out for delivery|Delivered/)
         labels.forEach((label) => {
             // Check that the component renders without errors
             expect(label).toBeInTheDocument()
@@ -54,8 +54,8 @@ describe('OrderStatusBar', () => {
         const {rerender} = renderWithProviders(<OrderStatusBar currentStepLabel="Ordered" />)
         expect(screen.getByText('Ordered')).toBeInTheDocument()
 
-        rerender(<OrderStatusBar currentStepLabel="Dispatched" />)
-        expect(screen.getByText('Dispatched')).toBeInTheDocument()
+        rerender(<OrderStatusBar currentStepLabel="Shipped" />)
+        expect(screen.getByText('Shipped')).toBeInTheDocument()
 
         rerender(<OrderStatusBar currentStepLabel="Delivered" />)
         expect(screen.getByText('Delivered')).toBeInTheDocument()
@@ -69,7 +69,7 @@ describe('OrderStatusBar', () => {
         rerender(<OrderStatusBar currentStepLabel={undefined} />)
         expect(screen.getByText('Ordered')).toBeInTheDocument()
 
-        rerender(<OrderStatusBar currentStepLabel={['Ordered', 'Dispatched']} />)
+        rerender(<OrderStatusBar currentStepLabel={['Ordered', 'Shipped']} />)
         expect(screen.getByText('Ordered')).toBeInTheDocument()
     })
 
@@ -86,7 +86,7 @@ describe('OrderStatusBar', () => {
     test('renders text labels with correct styling properties', () => {
         renderWithProviders(<OrderStatusBar />)
 
-        const labels = screen.getAllByText(/Ordered|Dispatched|Out for delivery|Delivered/)
+        const labels = screen.getAllByText(/Ordered|Shipped|Out for delivery|Delivered/)
         labels.forEach((label) => {
             // Check that labels are rendered
             expect(label).toBeInTheDocument()
@@ -99,8 +99,8 @@ describe('OrderStatusBar', () => {
         expect(screen.getByText('Ordered')).toBeInTheDocument()
 
         // Test with different case
-        rerender(<OrderStatusBar currentStepLabel="DISPATCHED" />)
-        expect(screen.getByText('Dispatched')).toBeInTheDocument()
+        rerender(<OrderStatusBar currentStepLabel="SHIPPED" />)
+        expect(screen.getByText('Shipped')).toBeInTheDocument()
 
         // Test with mixed case
         rerender(<OrderStatusBar currentStepLabel="Out For Delivery" />)

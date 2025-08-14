@@ -68,8 +68,8 @@ describe('OrderLookupForm', () => {
         renderWithProviders(<OrderLookupForm onSubmit={mockOnSubmit} />)
         await submitForm()
 
-        expect(screen.getByText('Please enter your order number.')).toBeInTheDocument()
-        expect(screen.getByText('Please enter your email address.')).toBeInTheDocument()
+        expect(screen.getByText('Enter your order number.')).toBeInTheDocument()
+        expect(screen.getByText('Enter your email address.')).toBeInTheDocument()
         expect(mockOnSubmit).not.toHaveBeenCalled()
     })
 
@@ -81,8 +81,8 @@ describe('OrderLookupForm', () => {
         })
         await submitForm()
 
-        expect(screen.getByText('Please enter your email address.')).toBeInTheDocument()
-        expect(screen.queryByText('Please enter your order number.')).not.toBeInTheDocument()
+        expect(screen.getByText('Enter your email address.')).toBeInTheDocument()
+        expect(screen.queryByText('Enter your order number.')).not.toBeInTheDocument()
         expect(mockOnSubmit).not.toHaveBeenCalled()
     })
 
@@ -94,8 +94,8 @@ describe('OrderLookupForm', () => {
         })
         await submitForm()
 
-        expect(screen.getByText('Please enter your order number.')).toBeInTheDocument()
-        expect(screen.queryByText('Please enter your email address.')).not.toBeInTheDocument()
+        expect(screen.getByText('Enter your order number.')).toBeInTheDocument()
+        expect(screen.queryByText('Enter your email address.')).not.toBeInTheDocument()
         expect(mockOnSubmit).not.toHaveBeenCalled()
     })
 
