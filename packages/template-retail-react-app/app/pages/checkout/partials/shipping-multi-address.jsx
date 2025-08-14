@@ -281,8 +281,15 @@ const ShippingMultiAddress = ({
                 deliveryItems.forEach((item) => {
                     const addressKey = item.itemId
                     const shipment = existingShipments.find((s) => s.shipmentId === item.shipmentId)
+                    const hasRequiredFields =
+                        shipment?.shippingAddress?.firstName &&
+                        shipment?.shippingAddress?.lastName &&
+                        shipment?.shippingAddress?.address1 &&
+                        shipment?.shippingAddress?.city &&
+                        shipment?.shippingAddress?.stateCode &&
+                        shipment?.shippingAddress?.postalCode
 
-                    if (shipment && shipment.shippingAddress) {
+                    if (hasRequiredFields) {
                         const addressId = `guest_${shipment.shipmentId}`
                         const address = {
                             addressId,
