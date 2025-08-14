@@ -163,7 +163,7 @@ export const AddToCartModal = () => {
                 <Flex
                     key={productId}
                     justifyContent="space-between"
-                    marginBottom={index < itemsAdded - 1 ? 0 : 4}
+                    marginBottom={index < itemsAdded.length - 1 ? 4 : 0}
                     paddingBottom={4}
                     borderBottomWidth={{base: '1px', lg: '0px'}}
                     borderColor="gray.200"
