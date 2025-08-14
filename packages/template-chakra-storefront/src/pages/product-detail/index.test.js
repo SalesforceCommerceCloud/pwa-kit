@@ -236,39 +236,30 @@ describe('product set', () => {
 
         // Initial basket is necessary to add items to it
         const initialBasket = {basketId: 'valid_id'}
-        renderWithProviders(<MockedComponent />, {wrapperProps: {initialBasket}})
+        const {user} = renderWithProviders(<MockedComponent />, {wrapperProps: {initialBasket}})
 
-        await waitFor(
-            () => {
-                expect(screen.getByRole('link', {name: /mens/i})).toBeInTheDocument()
+        await waitFor(() => {
+            expect(screen.getByRole('link', {name: /mens/i})).toBeInTheDocument()
 
-                expect(screen.getAllByText('Winter Look')[0]).toBeInTheDocument()
-                expect(screen.getAllByText('Quilted Jacket')[0]).toBeInTheDocument()
-                expect(screen.getAllByText('Pull On Pant')[0]).toBeInTheDocument()
-                expect(screen.getAllByText('Zerrick')[0]).toBeInTheDocument()
-                expect(
-                    screen.getByRole('heading', {name: /you might also like/i})
-                ).toBeInTheDocument()
-            },
-            {timeout: 5000}
-        )
+            expect(screen.getAllByText('Winter Look')[0]).toBeInTheDocument()
+            expect(screen.getAllByText('Quilted Jacket')[0]).toBeInTheDocument()
+            expect(screen.getAllByText('Pull On Pant')[0]).toBeInTheDocument()
+            expect(screen.getAllByText('Zerrick')[0]).toBeInTheDocument()
+            expect(screen.getByRole('heading', {name: /you might also like/i})).toBeInTheDocument()
+        })
 
         const buttons = await screen.findAllByText(/add set to cart/i)
         await act(async () => {
-            fireEvent.click(buttons[0])
+            await user.click(buttons[0])
         })
 
-        await waitFor(
-            () => {
-                const modal = screen.getByTestId('add-to-cart-modal')
-                expect(within(modal).getByText(/items added to cart/i)).toBeInTheDocument()
-                expect(within(modal).getByText(/Quilted Jacket/i)).toBeInTheDocument()
-                expect(within(modal).getByText(/Pull On Pant/i)).toBeInTheDocument()
-                expect(within(modal).getByText(/Zerrick/i)).toBeInTheDocument()
-            },
-            // Seems like rendering the modal takes a bit more time
-            {timeout: 10000}
-        )
+        await waitFor(() => {
+            const modal = screen.getByTestId('add-to-cart-modal')
+            expect(within(modal).getByText(/items added to cart/i)).toBeInTheDocument()
+            expect(within(modal).getByText(/Quilted Jacket/i)).toBeInTheDocument()
+            expect(within(modal).getByText(/Pull On Pant/i)).toBeInTheDocument()
+            expect(within(modal).getByText(/Zerrick/i)).toBeInTheDocument()
+        })
     })
 
     test('add the set to cart with error messages', async () => {

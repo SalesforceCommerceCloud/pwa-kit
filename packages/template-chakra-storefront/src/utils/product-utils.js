@@ -23,15 +23,27 @@ import {productUrlBuilder, rebuildPathWithParams} from './url'
  * // returns { "Colour": "royal" }
  */
 export const getDisplayVariationValues = (variationAttributes, values = {}) => {
+    if (!variationAttributes || !Array.isArray(variationAttributes)) {
+        return {}
+    }
+
     const returnVal = Object.entries(values).reduce((acc, [id, value]) => {
         const attribute = variationAttributes.find(({id: attributeId}) => attributeId === id)
+        if (!attribute || !attribute.values) {
+            return acc
+        }
+
         const attributeValue = attribute.values.find(
             ({value: attributeValue}) => attributeValue === value
         )
-        return {
-            ...acc,
-            [attribute.name]: attributeValue.name
+
+        if (attributeValue) {
+            return {
+                ...acc,
+                [attribute.name]: attributeValue.name
+            }
         }
+        return acc
     }, {})
     return returnVal
 }
