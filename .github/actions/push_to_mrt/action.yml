@@ -26,6 +26,6 @@ runs:
       run: |-
         cd ${{ inputs.CWD }}
         if [[ ${{ inputs.TARGET }} ]]; then
-          npm run push -- --projectSlug ${{ inputs.PROJECT }} --message "${{ inputs.MESSAGE }}" --target ${{ inputs.TARGET }} --cloud-origin ${{ inputs.CLOUD_ORIGIN }} --credentialsFile ${{inputs.CREDENTIALS_FILE_PATH}} ${{ inputs.FLAGS }}
+          npm run push -- --projectSlug ${{ inputs.PROJECT }} --message "${{ inputs.MESSAGE }}" --target ${{ inputs.TARGET }} --cloud-origin ${{ inputs.CLOUD_ORIGIN }} --credentialsFile ${{ inputs.CREDENTIALS_FILE_PATH }} ${{ inputs.FLAGS }}
         fi
       shell: bash
