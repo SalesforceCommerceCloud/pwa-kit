@@ -8,7 +8,7 @@ import React, {useEffect, useRef} from 'react'
 import AdyenCheckout from '@adyen/adyen-web'
 import '@adyen/adyen-web/dist/adyen.css'
 import PropTypes from 'prop-types'
-import {useAdyenExpressCheckout} from '@adyen/adyen-salesforce-pwa'
+import {useAdyenExpressCheckout} from '@salesforce/retail-react-app/app/api/adyen'
 import {
     getCurrencyValueForApi,
     getGPShippingOptionParameters

@@ -8,7 +8,7 @@ import React from 'react'
 import {render, waitFor} from '@testing-library/react'
 import {ApplePayExpress} from '@salesforce/retail-react-app/app/components/apple-pay-express/index'
 import AdyenCheckout from '@adyen/adyen-web'
-import {useAdyenExpressCheckout} from '@adyen/adyen-salesforce-pwa'
+import {useAdyenExpressCheckout} from '@salesforce/retail-react-app/app/api/adyen'
 import {
     getApplePaymentMethodConfig,
     getCustomerShippingDetails,
@@ -38,7 +38,7 @@ jest.mock('@adyen/adyen-web', () => ({
 }))
 
 // Mock the useAdyenExpressCheckout hook
-jest.mock('@adyen/adyen-salesforce-pwa', () => ({
+jest.mock('@salesforce/retail-react-app/app/api/adyen', () => ({
     useAdyenExpressCheckout: jest.fn()
 }))
 

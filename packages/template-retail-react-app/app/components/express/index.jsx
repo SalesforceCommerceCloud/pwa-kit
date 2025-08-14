@@ -6,9 +6,7 @@
  */
 import React, {useEffect, useState} from 'react'
 import {useLocation} from 'react-router-dom'
-
-import {AdyenExpressCheckoutProvider} from '@adyen/adyen-salesforce-pwa'
-
+import {AdyenExpressCheckoutProvider} from '@salesforce/retail-react-app/app/api/adyen'
 import {ApplePayExpress} from '@salesforce/retail-react-app/app/components/apple-pay-express/index'
 import {GooglePayExpress} from '@salesforce/retail-react-app/app/components/google-pay-express/index'
 import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'

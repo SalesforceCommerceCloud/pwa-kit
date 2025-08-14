@@ -5,9 +5,9 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React, {useEffect, useState} from 'react'
-import {AdyenCheckout, AdyenCheckoutProvider} from '@adyen/adyen-salesforce-pwa'
+import {AdyenCheckout, AdyenCheckoutProvider} from '@salesforce/retail-react-app/app/api/adyen'
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
-import '@adyen/adyen-salesforce-pwa/dist/app/adyen.css'
+import '@adyen/adyen-web/dist/adyen.css'
 import '@salesforce/retail-react-app/app/styles/adyen-overrides.css'
 import {useAccessToken, useCustomerId} from '@salesforce/commerce-sdk-react'
 import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'

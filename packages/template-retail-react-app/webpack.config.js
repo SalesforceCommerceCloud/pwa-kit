@@ -10,22 +10,25 @@ const configNames = require('@salesforce/pwa-kit-dev/configs/webpack/config-name
 const {isRemote} = require('@salesforce/pwa-kit-runtime/utils/ssr-server.js')
 
 module.exports = config.map((configItem) => {
-    if (configItem.name === configNames.CLIENT || configItem.name === configNames.SERVER) {
-        return {
-            ...configItem,
-            devtool: isRemote() ? false : 'source-map',
-            module: {
-                ...configItem.module,
-                rules: [
-                    ...configItem.module.rules,
-                    {
-                        test: /\.css$/i,
-                        use: ['style-loader', 'css-loader']
-                    }
-                ]
-            }
+    // Add CSS loader support to ALL configurations to handle CSS files like @adyen/adyen-web/dist/adyen.css
+    const updatedConfig = {
+        ...configItem,
+        module: {
+            ...configItem.module,
+            rules: [
+                ...configItem.module.rules,
+                {
+                    test: /\.css$/i,
+                    use: ['style-loader', 'css-loader']
+                }
+            ]
         }
-    } else {
-        return configItem
     }
+
+    // Special handling for CLIENT and SERVER configurations
+    if (configItem.name === configNames.CLIENT || configItem.name === configNames.SERVER) {
+        updatedConfig.devtool = isRemote() || process.env.CI === 'true' ? false : 'source-map'
+    }
+
+    return updatedConfig
 })

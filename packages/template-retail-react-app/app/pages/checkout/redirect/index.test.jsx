@@ -11,10 +11,10 @@ import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-curre
 import {useAccessToken, useCustomerId} from '@salesforce/commerce-sdk-react'
 import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
 import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
-import {AdyenCheckoutProvider, AdyenCheckout} from '@adyen/adyen-salesforce-pwa'
+import {AdyenCheckoutProvider, AdyenCheckout} from '@salesforce/retail-react-app/app/api/adyen'
 
 // Mock Adyen components
-jest.mock('@adyen/adyen-salesforce-pwa', () => ({
+jest.mock('@salesforce/retail-react-app/app/api/adyen', () => ({
     AdyenCheckout: jest.fn(() => <div data-testid="adyen-checkout" />),
     AdyenCheckoutProvider: jest.fn(({children}) => (
         <div data-testid="adyen-provider">{children}</div>

@@ -25,8 +25,8 @@ import {getRuntime} from '@salesforce/pwa-kit-runtime/ssr/server/express'
 import {defaultPwaKitSecurityHeaders} from '@salesforce/pwa-kit-runtime/utils/middleware'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import {getAppOrigin} from '@salesforce/pwa-kit-react-sdk/utils/url'
-import {registerAdyenEndpoints} from '@adyen/adyen-salesforce-pwa/dist/ssr/index.js'
-import standalonePaymentMethodsHandler from './api/adyen/paymentMethods/standalone.js'
+import {registerAdyenEndpoints} from '@salesforce/retail-react-app/app/api/adyen'
+import standalonePaymentMethodsHandler from '@salesforce/retail-react-app/app/api/adyen/paymentMethods/standalone.js'
 
 const config = getConfig()
 

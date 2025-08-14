@@ -8,7 +8,7 @@ import React from 'react'
 import {render, waitFor} from '@testing-library/react'
 import {GooglePayExpress} from '@salesforce/retail-react-app/app/components/google-pay-express/index'
 import AdyenCheckout from '@adyen/adyen-web'
-import {useAdyenExpressCheckout} from '@adyen/adyen-salesforce-pwa'
+import {useAdyenExpressCheckout} from '@salesforce/retail-react-app/app/api/adyen'
 import {
     getGooglePaymentMethodConfig,
     getCustomerShippingDetails,
@@ -27,7 +27,7 @@ jest.mock('@adyen/adyen-web', () => ({
     default: jest.fn()
 }))
 
-jest.mock('@adyen/adyen-salesforce-pwa', () => ({
+jest.mock('@salesforce/retail-react-app/app/api/adyen', () => ({
     useAdyenExpressCheckout: jest.fn()
 }))
 
@@ -517,7 +517,7 @@ describe('getGoogleButtonConfig', () => {
         })
         expect(mockUpdateShippingAddress).toHaveBeenCalled()
         expect(initializeResult).toHaveProperty('newTransactionInfo')
-        
+
         // Verify that the basket was updated with shipping option parameters
         expect(initializeResult).toHaveProperty('newShippingOptionParameters')
         expect(initializeResult.newShippingOptionParameters).toEqual({
