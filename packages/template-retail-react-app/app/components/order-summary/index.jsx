@@ -214,9 +214,7 @@ const OrderSummary = ({
                             )}
                         </Flex>
 
-                        {shippingItem?.priceAdjustments?.some(
-                            ({appliedDiscount}) => appliedDiscount?.type === 'free'
-                        ) ? (
+                        {basket.shippingTotal === 0 ? (
                             <Text
                                 as="span"
                                 color="green.700"
