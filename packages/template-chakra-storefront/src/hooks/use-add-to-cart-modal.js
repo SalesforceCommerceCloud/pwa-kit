@@ -33,6 +33,7 @@ import SafePortal from '../components/safe-portal'
 import {useBonusProductSelectionModalContext} from './use-bonus-product-selection-modal'
 import {addToCartModalTheme} from '../theme/components/project/add-to-cart-modal'
 import SelectBonusProductsButton from '../components/select-bonus-products-button'
+import {useModalState} from './use-modal-state'
 
 /**
  * Local configuration for component-specific styling
@@ -514,35 +515,9 @@ AddToCartModal.propTypes = {
 }
 
 export const useAddToCartModal = () => {
-    const [state, setState] = useState({
-        isOpen: false,
-        data: null
+    const {isOpen, data, onOpen, onClose} = useModalState({
+        closeOnRouteChange: true,
+        resetDataOnClose: true
     })
-
-    const {pathname} = useLocation()
-    useEffect(() => {
-        if (state.isOpen) {
-            setState({
-                ...state,
-                isOpen: false
-            })
-        }
-    }, [pathname])
-
-    return {
-        isOpen: state.isOpen,
-        data: state.data,
-        onOpen: (data) => {
-            setState({
-                isOpen: true,
-                data
-            })
-        },
-        onClose: () => {
-            setState({
-                isOpen: false,
-                data: null
-            })
-        }
-    }
+    return {isOpen, data, onOpen, onClose}
 }

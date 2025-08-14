@@ -58,4 +58,4 @@ SelectBonusProductsButton.propTypes = {
     onClose: PropTypes.func
 }
 
-export default SelectBonusProductsButton 
+export default SelectBonusProductsButton

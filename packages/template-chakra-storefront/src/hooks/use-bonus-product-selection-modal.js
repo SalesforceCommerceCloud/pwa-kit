@@ -9,6 +9,7 @@ import React, {useContext, useState, useEffect} from 'react'
 import {useLocation} from 'react-router-dom'
 import PropTypes from 'prop-types'
 import {Dialog, Button, Text, Box, useBreakpointValue} from '@chakra-ui/react'
+import {useModalState} from './use-modal-state'
 
 /**
  * Context for managing the BonusProductSelectionModal.
@@ -82,35 +83,9 @@ export const BonusProductSelectionModal = () => {
 }
 
 export const useBonusProductSelectionModal = () => {
-    const [state, setState] = useState({
-        isOpen: false,
-        data: null
+    const {isOpen, data, onOpen, onClose} = useModalState({
+        closeOnRouteChange: true,
+        resetDataOnClose: true
     })
-
-    const {pathname} = useLocation()
-    useEffect(() => {
-        if (state.isOpen) {
-            setState({
-                ...state,
-                isOpen: false
-            })
-        }
-    }, [pathname])
-
-    return {
-        isOpen: state.isOpen,
-        data: state.data,
-        onOpen: (data) => {
-            setState({
-                isOpen: true,
-                data
-            })
-        },
-        onClose: () => {
-            setState({
-                isOpen: false,
-                data: null
-            })
-        }
-    }
+    return {isOpen, data, onOpen, onClose}
 }
