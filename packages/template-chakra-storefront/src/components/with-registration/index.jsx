@@ -9,8 +9,7 @@ import PropTypes from 'prop-types'
 import {noop} from '../../utils/utils'
 import {useIntl} from 'react-intl'
 import {useLocation} from 'react-router-dom'
-import {useToast, useCurrentCustomer} from '../../hooks'
-import {AuthModal, useAuthModal} from '../../hooks/use-auth-modal'
+import {useToast, useCurrentCustomer, AuthModal, useAuthModal} from '../../hooks'
 
 /**
  * Higher-order component that modifies the given component's `onClick` to show the login form if
