@@ -35,6 +35,7 @@ const SelectBonusProductsButton = ({
             onClick={handleClick}
             width="100%"
             variant="outline-gray"
+            color="blue.600"
             size="md"
             height={9}
             minWidth={11}

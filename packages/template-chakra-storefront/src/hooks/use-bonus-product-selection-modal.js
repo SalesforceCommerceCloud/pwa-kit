@@ -55,7 +55,7 @@ export const BonusProductSelectionModal = () => {
             <Dialog.Backdrop />
             <Dialog.Positioner>
                 <Dialog.Content>
-                    <Dialog.Body bgColor="white" padding="8">
+                    <Dialog.Body bgColor="white" padding={8}>
                         <Text fontSize="md" mb="4">
                             Bonus Product Modal
                         </Text>
@@ -70,7 +70,7 @@ export const BonusProductSelectionModal = () => {
                             </Box>
                         )}
                     </Dialog.Body>
-                    <Dialog.Footer bgColor="white" padding="8">
+                    <Dialog.Footer bgColor="white" padding={8}>
                         <Button onClick={onClose} variant="solid" width="100%">
                             Close
                         </Button>
