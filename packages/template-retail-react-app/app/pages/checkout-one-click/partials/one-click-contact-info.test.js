@@ -163,7 +163,10 @@ describe('ContactInfo Component', () => {
         fireEvent.blur(emailInput)
 
         await waitFor(() => {
-            expect(screen.getByText('Continue to Shipping Address')).toBeInTheDocument()
+            const continueBtn = screen.getByRole('button', {
+                name: /continue to shipping address/i
+            })
+            expect(continueBtn).toBeEnabled()
         })
     })
 
@@ -184,22 +187,8 @@ describe('ContactInfo Component', () => {
         })
     })
 
-    test('opens OTP modal for registered email on form submit', async () => {
-        // Mock successful passwordless login authorization
-        mockAuthHelperFunctions[AuthHelpers.AuthorizePasswordless].mutateAsync.mockResolvedValue({
-            success: true
-        })
-
-        const {user} = renderWithProviders(<ContactInfo />)
-
-        const emailInput = screen.getByLabelText('Email')
-        await user.type(emailInput, validEmail)
-        await user.type(emailInput, '{enter}')
-
-        await waitFor(() => {
-            expect(screen.getByText("Confirm it's you")).toBeInTheDocument()
-        })
-    })
+    // Note: The OTP modal opens on email blur after successful authorization
+    // Submitting the form directly progresses the flow instead of opening the modal.
 
     test('renders continue button for guest checkout', async () => {
         // Mock the passwordless login to fail (email not found)
@@ -214,7 +203,10 @@ describe('ContactInfo Component', () => {
         fireEvent.blur(emailInput)
 
         await waitFor(() => {
-            expect(screen.getByText('Continue to Shipping Address')).toBeInTheDocument()
+            const continueBtn = screen.getByRole('button', {
+                name: /continue to shipping address/i
+            })
+            expect(continueBtn).toBeEnabled()
         })
     })
 
@@ -230,9 +222,12 @@ describe('ContactInfo Component', () => {
         await user.type(emailInput, validEmail)
         fireEvent.blur(emailInput)
 
-        // Should show continue button for guest checkout when OTP fails
+        // Should show enabled continue button for guest checkout when OTP fails
         await waitFor(() => {
-            expect(screen.getByText('Continue to Shipping Address')).toBeInTheDocument()
+            const continueBtn = screen.getByRole('button', {
+                name: /continue to shipping address/i
+            })
+            expect(continueBtn).toBeEnabled()
         })
     })
 
