@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, salesforce.com, inc.
+ * Copyright (c) 2025, salesforce.com, inc.
  * All rights reserved.
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
@@ -13,10 +13,8 @@ import {
 } from '@salesforce/retail-react-app/app/utils/address-suggestions'
 import {useAutocompleteSuggestions} from '@salesforce/retail-react-app/app/hooks/useAutocompleteSuggestions'
 
-// Mock the address service
 jest.mock('@salesforce/retail-react-app/app/utils/address-suggestions')
 
-// Mock the autocomplete suggestions hook
 jest.mock('@salesforce/retail-react-app/app/hooks/useAutocompleteSuggestions', () => ({
     useAutocompleteSuggestions: jest.fn()
 }))
@@ -28,12 +26,10 @@ jest.mock('react-intl', () => ({
     defineMessages: jest.fn((messages) => messages)
 }))
 
-// Mock the phone formatter
 jest.mock('@salesforce/retail-react-app/app/utils/phone-utils', () => ({
     formatPhoneNumber: jest.fn((value) => value)
 }))
 
-// Mock the state/province options
 jest.mock('@salesforce/retail-react-app/app/components/forms/state-province-options', () => ({
     stateOptions: [
         {value: 'NY', label: 'New York'},
@@ -45,7 +41,6 @@ jest.mock('@salesforce/retail-react-app/app/components/forms/state-province-opti
     ]
 }))
 
-// Mock the constants
 jest.mock('@salesforce/retail-react-app/app/constants', () => ({
     SHIPPING_COUNTRY_CODES: [
         {value: 'US', label: 'United States'},
@@ -72,7 +67,6 @@ describe('useAddressFields', () => {
             formState: {errors: {}}
         }
 
-        // Mock the autocomplete suggestions hook
         mockUseAutocompleteSuggestions = {
             suggestions: [],
             isLoading: false,
@@ -89,7 +83,6 @@ describe('useAddressFields', () => {
             countryCode: 'US'
         })
 
-        // Mock setAddressFieldValues
         setAddressFieldValues.mockImplementation((setValue, prefix, addressFields) => {
             setValue(`${prefix}address1`, addressFields.address1)
             if (addressFields.city) {
@@ -137,7 +130,6 @@ describe('useAddressFields', () => {
             })
         })
 
-        // The input change should be handled by the useAutocompleteSuggestions hook
         expect(result.current.address1.autocomplete).toBeDefined()
     })
 
@@ -151,7 +143,6 @@ describe('useAddressFields', () => {
             })
         })
 
-        // The input change should be handled by the useAutocompleteSuggestions hook
         expect(result.current.address1.autocomplete).toBeDefined()
     })
 
@@ -181,11 +172,9 @@ describe('useAddressFields', () => {
     it('should handle partial address data when some fields are missing', async () => {
         const {result} = renderHook(() => useAddressFields({form: mockForm}))
 
-        // Mock processAddressSuggestion to return partial data
         processAddressSuggestion.mockResolvedValue({
             address1: '456 Oak Avenue',
             city: 'Toronto'
-            // Missing stateCode, postalCode, and countryCode
         })
 
         const suggestion = {
@@ -213,8 +202,6 @@ describe('useAddressFields', () => {
             inputProps.onFocus()
         })
 
-        // The focus handler should reset the dismissed state
-        // This is tested by checking that the autocomplete props are available
         expect(result.current.address1.autocomplete).toBeDefined()
     })
 
@@ -228,7 +215,6 @@ describe('useAddressFields', () => {
             })
         })
 
-        // The cut event should be handled by the useAutocompleteSuggestions hook
         expect(result.current.address1.autocomplete).toBeDefined()
     })
 
@@ -239,32 +225,26 @@ describe('useAddressFields', () => {
             result.current.address1.autocomplete.onClose()
         })
 
-        // The close handler should set showDropdown to false and clear suggestions
-        // This is tested by checking that the autocomplete props are available
         expect(result.current.address1.autocomplete).toBeDefined()
         expect(result.current.address1.autocomplete.onClose).toBeDefined()
     })
 
     it('should handle country change and reset address fields', () => {
-        // Mock watch to return different country values on subsequent calls
         let callCount = 0
         mockWatch.mockImplementation(() => {
             callCount++
-            return callCount === 1 ? 'US' : 'CA' // First call returns US, second returns CA
+            return callCount === 1 ? 'US' : 'CA'
         })
 
         const {result, rerender} = renderHook(() => useAddressFields({form: mockForm}))
 
-        // Trigger a rerender to simulate country change
         rerender()
 
-        // When country changes, address fields should be reset
         expect(mockSetValue).toHaveBeenCalledWith('address1', '')
         expect(mockSetValue).toHaveBeenCalledWith('city', '')
         expect(mockSetValue).toHaveBeenCalledWith('stateCode', '')
         expect(mockSetValue).toHaveBeenCalledWith('postalCode', '')
 
-        // Should also reset the autocomplete session
         expect(mockUseAutocompleteSuggestions.resetSession).toHaveBeenCalled()
     })
 
@@ -345,20 +325,18 @@ describe('useAddressFields', () => {
     })
 
     it('should call useAutocompleteSuggestions with correct parameters', () => {
-        mockWatch.mockReturnValue('US') // Set country to US
+        mockWatch.mockReturnValue('US')
 
         renderHook(() => useAddressFields({form: mockForm}))
 
-        // Should be called with empty input initially and US country code
         expect(useAutocompleteSuggestions).toHaveBeenCalledWith('', 'US')
     })
 
     it('should call useAutocompleteSuggestions with prefix when provided', () => {
-        mockWatch.mockReturnValue('CA') // Set country to Canada
+        mockWatch.mockReturnValue('CA')
 
         renderHook(() => useAddressFields({form: mockForm, prefix: 'shipping'}))
 
-        // Should be called with empty input initially and CA country code
         expect(useAutocompleteSuggestions).toHaveBeenCalledWith('', 'CA')
     })
 })

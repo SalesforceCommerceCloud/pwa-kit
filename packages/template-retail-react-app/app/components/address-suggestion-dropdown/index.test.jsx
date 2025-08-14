@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, salesforce.com, inc.
+ * Copyright (c) 2025, salesforce.com, inc.
  * All rights reserved.
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
@@ -61,7 +61,6 @@ describe('AddressSuggestionDropdown', () => {
         onSelectSuggestion: jest.fn()
     }
 
-    // Helper function to render with IntlProvider
     const renderWithIntl = (component) => {
         return render(
             <IntlProvider locale="en" messages={{}}>
@@ -189,7 +188,6 @@ describe('AddressSuggestionDropdown', () => {
             <AddressSuggestionDropdown {...defaultProps} isVisible={true} suggestions={[]} />
         )
 
-        // Should not render anything when suggestions are empty
         expect(screen.queryByTestId('address-suggestion-dropdown')).not.toBeInTheDocument()
     })
 
@@ -216,7 +214,6 @@ describe('AddressSuggestionDropdown', () => {
         )
 
         expect(screen.getByText('123 Main Street')).toBeInTheDocument()
-        // Should not crash when secondaryText is null
     })
 
     it('should handle keyboard navigation', () => {
@@ -251,7 +248,6 @@ describe('AddressSuggestionDropdown', () => {
             .getByText('123 Main Street, New York, NY 10001, USA')
             .closest('[role="button"]')
 
-        // Should not crash on hover
         fireEvent.mouseEnter(firstSuggestion)
         fireEvent.mouseLeave(firstSuggestion)
     })
@@ -287,7 +283,6 @@ describe('AddressSuggestionDropdown', () => {
             />
         )
 
-        // Should display the full address from description
         expect(screen.getByText('123 Main St, New York, NY 10001, USA')).toBeInTheDocument()
     })
 
@@ -307,7 +302,6 @@ describe('AddressSuggestionDropdown', () => {
                     {value: '10001'},
                     {value: 'USA'}
                 ]
-                // No placePrediction
             }
         ]
 
@@ -319,7 +313,6 @@ describe('AddressSuggestionDropdown', () => {
             />
         )
 
-        // Should display the full address from description
         expect(screen.getByText('123 Main St, New York, NY 10001, USA')).toBeInTheDocument()
     })
 })

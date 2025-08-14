@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, salesforce.com, inc.
+ * Copyright (c) 2025, salesforce.com, inc.
  * All rights reserved.
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
@@ -28,19 +28,12 @@ export const useAutocompleteSuggestions = (
     const {googleCloudAPI = {}} = getConfig().app || {}
     const apiKey = googleCloudAPI.apiKey
 
-    // stores the current sessionToken - REUSED across multiple calls
     const sessionTokenRef = useRef(null)
-
-    // the suggestions based on the specified input
-    const [suggestions, setSuggestions] = useState([])
-
-    // indicates if there is currently an incomplete request to the places API
-    const [isLoading, setIsLoading] = useState(false)
-
-    // Debounce timeout ref
     const debounceTimeoutRef = useRef(null)
 
-    // Fetch suggestions from Google Maps API
+    const [suggestions, setSuggestions] = useState([])
+    const [isLoading, setIsLoading] = useState(false)
+
     const fetchSuggestions = useCallback(
         async (input) => {
             if (!places || !apiKey || !input || input.length < 3) {
@@ -53,28 +46,23 @@ export const useAutocompleteSuggestions = (
             try {
                 const {AutocompleteSessionToken, AutocompleteSuggestion} = places
 
-                // Create a new session token if one doesn't exist - REUSE SESSION
                 if (!sessionTokenRef.current) {
                     sessionTokenRef.current = new AutocompleteSessionToken()
                 }
 
-                // Create the request
                 const request = {
                     ...requestOptions,
                     input: input,
                     includedPrimaryTypes: ['street_address'],
-                    sessionToken: sessionTokenRef.current // REUSED SESSION TOKEN
+                    sessionToken: sessionTokenRef.current
                 }
 
-                // Places API (New) uses includedRegionCodes
                 if (countryCode) {
                     request.includedRegionCodes = [countryCode]
                 }
 
-                // Get suggestions from Google Maps API
                 const response = await AutocompleteSuggestion.fetchAutocompleteSuggestions(request)
 
-                // Convert Google Maps format to our expected format
                 const googleSuggestions = convertGoogleMapsSuggestions(response.suggestions)
 
                 setSuggestions(googleSuggestions)
@@ -87,9 +75,8 @@ export const useAutocompleteSuggestions = (
         [places, apiKey, countryCode]
     )
 
-    // Reset session and clear suggestions
     const resetSession = useCallback(() => {
-        sessionTokenRef.current = null // Clear the reused session token
+        sessionTokenRef.current = null
         setSuggestions([])
         setIsLoading(false)
         if (debounceTimeoutRef.current) {
@@ -97,25 +84,20 @@ export const useAutocompleteSuggestions = (
         }
     }, [])
 
-    // Effect to handle input changes with debouncing
     useEffect(() => {
-        // Clear any existing timeout
         if (debounceTimeoutRef.current) {
             clearTimeout(debounceTimeoutRef.current)
         }
 
-        // If input is too short, clear suggestions
         if (!inputString || inputString.length < 3) {
             setSuggestions([])
             return
         }
 
-        // Debounce the API call
         debounceTimeoutRef.current = setTimeout(() => {
             fetchSuggestions(inputString)
         }, DEBOUNCE_DELAY)
 
-        // Cleanup function
         return () => {
             if (debounceTimeoutRef.current) {
                 clearTimeout(debounceTimeoutRef.current)

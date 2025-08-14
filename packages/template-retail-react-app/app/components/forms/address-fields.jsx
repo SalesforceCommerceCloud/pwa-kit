@@ -54,11 +54,8 @@ const AddressFields = ({
             <Field {...fields.phone} />
             <Field {...fields.countryCode} />
 
-            {/* Address field with autocomplete dropdown */}
             <Box position="relative">
                 <Field {...fields.address1} />
-
-                {/* Address suggestion dropdown */}
                 <AddressSuggestionDropdown
                     suggestions={fields.address1.autocomplete.suggestions}
                     isVisible={

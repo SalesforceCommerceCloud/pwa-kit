@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, salesforce.com, inc.
+ * Copyright (c) 2025, salesforce.com, inc.
  * All rights reserved.
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
@@ -33,7 +33,6 @@ const AddressSuggestionDropdown = ({
 }) => {
     const dropdownRef = useRef(null)
 
-    // Handle click outside
     useEffect(() => {
         const handleClickOutside = (event) => {
             if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -127,10 +126,7 @@ const AddressSuggestionDropdown = ({
                         }}
                     >
                         <Flex alignItems="center" gap={2}>
-                            {/* Location Icon */}
                             <LocationIcon boxSize={4} color="black" />
-
-                            {/* Address Text */}
                             <Box flex={1}>
                                 <Text fontSize="sm" noOfLines={1}>
                                     {suggestion.description ||
@@ -142,7 +138,6 @@ const AddressSuggestionDropdown = ({
                 ))}
             </Stack>
 
-            {/* Google Maps Attribution */}
             <Box px={4} py={3} display="flex" alignItems="center">
                 <img
                     src={getAssetUrl('static/img/GoogleMaps_Logo_Gray_4x.png')}

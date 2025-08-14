@@ -56,56 +56,46 @@ export default function useAddressFields({
 }) {
     const {formatMessage} = useIntl()
 
-    // Address autocomplete state
-    const [showDropdown, setShowDropdown] = useState(false) // dropdown is initially hidden
-    const [isDismissed, setIsDismissed] = useState(false) // user has not dismissed the dropdown
-    const [currentInput, setCurrentInput] = useState('') // current input value for autocomplete
-    const [isAutocompleted, setIsAutocompleted] = useState(false) // state to track when fields are being set by autocomplete
-    const [previousCountry, setPreviousCountry] = useState(undefined) // state to track previous country code
+    const [showDropdown, setShowDropdown] = useState(false)
+    const [isDismissed, setIsDismissed] = useState(false)
+    const [currentInput, setCurrentInput] = useState('')
+    const [isAutocompleted, setIsAutocompleted] = useState(false)
+    const [previousCountry, setPreviousCountry] = useState(undefined)
 
     const countryCode = watch('countryCode')
 
-    // Use the autocomplete suggestions hook
     const {suggestions, isLoading, resetSession} = useAutocompleteSuggestions(
         currentInput,
         countryCode
     )
 
-    // Method to clear address fields
     const clearAddressFields = useCallback(() => {
         setValue(`${prefix}address1`, '')
         setValue(`${prefix}city`, '')
         setValue(`${prefix}stateCode`, '')
         setValue(`${prefix}postalCode`, '')
-        // Clear autocomplete suggestions
         setCurrentInput('')
         setShowDropdown(false)
         setIsDismissed(false)
         resetSession()
     }, [prefix, setValue, resetSession])
 
-    // Reset address fields when country changes
     useEffect(() => {
-        // Only clear fields if we're not currently setting fields by autocomplete
         if (isAutocompleted) {
             return
         }
 
-        // Only clear fields if the country actually changed from a previous value
-        // and we have a previous value (not initial load)
+        // Only clear fields if the country actually changed from a previous value (not initial load)
         if (countryCode && previousCountry !== undefined && countryCode !== previousCountry) {
             clearAddressFields()
         }
 
-        // Update the previous country after checking for changes
         setPreviousCountry(countryCode)
     }, [countryCode, clearAddressFields, isAutocompleted, previousCountry])
 
-    // Handle address input changes
     const handleAddressInputChange = useCallback((value) => {
         setCurrentInput(value)
 
-        // Show/hide dropdown based on input length
         if (!value || value.length < 3) {
             setShowDropdown(false)
         } else {
@@ -114,31 +104,23 @@ export default function useAddressFields({
         }
     }, [])
 
-    // Handle address field focus when user clicks into the address field
     const handleAddressFocus = useCallback(() => {
         setIsDismissed(false) // Reset dismissal on new focus
     }, [])
 
-    // Handle cut event
     const handleAddressCut = useCallback(
         (e) => {
-            // Get the new value after the cut operation
             const newValue = e.target.value
-            // Trigger the address change handler with the new value
             handleAddressInputChange(newValue)
         },
         [handleAddressInputChange]
     )
 
-    // Handle click outside to close dropdown
     useEffect(() => {
         const handleClickOutside = (event) => {
-            // Get the address input element
             const addressInput = document.querySelector(`input[name="${prefix}address1"]`)
-            // Get the dropdown element
             const dropdown = document.querySelector('[data-testid="address-suggestion-dropdown"]')
 
-            // If click is outside both the input and dropdown, close the dropdown
             if (
                 addressInput &&
                 dropdown &&
@@ -151,42 +133,33 @@ export default function useAddressFields({
             }
         }
 
-        // Add click event listener
         document.addEventListener('mousedown', handleClickOutside)
 
-        // Cleanup
         return () => {
             document.removeEventListener('mousedown', handleClickOutside)
         }
     }, [prefix, setShowDropdown, setIsDismissed, resetSession])
 
-    // Handle dropdown close when user clicks outside the dropdown
     const handleDropdownClose = useCallback(() => {
         setShowDropdown(false)
         setIsDismissed(true)
         resetSession()
     }, [setShowDropdown, setIsDismissed, resetSession])
 
-    // Handle suggestion selection
     const handleSuggestionSelect = useCallback(
         async (suggestion) => {
             try {
-                // Set flag to prevent country change effect from running
                 setIsAutocompleted(true)
 
-                // Process address suggestion using unified utility method
                 const addressFields = await processAddressSuggestion(suggestion)
 
-                // Use the utility function to set address fields
                 setAddressFieldValues(setValue, prefix, addressFields)
 
-                // Reset session token after selecting a place
                 resetSession()
                 setShowDropdown(false)
                 setIsDismissed(true)
                 setCurrentInput('')
 
-                // Clear the flag after setting fields
                 setTimeout(() => {
                     setIsAutocompleted(false)
                 }, 100)
@@ -198,7 +171,6 @@ export default function useAddressFields({
         [prefix, setValue, resetSession, setIsAutocompleted]
     )
 
-    // Define address fields
     const fields = {
         firstName: {
             name: `${prefix}firstName`,
@@ -280,19 +252,14 @@ export default function useAddressFields({
             },
             error: errors[`${prefix}address1`],
             control,
-
-            // inputProps with autocomplete functionality
             inputProps: ({onChange}) => ({
                 onChange(evt) {
-                    // Call original onChange first (this updates the form)
                     onChange(evt.target.value)
-                    // Then handle autocomplete
                     handleAddressInputChange(evt.target.value)
                 },
                 onFocus: handleAddressFocus,
                 onCut: handleAddressCut
             }),
-            // Autocomplete-specific props
             autocomplete: {
                 suggestions,
                 showDropdown,

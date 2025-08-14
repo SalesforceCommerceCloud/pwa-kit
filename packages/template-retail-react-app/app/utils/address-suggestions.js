@@ -1,16 +1,10 @@
 /*
- * Copyright (c) 2021, salesforce.com, inc.
+ * Copyright (c) 2025, salesforce.com, inc.
  * All rights reserved.
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-/**
- * Address Suggestions Utility Functions
- * Functions for handling address autocomplete functionality
- */
-
-// Country code mapping for address parsing
 const COUNTRY_CODE_MAP = {
     USA: 'US',
     Canada: 'CA'
@@ -47,7 +41,7 @@ export const convertGoogleMapsSuggestions = (suggestions) => {
         terms: suggestion.placePrediction.text.text
             .split(',')
             .map((term) => ({value: term.trim()})),
-        placePrediction: suggestion.placePrediction // Keep original for detailed place fetching
+        placePrediction: suggestion.placePrediction
     }))
 }
 
@@ -60,20 +54,12 @@ export const parseAddressSuggestion = async (suggestion) => {
     const {structured_formatting, terms} = suggestion
     const {main_text, secondary_text} = structured_formatting
 
-    // Initialize parsed fields
     const parsedFields = {
         address1: main_text
     }
 
-    // Extract country code from the last term
     const countryTerm = terms[terms.length - 1]?.value || ''
-    if (countryTerm === 'USA') {
-        parsedFields.countryCode = 'US'
-    } else if (countryTerm === 'Canada') {
-        parsedFields.countryCode = 'CA'
-    } else {
-        parsedFields.countryCode = countryTerm
-    }
+    parsedFields.countryCode = resolveCountryCode(countryTerm)
 
     if (!secondary_text) {
         return parsedFields
@@ -180,7 +166,7 @@ export const parseFormattedAddress = (formattedAddress) => {
         addressFields['locality'] = parts[1]
         const lastPart = parts[2]
 
-        if (lastPart === 'USA' || lastPart === 'Canada') {
+        if (COUNTRY_CODE_MAP[lastPart]) {
             addressFields['country-name'] = lastPart
         } else {
             // Parse state and postal code
