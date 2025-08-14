@@ -1,6 +1,7 @@
 ## v7.1.0-dev (July 28, 2025)
 
 - This feature introduces an AI-powered shopping assistant that integrates Salesforce Embedded Messaging Service with PWA Kit applications. The shopper agent provides real-time chat support, search assistance, and personalized shopping guidance directly within the e-commerce experience. [#2658](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2658)
+- Added support for Multi-Ship [#3056](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3056)
 
 ## v7.0.0 (July 22, 2025)
 
@@ -17,7 +18,6 @@
 - Support saving billing phone number on user registration from order confirmation [#2653](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2653)
 - Support saving default shipping address on user registration from order confirmation [#2706](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2706)
 - Minor updates to support BOPIS E2E tests [#2716](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2716)
-- Provide support for partial hydration [#2696](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2696)
 - Provide conditional support for partial hydration (feature flag `PARTIAL_HYDRATION_ENABLED`) [#2696](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2696) [#2846](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2846)
 - Show Automatic Bonus Products on Cart Page [#2704](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2704) [#2760](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2760) [#2815](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2815) 
 - [Breaking] Support Standard Products [2697](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2697)
@@ -26,7 +26,6 @@
 - Use `<picture>` element for responsive images [#2724](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2724)
 - Add Data Cloud partyIdentification events and improve error handling [#2811](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2811)
 - Introduce the cursor rules to assist project developers [#2820](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2820)
-- Added support for Multi-Ship [#3056](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3056)
 
 ## v6.1.0 (May 22, 2025)
 
