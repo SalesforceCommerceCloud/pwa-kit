@@ -324,7 +324,7 @@ export const useMultiship = (basket) => {
      * Multiple shipments with the same address are not supported
      * @param {Object} basket - The basket object
      * @param {Object} address - The address to match
-     * @returns {string|null} The matching shipment ID or null if not found
+     * @returns {string|null|undefined} The matching shipment ID or null if not found
      */
     const findDeliveryShipmentWithSameAddress = (basket, address) => {
         if (!basket?.shipments || !address) return null
@@ -345,7 +345,7 @@ export const useMultiship = (basket) => {
      * Finds the first existing delivery shipment that has no address or an empty address
      * Empty means falsey values for all fields in cleanAddressForOrder
      * @param {Object} basket - The basket object
-     * @returns {string|null} The shipment ID without address or null if not found
+     * @returns {string|null|undefined} The shipment ID without address or null if not found
      */
     const findDeliveryShipmentWithoutAddress = (basket) => {
         if (!basket?.shipments) return null
