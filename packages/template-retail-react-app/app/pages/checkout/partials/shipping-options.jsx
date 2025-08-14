@@ -81,6 +81,9 @@ const ShipmentOptionsWithProducts = ({shipment, basketId, currency, control, bas
                         basketId={basketId}
                         currency={currency}
                         control={control}
+                        shippingItem={basket?.shippingItems?.find(
+                            (item) => item.shipmentId === shipment.shipmentId
+                        )}
                     />
                 </VStack>
             </Box>
@@ -119,6 +122,14 @@ ShipmentOptionsWithProducts.propTypes = {
                 quantity: PropTypes.number,
                 variationValues: PropTypes.object,
                 variations: PropTypes.object
+            })
+        ),
+        shippingItems: PropTypes.arrayOf(
+            PropTypes.shape({
+                shipmentId: PropTypes.string.isRequired,
+                price: PropTypes.number,
+                priceAfterItemDiscount: PropTypes.number,
+                priceAdjustments: PropTypes.array
             })
         )
     }).isRequired
@@ -193,14 +204,13 @@ export default function ShippingOptions() {
         goToNextStep()
     }
 
-    // Calculate total shipping info
-    const totalShippingCost =
-        (basket &&
-            basket.shippingItems &&
-            basket.shippingItems.reduce((total, item) => {
-                return total + (item.priceAfterItemDiscount || item.price || 0)
-            }, 0)) ||
-        0
+    // get promotional shipping cost from shippingItem
+    const getPromotionalShippingCost = (shippingItem) => {
+        if (!shippingItem) return null
+        return shippingItem.priceAfterItemDiscount !== undefined
+            ? shippingItem.priceAfterItemDiscount
+            : shippingItem.price
+    }
 
     const freeLabel = formatMessage({
         defaultMessage: 'Free',
@@ -312,15 +322,25 @@ export default function ShippingOptions() {
                                     <Flex justify="space-between" w="full">
                                         <Text>{deliveryShipments[0].shippingMethod.name}</Text>
                                         <Text fontWeight="bold">
-                                            {totalShippingCost === 0 ? (
-                                                freeLabel
-                                            ) : (
-                                                <FormattedNumber
-                                                    value={totalShippingCost}
-                                                    style="currency"
-                                                    currency={currency}
-                                                />
-                                            )}
+                                            {(() => {
+                                                const shippingItem = basket?.shippingItems?.find(
+                                                    (item) =>
+                                                        item.shipmentId ===
+                                                        deliveryShipments[0].shipmentId
+                                                )
+                                                const itemCost =
+                                                    getPromotionalShippingCost(shippingItem) || 0
+
+                                                return itemCost === 0 ? (
+                                                    freeLabel
+                                                ) : (
+                                                    <FormattedNumber
+                                                        value={itemCost}
+                                                        style="currency"
+                                                        currency={currency}
+                                                    />
+                                                )
+                                            })()}
                                         </Text>
                                     </Flex>
                                     <Text fontSize="sm" color="gray.700">
@@ -339,10 +359,7 @@ export default function ShippingOptions() {
                                     basket.shippingItems.find(
                                         (item) => item.shipmentId === shipment.shipmentId
                                     )
-                                const itemCost =
-                                    (shippingItem && shippingItem.priceAfterItemDiscount) ||
-                                    (shippingItem && shippingItem.price) ||
-                                    0
+                                const itemCost = getPromotionalShippingCost(shippingItem) || 0
 
                                 return (
                                     <Box key={shipment.shipmentId}>
@@ -392,11 +409,15 @@ export default function ShippingOptions() {
                                             })}
                                         </Text>
                                         <Text fontWeight="bold">
-                                            <FormattedNumber
-                                                value={totalShippingCost}
-                                                style="currency"
-                                                currency={currency}
-                                            />
+                                            {basket?.shippingTotal === 0 ? (
+                                                freeLabel
+                                            ) : (
+                                                <FormattedNumber
+                                                    value={basket?.shippingTotal || 0}
+                                                    style="currency"
+                                                    currency={currency}
+                                                />
+                                            )}
                                         </Text>
                                     </Flex>
                                 </Box>
