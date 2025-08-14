@@ -43,4 +43,4 @@ jobs:
                   CWD: '${{ steps.generate_app.outputs.project_path }}'
                   PROJECT: q4-pwa-perf-develop
                   TARGET: production
-                  FLAGS: --wait --cloud-origin https://cloud-testing.mobify-staging.com
+                  FLAGS: --wait --cloud-origin https://cloud-testing.mobify-staging.com -c ~/.mobify
