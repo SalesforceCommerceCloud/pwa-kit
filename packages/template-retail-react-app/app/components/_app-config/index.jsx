@@ -45,6 +45,7 @@ import {
     STORE_LOCATOR_DEFAULT_PAGE_SIZE,
     STORE_LOCATOR_SUPPORTED_COUNTRIES
 } from '@salesforce/retail-react-app/app/constants'
+import {generateSfdcUserAgent} from '@salesforce/retail-react-app/app/utils/user-agent-utils'
 
 /**
  * Use the AppConfig component to inject extra arguments into the getProps
@@ -57,7 +58,8 @@ import {
 const AppConfig = ({children, locals = {}}) => {
     const {correlationId} = useCorrelationId()
     const headers = {
-        'correlation-id': correlationId
+        'correlation-id': correlationId,
+        sfdc_user_agent: generateSfdcUserAgent()
     }
 
     const commerceApiConfig = locals.appConfig.commerceAPI
