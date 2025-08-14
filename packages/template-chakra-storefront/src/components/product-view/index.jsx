@@ -94,8 +94,42 @@ const ProductViewHeader = ({
     priceData,
     category,
     product,
-    isProductPartOfBundle
+    isProductPartOfBundle,
+    promotionId
 }) => {
+    // Calculate promotional price data when promotionId is specified
+    const adjustedPriceData = useMemo(() => {
+        if (!promotionId || !product?.productPromotions || !priceData) {
+            return priceData
+        }
+
+        // Find the specific promotion by promotionId
+        const specificPromotion = product.productPromotions.find(
+            (promo) => promo.promotionId === promotionId
+        )
+
+        if (!specificPromotion) {
+            return priceData
+        }
+
+        // Use the promotionalPrice from the specific promotion, default to 0 if not specified
+        const promotionalPrice = specificPromotion.promotionalPrice ?? 0.0
+
+        // Ensure we have all required properties for DisplayPrice
+        return {
+            ...priceData,
+            currentPrice: promotionalPrice,
+            listPrice: priceData.listPrice || priceData.currentPrice,
+            isOnSale:
+                promotionalPrice > 0 &&
+                promotionalPrice < (priceData.listPrice || priceData.currentPrice || 0),
+            // Ensure other required properties are present
+            isASet: priceData.isASet || false,
+            isMaster: priceData.isMaster || false,
+            isRange: priceData.isRange || false
+        }
+    }, [priceData, product?.productPromotions, promotionId])
+
     return (
         <VStack mr={4} gap={2} align="flex-start" marginBottom={[4, 4, 4, 0, 0]}>
             {category && (
@@ -111,14 +145,16 @@ const ProductViewHeader = ({
 
             {!isProductPartOfBundle && (
                 <>
-                    <Skeleton loading={!priceData?.currentPrice}>
-                        {priceData?.currentPrice && (
-                            <DisplayPrice priceData={priceData} currency={currency} />
+                    <Skeleton loading={!adjustedPriceData}>
+                        {adjustedPriceData && adjustedPriceData.currentPrice !== undefined && (
+                            <DisplayPrice priceData={adjustedPriceData} currency={currency} />
                         )}
                     </Skeleton>
 
                     <Skeleton loading={!product}>
-                        {product?.productPromotions && <PromoCallout product={product} />}
+                        {product?.productPromotions && (
+                            <PromoCallout product={product} promotionId={promotionId} />
+                        )}
                     </Skeleton>
                 </>
             )}
@@ -132,7 +168,8 @@ ProductViewHeader.propTypes = {
     category: PropTypes.array,
     priceData: PropTypes.object,
     product: PropTypes.object,
-    isProductPartOfBundle: PropTypes.bool
+    isProductPartOfBundle: PropTypes.bool,
+    promotionId: PropTypes.string
 }
 
 const ButtonWithRegistration = withRegistration(Button)
@@ -166,7 +203,9 @@ const ProductView = forwardRef(
                 !isProductLoading && variant?.orderable && quantity > 0 && quantity <= stockLevel,
             showImageGallery = true,
             setSelectedBundleQuantity = () => {},
-            selectedBundleParentQuantity = 1
+            selectedBundleParentQuantity = 1,
+            customButtons = [],
+            promotionId
         },
         ref
     ) => {
@@ -352,6 +391,19 @@ const ProductView = forwardRef(
                 )
             }
 
+            // Add custom buttons if provided
+            if (customButtons && customButtons.length > 0) {
+                customButtons.forEach((customButton, index) => {
+                    buttons.push(
+                        React.cloneElement(customButton, {
+                            key: `custom-button-${index}`,
+                            width: customButton.props.width || '100%',
+                            marginBottom: customButton.props.marginBottom || 4
+                        })
+                    )
+                })
+            }
+
             return buttons
         }
 
@@ -419,6 +471,7 @@ const ProductView = forwardRef(
                         currency={product?.currency || activeCurrency}
                         category={category}
                         isProductPartOfBundle={isProductPartOfBundle}
+                        promotionId={promotionId}
                     />
                 </Box>
                 <Flex direction={['column', 'column', 'column', 'row']}>
@@ -459,6 +512,7 @@ const ProductView = forwardRef(
                                 currency={product?.currency || activeCurrency}
                                 category={category}
                                 isProductPartOfBundle={isProductPartOfBundle}
+                                promotionId={promotionId}
                             />
                         </Box>
                         <VStack align="stretch" gap={4}>
@@ -690,7 +744,9 @@ ProductView.propTypes = {
     validateOrderability: PropTypes.func,
     showImageGallery: PropTypes.bool,
     setSelectedBundleQuantity: PropTypes.func,
-    selectedBundleParentQuantity: PropTypes.number
+    selectedBundleParentQuantity: PropTypes.number,
+    customButtons: PropTypes.array,
+    promotionId: PropTypes.string
 }
 
 export default ProductView

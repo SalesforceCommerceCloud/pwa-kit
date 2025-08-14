@@ -13,11 +13,11 @@ import SocialLogin from '../../../components/social-login'
 const LoginState = ({
     form,
     handlePasswordlessLoginClick,
-    isSocialEnabled,
     isPasswordlessEnabled,
-    idps,
     showPasswordField,
-    togglePasswordField
+    togglePasswordField,
+    //@sfdc-extension-line SFDC_EXT_SOCIAL_LOGIN
+    idps = []
 }) => {
     const intl = useIntl()
     const {formatMessage} = intl
@@ -53,7 +53,9 @@ const LoginState = ({
         [intl]
     )
 
-    if (isSocialEnabled || isPasswordlessEnabled) {
+    // when passwordless enabled, social login buttons will be in the same screen with pwless login
+    // when pwless is disabled, the social login buttons will stay in the same screen with standard login
+    if (isPasswordlessEnabled) {
         return showLoginButtons ? (
             <>
                 <Separator />
@@ -89,8 +91,10 @@ const LoginState = ({
                         {messages.password}
                     </Button>
                 )}
+                {/* @sfdc-extension-block-start SFDC_EXT_SOCIAL_LOGIN */}
                 {/* Social Login */}
-                {isSocialEnabled && idps && <SocialLogin form={form} idps={idps} />}
+                {idps.length > 0 && <SocialLogin form={form} idps={idps} />}
+                {/* @sfdc-extension-block-end SFDC_EXT_SOCIAL_LOGIN */}
             </>
         ) : (
             <Button
@@ -106,9 +110,19 @@ const LoginState = ({
         )
     } else {
         return (
-            <Button variant="outline" borderColor="gray.500" onClick={togglePasswordField}>
-                {!showPasswordField ? messages.alreadyHaveAccount : messages.checkoutAsGuest}
-            </Button>
+            <>
+                <Button variant="outline" borderColor="gray.500" onClick={togglePasswordField}>
+                    {!showPasswordField ? messages.alreadyHaveAccount : messages.checkoutAsGuest}
+                </Button>
+                {/* @sfdc-extension-block-start SFDC_EXT_SOCIAL_LOGIN */}
+                <Separator />
+                <Text textAlign="center" fontSize="sm" marginTop={2} marginBottom={2}>
+                    {messages.orLoginWith}
+                </Text>
+                {/* Social Login */}
+                {idps.length > 0 && <SocialLogin form={form} idps={idps} />}
+                {/* @sfdc-extension-block-end SFDC_EXT_SOCIAL_LOGIN */}
+            </>
         )
     }
 }
@@ -116,8 +130,8 @@ const LoginState = ({
 LoginState.propTypes = {
     form: PropTypes.object,
     handlePasswordlessLoginClick: PropTypes.func,
-    isSocialEnabled: PropTypes.bool,
     isPasswordlessEnabled: PropTypes.bool,
+    //@sfdc-extension-line SFDC_EXT_SOCIAL_LOGIN
     idps: PropTypes.arrayOf(PropTypes.string),
     showPasswordField: PropTypes.bool,
     togglePasswordField: PropTypes.func

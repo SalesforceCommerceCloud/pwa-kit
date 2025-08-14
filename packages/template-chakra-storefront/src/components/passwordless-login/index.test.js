@@ -65,10 +65,12 @@ describe('PasswordlessLogin component', () => {
         expect(screen.queryByLabelText('Password')).not.toBeInTheDocument()
     })
 
+    //@sfdc-extension-block-start SFDC_EXT_SOCIAL_LOGIN
     test('renders social login buttons', async () => {
-        renderWithProviders(<WrapperComponent isSocialEnabled={true} idps={['google', 'apple']} />)
+        renderWithProviders(<WrapperComponent idps={['google', 'apple']} />)
 
         expect(screen.getByRole('button', {name: /Google/})).toBeInTheDocument()
         expect(screen.getByRole('button', {name: /Apple/})).toBeInTheDocument()
     })
+    //@sfdc-extension-block-end SFDC_EXT_SOCIAL_LOGIN
 })

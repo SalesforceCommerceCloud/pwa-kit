@@ -95,11 +95,12 @@ module.exports = {
                 process.env.PASSWORDLESS_LOGIN_CALLBACK_URI || '/passwordless-login-callback',
             landingPath: '/passwordless-login-landing'
         },
+        //@sfdc-extension-block-start SFDC_EXT_SOCIAL_LOGIN
         social: {
-            enabled: false,
             idps: ['google', 'apple'],
             redirectURI: process.env.SOCIAL_LOGIN_REDIRECT_URI || '/social-callback'
         },
+        //@sfdc-extension-block-end SFDC_EXT_SOCIAL_LOGIN
         resetPassword: {
             callbackURI: process.env.RESET_PASSWORD_CALLBACK_URI || '/reset-password-callback',
             landingPath: '/reset-password-landing'
