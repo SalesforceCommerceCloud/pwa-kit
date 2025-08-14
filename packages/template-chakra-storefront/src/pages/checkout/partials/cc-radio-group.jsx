@@ -12,7 +12,7 @@ import {PlusIcon} from '../../../components/icons'
 import {RadioCard, RadioCardGroup} from '../../../components/radio-card'
 import ActionCard from '../../../components/action-card'
 import {getCreditCardIcon} from '../../../utils/cc-utils'
-import {useCurrentCustomer} from '../../../hooks/use-current-customer'
+import {useCurrentCustomer} from '../../../hooks'
 
 const CCRadioGroup = ({
     form,

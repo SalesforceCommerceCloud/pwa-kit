@@ -6,16 +6,15 @@
  */
 import React from 'react'
 import {Box, Stack, Grid, GridItem, Container} from '@chakra-ui/react'
-import {useCurrentBasket, useCurrentCustomer} from '../../hooks/'
+import {useCurrentBasket, useCurrentCustomer, useErrorHandler} from '../../hooks'
 
 // Custom Cart Hooks
 import {useCartProducts} from './hooks/use-cart-products'
 import {useCartOperations} from './hooks/use-cart-operations'
+import {useCartDefaultShipping} from './hooks/use-cart-default-shipping'
+import {useCartGiftItems} from './hooks/use-cart-gift-items'
 //@sfdc-extension-line SFDC_EXT_WISHLIST
 import {useWishList} from '../../hooks/use-wish-list'
-import {useCartGiftItems} from './hooks/use-cart-gift-items'
-import {useCartDefaultShipping} from './hooks/use-cart-default-shipping'
-import {useErrorHandler} from '../../hooks/use-errors'
 
 // Cart Components
 import CartTitle from './partials/cart-title'

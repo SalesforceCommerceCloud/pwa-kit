@@ -7,7 +7,7 @@
 
 import React from 'react'
 import {renderHook} from '@testing-library/react'
-import useMultiSite from './use-multi-site'
+import {useMultiSite} from './use-multi-site'
 import {MultiSiteProvider} from '../contexts'
 import mockConfig from '../../config/mocks/mock-config'
 import {DEFAULT_LOCALE} from '../utils/test-utils'

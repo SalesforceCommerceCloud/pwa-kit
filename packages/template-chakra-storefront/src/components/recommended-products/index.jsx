@@ -10,15 +10,18 @@ import PropTypes from 'prop-types'
 import {useIntl} from 'react-intl'
 import {Button} from '@chakra-ui/react'
 import ProductScroller from '../product-scroller'
-import useEinstein from '../../hooks/use-einstein'
-import useDataCloud from '../../hooks/use-datacloud'
-import {useCurrentCustomer} from '../../hooks/use-current-customer'
-import useIntersectionObserver from '../../hooks/use-intersection-observer'
+import {
+    useEinstein,
+    useDataCloud,
+    useCurrentCustomer,
+    useIntersectionObserver,
+    useNavigation,
+    useToast
+} from '../../hooks'
+
 //@sfdc-extension-line SFDC_EXT_WISHLIST
 import {useWishList} from '../../hooks/use-wish-list'
 
-import useToast from '../../hooks/use-toast'
-import useNavigation from '../../hooks/use-navigation'
 import {
     API_ERROR_MESSAGE,
     //@sfdc-extension-line SFDC_EXT_WISHLIST

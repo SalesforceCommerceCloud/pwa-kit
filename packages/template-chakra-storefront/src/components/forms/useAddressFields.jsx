@@ -35,7 +35,7 @@ const messages = defineMessages({
  * @param {Object} form.formState.errors - An object containing field errors
  * @returns {Object} Field definitions for use in a form
  */
-export default function useAddressFields({
+export function useAddressFields({
     form: {
         watch,
         control,

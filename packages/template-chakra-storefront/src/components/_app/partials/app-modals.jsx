@@ -8,7 +8,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import {AuthModal} from '../../../hooks/use-auth-modal'
-import {DntNotification} from '../../../hooks/use-dnt-notification'
+import {DntNotification} from '../../../hooks'
 import Toaster, {toaster} from '../../../components/toaster'
 // import StoreLocatorModal from '../../../components/store-locator-modal'
 

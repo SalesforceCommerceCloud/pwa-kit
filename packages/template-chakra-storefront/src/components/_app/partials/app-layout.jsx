@@ -12,7 +12,7 @@ import {SkipNavLink, SkipNavContent} from '../../skip-nav'
 import ScrollToTop from '../../scroll-to-top'
 import OfflineBanner from '../../offline-banner'
 import OfflineBoundary from '../../offline-boundary'
-import {AddToCartModalProvider} from '../../../hooks/use-add-to-cart-modal'
+import {AddToCartModalProvider} from '../../../hooks'
 
 /**
  * AppLayout component that provides the main layout structure

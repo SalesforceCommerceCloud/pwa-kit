@@ -5,8 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import {useLocation, useParams} from 'react-router-dom'
-import {usePageUrls, useSortUrls, useSearchParams} from '../../../hooks'
-import useNavigation from '../../../hooks/use-navigation'
+import {usePageUrls, useSortUrls, useSearchParams, useNavigation} from '../../../hooks'
 
 /**
  * A hook for managing the controls of a product list page (PLP).

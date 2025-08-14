@@ -15,9 +15,9 @@ jest.mock('react-router-dom', () => ({
     useLocation: jest.fn()
 }))
 
-jest.mock('../../../hooks/use-active-data', () => ({
+jest.mock('../../../hooks', () => ({
     __esModule: true,
-    default: jest.fn()
+    useActiveData: jest.fn()
 }))
 
 describe('useAppAnalytics', () => {
@@ -33,7 +33,7 @@ describe('useAppAnalytics', () => {
 
     beforeEach(() => {
         const {useLocation} = require('react-router-dom')
-        const useActiveData = require('../../../hooks/use-active-data').default
+        const {useActiveData} = require('../../../hooks')
 
         useLocation.mockReturnValue(mockLocation)
         useActiveData.mockReturnValue(mockActiveData)
@@ -76,7 +76,7 @@ describe('useAppAnalytics', () => {
     })
 
     test('handles missing activeData gracefully', () => {
-        const useActiveData = require('../../../hooks/use-active-data').default
+        const {useActiveData} = require('../../../hooks')
         useActiveData.mockReturnValue(null)
 
         const {result} = renderHook(() => useAppAnalytics('test-site', 'en-US', 'USD'))

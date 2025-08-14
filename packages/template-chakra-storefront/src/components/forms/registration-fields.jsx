@@ -7,7 +7,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import {Stack} from '@chakra-ui/react'
-import useRegistrationFields from './useRegistrationFields'
+import {useRegistrationFields} from './useRegistrationFields'
 import Field from '../field'
 import PasswordRequirements from './password-requirements'
 

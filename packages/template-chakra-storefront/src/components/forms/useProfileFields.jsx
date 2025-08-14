@@ -8,7 +8,7 @@ import {useMemo} from 'react'
 import {useIntl} from 'react-intl'
 import {formatPhoneNumber} from '../../utils/phone-utils'
 
-export default function useProfileFields({
+export function useProfileFields({
     form: {
         control,
         formState: {errors}

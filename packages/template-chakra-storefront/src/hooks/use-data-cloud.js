@@ -9,7 +9,7 @@ import Cookies from 'js-cookie'
 import logger from '../utils/logger-instance'
 import {initDataCloudSdk} from '@salesforce/cc-datacloud-typescript'
 import {useUsid, useCustomerType, useDNT} from '@salesforce/commerce-sdk-react'
-import useMultiSite from '../hooks/use-multi-site'
+import {useMultiSite} from '../hooks/use-multi-site'
 import {useCurrentCustomer} from '../hooks/use-current-customer'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 
@@ -412,7 +412,7 @@ export class DataCloudApi {
  *
  * @returns {object} An object containing methods for sending different Data Cloud events
  */
-const useDataCloud = () => {
+export const useDataCloud = () => {
     const {getUsidWhenReady} = useUsid()
     const {isRegistered} = useCustomerType()
     const {data: customer} = useCurrentCustomer()
@@ -475,5 +475,3 @@ const useDataCloud = () => {
         }
     }
 }
-
-export default useDataCloud

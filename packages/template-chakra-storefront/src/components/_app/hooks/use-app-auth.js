@@ -6,7 +6,7 @@
  */
 
 import {useAccessToken} from '@salesforce/commerce-sdk-react'
-import {useAuthModal} from '../../../hooks/use-auth-modal'
+import {useAuthModal} from '../../../hooks'
 
 /**
  * Custom hook for managing authentication and auth modal state

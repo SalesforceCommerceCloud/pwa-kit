@@ -7,7 +7,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import {Box} from '@chakra-ui/react'
-import useResetPasswordFields from './useResetPasswordFields'
+import {useResetPasswordFields} from './useResetPasswordFields'
 import Field from '../field'
 
 const ResetPasswordFields = ({form, prefix = ''}) => {

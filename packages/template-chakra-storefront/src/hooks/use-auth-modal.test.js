@@ -57,9 +57,9 @@ jest.mock('@salesforce/commerce-sdk-react', () => {
             .mockImplementation((helperType) => mockAuthHelperFunctions[helperType])
     }
 })
-jest.mock('./use-datacloud', () => ({
+jest.mock('./use-data-cloud', () => ({
     __esModule: true,
-    default: jest.fn(() => ({
+    useDataCloud: jest.fn(() => ({
         sendViewPage: jest.fn(),
         sendViewProduct: jest.fn(),
         sendViewCategory: jest.fn(),

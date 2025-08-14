@@ -8,7 +8,7 @@ import {useMemo} from 'react'
 import {useIntl} from 'react-intl'
 import {validatePassword} from '../../utils/password-utils'
 
-export default function useRegistrationFields({
+export function useRegistrationFields({
     form: {
         control,
         formState: {errors}

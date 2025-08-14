@@ -9,7 +9,7 @@ import {useIntl} from 'react-intl'
 import {Badge, Box, Button, Flex, Center} from '@chakra-ui/react'
 import Link from '../../../components/link'
 import {BasketIcon, BrandLogo} from '../../../components/icons'
-import {useCurrentBasket} from '../../../hooks/use-current-basket'
+import {useCurrentBasket} from '../../../hooks'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 
 const CheckoutHeader = () => {

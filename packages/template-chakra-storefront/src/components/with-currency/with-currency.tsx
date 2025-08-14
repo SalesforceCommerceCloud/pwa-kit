@@ -9,7 +9,7 @@ import React from 'react'
 
 // Local Imports
 import {CurrencyProvider} from '../../contexts'
-import useMultiSite from '../../hooks/use-multi-site'
+import {useMultiSite} from '../../hooks'
 
 // Define a type for the HOC props
 type WithCurrencyProps = React.ComponentPropsWithoutRef<any>

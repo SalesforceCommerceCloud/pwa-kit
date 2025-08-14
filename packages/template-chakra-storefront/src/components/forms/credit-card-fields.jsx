@@ -11,7 +11,7 @@ import {useIntl} from 'react-intl'
 import {Box, Flex, SimpleGrid, Stack, Field as ChakraField} from '@chakra-ui/react'
 import Tooltip from '../../components/tooltip'
 import {formatCreditCardNumber, getCreditCardIcon} from '../../utils/cc-utils'
-import useCreditCardFields from './useCreditCardFields'
+import {useCreditCardFields} from './useCreditCardFields'
 import Field from '../field'
 import {AmexIcon, DiscoverIcon, MastercardIcon, VisaIcon, InfoIcon} from '../icons'
 

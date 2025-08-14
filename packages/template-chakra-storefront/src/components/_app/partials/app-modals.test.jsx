@@ -22,7 +22,7 @@ jest.mock('../../../hooks/use-auth-modal', () => ({
 }))
 
 // Mock DNTNotification component
-jest.mock('../../../hooks/use-dnt-notification', () => ({
+jest.mock('../../../hooks', () => ({
     DntNotification: function MockDNTNotification(props) {
         // Only render if props are provided and not empty
         if (!props || Object.keys(props).length === 0) {

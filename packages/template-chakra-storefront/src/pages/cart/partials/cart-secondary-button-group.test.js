@@ -15,7 +15,7 @@ import {screen, waitFor} from '@testing-library/react'
 import {noop} from '../../../utils/utils'
 
 // Mock the useCurrentCustomer hook to prevent API calls and act warnings
-jest.mock('../../../hooks/use-current-customer', () => ({
+jest.mock('../../../hooks', () => ({
     useCurrentCustomer: () => ({
         data: {
             isRegistered: true,

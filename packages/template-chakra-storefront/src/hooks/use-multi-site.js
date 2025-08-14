@@ -13,7 +13,7 @@ import {MultiSiteContext} from '../contexts'
  * the funtion used to build URLs following the App configuration.
  * @returns {{site, locale, buildUrl: (function(*, *, *): *)}}
  */
-const useMultiSite = () => {
+export const useMultiSite = () => {
     const context = useContext(MultiSiteContext)
     if (context === undefined) {
         throw new Error('useMultiSite must be used within MultiSiteProvider')
@@ -32,5 +32,3 @@ const useMultiSite = () => {
     )
     return {site, locale, buildUrl}
 }
-
-export default useMultiSite

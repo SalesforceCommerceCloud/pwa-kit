@@ -13,8 +13,8 @@ import {
     useShopperCustomersMutation,
     useCustomerId
 } from '@salesforce/commerce-sdk-react'
-import useToast from './use-toast'
-import useNavigation from './use-navigation'
+import {useToast} from './use-toast'
+import {useNavigation} from './use-navigation'
 import {
     API_ERROR_MESSAGE,
     TOAST_ACTION_VIEW_WISHLIST,

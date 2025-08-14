@@ -22,7 +22,7 @@ import {
 } from '@chakra-ui/react'
 
 // Hooks
-import useMultiSite from '../../hooks/use-multi-site'
+import {useMultiSite} from '../../hooks'
 
 const StoresList = ({storesInfo}) => {
     const intl = useIntl()
