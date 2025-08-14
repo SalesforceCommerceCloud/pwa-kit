@@ -25,6 +25,7 @@ jest.mock('../../../hooks/use-current-customer', () => ({
 }))
 
 const MockedComponent = ({
+    //@sfdc-extension-line SFDC_EXT_WISHLIST
     onAddToWishlistClick = noop,
     onEditClick = noop,
     onRemoveItemClick = noop,
@@ -35,6 +36,7 @@ const MockedComponent = ({
     return (
         <ItemVariantProvider variant={{...product, productName: product.name}}>
             <CartSecondaryButtonGroup
+                //@sfdc-extension-line SFDC_EXT_WISHLIST
                 onAddToWishlistClick={onAddToWishlistClick}
                 onEditClick={onEditClick}
                 onRemoveItemClick={onRemoveItemClick}
@@ -46,6 +48,7 @@ const MockedComponent = ({
 }
 
 MockedComponent.propTypes = {
+    //@sfdc-extension-line SFDC_EXT_WISHLIST
     onAddToWishlistClick: PropTypes.func,
     onEditClick: PropTypes.func,
     onRemoveItemClick: PropTypes.func,
@@ -98,11 +101,13 @@ test('renders secondary action component', async () => {
 test('renders secondary with event handlers', async () => {
     const onRemoveItemClick = jest.fn()
     const onEditClick = jest.fn()
+    //@sfdc-extension-line SFDC_EXT_WISHLIST
     const onAddToWishlistClick = jest.fn()
     const onIsAGiftChange = jest.fn()
 
     const {user} = renderWithProviders(
         <MockedComponent
+            //@sfdc-extension-line SFDC_EXT_WISHLIST
             onAddToWishlistClick={onAddToWishlistClick}
             onEditClick={onEditClick}
             onRemoveItemClick={onRemoveItemClick}
@@ -120,12 +125,13 @@ test('renders secondary with event handlers', async () => {
     })
     expect(onEditClick).toHaveBeenCalledTimes(1)
 
+    //@sfdc-extension-block-start SFDC_EXT_WISHLIST
     const addToWishlistButton = screen.getByRole('button', {
         name: /Add to wishlist/i
     })
     await user.click(addToWishlistButton)
     expect(onAddToWishlistClick).toHaveBeenCalledTimes(1)
-
+    //@sfdc-extension-block-end SFDC_EXT_WISHLIST
     const removeButton = screen.getByRole('button', {
         name: /remove/i
     })

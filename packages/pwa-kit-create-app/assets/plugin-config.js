@@ -19,6 +19,12 @@ module.exports = {
         // },
         SFDC_EXT_MARKETING_CONSENT_ENABLED: {
             description: 'Marketing Consent Extension (requires Marketing Cloud and Data Cloud)'
+        },
+        SFDC_EXT_SOCIAL_LOGIN: {
+            description: 'Social login Extension'
+        },
+        SFDC_EXT_WISHLIST: {
+            description: 'Wishlist Extension'
         }
     }
 }

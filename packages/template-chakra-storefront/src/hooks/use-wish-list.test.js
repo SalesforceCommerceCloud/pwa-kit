@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-
+//@sfdc-extension-block-start SFDC_EXT_WISHLIST
 import {renderHook, act} from '@testing-library/react'
 import {useIntl} from 'react-intl'
 import {
@@ -324,3 +324,4 @@ describe('useWishList', () => {
         )
     })
 })
+//@sfdc-extension-block-end SFDC_EXT_WISHLIST

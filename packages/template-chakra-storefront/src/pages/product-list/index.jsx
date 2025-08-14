@@ -22,6 +22,7 @@ import ProductListPagination from './partials/product-list-pagination'
 import PageAnalytics from './page-analytics'
 
 // Hooks
+//@sfdc-extension-line SFDC_EXT_WISHLIST
 import {useWishList} from '../../hooks/use-wish-list'
 import {useProductListData} from './hooks/use-product-list-data'
 import {useProductListControls} from './hooks/use-product-list-controls'
@@ -35,6 +36,7 @@ const ProductList = () => {
     const {
         pages: {productList: productListConfig}
     } = getConfig()
+    //@sfdc-extension-line SFDC_EXT_WISHLIST
     const {toggleWishlist, isItemInWishlist} = useWishList()
 
     const {
@@ -120,8 +122,10 @@ const ProductList = () => {
                                     productSearchResult={productSearchResult}
                                     searchParams={searchParams}
                                     productListConfig={productListConfig}
+                                    //@sfdc-extension-line SFDC_EXT_WISHLIST
                                     isItemInWishlist={isItemInWishlist}
                                     onClickProduct={handleProductClick}
+                                    //@sfdc-extension-line SFDC_EXT_WISHLIST
                                     onFavouriteToggle={toggleWishlist}
                                 />
                                 <ProductListPagination basePath={basePath} pageUrls={pageUrls} />

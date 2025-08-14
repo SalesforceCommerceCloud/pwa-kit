@@ -23,6 +23,7 @@ const AppHeader = ({
     onLogoClick,
     onMyCartClick,
     onMyAccountClick,
+    //@sfdc-extension-line SFDC_EXT_WISHLIST
     onWishlistClick,
     onStoreLocatorClick,
     mobileNavigationProps
@@ -36,6 +37,7 @@ const AppHeader = ({
                         onLogoClick={onLogoClick}
                         onMyCartClick={onMyCartClick}
                         onMyAccountClick={onMyAccountClick}
+                        //@sfdc-extension-line SFDC_EXT_WISHLIST
                         onWishlistClick={onWishlistClick}
                         onStoreLocatorClick={onStoreLocatorClick}
                     >
@@ -56,6 +58,7 @@ AppHeader.propTypes = {
     onLogoClick: PropTypes.func.isRequired,
     onMyCartClick: PropTypes.func.isRequired,
     onMyAccountClick: PropTypes.func.isRequired,
+    //@sfdc-extension-line SFDC_EXT_WISHLIST
     onWishlistClick: PropTypes.func.isRequired,
     onStoreLocatorClick: PropTypes.func.isRequired,
     mobileNavigationProps: PropTypes.object.isRequired

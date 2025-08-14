@@ -8,7 +8,7 @@ import React from 'react'
 import LoginState from '../../../pages/checkout/partials/login-state'
 import {renderWithProviders} from '../../../utils/test-utils'
 import {useForm} from 'react-hook-form'
-import {act} from '@testing-library/react'
+import {act, screen} from '@testing-library/react'
 
 const mockTogglePasswordField = jest.fn()
 const idps = ['apple', 'google']
@@ -55,14 +55,25 @@ describe('LoginState', () => {
         const {queryByRole, queryByText} = renderWithProviders(
             <WrapperComponent isPasswordlessEnabled={false} />
         )
-        expect(queryByText('Or Login With')).not.toBeInTheDocument()
         expect(queryByRole('button', {name: 'Secure Link'})).not.toBeInTheDocument()
     })
 
-    test('shows social login buttons if enabled', async () => {
+    //@sfdc-extension-block-start SFDC_EXT_SOCIAL_LOGIN
+    test('shows social login buttons along with standard login form', async () => {
+        const {getByRole, getByText} = renderWithProviders(<WrapperComponent idps={idps} />)
+        expect(getByText('Or Login With')).toBeInTheDocument()
+        expect(getByRole('button', {name: /Google/i})).toBeInTheDocument()
+        expect(getByRole('button', {name: /Apple/i})).toBeInTheDocument()
+        expect(
+            screen.queryByRole('button', {name: 'Back to Sign In Options'})
+        ).not.toBeInTheDocument()
+    })
+
+    test('shows social login buttons along with passwordless flow', async () => {
         const {getByRole, getByText, user} = renderWithProviders(
-            <WrapperComponent isSocialEnabled={true} idps={idps} />
+            <WrapperComponent idps={idps} isPasswordlessEnabled={true} />
         )
+
         expect(getByText('Or Login With')).toBeInTheDocument()
         expect(getByRole('button', {name: /Google/i})).toBeInTheDocument()
         expect(getByRole('button', {name: /Apple/i})).toBeInTheDocument()
@@ -71,15 +82,8 @@ describe('LoginState', () => {
             await user.click(trigger)
         })
         expect(mockTogglePasswordField).toHaveBeenCalled()
+        screen.logTestingPlaygroundURL()
         expect(getByRole('button', {name: 'Back to Sign In Options'})).toBeInTheDocument()
     })
-
-    test('does not show social login buttons if disabled', () => {
-        const {queryByRole, queryByText} = renderWithProviders(
-            <WrapperComponent isSocialEnabled={false} idps={idps} />
-        )
-        expect(queryByText('Or Login With')).not.toBeInTheDocument()
-        expect(queryByRole('button', {name: /Google/i})).not.toBeInTheDocument()
-        expect(queryByRole('button', {name: /Apple/i})).not.toBeInTheDocument()
-    })
+    //@sfdc-extension-block-end SFDC_EXT_SOCIAL_LOGIN
 })
