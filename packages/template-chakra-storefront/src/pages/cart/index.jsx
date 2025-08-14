@@ -11,6 +11,7 @@ import {useCurrentBasket, useCurrentCustomer} from '../../hooks/'
 // Custom Cart Hooks
 import {useCartProducts} from './hooks/use-cart-products'
 import {useCartOperations} from './hooks/use-cart-operations'
+//@sfdc-extension-line SFDC_EXT_WISHLIST
 import {useWishList} from '../../hooks/use-wish-list'
 import {useCartGiftItems} from './hooks/use-cart-gift-items'
 import {useCartDefaultShipping} from './hooks/use-cart-default-shipping'
@@ -53,9 +54,11 @@ const Cart = () => {
         handleRemoveItem
     } = useCartOperations(basket, productsByItemId, showError)
 
+    //@sfdc-extension-block-start SFDC_EXT_WISHLIST
     // Wishlist operations
     const {addToWishlist} = useWishList()
     const handleAddToWishlist = (product) => addToWishlist(product)
+    //@sfdc-extension-block-end SFDC_EXT_WISHLIST
 
     // Gift items
     const {localIsGiftItems, handleIsAGiftChange} = useCartGiftItems(
@@ -116,6 +119,7 @@ const Cart = () => {
                                     selectedItem={selectedItem}
                                     handleChangeItemQuantity={handleChangeItemQuantity}
                                     handleIsAGiftChange={handleIsAGiftChange}
+                                    //@sfdc-extension-line SFDC_EXT_WISHLIST
                                     handleAddToWishlist={handleAddToWishlist}
                                     handleEditClick={handleEditClick}
                                     handleRemoveItem={handleRemoveItem}

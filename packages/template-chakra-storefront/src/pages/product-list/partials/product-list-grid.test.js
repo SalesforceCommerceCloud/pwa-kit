@@ -63,6 +63,7 @@ const mockProps = {
     isFetched: true,
     searchParams: {limit: 2},
     productListConfig: {},
+    //@sfdc-extension-line SFDC_EXT_WISHLIST
     isItemInWishlist: jest.fn(),
     onFavouriteToggle: jest.fn(),
     onClickProduct: jest.fn()

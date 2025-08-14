@@ -13,9 +13,11 @@ import {getDisplayVariationValues} from '../utils/product-utils'
 
 // Mock the hooks
 jest.mock('./use-current-basket')
+//@sfdc-extension-line SFDC_EXT_WISHLIST
 jest.mock('./use-wish-list')
 
 import {useCurrentBasket} from './use-current-basket'
+//@sfdc-extension-line SFDC_EXT_WISHLIST
 import {useWishList} from './use-wish-list'
 
 const MOCK_PRODUCT = {
@@ -585,10 +587,12 @@ beforeEach(() => {
         isPending: false
     })
 
+    //@sfdc-extension-block-start SFDC_EXT_WISHLIST
     useWishList.mockReturnValue({
         data: null,
         isLoading: false
     })
+    //@sfdc-extension-block-end SFDC_EXT_WISHLIST
 })
 
 test('Renders AddToCartModal properly', () => {

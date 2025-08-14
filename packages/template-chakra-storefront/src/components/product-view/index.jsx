@@ -55,6 +55,7 @@ const messages = defineMessages({
         defaultMessage: 'Add Bundle to Cart',
         id: 'product_view.button.add_bundle_to_cart'
     },
+    //@sfdc-extension-block-start SFDC_EXT_WISHLIST
     addToWishlist: {
         defaultMessage: 'Add to Wishlist',
         id: 'product_view.button.add_to_wishlist'
@@ -67,6 +68,7 @@ const messages = defineMessages({
         defaultMessage: 'Add Bundle to Wishlist',
         id: 'product_view.button.add_bundle_to_wishlist'
     },
+    //@sfdc-extension-block-end SFDC_EXT_WISHLIST
     quantity: {
         defaultMessage: 'Quantity',
         id: 'product_view.label.quantity'
@@ -186,10 +188,13 @@ const ProductView = forwardRef(
             category,
             showFullLink = false,
             imageSize = 'md',
+            //@sfdc-extension-line SFDC_EXT_WISHLIST
             isWishlistLoading = false,
             addToCart,
             updateCart,
+            //@sfdc-extension-line SFDC_EXT_WISHLIST
             addToWishlist,
+            //@sfdc-extension-line SFDC_EXT_WISHLIST
             updateWishlist,
             isProductLoading,
             isProductPartOfSet = false,
@@ -237,6 +242,7 @@ const ProductView = forwardRef(
         const priceData = useMemo(() => {
             return getPriceData(product, {quantity})
         }, [product, quantity])
+        //@sfdc-extension-line SFDC_EXT_WISHLIST
         const canAddToWishlist = !isProductLoading
         const isProductASet = product?.type.set
         const isProductABundle = product?.type.bundle
@@ -302,9 +308,11 @@ const ProductView = forwardRef(
                 addToCart: formatMessage(messages.addToCart),
                 addSetToCart: formatMessage(messages.addSetToCart),
                 addBundleToCart: formatMessage(messages.addBundleToCart),
+                //@sfdc-extension-block-start SFDC_EXT_WISHLIST
                 addToWishlist: formatMessage(messages.addToWishlist),
                 addSetToWishlist: formatMessage(messages.addSetToWishlist),
                 addBundleToWishlist: formatMessage(messages.addBundleToWishlist)
+                //@sfdc-extension-block-end SFDC_EXT_WISHLIST
             }
 
             const handleCartItem = async () => {
@@ -323,7 +331,6 @@ const ProductView = forwardRef(
                     const itemsAdded = await addToCart(variant, quantity)
                     // Open modal only when `addToCart` returns some data
                     // It's possible that the item has been added to cart, but we don't want to open the modal.
-                    // See wishlist_primary_action for example.
                     if (itemsAdded) {
                         onAddToCartModalOpen({
                             product,
@@ -336,6 +343,7 @@ const ProductView = forwardRef(
                 }
             }
 
+            //@sfdc-extension-block-start SFDC_EXT_WISHLIST
             const handleWishlistItem = async () => {
                 if (!updateWishlist && !addToWishlist) return null
                 if (updateWishlist) {
@@ -344,6 +352,7 @@ const ProductView = forwardRef(
                 }
                 addToWishlist(product, variant, quantity)
             }
+            //@sfdc-extension-block-end SFDC_EXT_WISHLIST
 
             // child product of bundles do not have add to cart button
             if ((addToCart || updateCart) && !isProductPartOfBundle) {
@@ -368,6 +377,7 @@ const ProductView = forwardRef(
                 )
             }
 
+            //@sfdc-extension-block-start SFDC_EXT_WISHLIST
             // child product of bundles do not have add to wishlist button
             if ((addToWishlist || updateWishlist) && !isProductPartOfBundle) {
                 buttons.push(
@@ -390,6 +400,7 @@ const ProductView = forwardRef(
                     </ButtonWithRegistration>
                 )
             }
+            //@sfdc-extension-block-end SFDC_EXT_WISHLIST
 
             // Add custom buttons if provided
             if (customButtons && customButtons.length > 0) {
@@ -731,10 +742,13 @@ ProductView.propTypes = {
     category: PropTypes.array,
     isProductLoading: PropTypes.bool,
     isBasketLoading: PropTypes.bool,
+    //@sfdc-extension-line SFDC_EXT_WISHLIST
     isWishlistLoading: PropTypes.bool,
     addToCart: PropTypes.func,
+    //@sfdc-extension-line SFDC_EXT_WISHLIST
     addToWishlist: PropTypes.func,
     updateCart: PropTypes.func,
+    //@sfdc-extension-line SFDC_EXT_WISHLIST
     updateWishlist: PropTypes.func,
     showFullLink: PropTypes.bool,
     imageSize: PropTypes.oneOf(['sm', 'md']),
