@@ -3627,12 +3627,6 @@
       "value": "Delivered"
     }
   ],
-  "status_bar.dispatched": [
-    {
-      "type": 0,
-      "value": "Dispatched"
-    }
-  ],
   "status_bar.ordered": [
     {
       "type": 0,
@@ -3643,6 +3637,12 @@
     {
       "type": 0,
       "value": "Out for delivery"
+    }
+  ],
+  "status_bar.shipped": [
+    {
+      "type": 0,
+      "value": "Shipped"
     }
   ],
   "store_display.format.address_line_2": [
@@ -4172,13 +4172,13 @@
   "use_order_lookup_fields.error.required_email": [
     {
       "type": 0,
-      "value": "Please enter your email address."
+      "value": "Enter your email address."
     }
   ],
   "use_order_lookup_fields.error.required_order_number": [
     {
       "type": 0,
-      "value": "Please enter your order number."
+      "value": "Enter your order number."
     }
   ],
   "use_order_lookup_fields.label.email": [

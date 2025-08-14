@@ -1544,14 +1544,14 @@
   "status_bar.delivered": {
     "defaultMessage": "Delivered"
   },
-  "status_bar.dispatched": {
-    "defaultMessage": "Dispatched"
-  },
   "status_bar.ordered": {
     "defaultMessage": "Ordered"
   },
   "status_bar.out_for_delivery": {
     "defaultMessage": "Out for delivery"
+  },
+  "status_bar.shipped": {
+    "defaultMessage": "Shipped"
   },
   "store_display.format.address_line_2": {
     "defaultMessage": "{city}, {stateCode} {postalCode}"
@@ -1778,10 +1778,10 @@
     "defaultMessage": "Password"
   },
   "use_order_lookup_fields.error.required_email": {
-    "defaultMessage": "Please enter your email address."
+    "defaultMessage": "Enter your email address."
   },
   "use_order_lookup_fields.error.required_order_number": {
-    "defaultMessage": "Please enter your order number."
+    "defaultMessage": "Enter your order number."
   },
   "use_order_lookup_fields.label.email": {
     "defaultMessage": "Email"

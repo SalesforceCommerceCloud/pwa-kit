@@ -10,7 +10,7 @@ import PropTypes from 'prop-types'
 import {useIntl} from 'react-intl'
 import StatusBar from '@salesforce/retail-react-app/app/components/order-status-bar/status-bar'
 
-const steps = ['Ordered', 'Dispatched', 'Out for delivery', 'Delivered']
+const steps = ['Ordered', 'Shipped', 'Out for delivery', 'Delivered']
 
 const OrderStatusBar = ({currentStepLabel}) => {
     const theme = useTheme()
@@ -20,10 +20,10 @@ const OrderStatusBar = ({currentStepLabel}) => {
         switch (status) {
             case 'Ordered':
                 return intl.formatMessage({id: 'status_bar.ordered', defaultMessage: 'Ordered'})
-            case 'Dispatched':
+            case 'Shipped':
                 return intl.formatMessage({
-                    id: 'status_bar.dispatched',
-                    defaultMessage: 'Dispatched'
+                    id: 'status_bar.shipped',
+                    defaultMessage: 'Shipped'
                 })
             case 'Out for delivery':
                 return intl.formatMessage({
