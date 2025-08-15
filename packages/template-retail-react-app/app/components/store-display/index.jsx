@@ -51,8 +51,8 @@ const StoreDisplay = ({
                             ml={2}
                         >
                             <FormattedMessage
-                                defaultMessage="Change Store"
-                                id="store_display.button.change_store"
+                                defaultMessage="Use Preferred Store"
+                                id="store_display.button.use_preferred_store"
                             />
                         </Button>
                     )}

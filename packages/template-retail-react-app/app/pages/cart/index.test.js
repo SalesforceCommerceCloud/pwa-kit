@@ -1684,6 +1684,15 @@ describe('Change store for pickup shipment', () => {
             inventories: [{id: mockStore2.inventoryId, stockLevel: 10}]
         }
         mockUseMultiship.getItemsForShipment.mockReturnValue(mockBasketWithPickup.productItems)
+
+        // Mock selectedStore to be mockStore2 for the change store functionality
+        mockUseSelectedStore.mockImplementation(() => ({
+            selectedStore: mockStore2,
+            isLoading: false,
+            error: null,
+            hasSelectedStore: true
+        }))
+
         global.server.use(
             rest.get('*/customers/:customerId/baskets', (req, res, ctx) => {
                 return res(ctx.delay(0), ctx.json({baskets: [mockBasketWithPickup], total: 1}))
@@ -1698,26 +1707,14 @@ describe('Change store for pickup shipment', () => {
     })
 
     test('should move items to new pickup shipment when store is changed via modal', async () => {
-        const {rerender} = renderWithProviders(<Cart />)
+        renderWithProviders(<Cart />)
 
         await waitFor(() => {
-            expect(screen.getByText('Change Store')).toBeInTheDocument()
+            expect(screen.getByTestId('change-store-button')).toBeInTheDocument()
         })
 
         // Simulate clicking "Change Store"
-        fireEvent.click(screen.getByText('Change Store'))
-        expect(mockStoreLocatorModal.onOpen).toHaveBeenCalled()
-
-        // Simulate modal opening...
-        mockStoreLocatorModal.isOpen = true
-        rerender(<Cart />)
-
-        // And then closing with a new store selected.
-        mockStoreLocatorModal.isOpen = false
-        mockUseSelectedStore.mockImplementation(() => ({
-            selectedStore: mockStore2
-        }))
-        rerender(<Cart />)
+        fireEvent.click(screen.getByTestId('change-store-button'))
 
         // Verify that the shipment is updated with the new store.
         await waitFor(() => {
@@ -1737,26 +1734,14 @@ describe('Change store for pickup shipment', () => {
 
         mockUseMultiship.moveItemsToPickupShipment.mockRejectedValue(new Error('Update failed'))
 
-        const {rerender} = renderWithProviders(<Cart />)
+        renderWithProviders(<Cart />)
 
         await waitFor(() => {
-            expect(screen.getByText('Change Store')).toBeInTheDocument()
+            expect(screen.getByTestId('change-store-button')).toBeInTheDocument()
         })
 
         // Simulate clicking "Change Store"
-        fireEvent.click(screen.getByText('Change Store'))
-        expect(mockStoreLocatorModal.onOpen).toHaveBeenCalled()
-
-        // Simulate modal opening...
-        mockStoreLocatorModal.isOpen = true
-        rerender(<Cart />)
-
-        // And then closing with a new store selected.
-        mockStoreLocatorModal.isOpen = false
-        mockUseSelectedStore.mockImplementation(() => ({
-            selectedStore: mockStore2
-        }))
-        rerender(<Cart />)
+        fireEvent.click(screen.getByTestId('change-store-button'))
 
         // Verify that an error toast is shown.
         await waitFor(() => {
