@@ -574,7 +574,6 @@ describe('ShippingAddress', () => {
             })
 
             it('should not show "Deliver to Multiple Addresses" button when MULTISHIP_IS_ENABLED is false', () => {
-                // Mock that we're in editing mode with multiple items
                 const editingContext = {
                     ...mockCheckoutContext,
                     step: 3 // SHIPPING_ADDRESS
@@ -583,8 +582,6 @@ describe('ShippingAddress', () => {
 
                 renderWithIntl(<ShippingAddress {...defaultProps} />)
 
-                // The "Deliver to Multiple Addresses" button should not be present
-                // This is achieved by passing undefined to editAction and onEditActionClick props
                 expect(screen.queryByTestId('edit-action-button')).not.toBeInTheDocument()
             })
 
