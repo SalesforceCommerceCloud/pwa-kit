@@ -68,6 +68,7 @@ AddToCartModalProvider.propTypes = {
 
 /**
  * Visual feedback (a modal) for adding item to the cart.
+ * <delete this line>
  */
 export const AddToCartModal = () => {
     const {isOpen, onClose, data} = useAddToCartModalContext()
