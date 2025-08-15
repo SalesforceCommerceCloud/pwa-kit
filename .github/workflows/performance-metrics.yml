@@ -34,8 +34,8 @@ jobs:
             - name: Create MRT credentials file
               uses: './.github/actions/create_mrt'
               with:
-                  mobify_user: ${{ secrets.MOBIFY_STG_CLIENT_USER }}
-                  mobify_api_key: ${{ secrets.MOBIFY_STG_CLIENT_API_KEY }}
+                  mobify_user: ${{ secrets.MRT_STG_Q4_PWA_PERF_API_USER }}
+                  mobify_api_key: ${{ secrets.MRT_STG_Q4_PWA_PERF_API_KEY }}
 
             - name: Push Bundle to MRT
               uses: './.github/actions/push_to_mrt'
