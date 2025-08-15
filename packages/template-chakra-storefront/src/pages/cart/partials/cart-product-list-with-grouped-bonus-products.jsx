@@ -35,6 +35,17 @@ const CartProductListWithGroupedBonusProducts = ({
     getPromotionCalloutText,
     onSelectBonusProducts
 }) => {
+    // Fallback: if no non-bonus products, render all products in simple layout
+    if (!nonBonusProducts || nonBonusProducts.length === 0) {
+        return (
+            <Stack gap={4}>
+                {basket.productItems?.map((productItem, idx) =>
+                    renderProductItem(productItem, idx)
+                )}
+            </Stack>
+        )
+    }
+
     return (
         <Stack gap={6}>
             {nonBonusProducts.map((qualifyingProduct, qualifyingIdx) => {

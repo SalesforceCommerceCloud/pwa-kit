@@ -150,8 +150,8 @@ const CartProductList = ({
         return <Stack gap={4}></Stack>
     }
 
-    // Early return if product data is still loading and we don't have product details
-    if (isProductsPending || !productsByItemId) {
+    // Early return if product data is still loading
+    if (isProductsPending) {
         return <Stack gap={4}></Stack>
     }
 
