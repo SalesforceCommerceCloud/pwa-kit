@@ -4,10 +4,6 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React from 'react'
-import {render} from '@testing-library/react'
-import {IntlProvider} from 'react-intl'
-import {ChakraProvider} from '@chakra-ui/react'
 import {getOrderStatusColorScheme} from '@salesforce/retail-react-app/app/pages/account/order-history'
 
 // Mock the commerce-sdk-react hooks
@@ -50,14 +46,6 @@ jest.mock('@salesforce/pwa-kit-react-sdk/ssr/universal/hooks', () => ({
 }))
 
 describe('Order Status Badge Colors', () => {
-    const renderWithProviders = (component) => {
-        return render(
-            <IntlProvider locale="en">
-                <ChakraProvider>{component}</ChakraProvider>
-            </IntlProvider>
-        )
-    }
-
     test('getOrderStatusColorScheme helper returns correct colors for cancelled status', () => {
         const cancelledColor = getOrderStatusColorScheme('cancelled')
         expect(cancelledColor).toEqual({
