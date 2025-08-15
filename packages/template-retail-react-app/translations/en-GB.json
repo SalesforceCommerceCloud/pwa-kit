@@ -1101,9 +1101,6 @@
   "order_lookup.heading.look_up_with_order_number": {
     "defaultMessage": "Look it up with your order number"
   },
-  "order_lookup.link.help_to_find_order_number": {
-    "defaultMessage": "Need help finding your order number?"
-  },
   "order_lookup.subheading.find_individual_order": {
     "defaultMessage": "Find an individual order"
   },

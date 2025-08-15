@@ -9,7 +9,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import {useForm} from 'react-hook-form'
 import {FormattedMessage} from 'react-intl'
-import {Button, Text, Stack, Box, Link} from '@salesforce/retail-react-app/app/components/shared/ui'
+import {Button, Text, Stack, Box} from '@salesforce/retail-react-app/app/components/shared/ui'
 import Field from '@salesforce/retail-react-app/app/components/field'
 import useOrderLookupFields from '@salesforce/retail-react-app/app/components/forms/use-order-lookup-fields'
 
@@ -70,16 +70,6 @@ const OrderLookupForm = ({onSubmit}) => {
                         </Button>
                     </Stack>
                 </form>
-
-                <Box textAlign="center">
-                    {/* TODO: Add a link to the order retrieval help page */}
-                    <Link color="blue.600" fontSize="sm" textDecoration="underline">
-                        <FormattedMessage
-                            defaultMessage="Need help finding your order number?"
-                            id="order_lookup.link.help_to_find_order_number"
-                        />
-                    </Link>
-                </Box>
             </Stack>
         </Box>
     )
