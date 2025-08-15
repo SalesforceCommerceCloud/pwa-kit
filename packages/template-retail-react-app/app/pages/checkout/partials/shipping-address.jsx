@@ -49,7 +49,7 @@ const deliveryAddressLabel = defineMessage({
     id: 'shipping_address.label.delivery_address'
 })
 const shipToOneAddressLabel = defineMessage({
-    defaultMessage: 'Ship To Single Address',
+    defaultMessage: 'Ship to Single Address',
     id: 'shipping_address.action.ship_to_single_address'
 })
 const deliverToMultipleAddressesLabel = defineMessage({

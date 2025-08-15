@@ -1440,7 +1440,7 @@
     "defaultMessage": "Ship to Multiple Addresses"
   },
   "shipping_address.action.ship_to_single_address": {
-    "defaultMessage": "Ship To Single Address"
+    "defaultMessage": "Ship to Single Address"
   },
   "shipping_address.button.add_new_address": {
     "defaultMessage": "+ Add New Address"

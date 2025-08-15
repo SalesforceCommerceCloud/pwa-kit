@@ -3422,7 +3422,7 @@
   "shipping_address.action.ship_to_single_address": [
     {
       "type": 0,
-      "value": "Ship To Single Address"
+      "value": "Ship to Single Address"
     }
   ],
   "shipping_address.button.add_new_address": [
