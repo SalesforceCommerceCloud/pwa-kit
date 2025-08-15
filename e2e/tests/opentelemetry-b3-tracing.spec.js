@@ -17,10 +17,8 @@ test.beforeEach(async ({page}) => {
 })
 
 test('should inject B3 headers when __server_timing param is passed', async ({page}) => {
-    // Arrange
     const url = `${config.RETAIL_APP_HOME}?__server_timing=true`
     
-    // Capture response headers
     const responseHeaders = []
     page.on('response', (response) => {
         if (response.url().includes(config.RETAIL_APP_HOME)) {
@@ -32,11 +30,9 @@ test('should inject B3 headers when __server_timing param is passed', async ({pa
         }
     })
 
-    // Act
     await page.goto(url)
     await answerConsentTrackingForm(page)
 
-    // Assert
     expect(responseHeaders.length).toBeGreaterThan(0)
     
     const mainResponse = responseHeaders.find(r => 
@@ -49,7 +45,6 @@ test('should inject B3 headers when __server_timing param is passed', async ({pa
         // For now, just verify that the request was successful
         expect(mainResponse.headers).toBeDefined()
         
-        // Uncomment these lines once B3 headers are deployed:
         expect(mainResponse.headers['x-b3-traceid']).toBeDefined()
         expect(mainResponse.headers['x-b3-spanid']).toBeDefined()
         expect(mainResponse.headers['x-b3-sampled']).toBe('1')
@@ -65,10 +60,8 @@ test('should inject B3 headers when __server_timing param is passed', async ({pa
 })
 
 test('should not inject B3 headers when __server_timing param is not passed', async ({page}) => {
-    // Arrange
     const url = config.RETAIL_APP_HOME // No __server_timing param
     
-    // Capture response headers
     const responseHeaders = []
     page.on('response', (response) => {
         if (response.url().includes(config.RETAIL_APP_HOME)) {
@@ -80,11 +73,9 @@ test('should not inject B3 headers when __server_timing param is not passed', as
         }
     })
 
-    // Act
     await page.goto(url)
     await answerConsentTrackingForm(page)
 
-    // Assert
     expect(responseHeaders.length).toBeGreaterThan(0)
     
     const mainResponse = responseHeaders.find(r => 
@@ -99,56 +90,9 @@ test('should not inject B3 headers when __server_timing param is not passed', as
     }
 })
 
-test('should validate Server-Timing header contains performance marks with durations', async ({page}) => {
-    // Arrange
-    const url = `${config.RETAIL_APP_HOME}?__server_timing=true`
-    
-    // Capture response headers
-    const responseHeaders = []
-    page.on('response', (response) => {
-        if (response.url().includes(config.RETAIL_APP_HOME)) {
-            const headers = response.headers()
-            responseHeaders.push({
-                url: response.url(),
-                headers: headers
-            })
-        }
-    })
-
-    // Act
-    await page.goto(url)
-    await answerConsentTrackingForm(page)
-
-    // Assert
-    expect(responseHeaders.length).toBeGreaterThan(0)
-    
-    const mainResponse = responseHeaders.find(r => 
-        r.url.includes(config.RETAIL_APP_HOME) && !r.url.includes('static')
-    )
-    
-    if (mainResponse && mainResponse.headers['server-timing']) {
-        const serverTiming = mainResponse.headers['server-timing']
-        
-        // Should contain expected performance marks
-        expect(serverTiming).toContain('ssr.total')
-        expect(serverTiming).toContain('ssr.render-to-string')
-        expect(serverTiming).toContain('ssr.route-matching')
-        expect(serverTiming).toContain('ssr.load-component')
-        expect(serverTiming).toContain('ssr.fetch-strategies')
-        
-        // Each mark should have a duration
-        const timingEntries = serverTiming.split(', ')
-        timingEntries.forEach(entry => {
-            expect(entry).toMatch(/^[^;]+;dur=\d+\.\d+$/)
-        })
-    }
-})
-
 test('should validate performance marks in Server-Timing header have numeric durations', async ({page}) => {
-    // Arrange
     const url = `${config.RETAIL_APP_HOME}?__server_timing=true`
     
-    // Capture response headers
     const responseHeaders = []
     page.on('response', (response) => {
         if (response.url().includes(config.RETAIL_APP_HOME)) {
@@ -160,11 +104,9 @@ test('should validate performance marks in Server-Timing header have numeric dur
         }
     })
 
-    // Act
     await page.goto(url)
     await answerConsentTrackingForm(page)
 
-    // Assert
     expect(responseHeaders.length).toBeGreaterThan(0)
     
     const mainResponse = responseHeaders.find(r => 
