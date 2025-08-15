@@ -26,7 +26,7 @@ import {
 } from '../shared/ui'
 import {PhoneIcon} from '@chakra-ui/icons'
 
-const OtpAuth = ({isOpen, onClose, form, handleSendEmailOtp, handleOtpVerification}) => {
+const OtpAuth = ({ isOpen, onClose, form, handleSendEmailOtp, handleOtpVerification, onCheckoutAsGuest }) => {
     const OTP_LENGTH = 8
     const [otpValues, setOtpValues] = useState(new Array(OTP_LENGTH).fill(''))
     const [resendTimer, setResendTimer] = useState(0)

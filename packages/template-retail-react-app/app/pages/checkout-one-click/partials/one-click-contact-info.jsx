@@ -142,7 +142,7 @@ const ContactInfo = ({isSocialEnabled = false, idps = []}) => {
 
     // Helper function to validate email format
     const isValidEmail = (email) => {
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+        const emailRegex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/
         return emailRegex.test(email)
     }
 
@@ -264,6 +264,18 @@ const ContactInfo = ({isSocialEnabled = false, idps = []}) => {
 
     const submitForm = async (data) => {
         setError(null)
+
+        // Validate email before proceeding
+        if (!data.email) {
+            setError('Please enter your email address.')
+            return
+        }
+
+        if (!isValidEmail(data.email)) {
+            setError('Please enter a valid email address.')
+            return
+        }
+
         try {
             if (!data.password) {
                 await updateCustomerForBasket.mutateAsync({
