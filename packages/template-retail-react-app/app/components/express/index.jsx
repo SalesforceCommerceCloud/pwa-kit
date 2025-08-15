@@ -19,6 +19,7 @@ import {useExpressPaymentManager} from '@salesforce/retail-react-app/app/compone
 
 // Define the payment methods we will attempt to load
 const PAYMENT_METHODS = ['applepay', 'googlepay']
+const PDP_PAYMENT_METHODS = ['applepay']
 
 function Express() {
     const {getTokenWhenReady} = useAccessToken()
@@ -39,7 +40,9 @@ function Express() {
     const [currentQuantity, setCurrentQuantity] = useState(1)
 
     // Initialize the express payment manager
-    const {manager, managerError} = useExpressPaymentManager(PAYMENT_METHODS)
+    const {manager, managerError} = useExpressPaymentManager(
+        isPdpMode ? PDP_PAYMENT_METHODS : PAYMENT_METHODS
+    )
 
     useEffect(() => {
         const getToken = async () => {
@@ -136,6 +139,7 @@ function Express() {
                     isPdpMode={isPdpMode}
                     basketData={basket}
                     authToken={authToken}
+                    manager={manager}
                 />
             )}
         </div>

@@ -759,6 +759,7 @@ export const ApplePayExpress = ({
         adyenEnvironment,
         adyenPaymentMethods,
         isPdpMode,
+        quantity,
         ...(isPdpMode
             ? [
                   tempBasket,
