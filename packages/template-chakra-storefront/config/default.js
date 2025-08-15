@@ -29,7 +29,8 @@ module.exports = {
             orderSearchParam: {limit: 10, offset: 0, sort: 'best-matches', refine: []}
         },
         cart: {
-            path: '/cart'
+            path: '/cart',
+            groupBonusProductsWithQualifyingProduct: true
         },
         checkout: {
             path: '/checkout',

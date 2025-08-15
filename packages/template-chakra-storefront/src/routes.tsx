@@ -54,6 +54,7 @@ const Wishlist = loadable(() => import('../src/pages/account/wishlist'), {
 })
 
 const PageNotFound = loadable(() => import('../src/pages/page-not-found'))
+const BonusProductModalDebug = loadable(() => import('../src/pages/bonus-product-modal-debug'), {fallback})
 
 export const routes = [
     {
@@ -136,6 +137,11 @@ export const routes = [
     //     path: '/store-locator',
     //     component: StoreLocator
     // },
+    {
+        path: '/bonus-product-modal-debug',
+        component: BonusProductModalDebug,
+        exact: true
+    },
     {
         path: '*',
         component: PageNotFound
