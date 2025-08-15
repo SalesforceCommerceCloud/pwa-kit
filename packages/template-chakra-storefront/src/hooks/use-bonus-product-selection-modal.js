@@ -32,25 +32,27 @@ import DynamicImage from '../components/dynamic-image'
 import {findImageGroupBy} from '../utils/image-groups-utils'
 import {filterImageGroups} from '../utils/product-utils'
 import {addToCartModalTheme} from '../theme/components/project/add-to-cart-modal'
+import {useModalState} from './use-modal-state'
 
 /**
- * Context for managing the BonusProductModal.
+ * Context for managing the BonusProductSelectionModal.
  * Used in top level App component.
  */
-export const BonusProductModalContext = React.createContext()
-export const useBonusProductModalContext = () => useContext(BonusProductModalContext)
+export const BonusProductSelectionModalContext = React.createContext()
+export const useBonusProductSelectionModalContext = () =>
+    useContext(BonusProductSelectionModalContext)
 
-export const BonusProductModalProvider = ({children}) => {
-    const bonusProductModal = useBonusProductModal()
+export const BonusProductSelectionModalProvider = ({children}) => {
+    const bonusProductSelectionModal = useBonusProductSelectionModal()
     return (
-        <BonusProductModalContext.Provider value={bonusProductModal}>
+        <BonusProductSelectionModalContext.Provider value={bonusProductSelectionModal}>
             {children}
-            <BonusProductModal />
-        </BonusProductModalContext.Provider>
+            <BonusProductSelectionModal />
+        </BonusProductSelectionModalContext.Provider>
     )
 }
 
-BonusProductModalProvider.propTypes = {
+BonusProductSelectionModalProvider.propTypes = {
     children: PropTypes.node.isRequired
 }
 
@@ -154,8 +156,8 @@ BonusProductItem.propTypes = {
 /**
  * Modal for selecting from available bonus products.
  */
-export const BonusProductModal = () => {
-    const {isOpen, onClose, data} = useBonusProductModalContext()
+export const BonusProductSelectionModal = () => {
+    const {isOpen, onClose, data} = useBonusProductSelectionModalContext()
     // const [selectedProducts, setSelectedProducts] = useState([])
     const size = useBreakpointValue(addToCartModalTheme.modal.size)
     const intl = useIntl()
@@ -262,36 +264,10 @@ export const BonusProductModal = () => {
     )
 }
 
-export const useBonusProductModal = () => {
-    const [state, setState] = useState({
-        isOpen: false,
-        data: null
+export const useBonusProductSelectionModal = () => {
+    const {isOpen, data, onOpen, onClose} = useModalState({
+        closeOnRouteChange: true,
+        resetDataOnClose: true
     })
-
-    const {pathname} = useLocation()
-    useEffect(() => {
-        if (state.isOpen) {
-            setState({
-                ...state,
-                isOpen: false
-            })
-        }
-    }, [pathname])
-
-    return {
-        isOpen: state.isOpen,
-        data: state.data,
-        onOpen: (data) => {
-            setState({
-                isOpen: true,
-                data
-            })
-        },
-        onClose: () => {
-            setState({
-                isOpen: false,
-                data: null
-            })
-        }
-    }
+    return {isOpen, data, onOpen, onClose}
 }

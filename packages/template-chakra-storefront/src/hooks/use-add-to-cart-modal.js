@@ -30,8 +30,10 @@ import {getPriceData, getDisplayVariationValues} from '../utils/product-utils'
 import {EINSTEIN_RECOMMENDERS} from '../../config/constants'
 import DisplayPrice from '../components/display-price'
 import SafePortal from '../components/safe-portal'
-import {useBonusProductModalContext} from './use-bonus-product-modal'
+import {useBonusProductSelectionModalContext} from './use-bonus-product-selection-modal'
 import {addToCartModalTheme} from '../theme/components/project/add-to-cart-modal'
+import SelectBonusProductsButton from '../components/select-bonus-products-button'
+import {useModalState} from './use-modal-state'
 
 /**
  * Local configuration for component-specific styling
@@ -73,10 +75,19 @@ AddToCartModalProvider.propTypes = {
  */
 export const AddToCartModal = ({onSelectBonusProductsClick}) => {
     const {isOpen, onClose, data} = useAddToCartModalContext()
-    const bonusProductContext = useBonusProductModalContext()
+    const bonusProductContext = useBonusProductSelectionModalContext()
     const {onOpen: onOpenBonusModal} = bonusProductContext || {}
-    const {product, itemsAdded = [], selectedQuantity, bonusDiscountLineItems = []} = data || {}
+    const {product, itemsAdded = [], selectedQuantity} = data || {}
     const isProductABundle = !!product?.type.bundle
+
+    const intl = useIntl()
+    const {formatMessage} = intl
+    const {
+        data: basket = {},
+        derivedData: {totalItems}
+    } = useCurrentBasket()
+
+    const {bonusDiscountLineItems = []} = basket || {}
 
     // Extract unique promotion IDs
     const promotionIds = [
@@ -90,12 +101,6 @@ export const AddToCartModal = ({onSelectBonusProductsClick}) => {
     // Get the first promotion's details
     const promotionText = promotions?.data?.[0]?.details || ''
 
-    const intl = useIntl()
-    const {formatMessage} = intl
-    const {
-        data: basket = {},
-        derivedData: {totalItems}
-    } = useCurrentBasket()
     const size = useBreakpointValue(addToCartModalTheme.modal.size)
     const {currency, productSubTotal} = basket
     const numberOfItemsAdded = isProductABundle
@@ -397,29 +402,13 @@ export const AddToCartModal = ({onSelectBonusProductsClick}) => {
                                                 >
                                                     {promotionText}
                                                 </Text>
-                                                <Button
-                                                    onClick={() => {
-                                                        if (onOpenBonusModal) {
-                                                            onOpenBonusModal({
-                                                                bonusDiscountLineItems,
-                                                                product,
-                                                                itemsAdded
-                                                            })
-                                                        }
-                                                        onClose() // Close the AddToCartModal
-                                                    }}
-                                                    width="100%"
-                                                    variant="outline-gray"
-                                                    size="md"
-                                                    height={9}
-                                                    minWidth={11}
-                                                    textStyle="sm"
-                                                >
-                                                    {intl.formatMessage({
-                                                        defaultMessage: 'Select Bonus Products',
-                                                        id: 'add_to_cart_modal.button.select_bonus_products'
-                                                    })}
-                                                </Button>
+                                                <SelectBonusProductsButton
+                                                    bonusDiscountLineItems={bonusDiscountLineItems}
+                                                    product={product}
+                                                    itemsAdded={itemsAdded}
+                                                    onOpenBonusModal={onOpenBonusModal}
+                                                    onClose={onClose}
+                                                />
                                             </>
                                         )}
                                 </Box>
@@ -529,35 +518,9 @@ AddToCartModal.propTypes = {
 }
 
 export const useAddToCartModal = () => {
-    const [state, setState] = useState({
-        isOpen: false,
-        data: null
+    const {isOpen, data, onOpen, onClose} = useModalState({
+        closeOnRouteChange: true,
+        resetDataOnClose: true
     })
-
-    const {pathname} = useLocation()
-    useEffect(() => {
-        if (state.isOpen) {
-            setState({
-                ...state,
-                isOpen: false
-            })
-        }
-    }, [pathname])
-
-    return {
-        isOpen: state.isOpen,
-        data: state.data,
-        onOpen: (data) => {
-            setState({
-                isOpen: true,
-                data
-            })
-        },
-        onClose: () => {
-            setState({
-                isOpen: false,
-                data: null
-            })
-        }
-    }
+    return {isOpen, data, onOpen, onClose}
 }
