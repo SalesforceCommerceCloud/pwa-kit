@@ -230,16 +230,19 @@ const OtpAuth = ({ isOpen, onClose, form, handleSendEmailOtp, handleOtpVerificat
                         <HStack spacing={4} width="100%" justifyContent="center">
                             <Button
                                 onClick={handleCheckoutAsGuest}
-                                variant="outline"
-                                colorScheme="gray"
+                                variant="solid"
                                 size="lg"
                                 minWidth="160px"
                                 isDisabled={isVerifying}
-                                borderColor="gray.300"
-                                color="gray.600"
+                                bg="gray.50"
+                                color="gray.800"
+                                fontWeight="bold"
+                                border="none"
                                 _hover={{
-                                    bg: 'gray.50',
-                                    borderColor: 'gray.400'
+                                    bg: 'gray.100'
+                                }}
+                                _active={{
+                                    bg: 'gray.200'
                                 }}
                             >
                                 <FormattedMessage
