@@ -6,7 +6,7 @@
  */
 import React from 'react'
 import PropTypes from 'prop-types'
-import {Stack, Box, Divider, Heading} from '@chakra-ui/react'
+import {Stack, Box, Heading} from '@chakra-ui/react'
 import SelectBonusProductsCard from './select-bonus-products-card'
 import {
     getBonusProductsInCartForProduct,
@@ -137,7 +137,9 @@ const CartProductListWithGroupedBonusProducts = ({
                             )}
 
                             {/* Add divider between product groups if not the last item */}
-                            {qualifyingIdx < nonBonusProducts.length - 1 && <Divider mt={4} />}
+                            {qualifyingIdx < nonBonusProducts.length - 1 && (
+                                <Box borderTop="1px solid" borderColor="gray.200" mt={4} mb={4} />
+                            )}
                         </Box>
                     )
                 } catch (error) {
