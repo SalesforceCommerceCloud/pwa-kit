@@ -607,7 +607,9 @@ Payment.propTypes = {
     /** Whether user registration is enabled */
     enableUserRegistration: PropTypes.bool,
     /** Callback to set user registration state */
-    setEnableUserRegistration: PropTypes.func
+    setEnableUserRegistration: PropTypes.func,
+    /** Whether a registered user has chosen guest checkout */
+    registeredUserChoseGuest: PropTypes.bool
 }
 
 const PaymentCardSummary = ({payment}) => {

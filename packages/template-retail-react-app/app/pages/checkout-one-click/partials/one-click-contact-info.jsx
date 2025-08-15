@@ -108,6 +108,16 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
         ? passwordlessConfigCallback
         : `${appOrigin}${passwordlessConfigCallback}`
 
+    // Reset guest checkout flag when user registration status changes
+    useEffect(() => {
+        if (isRegistered) {
+            setRegisteredUserChoseGuest(false)
+            if (onRegisteredUserChoseGuest) {
+                onRegisteredUserChoseGuest(false)
+            }
+        }
+    }, [isRegistered, onRegisteredUserChoseGuest])
+
     // Modal controls for OtpAuth
     const {
         isOpen: isOtpModalOpen,
@@ -243,6 +253,13 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
                 parameters: { basketId: basket.basketId },
                 body: { email: email }
             })
+
+            // Set the flag that "Checkout as Guest" was clicked
+            setRegisteredUserChoseGuest(true)
+            if (onRegisteredUserChoseGuest) {
+                onRegisteredUserChoseGuest(true)
+            }
+
             // Proceed to next step (shipping address)
             goToNextStep()
         } catch (error) {
@@ -279,6 +296,12 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
                 parameters: {basketId: basket.basketId},
                 body: {email: email}
             })
+
+            // Reset guest checkout flag since user is now logged in
+            setRegisteredUserChoseGuest(false)
+            if (onRegisteredUserChoseGuest) {
+                onRegisteredUserChoseGuest(false)
+            }
 
             // Reset guest checkout flag since user is now logged in
             setRegisteredUserChoseGuest(false)
