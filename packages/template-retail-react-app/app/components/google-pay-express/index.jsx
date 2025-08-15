@@ -163,7 +163,10 @@ export const updateShippingOption = async (
                 ...getGPShippingOptionParameters(shippingMethodResponse)
             }
         }
-        return paymentDataRequestUpdate
+        return {
+            paymentDataRequestUpdate: paymentDataRequestUpdate,
+            newBasket: response
+        }
     } catch (error) {
         return {
             error: {
@@ -179,7 +182,6 @@ export const getGoogleButtonConfig = (
     authToken,
     site,
     basket,
-    shippingMethods,
     googlePayConfig
 ) => {
     // Use productTotal if orderTotal is null, otherwise use orderTotal
@@ -193,7 +195,6 @@ export const getGoogleButtonConfig = (
         shippingAddressRequired: true,
         // shippingAddressParameters: {"allowedCountryCodes": ["US"]}, // If you want to restrict country codes, you can do that here
         shippingOptionRequired: true,
-        shippingOptionParameters: getGPShippingOptionParameters(shippingMethods),
         billingAddressRequired: true,
         billingAddressParameters: {format: 'FULL'},
         emailRequired: true,
@@ -220,6 +221,7 @@ export const getGoogleButtonConfig = (
                         )
                     }
                 }
+
                 const adyenPaymentService = new AdyenPaymentsService(authToken, site)
                 basket = await forceOrderCalculation(basket.basketId, authToken, site)
 
@@ -263,22 +265,29 @@ export const getGoogleButtonConfig = (
                             callbackTrigger === 'INITIALIZE' ||
                             callbackTrigger === 'SHIPPING_ADDRESS'
                         ) {
-                            paymentDataRequestUpdate = await updateShippingAddress(
+                            const updateShippingAddressResponse = await updateShippingAddress(
                                 authToken,
                                 site,
                                 basket,
                                 shippingAddress
                             )
+
+                            paymentDataRequestUpdate = updateShippingAddressResponse.paymentDataRequestUpdate
+                            // Update our basket with the latest data
+                            basket = updateShippingAddressResponse.newBasket
                         }
                         if (callbackTrigger === 'SHIPPING_OPTION') {
-                            paymentDataRequestUpdate = await updateShippingOption(
+                            const updateShippingOptionResponse = await updateShippingOption(
                                 authToken,
                                 site,
                                 basket,
                                 shippingOptionData?.id
                             )
-                        }
 
+                            paymentDataRequestUpdate = updateShippingOptionResponse.paymentDataRequestUpdate
+                            // Update our basket with the latest data
+                            basket = updateShippingOptionResponse.newBasket
+                        }
                         resolve(paymentDataRequestUpdate)
                     }
 
@@ -309,9 +318,7 @@ export const GooglePayExpress = ({manager, overrideData = null}) => {
         basket,
         locale,
         site,
-        authToken,
-        shippingMethods,
-        fetchShippingMethods
+        authToken
     } = useAdyenExpressCheckout()
 
     const finalAuthToken = overrideData?.authToken
@@ -352,10 +359,7 @@ export const GooglePayExpress = ({manager, overrideData = null}) => {
                 const googleButtonConfig = getGoogleButtonConfig(
                     finalAuthToken,
                     site,
-                    finalBasket,
-                    !shippingMethods && finalBasket?.basketId
-                        ? await fetchShippingMethods(finalBasket?.basketId, site, finalAuthToken)
-                        : shippingMethods,
+                    basket,
                     googlePaymentMethodConfig
                 )
 
