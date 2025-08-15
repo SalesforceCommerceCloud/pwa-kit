@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React, {useState, useMemo, useEffect, useRef} from 'react'
+import React, {useState, useMemo, useEffect} from 'react'
 import {FormattedMessage, useIntl} from 'react-intl'
 
 // Chakra Components
@@ -273,71 +273,52 @@ const Cart = () => {
     const navigate = useNavigation()
     const modalProps = useDisclosure()
     const storeLocatorModal = useStoreLocatorModal()
-    const modalOpenedFromCart = useRef(null)
-
-    // Handle when modal closes after being opened from cart's "Change Store" button
-    useEffect(() => {
-        // If modal was opened from cart and is now closed, check if store changed
-        if (!isProductsLoading && modalOpenedFromCart.current && !storeLocatorModal.isOpen) {
-            const originalStoreId = modalOpenedFromCart.current.storeId
-            const shipmentId = modalOpenedFromCart.current.shipmentId
-
-            // Reset the ref
-            modalOpenedFromCart.current = null
-
-            // Only run action if store actually changed and all required data is available
-            if (
-                originalStoreId !== selectedStore?.id &&
-                selectedStore?.id &&
-                selectedStore?.inventoryId &&
-                shipmentId
-            ) {
-                const changeStore = async () => {
-                    try {
-                        setCartItemLoading(true)
-
-                        // Get all items from the source shipment that have inventory at the new store
-                        const itemsInShipment = getItemsForShipment(basket, shipmentId)
-                        const itemsToMove = itemsInShipment.filter(
-                            (productItem) =>
-                                productsByItemId?.[productItem.itemId]?.inventories?.find(
-                                    (inventory) => inventory.id === selectedStore?.inventoryId
-                                )?.stockLevel >= productItem.quantity
-                        )
-                        if (itemsToMove.length) {
-                            const targetShipmentId = await findOrCreatePickupShipment(selectedStore)
-                            await moveItemsToPickupShipment(
-                                itemsToMove,
-                                targetShipmentId,
-                                selectedStore.inventoryId
-                            )
-                        }
-
-                        if (itemsInShipment.length !== itemsToMove.length) {
-                            toast({
-                                title: formatMessage(TOAST_MESSAGE_STORE_INSUFFICIENT_INVENTORY),
-                                status: 'error'
-                            })
-                        }
-                    } catch (error) {
-                        console.error('Failed to change store for pickup shipment:', error)
-                        showError()
-                    } finally {
-                        setCartItemLoading(false)
-                    }
-                }
-                changeStore()
-            }
-        }
-    }, [storeLocatorModal.isOpen, selectedStore?.id, isProductsLoading])
 
     // Custom handler for opening store locator from cart's "Change Store" button
-    const handleChangeStoreFromCart = (shipmentInfo) => {
-        modalOpenedFromCart.current = {
-            storeId: shipmentInfo.store?.id,
-            shipmentId: shipmentInfo.shipment?.shipmentId
+    const handleChangeStoreFromCart = async (shipmentInfo) => {
+        if (
+            !isProductsLoading &&
+            selectedStore?.id &&
+            selectedStore.inventoryId &&
+            shipmentInfo.store?.id !== selectedStore.id &&
+            shipmentInfo.shipment?.shipmentId
+        ) {
+            try {
+                setCartItemLoading(true)
+
+                // Get all items from the source shipment that have inventory at the new store
+                const itemsInShipment = getItemsForShipment(
+                    basket,
+                    shipmentInfo.shipment?.shipmentId
+                )
+                const itemsToMove = itemsInShipment.filter(
+                    (productItem) =>
+                        productsByItemId?.[productItem.itemId]?.inventories?.find(
+                            (inventory) => inventory.id === selectedStore?.inventoryId
+                        )?.stockLevel >= productItem.quantity
+                )
+                if (itemsToMove.length) {
+                    const targetShipmentId = await findOrCreatePickupShipment(selectedStore)
+                    await moveItemsToPickupShipment(
+                        itemsToMove,
+                        targetShipmentId,
+                        selectedStore.inventoryId
+                    )
+                }
+
+                if (itemsInShipment.length !== itemsToMove.length) {
+                    toast({
+                        title: formatMessage(TOAST_MESSAGE_STORE_INSUFFICIENT_INVENTORY),
+                        status: 'error'
+                    })
+                }
+            } catch (error) {
+                console.error('Failed to change store for pickup shipment:', error)
+                showError()
+            } finally {
+                setCartItemLoading(false)
+            }
         }
-        storeLocatorModal.onOpen()
     }
 
     /******************* Assign Default Shipping Methods to Shipments *******************/
@@ -897,8 +878,14 @@ const Cart = () => {
                                                     totalItemsInCart={
                                                         basket?.productItems?.length || 0
                                                     }
-                                                    onChangeStore={() =>
-                                                        handleChangeStoreFromCart(shipmentInfo)
+                                                    onChangeStore={
+                                                        selectedStore &&
+                                                        selectedStore.id !== shipmentInfo.store?.id
+                                                            ? () =>
+                                                                  handleChangeStoreFromCart(
+                                                                      shipmentInfo
+                                                                  )
+                                                            : null
                                                     }
                                                 />
                                             )}

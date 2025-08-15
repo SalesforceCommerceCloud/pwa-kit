@@ -276,7 +276,7 @@ describe('StoreDisplay component', () => {
 
             const changeStoreButton = screen.getByTestId('change-store-button')
             expect(changeStoreButton).toBeInTheDocument()
-            expect(changeStoreButton).toHaveTextContent('Change Store')
+            expect(changeStoreButton).toHaveTextContent('Use Preferred Store')
         })
 
         test('does not render Change Store button when onChangeStore is not provided', () => {
