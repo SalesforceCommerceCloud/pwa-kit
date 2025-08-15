@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
-import { screen, waitFor, cleanup } from '@testing-library/react'
+import {screen, waitFor, cleanup} from '@testing-library/react'
 import ContactInfo from '@salesforce/retail-react-app/app/pages/checkout-one-click/partials/one-click-contact-info'
 import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
 import {rest} from 'msw'
@@ -15,8 +15,8 @@ const validEmail = 'test@salesforce.com'
 const invalidEmail = 'invalidEmail'
 const mockAuthHelperFunctions = {
     [AuthHelpers.LoginRegisteredUserB2C]: {mutateAsync: jest.fn()},
-    [AuthHelpers.Logout]: { mutateAsync: jest.fn() },
-    [AuthHelpers.AuthorizePasswordless]: { mutateAsync: jest.fn() }
+    [AuthHelpers.Logout]: {mutateAsync: jest.fn()},
+    [AuthHelpers.AuthorizePasswordless]: {mutateAsync: jest.fn()}
 }
 
 const mockUpdateCustomerForBasket = {mutateAsync: jest.fn()}
@@ -130,7 +130,7 @@ describe('ContactInfo Component', () => {
     })
 
     test('validates email is required on blur', async () => {
-        const { user } = renderWithProviders(<ContactInfo />)
+        const {user} = renderWithProviders(<ContactInfo />)
 
         const emailInput = screen.getByLabelText('Email')
         // Focus and then blur without entering email to trigger validation
@@ -141,7 +141,7 @@ describe('ContactInfo Component', () => {
     })
 
     test('validates email is required on form submission', async () => {
-    // Test the validation logic directly by simulating form submission
+        // Test the validation logic directly by simulating form submission
         const {user} = renderWithProviders(<ContactInfo />)
 
         const emailInput = screen.getByLabelText('Email')
@@ -160,7 +160,7 @@ describe('ContactInfo Component', () => {
 
     test('validates email format on form submission', async () => {
         // Test the validation logic directly
-        const { user } = renderWithProviders(<ContactInfo />)
+        const {user} = renderWithProviders(<ContactInfo />)
 
         const emailInput = screen.getByLabelText('Email')
 
@@ -182,7 +182,7 @@ describe('ContactInfo Component', () => {
     })
 
     test('validates different types of valid emails correctly', async () => {
-        const { user } = renderWithProviders(<ContactInfo />)
+        const {user} = renderWithProviders(<ContactInfo />)
 
         // Test various valid email formats
         const validEmails = [
@@ -199,7 +199,7 @@ describe('ContactInfo Component', () => {
         ]
 
         for (const email of validEmails) {
-            const { user: testUser } = renderWithProviders(<ContactInfo />)
+            const {user: testUser} = renderWithProviders(<ContactInfo />)
             const emailInput = screen.getByLabelText('Email')
 
             await testUser.type(emailInput, email)
@@ -208,7 +208,9 @@ describe('ContactInfo Component', () => {
             await testUser.tab()
 
             // Should not show email format error for valid emails
-            expect(screen.queryByText('Please enter a valid email address.')).not.toBeInTheDocument()
+            expect(
+                screen.queryByText('Please enter a valid email address.')
+            ).not.toBeInTheDocument()
 
             // Should not show required email error
             expect(screen.queryByText('Please enter your email address.')).not.toBeInTheDocument()
@@ -221,18 +223,18 @@ describe('ContactInfo Component', () => {
     test('validates different types of invalid emails correctly', async () => {
         // Test various invalid email formats that are definitely rejected by the current regex
         const invalidEmails = [
-            'plainaddress',                    // Missing @ symbol
-            '@missinglocal.com',               // Missing local part
-            'missingdomain@',                  // Missing domain
-            'user@',                           // Missing domain completely
-            'user@.domain.com',                // Domain starting with dot
-            'user@domain.com.',                // Domain ending with dot
-            'user@-domain.com',                // Domain starting with hyphen
-            'user@domain-.com'                 // Domain ending with hyphen
+            'plainaddress', // Missing @ symbol
+            '@missinglocal.com', // Missing local part
+            'missingdomain@', // Missing domain
+            'user@', // Missing domain completely
+            'user@.domain.com', // Domain starting with dot
+            'user@domain.com.', // Domain ending with dot
+            'user@-domain.com', // Domain starting with hyphen
+            'user@domain-.com' // Domain ending with hyphen
         ]
 
         for (const email of invalidEmails) {
-            const { user: testUser } = renderWithProviders(<ContactInfo />)
+            const {user: testUser} = renderWithProviders(<ContactInfo />)
             const emailInput = screen.getByLabelText('Email')
 
             await testUser.type(emailInput, email)
