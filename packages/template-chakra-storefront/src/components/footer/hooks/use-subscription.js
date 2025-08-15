@@ -38,14 +38,6 @@ export const useSubscription = ({
 
     const messages = useMemo(
         () => ({
-            customerSupport: formatMessage({
-                id: 'footer.column.customer_support',
-                defaultMessage: 'Customer Support'
-            }),
-            account: formatMessage({
-                id: 'footer.column.account',
-                defaultMessage: 'Account'
-            }),
             success_confirmation: formatMessage({
                 id: 'footer.success_confirmation',
                 defaultMessage: 'Thanks for subscribing!'
@@ -58,29 +50,8 @@ export const useSubscription = ({
                 generic_error: formatMessage({
                     id: 'footer.error.generic_error',
                     defaultMessage: "We couldn't process the subscription. Try again."
-                }),
-                shipping: formatMessage({
-                    id: 'footer.link.shipping',
-                    defaultMessage: 'Shipping'
-                }),
-                orderStatus: formatMessage({
-                    id: 'footer.link.order_status',
-                    defaultMessage: 'Order Status'
-                }),
-                signinCreateAccount: formatMessage({
-                    id: 'footer.link.signin_create_account',
-                    defaultMessage: 'Sign in or create account'
                 })
-            },
-            localeSelector: formatMessage({
-                id: 'footer.locale_selector.assistive_msg',
-                defaultMessage: 'Select Language'
-            }),
-            copyright: formatMessage({
-                id: 'footer.message.copyright',
-                defaultMessage:
-                    'Salesforce or its affiliates. All rights reserved. This is a demo store only. Orders made WILL NOT be processed.'
-            })
+            }
         }),
         [intl]
     )
