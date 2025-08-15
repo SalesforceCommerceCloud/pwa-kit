@@ -47,8 +47,8 @@ const ShipmentOptionsWithProducts = ({shipment, basketId, currency, control, bas
                 <Text fontWeight="bold" fontSize="md" mb={1}>
                     {formatMessage(
                         {
-                            defaultMessage: 'Delivering to {name}',
-                            id: 'shipping_options.label.delivering_to'
+                            defaultMessage: 'Shipping to {name}',
+                            id: 'shipping_options.label.shipping_to'
                         },
                         {
                             name: `${shipment.shippingAddress.firstName} ${shipment.shippingAddress.lastName}`

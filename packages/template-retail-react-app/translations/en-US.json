@@ -706,7 +706,7 @@
     "defaultMessage": "Item removed from wishlist"
   },
   "global.info.store_insufficient_inventory": {
-    "defaultMessage": "Some items aren't available for pickup at this store"
+    "defaultMessage": "Some items aren't available for pickup at this store."
   },
   "global.link.added_to_wishlist.view_wishlist": {
     "defaultMessage": "View"
@@ -1436,11 +1436,11 @@
   "selected_refinements.filter.in_stock": {
     "defaultMessage": "In Stock"
   },
-  "shipping_address.action.deliver_to_multiple_addresses": {
-    "defaultMessage": "Deliver to Multiple Addresses"
+  "shipping_address.action.ship_to_multiple_addresses": {
+    "defaultMessage": "Ship to Multiple Addresses"
   },
-  "shipping_address.action.ship_to_one_address": {
-    "defaultMessage": "Ship Items to One Address"
+  "shipping_address.action.ship_to_single_address": {
+    "defaultMessage": "Ship to Single Address"
   },
   "shipping_address.button.add_new_address": {
     "defaultMessage": "+ Add New Address"
@@ -1449,7 +1449,7 @@
     "defaultMessage": "Continue to Shipping Method"
   },
   "shipping_address.error.update_failed": {
-    "defaultMessage": "Error updating shipping address. Please try again."
+    "defaultMessage": "Something went wrong while updating the shipping address. Try again."
   },
   "shipping_address.label.delivery_address": {
     "defaultMessage": "Delivery Address"
@@ -1467,7 +1467,7 @@
     "defaultMessage": "No items in basket."
   },
   "shipping_address.summary.multiple_addresses": {
-    "defaultMessage": "Your items are being delivered to multiple addresses. See details below."
+    "defaultMessage": "Your items will be shipped to multiple addresses."
   },
   "shipping_address.title.shipping_address": {
     "defaultMessage": "Shipping Address"
@@ -1500,16 +1500,16 @@
     "defaultMessage": "Add new delivery address for {productName}"
   },
   "shipping_multi_address.error.label": {
-    "defaultMessage": "Error loading products"
+    "defaultMessage": "Something went wrong while loading products."
   },
   "shipping_multi_address.error.message": {
-    "defaultMessage": "Error loading products. Please try again."
+    "defaultMessage": "Something went wrong while loading products. Try again."
   },
   "shipping_multi_address.error.save_failed": {
-    "defaultMessage": "Failed to save address"
+    "defaultMessage": "Couldn't save the address."
   },
   "shipping_multi_address.error.submit_failed": {
-    "defaultMessage": "Error setting up shipments. Please try again."
+    "defaultMessage": "Something went wrong while setting up shipments. Try again."
   },
   "shipping_multi_address.format.address_line_2": {
     "defaultMessage": "{city}, {stateCode} {postalCode}"
@@ -1524,7 +1524,7 @@
     "defaultMessage": "Loading addresses..."
   },
   "shipping_multi_address.no_addresses_available": {
-    "defaultMessage": "No Address Available"
+    "defaultMessage": "No address available"
   },
   "shipping_multi_address.product_attributes.label": {
     "defaultMessage": "Product attributes"
@@ -1547,11 +1547,11 @@
   "shipping_options.free": {
     "defaultMessage": "Free"
   },
-  "shipping_options.label.delivering_to": {
-    "defaultMessage": "Delivering to {name}"
-  },
   "shipping_options.label.no_method_selected": {
     "defaultMessage": "No shipping method selected"
+  },
+  "shipping_options.label.shipping_to": {
+    "defaultMessage": "Shipping to {name}"
   },
   "shipping_options.label.total_shipping": {
     "defaultMessage": "Total Shipping"
@@ -1586,8 +1586,8 @@
   "social_login_redirect.message.redirect_link": {
     "defaultMessage": "If you are not automatically redirected, click <link>this link</link> to proceed."
   },
-  "store_display.button.use_preferred_store": {
-    "defaultMessage": "Use Preferred Store"
+  "store_display.button.use_recent_store": {
+    "defaultMessage": "Use Recent Store"
   },
   "store_display.format.address_line_2": {
     "defaultMessage": "{city}, {stateCode} {postalCode}"
@@ -1684,6 +1684,9 @@
   },
   "toggle_card.action.editShippingAddress": {
     "defaultMessage": "Edit Shipping Address"
+  },
+  "toggle_card.action.editShippingAddresses": {
+    "defaultMessage": "Edit Shipping Addresses"
   },
   "toggle_card.action.editShippingOptions": {
     "defaultMessage": "Edit Shipping Options"

@@ -222,8 +222,8 @@ const defaultProps = {
         id: 'shipping_address.message.no_items_in_basket'
     },
     deliveryAddressLabel: {
-        defaultMessage: 'Delivery Address',
-        id: 'shipping_address.label.delivery_address'
+        defaultMessage: 'Shipping Address',
+        id: 'shipping_address.label.shipping_address'
     }
 }
 
@@ -275,7 +275,7 @@ describe('ShippingMultiAddress', () => {
         expect(screen.getByText('Quantity: 1')).toBeInTheDocument()
 
         // Check delivery address sections
-        const deliveryAddressLabels = screen.getAllByText('Delivery Address')
+        const deliveryAddressLabels = screen.getAllByText('Shipping Address')
         expect(deliveryAddressLabels).toHaveLength(2)
 
         // Check product images
@@ -508,11 +508,11 @@ describe('ShippingMultiAddress', () => {
 
             // Check that the first dropdown shows "No Address Available"
             const firstSelect = selectElements[0]
-            expect(firstSelect).toHaveTextContent('No Address Available')
+            expect(firstSelect).toHaveTextContent('No address available')
 
             // Check that the second dropdown also shows "No Address Available"
             const secondSelect = selectElements[1]
-            expect(secondSelect).toHaveTextContent('No Address Available')
+            expect(secondSelect).toHaveTextContent('No address available')
 
             // Check that dropdowns are disabled when no addresses are available
             expect(firstSelect).toBeDisabled()
@@ -939,7 +939,7 @@ describe('ShippingMultiAddress - handleSubmit', () => {
         await waitFor(() => {
             // Should show error toast
             expect(mockShowToast).toHaveBeenCalledWith({
-                title: expect.stringContaining('Error setting up shipments'),
+                title: 'Something went wrong while setting up shipments. Try again.',
                 status: 'error'
             })
 
@@ -1316,8 +1316,8 @@ describe('ShippingMultiAddress - handleSubmit', () => {
                 expect(dropdown).toHaveValue('')
             })
 
-            // Check that "No Address Available" option is present
-            expect(screen.getAllByText('No Address Available')).toHaveLength(2)
+            // Check that "No address available" option is present
+            expect(screen.getAllByText('No address available')).toHaveLength(2)
         })
 
         test('should handle case-sensitive address matching correctly', () => {

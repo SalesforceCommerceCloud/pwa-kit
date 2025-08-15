@@ -1790,7 +1790,7 @@
   "global.info.store_insufficient_inventory": [
     {
       "type": 0,
-      "value": "Some items aren't available for pickup at this store"
+      "value": "Some items aren't available for pickup at this store."
     }
   ],
   "global.link.added_to_wishlist.view_wishlist": [
@@ -3413,16 +3413,16 @@
       "value": "In Stock"
     }
   ],
-  "shipping_address.action.deliver_to_multiple_addresses": [
+  "shipping_address.action.ship_to_multiple_addresses": [
     {
       "type": 0,
-      "value": "Deliver to Multiple Addresses"
+      "value": "Ship to Multiple Addresses"
     }
   ],
-  "shipping_address.action.ship_to_one_address": [
+  "shipping_address.action.ship_to_single_address": [
     {
       "type": 0,
-      "value": "Ship Items to One Address"
+      "value": "Ship to Single Address"
     }
   ],
   "shipping_address.button.add_new_address": [
@@ -3440,7 +3440,7 @@
   "shipping_address.error.update_failed": [
     {
       "type": 0,
-      "value": "Error updating shipping address. Please try again."
+      "value": "Something went wrong while updating the shipping address. Try again."
     }
   ],
   "shipping_address.label.delivery_address": [
@@ -3484,7 +3484,7 @@
   "shipping_address.summary.multiple_addresses": [
     {
       "type": 0,
-      "value": "Your items are being delivered to multiple addresses. See details below."
+      "value": "Your items will be shipped to multiple addresses."
     }
   ],
   "shipping_address.title.shipping_address": [
@@ -3554,25 +3554,25 @@
   "shipping_multi_address.error.label": [
     {
       "type": 0,
-      "value": "Error loading products"
+      "value": "Something went wrong while loading products."
     }
   ],
   "shipping_multi_address.error.message": [
     {
       "type": 0,
-      "value": "Error loading products. Please try again."
+      "value": "Something went wrong while loading products. Try again."
     }
   ],
   "shipping_multi_address.error.save_failed": [
     {
       "type": 0,
-      "value": "Failed to save address"
+      "value": "Couldn't save the address."
     }
   ],
   "shipping_multi_address.error.submit_failed": [
     {
       "type": 0,
-      "value": "Error setting up shipments. Please try again."
+      "value": "Something went wrong while setting up shipments. Try again."
     }
   ],
   "shipping_multi_address.format.address_line_2": [
@@ -3622,7 +3622,7 @@
   "shipping_multi_address.no_addresses_available": [
     {
       "type": 0,
-      "value": "No Address Available"
+      "value": "No address available"
     }
   ],
   "shipping_multi_address.product_attributes.label": [
@@ -3667,20 +3667,20 @@
       "value": "Free"
     }
   ],
-  "shipping_options.label.delivering_to": [
-    {
-      "type": 0,
-      "value": "Delivering to "
-    },
-    {
-      "type": 1,
-      "value": "name"
-    }
-  ],
   "shipping_options.label.no_method_selected": [
     {
       "type": 0,
       "value": "No shipping method selected"
+    }
+  ],
+  "shipping_options.label.shipping_to": [
+    {
+      "type": 0,
+      "value": "Shipping to "
+    },
+    {
+      "type": 1,
+      "value": "name"
     }
   ],
   "shipping_options.label.total_shipping": [
@@ -3763,10 +3763,10 @@
       "value": " to proceed."
     }
   ],
-  "store_display.button.use_preferred_store": [
+  "store_display.button.use_recent_store": [
     {
       "type": 0,
-      "value": "Use Preferred Store"
+      "value": "Use Recent Store"
     }
   ],
   "store_display.format.address_line_2": [
@@ -4039,6 +4039,12 @@
     {
       "type": 0,
       "value": "Edit Shipping Address"
+    }
+  ],
+  "toggle_card.action.editShippingAddresses": [
+    {
+      "type": 0,
+      "value": "Edit Shipping Addresses"
     }
   ],
   "toggle_card.action.editShippingOptions": [

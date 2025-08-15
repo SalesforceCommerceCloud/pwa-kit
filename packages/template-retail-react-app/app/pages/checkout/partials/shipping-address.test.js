@@ -377,7 +377,7 @@ describe('ShippingAddress', () => {
 
         const editActionButton = screen.getByTestId('edit-action-button')
         expect(editActionButton).toBeInTheDocument()
-        expect(editActionButton).toHaveTextContent('Deliver to Multiple Addresses')
+        expect(editActionButton).toHaveTextContent('Ship to Multiple Addresses')
     })
 
     it('should handle edit button click for single shipping', () => {
@@ -455,7 +455,7 @@ describe('ShippingAddress', () => {
         // Wait for the error to be handled
         await waitFor(() => {
             expect(mockShowToast).toHaveBeenCalledWith({
-                title: expect.stringContaining('Error updating shipping address'),
+                title: 'Something went wrong while updating the shipping address. Try again.',
                 status: 'error'
             })
         })
@@ -540,7 +540,7 @@ describe('ShippingAddress', () => {
                 setMultishipEnabled(true)
             })
 
-            it('should show "Deliver to Multiple Addresses" button when MULTISHIP_IS_ENABLED is true', () => {
+            it('should show "Ship to Multiple Addresses" button when MULTISHIP_IS_ENABLED is true', () => {
                 // Mock that we're in editing mode with multiple items
                 const editingContext = {
                     ...mockCheckoutContext,
@@ -552,10 +552,10 @@ describe('ShippingAddress', () => {
 
                 const editActionButton = screen.getByTestId('edit-action-button')
                 expect(editActionButton).toBeInTheDocument()
-                expect(editActionButton).toHaveTextContent('Deliver to Multiple Addresses')
+                expect(editActionButton).toHaveTextContent('Ship to Multiple Addresses')
             })
 
-            it('should handle "Deliver to Multiple Addresses" button click to toggle multi-shipping', () => {
+            it('should handle "Ship to Multiple Addresses" button click to toggle multi-shipping', () => {
                 // Mock that we're in editing mode
                 const editingContext = {
                     ...mockCheckoutContext,
@@ -576,7 +576,7 @@ describe('ShippingAddress', () => {
                 setMultishipEnabled(false)
             })
 
-            it('should not show "Deliver to Multiple Addresses" button when MULTISHIP_IS_ENABLED is false', () => {
+            it('should not show "Ship to Multiple Addresses" button when MULTISHIP_IS_ENABLED is false', () => {
                 const editingContext = {
                     ...mockCheckoutContext,
                     step: 3 // SHIPPING_ADDRESS
@@ -600,7 +600,7 @@ describe('ShippingAddress', () => {
 
                 // Should still show shipping address selection
                 expect(screen.getByTestId('shipping-address-selection')).toBeInTheDocument()
-                // But no "Deliver to Multiple Addresses" button
+                // But no "Ship to Multiple Addresses" button
                 expect(screen.queryByTestId('edit-action-button')).not.toBeInTheDocument()
             })
         })
