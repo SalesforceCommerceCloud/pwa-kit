@@ -259,9 +259,13 @@ export const BonusProductSelectionModal = () => {
                             </VStack>
                         )}
                     </Dialog.Body>
-                    <Dialog.CloseTrigger asChild>
-                        <CloseButton size="md" />
-                    </Dialog.CloseTrigger>
+                    <CloseButton 
+                        size="md" 
+                        onClick={onClose}
+                        position="absolute"
+                        top="4"
+                        right="4"
+                    />
                 </Dialog.Content>
             </Dialog.Positioner>
         </Dialog.Root>
