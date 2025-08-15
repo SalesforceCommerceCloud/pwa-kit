@@ -58,21 +58,21 @@ function Express() {
 
             if (event.data && typeof event.data === 'object') {
                 const {type, sku, quantity} = event.data
-                
+
                 // Handle SKU update messages
                 if (type === 'UPDATE_SKU' && typeof sku === 'string') {
                     setCurrentSku(sku)
                     // Always set quantity to 1 when SKU changes
                     setCurrentQuantity(1)
                 }
-                
+
                 // Handle quantity update messages
                 if (type === 'UPDATE_QUANTITY' && typeof quantity === 'number') {
                     // Validate quantity is a positive integer with reasonable limits
                     const validatedQuantity = Math.max(1, Math.min(999, Math.floor(quantity)))
                     setCurrentQuantity(validatedQuantity)
                 }
-              
+
                 // Handle SKU clear messages (for regular checkout)
                 if (type === 'CLEAR_SKU') {
                     setCurrentSku(null)
@@ -122,7 +122,7 @@ function Express() {
                         sku={currentSku}
                         quantity={currentQuantity}
                         isPdpMode={isPdpMode}
-                        basketData={basket} 
+                        basketData={basket}
                         authToken={authToken}
                         manager={manager}
                     />
@@ -130,7 +130,13 @@ function Express() {
                 </AdyenExpressCheckoutProvider>
             )}
             {isPdpMode && (
-                <ApplePayExpress sku={currentSku} quantity={currentQuantity} isPdpMode={isPdpMode} basketData={basket} authToken={authToken} />
+                <ApplePayExpress
+                    sku={currentSku}
+                    quantity={currentQuantity}
+                    isPdpMode={isPdpMode}
+                    basketData={basket}
+                    authToken={authToken}
+                />
             )}
         </div>
     )

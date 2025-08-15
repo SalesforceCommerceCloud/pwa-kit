@@ -117,8 +117,8 @@ export const getAppleButtonConfig = (
         // For PDP flows, create temporary basket if needed (and SKU is available)
         if (isPdpMode && sku && setTempBasket) {
             const newBasket = await createTemporaryBasket(sku, authToken, site, quantity)
-            sharedBasketRef = newBasket  // Update shared reference immediately
-            setTempBasket(newBasket)     // Update React state for re-renders
+            sharedBasketRef = newBasket // Update shared reference immediately
+            setTempBasket(newBasket) // Update React state for re-renders
             return newBasket
         }
 
@@ -517,7 +517,14 @@ export const getAppleButtonConfig = (
     return buttonConfig
 }
 
-export const ApplePayExpress = ({sku, quantity = 1, isPdpMode = false, basketData, authToken: providedAuthToken, manager}) => {
+export const ApplePayExpress = ({
+    sku,
+    quantity = 1,
+    isPdpMode = false,
+    basketData,
+    authToken: providedAuthToken,
+    manager
+}) => {
     const {locale, site} = useMultiSite()
     const navigate = useNavigation()
 
@@ -533,9 +540,11 @@ export const ApplePayExpress = ({sku, quantity = 1, isPdpMode = false, basketDat
 
     // In PDP mode, we simply ignore the data since we don't have a provider
     const regularAdyenData = useAdyenExpressCheckout()
-    
+
     // Use provided auth token for PDP mode, or provider token for regular mode
-    const authToken = isPdpMode ? providedAuthToken : (regularAdyenData?.authToken || providedAuthToken)
+    const authToken = isPdpMode
+        ? providedAuthToken
+        : regularAdyenData?.authToken || providedAuthToken
 
     // For PDP mode, use standalone payment methods
     // For regular mode, use the standard Adyen hook data
