@@ -178,12 +178,7 @@ export const updateShippingOption = async (
     }
 }
 
-export const getGoogleButtonConfig = (
-    authToken,
-    site,
-    basket,
-    googlePayConfig
-) => {
+export const getGoogleButtonConfig = (authToken, site, basket, googlePayConfig) => {
     // Use productTotal if orderTotal is null, otherwise use orderTotal
     // The INITIALIZE callback will update this in payment sheet before user can try to pay
     let googlePayAmount = basket.orderTotal || basket.productTotal
@@ -272,7 +267,8 @@ export const getGoogleButtonConfig = (
                                 shippingAddress
                             )
 
-                            paymentDataRequestUpdate = updateShippingAddressResponse.paymentDataRequestUpdate
+                            paymentDataRequestUpdate =
+                                updateShippingAddressResponse.paymentDataRequestUpdate
                             // Update our basket with the latest data
                             basket = updateShippingAddressResponse.newBasket
                         }
@@ -284,7 +280,8 @@ export const getGoogleButtonConfig = (
                                 shippingOptionData?.id
                             )
 
-                            paymentDataRequestUpdate = updateShippingOptionResponse.paymentDataRequestUpdate
+                            paymentDataRequestUpdate =
+                                updateShippingOptionResponse.paymentDataRequestUpdate
                             // Update our basket with the latest data
                             basket = updateShippingOptionResponse.newBasket
                         }
@@ -312,14 +309,8 @@ export const getGoogleButtonConfig = (
 }
 
 export const GooglePayExpress = ({manager, overrideData = null}) => {
-    const {
-        adyenEnvironment,
-        adyenPaymentMethods,
-        basket,
-        locale,
-        site,
-        authToken
-    } = useAdyenExpressCheckout()
+    const {adyenEnvironment, adyenPaymentMethods, basket, locale, site, authToken} =
+        useAdyenExpressCheckout()
 
     const finalAuthToken = overrideData?.authToken
     const finalBasket = overrideData?.basket
@@ -359,7 +350,7 @@ export const GooglePayExpress = ({manager, overrideData = null}) => {
                 const googleButtonConfig = getGoogleButtonConfig(
                     finalAuthToken,
                     site,
-                    basket,
+                    finalBasket,
                     googlePaymentMethodConfig
                 )
 
