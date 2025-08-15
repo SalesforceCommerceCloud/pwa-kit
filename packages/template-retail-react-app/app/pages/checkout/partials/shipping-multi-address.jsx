@@ -18,6 +18,7 @@ import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-cur
 import {useCurrency} from '@salesforce/retail-react-app/app/hooks'
 import ItemVariantProvider from '@salesforce/retail-react-app/app/components/item-variant'
 import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
+import {isAddressEmpty} from '@salesforce/retail-react-app/app/utils/address-utils'
 
 import AddressFields from '@salesforce/retail-react-app/app/components/forms/address-fields'
 import FormActionButtons from '@salesforce/retail-react-app/app/components/forms/form-action-buttons'
@@ -282,7 +283,7 @@ const ShippingMultiAddress = ({
                     const addressKey = item.itemId
                     const shipment = existingShipments.find((s) => s.shipmentId === item.shipmentId)
 
-                    if (shipment && shipment.shippingAddress) {
+                    if (shipment && !isAddressEmpty(shipment.shippingAddress)) {
                         const addressId = `guest_${shipment.shipmentId}`
                         const address = {
                             addressId,
