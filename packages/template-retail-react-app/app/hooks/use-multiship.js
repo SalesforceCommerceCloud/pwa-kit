@@ -11,6 +11,7 @@ import {
 } from '@salesforce/commerce-sdk-react'
 import {usePickupShipment} from '@salesforce/retail-react-app/app/hooks/use-pickup-shipment'
 import {DEFAULT_SHIPMENT_ID} from '@salesforce/retail-react-app/app/constants'
+import {isAddressEmpty} from '@salesforce/retail-react-app/app/utils/address-utils'
 
 /**
  * Custom hook to handle multiship functionality for cart items
@@ -363,16 +364,7 @@ export const useMultiship = (basket) => {
             }
 
             // Check if all address fields are falsey (empty address)
-            return (
-                !address.address1 &&
-                !address.city &&
-                !address.countryCode &&
-                !address.firstName &&
-                !address.lastName &&
-                !address.phone &&
-                !address.postalCode &&
-                !address.stateCode
-            )
+            return isAddressEmpty(address)
         })
         return foundShipment?.shipmentId
     }
