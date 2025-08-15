@@ -208,14 +208,14 @@ export default function ShippingAddress() {
                     ? isMultiShipping
                         ? formatMessage(shipToOneAddressLabel)
                         : formatMessage(deliverToMultipleAddressesLabel)
-                    : undefined
+                    : null
             }
             onEditActionClick={
                 MULTISHIP_IS_ENABLED
                     ? async () => {
                           setIsMultiShipping(!isMultiShipping)
                       }
-                    : undefined
+                    : null
             }
         >
             <ToggleCardEdit>

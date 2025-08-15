@@ -249,6 +249,9 @@ const renderWithIntl = (component) => {
 
 describe('ShippingAddress', () => {
     beforeEach(() => {
+        // Reset MULTISHIP_IS_ENABLED to default value for test isolation
+        setMultishipEnabled(true)
+
         mockCheckoutContext.goToStep.mockClear()
         mockShowToast.mockClear()
         mockMutateAsync.mockClear()

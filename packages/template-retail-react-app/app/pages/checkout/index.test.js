@@ -21,17 +21,6 @@ import {
 } from '@salesforce/retail-react-app/app/mocks/mock-data'
 import mockConfig from '@salesforce/retail-react-app/config/mocks/default'
 
-// Mock constants
-jest.mock('@salesforce/retail-react-app/app/constants', () => ({
-    DEFAULT_SHIPMENT_ID: 'me',
-    MULTISHIP_IS_ENABLED: true,
-    urlPartPositions: {
-        PATH: 'path',
-        QUERY_PARAM: 'query_param',
-        NONE: 'none'
-    }
-}))
-
 // This is a flaky test file!
 jest.retryTimes(5)
 jest.setTimeout(40_000)
