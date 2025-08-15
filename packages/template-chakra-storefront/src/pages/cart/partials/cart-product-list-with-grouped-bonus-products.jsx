@@ -48,8 +48,11 @@ const CartProductListWithGroupedBonusProducts = ({
                 }
 
                 // Check if product is eligible for bonus products
-                const isEligible = isProductEligibleForBonusProducts(qualifyingProduct.productId, productsWithPromotions)
-                
+                const isEligible = isProductEligibleForBonusProducts(
+                    qualifyingProduct.productId,
+                    productsWithPromotions
+                )
+
                 // If not eligible, render as simple card
                 if (!isEligible) {
                     return (
@@ -62,16 +65,25 @@ const CartProductListWithGroupedBonusProducts = ({
                 // Enhanced rendering for eligible products
                 try {
                     // Get bonus product data for this qualifying product
-                    const bonusProductsForThisProduct = getBonusProductsInCartForProduct(basket, qualifyingProduct.productId, productsWithPromotions)
-                    const remainingBonusProductsData = getRemainingAvailableBonusProductsForProduct(basket, qualifyingProduct.productId, productsWithPromotions)
-                    
+                    const bonusProductsForThisProduct = getBonusProductsInCartForProduct(
+                        basket,
+                        qualifyingProduct.productId,
+                        productsWithPromotions
+                    )
+                    const remainingBonusProductsData = getRemainingAvailableBonusProductsForProduct(
+                        basket,
+                        qualifyingProduct.productId,
+                        productsWithPromotions
+                    )
+
                     const hasBonusProductsInCart = bonusProductsForThisProduct.length > 0
-                    const hasRemainingCapacity = remainingBonusProductsData.hasRemainingCapacity || 
+                    const hasRemainingCapacity =
+                        remainingBonusProductsData.hasRemainingCapacity ||
                         (isEligible && remainingBonusProductsData.aggregatedMaxBonusItems === 0)
-                    
+
                     return (
-                        <Box 
-                            key={qualifyingProduct.itemId} 
+                        <Box
+                            key={qualifyingProduct.itemId}
                             data-testid={`product-group-${qualifyingProduct.productId}`}
                             layerStyle="cardBordered"
                             p={4}
@@ -82,7 +94,9 @@ const CartProductListWithGroupedBonusProducts = ({
                         >
                             {/* Main product */}
                             <Box>
-                                {renderProductItem(qualifyingProduct, qualifyingIdx, {hideBorder: true})}
+                                {renderProductItem(qualifyingProduct, qualifyingIdx, {
+                                    hideBorder: true
+                                })}
                             </Box>
 
                             {/* Bonus products already in cart */}
@@ -92,11 +106,19 @@ const CartProductListWithGroupedBonusProducts = ({
                                         Bonus Products
                                     </Heading>
                                     <Stack gap={0}>
-                                        {bonusProductsForThisProduct.map((bonusProduct, bonusIdx) => (
-                                            <Box key={bonusProduct.itemId} data-testid={`bonus-product-${bonusProduct.productId}`}>
-                                                {renderProductItem(bonusProduct, bonusIdx, {showQuantitySelector: false, hideBorder: true})}
-                                            </Box>
-                                        ))}
+                                        {bonusProductsForThisProduct.map(
+                                            (bonusProduct, bonusIdx) => (
+                                                <Box
+                                                    key={bonusProduct.itemId}
+                                                    data-testid={`bonus-product-${bonusProduct.productId}`}
+                                                >
+                                                    {renderProductItem(bonusProduct, bonusIdx, {
+                                                        showQuantitySelector: false,
+                                                        hideBorder: true
+                                                    })}
+                                                </Box>
+                                            )
+                                        )}
                                     </Stack>
                                 </Box>
                             )}
@@ -115,9 +137,7 @@ const CartProductListWithGroupedBonusProducts = ({
                             )}
 
                             {/* Add divider between product groups if not the last item */}
-                            {qualifyingIdx < nonBonusProducts.length - 1 && (
-                                <Divider mt={4} />
-                            )}
+                            {qualifyingIdx < nonBonusProducts.length - 1 && <Divider mt={4} />}
                         </Box>
                     )
                 } catch (error) {

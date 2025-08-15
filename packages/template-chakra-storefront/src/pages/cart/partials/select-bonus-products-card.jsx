@@ -35,92 +35,94 @@ const SelectBonusProductsCard = ({
     let promotionId
     let maxBonusItems
     let selectedItems
-    
+
     if (bonusDiscountLineItem && basket) {
         // Extract data from the specific bonusDiscountLineItem
         promotionId = bonusDiscountLineItem.promotionId
         maxBonusItems = bonusDiscountLineItem.maxBonusItems || 0
-        
+
         // Calculate selected items by counting bonus products in cart with matching bonusDiscountLineItemId
-        selectedItems = basket.productItems?.filter(cartItem => 
-            cartItem.bonusProductLineItem && 
-            cartItem.bonusDiscountLineItemId === bonusDiscountLineItem.id
-        ).reduce((total, cartItem) => total + (cartItem.quantity || 0), 0) || 0
+        selectedItems =
+            basket.productItems
+                ?.filter(
+                    (cartItem) =>
+                        cartItem.bonusProductLineItem &&
+                        cartItem.bonusDiscountLineItemId === bonusDiscountLineItem.id
+                )
+                .reduce((total, cartItem) => total + (cartItem.quantity || 0), 0) || 0
     } else {
         // Fallback to existing logic using remainingBonusProductsData
         const firstBonusItem = remainingBonusProductsData.bonusItems[0]
         promotionId = firstBonusItem?.promotionId
-        
+
         // Get product promotion data
         const productWithPromotions = productsWithPromotions?.[qualifyingProduct.productId]
-        
+
         // Fallback to product promotions if no bonus discount line items exist yet
         if (!promotionId && isEligible && productWithPromotions?.productPromotions?.length > 0) {
             promotionId = productWithPromotions.productPromotions[0].promotionId
         }
-        
-        const { aggregatedMaxBonusItems, aggregatedSelectedItems } = remainingBonusProductsData
+
+        const {aggregatedMaxBonusItems, aggregatedSelectedItems} = remainingBonusProductsData
         maxBonusItems = aggregatedMaxBonusItems
         selectedItems = aggregatedSelectedItems
     }
-    
+
     // Get product promotion data
     let productWithPromotions = productsWithPromotions?.[qualifyingProduct.productId]
-    
+
     // If we don't have promotion data for this product (when using fallback productId),
     // find any product that has promotions matching this promotionId
     if (!productWithPromotions && promotionId && productsWithPromotions) {
-        productWithPromotions = Object.values(productsWithPromotions).find(product => 
-            product.productPromotions?.some(promo => promo.promotionId === promotionId)
+        productWithPromotions = Object.values(productsWithPromotions).find((product) =>
+            product.productPromotions?.some((promo) => promo.promotionId === promotionId)
         )
     }
-    
+
     // Calculate remaining available bonus products
     const remainingAvailable = maxBonusItems - selectedItems
-    
+
     // Don't render if no bonus products are available
     if (remainingAvailable <= 0) {
         return null
     }
-    
+
     return (
-        <Box 
-            mt={4}
-            layerStyle="cardBordered"
-            p={4}
-            backgroundColor="white"
-            borderRadius="base"
-        >
+        <Box mt={4} layerStyle="cardBordered" p={4} backgroundColor="white" borderRadius="base">
             {/* Combined Promotion Label */}
-            {productWithPromotions && promotionId && (() => {
-                const promoText = getPromotionCalloutText(productWithPromotions, promotionId)
-                
-                // Show selection stats based on available data
-                let selectionText = ''
-                
-                if (maxBonusItems > 0) {
-                    // We have actual bonus discount line items with max limits
-                    selectionText = ` (${selectedItems} of ${maxBonusItems} selected)`
-                } else if (isEligible && selectedItems === 0) {
-                    // Product is eligible but no bonus items selected yet
-                    selectionText = ` (0 selected)`
-                }
-                const combinedText = promoText + selectionText
-                
-                return combinedText && (
-                    <Heading fontSize="md" pt="1" mb={3}>
-                        {combinedText}
-                    </Heading>
-                )
-            })()}
-            
+            {productWithPromotions &&
+                promotionId &&
+                (() => {
+                    const promoText = getPromotionCalloutText(productWithPromotions, promotionId)
+
+                    // Show selection stats based on available data
+                    let selectionText = ''
+
+                    if (maxBonusItems > 0) {
+                        // We have actual bonus discount line items with max limits
+                        selectionText = ` (${selectedItems} of ${maxBonusItems} selected)`
+                    } else if (isEligible && selectedItems === 0) {
+                        // Product is eligible but no bonus items selected yet
+                        selectionText = ` (0 selected)`
+                    }
+                    const combinedText = promoText + selectionText
+
+                    return (
+                        combinedText && (
+                            <Heading fontSize="md" pt="1" mb={3}>
+                                {combinedText}
+                            </Heading>
+                        )
+                    )
+                })()}
+
             {/* Select Button */}
             <Button
                 variant="outline"
                 colorScheme="blue"
                 size="md"
                 width="full"
-                onClick={() => onSelectBonusProducts(qualifyingProduct.productId)}
+                onClick={() => onSelectBonusProducts()}
                 data-testid={`select-bonus-products-btn-${qualifyingProduct.productId}`}
             >
                 Select Bonus Products

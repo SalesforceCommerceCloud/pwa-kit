@@ -58,9 +58,9 @@ const BonusProductViewModal = ({
         async (variant, quantity) => {
             // Find the first available bonus discount line item with capacity
             const availableBonusDiscountLineItemId = findAvailableBonusDiscountLineItemId(
-                basket, 
-                promotionId, 
-                quantity, 
+                basket,
+                promotionId,
+                quantity,
                 bonusDiscountLineItemId // fallback to originally passed id
             )
 

@@ -71,7 +71,7 @@ const ProductItem = ({
         >
             <ItemVariantProvider variant={product}>
                 {showLoading && <LoadingSpinner />}
-                <Stack layerStyle={hideBorder ? undefined : "cardBordered"} align="flex-start">
+                <Stack layerStyle={hideBorder ? undefined : 'cardBordered'} align="flex-start">
                     <Flex width="full" alignItems="flex-start" backgroundColor="white">
                         <CartItemVariantImage width={['88px', '136px']} mr={4} />
                         <Stack spacing={3} flex={1}>
@@ -120,7 +120,8 @@ const ProductItem = ({
                                                     // Call handler
                                                     onItemQuantityChange(valueAsNumber).then(
                                                         (isValidChange) =>
-                                                            isValidChange && setQuantity(valueAsNumber)
+                                                            isValidChange &&
+                                                            setQuantity(valueAsNumber)
                                                     )
                                                 } else if (value === '') {
                                                     // We want to allow the use to clear the input to start a new input so here we set the quantity to '' so NAN is not displayed
