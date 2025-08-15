@@ -1776,5 +1776,11 @@
   },
   "with_registration.info.please_sign_in": {
     "defaultMessage": "Meld je aan om verder te gaan."
+  },
+  "bonus_product_view_modal.modal_label": {
+    "defaultMessage": "Bonusproduct selectie modal voor {productName}"
+  },
+  "bonus_product_view_modal.button.view_cart": {
+    "defaultMessage": "Bekijk winkelwagen"
   }
 }

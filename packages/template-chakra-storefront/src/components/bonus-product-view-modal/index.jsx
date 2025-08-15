@@ -5,20 +5,30 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React, {useMemo} from 'react'
+import React, {useMemo, useCallback} from 'react'
 import PropTypes from 'prop-types'
-import {Dialog, CloseButton} from '@chakra-ui/react'
+import {Dialog, CloseButton, Button} from '@chakra-ui/react'
+import Link from '../link'
 import ProductView from '../../components/product-view'
 import {useProductViewModal} from '../../hooks/use-product-view-modal'
 import SafePortal from '../safe-portal'
 import {useIntl} from 'react-intl'
 import {productViewModalTheme} from '../../theme/components/project/product-view-modal'
+import {useShopperBasketsMutationHelper} from '@salesforce/commerce-sdk-react'
 
 /**
- * A Dialog that contains Product View
+ * A Dialog that contains Bonus Product View using product-view-modal theme
  */
-const ProductViewModal = ({product, isOpen, onClose, ...props}) => {
+const BonusProductViewModal = ({
+    product,
+    isOpen,
+    onClose,
+    bonusDiscountLineItemId,
+    promotionId,
+    ...props
+}) => {
     const productViewModalData = useProductViewModal(product)
+    const {addItemToNewOrExistingBasket} = useShopperBasketsMutationHelper()
 
     const intl = useIntl()
     const {formatMessage} = intl
@@ -27,14 +37,47 @@ const ProductViewModal = ({product, isOpen, onClose, ...props}) => {
         () => ({
             modalLabel: formatMessage(
                 {
-                    id: 'cart.product_edit_modal.modal_label',
-                    defaultMessage: 'Edit modal for {productName}'
+                    id: 'bonus_product_view_modal.modal_label',
+                    defaultMessage: 'Bonus product selection modal for {productName}'
                 },
                 {productName: productViewModalData?.product?.name}
-            )
+            ),
+            viewCart: formatMessage({
+                id: 'bonus_product_view_modal.button.view_cart',
+                defaultMessage: 'View Cart'
+            })
         }),
         [intl]
     )
+
+    // Custom addToCart handler for bonus products that includes bonusDiscountLineItemId
+    const handleAddToCart = useCallback(
+        async (variant, quantity) => {
+            const productItems = [
+                {
+                    productId: variant?.productId || product?.id,
+                    price: variant?.price || product?.price,
+                    quantity: quantity,
+                    bonusDiscountLineItemId: bonusDiscountLineItemId
+                }
+            ]
+
+            const result = await addItemToNewOrExistingBasket(productItems)
+            return result
+        },
+        [addItemToNewOrExistingBasket, product, bonusDiscountLineItemId]
+    )
+
+    // Custom buttons for the ProductView
+    const customButtons = useMemo(
+        () => [
+            <Button key="view-cart" asChild variant="outline" onClick={onClose}>
+                <Link to="/cart">{messages.viewCart}</Link>
+            </Button>
+        ],
+        [messages.viewCart, onClose]
+    )
+
     return (
         <Dialog.Root
             lazyMount
@@ -49,7 +92,7 @@ const ProductViewModal = ({product, isOpen, onClose, ...props}) => {
                 <Dialog.Backdrop />
                 <Dialog.Positioner>
                     <Dialog.Content
-                        data-testid="product-view-modal"
+                        data-testid="bonus-product-view-modal"
                         aria-label={messages.modalLabel}
                         margin={productViewModalTheme.layout.content.margin}
                         borderRadius={productViewModalTheme.layout.content.borderRadius}
@@ -64,13 +107,17 @@ const ProductViewModal = ({product, isOpen, onClose, ...props}) => {
                             marginTop={productViewModalTheme.layout.body.marginTop}
                         >
                             <ProductView
-                                showFullLink={productViewModalTheme.productView.showFullLink}
+                                showFullLink={false}
                                 imageSize={productViewModalTheme.productView.imageSize}
                                 showImageGallery={
                                     productViewModalTheme.productView.showImageGallery
                                 }
                                 product={productViewModalData.product}
                                 isLoading={productViewModalData.isFetching}
+                                addToCart={handleAddToCart}
+                                isProductLoading={productViewModalData.isFetching}
+                                customButtons={customButtons}
+                                promotionId={promotionId}
                                 {...props}
                             />
                         </Dialog.Body>
@@ -84,12 +131,14 @@ const ProductViewModal = ({product, isOpen, onClose, ...props}) => {
     )
 }
 
-ProductViewModal.propTypes = {
+BonusProductViewModal.propTypes = {
     isOpen: PropTypes.bool.isRequired,
-    onOpen: PropTypes.func.isRequired,
+    onOpen: PropTypes.func,
     onClose: PropTypes.func.isRequired,
     product: PropTypes.object,
-    isLoading: PropTypes.bool
+    isLoading: PropTypes.bool,
+    bonusDiscountLineItemId: PropTypes.string, // The 'id' from bonusDiscountLineItems
+    promotionId: PropTypes.string // The promotion ID to filter promotions in PromoCallout
 }
 
-export default ProductViewModal
+export default BonusProductViewModal
