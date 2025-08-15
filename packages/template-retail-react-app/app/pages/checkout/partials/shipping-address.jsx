@@ -49,12 +49,12 @@ const deliveryAddressLabel = defineMessage({
     id: 'shipping_address.label.delivery_address'
 })
 const shipToOneAddressLabel = defineMessage({
-    defaultMessage: 'Ship Items to One Address',
-    id: 'shipping_address.action.ship_to_one_address'
+    defaultMessage: 'Ship To Single Address',
+    id: 'shipping_address.action.ship_to_single_address'
 })
 const deliverToMultipleAddressesLabel = defineMessage({
-    defaultMessage: 'Deliver to Multiple Addresses',
-    id: 'shipping_address.action.deliver_to_multiple_addresses'
+    defaultMessage: 'Ship to Multiple Addresses',
+    id: 'shipping_address.action.ship_to_multiple_addresses'
 })
 
 export default function ShippingAddress() {
@@ -175,7 +175,8 @@ export default function ShippingAddress() {
         } catch (e) {
             showToast({
                 title: formatMessage({
-                    defaultMessage: 'Error updating shipping address. Please try again.',
+                    defaultMessage:
+                        'Something went wrong while updating the shipping address. Try again.',
                     id: 'shipping_address.error.update_failed'
                 }),
                 status: 'error'
@@ -199,10 +200,17 @@ export default function ShippingAddress() {
             isLoading={isLoading}
             disabled={step === STEPS.CONTACT_INFO && !selectedShippingAddress}
             onEdit={() => goToStep(STEPS.SHIPPING_ADDRESS)}
-            editLabel={formatMessage({
-                defaultMessage: 'Edit Shipping Address',
-                id: 'toggle_card.action.editShippingAddress'
-            })}
+            editLabel={
+                isMultiShipping
+                    ? formatMessage({
+                          defaultMessage: 'Edit Shipping Addresses',
+                          id: 'toggle_card.action.editShippingAddresses'
+                      })
+                    : formatMessage({
+                          defaultMessage: 'Edit Shipping Address',
+                          id: 'toggle_card.action.editShippingAddress'
+                      })
+            }
             editAction={
                 MULTISHIP_IS_ENABLED
                     ? isMultiShipping
@@ -241,8 +249,7 @@ export default function ShippingAddress() {
                     {hasMultipleDeliveryShipments ? (
                         <Text>
                             {formatMessage({
-                                defaultMessage:
-                                    'Your items are being delivered to multiple addresses. See details below.',
+                                defaultMessage: 'Your items will be shipped to multiple addresses.',
                                 id: 'shipping_address.summary.multiple_addresses'
                             })}
                         </Text>

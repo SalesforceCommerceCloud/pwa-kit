@@ -389,13 +389,13 @@ const ShippingMultiAddress = ({
                 <AlertTitle mr={2}>
                     {formatMessage({
                         id: 'shipping_multi_address.error.label',
-                        defaultMessage: 'Error loading products'
+                        defaultMessage: 'Something went wrong while loading products.'
                     })}
                 </AlertTitle>
                 <AlertDescription>
                     {formatMessage({
                         id: 'shipping_multi_address.error.message',
-                        defaultMessage: 'Error loading products. Please try again.'
+                        defaultMessage: 'Something went wrong while loading products. Try again.'
                     })}
                 </AlertDescription>
             </Alert>
@@ -475,7 +475,7 @@ const ShippingMultiAddress = ({
                 showToast({
                     title: formatMessage({
                         id: 'shipping_multi_address.error.save_failed',
-                        defaultMessage: 'Failed to save address'
+                        defaultMessage: "Couldn't save the address."
                     }),
                     status: 'error'
                 })
@@ -515,7 +515,7 @@ const ShippingMultiAddress = ({
                 showToast({
                     title: formatMessage({
                         id: 'shipping_multi_address.error.save_failed',
-                        defaultMessage: 'Failed to save address'
+                        defaultMessage: "Couldn't save the address."
                     }),
                     status: 'error'
                 })
@@ -594,7 +594,7 @@ const ShippingMultiAddress = ({
         } catch (error) {
             showToast({
                 title: formatMessage({
-                    defaultMessage: 'Error setting up shipments. Please try again.',
+                    defaultMessage: 'Something went wrong while setting up shipments. Try again.',
                     id: 'shipping_multi_address.error.submit_failed'
                 }),
                 status: 'error'
@@ -815,7 +815,7 @@ const ShippingMultiAddress = ({
                                                                     {formatMessage({
                                                                         id: 'shipping_multi_address.no_addresses_available',
                                                                         defaultMessage:
-                                                                            'No Address Available'
+                                                                            'No address available'
                                                                     })}
                                                                 </option>
                                                             ) : (
