@@ -57,7 +57,7 @@ BonusProductSelectionModalProvider.propTypes = {
 }
 
 // Component to display individual bonus product with checkbox for selection
-const BonusProductItem = ({product, productData, foundProductData, onToggle, isLoading}) => {
+const BonusProductItem = ({product, productData, foundProductData, onToggle, isLoading, onClose}) => {
     const intl = useIntl()
     const productName = product?.productName || product?.title
 
@@ -134,7 +134,10 @@ const BonusProductItem = ({product, productData, foundProductData, onToggle, isL
                         Free
                     </Text>
                 </Box>
-                <Button size="sm" variant="outline" width="162px" onClick={() => onToggle(product)}>
+                <Button size="sm" variant="outline" width="162px" onClick={() => {
+                    onToggle(product)
+                    onClose()
+                }}>
                     {intl.formatMessage({
                         id: 'bonus_product_modal.button_select',
                         defaultMessage: 'Select'
@@ -150,7 +153,8 @@ BonusProductItem.propTypes = {
     productData: PropTypes.object,
     foundProductData: PropTypes.object,
     onToggle: PropTypes.func.isRequired,
-    isLoading: PropTypes.bool
+    isLoading: PropTypes.bool,
+    onClose: PropTypes.func.isRequired
 }
 
 /**
@@ -252,6 +256,7 @@ export const BonusProductSelectionModal = () => {
                                                 foundProductData={foundProductData}
                                                 onToggle={() => {}}
                                                 isLoading={isLoading}
+                                                onClose={onClose}
                                             />
                                         )
                                     })}
