@@ -323,9 +323,6 @@ describe('OtpAuth', () => {
             expect(mockOnClose).toHaveBeenCalled()
         })
 
-<<<<<<< Updated upstream
-        test('clicking "Resend code" calls handleSendEmailOtp', async () => {
-=======
         test('clicking "Checkout as a guest" calls onCheckoutAsGuest when provided', async () => {
             const mockOnCheckoutAsGuest = jest.fn()
             const user = userEvent.setup()
@@ -348,7 +345,22 @@ describe('OtpAuth', () => {
         })
 
         test.skip('clicking "Resend code" calls handleSendEmailOtp', async () => {
->>>>>>> Stashed changes
+            const user = userEvent.setup()
+            renderWithProviders(
+                <OtpAuth
+                    isOpen={true}
+                    onClose={mockOnClose}
+                    form={mockForm}
+                    handleOtpVerification={mockHandleOtpVerification}
+                    handleSendEmailOtp={mockHandleSendEmailOtp}
+                />
+            )
+
+            const resendButton = screen.getByText('Resend code')
+            await user.click(resendButton)
+
+            expect(mockHandleSendEmailOtp).toHaveBeenCalledWith('test@example.com')
+        })
             const user = userEvent.setup()
             renderWithProviders(
                 <OtpAuth
