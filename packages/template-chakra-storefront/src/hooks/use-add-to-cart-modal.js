@@ -77,8 +77,17 @@ export const AddToCartModal = ({onSelectBonusProductsClick}) => {
     const {isOpen, onClose, data} = useAddToCartModalContext()
     const bonusProductContext = useBonusProductSelectionModalContext()
     const {onOpen: onOpenBonusModal} = bonusProductContext || {}
-    const {product, itemsAdded = [], selectedQuantity, bonusDiscountLineItems = []} = data || {}
+    const {product, itemsAdded = [], selectedQuantity} = data || {}
     const isProductABundle = !!product?.type.bundle
+
+    const intl = useIntl()
+    const {formatMessage} = intl
+    const {
+        data: basket = {},
+        derivedData: {totalItems}
+    } = useCurrentBasket()
+
+    const {bonusDiscountLineItems = []} = basket || {}
 
     // Extract unique promotion IDs
     const promotionIds = [
@@ -92,12 +101,6 @@ export const AddToCartModal = ({onSelectBonusProductsClick}) => {
     // Get the first promotion's details
     const promotionText = promotions?.data?.[0]?.details || ''
 
-    const intl = useIntl()
-    const {formatMessage} = intl
-    const {
-        data: basket = {},
-        derivedData: {totalItems}
-    } = useCurrentBasket()
     const size = useBreakpointValue(addToCartModalTheme.modal.size)
     const {currency, productSubTotal} = basket
     const numberOfItemsAdded = isProductABundle
