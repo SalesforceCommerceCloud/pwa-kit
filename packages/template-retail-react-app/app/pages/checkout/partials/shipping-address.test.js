@@ -537,7 +537,7 @@ describe('ShippingAddress', () => {
                 setMultishipEnabled(true)
             })
 
-            it('should show edit action button for multi-shipping', () => {
+            it('should show "Deliver to Multiple Addresses" button when MULTISHIP_IS_ENABLED is true', () => {
                 // Mock that we're in editing mode with multiple items
                 const editingContext = {
                     ...mockCheckoutContext,
@@ -552,7 +552,7 @@ describe('ShippingAddress', () => {
                 expect(editActionButton).toHaveTextContent('Deliver to Multiple Addresses')
             })
 
-            it('should handle edit action button click for multi-shipping', () => {
+            it('should handle "Deliver to Multiple Addresses" button click to toggle multi-shipping', () => {
                 // Mock that we're in editing mode
                 const editingContext = {
                     ...mockCheckoutContext,
@@ -573,7 +573,7 @@ describe('ShippingAddress', () => {
                 setMultishipEnabled(false)
             })
 
-            it('should not show edit action button for multi-shipping', () => {
+            it('should not show "Deliver to Multiple Addresses" button when MULTISHIP_IS_ENABLED is false', () => {
                 // Mock that we're in editing mode with multiple items
                 const editingContext = {
                     ...mockCheckoutContext,
@@ -583,7 +583,8 @@ describe('ShippingAddress', () => {
 
                 renderWithIntl(<ShippingAddress {...defaultProps} />)
 
-                // The edit action button should not be present
+                // The "Deliver to Multiple Addresses" button should not be present
+                // This is achieved by passing undefined to editAction and onEditActionClick props
                 expect(screen.queryByTestId('edit-action-button')).not.toBeInTheDocument()
             })
 
@@ -599,7 +600,7 @@ describe('ShippingAddress', () => {
 
                 // Should still show shipping address selection
                 expect(screen.getByTestId('shipping-address-selection')).toBeInTheDocument()
-                // But no edit action button
+                // But no "Deliver to Multiple Addresses" button
                 expect(screen.queryByTestId('edit-action-button')).not.toBeInTheDocument()
             })
         })
