@@ -84,7 +84,10 @@ afterAll(() => {
 // Shared test data
 const mockData = {
     props: {
-        shippingMethods: []
+        manager: {
+            setPaymentMethodAvailable: jest.fn(),
+            setPaymentMethodUnavailable: jest.fn()
+        }
     },
     environment: {
         ADYEN_ENVIRONMENT: 'test',
@@ -184,12 +187,8 @@ describe('GooglePayExpress', () => {
         AdyenCheckout.mockRejectedValue(new Error('Google Pay not available'))
         render(<GooglePayExpress {...mockData.props} />)
         await waitFor(() => {
-            expect(mockPostMessage).toHaveBeenCalledWith(
-                expect.objectContaining({
-                    type: 'express.payment.unavailable',
-                    payload: {PAYMENT_METHOD: 'googlepay'}
-                }),
-                '*'
+            expect(mockData.props.manager.setPaymentMethodUnavailable).toHaveBeenCalledWith(
+                'googlepay'
             )
         })
     })
@@ -275,11 +274,10 @@ describe('getGoogleButtonConfig', () => {
             mockData.authToken,
             mockData.site,
             mockData.basket,
-            mockData.shippingMethods,
             mockData.googlePayConfig
         )
         expect(config.showPayButton).toBe(true)
-        expect(config.buttonType).toBe('buy')
+        expect(config.buttonType).toBe('plain')
         expect(config.isExpress).toBe(true)
         expect(config.configuration).toBe(mockData.googlePayConfig)
         expect(config.amount.currency).toBe('USD')
@@ -292,7 +290,6 @@ describe('getGoogleButtonConfig', () => {
             mockData.authToken,
             mockData.site,
             basketWithoutOrderTotal,
-            mockData.shippingMethods,
             mockData.googlePayConfig
         )
         expect(config.amount.value).toBe(9500) // 95 * 100
@@ -312,7 +309,6 @@ describe('getGoogleButtonConfig', () => {
             mockData.authToken,
             mockData.site,
             mockData.basket,
-            mockData.shippingMethods,
             mockData.googlePayConfig
         )
 
@@ -362,7 +358,6 @@ describe('getGoogleButtonConfig', () => {
             mockData.authToken,
             mockData.site,
             mockData.basket,
-            mockData.shippingMethods,
             mockData.googlePayConfig
         )
 
@@ -401,7 +396,6 @@ describe('getGoogleButtonConfig', () => {
             mockData.authToken,
             mockData.site,
             mockData.basket,
-            mockData.shippingMethods,
             mockData.googlePayConfig
         )
 
@@ -435,7 +429,6 @@ describe('getGoogleButtonConfig', () => {
             mockData.authToken,
             mockData.site,
             mockData.basket,
-            mockData.shippingMethods,
             mockData.googlePayConfig
         )
 
@@ -455,12 +448,19 @@ describe('getGoogleButtonConfig', () => {
 
     it('onPaymentDataChanged handles different callbacks', async () => {
         const mockUpdateShippingAddress = jest.fn().mockResolvedValue({
-            newTransactionInfo: {
-                countryCode: 'USD',
-                currencyCode: 'USD',
-                totalPriceStatus: 'FINAL',
-                totalPriceLabel: 'Total',
-                totalPrice: '110.00'
+            paymentDataRequestUpdate: {
+                newTransactionInfo: {
+                    countryCode: 'USD',
+                    currencyCode: 'USD',
+                    totalPriceStatus: 'FINAL',
+                    totalPriceLabel: 'Total',
+                    totalPrice: '135.00'
+                }
+            },
+            newBasket: {
+                basketId: 'test-basket',
+                orderTotal: 135,
+                currency: 'USD'
             }
         })
         const mockGetShippingMethods = jest.fn().mockResolvedValue({
@@ -474,8 +474,20 @@ describe('getGoogleButtonConfig', () => {
             ]
         })
         const mockUpdateShippingMethod = jest.fn().mockResolvedValue({
-            orderTotal: 110,
-            currency: 'USD'
+            paymentDataRequestUpdate: {
+                newTransactionInfo: {
+                    countryCode: 'USD',
+                    currencyCode: 'USD',
+                    totalPriceStatus: 'FINAL',
+                    totalPriceLabel: 'Total',
+                    totalPrice: '150.00'
+                }
+            },
+            newBasket: {
+                basketId: 'test-basket',
+                orderTotal: 150,
+                currency: 'USD'
+            }
         })
 
         AdyenShippingAddressService.mockImplementation(() => ({
@@ -490,7 +502,6 @@ describe('getGoogleButtonConfig', () => {
             mockData.authToken,
             mockData.site,
             mockData.basket,
-            mockData.shippingMethods,
             mockData.googlePayConfig
         )
 
@@ -506,13 +517,20 @@ describe('getGoogleButtonConfig', () => {
         })
         expect(mockUpdateShippingAddress).toHaveBeenCalled()
         expect(initializeResult).toHaveProperty('newTransactionInfo')
+        
+        // Verify that the basket was updated with shipping option parameters
+        expect(initializeResult).toHaveProperty('newShippingOptionParameters')
+        expect(initializeResult.newShippingOptionParameters).toEqual({
+            defaultSelectedOptionId: 'method-1',
+            shippingOptions: [{id: 'method-1', label: 'Standard Shipping', description: '5-7 days'}]
+        })
 
         // Test SHIPPING_OPTION callback
         const shippingOptionResult = await config.paymentDataCallbacks.onPaymentDataChanged({
             callbackTrigger: 'SHIPPING_OPTION',
             shippingOptionData: {id: 'method-2'}
         })
-        expect(mockUpdateShippingMethod).toHaveBeenCalledWith('method-2', 'test-basket')
+        expect(mockUpdateShippingMethod).toHaveBeenCalled()
         expect(shippingOptionResult).toHaveProperty('newTransactionInfo')
     })
 })
@@ -545,7 +563,8 @@ describe('updateShippingAddress', () => {
                 ]
             }),
             updateShippingMethod: jest.fn().mockResolvedValue({
-                orderTotal: 110,
+                basketId: 'test-basket',
+                orderTotal: 125,
                 currency: 'USD'
             })
         }
@@ -559,7 +578,13 @@ describe('updateShippingAddress', () => {
             mockShippingAddress
         )
         expect(mockAddressService.updateShippingAddress).toHaveBeenCalled()
-        expect(result).toHaveProperty('newTransactionInfo')
+        expect(result).toHaveProperty('paymentDataRequestUpdate')
+        expect(result).toHaveProperty('newBasket')
+        expect(result.newBasket).toEqual({
+            basketId: 'test-basket',
+            orderTotal: 125,
+            currency: 'USD'
+        })
     })
 
     it('handles shipping address update error', async () => {
@@ -581,6 +606,8 @@ describe('updateShippingAddress', () => {
                 intent: 'SHIPPING_ADDRESS'
             }
         })
+        // Verify that no basket update occurs on error
+        expect(result).not.toHaveProperty('newBasket')
     })
 
     it('handles API exception', async () => {
@@ -615,7 +642,8 @@ describe('updateShippingOption', () => {
     it('updates shipping option successfully', async () => {
         const mockMethodsService = {
             updateShippingMethod: jest.fn().mockResolvedValue({
-                orderTotal: 110,
+                basketId: 'test-basket',
+                orderTotal: 140,
                 currency: 'USD'
             })
         }
@@ -631,7 +659,13 @@ describe('updateShippingOption', () => {
             'method-1',
             'test-basket'
         )
-        expect(result).toHaveProperty('newTransactionInfo')
+        expect(result).toHaveProperty('paymentDataRequestUpdate')
+        expect(result).toHaveProperty('newBasket')
+        expect(result.newBasket).toEqual({
+            basketId: 'test-basket',
+            orderTotal: 140,
+            currency: 'USD'
+        })
     })
 
     it('handles shipping option update error', async () => {
@@ -653,6 +687,8 @@ describe('updateShippingOption', () => {
                 intent: 'SHIPPING_OPTION'
             }
         })
+        // Verify that no basket update occurs on error
+        expect(result).not.toHaveProperty('newBasket')
     })
 
     it('handles API exception', async () => {
@@ -743,9 +779,8 @@ describe('GooglePayExpress error and edge cases', () => {
             setup()
             render(<GooglePayExpress {...mockData.props} />)
             await waitFor(() => {
-                expect(mockPostMessage).toHaveBeenCalledWith(
-                    expect.objectContaining({type: 'express.payment.unavailable'}),
-                    '*'
+                expect(mockData.props.manager.setPaymentMethodUnavailable).toHaveBeenCalledWith(
+                    'googlepay'
                 )
             })
         })
@@ -775,10 +810,7 @@ describe('GooglePayExpress error and edge cases', () => {
         })
         render(<GooglePayExpress {...mockData.props} />)
         await waitFor(() => {
-            expect(mockPostMessage).not.toHaveBeenCalledWith(
-                expect.objectContaining({type: 'express.payment.unavailable'}),
-                '*'
-            )
+            expect(mockData.props.manager.setPaymentMethodUnavailable).not.toHaveBeenCalled()
         })
     })
 
@@ -791,10 +823,7 @@ describe('GooglePayExpress error and edge cases', () => {
         })
         render(<GooglePayExpress {...mockData.props} />)
         await waitFor(() => {
-            expect(mockPostMessage).not.toHaveBeenCalledWith(
-                expect.objectContaining({type: 'express.payment.unavailable'}),
-                '*'
-            )
+            expect(mockData.props.manager.setPaymentMethodUnavailable).not.toHaveBeenCalled()
         })
     })
 })

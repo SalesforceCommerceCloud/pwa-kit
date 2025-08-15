@@ -160,7 +160,10 @@ export const updateShippingOption = async (
                 ...getGPShippingOptionParameters(shippingMethodResponse)
             }
         }
-        return paymentDataRequestUpdate
+        return {
+            paymentDataRequestUpdate: paymentDataRequestUpdate,
+            newBasket: response
+        }
     } catch (error) {
         return {
             error: {
@@ -176,7 +179,6 @@ export const getGoogleButtonConfig = (
     authToken,
     site,
     basket,
-    shippingMethods,
     googlePayConfig
 ) => {
     // Use productTotal if orderTotal is null, otherwise use orderTotal
@@ -185,12 +187,11 @@ export const getGoogleButtonConfig = (
 
     const buttonConfig = {
         showPayButton: true,
-        buttonType: 'buy',
+        buttonType: 'plain',
         isExpress: true,
         shippingAddressRequired: true,
         // shippingAddressParameters: {"allowedCountryCodes": ["US"]}, // If you want to restrict country codes, you can do that here
         shippingOptionRequired: true,
-        shippingOptionParameters: getGPShippingOptionParameters(shippingMethods),
         billingAddressRequired: true,
         billingAddressParameters: {format: 'FULL'},
         emailRequired: true,
@@ -217,6 +218,7 @@ export const getGoogleButtonConfig = (
                         )
                     }
                 }
+
                 const adyenPaymentService = new AdyenPaymentsService(authToken, site)
                 const paymentsResponse = await adyenPaymentService.submitPayment(
                     {
@@ -257,22 +259,29 @@ export const getGoogleButtonConfig = (
                             callbackTrigger === 'INITIALIZE' ||
                             callbackTrigger === 'SHIPPING_ADDRESS'
                         ) {
-                            paymentDataRequestUpdate = await updateShippingAddress(
+                            const updateShippingAddressResponse = await updateShippingAddress(
                                 authToken,
                                 site,
                                 basket,
                                 shippingAddress
                             )
+
+                            paymentDataRequestUpdate = updateShippingAddressResponse.paymentDataRequestUpdate
+                            // Update our basket with the latest data
+                            basket = updateShippingAddressResponse.newBasket
                         }
                         if (callbackTrigger === 'SHIPPING_OPTION') {
-                            paymentDataRequestUpdate = await updateShippingOption(
+                            const updateShippingOptionResponse = await updateShippingOption(
                                 authToken,
                                 site,
                                 basket,
                                 shippingOptionData?.id
                             )
-                        }
 
+                            paymentDataRequestUpdate = updateShippingOptionResponse.paymentDataRequestUpdate
+                            // Update our basket with the latest data
+                            basket = updateShippingOptionResponse.newBasket
+                        }
                         resolve(paymentDataRequestUpdate)
                     }
 
@@ -296,16 +305,14 @@ export const getGoogleButtonConfig = (
     return buttonConfig
 }
 
-export const GooglePayExpress = () => {
+export const GooglePayExpress = ({manager}) => {
     const {
         adyenEnvironment,
         adyenPaymentMethods,
         basket,
         locale,
         site,
-        authToken,
-        shippingMethods,
-        fetchShippingMethods
+        authToken
     } = useAdyenExpressCheckout()
 
     const paymentContainer = useRef(null)
@@ -319,9 +326,7 @@ export const GooglePayExpress = () => {
             }
 
             const handleGooglePayUnavailable = () => {
-                sendExpressMessage(EXPRESS_MESSAGES.PAYMENT_UNAVAILABLE, {
-                    PAYMENT_METHOD
-                })
+                manager.setPaymentMethodUnavailable(PAYMENT_METHOD)
             }
 
             try {
@@ -347,9 +352,6 @@ export const GooglePayExpress = () => {
                     authToken,
                     site,
                     basket,
-                    !shippingMethods && basket?.basketId
-                        ? await fetchShippingMethods(basket?.basketId, site, authToken)
-                        : shippingMethods,
                     googlePaymentMethodConfig
                 )
 
@@ -375,9 +377,7 @@ export const GooglePayExpress = () => {
 
                 try {
                     await googlePayButton.mount(paymentContainer.current)
-                    sendExpressMessage(EXPRESS_MESSAGES.PAYMENT_AVAILABLE, {
-                        PAYMENT_METHOD
-                    })
+                    manager.setPaymentMethodAvailable(PAYMENT_METHOD)
                 } catch (error) {
                     handleGooglePayUnavailable()
                 }
@@ -420,5 +420,5 @@ export const GooglePayExpress = () => {
 }
 
 GooglePayExpress.propTypes = {
-    shippingMethods: PropTypes.array
+    manager: PropTypes.object
 }

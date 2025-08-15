@@ -49,29 +49,26 @@ jest.mock('@salesforce/retail-react-app/app/components/express/utils/payments', 
     }))
 }))
 
-jest.mock(
-    '@salesforce/retail-react-app/app/components/express/utils/shipping-address',
-    () => ({
-        AdyenShippingAddressService: jest.fn().mockImplementation(() => ({
-            updateShippingAddress: jest.fn()
-        }))
-    })
-)
+jest.mock('@salesforce/retail-react-app/app/components/express/utils/shipping-address', () => ({
+    AdyenShippingAddressService: jest.fn().mockImplementation(() => ({
+        updateShippingAddress: jest.fn()
+    }))
+}))
 
-jest.mock(
-    '@salesforce/retail-react-app/app/components/express/utils/shipping-methods',
-    () => ({
-        AdyenShippingMethodsService: jest.fn().mockImplementation(() => ({
-            updateShippingMethod: jest.fn(),
-            getShippingMethods: jest.fn()
-        }))
-    })
-)
+jest.mock('@salesforce/retail-react-app/app/components/express/utils/shipping-methods', () => ({
+    AdyenShippingMethodsService: jest.fn().mockImplementation(() => ({
+        updateShippingMethod: jest.fn(),
+        getShippingMethods: jest.fn()
+    }))
+}))
 
 // Mock the useStandalonePaymentMethods hook
-jest.mock('@salesforce/retail-react-app/app/components/express/hooks/use-standalone-payment-methods', () => ({
-    useStandalonePaymentMethods: jest.fn()
-}))
+jest.mock(
+    '@salesforce/retail-react-app/app/components/express/hooks/use-standalone-payment-methods',
+    () => ({
+        useStandalonePaymentMethods: jest.fn()
+    })
+)
 
 // Mock temporary basket utilities
 jest.mock('@salesforce/retail-react-app/app/components/express/utils/pdp/temporary-basket', () => ({
@@ -81,10 +78,13 @@ jest.mock('@salesforce/retail-react-app/app/components/express/utils/pdp/tempora
 }))
 
 // Mock basket calculation utilities
-jest.mock('@salesforce/retail-react-app/app/components/express/utils/pdp/basket-calculation', () => ({
-    getBasketWithTotals: jest.fn(),
-    forceOrderCalculation: jest.fn()
-}))
+jest.mock(
+    '@salesforce/retail-react-app/app/components/express/utils/pdp/basket-calculation',
+    () => ({
+        getBasketWithTotals: jest.fn(),
+        forceOrderCalculation: jest.fn()
+    })
+)
 
 // Mock useMultiSite and useNavigation hooks
 jest.mock('@salesforce/retail-react-app/app/hooks/use-multi-site', () => ({
@@ -123,7 +123,11 @@ describe('ApplePayExpress', () => {
 
     const mockProps = {
         shippingMethods: [],
-        basketData: mockBasket
+        basketData: mockBasket,
+        manager: {
+            setPaymentMethodAvailable: jest.fn(),
+            setPaymentMethodUnavailable: jest.fn()
+        }
     }
 
     const mockAdyenEnvironment = {
@@ -210,23 +214,11 @@ describe('ApplePayExpress', () => {
         // Mock AdyenCheckout to throw an error
         AdyenCheckout.mockRejectedValue(new Error('Apple Pay not available'))
 
-        const originalPostMessage = window.postMessage
-        const mockPostMessage = jest.fn()
-        window.postMessage = mockPostMessage
-
         render(<ApplePayExpress {...mockProps} />)
 
         await waitFor(() => {
-            expect(mockPostMessage).toHaveBeenCalledWith(
-                expect.objectContaining({
-                    type: 'express.payment.unavailable',
-                    payload: {PAYMENT_METHOD: 'applepay'}
-                }),
-                '*'
-            )
+            expect(mockProps.manager.setPaymentMethodUnavailable).toHaveBeenCalledWith('applepay')
         })
-
-        window.postMessage = originalPostMessage
     })
 
     it('mounts Apple Pay button when available', async () => {
@@ -320,7 +312,7 @@ describe('getAppleButtonConfig', () => {
 
     beforeEach(() => {
         jest.clearAllMocks()
-        
+
         // Mock temporary basket and calculation functions for this test suite
         createTemporaryBasket.mockResolvedValue({basketId: 'mock-temp-basket'})
         deleteTemporaryBasket.mockResolvedValue({success: true})
@@ -626,17 +618,21 @@ describe('ApplePayExpress error and edge cases', () => {
         currency: 'USD',
         customerInfo: {customerId: 'test-customer'}
     }
-    const mockProps = {shippingMethods: [], basketData: mockBasket}
+    const mockProps = {
+        shippingMethods: [],
+        basketData: mockBasket,
+        manager: {
+            setPaymentMethodAvailable: jest.fn(),
+            setPaymentMethodUnavailable: jest.fn()
+        }
+    }
     const mockAdyenEnvironment = {ADYEN_ENVIRONMENT: 'test', ADYEN_CLIENT_KEY: 'test_key'}
     const mockAdyenPaymentMethods = {
         paymentMethods: [{type: 'applepay', configuration: {merchantName: 'Test Merchant'}}],
         applicationInfo: {}
     }
-    let originalPostMessage
     beforeEach(() => {
         jest.clearAllMocks()
-        originalPostMessage = window.postMessage
-        window.postMessage = jest.fn()
 
         // Mock useMultiSite hook
         useMultiSite.mockReturnValue({
@@ -666,19 +662,14 @@ describe('ApplePayExpress error and edge cases', () => {
             fetchShippingMethods: jest.fn()
         })
     })
-    afterEach(() => {
-        window.postMessage = originalPostMessage
-    })
+
     it('handles AdyenCheckout throwing', async () => {
         AdyenCheckout.mockImplementation(() => {
             throw new Error('fail')
         })
         render(<ApplePayExpress {...mockProps} />)
         await waitFor(() => {
-            expect(window.postMessage).toHaveBeenCalledWith(
-                expect.objectContaining({type: 'express.payment.unavailable'}),
-                '*'
-            )
+            expect(mockProps.manager.setPaymentMethodUnavailable).toHaveBeenCalledWith('applepay')
         })
     })
     it('handles create throwing', async () => {
@@ -689,10 +680,7 @@ describe('ApplePayExpress error and edge cases', () => {
         })
         render(<ApplePayExpress {...mockProps} />)
         await waitFor(() => {
-            expect(window.postMessage).toHaveBeenCalledWith(
-                expect.objectContaining({type: 'express.payment.unavailable'}),
-                '*'
-            )
+            expect(mockProps.manager.setPaymentMethodUnavailable).toHaveBeenCalledWith('applepay')
         })
     })
     it('handles isAvailable throwing', async () => {
@@ -706,10 +694,7 @@ describe('ApplePayExpress error and edge cases', () => {
         })
         render(<ApplePayExpress {...mockProps} />)
         await waitFor(() => {
-            expect(window.postMessage).toHaveBeenCalledWith(
-                expect.objectContaining({type: 'express.payment.unavailable'}),
-                '*'
-            )
+            expect(mockProps.manager.setPaymentMethodUnavailable).toHaveBeenCalledWith('applepay')
         })
     })
     it('handles isAvailable returning false', async () => {
@@ -721,10 +706,7 @@ describe('ApplePayExpress error and edge cases', () => {
         })
         render(<ApplePayExpress {...mockProps} />)
         await waitFor(() => {
-            expect(window.postMessage).toHaveBeenCalledWith(
-                expect.objectContaining({type: 'express.payment.unavailable'}),
-                '*'
-            )
+            expect(mockProps.manager.setPaymentMethodUnavailable).toHaveBeenCalledWith('applepay')
         })
     })
     it('handles mount throwing', async () => {
@@ -738,10 +720,7 @@ describe('ApplePayExpress error and edge cases', () => {
         })
         render(<ApplePayExpress {...mockProps} />)
         await waitFor(() => {
-            expect(window.postMessage).toHaveBeenCalledWith(
-                expect.objectContaining({type: 'express.payment.unavailable'}),
-                '*'
-            )
+            expect(mockProps.manager.setPaymentMethodUnavailable).toHaveBeenCalledWith('applepay')
         })
     })
     it('handles missing basket/orderTotal', async () => {
@@ -759,7 +738,7 @@ describe('ApplePayExpress error and edge cases', () => {
         const propsWithoutBasket = {...mockProps, basketData: null}
         render(<ApplePayExpress {...propsWithoutBasket} />)
         // Should not call AdyenCheckout when basket data is missing in regular mode
-        await new Promise(resolve => setTimeout(resolve, 100))
+        await new Promise((resolve) => setTimeout(resolve, 100))
         expect(AdyenCheckout).not.toHaveBeenCalled()
     })
     it('handles missing config', async () => {
@@ -863,7 +842,12 @@ describe('ApplePayExpress PDP Mode', () => {
         const pdpProps = {
             sku: 'TEST-SKU-123',
             quantity: 1,
-            isPdpMode: true
+            isPdpMode: true,
+            authToken: 'test-token',
+            manager: {
+                setPaymentMethodAvailable: jest.fn(),
+                setPaymentMethodUnavailable: jest.fn()
+            }
         }
 
         render(<ApplePayExpress {...pdpProps} />)
@@ -898,19 +882,19 @@ describe('ApplePayExpress PDP Mode', () => {
             error: null
         })
 
-        render(<ApplePayExpress sku="TEST-SKU" isPdpMode={true} />)
+        const mockManager = {
+            setPaymentMethodAvailable: jest.fn(),
+            setPaymentMethodUnavailable: jest.fn()
+        }
+
+        render(<ApplePayExpress sku="TEST-SKU" isPdpMode={true} manager={mockManager} />)
 
         // Should not call AdyenCheckout while loading
-        await new Promise(resolve => setTimeout(resolve, 100))
+        await new Promise((resolve) => setTimeout(resolve, 100))
         expect(AdyenCheckout).not.toHaveBeenCalled()
     })
 
     it('handles standalone payment methods error', async () => {
-        // Mock window.parent.postMessage first
-        const originalPostMessage = window.parent.postMessage
-        const mockPostMessage = jest.fn()
-        window.parent.postMessage = mockPostMessage
-
         // Need to provide some payment methods so it doesn't return early, but still has an error
         useStandalonePaymentMethods.mockReturnValue({
             paymentMethods: mockStandalonePaymentMethods, // Provide valid payment methods
@@ -918,19 +902,19 @@ describe('ApplePayExpress PDP Mode', () => {
             error: new Error('Failed to load payment methods') // But still have an error
         })
 
-        render(<ApplePayExpress sku="TEST-SKU" isPdpMode={true} />)
+        const mockManager = {
+            setPaymentMethodAvailable: jest.fn(),
+            setPaymentMethodUnavailable: jest.fn()
+        }
 
-        await waitFor(() => {
-            expect(mockPostMessage).toHaveBeenCalledWith(
-                expect.objectContaining({
-                    type: 'express.payment.unavailable',
-                    payload: {PAYMENT_METHOD: 'applepay'}
-                }),
-                '*'
-            )
-        }, { timeout: 2000 })
+        render(<ApplePayExpress sku="TEST-SKU" isPdpMode={true} manager={mockManager} />)
 
-        window.parent.postMessage = originalPostMessage
+        await waitFor(
+            () => {
+                expect(mockManager.setPaymentMethodUnavailable).toHaveBeenCalledWith('applepay')
+            },
+            {timeout: 2000}
+        )
     })
 
     it('cleans up temporary basket when SKU changes', async () => {
@@ -939,10 +923,10 @@ describe('ApplePayExpress PDP Mode', () => {
             orderTotal: 29.99,
             currency: 'USD'
         }
-        
+
         // Set up a scenario where createTemporaryBasket returns our mock basket
         createTemporaryBasket.mockResolvedValue(mockTempBasket)
-        
+
         // Create button config in PDP mode - this will use the getOrCreateBasket logic
         const buttonConfig = getAppleButtonConfig(
             'test-token',
@@ -961,24 +945,31 @@ describe('ApplePayExpress PDP Mode', () => {
         const mockResolve = jest.fn()
         const mockReject = jest.fn()
         await buttonConfig.onClick(mockResolve, mockReject)
-        
+
         // Verify temporary basket was created
-        expect(createTemporaryBasket).toHaveBeenCalledWith('OLD-SKU', 'test-token', {id: 'test-site'}, 1)
+        expect(createTemporaryBasket).toHaveBeenCalledWith(
+            'OLD-SKU',
+            'test-token',
+            {id: 'test-site'},
+            1
+        )
         expect(mockResolve).toHaveBeenCalled()
- 
+
         const currentSku = 'OLD-SKU'
         const newSku = 'NEW-SKU'
         const tempBasket = mockTempBasket
         const authToken = 'test-token'
         const site = {id: 'test-site'}
-        
+
         // Simulate the cleanup condition: sku !== currentSku && currentSku && tempBasket?.basketId
         if (newSku !== currentSku && currentSku && tempBasket?.basketId && authToken && site) {
             await deleteTemporaryBasket(tempBasket.basketId, authToken, site)
         }
-        
+
         // Verify cleanup was called
-        expect(deleteTemporaryBasket).toHaveBeenCalledWith('temp-basket-123', 'test-token', {id: 'test-site'})
+        expect(deleteTemporaryBasket).toHaveBeenCalledWith('temp-basket-123', 'test-token', {
+            id: 'test-site'
+        })
     })
 
     it('cleans up temporary basket on component unmount', async () => {
@@ -988,26 +979,32 @@ describe('ApplePayExpress PDP Mode', () => {
             orderTotal: 19.99,
             currency: 'USD'
         }
-        
+
         const isPdpMode = true
         const currentSku = 'TEST-SKU'
         const tempBasket = mockTempBasket
         const authToken = 'test-token'
         const site = {id: 'test-site'}
-        
+
         // Simulate the unmount cleanup condition: isPdpMode && currentSku && tempBasket?.basketId
         if (isPdpMode && currentSku && tempBasket?.basketId && authToken && site) {
             await deleteTemporaryBasket(tempBasket.basketId, authToken, site)
         }
-        
+
         // Verify cleanup was called for unmount scenario
-        expect(deleteTemporaryBasket).toHaveBeenCalledWith('temp-basket-unmount', 'test-token', {id: 'test-site'})
+        expect(deleteTemporaryBasket).toHaveBeenCalledWith('temp-basket-unmount', 'test-token', {
+            id: 'test-site'
+        })
     })
-    
+
     it('does not clean up when conditions are not met', async () => {
         // Test that cleanup doesn't happen when conditions aren't met
+        const mockManager = {
+            setPaymentMethodAvailable: jest.fn(),
+            setPaymentMethodUnavailable: jest.fn()
+        }
         const {unmount} = render(
-            <ApplePayExpress sku="TEST-SKU" isPdpMode={true} />
+            <ApplePayExpress sku="TEST-SKU" isPdpMode={true} manager={mockManager} />
         )
 
         // Reset the mock to track only calls from this test
@@ -1015,7 +1012,7 @@ describe('ApplePayExpress PDP Mode', () => {
 
         // Simulate component unmount when no temporary basket exists
         unmount()
-        
+
         expect(deleteTemporaryBasket).not.toHaveBeenCalled()
     })
 })
@@ -1036,7 +1033,7 @@ describe('ApplePayExpress PDP Button Configuration', () => {
 
     beforeEach(() => {
         jest.clearAllMocks()
-        
+
         // Reset temporary basket mocks
         createTemporaryBasket.mockResolvedValue(mockTempBasket)
         forceOrderCalculation.mockResolvedValue({...mockTempBasket, orderTotal: 54.98})
