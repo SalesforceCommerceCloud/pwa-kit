@@ -16,6 +16,7 @@ export default defineSlotRecipe({
         'subscribeHeading',
         'subscribeMessage',
         'subscribeDisclaimer',
+        'subscribeDisclaimerLink',
         'localeSelectorWrapper',
         'localeSelectorRoot',
         'localeSelectorField',
@@ -61,6 +62,10 @@ export default defineSlotRecipe({
         subscribeDisclaimer: {
             fontSize: 'sm',
             marginTop: 2
+        },
+        subscribeDisclaimerLink: {
+            color: 'inherit',
+            _hover: {color: 'inherit', textDecoration: 'underline'}
         },
         localeSelectorWrapper: {
             display: 'inline-block',

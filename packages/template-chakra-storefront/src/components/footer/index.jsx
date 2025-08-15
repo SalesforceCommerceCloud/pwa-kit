@@ -246,8 +246,16 @@ const Subscribe = ({...otherProps}) => {
                     id="footer.subscribe.disclaimer"
                     defaultMessage="By submitting this, I agree to the {terms} and {privacy}."
                     values={{
-                        terms: <Link href="/">{termsConditions}</Link>,
-                        privacy: <Link href="/">{privacyPolicy}</Link>
+                        terms: (
+                            <Link href="/" css={styles.subscribeDisclaimerLink}>
+                                {termsConditions}
+                            </Link>
+                        ),
+                        privacy: (
+                            <Link href="/" css={styles.subscribeDisclaimerLink}>
+                                {privacyPolicy}
+                            </Link>
+                        )
                     }}
                 />
             )
