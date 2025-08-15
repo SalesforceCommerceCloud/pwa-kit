@@ -1,0 +1,844 @@
+---
+description: Pwa best practise
+globs:
+alwaysApply: false
+---
+PWA Kit Best Practices Guide
+
+Overview
+
+This document outlines best practices for developing Salesforce Commerce Composable Storefront applications using PWA Kit's core technology stack. It covers React, React Query (TanStack Query), React Testing Library, and general frontend development patterns.
+
+Note: code examples in this docs are not from actual source code.
+
+PWA Kit V3 template-retail-react- app guideline at packages/template-retail-react-app
+
+Technology Stack Summary
+
+Core Dependencies
+
+* React: ^18.2.0 - Modern UI library with concurrent features
+* @tanstack/react-query: ^4.28.0 - Data fetching and caching
+* @testing-library/react: ^14.0.0 - Component testing utilities
+* @chakra-ui/react: ^2.6.0 - UI component library
+* @salesforce/commerce-sdk-react: Commerce API integration hooks
+* React Router Dom: ^5.3.4 - Client-side routing
+* React Hook Form: ^7.43.9 - Form state management
+
+Development
+
+ Workflow
+
+1. Analyze Requirements - Understand the feature requirements
+2. Review Existing Code - Look for similar implementations
+3. Plan Implementation - Design component structure
+4. Implement Incrementally - Build in small steps
+5. Test Thoroughly - Write comprehensive tests
+6. Review Code Quality - Ensure accessibility and performance
+
+
+Avoid:
+
+* Re-create a new component before checking current exising UI library (Chakra v2 UI)
+* Should NOT putting around a workaround for API the pwa-kit. This needs to be communicated and worked with API teams to get the API working for pwa-kit
+
+General
+
+1. File Organization
+
+✅ Follow kebab-case naming convention
+
+components/
+  ├── product-view/
+  │   ├── index.jsx
+  │   ├── index.test.js
+  ├── quantity-picker/
+  │   ├── index.jsx
+  │   └── index.test.jsx
+....            
+
+2. Logging
+
+Use pwa-kit logger to create a more context to logs messages. It is a simple wrapper around the native Node.js console. logger has all the methods of native Node.js log. console.log, console.warn, console.info, and the like
+
+ E.g
+
+import logger from '../app/utils/logger-instance'
+
+logger.warn(
+    '[DataCloudApi] 400 Bad Request: Check your Data Cloud configuration (appSourceId, tenantId) and event payload.',
+    {
+        namespace: 'use-datacloud._handleApiError',
+        additionalProperties: {error: err?.response}
+    }
+)
+
+
+To debugging PWA Kit: See this doc
+
+React 18
+
+1.  Functional Components with Hooks and follow single responsibility principle
+
+✅ Use functional components exclusively
+
+// Good: One purpose per component
+const QuantityPicker = ({ value, onChange, min = 1, max = 10 }) => {
+    // Only handles quantity selection logic
+}
+
+const AddToCartButton = ({ onAddToCart, isLoading }) => {
+    // Only handles add to cart action
+}
+
+
+const ProductView = ({ product, addToCart }) => {
+    const [quantity, setQuantity] = useState(1)
+    const [isLoading, setIsLoading] = useState(false)
+    
+    const handleAddToCart = useCallback(async () => {
+        setIsLoading(true)
+        try {
+            await addToCart({ productId: product.id, quantity })
+        } finally {
+            setIsLoading(false)
+        }
+    }, [addToCart, product.id, quantity])
+    
+    return (
+        <Box>
+            <QuantityPicker value={quantity} onChange={setQuantity} />
+            <AddToCartButton />
+        </Box>
+    )
+}
+
+2. Hook Usage Patterns to manage business logic and data fetching
+
+Hook pattern
+
+export const useCurrentCustomer = () => {
+    const customerId = useCustomerId()
+    const { isRegistered, isGuest, customerType } = useCustomerType()
+    const query = useCustomer(
+        { parameters: { customerId } }, 
+        { enabled: !!customerId && isRegistered }
+    )
+    
+    return {
+        ...query,
+        data: {
+            ...query.data,
+            customerType,
+            customerId,
+            isRegistered,
+            isGuest
+        }
+    }
+}
+
+useCallback for expensive callback. useMemo for expensive data calculation E.g
+
+const SearchComponent = ({ products, filters }) => {
+    const [searchResults, setSearchResults] = useState([])
+    
+    // ✅ useCallback for expensive search operation
+    const handleSearch = useCallback((searchTerm) => {
+        // Expensive search algorithm
+        const results = products.filter(product => {
+            // Complex scoring algorithm
+            const score = calculateRelevanceScore(product, searchTerm, filters)
+            return score > 0.5
+        }).sort((a, b) => {
+            // Expensive sorting logic
+            return calculateRelevanceScore(b, searchTerm, filters) - 
+                   calculateRelevanceScore(a, searchTerm, filters)
+        })
+        
+        setSearchResults(results)
+    }, [products, filters]) // Dependencies that affect the calculation
+    
+    return <SearchInput onSearch={handleSearch} />
+}
+
+// Bad: useCallback with dependencies that change on every render
+const BadExample = ({ user, settings }) => {
+    const [data, setData] = useState([])
+    
+    // ❌ settings object changes on every render, making useCallback useless
+    const handleSubmit = useCallback(() => {
+        processData(data, settings)
+    }, [data, settings])
+    
+    return <Form onSubmit={handleSubmit} />
+}
+
+// Good: Extract stable values or use useMemo for objects
+const GoodExample = ({ user, settings }) => {
+    const [data, setData] = useState([])
+    
+    // ✅ Memoize the settings object first
+    const memoizedSettings = useMemo(() => settings, [settings.theme, settings.locale])
+    
+    const handleSubmit = useCallback(() => {
+        processData(data, memoizedSettings)
+    }, [data, memoizedSettings])
+    
+    return <Form onSubmit={handleSubmit} />
+}
+
+3. Prop Types and TypeScript
+
+✅ Use PropTypes for runtime validation
+
+import PropTypes from 'prop-types'
+
+const ProductView = ({ product, addToCart }) => {
+    // Component implementation
+}
+
+ProductView.propTypes = {
+    product: PropTypes.shape({
+        id: PropTypes.string.isRequired,
+        name: PropTypes.string.isRequired,
+        price: PropTypes.number.isRequired
+    }).isRequired,
+    addToCart: PropTypes.func.isRequired
+}
+
+4. Performance Optimization
+
+✅ Code splitting with loadable components - Only for Page level component
+
+import loadable from '@loadable/component'
+const Home = loadable(() => import('./pages/home'), {fallback})
+export const routes = [
+    {
+        path: '/',
+        component: Home,
+        exact: true
+    }
+    
+]
+
+
+ ⚠️  Use Island architecture for selective hydration - Use this with caution. There are trade offs using this component. See more here
+
+// Only hydrate when component becomes visible
+<Island hydrationTrigger="visible">
+    <InteractiveComponent />
+</Island>
+// Or hydrate on user interaction
+<Island hydrationTrigger="interaction">
+    <SearchFilters />
+</Island>
+
+
+
+5. Internationalization
+
+✅ Use React Intl for translations. Either using FormatedMessage or imperative API like intl.formatMessages() for translations in the app. 
+https://formatjs.github.io/docs/react-intl/components
+https://formatjs.github.io/docs/react-intl/api
+
+Always run npm run build-translations at template directory to extract all messages
+
+import { useIntl, FormattedMessage } from 'react-intl'
+
+const Component = () => {
+    const intl = useIntl()
+    
+    return (
+        <div>
+            <FormattedMessage 
+                id="product.addToCart" 
+                defaultMessage="Add to Cart" 
+            />
+            <Button aria-label={intl.formatMessage({
+                id: 'product.addToCart.aria',
+                defaultMessage: 'Add {productName} to cart'
+            }, { productName: product.name })}>
+                +
+            </Button>
+        </div>
+    )
+}
+
+6. State Management
+
+✅ Choose appropriate state management level.
+
+Should use react-hook-form to manage form state. https://www.react-hook-form.com/api/
+
+// Local state for component-specific data
+const [isExpanded, setIsExpanded] = useState(false)
+// Context for app-wide shared state
+const { currency, setCurrency } = useCurrency()
+// React Query for server state
+const { data: products } = useProductSearch(searchParams)
+// Form state with React Hook Form
+const { register, handleSubmit, errors } = useForm()
+
+7. Accessibility
+
+✅ Follow WCAG guidelines
+
+// Buttons must have discernible names
+<Button aria-label="Close dialog">
+    <CloseIcon />
+</Button>
+// Images must have alt text
+<img src="product.jpg" alt="Blue cotton t-shirt" />
+// Inputs must have labels
+<label htmlFor="email">Email Address</label>
+<input id="email" type="email" />
+// Maintain heading hierarchy
+<h1>Page Title</h1>
+<h2>Section Title</h2>
+<h3>Subsection Title</h3>
+
+
+Chakra UI V2
+
+1. Theme Architecture
+
+✅ Use centralized theme structure as much as possible for component-level components
+See current theme structure: https://github.com/SalesforceCommerceCloud/pwa-kit/blob/develop/packages/template-retail-react-app/app/theme/index.js
+
+Follow Chakra UI Styled System: https://v2.chakra-ui.com/docs/styled-system/style-props
+✅ Good Practices
+
+// Use theme tokens consistently
+<Box bg="gray.50" p={4} borderRadius="md">
+// Leverage responsive arrays
+<Text fontSize={['sm', 'md', 'lg']}>
+// Use semantic color names
+<Alert status="error" colorScheme="red">
+// Compose with layer styles
+<Box layerStyle="card">
+
+❌ Anti-Patterns
+
+// Don't use hardcoded values
+<Box bg="#F7F7F7" p="16px">  // Use theme tokens instead
+// Don't break responsive patterns
+<Box display="flex" flexDirection="column">  // Use Stack instead
+// Don't override with important
+<Box sx={{ color: 'red !important' }}>  // Use proper theme hierarchy
+
+2. Custom Component Theming
+
+Create project-specific component themes
+
+✅ Use useStyleConfig for single-part components
+
+// app/theme/components/project/product-tile.js
+export default {
+    // general styles
+    baseStyle: {
+        position: 'relative',
+        overflow: 'hidden',
+        transition: 'transform 0.2s',
+        _hover: {
+            transform: 'translateY(-2px)',
+            shadow: 'lg'
+        }
+    },
+    // distinguish styling for individual variant
+    variants: {
+        default: {
+            bg: 'white',
+            border: '1px solid',
+            borderColor: 'gray.200',
+            borderRadius: 'md'
+        },
+        featured: {
+            bg: 'blue.50',
+            border: '2px solid',
+            borderColor: 'blue.200',
+            borderRadius: 'lg'
+        }
+    },
+    // distinguish styling for individual size
+    sizes: {
+        sm: {
+            ...
+        },
+        md: {
+            ...
+        }
+    }
+}
+
+// Usage
+// ✅ Correct: Using useStyleConfig in component
+import { useStyleConfig } from '@salesforce/retail-react-app/app/components/shared/ui'
+
+const ProductTile = ({ variant = 'default', size = 'md', children, ...rest }) => {
+    const styles = useStyleConfig('ProductTile', { variant, size })
+    
+    return (
+        <Box sx={styles} {...rest}>
+            {children}
+        </Box>
+    )
+}
+
+<ProductTile variant="featured" size="md">
+    <ProductTileContent />
+</ProductTile>
+
+✅ Use useMultiStyleConfig for complex multi-part components
+
+// app/theme/components/project/card.js
+export default {
+    parts: ['container', 'header', 'body', 'footer'],
+    
+    baseStyle: {
+        container: {
+            bg: 'white',
+            borderRadius: 'md',
+            overflow: 'hidden',
+            boxShadow: 'base'
+        },
+        header: {
+            px: 6,
+            py: 4,
+            ...
+        },
+        body: {
+            px: 6,
+            py: 4
+        },
+        footer: {
+            px: 6,
+            py: 4,
+            borderTop: '1px solid',
+            borderTopColor: 'gray.100',
+            bg: 'gray.50'
+        }
+    },
+    
+    variants: {
+        elevated: {
+            container: {
+                boxShadow: 'lg',
+                border: 'none'
+            }
+        },
+        outlined: {
+            container: {
+                border: '1px solid',
+                borderColor: 'gray.200',
+            }
+        }
+    },
+    
+    sizes: {
+        sm: {
+            ...
+        },
+        lg: {
+            ...
+        }
+    }
+}
+
+// Apply theme
+// ✅ Correct: Using useMultiStyleConfig for complex components
+import { useMultiStyleConfig, createStylesContext } from '@salesforce/retail-react-app/app/components/shared/ui'
+
+// Create styles context for the component
+const [StylesProvider, useStyles] = createStylesContext('Card')
+
+const Card = ({ variant, size, children, ...rest }) => {
+    const styles = useMultiStyleConfig('Card', { variant, size })
+    
+    return (
+        <StylesProvider value={styles}>
+            <Box sx={styles.container} {...rest}>
+                {children}
+            </Box>
+        </StylesProvider>
+    )
+}
+
+React  Query v4
+
+Most of data fetching from SCAPI have a decidated hook that using useQuery/useMutation under the hook. See more here
+Most of the time, you may not need to use anything but this library to interact with SCAPI. In case you need to perform multiple functions to get enough data, think about creating a custom hook in the template that will use more than 1 commerce-react-sdk hooks to get the data you need. E.g useCurrentBasket or useCurrentCustomer
+
+1. Configuration
+
+✅ Global configuration in app-config
+
+// From packages/template-retail-react-app/app/components/_app-config/index.jsx
+const options = {
+    queryClientConfig: {
+        defaultOptions: {
+            queries: {
+                retry: false,
+                refetchOnWindowFocus: false,
+                staleTime: 10 * 1000,
+                ...(isServerSide ? { retryOnMount: false } : {})
+            },
+            mutations: {
+                retry: false
+            }
+        }
+    },
+    beforeHydrate: (data) => {
+        const now = Date.now()
+        
+        const updateQueryTimeStamp = ({ state }) => {
+            state.dataUpdatedAt = now
+        }
+        
+        data?.mutations?.forEach(updateQueryTimeStamp)
+        data?.queries?.forEach(updateQueryTimeStamp)
+        
+        return data
+    }
+}
+
+export default withReactQuery(AppConfig, options)
+
+2. Query Patterns
+
+✅ Use descriptive query keys if you need to use React Query useQuery API directly
+
+// Good: Semantic query keys
+const { data: messages } = useQuery({
+    queryKey: ['app', 'translations', 'messages', targetLocale],
+    queryFn: () => fetchTranslations(targetLocale, appOrigin),
+    enabled: isServer
+})
+
+✅ Conditional queries with enabled
+
+const { error, data: category } = useCategory(
+    {
+        parameters: {
+            id: params.categoryId
+        }
+    },
+    {
+        enabled: !isSearch && !!params.categoryId
+    }
+)
+
+✅ Keep previous data for smooth UX
+
+
+const {
+    isLoading,
+    isFetched,
+    isRefetching,
+    data: productSearchResult
+} = useProductSearch(
+    {
+        parameters: {
+            ...restOfParams,
+            perPricebook: true,
+            allVariationProperties: true,
+            expand: ['promotions', 'variations', 'prices', 'images']
+        }
+    },
+    {
+        keepPreviousData: true  // Prevents loading states during pagination
+    }
+)
+
+3. Mutation Patterns
+
+✅ Use mutations for data modifications
+
+const Component = () => {
+    const updateBasket = useShopperBasketsMutation('updateBasket')
+    const updateCustomerForBasket = useShopperBasketsMutation('updateCustomerForBasket')
+    
+    useEffect(() => {
+        if (basket?.currency && basket?.currency !== currency) {
+            updateBasket.mutate({
+                parameters: { basketId: basket.basketId },
+                body: { currency }
+            })
+        }
+    }, [basket?.currency])
+    
+    return <div>...</div>
+}
+
+4. Error Handling
+
+const ProductListPage = () => {
+    const { error, data: category } = useCategory(...)
+    
+    // Handle specific error cases
+    const errorStatus = error?.response?.status
+    switch (errorStatus) {
+        case undefined:
+            break // No error
+        case 404:
+            throw new HTTPNotFound('Category Not Found.')
+        default:
+            throw new HTTPError(errorStatus, `HTTP Error ${errorStatus} occurred.`)
+    }
+    
+    return <div>...</div>
+}
+
+React Testing Library
+
+1. Test Setup and Configuration
+
+✅ Global test setup with proper providers
+
+// From test-utils.js
+export const renderWithProviders = (ui, {
+    locale = 'en-GB',
+    site = mockSite,
+    ...renderOptions
+} = {}) => {
+    const AllTheProviders = ({ children }) => (
+        <BrowserRouter>
+            <ServerContext value={{ req: {}, res: {} }}>
+                <CommerceApiProvider 
+                    shortCode="kv7kzm78"
+                    clientId="c9c45bfd-0ed3-4aa2-xxxx"
+                    organizationId="f_ecom_zzrf_001"
+                >
+                    <MultiSiteProvider site={site} locale={mockLocale} buildUrl={buildUrl}>
+                        <ChakraProvider theme={theme}>
+                            <IntlProvider locale={locale} messages={messages}>
+                                {children}
+                            </IntlProvider>
+                        </ChakraProvider>
+                    </MultiSiteProvider>
+                </CommerceApiProvider>
+            </ServerContext>
+        </BrowserRouter>
+    )
+    
+    return render(ui, { wrapper: AllTheProviders, ...renderOptions })
+}
+
+2. Testing Patterns
+
+✅ ✅ Test user interactions, not implementation. 
+
+test('clicking plus increments quantity value', async () => {
+    const user = userEvent.setup()
+    renderWithProviders(<QuantityPicker value={5} onChange={mockOnChange} />)
+    
+    const input = screen.getByRole('spinbutton')
+    const button = screen.getByText('+')
+    
+    await user.click(button)
+    
+    expect(input.value).toBe('6')
+})
+
+✅ Use semantic queries over implementation details
+
+
+// Good: Query by role, text, or label
+const submitButton = screen.getByRole('button', { name: /add to cart/i })
+const emailInput = screen.getByLabelText(/email/i)
+const heading = screen.getByRole('heading', { level: 1 })
+// Avoid: Querying by test IDs unless necessary
+const element = screen.getByTestId('complex-component')
+
+3. Async Testing
+
+✅ Use proper async utilities
+
+test('displays product information after loading', async () => {
+    renderWithProviders(<ProductView product={mockProduct} />)
+    
+    // Wait for async operations
+    await waitFor(() => {
+        expect(screen.getByText(/product name/i)).toBeInTheDocument()
+    })
+    
+    // Or use findBy queries (includes waitFor)
+    const productName = await screen.findByText(/product name/i)
+    expect(productName).toBeInTheDocument()
+})
+
+4. Mocking
+
+✅ Mock at the right level. For component level, you can mock the hooks being used to return data. However, the page level component (e.g cart, checkout, login). We’d like to write a more granular test to ensure the level of code confidence. It is better to mock the test at api level using msw 
+
+🧩 Component Level Testing - Mock Hooks. 
+
+import {useCurrentCustomer, useCurrentBasket} from '../hooks/'
+// Mock the hooks this component uses
+    jest.mock('@salesforce/retail-react-app/app/hooks/use-current-customer', () => ({
+        useCurrentCustomer: () => ({
+            data: { customerId: '123', isRegistered: true },
+            isLoading: false,
+            error: null
+        })
+    }))
+
+    jest.mock('@salesforce/commerce-sdk-react', () => ({
+        useShopperBasketsMutation: () => ({
+            mutate: jest.fn(),
+            isLoading: false,
+            error: null
+        })
+    }))
+
+// ✅ Component level - Mock hooks for isolated testing
+describe('ProductView Component', () => {
+    
+
+    test('renders product information correctly', () => {
+        const mockProduct = {
+            id: 'product-123',
+            name: 'Test Product',
+            price: 29.99
+        }
+
+        renderWithProviders(<ProductView product={mockProduct} />)
+        
+        expect(screen.getByText('Test Product')).toBeInTheDocument()
+        expect(screen.getByText('$29.99')).toBeInTheDocument()
+        expect(screen.getByRole('button', { name: /add to cart/i })).toBeInTheDocument()
+    })
+
+    test('handles add to cart interaction', async () => {
+        const user = userEvent.setup()
+        const mockProduct = { id: 'product-123', name: 'Test Product' }
+        
+        renderWithProviders(<ProductView product={mockProduct} />)
+        
+        const addToCartButton = screen.getByRole('button', { name: /add to cart/i })
+        await user.click(addToCartButton)
+        
+        // Test component behavior, not API calls
+        expect(screen.getByText(/adding to cart/i)).toBeInTheDocument()
+    })
+})
+
+🏪 Page Level Testing - Mock at API Level with MSW.
+For page components (cart, checkout, login), use MSW to mock API responses and test full user workflows. Using prependHandlersToServer for API Mocking to reduce boilderplate code 
+
+🔧 The Utility Function (from jest-setup.js)
+
+
+// From packages/template-retail-react-app/jest-setup.js
+export const prependHandlersToServer = (handlerConfig) => {
+    const handlers = prepareHandlers(handlerConfig)
+    global.server.use(...handlers)
+}
+
+const prepareHandlers = (handlerConfig = []) => {
+    return handlerConfig.map((config) => {
+        return rest[config.method?.toLowerCase() || 'get'](config.path, (req, res, ctx) => {
+            return res(
+                ctx.delay(0),
+                ctx.status(config.status || 200),
+                config.res && ctx.json(config.res(req, res, ctx))
+            )
+        })
+    })
+}
+
+Example code to test cart page level component
+
+import { prependHandlersToServer } from '@salesforce/retail-react-app/app/utils/test-utils'
+describe('Checkout Page Tests', () => {
+    test('can checkout as guest user', async () => {
+        // ✅ Mock checkout-specific endpoints
+        prependHandlersToServer([
+            {
+                path: '*/baskets/:basketId',
+                method: 'get',
+                res: () => ({
+                    basketId: 'basket-123',
+                    productItems: [
+                        {
+                            productId: 'product-1',
+                            productName: 'Test Product',
+                            price: 29.99,
+                            quantity: 2
+                        }
+                    ],
+                    orderTotal: 59.98
+                })
+            },
+            {
+                path: '*/orders',
+                method: 'post',
+                res: (req) => {
+                    // Can access request body to validate data
+                    const orderData = req.body
+                    return {
+                        orderNo: 'ORDER-123',
+                        status: 'created',
+                        orderTotal: orderData.basketTotal,
+                        confirmationEmail: orderData.customerInfo.email
+                    }
+                }
+            },
+            {
+                path: '*/shipping-methods',
+                method: 'get',
+                res: () => ([
+                    {
+                        id: 'standard',
+                        name: 'Standard Shipping',
+                        price: 5.99,
+                        estimatedTime: '5-7 business days'
+                    },
+                    {
+                        id: 'express',
+                        name: 'Express Shipping',
+                        price: 12.99,
+                        estimatedTime: '2-3 business days'
+                    }
+                ])
+            }
+        ])
+
+        const user = userEvent.setup()
+        renderWithProviders(<CheckoutPage />)
+
+        // Fill form and complete checkout...
+        await user.type(screen.getByLabelText(/first name/i), 'John')
+        await user.type(screen.getByLabelText(/email/i), 'john@example.com')
+
+        const placeOrderButton = screen.getByRole('button', { name: /place order/i })
+        await user.click(placeOrderButton)
+
+        await waitFor(() => {
+            expect(screen.getByText('ORDER-123')).toBeInTheDocument()
+        })
+    })
+)
+
+5. Component Testing Structure
+
+✅ Follow AAA pattern (Arrange, Act, Assert)
+
+describe('ProductView Component', () => {
+    test('renders product information correctly', () => {
+        // Arrange
+        const mockProduct = { id: '123', name: 'Test Product', price: 29.99 }
+        const mockAddToCart = jest.fn()
+        
+        // Act
+        renderWithProviders(
+            <ProductView product={mockProduct} addToCart={mockAddToCart} />
+        )
+        
+        // Assert
+        expect(screen.getByText('Test Product')).toBeInTheDocument()
+        expect(screen.getByText('$29.99')).toBeInTheDocument()
+    })
+})
+
+PWA Kit V4 template-retail-react- app guideline - TBD
+
