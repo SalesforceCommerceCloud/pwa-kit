@@ -250,8 +250,8 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
             const email = form.getValues('email')
             // Update basket with guest email
             await updateCustomerForBasket.mutateAsync({
-                parameters: { basketId: basket.basketId },
-                body: { email: email }
+                parameters: {basketId: basket.basketId},
+                body: {email: email}
             })
 
             // Set the flag that "Checkout as Guest" was clicked
