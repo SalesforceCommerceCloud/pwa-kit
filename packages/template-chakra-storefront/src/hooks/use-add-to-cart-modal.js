@@ -21,6 +21,7 @@ import {
     useBreakpointValue
 } from '@chakra-ui/react'
 import {useCurrentBasket} from './use-current-basket'
+import {usePromotions} from '@salesforce/commerce-sdk-react'
 import Link from '../components/link'
 import RecommendedProducts from '../components/recommended-products'
 import {LockIcon} from '../components/icons'
@@ -29,7 +30,10 @@ import {getPriceData, getDisplayVariationValues} from '../utils/product-utils'
 import {EINSTEIN_RECOMMENDERS} from '../../config/constants'
 import DisplayPrice from '../components/display-price'
 import SafePortal from '../components/safe-portal'
+import {useBonusProductSelectionModalContext} from './use-bonus-product-selection-modal'
 import {addToCartModalTheme} from '../theme/components/project/add-to-cart-modal'
+import SelectBonusProductsButton from '../components/select-bonus-products-button'
+import {useModalState} from './use-modal-state'
 
 /**
  * Local configuration for component-specific styling
@@ -69,8 +73,10 @@ AddToCartModalProvider.propTypes = {
 /**
  * Visual feedback (a modal) for adding item to the cart.
  */
-export const AddToCartModal = () => {
+export const AddToCartModal = ({onSelectBonusProductsClick}) => {
     const {isOpen, onClose, data} = useAddToCartModalContext()
+    const bonusProductContext = useBonusProductSelectionModalContext()
+    const {onOpen: onOpenBonusModal} = bonusProductContext || {}
     const {product, itemsAdded = [], selectedQuantity} = data || {}
     const isProductABundle = !!product?.type.bundle
 
@@ -80,6 +86,21 @@ export const AddToCartModal = () => {
         data: basket = {},
         derivedData: {totalItems}
     } = useCurrentBasket()
+
+    const {bonusDiscountLineItems = []} = basket || {}
+
+    // Extract unique promotion IDs
+    const promotionIds = [
+        ...new Set(bonusDiscountLineItems.map((item) => item.promotionId).filter(Boolean))
+    ]
+    // Fetch promotion details
+    const {data: promotions, isLoading: isPromotionsLoading} = usePromotions(
+        {parameters: {ids: promotionIds.join(',')}},
+        {enabled: promotionIds.length > 0}
+    )
+    // Get the first promotion's details
+    const promotionText = promotions?.data?.[0]?.details || ''
+
     const size = useBreakpointValue(addToCartModalTheme.modal.size)
     const {currency, productSubTotal} = basket
     const numberOfItemsAdded = isProductABundle
@@ -370,25 +391,26 @@ export const AddToCartModal = () => {
                                                 </Flex>
                                             )
                                         })}
-                                    {/* TODO: replace with text fetched from promotion */}
-                                    <Text mb={2} fontSize="md" fontWeight="normal" textAlign="left">
-                                        {'Bonus products available!'}
-                                    </Text>
-                                    <Button
-                                        as={Link}
-                                        to="/checkout"
-                                        width="100%"
-                                        variant="outline-gray"
-                                        size="md"
-                                        height={9}
-                                        minWidth={11}
-                                        textStyle="sm"
-                                    >
-                                        {intl.formatMessage({
-                                            defaultMessage: 'Select Bonus Products',
-                                            id: 'add_to_cart_modal.button.select_bonus_products'
-                                        })}
-                                    </Button>
+                                    {bonusDiscountLineItems &&
+                                        bonusDiscountLineItems.length > 0 && (
+                                            <>
+                                                <Text
+                                                    mb={2}
+                                                    fontSize="md"
+                                                    fontWeight="normal"
+                                                    textAlign="left"
+                                                >
+                                                    {promotionText}
+                                                </Text>
+                                                <SelectBonusProductsButton
+                                                    bonusDiscountLineItems={bonusDiscountLineItems}
+                                                    product={product}
+                                                    itemsAdded={itemsAdded}
+                                                    onOpenBonusModal={onOpenBonusModal}
+                                                    onClose={onClose}
+                                                />
+                                            </>
+                                        )}
                                 </Box>
                                 <Box
                                     display={['none', 'none', 'none', 'block']}
@@ -491,39 +513,14 @@ AddToCartModal.propTypes = {
     quantity: PropTypes.number,
     isOpen: PropTypes.bool,
     onClose: PropTypes.func,
+    onSelectBonusProductsClick: PropTypes.func,
     children: PropTypes.any
 }
 
 export const useAddToCartModal = () => {
-    const [state, setState] = useState({
-        isOpen: false,
-        data: null
+    const {isOpen, data, onOpen, onClose} = useModalState({
+        closeOnRouteChange: true,
+        resetDataOnClose: true
     })
-
-    const {pathname} = useLocation()
-    useEffect(() => {
-        if (state.isOpen) {
-            setState({
-                ...state,
-                isOpen: false
-            })
-        }
-    }, [pathname])
-
-    return {
-        isOpen: state.isOpen,
-        data: state.data,
-        onOpen: (data) => {
-            setState({
-                isOpen: true,
-                data
-            })
-        },
-        onClose: () => {
-            setState({
-                isOpen: false,
-                data: null
-            })
-        }
-    }
+    return {isOpen, data, onOpen, onClose}
 }
