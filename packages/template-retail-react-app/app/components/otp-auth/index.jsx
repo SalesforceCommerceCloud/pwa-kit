@@ -14,8 +14,6 @@ import {
     SimpleGrid,
     Stack,
     Text,
-    Icon,
-    Flex,
     HStack,
     Modal,
     ModalBody,
@@ -24,7 +22,6 @@ import {
     ModalHeader,
     ModalOverlay
 } from '../shared/ui'
-import {PhoneIcon} from '@chakra-ui/icons'
 
 const OtpAuth = ({ isOpen, onClose, form, handleSendEmailOtp, handleOtpVerification, onCheckoutAsGuest }) => {
     const OTP_LENGTH = 8
@@ -178,10 +175,8 @@ const OtpAuth = ({ isOpen, onClose, form, handleSendEmailOtp, handleOtpVerificat
                             />
                         </Text>
 
-                        {/* OTP Input with Phone Icon */}
-                        <Flex alignItems="center" spacing={4}>
-                            <Icon as={PhoneIcon} color="blue.500" boxSize={5} mr={4} />
-                            <SimpleGrid columns={OTP_LENGTH} spacing={3}>
+                        {/* OTP Input */}
+                        <SimpleGrid columns={OTP_LENGTH} spacing={3}>
                                 {otpValues.map((value, index) => (
                                     <Input
                                         key={index}
@@ -213,7 +208,6 @@ const OtpAuth = ({ isOpen, onClose, form, handleSendEmailOtp, handleOtpVerificat
                                     />
                                 ))}
                             </SimpleGrid>
-                        </Flex>
 
                         {/* Loading indicator during verification */}
                         {isVerifying && (
