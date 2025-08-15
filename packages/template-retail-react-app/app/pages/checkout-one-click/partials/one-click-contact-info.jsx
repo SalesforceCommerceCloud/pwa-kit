@@ -134,6 +134,13 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
         return emailRegex.test(email)
     }
 
+    // Helper function to validate email format
+    const isValidEmail = (email) => {
+        const emailRegex =
+            /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/
+        return emailRegex.test(email)
+    }
+
     // Handle email field blur/focus events
     const handleEmailBlur = async (e) => {
         // Call original React Hook Form blur handler if it exists
