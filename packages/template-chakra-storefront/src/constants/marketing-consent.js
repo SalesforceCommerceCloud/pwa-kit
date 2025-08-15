@@ -7,20 +7,20 @@
 
 // Marketing consent status constants
 export const CONSENT_STATUS = SFDC_EXT_MARKETING_CONSENT_ENABLED && {
-    OPT_IN: 'OPT_IN',
-    OPT_OUT: 'OPT_OUT'
+    OPT_IN: 'opt_in',
+    OPT_OUT: 'opt_out'
 }
 
 // Marketing consent channels, as configured by an administrator.
 export const CONSENT_CHANNELS = SFDC_EXT_MARKETING_CONSENT_ENABLED && {
-    EMAIL: 'EMAIL',
-    SMS: 'SMS'
+    EMAIL: 'email',
+    SMS: 'sms'
 }
 
 // Marketing consent tags, as configured by an administrator.
 export const CONSENT_TAGS = SFDC_EXT_MARKETING_CONSENT_ENABLED && {
-    HOMEPAGE_BANNER: 'HOMEPAGE_BANNER',
-    USER_PROFILE: 'USER_PROFILE',
-    CHECKOUT_PAGE: 'CHECKOUT_PAGE',
-    REGISTRATION: 'REGISTRATION'
+    HOMEPAGE_BANNER: 'homepage_banner',
+    USER_PROFILE: 'user_profile',
+    CHECKOUT_PAGE: 'checkout_page',
+    REGISTRATION: 'registration'
 }

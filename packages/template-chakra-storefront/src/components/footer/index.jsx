@@ -10,6 +10,7 @@ import {
     Alert,
     Box,
     Button,
+    Link,
     Flex,
     GridItem,
     Heading,
@@ -20,15 +21,14 @@ import {
     Text,
     useSlotRecipe
 } from '@chakra-ui/react'
-import {useIntl} from 'react-intl'
+import {useIntl, FormattedMessage} from 'react-intl'
 
 import LinksList from '../../components/links-list'
 import SocialIcons from '../../components/social-icons'
 import {getPathWithLocale} from '../../utils/url'
 import LocaleText from '../../components/locale-text'
 import useMultiSite from '../../hooks/use-multi-site'
-import {useMarketingConsent} from '../../hooks'
-import {CONSENT_CHANNELS, CONSENT_STATUS, CONSENT_TAGS} from '../../constants/marketing-consent'
+import {useSubscription} from './hooks/use-subscription'
 
 const Footer = ({...otherProps}) => {
     const recipe = useSlotRecipe({key: 'footer'})
@@ -206,93 +206,53 @@ const Subscribe = ({...otherProps}) => {
     const styles = recipe()
     const intl = useIntl()
     const {formatMessage} = intl
-    const [email, setEmail] = useState('')
-    const [message, setMessage] = useState(null)
-    const [messageType, setMessageType] = useState('success')
-    const {fetchConsentItems, submitConsent, isLoading} = useMarketingConsent()
-    const PAGE_TAG = CONSENT_TAGS.HOMEPAGE_BANNER
-    const EMAIL_REGEX = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9]+(\.[a-zA-Z0-9]+)*\.[a-zA-Z]{2,}$/
+    const {state, actions} = useSubscription()
 
-    const handleSignUp = async () => {
-        if (!email) {
-            setMessage('Please enter your email address')
-            setMessageType('error')
-            return
-        }
+    const messages = useMemo(() => {
+        const termsConditions = formatMessage({
+            id: 'footer.link.terms_conditions',
+            defaultMessage: 'Terms & Conditions'
+        })
+        const privacyPolicy = formatMessage({
+            id: 'footer.link.privacy_policy',
+            defaultMessage: 'Privacy Policy'
+        })
 
-        // Basic email validation
-        if (!EMAIL_REGEX.test(email)) {
-            setMessage('Please enter a valid email address')
-            setMessageType('error')
-            return
-        }
-
-        try {
-            setMessage(null)
-
-            // Fetch consent items with HOMEPAGE_BANNER tag
-            const consentData = await fetchConsentItems(PAGE_TAG)
-
-            // Filter items that have HOMEPAGE_BANNER in their tags
-            const homepageBannerItems =
-                consentData.data?.filter((item) => item.tags?.includes(PAGE_TAG)) || []
-
-            if (homepageBannerItems.length === 0) {
-                setMessage('No subscription options available at this time')
-                setMessageType('error')
-                return
-            }
-
-            // Use the first available consent item for submission
-            // (There may be one or more subscriptionIds available for a single channel.)
-            const firstConsentItem = homepageBannerItems[0]
-            const consentItem = {
-                subscriptionId: firstConsentItem.subscriptionId,
-                contactPointValue: email,
-                channel: CONSENT_CHANNELS.EMAIL,
-                status: CONSENT_STATUS.OPT_IN
-            }
-
-            // Submit the consent
-            const result = await submitConsent(consentItem)
-
-            // Check if the submission was successful
-            if (result?.status === CONSENT_STATUS.OPT_IN) {
-                setMessage('Thank you for subscribing! You will receive our latest updates.')
-                setMessageType('success')
-                setEmail('')
-            } else {
-                setMessage('Subscription failed. Please try again later.')
-                setMessageType('error')
-            }
-        } catch (error) {
-            console.error('Subscription error:', error)
-            setMessage('Something went wrong. Please try again later.')
-            setMessageType('error')
-        }
-    }
-
-    const messages = useMemo(
-        () => ({
+        return {
             heading: formatMessage({
                 id: 'footer.subscribe.heading.first_to_know',
-                defaultMessage: 'Be the first to know'
+                defaultMessage: 'Subscribe to Stay Updated'
             }),
             description: formatMessage({
                 id: 'footer.subscribe.description.sign_up',
-                defaultMessage: 'Sign up to stay in the loop about the hottest deals'
+                defaultMessage: 'Be the first to know about latest offers, news, tips, and more.'
             }),
             emailAriaLabel: formatMessage({
                 id: 'footer.subscribe.email.assistive_msg',
-                defaultMessage: 'Email address for newsletter'
+                defaultMessage: 'Email address for newsletter.'
             }),
             buttonSignUp: formatMessage({
                 id: 'footer.subscribe.button.sign_up',
-                defaultMessage: 'Sign Up'
-            })
-        }),
-        [intl]
-    )
+                defaultMessage: 'Subscribe'
+            }),
+            emailPlaceholderText: formatMessage({
+                id: 'footer.subscribe.email.placeholder_text',
+                defaultMessage: 'Enter your email address...'
+            }),
+            termsConditions,
+            privacyPolicy,
+            disclaimer: (
+                <FormattedMessage
+                    id="footer.subscribe.disclaimer"
+                    defaultMessage="By submitting this, I agree to the {terms} and {privacy}."
+                    values={{
+                        terms: <Link href="/">{termsConditions}</Link>,
+                        privacy: <Link href="/">{privacyPolicy}</Link>
+                    }}
+                />
+            )
+        }
+    }, [intl])
 
     return (
         <Box css={styles.subscribe} {...otherProps}>
@@ -301,10 +261,10 @@ const Subscribe = ({...otherProps}) => {
             </Heading>
             <Text css={styles.subscribeMessage}>{messages.description}</Text>
 
-            {message && (
-                <Alert.Root status={messageType} mb={4} borderRadius="md">
+            {state.feedback?.message && (
+                <Alert.Root status={state.feedback.type} mb={4} borderRadius="md">
                     <Alert.Indicator />
-                    <Alert.Description>{message}</Alert.Description>
+                    <Alert.Description>{state.feedback.message}</Alert.Description>
                 </Alert.Root>
             )}
 
@@ -312,16 +272,16 @@ const Subscribe = ({...otherProps}) => {
                 <Flex w="full" maxW="sm">
                     <Input
                         type="email"
-                        placeholder="you@email.com"
+                        placeholder={messages.emailPlaceholderText}
                         aria-label={messages.emailAriaLabel}
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
+                        value={state.email}
+                        onChange={(e) => actions.setEmail(e.target.value)}
                         onKeyDown={(e) => {
-                            if (e.key === 'Enter' && !isLoading) {
-                                handleSignUp()
+                            if (e.key === 'Enter' && !state.isLoading) {
+                                actions.submit()
                             }
                         }}
-                        disabled={isLoading}
+                        disabled={state.isLoading}
                         id="subscribe-email"
                         css={styles.subscribeField}
                         borderEndEndRadius={0}
@@ -333,14 +293,15 @@ const Subscribe = ({...otherProps}) => {
                     />
                     <Button
                         variant="footer"
-                        onClick={handleSignUp}
-                        loading={isLoading}
+                        onClick={actions.submit}
+                        loading={state.isLoading}
                         borderEndStartRadius={0}
                         borderStartStartRadius={0}
                     >
                         {messages.buttonSignUp}
                     </Button>
                 </Flex>
+                <Text css={styles.subscribeDisclaimer}>{messages.disclaimer}</Text>
             </Box>
 
             <SocialIcons variant="flex-start" pinterestInnerColor="black" />

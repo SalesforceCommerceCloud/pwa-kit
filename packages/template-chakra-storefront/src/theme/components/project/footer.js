@@ -15,6 +15,7 @@ export default defineSlotRecipe({
         'subscribeButtonContainer',
         'subscribeHeading',
         'subscribeMessage',
+        'subscribeDisclaimer',
         'localeSelectorWrapper',
         'localeSelectorRoot',
         'localeSelectorField',
@@ -56,6 +57,10 @@ export default defineSlotRecipe({
         subscribeMessage: {
             fontSize: 'sm',
             marginBottom: 4
+        },
+        subscribeDisclaimer: {
+            fontSize: 'sm',
+            marginTop: 2
         },
         localeSelectorWrapper: {
             display: 'inline-block',

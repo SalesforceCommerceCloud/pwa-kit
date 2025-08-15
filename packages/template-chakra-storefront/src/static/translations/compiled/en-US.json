@@ -465,12 +465,6 @@
       "value": "Scroll carousel right"
     }
   ],
-  "cart.info.removed_from_cart": [
-    {
-      "type": 0,
-      "value": "Item removed from cart"
-    }
-  ],
   "cart.product_edit_modal.modal_label": [
     {
       "type": 0,
@@ -959,12 +953,6 @@
       "value": "No, keep item"
     }
   ],
-  "confirmation_modal.remove_cart_item.action.remove": [
-    {
-      "type": 0,
-      "value": "Remove"
-    }
-  ],
   "confirmation_modal.remove_cart_item.action.yes": [
     {
       "type": 0,
@@ -977,22 +965,10 @@
       "value": "No, keep item"
     }
   ],
-  "confirmation_modal.remove_cart_item.assistive_msg.remove": [
-    {
-      "type": 0,
-      "value": "Remove unavailable products"
-    }
-  ],
   "confirmation_modal.remove_cart_item.assistive_msg.yes": [
     {
       "type": 0,
       "value": "Yes, remove item"
-    }
-  ],
-  "confirmation_modal.remove_cart_item.message.need_to_remove_due_to_unavailability": [
-    {
-      "type": 0,
-      "value": "Some items are no longer available online and will be removed from your cart."
     }
   ],
   "confirmation_modal.remove_cart_item.message.sure_to_remove": [
@@ -1005,12 +981,6 @@
     {
       "type": 0,
       "value": "Confirm Remove Item"
-    }
-  ],
-  "confirmation_modal.remove_cart_item.title.items_unavailable": [
-    {
-      "type": 0,
-      "value": "Items Unavailable"
     }
   ],
   "confirmation_modal.remove_wishlist_item.action.no": [
@@ -1035,6 +1005,12 @@
     {
       "type": 0,
       "value": "Confirm Remove Item"
+    }
+  ],
+  "consent_card.title.my_communications": [
+    {
+      "type": 0,
+      "value": "Marketing Communication Preferences"
     }
   ],
   "contact_info.action.sign_out": [
@@ -1443,6 +1419,18 @@
       "value": "Our Company"
     }
   ],
+  "footer.error.enter_valid_email": [
+    {
+      "type": 0,
+      "value": "Enter a valid email address."
+    }
+  ],
+  "footer.error.generic_error": [
+    {
+      "type": 0,
+      "value": "We couldn't process the subscription. Try again."
+    }
+  ],
   "footer.link.about_us": [
     {
       "type": 0,
@@ -1506,25 +1494,59 @@
   "footer.subscribe.button.sign_up": [
     {
       "type": 0,
-      "value": "Sign Up"
+      "value": "Subscribe"
     }
   ],
   "footer.subscribe.description.sign_up": [
     {
       "type": 0,
-      "value": "Sign up to stay in the loop about the hottest deals"
+      "value": "Be the first to know about latest offers, news, tips, and more."
+    }
+  ],
+  "footer.subscribe.disclaimer": [
+    {
+      "type": 0,
+      "value": "By submitting this, I agree to the "
+    },
+    {
+      "type": 1,
+      "value": "terms"
+    },
+    {
+      "type": 0,
+      "value": " and "
+    },
+    {
+      "type": 1,
+      "value": "privacy"
+    },
+    {
+      "type": 0,
+      "value": "."
     }
   ],
   "footer.subscribe.email.assistive_msg": [
     {
       "type": 0,
-      "value": "Email address for newsletter"
+      "value": "Email address for newsletter."
+    }
+  ],
+  "footer.subscribe.email.placeholder_text": [
+    {
+      "type": 0,
+      "value": "Enter your email address..."
     }
   ],
   "footer.subscribe.heading.first_to_know": [
     {
       "type": 0,
-      "value": "Be the first to know"
+      "value": "Subscribe to Stay Updated"
+    }
+  ],
+  "footer.success_confirmation": [
+    {
+      "type": 0,
+      "value": "Thanks for subscribing!"
     }
   ],
   "form_action_buttons.button.cancel": [
@@ -1561,86 +1583,6 @@
     {
       "type": 0,
       "value": "Wishlist"
-    }
-  ],
-  "global.error.create_account": [
-    {
-      "type": 0,
-      "value": "This feature is not currently available. You must create an account to access this feature."
-    }
-  ],
-  "global.error.feature_unavailable": [
-    {
-      "type": 0,
-      "value": "This feature is not currently available."
-    }
-  ],
-  "global.error.invalid_token": [
-    {
-      "type": 0,
-      "value": "Invalid token, please try again."
-    }
-  ],
-  "global.error.something_went_wrong": [
-    {
-      "type": 0,
-      "value": "Something went wrong. Try again!"
-    }
-  ],
-  "global.info.added_to_wishlist": [
-    {
-      "type": 1,
-      "value": "quantity"
-    },
-    {
-      "type": 0,
-      "value": " "
-    },
-    {
-      "offset": 0,
-      "options": {
-        "one": {
-          "value": [
-            {
-              "type": 0,
-              "value": "item"
-            }
-          ]
-        },
-        "other": {
-          "value": [
-            {
-              "type": 0,
-              "value": "items"
-            }
-          ]
-        }
-      },
-      "pluralType": "cardinal",
-      "type": 6,
-      "value": "quantity"
-    },
-    {
-      "type": 0,
-      "value": " added to wishlist"
-    }
-  ],
-  "global.info.already_in_wishlist": [
-    {
-      "type": 0,
-      "value": "Item is already in wishlist"
-    }
-  ],
-  "global.info.removed_from_wishlist": [
-    {
-      "type": 0,
-      "value": "Item removed from wishlist"
-    }
-  ],
-  "global.link.added_to_wishlist.view_wishlist": [
-    {
-      "type": 0,
-      "value": "View"
     }
   ],
   "header.button.assistive_msg.clear_search": [
@@ -2845,18 +2787,6 @@
       "value": " from wishlist"
     }
   ],
-  "product_tile.badge.label.new": [
-    {
-      "type": 0,
-      "value": "New"
-    }
-  ],
-  "product_tile.badge.label.sale": [
-    {
-      "type": 0,
-      "value": "Sale"
-    }
-  ],
   "product_view.button.add_bundle_to_cart": [
     {
       "type": 0,
@@ -2989,12 +2919,6 @@
     {
       "type": 0,
       "value": "Profile Form"
-    }
-  ],
-  "consent_card.title.my_communications": [
-    {
-      "type": 0,
-      "value": "Marketing Communication Preferences"
     }
   ],
   "promo_code_fields.button.apply": [
@@ -3373,18 +3297,6 @@
     {
       "type": 0,
       "value": "Viewing stores near your location"
-    }
-  ],
-  "store_locator.dropdown.germany": [
-    {
-      "type": 0,
-      "value": "Germany"
-    }
-  ],
-  "store_locator.dropdown.united_states": [
-    {
-      "type": 0,
-      "value": "United States"
     }
   ],
   "store_locator.error.agree_to_share_your_location": [
