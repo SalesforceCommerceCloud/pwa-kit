@@ -166,9 +166,15 @@ export const BonusProductSelectionModal = () => {
     const bonusProducts = data?.bonusDiscountLineItems || []
     const maxBonusItems = data?.maxBonusItems || 0
 
-    // Get product IDs for fetching product data
-    const productIds = bonusProducts
+    // Get product IDs for fetching product data, deduplicating by productId
+    const uniqueBonusProducts = bonusProducts
         .flatMap((item) => item.bonusProducts || [])
+        .filter(
+            (product, index, self) =>
+                index === self.findIndex((p) => p.productId === product.productId)
+        )
+
+    const productIds = uniqueBonusProducts
         .map((product) => product.productId)
         .filter(Boolean)
         .join(',')
@@ -233,24 +239,22 @@ export const BonusProductSelectionModal = () => {
                         ) : (
                             <VStack spacing="4">
                                 <SimpleGrid columns={{base: 1, md: 3}} spacing="4" width="100%">
-                                    {bonusProducts
-                                        .flatMap((item) => item.bonusProducts || [])
-                                        .map((product) => {
-                                            const foundProductData = productData?.data?.find(
-                                                (p) => p.id === product.productId
-                                            )
+                                    {uniqueBonusProducts.map((product) => {
+                                        const foundProductData = productData?.data?.find(
+                                            (p) => p.id === product.productId
+                                        )
 
-                                            return (
-                                                <BonusProductItem
-                                                    key={product.productId}
-                                                    product={product}
-                                                    productData={foundProductData}
-                                                    foundProductData={foundProductData}
-                                                    onToggle={() => {}}
-                                                    isLoading={isLoading}
-                                                />
-                                            )
-                                        })}
+                                        return (
+                                            <BonusProductItem
+                                                key={product.productId}
+                                                product={product}
+                                                productData={foundProductData}
+                                                foundProductData={foundProductData}
+                                                onToggle={() => {}}
+                                                isLoading={isLoading}
+                                            />
+                                        )
+                                    })}
                                 </SimpleGrid>
                             </VStack>
                         )}
