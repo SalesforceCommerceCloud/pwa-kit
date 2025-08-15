@@ -19,7 +19,15 @@ import {isRemote} from '../ssr-server'
 export const defaultPwaKitSecurityHeaders = (req, res, next) => {
     /** CSP-compatible origin for Runtime Admin. */
     // localhost doesn't include a protocol because different browsers behave differently :\
-    const runtimeAdmin = isRemote() ? 'https://runtime.commercecloud.com' : 'localhost:*'
+    // const runtimeAdmin = isRemote() ? 'https://runtime.commercecloud.com' : 'localhost:*'
+    const runtimeAdmin = [
+        'localhost:*',
+        'https://runtime.commercecloud.com',
+        'https://runtime-admin-hf-ecom-dev.mobify-storefront.com',
+        'https://runtime-admin-hf-ecom-soak.mobify-storefront.com',
+        'https://runtime-admin-hf-ecom-stage.mobify-storefront.com',
+        'https://runtime-admin-hf-ecom-production.mobify-storefront.com'
+    ]
     const siteDotCom = '*.site.com'
     /**
      * Map of directive names/values that are required for PWA Kit to work. Array values will be
@@ -27,11 +35,11 @@ export const defaultPwaKitSecurityHeaders = (req, res, next) => {
      * @type Object.<string, string[] | boolean>
      */
     const directives = {
-        'connect-src': ["'self'", runtimeAdmin, '*.salesforce-scrt.com'],
+        'connect-src': ["'self'", ...runtimeAdmin, '*.salesforce-scrt.com'],
         'frame-src': [siteDotCom],
-        'frame-ancestors': [runtimeAdmin],
+        'frame-ancestors': runtimeAdmin,
         'img-src': ["'self'", 'data:'],
-        'script-src': ["'self'", "'unsafe-eval'", runtimeAdmin, siteDotCom],
+        'script-src': ["'self'", "'unsafe-eval'", ...runtimeAdmin, siteDotCom],
         // Always upgrade insecure requests when deployed, never upgrade on local dev server
         'upgrade-insecure-requests': isRemote()
     }
