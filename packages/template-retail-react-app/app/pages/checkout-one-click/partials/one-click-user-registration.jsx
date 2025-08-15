@@ -15,7 +15,11 @@ import {
     Heading
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 
-export default function UserRegistration({ enableUserRegistration, setEnableUserRegistration, isGuestCheckout = false }) {
+export default function UserRegistration({
+    enableUserRegistration,
+    setEnableUserRegistration,
+    isGuestCheckout = false
+}) {
     const handleUserRegistrationChange = (e) => {
         setEnableUserRegistration(e.target.checked)
     }

@@ -344,23 +344,7 @@ describe('OtpAuth', () => {
             expect(mockOnClose).toHaveBeenCalled()
         })
 
-        test.skip('clicking "Resend code" calls handleSendEmailOtp', async () => {
-            const user = userEvent.setup()
-            renderWithProviders(
-                <OtpAuth
-                    isOpen={true}
-                    onClose={mockOnClose}
-                    form={mockForm}
-                    handleOtpVerification={mockHandleOtpVerification}
-                    handleSendEmailOtp={mockHandleSendEmailOtp}
-                />
-            )
-
-            const resendButton = screen.getByText('Resend code')
-            await user.click(resendButton)
-
-            expect(mockHandleSendEmailOtp).toHaveBeenCalledWith('test@example.com')
-        })
+        test('clicking "Resend code" calls handleSendEmailOtp', async () => {
             const user = userEvent.setup()
             renderWithProviders(
                 <OtpAuth

@@ -2,12 +2,12 @@
  * Copyright (c) 2025, Salesforce, Inc.
  * All rights reserved.
  * SPDX-License-Identifier: BSD-3-Clause
- * For full license text, see the LICENSE file in the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
+ * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
 import {render, screen} from '@testing-library/react'
 import {IntlProvider} from 'react-intl'
-import UserRegistration from './one-click-user-registration'
+import UserRegistration from '@salesforce/retail-react-app/../../app/pages/checkout-one-click/partials/one-click-user-registration'
 
 const renderWithProviders = (component) => {
     return render(

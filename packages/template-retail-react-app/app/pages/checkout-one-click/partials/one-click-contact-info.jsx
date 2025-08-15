@@ -51,7 +51,7 @@ import {isAbsoluteURL} from '@salesforce/retail-react-app/app/page-designer/util
 import {useAppOrigin} from '@salesforce/retail-react-app/app/hooks/use-app-origin'
 import {API_ERROR_MESSAGE} from '@salesforce/retail-react-app/app/constants'
 
-const ContactInfo = ({ isSocialEnabled = false, idps = [], onRegisteredUserChoseGuest }) => {
+const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseGuest}) => {
     const {formatMessage} = useIntl()
     const navigate = useNavigation()
     const appOrigin = useAppOrigin()
@@ -171,8 +171,8 @@ const ContactInfo = ({ isSocialEnabled = false, idps = [], onRegisteredUserChose
             const email = form.getValues('email')
             // Update basket with guest email
             await updateCustomerForBasket.mutateAsync({
-                parameters: { basketId: basket.basketId },
-                body: { email: email }
+                parameters: {basketId: basket.basketId},
+                body: {email: email}
             })
 
             // Set the flag that "Checkout as Guest" was clicked

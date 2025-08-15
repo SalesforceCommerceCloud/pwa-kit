@@ -23,7 +23,14 @@ import {
     ModalOverlay
 } from '../shared/ui'
 
-const OtpAuth = ({ isOpen, onClose, form, handleSendEmailOtp, handleOtpVerification, onCheckoutAsGuest }) => {
+const OtpAuth = ({
+    isOpen,
+    onClose,
+    form,
+    handleSendEmailOtp,
+    handleOtpVerification,
+    onCheckoutAsGuest
+}) => {
     const OTP_LENGTH = 8
     const [otpValues, setOtpValues] = useState(new Array(OTP_LENGTH).fill(''))
     const [resendTimer, setResendTimer] = useState(0)
@@ -177,37 +184,37 @@ const OtpAuth = ({ isOpen, onClose, form, handleSendEmailOtp, handleOtpVerificat
 
                         {/* OTP Input */}
                         <SimpleGrid columns={OTP_LENGTH} spacing={3}>
-                                {otpValues.map((value, index) => (
-                                    <Input
-                                        key={index}
-                                        ref={(el) => (inputRefs.current[index] = el)}
-                                        value={value}
-                                        onChange={(e) => handleOtpChange(index, e.target.value)}
-                                        onKeyDown={(e) => handleKeyDown(index, e)}
-                                        onPaste={handlePaste}
-                                        type="text"
-                                        inputMode="numeric"
-                                        maxLength={1}
-                                        textAlign="center"
-                                        fontSize="lg"
-                                        fontWeight="bold"
-                                        size="lg"
-                                        width="48px"
-                                        height="56px"
-                                        borderRadius="md"
-                                        borderColor="gray.300"
-                                        borderWidth="2px"
-                                        disabled={isVerifying}
-                                        _focus={{
-                                            borderColor: 'blue.500',
-                                            boxShadow: '0 0 0 1px var(--chakra-colors-blue-500)'
-                                        }}
-                                        _hover={{
-                                            borderColor: 'gray.400'
-                                        }}
-                                    />
-                                ))}
-                            </SimpleGrid>
+                            {otpValues.map((value, index) => (
+                                <Input
+                                    key={index}
+                                    ref={(el) => (inputRefs.current[index] = el)}
+                                    value={value}
+                                    onChange={(e) => handleOtpChange(index, e.target.value)}
+                                    onKeyDown={(e) => handleKeyDown(index, e)}
+                                    onPaste={handlePaste}
+                                    type="text"
+                                    inputMode="numeric"
+                                    maxLength={1}
+                                    textAlign="center"
+                                    fontSize="lg"
+                                    fontWeight="bold"
+                                    size="lg"
+                                    width="48px"
+                                    height="56px"
+                                    borderRadius="md"
+                                    borderColor="gray.300"
+                                    borderWidth="2px"
+                                    disabled={isVerifying}
+                                    _focus={{
+                                        borderColor: 'blue.500',
+                                        boxShadow: '0 0 0 1px var(--chakra-colors-blue-500)'
+                                    }}
+                                    _hover={{
+                                        borderColor: 'gray.400'
+                                    }}
+                                />
+                            ))}
+                        </SimpleGrid>
 
                         {/* Loading indicator during verification */}
                         {isVerifying && (
