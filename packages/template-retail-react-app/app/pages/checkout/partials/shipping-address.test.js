@@ -23,6 +23,23 @@ jest.mock('@salesforce/retail-react-app/app/hooks/use-toast')
 jest.mock('@salesforce/retail-react-app/app/hooks/use-multiship')
 jest.mock('@salesforce/retail-react-app/app/hooks/use-pickup-shipment')
 
+// Mock constants with a configurable function
+let mockMultishipEnabled = true
+
+jest.mock('@salesforce/retail-react-app/app/constants', () => ({
+    get DEFAULT_SHIPMENT_ID() {
+        return 'me'
+    },
+    get MULTISHIP_IS_ENABLED() {
+        return mockMultishipEnabled
+    }
+}))
+
+// Helper function to set MULTISHIP_IS_ENABLED for tests
+const setMultishipEnabled = (enabled) => {
+    mockMultishipEnabled = enabled
+}
+
 // Mock mutation hooks to prevent QueryClient errors
 const mockMutateAsync = jest.fn().mockResolvedValue({})
 const mockCustomerMutateAsync = jest.fn().mockResolvedValue({})
@@ -232,6 +249,9 @@ const renderWithIntl = (component) => {
 
 describe('ShippingAddress', () => {
     beforeEach(() => {
+        // Reset MULTISHIP_IS_ENABLED to default value for test isolation
+        setMultishipEnabled(true)
+
         mockCheckoutContext.goToStep.mockClear()
         mockShowToast.mockClear()
         mockMutateAsync.mockClear()
@@ -345,7 +365,7 @@ describe('ShippingAddress', () => {
         expect(editButton).toHaveTextContent('Edit Shipping Address')
     })
 
-    it('should show edit action button with correct label for multi-shipping', () => {
+    it('should show edit action button with correct label for multi-shipping when enabled', () => {
         // Mock that we're in editing mode with multiple items
         const editingContext = {
             ...mockCheckoutContext,
@@ -511,6 +531,108 @@ describe('ShippingAddress', () => {
             expect(screen.getByTestId('shipping-address-selection')).toBeInTheDocument()
             // Multi-shipping should not be available for single item
             expect(screen.queryByTestId('multi-shipping')).not.toBeInTheDocument()
+        })
+    })
+
+    describe('MULTISHIP_IS_ENABLED behavior', () => {
+        describe('when MULTISHIP_IS_ENABLED is true', () => {
+            beforeEach(() => {
+                setMultishipEnabled(true)
+            })
+
+            it('should show "Deliver to Multiple Addresses" button when MULTISHIP_IS_ENABLED is true', () => {
+                // Mock that we're in editing mode with multiple items
+                const editingContext = {
+                    ...mockCheckoutContext,
+                    step: 3 // SHIPPING_ADDRESS
+                }
+                useCheckout.mockReturnValue(editingContext)
+
+                renderWithIntl(<ShippingAddress {...defaultProps} />)
+
+                const editActionButton = screen.getByTestId('edit-action-button')
+                expect(editActionButton).toBeInTheDocument()
+                expect(editActionButton).toHaveTextContent('Deliver to Multiple Addresses')
+            })
+
+            it('should handle "Deliver to Multiple Addresses" button click to toggle multi-shipping', () => {
+                // Mock that we're in editing mode
+                const editingContext = {
+                    ...mockCheckoutContext,
+                    step: 3 // SHIPPING_ADDRESS
+                }
+                useCheckout.mockReturnValue(editingContext)
+
+                renderWithIntl(<ShippingAddress {...defaultProps} />)
+
+                const editActionButton = screen.getByTestId('edit-action-button')
+                fireEvent.click(editActionButton)
+                expect(screen.getByTestId('multi-shipping')).toBeInTheDocument()
+            })
+        })
+
+        describe('when MULTISHIP_IS_ENABLED is false', () => {
+            beforeEach(() => {
+                setMultishipEnabled(false)
+            })
+
+            it('should not show "Deliver to Multiple Addresses" button when MULTISHIP_IS_ENABLED is false', () => {
+                const editingContext = {
+                    ...mockCheckoutContext,
+                    step: 3 // SHIPPING_ADDRESS
+                }
+                useCheckout.mockReturnValue(editingContext)
+
+                renderWithIntl(<ShippingAddress {...defaultProps} />)
+
+                expect(screen.queryByTestId('edit-action-button')).not.toBeInTheDocument()
+            })
+
+            it('should still show shipping address selection when MULTISHIP_IS_ENABLED is false', () => {
+                // Mock that we're in editing mode
+                const editingContext = {
+                    ...mockCheckoutContext,
+                    step: 3 // SHIPPING_ADDRESS
+                }
+                useCheckout.mockReturnValue(editingContext)
+
+                renderWithIntl(<ShippingAddress {...defaultProps} />)
+
+                // Should still show shipping address selection
+                expect(screen.getByTestId('shipping-address-selection')).toBeInTheDocument()
+                // But no "Deliver to Multiple Addresses" button
+                expect(screen.queryByTestId('edit-action-button')).not.toBeInTheDocument()
+            })
+        })
+
+        describe('common behavior regardless of MULTISHIP_IS_ENABLED setting', () => {
+            it('should show edit mode when in shipping address step', () => {
+                setMultishipEnabled(true) // Test with enabled
+                const editingContext = {
+                    ...mockCheckoutContext,
+                    step: 3 // SHIPPING_ADDRESS
+                }
+                useCheckout.mockReturnValue(editingContext)
+
+                renderWithIntl(<ShippingAddress {...defaultProps} />)
+
+                const toggleCard = screen.getByTestId('toggle-card')
+                expect(toggleCard).toHaveAttribute('data-editing', 'true')
+            })
+
+            it('should show summary mode when not in shipping address step', () => {
+                setMultishipEnabled(false) // Test with disabled
+                const summaryContext = {
+                    ...mockCheckoutContext,
+                    step: 4 // SHIPPING_OPTIONS
+                }
+                useCheckout.mockReturnValue(summaryContext)
+
+                renderWithIntl(<ShippingAddress {...defaultProps} />)
+
+                const toggleCard = screen.getByTestId('toggle-card')
+                expect(toggleCard).toHaveAttribute('data-editing', 'false')
+            })
         })
     })
 })

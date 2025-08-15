@@ -26,7 +26,7 @@ import ShippingMultiAddress from '@salesforce/retail-react-app/app/pages/checkou
 import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
 import {useMultiship} from '@salesforce/retail-react-app/app/hooks/use-multiship'
 import {usePickupShipment} from '@salesforce/retail-react-app/app/hooks/use-pickup-shipment'
-import {DEFAULT_SHIPMENT_ID} from '@salesforce/retail-react-app/app/constants'
+import {DEFAULT_SHIPMENT_ID, MULTISHIP_IS_ENABLED} from '@salesforce/retail-react-app/app/constants'
 
 const submitButtonMessage = defineMessage({
     defaultMessage: 'Continue to Shipping Method',
@@ -204,13 +204,19 @@ export default function ShippingAddress() {
                 id: 'toggle_card.action.editShippingAddress'
             })}
             editAction={
-                isMultiShipping
-                    ? formatMessage(shipToOneAddressLabel)
-                    : formatMessage(deliverToMultipleAddressesLabel)
+                MULTISHIP_IS_ENABLED
+                    ? isMultiShipping
+                        ? formatMessage(shipToOneAddressLabel)
+                        : formatMessage(deliverToMultipleAddressesLabel)
+                    : null
             }
-            onEditActionClick={async () => {
-                setIsMultiShipping(!isMultiShipping)
-            }}
+            onEditActionClick={
+                MULTISHIP_IS_ENABLED
+                    ? async () => {
+                          setIsMultiShipping(!isMultiShipping)
+                      }
+                    : null
+            }
         >
             <ToggleCardEdit>
                 {!isMultiShipping ? (
