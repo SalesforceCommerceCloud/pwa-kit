@@ -22,6 +22,7 @@ import {
     useSlotRecipe
 } from '@chakra-ui/react'
 import {useIntl, FormattedMessage} from 'react-intl'
+import {AlertIcon} from '../icons'
 
 import LinksList from '../../components/links-list'
 import SocialIcons from '../../components/social-icons'
@@ -203,10 +204,10 @@ export default Footer
 
 const Subscribe = ({...otherProps}) => {
     const recipe = useSlotRecipe({key: 'footer'})
-    const styles = recipe()
     const intl = useIntl()
     const {formatMessage} = intl
     const {state, actions} = useSubscription()
+    const styles = recipe({alertStatus: state.feedback?.type === 'error' ? 'error' : 'success'})
 
     const messages = useMemo(() => {
         const termsConditions = formatMessage({
@@ -270,9 +271,13 @@ const Subscribe = ({...otherProps}) => {
             <Text css={styles.subscribeMessage}>{messages.description}</Text>
 
             {state.feedback?.message && (
-                <Alert.Root status={state.feedback.type} mb={4} borderRadius="md">
-                    <Alert.Indicator />
-                    <Alert.Description>{state.feedback.message}</Alert.Description>
+                <Alert.Root status={state.feedback.type} css={styles.subscribeAlert}>
+                    <Alert.Indicator>
+                        <AlertIcon css={styles.subscribeAlertIcon} />
+                    </Alert.Indicator>
+                    <Alert.Description css={styles.subscribeAlertDescription}>
+                        {state.feedback.message}
+                    </Alert.Description>
                 </Alert.Root>
             )}
 
