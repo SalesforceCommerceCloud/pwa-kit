@@ -428,55 +428,6 @@ describe('OpenTelemetry Utilities', () => {
         })
     })
 
-    describe('traceChildPerformance', () => {
-        test('should trace child performance successfully', async () => {
-            const mockFn = jest.fn().mockResolvedValue('child-result')
-
-            const result = await opentelemetryUtils.traceChildPerformance('child-perf', mockFn)
-
-            expect(mockTracer.startSpan).toHaveBeenCalledWith(
-                'child-perf',
-                {
-                    attributes: {
-                        'service.name': 'pwa-kit-react-sdk'
-                    }
-                },
-                'test-context'
-            )
-            expect(mockFn).toHaveBeenCalled()
-            expect(result).toBe('child-result')
-            expect(mockSpan.end).toHaveBeenCalled()
-        })
-
-        test('should handle function errors', async () => {
-            const mockFn = jest.fn().mockRejectedValue(new Error('Child function failed'))
-
-            await expect(
-                opentelemetryUtils.traceChildPerformance('child-perf', mockFn)
-            ).rejects.toThrow('Child function failed')
-
-            expect(mockSpan.setStatus).toHaveBeenCalledWith({
-                code: 2, // ERROR
-                message: 'Child function failed'
-            })
-            expect(mockSpan.end).toHaveBeenCalled()
-        })
-
-        test('should fallback to function execution when span creation fails', async () => {
-            mockTracer.startSpan.mockImplementation(() => {
-                throw new Error('Span creation failed')
-            })
-
-            const mockFn = jest.fn().mockResolvedValue('fallback-result')
-
-            const result = await opentelemetryUtils.traceChildPerformance('child-perf', mockFn)
-
-            expect(result).toBe('fallback-result')
-            expect(mockFn).toHaveBeenCalled()
-            expect(mockSpan.end).not.toHaveBeenCalled()
-        })
-    })
-
     // Test to cover the defensive check in logSpanData (lines 57-73)
     describe('logSpanData with invalid timing data', () => {
         test('should not warn about invalid startTime data in test environment', () => {

@@ -87,7 +87,7 @@ const logAndFormatError = (err) => {
 // as best as we can.
 export const getLocationSearch = (req, opts = {}) => {
     const {interpretPlusSignAsSpace = false} = opts
-    const [, search] = req.originalUrl.split('?')
+    const [_, search] = req.originalUrl.split('?')
     const params = new URLSearchParams(search)
 
     const newParams = new URLSearchParams()
@@ -125,161 +125,151 @@ export const getLocationSearch = (req, opts = {}) => {
  *
  * @return {Promise}
  */
-export const render = async (req, res, next) => {
+const performRender = async (req, res, next) => {
     const includeServerTimingHeader = '__server_timing' in req.query
     const shouldTrackPerformance = includeServerTimingHeader || process.env.SERVER_TIMING
 
-    // Auto-enable OpenTelemetry and B3 tracing when performance tracking is requested
-    if (shouldTrackPerformance) {
-        if (!process.env.OTEL_SDK_ENABLED) {
-            process.env.OTEL_SDK_ENABLED = 'true'
-        }
-        if (!process.env.OTEL_B3_TRACING_ENABLED) {
-            process.env.OTEL_B3_TRACING_ENABLED = 'true'
-        }
-    }
-
-    // Initialize server tracing if needed
-    if (shouldTrackPerformance && !isServerTracingInitialized()) {
+    // Initialize server tracing if needed for this request
+    if (includeServerTimingHeader && !isServerTracingInitialized()) {
         initializeServerTracing()
     }
 
-    return tracePerformance(
-        'ssr.render',
-        async () => {
-            res.__performanceTimer = new PerformanceTimer({enabled: shouldTrackPerformance})
-            res.__performanceTimer.mark(PERFORMANCE_MARKS.total, 'start')
+    // Initialize performance timer outside tracePerformance to ensure it's always available
+    res.__performanceTimer = new PerformanceTimer({enabled: shouldTrackPerformance})
+    res.__performanceTimer.mark(PERFORMANCE_MARKS.total, 'start')
+    const AppConfig = getAppConfig()
+    // Get the application config which should have been stored at this point.
+    const config = getConfig()
 
-            const AppConfig = getAppConfig()
-            // Get the application config which should have been stored at this point.
-            const config = getConfig()
+    AppConfig.restore(res.locals)
 
-            AppConfig.restore(res.locals)
+    const routes = getRoutes(res.locals)
+    const WrappedApp = routeComponent(App, false, res.locals)
 
-            const routes = getRoutes(res.locals)
-            const WrappedApp = routeComponent(App, false, res.locals)
+    const [pathname] = req.originalUrl.split('?')
 
-            const [pathname] = req.originalUrl.split('?')
+    const location = {
+        pathname,
+        search: getLocationSearch(req, {
+            interpretPlusSignAsSpace: config?.app?.url?.interpretPlusSignAsSpace
+        })
+    }
 
-            const location = {
-                pathname,
-                search: getLocationSearch(req, {
-                    interpretPlusSignAsSpace: config?.app?.url?.interpretPlusSignAsSpace
-                })
-            }
+    // Step 1 - Find the match.
+    res.__performanceTimer.mark(PERFORMANCE_MARKS.routeMatching, 'start')
+    let route
+    let match
 
-            // Step 1 - Find the match.
-            res.__performanceTimer.mark(PERFORMANCE_MARKS.routeMatching, 'start')
-            let route
-            let match
+    routes.some((_route) => {
+        const _match = matchPath(req.path, _route)
+        if (_match) {
+            match = _match
+            route = _route
+        }
+        return !!match
+    })
+    res.__performanceTimer.mark(PERFORMANCE_MARKS.routeMatching, 'end')
 
-            routes.some((_route) => {
-                const _match = matchPath(req.path, _route)
-                if (_match) {
-                    match = _match
-                    route = _route
-                }
-                return !!match
-            })
-            res.__performanceTimer.mark(PERFORMANCE_MARKS.routeMatching, 'end')
+    // Step 2 - Get the component
+    res.__performanceTimer.mark(PERFORMANCE_MARKS.loadComponent, 'start')
+    const component = await route.component.getComponent()
+    res.__performanceTimer.mark(PERFORMANCE_MARKS.loadComponent, 'end')
 
-            // Step 2 - Get the component
+    // Step 3 - Init the app state
+    const props = {
+        error: null,
+        appState: {},
+        routerContext: {},
+        req,
+        res,
+        App: WrappedApp,
+        routes,
+        location
+    }
+    let appJSX = <OuterApp {...props} />
 
-            res.__performanceTimer.mark(PERFORMANCE_MARKS.loadComponent, 'start')
-            const component = await route.component.getComponent()
-            res.__performanceTimer.mark(PERFORMANCE_MARKS.loadComponent, 'end')
+    let appState, appStateError
 
-            // Step 3 - Init the app state
-            const props = {
-                error: null,
-                appState: {},
-                routerContext: {},
-                req,
-                res,
-                App: WrappedApp,
-                routes,
-                location
-            }
-            let appJSX = <OuterApp {...props} />
+    if (component === Throw404) {
+        appState = {}
+        appStateError = new errors.HTTPNotFound('Not found')
+    } else {
+        res.__performanceTimer.mark(PERFORMANCE_MARKS.fetchStrategies, 'start')
+        const ret = await AppConfig.initAppState({
+            App: WrappedApp,
+            component,
+            match,
+            route,
+            req,
+            res,
+            location,
+            appJSX
+        })
+        appState = {
+            ...ret.appState,
+            __STATE_MANAGEMENT_LIBRARY: AppConfig.freeze(res.locals)
+        }
+        appStateError = ret.error
+        res.__performanceTimer.mark(PERFORMANCE_MARKS.fetchStrategies, 'end')
+    }
+    res.__performanceTimer.mark(PERFORMANCE_MARKS.renderToString, 'start')
+    appJSX = React.cloneElement(appJSX, {error: appStateError, appState})
 
-            let appState, appStateError
+    // Step 4 - Render the App
+    let renderResult
+    try {
+        renderResult = renderApp({
+            App: WrappedApp,
+            appState,
+            appStateError: appStateError && logAndFormatError(appStateError),
+            routes,
+            req,
+            res,
+            location,
+            config,
+            appJSX
+        })
+    } catch (e) {
+        // This is an unrecoverable error.
+        // (errors handled by the AppErrorBoundary are considered recoverable)
+        // Here, we use Express's convention to invoke error middleware.
+        // Note, we don't have an error handling middleware yet! This is calling the
+        // default error handling middleware provided by Express
+        res.__performanceTimer.cleanup()
+        shutdownServerTracing()
+        return next(e)
+    }
 
-            if (component === Throw404) {
-                appState = {}
-                appStateError = new errors.HTTPNotFound('Not found')
-            } else {
-                res.__performanceTimer.mark(PERFORMANCE_MARKS.fetchStrategies, 'start')
-                const ret = await AppConfig.initAppState({
-                    App: WrappedApp,
-                    component,
-                    match,
-                    route,
-                    req,
-                    res,
-                    location,
-                    appJSX
-                })
-                appState = {
-                    ...ret.appState,
-                    __STATE_MANAGEMENT_LIBRARY: AppConfig.freeze(res.locals)
-                }
-                appStateError = ret.error
-                res.__performanceTimer.mark(PERFORMANCE_MARKS.fetchStrategies, 'end')
-            }
+    res.__performanceTimer.mark(PERFORMANCE_MARKS.renderToString, 'end')
+    // Step 5 - Determine what is going to happen, redirect, or send html with
+    // the correct status code.
+    const {html, routerContext, error} = renderResult
+    const redirectUrl = routerContext.url
+    const status = (error && error.status) || res.statusCode
 
-            res.__performanceTimer.mark(PERFORMANCE_MARKS.renderToString, 'start')
-            appJSX = React.cloneElement(appJSX, {error: appStateError, appState})
+    res.__performanceTimer.mark(PERFORMANCE_MARKS.total, 'end')
 
-            // Step 4 - Render the App
-            let renderResult
-            try {
-                renderResult = renderApp({
-                    App: WrappedApp,
-                    appState,
-                    appStateError: appStateError && logAndFormatError(appStateError),
-                    routes,
-                    req,
-                    res,
-                    location,
-                    config,
-                    appJSX
-                })
-            } catch (e) {
-                // This is an unrecoverable error.
-                // (errors handled by the AppErrorBoundary are considered recoverable)
-                // Here, we use Express's convention to invoke error middleware.
-                // Note, we don't have an error handling middleware yet! This is calling the
-                // default error handling middleware provided by Express
-                return next(e)
-            }
+    if (includeServerTimingHeader) {
+        res.setHeader('Server-Timing', res.__performanceTimer.buildServerTimingHeader())
+        // Override cache-control header to no caching when __server_timing is used
+        // This happens after React rendering is complete, ensuring it overrides any
+        // cache headers set by individual page components
+        res.set('Cache-Control', NO_CACHE)
+    }
 
-            res.__performanceTimer.mark(PERFORMANCE_MARKS.renderToString, 'end')
+    // Cleanup performance timer and OpenTelemetry tracing after response is sent
+    res.__performanceTimer.cleanup()
+    shutdownServerTracing()
 
-            // Step 5 - Determine what is going to happen, redirect, or send html with
-            // the correct status code.
-            const {html, routerContext, error} = renderResult
-            const redirectUrl = routerContext.url
-            const status = (error && error.status) || res.statusCode
-
-            res.__performanceTimer.mark(PERFORMANCE_MARKS.total, 'end')
-
-            if (includeServerTimingHeader) {
-                res.setHeader('Server-Timing', res.__performanceTimer.buildServerTimingHeader())
-                // Override cache-control header to no caching when __server_timing is used
-                // This happens after React rendering is complete, ensuring it overrides any
-                // cache headers set by individual page components
-                res.set('Cache-Control', NO_CACHE)
-            }
-
-            if (redirectUrl) {
-                res.redirect(routerContext.status || 302, redirectUrl)
-            } else {
-                res.status(status).send(html)
-            }
-        },
-        res
-    )
+    if (redirectUrl) {
+        res.redirect(routerContext.status || 302, redirectUrl)
+    } else {
+        res.status(status).send(html)
+    }
 }
+
+export const render = (req, res, next) =>
+    tracePerformance('ssr.render', () => performRender(req, res, next), res)
 
 const OuterApp = ({req, res, error, App, appState, routes, routerContext, location}) => {
     const AppConfig = getAppConfig()
@@ -445,13 +435,5 @@ const serverRenderer =
     ({clientStats, serverStats}) => {
         return (req, res, next) => render(req, res, next)
     }
-
-/**
- * Cleanup function to shut down OpenTelemetry tracing
- * Call this when the server is shutting down to properly clean up resources
- */
-export const cleanup = async () => {
-    await shutdownServerTracing()
-}
 
 export default serverRenderer

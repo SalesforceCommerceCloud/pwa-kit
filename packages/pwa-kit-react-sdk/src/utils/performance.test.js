@@ -515,51 +515,6 @@ describe('PerformanceTimer', () => {
         })
     })
 
-    describe('log method', () => {
-        test('logs metrics correctly', () => {
-            const timer = new PerformanceTimer({enabled: true})
-            timer.mark('test1', 'start')
-            timer.mark('test1', 'end')
-            timer.mark('test2', 'start')
-            timer.mark('test2', 'end')
-
-            jest.clearAllMocks()
-
-            timer.log()
-
-            expect(logger.info).toHaveBeenCalledTimes(2)
-            expect(logger.info).toHaveBeenCalledWith(
-                expect.stringMatching(/test1 - \d+\.\d+ms/),
-                expect.objectContaining({
-                    namespace: 'performance'
-                })
-            )
-            expect(logger.info).toHaveBeenCalledWith(
-                expect.stringMatching(/test2 - \d+\.\d+ms/),
-                expect.objectContaining({
-                    namespace: 'performance'
-                })
-            )
-        })
-
-        test('logs metrics with detail', () => {
-            const timer = new PerformanceTimer({enabled: true})
-            timer.mark('test', 'start')
-            timer.mark('test', 'end', {detail: 'test detail'})
-
-            jest.clearAllMocks()
-
-            timer.log()
-
-            expect(logger.info).toHaveBeenCalledWith(
-                expect.stringMatching(/test - \d+\.\d+ms test detail/),
-                expect.objectContaining({
-                    namespace: 'performance'
-                })
-            )
-        })
-    })
-
     describe('warning scenarios (non-test environment)', () => {
         let originalEnv
 

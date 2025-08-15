@@ -22,25 +22,22 @@ const logSpanData = (span, event = 'start', res = null) => {
         startTime.length !== 2 ||
         (duration !== 0 && (!Array.isArray(duration) || duration.length !== 2))
     ) {
-        // Don't log warnings in test environments to avoid GitHub check failures
-        if (process.env.NODE_ENV !== 'test') {
-            logger.warn(
-                'Invalid timing data detected - OpenTelemetry may not be properly initialized',
-                {
-                    namespace: 'opentelemetry',
-                    additionalProperties: {
-                        span_name: span.name,
-                        event: event,
-                        startTime_valid: Array.isArray(startTime) && startTime.length === 2,
-                        duration_valid:
-                            duration === 0 || (Array.isArray(duration) && duration.length === 2),
-                        otel_enabled: getOTELConfig().enabled,
-                        startTime_type: typeof startTime,
-                        startTime_value: startTime
-                    }
+        logger.warn(
+            'Invalid timing data detected - OpenTelemetry may not be properly initialized',
+            {
+                namespace: 'opentelemetry',
+                additionalProperties: {
+                    span_name: span.name,
+                    event: event,
+                    startTime_valid: Array.isArray(startTime) && startTime.length === 2,
+                    duration_valid:
+                        duration === 0 || (Array.isArray(duration) && duration.length === 2),
+                    otel_enabled: getOTELConfig().enabled,
+                    startTime_type: typeof startTime,
+                    startTime_value: startTime
                 }
-            )
-        }
+            }
+        )
         return
     }
 
@@ -132,18 +129,15 @@ export const createChildSpan = (name, attributes = {}) => {
         // Check if OpenTelemetry is properly configured
         const otelConfig = getOTELConfig()
         if (!otelConfig.enabled) {
-            // Don't log warnings in test environments to avoid GitHub check failures
-            if (process.env.NODE_ENV !== 'test') {
-                logger.warn('OpenTelemetry is disabled - spans will not have proper timing data', {
-                    namespace: 'opentelemetry',
-                    additionalProperties: {
-                        span_name: name,
-                        otel_enabled: otelConfig.enabled,
-                        otel_service_name: otelConfig.serviceName,
-                        suggestion: 'Set OTEL_SDK_ENABLED=true to enable proper timing'
-                    }
-                })
-            }
+            logger.warn('OpenTelemetry is disabled - spans will not have proper timing data', {
+                namespace: 'opentelemetry',
+                additionalProperties: {
+                    span_name: name,
+                    otel_enabled: otelConfig.enabled,
+                    otel_service_name: otelConfig.serviceName,
+                    suggestion: 'Set OTEL_SDK_ENABLED=true to enable proper timing'
+                }
+            })
         }
 
         const tracer = trace.getTracer(getServiceName())
@@ -178,6 +172,7 @@ export const createChildSpan = (name, attributes = {}) => {
             },
             parentSpan ? ctx : undefined
         )
+
         logSpanData(span, 'start')
         return span
     } catch (error) {
@@ -283,39 +278,6 @@ export const tracePerformance = async (name, fn, res = null) => {
         // Log error completion
         logSpanData(rootSpan, 'end', res)
 
-        throw error
-    }
-}
-
-/**
- * Traces a performance metric
- * @param {string} name - The name of the metric
- * @param {number} duration - The duration of the metric in milliseconds
- * @param {Object} attributes - Additional attributes for the metric
- */
-
-/**
- * Traces a performance operation
- * @param {string} name - The name of the operation
- * @param {Function} fn - The function to trace
- * @returns {Promise<any>} The result of the function
- */
-export const traceChildPerformance = async (name, fn) => {
-    const span = createChildSpan(name)
-    if (!span) {
-        return fn()
-    }
-
-    try {
-        const result = await fn()
-        endSpan(span)
-        return result
-    } catch (error) {
-        span.setStatus({
-            code: SpanStatusCode.ERROR,
-            message: error.message
-        })
-        endSpan(span)
         throw error
     }
 }
