@@ -39,10 +39,7 @@ test('should inject B3 headers when __server_timing param is passed', async ({pa
         r.url.includes(config.RETAIL_APP_HOME) && !r.url.includes('static')
     )
     
-    if (mainResponse) {
-        console.log('Available headers:', Object.keys(mainResponse.headers))
-        
-        // For now, just verify that the request was successful
+    if (mainResponse) {        
         expect(mainResponse.headers).toBeDefined()
         
         expect(mainResponse.headers['x-b3-traceid']).toBeDefined()
@@ -59,7 +56,7 @@ test('should inject B3 headers when __server_timing param is passed', async ({pa
     }
 })
 
-test('should not inject B3 headers when __server_timing param is not passed', async ({page}) => {
+test('should not show Server Timing header if __server_timing param is not passed', async ({page}) => {
     const url = config.RETAIL_APP_HOME // No __server_timing param
     
     const responseHeaders = []
@@ -81,13 +78,9 @@ test('should not inject B3 headers when __server_timing param is not passed', as
     const mainResponse = responseHeaders.find(r => 
         r.url.includes(config.RETAIL_APP_HOME) && !r.url.includes('static')
     )
-    console.log("(JEREMY) mainResponse: ", mainResponse)
     
-    if (mainResponse) {
-        expect(mainResponse.headers['x-b3-traceid']).toBeUndefined()
-        expect(mainResponse.headers['x-b3-spanid']).toBeUndefined()
-        expect(mainResponse.headers['x-b3-sampled']).toBeUndefined()
-    }
+    expect(mainResponse).toBeDefined()
+    expect(mainResponse.headers['server-timing']).toBeUndefined()
 })
 
 test('should validate performance marks in Server-Timing header have numeric durations', async ({page}) => {
