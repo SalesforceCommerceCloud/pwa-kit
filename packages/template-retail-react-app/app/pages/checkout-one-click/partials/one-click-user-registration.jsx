@@ -78,6 +78,11 @@ export default function UserRegistration({
         return null
     }
 
+    // Hide the form if the "Checkout as Guest" button was clicked
+    if (isGuestCheckout) {
+        return null
+    }
+
     return (
         <>
             <Box

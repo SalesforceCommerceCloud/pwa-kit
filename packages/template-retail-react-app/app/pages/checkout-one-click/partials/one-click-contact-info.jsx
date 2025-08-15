@@ -267,6 +267,29 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
         }
     }
 
+    // Handle checkout as guest from OTP modal
+    const handleCheckoutAsGuest = async () => {
+        try {
+            const email = form.getValues('email')
+            // Update basket with guest email
+            await updateCustomerForBasket.mutateAsync({
+                parameters: {basketId: basket.basketId},
+                body: {email: email}
+            })
+
+            // Set the flag that "Checkout as Guest" was clicked
+            setRegisteredUserChoseGuest(true)
+            if (onRegisteredUserChoseGuest) {
+                onRegisteredUserChoseGuest(true)
+            }
+
+            // Proceed to next step (shipping address)
+            goToNextStep()
+        } catch (error) {
+            setError(error.message)
+        }
+    }
+
     // Handle OTP verification
     const handleOtpVerification = async (otpCode) => {
         try {
@@ -296,6 +319,12 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
                 parameters: {basketId: basket.basketId},
                 body: {email: email}
             })
+
+            // Reset guest checkout flag since user is now logged in
+            setRegisteredUserChoseGuest(false)
+            if (onRegisteredUserChoseGuest) {
+                onRegisteredUserChoseGuest(false)
+            }
 
             // Reset guest checkout flag since user is now logged in
             setRegisteredUserChoseGuest(false)
