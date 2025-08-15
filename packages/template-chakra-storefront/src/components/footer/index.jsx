@@ -294,10 +294,6 @@ const Subscribe = ({...otherProps}) => {
                         css={styles.subscribeField}
                         borderEndEndRadius={0}
                         borderStartEndRadius={0}
-                        bg="white"
-                        _focus={{bg: 'white'}}
-                        _hover={{bg: 'white'}}
-                        _filled={{bg: 'white'}}
                     />
                     <Button
                         variant="footer"

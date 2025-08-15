@@ -46,7 +46,10 @@ export default defineSlotRecipe({
         },
         subscribeField: {
             background: 'white',
-            color: 'gray.900'
+            color: 'gray.900',
+            _focus: {background: 'white'},
+            _hover: {background: 'white'},
+            _filled: {background: 'white'}
         },
         subscribeButtonContainer: {
             width: 'auto'
