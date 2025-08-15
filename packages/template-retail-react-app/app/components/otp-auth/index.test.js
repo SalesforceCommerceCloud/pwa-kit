@@ -305,8 +305,7 @@ describe('OtpAuth', () => {
     })
 
     describe('Button Interactions', () => {
-        // Note: Resend code functionality tests are skipped until implementation is complete
-        test.skip('clicking "Checkout as a guest" calls onClose', async () => {
+        test('clicking "Checkout as a guest" calls onClose', async () => {
             const user = userEvent.setup()
             renderWithProviders(
                 <OtpAuth
@@ -324,7 +323,32 @@ describe('OtpAuth', () => {
             expect(mockOnClose).toHaveBeenCalled()
         })
 
+<<<<<<< Updated upstream
         test('clicking "Resend code" calls handleSendEmailOtp', async () => {
+=======
+        test('clicking "Checkout as a guest" calls onCheckoutAsGuest when provided', async () => {
+            const mockOnCheckoutAsGuest = jest.fn()
+            const user = userEvent.setup()
+            renderWithProviders(
+                <OtpAuth
+                    isOpen={true}
+                    onClose={mockOnClose}
+                    form={mockForm}
+                    handleOtpVerification={mockHandleOtpVerification}
+                    handleSendEmailOtp={mockHandleSendEmailOtp}
+                    onCheckoutAsGuest={mockOnCheckoutAsGuest}
+                />
+            )
+
+            const guestButton = screen.getByText('Checkout as a guest')
+            await user.click(guestButton)
+
+            expect(mockOnCheckoutAsGuest).toHaveBeenCalled()
+            expect(mockOnClose).toHaveBeenCalled()
+        })
+
+        test.skip('clicking "Resend code" calls handleSendEmailOtp', async () => {
+>>>>>>> Stashed changes
             const user = userEvent.setup()
             renderWithProviders(
                 <OtpAuth

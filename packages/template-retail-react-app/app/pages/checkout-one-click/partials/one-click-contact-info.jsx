@@ -154,6 +154,22 @@ const ContactInfo = ({isSocialEnabled = false, idps = []}) => {
         onOtpModalClose()
     }
 
+    // Handle checkout as guest from OTP modal
+    const handleCheckoutAsGuest = async () => {
+        try {
+            const email = form.getValues('email')
+            // Update basket with guest email
+            await updateCustomerForBasket.mutateAsync({
+                parameters: { basketId: basket.basketId },
+                body: { email: email }
+            })
+            // Proceed to next step (shipping address)
+            goToNextStep()
+        } catch (error) {
+            setError(error.message)
+        }
+    }
+
     // Handle OTP verification
     const handleOtpVerification = async (otpCode) => {
         try {
@@ -297,6 +313,7 @@ const ContactInfo = ({isSocialEnabled = false, idps = []}) => {
                                 form={form}
                                 handleSendEmailOtp={handleSendEmailOtp}
                                 handleOtpVerification={handleOtpVerification}
+                                onCheckoutAsGuest={handleCheckoutAsGuest}
                             />
                         </form>
                     </Container>
