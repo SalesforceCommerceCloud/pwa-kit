@@ -51,7 +51,7 @@ import {isAbsoluteURL} from '@salesforce/retail-react-app/app/page-designer/util
 import {useAppOrigin} from '@salesforce/retail-react-app/app/hooks/use-app-origin'
 import {API_ERROR_MESSAGE} from '@salesforce/retail-react-app/app/constants'
 
-const ContactInfo = ({isSocialEnabled = false, idps = []}) => {
+const ContactInfo = ({ isSocialEnabled = false, idps = [], onRegisteredUserChoseGuest }) => {
     const {formatMessage} = useIntl()
     const navigate = useNavigation()
     const appOrigin = useAppOrigin()
@@ -85,11 +85,22 @@ const ContactInfo = ({isSocialEnabled = false, idps = []}) => {
     const [signOutConfirmDialogIsOpen, setSignOutConfirmDialogIsOpen] = useState(false)
     const [showContinueButton, setShowContinueButton] = useState(true)
     const [isCheckingEmail, setIsCheckingEmail] = useState(false)
+    const [registeredUserChoseGuest, setRegisteredUserChoseGuest] = useState(false)
 
     const passwordlessConfigCallback = getConfig().app.login?.passwordless?.callbackURI
     const callbackURL = isAbsoluteURL(passwordlessConfigCallback)
         ? passwordlessConfigCallback
         : `${appOrigin}${passwordlessConfigCallback}`
+
+    // Reset guest checkout flag when user registration status changes
+    useEffect(() => {
+        if (isRegistered) {
+            setRegisteredUserChoseGuest(false)
+            if (onRegisteredUserChoseGuest) {
+                onRegisteredUserChoseGuest(false)
+            }
+        }
+    }, [isRegistered, onRegisteredUserChoseGuest])
 
     // Modal controls for OtpAuth
     const {
@@ -163,6 +174,13 @@ const ContactInfo = ({isSocialEnabled = false, idps = []}) => {
                 parameters: { basketId: basket.basketId },
                 body: { email: email }
             })
+
+            // Set the flag that "Checkout as Guest" was clicked
+            setRegisteredUserChoseGuest(true)
+            if (onRegisteredUserChoseGuest) {
+                onRegisteredUserChoseGuest(true)
+            }
+
             // Proceed to next step (shipping address)
             goToNextStep()
         } catch (error) {
@@ -183,6 +201,12 @@ const ContactInfo = ({isSocialEnabled = false, idps = []}) => {
                         createDestinationBasket: true
                     }
                 })
+            }
+
+            // Reset guest checkout flag since user is now logged in
+            setRegisteredUserChoseGuest(false)
+            if (onRegisteredUserChoseGuest) {
+                onRegisteredUserChoseGuest(false)
             }
 
             // Close modal
@@ -214,6 +238,13 @@ const ContactInfo = ({isSocialEnabled = false, idps = []}) => {
             parameters: {basketId: basket.basketId},
             body: {email: data.email}
         })
+
+        // Reset guest checkout flag since user is proceeding normally
+        setRegisteredUserChoseGuest(false)
+        if (onRegisteredUserChoseGuest) {
+            onRegisteredUserChoseGuest(false)
+        }
+
         setShowContinueButton(false)
         goToNextStep()
     }
@@ -342,7 +373,8 @@ const ContactInfo = ({isSocialEnabled = false, idps = []}) => {
 
 ContactInfo.propTypes = {
     isSocialEnabled: PropTypes.bool,
-    idps: PropTypes.arrayOf(PropTypes.string)
+    idps: PropTypes.arrayOf(PropTypes.string),
+    onRegisteredUserChoseGuest: PropTypes.func
 }
 
 const SignOutConfirmationDialog = ({isOpen, onConfirm, onClose}) => {

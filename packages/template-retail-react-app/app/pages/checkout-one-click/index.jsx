@@ -56,6 +56,7 @@ const CheckoutOneClick = () => {
     const showToast = useToast()
     const [isLoading, setIsLoading] = useState(false)
     const [enableUserRegistration, setEnableUserRegistration] = useState(false)
+    const [registeredUserChoseGuest, setRegisteredUserChoseGuest] = useState(false)
     const {data: basket} = useCurrentBasket()
     const [error] = useState()
     const {social = {}} = getConfig().app.login || {}
@@ -135,6 +136,13 @@ const CheckoutOneClick = () => {
             body: paymentInstrument
         })
     }
+
+    // Reset guest checkout flag when step changes (user goes back to edit)
+    useEffect(() => {
+        if (step === 0) {
+            setRegisteredUserChoseGuest(false)
+        }
+    }, [step])
 
     const onBillingSubmit = async () => {
         const isFormValid = await billingAddressForm.trigger()
@@ -322,7 +330,11 @@ const CheckoutOneClick = () => {
                                 </Alert>
                             )}
 
-                            <ContactInfo isSocialEnabled={isSocialEnabled} idps={idps} />
+                            <ContactInfo
+                                isSocialEnabled={isSocialEnabled}
+                                idps={idps}
+                                onRegisteredUserChoseGuest={setRegisteredUserChoseGuest}
+                            />
                             {isPickupOrder ? <PickupAddress /> : <ShippingAddress />}
                             {!isPickupOrder && <ShippingOptions />}
                             <Payment
@@ -330,6 +342,7 @@ const CheckoutOneClick = () => {
                                 setEnableUserRegistration={setEnableUserRegistration}
                                 paymentMethodForm={paymentMethodForm}
                                 billingAddressForm={billingAddressForm}
+                                registeredUserChoseGuest={registeredUserChoseGuest}
                             />
 
                             {step === 4 && (

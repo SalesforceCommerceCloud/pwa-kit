@@ -42,7 +42,8 @@ const Payment = ({
     paymentMethodForm,
     billingAddressForm,
     enableUserRegistration,
-    setEnableUserRegistration
+    setEnableUserRegistration,
+    registeredUserChoseGuest = false
 }) => {
     const {formatMessage} = useIntl()
     const {data: basket} = useCurrentBasket()
@@ -244,6 +245,7 @@ const Payment = ({
                         <UserRegistration
                             enableUserRegistration={enableUserRegistration}
                             setEnableUserRegistration={setEnableUserRegistration}
+                            isGuestCheckout={registeredUserChoseGuest}
                         />
                     )}
                 </Stack>
@@ -280,6 +282,7 @@ const Payment = ({
                     <UserRegistration
                         enableUserRegistration={enableUserRegistration}
                         setEnableUserRegistration={setEnableUserRegistration}
+                        isGuestCheckout={registeredUserChoseGuest}
                     />
                 </Stack>
             </ToggleCardSummary>
@@ -291,7 +294,9 @@ Payment.propTypes = {
     /** Whether user registration is enabled */
     enableUserRegistration: PropTypes.bool,
     /** Callback to set user registration state */
-    setEnableUserRegistration: PropTypes.func
+    setEnableUserRegistration: PropTypes.func,
+    /** Whether a registered user has chosen guest checkout */
+    registeredUserChoseGuest: PropTypes.bool
 }
 
 const PaymentCardSummary = ({payment}) => {
