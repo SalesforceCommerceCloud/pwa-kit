@@ -29,6 +29,13 @@ describe('useAutocompleteSuggestions', () => {
     let mockAutocompleteSessionToken
     let mockAutocompleteSuggestion
 
+    const waitForDebounce = async (time = 300) => {
+        await act(async () => {
+            jest.advanceTimersByTime(time)
+            await Promise.resolve()
+        })
+    }
+
     beforeEach(() => {
         jest.clearAllMocks()
         jest.useFakeTimers()
@@ -63,10 +70,7 @@ describe('useAutocompleteSuggestions', () => {
     it('should not fetch suggestions for input shorter than 3 characters', async () => {
         const {result} = renderHook(() => useAutocompleteSuggestions('ab', 'US'))
 
-        await act(async () => {
-            jest.advanceTimersByTime(350)
-            await Promise.resolve()
-        })
+        await waitForDebounce()
 
         expect(mockAutocompleteSuggestion.fetchAutocompleteSuggestions).not.toHaveBeenCalled()
         expect(result.current.suggestions).toEqual([])
@@ -88,11 +92,7 @@ describe('useAutocompleteSuggestions', () => {
 
         const {result} = renderHook(() => useAutocompleteSuggestions('123 Main', 'US'))
 
-        await act(async () => {
-            jest.advanceTimersByTime(350)
-            await Promise.resolve()
-            await Promise.resolve()
-        })
+        await waitForDebounce()
 
         expect(mockAutocompleteSuggestion.fetchAutocompleteSuggestions).toHaveBeenCalledWith({
             input: '123 Main',
@@ -128,11 +128,7 @@ describe('useAutocompleteSuggestions', () => {
 
         const {result} = renderHook(() => useAutocompleteSuggestions('123 Main', 'US'))
 
-        await act(async () => {
-            jest.advanceTimersByTime(350)
-            await Promise.resolve()
-            await Promise.resolve()
-        })
+        await waitForDebounce()
 
         expect(result.current.suggestions).toHaveLength(1)
         expect(result.current.suggestions[0].description).toContain('USA')
@@ -154,11 +150,7 @@ describe('useAutocompleteSuggestions', () => {
 
         const {result} = renderHook(() => useAutocompleteSuggestions('456 Oak', 'CA'))
 
-        await act(async () => {
-            jest.advanceTimersByTime(350)
-            await Promise.resolve()
-            await Promise.resolve()
-        })
+        await waitForDebounce()
 
         expect(result.current.suggestions).toHaveLength(1)
         expect(result.current.suggestions[0].description).toContain('Canada')
@@ -171,11 +163,7 @@ describe('useAutocompleteSuggestions', () => {
 
         const {result} = renderHook(() => useAutocompleteSuggestions('123 Main', 'US'))
 
-        await act(async () => {
-            jest.advanceTimersByTime(350)
-            await Promise.resolve()
-            await Promise.resolve()
-        })
+        await waitForDebounce()
 
         expect(result.current.suggestions).toEqual([])
         expect(result.current.isLoading).toBe(false)
@@ -197,11 +185,7 @@ describe('useAutocompleteSuggestions', () => {
 
         mockAutocompleteSuggestion.fetchAutocompleteSuggestions.mockResolvedValue(mockResponse)
 
-        await act(async () => {
-            jest.advanceTimersByTime(350)
-            await Promise.resolve()
-            await Promise.resolve()
-        })
+        await waitForDebounce()
 
         expect(result.current.suggestions).toHaveLength(1)
 
@@ -218,10 +202,7 @@ describe('useAutocompleteSuggestions', () => {
 
         const {result} = renderHook(() => useAutocompleteSuggestions('123 Main', 'US'))
 
-        await act(async () => {
-            jest.advanceTimersByTime(350)
-            await Promise.resolve()
-        })
+        await waitForDebounce()
 
         expect(mockAutocompleteSuggestion.fetchAutocompleteSuggestions).not.toHaveBeenCalled()
         expect(result.current.suggestions).toEqual([])
@@ -236,10 +217,7 @@ describe('useAutocompleteSuggestions', () => {
 
         const {result} = renderHook(() => useAutocompleteSuggestions('123 Main', 'US'))
 
-        await act(async () => {
-            jest.advanceTimersByTime(350)
-            await Promise.resolve()
-        })
+        await waitForDebounce()
 
         expect(mockAutocompleteSuggestion.fetchAutocompleteSuggestions).not.toHaveBeenCalled()
         expect(result.current.suggestions).toEqual([])
@@ -284,11 +262,7 @@ describe('useAutocompleteSuggestions', () => {
 
         expect(mockAutocompleteSuggestion.fetchAutocompleteSuggestions).not.toHaveBeenCalled()
 
-        await act(async () => {
-            jest.advanceTimersByTime(300)
-            await Promise.resolve()
-            await Promise.resolve()
-        })
+        await waitForDebounce()
 
         expect(mockAutocompleteSuggestion.fetchAutocompleteSuggestions).toHaveBeenCalledTimes(1)
         expect(mockAutocompleteSuggestion.fetchAutocompleteSuggestions).toHaveBeenCalledWith(

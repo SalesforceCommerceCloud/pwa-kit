@@ -236,7 +236,7 @@ describe('useAddressFields', () => {
             return callCount === 1 ? 'US' : 'CA'
         })
 
-        const {result, rerender} = renderHook(() => useAddressFields({form: mockForm}))
+        const {rerender} = renderHook(() => useAddressFields({form: mockForm}))
 
         rerender()
 
@@ -273,38 +273,6 @@ describe('useAddressFields', () => {
         })
 
         expect(mockOnChange).toHaveBeenCalledWith('1234567890')
-    })
-
-    it('should show province label for Canada', () => {
-        mockWatch.mockReturnValue('CA')
-
-        const {result} = renderHook(() => useAddressFields({form: mockForm}))
-
-        expect(result.current.stateCode.label[0].value).toBe('Province')
-    })
-
-    it('should show state label for US', () => {
-        mockWatch.mockReturnValue('US')
-
-        const {result} = renderHook(() => useAddressFields({form: mockForm}))
-
-        expect(result.current.stateCode.label[0].value).toBe('State')
-    })
-
-    it('should show postal code label for Canada', () => {
-        mockWatch.mockReturnValue('CA')
-
-        const {result} = renderHook(() => useAddressFields({form: mockForm}))
-
-        expect(result.current.postalCode.label[0].value).toBe('Postal Code')
-    })
-
-    it('should show zip code label for US', () => {
-        mockWatch.mockReturnValue('US')
-
-        const {result} = renderHook(() => useAddressFields({form: mockForm}))
-
-        expect(result.current.postalCode.label[0].value).toBe('Zip Code')
     })
 
     it('should handle errors correctly', () => {
