@@ -45,3 +45,32 @@ jobs:
                   TARGET: production
                   CLOUD_ORIGIN: ${{ vars.MRT_STG_CLOUD_ORIGIN }}
                   FLAGS: --wait
+
+    notify-slack:
+        needs: [run-performance-metrics]
+        if: ${{ always() }}
+        runs-on: ubuntu-latest
+        steps:
+            - name: Send GitHub Action data to Slack workflow (Performance Metrics Success)
+              id: slack-success
+              if: ${{ github.event_name == 'schedule' && needs.run-performance-metrics.result == 'success' }}
+              uses: slackapi/slack-github-action@v1.23.0
+              with:
+                  payload: |
+                      {
+                        "message": "✅ Performance metrics workflow: successfully deployed bundle for performance testing."
+                      }
+              env:
+                  SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+
+            - name: Send GitHub Action data to Slack workflow (Performance Metrics Failure)
+              id: slack-failure
+              if: ${{ github.event_name == 'schedule' && needs.run-performance-metrics.result != 'success' }}
+              uses: slackapi/slack-github-action@v1.23.0
+              with:
+                  payload: |
+                      {
+                        "message": "❌ Performance metrics workflow: please check the logs for details. (${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})"
+                      }
+              env:
+                  SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
