@@ -577,7 +577,14 @@ beforeEach(() => {
         data: {
             currency: 'USD',
             productSubTotal: 344.77,
-            basketId: 'test-basket-id'
+            basketId: 'test-basket-id',
+            bonusDiscountLineItems: [
+                {
+                    id: 'bonus-123',
+                    promotionId: 'BonusProductPromotion',
+                    maxBonusItems: 2
+                }
+            ]
         },
         derivedData: {
             totalItems: 23
@@ -627,7 +634,7 @@ test('Renders AddToCartModal properly', () => {
     expect(numOfRowsRendered).toEqual(MOCK_DATA.itemsAdded.length)
 
     // Check that the "Select Bonus Products" button is displayed
-    expect(screen.getByText('Select Bonus Products')).toBeInTheDocument()
+    expect(screen.getByText(/select bonus products/i)).toBeInTheDocument()
 })
 
 test('Do not render when isOpen is false', () => {

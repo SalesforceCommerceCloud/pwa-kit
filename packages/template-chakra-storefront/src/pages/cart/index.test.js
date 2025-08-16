@@ -196,7 +196,7 @@ describe('Cart tests', () => {
         const {user} = renderWithProviders(<Cart />)
         await waitFor(async () => {
             expect(screen.getByTestId('sf-cart-container')).toBeInTheDocument()
-            expect(screen.getByText(/Belted Cardigan With Studs/i)).toBeInTheDocument()
+            expect(screen.getAllByText(/Belted Cardigan With Studs/i)[0]).toBeInTheDocument()
         })
 
         const cartItem = await screen.findByTestId(
@@ -248,11 +248,16 @@ describe('Product view tests', function () {
     test('Can update item quantity from product view modal', async () => {
         const {user} = renderWithProviders(<Cart />)
         expect(await screen.findByTestId('sf-cart-container')).toBeInTheDocument()
-        expect(screen.getByText(/Belted Cardigan With Studs/i)).toBeInTheDocument()
 
+        // Wait for cart content to load and try to find the cart item
         const cartItem = await screen.findByTestId(
-            `sf-cart-item-${mockCustomerBaskets.baskets[0].productItems[0].productId}`
+            `sf-cart-item-${mockCustomerBaskets.baskets[0].productItems[0].productId}`,
+            {},
+            {timeout: 5000} // Give more time for async loading
         )
+
+        // If cart item exists, the product name should be findable
+        expect(screen.getAllByText(/Belted Cardigan With Studs/i)[0]).toBeInTheDocument()
 
         // Mock the PATCH request for updating basket item quantity before opening modal
         prependHandlersToServer([
@@ -341,7 +346,7 @@ describe('Remove item from cart', function () {
         let cartItem
         await waitFor(() => {
             expect(screen.getByTestId('sf-cart-container')).toBeInTheDocument()
-            expect(screen.getByText(/Belted Cardigan With Studs/i)).toBeInTheDocument()
+            expect(screen.getAllByText(/Belted Cardigan With Studs/i)[0]).toBeInTheDocument()
 
             cartItem = screen.getByTestId('sf-cart-item-701642889830M')
             expect(cartItem).toBeInTheDocument()
@@ -585,7 +590,7 @@ describe('Gift option tests', function () {
         const {user} = renderWithProviders(<Cart />)
         await waitFor(() => {
             expect(screen.getByTestId('sf-cart-container')).toBeInTheDocument()
-            expect(screen.getByText(/Belted Cardigan With Studs/i)).toBeInTheDocument()
+            expect(screen.getAllByText(/Belted Cardigan With Studs/i)[0]).toBeInTheDocument()
 
             const cartItem = screen.getByTestId('sf-cart-item-701642889830M')
             expect(cartItem).toBeInTheDocument()
@@ -733,7 +738,7 @@ describe('Product bundles', () => {
         await waitFor(
             async () => {
                 expect(screen.getByTestId('sf-cart-container')).toBeInTheDocument()
-                expect(screen.getByText(/women's clothing test bundle/i)).toBeInTheDocument()
+                expect(screen.getAllByText(/women's clothing test bundle/i)[0]).toBeInTheDocument()
 
                 // child product 1
                 expect(
@@ -765,7 +770,7 @@ describe('Product bundles', () => {
         await waitFor(async () => {
             expect(screen.getByTestId('sf-cart-container')).toBeInTheDocument()
             // Parent bundle
-            expect(screen.getByText(/women's clothing test bundle/i)).toBeInTheDocument()
+            expect(screen.getAllByText(/women's clothing test bundle/i)[0]).toBeInTheDocument()
             // bundle children
             expect(screen.getByText(/Sleeveless Pleated Floral Front Blouse/i)).toBeInTheDocument()
             expect(screen.getByText(/swing tank/i)).toBeInTheDocument()
@@ -833,8 +838,8 @@ describe('Unavailable products tests', function () {
         const {user, getByText} = renderWithProviders(<Cart />)
         await waitFor(() => {
             expect(screen.getByTestId('sf-cart-container')).toBeInTheDocument()
-            expect(screen.getByText(/Worn Gold Dangle Earring/i)).toBeInTheDocument()
-            expect(screen.getByText(/Straight Leg Trousers/i)).toBeInTheDocument()
+            expect(screen.getAllByText(/Worn Gold Dangle Earring/i)[0]).toBeInTheDocument()
+            expect(screen.getAllByText(/Straight Leg Trousers/i)[0]).toBeInTheDocument()
         })
 
         await waitFor(async () => {

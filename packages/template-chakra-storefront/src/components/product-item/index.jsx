@@ -56,7 +56,9 @@ const ProductItem = ({
     primaryAction,
     secondaryActions,
     onItemQuantityChange = noop,
-    showLoading = false
+    showLoading = false,
+    showQuantitySelector = true,
+    hideBorder = false
 }) => {
     const {stepQuantity, showInventoryMessage, inventoryMessage, quantity, setQuantity} =
         useDerivedProduct(product)
@@ -69,7 +71,7 @@ const ProductItem = ({
         >
             <ItemVariantProvider variant={product}>
                 {showLoading && <LoadingSpinner />}
-                <Stack layerStyle="cardBordered" align="flex-start">
+                <Stack layerStyle={hideBorder ? undefined : 'cardBordered'} align="flex-start">
                     <Flex width="full" alignItems="flex-start" backgroundColor="white">
                         <CartItemVariantImage width={['88px', '136px']} mr={4} />
                         <Stack spacing={3} flex={1}>
@@ -87,53 +89,56 @@ const ProductItem = ({
                             </Stack>
 
                             <Flex align="flex-end" justify="space-between">
-                                <Stack spacing={1}>
-                                    <Text
-                                        fontSize="sm"
-                                        color="gray.700"
-                                        aria-label={formatMessage(messages.quantitySelector, {
-                                            quantity: product?.quantity,
-                                            productName: product?.name
-                                        })}
-                                    >
-                                        {formatMessage(messages.quantity)}
-                                    </Text>
-                                    <QuantityPicker
-                                        step={stepQuantity}
-                                        value={quantity}
-                                        min={0}
-                                        clampValueOnBlur={false}
-                                        onBlur={(e) => {
-                                            // Default to last known quantity if a user leaves the box with an invalid value
-                                            const {value} = e.target
+                                {showQuantitySelector && (
+                                    <Stack spacing={1}>
+                                        <Text
+                                            fontSize="sm"
+                                            color="gray.700"
+                                            aria-label={formatMessage(messages.quantitySelector, {
+                                                quantity: product?.quantity,
+                                                productName: product?.name
+                                            })}
+                                        >
+                                            {formatMessage(messages.quantity)}
+                                        </Text>
+                                        <QuantityPicker
+                                            step={stepQuantity}
+                                            value={quantity}
+                                            min={0}
+                                            clampValueOnBlur={false}
+                                            onBlur={(e) => {
+                                                // Default to last known quantity if a user leaves the box with an invalid value
+                                                const {value} = e.target
 
-                                            if (!value) {
-                                                setQuantity(product.quantity)
-                                            }
-                                        }}
-                                        onValueChange={({value, valueAsNumber}) => {
-                                            // Set the Quantity of product to value of input if value number
-                                            if (valueAsNumber >= 0) {
-                                                // Call handler
-                                                onItemQuantityChange(valueAsNumber).then(
-                                                    (isValidChange) =>
-                                                        isValidChange && setQuantity(valueAsNumber)
-                                                )
-                                            } else if (value === '') {
-                                                // We want to allow the use to clear the input to start a new input so here we set the quantity to '' so NAN is not displayed
-                                                // User will not be able to add '' quantity to the cart due to the add to cart button enablement rules
-                                                setQuantity(value)
-                                            }
-                                        }}
-                                        productName={product?.name}
-                                    />
-                                    <VisuallyHidden role="status">
-                                        {product?.name}
-                                        {formatMessage(messages.assistiveQuantityMsg, {
-                                            quantity: product?.quantity
-                                        })}
-                                    </VisuallyHidden>
-                                </Stack>
+                                                if (!value) {
+                                                    setQuantity(product.quantity)
+                                                }
+                                            }}
+                                            onValueChange={({value, valueAsNumber}) => {
+                                                // Set the Quantity of product to value of input if value number
+                                                if (valueAsNumber >= 0) {
+                                                    // Call handler
+                                                    onItemQuantityChange(valueAsNumber).then(
+                                                        (isValidChange) =>
+                                                            isValidChange &&
+                                                            setQuantity(valueAsNumber)
+                                                    )
+                                                } else if (value === '') {
+                                                    // We want to allow the use to clear the input to start a new input so here we set the quantity to '' so NAN is not displayed
+                                                    // User will not be able to add '' quantity to the cart due to the add to cart button enablement rules
+                                                    setQuantity(value)
+                                                }
+                                            }}
+                                            productName={product?.name}
+                                        />
+                                        <VisuallyHidden role="status">
+                                            {product?.name}
+                                            {formatMessage(messages.assistiveQuantityMsg, {
+                                                quantity: product?.quantity
+                                            })}
+                                        </VisuallyHidden>
+                                    </Stack>
+                                )}
                                 <Stack>
                                     <HideOnMobile>
                                         <CartItemVariantPrice currency={activeCurrency} />
@@ -174,7 +179,9 @@ ProductItem.propTypes = {
     showLoading: PropTypes.bool,
     isWishlistItem: PropTypes.bool,
     primaryAction: PropTypes.node,
-    secondaryActions: PropTypes.node
+    secondaryActions: PropTypes.node,
+    showQuantitySelector: PropTypes.bool,
+    hideBorder: PropTypes.bool
 }
 
 export default ProductItem
