@@ -96,7 +96,11 @@ const AppConfig = ({children, locals = {}}) => {
             passwordlessLoginCallbackURI={passwordlessCallback}
             // Set 'enablePWAKitPrivateClient' to true to use SLAS private client login flows.
             // Make sure to also enable useSLASPrivateClient in ssr.js when enabling this setting.
-            enablePWAKitPrivateClient={{{answers.project.commerce.isSlasPrivate}}}
+            {{#if answers.project.commerce.isSlasPrivate}}
+            enablePWAKitPrivateClient={true}
+            {{else}}
+            enablePWAKitPrivateClient={false}
+            {{/if}}
             slasPrivateClientProxyEndpoint={slasPrivateClientProxyEndpoint}
         >
             <MultiSiteProvider site={locals.site} locale={locals.locale} buildUrl={locals.buildUrl}>
