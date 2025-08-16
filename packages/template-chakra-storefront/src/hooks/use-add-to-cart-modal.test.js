@@ -601,6 +601,11 @@ test('Renders AddToCartModal properly', () => {
                 id: '701642811399M',
                 quantity: 22
             }
+        ],
+        bonusDiscountLineItems: [
+            {
+                promotionId: 'ChoiceOfBonusProdect-ProductLevel-ruleBased'
+            }
         ]
     }
 
@@ -620,9 +625,6 @@ test('Renders AddToCartModal properly', () => {
 
     const numOfRowsRendered = screen.getAllByTestId('product-added').length
     expect(numOfRowsRendered).toEqual(MOCK_DATA.itemsAdded.length)
-
-    // Check that the promotional message is displayed
-    expect(screen.getByText('Bonus products available!')).toBeInTheDocument() //todo: update tests after static text is removed
 
     // Check that the "Select Bonus Products" button is displayed
     // Try multiple approaches to find the button

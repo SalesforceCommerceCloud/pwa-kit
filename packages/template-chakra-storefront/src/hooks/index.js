@@ -17,3 +17,8 @@ export {useDerivedProduct} from './use-derived-product'
 export {useCurrency} from './use-currency'
 export {useCurrentCustomer} from './use-current-customer'
 export {useCurrentBasket} from './use-current-basket'
+export {
+    BonusProductSelectionModalProvider,
+    useBonusProductSelectionModalContext,
+    useBonusProductSelectionModal
+} from './use-bonus-product-selection-modal'
