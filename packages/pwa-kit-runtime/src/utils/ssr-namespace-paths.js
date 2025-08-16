@@ -33,7 +33,9 @@ export const getEnvBasePath = () => {
     let basePath = config?.envBasePath || ''
 
     if (typeof basePath !== 'string') {
-        logger.warn('Invalid envBasePath configuration. No base path is applied.')
+        logger.warn('Invalid envBasePath configuration. No base path is applied.', {
+            namespace: 'ssr-namespace-paths.getEnvBasePath'
+        })
         return ''
     }
 

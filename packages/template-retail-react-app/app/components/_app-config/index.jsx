@@ -102,7 +102,7 @@ const AppConfig = ({children, locals = {}}) => {
             proxy={proxy}
             headers={headers}
             defaultDnt={DEFAULT_DNT_STATE}
-            // Uncomment 'enablePWAKitPrivateClient' to use SLAS private client login flows.
+            // Set 'enablePWAKitPrivateClient' to true to use SLAS private client login flows.
             // Make sure to also enable useSLASPrivateClient in ssr.js when enabling this setting.
             enablePWAKitPrivateClient={false}
             slasPrivateClientProxyEndpoint={slasPrivateClientProxyEndpoint}
