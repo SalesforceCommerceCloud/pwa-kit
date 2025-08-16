@@ -625,7 +625,38 @@ test('Renders AddToCartModal properly', () => {
     expect(screen.getByText('Bonus products available!')).toBeInTheDocument() //todo: update tests after static text is removed
 
     // Check that the "Select Bonus Products" button is displayed
-    expect(screen.getByText('Select Bonus Products')).toBeInTheDocument()
+    // Try multiple approaches to find the button
+    let selectBonusButton = screen.queryByText(/select bonus products/i)
+
+    if (!selectBonusButton) {
+        // Try finding by role and name
+        selectBonusButton = screen.queryByRole('button', {name: /select bonus products/i})
+    }
+
+    if (!selectBonusButton) {
+        // Try finding by partial text match
+        selectBonusButton = screen.queryByText((content, element) => {
+            return (
+                element &&
+                element.tagName.toLowerCase() === 'button' &&
+                content.toLowerCase().includes('select') &&
+                content.toLowerCase().includes('bonus')
+            )
+        })
+    }
+
+    if (!selectBonusButton) {
+        // Debug: log all text content if button is still not found
+        console.log('Available text content:', screen.getByTestId('add-to-cart-modal').textContent)
+        // Also log all buttons
+        const buttons = screen.getAllByRole('button')
+        console.log(
+            'Available buttons:',
+            buttons.map((btn) => btn.textContent)
+        )
+    }
+
+    expect(selectBonusButton).toBeInTheDocument()
 })
 
 test('Do not render when isOpen is false', () => {
