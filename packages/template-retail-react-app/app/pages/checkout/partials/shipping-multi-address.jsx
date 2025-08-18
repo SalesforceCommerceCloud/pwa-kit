@@ -430,6 +430,25 @@ const ShippingMultiAddress = ({
         const addressKey = itemId
 
         if (customer && customer.isGuest) {
+            const addressExists = guestAddresses.some((addr) =>
+                areAddressesEqual(addr, addressData)
+            )
+
+            if (addressExists) {
+                setShowAddAddressForm((prev) => ({...prev, [addressKey]: false}))
+                form.reset()
+                form.clearErrors()
+
+                showToast({
+                    title: formatMessage({
+                        id: 'shipping_multi_address.info.address_already_exists',
+                        defaultMessage: 'Address already exists'
+                    }),
+                    status: 'info'
+                })
+                return
+            }
+
             // store address in component state
             try {
                 const newAddress = {
@@ -487,8 +506,6 @@ const ShippingMultiAddress = ({
                     ...addressData,
                     addressId: nanoid()
                 }
-
-                // Check if the new address already exists in customer address book
                 const addressExists = registeredUserAddresses.some((addr) =>
                     areAddressesEqual(addr, newAddress)
                 )
