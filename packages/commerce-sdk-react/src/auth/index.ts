@@ -4,14 +4,8 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import {
-    helpers,
-    ShopperLogin,
-    ShopperCustomers,
-    ShopperLoginTypes,
-    ShopperCustomersTypes,
-    FetchOptions
-} from 'commerce-sdk-isomorphic'
+import {helpers, ShopperLogin, ShopperCustomers} from 'commerce-sdk-isomorphic'
+import type {ShopperLoginTypes, ShopperCustomersTypes, FetchOptions} from 'commerce-sdk-isomorphic'
 import {jwtDecode, JwtPayload} from 'jwt-decode'
 import {ApiClientConfigParams, Prettify, RemoveStringIndex} from '../hooks/types'
 import {BaseStorage, LocalStorage, CookieStorage, MemoryStorage, StorageType} from './storage'

@@ -4,7 +4,8 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import {ShopperBasketsTypes, ShopperCustomers, ShopperCustomersTypes} from 'commerce-sdk-isomorphic'
+import {ShopperCustomers} from 'commerce-sdk-isomorphic'
+import type {ShopperBasketsTypes, ShopperCustomersTypes} from 'commerce-sdk-isomorphic'
 import {
     ApiClients,
     Argument,

@@ -9,7 +9,7 @@ import nock from 'nock'
 import {act, waitFor} from '@testing-library/react'
 import {mockMutationEndpoints, renderHookWithProviders} from '../test-utils'
 import * as useTrustedAgentModule from './useTrustedAgent'
-import {ShopperLoginTypes} from 'commerce-sdk-isomorphic'
+import type {ShopperLoginTypes} from 'commerce-sdk-isomorphic'
 import useAuthContext from './useAuthContext'
 
 jest.mock('./useAuthContext')

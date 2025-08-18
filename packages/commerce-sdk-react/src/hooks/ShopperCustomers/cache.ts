@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import {ShopperCustomersTypes} from 'commerce-sdk-isomorphic'
+import type {ShopperCustomersTypes} from 'commerce-sdk-isomorphic'
 import {Query} from '@tanstack/react-query'
 import {getCustomerProductListItem} from './queryKeyHelpers'
 import {ApiClients, CacheUpdateMatrix} from '../types'
