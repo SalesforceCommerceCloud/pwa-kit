@@ -11,12 +11,15 @@ runs:
       working-directory: ${{ inputs.cwd }}
       run: |-
         # Install node dependencies
+        echo "=== STARTING DEPENDENCY INSTALLATION ==="
         node ./scripts/gtime.js monorepo_install npm ci
 
         # Build the PWA
+        echo "=== BUILDING PWA ==="
         npm run lerna -- run analyze-build --scope "@salesforce/retail-react-app"
 
         # Report bundle sizes
+        echo "=== REPORTING BUNDLE SIZES ==="
         node ./scripts/report-bundle-size.js
 
         # Install Snyk CLI
@@ -25,5 +28,16 @@ runs:
         # sudo npm install -g snyk
 
         # Install Lighthouse CI CLI
+        echo "=== INSTALLING LIGHTHOUSE CLI ==="
         sudo npm install -g @lhci/cli
+        
+        echo "=== SETUP UBUNTU COMPLETED SUCCESSFULLY ==="
+      shell: bash
+      
+    - name: Run Diagnostics on Failure
+      if: failure()
+      working-directory: ${{ inputs.cwd }}
+      run: |-
+        echo "=== RUNNING CI DIAGNOSTICS DUE TO FAILURE ==="
+        node ./scripts/diagnose-ci-issues.js || echo "Diagnostic script failed, but continuing..."
       shell: bash
