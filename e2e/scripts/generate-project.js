@@ -69,7 +69,8 @@ program
             'retail-app-no-ext',
             'retail-app-private-client',
             'retail-react-app-bug-bounty',
-            'retail-react-app-demo-site'
+            'retail-react-app-demo-site',
+            'retail-react-app-performance-tests'
         ]
         if (!validKeys.includes(value)) {
             throw new Error('Invalid project key.')
