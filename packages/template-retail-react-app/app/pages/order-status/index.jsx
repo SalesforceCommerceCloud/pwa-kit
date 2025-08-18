@@ -46,7 +46,7 @@ const OrderStatusPage = () => {
     return (
         <Box data-testid="order-status-page" bg="gray.50">
             <Container py={{base: 8, md: 8}} pt={{base: 12, md: 24}}>
-                <Heading as="h1" size="lg" textAlign="left" tabIndex="0" ref={headingRef}>
+                <Heading as="h1" size="lg" textAlign="center" tabIndex="0" ref={headingRef}>
                     <FormattedMessage
                         defaultMessage="Order Status"
                         id="order_status_page.heading.order_status"

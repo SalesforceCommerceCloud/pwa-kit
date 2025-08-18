@@ -30,7 +30,7 @@ export default function useOrderLookupFields({
             defaultValue: '',
             rules: {
                 required: formatMessage({
-                    defaultMessage: 'Please enter your order number.',
+                    defaultMessage: 'Enter your order number.',
                     id: 'use_order_lookup_fields.error.required_order_number'
                 })
             },
@@ -52,7 +52,7 @@ export default function useOrderLookupFields({
             defaultValue: '',
             rules: {
                 required: formatMessage({
-                    defaultMessage: 'Please enter your email address.',
+                    defaultMessage: 'Enter your email address.',
                     id: 'use_order_lookup_fields.error.required_email'
                 })
             },
