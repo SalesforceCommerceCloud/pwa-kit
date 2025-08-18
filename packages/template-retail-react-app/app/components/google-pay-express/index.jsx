@@ -218,7 +218,6 @@ export const getGoogleButtonConfig = (authToken, site, basket, googlePayConfig) 
                 }
 
                 const adyenPaymentService = new AdyenPaymentsService(authToken, site)
-                basket = await forceOrderCalculation(basket.basketId, authToken, site)
 
                 const customerId = basket?.customerId || basket?.customerInfo?.customerId
                 const paymentsResponse = await adyenPaymentService.submitPayment(
