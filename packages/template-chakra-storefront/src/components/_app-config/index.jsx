@@ -13,7 +13,8 @@ import {ChakraProvider} from '@chakra-ui/react'
 import 'focus-visible/dist/focus-visible'
 
 import theme from '../../theme'
-// import {MultiSiteProvider, AppConfigProvider} from '../../../src/contexts'
+// @sfdc-extension-line SFDC_EXT_STORE_LOCATOR
+import {StoreLocatorProvider} from '../../contexts'
 import {MultiSiteProvider} from '../../contexts'
 import {useAppOrigin} from '../../hooks'
 import {resolveSiteFromUrl, resolveLocaleFromUrl} from '../../utils/site-utils'
@@ -26,9 +27,8 @@ import {CommerceApiProvider, resetDehydratedStateTimeStamp} from '@salesforce/co
 import {withReactQuery} from '@salesforce/pwa-kit-react-sdk/ssr/universal/components/with-react-query'
 import {useCorrelationId} from '@salesforce/pwa-kit-react-sdk/ssr/universal/hooks'
 import {ReactQueryDevtools} from '@tanstack/react-query-devtools'
+/** @sfdc-extension-block-start SFDC_EXT_STORE_LOCATOR */
 import {
-    DEFAULT_DNT_STATE,
-    /* @sfdc-extension-block-start SFDC_EXT_STORE_LOCATOR */
     STORE_LOCATOR_RADIUS,
     STORE_LOCATOR_RADIUS_UNIT,
     STORE_LOCATOR_DEFAULT_COUNTRY,
@@ -36,8 +36,8 @@ import {
     STORE_LOCATOR_DEFAULT_POSTAL_CODE,
     STORE_LOCATOR_DEFAULT_PAGE_SIZE,
     STORE_LOCATOR_SUPPORTED_COUNTRIES
-    /* @sfdc-extension-block-end SFDC_EXT_STORE_LOCATOR */
 } from '../../../src/config/constants'
+/** @sfdc-extension-block-end SFDC_EXT_STORE_LOCATOR */
 
 /**
  * Use the AppConfig component to inject extra arguments into the getProps

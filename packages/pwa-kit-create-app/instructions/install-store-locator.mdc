@@ -7,7 +7,7 @@ These are the steps to upgrade an existing store front application (currently op
 
  # Step 1. Prerequisites: First make sure the current project has all the necessary files. If any requirement in the prerequisite is not met, abort the rest of this instruction.
  <Prerequisites>
- - The file `config/constants` exists
+ - The file `config/constants.js` exists
  - The file `src/components/_app/index.jsx` exists
  - The file `src/components/_app/partials/app-header.jsx` exists
  - The file `src/components/_app/partials/app-modals.jsx` exists
@@ -32,7 +32,7 @@ These are the steps to upgrade an existing store front application (currently op
  # Step 4. Merge. Apply the following code changes to the files specified. Skip a step if the code change has already been applied.
  <Merge>
  - Go through following files in /tmp/pwa-kit-tmp/packages/template-chakra-storefront one by one, then perform the following steps: 
-        - `config/constants`
+        - `config/constants.js`
         - `src/components/_app/index.jsx`
         - `src/components/_app/partials/app-header.jsx`
         - `src/components/_app/partials/app-modals.jsx`
