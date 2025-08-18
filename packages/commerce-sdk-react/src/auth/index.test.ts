@@ -697,10 +697,10 @@ describe('Auth', () => {
             const auth = new Auth(config)
 
             // Mock the helper to return token response with no refresh_token_expires_in
-            const tokenResponse: ShopperLoginTypes.TokenResponse = {
+            const tokenResponse = {
                 ...TOKEN_RESPONSE,
                 refresh_token_expires_in: undefined
-            }
+            } as unknown as ShopperLoginTypes.TokenResponse
             ;(helpers.loginGuestUser as jest.Mock).mockResolvedValueOnce(tokenResponse)
 
             await auth.loginGuestUser()
@@ -723,10 +723,10 @@ describe('Auth', () => {
             const auth = new Auth(config)
 
             // Mock the helper to return token response with no refresh_token_expires_in
-            const tokenResponse: ShopperLoginTypes.TokenResponse = {
+            const tokenResponse = {
                 ...TOKEN_RESPONSE,
                 refresh_token_expires_in: undefined
-            }
+            } as unknown as ShopperLoginTypes.TokenResponse
             ;(helpers.loginRegisteredUserB2C as jest.Mock).mockResolvedValueOnce(tokenResponse)
 
             await auth.loginRegisteredUserB2C({username: 'test', password: 'test'})
