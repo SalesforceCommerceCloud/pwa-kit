@@ -238,9 +238,48 @@ const baseConfig = (target) => {
                                       [item]: path.resolve(projectDir)
                                   }))
                               )
-                            : {})
+                            : {}),
+                        // Handle node: protocol imports for Node.js built-ins
+                        'node:zlib': false,
+                        'node:net': false,
+                        'node:tls': false,
+                        'node:assert': false,
+                        'node:fs': false,
+                        'node:path': false,
+                        'node:os': false,
+                        'node:http': false,
+                        'node:https': false,
+                        'node:stream': false,
+                        'node:buffer': false,
+                        'node:util': false,
+                        'node:events': false,
+                        'node:querystring': false,
+                        'node:url': false,
+                        'node:crypto': false,
+                        'node:worker_threads': false,
+                        'node:async_hooks': false
                     },
-                    ...(target === 'web' ? {fallback: {crypto: false}} : {})
+                    fallback: {
+                        ...(target === 'web' ? {crypto: false} : {}),
+                        worker_threads: false,
+                        async_hooks: false,
+                        zlib: false,
+                        net: false,
+                        tls: false,
+                        assert: false,
+                        fs: false,
+                        path: false,
+                        os: false,
+                        http: false,
+                        https: false,
+                        stream: false,
+                        buffer: false,
+                        util: false,
+                        events: false,
+                        querystring: false,
+                        url: false,
+                        process: false
+                    }
                 },
 
                 plugins: [
@@ -254,6 +293,12 @@ const baseConfig = (target) => {
                     mode === development && new webpack.NoEmitOnErrorsPlugin(),
 
                     sdkReplacementPlugin(),
+
+                    // Handle node: protocol imports by providing empty modules
+                    new webpack.NormalModuleReplacementPlugin(/^node:/, (resource) => {
+                        const mod = resource.request.replace(/^node:/, '')
+                        resource.request = mod
+                    }),
 
                     // Don't chunk if it's a node target – faster Lambda startup.
                     target === 'node' && new webpack.optimize.LimitChunkCountPlugin({maxChunks: 1})
@@ -277,11 +322,22 @@ const baseConfig = (target) => {
                                 loader: findDepInStack('html-loader')
                             }
                         },
-                        {
+                        // Only use source-map-loader when not in CI to avoid source map parsing errors
+                        !CI && {
                             test: /\.js$/,
                             enforce: 'pre',
+                            exclude: /node_modules/,
                             use: {
-                                loader: findDepInStack('source-map-loader')
+                                loader: findDepInStack('source-map-loader'),
+                                options: {
+                                    filterSourceMappingUrl: (url) => {
+                                        // Skip source maps that reference non-existent TypeScript files
+                                        if (url.includes('/src/') && url.includes('.ts')) {
+                                            return false
+                                        }
+                                        return true
+                                    }
+                                }
                             }
                         }
                     ].filter(Boolean)

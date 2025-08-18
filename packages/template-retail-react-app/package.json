@@ -9,7 +9,7 @@
     ]
   },
   "scripts": {
-    "analyze-build": "cross-env MOBIFY_ANALYZE=true npm run build",
+    "analyze-build": "cross-env MOBIFY_ANALYZE=true CI=true npm run build",
     "build": "npm run build-translations && pwa-kit-dev build",
     "build-translations": "npm run extract-default-translations && npm run compile-translations && npm run compile-translations:pseudo",
     "compile-translations": "node ./scripts/translations/compile-folder.js translations",
