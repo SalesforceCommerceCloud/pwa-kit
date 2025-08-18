@@ -128,7 +128,6 @@ const ShopperAgentWindow = ({commerceAgentConfiguration, locale, basketId}) => {
         if (event.source && event.source !== window) {
             try {
                 if (event.data.type === 'lwc.getCustomerData') {
-                    console.log('Recevied request for customer data from MIAW window')
                     const authToken = await getTokenWhenReady()
                     sendExpressMessage('express.actualCustomerData', {
                         customerId,
