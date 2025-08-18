@@ -12,8 +12,8 @@ describe('user-agent-utils', () => {
         test('should generate correct sfdc_user_agent header value', () => {
             const userAgent = generateSfdcUserAgent()
             
-            expect(userAgent).toMatch(/^PWA-Kit@[\d\w.-]+ commerce-sdk-react@[\d\w.-]+$/)
-            expect(userAgent).toContain('PWA-Kit@')
+            expect(userAgent).toMatch(/^pwa-kit-react-sdk@[\d\w.-]+ commerce-sdk-react@[\d\w.-]+$/)
+            expect(userAgent).toContain('pwa-kit-react-sdk@')
             expect(userAgent).toContain('commerce-sdk-react@')
         })
         
@@ -43,7 +43,7 @@ describe('user-agent-utils', () => {
             
             const userAgent = generateSfdcUserAgent()
             if (userAgent.includes('unknown')) {
-                expect(userAgent).toBe('PWA-Kit@unknown commerce-sdk-react@unknown')
+                expect(userAgent).toBe('pwa-kit-react-sdk@unknown commerce-sdk-react@unknown')
             }
         })
         

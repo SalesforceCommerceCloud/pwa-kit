@@ -10,7 +10,7 @@
  * This header helps identify and track SDK versions invoking SCAPI for debugging
  * and metrics purposes.
  *
- * @returns {string} The sfdc_user_agent header value
+ * @returns {string} The sfdc_user_agent header value in format: pwa-kit-react-sdk@version commerce-sdk-react@version
  */
 export const generateSfdcUserAgent = () => {
     try {
@@ -24,9 +24,9 @@ export const generateSfdcUserAgent = () => {
             retailAppPkg.dependencies?.['@salesforce/pwa-kit-react-sdk'] || 'unknown'
 
         // Using @ format to align with NPM package@version conventions for better tooling compatibility
-        return `PWA-Kit@${pwaKitVersion} commerce-sdk-react@${commerceSdkVersion}`.trim()
+        return `pwa-kit-react-sdk@${pwaKitVersion} commerce-sdk-react@${commerceSdkVersion}`.trim()
     } catch (error) {
         console.warn('Unable to generate sfdc_user_agent header:', error)
-        return 'PWA-Kit@unknown commerce-sdk-react@unknown'
+        return 'pwa-kit-react-sdk@unknown commerce-sdk-react@unknown'
     }
 }
