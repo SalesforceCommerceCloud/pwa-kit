@@ -115,7 +115,6 @@ const ShopperAgentWindow = ({commerceAgentConfiguration, locale, basketId}) => {
     const sendExpressMessage = (type, payload = {}) => {
         const embeddedMessagingFrame = document.querySelector('div.embedded-messaging iframe')
         const iframeSrc = embeddedMessagingFrame.src
-        console.log('==embeddedMessagingFrame==', embeddedMessagingFrame)
         const eventData = {
             type,
             payload
