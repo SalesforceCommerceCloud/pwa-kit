@@ -17,6 +17,7 @@ import {useExpressPaymentManager} from '@salesforce/retail-react-app/app/compone
 
 // Define the payment methods we will attempt to load
 const PAYMENT_METHODS = ['applepay', 'googlepay']
+const PDP_PAYMENT_METHODS = ['applepay']
 
 function Express() {
     const navigate = useNavigation()
@@ -36,7 +37,9 @@ function Express() {
     const [currentQuantity, setCurrentQuantity] = useState(1)
 
     // Initialize the express payment manager
-    const {manager, managerError} = useExpressPaymentManager(PAYMENT_METHODS)
+    const {manager, managerError} = useExpressPaymentManager(
+        isPdpMode ? PDP_PAYMENT_METHODS : PAYMENT_METHODS
+    )
 
     // PostMessage listener for SKU updates
     useEffect(() => {
@@ -45,13 +48,20 @@ function Express() {
             // In production, you might want to restrict this to specific origins
 
             if (event.data && typeof event.data === 'object') {
-                const {type, sku} = event.data
+                const {type, sku, quantity} = event.data
 
                 // Handle SKU update messages
                 if (type === 'UPDATE_SKU' && typeof sku === 'string') {
                     setCurrentSku(sku)
                     // Always set quantity to 1 when SKU changes
                     setCurrentQuantity(1)
+                }
+
+                // Handle quantity update messages
+                if (type === 'UPDATE_QUANTITY' && typeof quantity === 'number') {
+                    // Validate quantity is a positive integer with reasonable limits
+                    const validatedQuantity = Math.max(1, Math.min(999, Math.floor(quantity)))
+                    setCurrentQuantity(validatedQuantity)
                 }
 
                 // Handle SKU clear messages (for regular checkout)
@@ -120,6 +130,7 @@ function Express() {
                     isPdpMode={isPdpMode}
                     basketData={basket}
                     authToken={authToken}
+                    manager={manager}
                 />
             )}
         </div>
