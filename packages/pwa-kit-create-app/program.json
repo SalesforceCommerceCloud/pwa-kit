@@ -473,6 +473,54 @@
                 "private": true
             },
             {
+                "id": "retail-react-app-performance-tests",
+                "name": "Retail React App for performance tests",
+                "description": "",
+                "templateId": "retail-react-app",
+                "answers": {
+                    "project.extend": false,
+                    "project.hybrid": false,
+                    "project.name": "retail-react-app",
+                    "project.commerce.instanceUrl": "https://zzrf-001.dx.commercecloud.salesforce.com",
+                    "project.commerce.clientId": "9629ef22-f8b8-4987-90ac-b815be3940c8",
+                    "project.commerce.siteId": "SiteNemesis",
+                    "project.commerce.organizationId": "f_ecom_tbbn_prd",
+                    "project.commerce.shortCode": "performance-001",
+                    "project.commerce.isSlasPrivate": true,
+                    "project.einstein.clientId": "1ea06c6e-c936-4324-bcf0-fada93f83bb1",
+                    "project.einstein.siteId": "aaij-MobileFirst",
+                    "project.dataCloud.appSourceId": "7ae070a6-f4ec-4def-a383-d9cacc3f20a1",
+                    "project.dataCloud.tenantId": "g82wgnrvm-ywk9dggrrw8mtggy.pc-rnd",
+                    "project.demo.enableDemoSettings": false,
+
+                    "project.partialHydrationEnabled": true,
+                    "project.contentSecurityPolicy": {
+                        "useDefaults": true,
+                        "directives": {
+                            "img-src": [
+                                "*.commercecloud.salesforce.com",
+                                "*.demandware.net",
+                                "*.sfcc-store-internal.net"
+                            ],
+                            "script-src": [
+                                "storage.googleapis.com",
+                                "*.sfcc-store-internal.net"
+                            ],
+                            "connect-src": [
+                                "api.cquotient.com",
+                                "*.c360a.salesforce.com",
+                                "*.salesforce-scrt.com",
+                                "*.sfcc-store-internal.net"
+                            ],
+                            "frame-src": [
+                                "*.site.com"
+                            ]
+                        }
+                    }
+                },
+                "private": true
+            },
+            {
                 "id": "typescript-minimal-test-project",
                 "name": "Template Minimal Test Project",
                 "description": "",
@@ -723,7 +771,7 @@
             {
                 "name": "--stdio",
                 "description": "Accept project generation answers from stdin as JSON"
-            }, 
+            },
             {
                 "name": "--displayProgram",
                 "description": "Display the program.json file detailing the program schema/data and exit"

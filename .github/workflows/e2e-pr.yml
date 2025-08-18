@@ -64,6 +64,7 @@ jobs:
                   echo "retail_app_template_version=$version" >> "$GITHUB_ENV"
 
             - name: Generate Retail App Private Client
+              id: generate_app
               if: ${{ env.SKIP_WORKFLOW != 'true' }}
               uses: ./.github/actions/e2e_generate_app
               with:
@@ -89,7 +90,7 @@ jobs:
               if: ${{ env.SKIP_WORKFLOW != 'true' }}
               uses: './.github/actions/push_to_mrt'
               with:
-                  CWD: '../generated-projects/retail-app-no-ext'
+                  CWD: ${{ steps.generate_app.outputs.project_path }}
                   # TODO: Use the MRT target ID from the target lock step above.
                   TARGET: e2e-tests-pwa-kit
                   FLAGS: --wait
