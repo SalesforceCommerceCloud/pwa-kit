@@ -16,7 +16,9 @@ on:
 
 jobs:
   pwa-kit-bundle-size:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest-4-cores
+    env:
+      CI_JOB_NAME: bundle-size
     steps:
       - name: Checkout
         uses: actions/checkout@v4
