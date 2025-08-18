@@ -62,11 +62,10 @@ function Express() {
 
                 // Handle basket data messages
                 if (type === 'basketDataAvailable') {
-                    const authData = event.data.data.authData
+                    console.log('==basketDataAvailable==', event)
+                    const {basketData, authData} = event.data.data
                     setAuthToken(authData.authToken)
                     setCustomerId(authData.customerId)
-                    const basketData = event.data.data.basketData
-                    // Store values in localStorage
                     setBasketData(basketData)
                 }
             }
