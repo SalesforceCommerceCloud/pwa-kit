@@ -47,7 +47,9 @@ const Payment = () => {
     const selectedBillingAddress = basket?.billingAddress
     const appliedPayment = basket?.paymentInstruments && basket?.paymentInstruments[0]
 
-    const isPickupOrder = basket?.shipments?.length > 0 && basket.shipments.every(shipment => isPickupShipment(shipment))
+    const isPickupOrder =
+        basket?.shipments?.length > 0 &&
+        basket.shipments.every((shipment) => isPickupShipment(shipment))
     const [billingSameAsShipping, setBillingSameAsShipping] = useState(!isPickupOrder)
     const {mutateAsync: addPaymentInstrumentToBasket} = useShopperBasketsMutation(
         'addPaymentInstrumentToBasket'
@@ -231,7 +233,8 @@ const Payment = () => {
                         )}
                     </Stack>
 
-                    {!billingSameAsShipping && (
+                    {/* Always show billing address form for pickup orders, or when not using same as shipping for delivery orders */}
+                    {(isPickupOrder || !billingSameAsShipping) && (
                         <ShippingAddressSelection
                             form={billingAddressForm}
                             selectedAddress={selectedBillingAddress}
