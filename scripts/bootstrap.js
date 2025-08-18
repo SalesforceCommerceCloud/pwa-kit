@@ -22,16 +22,12 @@ const npmCmd = process.env.npm_config_argv
     : process.env.npm_command
 const ciCommand = npmCmd === 'ci'
 
-// Note: For CI environments, we use optimized settings to reduce memory pressure
-// and prevent timeout issues while maintaining reasonable verbosity.
+// Note: We reduce concurrency and increase verbosity on CI environments.
+// They are often memory-constrained and kill processes which produce no
+// output for too long.
 const commandArgs = ciCommand ? '--ci' : '--no-ci'
-
-// For bundle-size CI, only install essential packages to reduce memory usage
-const isBundleSizeCI = process.env.CI_JOB_NAME === 'bundle-size' || process.env.GITHUB_JOB === 'pwa-kit-bundle-size'
-const scopeArgs = isBundleSizeCI ? '--scope="@salesforce/retail-react-app" --scope="@salesforce/commerce-sdk-react" --include-dependencies' : ''
-
-const environmentArgs = ciEnvironment ? '--concurrency 2 --loglevel warn' : ''
-const cmd = `npm run lerna -- bootstrap ${commandArgs} ${environmentArgs} ${scopeArgs}`
+const environmentArgs = ciEnvironment ? '--concurrency 1 --loglevel debug' : ''
+const cmd = `npm run lerna -- bootstrap ${commandArgs} ${environmentArgs}`
 
 childProc.execSync(cmd, {stdio: 'inherit'})
 
