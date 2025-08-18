@@ -7,7 +7,7 @@
 import React from 'react'
 import {render, screen} from '@testing-library/react'
 import {IntlProvider} from 'react-intl'
-import UserRegistration from '@salesforce/retail-react-app/../../app/pages/checkout-one-click/partials/one-click-user-registration'
+import UserRegistration from '@salesforce/retail-react-app/app/pages/checkout-one-click/partials/one-click-user-registration'
 
 const renderWithProviders = (component) => {
     return render(
