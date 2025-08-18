@@ -43,16 +43,10 @@ test('Region throws if used outside of a Page component', () => {
     const originalError = console.error
     console.error = jest.fn()
 
-    try {
+    expect(() => {
         render(<Region region={SAMPLE_REGION} />)
-        // If we get here, the component didn't throw as expected
-        expect(true).toBe(false)
-    } catch (error) {
-        // Expected behavior - component should throw when used outside Page context
-        expect(error).toBeDefined()
-    } finally {
-        console.error = originalError
-    }
+    }).toThrow()
+    console.error = originalError
 })
 
 test('Region renders without errors', () => {

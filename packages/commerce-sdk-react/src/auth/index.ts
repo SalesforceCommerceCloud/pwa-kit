@@ -1183,7 +1183,7 @@ class Auth {
             ],
             ...(!this.clientSecret ? [`code_verifier=${codeVerifier}`] : []),
             ...(usid ? [`usid=${usid}`] : []),
-            ...(dntPref ? [`dnt=${dntPref}`] : []),
+            ...(dntPref ? [`dnt=${String(dntPref)}`] : []),
             // Add custom parameters
             ...Object.entries(customParams)
                 .filter(([key]) => !['redirectURI', 'hint', 'usid', 'dnt'].includes(key))

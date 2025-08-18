@@ -1,0 +1,12 @@
+{
+  "name": "@salesforce/pwa-kit-mcp",
+  "version": "0.2.1-dev",
+  "private": true,
+  "description": "Source package for @salesforce/pwa-kit-mcp",
+  "scripts": {},
+  "devDependencies": {},
+  "engines": {
+    "node": "^16.11.0 || ^18.0.0 || ^20.0.0 || ^22.0.0",
+    "npm": "^8.0.0 || ^9.0.0 || ^10.0.0 || ^11.0.0"
+  }
+}
