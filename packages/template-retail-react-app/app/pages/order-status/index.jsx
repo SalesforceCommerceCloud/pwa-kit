@@ -20,6 +20,7 @@ import {BrandLogo} from '@salesforce/retail-react-app/app/components/icons'
 import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
 import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
 import OrderLookup from '@salesforce/retail-react-app/app/components/order-lookup/index'
+import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 
 const OrderStatusPage = () => {
     const navigate = useNavigation()
@@ -42,6 +43,14 @@ const OrderStatusPage = () => {
 
     // Check if user is not registered and customer data has loaded
     const shouldShowSignInForm = customerType !== null && !isRegistered
+
+    // Feature flag: gate page access (do not call hooks conditionally)
+    const isOrderStatusPageEnabled = getConfig()?.app?.oms?.orderStatusPage?.enabled
+    useEffect(() => {
+        if (isOrderStatusPageEnabled === false) {
+            navigate('/')
+        }
+    }, [isOrderStatusPageEnabled, navigate])
 
     return (
         <Box data-testid="order-status-page" bg="gray.50">

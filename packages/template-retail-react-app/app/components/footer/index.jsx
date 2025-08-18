@@ -31,6 +31,7 @@ import LocaleText from '@salesforce/retail-react-app/app/components/locale-text'
 import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
 import styled from '@emotion/styled'
 import {STORE_LOCATOR_IS_ENABLED} from '@salesforce/retail-react-app/app/constants'
+import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 
 const [StylesProvider, useStyles] = createStylesContext('Footer')
 const Footer = ({...otherProps}) => {
@@ -41,6 +42,7 @@ const Footer = ({...otherProps}) => {
     const {l10n} = site
     const supportedLocaleIds = l10n?.supportedLocales.map((locale) => locale.id)
     const showLocaleSelector = supportedLocaleIds?.length > 1
+    const isOrderStatusPageEnabled = getConfig()?.app?.oms?.orderStatusPage?.enabled
 
     // NOTE: this is a workaround to fix hydration error, by making sure that the `option.selected` property is set.
     // For some reason, adding some styles prop (to the option element) prevented `selected` from being set.
@@ -103,13 +105,17 @@ const Footer = ({...otherProps}) => {
                                     defaultMessage: 'Account'
                                 })}
                                 links={[
-                                    {
-                                        href: '/order-status',
-                                        text: intl.formatMessage({
-                                            id: 'footer.link.order_status',
-                                            defaultMessage: 'Order Status'
-                                        })
-                                    },
+                                    ...(isOrderStatusPageEnabled
+                                        ? [
+                                              {
+                                                  href: '/order-status',
+                                                  text: intl.formatMessage({
+                                                      id: 'footer.link.order_status',
+                                                      defaultMessage: 'Order Status'
+                                                  })
+                                              }
+                                          ]
+                                        : []),
                                     {
                                         href: '/',
                                         text: intl.formatMessage({
