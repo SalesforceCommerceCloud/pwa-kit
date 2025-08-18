@@ -26,9 +26,9 @@ import {
     ShopperPromotions,
     ShopperSearch,
     ShopperSEO,
-    ShopperStores
+    ShopperStores,
+    FetchOptions
 } from 'commerce-sdk-isomorphic'
-import type {FetchOptions} from 'commerce-sdk-isomorphic'
 import {transformSDKClient} from './utils'
 
 export interface CommerceApiProviderProps extends ApiClientConfigParams {

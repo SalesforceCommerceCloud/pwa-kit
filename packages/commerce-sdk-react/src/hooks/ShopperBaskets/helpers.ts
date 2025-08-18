@@ -8,7 +8,7 @@
 import {useCustomerId, useShopperBasketsMutation} from '../index'
 import {useCustomerBaskets} from '../ShopperCustomers'
 import {ApiClients, Argument} from '../types'
-import type {ShopperBasketsTypes} from 'commerce-sdk-isomorphic'
+import {ShopperBasketsTypes} from 'commerce-sdk-isomorphic'
 import {CLIENT_KEYS} from '../../constant'
 
 const CLIENT_KEY = CLIENT_KEYS.SHOPPER_BASKETS

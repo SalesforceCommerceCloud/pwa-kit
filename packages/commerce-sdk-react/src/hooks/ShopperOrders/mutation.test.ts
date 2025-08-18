@@ -6,7 +6,7 @@
  */
 import {useQueryClient} from '@tanstack/react-query'
 import {act} from '@testing-library/react'
-import type {ShopperOrdersTypes} from 'commerce-sdk-isomorphic'
+import {ShopperOrdersTypes} from 'commerce-sdk-isomorphic'
 import nock from 'nock'
 import {
     mockMutationEndpoints,

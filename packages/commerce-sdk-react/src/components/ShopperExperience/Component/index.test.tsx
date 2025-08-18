@@ -42,7 +42,9 @@ test('Page throws if used outside of a Page component', () => {
     const originalError = console.error
     console.error = jest.fn()
 
-    expect(() => render(<Component component={SAMPLE_COMPONENT} />)).toThrow()
+    expect(() => {
+        render(<Component component={SAMPLE_COMPONENT} />)
+    }).toThrow()
     console.error = originalError
 })
 

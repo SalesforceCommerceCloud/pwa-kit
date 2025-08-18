@@ -4,8 +4,14 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import {helpers, ShopperLogin, ShopperCustomers} from 'commerce-sdk-isomorphic'
-import type {ShopperLoginTypes, ShopperCustomersTypes, FetchOptions} from 'commerce-sdk-isomorphic'
+import {
+    helpers,
+    ShopperLogin,
+    ShopperCustomers,
+    ShopperLoginTypes,
+    ShopperCustomersTypes,
+    FetchOptions
+} from 'commerce-sdk-isomorphic'
 import {jwtDecode, JwtPayload} from 'jwt-decode'
 import {ApiClientConfigParams, Prettify, RemoveStringIndex} from '../hooks/types'
 import {BaseStorage, LocalStorage, CookieStorage, MemoryStorage, StorageType} from './storage'
@@ -64,6 +70,7 @@ interface SlasJwtPayload extends JwtPayload {
 type AuthorizeIDPParams = Parameters<Helpers['authorizeIDP']>[0]
 type LoginIDPUserParams = Parameters<Helpers['loginIDPUser']>[0]
 type AuthorizePasswordlessParams = Parameters<Helpers['authorizePasswordless']>[0]
+type LoginPasswordlessParams = Parameters<Helpers['getPasswordLessAccessToken']>[0]
 type LoginRegisteredUserB2CCredentials = Parameters<Helpers['loginRegisteredUserB2C']>[0]
 
 /**
@@ -1237,7 +1244,7 @@ class Auth {
             ],
             ...(!this.clientSecret ? [`code_verifier=${codeVerifier}`] : []),
             ...(usid ? [`usid=${usid}`] : []),
-            ...(dntPref !== undefined ? [`dnt=${String(dntPref)}`] : []),
+            ...(dntPref ? [`dnt=${String(dntPref)}`] : []),
             // Add custom parameters
             ...Object.entries(customParams)
                 .filter(([key]) => !['redirectURI', 'hint', 'usid', 'dnt'].includes(key))

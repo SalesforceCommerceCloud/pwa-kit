@@ -7,15 +7,20 @@
 import Auth, {AuthData} from './'
 import {waitFor} from '@testing-library/react'
 import jwt from 'jsonwebtoken'
-import {helpers, ShopperCustomers} from 'commerce-sdk-isomorphic'
-import type {ShopperCustomersTypes, ShopperLoginTypes} from 'commerce-sdk-isomorphic'
+import {
+    helpers,
+    ShopperCustomersTypes,
+    ShopperCustomers,
+    ShopperLogin
+} from 'commerce-sdk-isomorphic'
 import * as utils from '../utils'
 import {SLAS_SECRET_PLACEHOLDER} from '../constant'
+import {ShopperLoginTypes} from 'commerce-sdk-isomorphic'
 import {
     DEFAULT_SLAS_REFRESH_TOKEN_REGISTERED_TTL,
     DEFAULT_SLAS_REFRESH_TOKEN_GUEST_TTL
 } from './index'
-import {RequireKeys} from '../hooks/types'
+import {ApiClientConfigParams, RequireKeys} from '../hooks/types'
 
 const baseCustomer: RequireKeys<ShopperCustomersTypes.Customer, 'login'> = {
     customerId: 'customerId',
@@ -692,11 +697,10 @@ describe('Auth', () => {
             const auth = new Auth(config)
 
             // Mock the helper to return token response with no refresh_token_expires_in
-            // eslint-disable-next-line @typescript-eslint/no-unused-vars
-            const {refresh_token_expires_in, ...tokenResponseWithoutRefreshExpiry} = TOKEN_RESPONSE
-            const tokenResponse: ShopperLoginTypes.TokenResponse = {
-                ...tokenResponseWithoutRefreshExpiry
-            } as ShopperLoginTypes.TokenResponse
+            const tokenResponse = {
+                ...TOKEN_RESPONSE,
+                refresh_token_expires_in: undefined
+            } as unknown as ShopperLoginTypes.TokenResponse
             ;(helpers.loginGuestUser as jest.Mock).mockResolvedValueOnce(tokenResponse)
 
             await auth.loginGuestUser()
@@ -719,11 +723,10 @@ describe('Auth', () => {
             const auth = new Auth(config)
 
             // Mock the helper to return token response with no refresh_token_expires_in
-            // eslint-disable-next-line @typescript-eslint/no-unused-vars
-            const {refresh_token_expires_in, ...tokenResponseWithoutRefreshExpiry} = TOKEN_RESPONSE
-            const tokenResponse: ShopperLoginTypes.TokenResponse = {
-                ...tokenResponseWithoutRefreshExpiry
-            } as ShopperLoginTypes.TokenResponse
+            const tokenResponse = {
+                ...TOKEN_RESPONSE,
+                refresh_token_expires_in: undefined
+            } as unknown as ShopperLoginTypes.TokenResponse
             ;(helpers.loginRegisteredUserB2C as jest.Mock).mockResolvedValueOnce(tokenResponse)
 
             await auth.loginRegisteredUserB2C({username: 'test', password: 'test'})

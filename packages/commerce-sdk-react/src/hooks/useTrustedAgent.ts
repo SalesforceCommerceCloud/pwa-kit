@@ -7,7 +7,7 @@
 import {useState, useEffect, useCallback} from 'react'
 import {useMutation} from '@tanstack/react-query'
 import useAuthContext from './useAuthContext'
-import type {ShopperLoginTypes} from 'commerce-sdk-isomorphic'
+import {ShopperLoginTypes} from 'commerce-sdk-isomorphic'
 import {onClient} from '../utils'
 
 type TokenResponse = ShopperLoginTypes.TokenResponse

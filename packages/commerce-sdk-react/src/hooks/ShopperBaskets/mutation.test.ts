@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import {act} from '@testing-library/react'
-import type {ShopperBasketsTypes, ShopperCustomersTypes} from 'commerce-sdk-isomorphic'
+import {ShopperBasketsTypes, ShopperCustomersTypes} from 'commerce-sdk-isomorphic'
 import nock from 'nock'
 import {
     assertInvalidateQuery,

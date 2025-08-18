@@ -43,7 +43,9 @@ test('Region throws if used outside of a Page component', () => {
     const originalError = console.error
     console.error = jest.fn()
 
-    expect(() => render(<Region region={SAMPLE_REGION} />)).toThrow()
+    expect(() => {
+        render(<Region region={SAMPLE_REGION} />)
+    }).toThrow()
     console.error = originalError
 })
 
