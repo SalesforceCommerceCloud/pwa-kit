@@ -174,7 +174,6 @@ const AccountOrderDetail = () => {
                                 id="account_order_detail.title.order_details"
                             />
                         </Heading>
-                        {/* POC: Gate Cancel Order by config flag */}
                         {canCancel && (
                             <Button variant="link" size="sm" onClick={onCancelModalOpen}>
                                 <FormattedMessage

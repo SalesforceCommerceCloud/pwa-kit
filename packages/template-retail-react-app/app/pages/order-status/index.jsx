@@ -44,8 +44,12 @@ const OrderStatusPage = () => {
     // Check if user is not registered and customer data has loaded
     const shouldShowSignInForm = customerType !== null && !isRegistered
 
-    // Feature flag: gate page access (do not call hooks conditionally)
     const isOrderStatusPageEnabled = getConfig()?.app?.oms?.orderStatusPage?.enabled
+    const isGuestOrderDetailsEnabled = getConfig()?.app?.oms?.guestOrderDetails?.enabled
+    const isGuestUser = customerType === 'guest'
+    const showOrderLookup = !isGuestUser || isGuestOrderDetailsEnabled
+
+    // Redirect to home if order status page feature flag is explicitly disabled
     useEffect(() => {
         if (isOrderStatusPageEnabled === false) {
             navigate('/')
@@ -66,7 +70,7 @@ const OrderStatusPage = () => {
                 {shouldShowSignInForm ? (
                     // Two-column layout when sign-in form is present
                     <Grid
-                        templateColumns={{base: '1fr', md: '1fr 1fr'}}
+                        templateColumns={{base: '1fr', md: showOrderLookup ? '1fr 1fr' : '1fr'}}
                         gap={8}
                         justifyContent="center"
                         alignItems="flex-start"
@@ -103,8 +107,8 @@ const OrderStatusPage = () => {
                             </Stack>
                         </Box>
 
-                        {/* Order Lookup Card */}
-                        <OrderLookup onSubmit={handleOrderLookup} />
+                        {/* Order Lookup Card - guests see it only when feature flag is enabled; registered users always see it. */}
+                        {showOrderLookup && <OrderLookup onSubmit={handleOrderLookup} />}
                     </Grid>
                 ) : (
                     // Centered single-column layout when sign-in form is not present
