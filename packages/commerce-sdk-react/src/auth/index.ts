@@ -70,7 +70,6 @@ interface SlasJwtPayload extends JwtPayload {
 type AuthorizeIDPParams = Parameters<Helpers['authorizeIDP']>[0]
 type LoginIDPUserParams = Parameters<Helpers['loginIDPUser']>[0]
 type AuthorizePasswordlessParams = Parameters<Helpers['authorizePasswordless']>[0]
-type LoginPasswordlessParams = Parameters<Helpers['getPasswordLessAccessToken']>[0]
 type LoginRegisteredUserB2CCredentials = Parameters<Helpers['loginRegisteredUserB2C']>[0]
 
 /**
@@ -1244,7 +1243,7 @@ class Auth {
             ],
             ...(!this.clientSecret ? [`code_verifier=${codeVerifier}`] : []),
             ...(usid ? [`usid=${usid}`] : []),
-            ...(dntPref ? [`dnt=${dntPref}`] : []),
+            ...(dntPref !== undefined ? [`dnt=${String(dntPref)}`] : []),
             // Add custom parameters
             ...Object.entries(customParams)
                 .filter(([key]) => !['redirectURI', 'hint', 'usid', 'dnt'].includes(key))
