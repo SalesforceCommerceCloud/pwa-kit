@@ -25,7 +25,7 @@ function Express() {
     const location = useLocation()
 
     const [authToken, setAuthToken] = useState()
-    const [finalCustomerId, setFinalCustomerId] = useState()
+    const [customerId, setCustomerId] = useState()
 
     // Check for PDP mode flag in URL
     const urlParams = new URLSearchParams(location.search)
@@ -64,7 +64,7 @@ function Express() {
                 if (type === 'basketDataAvailable') {
                     const authData = event.data.data.authData
                     setAuthToken(authData.authToken)
-                    setFinalCustomerId(authData.customerId)
+                    setCustomerId(authData.customerId)
                     const basketData = event.data.data.basketData
                     // Store values in localStorage
                     setBasketData(basketData)
@@ -97,7 +97,7 @@ function Express() {
             {!isPdpMode && basket && (
                 <AdyenExpressCheckoutProvider
                     authToken={authToken}
-                    customerId={finalCustomerId}
+                    customerId={customerId}
                     locale={locale}
                     site={site}
                     basket={basket}
