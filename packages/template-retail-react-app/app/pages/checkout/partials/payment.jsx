@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React, {useState, useMemo} from 'react'
+import React, {useState, useMemo, useEffect} from 'react'
 import PropTypes from 'prop-types'
 import {defineMessage, FormattedMessage, useIntl} from 'react-intl'
 import {
@@ -43,18 +43,25 @@ const Payment = () => {
     const {formatMessage} = useIntl()
     const {data: basket} = useCurrentBasket()
     const {isPickupShipment} = usePickupShipment(basket)
-    const isPickupOrder =
+    const isPickupOnly =
         basket?.shipments?.length > 0 &&
         basket.shipments.every((shipment) => isPickupShipment(shipment))
     const selectedShippingAddress = useMemo(() => {
-        if (!basket?.shipments?.length || isPickupOrder) return null
+        if (!basket?.shipments?.length || isPickupOnly) return null
         const deliveryShipment = basket.shipments.find((shipment) => !isPickupShipment(shipment))
         return deliveryShipment?.shippingAddress || null
-    }, [basket?.shipments, isPickupShipment, isPickupOrder])
+    }, [basket?.shipments, isPickupShipment, isPickupOnly])
 
     const selectedBillingAddress = basket?.billingAddress
     const appliedPayment = basket?.paymentInstruments && basket?.paymentInstruments[0]
-    const [billingSameAsShipping, setBillingSameAsShipping] = useState(!isPickupOrder)
+    const [billingSameAsShipping, setBillingSameAsShipping] = useState(!isPickupOnly)
+
+    useEffect(() => {
+        if (isPickupOnly) {
+            setBillingSameAsShipping(false)
+        }
+    }, [isPickupOnly])
+
     const {mutateAsync: addPaymentInstrumentToBasket} = useShopperBasketsMutation(
         'addPaymentInstrumentToBasket'
     )
@@ -215,7 +222,7 @@ const Payment = () => {
                             />
                         </Heading>
 
-                        {!isPickupOrder && (
+                        {!isPickupOnly && (
                             <Checkbox
                                 name="billingSameAsShipping"
                                 isChecked={billingSameAsShipping}
@@ -237,7 +244,7 @@ const Payment = () => {
                         )}
                     </Stack>
 
-                    {(isPickupOrder || !billingSameAsShipping) && (
+                    {!billingSameAsShipping && (
                         <ShippingAddressSelection
                             form={billingAddressForm}
                             selectedAddress={selectedBillingAddress}
