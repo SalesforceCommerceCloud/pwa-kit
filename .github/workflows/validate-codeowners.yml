@@ -1,0 +1,32 @@
+name: Validate CODEOWNERS
+
+# Only run when CODEOWNERS file changes - efficient!
+on:
+  pull_request:
+    paths:
+      - '.github/CODEOWNERS'
+  push:
+    branches:
+      - develop
+      - 'release-*'
+    paths:
+      - '.github/CODEOWNERS'
+
+jobs:
+  validate:
+    name: Validate CODEOWNERS File
+    runs-on: ubuntu-latest
+    # Only run on pushes or PRs from the same repository (not forks)
+    # This prevents permission issues with GITHUB_TOKEN on external PRs
+    if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name == github.repository
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Validate CODEOWNERS structure
+        uses: mszostok/codeowners-validator@v0.7.4
+        with:
+          # files: paths exist, duppatterns: no duplicates, syntax: valid format
+          checks: "files,duppatterns,syntax"
+          github_access_token: "${{ secrets.GITHUB_TOKEN }}"
