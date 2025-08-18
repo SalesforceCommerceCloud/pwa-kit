@@ -52,6 +52,7 @@ import awsServerlessExpress from 'aws-serverless-express'
 import expressLogging from 'morgan'
 import logger from '../../utils/logger-instance'
 import {createProxyMiddleware} from 'http-proxy-middleware'
+import {hybridProxy} from '../../utils/ssr-server/hybridProxy'
 
 /**
  * An Array of mime-types (Content-Type values) that are considered
@@ -373,6 +374,7 @@ export const RemoteServerFactory = {
         this._setupProxying(app, options)
 
         this._setupSlasPrivateClientProxy(app, options)
+        this._setupHybridProxy(app, options)
 
         // Beyond this point, we know that this is not a proxy request
         // and not a bundle request, so we can apply specific
@@ -382,6 +384,12 @@ export const RemoteServerFactory = {
         this._addStaticAssetServing(app)
         this._addDevServerGarbageCollection(app)
         return app
+    },
+
+    _setupHybridProxy(app, options) {
+        if (options.enableHybridProxy) {
+            app.use(hybridProxy(options))
+        }
     },
 
     /**
