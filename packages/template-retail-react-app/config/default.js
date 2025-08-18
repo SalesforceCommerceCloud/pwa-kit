@@ -35,9 +35,17 @@ module.exports = {
                 landingPath: '/reset-password-landing'
             }
         },
-        // POC: flag for OMS features
         oms: {
             cancel: {
+                enabled: false
+            },
+            guestOrderDetails: {
+                enabled: false
+            },
+            orderStatusPage: {
+                enabled: false
+            },
+            orderStatusBar: {
                 enabled: true
             }
         },

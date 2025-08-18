@@ -70,6 +70,7 @@ const AccountOrderDetail = () => {
     const {data: currentCustomer} = useCurrentCustomer()
 
     const isCancelEnabled = getConfig().app?.oms?.cancel?.enabled
+    const isOrderStatusBarEnabled = getConfig().app?.oms?.orderStatusBar?.enabled
     const orderStatus = (order?.status || '').toLowerCase()
     const shipmentStatus = (shippingStatus || '').toLowerCase()
     const statusEligible = !['cancelled', 'canceled', 'completed', 'failed'].includes(orderStatus)
@@ -233,7 +234,9 @@ const AccountOrderDetail = () => {
                 </Stack>
             </Stack>
 
-            {!isLoading && <OrderStatusBar currentStepLabel={order.status} />}
+            {!isLoading && isOrderStatusBarEnabled && (
+                <OrderStatusBar currentStepLabel={order.status} />
+            )}
 
             <Box layerStyle="cardBordered">
                 <Grid templateColumns={{base: '1fr', xl: '60% 1fr'}} gap={{base: 6, xl: 2}}>
