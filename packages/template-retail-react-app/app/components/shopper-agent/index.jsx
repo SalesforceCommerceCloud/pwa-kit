@@ -114,11 +114,14 @@ const ShopperAgentWindow = ({commerceAgentConfiguration, locale, basketId}) => {
 
     const sendExpressMessage = (type, payload = {}) => {
         const embeddedMessagingFrame = document.querySelector('div.embedded-messaging iframe')
+        const iframeSrc = embeddedMessagingFrame.src
+        console.log('==embeddedMessagingFrame==', embeddedMessagingFrame)
         const eventData = {
             type,
             payload
         }
-        embeddedMessagingFrame.contentWindow.postMessage(eventData, '*')
+        const targetOrigin = new URL(iframeSrc).origin
+        embeddedMessagingFrame.contentWindow.postMessage(eventData, targetOrigin)
     }
 
     const handleMiawEvent = async (event) => {
