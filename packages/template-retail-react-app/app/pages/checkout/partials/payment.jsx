@@ -47,12 +47,7 @@ const Payment = () => {
         basket?.shipments?.length > 0 &&
         basket.shipments.every((shipment) => isPickupShipment(shipment))
     const selectedShippingAddress = useMemo(() => {
-        if (!basket?.shipments?.length) return null
-
-        if (isPickupOrder) {
-            return null
-        }
-
+        if (!basket?.shipments?.length || isPickupOrder) return null
         const deliveryShipment = basket.shipments.find((shipment) => !isPickupShipment(shipment))
         return deliveryShipment?.shippingAddress || null
     }, [basket?.shipments, isPickupShipment, isPickupOrder])
