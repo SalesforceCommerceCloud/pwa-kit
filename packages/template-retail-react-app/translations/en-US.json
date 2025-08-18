@@ -1517,6 +1517,9 @@
   "shipping_multi_address.image.alt": {
     "defaultMessage": "Product image for {productName}"
   },
+  "shipping_multi_address.info.address_already_exists": {
+    "defaultMessage": "Address already exists"
+  },
   "shipping_multi_address.loading.message": {
     "defaultMessage": "Loading..."
   },
@@ -1540,9 +1543,6 @@
   },
   "shipping_multi_address.success.address_saved": {
     "defaultMessage": "Address saved successfully"
-  },
-  "shipping_multi_address.info.address_already_exists": {
-    "defaultMessage": "Address already exists in your address book"
   },
   "shipping_options.button.continue_to_payment": {
     "defaultMessage": "Continue to Payment"
