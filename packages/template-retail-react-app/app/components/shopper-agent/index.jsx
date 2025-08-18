@@ -11,6 +11,7 @@ import {useUsid} from '@salesforce/commerce-sdk-react'
 import PropTypes from 'prop-types'
 import {useTheme} from '@salesforce/retail-react-app/app/components/shared/ui'
 import useMiaw from '@salesforce/retail-react-app/app/hooks/use-miaw'
+import {useAccessToken, useCustomerId} from '@salesforce/commerce-sdk-react'
 
 const onClient = typeof window !== 'undefined'
 
@@ -97,6 +98,8 @@ const isEnabled = (enabled) => {
  */
 const ShopperAgentWindow = ({commerceAgentConfiguration, locale, basketId}) => {
     const theme = useTheme()
+    const {getTokenWhenReady} = useAccessToken()
+    const customerId = useCustomerId()
     const {
         embeddedServiceName,
         embeddedServiceEndpoint,
@@ -108,6 +111,40 @@ const ShopperAgentWindow = ({commerceAgentConfiguration, locale, basketId}) => {
     } = commerceAgentConfiguration
 
     const {usid} = useUsid()
+
+    const sendExpressMessage = (type, payload = {}) => {
+        const embeddedMessagingFrame = document.querySelector('div.embedded-messaging iframe')
+        const iframeSrc = embeddedMessagingFrame.src
+        const eventData = {
+            type,
+            payload
+        }
+        const targetOrigin = new URL(iframeSrc).origin
+        embeddedMessagingFrame.contentWindow.postMessage(eventData, targetOrigin)
+    }
+
+    const handleMiawEvent = async (event) => {
+        if (event.source && event.source !== window) {
+            try {
+                if (event.data.type === 'lwc.getCustomerData') {
+                    const authToken = await getTokenWhenReady()
+                    sendExpressMessage('express.actualCustomerData', {
+                        customerId,
+                        authToken
+                    })
+                }
+            } catch (error) {
+                console.error('Error handling Miaw event:', error)
+            }
+        }
+    }
+
+    useEffect(() => {
+        window.addEventListener('message', handleMiawEvent)
+        return () => {
+            window.removeEventListener('message', handleMiawEvent)
+        }
+    })
 
     useEffect(() => {
         const handleEmbeddedMessagingReady = () => {

@@ -15,6 +15,7 @@ import {
 } from '@salesforce/retail-react-app/app/components/express/utils/parsers'
 import {AdyenShippingMethodsService} from '@salesforce/retail-react-app/app/components/express/utils/shipping-methods'
 import {AdyenShippingAddressService} from '@salesforce/retail-react-app/app/components/express/utils/shipping-address'
+import {forceOrderCalculation} from '@salesforce/retail-react-app/app/components/express/utils/pdp/basket-calculation'
 import {AdyenPaymentsService} from '@salesforce/retail-react-app/app/components/express/utils/payments'
 import {
     PAYMENT_METHODS,
@@ -78,6 +79,7 @@ export const updateShippingAddress = async (authToken, site, basket, shippingAdd
             basket.basketId,
             getCustomerShippingDetails(shippingAddress)
         )
+
         if (response.error) {
             return {
                 error: {
@@ -134,6 +136,7 @@ export const updateShippingOption = async (
             shippingOptionId,
             basket.basketId
         )
+
         if (response.error) {
             return {
                 error: {
@@ -175,12 +178,7 @@ export const updateShippingOption = async (
     }
 }
 
-export const getGoogleButtonConfig = (
-    authToken,
-    site,
-    basket,
-    googlePayConfig
-) => {
+export const getGoogleButtonConfig = (authToken, site, basket, googlePayConfig) => {
     // Use productTotal if orderTotal is null, otherwise use orderTotal
     // The INITIALIZE callback will update this in payment sheet before user can try to pay
     let googlePayAmount = basket.orderTotal || basket.productTotal
@@ -220,12 +218,14 @@ export const getGoogleButtonConfig = (
                 }
 
                 const adyenPaymentService = new AdyenPaymentsService(authToken, site)
+
+                const customerId = basket?.customerId || basket?.customerInfo?.customerId
                 const paymentsResponse = await adyenPaymentService.submitPayment(
                     {
                         ...state.data
                     },
                     basket?.basketId,
-                    basket?.customerInfo?.customerId
+                    customerId
                 )
 
                 if (paymentsResponse?.isFinal && paymentsResponse?.isSuccessful) {
@@ -266,7 +266,8 @@ export const getGoogleButtonConfig = (
                                 shippingAddress
                             )
 
-                            paymentDataRequestUpdate = updateShippingAddressResponse.paymentDataRequestUpdate
+                            paymentDataRequestUpdate =
+                                updateShippingAddressResponse.paymentDataRequestUpdate
                             // Update our basket with the latest data
                             basket = updateShippingAddressResponse.newBasket
                         }
@@ -278,7 +279,8 @@ export const getGoogleButtonConfig = (
                                 shippingOptionData?.id
                             )
 
-                            paymentDataRequestUpdate = updateShippingOptionResponse.paymentDataRequestUpdate
+                            paymentDataRequestUpdate =
+                                updateShippingOptionResponse.paymentDataRequestUpdate
                             // Update our basket with the latest data
                             basket = updateShippingOptionResponse.newBasket
                         }
@@ -305,16 +307,12 @@ export const getGoogleButtonConfig = (
     return buttonConfig
 }
 
-export const GooglePayExpress = ({manager}) => {
-    const {
-        adyenEnvironment,
-        adyenPaymentMethods,
-        basket,
-        locale,
-        site,
-        authToken
-    } = useAdyenExpressCheckout()
+export const GooglePayExpress = ({manager, overrideData = null}) => {
+    const {adyenEnvironment, adyenPaymentMethods, basket, locale, site, authToken} =
+        useAdyenExpressCheckout()
 
+    const finalAuthToken = overrideData?.authToken
+    const finalBasket = overrideData?.basket
     const paymentContainer = useRef(null)
 
     useEffect(() => {
@@ -349,9 +347,9 @@ export const GooglePayExpress = ({manager}) => {
 
                 const googlePaymentMethodConfig = getGooglePaymentMethodConfig(adyenPaymentMethods)
                 const googleButtonConfig = getGoogleButtonConfig(
-                    authToken,
+                    finalAuthToken,
                     site,
-                    basket,
+                    finalBasket,
                     googlePaymentMethodConfig
                 )
 
@@ -420,5 +418,7 @@ export const GooglePayExpress = ({manager}) => {
 }
 
 GooglePayExpress.propTypes = {
-    manager: PropTypes.object
+    shippingMethods: PropTypes.array,
+    manager: PropTypes.object,
+    overrideData: PropTypes.object
 }

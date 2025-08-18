@@ -7,14 +7,12 @@
 import React, {useEffect, useState} from 'react'
 import {useLocation} from 'react-router-dom'
 
-import {useAccessToken, useCustomerId} from '@salesforce/commerce-sdk-react'
 import {AdyenExpressCheckoutProvider} from '@adyen/adyen-salesforce-pwa'
 
 import {ApplePayExpress} from '@salesforce/retail-react-app/app/components/apple-pay-express/index'
 import {GooglePayExpress} from '@salesforce/retail-react-app/app/components/google-pay-express/index'
 import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
 import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
-import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
 import {useExpressPaymentManager} from '@salesforce/retail-react-app/app/components/express/hooks/use-express-payment-manager'
 
 // Define the payment methods we will attempt to load
@@ -22,14 +20,13 @@ const PAYMENT_METHODS = ['applepay', 'googlepay']
 const PDP_PAYMENT_METHODS = ['applepay']
 
 function Express() {
-    const {getTokenWhenReady} = useAccessToken()
-    const customerId = useCustomerId()
     const navigate = useNavigation()
     const {locale, site} = useMultiSite()
     const [basket, setBasketData] = useState(null)
     const location = useLocation()
 
     const [authToken, setAuthToken] = useState()
+    const [customerId, setCustomerId] = useState()
 
     // Check for PDP mode flag in URL
     const urlParams = new URLSearchParams(location.search)
@@ -43,15 +40,6 @@ function Express() {
     const {manager, managerError} = useExpressPaymentManager(
         isPdpMode ? PDP_PAYMENT_METHODS : PAYMENT_METHODS
     )
-
-    useEffect(() => {
-        const getToken = async () => {
-            const token = await getTokenWhenReady()
-            setAuthToken(token)
-        }
-
-        getToken()
-    }, [])
 
     // PostMessage listener for SKU updates
     useEffect(() => {
@@ -84,7 +72,9 @@ function Express() {
 
                 // Handle basket data messages
                 if (type === 'basketDataAvailable') {
-                    const basketData = event.data.data.basketData
+                    const {basketData, authData} = event.data.data
+                    setAuthToken(authData.authToken)
+                    setCustomerId(authData.customerId)
                     setBasketData(basketData)
                 }
             }
@@ -129,7 +119,7 @@ function Express() {
                         authToken={authToken}
                         manager={manager}
                     />
-                    <GooglePayExpress manager={manager} />
+                    <GooglePayExpress manager={manager} overrideData={{authToken, basket}} />
                 </AdyenExpressCheckoutProvider>
             )}
             {isPdpMode && (
