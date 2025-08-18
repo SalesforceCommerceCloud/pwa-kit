@@ -72,7 +72,6 @@ function Express() {
 
                 // Handle basket data messages
                 if (type === 'basketDataAvailable') {
-                    console.log('==basketDataAvailable==', event)
                     const {basketData, authData} = event.data.data
                     setAuthToken(authData.authToken)
                     setCustomerId(authData.customerId)
