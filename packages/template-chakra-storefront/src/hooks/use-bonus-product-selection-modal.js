@@ -31,6 +31,7 @@ import ProductView from '../components/product-view'
 import {useProductViewModal} from './use-product-view-modal'
 import {productViewModalTheme} from '../theme/components/project/product-view-modal'
 import {useShopperBasketsMutationHelper} from '@salesforce/commerce-sdk-react'
+import {useCurrentBasket} from './use-current-basket'
 
 // Dedicated panel for product view mode to keep hooks ordering valid and avoid remounts
 const BonusProductViewPanel = React.memo(function BonusProductViewPanel({
@@ -244,8 +245,27 @@ export const BonusProductSelectionModal = () => {
     const size = useBreakpointValue(addToCartModalTheme.modal.size)
     const intl = useIntl()
 
-    // Extract bonus products from the data
+    // Extract bonus products and basket for selection counts
     const bonusProducts = data?.bonusDiscountLineItems || []
+    const {data: basket} = useCurrentBasket()
+    const bonusLineItemIds = useMemo(
+        () => bonusProducts.map((bli) => bli.id).filter(Boolean),
+        [bonusProducts]
+    )
+    const maxBonusItems = useMemo(
+        () => bonusProducts.reduce((sum, bli) => sum + (bli.maxBonusItems || 0), 0),
+        [bonusProducts]
+    )
+    const selectedBonusItems = useMemo(() => {
+        const items = basket?.productItems || []
+        return items
+            .filter(
+                (it) =>
+                    it?.bonusProductLineItem &&
+                    bonusLineItemIds.includes(it?.bonusDiscountLineItemId)
+            )
+            .reduce((acc, it) => acc + (it?.quantity || 0), 0)
+    }, [basket, bonusLineItemIds])
 
     // Get product IDs for fetching product data, deduplicating by productId
     const uniqueBonusProducts = bonusProducts
@@ -341,10 +361,14 @@ export const BonusProductSelectionModal = () => {
                         >
                             {modalMode === 'selection' ? (
                                 <Heading as="h3" fontSize={24} fontWeight="700">
-                                    {intl.formatMessage({
-                                        id: 'bonus_product_modal.title',
-                                        defaultMessage: 'Select Bonus Product (0 of 2 selected)'
-                                    })}
+                                    {intl.formatMessage(
+                                        {
+                                            id: 'bonus_product_modal.title',
+                                            defaultMessage:
+                                                'Select Bonus Product ({selected} of {max} selected)'
+                                        },
+                                        {selected: selectedBonusItems, max: maxBonusItems}
+                                    )}
                                 </Heading>
                             ) : (
                                 <Heading as="h3" fontSize={24} fontWeight="700">
