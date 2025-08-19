@@ -308,7 +308,6 @@ const PickupAddress = () => {
                                                                                     >
                                                                                         <CartItemVariantName />
 
-                                                                                        {/* Abbreviated attributes without quantity */}
                                                                                         <CartItemVariantAttributes
                                                                                             includeQuantity={
                                                                                                 false
@@ -318,7 +317,6 @@ const PickupAddress = () => {
                                                                                             }
                                                                                         />
 
-                                                                                        {/* Quantity and price on same line */}
                                                                                         <Flex
                                                                                             width="full"
                                                                                             justifyContent="space-between"
@@ -413,7 +411,6 @@ const PickupAddress = () => {
                                                                                         >
                                                                                             <CartItemVariantName />
 
-                                                                                            {/* Abbreviated attributes without quantity */}
                                                                                             <CartItemVariantAttributes
                                                                                                 includeQuantity={
                                                                                                     false
@@ -423,7 +420,6 @@ const PickupAddress = () => {
                                                                                                 }
                                                                                             />
 
-                                                                                            {/* Quantity and price on same line */}
                                                                                             <Flex
                                                                                                 width="full"
                                                                                                 justifyContent="space-between"
