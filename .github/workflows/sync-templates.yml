@@ -1,0 +1,164 @@
+name: Sync Template Files
+
+on:
+  pull_request:
+    paths:
+      - 'packages/template-retail-react-app/app/**'
+      - 'packages/template-retail-react-app/config/**'
+      - 'packages/template-retail-react-app/app/static/manifest.json'
+      - 'packages/template-retail-react-app/app/components/_app-config/**'
+  push:
+    branches:
+      - develop
+      - main
+    paths:
+      - 'packages/template-retail-react-app/app/**'
+      - 'packages/template-retail-react-app/config/**'
+      - 'packages/template-retail-react-app/app/static/manifest.json'
+      - 'packages/template-retail-react-app/app/components/_app-config/**'
+  workflow_dispatch: # Allow manual triggering
+
+jobs:
+  check-template-sync:
+    name: Check Template Synchronization
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Get full history for better analysis
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: |
+          npm ci
+          # Install commander if not already in dependencies
+          npm install commander
+
+      - name: Check template synchronization
+        id: check-sync
+        run: |
+          node scripts/sync-template-files.js --check-only --verbose
+        continue-on-error: true
+
+      - name: Auto-sync templates (on push to main/develop)
+        if: |
+          (github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop')) &&
+          steps.check-sync.outcome == 'failure'
+        run: |
+          echo "Synchronizing template files..."
+          node scripts/sync-template-files.js --verbose
+          
+          # Check if there are changes to commit
+          if [[ -n $(git status --porcelain) ]]; then
+            echo "changes_made=true" >> $GITHUB_OUTPUT
+            
+            git config --local user.email "action@github.com"
+            git config --local user.name "GitHub Action"
+            git add -A
+            git commit -m "chore: auto-sync template files
+
+            Auto-generated commit to sync .hbs template files with source files
+            in template-retail-react-app.
+            
+            Source files changed:
+            $(git diff HEAD~1 --name-only packages/template-retail-react-app/ | sed 's/^/- /')"
+            git push
+          else
+            echo "No changes to commit"
+            echo "changes_made=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Fail PR if templates are out of sync
+        if: |
+          github.event_name == 'pull_request' &&
+          steps.check-sync.outcome == 'failure'
+        run: |
+          echo "::error::Template files are out of sync!"
+          echo ""
+          echo "Your changes to template-retail-react-app source files require"
+          echo "corresponding updates to the .hbs template files."
+          echo ""
+          echo "To fix this, run locally:"
+          echo "  node scripts/sync-template-files.js"
+          echo ""
+          echo "Or run the sync check to see what would be updated:"
+          echo "  node scripts/sync-template-files.js --check-only --verbose"
+          echo ""
+          exit 1
+
+      - name: Comment on PR with sync status
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+            });
+            
+            const botComment = comments.find(comment => 
+              comment.user.type === 'Bot' && 
+              comment.body.includes('Template Sync Status')
+            );
+            
+            const syncStatus = '${{ steps.check-sync.outcome }}' === 'success' ? 'success' : 'failure';
+            const statusIcon = syncStatus === 'success' ? '✅' : '❌';
+            const statusText = syncStatus === 'success' 
+              ? 'All template files are synchronized!' 
+              : 'Template files need synchronization';
+            
+            const commentBody = `## ${statusIcon} Template Sync Status
+            
+            **Status:** ${statusText}
+            
+            ${syncStatus === 'failure' ? `
+            Your changes to \`template-retail-react-app\` require corresponding updates to the \`.hbs\` template files.
+            
+            **To fix locally:**
+            \`\`\`bash
+            # See what would be updated
+            node scripts/sync-template-files.js --check-only --verbose
+            
+            # Apply the updates
+            node scripts/sync-template-files.js
+            \`\`\`
+            ` : ''}
+            
+            <details>
+            <summary>About Template Synchronization</summary>
+            
+            This check ensures that changes to source files in \`packages/template-retail-react-app/\` are properly reflected in the corresponding \`.hbs\` template files used by \`pwa-kit-create-app\`.
+            
+            The affected files include:
+            - \`app/ssr.js\` → \`ssr.js.hbs\`
+            - \`config/default.js\` → \`default.js.hbs\`
+            - \`config/sites.js\` → \`sites.js.hbs\`
+            - \`config/utils.js\` → \`utils.js.hbs\`
+            - \`app/static/manifest.json\` → \`manifest.json.hbs\`
+            - \`app/components/_app-config/index.jsx\` → \`index.jsx.hbs\`
+            </details>
+            `;
+            
+            if (botComment) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: botComment.id,
+                body: commentBody
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body: commentBody
+              });
+            }
