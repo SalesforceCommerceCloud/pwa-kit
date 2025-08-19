@@ -59,6 +59,7 @@ If the user requests a project using a **template**:
 - Presets and templates are mutually exclusive paths. Do not offer both options unless explicitly requested.
 - Do not pass any flags to the \`${CREATE_APP_COMMAND}\` CLI tool that are not listed in the program.json options".
 - Use the \`${COMMAND_RUNNER}\` command to run the \`${CREATE_APP_COMMAND}\` CLI tool when creating a new project.
+- After project creation, prompt the user if **they want to do version control through git** using the **version_control_git** MCP tool.
 `
 
 export default {

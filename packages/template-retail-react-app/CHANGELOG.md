@@ -1,6 +1,7 @@
 ## v7.1.0-dev (July 28, 2025)
 
 - This feature introduces an AI-powered shopping assistant that integrates Salesforce Embedded Messaging Service with PWA Kit applications. The shopper agent provides real-time chat support, search assistance, and personalized shopping guidance directly within the e-commerce experience. [#2658](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2658)
+- The feature toggle for partial hydration is now found in the config file (`config.app.partialHydrationEnabled`) [#3058](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3058)
 
 ## v7.0.0 (July 22, 2025)
 
@@ -18,7 +19,7 @@
 - Support saving default shipping address on user registration from order confirmation [#2706](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2706)
 - Minor updates to support BOPIS E2E tests [#2716](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2716)
 - Provide conditional support for partial hydration (feature flag `PARTIAL_HYDRATION_ENABLED`) [#2696](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2696) [#2846](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2846)
-- Show Automatic Bonus Products on Cart Page [#2704](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2704) [#2760](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2760) [#2815](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2815)
+- Show Automatic Bonus Products on Cart Page [#2704](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2704) [#2760](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2760) [#2815](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2815) 
 - [Breaking] Support Standard Products [2697](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2697)
 - Introduce store locator [#2542](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2542)
 - Fix passwordless race conditions in form submission [#2758](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2758)
