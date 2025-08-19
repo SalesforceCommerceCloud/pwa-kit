@@ -8,6 +8,7 @@
 /**
  * @module progressive-web-sdk/ssr/server/react-rendering
  */
+import {initializeServerTracing, isServerTracingInitialized} from './opentelemetry-server'
 
 import path from 'path'
 import React from 'react'
@@ -22,11 +23,6 @@ import {isRemote} from '@salesforce/pwa-kit-runtime/utils/ssr-server'
 import {proxyConfigs} from '@salesforce/pwa-kit-runtime/utils/ssr-shared'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import {NO_CACHE} from '@salesforce/pwa-kit-runtime/ssr/server/constants'
-import {
-    isServerTracingInitialized,
-    initializeServerTracing,
-    shutdownServerTracing
-} from './opentelemetry-server'
 
 import {getAssetUrl} from '../universal/utils'
 import {ServerContext, CorrelationIdProvider} from '../universal/contexts'
@@ -42,7 +38,6 @@ import * as errors from '../universal/errors'
 import logger from '../../utils/logger-instance'
 
 import PerformanceTimer, {PERFORMANCE_MARKS} from '../../utils/performance'
-import {tracePerformance} from '../../utils/opentelemetry'
 
 const CWD = process.cwd()
 const BUNDLES_PATH = path.resolve(CWD, 'build/loadable-stats.json')
@@ -125,16 +120,14 @@ export const getLocationSearch = (req, opts = {}) => {
  *
  * @return {Promise}
  */
-const performRender = async (req, res, next) => {
+export const render = async (req, res, next) => {
     const includeServerTimingHeader = '__server_timing' in req.query
     const shouldTrackPerformance = includeServerTimingHeader || process.env.SERVER_TIMING
 
-    // Initialize server tracing if needed for this request
-    if (includeServerTimingHeader && !isServerTracingInitialized()) {
+    if (!isServerTracingInitialized() && shouldTrackPerformance) {
         initializeServerTracing()
     }
 
-    // Initialize performance timer outside tracePerformance to ensure it's always available
     res.__performanceTimer = new PerformanceTimer({enabled: shouldTrackPerformance})
     res.__performanceTimer.mark(PERFORMANCE_MARKS.total, 'start')
     const AppConfig = getAppConfig()
@@ -235,31 +228,34 @@ const performRender = async (req, res, next) => {
         // Here, we use Express's convention to invoke error middleware.
         // Note, we don't have an error handling middleware yet! This is calling the
         // default error handling middleware provided by Express
-        res.__performanceTimer.cleanup()
-        shutdownServerTracing()
+
+        if (res.__performanceTimer) {
+            res.__performanceTimer.cleanup()
+        }
+
         return next(e)
     }
 
-    res.__performanceTimer.mark(PERFORMANCE_MARKS.renderToString, 'end')
     // Step 5 - Determine what is going to happen, redirect, or send html with
     // the correct status code.
     const {html, routerContext, error} = renderResult
     const redirectUrl = routerContext.url
     const status = (error && error.status) || res.statusCode
 
+    res.__performanceTimer.mark(PERFORMANCE_MARKS.renderToString, 'end')
     res.__performanceTimer.mark(PERFORMANCE_MARKS.total, 'end')
+    res.__performanceTimer.log()
 
     if (includeServerTimingHeader) {
         res.setHeader('Server-Timing', res.__performanceTimer.buildServerTimingHeader())
+
         // Override cache-control header to no caching when __server_timing is used
         // This happens after React rendering is complete, ensuring it overrides any
         // cache headers set by individual page components
         res.set('Cache-Control', NO_CACHE)
     }
 
-    // Cleanup performance timer and OpenTelemetry tracing after response is sent
     res.__performanceTimer.cleanup()
-    shutdownServerTracing()
 
     if (redirectUrl) {
         res.redirect(routerContext.status || 302, redirectUrl)
@@ -267,9 +263,6 @@ const performRender = async (req, res, next) => {
         res.status(status).send(html)
     }
 }
-
-export const render = (req, res, next) =>
-    tracePerformance('ssr.render', () => performRender(req, res, next), res)
 
 const OuterApp = ({req, res, error, App, appState, routes, routerContext, location}) => {
     const AppConfig = getAppConfig()

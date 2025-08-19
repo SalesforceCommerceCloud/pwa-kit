@@ -6,40 +6,16 @@
  */
 
 import {trace, context, SpanStatusCode} from '@opentelemetry/api'
-import {hrTimeToTimeStamp} from '@opentelemetry/core'
+import {hrTimeToMilliseconds, hrTimeToTimeStamp} from '@opentelemetry/core'
 import logger from './logger-instance'
 import {getOTELConfig, getServiceName} from './opentelemetry-config'
 
 const logSpanData = (span, event = 'start', res = null) => {
     const spanContext = span.spanContext()
     const startTime = span.startTime
-    const endTime = event === 'start' ? startTime : span.endTime
-    const duration = event === 'start' ? 0 : span.duration
 
-    // Only log if OpenTelemetry timing data is valid
-    if (
-        !Array.isArray(startTime) ||
-        startTime.length !== 2 ||
-        (duration !== 0 && (!Array.isArray(duration) || duration.length !== 2))
-    ) {
-        logger.warn(
-            'Invalid timing data detected - OpenTelemetry may not be properly initialized',
-            {
-                namespace: 'opentelemetry',
-                additionalProperties: {
-                    span_name: span.name,
-                    event: event,
-                    startTime_valid: Array.isArray(startTime) && startTime.length === 2,
-                    duration_valid:
-                        duration === 0 || (Array.isArray(duration) && duration.length === 2),
-                    otel_enabled: getOTELConfig().enabled,
-                    startTime_type: typeof startTime,
-                    startTime_value: startTime
-                }
-            }
-        )
-        return
-    }
+    const endTime = event === 'start' ? startTime : span.endTime
+    const duration = event === 'start' ? 0 : hrTimeToMilliseconds(span.duration)
 
     // Create the span data object that matches the expected format
     const spanData = {
@@ -48,7 +24,7 @@ const logSpanData = (span, event = 'start', res = null) => {
         name: span.name,
         id: spanContext.spanId,
         kind: span.kind,
-        timestamp: startTime ? hrTimeToTimeStamp(startTime) : undefined,
+        timestamp: hrTimeToTimeStamp(startTime),
         duration: duration,
         attributes: {
             'service.name': getServiceName(),
@@ -64,7 +40,7 @@ const logSpanData = (span, event = 'start', res = null) => {
     }
 
     // Inject B3 headers into response if available
-    if (res && getOTELConfig().b3TracingEnabled && event === 'start') {
+    if (res && process.env.DISABLE_B3_TRACING !== 'true' && event === 'start') {
         res.setHeader('x-b3-traceid', spanContext.traceId)
         res.setHeader('x-b3-spanid', spanContext.spanId)
         res.setHeader('x-b3-sampled', '1')
@@ -74,8 +50,12 @@ const logSpanData = (span, event = 'start', res = null) => {
         }
     }
 
-    if (event === 'end') {
-        console.info(JSON.stringify(spanData))
+    // Only log if this is an end event or if it's a start event for a new span
+    if (event === 'end' || !Object.prototype.hasOwnProperty.call(span.attributes, 'event')) {
+        logger.info('OpenTelemetry span data', {
+            namespace: 'opentelemetry.logSpanData',
+            additionalProperties: spanData
+        })
     }
 }
 
@@ -125,20 +105,6 @@ export const createSpan = (name, options = {}) => {
  */
 export const createChildSpan = (name, attributes = {}) => {
     try {
-        // Check if OpenTelemetry is properly configured
-        const otelConfig = getOTELConfig()
-        if (!otelConfig.enabled) {
-            logger.warn('OpenTelemetry is disabled - spans will not have proper timing data', {
-                namespace: 'opentelemetry',
-                additionalProperties: {
-                    span_name: name,
-                    otel_enabled: otelConfig.enabled,
-                    otel_service_name: otelConfig.serviceName,
-                    suggestion: 'Set OTEL_SDK_ENABLED=true to enable proper timing'
-                }
-            })
-        }
-
         const tracer = trace.getTracer(getServiceName())
         const ctx = context.active()
         const parentSpan = trace.getSpan(ctx)
@@ -220,23 +186,6 @@ export const endSpan = (span) => {
  * @returns {Promise<any>} The result of the function
  */
 export const tracePerformance = async (name, fn, res = null) => {
-    // Check if OpenTelemetry is properly configured
-    const otelConfig = getOTELConfig()
-    if (!otelConfig.enabled) {
-        logger.warn(
-            'OpenTelemetry is disabled - performance tracing will not have proper timing data',
-            {
-                namespace: 'opentelemetry',
-                additionalProperties: {
-                    trace_name: name,
-                    otel_enabled: otelConfig.enabled,
-                    otel_service_name: otelConfig.serviceName,
-                    suggestion: 'Set OTEL_SDK_ENABLED=true to enable proper timing'
-                }
-            }
-        )
-    }
-
     const tracer = trace.getTracer(getServiceName())
     // Create the root span
     const rootSpan = tracer.startSpan(name, {
@@ -277,6 +226,96 @@ export const tracePerformance = async (name, fn, res = null) => {
         // Log error completion
         logSpanData(rootSpan, 'end', res)
 
+        throw error
+    }
+}
+
+/**
+ * Traces a performance metric
+ * @param {string} name - The name of the metric
+ * @param {number} duration - The duration of the metric in milliseconds
+ * @param {Object} attributes - Additional attributes for the metric
+ */
+export const logPerformanceMetric = (name, duration, attributes = {}) => {
+    try {
+        const tracer = trace.getTracer(getServiceName())
+        const ctx = context.active()
+        const parentSpan = trace.getSpan(ctx)
+
+        if (!parentSpan) {
+            logger.warn('No parent span found in context', {
+                namespace: 'opentelemetry',
+                additionalProperties: {metricName: name}
+            })
+            return
+        }
+
+        // Extract and normalize performance details
+        const {performance_mark, performance_detail, ...otherAttributes} = attributes
+
+        // Build metric attributes
+        const metricAttributes = {
+            'service.name': getServiceName(),
+            'metric.duration': duration,
+            ...otherAttributes
+        }
+
+        if (performance_mark) {
+            metricAttributes['performance.mark'] = performance_mark
+            metricAttributes['performance.type'] = 'end'
+            metricAttributes['performance.detail'] =
+                typeof performance_detail === 'string'
+                    ? performance_detail
+                    : JSON.stringify(performance_detail)
+        }
+
+        // Create and immediately end the metric span
+        const span = tracer.startSpan(
+            name,
+            {
+                attributes: metricAttributes
+            },
+            ctx
+        )
+
+        span.end()
+
+        // Log completion data
+        logSpanData(span, 'end')
+    } catch (error) {
+        logger.error('Error logging performance metric', {
+            namespace: 'opentelemetry',
+            additionalProperties: {
+                metricName: name,
+                error: error.message,
+                stack: error.stack
+            }
+        })
+    }
+}
+
+/**
+ * Traces a performance operation
+ * @param {string} name - The name of the operation
+ * @param {Function} fn - The function to trace
+ * @returns {Promise<any>} The result of the function
+ */
+export const traceChildPerformance = async (name, fn) => {
+    const span = createChildSpan(name)
+    if (!span) {
+        return fn()
+    }
+
+    try {
+        const result = await fn()
+        endSpan(span)
+        return result
+    } catch (error) {
+        span.setStatus({
+            code: SpanStatusCode.ERROR,
+            message: error.message
+        })
+        endSpan(span)
         throw error
     }
 }

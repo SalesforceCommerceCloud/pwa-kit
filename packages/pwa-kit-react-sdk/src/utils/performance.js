@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import logger from './logger-instance'
-import {createChildSpan, endSpan} from './opentelemetry'
+import {createChildSpan, endSpan, logPerformanceMetric} from './opentelemetry'
 
 export const PERFORMANCE_MARKS = {
     total: 'ssr.total',
@@ -62,6 +62,18 @@ export default class PerformanceTimer {
     }
 
     /**
+     * Logs all performance metrics
+     */
+    log() {
+        // Log each metric once with the standardized format
+        this.metrics.forEach((metric) => {
+            logPerformanceMetric(metric.name, metric.duration, {
+                'performance.detail': metric.detail || ''
+            })
+        })
+    }
+
+    /**
      * This is a utility function to create performance marks.
      * The data will be used in console logs and the http response header `server-timing`.
      *
@@ -109,10 +121,7 @@ export default class PerformanceTimer {
                         this.spanTimeouts.set(name, timeoutId)
                     }
                 } else {
-                    logger.warn('Span already exists', {
-                        name,
-                        namespace: 'PerformanceTimer.mark'
-                    })
+                    logger.warn('Span already exists', {name, namespace: 'PerformanceTimer.mark'})
                 }
             } else if (type === this.MARKER_TYPES.END) {
                 const startMark = `${name}.${this.MARKER_TYPES.START}`
@@ -183,8 +192,8 @@ export default class PerformanceTimer {
                 error: 'Deleting orphaned span (reason: ' + reason + ' cleanup)',
                 namespace: 'PerformanceTimer._cleanupOrphanedSpan'
             })
-            endSpan(span)
             this.spans.delete(name)
+            endSpan(span)
         }
 
         // Clear the timeout

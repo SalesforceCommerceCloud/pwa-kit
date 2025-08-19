@@ -19,31 +19,9 @@ jest.mock('./opentelemetry', () => ({
     logPerformanceMetric: jest.fn()
 }))
 
-jest.mock('./logger-instance', () => ({
-    info: jest.fn(),
-    warn: jest.fn(),
-    error: jest.fn()
-}))
-
 import PerformanceTimer from './performance'
-import logger from './logger-instance'
 
 describe('PerformanceTimer', () => {
-    beforeEach(() => {
-        jest.useFakeTimers()
-    })
-
-    afterAll(() => {
-        jest.clearAllTimers()
-        jest.clearAllMocks()
-        jest.useRealTimers()
-    })
-
-    afterEach(() => {
-        // Clear any remaining timers that might have been created
-        jest.clearAllTimers()
-    })
-
     test('is disabled by default', () => {
         const timer = new PerformanceTimer()
         timer.mark('test', 'start')
@@ -253,9 +231,12 @@ describe('PerformanceTimer', () => {
     })
 
     describe('timeout and orphaned span handling', () => {
-        // Fake timers are already set up in the parent describe block
+        beforeEach(() => {
+            jest.useFakeTimers()
+        })
+
         afterEach(() => {
-            jest.clearAllTimers()
+            jest.useRealTimers()
         })
 
         test('orphaned spans are cleaned up after maxSpanDuration', () => {
@@ -512,121 +493,6 @@ describe('PerformanceTimer', () => {
             const timer = new PerformanceTimer({})
             expect(timer.enabled).toBe(false)
             expect(timer.maxSpanDuration).toBe(30000)
-        })
-    })
-
-    describe('warning scenarios (non-test environment)', () => {
-        let originalEnv
-
-        beforeEach(() => {
-            originalEnv = process.env.NODE_ENV
-            process.env.NODE_ENV = 'development'
-        })
-
-        afterEach(() => {
-            process.env.NODE_ENV = originalEnv
-            jest.clearAllMocks()
-        })
-
-        test('warns for invalid mark type', () => {
-            const timer = new PerformanceTimer({enabled: true})
-            jest.clearAllMocks()
-
-            timer.mark('test', 'invalid-type')
-
-            expect(logger.warn).toHaveBeenCalledWith(
-                'Invalid mark type',
-                expect.objectContaining({
-                    type: 'invalid-type',
-                    name: 'test',
-                    namespace: 'PerformanceTimer.mark'
-                })
-            )
-        })
-
-        test('warns when span already exists', () => {
-            const timer = new PerformanceTimer({enabled: true})
-            jest.clearAllMocks()
-
-            timer.mark('test', 'start')
-            timer.mark('test', 'start') // Duplicate
-
-            expect(logger.warn).toHaveBeenCalledWith(
-                'Span already exists',
-                expect.objectContaining({
-                    name: 'test',
-                    namespace: 'PerformanceTimer.mark'
-                })
-            )
-        })
-
-        test('warns when performance.measure fails', () => {
-            const timer = new PerformanceTimer({enabled: true})
-            jest.clearAllMocks()
-
-            // Mock performance.measure to throw an error
-            const originalMeasure = performance.measure
-            performance.measure = jest.fn().mockImplementation(() => {
-                throw new Error('Measure failed')
-            })
-
-            timer.mark('test', 'start')
-            timer.mark('test', 'end')
-
-            expect(logger.warn).toHaveBeenCalledWith(
-                'Failed to measure performance mark',
-                expect.objectContaining({
-                    name: 'test',
-                    error: 'Measure failed',
-                    startMark: 'test.start',
-                    endMark: 'test.end',
-                    namespace: 'PerformanceTimer.mark'
-                })
-            )
-
-            performance.measure = originalMeasure
-        })
-
-        test('warns for invalid performance mark name (SyntaxError)', () => {
-            const timer = new PerformanceTimer({enabled: true})
-            jest.clearAllMocks()
-
-            // Mock performance.mark to throw a SyntaxError
-            const originalMark = performance.mark
-            performance.mark = jest.fn().mockImplementation(() => {
-                const error = new Error('Invalid mark name')
-                error.name = 'SyntaxError'
-                throw error
-            })
-
-            timer.mark('test', 'start')
-
-            expect(logger.warn).toHaveBeenCalledWith(
-                'Invalid performance mark name',
-                expect.objectContaining({
-                    name: 'test',
-                    error: 'Invalid mark name'
-                })
-            )
-
-            performance.mark = originalMark
-        })
-
-        test('warns when cleaning up orphaned span', () => {
-            const timer = new PerformanceTimer({enabled: true})
-            jest.clearAllMocks()
-
-            timer.mark('test', 'start')
-            timer._cleanupOrphanedSpan('test', 'test-reason')
-
-            expect(logger.warn).toHaveBeenCalledWith(
-                'Cleaning up orphaned span',
-                expect.objectContaining({
-                    name: 'test',
-                    error: 'Deleting orphaned span (reason: test-reason cleanup)',
-                    namespace: 'PerformanceTimer._cleanupOrphanedSpan'
-                })
-            )
         })
     })
 })

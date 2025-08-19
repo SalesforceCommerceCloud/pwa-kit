@@ -36,30 +36,23 @@ jest.mock('./logger-instance', () => ({
     info: jest.fn()
 }))
 
-jest.mock('./opentelemetry-config', () => ({
-    getOTELConfig: jest.fn(() => ({
-        enabled: true,
-        serviceName: 'pwa-kit-react-sdk',
-        b3TracingEnabled: true
-    })),
-    getServiceName: jest.fn(() => 'pwa-kit-react-sdk')
-}))
-
 describe('OpenTelemetry Utilities', () => {
     let mockTracer
     let mockSpan
     let mockContext
     let mockTrace
+    let mockCore
     let mockLogger
     let opentelemetryUtils
 
     beforeEach(() => {
         jest.clearAllMocks()
-        jest.resetModules()
 
         // Get mocked modules
         // eslint-disable-next-line @typescript-eslint/no-var-requires
         const api = require('@opentelemetry/api')
+        // eslint-disable-next-line @typescript-eslint/no-var-requires
+        const core = require('@opentelemetry/core')
         // eslint-disable-next-line @typescript-eslint/no-var-requires
         const logger = require('./logger-instance')
 
@@ -100,22 +93,11 @@ describe('OpenTelemetry Utilities', () => {
             ERROR: 2
         }
 
+        mockCore = core
         mockLogger = logger
 
         // Configure span mock
         mockTracer.startSpan.mockReturnValue(mockSpan)
-
-        // Reset opentelemetry-config mock to default values
-        // eslint-disable-next-line @typescript-eslint/no-var-requires
-        const opentelemetryConfig = require('./opentelemetry-config')
-        opentelemetryConfig.getOTELConfig.mockReset()
-        opentelemetryConfig.getOTELConfig.mockReturnValue({
-            enabled: true,
-            serviceName: 'pwa-kit-react-sdk',
-            b3TracingEnabled: true
-        })
-        opentelemetryConfig.getServiceName.mockReset()
-        opentelemetryConfig.getServiceName.mockReturnValue('pwa-kit-react-sdk')
 
         // Import the module after mocks are set up
         opentelemetryUtils = require('./opentelemetry')
@@ -139,7 +121,13 @@ describe('OpenTelemetry Utilities', () => {
             )
             expect(mockTrace.setSpan).toHaveBeenCalledWith('test-context', mockSpan)
             expect(result).toBe('new-context')
-            // Note: logSpanData uses console.info, not logger.info
+            expect(mockLogger.info).toHaveBeenCalledWith('OpenTelemetry span data', {
+                namespace: 'opentelemetry.logSpanData',
+                additionalProperties: expect.objectContaining({
+                    traceId: 'test-trace-id',
+                    name: 'test-span'
+                })
+            })
         })
 
         test('should handle errors gracefully', () => {
@@ -289,7 +277,13 @@ describe('OpenTelemetry Utilities', () => {
             opentelemetryUtils.endSpan(mockSpan)
 
             expect(mockSpan.end).toHaveBeenCalled()
-            // Note: logSpanData uses console.info, not logger.info
+            expect(mockLogger.info).toHaveBeenCalledWith('OpenTelemetry span data', {
+                namespace: 'opentelemetry.logSpanData',
+                additionalProperties: expect.objectContaining({
+                    traceId: 'test-trace-id',
+                    name: 'test-span'
+                })
+            })
         })
 
         test('should handle null span gracefully', () => {
@@ -336,7 +330,7 @@ describe('OpenTelemetry Utilities', () => {
             expect(mockFn).toHaveBeenCalled()
             expect(result).toBe('test-result')
             expect(mockSpan.end).toHaveBeenCalled()
-            // Note: logSpanData uses console.info, not logger.info
+            expect(mockLogger.info).toHaveBeenCalledTimes(2) // start and end
         })
 
         test('should handle function errors', async () => {
@@ -360,17 +354,8 @@ describe('OpenTelemetry Utilities', () => {
         })
 
         test('should inject B3 headers when tracing is enabled', async () => {
-            const originalEnv = process.env.OTEL_B3_TRACING_ENABLED
-            process.env.OTEL_B3_TRACING_ENABLED = 'true'
-
-            // Ensure the mock returns enabled B3 tracing
-            // eslint-disable-next-line @typescript-eslint/no-var-requires
-            const opentelemetryConfig = require('./opentelemetry-config')
-            opentelemetryConfig.getOTELConfig.mockReturnValue({
-                serviceName: 'pwa-kit-react-sdk',
-                enabled: true,
-                b3TracingEnabled: true
-            })
+            const originalEnv = process.env.DISABLE_B3_TRACING
+            process.env.DISABLE_B3_TRACING = 'false'
 
             const mockFn = jest.fn().mockResolvedValue('test-result')
             const mockRes = {
@@ -390,21 +375,12 @@ describe('OpenTelemetry Utilities', () => {
                 'test-parent-span-id'
             )
 
-            process.env.OTEL_B3_TRACING_ENABLED = originalEnv
+            process.env.DISABLE_B3_TRACING = originalEnv
         })
 
         test('should not inject B3 headers when tracing is disabled', async () => {
-            const originalEnv = process.env.OTEL_B3_TRACING_ENABLED
-            process.env.OTEL_B3_TRACING_ENABLED = 'false'
-
-            // Update the mock to return disabled B3 tracing
-            // eslint-disable-next-line @typescript-eslint/no-var-requires
-            const opentelemetryConfig = require('./opentelemetry-config')
-            opentelemetryConfig.getOTELConfig.mockReturnValue({
-                serviceName: 'pwa-kit-react-sdk',
-                enabled: true,
-                b3TracingEnabled: false
-            })
+            const originalEnv = process.env.DISABLE_B3_TRACING
+            process.env.DISABLE_B3_TRACING = 'true'
 
             const mockFn = jest.fn().mockResolvedValue('test-result')
             const mockRes = {
@@ -418,143 +394,179 @@ describe('OpenTelemetry Utilities', () => {
 
             expect(mockRes.setHeader).not.toHaveBeenCalled()
 
-            // Restore the original mock
-            opentelemetryConfig.getOTELConfig.mockReturnValue({
-                enabled: true,
-                serviceName: 'pwa-kit-react-sdk',
-                b3TracingEnabled: true
-            })
-            process.env.OTEL_B3_TRACING_ENABLED = originalEnv
+            process.env.DISABLE_B3_TRACING = originalEnv
         })
     })
 
-    // Test to cover the defensive check in logSpanData (lines 57-73)
-    describe('logSpanData with invalid timing data', () => {
-        test('should not warn about invalid startTime data in test environment', () => {
-            const originalEnv = process.env.NODE_ENV
-            process.env.NODE_ENV = 'development'
-
-            const invalidSpan = {
-                ...mockSpan,
-                startTime: 'invalid-time',
-                duration: [0, 100000000]
-            }
-
-            opentelemetryUtils.endSpan(invalidSpan)
-
-            // Warnings are now allowed to run for coverage purposes
-            expect(mockLogger.warn).toHaveBeenCalled()
-
-            process.env.NODE_ENV = originalEnv
-        })
-
-        test('should not warn about invalid duration data in test environment', () => {
-            const originalEnv = process.env.NODE_ENV
-            process.env.NODE_ENV = 'development'
-
-            const invalidSpan = {
-                ...mockSpan,
-                startTime: [1234567890, 0],
-                duration: 'invalid-duration'
-            }
-
-            opentelemetryUtils.endSpan(invalidSpan)
-
-            // Warnings are now allowed to run for coverage purposes
-            expect(mockLogger.warn).toHaveBeenCalled()
-
-            process.env.NODE_ENV = originalEnv
-        })
-
-        test('should not warn about startTime with wrong array length in test environment', () => {
-            const originalEnv = process.env.NODE_ENV
-            process.env.NODE_ENV = 'development'
-
-            const invalidSpan = {
-                ...mockSpan,
-                startTime: [1234567890], // Only one element instead of two
-                duration: [0, 100000000]
-            }
-
-            opentelemetryUtils.endSpan(invalidSpan)
-
-            // Warnings are now allowed to run for coverage purposes
-            expect(mockLogger.warn).toHaveBeenCalled()
-
-            process.env.NODE_ENV = originalEnv
-        })
-
-        test('should not warn about duration with wrong array length in test environment', () => {
-            const originalEnv = process.env.NODE_ENV
-            process.env.NODE_ENV = 'development'
-
-            const invalidSpan = {
-                ...mockSpan,
-                startTime: [1234567890, 0],
-                duration: [0] // Only one element instead of two
-            }
-
-            opentelemetryUtils.endSpan(invalidSpan)
-
-            // Warnings are now allowed to run for coverage purposes
-            expect(mockLogger.warn).toHaveBeenCalled()
-
-            process.env.NODE_ENV = originalEnv
-        })
-    })
-
-    describe('OpenTelemetry disabled scenarios', () => {
-        test('should warn when OpenTelemetry is disabled in createChildSpan', () => {
-            const originalEnv = process.env.NODE_ENV
-            process.env.NODE_ENV = 'development'
-
-            // Mock getOTELConfig to return disabled
-            const {getOTELConfig} = jest.requireMock('./opentelemetry-config')
-            getOTELConfig.mockReturnValue({
-                enabled: false,
-                serviceName: 'test-service'
+    describe('logPerformanceMetric', () => {
+        test('should log performance metric successfully', () => {
+            opentelemetryUtils.logPerformanceMetric('test-metric', 150, {
+                test: 'value'
             })
 
-            opentelemetryUtils.createChildSpan('test-span')
-
-            expect(mockLogger.warn).toHaveBeenCalledWith(
-                'OpenTelemetry is disabled - spans will not have proper timing data',
-                expect.objectContaining({
-                    namespace: 'opentelemetry',
-                    additionalProperties: expect.objectContaining({
-                        span_name: 'test-span',
-                        otel_enabled: false
-                    })
-                })
+            expect(mockTracer.startSpan).toHaveBeenCalledWith(
+                'test-metric',
+                {
+                    attributes: {
+                        'service.name': 'pwa-kit-react-sdk',
+                        'metric.duration': 150,
+                        test: 'value'
+                    }
+                },
+                'test-context'
             )
-
-            process.env.NODE_ENV = originalEnv
+            expect(mockSpan.end).toHaveBeenCalled()
+            expect(mockLogger.info).toHaveBeenCalledWith('OpenTelemetry span data', {
+                namespace: 'opentelemetry.logSpanData',
+                additionalProperties: expect.objectContaining({
+                    traceId: 'test-trace-id',
+                    name: 'test-span'
+                })
+            })
         })
 
-        test('should warn when OpenTelemetry is disabled in tracePerformance', async () => {
-            // Mock getOTELConfig to return disabled
-            const {getOTELConfig} = jest.requireMock('./opentelemetry-config')
-            getOTELConfig.mockReturnValue({
-                enabled: false,
-                serviceName: 'test-service'
+        test('should handle performance mark attributes', () => {
+            opentelemetryUtils.logPerformanceMetric('test-metric', 150, {
+                performance_mark: 'test-mark',
+                performance_detail: 'test-detail',
+                other: 'value'
             })
 
-            const mockFn = jest.fn().mockResolvedValue('test-result')
-            await opentelemetryUtils.tracePerformance('test-trace', mockFn)
-
-            expect(mockLogger.warn).toHaveBeenCalledWith(
-                'OpenTelemetry is disabled - performance tracing will not have proper timing data',
-                expect.objectContaining({
-                    namespace: 'opentelemetry',
-                    additionalProperties: expect.objectContaining({
-                        trace_name: 'test-trace',
-                        otel_enabled: false
-                    })
-                })
+            expect(mockTracer.startSpan).toHaveBeenCalledWith(
+                'test-metric',
+                {
+                    attributes: {
+                        'service.name': 'pwa-kit-react-sdk',
+                        'metric.duration': 150,
+                        'performance.mark': 'test-mark',
+                        'performance.type': 'end',
+                        'performance.detail': 'test-detail',
+                        other: 'value'
+                    }
+                },
+                'test-context'
             )
         })
+
+        test('should handle performance mark with non-string detail in metric', () => {
+            opentelemetryUtils.logPerformanceMetric('test-metric', 150, {
+                performance_mark: 'test-mark',
+                performance_detail: {key: 'value'},
+                other: 'value'
+            })
+
+            expect(mockTracer.startSpan).toHaveBeenCalledWith(
+                'test-metric',
+                {
+                    attributes: {
+                        'service.name': 'pwa-kit-react-sdk',
+                        'metric.duration': 150,
+                        'performance.mark': 'test-mark',
+                        'performance.type': 'end',
+                        'performance.detail': '{"key":"value"}',
+                        other: 'value'
+                    }
+                },
+                'test-context'
+            )
+        })
+
+        test('should warn when no parent span is found', () => {
+            mockTrace.getSpan.mockReturnValue(null)
+
+            opentelemetryUtils.logPerformanceMetric('test-metric', 150)
+
+            expect(mockLogger.warn).toHaveBeenCalledWith('No parent span found in context', {
+                namespace: 'opentelemetry',
+                additionalProperties: {metricName: 'test-metric'}
+            })
+            expect(mockTracer.startSpan).not.toHaveBeenCalled()
+        })
+
+        test('should handle errors gracefully', () => {
+            // Reset the mock to throw an error
+            mockTracer.startSpan.mockImplementationOnce(() => {
+                throw new Error('Metric logging failed')
+            })
+
+            opentelemetryUtils.logPerformanceMetric('test-metric', 150)
+
+            expect(mockLogger.error).toHaveBeenCalledWith('Error logging performance metric', {
+                namespace: 'opentelemetry',
+                additionalProperties: {
+                    metricName: 'test-metric',
+                    error: 'Metric logging failed',
+                    stack: expect.any(String)
+                }
+            })
+        })
+
+        test('should handle errors when span creation fails in logPerformanceMetric', () => {
+            // Mock getSpan to return a span, but startSpan to throw
+            mockTrace.getSpan.mockReturnValue(mockSpan)
+            mockTracer.startSpan.mockImplementationOnce(() => {
+                throw new Error('Span creation failed in metric')
+            })
+
+            opentelemetryUtils.logPerformanceMetric('test-metric', 150)
+
+            expect(mockLogger.error).toHaveBeenCalledWith('Error logging performance metric', {
+                namespace: 'opentelemetry',
+                additionalProperties: {
+                    metricName: 'test-metric',
+                    error: 'Span creation failed in metric',
+                    stack: expect.any(String)
+                }
+            })
+        })
     })
 
-    // Note: OpenTelemetry disabled scenario tests removed - these test edge cases
-    // that are complex to mock in Jest and the core functionality is already tested
+    describe('traceChildPerformance', () => {
+        test('should trace child performance successfully', async () => {
+            const mockFn = jest.fn().mockResolvedValue('child-result')
+
+            const result = await opentelemetryUtils.traceChildPerformance('child-perf', mockFn)
+
+            expect(mockTracer.startSpan).toHaveBeenCalledWith(
+                'child-perf',
+                {
+                    attributes: {
+                        'service.name': 'pwa-kit-react-sdk'
+                    }
+                },
+                'test-context'
+            )
+            expect(mockFn).toHaveBeenCalled()
+            expect(result).toBe('child-result')
+            expect(mockSpan.end).toHaveBeenCalled()
+        })
+
+        test('should handle function errors', async () => {
+            const mockFn = jest.fn().mockRejectedValue(new Error('Child function failed'))
+
+            await expect(
+                opentelemetryUtils.traceChildPerformance('child-perf', mockFn)
+            ).rejects.toThrow('Child function failed')
+
+            expect(mockSpan.setStatus).toHaveBeenCalledWith({
+                code: 2, // ERROR
+                message: 'Child function failed'
+            })
+            expect(mockSpan.end).toHaveBeenCalled()
+        })
+
+        test('should fallback to function execution when span creation fails', async () => {
+            mockTracer.startSpan.mockImplementation(() => {
+                throw new Error('Span creation failed')
+            })
+
+            const mockFn = jest.fn().mockResolvedValue('fallback-result')
+
+            const result = await opentelemetryUtils.traceChildPerformance('child-perf', mockFn)
+
+            expect(result).toBe('fallback-result')
+            expect(mockFn).toHaveBeenCalled()
+            expect(mockSpan.end).not.toHaveBeenCalled()
+        })
+    })
 })

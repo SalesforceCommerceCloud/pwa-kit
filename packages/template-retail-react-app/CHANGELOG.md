@@ -5,6 +5,7 @@
 - Updated 6 new languages [#2495](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2495)
 - Fix Einstein event tracking for `addToCart` event [#2558](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2558)
 - Update latest translations for all languages [#2616](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2616)
+- Bundlesize update [#2722](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2722)
 
 ## v6.1.0 (May 22, 2025)
 
