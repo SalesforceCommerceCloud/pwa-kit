@@ -70,21 +70,16 @@ interface SlasJwtPayload extends JwtPayload {
 type AuthorizeIDPParams = Parameters<Helpers['authorizeIDP']>[0]
 type LoginIDPUserParams = Parameters<Helpers['loginIDPUser']>[0]
 type AuthorizePasswordlessParams = Parameters<Helpers['authorizePasswordless']>[0]
-type LoginPasswordlessParams = Parameters<Helpers['getPasswordLessAccessToken']>[0]
 type LoginRegisteredUserB2CCredentials = Parameters<Helpers['loginRegisteredUserB2C']>[0]
 
 /**
- * This is a temporary type until we can make a breaking change and modify the signature for
- * loginRegisteredUserB2C so that it takes in a body rather than just credentials
- *
+ * Body type for loginRegisteredUserB2C - aligns with register function pattern
  */
-type LoginRegisteredUserCredentialsWithCustomParams =
-    | {
-          username: string
-          password: string
-          options?: {body: helpers.CustomRequestBody}
-      }
-    | LoginRegisteredUserB2CCredentials
+type LoginRegisteredUserB2CBody = {
+    username: string
+    password: string
+    customParameters?: helpers.CustomRequestBody
+}
 
 /**
  * Simplified types for public API methods
@@ -965,7 +960,7 @@ class Auth {
                 password
             }
         })
-        await this.loginRegisteredUserB2C({
+        const loginParams: LoginRegisteredUserB2CCredentials = {
             slasClient: this.client,
             credentials: {
                 username: login,
@@ -978,21 +973,20 @@ class Auth {
                 ...(this.get('usid') && {usid: this.get('usid')})
             },
             body: customParameters
-        })
+        }
+
+        const token = await helpers.loginRegisteredUserB2C(loginParams)
+        this.handleTokenResponse(token, false)
         return res
     }
 
     /**
      * A wrapper method for commerce-sdk-isomorphic helper: loginRegisteredUserB2C.
      *
-     * Note: This uses the type LoginRegisteredUserCredentialsWithCustomParams rather than LoginRegisteredUserB2CCredentials
-     * as a workaround to allow custom parameters through because the login.mutateAsync hook will only pass through a single
-     * 'body' argument into this function.
-     *
-     * In the next major version release, we should modify this method so that it's input is a body containing credentials,
-     * similar to the input for the register function.
+     * This method uses a body-based API similar to the register function for consistency.
+     * Supports custom parameters through the customParameters field.
      */
-    async loginRegisteredUserB2C(credentials: LoginRegisteredUserCredentialsWithCustomParams) {
+    async loginRegisteredUserB2C(body: LoginRegisteredUserB2CBody) {
         if (this.clientSecret && onClient() && this.clientSecret !== SLAS_SECRET_PLACEHOLDER) {
             this.logWarning(SLAS_SECRET_WARNING_MSG)
         }
@@ -1001,17 +995,10 @@ class Auth {
         const dntPref = this.getDnt({includeDefaults: true})
         const isGuest = false
 
-        // Handle both internal calls (with slasClient) and public calls (with username/password)
-        const isInternalCall = 'slasClient' in credentials
-        const username = isInternalCall
-            ? credentials.credentials?.username || ''
-            : credentials.username || ''
-        const password = isInternalCall
-            ? credentials.credentials?.password || ''
-            : credentials.password || ''
-        const body = isInternalCall ? credentials.body : credentials.options?.body
+        // Extract fields from body parameter (aligned with register function pattern)
+        const {username, password, customParameters} = body
 
-        const token = await helpers.loginRegisteredUserB2C({
+        const loginParams: LoginRegisteredUserB2CCredentials = {
             slasClient: this.client,
             credentials: {
                 username,
@@ -1023,8 +1010,10 @@ class Auth {
                 dnt: dntPref,
                 ...(usid && {usid})
             },
-            body
-        })
+            body: customParameters
+        }
+
+        const token = await helpers.loginRegisteredUserB2C(loginParams)
         this.handleTokenResponse(token, isGuest)
         if (onClient()) {
             void this.clearECOMSession()
@@ -1193,7 +1182,7 @@ class Auth {
         })
 
         if (shouldReloginCurrentSession) {
-            await this.loginRegisteredUserB2C({
+            const loginParams: LoginRegisteredUserB2CCredentials = {
                 slasClient: this.client,
                 credentials: {
                     username: login,
@@ -1204,7 +1193,10 @@ class Auth {
                     dnt: this.getDnt({includeDefaults: true}),
                     ...(this.get('usid') && {usid: this.get('usid')})
                 }
-            })
+            }
+
+            const token = await helpers.loginRegisteredUserB2C(loginParams)
+            this.handleTokenResponse(token, false)
         }
         return res
     }
