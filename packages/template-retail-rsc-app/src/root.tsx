@@ -11,6 +11,7 @@ import CommerceProvider from '@/providers/commerce';
 import Header from '@/components/header';
 import Footer from '@/components/footer';
 import { getCommerceApiToken } from '@/utils/api/commerce-api';
+import { ToastProvider } from '@/components/ui/toast';
 import DumpError from './routes/error';
 import Loading from './routes/loading';
 import './routes/root.css';
@@ -73,13 +74,15 @@ export default function App({
 }) {
     return (
         <CommerceProvider context={{ session }}>
-            <Loading />
-            <ScrollRestoration />
-            <Header />
-            <main className="flex-grow pt-8">
-                <Outlet />
-            </main>
-            <Footer />
+            <ToastProvider>
+                <Loading />
+                <ScrollRestoration />
+                <Header />
+                <main className="flex-grow pt-8">
+                    <Outlet />
+                </main>
+                <Footer />
+            </ToastProvider>
         </CommerceProvider>
     );
 }

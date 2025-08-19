@@ -7,6 +7,7 @@ import type { SessionData } from '@/utils/api/commerce-api';
 import { createQueryClient } from '@/utils/api/commerce-client';
 import {
     createProductsGetCategoryQuery,
+    createProductsGetProductQuery,
     createSearchProductsQuery
 } from '@/utils/api/commerce-client-queries';
 
@@ -27,6 +28,19 @@ export const fetchProductsGetCategory = (
 ): Promise<ShopperProductsTypes.Category> =>
     getQueryClient().fetchQuery(
         createProductsGetCategoryQuery(session, parameters)
+    );
+
+export const fetchProductsGetProduct = (
+    session: SessionData,
+    parameters: {
+        id: string;
+        expand?: string[];
+        allImages?: boolean;
+        perPricebook?: boolean;
+    }
+): Promise<ShopperProductsTypes.Product> =>
+    getQueryClient().fetchQuery(
+        createProductsGetProductQuery(session, parameters)
     );
 
 export const fetchSearchProducts = (

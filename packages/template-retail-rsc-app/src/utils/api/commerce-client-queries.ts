@@ -30,6 +30,48 @@ export const createProductsGetCategoryQuery = (
     };
 };
 
+export const createProductsGetProductQuery = (
+    session: SessionData,
+    parameters: {
+        id: string;
+        expand?: string[];
+        allImages?: boolean;
+        perPricebook?: boolean;
+    }
+): FetchQueryOptions<ShopperProductsTypes.Product> => {
+    const {
+        id,
+        expand = [
+            'availability',
+            'bundled_products',
+            'images',
+            'options',
+            'page_meta_tags',
+            'prices',
+            'promotions',
+            'set_products',
+            'variations'
+        ],
+        allImages = true,
+        perPricebook = true
+    } = parameters;
+
+    return {
+        queryKey: ['products', 'getProduct', parameters],
+        queryFn: (): Promise<ShopperProductsTypes.Product> => {
+            const client = createShopperProductsClient(session);
+            return client.getProduct({
+                parameters: {
+                    id,
+                    expand,
+                    allImages,
+                    perPricebook
+                }
+            });
+        }
+    };
+};
+
 export const createSearchProductsQuery = (
     session: SessionData,
     parameters: {
