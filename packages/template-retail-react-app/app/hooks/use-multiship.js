@@ -234,6 +234,7 @@ export const useMultiship = (basket) => {
             shippingMethodId: pickupShippingMethodId,
             storeId: storeInfo.id
         })
+
         return {
             shipments: [
                 {
