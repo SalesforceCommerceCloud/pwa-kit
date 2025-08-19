@@ -51,7 +51,7 @@ import {applyProxyRequestHeaders} from '../../utils/ssr-server/configure-proxy'
 import awsServerlessExpress from 'aws-serverless-express'
 import expressLogging from 'morgan'
 import logger from '../../utils/logger-instance'
-import {createProxyMiddleware} from 'http-proxy-middleware'
+import {createProxyMiddleware, responseInterceptor} from 'http-proxy-middleware'
 
 /**
  * An Array of mime-types (Content-Type values) that are considered
@@ -719,10 +719,27 @@ export const RemoteServerFactory = {
 
         app.use(
             slasPrivateProxyPath,
+            (req, res, next) => {
+                // Check if the request should be blocked before it reaches the proxy
+                // We run this outside of the proxy middleware because modifying the response
+                // to send a 403 in the proxy causes issues with the response interceptor.
+                if (
+                    !req.path?.match(options.slasApiPath) ||
+                    req.path?.match(/\/oauth2\/trusted-system/)
+                ) {
+                    const message = `Request to ${req.path} is not allowed through the SLAS Private Client Proxy`
+                    logger.error(message)
+                    return res.status(403).json({
+                        message: message
+                    })
+                }
+                next()
+            },
             createProxyMiddleware({
                 target: options.slasTarget,
                 changeOrigin: true,
                 pathRewrite: {[slasPrivateProxyPath]: ''},
+                selfHandleResponse: true,
                 onProxyReq: (proxyRequest, incomingRequest, res) => {
                     applyProxyRequestHeaders({
                         proxyRequest,
@@ -732,33 +749,48 @@ export const RemoteServerFactory = {
                         targetProtocol: 'https'
                     })
 
-                    // We don't want the proxy to handle any non-SLAS requests
-                    // or any trusted system requests
-                    if (
-                        !incomingRequest.path?.match(options.slasApiPath) ||
-                        incomingRequest.path?.match(/\/oauth2\/trusted-system/)
-                    ) {
-                        const message = `Request to ${incomingRequest.path} is not allowed through the SLAS Private Client Proxy`
-                        logger.error(message)
-                        return res.status(403).json({
-                            message: message
-                        })
-                    }
-
-                    // We pattern match and add client secrets only to endpoints that
-                    // match the regex specified by options.applySLASPrivateClientToEndpoints.
-                    //
-                    // Other SLAS endpoints, ie. SLAS authenticate (/oauth2/login) and
-                    // SLAS logout (/oauth2/logout), use the Authorization header for a different
-                    // purpose so we don't want to overwrite the header for those calls.
-                    if (incomingRequest.path?.match(options.applySLASPrivateClientToEndpoints)) {
-                        proxyRequest.setHeader('Authorization', `Basic ${encodedSlasCredentials}`)
-                    } else if (incomingRequest.path?.match(/\/oauth2\/trusted-agent\/token/)) {
+                    if (incomingRequest.path?.match(/\/oauth2\/trusted-agent\/token/)) {
                         // /oauth2/trusted-agent/token endpoint auth header comes from Account Manager
                         // so the SLAS private client is sent via this special header
                         proxyRequest.setHeader('_sfdc_client_auth', encodedSlasCredentials)
+                    } else if (
+                        incomingRequest.path?.match(options.applySLASPrivateClientToEndpoints)
+                    ) {
+                        // We pattern match and add client secrets only to endpoints that
+                        // match the regex specified by options.applySLASPrivateClientToEndpoints.
+                        //
+                        // Other SLAS endpoints, ie. SLAS authenticate (/oauth2/login) and
+                        // SLAS logout (/oauth2/logout), use the Authorization header for a different
+                        // purpose so we don't want to overwrite the header for those calls.
+                        proxyRequest.setHeader('Authorization', `Basic ${encodedSlasCredentials}`)
                     }
-                }
+                },
+                onProxyRes: responseInterceptor((responseBuffer, proxyRes, req, res) => {
+                    try {
+                        // If the passwordless login endpoint returns a 404, which corresponds to a user
+                        // email not being found, we mask it with a 200 OK response so that it is not
+                        // obvious that the user does not exist.
+                        // We do this to prevent user enumeration.
+                        if (
+                            req.path?.match(/\/oauth2\/passwordless\/login/) &&
+                            proxyRes.statusCode === 404
+                        ) {
+                            res.statusCode = 200
+                            res.statusMessage = 'OK'
+
+                            // When a /passwordless/login endpoint response returns 200, it has no body
+                            // so we return an empty body here to match an actual 200 response.
+                            return Buffer.from('', 'utf8')
+                        }
+                        return responseBuffer
+                    } catch (error) {
+                        console.error(
+                            'There is an error processing the response from SLAS. Returning original response.',
+                            error
+                        )
+                        return responseBuffer
+                    }
+                })
             })
         )
     },
