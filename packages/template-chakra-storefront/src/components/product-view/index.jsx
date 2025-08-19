@@ -326,15 +326,7 @@ const ProductView = forwardRef(
                     // It's possible that the item has been added to cart, but we don't want to open the modal.
                     // See wishlist_primary_action for example.
                     if (itemsAdded) {
-                        if (suppressAddToCartModal) {
-                            console.log(
-                                '[PV:SUPPRESS_ADD_TO_CART_MODAL] Skipping add-to-cart modal open',
-                                {productId: product?.id}
-                            )
-                        } else {
-                            console.log('[PV:OPEN_ATC_MODAL] Opening add-to-cart modal', {
-                                productId: product?.id
-                            })
+                        if (!suppressAddToCartModal) {
                             onAddToCartModalOpen({
                                 product,
                                 itemsAdded,
