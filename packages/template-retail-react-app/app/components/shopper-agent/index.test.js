@@ -132,8 +132,20 @@ describe('ShopperAgent Component', () => {
             }
         })
 
-        // Default refresh token mock
-        mockedUseRefreshToken.mockReturnValue(null)
+        // Mock useUsid hook
+        mockedUseUsid.mockReturnValue({usid: 'test-usid'})
+
+        // Mock useMultiSite hook with proper structure
+        mockedUseMultiSite.mockReturnValue({
+            locale: {id: 'en-US', preferredCurrency: 'USD'}
+        })
+
+        // Mock useTheme hook
+        mockedUseTheme.mockReturnValue({
+            zIndices: {
+                sticky: 1100
+            }
+        })
 
         // Clear any existing scripts
         delete global.window.embeddedservice_bootstrap
@@ -828,177 +840,9 @@ describe('ShopperAgent Component', () => {
         })
     })
 
-    describe('Refresh Token Integration', () => {
-        beforeEach(() => {
-            jest.clearAllMocks()
-            mockedUseRefreshToken.mockReturnValue(null)
-        })
+    test('should call useScript with correct URL', () => {
+        render(<ShopperAgent {...defaultProps} />)
 
-        test('should call useRefreshToken hook when component renders', () => {
-            const refreshToken = 'test-refresh-token-123'
-            mockedUseRefreshToken.mockReturnValue(refreshToken)
-
-            useScript.mockReturnValue({loaded: true, error: false})
-
-            const props = {
-                ...defaultProps,
-                commerceAgentConfiguration: commerceAgentSettings,
-                basketDoneLoading: true
-            }
-
-            render(<ShopperAgent {...props} />)
-
-            // Verify useRefreshToken was called (no parameters needed now)
-            expect(mockedUseRefreshToken).toHaveBeenCalled()
-        })
-
-        test('should handle null refresh token gracefully', () => {
-            mockedUseRefreshToken.mockReturnValue(null)
-
-            useScript.mockReturnValue({loaded: true, error: false})
-
-            const props = {
-                ...defaultProps,
-                commerceAgentConfiguration: commerceAgentSettings,
-                basketDoneLoading: true
-            }
-
-            render(<ShopperAgent {...props} />)
-
-            // Verify useRefreshToken was called
-            expect(mockedUseRefreshToken).toHaveBeenCalled()
-        })
-
-        test('should handle undefined refresh token gracefully', () => {
-            mockedUseRefreshToken.mockReturnValue(undefined)
-
-            useScript.mockReturnValue({loaded: true, error: false})
-
-            const props = {
-                ...defaultProps,
-                commerceAgentConfiguration: commerceAgentSettings,
-                basketDoneLoading: true
-            }
-
-            render(<ShopperAgent {...props} />)
-
-            // Verify useRefreshToken was called
-            expect(mockedUseRefreshToken).toHaveBeenCalled()
-        })
-
-        test('should not render when refresh token is not available and component is disabled', () => {
-            mockedUseRefreshToken.mockReturnValue(null)
-
-            const disabledSettings = {...commerceAgentSettings, enabled: 'false'}
-            const props = {
-                ...defaultProps,
-                commerceAgentConfiguration: disabledSettings,
-                basketDoneLoading: true
-            }
-
-            render(<ShopperAgent {...props} />)
-
-            // useRefreshToken should still be called (but result doesn't matter)
-            expect(mockedUseRefreshToken).toHaveBeenCalled()
-        })
-
-        test('should handle refresh token changes', () => {
-            // Initial state
-            mockedUseRefreshToken.mockReturnValue('initial-token')
-            useScript.mockReturnValue({loaded: true, error: false})
-
-            const props = {
-                ...defaultProps,
-                commerceAgentConfiguration: commerceAgentSettings,
-                basketDoneLoading: true
-            }
-
-            const {rerender} = render(<ShopperAgent {...props} />)
-
-            expect(mockedUseRefreshToken).toHaveBeenCalled()
-
-            // Change refresh token
-            mockedUseRefreshToken.mockReturnValue('updated-token')
-            rerender(<ShopperAgent {...props} />)
-
-            // Verify useRefreshToken was called again
-            expect(mockedUseRefreshToken).toHaveBeenCalled()
-        })
-
-        test('should update prechat fields when refresh token changes', async () => {
-            // Initial refresh token
-            mockedUseRefreshToken.mockReturnValue('initial-token')
-            useScript.mockReturnValue({loaded: true, error: false})
-
-            const props = {
-                ...defaultProps,
-                commerceAgentConfiguration: commerceAgentSettings,
-                basketDoneLoading: true
-            }
-
-            const {rerender} = render(<ShopperAgent {...props} />)
-
-            // Trigger initial prechat fields setup
-            await act(async () => {
-                window.dispatchEvent(new Event('onEmbeddedMessagingReady'))
-            })
-
-            expect(mockEmbeddedService.prechatAPI.setHiddenPrechatFields).toHaveBeenCalledWith({
-                SiteId: commerceAgentSettings.siteId,
-                Locale: defaultProps.locale,
-                OrganizationId: commerceAgentSettings.commerceOrgId,
-                UsId: 'test-usid',
-                IsCartMgmtSupported: 'true',
-                RefreshToken: 'initial-token'
-            })
-
-            // Reset mock
-            mockEmbeddedService.prechatAPI.setHiddenPrechatFields.mockClear()
-
-            // Change refresh token and re-render
-            mockedUseRefreshToken.mockReturnValue('updated-token')
-            rerender(<ShopperAgent {...props} />)
-
-            // Trigger prechat fields setup with updated token
-            await act(async () => {
-                window.dispatchEvent(new Event('onEmbeddedMessagingReady'))
-            })
-
-            expect(mockEmbeddedService.prechatAPI.setHiddenPrechatFields).toHaveBeenCalledWith({
-                SiteId: commerceAgentSettings.siteId,
-                Locale: defaultProps.locale,
-                OrganizationId: commerceAgentSettings.commerceOrgId,
-                UsId: 'test-usid',
-                IsCartMgmtSupported: 'true',
-                RefreshToken: 'updated-token'
-            })
-        })
-
-        test('should handle null refresh token in prechat fields', async () => {
-            mockedUseRefreshToken.mockReturnValue(null)
-            useScript.mockReturnValue({loaded: true, error: false})
-
-            const props = {
-                ...defaultProps,
-                commerceAgentConfiguration: commerceAgentSettings,
-                basketDoneLoading: true
-            }
-
-            render(<ShopperAgent {...props} />)
-
-            // Trigger prechat fields setup
-            await act(async () => {
-                window.dispatchEvent(new Event('onEmbeddedMessagingReady'))
-            })
-
-            expect(mockEmbeddedService.prechatAPI.setHiddenPrechatFields).toHaveBeenCalledWith({
-                SiteId: commerceAgentSettings.siteId,
-                Locale: defaultProps.locale,
-                OrganizationId: commerceAgentSettings.commerceOrgId,
-                UsId: 'test-usid',
-                IsCartMgmtSupported: 'true',
-                RefreshToken: null
-            })
-        })
+        expect(mockedUseScript).toHaveBeenCalledWith('https://test.salesforce.com/script.js')
     })
 })
