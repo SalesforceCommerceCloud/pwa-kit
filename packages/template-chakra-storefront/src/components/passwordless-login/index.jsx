@@ -86,7 +86,7 @@ const PasswordlessLogin = ({
                         </Button>
                         {/* @sfdc-extension-block-start SFDC_EXT_SOCIAL_LOGIN */}
                         <SocialLogin form={form} idps={idps} />
-                        {/* @sfdc-extension-block-endSFDC_EXT_SOCIAL_LOGIN */}
+                        {/* @sfdc-extension-block-end SFDC_EXT_SOCIAL_LOGIN */}
                     </Stack>
                 </Stack>
             )}
