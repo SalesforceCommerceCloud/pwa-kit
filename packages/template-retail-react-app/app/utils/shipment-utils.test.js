@@ -80,19 +80,19 @@ describe('shipment-utils', () => {
     })
 
     describe('getItemsForShipment', () => {
-        it('should return items for a specific shipment', () => {
+        test('should return items for a specific shipment', () => {
             const items = getItemsForShipment(mockBasket, 'me')
             expect(items).toHaveLength(2)
             expect(items[0].productId).toBe('prod-1')
             expect(items[1].productId).toBe('prod-2')
         })
 
-        it('should return empty array for non-existent shipment', () => {
+        test('should return empty array for non-existent shipment', () => {
             const items = getItemsForShipment(mockBasket, 'non-existent')
             expect(items).toHaveLength(0)
         })
 
-        it('should return empty array for null/undefined inputs', () => {
+        test('should return empty array for null/undefined inputs', () => {
             expect(getItemsForShipment(null, 'me')).toEqual([])
             expect(getItemsForShipment(mockBasket, null)).toEqual([])
             expect(getItemsForShipment(undefined, 'me')).toEqual([])
@@ -100,25 +100,25 @@ describe('shipment-utils', () => {
     })
 
     describe('findEmptyShipments', () => {
-        it('should return empty shipments', () => {
+        test('should return empty shipments', () => {
             const emptyShipments = findEmptyShipments(mockBasket)
             expect(emptyShipments).toHaveLength(0) // All shipments have items in this case
         })
 
-        it('should return empty array for basket without shipments', () => {
+        test('should return empty array for basket without shipments', () => {
             const basketWithoutShipments = {...mockBasket, shipments: []}
             const emptyShipments = findEmptyShipments(basketWithoutShipments)
             expect(emptyShipments).toEqual([])
         })
 
-        it('should return empty array for null/undefined basket', () => {
+        test('should return empty array for null/undefined basket', () => {
             expect(findEmptyShipments(null)).toEqual([])
             expect(findEmptyShipments(undefined)).toEqual([])
         })
     })
 
     describe('groupItemsByAddress', () => {
-        it('should group items by address', () => {
+        test('should group items by address', () => {
             const items = [
                 {id: '1', address: {city: 'City1'}},
                 {id: '2', address: {city: 'City1'}},
@@ -134,19 +134,19 @@ describe('shipment-utils', () => {
             expect(groups[JSON.stringify({city: 'City2'})]).toHaveLength(1)
         })
 
-        it('should return empty object for invalid inputs', () => {
+        test('should return empty object for invalid inputs', () => {
             expect(groupItemsByAddress(null, () => ({}))).toEqual({})
             expect(groupItemsByAddress([], null)).toEqual({})
         })
     })
 
     describe('findExistingDeliveryShipment', () => {
-        it('should find delivery shipment', () => {
+        test('should find delivery shipment', () => {
             const shipment = findExistingDeliveryShipment(mockBasket, mockIsPickupMethod)
             expect(shipment.shipmentId).toBe('me')
         })
 
-        it('should return null if no delivery shipment found', () => {
+        test('should return null if no delivery shipment found', () => {
             const pickupOnlyBasket = {
                 ...mockBasket,
                 shipments: mockBasket.shipments.filter((s) => s.shipmentId === 'shipment-2')
@@ -157,12 +157,12 @@ describe('shipment-utils', () => {
     })
 
     describe('findExistingPickupShipment', () => {
-        it('should find pickup shipment for specific store', () => {
+        test('should find pickup shipment for specific store', () => {
             const shipment = findExistingPickupShipment(mockBasket, 'store-1', mockIsPickupMethod)
             expect(shipment.shipmentId).toBe('shipment-2')
         })
 
-        it('should return null if no pickup shipment found for store', () => {
+        test('should return null if no pickup shipment found for store', () => {
             const shipment = findExistingPickupShipment(
                 mockBasket,
                 'non-existent-store',
@@ -173,12 +173,12 @@ describe('shipment-utils', () => {
     })
 
     describe('findUnusedDeliveryShipment', () => {
-        it('should find unused delivery shipment', () => {
+        test('should find unused delivery shipment', () => {
             const shipment = findUnusedDeliveryShipment(mockBasket, ['me'], mockIsPickupMethod)
             expect(shipment.shipmentId).toBe('shipment-3')
         })
 
-        it('should return null if all delivery shipments are used', () => {
+        test('should return null if all delivery shipments are used', () => {
             const shipment = findUnusedDeliveryShipment(
                 mockBasket,
                 ['me', 'shipment-3'],
@@ -189,7 +189,7 @@ describe('shipment-utils', () => {
     })
 
     describe('areAddressesEqual', () => {
-        it('should return true for identical addresses', () => {
+        test('should return true for identical addresses', () => {
             const address1 = {
                 address1: '123 Main St',
                 city: 'Test City',
@@ -202,7 +202,7 @@ describe('shipment-utils', () => {
             expect(areAddressesEqual(address1, address2)).toBe(true)
         })
 
-        it('should return false for different addresses', () => {
+        test('should return false for different addresses', () => {
             const address1 = {
                 address1: '123 Main St',
                 city: 'Test City',
@@ -221,7 +221,7 @@ describe('shipment-utils', () => {
             expect(areAddressesEqual(address1, address2)).toBe(false)
         })
 
-        it('should handle null/undefined values', () => {
+        test('should handle null/undefined values', () => {
             const address1 = {
                 address1: '123 Main St',
                 city: 'Test City',
@@ -242,7 +242,7 @@ describe('shipment-utils', () => {
     })
 
     describe('cleanAddressForOrder', () => {
-        it('should clean address object', () => {
+        test('should clean address object', () => {
             const dirtyAddress = {
                 address1: '123 Main St',
                 city: 'Test City',
@@ -270,14 +270,14 @@ describe('shipment-utils', () => {
             expect(cleanAddress.extraField).toBeUndefined()
         })
 
-        it('should return null for null/undefined address', () => {
+        test('should return null for null/undefined address', () => {
             expect(cleanAddressForOrder(null)).toBeNull()
             expect(cleanAddressForOrder(undefined)).toBeNull()
         })
     })
 
     describe('findDeliveryShipmentWithSameAddress', () => {
-        it('should find shipment with matching address', () => {
+        test('should find shipment with matching address', () => {
             const address = {
                 address1: '123 Main St',
                 city: 'Test City',
@@ -294,7 +294,7 @@ describe('shipment-utils', () => {
             expect(shipmentId).toBe('me')
         })
 
-        it('should return null if no matching address found', () => {
+        test('should return null if no matching address found', () => {
             const address = {
                 address1: '456 Oak St',
                 city: 'Other City',
@@ -313,12 +313,12 @@ describe('shipment-utils', () => {
     })
 
     describe('findDeliveryShipmentWithoutAddress', () => {
-        it('should find shipment without address', () => {
+        test('should find shipment without address', () => {
             const shipmentId = findDeliveryShipmentWithoutAddress(mockBasket, mockIsPickupMethod)
             expect(shipmentId).toBe('shipment-3')
         })
 
-        it('should return null if all shipments have addresses', () => {
+        test('should return null if all shipments have addresses', () => {
             const basketWithAddresses = {
                 ...mockBasket,
                 shipments: mockBasket.shipments.map((s) => ({
@@ -336,12 +336,12 @@ describe('shipment-utils', () => {
     })
 
     describe('findShipmentToConsolidate', () => {
-        it('should find shipment to consolidate', () => {
+        test('should find shipment to consolidate', () => {
             const shipment = findShipmentToConsolidate(mockBasket)
             expect(shipment.shipmentId).toBe('shipment-2')
         })
 
-        it('should return null if no shipment to consolidate', () => {
+        test('should return null if no shipment to consolidate', () => {
             const basketWithOnlyDefault = {
                 ...mockBasket,
                 shipments: mockBasket.shipments.filter((s) => s.shipmentId === 'me'),
@@ -354,11 +354,11 @@ describe('shipment-utils', () => {
     })
 
     describe('isDefaultShipmentEmpty', () => {
-        it('should return false when default shipment has items', () => {
+        test('should return false when default shipment has items', () => {
             expect(isDefaultShipmentEmpty(mockBasket)).toBe(false)
         })
 
-        it('should return true when default shipment is empty', () => {
+        test('should return true when default shipment is empty', () => {
             const basketWithEmptyDefault = {
                 ...mockBasket,
                 productItems: mockBasket.productItems.filter((item) => item.shipmentId !== 'me')
@@ -367,7 +367,7 @@ describe('shipment-utils', () => {
             expect(isDefaultShipmentEmpty(basketWithEmptyDefault)).toBe(true)
         })
 
-        it('should return true when no default shipment exists', () => {
+        test('should return true when no default shipment exists', () => {
             const basketWithoutDefault = {
                 ...mockBasket,
                 shipments: mockBasket.shipments.filter((s) => s.shipmentId !== 'me')
