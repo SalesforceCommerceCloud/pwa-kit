@@ -1,6 +1,6 @@
 ---
 description: USE when creating new components manually
-globs: 
+globs:
 alwaysApply: false
 ---
 # Component Generation Requirements
@@ -17,7 +17,7 @@ alwaysApply: false
 Create components at the components directory: `**/components/[component-name]/index.jsx`
 
 ## Guidelines
-**IMPORTANT** 
+**IMPORTANT**
 - Use functional components with hooks
 - Use PascalCase for component names
 - Use kebab-case for directories
