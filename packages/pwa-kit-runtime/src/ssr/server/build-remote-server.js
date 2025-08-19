@@ -495,15 +495,90 @@ export const RemoteServerFactory = {
             return path.replace(regex, '/')
         }
 
+        /*
+         * '?' have different meanings in express and path-to-regexp so we need
+         * to convert the express route to something path-to-regexp can process
+         *
+         * Express uses ? to mark the preceeding character as optional
+         * For example: the express route /abc/def? corresponds to
+         * the regex /abc\/de(f)?/
+         *
+         * However, Path-to-regexp uses ? to mark a parameter as optional
+         * For example: /abc/:def? means the :def parameter is optional
+         *
+         * In path-to-regexp, a route with ? that is not preceeded by
+         * a : must wrap the optional character in a paranthesis to
+         * be condidered valid
+         *
+         * In other words, path-to-regexp allows /abc/de(f)? but
+         * /abc/def? is considered invalid.
+         */
+        const convertExpressOptionalChars = (routePattern) => {
+            if (!routePattern || typeof routePattern !== 'string') {
+                return routePattern || ''
+            }
+
+            let result = ''
+            let i = 0
+            let inParameter = false
+
+            // Step through a route pattern
+            // If we encounter a :, we are in a parameter context (ie. /:abc)
+            // If we encounter a / we are starting a new path segment (ie. /../abc)
+            // If we encounter a ?, we need to see if we're in a
+            // parameter context or not
+            while (i < routePattern.length) {
+                const char = routePattern[i]
+                if (char === ':') {
+                    inParameter = true
+                    result += char
+                } else if (char === '/' || char === '\\') {
+                    inParameter = false
+                    result += char
+                } else if (char === '?' && !inParameter) {
+                    // This ? is not in a parameter context so we
+                    // wrap the previous character in parentheses if
+                    // it is not an escaped ?
+                    const prevChar = result[result.length - 1]
+
+                    if (prevChar && prevChar !== '\\') {
+                        // Wrap the previous character in parentheses
+                        result = result.slice(0, -1) + `(${prevChar})?`
+                    } else {
+                        // Literal ? or escaped ?, keep as is
+                        result += char
+                    }
+                } else if (char === '?' && inParameter) {
+                    // This ? is part of a parameter, keep as is
+                    result += char
+                    inParameter = false
+                } else {
+                    result += char
+                }
+
+                i++
+            }
+            return result
+        }
+
         const _convertExpressRouteToRegex = (routePattern) => {
             if (!routePattern) return null
             if (routePattern instanceof RegExp) return routePattern
             if (typeof routePattern !== 'string') return null
 
             try {
-                // Convert Express wildcards to path-to-regexp syntax
+                // First, convert Express wildcards to path-to-regexp syntax
                 // Express uses * for wildcards, path-to-regexp uses (.*)
-                const processedPattern = routePattern.replace(/\*/g, '(.*)')
+                // We need to do this before handling optional (?) characters
+                let processedPattern = routePattern.replace(/\*/g, '(.*)')
+
+                // Then handle ? in express route to something path-to-regexp can process
+                processedPattern = convertExpressOptionalChars(processedPattern)
+
+                // Ensure we have a valid string
+                if (!processedPattern || typeof processedPattern !== 'string') {
+                    throw new Error(`Invalid processed pattern: ${processedPattern}`)
+                }
 
                 // Use path-to-regexp to convert the route pattern to a regex
                 return pathToRegexp(processedPattern)

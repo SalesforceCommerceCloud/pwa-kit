@@ -1366,4 +1366,21 @@ describe('Base path tests', () => {
                 expect(response.body.message).toBe('test')
             })
     }, 15000)
+
+    test('should handle optional characters in route pattern', async () => {
+        jest.spyOn(ssrConfig, 'getConfig').mockReturnValue({envBasePath: '/basepath'})
+
+        const app = RemoteServerFactory._createApp(opts())
+
+        app.get('/callbac?k?*/:param?', (req, res) => {
+            res.status(200).json({message: 'test'})
+        })
+
+        return request(app)
+            .get('/basepath/callback')
+            .then((response) => {
+                expect(response.status).toBe(200)
+                expect(response.body.message).toBe('test')
+            })
+    }, 15000)
 })
