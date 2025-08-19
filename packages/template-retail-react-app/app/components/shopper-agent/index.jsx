@@ -12,6 +12,7 @@ import PropTypes from 'prop-types'
 import {useTheme} from '@salesforce/retail-react-app/app/components/shared/ui'
 import useMiaw from '@salesforce/retail-react-app/app/hooks/use-miaw'
 import useRefreshToken from '@salesforce/retail-react-app/app/hooks/use-refresh-token'
+import {useCurrency} from '@salesforce/retail-react-app/app/hooks'
 
 const onClient = typeof window !== 'undefined'
 
@@ -100,6 +101,7 @@ const isEnabled = (enabled) => {
  */
 const ShopperAgentWindow = ({commerceAgentConfiguration, locale, basketId, refreshToken}) => {
     const theme = useTheme()
+    const {currency} = useCurrency()
     const {
         embeddedServiceName,
         embeddedServiceEndpoint,
@@ -120,7 +122,8 @@ const ShopperAgentWindow = ({commerceAgentConfiguration, locale, basketId, refre
                 OrganizationId: commerceOrgId,
                 UsId: usid,
                 IsCartMgmtSupported: 'true',
-                RefreshToken: refreshToken
+                RefreshToken: refreshToken,
+                Currency: currency
             })
         }
 
@@ -148,7 +151,7 @@ const ShopperAgentWindow = ({commerceAgentConfiguration, locale, basketId, refre
                 handleEmbeddedMessagingWindowMaximized
             )
         }
-    }, [commerceAgentConfiguration, usid, theme.zIndices.sticky, refreshToken])
+    }, [commerceAgentConfiguration, usid, theme.zIndices.sticky, refreshToken, currency])
 
     // whenever the basketId changes, update the hidden prechat fields
     useEffect(() => {
@@ -200,7 +203,6 @@ ShopperAgentWindow.propTypes = {
 /**
  * ShopperAgent component that initializes and manages the embedded messaging service.
  * Conditionally renders the agent window based on configuration and loading state.
- * Refresh token is used to set the refresh token for the embedded messaging service.
  *
  * @param {Object} props - Component props
  * @param {Object} props.commerceAgentConfiguration - Commerce agent settings containing enabled, embeddedServiceName, etc.

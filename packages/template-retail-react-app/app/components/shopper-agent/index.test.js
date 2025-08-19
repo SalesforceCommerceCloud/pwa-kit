@@ -10,6 +10,7 @@ import {render, act} from '@testing-library/react'
 import ShopperAgent from '@salesforce/retail-react-app/app/components/shopper-agent/index'
 import useScript from '@salesforce/retail-react-app/app/hooks/use-script'
 import useRefreshToken from '@salesforce/retail-react-app/app/hooks/use-refresh-token'
+import {useCurrency} from '@salesforce/retail-react-app/app/hooks'
 
 // Mock the embeddedservice_bootstrap object
 const mockEmbeddedService = {
@@ -25,6 +26,10 @@ const mockEmbeddedService = {
 
 jest.mock('../../hooks/use-script', () => jest.fn().mockReturnValue({loaded: false, error: false}))
 
+jest.mock('@salesforce/retail-react-app/app/hooks', () => ({
+    useCurrency: jest.fn()
+}))
+
 jest.mock('@salesforce/commerce-sdk-react', () => {
     const originalModule = jest.requireActual('@salesforce/commerce-sdk-react')
     return {
@@ -36,6 +41,7 @@ jest.mock('@salesforce/commerce-sdk-react', () => {
 jest.mock('@salesforce/retail-react-app/app/hooks/use-refresh-token')
 
 const mockedUseRefreshToken = useRefreshToken
+const mockedUseCurrency = useCurrency
 
 jest.mock('@salesforce/retail-react-app/app/components/shared/ui', () => {
     const originalModule = jest.requireActual(
@@ -78,6 +84,9 @@ describe('ShopperAgent Component', () => {
 
         // Default refresh token mock
         mockedUseRefreshToken.mockReturnValue(null)
+
+        // Mock useCurrency hook
+        mockedUseCurrency.mockReturnValue({currency: 'USD'})
 
         // Clear any existing scripts
         const scripts = document.querySelectorAll('script[src]')
@@ -227,7 +236,8 @@ describe('ShopperAgent Component', () => {
             OrganizationId: commerceAgentSettings.commerceOrgId,
             UsId: 'test-usid',
             IsCartMgmtSupported: 'true',
-            RefreshToken: refreshToken
+            RefreshToken: refreshToken,
+            Currency: 'USD'
         })
 
         // Reset mock to test button click event
@@ -241,6 +251,57 @@ describe('ShopperAgent Component', () => {
         expect(mockEmbeddedService.prechatAPI.setHiddenPrechatFields).toHaveBeenCalledWith({
             BasketId: defaultProps.basketId,
             RefreshToken: refreshToken
+        })
+    })
+
+    test('should update hidden prechat fields when currency changes', async () => {
+        const refreshToken = 'test-refresh-token-123'
+        mockedUseRefreshToken.mockReturnValue(refreshToken)
+        useScript.mockReturnValue({loaded: true, error: false})
+
+        // Mock useCurrency to return different currency values
+        mockedUseCurrency.mockReturnValue({currency: 'USD'})
+
+        // First render with USD
+        const {rerender} = render(<ShopperAgent {...defaultProps} />)
+
+        // Trigger ready event
+        await act(async () => {
+            window.dispatchEvent(new Event('onEmbeddedMessagingReady'))
+        })
+
+        // Verify USD is set
+        expect(mockEmbeddedService.prechatAPI.setHiddenPrechatFields).toHaveBeenCalledWith({
+            SiteId: commerceAgentSettings.siteId,
+            Locale: defaultProps.locale,
+            OrganizationId: commerceAgentSettings.commerceOrgId,
+            UsId: 'test-usid',
+            IsCartMgmtSupported: 'true',
+            RefreshToken: refreshToken,
+            Currency: 'USD'
+        })
+
+        // Clear mock and change currency to EUR
+        mockEmbeddedService.prechatAPI.setHiddenPrechatFields.mockClear()
+        mockedUseCurrency.mockReturnValue({currency: 'EUR'})
+
+        // Re-render with new currency
+        rerender(<ShopperAgent {...defaultProps} />)
+
+        // Trigger ready event again
+        await act(async () => {
+            window.dispatchEvent(new Event('onEmbeddedMessagingReady'))
+        })
+
+        // Verify EUR is now set
+        expect(mockEmbeddedService.prechatAPI.setHiddenPrechatFields).toHaveBeenCalledWith({
+            SiteId: commerceAgentSettings.siteId,
+            Locale: defaultProps.locale,
+            OrganizationId: commerceAgentSettings.commerceOrgId,
+            UsId: 'test-usid',
+            IsCartMgmtSupported: 'true',
+            RefreshToken: refreshToken,
+            Currency: 'EUR'
         })
     })
 
@@ -470,7 +531,8 @@ describe('ShopperAgent Component', () => {
             OrganizationId: commerceAgentSettings.commerceOrgId,
             UsId: 'test-usid',
             IsCartMgmtSupported: 'true',
-            RefreshToken: refreshToken
+            RefreshToken: refreshToken,
+            Currency: 'USD'
         })
 
         // Reset mock
@@ -500,7 +562,8 @@ describe('ShopperAgent Component', () => {
             OrganizationId: newCommerceAgentSettings.commerceOrgId,
             UsId: 'test-usid',
             IsCartMgmtSupported: 'true',
-            RefreshToken: refreshToken
+            RefreshToken: refreshToken,
+            Currency: 'USD'
         })
     })
 
@@ -712,7 +775,8 @@ describe('ShopperAgent Component', () => {
                 OrganizationId: commerceAgentSettings.commerceOrgId,
                 UsId: 'test-usid',
                 IsCartMgmtSupported: 'true',
-                RefreshToken: 'initial-token'
+                RefreshToken: 'initial-token',
+                Currency: 'USD'
             })
 
             // Reset mock
@@ -733,7 +797,8 @@ describe('ShopperAgent Component', () => {
                 OrganizationId: commerceAgentSettings.commerceOrgId,
                 UsId: 'test-usid',
                 IsCartMgmtSupported: 'true',
-                RefreshToken: 'updated-token'
+                RefreshToken: 'updated-token',
+                Currency: 'USD'
             })
         })
 
@@ -760,7 +825,8 @@ describe('ShopperAgent Component', () => {
                 OrganizationId: commerceAgentSettings.commerceOrgId,
                 UsId: 'test-usid',
                 IsCartMgmtSupported: 'true',
-                RefreshToken: null
+                RefreshToken: null,
+                Currency: 'USD'
             })
         })
     })
