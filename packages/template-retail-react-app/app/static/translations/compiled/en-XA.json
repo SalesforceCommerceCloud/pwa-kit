@@ -2019,24 +2019,6 @@
       "value": "]"
     }
   ],
-  "checkout_product_item.label.quantity_static": [
-    {
-      "type": 0,
-      "value": "["
-    },
-    {
-      "type": 0,
-      "value": "Ɋŧẏ: "
-    },
-    {
-      "type": 1,
-      "value": "quantity"
-    },
-    {
-      "type": 0,
-      "value": "]"
-    }
-  ],
   "colorRefinements.label.hitCount": [
     {
       "type": 0,
@@ -4267,6 +4249,24 @@
     {
       "type": 0,
       "value": "Ɋŭŭȧȧƞŧīŧẏ: "
+    },
+    {
+      "type": 1,
+      "value": "quantity"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "item_attributes.label.quantity_abbreviated": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ɋŧẏ: "
     },
     {
       "type": 1,

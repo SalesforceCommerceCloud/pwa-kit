@@ -373,9 +373,6 @@
   "checkout_payment.title.payment": {
     "defaultMessage": "Payment"
   },
-  "checkout_product_item.label.quantity_static": {
-    "defaultMessage": "Qty: {quantity}"
-  },
   "colorRefinements.label.hitCount": {
     "defaultMessage": "{colorLabel} ({colorHitCount})"
   },
