@@ -366,9 +366,6 @@ const App = (props) => {
                         {commerceAgentConfiguration?.enabled === 'true' && (
                             <ShopperAgent
                                 commerceAgentConfiguration={commerceAgentConfiguration}
-                                domainUrl={`${appOrigin}${buildUrl(location.pathname)}`}
-                                locale={locale?.id}
-                                basketId={basket?.basketId}
                                 basketDoneLoading={basketQueryLastUpdateTime > 0}
                             />
                         )}
