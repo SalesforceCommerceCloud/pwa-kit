@@ -167,6 +167,18 @@
       "value": "Spedito"
     }
   ],
+  "account_order_detail.status.cancelled": [
+    {
+      "type": 0,
+      "value": "Annullato"
+    }
+  ],
+  "account_order_detail.status.created": [
+    {
+      "type": 0,
+      "value": "Creato"
+    }
+  ],
   "account_order_detail.title.order_details": [
     {
       "type": 0,

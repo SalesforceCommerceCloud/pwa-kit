@@ -167,6 +167,18 @@
       "value": "Har skickats"
     }
   ],
+  "account_order_detail.status.cancelled": [
+    {
+      "type": 0,
+      "value": "Avbruten"
+    }
+  ],
+  "account_order_detail.status.created": [
+    {
+      "type": 0,
+      "value": "Skapad"
+    }
+  ],
   "account_order_detail.title.order_details": [
     {
       "type": 0,

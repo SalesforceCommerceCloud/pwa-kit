@@ -77,6 +77,12 @@
       "value": "Account Details"
     }
   ],
+  "account_order_detail.button.cancel_order": [
+    {
+      "type": 0,
+      "value": "Cancel order"
+    }
+  ],
   "account_order_detail.heading.billing_address": [
     {
       "type": 0,
@@ -165,6 +171,18 @@
     {
       "type": 0,
       "value": "Shipped"
+    }
+  ],
+  "account_order_detail.status.cancelled": [
+    {
+      "type": 0,
+      "value": "Cancelled"
+    }
+  ],
+  "account_order_detail.status.created": [
+    {
+      "type": 0,
+      "value": "Created"
     }
   ],
   "account_order_detail.title.order_details": [
@@ -509,6 +527,84 @@
     {
       "type": 0,
       "value": ")"
+    }
+  ],
+  "cancel_order_modal.button.close": [
+    {
+      "type": 0,
+      "value": "Close"
+    }
+  ],
+  "cancel_order_modal.dropdown.select_reason": [
+    {
+      "type": 0,
+      "value": "Select a cancellation reason"
+    }
+  ],
+  "cancel_order_modal.heading.request_cancellation": [
+    {
+      "type": 0,
+      "value": "Request Cancellation"
+    }
+  ],
+  "cancel_order_modal.message.no_order_provided": [
+    {
+      "type": 0,
+      "value": "No order provided"
+    }
+  ],
+  "cancel_order_modal.reason.changed_mind": [
+    {
+      "type": 0,
+      "value": "Changed my mind"
+    }
+  ],
+  "cancel_order_modal.reason.financial_reasons": [
+    {
+      "type": 0,
+      "value": "Financial reasons"
+    }
+  ],
+  "cancel_order_modal.reason.item_not_arrive_on_time": [
+    {
+      "type": 0,
+      "value": "Item(s) would not arrive on time"
+    }
+  ],
+  "cancel_order_modal.reason.item_price_too_high": [
+    {
+      "type": 0,
+      "value": "Item price too high"
+    }
+  ],
+  "cancel_order_modal.reason.no_longer_needed": [
+    {
+      "type": 0,
+      "value": "No longer needed"
+    }
+  ],
+  "cancel_order_modal.reason.order_created_by_mistake": [
+    {
+      "type": 0,
+      "value": "Order created by mistake"
+    }
+  ],
+  "cancel_order_modal.reason.other": [
+    {
+      "type": 0,
+      "value": "Other"
+    }
+  ],
+  "cancel_order_modal.reason.shipping_cost_too_high": [
+    {
+      "type": 0,
+      "value": "Shipping cost too high"
+    }
+  ],
+  "cancel_order_modal.text.confirmation": [
+    {
+      "type": 0,
+      "value": "We'll send you an email confirmation once your cancellation request has been processed."
     }
   ],
   "carousel.button.scroll_left.assistive_msg": [
@@ -1373,6 +1469,12 @@
     {
       "type": 0,
       "value": "Shipping & Returns"
+    }
+  ],
+  "drawer_menu.link.order_status": [
+    {
+      "type": 0,
+      "value": "Order Status"
     }
   ],
   "drawer_menu.link.our_company": [
@@ -2473,6 +2575,48 @@
       "value": "You're currently browsing in offline mode"
     }
   ],
+  "order_lookup.button.continue": [
+    {
+      "type": 0,
+      "value": "Continue"
+    }
+  ],
+  "order_lookup.heading.look_up_with_order_number": [
+    {
+      "type": 0,
+      "value": "Look it up with your order number"
+    }
+  ],
+  "order_lookup.link.help_to_find_order_number": [
+    {
+      "type": 0,
+      "value": "Need help finding your order number?"
+    }
+  ],
+  "order_lookup.subheading.find_individual_order": [
+    {
+      "type": 0,
+      "value": "Find an individual order"
+    }
+  ],
+  "order_status_page.heading.order_status": [
+    {
+      "type": 0,
+      "value": "Order Status"
+    }
+  ],
+  "order_status_page.sign_in.button": [
+    {
+      "type": 0,
+      "value": "Sign in"
+    }
+  ],
+  "order_status_page.sign_in.heading": [
+    {
+      "type": 0,
+      "value": "Sign in with your Account"
+    }
+  ],
   "order_summary.action.remove_promo": [
     {
       "type": 0,
@@ -3477,6 +3621,30 @@
       "value": " to proceed."
     }
   ],
+  "status_bar.delivered": [
+    {
+      "type": 0,
+      "value": "Delivered"
+    }
+  ],
+  "status_bar.ordered": [
+    {
+      "type": 0,
+      "value": "Ordered"
+    }
+  ],
+  "status_bar.out_for_delivery": [
+    {
+      "type": 0,
+      "value": "Out for delivery"
+    }
+  ],
+  "status_bar.shipped": [
+    {
+      "type": 0,
+      "value": "Shipped"
+    }
+  ],
   "store_display.format.address_line_2": [
     {
       "type": 1,
@@ -3999,6 +4167,42 @@
     {
       "type": 0,
       "value": "Password"
+    }
+  ],
+  "use_order_lookup_fields.error.required_email": [
+    {
+      "type": 0,
+      "value": "Enter your email address."
+    }
+  ],
+  "use_order_lookup_fields.error.required_order_number": [
+    {
+      "type": 0,
+      "value": "Enter your order number."
+    }
+  ],
+  "use_order_lookup_fields.label.email": [
+    {
+      "type": 0,
+      "value": "Email"
+    }
+  ],
+  "use_order_lookup_fields.label.order_number": [
+    {
+      "type": 0,
+      "value": "Order Number"
+    }
+  ],
+  "use_order_lookup_fields.placeholder.email": [
+    {
+      "type": 0,
+      "value": "you@email.com"
+    }
+  ],
+  "use_order_lookup_fields.placeholder.order_number": [
+    {
+      "type": 0,
+      "value": "Enter order number"
     }
   ],
   "use_product.message.inventory_remaining": [

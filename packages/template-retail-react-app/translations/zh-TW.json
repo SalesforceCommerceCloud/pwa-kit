@@ -77,6 +77,12 @@
   "account_order_detail.shipping_status.shipped": {
     "defaultMessage": "已出貨"
   },
+  "account_order_detail.status.cancelled": {
+    "defaultMessage": "已取消"
+  },
+  "account_order_detail.status.created": {
+    "defaultMessage": "已建立"
+  },
   "account_order_detail.title.order_details": {
     "defaultMessage": "訂單詳細資料"
   },

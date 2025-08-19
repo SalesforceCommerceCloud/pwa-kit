@@ -167,6 +167,18 @@
       "value": "Sendt"
     }
   ],
+  "account_order_detail.status.cancelled": [
+    {
+      "type": 0,
+      "value": "Kansellert"
+    }
+  ],
+  "account_order_detail.status.created": [
+    {
+      "type": 0,
+      "value": "Opprettet"
+    }
+  ],
   "account_order_detail.title.order_details": [
     {
       "type": 0,

@@ -332,7 +332,7 @@ const processTemplate = (relFile, inputDir, outputDir, context) => {
  * @param {*} answers
  * @param {*} param2
  */
-const runGenerator = (context, {outputDir, templateVersion, verbose}) => {
+const runGenerator = (context, {initGit, outputDir, templateVersion, verbose}) => {
     const {answers, template} = context
     const {id, source} = template
     const {extend = false} = answers.project
@@ -537,7 +537,7 @@ const main = async (opts) => {
     let isPreset = false
     let answers = {}
     let selectedTemplate
-    let {outputDir, verbose, preset, templateVersion, stdio, displayProgram} = opts
+    let {outputDir, verbose, preset, templateVersion, stdio, displayProgram, initGit} = opts
     const {prompt} = inquirer
     const OUTPUT_DIR_FLAG_ACTIVE = !!outputDir
     const presetId = preset || process.env.GENERATOR_PRESET
@@ -666,7 +666,7 @@ const main = async (opts) => {
     }
 
     // Generate the project.
-    runGenerator(context, {outputDir, templateVersion, verbose})
+    runGenerator(context, {initGit, outputDir, templateVersion, verbose})
 
     // Return the folder in which the project was generated in.
     return outputDir

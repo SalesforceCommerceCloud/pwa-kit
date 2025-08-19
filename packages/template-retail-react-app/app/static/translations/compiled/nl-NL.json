@@ -167,6 +167,18 @@
       "value": "Verzonden"
     }
   ],
+  "account_order_detail.status.cancelled": [
+    {
+      "type": 0,
+      "value": "Geannuleerd"
+    }
+  ],
+  "account_order_detail.status.created": [
+    {
+      "type": 0,
+      "value": "Aangemaakt"
+    }
+  ],
   "account_order_detail.title.order_details": [
     {
       "type": 0,
