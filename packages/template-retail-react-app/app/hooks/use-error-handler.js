@@ -7,6 +7,7 @@
 
 import {useCallback} from 'react'
 import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
+import logger from '@salesforce/retail-react-app/app/utils/logger-instance'
 
 /**
  * Hook for consistent error handling
@@ -18,10 +19,24 @@ export const useErrorHandler = () => {
 
     const handleError = useCallback(
         (message, error, options = {}) => {
-            const {showUserMessage = true, logToConsole = true, throwError = false} = options
+            const {
+                showUserMessage = true,
+                logToConsole = true,
+                throwError = false,
+                logLevel = 'warn'
+            } = options
 
             if (logToConsole) {
-                console.error(message, error)
+                // Use structured logging with proper namespace and context
+                const logMethod = logLevel === 'error' ? logger.error : logger.warn
+                logMethod(message, {
+                    namespace: 'useErrorHandler.handleError',
+                    additionalProperties: {
+                        error: error,
+                        showUserMessage,
+                        throwError
+                    }
+                })
             }
 
             if (showUserMessage) {
