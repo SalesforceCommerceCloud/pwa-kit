@@ -19,7 +19,6 @@ import React, {
 import PropTypes from 'prop-types'
 import {isServer} from '@salesforce/retail-react-app/app/components/island/utils'
 import {PARTIAL_HYDRATION_ENABLED} from '@salesforce/retail-react-app/app/constants'
-import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 
 const IslandContext = createContext(null)
 
@@ -85,8 +84,7 @@ function findChildren(children, componentType) {
  */
 function Island(props) {
     const {children} = props
-    const isEnabled = getConfig()?.app?.partialHydrationEnabled ?? PARTIAL_HYDRATION_ENABLED // in a backward compatible way
-    if (!isEnabled) {
+    if (!PARTIAL_HYDRATION_ENABLED) {
         return <>{children}</>
     }
 

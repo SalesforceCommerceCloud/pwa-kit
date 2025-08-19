@@ -32,10 +32,6 @@ The PWA Kit MCP Server offers the following intelligent tools tailored to Salesf
   Runs performance and accessibility audits on a provided site URL.
   *Example: `https://pwa-kit.mobify-storefront.com`*
 
-* **`git_version_control`**:
-  Manages the version control of your project using git.
-  If the project is not already a git repo, project files will be committed as a new local git repo together with a basic .gitignore. If the project is already a git repo, just commit the changes in the project.
-
 
 ## ▶️ Running the MCP Server
 
@@ -95,7 +91,7 @@ Then send JSON-RPC requests like:
 
 If you are actively developing features for the MCP server and want to get immediate feedback during testing, follow the below steps.
 
-1. Update your Cursor IDE MCP server configuration so that you are referencing the local server. This can be done by opening the "View: Open MCP Settings" 
+1. Update your Cursor IDE MCP server configuration so that you are referencing the local server. This can be done by opening the "View: Open MCP Settings"
 from the command pallet and editing your `pwa-kit` entry to look like the entry below.
 ```json
 {
@@ -129,4 +125,7 @@ the output on "MCP Logs".
 | `src/server/`  | Main server entry point (`server.js`)                                 |
 | `src/tools/`   | Contains all MCP tools like `create-app-guideline`, `site-test`, etc. |
 | `src/utils/`   | Shared utility functions                                              |
-| `
+| `src/data/`    | Static documents (e.g., product/category data models) used by tools   |
+| `docs/`        | Documentation and images for integration guides                       |
+| `dist/`        | Compiled output when building the package                             |
+

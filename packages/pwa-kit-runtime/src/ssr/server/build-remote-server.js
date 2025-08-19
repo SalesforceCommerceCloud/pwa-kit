@@ -695,17 +695,6 @@ export const RemoteServerFactory = {
             return
         }
 
-        // This is the full path to the SLAS trusted-system endpoint
-        // We want to throw an error if the regex defined options.applySLASPrivateClientToEndpoints
-        // matches this path as an early warning to developers that they should update their regex
-        // in ssr.js to exclude this path.
-        const trustedSystemPath = '/shopper/auth/v1/oauth2/trusted-system/token'
-        if (trustedSystemPath.match(options.applySLASPrivateClientToEndpoints)) {
-            throw new Error(
-                'It is not allowed to include /oauth2/trusted-system endpoints in `applySLASPrivateClientToEndpoints`'
-            )
-        }
-
         localDevLog(`Proxying ${slasPrivateProxyPath} to ${options.slasTarget}`)
 
         const clientId = options.mobify?.app?.commerceAPI?.parameters?.clientId
@@ -732,12 +721,15 @@ export const RemoteServerFactory = {
                         targetProtocol: 'https'
                     })
 
-                    // We don't want the proxy to handle any non-SLAS requests
-                    // or any trusted system requests
-                    if (
-                        !incomingRequest.path?.match(options.slasApiPath) ||
-                        incomingRequest.path?.match(/\/oauth2\/trusted-system/)
-                    ) {
+                    // We pattern match and add client secrets only to endpoints that
+                    // match the regex specified by options.applySLASPrivateClientToEndpoints
+                    // (see option defaults at the top of this file).
+                    // Other SLAS endpoints, ie. SLAS authenticate (/oauth2/login) and
+                    // SLAS logout (/oauth2/logout), use the Authorization header for a different
+                    // purpose so we don't want to overwrite the header for those calls.
+                    if (incomingRequest.path?.match(options.applySLASPrivateClientToEndpoints)) {
+                        proxyRequest.setHeader('Authorization', `Basic ${encodedSlasCredentials}`)
+                    } else if (!incomingRequest.path?.match(options.slasApiPath)) {
                         const message = `Request to ${incomingRequest.path} is not allowed through the SLAS Private Client Proxy`
                         logger.error(message)
                         return res.status(403).json({
@@ -745,17 +737,8 @@ export const RemoteServerFactory = {
                         })
                     }
 
-                    // We pattern match and add client secrets only to endpoints that
-                    // match the regex specified by options.applySLASPrivateClientToEndpoints.
-                    //
-                    // Other SLAS endpoints, ie. SLAS authenticate (/oauth2/login) and
-                    // SLAS logout (/oauth2/logout), use the Authorization header for a different
-                    // purpose so we don't want to overwrite the header for those calls.
-                    if (incomingRequest.path?.match(options.applySLASPrivateClientToEndpoints)) {
-                        proxyRequest.setHeader('Authorization', `Basic ${encodedSlasCredentials}`)
-                    } else if (incomingRequest.path?.match(/\/oauth2\/trusted-agent\/token/)) {
-                        // /oauth2/trusted-agent/token endpoint auth header comes from Account Manager
-                        // so the SLAS private client is sent via this special header
+                    // /oauth2/trusted-agent/token endpoint requires a different auth header
+                    if (incomingRequest.path?.match(/\/oauth2\/trusted-agent\/token/)) {
                         proxyRequest.setHeader('_sfdc_client_auth', encodedSlasCredentials)
                     }
                 }
