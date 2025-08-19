@@ -18,6 +18,16 @@ jest.mock('./use-pickup-shipment', () => ({
     usePickupShipment: jest.fn()
 }))
 
+jest.mock('@salesforce/retail-react-app/app/hooks/use-error-handler', () => ({
+    useErrorHandler: jest.fn(() => jest.fn())
+}))
+
+jest.mock('@salesforce/retail-react-app/app/hooks/use-toast', () => ({
+    useToast: jest.fn(() => ({
+        showToast: jest.fn()
+    }))
+}))
+
 import {
     useShopperBasketsMutation,
     useShippingMethodsForShipment
@@ -1312,7 +1322,6 @@ describe('useMultiship', () => {
         test('should handle API error gracefully', async () => {
             const {result} = renderHook(() => useMultiship(mockBasket))
 
-            const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {})
             mockUpdateItemsInBasket.mockRejectedValue(new Error('API Error'))
 
             await act(async () => {
@@ -1324,12 +1333,6 @@ describe('useMultiship', () => {
                     )
                 ).rejects.toThrow('API Error')
             })
-
-            expect(consoleErrorSpy).toHaveBeenCalledWith(
-                'Failed to move items to delivery shipment:',
-                expect.any(Error)
-            )
-            consoleErrorSpy.mockRestore()
         })
     })
 
@@ -1388,7 +1391,6 @@ describe('useMultiship', () => {
         test('should handle API error gracefully', async () => {
             const {result} = renderHook(() => useMultiship(mockBasket))
 
-            const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {})
             mockUpdateItemsInBasket.mockRejectedValue(new Error('API Error'))
 
             await act(async () => {
@@ -1400,12 +1402,6 @@ describe('useMultiship', () => {
                     )
                 ).rejects.toThrow('API Error')
             })
-
-            expect(consoleErrorSpy).toHaveBeenCalledWith(
-                'Failed to move items to pickup shipment:',
-                expect.any(Error)
-            )
-            consoleErrorSpy.mockRestore()
         })
     })
 
