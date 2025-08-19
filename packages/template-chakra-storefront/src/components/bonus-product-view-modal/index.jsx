@@ -15,6 +15,8 @@ import SafePortal from '../safe-portal'
 import {useIntl} from 'react-intl'
 import {productViewModalTheme} from '../../theme/components/project/product-view-modal'
 import {useShopperBasketsMutationHelper} from '@salesforce/commerce-sdk-react'
+import {useCurrentBasket} from '../../hooks/use-current-basket'
+import {findAvailableBonusDiscountLineItemId} from '../../utils/bonus-product-utils'
 
 /**
  * A Dialog that contains Bonus Product View using product-view-modal theme
@@ -29,6 +31,7 @@ const BonusProductViewModal = ({
 }) => {
     const productViewModalData = useProductViewModal(product)
     const {addItemToNewOrExistingBasket} = useShopperBasketsMutationHelper()
+    const {data: basket} = useCurrentBasket()
 
     const intl = useIntl()
     const {formatMessage} = intl
@@ -53,19 +56,35 @@ const BonusProductViewModal = ({
     // Custom addToCart handler for bonus products that includes bonusDiscountLineItemId
     const handleAddToCart = useCallback(
         async (variant, quantity) => {
+            // Find the first available bonus discount line item with capacity
+            const availableBonusDiscountLineItemId = findAvailableBonusDiscountLineItemId(
+                basket,
+                promotionId,
+                quantity,
+                bonusDiscountLineItemId // fallback to originally passed id
+            )
+
+            console.log('🎁 BonusProductViewModal addToCart:', {
+                productId: variant?.productId || product?.id,
+                promotionId,
+                originalBonusDiscountLineItemId: bonusDiscountLineItemId,
+                selectedBonusDiscountLineItemId: availableBonusDiscountLineItemId,
+                quantity
+            })
+
             const productItems = [
                 {
                     productId: variant?.productId || product?.id,
                     price: variant?.price || product?.price,
                     quantity: quantity,
-                    bonusDiscountLineItemId: bonusDiscountLineItemId
+                    bonusDiscountLineItemId: availableBonusDiscountLineItemId
                 }
             ]
 
             const result = await addItemToNewOrExistingBasket(productItems)
             return result
         },
-        [addItemToNewOrExistingBasket, product, bonusDiscountLineItemId]
+        [addItemToNewOrExistingBasket, product, bonusDiscountLineItemId, promotionId, basket]
     )
 
     // Custom buttons for the ProductView
