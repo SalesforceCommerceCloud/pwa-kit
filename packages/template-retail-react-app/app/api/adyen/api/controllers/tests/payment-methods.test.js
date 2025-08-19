@@ -4,9 +4,9 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import {PaymentMethodsController} from '@salesforce/retail-react-app/app/api/adyen/index'
+import {PaymentMethodsController} from '@salesforce/retail-react-app/app/api/adyen/api'
 import {AdyenError} from '@salesforce/retail-react-app/app/api/adyen/api/models/AdyenError'
-import {APPLICATION_VERSION} from '@salesforce/retail-react-app/app/api/adyen/utils/constants.js'
+import Logger from '../logger'
 
 let mockPaymentMethods = jest.fn()
 let mockGetCustomerBaskets = jest.fn()
@@ -43,6 +43,7 @@ jest.mock('commerce-sdk-isomorphic', () => {
         })
     }
 })
+
 jest.mock('../checkout-config', () => {
     return {
         getInstance: jest.fn().mockImplementation(() => {
@@ -52,8 +53,32 @@ jest.mock('../checkout-config', () => {
         })
     }
 })
+
+jest.mock(
+    '@salesforce/retail-react-app/app/api/adyen/utils/getAdyenConfigForCurrentSite.js',
+    () => ({
+        getAdyenConfigForCurrentSite: jest.fn().mockReturnValue({
+            apiKey: 'mock_api_key',
+            clientKey: 'mock_client_key',
+            environment: 'mock_environment',
+            merchantAccount: 'mock_ADYEN_MERCHANT_ACCOUNT',
+            systemIntegratorName: 'mock_system_integrator',
+            webhookUser: 'mock_webhook_user',
+            webhookPassword: 'mock_webhook_password',
+            webhookHmacKey: 'mock_webhook_hmac_key',
+            liveEndpointUrlPrefix: 'mock_live_url_prefix',
+            appleDomainAssociation: 'mock_apple_domain_association'
+        })
+    })
+)
+
+jest.mock('../logger', () => ({
+    info: jest.fn(),
+    error: jest.fn()
+}))
+
 describe('payment methods controller', () => {
-    let req, res, next, consoleInfoSpy, consoleErrorSpy
+    let req, res, next
     let blockedPaymentMethods = ['giftcard', 'wechatpayMiniProgram', 'wechatpayQR', 'wechatpaySDK']
 
     beforeEach(() => {
@@ -71,8 +96,11 @@ describe('payment methods controller', () => {
             locals: {}
         }
         next = jest.fn()
-        consoleInfoSpy = jest.spyOn(console, 'info').mockImplementation(() => {})
-        consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {})
+        jest.clearAllMocks()
+    })
+
+    afterEach(() => {
+        jest.clearAllMocks()
     })
     it('returns payment method list', async () => {
         mockGetCustomer.mockImplementation(() => {
@@ -125,16 +153,20 @@ describe('payment methods controller', () => {
                 }
             ],
             applicationInfo: {
-                externalPlatform: {integrator: '', name: 'SalesforceCommerceCloud', version: 'PWA'},
+                externalPlatform: {
+                    integrator: 'mock_system_integrator',
+                    name: 'SalesforceCommerceCloud',
+                    version: 'PWA'
+                },
                 merchantApplication: {
                     name: 'adyen-salesforce-commerce-cloud',
-                    version: APPLICATION_VERSION
+                    version: '3.0.0'
                 }
             }
         })
-        expect(consoleInfoSpy).toHaveBeenCalledTimes(2)
-        expect(consoleInfoSpy.mock.calls[0][0]).toContain('getPaymentMethods start')
-        expect(consoleInfoSpy.mock.calls[1][0]).toContain('getPaymentMethods success')
+        expect(Logger.info).toHaveBeenCalledTimes(2)
+        expect(Logger.info).toHaveBeenNthCalledWith(1, 'getPaymentMethods', 'start')
+        expect(Logger.info).toHaveBeenNthCalledWith(2, 'getPaymentMethods', 'success')
         expect(next).toHaveBeenCalled()
     })
     it('returns payment method when basket has productTotal but no orderTotal', async () => {
@@ -186,16 +218,20 @@ describe('payment methods controller', () => {
                 }
             ],
             applicationInfo: {
-                externalPlatform: {integrator: '', name: 'SalesforceCommerceCloud', version: 'PWA'},
+                externalPlatform: {
+                    integrator: 'mock_system_integrator',
+                    name: 'SalesforceCommerceCloud',
+                    version: 'PWA'
+                },
                 merchantApplication: {
                     name: 'adyen-salesforce-commerce-cloud',
-                    version: APPLICATION_VERSION
+                    version: '3.0.0'
                 }
             }
         })
-        expect(consoleInfoSpy).toHaveBeenCalledTimes(2)
-        expect(consoleInfoSpy.mock.calls[0][0]).toContain('getPaymentMethods start')
-        expect(consoleInfoSpy.mock.calls[1][0]).toContain('getPaymentMethods success')
+        expect(Logger.info).toHaveBeenCalledTimes(2)
+        expect(Logger.info).toHaveBeenNthCalledWith(1, 'getPaymentMethods', 'start')
+        expect(Logger.info).toHaveBeenNthCalledWith(2, 'getPaymentMethods', 'success')
         expect(next).toHaveBeenCalled()
     })
     it('throw an error when basket is empty', async () => {
@@ -216,8 +252,8 @@ describe('payment methods controller', () => {
             }
         })
         await PaymentMethodsController(req, res, next)
-        expect(consoleInfoSpy).toHaveBeenCalledTimes(1)
-        expect(consoleInfoSpy.mock.calls[0][0]).toContain('getPaymentMethods start')
+        expect(Logger.info).toHaveBeenCalledTimes(1)
+        expect(Logger.info).toHaveBeenCalledWith('getPaymentMethods', 'start')
         expect(next).toHaveBeenCalledWith(new AdyenError('invalid basket', 404))
     })
     it('returns error when payment method fails', async () => {
@@ -259,8 +295,12 @@ describe('payment methods controller', () => {
                 idempotencyKey: expect.any(String)
             }
         )
-        expect(consoleInfoSpy).toHaveBeenCalledTimes(1)
-        expect(consoleInfoSpy.mock.calls[0][0]).toContain('getPaymentMethods start')
+        expect(Logger.info).toHaveBeenCalledTimes(1)
+        expect(Logger.info).toHaveBeenCalledWith('getPaymentMethods', 'start')
+        expect(Logger.error).toHaveBeenCalledWith(
+            'getPaymentMethods',
+            JSON.stringify(new AdyenError('no payment methods', 400))
+        )
         expect(next).toHaveBeenCalledWith(new AdyenError('no payment methods', 400))
     })
 })

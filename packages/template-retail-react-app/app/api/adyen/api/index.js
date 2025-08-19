@@ -14,3 +14,4 @@ export {default as PaymentMethodsController} from '@salesforce/retail-react-app/
 export {default as PaymentsDetailsController} from '@salesforce/retail-react-app/app/api/adyen/api/controllers/payments-details'
 export {default as EnvironmentController} from '@salesforce/retail-react-app/app/api/adyen/api/controllers/environment'
 export * from '@salesforce/retail-react-app/app/api/adyen/api/controllers/authorization-webhook-handler'
+export {ApiClient} from '@salesforce/retail-react-app/app/api/adyen/services/api'

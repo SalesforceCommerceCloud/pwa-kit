@@ -21,15 +21,9 @@ jest.mock('@salesforce/retail-react-app/app/api/adyen/services/payments', () => 
 
 describe('getAppleButtonConfig function', () => {
     let mockGetTokenWhenReady
-    let mockAdyenPaymentsServiceSubmitPayment
 
     beforeEach(() => {
         mockGetTokenWhenReady = jest.fn().mockResolvedValue('mockToken')
-        mockAdyenPaymentsServiceSubmitPayment = jest.fn().mockResolvedValue({
-            isFinal: true,
-            isSuccessful: true,
-            merchantReference: 'mockMerchantReference'
-        })
     })
 
     it('returns expected button configuration and resolves onAuthorized event', async () => {

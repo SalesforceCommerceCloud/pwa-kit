@@ -23,6 +23,9 @@ describe('Logger', () => {
             beforeEach(() => {
                 consoleSpy = jest.spyOn(console, `${type}`).mockImplementation(() => {})
             })
+            afterEach(() => {
+                consoleSpy.mockRestore()
+            })
             it('creates log with correct prefix', () => {
                 Logger[`${type}`]()
                 expect(consoleSpy).toHaveBeenCalled()

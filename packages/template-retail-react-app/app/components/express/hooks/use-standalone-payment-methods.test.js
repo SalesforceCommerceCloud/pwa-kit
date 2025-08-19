@@ -40,7 +40,7 @@ describe('useStandalonePaymentMethods', () => {
     })
 
     afterEach(() => {
-        jest.restoreAllMocks()
+        jest.clearAllMocks()
     })
 
     describe('initial state', () => {

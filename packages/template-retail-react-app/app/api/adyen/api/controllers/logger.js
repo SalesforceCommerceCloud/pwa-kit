@@ -28,9 +28,9 @@ class Logger {
 
 const composeLog = (type, step, message) => {
     const logMessage = message instanceof Object ? JSON.stringify(message) : message
-    return `${ADYEN_PREFIX}_${type} ${APPLICATION_VERSION} ${step ? step : ''} ${
-        logMessage ? logMessage : ''
-    }`
+    const stepPart = step || ''
+    const messagePart = logMessage || ''
+    return `${ADYEN_PREFIX}_${type} ${APPLICATION_VERSION} ${stepPart} ${messagePart}`
         .trim()
         .replace(/\s\s+/g, ' ')
 }

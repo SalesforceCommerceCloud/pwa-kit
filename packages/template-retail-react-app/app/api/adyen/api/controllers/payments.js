@@ -358,7 +358,7 @@ async function sendPayments(req, res, next) {
         res.locals.response = checkoutResponse
         next()
     } catch (err) {
-        Logger.error('sendPayments', JSON.stringify(err))
+        Logger.error('sendPayments', err.message)
         const {app: appConfig} = getConfig()
         const shopperBaskets = new ShopperBaskets({
             ...appConfig.commerceAPI,

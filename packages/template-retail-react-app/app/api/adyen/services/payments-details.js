@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import {ApiClient} from '@salesforce/retail-react-app/app/api/adyen/services/api'
+import {ApiClient} from '@salesforce/retail-react-app/app/api/adyen/api'
 
 export class AdyenPaymentsDetailsService {
     baseUrl = '/api/adyen/payments/details'

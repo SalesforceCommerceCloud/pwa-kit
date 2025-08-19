@@ -26,8 +26,14 @@ describe('Temporary Basket', () => {
     const mockBasketId = 'test-basket-id'
     let consoleWarnSpy
 
+    const originalFetch = global.fetch
+
     beforeAll(() => {
         global.fetch = jest.fn()
+    })
+
+    afterAll(() => {
+        global.fetch = originalFetch
     })
 
     beforeEach(() => {

@@ -125,7 +125,7 @@ describe('parsers', () => {
                     {currency: 'BHD', decimals: 3, amount: 5.123, expected: 5123}
                 ]
 
-                testCases.forEach(({currency, decimals, amount, expected}) => {
+                testCases.forEach(({currency, amount, expected}) => {
                     const result = getCurrencyValueForApi(amount, currency)
                     expect(result).toBe(expected)
                 })

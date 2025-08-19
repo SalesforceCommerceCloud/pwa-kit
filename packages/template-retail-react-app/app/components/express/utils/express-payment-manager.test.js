@@ -13,18 +13,25 @@ import {EXPRESS_MESSAGES} from '@salesforce/retail-react-app/app/components/expr
 // Mock window.parent.postMessage
 const mockPostMessage = jest.fn()
 
-// Setup global window mock before importing the module
-Object.defineProperty(global, 'window', {
-    value: {
-        parent: {
-            postMessage: mockPostMessage
-        }
-    },
-    writable: true
-})
-
 describe('ExpressPaymentManager', () => {
+    let originalWindow
     let manager
+
+    beforeAll(() => {
+        originalWindow = global.window
+        Object.defineProperty(global, 'window', {
+            value: {
+                parent: {
+                    postMessage: mockPostMessage
+                }
+            },
+            writable: true
+        })
+    })
+
+    afterAll(() => {
+        global.window = originalWindow
+    })
 
     beforeEach(() => {
         manager = new ExpressPaymentManager()

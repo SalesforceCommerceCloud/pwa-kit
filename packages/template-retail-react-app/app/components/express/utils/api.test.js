@@ -8,11 +8,44 @@ import {ApiClient} from '@salesforce/retail-react-app/app/components/express/uti
 
 // Mock fetch properly
 const mockFetch = jest.fn()
-global.fetch = mockFetch
+
+// Mock Headers constructor for Node.js test environment
+global.Headers = class MockHeaders {
+    constructor(init = {}) {
+        this._headers = {...init}
+    }
+
+    get(name) {
+        return this._headers[name.toLowerCase()] || null
+    }
+
+    set(name, value) {
+        this._headers[name.toLowerCase()] = value
+    }
+
+    has(name) {
+        return name.toLowerCase() in this._headers
+    }
+
+    append(name, value) {
+        if (this.has(name)) {
+            this._headers[name.toLowerCase()] += `, ${value}`
+        } else {
+            this._headers[name.toLowerCase()] = value
+        }
+    }
+
+    delete(name) {
+        delete this._headers[name.toLowerCase()]
+    }
+}
 
 // Suppress MSW 'Found an unhandled' warnings for this test file
 const originalConsoleError = console.error
+const originalFetch = global.fetch
+
 beforeAll(() => {
+    global.fetch = mockFetch
     console.error = (...args) => {
         if (typeof args[0] === 'string' && args[0].startsWith('Found an unhandled')) {
             return
@@ -20,8 +53,11 @@ beforeAll(() => {
         originalConsoleError(...args)
     }
 })
+
 afterAll(() => {
+    global.fetch = originalFetch
     console.error = originalConsoleError
+    delete global.Headers
 })
 
 describe('ApiClient', () => {
@@ -58,11 +94,12 @@ describe('ApiClient', () => {
                 queryParams: {param1: 'value1'}
             })
 
-            const request = mockFetch.mock.calls[0][0]
-            expect(request.url).toBe(`${mockUrl}?siteId=${mockSite.id}&param1=value1`)
-            expect(request.method).toBe('GET')
-            expect(request.headers.get('Content-Type')).toBe('application/json')
-            expect(request.headers.get('authorization')).toBe(`Bearer ${mockToken}`)
+            const requestUrl = mockFetch.mock.calls[0][0]
+            const requestConfig = mockFetch.mock.calls[0][1]
+            expect(requestUrl).toBe(`${mockUrl}?siteId=${mockSite.id}&param1=value1`)
+            expect(requestConfig.method).toBe('GET')
+            expect(requestConfig.headers['Content-Type']).toBe('application/json')
+            expect(requestConfig.headers.authorization).toBe(`Bearer ${mockToken}`)
         })
 
         it('should make a POST request with body and headers', async () => {
@@ -82,16 +119,16 @@ describe('ApiClient', () => {
                 headers: customHeaders
             })
 
-            const request = mockFetch.mock.calls[0][0]
-            expect(request.url).toBe(`${mockUrl}?siteId=${mockSite.id}`)
-            expect(request.method).toBe('POST')
-            expect(request.headers.get('Content-Type')).toBe('application/json')
-            expect(request.headers.get('authorization')).toBe(`Bearer ${mockToken}`)
-            expect(request.headers.get('custom')).toBe('header')
+            const requestUrl = mockFetch.mock.calls[0][0]
+            const requestConfig = mockFetch.mock.calls[0][1]
+            expect(requestUrl).toBe(`${mockUrl}?siteId=${mockSite.id}`)
+            expect(requestConfig.method).toBe('POST')
+            expect(requestConfig.headers['Content-Type']).toBe('application/json')
+            expect(requestConfig.headers.authorization).toBe(`Bearer ${mockToken}`)
+            expect(requestConfig.headers.custom).toBe('header')
 
             // Check body separately to avoid conditional expect
-            const requestBody = await request.text()
-            expect(requestBody).toBe(body)
+            expect(requestConfig.body).toBe(body)
         })
 
         it('should handle request without optional parameters', async () => {
@@ -106,12 +143,13 @@ describe('ApiClient', () => {
 
             await apiClient.base('GET')
 
-            const request = mockFetch.mock.calls[0][0]
-            expect(request.url).toBe(`${mockUrl}?siteId=${mockSite.id}`)
-            expect(request.method).toBe('GET')
-            expect(request.body === null || request.body === undefined).toBe(true)
-            expect(request.headers.get('Content-Type')).toBe('application/json')
-            expect(request.headers.get('authorization')).toBe(`Bearer ${mockToken}`)
+            const requestUrl = mockFetch.mock.calls[0][0]
+            const requestConfig = mockFetch.mock.calls[0][1]
+            expect(requestUrl).toBe(`${mockUrl}?siteId=${mockSite.id}`)
+            expect(requestConfig.method).toBe('GET')
+            expect(requestConfig.body === null || requestConfig.body === undefined).toBe(true)
+            expect(requestConfig.headers['Content-Type']).toBe('application/json')
+            expect(requestConfig.headers.authorization).toBe(`Bearer ${mockToken}`)
         })
     })
 

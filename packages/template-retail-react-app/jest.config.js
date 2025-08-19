@@ -20,9 +20,22 @@ module.exports = {
         '^is-what$': '<rootDir>/node_modules/is-what/dist/cjs/index.cjs',
         '^copy-anything$': '<rootDir>/node_modules/copy-anything/dist/cjs/index.cjs',
         '^@salesforce/cc-datacloud-typescript$':
-            '<rootDir>/node_modules/@salesforce/cc-datacloud-typescript/dist/index.js'
+            '<rootDir>/node_modules/@salesforce/cc-datacloud-typescript/dist/index.js',
+        // Fix Chakra UI module resolution
+        '^@chakra-ui/utils/context$': '<rootDir>/node_modules/@chakra-ui/utils/dist/index.js',
+        '^@chakra-ui/utils$': '<rootDir>/node_modules/@chakra-ui/utils/dist/index.js',
+        '^@chakra-ui/react$': '<rootDir>/app/mocks/chakra-ui.js',
+        '^@chakra-ui/hooks$': '<rootDir>/app/mocks/chakra-ui.js',
+        // Fix node: protocol imports
+        '^node:(.*)$': '<rootDir>/node_modules/$1',
+        // Map node-fetch ESM entry to CJS build for Jest
+        '^node-fetch$': '<rootDir>/app/mocks/node-fetch.js',
+        // Mock CSS imports
+        '\\.css$': '<rootDir>/app/mocks/empty-css.js'
     },
-    transformIgnorePatterns: ['/node_modules/(?!@salesforce/cc-datacloud-typescript)'],
+    transformIgnorePatterns: [
+        '/node_modules/(?!@salesforce/cc-datacloud-typescript|@chakra-ui|node-fetch|fetch-blob)'
+    ],
     setupFilesAfterEnv: [path.join(__dirname, 'jest-setup.js')],
     collectCoverageFrom: [
         'app/**/*.{js,jsx}',

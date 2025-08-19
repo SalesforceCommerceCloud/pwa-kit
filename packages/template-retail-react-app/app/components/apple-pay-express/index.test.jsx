@@ -37,6 +37,10 @@ jest.mock('@adyen/adyen-web', () => ({
     default: jest.fn()
 }))
 
+// Mock console.error to prevent test noise
+const originalConsoleError = console.error
+const originalConsoleWarn = console.warn
+
 // Mock the useAdyenExpressCheckout hook
 jest.mock('@salesforce/retail-react-app/app/api/adyen', () => ({
     useAdyenExpressCheckout: jest.fn()
@@ -97,18 +101,14 @@ jest.mock('@salesforce/retail-react-app/app/hooks/use-navigation', () => ({
     default: jest.fn()
 }))
 
-// Suppress MSW 'Found an unhandled' warnings for this test file
-const originalConsoleError = console.error
+// Suppress console errors and warnings during tests
 beforeAll(() => {
-    console.error = (...args) => {
-        if (typeof args[0] === 'string' && args[0].startsWith('Found an unhandled')) {
-            return
-        }
-        originalConsoleError(...args)
-    }
+    console.error = jest.fn()
+    console.warn = jest.fn()
 })
 afterAll(() => {
     console.error = originalConsoleError
+    console.warn = originalConsoleWarn
 })
 
 describe('ApplePayExpress', () => {
@@ -180,15 +180,13 @@ describe('ApplePayExpress', () => {
             fetchShippingMethods: jest.fn()
         })
 
-        // Mock AdyenCheckout
-        const mockCreate = jest.fn()
-        const mockIsAvailable = jest.fn()
-        const mockMount = jest.fn()
-
-        AdyenCheckout.mockResolvedValue({
-            create: mockCreate.mockResolvedValue({
-                isAvailable: mockIsAvailable.mockResolvedValue(true),
-                mount: mockMount
+        // Mock AdyenCheckout to prevent actual execution
+        AdyenCheckout.mockImplementation(() => {
+            return Promise.resolve({
+                create: jest.fn().mockResolvedValue({
+                    isAvailable: jest.fn().mockResolvedValue(true),
+                    mount: jest.fn()
+                })
             })
         })
     })
@@ -212,7 +210,9 @@ describe('ApplePayExpress', () => {
 
     it('handles Apple Pay unavailability', async () => {
         // Mock AdyenCheckout to throw an error
-        AdyenCheckout.mockRejectedValue(new Error('Apple Pay not available'))
+        AdyenCheckout.mockImplementation(() => {
+            return Promise.reject(new Error('Apple Pay not available'))
+        })
 
         render(<ApplePayExpress {...mockProps} />)
 

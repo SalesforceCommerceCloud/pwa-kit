@@ -32,7 +32,7 @@ async function sendPaymentDetails(req, res, next) {
         res.locals.response = checkoutResponse
         next()
     } catch (err) {
-        Logger.error('sendPaymentDetails', JSON.stringify(err))
+        Logger.error('sendPaymentDetails', err.message)
         next(err)
     }
 }

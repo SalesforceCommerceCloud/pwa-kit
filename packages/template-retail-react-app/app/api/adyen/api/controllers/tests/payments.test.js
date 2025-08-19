@@ -4,9 +4,10 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import {PaymentsController} from '@salesforce/retail-react-app/app/api/adyen/index'
+import {PaymentsController} from '@salesforce/retail-react-app/app/api/adyen/api'
 import {RESULT_CODES} from '@salesforce/retail-react-app/app/api/adyen/utils/constants.js'
 import {AdyenError} from '@salesforce/retail-react-app/app/api/adyen/api/models/AdyenError'
+import Logger from '../logger'
 
 let mockPayments = jest.fn()
 let mockGetBasket = jest.fn()
@@ -74,11 +75,18 @@ jest.mock('../orderApi', () => {
         })
     }
 })
+
+jest.mock('../logger', () => ({
+    info: jest.fn(),
+    error: jest.fn()
+}))
+
 describe('payments controller', () => {
-    let req, res, next, consoleInfoSpy, consoleErrorSpy
+    let req, res, next
 
     afterEach(() => {
         mockPayments.mockReset()
+        jest.clearAllMocks()
     })
 
     beforeEach(() => {
@@ -120,8 +128,6 @@ describe('payments controller', () => {
             locals: {}
         }
         next = jest.fn()
-        consoleInfoSpy = jest.spyOn(console, 'info').mockImplementation(() => {})
-        consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {})
     })
     it('returns checkout response if request is valid', async () => {
         mockGetBasket.mockImplementationOnce(() => {
@@ -199,10 +205,10 @@ describe('payments controller', () => {
             isSuccessful: true,
             merchantReference: 'reference123'
         })
-        expect(consoleInfoSpy).toHaveBeenCalledTimes(4)
-        expect(consoleInfoSpy.mock.calls[0][0]).toContain('sendPayments start')
-        expect(consoleInfoSpy.mock.calls[1][0]).toContain('sendPayments orderCreated 123')
-        expect(consoleInfoSpy.mock.calls[2][0]).toContain('sendPayments resultCode Authorised')
+        expect(Logger.info).toHaveBeenCalledTimes(4)
+        expect(Logger.info).toHaveBeenNthCalledWith(1, 'sendPayments', 'start')
+        expect(Logger.info).toHaveBeenNthCalledWith(2, 'sendPayments', 'orderCreated 123')
+        expect(Logger.info).toHaveBeenNthCalledWith(3, 'sendPayments', 'resultCode Authorised')
         expect(next).toHaveBeenCalled()
     })
     it('returns error if request has no basket Id', async () => {
@@ -211,10 +217,10 @@ describe('payments controller', () => {
             customerid: 'testCustomer'
         }
         await PaymentsController(req, res, next)
-        expect(res.locals.response).toBeNil()
-        expect(consoleInfoSpy).toHaveBeenCalledTimes(1)
-        expect(consoleInfoSpy.mock.calls[0][0]).toContain('sendPayments start')
-        expect(consoleErrorSpy.mock.calls[0][0]).toContain('invalid request params')
+        expect(res.locals.response).toBeUndefined()
+        expect(Logger.info).toHaveBeenCalledTimes(1)
+        expect(Logger.info).toHaveBeenCalledWith('sendPayments', 'start')
+        expect(Logger.error).toHaveBeenCalledWith('sendPayments', 'invalid request params')
         expect(next).toHaveBeenCalledWith(new AdyenError('invalid request params', 400))
     })
     it('returns error if basket is empty', async () => {
@@ -228,10 +234,10 @@ describe('payments controller', () => {
             }
         })
         await PaymentsController(req, res, next)
-        expect(res.locals.response).toBeNil()
-        expect(consoleInfoSpy).toHaveBeenCalledTimes(1)
-        expect(consoleInfoSpy.mock.calls[0][0]).toContain('sendPayments start')
-        expect(consoleErrorSpy.mock.calls[0][0]).toContain('invalid basket')
+        expect(res.locals.response).toBeUndefined()
+        expect(Logger.info).toHaveBeenCalledTimes(1)
+        expect(Logger.info).toHaveBeenCalledWith('sendPayments', 'start')
+        expect(Logger.error).toHaveBeenCalledWith('sendPayments', 'invalid basket')
         expect(next).toHaveBeenCalledWith(new AdyenError('invalid basket', 404))
     })
     it('adds paymentInstrument to basket if basket has no paymentInstrument and returns checkout response', async () => {
@@ -305,13 +311,15 @@ describe('payments controller', () => {
             merchantReference: 'reference123'
         })
         expect(mockAddPaymentInstrumentToBasket).toHaveBeenCalled()
-        expect(consoleInfoSpy).toHaveBeenCalledTimes(5)
-        expect(consoleInfoSpy.mock.calls[0][0]).toContain('sendPayments start')
-        expect(consoleInfoSpy.mock.calls[1][0]).toContain(
-            'sendPayments addPaymentInstrumentToBasket'
+        expect(Logger.info).toHaveBeenCalledTimes(5)
+        expect(Logger.info).toHaveBeenNthCalledWith(1, 'sendPayments', 'start')
+        expect(Logger.info).toHaveBeenNthCalledWith(
+            2,
+            'sendPayments',
+            'addPaymentInstrumentToBasket'
         )
-        expect(consoleInfoSpy.mock.calls[2][0]).toContain('sendPayments orderCreated 123')
-        expect(consoleInfoSpy.mock.calls[3][0]).toContain('sendPayments resultCode Authorised')
+        expect(Logger.info).toHaveBeenNthCalledWith(3, 'sendPayments', 'orderCreated 123')
+        expect(Logger.info).toHaveBeenNthCalledWith(4, 'sendPayments', 'resultCode Authorised')
         expect(next).toHaveBeenCalled()
     })
     it('return error if order does not belong to the customer', async () => {
@@ -378,13 +386,13 @@ describe('payments controller', () => {
         })
 
         await PaymentsController(req, res, next)
-        expect(res.locals.response).toBeNil()
+        expect(res.locals.response).toBeUndefined()
         expect(mockUpdateOrderStatus).toHaveBeenCalled()
-        expect(consoleInfoSpy).toHaveBeenCalledTimes(3)
-        expect(consoleInfoSpy.mock.calls[0][0]).toContain('sendPayments start')
-        expect(consoleInfoSpy.mock.calls[1][0]).toContain('sendPayments orderCreated 123')
-        expect(consoleErrorSpy).toHaveBeenCalled()
-        expect(consoleErrorSpy.mock.calls[0][0]).toContain('order is invalid')
+        expect(Logger.info).toHaveBeenCalledTimes(3)
+        expect(Logger.info).toHaveBeenNthCalledWith(1, 'sendPayments', 'start')
+        expect(Logger.info).toHaveBeenNthCalledWith(2, 'sendPayments', 'orderCreated 123')
+        expect(Logger.error).toHaveBeenCalled()
+        expect(Logger.error).toHaveBeenCalledWith('sendPayments', 'order is invalid')
         expect(next).toHaveBeenCalledWith(
             new AdyenError('order is invalid', 404, expect.any(String))
         )
@@ -474,10 +482,10 @@ describe('payments controller', () => {
             isSuccessful: true,
             merchantReference: 'reference123'
         })
-        expect(consoleInfoSpy).toHaveBeenCalledTimes(4)
-        expect(consoleInfoSpy.mock.calls[0][0]).toContain('sendPayments start')
-        expect(consoleInfoSpy.mock.calls[1][0]).toContain('sendPayments orderCreated 123')
-        expect(consoleInfoSpy.mock.calls[2][0]).toContain('sendPayments resultCode Authorised')
+        expect(Logger.info).toHaveBeenCalledTimes(4)
+        expect(Logger.info).toHaveBeenNthCalledWith(1, 'sendPayments', 'start')
+        expect(Logger.info).toHaveBeenNthCalledWith(2, 'sendPayments', 'orderCreated 123')
+        expect(Logger.info).toHaveBeenNthCalledWith(3, 'sendPayments', 'resultCode Authorised')
         expect(next).toHaveBeenCalled()
     })
     it('returns checkout response when paymentMethod type is openInvoiceMethod', async () => {
@@ -630,10 +638,10 @@ describe('payments controller', () => {
                 idempotencyKey: expect.any(String)
             }
         )
-        expect(consoleInfoSpy).toHaveBeenCalledTimes(4)
-        expect(consoleInfoSpy.mock.calls[0][0]).toContain('sendPayments start')
-        expect(consoleInfoSpy.mock.calls[1][0]).toContain('sendPayments orderCreated 123')
-        expect(consoleInfoSpy.mock.calls[2][0]).toContain('sendPayments resultCode Authorised')
+        expect(Logger.info).toHaveBeenCalledTimes(4)
+        expect(Logger.info).toHaveBeenNthCalledWith(1, 'sendPayments', 'start')
+        expect(Logger.info).toHaveBeenNthCalledWith(2, 'sendPayments', 'orderCreated 123')
+        expect(Logger.info).toHaveBeenNthCalledWith(3, 'sendPayments', 'resultCode Authorised')
         expect(next).toHaveBeenCalled()
     })
     it('returns checkout response when tokenization is set along with request', async () => {
@@ -731,10 +739,10 @@ describe('payments controller', () => {
                 idempotencyKey: expect.any(String)
             }
         )
-        expect(consoleInfoSpy).toHaveBeenCalledTimes(4)
-        expect(consoleInfoSpy.mock.calls[0][0]).toContain('sendPayments start')
-        expect(consoleInfoSpy.mock.calls[1][0]).toContain('sendPayments orderCreated 123')
-        expect(consoleInfoSpy.mock.calls[2][0]).toContain('sendPayments resultCode Authorised')
+        expect(Logger.info).toHaveBeenCalledTimes(4)
+        expect(Logger.info).toHaveBeenNthCalledWith(1, 'sendPayments', 'start')
+        expect(Logger.info).toHaveBeenNthCalledWith(2, 'sendPayments', 'orderCreated 123')
+        expect(Logger.info).toHaveBeenNthCalledWith(3, 'sendPayments', 'resultCode Authorised')
         expect(next).toHaveBeenCalled()
     })
     it('returns checkout response when request is made with tokenized payment method', async () => {
@@ -835,10 +843,10 @@ describe('payments controller', () => {
                 idempotencyKey: expect.any(String)
             }
         )
-        expect(consoleInfoSpy).toHaveBeenCalledTimes(4)
-        expect(consoleInfoSpy.mock.calls[0][0]).toContain('sendPayments start')
-        expect(consoleInfoSpy.mock.calls[1][0]).toContain('sendPayments orderCreated 123')
-        expect(consoleInfoSpy.mock.calls[2][0]).toContain('sendPayments resultCode Authorised')
+        expect(Logger.info).toHaveBeenCalledTimes(4)
+        expect(Logger.info).toHaveBeenNthCalledWith(1, 'sendPayments', 'start')
+        expect(Logger.info).toHaveBeenNthCalledWith(2, 'sendPayments', 'orderCreated 123')
+        expect(Logger.info).toHaveBeenNthCalledWith(3, 'sendPayments', 'resultCode Authorised')
         expect(next).toHaveBeenCalled()
     })
     it('returns checkout response and updates order payment transaction if order has paymentInstrument', async () => {
@@ -932,10 +940,10 @@ describe('payments controller', () => {
             isSuccessful: true,
             merchantReference: 'reference123'
         })
-        expect(consoleInfoSpy).toHaveBeenCalledTimes(4)
-        expect(consoleInfoSpy.mock.calls[0][0]).toContain('sendPayments start')
-        expect(consoleInfoSpy.mock.calls[1][0]).toContain('sendPayments orderCreated 123')
-        expect(consoleInfoSpy.mock.calls[2][0]).toContain('sendPayments resultCode Authorised')
+        expect(Logger.info).toHaveBeenCalledTimes(4)
+        expect(Logger.info).toHaveBeenNthCalledWith(1, 'sendPayments', 'start')
+        expect(Logger.info).toHaveBeenNthCalledWith(2, 'sendPayments', 'orderCreated 123')
+        expect(Logger.info).toHaveBeenNthCalledWith(3, 'sendPayments', 'resultCode Authorised')
         expect(next).toHaveBeenCalled()
     })
     it('returns error if payment response is final and not successful', async () => {
@@ -1008,13 +1016,13 @@ describe('payments controller', () => {
         })
 
         await PaymentsController(req, res, next)
-        expect(res.locals.response).toBeNil()
-        expect(consoleInfoSpy).toHaveBeenCalledTimes(4)
-        expect(consoleInfoSpy.mock.calls[0][0]).toContain('sendPayments start')
-        expect(consoleInfoSpy.mock.calls[1][0]).toContain('sendPayments orderCreated 123')
-        expect(consoleInfoSpy.mock.calls[2][0]).toContain('sendPayments resultCode Error')
-        expect(consoleErrorSpy).toHaveBeenCalled()
-        expect(consoleErrorSpy.mock.calls[0][0]).toContain('payment not successful')
+        expect(res.locals.response).toBeUndefined()
+        expect(Logger.info).toHaveBeenCalledTimes(4)
+        expect(Logger.info).toHaveBeenNthCalledWith(1, 'sendPayments', 'start')
+        expect(Logger.info).toHaveBeenNthCalledWith(2, 'sendPayments', 'orderCreated 123')
+        expect(Logger.info).toHaveBeenNthCalledWith(3, 'sendPayments', 'resultCode Error')
+        expect(Logger.error).toHaveBeenCalled()
+        expect(Logger.error).toHaveBeenCalledWith('sendPayments', 'payment not successful')
         expect(next).toHaveBeenCalledWith(new AdyenError('payment not successful', 400))
     })
     it('returns error if payment response is error and remove all paymentInstrument', async () => {
@@ -1098,14 +1106,14 @@ describe('payments controller', () => {
         })
 
         await PaymentsController(req, res, next)
-        expect(res.locals.response).toBeNil()
+        expect(res.locals.response).toBeUndefined()
         expect(mockRemovePaymentInstrumentFromBasket).toHaveBeenCalled()
-        expect(consoleInfoSpy).toHaveBeenCalledTimes(5)
-        expect(consoleInfoSpy.mock.calls[0][0]).toContain('sendPayments start')
-        expect(consoleInfoSpy.mock.calls[1][0]).toContain('sendPayments orderCreated 123')
-        expect(consoleInfoSpy.mock.calls[2][0]).toContain('sendPayments resultCode Error')
-        expect(consoleErrorSpy).toHaveBeenCalled()
-        expect(consoleErrorSpy.mock.calls[0][0]).toContain('payment not successful')
+        expect(Logger.info).toHaveBeenCalledTimes(5)
+        expect(Logger.info).toHaveBeenNthCalledWith(1, 'sendPayments', 'start')
+        expect(Logger.info).toHaveBeenNthCalledWith(2, 'sendPayments', 'orderCreated 123')
+        expect(Logger.info).toHaveBeenNthCalledWith(3, 'sendPayments', 'resultCode Error')
+        expect(Logger.error).toHaveBeenCalled()
+        expect(Logger.error).toHaveBeenCalledWith('sendPayments', 'payment not successful')
         expect(next).toHaveBeenCalledWith(new AdyenError('payment not successful', 400))
     })
 })

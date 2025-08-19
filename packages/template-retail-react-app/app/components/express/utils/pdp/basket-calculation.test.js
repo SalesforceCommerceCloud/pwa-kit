@@ -21,9 +21,14 @@ describe('Basket Calculation', () => {
     const mockBasketId = 'test-basket-id'
     const mockSite = {id: 'test-site-id'}
     const mockOrganizationId = 'test-org-id'
+    const originalFetch = global.fetch
 
     beforeAll(() => {
         global.fetch = jest.fn()
+    })
+
+    afterAll(() => {
+        global.fetch = originalFetch
     })
 
     beforeEach(() => {

@@ -365,7 +365,8 @@ export const GooglePayExpress = ({manager, overrideData = null}) => {
                 try {
                     isGooglePayButtonAvailable = await googlePayButton.isAvailable()
                 } catch (ex) {
-                    isGooglePayButtonAvailable = false
+                    handleGooglePayUnavailable()
+                    return
                 }
 
                 if (!isGooglePayButtonAvailable) {

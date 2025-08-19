@@ -6,6 +6,7 @@
  */
 import {paymentMethodsConfiguration} from '@salesforce/retail-react-app/app/api/adyen/components/paymentMethodsConfiguration'
 import {baseConfig} from '@salesforce/retail-react-app/app/api/adyen/components/helpers/baseConfig'
+import {applePayConfig} from '@salesforce/retail-react-app/app/api/adyen/components/applepay/config'
 
 jest.mock('@salesforce/retail-react-app/app/api/adyen/components/helpers/baseConfig', () => ({
     baseConfig: jest.fn()
@@ -23,7 +24,13 @@ describe('paymentMethodsConfiguration', () => {
         const mockedBaseConfigResult = {
             someBaseConfigValue: 'mockedValue'
         }
+        const mockedApplePayConfigResult = {
+            ...mockedBaseConfigResult,
+            showPayButton: true
+        }
+
         baseConfig.mockReturnValue(mockedBaseConfigResult)
+        applePayConfig.mockReturnValue(mockedApplePayConfigResult)
 
         const props = {
             someProp: 'value'
@@ -34,8 +41,8 @@ describe('paymentMethodsConfiguration', () => {
         const result = paymentMethodsConfiguration({paymentMethods, ...props})
 
         expect(baseConfig).toHaveBeenCalledWith(props)
-
-        expect(result.applepay).toBeDefined()
+        expect(applePayConfig).toHaveBeenCalledWith(props)
+        expect(result.applepay).toEqual(mockedApplePayConfigResult)
     })
 
     it('should return default config if no payment methods available', () => {

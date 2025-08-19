@@ -4,7 +4,8 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import {authorizationWebhookHandler} from '@salesforce/retail-react-app/app/api/adyen/index'
+import {authorizationWebhookHandler} from '@salesforce/retail-react-app/app/api/adyen/api'
+import Logger from '../logger'
 
 let mockUpdateOrderPaymentTransaction = jest.fn()
 let mockUpdateOrderStatus = jest.fn()
@@ -25,8 +26,26 @@ jest.mock('../orderApi', () => {
         })
     }
 })
+
+jest.mock('@adyen/api-library', () => ({
+    NotificationRequestItem: {
+        EventCodeEnum: {
+            Authorisation: 'AUTHORISATION'
+        },
+        SuccessEnum: {
+            True: 'true',
+            False: 'false'
+        }
+    }
+}))
+
+jest.mock('../logger', () => ({
+    info: jest.fn(),
+    error: jest.fn()
+}))
+
 describe('authorizationWebhookHandler', () => {
-    let req, res, next, consoleInfoSpy, consoleErrorSpy
+    let req, res, next
 
     beforeEach(() => {
         req = {
@@ -63,9 +82,13 @@ describe('authorizationWebhookHandler', () => {
             }
         }
         next = jest.fn()
-        consoleInfoSpy = jest.spyOn(console, 'info').mockImplementation(() => {})
-        consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {})
+        jest.clearAllMocks()
     })
+
+    afterEach(() => {
+        jest.clearAllMocks()
+    })
+
     it('update order when success notification is received', async () => {
         await authorizationWebhookHandler(req, res, next)
         expect(res.locals.response).toBe('[accepted]')
@@ -73,9 +96,10 @@ describe('authorizationWebhookHandler', () => {
         expect(mockUpdateOrderStatus).toHaveBeenCalledWith('00007503', 'new')
         expect(mockUpdateOrderExportStatus).toHaveBeenCalledWith('00007503', 'ready')
         expect(mockUpdateOrderPaymentStatus).toHaveBeenCalledWith('00007503', 'paid')
-        expect(consoleInfoSpy).toHaveBeenCalledTimes(1)
-        expect(consoleInfoSpy.mock.calls[0][0]).toContain(
-            'AUTHORISATION Authorization for order 00007503 was successful.'
+        expect(Logger.info).toHaveBeenCalledTimes(1)
+        expect(Logger.info).toHaveBeenCalledWith(
+            'AUTHORISATION',
+            'Authorization for order 00007503 was successful.'
         )
         expect(next).toHaveBeenCalled()
     })
@@ -87,16 +111,17 @@ describe('authorizationWebhookHandler', () => {
         expect(mockUpdateOrderStatus).toHaveBeenCalledWith('00007503', 'failed')
         expect(mockUpdateOrderExportStatus).toHaveBeenCalledWith('00007503', 'not_exported')
         expect(mockUpdateOrderPaymentStatus).toHaveBeenCalledWith('00007503', 'not_paid')
-        expect(consoleInfoSpy).toHaveBeenCalledTimes(1)
-        expect(consoleInfoSpy.mock.calls[0][0]).toContain(
-            'AUTHORISATION Authorization for order 00007503 was not successful.'
+        expect(Logger.info).toHaveBeenCalledTimes(1)
+        expect(Logger.info).toHaveBeenCalledWith(
+            'AUTHORISATION',
+            'Authorization for order 00007503 was not successful.'
         )
         expect(next).toHaveBeenCalled()
     })
     it('does not process notification if eventCode is not AUTHORISATION', async () => {
         res.locals.notification.eventCode = 'CANCELLATION'
         await authorizationWebhookHandler(req, res, next)
-        expect(res.locals.response).toBeNil()
+        expect(res.locals.response).toBeUndefined()
         expect(next).toHaveBeenCalled()
     })
     it('return error if order update fails', async () => {
@@ -104,7 +129,7 @@ describe('authorizationWebhookHandler', () => {
             new Error('order confirmation failed')
         )
         await authorizationWebhookHandler(req, res, next)
-        expect(res.locals.response).toBeNil()
+        expect(res.locals.response).toBeUndefined()
         expect(next).toHaveBeenCalledWith(new Error('order confirmation failed'))
     })
 })

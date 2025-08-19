@@ -27,7 +27,7 @@ function SuccessHandler(req, res) {
     return res.status(200).json(res.locals.response)
 }
 
-function ErrorHandler(err, req, res, next) {
+function ErrorHandler(err, req, res) {
     Logger.error(err.message, err.cause)
     return res.status(err.statusCode || 500).json(createErrorResponse(err.message))
 }

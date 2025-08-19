@@ -51,9 +51,9 @@ async function authorizationWebhookHandler(req, res, next) {
         }
 
         res.locals.response = messages.AUTH_SUCCESS
-        return next()
+        next()
     } catch (err) {
-        return next(err)
+        next(err)
     }
 }
 

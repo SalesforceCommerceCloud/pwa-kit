@@ -25,17 +25,13 @@ jest.mock('@salesforce/retail-react-app/app/api/adyen/services/environment', () 
 }))
 
 describe('<AdyenCheckoutProvider />', () => {
-    let authToken, customerId, customerType, locale, site, locationSpy, setAdyenPaymentInProgress
+    let authToken, customerId, customerType, locale, site
     beforeEach(() => {
         authToken = 'testToken'
         customerId = 'customer123'
         customerType = 'guest'
         locale = 'en-US'
         site = 'RefArch'
-
-        setAdyenPaymentInProgress = jest.fn().mockImplementation(() => {
-            return 'success'
-        })
 
         mockFetchEnvironment.mockImplementationOnce(() => ({
             ADYEN_ENVIRONMENT: 'test',

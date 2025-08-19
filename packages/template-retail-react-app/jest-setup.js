@@ -6,10 +6,32 @@
  */
 /* eslint-env jest */
 /* eslint-disable @typescript-eslint/no-var-requires */
-// fetch polyfill can be removed when node 16 is no longer supported
-require('cross-fetch/polyfill')
+// Provide fetch in Jest environment without ESM issues
+const crossFetch = require('cross-fetch')
+global.fetch = crossFetch
+global.Headers = crossFetch.Headers
+global.Request = crossFetch.Request
+global.Response = crossFetch.Response
 require('raf/polyfill') // fix requestAnimationFrame issue with polyfill
 require('@testing-library/jest-dom/extend-expect')
+
+// Add custom Jest matchers
+expect.extend({
+    toBeTrue(received) {
+        const pass = received === true
+        if (pass) {
+            return {
+                message: () => `expected ${received} not to be true`,
+                pass: true
+            }
+        } else {
+            return {
+                message: () => `expected ${received} to be true`,
+                pass: false
+            }
+        }
+    }
+})
 const mockConfig = require('@salesforce/retail-react-app/config/mocks/default')
 const {configure: configureTestingLibrary} = require('@testing-library/react')
 const {Crypto} = require('@peculiar/webcrypto')

@@ -8,7 +8,7 @@ import {
     ErrorHandler,
     registerAdyenEndpoints,
     SuccessHandler
-} from '@salesforce/retail-react-app/app/api/adyen/index'
+} from '@salesforce/retail-react-app/app/api/adyen/api/routes'
 import Logger from '@salesforce/retail-react-app/app/api/adyen/api/controllers/logger'
 
 jest.mock('@salesforce/retail-react-app/app/api/adyen/api/controllers/logger', () => ({
