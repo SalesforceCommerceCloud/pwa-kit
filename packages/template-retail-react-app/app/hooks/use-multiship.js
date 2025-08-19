@@ -10,6 +10,7 @@ import {
     useShippingMethodsForShipment
 } from '@salesforce/commerce-sdk-react'
 import {usePickupShipment} from '@salesforce/retail-react-app/app/hooks/use-pickup-shipment'
+import {useShipmentOperations} from '@salesforce/retail-react-app/app/hooks/use-shipment-operations'
 import {DEFAULT_SHIPMENT_ID} from '@salesforce/retail-react-app/app/constants'
 
 import {
@@ -19,7 +20,6 @@ import {
     findExistingPickupShipment,
     findUnusedDeliveryShipment,
     areAddressesEqual,
-    cleanAddressForOrder,
     findDeliveryShipmentWithSameAddress,
     findDeliveryShipmentWithoutAddress,
     findShipmentToConsolidate
@@ -39,14 +39,15 @@ export const useMultiship = (basket) => {
         configureDefaultShipmentIfNeeded
     } = usePickupShipment(basket)
 
+    const {
+        createShipment: createShipmentOperation,
+        removeShipment: removeShipmentOperation,
+        updateShipmentAddress,
+        updateShippingMethod
+    } = useShipmentOperations(basket?.basketId)
+
     const updateItemInBasketMutation = useShopperBasketsMutation('updateItemInBasket')
-    const createShipmentForBasketMutation = useShopperBasketsMutation('createShipmentForBasket')
-    const removeShipmentFromBasketMutation = useShopperBasketsMutation('removeShipmentFromBasket')
-    const updateShippingMethodForShipmentMutation = useShopperBasketsMutation(
-        'updateShippingMethodForShipment'
-    )
     const updateItemsInBasketMutation = useShopperBasketsMutation('updateItemsInBasket')
-    const updateShipmentForBasketMutation = useShopperBasketsMutation('updateShipmentForBasket')
 
     // Hook for shipping methods for the main shipment - we'll use this as a fallback
     //
@@ -93,15 +94,7 @@ export const useMultiship = (basket) => {
             // Update each shipment that doesn't have a shipping method
             const updatePromises = shipmentsWithoutMethod.map(async (shipment) => {
                 try {
-                    await updateShippingMethodForShipmentMutation.mutateAsync({
-                        parameters: {
-                            basketId: basket.basketId,
-                            shipmentId: shipment.shipmentId
-                        },
-                        body: {
-                            id: defaultShippingMethodId
-                        }
-                    })
+                    await updateShippingMethod(shipment.shipmentId, defaultShippingMethodId)
                 } catch (error) {
                     console.error(
                         `Failed to assign shipping method to shipment ${shipment.shipmentId}:`,
@@ -137,15 +130,8 @@ export const useMultiship = (basket) => {
 
         // Otherwise, create a new shipment without a shipping method
         // The assignDefaultShippingMethodsToShipments function will handle setting the default shipping method
-        return await createShipmentForBasketMutation.mutateAsync({
-            parameters: {
-                basketId: basket.basketId
-            },
-            body: {
-                // Note: c_fromStoreId is omitted since this is a delivery shipment
-                // shippingMethod is also omitted - will be set by assignDefaultShippingMethodsToShipments
-            }
-        })
+        const shipmentId = await createShipmentOperation()
+        return {shipments: [{shipmentId, shippingMethod: null}]}
     }
 
     /**
@@ -241,18 +227,19 @@ export const useMultiship = (basket) => {
         }
 
         // Create a new shipment with pickup configuration
-        return await createShipmentForBasketMutation.mutateAsync({
-            parameters: {
-                basketId: basket.basketId
-            },
-            body: {
-                shippingMethod: {
-                    id: pickupShippingMethodId
-                },
-                c_fromStoreId: storeInfo.id,
-                shippingAddress: getShippingAddressForStore(storeInfo)
-            }
+        const shipmentId = await createShipmentOperation(getShippingAddressForStore(storeInfo), {
+            shippingMethodId: pickupShippingMethodId,
+            storeId: storeInfo.id
         })
+        return {
+            shipments: [
+                {
+                    shipmentId,
+                    shippingMethod: {id: pickupShippingMethodId},
+                    c_fromStoreId: storeInfo.id
+                }
+            ]
+        }
     }
 
     /**
@@ -264,23 +251,8 @@ export const useMultiship = (basket) => {
     const createNewDeliveryShipmentWithAddress = async (basket, address) => {
         if (!basket?.basketId || !address) return null
 
-        const shippingAddress = cleanAddressForOrder(address)
-
-        const response = await createShipmentForBasketMutation.mutateAsync({
-            parameters: {
-                basketId: basket.basketId
-            },
-            body: {
-                shippingAddress: shippingAddress
-            }
-        })
-
-        // Find the newly created shipment by matching the address
-        return response?.shipments?.find(
-            (shipment) =>
-                !isCurrentShippingMethodPickup(shipment.shippingMethod) &&
-                areAddressesEqual(shipment.shippingAddress, shippingAddress)
-        )?.shipmentId
+        const shipmentId = await createShipmentOperation(address)
+        return shipmentId
     }
 
     /**
@@ -294,17 +266,7 @@ export const useMultiship = (basket) => {
             return null
         }
 
-        const shippingAddress = cleanAddressForOrder(address)
-
-        return await updateShipmentForBasketMutation.mutateAsync({
-            parameters: {
-                basketId: basket.basketId,
-                shipmentId: shipmentId
-            },
-            body: {
-                shippingAddress: shippingAddress
-            }
-        })
+        return await updateShipmentAddress(shipmentId, address)
     }
 
     /**
@@ -603,12 +565,7 @@ export const useMultiship = (basket) => {
      */
     const removeShipment = async (shipmentId) => {
         try {
-            await removeShipmentFromBasketMutation.mutateAsync({
-                parameters: {
-                    basketId: basket.basketId,
-                    shipmentId: shipmentId
-                }
-            })
+            await removeShipmentOperation(shipmentId)
             return true
         } catch (error) {
             console.error(`Failed to remove shipment ${shipmentId}:`, error)
