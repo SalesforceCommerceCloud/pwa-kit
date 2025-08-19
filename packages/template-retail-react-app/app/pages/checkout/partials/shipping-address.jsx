@@ -63,7 +63,7 @@ export default function ShippingAddress() {
     const [isLoading, setIsLoading] = useState()
     const {data: customer} = useCurrentCustomer()
     const {data: basket} = useCurrentBasket()
-    const multishipEnabled = getConfig()?.app?.multishipEnabled
+    const multishipEnabled = getConfig()?.app?.multishipEnabled ?? true
     const {isCurrentShippingMethodPickup} = usePickupShipment(basket)
     const {findExistingDeliveryShipment, moveItemsToDeliveryShipment, removeEmptyShipments} =
         useMultiship(basket)

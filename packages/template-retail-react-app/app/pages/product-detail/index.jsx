@@ -75,7 +75,7 @@ const ProductDetail = () => {
     const navigate = useNavigation()
     const customerId = useCustomerId()
     const {onOpen: onOpenStoreLocator} = useStoreLocatorModal()
-    const multishipEnabled = getConfig()?.app?.multishipEnabled
+    const multishipEnabled = getConfig()?.app?.multishipEnabled ?? true
     const storeLocatorEnabled = getConfig()?.app?.storeLocatorEnabled ?? STORE_LOCATOR_IS_ENABLED
 
     /****************************** Basket *********************************/

@@ -57,7 +57,7 @@ const Checkout = () => {
     const isSocialEnabled = !!social?.enabled
     const isPasswordlessEnabled = !!passwordless?.enabled
     const {removeEmptyShipments} = useMultiship(basket)
-    const multishipEnabled = getConfig()?.app?.multishipEnabled
+    const multishipEnabled = getConfig()?.app?.multishipEnabled ?? true
     const storeLocatorEnabled = getConfig()?.app?.storeLocatorEnabled ?? STORE_LOCATOR_IS_ENABLED
 
     // cart has both pickup and delivery orders

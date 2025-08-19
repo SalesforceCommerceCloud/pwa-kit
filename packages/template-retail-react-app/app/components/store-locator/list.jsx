@@ -24,7 +24,7 @@ export const StoreLocatorList = () => {
     const [initialSelectedStoreId, setInitialSelectedStoreId] = useState(selectedStoreId)
 
     const hasItemsInBasket = derivedData?.totalItems > 0
-    const multishipEnabled = getConfig()?.app?.multishipEnabled
+    const multishipEnabled = getConfig()?.app?.multishipEnabled ?? true
     const storeSelectionDisabled = multishipEnabled ? false : hasItemsInBasket
 
     useEffect(() => {

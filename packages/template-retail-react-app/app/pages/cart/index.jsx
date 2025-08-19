@@ -76,7 +76,7 @@ const DEBOUNCE_WAIT = 750
 const Cart = () => {
     const {data: basket, isLoading} = useCurrentBasket()
     const {isPickupShipment} = usePickupShipment(basket)
-    const multishipEnabled = getConfig()?.app?.multishipEnabled
+    const multishipEnabled = getConfig()?.app?.multishipEnabled ?? true
     const storeLocatorEnabled = getConfig()?.app?.storeLocatorEnabled ?? STORE_LOCATOR_IS_ENABLED
 
     // Pickup in Store - inventory at current store and all unique store IDs from all shipments
