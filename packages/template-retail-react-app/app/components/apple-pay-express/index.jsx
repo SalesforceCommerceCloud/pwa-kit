@@ -732,9 +732,7 @@ export const ApplePayExpress = ({
 
                 try {
                     await applePayButton.mount(paymentContainer.current)
-                    if (manager && manager.setPaymentMethodAvailable) {
-                        manager.setPaymentMethodAvailable(PAYMENT_METHOD)
-                    }
+                    manager.setPaymentMethodAvailable(PAYMENT_METHOD)
                 } catch (error) {
                     console.error('Failed to mount Apple Pay button:', error)
                     handleApplePayUnavailable()
@@ -776,7 +774,7 @@ export const ApplePayExpress = ({
             : [])
     ])
 
-    return <div ref={paymentContainer} style={{ height: '40px' }}></div>
+    return <div ref={paymentContainer} style={{height: '40px'}}></div>
 }
 
 ApplePayExpress.propTypes = {
