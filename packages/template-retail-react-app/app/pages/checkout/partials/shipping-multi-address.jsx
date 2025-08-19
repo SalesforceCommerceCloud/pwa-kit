@@ -499,7 +499,7 @@ const ShippingMultiAddress = ({
 
                 await refetchCustomer()
 
-                setSelectedGuestAddresses((prev) => ({
+                setSelectedRegisteredUserAddresses((prev) => ({
                     ...prev,
                     [addressKey]: createdAddress.addressId
                 }))

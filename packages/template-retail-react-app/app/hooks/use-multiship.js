@@ -11,7 +11,19 @@ import {
 } from '@salesforce/commerce-sdk-react'
 import {usePickupShipment} from '@salesforce/retail-react-app/app/hooks/use-pickup-shipment'
 import {DEFAULT_SHIPMENT_ID} from '@salesforce/retail-react-app/app/constants'
-import {isAddressEmpty} from '@salesforce/retail-react-app/app/utils/address-utils'
+
+import {
+    getItemsForShipment,
+    findEmptyShipments,
+    findExistingDeliveryShipment,
+    findExistingPickupShipment,
+    findUnusedDeliveryShipment,
+    areAddressesEqual,
+    cleanAddressForOrder,
+    findDeliveryShipmentWithSameAddress,
+    findDeliveryShipmentWithoutAddress,
+    findShipmentToConsolidate
+} from '@salesforce/retail-react-app/app/utils/shipment-utils'
 
 /**
  * Custom hook to handle multiship functionality for cart items
@@ -105,35 +117,6 @@ export const useMultiship = (basket) => {
     }
 
     /**
-     * Finds an existing delivery shipment in the basket
-     * @param {Object} basket - The basket object
-     * @returns {Object|null} The delivery shipment object or null if not found
-     */
-    const findExistingDeliveryShipment = (basket) => {
-        if (!basket?.shipments) return null
-
-        return basket.shipments.find(
-            (shipment) => !isCurrentShippingMethodPickup(shipment.shippingMethod)
-        )
-    }
-
-    /**
-     * Finds the first delivery shipment that is not in the provided list of shipment IDs
-     * @param {Object} basket - The basket object
-     * @param {Array} usedShipmentIds - Array of shipment IDs to exclude from search
-     * @returns {Object|null} The unused delivery shipment object or null if not found
-     */
-    const findUnusedDeliveryShipment = (basket, usedShipmentIds = []) => {
-        if (!basket?.shipments) return null
-
-        return basket.shipments.find(
-            (shipment) =>
-                !isCurrentShippingMethodPickup(shipment.shippingMethod) &&
-                !usedShipmentIds.includes(shipment.shipmentId)
-        )
-    }
-
-    /**
      * Creates a new delivery shipment without a shipping method, or configures and returns the default shipment for delivery if it's empty
      * The default shipping method will be assigned later by assignDefaultShippingMethodsToShipments
      * @param {Object} basket - The basket object
@@ -172,7 +155,10 @@ export const useMultiship = (basket) => {
      */
     const findOrCreateDeliveryShipment = async () => {
         // Check if there's an existing delivery shipment
-        let existingDeliveryShipment = findExistingDeliveryShipment(basket)
+        let existingDeliveryShipment = findExistingDeliveryShipment(
+            basket,
+            isCurrentShippingMethodPickup
+        )
 
         if (!existingDeliveryShipment) {
             // Create a new delivery shipment
@@ -202,7 +188,11 @@ export const useMultiship = (basket) => {
         }
 
         // Check if there's an existing pickup shipment for this store
-        let existingPickupShipment = findExistingPickupShipment(basket, storeInfo.id)
+        let existingPickupShipment = findExistingPickupShipment(
+            basket,
+            storeInfo.id,
+            isCurrentShippingMethodPickup
+        )
 
         if (!existingPickupShipment) {
             // Create a new pickup shipment for this store
@@ -216,22 +206,6 @@ export const useMultiship = (basket) => {
         }
 
         return existingPickupShipment?.shipmentId
-    }
-
-    /**
-     * Finds an existing pickup shipment for the specified store
-     * @param {Object} basket - The basket object
-     * @param {string} storeId - The store ID to find pickup shipment for
-     * @returns {Object|null} The pickup shipment object or null if not found
-     */
-    const findExistingPickupShipment = (basket, storeId) => {
-        if (!basket?.shipments || !storeId) return null
-
-        return basket.shipments.find(
-            (shipment) =>
-                isCurrentShippingMethodPickup(shipment.shippingMethod) &&
-                shipment.c_fromStoreId === storeId
-        )
     }
 
     /**
@@ -279,94 +253,6 @@ export const useMultiship = (basket) => {
                 shippingAddress: getShippingAddressForStore(storeInfo)
             }
         })
-    }
-
-    /**
-     * Compares two addresses to determine if they are the same
-     * @param {Object} address1 - First address object
-     * @param {Object} address2 - Second address object
-     * @returns {boolean} True if addresses match
-     */
-    const areAddressesEqual = (address1, address2) => {
-        // Normalize falsey values (null, undefined, empty string)
-        const normalize = (value) => (!value ? '' : value)
-
-        return (
-            normalize(address1?.address1) === normalize(address2?.address1) &&
-            normalize(address1?.city) === normalize(address2?.city) &&
-            normalize(address1?.stateCode) === normalize(address2?.stateCode) &&
-            normalize(address1?.postalCode) === normalize(address2?.postalCode) &&
-            normalize(address1?.countryCode) === normalize(address2?.countryCode)
-        )
-    }
-
-    /**
-     * Extracts only valid OrderAddress fields from an address object
-     * @param {Object} address - The address object (may contain extra fields from customer address)
-     * @returns {Object} Clean address object with only OrderAddress fields
-     */
-    const cleanAddressForOrder = (address) => {
-        if (!address) return null
-
-        return {
-            address1: address.address1,
-            city: address.city,
-            countryCode: address.countryCode,
-            firstName: address.firstName,
-            lastName: address.lastName,
-            phone: address.phone,
-            postalCode: address.postalCode,
-            stateCode: address.stateCode
-        }
-    }
-
-    /**
-     * Finds the first existing delivery shipment with matching address
-     * Multiple shipments with the same address are not supported
-     * @param {Object} basket - The basket object
-     * @param {Object} address - The address to match
-     * @returns {string|null|undefined} The matching shipment ID or null if not found
-     */
-    const findDeliveryShipmentWithSameAddress = (basket, address) => {
-        if (!basket?.shipments || !address) return null
-
-        const foundShipment = basket.shipments.find((shipment) => {
-            // Must be a delivery shipment (not pickup)
-            if (isCurrentShippingMethodPickup(shipment.shippingMethod)) {
-                return false
-            }
-
-            // Check if shipment has a shipping address that matches
-            return shipment.shippingAddress && areAddressesEqual(shipment.shippingAddress, address)
-        })
-        return foundShipment?.shipmentId
-    }
-
-    /**
-     * Finds the first existing delivery shipment that has no address or an empty address
-     * Empty means falsey values for all fields in cleanAddressForOrder
-     * @param {Object} basket - The basket object
-     * @returns {string|null|undefined} The shipment ID without address or null if not found
-     */
-    const findDeliveryShipmentWithoutAddress = (basket) => {
-        if (!basket?.shipments) return null
-
-        const foundShipment = basket.shipments.find((shipment) => {
-            // Must be a delivery shipment (not pickup)
-            if (isCurrentShippingMethodPickup(shipment.shippingMethod)) {
-                return false
-            }
-
-            // Check if shipment has no address or empty address
-            const address = shipment.shippingAddress
-            if (!address) {
-                return true
-            }
-
-            // Check if all address fields are falsey (empty address)
-            return isAddressEmpty(address)
-        })
-        return foundShipment?.shipmentId
     }
 
     /**
@@ -636,38 +522,12 @@ export const useMultiship = (basket) => {
      * @param {Object} basket - The basket object
      * @returns {Array} Array of empty shipments
      */
-    const findEmptyShipments = (basket) => {
-        if (!basket?.shipments?.length) {
-            return []
-        }
-
-        return basket.shipments.filter((shipment) => {
-            const hasItems = basket.productItems?.some(
-                (item) => item.shipmentId === shipment.shipmentId
-            )
-            return !hasItems
-        })
-    }
 
     /**
      * Finds the best non-empty shipment to consolidate into the default shipment
      * @param {Object} basket - The basket object
      * @returns {Object|null} The shipment to consolidate or null if none found
      */
-    const findShipmentToConsolidate = (basket) => {
-        if (!basket?.shipments?.length) {
-            return null
-        }
-
-        return (
-            basket.shipments.find((shipment) => {
-                const hasItems = basket.productItems?.some(
-                    (item) => item.shipmentId === shipment.shipmentId
-                )
-                return hasItems && shipment.shipmentId !== DEFAULT_SHIPMENT_ID
-            }) || null
-        )
-    }
 
     /**
      * Gets items that belong to a specific shipment
@@ -675,9 +535,6 @@ export const useMultiship = (basket) => {
      * @param {string} shipmentId - The shipment ID
      * @returns {Array} Array of product items
      */
-    const getItemsForShipment = (basket, shipmentId) => {
-        return basket?.productItems?.filter((item) => item.shipmentId === shipmentId) || []
-    }
 
     /**
      * Consolidates items from a source shipment into the default shipment
@@ -846,8 +703,10 @@ export const useMultiship = (basket) => {
         assignDefaultShippingMethodsToShipments,
         handleDeliveryOptionChange,
         removeEmptyShipments,
-        findExistingDeliveryShipment,
-        findExistingPickupShipment,
+        findExistingDeliveryShipment: (basket) =>
+            findExistingDeliveryShipment(basket, isCurrentShippingMethodPickup),
+        findExistingPickupShipment: (basket, storeId) =>
+            findExistingPickupShipment(basket, storeId, isCurrentShippingMethodPickup),
         createNewDeliveryShipment,
         createNewDeliveryShipmentWithAddress,
         createNewPickupShipment,
@@ -855,15 +714,18 @@ export const useMultiship = (basket) => {
         moveItemsToDeliveryShipment,
         moveItemToPickupShipment,
         moveItemsToPickupShipment,
-        findDeliveryShipmentWithSameAddress,
-        findDeliveryShipmentWithoutAddress,
+        findDeliveryShipmentWithSameAddress: (basket, address) =>
+            findDeliveryShipmentWithSameAddress(basket, address, isCurrentShippingMethodPickup),
+        findDeliveryShipmentWithoutAddress: (basket) =>
+            findDeliveryShipmentWithoutAddress(basket, isCurrentShippingMethodPickup),
         findOrCreateDeliveryShipment,
         findOrCreatePickupShipment,
         getShipmentForItems,
         findEmptyShipments,
         findShipmentToConsolidate,
         getItemsForShipment,
-        findUnusedDeliveryShipment,
+        findUnusedDeliveryShipment: (basket, usedShipmentIds = []) =>
+            findUnusedDeliveryShipment(basket, usedShipmentIds, isCurrentShippingMethodPickup),
         updateDeliveryAddressForShipment,
         areAddressesEqual
     }

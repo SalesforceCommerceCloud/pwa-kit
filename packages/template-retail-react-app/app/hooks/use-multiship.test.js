@@ -345,7 +345,7 @@ describe('useMultiship', () => {
                     mockBasket,
                     address
                 )
-                expect(foundShipmentId).toBeUndefined()
+                expect(foundShipmentId).toBeNull()
             })
 
             test('should return null if basket is null', () => {
@@ -386,7 +386,7 @@ describe('useMultiship', () => {
                     basketWithPickupOnly,
                     address
                 )
-                expect(foundShipmentId).toBeUndefined()
+                expect(foundShipmentId).toBeNull()
             })
         })
 
@@ -475,7 +475,7 @@ describe('useMultiship', () => {
 
                 const foundShipmentId =
                     result.current.findDeliveryShipmentWithoutAddress(basketWithPartialAddress)
-                expect(foundShipmentId).toBeUndefined()
+                expect(foundShipmentId).toBeNull()
             })
 
             test('should return undefined if all delivery shipments have complete addresses', () => {
@@ -505,7 +505,7 @@ describe('useMultiship', () => {
 
                 const foundShipmentId =
                     result.current.findDeliveryShipmentWithoutAddress(basketWithCompleteAddress)
-                expect(foundShipmentId).toBeUndefined()
+                expect(foundShipmentId).toBeNull()
             })
 
             test('should skip pickup shipments when looking for delivery shipments without address', () => {
@@ -526,7 +526,7 @@ describe('useMultiship', () => {
 
                 const foundShipmentId =
                     result.current.findDeliveryShipmentWithoutAddress(basketWithPickupOnly)
-                expect(foundShipmentId).toBeUndefined()
+                expect(foundShipmentId).toBeNull()
             })
 
             test('should find first delivery shipment without address when multiple exist', () => {
@@ -849,7 +849,7 @@ describe('useMultiship', () => {
                 const {result} = renderHook(() => useMultiship(mockBasket))
 
                 const unusedShipment = result.current.findUnusedDeliveryShipment(mockBasket, ['me'])
-                expect(unusedShipment).toBeUndefined()
+                expect(unusedShipment).toBeNull()
             })
 
             test('should return null if basket has no shipments', () => {
@@ -882,7 +882,7 @@ describe('useMultiship', () => {
                     basketWithOnlyPickup,
                     []
                 )
-                expect(unusedShipment).toBeUndefined()
+                expect(unusedShipment).toBeNull()
             })
         })
     })
@@ -977,7 +977,7 @@ describe('useMultiship', () => {
             mockIsCurrentShippingMethodPickup.mockReturnValue(true)
 
             const deliveryShipment = result.current.findExistingDeliveryShipment(mockBasket)
-            expect(deliveryShipment).toBeUndefined()
+            expect(deliveryShipment).toBeNull()
         })
     })
 
