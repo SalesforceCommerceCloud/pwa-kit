@@ -17,6 +17,42 @@
       "value": "Log Out"
     }
   ],
+  "account.payments.action.refresh": [
+    {
+      "type": 0,
+      "value": "Refresh"
+    }
+  ],
+  "account.payments.action.retry": [
+    {
+      "type": 0,
+      "value": "Retry"
+    }
+  ],
+  "account.payments.heading.payment_methods": [
+    {
+      "type": 0,
+      "value": "Payment Methods"
+    }
+  ],
+  "account.payments.message.error": [
+    {
+      "type": 0,
+      "value": "Error loading payment methods. Please try again."
+    }
+  ],
+  "account.payments.message.loading": [
+    {
+      "type": 0,
+      "value": "Loading payment methods..."
+    }
+  ],
+  "account.payments.message.no_payment_methods": [
+    {
+      "type": 0,
+      "value": "No saved payment methods found."
+    }
+  ],
   "account_addresses.badge.default": [
     {
       "type": 0,
@@ -1393,6 +1429,12 @@
       "value": "Order History"
     }
   ],
+  "drawer_menu.button.payment_methods": [
+    {
+      "type": 0,
+      "value": "Payment Methods"
+    }
+  ],
   "drawer_menu.header.assistive_msg.title": [
     {
       "type": 0,
@@ -1717,6 +1759,12 @@
     {
       "type": 0,
       "value": "Order History"
+    }
+  ],
+  "global.account.link.payment_methods": [
+    {
+      "type": 0,
+      "value": "Payment Methods"
     }
   ],
   "global.account.link.wishlist": [

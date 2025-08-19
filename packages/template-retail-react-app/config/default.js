@@ -81,7 +81,7 @@ module.exports = {
         storeLocatorEnabled: true,
         multishipEnabled: true,
         oneClickCheckout: {
-            enabled: false
+            enabled: true
         },
         partialHydrationEnabled: false
     },
