@@ -44,7 +44,6 @@ export const useMultiship = (basket) => {
         updateShippingMethod
     } = useShipmentOperations(basket?.basketId)
 
-    // Use our new focused item movement hook
     const {
         updateItemToPickupShipment,
         updateItemToDeliveryShipment,
@@ -255,8 +254,7 @@ export const useMultiship = (basket) => {
     const createNewDeliveryShipmentWithAddress = async (basket, address) => {
         if (!basket?.basketId || !address) return null
 
-        const shipmentId = await createShipmentOperation(address)
-        return shipmentId
+        return await createShipmentOperation(address)
     }
 
     /**

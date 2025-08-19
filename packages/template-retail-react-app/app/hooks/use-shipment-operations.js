@@ -74,7 +74,7 @@ export const useShipmentOperations = (basketId) => {
                 throw error
             }
         },
-        [basketId, createShipmentMutation, handleError]
+        [basketId]
     )
 
     /**
@@ -100,7 +100,7 @@ export const useShipmentOperations = (basketId) => {
                 throw error
             }
         },
-        [basketId, removeShipmentMutation, handleError]
+        [basketId]
     )
 
     /**
@@ -132,7 +132,7 @@ export const useShipmentOperations = (basketId) => {
                 throw error
             }
         },
-        [basketId, updateShipmentMutation, handleError]
+        [basketId]
     )
 
     /**
@@ -162,7 +162,7 @@ export const useShipmentOperations = (basketId) => {
                 throw error
             }
         },
-        [basketId, updateShippingMethodMutation, handleError]
+        [basketId]
     )
 
     return {

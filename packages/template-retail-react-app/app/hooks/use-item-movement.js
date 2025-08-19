@@ -55,7 +55,7 @@ export const useItemMovement = (basketId) => {
                 throw error
             }
         },
-        [basketId, updateItemInBasketMutation, handleError]
+        [basketId]
     )
 
     /**
@@ -96,7 +96,7 @@ export const useItemMovement = (basketId) => {
                 throw error
             }
         },
-        [basketId, updateItemInBasketMutation, handleError]
+        [basketId]
     )
 
     /**
@@ -108,8 +108,12 @@ export const useItemMovement = (basketId) => {
      */
     const updateItemsToDeliveryShipment = useCallback(
         async (productItems, targetShipmentId = DEFAULT_SHIPMENT_ID, defaultInventoryId) => {
-            if (!basketId || !Array.isArray(productItems) || productItems.length === 0) {
+            if (!basketId || !Array.isArray(productItems)) {
                 throw new Error('Invalid basket or product items array')
+            }
+
+            if (productItems.length === 0) {
+                return {updated: true}
             }
 
             try {
@@ -134,7 +138,7 @@ export const useItemMovement = (basketId) => {
                 throw error
             }
         },
-        [basketId, updateItemsInBasketMutation, handleError]
+        [basketId]
     )
 
     /**
@@ -146,8 +150,12 @@ export const useItemMovement = (basketId) => {
      */
     const updateItemsToPickupShipment = useCallback(
         async (productItems, targetShipmentId, inventoryId) => {
-            if (!basketId || !Array.isArray(productItems) || productItems.length === 0) {
+            if (!basketId || !Array.isArray(productItems)) {
                 throw new Error('Invalid basket or product items array')
+            }
+
+            if (productItems.length === 0) {
+                return {updated: true}
             }
 
             try {
@@ -171,7 +179,7 @@ export const useItemMovement = (basketId) => {
                 throw error
             }
         },
-        [basketId, updateItemsInBasketMutation, handleError]
+        [basketId]
     )
 
     /**
@@ -239,7 +247,7 @@ export const useItemMovement = (basketId) => {
                 throw error
             }
         },
-        [basketId, updateItemToPickupShipment, updateItemToDeliveryShipment, handleError]
+        [basketId]
     )
 
     return {

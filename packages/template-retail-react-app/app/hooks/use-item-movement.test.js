@@ -298,12 +298,17 @@ describe('useItemMovement', () => {
             expect(response).toEqual(mockResponse)
         })
 
-        test('should throw error if productItems array is empty', async () => {
+        test('should handle empty productItems array gracefully', async () => {
             const {result} = renderHook(() => useItemMovement('basket-id'))
 
-            await expect(
-                result.current.updateItemsToDeliveryShipment([], 'shipment', 'inventory')
-            ).rejects.toThrow('Invalid basket or product items array')
+            const response = await result.current.updateItemsToDeliveryShipment(
+                [],
+                'shipment',
+                'inventory'
+            )
+
+            expect(response).toEqual({updated: true})
+            expect(mockUpdateItemsInBasketMutation.mutateAsync).not.toHaveBeenCalled()
         })
 
         test('should handle API errors', async () => {
@@ -373,12 +378,17 @@ describe('useItemMovement', () => {
             expect(response).toEqual(mockResponse)
         })
 
-        test('should throw error if productItems array is empty', async () => {
+        test('should handle empty productItems array gracefully', async () => {
             const {result} = renderHook(() => useItemMovement('basket-id'))
 
-            await expect(
-                result.current.updateItemsToPickupShipment([], 'shipment', 'inventory')
-            ).rejects.toThrow('Invalid basket or product items array')
+            const response = await result.current.updateItemsToPickupShipment(
+                [],
+                'shipment',
+                'inventory'
+            )
+
+            expect(response).toEqual({updated: true})
+            expect(mockUpdateItemsInBasketMutation.mutateAsync).not.toHaveBeenCalled()
         })
 
         test('should handle API errors', async () => {
