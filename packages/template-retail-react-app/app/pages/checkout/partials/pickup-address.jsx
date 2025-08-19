@@ -332,7 +332,7 @@ const PickupAddress = () => {
                                                                                                         quantity:
                                                                                                             productItem.quantity
                                                                                                     }}
-                                                                                                    id="checkout_product_item.label.quantity_static"
+                                                                                                    id="item_attributes.label.quantity_abbreviated"
                                                                                                 />
                                                                                             </Text>
                                                                                             <CartItemVariantPrice
@@ -435,7 +435,7 @@ const PickupAddress = () => {
                                                                                                             quantity:
                                                                                                                 productItem.quantity
                                                                                                         }}
-                                                                                                        id="checkout_product_item.label.quantity_static"
+                                                                                                        id="item_attributes.label.quantity_abbreviated"
                                                                                                     />
                                                                                                 </Text>
                                                                                                 <CartItemVariantPrice

@@ -835,6 +835,9 @@
   "item_attributes.label.quantity": {
     "defaultMessage": "Quantity: {quantity}"
   },
+  "item_attributes.label.quantity_abbreviated": {
+    "defaultMessage": "Qty: {quantity}"
+  },
   "item_attributes.label.selected_options": {
     "defaultMessage": "Selected Options"
   },
