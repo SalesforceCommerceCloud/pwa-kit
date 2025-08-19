@@ -1834,4 +1834,186 @@ describe('useMultiship', () => {
             })
         })
     })
+
+    describe('areAddressesEqual behavior', () => {
+        test('should match addresses with identical firstName and lastName', () => {
+            const address1 = {
+                firstName: 'John',
+                lastName: 'Doe',
+                address1: '123 Main St',
+                city: 'San Francisco',
+                stateCode: 'CA',
+                postalCode: '94105',
+                countryCode: 'US'
+            }
+            const address2 = {
+                firstName: 'John',
+                lastName: 'Doe',
+                address1: '123 Main St',
+                city: 'San Francisco',
+                stateCode: 'CA',
+                postalCode: '94105',
+                countryCode: 'US'
+            }
+
+            const {result} = renderHook(() => useMultiship(mockBasket))
+            const foundShipmentId = result.current.findDeliveryShipmentWithSameAddress(
+                {
+                    ...mockBasket,
+                    shipments: [
+                        {
+                            shipmentId: 'delivery-1',
+                            shippingMethod: {id: 'default-shipping-method'},
+                            shippingAddress: address1
+                        }
+                    ]
+                },
+                address2
+            )
+            expect(foundShipmentId).toBe('delivery-1')
+        })
+
+        test('should not match addresses with same location/street address but different names', () => {
+            const address1 = {
+                firstName: 'John',
+                lastName: 'Doe',
+                address1: '123 Main St',
+                city: 'San Francisco',
+                stateCode: 'CA',
+                postalCode: '94105',
+                countryCode: 'US'
+            }
+            const address2 = {
+                firstName: 'Jane',
+                lastName: 'Smith',
+                address1: '123 Main St',
+                city: 'San Francisco',
+                stateCode: 'CA',
+                postalCode: '94105',
+                countryCode: 'US'
+            }
+
+            const {result} = renderHook(() => useMultiship(mockBasket))
+            const foundShipmentId = result.current.findDeliveryShipmentWithSameAddress(
+                {
+                    ...mockBasket,
+                    shipments: [
+                        {
+                            shipmentId: 'delivery-1',
+                            shippingMethod: {id: 'default-shipping-method'},
+                            shippingAddress: address1
+                        }
+                    ]
+                },
+                address2
+            )
+            expect(foundShipmentId).toBeUndefined()
+        })
+
+        test('should handle missing firstName and lastName gracefully', () => {
+            const address1 = {
+                address1: '123 Main St',
+                city: 'San Francisco',
+                stateCode: 'CA',
+                postalCode: '94105',
+                countryCode: 'US'
+            }
+            const address2 = {
+                address1: '123 Main St',
+                city: 'San Francisco',
+                stateCode: 'CA',
+                postalCode: '94105',
+                countryCode: 'US'
+            }
+
+            const {result} = renderHook(() => useMultiship(mockBasket))
+            const foundShipmentId = result.current.findDeliveryShipmentWithSameAddress(
+                {
+                    ...mockBasket,
+                    shipments: [
+                        {
+                            shipmentId: 'delivery-1',
+                            shippingMethod: {id: 'default-shipping-method'},
+                            shippingAddress: address1
+                        }
+                    ]
+                },
+                address2
+            )
+            expect(foundShipmentId).toBe('delivery-1')
+        })
+
+        test('should handle missing & present names respectively in both addresses', () => {
+            const address1 = {
+                firstName: 'John',
+                lastName: 'Doe',
+                address1: '123 Main St',
+                city: 'San Francisco',
+                stateCode: 'CA',
+                postalCode: '94105',
+                countryCode: 'US'
+            }
+            const address2 = {
+                // Missing firstName and lastName
+                address1: '123 Main St',
+                city: 'San Francisco',
+                stateCode: 'CA',
+                postalCode: '94105',
+                countryCode: 'US'
+            }
+
+            const {result} = renderHook(() => useMultiship(mockBasket))
+            const foundShipmentId = result.current.findDeliveryShipmentWithSameAddress(
+                {
+                    ...mockBasket,
+                    shipments: [
+                        {
+                            shipmentId: 'delivery-1',
+                            shippingMethod: {id: 'default-shipping-method'},
+                            shippingAddress: address1
+                        }
+                    ]
+                },
+                address2
+            )
+            expect(foundShipmentId).toBeUndefined()
+        })
+
+        test('should normalize falsey values correctly', () => {
+            const address1 = {
+                firstName: null,
+                lastName: undefined,
+                address1: '123 Main St',
+                city: 'San Francisco',
+                stateCode: 'CA',
+                postalCode: '94105',
+                countryCode: 'US'
+            }
+            const address2 = {
+                firstName: '',
+                lastName: '',
+                address1: '123 Main St',
+                city: 'San Francisco',
+                stateCode: 'CA',
+                postalCode: '94105',
+                countryCode: 'US'
+            }
+
+            const {result} = renderHook(() => useMultiship(mockBasket))
+            const foundShipmentId = result.current.findDeliveryShipmentWithSameAddress(
+                {
+                    ...mockBasket,
+                    shipments: [
+                        {
+                            shipmentId: 'delivery-1',
+                            shippingMethod: {id: 'default-shipping-method'},
+                            shippingAddress: address1
+                        }
+                    ]
+                },
+                address2
+            )
+            expect(foundShipmentId).toBe('delivery-1')
+        })
+    })
 })
