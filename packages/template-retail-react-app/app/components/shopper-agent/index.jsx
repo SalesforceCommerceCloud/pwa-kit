@@ -1,43 +1,13 @@
 /**
  * @fileoverview ShopperAgent Component - Salesforce Embedded Messaging Integration
- * 
+ *
  * This module provides a React component that integrates Salesforce Embedded Messaging
  * (MIAW - Messaging in a Window) service with PWA Kit applications. The component
  * enables real-time chat support, search assistance, and personalized shopping guidance
  * directly within the e-commerce experience.
- * 
+ *
  * @module ShopperAgent
  * @description Main component for initializing and managing the embedded messaging service
- * 
- * @example
- * // Basic usage in _app/index.jsx
- * import ShopperAgent from '@salesforce/retail-react-app/app/components/shopper-agent'
- * 
- * {commerceAgentConfiguration?.enabled === 'true' && (
- *   <ShopperAgent
- *     commerceAgentConfiguration={commerceAgentConfiguration}
- *     basketDoneLoading={basketQueryLastUpdateTime > 0}
- *   />
- * )}
- * 
- * @example
- * // Configuration in config/default.js
- * module.exports = {
- *   app: {
- *     commerceAgent: {
- *       enabled: 'true',
- *       askAgentOnSearch: 'true',
- *       embeddedServiceName: 'MyService',
- *       embeddedServiceEndpoint: 'https://myorg.salesforce.com',
- *       scriptSourceUrl: 'https://myorg.salesforce.com/script.js',
- *       scrt2Url: 'https://myorg.salesforce.com-scrt.com',
- *       salesforceOrgId: '00D1234567890ABC',
- *       commerceOrgId: 'f_ecom_zzzz_001',
- *       siteId: 'RefArch'
- *     }
- *   }
- * }
- * 
  * @architecture
  * The component follows a layered architecture:
  * 1. ShopperAgent (Main) - Conditional rendering and validation
@@ -45,22 +15,21 @@
  * 3. Hooks Integration - useScript, useMiaw, useMultiSite, useRefreshToken, useUsid
  * 4. Event Management - Embedded messaging lifecycle events
  * 5. Prechat Fields - Dynamic context injection (locale, currency, user session)
- * 
+ *
  * @security
  * - Validates script URLs against trusted Salesforce domains
  * - Prevents loading of scripts from unauthorized sources
  * - Ensures configuration integrity before service initialization
- * 
+ *
  * @dependencies
  * - React hooks for state management and side effects
  * - Salesforce Embedded Messaging service
  * - PWA Kit hooks for multi-site, authentication, and user context
  * - Chakra UI for theming and z-index management
- * 
+ *
  * @since 3.12.0
  * @author Salesforce Commerce Cloud
  * @contributor Akasipathy
- * @license BSD-3-Clause
  */
 
 /*
@@ -87,13 +56,6 @@ const onClient = typeof window !== 'undefined'
  * @param {string} url - The URL to validate (e.g., 'https://myorg.salesforce.com/script.js')
  * @returns {boolean} True if the URL is from a trusted Salesforce domain, false otherwise
  * @throws {TypeError} If the URL is invalid and cannot be parsed
- * 
- * @example
- * const isValid = validateSalesforceDomain('https://myorg.salesforce.com/script.js')
- * // Returns: true
- * 
- * const isInvalid = validateSalesforceDomain('https://malicious-site.com/script.js')
- * // Returns: false
  */
 const validateSalesforceDomain = (url) => {
     try {
@@ -114,38 +76,19 @@ const validateSalesforceDomain = (url) => {
 }
 
 /**
- * Validates that the commerce agent configuration contains all necessary
- * fields before attempting to initialize the embedded messaging service.
+ * Validates the commerce agent configuration object to ensure all required fields
+ * are present and valid before initializing the embedded messaging service.
  *
  * @param {Object} commerceAgent - Commerce agent configuration object
- * @param {string} commerceAgent.enabled - Whether the agent is enabled ('true' or 'false')
- * @param {string} commerceAgent.askAgentOnSearch - Whether to show agent on search pages
- * @param {string} commerceAgent.embeddedServiceName - Name of the embedded service deployment
- * @param {string} commerceAgent.embeddedServiceEndpoint - URL of the embedded service deployment
- * @param {string} commerceAgent.scriptSourceUrl - URL to load the embedded messaging script
- * @param {string} commerceAgent.scrt2Url - SCRT2 URL for the embedded messaging service
- * @param {string} commerceAgent.salesforceOrgId - Salesforce organization ID
- * @param {string} commerceAgent.commerceOrgId - Commerce Cloud organization ID
- * @param {string} commerceAgent.siteId - Site identifier
- * @returns {boolean} True if all required fields are present and are strings, false otherwise
- * @throws {Error} Logs error messages to console for invalid configurations
- * 
- * @example
- * const config = {
- *   enabled: 'true',
- *   askAgentOnSearch: 'true',
- *   embeddedServiceName: 'MyService',
- *   embeddedServiceEndpoint: 'https://myorg.salesforce.com',
- *   scriptSourceUrl: 'https://myorg.salesforce.com/script.js',
- *   scrt2Url: 'https://myorg.salesforce.com-scrt.com',
- *   salesforceOrgId: '00D1234567890ABC',
- *   commerceOrgId: 'f_ecom_zzzz_001',
- *   siteId: 'RefArch'
- * }
- * const isValid = validateCommerceAgentSettings(config)
- * // Returns: true
+ * @returns {boolean} True if configuration is valid, false otherwise
+ * @throws {Error} When configuration validation fails
  */
 const validateCommerceAgentSettings = (commerceAgent) => {
+    if (!commerceAgent || typeof commerceAgent !== 'object') {
+        console.error('Commerce agent configuration must be an object.')
+        return false
+    }
+
     const requiredFields = [
         'enabled',
         'askAgentOnSearch',
@@ -158,7 +101,9 @@ const validateCommerceAgentSettings = (commerceAgent) => {
         'siteId'
     ]
 
-    const isValid = requiredFields.every((key) => typeof commerceAgent[key] === 'string')
+    const isValid = requiredFields.every((key) => 
+        typeof commerceAgent[key] === 'string' && commerceAgent[key].trim() !== ''
+    )
 
     if (!isValid) {
         console.error('Invalid commerce agent settings.')
@@ -192,7 +137,7 @@ const isEnabled = (enabled) => {
  * Internal component that renders the embedded messaging window.
  * This component handles the lifecycle of the Salesforce Embedded Messaging service,
  * including script loading, initialization, event handling, and cleanup.
- * 
+ *
  * Key responsibilities:
  * - Loads the embedded messaging script using useScript hook
  * - Initializes the MIAW service using useMiaw hook
@@ -211,10 +156,10 @@ const isEnabled = (enabled) => {
  * @param {string} props.commerceAgentConfiguration.commerceOrgId - Commerce org ID
  * @param {string} props.commerceAgentConfiguration.siteId - Site identifier
  * @returns {null} This component doesn't render any visible UI, only manages the messaging service
- * 
+ *
  * @example
  * <ShopperAgentWindow commerceAgentConfiguration={config} />
- * 
+ *
  * @since 3.12.0
  * @see {@link useScript} - For script loading functionality
  * @see {@link useMiaw} - For MIAW initialization
@@ -225,13 +170,13 @@ const isEnabled = (enabled) => {
 const ShopperAgentWindow = ({commerceAgentConfiguration}) => {
     // Theme hook for z-index management
     const theme = useTheme()
-    
+
     // Multi-site hook for locale and currency information
     const {locale} = useMultiSite()
-    
+
     // Authentication hook for refresh token
     const refreshToken = useRefreshToken()
-    
+
     // Destructure configuration for cleaner access
     const {
         embeddedServiceName,
@@ -293,7 +238,15 @@ const ShopperAgentWindow = ({commerceAgentConfiguration}) => {
                 handleEmbeddedMessagingWindowMaximized
             )
         }
-    }, [siteId, locale.id, locale.preferredCurrency, commerceOrgId, usid, theme.zIndices.sticky, refreshToken])
+    }, [
+        siteId,
+        locale.id,
+        locale.preferredCurrency,
+        commerceOrgId,
+        usid,
+        theme.zIndices.sticky,
+        refreshToken
+    ])
 
     // Load the embedded messaging script asynchronously
     const scriptLoadStatus = useScript(scriptSourceUrl)
@@ -306,7 +259,8 @@ const ShopperAgentWindow = ({commerceAgentConfiguration}) => {
         embeddedServiceEndpoint,
         scrt2Url,
         locale.id,
-        refreshToken
+        refreshToken,
+        locale.preferredCurrency
     )
 
     // This component doesn't render visible UI, only manages the messaging service
@@ -317,10 +271,10 @@ ShopperAgentWindow.propTypes = {
     /**
      * Commerce agent configuration object containing all necessary settings
      * for initializing and managing the embedded messaging service.
-     * 
+     *
      * @type {Object}
      * @required
-     * 
+     *
      * @property {string} embeddedServiceName - Name of the embedded service deployment
      * @property {string} embeddedServiceEndpoint - URL of the embedded service deployment
      * @property {string} scriptSourceUrl - URL to load the embedded messaging script
@@ -328,19 +282,6 @@ ShopperAgentWindow.propTypes = {
      * @property {string} salesforceOrgId - Salesforce organization ID
      * @property {string} commerceOrgId - Commerce Cloud organization ID
      * @property {string} siteId - Site identifier
-     * 
-     * @example
-     * const config = {
-     *   embeddedServiceName: 'MyService',
-     *   embeddedServiceEndpoint: 'https://myorg.salesforce.com',
-     *   scriptSourceUrl: 'https://myorg.salesforce.com/script.js',
-     *   scrt2Url: 'https://myorg.salesforce.com-scrt.com',
-     *   salesforceOrgId: '00D1234567890ABC',
-     *   commerceOrgId: 'f_ecom_zzzz_001',
-     *   siteId: 'RefArch'
-     * }
-     * 
-     * <ShopperAgentWindow commerceAgentConfiguration={config} />
      */
     commerceAgentConfiguration: PropTypes.object.isRequired
 }
@@ -349,13 +290,13 @@ ShopperAgentWindow.propTypes = {
  * Main ShopperAgent component that initializes and manages the embedded messaging service.
  * This component acts as a conditional wrapper that only renders the messaging service
  * when all required conditions are met (enabled, basket loaded, valid configuration).
- * 
+ *
  * The component integrates with several hooks to provide:
  * - Multi-site support (locale, currency)
  * - Authentication (refresh token)
  * - User session management (USID)
  * - Script loading and MIAW initialization
- * 
+ *
  * @param {Object} props - Component props
  * @param {Object} props.commerceAgentConfiguration - Commerce agent configuration object
  * @param {string} props.commerceAgentConfiguration.enabled - Whether the agent is enabled
@@ -369,20 +310,7 @@ ShopperAgentWindow.propTypes = {
  * @param {string} props.commerceAgentConfiguration.siteId - Site identifier
  * @param {boolean} props.basketDoneLoading - Whether the basket has finished loading
  * @returns {JSX.Element|null} The ShopperAgent component or null if conditions not met
- * 
- * @example
- * // Basic usage
- * <ShopperAgent 
- *   commerceAgentConfiguration={config}
- *   basketDoneLoading={true}
- * />
- * 
- * // With disabled state
- * <ShopperAgent 
- *   commerceAgentConfiguration={{...config, enabled: 'false'}}
- *   basketDoneLoading={true}
- * />
- * 
+ *
  * @since 3.12.0
  * @see {@link ShopperAgentWindow} - Internal component that manages the messaging service
  * @see {@link validateCommerceAgentSettings} - Configuration validation function
@@ -391,7 +319,7 @@ ShopperAgentWindow.propTypes = {
 const ShopperAgent = ({commerceAgentConfiguration, basketDoneLoading}) => {
     // Extract enabled state from configuration
     const {enabled} = commerceAgentConfiguration
-    
+
     // Check if agent is enabled and running on client side
     const isShopperAgentEnabled = isEnabled(enabled)
 
@@ -402,9 +330,9 @@ const ShopperAgent = ({commerceAgentConfiguration, basketDoneLoading}) => {
     return isShopperAgentEnabled &&
         basketDoneLoading &&
         validateCommerceAgentSettings(commerceAgentConfiguration) ? (
-        <ShopperAgentWindow
-            commerceAgentConfiguration={commerceAgentConfiguration}
-        />
+        <div data-testid="shopper-agent">
+            <ShopperAgentWindow commerceAgentConfiguration={commerceAgentConfiguration} />
+        </div>
     ) : null
 }
 
@@ -414,10 +342,10 @@ ShopperAgent.propTypes = {
      * for initializing and managing the embedded messaging service.
      * This object must contain all required fields and pass validation
      * before the component will render.
-     * 
+     *
      * @type {Object}
      * @required
-     * 
+     *
      * @property {string} enabled - Whether the agent is enabled ('true' or 'false')
      * @property {string} askAgentOnSearch - Whether to show agent on search pages
      * @property {string} embeddedServiceName - Name of the embedded service deployment
@@ -427,34 +355,16 @@ ShopperAgent.propTypes = {
      * @property {string} salesforceOrgId - Salesforce organization ID
      * @property {string} commerceOrgId - Commerce Cloud organization ID
      * @property {string} siteId - Site identifier
-     * 
-     * @example
-     * const config = {
-     *   enabled: 'true',
-     *   askAgentOnSearch: 'true',
-     *   embeddedServiceName: 'MyService',
-     *   embeddedServiceEndpoint: 'https://myorg.salesforce.com',
-     *   scriptSourceUrl: 'https://myorg.salesforce.com/script.js',
-     *   scrt2Url: 'https://myorg.salesforce.com-scrt.com',
-     *   salesforceOrgId: '00D1234567890ABC',
-     *   commerceOrgId: 'f_ecom_zzzz_001',
-     *   siteId: 'RefArch'
-     * }
-     * 
-     * <ShopperAgent 
-     *   commerceAgentConfiguration={config}
-     *   basketDoneLoading={true}
-     * />
-     * 
+     *
      * @see {@link validateCommerceAgentSettings} - For validation rules
      */
     commerceAgentConfiguration: PropTypes.object.isRequired,
-    
+
     /**
      * Boolean flag indicating whether the basket has finished loading.
      * This prevents the agent from initializing before the shopping cart
      * context is fully available, ensuring proper integration.
-     * 
+     *
      * @type {boolean}
      * @required
      * // Component will render null until basketDoneLoading becomes true

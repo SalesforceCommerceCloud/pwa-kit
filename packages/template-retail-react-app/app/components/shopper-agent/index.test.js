@@ -440,7 +440,8 @@ describe('ShopperAgent Component', () => {
             'https://test.salesforce.com', // embeddedServiceEndpoint
             'https://test.salesforce.com/scrt2.js', // scrt2Url
             'en-US',                      // locale.id
-            'test-refresh-token'          // refreshToken
+            'test-refresh-token',         // refreshToken
+            'USD'                         // locale.preferredCurrency
         )
     })
 
