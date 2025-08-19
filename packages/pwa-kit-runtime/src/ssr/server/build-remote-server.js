@@ -5,6 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import path from 'path'
+import {pathToRegexp} from 'path-to-regexp'
 import {
     BUILD,
     CONTENT_TYPE,
@@ -499,25 +500,16 @@ export const RemoteServerFactory = {
             if (routePattern instanceof RegExp) return routePattern
             if (typeof routePattern !== 'string') return null
 
-            // Replace route parameters like :id with regex capture groups
-            let regexPattern = routePattern
-                .replace(/:[^/]+/g, '[^/]+')
-                .replace(/\/\*/g, '/.*')
-                .replace(/\*/g, '.*')
+            try {
+                // Convert Express wildcards to path-to-regexp syntax
+                // Express uses * for wildcards, path-to-regexp uses (.*)
+                const processedPattern = routePattern.replace(/\*/g, '(.*)')
 
-            // Escape other regex special characters except those we just handled
-            regexPattern = regexPattern.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
-
-            // Unescape the patterns we want to keep
-            regexPattern = regexPattern
-                .replace(/\\\[\\\^\/\\\]\\\+/g, '[^/]+')
-                .replace(/\\\/\\\.\\\*/g, '/.*')
-                .replace(/\\\.\\\*/g, '.*')
-                .replace(/\\\(/g, '(')
-                .replace(/\\\)/g, ')')
-                .replace(/\\\?/g, '?')
-
-            return new RegExp(`^${regexPattern}$`)
+                // Use path-to-regexp to convert the route pattern to a regex
+                return pathToRegexp(processedPattern)
+            } catch (error) {
+                throw new Error(`Invalid route pattern: ${routePattern}`)
+            }
         }
 
         /**
