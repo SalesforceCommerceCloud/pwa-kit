@@ -508,6 +508,9 @@ export const RemoteServerFactory = {
                 // Use path-to-regexp to convert the route pattern to a regex
                 return pathToRegexp(processedPattern)
             } catch (error) {
+                // According to express docs, express uses path-to-regexp internally to parse routes
+                // We should not reach this code because express itself will error if an invalid route
+                // pattern is defined
                 throw new Error(`Invalid route pattern: ${routePattern}`)
             }
         }
@@ -530,39 +533,29 @@ export const RemoteServerFactory = {
             const basePath = getEnvBasePath()
             let shouldRemoveBasePath = false
 
-            if (basePath) {
-                if (req.path.startsWith(`${basePath}/mobify`)) {
-                    shouldRemoveBasePath = true
-                }
-
+            if (req.path.startsWith(`${basePath}/mobify`)) {
+                shouldRemoveBasePath = true
+            } else {
                 // Check if path matches any existing express route with base path prepended
-                if (!shouldRemoveBasePath) {
-                    // Routes are dynamically checked since we want to ensure that any express route
-                    // defined after the app is created, such as routes defined in ssr.js, are included.
-                    const expressRoutes = app._router.stack
-                        // specifically omit the generic wildcard from the express routes we want to
-                        // remove the base path from since it is mapped to the app render
-                        .filter(
-                            (layer) => layer.route && layer.route.path && layer.route.path !== '*'
-                        )
-                        .map((layer) => layer.route.path)
+                const pathWithoutBase = req.path.replace(new RegExp(`^${basePath}`), '')
 
-                    for (const route of expressRoutes) {
-                        if (route) {
-                            const routeRegex = _convertExpressRouteToRegex(route)
-                            if (routeRegex) {
-                                const pathWithoutBase = req.path.replace(
-                                    new RegExp(`^${basePath}`),
-                                    ''
-                                )
-                                if (routeRegex.test(pathWithoutBase)) {
-                                    shouldRemoveBasePath = true
-                                    break
-                                }
-                            }
-                        }
+                // Routes are dynamically checked since we want to ensure that any express route
+                // defined after the app is created, such as routes defined in ssr.js, are included.
+                const expressRoutes = app._router.stack
+                    // specifically omit the generic wildcard from the express routes we want to
+                    // remove the base path from since it is mapped to the app render
+                    .filter((layer) => layer.route && layer.route.path && layer.route.path !== '*')
+                    .map((layer) => layer.route.path)
+
+                shouldRemoveBasePath = expressRoutes.some((route) => {
+                    try {
+                        const routeRegex = _convertExpressRouteToRegex(route)
+                        return routeRegex.test(pathWithoutBase)
+                    } catch (error) {
+                        logger.warn(`Invalid route pattern: ${route}`, error)
+                        return false
                     }
-                }
+                })
             }
 
             if (shouldRemoveBasePath) {
