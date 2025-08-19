@@ -17,7 +17,6 @@ import {useExpressPaymentManager} from '@salesforce/retail-react-app/app/compone
 
 // Define the payment methods we will attempt to load
 const PAYMENT_METHODS = ['applepay', 'googlepay']
-const PDP_PAYMENT_METHODS = ['applepay']
 
 function Express() {
     const navigate = useNavigation()
@@ -36,14 +35,12 @@ function Express() {
     const [currentSku, setCurrentSku] = useState(null)
     const [currentQuantity, setCurrentQuantity] = useState(1)
 
-    // Initialize the express payment manager
-    const {manager, managerError} = useExpressPaymentManager(
-        isPdpMode ? PDP_PAYMENT_METHODS : PAYMENT_METHODS
-    )
+        // Initialize the express payment manager
+    const {manager, managerError} = useExpressPaymentManager(PAYMENT_METHODS)
 
     // PostMessage listener for SKU updates
     useEffect(() => {
-        const handleMessage = (event) => {
+                const handleMessage = (event) => {
             // Basic security check - accept messages from any origin for now
             // In production, you might want to restrict this to specific origins
 
@@ -77,6 +74,13 @@ function Express() {
                     setCustomerId(authData.customerId)
                     setBasketData(basketData)
                 }
+
+                // Handle authentication data messages
+                if (type === 'authDataAvailable') {
+                    const authData = event.data.data.authData
+                    setAuthToken(authData.authToken)
+                    setCustomerId(authData.customerId)
+                }
             }
         }
 
@@ -103,15 +107,42 @@ function Express() {
     return (
         <div>
             {!isPdpMode && basket && (
-                <AdyenExpressCheckoutProvider
-                    authToken={authToken}
-                    customerId={customerId}
-                    locale={locale}
-                    site={site}
-                    basket={basket}
-                    navigate={navigate}
-                >
-                    <ApplePayExpress
+                <>
+                    <AdyenExpressCheckoutProvider
+                        authToken={authToken}
+                        customerId={customerId}
+                        locale={locale}
+                        site={site}
+                        basket={basket}
+                        navigate={navigate}
+                    >
+                        <div style={{marginBottom: '8px'}}>
+                            <ApplePayExpress
+                                sku={currentSku}
+                                quantity={currentQuantity}
+                                isPdpMode={isPdpMode}
+                                basketData={basket}
+                                authToken={authToken}
+                                manager={manager}
+                            />
+                        </div>
+                        <GooglePayExpress manager={manager} overrideData={{authToken, basket}} />
+                    </AdyenExpressCheckoutProvider>
+                </>
+            )}
+            {isPdpMode && (
+                <>
+                    <div style={{marginBottom: '8px'}}>
+                        <ApplePayExpress
+                            sku={currentSku}
+                            quantity={currentQuantity}
+                            isPdpMode={isPdpMode}
+                            basketData={basket}
+                            authToken={authToken}
+                            manager={manager}
+                        />
+                    </div>
+                    <GooglePayExpress
                         sku={currentSku}
                         quantity={currentQuantity}
                         isPdpMode={isPdpMode}
@@ -119,18 +150,7 @@ function Express() {
                         authToken={authToken}
                         manager={manager}
                     />
-                    <GooglePayExpress manager={manager} overrideData={{authToken, basket}} />
-                </AdyenExpressCheckoutProvider>
-            )}
-            {isPdpMode && (
-                <ApplePayExpress
-                    sku={currentSku}
-                    quantity={currentQuantity}
-                    isPdpMode={isPdpMode}
-                    basketData={basket}
-                    authToken={authToken}
-                    manager={manager}
-                />
+                </>
             )}
         </div>
     )
