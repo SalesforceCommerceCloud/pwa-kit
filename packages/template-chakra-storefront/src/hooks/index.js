@@ -22,3 +22,4 @@ export {
     useBonusProductSelectionModalContext,
     useBonusProductSelectionModal
 } from './use-bonus-product-selection-modal'
+export {useBonusProductViewModal} from './use-bonus-product-view-modal'

@@ -83,7 +83,8 @@ export const useProductViewModal = (initialProduct) => {
         // clean up the params in case there are variant params not related to current product
         cleanUpVariantParams()
         return () => {
-            cleanUpVariantParams()
+            // Do not clean up on unmount in unified bonus modal flow to avoid route change churn
+            // The initial cleanup is sufficient to normalize params
         }
     }, [])
 

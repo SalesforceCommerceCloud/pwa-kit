@@ -88,16 +88,21 @@ const SwatchGroup = (props) => {
         const childrenArray = Children.toArray(children)
         const index = childrenArray.findIndex(({props}) => props?.value === value)
 
-        setSelectedIndex(index)
+        // If no matching child is found, default to the first child (index 0)
+        setSelectedIndex(index >= 0 ? index : 0)
     }, [])
 
     // Whenever the selected index changes ensure that we call the change handler.
     useEffect(() => {
         const childrenArray = Children.toArray(children)
-        const newValue = childrenArray[selectedIndex].props.value
-
+        if (!childrenArray.length) return
+        // Clamp index to valid range to avoid undefined access
+        const clampedIndex = Math.min(Math.max(selectedIndex, 0), childrenArray.length - 1)
+        const selectedChild = childrenArray[clampedIndex]
+        if (!selectedChild || !selectedChild.props) return
+        const newValue = selectedChild.props.value
         handleChange(newValue)
-    }, [selectedIndex])
+    }, [selectedIndex, children])
 
     return (
         <Box onKeyDown={onKeyDown}>
