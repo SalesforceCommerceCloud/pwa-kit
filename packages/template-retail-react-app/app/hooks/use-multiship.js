@@ -292,6 +292,8 @@ export const useMultiship = (basket) => {
         const normalize = (value) => (!value ? '' : value)
 
         return (
+            normalize(address1?.firstName) === normalize(address2?.firstName) &&
+            normalize(address1?.lastName) === normalize(address2?.lastName) &&
             normalize(address1?.address1) === normalize(address2?.address1) &&
             normalize(address1?.city) === normalize(address2?.city) &&
             normalize(address1?.stateCode) === normalize(address2?.stateCode) &&
