@@ -1899,7 +1899,7 @@ describe('useMultiship', () => {
                 },
                 address2
             )
-            expect(foundShipmentId).toBeUndefined()
+            expect(foundShipmentId).toBeNull()
         })
 
         test('should handle missing firstName and lastName gracefully', () => {
@@ -1968,7 +1968,7 @@ describe('useMultiship', () => {
                 },
                 address2
             )
-            expect(foundShipmentId).toBeUndefined()
+            expect(foundShipmentId).toBeNull()
         })
 
         test('should normalize falsey values correctly', () => {
