@@ -77,6 +77,12 @@
   "account_order_detail.shipping_status.shipped": {
     "defaultMessage": "출고됨"
   },
+  "account_order_detail.status.cancelled": {
+    "defaultMessage": "취소됨"
+  },
+  "account_order_detail.status.created": {
+    "defaultMessage": "생성됨"
+  },
   "account_order_detail.title.order_details": {
     "defaultMessage": "주문 세부 정보"
   },

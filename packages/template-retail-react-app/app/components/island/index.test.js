@@ -5,6 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 /* eslint-disable no-import-assign */
+/* eslint-disable no-import-assign */
 import React from 'react'
 import {act, render, screen, cleanup} from '@testing-library/react'
 import {renderToString} from 'react-dom/server'
@@ -51,6 +52,12 @@ function renderServerComponent(component) {
 }
 
 describe('Island Component', () => {
+    let originalFlagValue
+
+    beforeAll(() => (originalFlagValue = constants.PARTIAL_HYDRATION_ENABLED))
+
+    afterAll(() => Reflect.set(constants, 'PARTIAL_HYDRATION_ENABLED', originalFlagValue))
+
     let originalFlagValue
 
     beforeAll(() => (originalFlagValue = constants.PARTIAL_HYDRATION_ENABLED))

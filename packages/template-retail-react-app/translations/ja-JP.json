@@ -77,6 +77,12 @@
   "account_order_detail.shipping_status.shipped": {
     "defaultMessage": "出荷済み"
   },
+  "account_order_detail.status.cancelled": {
+    "defaultMessage": "キャンセル済み"
+  },
+  "account_order_detail.status.created": {
+    "defaultMessage": "作成済み"
+  },
   "account_order_detail.title.order_details": {
     "defaultMessage": "注文の詳細"
   },

@@ -269,6 +269,38 @@ const copyCursorRules = (outputDir) => {
 }
 
 /**
+ * If the generated project is based on a template that includes '.cursor/rules',
+ * this function copies the rules from the installed node_modules into the
+ * top-level of the generated project.
+ * @param {string} outputDir - The directory of the generated project
+ * @private
+ */
+const copyCursorRules = (outputDir) => {
+    const cursorRulesFromDir = p.join(
+        outputDir,
+        'node_modules',
+        '@salesforce',
+        'retail-react-app',
+        '.cursor',
+        'rules'
+    )
+    if (sh.test('-e', cursorRulesFromDir)) {
+        const outputCursorRulesDir = p.join(outputDir, '.cursor', 'rules')
+
+        // Create the directory if it doesn't exist
+        if (!sh.test('-e', outputCursorRulesDir)) {
+            fs.mkdirSync(outputCursorRulesDir, {recursive: true})
+        }
+
+        // Copy the contents of cursorRulesFromDir to outputCursorRulesDir
+        const files = fs.readdirSync(cursorRulesFromDir)
+        files.forEach((file) => {
+            sh.cp('-rf', p.join(cursorRulesFromDir, file), outputCursorRulesDir)
+        })
+    }
+}
+
+/**
  * Envoke the "npm install" command for the provided project directory.
  *
  * @param {*} outputDir
@@ -332,7 +364,7 @@ const processTemplate = (relFile, inputDir, outputDir, context) => {
  * @param {*} answers
  * @param {*} param2
  */
-const runGenerator = (context, {outputDir, templateVersion, verbose}) => {
+const runGenerator = (context, {initGit, outputDir, templateVersion, verbose}) => {
     const {answers, template} = context
     const {id, source} = template
     const {extend = false} = answers.project
@@ -386,6 +418,11 @@ const runGenerator = (context, {outputDir, templateVersion, verbose}) => {
         assets.forEach((asset) => {
             sh.cp('-rf', p.join(packagePath, asset), outputDir)
         })
+        // Install dependencies for the newly minted project.
+        npmInstall(outputDir, {verbose})
+
+        // Extended project does not contain cursor rules and need explicit copy
+        copyCursorRules(outputDir)
         // Install dependencies for the newly minted project.
         npmInstall(outputDir, {verbose})
 
@@ -537,7 +574,7 @@ const main = async (opts) => {
     let isPreset = false
     let answers = {}
     let selectedTemplate
-    let {outputDir, verbose, preset, templateVersion, stdio, displayProgram} = opts
+    let {outputDir, verbose, preset, templateVersion, stdio, displayProgram, initGit} = opts
     const {prompt} = inquirer
     const OUTPUT_DIR_FLAG_ACTIVE = !!outputDir
     const presetId = preset || process.env.GENERATOR_PRESET
@@ -666,7 +703,7 @@ const main = async (opts) => {
     }
 
     // Generate the project.
-    runGenerator(context, {outputDir, templateVersion, verbose})
+    runGenerator(context, {initGit, outputDir, templateVersion, verbose})
 
     // Return the folder in which the project was generated in.
     return outputDir

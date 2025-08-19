@@ -167,6 +167,18 @@
       "value": "出荷済み"
     }
   ],
+  "account_order_detail.status.cancelled": [
+    {
+      "type": 0,
+      "value": "キャンセル済み"
+    }
+  ],
+  "account_order_detail.status.created": [
+    {
+      "type": 0,
+      "value": "作成済み"
+    }
+  ],
   "account_order_detail.title.order_details": [
     {
       "type": 0,

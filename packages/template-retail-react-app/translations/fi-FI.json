@@ -77,6 +77,12 @@
   "account_order_detail.shipping_status.shipped": {
     "defaultMessage": "Lähetetty"
   },
+  "account_order_detail.status.cancelled": {
+    "defaultMessage": "Peruttu"
+  },
+  "account_order_detail.status.created": {
+    "defaultMessage": "Luotu"
+  },
   "account_order_detail.title.order_details": {
     "defaultMessage": "Tilauksen tiedot"
   },

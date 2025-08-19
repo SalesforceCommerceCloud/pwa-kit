@@ -7,11 +7,13 @@
 
 - Improved the layout of product tiles in product scroll and product list [#2446](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2446)
 - Update the configuration of datacloud [#2467](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2467)
+- Update the configuration of datacloud [#2467](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2467)
 - [a11y] Ensure voiceover announces contents of the email confirmation modal [#2540](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2540)
 - Updated 6 new languages [#2495](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2495)
 - Fix Einstein event tracking for `addToCart` event [#2558](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2558)
 - Password Reset and Passwordless Integration Test [#2669](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2669)
 - Update latest translations for all languages [#2616](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2616)
+- Added support for Buy Online Pick up In Store (BOPIS) [#2646](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2646) [#2716](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2716) [#2726](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2726) [#2629](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2629) [#2823](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2823)
 - Added support for Buy Online Pick up In Store (BOPIS) [#2646](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2646) [#2716](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2716) [#2726](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2726) [#2629](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2629) [#2823](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2823)
 - Load active data scripts on demand only [#2623](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2623)
 - Provide base image for convenient perf optimizations [#2642](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2642)
@@ -24,6 +26,9 @@
 - Introduce store locator [#2542](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2542)
 - Fix passwordless race conditions in form submission [#2758](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2758)
 - Use `<picture>` element for responsive images [#2724](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2724)
+- Add Data Cloud partyIdentification events and improve error handling [#2811](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2811)
+- Introduce the cursor rules to assist project developers [#2820](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2820)
+
 - Add Data Cloud partyIdentification events and improve error handling [#2811](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2811)
 - Introduce the cursor rules to assist project developers [#2820](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2820)
 

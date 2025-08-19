@@ -33,6 +33,37 @@ import Pagination from '@salesforce/retail-react-app/app/components/pagination'
 import PropTypes from 'prop-types'
 import {DEFAULT_ORDERS_SEARCH_PARAMS} from '@salesforce/retail-react-app/app/constants'
 
+// Helper function to get color scheme based on order status
+export const getOrderStatusColorScheme = (status) => {
+    const normalizedStatus = status.toLowerCase().trim()
+
+    switch (normalizedStatus) {
+        case 'cancelled':
+            return {bg: '#ff5722', color: 'white'}
+        case 'created':
+            return {bg: '#cdefc4', color: '#194e31'}
+        default:
+            return {bg: 'gray', color: 'white'}
+    }
+}
+
+export const getLocalizedOrderStatus = (status, formatMessage) => {
+    switch (status?.toLowerCase()) {
+        case 'created':
+            return formatMessage({
+                id: 'account_order_detail.status.created',
+                defaultMessage: 'Created'
+            })
+        case 'cancelled':
+            return formatMessage({
+                id: 'account_order_detail.status.cancelled',
+                defaultMessage: 'Cancelled'
+            })
+        default:
+            return status || ''
+    }
+}
+
 const OrderProductImages = ({productItems}) => {
     const ids = productItems.map((item) => item.productId).join(',') ?? ''
     const {data: {data: products} = {}, isLoading} = useProducts({
@@ -180,7 +211,14 @@ const AccountOrderHistory = () => {
                                                 values={{orderNumber: order.orderNo}}
                                             />
                                         </Text>
-                                        <Badge colorScheme="green">{order.status}</Badge>
+                                        {order.status} &&
+                                        <Badge
+                                            bg={getOrderStatusColorScheme(order.status).bg}
+                                            color={getOrderStatusColorScheme(order.status).color}
+                                            variant="solid"
+                                        >
+                                            {getLocalizedOrderStatus(order.status, formatMessage)}
+                                        </Badge>
                                     </Stack>
                                 </Box>
                                 <Grid templateColumns={{base: 'repeat(auto-fit, 88px)'}} gap={4}>

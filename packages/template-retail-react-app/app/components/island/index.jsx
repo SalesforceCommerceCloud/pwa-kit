@@ -6,6 +6,8 @@
  */
 /* eslint-disable react-hooks/rules-of-hooks */
 /* global globalThis */
+/* eslint-disable react-hooks/rules-of-hooks */
+/* global globalThis */
 import React, {
     Children,
     createContext,
@@ -43,6 +45,9 @@ function findChildren(children, componentType) {
 
 /**
  * This component is intended to give developers explicit and fine-granular control over the
+ * hydration behavior of their experiences. The influence of the `<Island/>` components on the
+ * hydration behavior can be activated or deactivated using the {@link PARTIAL_HYDRATION_ENABLED}
+ * constant.
  * hydration behavior of their experiences. The influence of the `<Island/>` components on the
  * hydration behavior can be activated or deactivated using the {@link PARTIAL_HYDRATION_ENABLED}
  * constant.
