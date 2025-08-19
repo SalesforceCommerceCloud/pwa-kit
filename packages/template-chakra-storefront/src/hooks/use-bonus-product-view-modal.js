@@ -16,4 +16,4 @@ export const useBonusProductViewModal = () => {
         resetDataOnClose: true
     })
     return {isOpen, data, onOpen, onClose}
-} 
+}

@@ -5,10 +5,22 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React, {useContext, useState, useEffect, useMemo, useCallback} from 'react'
+import React, {useContext, useState, useMemo, useCallback} from 'react'
 import PropTypes from 'prop-types'
 import {useIntl} from 'react-intl'
-import {Dialog, Text, Box, VStack, AspectRatio, Skeleton, SimpleGrid, Button, CloseButton, Heading, useBreakpointValue} from '@chakra-ui/react'
+import {
+    Dialog,
+    Text,
+    Box,
+    VStack,
+    AspectRatio,
+    Skeleton,
+    SimpleGrid,
+    Button,
+    CloseButton,
+    Heading,
+    useBreakpointValue
+} from '@chakra-ui/react'
 import {useProducts} from '@salesforce/commerce-sdk-react'
 import DynamicImage from '../components/dynamic-image'
 import {findImageGroupBy} from '../utils/image-groups-utils'
@@ -21,15 +33,19 @@ import {productViewModalTheme} from '../theme/components/project/product-view-mo
 import {useShopperBasketsMutationHelper} from '@salesforce/commerce-sdk-react'
 
 // Dedicated panel for product view mode to keep hooks ordering valid and avoid remounts
-const BonusProductViewPanel = React.memo(({initialProduct, bonusMeta, onBack}) => {
+const BonusProductViewPanel = React.memo(function BonusProductViewPanel({
+    initialProduct,
+    bonusMeta,
+    onBack
+}) {
     const intl = useIntl()
     const productViewModalData = useProductViewModal(initialProduct)
     const {addItemToNewOrExistingBasket} = useShopperBasketsMutationHelper()
 
     //
 
-    const handleAddToCart = useCallback(async (variant, quantity) => {
-        try {
+    const handleAddToCart = useCallback(
+        async (variant, quantity) => {
             const items = [
                 {
                     productId:
@@ -41,13 +57,15 @@ const BonusProductViewPanel = React.memo(({initialProduct, bonusMeta, onBack}) =
             ]
             const result = await addItemToNewOrExistingBasket(items)
             return result
-        } catch (e) {
-            throw e
-        }
-    }, [addItemToNewOrExistingBasket, initialProduct, bonusMeta])
+        },
+        [addItemToNewOrExistingBasket, initialProduct, bonusMeta]
+    )
 
     return (
-        <Box bg={productViewModalTheme.layout.body.background} padding={productViewModalTheme.layout.body.padding}>
+        <Box
+            bg={productViewModalTheme.layout.body.background}
+            padding={productViewModalTheme.layout.body.padding}
+        >
             <ProductView
                 showFullLink={productViewModalTheme.productView.showFullLink}
                 imageSize={productViewModalTheme.productView.imageSize}
@@ -176,9 +194,14 @@ const BonusProductItem = ({product, productData, foundProductData, onSelect, isL
                         Free
                     </Text>
                 </Box>
-                <Button size="sm" variant="outline" width="162px" onClick={() => {
-                    onSelect(product, foundProductData)
-                }}>
+                <Button
+                    size="sm"
+                    variant="outline"
+                    width="162px"
+                    onClick={() => {
+                        onSelect(product, foundProductData)
+                    }}
+                >
                     {intl.formatMessage({
                         id: 'bonus_product_modal.button_select',
                         defaultMessage: 'Select'
@@ -195,6 +218,15 @@ BonusProductItem.propTypes = {
     foundProductData: PropTypes.object,
     onSelect: PropTypes.func.isRequired,
     isLoading: PropTypes.bool
+}
+
+BonusProductViewPanel.propTypes = {
+    initialProduct: PropTypes.object,
+    bonusMeta: PropTypes.shape({
+        bonusDiscountLineItemId: PropTypes.string,
+        promotionId: PropTypes.string
+    }),
+    onBack: PropTypes.func.isRequired
 }
 
 /**
@@ -252,8 +284,8 @@ export const BonusProductSelectionModal = () => {
     }, [productData])
 
     // Switch to product view mode with selected product
-    const switchToProductView = useCallback((bonusProduct, foundProductData) => {
-        try {
+    const switchToProductView = useCallback(
+        (bonusProduct, foundProductData) => {
             const initial = foundProductData || productById.get(bonusProduct?.productId)
             const normalizedInitial = initial
                 ? {productId: initial.id, ...initial}
@@ -264,9 +296,9 @@ export const BonusProductSelectionModal = () => {
                 promotionId: bonusProduct?.promotionId || null
             })
             setModalMode('view')
-        } catch (e) {
-        }
-    }, [productById])
+        },
+        [productById]
+    )
 
     const goBackToSelection = useCallback(() => {
         setModalMode('selection')
@@ -316,10 +348,12 @@ export const BonusProductSelectionModal = () => {
                                 </Heading>
                             ) : (
                                 <Heading as="h3" fontSize={24} fontWeight="700">
-                                    {selectedProduct?.name || selectedProduct?.productName || intl.formatMessage({
-                                        id: 'bonus_product_modal.view_title',
-                                        defaultMessage: 'Bonus Product Details'
-                                    })}
+                                    {selectedProduct?.name ||
+                                        selectedProduct?.productName ||
+                                        intl.formatMessage({
+                                            id: 'bonus_product_modal.view_title',
+                                            defaultMessage: 'Bonus Product Details'
+                                        })}
                                 </Heading>
                             )}
                         </Dialog.Header>
@@ -339,7 +373,11 @@ export const BonusProductSelectionModal = () => {
                                     </Text>
                                 ) : (
                                     <VStack spacing="4">
-                                        <SimpleGrid columns={{base: 1, md: 3}} spacing="4" width="100%">
+                                        <SimpleGrid
+                                            columns={{base: 1, md: 3}}
+                                            spacing="4"
+                                            width="100%"
+                                        >
                                             {uniqueBonusProducts.map((product) => {
                                                 const foundProductData = productData?.data?.find(
                                                     (p) => p.id === product.productId
@@ -376,7 +414,6 @@ export const BonusProductSelectionModal = () => {
                     </Dialog.Content>
                 </Dialog.Positioner>
             </Dialog.Root>
-
         </>
     )
 }

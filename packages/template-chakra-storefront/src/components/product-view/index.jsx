@@ -327,9 +327,14 @@ const ProductView = forwardRef(
                     // See wishlist_primary_action for example.
                     if (itemsAdded) {
                         if (suppressAddToCartModal) {
-                            console.log('[PV:SUPPRESS_ADD_TO_CART_MODAL] Skipping add-to-cart modal open', {productId: product?.id})
+                            console.log(
+                                '[PV:SUPPRESS_ADD_TO_CART_MODAL] Skipping add-to-cart modal open',
+                                {productId: product?.id}
+                            )
                         } else {
-                            console.log('[PV:OPEN_ATC_MODAL] Opening add-to-cart modal', {productId: product?.id})
+                            console.log('[PV:OPEN_ATC_MODAL] Opening add-to-cart modal', {
+                                productId: product?.id
+                            })
                             onAddToCartModalOpen({
                                 product,
                                 itemsAdded,
