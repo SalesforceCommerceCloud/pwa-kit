@@ -7,7 +7,8 @@
 
 import {useShopperBasketsMutation} from '@salesforce/commerce-sdk-react'
 import {useCallback} from 'react'
-import {useErrorHandler} from '@salesforce/retail-react-app/app/hooks/use-error-handler'
+import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
+import logger from '@salesforce/retail-react-app/app/utils/logger-instance'
 import {cleanAddressForOrder} from '@salesforce/retail-react-app/app/utils/shipment-utils'
 
 /**
@@ -17,12 +18,28 @@ import {cleanAddressForOrder} from '@salesforce/retail-react-app/app/utils/shipm
  * @returns {Object} Object containing shipment operation functions
  */
 export const useShipmentOperations = (basketId) => {
-    const handleError = useErrorHandler()
+    const {showToast} = useToast()
     const createShipmentMutation = useShopperBasketsMutation('createShipmentForBasket')
     const removeShipmentMutation = useShopperBasketsMutation('removeShipmentFromBasket')
     const updateShipmentMutation = useShopperBasketsMutation('updateShipmentForBasket')
     const updateShippingMethodMutation = useShopperBasketsMutation(
         'updateShippingMethodForShipment'
+    )
+
+    const handleError = useCallback(
+        (message, error) => {
+            logger.warn(message, {
+                namespace: 'useShipmentOperations.handleError',
+                additionalProperties: {
+                    error: error
+                }
+            })
+            showToast({
+                title: message,
+                status: 'error'
+            })
+        },
+        [showToast]
     )
 
     /**

@@ -18,10 +18,6 @@ jest.mock('./use-pickup-shipment', () => ({
     usePickupShipment: jest.fn()
 }))
 
-jest.mock('@salesforce/retail-react-app/app/hooks/use-error-handler', () => ({
-    useErrorHandler: jest.fn(() => jest.fn())
-}))
-
 jest.mock('@salesforce/retail-react-app/app/hooks/use-toast', () => ({
     useToast: jest.fn(() => ({
         showToast: jest.fn()

@@ -6,32 +6,39 @@
  */
 
 import {renderHook} from '@testing-library/react'
+import {useShopperBasketsMutation} from '@salesforce/commerce-sdk-react'
 import {useItemMovement} from '@salesforce/retail-react-app/app/hooks/use-item-movement'
 
-// Mock the commerce SDK
+// Mock the commerce SDK hooks
 jest.mock('@salesforce/commerce-sdk-react', () => ({
     useShopperBasketsMutation: jest.fn()
 }))
 
-// Mock the error handler hook
-jest.mock('@salesforce/retail-react-app/app/hooks/use-error-handler', () => ({
-    useErrorHandler: jest.fn(() => jest.fn())
-}))
-
-// Mock the toast hook
+// Mock useToast
 jest.mock('@salesforce/retail-react-app/app/hooks/use-toast', () => ({
     useToast: jest.fn(() => ({
         showToast: jest.fn()
     }))
 }))
 
-// Import the mocked module
-import {useShopperBasketsMutation} from '@salesforce/commerce-sdk-react'
+// Mock logger
+jest.mock('@salesforce/retail-react-app/app/utils/logger-instance', () => ({
+    __esModule: true,
+    default: {
+        warn: jest.fn(),
+        error: jest.fn()
+    }
+}))
+
+import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
+import logger from '@salesforce/retail-react-app/app/utils/logger-instance'
 
 describe('useItemMovement', () => {
     let mockUpdateItemInBasketMutation
     let mockUpdateItemsInBasketMutation
     let mockUseShopperBasketsMutation
+    let mockShowToast
+    let mockLoggerWarn
 
     beforeEach(() => {
         mockUpdateItemInBasketMutation = {
@@ -40,6 +47,8 @@ describe('useItemMovement', () => {
         mockUpdateItemsInBasketMutation = {
             mutateAsync: jest.fn()
         }
+        mockShowToast = jest.fn()
+        mockLoggerWarn = jest.fn()
 
         mockUseShopperBasketsMutation = jest.fn((mutationType) => {
             switch (mutationType) {
@@ -53,6 +62,8 @@ describe('useItemMovement', () => {
         })
 
         useShopperBasketsMutation.mockImplementation(mockUseShopperBasketsMutation)
+        useToast.mockReturnValue({showToast: mockShowToast})
+        logger.warn.mockImplementation(mockLoggerWarn)
     })
 
     afterEach(() => {
@@ -123,6 +134,20 @@ describe('useItemMovement', () => {
             await expect(
                 result.current.updateItemToPickupShipment(productItem, 'shipment', 'inventory')
             ).rejects.toThrow('API Error')
+
+            expect(mockLoggerWarn).toHaveBeenCalledWith(
+                'Failed to update item to pickup shipment',
+                {
+                    namespace: 'useItemMovement.handleError',
+                    additionalProperties: {
+                        error: error
+                    }
+                }
+            )
+            expect(mockShowToast).toHaveBeenCalledWith({
+                title: 'Failed to update item to pickup shipment',
+                status: 'error'
+            })
         })
     })
 
@@ -240,6 +265,20 @@ describe('useItemMovement', () => {
             await expect(
                 result.current.updateItemToDeliveryShipment(productItem, 'shipment', 'inventory')
             ).rejects.toThrow('API Error')
+
+            expect(mockLoggerWarn).toHaveBeenCalledWith(
+                'Failed to update item to delivery shipment',
+                {
+                    namespace: 'useItemMovement.handleError',
+                    additionalProperties: {
+                        error: error
+                    }
+                }
+            )
+            expect(mockShowToast).toHaveBeenCalledWith({
+                title: 'Failed to update item to delivery shipment',
+                status: 'error'
+            })
         })
     })
 
@@ -322,6 +361,20 @@ describe('useItemMovement', () => {
             await expect(
                 result.current.updateItemsToDeliveryShipment(productItems, 'shipment', 'inventory')
             ).rejects.toThrow('API Error')
+
+            expect(mockLoggerWarn).toHaveBeenCalledWith(
+                'Failed to update items to delivery shipment',
+                {
+                    namespace: 'useItemMovement.handleError',
+                    additionalProperties: {
+                        error: error
+                    }
+                }
+            )
+            expect(mockShowToast).toHaveBeenCalledWith({
+                title: 'Failed to update items to delivery shipment',
+                status: 'error'
+            })
         })
     })
 
@@ -402,6 +455,20 @@ describe('useItemMovement', () => {
             await expect(
                 result.current.updateItemsToPickupShipment(productItems, 'shipment', 'inventory')
             ).rejects.toThrow('API Error')
+
+            expect(mockLoggerWarn).toHaveBeenCalledWith(
+                'Failed to update items to pickup shipment',
+                {
+                    namespace: 'useItemMovement.handleError',
+                    additionalProperties: {
+                        error: error
+                    }
+                }
+            )
+            expect(mockShowToast).toHaveBeenCalledWith({
+                title: 'Failed to update items to pickup shipment',
+                status: 'error'
+            })
         })
     })
 
@@ -549,6 +616,17 @@ describe('useItemMovement', () => {
                     mockFindOrCreateDeliveryShipment
                 )
             ).rejects.toThrow('Failed to find or create shipment')
+
+            expect(mockLoggerWarn).toHaveBeenCalledWith('Failed to handle delivery option change', {
+                namespace: 'useItemMovement.handleError',
+                additionalProperties: {
+                    error: expect.any(Error)
+                }
+            })
+            expect(mockShowToast).toHaveBeenCalledWith({
+                title: 'Failed to handle delivery option change',
+                status: 'error'
+            })
         })
     })
 })

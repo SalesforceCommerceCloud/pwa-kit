@@ -6,24 +6,32 @@
  */
 
 import {renderHook} from '@testing-library/react'
+import {useShopperBasketsMutation} from '@salesforce/commerce-sdk-react'
 import {useShipmentOperations} from '@salesforce/retail-react-app/app/hooks/use-shipment-operations'
 
-// Mock the commerce SDK
+// Mock the commerce SDK hooks
 jest.mock('@salesforce/commerce-sdk-react', () => ({
     useShopperBasketsMutation: jest.fn()
 }))
 
-// Mock the error handler hook
-jest.mock('@salesforce/retail-react-app/app/hooks/use-error-handler', () => ({
-    useErrorHandler: jest.fn(() => jest.fn())
-}))
-
-// Mock the toast hook
+// Mock useToast
 jest.mock('@salesforce/retail-react-app/app/hooks/use-toast', () => ({
     useToast: jest.fn(() => ({
         showToast: jest.fn()
     }))
 }))
+
+// Mock logger
+jest.mock('@salesforce/retail-react-app/app/utils/logger-instance', () => ({
+    __esModule: true,
+    default: {
+        warn: jest.fn(),
+        error: jest.fn()
+    }
+}))
+
+import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
+import logger from '@salesforce/retail-react-app/app/utils/logger-instance'
 
 describe('useShipmentOperations', () => {
     let mockCreateShipmentMutation
@@ -31,6 +39,8 @@ describe('useShipmentOperations', () => {
     let mockUpdateShipmentMutation
     let mockUpdateShippingMethodMutation
     let mockUseShopperBasketsMutation
+    let mockShowToast
+    let mockLoggerWarn
 
     beforeEach(() => {
         mockCreateShipmentMutation = {
@@ -45,6 +55,8 @@ describe('useShipmentOperations', () => {
         mockUpdateShippingMethodMutation = {
             mutateAsync: jest.fn()
         }
+        mockShowToast = jest.fn()
+        mockLoggerWarn = jest.fn()
 
         mockUseShopperBasketsMutation = jest.fn((mutationType) => {
             switch (mutationType) {
@@ -61,8 +73,9 @@ describe('useShipmentOperations', () => {
             }
         })
 
-        const {useShopperBasketsMutation} = jest.requireMock('@salesforce/commerce-sdk-react')
         useShopperBasketsMutation.mockImplementation(mockUseShopperBasketsMutation)
+        useToast.mockReturnValue({showToast: mockShowToast})
+        logger.warn.mockImplementation(mockLoggerWarn)
     })
 
     afterEach(() => {
@@ -177,6 +190,17 @@ describe('useShipmentOperations', () => {
             const {result} = renderHook(() => useShipmentOperations(basketId))
 
             await expect(result.current.createShipment({})).rejects.toThrow('API Error')
+
+            expect(mockLoggerWarn).toHaveBeenCalledWith('Failed to create shipment', {
+                namespace: 'useShipmentOperations.handleError',
+                additionalProperties: {
+                    error: error
+                }
+            })
+            expect(mockShowToast).toHaveBeenCalledWith({
+                title: 'Failed to create shipment',
+                status: 'error'
+            })
         })
     })
 
@@ -216,6 +240,17 @@ describe('useShipmentOperations', () => {
             const {result} = renderHook(() => useShipmentOperations(basketId))
 
             await expect(result.current.removeShipment(shipmentId)).rejects.toThrow('API Error')
+
+            expect(mockLoggerWarn).toHaveBeenCalledWith('Failed to remove shipment', {
+                namespace: 'useShipmentOperations.handleError',
+                additionalProperties: {
+                    error: error
+                }
+            })
+            expect(mockShowToast).toHaveBeenCalledWith({
+                title: 'Failed to remove shipment',
+                status: 'error'
+            })
         })
     })
 
@@ -279,6 +314,17 @@ describe('useShipmentOperations', () => {
             await expect(result.current.updateShipmentAddress(shipmentId, address)).rejects.toThrow(
                 'API Error'
             )
+
+            expect(mockLoggerWarn).toHaveBeenCalledWith('Failed to update shipment address', {
+                namespace: 'useShipmentOperations.handleError',
+                additionalProperties: {
+                    error: error
+                }
+            })
+            expect(mockShowToast).toHaveBeenCalledWith({
+                title: 'Failed to update shipment address',
+                status: 'error'
+            })
         })
     })
 
@@ -327,6 +373,17 @@ describe('useShipmentOperations', () => {
             await expect(
                 result.current.updateShippingMethod(shipmentId, shippingMethodId)
             ).rejects.toThrow('API Error')
+
+            expect(mockLoggerWarn).toHaveBeenCalledWith('Failed to update shipping method', {
+                namespace: 'useShipmentOperations.handleError',
+                additionalProperties: {
+                    error: error
+                }
+            })
+            expect(mockShowToast).toHaveBeenCalledWith({
+                title: 'Failed to update shipping method',
+                status: 'error'
+            })
         })
     })
 })

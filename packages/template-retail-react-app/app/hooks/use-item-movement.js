@@ -7,7 +7,8 @@
 
 import {useShopperBasketsMutation} from '@salesforce/commerce-sdk-react'
 import {useCallback} from 'react'
-import {useErrorHandler} from '@salesforce/retail-react-app/app/hooks/use-error-handler'
+import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
+import logger from '@salesforce/retail-react-app/app/utils/logger-instance'
 import {DEFAULT_SHIPMENT_ID} from '@salesforce/retail-react-app/app/constants'
 
 /**
@@ -17,9 +18,25 @@ import {DEFAULT_SHIPMENT_ID} from '@salesforce/retail-react-app/app/constants'
  * @returns {Object} Object containing item movement functions
  */
 export const useItemMovement = (basketId) => {
-    const handleError = useErrorHandler()
+    const {showToast} = useToast()
     const updateItemInBasketMutation = useShopperBasketsMutation('updateItemInBasket')
     const updateItemsInBasketMutation = useShopperBasketsMutation('updateItemsInBasket')
+
+    const handleError = useCallback(
+        (message, error) => {
+            logger.warn(message, {
+                namespace: 'useItemMovement.handleError',
+                additionalProperties: {
+                    error: error
+                }
+            })
+            showToast({
+                title: message,
+                status: 'error'
+            })
+        },
+        [showToast]
+    )
 
     /**
      * Updates a product item to a pickup shipment
