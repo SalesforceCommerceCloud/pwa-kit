@@ -26,7 +26,8 @@ import ShippingMultiAddress from '@salesforce/retail-react-app/app/pages/checkou
 import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
 import {useMultiship} from '@salesforce/retail-react-app/app/hooks/use-multiship'
 import {usePickupShipment} from '@salesforce/retail-react-app/app/hooks/use-pickup-shipment'
-import {DEFAULT_SHIPMENT_ID, MULTISHIP_IS_ENABLED} from '@salesforce/retail-react-app/app/constants'
+import {DEFAULT_SHIPMENT_ID} from '@salesforce/retail-react-app/app/constants'
+import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 
 const submitButtonMessage = defineMessage({
     defaultMessage: 'Continue to Shipping Method',
@@ -62,6 +63,7 @@ export default function ShippingAddress() {
     const [isLoading, setIsLoading] = useState()
     const {data: customer} = useCurrentCustomer()
     const {data: basket} = useCurrentBasket()
+    const multishipEnabled = getConfig()?.app?.multishipEnabled
     const {isCurrentShippingMethodPickup} = usePickupShipment(basket)
     const {findExistingDeliveryShipment, moveItemsToDeliveryShipment, removeEmptyShipments} =
         useMultiship(basket)
@@ -212,14 +214,14 @@ export default function ShippingAddress() {
                       })
             }
             editAction={
-                MULTISHIP_IS_ENABLED
+                multishipEnabled
                     ? isMultiShipping
                         ? formatMessage(shipToOneAddressLabel)
                         : formatMessage(deliverToMultipleAddressesLabel)
                     : null
             }
             onEditActionClick={
-                MULTISHIP_IS_ENABLED
+                multishipEnabled
                     ? async () => {
                           setIsMultiShipping(!isMultiShipping)
                       }

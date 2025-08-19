@@ -28,6 +28,7 @@ import {
     bundleProductItemsForPDP
 } from '@salesforce/retail-react-app/app/mocks/product-bundle'
 import {mockStandardProductOrderable} from '@salesforce/retail-react-app/app/mocks/standard-product'
+import mockConfig from '@salesforce/retail-react-app/config/mocks/default'
 
 jest.setTimeout(60000)
 
@@ -79,12 +80,24 @@ jest.mock('@salesforce/retail-react-app/app/components/recommended-products', ()
     return MockedRecommendedProducts
 })
 
+// Mock getConfig to return test values
+jest.mock('@salesforce/pwa-kit-runtime/utils/ssr-config', () => ({
+    getConfig: jest.fn(() => ({
+        ...mockConfig,
+        app: {
+            ...mockConfig.app,
+            storeLocatorEnabled: true,
+            multishipEnabled: false
+        }
+    }))
+}))
+
 jest.mock('@salesforce/retail-react-app/app/constants', () => {
     const originalModule = jest.requireActual('@salesforce/retail-react-app/app/constants')
     return {
         ...originalModule,
         DEFAULT_DNT_STATE: false,
-        MULTISHIP_IS_ENABLED: false
+        STORE_LOCATOR_IS_ENABLED: true
     }
 })
 

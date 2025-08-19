@@ -23,21 +23,52 @@ jest.mock('@salesforce/retail-react-app/app/hooks/use-toast')
 jest.mock('@salesforce/retail-react-app/app/hooks/use-multiship')
 jest.mock('@salesforce/retail-react-app/app/hooks/use-pickup-shipment')
 
-// Mock constants with a configurable function
+// Mock the constants and getConfig with dynamic values for testing
 let mockMultishipEnabled = true
+let mockStoreLocatorEnabled = true
+
+jest.mock('@salesforce/pwa-kit-runtime/utils/ssr-config', () => ({
+    getConfig: jest.fn(() => ({
+        app: {
+            multishipEnabled: mockMultishipEnabled,
+            storeLocatorEnabled: mockStoreLocatorEnabled
+        }
+    }))
+}))
 
 jest.mock('@salesforce/retail-react-app/app/constants', () => ({
     get DEFAULT_SHIPMENT_ID() {
         return 'me'
     },
-    get MULTISHIP_IS_ENABLED() {
-        return mockMultishipEnabled
+    get STORE_LOCATOR_IS_ENABLED() {
+        return mockStoreLocatorEnabled
     }
 }))
 
-// Helper function to set MULTISHIP_IS_ENABLED for tests
+// Helper function to set multishipEnabled for tests
 const setMultishipEnabled = (enabled) => {
     mockMultishipEnabled = enabled
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    const {getConfig} = require('@salesforce/pwa-kit-runtime/utils/ssr-config')
+    getConfig.mockReturnValue({
+        app: {
+            multishipEnabled: enabled,
+            storeLocatorEnabled: mockStoreLocatorEnabled
+        }
+    })
+}
+
+// Helper function to set storeLocatorEnabled for tests
+const setStoreLocatorEnabled = (enabled) => {
+    mockStoreLocatorEnabled = enabled
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    const {getConfig} = require('@salesforce/pwa-kit-runtime/utils/ssr-config')
+    getConfig.mockReturnValue({
+        app: {
+            multishipEnabled: mockMultishipEnabled,
+            storeLocatorEnabled: enabled
+        }
+    })
 }
 
 // Mock mutation hooks to prevent QueryClient errors
@@ -249,8 +280,9 @@ const renderWithIntl = (component) => {
 
 describe('ShippingAddress', () => {
     beforeEach(() => {
-        // Reset MULTISHIP_IS_ENABLED to default value for test isolation
+        // Reset multishipEnabled to default value for test isolation
         setMultishipEnabled(true)
+        setStoreLocatorEnabled(true)
 
         mockCheckoutContext.goToStep.mockClear()
         mockShowToast.mockClear()
@@ -290,6 +322,17 @@ describe('ShippingAddress', () => {
 
     afterEach(() => {
         jest.clearAllMocks()
+        // Reset to default values
+        mockMultishipEnabled = true
+        mockStoreLocatorEnabled = true
+        // eslint-disable-next-line @typescript-eslint/no-var-requires
+        const {getConfig} = require('@salesforce/pwa-kit-runtime/utils/ssr-config')
+        getConfig.mockReturnValue({
+            app: {
+                multishipEnabled: mockMultishipEnabled,
+                storeLocatorEnabled: mockStoreLocatorEnabled
+            }
+        })
     })
 
     it('should render shipping address selection for single shipping', () => {
@@ -534,13 +577,13 @@ describe('ShippingAddress', () => {
         })
     })
 
-    describe('MULTISHIP_IS_ENABLED behavior', () => {
-        describe('when MULTISHIP_IS_ENABLED is true', () => {
+    describe('multishipEnabled behavior', () => {
+        describe('when multishipEnabled is true', () => {
             beforeEach(() => {
                 setMultishipEnabled(true)
             })
 
-            it('should show "Ship to Multiple Addresses" button when MULTISHIP_IS_ENABLED is true', () => {
+            it('should show "Ship to Multiple Addresses" button when multishipEnabled is true', () => {
                 // Mock that we're in editing mode with multiple items
                 const editingContext = {
                     ...mockCheckoutContext,
@@ -571,12 +614,12 @@ describe('ShippingAddress', () => {
             })
         })
 
-        describe('when MULTISHIP_IS_ENABLED is false', () => {
+        describe('when multishipEnabled is false', () => {
             beforeEach(() => {
                 setMultishipEnabled(false)
             })
 
-            it('should not show "Ship to Multiple Addresses" button when MULTISHIP_IS_ENABLED is false', () => {
+            it('should not show "Ship to Multiple Addresses" button when multishipEnabled is false', () => {
                 const editingContext = {
                     ...mockCheckoutContext,
                     step: 3 // SHIPPING_ADDRESS
@@ -588,7 +631,7 @@ describe('ShippingAddress', () => {
                 expect(screen.queryByTestId('edit-action-button')).not.toBeInTheDocument()
             })
 
-            it('should still show shipping address selection when MULTISHIP_IS_ENABLED is false', () => {
+            it('should still show shipping address selection when multishipEnabled is false', () => {
                 // Mock that we're in editing mode
                 const editingContext = {
                     ...mockCheckoutContext,
@@ -605,7 +648,7 @@ describe('ShippingAddress', () => {
             })
         })
 
-        describe('common behavior regardless of MULTISHIP_IS_ENABLED setting', () => {
+        describe('common behavior regardless of multishipEnabled setting', () => {
             it('should show edit mode when in shipping address step', () => {
                 setMultishipEnabled(true) // Test with enabled
                 const editingContext = {

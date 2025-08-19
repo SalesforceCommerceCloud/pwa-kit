@@ -35,8 +35,7 @@ import UnavailableProductConfirmationModal from '@salesforce/retail-react-app/ap
 import {
     API_ERROR_MESSAGE,
     TOAST_MESSAGE_REMOVED_ITEM_FROM_CART,
-    STORE_LOCATOR_IS_ENABLED,
-    MULTISHIP_IS_ENABLED
+    STORE_LOCATOR_IS_ENABLED
 } from '@salesforce/retail-react-app/app/constants'
 import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
 import LoadingSpinner from '@salesforce/retail-react-app/app/components/loading-spinner'
@@ -58,24 +57,23 @@ const Checkout = () => {
     const isSocialEnabled = !!social?.enabled
     const isPasswordlessEnabled = !!passwordless?.enabled
     const {removeEmptyShipments} = useMultiship(basket)
+    const multishipEnabled = getConfig()?.app?.multishipEnabled
+    const storeLocatorEnabled = getConfig()?.app?.storeLocatorEnabled ?? STORE_LOCATOR_IS_ENABLED
 
     // cart has both pickup and delivery orders
     const isDeliveryAndPickupOrder =
-        STORE_LOCATOR_IS_ENABLED &&
-        MULTISHIP_IS_ENABLED &&
+        storeLocatorEnabled &&
+        multishipEnabled &&
         basket?.shipments?.some((shipment) => isPickupShipment(shipment)) &&
         basket?.shipments?.some((shipment) => !isPickupShipment(shipment))
 
     // Check if there are pickup shipments
     const hasPickupShipments =
-        STORE_LOCATOR_IS_ENABLED &&
-        basket?.shipments?.some((shipment) => isPickupShipment(shipment))
+        storeLocatorEnabled && basket?.shipments?.some((shipment) => isPickupShipment(shipment))
 
     // Only enable BOPIS functionality if the feature toggle is on
     const isPickupOrderOnly =
-        STORE_LOCATOR_IS_ENABLED &&
-        !isDeliveryAndPickupOrder &&
-        isPickupShipment(basket?.shipments?.[0])
+        storeLocatorEnabled && !isDeliveryAndPickupOrder && isPickupShipment(basket?.shipments?.[0])
 
     useEffect(() => {
         if (error || step === 4) {

@@ -146,6 +146,7 @@ const App = (props) => {
         onOpen: onOpenStoreLocator,
         onClose: onCloseStoreLocator
     } = useStoreLocatorModal()
+    const storeLocatorEnabled = getConfig()?.app?.storeLocatorEnabled ?? STORE_LOCATOR_IS_ENABLED
 
     const [isOnline, setIsOnline] = useState(true)
     const styles = useStyleConfig('App')
@@ -375,7 +376,7 @@ const App = (props) => {
 
                         <Box id="app" display="flex" flexDirection="column" flex={1}>
                             <SkipNavLink zIndex="skipLink">Skip to Content</SkipNavLink>
-                            {STORE_LOCATOR_IS_ENABLED && (
+                            {storeLocatorEnabled && (
                                 <StoreLocatorModal
                                     isOpen={isStoreLocatorOpen}
                                     onClose={onCloseStoreLocator}
