@@ -641,9 +641,7 @@ export const ApplePayExpress = ({
             }
 
             const handleApplePayUnavailable = () => {
-                if (manager && manager.setPaymentMethodUnavailable) {
-                    manager.setPaymentMethodUnavailable(PAYMENT_METHOD)
-                }
+                manager.setPaymentMethodUnavailable(PAYMENT_METHOD)
             }
 
             // For PDP mode, we don't need a basket initially but we do need payment methods
