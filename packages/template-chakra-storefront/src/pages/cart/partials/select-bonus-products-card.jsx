@@ -7,6 +7,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import {Box, Heading, Button} from '@chakra-ui/react'
+import {useBonusProductSelectionModalContext} from '../../../hooks/use-bonus-product-selection-modal'
 
 /**
  * Fragment component that renders the "Select Bonus Products" card with promotion callout and selection button
@@ -31,6 +32,7 @@ const SelectBonusProductsCard = ({
     onSelectBonusProducts,
     bonusDiscountLineItem
 }) => {
+    const {onOpen: openBonusSelectionModal} = useBonusProductSelectionModalContext()
     // Use bonusDiscountLineItem data if provided, otherwise fall back to existing logic
     let promotionId
     let maxBonusItems
@@ -122,7 +124,23 @@ const SelectBonusProductsCard = ({
                 colorScheme="blue"
                 size="md"
                 width="full"
-                onClick={() => onSelectBonusProducts()}
+                onClick={() => {
+                    // Build the payload for the bonus selection modal
+                    const modalBonusItems = bonusDiscountLineItem
+                        ? [bonusDiscountLineItem]
+                        : (basket?.bonusDiscountLineItems || []).filter((bli) =>
+                              promotionId ? bli.promotionId === promotionId : true
+                          )
+
+                    if (modalBonusItems.length > 0) {
+                        openBonusSelectionModal({
+                            bonusDiscountLineItems: modalBonusItems
+                        })
+                    }
+
+                    // Preserve existing callback behavior if provided
+                    if (onSelectBonusProducts) onSelectBonusProducts()
+                }}
                 data-testid={`select-bonus-products-btn-${qualifyingProduct.productId}`}
             >
                 Select Bonus Products
