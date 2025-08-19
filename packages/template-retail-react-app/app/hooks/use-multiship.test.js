@@ -168,10 +168,10 @@ describe('useMultiship', () => {
             expect(result.current).toHaveProperty('findExistingPickupShipment')
             expect(result.current).toHaveProperty('createNewDeliveryShipment')
             expect(result.current).toHaveProperty('createNewPickupShipment')
-            expect(result.current).toHaveProperty('moveItemToDeliveryShipment')
-            expect(result.current).toHaveProperty('moveItemsToDeliveryShipment')
-            expect(result.current).toHaveProperty('moveItemToPickupShipment')
-            expect(result.current).toHaveProperty('moveItemsToPickupShipment')
+            expect(result.current).toHaveProperty('updateItemToDeliveryShipment')
+            expect(result.current).toHaveProperty('updateItemsToDeliveryShipment')
+            expect(result.current).toHaveProperty('updateItemToPickupShipment')
+            expect(result.current).toHaveProperty('updateItemsToPickupShipment')
             expect(result.current).toHaveProperty('findOrCreateDeliveryShipment')
             expect(result.current).toHaveProperty('findOrCreatePickupShipment')
             expect(result.current).toHaveProperty('getShipmentForItems')
@@ -1143,21 +1143,21 @@ describe('useMultiship', () => {
         })
     })
 
-    describe('moveItemToPickupShipment', () => {
+    describe('updateItemToPickupShipment', () => {
         const mockProductItem = {
             itemId: 'item-1',
             productId: 'product-1',
             quantity: 1
         }
 
-        test('should move item to pickup shipment', async () => {
+        test('should update item to pickup shipment', async () => {
             const {result} = renderHook(() => useMultiship(mockBasket))
 
             const mockResponse = {basketId: 'test-basket-id'}
             mockUpdateItemInBasket.mockResolvedValue(mockResponse)
 
             await act(async () => {
-                const response = await result.current.moveItemToPickupShipment(
+                const response = await result.current.updateItemToPickupShipment(
                     mockProductItem,
                     'pickup-shipment',
                     'inventory-1'
@@ -1184,7 +1184,7 @@ describe('useMultiship', () => {
 
             await act(async () => {
                 await expect(
-                    result.current.moveItemToPickupShipment(
+                    result.current.updateItemToPickupShipment(
                         mockProductItem,
                         'pickup-shipment',
                         'inventory-1'
@@ -1194,7 +1194,7 @@ describe('useMultiship', () => {
         })
     })
 
-    describe('moveItemToDeliveryShipment', () => {
+    describe('updateItemToDeliveryShipment', () => {
         const mockProductItem = {
             itemId: 'item-1',
             productId: 'product-1',
@@ -1202,14 +1202,14 @@ describe('useMultiship', () => {
             inventoryId: 'inventory-1'
         }
 
-        test('should move item to delivery shipment', async () => {
+        test('should update item to delivery shipment', async () => {
             const {result} = renderHook(() => useMultiship(mockBasket))
 
             const mockResponse = {basketId: 'test-basket-id'}
             mockUpdateItemInBasket.mockResolvedValue(mockResponse)
 
             await act(async () => {
-                const response = await result.current.moveItemToDeliveryShipment(
+                const response = await result.current.updateItemToDeliveryShipment(
                     mockProductItem,
                     'me',
                     mockDefaultInventoryId
@@ -1231,7 +1231,7 @@ describe('useMultiship', () => {
             })
         })
 
-        test('should move item without inventory ID', async () => {
+        test('should update item without inventory ID', async () => {
             const productItemWithoutInventory = {
                 itemId: 'item-1',
                 productId: 'product-1',
@@ -1243,7 +1243,7 @@ describe('useMultiship', () => {
             mockUpdateItemInBasket.mockResolvedValue(mockResponse)
 
             await act(async () => {
-                const response = await result.current.moveItemToDeliveryShipment(
+                const response = await result.current.updateItemToDeliveryShipment(
                     productItemWithoutInventory,
                     'me',
                     mockDefaultInventoryId
@@ -1265,7 +1265,7 @@ describe('useMultiship', () => {
         })
     })
 
-    describe('moveItemsToDeliveryShipment', () => {
+    describe('updateItemsToDeliveryShipment', () => {
         const mockProductItems = [
             {
                 itemId: 'item-1',
@@ -1281,14 +1281,14 @@ describe('useMultiship', () => {
             }
         ]
 
-        test('should move multiple items to delivery shipment', async () => {
+        test('should update multiple items to delivery shipment', async () => {
             const {result} = renderHook(() => useMultiship(mockBasket))
 
             const mockResponse = {basketId: 'test-basket-id'}
             mockUpdateItemsInBasket.mockResolvedValue(mockResponse)
 
             await act(async () => {
-                const response = await result.current.moveItemsToDeliveryShipment(
+                const response = await result.current.updateItemsToDeliveryShipment(
                     mockProductItems,
                     'delivery-shipment',
                     mockDefaultInventoryId
@@ -1326,7 +1326,7 @@ describe('useMultiship', () => {
 
             await act(async () => {
                 await expect(
-                    result.current.moveItemsToDeliveryShipment(
+                    result.current.updateItemsToDeliveryShipment(
                         mockProductItems,
                         'me',
                         mockDefaultInventoryId
@@ -1336,7 +1336,7 @@ describe('useMultiship', () => {
         })
     })
 
-    describe('moveItemsToPickupShipment', () => {
+    describe('updateItemsToPickupShipment', () => {
         const mockProductItems = [
             {
                 itemId: 'item-1',
@@ -1350,14 +1350,14 @@ describe('useMultiship', () => {
             }
         ]
 
-        test('should move multiple items to pickup shipment', async () => {
+        test('should update multiple items to pickup shipment', async () => {
             const {result} = renderHook(() => useMultiship(mockBasket))
 
             const mockResponse = {basketId: 'test-basket-id'}
             mockUpdateItemsInBasket.mockResolvedValue(mockResponse)
 
             await act(async () => {
-                const response = await result.current.moveItemsToPickupShipment(
+                const response = await result.current.updateItemsToPickupShipment(
                     mockProductItems,
                     'pickup-shipment',
                     'inventory-1'
@@ -1395,7 +1395,7 @@ describe('useMultiship', () => {
 
             await act(async () => {
                 await expect(
-                    result.current.moveItemsToPickupShipment(
+                    result.current.updateItemsToPickupShipment(
                         mockProductItems,
                         'pickup-shipment',
                         'inventory-1'

@@ -22,13 +22,13 @@ export const useItemMovement = (basketId) => {
     const updateItemsInBasketMutation = useShopperBasketsMutation('updateItemsInBasket')
 
     /**
-     * Moves a product item to a pickup shipment
-     * @param {Object} productItem - The product item to move
+     * Updates a product item to a pickup shipment
+     * @param {Object} productItem - The product item to update
      * @param {string} targetShipmentId - The target shipment ID
      * @param {string} inventoryId - The inventory ID for the store
      * @returns {Promise<Object>} The updated basket response
      */
-    const moveItemToPickupShipment = useCallback(
+    const updateItemToPickupShipment = useCallback(
         async (productItem, targetShipmentId, inventoryId) => {
             if (!basketId || !productItem?.itemId) {
                 throw new Error('Invalid basket or product item')
@@ -51,7 +51,7 @@ export const useItemMovement = (basketId) => {
                     body: updateData
                 })
             } catch (error) {
-                handleError('Failed to move item to pickup shipment', error)
+                handleError('Failed to update item to pickup shipment', error)
                 throw error
             }
         },
@@ -59,13 +59,13 @@ export const useItemMovement = (basketId) => {
     )
 
     /**
-     * Moves a product item from pickup to delivery shipment
-     * @param {Object} productItem - The product item to move
+     * Updates a product item from pickup to delivery shipment
+     * @param {Object} productItem - The product item to update
      * @param {string} targetShipmentId - The target shipment ID (optional)
      * @param {string} defaultInventoryId - The default inventory ID to use for delivery items (required)
      * @returns {Promise<Object>} The updated basket response
      */
-    const moveItemToDeliveryShipment = useCallback(
+    const updateItemToDeliveryShipment = useCallback(
         async (productItem, targetShipmentId = DEFAULT_SHIPMENT_ID, defaultInventoryId) => {
             if (!basketId || !productItem?.itemId) {
                 throw new Error('Invalid basket or product item')
@@ -92,7 +92,7 @@ export const useItemMovement = (basketId) => {
                     body: updateData
                 })
             } catch (error) {
-                handleError('Failed to move item to delivery shipment', error)
+                handleError('Failed to update item to delivery shipment', error)
                 throw error
             }
         },
@@ -100,13 +100,13 @@ export const useItemMovement = (basketId) => {
     )
 
     /**
-     * Moves multiple product items from pickup to delivery shipment in parallel
-     * @param {Array} productItems - Array of product items to move
+     * Updates multiple product items from pickup to delivery shipment in parallel
+     * @param {Array} productItems - Array of product items to update
      * @param {string} targetShipmentId - The target shipment ID (optional)
      * @param {string} defaultInventoryId - The default inventory ID to use for delivery items (required)
      * @returns {Promise<Object>} The updated basket response
      */
-    const moveItemsToDeliveryShipment = useCallback(
+    const updateItemsToDeliveryShipment = useCallback(
         async (productItems, targetShipmentId = DEFAULT_SHIPMENT_ID, defaultInventoryId) => {
             if (!basketId || !Array.isArray(productItems) || productItems.length === 0) {
                 throw new Error('Invalid basket or product items array')
@@ -130,7 +130,7 @@ export const useItemMovement = (basketId) => {
                     body: updateData
                 })
             } catch (error) {
-                handleError('Failed to move items to delivery shipment', error)
+                handleError('Failed to update items to delivery shipment', error)
                 throw error
             }
         },
@@ -138,13 +138,13 @@ export const useItemMovement = (basketId) => {
     )
 
     /**
-     * Moves multiple product items to pickup shipment in parallel
-     * @param {Array} productItems - Array of product items to move
+     * Updates multiple product items to pickup shipment in parallel
+     * @param {Array} productItems - Array of product items to update
      * @param {string} targetShipmentId - The target shipment ID
      * @param {string} inventoryId - The inventory ID for the store
      * @returns {Promise<Object>} The updated basket response
      */
-    const moveItemsToPickupShipment = useCallback(
+    const updateItemsToPickupShipment = useCallback(
         async (productItems, targetShipmentId, inventoryId) => {
             if (!basketId || !Array.isArray(productItems) || productItems.length === 0) {
                 throw new Error('Invalid basket or product items array')
@@ -167,7 +167,7 @@ export const useItemMovement = (basketId) => {
                     body: updateData
                 })
             } catch (error) {
-                handleError('Failed to move items to pickup shipment', error)
+                handleError('Failed to update items to pickup shipment', error)
                 throw error
             }
         },
@@ -214,8 +214,8 @@ export const useItemMovement = (basketId) => {
                         throw new Error('Failed to find or create shipment')
                     }
 
-                    // Move the item to the pickup shipment
-                    await moveItemToPickupShipment(
+                    // Update the item to the pickup shipment
+                    await updateItemToPickupShipment(
                         productItem,
                         targetShipmentId,
                         storeInfo.inventoryId
@@ -227,8 +227,8 @@ export const useItemMovement = (basketId) => {
                         throw new Error('Failed to find or create shipment')
                     }
 
-                    // Move the item to the delivery shipment
-                    await moveItemToDeliveryShipment(
+                    // Update the item to the delivery shipment
+                    await updateItemToDeliveryShipment(
                         productItem,
                         targetShipmentId,
                         defaultInventoryId
@@ -239,14 +239,14 @@ export const useItemMovement = (basketId) => {
                 throw error
             }
         },
-        [basketId, moveItemToPickupShipment, moveItemToDeliveryShipment, handleError]
+        [basketId, updateItemToPickupShipment, updateItemToDeliveryShipment, handleError]
     )
 
     return {
-        moveItemToPickupShipment,
-        moveItemToDeliveryShipment,
-        moveItemsToDeliveryShipment,
-        moveItemsToPickupShipment,
+        updateItemToPickupShipment,
+        updateItemToDeliveryShipment,
+        updateItemsToDeliveryShipment,
+        updateItemsToPickupShipment,
         handleDeliveryOptionChange
     }
 }

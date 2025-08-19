@@ -59,8 +59,8 @@ describe('useItemMovement', () => {
         jest.clearAllMocks()
     })
 
-    describe('moveItemToPickupShipment', () => {
-        test('should move item to pickup shipment', async () => {
+    describe('updateItemToPickupShipment', () => {
+        test('should update item to pickup shipment', async () => {
             const basketId = 'test-basket-id'
             const productItem = {
                 itemId: 'item-1',
@@ -75,7 +75,7 @@ describe('useItemMovement', () => {
 
             const {result} = renderHook(() => useItemMovement(basketId))
 
-            const response = await result.current.moveItemToPickupShipment(
+            const response = await result.current.updateItemToPickupShipment(
                 productItem,
                 targetShipmentId,
                 inventoryId
@@ -100,7 +100,7 @@ describe('useItemMovement', () => {
             const {result} = renderHook(() => useItemMovement(null))
 
             await expect(
-                result.current.moveItemToPickupShipment({}, 'shipment', 'inventory')
+                result.current.updateItemToPickupShipment({}, 'shipment', 'inventory')
             ).rejects.toThrow('Invalid basket or product item')
         })
 
@@ -108,7 +108,7 @@ describe('useItemMovement', () => {
             const {result} = renderHook(() => useItemMovement('basket-id'))
 
             await expect(
-                result.current.moveItemToPickupShipment(null, 'shipment', 'inventory')
+                result.current.updateItemToPickupShipment(null, 'shipment', 'inventory')
             ).rejects.toThrow('Invalid basket or product item')
         })
 
@@ -121,13 +121,13 @@ describe('useItemMovement', () => {
             const {result} = renderHook(() => useItemMovement(basketId))
 
             await expect(
-                result.current.moveItemToPickupShipment(productItem, 'shipment', 'inventory')
+                result.current.updateItemToPickupShipment(productItem, 'shipment', 'inventory')
             ).rejects.toThrow('API Error')
         })
     })
 
-    describe('moveItemToDeliveryShipment', () => {
-        test('should move item to delivery shipment with default inventory', async () => {
+    describe('updateItemToDeliveryShipment', () => {
+        test('should update item to delivery shipment with default inventory', async () => {
             const basketId = 'test-basket-id'
             const productItem = {
                 itemId: 'item-1',
@@ -143,7 +143,7 @@ describe('useItemMovement', () => {
 
             const {result} = renderHook(() => useItemMovement(basketId))
 
-            const response = await result.current.moveItemToDeliveryShipment(
+            const response = await result.current.updateItemToDeliveryShipment(
                 productItem,
                 targetShipmentId,
                 defaultInventoryId
@@ -164,7 +164,7 @@ describe('useItemMovement', () => {
             expect(response).toEqual(mockResponse)
         })
 
-        test('should move item to delivery shipment without inventory ID', async () => {
+        test('should update item to delivery shipment without inventory ID', async () => {
             const basketId = 'test-basket-id'
             const productItem = {
                 itemId: 'item-1',
@@ -180,7 +180,7 @@ describe('useItemMovement', () => {
 
             const {result} = renderHook(() => useItemMovement(basketId))
 
-            const response = await result.current.moveItemToDeliveryShipment(
+            const response = await result.current.updateItemToDeliveryShipment(
                 productItem,
                 targetShipmentId,
                 defaultInventoryId
@@ -210,7 +210,7 @@ describe('useItemMovement', () => {
 
             const {result} = renderHook(() => useItemMovement(basketId))
 
-            await result.current.moveItemToDeliveryShipment(
+            await result.current.updateItemToDeliveryShipment(
                 productItem,
                 undefined,
                 defaultInventoryId
@@ -238,13 +238,13 @@ describe('useItemMovement', () => {
             const {result} = renderHook(() => useItemMovement(basketId))
 
             await expect(
-                result.current.moveItemToDeliveryShipment(productItem, 'shipment', 'inventory')
+                result.current.updateItemToDeliveryShipment(productItem, 'shipment', 'inventory')
             ).rejects.toThrow('API Error')
         })
     })
 
-    describe('moveItemsToDeliveryShipment', () => {
-        test('should move multiple items to delivery shipment', async () => {
+    describe('updateItemsToDeliveryShipment', () => {
+        test('should update multiple items to delivery shipment', async () => {
             const basketId = 'test-basket-id'
             const productItems = [
                 {
@@ -268,7 +268,7 @@ describe('useItemMovement', () => {
 
             const {result} = renderHook(() => useItemMovement(basketId))
 
-            const response = await result.current.moveItemsToDeliveryShipment(
+            const response = await result.current.updateItemsToDeliveryShipment(
                 productItems,
                 targetShipmentId,
                 defaultInventoryId
@@ -302,7 +302,7 @@ describe('useItemMovement', () => {
             const {result} = renderHook(() => useItemMovement('basket-id'))
 
             await expect(
-                result.current.moveItemsToDeliveryShipment([], 'shipment', 'inventory')
+                result.current.updateItemsToDeliveryShipment([], 'shipment', 'inventory')
             ).rejects.toThrow('Invalid basket or product items array')
         })
 
@@ -315,13 +315,13 @@ describe('useItemMovement', () => {
             const {result} = renderHook(() => useItemMovement(basketId))
 
             await expect(
-                result.current.moveItemsToDeliveryShipment(productItems, 'shipment', 'inventory')
+                result.current.updateItemsToDeliveryShipment(productItems, 'shipment', 'inventory')
             ).rejects.toThrow('API Error')
         })
     })
 
-    describe('moveItemsToPickupShipment', () => {
-        test('should move multiple items to pickup shipment', async () => {
+    describe('updateItemsToPickupShipment', () => {
+        test('should update multiple items to pickup shipment', async () => {
             const basketId = 'test-basket-id'
             const productItems = [
                 {
@@ -343,7 +343,7 @@ describe('useItemMovement', () => {
 
             const {result} = renderHook(() => useItemMovement(basketId))
 
-            const response = await result.current.moveItemsToPickupShipment(
+            const response = await result.current.updateItemsToPickupShipment(
                 productItems,
                 targetShipmentId,
                 inventoryId
@@ -377,7 +377,7 @@ describe('useItemMovement', () => {
             const {result} = renderHook(() => useItemMovement('basket-id'))
 
             await expect(
-                result.current.moveItemsToPickupShipment([], 'shipment', 'inventory')
+                result.current.updateItemsToPickupShipment([], 'shipment', 'inventory')
             ).rejects.toThrow('Invalid basket or product items array')
         })
 
@@ -390,7 +390,7 @@ describe('useItemMovement', () => {
             const {result} = renderHook(() => useItemMovement(basketId))
 
             await expect(
-                result.current.moveItemsToPickupShipment(productItems, 'shipment', 'inventory')
+                result.current.updateItemsToPickupShipment(productItems, 'shipment', 'inventory')
             ).rejects.toThrow('API Error')
         })
     })
