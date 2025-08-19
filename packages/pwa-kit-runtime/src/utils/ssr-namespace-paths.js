@@ -39,7 +39,8 @@ export const getEnvBasePath = () => {
         return ''
     }
 
-    return basePath.replace(/\/$/, '')
+    // Escape base path for safe regex usage. Also remove the trailing slash
+    return basePath.replace(/[.*+?^${}()|[\]\\]/g, '\\$&').replace(/\/$/, '')
 }
 
 export const proxyBasePath = PROXY_PATH_BASE

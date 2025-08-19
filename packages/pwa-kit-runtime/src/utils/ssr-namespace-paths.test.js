@@ -24,4 +24,26 @@ describe('ssr-namespace-paths tests', () => {
         jest.spyOn(ssrConfig, 'getConfig').mockReturnValue({envBasePath: 123})
         expect(getEnvBasePath()).toBe('')
     })
+
+    test('getEnvBasePath removes trailing slash', () => {
+        jest.spyOn(ssrConfig, 'getConfig').mockReturnValue({envBasePath: '/sample/'})
+        expect(getEnvBasePath()).toBe('/sample')
+    })
+
+    test('getEnvBasePath escapes regex characters', () => {
+        jest.spyOn(ssrConfig, 'getConfig').mockReturnValue({envBasePath: '/sample.*'})
+        expect(getEnvBasePath()).toBe('/sample\\.\\*')
+    })
+
+    test('getEnvBasePath escapes multiple regex characters', () => {
+        jest.spyOn(ssrConfig, 'getConfig').mockReturnValue({
+            envBasePath: '/path/with[special]chars'
+        })
+        expect(getEnvBasePath()).toBe('/path/with\\[special\\]chars')
+    })
+
+    test('getEnvBasePath escapes regex characters and removes trailing slash', () => {
+        jest.spyOn(ssrConfig, 'getConfig').mockReturnValue({envBasePath: '/sample.*/'})
+        expect(getEnvBasePath()).toBe('/sample\\.\\*')
+    })
 })
