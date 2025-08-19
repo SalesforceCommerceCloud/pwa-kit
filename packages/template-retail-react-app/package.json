@@ -35,6 +35,8 @@
     "last 4 ChromeAndroid versions"
   ],
   "dependencies": {
+    "@adyen/adyen-web": "^6.17.0",
+    "@adyen/api-library": "^27.0.0",
     "@chakra-ui/icons": "^2.0.19",
     "@chakra-ui/react": "2.7.0",
     "@chakra-ui/skip-nav": "^2.0.15",
@@ -60,8 +62,10 @@
     "base64-arraybuffer": "^0.2.0",
     "bundlesize2": "^0.0.35",
     "card-validator": "^8.1.1",
+    "commerce-sdk-isomorphic": "^3.3.0",
     "cross-env": "^5.2.1",
     "cross-fetch": "^3.1.4",
+    "express-validator": "^7.2.1",
     "focus-visible": "^5.2.0",
     "framer-motion": "^10.12.9",
     "full-icu": "^1.5.0",
