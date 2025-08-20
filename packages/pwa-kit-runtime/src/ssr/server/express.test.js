@@ -1372,7 +1372,12 @@ describe('Base path tests', () => {
 
         const app = RemoteServerFactory._createApp(opts())
 
-        app.get('/callbac?k?*/:param?', (req, res) => {
+        // This route is intentionally made complex to test the following:
+        // 1. Optional characters in route pattern ie. 'k?'
+        // 2. Optional characters in route pattern with groups ie. (c)?
+        // 3. Optional characters in route pattern with path parameters ie. (:param?)
+        // 4. Wildcards ie. '*'
+        app.get('/callba(c)?k?*/:param?', (req, res) => {
             res.status(200).json({message: 'test'})
         })
 

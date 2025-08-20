@@ -525,43 +525,59 @@ export const RemoteServerFactory = {
             let result = ''
             let i = 0
             let inParameter = false
+            let parenDepth = 0
 
             // Step through a route pattern
             // If we encounter a :, we are in a parameter context (ie. /:abc)
             // If we encounter a / we are starting a new path segment (ie. /../abc)
-            // If we encounter a ?, we need to see if we're in a
-            // parameter context or not
+            // If we encounter a (, we are entering a group context (ie. /abc(def)?)
+            // If we encounter a ), we are exiting a group context
+            // If we encounter a ?, we need to see if we're in a parameter or group context
+            // first before we wrap the previous character in parentheses
             while (i < routePattern.length) {
                 const char = routePattern[i]
+
                 if (char === ':') {
                     inParameter = true
+                    result += char
+                } else if (char === '(') {
+                    parenDepth++
+                    result += char
+                } else if (char === ')') {
+                    parenDepth--
                     result += char
                 } else if (char === '/' || char === '\\') {
                     inParameter = false
                     result += char
-                } else if (char === '?' && !inParameter) {
-                    // This ? is not in a parameter context so we
-                    // wrap the previous character in parentheses if
-                    // it is not an escaped ?
+                } else if (char === '?' && !inParameter && parenDepth === 0) {
+                    // This ? is not in a parameter context and not in a group
+                    // Check if the previous character is a closing parenthesis
                     const prevChar = result[result.length - 1]
 
-                    if (prevChar && prevChar !== '\\') {
+                    if (prevChar === ')') {
+                        // The ? follows a closing parenthesis, which means it's part of a group
+                        // Keep it as-is
+                        result += char
+                    } else if (prevChar && prevChar !== '\\') {
                         // Wrap the previous character in parentheses
                         result = result.slice(0, -1) + `(${prevChar})?`
                     } else {
                         // Literal ? or escaped ?, keep as is
                         result += char
                     }
-                } else if (char === '?' && inParameter) {
-                    // This ? is part of a parameter, keep as is
+                } else if (char === '?' && (inParameter || parenDepth > 0)) {
+                    // This ? is part of a parameter or group, keep as is
                     result += char
-                    inParameter = false
+                    if (inParameter) {
+                        inParameter = false
+                    }
                 } else {
                     result += char
                 }
 
                 i++
             }
+
             return result
         }
 
@@ -639,7 +655,7 @@ export const RemoteServerFactory = {
                     try {
                         return routeRegex.test(pathWithoutBase)
                     } catch (error) {
-                        logger.warn(`Invalid route pattern: ${route}`, error)
+                        logger.warn(`Invalid route pattern: ${routeRegex}`, error)
                         return false
                     }
                 })
