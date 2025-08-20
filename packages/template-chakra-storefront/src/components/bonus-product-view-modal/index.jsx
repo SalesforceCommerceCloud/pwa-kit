@@ -7,8 +7,7 @@
 
 import React, {useMemo, useCallback} from 'react'
 import PropTypes from 'prop-types'
-import {Dialog, CloseButton, Button} from '@chakra-ui/react'
-import Link from '../link'
+import {Dialog, CloseButton, Button, Box, Text} from '@chakra-ui/react'
 import ProductView from '../../components/product-view'
 import {useProductViewModal} from '../../hooks/use-product-view-modal'
 import SafePortal from '../safe-portal'
@@ -17,6 +16,7 @@ import {productViewModalTheme} from '../../theme/components/project/product-view
 import {useShopperBasketsMutationHelper} from '@salesforce/commerce-sdk-react'
 import {useCurrentBasket} from '../../hooks/use-current-basket'
 import {findAvailableBonusDiscountLineItemId} from '../../utils/bonus-product-utils'
+import useNavigation from '../../hooks/use-navigation'
 
 /**
  * A Dialog that contains Bonus Product View using product-view-modal theme
@@ -27,11 +27,29 @@ const BonusProductViewModal = ({
     onClose,
     bonusDiscountLineItemId,
     promotionId,
+    withBackdrop = true,
     ...props
 }) => {
-    const productViewModalData = useProductViewModal(product)
+    // Ensure a safe product shape for the modal hook
+    const safeProduct = useMemo(() => {
+        if (!product) return {productId: undefined, variants: [], variationAttributes: []}
+        const id = product.productId || product.id
+        return {
+            productId: id,
+            id,
+            variants: product.variants || [],
+            variationAttributes: product.variationAttributes || [],
+            imageGroups: product.imageGroups || [],
+            type: product.type || {set: false, bundle: false},
+            price: product.price,
+            name: product.name || product.productName
+        }
+    }, [product])
+
+    const productViewModalData = useProductViewModal(safeProduct)
     const {addItemToNewOrExistingBasket} = useShopperBasketsMutationHelper()
     const {data: basket} = useCurrentBasket()
+    const navigate = useNavigation()
 
     const intl = useIntl()
     const {formatMessage} = intl
@@ -64,14 +82,6 @@ const BonusProductViewModal = ({
                 bonusDiscountLineItemId // fallback to originally passed id
             )
 
-            console.log('🎁 BonusProductViewModal addToCart:', {
-                productId: variant?.productId || product?.id,
-                promotionId,
-                originalBonusDiscountLineItemId: bonusDiscountLineItemId,
-                selectedBonusDiscountLineItemId: availableBonusDiscountLineItemId,
-                quantity
-            })
-
             const productItems = [
                 {
                     productId: variant?.productId || product?.id,
@@ -82,33 +92,58 @@ const BonusProductViewModal = ({
             ]
 
             const result = await addItemToNewOrExistingBasket(productItems)
+
+            // Navigate to cart page after successful add to cart
+            if (result) {
+                onClose()
+                navigate('/cart', 'push')
+            }
+
             return result
         },
-        [addItemToNewOrExistingBasket, product, bonusDiscountLineItemId, promotionId, basket]
+        [
+            addItemToNewOrExistingBasket,
+            product,
+            bonusDiscountLineItemId,
+            promotionId,
+            basket,
+            onClose,
+            navigate
+        ]
     )
 
     // Custom buttons for the ProductView
+    const handleViewCart = useCallback(() => {
+        onClose()
+        navigate('/cart', 'push')
+    }, [onClose, navigate])
+
     const customButtons = useMemo(
         () => [
-            <Button key="view-cart" asChild variant="outline" onClick={onClose}>
-                <Link to="/cart">{messages.viewCart}</Link>
+            <Button key="view-cart" variant="outline" onClick={handleViewCart}>
+                {messages.viewCart}
             </Button>
         ],
-        [messages.viewCart, onClose]
+        [messages.viewCart, handleViewCart]
     )
 
     return (
         <Dialog.Root
-            lazyMount
+            key={safeProduct?.productId} // Force remount when product changes to prevent state conflicts
             open={isOpen}
-            onOpenChange={() => onClose()}
+            onOpenChange={(details) => {
+                // Only close when the dialog is actually being closed (not opened)
+                if (!details.open) {
+                    onClose()
+                }
+            }}
             size={productViewModalTheme.modal.size}
             scrollBehavior={productViewModalTheme.modal.scrollBehavior}
             placement={productViewModalTheme.modal.placement}
             closeOnInteractOutside={productViewModalTheme.modal.closeOnInteractOutside}
         >
             <SafePortal>
-                <Dialog.Backdrop />
+                {withBackdrop && <Dialog.Backdrop />}
                 <Dialog.Positioner>
                     <Dialog.Content
                         data-testid="bonus-product-view-modal"
@@ -125,20 +160,26 @@ const BonusProductViewModal = ({
                             paddingBottom={productViewModalTheme.layout.body.paddingBottom}
                             marginTop={productViewModalTheme.layout.body.marginTop}
                         >
-                            <ProductView
-                                showFullLink={false}
-                                imageSize={productViewModalTheme.productView.imageSize}
-                                showImageGallery={
-                                    productViewModalTheme.productView.showImageGallery
-                                }
-                                product={productViewModalData.product}
-                                isLoading={productViewModalData.isFetching}
-                                addToCart={handleAddToCart}
-                                isProductLoading={productViewModalData.isFetching}
-                                customButtons={customButtons}
-                                promotionId={promotionId}
-                                {...props}
-                            />
+                            {productViewModalData.isFetching && !productViewModalData.product ? (
+                                <Box p={8} textAlign="center">
+                                    <Text>Loading product details...</Text>
+                                </Box>
+                            ) : (
+                                <ProductView
+                                    showFullLink={false}
+                                    imageSize={productViewModalTheme.productView.imageSize}
+                                    showImageGallery={
+                                        productViewModalTheme.productView.showImageGallery
+                                    }
+                                    product={productViewModalData.product || safeProduct}
+                                    isLoading={false}
+                                    addToCart={handleAddToCart}
+                                    isProductLoading={false}
+                                    customButtons={customButtons}
+                                    promotionId={promotionId}
+                                    {...props}
+                                />
+                            )}
                         </Dialog.Body>
                         <Dialog.CloseTrigger asChild>
                             <CloseButton size="sm" />
@@ -157,7 +198,8 @@ BonusProductViewModal.propTypes = {
     product: PropTypes.object,
     isLoading: PropTypes.bool,
     bonusDiscountLineItemId: PropTypes.string, // The 'id' from bonusDiscountLineItems
-    promotionId: PropTypes.string // The promotion ID to filter promotions in PromoCallout
+    promotionId: PropTypes.string, // The promotion ID to filter promotions in PromoCallout
+    withBackdrop: PropTypes.bool
 }
 
 export default BonusProductViewModal

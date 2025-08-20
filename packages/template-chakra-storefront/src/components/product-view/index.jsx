@@ -205,7 +205,8 @@ const ProductView = forwardRef(
             setSelectedBundleQuantity = () => {},
             selectedBundleParentQuantity = 1,
             customButtons = [],
-            promotionId
+            promotionId,
+            suppressAddToCartModal = false
         },
         ref
     ) => {
@@ -213,11 +214,11 @@ const ProductView = forwardRef(
         const showError = useErrorHandler()
         const {formatMessage} = useIntl()
         const location = useLocation()
-        const {
-            isOpen: isAddToCartModalOpen,
-            onOpen: onAddToCartModalOpen,
-            onClose: onAddToCartModalClose
-        } = useAddToCartModalContext()
+        const addToCartCtx = useAddToCartModalContext ? useAddToCartModalContext() : undefined
+        const isAddToCartModalOpen = addToCartCtx?.isOpen ?? false
+        const onAddToCartModalOpen = addToCartCtx?.onOpen ?? (() => {})
+        const onAddToCartModalClose = addToCartCtx?.onClose ?? (() => {})
+        //
         const [showOptionsMessage, toggleShowOptionsMessage] = useState(false)
         const {
             showLoading,
@@ -325,11 +326,13 @@ const ProductView = forwardRef(
                     // It's possible that the item has been added to cart, but we don't want to open the modal.
                     // See wishlist_primary_action for example.
                     if (itemsAdded) {
-                        onAddToCartModalOpen({
-                            product,
-                            itemsAdded,
-                            selectedQuantity: quantity
-                        })
+                        if (!suppressAddToCartModal) {
+                            onAddToCartModalOpen({
+                                product,
+                                itemsAdded,
+                                selectedQuantity: quantity
+                            })
+                        }
                     }
                 } catch (e) {
                     showError()
@@ -428,11 +431,8 @@ const ProductView = forwardRef(
         }, [location.pathname])
 
         useEffect(() => {
-            if (
-                !isProductASet &&
-                !isProductABundle &&
-                validateOrderability(variant, quantity, stockLevel)
-            ) {
+            const valid = validateOrderability(variant, quantity, stockLevel)
+            if (!isProductASet && !isProductABundle && valid) {
                 toggleShowOptionsMessage(false)
             }
         }, [variationParams])
@@ -746,7 +746,8 @@ ProductView.propTypes = {
     setSelectedBundleQuantity: PropTypes.func,
     selectedBundleParentQuantity: PropTypes.number,
     customButtons: PropTypes.array,
-    promotionId: PropTypes.string
+    promotionId: PropTypes.string,
+    suppressAddToCartModal: PropTypes.bool
 }
 
 export default ProductView
