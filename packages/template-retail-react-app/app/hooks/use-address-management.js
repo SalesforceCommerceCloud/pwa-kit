@@ -205,14 +205,26 @@ export const useAddressManagement = (basket, deliveryItems) => {
         return selectedRegisteredUserAddresses
     }, [customer?.isGuest, selectedGuestAddresses, selectedRegisteredUserAddresses])
 
-    const selectAddressForItem = useCallback((itemId, addressId) => {
+
+
+    // Function to set addresses for items (handles both single and multiple items)
+    const setAddressesForItems = useCallback((itemIds, addressId) => {
+        // Handle both single item (string) and multiple items (array)
+        const itemIdArray = Array.isArray(itemIds) ? itemIds : [itemIds]
+        
         if (customer?.isGuest) {
             setSelectedGuestAddresses(prev => {
                 const newState = {...prev}
                 if (addressId === '') {
-                    delete newState[itemId]
+                    // Remove selections for specified items
+                    itemIdArray.forEach(itemId => {
+                        delete newState[itemId]
+                    })
                 } else {
-                    newState[itemId] = addressId
+                    // Set selections for specified items
+                    itemIdArray.forEach(itemId => {
+                        newState[itemId] = addressId
+                    })
                 }
                 return newState
             })
@@ -220,29 +232,18 @@ export const useAddressManagement = (basket, deliveryItems) => {
             setSelectedRegisteredUserAddresses(prev => {
                 const newState = {...prev}
                 if (addressId === '') {
-                    delete newState[itemId]
+                    // Remove selections for specified items
+                    itemIdArray.forEach(itemId => {
+                        delete newState[itemId]
+                    })
                 } else {
-                    newState[itemId] = addressId
+                    // Set selections for specified items
+                    itemIdArray.forEach(itemId => {
+                        newState[itemId] = addressId
+                    })
                 }
                 return newState
             })
-        }
-    }, [customer?.isGuest])
-
-    // Function to set addresses for multiple items (useful for initial assignment)
-    const setAddressesForItems = useCallback((itemIds, addressId) => {
-        if (customer?.isGuest) {
-            const newState = {}
-            itemIds.forEach(itemId => {
-                newState[itemId] = addressId
-            })
-            setSelectedGuestAddresses(newState)
-        } else {
-            const newState = {}
-            itemIds.forEach(itemId => {
-                newState[itemId] = addressId
-            })
-            setSelectedRegisteredUserAddresses(newState)
         }
     }, [customer?.isGuest])
 
@@ -259,7 +260,6 @@ export const useAddressManagement = (basket, deliveryItems) => {
     return {
         availableAddresses,
         selectedAddresses,
-        selectAddressForItem,
         addGuestAddress,
         isGuest: customer?.isGuest,
         setAddressesForItems

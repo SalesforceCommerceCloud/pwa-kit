@@ -186,7 +186,6 @@ const ShippingMultiAddress = ({
     const {
         availableAddresses,
         selectedAddresses,
-        selectAddressForItem,
         setAddressesForItems,
         addGuestAddress,
         isGuest: isGuestUser
@@ -344,8 +343,8 @@ const ShippingMultiAddress = ({
                     const itemIds = deliveryItems.map(item => item.itemId)
                     setAddressesForItems(itemIds, newAddress.addressId)
                 } else {
-                    // For subsequent addresses, only assign to the current item
-                    selectAddressForItem(addressKey, newAddress.addressId)
+                                            // For subsequent addresses, only assign to the current item
+                        setAddressesForItems(addressKey, newAddress.addressId)
                 }
 
                 setShowAddAddressForm((prev) => ({...prev, [addressKey]: false}))
@@ -391,7 +390,7 @@ const ShippingMultiAddress = ({
 
                 await refetchCustomer()
 
-                selectAddressForItem(addressKey, createdAddress.addressId)
+                setAddressesForItems(addressKey, createdAddress.addressId)
 
                 showToast({
                     title: formatMessage({
@@ -633,7 +632,7 @@ const ShippingMultiAddress = ({
                                                                     [addressKey]: false
                                                                 }))
 
-                                                                selectAddressForItem(addressKey, value)
+                                                                setAddressesForItems(addressKey, value)
                                                             }}
                                                             disabled={
                                                                 finalAddresses.length === 0 ||
