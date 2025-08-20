@@ -58,6 +58,7 @@ const CheckoutOneClick = () => {
     const [enableUserRegistration, setEnableUserRegistration] = useState(false)
     const [registeredUserChoseGuest, setRegisteredUserChoseGuest] = useState(false)
     const [savedPaymentMethods, setSavedPaymentMethods] = useState(new Set())
+    const [shouldSavePaymentMethod, setShouldSavePaymentMethod] = useState(false)
     const {data: basket} = useCurrentBasket()
     const [error] = useState()
     const {social = {}} = getConfig().app.login || {}
@@ -94,6 +95,10 @@ const CheckoutOneClick = () => {
     // Callback for when payment methods are saved
     const handlePaymentMethodSaved = (paymentId) => {
         setSavedPaymentMethods(prev => new Set([...prev, paymentId]))
+    }
+
+    const handleSavePreferenceChange = (shouldSave) => {
+        setShouldSavePaymentMethod(shouldSave)
     }
 
     const showError = (message) => {
@@ -206,6 +211,33 @@ const CheckoutOneClick = () => {
             }
         }
 
+        // Save payment instrument for existing registered users if they checked the save box
+        const savePaymentInstrumentForRegisteredUser = async (customerId, orderPaymentInstrument) => {
+            try {
+                if (orderPaymentInstrument && shopperPaymentInstrument) {
+                    // Use the same structure as the guest flow
+                    const paymentInstrument = {
+                        paymentMethodId: orderPaymentInstrument.paymentMethodId,
+                        paymentCard: {
+                            holder: shopperPaymentInstrument.holder,
+                            number: shopperPaymentInstrument.number,
+                            cardType: shopperPaymentInstrument.cardType,
+                            expirationMonth: shopperPaymentInstrument.expirationMonth,
+                            expirationYear: shopperPaymentInstrument.expirationYear
+                        }
+                    }
+
+                    await createCustomerPaymentInstruments.mutateAsync({
+                        body: paymentInstrument,
+                        parameters: { customerId: customerId }
+                    })
+                }
+            } catch (error) {
+                console.error('🔍 Debug - Failed to save payment instrument for registered user:', error)
+                // Fail silently
+            }
+        }
+
         const registerUser = async (data) => {
             try {
                 const body = {
@@ -280,6 +312,12 @@ const CheckoutOneClick = () => {
                     address: address,
                     paymentMethodId: order.paymentInstruments[0].paymentMethodId
                 })
+            } else {
+                // For existing registered users, save payment instrument if they checked the save box
+                if (shouldSavePaymentMethod && order.paymentInstruments?.[0]) {
+                    const paymentInstrument = order.paymentInstruments[0]
+                    await savePaymentInstrumentForRegisteredUser(order.customerInfo.customerId, paymentInstrument)
+                }
             }
 
             navigate(`/checkout/confirmation/${order.orderNo}`)
@@ -298,6 +336,16 @@ const CheckoutOneClick = () => {
         try {
             if (!appliedPayment) {
                 await onPaymentSubmit(paymentFormValues)
+            } else {
+                // If payment already exists in basket, still set shopperPaymentInstrument for saving
+                const [expirationMonth, expirationYear] = paymentFormValues.expiry.split('/')
+                shopperPaymentInstrument = {
+                    holder: paymentFormValues.holder,
+                    number: paymentFormValues.number,
+                    cardType: getPaymentInstrumentCardType(paymentFormValues.cardType),
+                    expirationMonth: parseInt(expirationMonth),
+                    expirationYear: parseInt(`20${expirationYear}`)
+                }
             }
 
             // If successful `onBillingSubmit` returns the updated basket. If the form was invalid on
@@ -350,6 +398,7 @@ const CheckoutOneClick = () => {
                                 billingAddressForm={billingAddressForm}
                                 registeredUserChoseGuest={registeredUserChoseGuest}
                                 onPaymentMethodSaved={handlePaymentMethodSaved}
+                                onSavePreferenceChange={handleSavePreferenceChange}
                             />
 
                             {step === 4 && (
@@ -393,3 +442,4 @@ const CheckoutOneClick = () => {
 }
 
 export default CheckoutOneClick
+
