@@ -186,14 +186,11 @@ const ShippingMultiAddress = ({
     const {
         availableAddresses,
         selectedAddresses,
-        selectedGuestAddresses,
-        selectedRegisteredUserAddresses,
         guestAddresses,
         selectAddressForItem,
+        setAddressesForItems,
         addGuestAddress,
         updateGuestAddresses,
-        updateSelectedGuestAddresses,
-        updateSelectedRegisteredUserAddresses,
         allItemsHaveAddress,
         isGuest: isGuestUser
     } = useAddressManagement(basket, deliveryItems)
@@ -345,18 +342,11 @@ const ShippingMultiAddress = ({
 
                 // If this is the first address, apply it to all delivery items
                 if (guestAddresses.length === 0) {
-                    const initialSelected = {}
-                    deliveryItems.forEach((item) => {
-                        const itemKey = item.itemId
-                        initialSelected[itemKey] = newAddress.addressId
-                    })
-                    updateSelectedGuestAddresses(initialSelected)
+                    const itemIds = deliveryItems.map(item => item.itemId)
+                    setAddressesForItems(itemIds, newAddress.addressId)
                 } else {
                     // For subsequent addresses, only assign to the current item
-                    updateSelectedGuestAddresses((prev) => ({
-                        ...prev,
-                        [addressKey]: newAddress.addressId
-                    }))
+                    selectAddressForItem(addressKey, newAddress.addressId)
                 }
 
                 setShowAddAddressForm((prev) => ({...prev, [addressKey]: false}))
@@ -402,10 +392,7 @@ const ShippingMultiAddress = ({
 
                 await refetchCustomer()
 
-                updateSelectedRegisteredUserAddresses((prev) => ({
-                    ...prev,
-                    [addressKey]: createdAddress.addressId
-                }))
+                selectAddressForItem(addressKey, createdAddress.addressId)
 
                 showToast({
                     title: formatMessage({
