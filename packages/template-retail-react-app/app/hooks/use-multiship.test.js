@@ -330,11 +330,11 @@ describe('useMultiship', () => {
                     return method?.id === 'pickup-shipping-method'
                 })
 
-                const foundShipmentId = result.current.findDeliveryShipmentWithSameAddress(
+                const foundShipment = result.current.findDeliveryShipmentWithSameAddress(
                     basketWithAddress,
                     address
                 )
-                expect(foundShipmentId).toBe('delivery-1')
+                expect(foundShipment.shipmentId).toBe('delivery-1')
             })
 
             test('should return null if no matching address found', () => {
@@ -347,22 +347,22 @@ describe('useMultiship', () => {
                 }
                 const {result} = renderHook(() => useMultiship(mockBasket))
 
-                const foundShipmentId = result.current.findDeliveryShipmentWithSameAddress(
+                const foundShipment = result.current.findDeliveryShipmentWithSameAddress(
                     mockBasket,
                     address
                 )
-                expect(foundShipmentId).toBeNull()
+                expect(foundShipment).toBeNull()
             })
 
             test('should return null if basket is null', () => {
                 const {result} = renderHook(() => useMultiship(mockBasket))
                 const address = {address1: '123 Main St'}
 
-                const foundShipmentId = result.current.findDeliveryShipmentWithSameAddress(
+                const foundShipment = result.current.findDeliveryShipmentWithSameAddress(
                     null,
                     address
                 )
-                expect(foundShipmentId).toBeNull()
+                expect(foundShipment).toBeNull()
             })
 
             test('should skip pickup shipments', () => {
@@ -388,11 +388,11 @@ describe('useMultiship', () => {
 
                 mockIsCurrentShippingMethodPickup.mockReturnValue(true)
 
-                const foundShipmentId = result.current.findDeliveryShipmentWithSameAddress(
+                const foundShipment = result.current.findDeliveryShipmentWithSameAddress(
                     basketWithPickupOnly,
                     address
                 )
-                expect(foundShipmentId).toBeNull()
+                expect(foundShipment).toBeNull()
             })
         })
 
@@ -419,9 +419,9 @@ describe('useMultiship', () => {
                     return method?.id === 'pickup-shipping-method'
                 })
 
-                const foundShipmentId =
+                const foundShipment =
                     result.current.findDeliveryShipmentWithoutAddress(basketWithNoAddress)
-                expect(foundShipmentId).toBe('delivery-no-address')
+                expect(foundShipment.shipmentId).toBe('delivery-no-address')
             })
 
             test('should find delivery shipment with empty address (all fields falsey)', () => {
@@ -449,9 +449,9 @@ describe('useMultiship', () => {
 
                 mockIsCurrentShippingMethodPickup.mockReturnValue(false)
 
-                const foundShipmentId =
+                const foundShipment =
                     result.current.findDeliveryShipmentWithoutAddress(basketWithEmptyAddress)
-                expect(foundShipmentId).toBe('delivery-empty-address')
+                expect(foundShipment.shipmentId).toBe('delivery-empty-address')
             })
 
             test('should return undefined for delivery shipment with partially empty address (some fields falsey)', () => {
@@ -479,9 +479,9 @@ describe('useMultiship', () => {
 
                 mockIsCurrentShippingMethodPickup.mockReturnValue(false)
 
-                const foundShipmentId =
+                const foundShipment =
                     result.current.findDeliveryShipmentWithoutAddress(basketWithPartialAddress)
-                expect(foundShipmentId).toBeNull()
+                expect(foundShipment).toBeNull()
             })
 
             test('should return undefined if all delivery shipments have complete addresses', () => {
@@ -509,9 +509,9 @@ describe('useMultiship', () => {
 
                 mockIsCurrentShippingMethodPickup.mockReturnValue(false)
 
-                const foundShipmentId =
+                const foundShipment =
                     result.current.findDeliveryShipmentWithoutAddress(basketWithCompleteAddress)
-                expect(foundShipmentId).toBeNull()
+                expect(foundShipment).toBeNull()
             })
 
             test('should skip pickup shipments when looking for delivery shipments without address', () => {
@@ -530,9 +530,9 @@ describe('useMultiship', () => {
 
                 mockIsCurrentShippingMethodPickup.mockReturnValue(true)
 
-                const foundShipmentId =
+                const foundShipment =
                     result.current.findDeliveryShipmentWithoutAddress(basketWithPickupOnly)
-                expect(foundShipmentId).toBeNull()
+                expect(foundShipment).toBeNull()
             })
 
             test('should find first delivery shipment without address when multiple exist', () => {
@@ -564,10 +564,10 @@ describe('useMultiship', () => {
 
                 mockIsCurrentShippingMethodPickup.mockReturnValue(false)
 
-                const foundShipmentId = result.current.findDeliveryShipmentWithoutAddress(
+                const foundShipment = result.current.findDeliveryShipmentWithoutAddress(
                     basketWithMultipleShipments
                 )
-                expect(foundShipmentId).toBe('delivery-no-address-1')
+                expect(foundShipment.shipmentId).toBe('delivery-no-address-1')
             })
 
             test('should handle mixed address states correctly', () => {
@@ -615,9 +615,9 @@ describe('useMultiship', () => {
                     return method?.id === 'pickup-shipping-method'
                 })
 
-                const foundShipmentId =
+                const foundShipment =
                     result.current.findDeliveryShipmentWithoutAddress(basketWithMixedAddresses)
-                expect(foundShipmentId).toBe('delivery-empty')
+                expect(foundShipment.shipmentId).toBe('delivery-empty')
             })
         })
     })
@@ -651,11 +651,11 @@ describe('useMultiship', () => {
                 const {result} = renderHook(() => useMultiship(mockBasket))
 
                 await act(async () => {
-                    const shipmentId = await result.current.createNewDeliveryShipmentWithAddress(
+                    const shipment = await result.current.createNewDeliveryShipmentWithAddress(
                         mockBasket,
                         address
                     )
-                    expect(shipmentId).toBe('new-delivery-shipment')
+                    expect(shipment.shipmentId).toBe('new-delivery-shipment')
                 })
 
                 expect(mockCreateShipmentForBasket).toHaveBeenCalledWith({
@@ -1849,7 +1849,7 @@ describe('useMultiship', () => {
             }
 
             const {result} = renderHook(() => useMultiship(mockBasket))
-            const foundShipmentId = result.current.findDeliveryShipmentWithSameAddress(
+            const foundShipment = result.current.findDeliveryShipmentWithSameAddress(
                 {
                     ...mockBasket,
                     shipments: [
@@ -1862,7 +1862,7 @@ describe('useMultiship', () => {
                 },
                 address2
             )
-            expect(foundShipmentId).toBe('delivery-1')
+            expect(foundShipment.shipmentId).toBe('delivery-1')
         })
 
         test('should not match addresses with same location/street address but different names', () => {
@@ -1919,7 +1919,7 @@ describe('useMultiship', () => {
             }
 
             const {result} = renderHook(() => useMultiship(mockBasket))
-            const foundShipmentId = result.current.findDeliveryShipmentWithSameAddress(
+            const foundShipment = result.current.findDeliveryShipmentWithSameAddress(
                 {
                     ...mockBasket,
                     shipments: [
@@ -1932,7 +1932,7 @@ describe('useMultiship', () => {
                 },
                 address2
             )
-            expect(foundShipmentId).toBe('delivery-1')
+            expect(foundShipment.shipmentId).toBe('delivery-1')
         })
 
         test('should handle missing & present names respectively in both addresses', () => {
@@ -1992,7 +1992,7 @@ describe('useMultiship', () => {
             }
 
             const {result} = renderHook(() => useMultiship(mockBasket))
-            const foundShipmentId = result.current.findDeliveryShipmentWithSameAddress(
+            const foundShipment = result.current.findDeliveryShipmentWithSameAddress(
                 {
                     ...mockBasket,
                     shipments: [
@@ -2005,7 +2005,7 @@ describe('useMultiship', () => {
                 },
                 address2
             )
-            expect(foundShipmentId).toBe('delivery-1')
+            expect(foundShipment.shipmentId).toBe('delivery-1')
         })
     })
 })

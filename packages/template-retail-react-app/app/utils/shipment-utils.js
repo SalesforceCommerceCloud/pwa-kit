@@ -164,7 +164,7 @@ export const cleanAddressForOrder = (address) => {
  * @param {Object} basket - The basket object
  * @param {Object} address - The address to match
  * @param {Function} isPickupMethod - Function to check if a shipping method is pickup
- * @returns {string|null} The shipment ID with matching address or null if not found
+ * @returns {Object|null} The shipment object with matching address or null if not found
  */
 export const findDeliveryShipmentWithSameAddress = (basket, address, isPickupMethod) => {
     if (!basket?.shipments || !address) return null
@@ -178,14 +178,14 @@ export const findDeliveryShipmentWithSameAddress = (basket, address, isPickupMet
         // Check if shipment has a shipping address that matches
         return shipment.shippingAddress && areAddressesEqual(shipment.shippingAddress, address)
     })
-    return foundShipment?.shipmentId || null
+    return foundShipment || null
 }
 
 /**
  * Finds the first existing delivery shipment that has no address or an empty address
  * @param {Object} basket - The basket object
  * @param {Function} isPickupMethod - Function to check if a shipping method is pickup
- * @returns {string|null} The shipment ID without address or null if not found
+ * @returns {Object|null} The shipment object without address or null if not found
  */
 export const findDeliveryShipmentWithoutAddress = (basket, isPickupMethod) => {
     if (!basket?.shipments) return null
@@ -205,7 +205,7 @@ export const findDeliveryShipmentWithoutAddress = (basket, isPickupMethod) => {
         // Check if all address fields are falsey (empty address)
         return isAddressEmpty(address)
     })
-    return foundShipment?.shipmentId || null
+    return foundShipment || null
 }
 
 /**

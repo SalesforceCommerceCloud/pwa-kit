@@ -133,8 +133,8 @@ export const useMultiship = (basket) => {
 
         // Otherwise, create a new shipment without a shipping method
         // The assignDefaultShippingMethodsToShipments function will handle setting the default shipping method
-        const shipmentId = await createShipmentOperation()
-        return {shipments: [{shipmentId, shippingMethod: null}]}
+        const newShipment = await createShipmentOperation()
+        return {shipments: [newShipment]}
     }
 
     /**
@@ -230,7 +230,7 @@ export const useMultiship = (basket) => {
         }
 
         // Create a new shipment with pickup configuration
-        const shipmentId = await createShipmentOperation(getShippingAddressForStore(storeInfo), {
+        const newShipment = await createShipmentOperation(getShippingAddressForStore(storeInfo), {
             shippingMethodId: pickupShippingMethodId,
             storeId: storeInfo.id
         })
@@ -238,7 +238,7 @@ export const useMultiship = (basket) => {
         return {
             shipments: [
                 {
-                    shipmentId,
+                    shipmentId: newShipment.shipmentId,
                     shippingMethod: {id: pickupShippingMethodId},
                     c_fromStoreId: storeInfo.id
                 }
@@ -250,7 +250,7 @@ export const useMultiship = (basket) => {
      * Creates a new delivery shipment with the specified address
      * @param {Object} basket - The basket object
      * @param {Object} address - The address to use for the shipment
-     * @returns {Promise<string>} The created shipment ID
+     * @returns {Promise<Object>} The created shipment object
      */
     const createNewDeliveryShipmentWithAddress = async (basket, address) => {
         if (!basket?.basketId || !address) return null

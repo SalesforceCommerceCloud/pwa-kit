@@ -48,7 +48,7 @@ export const useShipmentOperations = (basketId) => {
      * @param {Object} options - Additional options for shipment creation
      * @param {string} options.shippingMethodId - The shipping method ID
      * @param {string} options.storeId - The store ID for pickup shipments
-     * @returns {Promise<string>} The created shipment ID
+     * @returns {Promise<Object>} The created shipment object
      */
     const createShipment = useCallback(
         async (address, options = {}) => {
@@ -85,7 +85,7 @@ export const useShipmentOperations = (basketId) => {
                     (shipment) => !response.shipments.slice(0, -1).includes(shipment)
                 )
 
-                return newShipment?.shipmentId
+                return newShipment
             } catch (error) {
                 handleError('Failed to create shipment', error)
                 throw error

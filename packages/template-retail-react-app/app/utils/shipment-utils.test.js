@@ -286,12 +286,12 @@ describe('shipment-utils', () => {
                 countryCode: 'US'
             }
 
-            const shipmentId = findDeliveryShipmentWithSameAddress(
+            const shipment = findDeliveryShipmentWithSameAddress(
                 mockBasket,
                 address,
                 mockIsPickupMethod
             )
-            expect(shipmentId).toBe('me')
+            expect(shipment.shipmentId).toBe('me')
         })
 
         test('should return null if no matching address found', () => {
@@ -303,19 +303,19 @@ describe('shipment-utils', () => {
                 countryCode: 'US'
             }
 
-            const shipmentId = findDeliveryShipmentWithSameAddress(
+            const shipment = findDeliveryShipmentWithSameAddress(
                 mockBasket,
                 address,
                 mockIsPickupMethod
             )
-            expect(shipmentId).toBeNull()
+            expect(shipment).toBeNull()
         })
     })
 
     describe('findDeliveryShipmentWithoutAddress', () => {
         test('should find shipment without address', () => {
-            const shipmentId = findDeliveryShipmentWithoutAddress(mockBasket, mockIsPickupMethod)
-            expect(shipmentId).toBe('shipment-3')
+            const shipment = findDeliveryShipmentWithoutAddress(mockBasket, mockIsPickupMethod)
+            expect(shipment.shipmentId).toBe('shipment-3')
         })
 
         test('should return null if all shipments have addresses', () => {
@@ -327,11 +327,11 @@ describe('shipment-utils', () => {
                 }))
             }
 
-            const shipmentId = findDeliveryShipmentWithoutAddress(
+            const shipment = findDeliveryShipmentWithoutAddress(
                 basketWithAddresses,
                 mockIsPickupMethod
             )
-            expect(shipmentId).toBeNull()
+            expect(shipment).toBeNull()
         })
     })
 

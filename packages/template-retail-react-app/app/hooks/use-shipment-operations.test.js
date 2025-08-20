@@ -100,7 +100,7 @@ describe('useShipmentOperations', () => {
 
             const {result} = renderHook(() => useShipmentOperations(basketId))
 
-            const shipmentId = await result.current.createShipment(address)
+            const shipment = await result.current.createShipment(address)
 
             expect(mockCreateShipmentMutation.mutateAsync).toHaveBeenCalledWith({
                 parameters: {
@@ -119,7 +119,7 @@ describe('useShipmentOperations', () => {
                     }
                 }
             })
-            expect(shipmentId).toBe('new-shipment-id')
+            expect(shipment.shipmentId).toBe('new-shipment-id')
         })
 
         test('should create a shipment with shipping method', async () => {
@@ -135,7 +135,7 @@ describe('useShipmentOperations', () => {
 
             const {result} = renderHook(() => useShipmentOperations(basketId))
 
-            const shipmentId = await result.current.createShipment(null, options)
+            const shipment = await result.current.createShipment(null, options)
 
             expect(mockCreateShipmentMutation.mutateAsync).toHaveBeenCalledWith({
                 parameters: {
@@ -147,7 +147,7 @@ describe('useShipmentOperations', () => {
                     }
                 }
             })
-            expect(shipmentId).toBe('new-shipment-id')
+            expect(shipment.shipmentId).toBe('new-shipment-id')
         })
 
         test('should create a pickup shipment with store ID', async () => {
@@ -163,7 +163,7 @@ describe('useShipmentOperations', () => {
 
             const {result} = renderHook(() => useShipmentOperations(basketId))
 
-            const shipmentId = await result.current.createShipment(null, options)
+            const shipment = await result.current.createShipment(null, options)
 
             expect(mockCreateShipmentMutation.mutateAsync).toHaveBeenCalledWith({
                 parameters: {
@@ -173,7 +173,7 @@ describe('useShipmentOperations', () => {
                     c_fromStoreId: 'test-store-id'
                 }
             })
-            expect(shipmentId).toBe('new-shipment-id')
+            expect(shipment.shipmentId).toBe('new-shipment-id')
         })
 
         test('should throw error if basketId is missing', async () => {
