@@ -44,6 +44,7 @@ import {
 import {useMultiship} from '@salesforce/retail-react-app/app/hooks/use-multiship'
 import {useCheckout} from '@salesforce/retail-react-app/app/pages/checkout/util/checkout-context'
 import {usePickupShipment} from '@salesforce/retail-react-app/app/hooks/use-pickup-shipment'
+import {useAddressManagement} from '@salesforce/retail-react-app/app/hooks/use-address-management'
 
 const MultiShippingItemAttributes = ({variant, includeQuantity = true}) => {
     const {formatMessage} = useIntl()
@@ -181,140 +182,23 @@ const ShippingMultiAddress = ({
         isLoading: customerLoading
     } = useCurrentCustomer()
 
-    const registeredUserAddresses = customer?.addresses || []
-    const [guestAddresses, setGuestAddresses] = useState([])
-    const [selectedGuestAddresses, setSelectedGuestAddresses] = useState({})
+    // Use the address management hook
+    const {
+        availableAddresses,
+        selectedAddresses,
+        selectedGuestAddresses,
+        selectedRegisteredUserAddresses,
+        guestAddresses,
+        selectAddressForItem,
+        addGuestAddress,
+        updateGuestAddresses,
+        updateSelectedGuestAddresses,
+        updateSelectedRegisteredUserAddresses,
+        allItemsHaveAddress,
+        isGuest: isGuestUser
+    } = useAddressManagement(basket, deliveryItems)
 
-    // Initialize selected addresses with default addresses
-    const [selectedRegisteredUserAddresses, setSelectedRegisteredUserAddresses] = useState({})
-
-    useEffect(() => {
-        if (customer && !customer.isGuest && deliveryItems) {
-            const initialSelected = {}
-
-            // If there are existing shipments with addresses, try to match with customer addresses
-            const existingShipments =
-                basket.shipments?.filter(
-                    (shipment) =>
-                        shipment.shippingAddress &&
-                        !isCurrentShippingMethodPickup(shipment?.shippingMethod)
-                ) || []
-
-            if (existingShipments.length > 0) {
-                // Initialize based on existing shipments using item.shipmentId
-                deliveryItems.forEach((item) => {
-                    const addressKey = item.itemId
-                    const shipment = existingShipments.find((s) => s.shipmentId === item.shipmentId)
-
-                    if (shipment && shipment.shippingAddress) {
-                        // Try to find a matching customer address using areAddressesEqual
-                        const matchingAddress = registeredUserAddresses.find(
-                            (addr) =>
-                                areAddressesEqual &&
-                                areAddressesEqual(addr, shipment.shippingAddress)
-                        )
-
-                        if (matchingAddress) {
-                            initialSelected[addressKey] = matchingAddress.addressId
-                        } else if (registeredUserAddresses.length > 0) {
-                            // Fall back to first customer address if no match found
-                            initialSelected[addressKey] = registeredUserAddresses[0].addressId
-                        }
-                    } else {
-                        // Only set default for items that don't have a shipment assignment
-                        if (registeredUserAddresses.length > 0) {
-                            const defaultAddress =
-                                registeredUserAddresses.find((addr) => addr.preferred) ||
-                                registeredUserAddresses[0]
-                            if (defaultAddress) {
-                                initialSelected[addressKey] = defaultAddress.addressId
-                            }
-                        }
-                    }
-                })
-            } else if (registeredUserAddresses.length > 0) {
-                // Fall back to customer addresses if no existing shipments
-                deliveryItems.forEach((item) => {
-                    const addressKey = item.itemId
-                    // Find preferred address or use first address as default
-                    const defaultAddress =
-                        registeredUserAddresses.find((addr) => addr.preferred) ||
-                        registeredUserAddresses[0]
-                    if (defaultAddress) {
-                        initialSelected[addressKey] = defaultAddress.addressId
-                    }
-                })
-            }
-
-            // Only update selectedRegisteredUserAddresses if it's empty or if we have new items that aren't selected yet
-            setSelectedRegisteredUserAddresses((prev) => {
-                const newState = {...prev}
-                let hasChanges = false
-
-                deliveryItems.forEach((item) => {
-                    const addressKey = item.itemId
-                    if (!prev[addressKey] && initialSelected[addressKey]) {
-                        newState[addressKey] = initialSelected[addressKey]
-                        hasChanges = true
-                    }
-                })
-
-                return hasChanges ? newState : prev
-            })
-        }
-    }, [
-        customer?.customerId,
-        basket?.productItems?.length,
-        registeredUserAddresses.length,
-        basket?.shipments?.length
-    ])
-
-    useEffect(() => {
-        if (customer && customer.isGuest && deliveryItems) {
-            const existingShipments =
-                basket.shipments?.filter(
-                    (shipment) =>
-                        shipment.shippingAddress &&
-                        !isCurrentShippingMethodPickup(shipment?.shippingMethod)
-                ) || []
-
-            if (existingShipments.length > 0) {
-                deliveryItems.forEach((item) => {
-                    const addressKey = item.itemId
-                    const shipment = existingShipments.find((s) => s.shipmentId === item.shipmentId)
-
-                    if (shipment && !isAddressEmpty(shipment.shippingAddress)) {
-                        const addressId = `guest_${shipment.shipmentId}`
-                        const address = {
-                            addressId,
-                            firstName: shipment.shippingAddress.firstName,
-                            lastName: shipment.shippingAddress.lastName,
-                            address1: shipment.shippingAddress.address1,
-                            city: shipment.shippingAddress.city,
-                            stateCode: shipment.shippingAddress.stateCode,
-                            postalCode: shipment.shippingAddress.postalCode,
-                            countryCode: shipment.shippingAddress.countryCode,
-                            phone: shipment.shippingAddress.phone,
-                            isGuestAddress: true,
-                            originalShipmentId: shipment.shipmentId
-                        }
-
-                        // add guest address if not present
-                        setGuestAddresses((prev) => {
-                            const exists = prev.find((addr) => addr.addressId === addressId)
-                            return exists ? prev : [...prev, address]
-                        })
-
-                        // assign to product
-                        setSelectedGuestAddresses((prev) => ({
-                            ...prev,
-                            [addressKey]: addressId
-                        }))
-                    }
-                })
-            }
-        }
-    }, [customer?.isGuest, basket?.productItems?.length, basket?.shipments?.length])
+    // Address management logic is now handled by useAddressManagement hook
 
     const [showAddAddressForm, setShowAddAddressForm] = useState({})
 
@@ -340,19 +224,13 @@ const ShippingMultiAddress = ({
         Object.keys(showAddAddressForm).filter((key) => showAddAddressForm[key])?.length > 0
 
     // guest addresses for guests & customer addresses for registered users
-    const finalAddresses = customer && customer.isGuest ? guestAddresses : registeredUserAddresses
+    const finalAddresses = availableAddresses
 
     // Unified loading state - for guests, only check products loading since they may n't have addresses
-    const isLoading = (customer && customer.isGuest ? false : customerLoading) || productsLoading
+    const isLoading = (isGuestUser ? false : customerLoading) || productsLoading
 
     // Check if all product items have an address selected
-    const allShipmentsHaveAddress = (deliveryItems ?? []).every((item) => {
-        if (customer && customer.isGuest) {
-            return selectedGuestAddresses[item.itemId]
-        } else {
-            return selectedRegisteredUserAddresses[item.itemId]
-        }
-    })
+    const allShipmentsHaveAddress = allItemsHaveAddress
 
     if (!deliveryItems.length) {
         return (
@@ -434,7 +312,7 @@ const ShippingMultiAddress = ({
      * @returns {boolean}
      */
     const isDuplicateAddress = (newAddress, existingAddresses, addressKey, form) => {
-        const addressExists = existingAddresses.some((addr) => areAddressesEqual(addr, newAddress))
+        const addressExists = existingAddresses.some((addr) => areAddressesEqual && areAddressesEqual(addr, newAddress))
 
         if (addressExists) {
             setShowAddAddressForm((prev) => ({...prev, [addressKey]: false}))
@@ -456,40 +334,30 @@ const ShippingMultiAddress = ({
     const handleCreateAddress = async (addressData, form, itemId) => {
         const addressKey = itemId
 
-        if (customer && customer.isGuest) {
+        if (isGuestUser) {
             if (isDuplicateAddress(addressData, guestAddresses, addressKey, form)) {
                 return
             }
 
             // store address in component state
             try {
-                const newAddress = {
-                    ...addressData,
-                    addressId: `guest_${nanoid()}`,
-                    isGuestAddress: true
+                const newAddress = addGuestAddress(addressData)
+
+                // If this is the first address, apply it to all delivery items
+                if (guestAddresses.length === 0) {
+                    const initialSelected = {}
+                    deliveryItems.forEach((item) => {
+                        const itemKey = item.itemId
+                        initialSelected[itemKey] = newAddress.addressId
+                    })
+                    updateSelectedGuestAddresses(initialSelected)
+                } else {
+                    // For subsequent addresses, only assign to the current item
+                    updateSelectedGuestAddresses((prev) => ({
+                        ...prev,
+                        [addressKey]: newAddress.addressId
+                    }))
                 }
-
-                setGuestAddresses((prev) => {
-                    const updatedAddresses = [...prev, newAddress]
-
-                    // If this is the first address, apply it to all delivery items
-                    if (prev.length === 0) {
-                        const initialSelected = {}
-                        deliveryItems.forEach((item) => {
-                            const itemKey = item.itemId
-                            initialSelected[itemKey] = newAddress.addressId
-                        })
-                        setSelectedGuestAddresses(initialSelected)
-                    } else {
-                        // For subsequent addresses, only assign to the current item
-                        setSelectedGuestAddresses((prev) => ({
-                            ...prev,
-                            [addressKey]: newAddress.addressId
-                        }))
-                    }
-
-                    return updatedAddresses
-                })
 
                 setShowAddAddressForm((prev) => ({...prev, [addressKey]: false}))
                 form.reset()
@@ -519,7 +387,7 @@ const ShippingMultiAddress = ({
                     addressId: nanoid()
                 }
 
-                if (isDuplicateAddress(newAddress, registeredUserAddresses, addressKey, form)) {
+                if (isDuplicateAddress(newAddress, availableAddresses, addressKey, form)) {
                     return
                 }
 
@@ -534,7 +402,7 @@ const ShippingMultiAddress = ({
 
                 await refetchCustomer()
 
-                setSelectedRegisteredUserAddresses((prev) => ({
+                updateSelectedRegisteredUserAddresses((prev) => ({
                     ...prev,
                     [addressKey]: createdAddress.addressId
                 }))
@@ -566,11 +434,6 @@ const ShippingMultiAddress = ({
             let basketAfterItemMoves = null
 
             deliveryItems.forEach((item) => {
-                const selectedAddresses =
-                    customer && customer.isGuest
-                        ? selectedGuestAddresses
-                        : selectedRegisteredUserAddresses
-
                 // Defaults to the first address if no address is selected
                 const addressId = selectedAddresses[item.itemId] || finalAddresses[0]?.addressId
                 const address = finalAddresses.find((addr) => addr.addressId === addressId)
@@ -763,7 +626,7 @@ const ShippingMultiAddress = ({
 
                                             <Box w="100%" mb={6}>
                                                 <VStack spacing={3} align="stretch">
-                                                    {!customer?.isGuest && customerLoading ? (
+                                                    {!isGuestUser && customerLoading ? (
                                                         <Box p={4} textAlign="center">
                                                             <Text color="gray.500">
                                                                 {formatMessage({
@@ -775,15 +638,7 @@ const ShippingMultiAddress = ({
                                                         </Box>
                                                     ) : (
                                                         <Select
-                                                            value={
-                                                                customer && customer.isGuest
-                                                                    ? selectedGuestAddresses[
-                                                                          addressKey
-                                                                      ] || ''
-                                                                    : selectedRegisteredUserAddresses[
-                                                                          addressKey
-                                                                      ] || ''
-                                                            }
+                                                            value={selectedAddresses[addressKey] || ''}
                                                             onChange={(e) => {
                                                                 const value = e.target.value
                                                                 // Hide the address form when an existing address is selected
@@ -792,47 +647,11 @@ const ShippingMultiAddress = ({
                                                                     [addressKey]: false
                                                                 }))
 
-                                                                if (customer && customer.isGuest) {
-                                                                    setSelectedGuestAddresses(
-                                                                        (prev) => {
-                                                                            const newState = {
-                                                                                ...prev
-                                                                            }
-                                                                            if (value === '') {
-                                                                                delete newState[
-                                                                                    addressKey
-                                                                                ]
-                                                                            } else {
-                                                                                newState[
-                                                                                    addressKey
-                                                                                ] = value
-                                                                            }
-                                                                            return newState
-                                                                        }
-                                                                    )
-                                                                } else {
-                                                                    setSelectedRegisteredUserAddresses(
-                                                                        (prev) => {
-                                                                            const newState = {
-                                                                                ...prev
-                                                                            }
-                                                                            if (value === '') {
-                                                                                delete newState[
-                                                                                    addressKey
-                                                                                ]
-                                                                            } else {
-                                                                                newState[
-                                                                                    addressKey
-                                                                                ] = value
-                                                                            }
-                                                                            return newState
-                                                                        }
-                                                                    )
-                                                                }
+                                                                selectAddressForItem(addressKey, value)
                                                             }}
                                                             disabled={
                                                                 finalAddresses.length === 0 ||
-                                                                (!customer?.isGuest &&
+                                                                (!isGuestUser &&
                                                                     customerLoading)
                                                             }
                                                             aria-labelledby={`delivery-address-label-${addressKey}`}
@@ -978,11 +797,7 @@ ShippingMultiAddress.propTypes = {
     submitButtonLabel: PropTypes.object.isRequired,
     addNewAddressLabel: PropTypes.object.isRequired,
     noItemsInBasketMessage: PropTypes.object.isRequired,
-    deliveryAddressLabel: PropTypes.object.isRequired,
-    guestAddresses: PropTypes.array,
-    setGuestAddresses: PropTypes.func,
-    selectedGuestAddresses: PropTypes.object,
-    setSelectedGuestAddresses: PropTypes.func
+    deliveryAddressLabel: PropTypes.object.isRequired
 }
 
 export default ShippingMultiAddress
