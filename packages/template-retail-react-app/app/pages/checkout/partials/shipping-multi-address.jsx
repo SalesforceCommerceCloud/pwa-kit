@@ -184,7 +184,6 @@ const ShippingMultiAddress = ({
         isLoading: customerLoading
     } = useCurrentCustomer()
 
-    // Use the address management hook
     const {
         availableAddresses,
         selectedAddresses,
@@ -193,7 +192,6 @@ const ShippingMultiAddress = ({
         isGuest: isGuestUser
     } = useAddressManagement(basket, deliveryItems)
 
-    // Use the address form hook
     const {
         form: addressForm,
         showForm: showAddAddressForm,
@@ -203,17 +201,16 @@ const ShippingMultiAddress = ({
         handleCreateAddress,
         isAddressFormOpen,
         formErrors
-    } = useAddressForm(addGuestAddress, isGuestUser, setAddressesForItems, availableAddresses, deliveryItems, areAddressesEqual)
+    } = useAddressForm(
+        addGuestAddress,
+        isGuestUser,
+        setAddressesForItems,
+        availableAddresses,
+        deliveryItems,
+        areAddressesEqual
+    )
 
-    // Local state for overall form submission
     const [isSubmitting, setIsSubmitting] = useState(false)
-
-    // Address management logic is now handled by useAddressManagement hook
-
-
-
-
-
 
     // guest addresses for guests & customer addresses for registered users
     const finalAddresses = availableAddresses
@@ -222,8 +219,8 @@ const ShippingMultiAddress = ({
     const isLoading = (isGuestUser ? false : customerLoading) || productsLoading
 
     // Check if all product items have an address selected
-    const allShipmentsHaveAddress = (deliveryItems ?? []).every((item) => 
-        selectedAddresses[item.itemId]
+    const allShipmentsHaveAddress = (deliveryItems ?? []).every(
+        (item) => selectedAddresses[item.itemId]
     )
 
     if (!deliveryItems.length) {
@@ -289,13 +286,6 @@ const ShippingMultiAddress = ({
             </Center>
         )
     }
-
-
-
-
-
-
-
 
     const handleSubmit = async () => {
         setIsSubmitting(true)

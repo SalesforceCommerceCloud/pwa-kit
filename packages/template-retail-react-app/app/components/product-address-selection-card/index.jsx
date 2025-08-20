@@ -1,3 +1,9 @@
+/*
+ * Copyright (c) 2025, Salesforce, Inc.
+ * All rights reserved.
+ * SPDX-License-Identifier: BSD-3-Clause
+ * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
+ */
 import React from 'react'
 import PropTypes from 'prop-types'
 import {
@@ -66,6 +72,11 @@ const MultiShippingItemAttributes = ({variant, includeQuantity = true}) => {
     )
 }
 
+MultiShippingItemAttributes.propTypes = {
+    variant: PropTypes.object.isRequired,
+    includeQuantity: PropTypes.bool
+}
+
 /**
  * Sub-component for the address form
  */
@@ -98,6 +109,13 @@ const AddressForm = ({item, form, onSubmit, onCancel}) => {
             </form>
         </Box>
     )
+}
+
+AddressForm.propTypes = {
+    item: PropTypes.object.isRequired,
+    form: PropTypes.object.isRequired,
+    onSubmit: PropTypes.func.isRequired,
+    onCancel: PropTypes.func.isRequired
 }
 
 /**
@@ -163,8 +181,7 @@ const ProductAddressSelectionCard = ({
                                 alt={formatMessage(
                                     {
                                         id: 'shipping_multi_address.image.alt',
-                                        defaultMessage:
-                                            'Product image for {productName}'
+                                        defaultMessage: 'Product image for {productName}'
                                     },
                                     {
                                         productName: item.productName
@@ -235,8 +252,7 @@ const ProductAddressSelectionCard = ({
                                     <Text color="gray.500">
                                         {formatMessage({
                                             id: 'shipping_multi_address.loading_addresses',
-                                            defaultMessage:
-                                                'Loading addresses...'
+                                            defaultMessage: 'Loading addresses...'
                                         })}
                                     </Text>
                                 </Box>
@@ -251,16 +267,14 @@ const ProductAddressSelectionCard = ({
                                     }}
                                     disabled={
                                         availableAddresses.length === 0 ||
-                                        (!isGuestUser &&
-                                            customerLoading)
+                                        (!isGuestUser && customerLoading)
                                     }
                                     aria-labelledby={`delivery-address-label-${addressKey}`}
                                     borderColor="gray.300"
                                     _hover={{borderColor: 'gray.400'}}
                                     _focus={{
                                         borderColor: 'blue.500',
-                                        boxShadow:
-                                            '0 0 0 1px var(--chakra-colors-blue-500)'
+                                        boxShadow: '0 0 0 1px var(--chakra-colors-blue-500)'
                                     }}
                                     data-testid={`address-dropdown-${addressKey}`}
                                 >
@@ -268,8 +282,7 @@ const ProductAddressSelectionCard = ({
                                         <option value="">
                                             {formatMessage({
                                                 id: 'shipping_multi_address.no_addresses_available',
-                                                defaultMessage:
-                                                    'No address available'
+                                                defaultMessage: 'No address available'
                                             })}
                                         </option>
                                     ) : (
@@ -279,9 +292,7 @@ const ProductAddressSelectionCard = ({
                                                 value={addr.addressId}
                                                 data-testid={`address-option-${addr.addressId}`}
                                             >
-                                                {addr.firstName}{' '}
-                                                {addr.lastName} -{' '}
-                                                {addr.address1},{' '}
+                                                {addr.firstName} {addr.lastName} - {addr.address1},{' '}
                                                 {formatMessage(
                                                     {
                                                         id: 'shipping_multi_address.format.address_line_2',
@@ -290,9 +301,7 @@ const ProductAddressSelectionCard = ({
                                                     },
                                                     {
                                                         city: addr.city,
-                                                        stateCode:
-                                                            addr.stateCode ||
-                                                            '',
+                                                        stateCode: addr.stateCode || '',
                                                         postalCode: addr.postalCode
                                                     }
                                                 )}
@@ -311,8 +320,7 @@ const ProductAddressSelectionCard = ({
                                 aria-label={formatMessage(
                                     {
                                         id: 'shipping_multi_address.add_new_address.aria_label',
-                                        defaultMessage:
-                                            'Add new delivery address for {productName}'
+                                        defaultMessage: 'Add new delivery address for {productName}'
                                     },
                                     {
                                         productName: item.productName
@@ -346,7 +354,9 @@ const ProductAddressSelectionCard = ({
                     <AddressForm
                         item={item}
                         form={addressForm}
-                        onSubmit={(addressData, form, itemId) => handleCreateAddress(addressData, itemId)}
+                        onSubmit={(addressData, form, itemId) =>
+                            handleCreateAddress(addressData, itemId)
+                        }
                         onCancel={() => closeForm(addressKey)}
                     />
                 </Box>
