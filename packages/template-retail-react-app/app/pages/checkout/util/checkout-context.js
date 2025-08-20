@@ -11,6 +11,7 @@ import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-cur
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
 import {useMultiship} from '@salesforce/retail-react-app/app/hooks/use-multiship'
 import {STORE_LOCATOR_IS_ENABLED} from '@salesforce/retail-react-app/app/constants'
+import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 
 const CheckoutContext = React.createContext()
 
@@ -24,6 +25,7 @@ export const CheckoutProvider = ({children}) => {
         findExistingDeliveryShipment,
         findExistingPickupShipment
     } = useMultiship(basket)
+    const storeLocatorEnabled = getConfig()?.app?.storeLocatorEnabled ?? STORE_LOCATOR_IS_ENABLED
 
     const CHECKOUT_STEPS_LIST = [
         'CONTACT_INFO',
@@ -87,7 +89,7 @@ export const CheckoutProvider = ({children}) => {
         // Check if current step is CONTACT_INFO
         if (step === STEPS.CONTACT_INFO) {
             const hasPickupShipment =
-                STORE_LOCATOR_IS_ENABLED && Boolean(findExistingPickupShipment(basket))
+                storeLocatorEnabled && Boolean(findExistingPickupShipment(basket))
             // Skip to appropriate next step
             setStep(hasPickupShipment ? STEPS.PICKUP_ADDRESS : STEPS.SHIPPING_ADDRESS)
         } else if (step === STEPS.PICKUP_ADDRESS) {

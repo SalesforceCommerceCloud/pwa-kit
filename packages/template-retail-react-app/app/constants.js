@@ -192,6 +192,10 @@ export const REMOVE_UNAVAILABLE_CART_ITEM_DIALOG_CONFIG = {
     }),
     onPrimaryAction: noop
 }
+/**
+ * Constant to enable the store locator and shop the store feature.
+ * @deprecated Use `storeLocatorEnabled` in the config file instead
+ */
 export const STORE_LOCATOR_IS_ENABLED = true
 export const STORE_LOCATOR_SUPPORTED_COUNTRIES = [
     {
@@ -210,8 +214,6 @@ export const STORE_LOCATOR_DEFAULT_COUNTRY = 'DE'
 export const STORE_LOCATOR_DEFAULT_COUNTRY_CODE = 'DE'
 export const STORE_LOCATOR_DEFAULT_PAGE_SIZE = 10
 export const STORE_LOCATOR_NUM_STORES_PER_REQUEST_API_MAX = 200 // This is an API limit and is therefore not configurable
-
-export const MULTISHIP_IS_ENABLED = true
 
 export const DEFAULT_DNT_STATE = true
 // Constants for shopper context
