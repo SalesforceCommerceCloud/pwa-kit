@@ -8,10 +8,10 @@
 import React from 'react'
 import {renderHook, act} from '@testing-library/react'
 import {useSubscription} from './use-subscription'
-import {CONSENT_TAGS, CONSENT_CHANNELS, CONSENT_STATUS} from '../../../constants/marketing-consent'
+import {CONSENT_TAGS, CONSENT_CHANNELS, CONSENT_STATUS} from '../../constants/marketing-consent'
 import {IntlProvider} from 'react-intl'
 
-jest.mock('../../../hooks', () => ({
+jest.mock('../../hooks', () => ({
     useMarketingConsent: jest.fn()
 }))
 
@@ -46,7 +46,7 @@ describe('useSubscription', () => {
 
     const setHookReturn = (overrides = {}) => {
         // eslint-disable-next-line @typescript-eslint/no-var-requires
-        const {useMarketingConsent} = require('../../../hooks')
+        const {useMarketingConsent} = require('../../hooks')
         useMarketingConsent.mockReturnValue({
             fetchConsentItems: mockFetch,
             submitConsent: mockSubmit,

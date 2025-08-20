@@ -31,7 +31,7 @@ import {
     useCustomerType
 } from '@salesforce/commerce-sdk-react'
 import {useCurrentCustomer} from '../../hooks'
-import {useToast} from '../../hooks/use-toast'
+import useToast from '../../hooks/use-toast'
 import loadable from '@loadable/component'
 const MarketingConsentCard =
     SFDC_EXT_MARKETING_CONSENT_ENABLED &&
@@ -79,6 +79,10 @@ const ProfileCard = ({allowPasswordChange = false}) => {
             title: formatMessage({
                 defaultMessage: 'My Profile',
                 id: 'profile_card.title.my_profile'
+            }),
+            formAriaLabel: formatMessage({
+                defaultMessage: 'Profile Form',
+                id: 'profile_fields.label.profile_form'
             }),
             profileUpdated: formatMessage({
                 defaultMessage: 'Profile updated',
@@ -174,7 +178,7 @@ const ProfileCard = ({allowPasswordChange = false}) => {
         >
             <ToggleCardEdit>
                 <Container variant="form">
-                    <form onSubmit={form.handleSubmit(submit)}>
+                    <form aria-label={messages.formAriaLabel} onSubmit={form.handleSubmit(submit)}>
                         <Stack gap="6">
                             {form.formState.errors?.global && (
                                 <Alert.Root status="error">

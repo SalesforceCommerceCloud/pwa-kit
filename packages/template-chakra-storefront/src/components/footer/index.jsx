@@ -7,29 +7,23 @@
 import React, {useMemo, useState} from 'react'
 import PropTypes from 'prop-types'
 import {
-    Alert,
     Box,
-    Button,
-    Link,
-    Flex,
     GridItem,
-    Heading,
-    Input,
     NativeSelect,
     Separator,
     SimpleGrid,
     Text,
     useSlotRecipe
 } from '@chakra-ui/react'
-import {useIntl, FormattedMessage} from 'react-intl'
-import {AlertIcon} from '../icons'
+import {useIntl} from 'react-intl'
 
 import LinksList from '../../components/links-list'
-import SocialIcons from '../../components/social-icons'
 import {getPathWithLocale} from '../../utils/url'
 import LocaleText from '../../components/locale-text'
 import useMultiSite from '../../hooks/use-multi-site'
-import {useSubscription} from './hooks/use-subscription'
+import SubscribeForm from '../subscription/subscribe-form'
+//@sfdc-extension-line SFDC_EXT_MARKETING_CONSENT_ENABLED
+import SubscribeMarketingConsent from '../subscription/subscribe-marketing-consent'
 
 const Footer = ({...otherProps}) => {
     const recipe = useSlotRecipe({key: 'footer'})
@@ -203,119 +197,22 @@ const Footer = ({...otherProps}) => {
 export default Footer
 
 const Subscribe = ({...otherProps}) => {
-    const recipe = useSlotRecipe({key: 'footer'})
-    const intl = useIntl()
-    const {formatMessage} = intl
-    const {state, actions} = useSubscription()
-    const styles = recipe({alertStatus: state.feedback?.type === 'error' ? 'error' : 'success'})
+    //@sfdc-extension-block-start SFDC_EXT_MARKETING_CONSENT_ENABLED
+    // When marketing-consent extension is enabled, use dynamic consent-powered subscription
+    if (SFDC_EXT_MARKETING_CONSENT_ENABLED) {
+        // We have to separate it into a different component, because conditionals are not allowed.
+        // React Hooks must be called in the exact same order in every component render.
+        return <SubscribeMarketingConsent {...otherProps} />
+    }
+    //@sfdc-extension-block-end SFDC_EXT_MARKETING_CONSENT_ENABLED
 
-    const messages = useMemo(() => {
-        const termsConditions = formatMessage({
-            id: 'footer.link.terms_conditions',
-            defaultMessage: 'Terms & Conditions'
-        })
-        const privacyPolicy = formatMessage({
-            id: 'footer.link.privacy_policy',
-            defaultMessage: 'Privacy Policy'
-        })
+    // No-op to allow the form to render without any callouts.
+    const noopSubscription = {
+        state: {email: '', isLoading: false, feedback: {message: '', type: 'success'}},
+        actions: {setEmail: () => {}, submit: () => {}}
+    }
 
-        return {
-            heading: formatMessage({
-                id: 'footer.subscribe.heading.first_to_know',
-                defaultMessage: 'Subscribe to Stay Updated'
-            }),
-            description: formatMessage({
-                id: 'footer.subscribe.description.sign_up',
-                defaultMessage: 'Be the first to know about latest offers, news, tips, and more.'
-            }),
-            emailAriaLabel: formatMessage({
-                id: 'footer.subscribe.email.assistive_msg',
-                defaultMessage: 'Email address for newsletter.'
-            }),
-            buttonSignUp: formatMessage({
-                id: 'footer.subscribe.button.sign_up',
-                defaultMessage: 'Subscribe'
-            }),
-            emailPlaceholderText: formatMessage({
-                id: 'footer.subscribe.email.placeholder_text',
-                defaultMessage: 'Enter your email address...'
-            }),
-            termsConditions,
-            privacyPolicy,
-            disclaimer: (
-                <FormattedMessage
-                    id="footer.subscribe.disclaimer"
-                    defaultMessage="By submitting this, I agree to the {terms} and {privacy}."
-                    values={{
-                        terms: (
-                            <Link href="/" css={styles.subscribeDisclaimerLink}>
-                                {termsConditions}
-                            </Link>
-                        ),
-                        privacy: (
-                            <Link href="/" css={styles.subscribeDisclaimerLink}>
-                                {privacyPolicy}
-                            </Link>
-                        )
-                    }}
-                />
-            )
-        }
-    }, [intl])
-
-    return (
-        <Box css={styles.subscribe} {...otherProps}>
-            <Heading as="h1" css={styles.subscribeHeading}>
-                {messages.heading}
-            </Heading>
-            <Text css={styles.subscribeMessage}>{messages.description}</Text>
-
-            {state.feedback?.message && (
-                <Alert.Root status={state.feedback.type} css={styles.subscribeAlert}>
-                    <Alert.Indicator>
-                        <AlertIcon css={styles.subscribeAlertIcon} />
-                    </Alert.Indicator>
-                    <Alert.Description css={styles.subscribeAlertDescription}>
-                        {state.feedback.message}
-                    </Alert.Description>
-                </Alert.Root>
-            )}
-
-            <Box>
-                <Flex w="full" maxW="sm">
-                    <Input
-                        type="email"
-                        placeholder={messages.emailPlaceholderText}
-                        aria-label={messages.emailAriaLabel}
-                        value={state.email}
-                        onChange={(e) => actions.setEmail(e.target.value)}
-                        onKeyDown={(e) => {
-                            if (e.key === 'Enter' && !state.isLoading) {
-                                actions.submit()
-                            }
-                        }}
-                        disabled={state.isLoading}
-                        id="subscribe-email"
-                        css={styles.subscribeField}
-                        borderEndEndRadius={0}
-                        borderStartEndRadius={0}
-                    />
-                    <Button
-                        variant="footer"
-                        onClick={actions.submit}
-                        loading={state.isLoading}
-                        borderEndStartRadius={0}
-                        borderStartStartRadius={0}
-                    >
-                        {messages.buttonSignUp}
-                    </Button>
-                </Flex>
-                <Text css={styles.subscribeDisclaimer}>{messages.disclaimer}</Text>
-            </Box>
-
-            <SocialIcons variant="flex-start" pinterestInnerColor="black" />
-        </Box>
-    )
+    return <SubscribeForm subscription={noopSubscription} {...otherProps} />
 }
 
 const LegalLinks = ({variant}) => {

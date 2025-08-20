@@ -9,13 +9,16 @@ import {screen} from '@testing-library/react'
 import Footer from './index'
 import {renderWithProviders} from '../../utils/test-utils'
 
+//@sfdc-extension-block-start SFDC_EXT_MARKETING_CONSENT_ENABLED
 // Mocks for subscription hook to test UI interactions without hitting network
 const mockActions = {setEmail: jest.fn(), submit: jest.fn()}
 const mockState = {email: '', isLoading: false, feedback: {message: null, type: 'success'}}
 
-jest.mock('./hooks/use-subscription', () => ({
-    useSubscription: jest.fn(() => ({state: mockState, actions: mockActions}))
+jest.mock('../subscription/use-subscription', () => () => ({
+    state: mockState,
+    actions: mockActions
 }))
+//@sfdc-extension-block-end SFDC_EXT_MARKETING_CONSENT_ENABLED
 
 test('renders component', () => {
     renderWithProviders(<Footer />)

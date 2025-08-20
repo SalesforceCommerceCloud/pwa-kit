@@ -19,6 +19,16 @@ import {Route, Switch} from 'react-router-dom'
 import mockConfig from '../../../config/mocks/mock-config'
 import * as sdk from '@salesforce/commerce-sdk-react'
 
+// Avoid modal/portal side-effects from AddToCart provider
+jest.mock('../../hooks/use-add-to-cart-modal', () => ({
+    useAddToCartModalContext: () => ({
+        isOpen: false,
+        data: null,
+        onClose: () => {}
+    }),
+    AddToCartModalProvider: ({children}) => children
+}))
+
 const MockedComponent = () => {
     return (
         <>
@@ -50,7 +60,7 @@ jest.mock('@salesforce/commerce-sdk-react', () => ({
 
 // Set up and clean up
 beforeEach(() => {
-    jest.resetModules()
+    jest.clearAllMocks()
     global.server.use(
         rest.get('*/customers/:customerId', (req, res, ctx) =>
             res(ctx.delay(0), ctx.status(200), ctx.json(mockedRegisteredCustomer))
@@ -62,7 +72,7 @@ beforeEach(() => {
     window.history.pushState({}, 'Account', createPathWithDefaults('/account/addresses'))
 })
 afterEach(() => {
-    jest.resetModules()
+    jest.clearAllMocks()
     localStorage.clear()
 })
 
@@ -88,8 +98,8 @@ test('Allows customer to edit phone number', async () => {
         await user.click(within(profileCard).getByText(/edit/i))
     })
 
-    // Profile Form must be present
-    expect(screen.getByLabelText('Profile Form')).toBeInTheDocument()
+    // Profile Form must be present (target the actual form element)
+    expect(screen.getByRole('form', {name: 'Profile Form'})).toBeInTheDocument()
 
     await act(async () => {
         await user.type(screen.getByLabelText('Phone Number'), '7275551234')
@@ -101,12 +111,17 @@ test('Allows customer to edit phone number', async () => {
     )
 
     await act(async () => {
-        await user.click(screen.getByText(/^Save$/i))
+        const content = screen.getByTestId('sf-toggle-card-my-profile-content')
+        await user.click(within(content).getAllByRole('button', {name: /^Save$/i})[0])
     })
     await waitFor(() => {
         // Toast messages are rendered in a portal, so we need to search within document.body
         expect(within(document.body).getByText(/Profile updated/i)).toBeInTheDocument()
-        expect(screen.getByText(/555-1234/i)).toBeInTheDocument()
+        const content = screen.getByTestId('sf-toggle-card-my-profile-content')
+        const phoneMatches = within(content).getAllByText(
+            (_, node) => node?.textContent?.replace(/\D/g, '') === '7275551234'
+        )
+        expect(phoneMatches.length).toBeGreaterThan(0)
     })
 })
 

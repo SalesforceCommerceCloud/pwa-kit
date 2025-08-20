@@ -13,6 +13,9 @@ module.exports = {
     moduleNameMapper: {
         ...base.moduleNameMapper,
         '^react$': '<rootDir>/node_modules/react/index.js',
+        '^react-dom$': '<rootDir>/node_modules/react-dom/index.js',
+        '^react/jsx-runtime$': '<rootDir>/node_modules/react/jsx-runtime.js',
+        '^react/jsx-dev-runtime$': '<rootDir>/node_modules/react/jsx-dev-runtime.js',
         '^react-router-dom(.*)$': '<rootDir>/node_modules/react-router-dom/index.js',
         '^@tanstack/react-query$':
             '<rootDir>/node_modules/@tanstack/react-query/build/modern/index.cjs',

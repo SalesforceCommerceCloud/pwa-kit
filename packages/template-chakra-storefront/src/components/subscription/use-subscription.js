@@ -6,19 +6,10 @@
  */
 
 import {useCallback, useMemo, useState} from 'react'
-import {CONSENT_CHANNELS, CONSENT_STATUS, CONSENT_TAGS} from '../../../constants/marketing-consent'
-import {useMarketingConsent} from '../../../hooks'
+import {CONSENT_CHANNELS, CONSENT_STATUS, CONSENT_TAGS} from '../../constants/marketing-consent'
+import {useMarketingConsent} from '../../hooks'
 import {useIntl} from 'react-intl'
 
-/**
- * Subscription hook for the Footer component.
- * Encapsulates validation, consent fetch/submit, and messaging.
- *
- * @param {Object} [options]
- * @param {string} [options.pageTag]
- * @param {string} [options.channel]
- * @returns {{email: string, setEmail: Function, message: string|null, messageType: 'success'|'error', isLoading: boolean, handleSignUp: Function}}
- */
 export const useSubscription = ({
     pageTag = CONSENT_TAGS.HOMEPAGE_BANNER,
     channel = CONSENT_CHANNELS.EMAIL
@@ -117,3 +108,5 @@ export const useSubscription = ({
         }
     }
 }
+
+export default useSubscription
