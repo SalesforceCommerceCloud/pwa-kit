@@ -12,12 +12,12 @@ import logger from '@salesforce/retail-react-app/app/utils/logger-instance'
 import {DEFAULT_SHIPMENT_ID} from '@salesforce/retail-react-app/app/constants'
 
 /**
- * Hook for item movement operations
+ * Hook for item arrangement operations
  * Focused only on moving items between shipments (basket data manipulation)
  * @param {string} basketId - The basket ID
- * @returns {Object} Object containing item movement functions
+ * @returns {Object} Object containing item arrangement functions
  */
-export const useItemMovement = (basketId) => {
+export const useItemArrangement = (basketId) => {
     const {showToast} = useToast()
     const updateItemInBasketMutation = useShopperBasketsMutation('updateItemInBasket')
     const updateItemsInBasketMutation = useShopperBasketsMutation('updateItemsInBasket')
@@ -25,7 +25,7 @@ export const useItemMovement = (basketId) => {
     const handleError = useCallback(
         (message, error) => {
             logger.warn(message, {
-                namespace: 'useItemMovement.handleError',
+                namespace: 'useItemArrangement.handleError',
                 additionalProperties: {
                     error: error
                 }

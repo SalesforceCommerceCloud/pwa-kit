@@ -8,7 +8,7 @@
 import {useShippingMethodsForShipment} from '@salesforce/commerce-sdk-react'
 import {usePickupShipment} from '@salesforce/retail-react-app/app/hooks/use-pickup-shipment'
 import {useShipmentOperations} from '@salesforce/retail-react-app/app/hooks/use-shipment-operations'
-import {useItemMovement} from '@salesforce/retail-react-app/app/hooks/use-item-movement'
+import {useItemArrangement} from '@salesforce/retail-react-app/app/hooks/use-item-arrangement'
 import {DEFAULT_SHIPMENT_ID} from '@salesforce/retail-react-app/app/constants'
 
 import {
@@ -50,7 +50,7 @@ export const useMultiship = (basket) => {
         updateItemsToDeliveryShipment,
         updateItemsToPickupShipment,
         updateDeliveryOption: updateDeliveryOptionOperation
-    } = useItemMovement(basket?.basketId)
+    } = useItemArrangement(basket?.basketId)
 
     // Hook for shipping methods for the main shipment - we'll use this as a fallback
     //

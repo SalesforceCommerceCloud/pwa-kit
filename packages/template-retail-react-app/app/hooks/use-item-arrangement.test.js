@@ -7,7 +7,7 @@
 
 import {renderHook} from '@testing-library/react'
 import {useShopperBasketsMutation} from '@salesforce/commerce-sdk-react'
-import {useItemMovement} from '@salesforce/retail-react-app/app/hooks/use-item-movement'
+import {useItemArrangement} from '@salesforce/retail-react-app/app/hooks/use-item-arrangement'
 
 // Mock the commerce SDK hooks
 jest.mock('@salesforce/commerce-sdk-react', () => ({
@@ -33,7 +33,7 @@ jest.mock('@salesforce/retail-react-app/app/utils/logger-instance', () => ({
 import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
 import logger from '@salesforce/retail-react-app/app/utils/logger-instance'
 
-describe('useItemMovement', () => {
+describe('useItemArrangement', () => {
     let mockUpdateItemInBasketMutation
     let mockUpdateItemsInBasketMutation
     let mockUseShopperBasketsMutation
@@ -84,7 +84,7 @@ describe('useItemMovement', () => {
 
             mockUpdateItemInBasketMutation.mutateAsync.mockResolvedValue(mockResponse)
 
-            const {result} = renderHook(() => useItemMovement(basketId))
+            const {result} = renderHook(() => useItemArrangement(basketId))
 
             const response = await result.current.updateItemToPickupShipment(
                 productItem,
@@ -108,7 +108,7 @@ describe('useItemMovement', () => {
         })
 
         test('should throw error if basketId is missing', async () => {
-            const {result} = renderHook(() => useItemMovement(null))
+            const {result} = renderHook(() => useItemArrangement(null))
 
             await expect(
                 result.current.updateItemToPickupShipment({}, 'shipment', 'inventory')
@@ -116,7 +116,7 @@ describe('useItemMovement', () => {
         })
 
         test('should throw error if productItem is missing', async () => {
-            const {result} = renderHook(() => useItemMovement('basket-id'))
+            const {result} = renderHook(() => useItemArrangement('basket-id'))
 
             await expect(
                 result.current.updateItemToPickupShipment(null, 'shipment', 'inventory')
@@ -129,7 +129,7 @@ describe('useItemMovement', () => {
             const error = new Error('API Error')
             mockUpdateItemInBasketMutation.mutateAsync.mockRejectedValue(error)
 
-            const {result} = renderHook(() => useItemMovement(basketId))
+            const {result} = renderHook(() => useItemArrangement(basketId))
 
             await expect(
                 result.current.updateItemToPickupShipment(productItem, 'shipment', 'inventory')
@@ -138,7 +138,7 @@ describe('useItemMovement', () => {
             expect(mockLoggerWarn).toHaveBeenCalledWith(
                 'Failed to update item to pickup shipment',
                 {
-                    namespace: 'useItemMovement.handleError',
+                    namespace: 'useItemArrangement.handleError',
                     additionalProperties: {
                         error: error
                     }
@@ -166,7 +166,7 @@ describe('useItemMovement', () => {
 
             mockUpdateItemInBasketMutation.mutateAsync.mockResolvedValue(mockResponse)
 
-            const {result} = renderHook(() => useItemMovement(basketId))
+            const {result} = renderHook(() => useItemArrangement(basketId))
 
             const response = await result.current.updateItemToDeliveryShipment(
                 productItem,
@@ -203,7 +203,7 @@ describe('useItemMovement', () => {
 
             mockUpdateItemInBasketMutation.mutateAsync.mockResolvedValue(mockResponse)
 
-            const {result} = renderHook(() => useItemMovement(basketId))
+            const {result} = renderHook(() => useItemArrangement(basketId))
 
             const response = await result.current.updateItemToDeliveryShipment(
                 productItem,
@@ -233,7 +233,7 @@ describe('useItemMovement', () => {
 
             mockUpdateItemInBasketMutation.mutateAsync.mockResolvedValue({})
 
-            const {result} = renderHook(() => useItemMovement(basketId))
+            const {result} = renderHook(() => useItemArrangement(basketId))
 
             await result.current.updateItemToDeliveryShipment(
                 productItem,
@@ -260,7 +260,7 @@ describe('useItemMovement', () => {
             const error = new Error('API Error')
             mockUpdateItemInBasketMutation.mutateAsync.mockRejectedValue(error)
 
-            const {result} = renderHook(() => useItemMovement(basketId))
+            const {result} = renderHook(() => useItemArrangement(basketId))
 
             await expect(
                 result.current.updateItemToDeliveryShipment(productItem, 'shipment', 'inventory')
@@ -269,7 +269,7 @@ describe('useItemMovement', () => {
             expect(mockLoggerWarn).toHaveBeenCalledWith(
                 'Failed to update item to delivery shipment',
                 {
-                    namespace: 'useItemMovement.handleError',
+                    namespace: 'useItemArrangement.handleError',
                     additionalProperties: {
                         error: error
                     }
@@ -305,7 +305,7 @@ describe('useItemMovement', () => {
 
             mockUpdateItemsInBasketMutation.mutateAsync.mockResolvedValue(mockResponse)
 
-            const {result} = renderHook(() => useItemMovement(basketId))
+            const {result} = renderHook(() => useItemArrangement(basketId))
 
             const response = await result.current.updateItemsToDeliveryShipment(
                 productItems,
@@ -338,7 +338,7 @@ describe('useItemMovement', () => {
         })
 
         test('should handle empty productItems array gracefully', async () => {
-            const {result} = renderHook(() => useItemMovement('basket-id'))
+            const {result} = renderHook(() => useItemArrangement('basket-id'))
 
             const response = await result.current.updateItemsToDeliveryShipment(
                 [],
@@ -356,7 +356,7 @@ describe('useItemMovement', () => {
             const error = new Error('API Error')
             mockUpdateItemsInBasketMutation.mutateAsync.mockRejectedValue(error)
 
-            const {result} = renderHook(() => useItemMovement(basketId))
+            const {result} = renderHook(() => useItemArrangement(basketId))
 
             await expect(
                 result.current.updateItemsToDeliveryShipment(productItems, 'shipment', 'inventory')
@@ -365,7 +365,7 @@ describe('useItemMovement', () => {
             expect(mockLoggerWarn).toHaveBeenCalledWith(
                 'Failed to update items to delivery shipment',
                 {
-                    namespace: 'useItemMovement.handleError',
+                    namespace: 'useItemArrangement.handleError',
                     additionalProperties: {
                         error: error
                     }
@@ -399,7 +399,7 @@ describe('useItemMovement', () => {
 
             mockUpdateItemsInBasketMutation.mutateAsync.mockResolvedValue(mockResponse)
 
-            const {result} = renderHook(() => useItemMovement(basketId))
+            const {result} = renderHook(() => useItemArrangement(basketId))
 
             const response = await result.current.updateItemsToPickupShipment(
                 productItems,
@@ -432,7 +432,7 @@ describe('useItemMovement', () => {
         })
 
         test('should handle empty productItems array gracefully', async () => {
-            const {result} = renderHook(() => useItemMovement('basket-id'))
+            const {result} = renderHook(() => useItemArrangement('basket-id'))
 
             const response = await result.current.updateItemsToPickupShipment(
                 [],
@@ -450,7 +450,7 @@ describe('useItemMovement', () => {
             const error = new Error('API Error')
             mockUpdateItemsInBasketMutation.mutateAsync.mockRejectedValue(error)
 
-            const {result} = renderHook(() => useItemMovement(basketId))
+            const {result} = renderHook(() => useItemArrangement(basketId))
 
             await expect(
                 result.current.updateItemsToPickupShipment(productItems, 'shipment', 'inventory')
@@ -459,7 +459,7 @@ describe('useItemMovement', () => {
             expect(mockLoggerWarn).toHaveBeenCalledWith(
                 'Failed to update items to pickup shipment',
                 {
-                    namespace: 'useItemMovement.handleError',
+                    namespace: 'useItemArrangement.handleError',
                     additionalProperties: {
                         error: error
                     }
@@ -484,7 +484,7 @@ describe('useItemMovement', () => {
 
             mockUpdateItemInBasketMutation.mutateAsync.mockResolvedValue({})
 
-            const {result} = renderHook(() => useItemMovement(basketId))
+            const {result} = renderHook(() => useItemArrangement(basketId))
 
             await result.current.updateDeliveryOption(
                 productItem,
@@ -523,7 +523,7 @@ describe('useItemMovement', () => {
 
             mockUpdateItemInBasketMutation.mutateAsync.mockResolvedValue({})
 
-            const {result} = renderHook(() => useItemMovement(basketId))
+            const {result} = renderHook(() => useItemArrangement(basketId))
 
             await result.current.updateDeliveryOption(
                 productItem,
@@ -558,7 +558,7 @@ describe('useItemMovement', () => {
             const mockFindOrCreatePickupShipment = jest.fn()
             const mockFindOrCreateDeliveryShipment = jest.fn()
 
-            const {result} = renderHook(() => useItemMovement(basketId))
+            const {result} = renderHook(() => useItemArrangement(basketId))
 
             await expect(
                 result.current.updateDeliveryOption(
@@ -581,7 +581,7 @@ describe('useItemMovement', () => {
             const mockFindOrCreatePickupShipment = jest.fn()
             const mockFindOrCreateDeliveryShipment = jest.fn()
 
-            const {result} = renderHook(() => useItemMovement(basketId))
+            const {result} = renderHook(() => useItemArrangement(basketId))
 
             await expect(
                 result.current.updateDeliveryOption(
@@ -604,7 +604,7 @@ describe('useItemMovement', () => {
             const mockFindOrCreatePickupShipment = jest.fn().mockResolvedValue(null) // Failed
             const mockFindOrCreateDeliveryShipment = jest.fn()
 
-            const {result} = renderHook(() => useItemMovement(basketId))
+            const {result} = renderHook(() => useItemArrangement(basketId))
 
             await expect(
                 result.current.updateDeliveryOption(
@@ -618,7 +618,7 @@ describe('useItemMovement', () => {
             ).rejects.toThrow('Failed to find or create shipment')
 
             expect(mockLoggerWarn).toHaveBeenCalledWith('Failed to handle delivery option change', {
-                namespace: 'useItemMovement.handleError',
+                namespace: 'useItemArrangement.handleError',
                 additionalProperties: {
                     error: expect.any(Error)
                 }
