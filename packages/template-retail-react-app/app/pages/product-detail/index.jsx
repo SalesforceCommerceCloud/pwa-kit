@@ -37,10 +37,8 @@ import {useServerContext} from '@salesforce/pwa-kit-react-sdk/ssr/universal/hook
 import usePickupShipment from '@salesforce/retail-react-app/app/hooks/use-pickup-shipment'
 import {useSelectedStore} from '@salesforce/retail-react-app/app/hooks/use-selected-store'
 import {useMultiship} from '@salesforce/retail-react-app/app/hooks/use-multiship'
-import {
-    STORE_LOCATOR_IS_ENABLED,
-    MULTISHIP_IS_ENABLED
-} from '@salesforce/retail-react-app/app/constants'
+import {STORE_LOCATOR_IS_ENABLED} from '@salesforce/retail-react-app/app/constants'
+import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 // Project Components
 import RecommendedProducts from '@salesforce/retail-react-app/app/components/recommended-products'
 import ProductView from '@salesforce/retail-react-app/app/components/product-view'
@@ -77,6 +75,8 @@ const ProductDetail = () => {
     const navigate = useNavigation()
     const customerId = useCustomerId()
     const {onOpen: onOpenStoreLocator} = useStoreLocatorModal()
+    const multishipEnabled = getConfig()?.app?.multishipEnabled ?? true
+    const storeLocatorEnabled = getConfig()?.app?.storeLocatorEnabled ?? STORE_LOCATOR_IS_ENABLED
 
     /****************************** Basket *********************************/
     const {data: basket, isLoading: isBasketLoading} = useCurrentBasket()
@@ -438,7 +438,7 @@ const ProductDetail = () => {
                 basket?.shipments?.[0]?.shippingMethod
             )
             // Only perform the check if the basket exists and has at least one item
-            if (!MULTISHIP_IS_ENABLED && basket && basket.productItems?.length > 0) {
+            if (!multishipEnabled && basket && basket.productItems?.length > 0) {
                 if (hasAnyPickupSelected && !currentShippingMethodIsPickup) {
                     throw new Error(
                         formatMessage({
@@ -559,7 +559,7 @@ const ProductDetail = () => {
             )
 
             // Check for delivery method conflicts before adding to cart
-            if (!MULTISHIP_IS_ENABLED && basket && basket.productItems?.length > 0) {
+            if (!multishipEnabled && basket && basket.productItems?.length > 0) {
                 const currentShippingMethod = basket?.shipments?.[0]?.shippingMethod
                 const currentShippingMethodIsPickup =
                     isCurrentShippingMethodPickup(currentShippingMethod)
@@ -752,7 +752,7 @@ const ProductDetail = () => {
                                     product && handlePickupInStoreChange(product.id, checked)
                                 }
                                 onOpenStoreLocator={onOpenStoreLocator}
-                                showDeliveryOptions={STORE_LOCATOR_IS_ENABLED}
+                                showDeliveryOptions={storeLocatorEnabled}
                             />
                         </Island>
 
@@ -829,7 +829,7 @@ const ProductDetail = () => {
                                             }
                                             onOpenStoreLocator={onOpenStoreLocator}
                                             showDeliveryOptions={
-                                                STORE_LOCATOR_IS_ENABLED && !isProductABundle
+                                                storeLocatorEnabled && !isProductABundle
                                             }
                                         />
                                         <InformationAccordion product={childProduct} />
@@ -862,7 +862,7 @@ const ProductDetail = () => {
                                     product && handlePickupInStoreChange(product.id, checked)
                                 }
                                 onOpenStoreLocator={onOpenStoreLocator}
-                                showDeliveryOptions={STORE_LOCATOR_IS_ENABLED}
+                                showDeliveryOptions={storeLocatorEnabled}
                             />
                             <InformationAccordion product={product} />
                         </Island>

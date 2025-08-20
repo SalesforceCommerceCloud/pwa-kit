@@ -426,10 +426,41 @@ const ShippingMultiAddress = ({
         addressForm.clearErrors()
     }
 
+    /**
+     * @param {Object} newAddress - address to check
+     * @param {Array} existingAddresses
+     * @param {string} addressKey - key for address form
+     * @param {Object} form - form object to reset
+     * @returns {boolean}
+     */
+    const isDuplicateAddress = (newAddress, existingAddresses, addressKey, form) => {
+        const addressExists = existingAddresses.some((addr) => areAddressesEqual(addr, newAddress))
+
+        if (addressExists) {
+            setShowAddAddressForm((prev) => ({...prev, [addressKey]: false}))
+            form.reset()
+            form.clearErrors()
+
+            showToast({
+                title: formatMessage({
+                    id: 'shipping_multi_address.info.address_already_exists',
+                    defaultMessage: 'The address you entered already exists.'
+                }),
+                status: 'info'
+            })
+            return true
+        }
+        return false
+    }
+
     const handleCreateAddress = async (addressData, form, itemId) => {
         const addressKey = itemId
 
         if (customer && customer.isGuest) {
+            if (isDuplicateAddress(addressData, guestAddresses, addressKey, form)) {
+                return
+            }
+
             // store address in component state
             try {
                 const newAddress = {
@@ -486,6 +517,10 @@ const ShippingMultiAddress = ({
                 const newAddress = {
                     ...addressData,
                     addressId: nanoid()
+                }
+
+                if (isDuplicateAddress(newAddress, registeredUserAddresses, addressKey, form)) {
+                    return
                 }
 
                 const createdAddress = await createCustomerAddress.mutateAsync({

@@ -102,11 +102,6 @@ export const FEATURE_UNAVAILABLE_ERROR_MESSAGE = defineMessage({
     defaultMessage: 'This feature is not currently available.',
     id: 'global.error.feature_unavailable'
 })
-export const CREATE_ACCOUNT_FIRST_ERROR_MESSAGE = defineMessage({
-    defaultMessage:
-        'This feature is not currently available. You must create an account to access this feature.',
-    id: 'global.error.create_account'
-})
 
 export const HOME_HREF = '/'
 
@@ -192,6 +187,10 @@ export const REMOVE_UNAVAILABLE_CART_ITEM_DIALOG_CONFIG = {
     }),
     onPrimaryAction: noop
 }
+/**
+ * Constant to enable the store locator and shop the store feature.
+ * @deprecated Use `storeLocatorEnabled` in the config file instead
+ */
 export const STORE_LOCATOR_IS_ENABLED = true
 export const STORE_LOCATOR_SUPPORTED_COUNTRIES = [
     {
@@ -210,8 +209,6 @@ export const STORE_LOCATOR_DEFAULT_COUNTRY = 'DE'
 export const STORE_LOCATOR_DEFAULT_COUNTRY_CODE = 'DE'
 export const STORE_LOCATOR_DEFAULT_PAGE_SIZE = 10
 export const STORE_LOCATOR_NUM_STORES_PER_REQUEST_API_MAX = 200 // This is an API limit and is therefore not configurable
-
-export const MULTISHIP_IS_ENABLED = true
 
 export const DEFAULT_DNT_STATE = true
 // Constants for shopper context
@@ -265,6 +262,10 @@ export const PASSWORDLESS_ERROR_MESSAGES = [
 
 export const INVALID_TOKEN_ERROR = /invalid token/i
 
+/**
+ * @deprecated The SLAS private client proxy will mask user not found errors
+ * so this variable should not be used as the app will not see these errors.
+ */
 export const USER_NOT_FOUND_ERROR = /user not found/i
 
 /**

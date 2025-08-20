@@ -1027,16 +1027,6 @@
       "value": "Payment"
     }
   ],
-  "checkout_product_item.label.quantity_static": [
-    {
-      "type": 0,
-      "value": "Qty: "
-    },
-    {
-      "type": 1,
-      "value": "quantity"
-    }
-  ],
   "colorRefinements.label.hitCount": [
     {
       "type": 1,
@@ -1713,12 +1703,6 @@
       "value": "Wishlist"
     }
   ],
-  "global.error.create_account": [
-    {
-      "type": 0,
-      "value": "This feature is not currently available. You must create an account to access this feature."
-    }
-  ],
   "global.error.feature_unavailable": [
     {
       "type": 0,
@@ -2055,6 +2039,16 @@
     {
       "type": 0,
       "value": "Quantity: "
+    },
+    {
+      "type": 1,
+      "value": "quantity"
+    }
+  ],
+  "item_attributes.label.quantity_abbreviated": [
+    {
+      "type": 0,
+      "value": "Qty: "
     },
     {
       "type": 1,
@@ -3605,6 +3599,12 @@
     {
       "type": 1,
       "value": "productName"
+    }
+  ],
+  "shipping_multi_address.info.address_already_exists": [
+    {
+      "type": 0,
+      "value": "The address you entered already exists."
     }
   ],
   "shipping_multi_address.loading.message": [
