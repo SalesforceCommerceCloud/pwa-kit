@@ -1390,7 +1390,7 @@ describe('Base path tests', () => {
             })
     }, 15000)
 
-    test('remove base path can handle complex base paths', async () => {
+    test('remove base path can handle multi-part base paths', async () => {
         jest.spyOn(ssrConfig, 'getConfig').mockReturnValue({envBasePath: '/my/base/path'})
 
         const app = RemoteServerFactory._createApp(opts())

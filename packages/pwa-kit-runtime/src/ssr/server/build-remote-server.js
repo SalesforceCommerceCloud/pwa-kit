@@ -603,9 +603,6 @@ export const RemoteServerFactory = {
                 // Use path-to-regexp to convert the route pattern to a regex
                 return pathToRegexp(processedPattern)
             } catch (error) {
-                // According to express docs, express uses path-to-regexp internally to parse routes
-                // We should not reach this code because express itself will error if an invalid route
-                // pattern is defined
                 throw new Error(`Invalid route pattern: ${routePattern}`)
             }
         }
