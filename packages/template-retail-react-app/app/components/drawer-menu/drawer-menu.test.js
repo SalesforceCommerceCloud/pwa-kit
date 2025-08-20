@@ -13,6 +13,9 @@ import {mockCategories} from '@salesforce/retail-react-app/app/mocks/mock-data'
 // Mock the hooks and modules
 jest.mock('@salesforce/retail-react-app/app/hooks/use-navigation')
 jest.mock('@salesforce/retail-react-app/app/hooks/use-multi-site')
+jest.mock('@salesforce/pwa-kit-runtime/utils/ssr-config', () => ({
+    getConfig: jest.fn()
+}))
 jest.mock('@salesforce/commerce-sdk-react', () => ({
     ...jest.requireActual('@salesforce/commerce-sdk-react'),
     useCustomerType: jest.fn(),
@@ -25,6 +28,8 @@ jest.mock('@salesforce/commerce-sdk-react', () => ({
 import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
 import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
 import {useCustomerType, useAuthHelper} from '@salesforce/commerce-sdk-react'
+import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
+import mockConfig from '@salesforce/retail-react-app/config/mocks/default'
 
 describe('DrawerMenu', () => {
     const mockNavigate = jest.fn()
@@ -49,6 +54,15 @@ describe('DrawerMenu', () => {
         })
         useCustomerType.mockReturnValue({isRegistered: false})
         useAuthHelper.mockReturnValue(mockLogout)
+
+        // Default config with OMS enabled for tests
+        getConfig.mockReturnValue({
+            ...mockConfig,
+            app: {
+                ...mockConfig.app,
+                oms: {enabled: true}
+            }
+        })
     })
 
     test('Renders DrawerMenu without errors', async () => {
@@ -188,6 +202,13 @@ describe('DrawerMenu', () => {
     })
 
     test('renders Order Status menu item with correct link', () => {
+        getConfig.mockReturnValue({
+            ...mockConfig,
+            app: {
+                ...mockConfig.app,
+                oms: {enabled: true}
+            }
+        })
         renderWithProviders(<DrawerMenu isOpen={true} root={mockCategories.root} />)
 
         // Find the Order Status link by its accessible name
@@ -198,5 +219,18 @@ describe('DrawerMenu', () => {
 
         // Test that the link has the correct href attribute
         expect(orderStatusLink).toHaveAttribute('href', '/order-status')
+    })
+
+    test('does not render Order Status menu item when OMS is disabled', () => {
+        getConfig.mockReturnValue({
+            ...mockConfig,
+            app: {
+                ...mockConfig.app,
+                oms: {enabled: false}
+            }
+        })
+        renderWithProviders(<DrawerMenu isOpen={true} root={mockCategories.root} />)
+
+        expect(screen.queryByRole('link', {name: /order status/i})).not.toBeInTheDocument()
     })
 })

@@ -9,6 +9,8 @@ import {screen, within} from '@testing-library/react'
 import Footer from '@salesforce/retail-react-app/app/components/footer/index'
 import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
 import {useBreakpointValue} from '@chakra-ui/react'
+import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
+import mockConfig from '@salesforce/retail-react-app/config/mocks/default'
 
 // Mock the Chakra UI hook
 jest.mock('@chakra-ui/react', () => ({
@@ -16,9 +18,21 @@ jest.mock('@chakra-ui/react', () => ({
     useBreakpointValue: jest.fn()
 }))
 
+jest.mock('@salesforce/pwa-kit-runtime/utils/ssr-config', () => ({
+    getConfig: jest.fn()
+}))
+
 describe('Footer', () => {
     beforeEach(() => {
         jest.resetAllMocks()
+        // Default: OMS enabled with full app config (including sites/locales)
+        getConfig.mockReturnValue({
+            ...mockConfig,
+            app: {
+                ...mockConfig.app,
+                oms: {enabled: true}
+            }
+        })
     })
 
     test('renders component', () => {
@@ -35,6 +49,13 @@ describe('Footer', () => {
     test('renders desktop version (desktop links visible)', () => {
         // Mock for desktop view - force all content to be visible
         useBreakpointValue.mockImplementation(() => true)
+        getConfig.mockReturnValue({
+            ...mockConfig,
+            app: {
+                ...mockConfig.app,
+                oms: {enabled: true}
+            }
+        })
 
         renderWithProviders(<Footer />)
 
@@ -45,6 +66,22 @@ describe('Footer', () => {
         expect(orderStatusLink).toBeInTheDocument()
         expect(orderStatusLink).toHaveAttribute('href', '/uk/en-GB/order-status')
         expect(screen.getAllByText(/privacy policy/i)[0]).toBeInTheDocument()
+    })
+
+    test('hides Order Status link on desktop when OMS is disabled', () => {
+        useBreakpointValue.mockImplementation(() => true)
+        getConfig.mockReturnValue({
+            ...mockConfig,
+            app: {
+                ...mockConfig.app,
+                oms: {enabled: false}
+            }
+        })
+
+        renderWithProviders(<Footer />)
+
+        const footer = screen.getByRole('contentinfo')
+        expect(within(footer).queryByText('Order Status')).not.toBeInTheDocument()
     })
 
     test('renders mobile version (only mobile links visible)', () => {
