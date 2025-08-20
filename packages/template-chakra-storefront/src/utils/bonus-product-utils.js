@@ -18,6 +18,24 @@ import {useCurrentBasket} from '../hooks'
 //==============================================================================
 
 /**
+ * Helper function to get promotion callout message as plain text.
+ * Strips HTML tags from the promotion callout message.
+ *
+ * @param {Object} product - Product object with productPromotions array
+ * @param {string} promotionId - The promotion ID to find the callout text for
+ * @returns {string} Plain text promotion callout message
+ */
+export const getPromotionCalloutText = (product, promotionId) => {
+    if (!product?.productPromotions || !promotionId) return ''
+
+    const promo = product.productPromotions.find((p) => p.promotionId === promotionId)
+    if (!promo?.calloutMsg) return ''
+
+    // Strip HTML tags and return plain text
+    return promo.calloutMsg.replace(/<[^>]*>/g, '')
+}
+
+/**
  * Gets the qualifying product ID(s) for a bonus product from the bonusDiscountLineItems collection.
  * This function matches bonus discount line items with qualifying products in the cart
  * using the promotionId field.
