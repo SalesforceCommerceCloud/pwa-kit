@@ -46,6 +46,7 @@ import {useCheckout} from '@salesforce/retail-react-app/app/pages/checkout/util/
 import {usePickupShipment} from '@salesforce/retail-react-app/app/hooks/use-pickup-shipment'
 import {useAddressManagement} from '@salesforce/retail-react-app/app/hooks/use-address-management'
 import {useAddressForm} from '@salesforce/retail-react-app/app/hooks/use-address-form'
+import AddressSelectionCard from '@salesforce/retail-react-app/app/components/address-selection-card'
 
 const MultiShippingItemAttributes = ({variant, includeQuantity = true}) => {
     const {formatMessage} = useIntl()
@@ -395,231 +396,28 @@ const ShippingMultiAddress = ({
                             const addressKey = item.itemId
 
                             return (
-                                <Box
+                                <AddressSelectionCard
                                     key={addressKey}
-                                    border="1px solid"
-                                    borderColor="gray.200"
-                                    borderRadius="md"
-                                    p={4}
-                                    data-testid="multi-shipping-card"
-                                    w="100%"
-                                    flex="1"
-                                >
-                                    <Flex
-                                        direction={{base: 'column', md: 'row'}}
-                                        align="flex-start"
-                                        w="100%"
-                                        h="100%"
-                                        gap={{base: 4, md: 6}}
-                                    >
-                                        <Flex direction="row" align="flex-start" flex={1} minW={0}>
-                                            <HStack align="flex-start" spacing={3} w="100%">
-                                                <Box
-                                                    flexShrink={0}
-                                                    borderRadius="md"
-                                                    bg="gray.100"
-                                                    overflow="hidden"
-                                                    position="relative"
-                                                    maxW={{base: '60px', md: '80px'}}
-                                                    w="100%"
-                                                    aspectRatio="1"
-                                                >
-                                                    <Image
-                                                        src={imageUrl}
-                                                        alt={formatMessage(
-                                                            {
-                                                                id: 'shipping_multi_address.image.alt',
-                                                                defaultMessage:
-                                                                    'Product image for {productName}'
-                                                            },
-                                                            {
-                                                                productName: item.productName
-                                                            }
-                                                        )}
-                                                        objectFit="cover"
-                                                        w="100%"
-                                                        h="100%"
-                                                    />
-                                                </Box>
-                                                <ItemVariantProvider variant={variant}>
-                                                    <VStack
-                                                        justify="flex-start"
-                                                        minW={0}
-                                                        flex={1}
-                                                        pt={0}
-                                                        align="flex-start"
-                                                    >
-                                                        <Text
-                                                            id={`product-title-${addressKey}`}
-                                                            data-testid={`product-title-${addressKey}`}
-                                                            fontWeight="medium"
-                                                            fontSize={{base: 'sm', md: 'md'}}
-                                                            mb={1}
-                                                            color="gray.900"
-                                                            textAlign="left"
-                                                        >
-                                                            {item.productName}
-                                                        </Text>
-                                                        <Box
-                                                            id={`product-description-${addressKey}`}
-                                                            data-testid={`product-description-${addressKey}`}
-                                                        >
-                                                            <MultiShippingItemAttributes
-                                                                variant={variant}
-                                                                includeQuantity
-                                                            />
-                                                        </Box>
-                                                    </VStack>
-                                                </ItemVariantProvider>
-                                            </HStack>
-                                        </Flex>
-
-                                        <VStack
-                                            align="flex-start"
-                                            w="100%"
-                                            flex={{base: 'none', md: '1'}}
-                                            minW={{base: '100%', md: '280px'}}
-                                            maxW={{base: '100%', md: '400px'}}
-                                            pt={0}
-                                            spacing={1}
-                                            mt={{base: 4, md: 0}}
-                                        >
-                                            <Text
-                                                id={`delivery-address-label-${addressKey}`}
-                                                data-testid={`delivery-address-label-${addressKey}`}
-                                                fontWeight="medium"
-                                                fontSize="sm"
-                                                mb={1}
-                                            >
-                                                {formatMessage(deliveryAddressLabel)}
-                                            </Text>
-
-                                            <Box w="100%" mb={6}>
-                                                <VStack spacing={3} align="stretch">
-                                                    {!isGuestUser && customerLoading ? (
-                                                        <Box p={4} textAlign="center">
-                                                            <Text color="gray.500">
-                                                                {formatMessage({
-                                                                    id: 'shipping_multi_address.loading_addresses',
-                                                                    defaultMessage:
-                                                                        'Loading addresses...'
-                                                                })}
-                                                            </Text>
-                                                        </Box>
-                                                    ) : (
-                                                        <Select
-                                                            value={selectedAddresses[addressKey] || ''}
-                                                            onChange={(e) => {
-                                                                const value = e.target.value
-                                                                // Hide the address form when an existing address is selected
-                                                                closeForm(addressKey)
-
-                                                                setAddressesForItems(addressKey, value)
-                                                            }}
-                                                            disabled={
-                                                                finalAddresses.length === 0 ||
-                                                                (!isGuestUser &&
-                                                                    customerLoading)
-                                                            }
-                                                            aria-labelledby={`delivery-address-label-${addressKey}`}
-                                                            borderColor="gray.300"
-                                                            _hover={{borderColor: 'gray.400'}}
-                                                            _focus={{
-                                                                borderColor: 'blue.500',
-                                                                boxShadow:
-                                                                    '0 0 0 1px var(--chakra-colors-blue-500)'
-                                                            }}
-                                                            data-testid={`address-dropdown-${addressKey}`}
-                                                        >
-                                                            {finalAddresses.length === 0 ? (
-                                                                <option value="">
-                                                                    {formatMessage({
-                                                                        id: 'shipping_multi_address.no_addresses_available',
-                                                                        defaultMessage:
-                                                                            'No address available'
-                                                                    })}
-                                                                </option>
-                                                            ) : (
-                                                                finalAddresses.map((addr) => (
-                                                                    <option
-                                                                        key={addr.addressId}
-                                                                        value={addr.addressId}
-                                                                        data-testid={`address-option-${addr.addressId}`}
-                                                                    >
-                                                                        {addr.firstName}{' '}
-                                                                        {addr.lastName} -{' '}
-                                                                        {addr.address1},{' '}
-                                                                        {formatMessage(
-                                                                            {
-                                                                                id: 'shipping_multi_address.format.address_line_2',
-                                                                                defaultMessage:
-                                                                                    '{city}, {stateCode} {postalCode}'
-                                                                            },
-                                                                            {
-                                                                                city: addr.city,
-                                                                                stateCode:
-                                                                                    addr.stateCode ||
-                                                                                    '',
-                                                                                postalCode:
-                                                                                    addr.postalCode
-                                                                            }
-                                                                        )}
-                                                                    </option>
-                                                                ))
-                                                            )}
-                                                        </Select>
-                                                    )}
-                                                    <Button
-                                                        variant="link"
-                                                        size="sm"
-                                                        onClick={() => {
-                                                            openForm(addressKey)
-                                                        }}
-                                                        alignSelf="flex-start"
-                                                        aria-label={formatMessage(
-                                                            {
-                                                                id: 'shipping_multi_address.add_new_address.aria_label',
-                                                                defaultMessage:
-                                                                    'Add new delivery address for {productName}'
-                                                            },
-                                                            {
-                                                                productName: item.productName
-                                                            }
-                                                        )}
-                                                    >
-                                                        {formatMessage(addNewAddressLabel)}
-                                                    </Button>
-                                                </VStack>
-                                            </Box>
-
-                                            <Box
-                                                fontWeight="semibold"
-                                                fontSize="md"
-                                                color="gray.900"
-                                                alignSelf="flex-end"
-                                                mt="auto"
-                                            >
-                                                <DisplayPrice
-                                                    priceData={getPriceData(variant)}
-                                                    currency={currency}
-                                                    labelForA11y={variant.productName}
-                                                />
-                                            </Box>
-                                        </VStack>
-                                    </Flex>
-
-                                    {/* Add New Address Form - appears inside the product card */}
-                                    {showAddAddressForm[addressKey] && (
-                                        <Box position="relative" mt={4} width="100%">
-                                            <AddressForm
-                                                item={item}
-                                                form={addressForm}
-                                                onSubmit={(addressData, form, itemId) => handleCreateAddress(addressData, itemId)}
-                                                onCancel={() => closeForm(addressKey)}
-                                            />
-                                        </Box>
-                                    )}
-                                </Box>
+                                    item={item}
+                                    variant={variant}
+                                    productDetail={productDetail}
+                                    imageUrl={imageUrl}
+                                    addressKey={addressKey}
+                                    selectedAddressId={selectedAddresses[addressKey]}
+                                    availableAddresses={finalAddresses}
+                                    isGuestUser={isGuestUser}
+                                    customerLoading={customerLoading}
+                                    onAddressSelect={setAddressesForItems}
+                                    onAddNewAddress={openForm}
+                                    getPriceData={getPriceData}
+                                    currency={currency}
+                                    deliveryAddressLabel={deliveryAddressLabel}
+                                    addNewAddressLabel={addNewAddressLabel}
+                                    showAddAddressForm={showAddAddressForm}
+                                    addressForm={addressForm}
+                                    handleCreateAddress={handleCreateAddress}
+                                    closeForm={closeForm}
+                                />
                             )
                         })}
                     </VStack>
