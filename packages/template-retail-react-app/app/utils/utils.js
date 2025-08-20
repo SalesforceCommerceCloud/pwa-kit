@@ -206,7 +206,7 @@ export const isHydrated = () => typeof window !== 'undefined' && !window.__HYDRA
  * Constructs a redirectURI by combining `appOrigin` with `redirectPath`.
  * Ensures that `redirectPath` starts with a '/'.
  * Returns an empty string if `redirectPath` is falsy.
- * 
+ *
  * This will insert an envBasePath in between the 'appOrigin' and the 'redirectPath'
  * if one has been defined in the PWA config.
  *
