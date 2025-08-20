@@ -7,14 +7,14 @@
 
 import {renderHook} from '@testing-library/react'
 import {useShopperBasketsMutation} from '@salesforce/commerce-sdk-react'
-import {useItemArrangement} from '@salesforce/retail-react-app/app/hooks/use-item-arrangement'
+import {useItemShipmentManagement} from '@salesforce/retail-react-app/app/hooks/use-item-shipment-management'
 
 // Mock the commerce SDK hooks
 jest.mock('@salesforce/commerce-sdk-react', () => ({
     useShopperBasketsMutation: jest.fn()
 }))
 
-describe('useItemArrangement', () => {
+describe('useItemShipmentManagement', () => {
     let mockUpdateItemInBasketMutation
     let mockUpdateItemsInBasketMutation
     let mockUseShopperBasketsMutation
@@ -59,7 +59,7 @@ describe('useItemArrangement', () => {
 
             mockUpdateItemInBasketMutation.mutateAsync.mockResolvedValue(mockResponse)
 
-            const {result} = renderHook(() => useItemArrangement(basketId))
+            const {result} = renderHook(() => useItemShipmentManagement(basketId))
 
             const response = await result.current.updateItemToPickupShipment(
                 productItem,
@@ -88,7 +88,7 @@ describe('useItemArrangement', () => {
             const targetShipmentId = 'pickup-shipment'
             const inventoryId = 'store-inventory-1'
 
-            const {result} = renderHook(() => useItemArrangement(basketId))
+            const {result} = renderHook(() => useItemShipmentManagement(basketId))
 
             await expect(
                 result.current.updateItemToPickupShipment(
@@ -112,7 +112,7 @@ describe('useItemArrangement', () => {
 
             mockUpdateItemInBasketMutation.mutateAsync.mockRejectedValue(mockError)
 
-            const {result} = renderHook(() => useItemArrangement(basketId))
+            const {result} = renderHook(() => useItemShipmentManagement(basketId))
 
             await expect(
                 result.current.updateItemToPickupShipment(
@@ -139,7 +139,7 @@ describe('useItemArrangement', () => {
 
             mockUpdateItemInBasketMutation.mutateAsync.mockResolvedValue(mockResponse)
 
-            const {result} = renderHook(() => useItemArrangement(basketId))
+            const {result} = renderHook(() => useItemShipmentManagement(basketId))
 
             const response = await result.current.updateItemToDeliveryShipment(
                 productItem,
@@ -175,7 +175,7 @@ describe('useItemArrangement', () => {
 
             mockUpdateItemInBasketMutation.mutateAsync.mockResolvedValue(mockResponse)
 
-            const {result} = renderHook(() => useItemArrangement(basketId))
+            const {result} = renderHook(() => useItemShipmentManagement(basketId))
 
             const response = await result.current.updateItemToDeliveryShipment(
                 productItem,
@@ -203,7 +203,7 @@ describe('useItemArrangement', () => {
             const targetShipmentId = 'delivery-shipment'
             const defaultInventoryId = 'default-inventory'
 
-            const {result} = renderHook(() => useItemArrangement(basketId))
+            const {result} = renderHook(() => useItemShipmentManagement(basketId))
 
             await expect(
                 result.current.updateItemToDeliveryShipment(
@@ -227,7 +227,7 @@ describe('useItemArrangement', () => {
 
             mockUpdateItemInBasketMutation.mutateAsync.mockRejectedValue(mockError)
 
-            const {result} = renderHook(() => useItemArrangement(basketId))
+            const {result} = renderHook(() => useItemShipmentManagement(basketId))
 
             await expect(
                 result.current.updateItemToDeliveryShipment(
@@ -262,7 +262,7 @@ describe('useItemArrangement', () => {
 
             mockUpdateItemsInBasketMutation.mutateAsync.mockResolvedValue(mockResponse)
 
-            const {result} = renderHook(() => useItemArrangement(basketId))
+            const {result} = renderHook(() => useItemShipmentManagement(basketId))
 
             const response = await result.current.updateItemsToDeliveryShipment(
                 productItems,
@@ -300,7 +300,7 @@ describe('useItemArrangement', () => {
             const targetShipmentId = 'delivery-shipment'
             const defaultInventoryId = 'default-inventory'
 
-            const {result} = renderHook(() => useItemArrangement(basketId))
+            const {result} = renderHook(() => useItemShipmentManagement(basketId))
 
             const response = await result.current.updateItemsToDeliveryShipment(
                 productItems,
@@ -318,7 +318,7 @@ describe('useItemArrangement', () => {
             const targetShipmentId = 'delivery-shipment'
             const defaultInventoryId = 'default-inventory'
 
-            const {result} = renderHook(() => useItemArrangement(basketId))
+            const {result} = renderHook(() => useItemShipmentManagement(basketId))
 
             await expect(
                 result.current.updateItemsToDeliveryShipment(
@@ -344,7 +344,7 @@ describe('useItemArrangement', () => {
 
             mockUpdateItemsInBasketMutation.mutateAsync.mockRejectedValue(mockError)
 
-            const {result} = renderHook(() => useItemArrangement(basketId))
+            const {result} = renderHook(() => useItemShipmentManagement(basketId))
 
             await expect(
                 result.current.updateItemsToDeliveryShipment(
@@ -377,7 +377,7 @@ describe('useItemArrangement', () => {
 
             mockUpdateItemsInBasketMutation.mutateAsync.mockResolvedValue(mockResponse)
 
-            const {result} = renderHook(() => useItemArrangement(basketId))
+            const {result} = renderHook(() => useItemShipmentManagement(basketId))
 
             const response = await result.current.updateItemsToPickupShipment(
                 productItems,
@@ -415,7 +415,7 @@ describe('useItemArrangement', () => {
             const targetShipmentId = 'pickup-shipment'
             const inventoryId = 'store-inventory-1'
 
-            const {result} = renderHook(() => useItemArrangement(basketId))
+            const {result} = renderHook(() => useItemShipmentManagement(basketId))
 
             const response = await result.current.updateItemsToPickupShipment(
                 productItems,
@@ -433,7 +433,7 @@ describe('useItemArrangement', () => {
             const targetShipmentId = 'pickup-shipment'
             const inventoryId = 'store-inventory-1'
 
-            const {result} = renderHook(() => useItemArrangement(basketId))
+            const {result} = renderHook(() => useItemShipmentManagement(basketId))
 
             await expect(
                 result.current.updateItemsToPickupShipment(
@@ -459,7 +459,7 @@ describe('useItemArrangement', () => {
 
             mockUpdateItemsInBasketMutation.mutateAsync.mockRejectedValue(mockError)
 
-            const {result} = renderHook(() => useItemArrangement(basketId))
+            const {result} = renderHook(() => useItemShipmentManagement(basketId))
 
             await expect(
                 result.current.updateItemsToPickupShipment(
@@ -490,7 +490,7 @@ describe('useItemArrangement', () => {
 
             mockUpdateItemInBasketMutation.mutateAsync.mockResolvedValue({updated: true})
 
-            const {result} = renderHook(() => useItemArrangement(basketId))
+            const {result} = renderHook(() => useItemShipmentManagement(basketId))
 
             await result.current.updateDeliveryOption(
                 productItem,
@@ -532,7 +532,7 @@ describe('useItemArrangement', () => {
 
             mockUpdateItemInBasketMutation.mutateAsync.mockResolvedValue({updated: true})
 
-            const {result} = renderHook(() => useItemArrangement(basketId))
+            const {result} = renderHook(() => useItemShipmentManagement(basketId))
 
             await result.current.updateDeliveryOption(
                 productItem,
@@ -567,7 +567,7 @@ describe('useItemArrangement', () => {
             const findOrCreatePickupShipment = jest.fn()
             const findOrCreateDeliveryShipment = jest.fn()
 
-            const {result} = renderHook(() => useItemArrangement(basketId))
+            const {result} = renderHook(() => useItemShipmentManagement(basketId))
 
             await expect(
                 result.current.updateDeliveryOption(
@@ -594,7 +594,7 @@ describe('useItemArrangement', () => {
             const findOrCreatePickupShipment = jest.fn()
             const findOrCreateDeliveryShipment = jest.fn()
 
-            const {result} = renderHook(() => useItemArrangement(basketId))
+            const {result} = renderHook(() => useItemShipmentManagement(basketId))
 
             await expect(
                 result.current.updateDeliveryOption(
@@ -621,7 +621,7 @@ describe('useItemArrangement', () => {
             const findOrCreatePickupShipment = jest.fn()
             const findOrCreateDeliveryShipment = jest.fn()
 
-            const {result} = renderHook(() => useItemArrangement(basketId))
+            const {result} = renderHook(() => useItemShipmentManagement(basketId))
 
             await expect(
                 result.current.updateDeliveryOption(
@@ -648,7 +648,7 @@ describe('useItemArrangement', () => {
             const findOrCreatePickupShipment = jest.fn().mockResolvedValue(null)
             const findOrCreateDeliveryShipment = jest.fn()
 
-            const {result} = renderHook(() => useItemArrangement(basketId))
+            const {result} = renderHook(() => useItemShipmentManagement(basketId))
 
             await expect(
                 result.current.updateDeliveryOption(
@@ -675,7 +675,7 @@ describe('useItemArrangement', () => {
             const findOrCreatePickupShipment = jest.fn()
             const findOrCreateDeliveryShipment = jest.fn().mockResolvedValue(null)
 
-            const {result} = renderHook(() => useItemArrangement(basketId))
+            const {result} = renderHook(() => useItemShipmentManagement(basketId))
 
             await expect(
                 result.current.updateDeliveryOption(

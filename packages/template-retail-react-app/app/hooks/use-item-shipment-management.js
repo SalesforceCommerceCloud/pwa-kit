@@ -10,12 +10,12 @@ import {useCallback} from 'react'
 import {DEFAULT_SHIPMENT_ID} from '@salesforce/retail-react-app/app/constants'
 
 /**
- * Hook for item arrangement operations
+ * Hook for item shipment management operations
  * Focused only on moving items between shipments (basket data manipulation)
  * @param {string} basketId - The basket ID
- * @returns {Object} Object containing item arrangement functions
+ * @returns {Object} Object containing item shipment management functions
  */
-export const useItemArrangement = (basketId) => {
+export const useItemShipmentManagement = (basketId) => {
     const updateItemInBasketMutation = useShopperBasketsMutation('updateItemInBasket')
     const updateItemsInBasketMutation = useShopperBasketsMutation('updateItemsInBasket')
 
