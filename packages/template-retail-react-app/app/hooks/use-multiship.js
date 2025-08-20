@@ -49,7 +49,7 @@ export const useMultiship = (basket) => {
         updateItemToDeliveryShipment,
         updateItemsToDeliveryShipment,
         updateItemsToPickupShipment,
-        handleDeliveryOptionChange: handleDeliveryOptionChangeOperation
+        updateDeliveryOption: updateDeliveryOptionOperation
     } = useItemMovement(basket?.basketId)
 
     // Hook for shipping methods for the main shipment - we'll use this as a fallback
@@ -273,21 +273,20 @@ export const useMultiship = (basket) => {
     }
 
     /**
-     * Handles delivery option change for a product item
-     * Note: this might leave empty shipments behind
+     * Updates delivery option for a product item
      * @param {Object} productItem - The product item
      * @param {boolean} selectedPickup - Whether pickup is selected (true) or delivery is selected (false)
      * @param {Object} storeInfo - The selected store object (required for pickup)
      * @param {string} defaultInventoryId - The default inventory ID to use for delivery items (required)
      * @returns {Promise<void>}
      */
-    const handleDeliveryOptionChange = async (
+    const updateDeliveryOption = async (
         productItem,
         selectedPickup,
         storeInfo,
         defaultInventoryId
     ) => {
-        await handleDeliveryOptionChangeOperation(
+        await updateDeliveryOptionOperation(
             productItem,
             selectedPickup,
             storeInfo,
@@ -477,7 +476,7 @@ export const useMultiship = (basket) => {
 
     return {
         assignDefaultShippingMethodsToShipments,
-        handleDeliveryOptionChange,
+        updateDeliveryOption,
         removeEmptyShipments,
         findExistingDeliveryShipment: (basket) =>
             findExistingDeliveryShipment(basket, isCurrentShippingMethodPickup),

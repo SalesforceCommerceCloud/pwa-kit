@@ -158,7 +158,7 @@ describe('useMultiship', () => {
             const {result} = renderHook(() => useMultiship(mockBasket))
 
             expect(result.current).toHaveProperty('assignDefaultShippingMethodsToShipments')
-            expect(result.current).toHaveProperty('handleDeliveryOptionChange')
+            expect(result.current).toHaveProperty('updateDeliveryOption')
             expect(result.current).toHaveProperty('removeEmptyShipments')
             expect(result.current).toHaveProperty('findExistingDeliveryShipment')
             expect(result.current).toHaveProperty('findExistingPickupShipment')
@@ -1401,7 +1401,7 @@ describe('useMultiship', () => {
         })
     })
 
-    describe('handleDeliveryOptionChange', () => {
+    describe('updateDeliveryOption', () => {
         const mockProductItem = {
             itemId: 'item-1',
             productId: 'product-1',
@@ -1414,7 +1414,7 @@ describe('useMultiship', () => {
 
             await act(async () => {
                 await expect(
-                    result.current.handleDeliveryOptionChange(
+                    result.current.updateDeliveryOption(
                         mockProductItem,
                         false,
                         null,
@@ -1475,7 +1475,7 @@ describe('useMultiship', () => {
             }
 
             await act(async () => {
-                await result.current.handleDeliveryOptionChange(
+                await result.current.updateDeliveryOption(
                     productItemInDelivery,
                     true, // selectedPickup = true
                     mockStoreInfo,
@@ -1510,7 +1510,7 @@ describe('useMultiship', () => {
 
             await act(async () => {
                 await expect(
-                    result.current.handleDeliveryOptionChange(
+                    result.current.updateDeliveryOption(
                         mockProductItem,
                         true,
                         storeWithoutInventory,

@@ -200,7 +200,7 @@ export const useItemMovement = (basketId) => {
     )
 
     /**
-     * Handles delivery option change for a product item
+     * Updates delivery option for a product item
      * Note: this might leave empty shipments behind
      * @param {Object} productItem - The product item
      * @param {boolean} selectedPickup - Whether pickup is selected (true) or delivery is selected (false)
@@ -210,7 +210,7 @@ export const useItemMovement = (basketId) => {
      * @param {Function} findOrCreateDeliveryShipment - Function to find or create delivery shipment
      * @returns {Promise<void>}
      */
-    const handleDeliveryOptionChange = useCallback(
+    const updateDeliveryOption = useCallback(
         async (
             productItem,
             selectedPickup,
@@ -272,6 +272,6 @@ export const useItemMovement = (basketId) => {
         updateItemToDeliveryShipment,
         updateItemsToDeliveryShipment,
         updateItemsToPickupShipment,
-        handleDeliveryOptionChange
+        updateDeliveryOption
     }
 }

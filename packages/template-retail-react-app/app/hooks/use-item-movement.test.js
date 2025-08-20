@@ -472,7 +472,7 @@ describe('useItemMovement', () => {
         })
     })
 
-    describe('handleDeliveryOptionChange', () => {
+    describe('updateDeliveryOption', () => {
         test('should handle change to pickup', async () => {
             const basketId = 'test-basket-id'
             const productItem = {itemId: 'item-1', productId: 'prod-1', quantity: 1}
@@ -486,7 +486,7 @@ describe('useItemMovement', () => {
 
             const {result} = renderHook(() => useItemMovement(basketId))
 
-            await result.current.handleDeliveryOptionChange(
+            await result.current.updateDeliveryOption(
                 productItem,
                 selectedPickup,
                 storeInfo,
@@ -525,7 +525,7 @@ describe('useItemMovement', () => {
 
             const {result} = renderHook(() => useItemMovement(basketId))
 
-            await result.current.handleDeliveryOptionChange(
+            await result.current.updateDeliveryOption(
                 productItem,
                 selectedPickup,
                 storeInfo,
@@ -561,7 +561,7 @@ describe('useItemMovement', () => {
             const {result} = renderHook(() => useItemMovement(basketId))
 
             await expect(
-                result.current.handleDeliveryOptionChange(
+                result.current.updateDeliveryOption(
                     productItem,
                     selectedPickup,
                     storeInfo,
@@ -584,7 +584,7 @@ describe('useItemMovement', () => {
             const {result} = renderHook(() => useItemMovement(basketId))
 
             await expect(
-                result.current.handleDeliveryOptionChange(
+                result.current.updateDeliveryOption(
                     productItem,
                     selectedPickup,
                     storeInfo,
@@ -607,7 +607,7 @@ describe('useItemMovement', () => {
             const {result} = renderHook(() => useItemMovement(basketId))
 
             await expect(
-                result.current.handleDeliveryOptionChange(
+                result.current.updateDeliveryOption(
                     productItem,
                     selectedPickup,
                     storeInfo,
