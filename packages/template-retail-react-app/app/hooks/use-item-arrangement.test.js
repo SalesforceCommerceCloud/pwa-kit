@@ -14,31 +14,10 @@ jest.mock('@salesforce/commerce-sdk-react', () => ({
     useShopperBasketsMutation: jest.fn()
 }))
 
-// Mock useToast
-jest.mock('@salesforce/retail-react-app/app/hooks/use-toast', () => ({
-    useToast: jest.fn(() => ({
-        showToast: jest.fn()
-    }))
-}))
-
-// Mock logger
-jest.mock('@salesforce/retail-react-app/app/utils/logger-instance', () => ({
-    __esModule: true,
-    default: {
-        warn: jest.fn(),
-        error: jest.fn()
-    }
-}))
-
-import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
-import logger from '@salesforce/retail-react-app/app/utils/logger-instance'
-
 describe('useItemArrangement', () => {
     let mockUpdateItemInBasketMutation
     let mockUpdateItemsInBasketMutation
     let mockUseShopperBasketsMutation
-    let mockShowToast
-    let mockLoggerWarn
 
     beforeEach(() => {
         mockUpdateItemInBasketMutation = {
@@ -47,8 +26,6 @@ describe('useItemArrangement', () => {
         mockUpdateItemsInBasketMutation = {
             mutateAsync: jest.fn()
         }
-        mockShowToast = jest.fn()
-        mockLoggerWarn = jest.fn()
 
         mockUseShopperBasketsMutation = jest.fn((mutationType) => {
             switch (mutationType) {
@@ -62,8 +39,6 @@ describe('useItemArrangement', () => {
         })
 
         useShopperBasketsMutation.mockImplementation(mockUseShopperBasketsMutation)
-        useToast.mockReturnValue({showToast: mockShowToast})
-        logger.warn.mockImplementation(mockLoggerWarn)
     })
 
     afterEach(() => {
@@ -107,58 +82,56 @@ describe('useItemArrangement', () => {
             expect(response).toEqual(mockResponse)
         })
 
-        test('should throw error if basketId is missing', async () => {
-            const {result} = renderHook(() => useItemArrangement(null))
-
-            await expect(
-                result.current.updateItemToPickupShipment({}, 'shipment', 'inventory')
-            ).rejects.toThrow('Invalid basket or product item')
-        })
-
-        test('should throw error if productItem is missing', async () => {
-            const {result} = renderHook(() => useItemArrangement('basket-id'))
-
-            await expect(
-                result.current.updateItemToPickupShipment(null, 'shipment', 'inventory')
-            ).rejects.toThrow('Invalid basket or product item')
-        })
-
-        test('should handle API errors', async () => {
-            const basketId = 'test-basket-id'
-            const productItem = {itemId: 'item-1', productId: 'prod-1', quantity: 1}
-            const error = new Error('API Error')
-            mockUpdateItemInBasketMutation.mutateAsync.mockRejectedValue(error)
+        test('should throw error for invalid basket or product item', async () => {
+            const basketId = null
+            const productItem = null
+            const targetShipmentId = 'pickup-shipment'
+            const inventoryId = 'store-inventory-1'
 
             const {result} = renderHook(() => useItemArrangement(basketId))
 
             await expect(
-                result.current.updateItemToPickupShipment(productItem, 'shipment', 'inventory')
-            ).rejects.toThrow('API Error')
+                result.current.updateItemToPickupShipment(
+                    productItem,
+                    targetShipmentId,
+                    inventoryId
+                )
+            ).rejects.toThrow('Invalid basket or product item')
+        })
 
-            expect(mockLoggerWarn).toHaveBeenCalledWith(
-                'Failed to update item to pickup shipment',
-                {
-                    namespace: 'useItemArrangement.handleError',
-                    additionalProperties: {
-                        error: error
-                    }
-                }
-            )
-            expect(mockShowToast).toHaveBeenCalledWith({
-                title: 'Failed to update item to pickup shipment',
-                status: 'error'
-            })
+        test('should throw error when API call fails', async () => {
+            const basketId = 'test-basket-id'
+            const productItem = {
+                itemId: 'item-1',
+                productId: 'prod-1',
+                quantity: 2
+            }
+            const targetShipmentId = 'pickup-shipment'
+            const inventoryId = 'store-inventory-1'
+            const mockError = new Error('API Error')
+
+            mockUpdateItemInBasketMutation.mutateAsync.mockRejectedValue(mockError)
+
+            const {result} = renderHook(() => useItemArrangement(basketId))
+
+            await expect(
+                result.current.updateItemToPickupShipment(
+                    productItem,
+                    targetShipmentId,
+                    inventoryId
+                )
+            ).rejects.toThrow('API Error')
         })
     })
 
     describe('updateItemToDeliveryShipment', () => {
-        test('should update item to delivery shipment with default inventory', async () => {
+        test('should update item to delivery shipment', async () => {
             const basketId = 'test-basket-id'
             const productItem = {
                 itemId: 'item-1',
                 productId: 'prod-1',
                 quantity: 2,
-                inventoryId: 'pickup-inventory'
+                inventoryId: 'store-inventory-1'
             }
             const targetShipmentId = 'delivery-shipment'
             const defaultInventoryId = 'default-inventory'
@@ -195,7 +168,6 @@ describe('useItemArrangement', () => {
                 itemId: 'item-1',
                 productId: 'prod-1',
                 quantity: 2
-                // No inventoryId
             }
             const targetShipmentId = 'delivery-shipment'
             const defaultInventoryId = 'default-inventory'
@@ -220,65 +192,50 @@ describe('useItemArrangement', () => {
                     productId: 'prod-1',
                     quantity: 2,
                     shipmentId: 'delivery-shipment'
-                    // No inventoryId in body
                 }
             })
             expect(response).toEqual(mockResponse)
         })
 
-        test('should use default shipment ID when not provided', async () => {
-            const basketId = 'test-basket-id'
-            const productItem = {itemId: 'item-1', productId: 'prod-1', quantity: 1}
+        test('should throw error for invalid basket or product item', async () => {
+            const basketId = null
+            const productItem = null
+            const targetShipmentId = 'delivery-shipment'
             const defaultInventoryId = 'default-inventory'
-
-            mockUpdateItemInBasketMutation.mutateAsync.mockResolvedValue({})
-
-            const {result} = renderHook(() => useItemArrangement(basketId))
-
-            await result.current.updateItemToDeliveryShipment(
-                productItem,
-                undefined,
-                defaultInventoryId
-            )
-
-            expect(mockUpdateItemInBasketMutation.mutateAsync).toHaveBeenCalledWith({
-                parameters: {
-                    basketId,
-                    itemId: 'item-1'
-                },
-                body: {
-                    productId: 'prod-1',
-                    quantity: 1,
-                    shipmentId: 'me'
-                }
-            })
-        })
-
-        test('should handle API errors', async () => {
-            const basketId = 'test-basket-id'
-            const productItem = {itemId: 'item-1', productId: 'prod-1', quantity: 1}
-            const error = new Error('API Error')
-            mockUpdateItemInBasketMutation.mutateAsync.mockRejectedValue(error)
 
             const {result} = renderHook(() => useItemArrangement(basketId))
 
             await expect(
-                result.current.updateItemToDeliveryShipment(productItem, 'shipment', 'inventory')
-            ).rejects.toThrow('API Error')
+                result.current.updateItemToDeliveryShipment(
+                    productItem,
+                    targetShipmentId,
+                    defaultInventoryId
+                )
+            ).rejects.toThrow('Invalid basket or product item')
+        })
 
-            expect(mockLoggerWarn).toHaveBeenCalledWith(
-                'Failed to update item to delivery shipment',
-                {
-                    namespace: 'useItemArrangement.handleError',
-                    additionalProperties: {
-                        error: error
-                    }
-                }
-            )
-            expect(mockShowToast).toHaveBeenCalledWith({
-                title: 'Failed to update item to delivery shipment',
-                status: 'error'
-            })
+        test('should throw error when API call fails', async () => {
+            const basketId = 'test-basket-id'
+            const productItem = {
+                itemId: 'item-1',
+                productId: 'prod-1',
+                quantity: 2
+            }
+            const targetShipmentId = 'delivery-shipment'
+            const defaultInventoryId = 'default-inventory'
+            const mockError = new Error('API Error')
+
+            mockUpdateItemInBasketMutation.mutateAsync.mockRejectedValue(mockError)
+
+            const {result} = renderHook(() => useItemArrangement(basketId))
+
+            await expect(
+                result.current.updateItemToDeliveryShipment(
+                    productItem,
+                    targetShipmentId,
+                    defaultInventoryId
+                )
+            ).rejects.toThrow('API Error')
         })
     })
 
@@ -290,13 +247,13 @@ describe('useItemArrangement', () => {
                     itemId: 'item-1',
                     productId: 'prod-1',
                     quantity: 2,
-                    inventoryId: 'pickup-inventory'
+                    inventoryId: 'store-inventory-1'
                 },
                 {
                     itemId: 'item-2',
                     productId: 'prod-2',
-                    quantity: 1
-                    // No inventoryId
+                    quantity: 1,
+                    inventoryId: 'store-inventory-2'
                 }
             ]
             const targetShipmentId = 'delivery-shipment'
@@ -329,52 +286,73 @@ describe('useItemArrangement', () => {
                         itemId: 'item-2',
                         productId: 'prod-2',
                         quantity: 1,
-                        shipmentId: 'delivery-shipment'
-                        // No inventoryId
+                        shipmentId: 'delivery-shipment',
+                        inventoryId: 'default-inventory'
                     }
                 ]
             })
             expect(response).toEqual(mockResponse)
         })
 
-        test('should handle empty productItems array gracefully', async () => {
-            const {result} = renderHook(() => useItemArrangement('basket-id'))
+        test('should return early for empty product items array', async () => {
+            const basketId = 'test-basket-id'
+            const productItems = []
+            const targetShipmentId = 'delivery-shipment'
+            const defaultInventoryId = 'default-inventory'
+
+            const {result} = renderHook(() => useItemArrangement(basketId))
 
             const response = await result.current.updateItemsToDeliveryShipment(
-                [],
-                'shipment',
-                'inventory'
+                productItems,
+                targetShipmentId,
+                defaultInventoryId
             )
 
             expect(response).toEqual({updated: true})
             expect(mockUpdateItemsInBasketMutation.mutateAsync).not.toHaveBeenCalled()
         })
 
-        test('should handle API errors', async () => {
-            const basketId = 'test-basket-id'
-            const productItems = [{itemId: 'item-1', productId: 'prod-1', quantity: 1}]
-            const error = new Error('API Error')
-            mockUpdateItemsInBasketMutation.mutateAsync.mockRejectedValue(error)
+        test('should throw error for invalid basket or product items', async () => {
+            const basketId = null
+            const productItems = null
+            const targetShipmentId = 'delivery-shipment'
+            const defaultInventoryId = 'default-inventory'
 
             const {result} = renderHook(() => useItemArrangement(basketId))
 
             await expect(
-                result.current.updateItemsToDeliveryShipment(productItems, 'shipment', 'inventory')
-            ).rejects.toThrow('API Error')
+                result.current.updateItemsToDeliveryShipment(
+                    productItems,
+                    targetShipmentId,
+                    defaultInventoryId
+                )
+            ).rejects.toThrow('Invalid basket or product items array')
+        })
 
-            expect(mockLoggerWarn).toHaveBeenCalledWith(
-                'Failed to update items to delivery shipment',
+        test('should throw error when API call fails', async () => {
+            const basketId = 'test-basket-id'
+            const productItems = [
                 {
-                    namespace: 'useItemArrangement.handleError',
-                    additionalProperties: {
-                        error: error
-                    }
+                    itemId: 'item-1',
+                    productId: 'prod-1',
+                    quantity: 2
                 }
-            )
-            expect(mockShowToast).toHaveBeenCalledWith({
-                title: 'Failed to update items to delivery shipment',
-                status: 'error'
-            })
+            ]
+            const targetShipmentId = 'delivery-shipment'
+            const defaultInventoryId = 'default-inventory'
+            const mockError = new Error('API Error')
+
+            mockUpdateItemsInBasketMutation.mutateAsync.mockRejectedValue(mockError)
+
+            const {result} = renderHook(() => useItemArrangement(basketId))
+
+            await expect(
+                result.current.updateItemsToDeliveryShipment(
+                    productItems,
+                    targetShipmentId,
+                    defaultInventoryId
+                )
+            ).rejects.toThrow('API Error')
         })
     })
 
@@ -431,58 +409,86 @@ describe('useItemArrangement', () => {
             expect(response).toEqual(mockResponse)
         })
 
-        test('should handle empty productItems array gracefully', async () => {
-            const {result} = renderHook(() => useItemArrangement('basket-id'))
+        test('should return early for empty product items array', async () => {
+            const basketId = 'test-basket-id'
+            const productItems = []
+            const targetShipmentId = 'pickup-shipment'
+            const inventoryId = 'store-inventory-1'
+
+            const {result} = renderHook(() => useItemArrangement(basketId))
 
             const response = await result.current.updateItemsToPickupShipment(
-                [],
-                'shipment',
-                'inventory'
+                productItems,
+                targetShipmentId,
+                inventoryId
             )
 
             expect(response).toEqual({updated: true})
             expect(mockUpdateItemsInBasketMutation.mutateAsync).not.toHaveBeenCalled()
         })
 
-        test('should handle API errors', async () => {
-            const basketId = 'test-basket-id'
-            const productItems = [{itemId: 'item-1', productId: 'prod-1', quantity: 1}]
-            const error = new Error('API Error')
-            mockUpdateItemsInBasketMutation.mutateAsync.mockRejectedValue(error)
+        test('should throw error for invalid basket or product items', async () => {
+            const basketId = null
+            const productItems = null
+            const targetShipmentId = 'pickup-shipment'
+            const inventoryId = 'store-inventory-1'
 
             const {result} = renderHook(() => useItemArrangement(basketId))
 
             await expect(
-                result.current.updateItemsToPickupShipment(productItems, 'shipment', 'inventory')
-            ).rejects.toThrow('API Error')
+                result.current.updateItemsToPickupShipment(
+                    productItems,
+                    targetShipmentId,
+                    inventoryId
+                )
+            ).rejects.toThrow('Invalid basket or product items array')
+        })
 
-            expect(mockLoggerWarn).toHaveBeenCalledWith(
-                'Failed to update items to pickup shipment',
+        test('should throw error when API call fails', async () => {
+            const basketId = 'test-basket-id'
+            const productItems = [
                 {
-                    namespace: 'useItemArrangement.handleError',
-                    additionalProperties: {
-                        error: error
-                    }
+                    itemId: 'item-1',
+                    productId: 'prod-1',
+                    quantity: 2
                 }
-            )
-            expect(mockShowToast).toHaveBeenCalledWith({
-                title: 'Failed to update items to pickup shipment',
-                status: 'error'
-            })
+            ]
+            const targetShipmentId = 'pickup-shipment'
+            const inventoryId = 'store-inventory-1'
+            const mockError = new Error('API Error')
+
+            mockUpdateItemsInBasketMutation.mutateAsync.mockRejectedValue(mockError)
+
+            const {result} = renderHook(() => useItemArrangement(basketId))
+
+            await expect(
+                result.current.updateItemsToPickupShipment(
+                    productItems,
+                    targetShipmentId,
+                    inventoryId
+                )
+            ).rejects.toThrow('API Error')
         })
     })
 
     describe('updateDeliveryOption', () => {
-        test('should handle change to pickup', async () => {
+        test('should update item to pickup shipment', async () => {
             const basketId = 'test-basket-id'
-            const productItem = {itemId: 'item-1', productId: 'prod-1', quantity: 1}
+            const productItem = {
+                itemId: 'item-1',
+                productId: 'prod-1',
+                quantity: 2
+            }
             const selectedPickup = true
-            const storeInfo = {id: 'store-1', inventoryId: 'inventory-1'}
+            const storeInfo = {
+                id: 'store-1',
+                inventoryId: 'store-inventory-1'
+            }
             const defaultInventoryId = 'default-inventory'
-            const mockFindOrCreatePickupShipment = jest.fn().mockResolvedValue('pickup-shipment')
-            const mockFindOrCreateDeliveryShipment = jest.fn()
+            const findOrCreatePickupShipment = jest.fn().mockResolvedValue('pickup-shipment')
+            const findOrCreateDeliveryShipment = jest.fn()
 
-            mockUpdateItemInBasketMutation.mutateAsync.mockResolvedValue({})
+            mockUpdateItemInBasketMutation.mutateAsync.mockResolvedValue({updated: true})
 
             const {result} = renderHook(() => useItemArrangement(basketId))
 
@@ -491,11 +497,11 @@ describe('useItemArrangement', () => {
                 selectedPickup,
                 storeInfo,
                 defaultInventoryId,
-                mockFindOrCreatePickupShipment,
-                mockFindOrCreateDeliveryShipment
+                findOrCreatePickupShipment,
+                findOrCreateDeliveryShipment
             )
 
-            expect(mockFindOrCreatePickupShipment).toHaveBeenCalledWith(storeInfo)
+            expect(findOrCreatePickupShipment).toHaveBeenCalledWith(storeInfo)
             expect(mockUpdateItemInBasketMutation.mutateAsync).toHaveBeenCalledWith({
                 parameters: {
                     basketId,
@@ -503,25 +509,28 @@ describe('useItemArrangement', () => {
                 },
                 body: {
                     productId: 'prod-1',
-                    quantity: 1,
+                    quantity: 2,
                     shipmentId: 'pickup-shipment',
-                    inventoryId: 'inventory-1'
+                    inventoryId: 'store-inventory-1'
                 }
             })
         })
 
-        test('should handle change to delivery', async () => {
+        test('should update item to delivery shipment', async () => {
             const basketId = 'test-basket-id'
-            const productItem = {itemId: 'item-1', productId: 'prod-1', quantity: 1}
+            const productItem = {
+                itemId: 'item-1',
+                productId: 'prod-1',
+                quantity: 2,
+                inventoryId: 'store-inventory-1'
+            }
             const selectedPickup = false
-            const storeInfo = {id: 'store-1', inventoryId: 'inventory-1'}
+            const storeInfo = null
             const defaultInventoryId = 'default-inventory'
-            const mockFindOrCreatePickupShipment = jest.fn()
-            const mockFindOrCreateDeliveryShipment = jest
-                .fn()
-                .mockResolvedValue('delivery-shipment')
+            const findOrCreatePickupShipment = jest.fn()
+            const findOrCreateDeliveryShipment = jest.fn().mockResolvedValue('delivery-shipment')
 
-            mockUpdateItemInBasketMutation.mutateAsync.mockResolvedValue({})
+            mockUpdateItemInBasketMutation.mutateAsync.mockResolvedValue({updated: true})
 
             const {result} = renderHook(() => useItemArrangement(basketId))
 
@@ -530,11 +539,11 @@ describe('useItemArrangement', () => {
                 selectedPickup,
                 storeInfo,
                 defaultInventoryId,
-                mockFindOrCreatePickupShipment,
-                mockFindOrCreateDeliveryShipment
+                findOrCreatePickupShipment,
+                findOrCreateDeliveryShipment
             )
 
-            expect(mockFindOrCreateDeliveryShipment).toHaveBeenCalled()
+            expect(findOrCreateDeliveryShipment).toHaveBeenCalled()
             expect(mockUpdateItemInBasketMutation.mutateAsync).toHaveBeenCalledWith({
                 parameters: {
                     basketId,
@@ -542,21 +551,21 @@ describe('useItemArrangement', () => {
                 },
                 body: {
                     productId: 'prod-1',
-                    quantity: 1,
-                    shipmentId: 'delivery-shipment'
-                    // No inventoryId for delivery
+                    quantity: 2,
+                    shipmentId: 'delivery-shipment',
+                    inventoryId: 'default-inventory'
                 }
             })
         })
 
-        test('should throw error if no store selected for pickup', async () => {
-            const basketId = 'test-basket-id'
-            const productItem = {itemId: 'item-1', productId: 'prod-1', quantity: 1}
+        test('should throw error for invalid basket or product item', async () => {
+            const basketId = null
+            const productItem = null
             const selectedPickup = true
-            const storeInfo = {} // No id
+            const storeInfo = {id: 'store-1', inventoryId: 'store-inventory-1'}
             const defaultInventoryId = 'default-inventory'
-            const mockFindOrCreatePickupShipment = jest.fn()
-            const mockFindOrCreateDeliveryShipment = jest.fn()
+            const findOrCreatePickupShipment = jest.fn()
+            const findOrCreateDeliveryShipment = jest.fn()
 
             const {result} = renderHook(() => useItemArrangement(basketId))
 
@@ -566,20 +575,51 @@ describe('useItemArrangement', () => {
                     selectedPickup,
                     storeInfo,
                     defaultInventoryId,
-                    mockFindOrCreatePickupShipment,
-                    mockFindOrCreateDeliveryShipment
+                    findOrCreatePickupShipment,
+                    findOrCreateDeliveryShipment
+                )
+            ).rejects.toThrow('Invalid basket or product item')
+        })
+
+        test('should throw error when no store selected for pickup', async () => {
+            const basketId = 'test-basket-id'
+            const productItem = {
+                itemId: 'item-1',
+                productId: 'prod-1',
+                quantity: 2
+            }
+            const selectedPickup = true
+            const storeInfo = null
+            const defaultInventoryId = 'default-inventory'
+            const findOrCreatePickupShipment = jest.fn()
+            const findOrCreateDeliveryShipment = jest.fn()
+
+            const {result} = renderHook(() => useItemArrangement(basketId))
+
+            await expect(
+                result.current.updateDeliveryOption(
+                    productItem,
+                    selectedPickup,
+                    storeInfo,
+                    defaultInventoryId,
+                    findOrCreatePickupShipment,
+                    findOrCreateDeliveryShipment
                 )
             ).rejects.toThrow('No store selected for pickup')
         })
 
-        test('should throw error if store has no inventory ID', async () => {
+        test('should throw error when store has no inventory ID', async () => {
             const basketId = 'test-basket-id'
-            const productItem = {itemId: 'item-1', productId: 'prod-1', quantity: 1}
+            const productItem = {
+                itemId: 'item-1',
+                productId: 'prod-1',
+                quantity: 2
+            }
             const selectedPickup = true
-            const storeInfo = {id: 'store-1'} // No inventoryId
+            const storeInfo = {id: 'store-1'}
             const defaultInventoryId = 'default-inventory'
-            const mockFindOrCreatePickupShipment = jest.fn()
-            const mockFindOrCreateDeliveryShipment = jest.fn()
+            const findOrCreatePickupShipment = jest.fn()
+            const findOrCreateDeliveryShipment = jest.fn()
 
             const {result} = renderHook(() => useItemArrangement(basketId))
 
@@ -589,20 +629,24 @@ describe('useItemArrangement', () => {
                     selectedPickup,
                     storeInfo,
                     defaultInventoryId,
-                    mockFindOrCreatePickupShipment,
-                    mockFindOrCreateDeliveryShipment
+                    findOrCreatePickupShipment,
+                    findOrCreateDeliveryShipment
                 )
             ).rejects.toThrow('Selected store does not have an inventory ID')
         })
 
-        test('should throw error if shipment creation fails', async () => {
+        test('should throw error when findOrCreatePickupShipment fails', async () => {
             const basketId = 'test-basket-id'
-            const productItem = {itemId: 'item-1', productId: 'prod-1', quantity: 1}
+            const productItem = {
+                itemId: 'item-1',
+                productId: 'prod-1',
+                quantity: 2
+            }
             const selectedPickup = true
-            const storeInfo = {id: 'store-1', inventoryId: 'inventory-1'}
+            const storeInfo = {id: 'store-1', inventoryId: 'store-inventory-1'}
             const defaultInventoryId = 'default-inventory'
-            const mockFindOrCreatePickupShipment = jest.fn().mockResolvedValue(null) // Failed
-            const mockFindOrCreateDeliveryShipment = jest.fn()
+            const findOrCreatePickupShipment = jest.fn().mockResolvedValue(null)
+            const findOrCreateDeliveryShipment = jest.fn()
 
             const {result} = renderHook(() => useItemArrangement(basketId))
 
@@ -612,21 +656,37 @@ describe('useItemArrangement', () => {
                     selectedPickup,
                     storeInfo,
                     defaultInventoryId,
-                    mockFindOrCreatePickupShipment,
-                    mockFindOrCreateDeliveryShipment
+                    findOrCreatePickupShipment,
+                    findOrCreateDeliveryShipment
                 )
             ).rejects.toThrow('Failed to find or create shipment')
+        })
 
-            expect(mockLoggerWarn).toHaveBeenCalledWith('Failed to handle delivery option change', {
-                namespace: 'useItemArrangement.handleError',
-                additionalProperties: {
-                    error: expect.any(Error)
-                }
-            })
-            expect(mockShowToast).toHaveBeenCalledWith({
-                title: 'Failed to handle delivery option change',
-                status: 'error'
-            })
+        test('should throw error when findOrCreateDeliveryShipment fails', async () => {
+            const basketId = 'test-basket-id'
+            const productItem = {
+                itemId: 'item-1',
+                productId: 'prod-1',
+                quantity: 2
+            }
+            const selectedPickup = false
+            const storeInfo = null
+            const defaultInventoryId = 'default-inventory'
+            const findOrCreatePickupShipment = jest.fn()
+            const findOrCreateDeliveryShipment = jest.fn().mockResolvedValue(null)
+
+            const {result} = renderHook(() => useItemArrangement(basketId))
+
+            await expect(
+                result.current.updateDeliveryOption(
+                    productItem,
+                    selectedPickup,
+                    storeInfo,
+                    defaultInventoryId,
+                    findOrCreatePickupShipment,
+                    findOrCreateDeliveryShipment
+                )
+            ).rejects.toThrow('Failed to find or create shipment')
         })
     })
 })

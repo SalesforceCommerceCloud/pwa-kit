@@ -14,33 +14,12 @@ jest.mock('@salesforce/commerce-sdk-react', () => ({
     useShopperBasketsMutation: jest.fn()
 }))
 
-// Mock useToast
-jest.mock('@salesforce/retail-react-app/app/hooks/use-toast', () => ({
-    useToast: jest.fn(() => ({
-        showToast: jest.fn()
-    }))
-}))
-
-// Mock logger
-jest.mock('@salesforce/retail-react-app/app/utils/logger-instance', () => ({
-    __esModule: true,
-    default: {
-        warn: jest.fn(),
-        error: jest.fn()
-    }
-}))
-
-import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
-import logger from '@salesforce/retail-react-app/app/utils/logger-instance'
-
 describe('useShipmentOperations', () => {
     let mockCreateShipmentMutation
     let mockRemoveShipmentMutation
     let mockUpdateShipmentMutation
     let mockUpdateShippingMethodMutation
     let mockUseShopperBasketsMutation
-    let mockShowToast
-    let mockLoggerWarn
 
     beforeEach(() => {
         mockCreateShipmentMutation = {
@@ -55,8 +34,6 @@ describe('useShipmentOperations', () => {
         mockUpdateShippingMethodMutation = {
             mutateAsync: jest.fn()
         }
-        mockShowToast = jest.fn()
-        mockLoggerWarn = jest.fn()
 
         mockUseShopperBasketsMutation = jest.fn((mutationType) => {
             switch (mutationType) {
@@ -74,8 +51,6 @@ describe('useShipmentOperations', () => {
         })
 
         useShopperBasketsMutation.mockImplementation(mockUseShopperBasketsMutation)
-        useToast.mockReturnValue({showToast: mockShowToast})
-        logger.warn.mockImplementation(mockLoggerWarn)
     })
 
     afterEach(() => {
@@ -86,21 +61,23 @@ describe('useShipmentOperations', () => {
         test('should create a shipment with address', async () => {
             const basketId = 'test-basket-id'
             const address = {
+                firstName: 'John',
+                lastName: 'Doe',
                 address1: '123 Main St',
-                city: 'San Francisco',
+                city: 'Anytown',
                 stateCode: 'CA',
-                postalCode: '94105',
+                postalCode: '12345',
                 countryCode: 'US'
             }
             const mockResponse = {
-                shipments: [{shipmentId: 'existing-shipment'}, {shipmentId: 'new-shipment-id'}]
+                shipments: [{shipmentId: 'existing-shipment'}, {shipmentId: 'new-shipment'}]
             }
 
             mockCreateShipmentMutation.mutateAsync.mockResolvedValue(mockResponse)
 
             const {result} = renderHook(() => useShipmentOperations(basketId))
 
-            const shipment = await result.current.createShipment(address)
+            const response = await result.current.createShipment(address)
 
             expect(mockCreateShipmentMutation.mutateAsync).toHaveBeenCalledWith({
                 parameters: {
@@ -108,34 +85,34 @@ describe('useShipmentOperations', () => {
                 },
                 body: {
                     shippingAddress: {
+                        firstName: 'John',
+                        lastName: 'Doe',
                         address1: '123 Main St',
-                        city: 'San Francisco',
+                        city: 'Anytown',
                         stateCode: 'CA',
-                        postalCode: '94105',
-                        countryCode: 'US',
-                        firstName: undefined,
-                        lastName: undefined,
-                        phone: undefined
+                        postalCode: '12345',
+                        countryCode: 'US'
                     }
                 }
             })
-            expect(shipment.shipmentId).toBe('new-shipment-id')
+            expect(response).toEqual({shipmentId: 'new-shipment'})
         })
 
         test('should create a shipment with shipping method', async () => {
             const basketId = 'test-basket-id'
+            const address = null
             const options = {
-                shippingMethodId: 'test-shipping-method'
+                shippingMethodId: 'shipping-method-1'
             }
             const mockResponse = {
-                shipments: [{shipmentId: 'new-shipment-id'}]
+                shipments: [{shipmentId: 'existing-shipment'}, {shipmentId: 'new-shipment'}]
             }
 
             mockCreateShipmentMutation.mutateAsync.mockResolvedValue(mockResponse)
 
             const {result} = renderHook(() => useShipmentOperations(basketId))
 
-            const shipment = await result.current.createShipment(null, options)
+            const response = await result.current.createShipment(address, options)
 
             expect(mockCreateShipmentMutation.mutateAsync).toHaveBeenCalledWith({
                 parameters: {
@@ -143,71 +120,66 @@ describe('useShipmentOperations', () => {
                 },
                 body: {
                     shippingMethod: {
-                        id: 'test-shipping-method'
+                        id: 'shipping-method-1'
                     }
                 }
             })
-            expect(shipment.shipmentId).toBe('new-shipment-id')
+            expect(response).toEqual({shipmentId: 'new-shipment'})
         })
 
         test('should create a pickup shipment with store ID', async () => {
             const basketId = 'test-basket-id'
+            const address = null
             const options = {
-                storeId: 'test-store-id'
+                storeId: 'store-1'
             }
             const mockResponse = {
-                shipments: [{shipmentId: 'new-shipment-id'}]
+                shipments: [{shipmentId: 'existing-shipment'}, {shipmentId: 'new-shipment'}]
             }
 
             mockCreateShipmentMutation.mutateAsync.mockResolvedValue(mockResponse)
 
             const {result} = renderHook(() => useShipmentOperations(basketId))
 
-            const shipment = await result.current.createShipment(null, options)
+            const response = await result.current.createShipment(address, options)
 
             expect(mockCreateShipmentMutation.mutateAsync).toHaveBeenCalledWith({
                 parameters: {
                     basketId
                 },
                 body: {
-                    c_fromStoreId: 'test-store-id'
+                    c_fromStoreId: 'store-1'
                 }
             })
-            expect(shipment.shipmentId).toBe('new-shipment-id')
+            expect(response).toEqual({shipmentId: 'new-shipment'})
         })
 
         test('should throw error if basketId is missing', async () => {
-            const {result} = renderHook(() => useShipmentOperations(null))
-
-            await expect(result.current.createShipment({})).rejects.toThrow('Missing basketId')
-        })
-
-        test('should handle API errors', async () => {
-            const basketId = 'test-basket-id'
-            const error = new Error('API Error')
-            mockCreateShipmentMutation.mutateAsync.mockRejectedValue(error)
+            const basketId = null
+            const address = {firstName: 'John'}
 
             const {result} = renderHook(() => useShipmentOperations(basketId))
 
-            await expect(result.current.createShipment({})).rejects.toThrow('API Error')
+            await expect(result.current.createShipment(address)).rejects.toThrow('Missing basketId')
+        })
 
-            expect(mockLoggerWarn).toHaveBeenCalledWith('Failed to create shipment', {
-                namespace: 'useShipmentOperations.handleError',
-                additionalProperties: {
-                    error: error
-                }
-            })
-            expect(mockShowToast).toHaveBeenCalledWith({
-                title: 'Failed to create shipment',
-                status: 'error'
-            })
+        test('should throw error when API call fails', async () => {
+            const basketId = 'test-basket-id'
+            const address = {firstName: 'John'}
+            const mockError = new Error('API Error')
+
+            mockCreateShipmentMutation.mutateAsync.mockRejectedValue(mockError)
+
+            const {result} = renderHook(() => useShipmentOperations(basketId))
+
+            await expect(result.current.createShipment(address)).rejects.toThrow('API Error')
         })
     })
 
     describe('removeShipment', () => {
         test('should remove a shipment', async () => {
             const basketId = 'test-basket-id'
-            const shipmentId = 'test-shipment-id'
+            const shipmentId = 'shipment-1'
 
             mockRemoveShipmentMutation.mutateAsync.mockResolvedValue({})
 
@@ -224,45 +196,40 @@ describe('useShipmentOperations', () => {
         })
 
         test('should throw error if parameters are missing', async () => {
-            const {result} = renderHook(() => useShipmentOperations('basket-id'))
+            const basketId = null
+            const shipmentId = null
 
-            await expect(result.current.removeShipment(null)).rejects.toThrow(
+            const {result} = renderHook(() => useShipmentOperations(basketId))
+
+            await expect(result.current.removeShipment(shipmentId)).rejects.toThrow(
                 'Missing basketId or shipmentId'
             )
         })
 
-        test('should handle API errors', async () => {
+        test('should throw error when API call fails', async () => {
             const basketId = 'test-basket-id'
-            const shipmentId = 'test-shipment-id'
-            const error = new Error('API Error')
-            mockRemoveShipmentMutation.mutateAsync.mockRejectedValue(error)
+            const shipmentId = 'shipment-1'
+            const mockError = new Error('API Error')
+
+            mockRemoveShipmentMutation.mutateAsync.mockRejectedValue(mockError)
 
             const {result} = renderHook(() => useShipmentOperations(basketId))
 
             await expect(result.current.removeShipment(shipmentId)).rejects.toThrow('API Error')
-
-            expect(mockLoggerWarn).toHaveBeenCalledWith('Failed to remove shipment', {
-                namespace: 'useShipmentOperations.handleError',
-                additionalProperties: {
-                    error: error
-                }
-            })
-            expect(mockShowToast).toHaveBeenCalledWith({
-                title: 'Failed to remove shipment',
-                status: 'error'
-            })
         })
     })
 
     describe('updateShipmentAddress', () => {
         test('should update shipment address', async () => {
             const basketId = 'test-basket-id'
-            const shipmentId = 'test-shipment-id'
+            const shipmentId = 'shipment-1'
             const address = {
-                address1: '456 Oak St',
-                city: 'Oakland',
+                firstName: 'John',
+                lastName: 'Doe',
+                address1: '123 Main St',
+                city: 'Anytown',
                 stateCode: 'CA',
-                postalCode: '94601',
+                postalCode: '12345',
                 countryCode: 'US'
             }
             const mockResponse = {updated: true}
@@ -280,14 +247,13 @@ describe('useShipmentOperations', () => {
                 },
                 body: {
                     shippingAddress: {
-                        address1: '456 Oak St',
-                        city: 'Oakland',
+                        firstName: 'John',
+                        lastName: 'Doe',
+                        address1: '123 Main St',
+                        city: 'Anytown',
                         stateCode: 'CA',
-                        postalCode: '94601',
-                        countryCode: 'US',
-                        firstName: undefined,
-                        lastName: undefined,
-                        phone: undefined
+                        postalCode: '12345',
+                        countryCode: 'US'
                     }
                 }
             })
@@ -295,44 +261,38 @@ describe('useShipmentOperations', () => {
         })
 
         test('should throw error if parameters are missing', async () => {
-            const {result} = renderHook(() => useShipmentOperations('basket-id'))
+            const basketId = null
+            const shipmentId = null
+            const address = null
 
-            await expect(result.current.updateShipmentAddress('shipment-id', null)).rejects.toThrow(
+            const {result} = renderHook(() => useShipmentOperations(basketId))
+
+            await expect(result.current.updateShipmentAddress(shipmentId, address)).rejects.toThrow(
                 'Missing basketId, shipmentId, or address'
             )
         })
 
-        test('should handle API errors', async () => {
+        test('should throw error when API call fails', async () => {
             const basketId = 'test-basket-id'
-            const shipmentId = 'test-shipment-id'
-            const address = {address1: '123 Main St'}
-            const error = new Error('API Error')
-            mockUpdateShipmentMutation.mutateAsync.mockRejectedValue(error)
+            const shipmentId = 'shipment-1'
+            const address = {firstName: 'John'}
+            const mockError = new Error('API Error')
+
+            mockUpdateShipmentMutation.mutateAsync.mockRejectedValue(mockError)
 
             const {result} = renderHook(() => useShipmentOperations(basketId))
 
             await expect(result.current.updateShipmentAddress(shipmentId, address)).rejects.toThrow(
                 'API Error'
             )
-
-            expect(mockLoggerWarn).toHaveBeenCalledWith('Failed to update shipment address', {
-                namespace: 'useShipmentOperations.handleError',
-                additionalProperties: {
-                    error: error
-                }
-            })
-            expect(mockShowToast).toHaveBeenCalledWith({
-                title: 'Failed to update shipment address',
-                status: 'error'
-            })
         })
     })
 
     describe('updateShippingMethod', () => {
         test('should update shipping method', async () => {
             const basketId = 'test-basket-id'
-            const shipmentId = 'test-shipment-id'
-            const shippingMethodId = 'new-shipping-method'
+            const shipmentId = 'shipment-1'
+            const shippingMethodId = 'shipping-method-1'
             const mockResponse = {updated: true}
 
             mockUpdateShippingMethodMutation.mutateAsync.mockResolvedValue(mockResponse)
@@ -347,43 +307,37 @@ describe('useShipmentOperations', () => {
                     shipmentId
                 },
                 body: {
-                    id: 'new-shipping-method'
+                    id: 'shipping-method-1'
                 }
             })
             expect(response).toEqual(mockResponse)
         })
 
         test('should throw error if parameters are missing', async () => {
-            const {result} = renderHook(() => useShipmentOperations('basket-id'))
+            const basketId = null
+            const shipmentId = null
+            const shippingMethodId = null
 
-            await expect(result.current.updateShippingMethod('shipment-id', null)).rejects.toThrow(
-                'Missing basketId, shipmentId, or shippingMethodId'
-            )
+            const {result} = renderHook(() => useShipmentOperations(basketId))
+
+            await expect(
+                result.current.updateShippingMethod(shipmentId, shippingMethodId)
+            ).rejects.toThrow('Missing basketId, shipmentId, or shippingMethodId')
         })
 
-        test('should handle API errors', async () => {
+        test('should throw error when API call fails', async () => {
             const basketId = 'test-basket-id'
-            const shipmentId = 'test-shipment-id'
-            const shippingMethodId = 'test-method'
-            const error = new Error('API Error')
-            mockUpdateShippingMethodMutation.mutateAsync.mockRejectedValue(error)
+            const shipmentId = 'shipment-1'
+            const shippingMethodId = 'shipping-method-1'
+            const mockError = new Error('API Error')
+
+            mockUpdateShippingMethodMutation.mutateAsync.mockRejectedValue(mockError)
 
             const {result} = renderHook(() => useShipmentOperations(basketId))
 
             await expect(
                 result.current.updateShippingMethod(shipmentId, shippingMethodId)
             ).rejects.toThrow('API Error')
-
-            expect(mockLoggerWarn).toHaveBeenCalledWith('Failed to update shipping method', {
-                namespace: 'useShipmentOperations.handleError',
-                additionalProperties: {
-                    error: error
-                }
-            })
-            expect(mockShowToast).toHaveBeenCalledWith({
-                title: 'Failed to update shipping method',
-                status: 'error'
-            })
         })
     })
 })

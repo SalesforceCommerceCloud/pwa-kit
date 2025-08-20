@@ -7,8 +7,6 @@
 
 import {useShopperBasketsMutation} from '@salesforce/commerce-sdk-react'
 import {useCallback} from 'react'
-import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
-import logger from '@salesforce/retail-react-app/app/utils/logger-instance'
 import {DEFAULT_SHIPMENT_ID} from '@salesforce/retail-react-app/app/constants'
 
 /**
@@ -18,25 +16,8 @@ import {DEFAULT_SHIPMENT_ID} from '@salesforce/retail-react-app/app/constants'
  * @returns {Object} Object containing item arrangement functions
  */
 export const useItemArrangement = (basketId) => {
-    const {showToast} = useToast()
     const updateItemInBasketMutation = useShopperBasketsMutation('updateItemInBasket')
     const updateItemsInBasketMutation = useShopperBasketsMutation('updateItemsInBasket')
-
-    const handleError = useCallback(
-        (message, error) => {
-            logger.warn(message, {
-                namespace: 'useItemArrangement.handleError',
-                additionalProperties: {
-                    error: error
-                }
-            })
-            showToast({
-                title: message,
-                status: 'error'
-            })
-        },
-        [showToast]
-    )
 
     /**
      * Updates a product item to a pickup shipment
@@ -51,28 +32,23 @@ export const useItemArrangement = (basketId) => {
                 throw new Error('Invalid basket or product item')
             }
 
-            try {
-                // Update the item to add inventory ID and move to pickup shipment
-                const updateData = {
-                    productId: productItem.productId,
-                    quantity: productItem.quantity,
-                    shipmentId: targetShipmentId,
-                    inventoryId: inventoryId
-                }
-
-                return await updateItemInBasketMutation.mutateAsync({
-                    parameters: {
-                        basketId,
-                        itemId: productItem.itemId
-                    },
-                    body: updateData
-                })
-            } catch (error) {
-                handleError('Failed to update item to pickup shipment', error)
-                throw error
+            // Update the item to add inventory ID and move to pickup shipment
+            const updateData = {
+                productId: productItem.productId,
+                quantity: productItem.quantity,
+                shipmentId: targetShipmentId,
+                inventoryId: inventoryId
             }
+
+            return await updateItemInBasketMutation.mutateAsync({
+                parameters: {
+                    basketId,
+                    itemId: productItem.itemId
+                },
+                body: updateData
+            })
         },
-        [basketId]
+        [basketId, updateItemInBasketMutation]
     )
 
     /**
@@ -88,32 +64,27 @@ export const useItemArrangement = (basketId) => {
                 throw new Error('Invalid basket or product item')
             }
 
-            try {
-                // Update the item to remove inventory ID and move to different shipment
-                const updateData = {
-                    productId: productItem.productId,
-                    quantity: productItem.quantity,
-                    shipmentId: targetShipmentId
-                }
-
-                // Set inventoryId to default for delivery items (instead of null which doesn't work)
-                if (productItem.inventoryId) {
-                    updateData.inventoryId = defaultInventoryId
-                }
-
-                return await updateItemInBasketMutation.mutateAsync({
-                    parameters: {
-                        basketId,
-                        itemId: productItem.itemId
-                    },
-                    body: updateData
-                })
-            } catch (error) {
-                handleError('Failed to update item to delivery shipment', error)
-                throw error
+            // Update the item to remove inventory ID and move to different shipment
+            const updateData = {
+                productId: productItem.productId,
+                quantity: productItem.quantity,
+                shipmentId: targetShipmentId
             }
+
+            // Set inventoryId to default for delivery items (instead of null which doesn't work)
+            if (productItem.inventoryId) {
+                updateData.inventoryId = defaultInventoryId
+            }
+
+            return await updateItemInBasketMutation.mutateAsync({
+                parameters: {
+                    basketId,
+                    itemId: productItem.itemId
+                },
+                body: updateData
+            })
         },
-        [basketId]
+        [basketId, updateItemInBasketMutation]
     )
 
     /**
@@ -133,29 +104,24 @@ export const useItemArrangement = (basketId) => {
                 return {updated: true}
             }
 
-            try {
-                // Prepare update data for all items
-                const updateData = productItems.map((productItem) => ({
-                    itemId: productItem.itemId,
-                    productId: productItem.productId,
-                    quantity: productItem.quantity,
-                    shipmentId: targetShipmentId,
-                    // Set inventoryId to default for delivery items (instead of null which doesn't work)
-                    ...(productItem.inventoryId && {inventoryId: defaultInventoryId})
-                }))
+            // Prepare update data for all items
+            const updateData = productItems.map((productItem) => ({
+                itemId: productItem.itemId,
+                productId: productItem.productId,
+                quantity: productItem.quantity,
+                shipmentId: targetShipmentId,
+                // Set inventoryId to default for delivery items (instead of null which doesn't work)
+                ...(productItem.inventoryId && {inventoryId: defaultInventoryId})
+            }))
 
-                return await updateItemsInBasketMutation.mutateAsync({
-                    parameters: {
-                        basketId
-                    },
-                    body: updateData
-                })
-            } catch (error) {
-                handleError('Failed to update items to delivery shipment', error)
-                throw error
-            }
+            return await updateItemsInBasketMutation.mutateAsync({
+                parameters: {
+                    basketId
+                },
+                body: updateData
+            })
         },
-        [basketId]
+        [basketId, updateItemsInBasketMutation]
     )
 
     /**
@@ -175,28 +141,23 @@ export const useItemArrangement = (basketId) => {
                 return {updated: true}
             }
 
-            try {
-                // Prepare update data for all items
-                const updateData = productItems.map((productItem) => ({
-                    itemId: productItem.itemId,
-                    productId: productItem.productId,
-                    quantity: productItem.quantity,
-                    shipmentId: targetShipmentId,
-                    inventoryId: inventoryId
-                }))
+            // Prepare update data for all items
+            const updateData = productItems.map((productItem) => ({
+                itemId: productItem.itemId,
+                productId: productItem.productId,
+                quantity: productItem.quantity,
+                shipmentId: targetShipmentId,
+                inventoryId: inventoryId
+            }))
 
-                return await updateItemsInBasketMutation.mutateAsync({
-                    parameters: {
-                        basketId
-                    },
-                    body: updateData
-                })
-            } catch (error) {
-                handleError('Failed to update items to pickup shipment', error)
-                throw error
-            }
+            return await updateItemsInBasketMutation.mutateAsync({
+                parameters: {
+                    basketId
+                },
+                body: updateData
+            })
         },
-        [basketId]
+        [basketId, updateItemsInBasketMutation]
     )
 
     /**
@@ -223,48 +184,43 @@ export const useItemArrangement = (basketId) => {
                 throw new Error('Invalid basket or product item')
             }
 
-            try {
-                if (selectedPickup) {
-                    // Moving to pickup
-                    if (!storeInfo?.id) {
-                        throw new Error('No store selected for pickup')
-                    }
-
-                    if (!storeInfo.inventoryId) {
-                        throw new Error('Selected store does not have an inventory ID')
-                    }
-
-                    const targetShipmentId = await findOrCreatePickupShipment(storeInfo)
-                    if (!targetShipmentId) {
-                        throw new Error('Failed to find or create shipment')
-                    }
-
-                    // Update the item to the pickup shipment
-                    await updateItemToPickupShipment(
-                        productItem,
-                        targetShipmentId,
-                        storeInfo.inventoryId
-                    )
-                } else {
-                    // Moving to delivery
-                    const targetShipmentId = await findOrCreateDeliveryShipment()
-                    if (!targetShipmentId) {
-                        throw new Error('Failed to find or create shipment')
-                    }
-
-                    // Update the item to the delivery shipment
-                    await updateItemToDeliveryShipment(
-                        productItem,
-                        targetShipmentId,
-                        defaultInventoryId
-                    )
+            if (selectedPickup) {
+                // Moving to pickup
+                if (!storeInfo?.id) {
+                    throw new Error('No store selected for pickup')
                 }
-            } catch (error) {
-                handleError('Failed to handle delivery option change', error)
-                throw error
+
+                if (!storeInfo.inventoryId) {
+                    throw new Error('Selected store does not have an inventory ID')
+                }
+
+                const targetShipmentId = await findOrCreatePickupShipment(storeInfo)
+                if (!targetShipmentId) {
+                    throw new Error('Failed to find or create shipment')
+                }
+
+                // Update the item to the pickup shipment
+                await updateItemToPickupShipment(
+                    productItem,
+                    targetShipmentId,
+                    storeInfo.inventoryId
+                )
+            } else {
+                // Moving to delivery
+                const targetShipmentId = await findOrCreateDeliveryShipment()
+                if (!targetShipmentId) {
+                    throw new Error('Failed to find or create shipment')
+                }
+
+                // Update the item to the delivery shipment
+                await updateItemToDeliveryShipment(
+                    productItem,
+                    targetShipmentId,
+                    defaultInventoryId
+                )
             }
         },
-        [basketId]
+        [basketId, updateItemToPickupShipment, updateItemToDeliveryShipment]
     )
 
     return {
