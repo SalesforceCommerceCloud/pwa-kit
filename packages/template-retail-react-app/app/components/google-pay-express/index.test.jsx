@@ -210,21 +210,21 @@ describe('GooglePayExpress', () => {
     beforeEach(() => {
         jest.clearAllMocks()
         mockPostMessage.mockClear()
-        
+
         // Mock useMultiSite and useNavigation for all tests
         useMultiSite.mockReturnValue({
             locale: {id: 'en-US'},
             site: {id: 'test-site'}
         })
         useNavigation.mockReturnValue(jest.fn())
-        
+
         // Mock useStandalonePaymentMethods (returns null for non-PDP mode)
         useStandalonePaymentMethods.mockReturnValue({
             paymentMethods: null,
             loading: false,
             error: null
         })
-        
+
         setupMockHook()
         setupMockAdyenCheckout()
     })
@@ -329,7 +329,7 @@ describe('getGoogleButtonConfig', () => {
     beforeEach(() => {
         jest.clearAllMocks()
         mockPostMessage.mockClear()
-        
+
         // Mock force order calculation for all button config tests
         forceOrderCalculation.mockResolvedValue({
             ...mockData.basket,
@@ -369,7 +369,7 @@ describe('getGoogleButtonConfig', () => {
             ...mockData.basket,
             orderTotal: 100
         })
-        
+
         const mockSubmitPayment = jest.fn().mockResolvedValue({
             isFinal: true,
             isSuccessful: true,
@@ -425,7 +425,7 @@ describe('getGoogleButtonConfig', () => {
             ...mockData.basket,
             orderTotal: 100
         })
-        
+
         const mockSubmitPayment = jest.fn().mockResolvedValue({
             isFinal: false,
             isSuccessful: false
@@ -472,7 +472,7 @@ describe('getGoogleButtonConfig', () => {
             ...mockData.basket,
             orderTotal: 100
         })
-        
+
         const mockSubmitPayment = jest.fn().mockRejectedValue(new Error('fail'))
         AdyenPaymentsService.mockImplementation(() => ({
             submitPayment: mockSubmitPayment
@@ -580,7 +580,7 @@ describe('getGoogleButtonConfig', () => {
         })
         expect(mockUpdateShippingAddress).toHaveBeenCalled()
         expect(initializeResult).toHaveProperty('newTransactionInfo')
-        
+
         // Verify that the basket was updated with shipping option parameters
         expect(initializeResult).toHaveProperty('newShippingOptionParameters')
         expect(initializeResult.newShippingOptionParameters).toEqual({
@@ -780,21 +780,21 @@ describe('GooglePayExpress error and edge cases', () => {
     beforeEach(() => {
         jest.clearAllMocks()
         mockPostMessage.mockClear()
-        
+
         // Mock useMultiSite and useNavigation for all tests
         useMultiSite.mockReturnValue({
             locale: {id: 'en-US'},
             site: {id: 'test-site'}
         })
         useNavigation.mockReturnValue(jest.fn())
-        
+
         // Mock useStandalonePaymentMethods (returns null for non-PDP mode)
         useStandalonePaymentMethods.mockReturnValue({
             paymentMethods: null,
             loading: false,
             error: null
         })
-        
+
         setupMockHook()
     })
 
