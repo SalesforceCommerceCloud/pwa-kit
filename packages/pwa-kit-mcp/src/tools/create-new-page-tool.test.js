@@ -31,7 +31,7 @@ describe('CreateNewPageTool', () => {
         const result = await createNewPageTool.handler({})
         expect(result.role).toBe('system')
         expect(result.content[0].text).toContain(
-            'Please ask the user to provide following information'
+            'Please ask the user for the following information one at a time'
         )
     })
 
@@ -48,8 +48,8 @@ describe('CreateNewPageTool', () => {
             route: '/test',
             ...mockAbsolutePaths
         })
-        expect(result.role).toBe('system')
-        expect(result.content[0].text).toContain('Created page')
+        expect(result.role).toBe('assistant')
+        expect(result.content[0].text).toContain('Your new page')
     })
 
     it('returns error if page already exists', async () => {
@@ -89,7 +89,7 @@ describe('CreateNewPageTool', () => {
             route: '/test',
             ...mockAbsolutePaths
         })
-        expect(result.role).toBe('system')
+        expect(result.role).toBe('assistant')
         expect(result.content[0].text).toContain('MissingComponent')
     })
 
@@ -106,9 +106,9 @@ describe('CreateNewPageTool', () => {
             route: '/test',
             ...mockAbsolutePaths
         })
-        expect(result.role).toBe('system')
+        expect(result.role).toBe('assistant')
         expect(result.content[0].text).toContain(
-            'would you like to add the hook useProduct to your page?'
+            'would you like to add the useProduct hook to your page?'
         )
     })
 
@@ -219,7 +219,7 @@ describe('CreateNewPageTool', () => {
             route: '/test',
             ...mockAbsolutePaths
         })
-        expect(result.role).toBe('system')
+        expect(result.role).toBe('assistant')
         expect(result.content[0].text).toContain('ImageSpliter')
         expect(result.content[0].text).toMatch(/not found/i)
         expect(result.content[0].text).toMatch(
