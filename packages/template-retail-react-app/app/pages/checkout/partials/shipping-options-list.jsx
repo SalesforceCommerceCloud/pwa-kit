@@ -20,10 +20,12 @@ import {useShippingMethodsForShipment} from '@salesforce/commerce-sdk-react'
 import PropTypes from 'prop-types'
 import LoadingSpinner from '@salesforce/retail-react-app/app/components/loading-spinner'
 import {STORE_LOCATOR_IS_ENABLED} from '@salesforce/retail-react-app/app/constants'
+import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 
 // Component to handle shipping options for a single shipment (without product cards)
 const ShippingOptionsList = ({shipment, basketId, currency, control}) => {
     const {formatMessage} = useIntl()
+    const storeLocatorEnabled = getConfig()?.app?.storeLocatorEnabled ?? STORE_LOCATOR_IS_ENABLED
     const {data: shippingMethods, isLoading: isShippingMethodsLoading} =
         useShippingMethodsForShipment(
             {
@@ -46,7 +48,7 @@ const ShippingOptionsList = ({shipment, basketId, currency, control}) => {
         shipment.shippingMethod?.id || shippingMethods?.defaultShippingMethodId || ''
 
     // Filter out pickup shipping methods only if store locator/BOPIS is enabled
-    const applicableShippingMethods = STORE_LOCATOR_IS_ENABLED
+    const applicableShippingMethods = storeLocatorEnabled
         ? shippingMethods?.applicableShippingMethods?.filter(
               (method) => !method.c_storePickupEnabled
           ) || []

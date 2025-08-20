@@ -45,7 +45,6 @@ import {useStoreLocatorModal} from '@salesforce/retail-react-app/app/hooks/use-s
 import {
     API_ERROR_MESSAGE,
     EINSTEIN_RECOMMENDERS,
-    MULTISHIP_IS_ENABLED,
     TOAST_ACTION_VIEW_WISHLIST,
     TOAST_MESSAGE_ADDED_TO_WISHLIST,
     TOAST_MESSAGE_REMOVED_ITEM_FROM_CART,
@@ -53,6 +52,7 @@ import {
     TOAST_MESSAGE_STORE_INSUFFICIENT_INVENTORY,
     STORE_LOCATOR_IS_ENABLED
 } from '@salesforce/retail-react-app/app/constants'
+import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import {REMOVE_CART_ITEM_CONFIRMATION_DIALOG_CONFIG} from '@salesforce/retail-react-app/app/pages/cart/partials/cart-secondary-button-group'
 
 // Utilities
@@ -76,6 +76,8 @@ const DEBOUNCE_WAIT = 750
 const Cart = () => {
     const {data: basket, isLoading} = useCurrentBasket()
     const {isPickupShipment} = usePickupShipment(basket)
+    const multishipEnabled = getConfig()?.app?.multishipEnabled ?? true
+    const storeLocatorEnabled = getConfig()?.app?.storeLocatorEnabled ?? STORE_LOCATOR_IS_ENABLED
 
     // Pickup in Store - inventory at current store and all unique store IDs from all shipments
     const {selectedStore} = useSelectedStore()
@@ -93,7 +95,7 @@ const Cart = () => {
             }
         },
         {
-            enabled: !!allStoreIds && STORE_LOCATOR_IS_ENABLED
+            enabled: !!allStoreIds && storeLocatorEnabled
         }
     )
     const uniqueInventoryIds = [
@@ -674,7 +676,7 @@ const Cart = () => {
 
         // Separate pickup and delivery shipments
         basket.shipments.forEach((shipment) => {
-            const isPickupOrder = STORE_LOCATOR_IS_ENABLED && isPickupShipment(shipment)
+            const isPickupOrder = storeLocatorEnabled && isPickupShipment(shipment)
             const storeId = shipment?.c_fromStoreId
             const store = storeData?.data?.find((store) => store.id === storeId)
 
@@ -784,7 +786,7 @@ const Cart = () => {
 
     // Function to render deliveryActions
     const renderDeliveryActions = (productItem, shipmentInfo) => {
-        const showDeliveryOptions = STORE_LOCATOR_IS_ENABLED && MULTISHIP_IS_ENABLED
+        const showDeliveryOptions = storeLocatorEnabled && multishipEnabled
         if (!showDeliveryOptions) {
             return null
         }
@@ -870,7 +872,7 @@ const Cart = () => {
                                             p={4}
                                         >
                                             {/* Order Type Display */}
-                                            {STORE_LOCATOR_IS_ENABLED && (
+                                            {storeLocatorEnabled && (
                                                 <OrderTypeDisplay
                                                     isPickupOrder={shipmentInfo.isPickupOrder}
                                                     store={shipmentInfo.store}

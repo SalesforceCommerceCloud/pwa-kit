@@ -66,12 +66,24 @@ jest.mock('@salesforce/retail-react-app/app/hooks/use-store-locator', () => ({
     useStoreLocatorModal: () => mockStoreLocatorModal
 }))
 
+// Mock getConfig to return test values
+import mockConfig from '@salesforce/retail-react-app/config/mocks/default'
+jest.mock('@salesforce/pwa-kit-runtime/utils/ssr-config', () => ({
+    getConfig: jest.fn(() => ({
+        ...mockConfig,
+        app: {
+            ...mockConfig.app,
+            storeLocatorEnabled: true,
+            multishipEnabled: true
+        }
+    }))
+}))
+
 jest.mock('@salesforce/retail-react-app/app/constants', () => {
     const original = jest.requireActual('@salesforce/retail-react-app/app/constants')
     return {
         ...original,
-        STORE_LOCATOR_IS_ENABLED: true,
-        MULTISHIP_IS_ENABLED: true
+        STORE_LOCATOR_IS_ENABLED: true
     }
 })
 

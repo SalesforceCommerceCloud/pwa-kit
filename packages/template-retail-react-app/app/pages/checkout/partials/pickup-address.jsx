@@ -36,13 +36,15 @@ import {useSelectedStore} from '@salesforce/retail-react-app/app/hooks/use-selec
 import {useStores, useProducts} from '@salesforce/commerce-sdk-react'
 import {useCurrency} from '@salesforce/retail-react-app/app/hooks'
 import {STORE_LOCATOR_IS_ENABLED} from '@salesforce/retail-react-app/app/constants'
+import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import {usePickupShipment} from '@salesforce/retail-react-app/app/hooks/use-pickup-shipment'
 
 const PickupAddress = () => {
-    const {formatMessage, locale} = useIntl()
+    const {formatMessage} = useIntl()
     const {step, STEPS, goToStep, goToNextStep} = useCheckout()
     const {data: basket} = useCurrentBasket()
     const {isPickupShipment} = usePickupShipment(basket)
+    const storeLocatorEnabled = getConfig()?.app?.storeLocatorEnabled ?? STORE_LOCATOR_IS_ENABLED
     const {currency} = useCurrency()
 
     const shipmentData = useMemo(() => {
@@ -62,7 +64,7 @@ const PickupAddress = () => {
         let hasDeliveryShipments = false
 
         basket.shipments.forEach((shipment) => {
-            const isPickupOrder = STORE_LOCATOR_IS_ENABLED && isPickupShipment(shipment)
+            const isPickupOrder = storeLocatorEnabled && isPickupShipment(shipment)
 
             if (isPickupOrder) {
                 hasPickupShipments = true
@@ -91,7 +93,7 @@ const PickupAddress = () => {
 
     // Get product data for display
     const productIds = basket?.productItems?.map(({productId}) => productId).join(',') ?? ''
-    const {data: products, isLoading: isProductsLoading} = useProducts(
+    const {data: products} = useProducts(
         {
             parameters: {
                 ids: productIds,
@@ -119,7 +121,7 @@ const PickupAddress = () => {
             }
         },
         {
-            enabled: STORE_LOCATOR_IS_ENABLED && !!allStoreIds
+            enabled: storeLocatorEnabled && !!allStoreIds
         }
     )
 
@@ -139,7 +141,7 @@ const PickupAddress = () => {
         const pickupShipments = []
 
         basket.shipments.forEach((shipment) => {
-            const isPickupOrder = STORE_LOCATOR_IS_ENABLED && isPickupShipment(shipment)
+            const isPickupOrder = storeLocatorEnabled && isPickupShipment(shipment)
 
             if (isPickupOrder) {
                 const storeId = shipment?.c_fromStoreId

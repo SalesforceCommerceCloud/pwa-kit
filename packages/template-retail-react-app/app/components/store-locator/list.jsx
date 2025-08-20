@@ -12,7 +12,7 @@ import {StoreLocatorListItem} from '@salesforce/retail-react-app/app/components/
 import {useStoreLocator} from '@salesforce/retail-react-app/app/hooks/use-store-locator'
 import {useSelectedStore} from '@salesforce/retail-react-app/app/hooks/use-selected-store'
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
-import {MULTISHIP_IS_ENABLED} from '@salesforce/retail-react-app/app/constants'
+import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 
 export const StoreLocatorList = () => {
     const intl = useIntl()
@@ -24,7 +24,8 @@ export const StoreLocatorList = () => {
     const [initialSelectedStoreId, setInitialSelectedStoreId] = useState(selectedStoreId)
 
     const hasItemsInBasket = derivedData?.totalItems > 0
-    const storeSelectionDisabled = MULTISHIP_IS_ENABLED ? false : hasItemsInBasket
+    const multishipEnabled = getConfig()?.app?.multishipEnabled ?? true
+    const storeSelectionDisabled = multishipEnabled ? false : hasItemsInBasket
 
     useEffect(() => {
         setPage(1)
