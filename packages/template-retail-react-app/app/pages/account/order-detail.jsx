@@ -64,7 +64,7 @@ const AccountOrderDetail = () => {
     const CardIcon = getCreditCardIcon(paymentCard?.cardType)
     const itemCount = order?.productItems.reduce((count, item) => item.quantity + count, 0) || 0
 
-    // Cancel order gating (POC)
+    // Cancel order gating
     const customerId = useCustomerId()
     const {isRegistered} = useCustomerType()
     const {data: currentCustomer} = useCurrentCustomer()
@@ -435,11 +435,10 @@ const AccountOrderDetail = () => {
                     isOpen={isCancelModalOpen}
                     onClose={onCancelModalClose}
                     order={order}
-                    onCancel={(order, selectedReason) => {
-                        // POC: No backend call yet
-                        console.log('Requesting cancellation for order:', order?.orderNo)
-                        console.log('Cancellation reason:', selectedReason)
-                    }}
+                    // NOTE: `onCancel` is intentionally a no-op until the cancel API is ready.
+                    // When the API is available, replace this with a handler that submits the request
+                    // and updates UI (e.g., refetch order, show a toast, navigate back to orders).
+                    onCancel={() => {}}
                 />
             )}
         </Stack>

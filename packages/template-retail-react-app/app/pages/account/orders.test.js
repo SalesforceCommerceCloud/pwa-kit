@@ -295,11 +295,13 @@ describe('Cancel Order Button and Modal', () => {
 
     test('should render cancel order button', async () => {
         expect(await screen.findByTestId('account-order-details-page')).toBeInTheDocument()
+        await screen.findByText(/Order Number:/i)
         const cancelButton = screen.getByRole('button', {name: /cancel order/i})
         expect(cancelButton).toBeInTheDocument()
     })
 
     test('should open cancel order modal when button is clicked', async () => {
+        await screen.findByText(/Order Number:/i)
         const cancelButton = screen.getByRole('button', {name: /cancel order/i})
         await user.click(cancelButton)
 
@@ -309,6 +311,7 @@ describe('Cancel Order Button and Modal', () => {
     })
 
     test('should close modal when close button is clicked', async () => {
+        await screen.findByText(/Order Number:/i)
         // Open modal
         const cancelButton = screen.getByRole('button', {name: /cancel order/i})
         await user.click(cancelButton)
@@ -325,6 +328,7 @@ describe('Cancel Order Button and Modal', () => {
     })
 
     test('should close modal when request cancellation button is clicked', async () => {
+        await screen.findByText(/Order Number:/i)
         // Open modal
         const cancelButton = screen.getByRole('button', {name: /cancel order/i})
         await user.click(cancelButton)
@@ -346,6 +350,7 @@ describe('Cancel Order Button and Modal', () => {
     })
 
     test('should call onRequestCancellation when request cancellation button is clicked', async () => {
+        await screen.findByText(/Order Number:/i)
         // Open modal
         const cancelButton = screen.getByRole('button', {name: /cancel order/i})
         await user.click(cancelButton)

@@ -7,29 +7,28 @@
 import React from 'react'
 import {Route, Switch} from 'react-router-dom'
 import {screen} from '@testing-library/react'
-import {renderWithProviders, createPathWithDefaults} from '@salesforce/retail-react-app/app/utils/test-utils'
+import {
+    renderWithProviders,
+    createPathWithDefaults
+} from '@salesforce/retail-react-app/app/utils/test-utils'
 import AccountOrderDetail from '@salesforce/retail-react-app/app/pages/account/order-detail'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import mockConfig from '@salesforce/retail-react-app/config/mocks/default'
 
-// Mock Order Status Bar to make it easier to detect
 jest.mock('@salesforce/retail-react-app/app/components/order-status-bar/index', () => ({
     __esModule: true,
     default: () => <div data-testid="order-status-bar" />
 }))
 
-// Mock current customer hook
 jest.mock('@salesforce/retail-react-app/app/hooks/use-current-customer', () => ({
     __esModule: true,
     useCurrentCustomer: () => ({data: {email: 'test@example.com'}})
 }))
 
-// Mock getConfig to control OMS flag
 jest.mock('@salesforce/pwa-kit-runtime/utils/ssr-config', () => ({
     getConfig: jest.fn()
 }))
 
-// Mock commerce-sdk-react hooks used by the component
 jest.mock('@salesforce/commerce-sdk-react', () => ({
     __esModule: true,
     ...jest.requireActual('@salesforce/commerce-sdk-react'),
@@ -53,7 +52,14 @@ jest.mock('@salesforce/commerce-sdk-react', () => ({
                 }
             ],
             paymentInstruments: [
-                {paymentCard: {cardType: 'Visa', numberLastDigits: '1111', expirationMonth: 1, expirationYear: 2030}}
+                {
+                    paymentCard: {
+                        cardType: 'Visa',
+                        numberLastDigits: '1111',
+                        expirationMonth: 1,
+                        expirationYear: 2030
+                    }
+                }
             ],
             billingAddress: {
                 firstName: 'Jane',
@@ -75,7 +81,11 @@ jest.mock('@salesforce/commerce-sdk-react', () => ({
 
 const renderAtOrderDetailPath = () => {
     const orderNo = '0001'
-    window.history.pushState({}, 'Order Details', createPathWithDefaults(`/account/orders/${orderNo}`))
+    window.history.pushState(
+        {},
+        'Order Details',
+        createPathWithDefaults(`/account/orders/${orderNo}`)
+    )
     return renderWithProviders(
         <Switch>
             <Route path={createPathWithDefaults('/account/orders/:orderNo')}>
@@ -121,5 +131,3 @@ describe('AccountOrderDetail OMS gating', () => {
         expect(screen.queryByTestId('order-status-bar')).not.toBeInTheDocument()
     })
 })
-
-
