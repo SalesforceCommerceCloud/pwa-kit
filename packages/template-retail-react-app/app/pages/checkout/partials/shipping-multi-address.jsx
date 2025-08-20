@@ -331,7 +331,7 @@ const ShippingMultiAddress = ({
         const addressKey = itemId
 
         if (isGuestUser) {
-            if (isDuplicateAddress(addressData, guestAddresses, addressKey, form)) {
+            if (isDuplicateAddress(addressData, availableAddresses, addressKey, form)) {
                 return
             }
 
