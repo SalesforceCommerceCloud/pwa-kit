@@ -12,7 +12,10 @@ import ProductItem from '../../../components/product-item'
 import CartSecondaryButtonGroup from './cart-secondary-button-group'
 import CartProductListWithGroupedBonusProducts from './cart-product-list-with-grouped-bonus-products'
 import SelectBonusProductsCard from './select-bonus-products-card'
-import {useBasketProductsWithPromotions} from '../../../utils/bonus-product-utils'
+import {
+    useBasketProductsWithPromotions,
+    getPromotionCalloutText
+} from '../../../utils/bonus-product-utils'
 
 // Configurable version with bonus product grouping support
 
@@ -62,17 +65,6 @@ const CartProductList = ({
     // Fetch products with promotion data for enhanced bonus product utilities
     const {data: productsWithPromotions, isLoading: isPromotionDataLoading} =
         useBasketProductsWithPromotions(basket)
-
-    // Helper function to get promotion callout message as plain text
-    const getPromotionCalloutText = (product, promotionId) => {
-        if (!product?.productPromotions || !promotionId) return ''
-
-        const promo = product.productPromotions.find((p) => p.promotionId === promotionId)
-        if (!promo?.calloutMsg) return ''
-
-        // Strip HTML tags and return plain text
-        return promo.calloutMsg.replace(/<[^>]*>/g, '')
-    }
 
     // Helper function removed - debug logging no longer needed
     // Helper function to render a product item (memoized for stability)

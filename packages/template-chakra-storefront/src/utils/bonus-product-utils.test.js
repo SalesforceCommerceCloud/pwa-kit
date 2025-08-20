@@ -31,13 +31,24 @@ describe('Enhanced Bonus Product Utilities', () => {
         'prod-123': {
             id: 'prod-123',
             productPromotions: [
-                {promotionId: 'BonusProductOnOrderOfAmountAbove250'},
-                {promotionId: 'FreeShippingPromotion'}
+                {
+                    promotionId: 'BonusProductOnOrderOfAmountAbove250',
+                    calloutMsg: 'Buy $250+ and get <strong>free bonus products</strong>!'
+                },
+                {
+                    promotionId: 'FreeShippingPromotion',
+                    calloutMsg: 'Free shipping on orders over $50'
+                }
             ]
         },
         'bonus-prod-456': {
             id: 'bonus-prod-456',
-            productPromotions: [{promotionId: 'BonusProductOnOrderOfAmountAbove250'}]
+            productPromotions: [
+                {
+                    promotionId: 'BonusProductOnOrderOfAmountAbove250',
+                    calloutMsg: 'Special <em>bonus</em> product available!'
+                }
+            ]
         },
         'bonus-456': {
             id: 'bonus-456',
@@ -48,6 +59,96 @@ describe('Enhanced Bonus Product Utilities', () => {
             productPromotions: [{promotionId: 'BonusProductOnOrderOfAmountAbove250'}]
         }
     }
+
+    describe('getPromotionCalloutText', () => {
+        test('returns plain text callout message for valid promotion', () => {
+            const result = bonusProductUtils.getPromotionCalloutText(
+                mockProductsWithPromotions['prod-123'],
+                'BonusProductOnOrderOfAmountAbove250'
+            )
+            expect(result).toBe('Buy $250+ and get free bonus products!')
+        })
+
+        test('strips HTML tags from callout message', () => {
+            const result = bonusProductUtils.getPromotionCalloutText(
+                mockProductsWithPromotions['bonus-prod-456'],
+                'BonusProductOnOrderOfAmountAbove250'
+            )
+            expect(result).toBe('Special bonus product available!')
+        })
+
+        test('returns different promotion callout when specified', () => {
+            const result = bonusProductUtils.getPromotionCalloutText(
+                mockProductsWithPromotions['prod-123'],
+                'FreeShippingPromotion'
+            )
+            expect(result).toBe('Free shipping on orders over $50')
+        })
+
+        test('returns empty string for non-existent promotion ID', () => {
+            const result = bonusProductUtils.getPromotionCalloutText(
+                mockProductsWithPromotions['prod-123'],
+                'NonExistentPromotion'
+            )
+            expect(result).toBe('')
+        })
+
+        test('returns empty string when promotion has no calloutMsg', () => {
+            const result = bonusProductUtils.getPromotionCalloutText(
+                mockProductsWithPromotions['bonus-456'],
+                'BonusProductOnOrderOfAmountAbove250'
+            )
+            expect(result).toBe('')
+        })
+
+        test('returns empty string when product is null', () => {
+            const result = bonusProductUtils.getPromotionCalloutText(
+                null,
+                'BonusProductOnOrderOfAmountAbove250'
+            )
+            expect(result).toBe('')
+        })
+
+        test('returns empty string when product has no productPromotions', () => {
+            const productWithoutPromotions = {id: 'test-product'}
+            const result = bonusProductUtils.getPromotionCalloutText(
+                productWithoutPromotions,
+                'BonusProductOnOrderOfAmountAbove250'
+            )
+            expect(result).toBe('')
+        })
+
+        test('returns empty string when promotionId is null or undefined', () => {
+            const result1 = bonusProductUtils.getPromotionCalloutText(
+                mockProductsWithPromotions['prod-123'],
+                null
+            )
+            expect(result1).toBe('')
+
+            const result2 = bonusProductUtils.getPromotionCalloutText(
+                mockProductsWithPromotions['prod-123'],
+                undefined
+            )
+            expect(result2).toBe('')
+        })
+
+        test('handles complex HTML tags correctly', () => {
+            const productWithComplexHTML = {
+                productPromotions: [
+                    {
+                        promotionId: 'ComplexHTMLPromo',
+                        calloutMsg:
+                            '<div class="promo"><p>Get <span style="color: red;">20% off</span> with <a href="/terms">terms</a></p></div>'
+                    }
+                ]
+            }
+            const result = bonusProductUtils.getPromotionCalloutText(
+                productWithComplexHTML,
+                'ComplexHTMLPromo'
+            )
+            expect(result).toBe('Get 20% off with terms')
+        })
+    })
 
     describe('getQualifyingProductIdForBonusItem', () => {
         test('returns qualifying product IDs for a valid bonus discount line item', () => {
