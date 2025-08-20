@@ -1027,16 +1027,6 @@
       "value": "Payment"
     }
   ],
-  "checkout_product_item.label.quantity_static": [
-    {
-      "type": 0,
-      "value": "Qty: "
-    },
-    {
-      "type": 1,
-      "value": "quantity"
-    }
-  ],
   "colorRefinements.label.hitCount": [
     {
       "type": 1,
@@ -2055,6 +2045,16 @@
     {
       "type": 0,
       "value": "Quantity: "
+    },
+    {
+      "type": 1,
+      "value": "quantity"
+    }
+  ],
+  "item_attributes.label.quantity_abbreviated": [
+    {
+      "type": 0,
+      "value": "Qty: "
     },
     {
       "type": 1,
