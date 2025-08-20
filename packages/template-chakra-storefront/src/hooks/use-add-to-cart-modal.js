@@ -4,8 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React, {useContext, useState, useEffect, useMemo} from 'react'
-import {useLocation} from 'react-router-dom'
+import React, {useContext, useMemo} from 'react'
 import PropTypes from 'prop-types'
 import {useIntl} from 'react-intl'
 import {
@@ -21,7 +20,7 @@ import {
     useBreakpointValue
 } from '@chakra-ui/react'
 import {useCurrentBasket} from './use-current-basket'
-import {usePromotions} from '@salesforce/commerce-sdk-react'
+
 import Link from '../components/link'
 import RecommendedProducts from '../components/recommended-products'
 import {LockIcon} from '../components/icons'
@@ -32,7 +31,12 @@ import DisplayPrice from '../components/display-price'
 import SafePortal from '../components/safe-portal'
 import {useBonusProductSelectionModalContext} from './use-bonus-product-selection-modal'
 import {addToCartModalTheme} from '../theme/components/project/add-to-cart-modal'
-import SelectBonusProductsButton from '../components/select-bonus-products-button'
+import SelectBonusProductsCard from '../pages/cart/partials/select-bonus-products-card'
+import {
+    useBasketProductsWithPromotions,
+    getPromotionCalloutText,
+    findAvailableBonusDiscountLineItemId
+} from '../utils/bonus-product-utils'
 import {useModalState} from './use-modal-state'
 
 /**
@@ -73,7 +77,7 @@ AddToCartModalProvider.propTypes = {
 /**
  * Visual feedback (a modal) for adding item to the cart.
  */
-export const AddToCartModal = ({onSelectBonusProductsClick}) => {
+export const AddToCartModal = () => {
     const {isOpen, onClose, data} = useAddToCartModalContext()
     const bonusProductContext = useBonusProductSelectionModalContext()
     const {onOpen: onOpenBonusModal} = bonusProductContext || {}
@@ -89,17 +93,8 @@ export const AddToCartModal = ({onSelectBonusProductsClick}) => {
 
     const {bonusDiscountLineItems = []} = basket || {}
 
-    // Extract unique promotion IDs
-    const promotionIds = [
-        ...new Set(bonusDiscountLineItems.map((item) => item.promotionId).filter(Boolean))
-    ]
-    // Fetch promotion details
-    const {data: promotions, isLoading: isPromotionsLoading} = usePromotions(
-        {parameters: {ids: promotionIds.join(',')}},
-        {enabled: promotionIds.length > 0}
-    )
-    // Get the first promotion's details
-    const promotionText = promotions?.data?.[0]?.details || ''
+    // Fetch products with promotion data for SelectBonusProductsCard
+    const {data: productsWithPromotions} = useBasketProductsWithPromotions(basket)
 
     const size = useBreakpointValue(addToCartModalTheme.modal.size)
     const {currency, productSubTotal} = basket
@@ -392,25 +387,63 @@ export const AddToCartModal = ({onSelectBonusProductsClick}) => {
                                             )
                                         })}
                                     {bonusDiscountLineItems &&
-                                        bonusDiscountLineItems.length > 0 && (
-                                            <>
-                                                <Text
-                                                    mb={2}
-                                                    fontSize="md"
-                                                    fontWeight="normal"
-                                                    textAlign="left"
-                                                >
-                                                    {promotionText}
-                                                </Text>
-                                                <SelectBonusProductsButton
-                                                    bonusDiscountLineItems={bonusDiscountLineItems}
-                                                    product={product}
-                                                    itemsAdded={itemsAdded}
-                                                    onOpenBonusModal={onOpenBonusModal}
-                                                    onClose={onClose}
+                                        bonusDiscountLineItems.length > 0 &&
+                                        (() => {
+                                            // Find the first bonus discount line item with remaining capacity
+                                            // Use the existing utility function instead of manual logic
+                                            let availableBonusDiscountLineItem = null
+
+                                            for (const bonusDiscountLineItem of bonusDiscountLineItems) {
+                                                const availableId =
+                                                    findAvailableBonusDiscountLineItemId(
+                                                        basket,
+                                                        bonusDiscountLineItem.promotionId,
+                                                        1, // Check for capacity of 1 item
+                                                        null
+                                                    )
+
+                                                if (availableId === bonusDiscountLineItem.id) {
+                                                    availableBonusDiscountLineItem =
+                                                        bonusDiscountLineItem
+                                                    break
+                                                }
+                                            }
+
+                                            // Only render if we found an available bonus discount line item
+                                            if (!availableBonusDiscountLineItem) {
+                                                return null
+                                            }
+
+                                            return (
+                                                <SelectBonusProductsCard
+                                                    qualifyingProduct={{productId: product?.id}}
+                                                    basket={basket}
+                                                    productsWithPromotions={productsWithPromotions}
+                                                    remainingBonusProductsData={{
+                                                        bonusItems: [],
+                                                        aggregatedMaxBonusItems: 0,
+                                                        aggregatedSelectedItems: 0
+                                                    }} // Not used when bonusDiscountLineItem is provided
+                                                    isEligible={true}
+                                                    getPromotionCalloutText={
+                                                        getPromotionCalloutText
+                                                    }
+                                                    onSelectBonusProducts={() => {
+                                                        if (onOpenBonusModal) {
+                                                            onOpenBonusModal({
+                                                                bonusDiscountLineItems,
+                                                                product,
+                                                                itemsAdded
+                                                            })
+                                                        }
+                                                        if (onClose) onClose()
+                                                    }}
+                                                    bonusDiscountLineItem={
+                                                        availableBonusDiscountLineItem
+                                                    }
                                                 />
-                                            </>
-                                        )}
+                                            )
+                                        })()}
                                 </Box>
                                 <Box
                                     display={['none', 'none', 'none', 'block']}
@@ -513,7 +546,6 @@ AddToCartModal.propTypes = {
     quantity: PropTypes.number,
     isOpen: PropTypes.bool,
     onClose: PropTypes.func,
-    onSelectBonusProductsClick: PropTypes.func,
     children: PropTypes.any
 }
 
