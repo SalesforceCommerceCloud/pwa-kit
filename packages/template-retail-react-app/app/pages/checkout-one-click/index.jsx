@@ -57,6 +57,7 @@ const CheckoutOneClick = () => {
     const [isLoading, setIsLoading] = useState(false)
     const [enableUserRegistration, setEnableUserRegistration] = useState(false)
     const [registeredUserChoseGuest, setRegisteredUserChoseGuest] = useState(false)
+    const [savedPaymentMethods, setSavedPaymentMethods] = useState(new Set())
     const {data: basket} = useCurrentBasket()
     const [error] = useState()
     const {social = {}} = getConfig().app.login || {}
@@ -89,6 +90,11 @@ const CheckoutOneClick = () => {
     const {mutateAsync: createCustomerAddress} = useShopperCustomersMutation(
         ShopperCustomersMutations.CreateCustomerAddress
     )
+
+    // Callback for when payment methods are saved
+    const handlePaymentMethodSaved = (paymentId) => {
+        setSavedPaymentMethods(prev => new Set([...prev, paymentId]))
+    }
 
     const showError = (message) => {
         showToast({
@@ -343,6 +349,7 @@ const CheckoutOneClick = () => {
                                 paymentMethodForm={paymentMethodForm}
                                 billingAddressForm={billingAddressForm}
                                 registeredUserChoseGuest={registeredUserChoseGuest}
+                                onPaymentMethodSaved={handlePaymentMethodSaved}
                             />
 
                             {step === 4 && (

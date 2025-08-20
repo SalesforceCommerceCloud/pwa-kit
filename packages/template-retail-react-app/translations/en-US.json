@@ -391,6 +391,9 @@
   "checkout_payment.button.place_order": {
     "defaultMessage": "Place Order"
   },
+  "checkout.payment.save_payment_method": {
+    "defaultMessage": "Save this card"
+  },
   "checkout_payment.button.review_order": {
     "defaultMessage": "Review Order"
   },

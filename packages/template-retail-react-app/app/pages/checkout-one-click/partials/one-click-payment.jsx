@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React, {useState} from 'react'
+import React, { useState, useMemo, useEffect } from 'react'
 import PropTypes from 'prop-types'
 import {defineMessage, FormattedMessage, useIntl} from 'react-intl'
 import {
@@ -20,6 +20,7 @@ import {
 import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
 import {useShopperBasketsMutation, useCustomerType} from '@salesforce/commerce-sdk-react'
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
+import { useCurrentCustomer } from '@salesforce/retail-react-app/app/hooks/use-current-customer'
 import {useCheckout} from '@salesforce/retail-react-app/app/pages/checkout-container/util/checkout-context'
 import {
     getPaymentInstrumentCardType,
@@ -34,6 +35,7 @@ import {
 import PaymentForm from '@salesforce/retail-react-app/app/pages/checkout-one-click/partials/one-click-payment-form'
 import ShippingAddressSelection from '@salesforce/retail-react-app/app/pages/checkout-one-click/partials/one-click-shipping-address-selection'
 import UserRegistration from '@salesforce/retail-react-app/app/pages/checkout-one-click/partials/one-click-user-registration'
+import SavePaymentMethod from '@salesforce/retail-react-app/app/pages/checkout-one-click/partials/one-click-save-payment-method'
 import AddressDisplay from '@salesforce/retail-react-app/app/components/address-display'
 import {PromoCode, usePromoCode} from '@salesforce/retail-react-app/app/components/promo-code'
 import {API_ERROR_MESSAGE} from '@salesforce/retail-react-app/app/constants'
@@ -43,14 +45,152 @@ const Payment = ({
     billingAddressForm,
     enableUserRegistration,
     setEnableUserRegistration,
-    registeredUserChoseGuest = false
+    registeredUserChoseGuest = false,
+    onPaymentMethodSaved
 }) => {
+    console.log('🔍 Debug - Payment component props:', {
+        onPaymentMethodSaved: !!onPaymentMethodSaved,
+        registeredUserChoseGuest
+    })
     const {formatMessage} = useIntl()
-    const {data: basket} = useCurrentBasket()
+    const { data: basket } = useCurrentBasket()
+    const { data: customer } = useCurrentCustomer()
     const {isGuest} = useCustomerType()
     const selectedShippingAddress = basket?.shipments && basket?.shipments[0]?.shippingAddress
     const selectedBillingAddress = basket?.billingAddress
     const appliedPayment = basket?.paymentInstruments && basket?.paymentInstruments[0]
+
+    // Track current form values to detect new payment instruments in real-time
+    const [currentFormPayment, setCurrentFormPayment] = useState(null)
+
+    console.log('🔍 Debug - Hooks data:', {
+        hasBasket: !!basket,
+        hasCustomer: !!customer,
+        customerId: customer?.customerId,
+        customerPaymentInstruments: customer?.paymentInstruments?.length || 0,
+        isGuest,
+        hasAppliedPayment: !!appliedPayment,
+        hasCurrentFormPayment: !!currentFormPayment
+    })
+
+    // Function to update current form payment data
+    const updateCurrentFormPayment = (formData) => {
+        console.log('🔍 Debug - updateCurrentFormPayment called with:', formData)
+
+        if (formData?.number && formData?.holder && formData?.expiry) {
+            const [expirationMonth, expirationYear] = formData.expiry.split('/')
+            const paymentData = {
+                paymentMethodId: 'CREDIT_CARD',
+                paymentCard: {
+                    holder: formData.holder,
+                    numberLastDigits: formData.number.slice(-4),
+                    cardType: formData.cardType,
+                    expirationMonth: parseInt(expirationMonth),
+                    expirationYear: parseInt(`20${expirationYear}`)
+                }
+            }
+            setCurrentFormPayment(paymentData)
+            console.log('🔍 Debug - Form payment updated:', paymentData)
+        } else {
+            console.log('🔍 Debug - Form payment cleared - missing fields:', {
+                hasNumber: !!formData?.number,
+                hasHolder: !!formData?.holder,
+                hasExpiry: !!formData?.expiry,
+                numberLength: formData?.number?.length,
+                holderLength: formData?.holder?.length,
+                expiryLength: formData?.expiry?.length
+            })
+            setCurrentFormPayment(null)
+        }
+    }
+
+    // Detect new payment instruments that aren't in the customer's saved list
+    const newPaymentInstruments = useMemo(() => {
+        // Use currentFormPayment if available, otherwise fall back to appliedPayment
+        const paymentToCheck = currentFormPayment || appliedPayment
+
+        console.log('🔍 Debug - detectNewPaymentInstruments:', {
+            isGuest,
+            hasCustomer: !!customer,
+            customerPaymentInstruments: customer?.paymentInstruments,
+            paymentToCheck,
+            paymentSource: currentFormPayment ? 'form' : 'basket',
+            paymentStructure: paymentToCheck ? {
+                hasPaymentCard: !!paymentToCheck.paymentCard,
+                numberLastDigits: paymentToCheck.paymentCard?.numberLastDigits,
+                maskedNumber: paymentToCheck.paymentCard?.maskedNumber
+            } : null
+        })
+
+        if (!isGuest && paymentToCheck) {
+            console.log('🔍 Debug - All conditions met, checking for new payment...')
+
+            // If customer has no saved payment instruments, any new payment is considered new
+            if (!customer?.paymentInstruments || customer.paymentInstruments.length === 0) {
+                console.log('🔍 Debug - No existing payment instruments, treating as new payment')
+                return [paymentToCheck]
+            }
+
+            // Check if current payment instrument is not in saved list
+            const isNewPayment = !customer.paymentInstruments.some(saved => {
+                // Compare the entire payment instrument structure
+                return (
+                    saved.paymentCard?.cardType === paymentToCheck.paymentCard?.cardType &&
+                    saved.paymentCard?.numberLastDigits === paymentToCheck.paymentCard?.numberLastDigits &&
+                    saved.paymentCard?.holder === paymentToCheck.paymentCard?.holder &&
+                    saved.paymentCard?.expirationMonth === paymentToCheck.paymentCard?.expirationMonth &&
+                    saved.paymentCard?.expirationYear === paymentToCheck.paymentCard?.expirationYear
+                )
+            })
+
+            console.log('🔍 Debug - Payment comparison:', {
+                savedPaymentInstruments: customer.paymentInstruments.map(saved => ({
+                    cardType: saved.paymentCard?.cardType,
+                    numberLastDigits: saved.paymentCard?.numberLastDigits,
+                    holder: saved.paymentCard?.holder,
+                    expirationMonth: saved.paymentCard?.expirationMonth,
+                    expirationYear: saved.paymentCard?.expirationYear
+                })),
+                currentPayment: {
+                    cardType: paymentToCheck.paymentCard?.cardType,
+                    numberLastDigits: paymentToCheck.paymentCard?.numberLastDigits,
+                    holder: paymentToCheck.paymentCard?.holder,
+                    expirationMonth: paymentToCheck.paymentCard?.expirationMonth,
+                    expirationYear: paymentToCheck.paymentCard?.expirationYear
+                },
+                isNewPayment
+            })
+
+            console.log('🔍 Debug - Final result:', {
+                isNewPayment,
+                newPaymentInstruments: isNewPayment ? [paymentToCheck] : [],
+                willShowCheckbox: isNewPayment && !isGuest
+            })
+
+            return isNewPayment ? [paymentToCheck] : []
+        } else {
+            console.log('🔍 Debug - Conditions not met:', {
+                isGuest,
+                hasCustomer: !!customer,
+                hasCustomerPaymentInstruments: !!customer?.paymentInstruments,
+                hasPaymentToCheck: !!paymentToCheck,
+                customerPaymentInstrumentsLength: customer?.paymentInstruments?.length || 0
+            })
+        }
+        return []
+    }, [isGuest, customer, appliedPayment, currentFormPayment])
+
+    // Watch form values in real-time to detect new payment instruments
+    useEffect(() => {
+        if (paymentMethodForm && !isGuest) {
+            const subscription = paymentMethodForm.watch((value, { name, type }) => {
+                console.log('🔍 Debug - Form field changed:', { name, type, value })
+                updateCurrentFormPayment(value)
+            })
+
+            return () => subscription.unsubscribe()
+        }
+    }, [paymentMethodForm, isGuest])
 
     const isPickupOrder = basket?.shipments[0]?.shippingMethod?.c_storePickupEnabled === true
     const [billingSameAsShipping, setBillingSameAsShipping] = useState(!isPickupOrder)
@@ -150,7 +290,16 @@ const Payment = ({
         id: 'checkout_payment.label.billing_address_form'
     })
 
-    return (
+    console.log('🔍 Debug - Payment component about to render:', {
+        step,
+        STEPS_PAYMENT: STEPS.PAYMENT,
+        isEditing: step === STEPS.PAYMENT,
+        hasAppliedPayment: !!appliedPayment,
+        newPaymentInstrumentsLength: newPaymentInstruments.length
+    })
+
+    try {
+        return (
         <ToggleCard
             id="step-3"
             data-testid="payment-component"
@@ -168,13 +317,24 @@ const Payment = ({
             })}
         >
             <ToggleCardEdit>
+                    {console.log('🔍 Debug - ToggleCardEdit rendering')}
                 <Box mt={-2} mb={4}>
                     <PromoCode {...promoCodeProps} itemProps={{border: 'none'}} />
                 </Box>
 
                 <Stack spacing={6}>
                     {!appliedPayment?.paymentCard ? (
-                        <PaymentForm form={paymentMethodForm} onSubmit={onSubmit} />
+                            <>
+                                <PaymentForm form={paymentMethodForm} onSubmit={onSubmit} />
+
+                                {/* Save Payment Method - Show in the actual payment form */}
+                                {newPaymentInstruments.length > 0 && (
+                                    <SavePaymentMethod
+                                        paymentInstrument={newPaymentInstruments[0]}
+                                        onSaved={onPaymentMethodSaved}
+                                    />
+                                )}
+                            </>
                     ) : (
                         <Stack spacing={3}>
                             <Heading as="h3" fontSize="md">
@@ -252,7 +412,9 @@ const Payment = ({
             </ToggleCardEdit>
 
             <ToggleCardSummary>
+                    {console.log('🔍 Debug - ToggleCardSummary rendering')}
                 <Stack spacing={6}>
+                        {console.log('🔍 Debug - Stack in ToggleCardSummary rendering')}
                     {appliedPayment && (
                         <Stack spacing={3}>
                             <Heading as="h3" fontSize="md">
@@ -262,8 +424,67 @@ const Payment = ({
                                 />
                             </Heading>
                             <PaymentCardSummary payment={appliedPayment} />
+
+                                {console.log('🔍 Debug - Render section:', {
+                                    newPaymentInstrumentsLength: newPaymentInstruments.length,
+                                    newPaymentInstruments,
+                                    appliedPayment
+                                })}
+                                {console.log('🔍 Debug - Render SavePaymentMethod check:', {
+                                    newPaymentInstrumentsLength: newPaymentInstruments.length,
+                                    newPaymentInstruments,
+                                    firstPaymentInstrument: newPaymentInstruments[0],
+                                    shouldRender: newPaymentInstruments.length > 0
+                                })}
                         </Stack>
                     )}
+
+                        {/* Save Payment Method - Always check, regardless of appliedPayment */}
+                        {console.log('🔍 Debug - About to check SavePaymentMethod render conditions')}
+                        {console.log('🔍 Debug - Render SavePaymentMethod check:', {
+                            newPaymentInstrumentsLength: newPaymentInstruments.length,
+                            newPaymentInstruments,
+                            firstPaymentInstrument: newPaymentInstruments[0],
+                            shouldRender: newPaymentInstruments.length > 0,
+                            isGuest,
+                            hasAppliedPayment: !!appliedPayment,
+                            hasCurrentFormPayment: !!currentFormPayment
+                        })}
+                        {newPaymentInstruments.length > 0 && (
+                            <>
+                                <Text color="green.500" fontSize="sm">
+                                    🔍 Debug: SavePaymentMethod should render here
+                                </Text>
+                                <Text color="red.500" fontSize="sm">
+                                    🔍 Debug: This text should be visible if conditional rendering works
+                                </Text>
+                                {console.log('🔍 Debug - About to render SavePaymentMethod component')}
+                                <SavePaymentMethod
+                                    paymentInstrument={newPaymentInstruments[0]}
+                                    onSaved={onPaymentMethodSaved}
+                                />
+                                {console.log('🔍 Debug - SavePaymentMethod component rendered')}
+                            </>
+                        )}
+
+                        {/* Debug info */}
+                        <Box mt={4} p={3} bg="gray.50" rounded="md">
+                            <Text fontSize="sm" color="gray.600">
+                                Debug Info:
+                            </Text>
+                            <Text fontSize="xs" color="gray.500">
+                                newPaymentInstruments.length: {newPaymentInstruments.length}
+                            </Text>
+                            <Text fontSize="xs" color="gray.500">
+                                isGuest: {isGuest ? 'true' : 'false'}
+                            </Text>
+                            <Text fontSize="xs" color="gray.500">
+                                hasCurrentFormPayment: {currentFormPayment ? 'true' : 'false'}
+                            </Text>
+                            <Text fontSize="xs" color="gray.500">
+                                hasAppliedPayment: {appliedPayment ? 'true' : 'false'}
+                            </Text>
+                        </Box>
 
                     <Divider borderColor="gray.100" />
 
@@ -287,7 +508,11 @@ const Payment = ({
                 </Stack>
             </ToggleCardSummary>
         </ToggleCard>
-    )
+        )
+    } catch (error) {
+        console.error('🔍 Debug - Payment component render error:', error)
+        return <div>Error rendering payment component: {error.message}</div>
+    }
 }
 
 Payment.propTypes = {
@@ -296,7 +521,9 @@ Payment.propTypes = {
     /** Callback to set user registration state */
     setEnableUserRegistration: PropTypes.func,
     /** Whether a registered user has chosen guest checkout */
-    registeredUserChoseGuest: PropTypes.bool
+    registeredUserChoseGuest: PropTypes.bool,
+    /** Callback when payment method is successfully saved */
+    onPaymentMethodSaved: PropTypes.func
 }
 
 const PaymentCardSummary = ({payment}) => {
