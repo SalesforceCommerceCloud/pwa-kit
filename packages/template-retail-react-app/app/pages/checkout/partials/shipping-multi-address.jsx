@@ -186,12 +186,9 @@ const ShippingMultiAddress = ({
     const {
         availableAddresses,
         selectedAddresses,
-        guestAddresses,
         selectAddressForItem,
         setAddressesForItems,
         addGuestAddress,
-        updateGuestAddresses,
-        allItemsHaveAddress,
         isGuest: isGuestUser
     } = useAddressManagement(basket, deliveryItems)
 
@@ -227,7 +224,9 @@ const ShippingMultiAddress = ({
     const isLoading = (isGuestUser ? false : customerLoading) || productsLoading
 
     // Check if all product items have an address selected
-    const allShipmentsHaveAddress = allItemsHaveAddress
+    const allShipmentsHaveAddress = (deliveryItems ?? []).every((item) => 
+        selectedAddresses[item.itemId]
+    )
 
     if (!deliveryItems.length) {
         return (
@@ -341,7 +340,7 @@ const ShippingMultiAddress = ({
                 const newAddress = addGuestAddress(addressData)
 
                 // If this is the first address, apply it to all delivery items
-                if (guestAddresses.length === 0) {
+                if (availableAddresses.length === 0) {
                     const itemIds = deliveryItems.map(item => item.itemId)
                     setAddressesForItems(itemIds, newAddress.addressId)
                 } else {

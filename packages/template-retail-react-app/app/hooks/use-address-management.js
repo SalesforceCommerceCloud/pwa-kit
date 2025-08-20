@@ -214,40 +214,13 @@ export const useAddressManagement = (basket, deliveryItems) => {
         setGuestAddresses(prev => [...prev, newAddress])
         return newAddress
     }, [])
-
-    const updateGuestAddresses = useCallback((updater) => {
-        setGuestAddresses(updater)
-    }, [])
-
-    // Internal functions for updating selected addresses
-    const updateSelectedGuestAddresses = useCallback((updater) => {
-        setSelectedGuestAddresses(updater)
-    }, [])
-
-    const updateSelectedRegisteredUserAddresses = useCallback((updater) => {
-        setSelectedRegisteredUserAddresses(updater)
-    }, [])
-
-    // Check if all product items have an address selected
-    const allItemsHaveAddress = useMemo(() => {
-        return (deliveryItems ?? []).every((item) => {
-            if (customer?.isGuest) {
-                return selectedGuestAddresses[item.itemId]
-            } else {
-                return selectedRegisteredUserAddresses[item.itemId]
-            }
-        })
-    }, [deliveryItems, customer?.isGuest, selectedGuestAddresses, selectedRegisteredUserAddresses])
-
+    
     return {
         availableAddresses,
         selectedAddresses,
-        guestAddresses,
         selectAddressForItem,
-        setAddressesForItems,
         addGuestAddress,
-        updateGuestAddresses,
-        allItemsHaveAddress,
-        isGuest: customer?.isGuest
+        isGuest: customer?.isGuest,
+        setAddressesForItems
     }
 }
