@@ -4,9 +4,6 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-<<<<<<< HEAD
-import {EmptyJsonSchema, getCreateAppCommand, isMonoRepo} from './utils'
-=======
 import {
     EmptyJsonSchema,
     getCreateAppCommand,
@@ -17,7 +14,6 @@ import {
     isLocalSharedUIComponent,
     generateComponentImportStatement
 } from './utils'
->>>>>>> develop
 import fs from 'fs'
 import path from 'path'
 
@@ -97,8 +93,6 @@ describe('Utils', () => {
             expect(result).toBe(`@salesforce/pwa-kit-create-app@${CREATE_APP_VERSION}`)
         })
     })
-<<<<<<< HEAD
-=======
 
     describe('isBaseComponent', () => {
         const componentName = 'TestComponent'
@@ -285,7 +279,6 @@ describe('Utils', () => {
             expect(result).toBe("import MyComponent from '../../components/my-component'")
         })
     })
->>>>>>> develop
 })
 
 describe('logMCPMessage', () => {
