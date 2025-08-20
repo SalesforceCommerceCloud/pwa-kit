@@ -3610,7 +3610,7 @@
   "shipping_multi_address.info.address_already_exists": [
     {
       "type": 0,
-      "value": "Address already exists"
+      "value": "The address you entered already exists."
     }
   ],
   "shipping_multi_address.loading.message": [
