@@ -203,7 +203,7 @@ const ShippingMultiAddress = ({
         handleCreateAddress,
         isAddressFormOpen,
         formErrors
-    } = useAddressForm(addGuestAddress, isGuestUser, setAddressesForItems, availableAddresses, deliveryItems)
+    } = useAddressForm(addGuestAddress, isGuestUser, setAddressesForItems, availableAddresses, deliveryItems, areAddressesEqual)
 
     // Local state for overall form submission
     const [isSubmitting, setIsSubmitting] = useState(false)

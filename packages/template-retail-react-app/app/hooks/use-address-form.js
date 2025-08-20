@@ -6,7 +6,7 @@ import {useShopperCustomersMutation} from '@salesforce/commerce-sdk-react'
 import {useCurrentCustomer} from './use-current-customer'
 import {nanoid} from 'nanoid'
 
-export const useAddressForm = (addGuestAddress, isGuest, setAddressesForItems, availableAddresses, deliveryItems) => {
+export const useAddressForm = (addGuestAddress, isGuest, setAddressesForItems, availableAddresses, deliveryItems, areAddressesEqual) => {
     const {formatMessage} = useIntl()
     const showToast = useToast()
     const {data: customer, refetch: refetchCustomer} = useCurrentCustomer()
@@ -37,6 +37,23 @@ export const useAddressForm = (addGuestAddress, isGuest, setAddressesForItems, a
     const handleCreateAddress = useCallback(async (addressData, itemId) => {
         setIsSubmitting(true)
         try {
+            // Check for duplicate addresses before creating
+            const isDuplicate = availableAddresses.some(existingAddr => 
+                areAddressesEqual && areAddressesEqual(addressData, existingAddr)
+            )
+            
+            if (isDuplicate) {
+                showToast({
+                    title: formatMessage({
+                        id: 'shipping_multi_address.error.duplicate_address',
+                        defaultMessage: 'The address you entered already exists.'
+                    }),
+                    status: 'info'
+                })
+                setIsSubmitting(false)
+                return null
+            }
+
             let newAddress
 
             if (isGuest) {
