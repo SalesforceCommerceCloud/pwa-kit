@@ -186,7 +186,20 @@ describe('ContactInfo Component', () => {
             'user@example-domain.com',
             'user@subdomain1.subdomain2.example.com',
             'user.name@example.co.uk',
-            'user@example-domain123.com'
+            'user@example-domain123.com',
+            'josé@mañana.com',
+            'very.common@example.com',
+            'firstname.lastname@example.co.uk',
+            'email@subdomain.example.com',
+            'user+mailbox@example.com',
+            'user-name@example.org',
+            'user\'s.email@example.net',
+            '12345@example.com',
+            'email@mañana.com',
+            'josé@example.españa',
+            'email@bücher.de',
+            '用户@例子.中国',
+            '!#$%&'*+/=?^_{|}~-@example.com`'
         ]
 
         for (const email of validEmails) {
