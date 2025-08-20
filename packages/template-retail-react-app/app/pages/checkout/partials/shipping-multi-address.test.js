@@ -179,7 +179,11 @@ const mockProducts = {
                     name: 'Size',
                     values: [{value: 'M', name: 'Medium'}]
                 }
-            ]
+            ],
+            inventory: {
+                id: 'inventory-1',
+                stockLevel: 10
+            }
         },
         {
             id: 'product-2',
@@ -201,7 +205,11 @@ const mockProducts = {
                     name: 'Size',
                     values: [{value: 'L', name: 'Large'}]
                 }
-            ]
+            ],
+            inventory: {
+                id: 'inventory-2',
+                stockLevel: 5
+            }
         }
     ]
 }
@@ -883,7 +891,7 @@ describe('ShippingMultiAddress - handleSubmit', () => {
     let mockFindUnusedDeliveryShipment
     let mockCreateNewDeliveryShipmentWithAddress
     let mockUpdateDeliveryAddressForShipment
-    let mockMoveItemsToDeliveryShipment
+    let mockUpdateItemsToDeliveryShipment
     let mockRemoveEmptyShipments
 
     const mockBasket = {
@@ -891,14 +899,14 @@ describe('ShippingMultiAddress - handleSubmit', () => {
         productItems: [
             {
                 itemId: 'item-1',
-                productId: 'prod-1',
+                productId: 'product-1',
                 productName: 'Test Product 1',
                 quantity: 1,
                 shipmentId: 'me'
             },
             {
                 itemId: 'item-2',
-                productId: 'prod-2',
+                productId: 'product-2',
                 productName: 'Test Product 2',
                 quantity: 2,
                 shipmentId: 'me'
@@ -936,9 +944,11 @@ describe('ShippingMultiAddress - handleSubmit', () => {
     beforeEach(() => {
         mockFindDeliveryShipmentWithSameAddress = jest.fn().mockReturnValue(null)
         mockFindUnusedDeliveryShipment = jest.fn().mockReturnValue(null)
-        mockCreateNewDeliveryShipmentWithAddress = jest.fn().mockResolvedValue('new-shipment-1')
+        mockCreateNewDeliveryShipmentWithAddress = jest
+            .fn()
+            .mockResolvedValue({shipmentId: 'new-shipment-1'})
         mockUpdateDeliveryAddressForShipment = jest.fn().mockResolvedValue()
-        mockMoveItemsToDeliveryShipment = jest.fn().mockResolvedValue({
+        mockUpdateItemsToDeliveryShipment = jest.fn().mockResolvedValue({
             basketId: 'test-basket-123',
             // Return updated basket
             productItems: mockBasket.productItems,
@@ -951,7 +961,7 @@ describe('ShippingMultiAddress - handleSubmit', () => {
             findUnusedDeliveryShipment: mockFindUnusedDeliveryShipment,
             createNewDeliveryShipmentWithAddress: mockCreateNewDeliveryShipmentWithAddress,
             updateDeliveryAddressForShipment: mockUpdateDeliveryAddressForShipment,
-            moveItemsToDeliveryShipment: mockMoveItemsToDeliveryShipment,
+            updateItemsToDeliveryShipment: mockUpdateItemsToDeliveryShipment,
             removeEmptyShipments: mockRemoveEmptyShipments
         })
 
@@ -992,7 +1002,7 @@ describe('ShippingMultiAddress - handleSubmit', () => {
             )
 
             // Should move items to their respective shipments
-            expect(mockMoveItemsToDeliveryShipment).toHaveBeenCalledTimes(2)
+            expect(mockUpdateItemsToDeliveryShipment).toHaveBeenCalledTimes(2)
 
             // Should remove empty shipments
             expect(mockRemoveEmptyShipments).toHaveBeenCalled()
@@ -1006,7 +1016,7 @@ describe('ShippingMultiAddress - handleSubmit', () => {
         // Mock that a shipment already exists for address 1
         mockFindDeliveryShipmentWithSameAddress.mockImplementation((basket, address) => {
             if (address.addressId === 'addr-1') {
-                return 'existing-shipment-1'
+                return {shipmentId: 'existing-shipment-1'}
             }
             return null
         })
@@ -1028,12 +1038,13 @@ describe('ShippingMultiAddress - handleSubmit', () => {
             expect(mockCreateNewDeliveryShipmentWithAddress).not.toHaveBeenCalled()
 
             // Should move items to existing shipment
-            expect(mockMoveItemsToDeliveryShipment).toHaveBeenCalledWith(
+            expect(mockUpdateItemsToDeliveryShipment).toHaveBeenCalledWith(
                 expect.arrayContaining([
                     expect.objectContaining({itemId: 'item-1'}),
                     expect.objectContaining({itemId: 'item-2'})
                 ]),
-                'existing-shipment-1'
+                'existing-shipment-1',
+                expect.any(String) // defaultInventoryId
             )
         })
     })
@@ -1084,7 +1095,7 @@ describe('ShippingMultiAddress - handleSubmit', () => {
 
         mockFindDeliveryShipmentWithSameAddress.mockImplementation((basket, address) => {
             if (address.addressId === 'addr-1') {
-                return 'existing-shipment-1'
+                return {shipmentId: 'existing-shipment-1'}
             }
             return null
         })
@@ -1104,10 +1115,11 @@ describe('ShippingMultiAddress - handleSubmit', () => {
 
         await waitFor(() => {
             // Should only move the second item
-            expect(mockMoveItemsToDeliveryShipment).toHaveBeenCalledTimes(1)
-            expect(mockMoveItemsToDeliveryShipment).toHaveBeenCalledWith(
+            expect(mockUpdateItemsToDeliveryShipment).toHaveBeenCalledTimes(1)
+            expect(mockUpdateItemsToDeliveryShipment).toHaveBeenCalledWith(
                 expect.arrayContaining([expect.objectContaining({itemId: 'item-2'})]),
-                expect.any(String)
+                expect.any(String),
+                expect.any(String) // defaultInventoryId
             )
         })
     })
