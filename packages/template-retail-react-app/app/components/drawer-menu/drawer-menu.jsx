@@ -103,7 +103,7 @@ const DrawerMenu = ({
     const socialIconVariant = useBreakpointValue({base: 'flex', md: 'flex-start'})
     const {site, buildUrl} = useMultiSite()
     const {l10n} = site
-    const isOrderStatusPageEnabled = getConfig()?.app?.oms?.orderStatusPage?.enabled
+    const isOmsEnabled = getConfig()?.app?.oms?.enabled
     const [showLoading, setShowLoading] = useState(false)
     const [ariaBusy, setAriaBusy] = useState('true')
     const logout = useAuthHelper(AuthHelpers.Logout)
@@ -294,7 +294,7 @@ const DrawerMenu = ({
                                 </Box>
                             )}
                             {/* Order Status menu item */}
-                            {isOrderStatusPageEnabled && (
+                            {isOmsEnabled && (
                                 <Box {...styles.actionsItem}>
                                     <Link to={ORDER_STATUS_HREF}>
                                         <HStack spacing={2}>

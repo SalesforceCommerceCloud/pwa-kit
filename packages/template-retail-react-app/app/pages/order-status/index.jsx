@@ -44,17 +44,16 @@ const OrderStatusPage = () => {
     // Check if user is not registered and customer data has loaded
     const shouldShowSignInForm = customerType !== null && !isRegistered
 
-    const isOrderStatusPageEnabled = getConfig()?.app?.oms?.orderStatusPage?.enabled
-    const isGuestOrderDetailsEnabled = getConfig()?.app?.oms?.guestOrderDetails?.enabled
+    const isOmsEnabled = getConfig()?.app?.oms?.enabled
     const isGuestUser = customerType === 'guest'
-    const showOrderLookup = !isGuestUser || isGuestOrderDetailsEnabled
+    const showOrderLookup = !isGuestUser || isOmsEnabled
 
-    // Redirect to home if order status page feature flag is explicitly disabled
+    // Redirect to home if OMS feature flag is explicitly disabled
     useEffect(() => {
-        if (isOrderStatusPageEnabled === false) {
+        if (isOmsEnabled === false) {
             navigate('/')
         }
-    }, [isOrderStatusPageEnabled, navigate])
+    }, [isOmsEnabled, navigate])
 
     return (
         <Box data-testid="order-status-page" bg="gray.50">

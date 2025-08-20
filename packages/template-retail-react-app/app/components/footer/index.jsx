@@ -42,7 +42,7 @@ const Footer = ({...otherProps}) => {
     const {l10n} = site
     const supportedLocaleIds = l10n?.supportedLocales.map((locale) => locale.id)
     const showLocaleSelector = supportedLocaleIds?.length > 1
-    const isOrderStatusPageEnabled = getConfig()?.app?.oms?.orderStatusPage?.enabled
+    const isOmsEnabled = getConfig()?.app?.oms?.enabled
 
     // NOTE: this is a workaround to fix hydration error, by making sure that the `option.selected` property is set.
     // For some reason, adding some styles prop (to the option element) prevented `selected` from being set.
@@ -105,7 +105,7 @@ const Footer = ({...otherProps}) => {
                                     defaultMessage: 'Account'
                                 })}
                                 links={[
-                                    ...(isOrderStatusPageEnabled
+                                    ...(isOmsEnabled
                                         ? [
                                               {
                                                   href: '/order-status',

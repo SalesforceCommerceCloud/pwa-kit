@@ -69,8 +69,7 @@ const AccountOrderDetail = () => {
     const {isRegistered} = useCustomerType()
     const {data: currentCustomer} = useCurrentCustomer()
 
-    const isCancelEnabled = getConfig().app?.oms?.cancel?.enabled
-    const isOrderStatusBarEnabled = getConfig().app?.oms?.orderStatusBar?.enabled
+    const isOmsEnabled = getConfig().app?.oms?.enabled
     const orderStatus = (order?.status || '').toLowerCase()
     const shipmentStatus = (shippingStatus || '').toLowerCase()
     const statusEligible = !['cancelled', 'canceled', 'completed', 'failed'].includes(orderStatus)
@@ -83,27 +82,12 @@ const AccountOrderDetail = () => {
 
     const canCancel =
         !isLoading &&
-        isCancelEnabled &&
+        isOmsEnabled &&
         isRegistered &&
         ownsOrder &&
         statusEligible &&
         shippingEligible
 
-    // Debug purposes only
-    /*
-    console.groupCollapsed('Cancel Order gating debug')
-    console.log('isCancelEnabled (config flag app.oms.cancel.enabled):', isCancelEnabled)
-    console.log('isRegistered (authenticated user):', isRegistered)
-    console.log('customerId (from useCustomerId):', customerId)
-    console.log('currentCustomerEmail (from useCurrentCustomer):', currentCustomer?.email)
-    console.log('orderStatus (normalized from order.status):', orderStatus)
-    console.log('shipmentStatus (normalized from first shipment shippingStatus):', shipmentStatus)
-    console.log('statusEligible (!cancelled/canceled/completed/failed):', statusEligible)
-    console.log('shippingEligible (shipmentStatus === "not_shipped"): ', shippingEligible)
-    console.log('ownsOrder (customerId match OR email match with current customer):', ownsOrder)
-    console.log('canCancel (final gate):', canCancel)
-    console.groupEnd()
-    */
     // Fetch product data for order items
     const productIds = order?.productItems?.map((product) => product.productId) || []
     const {data: products, isLoading: isProductsLoading} = useProducts(
@@ -233,9 +217,7 @@ const AccountOrderDetail = () => {
                 </Stack>
             </Stack>
 
-            {!isLoading && isOrderStatusBarEnabled && (
-                <OrderStatusBar currentStepLabel={order.status} />
-            )}
+            {!isLoading && isOmsEnabled && <OrderStatusBar currentStepLabel={order.status} />}
 
             <Box layerStyle="cardBordered">
                 <Grid templateColumns={{base: '1fr', xl: '60% 1fr'}} gap={{base: 6, xl: 2}}>

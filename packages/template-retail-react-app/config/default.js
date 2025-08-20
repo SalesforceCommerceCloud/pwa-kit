@@ -36,22 +36,7 @@ module.exports = {
             }
         },
         oms: {
-            // Default: false
-            cancel: {
-                enabled: false
-            },
-            // Default: false
-            guestOrderDetails: {
-                enabled: false
-            },
-            // Default: false
-            orderStatusPage: {
-                enabled: false
-            },
-            // Default: true
-            orderStatusBar: {
-                enabled: true
-            }
+            enabled: true
         },
         defaultSite: 'RefArchGlobal',
         siteAliases: {
