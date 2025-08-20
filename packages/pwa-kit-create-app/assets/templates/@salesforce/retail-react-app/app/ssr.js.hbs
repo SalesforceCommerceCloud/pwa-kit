@@ -44,6 +44,13 @@ const options = {
     // environment variable as this endpoint will return HTTP 501 if it is not set
     useSLASPrivateClient: {{answers.project.commerce.isSlasPrivate}},
 
+    // If you wish to use additional SLAS endpoints that require private clients,
+    // customize this regex to include the additional endpoints the custom SLAS
+    // private client secret handler will inject an Authorization header.
+    // The default regex is defined in this file: https://github.com/SalesforceCommerceCloud/pwa-kit/blob/develop/packages/pwa-kit-runtime/src/ssr/server/build-remote-server.js
+    // applySLASPrivateClientToEndpoints:
+    //     /\/oauth2\/(token|passwordless\/(login|token)|password\/(reset|action))/,
+
     // If this is enabled, any HTTP header that has a non ASCII value will be URI encoded
     // If there any HTTP headers that have been encoded, an additional header will be
     // passed, `x-encoded-headers`, containing a comma separated list
@@ -282,29 +289,40 @@ const {handler} = runtime.createHandler(options, (app) => {
     // Set default HTTP security headers required by PWA Kit
     app.use(defaultPwaKitSecurityHeaders)
     // Set custom HTTP security headers
+    {{#if answers.project.contentSecurityPolicy}}
+    const contentSecurityPolicy = {{{json answers.project.contentSecurityPolicy}}}
+    {{else}}
+    const contentSecurityPolicy = {
+        useDefaults: true,
+        directives: {
+            'img-src': [
+                // Default source for product images - replace with your CDN
+                '*.commercecloud.salesforce.com',
+                '*.demandware.net'
+            ],
+            'script-src': [
+                // Used by the service worker in /worker/main.js
+                'storage.googleapis.com'
+            ],
+            'connect-src': [
+                // Connect to Einstein APIs
+                'api.cquotient.com',
+                // Connect to DataCloud APIs
+                '*.c360a.salesforce.com',
+                // Connect to SCRT2 URLs
+                '*.salesforce-scrt.com'
+            ],
+            'frame-src': [
+                // Allow frames from Salesforce site.com (Needed for MIAW)
+                '*.site.com'
+            ]
+        }
+    }
+    {{/if}}
+
     app.use(
         helmet({
-            contentSecurityPolicy: {
-                useDefaults: true,
-                directives: {
-                    'img-src': [
-                        // Default source for product images - replace with your CDN
-                        '*.commercecloud.salesforce.com'
-                    ],
-                    'script-src': [
-                        // Used by the service worker in /worker/main.js
-                        'storage.googleapis.com'
-                    ],
-                    'connect-src': [
-                        // Connect to Einstein APIs
-                        'api.cquotient.com',
-                        '*.c360a.salesforce.com'
-                    ]
-                },
-                referrerPolicy: {
-                    policy: 'strict-origin-when-cross-origin'
-                }
-            }
+            contentSecurityPolicy
         })
     )
 
