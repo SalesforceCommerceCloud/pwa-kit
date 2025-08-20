@@ -28,13 +28,11 @@ import LoginForm from '@salesforce/retail-react-app/app/components/login'
 import PasswordlessEmailConfirmation from '@salesforce/retail-react-app/app/components/email-confirmation/index'
 import {
     API_ERROR_MESSAGE,
-    CREATE_ACCOUNT_FIRST_ERROR_MESSAGE,
     INVALID_TOKEN_ERROR,
     INVALID_TOKEN_ERROR_MESSAGE,
     FEATURE_UNAVAILABLE_ERROR_MESSAGE,
     PASSWORDLESS_LOGIN_LANDING_PATH,
-    PASSWORDLESS_ERROR_MESSAGES,
-    USER_NOT_FOUND_ERROR
+    PASSWORDLESS_ERROR_MESSAGES
 } from '@salesforce/retail-react-app/app/constants'
 import {usePrevious} from '@salesforce/retail-react-app/app/hooks/use-previous'
 import {isServer, noop} from '@salesforce/retail-react-app/app/utils/utils'
@@ -111,9 +109,7 @@ const Login = ({initialView = LOGIN_VIEW}) => {
             setPasswordlessLoginEmail(email)
             setCurrentView(EMAIL_VIEW)
         } catch (error) {
-            const message = USER_NOT_FOUND_ERROR.test(error.message)
-                ? formatMessage(CREATE_ACCOUNT_FIRST_ERROR_MESSAGE)
-                : PASSWORDLESS_ERROR_MESSAGES.some((msg) => msg.test(error.message))
+            const message = PASSWORDLESS_ERROR_MESSAGES.some((msg) => msg.test(error.message))
                 ? formatMessage(FEATURE_UNAVAILABLE_ERROR_MESSAGE)
                 : formatMessage(API_ERROR_MESSAGE)
             form.setError('global', {type: 'manual', message})

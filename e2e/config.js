@@ -13,7 +13,7 @@ module.exports = {
   GENERATED_PROJECTS_DIR: "../generated-projects",
   GENERATE_PROJECTS: ["retail-app-demo", "retail-app-ext", "retail-app-no-ext"],
   GENERATOR_CMD:
-    "node packages/pwa-kit-create-app/scripts/create-mobify-app-dev.js --initGit --outputDir",
+    "node packages/pwa-kit-create-app/scripts/create-mobify-app-dev.js --outputDir",
   CLI_RESPONSES: {
     "retail-app-demo": [
       {
@@ -104,16 +104,16 @@ module.exports = {
     "retail-app-private-client": [],
     "retail-react-app-bug-bounty": [],
     "retail-react-app-demo-site": [],
+    "retail-react-app-performance-tests": [],
   },
   PRESET: {
     "retail-app-private-client": "retail-react-app-private-slas-client",
     "retail-react-app-bug-bounty": "retail-react-app-bug-bounty",
-    "retail-react-app-demo-site": "retail-react-app-demo-site-internal"
+    "retail-react-app-demo-site": "retail-react-app-demo-site-internal",
+    "retail-react-app-performance-tests": "retail-react-app-performance-tests"
   },
   EXPECTED_GENERATED_ARTIFACTS: {
     "retail-app-demo": [
-      ".git",
-      ".gitignore",
       ".cursor",
       ".eslintignore",
       ".eslintrc.js",
@@ -128,8 +128,6 @@ module.exports = {
       "worker",
     ],
     "retail-app-ext": [
-      ".git",
-      ".gitignore",
       ".cursor",
       ".eslintignore",
       ".eslintrc.js",

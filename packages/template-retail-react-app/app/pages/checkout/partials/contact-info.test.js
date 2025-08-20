@@ -210,10 +210,6 @@ describe('passwordless enabled', () => {
 
     test.each([
         [
-            'User not found',
-            'This feature is not currently available. You must create an account to access this feature.'
-        ],
-        [
             "callback_uri doesn't match the registered callbacks",
             'This feature is not currently available.'
         ],

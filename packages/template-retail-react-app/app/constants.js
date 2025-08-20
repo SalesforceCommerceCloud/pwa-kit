@@ -99,11 +99,6 @@ export const FEATURE_UNAVAILABLE_ERROR_MESSAGE = defineMessage({
     defaultMessage: 'This feature is not currently available.',
     id: 'global.error.feature_unavailable'
 })
-export const CREATE_ACCOUNT_FIRST_ERROR_MESSAGE = defineMessage({
-    defaultMessage:
-        'This feature is not currently available. You must create an account to access this feature.',
-    id: 'global.error.create_account'
-})
 
 export const HOME_HREF = '/'
 
@@ -255,7 +250,14 @@ export const PASSWORDLESS_ERROR_MESSAGES = [
 
 export const INVALID_TOKEN_ERROR = /invalid token/i
 
+/**
+ * @deprecated The SLAS private client proxy will mask user not found errors
+ * so this variable should not be used as the app will not see these errors.
+ */
 export const USER_NOT_FOUND_ERROR = /user not found/i
 
-// Constant to enable partial hydration capabilities, i.e. `<Island/>` components
+/**
+ * Constant to enable partial hydration capabilities, i.e. `<Island/>` components
+ * @deprecated Use `partialHydrationEnabled` in the config file instead
+ */
 export const PARTIAL_HYDRATION_ENABLED = false

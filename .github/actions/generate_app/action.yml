@@ -22,6 +22,11 @@ inputs:
   project_dir:
     description: Project Directory
 
+outputs:
+  project_path:
+    description: Path to the generated project directory
+    value: ${{ steps.generate_project.outputs.project_path }}
+
 runs:
   using: composite
   steps:
@@ -31,12 +36,12 @@ runs:
       run: |
         use_extensibility_input="${{ inputs.use_extensibility }}"
         if [ "use_extensibility_input" = "true" ]; then
-         use_extensibility_value=2
-        else
          use_extensibility_value=1
+        else
+         use_extensibility_value=2
         fi
-        echo "USE_EXTENSIBILITY_VALUE=$use_extensibility_value" >> $GITHUB_ENV 
-        
+        echo "USE_EXTENSIBILITY_VALUE=$use_extensibility_value" >> $GITHUB_ENV
+
         is_private_client_input="${{ inputs.is_private_client }}"
         if [ "$is_private_client_input" = "true" ]; then
          is_private_client_value=1
@@ -44,7 +49,7 @@ runs:
           is_private_client_value=2
         fi
         echo "IS_PRIVATE_CLIENT_VALUE=$is_private_client_value" >> $GITHUB_ENV
-        
+
         setup_hybrid_input="${{ inputs.setup_hybrid }}"
         if [ "$setup_hybrid_input" = "true" ]; then
           setup_hybrid_value=2
@@ -53,6 +58,8 @@ runs:
         fi
         echo "SETUP_HYBRID_VALUE=$setup_hybrid_value" >> $GITHUB_ENV
 
+    # TODO: update this to use the standard input feature that Ben created recently
+    # TODO: this action does not finish successfully because of a dirty-workspace error, due to creating this generator-responses.json
     - name: Build project generator inputs
       id: build_generator_inputs
       shell: bash
@@ -107,11 +114,16 @@ runs:
       run: |
         cat generator-responses.json
         node e2e/scripts/generate-project.js --project-config "$(jq -c . generator-responses.json)"
+
+        # Return path to the generated project
+        GENERATED_PROJECTS_DIR=$(node -e "console.log(require('./e2e/config.js').GENERATED_PROJECTS_DIR)")
+        echo "project_path=$GENERATED_PROJECTS_DIR/${{ inputs.project_dir }}" >> $GITHUB_OUTPUT
       shell: bash
 
+    # TODO: I think we can safely delete this step. We already install the dependencies in the previous step.
     - name: Build generated project
       id: build_generated_project
-      working-directory: ../generated-projects/${{ inputs.project_dir }}
+      working-directory: ${{ steps.generate_project.outputs.project_path }}
       run: |-
         npm ci
         npm run build

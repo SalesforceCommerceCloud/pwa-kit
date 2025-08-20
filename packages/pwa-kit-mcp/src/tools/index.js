@@ -11,6 +11,7 @@ export {default as CreateNewComponentTool} from './create-new-component.js'
 export {default as DeveloperGuidelinesTool} from './developer-guideline.js'
 export {TestWithPlaywrightTool} from './site-test.js'
 export {default as CreateNewPageTool} from './create-new-page-tool.js'
+export {default as VersionControlGitTool} from './version-control-git.js'
 
 // Re-export individual test functions
 export {runAccessibilityTest} from './site-test-accessibility.js'
