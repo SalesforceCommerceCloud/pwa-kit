@@ -1225,6 +1225,7 @@ describe('SLAS private client proxy', () => {
             .get('/mobify/slas/private/shopper/auth/v1/oauth2/trusted-agent/token')
             .then((response) => {
                 expect(response.body['_sfdc_client_auth']).toBe(encodedCredentials)
+                expect(response.body.authorization).toBeUndefined()
                 expect(response.body.host).toBe('shortCode.api.commercecloud.salesforce.com')
                 expect(response.body['x-mobify']).toBe('true')
             })
@@ -1275,4 +1276,43 @@ describe('SLAS private client proxy', () => {
             'It is not allowed to include /oauth2/trusted-system endpoints in `applySLASPrivateClientToEndpoints`'
         )
     }, 15000)
+
+    test('proxy returns a 200 OK masking a user not found error', async () => {
+        process.env.PWA_KIT_SLAS_CLIENT_SECRET = 'a secret'
+
+        // Create a new mock server specifically for this test so we can mock a response from SLAS
+        const testProxyApp = express()
+        const testProxyPort = 12346
+        const testSlasTarget = `http://localhost:${testProxyPort}/shopper/auth/responseHeaders`
+
+        // Set up the mock server to return a 404 for passwordless login
+        testProxyApp.use('/shopper/auth/responseHeaders', (req, res) => {
+            if (req.url.includes('/oauth2/passwordless/login')) {
+                res.status(404).send()
+            } else {
+                res.send(req.headers)
+            }
+        })
+
+        const testProxyServer = testProxyApp.listen(testProxyPort)
+
+        try {
+            const testAppConfig = {
+                ...appConfig,
+                slasTarget: testSlasTarget
+            }
+
+            const app = RemoteServerFactory._createApp(opts(testAppConfig))
+
+            return await request(app)
+                .get('/mobify/slas/private/shopper/auth/v1/oauth2/passwordless/login')
+                .expect(200)
+                .then((response) => {
+                    expect(response.text).toBe('')
+                })
+        } finally {
+            // Clean up the test server
+            testProxyServer.close()
+        }
+    })
 })
