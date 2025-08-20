@@ -32,3 +32,5 @@ export const useMultiSite = () => {
     )
     return {site, locale, buildUrl}
 }
+
+export default useMultiSite
