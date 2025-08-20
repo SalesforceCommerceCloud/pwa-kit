@@ -1517,6 +1517,9 @@
   "shipping_multi_address.image.alt": {
     "defaultMessage": "Product image for {productName}"
   },
+  "shipping_multi_address.info.address_already_exists": {
+    "defaultMessage": "The address you entered already exists."
+  },
   "shipping_multi_address.loading.message": {
     "defaultMessage": "Loading..."
   },
