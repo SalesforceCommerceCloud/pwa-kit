@@ -15,7 +15,10 @@ import {
 } from '@salesforce/retail-react-app/app/components/express/utils/parsers'
 import {AdyenShippingMethodsService} from '@salesforce/retail-react-app/app/components/express/utils/shipping-methods'
 import {AdyenShippingAddressService} from '@salesforce/retail-react-app/app/components/express/utils/shipping-address'
-import {forceOrderCalculation, getBasketWithTotals} from '@salesforce/retail-react-app/app/components/express/utils/pdp/basket-calculation'
+import {
+    forceOrderCalculation,
+    getBasketWithTotals
+} from '@salesforce/retail-react-app/app/components/express/utils/pdp/basket-calculation'
 import {AdyenPaymentsService} from '@salesforce/retail-react-app/app/components/express/utils/payments'
 import {
     createTemporaryBasket,
@@ -228,8 +231,6 @@ export const getGoogleButtonConfig = (
         // Return null if no basket can be created/found
         return null
     }
-
-
 
     const buttonConfig = {
         showPayButton: true,
@@ -507,8 +508,6 @@ export const GooglePayExpress = ({
         ? providedAuthToken
         : regularAdyenData?.authToken || overrideData?.authToken
 
-
-
     // For PDP mode, use standalone payment methods
     // For regular mode, use the standard Adyen hook data
     const {
@@ -516,8 +515,6 @@ export const GooglePayExpress = ({
         loading: standaloneLoading,
         error: standaloneError
     } = useStandalonePaymentMethods(authToken, site, locale, isPdpMode && !!authToken)
-
-
 
     // Handle SKU prop changes (for postMessage updates)
     useEffect(() => {
@@ -539,8 +536,6 @@ export const GooglePayExpress = ({
         ? standalonePaymentMethods
         : regularAdyenData.adyenPaymentMethods
 
-
-    const basket = isPdpMode ? null : basketData
     const finalAuthToken = overrideData?.authToken || authToken
     const finalBasket = overrideData?.basket || basketData
 
@@ -613,9 +608,9 @@ export const GooglePayExpress = ({
                 }
 
                 const googleButtonConfig = getGoogleButtonConfig(
-                    authToken,
+                    finalAuthToken,
                     site,
-                    basketData,
+                    finalBasket,
                     googlePaymentMethodConfig,
                     currentSku,
                     setTempBasket,
@@ -672,7 +667,11 @@ export const GooglePayExpress = ({
                 // For PDP mode, missing order total is expected initially when no SKU is set
                 const isExpectedPdpError = isPdpMode && isMissingOrderTotalError && !tempBasket
 
-                if (!isMissingOrderTotalError && !isMissingShippingMethodsError && !isExpectedPdpError) {
+                if (
+                    !isMissingOrderTotalError &&
+                    !isMissingShippingMethodsError &&
+                    !isExpectedPdpError
+                ) {
                     handleGooglePayUnavailable()
                 }
             }
@@ -688,19 +687,13 @@ export const GooglePayExpress = ({
         isPdpMode,
         quantity,
         ...(isPdpMode
-            ? [
-                  tempBasket,
-                  currentSku,
-                  standalonePaymentMethods,
-                  standaloneLoading,
-                  standaloneError
-              ]
+            ? [tempBasket, currentSku, standalonePaymentMethods, standaloneLoading, standaloneError]
             : [])
     ])
 
     return (
         <>
-            <div ref={paymentContainer} style={{ height: '40px' }}></div>
+            <div ref={paymentContainer} style={{height: '40px'}}></div>
         </>
     )
 }
