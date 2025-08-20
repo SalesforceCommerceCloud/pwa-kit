@@ -4,6 +4,7 @@ import {useToast} from './use-toast'
 import {useIntl} from 'react-intl'
 import {useShopperCustomersMutation} from '@salesforce/commerce-sdk-react'
 import {useCurrentCustomer} from './use-current-customer'
+import {nanoid} from 'nanoid'
 
 export const useAddressForm = (addGuestAddress, isGuest, setAddressesForItems, availableAddresses, deliveryItems) => {
     const {formatMessage} = useIntl()
@@ -45,8 +46,8 @@ export const useAddressForm = (addGuestAddress, isGuest, setAddressesForItems, a
                 // Handle registered user address creation
                 // Ensure required fields are present and properly formatted
                 const apiAddressData = {
-                    // Generate a unique addressId
-                    addressId: `addr_${Date.now()}`,
+                    // Generate a unique addressId using nanoid for better uniqueness
+                    addressId: `addr_${nanoid()}`,
                     // Keep original field names as the API expects them
                     firstName: addressData.firstName,
                     lastName: addressData.lastName,
