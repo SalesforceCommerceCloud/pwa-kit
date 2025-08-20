@@ -35,7 +35,7 @@ import SelectBonusProductsCard from '../pages/cart/partials/select-bonus-product
 import {
     useBasketProductsWithPromotions,
     getPromotionCalloutText,
-    findAvailableBonusDiscountLineItemId
+    getRemainingAvailableBonusProductsForProduct
 } from '../utils/bonus-product-utils'
 import {useModalState} from './use-modal-state'
 
@@ -389,28 +389,22 @@ export const AddToCartModal = () => {
                                     {bonusDiscountLineItems &&
                                         bonusDiscountLineItems.length > 0 &&
                                         (() => {
-                                            // Find the first bonus discount line item with remaining capacity
-                                            // Use the existing utility function instead of manual logic
-                                            let availableBonusDiscountLineItem = null
+                                            // Compute aggregated remaining capacity based on the latest basket data
+                                            const remainingBonusProductsData =
+                                                getRemainingAvailableBonusProductsForProduct(
+                                                    basket,
+                                                    product?.id,
+                                                    productsWithPromotions
+                                                )
 
-                                            for (const bonusDiscountLineItem of bonusDiscountLineItems) {
-                                                const availableId =
-                                                    findAvailableBonusDiscountLineItemId(
-                                                        basket,
-                                                        bonusDiscountLineItem.promotionId,
-                                                        1, // Check for capacity of 1 item
-                                                        null
-                                                    )
+                                            // Only render if there is remaining capacity across the collection
+                                            const hasCapacity =
+                                                remainingBonusProductsData?.aggregatedMaxBonusItems >
+                                                    0 &&
+                                                remainingBonusProductsData?.aggregatedSelectedItems <
+                                                    remainingBonusProductsData?.aggregatedMaxBonusItems
 
-                                                if (availableId === bonusDiscountLineItem.id) {
-                                                    availableBonusDiscountLineItem =
-                                                        bonusDiscountLineItem
-                                                    break
-                                                }
-                                            }
-
-                                            // Only render if we found an available bonus discount line item
-                                            if (!availableBonusDiscountLineItem) {
+                                            if (!hasCapacity) {
                                                 return null
                                             }
 
@@ -419,11 +413,9 @@ export const AddToCartModal = () => {
                                                     qualifyingProduct={{productId: product?.id}}
                                                     basket={basket}
                                                     productsWithPromotions={productsWithPromotions}
-                                                    remainingBonusProductsData={{
-                                                        bonusItems: [],
-                                                        aggregatedMaxBonusItems: 0,
-                                                        aggregatedSelectedItems: 0
-                                                    }} // Not used when bonusDiscountLineItem is provided
+                                                    remainingBonusProductsData={
+                                                        remainingBonusProductsData
+                                                    }
                                                     isEligible={true}
                                                     getPromotionCalloutText={
                                                         getPromotionCalloutText
@@ -438,9 +430,6 @@ export const AddToCartModal = () => {
                                                         }
                                                         if (onClose) onClose()
                                                     }}
-                                                    bonusDiscountLineItem={
-                                                        availableBonusDiscountLineItem
-                                                    }
                                                 />
                                             )
                                         })()}

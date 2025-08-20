@@ -27,73 +27,9 @@ import {findImageGroupBy} from '../utils/image-groups-utils'
 import {filterImageGroups} from '../utils/product-utils'
 import {addToCartModalTheme} from '../theme/components/project/add-to-cart-modal'
 import {useModalState} from './use-modal-state'
-import ProductView from '../components/product-view'
-import {useProductViewModal} from './use-product-view-modal'
-import {productViewModalTheme} from '../theme/components/project/product-view-modal'
-import {useShopperBasketsMutationHelper} from '@salesforce/commerce-sdk-react'
 import {useCurrentBasket} from './use-current-basket'
-
-// Dedicated panel for product view mode to keep hooks ordering valid and avoid remounts
-const BonusProductViewPanel = React.memo(function BonusProductViewPanel({
-    initialProduct,
-    bonusMeta,
-    onBack
-}) {
-    const intl = useIntl()
-    const productViewModalData = useProductViewModal(initialProduct)
-    const {addItemToNewOrExistingBasket} = useShopperBasketsMutationHelper()
-
-    //
-
-    const handleAddToCart = useCallback(
-        async (variant, quantity) => {
-            const items = [
-                {
-                    productId:
-                        variant?.productId || initialProduct?.id || initialProduct?.productId,
-                    price: variant?.price || initialProduct?.price,
-                    quantity: quantity,
-                    bonusDiscountLineItemId: bonusMeta.bonusDiscountLineItemId
-                }
-            ]
-            const result = await addItemToNewOrExistingBasket(items)
-            return result
-        },
-        [addItemToNewOrExistingBasket, initialProduct, bonusMeta]
-    )
-
-    return (
-        <Box
-            bg={productViewModalTheme.layout.body.background}
-            padding={productViewModalTheme.layout.body.padding}
-        >
-            <ProductView
-                showFullLink={productViewModalTheme.productView.showFullLink}
-                imageSize={productViewModalTheme.productView.imageSize}
-                showImageGallery={productViewModalTheme.productView.showImageGallery}
-                product={productViewModalData?.product}
-                isLoading={productViewModalData?.isFetching}
-                addToCart={handleAddToCart}
-                isProductLoading={productViewModalData?.isFetching}
-                promotionId={bonusMeta?.promotionId}
-                suppressAddToCartModal={true}
-            />
-            <Box mt={4} display="flex" gap={2}>
-                <Button
-                    variant="outline"
-                    onClick={() => {
-                        onBack()
-                    }}
-                >
-                    {intl.formatMessage({
-                        id: 'bonus_product_modal.back_to_selection',
-                        defaultMessage: 'Back to Selection'
-                    })}
-                </Button>
-            </Box>
-        </Box>
-    )
-})
+import BonusProductViewModal from '../components/bonus-product-view-modal'
+import {findAvailableBonusDiscountLineItemId} from '../utils/bonus-product-utils'
 
 /**
  * Context for managing the BonusProductSelectionModal.
@@ -221,22 +157,15 @@ BonusProductItem.propTypes = {
     isLoading: PropTypes.bool
 }
 
-BonusProductViewPanel.propTypes = {
-    initialProduct: PropTypes.object,
-    bonusMeta: PropTypes.shape({
-        bonusDiscountLineItemId: PropTypes.string,
-        promotionId: PropTypes.string
-    }),
-    onBack: PropTypes.func.isRequired
-}
+//
 
 /**
  * Modal for selecting from available bonus products.
  */
 export const BonusProductSelectionModal = () => {
     const {isOpen, onClose: originalOnClose, data} = useBonusProductSelectionModalContext()
-    // Modes: 'selection' | 'view'
-    const [modalMode, setModalMode] = useState('selection')
+    // Independent state for the product view modal
+    const [isViewOpen, setIsViewOpen] = useState(false)
     const [selectedProduct, setSelectedProduct] = useState(null)
     const [selectedBonusMeta, setSelectedBonusMeta] = useState({
         bonusDiscountLineItemId: null,
@@ -303,141 +232,176 @@ export const BonusProductSelectionModal = () => {
         return map
     }, [productData])
 
-    // Switch to product view mode with selected product
+    // When selecting a product, compute metadata, close the selection modal, and open product view modal
     const switchToProductView = useCallback(
         (bonusProduct, foundProductData) => {
             const initial = foundProductData || productById.get(bonusProduct?.productId)
             const normalizedInitial = initial
-                ? {productId: initial.id, ...initial}
-                : {productId: bonusProduct?.productId}
+                ? {
+                      productId: initial.id,
+                      ...initial,
+                      // Ensure imageGroups are preserved
+                      imageGroups: initial.imageGroups || [],
+                      // Ensure other required fields
+                      variants: initial.variants || [],
+                      variationAttributes: initial.variationAttributes || [],
+                      type: initial.type || {set: false, bundle: false}
+                  }
+                : {
+                      productId: bonusProduct?.productId,
+                      imageGroups: [],
+                      variants: [],
+                      variationAttributes: [],
+                      type: {set: false, bundle: false}
+                  }
+
+            // Determine the promotion and available bonus discount line item id for this product
+            let computedPromotionId = null
+            let computedBonusDiscountLineItemId = null
+
+            const candidates = bonusProducts.filter((bli) =>
+                (bli.bonusProducts || []).some((p) => p.productId === normalizedInitial.productId)
+            )
+
+            if (candidates.length > 0) {
+                for (const candidate of candidates) {
+                    const availableId = findAvailableBonusDiscountLineItemId(
+                        basket,
+                        candidate.promotionId,
+                        1,
+                        candidate.id
+                    )
+                    if (availableId) {
+                        computedPromotionId = candidate.promotionId
+                        computedBonusDiscountLineItemId = availableId
+                        break
+                    }
+                }
+
+                // Fallback to the first candidate if none computed
+                if (!computedBonusDiscountLineItemId) {
+                    computedPromotionId = candidates[0].promotionId || null
+                    computedBonusDiscountLineItemId = candidates[0].id || null
+                }
+            }
+
             setSelectedProduct(normalizedInitial)
             setSelectedBonusMeta({
-                bonusDiscountLineItemId: bonusProduct?.bonusDiscountLineItemId || null,
-                promotionId: bonusProduct?.promotionId || null
+                bonusDiscountLineItemId: computedBonusDiscountLineItemId,
+                promotionId: computedPromotionId
             })
-            setModalMode('view')
+            // Close selection modal immediately and open view modal
+            originalOnClose()
+            setIsViewOpen(true)
         },
-        [productById]
+        [productById, bonusProducts, basket, originalOnClose]
     )
 
     const goBackToSelection = useCallback(() => {
-        setModalMode('selection')
         setSelectedProduct(null)
         setSelectedBonusMeta({bonusDiscountLineItemId: null, promotionId: null})
+        setIsViewOpen(false)
     }, [])
 
     const handleClose = useCallback(() => {
-        // Auto-reset on close
-        setModalMode('selection')
+        // Auto-reset on close; also ensure view modal is closed
         setSelectedProduct(null)
         setSelectedBonusMeta({bonusDiscountLineItemId: null, promotionId: null})
+        setIsViewOpen(false)
         originalOnClose()
     }, [originalOnClose])
 
-    if (!isOpen) {
-        return null
-    }
+    // Build selection modal content when open
+    const selectionModal = isOpen ? (
+        <Dialog.Root
+            size={size}
+            open={isOpen}
+            scrollBehavior={addToCartModalTheme.modal.scrollBehavior}
+            placement={addToCartModalTheme.modal.placement}
+        >
+            <Dialog.Backdrop />
+            <Dialog.Positioner>
+                <Dialog.Content
+                    margin={addToCartModalTheme.layout.content.margin}
+                    borderRadius={addToCartModalTheme.layout.content.borderRadius}
+                    bgColor={addToCartModalTheme.colors.background}
+                >
+                    <Dialog.Header
+                        paddingY={addToCartModalTheme.layout.header.paddingY}
+                        bgColor={addToCartModalTheme.colors.contentBackground}
+                    >
+                        <Heading as="h3" fontSize={24} fontWeight="700">
+                            {intl.formatMessage(
+                                {
+                                    id: 'bonus_product_modal.title',
+                                    defaultMessage:
+                                        'Select Bonus Product ({selected} of {max} selected)'
+                                },
+                                {selected: selectedBonusItems, max: maxBonusItems}
+                            )}
+                        </Heading>
+                    </Dialog.Header>
 
-    // (removed inline BonusProductViewPanel — now using memoized top-level component)
+                    <Dialog.Body
+                        bgColor={addToCartModalTheme.colors.contentBackground}
+                        padding={addToCartModalTheme.layout.body.padding}
+                        marginBottom={addToCartModalTheme.layout.body.marginBottom}
+                    >
+                        {bonusProducts.length === 0 ? (
+                            <Text textAlign="center" color="gray.500" py="8">
+                                {intl.formatMessage({
+                                    id: 'bonus_product_modal.no_bonus_products',
+                                    defaultMessage: 'No bonus products available'
+                                })}
+                            </Text>
+                        ) : (
+                            <VStack spacing="4">
+                                <SimpleGrid columns={{base: 1, md: 3}} spacing="4" width="100%">
+                                    {uniqueBonusProducts.map((product) => {
+                                        const foundProductData = productData?.data?.find(
+                                            (p) => p.id === product.productId
+                                        )
+                                        return (
+                                            <BonusProductItem
+                                                key={product.productId}
+                                                product={product}
+                                                productData={foundProductData}
+                                                foundProductData={foundProductData}
+                                                onSelect={switchToProductView}
+                                                isLoading={isLoading}
+                                            />
+                                        )
+                                    })}
+                                </SimpleGrid>
+                            </VStack>
+                        )}
+                    </Dialog.Body>
+                    <CloseButton
+                        size="md"
+                        onClick={handleClose}
+                        position="absolute"
+                        top="4"
+                        right="4"
+                    />
+                </Dialog.Content>
+            </Dialog.Positioner>
+        </Dialog.Root>
+    ) : null
 
+    // Render selection modal (if open) and product view modal (controlled independently)
     return (
         <>
-            <Dialog.Root
-                size={size}
-                open={isOpen}
-                scrollBehavior={addToCartModalTheme.modal.scrollBehavior}
-                placement={addToCartModalTheme.modal.placement}
-            >
-                <Dialog.Backdrop />
-                <Dialog.Positioner>
-                    <Dialog.Content
-                        margin={addToCartModalTheme.layout.content.margin}
-                        borderRadius={addToCartModalTheme.layout.content.borderRadius}
-                        bgColor={addToCartModalTheme.colors.background}
-                    >
-                        <Dialog.Header
-                            paddingY={addToCartModalTheme.layout.header.paddingY}
-                            bgColor={addToCartModalTheme.colors.contentBackground}
-                        >
-                            {modalMode === 'selection' ? (
-                                <Heading as="h3" fontSize={24} fontWeight="700">
-                                    {intl.formatMessage(
-                                        {
-                                            id: 'bonus_product_modal.title',
-                                            defaultMessage:
-                                                'Select Bonus Product ({selected} of {max} selected)'
-                                        },
-                                        {selected: selectedBonusItems, max: maxBonusItems}
-                                    )}
-                                </Heading>
-                            ) : (
-                                <Heading as="h3" fontSize={24} fontWeight="700">
-                                    {selectedProduct?.name ||
-                                        selectedProduct?.productName ||
-                                        intl.formatMessage({
-                                            id: 'bonus_product_modal.view_title',
-                                            defaultMessage: 'Bonus Product Details'
-                                        })}
-                                </Heading>
-                            )}
-                        </Dialog.Header>
-
-                        <Dialog.Body
-                            bgColor={addToCartModalTheme.colors.contentBackground}
-                            padding={addToCartModalTheme.layout.body.padding}
-                            marginBottom={addToCartModalTheme.layout.body.marginBottom}
-                        >
-                            {modalMode === 'selection' ? (
-                                bonusProducts.length === 0 ? (
-                                    <Text textAlign="center" color="gray.500" py="8">
-                                        {intl.formatMessage({
-                                            id: 'bonus_product_modal.no_bonus_products',
-                                            defaultMessage: 'No bonus products available'
-                                        })}
-                                    </Text>
-                                ) : (
-                                    <VStack spacing="4">
-                                        <SimpleGrid
-                                            columns={{base: 1, md: 3}}
-                                            spacing="4"
-                                            width="100%"
-                                        >
-                                            {uniqueBonusProducts.map((product) => {
-                                                const foundProductData = productData?.data?.find(
-                                                    (p) => p.id === product.productId
-                                                )
-                                                return (
-                                                    <BonusProductItem
-                                                        key={product.productId}
-                                                        product={product}
-                                                        productData={foundProductData}
-                                                        foundProductData={foundProductData}
-                                                        onSelect={switchToProductView}
-                                                        isLoading={isLoading}
-                                                    />
-                                                )
-                                            })}
-                                        </SimpleGrid>
-                                    </VStack>
-                                )
-                            ) : (
-                                <BonusProductViewPanel
-                                    initialProduct={selectedProduct}
-                                    bonusMeta={selectedBonusMeta}
-                                    onBack={goBackToSelection}
-                                />
-                            )}
-                        </Dialog.Body>
-                        <CloseButton
-                            size="md"
-                            onClick={handleClose}
-                            position="absolute"
-                            top="4"
-                            right="4"
-                        />
-                    </Dialog.Content>
-                </Dialog.Positioner>
-            </Dialog.Root>
+            {selectionModal}
+            {isViewOpen && selectedProduct && (
+                <BonusProductViewModal
+                    isOpen={isViewOpen}
+                    onClose={goBackToSelection}
+                    product={selectedProduct}
+                    bonusDiscountLineItemId={selectedBonusMeta?.bonusDiscountLineItemId}
+                    promotionId={selectedBonusMeta?.promotionId}
+                    withBackdrop={true}
+                />
+            )}
         </>
     )
 }

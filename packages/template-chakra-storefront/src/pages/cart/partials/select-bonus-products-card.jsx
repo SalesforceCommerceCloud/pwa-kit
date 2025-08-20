@@ -160,7 +160,8 @@ SelectBonusProductsCard.propTypes = {
                 bonusDiscountLineItemId: PropTypes.string,
                 quantity: PropTypes.number
             })
-        )
+        ),
+        bonusDiscountLineItems: PropTypes.array
     }),
     productsWithPromotions: PropTypes.object,
     remainingBonusProductsData: PropTypes.shape({
