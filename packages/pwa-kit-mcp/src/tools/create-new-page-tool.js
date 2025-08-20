@@ -6,10 +6,10 @@
  */
 import fs from 'fs/promises'
 import path from 'path'
+import hooksRecommendationTool from './hooks-recommendation-tool.js'
 import {
     toKebabCase,
     toPascalCase,
-    logMCPMessage,
     isLocalComponent,
     isLocalSharedUIComponent,
     isBaseComponent,
@@ -18,52 +18,39 @@ import {
 } from '../utils/index.js'
 import {z} from 'zod'
 
-const systemPromptForCreatePage = `You are a smart assistant that can use tools when needed. \
-        Please ask the user to provide following information **one at a time**, in a natural and conversational way. \
-        Do **not** ask all the questions at once. \
-        Do **not** assume the answers to the questions, especially the URL route. **Always** ask the user for the URL route. \
-        - What is the name of the new page to create? \
-        - List the components to include on the page, separated by commas. Component names should be in PascalCase (e.g., Image, ProductView) \
-        - What is the URL route for this page? (e.g., /new-home, /my-products) \
-        - What is the absolute path to your node_modules directory? \
-        - What is the absolute path to your components directory? \
-        - What is the absolute path to your pages directory? \
-        - What is the absolute path to your routes.jsx file? \
-        - Is ccExtensibility.overridesDir set in your package.json? (true/false) \
-        Collect answers to these questions, then call the tool with the collected information as input parameters.`
+const systemPromptForCreatePage = `Please ask the user for the following information one at a time:
+- What is the name of the new page to create?
+- List the components to include on the page, separated by commas. Component names should be in PascalCase (e.g., Image, ProductView)
+- What is the URL route for this page? (e.g., /new-home, /my-products)
+- What is the absolute path to your node_modules directory?
+- What is the absolute path to your components directory?
+- What is the absolute path to your pages directory?
+- What is the absolute path to your routes.jsx file?
+- Is ccExtensibility.overridesDir set in your package.json? (true/false)
 
-const systemPromptForProductHook = `User has added the ProductView component to the new page. Please ask user: \
-        "To make it work, would you like to add the hook useProduct to your page?" \
-        If user answers yes, please make sure to do following: \
-        1. add the useProduct with ALL parameters following product-detail's useProduct as example, \
-        2. update ProductView tag to pass product and isProductLoading as props, \
-        3. in routes.jsx, update the path for the new page with '/:productId'. \
-        4. open the new page in the browser with URL: http://localhost:3000/{static-route-path}/25592300M \
-        If user answers no, skip above steps.`
+Collect answers to these questions, then call the tool with the collected information as input parameters.`
 
-const systemPromptForImageComponent = `User has added the Image component to the new page. Please ask the user, after they have provided the URL route:
-        "To make it work, would you like to provide the full path of the image source to your page? Note that CORS (Cross-Origin Resource Sharing) restrictions may apply."
-        
-        If the user answers yes, please do the following:
-        1. Ask the user to provide the full path of the image source.
-        2. If the image is from a URL from the internet, always check in the codebase if the domain of the image source is present in the CSP img-src allow list in ssr.js or related server files.
-        3. When checking the allow list, also check for wildcard entries (e.g., '*.domain.com') that would cover the provided domain. If either the exact domain or a matching wildcard is present, inform the user that the image source is already allowed by the CSP and proceed.
-        4. If neither the domain nor a matching wildcard is present in the allow list, inform the user and **do not** update the src of the Image component. Tell the user that the CSP img-src allow list needs to be updated manually, and do not proceed further until the domain is confirmed present in the codebase.
-        5. **Do not** update the CSP img-src allow list in ssr.js yourself; always ask the user to update the CSP img-src allow list manually, even if the user requests it.
-        6. Once the user confirms they have updated the CSP img-src allow list, check again in the codebase if the domain of the image source or a matching wildcard is part of the CSP img-src allow list. If yes, then proceed. If no, tell the user that the CSP img-src allow list needs to be updated manually, or ask the user to provide another image source.
-        7. Only if the image from the internet is part of the CSP img-src allow list (either by exact domain or wildcard), then proceed.
-        8. If the image source is an https URL, then use the image source directly in the Image component. If it's a local image, update the path inside getAssetUrl and use it in the Image component.
-        9. Ask the user to provide the alt text for the image.
-        10. Ask the user to provide the width and height of the image.
-        11. Update the src, alt text, width, and height of the Image component in the newly created page once the user has provided them.
-        12. Request the user to restart the front end server.
-        13. Open the new page in the browser with URL: http://localhost:3000/{static-route-path}
-        
-        If the user answers no, tell the user that the default image located at /static/img/hero.png is being displayed.
-        
-        Note:
-        If the automation cannot detect the Image component but you know it exists and works as intended, proceed with the above steps as if the component is available. Do not block or alter the workflow due to the detection issue. Clearly communicate to the user that the Image component will be used, even if it was not detected by the automation.
-        `
+const systemPromptForProductHook = `The ProductView component was added to the new page. Ask the user: "To make it work, would you like to add the useProduct hook to your page?"
+
+If yes:
+1. Add useProduct hook with all parameters (follow product-detail page example)
+2. Update ProductView tag to pass product and isProductLoading as props
+3. Update the route path to include '/:productId'
+4. Open the page at: http://localhost:3000/{route-path}/25592300M
+
+If no, skip these steps.`
+
+const systemPromptForImageComponent = `The Image component was added to the new page. Ask the user: "Would you like to provide a custom image source? Note that CORS restrictions may apply."
+
+If yes:
+1. Ask for the full image path
+2. For internet URLs, check if the domain is in the CSP img-src allow list in ssr.js
+3. If domain not allowed, inform user to update CSP manually (do not update it yourself)
+4. Ask for alt text, width, and height
+5. Update the Image component with the provided values
+6. Request server restart and open page at: http://localhost:3000/{route-path}
+
+If no, the default image at /static/img/hero.png will be displayed.`
 
 const systemPromptForUnfoundComponents = (unfoundComponents) =>
     `The following components were not found: ${unfoundComponents.join(', ')}. \
@@ -95,7 +82,6 @@ class CreateNewPageTool {
         this.unfoundComponents = []
 
         this.handler = async (args) => {
-            logMCPMessage(`------- Calling CreateNewPageTool handler`)
             if (
                 !args ||
                 !args.pageName ||
@@ -123,16 +109,10 @@ class CreateNewPageTool {
     }
 
     async createPage(pageName, componentList, route, absolutePaths) {
-        logMCPMessage(
-            `========== Creating page ${pageName} with components ${componentList} and route ${route}`
-        )
         this.unfoundComponents = []
-        await logMCPMessage(
-            `Creating page ${pageName} with components ${componentList} and route ${route}`
-        )
 
         try {
-            const messages = []
+            let messages = []
             // Use the provided absolute path for pages directory
             const pagesDir = absolutePaths.pagesPath
             pageName = toPascalCase(pageName)
@@ -152,30 +132,39 @@ class CreateNewPageTool {
                 componentList,
                 absolutePaths
             )
-            logMCPMessage(`!!!!!! \n pageContent: ${pageContent} \n !!!!!`)
             const indexPath = path.join(pageDir, 'index.jsx')
             await fs.writeFile(indexPath, pageContent, 'utf8')
             await this.updateRoutes(pageName, route, absolutePaths)
-            messages.push(`Created page ${pageName} at ${pageDir}`)
-            messages.push(`Added route ${route}`)
-            logMCPMessage(`componentList: ${componentList}`)
+            messages.push(
+                `Your new page ${pageName} has been created at ${route} and includes the Header component.`
+            )
             if (componentList.includes('ProductView')) {
                 messages.push(systemPromptForProductHook)
             }
             if (componentList.includes('Image')) {
                 messages.push(systemPromptForImageComponent)
             }
-            logMCPMessage(`Unfound components: ${this.unfoundComponents}`)
-            if (this.unfoundComponents.length != 0) {
+            if (this.unfoundComponents.length > 0) {
                 messages.push(systemPromptForUnfoundComponents(this.unfoundComponents))
             }
-            logMCPMessage(messages.join('\n'))
-            return {
-                role: 'system',
-                content: [{type: 'text', text: messages.join('\n')}]
+            // Suggest relevant hooks using the hooks recommendation tool
+            try {
+                const hooksResult = await hooksRecommendationTool.handler({
+                    pageName,
+                    componentList,
+                    useCase: `page creation for ${pageName}`,
+                    hooksPath: null // Let the tool auto-detect the path
+                })
+                if (hooksResult?.content?.[0]?.text) {
+                    messages.push('\n' + hooksResult.content[0].text)
+                }
+            } catch (error) {
+                messages.push(
+                    '\nUnable to get hook recommendations. You can ask for specific hook suggestions later.'
+                )
             }
+            return {role: 'assistant', content: [{type: 'text', text: messages.join('\n')}]}
         } catch (error) {
-            logMCPMessage(`Error creating page: ${error.message}`)
             return {
                 role: 'developer',
                 content: [{type: 'text', text: `Error creating page: ${error.message}`}]
@@ -238,8 +227,6 @@ class CreateNewPageTool {
         }
 
         return Promise.all(accessPromises).then(() => {
-            logMCPMessage(`?????? imports ${imports.join('\n')}`)
-
             const componentJsx = componentList
                 .map((component) => {
                     component = toPascalCase(component)
@@ -290,8 +277,6 @@ export default ${pageName};
             const importStatement = `const ${pageName} = loadable(() => import('./pages/${toKebabCase(
                 pageName
             )}'), {fallback})`
-
-            logMCPMessage(`!!!!!!!!!! importStatement: ${importStatement}`)
 
             // Match all loadable import statements
             const loadableRegex =

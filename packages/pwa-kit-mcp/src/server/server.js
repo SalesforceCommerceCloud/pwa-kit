@@ -13,12 +13,13 @@ import {
     CreateNewComponentTool,
     DeveloperGuidelinesTool,
     TestWithPlaywrightTool,
-    CreateNewPageTool
+    CreateNewPageTool,
+    HooksRecommendationTool
 } from '../tools'
 import {Telemetry} from '../utils/telemetry'
 
-import {createRequire} from 'module'
-const require = createRequire(import.meta.url)
+// NOTE: This is a workaround to import JSON files as ES modules.
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const packageJson = require('../../package.json')
 
 const FALLBACK_VERSION = '0.1.0'
@@ -103,6 +104,19 @@ class PwaStorefrontMCPServerHighLevel {
             CreateNewPageTool.description,
             CreateNewPageTool.inputSchema,
             CreateNewPageTool.handler
+        )
+        this.server.tool(
+            this.exploreCommerceAPITool.name,
+            this.exploreCommerceAPITool.description,
+            this.exploreCommerceAPITool.inputSchema,
+            this.exploreCommerceAPITool.handler
+        )
+        // Expose hooks recommendation tool
+        this.server.tool(
+            HooksRecommendationTool.name,
+            HooksRecommendationTool.description,
+            HooksRecommendationTool.inputSchema,
+            HooksRecommendationTool.handler
         )
     }
 
