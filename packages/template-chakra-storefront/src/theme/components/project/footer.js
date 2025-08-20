@@ -15,6 +15,11 @@ export default defineSlotRecipe({
         'subscribeButtonContainer',
         'subscribeHeading',
         'subscribeMessage',
+        'subscribeDisclaimer',
+        'subscribeDisclaimerLink',
+        'subscribeAlert',
+        'subscribeAlertDescription',
+        'subscribeAlertIcon',
         'localeSelectorWrapper',
         'localeSelectorRoot',
         'localeSelectorField',
@@ -44,7 +49,10 @@ export default defineSlotRecipe({
         },
         subscribeField: {
             background: 'white',
-            color: 'gray.900'
+            color: 'gray.900',
+            _focus: {background: 'white'},
+            _hover: {background: 'white'},
+            _filled: {background: 'white'}
         },
         subscribeButtonContainer: {
             width: 'auto'
@@ -56,6 +64,23 @@ export default defineSlotRecipe({
         subscribeMessage: {
             fontSize: 'sm',
             marginBottom: 4
+        },
+        subscribeDisclaimer: {
+            fontSize: 'sm',
+            marginTop: 2
+        },
+        subscribeDisclaimerLink: {
+            color: 'inherit',
+            _hover: {color: 'inherit', textDecoration: 'underline'}
+        },
+        subscribeAlert: {
+            marginBottom: 4
+        },
+        subscribeAlertDescription: {
+            fontSize: 'sm'
+        },
+        subscribeAlertIcon: {
+            boxSize: 4
         },
         localeSelectorWrapper: {
             display: 'inline-block',
@@ -87,6 +112,20 @@ export default defineSlotRecipe({
             fontSize: 'sm',
             marginBottom: 6,
             color: 'gray.50'
+        }
+    },
+    variants: {
+        alertStatus: {
+            error: {
+                subscribeAlertIcon: {
+                    color: 'red.500'
+                }
+            },
+            success: {
+                subscribeAlertIcon: {
+                    color: 'green.500'
+                }
+            }
         }
     }
 })

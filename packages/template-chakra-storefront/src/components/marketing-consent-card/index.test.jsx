@@ -7,16 +7,16 @@
 import React from 'react'
 import {screen} from '@testing-library/react'
 import {renderWithProviders} from '../../utils/test-utils'
-import {MarketingConsentCard} from './index'
+import MarketingConsentCard from './index'
 
-// Mock the useCurrentCustomer hook
-jest.mock('../../hooks/use-current-customer', () => ({
+// Mock the hooks barrel to match component import path
+jest.mock('../../hooks', () => ({
     useCurrentCustomer: jest.fn()
 }))
 
 import {useCurrentCustomer} from '../../hooks'
 
-const component_title = 'Messaging Preferences'
+const component_title = 'Marketing Communication Preferences'
 
 describe('MarketingConsentCard', () => {
     beforeEach(() => {

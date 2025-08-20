@@ -4,30 +4,26 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React, {useState, useMemo} from 'react'
+import React, {useMemo, useState} from 'react'
 import PropTypes from 'prop-types'
 import {
     Box,
-    Button,
     GridItem,
-    Group,
-    Heading,
-    Input,
+    NativeSelect,
     Separator,
     SimpleGrid,
-    NativeSelect,
     Text,
-
-    // hooks
     useSlotRecipe
 } from '@chakra-ui/react'
 import {useIntl} from 'react-intl'
 
 import LinksList from '../../components/links-list'
-import SocialIcons from '../../components/social-icons'
 import {getPathWithLocale} from '../../utils/url'
 import LocaleText from '../../components/locale-text'
 import useMultiSite from '../../hooks/use-multi-site'
+import SubscribeForm from '../subscription/subscribe-form'
+//@sfdc-extension-line SFDC_EXT_MARKETING_CONSENT_ENABLED
+import SubscribeMarketingConsent from '../subscription/subscribe-marketing-consent'
 
 const Footer = ({...otherProps}) => {
     const recipe = useSlotRecipe({key: 'footer'})
@@ -164,10 +160,13 @@ const Footer = ({...otherProps}) => {
                                             const newLocale = e.currentTarget.value
                                             setLocale(newLocale)
                                             // Update the `locale` in the URL.
-                                            const newUrl = getPathWithLocale(newLocale, buildUrl, {
-                                                disallowParams: ['refine']
-                                            })
-                                            window.location = newUrl
+                                            window.location = getPathWithLocale(
+                                                newLocale,
+                                                buildUrl,
+                                                {
+                                                    disallowParams: ['refine']
+                                                }
+                                            )
                                         }}
                                     >
                                         {supportedLocaleIds.map((locale) => (
@@ -198,56 +197,22 @@ const Footer = ({...otherProps}) => {
 export default Footer
 
 const Subscribe = ({...otherProps}) => {
-    const recipe = useSlotRecipe({key: 'footer'})
-    const styles = recipe()
-    const intl = useIntl()
-    const {formatMessage} = intl
+    //@sfdc-extension-block-start SFDC_EXT_MARKETING_CONSENT_ENABLED
+    // When marketing-consent extension is enabled, use dynamic consent-powered subscription
+    if (SFDC_EXT_MARKETING_CONSENT_ENABLED) {
+        // We have to separate it into a different component, because conditionals are not allowed.
+        // React Hooks must be called in the exact same order in every component render.
+        return <SubscribeMarketingConsent {...otherProps} />
+    }
+    //@sfdc-extension-block-end SFDC_EXT_MARKETING_CONSENT_ENABLED
 
-    const messages = useMemo(
-        () => ({
-            heading: formatMessage({
-                id: 'footer.subscribe.heading.first_to_know',
-                defaultMessage: 'Be the first to know'
-            }),
-            description: formatMessage({
-                id: 'footer.subscribe.description.sign_up',
-                defaultMessage: 'Sign up to stay in the loop about the hottest deals'
-            }),
-            emailAriaLabel: formatMessage({
-                id: 'footer.subscribe.email.assistive_msg',
-                defaultMessage: 'Email address for newsletter'
-            }),
-            buttonSignUp: formatMessage({
-                id: 'footer.subscribe.button.sign_up',
-                defaultMessage: 'Sign Up'
-            })
-        }),
-        [intl]
-    )
+    // No-op to allow the form to render without any callouts.
+    const noopSubscription = {
+        state: {email: '', isLoading: false, feedback: {message: '', type: 'success'}},
+        actions: {setEmail: () => {}, submit: () => {}}
+    }
 
-    return (
-        <Box css={styles.subscribe} {...otherProps}>
-            <Heading as="h1" css={styles.subscribeHeading}>
-                {messages.heading}
-            </Heading>
-            <Text css={styles.subscribeMessage}>{messages.description}</Text>
-
-            <Box>
-                <Group attached w="full" maxW="sm">
-                    <Input
-                        type="email"
-                        placeholder="you@email.com"
-                        aria-label={messages.emailAriaLabel}
-                        id="subscribe-email"
-                        css={styles.subscribeField}
-                    />
-                    <Button variant="footer">{messages.buttonSignUp}</Button>
-                </Group>
-            </Box>
-
-            <SocialIcons variant="flex-start" pinterestInnerColor="black" />
-        </Box>
-    )
+    return <SubscribeForm subscription={noopSubscription} {...otherProps} />
 }
 
 const LegalLinks = ({variant}) => {

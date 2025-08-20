@@ -22,6 +22,13 @@ import {useCustomerType} from '@salesforce/commerce-sdk-react'
 import {prependHandlersToServer} from '../../../jest-setup'
 
 jest.setTimeout(60000)
+
+// Prevent loadable chunks (e.g., MarketingConsentCard) from mounting in this suite
+jest.mock('@loadable/component', () => () => {
+    const Loadable = () => null
+    Loadable.preload = () => {}
+    return Loadable
+})
 jest.mock('@salesforce/commerce-sdk-react', () => ({
     ...jest.requireActual('@salesforce/commerce-sdk-react'),
     useCustomerType: jest.fn()
