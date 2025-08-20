@@ -13,6 +13,7 @@ export {TestWithPlaywrightTool} from './site-test.js'
 export {default as CreateNewPageTool} from './create-new-page-tool.js'
 export {default as VersionControlGitTool} from './version-control-git.js'
 export {default as ExploreCommerceAPITool} from './shopper-products.js'
+export {default as HooksRecommendationTool} from './hooks-recommendation-tool.js'
 
 // Re-export individual test functions
 export {runAccessibilityTest} from './site-test-accessibility.js'
