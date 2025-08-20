@@ -13,8 +13,8 @@ import {
     useCustomerId
 } from '@salesforce/commerce-sdk-react'
 import {useWishList} from './use-wish-list'
-import useToast from './use-toast'
-import useNavigation from './use-navigation'
+import {useToast} from './use-toast'
+import {useNavigation} from './use-navigation'
 
 // Mock dependencies
 jest.mock('react-intl')

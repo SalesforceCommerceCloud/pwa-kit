@@ -8,9 +8,9 @@ import React, {useEffect, useRef, useMemo} from 'react'
 import {defineMessage, useIntl} from 'react-intl'
 import PropTypes from 'prop-types'
 import {Grid, GridItem, SimpleGrid, Stack} from '@chakra-ui/react'
-import useAddressFields from './useAddressFields'
+import {useAddressFields} from './useAddressFields'
 import Field from '../field'
-import {useCurrentCustomer} from '../../hooks/use-current-customer'
+import {useCurrentCustomer} from '../../hooks'
 import {MESSAGE_PROPTYPE} from '../../utils/locale'
 
 const defaultFormTitleAriaLabel = defineMessage({

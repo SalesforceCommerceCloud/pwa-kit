@@ -9,7 +9,7 @@ import React, {useEffect} from 'react'
 import PropTypes from 'prop-types'
 import Cookies from 'js-cookie'
 import {waitFor} from '@testing-library/react'
-import useDataCloud from './use-datacloud'
+import {useDataCloud} from './use-data-cloud'
 import {useCurrentCustomer} from './use-current-customer'
 import {useDNT} from '@salesforce/commerce-sdk-react'
 import {

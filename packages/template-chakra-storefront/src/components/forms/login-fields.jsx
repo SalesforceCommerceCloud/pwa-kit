@@ -8,7 +8,7 @@ import React, {useMemo} from 'react'
 import PropTypes from 'prop-types'
 import {useIntl} from 'react-intl'
 import {Stack, Flex, Button} from '@chakra-ui/react'
-import useLoginFields from '../../components/forms/useLoginFields'
+import {useLoginFields} from '../../components/forms/useLoginFields'
 import Field from '../../components/field'
 
 const LoginFields = ({

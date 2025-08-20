@@ -42,7 +42,7 @@ const messages = defineMessages({
  * @param {Object} form.errors - An object containing field errors
  * @returns {Object} Field definitions for use in a form
  */
-export default function useCreditCardFields({
+export function useCreditCardFields({
     form: {
         control,
         formState: {errors}

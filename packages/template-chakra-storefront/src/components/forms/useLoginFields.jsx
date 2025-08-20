@@ -7,7 +7,7 @@
 import {useMemo} from 'react'
 import {useIntl} from 'react-intl'
 
-export default function useLoginFields({
+export function useLoginFields({
     form: {
         control,
         formState: {errors}

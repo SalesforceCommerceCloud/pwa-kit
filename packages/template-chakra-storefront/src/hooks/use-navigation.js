@@ -6,7 +6,7 @@
  */
 import {useCallback} from 'react'
 import {useHistory} from 'react-router-dom'
-import useMultiSite from './use-multi-site'
+import {useMultiSite} from './use-multi-site'
 import {removeSiteLocaleFromPath} from '../utils/url'
 
 /**
@@ -14,7 +14,7 @@ import {removeSiteLocaleFromPath} from '../utils/url'
  * is automatically prepended to the provided path. Additional args are passed through to `history`.
  * @returns {function} - Returns a navigate function that passes args to history methods.
  */
-const useNavigation = () => {
+export const useNavigation = () => {
     const history = useHistory()
 
     const {site, locale: localeShortCode, buildUrl} = useMultiSite()
@@ -33,5 +33,3 @@ const useNavigation = () => {
         [localeShortCode, site]
     )
 }
-
-export default useNavigation

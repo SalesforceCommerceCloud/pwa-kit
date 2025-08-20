@@ -18,7 +18,7 @@ import {useState, useEffect} from 'react'
  * @param {boolean} options.useOnce - Detach the observer after the element appears.
  * @returns {boolean}
  */
-const useIntersectionObserver = (ref, options = {}) => {
+export const useIntersectionObserver = (ref, options = {}) => {
     const [isIntersecting, setIntersecting] = useState(false)
 
     const {useOnce, ...ioOptions} = options
@@ -60,5 +60,3 @@ const useIntersectionObserver = (ref, options = {}) => {
 
     return isIntersecting
 }
-
-export default useIntersectionObserver

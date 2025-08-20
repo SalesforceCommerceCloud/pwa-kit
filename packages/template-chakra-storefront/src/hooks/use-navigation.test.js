@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
-import useNavigation from './use-navigation'
+import {useNavigation} from './use-navigation'
 import mockConfig from '../../config/mocks/mock-config'
 import {renderWithProviders} from '../utils/test-utils'
 import {act} from '@testing-library/react'

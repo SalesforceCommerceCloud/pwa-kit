@@ -8,7 +8,7 @@ import React, {useMemo} from 'react'
 import PropTypes from 'prop-types'
 import {useIntl} from 'react-intl'
 import {Box, Button} from '@chakra-ui/react'
-import usePromoCodeFields from './usePromoCodeFields'
+import {usePromoCodeFields} from './usePromoCodeFields'
 import Field from '../field'
 
 const PromoCodeFields = ({form, prefix = '', ...props}) => {

@@ -8,7 +8,7 @@ import React, {useMemo} from 'react'
 import PropTypes from 'prop-types'
 import {useIntl} from 'react-intl'
 import {SimpleGrid, Stack} from '@chakra-ui/react'
-import useProfileFields from './useProfileFields'
+import {useProfileFields} from './useProfileFields'
 import Field from '../field'
 
 const ProfileFields = ({form, prefix = ''}) => {

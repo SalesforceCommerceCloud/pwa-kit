@@ -30,8 +30,7 @@ import {
     AuthHelpers,
     useCustomerType
 } from '@salesforce/commerce-sdk-react'
-import {useCurrentCustomer} from '../../hooks'
-import useToast from '../../hooks/use-toast'
+import {useCurrentCustomer, useToast} from '../../hooks'
 import loadable from '@loadable/component'
 const MarketingConsentCard =
     SFDC_EXT_MARKETING_CONSENT_ENABLED &&
@@ -367,6 +366,7 @@ const PasswordCard = () => {
         </ToggleCard>
     )
 }
+
 const AccountDetail = () => {
     const intl = useIntl()
     const {formatMessage} = intl

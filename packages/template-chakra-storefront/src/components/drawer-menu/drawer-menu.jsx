@@ -43,8 +43,7 @@ import {noop} from '../../utils/utils'
 import {getPathWithLocale, categoryUrlBuilder} from '../../utils/url'
 import LoadingSpinner from '../../components/loading-spinner'
 
-import useNavigation from '../../hooks/use-navigation'
-import useMultiSite from '../../hooks/use-multi-site'
+import {useNavigation, useMultiSite} from '../../hooks'
 
 // Project Components
 import Fade from '../../components/fade'

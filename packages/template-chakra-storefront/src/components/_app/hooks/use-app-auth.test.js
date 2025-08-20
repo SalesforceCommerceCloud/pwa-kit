@@ -15,7 +15,7 @@ jest.mock('@salesforce/commerce-sdk-react', () => ({
     useAccessToken: jest.fn()
 }))
 
-jest.mock('../../../hooks/use-auth-modal', () => ({
+jest.mock('../../../hooks', () => ({
     useAuthModal: jest.fn()
 }))
 
@@ -30,7 +30,7 @@ const mockAuthModal = {
 describe('useAppAuth', () => {
     beforeEach(() => {
         const {useAccessToken} = require('@salesforce/commerce-sdk-react')
-        const {useAuthModal} = require('../../../hooks/use-auth-modal')
+        const {useAuthModal} = require('../../../hooks')
 
         useAccessToken.mockReturnValue({
             getTokenWhenReady: mockGetTokenWhenReady
@@ -58,7 +58,7 @@ describe('useAppAuth', () => {
     })
 
     test('calls useAuthModal hook', () => {
-        const {useAuthModal} = require('../../../hooks/use-auth-modal')
+        const {useAuthModal} = require('../../../hooks')
 
         renderHook(() => useAppAuth())
 
@@ -66,7 +66,7 @@ describe('useAppAuth', () => {
     })
 
     test('returns correct structure when auth modal is open', () => {
-        const {useAuthModal} = require('../../../hooks/use-auth-modal')
+        const {useAuthModal} = require('../../../hooks')
         useAuthModal.mockReturnValue({
             isOpen: true,
             onOpen: jest.fn(),

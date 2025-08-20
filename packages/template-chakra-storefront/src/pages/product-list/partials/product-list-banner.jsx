@@ -17,7 +17,7 @@ import {MobileGrid1r1c} from '../../../page-designer/layouts'
 
 // Hooks
 import {isServer} from '../../../utils/utils'
-import useMultiSite from '../../../hooks/use-multi-site'
+import {useMultiSite} from '../../../hooks'
 
 // Constants
 const PROMO_BANNER_DESKTOP_PAGE_ID = 'instagram-promo-banner-desktop'

@@ -25,17 +25,14 @@ jest.mock('react-intl', () => ({
     defineMessage: jest.fn((message) => message)
 }))
 
-jest.mock('../../../hooks/use-multi-site', () => {
+jest.mock('../../../hooks', () => {
     const mockUseMultiSite = jest.fn()
     return {
         __esModule: true,
-        default: mockUseMultiSite
+        useMultiSite: mockUseMultiSite,
+        useAppOrigin: jest.fn()
     }
 })
-
-jest.mock('../../../hooks/use-app-origin', () => ({
-    useAppOrigin: jest.fn()
-}))
 
 jest.mock('../../../utils/url', () => ({
     buildUrl: jest.fn()
@@ -129,10 +126,10 @@ describe('useAppLocalization', () => {
         const {useIntl} = require('react-intl')
         useIntl.mockReturnValue(mockIntl)
 
-        const useMultiSite = require('../../../hooks/use-multi-site').default
+        const {useMultiSite} = require('../../../hooks')
         useMultiSite.mockReturnValue(mockMultiSite)
 
-        const {useAppOrigin} = require('../../../hooks/use-app-origin')
+        const {useAppOrigin} = require('../../../hooks')
         useAppOrigin.mockReturnValue(mockAppOrigin)
 
         const {buildUrl} = require('../../../utils/url')
@@ -178,7 +175,7 @@ describe('useAppLocalization', () => {
     })
 
     test('handles missing window origin', () => {
-        const {useAppOrigin} = require('../../../hooks/use-app-origin')
+        const {useAppOrigin} = require('../../../hooks')
         useAppOrigin.mockReturnValue({origin: null})
 
         const {result} = renderHook(() => useAppLocalization())
@@ -194,7 +191,7 @@ describe('useAppLocalization', () => {
     })
 
     test('handles different currencies', () => {
-        const useMultiSite = require('../../../hooks/use-multi-site').default
+        const {useMultiSite} = require('../../../hooks')
         useMultiSite.mockClear()
         useMultiSite.mockReturnValue({
             ...mockMultiSite,

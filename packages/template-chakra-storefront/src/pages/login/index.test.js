@@ -16,9 +16,9 @@ import mockConfig from '../../../config/mocks/mock-config'
 import {mockedRegisteredCustomer} from '../../../mocks/mock-data'
 import {prependHandlersToServer} from '../../../jest-setup'
 
-jest.mock('../../hooks/use-datacloud', () => ({
+jest.mock('../../hooks/use-data-cloud', () => ({
     __esModule: true,
-    default: jest.fn(() => ({
+    useDataCloud: jest.fn(() => ({
         sendViewPage: jest.fn(),
         sendViewProduct: jest.fn(),
         sendViewCategory: jest.fn(),

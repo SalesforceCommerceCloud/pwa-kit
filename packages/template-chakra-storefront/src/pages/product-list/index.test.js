@@ -29,16 +29,19 @@ jest.mock('@salesforce/commerce-sdk-react', () => {
     }
 })
 
-jest.mock('../../hooks/use-datacloud', () => ({
-    __esModule: true,
-    default: jest.fn(() => ({
-        sendViewPage: jest.fn(),
-        sendViewProduct: jest.fn(),
-        sendViewCategory: jest.fn(),
-        sendViewSearchResults: jest.fn(),
-        sendViewRecommendations: jest.fn()
-    }))
-}))
+jest.mock('../../hooks', () => {
+    const originalModule = jest.requireActual('../../hooks')
+    return {
+        ...originalModule,
+        useDataCloud: jest.fn(() => ({
+            sendViewPage: jest.fn(),
+            sendViewProduct: jest.fn(),
+            sendViewCategory: jest.fn(),
+            sendViewSearchResults: jest.fn(),
+            sendViewRecommendations: jest.fn()
+        }))
+    }
+})
 let mockProductListSearchResponse = mockProductSearch
 
 const MockedComponent = () => {

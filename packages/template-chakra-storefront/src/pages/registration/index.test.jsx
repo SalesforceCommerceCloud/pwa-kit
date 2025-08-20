@@ -13,16 +13,19 @@ import Account from '../account'
 import mockConfig from '../../../config/mocks/mock-config'
 import {rest} from 'msw'
 import {mockedRegisteredCustomer} from '../../../mocks/mock-data'
-jest.mock('../../hooks/use-datacloud', () => ({
-    __esModule: true,
-    default: jest.fn(() => ({
-        sendViewPage: jest.fn(),
-        sendViewProduct: jest.fn(),
-        sendViewCategory: jest.fn(),
-        sendViewSearchResults: jest.fn(),
-        sendViewRecommendations: jest.fn()
-    }))
-}))
+jest.mock('../../hooks', () => {
+    const originalModule = jest.requireActual('../../hooks')
+    return {
+        ...originalModule,
+        useDataCloud: jest.fn(() => ({
+            sendViewPage: jest.fn(),
+            sendViewProduct: jest.fn(),
+            sendViewCategory: jest.fn(),
+            sendViewSearchResults: jest.fn(),
+            sendViewRecommendations: jest.fn()
+        }))
+    }
+})
 
 const MockedComponent = () => {
     const match = {

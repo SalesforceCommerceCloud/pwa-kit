@@ -8,7 +8,7 @@ import React, {useMemo} from 'react'
 import PropTypes from 'prop-types'
 import {useIntl} from 'react-intl'
 import {Box, Button, Stack, StackSeparator} from '@chakra-ui/react'
-import useUpdatePasswordFields from '../../components/forms/useUpdatePasswordFields'
+import {useUpdatePasswordFields} from '../../components/forms/useUpdatePasswordFields'
 import Field from '../../components/field'
 import PasswordRequirements from '../../components/forms/password-requirements'
 

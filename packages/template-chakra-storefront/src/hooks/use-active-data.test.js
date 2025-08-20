@@ -11,7 +11,7 @@ import PropTypes from 'prop-types'
 import {act, screen, waitFor} from '@testing-library/react'
 
 import {renderWithProviders} from '../utils/test-utils'
-import useActiveData from './use-active-data'
+import {useActiveData} from './use-active-data'
 import {mockCategory, mockProduct, mockSearchResults} from './einstein-mock-data'
 import mockConfig from '../../config/mocks/mock-config'
 const DEFAULT_SEARCH_PARAMS = mockConfig.search.defaultSearchParams
