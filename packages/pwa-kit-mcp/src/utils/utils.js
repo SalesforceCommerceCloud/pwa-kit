@@ -10,8 +10,11 @@ import path from 'path'
 import {spawn} from 'cross-spawn'
 import {zodToJsonSchema} from 'zod-to-json-schema'
 import {z} from 'zod'
+<<<<<<< HEAD
 import os from 'os'
 import {exec} from 'child_process'
+=======
+>>>>>>> develop
 
 // CONSTANTS
 const CREATE_APP_VERSION = 'latest'
@@ -84,6 +87,65 @@ export function isMonoRepo() {
 }
 
 /**
+<<<<<<< HEAD
+=======
+ * Check if the component is the base component under node_modules/@salesforce/retail-react-app/app/components
+ *
+ * @param {string} componentName - The name of the component to check.
+ * @param {string} nodeModulesPath - The absolute path to the node_modules directory.
+ * @returns {boolean} True if the component is the base component, false otherwise.
+ */
+export const isBaseComponent = (componentName, nodeModulesPath) => {
+    const baseComponentPath = path.join(
+        nodeModulesPath,
+        '@salesforce/retail-react-app/app/components',
+        componentName
+    )
+    return fs.existsSync(baseComponentPath)
+}
+
+/**
+ * Check if the component is the shared UI base component under node_modules/@salesforce/retail-react-app/app/components/shared/ui
+ *
+ * @param {string} componentName - The name of the component to check.
+ * @param {string} nodeModulesPath - The absolute path to the node_modules directory.
+ * @returns {boolean} True if the component is the shared UI base component, false otherwise.
+ */
+export const isSharedUIBaseComponent = (componentName, nodeModulesPath) => {
+    const baseComponentPath = path.join(
+        nodeModulesPath,
+        '@salesforce/retail-react-app/app/components/shared/ui',
+        componentName
+    )
+    return fs.existsSync(baseComponentPath)
+}
+
+/**
+ * Check if the component is the local component under components folder
+ *
+ * @param {string} componentName - The name of the component to check.
+ * @param {string} componentsPath - The absolute path to the components directory.
+ * @returns {boolean} True if the component is the local component, false otherwise.
+ */
+export const isLocalComponent = (componentName, componentsPath) => {
+    const localComponentPath = path.join(componentsPath, componentName)
+    return fs.existsSync(localComponentPath)
+}
+
+/**
+ * Check if the component is a local shared UI component under components/shared/ui folder
+ *
+ * @param {string} componentName - The name of the component to check.
+ * @param {string} componentsPath - The absolute path to the components directory.
+ * @returns {boolean} True if the component is a local shared UI component, false otherwise.
+ */
+export const isLocalSharedUIComponent = (componentName, componentsPath) => {
+    const localSharedUIComponentPath = path.join(componentsPath, 'shared', 'ui', componentName)
+    return fs.existsSync(localSharedUIComponentPath)
+}
+
+/**
+>>>>>>> develop
  * Returns the command or path to use for creating a new PWA Kit app.
  *
  * If the project is a monorepo (detected by the presence of lerna.json),
@@ -101,6 +163,7 @@ export const getCreateAppCommand = () => {
 }
 
 /**
+<<<<<<< HEAD
  * Runs an NPX command and captures its output.
  *
  * @returns {Promise<string>} - Resolves with the command output.
@@ -141,6 +204,8 @@ export const getCopyrightHeader = () => {
 }
 
 /**
+=======
+>>>>>>> develop
  * Converts a string to kebab-case (e.g., ProductCard -> product-card)
  */
 export function toKebabCase(str) {
@@ -158,7 +223,11 @@ export async function logMCPMessage(message) {
     if (process.env.DEBUG) {
         // Check if DEBUG mode is enabled
         const logFilePath = path.join(__dirname, 'mcp-debug.log')
+<<<<<<< HEAD
         const timestamp = new Date().toLocaleString('en-US', {timeZone: 'America/New_York'})
+=======
+        const timestamp = new Date().toLocaleString('en-US', {timeZone: 'GMT'})
+>>>>>>> develop
         const logMessage = `[${timestamp}] ${message}\n`
         try {
             // Ensure the log file exists, create it if it doesn't
@@ -171,3 +240,40 @@ export async function logMCPMessage(message) {
         }
     }
 }
+<<<<<<< HEAD
+=======
+
+/**
+ * Returns the import statement for a component
+ * @param {string} componentName - The name of the component to import.
+ * @param {string} componentDir - The directory of the component to import.
+ * @param {boolean} isLocal - Whether the component is a local component.
+ * @param {boolean} isBase - Whether the component is a base component.
+ * @param {Object} absolutePaths - Object containing absolute paths for components and pages.
+ * @param {string} absolutePaths.componentsPath - The absolute path to the components directory.
+ * @param {string} absolutePaths.pagesPath - The absolute path to the pages directory.
+ * @param {boolean} hasOverridesDir - Whether ccExtensibility.overridesDir is set in package.json.
+ * @returns {string} The import statement for the component.
+ */
+export function generateComponentImportStatement(
+    componentName,
+    componentDir,
+    isLocal,
+    isBase,
+    absolutePaths,
+    hasOverridesDir
+) {
+    const relativePath = path.relative(
+        path.join(absolutePaths.pagesPath, 'dummy'), // dummy file to get parent directory
+        path.join(absolutePaths.componentsPath, componentDir)
+    )
+
+    if ((!hasOverridesDir && isLocal) || isBase) {
+        return `import ${componentName} from '@salesforce/retail-react-app/app/components/${componentDir}'`
+    }
+    // Use local relative path for other cases
+    // Normalize path separators to forward slashes for ES6 imports
+    const normalizedPath = relativePath.replace(/\\/g, '/')
+    return `import ${componentName} from '${normalizedPath}'`
+}
+>>>>>>> develop
