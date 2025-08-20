@@ -10,11 +10,6 @@ import path from 'path'
 import {spawn} from 'cross-spawn'
 import {zodToJsonSchema} from 'zod-to-json-schema'
 import {z} from 'zod'
-<<<<<<< HEAD
-import os from 'os'
-import {exec} from 'child_process'
-=======
->>>>>>> develop
 
 // CONSTANTS
 const CREATE_APP_VERSION = 'latest'
@@ -87,8 +82,6 @@ export function isMonoRepo() {
 }
 
 /**
-<<<<<<< HEAD
-=======
  * Check if the component is the base component under node_modules/@salesforce/retail-react-app/app/components
  *
  * @param {string} componentName - The name of the component to check.
@@ -145,7 +138,6 @@ export const isLocalSharedUIComponent = (componentName, componentsPath) => {
 }
 
 /**
->>>>>>> develop
  * Returns the command or path to use for creating a new PWA Kit app.
  *
  * If the project is a monorepo (detected by the presence of lerna.json),
@@ -163,49 +155,6 @@ export const getCreateAppCommand = () => {
 }
 
 /**
-<<<<<<< HEAD
- * Runs an NPX command and captures its output.
- *
- * @returns {Promise<string>} - Resolves with the command output.
- */
-export async function runNpxCommand(NPX_COMMAND, CREATE_APP_COMMAND, DISPLAY_PROGRAM_COMMAND) {
-    return new Promise((resolve, reject) => {
-        const tempDir = os.tmpdir()
-        const outputFilePath = path.join(tempDir, 'npx-output.json')
-        const errorFilePath = path.join(tempDir, 'npx-error.log')
-        const command = `${NPX_COMMAND} ${CREATE_APP_COMMAND} ${DISPLAY_PROGRAM_COMMAND} > ${outputFilePath} 2> ${errorFilePath}`
-
-        exec(command, (error) => {
-            if (error) {
-                reject(error)
-                return
-            }
-
-            fsPromises.promises
-                .readFile(outputFilePath, 'utf-8')
-                .then((data) => resolve(data))
-                .catch((err) => reject(err))
-        })
-    })
-}
-
-/**
- * Returns the copyright header with the current year
- * @returns {string} The copyright header text
- */
-export const getCopyrightHeader = () => {
-    const year = new Date().getFullYear()
-    return `/*
- * Copyright (c) ${year}, Salesforce, Inc.
- * All rights reserved.
- * SPDX-License-Identifier: BSD-3-Clause
- * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
- */`
-}
-
-/**
-=======
->>>>>>> develop
  * Converts a string to kebab-case (e.g., ProductCard -> product-card)
  */
 export function toKebabCase(str) {
@@ -223,11 +172,7 @@ export async function logMCPMessage(message) {
     if (process.env.DEBUG) {
         // Check if DEBUG mode is enabled
         const logFilePath = path.join(__dirname, 'mcp-debug.log')
-<<<<<<< HEAD
-        const timestamp = new Date().toLocaleString('en-US', {timeZone: 'America/New_York'})
-=======
         const timestamp = new Date().toLocaleString('en-US', {timeZone: 'GMT'})
->>>>>>> develop
         const logMessage = `[${timestamp}] ${message}\n`
         try {
             // Ensure the log file exists, create it if it doesn't
@@ -240,8 +185,6 @@ export async function logMCPMessage(message) {
         }
     }
 }
-<<<<<<< HEAD
-=======
 
 /**
  * Returns the import statement for a component
@@ -276,4 +219,3 @@ export function generateComponentImportStatement(
     const normalizedPath = relativePath.replace(/\\/g, '/')
     return `import ${componentName} from '${normalizedPath}'`
 }
->>>>>>> develop
