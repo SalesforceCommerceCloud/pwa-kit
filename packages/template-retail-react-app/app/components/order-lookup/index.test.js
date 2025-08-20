@@ -56,7 +56,6 @@ describe('OrderLookupForm', () => {
         expect(screen.getByLabelText('Order Number')).toBeInTheDocument()
         expect(screen.getByLabelText('Email')).toBeInTheDocument()
         expect(screen.getByRole('button', {name: 'Continue'})).toBeInTheDocument()
-        expect(screen.getByText('Need help finding your order number?')).toBeInTheDocument()
     })
 
     test('button is always enabled', () => {

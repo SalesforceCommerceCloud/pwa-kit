@@ -2581,12 +2581,6 @@
       "value": "Look it up with your order number"
     }
   ],
-  "order_lookup.link.help_to_find_order_number": [
-    {
-      "type": 0,
-      "value": "Need help finding your order number?"
-    }
-  ],
   "order_lookup.subheading.find_individual_order": [
     {
       "type": 0,
