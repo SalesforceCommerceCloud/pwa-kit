@@ -45,6 +45,7 @@ import {useMultiship} from '@salesforce/retail-react-app/app/hooks/use-multiship
 import {useCheckout} from '@salesforce/retail-react-app/app/pages/checkout/util/checkout-context'
 import {usePickupShipment} from '@salesforce/retail-react-app/app/hooks/use-pickup-shipment'
 import {useAddressManagement} from '@salesforce/retail-react-app/app/hooks/use-address-management'
+import {useAddressForm} from '@salesforce/retail-react-app/app/hooks/use-address-form'
 
 const MultiShippingItemAttributes = ({variant, includeQuantity = true}) => {
     const {formatMessage} = useIntl()
@@ -191,30 +192,27 @@ const ShippingMultiAddress = ({
         isGuest: isGuestUser
     } = useAddressManagement(basket, deliveryItems)
 
-    // Address management logic is now handled by useAddressManagement hook
+    // Use the address form hook
+    const {
+        form: addressForm,
+        showForm: showAddAddressForm,
+        isSubmitting: isFormSubmitting,
+        openForm,
+        closeForm,
+        handleCreateAddress,
+        isAddressFormOpen,
+        formErrors
+    } = useAddressForm(addGuestAddress, isGuestUser, setAddressesForItems, availableAddresses, deliveryItems)
 
-    const [showAddAddressForm, setShowAddAddressForm] = useState({})
-
-    const addressForm = useForm({
-        mode: 'onSubmit',
-        defaultValues: {
-            firstName: '',
-            lastName: '',
-            phone: '',
-            countryCode: 'US',
-            address1: '',
-            city: '',
-            stateCode: '',
-            postalCode: '',
-            preferred: false
-        }
-    })
-
-    const createCustomerAddress = useShopperCustomersMutation('createCustomerAddress')
+    // Local state for overall form submission
     const [isSubmitting, setIsSubmitting] = useState(false)
 
-    const isAddressFormOpen =
-        Object.keys(showAddAddressForm).filter((key) => showAddAddressForm[key])?.length > 0
+    // Address management logic is now handled by useAddressManagement hook
+
+
+
+
+
 
     // guest addresses for guests & customer addresses for registered users
     const finalAddresses = availableAddresses
@@ -291,125 +289,12 @@ const ShippingMultiAddress = ({
         )
     }
 
-    const handleCancelAddressForm = (addressKey) => {
-        setShowAddAddressForm((prev) => ({
-            ...prev,
-            [addressKey]: false
-        }))
-        addressForm.clearErrors()
-    }
 
-    /**
-     * @param {Object} newAddress - address to check
-     * @param {Array} existingAddresses
-     * @param {string} addressKey - key for address form
-     * @param {Object} form - form object to reset
-     * @returns {boolean}
-     */
-    const isDuplicateAddress = (newAddress, existingAddresses, addressKey, form) => {
-        const addressExists = existingAddresses.some((addr) => areAddressesEqual && areAddressesEqual(addr, newAddress))
 
-        if (addressExists) {
-            setShowAddAddressForm((prev) => ({...prev, [addressKey]: false}))
-            form.reset()
-            form.clearErrors()
 
-            showToast({
-                title: formatMessage({
-                    id: 'shipping_multi_address.info.address_already_exists',
-                    defaultMessage: 'The address you entered already exists.'
-                }),
-                status: 'info'
-            })
-            return true
-        }
-        return false
-    }
 
-    const handleCreateAddress = async (addressData, form, itemId) => {
-        const addressKey = itemId
 
-        if (isGuestUser) {
-            if (isDuplicateAddress(addressData, availableAddresses, addressKey, form)) {
-                return
-            }
 
-            // store address in component state
-            try {
-                const newAddress = addGuestAddress(addressData)
-
-                // If this is the first address, apply it to all delivery items
-                if (availableAddresses.length === 0) {
-                    const itemIds = deliveryItems.map(item => item.itemId)
-                    setAddressesForItems(itemIds, newAddress.addressId)
-                } else {
-                                            // For subsequent addresses, only assign to the current item
-                        setAddressesForItems(addressKey, newAddress.addressId)
-                }
-
-                setShowAddAddressForm((prev) => ({...prev, [addressKey]: false}))
-                form.reset()
-                form.clearErrors()
-
-                showToast({
-                    title: formatMessage({
-                        id: 'shipping_multi_address.success.address_saved',
-                        defaultMessage: 'Address saved successfully'
-                    }),
-                    status: 'success'
-                })
-            } catch (error) {
-                showToast({
-                    title: formatMessage({
-                        id: 'shipping_multi_address.error.save_failed',
-                        defaultMessage: "Couldn't save the address."
-                    }),
-                    status: 'error'
-                })
-            }
-        } else {
-            // For registered users, save to customer address book
-            try {
-                const newAddress = {
-                    ...addressData,
-                    addressId: nanoid()
-                }
-
-                if (isDuplicateAddress(newAddress, availableAddresses, addressKey, form)) {
-                    return
-                }
-
-                const createdAddress = await createCustomerAddress.mutateAsync({
-                    body: newAddress,
-                    parameters: {customerId: customer.customerId}
-                })
-
-                setShowAddAddressForm((prev) => ({...prev, [addressKey]: false}))
-                form.reset()
-                form.clearErrors()
-
-                await refetchCustomer()
-
-                setAddressesForItems(addressKey, createdAddress.addressId)
-
-                showToast({
-                    title: formatMessage({
-                        id: 'shipping_multi_address.success.address_saved',
-                        defaultMessage: 'Address saved successfully'
-                    }),
-                    status: 'success'
-                })
-            } catch (error) {
-                showToast({
-                    title: formatMessage({
-                        id: 'shipping_multi_address.error.save_failed',
-                        defaultMessage: "Couldn't save the address."
-                    }),
-                    status: 'error'
-                })
-            }
-        }
-    }
 
     const handleSubmit = async () => {
         setIsSubmitting(true)
@@ -627,10 +512,7 @@ const ShippingMultiAddress = ({
                                                             onChange={(e) => {
                                                                 const value = e.target.value
                                                                 // Hide the address form when an existing address is selected
-                                                                setShowAddAddressForm((prev) => ({
-                                                                    ...prev,
-                                                                    [addressKey]: false
-                                                                }))
+                                                                closeForm(addressKey)
 
                                                                 setAddressesForItems(addressKey, value)
                                                             }}
@@ -691,10 +573,7 @@ const ShippingMultiAddress = ({
                                                         variant="link"
                                                         size="sm"
                                                         onClick={() => {
-                                                            setShowAddAddressForm((prev) => ({
-                                                                ...prev,
-                                                                [addressKey]: true
-                                                            }))
+                                                            openForm(addressKey)
                                                         }}
                                                         alignSelf="flex-start"
                                                         aria-label={formatMessage(
@@ -735,8 +614,8 @@ const ShippingMultiAddress = ({
                                             <AddressForm
                                                 item={item}
                                                 form={addressForm}
-                                                onSubmit={handleCreateAddress}
-                                                onCancel={() => handleCancelAddressForm(addressKey)}
+                                                onSubmit={(addressData, form, itemId) => handleCreateAddress(addressData, itemId)}
+                                                onCancel={() => closeForm(addressKey)}
                                             />
                                         </Box>
                                     )}
@@ -753,7 +632,7 @@ const ShippingMultiAddress = ({
                     cursor={
                         !allShipmentsHaveAddress || isAddressFormOpen ? 'not-allowed' : 'pointer'
                     }
-                    isLoading={addressForm.formState.isSubmitting || isSubmitting}
+                    isLoading={addressForm.formState.isSubmitting || isFormSubmitting}
                     isDisabled={!allShipmentsHaveAddress || isAddressFormOpen}
                     data-testid="continue-to-shipping-button"
                     loadingText={formatMessage({
