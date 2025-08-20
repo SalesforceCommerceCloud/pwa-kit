@@ -46,7 +46,7 @@ import {useCheckout} from '@salesforce/retail-react-app/app/pages/checkout/util/
 import {usePickupShipment} from '@salesforce/retail-react-app/app/hooks/use-pickup-shipment'
 import {useAddressManagement} from '@salesforce/retail-react-app/app/hooks/use-address-management'
 import {useAddressForm} from '@salesforce/retail-react-app/app/hooks/use-address-form'
-import AddressSelectionCard from '@salesforce/retail-react-app/app/components/address-selection-card'
+import ProductAddressSelectionCard from '@salesforce/retail-react-app/app/components/product-address-selection-card'
 
 const MultiShippingItemAttributes = ({variant, includeQuantity = true}) => {
     const {formatMessage} = useIntl()
@@ -396,7 +396,7 @@ const ShippingMultiAddress = ({
                             const addressKey = item.itemId
 
                             return (
-                                <AddressSelectionCard
+                                <ProductAddressSelectionCard
                                     key={addressKey}
                                     item={item}
                                     variant={variant}

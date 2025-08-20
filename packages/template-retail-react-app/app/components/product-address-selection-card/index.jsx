@@ -105,7 +105,7 @@ const AddressForm = ({item, form, onSubmit, onCancel}) => {
  * Extracted from ShippingMultiAddress to improve maintainability
  * UI structure and styling kept exactly the same
  */
-const AddressSelectionCard = ({
+const ProductAddressSelectionCard = ({
     item,
     variant,
     productDetail,
@@ -355,9 +355,9 @@ const AddressSelectionCard = ({
     )
 }
 
-AddressSelectionCard.displayName = 'AddressSelectionCard'
+ProductAddressSelectionCard.displayName = 'ProductAddressSelectionCard'
 
-AddressSelectionCard.propTypes = {
+ProductAddressSelectionCard.propTypes = {
     item: PropTypes.object.isRequired,
     variant: PropTypes.object.isRequired,
     productDetail: PropTypes.object.isRequired,
@@ -379,4 +379,4 @@ AddressSelectionCard.propTypes = {
     closeForm: PropTypes.func.isRequired
 }
 
-export default AddressSelectionCard
+export default ProductAddressSelectionCard
