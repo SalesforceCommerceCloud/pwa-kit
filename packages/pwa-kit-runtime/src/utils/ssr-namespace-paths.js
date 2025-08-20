@@ -39,8 +39,31 @@ export const getEnvBasePath = () => {
         return ''
     }
 
-    // Escape base path for safe regex usage. Also remove the trailing slash
-    return basePath.replace(/[.*+?^${}()|[\]\\]/g, '\\$&').replace(/\/$/, '')
+    // Normalize the base path
+    basePath = basePath
+        .trim()
+        .replace(/^\/?/, '/') // Ensure leading slash
+        .replace(/\/+/g, '/') // Normalize multiple slashes
+        .replace(/\/$/, '') // Remove trailing slash
+
+    // Return empty string for root path or empty result
+    if (basePath === '/' || !basePath) {
+        return ''
+    }
+
+    // only allow simple, safe characters
+    // eslint-disable-next-line no-useless-escape
+    if (!/^\/[a-zA-Z0-9\-_\/]*$/.test(basePath)) {
+        logger.warn(
+            'Invalid envBasePath configuration. Only letters, numbers, hyphens, underscores, and slashes allowed. No base path is applied.',
+            {
+                namespace: 'ssr-namespace-paths.getEnvBasePath'
+            }
+        )
+        return ''
+    }
+
+    return basePath
 }
 
 export const proxyBasePath = PROXY_PATH_BASE

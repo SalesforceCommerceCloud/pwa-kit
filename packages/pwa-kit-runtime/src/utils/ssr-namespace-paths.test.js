@@ -30,20 +30,18 @@ describe('ssr-namespace-paths tests', () => {
         expect(getEnvBasePath()).toBe('/sample')
     })
 
-    test('getEnvBasePath escapes regex characters', () => {
+    test('getEnvBasePath returns empty string if invalid cahracters are detected in envBasePath', () => {
         jest.spyOn(ssrConfig, 'getConfig').mockReturnValue({envBasePath: '/sample.*'})
-        expect(getEnvBasePath()).toBe('/sample\\.\\*')
+        expect(getEnvBasePath()).toBe('')
     })
 
-    test('getEnvBasePath escapes multiple regex characters', () => {
-        jest.spyOn(ssrConfig, 'getConfig').mockReturnValue({
-            envBasePath: '/path/with[special]chars'
-        })
-        expect(getEnvBasePath()).toBe('/path/with\\[special\\]chars')
+    test('getEnvBasePath normalizes envBasePath', () => {
+        jest.spyOn(ssrConfig, 'getConfig').mockReturnValue({envBasePath: '  //sample/  '})
+        expect(getEnvBasePath()).toBe('/sample')
     })
 
-    test('getEnvBasePath escapes regex characters and removes trailing slash', () => {
-        jest.spyOn(ssrConfig, 'getConfig').mockReturnValue({envBasePath: '/sample.*/'})
-        expect(getEnvBasePath()).toBe('/sample\\.\\*')
+    test('getEnvBasePath works with multiple part base path', () => {
+        jest.spyOn(ssrConfig, 'getConfig').mockReturnValue({envBasePath: '//test/sample/  '})
+        expect(getEnvBasePath()).toBe('/test/sample')
     })
 })

@@ -495,8 +495,21 @@ export const RemoteServerFactory = {
         let expressRouteRegexes
 
         const removeBasePathFromPath = (path) => {
-            const regex = new RegExp(`^${getEnvBasePath()}(/|$)`)
-            return path.replace(regex, '/')
+            const basePath = getEnvBasePath()
+            if (!basePath) {
+                return path
+            }
+
+            if (path.startsWith(basePath + '/')) {
+                // If path is like '/basepath/something', return '/something'
+                return path.substring(basePath.length)
+            } else if (path === basePath) {
+                // If path is exactly '/basepath', return '/'
+                return '/'
+            }
+
+            // Else the path doesn't start with base path, so we don't need to remove it
+            return path
         }
 
         /*
@@ -574,14 +587,13 @@ export const RemoteServerFactory = {
                 } else {
                     result += char
                 }
-
                 i++
             }
 
             return result
         }
 
-        const _convertExpressRouteToRegex = (routePattern) => {
+        const convertExpressRouteToRegex = (routePattern) => {
             if (!routePattern) return null
             if (routePattern instanceof RegExp) return routePattern
             if (typeof routePattern !== 'string') return null
@@ -592,7 +604,7 @@ export const RemoteServerFactory = {
                 // We need to do this before handling optional (?) characters
                 let processedPattern = routePattern.replace(/\*/g, '(.*)')
 
-                // Then handle ? in express route to something path-to-regexp can process
+                // Convert any ? in the express route to something path-to-regexp can process
                 processedPattern = convertExpressOptionalChars(processedPattern)
 
                 // Ensure we have a valid string
@@ -608,14 +620,15 @@ export const RemoteServerFactory = {
         }
 
         // Initializes a cache of regexes that correspond to the registered express routes
-        const _initailizeExpressRouteRegexes = () => {
+        const initializeExpressRouteRegexes = () => {
             const expressRoutes = app._router.stack
-                // specifically omit the generic wildcard from the express routes we want to
-                // remove the base path from since it is mapped to the app render
+                // Specifically omit the generic wildcard from the express routes we want to
+                // remove the base path from since it is mapped to the app render. Routes
+                // within the render are handled by React Router
                 .filter((layer) => layer.route && layer.route.path && layer.route.path !== '*')
                 .map((layer) => layer.route.path)
 
-            expressRouteRegexes = expressRoutes.map((route) => _convertExpressRouteToRegex(route))
+            expressRouteRegexes = expressRoutes.map((route) => convertExpressRouteToRegex(route))
         }
 
         /**
@@ -628,26 +641,35 @@ export const RemoteServerFactory = {
          */
         const removeBasePathMiddleware = (req, res, next) => {
             // Scope base path removal to /mobify routes and routes defined by the express app (ie. worker.js)
-            // This is to avoid affecting other paths where a base path might be present if it happens to
-            // be equal to a site id.
+            // This is to avoid affecting React Router routes where a site id or locale might be present that
+            // is equal to the base path.
             // For example, if you have a base path of /us and a site id of /us we don't want
-            // to remove the /us from www.example.com/us/en-US/category/...
+            // to remove the /us from www.example.com/us/en-US/category/... as this route is handled by
+            // React Router and the PWA multisite implementation.
 
             const basePath = getEnvBasePath()
             let shouldRemoveBasePath = false
 
+            // First we check if the path is for a /mobify resource. For these, we know that we have to
+            // remove the base path so we can move to the next step.
             if (req.path.startsWith(`${basePath}/mobify`)) {
                 shouldRemoveBasePath = true
             } else {
-                // Check if path matches any existing express route with base path prepended
-                const pathWithoutBase = req.path.replace(new RegExp(`^${basePath}`), '')
+                // Next we check if the path matches any existing express routes (ie. /callback or /worker.js)
+                // If it does, we want to remove the base path.
+
+                // For this check, let's first remove the base path from the path
+                const pathWithoutBase = removeBasePathFromPath(req.path)
 
                 if (!expressRouteRegexes) {
                     // We do this here since we want to ensure that any express route defined
                     // after the app is created, such as routes defined in ssr.js, are included.
-                    _initailizeExpressRouteRegexes()
+                    initializeExpressRouteRegexes()
                 }
 
+                // Then lets check the path (without the base path) against the express routes
+                // If we find a match, we now know that the request is meant for an express route
+                // and we want to remove the base path.
                 shouldRemoveBasePath = expressRouteRegexes.some((routeRegex) => {
                     try {
                         return routeRegex.test(pathWithoutBase)
