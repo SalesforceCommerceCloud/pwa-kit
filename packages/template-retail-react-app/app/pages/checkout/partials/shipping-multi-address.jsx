@@ -30,7 +30,7 @@ import {useCheckout} from '@salesforce/retail-react-app/app/pages/checkout/util/
 import {useAddressProductManagement} from '@salesforce/retail-react-app/app/hooks/use-address-product-management'
 import {useAddressForm} from '@salesforce/retail-react-app/app/hooks/use-address-form'
 import {useShipmentProcessing} from '@salesforce/retail-react-app/app/hooks/use-shipment-processing'
-import ProductAddressSelectionCard from '@salesforce/retail-react-app/app/components/product-address-selection-card'
+import ProductShippingAddressCard from './product-shipping-address-card'
 
 const ShippingMultiAddress = ({
     basket,
@@ -207,7 +207,7 @@ const ShippingMultiAddress = ({
                             const addressKey = item.itemId
 
                             return (
-                                <ProductAddressSelectionCard
+                                <ProductShippingAddressCard
                                     key={addressKey}
                                     item={item}
                                     variant={variant}
