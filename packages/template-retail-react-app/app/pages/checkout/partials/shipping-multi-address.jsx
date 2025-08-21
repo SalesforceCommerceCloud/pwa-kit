@@ -159,8 +159,11 @@ const ShippingMultiAddress = ({basket, submitButtonLabel, noItemsInBasketMessage
     const handleSubmit = async () => {
         setIsSubmitting(true)
         try {
+            // Restore the original working call with correct parameters
             await shipmentProcessing.processShipments(
-                addressProductManagement.groupedItemsByAddress
+                addressProductManagement.deliveryItems,
+                addressProductManagement.selectedAddresses,
+                addresses
             )
             goToStep(STEPS.SHIPPING_OPTIONS)
         } catch (error) {

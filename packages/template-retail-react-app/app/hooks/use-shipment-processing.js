@@ -9,10 +9,10 @@ import {useMultiship} from './use-multiship'
 
 /**
  * Hook for processing shipments in multi-shipping
- * Handle shipment operations: creating, moving items, and cleanup
+ * Restored to original working logic: creating shipments, moving items, and cleanup
  * 
- * @param {Object} basket
- * @returns {Object}
+ * @param {Object} basket - The current basket object
+ * @returns {Object} Object containing processShipments function
  */
 export const useShipmentProcessing = (basket) => {
     const {
@@ -25,37 +25,63 @@ export const useShipmentProcessing = (basket) => {
     } = useMultiship(basket)
 
     /**
-     * Processes shipments from item-address mapping
+     * Processes shipments with the original working logic
      * 
-     * @param {Object} groupedItemsByAddress
-     * @returns {Promise<Object>}
+     * @param {Array} deliveryItems - Array of items that need to be delivered
+     * @param {Object} selectedAddresses - Object mapping item IDs to selected address IDs
+     * @param {Array} finalAddresses - Array of final addresses to use for shipments
+     * @returns {Promise<Object>} Promise that resolves to success object or throws error
      */
-    const processShipments = useCallback(async (groupedItemsByAddress) => {
+    const processShipments = useCallback(async (deliveryItems, selectedAddresses, finalAddresses) => {
         try {
+            const addressToItemsMap = {}
             let basketAfterItemMoves = null
 
-            // Process each address group
-            for (const [addressKey, {address, items}] of Object.entries(groupedItemsByAddress)) {
-                // Find existing shipment with same address or create new one
-                let targetShipmentId = findDeliveryShipmentWithSameAddress(basket, address)
-                
-                if (!targetShipmentId) {
-                    // Find unused shipment or create new one
-                    const unusedShipment = findUnusedDeliveryShipment(basket, [])
-                    if (unusedShipment) {
-                        targetShipmentId = unusedShipment.shipmentId
-                        await updateDeliveryAddressForShipment(targetShipmentId, address)
-                    } else {
-                        targetShipmentId = await createNewDeliveryShipmentWithAddress(basket, address)
+            deliveryItems.forEach((item) => {
+                // Defaults to first address if no address is selected
+                const addressId = selectedAddresses[item.itemId] || finalAddresses[0]?.addressId
+                const address = finalAddresses.find((addr) => addr.addressId === addressId)
+
+                // If there is an existing shipment with the same address, use it in the next step
+                const shipmentIdWithSameAddress = findDeliveryShipmentWithSameAddress(
+                    basket,
+                    address
+                )
+
+                if (!addressToItemsMap[addressId]) {
+                    addressToItemsMap[addressId] = {
+                        address: address,
+                        items: [],
+                        shipmentId: shipmentIdWithSameAddress
                     }
                 }
+                addressToItemsMap[addressId].items.push(item)
+            })
 
-                // Move items to the target shipment
-                const itemsToMove = items.filter(itemId => {
-                    const item = basket.productItems?.find(i => i.itemId === itemId)
-                    return item && item.shipmentId !== targetShipmentId
-                })
+            // For each unique address, if there is no usable existing shipment, create a new one.
+            for (const [addressId, data] of Object.entries(addressToItemsMap)) {
+                const {address, items, shipmentId: existingShipmentId} = data
 
+                let targetShipmentId = existingShipmentId
+                if (!targetShipmentId) {
+                    const targetShipment = findUnusedDeliveryShipment(
+                        basket,
+                        Object.values(addressToItemsMap).map((d) => d.shipmentId)
+                    )
+                    targetShipmentId = targetShipment?.shipmentId
+                    if (targetShipmentId) {
+                        await updateDeliveryAddressForShipment(targetShipmentId, address)
+                    } else {
+                        targetShipmentId = await createNewDeliveryShipmentWithAddress(
+                            basket,
+                            address
+                        )
+                    }
+                }
+                // Set the shipmentId for the unique address
+                addressToItemsMap[addressId].shipmentId = targetShipmentId
+                // Move items to the new shipment if needed.
+                const itemsToMove = items.filter((item) => item.shipmentId !== targetShipmentId)
                 if (itemsToMove.length > 0) {
                     basketAfterItemMoves = await moveItemsToDeliveryShipment(
                         itemsToMove,
@@ -63,7 +89,6 @@ export const useShipmentProcessing = (basket) => {
                     )
                 }
             }
-
             await removeEmptyShipments(basketAfterItemMoves || basket)
 
             return {success: true}
