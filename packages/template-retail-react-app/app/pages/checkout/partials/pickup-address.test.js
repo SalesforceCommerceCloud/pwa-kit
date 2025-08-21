@@ -29,6 +29,21 @@ jest.mock('@salesforce/retail-react-app/app/components/item-variant/item-attribu
 // Mock goToNextStep function
 const mockGoToNextStep = jest.fn()
 
+// Configurable checkout state for tests
+const mockCheckoutState = {
+    step: 1,
+    STEPS: {
+        CONTACT_INFO: 0,
+        PICKUP_ADDRESS: 1,
+        SHIPPING_ADDRESS: 2,
+        SHIPPING_OPTIONS: 3,
+        PAYMENT: 4,
+        REVIEW_ORDER: 5
+    },
+    goToStep: jest.fn(),
+    goToNextStep: mockGoToNextStep
+}
+
 const mockProductsArray = [
     {
         id: 'product-1',
@@ -103,19 +118,7 @@ jest.mock('@salesforce/retail-react-app/app/hooks/use-multi-site', () =>
 )
 
 jest.mock('@salesforce/retail-react-app/app/pages/checkout/util/checkout-context', () => ({
-    useCheckout: () => ({
-        step: 1,
-        STEPS: {
-            CONTACT_INFO: 0,
-            PICKUP_ADDRESS: 1,
-            SHIPPING_ADDRESS: 2,
-            SHIPPING_OPTIONS: 3,
-            PAYMENT: 4,
-            REVIEW_ORDER: 5
-        },
-        goToStep: jest.fn(),
-        goToNextStep: mockGoToNextStep
-    })
+    useCheckout: () => mockCheckoutState
 }))
 
 const server = setupServer()
@@ -138,6 +141,8 @@ describe('PickupAddress', () => {
     beforeEach(() => {
         jest.clearAllMocks()
         mockGoToNextStep.mockClear()
+        // default to editing mode for pickup address
+        mockCheckoutState.step = mockCheckoutState.STEPS.PICKUP_ADDRESS
     })
 
     test('displays pickup address when available', async () => {
@@ -207,6 +212,156 @@ describe('PickupAddress', () => {
         expect(screen.getByText('Test Store 1')).toBeInTheDocument()
         expect(screen.getByText('123 Main Street')).toBeInTheDocument()
         expect(screen.getByText('San Francisco, CA 94105')).toBeInTheDocument()
+    })
+
+    test('renders product cards for products ready for pickup from one store', async () => {
+        const singleStoreBasket = {
+            ...scapiBasketWithItem,
+            shipments: [
+                {
+                    ...scapiBasketWithItem.shipments[0],
+                    shipmentId: 'shipment-1',
+                    shippingMethod: {c_storePickupEnabled: true},
+                    c_fromStoreId: 'store-1'
+                }
+            ],
+            productItems: [
+                {
+                    ...scapiBasketWithItem.productItems[0],
+                    itemId: 'item-1',
+                    shipmentId: 'shipment-1',
+                    productId: 'product-1',
+                    quantity: 1,
+                    productName: 'Pickup Product 1'
+                },
+                {
+                    ...scapiBasketWithItem.productItems[0],
+                    itemId: 'item-2',
+                    shipmentId: 'shipment-1',
+                    productId: 'product-2',
+                    quantity: 2,
+                    productName: 'Pickup Product 2'
+                }
+            ]
+        }
+
+        useCurrentBasket.mockReturnValue({
+            data: singleStoreBasket,
+            isLoading: false,
+            derivedData: {
+                hasBasket: true,
+                totalItems: singleStoreBasket.productItems.reduce(
+                    (acc, item) => acc + item.quantity,
+                    0
+                )
+            }
+        })
+
+        useSelectedStore.mockReturnValue({
+            selectedStore: null
+        })
+
+        global.server.use(
+            rest.get('*/stores', (req, res, ctx) => {
+                return res(
+                    ctx.json({
+                        data: [
+                            {
+                                id: 'store-1',
+                                name: 'Test Store 1',
+                                address1: '123 Main Street',
+                                city: 'San Francisco',
+                                stateCode: 'CA',
+                                postalCode: '94105',
+                                countryCode: 'US'
+                            }
+                        ]
+                    })
+                )
+            })
+        )
+
+        renderWithProviders(<PickupAddress />)
+
+        await waitFor(() => {
+            expect(screen.getByText('Pickup Address & Information')).toBeInTheDocument()
+        })
+
+        // Product cards show product names and quantities
+        expect(screen.getByText('Pickup Product 1')).toBeInTheDocument()
+        expect(screen.getByText('Pickup Product 2')).toBeInTheDocument()
+        expect(screen.getByText('Qty: 1')).toBeInTheDocument()
+        expect(screen.getByText('Qty: 2')).toBeInTheDocument()
+    })
+
+    test('shows "Show Products" edit label button when not editing', async () => {
+        // Switch out of editing mode to summary mode
+        mockCheckoutState.step = mockCheckoutState.STEPS.SHIPPING_ADDRESS
+
+        const singlePickupBasket = {
+            ...scapiBasketWithItem,
+            shipments: [
+                {
+                    ...scapiBasketWithItem.shipments[0],
+                    shipmentId: 'shipment-1',
+                    shippingMethod: {c_storePickupEnabled: true},
+                    c_fromStoreId: 'store-1'
+                }
+            ],
+            productItems: [
+                {
+                    ...scapiBasketWithItem.productItems[0],
+                    itemId: 'item-1',
+                    shipmentId: 'shipment-1',
+                    productId: 'product-1',
+                    quantity: 1,
+                    productName: 'Pickup Product 1'
+                }
+            ]
+        }
+
+        useCurrentBasket.mockReturnValue({
+            data: singlePickupBasket,
+            isLoading: false,
+            derivedData: {
+                hasBasket: true,
+                totalItems: singlePickupBasket.productItems.reduce(
+                    (acc, item) => acc + item.quantity,
+                    0
+                )
+            }
+        })
+
+        useSelectedStore.mockReturnValue({selectedStore: null})
+
+        global.server.use(
+            rest.get('*/stores', (req, res, ctx) => {
+                return res(
+                    ctx.json({
+                        data: [
+                            {
+                                id: 'store-1',
+                                name: 'Test Store 1',
+                                address1: '123 Main Street',
+                                city: 'San Francisco',
+                                stateCode: 'CA',
+                                postalCode: '94105',
+                                countryCode: 'US'
+                            }
+                        ]
+                    })
+                )
+            })
+        )
+
+        renderWithProviders(<PickupAddress />)
+
+        await waitFor(() => {
+            expect(screen.getByText('Pickup Address & Information')).toBeInTheDocument()
+        })
+
+        // ToggleCard's edit button label
+        expect(screen.getByRole('button', {name: 'Show Products'})).toBeInTheDocument()
     })
 
     test('continues to payment when button is clicked', async () => {
