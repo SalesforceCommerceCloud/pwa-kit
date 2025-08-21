@@ -490,10 +490,20 @@ export const RemoteServerFactory = {
      * @private
      */
     _setupBasePathMiddleware(app) {
-        // Cache the express route regexes to avoid re-calculating them
-        // on every request.
+        // Cache the express route regexes to avoid re-calculating them on every request.
         let expressRouteRegexes
 
+        /**
+         * Remove the base path from a path.
+         *
+         * If path is like '/basepath/something', this returns '/something'
+         * If path is exactly '/basepath', this returns '/'
+         * If path doesn't start with base path or if there is no base path defined,
+         * returns the unmodified path
+         *
+         * @param path {string} the path to remove the base path from
+         * @returns {string} the path with the base path removed
+         */
         const removeBasePathFromPath = (path) => {
             const basePath = getEnvBasePath()
             if (!basePath) {
@@ -501,18 +511,14 @@ export const RemoteServerFactory = {
             }
 
             if (path.startsWith(basePath + '/')) {
-                // If path is like '/basepath/something', return '/something'
                 return path.substring(basePath.length)
             } else if (path === basePath) {
-                // If path is exactly '/basepath', return '/'
                 return '/'
             }
-
-            // Else the path doesn't start with base path, so we don't need to remove it
             return path
         }
 
-        /*
+        /**
          * '?' have different meanings in express and path-to-regexp so we need
          * to convert the express route to something path-to-regexp can process
          *
@@ -529,6 +535,9 @@ export const RemoteServerFactory = {
          *
          * In other words, path-to-regexp allows /abc/de(f)? but
          * /abc/def? is considered invalid.
+         *
+         * This function convers express routes into something
+         * path-to-regexp can process
          */
         const convertExpressOptionalChars = (routePattern) => {
             if (!routePattern || typeof routePattern !== 'string') {
@@ -539,9 +548,10 @@ export const RemoteServerFactory = {
             let i = 0
             let inParameter = false
             let parenDepth = 0
+            let isEscaped = false
 
-            // Step through a route pattern
-            // If we encounter a :, we are in a parameter context (ie. /:abc)
+            // Step through each character in the route pattern
+            // If we encounter a :, we are in a parameter context (ie. /:abc?)
             // If we encounter a / we are starting a new path segment (ie. /../abc)
             // If we encounter a (, we are entering a group context (ie. /abc(def)?)
             // If we encounter a ), we are exiting a group context
@@ -550,39 +560,54 @@ export const RemoteServerFactory = {
             while (i < routePattern.length) {
                 const char = routePattern[i]
 
-                if (char === ':') {
+                if (isEscaped) {
+                    // This character is escaped, treat it as literal
+                    // We already added the backslash in the previous iteration
+                    result += char
+                    isEscaped = false
+                } else if (char === '\\') {
+                    // Next character will be escaped
+                    isEscaped = true
+                    result += char
+                } else if (char === ':') {
                     inParameter = true
                     result += char
                 } else if (char === '(') {
                     parenDepth++
                     result += char
                 } else if (char === ')') {
-                    parenDepth--
+                    // Only decrement parenDepth if we're actually in a group
+                    if (parenDepth > 0) {
+                        parenDepth--
+                    }
                     result += char
                 } else if (char === '/' || char === '\\') {
                     inParameter = false
                     result += char
-                } else if (char === '?' && !inParameter && parenDepth === 0) {
-                    // This ? is not in a parameter context and not in a group
-                    // Check if the previous character is a closing parenthesis
-                    const prevChar = result[result.length - 1]
-
-                    if (prevChar === ')') {
-                        // The ? follows a closing parenthesis, which means it's part of a group
-                        // Keep it as-is
-                        result += char
-                    } else if (prevChar && prevChar !== '\\') {
-                        // Wrap the previous character in parentheses
-                        result = result.slice(0, -1) + `(${prevChar})?`
-                    } else {
-                        // Literal ? or escaped ?, keep as is
-                        result += char
-                    }
-                } else if (char === '?' && (inParameter || parenDepth > 0)) {
-                    // This ? is part of a parameter or group, keep as is
-                    result += char
+                } else if (char === '?') {
+                    // Check if this ? follows a parameter
                     if (inParameter) {
+                        // This ? is part of a parameter, keep as is
+                        result += char
                         inParameter = false
+                    } else {
+                        // This ? is not part of a parameter
+                        // Check if the previous character is a closing parenthesis
+                        const prevChar = result[result.length - 1]
+
+                        if (prevChar === ')' && parenDepth === 0) {
+                            // The ? follows a closing parenthesis that actually closed a group
+                            // Keep it as-is
+                            result += char
+                        } else if (prevChar && prevChar !== '\\') {
+                            // Wrap the previous character in parentheses
+                            result = result.slice(0, -1) + `(${prevChar})?`
+                        } else {
+                            // Escaped ? or literal ? - throw an error
+                            throw new Error(
+                                `Invalid route pattern: literal or escaped '?' character not allowed in '${routePattern}'`
+                            )
+                        }
                     }
                 } else {
                     result += char
@@ -593,6 +618,15 @@ export const RemoteServerFactory = {
             return result
         }
 
+        /**
+         * Produces a regex that corresponds to the express route pattern provided.
+         *
+         * There are some differences in how express and path-to-regexp handle
+         * special characters in a route pattern such as * or ? so this function also
+         * handles the conversion of express route patterns to something path-to-regexp
+         * can process.
+         *
+         */
         const convertExpressRouteToRegex = (routePattern) => {
             if (!routePattern) return null
             if (routePattern instanceof RegExp) return routePattern
@@ -601,7 +635,6 @@ export const RemoteServerFactory = {
             try {
                 // First, convert Express wildcards to path-to-regexp syntax
                 // Express uses * for wildcards, path-to-regexp uses (.*)
-                // We need to do this before handling optional (?) characters
                 let processedPattern = routePattern.replace(/\*/g, '(.*)')
 
                 // Convert any ? in the express route to something path-to-regexp can process
@@ -612,19 +645,23 @@ export const RemoteServerFactory = {
                     throw new Error(`Invalid processed pattern: ${processedPattern}`)
                 }
 
-                // Use path-to-regexp to convert the route pattern to a regex
+                // By this point we should have an express route pattern that
+                // path-to-regexp can process into a regex.
                 return pathToRegexp(processedPattern)
             } catch (error) {
                 throw new Error(`Invalid route pattern: ${routePattern}`)
             }
         }
 
-        // Initializes a cache of regexes that correspond to the registered express routes
+        /**
+         * Initializes a cache of regexes that correspond to the registered express routes
+         *
+         * This specifically omits the generic wildcard from the express routes where we
+         * want to remove the base path from since it is mapped to the app render. This is
+         * because routes sent to the render are handled by React Router
+         */
         const initializeExpressRouteRegexes = () => {
             const expressRoutes = app._router.stack
-                // Specifically omit the generic wildcard from the express routes we want to
-                // remove the base path from since it is mapped to the app render. Routes
-                // within the render are handled by React Router
                 .filter((layer) => layer.route && layer.route.path && layer.route.path !== '*')
                 .map((layer) => layer.route.path)
 
@@ -634,59 +671,66 @@ export const RemoteServerFactory = {
         /**
          * Very early request processing.
          *
-         * If the server receives a request containing the base path, remove it before allowing it through
+         * If the server receives a request containing the base path, remove it before allowing
+         * the request through to the other express endpoints
+         *
+         * We scope base path removal to /mobify routes and routes defined by the express app
+         * (For example /callback or /worker.js)
+         * This is to avoid affecting React Router routes where a site id or locale might be present
+         * that is equal to the base path.
+         *
+         * For example, if you have a base path of /us and a site id of /us we don't want
+         * to remove the /us from www.example.com/us/en-US/category/... as this route is handled by
+         * React Router and the PWA multisite implementation.
          *
          * @param req {express.req} the incoming request - modified in-place
          * @private
          */
         const removeBasePathMiddleware = (req, res, next) => {
-            // Scope base path removal to /mobify routes and routes defined by the express app (ie. worker.js)
-            // This is to avoid affecting React Router routes where a site id or locale might be present that
-            // is equal to the base path.
-            // For example, if you have a base path of /us and a site id of /us we don't want
-            // to remove the /us from www.example.com/us/en-US/category/... as this route is handled by
-            // React Router and the PWA multisite implementation.
-
             const basePath = getEnvBasePath()
-            let shouldRemoveBasePath = false
 
-            // First we check if the path is for a /mobify resource. For these, we know that we have to
-            // remove the base path so we can move to the next step.
+            // Fast path: /mobify routes always get the base path removed
             if (req.path.startsWith(`${basePath}/mobify`)) {
-                shouldRemoveBasePath = true
-            } else {
-                // Next we check if the path matches any existing express routes (ie. /callback or /worker.js)
-                // If it does, we want to remove the base path.
-
-                // For this check, let's first remove the base path from the path
-                const pathWithoutBase = removeBasePathFromPath(req.path)
-
-                if (!expressRouteRegexes) {
-                    // We do this here since we want to ensure that any express route defined
-                    // after the app is created, such as routes defined in ssr.js, are included.
-                    initializeExpressRouteRegexes()
-                }
-
-                // Then lets check the path (without the base path) against the express routes
-                // If we find a match, we now know that the request is meant for an express route
-                // and we want to remove the base path.
-                shouldRemoveBasePath = expressRouteRegexes.some((routeRegex) => {
-                    try {
-                        return routeRegex.test(pathWithoutBase)
-                    } catch (error) {
-                        logger.warn(`Invalid route pattern: ${routeRegex}`, error)
-                        return false
-                    }
-                })
+                const cleanPath = removeBasePathFromPath(req.path)
+                const parsed = URL.parse(req.url)
+                parsed.pathname = cleanPath
+                req.url = URL.format(parsed)
+                return next()
             }
 
-            if (shouldRemoveBasePath) {
-                const updatedPath = removeBasePathFromPath(req.path)
+            // For other routes, only proceed if path actually starts with base path
+            if (!req.path.startsWith(basePath)) {
+                return next()
+            }
+
+            // Now we know path starts with base path, so we can remove it
+            const cleanPath = removeBasePathFromPath(req.path)
+
+            // Initialize express route regexes if needed
+            // We do this here since we want to ensure that any express route defined
+            // after the app is created, such as routes defined in ssr.js, are included.
+            if (!expressRouteRegexes) {
+                initializeExpressRouteRegexes()
+            }
+
+            // Next we check if the clean path matches any existing express routes
+            // (like /callback or /worker.js)
+            const matchesExpressRoute = expressRouteRegexes.some((routeRegex) => {
+                try {
+                    return routeRegex.test(cleanPath)
+                } catch (error) {
+                    logger.warn(`Invalid route pattern: ${routeRegex}`, error)
+                    return false
+                }
+            })
+
+            // Only update URL if our clean path matches an Express route
+            // This leaves React Router paths (like /en-US/category) unchanged
+            if (matchesExpressRoute) {
                 const parsed = URL.parse(req.url)
-                parsed.pathname = updatedPath
+                parsed.pathname = cleanPath
                 req.url = URL.format(parsed)
             }
-
             next()
         }
 

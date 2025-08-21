@@ -1340,17 +1340,19 @@ describe('Base path tests', () => {
 
         const app = RemoteServerFactory._createApp(opts())
 
-        // Add a route that doesn't match the request
-        app.get('/api/other', (req, res) => {
-            res.status(200).json({message: 'other'})
+        // Add a middleware to capture the request path after base path processing
+        let capturedPath = null
+        app.use((req, res, next) => {
+            capturedPath = req.path
+            next()
         })
 
-        return request(app)
-            .get('/basepath/api/unknown')
-            .then((response) => {
-                // Should get a 404 since the route doesn't exist
-                expect(response.status).toBe(404)
-            })
+        // Test that a request with base path gets a 404
+        const response = await request(app).get('/basepath/api/unknown').expect(404)
+
+        // Verify that the base path was not removed from the request path
+        expect(capturedPath).toBe('/basepath/api/unknown')
+        expect(response.status).toBe(404)
     }, 15000)
 
     test('should remove base path from routes with path parameters', async () => {
