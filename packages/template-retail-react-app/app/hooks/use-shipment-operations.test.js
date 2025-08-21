@@ -60,6 +60,10 @@ describe('useShipmentOperations', () => {
     describe('createShipment', () => {
         test('should create a shipment with address', async () => {
             const basketId = 'test-basket-id'
+            const basket = {
+                basketId,
+                shipments: [{shipmentId: 'existing-shipment'}]
+            }
             const address = {
                 firstName: 'John',
                 lastName: 'Doe',
@@ -75,7 +79,7 @@ describe('useShipmentOperations', () => {
 
             mockCreateShipmentMutation.mutateAsync.mockResolvedValue(mockResponse)
 
-            const {result} = renderHook(() => useShipmentOperations(basketId))
+            const {result} = renderHook(() => useShipmentOperations(basket))
 
             const response = await result.current.createShipment(address)
 
@@ -100,6 +104,10 @@ describe('useShipmentOperations', () => {
 
         test('should create a shipment with shipping method', async () => {
             const basketId = 'test-basket-id'
+            const basket = {
+                basketId,
+                shipments: [{shipmentId: 'existing-shipment'}]
+            }
             const address = null
             const options = {
                 shippingMethodId: 'shipping-method-1'
@@ -110,7 +118,7 @@ describe('useShipmentOperations', () => {
 
             mockCreateShipmentMutation.mutateAsync.mockResolvedValue(mockResponse)
 
-            const {result} = renderHook(() => useShipmentOperations(basketId))
+            const {result} = renderHook(() => useShipmentOperations(basket))
 
             const response = await result.current.createShipment(address, options)
 
@@ -129,6 +137,10 @@ describe('useShipmentOperations', () => {
 
         test('should create a pickup shipment with store ID', async () => {
             const basketId = 'test-basket-id'
+            const basket = {
+                basketId,
+                shipments: [{shipmentId: 'existing-shipment'}]
+            }
             const address = null
             const options = {
                 storeId: 'store-1'
@@ -139,7 +151,7 @@ describe('useShipmentOperations', () => {
 
             mockCreateShipmentMutation.mutateAsync.mockResolvedValue(mockResponse)
 
-            const {result} = renderHook(() => useShipmentOperations(basketId))
+            const {result} = renderHook(() => useShipmentOperations(basket))
 
             const response = await result.current.createShipment(address, options)
 
@@ -155,22 +167,28 @@ describe('useShipmentOperations', () => {
         })
 
         test('should throw error if basketId is missing', async () => {
-            const basketId = null
+            const basket = null
             const address = {firstName: 'John'}
 
-            const {result} = renderHook(() => useShipmentOperations(basketId))
+            const {result} = renderHook(() => useShipmentOperations(basket))
 
-            await expect(result.current.createShipment(address)).rejects.toThrow('Missing basketId')
+            await expect(result.current.createShipment(address)).rejects.toThrow(
+                'Missing basket or basketId'
+            )
         })
 
         test('should throw error when API call fails', async () => {
             const basketId = 'test-basket-id'
+            const basket = {
+                basketId,
+                shipments: [{shipmentId: 'existing-shipment'}]
+            }
             const address = {firstName: 'John'}
             const mockError = new Error('API Error')
 
             mockCreateShipmentMutation.mutateAsync.mockRejectedValue(mockError)
 
-            const {result} = renderHook(() => useShipmentOperations(basketId))
+            const {result} = renderHook(() => useShipmentOperations(basket))
 
             await expect(result.current.createShipment(address)).rejects.toThrow('API Error')
         })
@@ -179,11 +197,15 @@ describe('useShipmentOperations', () => {
     describe('removeShipment', () => {
         test('should remove a shipment', async () => {
             const basketId = 'test-basket-id'
+            const basket = {
+                basketId,
+                shipments: [{shipmentId: 'shipment-1'}]
+            }
             const shipmentId = 'shipment-1'
 
             mockRemoveShipmentMutation.mutateAsync.mockResolvedValue({})
 
-            const {result} = renderHook(() => useShipmentOperations(basketId))
+            const {result} = renderHook(() => useShipmentOperations(basket))
 
             await result.current.removeShipment(shipmentId)
 
@@ -196,24 +218,28 @@ describe('useShipmentOperations', () => {
         })
 
         test('should throw error if parameters are missing', async () => {
-            const basketId = null
+            const basket = null
             const shipmentId = null
 
-            const {result} = renderHook(() => useShipmentOperations(basketId))
+            const {result} = renderHook(() => useShipmentOperations(basket))
 
             await expect(result.current.removeShipment(shipmentId)).rejects.toThrow(
-                'Missing basketId or shipmentId'
+                'Missing basket or shipmentId'
             )
         })
 
         test('should throw error when API call fails', async () => {
             const basketId = 'test-basket-id'
+            const basket = {
+                basketId,
+                shipments: [{shipmentId: 'shipment-1'}]
+            }
             const shipmentId = 'shipment-1'
             const mockError = new Error('API Error')
 
             mockRemoveShipmentMutation.mutateAsync.mockRejectedValue(mockError)
 
-            const {result} = renderHook(() => useShipmentOperations(basketId))
+            const {result} = renderHook(() => useShipmentOperations(basket))
 
             await expect(result.current.removeShipment(shipmentId)).rejects.toThrow('API Error')
         })
@@ -222,6 +248,10 @@ describe('useShipmentOperations', () => {
     describe('updateShipmentAddress', () => {
         test('should update shipment address', async () => {
             const basketId = 'test-basket-id'
+            const basket = {
+                basketId,
+                shipments: [{shipmentId: 'shipment-1'}]
+            }
             const shipmentId = 'shipment-1'
             const address = {
                 firstName: 'John',
@@ -236,7 +266,7 @@ describe('useShipmentOperations', () => {
 
             mockUpdateShipmentMutation.mutateAsync.mockResolvedValue(mockResponse)
 
-            const {result} = renderHook(() => useShipmentOperations(basketId))
+            const {result} = renderHook(() => useShipmentOperations(basket))
 
             const response = await result.current.updateShipmentAddress(shipmentId, address)
 
@@ -261,26 +291,30 @@ describe('useShipmentOperations', () => {
         })
 
         test('should throw error if parameters are missing', async () => {
-            const basketId = null
+            const basket = null
             const shipmentId = null
             const address = null
 
-            const {result} = renderHook(() => useShipmentOperations(basketId))
+            const {result} = renderHook(() => useShipmentOperations(basket))
 
             await expect(result.current.updateShipmentAddress(shipmentId, address)).rejects.toThrow(
-                'Missing basketId, shipmentId, or address'
+                'Missing basket, shipmentId, or address'
             )
         })
 
         test('should throw error when API call fails', async () => {
             const basketId = 'test-basket-id'
+            const basket = {
+                basketId,
+                shipments: [{shipmentId: 'shipment-1'}]
+            }
             const shipmentId = 'shipment-1'
             const address = {firstName: 'John'}
             const mockError = new Error('API Error')
 
             mockUpdateShipmentMutation.mutateAsync.mockRejectedValue(mockError)
 
-            const {result} = renderHook(() => useShipmentOperations(basketId))
+            const {result} = renderHook(() => useShipmentOperations(basket))
 
             await expect(result.current.updateShipmentAddress(shipmentId, address)).rejects.toThrow(
                 'API Error'
@@ -291,13 +325,17 @@ describe('useShipmentOperations', () => {
     describe('updateShippingMethod', () => {
         test('should update shipping method', async () => {
             const basketId = 'test-basket-id'
+            const basket = {
+                basketId,
+                shipments: [{shipmentId: 'shipment-1'}]
+            }
             const shipmentId = 'shipment-1'
             const shippingMethodId = 'shipping-method-1'
             const mockResponse = {updated: true}
 
             mockUpdateShippingMethodMutation.mutateAsync.mockResolvedValue(mockResponse)
 
-            const {result} = renderHook(() => useShipmentOperations(basketId))
+            const {result} = renderHook(() => useShipmentOperations(basket))
 
             const response = await result.current.updateShippingMethod(shipmentId, shippingMethodId)
 
@@ -314,26 +352,30 @@ describe('useShipmentOperations', () => {
         })
 
         test('should throw error if parameters are missing', async () => {
-            const basketId = null
+            const basket = null
             const shipmentId = null
             const shippingMethodId = null
 
-            const {result} = renderHook(() => useShipmentOperations(basketId))
+            const {result} = renderHook(() => useShipmentOperations(basket))
 
             await expect(
                 result.current.updateShippingMethod(shipmentId, shippingMethodId)
-            ).rejects.toThrow('Missing basketId, shipmentId, or shippingMethodId')
+            ).rejects.toThrow('Missing basket, shipmentId, or shippingMethodId')
         })
 
         test('should throw error when API call fails', async () => {
             const basketId = 'test-basket-id'
+            const basket = {
+                basketId,
+                shipments: [{shipmentId: 'shipment-1'}]
+            }
             const shipmentId = 'shipment-1'
             const shippingMethodId = 'shipping-method-1'
             const mockError = new Error('API Error')
 
             mockUpdateShippingMethodMutation.mutateAsync.mockRejectedValue(mockError)
 
-            const {result} = renderHook(() => useShipmentOperations(basketId))
+            const {result} = renderHook(() => useShipmentOperations(basket))
 
             await expect(
                 result.current.updateShippingMethod(shipmentId, shippingMethodId)

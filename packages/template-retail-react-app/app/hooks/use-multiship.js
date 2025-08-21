@@ -42,7 +42,7 @@ export const useMultiship = (basket) => {
         removeShipment: removeShipmentOperation,
         updateShipmentAddress,
         updateShippingMethod
-    } = useShipmentOperations(basket?.basketId)
+    } = useShipmentOperations(basket)
 
     const itemShipmentManagement = useItemShipmentManagement(basket?.basketId)
 

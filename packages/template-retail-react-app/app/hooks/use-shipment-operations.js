@@ -12,10 +12,10 @@ import {cleanAddressForOrder} from '@salesforce/retail-react-app/app/utils/shipm
 /**
  * Hook for basic shipment CRUD operations
  * Focused only on shipment management (API calls)
- * @param {string} basketId - The basket ID
+ * @param {Object} basket - The basket object
  * @returns {Object} Object containing shipment operation functions
  */
-export const useShipmentOperations = (basketId) => {
+export const useShipmentOperations = (basket) => {
     const createShipmentMutation = useShopperBasketsMutation('createShipmentForBasket')
     const removeShipmentMutation = useShopperBasketsMutation('removeShipmentFromBasket')
     const updateShipmentMutation = useShopperBasketsMutation('updateShipmentForBasket')
@@ -33,8 +33,8 @@ export const useShipmentOperations = (basketId) => {
      */
     const createShipment = useCallback(
         async (address, options = {}) => {
-            if (!basketId) {
-                throw new Error('Missing basketId')
+            if (!basket?.basketId) {
+                throw new Error('Missing basket or basketId')
             }
 
             const body = {}
@@ -55,19 +55,35 @@ export const useShipmentOperations = (basketId) => {
 
             const response = await createShipmentMutation.mutateAsync({
                 parameters: {
-                    basketId
+                    basketId: basket.basketId
                 },
                 body
             })
 
-            // Find the newly created shipment
-            const newShipment = response?.shipments?.find(
-                (shipment) => !response.shipments.slice(0, -1).includes(shipment)
+            // Find the newly created shipment by comparing with original basket
+            if (!basket?.shipments || !response?.shipments) {
+                throw new Error(
+                    'Unable to identify new shipment: missing basket or response shipments'
+                )
+            }
+
+            // Get existing shipment IDs from the original basket
+            const existingShipmentIds = new Set(basket.shipments.map((s) => s.shipmentId))
+
+            // Find the shipment that doesn't exist in the original basket
+            const newShipment = response.shipments.find(
+                (shipment) => !existingShipmentIds.has(shipment.shipmentId)
             )
+
+            if (!newShipment) {
+                throw new Error(
+                    'Unable to identify new shipment: no new shipment found in response'
+                )
+            }
 
             return newShipment
         },
-        [basketId, createShipmentMutation]
+        [basket, createShipmentMutation]
     )
 
     /**
@@ -77,18 +93,18 @@ export const useShipmentOperations = (basketId) => {
      */
     const removeShipment = useCallback(
         async (shipmentId) => {
-            if (!basketId || !shipmentId) {
-                throw new Error('Missing basketId or shipmentId')
+            if (!basket?.basketId || !shipmentId) {
+                throw new Error('Missing basket or shipmentId')
             }
 
             await removeShipmentMutation.mutateAsync({
                 parameters: {
-                    basketId,
+                    basketId: basket.basketId,
                     shipmentId
                 }
             })
         },
-        [basketId, removeShipmentMutation]
+        [basket, removeShipmentMutation]
     )
 
     /**
@@ -99,15 +115,15 @@ export const useShipmentOperations = (basketId) => {
      */
     const updateShipmentAddress = useCallback(
         async (shipmentId, address) => {
-            if (!basketId || !shipmentId || !address) {
-                throw new Error('Missing basketId, shipmentId, or address')
+            if (!basket?.basketId || !shipmentId || !address) {
+                throw new Error('Missing basket, shipmentId, or address')
             }
 
             const shippingAddress = cleanAddressForOrder(address)
 
             return await updateShipmentMutation.mutateAsync({
                 parameters: {
-                    basketId,
+                    basketId: basket.basketId,
                     shipmentId
                 },
                 body: {
@@ -115,7 +131,7 @@ export const useShipmentOperations = (basketId) => {
                 }
             })
         },
-        [basketId, updateShipmentMutation]
+        [basket, updateShipmentMutation]
     )
 
     /**
@@ -126,13 +142,13 @@ export const useShipmentOperations = (basketId) => {
      */
     const updateShippingMethod = useCallback(
         async (shipmentId, shippingMethodId) => {
-            if (!basketId || !shipmentId || !shippingMethodId) {
-                throw new Error('Missing basketId, shipmentId, or shippingMethodId')
+            if (!basket?.basketId || !shipmentId || !shippingMethodId) {
+                throw new Error('Missing basket, shipmentId, or shippingMethodId')
             }
 
             return await updateShippingMethodMutation.mutateAsync({
                 parameters: {
-                    basketId,
+                    basketId: basket.basketId,
                     shipmentId
                 },
                 body: {
@@ -140,7 +156,7 @@ export const useShipmentOperations = (basketId) => {
                 }
             })
         },
-        [basketId, updateShippingMethodMutation]
+        [basket, updateShippingMethodMutation]
     )
 
     return {
