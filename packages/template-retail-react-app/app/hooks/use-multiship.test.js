@@ -8,6 +8,7 @@
 import {renderHook, act} from '@testing-library/react'
 import {useMultiship} from '@salesforce/retail-react-app/app/hooks/use-multiship'
 import {useItemShipmentManagement} from '@salesforce/retail-react-app/app/hooks/use-item-shipment-management'
+import logger from '@salesforce/retail-react-app/app/utils/logger-instance'
 
 // Mock dependencies
 jest.mock('@salesforce/commerce-sdk-react', () => ({
@@ -23,6 +24,13 @@ jest.mock('@salesforce/retail-react-app/app/hooks/use-toast', () => ({
     useToast: jest.fn(() => ({
         showToast: jest.fn()
     }))
+}))
+
+jest.mock('@salesforce/retail-react-app/app/utils/logger-instance', () => ({
+    __esModule: true,
+    default: {
+        error: jest.fn()
+    }
 }))
 
 import {
@@ -947,18 +955,16 @@ describe('useMultiship', () => {
             }
             const {result} = renderHook(() => useMultiship(basketWithShipmentWithoutMethod))
 
-            const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {})
             mockRefetchShippingMethods.mockRejectedValue(new Error('Network error'))
 
             await act(async () => {
                 await result.current.assignDefaultShippingMethodsToShipments()
             })
 
-            expect(consoleErrorSpy).toHaveBeenCalledWith(
-                'Failed to fetch shipping methods:',
-                expect.any(Error)
-            )
-            consoleErrorSpy.mockRestore()
+            expect(logger.error).toHaveBeenCalledWith('Failed to fetch shipping methods', {
+                error: 'Network error',
+                basketId: 'test-basket-id'
+            })
         })
     })
 

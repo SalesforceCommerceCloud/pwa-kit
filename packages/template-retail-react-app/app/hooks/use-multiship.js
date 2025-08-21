@@ -10,6 +10,7 @@ import {usePickupShipment} from '@salesforce/retail-react-app/app/hooks/use-pick
 import {useShipmentOperations} from '@salesforce/retail-react-app/app/hooks/use-shipment-operations'
 import {useItemShipmentManagement} from '@salesforce/retail-react-app/app/hooks/use-item-shipment-management'
 import {DEFAULT_SHIPMENT_ID} from '@salesforce/retail-react-app/app/constants'
+import logger from '@salesforce/retail-react-app/app/utils/logger-instance'
 
 import {
     getItemsForShipment,
@@ -66,6 +67,10 @@ export const useMultiship = (basket) => {
      * Assigns default shipping methods to shipments that don't have one
      * Note: Currently uses the same shipping methods as the main shipment ('me') for all shipments
      * This is a limitation due to React hooks constraints - ideally each shipment would get its own shipping methods
+     *
+     * IMPORTANT: This function never throws. Errors are considered non-fatal and do not block checkout.
+     * Failed shipping method assignments are logged but do not prevent the checkout process from continuing.
+     *
      * @returns {Promise<void>} Promise that resolves when all updates are complete
      */
     const assignDefaultShippingMethodsToShipments = async () => {
@@ -93,16 +98,23 @@ export const useMultiship = (basket) => {
                 try {
                     await updateShippingMethod(shipment.shipmentId, defaultShippingMethodId)
                 } catch (error) {
-                    console.error(
-                        `Failed to assign shipping method to shipment ${shipment.shipmentId}:`,
-                        error
+                    logger.error(
+                        `Failed to assign shipping method to shipment ${shipment.shipmentId}`,
+                        {
+                            error: error.message,
+                            shipmentId: shipment.shipmentId,
+                            defaultShippingMethodId
+                        }
                     )
                 }
             })
 
             await Promise.all(updatePromises)
         } catch (error) {
-            console.error('Failed to fetch shipping methods:', error)
+            logger.error('Failed to fetch shipping methods', {
+                error: error.message,
+                basketId: basket?.basketId
+            })
         }
     }
 
