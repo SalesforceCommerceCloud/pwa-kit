@@ -94,7 +94,7 @@ const CheckoutOneClick = () => {
 
     // Callback for when payment methods are saved
     const handlePaymentMethodSaved = (paymentId) => {
-        setSavedPaymentMethods(prev => new Set([...prev, paymentId]))
+        setSavedPaymentMethods((prev) => new Set([...prev, paymentId]))
     }
 
     const handleSavePreferenceChange = (shouldSave) => {
@@ -212,7 +212,10 @@ const CheckoutOneClick = () => {
         }
 
         // Save payment instrument for existing registered users if they checked the save box
-        const savePaymentInstrumentForRegisteredUser = async (customerId, orderPaymentInstrument) => {
+        const savePaymentInstrumentForRegisteredUser = async (
+            customerId,
+            orderPaymentInstrument
+        ) => {
             try {
                 if (orderPaymentInstrument && shopperPaymentInstrument) {
                     // Use the same structure as the guest flow
@@ -229,11 +232,14 @@ const CheckoutOneClick = () => {
 
                     await createCustomerPaymentInstruments.mutateAsync({
                         body: paymentInstrument,
-                        parameters: { customerId: customerId }
+                        parameters: {customerId: customerId}
                     })
                 }
             } catch (error) {
-                console.error('🔍 Debug - Failed to save payment instrument for registered user:', error)
+                console.error(
+                    '🔍 Debug - Failed to save payment instrument for registered user:',
+                    error
+                )
                 // Fail silently
             }
         }
@@ -316,7 +322,10 @@ const CheckoutOneClick = () => {
                 // For existing registered users, save payment instrument if they checked the save box
                 if (shouldSavePaymentMethod && order.paymentInstruments?.[0]) {
                     const paymentInstrument = order.paymentInstruments[0]
-                    await savePaymentInstrumentForRegisteredUser(order.customerInfo.customerId, paymentInstrument)
+                    await savePaymentInstrumentForRegisteredUser(
+                        order.customerInfo.customerId,
+                        paymentInstrument
+                    )
                 }
             }
 
@@ -442,4 +451,3 @@ const CheckoutOneClick = () => {
 }
 
 export default CheckoutOneClick
-

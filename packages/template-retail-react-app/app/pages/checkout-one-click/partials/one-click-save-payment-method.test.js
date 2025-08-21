@@ -8,7 +8,7 @@ import React from 'react'
 import {screen, waitFor} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
-import SavePaymentMethod from './one-click-save-payment-method'
+import SavePaymentMethod from '@salesforce/retail-react-app/../../app/pages/checkout-one-click/partials/one-click-save-payment-method'
 
 // Mock the useCurrentCustomer hook
 const mockUseCurrentCustomer = jest.fn()
@@ -52,7 +52,7 @@ describe('SavePaymentMethod', () => {
 
     test('renders save checkbox for registered user', () => {
         renderWithProviders(<SavePaymentMethod paymentInstrument={mockPaymentInstrument} />)
-        
+
         expect(screen.getByText(/save this card/i)).toBeInTheDocument()
         expect(screen.getByRole('checkbox')).toBeInTheDocument()
     })
@@ -62,28 +62,27 @@ describe('SavePaymentMethod', () => {
             data: null
         })
 
-        const {container} = renderWithProviders(<SavePaymentMethod paymentInstrument={mockPaymentInstrument} />)
-        
+        const {container} = renderWithProviders(
+            <SavePaymentMethod paymentInstrument={mockPaymentInstrument} />
+        )
+
         expect(container.firstChild).toBeNull()
     })
 
     test('calls API when checkbox is checked', async () => {
         const user = userEvent.setup()
         const mockOnSaved = jest.fn()
-        
+
         renderWithProviders(
-            <SavePaymentMethod 
-                paymentInstrument={mockPaymentInstrument} 
-                onSaved={mockOnSaved}
-            />
+            <SavePaymentMethod paymentInstrument={mockPaymentInstrument} onSaved={mockOnSaved} />
         )
-        
+
         const checkbox = screen.getByRole('checkbox')
         await user.click(checkbox)
-        
+
         await waitFor(() => {
             expect(mockCreateCustomerPaymentInstrument).toHaveBeenCalledWith({
-                parameters: { customerId: 'test-customer-id' },
+                parameters: {customerId: 'test-customer-id'},
                 body: {
                     paymentMethodId: 'CREDIT_CARD',
                     paymentCard: mockPaymentInstrument.paymentCard
@@ -95,17 +94,14 @@ describe('SavePaymentMethod', () => {
     test('calls onSaved callback when payment is saved successfully', async () => {
         const user = userEvent.setup()
         const mockOnSaved = jest.fn()
-        
+
         renderWithProviders(
-            <SavePaymentMethod 
-                paymentInstrument={mockPaymentInstrument} 
-                onSaved={mockOnSaved}
-            />
+            <SavePaymentMethod paymentInstrument={mockPaymentInstrument} onSaved={mockOnSaved} />
         )
-        
+
         const checkbox = screen.getByRole('checkbox')
         await user.click(checkbox)
-        
+
         await waitFor(() => {
             expect(mockOnSaved).toHaveBeenCalledWith('pi-1')
         })
@@ -115,12 +111,12 @@ describe('SavePaymentMethod', () => {
         const user = userEvent.setup()
         const mockError = new Error('API Error')
         mockCreateCustomerPaymentInstrument.mockRejectedValue(mockError)
-        
+
         renderWithProviders(<SavePaymentMethod paymentInstrument={mockPaymentInstrument} />)
-        
+
         const checkbox = screen.getByRole('checkbox')
         await user.click(checkbox)
-        
+
         await waitFor(() => {
             // Checkbox should be unchecked after error
             expect(checkbox).not.toBeChecked()
@@ -130,13 +126,15 @@ describe('SavePaymentMethod', () => {
     test('checkbox is disabled while saving', async () => {
         const user = userEvent.setup()
         // Mock a slow API call
-        mockCreateCustomerPaymentInstrument.mockImplementation(() => new Promise(resolve => setTimeout(resolve, 100)))
-        
+        mockCreateCustomerPaymentInstrument.mockImplementation(
+            () => new Promise((resolve) => setTimeout(resolve, 100))
+        )
+
         renderWithProviders(<SavePaymentMethod paymentInstrument={mockPaymentInstrument} />)
-        
+
         const checkbox = screen.getByRole('checkbox')
         await user.click(checkbox)
-        
+
         // Checkbox should be disabled while saving
         expect(checkbox).toBeDisabled()
     })

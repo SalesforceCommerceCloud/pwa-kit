@@ -742,7 +742,7 @@
   "checkout.payment.save_payment_method": [
     {
       "type": 0,
-      "value": "Save this payment method"
+      "value": "Save this payment method for future use"
     }
   ],
   "checkout.title.user_registration": [

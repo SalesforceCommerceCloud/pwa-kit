@@ -4,17 +4,15 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React, { useState } from 'react'
+import React, {useState} from 'react'
 import PropTypes from 'prop-types'
-import { Checkbox, Text } from '@salesforce/retail-react-app/app/components/shared/ui'
-import { useCurrentCustomer } from '@salesforce/retail-react-app/app/hooks/use-current-customer'
-import { FormattedMessage } from 'react-intl'
+import {Checkbox, Text} from '@salesforce/retail-react-app/app/components/shared/ui'
+import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
+import {FormattedMessage} from 'react-intl'
 
-export default function SavePaymentMethod({ paymentInstrument, onSaved }) {
+export default function SavePaymentMethod({paymentInstrument, onSaved}) {
     const [shouldSave, setShouldSave] = useState(false)
-    const { data: customer } = useCurrentCustomer()
-
-
+    const {data: customer} = useCurrentCustomer()
 
     // Just track the user's preference, don't call API yet
     const handleCheckboxChange = (e) => {
@@ -29,14 +27,10 @@ export default function SavePaymentMethod({ paymentInstrument, onSaved }) {
     }
 
     return (
-        <Checkbox
-            isChecked={shouldSave}
-            onChange={handleCheckboxChange}
-            size="md"
-        >
+        <Checkbox isChecked={shouldSave} onChange={handleCheckboxChange} size="md">
             <Text fontSize="sm" color="gray.700">
                 <FormattedMessage
-                    defaultMessage="Save this payment method"
+                    defaultMessage="Save this payment method for future use"
                     id="checkout.payment.save_payment_method"
                 />
             </Text>
