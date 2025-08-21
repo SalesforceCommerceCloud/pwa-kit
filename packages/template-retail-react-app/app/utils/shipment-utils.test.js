@@ -17,7 +17,8 @@ import {
     findDeliveryShipmentWithSameAddress,
     findDeliveryShipmentWithoutAddress,
     findShipmentToConsolidate,
-    isDefaultShipmentEmpty
+    isDefaultShipmentEmpty,
+    isPickupMethod
 } from '@salesforce/retail-react-app/app/utils/shipment-utils'
 
 // Mock the address-utils module
@@ -32,7 +33,6 @@ jest.mock('@salesforce/retail-react-app/app/constants', () => ({
 
 describe('shipment-utils', () => {
     let mockBasket
-    let mockIsPickupMethod
 
     beforeEach(() => {
         mockBasket = {
@@ -40,7 +40,7 @@ describe('shipment-utils', () => {
             shipments: [
                 {
                     shipmentId: 'me',
-                    shippingMethod: {id: 'delivery-method'},
+                    shippingMethod: {id: 'delivery-method', c_storePickupEnabled: false},
                     shippingAddress: {
                         address1: '123 Main St',
                         city: 'Test City',
@@ -51,12 +51,12 @@ describe('shipment-utils', () => {
                 },
                 {
                     shipmentId: 'shipment-2',
-                    shippingMethod: {id: 'pickup-method'},
+                    shippingMethod: {id: 'pickup-method', c_storePickupEnabled: true},
                     c_fromStoreId: 'store-1'
                 },
                 {
                     shipmentId: 'shipment-3',
-                    shippingMethod: {id: 'delivery-method-2'},
+                    shippingMethod: {id: 'delivery-method-2', c_storePickupEnabled: false},
                     shippingAddress: null
                 }
             ],
@@ -67,10 +67,6 @@ describe('shipment-utils', () => {
                 {productId: 'prod-4', shipmentId: 'shipment-3'}
             ]
         }
-
-        mockIsPickupMethod = jest.fn((shippingMethod) => {
-            return shippingMethod?.id === 'pickup-method'
-        })
 
         // Mock isAddressEmpty to return false by default
         const {isAddressEmpty} = jest.requireMock(
@@ -142,7 +138,7 @@ describe('shipment-utils', () => {
 
     describe('findExistingDeliveryShipment', () => {
         test('should find delivery shipment', () => {
-            const shipment = findExistingDeliveryShipment(mockBasket, mockIsPickupMethod)
+            const shipment = findExistingDeliveryShipment(mockBasket)
             expect(shipment.shipmentId).toBe('me')
         })
 
@@ -151,39 +147,31 @@ describe('shipment-utils', () => {
                 ...mockBasket,
                 shipments: mockBasket.shipments.filter((s) => s.shipmentId === 'shipment-2')
             }
-            const shipment = findExistingDeliveryShipment(pickupOnlyBasket, mockIsPickupMethod)
+            const shipment = findExistingDeliveryShipment(pickupOnlyBasket)
             expect(shipment).toBeNull()
         })
     })
 
     describe('findExistingPickupShipment', () => {
         test('should find pickup shipment for specific store', () => {
-            const shipment = findExistingPickupShipment(mockBasket, 'store-1', mockIsPickupMethod)
+            const shipment = findExistingPickupShipment(mockBasket, 'store-1')
             expect(shipment.shipmentId).toBe('shipment-2')
         })
 
         test('should return null if no pickup shipment found for store', () => {
-            const shipment = findExistingPickupShipment(
-                mockBasket,
-                'non-existent-store',
-                mockIsPickupMethod
-            )
+            const shipment = findExistingPickupShipment(mockBasket, 'non-existent-store')
             expect(shipment).toBeNull()
         })
     })
 
     describe('findUnusedDeliveryShipment', () => {
         test('should find unused delivery shipment', () => {
-            const shipment = findUnusedDeliveryShipment(mockBasket, ['me'], mockIsPickupMethod)
+            const shipment = findUnusedDeliveryShipment(mockBasket, ['me'])
             expect(shipment.shipmentId).toBe('shipment-3')
         })
 
         test('should return null if all delivery shipments are used', () => {
-            const shipment = findUnusedDeliveryShipment(
-                mockBasket,
-                ['me', 'shipment-3'],
-                mockIsPickupMethod
-            )
+            const shipment = findUnusedDeliveryShipment(mockBasket, ['me', 'shipment-3'])
             expect(shipment).toBeNull()
         })
     })
@@ -286,11 +274,7 @@ describe('shipment-utils', () => {
                 countryCode: 'US'
             }
 
-            const shipment = findDeliveryShipmentWithSameAddress(
-                mockBasket,
-                address,
-                mockIsPickupMethod
-            )
+            const shipment = findDeliveryShipmentWithSameAddress(mockBasket, address)
             expect(shipment.shipmentId).toBe('me')
         })
 
@@ -303,18 +287,14 @@ describe('shipment-utils', () => {
                 countryCode: 'US'
             }
 
-            const shipment = findDeliveryShipmentWithSameAddress(
-                mockBasket,
-                address,
-                mockIsPickupMethod
-            )
+            const shipment = findDeliveryShipmentWithSameAddress(mockBasket, address)
             expect(shipment).toBeNull()
         })
     })
 
     describe('findDeliveryShipmentWithoutAddress', () => {
         test('should find shipment without address', () => {
-            const shipment = findDeliveryShipmentWithoutAddress(mockBasket, mockIsPickupMethod)
+            const shipment = findDeliveryShipmentWithoutAddress(mockBasket)
             expect(shipment.shipmentId).toBe('shipment-3')
         })
 
@@ -327,10 +307,7 @@ describe('shipment-utils', () => {
                 }))
             }
 
-            const shipment = findDeliveryShipmentWithoutAddress(
-                basketWithAddresses,
-                mockIsPickupMethod
-            )
+            const shipment = findDeliveryShipmentWithoutAddress(basketWithAddresses)
             expect(shipment).toBeNull()
         })
     })
@@ -374,6 +351,28 @@ describe('shipment-utils', () => {
             }
 
             expect(isDefaultShipmentEmpty(basketWithoutDefault)).toBe(true)
+        })
+    })
+
+    describe('isPickupMethod', () => {
+        test('should return true for pickup shipping method', () => {
+            const pickupMethod = {c_storePickupEnabled: true}
+            expect(isPickupMethod(pickupMethod)).toBe(true)
+        })
+
+        test('should return false for delivery shipping method', () => {
+            const deliveryMethod = {c_storePickupEnabled: false}
+            expect(isPickupMethod(deliveryMethod)).toBe(false)
+        })
+
+        test('should return false for shipping method without pickup property', () => {
+            const normalMethod = {id: 'standard-shipping'}
+            expect(isPickupMethod(normalMethod)).toBe(false)
+        })
+
+        test('should return false for null/undefined shipping method', () => {
+            expect(isPickupMethod(null)).toBe(false)
+            expect(isPickupMethod(undefined)).toBe(false)
         })
     })
 })

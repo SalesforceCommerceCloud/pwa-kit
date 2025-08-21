@@ -14,6 +14,15 @@ import {DEFAULT_SHIPMENT_ID} from '@salesforce/retail-react-app/app/constants'
  */
 
 /**
+ * Checks if a shipping method is a pickup method
+ * @param {Object} shippingMethod - The shipping method object
+ * @returns {boolean} True if the shipping method is a pickup method
+ */
+export const isPickupMethod = (shippingMethod) => {
+    return shippingMethod?.c_storePickupEnabled === true
+}
+
+/**
  * Gets items that belong to a specific shipment
  * @param {Object} basket - The basket object
  * @param {string} shipmentId - The shipment ID
@@ -72,10 +81,9 @@ export const groupItemsByAddress = (items, getAddressForItem) => {
 /**
  * Finds the first existing delivery shipment (not pickup)
  * @param {Object} basket - The basket object
- * @param {Function} isPickupMethod - Function to check if a shipping method is pickup
  * @returns {Object|null} The delivery shipment object or null if not found
  */
-export const findExistingDeliveryShipment = (basket, isPickupMethod) => {
+export const findExistingDeliveryShipment = (basket) => {
     if (!basket?.shipments) return null
 
     return basket.shipments.find((shipment) => !isPickupMethod(shipment.shippingMethod)) || null
@@ -85,10 +93,9 @@ export const findExistingDeliveryShipment = (basket, isPickupMethod) => {
  * Finds the first existing pickup shipment for a specific store
  * @param {Object} basket - The basket object
  * @param {string} storeId - The store ID to search for
- * @param {Function} isPickupMethod - Function to check if a shipping method is pickup
  * @returns {Object|null} The pickup shipment object or null if not found
  */
-export const findExistingPickupShipment = (basket, storeId, isPickupMethod) => {
+export const findExistingPickupShipment = (basket, storeId) => {
     if (!basket?.shipments || !storeId) return null
 
     return (
@@ -103,10 +110,9 @@ export const findExistingPickupShipment = (basket, storeId, isPickupMethod) => {
  * Finds the first delivery shipment that is not in the provided list of shipment IDs
  * @param {Object} basket - The basket object
  * @param {Array} usedShipmentIds - Array of shipment IDs to exclude from search
- * @param {Function} isPickupMethod - Function to check if a shipping method is pickup
  * @returns {Object|null} The unused delivery shipment object or null if not found
  */
-export const findUnusedDeliveryShipment = (basket, usedShipmentIds = [], isPickupMethod) => {
+export const findUnusedDeliveryShipment = (basket, usedShipmentIds = []) => {
     if (!basket?.shipments) return null
 
     return (
@@ -163,10 +169,9 @@ export const cleanAddressForOrder = (address) => {
  * Finds the first existing delivery shipment with matching address
  * @param {Object} basket - The basket object
  * @param {Object} address - The address to match
- * @param {Function} isPickupMethod - Function to check if a shipping method is pickup
  * @returns {Object|null} The shipment object with matching address or null if not found
  */
-export const findDeliveryShipmentWithSameAddress = (basket, address, isPickupMethod) => {
+export const findDeliveryShipmentWithSameAddress = (basket, address) => {
     if (!basket?.shipments || !address) return null
 
     const foundShipment = basket.shipments.find((shipment) => {
@@ -184,10 +189,9 @@ export const findDeliveryShipmentWithSameAddress = (basket, address, isPickupMet
 /**
  * Finds the first existing delivery shipment that has no address or an empty address
  * @param {Object} basket - The basket object
- * @param {Function} isPickupMethod - Function to check if a shipping method is pickup
  * @returns {Object|null} The shipment object without address or null if not found
  */
-export const findDeliveryShipmentWithoutAddress = (basket, isPickupMethod) => {
+export const findDeliveryShipmentWithoutAddress = (basket) => {
     if (!basket?.shipments) return null
 
     const foundShipment = basket.shipments.find((shipment) => {

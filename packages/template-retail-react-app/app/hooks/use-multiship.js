@@ -21,7 +21,8 @@ import {
     areAddressesEqual,
     findDeliveryShipmentWithSameAddress,
     findDeliveryShipmentWithoutAddress,
-    findShipmentToConsolidate
+    findShipmentToConsolidate,
+    isPickupMethod
 } from '@salesforce/retail-react-app/app/utils/shipment-utils'
 
 /**
@@ -31,7 +32,6 @@ import {
  */
 export const useMultiship = (basket) => {
     const {
-        isCurrentShippingMethodPickup,
         getDefaultShippingMethodId,
         getPickupShippingMethodId,
         getShippingAddressForStore,
@@ -150,17 +150,14 @@ export const useMultiship = (basket) => {
      */
     const findOrCreateDeliveryShipment = async () => {
         // Check if there's an existing delivery shipment
-        let existingDeliveryShipment = findExistingDeliveryShipment(
-            basket,
-            isCurrentShippingMethodPickup
-        )
+        let existingDeliveryShipment = findExistingDeliveryShipment(basket)
 
         if (!existingDeliveryShipment) {
             // Create a new delivery shipment
             const newShipmentResponse = await createNewDeliveryShipment(basket)
             // Use the new shipment from the response
             existingDeliveryShipment = newShipmentResponse?.shipments?.find(
-                (shipment) => !isCurrentShippingMethodPickup(shipment.shippingMethod)
+                (shipment) => !isPickupMethod(shipment.shippingMethod)
             )
         }
 
@@ -183,11 +180,7 @@ export const useMultiship = (basket) => {
         }
 
         // Check if there's an existing pickup shipment for this store
-        let existingPickupShipment = findExistingPickupShipment(
-            basket,
-            storeInfo.id,
-            isCurrentShippingMethodPickup
-        )
+        let existingPickupShipment = findExistingPickupShipment(basket, storeInfo.id)
 
         if (!existingPickupShipment) {
             // Create a new pickup shipment for this store
@@ -195,7 +188,7 @@ export const useMultiship = (basket) => {
             // Find the newly created pickup shipment
             existingPickupShipment = newShipmentResponse?.shipments?.find(
                 (shipment) =>
-                    isCurrentShippingMethodPickup(shipment.shippingMethod) &&
+                    isPickupMethod(shipment.shippingMethod) &&
                     shipment.c_fromStoreId === storeInfo.id
             )
         }
@@ -245,7 +238,7 @@ export const useMultiship = (basket) => {
             shipments: [
                 {
                     shipmentId: newShipment.shipmentId,
-                    shippingMethod: {id: pickupShippingMethodId},
+                    shippingMethod: {id: pickupShippingMethodId, c_storePickupEnabled: true},
                     c_fromStoreId: storeInfo.id
                 }
             ]
@@ -330,7 +323,7 @@ export const useMultiship = (basket) => {
      */
     const consolidateIntoDefaultShipment = async (sourceShipment, itemsToMove) => {
         try {
-            const isSourcePickup = isCurrentShippingMethodPickup(sourceShipment.shippingMethod)
+            const isSourcePickup = isPickupMethod(sourceShipment.shippingMethod)
 
             if (isSourcePickup) {
                 return await consolidatePickupShipment(sourceShipment, itemsToMove)
@@ -492,25 +485,20 @@ export const useMultiship = (basket) => {
         assignDefaultShippingMethodsToShipments,
         updateDeliveryOption,
         removeEmptyShipments,
-        findExistingDeliveryShipment: (basket) =>
-            findExistingDeliveryShipment(basket, isCurrentShippingMethodPickup),
-        findExistingPickupShipment: (basket, storeId) =>
-            findExistingPickupShipment(basket, storeId, isCurrentShippingMethodPickup),
+        findExistingDeliveryShipment,
+        findExistingPickupShipment,
         createNewDeliveryShipment,
         createNewDeliveryShipmentWithAddress,
         createNewPickupShipment,
-        findDeliveryShipmentWithSameAddress: (basket, address) =>
-            findDeliveryShipmentWithSameAddress(basket, address, isCurrentShippingMethodPickup),
-        findDeliveryShipmentWithoutAddress: (basket) =>
-            findDeliveryShipmentWithoutAddress(basket, isCurrentShippingMethodPickup),
+        findDeliveryShipmentWithSameAddress,
+        findDeliveryShipmentWithoutAddress,
         findOrCreateDeliveryShipment,
         findOrCreatePickupShipment,
         getShipmentForItems,
         findEmptyShipments,
         findShipmentToConsolidate,
         getItemsForShipment,
-        findUnusedDeliveryShipment: (basket, usedShipmentIds = []) =>
-            findUnusedDeliveryShipment(basket, usedShipmentIds, isCurrentShippingMethodPickup),
+        findUnusedDeliveryShipment,
         updateDeliveryAddressForShipment,
         areAddressesEqual
     }
