@@ -13,6 +13,7 @@ import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-cur
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
 import {CurrencyProvider} from '@salesforce/retail-react-app/app/contexts'
 import {useMultiship} from '@salesforce/retail-react-app/app/hooks/use-multiship'
+import {useItemShipmentManagement} from '@salesforce/retail-react-app/app/hooks/use-item-shipment-management'
 import {useCheckout} from '@salesforce/retail-react-app/app/pages/checkout/util/checkout-context'
 import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
 import userEvent from '@testing-library/user-event'
@@ -47,6 +48,7 @@ jest.mock('@salesforce/retail-react-app/app/hooks/use-current-basket', () => ({
 }))
 
 jest.mock('@salesforce/retail-react-app/app/hooks/use-multiship')
+jest.mock('@salesforce/retail-react-app/app/hooks/use-item-shipment-management')
 jest.mock('@salesforce/retail-react-app/app/pages/checkout/util/checkout-context')
 jest.mock('@salesforce/retail-react-app/app/hooks/use-toast')
 jest.mock('@salesforce/retail-react-app/app/hooks/use-pickup-shipment', () => ({
@@ -75,6 +77,7 @@ jest.mock('@salesforce/retail-react-app/app/utils/image-groups-utils', () => ({
 
 const mockGoToStep = jest.fn()
 const mockShowToast = jest.fn()
+const mockUpdateItemsToDeliveryShipment = jest.fn()
 
 const mockAreAddressesEqual = jest.fn((address1, address2) => {
     if (!address1 || !address2) return false
@@ -110,6 +113,10 @@ beforeEach(() => {
         moveItemsToDeliveryShipment: jest.fn(),
         removeEmptyShipments: jest.fn(),
         areAddressesEqual: mockAreAddressesEqual
+    })
+
+    useItemShipmentManagement.mockReturnValue({
+        updateItemsToDeliveryShipment: mockUpdateItemsToDeliveryShipment
     })
 })
 
@@ -967,8 +974,11 @@ describe('ShippingMultiAddress - handleSubmit', () => {
             findUnusedDeliveryShipment: mockFindUnusedDeliveryShipment,
             createNewDeliveryShipmentWithAddress: mockCreateNewDeliveryShipmentWithAddress,
             updateDeliveryAddressForShipment: mockUpdateDeliveryAddressForShipment,
-            updateItemsToDeliveryShipment: mockUpdateItemsToDeliveryShipment,
             removeEmptyShipments: mockRemoveEmptyShipments
+        })
+
+        useItemShipmentManagement.mockReturnValue({
+            updateItemsToDeliveryShipment: mockUpdateItemsToDeliveryShipment
         })
 
         useCurrentCustomer.mockReturnValue({

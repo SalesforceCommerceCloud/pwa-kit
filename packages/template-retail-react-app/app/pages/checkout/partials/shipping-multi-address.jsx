@@ -42,6 +42,7 @@ import {
     Stack
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 import {useMultiship} from '@salesforce/retail-react-app/app/hooks/use-multiship'
+import {useItemShipmentManagement} from '@salesforce/retail-react-app/app/hooks/use-item-shipment-management'
 import {useCheckout} from '@salesforce/retail-react-app/app/pages/checkout/util/checkout-context'
 import {usePickupShipment} from '@salesforce/retail-react-app/app/hooks/use-pickup-shipment'
 
@@ -145,10 +146,11 @@ const ShippingMultiAddress = ({
         findUnusedDeliveryShipment,
         createNewDeliveryShipmentWithAddress,
         updateDeliveryAddressForShipment,
-        updateItemsToDeliveryShipment,
         removeEmptyShipments,
         areAddressesEqual
     } = useMultiship(basket)
+
+    const {updateItemsToDeliveryShipment} = useItemShipmentManagement(basket?.basketId)
 
     // Filter out pickup items - only show delivery items
     const deliveryItems =

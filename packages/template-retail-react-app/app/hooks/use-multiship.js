@@ -44,13 +44,7 @@ export const useMultiship = (basket) => {
         updateShippingMethod
     } = useShipmentOperations(basket?.basketId)
 
-    const {
-        updateItemToPickupShipment,
-        updateItemToDeliveryShipment,
-        updateItemsToDeliveryShipment,
-        updateItemsToPickupShipment,
-        updateDeliveryOption: updateDeliveryOptionOperation
-    } = useItemShipmentManagement(basket?.basketId)
+    const itemShipmentManagement = useItemShipmentManagement(basket?.basketId)
 
     // Hook for shipping methods for the main shipment - we'll use this as a fallback
     //
@@ -286,7 +280,7 @@ export const useMultiship = (basket) => {
         storeInfo,
         defaultInventoryId
     ) => {
-        await updateDeliveryOptionOperation(
+        await itemShipmentManagement.updateDeliveryOption(
             productItem,
             selectedPickup,
             storeInfo,
@@ -355,7 +349,11 @@ export const useMultiship = (basket) => {
         const storeInfo = {id: storeId, inventoryId: inventoryId}
 
         await configureDefaultShipmentIfNeeded(basket, DEFAULT_SHIPMENT_ID, true, storeInfo)
-        await updateItemsToPickupShipment(itemsToMove, DEFAULT_SHIPMENT_ID, inventoryId)
+        await itemShipmentManagement.updateItemsToPickupShipment(
+            itemsToMove,
+            DEFAULT_SHIPMENT_ID,
+            inventoryId
+        )
 
         return true
     }
@@ -371,7 +369,11 @@ export const useMultiship = (basket) => {
 
         await configureDefaultShipmentIfNeeded(basket, DEFAULT_SHIPMENT_ID, false, null)
         await updateDeliveryAddressForShipment(DEFAULT_SHIPMENT_ID, sourceShipment.shippingAddress)
-        await updateItemsToDeliveryShipment(itemsToMove, DEFAULT_SHIPMENT_ID, defaultInventoryId)
+        await itemShipmentManagement.updateItemsToDeliveryShipment(
+            itemsToMove,
+            DEFAULT_SHIPMENT_ID,
+            defaultInventoryId
+        )
 
         return true
     }
@@ -485,10 +487,6 @@ export const useMultiship = (basket) => {
         createNewDeliveryShipment,
         createNewDeliveryShipmentWithAddress,
         createNewPickupShipment,
-        updateItemToDeliveryShipment,
-        updateItemsToDeliveryShipment,
-        updateItemToPickupShipment,
-        updateItemsToPickupShipment,
         findDeliveryShipmentWithSameAddress: (basket, address) =>
             findDeliveryShipmentWithSameAddress(basket, address, isCurrentShippingMethodPickup),
         findDeliveryShipmentWithoutAddress: (basket) =>

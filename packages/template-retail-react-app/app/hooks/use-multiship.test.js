@@ -7,6 +7,7 @@
 
 import {renderHook, act} from '@testing-library/react'
 import {useMultiship} from '@salesforce/retail-react-app/app/hooks/use-multiship'
+import {useItemShipmentManagement} from '@salesforce/retail-react-app/app/hooks/use-item-shipment-management'
 
 // Mock dependencies
 jest.mock('@salesforce/commerce-sdk-react', () => ({
@@ -34,6 +35,7 @@ describe('useMultiship', () => {
     // Mock functions for mutations
     const mockUpdateItemInBasket = jest.fn()
     const mockCreateShipmentForBasket = jest.fn()
+    const mockCreateShipment = jest.fn()
     const mockRemoveShipmentFromBasket = jest.fn()
     const mockUpdateShippingMethodForShipment = jest.fn()
     const mockRefetchShippingMethods = jest.fn()
@@ -102,6 +104,8 @@ describe('useMultiship', () => {
                     return {mutateAsync: mockUpdateItemInBasket}
                 case 'createShipmentForBasket':
                     return {mutateAsync: mockCreateShipmentForBasket}
+                case 'createShipment':
+                    return {mutateAsync: mockCreateShipment}
                 case 'removeShipmentFromBasket':
                     return {mutateAsync: mockRemoveShipmentFromBasket}
                 case 'updateShippingMethodForShipment':
@@ -148,6 +152,7 @@ describe('useMultiship', () => {
         mockUpdateItemsInBasket.mockResolvedValue({basketId: 'test-basket-id'})
         mockUpdateItemInBasket.mockResolvedValue({basketId: 'test-basket-id'})
         mockCreateShipmentForBasket.mockResolvedValue({basketId: 'test-basket-id', shipments: []})
+        mockCreateShipment.mockResolvedValue({basketId: 'test-basket-id', shipments: []})
         mockRemoveShipmentFromBasket.mockResolvedValue({basketId: 'test-basket-id'})
         mockUpdateShippingMethodForShipment.mockResolvedValue({basketId: 'test-basket-id'})
         mockUpdateShipmentForBasket.mockResolvedValue({basketId: 'test-basket-id'})
@@ -164,10 +169,7 @@ describe('useMultiship', () => {
             expect(result.current).toHaveProperty('findExistingPickupShipment')
             expect(result.current).toHaveProperty('createNewDeliveryShipment')
             expect(result.current).toHaveProperty('createNewPickupShipment')
-            expect(result.current).toHaveProperty('updateItemToDeliveryShipment')
-            expect(result.current).toHaveProperty('updateItemsToDeliveryShipment')
-            expect(result.current).toHaveProperty('updateItemToPickupShipment')
-            expect(result.current).toHaveProperty('updateItemsToPickupShipment')
+
             expect(result.current).toHaveProperty('findOrCreateDeliveryShipment')
             expect(result.current).toHaveProperty('findOrCreatePickupShipment')
             expect(result.current).toHaveProperty('getShipmentForItems')
@@ -1147,7 +1149,7 @@ describe('useMultiship', () => {
         }
 
         test('should update item to pickup shipment', async () => {
-            const {result} = renderHook(() => useMultiship(mockBasket))
+            const {result} = renderHook(() => useItemShipmentManagement('test-basket-id'))
 
             const mockResponse = {basketId: 'test-basket-id'}
             mockUpdateItemInBasket.mockResolvedValue(mockResponse)
@@ -1176,7 +1178,7 @@ describe('useMultiship', () => {
         })
 
         test('should throw error if invalid basket', async () => {
-            const {result} = renderHook(() => useMultiship(null))
+            const {result} = renderHook(() => useItemShipmentManagement(null))
 
             await act(async () => {
                 await expect(
@@ -1199,7 +1201,7 @@ describe('useMultiship', () => {
         }
 
         test('should update item to delivery shipment', async () => {
-            const {result} = renderHook(() => useMultiship(mockBasket))
+            const {result} = renderHook(() => useItemShipmentManagement('test-basket-id'))
 
             const mockResponse = {basketId: 'test-basket-id'}
             mockUpdateItemInBasket.mockResolvedValue(mockResponse)
@@ -1233,7 +1235,7 @@ describe('useMultiship', () => {
                 productId: 'product-1',
                 quantity: 1
             }
-            const {result} = renderHook(() => useMultiship(mockBasket))
+            const {result} = renderHook(() => useItemShipmentManagement('test-basket-id'))
 
             const mockResponse = {basketId: 'test-basket-id'}
             mockUpdateItemInBasket.mockResolvedValue(mockResponse)
@@ -1278,7 +1280,7 @@ describe('useMultiship', () => {
         ]
 
         test('should update multiple items to delivery shipment', async () => {
-            const {result} = renderHook(() => useMultiship(mockBasket))
+            const {result} = renderHook(() => useItemShipmentManagement('test-basket-id'))
 
             const mockResponse = {basketId: 'test-basket-id'}
             mockUpdateItemsInBasket.mockResolvedValue(mockResponse)
@@ -1316,7 +1318,7 @@ describe('useMultiship', () => {
         })
 
         test('should handle API error gracefully', async () => {
-            const {result} = renderHook(() => useMultiship(mockBasket))
+            const {result} = renderHook(() => useItemShipmentManagement('test-basket-id'))
 
             mockUpdateItemsInBasket.mockRejectedValue(new Error('API Error'))
 
@@ -1347,7 +1349,7 @@ describe('useMultiship', () => {
         ]
 
         test('should update multiple items to pickup shipment', async () => {
-            const {result} = renderHook(() => useMultiship(mockBasket))
+            const {result} = renderHook(() => useItemShipmentManagement('test-basket-id'))
 
             const mockResponse = {basketId: 'test-basket-id'}
             mockUpdateItemsInBasket.mockResolvedValue(mockResponse)
@@ -1385,7 +1387,7 @@ describe('useMultiship', () => {
         })
 
         test('should handle API error gracefully', async () => {
-            const {result} = renderHook(() => useMultiship(mockBasket))
+            const {result} = renderHook(() => useItemShipmentManagement('test-basket-id'))
 
             mockUpdateItemsInBasket.mockRejectedValue(new Error('API Error'))
 
