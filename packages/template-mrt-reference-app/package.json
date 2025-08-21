@@ -45,7 +45,7 @@
       "node_modules/**/*.*"
     ],
     "ssrShared": [
-      "static/example.txt", 
+      "static/example.txt",
       "static/favicon.ico",
       "static/robots.txt"
     ]
