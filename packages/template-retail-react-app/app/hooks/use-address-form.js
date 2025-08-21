@@ -64,6 +64,10 @@ export const useAddressForm = (
                         }),
                         status: 'info'
                     })
+                    setShowForm((prev) => ({...prev, [itemId]: false}))
+                    form.reset()
+                    form.clearErrors()
+                    setIsSubmitting(false)
                     return null
                 }
 

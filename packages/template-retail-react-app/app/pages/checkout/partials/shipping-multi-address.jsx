@@ -233,7 +233,7 @@ const ShippingMultiAddress = ({basket, submitButtonLabel, noItemsInBasketMessage
                     cursor={
                         !allShipmentsHaveAddress || isAddressFormOpen ? 'not-allowed' : 'pointer'
                     }
-                    isLoading={addressForm.formState.isSubmitting || isFormSubmitting}
+                    isLoading={addressForm.formState.isSubmitting || isFormSubmitting || isSubmitting}
                     isDisabled={!allShipmentsHaveAddress || isAddressFormOpen}
                     data-testid="continue-to-shipping-button"
                     loadingText={formatMessage({
