@@ -106,6 +106,8 @@ const AppConfig = ({children, locals = {}}) => {
             // Make sure to also enable useSLASPrivateClient in ssr.js when enabling this setting.
             enablePWAKitPrivateClient={false}
             slasPrivateClientProxyEndpoint={slasPrivateClientProxyEndpoint}
+            // Uncomment 'hybridAuthEnabled' if the current site has Hybrid Auth enabled. Do NOT set this flag for hybrid storefronts using Plugin SLAS.
+            // hybridAuthEnabled={true}
             logger={createLogger({packageName: 'commerce-sdk-react'})}
         >
             <MultiSiteProvider site={locals.site} locale={locals.locale} buildUrl={locals.buildUrl}>
