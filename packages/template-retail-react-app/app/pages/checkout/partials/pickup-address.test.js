@@ -1035,7 +1035,10 @@ describe('PickupAddress', () => {
             isLoading: false,
             derivedData: {
                 hasBasket: true,
-                totalItems: singlePickupBasket.productItems.reduce((acc, item) => acc + item.quantity, 0)
+                totalItems: singlePickupBasket.productItems.reduce(
+                    (acc, item) => acc + item.quantity,
+                    0
+                )
             }
         })
         useSelectedStore.mockReturnValue({selectedStore: null})
@@ -1070,26 +1073,36 @@ describe('PickupAddress', () => {
     })
 
     test('shows "Show Product Details" label for mixed pickup and shipping items', async () => {
-        jest.resetModules();
+        jest.resetModules()
 
         // Mock useCheckout to set the step to SHIPPING_ADDRESS (summary mode, not disabled)
-        const checkoutContext = require('@salesforce/retail-react-app/app/pages/checkout/util/checkout-context');
-        jest.spyOn(checkoutContext, 'useCheckout').mockReturnValue({
-            step: 2, // SHIPPING_ADDRESS
-            STEPS: {
-                CONTACT_INFO: 0,
-                PICKUP_ADDRESS: 1,
-                SHIPPING_ADDRESS: 2,
-                SHIPPING_OPTIONS: 3,
-                PAYMENT: 4,
-                REVIEW_ORDER: 5
-            },
-            goToStep: jest.fn(),
-            goToNextStep: jest.fn()
-        });
+        jest.doMock(
+            '@salesforce/retail-react-app/app/pages/checkout/util/checkout-context',
+            () => ({
+                __esModule: true,
+                ...jest.requireActual(
+                    '@salesforce/retail-react-app/app/pages/checkout/util/checkout-context'
+                ),
+                useCheckout: () => ({
+                    step: 2, // SHIPPING_ADDRESS
+                    STEPS: {
+                        CONTACT_INFO: 0,
+                        PICKUP_ADDRESS: 1,
+                        SHIPPING_ADDRESS: 2,
+                        SHIPPING_OPTIONS: 3,
+                        PAYMENT: 4,
+                        REVIEW_ORDER: 5
+                    },
+                    goToStep: jest.fn(),
+                    goToNextStep: jest.fn()
+                })
+            })
+        )
 
         // Mock useCurrentBasket
-        const {useCurrentBasket} = require('@salesforce/retail-react-app/app/hooks/use-current-basket');
+        const {useCurrentBasket} = await import(
+            '@salesforce/retail-react-app/app/hooks/use-current-basket'
+        )
         const mixedBasket = {
             ...scapiBasketWithItem,
             shipments: [
@@ -1123,7 +1136,7 @@ describe('PickupAddress', () => {
                     quantity: 1
                 }
             ]
-        };
+        }
         useCurrentBasket.mockReturnValue({
             data: mixedBasket,
             isLoading: false,
@@ -1131,16 +1144,18 @@ describe('PickupAddress', () => {
                 hasBasket: true,
                 totalItems: mixedBasket.productItems.reduce((acc, item) => acc + item.quantity, 0)
             }
-        });
+        })
 
         // Mock useSelectedStore
-        const {useSelectedStore} = require('@salesforce/retail-react-app/app/hooks/use-selected-store');
-        useSelectedStore.mockReturnValue({selectedStore: null});
+        const {useSelectedStore} = await import(
+            '@salesforce/retail-react-app/app/hooks/use-selected-store'
+        )
+        useSelectedStore.mockReturnValue({selectedStore: null})
 
         // Inline mock useStores and useProducts
-        const commerceSdkReact = require('@salesforce/commerce-sdk-react');
-        const originalUseStores = commerceSdkReact.useStores;
-        const originalUseProducts = commerceSdkReact.useProducts;
+        const commerceSdkReact = await import('@salesforce/commerce-sdk-react')
+        const originalUseStores = commerceSdkReact.useStores
+        const originalUseProducts = commerceSdkReact.useProducts
         commerceSdkReact.useStores = jest.fn().mockReturnValue({
             data: {
                 data: [
@@ -1159,33 +1174,37 @@ describe('PickupAddress', () => {
                 ]
             },
             isLoading: false
-        });
+        })
         commerceSdkReact.useProducts = jest.fn().mockReturnValue({
             data: {
                 'product-1': {id: 'product-1', name: 'Pickup Product'},
                 'product-2': {id: 'product-2', name: 'Shipping Product'}
             },
             isLoading: false
-        });
+        })
 
         // Dynamically import PickupAddress after mocks are set
-        const PickupAddress = require('./pickup-address').default;
-        const {renderWithProviders} = require('@salesforce/retail-react-app/app/utils/test-utils');
-        const {screen, waitFor} = require('@testing-library/react');
+        const PickupAddress = (await import('./pickup-address')).default
+        const {renderWithProviders} = await import(
+            '@salesforce/retail-react-app/app/utils/test-utils'
+        )
+        const {screen, waitFor} = await import('@testing-library/react')
 
         try {
-            renderWithProviders(<PickupAddress />);
+            renderWithProviders(<PickupAddress />)
             await waitFor(() => {
-                expect(screen.getByText('Pickup Address & Information')).toBeInTheDocument();
-            });
+                expect(screen.getByText('Pickup Address & Information')).toBeInTheDocument()
+            })
             // The label should be present in summary mode as a button
             await waitFor(() => {
-                expect(screen.getByRole('button', {name: /show product details/i})).toBeInTheDocument();
-            });
+                expect(
+                    screen.getByRole('button', {name: /show product details/i})
+                ).toBeInTheDocument()
+            })
         } finally {
             // Restore original hooks
-            commerceSdkReact.useStores = originalUseStores;
-            commerceSdkReact.useProducts = originalUseProducts;
+            commerceSdkReact.useStores = originalUseStores
+            commerceSdkReact.useProducts = originalUseProducts
         }
-    });
+    })
 })
