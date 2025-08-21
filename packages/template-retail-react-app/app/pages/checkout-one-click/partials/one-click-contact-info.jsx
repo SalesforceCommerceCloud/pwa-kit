@@ -112,9 +112,9 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
 
     // Helper function to validate email format
     const isValidEmail = (email) => {
-        const emailRegex = new RegExp(
-            /^[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[\p{L}]{2,63}$/iu
-        )
+        const emailRegex =
+            /^[\p{L}\p{N}._!#$%&'*+/=?^`{|}~-]+@([a-zA-Z0-9\u00A1-\uFFFF-]+\.)+[a-zA-Z0-9\u00A1-\uFFFF-]+$/u
+
         return emailRegex.test(email)
     }
 
