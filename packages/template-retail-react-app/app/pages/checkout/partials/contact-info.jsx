@@ -83,6 +83,12 @@ const ContactInfo = ({isSocialEnabled = false, isPasswordlessEnabled = false, id
         ? passwordlessConfigCallback
         : `${appOrigin}${passwordlessConfigCallback}`
 
+    const pickupShipments =
+        basket?.shipments?.filter((shipment) => shipment.shippingMethod?.c_storePickupEnabled) || []
+    const deliveryShipments =
+        basket?.shipments?.filter((shipment) => !shipment.shippingMethod?.c_storePickupEnabled) ||
+        []
+
     const handlePasswordlessLogin = async (email) => {
         try {
             const redirectPath = window.location.pathname + (window.location.search || '')
@@ -120,7 +126,18 @@ const ContactInfo = ({isSocialEnabled = false, isPasswordlessEnabled = false, id
                     })
                 }
             }
-            goToNextStep()
+            if (
+                pickupShipments.length === 1 &&
+                deliveryShipments.length === 0 &&
+                basket?.productItems?.every(
+                    (item) => item.shipmentId === pickupShipments[0].shipmentId
+                )
+            ) {
+                // All items are for pickup at one store, skip to payment
+                goToStep(STEPS.PAYMENT)
+            } else {
+                goToNextStep()
+            }
         } catch (error) {
             if (/Unauthorized/i.test(error.message)) {
                 setError(
