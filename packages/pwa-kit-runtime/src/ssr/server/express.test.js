@@ -1336,7 +1336,8 @@ describe('Base path tests', () => {
     }, 15000)
 
     test('should not remove base path from non /mobify non-express routes', async () => {
-        jest.spyOn(ssrConfig, 'getConfig').mockReturnValue({envBasePath: '/basepath'})
+        // Set base path to something that might also be a site id used by react router routes
+        jest.spyOn(ssrConfig, 'getConfig').mockReturnValue({envBasePath: '/us'})
 
         const app = RemoteServerFactory._createApp(opts())
 
@@ -1347,12 +1348,14 @@ describe('Base path tests', () => {
             next()
         })
 
-        // Test that a request with base path gets a 404
-        const response = await request(app).get('/basepath/api/unknown').expect(404)
+        return request(app)
+            .get('/us/products/123')
+            .then((response) => {
+                expect(response.status).toBe(404) // 404 because the route doesn't exist in express
 
-        // Verify that the base path was not removed from the request path
-        expect(capturedPath).toBe('/basepath/api/unknown')
-        expect(response.status).toBe(404)
+                // Verify that the base path was not removed from the request path
+                expect(capturedPath).toBe('/us/products/123')
+            })
     }, 15000)
 
     test('should remove base path from routes with path parameters', async () => {
