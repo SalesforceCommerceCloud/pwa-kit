@@ -64,7 +64,6 @@ export const useAddressForm = (
                         }),
                         status: 'info'
                     })
-                    setIsSubmitting(false)
                     return null
                 }
 

@@ -24,6 +24,8 @@ import {
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 import LoadingSpinner from '@salesforce/retail-react-app/app/components/loading-spinner'
 import {useIntl, defineMessage} from 'react-intl'
+import {useCurrency} from '@salesforce/retail-react-app/app/hooks'
+import {getPriceData} from '@salesforce/retail-react-app/app/utils/product-utils'
 import ItemVariantProvider from '@salesforce/retail-react-app/app/components/item-variant'
 import DisplayPrice from '@salesforce/retail-react-app/app/components/display-price'
 import AddressFields from '@salesforce/retail-react-app/app/components/forms/address-fields'
@@ -115,7 +117,7 @@ AddressForm.propTypes = {
 /**
  * Component for selecting address for a single product item
  */
-const ProductAddressSelectionCard = ({
+const ProductShippingAddressCard = ({
     item,
     variant,
     productDetail,
@@ -127,16 +129,13 @@ const ProductAddressSelectionCard = ({
     customerLoading,
     onAddressSelect,
     onAddNewAddress,
-    getPriceData,
-    currency,
-    deliveryAddressLabel,
-    addNewAddressLabel,
     showAddAddressForm,
     addressForm,
     handleCreateAddress,
     closeForm
 }) => {
     const {formatMessage} = useIntl()
+    const {currency} = useCurrency()
 
     return (
         <Box
@@ -234,7 +233,10 @@ const ProductAddressSelectionCard = ({
                         fontSize="sm"
                         mb={1}
                     >
-                        {formatMessage(deliveryAddressLabel)}
+                        {formatMessage({
+                            defaultMessage: 'Delivery Address',
+                            id: 'shipping_address.label.delivery_address'
+                        })}
                     </Text>
 
                     <Box w="100%" mb={6}>
@@ -318,7 +320,10 @@ const ProductAddressSelectionCard = ({
                                     }
                                 )}
                             >
-                                {formatMessage(addNewAddressLabel)}
+                                {formatMessage({
+                                    defaultMessage: '+ Add New Address',
+                                    id: 'shipping_address.button.add_new_address'
+                                })}
                             </Button>
                         </VStack>
                     </Box>
@@ -356,9 +361,9 @@ const ProductAddressSelectionCard = ({
     )
 }
 
-ProductAddressSelectionCard.displayName = 'ProductAddressSelectionCard'
+ProductShippingAddressCard.displayName = 'ProductShippingAddressCard'
 
-ProductAddressSelectionCard.propTypes = {
+ProductShippingAddressCard.propTypes = {
     item: PropTypes.object.isRequired,
     variant: PropTypes.object.isRequired,
     productDetail: PropTypes.object.isRequired,
@@ -370,14 +375,10 @@ ProductAddressSelectionCard.propTypes = {
     customerLoading: PropTypes.bool.isRequired,
     onAddressSelect: PropTypes.func.isRequired,
     onAddNewAddress: PropTypes.func.isRequired,
-    getPriceData: PropTypes.func.isRequired,
-    currency: PropTypes.string.isRequired,
-    deliveryAddressLabel: PropTypes.object.isRequired,
-    addNewAddressLabel: PropTypes.object.isRequired,
     showAddAddressForm: PropTypes.object.isRequired,
     addressForm: PropTypes.object.isRequired,
     handleCreateAddress: PropTypes.func.isRequired,
     closeForm: PropTypes.func.isRequired
 }
 
-export default ProductAddressSelectionCard
+export default ProductShippingAddressCard

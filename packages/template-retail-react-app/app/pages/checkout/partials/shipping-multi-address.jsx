@@ -9,9 +9,7 @@ import {useIntl} from 'react-intl'
 import PropTypes from 'prop-types'
 import {useProducts} from '@salesforce/commerce-sdk-react'
 import {findImageGroupBy} from '@salesforce/retail-react-app/app/utils/image-groups-utils'
-import {getPriceData} from '@salesforce/retail-react-app/app/utils/product-utils'
 import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
-import {useCurrency} from '@salesforce/retail-react-app/app/hooks'
 import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
 import {
     Text,
@@ -35,12 +33,9 @@ import ProductShippingAddressCard from './product-shipping-address-card'
 const ShippingMultiAddress = ({
     basket,
     submitButtonLabel,
-    addNewAddressLabel,
-    noItemsInBasketMessage,
-    deliveryAddressLabel
+    noItemsInBasketMessage
 }) => {
     const {formatMessage} = useIntl()
-    const {currency} = useCurrency()
     const {STEPS, goToStep} = useCheckout()
     const showToast = useToast()
 
@@ -220,10 +215,6 @@ const ShippingMultiAddress = ({
                                     customerLoading={customerLoading}
                                     onAddressSelect={addressProductManagement.setAddressesForItems}
                                     onAddNewAddress={openForm}
-                                    getPriceData={getPriceData}
-                                    currency={currency}
-                                    deliveryAddressLabel={deliveryAddressLabel}
-                                    addNewAddressLabel={addNewAddressLabel}
                                     showAddAddressForm={showAddAddressForm}
                                     addressForm={addressForm}
                                     handleCreateAddress={handleCreateAddress}
