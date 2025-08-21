@@ -1212,3 +1212,105 @@ describe('Auth service sends credentials fetch option to the ShopperLogin API', 
         expect(shopperLogin.clientConfig.fetchOptions.credentials).toBe('same-origin')
     })
 })
+
+describe('clearECOMSession with hybridAuthEnabled', () => {
+    beforeEach(() => {
+        jest.clearAllMocks()
+    })
+
+    test('clears DWSID cookie when hybridAuthEnabled is false', () => {
+        const auth = new Auth({...config, hybridAuthEnabled: false})
+
+        // Set a DWSID cookie value
+        // @ts-expect-error private method
+        auth.set('dwsid', 'test-dwsid-value')
+
+        // Verify the cookie was set
+        expect(auth.get('dwsid')).toBe('test-dwsid-value')
+
+        // Call clearECOMSession
+        // @ts-expect-error private method
+        auth.clearECOMSession()
+
+        // Verify the cookie was cleared
+        expect(auth.get('dwsid')).toBeFalsy()
+    })
+
+    test('does NOT clear DWSID cookie when hybridAuthEnabled is true', () => {
+        const auth = new Auth({...config, hybridAuthEnabled: true})
+
+        // Set a DWSID cookie value
+        // @ts-expect-error private method
+        auth.set('dwsid', 'test-dwsid-value')
+
+        // Verify the cookie was set
+        expect(auth.get('dwsid')).toBe('test-dwsid-value')
+
+        // Call clearECOMSession
+        // @ts-expect-error private method
+        auth.clearECOMSession()
+
+        // Verify the cookie was NOT cleared
+        expect(auth.get('dwsid')).toBe('test-dwsid-value')
+    })
+
+    test('clearECOMSession is called during registered user login and respects hybridAuthEnabled', async () => {
+        const clearECOMSessionSpy = jest.spyOn(Auth.prototype as any, 'clearECOMSession')
+
+        // Test with hybridAuthEnabled: false
+        const authNonHybrid = new Auth({...config, hybridAuthEnabled: false})
+        await authNonHybrid.loginRegisteredUserB2C({username: 'test', password: 'test'})
+
+        expect(clearECOMSessionSpy).toHaveBeenCalled()
+
+        clearECOMSessionSpy.mockClear()
+
+        // Test with hybridAuthEnabled: true
+        const authHybrid = new Auth({...config, hybridAuthEnabled: true})
+        await authHybrid.loginRegisteredUserB2C({username: 'test', password: 'test'})
+
+        expect(clearECOMSessionSpy).toHaveBeenCalled()
+
+        clearECOMSessionSpy.mockRestore()
+    })
+
+    test('clearECOMSession is called during IDP user login and respects hybridAuthEnabled', async () => {
+        const clearECOMSessionSpy = jest.spyOn(Auth.prototype as any, 'clearECOMSession')
+
+        // Test with hybridAuthEnabled: false
+        const authNonHybrid = new Auth({...config, hybridAuthEnabled: false})
+        await authNonHybrid.loginIDPUser({redirectURI: 'test', code: 'test'})
+
+        expect(clearECOMSessionSpy).toHaveBeenCalled()
+
+        clearECOMSessionSpy.mockClear()
+
+        // Test with hybridAuthEnabled: true
+        const authHybrid = new Auth({...config, hybridAuthEnabled: true})
+        await authHybrid.loginIDPUser({redirectURI: 'test', code: 'test'})
+
+        expect(clearECOMSessionSpy).toHaveBeenCalled()
+
+        clearECOMSessionSpy.mockRestore()
+    })
+
+    test('clearECOMSession is called during passwordless login and respects hybridAuthEnabled', async () => {
+        const clearECOMSessionSpy = jest.spyOn(Auth.prototype as any, 'clearECOMSession')
+
+        // Test with hybridAuthEnabled: false
+        const authNonHybrid = new Auth({...config, hybridAuthEnabled: false})
+        await authNonHybrid.getPasswordLessAccessToken({pwdlessLoginToken: 'test'})
+
+        expect(clearECOMSessionSpy).toHaveBeenCalled()
+
+        clearECOMSessionSpy.mockClear()
+
+        // Test with hybridAuthEnabled: true
+        const authHybrid = new Auth({...config, hybridAuthEnabled: true})
+        await authHybrid.getPasswordLessAccessToken({pwdlessLoginToken: 'test'})
+
+        expect(clearECOMSessionSpy).toHaveBeenCalled()
+
+        clearECOMSessionSpy.mockRestore()
+    })
+})

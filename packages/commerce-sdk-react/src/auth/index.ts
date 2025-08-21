@@ -591,6 +591,14 @@ class Auth {
      * registered shopper refresh-token and restores session and basket on SFRA.
      */
     private clearECOMSession() {
+        /**
+         * If `hybridAuthEnabled` is true, dwsid cookie must not be cleared.
+         * This makes sure the session-bridged dwsid, received from `/oauth2/token` call on shopper login
+         * is NOT cleared and can be used to maintain the server affinity.
+         */
+        if (this.hybridAuthEnabled) {
+            return
+        }
         const {key, storageType} = DATA_MAP[DWSID_COOKIE_NAME]
         const store = this.stores[storageType]
         store.delete(key)
@@ -992,13 +1000,7 @@ class Auth {
             credentials.options
         )
         this.handleTokenResponse(token, isGuest)
-        /**
-         * If `hybridAuthEnabled` is true,
-         * the `clearECOMSession` method will not be called. This makes sure the session-bridged dwsid,
-         * received from `/oauth2/token` call on shopper login is NOT cleared and can be used to
-         * maintain the server affinity.
-         */
-        if (onClient() && !this.hybridAuthEnabled) {
+        if (onClient()) {
             void this.clearECOMSession()
         }
         return token
