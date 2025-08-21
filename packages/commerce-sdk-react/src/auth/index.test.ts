@@ -896,7 +896,7 @@ describe('Auth', () => {
             hint: 'test',
             c_customParam: 'customParam'
         })
-        
+
         expect(helpers.authorizeIDP).toHaveBeenCalled()
         const functionArg = (helpers.authorizeIDP as jest.Mock).mock.calls[0][0]
         expect(functionArg).toMatchObject({
@@ -906,7 +906,7 @@ describe('Auth', () => {
                 c_customParam: 'customParam'
             })
         })
-        
+
         // Should return the result from helpers.authorizeIDP
         expect(result).toHaveProperty('url')
         expect(result).toHaveProperty('codeVerifier')
@@ -915,7 +915,7 @@ describe('Auth', () => {
     test('authorizeIDP works with private client configuration', async () => {
         const auth = new Auth(configSLASPrivate)
         const result = await auth.authorizeIDP({redirectURI: 'test', hint: 'test'})
-        
+
         expect(helpers.authorizeIDP).toHaveBeenCalled()
         expect(result).toHaveProperty('url')
         expect(result).toHaveProperty('codeVerifier')
@@ -1239,3 +1239,44 @@ describe('Auth service sends credentials fetch option to the ShopperLogin API', 
     })
 })
 
+describe('hybridAuthEnabled property toggles clearECOMSession', () => {
+    beforeEach(() => {
+        jest.clearAllMocks()
+    })
+
+    test('clears DWSID cookie when hybridAuthEnabled is false', () => {
+        const auth = new Auth({...config, hybridAuthEnabled: false})
+
+        // Set a DWSID cookie value
+        // @ts-expect-error private method
+        auth.set('dwsid', 'test-dwsid-value')
+
+        // Verify the cookie was set
+        expect(auth.get('dwsid')).toBe('test-dwsid-value')
+
+        // Call clearECOMSession
+        // @ts-expect-error private method
+        auth.clearECOMSession()
+
+        // Verify the cookie was cleared
+        expect(auth.get('dwsid')).toBeFalsy()
+    })
+
+    test('does NOT clear DWSID cookie when hybridAuthEnabled is true', () => {
+        const auth = new Auth({...config, hybridAuthEnabled: true})
+
+        // Set a DWSID cookie value
+        // @ts-expect-error private method
+        auth.set('dwsid', 'test-dwsid-value')
+
+        // Verify the cookie was set
+        expect(auth.get('dwsid')).toBe('test-dwsid-value')
+
+        // Call clearECOMSession
+        // @ts-expect-error private method
+        auth.clearECOMSession()
+
+        // Verify the cookie was NOT cleared
+        expect(auth.get('dwsid')).toBe('test-dwsid-value')
+    })
+})
