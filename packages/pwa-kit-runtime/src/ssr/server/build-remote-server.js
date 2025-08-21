@@ -5,7 +5,6 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import path from 'path'
-import {pathToRegexp} from 'path-to-regexp'
 import {
     BUILD,
     CONTENT_TYPE,
@@ -519,106 +518,6 @@ export const RemoteServerFactory = {
         }
 
         /**
-         * '?' have different meanings in express and path-to-regexp so we need
-         * to convert the express route to something path-to-regexp can process
-         *
-         * Express uses ? to mark the preceeding character as optional
-         * For example: the express route /abc/def? corresponds to
-         * the regex /abc\/de(f)?/
-         *
-         * However, Path-to-regexp uses ? to mark a parameter as optional
-         * For example: /abc/:def? means the :def parameter is optional
-         *
-         * In path-to-regexp, a route with ? that is not preceeded by
-         * a : must wrap the optional character in a paranthesis to
-         * be condidered valid
-         *
-         * In other words, path-to-regexp allows /abc/de(f)? but
-         * /abc/def? is considered invalid.
-         *
-         * This function convers express routes into something
-         * path-to-regexp can process
-         */
-        const convertExpressOptionalChars = (routePattern) => {
-            if (!routePattern || typeof routePattern !== 'string') {
-                return routePattern || ''
-            }
-
-            let result = ''
-            let i = 0
-            let inParameter = false
-            let parenDepth = 0
-            let isEscaped = false
-
-            // Step through each character in the route pattern
-            // If we encounter a :, we are in a parameter context (ie. /:abc?)
-            // If we encounter a / we are starting a new path segment (ie. /../abc)
-            // If we encounter a (, we are entering a group context (ie. /abc(def)?)
-            // If we encounter a ), we are exiting a group context
-            // If we encounter a ?, we need to see if we're in a parameter or group context
-            // first before we wrap the previous character in parentheses
-            while (i < routePattern.length) {
-                const char = routePattern[i]
-
-                if (isEscaped) {
-                    // This character is escaped, treat it as literal
-                    // We already added the backslash in the previous iteration
-                    result += char
-                    isEscaped = false
-                } else if (char === '\\') {
-                    // Next character will be escaped
-                    isEscaped = true
-                    result += char
-                } else if (char === ':') {
-                    inParameter = true
-                    result += char
-                } else if (char === '(') {
-                    parenDepth++
-                    result += char
-                } else if (char === ')') {
-                    // Only decrement parenDepth if we're actually in a group
-                    if (parenDepth > 0) {
-                        parenDepth--
-                    }
-                    result += char
-                } else if (char === '/' || char === '\\') {
-                    inParameter = false
-                    result += char
-                } else if (char === '?') {
-                    // Check if this ? follows a parameter
-                    if (inParameter) {
-                        // This ? is part of a parameter, keep as is
-                        result += char
-                        inParameter = false
-                    } else {
-                        // This ? is not part of a parameter
-                        // Check if the previous character is a closing parenthesis
-                        const prevChar = result[result.length - 1]
-
-                        if (prevChar === ')' && parenDepth === 0) {
-                            // The ? follows a closing parenthesis that actually closed a group
-                            // Keep it as-is
-                            result += char
-                        } else if (prevChar && prevChar !== '\\') {
-                            // Wrap the previous character in parentheses
-                            result = result.slice(0, -1) + `(${prevChar})?`
-                        } else {
-                            // Escaped ? or literal ? - throw an error
-                            throw new Error(
-                                `Invalid route pattern: literal or escaped '?' character not allowed in '${routePattern}'`
-                            )
-                        }
-                    }
-                } else {
-                    result += char
-                }
-                i++
-            }
-
-            return result
-        }
-
-        /**
          * Produces a regex that corresponds to the express route pattern provided.
          *
          * There are some differences in how express and path-to-regexp handle
@@ -633,21 +532,64 @@ export const RemoteServerFactory = {
             if (typeof routePattern !== 'string') return null
 
             try {
-                // First, convert Express wildcards to path-to-regexp syntax
-                // Express uses * for wildcards, path-to-regexp uses (.*)
-                let processedPattern = routePattern.replace(/\*/g, '(.*)')
+                // If it's a string, it's an Express route pattern that needs conversion
+                // Express route patterns can contain:
+                // - Static paths: /users, /about
+                // - Route parameters: :id, :userId
+                // - Optional parameters: :id?
+                // - Regex constraints: :id(\d+)
+                // - Wildcards: *, /*
+                // - Optional characters: abc?
+                // - Optional groups: (abc)?
 
-                // Convert any ? in the express route to something path-to-regexp can process
-                processedPattern = convertExpressOptionalChars(processedPattern)
+                let regexPattern = routePattern
 
-                // Ensure we have a valid string
-                if (!processedPattern || typeof processedPattern !== 'string') {
-                    throw new Error(`Invalid processed pattern: ${processedPattern}`)
-                }
+                // Step 1: Handle regex constraints in parameters like :param(regex)
+                // Example: /search/:query(\d+) -> /search/(\d+)
+                regexPattern = regexPattern.replace(
+                    /:([^/]+)\(([^)]+)\)/g,
+                    (match, paramName, constraint) => {
+                        return `(${constraint})`
+                    }
+                )
 
-                // By this point we should have an express route pattern that
-                // path-to-regexp can process into a regex.
-                return pathToRegexp(processedPattern)
+                // Step 2: Handle all route parameters (both regular and optional) in a single pass
+                // This avoids conflicts between the two types of replacements
+                regexPattern = regexPattern.replace(
+                    /:(?:([^/]+)\?|([^/]+))/g,
+                    (match, optionalParam, regularParam) => {
+                        if (optionalParam) {
+                            // This is an optional parameter like :param?
+                            return `(?:[^/]+)?`
+                        } else {
+                            // This is a regular parameter like :param
+                            return `[^/]+`
+                        }
+                    }
+                )
+
+                // Step 3: Handle wildcards - Express uses * for wildcards
+                // * should match characters up to but not including the next /
+                // /* should match / followed by any characters
+                regexPattern = regexPattern.replace(/\/\*/g, '/.*')
+                regexPattern = regexPattern.replace(/\*/g, '[^/]*')
+
+                // Step 4: Handle the specific case where a wildcard is followed by an optional parameter
+                // Make the entire "/optional-parameter" part optional when preceded by a wildcard
+                // Pattern to match: [^/]*/(?:[^/]+)?  ->  [^/]*(?:/(?:[^/]+)?)?
+                regexPattern = regexPattern.replace(
+                    // eslint-disable-next-line no-useless-escape
+                    /\[(\^\/)\]\*\/\(\?\:\[(\^\/)\]\+\)\?/g,
+                    '[^/]*(?:/(?:[^/]+)?)?'
+                )
+
+                // Step 5: Escape regex special characters that are literal in the route
+                // We need to escape: $ { } | \ (these are not part of our patterns)
+                // Note: We don't escape ^ because it's used in character classes
+                // eslint-disable-next-line no-useless-escape
+                regexPattern = regexPattern.replace(/[\${}|\\]/g, '\\$&')
+
+                return new RegExp(`^${regexPattern}$`)
             } catch (error) {
                 throw new Error(`Invalid route pattern: ${routePattern}`)
             }
