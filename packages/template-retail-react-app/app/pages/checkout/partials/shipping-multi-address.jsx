@@ -44,7 +44,7 @@ import {
 import {useMultiship} from '@salesforce/retail-react-app/app/hooks/use-multiship'
 import {useCheckout} from '@salesforce/retail-react-app/app/pages/checkout/util/checkout-context'
 import {usePickupShipment} from '@salesforce/retail-react-app/app/hooks/use-pickup-shipment'
-import {useAddressManagement} from '@salesforce/retail-react-app/app/hooks/use-address-management'
+import {useAddressProductManagement} from '@salesforce/retail-react-app/app/hooks/use-address-product-management'
 import {useAddressForm} from '@salesforce/retail-react-app/app/hooks/use-address-form'
 import {useShipmentProcessing} from '@salesforce/retail-react-app/app/hooks/use-shipment-processing'
 import ProductAddressSelectionCard from '@salesforce/retail-react-app/app/components/product-address-selection-card'
@@ -62,8 +62,8 @@ const ShippingMultiAddress = ({
     const showToast = useToast()
 
     const {areAddressesEqual} = useMultiship(basket)
-    const addressManagement = useAddressManagement(basket)
-    const productIds = addressManagement.deliveryItems.map((item) => item.productId).join(',')
+    const addressProductManagement = useAddressProductManagement(basket)
+    const productIds = addressProductManagement.deliveryItems.map((item) => item.productId).join(',')
 
     const {
         data: productsMap,
@@ -99,11 +99,11 @@ const ShippingMultiAddress = ({
         isAddressFormOpen,
         formErrors
     } = useAddressForm(
-        addressManagement.addGuestAddress,
-        addressManagement.isGuest,
-        addressManagement.setAddressesForItems,
-        addressManagement.availableAddresses,
-        addressManagement.deliveryItems,
+        addressProductManagement.addGuestAddress,
+        addressProductManagement.isGuest,
+        addressProductManagement.setAddressesForItems,
+        addressProductManagement.availableAddresses,
+        addressProductManagement.deliveryItems,
         areAddressesEqual
     )
 
@@ -111,16 +111,16 @@ const ShippingMultiAddress = ({
 
     const [isSubmitting, setIsSubmitting] = useState(false)
 
-    const addresses = addressManagement.availableAddresses
+    const addresses = addressProductManagement.availableAddresses
 
     // for guests, only check products loading since they may not have addresses yet
-    const isLoading = (addressManagement.isGuest ? false : customerLoading) || productsLoading
+    const isLoading = (addressProductManagement.isGuest ? false : customerLoading) || productsLoading
 
-    const allShipmentsHaveAddress = addressManagement.deliveryItems.every(
-        (item) => addressManagement.selectedAddresses[item.itemId]
+    const allShipmentsHaveAddress = addressProductManagement.deliveryItems.every(
+        (item) => addressProductManagement.selectedAddresses[item.itemId]
     )
 
-    if (!addressManagement.deliveryItems.length) {
+    if (!addressProductManagement.deliveryItems.length) {
         return (
             <Center
                 p={8}
@@ -187,7 +187,7 @@ const ShippingMultiAddress = ({
     const handleSubmit = async () => {
         setIsSubmitting(true)
         try {
-            await shipmentProcessing.processShipments(addressManagement.deliveryItems, addressManagement.selectedAddresses, addresses)
+            await shipmentProcessing.processShipments(addressProductManagement.deliveryItems, addressProductManagement.selectedAddresses, addresses)
             goToStep(STEPS.SHIPPING_OPTIONS)
         } catch (error) {
             showToast({
@@ -214,7 +214,7 @@ const ShippingMultiAddress = ({
                     w="100%"
                 >
                     <VStack spacing={2} w="100%" h="100%">
-                        {addressManagement.deliveryItems.map((item) => {
+                        {addressProductManagement.deliveryItems.map((item) => {
                             const productDetail = productsMap?.[item.productId] || {}
                             const variant = {...item, ...productDetail}
                             const image = findImageGroupBy(productDetail.imageGroups, {
@@ -232,11 +232,11 @@ const ShippingMultiAddress = ({
                                     productDetail={productDetail}
                                     imageUrl={imageUrl}
                                     addressKey={addressKey}
-                                    selectedAddressId={addressManagement.selectedAddresses[addressKey]}
+                                    selectedAddressId={addressProductManagement.selectedAddresses[addressKey]}
                                     availableAddresses={addresses}
-                                    isGuestUser={addressManagement.isGuest}
+                                    isGuestUser={addressProductManagement.isGuest}
                                     customerLoading={customerLoading}
-                                    onAddressSelect={addressManagement.setAddressesForItems}
+                                    onAddressSelect={addressProductManagement.setAddressesForItems}
                                     onAddNewAddress={openForm}
                                     getPriceData={getPriceData}
                                     currency={currency}
