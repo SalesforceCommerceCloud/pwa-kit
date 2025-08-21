@@ -272,7 +272,7 @@ export const useAddressProductManagement = (basket) => {
         const map = {}
         deliveryItems.forEach((item) => {
             const addressId = selectedAddresses[item.itemId]
-            const address = availableAddresses.find(addr => addr.addressId === addressId)
+            const address = availableAddresses.find((addr) => addr.addressId === addressId)
             if (address) {
                 map[item.itemId] = address
             }
@@ -281,7 +281,7 @@ export const useAddressProductManagement = (basket) => {
     }, [deliveryItems, selectedAddresses, availableAddresses])
 
     const allItemsHaveAddresses = useMemo(() => {
-        return deliveryItems.every(item => itemAddressMap[item.itemId])
+        return deliveryItems.every((item) => itemAddressMap[item.itemId])
     }, [deliveryItems, itemAddressMap])
 
     return {
