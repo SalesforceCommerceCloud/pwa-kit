@@ -6,7 +6,7 @@
  */
 
 /**
- * Normalizes a string value to an empty string if it is not falsey or 0
+ * Normalizes a string value to an empty string if it is falsey but not false or 0
  * @param {any} value - The value to normalize
  * @returns {any} The normalized value
  */

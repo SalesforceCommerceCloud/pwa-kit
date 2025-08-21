@@ -227,7 +227,6 @@ describe('useMultiship', () => {
 
                 expect(mockCreateShipmentOperation).not.toHaveBeenCalled()
             })
-            // Removed extra fields filtering test; hook delegates address directly to operation
         })
 
         describe('updateDeliveryAddressForShipment', () => {
@@ -281,8 +280,6 @@ describe('useMultiship', () => {
                 expect(mockUpdateShipmentAddress).not.toHaveBeenCalled()
             })
         })
-
-        // findUnusedDeliveryShipment has become internal; remove tests here
     })
 
     describe('updateShipmentsWithoutMethods', () => {
@@ -448,14 +445,6 @@ describe('useMultiship', () => {
             })
         })
     })
-
-    // Item-level pickup update tests belong to use-item-shipment-management unit tests
-
-    // Item-level delivery update tests belong to use-item-shipment-management unit tests
-
-    // Batch delivery mutation tests belong to use-item-shipment-management unit tests
-
-    // Batch pickup mutation tests belong to use-item-shipment-management unit tests
 
     describe('updateDeliveryOption', () => {
         const mockProductItem = {

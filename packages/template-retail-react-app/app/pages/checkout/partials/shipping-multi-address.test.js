@@ -937,7 +937,6 @@ describe('ShippingMultiAddress - handleSubmit', () => {
         }
     ]
 
-    // Helper baskets tailored for real shipment-utils behavior
     const basketNoShipments = {
         ...mockBasket,
         shipments: []
@@ -1028,8 +1027,6 @@ describe('ShippingMultiAddress - handleSubmit', () => {
     })
 
     test('should reuse existing shipment with same address', async () => {
-        // Use real utils with a basket that already contains a matching shipment for addr-1
-
         const user = userEvent.setup()
 
         renderWithIntl(
@@ -1111,8 +1108,6 @@ describe('ShippingMultiAddress - handleSubmit', () => {
                 }
             ]
         }
-
-        // Basket already includes a shipment matching addr-1; rely on real utils
 
         const user = userEvent.setup()
 
@@ -1241,7 +1236,6 @@ describe('ShippingMultiAddress - handleSubmit', () => {
 
         test('should initialize selected addresses based on existing shipments when addresses match customer addresses', () => {
             // Ensure strict address equality matching
-            // Use real address equality; no override
             useCurrentCustomer.mockReturnValue({
                 data: mockCustomerWithMatchingAddresses,
                 isLoading: false
@@ -1390,7 +1384,6 @@ describe('ShippingMultiAddress - handleSubmit', () => {
         })
 
         test('should handle shipments without addresses gracefully', () => {
-            // Use real address equality; no override
             const mockBasketWithShipmentsWithoutAddresses = {
                 ...mockBasket,
                 productItems: [
@@ -1547,7 +1540,6 @@ describe('ShippingMultiAddress - handleSubmit', () => {
         })
 
         test('should update selected addresses when customer data changes', () => {
-            // Use real address equality; no override
             // Initially with matching addresses
             useCurrentCustomer.mockReturnValue({
                 data: mockCustomerWithMatchingAddresses,
