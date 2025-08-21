@@ -2,6 +2,8 @@
 
 - Update USID expiry to match SLAS refresh token expiry[#2854](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2854)
 
+- [Bugfix] Skip deleting dwsid on shopper login if hybrid auth is enabled for current site. [#3151](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3151)
+
 ## v3.4.0 (Jul 22, 2025)
 
 - Optionally disable auth init in CommerceApiProvider [#2629](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2629)
