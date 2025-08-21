@@ -994,8 +994,8 @@ class Auth {
         this.handleTokenResponse(token, isGuest)
         /**
          * If `hybridAuthEnabled` is true,
-         * the `clearECOMSession` method will not be called. This makes sure the session-bridged dwsid, 
-         * received from `/oauth2/token` call on shopper login is NOT cleared and can be used to 
+         * the `clearECOMSession` method will not be called. This makes sure the session-bridged dwsid,
+         * received from `/oauth2/token` call on shopper login is NOT cleared and can be used to
          * maintain the server affinity.
          */
         if (onClient() && !this.hybridAuthEnabled) {
