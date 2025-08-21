@@ -270,6 +270,9 @@
   "checkout.message.user_registration": {
     "defaultMessage": "When you place your order, we create an account for you and save your payment information and other details for future purchases. During your next checkout, confirm your account using the code we'll send to you."
   },
+  "checkout.payment.save_payment_method": {
+    "defaultMessage": "Save this payment method"
+  },
   "checkout.title.user_registration": {
     "defaultMessage": "Save for Future Use"
   },
@@ -390,9 +393,6 @@
   },
   "checkout_payment.button.place_order": {
     "defaultMessage": "Place Order"
-  },
-  "checkout.payment.save_payment_method": {
-    "defaultMessage": "Save this card"
   },
   "checkout_payment.button.review_order": {
     "defaultMessage": "Review Order"
