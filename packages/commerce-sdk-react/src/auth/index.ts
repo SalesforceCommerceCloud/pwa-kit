@@ -1403,11 +1403,7 @@ class Auth {
      * A wrapper method for the SLAS endpoint: resetPassword.
      *
      */
-    async resetPassword(parameters: {
-        pwd_action_token: string
-        new_password: string
-        user_id: string
-    }) {
+    async resetPassword(parameters: ShopperLoginTypes.resetPasswordBodyType) {
         const slasClient = this.client
         const options = {
             headers: {
@@ -1415,10 +1411,11 @@ class Auth {
             },
             body: {
                 pwd_action_token: parameters.pwd_action_token,
-                channel_id: slasClient.clientConfig.parameters.siteId,
-                client_id: slasClient.clientConfig.parameters.clientId,
+                channel_id: parameters.channel_id || slasClient.clientConfig.parameters.siteId,
+                client_id: parameters.client_id || slasClient.clientConfig.parameters.clientId,
                 new_password: parameters.new_password,
-                user_id: parameters.user_id
+                code_verifier: parameters.code_verifier,
+                hint: parameters.hint
             }
         }
 
