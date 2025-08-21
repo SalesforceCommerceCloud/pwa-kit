@@ -1496,6 +1496,9 @@
   "shipping_multi_address.add_new_address.aria_label": {
     "defaultMessage": "Add new delivery address for {productName}"
   },
+  "shipping_multi_address.error.duplicate_address": {
+    "defaultMessage": "The address you entered already exists."
+  },
   "shipping_multi_address.error.label": {
     "defaultMessage": "Something went wrong while loading products."
   },
@@ -1513,9 +1516,6 @@
   },
   "shipping_multi_address.image.alt": {
     "defaultMessage": "Product image for {productName}"
-  },
-  "shipping_multi_address.info.address_already_exists": {
-    "defaultMessage": "The address you entered already exists."
   },
   "shipping_multi_address.loading.message": {
     "defaultMessage": "Loading..."

@@ -7497,6 +7497,20 @@
       "value": "]"
     }
   ],
+  "shipping_multi_address.error.duplicate_address": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ŧħḗḗ ȧȧḓḓřḗḗşş ẏǿǿŭŭ ḗḗƞŧḗḗřḗḗḓ ȧȧŀřḗḗȧȧḓẏ ḗḗẋīşŧş."
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
   "shipping_multi_address.error.label": [
     {
       "type": 0,
@@ -7595,20 +7609,6 @@
     {
       "type": 1,
       "value": "productName"
-    },
-    {
-      "type": 0,
-      "value": "]"
-    }
-  ],
-  "shipping_multi_address.info.address_already_exists": [
-    {
-      "type": 0,
-      "value": "["
-    },
-    {
-      "type": 0,
-      "value": "Ŧħḗḗ ȧȧḓḓřḗḗşş ẏǿǿŭŭ ḗḗƞŧḗḗřḗḗḓ ȧȧŀřḗḗȧȧḓẏ ḗḗẋīşŧş."
     },
     {
       "type": 0,

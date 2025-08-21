@@ -3545,6 +3545,12 @@
       "value": "productName"
     }
   ],
+  "shipping_multi_address.error.duplicate_address": [
+    {
+      "type": 0,
+      "value": "The address you entered already exists."
+    }
+  ],
   "shipping_multi_address.error.label": [
     {
       "type": 0,
@@ -3599,12 +3605,6 @@
     {
       "type": 1,
       "value": "productName"
-    }
-  ],
-  "shipping_multi_address.info.address_already_exists": [
-    {
-      "type": 0,
-      "value": "The address you entered already exists."
     }
   ],
   "shipping_multi_address.loading.message": [
