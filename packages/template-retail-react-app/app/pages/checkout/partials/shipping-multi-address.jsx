@@ -30,18 +30,16 @@ import {useAddressForm} from '@salesforce/retail-react-app/app/hooks/use-address
 import {useShipmentProcessing} from '@salesforce/retail-react-app/app/hooks/use-shipment-processing'
 import ProductShippingAddressCard from './product-shipping-address-card'
 
-const ShippingMultiAddress = ({
-    basket,
-    submitButtonLabel,
-    noItemsInBasketMessage
-}) => {
+const ShippingMultiAddress = ({basket, submitButtonLabel, noItemsInBasketMessage}) => {
     const {formatMessage} = useIntl()
     const {STEPS, goToStep} = useCheckout()
     const showToast = useToast()
 
     const {areAddressesEqual} = useMultiship(basket)
     const addressProductManagement = useAddressProductManagement(basket)
-    const productIds = addressProductManagement.deliveryItems.map((item) => item.productId).join(',')
+    const productIds = addressProductManagement.deliveryItems
+        .map((item) => item.productId)
+        .join(',')
 
     const {
         data: productsMap,
@@ -92,7 +90,8 @@ const ShippingMultiAddress = ({
     const addresses = addressProductManagement.availableAddresses
 
     // guests only products loading since they may not have addresses yet
-    const isLoading = (addressProductManagement.isGuest ? false : customerLoading) || productsLoading
+    const isLoading =
+        (addressProductManagement.isGuest ? false : customerLoading) || productsLoading
 
     const allShipmentsHaveAddress = addressProductManagement.deliveryItems.every(
         (item) => addressProductManagement.selectedAddresses[item.itemId]
@@ -164,7 +163,11 @@ const ShippingMultiAddress = ({
     const handleSubmit = async () => {
         setIsSubmitting(true)
         try {
-            await shipmentProcessing.processShipments(addressProductManagement.deliveryItems, addressProductManagement.selectedAddresses, addresses)
+            await shipmentProcessing.processShipments(
+                addressProductManagement.deliveryItems,
+                addressProductManagement.selectedAddresses,
+                addresses
+            )
             goToStep(STEPS.SHIPPING_OPTIONS)
         } catch (error) {
             showToast({
@@ -209,7 +212,9 @@ const ShippingMultiAddress = ({
                                     productDetail={productDetail}
                                     imageUrl={imageUrl}
                                     addressKey={addressKey}
-                                    selectedAddressId={addressProductManagement.selectedAddresses[addressKey]}
+                                    selectedAddressId={
+                                        addressProductManagement.selectedAddresses[addressKey]
+                                    }
                                     availableAddresses={addresses}
                                     isGuestUser={addressProductManagement.isGuest}
                                     customerLoading={customerLoading}

@@ -18,12 +18,13 @@ export const useAddressProductManagement = (basket) => {
     const {data: customer} = useCurrentCustomer()
     const {isCurrentShippingMethodPickup} = usePickupShipment(basket)
     const {areAddressesEqual} = useMultiship(basket)
-    
+
     // Filter out for only delivery items
-    const deliveryItems = basket?.productItems?.filter((item) => {
-        const shipment = basket?.shipments?.find((s) => s.shipmentId === item.shipmentId)
-        return !isCurrentShippingMethodPickup(shipment?.shippingMethod)
-    }) || []
+    const deliveryItems =
+        basket?.productItems?.filter((item) => {
+            const shipment = basket?.shipments?.find((s) => s.shipmentId === item.shipmentId)
+            return !isCurrentShippingMethodPickup(shipment?.shippingMethod)
+        }) || []
 
     const [guestAddresses, setGuestAddresses] = useState([])
     const [selectedGuestAddresses, setSelectedGuestAddresses] = useState({})
