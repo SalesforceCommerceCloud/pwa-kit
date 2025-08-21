@@ -352,7 +352,7 @@ describe('getGoogleButtonConfig', () => {
         expect(config.callbackIntents).toEqual(['SHIPPING_ADDRESS', 'SHIPPING_OPTION'])
     })
 
-    it('uses productTotal when orderTotal is null', () => {
+    it('uses 0 when orderTotal is null', () => {
         const basketWithoutOrderTotal = {...mockData.basket, orderTotal: null}
         const config = getGoogleButtonConfig(
             mockData.authToken,
@@ -360,7 +360,7 @@ describe('getGoogleButtonConfig', () => {
             basketWithoutOrderTotal,
             mockData.googlePayConfig
         )
-        expect(config.amount.value).toBe(9500) // 95 * 100
+        expect(config.amount.value).toBe(0) // Should be 0 when orderTotal is null
     })
 
     it('onAuthorized resolves on successful payment', async () => {
@@ -1280,7 +1280,7 @@ describe('GooglePayExpress PDP Button Configuration', () => {
         })
     })
 
-    it('forces order calculation before payment in PDP mode', async () => {
+    it('processes payment successfully in PDP mode without force calculation', async () => {
         const config = getGoogleButtonConfig(
             mockAuthToken,
             mockSite,
@@ -1330,16 +1330,17 @@ describe('GooglePayExpress PDP Button Configuration', () => {
 
         await config.onAuthorized(mockPaymentData)
 
-        expect(forceOrderCalculation).toHaveBeenCalledWith(
-            mockTempBasket.basketId,
-            mockAuthToken,
-            mockSite
-        )
+        // Verify forceOrderCalculation is NOT called (removed optimization)
+        expect(forceOrderCalculation).not.toHaveBeenCalled()
         expect(mockSubmitPayment).toHaveBeenCalled()
     })
 
-    it('handles force order calculation failure', async () => {
-        forceOrderCalculation.mockRejectedValue(new Error('Calculation failed'))
+    it('handles payment submission failure in PDP mode', async () => {
+        // Mock payment submission failure instead of force calculation failure
+        const mockSubmitPayment = jest.fn().mockRejectedValue(new Error('Payment failed'))
+        AdyenPaymentsService.mockImplementation(() => ({
+            submitPayment: mockSubmitPayment
+        }))
 
         const config = getGoogleButtonConfig(
             mockAuthToken,
@@ -1379,11 +1380,12 @@ describe('GooglePayExpress PDP Button Configuration', () => {
         )
     })
 
-    it('rejects payment when orderTotal is null after calculation', async () => {
-        forceOrderCalculation.mockResolvedValue({
+    it('rejects payment when basket has null orderTotal', async () => {
+        // Create a temp basket with null orderTotal to test the validation
+        const basketWithNullOrderTotal = {
             ...mockTempBasket,
             orderTotal: null
-        })
+        }
 
         const config = getGoogleButtonConfig(
             mockAuthToken,
@@ -1392,7 +1394,7 @@ describe('GooglePayExpress PDP Button Configuration', () => {
             mockGooglePayConfig,
             'TEST-SKU-PDP',
             mockSetTempBasket,
-            mockTempBasket,
+            basketWithNullOrderTotal,
             true,
             1
         )

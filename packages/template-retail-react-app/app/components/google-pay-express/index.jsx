@@ -203,7 +203,7 @@ export const getGoogleButtonConfig = (
     // For PDP mode, prioritize temporary basket creation over existing basket
     // For regular mode, use existing basket
     const currentBasket = isPdpMode ? tempBasket : basket
-    let googlePayAmount = currentBasket?.orderTotal || currentBasket?.productTotal || 0
+    let googlePayAmount = currentBasket?.orderTotal || 0
 
     // Shared basket reference to prevent multiple basket creation
     // This will be updated by callbacks and shared across all Google Pay events
@@ -282,40 +282,15 @@ export const getGoogleButtonConfig = (
                     return
                 }
 
-                googlePayAmount = currentBasket.orderTotal || currentBasket.productTotal || 0
+                // Basket should already be calculated from payment sheet callbacks
+                // (INITIALIZE, SHIPPING_ADDRESS, SHIPPING_OPTION already updated totals)
+                googlePayAmount = currentBasket.orderTotal || 0
 
-                // CRITICAL: Force final order calculation before payment
-                // This ensures orderTotal is calculated and not null
-                try {
-                    const finalizedBasket = await forceOrderCalculation(
-                        currentBasket.basketId,
-                        authToken,
-                        site
-                    )
-                    currentBasket = finalizedBasket
-
-                    // Update the amount tracking with calculated totals
-                    googlePayAmount = currentBasket.orderTotal || currentBasket.productTotal || 0
-
-                    // Ensure we have a valid order total before proceeding
-                    if (
-                        currentBasket.orderTotal === null ||
-                        currentBasket.orderTotal === undefined
-                    ) {
-                        await cleanupTemporaryBasket(
-                            isPdpMode,
-                            sharedBasketRef,
-                            authToken,
-                            site,
-                            setTempBasket
-                        )
-                        sendExpressMessage(EXPRESS_MESSAGES.PAYMENT_FAILURE, {
-                            PAYMENT_METHOD
-                        })
-                        return
-                    }
-                } catch (calculationError) {
-                    // This is a critical error - we cannot proceed without order total
+                // Ensure we have a valid order total before proceeding
+                if (
+                    currentBasket.orderTotal === null ||
+                    currentBasket.orderTotal === undefined
+                ) {
                     await cleanupTemporaryBasket(
                         isPdpMode,
                         sharedBasketRef,
