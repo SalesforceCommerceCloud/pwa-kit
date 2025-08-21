@@ -13,6 +13,7 @@ import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-cur
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
 import {CurrencyProvider} from '@salesforce/retail-react-app/app/contexts'
 import {useMultiship} from '@salesforce/retail-react-app/app/hooks/use-multiship'
+import {useItemShipmentManagement} from '@salesforce/retail-react-app/app/hooks/use-item-shipment-management'
 import {useCheckout} from '@salesforce/retail-react-app/app/pages/checkout/util/checkout-context'
 import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
 import userEvent from '@testing-library/user-event'
@@ -54,6 +55,7 @@ jest.mock('@salesforce/retail-react-app/app/hooks/use-current-basket', () => ({
 }))
 
 jest.mock('@salesforce/retail-react-app/app/hooks/use-multiship')
+jest.mock('@salesforce/retail-react-app/app/hooks/use-item-shipment-management')
 jest.mock('@salesforce/retail-react-app/app/pages/checkout/util/checkout-context')
 jest.mock('@salesforce/retail-react-app/app/hooks/use-toast')
 jest.mock('@salesforce/retail-react-app/app/hooks/use-pickup-shipment', () => ({
@@ -82,6 +84,7 @@ jest.mock('@salesforce/retail-react-app/app/utils/image-groups-utils', () => ({
 
 const mockGoToStep = jest.fn()
 const mockShowToast = jest.fn()
+const mockUpdateItemsToDeliveryShipment = jest.fn()
 
 const mockAreAddressesEqual = jest.fn((address1, address2) => {
     if (!address1 || !address2) return false
@@ -117,6 +120,10 @@ beforeEach(() => {
         moveItemsToDeliveryShipment: jest.fn(),
         removeEmptyShipments: jest.fn(),
         areAddressesEqual: mockAreAddressesEqual
+    })
+
+    useItemShipmentManagement.mockReturnValue({
+        updateItemsToDeliveryShipment: mockUpdateItemsToDeliveryShipment
     })
 })
 
@@ -192,7 +199,11 @@ const mockProducts = {
                     name: 'Size',
                     values: [{value: 'M', name: 'Medium'}]
                 }
-            ]
+            ],
+            inventory: {
+                id: 'inventory-1',
+                stockLevel: 10
+            }
         },
         {
             id: 'product-2',
@@ -214,7 +225,11 @@ const mockProducts = {
                     name: 'Size',
                     values: [{value: 'L', name: 'Large'}]
                 }
-            ]
+            ],
+            inventory: {
+                id: 'inventory-2',
+                stockLevel: 5
+            }
         }
     ]
 }
@@ -580,6 +595,167 @@ describe('ShippingMultiAddress', () => {
             expect(screen.getByText('Test Product 2')).toBeInTheDocument()
             expect(screen.getAllByText('+ Add New Address')).toHaveLength(2)
         })
+
+        test('should automatically select newly created address for the associated product', async () => {
+            // Mock the createCustomerAddress mutation with a specific return value
+            const mockCreateCustomerAddress = jest.fn().mockResolvedValue({
+                addressId: 'addr-newly-created',
+                firstName: 'Alice',
+                lastName: 'Wonder',
+                address1: '789 New St',
+                city: 'New City',
+                stateCode: 'TX',
+                postalCode: '55555'
+            })
+
+            // Update the mock to return our specific mock function
+            const {useShopperCustomersMutation} = jest.requireMock('@salesforce/commerce-sdk-react')
+            useShopperCustomersMutation.mockReturnValue({
+                mutateAsync: mockCreateCustomerAddress
+            })
+
+            // Mock refetchCustomer to simulate customer data refresh
+            const mockRefetchCustomer = jest.fn().mockResolvedValue({
+                data: {
+                    ...mockCustomer,
+                    addresses: [
+                        ...mockCustomer.addresses,
+                        {
+                            addressId: 'addr-newly-created',
+                            firstName: 'Alice',
+                            lastName: 'Wonder',
+                            address1: '789 New St',
+                            city: 'New City',
+                            stateCode: 'TX',
+                            postalCode: '55555'
+                        }
+                    ]
+                }
+            })
+
+            // Mock useCurrentCustomer to include refetch function
+            useCurrentCustomer.mockReturnValue({
+                data: mockCustomer,
+                isLoading: false,
+                refetch: mockRefetchCustomer
+            })
+
+            renderWithIntl(<ShippingMultiAddress {...defaultProps} />)
+
+            // Get the first "Add New Address" button and click it
+            const addNewAddressButtons = screen.getAllByText('+ Add New Address')
+            fireEvent.click(addNewAddressButtons[0])
+
+            // Wait for the form to appear
+            await waitFor(() => {
+                expect(screen.getByTestId('address-form')).toBeInTheDocument()
+            })
+
+            // Fill out the address form
+            fireEvent.change(screen.getByLabelText('First Name'), {target: {value: 'Alice'}})
+            fireEvent.change(screen.getByLabelText('Last Name'), {target: {value: 'Wonder'}})
+            fireEvent.change(screen.getByLabelText('Phone'), {target: {value: '1234567890'}})
+            fireEvent.change(screen.getByLabelText('Address'), {target: {value: '789 New St'}})
+            fireEvent.change(screen.getByLabelText('City'), {target: {value: 'New City'}})
+            fireEvent.change(screen.getByLabelText('State'), {target: {value: 'TX'}})
+            fireEvent.change(screen.getByLabelText('Zip Code'), {target: {value: '55555'}})
+
+            // Click Save button
+            fireEvent.click(screen.getByText('Save'))
+
+            // Wait for the form to disappear and address creation to complete
+            await waitFor(
+                () => {
+                    expect(screen.queryByTestId('address-form')).not.toBeInTheDocument()
+                },
+                {timeout: 3000}
+            )
+
+            // Verify that the createCustomerAddress mutation was called
+            expect(mockCreateCustomerAddress).toHaveBeenCalledWith({
+                body: {
+                    firstName: 'Alice',
+                    lastName: 'Wonder',
+                    phone: '(123) 456-7890',
+                    countryCode: 'US',
+                    address1: '789 New St',
+                    city: 'New City',
+                    stateCode: 'TX',
+                    postalCode: '55555',
+                    preferred: false,
+                    addressId: expect.any(String) // nanoid generates a random string
+                },
+                parameters: {customerId: 'customer-1'}
+            })
+
+            // Verify that refetchCustomer was called to refresh customer data
+            expect(mockRefetchCustomer).toHaveBeenCalled()
+
+            // Verify success toast was shown
+            expect(mockShowToast).toHaveBeenCalledWith({
+                title: 'Address saved successfully',
+                status: 'success'
+            })
+
+            // Verify that the address form is closed and the continue button is enabled
+            expect(screen.queryByTestId('address-form')).not.toBeInTheDocument()
+
+            // Verify that the continue button is enabled (indicating address selection is complete)
+            const continueButton = screen.getByText('Continue')
+            expect(continueButton).not.toBeDisabled()
+        })
+
+        test('should handle address creation error gracefully', async () => {
+            // Mock the createCustomerAddress mutation to throw an error
+            const mockCreateCustomerAddress = jest
+                .fn()
+                .mockRejectedValue(new Error('Network error'))
+
+            // Update the mock to return our error-throwing mock function
+            const {useShopperCustomersMutation} = jest.requireMock('@salesforce/commerce-sdk-react')
+            useShopperCustomersMutation.mockReturnValue({
+                mutateAsync: mockCreateCustomerAddress
+            })
+
+            renderWithIntl(<ShippingMultiAddress {...defaultProps} />)
+
+            // Get the first "Add New Address" button and click it
+            const addNewAddressButtons = screen.getAllByText('+ Add New Address')
+            fireEvent.click(addNewAddressButtons[0])
+
+            // Wait for the form to appear
+            await waitFor(() => {
+                expect(screen.getByTestId('address-form')).toBeInTheDocument()
+            })
+
+            // Fill out the address form
+            fireEvent.change(screen.getByLabelText('First Name'), {target: {value: 'Alice'}})
+            fireEvent.change(screen.getByLabelText('Last Name'), {target: {value: 'Wonder'}})
+            fireEvent.change(screen.getByLabelText('Phone'), {target: {value: '1234567890'}})
+            fireEvent.change(screen.getByLabelText('Address'), {target: {value: '789 New St'}})
+            fireEvent.change(screen.getByLabelText('City'), {target: {value: 'New City'}})
+            fireEvent.change(screen.getByLabelText('State'), {target: {value: 'TX'}})
+            fireEvent.change(screen.getByLabelText('Zip Code'), {target: {value: '55555'}})
+
+            // Click Save button
+            fireEvent.click(screen.getByText('Save'))
+
+            // Wait for the error to be handled
+            await waitFor(() => {
+                expect(mockShowToast).toHaveBeenCalledWith({
+                    title: "Couldn't save the address.",
+                    status: 'error'
+                })
+            })
+
+            // Verify that the form is still visible (not closed on error)
+            expect(screen.getByTestId('address-form')).toBeInTheDocument()
+
+            // Verify that the address dropdowns still show original selections
+            const addressDropdowns = screen.getAllByRole('combobox')
+            const firstProductDropdown = addressDropdowns[0]
+            expect(firstProductDropdown).toHaveValue('addr-2') // Should still show preferred address
+        })
     })
 
     describe('Continue to Shipping Method Button', () => {
@@ -637,49 +813,6 @@ describe('ShippingMultiAddress', () => {
 
             // Click Cancel button
             fireEvent.click(screen.getByText('Cancel'))
-
-            // Wait for the form to disappear
-            await waitFor(() => {
-                expect(screen.queryByTestId('address-form')).not.toBeInTheDocument()
-            })
-
-            // Button should now be enabled
-            fireEvent.click(continueButton)
-            await waitFor(() => {
-                expect(screen.queryByText('Setting up shipments...')).toBeInTheDocument()
-            })
-        })
-
-        test('should be re-enabled when address form is saved', async () => {
-            renderWithIntl(<ShippingMultiAddress {...defaultProps} />)
-
-            // Click "Add New Address" button
-            const addNewAddressButtons = screen.getAllByText('+ Add New Address')
-            fireEvent.click(addNewAddressButtons[0])
-
-            // Wait for the form to appear
-            await waitFor(() => {
-                expect(screen.getByTestId('address-form')).toBeInTheDocument()
-            })
-
-            // Try to click the button (should not call onSubmit)
-            const continueButton = screen.getByText('Continue')
-            fireEvent.click(continueButton)
-            await waitFor(() => {
-                expect(screen.queryByText('Setting up shipments...')).not.toBeInTheDocument()
-            })
-
-            // Fill out the form
-            fireEvent.change(screen.getByLabelText('First Name'), {target: {value: 'John'}})
-            fireEvent.change(screen.getByLabelText('Last Name'), {target: {value: 'Doe'}})
-            fireEvent.change(screen.getByLabelText('Phone'), {target: {value: '1234567890'}})
-            fireEvent.change(screen.getByLabelText('Address'), {target: {value: '123 Test St'}})
-            fireEvent.change(screen.getByLabelText('City'), {target: {value: 'Test City'}})
-            fireEvent.change(screen.getByLabelText('State'), {target: {value: 'TX'}})
-            fireEvent.change(screen.getByLabelText('Zip Code'), {target: {value: '12345'}})
-
-            // Click Save button
-            fireEvent.click(screen.getByText('Save'))
 
             await waitFor(() => {
                 expect(mockShowToast).toHaveBeenCalledWith({
@@ -784,7 +917,7 @@ describe('ShippingMultiAddress - handleSubmit', () => {
     let mockFindUnusedDeliveryShipment
     let mockCreateNewDeliveryShipmentWithAddress
     let mockUpdateDeliveryAddressForShipment
-    let mockMoveItemsToDeliveryShipment
+    let mockUpdateItemsToDeliveryShipment
     let mockRemoveEmptyShipments
 
     const mockBasket = {
@@ -792,14 +925,14 @@ describe('ShippingMultiAddress - handleSubmit', () => {
         productItems: [
             {
                 itemId: 'item-1',
-                productId: 'prod-1',
+                productId: 'product-1',
                 productName: 'Test Product 1',
                 quantity: 1,
                 shipmentId: 'me'
             },
             {
                 itemId: 'item-2',
-                productId: 'prod-2',
+                productId: 'product-2',
                 productName: 'Test Product 2',
                 quantity: 2,
                 shipmentId: 'me'
@@ -837,9 +970,11 @@ describe('ShippingMultiAddress - handleSubmit', () => {
     beforeEach(() => {
         mockFindDeliveryShipmentWithSameAddress = jest.fn().mockReturnValue(null)
         mockFindUnusedDeliveryShipment = jest.fn().mockReturnValue(null)
-        mockCreateNewDeliveryShipmentWithAddress = jest.fn().mockResolvedValue('new-shipment-1')
+        mockCreateNewDeliveryShipmentWithAddress = jest
+            .fn()
+            .mockResolvedValue({shipmentId: 'new-shipment-1'})
         mockUpdateDeliveryAddressForShipment = jest.fn().mockResolvedValue()
-        mockMoveItemsToDeliveryShipment = jest.fn().mockResolvedValue({
+        mockUpdateItemsToDeliveryShipment = jest.fn().mockResolvedValue({
             basketId: 'test-basket-123',
             // Return updated basket
             productItems: mockBasket.productItems,
@@ -852,8 +987,11 @@ describe('ShippingMultiAddress - handleSubmit', () => {
             findUnusedDeliveryShipment: mockFindUnusedDeliveryShipment,
             createNewDeliveryShipmentWithAddress: mockCreateNewDeliveryShipmentWithAddress,
             updateDeliveryAddressForShipment: mockUpdateDeliveryAddressForShipment,
-            moveItemsToDeliveryShipment: mockMoveItemsToDeliveryShipment,
             removeEmptyShipments: mockRemoveEmptyShipments
+        })
+
+        useItemShipmentManagement.mockReturnValue({
+            updateItemsToDeliveryShipment: mockUpdateItemsToDeliveryShipment
         })
 
         useCurrentCustomer.mockReturnValue({
@@ -893,7 +1031,7 @@ describe('ShippingMultiAddress - handleSubmit', () => {
             )
 
             // Should move items to their respective shipments
-            expect(mockMoveItemsToDeliveryShipment).toHaveBeenCalledTimes(2)
+            expect(mockUpdateItemsToDeliveryShipment).toHaveBeenCalledTimes(2)
 
             // Should remove empty shipments
             expect(mockRemoveEmptyShipments).toHaveBeenCalled()
@@ -907,7 +1045,7 @@ describe('ShippingMultiAddress - handleSubmit', () => {
         // Mock that a shipment already exists for address 1
         mockFindDeliveryShipmentWithSameAddress.mockImplementation((basket, address) => {
             if (address.addressId === 'addr-1') {
-                return 'existing-shipment-1'
+                return {shipmentId: 'existing-shipment-1'}
             }
             return null
         })
@@ -929,12 +1067,13 @@ describe('ShippingMultiAddress - handleSubmit', () => {
             expect(mockCreateNewDeliveryShipmentWithAddress).not.toHaveBeenCalled()
 
             // Should move items to existing shipment
-            expect(mockMoveItemsToDeliveryShipment).toHaveBeenCalledWith(
+            expect(mockUpdateItemsToDeliveryShipment).toHaveBeenCalledWith(
                 expect.arrayContaining([
                     expect.objectContaining({itemId: 'item-1'}),
                     expect.objectContaining({itemId: 'item-2'})
                 ]),
-                'existing-shipment-1'
+                'existing-shipment-1',
+                expect.any(String) // defaultInventoryId
             )
         })
     })
@@ -985,7 +1124,7 @@ describe('ShippingMultiAddress - handleSubmit', () => {
 
         mockFindDeliveryShipmentWithSameAddress.mockImplementation((basket, address) => {
             if (address.addressId === 'addr-1') {
-                return 'existing-shipment-1'
+                return {shipmentId: 'existing-shipment-1'}
             }
             return null
         })
@@ -1005,10 +1144,11 @@ describe('ShippingMultiAddress - handleSubmit', () => {
 
         await waitFor(() => {
             // Should only move the second item
-            expect(mockMoveItemsToDeliveryShipment).toHaveBeenCalledTimes(1)
-            expect(mockMoveItemsToDeliveryShipment).toHaveBeenCalledWith(
+            expect(mockUpdateItemsToDeliveryShipment).toHaveBeenCalledTimes(1)
+            expect(mockUpdateItemsToDeliveryShipment).toHaveBeenCalledWith(
                 expect.arrayContaining([expect.objectContaining({itemId: 'item-2'})]),
-                expect.any(String)
+                expect.any(String),
+                expect.any(String) // defaultInventoryId
             )
         })
     })
@@ -1777,67 +1917,162 @@ describe('ShippingMultiAddress - handleSubmit', () => {
             })
         })
 
-        test('should allow different addresses to be saved successfully for registered', async () => {
+        test('should allow registered user to add two different addresses successfully', async () => {
+            // Mock the createCustomerAddress mutation for registered user
+            const mockCreateCustomerAddress = jest
+                .fn()
+                .mockResolvedValueOnce({
+                    addressId: 'addr-new-1',
+                    firstName: 'Alice',
+                    lastName: 'Johnson',
+                    address1: '789 Home St',
+                    city: 'Home City',
+                    stateCode: 'TX',
+                    postalCode: '11111'
+                })
+                .mockResolvedValueOnce({
+                    addressId: 'addr-new-2',
+                    firstName: 'Bob',
+                    lastName: 'Wilson',
+                    address1: '321 Work Ave',
+                    city: 'Work City',
+                    stateCode: 'CA',
+                    postalCode: '22222'
+                })
+
+            // Update the mock to return our specific mock function
+            const {useShopperCustomersMutation} = jest.requireMock('@salesforce/commerce-sdk-react')
+            useShopperCustomersMutation.mockReturnValue({
+                mutateAsync: mockCreateCustomerAddress
+            })
+
+            // Mock refetchCustomer to simulate customer data refresh
+            const mockRefetchCustomer = jest.fn().mockResolvedValue({
+                data: {
+                    ...mockCustomer,
+                    addresses: [
+                        ...mockCustomer.addresses,
+                        {
+                            addressId: 'addr-new-1',
+                            firstName: 'Alice',
+                            lastName: 'Johnson',
+                            address1: '789 Home St',
+                            city: 'Home City',
+                            stateCode: 'TX',
+                            postalCode: '11111'
+                        },
+                        {
+                            addressId: 'addr-new-2',
+                            firstName: 'Bob',
+                            lastName: 'Wilson',
+                            address1: '321 Work Ave',
+                            city: 'Work City',
+                            stateCode: 'CA',
+                            postalCode: '22222'
+                        }
+                    ]
+                }
+            })
+
             useCurrentCustomer.mockReturnValue({
                 data: {...mockCustomer, isGuest: false},
                 isLoading: false,
-                refetch: jest.fn().mockResolvedValue(undefined)
+                refetch: mockRefetchCustomer
             })
 
-            const mockCreateCustomerAddress = {
-                mutateAsync: jest.fn().mockResolvedValue({addressId: 'new-addr-3'})
-            }
+            renderWithIntl(<ShippingMultiAddress {...defaultProps} />)
 
-            renderWithIntl(
-                <ShippingMultiAddress
-                    {...defaultProps}
-                    createCustomerAddress={mockCreateCustomerAddress}
-                />
-            )
-
-            // initial address
+            // Add first new address
             const addNewAddressButtons = screen.getAllByText('+ Add New Address')
             fireEvent.click(addNewAddressButtons[0])
 
-            fireEvent.change(screen.getByLabelText('First Name'), {target: {value: 'John'}})
-            fireEvent.change(screen.getByLabelText('Last Name'), {target: {value: 'Doe'}})
-            fireEvent.change(screen.getByLabelText('Phone'), {target: {value: '1234567890'}})
-            fireEvent.change(screen.getByLabelText('Address'), {target: {value: '123 Test St'}})
-            fireEvent.change(screen.getByLabelText('City'), {target: {value: 'Test City'}})
-            fireEvent.change(screen.getByLabelText('State'), {target: {value: 'CA'}})
-            fireEvent.change(screen.getByLabelText('Zip Code'), {target: {value: '12345'}})
+            // Fill out first address form
+            fireEvent.change(screen.getByLabelText('First Name'), {target: {value: 'Alice'}})
+            fireEvent.change(screen.getByLabelText('Last Name'), {target: {value: 'Johnson'}})
+            fireEvent.change(screen.getByLabelText('Phone'), {target: {value: '1111111111'}})
+            fireEvent.change(screen.getByLabelText('Address'), {target: {value: '789 Home St'}})
+            fireEvent.change(screen.getByLabelText('City'), {target: {value: 'Home City'}})
+            fireEvent.change(screen.getByLabelText('State'), {target: {value: 'TX'}})
+            fireEvent.change(screen.getByLabelText('Zip Code'), {target: {value: '11111'}})
 
             fireEvent.click(screen.getByText('Save'))
 
+            // Wait for first address to be saved
             await waitFor(() => {
                 expect(screen.queryByTestId('address-form')).not.toBeInTheDocument()
-            })
-
-            mockShowToast.mockClear()
-
-            // different address
-            const addNewAddressButtons2 = screen.getAllByText('+ Add New Address')
-            fireEvent.click(addNewAddressButtons2[0])
-
-            fireEvent.change(screen.getByLabelText('First Name'), {target: {value: 'Jane'}})
-            fireEvent.change(screen.getByLabelText('Last Name'), {target: {value: 'Smith'}})
-            fireEvent.change(screen.getByLabelText('Phone'), {target: {value: '0987654321'}})
-            fireEvent.change(screen.getByLabelText('Address'), {
-                target: {value: '456 Different St'}
-            })
-            fireEvent.change(screen.getByLabelText('City'), {target: {value: 'Different City'}})
-            fireEvent.change(screen.getByLabelText('State'), {target: {value: 'NY'}})
-            fireEvent.change(screen.getByLabelText('Zip Code'), {target: {value: '67890'}})
-
-            fireEvent.click(screen.getByText('Save'))
-
-            await waitFor(() => {
-                expect(screen.queryByTestId('address-form')).not.toBeInTheDocument()
+                expect(mockCreateCustomerAddress).toHaveBeenCalledWith({
+                    body: {
+                        firstName: 'Alice',
+                        lastName: 'Johnson',
+                        phone: '(111) 111-1111',
+                        countryCode: 'US',
+                        address1: '789 Home St',
+                        city: 'Home City',
+                        stateCode: 'TX',
+                        postalCode: '11111',
+                        preferred: false,
+                        addressId: expect.any(String)
+                    },
+                    parameters: {customerId: 'customer-1'}
+                })
                 expect(mockShowToast).toHaveBeenCalledWith({
                     title: 'Address saved successfully',
                     status: 'success'
                 })
             })
+
+            // Clear toast mock for second address
+            mockShowToast.mockClear()
+
+            // Add second new address
+            const addNewAddressButtons2 = screen.getAllByText('+ Add New Address')
+            fireEvent.click(addNewAddressButtons2[0])
+
+            // Fill out second address form
+            fireEvent.change(screen.getByLabelText('First Name'), {target: {value: 'Bob'}})
+            fireEvent.change(screen.getByLabelText('Last Name'), {target: {value: 'Wilson'}})
+            fireEvent.change(screen.getByLabelText('Phone'), {target: {value: '2222222222'}})
+            fireEvent.change(screen.getByLabelText('Address'), {target: {value: '321 Work Ave'}})
+            fireEvent.change(screen.getByLabelText('City'), {target: {value: 'Work City'}})
+            fireEvent.change(screen.getByLabelText('State'), {target: {value: 'CA'}})
+            fireEvent.change(screen.getByLabelText('Zip Code'), {target: {value: '22222'}})
+
+            fireEvent.click(screen.getByText('Save'))
+
+            // Wait for second address to be saved
+            await waitFor(() => {
+                expect(screen.queryByTestId('address-form')).not.toBeInTheDocument()
+                expect(mockCreateCustomerAddress).toHaveBeenCalledWith({
+                    body: {
+                        firstName: 'Bob',
+                        lastName: 'Wilson',
+                        phone: '(222) 222-2222',
+                        countryCode: 'US',
+                        address1: '321 Work Ave',
+                        city: 'Work City',
+                        stateCode: 'CA',
+                        postalCode: '22222',
+                        preferred: false,
+                        addressId: expect.any(String)
+                    },
+                    parameters: {customerId: 'customer-1'}
+                })
+                expect(mockShowToast).toHaveBeenCalledWith({
+                    title: 'Address saved successfully',
+                    status: 'success'
+                })
+            })
+
+            // Verify that createCustomerAddress was called twice (once for each address)
+            expect(mockCreateCustomerAddress).toHaveBeenCalledTimes(2)
+
+            // Verify that refetchCustomer was called twice to refresh customer data
+            expect(mockRefetchCustomer).toHaveBeenCalledTimes(2)
+
+            // Verify that the form is closed and continue button is enabled
+            expect(screen.queryByTestId('address-form')).not.toBeInTheDocument()
+            const continueButton = screen.getByText('Continue')
+            expect(continueButton).not.toBeDisabled()
         })
     })
 })

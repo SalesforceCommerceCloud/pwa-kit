@@ -46,7 +46,7 @@ jest.mock('@salesforce/retail-react-app/app/hooks/use-selected-store', () => ({
 
 // Mock useMultiship hook
 const mockUseMultiship = {
-    handleDeliveryOptionChange: jest.fn().mockResolvedValue(undefined),
+    updateDeliveryOption: jest.fn().mockResolvedValue(undefined),
     assignDefaultShippingMethodsToShipments: jest.fn().mockResolvedValue(undefined),
     findOrCreatePickupShipment: jest.fn().mockResolvedValue('pickup-shipment-2'),
     moveItemsToPickupShipment: jest.fn().mockResolvedValue(undefined),
@@ -1358,10 +1358,10 @@ describe('Delivery options', () => {
         const deliverySelects = await screen.findAllByTestId('delivery-option-select')
         fireEvent.change(deliverySelects[0], {target: {value: 'pickup'}})
         expect(mockStoreLocatorModal.onOpen).not.toHaveBeenCalled()
-        await waitFor(() => expect(mockUseMultiship.handleDeliveryOptionChange).toHaveBeenCalled())
+        await waitFor(() => expect(mockUseMultiship.updateDeliveryOption).toHaveBeenCalled())
         const firstProductItem = mockBaskets.baskets[0].productItems[0]
         const productData = mockProducts.data.find((p) => p.id === firstProductItem.productId)
-        expect(mockUseMultiship.handleDeliveryOptionChange).toHaveBeenCalledWith(
+        expect(mockUseMultiship.updateDeliveryOption).toHaveBeenCalledWith(
             expect.objectContaining({productId: firstProductItem.productId}),
             true, // selectedPickup
             mockStore,
@@ -1395,10 +1395,10 @@ describe('Delivery options', () => {
         const deliverySelects = await screen.findAllByTestId('delivery-option-select')
         await userEvent.selectOptions(deliverySelects[0], 'delivery')
         expect(mockStoreLocatorModal.onOpen).not.toHaveBeenCalled()
-        expect(mockUseMultiship.handleDeliveryOptionChange).toHaveBeenCalled()
+        expect(mockUseMultiship.updateDeliveryOption).toHaveBeenCalled()
         const firstProductItem = basketWithPickup.productItems[0]
         const productData = mockProducts.data.find((p) => p.id === firstProductItem.productId)
-        expect(mockUseMultiship.handleDeliveryOptionChange).toHaveBeenCalledWith(
+        expect(mockUseMultiship.updateDeliveryOption).toHaveBeenCalledWith(
             expect.objectContaining({productId: firstProductItem.productId}),
             false, // selectedPickup
             null,

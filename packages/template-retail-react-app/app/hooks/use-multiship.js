@@ -5,13 +5,25 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import {
-    useShopperBasketsMutation,
-    useShippingMethodsForShipment
-} from '@salesforce/commerce-sdk-react'
+import {useShippingMethodsForShipment} from '@salesforce/commerce-sdk-react'
 import {usePickupShipment} from '@salesforce/retail-react-app/app/hooks/use-pickup-shipment'
+import {useShipmentOperations} from '@salesforce/retail-react-app/app/hooks/use-shipment-operations'
+import {useItemShipmentManagement} from '@salesforce/retail-react-app/app/hooks/use-item-shipment-management'
 import {DEFAULT_SHIPMENT_ID} from '@salesforce/retail-react-app/app/constants'
-import {isAddressEmpty} from '@salesforce/retail-react-app/app/utils/address-utils'
+import logger from '@salesforce/retail-react-app/app/utils/logger-instance'
+
+import {
+    getItemsForShipment,
+    findEmptyShipments,
+    findExistingDeliveryShipment,
+    findExistingPickupShipment,
+    findUnusedDeliveryShipment,
+    areAddressesEqual,
+    findDeliveryShipmentWithSameAddress,
+    findDeliveryShipmentWithoutAddress,
+    findShipmentToConsolidate,
+    isPickupMethod
+} from '@salesforce/retail-react-app/app/utils/shipment-utils'
 
 /**
  * Custom hook to handle multiship functionality for cart items
@@ -20,21 +32,20 @@ import {isAddressEmpty} from '@salesforce/retail-react-app/app/utils/address-uti
  */
 export const useMultiship = (basket) => {
     const {
-        isCurrentShippingMethodPickup,
         getDefaultShippingMethodId,
         getPickupShippingMethodId,
         getShippingAddressForStore,
         configureDefaultShipmentIfNeeded
     } = usePickupShipment(basket)
 
-    const updateItemInBasketMutation = useShopperBasketsMutation('updateItemInBasket')
-    const createShipmentForBasketMutation = useShopperBasketsMutation('createShipmentForBasket')
-    const removeShipmentFromBasketMutation = useShopperBasketsMutation('removeShipmentFromBasket')
-    const updateShippingMethodForShipmentMutation = useShopperBasketsMutation(
-        'updateShippingMethodForShipment'
-    )
-    const updateItemsInBasketMutation = useShopperBasketsMutation('updateItemsInBasket')
-    const updateShipmentForBasketMutation = useShopperBasketsMutation('updateShipmentForBasket')
+    const {
+        createShipment: createShipmentOperation,
+        removeShipment: removeShipmentOperation,
+        updateShipmentAddress,
+        updateShippingMethod
+    } = useShipmentOperations(basket)
+
+    const itemShipmentManagement = useItemShipmentManagement(basket?.basketId)
 
     // Hook for shipping methods for the main shipment - we'll use this as a fallback
     //
@@ -56,6 +67,10 @@ export const useMultiship = (basket) => {
      * Assigns default shipping methods to shipments that don't have one
      * Note: Currently uses the same shipping methods as the main shipment ('me') for all shipments
      * This is a limitation due to React hooks constraints - ideally each shipment would get its own shipping methods
+     *
+     * IMPORTANT: This function never throws. Errors are considered non-fatal and do not block checkout.
+     * Failed shipping method assignments are logged but do not prevent the checkout process from continuing.
+     *
      * @returns {Promise<void>} Promise that resolves when all updates are complete
      */
     const assignDefaultShippingMethodsToShipments = async () => {
@@ -81,56 +96,26 @@ export const useMultiship = (basket) => {
             // Update each shipment that doesn't have a shipping method
             const updatePromises = shipmentsWithoutMethod.map(async (shipment) => {
                 try {
-                    await updateShippingMethodForShipmentMutation.mutateAsync({
-                        parameters: {
-                            basketId: basket.basketId,
-                            shipmentId: shipment.shipmentId
-                        },
-                        body: {
-                            id: defaultShippingMethodId
-                        }
-                    })
+                    await updateShippingMethod(shipment.shipmentId, defaultShippingMethodId)
                 } catch (error) {
-                    console.error(
-                        `Failed to assign shipping method to shipment ${shipment.shipmentId}:`,
-                        error
+                    logger.error(
+                        `Failed to assign shipping method to shipment ${shipment.shipmentId}`,
+                        {
+                            error: error.message,
+                            shipmentId: shipment.shipmentId,
+                            defaultShippingMethodId
+                        }
                     )
                 }
             })
 
             await Promise.all(updatePromises)
         } catch (error) {
-            console.error('Failed to fetch shipping methods:', error)
+            logger.error('Failed to fetch shipping methods', {
+                error: error.message,
+                basketId: basket?.basketId
+            })
         }
-    }
-
-    /**
-     * Finds an existing delivery shipment in the basket
-     * @param {Object} basket - The basket object
-     * @returns {Object|null} The delivery shipment object or null if not found
-     */
-    const findExistingDeliveryShipment = (basket) => {
-        if (!basket?.shipments) return null
-
-        return basket.shipments.find(
-            (shipment) => !isCurrentShippingMethodPickup(shipment.shippingMethod)
-        )
-    }
-
-    /**
-     * Finds the first delivery shipment that is not in the provided list of shipment IDs
-     * @param {Object} basket - The basket object
-     * @param {Array} usedShipmentIds - Array of shipment IDs to exclude from search
-     * @returns {Object|null} The unused delivery shipment object or null if not found
-     */
-    const findUnusedDeliveryShipment = (basket, usedShipmentIds = []) => {
-        if (!basket?.shipments) return null
-
-        return basket.shipments.find(
-            (shipment) =>
-                !isCurrentShippingMethodPickup(shipment.shippingMethod) &&
-                !usedShipmentIds.includes(shipment.shipmentId)
-        )
     }
 
     /**
@@ -154,15 +139,8 @@ export const useMultiship = (basket) => {
 
         // Otherwise, create a new shipment without a shipping method
         // The assignDefaultShippingMethodsToShipments function will handle setting the default shipping method
-        return await createShipmentForBasketMutation.mutateAsync({
-            parameters: {
-                basketId: basket.basketId
-            },
-            body: {
-                // Note: c_fromStoreId is omitted since this is a delivery shipment
-                // shippingMethod is also omitted - will be set by assignDefaultShippingMethodsToShipments
-            }
-        })
+        const newShipment = await createShipmentOperation()
+        return {shipments: [newShipment]}
     }
 
     /**
@@ -179,7 +157,7 @@ export const useMultiship = (basket) => {
             const newShipmentResponse = await createNewDeliveryShipment(basket)
             // Use the new shipment from the response
             existingDeliveryShipment = newShipmentResponse?.shipments?.find(
-                (shipment) => !isCurrentShippingMethodPickup(shipment.shippingMethod)
+                (shipment) => !isPickupMethod(shipment.shippingMethod)
             )
         }
 
@@ -210,28 +188,12 @@ export const useMultiship = (basket) => {
             // Find the newly created pickup shipment
             existingPickupShipment = newShipmentResponse?.shipments?.find(
                 (shipment) =>
-                    isCurrentShippingMethodPickup(shipment.shippingMethod) &&
+                    isPickupMethod(shipment.shippingMethod) &&
                     shipment.c_fromStoreId === storeInfo.id
             )
         }
 
         return existingPickupShipment?.shipmentId
-    }
-
-    /**
-     * Finds an existing pickup shipment for the specified store
-     * @param {Object} basket - The basket object
-     * @param {string} storeId - The store ID to find pickup shipment for
-     * @returns {Object|null} The pickup shipment object or null if not found
-     */
-    const findExistingPickupShipment = (basket, storeId) => {
-        if (!basket?.shipments || !storeId) return null
-
-        return basket.shipments.find(
-            (shipment) =>
-                isCurrentShippingMethodPickup(shipment.shippingMethod) &&
-                shipment.c_fromStoreId === storeId
-        )
     }
 
     /**
@@ -267,136 +229,32 @@ export const useMultiship = (basket) => {
         }
 
         // Create a new shipment with pickup configuration
-        return await createShipmentForBasketMutation.mutateAsync({
-            parameters: {
-                basketId: basket.basketId
-            },
-            body: {
-                shippingMethod: {
-                    id: pickupShippingMethodId
-                },
-                c_fromStoreId: storeInfo.id,
-                shippingAddress: getShippingAddressForStore(storeInfo)
-            }
+        const newShipment = await createShipmentOperation(getShippingAddressForStore(storeInfo), {
+            shippingMethodId: pickupShippingMethodId,
+            storeId: storeInfo.id
         })
-    }
-
-    /**
-     * Compares two addresses to determine if they are the same
-     * @param {Object} address1 - First address object
-     * @param {Object} address2 - Second address object
-     * @returns {boolean} True if addresses match
-     */
-    const areAddressesEqual = (address1, address2) => {
-        // Normalize falsey values (null, undefined, empty string)
-        const normalize = (value) => (!value ? '' : value)
-
-        return (
-            normalize(address1?.firstName) === normalize(address2?.firstName) &&
-            normalize(address1?.lastName) === normalize(address2?.lastName) &&
-            normalize(address1?.address1) === normalize(address2?.address1) &&
-            normalize(address1?.city) === normalize(address2?.city) &&
-            normalize(address1?.stateCode) === normalize(address2?.stateCode) &&
-            normalize(address1?.postalCode) === normalize(address2?.postalCode) &&
-            normalize(address1?.countryCode) === normalize(address2?.countryCode)
-        )
-    }
-
-    /**
-     * Extracts only valid OrderAddress fields from an address object
-     * @param {Object} address - The address object (may contain extra fields from customer address)
-     * @returns {Object} Clean address object with only OrderAddress fields
-     */
-    const cleanAddressForOrder = (address) => {
-        if (!address) return null
 
         return {
-            address1: address.address1,
-            city: address.city,
-            countryCode: address.countryCode,
-            firstName: address.firstName,
-            lastName: address.lastName,
-            phone: address.phone,
-            postalCode: address.postalCode,
-            stateCode: address.stateCode
+            shipments: [
+                {
+                    shipmentId: newShipment.shipmentId,
+                    shippingMethod: {id: pickupShippingMethodId, c_storePickupEnabled: true},
+                    c_fromStoreId: storeInfo.id
+                }
+            ]
         }
-    }
-
-    /**
-     * Finds the first existing delivery shipment with matching address
-     * Multiple shipments with the same address are not supported
-     * @param {Object} basket - The basket object
-     * @param {Object} address - The address to match
-     * @returns {string|null|undefined} The matching shipment ID or null if not found
-     */
-    const findDeliveryShipmentWithSameAddress = (basket, address) => {
-        if (!basket?.shipments || !address) return null
-
-        const foundShipment = basket.shipments.find((shipment) => {
-            // Must be a delivery shipment (not pickup)
-            if (isCurrentShippingMethodPickup(shipment.shippingMethod)) {
-                return false
-            }
-
-            // Check if shipment has a shipping address that matches
-            return shipment.shippingAddress && areAddressesEqual(shipment.shippingAddress, address)
-        })
-        return foundShipment?.shipmentId
-    }
-
-    /**
-     * Finds the first existing delivery shipment that has no address or an empty address
-     * Empty means falsey values for all fields in cleanAddressForOrder
-     * @param {Object} basket - The basket object
-     * @returns {string|null|undefined} The shipment ID without address or null if not found
-     */
-    const findDeliveryShipmentWithoutAddress = (basket) => {
-        if (!basket?.shipments) return null
-
-        const foundShipment = basket.shipments.find((shipment) => {
-            // Must be a delivery shipment (not pickup)
-            if (isCurrentShippingMethodPickup(shipment.shippingMethod)) {
-                return false
-            }
-
-            // Check if shipment has no address or empty address
-            const address = shipment.shippingAddress
-            if (!address) {
-                return true
-            }
-
-            // Check if all address fields are falsey (empty address)
-            return isAddressEmpty(address)
-        })
-        return foundShipment?.shipmentId
     }
 
     /**
      * Creates a new delivery shipment with the specified address
      * @param {Object} basket - The basket object
      * @param {Object} address - The address to use for the shipment
-     * @returns {Promise<string>} The created shipment ID
+     * @returns {Promise<Object>} The created shipment object
      */
     const createNewDeliveryShipmentWithAddress = async (basket, address) => {
         if (!basket?.basketId || !address) return null
 
-        const shippingAddress = cleanAddressForOrder(address)
-
-        const response = await createShipmentForBasketMutation.mutateAsync({
-            parameters: {
-                basketId: basket.basketId
-            },
-            body: {
-                shippingAddress: shippingAddress
-            }
-        })
-
-        // Find the newly created shipment by matching the address
-        return response?.shipments?.find(
-            (shipment) =>
-                !isCurrentShippingMethodPickup(shipment.shippingMethod) &&
-                areAddressesEqual(shipment.shippingAddress, shippingAddress)
-        )?.shipmentId
+        return await createShipmentOperation(address)
     }
 
     /**
@@ -410,207 +268,31 @@ export const useMultiship = (basket) => {
             return null
         }
 
-        const shippingAddress = cleanAddressForOrder(address)
-
-        return await updateShipmentForBasketMutation.mutateAsync({
-            parameters: {
-                basketId: basket.basketId,
-                shipmentId: shipmentId
-            },
-            body: {
-                shippingAddress: shippingAddress
-            }
-        })
+        return await updateShipmentAddress(shipmentId, address)
     }
 
     /**
-     * Moves a product item to a pickup shipment for the specified store
-     * @param {Object} productItem - The product item to move
-     * @param {string} targetShipmentId - The target shipment ID
-     * @param {string} inventoryId - The inventory ID for the store
-     * @returns {Promise<Object>} The updated basket response
-     */
-    const moveItemToPickupShipment = async (productItem, targetShipmentId, inventoryId) => {
-        if (!basket?.basketId || !productItem?.itemId) {
-            throw new Error('Invalid basket or product item')
-        }
-
-        // Update the item to add inventory ID and move to pickup shipment
-        const updateData = {
-            productId: productItem.productId,
-            quantity: productItem.quantity,
-            shipmentId: targetShipmentId,
-            inventoryId: inventoryId
-        }
-
-        return await updateItemInBasketMutation.mutateAsync({
-            parameters: {
-                basketId: basket.basketId,
-                itemId: productItem.itemId
-            },
-            body: updateData
-        })
-    }
-
-    /**
-     * Moves a product item from pickup to delivery shipment
-     * @param {Object} productItem - The product item to move
-     * @param {string} targetShipmentId - The target shipment ID (optional)
-     * @param {string} defaultInventoryId - The default inventory ID to use for delivery items (required)
-     * @returns {Promise<Object>} The updated basket response
-     */
-    const moveItemToDeliveryShipment = async (
-        productItem,
-        targetShipmentId = DEFAULT_SHIPMENT_ID,
-        defaultInventoryId
-    ) => {
-        if (!basket?.basketId || !productItem?.itemId) {
-            throw new Error('Invalid basket or product item')
-        }
-
-        // Update the item to remove inventory ID and move to different shipment
-        const updateData = {
-            productId: productItem.productId,
-            quantity: productItem.quantity,
-            shipmentId: targetShipmentId
-        }
-
-        // Set inventoryId to default for delivery items (instead of null which doesn't work)
-        if (productItem.inventoryId) {
-            updateData.inventoryId = defaultInventoryId
-        }
-
-        return await updateItemInBasketMutation.mutateAsync({
-            parameters: {
-                basketId: basket.basketId,
-                itemId: productItem.itemId
-            },
-            body: updateData
-        })
-    }
-
-    /**
-     * Moves multiple product items from pickup to delivery shipment in parallel
-     * @param {Array} productItems - Array of product items to move
-     * @param {string} targetShipmentId - The target shipment ID (optional)
-     * @param {string} defaultInventoryId - The default inventory ID to use for delivery items (required)
-     * @returns {Promise<Object>} The updated basket response
-     */
-    const moveItemsToDeliveryShipment = async (
-        productItems,
-        targetShipmentId = DEFAULT_SHIPMENT_ID,
-        defaultInventoryId
-    ) => {
-        if (!basket?.basketId || !Array.isArray(productItems) || productItems.length === 0) {
-            throw new Error('Invalid basket or product items array')
-        }
-
-        // Prepare update data for all items
-        const updateData = productItems.map((productItem) => ({
-            itemId: productItem.itemId,
-            productId: productItem.productId,
-            quantity: productItem.quantity,
-            shipmentId: targetShipmentId,
-            // Set inventoryId to default for delivery items (instead of null which doesn't work)
-            ...(productItem.inventoryId && {inventoryId: defaultInventoryId})
-        }))
-
-        try {
-            return await updateItemsInBasketMutation.mutateAsync({
-                parameters: {
-                    basketId: basket.basketId
-                },
-                body: updateData
-            })
-        } catch (error) {
-            console.error('Failed to move items to delivery shipment:', error)
-            throw error
-        }
-    }
-
-    /**
-     * Moves multiple product items to pickup shipment in parallel
-     * @param {Array} productItems - Array of product items to move
-     * @param {string} targetShipmentId - The target shipment ID
-     * @param {string} inventoryId - The inventory ID for the store
-     * @returns {Promise<Object>} The updated basket response
-     */
-    const moveItemsToPickupShipment = async (productItems, targetShipmentId, inventoryId) => {
-        if (!basket?.basketId || !Array.isArray(productItems) || productItems.length === 0) {
-            throw new Error('Invalid basket or product items array')
-        }
-
-        // Prepare update data for all items
-        const updateData = productItems.map((productItem) => ({
-            itemId: productItem.itemId,
-            productId: productItem.productId,
-            quantity: productItem.quantity,
-            shipmentId: targetShipmentId,
-            inventoryId: inventoryId
-        }))
-
-        try {
-            const response = await updateItemsInBasketMutation.mutateAsync({
-                parameters: {
-                    basketId: basket.basketId
-                },
-                body: updateData
-            })
-
-            return response
-        } catch (error) {
-            console.error('Failed to move items to pickup shipment:', error)
-            throw error
-        }
-    }
-
-    /**
-     * Handles delivery option change for a product item
-     * Note: this might leave empty shipments behind
+     * Updates delivery option for a product item
      * @param {Object} productItem - The product item
      * @param {boolean} selectedPickup - Whether pickup is selected (true) or delivery is selected (false)
      * @param {Object} storeInfo - The selected store object (required for pickup)
      * @param {string} defaultInventoryId - The default inventory ID to use for delivery items (required)
      * @returns {Promise<void>}
      */
-    const handleDeliveryOptionChange = async (
+    const updateDeliveryOption = async (
         productItem,
         selectedPickup,
         storeInfo,
         defaultInventoryId
     ) => {
-        if (!basket?.basketId || !productItem) {
-            throw new Error('Invalid basket or product item')
-        }
-
-        const currentShipment = basket.shipments?.find(
-            (shipment) => shipment.shipmentId === productItem.shipmentId
+        await itemShipmentManagement.updateDeliveryOption(
+            productItem,
+            selectedPickup,
+            storeInfo,
+            defaultInventoryId,
+            findOrCreatePickupShipment,
+            findOrCreateDeliveryShipment
         )
-        const isCurrentlyPickup = isCurrentShippingMethodPickup(currentShipment?.shippingMethod)
-
-        let targetShipmentId = null
-
-        // Handle change from pickup to delivery
-        if (!selectedPickup && isCurrentlyPickup) {
-            targetShipmentId = await findOrCreateDeliveryShipment()
-
-            if (!targetShipmentId) {
-                throw new Error('Failed to find or create shipment')
-            }
-
-            await moveItemToDeliveryShipment(productItem, targetShipmentId, defaultInventoryId)
-        }
-        // Handle change from delivery to pickup
-        else if (selectedPickup && !isCurrentlyPickup) {
-            targetShipmentId = await findOrCreatePickupShipment(storeInfo)
-
-            if (!targetShipmentId) {
-                throw new Error('Failed to find or create shipment')
-            }
-
-            // Move the item to the pickup shipment
-            await moveItemToPickupShipment(productItem, targetShipmentId, storeInfo.inventoryId)
-        }
     }
 
     /**
@@ -634,54 +316,6 @@ export const useMultiship = (basket) => {
     }
 
     /**
-     * Identifies shipments that have no product items
-     * @param {Object} basket - The basket object
-     * @returns {Array} Array of empty shipments
-     */
-    const findEmptyShipments = (basket) => {
-        if (!basket?.shipments?.length) {
-            return []
-        }
-
-        return basket.shipments.filter((shipment) => {
-            const hasItems = basket.productItems?.some(
-                (item) => item.shipmentId === shipment.shipmentId
-            )
-            return !hasItems
-        })
-    }
-
-    /**
-     * Finds the best non-empty shipment to consolidate into the default shipment
-     * @param {Object} basket - The basket object
-     * @returns {Object|null} The shipment to consolidate or null if none found
-     */
-    const findShipmentToConsolidate = (basket) => {
-        if (!basket?.shipments?.length) {
-            return null
-        }
-
-        return (
-            basket.shipments.find((shipment) => {
-                const hasItems = basket.productItems?.some(
-                    (item) => item.shipmentId === shipment.shipmentId
-                )
-                return hasItems && shipment.shipmentId !== DEFAULT_SHIPMENT_ID
-            }) || null
-        )
-    }
-
-    /**
-     * Gets items that belong to a specific shipment
-     * @param {Object} basket - The basket object
-     * @param {string} shipmentId - The shipment ID
-     * @returns {Array} Array of product items
-     */
-    const getItemsForShipment = (basket, shipmentId) => {
-        return basket?.productItems?.filter((item) => item.shipmentId === shipmentId) || []
-    }
-
-    /**
      * Consolidates items from a source shipment into the default shipment
      * @param {Object} sourceShipment - The shipment to consolidate from
      * @param {Array} itemsToMove - The items to move
@@ -689,7 +323,7 @@ export const useMultiship = (basket) => {
      */
     const consolidateIntoDefaultShipment = async (sourceShipment, itemsToMove) => {
         try {
-            const isSourcePickup = isCurrentShippingMethodPickup(sourceShipment.shippingMethod)
+            const isSourcePickup = isPickupMethod(sourceShipment.shippingMethod)
 
             if (isSourcePickup) {
                 return await consolidatePickupShipment(sourceShipment, itemsToMove)
@@ -720,7 +354,11 @@ export const useMultiship = (basket) => {
         const storeInfo = {id: storeId, inventoryId: inventoryId}
 
         await configureDefaultShipmentIfNeeded(basket, DEFAULT_SHIPMENT_ID, true, storeInfo)
-        await moveItemsToPickupShipment(itemsToMove, DEFAULT_SHIPMENT_ID, inventoryId)
+        await itemShipmentManagement.updateItemsToPickupShipment(
+            itemsToMove,
+            DEFAULT_SHIPMENT_ID,
+            inventoryId
+        )
 
         return true
     }
@@ -736,7 +374,11 @@ export const useMultiship = (basket) => {
 
         await configureDefaultShipmentIfNeeded(basket, DEFAULT_SHIPMENT_ID, false, null)
         await updateDeliveryAddressForShipment(DEFAULT_SHIPMENT_ID, sourceShipment.shippingAddress)
-        await moveItemsToDeliveryShipment(itemsToMove, DEFAULT_SHIPMENT_ID, defaultInventoryId)
+        await itemShipmentManagement.updateItemsToDeliveryShipment(
+            itemsToMove,
+            DEFAULT_SHIPMENT_ID,
+            defaultInventoryId
+        )
 
         return true
     }
@@ -748,12 +390,7 @@ export const useMultiship = (basket) => {
      */
     const removeShipment = async (shipmentId) => {
         try {
-            await removeShipmentFromBasketMutation.mutateAsync({
-                parameters: {
-                    basketId: basket.basketId,
-                    shipmentId: shipmentId
-                }
-            })
+            await removeShipmentOperation(shipmentId)
             return true
         } catch (error) {
             console.error(`Failed to remove shipment ${shipmentId}:`, error)
@@ -846,17 +483,13 @@ export const useMultiship = (basket) => {
 
     return {
         assignDefaultShippingMethodsToShipments,
-        handleDeliveryOptionChange,
+        updateDeliveryOption,
         removeEmptyShipments,
         findExistingDeliveryShipment,
         findExistingPickupShipment,
         createNewDeliveryShipment,
         createNewDeliveryShipmentWithAddress,
         createNewPickupShipment,
-        moveItemToDeliveryShipment,
-        moveItemsToDeliveryShipment,
-        moveItemToPickupShipment,
-        moveItemsToPickupShipment,
         findDeliveryShipmentWithSameAddress,
         findDeliveryShipmentWithoutAddress,
         findOrCreateDeliveryShipment,

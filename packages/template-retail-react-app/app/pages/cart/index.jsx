@@ -107,7 +107,7 @@ const Cart = () => {
     ].join(',')
 
     const {
-        handleDeliveryOptionChange,
+        updateDeliveryOption,
         assignDefaultShippingMethodsToShipments,
         getItemsForShipment,
         findOrCreatePickupShipment,
@@ -769,7 +769,7 @@ const Cart = () => {
                 throw new Error(`No inventory ID found for product ${productItem.productId}`)
             }
 
-            await handleDeliveryOptionChange(
+            await updateDeliveryOption(
                 productItem,
                 selectedPickup,
                 selectedStore,

@@ -23,6 +23,7 @@ import {
     Center
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 import {useMultiship} from '@salesforce/retail-react-app/app/hooks/use-multiship'
+import {useItemShipmentManagement} from '@salesforce/retail-react-app/app/hooks/use-item-shipment-management'
 import {useCheckout} from '@salesforce/retail-react-app/app/pages/checkout/util/checkout-context'
 import {useAddressProductManagement} from '@salesforce/retail-react-app/app/hooks/use-address-product-management'
 import {useAddressForm} from '@salesforce/retail-react-app/app/hooks/use-address-form'
@@ -33,7 +34,6 @@ const ShippingMultiAddress = ({basket, submitButtonLabel, noItemsInBasketMessage
     const {formatMessage} = useIntl()
     const {STEPS, goToStep} = useCheckout()
     const showToast = useToast()
-
     const {areAddressesEqual} = useMultiship(basket)
     const addressProductManagement = useAddressProductManagement(basket)
     const productIds = addressProductManagement.deliveryItems
@@ -164,6 +164,81 @@ const ShippingMultiAddress = ({basket, submitButtonLabel, noItemsInBasketMessage
                 addressProductManagement.selectedAddresses,
                 addresses
             )
+
+            // Based on the shopper's selected addresses, create a map of unique addressIds and their associated items
+            const addressToItemsMap = {}
+            let basketAfterItemMoves = null
+
+            deliveryItems.forEach((item) => {
+                const selectedAddresses =
+                    customer && customer.isGuest
+                        ? selectedGuestAddresses
+                        : selectedRegisteredUserAddresses
+
+                // Defaults to the first address if no address is selected
+                const addressId = selectedAddresses[item.itemId] || finalAddresses[0]?.addressId
+                const address = finalAddresses.find((addr) => addr.addressId === addressId)
+
+                // If there is an existing shipment with the same address, use it in the next step
+                const shipmentWithSameAddress = findDeliveryShipmentWithSameAddress(basket, address)
+
+                if (!addressToItemsMap[addressId]) {
+                    addressToItemsMap[addressId] = {
+                        address: address,
+                        items: [],
+                        shipmentId: shipmentWithSameAddress?.shipmentId
+                    }
+                }
+                addressToItemsMap[addressId].items.push(item)
+            })
+
+            // For each unique address, if there is no usable existing shipment, create a new one.
+            for (const [addressId, data] of Object.entries(addressToItemsMap)) {
+                const {address, items, shipmentId: existingShipmentId} = data
+
+                let targetShipmentId = existingShipmentId
+                if (!targetShipmentId) {
+                    const targetShipment = findUnusedDeliveryShipment(
+                        basket,
+                        Object.values(addressToItemsMap)
+                            .map((d) => d.shipmentId)
+                            .filter(Boolean) // Filter out undefined/null values
+                    )
+                    targetShipmentId = targetShipment?.shipmentId
+                    if (targetShipmentId) {
+                        await updateDeliveryAddressForShipment(targetShipmentId, address)
+                    } else {
+                        const newShipment = await createNewDeliveryShipmentWithAddress(
+                            basket,
+                            address
+                        )
+                        targetShipmentId = newShipment?.shipmentId
+                    }
+                }
+                // Set the shipmentId for the unique address
+                addressToItemsMap[addressId].shipmentId = targetShipmentId
+                // Move items to the new shipment if needed.
+                const itemsToMove = items.filter((item) => item.shipmentId !== targetShipmentId)
+                if (itemsToMove.length > 0) {
+                    // Get default inventory ID from the first item's product data
+                    const firstItem = itemsToMove[0]
+                    const productData = productsMap?.[firstItem.productId]
+                    const defaultInventoryId = productData?.inventory?.id
+
+                    if (!defaultInventoryId) {
+                        throw new Error(`No inventory ID found for product ${firstItem.productId}`)
+                    }
+
+                    basketAfterItemMoves = await updateItemsToDeliveryShipment(
+                        itemsToMove,
+                        targetShipmentId,
+                        defaultInventoryId
+                    )
+                }
+            }
+            // Remove any empty shipments.
+            await removeEmptyShipments(basketAfterItemMoves || basket)
+
             goToStep(STEPS.SHIPPING_OPTIONS)
         } catch (error) {
             showToast({
