@@ -2,6 +2,8 @@
 - Add support for environment level base paths on /mobify routes [#2892](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2892)
 - Update USID expiry to match SLAS refresh token expiry[#2854](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2854)
 
+- [Bugfix] Skip deleting dwsid on shopper login if hybrid auth is enabled for current site. [#2658](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2658)
+
 ## v3.4.0 (Jul 22, 2025)
 
 - Optionally disable auth init in CommerceApiProvider [#2629](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2629)
