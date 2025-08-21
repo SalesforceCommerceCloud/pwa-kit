@@ -6,15 +6,20 @@
  */
 /* eslint-disable no-import-assign */
 import React from 'react'
-import {act, render, screen} from '@testing-library/react'
+import {act, render, screen, cleanup} from '@testing-library/react'
 import {renderToString} from 'react-dom/server'
 import Island from '@salesforce/retail-react-app/app/components/island'
 import {isServer} from '@salesforce/retail-react-app/app/components/island/utils'
 import * as constants from '@salesforce/retail-react-app/app/constants'
+import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 
 jest.mock('@salesforce/retail-react-app/app/components/island/utils', () => ({
     ...jest.requireActual('@salesforce/retail-react-app/app/components/island/utils'),
     isServer: jest.fn()
+}))
+
+jest.mock('@salesforce/pwa-kit-runtime/utils/ssr-config', () => ({
+    getConfig: jest.fn()
 }))
 
 // Setup global mocks
@@ -54,6 +59,13 @@ describe('Island Component', () => {
 
     beforeEach(() => {
         jest.clearAllMocks()
+        // Set default config to enable partial hydration
+        getConfig.mockReturnValue({
+            app: {
+                partialHydrationEnabled: true
+            }
+        })
+        // Keep the constant as fallback for backward compatibility tests
         Reflect.set(constants, 'PARTIAL_HYDRATION_ENABLED', true)
         global.requestIdleCallback = mockRequestIdleCallback
         global.cancelIdleCallback = mockCancelIdleCallback
@@ -70,8 +82,12 @@ describe('Island Component', () => {
             isServer.mockReturnValue(true)
         })
 
-        test('should not render an island at all if constant "PARTIAL_HYDRATION_ENABLED" is false', () => {
-            Reflect.set(constants, 'PARTIAL_HYDRATION_ENABLED', false)
+        test('should not render an island at all if config "partialHydrationEnabled" is false', () => {
+            getConfig.mockReturnValue({
+                app: {
+                    partialHydrationEnabled: false
+                }
+            })
 
             const {container} = render(
                 <Island>
@@ -120,8 +136,12 @@ describe('Island Component', () => {
     })
 
     describe('Client-Side Rendering (CSR)', () => {
-        test('should not render an island at all if constant "PARTIAL_HYDRATION_ENABLED" is false', () => {
-            Reflect.set(constants, 'PARTIAL_HYDRATION_ENABLED', false)
+        test('should not render an island at all if config "partialHydrationEnabled" is false', () => {
+            getConfig.mockReturnValue({
+                app: {
+                    partialHydrationEnabled: false
+                }
+            })
 
             const {container} = render(
                 <Island>
@@ -909,6 +929,75 @@ describe('Island Component', () => {
                     'server'
                 ])
             })
+        })
+    })
+
+    describe('Backward Compatibility', () => {
+        test('should fall back to PARTIAL_HYDRATION_ENABLED constant when config.app.partialHydrationEnabled is not available', () => {
+            // Mock getConfig to return config without partialHydrationEnabled property
+            getConfig.mockReturnValue({
+                app: {}
+            })
+            Reflect.set(constants, 'PARTIAL_HYDRATION_ENABLED', true)
+
+            // Test SSR behavior first
+            isServer.mockReturnValue(true)
+            const {container: serverContainer, getByTestId: getByTestIdServer} = render(
+                <Island>
+                    <div data-testid="server-content">Server Content</div>
+                </Island>
+            )
+            expect(serverContainer.firstElementChild?.dataset?.sfdcIslandOrigin).toBe('server')
+            expect(getByTestIdServer('server-content')).toBeInTheDocument()
+
+            // Clean up and test CSR behavior
+            cleanup()
+            isServer.mockReturnValue(false)
+            const {container: clientContainer, getByTestId: getByTestIdClient} = render(
+                <Island>
+                    <div data-testid="server-content">Server Content</div>
+                </Island>
+            )
+            expect(clientContainer.firstElementChild?.dataset?.sfdcIslandOrigin).toBe('client')
+            expect(getByTestIdClient('server-content')).toBeInTheDocument()
+        })
+
+        test('should disable islands when both config and constant are false', () => {
+            getConfig.mockReturnValue({
+                app: {
+                    partialHydrationEnabled: false
+                }
+            })
+            Reflect.set(constants, 'PARTIAL_HYDRATION_ENABLED', false)
+
+            const {container} = render(
+                <Island>
+                    <div data-testid="server-content">Server Content</div>
+                </Island>
+            )
+
+            // Should render children directly without island wrapper
+            expect(screen.getByTestId('server-content')).toBeInTheDocument()
+            expect(screen.getByTestId('server-content')).toBe(container.firstElementChild)
+        })
+
+        test('should disable islands when config is false even if constant is true', () => {
+            getConfig.mockReturnValue({
+                app: {
+                    partialHydrationEnabled: false
+                }
+            })
+            Reflect.set(constants, 'PARTIAL_HYDRATION_ENABLED', true)
+
+            const {container} = render(
+                <Island>
+                    <div data-testid="server-content">Server Content</div>
+                </Island>
+            )
+
+            // Config should take precedence over constant
+            expect(screen.getByTestId('server-content')).toBeInTheDocument()
+            expect(screen.getByTestId('server-content')).toBe(container.firstElementChild)
         })
     })
 })

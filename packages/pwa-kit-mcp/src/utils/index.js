@@ -12,7 +12,12 @@ import {
     toKebabCase,
     toPascalCase,
     logMCPMessage,
-    getCopyrightHeader
+    getCopyrightHeader,
+    isBaseComponent,
+    isSharedUIBaseComponent,
+    isLocalComponent,
+    isLocalSharedUIComponent,
+    generateComponentImportStatement
 } from './utils'
 
 export {
@@ -23,5 +28,10 @@ export {
     toKebabCase,
     toPascalCase,
     logMCPMessage,
-    getCopyrightHeader
+    getCopyrightHeader,
+    isBaseComponent,
+    isSharedUIBaseComponent,
+    isLocalComponent,
+    isLocalSharedUIComponent,
+    generateComponentImportStatement
 }

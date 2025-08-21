@@ -1677,12 +1677,6 @@
       "value": "Wishlist"
     }
   ],
-  "global.error.create_account": [
-    {
-      "type": 0,
-      "value": "This feature is not currently available. You must create an account to access this feature."
-    }
-  ],
   "global.error.feature_unavailable": [
     {
       "type": 0,
