@@ -341,8 +341,8 @@ describe('navigation based on shipment context', () => {
 
         await user.click(screen.getByText('Log In'))
 
-        expect(mockGoToStep).toHaveBeenCalledWith(MOCK_STEPS.PAYMENT)
-        expect(mockGoToNextStep).not.toHaveBeenCalled()
+        expect(mockGoToNextStep).toHaveBeenCalled()
+        expect(mockGoToStep).not.toHaveBeenCalled()
     })
 
     test('goes to next step when shipments are mixed (delivery present)', async () => {
