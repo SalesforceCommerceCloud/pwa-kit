@@ -20,8 +20,7 @@ import {
     AlertIcon,
     AlertTitle,
     AlertDescription,
-    Center,
-    Stack
+    Center
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 import {useMultiship} from '@salesforce/retail-react-app/app/hooks/use-multiship'
 import {useCheckout} from '@salesforce/retail-react-app/app/pages/checkout/util/checkout-context'
@@ -92,9 +91,7 @@ const ShippingMultiAddress = ({basket, submitButtonLabel, noItemsInBasketMessage
     const isLoading =
         (addressProductManagement.isGuest ? false : customerLoading) || productsLoading
 
-    const allShipmentsHaveAddress = addressProductManagement.deliveryItems.every(
-        (item) => addressProductManagement.selectedAddresses[item.itemId]
-    )
+    const allShipmentsHaveAddress = addressProductManagement.allItemsHaveAddresses
 
     if (!addressProductManagement.deliveryItems.length) {
         return (
@@ -163,9 +160,7 @@ const ShippingMultiAddress = ({basket, submitButtonLabel, noItemsInBasketMessage
         setIsSubmitting(true)
         try {
             await shipmentProcessing.processShipments(
-                addressProductManagement.deliveryItems,
-                addressProductManagement.selectedAddresses,
-                addresses
+                addressProductManagement.groupedItemsByAddress
             )
             goToStep(STEPS.SHIPPING_OPTIONS)
         } catch (error) {
