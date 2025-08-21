@@ -42,6 +42,7 @@ import {
     Stack
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 import {useMultiship} from '@salesforce/retail-react-app/app/hooks/use-multiship'
+import {useItemShipmentManagement} from '@salesforce/retail-react-app/app/hooks/use-item-shipment-management'
 import {useCheckout} from '@salesforce/retail-react-app/app/pages/checkout/util/checkout-context'
 import {usePickupShipment} from '@salesforce/retail-react-app/app/hooks/use-pickup-shipment'
 
@@ -145,10 +146,11 @@ const ShippingMultiAddress = ({
         findUnusedDeliveryShipment,
         createNewDeliveryShipmentWithAddress,
         updateDeliveryAddressForShipment,
-        moveItemsToDeliveryShipment,
         removeEmptyShipments,
         areAddressesEqual
     } = useMultiship(basket)
+
+    const {updateItemsToDeliveryShipment} = useItemShipmentManagement(basket?.basketId)
 
     // Filter out pickup items - only show delivery items
     const deliveryItems =
@@ -576,16 +578,13 @@ const ShippingMultiAddress = ({
                 const address = finalAddresses.find((addr) => addr.addressId === addressId)
 
                 // If there is an existing shipment with the same address, use it in the next step
-                const shipmentIdWithSameAddress = findDeliveryShipmentWithSameAddress(
-                    basket,
-                    address
-                )
+                const shipmentWithSameAddress = findDeliveryShipmentWithSameAddress(basket, address)
 
                 if (!addressToItemsMap[addressId]) {
                     addressToItemsMap[addressId] = {
                         address: address,
                         items: [],
-                        shipmentId: shipmentIdWithSameAddress
+                        shipmentId: shipmentWithSameAddress?.shipmentId
                     }
                 }
                 addressToItemsMap[addressId].items.push(item)
@@ -599,16 +598,19 @@ const ShippingMultiAddress = ({
                 if (!targetShipmentId) {
                     const targetShipment = findUnusedDeliveryShipment(
                         basket,
-                        Object.values(addressToItemsMap).map((d) => d.shipmentId)
+                        Object.values(addressToItemsMap)
+                            .map((d) => d.shipmentId)
+                            .filter(Boolean) // Filter out undefined/null values
                     )
                     targetShipmentId = targetShipment?.shipmentId
                     if (targetShipmentId) {
                         await updateDeliveryAddressForShipment(targetShipmentId, address)
                     } else {
-                        targetShipmentId = await createNewDeliveryShipmentWithAddress(
+                        const newShipment = await createNewDeliveryShipmentWithAddress(
                             basket,
                             address
                         )
+                        targetShipmentId = newShipment?.shipmentId
                     }
                 }
                 // Set the shipmentId for the unique address
@@ -616,9 +618,19 @@ const ShippingMultiAddress = ({
                 // Move items to the new shipment if needed.
                 const itemsToMove = items.filter((item) => item.shipmentId !== targetShipmentId)
                 if (itemsToMove.length > 0) {
-                    basketAfterItemMoves = await moveItemsToDeliveryShipment(
+                    // Get default inventory ID from the first item's product data
+                    const firstItem = itemsToMove[0]
+                    const productData = productsMap?.[firstItem.productId]
+                    const defaultInventoryId = productData?.inventory?.id
+
+                    if (!defaultInventoryId) {
+                        throw new Error(`No inventory ID found for product ${firstItem.productId}`)
+                    }
+
+                    basketAfterItemMoves = await updateItemsToDeliveryShipment(
                         itemsToMove,
-                        targetShipmentId
+                        targetShipmentId,
+                        defaultInventoryId
                     )
                 }
             }
