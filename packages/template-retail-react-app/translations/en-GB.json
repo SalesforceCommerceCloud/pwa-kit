@@ -1176,6 +1176,9 @@
   "pickup_address.button.continue_to_shipping_address": {
     "defaultMessage": "Continue to Shipping Address"
   },
+  "pickup_address.button.show_product_details": {
+    "defaultMessage": "Show Product Details"
+  },
   "pickup_address.title.pickup_address": {
     "defaultMessage": "Pickup Address & Information"
   },

@@ -63,7 +63,7 @@ const ContactInfo = ({isSocialEnabled = false, isPasswordlessEnabled = false, id
     const updateCustomerForBasket = useShopperBasketsMutation('updateCustomerForBasket')
     const mergeBasket = useShopperBasketsMutation('mergeBasket')
 
-    const {step, STEPS, goToStep, goToNextStep} = useCheckout()
+    const {step, STEPS, goToStep} = useCheckout()
 
     const form = useForm({
         defaultValues: {email: customer?.email || basket?.customerInfo?.email || '', password: ''}
@@ -120,7 +120,7 @@ const ContactInfo = ({isSocialEnabled = false, isPasswordlessEnabled = false, id
                     })
                 }
             }
-            goToNextStep()
+            goToStep(STEPS.PICKUP_ADDRESS)
         } catch (error) {
             if (/Unauthorized/i.test(error.message)) {
                 setError(

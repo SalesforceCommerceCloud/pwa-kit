@@ -35,6 +35,7 @@ export const ToggleCard = ({
     isLoading,
     children,
     onEditActionClick,
+    expandDetails = true,
     ...props
 }) => {
     const titleRef = useRef()
@@ -66,7 +67,7 @@ export const ToggleCard = ({
                         >
                             {title}
                         </Heading>
-                        {!editing && !disabled && onEdit && !disableEdit && (
+                        {!editing && !disabled && onEdit && !disableEdit && expandDetails && (
                             <Button
                                 variant="link"
                                 size="sm"
@@ -122,7 +123,8 @@ ToggleCard.propTypes = {
     onEdit: PropTypes.func,
     editAction: PropTypes.string,
     onEditActionClick: PropTypes.func,
-    children: PropTypes.any
+    children: PropTypes.any,
+    expandDetails: PropTypes.bool
 }
 
 ToggleCardEdit.propTypes = {

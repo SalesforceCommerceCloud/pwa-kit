@@ -128,6 +128,7 @@ afterEach(() => {
     server.resetHandlers()
     cleanup()
     jest.clearAllMocks()
+    jest.restoreAllMocks()
 })
 
 afterAll(() => {
@@ -1005,4 +1006,186 @@ describe('PickupAddress', () => {
         expect(screen.getByText('Store 1 Product')).toBeInTheDocument()
         expect(screen.getByText('Store 2 Product')).toBeInTheDocument()
     })
+
+    test('does not show "Show Product Details" label for single pickup item', async () => {
+        const singlePickupBasket = {
+            ...scapiBasketWithItem,
+            shipments: [
+                {
+                    ...scapiBasketWithItem.shipments[0],
+                    shipmentId: 'shipment-1',
+                    shippingMethod: {c_storePickupEnabled: true},
+                    c_fromStoreId: 'store-1'
+                }
+            ],
+            productItems: [
+                {
+                    ...scapiBasketWithItem.productItems[0],
+                    shipmentId: 'shipment-1',
+                    itemId: 'item-1',
+                    productId: 'product-1',
+                    productName: 'Pickup Product',
+                    quantity: 1
+                }
+            ]
+        }
+
+        useCurrentBasket.mockReturnValue({
+            data: singlePickupBasket,
+            isLoading: false,
+            derivedData: {
+                hasBasket: true,
+                totalItems: singlePickupBasket.productItems.reduce((acc, item) => acc + item.quantity, 0)
+            }
+        })
+        useSelectedStore.mockReturnValue({selectedStore: null})
+        global.server.use(
+            rest.get('*/stores', (req, res, ctx) => {
+                return res(
+                    ctx.json({
+                        data: [
+                            {
+                                id: 'store-1',
+                                name: 'Test Store 1',
+                                address1: '123 Main Street',
+                                city: 'San Francisco',
+                                stateCode: 'CA',
+                                postalCode: '94105',
+                                countryCode: 'US',
+                                phone: '555-123-4567',
+                                storeHours: 'Mon-Fri: 9AM-6PM',
+                                storeType: 'retail'
+                            }
+                        ]
+                    })
+                )
+            })
+        )
+        renderWithProviders(<PickupAddress />)
+        await waitFor(() => {
+            expect(screen.getByText('Pickup Address & Information')).toBeInTheDocument()
+        })
+        // The label should NOT be present
+        expect(screen.queryByText('Show Product Details')).not.toBeInTheDocument()
+    })
+
+    test('shows "Show Product Details" label for mixed pickup and shipping items', async () => {
+        jest.resetModules();
+
+        // Mock useCheckout to set the step to SHIPPING_ADDRESS (summary mode, not disabled)
+        const checkoutContext = require('@salesforce/retail-react-app/app/pages/checkout/util/checkout-context');
+        jest.spyOn(checkoutContext, 'useCheckout').mockReturnValue({
+            step: 2, // SHIPPING_ADDRESS
+            STEPS: {
+                CONTACT_INFO: 0,
+                PICKUP_ADDRESS: 1,
+                SHIPPING_ADDRESS: 2,
+                SHIPPING_OPTIONS: 3,
+                PAYMENT: 4,
+                REVIEW_ORDER: 5
+            },
+            goToStep: jest.fn(),
+            goToNextStep: jest.fn()
+        });
+
+        // Mock useCurrentBasket
+        const {useCurrentBasket} = require('@salesforce/retail-react-app/app/hooks/use-current-basket');
+        const mixedBasket = {
+            ...scapiBasketWithItem,
+            shipments: [
+                {
+                    ...scapiBasketWithItem.shipments[0],
+                    shipmentId: 'shipment-1',
+                    shippingMethod: {c_storePickupEnabled: true},
+                    c_fromStoreId: 'store-1'
+                },
+                {
+                    ...scapiBasketWithItem.shipments[0],
+                    shipmentId: 'shipment-2',
+                    shippingMethod: {c_storePickupEnabled: false}
+                }
+            ],
+            productItems: [
+                {
+                    ...scapiBasketWithItem.productItems[0],
+                    shipmentId: 'shipment-1',
+                    itemId: 'item-1',
+                    productId: 'product-1',
+                    productName: 'Pickup Product',
+                    quantity: 1
+                },
+                {
+                    ...scapiBasketWithItem.productItems[0],
+                    shipmentId: 'shipment-2',
+                    itemId: 'item-2',
+                    productId: 'product-2',
+                    productName: 'Shipping Product',
+                    quantity: 1
+                }
+            ]
+        };
+        useCurrentBasket.mockReturnValue({
+            data: mixedBasket,
+            isLoading: false,
+            derivedData: {
+                hasBasket: true,
+                totalItems: mixedBasket.productItems.reduce((acc, item) => acc + item.quantity, 0)
+            }
+        });
+
+        // Mock useSelectedStore
+        const {useSelectedStore} = require('@salesforce/retail-react-app/app/hooks/use-selected-store');
+        useSelectedStore.mockReturnValue({selectedStore: null});
+
+        // Inline mock useStores and useProducts
+        const commerceSdkReact = require('@salesforce/commerce-sdk-react');
+        const originalUseStores = commerceSdkReact.useStores;
+        const originalUseProducts = commerceSdkReact.useProducts;
+        commerceSdkReact.useStores = jest.fn().mockReturnValue({
+            data: {
+                data: [
+                    {
+                        id: 'store-1',
+                        name: 'Test Store 1',
+                        address1: '123 Main Street',
+                        city: 'San Francisco',
+                        stateCode: 'CA',
+                        postalCode: '94105',
+                        countryCode: 'US',
+                        phone: '555-123-4567',
+                        storeHours: 'Mon-Fri: 9AM-6PM',
+                        storeType: 'retail'
+                    }
+                ]
+            },
+            isLoading: false
+        });
+        commerceSdkReact.useProducts = jest.fn().mockReturnValue({
+            data: {
+                'product-1': {id: 'product-1', name: 'Pickup Product'},
+                'product-2': {id: 'product-2', name: 'Shipping Product'}
+            },
+            isLoading: false
+        });
+
+        // Dynamically import PickupAddress after mocks are set
+        const PickupAddress = require('./pickup-address').default;
+        const {renderWithProviders} = require('@salesforce/retail-react-app/app/utils/test-utils');
+        const {screen, waitFor} = require('@testing-library/react');
+
+        try {
+            renderWithProviders(<PickupAddress />);
+            await waitFor(() => {
+                expect(screen.getByText('Pickup Address & Information')).toBeInTheDocument();
+            });
+            // The label should be present in summary mode as a button
+            await waitFor(() => {
+                expect(screen.getByRole('button', {name: /show product details/i})).toBeInTheDocument();
+            });
+        } finally {
+            // Restore original hooks
+            commerceSdkReact.useStores = originalUseStores;
+            commerceSdkReact.useProducts = originalUseProducts;
+        }
+    });
 })

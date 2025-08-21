@@ -197,6 +197,11 @@ const PickupAddress = () => {
             editing={step === STEPS.PICKUP_ADDRESS}
             disabled={step === STEPS.CONTACT_INFO}
             onEdit={() => goToStep(STEPS.PICKUP_ADDRESS)}
+            expandDetails={shouldShowCartItems}
+            editLabel={formatMessage({
+                defaultMessage: 'Show Product Details',
+                id: 'pickup_address.button.show_product_details'
+            })}
         >
             {step === STEPS.PICKUP_ADDRESS && (
                 <>
