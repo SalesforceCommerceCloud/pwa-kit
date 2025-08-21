@@ -1203,14 +1203,11 @@ class Auth {
 
     /**
      * A wrapper method for commerce-sdk-isomorphic helper: authorizeIDP.
+     * Initiates OAuth2 authorization flow for Identity Provider (IDP) login.
      *
      */
     async authorizeIDP(parameters: AuthorizeIDPPublicParams | AuthorizeIDPParams) {
-        const codeVerifier = helpers.createCodeVerifier()
-        const codeChallenge = await helpers.generateCodeChallenge(codeVerifier)
-        const organizationId = this.client.clientConfig.parameters.organizationId
-        const clientId = this.client.clientConfig.parameters.clientId
-        const siteId = this.client.clientConfig.parameters.siteId
+        const slasClient = this.client
         const usid = this.get('usid')
         const dntPref = this.getDnt({includeDefaults: true})
 
@@ -1222,34 +1219,36 @@ class Auth {
         const hint = isPublicCall ? parameters.hint : parameters.parameters?.hint || ''
         const customParams = isPublicCall ? parameters : parameters.parameters || {}
 
-        const url = `${
-            this.client.clientConfig.proxy || ''
-        }/shopper/auth/v1/organizations/${organizationId}/oauth2/authorize?${[
-            ...[
-                `client_id=${clientId}`,
-                `channel_id=${siteId}`,
-                `redirect_uri=${redirectURI as string}`,
-                `response_type=code`,
-                `hint=${hint as string}`,
-                `code_challenge=${codeChallenge}`,
-                `code_challenge_method=S256`
-            ],
-            ...(!this.clientSecret ? [`code_verifier=${codeVerifier}`] : []),
-            ...(usid ? [`usid=${usid}`] : []),
-            ...(dntPref ? [`dnt=${String(dntPref)}`] : []),
-            // Add custom parameters
-            ...Object.entries(customParams)
-                .filter(([key]) => !['redirectURI', 'hint', 'usid', 'dnt'].includes(key))
-                .map(([key, value]) => `${key}=${value as string}`)
-        ].join('&')}`
+        // Filter out known parameters to get only custom ones
+        const filteredCustomParams = Object.fromEntries(
+            Object.entries(customParams).filter(
+                ([key]) => !['redirectURI', 'hint', 'usid', 'dnt'].includes(key)
+            )
+        )
 
-        this.set('code_verifier', codeVerifier)
+        const authorizeParams = {
+            ...filteredCustomParams,
+            ...(usid && {usid}),
+            ...(dntPref && {dnt: dntPref}),
+            redirectURI,
+            hint
+        }
+
+        const result = await helpers.authorizeIDP({
+            slasClient,
+            parameters: authorizeParams
+        })
+
+        // Store code verifier for later use in loginIDPUser
+        this.set('code_verifier', result.codeVerifier)
+
         if (onClient()) {
-            window.location.assign(url)
+            window.location.assign(result.url)
         } else {
             console.warn('Something went wrong, this client side method is invoked on the server.')
         }
-        this.set('code_verifier', codeVerifier)
+
+        return result
     }
 
     /**

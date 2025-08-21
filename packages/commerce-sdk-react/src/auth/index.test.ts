@@ -51,7 +51,10 @@ jest.mock('commerce-sdk-isomorphic', () => {
             logout: jest.fn().mockResolvedValue(''),
             handleTokenResponse: jest.fn().mockResolvedValue(''),
             loginIDPUser: jest.fn().mockResolvedValue(''),
-            authorizeIDP: jest.fn().mockResolvedValue(''),
+            authorizeIDP: jest.fn().mockResolvedValue({
+                url: 'https://example.com/authorize?code_challenge=test&redirect_uri=test',
+                codeVerifier: 'test-code-verifier'
+            }),
             authorizePasswordless: jest.fn().mockResolvedValue(''),
             getPasswordLessAccessToken: jest.fn().mockResolvedValue(''),
             createCodeVerifier: jest.fn().mockReturnValue('test-code-verifier'),
@@ -886,24 +889,36 @@ describe('Auth', () => {
         })
     })
 
-    test('authorizeIDP calls isomorphic authorizeIDP', async () => {
+    test('authorizeIDP calls helpers.authorizeIDP and handles client-side navigation', async () => {
         const auth = new Auth(config)
-        await auth.authorizeIDP({
+        const result = await auth.authorizeIDP({
             redirectURI: 'redirectURI',
             hint: 'test',
             c_customParam: 'customParam'
         })
-        // authorizeIDP doesn't actually call the helper, it constructs a URL
-        // So we just verify that createCodeVerifier was called (which it is for URL construction)
-        expect(helpers.createCodeVerifier).toHaveBeenCalled()
+        
+        expect(helpers.authorizeIDP).toHaveBeenCalled()
+        const functionArg = (helpers.authorizeIDP as jest.Mock).mock.calls[0][0]
+        expect(functionArg).toMatchObject({
+            parameters: expect.objectContaining({
+                redirectURI: 'redirectURI',
+                hint: 'test',
+                c_customParam: 'customParam'
+            })
+        })
+        
+        // Should return the result from helpers.authorizeIDP
+        expect(result).toHaveProperty('url')
+        expect(result).toHaveProperty('codeVerifier')
     })
 
-    test('authorizeIDP adds clientSecret to parameters when using private client', async () => {
+    test('authorizeIDP works with private client configuration', async () => {
         const auth = new Auth(configSLASPrivate)
-        await auth.authorizeIDP({redirectURI: 'test', hint: 'test'})
-        // authorizeIDP doesn't actually call the helper, it constructs a URL
-        // So we just verify that createCodeVerifier was called (which it is for URL construction)
-        expect(helpers.createCodeVerifier).toHaveBeenCalled()
+        const result = await auth.authorizeIDP({redirectURI: 'test', hint: 'test'})
+        
+        expect(helpers.authorizeIDP).toHaveBeenCalled()
+        expect(result).toHaveProperty('url')
+        expect(result).toHaveProperty('codeVerifier')
     })
 
     test('authorizePasswordless calls isomorphic authorizePasswordless', async () => {
@@ -1223,3 +1238,4 @@ describe('Auth service sends credentials fetch option to the ShopperLogin API', 
         expect(args.slasClient.clientConfig.fetchOptions.credentials).toBe('same-origin')
     })
 })
+
