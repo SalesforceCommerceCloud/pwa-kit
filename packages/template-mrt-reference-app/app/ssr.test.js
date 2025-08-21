@@ -11,7 +11,7 @@ const {LambdaClient, InvokeCommand} = require('@aws-sdk/client-lambda')
 const {S3Client, GetObjectCommand} = require('@aws-sdk/client-s3')
 const {
     CloudWatchLogsClient,
-    PutLogEventsCommand,
+    CreateLogStreamCommand,
     AccessDeniedException
 } = require('@aws-sdk/client-cloudwatch-logs')
 const {mockClient} = require('aws-sdk-client-mock')
@@ -37,7 +37,8 @@ describe('server', () => {
             DEPLOY_TARGET: 'test',
             EXTERNAL_DOMAIN_NAME: 'test.com',
             MOBIFY_PROPERTY_ID: 'test',
-            AWS_LAMBDA_FUNCTION_NAME: 'pretend-to-be-remote'
+            AWS_LAMBDA_FUNCTION_NAME: 'pretend-to-be-remote',
+            AWS_REGION: 'us-east-2'
         })
 
         const ssr = require('./ssr')
@@ -99,8 +100,8 @@ describe('server', () => {
         jest.spyOn(console, 'error')
         lambdaMock.on(InvokeCommand).rejects(new AccessDeniedException())
         s3Mock.on(GetObjectCommand).rejects(new AccessDenied())
-        logsMock.on(PutLogEventsCommand).rejects(new AccessDeniedException())
-        const params = `FunctionName=name&Bucket=bucket&Key=key&logGroupName=lgName&logStreamName=lsName`
+        logsMock.on(CreateLogStreamCommand).rejects(new AccessDeniedException())
+        const params = `FunctionName=name&Bucket=bucket&Key=key&logGroupName=lgName`
         const response = await request(app).get(`/isolation?${params}`)
         expect(response.body.origin).toBe(true)
         expect(response.body.storage).toBe(true)
@@ -111,8 +112,8 @@ describe('server', () => {
         jest.spyOn(console, 'error')
         lambdaMock.on(InvokeCommand).resolves()
         s3Mock.on(GetObjectCommand).resolves()
-        logsMock.on(PutLogEventsCommand).resolves()
-        const params = `FunctionName=name&Bucket=bucket&Key=key&logGroupName=lgName&logStreamName=lsName`
+        logsMock.on(CreateLogStreamCommand).resolves()
+        const params = `FunctionName=name&Bucket=bucket&Key=key&logGroupName=lgName`
         const response = await request(app).get(`/isolation?${params}`)
         expect(response.body.origin).toBe(false)
         expect(response.body.storage).toBe(false)
