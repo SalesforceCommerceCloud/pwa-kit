@@ -8,7 +8,7 @@
 
 const {LambdaClient, InvokeCommand} = require('@aws-sdk/client-lambda')
 const {S3Client, GetObjectCommand} = require('@aws-sdk/client-s3')
-const {CloudWatchLogsClient, PutLogEventsCommand} = require('@aws-sdk/client-cloudwatch-logs')
+const {CloudWatchLogsClient, CreateLogStreamCommand} = require('@aws-sdk/client-cloudwatch-logs')
 
 export const isolationOriginLambdaTest = async (input) => {
     const client = new LambdaClient()
@@ -25,7 +25,8 @@ export const isolationOriginLambdaTest = async (input) => {
 }
 
 export const isolationS3Test = async (input) => {
-    const client = new S3Client({region: 'us-east-1'})
+    const region = process.env.AWS_REGION || 'us-east-1'
+    const client = new S3Client({region: region})
     try {
         await client.send(new GetObjectCommand(input))
     } catch (e) {
@@ -41,16 +42,12 @@ export const isolationS3Test = async (input) => {
 export const isolationLogsTest = async (input) => {
     const client = new CloudWatchLogsClient()
     try {
+        const randomString = Math.random().toString(36).slice(2, 7)
         const inputValues = {
             ...input,
-            logEvents: [
-                {
-                    timestamp: Date.now(),
-                    message: 'This is plastic'
-                }
-            ]
+            logStreamName: `new_log_stream_${randomString}`
         }
-        await client.send(new PutLogEventsCommand(inputValues))
+        await client.send(new CreateLogStreamCommand(inputValues))
     } catch (e) {
         if (e.name === 'AccessDeniedException') {
             return true
@@ -65,7 +62,7 @@ export const executeIsolationTests = async (params) => {
     const tests = [
         {name: 'origin', keys: ['FunctionName'], fn: isolationOriginLambdaTest},
         {name: 'storage', keys: ['Bucket', 'Key'], fn: isolationS3Test},
-        {name: 'logs', keys: ['logGroupName', 'logStreamName'], fn: isolationLogsTest}
+        {name: 'logs', keys: ['logGroupName'], fn: isolationLogsTest}
     ]
     let results = {}
     for (const test of tests) {
