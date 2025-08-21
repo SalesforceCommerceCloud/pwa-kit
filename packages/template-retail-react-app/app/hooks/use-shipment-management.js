@@ -25,12 +25,12 @@ export const useShipmentManagement = (basket) => {
     } = useMultiship(basket)
 
     /**
-     * Orchestrates shipment operations: finding, creating, updating, moving items, and cleanup
+     * Orchestrates shipment operations
      * 
-     * @param {Array} deliveryItems - Array of items that need to be delivered
+     * @param {Array} deliveryItems
      * @param {Object} selectedAddresses - Object mapping item IDs to selected address IDs
-     * @param {Array} finalAddresses - Array of final addresses to use for shipments
-     * @returns {Promise<Object>} Promise that resolves to success object or throws error
+     * @param {Array} finalAddresses
+     * @returns {Promise<Object>}
      */
     const orchestrateShipmentOperations = useCallback(async (deliveryItems, selectedAddresses, finalAddresses) => {
         try {

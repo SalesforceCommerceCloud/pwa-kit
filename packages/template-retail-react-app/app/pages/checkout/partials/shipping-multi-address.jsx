@@ -26,8 +26,8 @@ import {useMultiship} from '@salesforce/retail-react-app/app/hooks/use-multiship
 import {useCheckout} from '@salesforce/retail-react-app/app/pages/checkout/util/checkout-context'
 import {useAddressProductManagement} from '@salesforce/retail-react-app/app/hooks/use-address-product-management'
 import {useAddressForm} from '@salesforce/retail-react-app/app/hooks/use-address-form'
-import {useShipmentManagement} from '@salesforce/retail-react-app/app/hooks/use-shipment-processing'
-import ProductShippingAddressCard from './product-shipping-address-card'
+import {useShipmentManagement} from '@salesforce/retail-react-app/app/hooks/use-shipment-management'
+import ProductShippingAddressCard from './product-shipping-address-card.jsx'
 
 const ShippingMultiAddress = ({basket, submitButtonLabel, noItemsInBasketMessage}) => {
     const {formatMessage} = useIntl()
@@ -159,7 +159,6 @@ const ShippingMultiAddress = ({basket, submitButtonLabel, noItemsInBasketMessage
     const handleSubmit = async () => {
         setIsSubmitting(true)
         try {
-            // Orchestrate shipment operations with correct parameters
             await shipmentManagement.orchestrateShipmentOperations(
                 addressProductManagement.deliveryItems,
                 addressProductManagement.selectedAddresses,
