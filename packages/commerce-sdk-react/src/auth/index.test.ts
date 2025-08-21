@@ -1213,7 +1213,7 @@ describe('Auth service sends credentials fetch option to the ShopperLogin API', 
     })
 })
 
-describe('clearECOMSession with hybridAuthEnabled', () => {
+describe('hybridAuthEnabled property toggles clearECOMSession', () => {
     beforeEach(() => {
         jest.clearAllMocks()
     })
