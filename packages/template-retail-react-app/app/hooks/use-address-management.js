@@ -14,10 +14,16 @@ import {isAddressEmpty} from '../utils/address-utils'
 /**
  * Managing address selection state
  */
-export const useAddressManagement = (basket, deliveryItems) => {
+export const useAddressManagement = (basket) => {
     const {data: customer} = useCurrentCustomer()
     const {isCurrentShippingMethodPickup} = usePickupShipment(basket)
     const {areAddressesEqual} = useMultiship(basket)
+    
+    // Filter out pickup items - only show delivery items
+    const deliveryItems = basket?.productItems?.filter((item) => {
+        const shipment = basket?.shipments?.find((s) => s.shipmentId === item.shipmentId)
+        return !isCurrentShippingMethodPickup(shipment?.shippingMethod)
+    }) || []
 
     const [guestAddresses, setGuestAddresses] = useState([])
     const [selectedGuestAddresses, setSelectedGuestAddresses] = useState({})
@@ -198,7 +204,7 @@ export const useAddressManagement = (basket, deliveryItems) => {
         }
     }, [
         customer?.isGuest,
-        deliveryItems?.length,
+        basket?.productItems?.length,
         basket?.shipments?.length,
         isCurrentShippingMethodPickup,
         areAddressesEqual
@@ -263,10 +269,11 @@ export const useAddressManagement = (basket, deliveryItems) => {
     }, [])
 
     return {
-        availableAddresses,
-        selectedAddresses,
+        availableAddresses: availableAddresses || [],
+        selectedAddresses: selectedAddresses || {},
         addGuestAddress,
-        isGuest: customer?.isGuest,
-        setAddressesForItems
+        isGuest: customer?.isGuest || false,
+        setAddressesForItems,
+        deliveryItems: deliveryItems || []
     }
 }
