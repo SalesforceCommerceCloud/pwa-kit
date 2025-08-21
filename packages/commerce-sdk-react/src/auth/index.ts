@@ -1368,9 +1368,8 @@ class Auth {
      * A wrapper method for the SLAS endpoint: getPasswordResetToken.
      *
      */
-    async getPasswordResetToken(parameters: {user_id: string; callback_uri: string}) {
+    async getPasswordResetToken(parameters: ShopperLoginTypes.getPasswordResetTokenBodyType) {
         const slasClient = this.client
-        const callbackURI = parameters.callback_uri
 
         const options = {
             headers: {
@@ -1378,11 +1377,14 @@ class Auth {
             },
             body: {
                 user_id: parameters.user_id,
-                mode: 'callback',
-                channel_id: slasClient.clientConfig.parameters.siteId,
-                client_id: slasClient.clientConfig.parameters.clientId,
-                callback_uri: callbackURI,
-                hint: 'cross_device'
+                mode: parameters.mode || 'callback',
+                channel_id: parameters.channel_id || slasClient.clientConfig.parameters.siteId,
+                client_id: parameters.client_id || slasClient.clientConfig.parameters.clientId,
+                callback_uri: parameters.callback_uri,
+                hint: parameters.hint || 'cross_device',
+                locale: parameters.locale,
+                code_challenge: parameters.code_challenge,
+                idp_name: parameters.idp_name
             }
         }
 
