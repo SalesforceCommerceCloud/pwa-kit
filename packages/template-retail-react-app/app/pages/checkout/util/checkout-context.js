@@ -9,9 +9,13 @@ import PropTypes from 'prop-types'
 import useEinstein from '@salesforce/retail-react-app/app/hooks/use-einstein'
 import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
-import {useMultiship} from '@salesforce/retail-react-app/app/hooks/use-multiship'
 import {STORE_LOCATOR_IS_ENABLED} from '@salesforce/retail-react-app/app/constants'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
+import {
+    findDeliveryShipmentWithoutAddress,
+    findExistingDeliveryShipment,
+    findExistingPickupShipment
+} from '@salesforce/retail-react-app/app/utils/shipment-utils'
 
 const CheckoutContext = React.createContext()
 
@@ -20,11 +24,6 @@ export const CheckoutProvider = ({children}) => {
     const {data: basket} = useCurrentBasket()
     const einstein = useEinstein()
     const [step, setStep] = useState()
-    const {
-        findDeliveryShipmentWithoutAddress,
-        findExistingDeliveryShipment,
-        findExistingPickupShipment
-    } = useMultiship(basket)
     const storeLocatorEnabled = getConfig()?.app?.storeLocatorEnabled ?? STORE_LOCATOR_IS_ENABLED
 
     const CHECKOUT_STEPS_LIST = [

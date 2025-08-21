@@ -17,10 +17,6 @@ import {
     findEmptyShipments,
     findExistingDeliveryShipment,
     findExistingPickupShipment,
-    findUnusedDeliveryShipment,
-    areAddressesEqual,
-    findDeliveryShipmentWithSameAddress,
-    findDeliveryShipmentWithoutAddress,
     findShipmentToConsolidate,
     isPickupMethod
 } from '@salesforce/retail-react-app/app/utils/shipment-utils'
@@ -35,7 +31,7 @@ export const useMultiship = (basket) => {
         getDefaultShippingMethodId,
         getPickupShippingMethodId,
         getShippingAddressForStore,
-        configureDefaultShipmentIfNeeded
+        updateDefaultShipmentIfNeeded
     } = usePickupShipment(basket)
 
     const {
@@ -73,7 +69,7 @@ export const useMultiship = (basket) => {
      *
      * @returns {Promise<void>} Promise that resolves when all updates are complete
      */
-    const assignDefaultShippingMethodsToShipments = async () => {
+    const updateShipmentsWithoutMethods = async () => {
         if (!basket?.basketId || !basket?.shipments?.length) {
             return
         }
@@ -120,7 +116,7 @@ export const useMultiship = (basket) => {
 
     /**
      * Creates a new delivery shipment without a shipping method, or configures and returns the default shipment for delivery if it's empty
-     * The default shipping method will be assigned later by assignDefaultShippingMethodsToShipments
+     * The default shipping method will be assigned later by updateShipmentsWithoutMethods
      * @param {Object} basket - The basket object
      * @returns {Promise<Object>} The created shipment response
      */
@@ -134,11 +130,11 @@ export const useMultiship = (basket) => {
             !basket.productItems?.some((item) => item.shipmentId === DEFAULT_SHIPMENT_ID)
 
         if (isDefaultShipmentEmpty) {
-            return await configureDefaultShipmentIfNeeded(basket, DEFAULT_SHIPMENT_ID, false)
+            return await updateDefaultShipmentIfNeeded(basket, DEFAULT_SHIPMENT_ID, false)
         }
 
         // Otherwise, create a new shipment without a shipping method
-        // The assignDefaultShippingMethodsToShipments function will handle setting the default shipping method
+        // The updateShipmentsWithoutMethods function will handle setting the default shipping method
         const newShipment = await createShipmentOperation()
         return {shipments: [newShipment]}
     }
@@ -212,12 +208,7 @@ export const useMultiship = (basket) => {
             !basket.productItems?.some((item) => item.shipmentId === DEFAULT_SHIPMENT_ID)
 
         if (isDefaultShipmentEmpty) {
-            return await configureDefaultShipmentIfNeeded(
-                basket,
-                DEFAULT_SHIPMENT_ID,
-                true,
-                storeInfo
-            )
+            return await updateDefaultShipmentIfNeeded(basket, DEFAULT_SHIPMENT_ID, true, storeInfo)
         }
 
         // Get shipping methods to determine the pickup shipping method ID
@@ -316,7 +307,8 @@ export const useMultiship = (basket) => {
     }
 
     /**
-     * Consolidates items from a source shipment into the default shipment
+     * Consolidates items from a source shipment into the default shipment.
+     * Fails without throwing an error.
      * @param {Object} sourceShipment - The shipment to consolidate from
      * @param {Array} itemsToMove - The items to move
      * @returns {Promise<boolean>} True if consolidation was successful
@@ -331,7 +323,10 @@ export const useMultiship = (basket) => {
                 return await consolidateDeliveryShipment(sourceShipment, itemsToMove)
             }
         } catch (error) {
-            console.error(`Failed to consolidate shipment ${sourceShipment.shipmentId}:`, error)
+            logger.error(`Failed to consolidate shipment ${sourceShipment.shipmentId}`, {
+                error: error.message,
+                shipmentId: sourceShipment.shipmentId
+            })
             return false
         }
     }
@@ -347,13 +342,13 @@ export const useMultiship = (basket) => {
         const inventoryId = itemsToMove[0]?.inventoryId
 
         if (!storeId || !inventoryId) {
-            console.warn('Missing store or inventory information for pickup consolidation')
+            logger.error('Missing store or inventory information for pickup consolidation')
             return false
         }
 
         const storeInfo = {id: storeId, inventoryId: inventoryId}
 
-        await configureDefaultShipmentIfNeeded(basket, DEFAULT_SHIPMENT_ID, true, storeInfo)
+        await updateDefaultShipmentIfNeeded(basket, DEFAULT_SHIPMENT_ID, true, storeInfo)
         await itemShipmentManagement.updateItemsToPickupShipment(
             itemsToMove,
             DEFAULT_SHIPMENT_ID,
@@ -372,7 +367,7 @@ export const useMultiship = (basket) => {
     const consolidateDeliveryShipment = async (sourceShipment, itemsToMove) => {
         const defaultInventoryId = itemsToMove[0]?.inventoryId
 
-        await configureDefaultShipmentIfNeeded(basket, DEFAULT_SHIPMENT_ID, false, null)
+        await updateDefaultShipmentIfNeeded(basket, DEFAULT_SHIPMENT_ID, false, null)
         await updateDeliveryAddressForShipment(DEFAULT_SHIPMENT_ID, sourceShipment.shippingAddress)
         await itemShipmentManagement.updateItemsToDeliveryShipment(
             itemsToMove,
@@ -384,7 +379,7 @@ export const useMultiship = (basket) => {
     }
 
     /**
-     * Removes a shipment from the basket
+     * Removes a shipment from the basket. Fails without throwing an error.
      * @param {string} shipmentId - The shipment ID to remove
      * @returns {Promise<boolean>} True if removal was successful
      */
@@ -393,7 +388,10 @@ export const useMultiship = (basket) => {
             await removeShipmentOperation(shipmentId)
             return true
         } catch (error) {
-            console.error(`Failed to remove shipment ${shipmentId}:`, error)
+            logger.error(`Failed to remove shipment ${shipmentId}:`, {
+                error: error.message,
+                shipmentId
+            })
             return false
         }
     }
@@ -482,24 +480,15 @@ export const useMultiship = (basket) => {
     }
 
     return {
-        assignDefaultShippingMethodsToShipments,
+        updateShipmentsWithoutMethods,
         updateDeliveryOption,
         removeEmptyShipments,
-        findExistingDeliveryShipment,
-        findExistingPickupShipment,
         createNewDeliveryShipment,
         createNewDeliveryShipmentWithAddress,
         createNewPickupShipment,
-        findDeliveryShipmentWithSameAddress,
-        findDeliveryShipmentWithoutAddress,
         findOrCreateDeliveryShipment,
         findOrCreatePickupShipment,
         getShipmentForItems,
-        findEmptyShipments,
-        findShipmentToConsolidate,
-        getItemsForShipment,
-        findUnusedDeliveryShipment,
-        updateDeliveryAddressForShipment,
-        areAddressesEqual
+        updateDeliveryAddressForShipment
     }
 }

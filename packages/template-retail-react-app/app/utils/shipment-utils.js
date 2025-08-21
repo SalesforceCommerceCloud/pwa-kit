@@ -5,7 +5,11 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import {isAddressEmpty} from '@salesforce/retail-react-app/app/utils/address-utils'
+import {
+    cleanAddressForOrder,
+    areAddressesEqual,
+    isAddressEmpty
+} from '@salesforce/retail-react-app/app/utils/address-utils'
 import {DEFAULT_SHIPMENT_ID} from '@salesforce/retail-react-app/app/constants'
 
 /**
@@ -20,6 +24,15 @@ import {DEFAULT_SHIPMENT_ID} from '@salesforce/retail-react-app/app/constants'
  */
 export const isPickupMethod = (shippingMethod) => {
     return shippingMethod?.c_storePickupEnabled === true
+}
+
+/**
+ * Checks if a shipment is configured for pickup-in-store
+ * @param {object} shipment the shipment to check. can be null.
+ * @returns {boolean} true if the shipment is configured for pickup-in-store.
+ */
+export const isPickupShipment = (shipment) => {
+    return isPickupMethod(shipment?.shippingMethod)
 }
 
 /**
@@ -122,47 +135,6 @@ export const findUnusedDeliveryShipment = (basket, usedShipmentIds = []) => {
                 !usedShipmentIds.includes(shipment.shipmentId)
         ) || null
     )
-}
-
-/**
- * Compares two addresses to determine if they are the same
- * @param {Object} address1 - First address object
- * @param {Object} address2 - Second address object
- * @returns {boolean} True if addresses match
- */
-export const areAddressesEqual = (address1, address2) => {
-    // Normalize falsey values (null, undefined, empty string)
-    const normalize = (value) => (!value ? '' : value)
-
-    return (
-        normalize(address1?.firstName) === normalize(address2?.firstName) &&
-        normalize(address1?.lastName) === normalize(address2?.lastName) &&
-        normalize(address1?.address1) === normalize(address2?.address1) &&
-        normalize(address1?.city) === normalize(address2?.city) &&
-        normalize(address1?.stateCode) === normalize(address2?.stateCode) &&
-        normalize(address1?.postalCode) === normalize(address2?.postalCode) &&
-        normalize(address1?.countryCode) === normalize(address2?.countryCode)
-    )
-}
-
-/**
- * Extracts only valid OrderAddress fields from an address object
- * @param {Object} address - The address object (may contain extra fields from customer address)
- * @returns {Object} Clean address object with only OrderAddress fields
- */
-export const cleanAddressForOrder = (address) => {
-    if (!address) return null
-
-    return {
-        address1: address.address1,
-        city: address.city,
-        countryCode: address.countryCode,
-        firstName: address.firstName,
-        lastName: address.lastName,
-        phone: address.phone,
-        postalCode: address.postalCode,
-        stateCode: address.stateCode
-    }
 }
 
 /**

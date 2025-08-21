@@ -37,12 +37,11 @@ import ShippingAddressSelection from '@salesforce/retail-react-app/app/pages/che
 import AddressDisplay from '@salesforce/retail-react-app/app/components/address-display'
 import {PromoCode, usePromoCode} from '@salesforce/retail-react-app/app/components/promo-code'
 import {API_ERROR_MESSAGE} from '@salesforce/retail-react-app/app/constants'
-import {usePickupShipment} from '@salesforce/retail-react-app/app/hooks/use-pickup-shipment'
+import {isPickupShipment} from '@salesforce/retail-react-app/app/utils/shipment-utils'
 
 const Payment = () => {
     const {formatMessage} = useIntl()
     const {data: basket} = useCurrentBasket()
-    const {isPickupShipment} = usePickupShipment(basket)
     const isPickupOnly =
         basket?.shipments?.length > 0 &&
         basket.shipments.every((shipment) => isPickupShipment(shipment))
