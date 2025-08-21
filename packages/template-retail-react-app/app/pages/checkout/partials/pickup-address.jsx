@@ -196,6 +196,10 @@ const PickupAddress = () => {
             editing={step === STEPS.PICKUP_ADDRESS}
             disabled={step === STEPS.CONTACT_INFO}
             onEdit={() => goToStep(STEPS.PICKUP_ADDRESS)}
+            editLabel={formatMessage({
+                defaultMessage: 'Show Products',
+                id: 'pickup_address.button.show_products'
+            })}
         >
             {step === STEPS.PICKUP_ADDRESS && (
                 <>
@@ -204,34 +208,8 @@ const PickupAddress = () => {
                             pickupShipmentItems.length > 0 &&
                             !isStoreDataLoading && (
                                 <>
-                                    {/* Single pickup */}
-                                    {pickupShipmentItems.length === 1 && !shouldShowCartItems && (
-                                        <>
-                                            <Text fontWeight="bold" fontSize="md" mb={2}>
-                                                <FormattedMessage
-                                                    defaultMessage="Store Information"
-                                                    id="pickup_address.title.store_information"
-                                                />
-                                            </Text>
-                                            {pickupShipmentItems[0].store && (
-                                                <StoreDisplay
-                                                    store={pickupShipmentItems[0].store}
-                                                    showDistance={false}
-                                                    showStoreHours={false}
-                                                    showPhone={false}
-                                                    showEmail={false}
-                                                    nameStyle={{
-                                                        fontSize: 'sm',
-                                                        fontWeight: 'normal'
-                                                    }}
-                                                    textSize="sm"
-                                                />
-                                            )}
-                                        </>
-                                    )}
-
-                                    {/* Multiple pickups/mixed basket */}
-                                    {shouldShowCartItems && (
+                                    {/* Pickups/mixed basket */}
+                                    {
                                         <Stack spacing={6}>
                                             {pickupShipmentItems.map((shipmentInfo, index) => (
                                                 <Box
@@ -458,7 +436,7 @@ const PickupAddress = () => {
                                                 </Box>
                                             ))}
                                         </Stack>
-                                    )}
+                                    }
                                 </>
                             )
                         )

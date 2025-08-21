@@ -14,7 +14,7 @@ import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import {
     findDeliveryShipmentWithoutAddress,
     findExistingDeliveryShipment,
-    findExistingPickupShipment
+    isPickupShipment
 } from '@salesforce/retail-react-app/app/utils/shipment-utils'
 
 const CheckoutContext = React.createContext()
@@ -87,10 +87,28 @@ export const CheckoutProvider = ({children}) => {
     const goToNextStep = () => {
         // Check if current step is CONTACT_INFO
         if (step === STEPS.CONTACT_INFO) {
-            const hasPickupShipment =
-                storeLocatorEnabled && Boolean(findExistingPickupShipment(basket))
-            // Skip to appropriate next step
-            setStep(hasPickupShipment ? STEPS.PICKUP_ADDRESS : STEPS.SHIPPING_ADDRESS)
+            const shipments = basket?.shipments || []
+            const pickupShipments = shipments.filter(isPickupShipment)
+            const deliveryShipments = shipments.filter((shipment) => !isPickupShipment(shipment))
+
+            // If all items are pickup at one store, skip directly to payment
+            const shouldSkipDirectlyToPayment =
+                pickupShipments.length === 1 &&
+                deliveryShipments.length === 0 &&
+                (basket?.productItems?.length
+                    ? basket.productItems.every(
+                          (item) => item.shipmentId === pickupShipments[0].shipmentId
+                      )
+                    : true)
+
+            if (shouldSkipDirectlyToPayment) {
+                setStep(STEPS.PAYMENT)
+                return
+            }
+
+            const hasAnyPickupShipment = storeLocatorEnabled && pickupShipments.length > 0
+            // Otherwise go to pickup address for pickup baskets, or shipping address for delivery baskets
+            setStep(hasAnyPickupShipment ? STEPS.PICKUP_ADDRESS : STEPS.SHIPPING_ADDRESS)
         } else if (step === STEPS.PICKUP_ADDRESS) {
             const hasDeliveryShipment = Boolean(findExistingDeliveryShipment(basket))
             setStep(hasDeliveryShipment ? STEPS.SHIPPING_ADDRESS : STEPS.PAYMENT)

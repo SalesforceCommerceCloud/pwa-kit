@@ -2785,6 +2785,12 @@
       "value": "Continue to Shipping Address"
     }
   ],
+  "pickup_address.button.show_products": [
+    {
+      "type": 0,
+      "value": "Show Products"
+    }
+  ],
   "pickup_address.title.pickup_address": [
     {
       "type": 0,
