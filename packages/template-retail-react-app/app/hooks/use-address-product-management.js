@@ -19,7 +19,6 @@ export const useAddressProductManagement = (basket) => {
     const {isCurrentShippingMethodPickup} = usePickupShipment(basket)
     const {areAddressesEqual} = useMultiship(basket)
 
-    // Filter out for only delivery items
     const deliveryItems =
         basket?.productItems?.filter((item) => {
             const shipment = basket?.shipments?.find((s) => s.shipmentId === item.shipmentId)
@@ -281,42 +280,9 @@ export const useAddressProductManagement = (basket) => {
         return map
     }, [deliveryItems, selectedAddresses, availableAddresses])
 
-    const groupedItemsByAddress = useMemo(() => {
-        const groups = {}
-        Object.entries(itemAddressMap).forEach(([itemId, address]) => {
-            const addressKey = JSON.stringify(address)
-            if (!groups[addressKey]) {
-                groups[addressKey] = {
-                    address,
-                    items: []
-                }
-            }
-            groups[addressKey].items.push(itemId)
-        })
-        return groups
-    }, [itemAddressMap])
-
     const allItemsHaveAddresses = useMemo(() => {
         return deliveryItems.every(item => itemAddressMap[item.itemId])
     }, [deliveryItems, itemAddressMap])
-
-    const unassignedItems = useMemo(() => {
-        return deliveryItems.filter(item => !itemAddressMap[item.itemId])
-    }, [deliveryItems, itemAddressMap])
-
-    const validateAddressAssignments = useCallback(() => {
-        const errors = []
-        
-        if (!allItemsHaveAddresses) {
-            errors.push('Not all items have addresses assigned')
-        }
-        
-        if (unassignedItems.length > 0) {
-            errors.push(`${unassignedItems.length} items are missing addresses`)
-        }
-        
-        return errors
-    }, [allItemsHaveAddresses, unassignedItems])
 
     return {
         availableAddresses: availableAddresses || [],
@@ -325,10 +291,6 @@ export const useAddressProductManagement = (basket) => {
         isGuest: customer?.isGuest || false,
         setAddressesForItems,
         deliveryItems: deliveryItems || [],
-        // Expose clean mapping interface
-        itemAddressMap,
-        groupedItemsByAddress,
-        allItemsHaveAddresses,
-        validateAddressAssignments
+        allItemsHaveAddresses
     }
 }
