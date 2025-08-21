@@ -4,6 +4,8 @@
 - Add `--initGit` to automate git repo creation for the generated project [#2817](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2817)
 
 
+- Update _app-config generator template to include `hybridAuthEnabled` prop [#3151](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3151)
+
 ## v3.11.0 (Jul 22, 2025)
 - Fix the demo instance details in `program.json`[#2800](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2800)
 - Fix exiting before `program.json` content can be flushed [#2699](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2699)
