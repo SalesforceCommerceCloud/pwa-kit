@@ -220,7 +220,7 @@ describe('ContactInfo Component', () => {
             'josé@example.españa',
             'email@bücher.de',
             '用户@例子.中国',
-            '!#$%&'*+/=?^_{|}~-@example.com`'
+            '!#$%&*+/=?^_{|}~-@example.com'
         ]
 
         for (const email of validEmails) {
