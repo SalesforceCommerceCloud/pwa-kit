@@ -24,6 +24,18 @@ function Express() {
     const [basket, setBasketData] = useState(null)
     const location = useLocation()
 
+    // Set transparent background for iframe
+    useEffect(() => {
+        document.documentElement.style.backgroundColor = 'transparent'
+        document.body.style.backgroundColor = 'transparent'
+        
+        // Cleanup on unmount
+        return () => {
+            document.documentElement.style.backgroundColor = ''
+            document.body.style.backgroundColor = ''
+        }
+    }, [])
+
     const [authToken, setAuthToken] = useState()
     const [customerId, setCustomerId] = useState()
 
