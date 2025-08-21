@@ -193,7 +193,7 @@ describe('ContactInfo Component', () => {
             'email@subdomain.example.com',
             'user+mailbox@example.com',
             'user-name@example.org',
-            'user\'s.email@example.net',
+            `"user's.email@example.net"`,
             '12345@example.com',
             'email@mañana.com',
             'josé@example.españa',
