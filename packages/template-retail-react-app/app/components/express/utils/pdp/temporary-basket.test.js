@@ -247,7 +247,7 @@ describe('Temporary Basket', () => {
             getConfig.mockImplementation(() => {
                 throw configError
             })
-            
+
             const sharedBasketRef = {basketId: mockBasketId}
             const setTempBasket = jest.fn()
 
@@ -260,7 +260,10 @@ describe('Temporary Basket', () => {
             )
 
             // deleteTemporaryBasket catches the config error and logs its own warning
-            expect(console.warn).toHaveBeenCalledWith('Failed to delete temporary basket:', configError)
+            expect(console.warn).toHaveBeenCalledWith(
+                'Failed to delete temporary basket:',
+                configError
+            )
         })
 
         it('should handle setTempBasket throwing an error', async () => {
@@ -280,7 +283,10 @@ describe('Temporary Basket', () => {
             )
 
             // Should catch the error from setTempBasket and log cleanup warning
-            expect(console.warn).toHaveBeenCalledWith('Failed to cleanup temporary basket:', setTempBasketError)
+            expect(console.warn).toHaveBeenCalledWith(
+                'Failed to cleanup temporary basket:',
+                setTempBasketError
+            )
         })
 
         it('should handle cleanup when setTempBasket is null', async () => {
@@ -292,7 +298,7 @@ describe('Temporary Basket', () => {
                 sharedBasketRef,
                 mockAuthToken,
                 mockSite,
-                null  // setTempBasket is null
+                null // setTempBasket is null
             )
 
             expect(global.fetch).toHaveBeenCalledTimes(1)

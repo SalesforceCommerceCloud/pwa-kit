@@ -15,7 +15,7 @@ import {
 } from '@salesforce/retail-react-app/app/components/express/utils/parsers'
 import {AdyenShippingMethodsService} from '@salesforce/retail-react-app/app/components/express/utils/shipping-methods'
 import {AdyenShippingAddressService} from '@salesforce/retail-react-app/app/components/express/utils/shipping-address'
-import {forceOrderCalculation} from '@salesforce/retail-react-app/app/components/express/utils/pdp/basket-calculation'
+
 import {AdyenPaymentsService} from '@salesforce/retail-react-app/app/components/express/utils/payments'
 import {
     PAYMENT_METHODS,
@@ -307,9 +307,15 @@ export const getGoogleButtonConfig = (authToken, site, basket, googlePayConfig) 
     return buttonConfig
 }
 
-export const GooglePayExpress = ({manager, overrideData = null}) => {
-    const {adyenEnvironment, adyenPaymentMethods, basket, locale, site, authToken} =
-        useAdyenExpressCheckout()
+export const GooglePayExpress = ({
+    manager,
+    overrideData = null,
+    adyenEnvironment: providedAdyenEnvironment
+}) => {
+    const {adyenPaymentMethods, locale, site} = useAdyenExpressCheckout()
+
+    // Use provided adyenEnvironment or fall back to hook data
+    const adyenEnvironment = providedAdyenEnvironment || adyenPaymentMethods?.environment
 
     const finalAuthToken = overrideData?.authToken
     const finalBasket = overrideData?.basket
@@ -420,5 +426,6 @@ export const GooglePayExpress = ({manager, overrideData = null}) => {
 GooglePayExpress.propTypes = {
     shippingMethods: PropTypes.array,
     manager: PropTypes.object,
-    overrideData: PropTypes.object
+    overrideData: PropTypes.object,
+    adyenEnvironment: PropTypes.object
 }

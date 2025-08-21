@@ -523,7 +523,8 @@ export const ApplePayExpress = ({
     isPdpMode = false,
     basketData,
     authToken: providedAuthToken,
-    manager
+    manager,
+    adyenEnvironment: providedAdyenEnvironment
 }) => {
     const {locale, site} = useMultiSite()
     const navigate = useNavigation()
@@ -568,9 +569,7 @@ export const ApplePayExpress = ({
         }
     }, [sku, currentSku, tempBasket?.basketId, authToken, site])
 
-    const adyenEnvironment = isPdpMode
-        ? standalonePaymentMethods?.environment
-        : regularAdyenData.adyenEnvironment
+    const adyenEnvironment = providedAdyenEnvironment
 
     const adyenPaymentMethods = isPdpMode
         ? standalonePaymentMethods
@@ -597,7 +596,6 @@ export const ApplePayExpress = ({
         // Compare with previous dependencies to see what changed
         // Only track dependencies that are actually in the dependency array
         const baseDeps = {
-            adyenEnvironment,
             adyenPaymentMethods,
             basket,
             isPdpMode,
@@ -626,14 +624,18 @@ export const ApplePayExpress = ({
             }
         })
 
-        if (changedDeps.length > 0) {
-            console.log('🔄 Changed dependencies:', changedDeps)
-        } else {
-            console.log('🔄 No dependencies changed (effect triggered by initial render)')
-        }
-
         // Store current deps for next comparison
         prevDepsRef.current = currentDeps
+
+        // Early return if required dependencies aren't ready
+        if (!adyenPaymentMethods) {
+            return
+        }
+
+        // adyenEnvironment is guaranteed to exist from props
+        if (!adyenEnvironment) {
+            return
+        }
 
         const createCheckout = async () => {
             if (isCanceled) {
@@ -659,10 +661,6 @@ export const ApplePayExpress = ({
                 if (!hasRequiredBasketData) {
                     return
                 }
-            }
-
-            if (!adyenEnvironment) {
-                return
             }
 
             try {
@@ -756,8 +754,7 @@ export const ApplePayExpress = ({
             isCanceled = true
         }
     }, [
-        adyenEnvironment,
-        adyenPaymentMethods,
+        adyenPaymentMethods ? 'ready' : 'waiting',
         isPdpMode,
         quantity,
         ...(isPdpMode
@@ -782,5 +779,6 @@ ApplePayExpress.propTypes = {
     isPdpMode: PropTypes.bool,
     basketData: PropTypes.object,
     authToken: PropTypes.string,
-    manager: PropTypes.object
+    manager: PropTypes.object,
+    adyenEnvironment: PropTypes.object
 }

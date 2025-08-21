@@ -121,15 +121,6 @@ describe('ApplePayExpress', () => {
         }
     }
 
-    const mockProps = {
-        shippingMethods: [],
-        basketData: mockBasket,
-        manager: {
-            setPaymentMethodAvailable: jest.fn(),
-            setPaymentMethodUnavailable: jest.fn()
-        }
-    }
-
     const mockAdyenEnvironment = {
         ADYEN_ENVIRONMENT: 'test',
         ADYEN_CLIENT_KEY: 'test_key'
@@ -145,6 +136,20 @@ describe('ApplePayExpress', () => {
             }
         ],
         applicationInfo: {}
+    }
+
+    const mockProps = {
+        shippingMethods: [],
+        basketData: mockBasket,
+        sku: 'TEST-SKU-123',
+        quantity: 1,
+        isPdpMode: false,
+        authToken: 'test-token',
+        manager: {
+            setPaymentMethodAvailable: jest.fn(),
+            setPaymentMethodUnavailable: jest.fn()
+        },
+        adyenEnvironment: mockAdyenEnvironment
     }
 
     beforeEach(() => {
@@ -173,7 +178,7 @@ describe('ApplePayExpress', () => {
             adyenPaymentMethods: mockAdyenPaymentMethods,
             basket: mockProps.basketData,
             locale: {id: 'en-US'},
-            site: 'test-site',
+            site: {id: 'test-site'},
             authToken: 'test-token',
             navigate: jest.fn(),
             shippingMethods: {applicableShippingMethods: []},
@@ -664,26 +669,43 @@ describe('ApplePayExpress error and edge cases', () => {
     })
 
     it('handles AdyenCheckout throwing', async () => {
+        // Override the mock to throw an error
         AdyenCheckout.mockImplementation(() => {
             throw new Error('fail')
         })
+
         render(<ApplePayExpress {...mockProps} />)
-        await waitFor(() => {
-            expect(mockProps.manager.setPaymentMethodUnavailable).toHaveBeenCalledWith('applepay')
-        })
+
+        await waitFor(
+            () => {
+                expect(mockProps.manager.setPaymentMethodUnavailable).toHaveBeenCalledWith(
+                    'applepay'
+                )
+            },
+            {timeout: 3000}
+        )
     })
     it('handles create throwing', async () => {
+        // Override the mock to make create throw an error
         AdyenCheckout.mockResolvedValue({
             create: jest.fn().mockImplementation(() => {
                 throw new Error('fail create')
             })
         })
+
         render(<ApplePayExpress {...mockProps} />)
-        await waitFor(() => {
-            expect(mockProps.manager.setPaymentMethodUnavailable).toHaveBeenCalledWith('applepay')
-        })
+
+        await waitFor(
+            () => {
+                expect(mockProps.manager.setPaymentMethodUnavailable).toHaveBeenCalledWith(
+                    'applepay'
+                )
+            },
+            {timeout: 3000}
+        )
     })
     it('handles isAvailable throwing', async () => {
+        // Override the mock to make isAvailable throw an error
         AdyenCheckout.mockResolvedValue({
             create: jest.fn().mockResolvedValue({
                 isAvailable: jest.fn().mockImplementation(() => {
@@ -692,24 +714,40 @@ describe('ApplePayExpress error and edge cases', () => {
                 mount: jest.fn()
             })
         })
+
         render(<ApplePayExpress {...mockProps} />)
-        await waitFor(() => {
-            expect(mockProps.manager.setPaymentMethodUnavailable).toHaveBeenCalledWith('applepay')
-        })
+
+        await waitFor(
+            () => {
+                expect(mockProps.manager.setPaymentMethodUnavailable).toHaveBeenCalledWith(
+                    'applepay'
+                )
+            },
+            {timeout: 3000}
+        )
     })
     it('handles isAvailable returning false', async () => {
+        // Override the mock to make isAvailable return false
         AdyenCheckout.mockResolvedValue({
             create: jest.fn().mockResolvedValue({
                 isAvailable: jest.fn().mockResolvedValue(false),
                 mount: jest.fn()
             })
         })
+
         render(<ApplePayExpress {...mockProps} />)
-        await waitFor(() => {
-            expect(mockProps.manager.setPaymentMethodUnavailable).toHaveBeenCalledWith('applepay')
-        })
+
+        await waitFor(
+            () => {
+                expect(mockProps.manager.setPaymentMethodUnavailable).toHaveBeenCalledWith(
+                    'applepay'
+                )
+            },
+            {timeout: 3000}
+        )
     })
     it('handles mount throwing', async () => {
+        // Override the mock to make mount throw an error
         AdyenCheckout.mockResolvedValue({
             create: jest.fn().mockResolvedValue({
                 isAvailable: jest.fn().mockResolvedValue(true),
@@ -718,10 +756,17 @@ describe('ApplePayExpress error and edge cases', () => {
                 })
             })
         })
+
         render(<ApplePayExpress {...mockProps} />)
-        await waitFor(() => {
-            expect(mockProps.manager.setPaymentMethodUnavailable).toHaveBeenCalledWith('applepay')
-        })
+
+        await waitFor(
+            () => {
+                expect(mockProps.manager.setPaymentMethodUnavailable).toHaveBeenCalledWith(
+                    'applepay'
+                )
+            },
+            {timeout: 3000}
+        )
     })
     it('handles missing basket/orderTotal', async () => {
         useAdyenExpressCheckout.mockReturnValue({

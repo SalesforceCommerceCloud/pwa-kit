@@ -5,12 +5,64 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React, {useEffect, useState} from 'react'
+import PropTypes from 'prop-types'
 import {useLocation} from 'react-router-dom'
 
-import {AdyenExpressCheckoutProvider} from '@adyen/adyen-salesforce-pwa'
+import {AdyenExpressCheckoutProvider, useAdyenExpressCheckout} from '@adyen/adyen-salesforce-pwa'
 
 import {ApplePayExpress} from '@salesforce/retail-react-app/app/components/apple-pay-express/index'
 import {GooglePayExpress} from '@salesforce/retail-react-app/app/components/google-pay-express/index'
+
+// Component that will be rendered inside the AdyenExpressCheckoutProvider context
+const ExpressPaymentComponents = ({
+    isPdpMode,
+    basket,
+    currentSku,
+    currentQuantity,
+    authToken,
+    manager
+}) => {
+    const adyenData = useAdyenExpressCheckout()
+
+    if (!adyenData?.adyenEnvironment) {
+        return null // Don't render until we have the data
+    }
+
+    return (
+        <>
+            {!isPdpMode && basket && (
+                <>
+                    <ApplePayExpress
+                        sku={currentSku}
+                        quantity={currentQuantity}
+                        isPdpMode={isPdpMode}
+                        basketData={basket}
+                        authToken={authToken}
+                        manager={manager}
+                        adyenEnvironment={adyenData.adyenEnvironment}
+                    />
+                    <GooglePayExpress
+                        manager={manager}
+                        overrideData={{authToken, basket}}
+                        adyenEnvironment={adyenData.adyenEnvironment}
+                    />
+                </>
+            )}
+            {isPdpMode && (
+                <ApplePayExpress
+                    sku={currentSku}
+                    quantity={currentQuantity}
+                    isPdpMode={isPdpMode}
+                    basketData={basket}
+                    authToken={authToken}
+                    manager={manager}
+                    adyenEnvironment={adyenData.adyenEnvironment}
+                />
+            )}
+        </>
+    )
+}
+
 import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
 import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
 import {useExpressPaymentManager} from '@salesforce/retail-react-app/app/components/express/hooks/use-express-payment-manager'
@@ -102,38 +154,35 @@ function Express() {
 
     return (
         <div>
-            {!isPdpMode && basket && (
-                <AdyenExpressCheckoutProvider
-                    authToken={authToken}
-                    customerId={customerId}
-                    locale={locale}
-                    site={site}
-                    basket={basket}
-                    navigate={navigate}
-                >
-                    <ApplePayExpress
-                        sku={currentSku}
-                        quantity={currentQuantity}
-                        isPdpMode={isPdpMode}
-                        basketData={basket}
-                        authToken={authToken}
-                        manager={manager}
-                    />
-                    <GooglePayExpress manager={manager} overrideData={{authToken, basket}} />
-                </AdyenExpressCheckoutProvider>
-            )}
-            {isPdpMode && (
-                <ApplePayExpress
-                    sku={currentSku}
-                    quantity={currentQuantity}
+            <AdyenExpressCheckoutProvider
+                authToken={authToken}
+                customerId={customerId}
+                locale={locale}
+                site={site}
+                basket={basket}
+                navigate={navigate}
+            >
+                <ExpressPaymentComponents
                     isPdpMode={isPdpMode}
-                    basketData={basket}
+                    basket={basket}
+                    currentSku={currentSku}
+                    currentQuantity={currentQuantity}
                     authToken={authToken}
                     manager={manager}
                 />
-            )}
+            </AdyenExpressCheckoutProvider>
         </div>
     )
+}
+
+// PropTypes for ExpressPaymentComponents
+ExpressPaymentComponents.propTypes = {
+    isPdpMode: PropTypes.bool,
+    basket: PropTypes.object,
+    currentSku: PropTypes.string,
+    currentQuantity: PropTypes.number,
+    authToken: PropTypes.string,
+    manager: PropTypes.object
 }
 
 export default Express

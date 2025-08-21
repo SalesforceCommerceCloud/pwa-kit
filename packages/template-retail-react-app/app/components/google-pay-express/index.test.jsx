@@ -87,6 +87,10 @@ const mockData = {
         manager: {
             setPaymentMethodAvailable: jest.fn(),
             setPaymentMethodUnavailable: jest.fn()
+        },
+        adyenEnvironment: {
+            ADYEN_ENVIRONMENT: 'test',
+            ADYEN_CLIENT_KEY: 'test_key'
         }
     },
     environment: {
@@ -517,7 +521,7 @@ describe('getGoogleButtonConfig', () => {
         })
         expect(mockUpdateShippingAddress).toHaveBeenCalled()
         expect(initializeResult).toHaveProperty('newTransactionInfo')
-        
+
         // Verify that the basket was updated with shipping option parameters
         expect(initializeResult).toHaveProperty('newShippingOptionParameters')
         expect(initializeResult.newShippingOptionParameters).toEqual({
