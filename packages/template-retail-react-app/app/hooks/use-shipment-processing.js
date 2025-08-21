@@ -10,7 +10,7 @@ import {useMultiship} from './use-multiship'
 /**
  * Hook for processing shipments in multi-shipping
  * Handles the complex logic of -creating shipments -moving items -cleaning up
- * 
+ *
  * @param {Object} basket
  * @returns {Object} processShipments function
  */
@@ -26,7 +26,7 @@ export const useShipmentProcessing = (basket) => {
 
     /**
      * Processes shipments
-     * 
+     *
      * @param {Array} deliveryItems
      * @param {Object} selectedAddresses - item IDs to selected address IDs map
      * @param {Array} finalAddresses - addresses to use for shipments

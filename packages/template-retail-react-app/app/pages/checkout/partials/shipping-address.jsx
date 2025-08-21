@@ -240,9 +240,7 @@ export default function ShippingAddress() {
                     <ShippingMultiAddress
                         basket={basket}
                         submitButtonLabel={submitButtonMessage}
-                        addNewAddressLabel={addNewAddressLabel}
                         noItemsInBasketMessage={noItemsInBasketMessage}
-                        deliveryAddressLabel={deliveryAddressLabel}
                     />
                 )}
             </ToggleCardEdit>

@@ -85,9 +85,8 @@ const ShippingMultiAddress = ({basket, submitButtonLabel, noItemsInBasketMessage
 
     const shipmentProcessing = useShipmentProcessing(basket)
 
-    const [isSubmitting, setIsSubmitting] = useState(false)
-
     const addresses = addressProductManagement.availableAddresses
+    const [isSubmitting, setIsSubmitting] = useState(false)
 
     // guests only products loading since they may not have addresses yet
     const isLoading =
@@ -264,9 +263,7 @@ const ShippingMultiAddress = ({basket, submitButtonLabel, noItemsInBasketMessage
 ShippingMultiAddress.propTypes = {
     basket: PropTypes.object.isRequired,
     submitButtonLabel: PropTypes.object.isRequired,
-    addNewAddressLabel: PropTypes.object.isRequired,
-    noItemsInBasketMessage: PropTypes.object.isRequired,
-    deliveryAddressLabel: PropTypes.object.isRequired
+    noItemsInBasketMessage: PropTypes.object.isRequired
 }
 
 export default ShippingMultiAddress
