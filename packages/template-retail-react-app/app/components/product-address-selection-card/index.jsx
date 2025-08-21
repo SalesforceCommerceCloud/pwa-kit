@@ -29,9 +29,6 @@ import DisplayPrice from '@salesforce/retail-react-app/app/components/display-pr
 import AddressFields from '@salesforce/retail-react-app/app/components/forms/address-fields'
 import FormActionButtons from '@salesforce/retail-react-app/app/components/forms/form-action-buttons'
 
-/**
- * Sub-component for displaying product attributes
- */
 const MultiShippingItemAttributes = ({variant, includeQuantity = true}) => {
     const {formatMessage} = useIntl()
     const variationAttributes = variant?.variationAttributes || []
@@ -77,9 +74,6 @@ MultiShippingItemAttributes.propTypes = {
     includeQuantity: PropTypes.bool
 }
 
-/**
- * Sub-component for the address form
- */
 const AddressForm = ({item, form, onSubmit, onCancel}) => {
     const saveButtonLabel = defineMessage({
         defaultMessage: 'Save',
@@ -120,8 +114,6 @@ AddressForm.propTypes = {
 
 /**
  * Component for selecting address for a single product item
- * Extracted from ShippingMultiAddress to improve maintainability
- * UI structure and styling kept exactly the same
  */
 const ProductAddressSelectionCard = ({
     item,
@@ -261,7 +253,6 @@ const ProductAddressSelectionCard = ({
                                     value={selectedAddressId || ''}
                                     onChange={(e) => {
                                         const value = e.target.value
-                                        // Hide the address form when an existing address is selected
                                         closeForm(addressKey)
                                         onAddressSelect(addressKey, value)
                                     }}

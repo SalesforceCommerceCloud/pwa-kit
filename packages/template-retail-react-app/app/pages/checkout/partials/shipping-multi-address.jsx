@@ -4,36 +4,20 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React, {useState, useEffect} from 'react'
-import {useIntl, defineMessage} from 'react-intl'
+import React, {useState} from 'react'
+import {useIntl} from 'react-intl'
 import PropTypes from 'prop-types'
-import {useForm} from 'react-hook-form'
-import {nanoid} from 'nanoid'
-
-import {useProducts, useShopperCustomersMutation} from '@salesforce/commerce-sdk-react'
+import {useProducts} from '@salesforce/commerce-sdk-react'
 import {findImageGroupBy} from '@salesforce/retail-react-app/app/utils/image-groups-utils'
 import {getPriceData} from '@salesforce/retail-react-app/app/utils/product-utils'
-import DisplayPrice from '@salesforce/retail-react-app/app/components/display-price'
 import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
 import {useCurrency} from '@salesforce/retail-react-app/app/hooks'
-import ItemVariantProvider from '@salesforce/retail-react-app/app/components/item-variant'
 import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
-import {isAddressEmpty} from '@salesforce/retail-react-app/app/utils/address-utils'
-
-import AddressFields from '@salesforce/retail-react-app/app/components/forms/address-fields'
-import FormActionButtons from '@salesforce/retail-react-app/app/components/forms/form-action-buttons'
-import LoadingSpinner from '@salesforce/retail-react-app/app/components/loading-spinner'
 import {
     Text,
     Button,
     Box,
-    Flex,
     VStack,
-    HStack,
-    Image,
-    Select,
-    List,
-    ListItem,
     Alert,
     AlertIcon,
     AlertTitle,
@@ -43,7 +27,6 @@ import {
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 import {useMultiship} from '@salesforce/retail-react-app/app/hooks/use-multiship'
 import {useCheckout} from '@salesforce/retail-react-app/app/pages/checkout/util/checkout-context'
-import {usePickupShipment} from '@salesforce/retail-react-app/app/hooks/use-pickup-shipment'
 import {useAddressProductManagement} from '@salesforce/retail-react-app/app/hooks/use-address-product-management'
 import {useAddressForm} from '@salesforce/retail-react-app/app/hooks/use-address-form'
 import {useShipmentProcessing} from '@salesforce/retail-react-app/app/hooks/use-shipment-processing'
@@ -113,7 +96,7 @@ const ShippingMultiAddress = ({
 
     const addresses = addressProductManagement.availableAddresses
 
-    // for guests, only check products loading since they may not have addresses yet
+    // guests only products loading since they may not have addresses yet
     const isLoading = (addressProductManagement.isGuest ? false : customerLoading) || productsLoading
 
     const allShipmentsHaveAddress = addressProductManagement.deliveryItems.every(
@@ -168,7 +151,6 @@ const ShippingMultiAddress = ({
         )
     }
 
-    // Show loading message when loading
     if (isLoading) {
         return (
             <Center p={8} textAlign="center" color="gray.500">

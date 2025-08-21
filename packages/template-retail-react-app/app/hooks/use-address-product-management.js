@@ -12,14 +12,14 @@ import {useMultiship} from './use-multiship'
 import {isAddressEmpty} from '../utils/address-utils'
 
 /**
- * Managing address selection state and product delivery items
+ * Managing address selection state with product delivery items
  */
 export const useAddressProductManagement = (basket) => {
     const {data: customer} = useCurrentCustomer()
     const {isCurrentShippingMethodPickup} = usePickupShipment(basket)
     const {areAddressesEqual} = useMultiship(basket)
     
-    // Filter out pickup items - only show delivery items
+    // Filter out for only delivery items
     const deliveryItems = basket?.productItems?.filter((item) => {
         const shipment = basket?.shipments?.find((s) => s.shipmentId === item.shipmentId)
         return !isCurrentShippingMethodPickup(shipment?.shippingMethod)

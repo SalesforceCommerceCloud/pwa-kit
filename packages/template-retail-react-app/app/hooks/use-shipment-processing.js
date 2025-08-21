@@ -19,12 +19,11 @@ export const useShipmentProcessing = (basket) => {
 
     const processShipments = useCallback(async (deliveryItems, selectedAddresses, finalAddresses) => {
         try {
-            // Based on the shopper's selected addresses, create a map of unique addressIds and their associated items
             const addressToItemsMap = {}
             let basketAfterItemMoves = null
 
             deliveryItems.forEach((item) => {
-                // Defaults to the first address if no address is selected
+                // Defaults to first address if no address is selected
                 const addressId = selectedAddresses[item.itemId] || finalAddresses[0]?.addressId
                 const address = finalAddresses.find((addr) => addr.addressId === addressId)
 
@@ -75,7 +74,6 @@ export const useShipmentProcessing = (basket) => {
                     )
                 }
             }
-            // Remove any empty shipments.
             await removeEmptyShipments(basketAfterItemMoves || basket)
 
             return {success: true}
