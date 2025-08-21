@@ -54,6 +54,7 @@ interface AuthConfig extends ApiClientConfigParams {
     passwordlessLoginCallbackURI?: string
     refreshTokenRegisteredCookieTTL?: number
     refreshTokenGuestCookieTTL?: number
+    hybridAuthEnabled?: boolean
 }
 
 interface JWTHeaders {
@@ -244,6 +245,8 @@ class Auth {
         | ((loginId: string, usid: string, refresh: boolean) => Promise<TokenResponse>)
         | undefined
 
+    private hybridAuthEnabled: boolean
+
     constructor(config: AuthConfig) {
         // Special proxy endpoint for injecting SLAS private client secret.
         // We prioritize config.privateClientProxyEndpoint since that allows us to use the new envBasePath feature
@@ -349,6 +352,8 @@ class Auth {
                   // To set an env base path, config.passwordlessLoginCallbackURI must be an absolute url
                   `${baseUrl}${passwordlessLoginCallbackURI}`
             : ''
+
+        this.hybridAuthEnabled = config.hybridAuthEnabled || false
     }
 
     get(name: AuthDataKeys) {
@@ -987,7 +992,13 @@ class Auth {
             credentials.options
         )
         this.handleTokenResponse(token, isGuest)
-        if (onClient()) {
+        /**
+         * If `hybridAuthEnabled` is true,
+         * the `clearECOMSession` method will not be called. This makes sure the session-bridged dwsid, 
+         * received from `/oauth2/token` call on shopper login is NOT cleared and can be used to 
+         * maintain the server affinity.
+         */
+        if (onClient() && !this.hybridAuthEnabled) {
             void this.clearECOMSession()
         }
         return token
