@@ -26,7 +26,7 @@ import {useMultiship} from '@salesforce/retail-react-app/app/hooks/use-multiship
 import {useCheckout} from '@salesforce/retail-react-app/app/pages/checkout/util/checkout-context'
 import {useAddressProductManagement} from '@salesforce/retail-react-app/app/hooks/use-address-product-management'
 import {useAddressForm} from '@salesforce/retail-react-app/app/hooks/use-address-form'
-import {useShipmentProcessing} from '@salesforce/retail-react-app/app/hooks/use-shipment-processing'
+import {useShipmentManagement} from '@salesforce/retail-react-app/app/hooks/use-shipment-processing'
 import ProductShippingAddressCard from './product-shipping-address-card'
 
 const ShippingMultiAddress = ({basket, submitButtonLabel, noItemsInBasketMessage}) => {
@@ -82,7 +82,7 @@ const ShippingMultiAddress = ({basket, submitButtonLabel, noItemsInBasketMessage
         areAddressesEqual
     )
 
-    const shipmentProcessing = useShipmentProcessing(basket)
+    const shipmentManagement = useShipmentManagement(basket)
 
     const addresses = addressProductManagement.availableAddresses
     const [isSubmitting, setIsSubmitting] = useState(false)
@@ -159,8 +159,8 @@ const ShippingMultiAddress = ({basket, submitButtonLabel, noItemsInBasketMessage
     const handleSubmit = async () => {
         setIsSubmitting(true)
         try {
-            // Restore the original working call with correct parameters
-            await shipmentProcessing.processShipments(
+            // Orchestrate shipment operations with correct parameters
+            await shipmentManagement.orchestrateShipmentOperations(
                 addressProductManagement.deliveryItems,
                 addressProductManagement.selectedAddresses,
                 addresses

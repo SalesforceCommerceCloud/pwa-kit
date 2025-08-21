@@ -9,12 +9,12 @@ import {useMultiship} from './use-multiship'
 
 /**
  * Hook for processing shipments in multi-shipping
- * Restored to original working logic: creating shipments, moving items, and cleanup
+ * creating shipments, moving items, and cleanup
  * 
- * @param {Object} basket - The current basket object
- * @returns {Object} Object containing processShipments function
+ * @param {Object} basket
+ * @returns {Object}
  */
-export const useShipmentProcessing = (basket) => {
+export const useShipmentManagement = (basket) => {
     const {
         findDeliveryShipmentWithSameAddress,
         findUnusedDeliveryShipment,
@@ -25,14 +25,14 @@ export const useShipmentProcessing = (basket) => {
     } = useMultiship(basket)
 
     /**
-     * Processes shipments with the original working logic
+     * Orchestrates shipment operations: finding, creating, updating, moving items, and cleanup
      * 
      * @param {Array} deliveryItems - Array of items that need to be delivered
      * @param {Object} selectedAddresses - Object mapping item IDs to selected address IDs
      * @param {Array} finalAddresses - Array of final addresses to use for shipments
      * @returns {Promise<Object>} Promise that resolves to success object or throws error
      */
-    const processShipments = useCallback(async (deliveryItems, selectedAddresses, finalAddresses) => {
+    const orchestrateShipmentOperations = useCallback(async (deliveryItems, selectedAddresses, finalAddresses) => {
         try {
             const addressToItemsMap = {}
             let basketAfterItemMoves = null
@@ -106,6 +106,6 @@ export const useShipmentProcessing = (basket) => {
     ])
 
     return {
-        processShipments
+        orchestrateShipmentOperations
     }
 }
