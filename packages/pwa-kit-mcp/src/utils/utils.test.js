@@ -12,11 +12,7 @@ import {
     isSharedUIBaseComponent,
     isLocalComponent,
     isLocalSharedUIComponent,
-    generateComponentImportStatement,
-    runCommand,
-    toKebabCase,
-    toPascalCase,
-    getCopyrightHeader
+    generateComponentImportStatement
 } from './utils'
 import fs from 'fs'
 import path from 'path'
