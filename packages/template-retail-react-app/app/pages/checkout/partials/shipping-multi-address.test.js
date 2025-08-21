@@ -19,17 +19,24 @@ import userEvent from '@testing-library/user-event'
 
 jest.mock('@salesforce/commerce-sdk-react', () => ({
     useProducts: jest.fn(),
-    useShopperCustomersMutation: jest.fn(() => ({
-        mutateAsync: jest.fn().mockResolvedValue({
-            addressId: 'addr-new',
-            firstName: 'Alice',
-            lastName: 'Wonder',
-            address1: '789 New St',
-            city: 'New City',
-            stateCode: 'TX',
-            postalCode: '55555'
-        })
-    })),
+    useShopperCustomersMutation: jest.fn((mutationType) => {
+        if (mutationType === 'createCustomerAddress') {
+            return {
+                mutateAsync: jest.fn().mockResolvedValue({
+                    addressId: 'addr-new',
+                    firstName: 'Alice',
+                    lastName: 'Wonder',
+                    address1: '789 New St',
+                    city: 'New City',
+                    stateCode: 'TX',
+                    postalCode: '55555'
+                })
+            }
+        }
+        return {
+            mutateAsync: jest.fn().mockResolvedValue({})
+        }
+    }),
     useShopperBasketsMutation: jest.fn(() => ({
         mutateAsync: jest.fn().mockResolvedValue({})
     })),
@@ -281,7 +288,7 @@ describe('ShippingMultiAddress', () => {
         expect(screen.getByText('Quantity: 1')).toBeInTheDocument()
 
         // Check delivery address sections
-        const deliveryAddressLabels = screen.getAllByText('Shipping Address')
+        const deliveryAddressLabels = screen.getAllByText('Delivery Address')
         expect(deliveryAddressLabels).toHaveLength(2)
 
         // Check product images
@@ -674,7 +681,13 @@ describe('ShippingMultiAddress', () => {
             // Click Save button
             fireEvent.click(screen.getByText('Save'))
 
-            // Wait for the form to disappear
+            await waitFor(() => {
+                expect(mockShowToast).toHaveBeenCalledWith({
+                    title: 'Address saved successfully',
+                    status: 'success'
+                })
+            })
+
             await waitFor(() => {
                 expect(screen.queryByTestId('address-form')).not.toBeInTheDocument()
             })

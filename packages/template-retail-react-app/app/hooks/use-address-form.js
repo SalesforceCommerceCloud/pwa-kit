@@ -144,7 +144,8 @@ export const useAddressForm = (
             form,
             setAddressesForItems,
             availableAddresses,
-            deliveryItems
+            deliveryItems,
+            setShowForm
         ]
     )
 

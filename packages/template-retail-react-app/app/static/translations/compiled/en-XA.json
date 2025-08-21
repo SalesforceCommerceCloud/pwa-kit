@@ -7311,6 +7311,20 @@
       "value": "]"
     }
   ],
+  "shipping_address.label.shipping_address": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ḓḗḗŀīṽḗḗřẏ Ȧḓḓřḗḗşş"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
   "shipping_address.label.shipping_address_form": [
     {
       "type": 0,

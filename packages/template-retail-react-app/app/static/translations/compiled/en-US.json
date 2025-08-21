@@ -3463,6 +3463,12 @@
       "value": "address"
     }
   ],
+  "shipping_address.label.shipping_address": [
+    {
+      "type": 0,
+      "value": "Delivery Address"
+    }
+  ],
   "shipping_address.label.shipping_address_form": [
     {
       "type": 0,

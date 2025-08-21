@@ -235,7 +235,7 @@ const ProductShippingAddressCard = ({
                     >
                         {formatMessage({
                             defaultMessage: 'Delivery Address',
-                            id: 'shipping_address.label.delivery_address'
+                            id: 'shipping_address.label.shipping_address'
                         })}
                     </Text>
 

@@ -1457,6 +1457,9 @@
   "shipping_address.label.remove_button": {
     "defaultMessage": "Remove {address}"
   },
+  "shipping_address.label.shipping_address": {
+    "defaultMessage": "Delivery Address"
+  },
   "shipping_address.label.shipping_address_form": {
     "defaultMessage": "Shipping Address Form"
   },
