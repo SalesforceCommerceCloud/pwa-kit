@@ -28,11 +28,8 @@ import {
  * @returns {Object} Object containing helper functions for multiship management
  */
 export const useMultiship = (basket) => {
-    const {
-        getDefaultShippingMethodId,
-        getPickupShippingMethodId,
-        updateDefaultShipmentIfNeeded
-    } = usePickupShipment(basket)
+    const {getDefaultShippingMethodId, getPickupShippingMethodId, updateDefaultShipmentIfNeeded} =
+        usePickupShipment(basket)
 
     const {
         createShipment: createShipmentOperation,
