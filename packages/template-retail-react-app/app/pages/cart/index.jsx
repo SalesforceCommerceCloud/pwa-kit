@@ -67,7 +67,7 @@ import {
 import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
 import UnavailableProductConfirmationModal from '@salesforce/retail-react-app/app/components/unavailable-product-confirmation-modal'
 import {getUpdateBundleChildArray} from '@salesforce/retail-react-app/app/utils/product-utils'
-import {usePickupShipment} from '@salesforce/retail-react-app/app/hooks/use-pickup-shipment'
+import {isPickupShipment} from '@salesforce/retail-react-app/app/utils/shipment-utils'
 import {useSelectedStore} from '@salesforce/retail-react-app/app/hooks/use-selected-store'
 import {useMultiship} from '@salesforce/retail-react-app/app/hooks/use-multiship'
 
@@ -75,7 +75,6 @@ const DEBOUNCE_WAIT = 750
 
 const Cart = () => {
     const {data: basket, isLoading} = useCurrentBasket()
-    const {isPickupShipment} = usePickupShipment(basket)
     const multishipEnabled = getConfig()?.app?.multishipEnabled ?? true
     const storeLocatorEnabled = getConfig()?.app?.storeLocatorEnabled ?? STORE_LOCATOR_IS_ENABLED
 
@@ -108,7 +107,7 @@ const Cart = () => {
 
     const {
         updateDeliveryOption,
-        assignDefaultShippingMethodsToShipments,
+        updateShipmentsWithoutMethods,
         getItemsForShipment,
         findOrCreatePickupShipment,
         moveItemsToPickupShipment
@@ -300,10 +299,10 @@ const Cart = () => {
                         )?.stockLevel >= productItem.quantity
                 )
                 if (itemsToMove.length) {
-                    const targetShipmentId = await findOrCreatePickupShipment(selectedStore)
+                    const targetShipment = await findOrCreatePickupShipment(selectedStore)
                     await moveItemsToPickupShipment(
                         itemsToMove,
-                        targetShipmentId,
+                        targetShipment?.shipmentId,
                         selectedStore.inventoryId
                     )
                 }
@@ -343,7 +342,7 @@ const Cart = () => {
 
             setIsProcessingShippingMethods(true)
             try {
-                await assignDefaultShippingMethodsToShipments()
+                await updateShipmentsWithoutMethods()
             } catch (error) {
                 console.error('Failed to assign default shipping methods:', error)
             } finally {

@@ -63,6 +63,7 @@ import {useHistory, useLocation, useParams} from 'react-router-dom'
 import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
 import {useWishList} from '@salesforce/retail-react-app/app/hooks/use-wish-list'
 import {useStoreLocatorModal} from '@salesforce/retail-react-app/app/hooks/use-store-locator'
+import {isPickupMethod} from '@salesforce/retail-react-app/app/utils/shipment-utils'
 
 const ProductDetail = () => {
     const {formatMessage} = useIntl()
@@ -94,15 +95,11 @@ const ProductDetail = () => {
     const {selectedStore} = useSelectedStore()
     const selectedInventoryId = selectedStore?.inventoryId || null
 
-    const {
-        addInventoryIdsToPickupItems,
-        configureDefaultShipmentIfNeeded,
-        isCurrentShippingMethodPickup,
-        hasPickupItems
-    } = usePickupShipment(basket)
+    const {addInventoryIdsToPickupItems, updateDefaultShipmentIfNeeded, hasPickupItems} =
+        usePickupShipment(basket)
 
     /*************************** Multiship ********************/
-    const {getShipmentForItems} = useMultiship(basket)
+    const {getShipmentIdForItems} = useMultiship(basket)
 
     /*************************** Product Detail and Category ********************/
     const {productId} = useParams()
@@ -434,7 +431,7 @@ const ProductDetail = () => {
                 product
             )
 
-            const currentShippingMethodIsPickup = isCurrentShippingMethodPickup(
+            const currentShippingMethodIsPickup = isPickupMethod(
                 basket?.shipments?.[0]?.shippingMethod
             )
             // Only perform the check if the basket exists and has at least one item
@@ -460,7 +457,10 @@ const ProductDetail = () => {
             }
 
             // Fetch and assign a suitable shipment for product items
-            const targetShipmentId = await getShipmentForItems(hasAnyPickupSelected, selectedStore)
+            const targetShipmentId = await getShipmentIdForItems(
+                hasAnyPickupSelected,
+                selectedStore
+            )
 
             if (targetShipmentId) {
                 productItems = productItems.map((item) => ({
@@ -472,7 +472,7 @@ const ProductDetail = () => {
             const basketResponse = await addItemToNewOrExistingBasket(productItems)
 
             // Configure shipping method for default shipment based on pickup selection
-            await configureDefaultShipmentIfNeeded(
+            await updateDefaultShipmentIfNeeded(
                 basketResponse,
                 targetShipmentId,
                 hasAnyPickupSelected,
@@ -561,8 +561,7 @@ const ProductDetail = () => {
             // Check for delivery method conflicts before adding to cart
             if (!multishipEnabled && basket && basket.productItems?.length > 0) {
                 const currentShippingMethod = basket?.shipments?.[0]?.shippingMethod
-                const currentShippingMethodIsPickup =
-                    isCurrentShippingMethodPickup(currentShippingMethod)
+                const currentShippingMethodIsPickup = isPickupMethod(currentShippingMethod)
 
                 // If there's no shipping method, treat it as non-pickup (ship to address)
                 if (
@@ -616,7 +615,10 @@ const ProductDetail = () => {
             )
 
             // Fetch and assign a suitable shipment for product items
-            const targetShipmentId = await getShipmentForItems(hasAnyPickupSelected, selectedStore)
+            const targetShipmentId = await getShipmentIdForItems(
+                hasAnyPickupSelected,
+                selectedStore
+            )
 
             if (targetShipmentId) {
                 productItems = productItems.map((item) => ({
@@ -661,7 +663,7 @@ const ProductDetail = () => {
             }
 
             // Configure shipping method based on pickup selection
-            await configureDefaultShipmentIfNeeded(
+            await updateDefaultShipmentIfNeeded(
                 res,
                 targetShipmentId,
                 hasAnyPickupSelected,

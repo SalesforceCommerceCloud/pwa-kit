@@ -10,6 +10,10 @@ import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
 import {useIntl} from 'react-intl'
 import {useShopperCustomersMutation} from '@salesforce/commerce-sdk-react'
 import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
+import {
+    areAddressesEqual,
+    cleanAddressForCustomer
+} from '@salesforce/retail-react-app/app/utils/address-utils'
 import {nanoid} from 'nanoid'
 
 export const useAddressForm = (
@@ -17,8 +21,7 @@ export const useAddressForm = (
     isGuest,
     setAddressesForItems,
     availableAddresses,
-    deliveryItems,
-    areAddressesEqual
+    deliveryItems
 ) => {
     const {formatMessage} = useIntl()
     const showToast = useToast()
@@ -51,9 +54,8 @@ export const useAddressForm = (
         async (addressData, itemId) => {
             setIsSubmitting(true)
             try {
-                const isDuplicate = availableAddresses.some(
-                    (existingAddr) =>
-                        areAddressesEqual && areAddressesEqual(addressData, existingAddr)
+                const isDuplicate = availableAddresses.some((existingAddr) =>
+                    areAddressesEqual(addressData, existingAddr)
                 )
 
                 if (isDuplicate) {
@@ -77,18 +79,8 @@ export const useAddressForm = (
                     newAddress = addGuestAddress(addressData)
                 } else {
                     const apiAddressData = {
-                        addressId: `addr_${nanoid()}`,
-                        firstName: addressData.firstName,
-                        lastName: addressData.lastName,
-                        phone: addressData.phone,
-                        countryCode: addressData.countryCode,
-                        address1: addressData.address1,
-                        city: addressData.city,
-                        stateCode: addressData.stateCode,
-                        postalCode: addressData.postalCode,
-                        address2: addressData.address2 || '',
-                        companyName: addressData.companyName || '',
-                        preferred: addressData.preferred || false
+                        ...cleanAddressForCustomer(addressData),
+                        addressId: `addr_${nanoid()}`
                     }
 
                     const createdAddress = await createCustomerAddress.mutateAsync({

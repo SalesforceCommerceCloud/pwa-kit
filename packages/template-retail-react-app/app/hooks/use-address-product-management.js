@@ -7,22 +7,22 @@
 import {useState, useEffect, useCallback, useMemo, useRef} from 'react'
 import {nanoid} from 'nanoid'
 import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
-import {usePickupShipment} from '@salesforce/retail-react-app/app/hooks/use-pickup-shipment'
-import {useMultiship} from '@salesforce/retail-react-app/app/hooks/use-multiship'
-import {isAddressEmpty} from '../utils/address-utils'
+import {
+    areAddressesEqual,
+    isAddressEmpty
+} from '@salesforce/retail-react-app/app/utils/address-utils'
+import {isPickupMethod} from '@salesforce/retail-react-app/app/utils/shipment-utils'
 
 /**
  * Managing address selection state with product delivery items
  */
 export const useAddressProductManagement = (basket) => {
     const {data: customer} = useCurrentCustomer()
-    const {isCurrentShippingMethodPickup} = usePickupShipment(basket)
-    const {areAddressesEqual} = useMultiship(basket)
 
     const deliveryItems =
         basket?.productItems?.filter((item) => {
             const shipment = basket?.shipments?.find((s) => s.shipmentId === item.shipmentId)
-            return !isCurrentShippingMethodPickup(shipment?.shippingMethod)
+            return !isPickupMethod(shipment?.shippingMethod)
         }) || []
 
     const [guestAddresses, setGuestAddresses] = useState([])
@@ -52,8 +52,7 @@ export const useAddressProductManagement = (basket) => {
             const existingShipments =
                 basket?.shipments?.filter(
                     (shipment) =>
-                        shipment.shippingAddress &&
-                        !isCurrentShippingMethodPickup(shipment?.shippingMethod)
+                        shipment.shippingAddress && !isPickupMethod(shipment?.shippingMethod)
                 ) || []
 
             if (existingShipments.length > 0) {
@@ -122,9 +121,7 @@ export const useAddressProductManagement = (basket) => {
         customer?.isGuest,
         availableAddresses.length,
         basket?.shipments?.length,
-        deliveryItems?.length,
-        areAddressesEqual,
-        isCurrentShippingMethodPickup
+        deliveryItems?.length
     ])
 
     // initialize address selections -guest
@@ -133,8 +130,7 @@ export const useAddressProductManagement = (basket) => {
             const existingShipments =
                 basket?.shipments?.filter(
                     (shipment) =>
-                        shipment.shippingAddress &&
-                        !isCurrentShippingMethodPickup(shipment?.shippingMethod)
+                        shipment.shippingAddress && !isPickupMethod(shipment?.shippingMethod)
                 ) || []
 
             if (existingShipments.length > 0) {
@@ -202,13 +198,7 @@ export const useAddressProductManagement = (basket) => {
                 hasInitialized.current = true
             }
         }
-    }, [
-        customer?.isGuest,
-        basket?.productItems?.length,
-        basket?.shipments?.length,
-        isCurrentShippingMethodPickup,
-        areAddressesEqual
-    ])
+    }, [customer?.isGuest, basket?.productItems?.length, basket?.shipments?.length])
 
     const selectedAddresses = useMemo(() => {
         if (customer?.isGuest) {

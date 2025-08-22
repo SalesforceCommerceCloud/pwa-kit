@@ -25,7 +25,7 @@ import {
 import {useShopperBasketsMutation} from '@salesforce/commerce-sdk-react'
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
 import {useCurrency} from '@salesforce/retail-react-app/app/hooks'
-import {usePickupShipment} from '@salesforce/retail-react-app/app/hooks/use-pickup-shipment'
+import {isPickupShipment} from '@salesforce/retail-react-app/app/utils/shipment-utils'
 import LoadingSpinner from '@salesforce/retail-react-app/app/components/loading-spinner'
 import PropTypes from 'prop-types'
 
@@ -129,16 +129,13 @@ export default function ShippingOptions() {
     const {step, STEPS, goToStep, goToNextStep} = useCheckout()
     const {data: basket, isLoading: isBasketLoading} = useCurrentBasket()
     const {currency} = useCurrency()
-    const {isCurrentShippingMethodPickup} = usePickupShipment(basket)
     const updateShippingMethod = useShopperBasketsMutation('updateShippingMethodForShipment')
 
     const deliveryShipments =
         (basket &&
             basket.shipments &&
             basket.shipments.filter(
-                (shipment) =>
-                    shipment.shippingAddress &&
-                    !isCurrentShippingMethodPickup(shipment.shippingMethod)
+                (shipment) => shipment.shippingAddress && !isPickupShipment(shipment)
             )) ||
         []
 

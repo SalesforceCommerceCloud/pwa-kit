@@ -194,7 +194,7 @@ export const useItemShipmentManagement = (basketId) => {
                     throw new Error('Selected store does not have an inventory ID')
                 }
 
-                const targetShipmentId = await findOrCreatePickupShipment(storeInfo)
+                const targetShipmentId = (await findOrCreatePickupShipment(storeInfo))?.shipmentId
                 if (!targetShipmentId) {
                     throw new Error('Failed to find or create shipment')
                 }
@@ -207,7 +207,7 @@ export const useItemShipmentManagement = (basketId) => {
                 )
             } else {
                 // Moving to delivery
-                const targetShipmentId = await findOrCreateDeliveryShipment()
+                const targetShipmentId = (await findOrCreateDeliveryShipment())?.shipmentId
                 if (!targetShipmentId) {
                     throw new Error('Failed to find or create shipment')
                 }

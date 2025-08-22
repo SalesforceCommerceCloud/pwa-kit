@@ -22,7 +22,6 @@ import {
     AlertDescription,
     Center
 } from '@salesforce/retail-react-app/app/components/shared/ui'
-import {useMultiship} from '@salesforce/retail-react-app/app/hooks/use-multiship'
 import {useCheckout} from '@salesforce/retail-react-app/app/pages/checkout/util/checkout-context'
 import {useAddressProductManagement} from '@salesforce/retail-react-app/app/hooks/use-address-product-management'
 import {useAddressForm} from '@salesforce/retail-react-app/app/hooks/use-address-form'
@@ -33,7 +32,6 @@ const ShippingMultiAddress = ({basket, submitButtonLabel, noItemsInBasketMessage
     const {formatMessage} = useIntl()
     const {STEPS, goToStep} = useCheckout()
     const showToast = useToast()
-    const {areAddressesEqual} = useMultiship(basket)
     const addressProductManagement = useAddressProductManagement(basket)
     const productIds = addressProductManagement.deliveryItems
         .map((item) => item.productId)
@@ -72,8 +70,7 @@ const ShippingMultiAddress = ({basket, submitButtonLabel, noItemsInBasketMessage
         addressProductManagement.isGuest,
         addressProductManagement.setAddressesForItems,
         addressProductManagement.availableAddresses,
-        addressProductManagement.deliveryItems,
-        areAddressesEqual
+        addressProductManagement.deliveryItems
     )
 
     const shipmentManagement = useShipmentManagement(basket)

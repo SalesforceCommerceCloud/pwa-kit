@@ -6,10 +6,11 @@
  */
 import {renderHook, act} from '@testing-library/react'
 import {useShipmentManagement} from '@salesforce/retail-react-app/app/hooks/use-shipment-management'
+import * as shipmentUtils from '@salesforce/retail-react-app/app/utils/shipment-utils'
 
 // Mock dependencies
-jest.mock('./use-multiship')
-jest.mock('./use-item-shipment-management')
+jest.mock('@salesforce/retail-react-app/app/hooks/use-multiship')
+jest.mock('@salesforce/retail-react-app/app/hooks/use-item-shipment-management')
 
 import {useMultiship} from '@salesforce/retail-react-app/app/hooks/use-multiship'
 import {useItemShipmentManagement} from '@salesforce/retail-react-app/app/hooks/use-item-shipment-management'
@@ -70,8 +71,6 @@ describe('useShipmentManagement', () => {
     }
 
     const mockMultishipFunctions = {
-        findDeliveryShipmentWithSameAddress: jest.fn(),
-        findUnusedDeliveryShipment: jest.fn(),
         createNewDeliveryShipmentWithAddress: jest.fn(),
         updateDeliveryAddressForShipment: jest.fn(),
         removeEmptyShipments: jest.fn()
@@ -81,20 +80,29 @@ describe('useShipmentManagement', () => {
         updateItemsToDeliveryShipment: jest.fn()
     }
 
+    let findDeliveryShipmentWithSameAddressSpy
+    let findUnusedDeliveryShipmentSpy
+
     beforeEach(() => {
         jest.clearAllMocks()
+        jest.restoreAllMocks()
         mockUseMultiship.mockReturnValue(mockMultishipFunctions)
         mockUseItemShipmentManagement.mockReturnValue(mockItemShipmentManagement)
+        findDeliveryShipmentWithSameAddressSpy = jest.spyOn(
+            shipmentUtils,
+            'findDeliveryShipmentWithSameAddress'
+        )
+        findUnusedDeliveryShipmentSpy = jest.spyOn(shipmentUtils, 'findUnusedDeliveryShipment')
     })
 
     describe('orchestration with mixed scenarios (existing + new shipments)', () => {
         it('should handle mixed existing and new shipments successfully', async () => {
             // Setup: One item uses existing shipment, one creates new
-            mockMultishipFunctions.findDeliveryShipmentWithSameAddress
+            findDeliveryShipmentWithSameAddressSpy
                 .mockReturnValueOnce({shipmentId: 'shipment-1'}) // Existing
                 .mockReturnValueOnce(null) // New shipment needed
 
-            mockMultishipFunctions.findUnusedDeliveryShipment.mockReturnValue(null)
+            findUnusedDeliveryShipmentSpy.mockReturnValue(null)
             mockMultishipFunctions.createNewDeliveryShipmentWithAddress.mockResolvedValue({
                 shipmentId: 'new-shipment-1'
             })
@@ -114,7 +122,7 @@ describe('useShipmentManagement', () => {
             })
 
             // Verify existing shipment was found
-            expect(mockMultishipFunctions.findDeliveryShipmentWithSameAddress).toHaveBeenCalledWith(
+            expect(findDeliveryShipmentWithSameAddressSpy).toHaveBeenCalledWith(
                 mockBasket,
                 mockFinalAddresses[0]
             )
@@ -139,8 +147,8 @@ describe('useShipmentManagement', () => {
                 shipmentId: 'different-shipment' // Different from target shipment
             }
 
-            mockMultishipFunctions.findDeliveryShipmentWithSameAddress.mockReturnValue(null)
-            mockMultishipFunctions.findUnusedDeliveryShipment.mockReturnValue(null)
+            findDeliveryShipmentWithSameAddressSpy.mockReturnValue(null)
+            findUnusedDeliveryShipmentSpy.mockReturnValue(null)
             mockMultishipFunctions.createNewDeliveryShipmentWithAddress.mockResolvedValue({
                 shipmentId: 'new-shipment-1'
             })
@@ -162,8 +170,8 @@ describe('useShipmentManagement', () => {
 
     describe('maps addresses to items', () => {
         it('should create correct address-to-items mapping', async () => {
-            mockMultishipFunctions.findDeliveryShipmentWithSameAddress.mockReturnValue(null)
-            mockMultishipFunctions.findUnusedDeliveryShipment.mockReturnValue(null)
+            findDeliveryShipmentWithSameAddressSpy.mockReturnValue(null)
+            findUnusedDeliveryShipmentSpy.mockReturnValue(null)
             mockMultishipFunctions.createNewDeliveryShipmentWithAddress.mockResolvedValue({
                 shipmentId: 'new-shipment-1'
             })
@@ -197,9 +205,7 @@ describe('useShipmentManagement', () => {
     describe('finds/reuses existing shipments', () => {
         it('should find and reuse existing shipment with same address', async () => {
             const existingShipment = {shipmentId: 'existing-shipment-1'}
-            mockMultishipFunctions.findDeliveryShipmentWithSameAddress.mockReturnValue(
-                existingShipment
-            )
+            findDeliveryShipmentWithSameAddressSpy.mockReturnValue(existingShipment)
             mockItemShipmentManagement.updateItemsToDeliveryShipment.mockResolvedValue(mockBasket)
             mockMultishipFunctions.removeEmptyShipments.mockResolvedValue()
 
@@ -214,7 +220,7 @@ describe('useShipmentManagement', () => {
                 )
             })
 
-            expect(mockMultishipFunctions.findDeliveryShipmentWithSameAddress).toHaveBeenCalledWith(
+            expect(findDeliveryShipmentWithSameAddressSpy).toHaveBeenCalledWith(
                 mockBasket,
                 mockFinalAddresses[0]
             )
@@ -226,8 +232,8 @@ describe('useShipmentManagement', () => {
 
     describe('creates new shipments when needed', () => {
         it('should create new shipment when no existing shipment found', async () => {
-            mockMultishipFunctions.findDeliveryShipmentWithSameAddress.mockReturnValue(null)
-            mockMultishipFunctions.findUnusedDeliveryShipment.mockReturnValue(null)
+            findDeliveryShipmentWithSameAddressSpy.mockReturnValue(null)
+            findUnusedDeliveryShipmentSpy.mockReturnValue(null)
             mockMultishipFunctions.createNewDeliveryShipmentWithAddress.mockResolvedValue({
                 shipmentId: 'new-shipment-1'
             })
@@ -253,8 +259,8 @@ describe('useShipmentManagement', () => {
 
     describe('moves items between shipments', () => {
         it('should move items to correct shipment', async () => {
-            mockMultishipFunctions.findDeliveryShipmentWithSameAddress.mockReturnValue(null)
-            mockMultishipFunctions.findUnusedDeliveryShipment.mockReturnValue(null)
+            findDeliveryShipmentWithSameAddressSpy.mockReturnValue(null)
+            findUnusedDeliveryShipmentSpy.mockReturnValue(null)
             mockMultishipFunctions.createNewDeliveryShipmentWithAddress.mockResolvedValue({
                 shipmentId: 'new-shipment-1'
             })
@@ -282,8 +288,8 @@ describe('useShipmentManagement', () => {
 
     describe('cleans up empty shipments', () => {
         it('should remove empty shipments after operations', async () => {
-            mockMultishipFunctions.findDeliveryShipmentWithSameAddress.mockReturnValue(null)
-            mockMultishipFunctions.findUnusedDeliveryShipment.mockReturnValue(null)
+            findDeliveryShipmentWithSameAddressSpy.mockReturnValue(null)
+            findUnusedDeliveryShipmentSpy.mockReturnValue(null)
             mockMultishipFunctions.createNewDeliveryShipmentWithAddress.mockResolvedValue({
                 shipmentId: 'new-shipment-1'
             })
@@ -307,8 +313,8 @@ describe('useShipmentManagement', () => {
 
     describe('API failures during shipment creation/updates', () => {
         it('should handle API failure during shipment creation', async () => {
-            mockMultishipFunctions.findDeliveryShipmentWithSameAddress.mockReturnValue(null)
-            mockMultishipFunctions.findUnusedDeliveryShipment.mockReturnValue(null)
+            findDeliveryShipmentWithSameAddressSpy.mockReturnValue(null)
+            findUnusedDeliveryShipmentSpy.mockReturnValue(null)
             mockMultishipFunctions.createNewDeliveryShipmentWithAddress.mockRejectedValue(
                 new Error('API Error')
             )
@@ -328,8 +334,8 @@ describe('useShipmentManagement', () => {
         })
 
         it('should handle API failure during item movement', async () => {
-            mockMultishipFunctions.findDeliveryShipmentWithSameAddress.mockReturnValue(null)
-            mockMultishipFunctions.findUnusedDeliveryShipment.mockReturnValue(null)
+            findDeliveryShipmentWithSameAddressSpy.mockReturnValue(null)
+            findUnusedDeliveryShipmentSpy.mockReturnValue(null)
             mockMultishipFunctions.createNewDeliveryShipmentWithAddress.mockResolvedValue({
                 shipmentId: 'new-shipment-1'
             })
@@ -355,8 +361,8 @@ describe('useShipmentManagement', () => {
     describe('error propagation and message', () => {
         it('should format error messages correctly', async () => {
             const originalError = new Error('Original error message')
-            mockMultishipFunctions.findDeliveryShipmentWithSameAddress.mockReturnValue(null)
-            mockMultishipFunctions.findUnusedDeliveryShipment.mockReturnValue(null)
+            findDeliveryShipmentWithSameAddressSpy.mockReturnValue(null)
+            findUnusedDeliveryShipmentSpy.mockReturnValue(null)
             mockMultishipFunctions.createNewDeliveryShipmentWithAddress.mockRejectedValue(
                 originalError
             )

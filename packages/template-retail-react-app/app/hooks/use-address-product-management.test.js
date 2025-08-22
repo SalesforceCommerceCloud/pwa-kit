@@ -9,20 +9,11 @@ import {renderHook, act} from '@testing-library/react'
 import {useAddressProductManagement} from '@salesforce/retail-react-app/app/hooks/use-address-product-management'
 
 // Mock dependencies
-jest.mock('./use-current-customer')
-jest.mock('./use-pickup-shipment')
-jest.mock('./use-multiship')
-jest.mock('../utils/address-utils')
+jest.mock('@salesforce/retail-react-app/app/hooks/use-current-customer')
 
 import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
-import {usePickupShipment} from '@salesforce/retail-react-app/app/hooks/use-pickup-shipment'
-import {useMultiship} from '@salesforce/retail-react-app/app/hooks/use-multiship'
-import {isAddressEmpty} from '../utils/address-utils'
 
 const mockUseCurrentCustomer = useCurrentCustomer
-const mockUsePickupShipment = usePickupShipment
-const mockUseMultiship = useMultiship
-const mockIsAddressEmpty = isAddressEmpty
 
 const mockBasket = {
     basketId: 'basket-1',
@@ -107,32 +98,19 @@ describe('useAddressProductManagement', () => {
             data: mockCustomer,
             isLoading: false
         })
-
-        mockUsePickupShipment.mockReturnValue({
-            isCurrentShippingMethodPickup: jest.fn().mockReturnValue(false)
-        })
-
-        mockUseMultiship.mockReturnValue({
-            areAddressesEqual: jest.fn().mockImplementation((addr1, addr2) => {
-                return (
-                    addr1.address1 === addr2.address1 &&
-                    addr1.city === addr2.city &&
-                    addr1.stateCode === addr2.stateCode &&
-                    addr1.postalCode === addr2.postalCode
-                )
-            })
-        })
-
-        mockIsAddressEmpty.mockReturnValue(false)
     })
 
     describe('deliveryItems filtering', () => {
         test('should filter out pickup shipments', () => {
-            mockUsePickupShipment.mockReturnValue({
-                isCurrentShippingMethodPickup: jest.fn().mockReturnValue(true)
-            })
+            const pickupBasket = {
+                ...mockBasket,
+                shipments: mockBasket.shipments.map((s) => ({
+                    ...s,
+                    shippingMethod: {...s.shippingMethod, c_storePickupEnabled: true}
+                }))
+            }
 
-            const {result} = renderHook(() => useAddressProductManagement(mockBasket))
+            const {result} = renderHook(() => useAddressProductManagement(pickupBasket))
 
             expect(result.current.deliveryItems).toHaveLength(0)
         })

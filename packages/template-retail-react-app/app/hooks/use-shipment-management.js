@@ -7,6 +7,10 @@
 import {useCallback} from 'react'
 import {useMultiship} from '@salesforce/retail-react-app/app/hooks/use-multiship'
 import {useItemShipmentManagement} from '@salesforce/retail-react-app/app/hooks/use-item-shipment-management'
+import {
+    findDeliveryShipmentWithSameAddress,
+    findUnusedDeliveryShipment
+} from '@salesforce/retail-react-app/app/utils/shipment-utils'
 
 /**
  * Hook for processing shipments in multi-shipping
@@ -17,8 +21,6 @@ import {useItemShipmentManagement} from '@salesforce/retail-react-app/app/hooks/
  */
 export const useShipmentManagement = (basket) => {
     const {
-        findDeliveryShipmentWithSameAddress,
-        findUnusedDeliveryShipment,
         createNewDeliveryShipmentWithAddress,
         updateDeliveryAddressForShipment,
         removeEmptyShipments
@@ -117,8 +119,6 @@ export const useShipmentManagement = (basket) => {
         },
         [
             basket,
-            findDeliveryShipmentWithSameAddress,
-            findUnusedDeliveryShipment,
             createNewDeliveryShipmentWithAddress,
             updateDeliveryAddressForShipment,
             updateItemsToDeliveryShipment,

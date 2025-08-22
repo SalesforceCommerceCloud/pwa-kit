@@ -1451,9 +1451,6 @@
   "shipping_address.error.update_failed": {
     "defaultMessage": "Something went wrong while updating the shipping address. Try again."
   },
-  "shipping_address.label.delivery_address": {
-    "defaultMessage": "Delivery Address"
-  },
   "shipping_address.label.edit_button": {
     "defaultMessage": "Edit {address}"
   },
@@ -1561,15 +1558,6 @@
   },
   "shipping_options.label.total_shipping": {
     "defaultMessage": "Total Shipping"
-  },
-  "shipping_options.no_image": {
-    "defaultMessage": "No Image"
-  },
-  "shipping_options.product_attributes.label": {
-    "defaultMessage": "Product attributes"
-  },
-  "shipping_options.quantity.label": {
-    "defaultMessage": "Quantity"
   },
   "shipping_options.title.shipping_gift_options": {
     "defaultMessage": "Shipping & Gift Options"

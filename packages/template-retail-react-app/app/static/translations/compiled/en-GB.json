@@ -3443,12 +3443,6 @@
       "value": "Something went wrong while updating the shipping address. Try again."
     }
   ],
-  "shipping_address.label.delivery_address": [
-    {
-      "type": 0,
-      "value": "Delivery Address"
-    }
-  ],
   "shipping_address.label.edit_button": [
     {
       "type": 0,
@@ -3699,24 +3693,6 @@
     {
       "type": 0,
       "value": "Total Shipping"
-    }
-  ],
-  "shipping_options.no_image": [
-    {
-      "type": 0,
-      "value": "No Image"
-    }
-  ],
-  "shipping_options.product_attributes.label": [
-    {
-      "type": 0,
-      "value": "Product attributes"
-    }
-  ],
-  "shipping_options.quantity.label": [
-    {
-      "type": 0,
-      "value": "Quantity"
     }
   ],
   "shipping_options.title.shipping_gift_options": [
