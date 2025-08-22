@@ -174,7 +174,7 @@ describe('useMultiship', () => {
 
             expect(result.current).toHaveProperty('findOrCreateDeliveryShipment')
             expect(result.current).toHaveProperty('findOrCreatePickupShipment')
-            expect(result.current).toHaveProperty('getShipmentForItems')
+            expect(result.current).toHaveProperty('getShipmentIdForItems')
             expect(result.current).toHaveProperty('createNewDeliveryShipmentWithAddress')
             expect(result.current).toHaveProperty('updateDeliveryAddressForShipment')
         })
@@ -726,12 +726,12 @@ describe('useMultiship', () => {
         })
     })
 
-    describe('getShipmentForItems', () => {
+    describe('getShipmentIdForItems', () => {
         test('should return default shipment ID when no basket', async () => {
             const {result} = renderHook(() => useMultiship(null))
 
             await act(async () => {
-                const response = await result.current.getShipmentForItems(false, mockStoreInfo)
+                const response = await result.current.getShipmentIdForItems(false, mockStoreInfo)
                 expect(response).toBe('me')
             })
         })
@@ -752,7 +752,7 @@ describe('useMultiship', () => {
             const {result} = renderHook(() => useMultiship(basketWithPickupShipment))
 
             await act(async () => {
-                const response = await result.current.getShipmentForItems(true, mockStoreInfo)
+                const response = await result.current.getShipmentIdForItems(true, mockStoreInfo)
                 expect(response).toBe('pickup-shipment')
             })
         })

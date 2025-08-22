@@ -99,7 +99,7 @@ const ProductDetail = () => {
         usePickupShipment(basket)
 
     /*************************** Multiship ********************/
-    const {getShipmentForItems} = useMultiship(basket)
+    const {getShipmentIdForItems} = useMultiship(basket)
 
     /*************************** Product Detail and Category ********************/
     const {productId} = useParams()
@@ -457,7 +457,10 @@ const ProductDetail = () => {
             }
 
             // Fetch and assign a suitable shipment for product items
-            const targetShipmentId = await getShipmentForItems(hasAnyPickupSelected, selectedStore)
+            const targetShipmentId = await getShipmentIdForItems(
+                hasAnyPickupSelected,
+                selectedStore
+            )
 
             if (targetShipmentId) {
                 productItems = productItems.map((item) => ({
@@ -612,7 +615,10 @@ const ProductDetail = () => {
             )
 
             // Fetch and assign a suitable shipment for product items
-            const targetShipmentId = await getShipmentForItems(hasAnyPickupSelected, selectedStore)
+            const targetShipmentId = await getShipmentIdForItems(
+                hasAnyPickupSelected,
+                selectedStore
+            )
 
             if (targetShipmentId) {
                 productItems = productItems.map((item) => ({

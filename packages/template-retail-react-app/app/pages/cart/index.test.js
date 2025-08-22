@@ -48,7 +48,7 @@ jest.mock('@salesforce/retail-react-app/app/hooks/use-selected-store', () => ({
 const mockUseMultiship = {
     updateDeliveryOption: jest.fn().mockResolvedValue(undefined),
     updateShipmentsWithoutMethods: jest.fn().mockResolvedValue(undefined),
-    findOrCreatePickupShipment: jest.fn().mockResolvedValue('pickup-shipment-2'),
+    findOrCreatePickupShipment: jest.fn().mockResolvedValue({shipmentId: 'pickup-shipment-2'}),
     moveItemsToPickupShipment: jest.fn().mockResolvedValue(undefined),
     getItemsForShipment: jest.fn(() => [])
 }

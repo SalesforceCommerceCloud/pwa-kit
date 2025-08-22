@@ -142,7 +142,7 @@ export const useMultiship = (basket) => {
     /**
      * Ensures a delivery shipment exists and returns it
      * Creates a new delivery shipment if none exists
-     * @returns {Promise<string>} The delivery shipment ID
+     * @returns {Promise<object|null>} The delivery shipment or null if not found
      */
     const findOrCreateDeliveryShipment = async () => {
         // Check if there's an existing delivery shipment
@@ -157,14 +157,14 @@ export const useMultiship = (basket) => {
             )
         }
 
-        return existingDeliveryShipment?.shipmentId
+        return existingDeliveryShipment
     }
 
     /**
      * Ensures a pickup shipment exists for the specified store and returns it
      * Creates a new pickup shipment if none exists for the store
      * @param {Object} storeInfo - The store object containing id and inventoryId
-     * @returns {Promise<string>} The pickup shipment ID
+     * @returns {Promise<object|null>} The pickup shipment or null if not found
      */
     const findOrCreatePickupShipment = async (storeInfo) => {
         if (!storeInfo?.id) {
@@ -189,7 +189,7 @@ export const useMultiship = (basket) => {
             )
         }
 
-        return existingPickupShipment?.shipmentId
+        return existingPickupShipment
     }
 
     /**
@@ -292,15 +292,15 @@ export const useMultiship = (basket) => {
      * @param {Object} selectedStore - Selected store information
      * @returns {Promise<string>} The target shipment ID
      */
-    const getShipmentForItems = async (selectedPickup, selectedStore) => {
+    const getShipmentIdForItems = async (selectedPickup, selectedStore) => {
         let targetShipmentId = DEFAULT_SHIPMENT_ID
 
         if (basket) {
             // Ensure a suitable shipment exists
             if (selectedPickup) {
-                targetShipmentId = await findOrCreatePickupShipment(selectedStore)
+                targetShipmentId = (await findOrCreatePickupShipment(selectedStore))?.shipmentId
             } else {
-                targetShipmentId = await findOrCreateDeliveryShipment()
+                targetShipmentId = (await findOrCreateDeliveryShipment())?.shipmentId
             }
         }
         return targetShipmentId
@@ -488,7 +488,7 @@ export const useMultiship = (basket) => {
         createNewPickupShipment,
         findOrCreateDeliveryShipment,
         findOrCreatePickupShipment,
-        getShipmentForItems,
+        getShipmentIdForItems,
         updateDeliveryAddressForShipment
     }
 }

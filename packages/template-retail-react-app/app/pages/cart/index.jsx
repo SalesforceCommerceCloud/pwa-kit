@@ -299,10 +299,10 @@ const Cart = () => {
                         )?.stockLevel >= productItem.quantity
                 )
                 if (itemsToMove.length) {
-                    const targetShipmentId = await findOrCreatePickupShipment(selectedStore)
+                    const targetShipment = await findOrCreatePickupShipment(selectedStore)
                     await moveItemsToPickupShipment(
                         itemsToMove,
-                        targetShipmentId,
+                        targetShipment?.shipmentId,
                         selectedStore.inventoryId
                     )
                 }
