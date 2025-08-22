@@ -312,9 +312,9 @@ test('when sendTextMessage fails and launchChat succeeds, sends message after bo
     // Wait for the setTimeout after bot message
     jest.advanceTimersByTime(500)
 
-    // Verify second sendTextMessage was called
+    // Verify second sendTextMessage was called (access token)
     expect(sendTextMessageSpy).toHaveBeenCalledTimes(2)
-    expect(sendTextMessageSpy).toHaveBeenLastCalledWith('test search')
+    expect(sendTextMessageSpy).toHaveBeenLastCalledWith('get me access token')
 
     // Simulate bot response again
     window.dispatchEvent(
@@ -332,8 +332,9 @@ test('when sendTextMessage fails and launchChat succeeds, sends message after bo
     // Wait for the setTimeout after bot message
     jest.advanceTimersByTime(500)
 
-    // Verify sendTextMessage was not called again
-    expect(sendTextMessageSpy).toHaveBeenCalledTimes(2)
+    // Verify third sendTextMessage was called (search utterance)
+    expect(sendTextMessageSpy).toHaveBeenCalledTimes(3)
+    expect(sendTextMessageSpy).toHaveBeenLastCalledWith('test search')
 })
 
 test('when sendTextMessage fails and launchChat returns maximized message, no additional send text is triggered', async () => {

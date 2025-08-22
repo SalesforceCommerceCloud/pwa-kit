@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React, {useEffect} from 'react'
+import React, {useEffect, useRef} from 'react'
 import useScript from '@salesforce/retail-react-app/app/hooks/use-script'
 import {useUsid} from '@salesforce/commerce-sdk-react'
 import PropTypes from 'prop-types'
@@ -156,6 +156,13 @@ const ShopperAgentWindow = ({commerceAgentConfiguration}) => {
     // User session identifier hook
     const {usid} = useUsid()
 
+    // Track conversation state using the same pattern as Search component
+    const miawChatRef = useRef({
+        newChatLaunched: false,
+        hasFired: false
+    })
+
+    // Set up hidden prechat fields when the embedded messaging service is ready
     useEffect(() => {
         /**
          * Sets up hidden prechat fields when the embedded messaging service is ready.
@@ -212,6 +219,59 @@ const ShopperAgentWindow = ({commerceAgentConfiguration}) => {
         theme.zIndices.sticky,
         refreshToken
     ])
+
+    // Handle conversation start utterance functionality
+    useEffect(() => {
+        const handleEmbeddedMessagingConversationStarted = () => {
+            // This event fires when we first join ANY conversation
+            // Reset flags for new conversation
+            miawChatRef.current.hasFired = false
+            miawChatRef.current.newChatLaunched = true
+        }
+
+        const handleEmbeddedMessageSent = (e) => {
+            // Follow the same pattern as Search component
+            if (!miawChatRef.current.hasFired && miawChatRef.current.newChatLaunched) {
+                // Check if this is the welcome message from the agent (Chatbot)
+                if (e.detail.conversationEntry?.sender?.role === 'Chatbot') {
+                    miawChatRef.current.hasFired = true
+                    // Send utterance after welcome message is received
+                    // setTimeout(() => {
+                    //     if (window.embeddedservice_bootstrap?.utilAPI?.sendTextMessage) {
+                    //         window.embeddedservice_bootstrap.utilAPI.sendTextMessage('start chat session')
+                    //             .catch(console.error)
+                    //     }
+                    // }, 300)
+                }
+            }
+        }
+
+        const handleEmbeddedMessagingConversationOpened = (e) => {
+            // Reset flags for new conversation
+            miawChatRef.current.hasFired = false
+            miawChatRef.current.newChatLaunched = true
+        }
+
+        const handleEmbeddedMessagingConversationEnded = () => {
+            // Reset conversation state for fresh start
+            miawChatRef.current.hasFired = false
+            miawChatRef.current.newChatLaunched = false
+        }
+
+        // Add event listeners
+        window.addEventListener('onEmbeddedMessagingConversationStarted', handleEmbeddedMessagingConversationStarted)
+        window.addEventListener('onEmbeddedMessageSent', handleEmbeddedMessageSent)
+        window.addEventListener('onEmbeddedMessagingConversationOpened', handleEmbeddedMessagingConversationOpened)
+        window.addEventListener('onEmbeddedMessagingConversationEnded', handleEmbeddedMessagingConversationEnded)
+
+        // Cleanup function
+        return () => {
+            window.removeEventListener('onEmbeddedMessagingConversationStarted', handleEmbeddedMessagingConversationStarted)
+            window.removeEventListener('onEmbeddedMessageSent', handleEmbeddedMessageSent)
+            window.removeEventListener('onEmbeddedMessagingConversationOpened', handleEmbeddedMessagingConversationOpened)
+            window.removeEventListener('onEmbeddedMessagingConversationEnded', handleEmbeddedMessagingConversationEnded)
+        }
+    }, [])
 
     // Load the embedded messaging script asynchronously
     const scriptLoadStatus = useScript(scriptSourceUrl)

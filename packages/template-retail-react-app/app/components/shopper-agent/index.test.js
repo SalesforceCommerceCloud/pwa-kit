@@ -16,7 +16,7 @@ const mockEmbeddedService = {
         setHiddenPrechatFields: jest.fn()
     },
     utilAPI: {
-        sendTextMessage: jest.fn()
+        sendTextMessage: jest.fn().mockResolvedValue(undefined)
     }
 }
 
@@ -449,5 +449,247 @@ describe('ShopperAgent Component', () => {
         render(<ShopperAgent {...defaultProps} />)
 
         expect(mockedUseScript).toHaveBeenCalledWith('https://test.salesforce.com/script.js')
+    })
+
+    // New tests for conversation management functionality
+    describe('Conversation Management and Utterance Functionality', () => {
+        beforeEach(() => {
+            // Reset the mock for sendTextMessage before each test
+            mockEmbeddedService.utilAPI.sendTextMessage.mockClear()
+            
+            // Ensure the mock is properly set up for each test
+            Object.defineProperty(window, 'embeddedservice_bootstrap', {
+                value: mockEmbeddedService,
+                writable: true
+            })
+        })
+
+        test('should NOT send utterance immediately when conversation starts', async () => {
+            render(<ShopperAgent {...defaultProps} />)
+
+            // Trigger conversation started event
+            await act(async () => {
+                window.dispatchEvent(new Event('onEmbeddedMessagingConversationStarted'))
+            })
+
+            // Wait for the setTimeout to execute
+            await act(async () => {
+                await new Promise(resolve => setTimeout(resolve, 600))
+            })
+
+            // Verify that sendTextMessage was NOT called immediately
+            expect(mockEmbeddedService.utilAPI.sendTextMessage).not.toHaveBeenCalled()
+        })
+
+        test('should send utterance only after welcome message from agent', async () => {
+            render(<ShopperAgent {...defaultProps} />)
+
+            // First, trigger conversation started (should NOT send utterance)
+            await act(async () => {
+                window.dispatchEvent(new Event('onEmbeddedMessagingConversationStarted'))
+            })
+
+            // Verify no utterance sent yet
+            expect(mockEmbeddedService.utilAPI.sendTextMessage).not.toHaveBeenCalled()
+
+            // Now simulate the welcome message from the agent
+            const welcomeMessageEvent = new CustomEvent('onEmbeddedMessageSent', {
+                detail: {
+                    conversationEntry: {
+                        sender: {
+                            role: 'Chatbot'
+                        }
+                    }
+                }
+            })
+
+            await act(async () => {
+                window.dispatchEvent(welcomeMessageEvent)
+            })
+
+            // Wait for the setTimeout to execute
+            await act(async () => {
+                await new Promise(resolve => setTimeout(resolve, 600))
+            })
+
+            // Verify utterance was sent after welcome message
+            expect(mockEmbeddedService.utilAPI.sendTextMessage).toHaveBeenCalledWith('get me access token')
+        })
+
+        test('should send utterance only once per conversation', async () => {
+            render(<ShopperAgent {...defaultProps} />)
+
+            // Start conversation
+            await act(async () => {
+                window.dispatchEvent(new Event('onEmbeddedMessagingConversationStarted'))
+            })
+
+            // Send welcome message
+            const welcomeMessageEvent = new CustomEvent('onEmbeddedMessageSent', {
+                detail: {
+                    conversationEntry: {
+                        sender: {
+                            role: 'Chatbot'
+                        }
+                    }
+                }
+            })
+
+            await act(async () => {
+                window.dispatchEvent(welcomeMessageEvent)
+            })
+
+            // Wait for utterance to be sent
+            await act(async () => {
+                await new Promise(resolve => setTimeout(resolve, 600))
+            })
+
+            // Verify utterance was sent once
+            expect(mockEmbeddedService.utilAPI.sendTextMessage).toHaveBeenCalledTimes(1)
+            expect(mockEmbeddedService.utilAPI.sendTextMessage).toHaveBeenCalledWith('get me access token')
+
+            // Clear mock
+            mockEmbeddedService.utilAPI.sendTextMessage.mockClear()
+
+            // Try to send another welcome message (should not send utterance again)
+            await act(async () => {
+                window.dispatchEvent(welcomeMessageEvent)
+            })
+
+            // Wait for the setTimeout to execute
+            await act(async () => {
+                await new Promise(resolve => setTimeout(resolve, 600))
+            })
+
+            // Verify no additional utterance was sent
+            expect(mockEmbeddedService.utilAPI.sendTextMessage).not.toHaveBeenCalled()
+        })
+
+        test('should reset conversation state when conversation ends', async () => {
+            render(<ShopperAgent {...defaultProps} />)
+
+            // First conversation start and welcome message
+            await act(async () => {
+                window.dispatchEvent(new Event('onEmbeddedMessagingConversationStarted'))
+            })
+
+            const welcomeMessageEvent = new CustomEvent('onEmbeddedMessageSent', {
+                detail: {
+                    conversationEntry: {
+                        sender: {
+                            role: 'Chatbot'
+                        }
+                    }
+                }
+            })
+
+            await act(async () => {
+                window.dispatchEvent(welcomeMessageEvent)
+            })
+
+            // Wait for utterance to be sent
+            await act(async () => {
+                await new Promise(resolve => setTimeout(resolve, 600))
+            })
+
+            // Verify utterance was sent
+            expect(mockEmbeddedService.utilAPI.sendTextMessage).toHaveBeenCalledWith('get me access token')
+
+            // Clear mock
+            mockEmbeddedService.utilAPI.sendTextMessage.mockClear()
+
+            // End the conversation
+            await act(async () => {
+                window.dispatchEvent(new Event('onEmbeddedMessagingConversationEnded'))
+            })
+
+            // Now start a new conversation and send welcome message (should send utterance again)
+            await act(async () => {
+                window.dispatchEvent(new Event('onEmbeddedMessagingConversationStarted'))
+            })
+
+            await act(async () => {
+                window.dispatchEvent(welcomeMessageEvent)
+            })
+
+            // Wait for the setTimeout to execute
+            await act(async () => {
+                await new Promise(resolve => setTimeout(resolve, 600))
+            })
+
+            // Verify utterance was sent again
+            expect(mockEmbeddedService.utilAPI.sendTextMessage).toHaveBeenCalledWith('get me access token')
+        })
+
+        test('should handle error when sendTextMessage fails', async () => {
+            // Mock console.error to capture error logging
+            const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {})
+            
+            // Mock sendTextMessage to reject
+            mockEmbeddedService.utilAPI.sendTextMessage.mockRejectedValue(new Error('API Error'))
+
+            render(<ShopperAgent {...defaultProps} />)
+
+            // Start conversation and send welcome message
+            await act(async () => {
+                window.dispatchEvent(new Event('onEmbeddedMessagingConversationStarted'))
+            })
+
+            const welcomeMessageEvent = new CustomEvent('onEmbeddedMessageSent', {
+                detail: {
+                    conversationEntry: {
+                        sender: {
+                            role: 'Chatbot'
+                        }
+                    }
+                }
+            })
+
+            await act(async () => {
+                window.dispatchEvent(welcomeMessageEvent)
+            })
+
+            // Wait for the setTimeout to execute
+            await act(async () => {
+                await new Promise(resolve => setTimeout(resolve, 600))
+            })
+
+            // Verify error was logged
+            expect(consoleSpy).toHaveBeenCalledWith(expect.any(Error))
+
+            // Cleanup
+            consoleSpy.mockRestore()
+        })
+
+        test('should clean up all conversation event listeners on unmount', () => {
+            const {unmount} = render(<ShopperAgent {...defaultProps} />)
+
+            // Spy on removeEventListener
+            const removeEventListenerSpy = jest.spyOn(window, 'removeEventListener')
+
+            // Unmount the component
+            unmount()
+
+            // Verify that all conversation event listeners were removed
+            expect(removeEventListenerSpy).toHaveBeenCalledWith(
+                'onEmbeddedMessagingConversationStarted',
+                expect.any(Function)
+            )
+            expect(removeEventListenerSpy).toHaveBeenCalledWith(
+                'onEmbeddedMessageSent',
+                expect.any(Function)
+            )
+            expect(removeEventListenerSpy).toHaveBeenCalledWith(
+                'onEmbeddedMessagingConversationOpened',
+                expect.any(Function)
+            )
+            expect(removeEventListenerSpy).toHaveBeenCalledWith(
+                'onEmbeddedMessagingConversationEnded',
+                expect.any(Function)
+            )
+
+            // Clean up
+            removeEventListenerSpy.mockRestore()
+        })
     })
 })

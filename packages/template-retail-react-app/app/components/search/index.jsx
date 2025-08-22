@@ -115,7 +115,10 @@ const Search = (props) => {
     const searchInputRef = useRef()
     const miawChatRef = useRef({
         newChatLaunched: false,
-        hasFired: false
+        hasFired: false,
+        accessTokenSent: false,
+        searchUtteranceSent: false,
+        chatEverLaunched: false
     })
     const recentSearches = getSessionJSONItem(RECENT_SEARCH_KEY)
     const searchSuggestions = useMemo(
@@ -176,12 +179,23 @@ const Search = (props) => {
                     e.detail.conversationEntry?.sender?.role === 'Chatbot' &&
                     searchInputRef?.current?.value
                 ) {
-                    miawChatRef.current.hasFired = true
-                    setTimeout(() => {
-                        window.embeddedservice_bootstrap.utilAPI.sendTextMessage(
-                            searchInputRef.current.value.trim()
-                        )
-                    }, 500)
+                    // First, send "get me access token" if we haven't sent it yet
+                    if (!miawChatRef.current.accessTokenSent) {
+                        miawChatRef.current.accessTokenSent = true
+                        setTimeout(() => {
+                            window.embeddedservice_bootstrap.utilAPI.sendTextMessage('get me access token')
+                                .catch(console.error)
+                        }, 500)
+                    } else if (!miawChatRef.current.searchUtteranceSent) {
+                        // After access token is sent and bot responds, send the search utterance
+                        miawChatRef.current.searchUtteranceSent = true
+                        miawChatRef.current.hasFired = true
+                        setTimeout(() => {
+                            window.embeddedservice_bootstrap.utilAPI.sendTextMessage(
+                                searchInputRef.current.value.trim()
+                            )
+                        }, 500)
+                    }
                 }
             }
         }
@@ -194,14 +208,24 @@ const Search = (props) => {
         }
     }, [])
     const launchChat = () => {
+        window.embeddedservice_bootstrap.settings.disableStreamingResponses = true
+        window.embeddedservice_bootstrap.settings.enableUserInputForConversationWithBot = false
         window.embeddedservice_bootstrap.utilAPI
             .launchChat()
             .then((successMessage) => {
                 /* TODO: With the Salesforce Winter '26 release, we will be able to use the
                  * onEmbeddedMessagingFirstBotMessageSent event instead, and get rid of this logic. */
                 if (successMessage.includes('Successfully initialized the messaging client')) {
-                    miawChatRef.current.hasFired = false //We want the logic in onEmbeddedMessageSent to happen once per new conversation
+                    // Reset conversation flags for new conversation
+                    miawChatRef.current.hasFired = false
                     miawChatRef.current.newChatLaunched = true
+                    miawChatRef.current.searchUtteranceSent = false
+                    
+                    // Only reset accessTokenSent if this is the first time ever launching chat
+                    if (!miawChatRef.current.chatEverLaunched) {
+                        miawChatRef.current.accessTokenSent = false
+                        miawChatRef.current.chatEverLaunched = true
+                    }
                 }
             })
             .catch((err) => {
@@ -219,6 +243,9 @@ const Search = (props) => {
         }
 
         if (askAgentOnSearchEnabled && window.embeddedservice_bootstrap) {
+            // Only reset search utterance flag for new search, keep accessTokenSent as is
+            miawChatRef.current.searchUtteranceSent = false
+            
             // Add a 500ms delay before sending the message to ensure the experience isn't jarring to the user
             setTimeout(() => {
                 window.embeddedservice_bootstrap.utilAPI
