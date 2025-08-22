@@ -523,9 +523,6 @@ export const ApplePayExpress = ({
         site: providedSite
     })
 
-    // Get Apple Pay configuration from payment methods
-    const applePayConfig = getPaymentMethodConfig(adyenPaymentMethods, 'applepay')
-
     // Cleanup effect to remove temporary basket when component unmounts
     useEffect(() => {
         return () => {
@@ -632,8 +629,13 @@ export const ApplePayExpress = ({
 
                         // Log the actual button creation and mounting time
                         const buttonCreationEndTime = performance.now()
-                        const buttonCreationDuration = buttonCreationEndTime - buttonCreationStartTime
-                        console.log(`🍎 ApplePayExpress button created and mounted in ${buttonCreationDuration.toFixed(2)}ms`)
+                        const buttonCreationDuration =
+                            buttonCreationEndTime - buttonCreationStartTime
+                        console.log(
+                            `🍎 ApplePayExpress button created and mounted in ${buttonCreationDuration.toFixed(
+                                2
+                            )}ms`
+                        )
                     } catch (error) {
                         console.error('Failed to mount Apple Pay button:', error)
                         handleApplePayUnavailable()

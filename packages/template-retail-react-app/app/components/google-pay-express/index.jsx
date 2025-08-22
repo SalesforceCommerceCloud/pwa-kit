@@ -456,9 +456,6 @@ export const GooglePayExpress = ({
         site: providedSite
     })
 
-    // Get Google Pay configuration from payment methods
-    const googlePayConfig = getPaymentMethodConfig(adyenPaymentMethods, 'googlepay')
-
     // Cleanup effect to remove temporary basket when component unmounts
     useEffect(() => {
         return () => {
@@ -561,8 +558,13 @@ export const GooglePayExpress = ({
 
                         // Log the actual button creation and mounting time
                         const buttonCreationEndTime = performance.now()
-                        const buttonCreationDuration = buttonCreationEndTime - buttonCreationStartTime
-                        console.log(`🤖 GooglePayExpress button created and mounted in ${buttonCreationDuration.toFixed(2)}ms`)
+                        const buttonCreationDuration =
+                            buttonCreationEndTime - buttonCreationStartTime
+                        console.log(
+                            `🤖 GooglePayExpress button created and mounted in ${buttonCreationDuration.toFixed(
+                                2
+                            )}ms`
+                        )
                     } catch (error) {
                         handleGooglePayUnavailable()
                     }

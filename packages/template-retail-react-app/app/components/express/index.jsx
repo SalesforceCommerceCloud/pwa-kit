@@ -113,9 +113,6 @@ function Express() {
         }
     }, [])
 
-    // Get environment from payment methods response
-    const adyenEnvironment = adyenPaymentMethods?.environment
-
     // Prepare context data for express payment components
     const expressPaymentContext = {
         adyenPaymentMethods,
