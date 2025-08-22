@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React, {useState} from 'react'
+import React, {useState, useMemo, useEffect} from 'react'
 import PropTypes from 'prop-types'
 import {defineMessage, FormattedMessage, useIntl} from 'react-intl'
 import {
@@ -20,6 +20,7 @@ import {
 import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
 import {useShopperBasketsMutation, useCustomerType} from '@salesforce/commerce-sdk-react'
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
+import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
 import {useCheckout} from '@salesforce/retail-react-app/app/pages/checkout-container/util/checkout-context'
 import {
     getPaymentInstrumentCardType,
@@ -34,6 +35,7 @@ import {
 import PaymentForm from '@salesforce/retail-react-app/app/pages/checkout-one-click/partials/one-click-payment-form'
 import ShippingAddressSelection from '@salesforce/retail-react-app/app/pages/checkout-one-click/partials/one-click-shipping-address-selection'
 import UserRegistration from '@salesforce/retail-react-app/app/pages/checkout-one-click/partials/one-click-user-registration'
+import SavePaymentMethod from '@salesforce/retail-react-app/app/pages/checkout-one-click/partials/one-click-save-payment-method'
 import AddressDisplay from '@salesforce/retail-react-app/app/components/address-display'
 import {PromoCode, usePromoCode} from '@salesforce/retail-react-app/app/components/promo-code'
 import {API_ERROR_MESSAGE} from '@salesforce/retail-react-app/app/constants'
@@ -43,14 +45,96 @@ const Payment = ({
     billingAddressForm,
     enableUserRegistration,
     setEnableUserRegistration,
-    registeredUserChoseGuest = false
+    registeredUserChoseGuest = false,
+    onPaymentMethodSaved,
+    onSavePreferenceChange
 }) => {
     const {formatMessage} = useIntl()
     const {data: basket} = useCurrentBasket()
+    const {data: customer} = useCurrentCustomer()
     const {isGuest} = useCustomerType()
     const selectedShippingAddress = basket?.shipments && basket?.shipments[0]?.shippingAddress
     const selectedBillingAddress = basket?.billingAddress
     const appliedPayment = basket?.paymentInstruments && basket?.paymentInstruments[0]
+
+    // Track current form values to detect new payment instruments in real-time
+    const [currentFormPayment, setCurrentFormPayment] = useState(null)
+
+    // Track whether user wants to save the payment method
+    const [shouldSavePaymentMethod, setShouldSavePaymentMethod] = useState(false)
+
+    // Callback when user changes save preference
+    const handleSavePreferenceChange = (shouldSave) => {
+        setShouldSavePaymentMethod(shouldSave)
+    }
+
+    // Function to update current form payment data
+    const updateCurrentFormPayment = (formData) => {
+        if (formData?.number && formData?.holder && formData?.expiry) {
+            const [expirationMonth, expirationYear] = formData.expiry.split('/')
+            const paymentData = {
+                paymentMethodId: 'CREDIT_CARD',
+                paymentCard: {
+                    holder: formData.holder,
+                    numberLastDigits: formData.number.slice(-4),
+                    cardType: formData.cardType,
+                    expirationMonth: parseInt(expirationMonth),
+                    expirationYear: parseInt(`20${expirationYear}`)
+                }
+            }
+            setCurrentFormPayment(paymentData)
+        } else {
+            setCurrentFormPayment(null)
+        }
+    }
+
+    // Detect new payment instruments that aren't in the customer's saved list
+    const newPaymentInstruments = useMemo(() => {
+        // Use currentFormPayment if available, otherwise fall back to appliedPayment
+        const paymentToCheck = currentFormPayment || appliedPayment
+
+        if (!isGuest && paymentToCheck) {
+            // If customer has no saved payment instruments, any new payment is considered new
+            if (!customer?.paymentInstruments || customer.paymentInstruments.length === 0) {
+                return [paymentToCheck]
+            }
+
+            // Check if current payment instrument is not in saved list
+            const isNewPayment = !customer.paymentInstruments.some((saved) => {
+                // Compare the entire payment instrument structure
+                return (
+                    saved.paymentCard?.cardType === paymentToCheck.paymentCard?.cardType &&
+                    saved.paymentCard?.numberLastDigits ===
+                        paymentToCheck.paymentCard?.numberLastDigits &&
+                    saved.paymentCard?.holder === paymentToCheck.paymentCard?.holder &&
+                    saved.paymentCard?.expirationMonth ===
+                        paymentToCheck.paymentCard?.expirationMonth &&
+                    saved.paymentCard?.expirationYear === paymentToCheck.paymentCard?.expirationYear
+                )
+            })
+
+            return isNewPayment ? [paymentToCheck] : []
+        }
+        return []
+    }, [isGuest, customer, appliedPayment, currentFormPayment])
+
+    // Watch form values in real-time to detect new payment instruments
+    useEffect(() => {
+        if (paymentMethodForm && !isGuest) {
+            const subscription = paymentMethodForm.watch((value, {name, type}) => {
+                updateCurrentFormPayment(value)
+            })
+
+            return () => subscription.unsubscribe()
+        }
+    }, [paymentMethodForm, isGuest])
+
+    // Notify parent when save preference changes
+    useEffect(() => {
+        if (onSavePreferenceChange) {
+            onSavePreferenceChange(shouldSavePaymentMethod)
+        }
+    }, [shouldSavePaymentMethod, onSavePreferenceChange])
 
     const isPickupOrder = basket?.shipments[0]?.shippingMethod?.c_storePickupEnabled === true
     const [billingSameAsShipping, setBillingSameAsShipping] = useState(!isPickupOrder)
@@ -150,124 +234,70 @@ const Payment = ({
         id: 'checkout_payment.label.billing_address_form'
     })
 
-    return (
-        <ToggleCard
-            id="step-3"
-            data-testid="payment-component"
-            title={formatMessage({defaultMessage: 'Payment', id: 'checkout_payment.title.payment'})}
-            editing={step === STEPS.PAYMENT}
-            isLoading={
-                paymentMethodForm.formState.isSubmitting ||
-                billingAddressForm.formState.isSubmitting
-            }
-            disabled={appliedPayment == null}
-            onEdit={() => goToStep(STEPS.PAYMENT)}
-            editLabel={formatMessage({
-                defaultMessage: 'Edit Payment Info',
-                id: 'toggle_card.action.editPaymentInfo'
-            })}
-        >
-            <ToggleCardEdit>
-                <Box mt={-2} mb={4}>
-                    <PromoCode {...promoCodeProps} itemProps={{border: 'none'}} />
-                </Box>
+    try {
+        return (
+            <ToggleCard
+                id="step-3"
+                data-testid="payment-component"
+                title={formatMessage({
+                    defaultMessage: 'Payment',
+                    id: 'checkout_payment.title.payment'
+                })}
+                editing={step === STEPS.PAYMENT}
+                isLoading={
+                    paymentMethodForm.formState.isSubmitting ||
+                    billingAddressForm.formState.isSubmitting
+                }
+                disabled={appliedPayment == null}
+                onEdit={() => goToStep(STEPS.PAYMENT)}
+                editLabel={formatMessage({
+                    defaultMessage: 'Edit Payment Info',
+                    id: 'toggle_card.action.editPaymentInfo'
+                })}
+            >
+                <ToggleCardEdit>
+                    <Box mt={-2} mb={4}>
+                        <PromoCode {...promoCodeProps} itemProps={{border: 'none'}} />
+                    </Box>
 
-                <Stack spacing={6}>
-                    {!appliedPayment?.paymentCard ? (
-                        <PaymentForm form={paymentMethodForm} onSubmit={onSubmit} />
-                    ) : (
-                        <Stack spacing={3}>
-                            <Heading as="h3" fontSize="md">
-                                <FormattedMessage
-                                    defaultMessage="Credit Card"
-                                    id="checkout_payment.heading.credit_card"
-                                />
-                            </Heading>
-                            <Stack direction="row" spacing={4}>
-                                <PaymentCardSummary payment={appliedPayment} />
-                                <Button
-                                    variant="link"
-                                    size="sm"
-                                    colorScheme="red"
-                                    onClick={onPaymentRemoval}
-                                >
-                                    <FormattedMessage
-                                        defaultMessage="Remove"
-                                        id="checkout_payment.action.remove"
+                    <Stack spacing={6}>
+                        {!appliedPayment?.paymentCard ? (
+                            <PaymentForm form={paymentMethodForm} onSubmit={onSubmit}>
+                                {/* Save Payment Method - Show right underneath credit card fields */}
+                                {newPaymentInstruments.length > 0 && (
+                                    <SavePaymentMethod
+                                        paymentInstrument={newPaymentInstruments[0]}
+                                        onSaved={handleSavePreferenceChange}
                                     />
-                                </Button>
+                                )}
+                            </PaymentForm>
+                        ) : (
+                            <Stack spacing={3}>
+                                <Heading as="h3" fontSize="md">
+                                    <FormattedMessage
+                                        defaultMessage="Credit Card"
+                                        id="checkout_payment.heading.credit_card"
+                                    />
+                                </Heading>
+                                <Stack direction="row" spacing={4}>
+                                    <PaymentCardSummary payment={appliedPayment} />
+                                    <Button
+                                        variant="link"
+                                        size="sm"
+                                        colorScheme="red"
+                                        onClick={onPaymentRemoval}
+                                    >
+                                        <FormattedMessage
+                                            defaultMessage="Remove"
+                                            id="checkout_payment.action.remove"
+                                        />
+                                    </Button>
+                                </Stack>
                             </Stack>
-                        </Stack>
-                    )}
-
-                    <Divider borderColor="gray.100" />
-
-                    <Stack spacing={2}>
-                        <Heading as="h3" fontSize="md">
-                            <FormattedMessage
-                                defaultMessage="Billing Address"
-                                id="checkout_payment.heading.billing_address"
-                            />
-                        </Heading>
-
-                        {!isPickupOrder && selectedShippingAddress && (
-                            <Checkbox
-                                name="billingSameAsShipping"
-                                isChecked={billingSameAsShipping}
-                                onChange={(e) => setBillingSameAsShipping(e.target.checked)}
-                            >
-                                <Text fontSize="sm" color="gray.700">
-                                    <FormattedMessage
-                                        defaultMessage="Same as shipping address"
-                                        id="checkout_payment.label.same_as_shipping"
-                                    />
-                                </Text>
-                            </Checkbox>
                         )}
 
-                        {billingSameAsShipping && selectedShippingAddress && (
-                            <Box pl={7}>
-                                <AddressDisplay address={selectedShippingAddress} />
-                            </Box>
-                        )}
-                    </Stack>
+                        <Divider borderColor="gray.100" />
 
-                    {!billingSameAsShipping && (
-                        <ShippingAddressSelection
-                            form={billingAddressForm}
-                            selectedAddress={selectedBillingAddress}
-                            formTitleAriaLabel={billingAddressAriaLabel}
-                            hideSubmitButton
-                            isBillingAddress
-                        />
-                    )}
-                    {isGuest && (
-                        <UserRegistration
-                            enableUserRegistration={enableUserRegistration}
-                            setEnableUserRegistration={setEnableUserRegistration}
-                            isGuestCheckout={registeredUserChoseGuest}
-                        />
-                    )}
-                </Stack>
-            </ToggleCardEdit>
-
-            <ToggleCardSummary>
-                <Stack spacing={6}>
-                    {appliedPayment && (
-                        <Stack spacing={3}>
-                            <Heading as="h3" fontSize="md">
-                                <FormattedMessage
-                                    defaultMessage="Credit Card"
-                                    id="checkout_payment.heading.credit_card"
-                                />
-                            </Heading>
-                            <PaymentCardSummary payment={appliedPayment} />
-                        </Stack>
-                    )}
-
-                    <Divider borderColor="gray.100" />
-
-                    {selectedBillingAddress && (
                         <Stack spacing={2}>
                             <Heading as="h3" fontSize="md">
                                 <FormattedMessage
@@ -275,19 +305,97 @@ const Payment = ({
                                     id="checkout_payment.heading.billing_address"
                                 />
                             </Heading>
-                            <AddressDisplay address={selectedBillingAddress} />
-                        </Stack>
-                    )}
 
-                    <UserRegistration
-                        enableUserRegistration={enableUserRegistration}
-                        setEnableUserRegistration={setEnableUserRegistration}
-                        isGuestCheckout={registeredUserChoseGuest}
-                    />
-                </Stack>
-            </ToggleCardSummary>
-        </ToggleCard>
-    )
+                            {!isPickupOrder && selectedShippingAddress && (
+                                <Checkbox
+                                    name="billingSameAsShipping"
+                                    isChecked={billingSameAsShipping}
+                                    onChange={(e) => setBillingSameAsShipping(e.target.checked)}
+                                >
+                                    <Text fontSize="sm" color="gray.700">
+                                        <FormattedMessage
+                                            defaultMessage="Same as shipping address"
+                                            id="checkout_payment.label.same_as_shipping"
+                                        />
+                                    </Text>
+                                </Checkbox>
+                            )}
+
+                            {billingSameAsShipping && selectedShippingAddress && (
+                                <Box pl={7}>
+                                    <AddressDisplay address={selectedShippingAddress} />
+                                </Box>
+                            )}
+                        </Stack>
+
+                        {!billingSameAsShipping && (
+                            <ShippingAddressSelection
+                                form={billingAddressForm}
+                                selectedAddress={selectedBillingAddress}
+                                formTitleAriaLabel={billingAddressAriaLabel}
+                                hideSubmitButton
+                                isBillingAddress
+                            />
+                        )}
+                        {isGuest && (
+                            <UserRegistration
+                                enableUserRegistration={enableUserRegistration}
+                                setEnableUserRegistration={setEnableUserRegistration}
+                                isGuestCheckout={registeredUserChoseGuest}
+                            />
+                        )}
+                    </Stack>
+                </ToggleCardEdit>
+
+                <ToggleCardSummary>
+                    <Stack spacing={6}>
+                        {appliedPayment && (
+                            <Stack spacing={3}>
+                                <Heading as="h3" fontSize="md">
+                                    <FormattedMessage
+                                        defaultMessage="Credit Card"
+                                        id="checkout_payment.heading.credit_card"
+                                    />
+                                </Heading>
+                                <PaymentCardSummary payment={appliedPayment} />
+                            </Stack>
+                        )}
+
+                        {/* Save Payment Method - Always check, regardless of appliedPayment */}
+                        {newPaymentInstruments.length > 0 && (
+                            <SavePaymentMethod
+                                paymentInstrument={newPaymentInstruments[0]}
+                                onSaved={onPaymentMethodSaved}
+                            />
+                        )}
+
+                        <Divider borderColor="gray.100" />
+
+                        {selectedBillingAddress && (
+                            <Stack spacing={2}>
+                                <Heading as="h3" fontSize="md">
+                                    <FormattedMessage
+                                        defaultMessage="Billing Address"
+                                        id="checkout_payment.heading.billing_address"
+                                    />
+                                </Heading>
+                                <AddressDisplay address={selectedBillingAddress} />
+                            </Stack>
+                        )}
+
+                        <UserRegistration
+                            enableUserRegistration={enableUserRegistration}
+                            setEnableUserRegistration={setEnableUserRegistration}
+                            isGuestCheckout={registeredUserChoseGuest}
+                        />
+                    </Stack>
+                </ToggleCardSummary>
+            </ToggleCard>
+        )
+    } catch (error) {
+        console.error('🔍 Debug - Payment component render error:', error)
+        return <div>Error rendering payment component: {error.message}</div>
+    }
 }
 
 Payment.propTypes = {
@@ -296,7 +404,11 @@ Payment.propTypes = {
     /** Callback to set user registration state */
     setEnableUserRegistration: PropTypes.func,
     /** Whether a registered user has chosen guest checkout */
-    registeredUserChoseGuest: PropTypes.bool
+    registeredUserChoseGuest: PropTypes.bool,
+    /** Callback when payment method is successfully saved */
+    onPaymentMethodSaved: PropTypes.func,
+    /** Callback when save preference changes */
+    onSavePreferenceChange: PropTypes.func
 }
 
 const PaymentCardSummary = ({payment}) => {

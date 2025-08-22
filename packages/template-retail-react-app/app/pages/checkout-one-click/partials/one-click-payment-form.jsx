@@ -21,7 +21,7 @@ import {LockIcon, PaypalIcon} from '@salesforce/retail-react-app/app/components/
 import CreditCardFields from '@salesforce/retail-react-app/app/components/forms/credit-card-fields'
 import {useCurrency} from '@salesforce/retail-react-app/app/hooks'
 
-const PaymentForm = ({form, onSubmit}) => {
+const PaymentForm = ({form, onSubmit, children}) => {
     const {formatMessage} = useIntl()
     const {data: basket} = useCurrentBasket()
     const {currency} = useCurrency()
@@ -83,6 +83,7 @@ const PaymentForm = ({form, onSubmit}) => {
                                     <Stack spacing={6}>
                                         <CreditCardFields form={form} />
                                     </Stack>
+                                    {children && <Box pt={2}>{children}</Box>}
                                 </Stack>
                             </Box>
 
@@ -106,7 +107,10 @@ PaymentForm.propTypes = {
     form: PropTypes.object,
 
     /** Callback for form submit */
-    onSubmit: PropTypes.func
+    onSubmit: PropTypes.func,
+
+    /** Additional content to render after credit card fields */
+    children: PropTypes.node
 }
 
 export default PaymentForm
