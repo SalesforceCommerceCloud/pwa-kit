@@ -490,7 +490,7 @@ class Auth {
             id_token: this.get('id_token'),
             idp_access_token: this.get('idp_access_token'),
             refresh_token: this.get('refresh_token_registered') || this.get('refresh_token_guest'),
-            token_type: 'Bearer',
+            token_type: this.get('token_type') as 'Bearer',
             usid: this.get('usid'),
             customer_type: this.get('customer_type') as CustomerType,
             refresh_token_expires_in: Number(this.get('refresh_token_expires_in'))
