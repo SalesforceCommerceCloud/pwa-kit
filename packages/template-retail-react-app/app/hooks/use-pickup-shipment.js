@@ -221,7 +221,8 @@ export const usePickupShipment = (basket) => {
         addInventoryIdsToPickupItems,
         getPickupShippingMethodId,
         getDefaultShippingMethodId,
-        updateShipmentForBasketMutation
+        updateShipmentForBasketMutation,
+        getShippingAddressForStore
     }
 }
 
