@@ -82,26 +82,26 @@ type LoginRegisteredUserB2CBody = {
 /**
  * Simplified types for public API methods
  */
-type LoginIDPUserPublicParams = {
+type LoginIDPUserParams = {
     redirectURI?: string
     code: string
     usid?: string
 }
 
-type AuthorizeIDPPublicParams = {
+type AuthorizeIDPParams = {
     redirectURI: string
     hint: string
     usid?: string
     [key: string]: any // Allow custom parameters
 }
 
-type AuthorizePasswordlessPublicParams = {
+type AuthorizePasswordlessParams = {
     callbackURI?: string
     userid: string
     mode?: string
 }
 
-type GetPasswordLessAccessTokenPublicParams = {
+type GetPasswordLessAccessTokenParams = {
     pwdlessLoginToken: string
 }
 
@@ -1193,7 +1193,7 @@ class Auth {
      * Initiates OAuth2 authorization flow for Identity Provider (IDP) login.
      *
      */
-    async authorizeIDP(parameters: AuthorizeIDPPublicParams) {
+    async authorizeIDP(parameters: AuthorizeIDPParams) {
         const slasClient = this.client
         const usid = this.get('usid')
         const dntPref = this.getDnt({includeDefaults: true})
@@ -1231,7 +1231,7 @@ class Auth {
      * A wrapper method for commerce-sdk-isomorphic helper: loginIDPUser.
      *
      */
-    async loginIDPUser(parameters: LoginIDPUserPublicParams) {
+    async loginIDPUser(parameters: LoginIDPUserParams) {
         const codeVerifier = this.get('code_verifier')
         const redirectURI = parameters.redirectURI || this.redirectURI
         const usid = parameters.usid || this.get('usid')
@@ -1263,7 +1263,7 @@ class Auth {
     /**
      * A wrapper method for commerce-sdk-isomorphic helper: authorizePasswordless.
      */
-    async authorizePasswordless(parameters: AuthorizePasswordlessPublicParams) {
+    async authorizePasswordless(parameters: AuthorizePasswordlessParams) {
         const usid = this.get('usid')
         const callbackURI = parameters.callbackURI || this.passwordlessLoginCallbackURI
         const finalMode = callbackURI ? 'callback' : parameters.mode || 'sms'
@@ -1290,7 +1290,7 @@ class Auth {
     /**
      * A wrapper method for commerce-sdk-isomorphic helper: getPasswordLessAccessToken.
      */
-    async getPasswordLessAccessToken(parameters: GetPasswordLessAccessTokenPublicParams) {
+    async getPasswordLessAccessToken(parameters: GetPasswordLessAccessTokenParams) {
         const pwdlessLoginToken = parameters.pwdlessLoginToken || ''
         const dntPref = this.getDnt({includeDefaults: true})
         const token = await helpers.getPasswordLessAccessToken({
