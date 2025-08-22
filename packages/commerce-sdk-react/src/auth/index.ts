@@ -68,9 +68,6 @@ interface SlasJwtPayload extends JwtPayload {
     dnt: string
 }
 
-type AuthorizeIDPParams = Parameters<Helpers['authorizeIDP']>[0]
-type LoginIDPUserParams = Parameters<Helpers['loginIDPUser']>[0]
-type AuthorizePasswordlessParams = Parameters<Helpers['authorizePasswordless']>[0]
 type LoginRegisteredUserB2CCredentials = Parameters<Helpers['loginRegisteredUserB2C']>[0]
 
 /**
@@ -1196,32 +1193,21 @@ class Auth {
      * Initiates OAuth2 authorization flow for Identity Provider (IDP) login.
      *
      */
-    async authorizeIDP(parameters: AuthorizeIDPPublicParams | AuthorizeIDPParams) {
+    async authorizeIDP(parameters: AuthorizeIDPPublicParams) {
         const slasClient = this.client
         const usid = this.get('usid')
         const dntPref = this.getDnt({includeDefaults: true})
 
-        // Handle both public and internal calls
-        const isPublicCall = 'redirectURI' in parameters && !('parameters' in parameters)
-        const redirectURI = isPublicCall
-            ? parameters.redirectURI
-            : parameters.parameters?.redirectURI || this.redirectURI
-        const hint = isPublicCall ? parameters.hint : parameters.parameters?.hint || ''
-        const customParams = isPublicCall ? parameters : parameters.parameters || {}
-
-        // Filter out known parameters to get only custom ones
-        const filteredCustomParams = Object.fromEntries(
-            Object.entries(customParams).filter(
-                ([key]) => !['redirectURI', 'hint', 'usid', 'dnt'].includes(key)
-            )
-        )
+        // Extract known parameters and get custom ones
+        const {redirectURI, hint, ...customParams} = parameters
+        const finalRedirectURI = redirectURI || this.redirectURI
 
         const authorizeParams = {
-            ...filteredCustomParams,
+            ...customParams,
             ...(usid && {usid}),
             ...(dntPref && {dnt: dntPref}),
-            redirectURI,
-            hint
+            redirectURI: finalRedirectURI,
+            hint: hint || ''
         }
 
         const result = await helpers.authorizeIDP({
@@ -1245,18 +1231,10 @@ class Auth {
      * A wrapper method for commerce-sdk-isomorphic helper: loginIDPUser.
      *
      */
-    async loginIDPUser(parameters: LoginIDPUserPublicParams | LoginIDPUserParams) {
+    async loginIDPUser(parameters: LoginIDPUserPublicParams) {
         const codeVerifier = this.get('code_verifier')
-
-        // Handle both public and internal calls
-        const isPublicCall = 'code' in parameters && !('parameters' in parameters)
-        const code = isPublicCall ? parameters.code : parameters.parameters?.code || ''
-        const usid = isPublicCall
-            ? parameters.usid
-            : parameters.parameters?.usid || this.get('usid')
-        const redirectURI = isPublicCall
-            ? parameters.redirectURI || this.redirectURI
-            : parameters.parameters?.redirectURI || this.redirectURI
+        const redirectURI = parameters.redirectURI || this.redirectURI
+        const usid = parameters.usid || this.get('usid')
         const dntPref = this.getDnt({includeDefaults: true})
 
         const token = await helpers.loginIDPUser({
@@ -1267,7 +1245,7 @@ class Auth {
             },
             parameters: {
                 redirectURI,
-                code,
+                code: parameters.code,
                 dnt: dntPref,
                 ...(usid && {usid})
             }
@@ -1285,18 +1263,10 @@ class Auth {
     /**
      * A wrapper method for commerce-sdk-isomorphic helper: authorizePasswordless.
      */
-    async authorizePasswordless(
-        parameters: AuthorizePasswordlessPublicParams | AuthorizePasswordlessParams
-    ) {
-        // Handle both public and internal calls
-        const isPublicCall = 'userid' in parameters && !('parameters' in parameters)
-        const userid = isPublicCall ? parameters.userid : parameters.parameters?.userid || ''
-        const callbackURI = isPublicCall
-            ? parameters.callbackURI
-            : parameters.parameters?.callbackURI || this.passwordlessLoginCallbackURI
-        const mode = isPublicCall ? parameters.mode : parameters.parameters?.mode
+    async authorizePasswordless(parameters: AuthorizePasswordlessPublicParams) {
         const usid = this.get('usid')
-        const finalMode = callbackURI ? 'callback' : mode || 'sms'
+        const callbackURI = parameters.callbackURI || this.passwordlessLoginCallbackURI
+        const finalMode = callbackURI ? 'callback' : parameters.mode || 'sms'
 
         const res = await helpers.authorizePasswordless({
             slasClient: this.client,
@@ -1306,7 +1276,7 @@ class Auth {
             parameters: {
                 ...(callbackURI && {callbackURI: callbackURI}),
                 ...(usid && {usid}),
-                userid,
+                userid: parameters.userid,
                 mode: finalMode
             }
         })
