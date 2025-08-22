@@ -1,6 +1,8 @@
 ## v3.5.0-dev (Jul 22, 2025)
-
+- Add support for environment level base paths on /mobify routes [#2892](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2892)
 - Update USID expiry to match SLAS refresh token expiry[#2854](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2854)
+
+- [Bugfix] Skip deleting dwsid on shopper login if hybrid auth is enabled for current site. [#3151](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3151)
 
 ## v3.4.0 (Jul 22, 2025)
 

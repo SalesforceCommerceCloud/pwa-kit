@@ -65,6 +65,7 @@ module.exports = {
         storeLocatorEnabled: true,
         multishipEnabled: true
     },
+    envBasePath: '/',
     externals: [],
     pageNotFoundURL: '/page-not-found',
     ssrEnabled: true,

@@ -15,6 +15,12 @@ jest.mock('aws-serverless-express', () => {
     }
 })
 
+jest.mock('../../utils/ssr-config', () => {
+    return {
+        getConfig: () => {}
+    }
+})
+
 describe('the once function', () => {
     test('should prevent a function being called more than once', () => {
         const fn = jest.fn(() => ({test: 'test'}))
