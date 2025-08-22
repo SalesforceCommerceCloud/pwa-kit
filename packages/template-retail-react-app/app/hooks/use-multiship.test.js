@@ -12,6 +12,7 @@ import {useShippingMethodsForShipment} from '@salesforce/commerce-sdk-react'
 import {usePickupShipment} from '@salesforce/retail-react-app/app/hooks/use-pickup-shipment'
 import {useShipmentOperations} from '@salesforce/retail-react-app/app/hooks/use-shipment-operations'
 import {useItemShipmentManagement} from '@salesforce/retail-react-app/app/hooks/use-item-shipment-management'
+import {getShippingAddressForStore} from '@salesforce/retail-react-app/app/utils/address-utils'
 
 // Mock dependencies
 jest.mock('@salesforce/commerce-sdk-react', () => ({
@@ -42,6 +43,11 @@ jest.mock('@salesforce/retail-react-app/app/utils/logger-instance', () => ({
         error: jest.fn()
     }
 }))
+
+jest.mock('@salesforce/retail-react-app/app/utils/address-utils', () => ({
+    getShippingAddressForStore: jest.fn()
+}))
+
 describe('useMultiship', () => {
     // Mock functions for shipment operations
     const mockCreateShipmentOperation = jest.fn()
@@ -158,6 +164,17 @@ describe('useMultiship', () => {
         mockUpdateItemsToDeliveryShipment.mockResolvedValue({basketId: 'test-basket-id'})
         mockUpdateItemsToPickupShipment.mockResolvedValue({basketId: 'test-basket-id'})
         mockRemoveShipmentOperation.mockResolvedValue(true)
+
+        getShippingAddressForStore.mockReturnValue({
+            address1: 'Test Store Address',
+            city: 'Test City',
+            countryCode: 'US',
+            postalCode: '12345',
+            stateCode: 'CA',
+            firstName: 'Test Store',
+            lastName: 'pickup',
+            phone: '555-0123'
+        })
     })
 
     describe('initialization', () => {
