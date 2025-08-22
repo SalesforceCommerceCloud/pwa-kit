@@ -973,23 +973,11 @@ class Auth {
                 password
             }
         })
-        const loginParams: LoginRegisteredUserB2CCredentials = {
-            slasClient: this.client,
-            credentials: {
-                username: login,
-                password,
-                clientSecret: this.clientSecret
-            },
-            parameters: {
-                redirectURI: this.redirectURI,
-                dnt: this.getDnt({includeDefaults: true}),
-                ...(this.get('usid') && {usid: this.get('usid')})
-            },
-            body: customParameters
-        }
-
-        const token = await helpers.loginRegisteredUserB2C(loginParams)
-        this.handleTokenResponse(token, false)
+        await this.loginRegisteredUserB2C({
+            username: login,
+            password,
+            customParameters
+        })
         return res
     }
 
@@ -1195,21 +1183,10 @@ class Auth {
         })
 
         if (shouldReloginCurrentSession) {
-            const loginParams: LoginRegisteredUserB2CCredentials = {
-                slasClient: this.client,
-                credentials: {
-                    username: login,
-                    password
-                },
-                parameters: {
-                    redirectURI: this.redirectURI,
-                    dnt: this.getDnt({includeDefaults: true}),
-                    ...(this.get('usid') && {usid: this.get('usid')})
-                }
-            }
-
-            const token = await helpers.loginRegisteredUserB2C(loginParams)
-            this.handleTokenResponse(token, false)
+            await this.loginRegisteredUserB2C({
+                username: login,
+                password
+            })
         }
         return res
     }
