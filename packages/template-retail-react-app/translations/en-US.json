@@ -1559,6 +1559,15 @@
   "shipping_options.label.total_shipping": {
     "defaultMessage": "Total Shipping"
   },
+  "shipping_options.no_image": {
+    "defaultMessage": "No Image"
+  },
+  "shipping_options.product_attributes.label": {
+    "defaultMessage": "Product attributes"
+  },
+  "shipping_options.quantity.label": {
+    "defaultMessage": "Quantity"
+  },
   "shipping_options.title.shipping_gift_options": {
     "defaultMessage": "Shipping & Gift Options"
   },

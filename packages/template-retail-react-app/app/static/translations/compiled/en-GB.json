@@ -3695,6 +3695,24 @@
       "value": "Total Shipping"
     }
   ],
+  "shipping_options.no_image": [
+    {
+      "type": 0,
+      "value": "No Image"
+    }
+  ],
+  "shipping_options.product_attributes.label": [
+    {
+      "type": 0,
+      "value": "Product attributes"
+    }
+  ],
+  "shipping_options.quantity.label": [
+    {
+      "type": 0,
+      "value": "Quantity"
+    }
+  ],
   "shipping_options.title.shipping_gift_options": [
     {
       "type": 0,
