@@ -2,6 +2,7 @@
   "name": "pwa-kit",
   "version": "3.12.0-dev",
   "scripts": {
+    "build": "lerna run --stream build",
     "bump-version": "node ./scripts/bump-version/index.js",
     "bump-version:retail-react-app": "node ./scripts/bump-version/index.js --package=@salesforce/retail-react-app",
     "bump-version:commerce-sdk-react": "node ./scripts/bump-version/index.js --package=@salesforce/commerce-sdk-react",
