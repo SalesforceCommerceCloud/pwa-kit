@@ -6,7 +6,7 @@
  */
 
 import {renderHook, act} from '@testing-library/react'
-import {useAddressProductManagement} from './use-address-product-management'
+import {useAddressProductManagement} from '@salesforce/retail-react-app/app/hooks/use-address-product-management'
 
 // Mock dependencies
 jest.mock('./use-current-customer')
@@ -14,9 +14,9 @@ jest.mock('./use-pickup-shipment')
 jest.mock('./use-multiship')
 jest.mock('../utils/address-utils')
 
-import {useCurrentCustomer} from './use-current-customer'
-import {usePickupShipment} from './use-pickup-shipment'
-import {useMultiship} from './use-multiship'
+import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
+import {usePickupShipment} from '@salesforce/retail-react-app/app/hooks/use-pickup-shipment'
+import {useMultiship} from '@salesforce/retail-react-app/app/hooks/use-multiship'
 import {isAddressEmpty} from '../utils/address-utils'
 
 const mockUseCurrentCustomer = useCurrentCustomer

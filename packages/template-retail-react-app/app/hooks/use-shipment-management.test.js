@@ -5,14 +5,14 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import {renderHook, act} from '@testing-library/react'
-import {useShipmentManagement} from './use-shipment-management'
+import {useShipmentManagement} from '@salesforce/retail-react-app/app/hooks/use-shipment-management'
 
 // Mock dependencies
 jest.mock('./use-multiship')
 jest.mock('./use-item-shipment-management')
 
-import {useMultiship} from './use-multiship'
-import {useItemShipmentManagement} from './use-item-shipment-management'
+import {useMultiship} from '@salesforce/retail-react-app/app/hooks/use-multiship'
+import {useItemShipmentManagement} from '@salesforce/retail-react-app/app/hooks/use-item-shipment-management'
 
 const mockUseMultiship = useMultiship
 const mockUseItemShipmentManagement = useItemShipmentManagement

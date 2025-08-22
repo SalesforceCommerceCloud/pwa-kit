@@ -27,7 +27,7 @@ import {useCheckout} from '@salesforce/retail-react-app/app/pages/checkout/util/
 import {useAddressProductManagement} from '@salesforce/retail-react-app/app/hooks/use-address-product-management'
 import {useAddressForm} from '@salesforce/retail-react-app/app/hooks/use-address-form'
 import {useShipmentManagement} from '@salesforce/retail-react-app/app/hooks/use-shipment-management'
-import ProductShippingAddressCard from './product-shipping-address-card.jsx'
+import ProductShippingAddressCard from '@salesforce/retail-react-app/app/pages/checkout/partials/product-shipping-address-card.jsx'
 
 const ShippingMultiAddress = ({basket, submitButtonLabel, noItemsInBasketMessage}) => {
     const {formatMessage} = useIntl()
@@ -200,7 +200,7 @@ const ShippingMultiAddress = ({basket, submitButtonLabel, noItemsInBasketMessage
                                 <ProductShippingAddressCard
                                     key={addressKey}
                                     item={item}
-                                                                variant={variant}
+                                    variant={variant}
                                     imageUrl={imageUrl}
                                     addressKey={addressKey}
                                     selectedAddressId={
