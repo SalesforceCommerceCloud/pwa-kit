@@ -5,7 +5,6 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React, {useEffect, useRef} from 'react'
-import AdyenCheckout from '@adyen/adyen-web'
 import '@adyen/adyen-web/dist/adyen.css'
 import PropTypes from 'prop-types'
 
@@ -28,7 +27,8 @@ import {
     getExpressPaymentDependencies,
     sendExpressMessage,
     getPaymentMethodConfig,
-    isMissingOrderTotalError
+    isMissingOrderTotalError,
+    createAdyenCheckout
 } from '@salesforce/retail-react-app/app/components/express/utils/express-payment-utils'
 import {
     PAYMENT_METHODS,
@@ -116,10 +116,7 @@ export const getAppleButtonConfig = (
         isExpress: true,
         configuration: applePayConfig,
         amount: {
-            value: getCurrencyValueForApi(
-                basketRef?.orderTotal || 0,
-                basketRef?.currency || 'USD'
-            ),
+            value: getCurrencyValueForApi(basketRef?.orderTotal || 0, basketRef?.currency || 'USD'),
             currency: basketRef?.currency || 'USD'
         },
         requiredShippingContactFields: ['postalAddress', 'name', 'email', 'phone'],
@@ -223,10 +220,7 @@ export const getAppleButtonConfig = (
                     applePayAmount = basketToUse.orderTotal || basketToUse.productTotal || 0
 
                     // Ensure we have a valid order total before proceeding
-                    if (
-                        basketToUse.orderTotal === null ||
-                        basketToUse.orderTotal === undefined
-                    ) {
+                    if (basketToUse.orderTotal === null || basketToUse.orderTotal === undefined) {
                         await cleanupTemporaryBasket(
                             isPdpMode,
                             basketRef,
@@ -300,13 +294,7 @@ export const getAppleButtonConfig = (
                 }
             } catch (err) {
                 // Clean up temporary basket on any unexpected error
-                await cleanupTemporaryBasket(
-                    isPdpMode,
-                    basketRef,
-                    authToken,
-                    site,
-                    setTempBasket
-                )
+                await cleanupTemporaryBasket(isPdpMode, basketRef, authToken, site, setTempBasket)
                 reject()
                 sendExpressMessage(EXPRESS_MESSAGES.PAYMENT_FAILURE, {
                     PAYMENT_METHOD
@@ -562,6 +550,143 @@ export const ApplePayExpress = ({
         config: applePayConfig
     })
 
+    // Cleanup effect to remove temporary basket when component unmounts
+    useEffect(() => {
+        return () => {
+            // Clean up temporary basket when component unmounts (user navigates away)
+            if (isPdpMode && currentSku && tempBasket?.basketId && authToken && finalSite) {
+                deleteTemporaryBasket(tempBasket.basketId, authToken, finalSite).catch((error) =>
+                    console.warn('Failed to cleanup temporary basket on unmount:', error)
+                )
+            }
+        }
+    }, [tempBasket?.basketId, authToken, finalSite?.id, currentSku, isPdpMode])
+
+    useEffect(
+        () => {
+            let isCanceled = false
+
+            const createCheckout = async () => {
+                if (isCanceled) {
+                    return
+                }
+
+                const handleApplePayUnavailable = () => {
+                    manager.setPaymentMethodUnavailable(PAYMENT_METHOD)
+                }
+
+                // For PDP mode, we don't need a basket initially but we do need payment methods
+                // For regular mode, we need a basket to continue
+                if (
+                    !validateExpressPaymentSetup({
+                        isPdpMode,
+                        adyenPaymentMethods: adyenPaymentMethods,
+                        hasRequiredBasketData
+                    })
+                ) {
+                    return
+                }
+
+                if (!adyenPaymentMethods?.environment) {
+                    return
+                }
+
+                try {
+                    let checkout
+                    try {
+                        checkout = await createAdyenCheckout(
+                            adyenPaymentMethods?.environment,
+                            finalLocale,
+                            adyenPaymentMethods?.applicationInfo
+                        )
+                    } catch (ex) {
+                        console.error('Failed to initialize AdyenCheckout:', ex)
+                        handleApplePayUnavailable()
+                        return
+                    }
+
+                    const applePaymentMethodConfig =
+                        getApplePaymentMethodConfig(adyenPaymentMethods)
+
+                    if (!applePaymentMethodConfig) {
+                        console.warn('Apple Pay configuration not found in payment methods')
+                        handleApplePayUnavailable()
+                        return
+                    }
+
+                    const appleButtonConfig = getAppleButtonConfig(
+                        authToken,
+                        finalSite,
+                        basket,
+                        adyenPaymentMethods?.applicableShippingMethods || [],
+                        applePaymentMethodConfig,
+                        adyenPaymentMethods?.fetchShippingMethods,
+                        currentSku,
+                        setTempBasket,
+                        tempBasket,
+                        isPdpMode,
+                        quantity
+                    )
+
+                    let applePayButton
+                    try {
+                        applePayButton = await checkout.create('applepay', appleButtonConfig)
+                    } catch (ex) {
+                        console.error('Failed to create Apple Pay button:', ex)
+                        handleApplePayUnavailable()
+                        return
+                    }
+
+                    let isApplePayButtonAvailable = false
+                    try {
+                        isApplePayButtonAvailable = await applePayButton.isAvailable()
+                    } catch (ex) {
+                        isApplePayButtonAvailable = false
+                    }
+
+                    if (!isApplePayButtonAvailable) {
+                        handleApplePayUnavailable()
+                        return
+                    }
+
+                    try {
+                        await applePayButton.mount(paymentContainer.current)
+                        manager.setPaymentMethodAvailable(PAYMENT_METHOD)
+                    } catch (error) {
+                        console.error('Failed to mount Apple Pay button:', error)
+                        handleApplePayUnavailable()
+                    }
+                } catch (err) {
+                    console.error('Full error details:', err)
+                    const hasMissingOrderTotalError = isMissingOrderTotalError(err)
+
+                    // For PDP mode, missing order total is expected initially when no SKU is set
+                    const isExpectedPdpError = isPdpMode && hasMissingOrderTotalError && !tempBasket
+
+                    if (!hasMissingOrderTotalError && !isExpectedPdpError) {
+                        handleApplePayUnavailable()
+                    }
+                }
+            }
+
+            createCheckout()
+
+            return () => {
+                isCanceled = true
+            }
+        },
+        getExpressPaymentDependencies({
+            adyenEnvironment: adyenPaymentMethods?.environment,
+            adyenPaymentMethods,
+            basket,
+            sku,
+            quantity,
+            isPdpMode,
+            tempBasket,
+            currentSku
+        })
+    )
+
     // Check if we should render the Apple Pay button
     const shouldRender = validateExpressPaymentSetup({
         isPdpMode,
@@ -591,152 +716,6 @@ export const ApplePayExpress = ({
     }
 
     console.log('🍎 ApplePayExpress rendering Apple Pay button...')
-
-    // Cleanup effect to remove temporary basket when component unmounts
-    useEffect(() => {
-        return () => {
-            // Clean up temporary basket when component unmounts (user navigates away)
-            if (isPdpMode && currentSku && tempBasket?.basketId && authToken && site) {
-                deleteTemporaryBasket(tempBasket.basketId, authToken, site).catch((error) =>
-                    console.warn('Failed to cleanup temporary basket on unmount:', error)
-                )
-            }
-        }
-    }, [tempBasket?.basketId, authToken, site?.id, currentSku, isPdpMode])
-
-    useEffect(() => {
-        let isCanceled = false
-
-        // Compare with previous dependencies to see what changed
-        // Only track dependencies that are actually in the dependency array
-        const baseDeps = {
-            adyenEnvironment: adyenPaymentMethods?.environment,
-            adyenPaymentMethods,
-            basket,
-            isPdpMode,
-            hasRequiredBasketData
-        }
-
-        const createCheckout = async () => {
-            if (isCanceled) {
-                return
-            }
-
-            const handleApplePayUnavailable = () => {
-                manager.setPaymentMethodUnavailable(PAYMENT_METHOD)
-            }
-
-            // For PDP mode, we don't need a basket initially but we do need payment methods
-            // For regular mode, we need a basket to continue
-            if (!validateExpressPaymentSetup({
-                isPdpMode,
-                adyenPaymentMethods: adyenPaymentMethods,
-                hasRequiredBasketData
-            })) {
-                return
-            }
-
-            if (!adyenPaymentMethods?.environment) {
-                return
-            }
-
-            try {
-                let checkout
-                try {
-                    checkout = await AdyenCheckout({
-                        environment: adyenPaymentMethods?.environment?.ADYEN_ENVIRONMENT,
-                        clientKey: adyenPaymentMethods?.environment?.ADYEN_CLIENT_KEY,
-                        locale: locale.id,
-                        analytics: {
-                            analyticsData: {
-                                applicationInfo: adyenPaymentMethods?.applicationInfo
-                            }
-                        }
-                    })
-                } catch (ex) {
-                    console.error('Failed to initialize AdyenCheckout:', ex)
-                    handleApplePayUnavailable()
-                    return
-                }
-
-                const applePaymentMethodConfig = getApplePaymentMethodConfig(adyenPaymentMethods)
-
-                if (!applePaymentMethodConfig) {
-                    console.warn('Apple Pay configuration not found in payment methods')
-                    handleApplePayUnavailable()
-                    return
-                }
-
-                const appleButtonConfig = getAppleButtonConfig(
-                    authToken,
-                    site,
-                    basket,
-                    adyenPaymentMethods?.applicableShippingMethods || [],
-                    applePaymentMethodConfig,
-                    adyenPaymentMethods?.fetchShippingMethods,
-                    currentSku,
-                    setTempBasket,
-                    tempBasket,
-                    isPdpMode,
-                    quantity
-                )
-
-                let applePayButton
-                try {
-                    applePayButton = await checkout.create('applepay', appleButtonConfig)
-                } catch (ex) {
-                    console.error('Failed to create Apple Pay button:', ex)
-                    handleApplePayUnavailable()
-                    return
-                }
-
-                let isApplePayButtonAvailable = false
-                try {
-                    isApplePayButtonAvailable = await applePayButton.isAvailable()
-                } catch (ex) {
-                    isApplePayButtonAvailable = false
-                }
-
-                if (!isApplePayButtonAvailable) {
-                    handleApplePayUnavailable()
-                    return
-                }
-
-                try {
-                    await applePayButton.mount(paymentContainer.current)
-                    manager.setPaymentMethodAvailable(PAYMENT_METHOD)
-                } catch (error) {
-                    console.error('Failed to mount Apple Pay button:', error)
-                    handleApplePayUnavailable()
-                }
-            } catch (err) {
-                console.error('Full error details:', err)
-                const hasMissingOrderTotalError = isMissingOrderTotalError(err)
-
-                // For PDP mode, missing order total is expected initially when no SKU is set
-                const isExpectedPdpError = isPdpMode && hasMissingOrderTotalError && !tempBasket
-
-                if (!hasMissingOrderTotalError && !isExpectedPdpError) {
-                    handleApplePayUnavailable()
-                }
-            }
-        }
-
-        createCheckout()
-
-        return () => {
-            isCanceled = true
-        }
-    }, getExpressPaymentDependencies({
-        adyenEnvironment: adyenPaymentMethods?.environment,
-        adyenPaymentMethods,
-        basket,
-        sku,
-        quantity,
-        isPdpMode,
-        tempBasket,
-        currentSku
-    }))
 
     return <div ref={paymentContainer} style={{height: '40px'}}></div>
 }

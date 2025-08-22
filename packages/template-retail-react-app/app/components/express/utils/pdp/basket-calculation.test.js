@@ -106,9 +106,9 @@ describe('Basket Calculation', () => {
                 }
             })
 
-            await expect(calculateBasketTotals(mockBasketId, mockAuthToken, mockSite)).rejects.toThrow(
-                'Organization ID is required and not found in configuration'
-            )
+            await expect(
+                calculateBasketTotals(mockBasketId, mockAuthToken, mockSite)
+            ).rejects.toThrow('Organization ID is required and not found in configuration')
         })
     })
 
@@ -135,9 +135,9 @@ describe('Basket Calculation', () => {
         it('should throw an error if the request fails', async () => {
             global.fetch.mockResolvedValue(mockErrorResponse(404, 'Not Found'))
 
-            await expect(getBasketWithTotals(mockBasketId, mockAuthToken, mockSite)).rejects.toThrow(
-                'HTTP error! status: 404, message: Not Found'
-            )
+            await expect(
+                getBasketWithTotals(mockBasketId, mockAuthToken, mockSite)
+            ).rejects.toThrow('HTTP error! status: 404, message: Not Found')
         })
     })
 

@@ -5,7 +5,6 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React, {useEffect, useRef} from 'react'
-import AdyenCheckout from '@adyen/adyen-web'
 import '@adyen/adyen-web/dist/adyen.css'
 import PropTypes from 'prop-types'
 
@@ -28,7 +27,8 @@ import {
     sendExpressMessage,
     getPaymentMethodConfig,
     isMissingOrderTotalError,
-    isMissingShippingMethodsError
+    isMissingShippingMethodsError,
+    createAdyenCheckout
 } from '@salesforce/retail-react-app/app/components/express/utils/express-payment-utils'
 import {
     PAYMENT_METHODS,
@@ -202,14 +202,10 @@ export const getGoogleButtonConfig = (
 
         // For PDP flows, create temporary basket if needed (and SKU is available)
         if (isPdpMode && sku && setTempBasket) {
-            try {
-                const newBasket = await createTemporaryBasket(sku, authToken, site, quantity)
-                basketRef = newBasket // Update basket reference immediately
-                setTempBasket(newBasket) // Update React state for re-renders
-                return newBasket
-            } catch (error) {
-                throw error
-            }
+            const newBasket = await createTemporaryBasket(sku, authToken, site, quantity)
+            basketRef = newBasket // Update basket reference immediately
+            setTempBasket(newBasket) // Update React state for re-renders
+            return newBasket
         }
         // Return null if no basket can be created/found
         return null
@@ -270,10 +266,7 @@ export const getGoogleButtonConfig = (
                 googlePayAmount = basketToUse.orderTotal || 0
 
                 // Ensure we have a valid order total before proceeding
-                if (
-                    basketToUse.orderTotal === null ||
-                    basketToUse.orderTotal === undefined
-                ) {
+                if (basketToUse.orderTotal === null || basketToUse.orderTotal === undefined) {
                     await cleanupTemporaryBasket(
                         isPdpMode,
                         basketRef,
@@ -320,13 +313,7 @@ export const getGoogleButtonConfig = (
                 }
             } catch (err) {
                 // Clean up temporary basket on any unexpected error
-                await cleanupTemporaryBasket(
-                    isPdpMode,
-                    basketRef,
-                    authToken,
-                    site,
-                    setTempBasket
-                )
+                await cleanupTemporaryBasket(isPdpMode, basketRef, authToken, site, setTempBasket)
                 sendExpressMessage(EXPRESS_MESSAGES.PAYMENT_FAILURE, {
                     PAYMENT_METHOD
                 })
@@ -496,6 +483,134 @@ export const GooglePayExpress = ({
         config: googlePayConfig
     })
 
+    // Cleanup effect to remove temporary basket when component unmounts
+    useEffect(() => {
+        return () => {
+            // Clean up temporary basket when component unmounts (user navigates away)
+            if (isPdpMode && currentSku && tempBasket?.basketId && authToken && finalSite) {
+                deleteTemporaryBasket(tempBasket.basketId, authToken, finalSite).catch(() => {})
+            }
+        }
+    }, [tempBasket?.basketId, authToken, finalSite?.id, currentSku, isPdpMode])
+
+    useEffect(
+        () => {
+            let isCanceled = false
+
+            const createCheckout = async () => {
+                if (isCanceled) {
+                    return
+                }
+
+                const handleGooglePayUnavailable = () => {
+                    manager.setPaymentMethodUnavailable(PAYMENT_METHOD)
+                }
+
+                // For PDP mode, we don't need a basket initially but we do need payment methods
+                // For regular mode, we need a basket to continue
+                if (
+                    !validateExpressPaymentSetup({
+                        isPdpMode,
+                        adyenPaymentMethods: adyenPaymentMethods,
+                        hasRequiredBasketData
+                    })
+                ) {
+                    return
+                }
+
+                if (!adyenPaymentMethods?.environment) {
+                    return
+                }
+
+                try {
+                    let checkout
+                    try {
+                        checkout = await createAdyenCheckout(
+                            adyenPaymentMethods?.environment,
+                            finalLocale,
+                            adyenPaymentMethods?.applicationInfo
+                        )
+                    } catch (ex) {
+                        handleGooglePayUnavailable()
+                        return
+                    }
+
+                    const googlePaymentMethodConfig =
+                        getGooglePaymentMethodConfig(adyenPaymentMethods)
+
+                    if (!googlePaymentMethodConfig) {
+                        handleGooglePayUnavailable()
+                        return
+                    }
+
+                    const googleButtonConfig = getGoogleButtonConfig(
+                        authToken,
+                        finalSite,
+                        basket,
+                        googlePaymentMethodConfig,
+                        currentSku,
+                        setTempBasket,
+                        tempBasket,
+                        isPdpMode,
+                        quantity
+                    )
+
+                    let googlePayButton
+                    try {
+                        googlePayButton = await checkout.create('googlepay', googleButtonConfig)
+                    } catch (ex) {
+                        handleGooglePayUnavailable()
+                        return
+                    }
+
+                    let isGooglePayButtonAvailable = false
+                    try {
+                        isGooglePayButtonAvailable = await googlePayButton.isAvailable()
+                    } catch (ex) {
+                        isGooglePayButtonAvailable = false
+                    }
+
+                    if (!isGooglePayButtonAvailable) {
+                        handleGooglePayUnavailable()
+                        return
+                    }
+
+                    try {
+                        await googlePayButton.mount(paymentContainer.current)
+                        manager.setPaymentMethodAvailable(PAYMENT_METHOD)
+                    } catch (error) {
+                        handleGooglePayUnavailable()
+                    }
+                } catch (err) {
+                    const isExpectedPdpError =
+                        isPdpMode && isMissingOrderTotalError(err) && !tempBasket
+
+                    if (
+                        !isMissingOrderTotalError(err) &&
+                        !isMissingShippingMethodsError(err) &&
+                        !isExpectedPdpError
+                    ) {
+                        handleGooglePayUnavailable()
+                    }
+                }
+            }
+            createCheckout()
+
+            return () => {
+                isCanceled = true
+            }
+        },
+        getExpressPaymentDependencies({
+            adyenPaymentMethods,
+            basket,
+            sku,
+            quantity,
+            isPdpMode,
+            tempBasket,
+            currentSku
+        })
+    )
+
     // Check if we should render the Google Pay button
     const shouldRender = validateExpressPaymentSetup({
         isPdpMode,
@@ -536,133 +651,6 @@ export const GooglePayExpress = ({
     }
 
     console.log('🤖 GooglePayExpress rendering Google Pay button...')
-
-    // Cleanup effect to remove temporary basket when component unmounts
-    useEffect(() => {
-        return () => {
-            // Clean up temporary basket when component unmounts (user navigates away)
-            if (isPdpMode && currentSku && tempBasket?.basketId && authToken && site) {
-                deleteTemporaryBasket(tempBasket.basketId, authToken, site).catch(() => {})
-            }
-        }
-    }, [tempBasket?.basketId, authToken, site?.id, currentSku, isPdpMode])
-
-    useEffect(() => {
-        let isCanceled = false
-
-        const createCheckout = async () => {
-            if (isCanceled) {
-                return
-            }
-
-            const handleGooglePayUnavailable = () => {
-                manager.setPaymentMethodUnavailable(PAYMENT_METHOD)
-            }
-
-            // For PDP mode, we don't need a basket initially but we do need payment methods
-            // For regular mode, we need a basket to continue
-            if (!validateExpressPaymentSetup({
-                isPdpMode,
-                adyenPaymentMethods: adyenPaymentMethods,
-                hasRequiredBasketData
-            })) {
-                return
-            }
-
-            if (!adyenPaymentMethods?.environment) {
-                return
-            }
-
-            try {
-                let checkout
-                try {
-                    checkout = await AdyenCheckout({
-                        environment: adyenPaymentMethods?.environment?.ADYEN_ENVIRONMENT,
-                        clientKey: adyenPaymentMethods?.environment?.ADYEN_CLIENT_KEY,
-                        locale: locale.id,
-                        analytics: {
-                            analyticsData: {
-                                applicationInfo: adyenPaymentMethods?.applicationInfo
-                            }
-                        }
-                    })
-                } catch (ex) {
-                    handleGooglePayUnavailable()
-                    return
-                }
-
-                const googlePaymentMethodConfig = getGooglePaymentMethodConfig(adyenPaymentMethods)
-
-                if (!googlePaymentMethodConfig) {
-                    handleGooglePayUnavailable()
-                    return
-                }
-
-                const googleButtonConfig = getGoogleButtonConfig(
-                    authToken,
-                    site,
-                    basket,
-                    googlePaymentMethodConfig,
-                    currentSku,
-                    setTempBasket,
-                    tempBasket,
-                    isPdpMode,
-                    quantity
-                )
-
-                let googlePayButton
-                try {
-                    googlePayButton = await checkout.create('googlepay', googleButtonConfig)
-                } catch (ex) {
-                    handleGooglePayUnavailable()
-                    return
-                }
-
-                let isGooglePayButtonAvailable = false
-                try {
-                    isGooglePayButtonAvailable = await googlePayButton.isAvailable()
-                } catch (ex) {
-                    isGooglePayButtonAvailable = false
-                }
-
-                if (!isGooglePayButtonAvailable) {
-                    handleGooglePayUnavailable()
-                    return
-                }
-
-                try {
-                    await googlePayButton.mount(paymentContainer.current)
-                    manager.setPaymentMethodAvailable(PAYMENT_METHOD)
-                } catch (error) {
-                    handleGooglePayUnavailable()
-                }
-            } catch (err) {
-                const isExpectedPdpError = isPdpMode && isMissingOrderTotalError(err) && !tempBasket
-
-                if (
-                    !isMissingOrderTotalError(err) &&
-                    !isMissingShippingMethodsError(err) &&
-                    !isExpectedPdpError
-                ) {
-                    handleGooglePayUnavailable()
-                }
-            }
-        }
-        createCheckout()
-
-        return () => {
-            isCanceled = true
-        }
-    }, getExpressPaymentDependencies({
-        adyenEnvironment: adyenEnvironmentFinal,
-        adyenPaymentMethods: adyenPaymentMethodsFinal,
-        basket,
-        sku,
-        quantity,
-        isPdpMode,
-        tempBasket,
-        currentSku
-    }))
 
     return (
         <>

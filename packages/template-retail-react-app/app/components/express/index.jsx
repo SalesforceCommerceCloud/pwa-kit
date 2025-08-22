@@ -25,7 +25,7 @@ function Express() {
     useEffect(() => {
         document.documentElement.style.backgroundColor = 'transparent'
         document.body.style.backgroundColor = 'transparent'
-        
+
         // Cleanup on unmount
         return () => {
             document.documentElement.style.backgroundColor = ''
@@ -180,7 +180,12 @@ function Express() {
     if (!authToken || managerError) {
         // Do not render express payment components if there is no auth token
         // or if there was an error setting up the manager
-        console.log('[Express] Not rendering - authToken:', !!authToken, 'managerError:', !!managerError)
+        console.log(
+            '[Express] Not rendering - authToken:',
+            !!authToken,
+            'managerError:',
+            !!managerError
+        )
         return null
     }
 
@@ -188,8 +193,8 @@ function Express() {
     const shouldRender = !isPdpMode && basket
     console.log('[Express] Conditional check (!isPdpMode && basket):', {
         '!isPdpMode': !isPdpMode,
-        'basket': !!basket,
-        'result': shouldRender
+        basket: !!basket,
+        result: shouldRender
     })
 
     // Add comprehensive logging for debugging
@@ -212,8 +217,8 @@ function Express() {
     // Log the conditional logic
     console.log('[Express] Conditional check (!isPdpMode && basket):', {
         '!isPdpMode': !isPdpMode,
-        'basket': !!basket,
-        'result': !isPdpMode && basket
+        basket: !!basket,
+        result: !isPdpMode && basket
     })
 
     if (!shouldRender) {

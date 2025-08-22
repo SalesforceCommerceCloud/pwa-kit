@@ -4,11 +4,9 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import {useEffect, useRef, useState} from 'react'
+import {useEffect, useState} from 'react'
 import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
-import {
-    deleteTemporaryBasket
-} from '@salesforce/retail-react-app/app/components/express/utils/pdp/temporary-basket'
+import {deleteTemporaryBasket} from '@salesforce/retail-react-app/app/components/express/utils/pdp/temporary-basket'
 
 /**
  * Shared hook for express payment components setup
@@ -16,7 +14,6 @@ import {
  */
 export const useExpressPaymentSetup = ({
     sku,
-    quantity = 1,
     isPdpMode = false,
     basket,
     authToken,
@@ -33,8 +30,7 @@ export const useExpressPaymentSetup = ({
     const [currentSku, setCurrentSku] = useState(sku)
 
     // Check if we have the minimum required basket data (from basket only)
-    const hasRequiredBasketData =
-        basket && basket.orderTotal && basket.currency && basket.basketId
+    const hasRequiredBasketData = basket && basket.orderTotal && basket.currency && basket.basketId
 
     // Handle SKU prop changes (for postMessage updates)
     useEffect(() => {

@@ -5,6 +5,8 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
+import AdyenCheckout from '@adyen/adyen-web'
+
 /**
  * Shared utilities for express payment components
  */
@@ -75,8 +77,12 @@ export const isMissingOrderTotalError = (error) => {
 export const isMissingShippingMethodsError = (error) => {
     return (
         error instanceof TypeError &&
-        (/undefined is not an object \(evaluating '[a-z]\.defaultShippingMethodId'\)/.test(error.message) ||
-            /Cannot read properties of undefined \(reading 'defaultShippingMethodId'\)/.test(error.message))
+        (/undefined is not an object \(evaluating '[a-z]\.defaultShippingMethodId'\)/.test(
+            error.message
+        ) ||
+            /Cannot read properties of undefined \(reading 'defaultShippingMethodId'\)/.test(
+                error.message
+            ))
     )
 }
 
@@ -98,7 +104,7 @@ export const getExpressPaymentDependencies = ({
     sku,
     quantity,
     isPdpMode,
-    
+
     // Local state that could change
     tempBasket,
     currentSku

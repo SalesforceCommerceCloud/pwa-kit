@@ -13,14 +13,17 @@ import {
 import {expressPaymentManager} from '@salesforce/retail-react-app/app/components/express/utils/express-payment-manager'
 
 // Mock the expressPaymentManager
-jest.mock('@salesforce/retail-react-app/app/components/express/utils/express-payment-manager', () => ({
-    expressPaymentManager: {
-        initialize: jest.fn(),
-        getCurrentHeight: jest.fn(),
-        addHeightListener: jest.fn(),
-        removeHeightListener: jest.fn()
-    }
-}))
+jest.mock(
+    '@salesforce/retail-react-app/app/components/express/utils/express-payment-manager',
+    () => ({
+        expressPaymentManager: {
+            initialize: jest.fn(),
+            getCurrentHeight: jest.fn(),
+            addHeightListener: jest.fn(),
+            removeHeightListener: jest.fn()
+        }
+    })
+)
 
 describe('useExpressPaymentManager', () => {
     beforeEach(() => {
