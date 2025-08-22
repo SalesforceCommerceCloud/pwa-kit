@@ -447,10 +447,22 @@ export const GooglePayExpress = ({
     isPdpMode = false,
     manager
 }) => {
-    // Use shared hook for common setup logic
+    console.log('🤖 GooglePayExpress component rendering with props:', {
+        hasAdyenPaymentMethods: !!adyenPaymentMethods,
+        hasAuthToken: !!authToken,
+        hasLocale: !!providedLocale,
+        hasSite: !!providedSite,
+        hasBasket: !!basket,
+        sku,
+        quantity,
+        isPdpMode,
+        hasManager: !!manager
+    })
+
+    // Use the shared express payment setup hook
     const {
-        locale,
-        site,
+        locale: finalLocale,
+        site: finalSite,
         tempBasket,
         setTempBasket,
         currentSku,
@@ -464,6 +476,62 @@ export const GooglePayExpress = ({
         locale: providedLocale,
         site: providedSite
     })
+
+    console.log('🤖 GooglePayExpress setup data:', {
+        finalLocale,
+        finalSite: finalSite?.id,
+        hasTempBasket: !!tempBasket,
+        currentSku,
+        hasRequiredBasketData
+    })
+
+    // Get Google Pay configuration from payment methods
+    const googlePayConfig = getPaymentMethodConfig(adyenPaymentMethods, 'googlepay')
+    console.log('🤖 Google Pay config:', {
+        hasConfig: !!googlePayConfig,
+        config: googlePayConfig
+    })
+
+    // Check if we should render the Google Pay button
+    const shouldRender = validateExpressPaymentSetup({
+        isPdpMode,
+        adyenPaymentMethods,
+        hasRequiredBasketData
+    })
+
+    console.log('🤖 GooglePayExpress should render:', {
+        shouldRender,
+        reason: shouldRender ? 'All conditions met' : 'Missing required data'
+    })
+
+    if (!shouldRender) {
+        console.log('🤖 GooglePayExpress not rendering - validation failed')
+        return null
+    }
+
+    // Check for missing order total error
+    const hasMissingOrderTotalError = isMissingOrderTotalError(
+        isPdpMode ? tempBasket : basket,
+        isPdpMode
+    )
+
+    if (hasMissingOrderTotalError) {
+        console.log('🤖 GooglePayExpress not rendering - missing order total')
+        return null
+    }
+
+    // Check for missing shipping methods error
+    const hasMissingShippingMethodsError = isMissingShippingMethodsError(
+        isPdpMode ? tempBasket : basket,
+        isPdpMode
+    )
+
+    if (hasMissingShippingMethodsError) {
+        console.log('🤖 GooglePayExpress not rendering - missing shipping methods')
+        return null
+    }
+
+    console.log('🤖 GooglePayExpress rendering Google Pay button...')
 
     const paymentContainer = useRef(null)
 

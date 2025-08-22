@@ -54,6 +54,28 @@ function Express() {
         error: paymentMethodsError
     } = useStandalonePaymentMethods(authToken, site, locale, !!authToken)
 
+    // Get environment from payment methods response
+    const adyenEnvironment = adyenPaymentMethods?.environment
+
+    // Add comprehensive logging for debugging
+    console.log('[Express] Component state:', {
+        isPdpMode,
+        basket: !!basket,
+        basketData: basket,
+        authToken: !!authToken,
+        customerId,
+        currentSku,
+        currentQuantity,
+        manager: !!manager,
+        managerError,
+        adyenEnvironment,
+        adyenPaymentMethods: !!adyenPaymentMethods,
+        paymentMethodsLoading,
+        paymentMethodsError,
+        site: site?.id,
+        locale
+    })
+
     // Prepare context data for express payment components
     const expressPaymentContext = {
         adyenPaymentMethods,
@@ -66,6 +88,18 @@ function Express() {
         isPdpMode,
         manager
     }
+
+    console.log('[Express] Express payment context:', {
+        hasAdyenPaymentMethods: !!expressPaymentContext.adyenPaymentMethods,
+        hasAuthToken: !!expressPaymentContext.authToken,
+        hasLocale: !!expressPaymentContext.locale,
+        hasSite: !!expressPaymentContext.site,
+        hasBasket: !!expressPaymentContext.basket,
+        sku: expressPaymentContext.sku,
+        quantity: expressPaymentContext.quantity,
+        isPdpMode: expressPaymentContext.isPdpMode,
+        hasManager: !!expressPaymentContext.manager
+    })
 
     // PostMessage listener for SKU updates
     useEffect(() => {
@@ -143,6 +177,14 @@ function Express() {
         return null
     }
 
+    // Log the conditional logic for rendering
+    const shouldRender = !isPdpMode && basket
+    console.log('[Express] Conditional check (!isPdpMode && basket):', {
+        '!isPdpMode': !isPdpMode,
+        'basket': !!basket,
+        'result': shouldRender
+    })
+
     // Add comprehensive logging for debugging
     console.log('[Express] Render state:', {
         isPdpMode,
@@ -166,6 +208,13 @@ function Express() {
         'basket': !!basket,
         'result': !isPdpMode && basket
     })
+
+    if (!shouldRender) {
+        console.log('[Express] Not rendering payment components - condition not met')
+        return null
+    }
+
+    console.log('[Express] Rendering ApplePayExpress and GooglePayExpress components...')
 
     return (
         <div>

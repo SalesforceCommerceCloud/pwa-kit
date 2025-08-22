@@ -514,10 +514,22 @@ export const ApplePayExpress = ({
     isPdpMode = false,
     manager
 }) => {
-    // Use shared hook for common setup logic
+    console.log('🍎 ApplePayExpress component rendering with props:', {
+        hasAdyenPaymentMethods: !!adyenPaymentMethods,
+        hasAuthToken: !!authToken,
+        hasLocale: !!providedLocale,
+        hasSite: !!providedSite,
+        hasBasket: !!basket,
+        sku,
+        quantity,
+        isPdpMode,
+        hasManager: !!manager
+    })
+
+    // Use the shared express payment setup hook
     const {
-        locale,
-        site,
+        locale: finalLocale,
+        site: finalSite,
         tempBasket,
         setTempBasket,
         currentSku,
@@ -531,6 +543,51 @@ export const ApplePayExpress = ({
         locale: providedLocale,
         site: providedSite
     })
+
+    console.log('🍎 ApplePayExpress setup data:', {
+        finalLocale,
+        finalSite: finalSite?.id,
+        hasTempBasket: !!tempBasket,
+        currentSku,
+        hasRequiredBasketData
+    })
+
+    // Get Apple Pay configuration from payment methods
+    const applePayConfig = getPaymentMethodConfig(adyenPaymentMethods, 'applepay')
+    console.log('🍎 Apple Pay config:', {
+        hasConfig: !!applePayConfig,
+        config: applePayConfig
+    })
+
+    // Check if we should render the Apple Pay button
+    const shouldRender = validateExpressPaymentSetup({
+        isPdpMode,
+        adyenPaymentMethods,
+        hasRequiredBasketData
+    })
+
+    console.log('🍎 ApplePayExpress should render:', {
+        shouldRender,
+        reason: shouldRender ? 'All conditions met' : 'Missing required data'
+    })
+
+    if (!shouldRender) {
+        console.log('🍎 ApplePayExpress not rendering - validation failed')
+        return null
+    }
+
+    // Check for missing order total error
+    const hasMissingOrderTotalError = isMissingOrderTotalError(
+        isPdpMode ? tempBasket : basket,
+        isPdpMode
+    )
+
+    if (hasMissingOrderTotalError) {
+        console.log('🍎 ApplePayExpress not rendering - missing order total')
+        return null
+    }
+
+    console.log('🍎 ApplePayExpress rendering Apple Pay button...')
 
     const paymentContainer = useRef(null)
 
