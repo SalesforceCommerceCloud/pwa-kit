@@ -42,49 +42,13 @@ import {isPickupShipment} from '@salesforce/retail-react-app/app/utils/shipment-
 const PickupAddress = () => {
     const {formatMessage} = useIntl()
     const {step, STEPS, goToStep, goToNextStep} = useCheckout()
-    const {data: basket} = useCurrentBasket()
+    const {data: basket, derivedData} = useCurrentBasket()
     const storeLocatorEnabled = getConfig()?.app?.storeLocatorEnabled ?? STORE_LOCATOR_IS_ENABLED
     const {currency} = useCurrency()
 
-    const shipmentData = useMemo(() => {
-        if (!basket?.shipments) {
-            return {
-                hasPickupShipments: false,
-                hasDeliveryShipments: false,
-                pickupShipments: [],
-                allStoreIds: '',
-                pickupShipmentItems: []
-            }
-        }
-
-        const pickupShipments = []
-        const storeIds = new Set()
-        let hasPickupShipments = false
-        let hasDeliveryShipments = false
-
-        basket.shipments.forEach((shipment) => {
-            const isPickupOrder = storeLocatorEnabled && isPickupShipment(shipment)
-
-            if (isPickupOrder) {
-                hasPickupShipments = true
-                pickupShipments.push(shipment)
-                if (shipment.c_fromStoreId) {
-                    storeIds.add(shipment.c_fromStoreId)
-                }
-            } else {
-                hasDeliveryShipments = true
-            }
-        })
-
-        return {
-            hasPickupShipments,
-            hasDeliveryShipments,
-            pickupShipments,
-            allStoreIds: Array.from(storeIds).join(',')
-        }
-    }, [basket?.shipments])
-
-    const {hasPickupShipments, hasDeliveryShipments, pickupShipments, allStoreIds} = shipmentData
+    const hasPickupShipments = derivedData?.totalPickupShipments > 0
+    const hasDeliveryShipments = derivedData?.totalDeliveryShipments > 0
+    const allStoreIds = derivedData?.pickupStoreIds?.join(',') ?? ''
 
     // Get selected store inventory ID for product data
     const {selectedStore} = useSelectedStore()
@@ -177,7 +141,7 @@ const PickupAddress = () => {
         return pickupShipments
     }, [basket?.shipments, basket?.productItems, storeData?.data])
 
-    const hasMultiplePickups = pickupShipments.length > 1
+    const hasMultiplePickups = pickupShipmentItems.length > 1
     const shouldShowCartItems = hasMultiplePickups || hasDeliveryShipments
 
     if (!hasPickupShipments) {

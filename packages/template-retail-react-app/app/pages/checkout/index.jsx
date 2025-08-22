@@ -34,21 +34,19 @@ import {useShopperOrdersMutation, useShopperBasketsMutation} from '@salesforce/c
 import UnavailableProductConfirmationModal from '@salesforce/retail-react-app/app/components/unavailable-product-confirmation-modal'
 import {
     API_ERROR_MESSAGE,
-    TOAST_MESSAGE_REMOVED_ITEM_FROM_CART,
-    STORE_LOCATOR_IS_ENABLED
+    TOAST_MESSAGE_REMOVED_ITEM_FROM_CART
 } from '@salesforce/retail-react-app/app/constants'
 import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
 import LoadingSpinner from '@salesforce/retail-react-app/app/components/loading-spinner'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import {useMultiship} from '@salesforce/retail-react-app/app/hooks/use-multiship'
-import {isPickupShipment} from '@salesforce/retail-react-app/app/utils/shipment-utils'
 
 const Checkout = () => {
     const {formatMessage} = useIntl()
     const navigate = useNavigation()
     const {step} = useCheckout()
     const [error, setError] = useState()
-    const {data: basket} = useCurrentBasket()
+    const {data: basket, derivedData} = useCurrentBasket()
     const [isLoading, setIsLoading] = useState(false)
     const {mutateAsync: createOrder} = useShopperOrdersMutation('createOrder')
     const {passwordless = {}, social = {}} = getConfig().app.login || {}
@@ -57,22 +55,18 @@ const Checkout = () => {
     const isPasswordlessEnabled = !!passwordless?.enabled
     const {removeEmptyShipments} = useMultiship(basket)
     const multishipEnabled = getConfig()?.app?.multishipEnabled ?? true
-    const storeLocatorEnabled = getConfig()?.app?.storeLocatorEnabled ?? STORE_LOCATOR_IS_ENABLED
 
     // cart has both pickup and delivery orders
     const isDeliveryAndPickupOrder =
-        storeLocatorEnabled &&
         multishipEnabled &&
-        basket?.shipments?.some((shipment) => isPickupShipment(shipment)) &&
-        basket?.shipments?.some((shipment) => !isPickupShipment(shipment))
+        derivedData?.totalPickupShipments > 0 &&
+        derivedData?.totalDeliveryShipments > 0
 
     // Check if there are pickup shipments
-    const hasPickupShipments =
-        storeLocatorEnabled && basket?.shipments?.some((shipment) => isPickupShipment(shipment))
+    const hasPickupShipments = derivedData?.totalPickupShipments > 0
 
     // Only enable BOPIS functionality if the feature toggle is on
-    const isPickupOrderOnly =
-        storeLocatorEnabled && !isDeliveryAndPickupOrder && isPickupShipment(basket?.shipments?.[0])
+    const isPickupOrderOnly = !isDeliveryAndPickupOrder && hasPickupShipments
 
     useEffect(() => {
         if (error || step === 4) {
