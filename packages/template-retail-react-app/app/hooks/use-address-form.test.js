@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import {renderHook, act} from '@testing-library/react'
-import {useAddressForm} from '@salesforce/retail-react-app/../../app/hooks/use-address-form'
+import {useAddressForm} from './use-address-form'
 
 // Mock dependencies
 jest.mock('./use-toast')
@@ -27,8 +27,8 @@ jest.mock('react-hook-form', () => ({
     })
 }))
 
-import {useToast} from '@salesforce/retail-react-app/../../app/hooks/use-toast'
-import {useCurrentCustomer} from '@salesforce/retail-react-app/../../app/hooks/use-current-customer'
+import {useToast} from './use-toast'
+import {useCurrentCustomer} from './use-current-customer'
 import {useShopperCustomersMutation} from '@salesforce/commerce-sdk-react'
 import {nanoid} from 'nanoid'
 
