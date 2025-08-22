@@ -11,8 +11,11 @@ import {useShipmentManagement} from './use-shipment-management'
 jest.mock('./use-multiship')
 jest.mock('./use-item-shipment-management')
 
-const mockUseMultiship = require('./use-multiship').useMultiship
-const mockUseItemShipmentManagement = require('./use-item-shipment-management').useItemShipmentManagement
+import {useMultiship} from './use-multiship'
+import {useItemShipmentManagement} from './use-item-shipment-management'
+
+const mockUseMultiship = useMultiship
+const mockUseItemShipmentManagement = useItemShipmentManagement
 
 describe('useShipmentManagement', () => {
     const mockBasket = {
@@ -117,10 +120,9 @@ describe('useShipmentManagement', () => {
             )
 
             // Verify new shipment was created
-            expect(mockMultishipFunctions.createNewDeliveryShipmentWithAddress).toHaveBeenCalledWith(
-                mockBasket,
-                mockFinalAddresses[1]
-            )
+            expect(
+                mockMultishipFunctions.createNewDeliveryShipmentWithAddress
+            ).toHaveBeenCalledWith(mockBasket, mockFinalAddresses[1])
         })
     })
 
@@ -129,7 +131,7 @@ describe('useShipmentManagement', () => {
             const productsMapWithoutInventory = {
                 'product-1': {} // No inventory
             }
-            
+
             // Item needs to be moved to trigger inventory check
             const itemNeedingMove = {
                 itemId: 'item-1',
@@ -180,22 +182,24 @@ describe('useShipmentManagement', () => {
             })
 
             // Verify address mapping was created correctly
-            expect(mockMultishipFunctions.createNewDeliveryShipmentWithAddress).toHaveBeenCalledTimes(2)
-            expect(mockMultishipFunctions.createNewDeliveryShipmentWithAddress).toHaveBeenCalledWith(
-                mockBasket,
-                mockFinalAddresses[0]
-            )
-            expect(mockMultishipFunctions.createNewDeliveryShipmentWithAddress).toHaveBeenCalledWith(
-                mockBasket,
-                mockFinalAddresses[1]
-            )
+            expect(
+                mockMultishipFunctions.createNewDeliveryShipmentWithAddress
+            ).toHaveBeenCalledTimes(2)
+            expect(
+                mockMultishipFunctions.createNewDeliveryShipmentWithAddress
+            ).toHaveBeenCalledWith(mockBasket, mockFinalAddresses[0])
+            expect(
+                mockMultishipFunctions.createNewDeliveryShipmentWithAddress
+            ).toHaveBeenCalledWith(mockBasket, mockFinalAddresses[1])
         })
     })
 
     describe('finds/reuses existing shipments', () => {
         it('should find and reuse existing shipment with same address', async () => {
             const existingShipment = {shipmentId: 'existing-shipment-1'}
-            mockMultishipFunctions.findDeliveryShipmentWithSameAddress.mockReturnValue(existingShipment)
+            mockMultishipFunctions.findDeliveryShipmentWithSameAddress.mockReturnValue(
+                existingShipment
+            )
             mockItemShipmentManagement.updateItemsToDeliveryShipment.mockResolvedValue(mockBasket)
             mockMultishipFunctions.removeEmptyShipments.mockResolvedValue()
 
@@ -214,7 +218,9 @@ describe('useShipmentManagement', () => {
                 mockBasket,
                 mockFinalAddresses[0]
             )
-            expect(mockMultishipFunctions.createNewDeliveryShipmentWithAddress).not.toHaveBeenCalled()
+            expect(
+                mockMultishipFunctions.createNewDeliveryShipmentWithAddress
+            ).not.toHaveBeenCalled()
         })
     })
 
@@ -239,10 +245,9 @@ describe('useShipmentManagement', () => {
                 )
             })
 
-            expect(mockMultishipFunctions.createNewDeliveryShipmentWithAddress).toHaveBeenCalledWith(
-                mockBasket,
-                mockFinalAddresses[0]
-            )
+            expect(
+                mockMultishipFunctions.createNewDeliveryShipmentWithAddress
+            ).toHaveBeenCalledWith(mockBasket, mockFinalAddresses[0])
         })
     })
 
@@ -352,7 +357,9 @@ describe('useShipmentManagement', () => {
             const originalError = new Error('Original error message')
             mockMultishipFunctions.findDeliveryShipmentWithSameAddress.mockReturnValue(null)
             mockMultishipFunctions.findUnusedDeliveryShipment.mockReturnValue(null)
-            mockMultishipFunctions.createNewDeliveryShipmentWithAddress.mockRejectedValue(originalError)
+            mockMultishipFunctions.createNewDeliveryShipmentWithAddress.mockRejectedValue(
+                originalError
+            )
 
             const {result} = renderHook(() => useShipmentManagement(mockBasket))
 

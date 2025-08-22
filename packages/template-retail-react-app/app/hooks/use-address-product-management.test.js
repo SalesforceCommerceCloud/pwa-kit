@@ -14,10 +14,15 @@ jest.mock('./use-pickup-shipment')
 jest.mock('./use-multiship')
 jest.mock('../utils/address-utils')
 
-const mockUseCurrentCustomer = require('./use-current-customer').useCurrentCustomer
-const mockUsePickupShipment = require('./use-pickup-shipment').usePickupShipment
-const mockUseMultiship = require('./use-multiship').useMultiship
-const mockIsAddressEmpty = require('../utils/address-utils').isAddressEmpty
+import {useCurrentCustomer} from './use-current-customer'
+import {usePickupShipment} from './use-pickup-shipment'
+import {useMultiship} from './use-multiship'
+import {isAddressEmpty} from '../utils/address-utils'
+
+const mockUseCurrentCustomer = useCurrentCustomer
+const mockUsePickupShipment = usePickupShipment
+const mockUseMultiship = useMultiship
+const mockIsAddressEmpty = isAddressEmpty
 
 const mockBasket = {
     basketId: 'basket-1',
