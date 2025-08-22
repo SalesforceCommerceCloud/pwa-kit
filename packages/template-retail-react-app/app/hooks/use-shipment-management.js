@@ -5,8 +5,8 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import {useCallback} from 'react'
-import {useMultiship} from './use-multiship'
-import {useItemShipmentManagement} from './use-item-shipment-management'
+import {useMultiship} from '@salesforce/retail-react-app/app/hooks/use-multiship'
+import {useItemShipmentManagement} from '@salesforce/retail-react-app/app/hooks/use-item-shipment-management'
 
 /**
  * Hook for processing shipments in multi-shipping
@@ -21,7 +21,6 @@ export const useShipmentManagement = (basket) => {
         findUnusedDeliveryShipment,
         createNewDeliveryShipmentWithAddress,
         updateDeliveryAddressForShipment,
-        moveItemsToDeliveryShipment,
         removeEmptyShipments
     } = useMultiship(basket)
 
@@ -48,7 +47,10 @@ export const useShipmentManagement = (basket) => {
                     const address = finalAddresses.find((addr) => addr.addressId === addressId)
 
                     // If there is an existing shipment with the same address, use it in the next step
-                    const shipmentWithSameAddress = findDeliveryShipmentWithSameAddress(basket, address)
+                    const shipmentWithSameAddress = findDeliveryShipmentWithSameAddress(
+                        basket,
+                        address
+                    )
 
                     if (!addressToItemsMap[addressId]) {
                         addressToItemsMap[addressId] = {
@@ -94,7 +96,9 @@ export const useShipmentManagement = (basket) => {
                         const defaultInventoryId = productData?.inventory?.id
 
                         if (!defaultInventoryId) {
-                            throw new Error(`No inventory ID found for product ${firstItem.productId}`)
+                            throw new Error(
+                                `No inventory ID found for product ${firstItem.productId}`
+                            )
                         }
 
                         basketAfterItemMoves = await updateItemsToDeliveryShipment(

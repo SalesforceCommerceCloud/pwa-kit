@@ -6,10 +6,10 @@
  */
 import {useState, useCallback, useMemo} from 'react'
 import {useForm} from 'react-hook-form'
-import {useToast} from './use-toast'
+import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
 import {useIntl} from 'react-intl'
 import {useShopperCustomersMutation} from '@salesforce/commerce-sdk-react'
-import {useCurrentCustomer} from './use-current-customer'
+import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
 import {nanoid} from 'nanoid'
 
 export const useAddressForm = (

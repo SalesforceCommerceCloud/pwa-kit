@@ -6,9 +6,9 @@
  */
 import {useState, useEffect, useCallback, useMemo, useRef} from 'react'
 import {nanoid} from 'nanoid'
-import {useCurrentCustomer} from './use-current-customer'
-import {usePickupShipment} from './use-pickup-shipment'
-import {useMultiship} from './use-multiship'
+import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
+import {usePickupShipment} from '@salesforce/retail-react-app/app/hooks/use-pickup-shipment'
+import {useMultiship} from '@salesforce/retail-react-app/app/hooks/use-multiship'
 import {isAddressEmpty} from '../utils/address-utils'
 
 /**

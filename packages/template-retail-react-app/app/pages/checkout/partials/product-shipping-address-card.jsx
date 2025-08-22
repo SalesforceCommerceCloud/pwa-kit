@@ -120,7 +120,6 @@ AddressForm.propTypes = {
 const ProductShippingAddressCard = ({
     item,
     variant,
-    productDetail,
     imageUrl,
     addressKey,
     selectedAddressId,

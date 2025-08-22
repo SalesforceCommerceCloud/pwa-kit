@@ -57,11 +57,7 @@ const ShippingMultiAddress = ({basket, submitButtonLabel, noItemsInBasketMessage
             }
         }
     )
-    const {
-        data: customer,
-        refetch: refetchCustomer,
-        isLoading: customerLoading
-    } = useCurrentCustomer()
+    const {isLoading: customerLoading} = useCurrentCustomer()
 
     const {
         form: addressForm,
@@ -70,8 +66,7 @@ const ShippingMultiAddress = ({basket, submitButtonLabel, noItemsInBasketMessage
         openForm,
         closeForm,
         handleCreateAddress,
-        isAddressFormOpen,
-        formErrors
+        isAddressFormOpen
     } = useAddressForm(
         addressProductManagement.addGuestAddress,
         addressProductManagement.isGuest,
@@ -206,7 +201,6 @@ const ShippingMultiAddress = ({basket, submitButtonLabel, noItemsInBasketMessage
                                     key={addressKey}
                                     item={item}
                                     variant={variant}
-                                    productDetail={productDetail}
                                     imageUrl={imageUrl}
                                     addressKey={addressKey}
                                     selectedAddressId={
@@ -234,7 +228,9 @@ const ShippingMultiAddress = ({basket, submitButtonLabel, noItemsInBasketMessage
                     cursor={
                         !allShipmentsHaveAddress || isAddressFormOpen ? 'not-allowed' : 'pointer'
                     }
-                    isLoading={addressForm.formState.isSubmitting || isFormSubmitting || isSubmitting}
+                    isLoading={
+                        addressForm.formState.isSubmitting || isFormSubmitting || isSubmitting
+                    }
                     isDisabled={!allShipmentsHaveAddress || isAddressFormOpen}
                     data-testid="continue-to-shipping-button"
                     loadingText={formatMessage({
