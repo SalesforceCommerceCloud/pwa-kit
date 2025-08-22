@@ -81,7 +81,7 @@ describe('OrderStatusPage', () => {
         })
         renderWithProviders(<OrderStatusPage />)
 
-        expect(mockNavigate).toHaveBeenCalledWith('/')
+        expect(mockNavigate).toHaveBeenCalledWith('/', 'replace')
     })
 
     test('displays sign in card with brand logo and sign in button for guest users', () => {

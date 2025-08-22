@@ -36,7 +36,7 @@ module.exports = {
             }
         },
         oms: {
-            enabled: true
+            enabled: false
         },
         defaultSite: 'RefArchGlobal',
         siteAliases: {

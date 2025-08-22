@@ -5,7 +5,8 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React, {useRef, useEffect} from 'react'
+import React, {useRef, useEffect, useLayoutEffect} from 'react'
+import {Redirect} from 'react-router-dom'
 import {FormattedMessage} from 'react-intl'
 import {
     Box,
@@ -45,15 +46,18 @@ const OrderStatusPage = () => {
     const shouldShowSignInForm = customerType !== null && !isRegistered
 
     const isOmsEnabled = getConfig()?.app?.oms?.enabled
-    const isGuestUser = customerType === 'guest'
-    const showOrderLookup = !isGuestUser || isOmsEnabled
 
-    // Redirect to home if OMS feature flag is explicitly disabled
-    useEffect(() => {
+    // Redirect to home if user navigates to order status page manually
+    useLayoutEffect(() => {
         if (isOmsEnabled === false) {
-            navigate('/')
+            navigate('/', 'replace')
         }
     }, [isOmsEnabled, navigate])
+
+    // Hide the page entirely and redirect when OMS is disabled
+    if (isOmsEnabled === false) {
+        return <Redirect to="/" />
+    }
 
     return (
         <Box data-testid="order-status-page" bg="gray.50">
@@ -69,7 +73,7 @@ const OrderStatusPage = () => {
                 {shouldShowSignInForm ? (
                     // Two-column layout when sign-in form is present
                     <Grid
-                        templateColumns={{base: '1fr', md: showOrderLookup ? '1fr 1fr' : '1fr'}}
+                        templateColumns={{base: '1fr', md: '1fr 1fr'}}
                         gap={8}
                         justifyContent="center"
                         alignItems="flex-start"
@@ -106,8 +110,8 @@ const OrderStatusPage = () => {
                             </Stack>
                         </Box>
 
-                        {/* Order Lookup Card - guests see it only when feature flag is enabled; registered users always see it. */}
-                        {showOrderLookup && <OrderLookup onSubmit={handleOrderLookup} />}
+                        {/* Order Lookup Card */}
+                        <OrderLookup onSubmit={handleOrderLookup} />
                     </Grid>
                 ) : (
                     // Centered single-column layout when sign-in form is not present
