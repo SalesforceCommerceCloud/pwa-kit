@@ -503,18 +503,6 @@ export const ApplePayExpress = ({
     isPdpMode = false,
     manager
 }) => {
-    console.log('🍎 ApplePayExpress component rendering with props:', {
-        hasAdyenPaymentMethods: !!adyenPaymentMethods,
-        hasAuthToken: !!authToken,
-        hasLocale: !!providedLocale,
-        hasSite: !!providedSite,
-        hasBasket: !!basket,
-        sku,
-        quantity,
-        isPdpMode,
-        hasManager: !!manager
-    })
-
     const paymentContainer = useRef(null)
 
     // Use the shared express payment setup hook
@@ -535,20 +523,8 @@ export const ApplePayExpress = ({
         site: providedSite
     })
 
-    console.log('🍎 ApplePayExpress setup data:', {
-        finalLocale,
-        finalSite: finalSite?.id,
-        hasTempBasket: !!tempBasket,
-        currentSku,
-        hasRequiredBasketData
-    })
-
     // Get Apple Pay configuration from payment methods
     const applePayConfig = getPaymentMethodConfig(adyenPaymentMethods, 'applepay')
-    console.log('🍎 Apple Pay config:', {
-        hasConfig: !!applePayConfig,
-        config: applePayConfig
-    })
 
     // Cleanup effect to remove temporary basket when component unmounts
     useEffect(() => {
@@ -565,6 +541,7 @@ export const ApplePayExpress = ({
     useEffect(
         () => {
             let isCanceled = false
+            const buttonCreationStartTime = performance.now()
 
             const createCheckout = async () => {
                 if (isCanceled) {
@@ -652,6 +629,11 @@ export const ApplePayExpress = ({
                     try {
                         await applePayButton.mount(paymentContainer.current)
                         manager.setPaymentMethodAvailable(PAYMENT_METHOD)
+
+                        // Log the actual button creation and mounting time
+                        const buttonCreationEndTime = performance.now()
+                        const buttonCreationDuration = buttonCreationEndTime - buttonCreationStartTime
+                        console.log(`🍎 ApplePayExpress button created and mounted in ${buttonCreationDuration.toFixed(2)}ms`)
                     } catch (error) {
                         console.error('Failed to mount Apple Pay button:', error)
                         handleApplePayUnavailable()
@@ -694,28 +676,9 @@ export const ApplePayExpress = ({
         hasRequiredBasketData
     })
 
-    console.log('🍎 ApplePayExpress should render:', {
-        shouldRender,
-        reason: shouldRender ? 'All conditions met' : 'Missing required data'
-    })
-
     if (!shouldRender) {
-        console.log('🍎 ApplePayExpress not rendering - validation failed')
         return null
     }
-
-    // Check for missing order total error
-    const hasMissingOrderTotalError = isMissingOrderTotalError(
-        isPdpMode ? tempBasket : basket,
-        isPdpMode
-    )
-
-    if (hasMissingOrderTotalError) {
-        console.log('🍎 ApplePayExpress not rendering - missing order total')
-        return null
-    }
-
-    console.log('🍎 ApplePayExpress rendering Apple Pay button...')
 
     return <div ref={paymentContainer} style={{height: '40px'}}></div>
 }
