@@ -123,6 +123,51 @@ jest.mock('@salesforce/retail-react-app/app/pages/checkout/util/checkout-context
 
 const server = setupServer()
 
+// Build derivedData consistent with useCurrentBasket
+const buildDerivedData = (basket) => {
+    const productItems = basket?.productItems || []
+    const shipments = basket?.shipments || []
+    let totalItems = 0
+    const shipmentIdToTotalItems = {}
+    productItems.forEach((item) => {
+        const quantity = item?.quantity || 0
+        totalItems += quantity
+        if (item?.shipmentId) {
+            shipmentIdToTotalItems[item.shipmentId] =
+                (shipmentIdToTotalItems[item.shipmentId] || 0) + quantity
+        }
+    })
+    let totalDeliveryShipments = 0
+    let totalPickupShipments = 0
+    const pickupStoreIds = []
+    let isMissingShippingAddress = false
+    let isMissingShippingMethod = false
+    shipments.forEach((shipment) => {
+        const hasItems = shipmentIdToTotalItems[shipment?.shipmentId] > 0
+        if (!hasItems) return
+        const isPickup = Boolean(shipment?.shippingMethod?.c_storePickupEnabled)
+        if (isPickup) {
+            totalPickupShipments += 1
+            if (shipment?.c_fromStoreId) pickupStoreIds.push(shipment.c_fromStoreId)
+        } else {
+            totalDeliveryShipments += 1
+            if (!shipment?.shippingAddress) isMissingShippingAddress = true
+            if (!shipment?.shippingMethod) isMissingShippingMethod = true
+        }
+    })
+    pickupStoreIds.sort()
+    return {
+        hasBasket: productItems.length > 0 || shipments.length > 0,
+        totalItems,
+        shipmentIdToTotalItems,
+        totalDeliveryShipments,
+        totalPickupShipments,
+        pickupStoreIds,
+        isMissingShippingAddress,
+        isMissingShippingMethod
+    }
+}
+
 beforeAll(() => {
     server.listen()
 })
@@ -167,10 +212,7 @@ describe('PickupAddress', () => {
         useCurrentBasket.mockReturnValue({
             data: pickupBasket,
             isLoading: false,
-            derivedData: {
-                hasBasket: true,
-                totalItems: pickupBasket.productItems.reduce((acc, item) => acc + item.quantity, 0)
-            }
+            derivedData: buildDerivedData(pickupBasket)
         })
 
         useSelectedStore.mockReturnValue({
@@ -248,13 +290,7 @@ describe('PickupAddress', () => {
         useCurrentBasket.mockReturnValue({
             data: singleStoreBasket,
             isLoading: false,
-            derivedData: {
-                hasBasket: true,
-                totalItems: singleStoreBasket.productItems.reduce(
-                    (acc, item) => acc + item.quantity,
-                    0
-                )
-            }
+            derivedData: buildDerivedData(singleStoreBasket)
         })
 
         useSelectedStore.mockReturnValue({
@@ -323,13 +359,7 @@ describe('PickupAddress', () => {
         useCurrentBasket.mockReturnValue({
             data: singlePickupBasket,
             isLoading: false,
-            derivedData: {
-                hasBasket: true,
-                totalItems: singlePickupBasket.productItems.reduce(
-                    (acc, item) => acc + item.quantity,
-                    0
-                )
-            }
+            derivedData: buildDerivedData(singlePickupBasket)
         })
 
         useSelectedStore.mockReturnValue({selectedStore: null})
@@ -386,10 +416,7 @@ describe('PickupAddress', () => {
         useCurrentBasket.mockReturnValue({
             data: pickupBasket,
             isLoading: false,
-            derivedData: {
-                hasBasket: true,
-                totalItems: pickupBasket.productItems.reduce((acc, item) => acc + item.quantity, 0)
-            }
+            derivedData: buildDerivedData(pickupBasket)
         })
 
         useSelectedStore.mockReturnValue({
@@ -472,13 +499,7 @@ describe('PickupAddress', () => {
         useCurrentBasket.mockReturnValue({
             data: multiPickupBasket,
             isLoading: false,
-            derivedData: {
-                hasBasket: true,
-                totalItems: multiPickupBasket.productItems.reduce(
-                    (acc, item) => acc + item.quantity,
-                    0
-                )
-            }
+            derivedData: buildDerivedData(multiPickupBasket)
         })
 
         useSelectedStore.mockReturnValue({
@@ -575,10 +596,7 @@ describe('PickupAddress', () => {
         useCurrentBasket.mockReturnValue({
             data: mixedBasket,
             isLoading: false,
-            derivedData: {
-                hasBasket: true,
-                totalItems: mixedBasket.productItems.reduce((acc, item) => acc + item.quantity, 0)
-            }
+            derivedData: buildDerivedData(mixedBasket)
         })
 
         useSelectedStore.mockReturnValue({
@@ -657,13 +675,7 @@ describe('PickupAddress', () => {
         useCurrentBasket.mockReturnValue({
             data: multiPickupBasket,
             isLoading: false,
-            derivedData: {
-                hasBasket: true,
-                totalItems: multiPickupBasket.productItems.reduce(
-                    (acc, item) => acc + item.quantity,
-                    0
-                )
-            }
+            derivedData: buildDerivedData(multiPickupBasket)
         })
 
         useSelectedStore.mockReturnValue({
@@ -738,13 +750,7 @@ describe('PickupAddress', () => {
         useCurrentBasket.mockReturnValue({
             data: singlePickupBasket,
             isLoading: false,
-            derivedData: {
-                hasBasket: true,
-                totalItems: singlePickupBasket.productItems.reduce(
-                    (acc, item) => acc + item.quantity,
-                    0
-                )
-            }
+            derivedData: buildDerivedData(singlePickupBasket)
         })
 
         useSelectedStore.mockReturnValue({
@@ -838,10 +844,7 @@ describe('PickupAddress', () => {
         useCurrentBasket.mockReturnValue({
             data: mixedBasket,
             isLoading: false,
-            derivedData: {
-                hasBasket: true,
-                totalItems: mixedBasket.productItems.reduce((acc, item) => acc + item.quantity, 0)
-            }
+            derivedData: buildDerivedData(mixedBasket)
         })
 
         useSelectedStore.mockReturnValue({
@@ -924,10 +927,7 @@ describe('PickupAddress', () => {
         useCurrentBasket.mockReturnValue({
             data: pickupBasket,
             isLoading: false,
-            derivedData: {
-                hasBasket: true,
-                totalItems: pickupBasket.productItems.reduce((acc, item) => acc + item.quantity, 0)
-            }
+            derivedData: buildDerivedData(pickupBasket)
         })
 
         useSelectedStore.mockReturnValue({
@@ -1012,13 +1012,7 @@ describe('PickupAddress', () => {
         useCurrentBasket.mockReturnValue({
             data: multiProductBasket,
             isLoading: false,
-            derivedData: {
-                hasBasket: true,
-                totalItems: multiProductBasket.productItems.reduce(
-                    (acc, item) => acc + item.quantity,
-                    0
-                )
-            }
+            derivedData: buildDerivedData(multiProductBasket)
         })
 
         useSelectedStore.mockReturnValue({
@@ -1099,13 +1093,7 @@ describe('PickupAddress', () => {
         useCurrentBasket.mockReturnValue({
             data: multiStoreBasket,
             isLoading: false,
-            derivedData: {
-                hasBasket: true,
-                totalItems: multiStoreBasket.productItems.reduce(
-                    (acc, item) => acc + item.quantity,
-                    0
-                )
-            }
+            derivedData: buildDerivedData(multiStoreBasket)
         })
 
         useSelectedStore.mockReturnValue({

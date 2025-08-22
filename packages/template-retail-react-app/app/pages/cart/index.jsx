@@ -74,19 +74,14 @@ import {useMultiship} from '@salesforce/retail-react-app/app/hooks/use-multiship
 const DEBOUNCE_WAIT = 750
 
 const Cart = () => {
-    const {data: basket, isLoading} = useCurrentBasket()
+    const {data: basket, isLoading, derivedData} = useCurrentBasket()
     const multishipEnabled = getConfig()?.app?.multishipEnabled ?? true
     const storeLocatorEnabled = getConfig()?.app?.storeLocatorEnabled ?? STORE_LOCATOR_IS_ENABLED
 
     // Pickup in Store - inventory at current store and all unique store IDs from all shipments
     const {selectedStore} = useSelectedStore()
     const selectedInventoryId = selectedStore?.inventoryId || null
-    const allStoreIds =
-        basket?.shipments
-            ?.map((shipment) => shipment.c_fromStoreId)
-            .filter(Boolean)
-            .filter((id, index, array) => array.indexOf(id) === index) // Remove duplicates
-            .join(',') || ''
+    const allStoreIds = derivedData?.pickupStoreIds?.join(',') ?? ''
     const {data: storeData} = useStores(
         {
             parameters: {
