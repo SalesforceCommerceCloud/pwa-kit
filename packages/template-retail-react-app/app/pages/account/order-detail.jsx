@@ -30,8 +30,11 @@ import OrderSummary from '@salesforce/retail-react-app/app/components/order-summ
 import ProductList from '@salesforce/retail-react-app/app/components/product-list'
 import CancelOrderModal from '@salesforce/retail-react-app/app/components/cancel-order-modal'
 import OrderStatusBar from '@salesforce/retail-react-app/app/components/order-status-bar/index'
+import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import {getOrderStatusColorScheme} from '@salesforce/retail-react-app/app/pages/account/order-history'
 import {getLocalizedOrderStatus} from '@salesforce/retail-react-app/app/pages/account/order-history'
+import {useCustomerId, useCustomerType} from '@salesforce/commerce-sdk-react'
+import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
 
 const onClient = typeof window !== 'undefined'
 
@@ -60,6 +63,30 @@ const AccountOrderDetail = () => {
     const paymentCard = order?.paymentInstruments[0]?.paymentCard
     const CardIcon = getCreditCardIcon(paymentCard?.cardType)
     const itemCount = order?.productItems.reduce((count, item) => item.quantity + count, 0) || 0
+
+    // Cancel order gating
+    const customerId = useCustomerId()
+    const {isRegistered} = useCustomerType()
+    const {data: currentCustomer} = useCurrentCustomer()
+
+    const isOmsEnabled = getConfig().app?.oms?.enabled
+    const orderStatus = (order?.status || '').toLowerCase()
+    const shipmentStatus = (shippingStatus || '').toLowerCase()
+    const statusEligible = !['cancelled', 'canceled', 'completed', 'failed'].includes(orderStatus)
+    const shippingEligible = shipmentStatus === 'not_shipped'
+    const ownsOrder =
+        (order?.customerInfo?.customerId && order.customerInfo.customerId === customerId) ||
+        (order?.customerInfo?.email &&
+            currentCustomer?.email &&
+            order.customerInfo.email.toLowerCase() === currentCustomer.email.toLowerCase())
+
+    const canCancel =
+        !isLoading &&
+        isOmsEnabled &&
+        isRegistered &&
+        ownsOrder &&
+        statusEligible &&
+        shippingEligible
 
     // Fetch product data for order items
     const productIds = order?.productItems?.map((product) => product.productId) || []
@@ -131,13 +158,14 @@ const AccountOrderDetail = () => {
                                 id="account_order_detail.title.order_details"
                             />
                         </Heading>
-                        {/* TODO: addcancel order elligibility logic */}
-                        <Button variant="link" size="sm" onClick={onCancelModalOpen}>
-                            <FormattedMessage
-                                defaultMessage="Cancel order"
-                                id="account_order_detail.button.cancel_order"
-                            />
-                        </Button>
+                        {canCancel && (
+                            <Button variant="link" size="sm" onClick={onCancelModalOpen}>
+                                <FormattedMessage
+                                    defaultMessage="Cancel order"
+                                    id="account_order_detail.button.cancel_order"
+                                />
+                            </Button>
+                        )}
                     </Flex>
 
                     {!isLoading ? (
@@ -189,7 +217,7 @@ const AccountOrderDetail = () => {
                 </Stack>
             </Stack>
 
-            {!isLoading && <OrderStatusBar currentStepLabel={order.status} />}
+            {!isLoading && isOmsEnabled && <OrderStatusBar currentStepLabel={order.status} />}
 
             <Box layerStyle="cardBordered">
                 <Grid templateColumns={{base: '1fr', xl: '60% 1fr'}} gap={{base: 6, xl: 2}}>
@@ -402,19 +430,17 @@ const AccountOrderDetail = () => {
                 </Stack>
             </Stack>
 
-            <CancelOrderModal
-                isOpen={isCancelModalOpen}
-                onClose={onCancelModalClose}
-                order={order}
-                onCancel={(order, selectedReason) => {
-                    // TODO: Add cancellation logic here
-                    console.log('Requesting cancellation for order:', order?.orderNo)
-                    console.log('Requesting cancellation for email:', order?.customerInfo?.email)
-                    console.log('Customer last name:', order?.billingAddress?.lastName)
-                    console.log('Customer zip code:', order?.billingAddress?.postalCode)
-                    console.log('Cancellation reason:', selectedReason)
-                }}
-            />
+            {canCancel && (
+                <CancelOrderModal
+                    isOpen={isCancelModalOpen}
+                    onClose={onCancelModalClose}
+                    order={order}
+                    // NOTE: `onCancel` is intentionally a no-op until the cancel API is ready.
+                    // When the API is available, replace this with a handler that submits the request
+                    // and updates UI (e.g., refetch order, show a toast, navigate back to orders).
+                    onCancel={() => {}}
+                />
+            )}
         </Stack>
     )
 }

@@ -42,6 +42,9 @@ module.exports = {
                 idps: ['google', 'apple']
             }
         },
+        oms: {
+            enabled: true
+        },
         siteAliases: {
             'site-1': 'uk',
             'site-2': 'us'

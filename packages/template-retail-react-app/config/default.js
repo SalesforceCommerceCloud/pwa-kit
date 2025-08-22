@@ -35,6 +35,9 @@ module.exports = {
                 landingPath: '/reset-password-landing'
             }
         },
+        oms: {
+            enabled: false
+        },
         defaultSite: 'RefArchGlobal',
         siteAliases: {
             RefArch: 'us',

@@ -9,6 +9,8 @@ import {screen} from '@testing-library/react'
 import OrderStatusPage from '@salesforce/retail-react-app/app/pages/order-status/index.jsx'
 import userEvent from '@testing-library/user-event'
 import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
+import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
+import mockConfig from '@salesforce/retail-react-app/config/mocks/default'
 
 // Mock the navigation hook
 const mockNavigate = jest.fn()
@@ -22,6 +24,10 @@ const mockUseCurrentCustomer = jest.fn()
 jest.mock('@salesforce/retail-react-app/app/hooks/use-current-customer', () => ({
     __esModule: true,
     useCurrentCustomer: () => mockUseCurrentCustomer()
+}))
+
+jest.mock('@salesforce/pwa-kit-runtime/utils/ssr-config', () => ({
+    getConfig: jest.fn()
 }))
 
 describe('OrderStatusPage', () => {
@@ -44,6 +50,15 @@ describe('OrderStatusPage', () => {
                 customerType: 'guest'
             }
         })
+
+        // Default: OMS enabled with full app config
+        getConfig.mockReturnValue({
+            ...mockConfig,
+            app: {
+                ...mockConfig.app,
+                oms: {enabled: true}
+            }
+        })
     })
 
     test('displays order status page with main heading and proper page structure', () => {
@@ -54,6 +69,19 @@ describe('OrderStatusPage', () => {
 
         // Check heading
         expect(screen.getByRole('heading', {name: /order status/i})).toBeInTheDocument()
+    })
+
+    test('redirects to home when OMS is disabled', () => {
+        getConfig.mockReturnValue({
+            ...mockConfig,
+            app: {
+                ...mockConfig.app,
+                oms: {enabled: false}
+            }
+        })
+        renderWithProviders(<OrderStatusPage />)
+
+        expect(mockNavigate).toHaveBeenCalledWith('/', 'replace')
     })
 
     test('displays sign in card with brand logo and sign in button for guest users', () => {

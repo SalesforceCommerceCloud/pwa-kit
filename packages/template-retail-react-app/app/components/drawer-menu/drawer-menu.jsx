@@ -61,6 +61,7 @@ import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation
 import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
 
 import {STORE_LOCATOR_IS_ENABLED} from '@salesforce/retail-react-app/app/constants'
+import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 // The FONT_SIZES and FONT_WEIGHTS constants are used to control the styling for
 // the accordion buttons as their current depth. In the below definition we assign
 // values for depths 0 - 3, any depth deeper than that will use the default styling.
@@ -102,6 +103,7 @@ const DrawerMenu = ({
     const socialIconVariant = useBreakpointValue({base: 'flex', md: 'flex-start'})
     const {site, buildUrl} = useMultiSite()
     const {l10n} = site
+    const isOmsEnabled = getConfig()?.app?.oms?.enabled
     const [showLoading, setShowLoading] = useState(false)
     const [ariaBusy, setAriaBusy] = useState('true')
     const logout = useAuthHelper(AuthHelpers.Logout)
@@ -292,19 +294,21 @@ const DrawerMenu = ({
                                 </Box>
                             )}
                             {/* Order Status menu item */}
-                            <Box {...styles.actionsItem}>
-                                <Link to={ORDER_STATUS_HREF}>
-                                    <HStack spacing={2}>
-                                        <SearchIcon {...styles.icon} />
-                                        <Text>
-                                            {intl.formatMessage({
-                                                id: 'drawer_menu.link.order_status',
-                                                defaultMessage: 'Order Status'
-                                            })}
-                                        </Text>
-                                    </HStack>
-                                </Link>
-                            </Box>
+                            {isOmsEnabled && (
+                                <Box {...styles.actionsItem}>
+                                    <Link to={ORDER_STATUS_HREF}>
+                                        <HStack spacing={2}>
+                                            <SearchIcon {...styles.icon} />
+                                            <Text>
+                                                {intl.formatMessage({
+                                                    id: 'drawer_menu.link.order_status',
+                                                    defaultMessage: 'Order Status'
+                                                })}
+                                            </Text>
+                                        </HStack>
+                                    </Link>
+                                </Box>
+                            )}
                             {showLocaleSelector && (
                                 <Box>
                                     <LocaleSelector

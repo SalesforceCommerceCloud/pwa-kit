@@ -5,7 +5,8 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React, {useRef, useEffect} from 'react'
+import React, {useRef, useEffect, useLayoutEffect} from 'react'
+import {Redirect} from 'react-router-dom'
 import {FormattedMessage} from 'react-intl'
 import {
     Box,
@@ -20,6 +21,7 @@ import {BrandLogo} from '@salesforce/retail-react-app/app/components/icons'
 import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
 import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
 import OrderLookup from '@salesforce/retail-react-app/app/components/order-lookup/index'
+import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 
 const OrderStatusPage = () => {
     const navigate = useNavigation()
@@ -42,6 +44,20 @@ const OrderStatusPage = () => {
 
     // Check if user is not registered and customer data has loaded
     const shouldShowSignInForm = customerType !== null && !isRegistered
+
+    const isOmsEnabled = getConfig()?.app?.oms?.enabled
+
+    // Redirect to home if user navigates to order status page manually
+    useLayoutEffect(() => {
+        if (isOmsEnabled === false) {
+            navigate('/', 'replace')
+        }
+    }, [isOmsEnabled, navigate])
+
+    // Hide the page entirely and redirect when OMS is disabled
+    if (isOmsEnabled === false) {
+        return <Redirect to="/" />
+    }
 
     return (
         <Box data-testid="order-status-page" bg="gray.50">
