@@ -431,6 +431,34 @@
       "value": "]"
     }
   ],
+  "account_order_detail.toast.cancellation_failed": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Řḗḗɋŭŭḗḗşŧ ƈȧȧƞƈḗḗŀŀȧȧŧīǿǿƞ ḓīḓ ƞǿǿŧ şŭŭƈƈḗḗḗḗḓ."
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "account_order_detail.toast.cancellation_success": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ƈȧȧƞƈḗḗŀŀȧȧŧīǿǿƞ řḗḗɋŭŭḗḗşŧ şŭŭƀḿīŧŧḗḗḓ."
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
   "account_order_history.button.continue_shopping": [
     {
       "type": 0,

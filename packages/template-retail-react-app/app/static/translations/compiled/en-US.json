@@ -191,6 +191,18 @@
       "value": "Order Details"
     }
   ],
+  "account_order_detail.toast.cancellation_failed": [
+    {
+      "type": 0,
+      "value": "Request cancellation did not succeed."
+    }
+  ],
+  "account_order_detail.toast.cancellation_success": [
+    {
+      "type": 0,
+      "value": "Cancellation request submitted."
+    }
+  ],
   "account_order_history.button.continue_shopping": [
     {
       "type": 0,
