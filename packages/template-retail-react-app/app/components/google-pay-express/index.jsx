@@ -461,6 +461,8 @@ export const GooglePayExpress = ({
         hasManager: !!manager
     })
 
+    const paymentContainer = useRef(null)
+
     // Use the shared express payment setup hook
     const {
         locale: finalLocale,
@@ -534,8 +536,6 @@ export const GooglePayExpress = ({
     }
 
     console.log('🤖 GooglePayExpress rendering Google Pay button...')
-
-    const paymentContainer = useRef(null)
 
     // Cleanup effect to remove temporary basket when component unmounts
     useEffect(() => {

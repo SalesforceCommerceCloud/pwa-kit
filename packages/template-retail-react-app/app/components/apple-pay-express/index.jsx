@@ -527,6 +527,8 @@ export const ApplePayExpress = ({
         hasManager: !!manager
     })
 
+    const paymentContainer = useRef(null)
+
     // Use the shared express payment setup hook
     const {
         locale: finalLocale,
@@ -589,8 +591,6 @@ export const ApplePayExpress = ({
     }
 
     console.log('🍎 ApplePayExpress rendering Apple Pay button...')
-
-    const paymentContainer = useRef(null)
 
     // Cleanup effect to remove temporary basket when component unmounts
     useEffect(() => {
