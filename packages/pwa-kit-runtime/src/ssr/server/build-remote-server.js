@@ -584,7 +584,16 @@ export const RemoteServerFactory = {
                 try {
                     return routeRegex.test(cleanPath)
                 } catch (error) {
-                    logger.warn(`Invalid route pattern: ${routeRegex}`, error)
+                    logger.warn(
+                        `Invalid express route pattern: ${routeRegex}`,
+                        /* istanbul ignore next */
+                        {
+                            namespace: 'removeBasePathMiddleware',
+                            additionalProperties: {
+                                error: error
+                            }
+                        }
+                    )
                     return false
                 }
             })
