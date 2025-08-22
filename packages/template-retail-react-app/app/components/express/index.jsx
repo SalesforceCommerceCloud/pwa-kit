@@ -59,8 +59,12 @@ function Express() {
             if (event.data && typeof event.data === 'object') {
                 const {type, sku, quantity} = event.data
 
+                // Log all incoming messages for debugging
+                console.log('[Express] Received message:', event.data)
+
                 // Handle SKU update messages
                 if (type === 'UPDATE_SKU' && typeof sku === 'string') {
+                    console.log('[Express] Updating SKU:', sku)
                     setCurrentSku(sku)
                     // Always set quantity to 1 when SKU changes
                     setCurrentQuantity(1)
@@ -68,6 +72,7 @@ function Express() {
 
                 // Handle quantity update messages
                 if (type === 'UPDATE_QUANTITY' && typeof quantity === 'number') {
+                    console.log('[Express] Updating quantity:', quantity)
                     // Validate quantity is a positive integer with reasonable limits
                     const validatedQuantity = Math.max(1, Math.min(999, Math.floor(quantity)))
                     setCurrentQuantity(validatedQuantity)
@@ -75,6 +80,7 @@ function Express() {
 
                 // Handle SKU clear messages (for regular checkout)
                 if (type === 'CLEAR_SKU') {
+                    console.log('[Express] Clearing SKU')
                     setCurrentSku(null)
                     setCurrentQuantity(1) // Reset quantity when clearing
                 }
@@ -82,6 +88,7 @@ function Express() {
                 // Handle basket data messages
                 if (type === 'basketDataAvailable') {
                     const {basketData, authData} = event.data.data
+                    console.log('[Express] Received basket data:', {basketData, authData})
                     setAuthToken(authData.authToken)
                     setCustomerId(authData.customerId)
                     setBasketData(basketData)
@@ -90,6 +97,7 @@ function Express() {
                 // Handle authentication data messages
                 if (type === 'authDataAvailable') {
                     const authData = event.data.data.authData
+                    console.log('[Express] Received auth data:', authData)
                     setAuthToken(authData.authToken)
                     setCustomerId(authData.customerId)
                 }
@@ -101,6 +109,7 @@ function Express() {
 
         // Request basket data from parent with a small delay to ensure listener is active
         setTimeout(() => {
+            console.log('[Express] Requesting basket data from parent')
             window.parent.postMessage({type: 'basketDataRequested'}, '*')
         }, 200)
 
@@ -113,8 +122,29 @@ function Express() {
     if (!authToken || managerError) {
         // Do not render express payment components if there is no auth token
         // or if there was an error setting up the manager
+        console.log('[Express] Not rendering - authToken:', !!authToken, 'managerError:', !!managerError)
         return null
     }
+
+    // Add comprehensive logging for debugging
+    console.log('[Express] Render state:', {
+        isPdpMode,
+        basket: !!basket,
+        basketData: basket,
+        authToken: !!authToken,
+        customerId,
+        currentSku,
+        currentQuantity,
+        manager: !!manager,
+        managerError
+    })
+
+    // Log the conditional logic
+    console.log('[Express] Conditional check (!isPdpMode && basket):', {
+        '!isPdpMode': !isPdpMode,
+        'basket': !!basket,
+        'result': !isPdpMode && basket
+    })
 
     return (
         <div>
