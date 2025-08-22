@@ -26,7 +26,9 @@ import {
     validateExpressPaymentSetup,
     getExpressPaymentDependencies,
     sendExpressMessage,
-    getPaymentMethodConfig
+    getPaymentMethodConfig,
+    isMissingOrderTotalError,
+    isMissingShippingMethodsError
 } from '@salesforce/retail-react-app/app/components/express/utils/express-payment-utils'
 import {
     PAYMENT_METHODS,

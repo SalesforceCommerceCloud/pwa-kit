@@ -27,7 +27,8 @@ import {
     validateExpressPaymentSetup,
     getExpressPaymentDependencies,
     sendExpressMessage,
-    getPaymentMethodConfig
+    getPaymentMethodConfig,
+    isMissingOrderTotalError
 } from '@salesforce/retail-react-app/app/components/express/utils/express-payment-utils'
 import {
     PAYMENT_METHODS,
@@ -710,14 +711,12 @@ export const ApplePayExpress = ({
                 }
             } catch (err) {
                 console.error('Full error details:', err)
-                const isMissingOrderTotalError =
-                    err instanceof TypeError &&
-                    err.message == "undefined is not an object (evaluating 'a.orderTotal')"
+                const hasMissingOrderTotalError = isMissingOrderTotalError(err)
 
                 // For PDP mode, missing order total is expected initially when no SKU is set
-                const isExpectedPdpError = isPdpMode && isMissingOrderTotalError && !tempBasket
+                const isExpectedPdpError = isPdpMode && hasMissingOrderTotalError && !tempBasket
 
-                if (!isMissingOrderTotalError && !isExpectedPdpError) {
+                if (!hasMissingOrderTotalError && !isExpectedPdpError) {
                     handleApplePayUnavailable()
                 }
             }
