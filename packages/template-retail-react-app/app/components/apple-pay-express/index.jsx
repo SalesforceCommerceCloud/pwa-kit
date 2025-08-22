@@ -4,11 +4,11 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React, {useEffect, useRef, useState} from 'react'
+import React, {useEffect, useRef} from 'react'
 import AdyenCheckout from '@adyen/adyen-web'
 import '@adyen/adyen-web/dist/adyen.css'
 import PropTypes from 'prop-types'
-import {useAdyenExpressCheckout} from '@adyen/adyen-salesforce-pwa'
+
 import {getCurrencyValueForApi} from '@salesforce/retail-react-app/app/components/express/utils/parsers'
 import {AdyenShippingMethodsService} from '@salesforce/retail-react-app/app/components/express/utils/shipping-methods'
 import {AdyenShippingAddressService} from '@salesforce/retail-react-app/app/components/express/utils/shipping-address'
@@ -22,9 +22,13 @@ import {
     getBasketWithTotals,
     forceOrderCalculation
 } from '@salesforce/retail-react-app/app/components/express/utils/pdp/basket-calculation'
-import {useStandalonePaymentMethods} from '@salesforce/retail-react-app/app/components/express/hooks/use-standalone-payment-methods'
-import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
-import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
+import {useExpressPaymentSetup} from '@salesforce/retail-react-app/app/components/express/hooks/use-express-payment-setup'
+import {
+    validateExpressPaymentSetup,
+    getExpressPaymentDependencies,
+    sendExpressMessage,
+    getPaymentMethodConfig
+} from '@salesforce/retail-react-app/app/components/express/utils/express-payment-utils'
 import {
     PAYMENT_METHODS,
     EXPRESS_MESSAGES
@@ -32,21 +36,8 @@ import {
 
 const PAYMENT_METHOD = PAYMENT_METHODS.APPLE_PAY
 
-const sendExpressMessage = (type, payload = {}) => {
-    window.parent.postMessage(
-        {
-            type,
-            payload
-        },
-        '*'
-    )
-}
-
 export const getApplePaymentMethodConfig = (paymentMethodsResponse) => {
-    const applePayPaymentMethod = paymentMethodsResponse?.paymentMethods?.find(
-        (pm) => pm.type === PAYMENT_METHOD
-    )
-    return applePayPaymentMethod?.configuration || null
+    return getPaymentMethodConfig(paymentMethodsResponse, PAYMENT_METHOD)
 }
 
 export const getCustomerShippingDetails = (shippingContact) => {
@@ -89,7 +80,6 @@ export const getAppleButtonConfig = (
     basket,
     shippingMethods,
     applePayConfig,
-    navigate,
     fetchShippingMethods,
     sku = null,
     setTempBasket = null,
@@ -97,27 +87,21 @@ export const getAppleButtonConfig = (
     isPdpMode = false,
     quantity = 1
 ) => {
-    // For PDP mode, prioritize temporary basket creation over existing basket
-    // For regular mode, use existing basket
-    const currentBasket = isPdpMode ? tempBasket : basket
-    let applePayAmount = currentBasket?.orderTotal || 0
-
-    // Shared basket reference to prevent multiple basket creation
-    // This will be updated by callbacks and shared across all Apple Pay events
-    // In PDP mode, start with null/tempBasket to force temporary basket creation
-    let sharedBasketRef = isPdpMode ? tempBasket : currentBasket
+    // Single basket reference that gets updated as needed
+    let basketRef = isPdpMode ? tempBasket : basket
+    let applePayAmount = basketRef?.orderTotal || 0
 
     // Helper function to get or create basket (prevents multiple creation)
     const getOrCreateBasket = async () => {
-        // If we already have a shared basket, return it
-        if (sharedBasketRef && sharedBasketRef.basketId) {
-            return sharedBasketRef
+        // If we already have a basket reference, return it
+        if (basketRef && basketRef.basketId) {
+            return basketRef
         }
 
         // For PDP flows, create temporary basket if needed (and SKU is available)
         if (isPdpMode && sku && setTempBasket) {
             const newBasket = await createTemporaryBasket(sku, authToken, site, quantity)
-            sharedBasketRef = newBasket // Update shared reference immediately
+            basketRef = newBasket // Update basket reference immediately
             setTempBasket(newBasket) // Update React state for re-renders
             return newBasket
         }
@@ -132,10 +116,10 @@ export const getAppleButtonConfig = (
         configuration: applePayConfig,
         amount: {
             value: getCurrencyValueForApi(
-                currentBasket?.orderTotal || 0,
-                currentBasket?.currency || 'USD'
+                basketRef?.orderTotal || 0,
+                basketRef?.currency || 'USD'
             ),
-            currency: currentBasket?.currency || 'USD'
+            currency: basketRef?.currency || 'USD'
         },
         requiredShippingContactFields: ['postalAddress', 'name', 'email', 'phone'],
         requiredBillingContactFields: ['postalAddress'],
@@ -176,7 +160,7 @@ export const getAppleButtonConfig = (
                 } catch (error) {
                     await cleanupTemporaryBasket(
                         isPdpMode,
-                        sharedBasketRef,
+                        basketRef,
                         authToken,
                         site,
                         setTempBasket
@@ -204,12 +188,12 @@ export const getAppleButtonConfig = (
                     }
                 }
 
-                // Get or create basket using shared reference
-                let currentBasket = await getOrCreateBasket()
-                if (!currentBasket || !currentBasket.basketId) {
+                // Get or create basket using basket reference
+                let basketToUse = await getOrCreateBasket()
+                if (!basketToUse || !basketToUse.basketId) {
                     await cleanupTemporaryBasket(
                         isPdpMode,
-                        sharedBasketRef,
+                        basketRef,
                         authToken,
                         site,
                         setTempBasket
@@ -221,29 +205,30 @@ export const getAppleButtonConfig = (
                     return
                 }
 
-                applePayAmount = currentBasket.orderTotal || currentBasket.productTotal || 0
+                applePayAmount = basketToUse.orderTotal || basketToUse.productTotal || 0
 
                 // CRITICAL: Force final order calculation before payment
                 // This ensures orderTotal is calculated and not null
                 try {
                     const finalizedBasket = await forceOrderCalculation(
-                        currentBasket.basketId,
+                        basketToUse.basketId,
                         authToken,
                         site
                     )
-                    currentBasket = finalizedBasket
+                    basketToUse = finalizedBasket
+                    basketRef = finalizedBasket // Update basket reference
 
                     // Update the amount tracking with calculated totals
-                    applePayAmount = currentBasket.orderTotal || currentBasket.productTotal || 0
+                    applePayAmount = basketToUse.orderTotal || basketToUse.productTotal || 0
 
                     // Ensure we have a valid order total before proceeding
                     if (
-                        currentBasket.orderTotal === null ||
-                        currentBasket.orderTotal === undefined
+                        basketToUse.orderTotal === null ||
+                        basketToUse.orderTotal === undefined
                     ) {
                         await cleanupTemporaryBasket(
                             isPdpMode,
-                            sharedBasketRef,
+                            basketRef,
                             authToken,
                             site,
                             setTempBasket
@@ -258,7 +243,7 @@ export const getAppleButtonConfig = (
                     // This is a critical error - we cannot proceed without order total
                     await cleanupTemporaryBasket(
                         isPdpMode,
-                        sharedBasketRef,
+                        basketRef,
                         authToken,
                         site,
                         setTempBasket
@@ -278,8 +263,8 @@ export const getAppleButtonConfig = (
                 const adyenPaymentService = new AdyenPaymentsService(authToken, site)
                 const paymentsResponse = await adyenPaymentService.submitPayment(
                     paymentData,
-                    currentBasket?.basketId,
-                    currentBasket?.customerInfo?.customerId
+                    basketToUse?.basketId,
+                    basketToUse?.customerInfo?.customerId
                 )
 
                 if (paymentsResponse?.isFinal && paymentsResponse?.isSuccessful) {
@@ -302,7 +287,7 @@ export const getAppleButtonConfig = (
                     // Clean up temporary basket on payment failure
                     await cleanupTemporaryBasket(
                         isPdpMode,
-                        sharedBasketRef,
+                        basketRef,
                         authToken,
                         site,
                         setTempBasket
@@ -316,7 +301,7 @@ export const getAppleButtonConfig = (
                 // Clean up temporary basket on any unexpected error
                 await cleanupTemporaryBasket(
                     isPdpMode,
-                    sharedBasketRef,
+                    basketRef,
                     authToken,
                     site,
                     setTempBasket
@@ -332,9 +317,9 @@ export const getAppleButtonConfig = (
             try {
                 const {shippingContact} = event
 
-                // Get or create basket using shared reference
-                let currentBasket = await getOrCreateBasket()
-                if (!currentBasket || !currentBasket.basketId) {
+                // Get or create basket using basket reference
+                let basketToUse = await getOrCreateBasket()
+                if (!basketToUse || !basketToUse.basketId) {
                     reject()
                     return
                 }
@@ -343,7 +328,7 @@ export const getAppleButtonConfig = (
                 const adyenShippingMethodsService = new AdyenShippingMethodsService(authToken, site)
                 const customerShippingDetails = getCustomerShippingDetails(shippingContact)
                 await adyenShippingAddressService.updateShippingAddress(
-                    currentBasket.basketId,
+                    basketToUse.basketId,
                     customerShippingDetails
                 )
 
@@ -351,7 +336,7 @@ export const getAppleButtonConfig = (
                 let newShippingMethods
                 if (fetchShippingMethods && typeof fetchShippingMethods === 'function') {
                     newShippingMethods = await fetchShippingMethods(
-                        currentBasket?.basketId,
+                        basketToUse?.basketId,
                         site,
                         authToken
                     )
@@ -360,7 +345,7 @@ export const getAppleButtonConfig = (
                     try {
                         const shippingMethodsResponse =
                             await adyenShippingMethodsService.getShippingMethods(
-                                currentBasket.basketId
+                                basketToUse.basketId
                             )
 
                         // Ensure the response has the expected format
@@ -389,7 +374,7 @@ export const getAppleButtonConfig = (
                 } else {
                     const response = await adyenShippingMethodsService.updateShippingMethod(
                         newShippingMethods.applicableShippingMethods[0].id,
-                        currentBasket.basketId
+                        basketToUse.basketId
                     )
 
                     // Calculate basket totals after shipping method assignment
@@ -397,7 +382,7 @@ export const getAppleButtonConfig = (
                     try {
                         if (response.orderTotal === null || response.orderTotal === undefined) {
                             const calculatedBasket = await getBasketWithTotals(
-                                currentBasket.basketId,
+                                basketToUse.basketId,
                                 authToken,
                                 site
                             )
@@ -444,9 +429,9 @@ export const getAppleButtonConfig = (
             try {
                 const {shippingMethod} = event
 
-                // Get or create basket using shared reference
-                let currentBasket = await getOrCreateBasket()
-                if (!currentBasket || !currentBasket.basketId) {
+                // Get or create basket using basket reference
+                let basketToUse = await getOrCreateBasket()
+                if (!basketToUse || !basketToUse.basketId) {
                     reject()
                     return
                 }
@@ -454,7 +439,7 @@ export const getAppleButtonConfig = (
                 const adyenShippingMethodsService = new AdyenShippingMethodsService(authToken, site)
                 const response = await adyenShippingMethodsService.updateShippingMethod(
                     shippingMethod.identifier,
-                    currentBasket.basketId
+                    basketToUse.basketId
                 )
                 if (response.error) {
                     reject()
@@ -464,7 +449,7 @@ export const getAppleButtonConfig = (
                     try {
                         if (response.orderTotal === null || response.orderTotal === undefined) {
                             const calculatedBasket = await getBasketWithTotals(
-                                currentBasket.basketId,
+                                basketToUse.basketId,
                                 authToken,
                                 site
                             )
@@ -502,12 +487,12 @@ export const getAppleButtonConfig = (
         onError: (error) => {
             // Clean up temporary basket when Apple Pay is cancelled or fails
             if (error.name === 'CANCEL') {
-                cleanupTemporaryBasket(isPdpMode, sharedBasketRef, authToken, site, setTempBasket)
+                cleanupTemporaryBasket(isPdpMode, basketRef, authToken, site, setTempBasket)
                 sendExpressMessage(EXPRESS_MESSAGES.PAYMENT_CANCEL, {
                     PAYMENT_METHOD
                 })
             } else {
-                cleanupTemporaryBasket(isPdpMode, sharedBasketRef, authToken, site, setTempBasket)
+                cleanupTemporaryBasket(isPdpMode, basketRef, authToken, site, setTempBasket)
                 sendExpressMessage(EXPRESS_MESSAGES.PAYMENT_FAILURE, {
                     PAYMENT_METHOD
                 })
@@ -518,66 +503,36 @@ export const getAppleButtonConfig = (
 }
 
 export const ApplePayExpress = ({
+    // All props now come from expressPaymentContext
+    adyenPaymentMethods,
+    authToken,
+    locale: providedLocale,
+    site: providedSite,
+    basket,
     sku,
     quantity = 1,
     isPdpMode = false,
-    basketData,
-    authToken: providedAuthToken,
     manager
 }) => {
-    const {locale, site} = useMultiSite()
-    const navigate = useNavigation()
-
-    const [tempBasket, setTempBasket] = useState(null)
-    const [currentSku, setCurrentSku] = useState(sku)
-
-    // Check if we have the minimum required basket data (from basket only)
-    const hasRequiredBasketData =
-        basketData && basketData.orderTotal && basketData.currency && basketData.basketId
+    // Use shared hook for common setup logic
+    const {
+        locale,
+        site,
+        tempBasket,
+        setTempBasket,
+        currentSku,
+        hasRequiredBasketData
+    } = useExpressPaymentSetup({
+        sku,
+        quantity,
+        isPdpMode,
+        basket,
+        authToken,
+        locale: providedLocale,
+        site: providedSite
+    })
 
     const paymentContainer = useRef(null)
-    const prevDepsRef = useRef({})
-
-    // In PDP mode, we simply ignore the data since we don't have a provider
-    const regularAdyenData = useAdyenExpressCheckout()
-
-    // Use provided auth token for PDP mode, or provider token for regular mode
-    const authToken = isPdpMode
-        ? providedAuthToken
-        : regularAdyenData?.authToken || providedAuthToken
-
-    // For PDP mode, use standalone payment methods
-    // For regular mode, use the standard Adyen hook data
-    const {
-        paymentMethods: standalonePaymentMethods,
-        loading: standaloneLoading,
-        error: standaloneError
-    } = useStandalonePaymentMethods(authToken, site, locale, isPdpMode && !!authToken)
-
-    // Handle SKU prop changes (for postMessage updates)
-    useEffect(() => {
-        if (sku !== currentSku) {
-            // Clean up previous temporary basket if switching SKUs
-            if (currentSku && tempBasket?.basketId && authToken && site) {
-                deleteTemporaryBasket(tempBasket.basketId, authToken, site).catch((error) =>
-                    console.warn('Failed to cleanup previous temporary basket:', error)
-                )
-                setTempBasket(null)
-            }
-            setCurrentSku(sku)
-        }
-    }, [sku, currentSku, tempBasket?.basketId, authToken, site])
-
-    const adyenEnvironment = isPdpMode
-        ? standalonePaymentMethods?.environment
-        : regularAdyenData.adyenEnvironment
-
-    const adyenPaymentMethods = isPdpMode
-        ? standalonePaymentMethods
-        : regularAdyenData.adyenPaymentMethods
-    const basket = isPdpMode ? null : basketData
-    const shippingMethods = isPdpMode ? null : regularAdyenData.shippingMethods
-    const fetchShippingMethods = isPdpMode ? null : regularAdyenData.fetchShippingMethods
 
     // Cleanup effect to remove temporary basket when component unmounts
     useEffect(() => {
@@ -597,43 +552,12 @@ export const ApplePayExpress = ({
         // Compare with previous dependencies to see what changed
         // Only track dependencies that are actually in the dependency array
         const baseDeps = {
-            adyenEnvironment,
+            adyenEnvironment: adyenPaymentMethods?.environment,
             adyenPaymentMethods,
             basket,
             isPdpMode,
             hasRequiredBasketData
         }
-
-        const pdpDeps = isPdpMode
-            ? {
-                  tempBasket,
-                  currentSku,
-                  shippingMethods,
-                  standalonePaymentMethods,
-                  standaloneLoading,
-                  standaloneError
-              }
-            : {}
-
-        const currentDeps = {...baseDeps, ...pdpDeps}
-
-        const prevDeps = prevDepsRef.current
-        const changedDeps = []
-
-        Object.keys(currentDeps).forEach((key) => {
-            if (prevDeps[key] !== currentDeps[key]) {
-                changedDeps.push(`${key}: ${prevDeps[key]} → ${currentDeps[key]}`)
-            }
-        })
-
-        if (changedDeps.length > 0) {
-            console.log('🔄 Changed dependencies:', changedDeps)
-        } else {
-            console.log('🔄 No dependencies changed (effect triggered by initial render)')
-        }
-
-        // Store current deps for next comparison
-        prevDepsRef.current = currentDeps
 
         const createCheckout = async () => {
             if (isCanceled) {
@@ -646,22 +570,15 @@ export const ApplePayExpress = ({
 
             // For PDP mode, we don't need a basket initially but we do need payment methods
             // For regular mode, we need a basket to continue
-            if (isPdpMode) {
-                if (!standalonePaymentMethods || standaloneLoading) {
-                    return
-                }
-                if (standaloneError) {
-                    handleApplePayUnavailable()
-                    return
-                }
-            } else {
-                // Validate required basket properties
-                if (!hasRequiredBasketData) {
-                    return
-                }
+            if (!validateExpressPaymentSetup({
+                isPdpMode,
+                adyenPaymentMethods: adyenPaymentMethods,
+                hasRequiredBasketData
+            })) {
+                return
             }
 
-            if (!adyenEnvironment) {
+            if (!adyenPaymentMethods?.environment) {
                 return
             }
 
@@ -669,8 +586,8 @@ export const ApplePayExpress = ({
                 let checkout
                 try {
                     checkout = await AdyenCheckout({
-                        environment: adyenEnvironment?.ADYEN_ENVIRONMENT,
-                        clientKey: adyenEnvironment?.ADYEN_CLIENT_KEY,
+                        environment: adyenPaymentMethods?.environment?.ADYEN_ENVIRONMENT,
+                        clientKey: adyenPaymentMethods?.environment?.ADYEN_CLIENT_KEY,
                         locale: locale.id,
                         analytics: {
                             analyticsData: {
@@ -695,11 +612,10 @@ export const ApplePayExpress = ({
                 const appleButtonConfig = getAppleButtonConfig(
                     authToken,
                     site,
-                    basketData,
-                    shippingMethods?.applicableShippingMethods || [],
+                    basket,
+                    adyenPaymentMethods?.applicableShippingMethods || [],
                     applePaymentMethodConfig,
-                    navigate,
-                    fetchShippingMethods,
+                    adyenPaymentMethods?.fetchShippingMethods,
                     currentSku,
                     setTempBasket,
                     tempBasket,
@@ -755,32 +671,29 @@ export const ApplePayExpress = ({
         return () => {
             isCanceled = true
         }
-    }, [
-        adyenEnvironment,
+    }, getExpressPaymentDependencies({
+        adyenEnvironment: adyenPaymentMethods?.environment,
         adyenPaymentMethods,
-        isPdpMode,
+        basket,
+        sku,
         quantity,
-        ...(isPdpMode
-            ? [
-                  tempBasket,
-                  currentSku,
-                  shippingMethods,
-                  standalonePaymentMethods,
-                  standaloneLoading,
-                  standaloneError
-              ]
-            : [])
-    ])
+        isPdpMode,
+        tempBasket,
+        currentSku
+    }))
 
     return <div ref={paymentContainer} style={{height: '40px'}}></div>
 }
 
 ApplePayExpress.propTypes = {
-    shippingMethods: PropTypes.array,
+    // All props now come from sharedPaymentData
+    adyenPaymentMethods: PropTypes.object,
+    authToken: PropTypes.string,
+    locale: PropTypes.object,
+    site: PropTypes.object,
+    basket: PropTypes.object,
     sku: PropTypes.string,
     quantity: PropTypes.number,
     isPdpMode: PropTypes.bool,
-    basketData: PropTypes.object,
-    authToken: PropTypes.string,
     manager: PropTypes.object
 }

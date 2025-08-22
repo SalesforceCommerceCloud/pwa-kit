@@ -7,19 +7,16 @@
 import React, {useEffect, useState} from 'react'
 import {useLocation} from 'react-router-dom'
 
-import {AdyenExpressCheckoutProvider} from '@adyen/adyen-salesforce-pwa'
-
 import {ApplePayExpress} from '@salesforce/retail-react-app/app/components/apple-pay-express/index'
 import {GooglePayExpress} from '@salesforce/retail-react-app/app/components/google-pay-express/index'
 import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
-import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
 import {useExpressPaymentManager} from '@salesforce/retail-react-app/app/components/express/hooks/use-express-payment-manager'
+import {useStandalonePaymentMethods} from '@salesforce/retail-react-app/app/components/express/hooks/use-standalone-payment-methods'
 
 // Define the payment methods we will attempt to load
 const PAYMENT_METHODS = ['applepay', 'googlepay']
 
 function Express() {
-    const navigate = useNavigation()
     const {locale, site} = useMultiSite()
     const [basket, setBasketData] = useState(null)
     const location = useLocation()
@@ -49,6 +46,26 @@ function Express() {
 
     // Initialize the express payment manager
     const {manager, managerError} = useExpressPaymentManager(PAYMENT_METHODS)
+
+    // Fetch payment methods and environment data directly
+    const {
+        paymentMethods: adyenPaymentMethods,
+        loading: paymentMethodsLoading,
+        error: paymentMethodsError
+    } = useStandalonePaymentMethods(authToken, site, locale, !!authToken)
+
+    // Prepare context data for express payment components
+    const expressPaymentContext = {
+        adyenPaymentMethods,
+        authToken,
+        locale,
+        site,
+        basket,
+        sku: currentSku,
+        quantity: currentQuantity,
+        isPdpMode,
+        manager
+    }
 
     // PostMessage listener for SKU updates
     useEffect(() => {
@@ -136,7 +153,11 @@ function Express() {
         currentSku,
         currentQuantity,
         manager: !!manager,
-        managerError
+        managerError,
+        adyenEnvironment,
+        adyenPaymentMethods: !!adyenPaymentMethods,
+        paymentMethodsLoading,
+        paymentMethodsError
     })
 
     // Log the conditional logic
@@ -148,50 +169,10 @@ function Express() {
 
     return (
         <div>
-            {!isPdpMode && basket && (
-                <AdyenExpressCheckoutProvider
-                    authToken={authToken}
-                    customerId={customerId}
-                    locale={locale}
-                    site={site}
-                    basket={basket}
-                    navigate={navigate}
-                >
-                    <div style={{marginBottom: '8px'}}>
-                        <ApplePayExpress
-                            sku={currentSku}
-                            quantity={currentQuantity}
-                            isPdpMode={isPdpMode}
-                            basketData={basket}
-                            authToken={authToken}
-                            manager={manager}
-                        />
-                    </div>
-                    <GooglePayExpress manager={manager} overrideData={{authToken, basket}} />
-                </AdyenExpressCheckoutProvider>
-            )}
-            {isPdpMode && (
-                <>
-                    <div style={{marginBottom: '8px'}}>
-                        <ApplePayExpress
-                            sku={currentSku}
-                            quantity={currentQuantity}
-                            isPdpMode={isPdpMode}
-                            basketData={basket}
-                            authToken={authToken}
-                            manager={manager}
-                        />
-                    </div>
-                    <GooglePayExpress
-                        sku={currentSku}
-                        quantity={currentQuantity}
-                        isPdpMode={isPdpMode}
-                        basketData={basket}
-                        authToken={authToken}
-                        manager={manager}
-                    />
-                </>
-            )}
+            <div style={{marginBottom: '8px'}}>
+                <ApplePayExpress {...expressPaymentContext} />
+            </div>
+            <GooglePayExpress {...expressPaymentContext} />
         </div>
     )
 }
