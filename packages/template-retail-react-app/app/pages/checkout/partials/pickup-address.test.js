@@ -140,8 +140,8 @@ const buildDerivedData = (basket) => {
     let totalDeliveryShipments = 0
     let totalPickupShipments = 0
     const pickupStoreIds = []
-    let someShipmentsNeedAddress = false
-    let someShipmentsNeedShippingMethod = false
+    let isMissingShippingAddress = false
+    let isMissingShippingMethod = false
     shipments.forEach((shipment) => {
         const hasItems = shipmentIdToTotalItems[shipment?.shipmentId] > 0
         if (!hasItems) return
@@ -151,8 +151,8 @@ const buildDerivedData = (basket) => {
             if (shipment?.c_fromStoreId) pickupStoreIds.push(shipment.c_fromStoreId)
         } else {
             totalDeliveryShipments += 1
-            if (!shipment?.shippingAddress) someShipmentsNeedAddress = true
-            if (!shipment?.shippingMethod) someShipmentsNeedShippingMethod = true
+            if (!shipment?.shippingAddress) isMissingShippingAddress = true
+            if (!shipment?.shippingMethod) isMissingShippingMethod = true
         }
     })
     pickupStoreIds.sort()
@@ -163,8 +163,8 @@ const buildDerivedData = (basket) => {
         totalDeliveryShipments,
         totalPickupShipments,
         pickupStoreIds,
-        someShipmentsNeedAddress,
-        someShipmentsNeedShippingMethod
+        isMissingShippingAddress,
+        isMissingShippingMethod
     }
 }
 

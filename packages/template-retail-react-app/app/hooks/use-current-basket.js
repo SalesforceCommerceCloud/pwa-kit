@@ -10,6 +10,7 @@ import {isPickupShipment} from '@salesforce/retail-react-app/app/utils/shipment-
 import {isAddressEmpty} from '@salesforce/retail-react-app/app/utils/address-utils'
 import {STORE_LOCATOR_IS_ENABLED} from '@salesforce/retail-react-app/app/constants'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
+import {useMemo} from 'react'
 /**
  * This hook combine some commerce-react-sdk hooks to provide more derived data for Retail App baskets
  * @param id - basket id to get the current used basket among baskets returned, use first basket in the array if not defined
@@ -28,54 +29,60 @@ export const useCurrentBasket = ({id = ''} = {}) => {
     const currentBasket =
         basketsData?.baskets?.find((basket) => basket?.basketId === id) || basketsData?.baskets?.[0]
 
-    // count the number of items in each shipment and rollup total
-    let totalItems = 0
-    const shipmentIdToTotalItems =
-        currentBasket?.productItems?.reduce((acc, item) => {
-            totalItems += item.quantity
-            acc[item.shipmentId] = acc[item.shipmentId] || 0
-            acc[item.shipmentId] += item.quantity
-            return acc
-        }, {}) ?? {}
+    const memoizedDerived = useMemo(() => {
+        // count the number of items in each shipment and rollup total
+        let totalItems = 0
+        const shipmentIdToTotalItems =
+            currentBasket?.productItems?.reduce((acc, item) => {
+                totalItems += item.quantity
+                acc[item.shipmentId] = acc[item.shipmentId] || 0
+                acc[item.shipmentId] += item.quantity
+                return acc
+            }, {}) ?? {}
 
-    // count the number on non-empty pickup and delivery shipments
-    // also count the number of delivery shipments missing an address or shipping method
-    let totalDeliveryShipments = 0
-    let totalPickupShipments = 0
-    const pickupStoreIds = []
-    let someShipmentsNeedAddress = false
-    let someShipmentsNeedShippingMethod = false
-    currentBasket?.shipments?.forEach((shipment) => {
-        if (shipmentIdToTotalItems[shipment.shipmentId]) {
-            if (storeLocatorEnabled && isPickupShipment(shipment)) {
-                totalPickupShipments += 1
-                pickupStoreIds.push(shipment.c_fromStoreId)
-            } else {
-                totalDeliveryShipments += 1
-                if (isAddressEmpty(shipment.shippingAddress)) {
-                    someShipmentsNeedAddress = true
-                }
-                if (!shipment.shippingMethod) {
-                    someShipmentsNeedShippingMethod = true
+        // count the number on non-empty pickup and delivery shipments
+        // also count the number of delivery shipments missing an address or shipping method
+        let totalDeliveryShipments = 0
+        let totalPickupShipments = 0
+        const pickupStoreIds = []
+        let isMissingShippingAddress = false
+        let isMissingShippingMethod = false
+        currentBasket?.shipments?.forEach((shipment) => {
+            if (shipmentIdToTotalItems[shipment.shipmentId]) {
+                if (storeLocatorEnabled && isPickupShipment(shipment)) {
+                    totalPickupShipments += 1
+                    pickupStoreIds.push(shipment.c_fromStoreId)
+                } else {
+                    totalDeliveryShipments += 1
+                    if (isAddressEmpty(shipment.shippingAddress)) {
+                        isMissingShippingAddress = true
+                    }
+                    if (!shipment.shippingMethod) {
+                        isMissingShippingMethod = true
+                    }
                 }
             }
+        })
+        // sorting helps with query caching
+        pickupStoreIds.sort()
+
+        return {
+            totalItems,
+            shipmentIdToTotalItems,
+            totalDeliveryShipments,
+            totalPickupShipments,
+            pickupStoreIds,
+            isMissingShippingAddress,
+            isMissingShippingMethod
         }
-    })
-    // sorting helps with query caching
-    pickupStoreIds.sort()
+    }, [currentBasket?.productItems, currentBasket?.shipments, storeLocatorEnabled])
 
     return {
         ...restOfQuery,
         data: currentBasket,
         derivedData: {
             hasBasket: basketsData?.total > 0,
-            totalItems,
-            shipmentIdToTotalItems,
-            totalDeliveryShipments,
-            totalPickupShipments,
-            pickupStoreIds,
-            someShipmentsNeedAddress,
-            someShipmentsNeedShippingMethod
+            ...memoizedDerived
         }
     }
 }

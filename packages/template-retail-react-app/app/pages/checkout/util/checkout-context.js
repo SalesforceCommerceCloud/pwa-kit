@@ -41,9 +41,9 @@ export const CheckoutProvider = ({children}) => {
 
         if (customer.isGuest && !basket.customerInfo?.email) {
             step = STEPS.CONTACT_INFO
-        } else if (derivedData?.someShipmentsNeedAddress) {
+        } else if (derivedData?.isMissingShippingAddress) {
             step = STEPS.SHIPPING_ADDRESS
-        } else if (derivedData?.someShipmentsNeedShippingMethod) {
+        } else if (derivedData?.isMissingShippingMethod) {
             step = STEPS.SHIPPING_OPTIONS
         } else if (!basket.paymentInstruments || !basket.billingAddress) {
             step = STEPS.PAYMENT
@@ -56,8 +56,8 @@ export const CheckoutProvider = ({children}) => {
         basket?.shipments,
         basket?.paymentInstruments,
         basket?.billingAddress,
-        derivedData?.someShipmentsNeedAddress,
-        derivedData?.someShipmentsNeedShippingMethod
+        derivedData?.isMissingShippingAddress,
+        derivedData?.isMissingShippingMethod
     ])
 
     /**************** Einstein ****************/

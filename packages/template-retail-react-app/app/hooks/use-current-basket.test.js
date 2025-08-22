@@ -60,8 +60,8 @@ const MockComponent = () => {
             totalDeliveryShipments,
             totalPickupShipments,
             pickupStoreIds,
-            someShipmentsNeedAddress,
-            someShipmentsNeedShippingMethod
+            isMissingShippingAddress,
+            isMissingShippingMethod
         }
     } = useCurrentBasket()
     return (
@@ -80,10 +80,8 @@ const MockComponent = () => {
             <div data-testid="delivery-shipments">{totalDeliveryShipments}</div>
             <div data-testid="pickup-shipments">{totalPickupShipments}</div>
             <div data-testid="pickup-store-ids">{JSON.stringify(pickupStoreIds)}</div>
-            <div data-testid="needs-address">{someShipmentsNeedAddress.toString()}</div>
-            <div data-testid="needs-shipping-method">
-                {someShipmentsNeedShippingMethod.toString()}
-            </div>
+            <div data-testid="needs-address">{isMissingShippingAddress.toString()}</div>
+            <div data-testid="needs-shipping-method">{isMissingShippingMethod.toString()}</div>
         </div>
     )
 }
