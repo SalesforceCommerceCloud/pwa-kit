@@ -76,7 +76,7 @@ describe('OtpAuth', () => {
                 return {email: 'test@example.com'}
             })
         }
-        
+
         // Reset Einstein tracking mocks
         mockSendViewPage.mockClear()
         mockGetUsidWhenReady.mockResolvedValue('mock-usid-12345')
@@ -84,7 +84,7 @@ describe('OtpAuth', () => {
         mockUseCurrentCustomer.mockReturnValue({
             data: null // Default to guest user
         })
-        
+
         jest.clearAllMocks()
 
         // Set up mock implementation after clearAllMocks
@@ -495,8 +495,8 @@ describe('OtpAuth', () => {
 
     describe('Einstein Tracking - Privacy-Compliant User Identification', () => {
         test('uses USID for guest users when DNT is disabled', async () => {
-            mockUseCurrentCustomer.mockReturnValue({ data: null })
-            
+            mockUseCurrentCustomer.mockReturnValue({data: null})
+
             renderWithProviders(
                 <OtpAuth
                     isOpen={true}
@@ -552,7 +552,7 @@ describe('OtpAuth', () => {
 
             jest.doMock('@salesforce/retail-react-app/app/hooks/use-current-customer', () => ({
                 useCurrentCustomer: () => ({
-                    data: { customerId: 'customer-123', email: 'test@example.com' }
+                    data: {customerId: 'customer-123', email: 'test@example.com'}
                 })
             }))
 
@@ -572,8 +572,8 @@ describe('OtpAuth', () => {
         test('uses __DNT__ placeholder when Do Not Track is enabled', async () => {
             jest.doMock('@salesforce/commerce-sdk-react', () => ({
                 ...jest.requireActual('@salesforce/commerce-sdk-react'),
-                useCustomerType: () => ({ isRegistered: false }),
-                useDNT: () => ({ effectiveDnt: true })
+                useCustomerType: () => ({isRegistered: false}),
+                useDNT: () => ({effectiveDnt: true})
             }))
 
             renderWithProviders(
@@ -653,7 +653,7 @@ describe('OtpAuth', () => {
 
         test('tracks successful OTP verification', async () => {
             const user = userEvent.setup()
-            mockHandleOtpVerification.mockResolvedValue({ success: true })
+            mockHandleOtpVerification.mockResolvedValue({success: true})
 
             renderWithProviders(
                 <OtpAuth
@@ -684,9 +684,9 @@ describe('OtpAuth', () => {
 
         test('tracks failed OTP verification', async () => {
             const user = userEvent.setup()
-            mockHandleOtpVerification.mockResolvedValue({ 
-                success: false, 
-                error: 'Invalid OTP code' 
+            mockHandleOtpVerification.mockResolvedValue({
+                success: false,
+                error: 'Invalid OTP code'
             })
 
             renderWithProviders(
@@ -807,7 +807,7 @@ describe('OtpAuth', () => {
     describe('Einstein Tracking - Integration Tests', () => {
         test('tracks complete OTP flow from modal open to successful verification', async () => {
             const user = userEvent.setup()
-            mockHandleOtpVerification.mockResolvedValue({ success: true })
+            mockHandleOtpVerification.mockResolvedValue({success: true})
 
             renderWithProviders(
                 <OtpAuth
@@ -828,21 +828,33 @@ describe('OtpAuth', () => {
             await waitFor(() => {
                 // Should track modal view, verification attempt, and success
                 expect(mockSendViewPage).toHaveBeenCalledTimes(3)
-                expect(mockSendViewPage).toHaveBeenNthCalledWith(1, '/otp-authentication', expect.objectContaining({
-                    activity: 'otp_modal_viewed'
-                }))
-                expect(mockSendViewPage).toHaveBeenNthCalledWith(2, '/otp-verification', expect.objectContaining({
-                    activity: 'otp_verification_attempted'
-                }))
-                expect(mockSendViewPage).toHaveBeenNthCalledWith(3, '/otp-verification-success', expect.objectContaining({
-                    activity: 'otp_verification_successful'
-                }))
+                expect(mockSendViewPage).toHaveBeenNthCalledWith(
+                    1,
+                    '/otp-authentication',
+                    expect.objectContaining({
+                        activity: 'otp_modal_viewed'
+                    })
+                )
+                expect(mockSendViewPage).toHaveBeenNthCalledWith(
+                    2,
+                    '/otp-verification',
+                    expect.objectContaining({
+                        activity: 'otp_verification_attempted'
+                    })
+                )
+                expect(mockSendViewPage).toHaveBeenNthCalledWith(
+                    3,
+                    '/otp-verification-success',
+                    expect.objectContaining({
+                        activity: 'otp_verification_successful'
+                    })
+                )
             })
         })
 
         test('tracks complete OTP flow with resend and eventual success', async () => {
             const user = userEvent.setup()
-            mockHandleOtpVerification.mockResolvedValue({ success: true })
+            mockHandleOtpVerification.mockResolvedValue({success: true})
 
             renderWithProviders(
                 <OtpAuth
@@ -867,18 +879,30 @@ describe('OtpAuth', () => {
             await waitFor(() => {
                 // Should track: modal view, resend, verification attempt, success
                 expect(mockSendViewPage).toHaveBeenCalledTimes(4)
-                expect(mockSendViewPage).toHaveBeenCalledWith('/otp-authentication', expect.objectContaining({
-                    activity: 'otp_modal_viewed'
-                }))
-                expect(mockSendViewPage).toHaveBeenCalledWith('/otp-resend', expect.objectContaining({
-                    activity: 'otp_code_resent'
-                }))
-                expect(mockSendViewPage).toHaveBeenCalledWith('/otp-verification', expect.objectContaining({
-                    activity: 'otp_verification_attempted'
-                }))
-                expect(mockSendViewPage).toHaveBeenCalledWith('/otp-verification-success', expect.objectContaining({
-                    activity: 'otp_verification_successful'
-                }))
+                expect(mockSendViewPage).toHaveBeenCalledWith(
+                    '/otp-authentication',
+                    expect.objectContaining({
+                        activity: 'otp_modal_viewed'
+                    })
+                )
+                expect(mockSendViewPage).toHaveBeenCalledWith(
+                    '/otp-resend',
+                    expect.objectContaining({
+                        activity: 'otp_code_resent'
+                    })
+                )
+                expect(mockSendViewPage).toHaveBeenCalledWith(
+                    '/otp-verification',
+                    expect.objectContaining({
+                        activity: 'otp_verification_attempted'
+                    })
+                )
+                expect(mockSendViewPage).toHaveBeenCalledWith(
+                    '/otp-verification-success',
+                    expect.objectContaining({
+                        activity: 'otp_verification_successful'
+                    })
+                )
             })
         })
 
@@ -899,7 +923,7 @@ describe('OtpAuth', () => {
 
         test('maintains consistent user identifier across all tracking calls', async () => {
             const user = userEvent.setup()
-            mockHandleOtpVerification.mockResolvedValue({ success: true })
+            mockHandleOtpVerification.mockResolvedValue({success: true})
 
             renderWithProviders(
                 <OtpAuth
@@ -924,8 +948,8 @@ describe('OtpAuth', () => {
                 // All calls should use the same user identifier
                 const calls = mockSendViewPage.mock.calls
                 expect(calls.length).toBeGreaterThan(0)
-                
-                const userIds = calls.map(call => call[1].userId)
+
+                const userIds = calls.map((call) => call[1].userId)
                 const uniqueUserIds = [...new Set(userIds)]
                 expect(uniqueUserIds).toHaveLength(1)
                 expect(uniqueUserIds[0]).toBe('mock-usid-12345')
