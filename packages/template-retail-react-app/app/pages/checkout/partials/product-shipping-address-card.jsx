@@ -365,7 +365,6 @@ ProductShippingAddressCard.displayName = 'ProductShippingAddressCard'
 ProductShippingAddressCard.propTypes = {
     item: PropTypes.object.isRequired,
     variant: PropTypes.object.isRequired,
-    productDetail: PropTypes.object.isRequired,
     imageUrl: PropTypes.string.isRequired,
     addressKey: PropTypes.string.isRequired,
     selectedAddressId: PropTypes.string,
