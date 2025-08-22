@@ -772,7 +772,7 @@ export const ApplePayExpress = ({
             : [])
     ])
 
-    return <div ref={paymentContainer}></div>
+    return <div ref={paymentContainer} style={{height: '40px'}}></div>
 }
 
 ApplePayExpress.propTypes = {

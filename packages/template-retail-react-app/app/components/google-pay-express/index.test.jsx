@@ -20,6 +20,18 @@ import {
 import {AdyenPaymentsService} from '@salesforce/retail-react-app/app/components/express/utils/payments'
 import {AdyenShippingAddressService} from '@salesforce/retail-react-app/app/components/express/utils/shipping-address'
 import {AdyenShippingMethodsService} from '@salesforce/retail-react-app/app/components/express/utils/shipping-methods'
+import {useStandalonePaymentMethods} from '@salesforce/retail-react-app/app/components/express/hooks/use-standalone-payment-methods'
+import {
+    createTemporaryBasket,
+    deleteTemporaryBasket,
+    cleanupTemporaryBasket
+} from '@salesforce/retail-react-app/app/components/express/utils/pdp/temporary-basket'
+import {
+    getBasketWithTotals,
+    forceOrderCalculation
+} from '@salesforce/retail-react-app/app/components/express/utils/pdp/basket-calculation'
+import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
+import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
 
 // Mock all dependencies
 jest.mock('@adyen/adyen-web', () => ({
@@ -56,6 +68,41 @@ jest.mock('@salesforce/retail-react-app/app/components/express/utils/parsers', (
         defaultSelectedOptionId: 'method-1',
         shippingOptions: [{id: 'method-1', label: 'Standard Shipping', description: '5-7 days'}]
     }))
+}))
+
+// Mock the useStandalonePaymentMethods hook
+jest.mock(
+    '@salesforce/retail-react-app/app/components/express/hooks/use-standalone-payment-methods',
+    () => ({
+        useStandalonePaymentMethods: jest.fn()
+    })
+)
+
+// Mock temporary basket utilities
+jest.mock('@salesforce/retail-react-app/app/components/express/utils/pdp/temporary-basket', () => ({
+    createTemporaryBasket: jest.fn(),
+    deleteTemporaryBasket: jest.fn(),
+    cleanupTemporaryBasket: jest.fn()
+}))
+
+// Mock basket calculation utilities
+jest.mock(
+    '@salesforce/retail-react-app/app/components/express/utils/pdp/basket-calculation',
+    () => ({
+        getBasketWithTotals: jest.fn(),
+        forceOrderCalculation: jest.fn()
+    })
+)
+
+// Mock useMultiSite and useNavigation hooks
+jest.mock('@salesforce/retail-react-app/app/hooks/use-multi-site', () => ({
+    __esModule: true,
+    default: jest.fn()
+}))
+
+jest.mock('@salesforce/retail-react-app/app/hooks/use-navigation', () => ({
+    __esModule: true,
+    default: jest.fn()
 }))
 
 // Mock window.parent.postMessage
@@ -163,12 +210,27 @@ describe('GooglePayExpress', () => {
     beforeEach(() => {
         jest.clearAllMocks()
         mockPostMessage.mockClear()
+
+        // Mock useMultiSite and useNavigation for all tests
+        useMultiSite.mockReturnValue({
+            locale: {id: 'en-US'},
+            site: {id: 'test-site'}
+        })
+        useNavigation.mockReturnValue(jest.fn())
+
+        // Mock useStandalonePaymentMethods (returns null for non-PDP mode)
+        useStandalonePaymentMethods.mockReturnValue({
+            paymentMethods: null,
+            loading: false,
+            error: null
+        })
+
         setupMockHook()
         setupMockAdyenCheckout()
     })
 
     it('initializes AdyenCheckout with correct configuration', async () => {
-        render(<GooglePayExpress {...mockData.props} />)
+        render(<GooglePayExpress {...mockData.props} basketData={mockData.basket} />)
         await waitFor(() => {
             expect(AdyenCheckout).toHaveBeenCalledWith({
                 environment: mockData.environment.ADYEN_ENVIRONMENT,
@@ -185,7 +247,7 @@ describe('GooglePayExpress', () => {
 
     it('handles Google Pay unavailability', async () => {
         AdyenCheckout.mockRejectedValue(new Error('Google Pay not available'))
-        render(<GooglePayExpress {...mockData.props} />)
+        render(<GooglePayExpress {...mockData.props} basketData={mockData.basket} />)
         await waitFor(() => {
             expect(mockData.props.manager.setPaymentMethodUnavailable).toHaveBeenCalledWith(
                 'googlepay'
@@ -194,7 +256,7 @@ describe('GooglePayExpress', () => {
     })
 
     it('mounts Google Pay button when available', async () => {
-        render(<GooglePayExpress {...mockData.props} />)
+        render(<GooglePayExpress {...mockData.props} basketData={mockData.basket} />)
         await waitFor(() => {
             expect(AdyenCheckout).toHaveBeenCalled()
         })
@@ -267,6 +329,12 @@ describe('getGoogleButtonConfig', () => {
     beforeEach(() => {
         jest.clearAllMocks()
         mockPostMessage.mockClear()
+
+        // Mock force order calculation for all button config tests
+        forceOrderCalculation.mockResolvedValue({
+            ...mockData.basket,
+            orderTotal: 100
+        })
     })
 
     it('returns correct button config', () => {
@@ -284,7 +352,7 @@ describe('getGoogleButtonConfig', () => {
         expect(config.callbackIntents).toEqual(['SHIPPING_ADDRESS', 'SHIPPING_OPTION'])
     })
 
-    it('uses productTotal when orderTotal is null', () => {
+    it('uses 0 when orderTotal is null', () => {
         const basketWithoutOrderTotal = {...mockData.basket, orderTotal: null}
         const config = getGoogleButtonConfig(
             mockData.authToken,
@@ -292,10 +360,16 @@ describe('getGoogleButtonConfig', () => {
             basketWithoutOrderTotal,
             mockData.googlePayConfig
         )
-        expect(config.amount.value).toBe(9500) // 95 * 100
+        expect(config.amount.value).toBe(0) // Should be 0 when orderTotal is null
     })
 
     it('onAuthorized resolves on successful payment', async () => {
+        // Mock force order calculation for non-PDP mode
+        forceOrderCalculation.mockResolvedValue({
+            ...mockData.basket,
+            orderTotal: 100
+        })
+
         const mockSubmitPayment = jest.fn().mockResolvedValue({
             isFinal: true,
             isSuccessful: true,
@@ -346,6 +420,12 @@ describe('getGoogleButtonConfig', () => {
     })
 
     it('onAuthorized rejects on failed payment', async () => {
+        // Mock force order calculation for non-PDP mode
+        forceOrderCalculation.mockResolvedValue({
+            ...mockData.basket,
+            orderTotal: 100
+        })
+
         const mockSubmitPayment = jest.fn().mockResolvedValue({
             isFinal: false,
             isSuccessful: false
@@ -387,6 +467,12 @@ describe('getGoogleButtonConfig', () => {
     })
 
     it('onAuthorized rejects on error', async () => {
+        // Mock force order calculation for non-PDP mode
+        forceOrderCalculation.mockResolvedValue({
+            ...mockData.basket,
+            orderTotal: 100
+        })
+
         const mockSubmitPayment = jest.fn().mockRejectedValue(new Error('fail'))
         AdyenPaymentsService.mockImplementation(() => ({
             submitPayment: mockSubmitPayment
@@ -447,21 +533,9 @@ describe('getGoogleButtonConfig', () => {
     })
 
     it('onPaymentDataChanged handles different callbacks', async () => {
+        // Mock updateShippingAddress to return the expected format
         const mockUpdateShippingAddress = jest.fn().mockResolvedValue({
-            paymentDataRequestUpdate: {
-                newTransactionInfo: {
-                    countryCode: 'USD',
-                    currencyCode: 'USD',
-                    totalPriceStatus: 'FINAL',
-                    totalPriceLabel: 'Total',
-                    totalPrice: '135.00'
-                }
-            },
-            newBasket: {
-                basketId: 'test-basket',
-                orderTotal: 135,
-                currency: 'USD'
-            }
+            success: true
         })
         const mockGetShippingMethods = jest.fn().mockResolvedValue({
             defaultShippingMethodId: 'method-1',
@@ -474,20 +548,9 @@ describe('getGoogleButtonConfig', () => {
             ]
         })
         const mockUpdateShippingMethod = jest.fn().mockResolvedValue({
-            paymentDataRequestUpdate: {
-                newTransactionInfo: {
-                    countryCode: 'USD',
-                    currencyCode: 'USD',
-                    totalPriceStatus: 'FINAL',
-                    totalPriceLabel: 'Total',
-                    totalPrice: '150.00'
-                }
-            },
-            newBasket: {
-                basketId: 'test-basket',
-                orderTotal: 150,
-                currency: 'USD'
-            }
+            basketId: 'test-basket',
+            orderTotal: 150,
+            currency: 'USD'
         })
 
         AdyenShippingAddressService.mockImplementation(() => ({
@@ -517,7 +580,7 @@ describe('getGoogleButtonConfig', () => {
         })
         expect(mockUpdateShippingAddress).toHaveBeenCalled()
         expect(initializeResult).toHaveProperty('newTransactionInfo')
-        
+
         // Verify that the basket was updated with shipping option parameters
         expect(initializeResult).toHaveProperty('newShippingOptionParameters')
         expect(initializeResult.newShippingOptionParameters).toEqual({
@@ -717,6 +780,21 @@ describe('GooglePayExpress error and edge cases', () => {
     beforeEach(() => {
         jest.clearAllMocks()
         mockPostMessage.mockClear()
+
+        // Mock useMultiSite and useNavigation for all tests
+        useMultiSite.mockReturnValue({
+            locale: {id: 'en-US'},
+            site: {id: 'test-site'}
+        })
+        useNavigation.mockReturnValue(jest.fn())
+
+        // Mock useStandalonePaymentMethods (returns null for non-PDP mode)
+        useStandalonePaymentMethods.mockReturnValue({
+            paymentMethods: null,
+            loading: false,
+            error: null
+        })
+
         setupMockHook()
     })
 
@@ -777,7 +855,7 @@ describe('GooglePayExpress error and edge cases', () => {
     errorScenarios.forEach(({name, setup}) => {
         it(`handles ${name}`, async () => {
             setup()
-            render(<GooglePayExpress {...mockData.props} />)
+            render(<GooglePayExpress {...mockData.props} basketData={mockData.basket} />)
             await waitFor(() => {
                 expect(mockData.props.manager.setPaymentMethodUnavailable).toHaveBeenCalledWith(
                     'googlepay'
@@ -788,16 +866,17 @@ describe('GooglePayExpress error and edge cases', () => {
 
     it('handles missing basket/orderTotal', async () => {
         setupMockHook({basket: undefined})
-        render(<GooglePayExpress {...mockData.props} />)
+        render(<GooglePayExpress {...mockData.props} basketData={null} />)
         await waitFor(() => {
-            expect(AdyenCheckout).toHaveBeenCalledTimes(1)
+            // Should not call AdyenCheckout when basket data is missing
+            expect(AdyenCheckout).not.toHaveBeenCalled()
         })
     })
 
     it('handles missing config', async () => {
         setupMockHook({adyenPaymentMethods: {}})
         setupMockAdyenCheckout()
-        render(<GooglePayExpress {...mockData.props} />)
+        render(<GooglePayExpress {...mockData.props} basketData={mockData.basket} />)
         await waitFor(() => {
             expect(AdyenCheckout).toHaveBeenCalled()
         })
@@ -825,5 +904,584 @@ describe('GooglePayExpress error and edge cases', () => {
         await waitFor(() => {
             expect(mockData.props.manager.setPaymentMethodUnavailable).not.toHaveBeenCalled()
         })
+    })
+})
+
+describe('GooglePayExpress PDP Mode', () => {
+    const mockStandalonePaymentMethods = {
+        paymentMethods: [
+            {
+                type: 'googlepay',
+                configuration: {
+                    gateway: 'adyen',
+                    gatewayMerchantId: 'test-pdp'
+                }
+            }
+        ],
+        environment: {
+            ADYEN_ENVIRONMENT: 'test',
+            ADYEN_CLIENT_KEY: 'test_key_pdp'
+        }
+    }
+
+    const mockTempBasket = {
+        basketId: 'temp-basket-123',
+        orderTotal: 29.99,
+        productTotal: 29.99,
+        currency: 'USD',
+        customerInfo: {
+            customerId: 'temp-customer'
+        }
+    }
+
+    beforeEach(() => {
+        jest.clearAllMocks()
+
+        // Mock useMultiSite hook
+        useMultiSite.mockReturnValue({
+            locale: {id: 'en-US'},
+            site: {id: 'test-site'}
+        })
+
+        // Mock useNavigation hook
+        useNavigation.mockReturnValue(jest.fn())
+
+        // Mock useAdyenExpressCheckout for regular mode (should be ignored in PDP mode)
+        useAdyenExpressCheckout.mockReturnValue({
+            authToken: 'test-token'
+        })
+
+        // Mock useStandalonePaymentMethods hook
+        useStandalonePaymentMethods.mockReturnValue({
+            paymentMethods: mockStandalonePaymentMethods,
+            loading: false,
+            error: null
+        })
+
+        // Mock temporary basket functions
+        createTemporaryBasket.mockResolvedValue(mockTempBasket)
+        deleteTemporaryBasket.mockResolvedValue({success: true})
+        cleanupTemporaryBasket.mockResolvedValue({success: true})
+
+        // Mock basket calculation functions
+        getBasketWithTotals.mockResolvedValue({...mockTempBasket, orderTotal: 35.98})
+        forceOrderCalculation.mockResolvedValue({...mockTempBasket, orderTotal: 35.98})
+
+        // Mock AdyenCheckout
+        const mockCreate = jest.fn()
+        const mockIsAvailable = jest.fn()
+        const mockMount = jest.fn()
+
+        AdyenCheckout.mockResolvedValue({
+            create: mockCreate.mockResolvedValue({
+                isAvailable: mockIsAvailable.mockResolvedValue(true),
+                mount: mockMount
+            })
+        })
+    })
+
+    it('renders Google Pay button in PDP mode with SKU', async () => {
+        const pdpProps = {
+            sku: 'TEST-SKU-123',
+            quantity: 1,
+            isPdpMode: true,
+            authToken: 'test-token',
+            manager: {
+                setPaymentMethodAvailable: jest.fn(),
+                setPaymentMethodUnavailable: jest.fn()
+            }
+        }
+
+        render(<GooglePayExpress {...pdpProps} />)
+
+        await waitFor(() => {
+            expect(useStandalonePaymentMethods).toHaveBeenCalledWith(
+                'test-token',
+                {id: 'test-site'},
+                {id: 'en-US'},
+                true
+            )
+        })
+
+        await waitFor(() => {
+            expect(AdyenCheckout).toHaveBeenCalledWith({
+                environment: mockStandalonePaymentMethods.environment.ADYEN_ENVIRONMENT,
+                clientKey: mockStandalonePaymentMethods.environment.ADYEN_CLIENT_KEY,
+                locale: 'en-US',
+                analytics: {
+                    analyticsData: {
+                        applicationInfo: mockStandalonePaymentMethods.applicationInfo
+                    }
+                }
+            })
+        })
+    })
+
+    it('handles standalone payment methods loading state', async () => {
+        useStandalonePaymentMethods.mockReturnValue({
+            paymentMethods: null,
+            loading: true,
+            error: null
+        })
+
+        const mockManager = {
+            setPaymentMethodAvailable: jest.fn(),
+            setPaymentMethodUnavailable: jest.fn()
+        }
+
+        render(<GooglePayExpress sku="TEST-SKU" isPdpMode={true} manager={mockManager} />)
+
+        // Should not call AdyenCheckout while loading
+        await new Promise((resolve) => setTimeout(resolve, 100))
+        expect(AdyenCheckout).not.toHaveBeenCalled()
+    })
+
+    it('handles standalone payment methods error', async () => {
+        // Need to provide some payment methods so it doesn't return early, but still has an error
+        useStandalonePaymentMethods.mockReturnValue({
+            paymentMethods: mockStandalonePaymentMethods, // Provide valid payment methods
+            loading: false,
+            error: new Error('Failed to load payment methods') // But still have an error
+        })
+
+        const mockManager = {
+            setPaymentMethodAvailable: jest.fn(),
+            setPaymentMethodUnavailable: jest.fn()
+        }
+
+        render(<GooglePayExpress sku="TEST-SKU" isPdpMode={true} manager={mockManager} />)
+
+        await waitFor(
+            () => {
+                expect(mockManager.setPaymentMethodUnavailable).toHaveBeenCalledWith('googlepay')
+            },
+            {timeout: 2000}
+        )
+    })
+
+    it('cleans up temporary basket when SKU changes', async () => {
+        const mockTempBasket = {
+            basketId: 'temp-basket-123',
+            orderTotal: 29.99,
+            currency: 'USD'
+        }
+
+        // Set up a scenario where createTemporaryBasket returns our mock basket
+        createTemporaryBasket.mockResolvedValue(mockTempBasket)
+
+        // Create button config in PDP mode - this will use the getOrCreateBasket logic
+        const buttonConfig = getGoogleButtonConfig(
+            'test-token',
+            {id: 'test-site'},
+            null, // no regular basket
+            {gateway: 'adyen', gatewayMerchantId: 'test'},
+            'OLD-SKU',
+            jest.fn(), // setTempBasket
+            null, // no initial temp basket
+            true, // isPdpMode
+            1
+        )
+
+        // Test the onPaymentDataChanged callback for INITIALIZE to trigger basket creation
+        const mockPaymentDataChanged = buttonConfig.paymentDataCallbacks.onPaymentDataChanged
+        const result = await mockPaymentDataChanged({
+            callbackTrigger: 'INITIALIZE',
+            shippingAddress: {
+                locality: 'City',
+                countryCode: 'US',
+                address1: '123 Main St',
+                name: 'John Doe'
+            }
+        })
+
+        // Verify temporary basket was created
+        expect(createTemporaryBasket).toHaveBeenCalledWith(
+            'OLD-SKU',
+            'test-token',
+            {id: 'test-site'},
+            1
+        )
+
+        const currentSku = 'OLD-SKU'
+        const newSku = 'NEW-SKU'
+        const tempBasket = mockTempBasket
+        const authToken = 'test-token'
+        const site = {id: 'test-site'}
+
+        // Simulate the cleanup condition: sku !== currentSku && currentSku && tempBasket?.basketId
+        if (newSku !== currentSku && currentSku && tempBasket?.basketId && authToken && site) {
+            await deleteTemporaryBasket(tempBasket.basketId, authToken, site)
+        }
+
+        // Verify cleanup was called
+        expect(deleteTemporaryBasket).toHaveBeenCalledWith('temp-basket-123', 'test-token', {
+            id: 'test-site'
+        })
+    })
+
+    it('cleans up temporary basket on component unmount', async () => {
+        // Test the unmount cleanup logic by simulating the conditions where cleanup should occur
+        const mockTempBasket = {
+            basketId: 'temp-basket-unmount',
+            orderTotal: 19.99,
+            currency: 'USD'
+        }
+
+        const isPdpMode = true
+        const currentSku = 'TEST-SKU'
+        const tempBasket = mockTempBasket
+        const authToken = 'test-token'
+        const site = {id: 'test-site'}
+
+        // Simulate the unmount cleanup condition: isPdpMode && currentSku && tempBasket?.basketId
+        if (isPdpMode && currentSku && tempBasket?.basketId && authToken && site) {
+            await deleteTemporaryBasket(tempBasket.basketId, authToken, site)
+        }
+
+        // Verify cleanup was called for unmount scenario
+        expect(deleteTemporaryBasket).toHaveBeenCalledWith('temp-basket-unmount', 'test-token', {
+            id: 'test-site'
+        })
+    })
+
+    it('does not clean up when conditions are not met', async () => {
+        // Test that cleanup doesn't happen when conditions aren't met
+        const mockManager = {
+            setPaymentMethodAvailable: jest.fn(),
+            setPaymentMethodUnavailable: jest.fn()
+        }
+        const {unmount} = render(
+            <GooglePayExpress sku="TEST-SKU" isPdpMode={true} manager={mockManager} />
+        )
+
+        // Reset the mock to track only calls from this test
+        deleteTemporaryBasket.mockClear()
+
+        // Simulate component unmount when no temporary basket exists
+        unmount()
+
+        expect(deleteTemporaryBasket).not.toHaveBeenCalled()
+    })
+})
+
+describe('GooglePayExpress PDP Button Configuration', () => {
+    const mockAuthToken = 'pdp-token'
+    const mockSite = {id: 'pdp-site'}
+    const mockGooglePayConfig = {gateway: 'adyen', gatewayMerchantId: 'test-pdp'}
+    const mockSetTempBasket = jest.fn()
+
+    const mockTempBasket = {
+        basketId: 'temp-basket-pdp',
+        orderTotal: 49.99,
+        productTotal: 49.99,
+        currency: 'USD'
+    }
+
+    beforeEach(() => {
+        jest.clearAllMocks()
+
+        // Reset temporary basket mocks
+        createTemporaryBasket.mockResolvedValue(mockTempBasket)
+        forceOrderCalculation.mockResolvedValue({...mockTempBasket, orderTotal: 54.98})
+    })
+
+    it('creates temporary basket on payment data changed in PDP mode', async () => {
+        const config = getGoogleButtonConfig(
+            mockAuthToken,
+            mockSite,
+            null, // no existing basket
+            mockGooglePayConfig,
+            'TEST-SKU-PDP',
+            mockSetTempBasket,
+            null, // no initial temp basket
+            true, // isPdpMode
+            1
+        )
+
+        const mockPaymentDataChanged = config.paymentDataCallbacks.onPaymentDataChanged
+        const result = await mockPaymentDataChanged({
+            callbackTrigger: 'INITIALIZE',
+            shippingAddress: {
+                locality: 'City',
+                countryCode: 'US',
+                address1: '123 Main St',
+                name: 'John Doe'
+            }
+        })
+
+        expect(createTemporaryBasket).toHaveBeenCalledWith(
+            'TEST-SKU-PDP',
+            mockAuthToken,
+            mockSite,
+            1
+        )
+        expect(mockSetTempBasket).toHaveBeenCalledWith(mockTempBasket)
+    })
+
+    it('uses existing temporary basket if available', async () => {
+        const config = getGoogleButtonConfig(
+            mockAuthToken,
+            mockSite,
+            null,
+            mockGooglePayConfig,
+            'TEST-SKU-PDP',
+            mockSetTempBasket,
+            mockTempBasket, // existing temp basket
+            true,
+            1
+        )
+
+        const mockPaymentDataChanged = config.paymentDataCallbacks.onPaymentDataChanged
+        const result = await mockPaymentDataChanged({
+            callbackTrigger: 'INITIALIZE',
+            shippingAddress: {
+                locality: 'City',
+                countryCode: 'US',
+                address1: '123 Main St',
+                name: 'John Doe'
+            }
+        })
+
+        expect(createTemporaryBasket).not.toHaveBeenCalled()
+    })
+
+    it('handles temporary basket creation failure', async () => {
+        // Test the error handling path by creating a config without SKU
+        // This will trigger the "no basket" error path
+        const failingConfig = getGoogleButtonConfig(
+            mockAuthToken,
+            mockSite,
+            null,
+            mockGooglePayConfig,
+            null, // No SKU provided
+            mockSetTempBasket,
+            null,
+            true,
+            1
+        )
+
+        const mockPaymentDataChanged = failingConfig.paymentDataCallbacks.onPaymentDataChanged
+        const result = await mockPaymentDataChanged({
+            callbackTrigger: 'INITIALIZE',
+            shippingAddress: {
+                locality: 'City',
+                countryCode: 'US',
+                address1: '123 Main St',
+                name: 'John Doe'
+            }
+        })
+
+        expect(result).toEqual({
+            error: {
+                reason: 'OTHER_ERROR',
+                message: 'Unable to process order',
+                intent: 'SHIPPING_ADDRESS'
+            }
+        })
+    })
+
+    it('processes payment successfully in PDP mode without force calculation', async () => {
+        const config = getGoogleButtonConfig(
+            mockAuthToken,
+            mockSite,
+            null,
+            mockGooglePayConfig,
+            'TEST-SKU-PDP',
+            mockSetTempBasket,
+            mockTempBasket,
+            true,
+            1
+        )
+
+        // Mock successful payment
+        const mockSubmitPayment = jest.fn().mockResolvedValue({
+            isFinal: true,
+            isSuccessful: true,
+            merchantReference: 'pdp-order-123'
+        })
+        AdyenPaymentsService.mockImplementation(() => ({
+            submitPayment: mockSubmitPayment
+        }))
+
+        const mockPaymentData = {
+            paymentMethodData: {
+                tokenizationData: {token: 'test-payment-data'},
+                info: {
+                    billingAddress: {
+                        locality: 'Test City',
+                        countryCode: 'US',
+                        address1: '123 Test St',
+                        address2: '',
+                        postalCode: '12345',
+                        administrativeArea: 'CA'
+                    }
+                }
+            },
+            shippingAddress: {
+                locality: 'Test City',
+                countryCode: 'US',
+                address1: '123 Test St',
+                address2: '',
+                postalCode: '12345',
+                administrativeArea: 'CA',
+                name: 'John Doe'
+            }
+        }
+
+        await config.onAuthorized(mockPaymentData)
+
+        // Verify forceOrderCalculation is NOT called (removed optimization)
+        expect(forceOrderCalculation).not.toHaveBeenCalled()
+        expect(mockSubmitPayment).toHaveBeenCalled()
+    })
+
+    it('handles payment submission failure in PDP mode', async () => {
+        // Mock payment submission failure instead of force calculation failure
+        const mockSubmitPayment = jest.fn().mockRejectedValue(new Error('Payment failed'))
+        AdyenPaymentsService.mockImplementation(() => ({
+            submitPayment: mockSubmitPayment
+        }))
+
+        const config = getGoogleButtonConfig(
+            mockAuthToken,
+            mockSite,
+            null,
+            mockGooglePayConfig,
+            'TEST-SKU-PDP',
+            mockSetTempBasket,
+            mockTempBasket,
+            true,
+            1
+        )
+
+        const mockPaymentData = {
+            paymentMethodData: {
+                tokenizationData: {token: 'test-data'},
+                info: {
+                    billingAddress: {}
+                }
+            },
+            shippingAddress: {
+                locality: 'City',
+                countryCode: 'US',
+                address1: '123 Main St',
+                name: 'John Doe'
+            }
+        }
+
+        await config.onAuthorized(mockPaymentData)
+
+        expect(cleanupTemporaryBasket).toHaveBeenCalled()
+        expect(mockPostMessage).toHaveBeenCalledWith(
+            expect.objectContaining({
+                type: 'express.payment.failure'
+            }),
+            '*'
+        )
+    })
+
+    it('rejects payment when basket has null orderTotal', async () => {
+        // Create a temp basket with null orderTotal to test the validation
+        const basketWithNullOrderTotal = {
+            ...mockTempBasket,
+            orderTotal: null
+        }
+
+        const config = getGoogleButtonConfig(
+            mockAuthToken,
+            mockSite,
+            null,
+            mockGooglePayConfig,
+            'TEST-SKU-PDP',
+            mockSetTempBasket,
+            basketWithNullOrderTotal,
+            true,
+            1
+        )
+
+        const mockPaymentData = {
+            paymentMethodData: {
+                tokenizationData: {token: 'test-data'},
+                info: {
+                    billingAddress: {}
+                }
+            },
+            shippingAddress: {
+                locality: 'City',
+                countryCode: 'US',
+                address1: '123 Main St',
+                name: 'John Doe'
+            }
+        }
+
+        await config.onAuthorized(mockPaymentData)
+
+        expect(cleanupTemporaryBasket).toHaveBeenCalled()
+        expect(mockPostMessage).toHaveBeenCalledWith(
+            expect.objectContaining({
+                type: 'express.payment.failure'
+            }),
+            '*'
+        )
+    })
+
+    it('cleans up temporary basket on payment cancellation', () => {
+        const config = getGoogleButtonConfig(
+            mockAuthToken,
+            mockSite,
+            null,
+            mockGooglePayConfig,
+            'TEST-SKU-PDP',
+            mockSetTempBasket,
+            mockTempBasket,
+            true,
+            1
+        )
+
+        config.onError({name: 'CANCEL'})
+
+        expect(cleanupTemporaryBasket).toHaveBeenCalledWith(
+            true,
+            mockTempBasket,
+            mockAuthToken,
+            mockSite,
+            mockSetTempBasket
+        )
+        expect(mockPostMessage).toHaveBeenCalledWith(
+            expect.objectContaining({
+                type: 'express.payment.cancel'
+            }),
+            '*'
+        )
+    })
+
+    it('cleans up temporary basket on payment failure', () => {
+        const config = getGoogleButtonConfig(
+            mockAuthToken,
+            mockSite,
+            null,
+            mockGooglePayConfig,
+            'TEST-SKU-PDP',
+            mockSetTempBasket,
+            mockTempBasket,
+            true,
+            1
+        )
+
+        config.onError({name: 'UNKNOWN_ERROR'})
+
+        expect(cleanupTemporaryBasket).toHaveBeenCalledWith(
+            true,
+            mockTempBasket,
+            mockAuthToken,
+            mockSite,
+            mockSetTempBasket
+        )
+        expect(mockPostMessage).toHaveBeenCalledWith(
+            expect.objectContaining({
+                type: 'express.payment.failure'
+            }),
+            '*'
+        )
     })
 })

@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React, {useEffect, useRef} from 'react'
+import React, {useEffect, useRef, useState} from 'react'
 import AdyenCheckout from '@adyen/adyen-web'
 import '@adyen/adyen-web/dist/adyen.css'
 import PropTypes from 'prop-types'
@@ -15,8 +15,19 @@ import {
 } from '@salesforce/retail-react-app/app/components/express/utils/parsers'
 import {AdyenShippingMethodsService} from '@salesforce/retail-react-app/app/components/express/utils/shipping-methods'
 import {AdyenShippingAddressService} from '@salesforce/retail-react-app/app/components/express/utils/shipping-address'
-import {forceOrderCalculation} from '@salesforce/retail-react-app/app/components/express/utils/pdp/basket-calculation'
+import {
+    forceOrderCalculation,
+    getBasketWithTotals
+} from '@salesforce/retail-react-app/app/components/express/utils/pdp/basket-calculation'
 import {AdyenPaymentsService} from '@salesforce/retail-react-app/app/components/express/utils/payments'
+import {
+    createTemporaryBasket,
+    deleteTemporaryBasket,
+    cleanupTemporaryBasket
+} from '@salesforce/retail-react-app/app/components/express/utils/pdp/temporary-basket'
+import {useStandalonePaymentMethods} from '@salesforce/retail-react-app/app/components/express/hooks/use-standalone-payment-methods'
+import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
+import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
 import {
     PAYMENT_METHODS,
     EXPRESS_MESSAGES
@@ -178,10 +189,48 @@ export const updateShippingOption = async (
     }
 }
 
-export const getGoogleButtonConfig = (authToken, site, basket, googlePayConfig) => {
-    // Use productTotal if orderTotal is null, otherwise use orderTotal
-    // The INITIALIZE callback will update this in payment sheet before user can try to pay
-    let googlePayAmount = basket.orderTotal || basket.productTotal
+export const getGoogleButtonConfig = (
+    authToken,
+    site,
+    basket,
+    googlePayConfig,
+    sku = null,
+    setTempBasket = null,
+    tempBasket = null,
+    isPdpMode = false,
+    quantity = 1
+) => {
+    // For PDP mode, prioritize temporary basket creation over existing basket
+    // For regular mode, use existing basket
+    const currentBasket = isPdpMode ? tempBasket : basket
+    let googlePayAmount = currentBasket?.orderTotal || 0
+
+    // Shared basket reference to prevent multiple basket creation
+    // This will be updated by callbacks and shared across all Google Pay events
+    // In PDP mode, start with null/tempBasket to force temporary basket creation
+    let sharedBasketRef = isPdpMode ? tempBasket : currentBasket
+
+    // Helper function to get or create basket (prevents multiple creation)
+    const getOrCreateBasket = async () => {
+        // If we already have a shared basket, return it
+        if (sharedBasketRef && sharedBasketRef.basketId) {
+            return sharedBasketRef
+        }
+
+        // For PDP flows, create temporary basket if needed (and SKU is available)
+        if (isPdpMode && sku && setTempBasket) {
+            try {
+                const newBasket = await createTemporaryBasket(sku, authToken, site, quantity)
+                sharedBasketRef = newBasket // Update shared reference immediately
+                setTempBasket(newBasket) // Update React state for re-renders
+                return newBasket
+            } catch (error) {
+                throw error
+            }
+        }
+        // Return null if no basket can be created/found
+        return null
+    }
 
     const buttonConfig = {
         showPayButton: true,
@@ -195,8 +244,8 @@ export const getGoogleButtonConfig = (authToken, site, basket, googlePayConfig) 
         emailRequired: true,
         configuration: googlePayConfig,
         amount: {
-            value: getCurrencyValueForApi(googlePayAmount, basket.currency),
-            currency: basket.currency
+            value: getCurrencyValueForApi(googlePayAmount, currentBasket?.currency || 'USD'),
+            currency: currentBasket?.currency || 'USD'
         },
         requiredShippingContactFields: ['postalAddress', 'name', 'email', 'phone'],
         requiredBillingContactFields: ['postalAddress'],
@@ -217,15 +266,54 @@ export const getGoogleButtonConfig = (authToken, site, basket, googlePayConfig) 
                     }
                 }
 
-                const adyenPaymentService = new AdyenPaymentsService(authToken, site)
+                // Get or create basket using shared reference
+                let currentBasket = await getOrCreateBasket()
+                if (!currentBasket || !currentBasket.basketId) {
+                    await cleanupTemporaryBasket(
+                        isPdpMode,
+                        sharedBasketRef,
+                        authToken,
+                        site,
+                        setTempBasket
+                    )
+                    sendExpressMessage(EXPRESS_MESSAGES.PAYMENT_FAILURE, {
+                        PAYMENT_METHOD
+                    })
+                    return
+                }
 
-                const customerId = basket?.customerId || basket?.customerInfo?.customerId
+                // Basket should already be calculated from payment sheet callbacks
+                // (INITIALIZE, SHIPPING_ADDRESS, SHIPPING_OPTION already updated totals)
+                googlePayAmount = currentBasket.orderTotal || 0
+
+                // Ensure we have a valid order total before proceeding
+                if (
+                    currentBasket.orderTotal === null ||
+                    currentBasket.orderTotal === undefined
+                ) {
+                    await cleanupTemporaryBasket(
+                        isPdpMode,
+                        sharedBasketRef,
+                        authToken,
+                        site,
+                        setTempBasket
+                    )
+                    sendExpressMessage(EXPRESS_MESSAGES.PAYMENT_FAILURE, {
+                        PAYMENT_METHOD
+                    })
+                    return
+                }
+
+                const paymentData = {
+                    ...state.data,
+                    origin: state.data.origin ? state.data.origin : window.location.origin
+                }
+
+                const adyenPaymentService = new AdyenPaymentsService(authToken, site)
                 const paymentsResponse = await adyenPaymentService.submitPayment(
-                    {
-                        ...state.data
-                    },
-                    basket?.basketId,
-                    customerId
+                    paymentData,
+                    currentBasket?.basketId,
+                    currentBasket?.customerInfo?.customerId
                 )
 
                 if (paymentsResponse?.isFinal && paymentsResponse?.isSuccessful) {
@@ -235,11 +323,27 @@ export const getGoogleButtonConfig = (authToken, site, basket, googlePayConfig) 
                         PAYMENT_METHOD
                     })
                 } else {
+                    // Clean up temporary basket on payment failure
+                    await cleanupTemporaryBasket(
+                        isPdpMode,
+                        sharedBasketRef,
+                        authToken,
+                        site,
+                        setTempBasket
+                    )
                     sendExpressMessage(EXPRESS_MESSAGES.PAYMENT_FAILURE, {
                         PAYMENT_METHOD
                     })
                 }
             } catch (err) {
+                // Clean up temporary basket on any unexpected error
+                await cleanupTemporaryBasket(
+                    isPdpMode,
+                    sharedBasketRef,
+                    authToken,
+                    site,
+                    setTempBasket
+                )
                 sendExpressMessage(EXPRESS_MESSAGES.PAYMENT_FAILURE, {
                     PAYMENT_METHOD
                 })
@@ -259,30 +363,70 @@ export const getGoogleButtonConfig = (authToken, site, basket, googlePayConfig) 
                             callbackTrigger === 'INITIALIZE' ||
                             callbackTrigger === 'SHIPPING_ADDRESS'
                         ) {
+                            // Get or create basket using shared reference
+                            let basketToUse = await getOrCreateBasket()
+                            if (!basketToUse || !basketToUse.basketId) {
+                                // Return error if we can't get/create a basket
+                                paymentDataRequestUpdate = {
+                                    error: {
+                                        reason: 'OTHER_ERROR',
+                                        message: 'Unable to process order',
+                                        intent: 'SHIPPING_ADDRESS'
+                                    }
+                                }
+                                resolve(paymentDataRequestUpdate)
+                                return
+                            }
+
                             const updateShippingAddressResponse = await updateShippingAddress(
                                 authToken,
                                 site,
-                                basket,
+                                basketToUse,
                                 shippingAddress
                             )
 
                             paymentDataRequestUpdate =
                                 updateShippingAddressResponse.paymentDataRequestUpdate
-                            // Update our basket with the latest data
-                            basket = updateShippingAddressResponse.newBasket
+                            // Update our basket reference with the latest data
+                            if (updateShippingAddressResponse.newBasket) {
+                                sharedBasketRef = updateShippingAddressResponse.newBasket
+                                if (isPdpMode && setTempBasket) {
+                                    setTempBasket(updateShippingAddressResponse.newBasket)
+                                }
+                            }
                         }
                         if (callbackTrigger === 'SHIPPING_OPTION') {
+                            // Get current basket
+                            let basketToUse = await getOrCreateBasket()
+                            if (!basketToUse || !basketToUse.basketId) {
+                                // Return error if we can't get/create a basket
+                                paymentDataRequestUpdate = {
+                                    error: {
+                                        reason: 'OTHER_ERROR',
+                                        message: 'Unable to process order',
+                                        intent: 'SHIPPING_OPTION'
+                                    }
+                                }
+                                resolve(paymentDataRequestUpdate)
+                                return
+                            }
+
                             const updateShippingOptionResponse = await updateShippingOption(
                                 authToken,
                                 site,
-                                basket,
+                                basketToUse,
                                 shippingOptionData?.id
                             )
 
                             paymentDataRequestUpdate =
                                 updateShippingOptionResponse.paymentDataRequestUpdate
-                            // Update our basket with the latest data
-                            basket = updateShippingOptionResponse.newBasket
+                            // Update our basket reference with the latest data
+                            if (updateShippingOptionResponse.newBasket) {
+                                sharedBasketRef = updateShippingOptionResponse.newBasket
+                                if (isPdpMode && setTempBasket) {
+                                    setTempBasket(updateShippingOptionResponse.newBasket)
+                                }
+                            }
                         }
                         resolve(paymentDataRequestUpdate)
                     }
@@ -293,11 +437,14 @@ export const getGoogleButtonConfig = (authToken, site, basket, googlePayConfig) 
         },
 
         onError: (error) => {
+            // Clean up temporary basket when Google Pay is cancelled or fails
             if (error.name === 'CANCEL') {
+                cleanupTemporaryBasket(isPdpMode, sharedBasketRef, authToken, site, setTempBasket)
                 sendExpressMessage(EXPRESS_MESSAGES.PAYMENT_CANCEL, {
                     PAYMENT_METHOD
                 })
             } else {
+                cleanupTemporaryBasket(isPdpMode, sharedBasketRef, authToken, site, setTempBasket)
                 sendExpressMessage(EXPRESS_MESSAGES.PAYMENT_FAILURE, {
                     PAYMENT_METHOD
                 })
@@ -307,13 +454,75 @@ export const getGoogleButtonConfig = (authToken, site, basket, googlePayConfig) 
     return buttonConfig
 }
 
-export const GooglePayExpress = ({manager, overrideData = null}) => {
-    const {adyenEnvironment, adyenPaymentMethods, basket, locale, site, authToken} =
-        useAdyenExpressCheckout()
+export const GooglePayExpress = ({
+    sku,
+    quantity = 1,
+    isPdpMode = false,
+    basketData,
+    authToken: providedAuthToken,
+    manager,
+    overrideData = null
+}) => {
+    const {locale, site} = useMultiSite()
+    const navigate = useNavigation()
 
-    const finalAuthToken = overrideData?.authToken
-    const finalBasket = overrideData?.basket
+    const [tempBasket, setTempBasket] = useState(null)
+    const [currentSku, setCurrentSku] = useState(sku)
+
+    // Check if we have the minimum required basket data (from basket only)
+    const hasRequiredBasketData =
+        basketData && basketData.orderTotal && basketData.currency && basketData.basketId
+
     const paymentContainer = useRef(null)
+
+    // In PDP mode, we simply ignore the data since we don't have a provider
+    const regularAdyenData = useAdyenExpressCheckout()
+
+    // Use provided auth token for PDP mode, or provider token for regular mode
+    const authToken = isPdpMode
+        ? providedAuthToken
+        : regularAdyenData?.authToken || overrideData?.authToken
+
+    // For PDP mode, use standalone payment methods
+    // For regular mode, use the standard Adyen hook data
+    const {
+        paymentMethods: standalonePaymentMethods,
+        loading: standaloneLoading,
+        error: standaloneError
+    } = useStandalonePaymentMethods(authToken, site, locale, isPdpMode && !!authToken)
+
+    // Handle SKU prop changes (for postMessage updates)
+    useEffect(() => {
+        if (sku !== currentSku) {
+            // Clean up previous temporary basket if switching SKUs
+            if (currentSku && tempBasket?.basketId && authToken && site) {
+                deleteTemporaryBasket(tempBasket.basketId, authToken, site).catch(() => {})
+                setTempBasket(null)
+            }
+            setCurrentSku(sku)
+        }
+    }, [sku, currentSku, tempBasket?.basketId, authToken, site])
+
+    const adyenEnvironment = isPdpMode
+        ? standalonePaymentMethods?.environment
+        : regularAdyenData.adyenEnvironment
+
+    const adyenPaymentMethods = isPdpMode
+        ? standalonePaymentMethods
+        : regularAdyenData.adyenPaymentMethods
+
+    const finalAuthToken = overrideData?.authToken || authToken
+    const finalBasket = overrideData?.basket || basketData
+
+    // Cleanup effect to remove temporary basket when component unmounts
+    useEffect(() => {
+        return () => {
+            // Clean up temporary basket when component unmounts (user navigates away)
+            if (isPdpMode && currentSku && tempBasket?.basketId && authToken && site) {
+                deleteTemporaryBasket(tempBasket.basketId, authToken, site).catch(() => {})
+            }
+        }
+    }, [tempBasket?.basketId, authToken, site?.id, currentSku, isPdpMode])
 
     useEffect(() => {
         let isCanceled = false
@@ -325,6 +534,27 @@ export const GooglePayExpress = ({manager, overrideData = null}) => {
 
             const handleGooglePayUnavailable = () => {
                 manager.setPaymentMethodUnavailable(PAYMENT_METHOD)
+            }
+
+            // For PDP mode, we don't need a basket initially but we do need payment methods
+            // For regular mode, we need a basket to continue
+            if (isPdpMode) {
+                if (!standalonePaymentMethods || standaloneLoading) {
+                    return
+                }
+                if (standaloneError) {
+                    handleGooglePayUnavailable()
+                    return
+                }
+            } else {
+                // Validate required basket properties
+                if (!hasRequiredBasketData) {
+                    return
+                }
+            }
+
+            if (!adyenEnvironment) {
+                return
             }
 
             try {
@@ -346,11 +576,22 @@ export const GooglePayExpress = ({manager, overrideData = null}) => {
                 }
 
                 const googlePaymentMethodConfig = getGooglePaymentMethodConfig(adyenPaymentMethods)
+
+                if (!googlePaymentMethodConfig) {
+                    handleGooglePayUnavailable()
+                    return
+                }
+
                 const googleButtonConfig = getGoogleButtonConfig(
                     finalAuthToken,
                     site,
                     finalBasket,
-                    googlePaymentMethodConfig
+                    googlePaymentMethodConfig,
+                    currentSku,
+                    setTempBasket,
+                    tempBasket,
+                    isPdpMode,
+                    quantity
                 )
 
                 let googlePayButton
@@ -398,7 +639,14 @@ export const GooglePayExpress = ({manager, overrideData = null}) => {
                             err.message
                         ))
 
-                if (!isMissingOrderTotalError && !isMissingShippingMethodsError) {
+                // For PDP mode, missing order total is expected initially when no SKU is set
+                const isExpectedPdpError = isPdpMode && isMissingOrderTotalError && !tempBasket
+
+                if (
+                    !isMissingOrderTotalError &&
+                    !isMissingShippingMethodsError &&
+                    !isExpectedPdpError
+                ) {
                     handleGooglePayUnavailable()
                 }
             }
@@ -408,17 +656,30 @@ export const GooglePayExpress = ({manager, overrideData = null}) => {
         return () => {
             isCanceled = true
         }
-    }, [adyenEnvironment, adyenPaymentMethods])
+    }, [
+        adyenEnvironment,
+        adyenPaymentMethods,
+        isPdpMode,
+        quantity,
+        ...(isPdpMode
+            ? [tempBasket, currentSku, standalonePaymentMethods, standaloneLoading, standaloneError]
+            : [])
+    ])
 
     return (
         <>
-            <div ref={paymentContainer}></div>
+            <div ref={paymentContainer} style={{height: '40px'}}></div>
         </>
     )
 }
 
 GooglePayExpress.propTypes = {
     shippingMethods: PropTypes.array,
+    sku: PropTypes.string,
+    quantity: PropTypes.number,
+    isPdpMode: PropTypes.bool,
+    basketData: PropTypes.object,
+    authToken: PropTypes.string,
     manager: PropTypes.object,
     overrideData: PropTypes.object
 }
