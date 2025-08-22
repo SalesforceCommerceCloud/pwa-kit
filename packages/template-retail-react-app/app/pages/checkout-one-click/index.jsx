@@ -96,6 +96,15 @@ const CheckoutOneClick = () => {
         setShouldSavePaymentMethod(shouldSave)
     }
 
+    // Callback for when payment methods are saved
+    const handlePaymentMethodSaved = (paymentId) => {
+        setSavedPaymentMethods((prev) => new Set([...prev, paymentId]))
+    }
+
+    const handleSavePreferenceChange = (shouldSave) => {
+        setShouldSavePaymentMethod(shouldSave)
+    }
+
     const showError = (message) => {
         showToast({
             title: message || formatMessage(API_ERROR_MESSAGE),
