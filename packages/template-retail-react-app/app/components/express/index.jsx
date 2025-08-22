@@ -44,62 +44,21 @@ function Express() {
     const [currentSku, setCurrentSku] = useState(null)
     const [currentQuantity, setCurrentQuantity] = useState(1)
 
-    // Initialize the express payment manager
+    // Initialize the express payment manager - always call this hook
     const {manager, managerError} = useExpressPaymentManager(PAYMENT_METHODS)
 
     // Fetch payment methods and environment data directly
+    // Only call this hook when we have all required parameters to prevent hook ordering issues
     const {
         paymentMethods: adyenPaymentMethods,
         loading: paymentMethodsLoading,
         error: paymentMethodsError
-    } = useStandalonePaymentMethods(authToken, site, locale, !!authToken)
-
-    // Get environment from payment methods response
-    const adyenEnvironment = adyenPaymentMethods?.environment
-
-    // Add comprehensive logging for debugging
-    console.log('[Express] Component state:', {
-        isPdpMode,
-        basket: !!basket,
-        basketData: basket,
-        authToken: !!authToken,
-        customerId,
-        currentSku,
-        currentQuantity,
-        manager: !!manager,
-        managerError,
-        adyenEnvironment,
-        adyenPaymentMethods: !!adyenPaymentMethods,
-        paymentMethodsLoading,
-        paymentMethodsError,
-        site: site?.id,
-        locale
-    })
-
-    // Prepare context data for express payment components
-    const expressPaymentContext = {
-        adyenPaymentMethods,
-        authToken,
-        locale,
-        site,
-        basket,
-        sku: currentSku,
-        quantity: currentQuantity,
-        isPdpMode,
-        manager
-    }
-
-    console.log('[Express] Express payment context:', {
-        hasAdyenPaymentMethods: !!expressPaymentContext.adyenPaymentMethods,
-        hasAuthToken: !!expressPaymentContext.authToken,
-        hasLocale: !!expressPaymentContext.locale,
-        hasSite: !!expressPaymentContext.site,
-        hasBasket: !!expressPaymentContext.basket,
-        sku: expressPaymentContext.sku,
-        quantity: expressPaymentContext.quantity,
-        isPdpMode: expressPaymentContext.isPdpMode,
-        hasManager: !!expressPaymentContext.manager
-    })
+    } = useStandalonePaymentMethods(
+        authToken || null, // Ensure we always pass a consistent value
+        site || null, // Ensure we always pass a consistent value
+        locale || null, // Ensure we always pass a consistent value
+        !!(authToken && site && locale) // Only enable when all params are available
+    )
 
     // PostMessage listener for SKU updates
     useEffect(() => {
@@ -170,6 +129,54 @@ function Express() {
         }
     }, [])
 
+    // Get environment from payment methods response
+    const adyenEnvironment = adyenPaymentMethods?.environment
+
+    // Add comprehensive logging for debugging
+    console.log('[Express] Component state:', {
+        isPdpMode,
+        basket: !!basket,
+        basketData: basket,
+        authToken: !!authToken,
+        customerId,
+        currentSku,
+        currentQuantity,
+        manager: !!manager,
+        managerError,
+        adyenEnvironment,
+        adyenPaymentMethods: !!adyenPaymentMethods,
+        paymentMethodsLoading,
+        paymentMethodsError,
+        site: site?.id,
+        locale
+    })
+
+    // Prepare context data for express payment components
+    const expressPaymentContext = {
+        adyenPaymentMethods,
+        authToken,
+        locale,
+        site,
+        basket,
+        sku: currentSku,
+        quantity: currentQuantity,
+        isPdpMode,
+        manager
+    }
+
+    console.log('[Express] Express payment context:', {
+        hasAdyenPaymentMethods: !!expressPaymentContext.adyenPaymentMethods,
+        hasAuthToken: !!expressPaymentContext.authToken,
+        hasLocale: !!expressPaymentContext.locale,
+        hasSite: !!expressPaymentContext.site,
+        hasBasket: !!expressPaymentContext.basket,
+        sku: expressPaymentContext.sku,
+        quantity: expressPaymentContext.quantity,
+        isPdpMode: expressPaymentContext.isPdpMode,
+        hasManager: !!expressPaymentContext.manager
+    })
+
+    // NOW check for early return conditions - after all hooks have been called
     if (!authToken || managerError) {
         // Do not render express payment components if there is no auth token
         // or if there was an error setting up the manager
