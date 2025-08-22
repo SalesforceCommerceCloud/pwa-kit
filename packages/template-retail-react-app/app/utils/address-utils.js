@@ -70,6 +70,29 @@ export const cleanAddressForOrder = (address) => {
 }
 
 /**
+ * Extracts valid CustomerAddress fields from an address object
+ * @param {Object} address - The address object (may contain extra fields from customer address)
+ * @returns {Object} Clean address object with only OrderAddress fields
+ */
+export const cleanAddressForCustomer = (address) => {
+    if (!address) return null
+
+    return {
+        address1: address.address1,
+        address2: address.address2 || '',
+        companyName: address.companyName || '',
+        city: address.city,
+        countryCode: address.countryCode,
+        firstName: address.firstName,
+        lastName: address.lastName,
+        phone: address.phone,
+        postalCode: address.postalCode,
+        preferred: address.preferred || false,
+        stateCode: address.stateCode
+    }
+}
+
+/**
  * Creates a shipping address object from store information
  * @param {Object} storeInfo - Store information object
  * @returns {Object} Shipping address object formatted for the basket

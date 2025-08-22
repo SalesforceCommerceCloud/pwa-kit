@@ -9,6 +9,7 @@ import {useShippingMethodsForShipment} from '@salesforce/commerce-sdk-react'
 import {usePickupShipment} from '@salesforce/retail-react-app/app/hooks/use-pickup-shipment'
 import {useShipmentOperations} from '@salesforce/retail-react-app/app/hooks/use-shipment-operations'
 import {useItemShipmentManagement} from '@salesforce/retail-react-app/app/hooks/use-item-shipment-management'
+import {getShippingAddressForStore} from '@salesforce/retail-react-app/app/utils/address-utils'
 import {DEFAULT_SHIPMENT_ID} from '@salesforce/retail-react-app/app/constants'
 import logger from '@salesforce/retail-react-app/app/utils/logger-instance'
 
@@ -27,12 +28,8 @@ import {
  * @returns {Object} Object containing helper functions for multiship management
  */
 export const useMultiship = (basket) => {
-    const {
-        getDefaultShippingMethodId,
-        getPickupShippingMethodId,
-        getShippingAddressForStore,
-        updateDefaultShipmentIfNeeded
-    } = usePickupShipment(basket)
+    const {getDefaultShippingMethodId, getPickupShippingMethodId, updateDefaultShipmentIfNeeded} =
+        usePickupShipment(basket)
 
     const {
         createShipment: createShipmentOperation,

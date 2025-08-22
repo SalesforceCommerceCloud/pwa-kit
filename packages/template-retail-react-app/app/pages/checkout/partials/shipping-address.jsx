@@ -27,7 +27,10 @@ import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
 import {useMultiship} from '@salesforce/retail-react-app/app/hooks/use-multiship'
 import {DEFAULT_SHIPMENT_ID} from '@salesforce/retail-react-app/app/constants'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
-import {cleanAddressForOrder} from '@salesforce/retail-react-app/app/utils/address-utils'
+import {
+    cleanAddressForCustomer,
+    cleanAddressForOrder
+} from '@salesforce/retail-react-app/app/utils/address-utils'
 import {
     findExistingDeliveryShipment,
     isPickupShipment
@@ -41,17 +44,9 @@ const shippingAddressAriaLabel = defineMessage({
     defaultMessage: 'Shipping Address Form',
     id: 'shipping_address.label.shipping_address_form'
 })
-const addNewAddressLabel = defineMessage({
-    defaultMessage: '+ Add New Address',
-    id: 'shipping_address.button.add_new_address'
-})
 const noItemsInBasketMessage = defineMessage({
     defaultMessage: 'No items in basket.',
     id: 'shipping_address.message.no_items_in_basket'
-})
-const deliveryAddressLabel = defineMessage({
-    defaultMessage: 'Delivery Address',
-    id: 'shipping_address.label.delivery_address'
 })
 const shipToOneAddressLabel = defineMessage({
     defaultMessage: 'Ship to Single Address',
@@ -112,7 +107,7 @@ export default function ShippingAddress() {
 
             if (customer.isRegistered && !addressId) {
                 const body = {
-                    ...cleanAddressForOrder(address),
+                    ...cleanAddressForCustomer(address),
                     addressId: nanoid()
                 }
                 await createCustomerAddress.mutateAsync({
@@ -212,9 +207,7 @@ export default function ShippingAddress() {
                     <ShippingMultiAddress
                         basket={basket}
                         submitButtonLabel={submitButtonMessage}
-                        addNewAddressLabel={addNewAddressLabel}
                         noItemsInBasketMessage={noItemsInBasketMessage}
-                        deliveryAddressLabel={deliveryAddressLabel}
                     />
                 )}
             </ToggleCardEdit>
