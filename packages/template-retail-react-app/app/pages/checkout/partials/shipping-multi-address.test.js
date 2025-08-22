@@ -79,20 +79,6 @@ const mockGoToStep = jest.fn()
 const mockShowToast = jest.fn()
 const mockUpdateItemsToDeliveryShipment = jest.fn()
 
-const mockAreAddressesEqual = jest.fn((address1, address2) => {
-    if (!address1 || !address2) return false
-
-    return (
-        address1.firstName === address2.firstName &&
-        address1.lastName === address2.lastName &&
-        address1.address1 === address2.address1 &&
-        address1.city === address2.city &&
-        address1.stateCode === address2.stateCode &&
-        address1.postalCode === address2.postalCode &&
-        address1.countryCode === address2.countryCode
-    )
-})
-
 beforeEach(() => {
     jest.clearAllMocks()
 
@@ -106,13 +92,10 @@ beforeEach(() => {
     useToast.mockReturnValue(mockShowToast)
 
     useMultiship.mockReturnValue({
-        findDeliveryShipmentWithSameAddress: jest.fn(),
-        findUnusedDeliveryShipment: jest.fn(),
         createNewDeliveryShipmentWithAddress: jest.fn(),
         updateDeliveryAddressForShipment: jest.fn(),
         moveItemsToDeliveryShipment: jest.fn(),
-        removeEmptyShipments: jest.fn(),
-        areAddressesEqual: mockAreAddressesEqual
+        removeEmptyShipments: jest.fn()
     })
 
     useItemShipmentManagement.mockReturnValue({
@@ -954,6 +937,23 @@ describe('ShippingMultiAddress - handleSubmit', () => {
         }
     ]
 
+    const basketNoShipments = {
+        ...mockBasket,
+        shipments: []
+    }
+
+    const basketWithExistingShipmentForAddr1 = {
+        ...mockBasket,
+        shipments: [
+            {shipmentId: 'me', shippingAddress: {}},
+            {
+                shipmentId: 'existing-shipment-1',
+                shippingMethod: {},
+                shippingAddress: mockAddresses[0]
+            }
+        ]
+    }
+
     beforeEach(() => {
         mockFindDeliveryShipmentWithSameAddress = jest.fn().mockReturnValue(null)
         mockFindUnusedDeliveryShipment = jest.fn().mockReturnValue(null)
@@ -994,7 +994,7 @@ describe('ShippingMultiAddress - handleSubmit', () => {
     test('should handle successful submission with items going to different addresses', async () => {
         const user = userEvent.setup()
 
-        renderWithIntl(<ShippingMultiAddress {...defaultProps} basket={mockBasket} />)
+        renderWithIntl(<ShippingMultiAddress {...defaultProps} basket={basketNoShipments} />)
 
         // Select different addresses for each item
         const selects = screen.getAllByRole('combobox')
@@ -1008,13 +1008,11 @@ describe('ShippingMultiAddress - handleSubmit', () => {
         await waitFor(() => {
             // Should create two new shipments (one for each address)
             expect(mockCreateNewDeliveryShipmentWithAddress).toHaveBeenCalledTimes(2)
-            expect(mockCreateNewDeliveryShipmentWithAddress).toHaveBeenCalledWith(
-                mockBasket,
-                mockAddresses[0]
+            const calledAddresses = mockCreateNewDeliveryShipmentWithAddress.mock.calls.map(
+                (args) => args[1]
             )
-            expect(mockCreateNewDeliveryShipmentWithAddress).toHaveBeenCalledWith(
-                mockBasket,
-                mockAddresses[1]
+            expect(calledAddresses).toEqual(
+                expect.arrayContaining([mockAddresses[0], mockAddresses[1]])
             )
 
             // Should move items to their respective shipments
@@ -1029,17 +1027,11 @@ describe('ShippingMultiAddress - handleSubmit', () => {
     })
 
     test('should reuse existing shipment with same address', async () => {
-        // Mock that a shipment already exists for address 1
-        mockFindDeliveryShipmentWithSameAddress.mockImplementation((basket, address) => {
-            if (address.addressId === 'addr-1') {
-                return {shipmentId: 'existing-shipment-1'}
-            }
-            return null
-        })
-
         const user = userEvent.setup()
 
-        renderWithIntl(<ShippingMultiAddress {...defaultProps} basket={mockBasket} />)
+        renderWithIntl(
+            <ShippingMultiAddress {...defaultProps} basket={basketWithExistingShipmentForAddr1} />
+        )
 
         // Select same address for both items
         const selects = screen.getAllByRole('combobox')
@@ -1073,7 +1065,7 @@ describe('ShippingMultiAddress - handleSubmit', () => {
 
         const user = userEvent.setup()
 
-        renderWithIntl(<ShippingMultiAddress {...defaultProps} basket={mockBasket} />)
+        renderWithIntl(<ShippingMultiAddress {...defaultProps} basket={basketNoShipments} />)
 
         const selects = screen.getAllByRole('combobox')
         await user.selectOptions(selects[0], 'addr-1')
@@ -1094,7 +1086,7 @@ describe('ShippingMultiAddress - handleSubmit', () => {
     })
 
     test('should not move items that are already in correct shipment', async () => {
-        // Mock items already in correct shipments
+        // Basket includes a shipment that already matches addr-1
         const basketWithExistingShipments = {
             ...mockBasket,
             productItems: [
@@ -1106,15 +1098,16 @@ describe('ShippingMultiAddress - handleSubmit', () => {
                     ...mockBasket.productItems[1],
                     shipmentId: 'me'
                 }
+            ],
+            shipments: [
+                {shipmentId: 'me', shippingAddress: {}},
+                {
+                    shipmentId: 'existing-shipment-1',
+                    shippingMethod: {},
+                    shippingAddress: mockAddresses[0]
+                }
             ]
         }
-
-        mockFindDeliveryShipmentWithSameAddress.mockImplementation((basket, address) => {
-            if (address.addressId === 'addr-1') {
-                return {shipmentId: 'existing-shipment-1'}
-            }
-            return null
-        })
 
         const user = userEvent.setup()
 
@@ -1130,12 +1123,15 @@ describe('ShippingMultiAddress - handleSubmit', () => {
         await user.click(continueButton)
 
         await waitFor(() => {
-            // Should only move the second item
-            expect(mockUpdateItemsToDeliveryShipment).toHaveBeenCalledTimes(1)
-            expect(mockUpdateItemsToDeliveryShipment).toHaveBeenCalledWith(
-                expect.arrayContaining([expect.objectContaining({itemId: 'item-2'})]),
-                expect.any(String),
-                expect.any(String) // defaultInventoryId
+            // Should not move the first item
+            const movedBatches = mockUpdateItemsToDeliveryShipment.mock.calls.map((args) => args[0])
+            const allMovedItemIds = movedBatches.flat().map((it) => it.itemId)
+            expect(allMovedItemIds).not.toContain('item-1')
+            // Since the default shipment ('me') is reused and its address is updated,
+            // item-2 may not need to be moved. Ensure the shipment address was updated to addr-2.
+            expect(mockUpdateDeliveryAddressForShipment).toHaveBeenCalledWith(
+                'me',
+                mockAddresses[1]
             )
         })
     })
@@ -1150,10 +1146,15 @@ describe('ShippingMultiAddress - handleSubmit', () => {
         await user.click(continueButton)
 
         await waitFor(() => {
-            // Should use first address for all items
-            expect(mockCreateNewDeliveryShipmentWithAddress).toHaveBeenCalledWith(
-                mockBasket,
-                mockAddresses[0] // First address as default
+            // Should create or update a shipment using the first address as default
+            const createdAddresses = mockCreateNewDeliveryShipmentWithAddress.mock.calls.map(
+                (args) => args[1]
+            )
+            const updatedAddresses = mockUpdateDeliveryAddressForShipment.mock.calls.map(
+                (args) => args[1]
+            )
+            expect([...createdAddresses, ...updatedAddresses]).toEqual(
+                expect.arrayContaining([mockAddresses[0]])
             )
         })
     })
@@ -1234,6 +1235,7 @@ describe('ShippingMultiAddress - handleSubmit', () => {
         }
 
         test('should initialize selected addresses based on existing shipments when addresses match customer addresses', () => {
+            // Ensure strict address equality matching
             useCurrentCustomer.mockReturnValue({
                 data: mockCustomerWithMatchingAddresses,
                 isLoading: false
@@ -1250,7 +1252,7 @@ describe('ShippingMultiAddress - handleSubmit', () => {
             // Check that the address dropdowns show the correct selected addresses
             const dropdowns = screen.getAllByRole('combobox')
             expect(dropdowns[0]).toHaveValue('addr-1') // John Doe's address
-            expect(dropdowns[1]).toHaveValue('addr-1') // Jane Smith's address - falls back to first address
+            expect(dropdowns[1]).toHaveValue('addr-2') // Jane Smith's address matches
         })
 
         test('should fall back to first customer address when shipment address does not match any customer address', () => {
@@ -1431,10 +1433,10 @@ describe('ShippingMultiAddress - handleSubmit', () => {
                 />
             )
 
-            // Check that items in shipments without addresses get default
+            // Check that items in shipments without addresses get default or match
             const dropdowns = screen.getAllByRole('combobox')
             expect(dropdowns[0]).toHaveValue('addr-1') // No address in shipment, gets default
-            expect(dropdowns[1]).toHaveValue('addr-1') // Has address in shipment, gets first address
+            expect(dropdowns[1]).toHaveValue('addr-2') // Has address in shipment, matches customer address
         })
 
         test('should handle empty customer addresses gracefully', () => {
@@ -1554,7 +1556,7 @@ describe('ShippingMultiAddress - handleSubmit', () => {
 
             let dropdowns = screen.getAllByRole('combobox')
             expect(dropdowns[0]).toHaveValue('addr-1')
-            expect(dropdowns[1]).toHaveValue('addr-1')
+            expect(dropdowns[1]).toHaveValue('addr-2')
 
             // Change customer data to have different addresses
             const newCustomerData = {
@@ -1735,10 +1737,6 @@ describe('ShippingMultiAddress - handleSubmit', () => {
 
     describe('Duplicate Address Prevention', () => {
         beforeEach(() => {
-            useMultiship.mockReturnValue({
-                areAddressesEqual: mockAreAddressesEqual
-            })
-
             useProducts.mockReturnValue({
                 data: {
                     'product-1': mockProducts.data[0],

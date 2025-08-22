@@ -21,10 +21,9 @@ import CartItemVariantAttributes from '@salesforce/retail-react-app/app/componen
 import CartItemVariantPrice from '@salesforce/retail-react-app/app/components/item-variant/item-price'
 import {STORE_LOCATOR_IS_ENABLED} from '@salesforce/retail-react-app/app/constants'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
-import {usePickupShipment} from '@salesforce/retail-react-app/app/hooks/use-pickup-shipment'
+import {isPickupShipment} from '@salesforce/retail-react-app/app/utils/shipment-utils'
 
 const MultiShipOrderSummary = ({order, productItemsMap, currency}) => {
-    const {isPickupShipment} = usePickupShipment()
     const storeLocatorEnabled = getConfig()?.app?.storeLocatorEnabled ?? STORE_LOCATOR_IS_ENABLED
     // Group shipments by type (pickup vs delivery)
     const pickupShipments = []

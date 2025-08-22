@@ -25,9 +25,13 @@ import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-curre
 import ShippingMultiAddress from '@salesforce/retail-react-app/app/pages/checkout/partials/shipping-multi-address'
 import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
 import {useMultiship} from '@salesforce/retail-react-app/app/hooks/use-multiship'
-import {usePickupShipment} from '@salesforce/retail-react-app/app/hooks/use-pickup-shipment'
 import {DEFAULT_SHIPMENT_ID} from '@salesforce/retail-react-app/app/constants'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
+import {cleanAddressForOrder} from '@salesforce/retail-react-app/app/utils/address-utils'
+import {
+    findExistingDeliveryShipment,
+    isPickupShipment
+} from '@salesforce/retail-react-app/app/utils/shipment-utils'
 
 const submitButtonMessage = defineMessage({
     defaultMessage: 'Continue to Shipping Method',
@@ -64,24 +68,14 @@ export default function ShippingAddress() {
     const {data: customer} = useCurrentCustomer()
     const {data: basket} = useCurrentBasket()
     const multishipEnabled = getConfig()?.app?.multishipEnabled ?? true
-    const {isCurrentShippingMethodPickup} = usePickupShipment(basket)
-    const {findExistingDeliveryShipment, moveItemsToDeliveryShipment, removeEmptyShipments} =
-        useMultiship(basket)
+    const {moveItemsToDeliveryShipment, removeEmptyShipments} = useMultiship(basket)
     const selectedShipment = findExistingDeliveryShipment(basket)
     const selectedShippingAddress = selectedShipment?.shippingAddress
     const isAddressFilled = selectedShippingAddress?.address1 && selectedShippingAddress?.city
 
     // Check if there are multiple delivery shipments (multi-shipping was used)
     const deliveryShipments =
-        basket?.shipments?.filter(
-            (shipment) => !isCurrentShippingMethodPickup(shipment?.shippingMethod)
-        ) || []
-
-    const deliveryItems =
-        basket?.productItems?.filter((item) =>
-            deliveryShipments.some((shipment) => shipment.shipmentId === item.shipmentId)
-        ) || []
-
+        basket?.shipments?.filter((shipment) => !isPickupShipment(shipment)) || []
     const hasMultipleDeliveryShipments = deliveryShipments.length > 1
 
     // Initialize multi-shipping state based on existing basket shipments
@@ -102,17 +96,7 @@ export default function ShippingAddress() {
     const submitAndContinue = async (address) => {
         setIsLoading(true)
         try {
-            const {
-                addressId,
-                address1,
-                city,
-                countryCode,
-                firstName,
-                lastName,
-                phone,
-                postalCode,
-                stateCode
-            } = address
+            const {addressId} = address
             const targetShipment = findExistingDeliveryShipment(basket)
             const targetShipmentId = targetShipment?.shipmentId || DEFAULT_SHIPMENT_ID
             let basketAfterItemMoves = null
@@ -123,28 +107,12 @@ export default function ShippingAddress() {
                     shipmentId: targetShipmentId,
                     useAsBilling: false
                 },
-                body: {
-                    address1,
-                    city,
-                    countryCode,
-                    firstName,
-                    lastName,
-                    phone,
-                    postalCode,
-                    stateCode
-                }
+                body: cleanAddressForOrder(address)
             })
 
             if (customer.isRegistered && !addressId) {
                 const body = {
-                    address1,
-                    city,
-                    countryCode,
-                    firstName,
-                    lastName,
-                    phone,
-                    postalCode,
-                    stateCode,
+                    ...cleanAddressForOrder(address),
                     addressId: nanoid()
                 }
                 await createCustomerAddress.mutateAsync({
@@ -163,6 +131,10 @@ export default function ShippingAddress() {
                 })
             }
             // Move all items to the single target delivery shipment.
+            const deliveryItems =
+                basket?.productItems?.filter((item) =>
+                    deliveryShipments.some((shipment) => shipment.shipmentId === item.shipmentId)
+                ) || []
             const itemsToMove = deliveryItems.filter((item) => item.shipmentId !== targetShipmentId)
             if (itemsToMove.length > 0) {
                 basketAfterItemMoves = await moveItemsToDeliveryShipment(

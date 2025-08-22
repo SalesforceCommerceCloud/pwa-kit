@@ -23,6 +23,8 @@ export const StoreLocatorList = () => {
     const [page, setPage] = useState(1)
     const [initialSelectedStoreId, setInitialSelectedStoreId] = useState(selectedStoreId)
 
+    // with BOPIS enabled: store locator selector can't be changed unless basket is emty
+    // with BOPIS and MULTI_SHIP enabled, store locator can be changed any time
     const hasItemsInBasket = derivedData?.totalItems > 0
     const multishipEnabled = getConfig()?.app?.multishipEnabled ?? true
     const storeSelectionDisabled = multishipEnabled ? false : hasItemsInBasket

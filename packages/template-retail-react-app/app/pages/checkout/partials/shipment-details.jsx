@@ -21,13 +21,11 @@ import AddressDisplay from '@salesforce/retail-react-app/app/components/address-
 import StoreDisplay from '@salesforce/retail-react-app/app/components/store-display'
 import {STORE_LOCATOR_IS_ENABLED} from '@salesforce/retail-react-app/app/constants'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
-import {usePickupShipment} from '@salesforce/retail-react-app/app/hooks/use-pickup-shipment'
+import {isPickupShipment} from '@salesforce/retail-react-app/app/utils/shipment-utils'
 
 const onClient = typeof window !== 'undefined'
 
 const ShipmentDetails = ({shipments = []}) => {
-    // No need to pass basket here, we're not using it to check if it's a pickup shipment
-    const {isPickupShipment} = usePickupShipment()
     const storeLocatorEnabled = getConfig()?.app?.storeLocatorEnabled ?? STORE_LOCATOR_IS_ENABLED
     // Get all unique store IDs from pickup shipments
     const storeIds =

@@ -7,7 +7,7 @@
 
 import {useShopperBasketsMutation} from '@salesforce/commerce-sdk-react'
 import {useCallback} from 'react'
-import {cleanAddressForOrder} from '@salesforce/retail-react-app/app/utils/shipment-utils'
+import {cleanAddressForOrder} from '@salesforce/retail-react-app/app/utils/address-utils'
 
 /**
  * Hook for basic shipment CRUD operations

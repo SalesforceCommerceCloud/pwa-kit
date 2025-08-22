@@ -44,7 +44,12 @@ import {
 import {useMultiship} from '@salesforce/retail-react-app/app/hooks/use-multiship'
 import {useItemShipmentManagement} from '@salesforce/retail-react-app/app/hooks/use-item-shipment-management'
 import {useCheckout} from '@salesforce/retail-react-app/app/pages/checkout/util/checkout-context'
-import {usePickupShipment} from '@salesforce/retail-react-app/app/hooks/use-pickup-shipment'
+import {areAddressesEqual} from '@salesforce/retail-react-app/app/utils/address-utils'
+import {
+    isPickupShipment,
+    findDeliveryShipmentWithSameAddress,
+    findUnusedDeliveryShipment
+} from '@salesforce/retail-react-app/app/utils/shipment-utils'
 
 const MultiShippingItemAttributes = ({variant, includeQuantity = true}) => {
     const {formatMessage} = useIntl()
@@ -140,14 +145,10 @@ const ShippingMultiAddress = ({
     const {currency} = useCurrency()
     const {STEPS, goToStep} = useCheckout()
     const showToast = useToast()
-    const {isCurrentShippingMethodPickup} = usePickupShipment(basket)
     const {
-        findDeliveryShipmentWithSameAddress,
-        findUnusedDeliveryShipment,
         createNewDeliveryShipmentWithAddress,
         updateDeliveryAddressForShipment,
-        removeEmptyShipments,
-        areAddressesEqual
+        removeEmptyShipments
     } = useMultiship(basket)
 
     const {updateItemsToDeliveryShipment} = useItemShipmentManagement(basket?.basketId)
@@ -156,7 +157,7 @@ const ShippingMultiAddress = ({
     const deliveryItems =
         basket?.productItems?.filter((item) => {
             const shipment = basket?.shipments?.find((s) => s.shipmentId === item.shipmentId)
-            return !isCurrentShippingMethodPickup(shipment?.shippingMethod)
+            return !isPickupShipment(shipment)
         }) || []
     const productIds = deliveryItems.map((item) => item.productId).join(',')
     const {
@@ -197,9 +198,7 @@ const ShippingMultiAddress = ({
             // If there are existing shipments with addresses, try to match with customer addresses
             const existingShipments =
                 basket.shipments?.filter(
-                    (shipment) =>
-                        shipment.shippingAddress &&
-                        !isCurrentShippingMethodPickup(shipment?.shippingMethod)
+                    (shipment) => shipment.shippingAddress && !isPickupShipment(shipment)
                 ) || []
 
             if (existingShipments.length > 0) {
@@ -275,9 +274,7 @@ const ShippingMultiAddress = ({
         if (customer && customer.isGuest && deliveryItems) {
             const existingShipments =
                 basket.shipments?.filter(
-                    (shipment) =>
-                        shipment.shippingAddress &&
-                        !isCurrentShippingMethodPickup(shipment?.shippingMethod)
+                    (shipment) => shipment.shippingAddress && !isPickupShipment(shipment)
                 ) || []
 
             if (existingShipments.length > 0) {

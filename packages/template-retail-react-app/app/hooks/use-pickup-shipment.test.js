@@ -20,8 +20,6 @@ jest.mock('@salesforce/commerce-sdk-react', () => ({
     }))
 }))
 
-// Use real localStorage for tests
-
 // Mock store data for testing
 const mockStoreData = {
     complete: {
@@ -94,13 +92,6 @@ const expectedShippingAddress = {
 describe('usePickupShipment', () => {
     beforeEach(() => {
         jest.clearAllMocks()
-        // Clear localStorage before each test
-        localStorage.clear()
-    })
-
-    afterEach(() => {
-        // Clean up localStorage after each test
-        localStorage.clear()
     })
 
     test('hasPickupItems returns true when pickup items exist', () => {
@@ -402,8 +393,6 @@ describe('usePickupShipment', () => {
 
     test('addInventoryIdsToPickupItems handles different productId combinations', () => {
         const storeData = {inventoryId: 'store-123'}
-        localStorage.setItem('store_test-site', JSON.stringify(storeData))
-
         const {result} = renderHook(() => usePickupShipment())
 
         // Test with productId
@@ -543,49 +532,18 @@ describe('usePickupShipment', () => {
             })
         })
 
-        test('returns early when store info is invalid and throwOnError is false', async () => {
+        test('returns early when store info is invalid', async () => {
             const {result} = renderHook(() => usePickupShipment())
 
             const basketId = 'basket-123'
 
-            await result.current.updatePickupShipment(basketId, null) // Invalid store info
+            const response = await result.current.updatePickupShipment(basketId, null) // Invalid store info
 
             expect(mockMutateAsync).not.toHaveBeenCalled()
+            expect(response).toBeUndefined()
         })
 
-        test('throws error when store info is invalid and throwOnError is true', async () => {
-            const {result} = renderHook(() => usePickupShipment())
-
-            const basketId = 'basket-123'
-            const options = {throwOnError: true}
-
-            await expect(
-                result.current.updatePickupShipment(basketId, null, options) // Invalid store info
-            ).rejects.toThrow('Failed to retrieve store information')
-        })
-
-        test('returns early when no store info exists and throwOnError is false', async () => {
-            const {result} = renderHook(() => usePickupShipment())
-
-            const basketId = 'basket-123'
-
-            await result.current.updatePickupShipment(basketId, null)
-
-            expect(mockMutateAsync).not.toHaveBeenCalled()
-        })
-
-        test('throws error when no store info exists and throwOnError is true', async () => {
-            const {result} = renderHook(() => usePickupShipment())
-
-            const basketId = 'basket-123'
-            const options = {throwOnError: true}
-
-            await expect(
-                result.current.updatePickupShipment(basketId, null, options)
-            ).rejects.toThrow('Failed to retrieve store information')
-        })
-
-        test('returns early when store info missing inventoryId and throwOnError is false', async () => {
+        test('returns early when store info missing inventoryId', async () => {
             const {result} = renderHook(() => usePickupShipment())
 
             const basketId = 'basket-123'
@@ -593,57 +551,6 @@ describe('usePickupShipment', () => {
             await result.current.updatePickupShipment(basketId, mockStoreData.withoutInventory)
 
             expect(mockMutateAsync).not.toHaveBeenCalled()
-        })
-
-        test('throws error when store info missing inventoryId and throwOnError is true', async () => {
-            const {result} = renderHook(() => usePickupShipment())
-
-            const basketId = 'basket-123'
-            const options = {throwOnError: true}
-
-            await expect(
-                result.current.updatePickupShipment(
-                    basketId,
-                    mockStoreData.withoutInventory,
-                    options
-                )
-            ).rejects.toThrow('No store inventory ID found')
-        })
-
-        test('logs warning when mutation fails and throwOnError is false', async () => {
-            const mutationError = new Error('Mutation failed')
-            mockMutateAsync.mockRejectedValue(mutationError)
-
-            const consoleSpy = jest.spyOn(console, 'warn').mockImplementation(() => {})
-
-            const {result} = renderHook(() => usePickupShipment())
-
-            const basketId = 'basket-123'
-
-            await result.current.updatePickupShipment(basketId, mockStoreData.minimal)
-
-            expect(consoleSpy).toHaveBeenCalledWith(
-                'Failed to configure pickup shipment:',
-                mutationError
-            )
-
-            consoleSpy.mockRestore()
-        })
-
-        test('throws error when mutation fails and throwOnError is true', async () => {
-            localStorage.setItem('store_test-site', JSON.stringify(mockStoreData.minimal))
-
-            const mutationError = new Error('Mutation failed')
-            mockMutateAsync.mockRejectedValue(mutationError)
-
-            const {result} = renderHook(() => usePickupShipment())
-
-            const basketId = 'basket-123'
-            const options = {throwOnError: true}
-
-            await expect(
-                result.current.updatePickupShipment(basketId, mockStoreData.minimal, options)
-            ).rejects.toThrow('Mutation failed')
         })
 
         test('handles store data with missing address fields gracefully', async () => {
@@ -669,7 +576,7 @@ describe('usePickupShipment', () => {
         })
     })
 
-    describe('configureDefaultShipmentIfNeeded', () => {
+    describe('updateDefaultShipmentIfNeeded', () => {
         let mockMutateAsync
         let mockRefetchShippingMethods
 
@@ -718,13 +625,13 @@ describe('usePickupShipment', () => {
                 ]
             }
             const targetShipmentId = 'me'
-            const hasAnyPickupSelected = true
+            const selectedPickup = true
             const selectedStore = mockStoreData.minimal
 
-            await result.current.configureDefaultShipmentIfNeeded(
+            await result.current.updateDefaultShipmentIfNeeded(
                 basketResponse,
                 targetShipmentId,
-                hasAnyPickupSelected,
+                selectedPickup,
                 selectedStore
             )
 
@@ -763,13 +670,13 @@ describe('usePickupShipment', () => {
                 ]
             }
             const targetShipmentId = 'me'
-            const hasAnyPickupSelected = false
+            const selectedPickup = false
             const selectedStore = mockStoreData.minimal
 
-            await result.current.configureDefaultShipmentIfNeeded(
+            await result.current.updateDefaultShipmentIfNeeded(
                 basketResponse,
                 targetShipmentId,
-                hasAnyPickupSelected,
+                selectedPickup,
                 selectedStore
             )
 
@@ -808,13 +715,13 @@ describe('usePickupShipment', () => {
                 ]
             }
             const targetShipmentId = 'custom-shipment-456'
-            const hasAnyPickupSelected = true
+            const selectedPickup = true
             const selectedStore = {id: 'store-1', inventoryId: 'inv-1'}
 
-            await result.current.configureDefaultShipmentIfNeeded(
+            await result.current.updateDefaultShipmentIfNeeded(
                 basketResponse,
                 targetShipmentId,
-                hasAnyPickupSelected,
+                selectedPickup,
                 selectedStore
             )
 
@@ -840,13 +747,13 @@ describe('usePickupShipment', () => {
                 ]
             }
             const targetShipmentId = 'me'
-            const hasAnyPickupSelected = true // Pickup selected and current method is pickup
+            const selectedPickup = true // Pickup selected and current method is pickup
             const selectedStore = {id: 'store-1', inventoryId: 'inv-1'}
 
-            await result.current.configureDefaultShipmentIfNeeded(
+            await result.current.updateDefaultShipmentIfNeeded(
                 basketResponse,
                 targetShipmentId,
-                hasAnyPickupSelected,
+                selectedPickup,
                 selectedStore
             )
 
@@ -871,13 +778,13 @@ describe('usePickupShipment', () => {
                 ]
             }
             const targetShipmentId = 'me'
-            const hasAnyPickupSelected = false // No pickup selected and current method is not pickup
+            const selectedPickup = false // No pickup selected and current method is not pickup
             const selectedStore = {id: 'store-1', inventoryId: 'inv-1'}
 
-            await result.current.configureDefaultShipmentIfNeeded(
+            await result.current.updateDefaultShipmentIfNeeded(
                 basketResponse,
                 targetShipmentId,
-                hasAnyPickupSelected,
+                selectedPickup,
                 selectedStore
             )
 
@@ -901,12 +808,12 @@ describe('usePickupShipment', () => {
                 ]
             }
             const targetShipmentId = 'me'
-            const hasAnyPickupSelected = true
+            const selectedPickup = true
             const selectedStore = {id: 'store-2', inventoryId: 'inv-2', name: 'Store 2'}
-            await result.current.configureDefaultShipmentIfNeeded(
+            await result.current.updateDefaultShipmentIfNeeded(
                 basketResponse,
                 targetShipmentId,
-                hasAnyPickupSelected,
+                selectedPickup,
                 selectedStore
             )
             // Should fetch shipping methods
@@ -964,13 +871,13 @@ describe('usePickupShipment', () => {
                 ]
             }
             const targetShipmentId = 'me'
-            const hasAnyPickupSelected = true
+            const selectedPickup = true
             const selectedStore = mockStoreData.minimal
 
-            await result.current.configureDefaultShipmentIfNeeded(
+            await result.current.updateDefaultShipmentIfNeeded(
                 basketResponse,
                 targetShipmentId,
-                hasAnyPickupSelected,
+                selectedPickup,
                 selectedStore
             )
 
@@ -1020,13 +927,13 @@ describe('usePickupShipment', () => {
                 ]
             }
             const targetShipmentId = 'me'
-            const hasAnyPickupSelected = false
+            const selectedPickup = false
             const selectedStore = {id: 'store-1', inventoryId: 'inv-1'}
 
-            await result.current.configureDefaultShipmentIfNeeded(
+            await result.current.updateDefaultShipmentIfNeeded(
                 basketResponse,
                 targetShipmentId,
-                hasAnyPickupSelected,
+                selectedPickup,
                 selectedStore
             )
 
@@ -1084,42 +991,6 @@ describe('usePickupShipment', () => {
                 }
             })
         })
-
-        test('logs warning when mutation fails and throwOnError is false', async () => {
-            const mutationError = new Error('Regular shipping mutation failed')
-            mockMutateAsync.mockRejectedValue(mutationError)
-
-            const consoleSpy = jest.spyOn(console, 'warn').mockImplementation(() => {})
-
-            const {result} = renderHook(() => usePickupShipment())
-
-            const basketId = 'basket-123'
-            const shippingMethodId = 'standard-shipping'
-
-            await result.current.updateDeliveryShipment(basketId, shippingMethodId)
-
-            expect(consoleSpy).toHaveBeenCalledWith(
-                'Failed to configure regular shipping method:',
-                mutationError
-            )
-
-            consoleSpy.mockRestore()
-        })
-
-        test('throws error when mutation fails and throwOnError is true', async () => {
-            const mutationError = new Error('Regular shipping mutation failed')
-            mockMutateAsync.mockRejectedValue(mutationError)
-
-            const {result} = renderHook(() => usePickupShipment())
-
-            const basketId = 'basket-123'
-            const shippingMethodId = 'standard-shipping'
-            const throwOnError = true
-
-            await expect(
-                result.current.updateDeliveryShipment(basketId, shippingMethodId, throwOnError)
-            ).rejects.toThrow('Regular shipping mutation failed')
-        })
     })
 
     describe('getDefaultShippingMethodId', () => {
@@ -1154,91 +1025,6 @@ describe('usePickupShipment', () => {
         })
     })
 
-    describe('isCurrentShippingMethodPickup', () => {
-        test('returns true when shipping method has c_storePickupEnabled = true', () => {
-            const {result} = renderHook(() => usePickupShipment())
-
-            const shippingMethod = {
-                id: 'pickup-method',
-                c_storePickupEnabled: true
-            }
-
-            const isPickup = result.current.isCurrentShippingMethodPickup(shippingMethod)
-
-            expect(isPickup).toBe(true)
-        })
-
-        test('returns false when shipping method has c_storePickupEnabled = false', () => {
-            const {result} = renderHook(() => usePickupShipment())
-
-            const shippingMethod = {
-                id: 'standard-shipping',
-                c_storePickupEnabled: false
-            }
-
-            const isPickup = result.current.isCurrentShippingMethodPickup(shippingMethod)
-
-            expect(isPickup).toBe(false)
-        })
-
-        test('returns false when shipping method has no c_storePickupEnabled property', () => {
-            const {result} = renderHook(() => usePickupShipment())
-
-            const shippingMethod = {
-                id: 'standard-shipping'
-            }
-
-            const isPickup = result.current.isCurrentShippingMethodPickup(shippingMethod)
-
-            expect(isPickup).toBe(false)
-        })
-
-        test('returns false when shipping method is null', () => {
-            const {result} = renderHook(() => usePickupShipment())
-
-            const isPickup = result.current.isCurrentShippingMethodPickup(null)
-
-            expect(isPickup).toBe(false)
-        })
-    })
-
-    describe('isPickupShipment', () => {
-        test('returns true when c_storePickupEnabled is true', () => {
-            const {result} = renderHook(() => usePickupShipment())
-
-            const isPickup = result.current.isPickupShipment({
-                shippingMethod: {id: '005', c_storePickupEnabled: true}
-            })
-
-            expect(isPickup).toBe(true)
-        })
-
-        test('returns false when c_storePickupEnabled is false', () => {
-            const {result} = renderHook(() => usePickupShipment())
-
-            const isPickup = result.current.isPickupShipment({
-                shippingMethod: {id: '001', c_storePickupEnabled: false}
-            })
-
-            expect(isPickup).toBe(false)
-        })
-
-        test('returns false when shippingMethod is missing', () => {
-            const {result} = renderHook(() => usePickupShipment())
-
-            const isPickup = result.current.isPickupShipment({shipmentId: 'me'})
-
-            expect(isPickup).toBe(false)
-        })
-
-        test('returns false when shipment is nullish', () => {
-            const {result} = renderHook(() => usePickupShipment())
-
-            expect(result.current.isPickupShipment(null)).toBe(false)
-            expect(result.current.isPickupShipment(undefined)).toBe(false)
-        })
-    })
-
     describe('hook initialization with basket parameter', () => {
         test('initializes hook with basket parameter', () => {
             const basket = {
@@ -1250,12 +1036,12 @@ describe('usePickupShipment', () => {
             // Verify that all expected functions are returned
             expect(result.current.updatePickupShipment).toBeDefined()
             expect(result.current.updateDeliveryShipment).toBeDefined()
-            expect(result.current.configureDefaultShipmentIfNeeded).toBeDefined()
+            expect(result.current.updateDefaultShipmentIfNeeded).toBeDefined()
             expect(result.current.hasPickupItems).toBeDefined()
             expect(result.current.addInventoryIdsToPickupItems).toBeDefined()
             expect(result.current.getPickupShippingMethodId).toBeDefined()
             expect(result.current.getDefaultShippingMethodId).toBeDefined()
-            expect(result.current.isCurrentShippingMethodPickup).toBeDefined()
+
             expect(result.current.updateShipmentForBasketMutation).toBeDefined()
         })
 
@@ -1265,12 +1051,12 @@ describe('usePickupShipment', () => {
             // Verify that all expected functions are returned
             expect(result.current.updatePickupShipment).toBeDefined()
             expect(result.current.updateDeliveryShipment).toBeDefined()
-            expect(result.current.configureDefaultShipmentIfNeeded).toBeDefined()
+            expect(result.current.updateDefaultShipmentIfNeeded).toBeDefined()
             expect(result.current.hasPickupItems).toBeDefined()
             expect(result.current.addInventoryIdsToPickupItems).toBeDefined()
             expect(result.current.getPickupShippingMethodId).toBeDefined()
             expect(result.current.getDefaultShippingMethodId).toBeDefined()
-            expect(result.current.isCurrentShippingMethodPickup).toBeDefined()
+
             expect(result.current.updateShipmentForBasketMutation).toBeDefined()
         })
     })

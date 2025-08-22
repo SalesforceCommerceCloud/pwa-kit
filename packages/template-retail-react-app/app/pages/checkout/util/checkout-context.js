@@ -9,9 +9,13 @@ import PropTypes from 'prop-types'
 import useEinstein from '@salesforce/retail-react-app/app/hooks/use-einstein'
 import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
-import {useMultiship} from '@salesforce/retail-react-app/app/hooks/use-multiship'
 import {STORE_LOCATOR_IS_ENABLED} from '@salesforce/retail-react-app/app/constants'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
+import {
+    findDeliveryShipmentWithoutAddress,
+    findExistingDeliveryShipment,
+    isPickupShipment
+} from '@salesforce/retail-react-app/app/utils/shipment-utils'
 
 const CheckoutContext = React.createContext()
 
@@ -20,7 +24,6 @@ export const CheckoutProvider = ({children}) => {
     const {data: basket} = useCurrentBasket()
     const einstein = useEinstein()
     const [step, setStep] = useState()
-    const {findDeliveryShipmentWithoutAddress, findExistingDeliveryShipment} = useMultiship(basket)
     const storeLocatorEnabled = getConfig()?.app?.storeLocatorEnabled ?? STORE_LOCATOR_IS_ENABLED
 
     const CHECKOUT_STEPS_LIST = [
@@ -85,12 +88,8 @@ export const CheckoutProvider = ({children}) => {
         // Check if current step is CONTACT_INFO
         if (step === STEPS.CONTACT_INFO) {
             const shipments = basket?.shipments || []
-            const pickupShipments = shipments.filter(
-                (shipment) => shipment?.shippingMethod?.c_storePickupEnabled
-            )
-            const deliveryShipments = shipments.filter(
-                (shipment) => !shipment?.shippingMethod?.c_storePickupEnabled
-            )
+            const pickupShipments = shipments.filter(isPickupShipment)
+            const deliveryShipments = shipments.filter((shipment) => !isPickupShipment(shipment))
 
             // If all items are pickup at one store, skip directly to payment
             const shouldSkipDirectlyToPayment =

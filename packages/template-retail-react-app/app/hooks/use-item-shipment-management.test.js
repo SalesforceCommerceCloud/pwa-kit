@@ -485,7 +485,9 @@ describe('useItemShipmentManagement', () => {
                 inventoryId: 'store-inventory-1'
             }
             const defaultInventoryId = 'default-inventory'
-            const findOrCreatePickupShipment = jest.fn().mockResolvedValue('pickup-shipment')
+            const findOrCreatePickupShipment = jest.fn().mockResolvedValue({
+                shipmentId: 'pickup-shipment'
+            })
             const findOrCreateDeliveryShipment = jest.fn()
 
             mockUpdateItemInBasketMutation.mutateAsync.mockResolvedValue({updated: true})
@@ -528,7 +530,9 @@ describe('useItemShipmentManagement', () => {
             const storeInfo = null
             const defaultInventoryId = 'default-inventory'
             const findOrCreatePickupShipment = jest.fn()
-            const findOrCreateDeliveryShipment = jest.fn().mockResolvedValue('delivery-shipment')
+            const findOrCreateDeliveryShipment = jest.fn().mockResolvedValue({
+                shipmentId: 'delivery-shipment'
+            })
 
             mockUpdateItemInBasketMutation.mutateAsync.mockResolvedValue({updated: true})
 

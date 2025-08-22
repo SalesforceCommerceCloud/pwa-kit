@@ -119,7 +119,7 @@ jest.mock('@salesforce/retail-react-app/app/hooks/use-selected-store', () => ({
 const mockGetShipmentForItems = jest.fn()
 jest.mock('@salesforce/retail-react-app/app/hooks/use-multiship', () => ({
     useMultiship: () => ({
-        getShipmentForItems: mockGetShipmentForItems
+        getShipmentIdForItems: mockGetShipmentForItems
     })
 }))
 

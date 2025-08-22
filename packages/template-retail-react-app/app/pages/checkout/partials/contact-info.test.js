@@ -12,7 +12,10 @@ import {rest} from 'msw'
 import {scapiBasketWithItem} from '@salesforce/retail-react-app/app/mocks/mock-data'
 import {AuthHelpers} from '@salesforce/commerce-sdk-react'
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
-import {mockGoToStep, mockGoToNextStep, MOCK_STEPS} from '../util/checkout-context'
+import {
+    mockGoToStep,
+    mockGoToNextStep
+} from '@salesforce/retail-react-app/app/pages/checkout/util/checkout-context'
 
 const invalidEmail = 'invalidEmail'
 const validEmail = 'test@salesforce.com'
