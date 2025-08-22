@@ -200,7 +200,7 @@ const ShippingMultiAddress = ({basket, submitButtonLabel, noItemsInBasketMessage
                                 <ProductShippingAddressCard
                                     key={addressKey}
                                     item={item}
-                                    variant={variant}
+                                                                variant={variant}
                                     imageUrl={imageUrl}
                                     addressKey={addressKey}
                                     selectedAddressId={
