@@ -11,6 +11,7 @@ import {isAddressEmpty} from '@salesforce/retail-react-app/app/utils/address-uti
 import {STORE_LOCATOR_IS_ENABLED} from '@salesforce/retail-react-app/app/constants'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import {useMemo} from 'react'
+
 /**
  * This hook combine some commerce-react-sdk hooks to provide more derived data for Retail App baskets
  * @param id - basket id to get the current used basket among baskets returned, use first basket in the array if not defined
