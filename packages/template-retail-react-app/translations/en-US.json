@@ -1451,14 +1451,14 @@
   "shipping_address.error.update_failed": {
     "defaultMessage": "Something went wrong while updating the shipping address. Try again."
   },
-  "shipping_address.label.delivery_address": {
-    "defaultMessage": "Delivery Address"
-  },
   "shipping_address.label.edit_button": {
     "defaultMessage": "Edit {address}"
   },
   "shipping_address.label.remove_button": {
     "defaultMessage": "Remove {address}"
+  },
+  "shipping_address.label.shipping_address": {
+    "defaultMessage": "Delivery Address"
   },
   "shipping_address.label.shipping_address_form": {
     "defaultMessage": "Shipping Address Form"
@@ -1499,6 +1499,9 @@
   "shipping_multi_address.add_new_address.aria_label": {
     "defaultMessage": "Add new delivery address for {productName}"
   },
+  "shipping_multi_address.error.duplicate_address": {
+    "defaultMessage": "The address you entered already exists."
+  },
   "shipping_multi_address.error.label": {
     "defaultMessage": "Something went wrong while loading products."
   },
@@ -1516,9 +1519,6 @@
   },
   "shipping_multi_address.image.alt": {
     "defaultMessage": "Product image for {productName}"
-  },
-  "shipping_multi_address.info.address_already_exists": {
-    "defaultMessage": "The address you entered already exists."
   },
   "shipping_multi_address.loading.message": {
     "defaultMessage": "Loading..."

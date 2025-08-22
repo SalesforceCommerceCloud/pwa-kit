@@ -3443,12 +3443,6 @@
       "value": "Something went wrong while updating the shipping address. Try again."
     }
   ],
-  "shipping_address.label.delivery_address": [
-    {
-      "type": 0,
-      "value": "Delivery Address"
-    }
-  ],
   "shipping_address.label.edit_button": [
     {
       "type": 0,
@@ -3467,6 +3461,12 @@
     {
       "type": 1,
       "value": "address"
+    }
+  ],
+  "shipping_address.label.shipping_address": [
+    {
+      "type": 0,
+      "value": "Delivery Address"
     }
   ],
   "shipping_address.label.shipping_address_form": [
@@ -3551,6 +3551,12 @@
       "value": "productName"
     }
   ],
+  "shipping_multi_address.error.duplicate_address": [
+    {
+      "type": 0,
+      "value": "The address you entered already exists."
+    }
+  ],
   "shipping_multi_address.error.label": [
     {
       "type": 0,
@@ -3605,12 +3611,6 @@
     {
       "type": 1,
       "value": "productName"
-    }
-  ],
-  "shipping_multi_address.info.address_already_exists": [
-    {
-      "type": 0,
-      "value": "The address you entered already exists."
     }
   ],
   "shipping_multi_address.loading.message": [

@@ -9,6 +9,7 @@ import {
     isAddressEmpty,
     areAddressesEqual,
     cleanAddressForOrder,
+    cleanAddressForCustomer,
     getShippingAddressForStore
 } from '@salesforce/retail-react-app/app/utils/address-utils'
 
@@ -296,6 +297,108 @@ describe('address-utils', () => {
                 lastName: undefined,
                 phone: undefined,
                 postalCode: undefined,
+                stateCode: undefined
+            })
+        })
+    })
+
+    describe('cleanAddressForCustomer', () => {
+        test('should return null for null address', () => {
+            expect(cleanAddressForCustomer(null)).toBeNull()
+        })
+
+        test('should return null for undefined address', () => {
+            expect(cleanAddressForCustomer(undefined)).toBeNull()
+        })
+
+        test('should extract valid CustomerAddress fields and default optional ones', () => {
+            const input = {
+                address1: '500 Terry Francois St',
+                city: 'San Francisco',
+                countryCode: 'US',
+                firstName: 'Ada',
+                lastName: 'Lovelace',
+                phone: '415-555-1234',
+                postalCode: '94158',
+                stateCode: 'CA',
+                // Extra fields to be ignored
+                id: 'abc123',
+                customerId: 'cust-1'
+            }
+
+            const result = cleanAddressForCustomer(input)
+
+            expect(result).toEqual({
+                address1: '500 Terry Francois St',
+                address2: '',
+                companyName: '',
+                city: 'San Francisco',
+                countryCode: 'US',
+                firstName: 'Ada',
+                lastName: 'Lovelace',
+                phone: '415-555-1234',
+                postalCode: '94158',
+                preferred: false,
+                stateCode: 'CA'
+            })
+
+            expect(result.id).toBeUndefined()
+            expect(result.customerId).toBeUndefined()
+        })
+
+        test('should preserve provided optional fields', () => {
+            const input = {
+                address1: '1 Infinite Loop',
+                address2: 'Suite 100',
+                companyName: 'Apple',
+                city: 'Cupertino',
+                countryCode: 'US',
+                firstName: 'Steve',
+                lastName: 'Jobs',
+                phone: '408-555-0000',
+                postalCode: '95014',
+                preferred: true,
+                stateCode: 'CA'
+            }
+
+            const result = cleanAddressForCustomer(input)
+
+            expect(result).toEqual({
+                address1: '1 Infinite Loop',
+                address2: 'Suite 100',
+                companyName: 'Apple',
+                city: 'Cupertino',
+                countryCode: 'US',
+                firstName: 'Steve',
+                lastName: 'Jobs',
+                phone: '408-555-0000',
+                postalCode: '95014',
+                preferred: true,
+                stateCode: 'CA'
+            })
+        })
+
+        test('should handle partial data and default address2/companyName/preferred', () => {
+            const input = {
+                address1: '221B Baker Street',
+                city: 'London',
+                countryCode: 'GB'
+                // other fields missing
+            }
+
+            const result = cleanAddressForCustomer(input)
+
+            expect(result).toEqual({
+                address1: '221B Baker Street',
+                address2: '',
+                companyName: '',
+                city: 'London',
+                countryCode: 'GB',
+                firstName: undefined,
+                lastName: undefined,
+                phone: undefined,
+                postalCode: undefined,
+                preferred: false,
                 stateCode: undefined
             })
         })

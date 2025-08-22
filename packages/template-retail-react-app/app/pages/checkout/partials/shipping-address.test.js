@@ -306,14 +306,6 @@ describe('ShippingAddress', () => {
             removeEmptyShipments: jest.fn().mockResolvedValue()
         })
 
-        // Mock usePickupShipment hook
-        const usePickupShipment =
-            // eslint-disable-next-line @typescript-eslint/no-var-requires
-            require('@salesforce/retail-react-app/app/hooks/use-pickup-shipment').usePickupShipment
-        usePickupShipment.mockReturnValue({
-            isCurrentShippingMethodPickup: jest.fn().mockReturnValue(false)
-        })
-
         // Mock useToast hook
         // eslint-disable-next-line @typescript-eslint/no-var-requires
         const useToast = require('@salesforce/retail-react-app/app/hooks/use-toast').useToast
