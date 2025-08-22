@@ -5889,6 +5889,20 @@
       "value": "]"
     }
   ],
+  "pickup_address.button.show_products": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Şħǿǿẇ Ƥřǿǿḓŭŭƈŧş"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
   "pickup_address.title.pickup_address": [
     {
       "type": 0,
