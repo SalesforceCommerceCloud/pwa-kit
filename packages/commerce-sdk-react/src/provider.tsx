@@ -41,6 +41,7 @@ export interface CommerceApiProviderProps extends ApiClientConfigParams {
     headers?: Record<string, string>
     fetchedToken?: string
     enablePWAKitPrivateClient?: boolean
+    privateClientProxyEndpoint?: string
     clientSecret?: string
     silenceWarnings?: boolean
     logger?: Logger
@@ -138,6 +139,7 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
         currency,
         fetchedToken,
         enablePWAKitPrivateClient,
+        privateClientProxyEndpoint,
         clientSecret,
         silenceWarnings,
         logger,
@@ -164,6 +166,7 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
             fetchOptions,
             fetchedToken,
             enablePWAKitPrivateClient,
+            privateClientProxyEndpoint,
             clientSecret,
             silenceWarnings,
             logger: configLogger,
@@ -183,6 +186,7 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
         fetchOptions,
         fetchedToken,
         enablePWAKitPrivateClient,
+        privateClientProxyEndpoint,
         clientSecret,
         silenceWarnings,
         configLogger,
@@ -253,6 +257,11 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
             fetchOptions
         }
 
+        // Special proxy endpoint for injecting SLAS private client secret.
+        // This is only used by the ShopperLogin API as that is the only one that interacts with SLAS.
+        // We prioritize config.privateClientProxyEndpoint since that allows us to use the new envBasePath feature
+        // The preexisting hard coded privateClientEndpoint is kept here for now to prevent a breaking change.
+        // TODO: We should remove this in the next major release so we do not have a hard coded proxy path inside commerce-sdk-react
         const baseUrl = config.proxy.split(MOBIFY_PATH)[0]
         const privateClientEndpoint = `${baseUrl}${SLAS_PRIVATE_PROXY_PATH}`
 
@@ -264,7 +273,11 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
             shopperGiftCertificates: new ShopperGiftCertificates(config),
             shopperLogin: new ShopperLogin({
                 ...config,
-                proxy: enablePWAKitPrivateClient ? privateClientEndpoint : config.proxy
+                proxy: enablePWAKitPrivateClient
+                    ? privateClientProxyEndpoint
+                        ? privateClientProxyEndpoint
+                        : privateClientEndpoint
+                    : config.proxy
             }),
             shopperOrders: new ShopperOrders(config),
             shopperProducts: new ShopperProducts(config),

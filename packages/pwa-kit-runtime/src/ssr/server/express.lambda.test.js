@@ -40,6 +40,12 @@ const testPackageMobify = {
     }
 }
 
+jest.mock('../../utils/ssr-config', () => {
+    return {
+        getConfig: () => testPackageMobify
+    }
+})
+
 const testFixtures = path.resolve(process.cwd(), 'src/ssr/server/test_fixtures')
 
 /**
