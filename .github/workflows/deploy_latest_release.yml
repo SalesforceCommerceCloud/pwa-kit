@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       IS_LATEST_RELEASE: ${{ steps.checkRelease.outputs.IS_LATEST_RELEASE }}
-    steps:  
+    steps:
       - name: Checkout
         uses: actions/checkout@v4
 
@@ -21,7 +21,7 @@ jobs:
         uses: ./.github/actions/check_if_latest_release
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-      
+
       - name: Update Github Outputs
         id: checkRelease
         run: |-
@@ -45,13 +45,15 @@ jobs:
             project: pwa-kit
             mobify_user: MOBIFY_STG_CLIENT_USER
             mobify_api_key: MOBIFY_STG_CLIENT_API_KEY
-            flags: --cloud-origin https://cloud-testing.mobify-staging.com -c ~/.mobify --wait
+            cloud_origin: https://cloud-testing.mobify-staging.com
+            flags: --wait
           - name: demo-site
             project_key: retail-react-app-demo-site
             target: production
             project: scaffold-pwa
             mobify_user: MOBIFY_CLIENT_USER
             mobify_api_key: MOBIFY_CLIENT_API_KEY
+            cloud_origin: https://cloud.mobify.com
             flags: --wait
     steps:
       - name: Checkout
@@ -70,6 +72,7 @@ jobs:
           node ./scripts/gtime.js monorepo_install npm ci
 
       - name: Generate Retail App Demo
+        id: generate_app
         uses: ./.github/actions/e2e_generate_app
         with:
           PROJECT_KEY: ${{ matrix.environment.project_key }}
@@ -94,8 +97,9 @@ jobs:
       - name: Push Bundle to MRT (${{matrix.environment.name}})
         uses: "./.github/actions/push_to_mrt"
         with:
-          CWD: "../generated-projects/${{ matrix.environment.project_key }}"
+          CWD: ${{ steps.generate_app.outputs.project_path }}
           TARGET: ${{ matrix.environment.target }}
           PROJECT: ${{ matrix.environment.project }}
           MESSAGE: ${{ env.BUNDLE_NAME }})
+          CLOUD_ORIGIN: ${{ matrix.environment.cloud_origin }}
           FLAGS: ${{ matrix.environment.flags }}

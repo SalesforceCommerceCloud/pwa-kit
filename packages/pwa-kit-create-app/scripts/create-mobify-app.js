@@ -91,6 +91,9 @@ sh.set('-e')
 // will ensure those escaped double quotes are still escaped after processing the template.
 Handlebars.registerHelper('script', (object) => object.replaceAll('"', '\\"'))
 
+// Helper to convert JavaScript objects to JSON strings
+Handlebars.registerHelper('json', (object) => JSON.stringify(object, null, 4))
+
 // Validations
 const validPreset = (preset) => {
     return ALL_PRESET_NAMES.includes(preset)

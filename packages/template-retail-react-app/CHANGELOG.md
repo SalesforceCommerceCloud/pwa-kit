@@ -1,6 +1,10 @@
 ## v7.1.0-dev (July 28, 2025)
 
 - This feature introduces an AI-powered shopping assistant that integrates Salesforce Embedded Messaging Service with PWA Kit applications. The shopper agent provides real-time chat support, search assistance, and personalized shopping guidance directly within the e-commerce experience. [#2658](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2658)
+- The feature toggle for partial hydration is now found in the config file (`config.app.partialHydrationEnabled`) [#3058](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3058)
+- Mask user not found messages to prevent user enumeration from passwordless login [#3113](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3113)
+
+- [Bugfix] Pin `@chakra-ui/react` version to 2.7.0 to avoid breaking changes from 2.10.9 [#2658](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2658)
 
 ## v7.0.0 (July 22, 2025)
 
@@ -25,7 +29,6 @@
 - Use `<picture>` element for responsive images [#2724](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2724)
 - Add Data Cloud partyIdentification events and improve error handling [#2811](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2811)
 - Introduce the cursor rules to assist project developers [#2820](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2820)
-- Search Suggestion Enhancements [#2901](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2901)
 
 
 ## v6.1.0 (May 22, 2025)

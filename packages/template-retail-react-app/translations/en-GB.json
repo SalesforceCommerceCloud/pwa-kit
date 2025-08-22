@@ -678,9 +678,6 @@
   "global.account.link.wishlist": {
     "defaultMessage": "Wishlist"
   },
-  "global.error.create_account": {
-    "defaultMessage": "This feature is not currently available. You must create an account to access this feature."
-  },
   "global.error.feature_unavailable": {
     "defaultMessage": "This feature is not currently available."
   },
