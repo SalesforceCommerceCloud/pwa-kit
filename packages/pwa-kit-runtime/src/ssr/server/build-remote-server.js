@@ -519,12 +519,6 @@ export const RemoteServerFactory = {
 
         /**
          * Produces a regex that corresponds to the express route pattern provided.
-         *
-         * There are some differences in how express and path-to-regexp handle
-         * special characters in a route pattern such as * or ? so this function also
-         * handles the conversion of express route patterns to something path-to-regexp
-         * can process.
-         *
          */
         const convertExpressRouteToRegex = (routePattern) => {
             if (!routePattern) return null
@@ -546,48 +540,98 @@ export const RemoteServerFactory = {
 
                 // Step 1: Handle regex constraints in parameters like :param(regex)
                 // Example: /search/:query(\d+) -> /search/(\d+)
+                // Store the constraints to prevent them from being escaped later
+                const constraints = []
                 regexPattern = regexPattern.replace(
-                    /:([^/]+)\(([^)]+)\)/g,
+                    /:([^(/]+)\(([^)]+)\)/g,
                     (match, paramName, constraint) => {
-                        return `(${constraint})`
+                        const constraintId = `__CONSTRAINT_${constraints.length}__`
+                        constraints.push(constraint)
+                        return constraintId
                     }
                 )
 
-                // Step 2: Handle all route parameters (both regular and optional) in a single pass
-                // This avoids conflicts between the two types of replacements
+                // Step 2: Handle complex optional parameter sequences first
+                // For patterns like /api/:version?/users/:id?/posts/:postId?
+                // We need to make literal segments optional when they're followed by optional parameters
                 regexPattern = regexPattern.replace(
-                    /:(?:([^/]+)\?|([^/]+))/g,
-                    (match, optionalParam, regularParam) => {
-                        if (optionalParam) {
-                            // This is an optional parameter like :param?
-                            return `(?:[^/]+)?`
-                        } else {
-                            // This is a regular parameter like :param
-                            return `[^/]+`
-                        }
-                    }
+                    /\/([a-zA-Z0-9_-]+)\/:([^(/]+)\?/g,
+                    (match, segment, param) => `(?:/${segment}(?:/[^/]+)?)?`
                 )
 
-                // Step 3: Handle wildcards - Express uses * for wildcards
-                // * should match characters up to but not including the next /
-                // /* should match / followed by any characters
-                regexPattern = regexPattern.replace(/\/\*/g, '/.*')
-                regexPattern = regexPattern.replace(/\*/g, '[^/]*')
+                // Step 3: Handle remaining optional parameters :param?
+                // For /users/:id?, we want to match both /users and /users/123
+                // So we need to replace the entire pattern, not just the parameter
+                regexPattern = regexPattern.replace(/\/:([^(/]+)\?/g, '(?:/[^/]+)?')
 
-                // Step 4: Handle the specific case where a wildcard is followed by an optional parameter
-                // Make the entire "/optional-parameter" part optional when preceded by a wildcard
-                // Pattern to match: [^/]*/(?:[^/]+)?  ->  [^/]*(?:/(?:[^/]+)?)?
+                // Step 4: Handle regular parameters :param
+                regexPattern = regexPattern.replace(/:([^(/]+)/g, '[^/]+')
+
+                // Step 5: Handle wildcards
+                // Express wildcards * should be converted to .* which matches everything including slashes
+                // Handle /* first, then handle standalone * (but not if it's already been converted)
+                regexPattern = regexPattern.replace(/\/\*/g, '/.*')
+                // Handle standalone * that hasn't been converted yet
+                regexPattern = regexPattern.replace(/(?<!\.)\*(?!\*)/g, '.*')
+
+                // Step 6: Handle wildcard + optional parameter combinations
+                // For example /users*/:id?
                 regexPattern = regexPattern.replace(
                     // eslint-disable-next-line no-useless-escape
-                    /\[(\^\/)\]\*\/\(\?\:\[(\^\/)\]\+\)\?/g,
-                    '[^/]*(?:/(?:[^/]+)?)?'
+                    /\.\*\/\(\?\:\/\[(\^\/)\]\+\)\?/g,
+                    '.*(?:/(?:[^/]+)?)?'
                 )
 
-                // Step 5: Escape regex special characters that are literal in the route
-                // We need to escape: $ { } | \ (these are not part of our patterns)
-                // Note: We don't escape ^ because it's used in character classes
+                // Step 7: Handle optional groups (user|admin) -> (?:user|admin)
+                regexPattern = regexPattern.replace(/\(([^)]*\|[^)]*)\)/g, '(?:$1)')
+
+                // Step 8: Handle optional characters in literal strings
+                // For patterns like /favori?te, /colou?r, /analy?se
+                // The ? makes the preceding character optional
+                regexPattern = regexPattern.replace(
+                    /([a-zA-Z0-9])\?/g,
+                    (match, char) => `(?:${char})?`
+                )
+
+                // Step 9: Fix double slashes that may have been created
+                regexPattern = regexPattern.replace(/\/\//g, '/')
+
+                // Step 10: Restore regex constraints without escaping
+                constraints.forEach((constraint, index) => {
+                    const constraintId = `__CONSTRAINT_${index}__`
+                    regexPattern = regexPattern.replace(constraintId, `(${constraint})`)
+                })
+
+                // Step 10.5: Handle optional parameters with regex constraints
+                // For patterns like /users/:id(\d+)?, we need to make the entire constraint group optional
+                // This step must be applied after the constraints are restored but before root path handling
+                // Only apply to actual constraint groups, not already processed optional groups
+                regexPattern = regexPattern.replace(/\(([^)]+)\)\?/g, (match, content) => {
+                    // Only convert if this looks like a regex constraint (contains regex patterns like \d, \w, etc.)
+                    // and is not already an optional group (doesn't start with ?:)
+                    if (
+                        (/\\[dwDsS]/.test(content) || /[^a-zA-Z0-9\s]/.test(content)) &&
+                        !content.startsWith('?:')
+                    ) {
+                        return `(?:${content})?`
+                    }
+                    return match
+                })
+
+                // Step 11: Only escape literal characters that need escaping, but not regex constraints
+                // Don't escape curly braces {} as they're used in regex quantifiers
                 // eslint-disable-next-line no-useless-escape
-                regexPattern = regexPattern.replace(/[\${}|\\]/g, '\\$&')
+                regexPattern = regexPattern.replace(/[\$]/g, '\\$&')
+
+                // Step 12: Handle root path optional parameters
+                // For patterns like /:id? or /*, we need to handle the root path correctly
+                if (regexPattern === '^(?:/[^/]+)?$') {
+                    // This is a root optional parameter, should match both / and /something
+                    regexPattern = '^(?:/|/[^/]+)$'
+                } else if (regexPattern === '^/.*$') {
+                    // This is a root wildcard, should match everything including /
+                    regexPattern = '^/.*$'
+                }
 
                 return new RegExp(`^${regexPattern}$`)
             } catch (error) {
