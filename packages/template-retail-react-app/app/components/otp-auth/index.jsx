@@ -22,6 +22,9 @@ import {
     ModalHeader,
     ModalOverlay
 } from '../shared/ui'
+import useEinstein from '@salesforce/retail-react-app/app/hooks/use-einstein'
+import {useUsid, useEncUserId, useCustomerType, useDNT} from '@salesforce/commerce-sdk-react'
+import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
 
 const OtpAuth = ({
     isOpen,
@@ -37,6 +40,26 @@ const OtpAuth = ({
     const [isVerifying, setIsVerifying] = useState(false)
     const [verificationError, setVerificationError] = useState('')
     const inputRefs = useRef([])
+    // Privacy-aware user identification hooks
+    const {getUsidWhenReady} = useUsid()
+    const {getEncUserIdWhenReady} = useEncUserId()
+    const {isRegistered} = useCustomerType()
+    const {data: customer} = useCurrentCustomer()
+    const {effectiveDnt} = useDNT()
+    // Einstein tracking
+    const {sendViewPage} = useEinstein()
+    // Get privacy-compliant user identifier
+    const getUserIdentifier = async () => {
+        if (effectiveDnt) {
+            return '__DNT__' // Respect Do Not Track
+        }
+        if (isRegistered && customer?.customerId) {
+            return customer.customerId // Use customer ID for registered users
+        }
+        // Use USID for guest users
+        const usid = await getUsidWhenReady()
+        return usid
+    }
 
     // Initialize refs array
     useEffect(() => {
@@ -51,7 +74,7 @@ const OtpAuth = ({
         }
     }, [resendTimer])
 
-    // Focus first OTP input when modal opens and clear previous values
+    // Track OTP modal view activity and focus first input when modal opens
     useEffect(() => {
         if (isOpen) {
             // Clear previous OTP values
@@ -59,13 +82,27 @@ const OtpAuth = ({
             setVerificationError('')
             form.setValue('otp', '')
 
+            // Track OTP modal view activity with Einstein using privacy-compliant identifiers
+            const trackModalView = async () => {
+                const userIdentifier = await getUserIdentifier()
+
+                sendViewPage('/otp-authentication', {
+                    activity: 'otp_modal_viewed',
+                    userId: userIdentifier,
+                    userType: isRegistered ? 'registered' : 'guest',
+                    context: 'authentication',
+                    dntCompliant: effectiveDnt
+                })
+            }
+            trackModalView()
+
             // Small delay to ensure modal is fully rendered
             const timer = setTimeout(() => {
                 inputRefs.current[0]?.focus()
             }, 100)
             return () => clearTimeout(timer)
         }
-    }, [isOpen, form])
+    }, [isOpen, form, sendViewPage, effectiveDnt, isRegistered])
 
     // Validation function to check if value contains only digits
     const isNumericValue = (value) => {
@@ -75,16 +112,48 @@ const OtpAuth = ({
     // Function to verify OTP and handle the result
     const verifyOtpCode = async (otpCode) => {
         setIsVerifying(true)
+
+        const userIdentifier = await getUserIdentifier()
+
+        // Track OTP verification attempt with Einstein using privacy-compliant identifiers
+        sendViewPage('/otp-verification', {
+            activity: 'otp_verification_attempted',
+            userId: userIdentifier,
+            userType: isRegistered ? 'registered' : 'guest',
+            context: 'authentication',
+            otpLength: otpCode.length,
+            dntCompliant: effectiveDnt
+        })
+
         const result = await handleOtpVerification(otpCode)
         setIsVerifying(false)
 
         if (result && !result.success) {
+            // Track failed OTP verification using privacy-compliant identifiers
+            sendViewPage('/otp-verification-failed', {
+                activity: 'otp_verification_failed',
+                userId: userIdentifier,
+                userType: isRegistered ? 'registered' : 'guest',
+                context: 'authentication',
+                error: result.error,
+                dntCompliant: effectiveDnt
+            })
+
             setVerificationError(result.error)
             // Clear the OTP fields so user can try again
             setOtpValues(new Array(OTP_LENGTH).fill(''))
             form.setValue('otp', '')
             // Focus first input
             inputRefs.current[0]?.focus()
+        } else if (result && result.success) {
+            // Track successful OTP verification using privacy-compliant identifiers
+            sendViewPage('/otp-verification-success', {
+                activity: 'otp_verification_successful',
+                userId: userIdentifier,
+                userType: isRegistered ? 'registered' : 'guest',
+                context: 'authentication',
+                dntCompliant: effectiveDnt
+            })
         }
     }
 
@@ -145,15 +214,51 @@ const OtpAuth = ({
             // Start countdown immediately to disable the button while request is in-flight
             setResendTimer(5)
             const email = form.getValues('email')
+            const userIdentifier = await getUserIdentifier()
+
+            // Track OTP resend activity with Einstein using privacy-compliant identifiers
+            sendViewPage('/otp-resend', {
+                activity: 'otp_code_resent',
+                userId: userIdentifier,
+                userType: isRegistered ? 'registered' : 'guest',
+                context: 'authentication',
+                resendAttempt: true,
+                dntCompliant: effectiveDnt
+            })
+
             await handleSendEmailOtp(email)
         } catch (error) {
             // Reset timer so user can try again
             setResendTimer(0)
+
+            // Track failed resend attempt using privacy-compliant identifiers
+            const userIdentifier = await getUserIdentifier()
+            sendViewPage('/otp-resend-failed', {
+                activity: 'otp_resend_failed',
+                userId: userIdentifier,
+                userType: isRegistered ? 'registered' : 'guest',
+                context: 'authentication',
+                error: error.message,
+                dntCompliant: effectiveDnt
+            })
+
             console.error('Error resending code:', error)
         }
     }
 
-    const handleCheckoutAsGuest = () => {
+    const handleCheckoutAsGuest = async () => {
+        // Track checkout as guest selection with Einstein using privacy-compliant identifiers
+        const userIdentifier = await getUserIdentifier()
+
+        sendViewPage('/checkout-as-guest', {
+            activity: 'checkout_as_guest_selected',
+            userId: userIdentifier,
+            userType: isRegistered ? 'registered' : 'guest',
+            context: 'otp_authentication',
+            userChoice: 'guest_checkout',
+            dntCompliant: effectiveDnt
+        })
+
         if (onCheckoutAsGuest) {
             onCheckoutAsGuest()
         }

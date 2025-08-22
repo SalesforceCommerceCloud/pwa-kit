@@ -11,6 +11,39 @@ import OtpAuth from '@salesforce/retail-react-app/app/components/otp-auth/index'
 import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
 import {useForm} from 'react-hook-form'
 
+// Mock the Einstein hook
+const mockSendViewPage = jest.fn()
+jest.mock('@salesforce/retail-react-app/app/hooks/use-einstein', () => {
+    return jest.fn(() => ({
+        sendViewPage: mockSendViewPage
+    }))
+})
+
+// Mock the Commerce SDK hooks
+const mockGetUsidWhenReady = jest.fn()
+const mockGetEncUserIdWhenReady = jest.fn()
+const mockUseCurrentCustomer = jest.fn()
+
+jest.mock('@salesforce/commerce-sdk-react', () => ({
+    ...jest.requireActual('@salesforce/commerce-sdk-react'),
+    useUsid: () => ({
+        getUsidWhenReady: mockGetUsidWhenReady
+    }),
+    useEncUserId: () => ({
+        getEncUserIdWhenReady: mockGetEncUserIdWhenReady
+    }),
+    useCustomerType: () => ({
+        isRegistered: false
+    }),
+    useDNT: () => ({
+        effectiveDnt: false
+    })
+}))
+
+jest.mock('@salesforce/retail-react-app/app/hooks/use-current-customer', () => ({
+    useCurrentCustomer: () => mockUseCurrentCustomer()
+}))
+
 const WrapperComponent = ({...props}) => {
     const form = useForm()
     const mockOnClose = jest.fn()
@@ -43,6 +76,15 @@ describe('OtpAuth', () => {
                 return {email: 'test@example.com'}
             })
         }
+        
+        // Reset Einstein tracking mocks
+        mockSendViewPage.mockClear()
+        mockGetUsidWhenReady.mockResolvedValue('mock-usid-12345')
+        mockGetEncUserIdWhenReady.mockResolvedValue('mock-enc-user-id')
+        mockUseCurrentCustomer.mockReturnValue({
+            data: null // Default to guest user
+        })
+        
         jest.clearAllMocks()
 
         // Set up mock implementation after clearAllMocks
@@ -448,6 +490,446 @@ describe('OtpAuth', () => {
 
             expect(screen.getByText('Checkout as a guest')).toBeInTheDocument()
             expect(screen.getByText('Resend code')).toBeInTheDocument()
+        })
+    })
+
+    describe('Einstein Tracking - Privacy-Compliant User Identification', () => {
+        test('uses USID for guest users when DNT is disabled', async () => {
+            mockUseCurrentCustomer.mockReturnValue({ data: null })
+            
+            renderWithProviders(
+                <OtpAuth
+                    isOpen={true}
+                    onClose={mockOnClose}
+                    form={mockForm}
+                    handleOtpVerification={mockHandleOtpVerification}
+                    handleSendEmailOtp={mockHandleSendEmailOtp}
+                />
+            )
+
+            await waitFor(() => {
+                expect(mockSendViewPage).toHaveBeenCalledWith('/otp-authentication', {
+                    activity: 'otp_modal_viewed',
+                    userId: 'mock-usid-12345',
+                    userType: 'guest',
+                    context: 'authentication',
+                    dntCompliant: false
+                })
+            })
+        })
+
+        test('uses customer ID for registered users', async () => {
+            // Create a test component with updated mocks for this specific test
+            const TestComponentWithRegisteredUser = () => {
+                const form = useForm()
+                return (
+                    <OtpAuth
+                        isOpen={true}
+                        onClose={mockOnClose}
+                        form={form}
+                        handleOtpVerification={mockHandleOtpVerification}
+                        handleSendEmailOtp={mockHandleSendEmailOtp}
+                    />
+                )
+            }
+
+            // Mock the specific hooks for this test case
+            jest.doMock('@salesforce/commerce-sdk-react', () => ({
+                ...jest.requireActual('@salesforce/commerce-sdk-react'),
+                useUsid: () => ({
+                    getUsidWhenReady: () => Promise.resolve('mock-usid-12345')
+                }),
+                useEncUserId: () => ({
+                    getEncUserIdWhenReady: () => Promise.resolve('mock-enc-user-id')
+                }),
+                useCustomerType: () => ({
+                    isRegistered: true
+                }),
+                useDNT: () => ({
+                    effectiveDnt: false
+                })
+            }))
+
+            jest.doMock('@salesforce/retail-react-app/app/hooks/use-current-customer', () => ({
+                useCurrentCustomer: () => ({
+                    data: { customerId: 'customer-123', email: 'test@example.com' }
+                })
+            }))
+
+            renderWithProviders(<TestComponentWithRegisteredUser />)
+
+            await waitFor(() => {
+                expect(mockSendViewPage).toHaveBeenCalledWith('/otp-authentication', {
+                    activity: 'otp_modal_viewed',
+                    userId: 'customer-123',
+                    userType: 'registered',
+                    context: 'authentication',
+                    dntCompliant: false
+                })
+            })
+        })
+
+        test('uses __DNT__ placeholder when Do Not Track is enabled', async () => {
+            jest.doMock('@salesforce/commerce-sdk-react', () => ({
+                ...jest.requireActual('@salesforce/commerce-sdk-react'),
+                useCustomerType: () => ({ isRegistered: false }),
+                useDNT: () => ({ effectiveDnt: true })
+            }))
+
+            renderWithProviders(
+                <OtpAuth
+                    isOpen={true}
+                    onClose={mockOnClose}
+                    form={mockForm}
+                    handleOtpVerification={mockHandleOtpVerification}
+                    handleSendEmailOtp={mockHandleSendEmailOtp}
+                />
+            )
+
+            await waitFor(() => {
+                expect(mockSendViewPage).toHaveBeenCalledWith('/otp-authentication', {
+                    activity: 'otp_modal_viewed',
+                    userId: '__DNT__',
+                    userType: 'guest',
+                    context: 'authentication',
+                    dntCompliant: true
+                })
+            })
+        })
+    })
+
+    describe('Einstein Tracking - OTP Flow Events', () => {
+        test('tracks OTP modal view when component opens', async () => {
+            renderWithProviders(
+                <OtpAuth
+                    isOpen={true}
+                    onClose={mockOnClose}
+                    form={mockForm}
+                    handleOtpVerification={mockHandleOtpVerification}
+                    handleSendEmailOtp={mockHandleSendEmailOtp}
+                />
+            )
+
+            await waitFor(() => {
+                expect(mockSendViewPage).toHaveBeenCalledWith('/otp-authentication', {
+                    activity: 'otp_modal_viewed',
+                    userId: 'mock-usid-12345',
+                    userType: 'guest',
+                    context: 'authentication',
+                    dntCompliant: false
+                })
+            })
+        })
+
+        test('tracks OTP verification attempt', async () => {
+            const user = userEvent.setup()
+            renderWithProviders(
+                <OtpAuth
+                    isOpen={true}
+                    onClose={mockOnClose}
+                    form={mockForm}
+                    handleOtpVerification={mockHandleOtpVerification}
+                    handleSendEmailOtp={mockHandleSendEmailOtp}
+                />
+            )
+
+            // Fill all OTP fields to trigger verification
+            const otpInputs = screen.getAllByRole('textbox')
+            for (let i = 0; i < 8; i++) {
+                await user.type(otpInputs[i], (i + 1).toString())
+            }
+
+            await waitFor(() => {
+                expect(mockSendViewPage).toHaveBeenCalledWith('/otp-verification', {
+                    activity: 'otp_verification_attempted',
+                    userId: 'mock-usid-12345',
+                    userType: 'guest',
+                    context: 'authentication',
+                    otpLength: 8,
+                    dntCompliant: false
+                })
+            })
+        })
+
+        test('tracks successful OTP verification', async () => {
+            const user = userEvent.setup()
+            mockHandleOtpVerification.mockResolvedValue({ success: true })
+
+            renderWithProviders(
+                <OtpAuth
+                    isOpen={true}
+                    onClose={mockOnClose}
+                    form={mockForm}
+                    handleOtpVerification={mockHandleOtpVerification}
+                    handleSendEmailOtp={mockHandleSendEmailOtp}
+                />
+            )
+
+            // Fill all OTP fields to trigger verification
+            const otpInputs = screen.getAllByRole('textbox')
+            for (let i = 0; i < 8; i++) {
+                await user.type(otpInputs[i], (i + 1).toString())
+            }
+
+            await waitFor(() => {
+                expect(mockSendViewPage).toHaveBeenCalledWith('/otp-verification-success', {
+                    activity: 'otp_verification_successful',
+                    userId: 'mock-usid-12345',
+                    userType: 'guest',
+                    context: 'authentication',
+                    dntCompliant: false
+                })
+            })
+        })
+
+        test('tracks failed OTP verification', async () => {
+            const user = userEvent.setup()
+            mockHandleOtpVerification.mockResolvedValue({ 
+                success: false, 
+                error: 'Invalid OTP code' 
+            })
+
+            renderWithProviders(
+                <OtpAuth
+                    isOpen={true}
+                    onClose={mockOnClose}
+                    form={mockForm}
+                    handleOtpVerification={mockHandleOtpVerification}
+                    handleSendEmailOtp={mockHandleSendEmailOtp}
+                />
+            )
+
+            // Fill all OTP fields to trigger verification
+            const otpInputs = screen.getAllByRole('textbox')
+            for (let i = 0; i < 8; i++) {
+                await user.type(otpInputs[i], (i + 1).toString())
+            }
+
+            await waitFor(() => {
+                expect(mockSendViewPage).toHaveBeenCalledWith('/otp-verification-failed', {
+                    activity: 'otp_verification_failed',
+                    userId: 'mock-usid-12345',
+                    userType: 'guest',
+                    context: 'authentication',
+                    error: 'Invalid OTP code',
+                    dntCompliant: false
+                })
+            })
+        })
+
+        test('tracks OTP resend action', async () => {
+            const user = userEvent.setup()
+            renderWithProviders(
+                <OtpAuth
+                    isOpen={true}
+                    onClose={mockOnClose}
+                    form={mockForm}
+                    handleOtpVerification={mockHandleOtpVerification}
+                    handleSendEmailOtp={mockHandleSendEmailOtp}
+                />
+            )
+
+            const resendButton = screen.getByText('Resend code')
+            await user.click(resendButton)
+
+            await waitFor(() => {
+                expect(mockSendViewPage).toHaveBeenCalledWith('/otp-resend', {
+                    activity: 'otp_code_resent',
+                    userId: 'mock-usid-12345',
+                    userType: 'guest',
+                    context: 'authentication',
+                    resendAttempt: true,
+                    dntCompliant: false
+                })
+            })
+        })
+
+        test('tracks OTP resend failure', async () => {
+            const user = userEvent.setup()
+            mockHandleSendEmailOtp.mockRejectedValue(new Error('Network error'))
+
+            renderWithProviders(
+                <OtpAuth
+                    isOpen={true}
+                    onClose={mockOnClose}
+                    form={mockForm}
+                    handleOtpVerification={mockHandleOtpVerification}
+                    handleSendEmailOtp={mockHandleSendEmailOtp}
+                />
+            )
+
+            const resendButton = screen.getByText('Resend code')
+            await user.click(resendButton)
+
+            await waitFor(() => {
+                expect(mockSendViewPage).toHaveBeenCalledWith('/otp-resend-failed', {
+                    activity: 'otp_resend_failed',
+                    userId: 'mock-usid-12345',
+                    userType: 'guest',
+                    context: 'authentication',
+                    error: 'Network error',
+                    dntCompliant: false
+                })
+            })
+        })
+
+        test('tracks checkout as guest selection', async () => {
+            const user = userEvent.setup()
+            const mockOnCheckoutAsGuest = jest.fn()
+
+            renderWithProviders(
+                <OtpAuth
+                    isOpen={true}
+                    onClose={mockOnClose}
+                    form={mockForm}
+                    handleOtpVerification={mockHandleOtpVerification}
+                    handleSendEmailOtp={mockHandleSendEmailOtp}
+                    onCheckoutAsGuest={mockOnCheckoutAsGuest}
+                />
+            )
+
+            const guestButton = screen.getByText('Checkout as a guest')
+            await user.click(guestButton)
+
+            await waitFor(() => {
+                expect(mockSendViewPage).toHaveBeenCalledWith('/checkout-as-guest', {
+                    activity: 'checkout_as_guest_selected',
+                    userId: 'mock-usid-12345',
+                    userType: 'guest',
+                    context: 'otp_authentication',
+                    userChoice: 'guest_checkout',
+                    dntCompliant: false
+                })
+            })
+        })
+    })
+
+    describe('Einstein Tracking - Integration Tests', () => {
+        test('tracks complete OTP flow from modal open to successful verification', async () => {
+            const user = userEvent.setup()
+            mockHandleOtpVerification.mockResolvedValue({ success: true })
+
+            renderWithProviders(
+                <OtpAuth
+                    isOpen={true}
+                    onClose={mockOnClose}
+                    form={mockForm}
+                    handleOtpVerification={mockHandleOtpVerification}
+                    handleSendEmailOtp={mockHandleSendEmailOtp}
+                />
+            )
+
+            // Fill all OTP fields to trigger verification
+            const otpInputs = screen.getAllByRole('textbox')
+            for (let i = 0; i < 8; i++) {
+                await user.type(otpInputs[i], (i + 1).toString())
+            }
+
+            await waitFor(() => {
+                // Should track modal view, verification attempt, and success
+                expect(mockSendViewPage).toHaveBeenCalledTimes(3)
+                expect(mockSendViewPage).toHaveBeenNthCalledWith(1, '/otp-authentication', expect.objectContaining({
+                    activity: 'otp_modal_viewed'
+                }))
+                expect(mockSendViewPage).toHaveBeenNthCalledWith(2, '/otp-verification', expect.objectContaining({
+                    activity: 'otp_verification_attempted'
+                }))
+                expect(mockSendViewPage).toHaveBeenNthCalledWith(3, '/otp-verification-success', expect.objectContaining({
+                    activity: 'otp_verification_successful'
+                }))
+            })
+        })
+
+        test('tracks complete OTP flow with resend and eventual success', async () => {
+            const user = userEvent.setup()
+            mockHandleOtpVerification.mockResolvedValue({ success: true })
+
+            renderWithProviders(
+                <OtpAuth
+                    isOpen={true}
+                    onClose={mockOnClose}
+                    form={mockForm}
+                    handleOtpVerification={mockHandleOtpVerification}
+                    handleSendEmailOtp={mockHandleSendEmailOtp}
+                />
+            )
+
+            // Click resend
+            const resendButton = screen.getByText('Resend code')
+            await user.click(resendButton)
+
+            // Fill OTP fields after resend
+            const otpInputs = screen.getAllByRole('textbox')
+            for (let i = 0; i < 8; i++) {
+                await user.type(otpInputs[i], (i + 1).toString())
+            }
+
+            await waitFor(() => {
+                // Should track: modal view, resend, verification attempt, success
+                expect(mockSendViewPage).toHaveBeenCalledTimes(4)
+                expect(mockSendViewPage).toHaveBeenCalledWith('/otp-authentication', expect.objectContaining({
+                    activity: 'otp_modal_viewed'
+                }))
+                expect(mockSendViewPage).toHaveBeenCalledWith('/otp-resend', expect.objectContaining({
+                    activity: 'otp_code_resent'
+                }))
+                expect(mockSendViewPage).toHaveBeenCalledWith('/otp-verification', expect.objectContaining({
+                    activity: 'otp_verification_attempted'
+                }))
+                expect(mockSendViewPage).toHaveBeenCalledWith('/otp-verification-success', expect.objectContaining({
+                    activity: 'otp_verification_successful'
+                }))
+            })
+        })
+
+        test('does not track events when modal is closed', () => {
+            renderWithProviders(
+                <OtpAuth
+                    isOpen={false}
+                    onClose={mockOnClose}
+                    form={mockForm}
+                    handleOtpVerification={mockHandleOtpVerification}
+                    handleSendEmailOtp={mockHandleSendEmailOtp}
+                />
+            )
+
+            // Should not track any events when modal is closed
+            expect(mockSendViewPage).not.toHaveBeenCalled()
+        })
+
+        test('maintains consistent user identifier across all tracking calls', async () => {
+            const user = userEvent.setup()
+            mockHandleOtpVerification.mockResolvedValue({ success: true })
+
+            renderWithProviders(
+                <OtpAuth
+                    isOpen={true}
+                    onClose={mockOnClose}
+                    form={mockForm}
+                    handleOtpVerification={mockHandleOtpVerification}
+                    handleSendEmailOtp={mockHandleSendEmailOtp}
+                />
+            )
+
+            // Trigger multiple tracking events
+            const resendButton = screen.getByText('Resend code')
+            await user.click(resendButton)
+
+            const otpInputs = screen.getAllByRole('textbox')
+            for (let i = 0; i < 8; i++) {
+                await user.type(otpInputs[i], (i + 1).toString())
+            }
+
+            await waitFor(() => {
+                // All calls should use the same user identifier
+                const calls = mockSendViewPage.mock.calls
+                expect(calls.length).toBeGreaterThan(0)
+                
+                const userIds = calls.map(call => call[1].userId)
+                const uniqueUserIds = [...new Set(userIds)]
+                expect(uniqueUserIds).toHaveLength(1)
+                expect(uniqueUserIds[0]).toBe('mock-usid-12345')
+            })
         })
     })
 })
