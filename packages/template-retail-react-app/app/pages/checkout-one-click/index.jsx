@@ -218,22 +218,7 @@ const CheckoutOneClick = () => {
         ) => {
             try {
                 if (orderPaymentInstrument && shopperPaymentInstrument) {
-                    // Use the same structure as the guest flow
-                    const paymentInstrument = {
-                        paymentMethodId: orderPaymentInstrument.paymentMethodId,
-                        paymentCard: {
-                            holder: shopperPaymentInstrument.holder,
-                            number: shopperPaymentInstrument.number,
-                            cardType: shopperPaymentInstrument.cardType,
-                            expirationMonth: shopperPaymentInstrument.expirationMonth,
-                            expirationYear: shopperPaymentInstrument.expirationYear
-                        }
-                    }
-
-                    await createCustomerPaymentInstruments.mutateAsync({
-                        body: paymentInstrument,
-                        parameters: {customerId: customerId}
-                    })
+                    await savePaymentInstrument(customerId, orderPaymentInstrument.paymentMethodId)
                 }
             } catch (error) {
                 console.error(
