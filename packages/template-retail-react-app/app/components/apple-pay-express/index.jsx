@@ -538,7 +538,6 @@ export const ApplePayExpress = ({
     useEffect(
         () => {
             let isCanceled = false
-            const buttonCreationStartTime = performance.now()
 
             const createCheckout = async () => {
                 if (isCanceled) {
@@ -558,31 +557,29 @@ export const ApplePayExpress = ({
                         hasRequiredBasketData
                     })
                 ) {
+                    handleApplePayUnavailable()
                     return
                 }
 
                 if (!adyenPaymentMethods?.environment) {
+                    handleApplePayUnavailable()
                     return
                 }
 
                 try {
                     let checkout
-                    const checkoutStartTime = performance.now()
                     try {
                         checkout = await createAdyenCheckout(
                             adyenPaymentMethods?.environment,
                             finalLocale,
                             adyenPaymentMethods?.applicationInfo
                         )
-                        const checkoutEndTime = performance.now()
-                        console.log(`🍎 [${isPdpMode ? 'PDP' : 'Cart'}] createAdyenCheckout: ${(checkoutEndTime - checkoutStartTime).toFixed(2)}ms`)
                     } catch (ex) {
                         console.error('Failed to initialize AdyenCheckout:', ex)
                         handleApplePayUnavailable()
                         return
                     }
 
-                    const configStartTime = performance.now()
                     const applePaymentMethodConfig =
                         getApplePaymentMethodConfig(adyenPaymentMethods)
 
@@ -605,27 +602,19 @@ export const ApplePayExpress = ({
                         isPdpMode,
                         quantity
                     )
-                    const configEndTime = performance.now()
-                    console.log(`🍎 [${isPdpMode ? 'PDP' : 'Cart'}] getAppleButtonConfig: ${(configEndTime - configStartTime).toFixed(2)}ms`)
 
-                    const createStartTime = performance.now()
                     let applePayButton
                     try {
                         applePayButton = await checkout.create('applepay', appleButtonConfig)
-                        const createEndTime = performance.now()
-                        console.log(`🍎 [${isPdpMode ? 'PDP' : 'Cart'}] checkout.create: ${(createEndTime - createStartTime).toFixed(2)}ms`)
                     } catch (ex) {
                         console.error('Failed to create Apple Pay button:', ex)
                         handleApplePayUnavailable()
                         return
                     }
 
-                    const availabilityStartTime = performance.now()
                     let isApplePayButtonAvailable = false
                     try {
                         isApplePayButtonAvailable = await applePayButton.isAvailable()
-                        const availabilityEndTime = performance.now()
-                        console.log(`🍎 [${isPdpMode ? 'PDP' : 'Cart'}] isAvailable: ${(availabilityEndTime - availabilityStartTime).toFixed(2)}ms`)
                     } catch (ex) {
                         isApplePayButtonAvailable = false
                     }
@@ -635,22 +624,9 @@ export const ApplePayExpress = ({
                         return
                     }
 
-                    const mountStartTime = performance.now()
                     try {
                         await applePayButton.mount(paymentContainer.current)
                         manager.setPaymentMethodAvailable(PAYMENT_METHOD)
-                        const mountEndTime = performance.now()
-                        console.log(`🍎 [${isPdpMode ? 'PDP' : 'Cart'}] mount: ${(mountEndTime - mountStartTime).toFixed(2)}ms`)
-
-                        // Log the actual button creation and mounting time
-                        const buttonCreationEndTime = performance.now()
-                        const buttonCreationDuration =
-                            buttonCreationEndTime - buttonCreationStartTime
-                        console.log(
-                            `🍎 [${isPdpMode ? 'PDP' : 'Cart'}] TOTAL button created and mounted in ${buttonCreationDuration.toFixed(
-                                2
-                            )}ms`
-                        )
                     } catch (error) {
                         console.error('Failed to mount Apple Pay button:', error)
                         handleApplePayUnavailable()
