@@ -74,7 +74,7 @@ export const cleanAddressForOrder = (address) => {
  * @param {Object} address - The address object (may contain extra fields from customer address)
  * @returns {Object} Clean address object with only OrderAddress fields
  */
-export const cleanAddressForCustomer = (address) => {
+export const sanitizedCustomerAddress = (address) => {
     if (!address) return null
 
     return {

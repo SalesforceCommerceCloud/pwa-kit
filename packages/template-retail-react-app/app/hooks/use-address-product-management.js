@@ -46,7 +46,7 @@ export const useAddressProductManagement = (basket) => {
     useEffect(() => {
         if (
             customer?.customerId &&
-            !customer?.isGuest &&
+            customer?.isRegistered &&
             deliveryItems?.length > 0 &&
             availableAddresses.length > 0
         ) {

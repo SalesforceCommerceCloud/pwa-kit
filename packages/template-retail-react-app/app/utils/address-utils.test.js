@@ -9,7 +9,7 @@ import {
     isAddressEmpty,
     areAddressesEqual,
     cleanAddressForOrder,
-    cleanAddressForCustomer,
+    sanitizedCustomerAddress,
     getShippingAddressForStore
 } from '@salesforce/retail-react-app/app/utils/address-utils'
 
@@ -302,13 +302,13 @@ describe('address-utils', () => {
         })
     })
 
-    describe('cleanAddressForCustomer', () => {
+    describe('sanitizedCustomerAddress', () => {
         test('should return null for null address', () => {
-            expect(cleanAddressForCustomer(null)).toBeNull()
+            expect(sanitizedCustomerAddress(null)).toBeNull()
         })
 
         test('should return null for undefined address', () => {
-            expect(cleanAddressForCustomer(undefined)).toBeNull()
+            expect(sanitizedCustomerAddress(undefined)).toBeNull()
         })
 
         test('should extract valid CustomerAddress fields and default optional ones', () => {
@@ -326,7 +326,7 @@ describe('address-utils', () => {
                 customerId: 'cust-1'
             }
 
-            const result = cleanAddressForCustomer(input)
+            const result = sanitizedCustomerAddress(input)
 
             expect(result).toEqual({
                 address1: '500 Terry Francois St',
@@ -361,7 +361,7 @@ describe('address-utils', () => {
                 stateCode: 'CA'
             }
 
-            const result = cleanAddressForCustomer(input)
+            const result = sanitizedCustomerAddress(input)
 
             expect(result).toEqual({
                 address1: '1 Infinite Loop',
@@ -386,7 +386,7 @@ describe('address-utils', () => {
                 // other fields missing
             }
 
-            const result = cleanAddressForCustomer(input)
+            const result = sanitizedCustomerAddress(input)
 
             expect(result).toEqual({
                 address1: '221B Baker Street',
