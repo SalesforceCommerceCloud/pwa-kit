@@ -194,13 +194,13 @@
   "account_order_detail.toast.cancellation_failed": [
     {
       "type": 0,
-      "value": "Request cancellation did not succeed."
+      "value": "Something went wrong with the order cancellation."
     }
   ],
   "account_order_detail.toast.cancellation_success": [
     {
       "type": 0,
-      "value": "Cancellation request submitted."
+      "value": "Your order cancellation request was submitted."
     }
   ],
   "account_order_history.button.continue_shopping": [

@@ -102,7 +102,7 @@ const AccountOrderDetail = () => {
             if (response && !response.ok) {
                 toast({
                     title: formatMessage({
-                        defaultMessage: 'Request cancellation did not succeed.',
+                        defaultMessage: 'Something went wrong with the order cancellation.',
                         id: 'account_order_detail.toast.cancellation_failed'
                     }),
                     status: 'error'
@@ -113,7 +113,7 @@ const AccountOrderDetail = () => {
             // Success (2xx)
             toast({
                 title: formatMessage({
-                    defaultMessage: 'Cancellation request submitted.',
+                    defaultMessage: 'Your order cancellation request was submitted.',
                     id: 'account_order_detail.toast.cancellation_success'
                 }),
                 status: 'success'
@@ -122,7 +122,7 @@ const AccountOrderDetail = () => {
             // Network/unexpected error
             toast({
                 title: formatMessage({
-                    defaultMessage: 'Request cancellation did not succeed.',
+                    defaultMessage: 'Something went wrong with the order cancellation.',
                     id: 'account_order_detail.toast.cancellation_failed'
                 }),
                 status: 'error'

@@ -90,10 +90,10 @@
     "defaultMessage": "Order Details"
   },
   "account_order_detail.toast.cancellation_failed": {
-    "defaultMessage": "Request cancellation did not succeed."
+    "defaultMessage": "Something went wrong with the order cancellation."
   },
   "account_order_detail.toast.cancellation_success": {
-    "defaultMessage": "Cancellation request submitted."
+    "defaultMessage": "Your order cancellation request was submitted."
   },
   "account_order_history.button.continue_shopping": {
     "defaultMessage": "Continue Shopping"
