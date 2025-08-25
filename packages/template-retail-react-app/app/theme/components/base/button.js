@@ -23,6 +23,14 @@ export default {
             props.colorScheme === 'black'
                 ? {color: 'gray.900', _hover: {bg: 'gray.50'}, borderColor: 'gray.200'}
                 : {color: 'blue.600', _hover: {bg: 'gray.50'}},
+        'outline-gray': {
+            color: 'blue.600',
+            border: '1px solid',
+            borderColor: 'blue.600',
+            _hover: {bg: 'gray.50'},
+            _active: {bg: 'gray.100'},
+            _disabled: {borderColor: 'gray.300', color: 'gray.400', border: '1px solid'}
+        },
         footer: {
             fontSize: 'sm',
             backgroundColor: 'gray.100',
