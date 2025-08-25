@@ -39,6 +39,8 @@
 
 - Introduce optional prop `hybridAuthEnabled` to control Hybrid Auth specific behaviors in commerce-sdk-react [#3151](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3151)
 
+- Introduce optional prop `hybridAuthEnabled` to control Hybrid Auth specific behaviors in commerce-sdk-react [#3151](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3151)
+
 ## v7.0.0 (July 22, 2025)
 
 - Improved the layout of product tiles in product scroll and product list [#2446](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2446)
