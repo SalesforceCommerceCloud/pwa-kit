@@ -504,7 +504,9 @@ describe('Payment Component', () => {
 
             render(<TestWrapper basketData={pickupBasket} />)
 
-            expect(screen.queryByText('checkout_payment.label.same_as_shipping')).not.toBeInTheDocument()
+            expect(
+                screen.queryByText('checkout_payment.label.same_as_shipping')
+            ).not.toBeInTheDocument()
         })
     })
 
@@ -607,7 +609,9 @@ describe('Payment Component', () => {
             const {user} = render(<TestWrapper />)
 
             // Ensure "Same as shipping address" is checked (default)
-            const sameAsShippingCheckbox = screen.getByText('checkout_payment.label.same_as_shipping')
+            const sameAsShippingCheckbox = screen.getByText(
+                'checkout_payment.label.same_as_shipping'
+            )
             expect(sameAsShippingCheckbox.closest('label')).toBeInTheDocument()
 
             // Submit form
@@ -633,7 +637,9 @@ describe('Payment Component', () => {
         test('allows separate billing address when checkbox is unchecked', async () => {
             const {user} = render(<TestWrapper />)
 
-            const sameAsShippingCheckbox = screen.getByText('checkout_payment.label.same_as_shipping')
+            const sameAsShippingCheckbox = screen.getByText(
+                'checkout_payment.label.same_as_shipping'
+            )
             await user.click(sameAsShippingCheckbox)
 
             // Should show billing address form
@@ -646,7 +652,9 @@ describe('Payment Component', () => {
             const {user} = render(<TestWrapper />)
 
             // Uncheck "Same as shipping address"
-            const sameAsShippingCheckbox = screen.getByText('checkout_payment.label.same_as_shipping')
+            const sameAsShippingCheckbox = screen.getByText(
+                'checkout_payment.label.same_as_shipping'
+            )
             await user.click(sameAsShippingCheckbox)
 
             await waitFor(() => {
