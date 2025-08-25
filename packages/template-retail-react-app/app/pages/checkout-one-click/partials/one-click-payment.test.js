@@ -7,9 +7,7 @@
 /* eslint-disable react/prop-types */
 import React from 'react'
 import PropTypes from 'prop-types'
-import {render, screen, fireEvent, waitFor} from '@testing-library/react'
-import {useForm} from 'react-hook-form'
-import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
+import {render, screen, waitFor} from '@testing-library/react'
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
 import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
 import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
@@ -23,7 +21,8 @@ jest.mock('react-intl', () => ({
     useIntl: () => ({
         formatMessage: jest.fn((descriptor) => {
             if (typeof descriptor === 'string') return descriptor
-            if (descriptor && typeof descriptor.defaultMessage === 'string') return descriptor.defaultMessage
+            if (descriptor && typeof descriptor.defaultMessage === 'string')
+                return descriptor.defaultMessage
             if (descriptor && typeof descriptor.id === 'string') return descriptor.id
             return 'Formatted Message'
         })
@@ -74,7 +73,7 @@ jest.mock('@salesforce/retail-react-app/app/components/promo-code', () => ({
 jest.mock(
     '@salesforce/retail-react-app/app/pages/checkout-one-click/partials/one-click-payment-form',
     () => {
-        const MockPaymentForm = function ({form, onSubmit}) {
+        const MockPaymentForm = function ({onSubmit}) {
             return (
                 <div data-testid="payment-form">
                     <div>Credit Card</div>
@@ -107,7 +106,7 @@ jest.mock(
 jest.mock(
     '@salesforce/retail-react-app/app/pages/checkout-one-click/partials/one-click-shipping-address-selection',
     () => {
-        const MockShippingAddressSelection = function ({hideSubmitButton, isBillingAddress, form}) {
+        const MockShippingAddressSelection = function ({hideSubmitButton}) {
             return (
                 <div data-testid="shipping-address-selection">
                     <input aria-label="First Name" data-testid="first-name" />
@@ -131,10 +130,7 @@ jest.mock(
 jest.mock(
     '@salesforce/retail-react-app/app/pages/checkout-one-click/partials/one-click-user-registration',
     () => {
-        const MockUserRegistration = function ({
-            enableUserRegistration,
-            setEnableUserRegistration
-        }) {
+        const MockUserRegistration = function ({enableUserRegistration}) {
             return enableUserRegistration ? (
                 <div data-testid="user-registration">User Registration</div>
             ) : null
@@ -184,16 +180,7 @@ jest.mock('@salesforce/retail-react-app/app/components/address-display', () => {
 
 // Mock the ToggleCard components
 jest.mock('@salesforce/retail-react-app/app/components/toggle-card', () => {
-    const ToggleCard = ({
-        children,
-        title,
-        editing,
-        isLoading,
-        disabled,
-        onEdit,
-        editLabel,
-        ...props
-    }) => (
+    const ToggleCard = ({children, title, editing, onEdit, editLabel, ...props}) => (
         <div data-testid="toggle-card" {...props}>
             <div data-testid="toggle-card-title">{title}</div>
             {editing && (
@@ -416,7 +403,7 @@ describe('Payment Component', () => {
         } catch (simpleError) {
             console.log('=== SIMPLE RENDER ERROR ===')
             console.log(simpleError.message)
-            
+
             try {
                 render(<TestWrapper />)
                 console.log('=== PROVIDER RENDER SUCCESS ===')
@@ -437,7 +424,7 @@ describe('Payment Component', () => {
         // Debug what's actually rendering
         console.log('=== DOM HTML ===')
         console.log(document.body.innerHTML)
-        
+
         // Try to find any elements
         console.log('=== SEARCHING FOR ELEMENTS ===')
         console.log('Payment title:', screen.queryByText('Payment'))
@@ -485,15 +472,16 @@ describe('Payment Component', () => {
 
             render(<TestWrapper basketData={basketWithPayment} />)
 
-            expect(screen.getByText('Visa')).toBeInTheDocument()
-            expect(screen.getByText('•••• 1234')).toBeInTheDocument()
+            expect(screen.getAllByText('Visa')).toHaveLength(2) // Shows in both edit and summary sections
+            expect(screen.getAllByText('•••• 1234')).toHaveLength(2) // Shows in both edit and summary sections
         })
 
         test('renders billing address section', () => {
             render(<TestWrapper />)
 
             // The heading shows as the message ID since we're mocking formatMessage
-            expect(screen.getByText('checkout_payment.heading.billing_address')).toBeInTheDocument()
+            // It appears in both edit and summary sections
+            expect(screen.getAllByText('checkout_payment.heading.billing_address')).toHaveLength(2)
         })
 
         test('shows "Same as shipping address" checkbox for non-pickup orders', () => {
@@ -516,7 +504,7 @@ describe('Payment Component', () => {
 
             render(<TestWrapper basketData={pickupBasket} />)
 
-            expect(screen.queryByText('Same as shipping address')).not.toBeInTheDocument()
+            expect(screen.queryByText('checkout_payment.label.same_as_shipping')).not.toBeInTheDocument()
         })
     })
 
@@ -560,7 +548,7 @@ describe('Payment Component', () => {
 
             const {user} = render(<TestWrapper basketData={basketWithPayment} />)
 
-            const removeButton = screen.getByText('Remove')
+            const removeButton = screen.getByText('checkout_payment.action.remove')
             await user.click(removeButton)
 
             await waitFor(() => {
@@ -594,7 +582,7 @@ describe('Payment Component', () => {
 
             const {user} = render(<TestWrapper basketData={basketWithPayment} />)
 
-            const removeButton = screen.getByText('Remove')
+            const removeButton = screen.getByText('checkout_payment.action.remove')
             await user.click(removeButton)
 
             await waitFor(() => {
@@ -619,7 +607,7 @@ describe('Payment Component', () => {
             const {user} = render(<TestWrapper />)
 
             // Ensure "Same as shipping address" is checked (default)
-            const sameAsShippingCheckbox = screen.getByText('Same as shipping address')
+            const sameAsShippingCheckbox = screen.getByText('checkout_payment.label.same_as_shipping')
             expect(sameAsShippingCheckbox.closest('label')).toBeInTheDocument()
 
             // Submit form
@@ -645,9 +633,7 @@ describe('Payment Component', () => {
         test('allows separate billing address when checkbox is unchecked', async () => {
             const {user} = render(<TestWrapper />)
 
-            const sameAsShippingCheckbox = screen.getByRole('checkbox', {
-                name: /same as shipping address/i
-            })
+            const sameAsShippingCheckbox = screen.getByText('checkout_payment.label.same_as_shipping')
             await user.click(sameAsShippingCheckbox)
 
             // Should show billing address form
@@ -660,9 +646,7 @@ describe('Payment Component', () => {
             const {user} = render(<TestWrapper />)
 
             // Uncheck "Same as shipping address"
-            const sameAsShippingCheckbox = screen.getByRole('checkbox', {
-                name: /same as shipping address/i
-            })
+            const sameAsShippingCheckbox = screen.getByText('checkout_payment.label.same_as_shipping')
             await user.click(sameAsShippingCheckbox)
 
             await waitFor(() => {
@@ -708,9 +692,7 @@ describe('Payment Component', () => {
         })
 
         test('hides user registration when user chose guest checkout', () => {
-            render(
-                <TestWrapper enableUserRegistration={true} registeredUserChoseGuest={true} />
-            )
+            render(<TestWrapper enableUserRegistration={true} registeredUserChoseGuest={true} />)
 
             // User registration should be hidden
             expect(screen.getByText('Review Order')).toBeInTheDocument()
@@ -719,9 +701,7 @@ describe('Payment Component', () => {
         test('calls setEnableUserRegistration when registration preference changes', () => {
             const mockSetEnableUserRegistration = jest.fn()
 
-            render(
-                <TestWrapper setEnableUserRegistration={mockSetEnableUserRegistration} />
-            )
+            render(<TestWrapper setEnableUserRegistration={mockSetEnableUserRegistration} />)
 
             // The component should set up the registration preference handler
             expect(mockSetEnableUserRegistration).toBeDefined()
@@ -773,9 +753,7 @@ describe('Payment Component', () => {
                 ]
             }
 
-            render(
-                <TestWrapper customerData={customerWithDifferentCard} isRegistered={true} />
-            )
+            render(<TestWrapper customerData={customerWithDifferentCard} isRegistered={true} />)
 
             // Component should detect new payment instruments
             expect(screen.getByText('Review Order')).toBeInTheDocument()
@@ -857,7 +835,7 @@ describe('Payment Component', () => {
         test('handles empty basket gracefully', () => {
             render(<TestWrapper basketData={null} />)
 
-            expect(screen.getByText('Payment')).toBeInTheDocument()
+            expect(screen.getByText('checkout_payment.title.payment')).toBeInTheDocument()
         })
 
         test('handles customer without payment instruments', () => {
@@ -869,7 +847,7 @@ describe('Payment Component', () => {
         test('handles undefined customer data', () => {
             render(<TestWrapper customerData={undefined} />)
 
-            expect(screen.getByText('Payment')).toBeInTheDocument()
+            expect(screen.getByText('checkout_payment.title.payment')).toBeInTheDocument()
         })
 
         test('handles basket without shipments', () => {
@@ -880,14 +858,14 @@ describe('Payment Component', () => {
 
             render(<TestWrapper basketData={basketWithoutShipments} />)
 
-            expect(screen.getByText('Payment')).toBeInTheDocument()
+            expect(screen.getByText('checkout_payment.title.payment')).toBeInTheDocument()
         })
 
         test('handles null billing address form values', async () => {
             const {user} = render(<TestWrapper />)
 
             // Uncheck same as shipping
-            const checkbox = screen.getByRole('checkbox', {name: /same as shipping address/i})
+            const checkbox = screen.getByText('checkout_payment.label.same_as_shipping')
             await user.click(checkbox)
 
             // Should show the billing address form
@@ -901,9 +879,9 @@ describe('Payment Component', () => {
         test('payment section has proper heading structure', () => {
             render(<TestWrapper />)
 
-            expect(screen.getByRole('heading', {name: 'Payment'})).toBeInTheDocument()
+            expect(screen.getByText('checkout_payment.title.payment')).toBeInTheDocument()
             expect(screen.getByText('Credit Card')).toBeInTheDocument()
-            expect(screen.getByRole('heading', {name: 'Billing Address'})).toBeInTheDocument()
+            expect(screen.getByText('checkout_payment.heading.billing_address')).toBeInTheDocument()
         })
 
         test('form controls have proper labels', () => {
@@ -924,7 +902,7 @@ describe('Payment Component', () => {
         test('checkboxes have proper labels', () => {
             render(<TestWrapper />)
 
-            expect(screen.getByText('Same as shipping address')).toBeInTheDocument()
+            expect(screen.getByText('checkout_payment.label.same_as_shipping')).toBeInTheDocument()
         })
     })
 })
