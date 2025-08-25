@@ -189,20 +189,45 @@ export const getGoogleButtonConfig = (
     isPdpMode = false,
     quantity = 1
 ) => {
+    console.log('🔧 getGoogleButtonConfig called with params:', {
+        authToken: !!authToken,
+        site: !!site,
+        basket: basket,
+        googlePayConfig: !!googlePayConfig,
+        sku: sku,
+        setTempBasket: !!setTempBasket,
+        tempBasket: tempBasket,
+        isPdpMode: isPdpMode,
+        quantity: quantity
+    })
+
     // Single basket reference that gets updated as needed
+    // Initialize basketRef with the actual basket value, not null
     let basketRef = isPdpMode ? tempBasket : basket
     let googlePayAmount = basketRef?.orderTotal || 0
+
+    console.log('🔧 getGoogleButtonConfig initialized:', {
+        isPdpMode,
+        hasBasket: !!basket,
+        hasTempBasket: !!tempBasket,
+        basketRef: basketRef,
+        basketId: basketRef?.basketId,
+        basket: basket,
+        tempBasket: tempBasket
+    })
 
     // Helper function to get or create basket (prevents multiple creation)
     const getOrCreateBasket = async () => {
         console.log('🔍 getOrCreateBasket called:', { 
-            isPdpMode, 
+            isPdpMode,
             sku, 
             tempBasket, 
             basket, 
             basketRef,
             hasBasketRef: !!basketRef,
-            hasBasketRefId: !!(basketRef?.basketId)
+            hasBasketRefId: !!(basketRef?.basketId),
+            skuType: typeof sku,
+            isPdpModeType: typeof isPdpMode
         })
         
         // If we already have a basket reference, return it
@@ -212,7 +237,7 @@ export const getGoogleButtonConfig = (
         }
 
         // For PDP flows, create temporary basket if needed (and SKU is available)
-        if (isPdpMode && sku && setTempBasket) {
+        if (isPdpMode && sku && typeof sku === 'string' && setTempBasket) {
             console.log('🛒 Creating temporary basket for SKU:', sku)
             try {
                 const newBasket = await createTemporaryBasket(sku, authToken, site, quantity)
@@ -224,6 +249,25 @@ export const getGoogleButtonConfig = (
                 console.error('❌ Failed to create temporary basket:', error)
                 return null
             }
+        } else {
+            console.log('❌ PDP mode conditions not met:', {
+                isPdpMode,
+                hasSku: !!sku,
+                skuType: typeof sku,
+                skuValue: sku,
+                hasSetTempBasket: !!setTempBasket,
+                reason: !isPdpMode ? 'not PDP mode' :
+                         !sku ? 'no SKU' :
+                         typeof sku !== 'string' ? 'SKU is not a string' :
+                         !setTempBasket ? 'no setTempBasket function' : 'unknown'
+            })
+        }
+
+        // For Cart mode, use the existing basket
+        if (basket && basket.basketId) {
+            console.log('🛒 Using existing cart basket:', basket.basketId)
+            basketRef = basket // Update basket reference
+            return basket
         }
 
         console.log('❌ No basket available and cannot create one')
@@ -566,9 +610,7 @@ export const GooglePayExpress = ({
                         authToken,
                         finalSite,
                         basket,
-                        adyenPaymentMethods?.applicableShippingMethods || [],
                         googlePaymentMethodConfig,
-                        adyenPaymentMethods?.fetchShippingMethods,
                         currentSku,
                         setTempBasket,
                         tempBasket,
