@@ -1219,7 +1219,8 @@ class Auth {
 
         const result = await helpers.authorizeIDP({
             slasClient,
-            parameters: authorizeParams
+            parameters: authorizeParams,
+            privateClient: this.isPrivate
         })
 
         // Store code verifier for later use in loginIDPUser
