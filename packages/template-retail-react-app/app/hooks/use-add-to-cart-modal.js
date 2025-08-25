@@ -61,7 +61,7 @@ AddToCartModalProvider.propTypes = {
  */
 export const AddToCartModal = () => {
     const {isOpen, onClose, data} = useAddToCartModalContext()
-    const {product, itemsAdded = [], selectedQuantity} = data || {}
+    const {product, itemsAdded = [], selectedQuantity, newBonusItems, allBonusItems} = data || {}
     const isProductABundle = product?.type.bundle
 
     const intl = useIntl()
@@ -278,6 +278,26 @@ export const AddToCartModal = () => {
                                         </Flex>
                                     )
                                 })}
+
+                            {newBonusItems?.length > 0 && (
+                                <Box paddingTop={4}>
+                                    <Button
+                                        as={Link}
+                                        to="/cart"
+                                        width="100%"
+                                        variant="outline-gray"
+                                        size="md"
+                                        height={9}
+                                        minWidth={11}
+                                        textStyle="sm"
+                                    >
+                                        {intl.formatMessage({
+                                            defaultMessage: 'Select Bonus Products',
+                                            id: 'add_to_cart_modal.button.select_bonus_products'
+                                        })}
+                                    </Button>
+                                </Box>
+                            )}
                         </Box>
                         <Box
                             display={['none', 'none', 'none', 'block']}

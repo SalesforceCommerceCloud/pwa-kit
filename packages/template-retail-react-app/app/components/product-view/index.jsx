@@ -303,29 +303,22 @@ const ProductView = forwardRef(
                     // It's possible that the item has been added to cart, but we don't want to open the modal.
                     // See wishlist_primary_action for example.
                     if (isValidResponse) {
-                        // Show bonus product modal first if there are bonus items
-                        // TODO: Rule based promotions are not supported yet
+                        // Update bonusProducts list if there are new bonus items
                         if (
                             newBonusItems?.length > 0 &&
                             newBonusItems.some((item) => item.bonusProducts)
                         ) {
-                            // Update bonusProducts list with the new bonus items
                             addBonusProducts(newBonusItems)
-                            onBonusProductModalOpen({
-                                newBonusItems,
-                                allBonusItems: addToCartResponse.bonusDiscountLineItems,
-                                product,
-                                itemsAdded,
-                                selectedQuantity: quantity
-                            })
-                        } else {
-                            // If no bonus items, just show add to cart modal
-                            onAddToCartModalOpen({
-                                product,
-                                itemsAdded,
-                                selectedQuantity: quantity
-                            })
                         }
+
+                        // Always show add to cart modal, but include bonus data
+                        onAddToCartModalOpen({
+                            product,
+                            itemsAdded,
+                            selectedQuantity: quantity,
+                            newBonusItems: newBonusItems?.length > 0 ? newBonusItems : null,
+                            allBonusItems: addToCartResponse.bonusDiscountLineItems
+                        })
                     }
                 } catch (e) {
                     showError()
