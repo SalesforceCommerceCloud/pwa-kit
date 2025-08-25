@@ -32,11 +32,22 @@ import ProductItemList from '@salesforce/retail-react-app/app/components/product
 import ProductViewModal from '@salesforce/retail-react-app/app/components/product-view-modal'
 import BundleProductViewModal from '@salesforce/retail-react-app/app/components/product-view-modal/bundle'
 import RecommendedProducts from '@salesforce/retail-react-app/app/components/recommended-products'
+import CartProductListWithGroupedBonusProducts from '@salesforce/retail-react-app/app/pages/cart/partials/cart-product-list-with-grouped-bonus-products'
+import SelectBonusProductsCard from '@salesforce/retail-react-app/app/pages/cart/partials/select-bonus-products-card'
 
 // Hooks
 import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
 import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
 import {useWishList} from '@salesforce/retail-react-app/app/hooks/use-wish-list'
+
+// Bonus Product Utilities
+import {
+    useBasketProductsWithPromotions,
+    getPromotionCalloutText
+} from '@salesforce/retail-react-app/app/utils/bonus-product-utils'
+import {useBonusProductViewModal} from '@salesforce/retail-react-app/app/hooks/use-bonus-product-view-modal'
+import {useBonusProductSelectionModalContext} from '@salesforce/retail-react-app/app/hooks/use-bonus-product-selection-modal'
+import BonusProductViewModal from '@salesforce/retail-react-app/app/components/bonus-product-view-modal'
 
 // Constants
 import {
@@ -52,6 +63,7 @@ import {REMOVE_CART_ITEM_CONFIRMATION_DIALOG_CONFIG} from '@salesforce/retail-re
 
 // Utilities
 import debounce from 'lodash/debounce'
+import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
 import {
     useShopperBasketsMutation,
@@ -69,6 +81,11 @@ const DEBOUNCE_WAIT = 750
 
 const Cart = () => {
     const {data: basket, isLoading} = useCurrentBasket()
+
+    // Get configuration for bonus product grouping
+    const config = getConfig()
+    const groupBonusProductsWithQualifyingProduct =
+        config.app?.pages?.cart?.groupBonusProductsWithQualifyingProduct ?? true
 
     // Pickup in Store - only enabled if feature toggle is on
     const isPickupOrder = STORE_LOCATOR_IS_ENABLED
@@ -90,6 +107,21 @@ const Cart = () => {
     const {selectedStore} = useSelectedStore()
     const selectedInventoryId = selectedStore?.inventoryId || null
     const productIds = basket?.productItems?.map(({productId}) => productId).join(',') ?? ''
+
+    // Bonus Product Logic
+    const {data: productsWithPromotions, isLoading: isPromotionDataLoading} = useBasketProductsWithPromotions(basket)
+    const bonusProductViewModal = useBonusProductViewModal()
+    const {onOpen: openBonusSelectionModal} = useBonusProductSelectionModalContext()
+    
+    // Handle opening bonus product selection modal (not the view modal directly)
+    const handleSelectBonusProducts = () => {
+        const bonusDiscountLineItems = basket?.bonusDiscountLineItems || []
+        if (bonusDiscountLineItems.length > 0) {
+            openBonusSelectionModal({
+                bonusDiscountLineItems: bonusDiscountLineItems
+            })
+        }
+    }
     const {data: products, isLoading: isProductsLoading} = useProducts(
         {
             parameters: {
@@ -663,22 +695,87 @@ const Cart = () => {
                                             )}
                                         </Box>
                                     )}
-                                    {/* Regular Products */}
-                                    <ProductItemList
-                                        productItems={categorizedProducts.regularProducts}
-                                        productsByItemId={productsByItemId}
-                                        isProductsLoading={isProductsLoading}
-                                        localQuantity={localQuantity}
-                                        localIsGiftItems={localIsGiftItems}
-                                        isCartItemLoading={isCartItemLoading}
-                                        selectedItem={selectedItem}
-                                        onItemQuantityChange={handleChangeItemQuantity}
-                                        onRemoveItemClick={handleRemoveItem}
-                                        renderSecondaryActions={renderSecondaryActions}
-                                    />
+                                    {/* Conditional Bonus Product Rendering */}
+                                    {groupBonusProductsWithQualifyingProduct ? (
+                                        /* Grouped layout: Groups bonus products with their qualifying products */
+                                        <CartProductListWithGroupedBonusProducts
+                                            nonBonusProducts={categorizedProducts.regularProducts}
+                                            basket={basket}
+                                            productsWithPromotions={productsWithPromotions}
+                                            isPromotionDataLoading={isPromotionDataLoading}
+                                            renderProductItem={(productItem, idx, options) => (
+                                                <ProductItemList
+                                                    key={productItem.itemId}
+                                                    productItems={[productItem]}
+                                                    productsByItemId={productsByItemId}
+                                                    isProductsLoading={isProductsLoading}
+                                                    localQuantity={localQuantity}
+                                                    localIsGiftItems={localIsGiftItems}
+                                                    isCartItemLoading={isCartItemLoading}
+                                                    selectedItem={selectedItem}
+                                                    onItemQuantityChange={handleChangeItemQuantity}
+                                                    onRemoveItemClick={handleRemoveItem}
+                                                    renderSecondaryActions={renderSecondaryActions}
+                                                    {...options}
+                                                />
+                                            )}
+                                            getPromotionCalloutText={getPromotionCalloutText}
+                                            onSelectBonusProducts={handleSelectBonusProducts}
+                                        />
+                                    ) : (
+                                        /* Simple layout: Renders all cart items individually with separate bonus product cards */
+                                        <Stack gap={4}>
+                                            {/* Render all cart items in simple layout */}
+                                            {basket.productItems?.map((productItem, idx) => (
+                                                <ProductItemList
+                                                    key={productItem.itemId}
+                                                    productItems={[productItem]}
+                                                    productsByItemId={productsByItemId}
+                                                    isProductsLoading={isProductsLoading}
+                                                    localQuantity={localQuantity}
+                                                    localIsGiftItems={localIsGiftItems}
+                                                    isCartItemLoading={isCartItemLoading}
+                                                    selectedItem={selectedItem}
+                                                    onItemQuantityChange={handleChangeItemQuantity}
+                                                    onRemoveItemClick={handleRemoveItem}
+                                                    renderSecondaryActions={renderSecondaryActions}
+                                                />
+                                            ))}
 
-                                    {/* Bonus Products */}
-                                    {categorizedProducts.bonusProducts.length > 0 && (
+                                            {/* Render SelectBonusProductsCard for each bonusDiscountLineItem */}
+                                            {basket.bonusDiscountLineItems?.map((bonusDiscountLineItem) => {
+                                                // Find a qualifying product that triggered this bonus opportunity
+                                                const qualifyingProduct = basket.productItems?.find(
+                                                    (item) =>
+                                                        !item.bonusProductLineItem &&
+                                                        item.priceAdjustments?.some(
+                                                            (adj) => adj.promotionId === bonusDiscountLineItem.promotionId
+                                                        )
+                                                ) || {productId: bonusDiscountLineItem.promotionId} // Fallback
+
+                                                return (
+                                                    <SelectBonusProductsCard
+                                                        key={bonusDiscountLineItem.id}
+                                                        qualifyingProduct={qualifyingProduct}
+                                                        basket={basket}
+                                                        productsWithPromotions={productsWithPromotions}
+                                                        remainingBonusProductsData={{
+                                                            bonusItems: [],
+                                                            hasRemainingCapacity: true,
+                                                            aggregatedMaxBonusItems: bonusDiscountLineItem.maxBonusItems || 0,
+                                                            aggregatedSelectedItems: 0
+                                                        }}
+                                                        bonusDiscountLineItem={bonusDiscountLineItem}
+                                                        getPromotionCalloutText={getPromotionCalloutText}
+                                                        onSelectBonusProducts={handleSelectBonusProducts}
+                                                    />
+                                                )
+                                            })}
+                                        </Stack>
+                                    )}
+
+                                    {/* Fallback: Orphan Bonus Products (only when grouping is disabled) */}
+                                    {!groupBonusProductsWithQualifyingProduct && categorizedProducts.bonusProducts.length > 0 && (
                                         <>
                                             <Box>
                                                 <BonusProductsTitle />
@@ -794,6 +891,17 @@ const Cart = () => {
                 productItems={basket?.productItems}
                 handleUnavailableProducts={handleUnavailableProducts}
             />
+            
+            {/* Bonus Product View Modal */}
+            {bonusProductViewModal.isOpen && bonusProductViewModal.data && (
+                <BonusProductViewModal
+                    product={bonusProductViewModal.data.product}
+                    isOpen={bonusProductViewModal.isOpen}
+                    onClose={bonusProductViewModal.onClose}
+                    bonusDiscountLineItemId={bonusProductViewModal.data.bonusDiscountLineItemId}
+                    promotionId={bonusProductViewModal.data.promotionId}
+                />
+            )}
         </Box>
     )
 }

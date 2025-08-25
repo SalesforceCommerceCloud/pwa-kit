@@ -41,7 +41,8 @@ const ProductItem = ({
     primaryAction,
     secondaryActions,
     onItemQuantityChange = noop,
-    showLoading = false
+    showLoading = false,
+    hideBorder = false
 }) => {
     const {stepQuantity, showInventoryMessage, inventoryMessage, quantity, setQuantity} =
         useDerivedProduct(product)
@@ -53,7 +54,7 @@ const ProductItem = ({
         >
             <ItemVariantProvider variant={product}>
                 {showLoading && <LoadingSpinner />}
-                <Stack layerStyle="cardBordered" align="flex-start">
+                <Stack layerStyle={hideBorder ? undefined : "cardBordered"} align="flex-start">
                     <Flex width="full" alignItems="flex-start" backgroundColor="white">
                         <CartItemVariantImage width={['88px', '136px']} mr={4} />
                         <Stack spacing={3} flex={1}>
@@ -124,7 +125,8 @@ ProductItem.propTypes = {
     showLoading: PropTypes.bool,
     isWishlistItem: PropTypes.bool,
     primaryAction: PropTypes.node,
-    secondaryActions: PropTypes.node
+    secondaryActions: PropTypes.node,
+    hideBorder: PropTypes.bool
 }
 
 export default ProductItem
