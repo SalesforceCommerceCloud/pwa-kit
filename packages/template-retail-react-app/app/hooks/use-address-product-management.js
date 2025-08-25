@@ -61,10 +61,8 @@ export const useAddressProductManagement = (basket) => {
                     const shipment = existingShipments.find((s) => s.shipmentId === item.shipmentId)
 
                     if (shipment && shipment.shippingAddress) {
-                        const matchingAddress = availableAddresses.find(
-                            (addr) =>
-                                areAddressesEqual &&
-                                areAddressesEqual(addr, shipment.shippingAddress)
+                        const matchingAddress = availableAddresses.find((addr) =>
+                            areAddressesEqual(addr, shipment.shippingAddress)
                         )
 
                         if (matchingAddress) {
@@ -142,10 +140,8 @@ export const useAddressProductManagement = (basket) => {
                     const shipment = existingShipments.find((s) => s.shipmentId === item.shipmentId)
 
                     if (shipment && !isAddressEmpty(shipment.shippingAddress)) {
-                        const existingAddress = guestAddresses.find(
-                            (addr) =>
-                                areAddressesEqual &&
-                                areAddressesEqual(addr, shipment.shippingAddress)
+                        const existingAddress = guestAddresses.find((addr) =>
+                            areAddressesEqual(addr, shipment.shippingAddress)
                         )
 
                         if (existingAddress) {
@@ -179,9 +175,8 @@ export const useAddressProductManagement = (basket) => {
                         const uniqueAddresses = []
 
                         allAddresses.forEach((addr) => {
-                            const isDuplicate = uniqueAddresses.some(
-                                (existingAddr) =>
-                                    areAddressesEqual && areAddressesEqual(addr, existingAddr)
+                            const isDuplicate = uniqueAddresses.some((existingAddr) =>
+                                areAddressesEqual(addr, existingAddr)
                             )
 
                             if (!isDuplicate) {
