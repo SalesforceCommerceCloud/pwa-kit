@@ -9,13 +9,11 @@ import {renderHook} from '@testing-library/react'
 import {useProductInventory} from '@salesforce/retail-react-app/../../app/hooks/use-product-inventory'
 import {normalizeSetBundleProduct} from '@salesforce/retail-react-app/app/utils/product-utils'
 
-// Mock the normalizeSetBundleProduct utility
 jest.mock('@salesforce/retail-react-app/app/utils/product-utils', () => ({
     normalizeSetBundleProduct: jest.fn()
 }))
 
 describe('useProductInventory', () => {
-    // Test helpers and fixtures
     const createChildProduct = (id, name, stockLevel, options = {}) => ({
         product: {
             id,
@@ -51,7 +49,6 @@ describe('useProductInventory', () => {
         return renderHook(() => useProductInventory(product, variantData, storeId, isSet, isBundle))
     }
 
-    // Common mock setup
     const setupNormalizeMock = () => {
         normalizeSetBundleProduct.mockImplementation((product) => ({
             ...product,
