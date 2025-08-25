@@ -19,11 +19,14 @@ import {isPickupMethod} from '@salesforce/retail-react-app/app/utils/shipment-ut
 export const useAddressProductManagement = (basket) => {
     const {data: customer} = useCurrentCustomer()
 
-    const deliveryItems =
-        basket?.productItems?.filter((item) => {
-            const shipment = basket?.shipments?.find((s) => s.shipmentId === item.shipmentId)
-            return !isPickupMethod(shipment?.shippingMethod)
-        }) || []
+    const deliveryItems = useMemo(() => {
+        return (
+            basket?.productItems?.filter((item) => {
+                const shipment = basket?.shipments?.find((s) => s.shipmentId === item.shipmentId)
+                return !isPickupMethod(shipment?.shippingMethod)
+            }) || []
+        )
+    }, [basket?.productItems, basket?.shipments])
 
     const [guestAddresses, setGuestAddresses] = useState([])
     const [selectedGuestAddresses, setSelectedGuestAddresses] = useState({})
