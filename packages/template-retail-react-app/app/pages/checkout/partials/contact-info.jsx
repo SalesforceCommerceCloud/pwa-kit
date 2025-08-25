@@ -45,6 +45,7 @@ import {isAbsoluteURL} from '@salesforce/retail-react-app/app/page-designer/util
 import {useAppOrigin} from '@salesforce/retail-react-app/app/hooks/use-app-origin'
 import {AuthHelpers, useAuthHelper, useShopperBasketsMutation} from '@salesforce/commerce-sdk-react'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
+import {getEnvBasePath} from '@salesforce/pwa-kit-runtime/utils/ssr-namespace-paths'
 import {
     API_ERROR_MESSAGE,
     FEATURE_UNAVAILABLE_ERROR_MESSAGE,
@@ -81,7 +82,7 @@ const ContactInfo = ({isSocialEnabled = false, isPasswordlessEnabled = false, id
     const passwordlessConfigCallback = getConfig().app.login?.passwordless?.callbackURI
     const callbackURL = isAbsoluteURL(passwordlessConfigCallback)
         ? passwordlessConfigCallback
-        : `${appOrigin}${passwordlessConfigCallback}`
+        : `${appOrigin}${getEnvBasePath()}${passwordlessConfigCallback}`
 
     const handlePasswordlessLogin = async (email) => {
         try {

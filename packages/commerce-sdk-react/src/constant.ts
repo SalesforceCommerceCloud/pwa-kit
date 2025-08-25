@@ -14,10 +14,23 @@ export const IFRAME_HOST_ALLOW_LIST = Object.freeze([
     'https://runtime-admin-preview.mobify-storefront.com'
 ])
 
-// We hardcode these here since we don't want commerce-sdk-react to have a dependency on pwa-kit-runtime
+/* Deprecating the following path constants since, outside of storefront preview,
+ * the paths they are used for can be passed in via the provider. */
+/**
+ * @deprecated
+ */
 export const MOBIFY_PATH = '/mobify'
+/**
+ * @deprecated
+ */
 export const PROXY_PATH = `${MOBIFY_PATH}/proxy`
+/**
+ * @deprecated
+ */
 export const LOCAL_BUNDLE_PATH = `${MOBIFY_PATH}/bundle/development`
+/**
+ * @deprecated
+ */
 export const SLAS_PRIVATE_PROXY_PATH = `${MOBIFY_PATH}/slas/private`
 
 export const SLAS_SECRET_WARNING_MSG =

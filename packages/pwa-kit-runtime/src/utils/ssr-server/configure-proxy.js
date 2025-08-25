@@ -10,6 +10,7 @@ import {proxyConfigs} from '../ssr-shared'
 import {processExpressResponse} from './process-express-response'
 import {isRemote, localDevLog, verboseProxyLogging} from './utils'
 import logger from '../logger-instance'
+import {getEnvBasePath} from '../ssr-namespace-paths'
 
 export const ALLOWED_CACHING_PROXY_REQUEST_METHODS = ['HEAD', 'GET', 'OPTIONS']
 
@@ -248,10 +249,13 @@ export const configureProxy = ({
             }
         },
 
-        // Rewrite the request's path to remove the /mobify/proxy/...
-        // prefix.
-        pathRewrite: {
-            [`^${proxyPath}`]: ''
+        // Rewrite the request's path to remove the /mobify/proxy/... prefix.
+        // This cannot be modified by any express middleware
+        // So we need to use the built in pathRewrite to remove the base path if present
+        pathRewrite: (path) => {
+            const basePathRegexEntry = getEnvBasePath() ? `${getEnvBasePath()}?` : ''
+            const regex = new RegExp(`^${basePathRegexEntry}${proxyPath}`)
+            return path.replace(regex, '')
         },
 
         // The origin (protocol + host) to which we proxy

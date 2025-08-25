@@ -66,6 +66,7 @@ module.exports = {
         },
         partialHydrationEnabled: false
     },
+    envBasePath: '/',
     externals: [],
     pageNotFoundURL: '/page-not-found',
     ssrEnabled: true,

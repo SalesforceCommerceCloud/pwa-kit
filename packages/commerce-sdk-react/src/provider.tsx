@@ -41,6 +41,7 @@ export interface CommerceApiProviderProps extends ApiClientConfigParams {
     headers?: Record<string, string>
     fetchedToken?: string
     enablePWAKitPrivateClient?: boolean
+    privateClientProxyEndpoint?: string
     clientSecret?: string
     silenceWarnings?: boolean
     logger?: Logger
@@ -50,6 +51,7 @@ export interface CommerceApiProviderProps extends ApiClientConfigParams {
     refreshTokenGuestCookieTTL?: number
     apiClients?: ApiClients
     disableAuthInit?: boolean
+    hybridAuthEnabled?: boolean
 }
 
 /**
@@ -108,6 +110,17 @@ export const AuthContext = React.createContext({} as Auth)
  * Non-PWA Kit users can enable private client mode by passing in a client secret
  * directly to the provider. However, be careful when doing this as you will have
  * to make sure the secret is not unexpectedly exposed to the client.
+ * 
+ * 
+ * `hybridAuthEnabled` is an optional flag that indicates the current Site has Hybrid Auth enabled.
+ * This drives the behavior of the `clearECOMSession` method. If `hybridAuthEnabled` is true,
+ * the `clearECOMSession` method will not be called. This makes sure the session-bridged dwsid, received from `/oauth2/token` call
+ * on shopper login is NOT cleared and can be used to maintain the server affinity.
+ * 
+ * `hybridAuthEnabled` flag can also be used to drive other Hybrid Auth specific behaviors in the future.
+ * 
+ * Note: `hybridAuthEnabled` should NOT be set to true for hybrid storefronts using Plugin SLAS as we need the dwsid to be deleted
+ * to force session-bridging on SFRA as in this case, the `oauth2/token` call does not return a dwsid.
  *
  * @returns Provider to wrap your app with
  */
@@ -126,6 +139,7 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
         currency,
         fetchedToken,
         enablePWAKitPrivateClient,
+        privateClientProxyEndpoint,
         clientSecret,
         silenceWarnings,
         logger,
@@ -134,7 +148,8 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
         refreshTokenRegisteredCookieTTL,
         refreshTokenGuestCookieTTL,
         apiClients,
-        disableAuthInit = false
+        disableAuthInit = false,
+        hybridAuthEnabled = false
     } = props
 
     // Set the logger based on provided configuration, or default to the console object if no logger is provided
@@ -151,13 +166,15 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
             fetchOptions,
             fetchedToken,
             enablePWAKitPrivateClient,
+            privateClientProxyEndpoint,
             clientSecret,
             silenceWarnings,
             logger: configLogger,
             defaultDnt,
             passwordlessLoginCallbackURI,
             refreshTokenRegisteredCookieTTL,
-            refreshTokenGuestCookieTTL
+            refreshTokenGuestCookieTTL,
+            hybridAuthEnabled
         })
     }, [
         clientId,
@@ -169,6 +186,7 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
         fetchOptions,
         fetchedToken,
         enablePWAKitPrivateClient,
+        privateClientProxyEndpoint,
         clientSecret,
         silenceWarnings,
         configLogger,
@@ -176,7 +194,8 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
         passwordlessLoginCallbackURI,
         refreshTokenRegisteredCookieTTL,
         refreshTokenGuestCookieTTL,
-        apiClients
+        apiClients,
+        hybridAuthEnabled
     ])
 
     const dwsid = auth.get(DWSID_COOKIE_NAME)
@@ -238,6 +257,11 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
             fetchOptions
         }
 
+        // Special proxy endpoint for injecting SLAS private client secret.
+        // This is only used by the ShopperLogin API as that is the only one that interacts with SLAS.
+        // We prioritize config.privateClientProxyEndpoint since that allows us to use the new envBasePath feature
+        // The preexisting hard coded privateClientEndpoint is kept here for now to prevent a breaking change.
+        // TODO: We should remove this in the next major release so we do not have a hard coded proxy path inside commerce-sdk-react
         const baseUrl = config.proxy.split(MOBIFY_PATH)[0]
         const privateClientEndpoint = `${baseUrl}${SLAS_PRIVATE_PROXY_PATH}`
 
@@ -249,7 +273,11 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
             shopperGiftCertificates: new ShopperGiftCertificates(config),
             shopperLogin: new ShopperLogin({
                 ...config,
-                proxy: enablePWAKitPrivateClient ? privateClientEndpoint : config.proxy
+                proxy: enablePWAKitPrivateClient
+                    ? privateClientProxyEndpoint
+                        ? privateClientProxyEndpoint
+                        : privateClientEndpoint
+                    : config.proxy
             }),
             shopperOrders: new ShopperOrders(config),
             shopperProducts: new ShopperProducts(config),
