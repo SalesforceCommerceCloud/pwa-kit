@@ -195,19 +195,38 @@ export const getGoogleButtonConfig = (
 
     // Helper function to get or create basket (prevents multiple creation)
     const getOrCreateBasket = async () => {
+        console.log('🔍 getOrCreateBasket called:', { 
+            isPdpMode, 
+            sku, 
+            tempBasket, 
+            basket, 
+            basketRef,
+            hasBasketRef: !!basketRef,
+            hasBasketRefId: !!(basketRef?.basketId)
+        })
+        
         // If we already have a basket reference, return it
         if (basketRef && basketRef.basketId) {
+            console.log('✅ Using existing basket:', basketRef.basketId)
             return basketRef
         }
 
         // For PDP flows, create temporary basket if needed (and SKU is available)
         if (isPdpMode && sku && setTempBasket) {
-            const newBasket = await createTemporaryBasket(sku, authToken, site, quantity)
-            basketRef = newBasket // Update basket reference immediately
-            setTempBasket(newBasket) // Update React state for re-renders
-            return newBasket
+            console.log('🛒 Creating temporary basket for SKU:', sku)
+            try {
+                const newBasket = await createTemporaryBasket(sku, authToken, site, quantity)
+                console.log('✅ Temporary basket created:', newBasket)
+                basketRef = newBasket // Update basket reference immediately
+                setTempBasket(newBasket) // Update React state for re-renders
+                return newBasket
+            } catch (error) {
+                console.error('❌ Failed to create temporary basket:', error)
+                return null
+            }
         }
-        // Return null if no basket can be created/found
+
+        console.log('❌ No basket available and cannot create one')
         return null
     }
 
@@ -335,7 +354,19 @@ export const getGoogleButtonConfig = (
                         ) {
                             // Get or create basket using basket reference
                             let basketToUse = await getOrCreateBasket()
+
+                            // Add detailed logging for Safari debugging
+                            console.log('🔍 SHIPPING_ADDRESS callback:', {
+                                callbackTrigger,
+                                basketToUse,
+                                basketRef,
+                                tempBasket,
+                                basket,
+                                isPdpMode
+                            })
+
                             if (!basketToUse || !basketToUse.basketId) {
+                                console.error('❌ SHIPPING_ADDRESS: No basket available')
                                 // Return error if we can't get/create a basket
                                 paymentDataRequestUpdate = {
                                     error: {
@@ -368,7 +399,20 @@ export const getGoogleButtonConfig = (
                         if (callbackTrigger === 'SHIPPING_OPTION') {
                             // Get current basket
                             let basketToUse = await getOrCreateBasket()
+
+                            // Add detailed logging for Safari debugging
+                            console.log('🔍 SHIPPING_OPTION callback:', {
+                                basketToUse,
+                                basketRef,
+                                tempBasket,
+                                basket,
+                                isPdpMode,
+                                callbackTrigger,
+                                shippingOptionData
+                            })
+
                             if (!basketToUse || !basketToUse.basketId) {
+                                console.error('❌ SHIPPING_OPTION: No basket available')
                                 // Return error if we can't get/create a basket
                                 paymentDataRequestUpdate = {
                                     error: {
