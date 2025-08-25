@@ -7,7 +7,8 @@
 
 import {ApiClients} from '../../hooks/types'
 import {DEVELOPMENT_ORIGIN, getParentOrigin, isOriginTrusted} from '../../utils'
-import {LOCAL_BUNDLE_PATH} from '../../constant'
+
+const LOCAL_BUNDLE_PATH = `/mobify/bundle/development`
 
 /** Detects whether the storefront is running in an iframe as part of Storefront Preview.
  * @private

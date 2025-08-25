@@ -14,25 +14,6 @@ export const IFRAME_HOST_ALLOW_LIST = Object.freeze([
     'https://runtime-admin-preview.mobify-storefront.com'
 ])
 
-/* Deprecating the following path constants since, outside of storefront preview,
- * the paths they are used for can be passed in via the provider. */
-/**
- * @deprecated
- */
-export const MOBIFY_PATH = '/mobify'
-/**
- * @deprecated
- */
-export const PROXY_PATH = `${MOBIFY_PATH}/proxy`
-/**
- * @deprecated
- */
-export const LOCAL_BUNDLE_PATH = `${MOBIFY_PATH}/bundle/development`
-/**
- * @deprecated
- */
-export const SLAS_PRIVATE_PROXY_PATH = `${MOBIFY_PATH}/slas/private`
-
 export const SLAS_SECRET_WARNING_MSG =
     'You are potentially exposing SLAS secret on browser. Make sure to keep it safe and secure!'
 

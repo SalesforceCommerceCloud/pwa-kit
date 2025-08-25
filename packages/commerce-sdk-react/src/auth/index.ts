@@ -25,8 +25,6 @@ import {
     extractCustomParameters
 } from '../utils'
 import {
-    MOBIFY_PATH,
-    SLAS_PRIVATE_PROXY_PATH,
     SLAS_SECRET_WARNING_MSG,
     SLAS_SECRET_PLACEHOLDER,
     SLAS_SECRET_OVERRIDE_MSG,
@@ -250,16 +248,9 @@ class Auth {
     constructor(config: AuthConfig) {
         // Special proxy endpoint for injecting SLAS private client secret.
         // We prioritize config.privateClientProxyEndpoint since that allows us to use the new envBasePath feature
-        // The preexisting hard coded privateClientEndpoint is kept here for now to prevent a breaking change.
-        // TODO: We should remove this in the next major release so we do not have a hard coded proxy path inside commerce-sdk-react
-        const baseUrl = config.proxy.split(MOBIFY_PATH)[0]
-        const privateClientEndpoint = `${baseUrl}${SLAS_PRIVATE_PROXY_PATH}`
-
         this.client = new ShopperLogin({
             proxy: config.enablePWAKitPrivateClient
                 ? config.privateClientProxyEndpoint
-                    ? config.privateClientProxyEndpoint
-                    : privateClientEndpoint
                 : config.proxy,
             parameters: {
                 clientId: config.clientId,
@@ -345,13 +336,7 @@ class Auth {
         this.isPrivate = !!this.clientSecret
 
         const passwordlessLoginCallbackURI = config.passwordlessLoginCallbackURI
-        this.passwordlessLoginCallbackURI = passwordlessLoginCallbackURI
-            ? isAbsoluteUrl(passwordlessLoginCallbackURI)
-                ? passwordlessLoginCallbackURI
-                : // This fallback does not take into account the envBasePath feature
-                  // To set an env base path, config.passwordlessLoginCallbackURI must be an absolute url
-                  `${baseUrl}${passwordlessLoginCallbackURI}`
-            : ''
+        this.passwordlessLoginCallbackURI = passwordlessLoginCallbackURI || ''
 
         this.hybridAuthEnabled = config.hybridAuthEnabled || false
     }
