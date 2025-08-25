@@ -7,19 +7,16 @@
 import React, {useEffect, useState} from 'react'
 import {useLocation} from 'react-router-dom'
 
-import {AdyenExpressCheckoutProvider} from '@adyen/adyen-salesforce-pwa'
-
 import {ApplePayExpress} from '@salesforce/retail-react-app/app/components/apple-pay-express/index'
 import {GooglePayExpress} from '@salesforce/retail-react-app/app/components/google-pay-express/index'
 import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
-import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
 import {useExpressPaymentManager} from '@salesforce/retail-react-app/app/components/express/hooks/use-express-payment-manager'
+import {useStandalonePaymentMethods} from '@salesforce/retail-react-app/app/components/express/hooks/use-standalone-payment-methods'
 
 // Define the payment methods we will attempt to load
 const PAYMENT_METHODS = ['applepay', 'googlepay']
 
 function Express() {
-    const navigate = useNavigation()
     const {locale, site} = useMultiSite()
     const [basket, setBasketData] = useState(null)
     const location = useLocation()
@@ -28,7 +25,7 @@ function Express() {
     useEffect(() => {
         document.documentElement.style.backgroundColor = 'transparent'
         document.body.style.backgroundColor = 'transparent'
-        
+
         // Cleanup on unmount
         return () => {
             document.documentElement.style.backgroundColor = ''
@@ -37,7 +34,6 @@ function Express() {
     }, [])
 
     const [authToken, setAuthToken] = useState()
-    const [customerId, setCustomerId] = useState()
 
     // Check for PDP mode flag in URL
     const urlParams = new URLSearchParams(location.search)
@@ -47,8 +43,17 @@ function Express() {
     const [currentSku, setCurrentSku] = useState(null)
     const [currentQuantity, setCurrentQuantity] = useState(1)
 
-    // Initialize the express payment manager
+    // Initialize the express payment manager - always call this hook
     const {manager, managerError} = useExpressPaymentManager(PAYMENT_METHODS)
+
+    // Fetch payment methods and environment data directly
+    // Only call this hook when we have all required parameters to prevent hook ordering issues
+    const {paymentMethods: adyenPaymentMethods} = useStandalonePaymentMethods(
+        authToken || null, // Ensure we always pass a consistent value
+        site || null, // Ensure we always pass a consistent value
+        locale || null, // Ensure we always pass a consistent value
+        !!(authToken && site && locale) // Only enable when all params are available
+    )
 
     // PostMessage listener for SKU updates
     useEffect(() => {
@@ -83,7 +88,6 @@ function Express() {
                 if (type === 'basketDataAvailable') {
                     const {basketData, authData} = event.data.data
                     setAuthToken(authData.authToken)
-                    setCustomerId(authData.customerId)
                     setBasketData(basketData)
                 }
 
@@ -91,7 +95,6 @@ function Express() {
                 if (type === 'authDataAvailable') {
                     const authData = event.data.data.authData
                     setAuthToken(authData.authToken)
-                    setCustomerId(authData.customerId)
                 }
             }
         }
@@ -110,58 +113,48 @@ function Express() {
         }
     }, [])
 
+    // Prepare context data for express payment components
+    const expressPaymentContext = {
+        adyenPaymentMethods,
+        authToken,
+        locale,
+        site,
+        basket,
+        sku: currentSku,
+        quantity: currentQuantity,
+        isPdpMode,
+        manager
+    }
+
+    // NOW check for early return conditions - after all hooks have been called
     if (!authToken || managerError) {
         // Do not render express payment components if there is no auth token
         // or if there was an error setting up the manager
         return null
     }
 
+    // Determine if we should render based on mode and requirements
+    let shouldRender = false
+
+    if (isPdpMode) {
+        // In PDP mode, render if we have basic requirements (authToken, payment methods)
+        // Basket will be created dynamically when needed
+        shouldRender = !!(authToken && adyenPaymentMethods)
+    } else {
+        // In checkout mode, render if we have a basket
+        shouldRender = !!(authToken && basket)
+    }
+
+    if (!shouldRender) {
+        return null
+    }
+
     return (
         <div>
-            {!isPdpMode && basket && (
-                <AdyenExpressCheckoutProvider
-                    authToken={authToken}
-                    customerId={customerId}
-                    locale={locale}
-                    site={site}
-                    basket={basket}
-                    navigate={navigate}
-                >
-                    <div style={{marginBottom: '8px'}}>
-                        <ApplePayExpress
-                            sku={currentSku}
-                            quantity={currentQuantity}
-                            isPdpMode={isPdpMode}
-                            basketData={basket}
-                            authToken={authToken}
-                            manager={manager}
-                        />
-                    </div>
-                    <GooglePayExpress manager={manager} overrideData={{authToken, basket}} />
-                </AdyenExpressCheckoutProvider>
-            )}
-            {isPdpMode && (
-                <>
-                    <div style={{marginBottom: '8px'}}>
-                        <ApplePayExpress
-                            sku={currentSku}
-                            quantity={currentQuantity}
-                            isPdpMode={isPdpMode}
-                            basketData={basket}
-                            authToken={authToken}
-                            manager={manager}
-                        />
-                    </div>
-                    <GooglePayExpress
-                        sku={currentSku}
-                        quantity={currentQuantity}
-                        isPdpMode={isPdpMode}
-                        basketData={basket}
-                        authToken={authToken}
-                        manager={manager}
-                    />
-                </>
-            )}
+            <div style={{marginBottom: '8px'}}>
+                <ApplePayExpress {...expressPaymentContext} />
+            </div>
+            <GooglePayExpress {...expressPaymentContext} />
         </div>
     )
 }

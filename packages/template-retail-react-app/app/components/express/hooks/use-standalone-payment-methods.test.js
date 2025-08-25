@@ -28,7 +28,7 @@ describe('useStandalonePaymentMethods', () => {
     beforeEach(() => {
         // Reset mocks
         jest.clearAllMocks()
-        
+
         // Mock the service methods
         mockGetPaymentMethods = jest.fn()
         AdyenPaymentMethodsService.mockImplementation(() => ({
@@ -81,8 +81,8 @@ describe('useStandalonePaymentMethods', () => {
 
             // Should start loading
             expect(result.current.loading).toBe(true)
-            expect(result.current.error).toBe(null)
-            expect(result.current.paymentMethods).toBe(null)
+            expect(result.current.error).toBeNull()
+            expect(result.current.paymentMethods).toBeNull()
 
             // Wait for the API call to complete
             await waitFor(() => {
@@ -90,16 +90,14 @@ describe('useStandalonePaymentMethods', () => {
             })
 
             expect(result.current.paymentMethods).toEqual(mockPaymentMethods)
-            expect(result.current.error).toBe(null)
+            expect(result.current.error).toBeNull()
             expect(mockGetPaymentMethods).toHaveBeenCalledTimes(1)
         })
 
         it('should create AdyenPaymentMethodsService with correct parameters', async () => {
             mockGetPaymentMethods.mockResolvedValueOnce(mockPaymentMethods)
 
-            renderHook(() =>
-                useStandalonePaymentMethods(mockAuthToken, mockSite, mockLocale)
-            )
+            renderHook(() => useStandalonePaymentMethods(mockAuthToken, mockSite, mockLocale))
 
             await waitFor(() => {
                 expect(AdyenPaymentMethodsService).toHaveBeenCalledWith(mockAuthToken, mockSite)
@@ -125,7 +123,7 @@ describe('useStandalonePaymentMethods', () => {
             })
 
             expect(result.current.error).toBe(mockError)
-            expect(result.current.paymentMethods).toBe(null)
+            expect(result.current.paymentMethods).toBeNull()
             expect(console.error).toHaveBeenCalledWith(
                 'Error fetching standalone payment methods:',
                 mockError
@@ -158,7 +156,7 @@ describe('useStandalonePaymentMethods', () => {
                 expect(result.current.loading).toBe(false)
             })
 
-            expect(result.current.error).toBe(null)
+            expect(result.current.error).toBeNull()
             expect(result.current.paymentMethods).toEqual(mockPaymentMethods)
         })
     })
@@ -174,18 +172,14 @@ describe('useStandalonePaymentMethods', () => {
         })
 
         it('should not make API call when authToken is missing', () => {
-            renderHook(() =>
-                useStandalonePaymentMethods(null, mockSite, mockLocale)
-            )
+            renderHook(() => useStandalonePaymentMethods(null, mockSite, mockLocale))
 
             expect(mockGetPaymentMethods).not.toHaveBeenCalled()
             expect(AdyenPaymentMethodsService).not.toHaveBeenCalled()
         })
 
         it('should not make API call when site is missing', () => {
-            renderHook(() =>
-                useStandalonePaymentMethods(mockAuthToken, null, mockLocale)
-            )
+            renderHook(() => useStandalonePaymentMethods(mockAuthToken, null, mockLocale))
 
             expect(mockGetPaymentMethods).not.toHaveBeenCalled()
             expect(AdyenPaymentMethodsService).not.toHaveBeenCalled()
@@ -195,7 +189,8 @@ describe('useStandalonePaymentMethods', () => {
             mockGetPaymentMethods.mockResolvedValueOnce(mockPaymentMethods)
 
             const {result, rerender} = renderHook(
-                ({enabled}) => useStandalonePaymentMethods(mockAuthToken, mockSite, mockLocale, enabled),
+                ({enabled}) =>
+                    useStandalonePaymentMethods(mockAuthToken, mockSite, mockLocale, enabled),
                 {
                     initialProps: {enabled: false}
                 }
@@ -293,7 +288,8 @@ describe('useStandalonePaymentMethods', () => {
             mockGetPaymentMethods.mockResolvedValue(mockPaymentMethods)
 
             const {rerender} = renderHook(
-                ({enabled}) => useStandalonePaymentMethods(mockAuthToken, mockSite, mockLocale, enabled),
+                ({enabled}) =>
+                    useStandalonePaymentMethods(mockAuthToken, mockSite, mockLocale, enabled),
                 {
                     initialProps: {enabled: true}
                 }
@@ -327,8 +323,8 @@ describe('useStandalonePaymentMethods', () => {
 
             // Should be loading
             expect(result.current.loading).toBe(true)
-            expect(result.current.paymentMethods).toBe(null)
-            expect(result.current.error).toBe(null)
+            expect(result.current.paymentMethods).toBeNull()
+            expect(result.current.error).toBeNull()
 
             // Resolve the promise
             resolvePromise(mockPaymentMethods)
