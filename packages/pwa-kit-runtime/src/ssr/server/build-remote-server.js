@@ -42,6 +42,7 @@ import http from 'http'
 import https from 'https'
 import {proxyConfigs, updatePackageMobify} from '../../utils/ssr-shared'
 import {
+    getEnvBasePath,
     proxyBasePath,
     bundleBasePath,
     healthCheckPath,
@@ -52,6 +53,7 @@ import awsServerlessExpress from 'aws-serverless-express'
 import expressLogging from 'morgan'
 import logger from '../../utils/logger-instance'
 import {createProxyMiddleware, responseInterceptor} from 'http-proxy-middleware'
+import {convertExpressRouteToRegex} from '../../utils/ssr-server/convert-express-route'
 
 /**
  * An Array of mime-types (Content-Type values) that are considered
@@ -361,6 +363,17 @@ export const RemoteServerFactory = {
         this._setCompression(app)
         this._setRequestId(app)
         // this._addEventContext(app)
+
+        // We want to remove any base paths that have made it this far.
+        // Base paths are used to route requests to the correct server.
+        // If the request has reached the server, it is no longer needed.
+        // Note: We use envBasePath as the feature flag for this middleware
+        // If envBasePath is `/`, '', or undefined when the server starts, we don't need to
+        // initialize this middleware.
+        if (getEnvBasePath()) {
+            this._setupBasePathMiddleware(app)
+        }
+
         // Ordering of the next two calls are vital - we don't
         // want request-processors applied to development views.
         this._addSDKInternalHandlers(app)
@@ -471,6 +484,131 @@ export const RemoteServerFactory = {
 
             next()
         })
+    },
+
+    /**
+     * @private
+     */
+    _setupBasePathMiddleware(app) {
+        // Cache the express route regexes to avoid re-calculating them on every request.
+        let expressRouteRegexes
+
+        /**
+         * Remove the base path from a path.
+         *
+         * If path is like '/basepath/something', this returns '/something'
+         * If path is exactly '/basepath', this returns '/'
+         * If path doesn't start with base path or if there is no base path defined,
+         * returns the unmodified path
+         *
+         * @param path {string} the path to remove the base path from
+         * @returns {string} the path with the base path removed
+         */
+        const removeBasePathFromPath = (path) => {
+            const basePath = getEnvBasePath()
+            if (!basePath) {
+                return path
+            }
+
+            if (path.startsWith(basePath + '/')) {
+                return path.substring(basePath.length)
+            } else if (path === basePath) {
+                return '/'
+            }
+            return path
+        }
+
+        /**
+         * Initializes a cache of regexes that correspond to the registered express routes
+         *
+         * This specifically omits the generic wildcard from the express routes where we
+         * want to remove the base path from since it is mapped to the app render. This is
+         * because routes sent to the render are handled by React Router
+         */
+        const initializeExpressRouteRegexes = () => {
+            const expressRoutes = app._router.stack
+                .filter((layer) => layer.route && layer.route.path && layer.route.path !== '*')
+                .map((layer) => layer.route.path)
+
+            expressRouteRegexes = expressRoutes.map((route) => convertExpressRouteToRegex(route))
+        }
+
+        /**
+         * Very early request processing.
+         *
+         * If the server receives a request containing the base path, remove it before allowing
+         * the request through to the other express endpoints
+         *
+         * We scope base path removal to /mobify routes and routes defined by the express app
+         * (For example /callback or /worker.js)
+         * This is to avoid affecting React Router routes where a site id or locale might be present
+         * that is equal to the base path.
+         *
+         * For example, if you have a base path of /us and a site id of /us we don't want
+         * to remove the /us from www.example.com/us/en-US/category/... as this route is handled by
+         * React Router and the PWA multisite implementation.
+         *
+         * @param req {express.req} the incoming request - modified in-place
+         * @private
+         */
+        const removeBasePathMiddleware = (req, res, next) => {
+            const basePath = getEnvBasePath()
+
+            // Fast path: /mobify routes always get the base path removed
+            if (req.path.startsWith(`${basePath}/mobify`)) {
+                const cleanPath = removeBasePathFromPath(req.path)
+                const parsed = URL.parse(req.url)
+                parsed.pathname = cleanPath
+                req.url = URL.format(parsed)
+                return next()
+            }
+
+            // For other routes, only proceed if path actually starts with base path
+            if (!req.path.startsWith(basePath)) {
+                return next()
+            }
+
+            // Now we know path starts with base path, so we can remove it
+            const cleanPath = removeBasePathFromPath(req.path)
+
+            // Initialize express route regexes if needed
+            // We do this here since we want to ensure that any express route defined
+            // after the app is created, such as routes defined in ssr.js, are included.
+            if (!expressRouteRegexes) {
+                initializeExpressRouteRegexes()
+            }
+
+            // Next we check if the clean path matches any existing express routes
+            // (like /callback or /worker.js)
+            const matchesExpressRoute = expressRouteRegexes.some((routeRegex) => {
+                try {
+                    return routeRegex.test(cleanPath)
+                } catch (error) {
+                    logger.warn(
+                        `Invalid express route pattern: ${routeRegex}`,
+                        /* istanbul ignore next */
+                        {
+                            namespace: 'removeBasePathMiddleware',
+                            additionalProperties: {
+                                error: error
+                            }
+                        }
+                    )
+                    return false
+                }
+            })
+
+            // Only update URL if our clean path matches an Express route
+            // This leaves React Router paths (like /en-US/category) unchanged
+            if (matchesExpressRoute) {
+                const parsed = URL.parse(req.url)
+                parsed.pathname = cleanPath
+                req.url = URL.format(parsed)
+            }
+            next()
+        }
+
+        app.use(removeBasePathMiddleware)
     },
 
     /**
@@ -678,7 +816,7 @@ export const RemoteServerFactory = {
     /**
      * @private
      */
-    _handleMissingSlasPrivateEnvVar(app) {
+    _handleMissingSlasPrivateEnvVar(app, slasPrivateProxyPath) {
         app.use(slasPrivateProxyPath, (_, res) => {
             return res.status(501).json({
                 message:
@@ -738,7 +876,16 @@ export const RemoteServerFactory = {
             createProxyMiddleware({
                 target: options.slasTarget,
                 changeOrigin: true,
-                pathRewrite: {[slasPrivateProxyPath]: ''},
+
+                // http-proxy-middleware uses the original incoming request path to determine
+                // both proxyRequest and incomingRequest paths.
+                // This cannot be modified by any express middleware
+                // So we need to use the built in pathRewrite to remove the base path
+                pathRewrite: (path) => {
+                    const basePathRegexEntry = getEnvBasePath() ? `${getEnvBasePath()}?` : ''
+                    const regex = new RegExp(`^${basePathRegexEntry}${slasPrivateProxyPath}`)
+                    return path.replace(regex, '')
+                },
                 selfHandleResponse: true,
                 onProxyReq: (proxyRequest, incomingRequest, res) => {
                     applyProxyRequestHeaders({

@@ -1,4 +1,6 @@
 ## v3.12.0-dev (Jul 22, 2025)
+- Add support for environment level base paths on /mobify routes [#2892](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2892)
+
 ## v3.11.0 (Jul 22, 2025)
 - Fix the performance logging so that it'll capture all SSR queries, even those that result in errors [#2486](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2486)
 

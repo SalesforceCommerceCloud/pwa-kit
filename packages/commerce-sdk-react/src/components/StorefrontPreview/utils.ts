@@ -25,6 +25,7 @@ export const detectStorefrontPreview = () => {
 export const getClientScript = () => {
     const parentOrigin = getParentOrigin() ?? 'https://runtime.commercecloud.com'
     return parentOrigin === DEVELOPMENT_ORIGIN
+        // TODO: This will need to be updated to support base paths with storefront preview
         ? `${parentOrigin}${LOCAL_BUNDLE_PATH}/static/storefront-preview.js`
         : `${parentOrigin}/cc/b2c/preview/preview.client.js`
 }

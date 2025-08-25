@@ -20,6 +20,7 @@ import {CachedResponse} from '../../utils/ssr-server'
 // We need to mock isRemote in some tests, so we need to import it directly from
 // the file it was defined in, because of the way jest works.
 import * as ssrServerUtils from '../../utils/ssr-server/utils'
+import * as ssrConfig from '../../utils/ssr-config'
 import {RemoteServerFactory, REMOTE_REQUIRED_ENV_VARS} from './build-remote-server'
 import {X_MOBIFY_QUERYSTRING} from './constants'
 import {
@@ -97,6 +98,8 @@ const opts = (overrides = {}) => {
 const mkdtempSync = () => fse.mkdtempSync(path.resolve(os.tmpdir(), 'ssr-server-tests-'))
 
 beforeAll(() => {
+    jest.spyOn(ssrConfig, 'getConfig').mockReturnValue({})
+
     // The SSR app applies patches on creation. Those patches are specific to an
     // environment (Lambda or not) and we need to ensure that the non-lambda patches
     // are applied for testing. Creating and immediately discarding an app in
@@ -1106,6 +1109,7 @@ describe('SLAS private client proxy', () => {
     }
 
     beforeAll(() => {
+        jest.spyOn(ssrConfig, 'getConfig').mockReturnValue({})
         // by setting slasTarget, rather than forwarding the request to SLAS,
         // we send the proxy request here so we can return the request headers
         proxyApp = express()
@@ -1152,6 +1156,7 @@ describe('SLAS private client proxy', () => {
     })
 
     test('should return HTTP 501 if PWA_KIT_SLAS_CLIENT_SECRET env var not set', () => {
+        delete process.env.PWA_KIT_SLAS_CLIENT_SECRET
         const app = RemoteServerFactory._createApp(opts({useSLASPrivateClient: true}))
         return request(app).get('/mobify/slas/private').expect(501)
     })
@@ -1315,4 +1320,117 @@ describe('SLAS private client proxy', () => {
             testProxyServer.close()
         }
     })
+})
+
+describe('Base path tests', () => {
+    test('Base path is removed from /mobify request path and still gets through to /mobify endpoint', async () => {
+        jest.spyOn(ssrConfig, 'getConfig').mockReturnValue({envBasePath: '/basepath'})
+
+        const app = RemoteServerFactory._createApp(opts())
+
+        return request(app)
+            .get('/basepath/mobify/ping')
+            .then((response) => {
+                expect(response.status).toBe(200)
+            })
+    }, 15000)
+
+    test('should not remove base path from non /mobify non-express routes', async () => {
+        // Set base path to something that might also be a site id used by react router routes
+        jest.spyOn(ssrConfig, 'getConfig').mockReturnValue({envBasePath: '/us'})
+
+        const app = RemoteServerFactory._createApp(opts())
+
+        // Add a middleware to capture the request path after base path processing
+        let capturedPath = null
+        app.use((req, res, next) => {
+            capturedPath = req.path
+            next()
+        })
+
+        return request(app)
+            .get('/us/products/123')
+            .then((response) => {
+                expect(response.status).toBe(404) // 404 because the route doesn't exist in express
+
+                // Verify that the base path was not removed from the request path
+                expect(capturedPath).toBe('/us/products/123')
+            })
+    }, 15000)
+
+    test('should remove base path from routes with path parameters', async () => {
+        jest.spyOn(ssrConfig, 'getConfig').mockReturnValue({envBasePath: '/basepath'})
+
+        const app = RemoteServerFactory._createApp(opts())
+
+        app.get('/api/users/:id', (req, res) => {
+            res.status(200).json({userId: req.params.id})
+        })
+
+        return request(app)
+            .get('/basepath/api/users/123')
+            .then((response) => {
+                expect(response.status).toBe(200)
+                expect(response.body.userId).toBe('123')
+            })
+    }, 15000)
+
+    test('should remove base path from routes defined with regex', async () => {
+        jest.spyOn(ssrConfig, 'getConfig').mockReturnValue({envBasePath: '/basepath'})
+
+        const app = RemoteServerFactory._createApp(opts())
+
+        app.get(/\/api\/users\/\d+/, (req, res) => {
+            // Extract the user ID from the URL path since regex routes don't create req.params automatically
+            const match = req.path.match(/\/api\/users\/(\d+)/)
+            const userId = match ? match[1] : 'unknown'
+            res.status(200).json({userId: userId})
+        })
+
+        return request(app)
+            .get('/basepath/api/users/123')
+            .then((response) => {
+                expect(response.status).toBe(200)
+                expect(response.body.userId).toBe('123')
+            })
+    }, 15000)
+
+    test('remove base path can handle multi-part base paths', async () => {
+        jest.spyOn(ssrConfig, 'getConfig').mockReturnValue({envBasePath: '/my/base/path'})
+
+        const app = RemoteServerFactory._createApp(opts())
+
+        app.get('/api/test', (req, res) => {
+            res.status(200).json({message: 'test'})
+        })
+
+        return request(app)
+            .get('/my/base/path/api/test')
+            .then((response) => {
+                expect(response.status).toBe(200)
+                expect(response.body.message).toBe('test')
+            })
+    }, 15000)
+
+    test('should handle optional characters in route pattern', async () => {
+        jest.spyOn(ssrConfig, 'getConfig').mockReturnValue({envBasePath: '/basepath'})
+
+        const app = RemoteServerFactory._createApp(opts())
+
+        // This route is intentionally made complex to test the following:
+        // 1. Optional characters in route pattern ie. 'k?'
+        // 2. Optional characters in route pattern with groups ie. (c)?
+        // 3. Optional characters in route pattern with path parameters ie. (:param?)
+        // 4. Wildcards ie. '*'
+        app.get('/callba(c)?k?*/:param?', (req, res) => {
+            res.status(200).json({message: 'test'})
+        })
+
+        return request(app)
+            .get('/basepath/callback')
+            .then((response) => {
+                expect(response.status).toBe(200)
+                expect(response.body.message).toBe('test')
+            })
+    }, 15000)
 })
