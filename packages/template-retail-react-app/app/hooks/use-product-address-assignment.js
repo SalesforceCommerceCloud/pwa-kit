@@ -16,7 +16,7 @@ import {isPickupMethod} from '@salesforce/retail-react-app/app/utils/shipment-ut
 /**
  * Managing address selection state with product delivery items
  */
-export const useAddressProductManagement = (basket) => {
+export const useProductAddressAssignment = (basket) => {
     const {data: customer} = useCurrentCustomer()
 
     const deliveryItems = useMemo(() => {

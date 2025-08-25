@@ -23,7 +23,7 @@ import {
     Center
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 import {useCheckout} from '@salesforce/retail-react-app/app/pages/checkout/util/checkout-context'
-import {useAddressProductManagement} from '@salesforce/retail-react-app/app/hooks/use-address-product-management'
+import {useProductAddressAssignment} from '@salesforce/retail-react-app/app/hooks/use-product-address-assignment'
 import {useAddressForm} from '@salesforce/retail-react-app/app/hooks/use-address-form'
 import {useShipmentManagement} from '@salesforce/retail-react-app/app/hooks/use-shipment-management'
 import ProductShippingAddressCard from '@salesforce/retail-react-app/app/pages/checkout/partials/product-shipping-address-card.jsx'
@@ -32,8 +32,8 @@ const ShippingMultiAddress = ({basket, submitButtonLabel, noItemsInBasketMessage
     const {formatMessage} = useIntl()
     const {STEPS, goToStep} = useCheckout()
     const showToast = useToast()
-    const addressProductManagement = useAddressProductManagement(basket)
-    const productIds = addressProductManagement.deliveryItems
+    const productAddressAssignment = useProductAddressAssignment(basket)
+    const productIds = productAddressAssignment.deliveryItems
         .map((item) => item.productId)
         .join(',')
 
@@ -66,25 +66,25 @@ const ShippingMultiAddress = ({basket, submitButtonLabel, noItemsInBasketMessage
         handleCreateAddress,
         isAddressFormOpen
     } = useAddressForm(
-        addressProductManagement.addGuestAddress,
-        addressProductManagement.isGuest,
-        addressProductManagement.setAddressesForItems,
-        addressProductManagement.availableAddresses,
-        addressProductManagement.deliveryItems
+        productAddressAssignment.addGuestAddress,
+        productAddressAssignment.isGuest,
+        productAddressAssignment.setAddressesForItems,
+        productAddressAssignment.availableAddresses,
+        productAddressAssignment.deliveryItems
     )
 
     const shipmentManagement = useShipmentManagement(basket)
 
-    const addresses = addressProductManagement.availableAddresses
+    const addresses = productAddressAssignment.availableAddresses
     const [isSubmitting, setIsSubmitting] = useState(false)
 
     // guests only products loading since they may not have addresses yet
     const isLoading =
-        (addressProductManagement.isGuest ? false : customerLoading) || productsLoading
+        (productAddressAssignment.isGuest ? false : customerLoading) || productsLoading
 
-    const allShipmentsHaveAddress = addressProductManagement.allItemsHaveAddresses
+    const allShipmentsHaveAddress = productAddressAssignment.allItemsHaveAddresses
 
-    if (!addressProductManagement.deliveryItems.length) {
+    if (!productAddressAssignment.deliveryItems.length) {
         return (
             <Center
                 p={8}
@@ -151,8 +151,8 @@ const ShippingMultiAddress = ({basket, submitButtonLabel, noItemsInBasketMessage
         setIsSubmitting(true)
         try {
             await shipmentManagement.orchestrateShipmentOperations(
-                addressProductManagement.deliveryItems,
-                addressProductManagement.selectedAddresses,
+                productAddressAssignment.deliveryItems,
+                productAddressAssignment.selectedAddresses,
                 addresses,
                 productsMap
             )
@@ -183,7 +183,7 @@ const ShippingMultiAddress = ({basket, submitButtonLabel, noItemsInBasketMessage
                     w="100%"
                 >
                     <VStack spacing={2} w="100%" h="100%">
-                        {addressProductManagement.deliveryItems.map((item) => {
+                        {productAddressAssignment.deliveryItems.map((item) => {
                             const productDetail = productsMap?.[item.productId] || {}
                             const variant = {...item, ...productDetail}
                             const image = findImageGroupBy(productDetail.imageGroups, {
@@ -201,12 +201,12 @@ const ShippingMultiAddress = ({basket, submitButtonLabel, noItemsInBasketMessage
                                     imageUrl={imageUrl}
                                     addressKey={addressKey}
                                     selectedAddressId={
-                                        addressProductManagement.selectedAddresses[addressKey]
+                                        productAddressAssignment.selectedAddresses[addressKey]
                                     }
                                     availableAddresses={addresses}
-                                    isGuestUser={addressProductManagement.isGuest}
+                                    isGuestUser={productAddressAssignment.isGuest}
                                     customerLoading={customerLoading}
-                                    onAddressSelect={addressProductManagement.setAddressesForItems}
+                                    onAddressSelect={productAddressAssignment.setAddressesForItems}
                                     onAddNewAddress={openForm}
                                     showAddAddressForm={showAddAddressForm}
                                     addressForm={addressForm}
