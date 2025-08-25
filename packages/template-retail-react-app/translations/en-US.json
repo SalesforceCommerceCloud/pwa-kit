@@ -89,6 +89,12 @@
   "account_order_detail.title.order_details": {
     "defaultMessage": "Order Details"
   },
+  "account_order_detail.toast.cancellation_failed": {
+    "defaultMessage": "Something went wrong with the order cancellation."
+  },
+  "account_order_detail.toast.cancellation_success": {
+    "defaultMessage": "Your order cancellation request was submitted."
+  },
   "account_order_history.button.continue_shopping": {
     "defaultMessage": "Continue Shopping"
   },

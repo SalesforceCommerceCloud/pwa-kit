@@ -35,6 +35,7 @@ import {getOrderStatusColorScheme} from '@salesforce/retail-react-app/app/pages/
 import {getLocalizedOrderStatus} from '@salesforce/retail-react-app/app/pages/account/order-history'
 import {useCustomerId, useCustomerType} from '@salesforce/commerce-sdk-react'
 import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
+import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
 
 const onClient = typeof window !== 'undefined'
 
@@ -42,6 +43,7 @@ const AccountOrderDetail = () => {
     const {params} = useRouteMatch()
     const history = useHistory()
     const {formatMessage, formatDate} = useIntl()
+    const toast = useToast()
 
     const {
         isOpen: isCancelModalOpen,
@@ -87,6 +89,46 @@ const AccountOrderDetail = () => {
         ownsOrder &&
         statusEligible &&
         shippingEligible
+
+    // NOTE: intentionally left API call as no-op until the cancel API is ready.
+    // When the API is available, replace call with real API request.
+    // The handler should update UI (e.g., refetch order, show a toast, navigate back to orders).
+    const handleCancelOrder = async () => {
+        try {
+            // const response = await realCancelOrderApi(_order.orderNo, _reasonId)
+            const response = undefined // no-op placeholder for now
+
+            // Error (4xx/5xx)
+            if (response && !response.ok) {
+                toast({
+                    title: formatMessage({
+                        defaultMessage: 'Something went wrong with the order cancellation.',
+                        id: 'account_order_detail.toast.cancellation_failed'
+                    }),
+                    status: 'error'
+                })
+                return
+            }
+
+            // Success (2xx)
+            toast({
+                title: formatMessage({
+                    defaultMessage: 'Your order cancellation request was submitted.',
+                    id: 'account_order_detail.toast.cancellation_success'
+                }),
+                status: 'success'
+            })
+        } catch (e) {
+            // Network/unexpected error
+            toast({
+                title: formatMessage({
+                    defaultMessage: 'Something went wrong with the order cancellation.',
+                    id: 'account_order_detail.toast.cancellation_failed'
+                }),
+                status: 'error'
+            })
+        }
+    }
 
     // Fetch product data for order items
     const productIds = order?.productItems?.map((product) => product.productId) || []
@@ -435,10 +477,7 @@ const AccountOrderDetail = () => {
                     isOpen={isCancelModalOpen}
                     onClose={onCancelModalClose}
                     order={order}
-                    // NOTE: `onCancel` is intentionally a no-op until the cancel API is ready.
-                    // When the API is available, replace this with a handler that submits the request
-                    // and updates UI (e.g., refetch order, show a toast, navigate back to orders).
-                    onCancel={() => {}}
+                    onCancel={handleCancelOrder}
                 />
             )}
         </Stack>

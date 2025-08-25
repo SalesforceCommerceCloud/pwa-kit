@@ -6,7 +6,7 @@
  */
 import React from 'react'
 import {Route, Switch} from 'react-router-dom'
-import {screen} from '@testing-library/react'
+import {screen, waitFor} from '@testing-library/react'
 import {
     renderWithProviders,
     createPathWithDefaults
@@ -129,5 +129,37 @@ describe('AccountOrderDetail OMS gating', () => {
         })
         renderAtOrderDetailPath()
         expect(screen.queryByTestId('order-status-bar')).not.toBeInTheDocument()
+    })
+})
+
+describe('Cancel Order toast', () => {
+    beforeEach(() => {
+        jest.clearAllMocks()
+        getConfig.mockReturnValue({
+            ...mockConfig,
+            app: {
+                ...mockConfig.app,
+                oms: {enabled: true}
+            }
+        })
+    })
+
+    test('shows success toast when onCancel is triggered', async () => {
+        const {user} = renderAtOrderDetailPath()
+        await screen.findByText(/Order Number:/i)
+
+        // Open cancel modal
+        const cancelButton = screen.getByRole('button', {name: /cancel order/i})
+        await user.click(cancelButton)
+
+        // Click "Request Cancellation" button in modal
+        const requestButtons = screen.getAllByRole('button', {name: /request cancellation/i})
+        const modalButton = requestButtons.find((btn) => btn.closest('[role="dialog"]'))
+        expect(modalButton).toBeInTheDocument()
+        await user.click(modalButton)
+
+        await waitFor(() => {
+            expect(screen.getByRole('status')).toHaveTextContent(/cancellation request submitted/i)
+        })
     })
 })
