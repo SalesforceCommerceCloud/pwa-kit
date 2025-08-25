@@ -43,6 +43,7 @@ type Helpers = typeof helpers
 interface AuthConfig extends ApiClientConfigParams {
     redirectURI: string
     proxy: string
+    privateClientProxyEndpoint?: string
     fetchOptions?: ShopperLoginTypes.FetchOptions
     fetchedToken?: string
     enablePWAKitPrivateClient?: boolean
@@ -247,12 +248,19 @@ class Auth {
     private hybridAuthEnabled: boolean
 
     constructor(config: AuthConfig) {
-        // Special endpoint for injecting SLAS private client secret.
+        // Special proxy endpoint for injecting SLAS private client secret.
+        // We prioritize config.privateClientProxyEndpoint since that allows us to use the new envBasePath feature
+        // The preexisting hard coded privateClientEndpoint is kept here for now to prevent a breaking change.
+        // TODO: We should remove this in the next major release so we do not have a hard coded proxy path inside commerce-sdk-react
         const baseUrl = config.proxy.split(MOBIFY_PATH)[0]
         const privateClientEndpoint = `${baseUrl}${SLAS_PRIVATE_PROXY_PATH}`
 
         this.client = new ShopperLogin({
-            proxy: config.enablePWAKitPrivateClient ? privateClientEndpoint : config.proxy,
+            proxy: config.enablePWAKitPrivateClient
+                ? config.privateClientProxyEndpoint
+                    ? config.privateClientProxyEndpoint
+                    : privateClientEndpoint
+                : config.proxy,
             parameters: {
                 clientId: config.clientId,
                 organizationId: config.organizationId,
@@ -340,7 +348,9 @@ class Auth {
         this.passwordlessLoginCallbackURI = passwordlessLoginCallbackURI
             ? isAbsoluteUrl(passwordlessLoginCallbackURI)
                 ? passwordlessLoginCallbackURI
-                : `${baseUrl}${passwordlessLoginCallbackURI}`
+                : // This fallback does not take into account the envBasePath feature
+                  // To set an env base path, config.passwordlessLoginCallbackURI must be an absolute url
+                  `${baseUrl}${passwordlessLoginCallbackURI}`
             : ''
 
         this.hybridAuthEnabled = config.hybridAuthEnabled || false
