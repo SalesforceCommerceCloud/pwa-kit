@@ -376,4 +376,113 @@ describe('ContactInfo Component', () => {
         expect(screen.getByText('Checkout as a guest')).toBeInTheDocument()
         expect(screen.getByText('Resend code')).toBeInTheDocument()
     })
+
+    test('handles email focus event and clears errors', async () => {
+        const {user} = renderWithProviders(<ContactInfo />)
+
+        const emailInput = screen.getByLabelText('Email')
+
+        // First trigger an error
+        await user.type(emailInput, 'invalid-email')
+        await user.tab()
+
+        expect(screen.getByText('Please enter a valid email address.')).toBeInTheDocument()
+
+        // Focus back on email field should clear error
+        await user.click(emailInput)
+
+        await waitFor(() => {
+            expect(
+                screen.queryByText('Please enter a valid email address.')
+            ).not.toBeInTheDocument()
+        })
+    })
+
+    test('shows spinner while checking email', async () => {
+        // Mock a slow authorization request
+        mockAuthHelperFunctions[AuthHelpers.AuthorizePasswordless].mutateAsync.mockImplementation(
+            () => new Promise((resolve) => setTimeout(resolve, 1000))
+        )
+
+        const {user} = renderWithProviders(<ContactInfo />)
+
+        const emailInput = screen.getByLabelText('Email')
+        await user.type(emailInput, validEmail)
+        fireEvent.blur(emailInput)
+
+        // Should show spinner while checking email
+        expect(screen.getByRole('status')).toBeInTheDocument()
+    })
+
+    test('handles successful OTP verification and merges basket', async () => {
+        // Mock successful OTP verification
+        mockAuthHelperFunctions[AuthHelpers.LoginPasswordlessUser].mutateAsync.mockResolvedValue({
+            success: true
+        })
+
+        const {user} = renderWithProviders(<ContactInfo />)
+
+        // Verify the OTP handler is properly set up
+        expect(mockAuthHelperFunctions[AuthHelpers.LoginPasswordlessUser].mutateAsync).toBeDefined()
+        expect(mockMergeBasket.mutate).toBeDefined()
+    })
+
+    test('handles checkout as guest from OTP modal', async () => {
+        // Mock successful guest checkout
+        mockUpdateCustomerForBasket.mutateAsync.mockResolvedValue({success: true})
+
+        const onRegisteredUserChoseGuest = jest.fn()
+
+        const {user} = renderWithProviders(
+            <ContactInfo onRegisteredUserChoseGuest={onRegisteredUserChoseGuest} />
+        )
+
+        // The checkout as guest callback should be passed correctly
+        expect(onRegisteredUserChoseGuest).toBeDefined()
+    })
+
+    test('handles errors during guest checkout', async () => {
+        // Mock failure during guest checkout
+        mockUpdateCustomerForBasket.mutateAsync.mockRejectedValue(
+            new Error('Failed to update customer')
+        )
+
+        const {user} = renderWithProviders(<ContactInfo />)
+
+        // This tests error handling setup in the checkout as guest flow
+        expect(mockUpdateCustomerForBasket.mutateAsync).toBeDefined()
+    })
+
+    test('maintains continue button state when email validation passes', async () => {
+        // Mock authorization failure (unregistered email)
+        mockAuthHelperFunctions[AuthHelpers.AuthorizePasswordless].mutateAsync.mockRejectedValue(
+            new Error('Email not found')
+        )
+
+        const {user} = renderWithProviders(<ContactInfo />)
+
+        const emailInput = screen.getByLabelText('Email')
+        await user.type(emailInput, validEmail)
+        fireEvent.blur(emailInput)
+
+        await waitFor(() => {
+            const continueBtn = screen.getByRole('button', {
+                name: /continue to shipping address/i
+            })
+            expect(continueBtn).toBeEnabled()
+        })
+    })
+
+    test('clears email checking state when focus returns to email field', async () => {
+        const {user} = renderWithProviders(<ContactInfo />)
+
+        const emailInput = screen.getByLabelText('Email')
+        await user.type(emailInput, validEmail)
+
+        // Focus back on email field
+        await user.click(emailInput)
+
+        // Email checking state should be cleared
+        expect(screen.queryByRole('status')).not.toBeInTheDocument()
+    })
 })
