@@ -30,6 +30,9 @@ For help, run:
 ```bash
 npx @salesforce/pwa-kit-create-app --help
 ```
+## Install Extensions
+
+V4 of PWA Kit introduces the concept of extensions as part of the `npx @salesforce/pwa-kit-create-app` project generator command, read about this in [EXTENSIONS.md](EXTENSIONS.md)
 
 ## Documentation
 
