@@ -9,10 +9,7 @@ import React, {Fragment, useCallback, useEffect, useState} from 'react'
 import PropTypes from 'prop-types'
 import {Helmet} from 'react-helmet'
 import {FormattedMessage, useIntl} from 'react-intl'
-import {
-    normalizeSetBundleProduct,
-    getUpdateBundleChildArray
-} from '@salesforce/retail-react-app/app/utils/product-utils'
+import {getUpdateBundleChildArray} from '@salesforce/retail-react-app/app/utils/product-utils'
 
 // Components
 import {Box, Button, Stack} from '@salesforce/retail-react-app/app/components/shared/ui'
@@ -64,6 +61,7 @@ import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
 import {useWishList} from '@salesforce/retail-react-app/app/hooks/use-wish-list'
 import {useStoreLocatorModal} from '@salesforce/retail-react-app/app/hooks/use-store-locator'
 import {isPickupMethod} from '@salesforce/retail-react-app/app/utils/shipment-utils'
+import {useProductInventory} from '@salesforce/retail-react-app/app/hooks/use-product-inventory'
 
 const ProductDetail = () => {
     const {formatMessage} = useIntl()
@@ -182,78 +180,13 @@ const ProductDetail = () => {
         }
     )
 
-    // Optimize combo product inventory calculations with useEffect
-    const [product, setProduct] = useState(productResponse)
-    useEffect(() => {
-        if (!isProductASet && !isProductABundle) {
-            setProduct(productResponse)
-            return
-        }
-
-        const normalizedProduct = normalizeSetBundleProduct(productResponse)
-
-        if (!normalizedProduct.childProducts) {
-            setProduct(normalizedProduct)
-            return
-        }
-
-        // normalizeSetBundleProduct already creates deep clones for safe mutation
-        const updatedChildProducts = normalizedProduct.childProducts
-
-        // Update base product inventory to inventory variant selections
-        if (variantProductData?.data) {
-            updatedChildProducts.forEach(({product: childProduct}, index) => {
-                const matchingChildProduct = variantProductData.data.find(
-                    (variantChild) => variantChild?.master?.masterId === childProduct.id
-                )
-                if (matchingChildProduct) {
-                    updatedChildProducts[index].product = {
-                        ...childProduct,
-                        inventory: matchingChildProduct.inventory,
-                        inventories: matchingChildProduct.inventories
-                    }
-                }
-            })
-        }
-
-        // Calculate lowest inventory for product sets and update normalizedProduct directly
-        if (isProductASet) {
-            let lowestInventory
-            let missingInventory = false
-            let lowestStoreInventory
-            let missingStoreInventory = false
-            updatedChildProducts.forEach(({product: childProduct}) => {
-                if (!childProduct.inventory) {
-                    missingInventory = true
-                } else if (!(lowestInventory?.stockLevel < childProduct.inventory.stockLevel)) {
-                    lowestInventory = {...childProduct.inventory}
-                    lowestInventory.lowestStockLevelProductName = childProduct.name
-                }
-
-                const selectedStoreInventory = childProduct.inventories?.find(
-                    (inventory) => inventory.id === selectedInventoryId
-                )
-                if (!selectedStoreInventory) {
-                    missingStoreInventory = true
-                } else if (
-                    !(lowestStoreInventory?.stockLevel < selectedStoreInventory.stockLevel)
-                ) {
-                    lowestStoreInventory = {...selectedStoreInventory}
-                    lowestStoreInventory.lowestStockLevelProductName = childProduct.name
-                }
-            })
-
-            // Update normalizedProduct directly with the lowest values
-            if (!missingInventory && lowestInventory) {
-                normalizedProduct.inventory = lowestInventory
-            }
-            if (!missingStoreInventory && lowestStoreInventory) {
-                normalizedProduct.inventories = [lowestStoreInventory]
-            }
-        }
-
-        setProduct(normalizedProduct)
-    }, [productResponse, variantProductData, selectedInventoryId, isProductASet, isProductABundle])
+    const product = useProductInventory(
+        productResponse,
+        variantProductData,
+        selectedInventoryId,
+        isProductASet,
+        isProductABundle
+    )
 
     /**************** Error Handling ****************/
 
