@@ -5,6 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
+import PropTypes from 'prop-types'
 import {screen, fireEvent} from '@testing-library/react'
 import {useForm} from 'react-hook-form'
 import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
@@ -77,6 +78,16 @@ const TestWrapper = ({
             onPaymentIdChange={onPaymentIdChange}
         />
     )
+}
+
+// Add PropTypes to prevent "missing in props validation" warnings
+TestWrapper.propTypes = {
+    value: PropTypes.string,
+    isEditingPayment: PropTypes.bool,
+    togglePaymentEdit: PropTypes.func,
+    onPaymentIdChange: PropTypes.func,
+    customerData: PropTypes.object,
+    formErrors: PropTypes.object
 }
 
 describe('CCRadioGroup', () => {
