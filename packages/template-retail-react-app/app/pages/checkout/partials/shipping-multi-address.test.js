@@ -129,6 +129,7 @@ const mockBasket = {
 
 const mockCustomer = {
     customerId: 'customer-1',
+    isRegistered: true,
     addresses: [
         {
             addressId: 'addr-1',
@@ -988,6 +989,7 @@ describe('ShippingMultiAddress - handleSubmit', () => {
         useCurrentCustomer.mockReturnValue({
             data: {
                 customerId: 'test-customer',
+                isRegistered: true,
                 addresses: mockAddresses
             },
             refetch: jest.fn(),
