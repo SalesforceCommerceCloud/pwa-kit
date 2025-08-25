@@ -28,7 +28,9 @@ const ProductItemList = ({
     localQuantity = {},
     localIsGiftItems = {},
     isCartItemLoading = false,
-    selectedItem = null
+    selectedItem = null,
+    // Styling options
+    hideBorder = false
 }) => {
     return (
         <Stack spacing={4}>
@@ -65,6 +67,7 @@ const ProductItemList = ({
                             isCartItemLoading && selectedItem?.itemId === productItem.itemId
                         }
                         handleRemoveItem={onRemoveItemClick}
+                        hideBorder={hideBorder}
                     />
                 )
             })}
@@ -82,7 +85,8 @@ ProductItemList.propTypes = {
     localQuantity: PropTypes.object,
     localIsGiftItems: PropTypes.object,
     isCartItemLoading: PropTypes.bool,
-    selectedItem: PropTypes.object
+    selectedItem: PropTypes.object,
+    hideBorder: PropTypes.bool
 }
 
 export default ProductItemList

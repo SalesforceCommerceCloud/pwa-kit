@@ -146,7 +146,9 @@ const ProductView = forwardRef(
             pickupInStore = false,
             setPickupInStore = () => {},
             onOpenStoreLocator = () => {},
-            showDeliveryOptions = true
+            showDeliveryOptions = true,
+            customButtons = [],
+            promotionId
         },
         ref
     ) => {
@@ -374,6 +376,19 @@ const ProductView = forwardRef(
                             : buttonText.addToWishlist}
                     </ButtonWithRegistration>
                 )
+            }
+
+            // Add custom buttons if provided
+            if (customButtons && customButtons.length > 0) {
+                customButtons.forEach((customButton, index) => {
+                    buttons.push(
+                        React.cloneElement(customButton, {
+                            key: `custom-button-${index}`,
+                            width: customButton.props.width || '100%',
+                            marginBottom: customButton.props.marginBottom || 4
+                        })
+                    )
+                })
             }
 
             return buttons
@@ -889,7 +904,9 @@ ProductView.propTypes = {
     pickupInStore: PropTypes.bool,
     setPickupInStore: PropTypes.func,
     onOpenStoreLocator: PropTypes.func,
-    showDeliveryOptions: PropTypes.bool
+    showDeliveryOptions: PropTypes.bool,
+    customButtons: PropTypes.array,
+    promotionId: PropTypes.string
 }
 
 export default ProductView

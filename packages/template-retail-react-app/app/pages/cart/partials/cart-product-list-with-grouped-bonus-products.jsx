@@ -1,0 +1,209 @@
+/*
+ * Copyright (c) 2023, Salesforce, Inc.
+ * All rights reserved.
+ * SPDX-License-Identifier: BSD-3-Clause
+ * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
+ */
+import React from 'react'
+import PropTypes from 'prop-types'
+import {Stack, Box, Heading} from '@salesforce/retail-react-app/app/components/shared/ui'
+import SelectBonusProductsCard from '@salesforce/retail-react-app/app/pages/cart/partials/select-bonus-products-card'
+import {
+    getBonusProductsInCartForProduct,
+    getRemainingAvailableBonusProductsForProduct,
+    isProductEligibleForBonusProducts
+} from '@salesforce/retail-react-app/app/utils/bonus-product-utils'
+
+/**
+ * Fragment component that renders cart items with bonus products grouped with their qualifying products
+ * @param {Object} props - Component props
+ * @param {Array} props.nonBonusProducts - Array of non-bonus products
+ * @param {Object} props.basket - The current basket data
+ * @param {Object} props.productsWithPromotions - Products with promotion data
+ * @param {boolean} props.isPromotionDataLoading - Whether promotion data is loading
+ * @param {Function} props.renderProductItem - Function to render individual product items
+ * @param {Function} props.getPromotionCalloutText - Function to get promotion text
+ * @param {Function} props.onSelectBonusProducts - Callback when select bonus products button is clicked
+ * @returns {JSX.Element} The grouped cart product list
+ */
+const CartProductListWithGroupedBonusProducts = ({
+    nonBonusProducts,
+    basket,
+    productsWithPromotions,
+    isPromotionDataLoading,
+    renderProductItem,
+    getPromotionCalloutText,
+    onSelectBonusProducts
+}) => {
+    // Fallback: if no non-bonus products, render all products in simple layout
+    if (!nonBonusProducts || nonBonusProducts.length === 0) {
+        return (
+            <Stack gap={4}>
+                {basket.productItems?.map((productItem, idx) =>
+                    renderProductItem(productItem, idx)
+                )}
+            </Stack>
+        )
+    }
+
+    return (
+        <Stack gap={6}>
+            {nonBonusProducts.map((qualifyingProduct, qualifyingIdx) => {
+                // Skip bonus product logic if promotion data is not loaded
+                if (!productsWithPromotions || isPromotionDataLoading) {
+                    return (
+                        <Box key={qualifyingProduct.itemId}>
+                            {renderProductItem(qualifyingProduct, qualifyingIdx)}
+                        </Box>
+                    )
+                }
+
+                // Check if product is eligible for bonus products
+                const isEligible = isProductEligibleForBonusProducts(
+                    qualifyingProduct.productId,
+                    productsWithPromotions
+                )
+
+                // If not eligible, render as simple card
+                if (!isEligible) {
+                    return (
+                        <Box key={qualifyingProduct.itemId}>
+                            {renderProductItem(qualifyingProduct, qualifyingIdx)}
+                        </Box>
+                    )
+                }
+
+                // Enhanced rendering for eligible products
+                try {
+                    // Get bonus product data for this qualifying product
+                    const bonusProductsForThisProduct = getBonusProductsInCartForProduct(
+                        basket,
+                        qualifyingProduct.productId,
+                        productsWithPromotions
+                    )
+                    const remainingBonusProductsData = getRemainingAvailableBonusProductsForProduct(
+                        basket,
+                        qualifyingProduct.productId,
+                        productsWithPromotions
+                    )
+
+                    const hasBonusProductsInCart = bonusProductsForThisProduct.length > 0
+                    const hasRemainingCapacity =
+                        remainingBonusProductsData.hasRemainingCapacity ||
+                        (isEligible && remainingBonusProductsData.aggregatedMaxBonusItems === 0)
+
+                    return (
+                        <Box
+                            key={qualifyingProduct.itemId}
+                            data-testid={`product-group-${qualifyingProduct.productId}`}
+                            layerStyle="cardBordered"
+                            p={4}
+                            backgroundColor="white"
+                            borderWidth="1px"
+                            borderColor="gray.200"
+                            borderRadius="base"
+                        >
+                            {/* Main product */}
+                            <Box>
+                                {renderProductItem(qualifyingProduct, qualifyingIdx, {
+                                    hideBorder: true
+                                })}
+                            </Box>
+
+                            {/* Bonus products already in cart */}
+                            {hasBonusProductsInCart && (
+                                <Box mt={4}>
+                                    <Heading
+                                        fontSize="md"
+                                        pt="1"
+                                        mb={3}
+                                    >
+                                        Bonus Products
+                                    </Heading>
+                                    <Stack gap={0}>
+                                        {bonusProductsForThisProduct.map(
+                                            (bonusProduct, bonusIdx) => (
+                                                <Box
+                                                    key={bonusProduct.itemId}
+                                                    data-testid={`bonus-product-${bonusProduct.productId}`}
+                                                    border="none"
+                                                    borderBottom="none"
+                                                    borderTop="none"
+                                                    borderLeft="none"
+                                                    borderRight="none"
+                                                >
+                                                    {renderProductItem(bonusProduct, bonusIdx, {
+                                                        showQuantitySelector: false,
+                                                        hideBorder: true
+                                                    })}
+                                                </Box>
+                                            )
+                                        )}
+                                    </Stack>
+                                </Box>
+                            )}
+
+                            {/* Separator between bonus products and select card */}
+                            {hasBonusProductsInCart && hasRemainingCapacity && (
+                                <Box borderTop="1px solid" borderColor="gray.200" mt={4} mb={4} />
+                            )}
+
+                            {/* Select Bonus Products card */}
+                            {hasRemainingCapacity && (
+                                <SelectBonusProductsCard
+                                    qualifyingProduct={qualifyingProduct}
+                                    basket={basket}
+                                    productsWithPromotions={productsWithPromotions}
+                                    remainingBonusProductsData={remainingBonusProductsData}
+                                    isEligible={isEligible}
+                                    getPromotionCalloutText={getPromotionCalloutText}
+                                    onSelectBonusProducts={onSelectBonusProducts}
+                                />
+                            )}
+
+                            {/* Add divider between product groups if not the last item */}
+                            {qualifyingIdx < nonBonusProducts.length - 1 && (
+                                <Box borderTop="1px solid" borderColor="gray.200" mt={4} mb={4} />
+                            )}
+                        </Box>
+                    )
+                } catch (error) {
+                    console.error('Error in enhanced rendering:', error)
+                    // Fallback to simple rendering if enhanced fails
+                    return (
+                        <Box key={qualifyingProduct.itemId}>
+                            {renderProductItem(qualifyingProduct, qualifyingIdx)}
+                        </Box>
+                    )
+                }
+            })}
+
+            {/* Temporarily disabled orphan bonus products for debugging */}
+        </Stack>
+    )
+}
+
+CartProductListWithGroupedBonusProducts.propTypes = {
+    nonBonusProducts: PropTypes.arrayOf(
+        PropTypes.shape({
+            itemId: PropTypes.string,
+            productId: PropTypes.string
+        })
+    ).isRequired,
+    basket: PropTypes.shape({
+        productItems: PropTypes.arrayOf(
+            PropTypes.shape({
+                itemId: PropTypes.string,
+                productId: PropTypes.string,
+                bonusProductLineItem: PropTypes.bool
+            })
+        )
+    }).isRequired,
+    productsWithPromotions: PropTypes.object,
+    isPromotionDataLoading: PropTypes.bool.isRequired,
+    renderProductItem: PropTypes.func.isRequired,
+    getPromotionCalloutText: PropTypes.func.isRequired,
+    onSelectBonusProducts: PropTypes.func.isRequired
+}
+
+export default CartProductListWithGroupedBonusProducts
