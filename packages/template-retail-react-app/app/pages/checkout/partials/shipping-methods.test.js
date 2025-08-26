@@ -8,7 +8,7 @@ import React from 'react'
 import {render, screen, waitFor} from '@testing-library/react'
 import {IntlProvider} from 'react-intl'
 import {CurrencyProvider} from '@salesforce/retail-react-app/app/contexts'
-import ShippingOptions from '@salesforce/retail-react-app/app/pages/checkout/partials/shipping-options'
+import ShippingMethods from '@salesforce/retail-react-app/app/pages/checkout/partials/shipping-methods'
 import {useCheckout} from '@salesforce/retail-react-app/app/pages/checkout/util/checkout-context'
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
 import {useCurrency} from '@salesforce/retail-react-app/app/hooks'
@@ -148,11 +148,14 @@ const renderWithIntl = (component) => {
     )
 }
 
-describe('ShippingOptions', () => {
+describe('ShippingMethods', () => {
     beforeEach(() => {
         mockUseCheckout.mockReturnValue(defaultProps)
         mockUseCurrentBasket.mockReturnValue({
             data: mockBasket,
+            derivedData: {
+                totalShippingCost: 5.99
+            },
             isLoading: false
         })
         mockUseCurrency.mockReturnValue({
@@ -176,10 +179,13 @@ describe('ShippingOptions', () => {
         test('should show loading spinner when basket is loading', () => {
             mockUseCurrentBasket.mockReturnValue({
                 data: null,
+                derivedData: {
+                    totalShippingCost: undefined
+                },
                 isLoading: true
             })
 
-            renderWithIntl(<ShippingOptions />)
+            renderWithIntl(<ShippingMethods />)
 
             expect(screen.getAllByTestId('loading').length).toBeGreaterThan(0)
         })
@@ -190,7 +196,7 @@ describe('ShippingOptions', () => {
                 isLoading: true
             })
 
-            renderWithIntl(<ShippingOptions />)
+            renderWithIntl(<ShippingMethods />)
 
             // Wait for the loading spinner to appear
             await waitFor(() => {
@@ -201,6 +207,9 @@ describe('ShippingOptions', () => {
         test('should show loading spinner when multiple data sources are loading', () => {
             mockUseCurrentBasket.mockReturnValue({
                 data: null,
+                derivedData: {
+                    totalShippingCost: undefined
+                },
                 isLoading: true
             })
             mockUseProducts.mockReturnValue({
@@ -212,7 +221,7 @@ describe('ShippingOptions', () => {
                 isLoading: true
             })
 
-            renderWithIntl(<ShippingOptions />)
+            renderWithIntl(<ShippingMethods />)
 
             expect(screen.getAllByTestId('loading').length).toBeGreaterThan(0)
         })
@@ -220,7 +229,7 @@ describe('ShippingOptions', () => {
 
     describe('Component Rendering', () => {
         test('should render shipping options when all data is loaded', () => {
-            renderWithIntl(<ShippingOptions />)
+            renderWithIntl(<ShippingMethods />)
 
             expect(screen.getByText('Shipping & Gift Options')).toBeInTheDocument()
             expect(screen.getByText('Standard Shipping')).toBeInTheDocument()
@@ -228,7 +237,7 @@ describe('ShippingOptions', () => {
         })
 
         test('should render shipping methods correctly', () => {
-            renderWithIntl(<ShippingOptions />)
+            renderWithIntl(<ShippingMethods />)
 
             expect(screen.getByText('Standard Shipping')).toBeInTheDocument()
             expect(screen.getByText('Express Shipping')).toBeInTheDocument()
@@ -237,18 +246,23 @@ describe('ShippingOptions', () => {
         })
 
         test('should render shipping methods when shipping methods are loaded', () => {
-            renderWithIntl(<ShippingOptions />)
+            renderWithIntl(<ShippingMethods />)
 
             expect(screen.getByText('Standard Shipping')).toBeInTheDocument()
             expect(screen.getByText('Express Shipping')).toBeInTheDocument()
             expect(screen.getByText('5-7 business days')).toBeInTheDocument()
             expect(screen.getByText('2-3 business days')).toBeInTheDocument()
         })
+
+        test('should display shipping cost from derivedData correctly', () => {
+            renderWithIntl(<ShippingMethods />)
+            expect(screen.getByText('$5.99')).toBeInTheDocument()
+        })
     })
 
     describe('Form Functionality', () => {
         test('should render continue button when shipping method is selected', () => {
-            renderWithIntl(<ShippingOptions />)
+            renderWithIntl(<ShippingMethods />)
 
             const continueButton = screen.getByText('Continue to Payment')
             expect(continueButton).toBeInTheDocument()
@@ -269,10 +283,13 @@ describe('ShippingOptions', () => {
 
             mockUseCurrentBasket.mockReturnValue({
                 data: basketWithoutShippingMethod,
+                derivedData: {
+                    totalShippingCost: 5.99
+                },
                 isLoading: false
             })
 
-            renderWithIntl(<ShippingOptions />)
+            renderWithIntl(<ShippingMethods />)
 
             const continueButton = screen.getByText('Continue to Payment')
             expect(continueButton).toBeDisabled()
@@ -321,10 +338,13 @@ describe('ShippingOptions', () => {
 
             mockUseCurrentBasket.mockReturnValue({
                 data: multiShipmentBasket,
+                derivedData: {
+                    totalShippingCost: 18.98
+                },
                 isLoading: false
             })
 
-            renderWithIntl(<ShippingOptions />)
+            renderWithIntl(<ShippingMethods />)
 
             expect(screen.getAllByText('Standard Shipping').length).toBeGreaterThan(0)
             expect(screen.getAllByText('Express Shipping').length).toBeGreaterThan(0)
@@ -335,10 +355,13 @@ describe('ShippingOptions', () => {
         test('should handle missing basket data gracefully', () => {
             mockUseCurrentBasket.mockReturnValue({
                 data: null,
+                derivedData: {
+                    totalShippingCost: undefined
+                },
                 isLoading: false
             })
 
-            renderWithIntl(<ShippingOptions />)
+            renderWithIntl(<ShippingMethods />)
 
             // Should not crash and should show appropriate state
             expect(screen.getByText('Shipping & Gift Options')).toBeInTheDocument()
@@ -357,10 +380,13 @@ describe('ShippingOptions', () => {
 
             mockUseCurrentBasket.mockReturnValue({
                 data: basketWithoutAddress,
+                derivedData: {
+                    totalShippingCost: 5.99
+                },
                 isLoading: false
             })
 
-            renderWithIntl(<ShippingOptions />)
+            renderWithIntl(<ShippingMethods />)
 
             // Should not crash and should show appropriate state
             expect(screen.getByText('Shipping & Gift Options')).toBeInTheDocument()
@@ -369,7 +395,7 @@ describe('ShippingOptions', () => {
 
     describe('Product Display', () => {
         test('should render shipping options component with basic structure', () => {
-            renderWithIntl(<ShippingOptions />)
+            renderWithIntl(<ShippingMethods />)
 
             // Check that the main component structure is rendered
             expect(screen.getByText('Shipping & Gift Options')).toBeInTheDocument()
@@ -399,7 +425,7 @@ describe('ShippingOptions', () => {
                 isLoading: false
             })
 
-            renderWithIntl(<ShippingOptions />)
+            renderWithIntl(<ShippingMethods />)
 
             expect(screen.getByText('Free shipping on orders over $50')).toBeInTheDocument()
         })
@@ -410,22 +436,28 @@ describe('ShippingOptions', () => {
             // Start with loading state
             mockUseCurrentBasket.mockReturnValue({
                 data: null,
+                derivedData: {
+                    totalShippingCost: undefined
+                },
                 isLoading: true
             })
 
-            const {rerender} = renderWithIntl(<ShippingOptions />)
+            const {rerender} = renderWithIntl(<ShippingMethods />)
             expect(screen.getAllByTestId('loading').length).toBeGreaterThan(0)
 
             // Transition to loaded state
             mockUseCurrentBasket.mockReturnValue({
                 data: mockBasket,
+                derivedData: {
+                    totalShippingCost: 5.99
+                },
                 isLoading: false
             })
 
             rerender(
                 <CurrencyProvider currency="USD">
                     <IntlProvider locale="en">
-                        <ShippingOptions />
+                        <ShippingMethods />
                     </IntlProvider>
                 </CurrencyProvider>
             )

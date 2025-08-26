@@ -159,32 +159,6 @@ export const findDeliveryShipmentWithSameAddress = (basket, address) => {
 }
 
 /**
- * Finds the first existing delivery shipment that has no address or an empty address
- * @param {Object} basket - The basket object
- * @returns {Object|null} The shipment object without address or null if not found
- */
-export const findDeliveryShipmentWithoutAddress = (basket) => {
-    if (!basket?.shipments) return null
-
-    const foundShipment = basket.shipments.find((shipment) => {
-        // Must be a delivery shipment (not pickup)
-        if (isPickupMethod(shipment.shippingMethod)) {
-            return false
-        }
-
-        // Check if shipment has no address or empty address
-        const address = shipment.shippingAddress
-        if (!address) {
-            return true
-        }
-
-        // Check if all address fields are falsey (empty address)
-        return isAddressEmpty(address)
-    })
-    return foundShipment || null
-}
-
-/**
  * Finds the best non-empty shipment to consolidate into the default shipment
  * @param {Object} basket - The basket object
  * @returns {Object|null} The shipment to consolidate or null if none found

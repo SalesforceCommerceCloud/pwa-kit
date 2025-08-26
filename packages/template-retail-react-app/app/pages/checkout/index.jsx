@@ -24,7 +24,7 @@ import {
 import ContactInfo from '@salesforce/retail-react-app/app/pages/checkout/partials/contact-info'
 import PickupAddress from '@salesforce/retail-react-app/app/pages/checkout/partials/pickup-address'
 import ShippingAddress from '@salesforce/retail-react-app/app/pages/checkout/partials/shipping-address'
-import ShippingOptions from '@salesforce/retail-react-app/app/pages/checkout/partials/shipping-options'
+import ShippingMethods from '@salesforce/retail-react-app/app/pages/checkout/partials/shipping-methods'
 import Payment from '@salesforce/retail-react-app/app/pages/checkout/partials/payment'
 import OrderSummary from '@salesforce/retail-react-app/app/components/order-summary'
 import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
@@ -130,7 +130,7 @@ const Checkout = () => {
                                 <>
                                     {hasPickupShipments && <PickupAddress />}
                                     <ShippingAddress />
-                                    <ShippingOptions />
+                                    <ShippingMethods />
                                 </>
                             )}
                             <Payment />
