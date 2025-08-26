@@ -385,6 +385,8 @@ jobs:
       # this will not include a11y tests
       - name: Run Playwright tests
         run: npm run test:e2e
+        env:
+          RUN_PRIVATE_CLIENT_TESTS: true
 
   notify-slack-pwa-private-client:
     needs: [run-generator-private-client]
