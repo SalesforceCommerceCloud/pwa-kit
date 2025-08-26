@@ -256,9 +256,6 @@ describe('ShippingOptions', () => {
 
         test('should display shipping cost from derivedData correctly', () => {
             renderWithIntl(<ShippingOptions />)
-
-            // Verify that the shipping cost from derivedData is displayed
-            // The component should show the shipping cost somewhere in the UI
             expect(screen.getByText('$5.99')).toBeInTheDocument()
         })
     })
