@@ -8,6 +8,9 @@ on:
         # Runs on the default branch.
         - cron: '0 3 * * *'
 
+env:
+    MRT_PROJECT_NAME: q4-pwa-perf-develop
+
 jobs:
     run-performance-metrics:
         runs-on: ubuntu-latest
@@ -41,7 +44,7 @@ jobs:
               uses: './.github/actions/push_to_mrt'
               with:
                   CWD: '${{ steps.generate_app.outputs.project_path }}'
-                  PROJECT: q4-pwa-perf-develop
+                  PROJECT: ${{ env.MRT_PROJECT_NAME }}
                   TARGET: production
                   CLOUD_ORIGIN: ${{ vars.MRT_STG_CLOUD_ORIGIN }}
                   FLAGS: --wait
@@ -58,10 +61,10 @@ jobs:
               with:
                   payload: |
                       {
-                        "message": "✅ Performance metrics workflow: successfully deployed bundle for performance testing."
+                        "message": "✅ Deployed the latest changes from `develop` branch to MRT project `${{ env.MRT_PROJECT_NAME }}`."
                       }
               env:
-                  SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+                  SLACK_WEBHOOK_URL: ${{ secrets.PERF_WORKFLOW_SLACK_WEBHOOK_URL }}
 
             - name: Send GitHub Action data to Slack workflow (Performance Metrics Failure)
               id: slack-failure
@@ -70,7 +73,7 @@ jobs:
               with:
                   payload: |
                       {
-                        "message": "❌ Performance metrics workflow: please check the logs for details. (${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})"
+                        "message": "❌ Please check the logs for details. (${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})"
                       }
               env:
                   SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
