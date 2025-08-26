@@ -113,7 +113,7 @@ function UseShopperOrders() {
                 {loginRegisteredUser.isLoading ? (
                     <span>Logging in...</span>
                 ) : (
-                    <h3>Logged in as {loginRegisteredUser?.variables?.username}</h3>
+                    <h3>Logged in successfully</h3>
                 )}
                 <div>Click on the link to go to an order page</div>
                 {orderNos.map((orderNo) => (
