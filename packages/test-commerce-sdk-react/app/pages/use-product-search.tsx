@@ -20,7 +20,7 @@ function UseProductSearch() {
     } = useProductSearch({
         parameters: {
             q: searchQuery,
-            refine: refinement
+            refine: refinement[0]
         }
     })
     if (isLoading) {

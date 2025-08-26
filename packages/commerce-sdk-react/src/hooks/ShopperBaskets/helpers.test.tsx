@@ -9,6 +9,7 @@ import {useShopperBasketsMutationHelper} from './helpers'
 import {useCustomerBaskets} from '../ShopperCustomers'
 import {renderWithProviders} from '../../test-utils'
 import {screen, waitFor} from '@testing-library/react'
+import {ShopperBasketsTypes} from 'commerce-sdk-isomorphic'
 import jwt from 'jsonwebtoken'
 
 const basketId = '10cf6aa40edba4fcfcc6915594'
@@ -51,7 +52,7 @@ const MockComponent = () => {
                                 price: 100,
                                 quantity: 1
                             }
-                        ])
+                        ] as ShopperBasketsTypes.ProductItem[] & Record<`c_${string}`, any>)
                         .catch((e) => console.log('e', e))
                 }}
             >

@@ -41,23 +41,23 @@ export const searchStores: QueryKeyHelper<'searchStores'> = {
     path: (params) => [
         '/commerce-sdk-react',
         '/organizations/',
-        params.organizationId,
+        params?.organizationId,
         '/store-search'
     ],
     queryKey: (params: Params<'searchStores'>) => {
         return [
             ...searchStores.path(params),
-            pickValidParams(params, ShopperStores.paramKeys.searchStores)
+            pickValidParams(params || {}, ShopperStores.paramKeys.searchStores)
         ]
     }
 }
 
 export const getStores: QueryKeyHelper<'getStores'> = {
-    path: (params) => ['/commerce-sdk-react', '/organizations/', params.organizationId, '/stores'],
+    path: (params) => ['/commerce-sdk-react', '/organizations/', params?.organizationId, '/stores'],
     queryKey: (params: Params<'getStores'>) => {
         return [
             ...getStores.path(params),
-            pickValidParams(params, ShopperStores.paramKeys.getStores)
+            pickValidParams(params || {}, ShopperStores.paramKeys.getStores)
         ]
     }
 }

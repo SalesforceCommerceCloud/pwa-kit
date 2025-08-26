@@ -14,7 +14,7 @@ function UsePromotions() {
         data: result,
         isLoading,
         error
-    } = usePromotions({parameters: {ids: '10offsuits,50%offorder'}})
+    } = usePromotions({parameters: {ids: ['10offsuits', '50%offorder']}})
     if (isLoading) {
         return (
             <div>
