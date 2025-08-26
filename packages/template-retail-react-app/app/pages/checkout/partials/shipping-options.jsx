@@ -33,7 +33,7 @@ import ShippingProductCards from '@salesforce/retail-react-app/app/pages/checkou
 import ShippingOptionsList from '@salesforce/retail-react-app/app/pages/checkout/partials/shipping-options-list'
 
 // Component to handle combined product cards and shipping options for multiship
-const ShipmentOptionsWithProducts = ({shipment, basketId, currency, control, basket}) => {
+const MultiAddressShipmentMethod = ({shipment, basketId, currency, control, basket}) => {
     const {formatMessage} = useIntl()
 
     if (!shipment.shippingAddress) {
@@ -88,7 +88,7 @@ const ShipmentOptionsWithProducts = ({shipment, basketId, currency, control, bas
     )
 }
 
-ShipmentOptionsWithProducts.propTypes = {
+MultiAddressShipmentMethod.propTypes = {
     shipment: PropTypes.shape({
         shipmentId: PropTypes.string.isRequired,
         shippingAddress: PropTypes.shape({
@@ -261,7 +261,7 @@ export default function ShippingOptions() {
                             <Box key={shipment.shipmentId}>
                                 {hasMultipleDeliveryShipments ? (
                                     // Multiship: Show both product cards and shipping options
-                                    <ShipmentOptionsWithProducts
+                                    <MultiAddressShipmentMethod
                                         shipment={shipment}
                                         basketId={basket.basketId}
                                         currency={currency}
