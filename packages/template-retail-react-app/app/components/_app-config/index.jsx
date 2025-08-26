@@ -40,7 +40,7 @@ import {CommerceApiProvider} from '@salesforce/commerce-sdk-react'
 import {withReactQuery} from '@salesforce/pwa-kit-react-sdk/ssr/universal/components/with-react-query'
 import {useCorrelationId} from '@salesforce/pwa-kit-react-sdk/ssr/universal/hooks'
 import {ReactQueryDevtools} from '@tanstack/react-query-devtools'
-import {generateSfdcUserAgent} from '@salesforce/retail-react-app/app/utils/user-agent-utils'
+import {generateSfdcUserAgent} from '@salesforce/retail-react-app/app/utils/sfdc-user-agent-utils'
 import {
     DEFAULT_DNT_STATE,
     STORE_LOCATOR_RADIUS,
