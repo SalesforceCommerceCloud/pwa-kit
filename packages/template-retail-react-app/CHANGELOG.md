@@ -4,10 +4,9 @@
 - This feature introduces an AI-powered shopping assistant that integrates Salesforce Embedded Messaging Service with PWA Kit applications. The shopper agent provides real-time chat support, search assistance, and personalized shopping guidance directly within the e-commerce experience. [#2658](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2658)
 - The feature toggle for partial hydration is now found in the config file (`config.app.partialHydrationEnabled`) [#3058](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3058)
 - Mask user not found messages to prevent user enumeration from passwordless login [#3113](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3113)
-
 - [Bugfix] Pin `@chakra-ui/react` version to 2.7.0 to avoid breaking changes from 2.10.9 [#2658](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2658)
-
 - Introduce optional prop `hybridAuthEnabled` to control Hybrid Auth specific behaviors in commerce-sdk-react [#3151](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3151)
+- Inject sfdc_user_agent request header into all SCAPI requests for debugging and metrics prupose [#3183](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3183)
 
 ## v7.0.0 (July 22, 2025)
 

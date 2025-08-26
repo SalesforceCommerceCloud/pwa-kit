@@ -42,6 +42,7 @@ type Helpers = typeof helpers
 interface AuthConfig extends ApiClientConfigParams {
     redirectURI: string
     proxy: string
+    headers?: Record<string, string>
     privateClientProxyEndpoint?: string
     fetchOptions?: FetchOptions
     fetchedToken?: string
@@ -272,6 +273,7 @@ class Auth {
             proxy: config.enablePWAKitPrivateClient
                 ? config.privateClientProxyEndpoint
                 : config.proxy,
+            headers: config.headers || {},
             parameters: {
                 clientId: config.clientId,
                 organizationId: config.organizationId,
@@ -289,6 +291,7 @@ class Auth {
         })
         this.shopperCustomersClient = new ShopperCustomers({
             proxy: config.proxy,
+            headers: config.headers || {},
             parameters: {
                 clientId: config.clientId,
                 organizationId: config.organizationId,

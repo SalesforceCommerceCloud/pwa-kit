@@ -3,9 +3,8 @@
 - Add support for environment level base paths on /mobify routes [#2892](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2892)
 - Fix private client endpoint prop name in app config templates [#3177](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3177)
 - Add `--initGit` to automate git repo creation for the generated project [#2817](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2817)
-
-
 - Update _app-config generator template to include `hybridAuthEnabled` prop [#3151](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3151)
+- Update templates files to include sfdc_user_agent header for debugging and metrics prupose [#3183](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3183)
 
 ## v3.11.0 (Jul 22, 2025)
 - Fix the demo instance details in `program.json`[#2800](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2800)
