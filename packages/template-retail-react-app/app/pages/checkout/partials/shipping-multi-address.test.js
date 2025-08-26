@@ -97,7 +97,8 @@ beforeEach(() => {
         createNewDeliveryShipmentWithAddress: jest.fn(),
         updateDeliveryAddressForShipment: jest.fn(),
         moveItemsToDeliveryShipment: jest.fn(),
-        removeEmptyShipments: jest.fn()
+        removeEmptyShipments: jest.fn(),
+        orchestrateShipmentOperations: jest.fn()
     })
 
     useItemShipmentManagement.mockReturnValue({
@@ -894,6 +895,7 @@ describe('ShippingMultiAddress - handleSubmit', () => {
     let mockUpdateDeliveryAddressForShipment
     let mockUpdateItemsToDeliveryShipment
     let mockRemoveEmptyShipments
+    let mockOrchestrateShipmentOperations
 
     const mockBasket = {
         basketId: 'test-basket-123',
@@ -973,13 +975,15 @@ describe('ShippingMultiAddress - handleSubmit', () => {
             shipments: mockBasket.shipments
         })
         mockRemoveEmptyShipments = jest.fn().mockResolvedValue()
+        mockOrchestrateShipmentOperations = jest.fn().mockResolvedValue()
 
         useMultiship.mockReturnValue({
             findDeliveryShipmentWithSameAddress: mockFindDeliveryShipmentWithSameAddress,
             findUnusedDeliveryShipment: mockFindUnusedDeliveryShipment,
             createNewDeliveryShipmentWithAddress: mockCreateNewDeliveryShipmentWithAddress,
             updateDeliveryAddressForShipment: mockUpdateDeliveryAddressForShipment,
-            removeEmptyShipments: mockRemoveEmptyShipments
+            removeEmptyShipments: mockRemoveEmptyShipments,
+            orchestrateShipmentOperations: mockOrchestrateShipmentOperations
         })
 
         useItemShipmentManagement.mockReturnValue({
@@ -1012,20 +1016,19 @@ describe('ShippingMultiAddress - handleSubmit', () => {
         await user.click(continueButton)
 
         await waitFor(() => {
-            // Should create two new shipments (one for each address)
-            expect(mockCreateNewDeliveryShipmentWithAddress).toHaveBeenCalledTimes(2)
-            const calledAddresses = mockCreateNewDeliveryShipmentWithAddress.mock.calls.map(
-                (args) => args[1]
+            // Should call orchestrateShipmentOperations with correct parameters
+            expect(mockOrchestrateShipmentOperations).toHaveBeenCalledWith(
+                expect.arrayContaining([
+                    expect.objectContaining({itemId: 'item-1'}),
+                    expect.objectContaining({itemId: 'item-2'})
+                ]),
+                expect.objectContaining({
+                    'item-1': 'addr-1',
+                    'item-2': 'addr-2'
+                }),
+                mockAddresses,
+                expect.any(Object) // productsMap
             )
-            expect(calledAddresses).toEqual(
-                expect.arrayContaining([mockAddresses[0], mockAddresses[1]])
-            )
-
-            // Should move items to their respective shipments
-            expect(mockUpdateItemsToDeliveryShipment).toHaveBeenCalledTimes(2)
-
-            // Should remove empty shipments
-            expect(mockRemoveEmptyShipments).toHaveBeenCalled()
 
             // Should navigate to next step
             expect(mockGoToStep).toHaveBeenCalledWith('SHIPPING_OPTIONS')
@@ -1048,25 +1051,29 @@ describe('ShippingMultiAddress - handleSubmit', () => {
         await user.click(continueButton)
 
         await waitFor(() => {
-            // Should NOT create new shipment since one exists
-            expect(mockCreateNewDeliveryShipmentWithAddress).not.toHaveBeenCalled()
-
-            // Should move items to existing shipment
-            expect(mockUpdateItemsToDeliveryShipment).toHaveBeenCalledWith(
+            // Should call orchestrateShipmentOperations with same address for both items
+            expect(mockOrchestrateShipmentOperations).toHaveBeenCalledWith(
                 expect.arrayContaining([
                     expect.objectContaining({itemId: 'item-1'}),
                     expect.objectContaining({itemId: 'item-2'})
                 ]),
-                'existing-shipment-1',
-                expect.any(String) // defaultInventoryId
+                expect.objectContaining({
+                    'item-1': 'addr-1',
+                    'item-2': 'addr-1'
+                }),
+                mockAddresses,
+                expect.any(Object)
             )
+
+            // Should navigate to next step
+            expect(mockGoToStep).toHaveBeenCalledWith('SHIPPING_OPTIONS')
         })
     })
 
     test('should handle errors gracefully', async () => {
-        // Mock an error during shipment creation
-        mockCreateNewDeliveryShipmentWithAddress.mockRejectedValue(
-            new Error('Failed to create shipment')
+        // Mock an error during orchestration
+        mockOrchestrateShipmentOperations.mockRejectedValue(
+            new Error('Failed to orchestrate shipments')
         )
 
         const user = userEvent.setup()
@@ -1129,16 +1136,22 @@ describe('ShippingMultiAddress - handleSubmit', () => {
         await user.click(continueButton)
 
         await waitFor(() => {
-            // Should not move the first item
-            const movedBatches = mockUpdateItemsToDeliveryShipment.mock.calls.map((args) => args[0])
-            const allMovedItemIds = movedBatches.flat().map((it) => it.itemId)
-            expect(allMovedItemIds).not.toContain('item-1')
-            // Since the default shipment ('me') is reused and its address is updated,
-            // item-2 may not need to be moved. Ensure the shipment address was updated to addr-2.
-            expect(mockUpdateDeliveryAddressForShipment).toHaveBeenCalledWith(
-                'me',
-                mockAddresses[1]
+            // Should call orchestrateShipmentOperations with the correct parameters
+            expect(mockOrchestrateShipmentOperations).toHaveBeenCalledWith(
+                expect.arrayContaining([
+                    expect.objectContaining({itemId: 'item-1', shipmentId: 'existing-shipment-1'}),
+                    expect.objectContaining({itemId: 'item-2', shipmentId: 'me'})
+                ]),
+                expect.objectContaining({
+                    'item-1': 'addr-1',
+                    'item-2': 'addr-2'
+                }),
+                mockAddresses,
+                expect.any(Object)
             )
+
+            // Should navigate to next step
+            expect(mockGoToStep).toHaveBeenCalledWith('SHIPPING_OPTIONS')
         })
     })
 
@@ -1152,16 +1165,22 @@ describe('ShippingMultiAddress - handleSubmit', () => {
         await user.click(continueButton)
 
         await waitFor(() => {
-            // Should create or update a shipment using the first address as default
-            const createdAddresses = mockCreateNewDeliveryShipmentWithAddress.mock.calls.map(
-                (args) => args[1]
+            // Should call orchestrateShipmentOperations with default address
+            expect(mockOrchestrateShipmentOperations).toHaveBeenCalledWith(
+                expect.arrayContaining([
+                    expect.objectContaining({itemId: 'item-1'}),
+                    expect.objectContaining({itemId: 'item-2'})
+                ]),
+                expect.objectContaining({
+                    'item-1': 'addr-1', // Default address
+                    'item-2': 'addr-1' // Default address
+                }),
+                mockAddresses,
+                expect.any(Object)
             )
-            const updatedAddresses = mockUpdateDeliveryAddressForShipment.mock.calls.map(
-                (args) => args[1]
-            )
-            expect([...createdAddresses, ...updatedAddresses]).toEqual(
-                expect.arrayContaining([mockAddresses[0]])
-            )
+
+            // Should navigate to next step
+            expect(mockGoToStep).toHaveBeenCalledWith('SHIPPING_OPTIONS')
         })
     })
 
