@@ -127,7 +127,11 @@ MultiAddressShipmentMethod.propTypes = {
 export default function ShippingMethods() {
     const {formatMessage} = useIntl()
     const {step, STEPS, goToStep, goToNextStep} = useCheckout()
-    const {data: basket, derivedData: {totalShippingCost}, isLoading: isBasketLoading} = useCurrentBasket()
+    const {
+        data: basket,
+        derivedData: {totalShippingCost},
+        isLoading: isBasketLoading
+    } = useCurrentBasket()
     const {currency} = useCurrency()
     const updateShippingMethod = useShopperBasketsMutation('updateShippingMethodForShipment')
 

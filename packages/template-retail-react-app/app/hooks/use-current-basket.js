@@ -69,7 +69,12 @@ export const useCurrentBasket = ({id = ''} = {}) => {
 
         // Calculate total shipping cost
         const totalShippingCost = currentBasket?.shippingItems?.reduce((total, item) => {
-            return total + (item.priceAfterItemDiscount !== undefined ? item.priceAfterItemDiscount : (item.price || 0))
+            return (
+                total +
+                (item.priceAfterItemDiscount !== undefined
+                    ? item.priceAfterItemDiscount
+                    : item.price || 0)
+            )
         }, 0)
 
         return {
@@ -82,7 +87,12 @@ export const useCurrentBasket = ({id = ''} = {}) => {
             isMissingShippingMethod,
             totalShippingCost
         }
-    }, [currentBasket?.productItems, currentBasket?.shipments, currentBasket?.shippingItems, storeLocatorEnabled])
+    }, [
+        currentBasket?.productItems,
+        currentBasket?.shipments,
+        currentBasket?.shippingItems,
+        storeLocatorEnabled
+    ])
 
     return {
         ...restOfQuery,
