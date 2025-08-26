@@ -12,7 +12,7 @@ import {useShopperCustomersMutation} from '@salesforce/commerce-sdk-react'
 import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
 import {
     areAddressesEqual,
-    cleanAddressForCustomer
+    sanitizedCustomerAddress
 } from '@salesforce/retail-react-app/app/utils/address-utils'
 import {nanoid} from 'nanoid'
 
@@ -79,7 +79,7 @@ export const useAddressForm = (
                     newAddress = addGuestAddress(addressData)
                 } else {
                     const apiAddressData = {
-                        ...cleanAddressForCustomer(addressData),
+                        ...sanitizedCustomerAddress(addressData),
                         addressId: `addr_${nanoid()}`
                     }
 

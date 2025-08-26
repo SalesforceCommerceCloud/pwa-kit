@@ -44,7 +44,7 @@ export const useShipmentManagement = (basket) => {
                 let basketAfterItemMoves = null
 
                 deliveryItems.forEach((item) => {
-                    // Use the unified selectedAddresses from useAddressProductManagement
+                    // Use the unified selectedAddresses from useProductAddressAssignment
                     const addressId = selectedAddresses[item.itemId] || finalAddresses[0]?.addressId
                     const address = finalAddresses.find((addr) => addr.addressId === addressId)
 

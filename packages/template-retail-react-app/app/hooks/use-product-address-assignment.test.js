@@ -6,7 +6,7 @@
  */
 
 import {renderHook, act} from '@testing-library/react'
-import {useAddressProductManagement} from '@salesforce/retail-react-app/app/hooks/use-address-product-management'
+import {useProductAddressAssignment} from '@salesforce/retail-react-app/app/hooks/use-product-address-assignment'
 
 // Mock dependencies
 jest.mock('@salesforce/retail-react-app/app/hooks/use-current-customer')
@@ -56,6 +56,7 @@ const mockBasket = {
 const mockCustomer = {
     customerId: 'customer-1',
     isGuest: false,
+    isRegistered: true,
     addresses: [
         {
             addressId: 'addr-1',
@@ -90,7 +91,7 @@ const mockGuestCustomer = {
     addresses: []
 }
 
-describe('useAddressProductManagement', () => {
+describe('useProductAddressAssignment', () => {
     beforeEach(() => {
         jest.clearAllMocks()
 
@@ -110,13 +111,13 @@ describe('useAddressProductManagement', () => {
                 }))
             }
 
-            const {result} = renderHook(() => useAddressProductManagement(pickupBasket))
+            const {result} = renderHook(() => useProductAddressAssignment(pickupBasket))
 
             expect(result.current.deliveryItems).toHaveLength(0)
         })
 
         test('should include delivery shipments', () => {
-            const {result} = renderHook(() => useAddressProductManagement(mockBasket))
+            const {result} = renderHook(() => useProductAddressAssignment(mockBasket))
 
             expect(result.current.deliveryItems).toHaveLength(2)
             expect(result.current.deliveryItems[0].itemId).toBe('item-1')
@@ -125,7 +126,7 @@ describe('useAddressProductManagement', () => {
 
         test('should handle empty basket', () => {
             const emptyBasket = {...mockBasket, productItems: []}
-            const {result} = renderHook(() => useAddressProductManagement(emptyBasket))
+            const {result} = renderHook(() => useProductAddressAssignment(emptyBasket))
 
             expect(result.current.deliveryItems).toHaveLength(0)
         })
@@ -133,7 +134,7 @@ describe('useAddressProductManagement', () => {
 
     describe('availableAddresses', () => {
         test('should return customer addresses for registered users', () => {
-            const {result} = renderHook(() => useAddressProductManagement(mockBasket))
+            const {result} = renderHook(() => useProductAddressAssignment(mockBasket))
 
             expect(result.current.availableAddresses).toHaveLength(2)
             expect(result.current.availableAddresses[0].addressId).toBe('addr-1')
@@ -146,7 +147,7 @@ describe('useAddressProductManagement', () => {
                 isLoading: false
             })
 
-            const {result} = renderHook(() => useAddressProductManagement(mockBasket))
+            const {result} = renderHook(() => useProductAddressAssignment(mockBasket))
 
             expect(result.current.availableAddresses).toHaveLength(2)
             expect(result.current.availableAddresses[0].isGuestAddress).toBe(true)
@@ -155,7 +156,7 @@ describe('useAddressProductManagement', () => {
 
     describe('registered user address initialization', () => {
         test('should initialize addresses from existing shipments', () => {
-            const {result} = renderHook(() => useAddressProductManagement(mockBasket))
+            const {result} = renderHook(() => useProductAddressAssignment(mockBasket))
 
             expect(result.current.selectedAddresses['item-1']).toBe('addr-1')
             expect(result.current.selectedAddresses['item-2']).toBe('addr-2')
@@ -167,7 +168,7 @@ describe('useAddressProductManagement', () => {
                 shipments: []
             }
 
-            const {result} = renderHook(() => useAddressProductManagement(basketWithoutShipments))
+            const {result} = renderHook(() => useProductAddressAssignment(basketWithoutShipments))
 
             expect(result.current.selectedAddresses['item-1']).toBe('addr-1')
             expect(result.current.selectedAddresses['item-2']).toBe('addr-1')
@@ -189,7 +190,7 @@ describe('useAddressProductManagement', () => {
                 shipments: []
             }
 
-            const {result} = renderHook(() => useAddressProductManagement(basketWithoutShipments))
+            const {result} = renderHook(() => useProductAddressAssignment(basketWithoutShipments))
 
             expect(result.current.selectedAddresses['item-1']).toBe('addr-1')
             expect(result.current.selectedAddresses['item-2']).toBe('addr-1')
@@ -203,7 +204,7 @@ describe('useAddressProductManagement', () => {
                 isLoading: false
             })
 
-            const {result} = renderHook(() => useAddressProductManagement(mockBasket))
+            const {result} = renderHook(() => useProductAddressAssignment(mockBasket))
 
             expect(result.current.availableAddresses).toHaveLength(2)
             expect(result.current.selectedAddresses['item-1']).toMatch(/^guest_/)
@@ -228,7 +229,7 @@ describe('useAddressProductManagement', () => {
             }
 
             const {result} = renderHook(() =>
-                useAddressProductManagement(basketWithDuplicateAddresses)
+                useProductAddressAssignment(basketWithDuplicateAddresses)
             )
 
             expect(result.current.availableAddresses).toHaveLength(1)
@@ -240,7 +241,7 @@ describe('useAddressProductManagement', () => {
                 isLoading: false
             })
 
-            const {result, rerender} = renderHook(() => useAddressProductManagement(mockBasket))
+            const {result, rerender} = renderHook(() => useProductAddressAssignment(mockBasket))
 
             const initialAddressCount = result.current.availableAddresses.length
 
@@ -257,7 +258,7 @@ describe('useAddressProductManagement', () => {
                 isLoading: false
             })
 
-            const {result} = renderHook(() => useAddressProductManagement(mockBasket))
+            const {result} = renderHook(() => useProductAddressAssignment(mockBasket))
 
             const newAddress = {
                 firstName: 'New',
@@ -287,7 +288,7 @@ describe('useAddressProductManagement', () => {
 
     describe('setAddressesForItems', () => {
         test('should set addresses for registered users', () => {
-            const {result} = renderHook(() => useAddressProductManagement(mockBasket))
+            const {result} = renderHook(() => useProductAddressAssignment(mockBasket))
 
             act(() => {
                 result.current.setAddressesForItems(['item-1'], 'addr-2')
@@ -302,7 +303,7 @@ describe('useAddressProductManagement', () => {
                 isLoading: false
             })
 
-            const {result} = renderHook(() => useAddressProductManagement(mockBasket))
+            const {result} = renderHook(() => useProductAddressAssignment(mockBasket))
 
             act(() => {
                 result.current.setAddressesForItems(['item-1'], 'guest_new')
@@ -312,7 +313,7 @@ describe('useAddressProductManagement', () => {
         })
 
         test('should handle multiple items', () => {
-            const {result} = renderHook(() => useAddressProductManagement(mockBasket))
+            const {result} = renderHook(() => useProductAddressAssignment(mockBasket))
 
             act(() => {
                 result.current.setAddressesForItems(['item-1', 'item-2'], 'addr-2')
@@ -323,7 +324,7 @@ describe('useAddressProductManagement', () => {
         })
 
         test('should clear addresses when empty string provided', () => {
-            const {result} = renderHook(() => useAddressProductManagement(mockBasket))
+            const {result} = renderHook(() => useProductAddressAssignment(mockBasket))
 
             act(() => {
                 result.current.setAddressesForItems(['item-1'], '')
@@ -335,7 +336,7 @@ describe('useAddressProductManagement', () => {
 
     describe('address selection state', () => {
         test('should have selected addresses for items', () => {
-            const {result} = renderHook(() => useAddressProductManagement(mockBasket))
+            const {result} = renderHook(() => useProductAddressAssignment(mockBasket))
 
             expect(result.current.selectedAddresses['item-1']).toBeDefined()
             expect(result.current.selectedAddresses['item-1']).toBe('addr-1')
@@ -347,7 +348,7 @@ describe('useAddressProductManagement', () => {
                 shipments: []
             }
 
-            const {result} = renderHook(() => useAddressProductManagement(basketWithoutAddresses))
+            const {result} = renderHook(() => useProductAddressAssignment(basketWithoutAddresses))
 
             expect(result.current.selectedAddresses['item-1']).toBeDefined()
         })
@@ -355,7 +356,7 @@ describe('useAddressProductManagement', () => {
 
     describe('allItemsHaveAddresses', () => {
         test('should return true when all items have addresses', () => {
-            const {result} = renderHook(() => useAddressProductManagement(mockBasket))
+            const {result} = renderHook(() => useProductAddressAssignment(mockBasket))
 
             expect(result.current.allItemsHaveAddresses).toBe(true)
         })
@@ -366,7 +367,7 @@ describe('useAddressProductManagement', () => {
                 shipments: []
             }
 
-            const {result} = renderHook(() => useAddressProductManagement(basketWithoutAddresses))
+            const {result} = renderHook(() => useProductAddressAssignment(basketWithoutAddresses))
 
             expect(result.current.allItemsHaveAddresses).toBe(true)
         })
@@ -374,7 +375,7 @@ describe('useAddressProductManagement', () => {
 
     describe('edge cases', () => {
         test('should handle null basket', () => {
-            const {result} = renderHook(() => useAddressProductManagement(null))
+            const {result} = renderHook(() => useProductAddressAssignment(null))
 
             expect(result.current.deliveryItems).toHaveLength(0)
             expect(result.current.availableAddresses).toHaveLength(2)
@@ -388,7 +389,7 @@ describe('useAddressProductManagement', () => {
                 isLoading: false
             })
 
-            const {result} = renderHook(() => useAddressProductManagement(mockBasket))
+            const {result} = renderHook(() => useProductAddressAssignment(mockBasket))
 
             expect(result.current.isGuest).toBe(false)
             expect(result.current.availableAddresses).toHaveLength(0)
@@ -405,7 +406,7 @@ describe('useAddressProductManagement', () => {
                 isLoading: false
             })
 
-            const {result} = renderHook(() => useAddressProductManagement(mockBasket))
+            const {result} = renderHook(() => useProductAddressAssignment(mockBasket))
 
             expect(result.current.availableAddresses).toHaveLength(0)
             expect(result.current.allItemsHaveAddresses).toBe(false)

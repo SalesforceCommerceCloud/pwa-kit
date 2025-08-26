@@ -28,7 +28,7 @@ import {useMultiship} from '@salesforce/retail-react-app/app/hooks/use-multiship
 import {DEFAULT_SHIPMENT_ID} from '@salesforce/retail-react-app/app/constants'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import {
-    cleanAddressForCustomer,
+    sanitizedCustomerAddress,
     cleanAddressForOrder
 } from '@salesforce/retail-react-app/app/utils/address-utils'
 import {
@@ -107,7 +107,7 @@ export default function ShippingAddress() {
 
             if (customer.isRegistered && !addressId) {
                 const body = {
-                    ...cleanAddressForCustomer(address),
+                    ...sanitizedCustomerAddress(address),
                     addressId: nanoid()
                 }
                 await createCustomerAddress.mutateAsync({
