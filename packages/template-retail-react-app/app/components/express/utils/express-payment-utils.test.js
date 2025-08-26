@@ -124,108 +124,60 @@ describe('express-payment-utils', () => {
             clientKey: 'test-key'
         }
 
-        it('should return false when adyenPaymentMethods environment is missing', () => {
-            const result = validateExpressPaymentSetup({
-                isPdpMode: false,
-                adyenPaymentMethods: {clientKey: 'test-key'},
-                hasRequiredBasketData: true,
-                sku: 'test-sku',
-                basket: {basketId: 'basket-123'},
-                authToken: 'token'
-            })
-
-            expect(result).toBe(false)
-        })
-
-        it('should return false when adyenPaymentMethods is undefined', () => {
-            const result = validateExpressPaymentSetup({
-                isPdpMode: false,
-                adyenPaymentMethods: undefined,
-                hasRequiredBasketData: true,
-                sku: 'test-sku',
-                basket: {basketId: 'basket-123'},
-                authToken: 'token'
-            })
-
-            expect(result).toBe(false)
-        })
-
-        it('should return true for PDP mode with valid SKU', () => {
+        it('should return false when adyenPaymentMethods environment is missing in PDP mode', () => {
             const result = validateExpressPaymentSetup({
                 isPdpMode: true,
-                adyenPaymentMethods: mockAdyenPaymentMethods,
-                hasRequiredBasketData: false,
-                sku: 'test-sku',
-                basket: {},
-                authToken: 'token'
+                adyenPaymentMethods: {clientKey: 'test-key'}
+            })
+
+            expect(result).toBe(false)
+        })
+
+        it('should return false when adyenPaymentMethods is undefined in PDP mode', () => {
+            const result = validateExpressPaymentSetup({
+                isPdpMode: true,
+                adyenPaymentMethods: undefined
+            })
+
+            expect(result).toBe(false)
+        })
+
+        it('should return true for PDP mode with valid adyenPaymentMethods', () => {
+            const result = validateExpressPaymentSetup({
+                isPdpMode: true,
+                adyenPaymentMethods: mockAdyenPaymentMethods
             })
 
             expect(result).toBe(true)
         })
 
-        it('should return false for PDP mode without SKU', () => {
-            const result = validateExpressPaymentSetup({
-                isPdpMode: true,
-                adyenPaymentMethods: mockAdyenPaymentMethods,
-                hasRequiredBasketData: false,
-                sku: '',
-                basket: {},
-                authToken: 'token'
-            })
-
-            expect(result).toBe(false)
-        })
-
-        it('should return truthy value for cart mode with all required basket data', () => {
-            const result = validateExpressPaymentSetup({
-                isPdpMode: false,
-                adyenPaymentMethods: mockAdyenPaymentMethods,
-                hasRequiredBasketData: true,
-                sku: 'test-sku',
-                basket: {
-                    basketId: 'basket-123',
-                    orderTotal: 100,
-                    currency: 'USD'
-                },
-                authToken: 'token'
-            })
-
-            expect(result).toBeTruthy()
-            expect(result).toBe('USD') // The function returns the last truthy value in the chain
-        })
-
         it('should return false for cart mode without required basket data', () => {
             const result = validateExpressPaymentSetup({
                 isPdpMode: false,
-                adyenPaymentMethods: mockAdyenPaymentMethods,
-                hasRequiredBasketData: false,
-                sku: 'test-sku',
-                basket: {
-                    basketId: 'basket-123',
-                    orderTotal: 100,
-                    currency: 'USD'
-                },
-                authToken: 'token'
+                hasRequiredBasketData: false
             })
 
             expect(result).toBe(false)
         })
 
-        it('should return false for cart mode with missing basket properties', () => {
+        it('should return true for cart mode with required basket data', () => {
             const result = validateExpressPaymentSetup({
                 isPdpMode: false,
                 adyenPaymentMethods: mockAdyenPaymentMethods,
-                hasRequiredBasketData: true,
-                sku: 'test-sku',
-                basket: {
-                    basketId: 'basket-123'
-                    // Missing orderTotal and currency
-                },
-                authToken: 'token'
+                hasRequiredBasketData: true
             })
 
-            expect(result).toBeFalsy()
-            expect(result).toBeUndefined() // The function returns undefined when orderTotal is missing
+            expect(result).toBe(true)
+        })
+
+        it('should return false when adyenPaymentMethods environment is missing in cart mode', () => {
+            const result = validateExpressPaymentSetup({
+                isPdpMode: false,
+                adyenPaymentMethods: {clientKey: 'test-key'},
+                hasRequiredBasketData: true
+            })
+
+            expect(result).toBe(false)
         })
     })
 

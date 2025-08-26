@@ -611,10 +611,7 @@ export const GooglePayExpress = ({
     const shouldRender = validateExpressPaymentSetup({
         isPdpMode,
         adyenPaymentMethods,
-        hasRequiredBasketData,
-        sku,
-        basket,
-        authToken
+        hasRequiredBasketData
     })
 
     if (!shouldRender) {

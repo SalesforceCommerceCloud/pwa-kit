@@ -39,23 +39,25 @@ export const createAdyenCheckout = async (adyenEnvironment, locale, applicationI
 export const validateExpressPaymentSetup = ({
     isPdpMode,
     adyenPaymentMethods,
-    hasRequiredBasketData,
-    sku,
-    basket,
-    authToken
+    hasRequiredBasketData
 }) => {
-    // Always check for required payment method data first
+    if (isPdpMode) {
+        // In PDP mode, we just need the basic data from parent
+        if (!adyenPaymentMethods?.environment || !adyenPaymentMethods) {
+            return false
+        }
+    } else {
+        // Validate required basket properties
+        if (!hasRequiredBasketData) {
+            return false
+        }
+    }
+
     if (!adyenPaymentMethods?.environment) {
         return false
     }
 
-    if (isPdpMode) {
-        // In PDP mode, we only need SKU
-        return !!sku
-    } else {
-        // In cart mode, validate required basket properties
-        return hasRequiredBasketData && basket?.basketId && basket?.orderTotal && basket?.currency
-    }
+    return true
 }
 
 /**

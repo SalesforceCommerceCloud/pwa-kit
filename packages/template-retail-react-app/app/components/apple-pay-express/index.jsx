@@ -670,10 +670,7 @@ export const ApplePayExpress = ({
     const shouldRender = validateExpressPaymentSetup({
         isPdpMode,
         adyenPaymentMethods,
-        hasRequiredBasketData,
-        sku,
-        basket,
-        authToken
+        hasRequiredBasketData
     })
 
     if (!shouldRender) {
