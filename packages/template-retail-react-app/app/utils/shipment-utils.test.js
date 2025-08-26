@@ -15,7 +15,7 @@ import {
     findExistingPickupShipment,
     findUnusedDeliveryShipment,
     findDeliveryShipmentWithSameAddress,
-    findDeliveryShipmentWithoutAddress,
+    getAddresslessShipment,
     findShipmentToConsolidate,
     isDefaultShipmentEmpty
 } from '@salesforce/retail-react-app/app/utils/shipment-utils'
@@ -318,9 +318,9 @@ describe('shipment-utils', () => {
         })
     })
 
-    describe('findDeliveryShipmentWithoutAddress', () => {
+    describe('getAddresslessShipment', () => {
         test('should find shipment without address', () => {
-            const shipment = findDeliveryShipmentWithoutAddress(mockBasket)
+            const shipment = getAddresslessShipment(mockBasket)
             expect(shipment.shipmentId).toBe('shipment-3')
         })
 
@@ -333,7 +333,7 @@ describe('shipment-utils', () => {
                 }))
             }
 
-            const shipment = findDeliveryShipmentWithoutAddress(basketWithAddresses)
+            const shipment = getAddresslessShipment(basketWithAddresses)
             expect(shipment).toBeNull()
         })
 
@@ -358,18 +358,18 @@ describe('shipment-utils', () => {
                 ]
             }
 
-            const shipment = findDeliveryShipmentWithoutAddress(basketWithEmptyAddress)
+            const shipment = getAddresslessShipment(basketWithEmptyAddress)
             expect(shipment.shipmentId).toBe('empty-address-shipment')
         })
 
         test('should return null for basket without shipments', () => {
             const basketWithoutShipments = {...mockBasket, shipments: null}
-            expect(findDeliveryShipmentWithoutAddress(basketWithoutShipments)).toBeNull()
+            expect(getAddresslessShipment(basketWithoutShipments)).toBeNull()
         })
 
         test('should return null for null/undefined basket', () => {
-            expect(findDeliveryShipmentWithoutAddress(null)).toBeNull()
-            expect(findDeliveryShipmentWithoutAddress(undefined)).toBeNull()
+            expect(getAddresslessShipment(null)).toBeNull()
+            expect(getAddresslessShipment(undefined)).toBeNull()
         })
 
         test('should skip pickup shipments', () => {
@@ -378,7 +378,7 @@ describe('shipment-utils', () => {
                 shipments: mockBasket.shipments.filter((s) => s.shipmentId === 'shipment-2')
             }
 
-            const shipment = findDeliveryShipmentWithoutAddress(pickupOnlyBasket)
+            const shipment = getAddresslessShipment(pickupOnlyBasket)
             expect(shipment).toBeNull()
         })
     })

@@ -61,7 +61,8 @@ const MockComponent = () => {
             totalPickupShipments,
             pickupStoreIds,
             isMissingShippingAddress,
-            isMissingShippingMethod
+            isMissingShippingMethod,
+            totalShippingCost
         }
     } = useCurrentBasket()
     return (
@@ -82,6 +83,7 @@ const MockComponent = () => {
             <div data-testid="pickup-store-ids">{JSON.stringify(pickupStoreIds)}</div>
             <div data-testid="needs-address">{isMissingShippingAddress.toString()}</div>
             <div data-testid="needs-shipping-method">{isMissingShippingMethod.toString()}</div>
+            <div data-testid="total-shipping-cost">{totalShippingCost}</div>
         </div>
     )
 }
@@ -119,5 +121,7 @@ describe('useCurrentBasket', function () {
         // New derived fields for checkout step logic
         expect(screen.getByTestId('needs-address').innerHTML).toBe('true')
         expect(screen.getByTestId('needs-shipping-method').innerHTML).toBe('true')
+        // New derived field: totalShippingCost should calculate from shippingItems
+        expect(screen.getByTestId('total-shipping-cost').innerHTML).toBe('0')
     })
 })

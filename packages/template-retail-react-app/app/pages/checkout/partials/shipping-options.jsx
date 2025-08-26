@@ -127,7 +127,11 @@ ShipmentOptionsWithProducts.propTypes = {
 export default function ShippingOptions() {
     const {formatMessage} = useIntl()
     const {step, STEPS, goToStep, goToNextStep} = useCheckout()
-    const {data: basket, isLoading: isBasketLoading} = useCurrentBasket()
+    const {
+        data: basket,
+        derivedData: {totalShippingCost},
+        isLoading: isBasketLoading
+    } = useCurrentBasket()
     const {currency} = useCurrency()
     const updateShippingMethod = useShopperBasketsMutation('updateShippingMethodForShipment')
 
@@ -189,15 +193,6 @@ export default function ShippingOptions() {
         await Promise.all(promises)
         goToNextStep()
     }
-
-    // Calculate total shipping info
-    const totalShippingCost =
-        (basket &&
-            basket.shippingItems &&
-            basket.shippingItems.reduce((total, item) => {
-                return total + (item.priceAfterItemDiscount || item.price || 0)
-            }, 0)) ||
-        0
 
     const freeLabel = formatMessage({
         defaultMessage: 'Free',
