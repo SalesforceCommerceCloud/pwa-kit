@@ -198,12 +198,9 @@ export const useProductAddressAssignment = (basket) => {
         }
     }, [customer?.isGuest, basket?.productItems?.length, basket?.shipments?.length])
 
-    const selectedAddresses = useMemo(() => {
-        if (customer?.isGuest) {
-            return selectedGuestAddresses
-        }
-        return selectedRegisteredUserAddresses
-    }, [customer?.isGuest, selectedGuestAddresses, selectedRegisteredUserAddresses])
+    const selectedAddresses = customer?.isGuest
+        ? selectedGuestAddresses
+        : selectedRegisteredUserAddresses
 
     const setAddressesForItems = useCallback(
         (itemIds, addressId) => {
@@ -276,7 +273,6 @@ export const useProductAddressAssignment = (basket) => {
         availableAddresses: availableAddresses || [],
         selectedAddresses: selectedAddresses || {},
         addGuestAddress,
-        isGuest: customer?.isGuest || false,
         setAddressesForItems,
         deliveryItems: deliveryItems || [],
         allItemsHaveAddresses
