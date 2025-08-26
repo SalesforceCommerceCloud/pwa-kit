@@ -15,7 +15,6 @@ import {
     findExistingPickupShipment,
     findUnusedDeliveryShipment,
     findDeliveryShipmentWithSameAddress,
-    getAddresslessShipment,
     findShipmentToConsolidate,
     isDefaultShipmentEmpty
 } from '@salesforce/retail-react-app/app/utils/shipment-utils'
