@@ -43,6 +43,8 @@ import {
     STORE_LOCATOR_SUPPORTED_COUNTRIES
 } from '@salesforce/retail-react-app/app/constants'
 
+const sfdcUserAgent = generateSfdcUserAgent()
+
 /**
  * Use the AppConfig component to inject extra arguments into the getProps
  * methods for all Route Components in the app – typically you'd want to do this
@@ -55,7 +57,7 @@ const AppConfig = ({children, locals = {}}) => {
     const {correlationId} = useCorrelationId()
     const headers = {
         'correlation-id': correlationId,
-        sfdc_user_agent: generateSfdcUserAgent()
+        sfdc_user_agent: sfdcUserAgent
     }
 
     const commerceApiConfig = locals.appConfig.commerceAPI
