@@ -9,7 +9,8 @@ on:
         - cron: '0 3 * * *'
 
 env:
-    MRT_PROJECT_NAME: q4-pwa-perf-develop
+    MRT_PROJECT_ID: q4-pwa-perf-develop
+    MRT_ENVIRONMENT_ID: production
 
 jobs:
     run-performance-metrics:
@@ -44,8 +45,8 @@ jobs:
               uses: './.github/actions/push_to_mrt'
               with:
                   CWD: '${{ steps.generate_app.outputs.project_path }}'
-                  PROJECT: ${{ env.MRT_PROJECT_NAME }}
-                  TARGET: production
+                  PROJECT: ${{ env.MRT_PROJECT_ID }}
+                  TARGET: ${{ env.MRT_ENVIRONMENT_ID }}
                   CLOUD_ORIGIN: ${{ vars.MRT_STG_CLOUD_ORIGIN }}
                   FLAGS: --wait
 
@@ -61,7 +62,7 @@ jobs:
               with:
                   payload: |
                       {
-                        "message": "✅ Deployed the latest changes from `develop` branch to MRT project `${{ env.MRT_PROJECT_NAME }}`."
+                        "message": "✅ Deployed the latest changes from `develop` branch to MRT project `${{ env.MRT_PROJECT_ID }}`: https://runtime-admin-staging.mobify-storefront.com/salesforce-internal/${{ env.MRT_PROJECT_ID }}/${{ env.MRT_ENVIRONMENT_ID }}"
                       }
               env:
                   SLACK_WEBHOOK_URL: ${{ secrets.PERF_WORKFLOW_SLACK_WEBHOOK_URL }}
