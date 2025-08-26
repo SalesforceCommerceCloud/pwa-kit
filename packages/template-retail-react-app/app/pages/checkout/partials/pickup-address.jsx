@@ -46,7 +46,7 @@ const ProductList = ({products, productsByItemId, currency, title}) => {
     }
 
     return (
-        <>
+        <Stack spacing={4}>
             {title && (
                 <Box mt={3} mb={2}>
                     <Text fontWeight="bold" fontSize="sm" color="gray.600">
@@ -54,51 +54,49 @@ const ProductList = ({products, productsByItemId, currency, title}) => {
                     </Text>
                 </Box>
             )}
-            <Stack spacing={4}>
-                {products.map((productItem) => {
-                    const product = {
-                        ...productItem,
-                        ...(productsByItemId && productsByItemId[productItem.itemId])
-                    }
-                    return (
-                        <ItemVariantProvider key={productItem.itemId} variant={product}>
-                            <Box
-                                border="1px solid"
-                                borderColor="gray.200"
-                                borderRadius="md"
-                                p={3}
-                                bg="white"
-                            >
-                                <Flex width="full" alignItems="flex-start">
-                                    <CartItemVariantImage width={['88px', '136px']} mr={4} />
-                                    <Stack spacing={1} marginTop="-3px" flex={1}>
-                                        <CartItemVariantName />
-                                        <CartItemVariantAttributes
-                                            includeQuantity={false}
-                                            hideAttributeLabels={true}
-                                        />
-                                        <Flex
-                                            width="full"
-                                            justifyContent="space-between"
-                                            alignItems="flex-end"
-                                        >
-                                            <Text fontSize="sm" color="gray.700">
-                                                <FormattedMessage
-                                                    defaultMessage="Qty: {quantity}"
-                                                    values={{quantity: productItem.quantity}}
-                                                    id="item_attributes.label.quantity_abbreviated"
-                                                />
-                                            </Text>
-                                            <CartItemVariantPrice currency={currency} />
-                                        </Flex>
-                                    </Stack>
-                                </Flex>
-                            </Box>
-                        </ItemVariantProvider>
-                    )
-                })}
-            </Stack>
-        </>
+            {products.map((productItem) => {
+                const product = {
+                    ...productItem,
+                    ...(productsByItemId && productsByItemId[productItem.itemId])
+                }
+                return (
+                    <ItemVariantProvider key={productItem.itemId} variant={product}>
+                        <Box
+                            border="1px solid"
+                            borderColor="gray.200"
+                            borderRadius="md"
+                            p={3}
+                            bg="white"
+                        >
+                            <Flex width="full" alignItems="flex-start">
+                                <CartItemVariantImage width={['88px', '136px']} mr={4} />
+                                <Stack spacing={1} marginTop="-3px" flex={1}>
+                                    <CartItemVariantName />
+                                    <CartItemVariantAttributes
+                                        includeQuantity={false}
+                                        hideAttributeLabels={true}
+                                    />
+                                    <Flex
+                                        width="full"
+                                        justifyContent="space-between"
+                                        alignItems="flex-end"
+                                    >
+                                        <Text fontSize="sm" color="gray.700">
+                                            <FormattedMessage
+                                                defaultMessage="Qty: {quantity}"
+                                                values={{quantity: productItem.quantity}}
+                                                id="item_attributes.label.quantity_abbreviated"
+                                            />
+                                        </Text>
+                                        <CartItemVariantPrice currency={currency} />
+                                    </Flex>
+                                </Stack>
+                            </Flex>
+                        </Box>
+                    </ItemVariantProvider>
+                )
+            })}
+        </Stack>
     )
 }
 
