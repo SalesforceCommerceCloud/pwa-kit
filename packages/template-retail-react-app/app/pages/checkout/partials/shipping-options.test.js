@@ -153,6 +153,9 @@ describe('ShippingOptions', () => {
         mockUseCheckout.mockReturnValue(defaultProps)
         mockUseCurrentBasket.mockReturnValue({
             data: mockBasket,
+            derivedData: {
+                totalShippingCost: 5.99
+            },
             isLoading: false
         })
         mockUseCurrency.mockReturnValue({
@@ -176,6 +179,9 @@ describe('ShippingOptions', () => {
         test('should show loading spinner when basket is loading', () => {
             mockUseCurrentBasket.mockReturnValue({
                 data: null,
+                derivedData: {
+                    totalShippingCost: 0
+                },
                 isLoading: true
             })
 
@@ -201,6 +207,9 @@ describe('ShippingOptions', () => {
         test('should show loading spinner when multiple data sources are loading', () => {
             mockUseCurrentBasket.mockReturnValue({
                 data: null,
+                derivedData: {
+                    totalShippingCost: 0
+                },
                 isLoading: true
             })
             mockUseProducts.mockReturnValue({
@@ -244,6 +253,14 @@ describe('ShippingOptions', () => {
             expect(screen.getByText('5-7 business days')).toBeInTheDocument()
             expect(screen.getByText('2-3 business days')).toBeInTheDocument()
         })
+
+        test('should display shipping cost from derivedData correctly', () => {
+            renderWithIntl(<ShippingOptions />)
+
+            // Verify that the shipping cost from derivedData is displayed
+            // The component should show the shipping cost somewhere in the UI
+            expect(screen.getByText('$5.99')).toBeInTheDocument()
+        })
     })
 
     describe('Form Functionality', () => {
@@ -269,6 +286,9 @@ describe('ShippingOptions', () => {
 
             mockUseCurrentBasket.mockReturnValue({
                 data: basketWithoutShippingMethod,
+                derivedData: {
+                    totalShippingCost: 5.99
+                },
                 isLoading: false
             })
 
@@ -321,6 +341,9 @@ describe('ShippingOptions', () => {
 
             mockUseCurrentBasket.mockReturnValue({
                 data: multiShipmentBasket,
+                derivedData: {
+                    totalShippingCost: 18.98
+                },
                 isLoading: false
             })
 
@@ -335,6 +358,9 @@ describe('ShippingOptions', () => {
         test('should handle missing basket data gracefully', () => {
             mockUseCurrentBasket.mockReturnValue({
                 data: null,
+                derivedData: {
+                    totalShippingCost: 0
+                },
                 isLoading: false
             })
 
@@ -357,6 +383,9 @@ describe('ShippingOptions', () => {
 
             mockUseCurrentBasket.mockReturnValue({
                 data: basketWithoutAddress,
+                derivedData: {
+                    totalShippingCost: 5.99
+                },
                 isLoading: false
             })
 
@@ -410,6 +439,9 @@ describe('ShippingOptions', () => {
             // Start with loading state
             mockUseCurrentBasket.mockReturnValue({
                 data: null,
+                derivedData: {
+                    totalShippingCost: 0
+                },
                 isLoading: true
             })
 
@@ -419,6 +451,9 @@ describe('ShippingOptions', () => {
             // Transition to loaded state
             mockUseCurrentBasket.mockReturnValue({
                 data: mockBasket,
+                derivedData: {
+                    totalShippingCost: 5.99
+                },
                 isLoading: false
             })
 
