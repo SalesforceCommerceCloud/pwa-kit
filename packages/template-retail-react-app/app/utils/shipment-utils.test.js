@@ -15,7 +15,7 @@ import {
     findExistingPickupShipment,
     findUnusedDeliveryShipment,
     findDeliveryShipmentWithSameAddress,
-    getMissingAddressShipment,
+    getAddresslessShipment,
     findShipmentToConsolidate,
     isDefaultShipmentEmpty
 } from '@salesforce/retail-react-app/app/utils/shipment-utils'
@@ -314,71 +314,6 @@ describe('shipment-utils', () => {
             }
 
             const shipment = findDeliveryShipmentWithSameAddress(pickupOnlyBasket, address)
-            expect(shipment).toBeNull()
-        })
-    })
-
-    describe('getMissingAddressShipment', () => {
-        test('should find shipment without address', () => {
-            const shipment = getMissingAddressShipment(mockBasket)
-            expect(shipment.shipmentId).toBe('shipment-3')
-        })
-
-        test('should return null if all shipments have addresses', () => {
-            const basketWithAddresses = {
-                ...mockBasket,
-                shipments: mockBasket.shipments.map((s) => ({
-                    ...s,
-                    shippingAddress: {address1: '123 Main St'}
-                }))
-            }
-
-            const shipment = getMissingAddressShipment(basketWithAddresses)
-            expect(shipment).toBeNull()
-        })
-
-        test('should find shipment with empty address', () => {
-            const basketWithEmptyAddress = {
-                ...mockBasket,
-                shipments: [
-                    {
-                        shipmentId: 'empty-address-shipment',
-                        shippingMethod: {id: 'delivery-method', c_storePickupEnabled: false},
-                        shippingAddress: {
-                            address1: '',
-                            city: '',
-                            stateCode: '',
-                            postalCode: '',
-                            countryCode: '',
-                            firstName: '',
-                            lastName: '',
-                            phone: ''
-                        }
-                    }
-                ]
-            }
-
-            const shipment = getMissingAddressShipment(basketWithEmptyAddress)
-            expect(shipment.shipmentId).toBe('empty-address-shipment')
-        })
-
-        test('should return null for basket without shipments', () => {
-            const basketWithoutShipments = {...mockBasket, shipments: null}
-            expect(getMissingAddressShipment(basketWithoutShipments)).toBeNull()
-        })
-
-        test('should return null for null/undefined basket', () => {
-            expect(getMissingAddressShipment(null)).toBeNull()
-            expect(getMissingAddressShipment(undefined)).toBeNull()
-        })
-
-        test('should skip pickup shipments', () => {
-            const pickupOnlyBasket = {
-                ...mockBasket,
-                shipments: mockBasket.shipments.filter((s) => s.shipmentId === 'shipment-2')
-            }
-
-            const shipment = getMissingAddressShipment(pickupOnlyBasket)
             expect(shipment).toBeNull()
         })
     })
