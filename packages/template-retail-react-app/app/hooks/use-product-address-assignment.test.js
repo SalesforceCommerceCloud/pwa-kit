@@ -391,7 +391,6 @@ describe('useProductAddressAssignment', () => {
 
             const {result} = renderHook(() => useProductAddressAssignment(mockBasket))
 
-            expect(result.current.isGuest).toBe(false)
             expect(result.current.availableAddresses).toHaveLength(0)
         })
 

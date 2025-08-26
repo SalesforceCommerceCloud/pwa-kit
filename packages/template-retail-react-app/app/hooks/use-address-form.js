@@ -27,7 +27,6 @@ export const useAddressForm = (
     const showToast = useToast()
     const {data: customer, refetch: refetchCustomer} = useCurrentCustomer()
     const [showForm, setShowForm] = useState({})
-    const [isSubmitting, setIsSubmitting] = useState(false)
 
     const createCustomerAddress = useShopperCustomersMutation('createCustomerAddress')
 
@@ -52,7 +51,6 @@ export const useAddressForm = (
 
     const handleCreateAddress = useCallback(
         async (addressData, itemId) => {
-            setIsSubmitting(true)
             try {
                 const isDuplicate = availableAddresses.some((existingAddr) =>
                     areAddressesEqual(addressData, existingAddr)
@@ -69,7 +67,6 @@ export const useAddressForm = (
                     setShowForm((prev) => ({...prev, [itemId]: false}))
                     form.reset()
                     form.clearErrors()
-                    setIsSubmitting(false)
                     return null
                 }
 
@@ -121,23 +118,15 @@ export const useAddressForm = (
                     }),
                     status: 'error'
                 })
-            } finally {
-                setIsSubmitting(false)
             }
         },
         [
             isGuest,
             addGuestAddress,
-            createCustomerAddress,
             customer?.customerId,
-            refetchCustomer,
-            showToast,
-            formatMessage,
-            form,
             setAddressesForItems,
             availableAddresses,
-            deliveryItems,
-            setShowForm
+            deliveryItems
         ]
     )
 
@@ -156,7 +145,7 @@ export const useAddressForm = (
     return {
         form,
         showForm,
-        isSubmitting,
+        isSubmitting: form.formState.isSubmitting,
         openForm,
         closeForm,
         handleCreateAddress,
