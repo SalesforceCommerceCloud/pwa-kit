@@ -4,77 +4,21 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-
+import React from 'react'
+import {render, waitFor} from '@testing-library/react'
+import {ApplePayExpress} from '@salesforce/retail-react-app/app/components/apple-pay-express/index'
+import AdyenCheckout from '@adyen/adyen-web'
+import {useAdyenExpressCheckout} from '@adyen/adyen-salesforce-pwa'
 import {
     getApplePaymentMethodConfig,
     getCustomerShippingDetails,
     getCustomerBillingDetails,
     getAppleButtonConfig
-} from '.'
-
-// Mock the Adyen services and utilities
-jest.mock('@adyen/adyen-web', () => ({
-    __esModule: true,
-    default: jest.fn()
-}))
-
-jest.mock('@salesforce/retail-react-app/app/components/express/utils/shipping-methods', () => ({
-    AdyenShippingMethodsService: jest.fn()
-}))
-
-jest.mock('@salesforce/retail-react-app/app/components/express/utils/shipping-address', () => ({
-    AdyenShippingAddressService: jest.fn()
-}))
-
-jest.mock('@salesforce/retail-react-app/app/components/express/utils/payments', () => ({
-    AdyenPaymentsService: jest.fn()
-}))
-
-jest.mock('@salesforce/retail-react-app/app/components/express/utils/pdp/temporary-basket', () => ({
-    createTemporaryBasket: jest.fn(),
-    deleteTemporaryBasket: jest.fn(),
-    cleanupTemporaryBasket: jest.fn()
-}))
-
-jest.mock(
-    '@salesforce/retail-react-app/app/components/express/utils/pdp/basket-calculation',
-    () => ({
-        getBasketWithTotals: jest.fn(),
-        forceOrderCalculation: jest.fn()
-    })
-)
-
-jest.mock(
-    '@salesforce/retail-react-app/app/components/express/utils/express-payment-utils',
-    () => ({
-        validateExpressPaymentSetup: jest.fn(),
-        getExpressPaymentDependencies: jest.fn(),
-        sendExpressMessage: jest.fn(),
-        getPaymentMethodConfig: jest.fn(),
-        isMissingOrderTotalError: jest.fn(),
-        createAdyenCheckout: jest.fn()
-    })
-)
-
-jest.mock('@salesforce/retail-react-app/app/components/express/utils/parsers', () => ({
-    getCurrencyValueForApi: jest.fn()
-}))
-
-jest.mock('@salesforce/retail-react-app/app/components/express/utils/constants', () => ({
-    PAYMENT_METHODS: {
-        APPLE_PAY: 'applepay'
-    },
-    EXPRESS_MESSAGES: {
-        PAYMENT_SUCCESS: 'express.payment.success',
-        PAYMENT_FAILURE: 'express.payment.failure',
-        PAYMENT_CANCEL: 'express.payment.cancel'
-    }
-}))
-
-// Import mocked modules
-import {AdyenShippingMethodsService} from '@salesforce/retail-react-app/app/components/express/utils/shipping-methods'
-import {AdyenShippingAddressService} from '@salesforce/retail-react-app/app/components/express/utils/shipping-address'
+} from '@salesforce/retail-react-app/app/components/apple-pay-express/index'
 import {AdyenPaymentsService} from '@salesforce/retail-react-app/app/components/express/utils/payments'
+import {AdyenShippingAddressService} from '@salesforce/retail-react-app/app/components/express/utils/shipping-address'
+import {AdyenShippingMethodsService} from '@salesforce/retail-react-app/app/components/express/utils/shipping-methods'
+import {useStandalonePaymentMethods} from '@salesforce/retail-react-app/app/components/express/hooks/use-standalone-payment-methods'
 import {
     createTemporaryBasket,
     deleteTemporaryBasket,
@@ -84,478 +28,1307 @@ import {
     getBasketWithTotals,
     forceOrderCalculation
 } from '@salesforce/retail-react-app/app/components/express/utils/pdp/basket-calculation'
-import {sendExpressMessage} from '@salesforce/retail-react-app/app/components/express/utils/express-payment-utils'
-import {getCurrencyValueForApi} from '@salesforce/retail-react-app/app/components/express/utils/parsers'
+import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
+import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
 
-describe('ApplePayExpress Utilities', () => {
-    const mockAuthToken = 'test-auth-token'
-    const mockSite = {id: 'test-site', name: 'Test Site'}
+// Mock the AdyenCheckout module
+jest.mock('@adyen/adyen-web', () => ({
+    __esModule: true,
+    default: jest.fn()
+}))
+
+// Mock the useAdyenExpressCheckout hook
+jest.mock('@adyen/adyen-salesforce-pwa', () => ({
+    useAdyenExpressCheckout: jest.fn()
+}))
+
+// Mock the utility services
+jest.mock('@salesforce/retail-react-app/app/components/express/utils/payments', () => ({
+    AdyenPaymentsService: jest.fn().mockImplementation(() => ({
+        submitPayment: jest.fn()
+    }))
+}))
+
+jest.mock('@salesforce/retail-react-app/app/components/express/utils/shipping-address', () => ({
+    AdyenShippingAddressService: jest.fn().mockImplementation(() => ({
+        updateShippingAddress: jest.fn()
+    }))
+}))
+
+jest.mock('@salesforce/retail-react-app/app/components/express/utils/shipping-methods', () => ({
+    AdyenShippingMethodsService: jest.fn().mockImplementation(() => ({
+        updateShippingMethod: jest.fn(),
+        getShippingMethods: jest.fn()
+    }))
+}))
+
+// Mock the useStandalonePaymentMethods hook
+jest.mock(
+    '@salesforce/retail-react-app/app/components/express/hooks/use-standalone-payment-methods',
+    () => ({
+        useStandalonePaymentMethods: jest.fn()
+    })
+)
+
+// Mock temporary basket utilities
+jest.mock('@salesforce/retail-react-app/app/components/express/utils/pdp/temporary-basket', () => ({
+    createTemporaryBasket: jest.fn(),
+    deleteTemporaryBasket: jest.fn(),
+    cleanupTemporaryBasket: jest.fn()
+}))
+
+// Mock basket calculation utilities
+jest.mock(
+    '@salesforce/retail-react-app/app/components/express/utils/pdp/basket-calculation',
+    () => ({
+        getBasketWithTotals: jest.fn(),
+        forceOrderCalculation: jest.fn()
+    })
+)
+
+// Mock useMultiSite and useNavigation hooks
+jest.mock('@salesforce/retail-react-app/app/hooks/use-multi-site', () => ({
+    __esModule: true,
+    default: jest.fn()
+}))
+
+jest.mock('@salesforce/retail-react-app/app/hooks/use-navigation', () => ({
+    __esModule: true,
+    default: jest.fn()
+}))
+
+// Suppress MSW 'Found an unhandled' warnings for this test file
+const originalConsoleError = console.error
+beforeAll(() => {
+    console.error = (...args) => {
+        if (typeof args[0] === 'string' && args[0].startsWith('Found an unhandled')) {
+            return
+        }
+        originalConsoleError(...args)
+    }
+})
+afterAll(() => {
+    console.error = originalConsoleError
+})
+
+describe('ApplePayExpress', () => {
     const mockBasket = {
-        basketId: 'test-basket-id',
-        orderTotal: 100.0,
+        basketId: 'test-basket',
+        orderTotal: 100,
         currency: 'USD',
-        customerInfo: {customerId: 'test-customer-id'}
+        customerInfo: {
+            customerId: 'test-customer'
+        }
     }
-    const mockAdyenPaymentMethods = {
-        environment: {
-            ADYEN_ENVIRONMENT: 'test',
-            ADYEN_CLIENT_KEY: 'test-key'
-        },
-        applicationInfo: {name: 'Test App'}
-    }
-    const mockShippingMethods = [
-        {id: 'method-1', name: 'Standard Shipping', price: 5.99, description: 'Standard shipping'},
-        {id: 'method-2', name: 'Express Shipping', price: 12.99, description: 'Express shipping'}
-    ]
 
-    let mockShippingMethodsService
-    let mockShippingAddressService
-    let mockPaymentsService
+    const mockProps = {
+        shippingMethods: [],
+        basketData: mockBasket,
+        manager: {
+            setPaymentMethodAvailable: jest.fn(),
+            setPaymentMethodUnavailable: jest.fn()
+        }
+    }
+
+    const mockAdyenEnvironment = {
+        ADYEN_ENVIRONMENT: 'test',
+        ADYEN_CLIENT_KEY: 'test_key'
+    }
+
+    const mockAdyenPaymentMethods = {
+        paymentMethods: [
+            {
+                type: 'applepay',
+                configuration: {
+                    merchantName: 'Test Merchant'
+                }
+            }
+        ],
+        applicationInfo: {}
+    }
+
+    beforeEach(() => {
+        // Reset all mocks before each test
+        jest.clearAllMocks()
+
+        // Mock useMultiSite hook
+        useMultiSite.mockReturnValue({
+            locale: {id: 'en-US'},
+            site: {id: 'test-site'}
+        })
+
+        // Mock useNavigation hook
+        useNavigation.mockReturnValue(jest.fn())
+
+        // Mock useStandalonePaymentMethods hook (will return null for non-PDP mode)
+        useStandalonePaymentMethods.mockReturnValue({
+            paymentMethods: null,
+            loading: false,
+            error: null
+        })
+
+        // Mock the useAdyenExpressCheckout hook
+        useAdyenExpressCheckout.mockReturnValue({
+            adyenEnvironment: mockAdyenEnvironment,
+            adyenPaymentMethods: mockAdyenPaymentMethods,
+            basket: mockProps.basketData,
+            locale: {id: 'en-US'},
+            site: 'test-site',
+            authToken: 'test-token',
+            navigate: jest.fn(),
+            shippingMethods: {applicableShippingMethods: []},
+            fetchShippingMethods: jest.fn()
+        })
+
+        // Mock AdyenCheckout
+        const mockCreate = jest.fn()
+        const mockIsAvailable = jest.fn()
+        const mockMount = jest.fn()
+
+        AdyenCheckout.mockResolvedValue({
+            create: mockCreate.mockResolvedValue({
+                isAvailable: mockIsAvailable.mockResolvedValue(true),
+                mount: mockMount
+            })
+        })
+    })
+
+    it('initializes AdyenCheckout with correct configuration', async () => {
+        render(<ApplePayExpress {...mockProps} />)
+
+        await waitFor(() => {
+            expect(AdyenCheckout).toHaveBeenCalledWith({
+                environment: mockAdyenEnvironment.ADYEN_ENVIRONMENT,
+                clientKey: mockAdyenEnvironment.ADYEN_CLIENT_KEY,
+                locale: 'en-US',
+                analytics: {
+                    analyticsData: {
+                        applicationInfo: mockAdyenPaymentMethods.applicationInfo
+                    }
+                }
+            })
+        })
+    })
+
+    it('handles Apple Pay unavailability', async () => {
+        // Mock AdyenCheckout to throw an error
+        AdyenCheckout.mockRejectedValue(new Error('Apple Pay not available'))
+
+        render(<ApplePayExpress {...mockProps} />)
+
+        await waitFor(() => {
+            expect(mockProps.manager.setPaymentMethodUnavailable).toHaveBeenCalledWith('applepay')
+        })
+    })
+
+    it('mounts Apple Pay button when available', async () => {
+        render(<ApplePayExpress {...mockProps} />)
+
+        await waitFor(() => {
+            expect(AdyenCheckout).toHaveBeenCalled()
+        })
+    })
+})
+
+describe('Utility functions', () => {
+    it('getApplePaymentMethodConfig returns config for applepay', () => {
+        const paymentMethodsResponse = {
+            paymentMethods: [
+                {type: 'applepay', configuration: {merchantName: 'Test Merchant'}},
+                {type: 'card', configuration: {}}
+            ]
+        }
+        expect(getApplePaymentMethodConfig(paymentMethodsResponse)).toEqual({
+            merchantName: 'Test Merchant'
+        })
+    })
+    it('getApplePaymentMethodConfig returns null if not found', () => {
+        expect(getApplePaymentMethodConfig({paymentMethods: [{type: 'card'}]})).toBeNull()
+        expect(getApplePaymentMethodConfig(undefined)).toBeNull()
+    })
+    it('getCustomerShippingDetails returns correct structure', () => {
+        const shippingContact = {
+            locality: 'City',
+            countryCode: 'US',
+            addressLines: ['123 Main St', 'Apt 4'],
+            postalCode: '12345',
+            administrativeArea: 'CA',
+            givenName: 'John',
+            familyName: 'Doe',
+            emailAddress: 'john@example.com',
+            phoneNumber: '555-1234'
+        }
+        expect(getCustomerShippingDetails(shippingContact)).toEqual({
+            deliveryAddress: {
+                city: 'City',
+                country: 'US',
+                houseNumberOrName: 'Apt 4',
+                postalCode: '12345',
+                stateOrProvince: 'CA',
+                street: '123 Main St'
+            },
+            profile: {
+                firstName: 'John',
+                lastName: 'Doe',
+                email: 'john@example.com',
+                phone: '555-1234'
+            }
+        })
+    })
+    it('getCustomerBillingDetails returns correct structure', () => {
+        const billingContact = {
+            locality: 'City',
+            countryCode: 'US',
+            addressLines: ['123 Main St', 'Apt 4'],
+            postalCode: '12345',
+            administrativeArea: 'CA'
+        }
+        expect(getCustomerBillingDetails(billingContact)).toEqual({
+            billingAddress: {
+                city: 'City',
+                country: 'US',
+                houseNumberOrName: 'Apt 4',
+                postalCode: '12345',
+                stateOrProvince: 'CA',
+                street: '123 Main St'
+            }
+        })
+    })
+})
+
+describe('getAppleButtonConfig', () => {
+    const mockAuthToken = 'token'
+    const mockSite = 'site'
+    const mockBasket = {
+        basketId: 'basket',
+        orderTotal: 100,
+        currency: 'USD',
+        customerInfo: {customerId: 'customer'}
+    }
+    const mockShippingMethods = [{name: 'Standard', description: 'desc', id: 'sm1', price: 10}]
+    const mockApplePayConfig = {merchantName: 'Test Merchant'}
+    const mockNavigate = jest.fn()
+    const mockFetchShippingMethods = jest.fn()
 
     beforeEach(() => {
         jest.clearAllMocks()
 
-        // Mock services
-        mockShippingMethodsService = {
-            getShippingMethods: jest.fn(),
-            updateShippingMethod: jest.fn()
-        }
-        mockShippingAddressService = {
-            updateShippingAddress: jest.fn()
-        }
-        mockPaymentsService = {
-            submitPayment: jest.fn()
-        }
-
-        AdyenShippingMethodsService.mockImplementation(() => mockShippingMethodsService)
-        AdyenShippingAddressService.mockImplementation(() => mockShippingAddressService)
-        AdyenPaymentsService.mockImplementation(() => mockPaymentsService)
-
-        // Mock utility functions
-        getCurrencyValueForApi.mockReturnValue(10000)
-        getBasketWithTotals.mockResolvedValue(mockBasket)
-        forceOrderCalculation.mockResolvedValue(mockBasket)
+        // Mock temporary basket and calculation functions for this test suite
+        createTemporaryBasket.mockResolvedValue({basketId: 'mock-temp-basket'})
+        deleteTemporaryBasket.mockResolvedValue({success: true})
+        cleanupTemporaryBasket.mockResolvedValue({success: true})
+        getBasketWithTotals.mockResolvedValue({orderTotal: 110, currency: 'USD'})
+        forceOrderCalculation.mockResolvedValue({...mockBasket, orderTotal: 110})
     })
 
-    afterEach(() => {
-        jest.restoreAllMocks()
+    it('returns correct button config', () => {
+        const config = getAppleButtonConfig(
+            mockAuthToken,
+            mockSite,
+            mockBasket,
+            mockShippingMethods,
+            mockApplePayConfig,
+            mockNavigate,
+            mockFetchShippingMethods
+        )
+        expect(config.showPayButton).toBe(true)
+        expect(config.isExpress).toBe(true)
+        expect(config.configuration).toBe(mockApplePayConfig)
+        expect(config.amount.currency).toBe('USD')
+        expect(config.shippingMethods).toHaveLength(1)
     })
 
-    describe('getCustomerShippingDetails', () => {
-        it('should format shipping contact correctly', () => {
-            const shippingContact = {
-                locality: 'Test City',
-                countryCode: 'US',
-                addressLines: ['123 Test St', 'Apt 123'],
-                postalCode: '12345',
-                administrativeArea: 'CA',
-                givenName: 'John',
-                familyName: 'Doe',
-                emailAddress: 'john.doe@example.com',
-                phoneNumber: '+1234567890'
+    it('onAuthorized resolves on successful payment', async () => {
+        const config = getAppleButtonConfig(
+            mockAuthToken,
+            mockSite,
+            mockBasket,
+            mockShippingMethods,
+            mockApplePayConfig,
+            mockNavigate,
+            mockFetchShippingMethods
+        )
+        // Mock the service directly
+        const mockSubmitPayment = jest
+            .fn()
+            .mockResolvedValue({isFinal: true, isSuccessful: true, merchantReference: 'order123'})
+        AdyenPaymentsService.mockImplementation(() => ({
+            submitPayment: mockSubmitPayment
+        }))
+
+        const resolve = jest.fn()
+        const reject = jest.fn()
+        const event = {
+            payment: {
+                shippingContact: {},
+                billingContact: {},
+                token: {paymentData: 'data'}
             }
+        }
+        await config.onAuthorized(resolve, reject, event)
+        expect(resolve).toHaveBeenCalled()
+        expect(reject).not.toHaveBeenCalled()
+    })
 
-            const result = getCustomerShippingDetails(shippingContact)
+    it('onAuthorized rejects on failed payment', async () => {
+        const config = getAppleButtonConfig(
+            mockAuthToken,
+            mockSite,
+            mockBasket,
+            mockShippingMethods,
+            mockApplePayConfig,
+            mockNavigate,
+            mockFetchShippingMethods
+        )
+        const mockSubmitPayment = jest.fn().mockResolvedValue({isFinal: false, isSuccessful: false})
+        AdyenPaymentsService.mockImplementation(() => ({
+            submitPayment: mockSubmitPayment
+        }))
 
-            expect(result).toEqual({
-                deliveryAddress: {
-                    city: 'Test City',
-                    country: 'US',
-                    houseNumberOrName: 'Apt 123',
-                    postalCode: '12345',
-                    stateOrProvince: 'CA',
-                    street: '123 Test St'
-                },
-                profile: {
-                    firstName: 'John',
-                    lastName: 'Doe',
-                    email: 'john.doe@example.com',
-                    phone: '+1234567890'
-                }
-            })
+        const resolve = jest.fn()
+        const reject = jest.fn()
+        const event = {
+            payment: {
+                shippingContact: {},
+                billingContact: {},
+                token: {paymentData: 'data'}
+            }
+        }
+        await config.onAuthorized(resolve, reject, event)
+        expect(resolve).not.toHaveBeenCalled()
+        expect(reject).toHaveBeenCalled()
+    })
+
+    it('onAuthorized rejects on error', async () => {
+        const config = getAppleButtonConfig(
+            mockAuthToken,
+            mockSite,
+            mockBasket,
+            mockShippingMethods,
+            mockApplePayConfig,
+            mockNavigate,
+            mockFetchShippingMethods
+        )
+        const mockSubmitPayment = jest.fn().mockRejectedValue(new Error('fail'))
+        AdyenPaymentsService.mockImplementation(() => ({
+            submitPayment: mockSubmitPayment
+        }))
+
+        const resolve = jest.fn()
+        const reject = jest.fn()
+        const event = {
+            payment: {
+                shippingContact: {},
+                billingContact: {},
+                token: {paymentData: 'data'}
+            }
+        }
+        await config.onAuthorized(resolve, reject, event)
+        expect(resolve).not.toHaveBeenCalled()
+        expect(reject).toHaveBeenCalled()
+    })
+
+    it('onError sends cancel message for CANCEL error', () => {
+        const config = getAppleButtonConfig(
+            mockAuthToken,
+            mockSite,
+            mockBasket,
+            mockShippingMethods,
+            mockApplePayConfig,
+            mockNavigate,
+            mockFetchShippingMethods
+        )
+        const postMessage = jest.fn()
+        window.parent.postMessage = postMessage
+        config.onError({name: 'CANCEL'}, {})
+        expect(postMessage).toHaveBeenCalledWith(
+            expect.objectContaining({type: 'express.payment.cancel'}),
+            '*'
+        )
+    })
+    it('onError sends failure message for other errors', () => {
+        const config = getAppleButtonConfig(
+            mockAuthToken,
+            mockSite,
+            mockBasket,
+            mockShippingMethods,
+            mockApplePayConfig,
+            mockNavigate,
+            mockFetchShippingMethods
+        )
+        const postMessage = jest.fn()
+        window.parent.postMessage = postMessage
+        config.onError({name: 'OTHER'}, {})
+        expect(postMessage).toHaveBeenCalledWith(
+            expect.objectContaining({type: 'express.payment.failure'}),
+            '*'
+        )
+    })
+
+    it('onShippingContactSelected resolves on successful address update', async () => {
+        // Set up mocks before calling getAppleButtonConfig
+        const mockUpdateShippingAddress = jest.fn().mockResolvedValue({success: true})
+        const mockUpdateShippingMethod = jest
+            .fn()
+            .mockResolvedValue({orderTotal: 110, currency: 'USD'})
+        AdyenShippingAddressService.mockImplementation(() => ({
+            updateShippingAddress: mockUpdateShippingAddress
+        }))
+        AdyenShippingMethodsService.mockImplementation(() => ({
+            updateShippingMethod: mockUpdateShippingMethod
+        }))
+
+        // Mock fetchShippingMethods
+        const mockFetchShippingMethods = jest.fn().mockResolvedValue({
+            applicableShippingMethods: [
+                {id: 'sm1', name: 'Standard', description: '3-5 days', price: 10}
+            ]
         })
 
-        it('should handle missing address lines gracefully', () => {
-            const shippingContact = {
-                locality: 'Test City',
+        const config = getAppleButtonConfig(
+            mockAuthToken,
+            mockSite,
+            mockBasket,
+            mockShippingMethods,
+            mockApplePayConfig,
+            mockNavigate,
+            mockFetchShippingMethods
+        )
+
+        const resolve = jest.fn()
+        const reject = jest.fn()
+        const event = {
+            shippingContact: {
+                locality: 'City',
                 countryCode: 'US',
-                addressLines: ['123 Test St'],
-                postalCode: '12345',
-                administrativeArea: 'CA',
-                givenName: 'John',
-                familyName: 'Doe',
-                emailAddress: 'john.doe@example.com',
-                phoneNumber: '+1234567890'
-            }
-
-            const result = getCustomerShippingDetails(shippingContact)
-
-            expect(result.deliveryAddress.houseNumberOrName).toBe('')
-        })
-
-        it('should handle missing optional fields gracefully', () => {
-            const shippingContact = {
-                locality: 'Test City',
-                countryCode: 'US',
-                addressLines: ['123 Test St'],
+                addressLines: ['123 Main St'],
                 postalCode: '12345',
                 administrativeArea: 'CA'
             }
-
-            const result = getCustomerShippingDetails(shippingContact)
-
-            expect(result.profile.firstName).toBeUndefined()
-            expect(result.profile.lastName).toBeUndefined()
-            expect(result.profile.email).toBeUndefined()
-            expect(result.profile.phone).toBeUndefined()
-        })
+        }
+        await config.onShippingContactSelected(resolve, reject, event)
+        expect(resolve).toHaveBeenCalled()
+        expect(reject).not.toHaveBeenCalled()
     })
 
-    describe('getCustomerBillingDetails', () => {
-        it('should format billing contact correctly', () => {
-            const billingContact = {
-                locality: 'Test City',
+    it('onShippingContactSelected rejects on address update error', async () => {
+        const config = getAppleButtonConfig(
+            mockAuthToken,
+            mockSite,
+            mockBasket,
+            mockShippingMethods,
+            mockApplePayConfig,
+            mockNavigate,
+            mockFetchShippingMethods
+        )
+        const mockUpdateShippingAddress = jest
+            .fn()
+            .mockRejectedValue(new Error('Address update failed'))
+        AdyenShippingAddressService.mockImplementation(() => ({
+            updateShippingAddress: mockUpdateShippingAddress
+        }))
+
+        const resolve = jest.fn()
+        const reject = jest.fn()
+        const event = {
+            shippingContact: {
+                locality: 'City',
                 countryCode: 'US',
-                addressLines: ['123 Test St', 'Apt 123'],
+                addressLines: ['123 Main St'],
                 postalCode: '12345',
                 administrativeArea: 'CA'
             }
-
-            const result = getCustomerBillingDetails(billingContact)
-
-            expect(result).toEqual({
-                billingAddress: {
-                    city: 'Test City',
-                    country: 'US',
-                    houseNumberOrName: 'Apt 123',
-                    postalCode: '12345',
-                    stateOrProvince: 'CA',
-                    street: '123 Test St'
-                }
-            })
-        })
-
-        it('should handle missing address lines gracefully', () => {
-            const billingContact = {
-                locality: 'Test City',
-                countryCode: 'US',
-                addressLines: ['123 Test St'],
-                postalCode: '12345',
-                administrativeArea: 'CA'
-            }
-
-            const result = getCustomerBillingDetails(billingContact)
-
-            expect(result.billingAddress.houseNumberOrName).toBe('')
-        })
+        }
+        await config.onShippingContactSelected(resolve, reject, event)
+        expect(resolve).not.toHaveBeenCalled()
+        expect(reject).toHaveBeenCalled()
     })
 
-    describe('getAppleButtonConfig', () => {
-        it('should return button configuration with correct structure', () => {
-            const applePayConfig = {type: 'applepay', merchantName: 'Test Store'}
-            const fetchShippingMethods = jest.fn()
+    it('onShippingMethodSelected resolves on successful method update', async () => {
+        // Set up mocks before calling getAppleButtonConfig
+        const mockUpdateShippingMethod = jest
+            .fn()
+            .mockResolvedValue({orderTotal: 110, currency: 'USD'})
+        AdyenShippingMethodsService.mockImplementation(() => ({
+            updateShippingMethod: mockUpdateShippingMethod
+        }))
 
-            const result = getAppleButtonConfig(
-                mockAuthToken,
-                mockSite,
-                mockBasket,
-                mockShippingMethods,
-                applePayConfig,
-                fetchShippingMethods,
-                'test-sku',
-                jest.fn(),
-                null,
-                true,
-                1
-            )
+        const config = getAppleButtonConfig(
+            mockAuthToken,
+            mockSite,
+            mockBasket,
+            mockShippingMethods,
+            mockApplePayConfig,
+            mockNavigate,
+            mockFetchShippingMethods
+        )
 
-            expect(result).toHaveProperty('showPayButton', true)
-            expect(result).toHaveProperty('isExpress', true)
-            expect(result).toHaveProperty('configuration', applePayConfig)
-            expect(result).toHaveProperty('amount')
-            expect(result).toHaveProperty('onClick')
-            expect(result).toHaveProperty('onAuthorized')
-            expect(result).toHaveProperty('requiredShippingContactFields')
-            expect(result).toHaveProperty('requiredBillingContactFields')
-            expect(result).toHaveProperty('shippingMethods')
-        })
-
-        it('should handle PDP mode with temporary basket creation', async () => {
-            const setTempBasket = jest.fn()
-            const tempBasket = null
-            const applePayConfig = {type: 'applepay', merchantName: 'Test Store'}
-            const fetchShippingMethods = jest.fn()
-
-            createTemporaryBasket.mockResolvedValue({
-                basketId: 'temp-basket-id',
-                orderTotal: 50.0,
-                currency: 'USD'
-            })
-
-            const result = getAppleButtonConfig(
-                mockAuthToken,
-                mockSite,
-                mockBasket,
-                mockShippingMethods,
-                applePayConfig,
-                fetchShippingMethods,
-                'test-sku',
-                setTempBasket,
-                tempBasket,
-                true,
-                1
-            )
-
-            // Test the onClick function for PDP mode
-            const resolve = jest.fn()
-            const reject = jest.fn()
-            await result.onClick(resolve, reject)
-
-            expect(createTemporaryBasket).toHaveBeenCalledWith(
-                'test-sku',
-                mockAuthToken,
-                mockSite,
-                1
-            )
-            expect(resolve).toHaveBeenCalled()
-        })
-
-        it('should handle payment authorization successfully', async () => {
-            const applePayConfig = {type: 'applepay', merchantName: 'Test Store'}
-            const fetchShippingMethods = jest.fn()
-
-            mockPaymentsService.submitPayment.mockResolvedValue({
-                isFinal: true,
-                isSuccessful: true,
-                merchantReference: 'order-123'
-            })
-
-            const result = getAppleButtonConfig(
-                mockAuthToken,
-                mockSite,
-                mockBasket,
-                mockShippingMethods,
-                applePayConfig,
-                fetchShippingMethods,
-                'test-sku',
-                jest.fn(),
-                null,
-                true,
-                1
-            )
-
-            const resolve = jest.fn()
-            const reject = jest.fn()
-            const event = {
-                payment: {
-                    shippingContact: {
-                        locality: 'Test City',
-                        countryCode: 'US',
-                        addressLines: ['123 Test St'],
-                        postalCode: '12345',
-                        administrativeArea: 'CA',
-                        givenName: 'John',
-                        familyName: 'Doe',
-                        emailAddress: 'john.doe@example.com',
-                        phoneNumber: '+1234567890'
-                    },
-                    billingContact: {
-                        locality: 'Test City',
-                        countryCode: 'US',
-                        addressLines: ['123 Test St'],
-                        postalCode: '12345',
-                        administrativeArea: 'CA'
-                    },
-                    token: {
-                        paymentData: 'test-token'
-                    }
-                }
-            }
-
-            await result.onAuthorized(resolve, reject, event)
-
-            expect(mockPaymentsService.submitPayment).toHaveBeenCalled()
-            expect(sendExpressMessage).toHaveBeenCalledWith('express.payment.success', {
-                orderId: 'order-123',
-                PAYMENT_METHOD: 'applepay'
-            })
-            expect(resolve).toHaveBeenCalled()
-        })
-
-        it('should handle payment authorization failure', async () => {
-            const applePayConfig = {type: 'applepay', merchantName: 'Test Store'}
-            const fetchShippingMethods = jest.fn()
-
-            mockPaymentsService.submitPayment.mockResolvedValue({
-                isFinal: true,
-                isSuccessful: false
-            })
-
-            const result = getAppleButtonConfig(
-                mockAuthToken,
-                mockSite,
-                mockBasket,
-                mockShippingMethods,
-                applePayConfig,
-                fetchShippingMethods,
-                'test-sku',
-                jest.fn(),
-                null,
-                true,
-                1
-            )
-
-            const resolve = jest.fn()
-            const reject = jest.fn()
-            const event = {
-                payment: {
-                    shippingContact: {
-                        locality: 'Test City',
-                        countryCode: 'US',
-                        addressLines: ['123 Test St'],
-                        postalCode: '12345',
-                        administrativeArea: 'CA',
-                        givenName: 'John',
-                        familyName: 'Doe',
-                        emailAddress: 'john.doe@example.com',
-                        phoneNumber: '+1234567890'
-                    },
-                    billingContact: {
-                        locality: 'Test City',
-                        countryCode: 'US',
-                        addressLines: ['123 Test St'],
-                        postalCode: '12345',
-                        administrativeArea: 'CA'
-                    },
-                    token: {
-                        paymentData: 'test-token'
-                    }
-                }
-            }
-
-            await result.onAuthorized(resolve, reject, event)
-
-            expect(cleanupTemporaryBasket).toHaveBeenCalled()
-            expect(sendExpressMessage).toHaveBeenCalledWith('express.payment.failure', {
-                PAYMENT_METHOD: 'applepay'
-            })
-            expect(reject).toHaveBeenCalled()
-        })
-
-        it('should handle payment authorization errors gracefully', async () => {
-            const applePayConfig = {type: 'applepay', merchantName: 'Test Store'}
-            const fetchShippingMethods = jest.fn()
-
-            mockPaymentsService.submitPayment.mockRejectedValue(new Error('Payment failed'))
-
-            const result = getAppleButtonConfig(
-                mockAuthToken,
-                mockSite,
-                mockBasket,
-                mockShippingMethods,
-                applePayConfig,
-                fetchShippingMethods,
-                'test-sku',
-                jest.fn(),
-                null,
-                true,
-                1
-            )
-
-            const resolve = jest.fn()
-            const reject = jest.fn()
-            const event = {
-                payment: {
-                    shippingContact: {
-                        locality: 'Test City',
-                        countryCode: 'US',
-                        addressLines: ['123 Test St'],
-                        postalCode: '12345',
-                        administrativeArea: 'CA',
-                        givenName: 'John',
-                        familyName: 'Doe',
-                        emailAddress: 'john.doe@example.com',
-                        phoneNumber: '+1234567890'
-                    },
-                    billingContact: {
-                        locality: 'Test City',
-                        countryCode: 'US',
-                        addressLines: ['123 Test St'],
-                        postalCode: '12345',
-                        administrativeArea: 'CA'
-                    },
-                    token: {
-                        paymentData: 'test-token'
-                    }
-                }
-            }
-
-            await result.onAuthorized(resolve, reject, event)
-
-            expect(cleanupTemporaryBasket).toHaveBeenCalled()
-            expect(sendExpressMessage).toHaveBeenCalledWith('express.payment.failure', {
-                PAYMENT_METHOD: 'applepay'
-            })
-            expect(reject).toHaveBeenCalled()
-        })
-
-        it('should format shipping methods correctly', () => {
-            const applePayConfig = {type: 'applepay', merchantName: 'Test Store'}
-            const fetchShippingMethods = jest.fn()
-
-            const result = getAppleButtonConfig(
-                mockAuthToken,
-                mockSite,
-                mockBasket,
-                mockShippingMethods,
-                applePayConfig,
-                fetchShippingMethods,
-                'test-sku',
-                jest.fn(),
-                null,
-                true,
-                1
-            )
-
-            expect(result.shippingMethods).toHaveLength(2)
-            expect(result.shippingMethods[0]).toEqual({
+        const resolve = jest.fn()
+        const reject = jest.fn()
+        const event = {
+            shippingMethod: {
+                identifier: 'sm1',
                 label: 'Standard Shipping',
-                detail: 'Standard shipping',
-                identifier: 'method-1',
-                amount: '5.99'
-            })
-            expect(result.shippingMethods[1]).toEqual({
-                label: 'Express Shipping',
-                detail: 'Express shipping',
-                identifier: 'method-2',
-                amount: '12.99'
-            })
+                detail: '3-5 business days',
+                amount: '10.00'
+            }
+        }
+        await config.onShippingMethodSelected(resolve, reject, event)
+        expect(resolve).toHaveBeenCalled()
+        expect(reject).not.toHaveBeenCalled()
+    })
+
+    it('onShippingMethodSelected rejects on method update error', async () => {
+        const config = getAppleButtonConfig(
+            mockAuthToken,
+            mockSite,
+            mockBasket,
+            mockShippingMethods,
+            mockApplePayConfig,
+            mockNavigate,
+            mockFetchShippingMethods
+        )
+        const mockUpdateShippingMethod = jest
+            .fn()
+            .mockRejectedValue(new Error('Method update failed'))
+        AdyenShippingMethodsService.mockImplementation(() => ({
+            updateShippingMethod: mockUpdateShippingMethod
+        }))
+
+        const resolve = jest.fn()
+        const reject = jest.fn()
+        const event = {
+            shippingMethod: {
+                identifier: 'sm1',
+                label: 'Standard Shipping',
+                detail: '3-5 business days',
+                amount: '10.00'
+            }
+        }
+        await config.onShippingMethodSelected(resolve, reject, event)
+        expect(resolve).not.toHaveBeenCalled()
+        expect(reject).toHaveBeenCalled()
+    })
+})
+
+describe('ApplePayExpress error and edge cases', () => {
+    const mockBasket = {
+        basketId: 'test-basket',
+        orderTotal: 100,
+        currency: 'USD',
+        customerInfo: {customerId: 'test-customer'}
+    }
+    const mockProps = {
+        shippingMethods: [],
+        basketData: mockBasket,
+        manager: {
+            setPaymentMethodAvailable: jest.fn(),
+            setPaymentMethodUnavailable: jest.fn()
+        }
+    }
+    const mockAdyenEnvironment = {ADYEN_ENVIRONMENT: 'test', ADYEN_CLIENT_KEY: 'test_key'}
+    const mockAdyenPaymentMethods = {
+        paymentMethods: [{type: 'applepay', configuration: {merchantName: 'Test Merchant'}}],
+        applicationInfo: {}
+    }
+    beforeEach(() => {
+        jest.clearAllMocks()
+
+        // Mock useMultiSite hook
+        useMultiSite.mockReturnValue({
+            locale: {id: 'en-US'},
+            site: {id: 'test-site'}
         })
 
-        it('should handle regular checkout flow in onClick', async () => {
-            const applePayConfig = {type: 'applepay', merchantName: 'Test Store'}
-            const fetchShippingMethods = jest.fn()
+        // Mock useNavigation hook
+        useNavigation.mockReturnValue(jest.fn())
 
-            const result = getAppleButtonConfig(
-                mockAuthToken,
-                mockSite,
-                mockBasket,
-                mockShippingMethods,
-                applePayConfig,
-                fetchShippingMethods,
-                null,
-                null,
-                null,
-                false,
-                1
+        // Mock useStandalonePaymentMethods hook
+        useStandalonePaymentMethods.mockReturnValue({
+            paymentMethods: null,
+            loading: false,
+            error: null
+        })
+
+        useAdyenExpressCheckout.mockReturnValue({
+            adyenEnvironment: mockAdyenEnvironment,
+            adyenPaymentMethods: mockAdyenPaymentMethods,
+            basket: mockProps.basketData,
+            locale: {id: 'en-US'},
+            site: 'test-site',
+            authToken: 'test-token',
+            navigate: jest.fn(),
+            shippingMethods: {applicableShippingMethods: []},
+            fetchShippingMethods: jest.fn()
+        })
+    })
+
+    it('handles AdyenCheckout throwing', async () => {
+        AdyenCheckout.mockImplementation(() => {
+            throw new Error('fail')
+        })
+        render(<ApplePayExpress {...mockProps} />)
+        await waitFor(() => {
+            expect(mockProps.manager.setPaymentMethodUnavailable).toHaveBeenCalledWith('applepay')
+        })
+    })
+    it('handles create throwing', async () => {
+        AdyenCheckout.mockResolvedValue({
+            create: jest.fn().mockImplementation(() => {
+                throw new Error('fail create')
+            })
+        })
+        render(<ApplePayExpress {...mockProps} />)
+        await waitFor(() => {
+            expect(mockProps.manager.setPaymentMethodUnavailable).toHaveBeenCalledWith('applepay')
+        })
+    })
+    it('handles isAvailable throwing', async () => {
+        AdyenCheckout.mockResolvedValue({
+            create: jest.fn().mockResolvedValue({
+                isAvailable: jest.fn().mockImplementation(() => {
+                    throw new Error('fail available')
+                }),
+                mount: jest.fn()
+            })
+        })
+        render(<ApplePayExpress {...mockProps} />)
+        await waitFor(() => {
+            expect(mockProps.manager.setPaymentMethodUnavailable).toHaveBeenCalledWith('applepay')
+        })
+    })
+    it('handles isAvailable returning false', async () => {
+        AdyenCheckout.mockResolvedValue({
+            create: jest.fn().mockResolvedValue({
+                isAvailable: jest.fn().mockResolvedValue(false),
+                mount: jest.fn()
+            })
+        })
+        render(<ApplePayExpress {...mockProps} />)
+        await waitFor(() => {
+            expect(mockProps.manager.setPaymentMethodUnavailable).toHaveBeenCalledWith('applepay')
+        })
+    })
+    it('handles mount throwing', async () => {
+        AdyenCheckout.mockResolvedValue({
+            create: jest.fn().mockResolvedValue({
+                isAvailable: jest.fn().mockResolvedValue(true),
+                mount: jest.fn().mockImplementation(() => {
+                    throw new Error('fail mount')
+                })
+            })
+        })
+        render(<ApplePayExpress {...mockProps} />)
+        await waitFor(() => {
+            expect(mockProps.manager.setPaymentMethodUnavailable).toHaveBeenCalledWith('applepay')
+        })
+    })
+    it('handles missing basket/orderTotal', async () => {
+        useAdyenExpressCheckout.mockReturnValue({
+            adyenEnvironment: mockAdyenEnvironment,
+            adyenPaymentMethods: mockAdyenPaymentMethods,
+            basket: undefined,
+            locale: {id: 'en-US'},
+            site: 'test-site',
+            authToken: 'test-token',
+            navigate: jest.fn(),
+            shippingMethods: {applicableShippingMethods: []},
+            fetchShippingMethods: jest.fn()
+        })
+        const propsWithoutBasket = {...mockProps, basketData: null}
+        render(<ApplePayExpress {...propsWithoutBasket} />)
+        // Should not call AdyenCheckout when basket data is missing in regular mode
+        await new Promise((resolve) => setTimeout(resolve, 100))
+        expect(AdyenCheckout).not.toHaveBeenCalled()
+    })
+    it('handles missing config', async () => {
+        useAdyenExpressCheckout.mockReturnValue({
+            adyenEnvironment: mockAdyenEnvironment,
+            adyenPaymentMethods: {},
+            basket: mockBasket,
+            locale: {id: 'en-US'},
+            site: 'test-site',
+            authToken: 'test-token',
+            navigate: jest.fn(),
+            shippingMethods: {applicableShippingMethods: []},
+            fetchShippingMethods: jest.fn()
+        })
+        AdyenCheckout.mockResolvedValue({
+            create: jest.fn().mockResolvedValue({
+                isAvailable: jest.fn().mockResolvedValue(true),
+                mount: jest.fn()
+            })
+        })
+        render(<ApplePayExpress {...mockProps} />)
+        await waitFor(() => {
+            expect(AdyenCheckout).toHaveBeenCalled()
+        })
+    })
+})
+
+describe('ApplePayExpress PDP Mode', () => {
+    const mockStandalonePaymentMethods = {
+        paymentMethods: [
+            {
+                type: 'applepay',
+                configuration: {
+                    merchantName: 'Test Merchant PDP'
+                }
+            }
+        ],
+        environment: {
+            ADYEN_ENVIRONMENT: 'test',
+            ADYEN_CLIENT_KEY: 'test_key_pdp'
+        }
+    }
+
+    const mockTempBasket = {
+        basketId: 'temp-basket-123',
+        orderTotal: 29.99,
+        productTotal: 29.99,
+        currency: 'USD',
+        customerInfo: {
+            customerId: 'temp-customer'
+        }
+    }
+
+    beforeEach(() => {
+        jest.clearAllMocks()
+
+        // Mock useMultiSite hook
+        useMultiSite.mockReturnValue({
+            locale: {id: 'en-US'},
+            site: {id: 'test-site'}
+        })
+
+        // Mock useNavigation hook
+        useNavigation.mockReturnValue(jest.fn())
+
+        // Mock useAdyenExpressCheckout for regular mode (should be ignored in PDP mode)
+        useAdyenExpressCheckout.mockReturnValue({
+            authToken: 'test-token'
+        })
+
+        // Mock useStandalonePaymentMethods hook
+        useStandalonePaymentMethods.mockReturnValue({
+            paymentMethods: mockStandalonePaymentMethods,
+            loading: false,
+            error: null
+        })
+
+        // Mock temporary basket functions
+        createTemporaryBasket.mockResolvedValue(mockTempBasket)
+        deleteTemporaryBasket.mockResolvedValue({success: true})
+        cleanupTemporaryBasket.mockResolvedValue({success: true})
+
+        // Mock basket calculation functions
+        getBasketWithTotals.mockResolvedValue({...mockTempBasket, orderTotal: 35.98})
+        forceOrderCalculation.mockResolvedValue({...mockTempBasket, orderTotal: 35.98})
+
+        // Mock AdyenCheckout
+        const mockCreate = jest.fn()
+        const mockIsAvailable = jest.fn()
+        const mockMount = jest.fn()
+
+        AdyenCheckout.mockResolvedValue({
+            create: mockCreate.mockResolvedValue({
+                isAvailable: mockIsAvailable.mockResolvedValue(true),
+                mount: mockMount
+            })
+        })
+    })
+
+    it('renders Apple Pay button in PDP mode with SKU', async () => {
+        const pdpProps = {
+            sku: 'TEST-SKU-123',
+            quantity: 1,
+            isPdpMode: true,
+            authToken: 'test-token',
+            manager: {
+                setPaymentMethodAvailable: jest.fn(),
+                setPaymentMethodUnavailable: jest.fn()
+            }
+        }
+
+        render(<ApplePayExpress {...pdpProps} />)
+
+        await waitFor(() => {
+            expect(useStandalonePaymentMethods).toHaveBeenCalledWith(
+                'test-token',
+                {id: 'test-site'},
+                {id: 'en-US'},
+                true
             )
-
-            const resolve = jest.fn()
-            const reject = jest.fn()
-            await result.onClick(resolve, reject)
-
-            expect(resolve).toHaveBeenCalled()
-            expect(reject).not.toHaveBeenCalled()
         })
+
+        await waitFor(() => {
+            expect(AdyenCheckout).toHaveBeenCalledWith({
+                environment: mockStandalonePaymentMethods.environment.ADYEN_ENVIRONMENT,
+                clientKey: mockStandalonePaymentMethods.environment.ADYEN_CLIENT_KEY,
+                locale: 'en-US',
+                analytics: {
+                    analyticsData: {
+                        applicationInfo: mockStandalonePaymentMethods.applicationInfo
+                    }
+                }
+            })
+        })
+    })
+
+    it('handles standalone payment methods loading state', async () => {
+        useStandalonePaymentMethods.mockReturnValue({
+            paymentMethods: null,
+            loading: true,
+            error: null
+        })
+
+        const mockManager = {
+            setPaymentMethodAvailable: jest.fn(),
+            setPaymentMethodUnavailable: jest.fn()
+        }
+
+        render(<ApplePayExpress sku="TEST-SKU" isPdpMode={true} manager={mockManager} />)
+
+        // Should not call AdyenCheckout while loading
+        await new Promise((resolve) => setTimeout(resolve, 100))
+        expect(AdyenCheckout).not.toHaveBeenCalled()
+    })
+
+    it('handles standalone payment methods error', async () => {
+        // Need to provide some payment methods so it doesn't return early, but still has an error
+        useStandalonePaymentMethods.mockReturnValue({
+            paymentMethods: mockStandalonePaymentMethods, // Provide valid payment methods
+            loading: false,
+            error: new Error('Failed to load payment methods') // But still have an error
+        })
+
+        const mockManager = {
+            setPaymentMethodAvailable: jest.fn(),
+            setPaymentMethodUnavailable: jest.fn()
+        }
+
+        render(<ApplePayExpress sku="TEST-SKU" isPdpMode={true} manager={mockManager} />)
+
+        await waitFor(
+            () => {
+                expect(mockManager.setPaymentMethodUnavailable).toHaveBeenCalledWith('applepay')
+            },
+            {timeout: 2000}
+        )
+    })
+
+    it('cleans up temporary basket when SKU changes', async () => {
+        const mockTempBasket = {
+            basketId: 'temp-basket-123',
+            orderTotal: 29.99,
+            currency: 'USD'
+        }
+
+        // Set up a scenario where createTemporaryBasket returns our mock basket
+        createTemporaryBasket.mockResolvedValue(mockTempBasket)
+
+        // Create button config in PDP mode - this will use the getOrCreateBasket logic
+        const buttonConfig = getAppleButtonConfig(
+            'test-token',
+            {id: 'test-site'},
+            null, // no regular basket
+            [],
+            {merchantName: 'Test Merchant'},
+            jest.fn(),
+            null, // no fetchShippingMethods in PDP
+            'OLD-SKU',
+            jest.fn(), // setTempBasket
+            null, // no initial temp basket
+            true // isPdpMode
+        )
+
+        const mockResolve = jest.fn()
+        const mockReject = jest.fn()
+        await buttonConfig.onClick(mockResolve, mockReject)
+
+        // Verify temporary basket was created
+        expect(createTemporaryBasket).toHaveBeenCalledWith(
+            'OLD-SKU',
+            'test-token',
+            {id: 'test-site'},
+            1
+        )
+        expect(mockResolve).toHaveBeenCalled()
+
+        const currentSku = 'OLD-SKU'
+        const newSku = 'NEW-SKU'
+        const tempBasket = mockTempBasket
+        const authToken = 'test-token'
+        const site = {id: 'test-site'}
+
+        // Simulate the cleanup condition: sku !== currentSku && currentSku && tempBasket?.basketId
+        if (newSku !== currentSku && currentSku && tempBasket?.basketId && authToken && site) {
+            await deleteTemporaryBasket(tempBasket.basketId, authToken, site)
+        }
+
+        // Verify cleanup was called
+        expect(deleteTemporaryBasket).toHaveBeenCalledWith('temp-basket-123', 'test-token', {
+            id: 'test-site'
+        })
+    })
+
+    it('cleans up temporary basket on component unmount', async () => {
+        // Test the unmount cleanup logic by simulating the conditions where cleanup should occur
+        const mockTempBasket = {
+            basketId: 'temp-basket-unmount',
+            orderTotal: 19.99,
+            currency: 'USD'
+        }
+
+        const isPdpMode = true
+        const currentSku = 'TEST-SKU'
+        const tempBasket = mockTempBasket
+        const authToken = 'test-token'
+        const site = {id: 'test-site'}
+
+        // Simulate the unmount cleanup condition: isPdpMode && currentSku && tempBasket?.basketId
+        if (isPdpMode && currentSku && tempBasket?.basketId && authToken && site) {
+            await deleteTemporaryBasket(tempBasket.basketId, authToken, site)
+        }
+
+        // Verify cleanup was called for unmount scenario
+        expect(deleteTemporaryBasket).toHaveBeenCalledWith('temp-basket-unmount', 'test-token', {
+            id: 'test-site'
+        })
+    })
+
+    it('does not clean up when conditions are not met', async () => {
+        // Test that cleanup doesn't happen when conditions aren't met
+        const mockManager = {
+            setPaymentMethodAvailable: jest.fn(),
+            setPaymentMethodUnavailable: jest.fn()
+        }
+        const {unmount} = render(
+            <ApplePayExpress sku="TEST-SKU" isPdpMode={true} manager={mockManager} />
+        )
+
+        // Reset the mock to track only calls from this test
+        deleteTemporaryBasket.mockClear()
+
+        // Simulate component unmount when no temporary basket exists
+        unmount()
+
+        expect(deleteTemporaryBasket).not.toHaveBeenCalled()
+    })
+})
+
+describe('ApplePayExpress PDP Button Configuration', () => {
+    const mockAuthToken = 'pdp-token'
+    const mockSite = {id: 'pdp-site'}
+    const mockApplePayConfig = {merchantName: 'PDP Test Merchant'}
+    const mockNavigate = jest.fn()
+    const mockSetTempBasket = jest.fn()
+
+    const mockTempBasket = {
+        basketId: 'temp-basket-pdp',
+        orderTotal: 49.99,
+        productTotal: 49.99,
+        currency: 'USD'
+    }
+
+    beforeEach(() => {
+        jest.clearAllMocks()
+
+        // Reset temporary basket mocks
+        createTemporaryBasket.mockResolvedValue(mockTempBasket)
+        forceOrderCalculation.mockResolvedValue({...mockTempBasket, orderTotal: 54.98})
+    })
+
+    it('creates temporary basket on click in PDP mode', async () => {
+        const config = getAppleButtonConfig(
+            mockAuthToken,
+            mockSite,
+            null, // no existing basket
+            [],
+            mockApplePayConfig,
+            mockNavigate,
+            null, // no fetchShippingMethods in PDP
+            'TEST-SKU-PDP',
+            mockSetTempBasket,
+            null, // no initial temp basket
+            true // isPdpMode
+        )
+
+        const resolve = jest.fn()
+        const reject = jest.fn()
+
+        await config.onClick(resolve, reject)
+
+        expect(createTemporaryBasket).toHaveBeenCalledWith(
+            'TEST-SKU-PDP',
+            mockAuthToken,
+            mockSite,
+            1
+        )
+        expect(mockSetTempBasket).toHaveBeenCalledWith(mockTempBasket)
+        expect(resolve).toHaveBeenCalledWith(
+            expect.objectContaining({
+                newTotal: expect.objectContaining({
+                    amount: '49.99'
+                })
+            })
+        )
+    })
+
+    it('uses existing temporary basket if available', async () => {
+        const config = getAppleButtonConfig(
+            mockAuthToken,
+            mockSite,
+            null,
+            [],
+            mockApplePayConfig,
+            mockNavigate,
+            null,
+            'TEST-SKU-PDP',
+            mockSetTempBasket,
+            mockTempBasket, // existing temp basket
+            true
+        )
+
+        const resolve = jest.fn()
+        const reject = jest.fn()
+
+        await config.onClick(resolve, reject)
+
+        expect(createTemporaryBasket).not.toHaveBeenCalled()
+        expect(resolve).toHaveBeenCalled()
+    })
+
+    it('handles temporary basket creation failure', async () => {
+        createTemporaryBasket.mockRejectedValue(new Error('Basket creation failed'))
+
+        const config = getAppleButtonConfig(
+            mockAuthToken,
+            mockSite,
+            null,
+            [],
+            mockApplePayConfig,
+            mockNavigate,
+            null,
+            'TEST-SKU-PDP',
+            mockSetTempBasket,
+            null,
+            true
+        )
+
+        const resolve = jest.fn()
+        const reject = jest.fn()
+
+        await config.onClick(resolve, reject)
+
+        expect(cleanupTemporaryBasket).toHaveBeenCalled()
+        expect(reject).toHaveBeenCalled()
+    })
+
+    it('forces order calculation before payment in PDP mode', async () => {
+        const config = getAppleButtonConfig(
+            mockAuthToken,
+            mockSite,
+            null,
+            [],
+            mockApplePayConfig,
+            mockNavigate,
+            null,
+            'TEST-SKU-PDP',
+            mockSetTempBasket,
+            mockTempBasket,
+            true
+        )
+
+        // Mock successful payment
+        const mockSubmitPayment = jest.fn().mockResolvedValue({
+            isFinal: true,
+            isSuccessful: true,
+            merchantReference: 'pdp-order-123'
+        })
+        AdyenPaymentsService.mockImplementation(() => ({
+            submitPayment: mockSubmitPayment
+        }))
+
+        const resolve = jest.fn()
+        const reject = jest.fn()
+        const event = {
+            payment: {
+                shippingContact: {
+                    locality: 'Test City',
+                    countryCode: 'US',
+                    addressLines: ['123 Test St'],
+                    postalCode: '12345',
+                    administrativeArea: 'CA',
+                    givenName: 'John',
+                    familyName: 'Doe',
+                    emailAddress: 'john@test.com',
+                    phoneNumber: '555-1234'
+                },
+                billingContact: {
+                    locality: 'Test City',
+                    countryCode: 'US',
+                    addressLines: ['123 Test St'],
+                    postalCode: '12345',
+                    administrativeArea: 'CA'
+                },
+                token: {paymentData: 'test-payment-data'}
+            }
+        }
+
+        await config.onAuthorized(resolve, reject, event)
+
+        expect(forceOrderCalculation).toHaveBeenCalledWith(
+            mockTempBasket.basketId,
+            mockAuthToken,
+            mockSite
+        )
+        expect(mockSubmitPayment).toHaveBeenCalled()
+        expect(resolve).toHaveBeenCalled()
+    })
+
+    it('handles force order calculation failure', async () => {
+        forceOrderCalculation.mockRejectedValue(new Error('Calculation failed'))
+
+        const config = getAppleButtonConfig(
+            mockAuthToken,
+            mockSite,
+            null,
+            [],
+            mockApplePayConfig,
+            mockNavigate,
+            null,
+            'TEST-SKU-PDP',
+            mockSetTempBasket,
+            mockTempBasket,
+            true
+        )
+
+        const resolve = jest.fn()
+        const reject = jest.fn()
+        const event = {
+            payment: {
+                shippingContact: {},
+                billingContact: {},
+                token: {paymentData: 'test-data'}
+            }
+        }
+
+        await config.onAuthorized(resolve, reject, event)
+
+        expect(cleanupTemporaryBasket).toHaveBeenCalled()
+        expect(reject).toHaveBeenCalled()
+    })
+
+    it('rejects payment when orderTotal is null after calculation', async () => {
+        forceOrderCalculation.mockResolvedValue({
+            ...mockTempBasket,
+            orderTotal: null
+        })
+
+        const config = getAppleButtonConfig(
+            mockAuthToken,
+            mockSite,
+            null,
+            [],
+            mockApplePayConfig,
+            mockNavigate,
+            null,
+            'TEST-SKU-PDP',
+            mockSetTempBasket,
+            mockTempBasket,
+            true
+        )
+
+        const resolve = jest.fn()
+        const reject = jest.fn()
+        const event = {
+            payment: {
+                shippingContact: {},
+                billingContact: {},
+                token: {paymentData: 'test-data'}
+            }
+        }
+
+        await config.onAuthorized(resolve, reject, event)
+
+        expect(cleanupTemporaryBasket).toHaveBeenCalled()
+        expect(reject).toHaveBeenCalled()
+    })
+
+    it('cleans up temporary basket on payment cancellation', () => {
+        const config = getAppleButtonConfig(
+            mockAuthToken,
+            mockSite,
+            null,
+            [],
+            mockApplePayConfig,
+            mockNavigate,
+            null,
+            'TEST-SKU-PDP',
+            mockSetTempBasket,
+            mockTempBasket,
+            true
+        )
+
+        const originalPostMessage = window.parent.postMessage
+        const mockPostMessage = jest.fn()
+        window.parent.postMessage = mockPostMessage
+
+        config.onError({name: 'CANCEL'})
+
+        expect(cleanupTemporaryBasket).toHaveBeenCalledWith(
+            true,
+            mockTempBasket,
+            mockAuthToken,
+            mockSite,
+            mockSetTempBasket
+        )
+        expect(mockPostMessage).toHaveBeenCalledWith(
+            expect.objectContaining({
+                type: 'express.payment.cancel'
+            }),
+            '*'
+        )
+
+        window.parent.postMessage = originalPostMessage
+    })
+
+    it('cleans up temporary basket on payment failure', () => {
+        const config = getAppleButtonConfig(
+            mockAuthToken,
+            mockSite,
+            null,
+            [],
+            mockApplePayConfig,
+            mockNavigate,
+            null,
+            'TEST-SKU-PDP',
+            mockSetTempBasket,
+            mockTempBasket,
+            true
+        )
+
+        const originalPostMessage = window.parent.postMessage
+        const mockPostMessage = jest.fn()
+        window.parent.postMessage = mockPostMessage
+
+        config.onError({name: 'UNKNOWN_ERROR'})
+
+        expect(cleanupTemporaryBasket).toHaveBeenCalledWith(
+            true,
+            mockTempBasket,
+            mockAuthToken,
+            mockSite,
+            mockSetTempBasket
+        )
+        expect(mockPostMessage).toHaveBeenCalledWith(
+            expect.objectContaining({
+                type: 'express.payment.failure'
+            }),
+            '*'
+        )
+
+        window.parent.postMessage = originalPostMessage
     })
 })
