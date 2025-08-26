@@ -48,7 +48,6 @@ describe('useAddressForm', () => {
     const mockAreAddressesEqual = jest.fn().mockReturnValue(false)
 
     const mockShowToast = jest.fn()
-    const mockFormatMessage = jest.fn(({defaultMessage}) => defaultMessage)
     const mockCustomer = {customerId: 'customer-1'}
     const mockRefetchCustomer = jest.fn()
     const mockCreateCustomerAddress = {
