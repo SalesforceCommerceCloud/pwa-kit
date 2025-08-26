@@ -42,13 +42,13 @@ export const getPromotions: QueryKeyHelper<'getPromotions'> = {
     path: (params) => [
         '/commerce-sdk-react',
         '/organizations/',
-        params.organizationId,
+        params?.organizationId,
         '/promotions'
     ],
     queryKey: (params: Params<'getPromotions'>) => {
         return [
             ...getPromotions.path(params),
-            pickValidParams(params, ShopperPromotions.paramKeys.getPromotions)
+            pickValidParams(params || {}, ShopperPromotions.paramKeys.getPromotions)
         ]
     }
 }
@@ -57,14 +57,14 @@ export const getPromotionsForCampaign: QueryKeyHelper<'getPromotionsForCampaign'
     path: (params) => [
         '/commerce-sdk-react',
         '/organizations/',
-        params.organizationId,
+        params?.organizationId,
         '/promotions/campaigns/',
-        params.campaignId
+        params?.campaignId
     ],
     queryKey: (params: Params<'getPromotionsForCampaign'>) => {
         return [
             ...getPromotionsForCampaign.path(params),
-            pickValidParams(params, ShopperPromotions.paramKeys.getPromotionsForCampaign)
+            pickValidParams(params || {}, ShopperPromotions.paramKeys.getPromotionsForCampaign)
         ]
     }
 }

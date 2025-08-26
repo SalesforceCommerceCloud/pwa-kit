@@ -8,26 +8,21 @@ import React, {ReactElement, useEffect, useMemo} from 'react'
 import Auth from './auth'
 import {ApiClientConfigParams, ApiClients, SDKClientTransformer} from './hooks/types'
 import {Logger} from './types'
-import {
-    DWSID_COOKIE_NAME,
-    MOBIFY_PATH,
-    SERVER_AFFINITY_HEADER_KEY,
-    SLAS_PRIVATE_PROXY_PATH
-} from './constant'
+import {DWSID_COOKIE_NAME, SERVER_AFFINITY_HEADER_KEY} from './constant'
 import {
     ShopperBaskets,
     ShopperContexts,
     ShopperCustomers,
     ShopperExperience,
+    ShopperGiftCertificates,
     ShopperLogin,
     ShopperOrders,
     ShopperProducts,
     ShopperPromotions,
-    ShopperGiftCertificates,
     ShopperSearch,
-    ShopperSeo,
-    ShopperBasketsTypes,
-    ShopperStores
+    ShopperSEO,
+    ShopperStores,
+    FetchOptions
 } from 'commerce-sdk-isomorphic'
 import {transformSDKClient} from './utils'
 
@@ -37,7 +32,7 @@ export interface CommerceApiProviderProps extends ApiClientConfigParams {
     locale: string
     currency: string
     redirectURI: string
-    fetchOptions?: ShopperBasketsTypes.FetchOptions
+    fetchOptions?: FetchOptions
     headers?: Record<string, string>
     fetchedToken?: string
     enablePWAKitPrivateClient?: boolean
@@ -257,14 +252,6 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
             fetchOptions
         }
 
-        // Special proxy endpoint for injecting SLAS private client secret.
-        // This is only used by the ShopperLogin API as that is the only one that interacts with SLAS.
-        // We prioritize config.privateClientProxyEndpoint since that allows us to use the new envBasePath feature
-        // The preexisting hard coded privateClientEndpoint is kept here for now to prevent a breaking change.
-        // TODO: We should remove this in the next major release so we do not have a hard coded proxy path inside commerce-sdk-react
-        const baseUrl = config.proxy.split(MOBIFY_PATH)[0]
-        const privateClientEndpoint = `${baseUrl}${SLAS_PRIVATE_PROXY_PATH}`
-
         return {
             shopperBaskets: new ShopperBaskets(config),
             shopperContexts: new ShopperContexts(config),
@@ -273,17 +260,13 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
             shopperGiftCertificates: new ShopperGiftCertificates(config),
             shopperLogin: new ShopperLogin({
                 ...config,
-                proxy: enablePWAKitPrivateClient
-                    ? privateClientProxyEndpoint
-                        ? privateClientProxyEndpoint
-                        : privateClientEndpoint
-                    : config.proxy
+                proxy: enablePWAKitPrivateClient ? privateClientProxyEndpoint : config.proxy
             }),
             shopperOrders: new ShopperOrders(config),
             shopperProducts: new ShopperProducts(config),
             shopperPromotions: new ShopperPromotions(config),
             shopperSearch: new ShopperSearch(config),
-            shopperSeo: new ShopperSeo(config),
+            shopperSeo: new ShopperSEO(config),
             shopperStores: new ShopperStores(config)
         }
     }, [
