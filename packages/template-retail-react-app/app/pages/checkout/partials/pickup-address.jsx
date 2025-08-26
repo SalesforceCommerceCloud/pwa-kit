@@ -38,6 +38,67 @@ import {useCurrency} from '@salesforce/retail-react-app/app/hooks'
 import {STORE_LOCATOR_IS_ENABLED} from '@salesforce/retail-react-app/app/constants'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import {isPickupShipment} from '@salesforce/retail-react-app/app/utils/shipment-utils'
+import PropTypes from 'prop-types'
+
+const ProductList = ({products, productsByItemId, currency, title}) => {
+    if (!products || products.length === 0) {
+        return null
+    }
+
+    return (
+        <Stack spacing={4}>
+            {title && (
+                <Box mt={3} mb={2}>
+                    <Text fontWeight="bold" fontSize="sm" color="gray.600">
+                        {title}
+                    </Text>
+                </Box>
+            )}
+            {products.map((productItem) => {
+                const product = {
+                    ...productItem,
+                    ...(productsByItemId && productsByItemId[productItem.itemId])
+                }
+                return (
+                    <ItemVariantProvider key={productItem.itemId} variant={product}>
+                        <Box
+                            border="1px solid"
+                            borderColor="gray.200"
+                            borderRadius="md"
+                            p={3}
+                            bg="white"
+                        >
+                            <Flex width="full" alignItems="flex-start">
+                                <CartItemVariantImage width={['88px', '136px']} mr={4} />
+                                <Stack spacing={1} marginTop="-3px" flex={1}>
+                                    <CartItemVariantName />
+                                    <CartItemVariantAttributes
+                                        includeQuantity={false}
+                                        hideAttributeLabels={true}
+                                    />
+                                    <Flex
+                                        width="full"
+                                        justifyContent="space-between"
+                                        alignItems="flex-end"
+                                    >
+                                        <Text fontSize="sm" color="gray.700">
+                                            <FormattedMessage
+                                                defaultMessage="Qty: {quantity}"
+                                                values={{quantity: productItem.quantity}}
+                                                id="item_attributes.label.quantity_abbreviated"
+                                            />
+                                        </Text>
+                                        <CartItemVariantPrice currency={currency} />
+                                    </Flex>
+                                </Stack>
+                            </Flex>
+                        </Box>
+                    </ItemVariantProvider>
+                )
+            })}
+        </Stack>
+    )
+}
 
 const PickupAddress = () => {
     const {formatMessage} = useIntl()
@@ -167,244 +228,68 @@ const PickupAddress = () => {
         >
             {step === STEPS.PICKUP_ADDRESS && (
                 <>
-                    {(() => {
-                        return (
-                            pickupShipmentItems.length > 0 &&
-                            !isStoreDataLoading && (
-                                <>
-                                    {/* Pickups/mixed basket */}
-                                    {
-                                        <Stack spacing={6}>
-                                            {pickupShipmentItems.map((shipmentInfo, index) => (
-                                                <Box
-                                                    key={`pickup-${
-                                                        shipmentInfo.shipment?.shipmentId
-                                                    }-${shipmentInfo.store?.id || index}`}
-                                                    border="1px solid"
-                                                    borderColor="gray.200"
-                                                    borderRadius="md"
-                                                    p={4}
-                                                    mb={4}
-                                                >
-                                                    <Text fontWeight="bold" fontSize="md" mb={2}>
-                                                        <FormattedMessage
-                                                            defaultMessage="Store Information"
-                                                            id="pickup_address.title.store_information"
-                                                        />
-                                                    </Text>
-                                                    {shipmentInfo.store && (
-                                                        <Box mb={4}>
-                                                            <StoreDisplay
-                                                                store={shipmentInfo.store}
-                                                                showDistance={false}
-                                                                showStoreHours={false}
-                                                                showPhone={false}
-                                                                showEmail={false}
-                                                                nameStyle={{
-                                                                    fontSize: 'sm',
-                                                                    fontWeight: 'normal'
-                                                                }}
-                                                                textSize="sm"
-                                                            />
-                                                        </Box>
-                                                    )}
+                    {pickupShipmentItems.length > 0 && !isStoreDataLoading && (
+                        <>
+                            {/* Pickups/mixed basket */}
+                            <Stack spacing={6}>
+                                {pickupShipmentItems.map((shipmentInfo, index) => (
+                                    <Box
+                                        key={`pickup-${shipmentInfo.shipment?.shipmentId}-${
+                                            shipmentInfo.store?.id || index
+                                        }`}
+                                        border="1px solid"
+                                        borderColor="gray.200"
+                                        borderRadius="md"
+                                        p={4}
+                                        mb={4}
+                                    >
+                                        <Text fontWeight="bold" fontSize="md" mb={2}>
+                                            <FormattedMessage
+                                                defaultMessage="Store Information"
+                                                id="pickup_address.title.store_information"
+                                            />
+                                        </Text>
+                                        {shipmentInfo.store && (
+                                            <Box mb={4}>
+                                                <StoreDisplay
+                                                    store={shipmentInfo.store}
+                                                    showDistance={false}
+                                                    showStoreHours={false}
+                                                    showPhone={false}
+                                                    showEmail={false}
+                                                    nameStyle={{
+                                                        fontSize: 'sm',
+                                                        fontWeight: 'normal'
+                                                    }}
+                                                    textSize="sm"
+                                                />
+                                            </Box>
+                                        )}
 
-                                                    {/* Regular Products */}
-                                                    {shipmentInfo.regularProducts.length > 0 && (
-                                                        <Stack spacing={4}>
-                                                            {shipmentInfo.regularProducts.map(
-                                                                (productItem) => {
-                                                                    const product = {
-                                                                        ...productItem,
-                                                                        ...(productsByItemId &&
-                                                                            productsByItemId[
-                                                                                productItem.itemId
-                                                                            ])
-                                                                    }
-                                                                    return (
-                                                                        <ItemVariantProvider
-                                                                            key={productItem.itemId}
-                                                                            variant={product}
-                                                                        >
-                                                                            <Box
-                                                                                border="1px solid"
-                                                                                borderColor="gray.200"
-                                                                                borderRadius="md"
-                                                                                p={3}
-                                                                                bg="white"
-                                                                            >
-                                                                                <Flex
-                                                                                    width="full"
-                                                                                    alignItems="flex-start"
-                                                                                >
-                                                                                    <CartItemVariantImage
-                                                                                        width={[
-                                                                                            '88px',
-                                                                                            '136px'
-                                                                                        ]}
-                                                                                        mr={4}
-                                                                                    />
-                                                                                    <Stack
-                                                                                        spacing={1}
-                                                                                        marginTop="-3px"
-                                                                                        flex={1}
-                                                                                    >
-                                                                                        <CartItemVariantName />
+                                        {/* Regular Products */}
+                                        <ProductList
+                                            products={shipmentInfo.regularProducts}
+                                            productsByItemId={productsByItemId}
+                                            currency={currency}
+                                        />
 
-                                                                                        <CartItemVariantAttributes
-                                                                                            includeQuantity={
-                                                                                                false
-                                                                                            }
-                                                                                            hideAttributeLabels={
-                                                                                                true
-                                                                                            }
-                                                                                        />
-
-                                                                                        <Flex
-                                                                                            width="full"
-                                                                                            justifyContent="space-between"
-                                                                                            alignItems="flex-end"
-                                                                                        >
-                                                                                            <Text
-                                                                                                fontSize="sm"
-                                                                                                color="gray.700"
-                                                                                            >
-                                                                                                <FormattedMessage
-                                                                                                    defaultMessage="Qty: {quantity}"
-                                                                                                    values={{
-                                                                                                        quantity:
-                                                                                                            productItem.quantity
-                                                                                                    }}
-                                                                                                    id="item_attributes.label.quantity_abbreviated"
-                                                                                                />
-                                                                                            </Text>
-                                                                                            <CartItemVariantPrice
-                                                                                                currency={
-                                                                                                    currency
-                                                                                                }
-                                                                                            />
-                                                                                        </Flex>
-                                                                                    </Stack>
-                                                                                </Flex>
-                                                                            </Box>
-                                                                        </ItemVariantProvider>
-                                                                    )
-                                                                }
-                                                            )}
-                                                        </Stack>
-                                                    )}
-
-                                                    {/* Bonus Products */}
-                                                    {shipmentInfo.bonusProducts.length > 0 && (
-                                                        <>
-                                                            <Box mt={3} mb={2}>
-                                                                <Text
-                                                                    fontWeight="bold"
-                                                                    fontSize="sm"
-                                                                    color="gray.600"
-                                                                >
-                                                                    <FormattedMessage
-                                                                        defaultMessage="Bonus Items"
-                                                                        id="pickup_address.bonus_products.title"
-                                                                    />
-                                                                </Text>
-                                                            </Box>
-                                                            <Stack spacing={4}>
-                                                                {shipmentInfo.bonusProducts.map(
-                                                                    (productItem) => {
-                                                                        const product = {
-                                                                            ...productItem,
-                                                                            ...(productsByItemId &&
-                                                                                productsByItemId[
-                                                                                    productItem
-                                                                                        .itemId
-                                                                                ])
-                                                                        }
-                                                                        return (
-                                                                            <ItemVariantProvider
-                                                                                key={
-                                                                                    productItem.itemId
-                                                                                }
-                                                                                variant={product}
-                                                                            >
-                                                                                <Box
-                                                                                    border="1px solid"
-                                                                                    borderColor="gray.200"
-                                                                                    borderRadius="md"
-                                                                                    p={3}
-                                                                                    bg="white"
-                                                                                >
-                                                                                    <Flex
-                                                                                        width="full"
-                                                                                        alignItems="flex-start"
-                                                                                    >
-                                                                                        <CartItemVariantImage
-                                                                                            width={[
-                                                                                                '88px',
-                                                                                                '136px'
-                                                                                            ]}
-                                                                                            mr={4}
-                                                                                        />
-                                                                                        <Stack
-                                                                                            spacing={
-                                                                                                1
-                                                                                            }
-                                                                                            marginTop="-3px"
-                                                                                            flex={1}
-                                                                                        >
-                                                                                            <CartItemVariantName />
-
-                                                                                            <CartItemVariantAttributes
-                                                                                                includeQuantity={
-                                                                                                    false
-                                                                                                }
-                                                                                                hideAttributeLabels={
-                                                                                                    true
-                                                                                                }
-                                                                                            />
-
-                                                                                            <Flex
-                                                                                                width="full"
-                                                                                                justifyContent="space-between"
-                                                                                                alignItems="flex-end"
-                                                                                            >
-                                                                                                <Text
-                                                                                                    fontSize="sm"
-                                                                                                    color="gray.700"
-                                                                                                >
-                                                                                                    <FormattedMessage
-                                                                                                        defaultMessage="Qty: {quantity}"
-                                                                                                        values={{
-                                                                                                            quantity:
-                                                                                                                productItem.quantity
-                                                                                                        }}
-                                                                                                        id="item_attributes.label.quantity_abbreviated"
-                                                                                                    />
-                                                                                                </Text>
-                                                                                                <CartItemVariantPrice
-                                                                                                    currency={
-                                                                                                        currency
-                                                                                                    }
-                                                                                                />
-                                                                                            </Flex>
-                                                                                        </Stack>
-                                                                                    </Flex>
-                                                                                </Box>
-                                                                            </ItemVariantProvider>
-                                                                        )
-                                                                    }
-                                                                )}
-                                                            </Stack>
-                                                        </>
-                                                    )}
-                                                </Box>
-                                            ))}
-                                        </Stack>
-                                    }
-                                </>
-                            )
-                        )
-                    })()}
+                                        {/* Bonus Products */}
+                                        <ProductList
+                                            products={shipmentInfo.bonusProducts}
+                                            productsByItemId={productsByItemId}
+                                            currency={currency}
+                                            title={
+                                                <FormattedMessage
+                                                    defaultMessage="Bonus Items"
+                                                    id="pickup_address.bonus_products.title"
+                                                />
+                                            }
+                                        />
+                                    </Box>
+                                ))}
+                            </Stack>
+                        </>
+                    )}
 
                     <Box pt={3}>
                         <Container variant="form">
@@ -496,6 +381,22 @@ const PickupAddress = () => {
             )}
         </ToggleCard>
     )
+}
+
+ProductList.propTypes = {
+    products: PropTypes.arrayOf(
+        PropTypes.shape({
+            itemId: PropTypes.string.isRequired,
+            productId: PropTypes.string.isRequired,
+            productName: PropTypes.string.isRequired,
+            quantity: PropTypes.number.isRequired,
+            priceAfterItemDiscount: PropTypes.number.isRequired,
+            variationValues: PropTypes.object
+        })
+    ),
+    productsByItemId: PropTypes.object,
+    currency: PropTypes.string,
+    title: PropTypes.oneOfType([PropTypes.string, PropTypes.element])
 }
 
 export default PickupAddress

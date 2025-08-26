@@ -25,7 +25,7 @@ import {
 import {useCheckout} from '@salesforce/retail-react-app/app/pages/checkout/util/checkout-context'
 import {useProductAddressAssignment} from '@salesforce/retail-react-app/app/hooks/use-product-address-assignment'
 import {useAddressForm} from '@salesforce/retail-react-app/app/hooks/use-address-form'
-import {useShipmentManagement} from '@salesforce/retail-react-app/app/hooks/use-shipment-management'
+import {useMultiship} from '@salesforce/retail-react-app/app/hooks/use-multiship'
 import ProductShippingAddressCard from '@salesforce/retail-react-app/app/pages/checkout/partials/product-shipping-address-card.jsx'
 
 const ShippingMultiAddress = ({basket, submitButtonLabel, noItemsInBasketMessage}) => {
@@ -73,7 +73,7 @@ const ShippingMultiAddress = ({basket, submitButtonLabel, noItemsInBasketMessage
         productAddressAssignment.deliveryItems
     )
 
-    const shipmentManagement = useShipmentManagement(basket)
+    const {orchestrateShipmentOperations} = useMultiship(basket)
 
     const addresses = productAddressAssignment.availableAddresses
     const [isSubmitting, setIsSubmitting] = useState(false)
@@ -149,7 +149,7 @@ const ShippingMultiAddress = ({basket, submitButtonLabel, noItemsInBasketMessage
     const handleSubmit = async () => {
         setIsSubmitting(true)
         try {
-            await shipmentManagement.orchestrateShipmentOperations(
+            await orchestrateShipmentOperations(
                 productAddressAssignment.deliveryItems,
                 productAddressAssignment.selectedAddresses,
                 addresses,
