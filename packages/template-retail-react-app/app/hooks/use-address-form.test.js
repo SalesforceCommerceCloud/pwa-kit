@@ -92,7 +92,7 @@ describe('useAddressForm', () => {
             )
 
             expect(result.current.form).toBeDefined()
-            expect(result.current.showForm).toEqual({})
+            expect(result.current.formStateByItemId).toEqual({})
             expect(result.current.isSubmitting).toBe(false)
             expect(result.current.isAddressFormOpen).toBe(false)
         })
@@ -133,7 +133,7 @@ describe('useAddressForm', () => {
                 result.current.openForm('item-1')
             })
 
-            expect(result.current.showForm).toEqual({'item-1': true})
+            expect(result.current.formStateByItemId).toEqual({'item-1': true})
             expect(result.current.isAddressFormOpen).toBe(true)
         })
 
@@ -157,7 +157,7 @@ describe('useAddressForm', () => {
                 result.current.closeForm('item-1')
             })
 
-            expect(result.current.showForm).toEqual({'item-1': false})
+            expect(result.current.formStateByItemId).toEqual({'item-1': false})
             expect(result.current.isAddressFormOpen).toBe(false)
         })
 
@@ -178,7 +178,7 @@ describe('useAddressForm', () => {
                 result.current.openForm('item-2')
             })
 
-            expect(result.current.showForm).toEqual({
+            expect(result.current.formStateByItemId).toEqual({
                 'item-1': true,
                 'item-2': true
             })
@@ -391,7 +391,7 @@ describe('useAddressForm', () => {
                 title: expect.any(Array),
                 status: 'info'
             })
-            expect(result.current.showForm).toEqual({'item-1': false})
+            expect(result.current.formStateByItemId).toEqual({'item-1': false})
         })
 
         it('should close form and reset after duplicate detection', async () => {
@@ -434,7 +434,7 @@ describe('useAddressForm', () => {
                 await result.current.handleCreateAddress(duplicateAddressData, 'item-1')
             })
 
-            expect(result.current.showForm).toEqual({'item-1': false})
+            expect(result.current.formStateByItemId).toEqual({'item-1': false})
             expect(result.current.isSubmitting).toBe(false)
         })
     })

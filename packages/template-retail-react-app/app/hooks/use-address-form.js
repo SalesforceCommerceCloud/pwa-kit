@@ -26,7 +26,7 @@ export const useAddressForm = (
     const {formatMessage} = useIntl()
     const showToast = useToast()
     const {data: customer, refetch: refetchCustomer} = useCurrentCustomer()
-    const [showForm, setShowForm] = useState({})
+    const [formStateByItemId, setFormStateByItemId] = useState({})
 
     const createCustomerAddress = useShopperCustomersMutation('createCustomerAddress')
 
@@ -46,8 +46,8 @@ export const useAddressForm = (
     })
 
     const isAddressFormOpen = useMemo(() => {
-        return Object.keys(showForm).filter((key) => showForm[key])?.length > 0
-    }, [showForm])
+        return Object.keys(formStateByItemId).filter((key) => formStateByItemId[key])?.length > 0
+    }, [formStateByItemId])
 
     const handleCreateAddress = useCallback(
         async (addressData, itemId) => {
@@ -64,7 +64,7 @@ export const useAddressForm = (
                         }),
                         status: 'info'
                     })
-                    setShowForm((prev) => ({...prev, [itemId]: false}))
+                    setFormStateByItemId((prev) => ({...prev, [itemId]: false}))
                     form.reset()
                     form.clearErrors()
                     return null
@@ -105,7 +105,7 @@ export const useAddressForm = (
                     setAddressesForItems(itemId, newAddress.addressId)
                 }
 
-                setShowForm((prev) => ({...prev, [itemId]: false}))
+                setFormStateByItemId((prev) => ({...prev, [itemId]: false}))
                 form.reset()
                 form.clearErrors()
 
@@ -131,12 +131,12 @@ export const useAddressForm = (
     )
 
     const openForm = useCallback((itemId) => {
-        setShowForm((prev) => ({...prev, [itemId]: true}))
+        setFormStateByItemId((prev) => ({...prev, [itemId]: true}))
     }, [])
 
     const closeForm = useCallback(
         (itemId) => {
-            setShowForm((prev) => ({...prev, [itemId]: false}))
+            setFormStateByItemId((prev) => ({...prev, [itemId]: false}))
             form.clearErrors()
         },
         [form]
@@ -144,7 +144,7 @@ export const useAddressForm = (
 
     return {
         form,
-        showForm,
+        formStateByItemId,
         isSubmitting: form.formState.isSubmitting,
         openForm,
         closeForm,

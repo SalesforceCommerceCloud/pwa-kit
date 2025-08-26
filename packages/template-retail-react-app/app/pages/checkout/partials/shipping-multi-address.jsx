@@ -59,7 +59,7 @@ const ShippingMultiAddress = ({basket, submitButtonLabel, noItemsInBasketMessage
 
     const {
         form: addressForm,
-        showForm: showAddAddressForm,
+        formStateByItemId: showAddAddressForm,
         isSubmitting: isFormSubmitting,
         openForm,
         closeForm,

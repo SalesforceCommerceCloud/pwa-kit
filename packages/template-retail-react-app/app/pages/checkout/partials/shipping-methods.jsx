@@ -30,10 +30,10 @@ import LoadingSpinner from '@salesforce/retail-react-app/app/components/loading-
 import PropTypes from 'prop-types'
 
 import ShippingProductCards from '@salesforce/retail-react-app/app/pages/checkout/partials/shipping-product-cards'
-import ShippingOptionsList from '@salesforce/retail-react-app/app/pages/checkout/partials/shipping-options-list'
+import ShippingMethodOptions from '@salesforce/retail-react-app/app/pages/checkout/partials/shipping-method-options'
 
 // Component to handle combined product cards and shipping options for multiship
-const ShipmentOptionsWithProducts = ({shipment, basketId, currency, control, basket}) => {
+const MultiAddressShipmentMethod = ({shipment, basketId, currency, control, basket}) => {
     const {formatMessage} = useIntl()
 
     if (!shipment.shippingAddress) {
@@ -76,7 +76,7 @@ const ShipmentOptionsWithProducts = ({shipment, basketId, currency, control, bas
                     <ShippingProductCards shipment={shipment} basket={basket} />
 
                     {/* Shipping Options */}
-                    <ShippingOptionsList
+                    <ShippingMethodOptions
                         shipment={shipment}
                         basketId={basketId}
                         currency={currency}
@@ -88,7 +88,7 @@ const ShipmentOptionsWithProducts = ({shipment, basketId, currency, control, bas
     )
 }
 
-ShipmentOptionsWithProducts.propTypes = {
+MultiAddressShipmentMethod.propTypes = {
     shipment: PropTypes.shape({
         shipmentId: PropTypes.string.isRequired,
         shippingAddress: PropTypes.shape({
@@ -124,10 +124,10 @@ ShipmentOptionsWithProducts.propTypes = {
     }).isRequired
 }
 
-export default function ShippingOptions() {
+export default function ShippingMethods() {
     const {formatMessage} = useIntl()
     const {step, STEPS, goToStep, goToNextStep} = useCheckout()
-    const {data: basket, isLoading: isBasketLoading} = useCurrentBasket()
+    const {data: basket, derivedData: {totalShippingCost}, isLoading: isBasketLoading} = useCurrentBasket()
     const {currency} = useCurrency()
     const updateShippingMethod = useShopperBasketsMutation('updateShippingMethodForShipment')
 
@@ -191,14 +191,6 @@ export default function ShippingOptions() {
     }
 
     // Calculate total shipping info
-    const totalShippingCost =
-        (basket &&
-            basket.shippingItems &&
-            basket.shippingItems.reduce((total, item) => {
-                return total + (item.priceAfterItemDiscount || item.price || 0)
-            }, 0)) ||
-        0
-
     const freeLabel = formatMessage({
         defaultMessage: 'Free',
         id: 'checkout_confirmation.label.free'
@@ -266,7 +258,7 @@ export default function ShippingOptions() {
                             <Box key={shipment.shipmentId}>
                                 {hasMultipleDeliveryShipments ? (
                                     // Multiship: Show both product cards and shipping options
-                                    <ShipmentOptionsWithProducts
+                                    <MultiAddressShipmentMethod
                                         shipment={shipment}
                                         basketId={basket.basketId}
                                         currency={currency}
@@ -275,7 +267,7 @@ export default function ShippingOptions() {
                                     />
                                 ) : (
                                     // Single ship: Show only shipping options
-                                    <ShippingOptionsList
+                                    <ShippingMethodOptions
                                         shipment={shipment}
                                         basketId={basket.basketId}
                                         currency={currency}

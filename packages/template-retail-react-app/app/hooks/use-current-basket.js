@@ -67,6 +67,11 @@ export const useCurrentBasket = ({id = ''} = {}) => {
         // sorting helps with query caching
         pickupStoreIds.sort()
 
+        // Calculate total shipping cost
+        const totalShippingCost = currentBasket?.shippingItems?.reduce((total, item) => {
+            return total + (item.priceAfterItemDiscount !== undefined ? item.priceAfterItemDiscount : (item.price || 0))
+        }, 0)
+
         return {
             totalItems,
             shipmentIdToTotalItems,
@@ -74,9 +79,10 @@ export const useCurrentBasket = ({id = ''} = {}) => {
             totalPickupShipments,
             pickupStoreIds,
             isMissingShippingAddress,
-            isMissingShippingMethod
+            isMissingShippingMethod,
+            totalShippingCost
         }
-    }, [currentBasket?.productItems, currentBasket?.shipments, storeLocatorEnabled])
+    }, [currentBasket?.productItems, currentBasket?.shipments, currentBasket?.shippingItems, storeLocatorEnabled])
 
     return {
         ...restOfQuery,
