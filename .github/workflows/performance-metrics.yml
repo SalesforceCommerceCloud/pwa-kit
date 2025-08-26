@@ -13,7 +13,7 @@ env:
     MRT_ENVIRONMENT_ID: production
 
 jobs:
-    run-performance-metrics:
+    deploy-latest-changes:
         runs-on: ubuntu-latest
         steps:
             - name: Checkout
@@ -51,13 +51,13 @@ jobs:
                   FLAGS: --wait
 
     notify-slack:
-        needs: [run-performance-metrics]
+        needs: [deploy-latest-changes]
         if: ${{ always() }}
         runs-on: ubuntu-latest
         steps:
-            - name: Send GitHub Action data to Slack workflow (Performance Metrics Success)
+            - name: Send GitHub Action data to Slack workflow (Success)
               id: slack-success
-              if: ${{ github.event_name == 'schedule' && needs.run-performance-metrics.result == 'success' }}
+              if: ${{ github.event_name == 'schedule' && needs.deploy-latest-changes.result == 'success' }}
               uses: slackapi/slack-github-action@v1.23.0
               with:
                   payload: |
@@ -67,9 +67,9 @@ jobs:
               env:
                   SLACK_WEBHOOK_URL: ${{ secrets.PERF_WORKFLOW_SLACK_WEBHOOK_URL }}
 
-            - name: Send GitHub Action data to Slack workflow (Performance Metrics Failure)
+            - name: Send GitHub Action data to Slack workflow (Failure)
               id: slack-failure
-              if: ${{ github.event_name == 'schedule' && needs.run-performance-metrics.result != 'success' }}
+              if: ${{ github.event_name == 'schedule' && needs.deploy-latest-changes.result != 'success' }}
               uses: slackapi/slack-github-action@v1.23.0
               with:
                   payload: |
