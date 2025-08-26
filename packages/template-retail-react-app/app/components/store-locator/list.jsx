@@ -52,7 +52,7 @@ export const StoreLocatorList = () => {
                 id: 'store_locator.description.no_locations',
                 defaultMessage: 'Sorry, there are no locations in this area.'
             })
-        if (storeSelectionDisabled && hasItemsInBasket) {
+        if (storeSelectionDisabled) {
             return intl.formatMessage({
                 id: 'store_locator.error.items_in_basket',
                 defaultMessage: 'To change your selected store, remove all items from your cart.'
