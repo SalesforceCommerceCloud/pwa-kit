@@ -1,3 +1,9 @@
+/*
+ * Copyright (c) 2025, Salesforce, Inc.
+ * All rights reserved.
+ * SPDX-License-Identifier: BSD-3-Clause
+ * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
+ */
 const {expect} = require('@playwright/test')
 const config = require('../config')
 const {getCreditCardExpiry, runAccessibilityTest} = require('../scripts/utils.js')
@@ -247,7 +253,7 @@ export const addProductToCart = async ({page, isMobile = false}) => {
  *      - password
  * @param {Boolean} options.isMobile - flag to indicate if device type is mobile or not, defaulted to false
  */
-export const registerShopper = async ({page, userCredentials, isMobile = false}) => {
+export const registerShopper = async ({page, userCredentials}) => {
     // Create Account and Sign In
     await page.goto(config.RETAIL_APP_HOME + '/registration')
     await answerConsentTrackingForm(page)
@@ -496,7 +502,9 @@ export const checkoutProduct = async ({page, userCredentials, a11y = {checkA11y:
             await runAccessibilityTest(page, [snapShotName, 'checkout-a11y-violations-step-2.json'])
         }
         await continueToPayment.click()
-    } catch {}
+    } catch (error) {
+        // Silently continue - consent form handling should not break tests
+    }
 
     await expect(page.getByRole('heading', {name: /Payment/i})).toBeVisible()
     const creditCardExpiry = getCreditCardExpiry()

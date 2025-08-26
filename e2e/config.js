@@ -5,168 +5,171 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
+const path = require('path')
+
 module.exports = {
-  RETAIL_APP_HOME:
-    process.env.RETAIL_APP_HOME ||
-    "https://scaffold-pwa-e2e-tests-pwa-kit.mobify-storefront.com",
-  RETAIL_APP_HOME_SITE: "RefArch",
-  GENERATED_PROJECTS_DIR: "../generated-projects",
-  GENERATE_PROJECTS: ["retail-app-demo", "retail-app-ext", "retail-app-no-ext"],
-  GENERATOR_CMD:
-    "node packages/pwa-kit-create-app/scripts/create-mobify-app-dev.js --outputDir",
-  CLI_RESPONSES: {
-    "retail-app-demo": [
-      {
-        expectedPrompt: /Choose a project preset to get started:/i,
-        response: "2\n",
-      },
-    ],
-    "retail-app-ext": [
-      {
-        expectedPrompt: /Choose a project preset to get started:/i,
-        response: "1\n",
-      },
-      {
-        expectedPrompt: /Do you wish to use template extensibility?/i,
-        response: "2\n",
-      },
-      {
-        expectedPrompt: /What is the name of your Project?/i,
-        response: "scaffold-pwa\n",
-      },
-      {
-        expectedPrompt: /What is the URL for your Commerce Cloud instance?/i,
-        response: "https://zzrf-002.dx.commercecloud.salesforce.com\n",
-      },
-      {
-        expectedPrompt: /What is your SLAS Client ID?/i,
-        response: "987fc116-d30c-4537-93cb-c2bd433c3b5a\n",
-      },
-      {
-        expectedPrompt: /Is your SLAS client private?/i,
-        response: "2\n",
-      },
-      {
-        expectedPrompt: /What is your Site ID in Business Manager?/i,
-        response: "RefArch\n",
-      },
-      {
-        expectedPrompt:
-          /What is your Commerce API organization ID in Business Manager?/i,
-        response: "f_ecom_zzrf_002\n",
-      },
-      {
-        expectedPrompt:
-          /What is your Commerce API short code in Business Manager?/i,
-        response: "kv7kzm78\n",
-      },
-    ],
-    "retail-app-no-ext": [
-      {
-        expectedPrompt: /Choose a project preset to get started:/i,
-        response: "1\n",
-      },
-      {
-        expectedPrompt: /Do you wish to use template extensibility?/i,
-        response: "1\n",
-      },
-      {
-        expectedPrompt: /What is the name of your Project?/i,
-        response: "scaffold-pwa\n",
-      },
-      {
-        expectedPrompt: /What is the URL for your Commerce Cloud instance?/i,
-        response: "https://zzrf-002.dx.commercecloud.salesforce.com\n",
-      },
-      {
-        expectedPrompt: /What is your SLAS Client ID?/i,
-        response: "987fc116-d30c-4537-93cb-c2bd433c3b5a\n",
-      },
-      {
-        expectedPrompt: /Is your SLAS client private?/i,
-        response: "2\n",
-      },
-      {
-        expectedPrompt: /What is your Site ID in Business Manager?/i,
-        response: "RefArch\n",
-      },
-      {
-        expectedPrompt:
-          /What is your Commerce API organization ID in Business Manager?/i,
-        response: "f_ecom_zzrf_002\n",
-      },
-      {
-        expectedPrompt:
-          /What is your Commerce API short code in Business Manager?/i,
-        response: "kv7kzm78\n",
-      },
-    ],
-    "retail-app-private-client": [],
-    "retail-react-app-bug-bounty": [],
-    "retail-react-app-demo-site": [],
-    "retail-react-app-performance-tests": [],
-  },
-  PRESET: {
-    "retail-app-private-client": "retail-react-app-private-slas-client",
-    "retail-react-app-bug-bounty": "retail-react-app-bug-bounty",
-    "retail-react-app-demo-site": "retail-react-app-demo-site-internal",
-    "retail-react-app-performance-tests": "retail-react-app-performance-tests"
-  },
-  EXPECTED_GENERATED_ARTIFACTS: {
-    "retail-app-demo": [
-      ".cursor",
-      ".eslintignore",
-      ".eslintrc.js",
-      ".prettierrc.yaml",
-      "babel.config.js",
-      "config",
-      "node_modules",
-      "overrides",
-      "package-lock.json",
-      "package.json",
-      "translations",
-      "worker",
-    ],
-    "retail-app-ext": [
-      ".cursor",
-      ".eslintignore",
-      ".eslintrc.js",
-      ".prettierrc.yaml",
-      "babel.config.js",
-      "config",
-      "node_modules",
-      "overrides",
-      "package-lock.json",
-      "package.json",
-      "translations",
-      "worker",
-    ],
-    "retail-app-no-ext": [
-      ".eslintignore",
-      ".eslintrc.js",
-      ".prettierignore",
-      ".prettierrc.yaml",
-      "CHANGELOG.md",
-      "LICENSE",
-      "README.md",
-      "app",
-      "babel.config.js",
-      "cache-hash-config.json",
-      "config",
-      "jest-setup.js",
-      "jest.config.js",
-      "jsconfig.json",
-      "node_modules",
-      "package-lock.json",
-      "package.json",
-      "scripts",
-      "tests",
-      "translations",
-      "worker",
-    ],
-  },
-  PWA_E2E_USER_EMAIL: process.env.PWA_E2E_USER_EMAIL,
-  PWA_E2E_USER_PASSWORD: process.env.PWA_E2E_USER_PASSWORD,
-  EXTRA_FEATURES_E2E_RETAIL_APP_HOME: "https://scaffold-pwa-extra-features-e2e.mobify-storefront.com",
-  EXTRA_FEATURES_E2E_RETAIL_APP_HOME_SITE: "RefArchGlobal"
-};
+    RETAIL_APP_HOME:
+        process.env.RETAIL_APP_HOME ||
+        'https://scaffold-pwa-e2e-tests-pwa-kit.mobify-storefront.com',
+    RETAIL_APP_HOME_SITE: 'RefArch',
+    /**
+     * We need to write the environment details and status to a file so that other steps in the workflow can use it.
+     * Propagating outputs from node to composite actions to workflow is not robust enough.
+     */
+    MRT_TARGET_DETAILS_FILE: path.join(__dirname, './mrt-target/mrt-target-details.json'),
+    GENERATED_PROJECTS_DIR: '../generated-projects',
+    GENERATE_PROJECTS: ['retail-app-demo', 'retail-app-ext', 'retail-app-no-ext'],
+    GENERATOR_CMD: 'node packages/pwa-kit-create-app/scripts/create-mobify-app-dev.js --outputDir',
+    CLI_RESPONSES: {
+        'retail-app-demo': [
+            {
+                expectedPrompt: /Choose a project preset to get started:/i,
+                response: '2\n'
+            }
+        ],
+        'retail-app-ext': [
+            {
+                expectedPrompt: /Choose a project preset to get started:/i,
+                response: '1\n'
+            },
+            {
+                expectedPrompt: /Do you wish to use template extensibility?/i,
+                response: '2\n'
+            },
+            {
+                expectedPrompt: /What is the name of your Project?/i,
+                response: 'scaffold-pwa\n'
+            },
+            {
+                expectedPrompt: /What is the URL for your Commerce Cloud instance?/i,
+                response: 'https://zzrf-002.dx.commercecloud.salesforce.com\n'
+            },
+            {
+                expectedPrompt: /What is your SLAS Client ID?/i,
+                response: '987fc116-d30c-4537-93cb-c2bd433c3b5a\n'
+            },
+            {
+                expectedPrompt: /Is your SLAS client private?/i,
+                response: '2\n'
+            },
+            {
+                expectedPrompt: /What is your Site ID in Business Manager?/i,
+                response: 'RefArch\n'
+            },
+            {
+                expectedPrompt: /What is your Commerce API organization ID in Business Manager?/i,
+                response: 'f_ecom_zzrf_002\n'
+            },
+            {
+                expectedPrompt: /What is your Commerce API short code in Business Manager?/i,
+                response: 'kv7kzm78\n'
+            }
+        ],
+        'retail-app-no-ext': [
+            {
+                expectedPrompt: /Choose a project preset to get started:/i,
+                response: '1\n'
+            },
+            {
+                expectedPrompt: /Do you wish to use template extensibility?/i,
+                response: '1\n'
+            },
+            {
+                expectedPrompt: /What is the name of your Project?/i,
+                response: 'scaffold-pwa\n'
+            },
+            {
+                expectedPrompt: /What is the URL for your Commerce Cloud instance?/i,
+                response: 'https://zzrf-002.dx.commercecloud.salesforce.com\n'
+            },
+            {
+                expectedPrompt: /What is your SLAS Client ID?/i,
+                response: '987fc116-d30c-4537-93cb-c2bd433c3b5a\n'
+            },
+            {
+                expectedPrompt: /Is your SLAS client private?/i,
+                response: '2\n'
+            },
+            {
+                expectedPrompt: /What is your Site ID in Business Manager?/i,
+                response: 'RefArch\n'
+            },
+            {
+                expectedPrompt: /What is your Commerce API organization ID in Business Manager?/i,
+                response: 'f_ecom_zzrf_002\n'
+            },
+            {
+                expectedPrompt: /What is your Commerce API short code in Business Manager?/i,
+                response: 'kv7kzm78\n'
+            }
+        ],
+        'retail-app-private-client': [],
+        'retail-react-app-bug-bounty': [],
+        'retail-react-app-demo-site': [],
+        'retail-react-app-performance-tests': []
+    },
+    PRESET: {
+        'retail-app-private-client': 'retail-react-app-private-slas-client',
+        'retail-react-app-bug-bounty': 'retail-react-app-bug-bounty',
+        'retail-react-app-demo-site': 'retail-react-app-demo-site-internal',
+        'retail-react-app-performance-tests': 'retail-react-app-performance-tests'
+    },
+    EXPECTED_GENERATED_ARTIFACTS: {
+        'retail-app-demo': [
+            '.cursor',
+            '.eslintignore',
+            '.eslintrc.js',
+            '.prettierrc.yaml',
+            'babel.config.js',
+            'config',
+            'node_modules',
+            'overrides',
+            'package-lock.json',
+            'package.json',
+            'translations',
+            'worker'
+        ],
+        'retail-app-ext': [
+            '.cursor',
+            '.eslintignore',
+            '.eslintrc.js',
+            '.prettierrc.yaml',
+            'babel.config.js',
+            'config',
+            'node_modules',
+            'overrides',
+            'package-lock.json',
+            'package.json',
+            'translations',
+            'worker'
+        ],
+        'retail-app-no-ext': [
+            '.eslintignore',
+            '.eslintrc.js',
+            '.prettierignore',
+            '.prettierrc.yaml',
+            'CHANGELOG.md',
+            'LICENSE',
+            'README.md',
+            'app',
+            'babel.config.js',
+            'cache-hash-config.json',
+            'config',
+            'jest-setup.js',
+            'jest.config.js',
+            'jsconfig.json',
+            'node_modules',
+            'package-lock.json',
+            'package.json',
+            'scripts',
+            'tests',
+            'translations',
+            'worker'
+        ]
+    },
+    PWA_E2E_USER_EMAIL: process.env.PWA_E2E_USER_EMAIL,
+    PWA_E2E_USER_PASSWORD: process.env.PWA_E2E_USER_PASSWORD,
+    EXTRA_FEATURES_E2E_RETAIL_APP_HOME:
+        'https://scaffold-pwa-extra-features-e2e.mobify-storefront.com',
+    EXTRA_FEATURES_E2E_RETAIL_APP_HOME_SITE: 'RefArchGlobal'
+}
