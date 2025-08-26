@@ -13,7 +13,10 @@ const {answerConsentTrackingForm} = require('../../scripts/pageHelpers.js')
 const GUEST_USER_CREDENTIALS = generateUserCredentials()
 
 // Skip this test suite if not running private client tests
-test.skip(() => !process.env.RUN_PRIVATE_CLIENT_TESTS, 'Passwordless login tests require private client configuration')
+test.skip(
+    () => !process.env.RUN_PRIVATE_CLIENT_TESTS,
+    'Passwordless login tests require private client configuration'
+)
 
 /**
  * Test that a user can login with passwordless login on mobile. There is no programmatic way to check the email,
