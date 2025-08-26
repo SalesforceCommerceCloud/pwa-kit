@@ -10,7 +10,8 @@ import {normalizeSetBundleProduct} from '@salesforce/retail-react-app/app/utils/
 
 /**
  * Custom hook to manage product inventory calculations for different product types.
- * Handles inventory normalization for sets and bundles.
+ * Handles inventory normalization for sets and bundles, meaning the master product inventory
+ * is reduced to represent the inventory of the selected sub product variants.
  *
  * @param {Object} productResponse - The raw product data from the API
  * @param {Object} variantProductData - Variant data for child products

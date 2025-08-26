@@ -6,7 +6,7 @@
  */
 
 import {renderHook} from '@testing-library/react'
-import {useProductInventory} from '@salesforce/retail-react-app/../../app/hooks/use-product-inventory'
+import {useProductInventory} from '@salesforce/retail-react-app/app/hooks/use-product-inventory'
 import {normalizeSetBundleProduct} from '@salesforce/retail-react-app/app/utils/product-utils'
 
 jest.mock('@salesforce/retail-react-app/app/utils/product-utils', () => ({
