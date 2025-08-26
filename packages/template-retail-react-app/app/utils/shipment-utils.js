@@ -163,7 +163,7 @@ export const findDeliveryShipmentWithSameAddress = (basket, address) => {
  * @param {Object} basket - The basket object
  * @returns {Object|null} The shipment object without address or null if not found
  */
-export const getAddresslessShipment = (basket) => {
+export const getMissingAddressShipment = (basket) => {
     if (!basket?.shipments) return null
 
     const foundShipment = basket.shipments.find((shipment) => {

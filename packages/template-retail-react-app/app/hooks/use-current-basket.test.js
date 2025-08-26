@@ -121,7 +121,6 @@ describe('useCurrentBasket', function () {
         // New derived fields for checkout step logic
         expect(screen.getByTestId('needs-address').innerHTML).toBe('true')
         expect(screen.getByTestId('needs-shipping-method').innerHTML).toBe('true')
-        // New derived field: totalShippingCost should calculate from shippingItems
         expect(screen.getByTestId('total-shipping-cost').innerHTML).toBe('0')
     })
 })

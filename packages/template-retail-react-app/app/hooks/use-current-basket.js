@@ -71,7 +71,12 @@ export const useCurrentBasket = ({id = ''} = {}) => {
         const totalShippingCost =
             (currentBasket?.shippingItems &&
                 currentBasket.shippingItems.reduce((total, item) => {
-                    return total + (item.priceAfterItemDiscount !== undefined ? item.priceAfterItemDiscount : (item.price || 0))
+                    return (
+                        total +
+                        (item.priceAfterItemDiscount !== undefined
+                            ? item.priceAfterItemDiscount
+                            : item.price || 0)
+                    )
                 }, 0)) ||
             0
 
