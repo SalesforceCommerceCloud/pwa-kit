@@ -27,6 +27,7 @@ import {withReactQuery} from '@salesforce/pwa-kit-react-sdk/ssr/universal/compon
 import {useCorrelationId} from '@salesforce/pwa-kit-react-sdk/ssr/universal/hooks'
 import {getAppOrigin} from '@salesforce/pwa-kit-react-sdk/utils/url'
 import {ReactQueryDevtools} from '@tanstack/react-query-devtools'
+import {generateSfdcUserAgent} from './utils/user-agent-utils'
 import {
     DEFAULT_DNT_STATE,
     STORE_LOCATOR_RADIUS,
@@ -37,7 +38,6 @@ import {
     STORE_LOCATOR_DEFAULT_PAGE_SIZE,
     STORE_LOCATOR_SUPPORTED_COUNTRIES
 } from '@salesforce/retail-react-app/app/constants'
-import {generateSfdcUserAgent} from '../../../utils/user-agent-utils'
 
 /**
  * Use the AppConfig component to inject extra arguments into the getProps
@@ -51,7 +51,7 @@ const AppConfig = ({children, locals = {}}) => {
     const {correlationId} = useCorrelationId()
     const headers = {
         'correlation-id': correlationId,
-        'sfdc_user_agent': generateSfdcUserAgent()
+        sfdc_user_agent: generateSfdcUserAgent()
     }
 
     const commerceApiConfig = locals.appConfig.commerceAPI
