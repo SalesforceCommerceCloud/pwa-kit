@@ -4,6 +4,7 @@
 - Update USID expiry to match SLAS refresh token expiry[#2854](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2854)
 - [Bugfix] Skip deleting dwsid on shopper login if hybrid auth is enabled for current site. [#3151](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3151)
 - Remove deprecated properties in commerce-sdk-react [#3177](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3177)
+- Update Auth class and CommerceApiProvider to support custom headers in SCAPI requests [#3183](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3183)
 
 ## v3.4.0 (Jul 22, 2025)
 
