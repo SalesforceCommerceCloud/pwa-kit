@@ -492,9 +492,7 @@ export const GooglePayExpress = ({
                 }
 
                 const handleGooglePayUnavailable = () => {
-                    if (manager) {
-                        manager.setPaymentMethodUnavailable(PAYMENT_METHOD)
-                    }
+                    manager.setPaymentMethodUnavailable(PAYMENT_METHOD)
                 }
 
                 // For PDP mode, we don't need a basket initially but we do need payment methods
@@ -571,9 +569,7 @@ export const GooglePayExpress = ({
 
                     try {
                         await googlePayButton.mount(paymentContainer.current)
-                        if (manager) {
-                            manager.setPaymentMethodAvailable(PAYMENT_METHOD)
-                        }
+                        manager.setPaymentMethodAvailable(PAYMENT_METHOD)
                     } catch (error) {
                         handleGooglePayUnavailable()
                     }
@@ -611,10 +607,7 @@ export const GooglePayExpress = ({
     const shouldRender = validateExpressPaymentSetup({
         isPdpMode,
         adyenPaymentMethods,
-        hasRequiredBasketData,
-        sku,
-        basket,
-        authToken
+        hasRequiredBasketData
     })
 
     if (!shouldRender) {
@@ -623,11 +616,7 @@ export const GooglePayExpress = ({
 
     return (
         <>
-            <div
-                ref={paymentContainer}
-                style={{height: '40px'}}
-                data-testid="google-pay-express"
-            ></div>
+            <div ref={paymentContainer} style={{height: '40px'}}></div>
         </>
     )
 }

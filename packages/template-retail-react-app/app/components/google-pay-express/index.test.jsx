@@ -4,418 +4,365 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
+import React from 'react'
+import {render, waitFor} from '@testing-library/react'
+import {GooglePayExpress} from '@salesforce/retail-react-app/app/components/google-pay-express/index'
 
-import {
-    getGooglePaymentMethodConfig,
-    getCustomerShippingDetails,
-    getCustomerBillingDetails,
-    updateShippingAddress,
-    updateShippingOption,
-    getGoogleButtonConfig
-} from '.'
-
-// Mock the Adyen services and utilities
+// Mock AdyenCheckout
 jest.mock('@adyen/adyen-web', () => ({
     __esModule: true,
     default: jest.fn()
 }))
 
-jest.mock('@salesforce/retail-react-app/app/components/express/utils/shipping-methods', () => ({
-    AdyenShippingMethodsService: jest.fn()
-}))
+// Mock the useExpressPaymentSetup hook
+jest.mock(
+    '@salesforce/retail-react-app/app/components/express/hooks/use-express-payment-setup',
+    () => ({
+        useExpressPaymentSetup: jest.fn()
+    })
+)
 
-jest.mock('@salesforce/retail-react-app/app/components/express/utils/shipping-address', () => ({
-    AdyenShippingAddressService: jest.fn()
-}))
+// Mock the express-payment-utils module
+jest.mock(
+    '@salesforce/retail-react-app/app/components/express/utils/express-payment-utils',
+    () => ({
+        createAdyenCheckout: jest.fn(),
+        validateExpressPaymentSetup: jest.fn(),
+        isMissingOrderTotalError: jest.fn(),
+        getExpressPaymentDependencies: jest.fn(),
+        getPaymentMethodConfig: jest.fn()
+    })
+)
 
-jest.mock('@salesforce/retail-react-app/app/components/express/utils/payments', () => ({
-    AdyenPaymentsService: jest.fn()
-}))
-
+// Mock temporary basket utilities
 jest.mock('@salesforce/retail-react-app/app/components/express/utils/pdp/temporary-basket', () => ({
     createTemporaryBasket: jest.fn(),
     deleteTemporaryBasket: jest.fn(),
     cleanupTemporaryBasket: jest.fn()
 }))
 
+// Mock basket calculation utilities
 jest.mock(
-    '@salesforce/retail-react-app/app/components/express/utils/express-payment-utils',
+    '@salesforce/retail-react-app/app/components/express/utils/pdp/basket-calculation',
     () => ({
-        validateExpressPaymentSetup: jest.fn(),
-        getExpressPaymentDependencies: jest.fn(),
-        sendExpressMessage: jest.fn(),
-        getPaymentMethodConfig: jest.fn(),
-        isMissingOrderTotalError: jest.fn(),
-        isMissingShippingMethodsError: jest.fn(),
-        createAdyenCheckout: jest.fn()
+        getBasketWithTotals: jest.fn(),
+        forceOrderCalculation: jest.fn()
     })
 )
 
-jest.mock('@salesforce/retail-react-app/app/components/express/utils/parsers', () => ({
-    getCurrencyValueForApi: jest.fn(),
-    getGPShippingOptionParameters: jest.fn()
+// Mock the useMultiSite hook
+jest.mock('@salesforce/retail-react-app/app/hooks/use-multi-site', () => ({
+    __esModule: true,
+    default: jest.fn()
 }))
 
-jest.mock('@salesforce/retail-react-app/app/components/express/utils/constants', () => ({
-    PAYMENT_METHODS: {
-        GOOGLE_PAY: 'googlepay'
-    },
-    EXPRESS_MESSAGES: {
-        PAYMENT_SUCCESS: 'express.payment.success',
-        PAYMENT_FAILURE: 'express.payment.failure',
-        PAYMENT_CANCEL: 'express.payment.cancel'
-    }
+// Mock the useNavigation hook
+jest.mock('@salesforce/retail-react-app/app/hooks/use-navigation', () => ({
+    __esModule: true,
+    default: jest.fn()
 }))
+
+// Mock the useStandalonePaymentMethods hook
+jest.mock(
+    '@salesforce/retail-react-app/app/components/express/hooks/use-standalone-payment-methods',
+    () => ({
+        useStandalonePaymentMethods: jest.fn()
+    })
+)
 
 // Import mocked modules
-import {AdyenShippingMethodsService} from '@salesforce/retail-react-app/app/components/express/utils/shipping-methods'
-import {AdyenShippingAddressService} from '@salesforce/retail-react-app/app/components/express/utils/shipping-address'
-import {AdyenPaymentsService} from '@salesforce/retail-react-app/app/components/express/utils/payments'
+import AdyenCheckout from '@adyen/adyen-web'
+import {useExpressPaymentSetup} from '@salesforce/retail-react-app/app/components/express/hooks/use-express-payment-setup'
 import {
-    createTemporaryBasket,
-    deleteTemporaryBasket,
-    cleanupTemporaryBasket
-} from '@salesforce/retail-react-app/app/components/express/utils/pdp/temporary-basket'
-import {sendExpressMessage} from '@salesforce/retail-react-app/app/components/express/utils/express-payment-utils'
-import {
-    getCurrencyValueForApi,
-    getGPShippingOptionParameters
-} from '@salesforce/retail-react-app/app/components/express/utils/parsers'
+    createAdyenCheckout,
+    validateExpressPaymentSetup,
+    isMissingOrderTotalError,
+    getExpressPaymentDependencies,
+    getPaymentMethodConfig
+} from '@salesforce/retail-react-app/app/components/express/utils/express-payment-utils'
+import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
+import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
+import {useStandalonePaymentMethods} from '@salesforce/retail-react-app/app/components/express/hooks/use-standalone-payment-methods'
 
-describe('GooglePayExpress Utilities', () => {
-    const mockAuthToken = 'test-auth-token'
-    const mockSite = {id: 'test-site', name: 'Test Site'}
+describe('GooglePayExpress', () => {
+    // Mock data
     const mockBasket = {
-        basketId: 'test-basket-id',
-        orderTotal: 100.0,
+        basketId: 'test-basket',
+        orderTotal: 100,
         currency: 'USD',
-        customerInfo: {customerId: 'test-customer-id'}
-    }
-    const mockAdyenPaymentMethods = {
-        environment: {
-            ADYEN_ENVIRONMENT: 'test',
-            ADYEN_CLIENT_KEY: 'test-key'
-        },
-        applicationInfo: {name: 'Test App'}
+        customerInfo: {
+            customerId: 'test-customer'
+        }
     }
 
-    let mockShippingMethodsService
-    let mockShippingAddressService
-    let mockPaymentsService
+    const mockAdyenEnvironment = {
+        ADYEN_ENVIRONMENT: 'test',
+        ADYEN_CLIENT_KEY: 'test_key'
+    }
+
+    const mockAdyenPaymentMethods = {
+        paymentMethods: [
+            {
+                type: 'googlepay',
+                configuration: {
+                    merchantName: 'Test Merchant'
+                }
+            }
+        ],
+        applicationInfo: {},
+        environment: mockAdyenEnvironment,
+        applicableShippingMethods: [],
+        fetchShippingMethods: jest.fn()
+    }
+
+    const mockProps = {
+        adyenPaymentMethods: mockAdyenPaymentMethods,
+        authToken: 'test-token',
+        locale: {id: 'en-US'},
+        site: {id: 'test-site'},
+        basket: mockBasket,
+        sku: null,
+        quantity: 1,
+        isPdpMode: false,
+        manager: {
+            setPaymentMethodAvailable: jest.fn(),
+            setPaymentMethodUnavailable: jest.fn()
+        }
+    }
 
     beforeEach(() => {
         jest.clearAllMocks()
 
-        // Mock services
-        mockShippingMethodsService = {
-            getShippingMethods: jest.fn(),
-            updateShippingMethod: jest.fn()
+        // Mock useMultiSite hook
+        useMultiSite.mockReturnValue({
+            locale: {id: 'en-US'},
+            site: {id: 'test-site'}
+        })
+
+        // Mock useNavigation hook
+        useNavigation.mockReturnValue(jest.fn())
+
+        // Mock useStandalonePaymentMethods hook
+        useStandalonePaymentMethods.mockReturnValue({
+            paymentMethods: null,
+            loading: false,
+            error: null
+        })
+
+        // Mock the useExpressPaymentSetup hook
+        useExpressPaymentSetup.mockReturnValue({
+            locale: {id: 'en-US'},
+            site: {id: 'test-site'},
+            tempBasket: null,
+            setTempBasket: jest.fn(),
+            currentSku: null,
+            hasRequiredBasketData: true
+        })
+
+        // Mock AdyenCheckout
+        const mockCreate = jest.fn()
+        const mockIsAvailable = jest.fn()
+        const mockMount = jest.fn()
+
+        AdyenCheckout.mockResolvedValue({
+            create: mockCreate.mockResolvedValue({
+                isAvailable: mockIsAvailable.mockResolvedValue(true),
+                mount: mockMount
+            })
+        })
+
+        // Mock createAdyenCheckout
+        createAdyenCheckout.mockResolvedValue({
+            create: mockCreate.mockResolvedValue({
+                isAvailable: mockIsAvailable.mockResolvedValue(true),
+                mount: mockMount
+            })
+        })
+
+        // Mock validateExpressPaymentSetup
+        validateExpressPaymentSetup.mockReturnValue(true)
+
+        // Mock isMissingOrderTotalError
+        isMissingOrderTotalError.mockReturnValue(false)
+
+        // Mock getExpressPaymentDependencies
+        getExpressPaymentDependencies.mockReturnValue([])
+
+        // Mock getPaymentMethodConfig
+        getPaymentMethodConfig.mockReturnValue({
+            merchantName: 'Test Merchant'
+        })
+    })
+
+    it('renders without crashing', () => {
+        render(<GooglePayExpress {...mockProps} />)
+        expect(true).toBe(true)
+    })
+
+    it('initializes AdyenCheckout when validation passes', async () => {
+        render(<GooglePayExpress {...mockProps} />)
+
+        await waitFor(() => {
+            expect(createAdyenCheckout).toHaveBeenCalledWith(
+                mockAdyenEnvironment,
+                {id: 'en-US'},
+                {}
+            )
+        })
+    })
+
+    it('sets payment method as unavailable when validation fails', async () => {
+        validateExpressPaymentSetup.mockReturnValue(false)
+
+        render(<GooglePayExpress {...mockProps} />)
+
+        await waitFor(() => {
+            expect(mockProps.manager.setPaymentMethodUnavailable).toHaveBeenCalledWith('googlepay')
+        })
+    })
+
+    it('sets payment method as unavailable when adyenPaymentMethods.environment is missing', async () => {
+        const propsWithoutEnvironment = {
+            ...mockProps,
+            adyenPaymentMethods: {
+                ...mockAdyenPaymentMethods,
+                environment: undefined
+            }
         }
-        mockShippingAddressService = {
-            updateShippingAddress: jest.fn()
+
+        render(<GooglePayExpress {...propsWithoutEnvironment} />)
+
+        await waitFor(() => {
+            expect(mockProps.manager.setPaymentMethodUnavailable).toHaveBeenCalledWith('googlepay')
+        })
+    })
+
+    it('handles createAdyenCheckout failure', async () => {
+        createAdyenCheckout.mockRejectedValue(new Error('Checkout creation failed'))
+
+        render(<GooglePayExpress {...mockProps} />)
+
+        await waitFor(() => {
+            expect(mockProps.manager.setPaymentMethodUnavailable).toHaveBeenCalledWith('googlepay')
+        })
+    })
+
+    it('handles button creation failure', async () => {
+        const mockCreate = jest.fn().mockRejectedValue(new Error('Button creation failed'))
+        createAdyenCheckout.mockResolvedValue({
+            create: mockCreate
+        })
+
+        render(<GooglePayExpress {...mockProps} />)
+
+        await waitFor(() => {
+            expect(mockProps.manager.setPaymentMethodUnavailable).toHaveBeenCalledWith('googlepay')
+        })
+    })
+
+    it('handles button availability check failure', async () => {
+        const mockIsAvailable = jest.fn().mockRejectedValue(new Error('Availability check failed'))
+        const mockCreate = jest.fn().mockResolvedValue({
+            isAvailable: mockIsAvailable
+        })
+        createAdyenCheckout.mockResolvedValue({
+            create: mockCreate
+        })
+
+        render(<GooglePayExpress {...mockProps} />)
+
+        await waitFor(() => {
+            expect(mockProps.manager.setPaymentMethodUnavailable).toHaveBeenCalledWith('googlepay')
+        })
+    })
+
+    it('handles button availability returning false', async () => {
+        const mockIsAvailable = jest.fn().mockResolvedValue(false)
+        const mockCreate = jest.fn().mockResolvedValue({
+            isAvailable: mockIsAvailable
+        })
+        createAdyenCheckout.mockResolvedValue({
+            create: mockCreate
+        })
+
+        render(<GooglePayExpress {...mockProps} />)
+
+        await waitFor(() => {
+            expect(mockProps.manager.setPaymentMethodUnavailable).toHaveBeenCalledWith('googlepay')
+        })
+    })
+
+    it('handles button mount failure', async () => {
+        const mockMount = jest.fn().mockRejectedValue(new Error('Mount failed'))
+        const mockIsAvailable = jest.fn().mockResolvedValue(true)
+        const mockCreate = jest.fn().mockResolvedValue({
+            isAvailable: mockIsAvailable,
+            mount: mockMount
+        })
+        createAdyenCheckout.mockResolvedValue({
+            create: mockCreate
+        })
+
+        render(<GooglePayExpress {...mockProps} />)
+
+        await waitFor(() => {
+            expect(mockProps.manager.setPaymentMethodUnavailable).toHaveBeenCalledWith('googlepay')
+        })
+    })
+
+    it('sets payment method as available when everything succeeds', async () => {
+        const mockMount = jest.fn().mockResolvedValue(undefined)
+        const mockIsAvailable = jest.fn().mockResolvedValue(true)
+        const mockCreate = jest.fn().mockResolvedValue({
+            isAvailable: mockIsAvailable,
+            mount: mockMount
+        })
+        createAdyenCheckout.mockResolvedValue({
+            create: mockCreate
+        })
+
+        render(<GooglePayExpress {...mockProps} />)
+
+        await waitFor(() => {
+            expect(mockProps.manager.setPaymentMethodAvailable).toHaveBeenCalledWith('googlepay')
+        })
+    })
+
+    it('handles missing order total error gracefully', async () => {
+        isMissingOrderTotalError.mockReturnValue(true)
+        createAdyenCheckout.mockRejectedValue(new Error('Missing order total'))
+
+        render(<GooglePayExpress {...mockProps} />)
+
+        // Should not call setPaymentMethodUnavailable for expected PDP errors
+        await waitFor(() => {
+            expect(mockProps.manager.setPaymentMethodUnavailable).not.toHaveBeenCalled()
+        })
+    })
+
+    it('works in PDP mode with SKU', async () => {
+        const pdpProps = {
+            ...mockProps,
+            isPdpMode: true,
+            sku: 'TEST-SKU',
+            basket: undefined
         }
-        mockPaymentsService = {
-            submitPayment: jest.fn()
-        }
 
-        AdyenShippingMethodsService.mockImplementation(() => mockShippingMethodsService)
-        AdyenShippingAddressService.mockImplementation(() => mockShippingAddressService)
-        AdyenPaymentsService.mockImplementation(() => mockPaymentsService)
-
-        // Mock utility functions
-        getCurrencyValueForApi.mockReturnValue(10000)
-        getGPShippingOptionParameters.mockReturnValue([])
-    })
-
-    afterEach(() => {
-        jest.restoreAllMocks()
-    })
-
-    describe('getCustomerShippingDetails', () => {
-        it('should format shipping address correctly', () => {
-            const shippingAddress = {
-                locality: 'Test City',
-                countryCode: 'US',
-                address2: 'Apt 123',
-                postalCode: '12345',
-                administrativeArea: 'CA',
-                address1: '123 Test St',
-                name: 'John Doe'
-            }
-
-            const result = getCustomerShippingDetails(shippingAddress)
-
-            expect(result).toEqual({
-                deliveryAddress: {
-                    city: 'Test City',
-                    country: 'US',
-                    houseNumberOrName: 'Apt 123',
-                    postalCode: '12345',
-                    stateOrProvince: 'CA',
-                    street: '123 Test St'
-                },
-                profile: {
-                    firstName: 'John',
-                    lastName: 'Doe'
-                }
-            })
+        // Mock useExpressPaymentSetup for PDP mode
+        useExpressPaymentSetup.mockReturnValue({
+            locale: {id: 'en-US'},
+            site: {id: 'test-site'},
+            tempBasket: null,
+            setTempBasket: jest.fn(),
+            currentSku: 'TEST-SKU',
+            hasRequiredBasketData: false
         })
 
-        it('should handle missing name gracefully', () => {
-            const shippingAddress = {
-                locality: 'Test City',
-                countryCode: 'US',
-                address2: 'Apt 123',
-                postalCode: '12345',
-                administrativeArea: 'CA',
-                address1: '123 Test St'
-            }
+        render(<GooglePayExpress {...pdpProps} />)
 
-            const result = getCustomerShippingDetails(shippingAddress)
-
-            expect(result.profile.firstName).toBe('')
-            expect(result.profile.lastName).toBe('')
-        })
-    })
-
-    describe('getCustomerBillingDetails', () => {
-        it('should format billing address correctly', () => {
-            const billingAddress = {
-                locality: 'Test City',
-                countryCode: 'US',
-                address2: 'Apt 123',
-                postalCode: '12345',
-                administrativeArea: 'CA',
-                address1: '123 Test St'
-            }
-
-            const result = getCustomerBillingDetails(billingAddress)
-
-            expect(result).toEqual({
-                billingAddress: {
-                    city: 'Test City',
-                    country: 'US',
-                    houseNumberOrName: 'Apt 123',
-                    postalCode: '12345',
-                    stateOrProvince: 'CA',
-                    street: '123 Test St'
-                }
-            })
-        })
-    })
-
-    describe('updateShippingAddress', () => {
-        it('should update shipping address successfully', async () => {
-            const mockShippingAddress = {
-                locality: 'Test City',
-                countryCode: 'US',
-                address2: 'Apt 123',
-                postalCode: '12345',
-                administrativeArea: 'CA',
-                address1: '123 Test St',
-                name: 'John Doe'
-            }
-
-            mockShippingAddressService.updateShippingAddress.mockResolvedValue({})
-            mockShippingMethodsService.getShippingMethods.mockResolvedValue({
-                defaultShippingMethodId: 'method-1',
-                applicableShippingMethods: [{id: 'method-1'}]
-            })
-            mockShippingMethodsService.updateShippingMethod.mockResolvedValue({
-                currency: 'USD',
-                orderTotal: 100.0
-            })
-
-            const result = await updateShippingAddress(
-                mockAuthToken,
-                mockSite,
-                mockBasket,
-                mockShippingAddress
-            )
-
-            expect(mockShippingAddressService.updateShippingAddress).toHaveBeenCalledWith(
-                mockBasket.basketId,
-                getCustomerShippingDetails(mockShippingAddress)
-            )
-            expect(result).toHaveProperty('paymentDataRequestUpdate')
-            expect(result).toHaveProperty('newBasket')
-        })
-
-        it('should handle shipping address update error', async () => {
-            const mockShippingAddress = {
-                locality: 'Test City',
-                countryCode: 'US',
-                address2: 'Apt 123',
-                postalCode: '12345',
-                administrativeArea: 'CA',
-                address1: '123 Test St',
-                name: 'John Doe'
-            }
-
-            mockShippingAddressService.updateShippingAddress.mockResolvedValue({
-                error: 'Address not available'
-            })
-
-            const result = await updateShippingAddress(
-                mockAuthToken,
-                mockSite,
-                mockBasket,
-                mockShippingAddress
-            )
-
-            expect(result.error.reason).toBe('SHIPPING_ADDRESS_UNAVAILABLE')
-            expect(result.error.intent).toBe('SHIPPING_ADDRESS')
-        })
-
-        it('should handle exceptions gracefully', async () => {
-            const mockShippingAddress = {
-                locality: 'Test City',
-                countryCode: 'US',
-                address2: 'Apt 123',
-                postalCode: '12345',
-                administrativeArea: 'CA',
-                address1: '123 Test St',
-                name: 'John Doe'
-            }
-
-            mockShippingAddressService.updateShippingAddress.mockRejectedValue(
-                new Error('Network error')
-            )
-
-            const result = await updateShippingAddress(
-                mockAuthToken,
-                mockSite,
-                mockBasket,
-                mockShippingAddress
-            )
-
-            expect(result.error.reason).toBe('SHIPPING_ADDRESS_UNAVAILABLE')
-            expect(result.error.intent).toBe('SHIPPING_ADDRESS')
-        })
-    })
-
-    describe('updateShippingOption', () => {
-        it('should update shipping option successfully', async () => {
-            mockShippingMethodsService.updateShippingMethod.mockResolvedValue({
-                currency: 'USD',
-                orderTotal: 100.0
-            })
-
-            const result = await updateShippingOption(
-                mockAuthToken,
-                mockSite,
-                mockBasket,
-                'method-1'
-            )
-
-            expect(mockShippingMethodsService.updateShippingMethod).toHaveBeenCalledWith(
-                'method-1',
-                mockBasket.basketId
-            )
-            expect(result).toHaveProperty('paymentDataRequestUpdate')
-            expect(result).toHaveProperty('newBasket')
-        })
-
-        it('should handle shipping option update error', async () => {
-            mockShippingMethodsService.updateShippingMethod.mockResolvedValue({
-                error: 'Method not available'
-            })
-
-            const result = await updateShippingOption(
-                mockAuthToken,
-                mockSite,
-                mockBasket,
-                'method-1'
-            )
-
-            expect(result.error.reason).toBe('SHIPPING_OPTION_UNAVAILABLE')
-            expect(result.error.intent).toBe('SHIPPING_OPTION')
-        })
-
-        it('should handle exceptions gracefully', async () => {
-            mockShippingMethodsService.updateShippingMethod.mockRejectedValue(
-                new Error('Network error')
-            )
-
-            const result = await updateShippingOption(
-                mockAuthToken,
-                mockSite,
-                mockBasket,
-                'method-1'
-            )
-
-            expect(result.error.reason).toBe('SHIPPING_OPTION_UNAVAILABLE')
-            expect(result.error.intent).toBe('SHIPPING_OPTION')
-        })
-    })
-
-    describe('getGoogleButtonConfig', () => {
-        it('should return button configuration with correct structure', () => {
-            const googlePayConfig = {type: 'googlepay'}
-            const result = getGoogleButtonConfig(
-                mockAuthToken,
-                mockSite,
-                mockBasket,
-                googlePayConfig,
-                'test-sku',
-                jest.fn(),
-                null,
-                true,
-                1
-            )
-
-            expect(result).toHaveProperty('showPayButton', true)
-            expect(result).toHaveProperty('buttonType', 'plain')
-            expect(result).toHaveProperty('isExpress', true)
-            expect(result).toHaveProperty('shippingAddressRequired', true)
-            expect(result).toHaveProperty('shippingOptionRequired', true)
-            expect(result).toHaveProperty('billingAddressRequired', true)
-            expect(result).toHaveProperty('emailRequired', true)
-            expect(result).toHaveProperty('configuration', googlePayConfig)
-            expect(result).toHaveProperty('amount')
-            expect(result).toHaveProperty('onAuthorized')
-            expect(result).toHaveProperty('onSubmit')
-            expect(result).toHaveProperty('callbackIntents')
-            expect(result).toHaveProperty('paymentDataCallbacks')
-            expect(result).toHaveProperty('onError')
-        })
-
-        it('should handle PDP mode with temporary basket creation', async () => {
-            const setTempBasket = jest.fn()
-            const tempBasket = null
-            const googlePayConfig = {type: 'googlepay'}
-
-            createTemporaryBasket.mockResolvedValue({
-                basketId: 'temp-basket-id',
-                orderTotal: 50.0,
-                currency: 'USD'
-            })
-
-            const result = getGoogleButtonConfig(
-                mockAuthToken,
-                mockSite,
-                mockBasket,
-                googlePayConfig,
-                'test-sku',
-                setTempBasket,
-                tempBasket,
-                true,
-                1
-            )
-
-            // Test the getOrCreateBasket function within the config
-            const basketToUse = await result.paymentDataCallbacks.onPaymentDataChanged({
-                callbackTrigger: 'INITIALIZE',
-                shippingAddress: {},
-                shippingOptionData: {}
-            })
-
-            expect(createTemporaryBasket).toHaveBeenCalledWith(
-                'test-sku',
-                mockAuthToken,
-                mockSite,
-                1
-            )
+        // Should still try to create checkout even without basket data in PDP mode
+        await waitFor(() => {
+            expect(createAdyenCheckout).toHaveBeenCalled()
         })
     })
 })

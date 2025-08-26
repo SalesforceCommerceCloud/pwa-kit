@@ -545,9 +545,7 @@ export const ApplePayExpress = ({
                 }
 
                 const handleApplePayUnavailable = () => {
-                    if (manager) {
-                        manager.setPaymentMethodUnavailable(PAYMENT_METHOD)
-                    }
+                    manager.setPaymentMethodUnavailable(PAYMENT_METHOD)
                 }
 
                 // For PDP mode, we don't need a basket initially but we do need payment methods
@@ -628,9 +626,7 @@ export const ApplePayExpress = ({
 
                     try {
                         await applePayButton.mount(paymentContainer.current)
-                        if (manager) {
-                            manager.setPaymentMethodAvailable(PAYMENT_METHOD)
-                        }
+                        manager.setPaymentMethodAvailable(PAYMENT_METHOD)
                     } catch (error) {
                         console.error('Failed to mount Apple Pay button:', error)
                         handleApplePayUnavailable()
@@ -670,19 +666,14 @@ export const ApplePayExpress = ({
     const shouldRender = validateExpressPaymentSetup({
         isPdpMode,
         adyenPaymentMethods,
-        hasRequiredBasketData,
-        sku,
-        basket,
-        authToken
+        hasRequiredBasketData
     })
 
     if (!shouldRender) {
         return null
     }
 
-    return (
-        <div ref={paymentContainer} style={{height: '40px'}} data-testid="apple-pay-express"></div>
-    )
+    return <div ref={paymentContainer} style={{height: '40px'}}></div>
 }
 
 ApplePayExpress.propTypes = {
