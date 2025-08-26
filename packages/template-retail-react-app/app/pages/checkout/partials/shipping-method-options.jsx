@@ -23,7 +23,7 @@ import {STORE_LOCATOR_IS_ENABLED} from '@salesforce/retail-react-app/app/constan
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 
 // Component to handle shipping options for a single shipment (without product cards)
-const ShippingOptionsList = ({shipment, basketId, currency, control}) => {
+const ShippingMethodOptions = ({shipment, basketId, currency, control}) => {
     const {formatMessage} = useIntl()
     const storeLocatorEnabled = getConfig()?.app?.storeLocatorEnabled ?? STORE_LOCATOR_IS_ENABLED
     const {data: shippingMethods, isLoading: isShippingMethodsLoading} =
@@ -157,7 +157,7 @@ const ShippingOptionsList = ({shipment, basketId, currency, control}) => {
     )
 }
 
-ShippingOptionsList.propTypes = {
+ShippingMethodOptions.propTypes = {
     shipment: PropTypes.shape({
         shipmentId: PropTypes.string.isRequired,
         shippingAddress: PropTypes.shape({
@@ -177,4 +177,4 @@ ShippingOptionsList.propTypes = {
     control: PropTypes.object.isRequired
 }
 
-export default ShippingOptionsList
+export default ShippingMethodOptions

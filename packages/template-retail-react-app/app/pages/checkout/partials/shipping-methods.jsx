@@ -30,7 +30,7 @@ import LoadingSpinner from '@salesforce/retail-react-app/app/components/loading-
 import PropTypes from 'prop-types'
 
 import ShippingProductCards from '@salesforce/retail-react-app/app/pages/checkout/partials/shipping-product-cards'
-import ShippingOptionsList from '@salesforce/retail-react-app/app/pages/checkout/partials/shipping-options-list'
+import ShippingMethodOptions from '@salesforce/retail-react-app/app/pages/checkout/partials/shipping-method-options'
 
 // Component to handle combined product cards and shipping options for multiship
 const MultiAddressShipmentMethod = ({shipment, basketId, currency, control, basket}) => {
@@ -76,7 +76,7 @@ const MultiAddressShipmentMethod = ({shipment, basketId, currency, control, bask
                     <ShippingProductCards shipment={shipment} basket={basket} />
 
                     {/* Shipping Options */}
-                    <ShippingOptionsList
+                    <ShippingMethodOptions
                         shipment={shipment}
                         basketId={basketId}
                         currency={currency}
@@ -124,7 +124,7 @@ MultiAddressShipmentMethod.propTypes = {
     }).isRequired
 }
 
-export default function ShippingOptions() {
+export default function ShippingMethods() {
     const {formatMessage} = useIntl()
     const {step, STEPS, goToStep, goToNextStep} = useCheckout()
     const {
@@ -270,7 +270,7 @@ export default function ShippingOptions() {
                                     />
                                 ) : (
                                     // Single ship: Show only shipping options
-                                    <ShippingOptionsList
+                                    <ShippingMethodOptions
                                         shipment={shipment}
                                         basketId={basket.basketId}
                                         currency={currency}

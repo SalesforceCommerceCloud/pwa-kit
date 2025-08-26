@@ -8,7 +8,7 @@ import React from 'react'
 import {render, screen, waitFor} from '@testing-library/react'
 import {IntlProvider} from 'react-intl'
 import {CurrencyProvider} from '@salesforce/retail-react-app/app/contexts'
-import ShippingOptions from '@salesforce/retail-react-app/app/pages/checkout/partials/shipping-options'
+import ShippingMethods from '@salesforce/retail-react-app/app/pages/checkout/partials/shipping-methods'
 import {useCheckout} from '@salesforce/retail-react-app/app/pages/checkout/util/checkout-context'
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
 import {useCurrency} from '@salesforce/retail-react-app/app/hooks'
@@ -148,7 +148,7 @@ const renderWithIntl = (component) => {
     )
 }
 
-describe('ShippingOptions', () => {
+describe('ShippingMethods', () => {
     beforeEach(() => {
         mockUseCheckout.mockReturnValue(defaultProps)
         mockUseCurrentBasket.mockReturnValue({
@@ -185,7 +185,7 @@ describe('ShippingOptions', () => {
                 isLoading: true
             })
 
-            renderWithIntl(<ShippingOptions />)
+            renderWithIntl(<ShippingMethods />)
 
             expect(screen.getAllByTestId('loading').length).toBeGreaterThan(0)
         })
@@ -196,7 +196,7 @@ describe('ShippingOptions', () => {
                 isLoading: true
             })
 
-            renderWithIntl(<ShippingOptions />)
+            renderWithIntl(<ShippingMethods />)
 
             // Wait for the loading spinner to appear
             await waitFor(() => {
@@ -221,7 +221,7 @@ describe('ShippingOptions', () => {
                 isLoading: true
             })
 
-            renderWithIntl(<ShippingOptions />)
+            renderWithIntl(<ShippingMethods />)
 
             expect(screen.getAllByTestId('loading').length).toBeGreaterThan(0)
         })
@@ -229,7 +229,7 @@ describe('ShippingOptions', () => {
 
     describe('Component Rendering', () => {
         test('should render shipping options when all data is loaded', () => {
-            renderWithIntl(<ShippingOptions />)
+            renderWithIntl(<ShippingMethods />)
 
             expect(screen.getByText('Shipping & Gift Options')).toBeInTheDocument()
             expect(screen.getByText('Standard Shipping')).toBeInTheDocument()
@@ -237,7 +237,7 @@ describe('ShippingOptions', () => {
         })
 
         test('should render shipping methods correctly', () => {
-            renderWithIntl(<ShippingOptions />)
+            renderWithIntl(<ShippingMethods />)
 
             expect(screen.getByText('Standard Shipping')).toBeInTheDocument()
             expect(screen.getByText('Express Shipping')).toBeInTheDocument()
@@ -246,7 +246,7 @@ describe('ShippingOptions', () => {
         })
 
         test('should render shipping methods when shipping methods are loaded', () => {
-            renderWithIntl(<ShippingOptions />)
+            renderWithIntl(<ShippingMethods />)
 
             expect(screen.getByText('Standard Shipping')).toBeInTheDocument()
             expect(screen.getByText('Express Shipping')).toBeInTheDocument()
@@ -255,14 +255,14 @@ describe('ShippingOptions', () => {
         })
 
         test('should display shipping cost from derivedData correctly', () => {
-            renderWithIntl(<ShippingOptions />)
+            renderWithIntl(<ShippingMethods />)
             expect(screen.getByText('$5.99')).toBeInTheDocument()
         })
     })
 
     describe('Form Functionality', () => {
         test('should render continue button when shipping method is selected', () => {
-            renderWithIntl(<ShippingOptions />)
+            renderWithIntl(<ShippingMethods />)
 
             const continueButton = screen.getByText('Continue to Payment')
             expect(continueButton).toBeInTheDocument()
@@ -289,7 +289,7 @@ describe('ShippingOptions', () => {
                 isLoading: false
             })
 
-            renderWithIntl(<ShippingOptions />)
+            renderWithIntl(<ShippingMethods />)
 
             const continueButton = screen.getByText('Continue to Payment')
             expect(continueButton).toBeDisabled()
@@ -344,7 +344,7 @@ describe('ShippingOptions', () => {
                 isLoading: false
             })
 
-            renderWithIntl(<ShippingOptions />)
+            renderWithIntl(<ShippingMethods />)
 
             expect(screen.getAllByText('Standard Shipping').length).toBeGreaterThan(0)
             expect(screen.getAllByText('Express Shipping').length).toBeGreaterThan(0)
@@ -361,7 +361,7 @@ describe('ShippingOptions', () => {
                 isLoading: false
             })
 
-            renderWithIntl(<ShippingOptions />)
+            renderWithIntl(<ShippingMethods />)
 
             // Should not crash and should show appropriate state
             expect(screen.getByText('Shipping & Gift Options')).toBeInTheDocument()
@@ -386,7 +386,7 @@ describe('ShippingOptions', () => {
                 isLoading: false
             })
 
-            renderWithIntl(<ShippingOptions />)
+            renderWithIntl(<ShippingMethods />)
 
             // Should not crash and should show appropriate state
             expect(screen.getByText('Shipping & Gift Options')).toBeInTheDocument()
@@ -395,7 +395,7 @@ describe('ShippingOptions', () => {
 
     describe('Product Display', () => {
         test('should render shipping options component with basic structure', () => {
-            renderWithIntl(<ShippingOptions />)
+            renderWithIntl(<ShippingMethods />)
 
             // Check that the main component structure is rendered
             expect(screen.getByText('Shipping & Gift Options')).toBeInTheDocument()
@@ -425,7 +425,7 @@ describe('ShippingOptions', () => {
                 isLoading: false
             })
 
-            renderWithIntl(<ShippingOptions />)
+            renderWithIntl(<ShippingMethods />)
 
             expect(screen.getByText('Free shipping on orders over $50')).toBeInTheDocument()
         })
@@ -442,7 +442,7 @@ describe('ShippingOptions', () => {
                 isLoading: true
             })
 
-            const {rerender} = renderWithIntl(<ShippingOptions />)
+            const {rerender} = renderWithIntl(<ShippingMethods />)
             expect(screen.getAllByTestId('loading').length).toBeGreaterThan(0)
 
             // Transition to loaded state
@@ -457,7 +457,7 @@ describe('ShippingOptions', () => {
             rerender(
                 <CurrencyProvider currency="USD">
                     <IntlProvider locale="en">
-                        <ShippingOptions />
+                        <ShippingMethods />
                     </IntlProvider>
                 </CurrencyProvider>
             )
