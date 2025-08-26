@@ -11,111 +11,234 @@ import {
     Button,
     Container,
     Flex,
-    Radio,
-    RadioGroup,
     Stack,
-    Text
+    Text,
+    VStack
 } from '@salesforce/retail-react-app/app/components/shared/ui'
-import {useForm, Controller} from 'react-hook-form'
+import {useForm} from 'react-hook-form'
 import {useCheckout} from '@salesforce/retail-react-app/app/pages/checkout/util/checkout-context'
-import {ChevronDownIcon} from '@salesforce/retail-react-app/app/components/icons'
 import {
     ToggleCard,
     ToggleCardEdit,
     ToggleCardSummary
 } from '@salesforce/retail-react-app/app/components/toggle-card'
-import {
-    useShippingMethodsForShipment,
-    useShopperBasketsMutation
-} from '@salesforce/commerce-sdk-react'
+import {useShopperBasketsMutation} from '@salesforce/commerce-sdk-react'
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
 import {useCurrency} from '@salesforce/retail-react-app/app/hooks'
+import {isPickupShipment} from '@salesforce/retail-react-app/app/utils/shipment-utils'
+import LoadingSpinner from '@salesforce/retail-react-app/app/components/loading-spinner'
+import PropTypes from 'prop-types'
+
+import ShippingProductCards from '@salesforce/retail-react-app/app/pages/checkout/partials/shipping-product-cards'
+import ShippingOptionsList from '@salesforce/retail-react-app/app/pages/checkout/partials/shipping-options-list'
+
+// Component to handle combined product cards and shipping options for multiship
+const ShipmentOptionsWithProducts = ({shipment, basketId, currency, control, basket}) => {
+    const {formatMessage} = useIntl()
+
+    if (!shipment.shippingAddress) {
+        return null
+    }
+
+    return (
+        <VStack spacing={6} align="stretch">
+            {/* Delivery Address */}
+            <Box>
+                <Text fontWeight="bold" fontSize="md" mb={1}>
+                    {formatMessage(
+                        {
+                            defaultMessage: 'Shipping to {name}',
+                            id: 'shipping_options.label.shipping_to'
+                        },
+                        {
+                            name: `${shipment.shippingAddress.firstName} ${shipment.shippingAddress.lastName}`
+                        }
+                    )}
+                </Text>
+                <Text fontSize="sm" color="gray.600">
+                    {shipment.shippingAddress.address1}, {shipment.shippingAddress.city},{' '}
+                    {shipment.shippingAddress.stateCode} {shipment.shippingAddress.postalCode}
+                </Text>
+            </Box>
+
+            {/* Combined Product Cards and Shipping Options */}
+            <Box
+                border="1px solid"
+                borderColor="gray.200"
+                borderRadius="lg"
+                pt={2}
+                pb={4}
+                px={2}
+                bg="white"
+            >
+                <VStack spacing={4} align="stretch">
+                    {/* Product Cards */}
+                    <ShippingProductCards shipment={shipment} basket={basket} />
+
+                    {/* Shipping Options */}
+                    <ShippingOptionsList
+                        shipment={shipment}
+                        basketId={basketId}
+                        currency={currency}
+                        control={control}
+                    />
+                </VStack>
+            </Box>
+        </VStack>
+    )
+}
+
+ShipmentOptionsWithProducts.propTypes = {
+    shipment: PropTypes.shape({
+        shipmentId: PropTypes.string.isRequired,
+        shippingAddress: PropTypes.shape({
+            firstName: PropTypes.string,
+            lastName: PropTypes.string,
+            address1: PropTypes.string,
+            city: PropTypes.string,
+            stateCode: PropTypes.string,
+            postalCode: PropTypes.string
+        }),
+        shippingMethod: PropTypes.shape({
+            id: PropTypes.string
+        })
+    }).isRequired,
+    basketId: PropTypes.string.isRequired,
+    currency: PropTypes.string.isRequired,
+    control: PropTypes.object.isRequired,
+    basket: PropTypes.shape({
+        productItems: PropTypes.arrayOf(
+            PropTypes.shape({
+                itemId: PropTypes.string.isRequired,
+                shipmentId: PropTypes.string,
+                productName: PropTypes.string,
+                image: PropTypes.string,
+                imageUrl: PropTypes.string,
+                primaryImage: PropTypes.string,
+                images: PropTypes.array,
+                quantity: PropTypes.number,
+                variationValues: PropTypes.object,
+                variations: PropTypes.object
+            })
+        )
+    }).isRequired
+}
 
 export default function ShippingOptions() {
     const {formatMessage} = useIntl()
     const {step, STEPS, goToStep, goToNextStep} = useCheckout()
-    const {data: basket} = useCurrentBasket()
+    const {data: basket, isLoading: isBasketLoading} = useCurrentBasket()
     const {currency} = useCurrency()
     const updateShippingMethod = useShopperBasketsMutation('updateShippingMethodForShipment')
-    const {data: shippingMethods} = useShippingMethodsForShipment(
-        {
-            parameters: {
-                basketId: basket?.basketId,
-                shipmentId: 'me'
-            }
-        },
-        {
-            enabled: Boolean(basket?.basketId) && step === STEPS.SHIPPING_OPTIONS
-        }
-    )
 
-    const selectedShippingMethod = basket?.shipments?.[0]?.shippingMethod
-    const selectedShippingAddress = basket?.shipments?.[0]?.shippingAddress
+    const deliveryShipments =
+        (basket &&
+            basket.shipments &&
+            basket.shipments.filter(
+                (shipment) => shipment.shippingAddress && !isPickupShipment(shipment)
+            )) ||
+        []
+
+    const hasMultipleDeliveryShipments = deliveryShipments.length > 1
+
+    // Build initial form values
+    const getInitialValues = () => {
+        const values = {}
+        deliveryShipments.forEach((shipment) => {
+            values[`shippingMethodId_${shipment.shipmentId}`] =
+                (shipment.shippingMethod && shipment.shippingMethod.id) || ''
+        })
+        return values
+    }
 
     const form = useForm({
-        shouldUnregister: false,
-        defaultValues: {
-            shippingMethodId: selectedShippingMethod?.id || shippingMethods?.defaultShippingMethodId
-        }
+        mode: 'onChange',
+        defaultValues: getInitialValues()
     })
 
+    // Update form when shipments change
     useEffect(() => {
-        const defaultMethodId = shippingMethods?.defaultShippingMethodId
-        const methodId = form.getValues().shippingMethodId
-        if (!selectedShippingMethod && !methodId && defaultMethodId) {
-            form.reset({shippingMethodId: defaultMethodId})
-        }
-        if (selectedShippingMethod && methodId !== selectedShippingMethod.id) {
-            form.reset({shippingMethodId: selectedShippingMethod.id})
-        }
-    }, [selectedShippingMethod, shippingMethods])
+        const currentValues = form.getValues()
+        const newDefaults = getInitialValues()
 
-    const submitForm = async ({shippingMethodId}) => {
-        await updateShippingMethod.mutateAsync({
-            parameters: {
-                basketId: basket.basketId,
-                shipmentId: 'me'
-            },
-            body: {
-                id: shippingMethodId
+        // Only reset if there are new fields or values have changed
+        const hasNewFields = Object.keys(newDefaults).some((key) => !(key in currentValues))
+        if (hasNewFields) {
+            form.reset(newDefaults)
+        }
+    }, [deliveryShipments.length])
+
+    const submitForm = async (formData) => {
+        // Submit shipping method for each shipment
+        const promises = deliveryShipments.map((shipment) => {
+            const methodId = formData[`shippingMethodId_${shipment.shipmentId}`]
+            if (methodId) {
+                return updateShippingMethod.mutateAsync({
+                    parameters: {
+                        basketId: basket.basketId,
+                        shipmentId: shipment.shipmentId
+                    },
+                    body: {
+                        id: methodId
+                    }
+                })
             }
+            return Promise.resolve()
         })
+
+        await Promise.all(promises)
         goToNextStep()
     }
 
-    const shippingItem = basket?.shippingItems?.[0]
-
-    const selectedMethodDisplayPrice = Math.min(
-        shippingItem?.price || 0,
-        shippingItem?.priceAfterItemDiscount || 0
-    )
+    // Calculate total shipping info
+    const totalShippingCost =
+        (basket &&
+            basket.shippingItems &&
+            basket.shippingItems.reduce((total, item) => {
+                return total + (item.priceAfterItemDiscount || item.price || 0)
+            }, 0)) ||
+        0
 
     const freeLabel = formatMessage({
         defaultMessage: 'Free',
         id: 'checkout_confirmation.label.free'
     })
 
-    let shippingPriceLabel = selectedMethodDisplayPrice
-    if (selectedMethodDisplayPrice !== shippingItem.price) {
-        const currentPrice =
-            selectedMethodDisplayPrice === 0 ? freeLabel : selectedMethodDisplayPrice
+    // Check if all shipments have valid shipping info
+    const hasValidShippingInfo =
+        deliveryShipments.length > 0 && deliveryShipments.every((s) => s.shippingAddress)
 
-        shippingPriceLabel = formatMessage(
-            {
-                defaultMessage: 'Originally {originalPrice}, now {newPrice}',
-                id: 'checkout_confirmation.label.shipping.strikethrough.price'
-            },
-            {
-                originalPrice: shippingItem.price,
-                newPrice: currentPrice
-            }
+    const isFormValid =
+        form.formState.isValid ||
+        deliveryShipments.every((s) => s.shippingMethod && s.shippingMethod.id)
+
+    // Show loading spinner if basket is loading
+    if (isBasketLoading) {
+        return (
+            <ToggleCard
+                id="step-2"
+                title={formatMessage({
+                    defaultMessage: 'Shipping & Gift Options',
+                    id: 'shipping_options.title.shipping_gift_options'
+                })}
+                editing={step === STEPS.SHIPPING_OPTIONS}
+                isLoading={true}
+                disabled={true}
+                onEdit={() => goToStep(STEPS.SHIPPING_OPTIONS)}
+                editLabel={formatMessage({
+                    defaultMessage: 'Edit Shipping Options',
+                    id: 'toggle_card.action.editShippingOptions'
+                })}
+            >
+                <ToggleCardEdit>
+                    <Box display="flex" justifyContent="center" alignItems="center" minH="200px">
+                        <LoadingSpinner />
+                    </Box>
+                </ToggleCardEdit>
+            </ToggleCard>
         )
     }
 
-    // Note that this card is disabled when there is no shipping address as well as no shipping method.
-    // We do this because we apply the default shipping method to the basket before checkout - so when
-    // landing on checkout the first time will put you at the first step (contact info), but the shipping
-    // method step would appear filled out already. This fix attempts to avoid any confusion in the UI.
     return (
         <ToggleCard
             id="step-2"
@@ -125,7 +248,7 @@ export default function ShippingOptions() {
             })}
             editing={step === STEPS.SHIPPING_OPTIONS}
             isLoading={form.formState.isSubmitting}
-            disabled={selectedShippingMethod == null || !selectedShippingAddress}
+            disabled={!hasValidShippingInfo}
             onEdit={() => goToStep(STEPS.SHIPPING_OPTIONS)}
             editLabel={formatMessage({
                 defaultMessage: 'Edit Shipping Options',
@@ -138,71 +261,33 @@ export default function ShippingOptions() {
                     data-testid="sf-checkout-shipping-options-form"
                 >
                     <Stack spacing={6}>
-                        {shippingMethods?.applicableShippingMethods && (
-                            <Controller
-                                name="shippingMethodId"
-                                control={form.control}
-                                defaultValue=""
-                                render={({field: {value, onChange}}) => (
-                                    <RadioGroup
-                                        name="shipping-options-radiogroup"
-                                        value={value}
-                                        onChange={onChange}
-                                    >
-                                        <Stack spacing={5}>
-                                            {shippingMethods.applicableShippingMethods.map(
-                                                (opt) => (
-                                                    <Radio value={opt.id} key={opt.id}>
-                                                        <Flex justify="space-between" w="full">
-                                                            <Box>
-                                                                <Text>{opt.name}</Text>
-                                                                <Text
-                                                                    fontSize="sm"
-                                                                    color="gray.600"
-                                                                >
-                                                                    {opt.description}
-                                                                </Text>
-                                                            </Box>
-                                                            <Text fontWeight="bold">
-                                                                <FormattedNumber
-                                                                    value={opt.price}
-                                                                    style="currency"
-                                                                    currency={currency}
-                                                                />
-                                                            </Text>
-                                                        </Flex>
-
-                                                        {opt.shippingPromotions?.map((promo) => {
-                                                            return (
-                                                                <Text
-                                                                    key={promo.promotionId}
-                                                                    fontSize="sm"
-                                                                    color="green.600"
-                                                                >
-                                                                    {promo.calloutMsg}
-                                                                </Text>
-                                                            )
-                                                        })}
-                                                    </Radio>
-                                                )
-                                            )}
-                                        </Stack>
-                                    </RadioGroup>
+                        {/* Dynamically create shipping method options for each shipment */}
+                        {deliveryShipments.map((shipment) => (
+                            <Box key={shipment.shipmentId}>
+                                {hasMultipleDeliveryShipments ? (
+                                    // Multiship: Show both product cards and shipping options
+                                    <ShipmentOptionsWithProducts
+                                        shipment={shipment}
+                                        basketId={basket.basketId}
+                                        currency={currency}
+                                        control={form.control}
+                                        basket={basket}
+                                    />
+                                ) : (
+                                    // Single ship: Show only shipping options
+                                    <ShippingOptionsList
+                                        shipment={shipment}
+                                        basketId={basket.basketId}
+                                        currency={currency}
+                                        control={form.control}
+                                    />
                                 )}
-                            />
-                        )}
+                            </Box>
+                        ))}
 
-                        <Box>
-                            <Button variant="link" size="sm" rightIcon={<ChevronDownIcon />}>
-                                <FormattedMessage
-                                    defaultMessage="Do you want to send this as a gift?"
-                                    id="shipping_options.action.send_as_a_gift"
-                                />
-                            </Button>
-                        </Box>
                         <Box>
                             <Container variant="form">
-                                <Button w="full" type="submit">
+                                <Button w="full" type="submit" isDisabled={!isFormValid}>
                                     <FormattedMessage
                                         defaultMessage="Continue to Payment"
                                         id="shipping_options.button.continue_to_payment"
@@ -214,54 +299,107 @@ export default function ShippingOptions() {
                 </form>
             </ToggleCardEdit>
 
-            {selectedShippingMethod && selectedShippingAddress && (
+            {hasValidShippingInfo && (
                 <ToggleCardSummary>
-                    <Flex justify="space-between" w="full">
-                        <Text>{selectedShippingMethod.name}</Text>
-                        <Flex alignItems="center" aria-label={shippingPriceLabel} role="group">
-                            <Text fontWeight="bold" aria-hidden="true" role="presentation">
-                                {selectedMethodDisplayPrice === 0 ? (
-                                    freeLabel
-                                ) : (
-                                    <FormattedNumber
-                                        value={selectedMethodDisplayPrice}
-                                        style="currency"
-                                        currency={currency}
-                                    />
-                                )}
-                            </Text>
-                            {selectedMethodDisplayPrice !== shippingItem.price && (
-                                <Text
-                                    fontWeight="normal"
-                                    textDecoration="line-through"
-                                    color="gray.600"
-                                    marginLeft={1}
-                                    aria-hidden="true"
-                                    role="presentation"
-                                >
-                                    <FormattedNumber
-                                        style="currency"
-                                        currency={currency}
-                                        value={shippingItem.price}
-                                    />
-                                </Text>
+                    {deliveryShipments.length === 1 ? (
+                        // Single shipment summary
+                        <Box>
+                            {deliveryShipments[0].shippingMethod && (
+                                <>
+                                    <Flex justify="space-between" w="full">
+                                        <Text>{deliveryShipments[0].shippingMethod.name}</Text>
+                                        <Text fontWeight="bold">
+                                            {totalShippingCost === 0 ? (
+                                                freeLabel
+                                            ) : (
+                                                <FormattedNumber
+                                                    value={totalShippingCost}
+                                                    style="currency"
+                                                    currency={currency}
+                                                />
+                                            )}
+                                        </Text>
+                                    </Flex>
+                                    <Text fontSize="sm" color="gray.700">
+                                        {deliveryShipments[0].shippingMethod.description}
+                                    </Text>
+                                </>
                             )}
-                        </Flex>
-                    </Flex>
-                    <Text fontSize="sm" color="gray.700">
-                        {selectedShippingMethod.description}
-                    </Text>
-                    {shippingItem?.priceAdjustments?.map((adjustment) => {
-                        return (
-                            <Text
-                                key={adjustment.priceAdjustmentId}
-                                fontSize="sm"
-                                color="green.600"
-                            >
-                                {adjustment.itemText}
-                            </Text>
-                        )
-                    })}
+                        </Box>
+                    ) : (
+                        // Multiple shipments summary
+                        <Stack spacing={2}>
+                            {deliveryShipments.map((shipment) => {
+                                const shippingItem =
+                                    basket &&
+                                    basket.shippingItems &&
+                                    basket.shippingItems.find(
+                                        (item) => item.shipmentId === shipment.shipmentId
+                                    )
+                                const itemCost =
+                                    (shippingItem && shippingItem.priceAfterItemDiscount) ||
+                                    (shippingItem && shippingItem.price) ||
+                                    0
+
+                                return (
+                                    <Box key={shipment.shipmentId}>
+                                        <Flex justify="space-between" w="full">
+                                            <Box flex="1">
+                                                {shipment.shippingMethod ? (
+                                                    <>
+                                                        <Text mt={2}>
+                                                            {shipment.shippingMethod.name}
+                                                        </Text>
+                                                        <Text fontSize="sm" color="gray.700">
+                                                            {shipment.shippingMethod.description}
+                                                        </Text>
+                                                    </>
+                                                ) : (
+                                                    <Text mt={2} fontSize="sm" color="gray.500">
+                                                        {formatMessage({
+                                                            defaultMessage:
+                                                                'No shipping method selected',
+                                                            id: 'shipping_options.label.no_method_selected'
+                                                        })}
+                                                    </Text>
+                                                )}
+                                            </Box>
+                                            <Text fontWeight="bold" fontSize="sm">
+                                                {itemCost === 0 ? (
+                                                    freeLabel
+                                                ) : (
+                                                    <FormattedNumber
+                                                        value={itemCost}
+                                                        style="currency"
+                                                        currency={currency}
+                                                    />
+                                                )}
+                                            </Text>
+                                        </Flex>
+                                    </Box>
+                                )
+                            })}
+                            {deliveryShipments.length > 1 && (
+                                <Box borderTopWidth="1px" pt={2} mt={2}>
+                                    <Flex justify="space-between" w="full">
+                                        <Text fontWeight="semibold">
+                                            {formatMessage({
+                                                defaultMessage: 'Total Shipping',
+                                                id: 'shipping_options.label.total_shipping'
+                                            })}
+                                        </Text>
+                                        <Text fontWeight="bold">
+                                            <FormattedNumber
+                                                value={totalShippingCost}
+                                                style="currency"
+                                                currency={currency}
+                                            />
+                                        </Text>
+                                    </Flex>
+                                </Box>
+                            )}
+                        </Stack>
+                    )}
                 </ToggleCardSummary>
             )}
         </ToggleCard>
