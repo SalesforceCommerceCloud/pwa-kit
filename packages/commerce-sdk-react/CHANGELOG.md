@@ -1,3 +1,6 @@
+## v4.0.0-nightly-20250826080215 (Aug 26, 2025)
+## v4.0.0-dev (Aug 26, 2025)
+## v3.12.0-nightly-20250826080215 (Aug 26, 2025)
 ## v4.0.0-dev (Aug 18, 2025)
 - Upgrade to commerce-sdk-isomorphic v4.0.0 [2879](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2879)
 - Add support for environment level base paths on /mobify routes [#2892](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2892)
