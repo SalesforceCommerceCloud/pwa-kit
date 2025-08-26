@@ -55,7 +55,7 @@ const ShippingMultiAddress = ({basket, submitButtonLabel, noItemsInBasketMessage
             }
         }
     )
-    const {isLoading: customerLoading} = useCurrentCustomer()
+    const {data: customer, isLoading: customerLoading} = useCurrentCustomer()
 
     const {
         form: addressForm,
@@ -67,7 +67,7 @@ const ShippingMultiAddress = ({basket, submitButtonLabel, noItemsInBasketMessage
         isAddressFormOpen
     } = useAddressForm(
         productAddressAssignment.addGuestAddress,
-        productAddressAssignment.isGuest,
+        customer?.isGuest,
         productAddressAssignment.setAddressesForItems,
         productAddressAssignment.availableAddresses,
         productAddressAssignment.deliveryItems
@@ -79,8 +79,7 @@ const ShippingMultiAddress = ({basket, submitButtonLabel, noItemsInBasketMessage
     const [isSubmitting, setIsSubmitting] = useState(false)
 
     // guests only products loading since they may not have addresses yet
-    const isLoading =
-        (productAddressAssignment.isGuest ? false : customerLoading) || productsLoading
+    const isLoading = (customer?.isGuest ? false : customerLoading) || productsLoading
 
     const allShipmentsHaveAddress = productAddressAssignment.allItemsHaveAddresses
 
@@ -204,7 +203,7 @@ const ShippingMultiAddress = ({basket, submitButtonLabel, noItemsInBasketMessage
                                         productAddressAssignment.selectedAddresses[addressKey]
                                     }
                                     availableAddresses={addresses}
-                                    isGuestUser={productAddressAssignment.isGuest}
+                                    isGuestUser={customer?.isGuest}
                                     customerLoading={customerLoading}
                                     onAddressSelect={productAddressAssignment.setAddressesForItems}
                                     onAddNewAddress={openForm}
