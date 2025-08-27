@@ -12,11 +12,16 @@ const {answerConsentTrackingForm} = require('../../scripts/pageHelpers.js')
 
 const GUEST_USER_CREDENTIALS = generateUserCredentials()
 
+// Skip this test suite if not running private client tests
+test.skip(
+    () => !process.env.RUN_PRIVATE_CLIENT_TESTS,
+    'Passwordless login tests require private client configuration'
+)
 /**
  * Test that a user can login with passwordless login on mobile. There is no programmatic way to check the email,
  * so we will check that the necessary API call is being made and expected UI is shown
  */
-test('Verify passwordless login request on mobile', async ({page}) => {
+test('Verify passwordless login request', async ({page}) => {
     let interceptedRequest = null
 
     await page.route(
@@ -33,7 +38,6 @@ test('Verify passwordless login request on mobile', async ({page}) => {
     await page.locator('#email').scrollIntoViewIfNeeded()
     await page.fill('#email', config.PWA_E2E_USER_EMAIL)
 
-    await page.getByRole('button', {name: 'Continue Securely'}).scrollIntoViewIfNeeded()
     await page.getByRole('button', {name: 'Continue Securely'}).click()
 
     await page.waitForResponse(
@@ -54,9 +58,7 @@ test('Verify passwordless login request on mobile', async ({page}) => {
     expect(params.get('callback_uri')).toMatch(/.*\/passwordless-login-callback$/)
 })
 
-test('Verify password reset callback request on mobile (extra features enabled)', async ({
-    page
-}) => {
+test('Verify password reset callback request', async ({page}) => {
     let interceptedRequest = null
 
     await page.route(
@@ -77,7 +79,7 @@ test('Verify password reset callback request on mobile (extra features enabled)'
     await page.getByRole('button', {name: 'Forgot password?'}).click()
 
     await page.fill('#email', config.PWA_E2E_USER_EMAIL)
-    await page.getByRole('button', {name: /reset password/i}).click()
+    await page.getByRole('button', {name: 'Reset Password'}).click()
 
     await page.waitForResponse(
         '**/mobify/slas/private/shopper/auth/v1/organizations/*/oauth2/password/reset'
@@ -98,7 +100,8 @@ test('Verify password reset callback request on mobile (extra features enabled)'
     expect(params.get('hint')).toBe('cross_device')
 })
 
-test('Verify password reset callback request on mobile when extra login features are not enabled', async ({
+// Verify on the login UI that looks different when extra login features are not enabled
+test('Verify password reset callback request when extra login features are not enabled', async ({
     page
 }) => {
     let interceptedRequest = null
@@ -122,7 +125,6 @@ test('Verify password reset callback request on mobile when extra login features
     await page.waitForSelector('form[data-testid="sf-auth-modal-form"] >> text=Reset Password')
     await page.fill('form[data-testid="sf-auth-modal-form"] #email', config.PWA_E2E_USER_EMAIL)
     await page.getByRole('button', {name: /reset password/i}).click()
-
     await page.waitForResponse(
         '**/mobify/proxy/api/shopper/auth/v1/organizations/*/oauth2/password/reset'
     )
@@ -142,7 +144,7 @@ test('Verify password reset callback request on mobile when extra login features
     expect(params.get('hint')).toBe('cross_device')
 })
 
-test('Verify password reset request on mobile', async ({page}) => {
+test('Verify password reset request', async ({page}) => {
     let interceptedRequest = null
     await page.route(
         '**/mobify/slas/private/shopper/auth/v1/organizations/*/oauth2/password/action',
@@ -158,16 +160,11 @@ test('Verify password reset request on mobile', async ({page}) => {
     )
     await answerConsentTrackingForm(page)
 
-    await page.locator('#password').scrollIntoViewIfNeeded()
     await page.fill('#password', GUEST_USER_CREDENTIALS.password)
-
-    await page.locator('#confirmPassword').scrollIntoViewIfNeeded()
     await page.fill('#confirmPassword', GUEST_USER_CREDENTIALS.password)
 
     expect(await page.inputValue('#password')).toBe(GUEST_USER_CREDENTIALS.password)
     expect(await page.inputValue('#confirmPassword')).toBe(GUEST_USER_CREDENTIALS.password)
-
-    await page.getByRole('button', {name: 'Reset Password'}).scrollIntoViewIfNeeded()
     await page.getByRole('button', {name: 'Reset Password'}).click()
 
     await page.waitForResponse(

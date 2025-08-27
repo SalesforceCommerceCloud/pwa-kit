@@ -49,10 +49,14 @@ module.exports = {
         login: {
             passwordless: {
                 // Enables or disables passwordless login for the site. Defaults to: false
+                {{#if answers.project.login.passwordless.enabled}}
+                enabled: true,
+                {{else}}
                 {{#if answers.project.demo.enableDemoSettings}}
                 enabled: true,
                 {{else}}
                 enabled: false,
+                {{/if}}
                 {{/if}}
                 // The callback URI, which can be an absolute URL (including third-party URIs) or a relative path set up by the developer.
                 // Required in 'callback' mode; if missing, passwordless login defaults to 'sms' mode, which requires Marketing Cloud configuration.
@@ -64,10 +68,14 @@ module.exports = {
             },
             social: {
                 // Enables or disables social login for the site. Defaults to: false
+                {{#if answers.project.login.social.enabled}}
+                enabled: true,
+                {{else}}
                 {{#if answers.project.demo.enableDemoSettings}}
                 enabled: true,
                 {{else}}
                 enabled: false,
+                {{/if}}
                 {{/if}}
                 // The third-party identity providers supported by your app. The PWA Kit supports Google and Apple by default.
                 // Additional IDPs will also need to be added to the IDP_CONFIG in the SocialLogin component.

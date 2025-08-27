@@ -4,9 +4,12 @@ on:
   schedule:
     # Run every day at 12am (PST) - cron uses UTC times
     - cron: "0 8 * * *"
+  pull_request:
 
 jobs:
   run-generator-demo:
+    # Only run on scheduled events and manual dispatch (not on PRs)
+    if: ${{ github.event_name == 'schedule' || github.event_name == 'workflow_dispatch' }}
     strategy:
       fail-fast: false
       matrix:
@@ -61,6 +64,8 @@ jobs:
         with:
           PROJECT_KEY: "retail-app-demo"
   run-generator-retail-app-no-ext:
+    # Only run on scheduled events and manual dispatch (not on PRs)  
+    if: ${{ github.event_name == 'schedule' || github.event_name == 'workflow_dispatch' }}
     strategy:
       fail-fast: false
       # Run one matrix env at a time because we need to deploy each app to MRT and run e2e tests there
@@ -175,7 +180,8 @@ jobs:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
   run-generator-retail-app-ext:
     # Run after the previous job completes irrespective of its result
-    if: ${{ always() }}
+    # Only run on scheduled events and manual dispatch (not on PRs)
+    if: ${{ always() && (github.event_name == 'schedule' || github.event_name == 'workflow_dispatch') }}
     needs: [run-generator-retail-app-no-ext]
     strategy:
       fail-fast: false
@@ -297,6 +303,8 @@ jobs:
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
   run-generator-private-client:
+    # Run on PRs and scheduled runs  
+    if: ${{ github.event_name == 'pull_request' || github.event_name == 'schedule' || github.event_name == 'workflow_dispatch' }}
     strategy:
       fail-fast: false
       # Run one matrix env at a time because we need to deploy each app to MRT and run e2e tests there
@@ -347,6 +355,15 @@ jobs:
           version=`jq -r ".version" packages/template-retail-react-app/package.json`
           echo "retail_app_template_version=$version" >> "$GITHUB_ENV"
 
+      - name: Debug preset before generation
+        run: |
+          echo "=== Preset Configuration Debug ==="
+          node -e "const config = require('./e2e/config.js'); console.log('Preset for retail-app-private-client:', config.PRESET['retail-app-private-client'])"
+          echo ""
+          echo "=== Program.json preset content ==="
+          jq '.data.presets[] | select(.id == "retail-react-app-private-slas-client")' packages/pwa-kit-create-app/program.json
+          echo ""
+
       - name: Generate Retail App Private Client
         id: generate_app_private_client
         uses: ./.github/actions/e2e_generate_app
@@ -373,18 +390,17 @@ jobs:
           TARGET: e2e-pwa-kit-private
           FLAGS: --wait
 
-      - name: Set Retail App Private Client Home
-        run: export RETAIL_APP_HOME=https://scaffold-pwa-e2e-pwa-kit-private.mobify-storefront.com/
-
-      - name: Set PWA Kit E2E Test User
-        run: export PWA_E2E_USER_EMAIL=e2e.pwa.kit@gmail.com PWA_E2E_USER_PASSWORD=hpv_pek-JZK_xkz0wzf
-
       - name: Install Playwright Browsers
         run: npx playwright install --with-deps
 
       # this will not include a11y tests
       - name: Run Playwright tests
         run: npm run test:e2e
+        env:
+          RUN_PRIVATE_CLIENT_TESTS: true
+          PWA_E2E_USER_EMAIL: "e2e.pwa.kit@gmail.com"
+          PWA_E2E_USER_PASSWORD: "hpv_pek-JZK_xkz0wzf"
+          RETAIL_APP_HOME: "https://scaffold-pwa-e2e-pwa-kit-private.mobify-storefront.com/"
 
   notify-slack-pwa-private-client:
     needs: [run-generator-private-client]
@@ -414,25 +430,3 @@ jobs:
             }
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-
-  test-extra-features:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: npm
-      - name: Install Monorepo Dependencies
-        run: node ./scripts/gtime.js monorepo_install npm ci
-      - name: Install Playwright Browsers
-        run: npx playwright install --with-deps
-      - name: Set PWA Kit E2E Test User
-        run: export PWA_E2E_USER_EMAIL=e2e.pwa.kit@gmail.com PWA_E2E_USER_PASSWORD=hpv_pek-JZK_xkz0wzf
-      - name: Run extra features tests
-        env:
-          PWA_E2E_USER_EMAIL: e2e.pwa.kit@gmail.com
-          PWA_E2E_USER_PASSWORD: hpv_pek-JZK_xkz0wzf
-        run: npm run test:e2e:extra_features
