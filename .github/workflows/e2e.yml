@@ -378,6 +378,12 @@ jobs:
           # Add debug output at the top of the template
           sed -i '11i\\n// DEBUG: answers.project.login.passwordless.enabled = {{answers.project.login.passwordless.enabled}}\n// DEBUG: answers.project.login.social.enabled = {{answers.project.login.social.enabled}}\n// DEBUG: answers.project.demo.enableDemoSettings = {{answers.project.demo.enableDemoSettings}}\n' "$TEMPLATE_FILE"
           echo "Debug lines added to template"
+          
+          # Temporarily commit the debug changes to allow lerna publish
+          git config --global user.email "ci@example.com"
+          git config --global user.name "CI Debug"
+          git add "$TEMPLATE_FILE"
+          git commit -m "Temporary debug changes to template" || echo "Already committed"
 
       - name: Regenerate with debug template
         run: |
@@ -390,6 +396,12 @@ jobs:
           fi
           $COMMAND
         id: regenerate_debug
+
+      - name: Restore template file after debug
+        if: always()
+        run: |
+          # Revert the debug changes
+          git reset --hard HEAD~1 || echo "Failed to reset, template might remain modified"
 
       - name: Validate Generated Retail App Private Client
         uses: ./.github/actions/e2e_validate_generated_app
