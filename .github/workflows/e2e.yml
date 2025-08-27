@@ -375,9 +375,15 @@ jobs:
         run: |
           echo "=== Adding debug to template to see actual variables ==="
           TEMPLATE_FILE="packages/pwa-kit-create-app/assets/templates/@salesforce/retail-react-app/config/default.js.hbs"
-          # Add debug output at the top of the template
-          sed -i '11i\\n// DEBUG: answers.project.login.passwordless.enabled = {{answers.project.login.passwordless.enabled}}\n// DEBUG: answers.project.login.social.enabled = {{answers.project.login.social.enabled}}\n// DEBUG: answers.project.demo.enableDemoSettings = {{answers.project.demo.enableDemoSettings}}\n' "$TEMPLATE_FILE"
-          echo "Debug lines added to template"
+          
+          # Create backup
+          cp "$TEMPLATE_FILE" "$TEMPLATE_FILE.backup"
+          
+          # Add debug output after the copyright header (around line 10)
+          sed -i '10a\\n// DEBUG: Full context dump\n// answers = {{json answers}}\n// answers.project.login.passwordless.enabled = {{answers.project.login.passwordless.enabled}}\n// answers.project.login.social.enabled = {{answers.project.login.social.enabled}}\n' "$TEMPLATE_FILE"
+          
+          echo "Debug lines added to template - showing changes:"
+          head -20 "$TEMPLATE_FILE"
           
           # Temporarily commit the debug changes to allow lerna publish
           git config --global user.email "ci@example.com"
@@ -416,29 +422,24 @@ jobs:
           echo "PRESET: retail-react-app-private-slas-client"
           echo "TEMPLATE_VERSION: ${{ env.retail_app_template_version }}"
           echo ""
+          echo "=== Template Files Check ==="
+          echo "Checking if debug was added to template file:"
+          grep -n "DEBUG:" packages/pwa-kit-create-app/assets/templates/@salesforce/retail-react-app/config/default.js.hbs || echo "No debug lines found in template"
+          echo ""
+          echo "Checking if login template logic exists:"
+          grep -n "answers.project.login" packages/pwa-kit-create-app/assets/templates/@salesforce/retail-react-app/config/default.js.hbs || echo "No login template logic found"
+          echo ""
           echo "=== Generated App Structure ==="
           ls -la ${{ steps.generate_app_private_client.outputs.project_path }}
           echo ""
-          echo "=== Config Directory ==="
-          ls -la ${{ steps.generate_app_private_client.outputs.project_path }}/config/ || echo "No config directory found"
+          echo "=== Generated config/default.js Content (first 20 lines) ==="
+          head -20 ${{ steps.generate_app_private_client.outputs.project_path }}/config/default.js || echo "config/default.js not found"
           echo ""
-          echo "=== App Directory ==="
-          ls -la ${{ steps.generate_app_private_client.outputs.project_path }}/app/ || echo "No app directory found"
+          echo "=== Generated config login section ==="
+          grep -A 20 "login:" ${{ steps.generate_app_private_client.outputs.project_path }}/config/default.js || echo "No login section found"
           echo ""
-          echo "=== Overrides Directory (if extensibility enabled) ==="
-          ls -la ${{ steps.generate_app_private_client.outputs.project_path }}/overrides/ || echo "No overrides directory found"
-          echo ""
-          echo "=== Generated config/default.js Content ==="
-          cat ${{ steps.generate_app_private_client.outputs.project_path }}/config/default.js || echo "config/default.js not found"
-          echo ""
-          echo "=== Generated app/config/default.js Content (if exists) ==="
-          cat ${{ steps.generate_app_private_client.outputs.project_path }}/app/config/default.js || echo "app/config/default.js not found"
-          echo ""
-          echo "=== Generated overrides/config/default.js Content (if exists) ==="
-          cat ${{ steps.generate_app_private_client.outputs.project_path }}/overrides/config/default.js || echo "overrides/config/default.js not found"
-          echo ""
-          echo "=== Check if template was processed correctly ==="
-          grep -n "project.login" ${{ steps.generate_app_private_client.outputs.project_path }}/config/default.js || echo "No project.login references found in generated config"
+          echo "=== Check if debug comments exist in generated file ==="
+          grep "DEBUG:" ${{ steps.generate_app_private_client.outputs.project_path }}/config/default.js || echo "No debug comments found in generated config"
 
       - name: Create MRT credentials file
         uses: "./.github/actions/create_mrt"
