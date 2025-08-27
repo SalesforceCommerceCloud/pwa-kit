@@ -1,0 +1,171 @@
+name: Detect Template Drift
+
+on:
+  pull_request:
+    paths:
+      - 'packages/template-retail-react-app/app/**'
+      - 'packages/template-retail-react-app/config/**'
+      - 'packages/template-retail-react-app/app/static/manifest.json'
+      - 'packages/template-retail-react-app/app/components/_app-config/**'
+  push:
+    branches:
+      - develop
+      - main
+    paths:
+      - 'packages/template-retail-react-app/app/**'
+      - 'packages/template-retail-react-app/config/**'
+      - 'packages/template-retail-react-app/app/static/manifest.json'
+      - 'packages/template-retail-react-app/app/components/_app-config/**'
+  workflow_dispatch: # Allow manual triggering
+
+jobs:
+  detect-drift:
+    name: Detect Template Drift
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Get full git history for commit time analysis
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: |
+          # Install commander if not already in dependencies
+          npm install commander
+
+      - name: Detect template drift
+        id: detect-drift
+        run: |
+          node scripts/detect-template-drift.js --verbose
+        continue-on-error: true
+
+      - name: Set drift status output
+        id: drift-status
+        run: |
+          if [ ${{ steps.detect-drift.outcome }} == "success" ]; then
+            echo "drift_detected=false" >> $GITHUB_OUTPUT
+            echo "status_icon=✅" >> $GITHUB_OUTPUT
+            echo "status_text=All template files are up to date" >> $GITHUB_OUTPUT
+          else
+            echo "drift_detected=true" >> $GITHUB_OUTPUT
+            echo "status_icon=⚠️" >> $GITHUB_OUTPUT
+            echo "status_text=Template drift detected - manual review needed" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Comment on PR with drift status
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+            });
+            
+            const botComment = comments.find(comment => 
+              comment.user.type === 'Bot' && 
+              comment.body.includes('Template Drift Detection')
+            );
+            
+            const driftDetected = '${{ steps.drift-status.outputs.drift_detected }}' === 'true';
+            const statusIcon = '${{ steps.drift-status.outputs.status_icon }}';
+            const statusText = '${{ steps.drift-status.outputs.status_text }}';
+            
+            const commentBody = `## ${statusIcon} Template Drift Detection
+            
+            **Status:** ${statusText}
+            
+            ${driftDetected ? `
+            **⚠️ Action Required:**
+            
+            Your changes to \`template-retail-react-app\` source files may require corresponding updates to the \`.hbs\` template files in \`pwa-kit-create-app\`.
+            
+            **Steps to resolve:**
+            1. Review the source file changes in your PR
+            2. Check the corresponding \`.hbs\` template files:
+               - \`packages/pwa-kit-create-app/assets/templates/@salesforce/retail-react-app/\`
+               - \`packages/pwa-kit-create-app/assets/bootstrap/js/\`
+            3. Manually update template files if needed (preserve Handlebars placeholders!)
+            4. Test with \`pwa-kit-create-app\` to ensure templates work correctly
+            
+            **To check drift locally:**
+            \`\`\`bash
+            node scripts/detect-template-drift.js --verbose
+            \`\`\`
+            ` : `
+            **✅ No drift detected**
+            
+            Your changes don't affect files that have corresponding template files, or all templates are already up to date.
+            `}
+            
+            <details>
+            <summary>About Template Drift Detection</summary>
+            
+            This check compares the last commit time of source files in \`packages/template-retail-react-app/\` with their corresponding \`.hbs\` template files used by \`pwa-kit-create-app\`.
+            
+            **Why this matters:**
+            - Template files contain Handlebars placeholders for project generation
+            - They may have unique code that doesn't exist in source files
+            - Manual review ensures templates stay functional and up-to-date
+            
+            **Monitored files:**
+            - \`app/ssr.js\` ↔ \`ssr.js.hbs\`
+            - \`config/default.js\` ↔ \`default.js.hbs\`
+            - \`config/sites.js\` ↔ \`sites.js.hbs\`
+            - \`config/utils.js\` ↔ \`utils.js.hbs\`
+            - \`app/static/manifest.json\` ↔ \`manifest.json.hbs\`
+            - \`app/components/_app-config/index.jsx\` ↔ \`index.jsx.hbs\`
+            - And more...
+            </details>
+            `;
+            
+            if (botComment) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: botComment.id,
+                body: commentBody
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body: commentBody
+              });
+            }
+
+      - name: Warn on push to main/develop if drift detected
+        if: |
+          (github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop')) &&
+          steps.drift-status.outputs.drift_detected == 'true'
+        run: |
+          echo "::warning::Template drift detected on ${{ github.ref }}"
+          echo ""
+          echo "Source files in template-retail-react-app have been updated more recently"
+          echo "than their corresponding .hbs template files. Consider reviewing and"
+          echo "updating the template files to ensure pwa-kit-create-app generates"
+          echo "projects with the latest changes."
+          echo ""
+          echo "Run locally to see details:"
+          echo "  node scripts/detect-template-drift.js --verbose"
+
+      - name: Set PR status based on drift detection
+        if: github.event_name == 'pull_request'
+        run: |
+          if [ "${{ steps.drift-status.outputs.drift_detected }}" == "true" ]; then
+            echo "::notice::Template drift detected - please review template files"
+            # Note: We don't fail the PR, just notify
+            exit 0
+          else
+            echo "::notice::No template drift detected"
+            exit 0
+          fi

@@ -1,0 +1,119 @@
+{
+  "description": "Configuration for detecting drift between template-retail-react-app source files and corresponding .hbs templates",
+  "mappings": [
+    {
+      "source": "app/ssr.js",
+      "description": "Server-side rendering configuration with SLAS and security headers",
+      "templates": [
+        {
+          "templateDir": "retail",
+          "destination": "app/ssr.js.hbs"
+        },
+        {
+          "templateDir": "bootstrap",
+          "destination": "overrides/app/ssr.js.hbs"
+        }
+      ]
+    },
+    {
+      "source": "config/default.js",
+      "description": "Main application configuration including Commerce API, Einstein, and DataCloud settings",
+      "templates": [
+        {
+          "templateDir": "retail",
+          "destination": "config/default.js.hbs"
+        },
+        {
+          "templateDir": "bootstrap",
+          "destination": "config/default.js.hbs"
+        }
+      ]
+    },
+    {
+      "source": "config/sites.js",
+      "description": "Site configuration and locale settings",
+      "templates": [
+        {
+          "templateDir": "retail",
+          "destination": "config/sites.js.hbs"
+        },
+        {
+          "templateDir": "bootstrap",
+          "destination": "config/sites.js.hbs"
+        }
+      ]
+    },
+    {
+      "source": "config/utils.js",
+      "description": "Configuration utility functions",
+      "templates": [
+        {
+          "templateDir": "retail",
+          "destination": "config/utils.js.hbs"
+        },
+        {
+          "templateDir": "bootstrap",
+          "destination": "config/utils.js.hbs"
+        }
+      ]
+    },
+    {
+      "source": "app/static/manifest.json",
+      "description": "Progressive Web App manifest configuration",
+      "templates": [
+        {
+          "templateDir": "retail",
+          "destination": "app/static/manifest.json.hbs"
+        },
+        {
+          "templateDir": "bootstrap",
+          "destination": "overrides/app/static/manifest.json.hbs"
+        }
+      ]
+    },
+    {
+      "source": "app/components/_app-config/index.jsx",
+      "description": "Application configuration component",
+      "templates": [
+        {
+          "templateDir": "retail",
+          "destination": "app/components/_app-config/index.jsx.hbs"
+        },
+        {
+          "templateDir": "bootstrap",
+          "destination": "overrides/app/components/_app-config/index.jsx.hbs"
+        }
+      ]
+    },
+    {
+      "source": "app/constants.js",
+      "description": "Application constants and configuration values",
+      "templates": [
+        {
+          "templateDir": "bootstrap",
+          "destination": "overrides/app/constants.js.hbs"
+        }
+      ]
+    },
+    {
+      "source": "app/routes.jsx",
+      "description": "Application routing configuration",
+      "templates": [
+        {
+          "templateDir": "bootstrap",
+          "destination": "overrides/app/routes.jsx.hbs"
+        }
+      ]
+    },
+    {
+      "source": "app/pages/home/index.jsx",
+      "description": "Home page component",
+      "templates": [
+        {
+          "templateDir": "bootstrap",
+          "destination": "overrides/app/pages/home/index.jsx.hbs"
+        }
+      ]
+    }
+  ]
+}
