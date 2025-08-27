@@ -41,7 +41,23 @@ const ItemAttributes = ({includeQuantity, currency, excludeBonusLabel, ...props}
             enabled: promotionIds.length > 0
         }
     )
-    const promos = res?.data || []
+    
+    // Merge API promotion data with basket data - simplified
+    const promos = React.useMemo(() => {
+        const apiPromos = res?.data || []
+        const apiPromosMap = apiPromos.reduce((acc, promo) => {
+            acc[promo.id] = promo
+            return acc
+        }, {})
+        
+        return variant.priceAdjustments?.map((adjustment) => {
+            const apiPromo = apiPromosMap[adjustment.promotionId]
+            return {
+                ...apiPromo,
+                calloutMsg: apiPromo?.calloutMsg || adjustment.itemText
+            }
+        }) || []
+    }, [res?.data, variant.priceAdjustments])
     const variationValues = getDisplayVariationValues(
         variant?.variationAttributes,
         variant?.variationValues
@@ -205,9 +221,9 @@ const ItemAttributes = ({includeQuantity, currency, excludeBonusLabel, ...props}
                         </Text>
                     </Text>
                     <PromoPopover ml={2}>
-                        <Stack>
+                        <Stack spacing={1} align="flex-start" pl={2}>
                             {promos?.map((promo) => (
-                                <Text key={promo?.id} fontSize="sm">
+                                <Text key={promo?.id} fontSize="sm" color="green.600" fontWeight="600">
                                     {promo?.calloutMsg}
                                 </Text>
                             ))}

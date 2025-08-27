@@ -55,11 +55,11 @@ const PromoPopover = ({header, children, ...props}) => {
                         })}
                     />
                 </PopoverTrigger>
-                <PopoverContent border="none" borderRadius="base">
+                <PopoverContent border="none" borderRadius="base" maxW="fit-content" w="auto">
                     <Box boxShadow="lg">
                         <PopoverArrow />
                         <PopoverCloseButton />
-                        <PopoverHeader borderBottom="none">
+                        <PopoverHeader borderBottom="none" py={3} pr={10}>
                             {header || (
                                 <Text fontWeight="bold" fontSize="md">
                                     <FormattedMessage
@@ -69,7 +69,7 @@ const PromoPopover = ({header, children, ...props}) => {
                                 </Text>
                             )}
                         </PopoverHeader>
-                        <PopoverBody pt={0}>{children}</PopoverBody>
+                        <PopoverBody pt={1} pb={4} pl={2} pr={4}>{children}</PopoverBody>
                     </Box>
                 </PopoverContent>
             </Popover>

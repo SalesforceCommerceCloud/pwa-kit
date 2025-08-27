@@ -61,22 +61,6 @@ const ProductItem = ({
                                 <CartItemVariantName />
                                 <CartItemVariantAttributes excludeBonusLabel />
                                 
-                                {/* Price Adjustments - Custom Promotions */}
-                                {product.priceAdjustments && product.priceAdjustments.length > 0 && (
-                                    <Stack spacing={1}>
-                                        {product.priceAdjustments.map((adjustment, index) => (
-                                            <Text
-                                                key={adjustment.priceAdjustmentId || index}
-                                                fontSize="sm"
-                                                color="green.600"
-                                                fontWeight="600"
-                                            >
-                                                {adjustment.itemText}
-                                            </Text>
-                                        ))}
-                                    </Stack>
-                                )}
-                                
                                 <HideOnDesktop>
                                     <Box marginTop={2}>
                                         <CartItemVariantPrice
