@@ -54,7 +54,8 @@ export const getCustomerShippingDetails = (shippingAddress, email) => {
         profile: {
             firstName: shippingAddress.name?.split(' ')[0] || '',
             lastName: shippingAddress.name?.split(' ').slice(1).join(' ') || '',
-            email: email || ''
+            email: email || '',
+            phone: shippingAddress.phoneNumber || ''
         }
     }
 }
@@ -280,7 +281,7 @@ export const getGoogleButtonConfig = (
         buttonType: 'plain',
         isExpress: true,
         shippingAddressRequired: true,
-        // shippingAddressParameters: {"allowedCountryCodes": ["US"]}, // If you want to restrict country codes, you can do that here
+        shippingAddressParameters: {phoneNumberRequired: true},
         shippingOptionRequired: true,
         billingAddressRequired: true,
         billingAddressParameters: {format: 'FULL'},
