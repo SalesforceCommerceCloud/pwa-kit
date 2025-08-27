@@ -143,8 +143,8 @@ export const useProductAddressAssignment = (basket) => {
                     const shipment = existingShipments.find((s) => s.shipmentId === item.shipmentId)
 
                     if (shipment && !isAddressEmpty(shipment.shippingAddress)) {
-                        const existingAddress = guestAddresses.find((addr) =>
-                            areAddressesEqual(addr, shipment.shippingAddress)
+                        const existingAddress = [...guestAddresses, ...newGuestAddresses].find(
+                            (addr) => areAddressesEqual(addr, shipment.shippingAddress)
                         )
 
                         if (existingAddress) {
