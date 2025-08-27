@@ -12,13 +12,12 @@ import {Box, Button, Wrap, WrapItem} from '@salesforce/retail-react-app/app/comp
 import {CloseIcon} from '@salesforce/retail-react-app/app/components/icons'
 import {REMOVE_FILTER} from '@salesforce/retail-react-app/app/pages/product-list/partials/refinements-utils'
 import {useSelectedStore} from '@salesforce/retail-react-app/app/hooks/use-selected-store'
-import {STORE_LOCATOR_IS_ENABLED} from '@salesforce/retail-react-app/app/constants'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 
 const SelectedRefinements = ({toggleFilter, selectedFilterValues, filters, handleReset}) => {
     const {formatMessage} = useIntl()
     const {selectedStore} = useSelectedStore()
-    const storeLocatorEnabled = getConfig()?.app?.storeLocatorEnabled ?? STORE_LOCATOR_IS_ENABLED
+    const storeLocatorEnabled = getConfig()?.app?.storeLocatorEnabled
     const priceFilterValues = filters?.find((filter) => filter.attributeId === 'price')
     let selectedFilters = []
     for (const key in selectedFilterValues) {

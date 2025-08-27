@@ -79,14 +79,6 @@ jest.mock('@salesforce/pwa-kit-runtime/utils/ssr-config', () => ({
     }))
 }))
 
-jest.mock('@salesforce/retail-react-app/app/constants', () => {
-    const original = jest.requireActual('@salesforce/retail-react-app/app/constants')
-    return {
-        ...original,
-        STORE_LOCATOR_IS_ENABLED: true
-    }
-})
-
 const mockProduct = {
     ...mockVariant,
     id: '750518699660M',

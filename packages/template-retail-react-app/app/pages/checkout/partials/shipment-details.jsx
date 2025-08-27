@@ -19,14 +19,13 @@ import {
 import {useStores} from '@salesforce/commerce-sdk-react'
 import AddressDisplay from '@salesforce/retail-react-app/app/components/address-display'
 import StoreDisplay from '@salesforce/retail-react-app/app/components/store-display'
-import {STORE_LOCATOR_IS_ENABLED} from '@salesforce/retail-react-app/app/constants'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import {isPickupShipment} from '@salesforce/retail-react-app/app/utils/shipment-utils'
 
 const onClient = typeof window !== 'undefined'
 
 const ShipmentDetails = ({shipments = []}) => {
-    const storeLocatorEnabled = getConfig()?.app?.storeLocatorEnabled ?? STORE_LOCATOR_IS_ENABLED
+    const storeLocatorEnabled = getConfig()?.app?.storeLocatorEnabled
     // Get all unique store IDs from pickup shipments
     const storeIds =
         shipments

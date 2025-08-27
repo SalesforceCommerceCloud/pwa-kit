@@ -39,9 +39,6 @@ jest.mock('@salesforce/pwa-kit-runtime/utils/ssr-config', () => ({
 jest.mock('@salesforce/retail-react-app/app/constants', () => ({
     get DEFAULT_SHIPMENT_ID() {
         return 'me'
-    },
-    get STORE_LOCATOR_IS_ENABLED() {
-        return mockStoreLocatorEnabled
     }
 }))
 

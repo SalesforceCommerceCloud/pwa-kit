@@ -78,8 +78,7 @@ import {
     THEME_COLOR,
     CAT_MENU_DEFAULT_NAV_SSR_DEPTH,
     CAT_MENU_DEFAULT_ROOT_CATEGORY,
-    DEFAULT_LOCALE,
-    STORE_LOCATOR_IS_ENABLED
+    DEFAULT_LOCALE
 } from '@salesforce/retail-react-app/app/constants'
 
 import Seo from '@salesforce/retail-react-app/app/components/seo'
@@ -146,7 +145,7 @@ const App = (props) => {
         onOpen: onOpenStoreLocator,
         onClose: onCloseStoreLocator
     } = useStoreLocatorModal()
-    const storeLocatorEnabled = getConfig()?.app?.storeLocatorEnabled ?? STORE_LOCATOR_IS_ENABLED
+    const storeLocatorEnabled = getConfig()?.app?.storeLocatorEnabled
 
     const [isOnline, setIsOnline] = useState(true)
     const styles = useStyleConfig('App')

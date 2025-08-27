@@ -8,7 +8,6 @@ import {useCustomerId, useCustomerBaskets} from '@salesforce/commerce-sdk-react'
 import {isServer} from '@salesforce/retail-react-app/app/utils/utils'
 import {isPickupShipment} from '@salesforce/retail-react-app/app/utils/shipment-utils'
 import {isAddressEmpty} from '@salesforce/retail-react-app/app/utils/address-utils'
-import {STORE_LOCATOR_IS_ENABLED} from '@salesforce/retail-react-app/app/constants'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import {useMemo} from 'react'
 
@@ -18,7 +17,7 @@ import {useMemo} from 'react'
  * @param shouldFetchProductDetail - boolean to indicate if the baskets should fetch product details based on basket items
  */
 export const useCurrentBasket = ({id = ''} = {}) => {
-    const storeLocatorEnabled = getConfig()?.app?.storeLocatorEnabled ?? STORE_LOCATOR_IS_ENABLED
+    const storeLocatorEnabled = getConfig()?.app?.storeLocatorEnabled
     const customerId = useCustomerId()
     const {data: basketsData, ...restOfQuery} = useCustomerBaskets(
         {parameters: {customerId}},

@@ -91,8 +91,7 @@ import {
     TOAST_MESSAGE_REMOVED_FROM_WISHLIST,
     STALE_WHILE_REVALIDATE,
     PRODUCT_LIST_IMAGE_VIEW_TYPE,
-    PRODUCT_LIST_SELECTABLE_ATTRIBUTE_ID,
-    STORE_LOCATOR_IS_ENABLED
+    PRODUCT_LIST_SELECTABLE_ATTRIBUTE_ID
 } from '@salesforce/retail-react-app/app/constants'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
@@ -127,7 +126,7 @@ const ProductList = (props) => {
     const {res} = useServerContext()
     const customerId = useCustomerId()
     const [searchParams, {stringify: stringifySearchParams}] = useSearchParams()
-    const storeLocatorEnabled = getConfig()?.app?.storeLocatorEnabled ?? STORE_LOCATOR_IS_ENABLED
+    const storeLocatorEnabled = getConfig()?.app?.storeLocatorEnabled
 
     /**************** Page State ****************/
     const [filtersLoading, setFiltersLoading] = useState(false)

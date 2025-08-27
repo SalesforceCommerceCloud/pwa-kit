@@ -49,8 +49,7 @@ import {
     TOAST_MESSAGE_ADDED_TO_WISHLIST,
     TOAST_MESSAGE_REMOVED_ITEM_FROM_CART,
     TOAST_MESSAGE_ALREADY_IN_WISHLIST,
-    TOAST_MESSAGE_STORE_INSUFFICIENT_INVENTORY,
-    STORE_LOCATOR_IS_ENABLED
+    TOAST_MESSAGE_STORE_INSUFFICIENT_INVENTORY
 } from '@salesforce/retail-react-app/app/constants'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import {REMOVE_CART_ITEM_CONFIRMATION_DIALOG_CONFIG} from '@salesforce/retail-react-app/app/pages/cart/partials/cart-secondary-button-group'
@@ -76,7 +75,7 @@ const DEBOUNCE_WAIT = 750
 const Cart = () => {
     const {data: basket, isLoading, derivedData} = useCurrentBasket()
     const multishipEnabled = getConfig()?.app?.multishipEnabled ?? true
-    const storeLocatorEnabled = getConfig()?.app?.storeLocatorEnabled ?? STORE_LOCATOR_IS_ENABLED
+    const storeLocatorEnabled = getConfig()?.app?.storeLocatorEnabled
 
     // Pickup in Store - inventory at current store and all unique store IDs from all shipments
     const {selectedStore} = useSelectedStore()

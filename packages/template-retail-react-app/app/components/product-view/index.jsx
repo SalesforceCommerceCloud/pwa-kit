@@ -32,7 +32,6 @@ const DELIVERY_OPTIONS = {
 }
 import {useCurrency, useDerivedProduct} from '@salesforce/retail-react-app/app/hooks'
 import {useAddToCartModalContext} from '@salesforce/retail-react-app/app/hooks/use-add-to-cart-modal'
-import {STORE_LOCATOR_IS_ENABLED} from '@salesforce/retail-react-app/app/constants'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 
 // project components
@@ -155,8 +154,7 @@ const ProductView = forwardRef(
         const showToast = useToast()
         const intl = useIntl()
         const location = useLocation()
-        const storeLocatorEnabled =
-            getConfig()?.app?.storeLocatorEnabled ?? STORE_LOCATOR_IS_ENABLED
+        const storeLocatorEnabled = getConfig()?.app?.storeLocatorEnabled
         const {
             isOpen: isAddToCartModalOpen,
             onOpen: onAddToCartModalOpen,

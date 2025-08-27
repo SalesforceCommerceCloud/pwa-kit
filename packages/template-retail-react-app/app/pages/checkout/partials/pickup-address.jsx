@@ -35,7 +35,6 @@ import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-curre
 import {useSelectedStore} from '@salesforce/retail-react-app/app/hooks/use-selected-store'
 import {useStores, useProducts} from '@salesforce/commerce-sdk-react'
 import {useCurrency} from '@salesforce/retail-react-app/app/hooks'
-import {STORE_LOCATOR_IS_ENABLED} from '@salesforce/retail-react-app/app/constants'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import {isPickupShipment} from '@salesforce/retail-react-app/app/utils/shipment-utils'
 import PropTypes from 'prop-types'
@@ -104,7 +103,7 @@ const PickupAddress = () => {
     const {formatMessage} = useIntl()
     const {step, STEPS, goToStep, goToNextStep} = useCheckout()
     const {data: basket, derivedData} = useCurrentBasket()
-    const storeLocatorEnabled = getConfig()?.app?.storeLocatorEnabled ?? STORE_LOCATOR_IS_ENABLED
+    const storeLocatorEnabled = getConfig()?.app?.storeLocatorEnabled
     const {currency} = useCurrency()
 
     const hasPickupShipments = derivedData?.totalPickupShipments > 0

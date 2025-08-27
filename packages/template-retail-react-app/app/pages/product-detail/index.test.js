@@ -96,8 +96,7 @@ jest.mock('@salesforce/retail-react-app/app/constants', () => {
     const originalModule = jest.requireActual('@salesforce/retail-react-app/app/constants')
     return {
         ...originalModule,
-        DEFAULT_DNT_STATE: false,
-        STORE_LOCATOR_IS_ENABLED: true
+        DEFAULT_DNT_STATE: false
     }
 })
 
