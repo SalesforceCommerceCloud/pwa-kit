@@ -355,6 +355,15 @@ jobs:
           version=`jq -r ".version" packages/template-retail-react-app/package.json`
           echo "retail_app_template_version=$version" >> "$GITHUB_ENV"
 
+      - name: Debug preset before generation
+        run: |
+          echo "=== Preset Configuration Debug ==="
+          node -e "const config = require('./e2e/config.js'); console.log('Preset for retail-app-private-client:', config.PRESET['retail-app-private-client'])"
+          echo ""
+          echo "=== Program.json preset content ==="
+          jq '.programs.presets[] | select(.id == "retail-react-app-private-slas-client")' packages/pwa-kit-create-app/program.json
+          echo ""
+
       - name: Generate Retail App Private Client
         id: generate_app_private_client
         uses: ./.github/actions/e2e_generate_app
@@ -368,8 +377,13 @@ jobs:
           PROJECT_KEY: "retail-app-private-client"
           TEMPLATE_VERSION: ${{ env.retail_app_template_version }}
 
-      - name: Debug - Show generated app config
+      - name: Debug - Show generated app config and preset usage
         run: |
+          echo "=== Generation Command Debug ==="
+          echo "PROJECT_KEY: retail-app-private-client"
+          echo "PRESET: retail-react-app-private-slas-client"
+          echo "TEMPLATE_VERSION: ${{ env.retail_app_template_version }}"
+          echo ""
           echo "=== Generated App Structure ==="
           ls -la ${{ steps.generate_app_private_client.outputs.project_path }}
           echo ""
@@ -379,11 +393,20 @@ jobs:
           echo "=== App Directory ==="
           ls -la ${{ steps.generate_app_private_client.outputs.project_path }}/app/ || echo "No app directory found"
           echo ""
+          echo "=== Overrides Directory (if extensibility enabled) ==="
+          ls -la ${{ steps.generate_app_private_client.outputs.project_path }}/overrides/ || echo "No overrides directory found"
+          echo ""
           echo "=== Generated config/default.js Content ==="
           cat ${{ steps.generate_app_private_client.outputs.project_path }}/config/default.js || echo "config/default.js not found"
           echo ""
           echo "=== Generated app/config/default.js Content (if exists) ==="
           cat ${{ steps.generate_app_private_client.outputs.project_path }}/app/config/default.js || echo "app/config/default.js not found"
+          echo ""
+          echo "=== Generated overrides/config/default.js Content (if exists) ==="
+          cat ${{ steps.generate_app_private_client.outputs.project_path }}/overrides/config/default.js || echo "overrides/config/default.js not found"
+          echo ""
+          echo "=== Check if template was processed correctly ==="
+          grep -n "project.login" ${{ steps.generate_app_private_client.outputs.project_path }}/config/default.js || echo "No project.login references found in generated config"
 
       - name: Create MRT credentials file
         uses: "./.github/actions/create_mrt"
