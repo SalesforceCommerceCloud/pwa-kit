@@ -361,7 +361,7 @@ jobs:
           node -e "const config = require('./e2e/config.js'); console.log('Preset for retail-app-private-client:', config.PRESET['retail-app-private-client'])"
           echo ""
           echo "=== Program.json preset content ==="
-          jq '.presets[] | select(.id == "retail-react-app-private-slas-client")' packages/pwa-kit-create-app/program.json
+          jq '.data.presets[] | select(.id == "retail-react-app-private-slas-client")' packages/pwa-kit-create-app/program.json
           echo ""
 
       - name: Generate Retail App Private Client
