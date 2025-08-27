@@ -1,6 +1,7 @@
-## v8.0.0-dev (August 19, 2025)
+## v8.0.0-preview.0 (August 19, 2025)
+
 - Add support for environment level base paths on /mobify routes [#2892](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2892)
-- Fix private client endpoint prop name [#3177](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3177)
+- Remove deprecated properties from useDNT in commerce-sdk-react [#3177](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3177)
 - This feature introduces an AI-powered shopping assistant that integrates Salesforce Embedded Messaging Service with PWA Kit applications. The shopper agent provides real-time chat support, search assistance, and personalized shopping guidance directly within the e-commerce experience. [#2658](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2658)
 - Added support for Multi-Ship [#3056](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3056)
 - The feature toggle for partial hydration is now found in the config file (`config.app.partialHydrationEnabled`) [#3058](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3058)
