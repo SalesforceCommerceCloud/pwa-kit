@@ -93,6 +93,14 @@ class ExpressPaymentManager {
     }
 
     /**
+     * Gets the current count of available payment methods
+     * @returns {number} - Count of available payment methods
+     */
+    getNumberOfAvailablePaymentMethods() {
+        return this.availableCount
+    }
+
+    /**
      * Registers payment methods to track
      * @param {string[]} paymentMethods - Array of payment method identifiers
      */
