@@ -217,7 +217,7 @@ const App = (props) => {
     }, [basket?.currency])
 
     const commerceAgentConfiguration = useMemo(() => {
-        return config.app.commerceAgent
+        return config?.app?.commerceAgent
     }, [config?.app])
 
     useEffect(() => {
