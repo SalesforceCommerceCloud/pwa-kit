@@ -172,8 +172,8 @@ const OrderSummary = ({
                             aria-live="polite"
                             aria-atomic="true"
                         >
-                            <Text fontSize={fontSize}>{adjustment.itemText}</Text>
-                            <Text color="green.600" fontSize={fontSize}>
+                                                    <Text fontSize={fontSize} color="green.600" fontWeight="600">{adjustment.itemText}</Text>
+                        <Text color="green.600" fontSize={fontSize} fontWeight="600">
                                 <FormattedNumber
                                     style="currency"
                                     currency={basket?.currency}
