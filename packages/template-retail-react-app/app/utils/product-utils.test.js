@@ -28,14 +28,8 @@ import productSetWinterLookM from '@salesforce/retail-react-app/app/mocks/produc
 import {mockProductSearch} from '@salesforce/retail-react-app/app/mocks/mock-data'
 import {
     mockProductBundle,
-    mockBundleItemsAdded,
     mockBundledProductItemsVariant,
-    mockStandardProduct,
-    mockBundleItemsWithStandardProducts,
-    mockBasketWithStandardProducts,
-    mockBundleWithMixedProducts,
-    mockBundleItemsWithMixedProducts,
-    mockBasketWithMixedProducts
+    mockBundleItemsWithMixedProducts
 } from '@salesforce/retail-react-app/app/mocks/product-bundle'
 
 const imageGroups = [
@@ -1026,11 +1020,26 @@ describe('getUpdateBundleChildArray', () => {
         const mixedProductSelections = mockBundleItemsWithMixedProducts
 
         const bundleWithMixedProducts = {
-            bundledProductItems: mockBasketWithMixedProducts.productItems[0].bundledProductItems
+            bundledProductItems: [
+                {
+                    itemId: 'standard-item-1',
+                    productId: 'standard-product-1',
+                    quantity: 1
+                },
+                {
+                    itemId: 'variant-item-1',
+                    productId: 'variant-1-id', // Current product ID in bundle
+                    quantity: 2
+                }
+            ]
         }
 
         const result = getUpdateBundleChildArray(bundleWithMixedProducts, mixedProductSelections)
 
+        // The function should return an update for the variant item because:
+        // - Bundle has productId: 'variant-1-id'
+        // - Selection has variant with productId: 'variant-2-id'
+        // - These are different, so an update is needed
         expect(result).toEqual([
             {
                 itemId: 'variant-item-1',

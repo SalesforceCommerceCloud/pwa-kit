@@ -51,6 +51,7 @@ import LoadingSpinner from '@salesforce/retail-react-app/app/components/loading-
 import {HideOnDesktop, HideOnMobile} from '@salesforce/retail-react-app/app/components/responsive'
 import {isHydrated, noop} from '@salesforce/retail-react-app/app/utils/utils'
 import {STORE_LOCATOR_IS_ENABLED} from '@salesforce/retail-react-app/app/constants'
+import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 const IconButtonWithRegistration = withRegistration(IconButton)
 
 /**
@@ -117,6 +118,7 @@ const Header = ({
     const {isRegistered} = useCustomerType()
     const logout = useAuthHelper(AuthHelpers.Logout)
     const navigate = useNavigation()
+    const storeLocatorEnabled = getConfig()?.app?.storeLocatorEnabled ?? STORE_LOCATOR_IS_ENABLED
     const {
         getButtonProps: getAccountMenuButtonProps,
         getDisclosureProps: getAccountMenuDisclosureProps,
@@ -311,7 +313,7 @@ const Header = ({
                         {...styles.wishlistIcon}
                         onClick={onWishlistClick}
                     />
-                    {STORE_LOCATOR_IS_ENABLED && (
+                    {storeLocatorEnabled && (
                         <IconButton
                             aria-label={intl.formatMessage({
                                 defaultMessage: 'Store Locator',
