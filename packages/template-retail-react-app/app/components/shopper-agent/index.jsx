@@ -106,7 +106,7 @@ const ShopperAgentWindow = ({commerceAgentConfiguration, locale, basketId}) => {
         salesforceOrgId,
         commerceOrgId,
         siteId
-    } = commerceAgentConfiguration
+    } = commerceAgentConfiguration || {}
 
     const {usid} = useUsid()
 
@@ -203,7 +203,7 @@ ShopperAgentWindow.propTypes = {
  * @returns {JSX.Element|null} The ShopperAgent component or null if conditions not met
  */
 const ShopperAgent = ({commerceAgentConfiguration, basketId, locale, basketDoneLoading}) => {
-    const {enabled} = commerceAgentConfiguration
+    const {enabled} = commerceAgentConfiguration || {}
     const isShopperAgentEnabled = isEnabled(enabled)
 
     return isShopperAgentEnabled &&
