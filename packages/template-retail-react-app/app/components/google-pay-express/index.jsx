@@ -41,7 +41,7 @@ export const getGooglePaymentMethodConfig = (paymentMethodsResponse) => {
     return getPaymentMethodConfig(paymentMethodsResponse, PAYMENT_METHOD)
 }
 
-export const getCustomerShippingDetails = (shippingAddress) => {
+export const getCustomerShippingDetails = (shippingAddress, email) => {
     return {
         deliveryAddress: {
             city: shippingAddress.locality,
@@ -53,7 +53,8 @@ export const getCustomerShippingDetails = (shippingAddress) => {
         },
         profile: {
             firstName: shippingAddress.name?.split(' ')[0] || '',
-            lastName: shippingAddress.name?.split(' ').slice(1).join(' ') || ''
+            lastName: shippingAddress.name?.split(' ').slice(1).join(' ') || '',
+            email: email || ''
         }
     }
 }
@@ -77,7 +78,7 @@ export const updateShippingAddress = async (authToken, site, basket, shippingAdd
         const adyenShippingAddressService = new AdyenShippingAddressService(authToken, site)
         const response = await adyenShippingAddressService.updateShippingAddress(
             basket.basketId,
-            getCustomerShippingDetails(shippingAddress)
+            getCustomerShippingDetails(shippingAddress, basket?.customerInfo?.email)
         )
 
         if (response.error) {
@@ -301,7 +302,7 @@ export const getGoogleButtonConfig = (
                             type: 'googlepay',
                             googlePayToken: data.paymentMethodData.tokenizationData.token
                         },
-                        ...getCustomerShippingDetails(data?.shippingAddress),
+                        ...getCustomerShippingDetails(data?.shippingAddress, data?.email),
                         ...getCustomerBillingDetails(
                             data?.paymentMethodData?.info?.billingAddress || data?.shippingAddress
                         )
