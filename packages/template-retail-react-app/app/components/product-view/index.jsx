@@ -31,6 +31,7 @@ const DELIVERY_OPTIONS = {
     PICKUP: 'pickup'
 }
 import {useCurrency, useDerivedProduct} from '@salesforce/retail-react-app/app/hooks'
+import CustomPromotions from '@salesforce/retail-react-app/app/components/custom-promotions'
 import {useAddToCartModalContext} from '@salesforce/retail-react-app/app/hooks/use-add-to-cart-modal'
 import {STORE_LOCATOR_IS_ENABLED} from '@salesforce/retail-react-app/app/constants'
 
@@ -647,6 +648,9 @@ const ProductView = forwardRef(
                                         }}
                                         productName={product?.name}
                                     />
+                                    
+                                    {/* Custom Promotions - Product Specific Sale */}
+                                    <CustomPromotions product={product} />
                                 </VStack>
                             )}
                             <Box ref={errorContainerRef}>
