@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React, {useState, useRef, useEffect} from 'react'
+import React, {useState, useEffect} from 'react'
 import PropTypes from 'prop-types'
 import {FormattedMessage} from 'react-intl'
 import {
@@ -21,10 +21,12 @@ import {
     ModalContent,
     ModalHeader,
     ModalOverlay
-} from '../shared/ui'
+} from '@salesforce/retail-react-app/app/components/shared/ui'
 import useEinstein from '@salesforce/retail-react-app/app/hooks/use-einstein'
-import {useUsid, useEncUserId, useCustomerType, useDNT} from '@salesforce/commerce-sdk-react'
+import {useUsid, useCustomerType, useDNT} from '@salesforce/commerce-sdk-react'
 import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
+import {useOtpInputs} from '@salesforce/retail-react-app/app/hooks/use-otp-inputs'
+import {useCountdown} from '@salesforce/retail-react-app/app/hooks/use-countdown'
 
 const OtpAuth = ({
     isOpen,
@@ -35,228 +37,128 @@ const OtpAuth = ({
     onCheckoutAsGuest
 }) => {
     const OTP_LENGTH = 8
-    const [otpValues, setOtpValues] = useState(new Array(OTP_LENGTH).fill(''))
-    const [resendTimer, setResendTimer] = useState(0)
     const [isVerifying, setIsVerifying] = useState(false)
-    const [verificationError, setVerificationError] = useState('')
-    const inputRefs = useRef([])
+    const [error, setError] = useState('')
+    const [resendTimer, setResendTimer] = useCountdown(0)
+
     // Privacy-aware user identification hooks
     const {getUsidWhenReady} = useUsid()
-    const {getEncUserIdWhenReady} = useEncUserId()
     const {isRegistered} = useCustomerType()
     const {data: customer} = useCurrentCustomer()
     const {effectiveDnt} = useDNT()
+
     // Einstein tracking
     const {sendViewPage} = useEinstein()
+
     // Get privacy-compliant user identifier
     const getUserIdentifier = async () => {
+        // Respect Do Not Track
         if (effectiveDnt) {
-            return '__DNT__' // Respect Do Not Track
+            return '__DNT__'
         }
+        // Use customer ID for registered users
         if (isRegistered && customer?.customerId) {
-            return customer.customerId // Use customer ID for registered users
+            return customer.customerId
         }
         // Use USID for guest users
         const usid = await getUsidWhenReady()
         return usid
     }
 
-    // Initialize refs array
-    useEffect(() => {
-        inputRefs.current = inputRefs.current.slice(0, OTP_LENGTH)
-    }, [])
+    const track = async (path, payload = {}) => {
+        const userId = await getUserIdentifier()
+        sendViewPage(path, {
+            userId,
+            userType: isRegistered ? 'registered' : 'guest',
+            dntCompliant: effectiveDnt,
+            ...payload
+        })
+    }
 
-    // Handle resend timer
-    useEffect(() => {
-        if (resendTimer > 0) {
-            const timer = setTimeout(() => setResendTimer(resendTimer - 1), 1000)
-            return () => clearTimeout(timer)
+    const otpInputs = useOtpInputs(OTP_LENGTH, (code) => {
+        if (code.length === OTP_LENGTH) {
+            handleVerify(code)
         }
-    }, [resendTimer])
+    })
 
-    // Track OTP modal view activity and focus first input when modal opens
     useEffect(() => {
         if (isOpen) {
-            // Clear previous OTP values
-            setOtpValues(new Array(OTP_LENGTH).fill(''))
-            setVerificationError('')
+            otpInputs.clear()
+            setError('')
             form.setValue('otp', '')
 
-            // Track OTP modal view activity with Einstein using privacy-compliant identifiers
-            const trackModalView = async () => {
-                const userIdentifier = await getUserIdentifier()
+            // Track OTP modal view activity
+            track('/otp-authentication', {
+                activity: 'otp_modal_viewed',
+                context: 'authentication'
+            })
 
-                sendViewPage('/otp-authentication', {
-                    activity: 'otp_modal_viewed',
-                    userId: userIdentifier,
-                    userType: isRegistered ? 'registered' : 'guest',
-                    context: 'authentication',
-                    dntCompliant: effectiveDnt
-                })
-            }
-            trackModalView()
-
-            // Small delay to ensure modal is fully rendered
-            const timer = setTimeout(() => {
-                inputRefs.current[0]?.focus()
-            }, 100)
-            return () => clearTimeout(timer)
+            setTimeout(() => otpInputs.inputRefs.current[0]?.focus(), 100)
         }
-    }, [isOpen, form, sendViewPage, effectiveDnt, isRegistered])
+    }, [isOpen])
 
-    // Validation function to check if value contains only digits
-    const isNumericValue = (value) => {
-        return /^\d*$/.test(value)
-    }
+    const handleVerify = async (code = otpInputs.values.join('')) => {
+        if (code.length !== OTP_LENGTH) return
 
-    // Function to verify OTP and handle the result
-    const verifyOtpCode = async (otpCode) => {
         setIsVerifying(true)
+        setError('')
 
-        const userIdentifier = await getUserIdentifier()
-
-        // Track OTP verification attempt with Einstein using privacy-compliant identifiers
-        sendViewPage('/otp-verification', {
+        // Track OTP verification attempt
+        track('/otp-verification', {
             activity: 'otp_verification_attempted',
-            userId: userIdentifier,
-            userType: isRegistered ? 'registered' : 'guest',
             context: 'authentication',
-            otpLength: otpCode.length,
-            dntCompliant: effectiveDnt
+            otpLength: code.length
         })
 
-        const result = await handleOtpVerification(otpCode)
-        setIsVerifying(false)
-
-        if (result && !result.success) {
-            // Track failed OTP verification using privacy-compliant identifiers
-            sendViewPage('/otp-verification-failed', {
-                activity: 'otp_verification_failed',
-                userId: userIdentifier,
-                userType: isRegistered ? 'registered' : 'guest',
-                context: 'authentication',
-                error: result.error,
-                dntCompliant: effectiveDnt
-            })
-
-            setVerificationError(result.error)
-            // Clear the OTP fields so user can try again
-            setOtpValues(new Array(OTP_LENGTH).fill(''))
-            form.setValue('otp', '')
-            // Focus first input
-            inputRefs.current[0]?.focus()
-        } else if (result && result.success) {
-            // Track successful OTP verification using privacy-compliant identifiers
-            sendViewPage('/otp-verification-success', {
-                activity: 'otp_verification_successful',
-                userId: userIdentifier,
-                userType: isRegistered ? 'registered' : 'guest',
-                context: 'authentication',
-                dntCompliant: effectiveDnt
-            })
-        }
-    }
-
-    const handleOtpChange = async (index, value) => {
-        // Only allow digits
-        if (!isNumericValue(value)) return
-
-        // Clear any previous verification error
-        setVerificationError('')
-
-        const newOtpValues = [...otpValues]
-        newOtpValues[index] = value
-        setOtpValues(newOtpValues)
-
-        // Update form value
-        const otpString = newOtpValues.join('')
-        form.setValue('otp', otpString)
-
-        // Auto-focus next input
-        if (value && index < OTP_LENGTH - 1) {
-            inputRefs.current[index + 1]?.focus()
-        }
-
-        // If all digits are entered, automatically verify OTP
-        if (otpString.length === OTP_LENGTH && !isVerifying) {
-            await verifyOtpCode(otpString)
-        }
-    }
-
-    const handleKeyDown = (index, e) => {
-        // Handle backspace
-        if (e.key === 'Backspace' && !otpValues[index] && index > 0) {
-            inputRefs.current[index - 1]?.focus()
-        }
-    }
-
-    const handlePaste = async (e) => {
-        e.preventDefault()
-        const pastedData = e.clipboardData.getData('text').replace(/\D/g, '').slice(0, OTP_LENGTH)
-        if (pastedData.length === OTP_LENGTH) {
-            // Clear any previous verification error
-            setVerificationError('')
-
-            const newOtpValues = pastedData.split('')
-            setOtpValues(newOtpValues)
-            form.setValue('otp', pastedData)
-            inputRefs.current[7]?.focus()
-
-            // Automatically verify the pasted OTP
-            if (!isVerifying) {
-                await verifyOtpCode(pastedData)
-            }
-        }
-    }
-
-    const handleResendCode = async () => {
         try {
-            // Start countdown immediately to disable the button while request is in-flight
-            setResendTimer(5)
-            const email = form.getValues('email')
-            const userIdentifier = await getUserIdentifier()
+            const result = await handleOtpVerification(code)
+            if (result && !result.success) {
+                setError(result.error)
+                otpInputs.clear()
 
-            // Track OTP resend activity with Einstein using privacy-compliant identifiers
-            sendViewPage('/otp-resend', {
+                // Track failed OTP verification
+                track('/otp-verification-failed', {
+                    activity: 'otp_verification_failed',
+                    context: 'authentication',
+                    error: result.error
+                })
+            }
+        } finally {
+            setIsVerifying(false)
+            // Track successful OTP verification
+            track('/otp-verification-success', {
+                activity: 'otp_verification_successful',
+                context: 'authentication'
+            })
+        }
+    }
+
+    const handleResend = async () => {
+        setResendTimer(5)
+        try {
+            await track('/otp-resend', {
                 activity: 'otp_code_resent',
-                userId: userIdentifier,
-                userType: isRegistered ? 'registered' : 'guest',
                 context: 'authentication',
-                resendAttempt: true,
-                dntCompliant: effectiveDnt
+                resendAttempt: true
             })
-
-            await handleSendEmailOtp(email)
+            await handleSendEmailOtp(form.getValues('email'))
         } catch (error) {
-            // Reset timer so user can try again
             setResendTimer(0)
-
-            // Track failed resend attempt using privacy-compliant identifiers
-            const userIdentifier = await getUserIdentifier()
-            sendViewPage('/otp-resend-failed', {
+            await track('/otp-resend-failed', {
                 activity: 'otp_resend_failed',
-                userId: userIdentifier,
-                userType: isRegistered ? 'registered' : 'guest',
                 context: 'authentication',
-                error: error.message,
-                dntCompliant: effectiveDnt
+                error: error.message
             })
-
             console.error('Error resending code:', error)
         }
     }
 
     const handleCheckoutAsGuest = async () => {
-        // Track checkout as guest selection with Einstein using privacy-compliant identifiers
-        const userIdentifier = await getUserIdentifier()
-
-        sendViewPage('/checkout-as-guest', {
+        // Track checkout as guest selection
+        await track('/checkout-as-guest', {
             activity: 'checkout_as_guest_selected',
-            userId: userIdentifier,
-            userType: isRegistered ? 'registered' : 'guest',
             context: 'otp_authentication',
-            userChoice: 'guest_checkout',
-            dntCompliant: effectiveDnt
+            userChoice: 'guest_checkout'
         })
 
         if (onCheckoutAsGuest) {
@@ -265,6 +167,18 @@ const OtpAuth = ({
         onClose()
     }
 
+    const handleInputChange = (index, value) => {
+        const code = otpInputs.setValue(index, value)
+        setError('') // Clear error on user input
+        if (typeof code === 'string') {
+            form.setValue('otp', code)
+            if (code.length === OTP_LENGTH) {
+                handleVerify(code)
+            }
+        }
+    }
+
+    const isComplete = otpInputs.values.join('').length === OTP_LENGTH
     const isResendDisabled = resendTimer > 0 || isVerifying
 
     return (
@@ -289,14 +203,14 @@ const OtpAuth = ({
 
                         {/* OTP Input */}
                         <SimpleGrid columns={OTP_LENGTH} spacing={3}>
-                            {otpValues.map((value, index) => (
+                            {Array.from({length: OTP_LENGTH}).map((_, index) => (
                                 <Input
                                     key={index}
-                                    ref={(el) => (inputRefs.current[index] = el)}
-                                    value={value}
-                                    onChange={(e) => handleOtpChange(index, e.target.value)}
-                                    onKeyDown={(e) => handleKeyDown(index, e)}
-                                    onPaste={handlePaste}
+                                    ref={(el) => (otpInputs.inputRefs.current[index] = el)}
+                                    value={otpInputs.values[index]}
+                                    onChange={(e) => handleInputChange(index, e.target.value)}
+                                    onKeyDown={(e) => otpInputs.handleKeyDown(index, e)}
+                                    onPaste={otpInputs.handlePaste}
                                     type="text"
                                     inputMode="numeric"
                                     maxLength={1}
@@ -332,9 +246,9 @@ const OtpAuth = ({
                         )}
 
                         {/* Error message */}
-                        {verificationError && (
+                        {error && (
                             <Text fontSize="sm" color="red.500" textAlign="center">
-                                {verificationError}
+                                {error}
                             </Text>
                         )}
 
@@ -364,7 +278,7 @@ const OtpAuth = ({
                             </Button>
 
                             <Button
-                                onClick={handleResendCode}
+                                onClick={handleResend}
                                 variant="solid"
                                 size="lg"
                                 colorScheme={isResendDisabled ? 'gray' : 'blue'}
