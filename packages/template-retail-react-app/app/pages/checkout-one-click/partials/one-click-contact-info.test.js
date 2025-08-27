@@ -63,7 +63,7 @@ jest.mock('@salesforce/retail-react-app/app/hooks/use-current-customer', () => (
     })
 }))
 
-jest.mock('@salesforce/retail-react-app/app/pages/checkout-container/util/checkout-context', () => {
+jest.mock('@salesforce/retail-react-app/app/pages/checkout-one-click/util/checkout-context', () => {
     return {
         useCheckout: jest.fn().mockReturnValue({
             customer: null,

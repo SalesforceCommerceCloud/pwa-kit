@@ -29,16 +29,24 @@ import {
 } from '@salesforce/commerce-sdk-react'
 import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
 import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
-import {useCheckout} from '@salesforce/retail-react-app/app/pages/checkout-container/util/checkout-context'
+import {
+    useCheckout,
+    CheckoutProvider
+} from '@salesforce/retail-react-app/app/pages/checkout-one-click/util/checkout-context'
 import ContactInfo from '@salesforce/retail-react-app/app/pages/checkout-one-click/partials/one-click-contact-info'
 import PickupAddress from '@salesforce/retail-react-app/app/pages/checkout-one-click/partials/one-click-pickup-address'
 import ShippingAddress from '@salesforce/retail-react-app/app/pages/checkout-one-click/partials/one-click-shipping-address'
 import ShippingOptions from '@salesforce/retail-react-app/app/pages/checkout-one-click/partials/one-click-shipping-options'
 import Payment from '@salesforce/retail-react-app/app/pages/checkout-one-click/partials/one-click-payment'
+import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
+import CheckoutSkeleton from '@salesforce/retail-react-app/app/pages/checkout-one-click/partials/one-click-checkout-skeleton'
+import UnavailableProductConfirmationModal from '@salesforce/retail-react-app/app/components/unavailable-product-confirmation-modal'
+import LoadingSpinner from '@salesforce/retail-react-app/app/components/loading-spinner'
 import OrderSummary from '@salesforce/retail-react-app/app/components/order-summary'
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
 import {
     API_ERROR_MESSAGE,
+    TOAST_MESSAGE_REMOVED_ITEM_FROM_CART,
     STORE_LOCATOR_IS_ENABLED
 } from '@salesforce/retail-react-app/app/constants'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
@@ -435,4 +443,61 @@ const CheckoutOneClick = () => {
     )
 }
 
-export default CheckoutOneClick
+const CheckoutContainer = () => {
+    const {data: customer} = useCurrentCustomer()
+    const {data: basket} = useCurrentBasket()
+    const {formatMessage} = useIntl()
+    const removeItemFromBasketMutation = useShopperBasketsMutation('removeItemFromBasket')
+    const toast = useToast()
+    const [isDeletingUnavailableItem, setIsDeletingUnavailableItem] = useState(false)
+
+    const handleRemoveItem = async (product) => {
+        await removeItemFromBasketMutation.mutateAsync(
+            {
+                parameters: {basketId: basket.basketId, itemId: product.itemId}
+            },
+            {
+                onSuccess: () => {
+                    toast({
+                        title: formatMessage(TOAST_MESSAGE_REMOVED_ITEM_FROM_CART, {quantity: 1}),
+                        status: 'success'
+                    })
+                },
+                onError: () => {
+                    toast({
+                        title: formatMessage(API_ERROR_MESSAGE),
+                        status: 'error'
+                    })
+                }
+            }
+        )
+    }
+    const handleUnavailableProducts = async (unavailableProductIds) => {
+        setIsDeletingUnavailableItem(true)
+        const productItems = basket?.productItems?.filter((item) =>
+            unavailableProductIds?.includes(item.productId)
+        )
+        for (let item of productItems) {
+            await handleRemoveItem(item)
+        }
+        setIsDeletingUnavailableItem(false)
+    }
+
+    if (!customer || !customer.customerId || !basket || !basket.basketId) {
+        return <CheckoutSkeleton />
+    }
+
+    return (
+        <CheckoutProvider>
+            {isDeletingUnavailableItem && <LoadingSpinner wrapperStyles={{height: '100vh'}} />}
+
+            <CheckoutOneClick />
+            <UnavailableProductConfirmationModal
+                productItems={basket?.productItems}
+                handleUnavailableProducts={handleUnavailableProducts}
+            />
+        </CheckoutProvider>
+    )
+}
+
+export default CheckoutContainer

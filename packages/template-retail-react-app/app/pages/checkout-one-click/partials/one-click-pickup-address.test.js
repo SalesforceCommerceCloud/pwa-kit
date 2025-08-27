@@ -87,7 +87,7 @@ jest.mock('@salesforce/retail-react-app/app/hooks/use-current-basket', () => ({
 }))
 
 jest.mock(
-    '@salesforce/retail-react-app/app/pages/checkout-container/util/checkout-context',
+    '@salesforce/retail-react-app/app/pages/checkout-one-click/util/checkout-context',
     () => ({
         useCheckout: () => ({
             step: 1,
