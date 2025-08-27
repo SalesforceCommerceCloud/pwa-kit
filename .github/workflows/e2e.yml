@@ -361,7 +361,7 @@ jobs:
           node -e "const config = require('./e2e/config.js'); console.log('Preset for retail-app-private-client:', config.PRESET['retail-app-private-client'])"
           echo ""
           echo "=== Program.json preset content ==="
-          jq '.programs.presets[] | select(.id == "retail-react-app-private-slas-client")' packages/pwa-kit-create-app/program.json
+          jq '.presets[] | select(.id == "retail-react-app-private-slas-client")' packages/pwa-kit-create-app/program.json
           echo ""
 
       - name: Generate Retail App Private Client
@@ -370,6 +370,26 @@ jobs:
         with:
           PROJECT_KEY: "retail-app-private-client"
           TEMPLATE_VERSION: ${{ env.retail_app_template_version }}
+
+      - name: Debug template variables (add to template temporarily)
+        run: |
+          echo "=== Adding debug to template to see actual variables ==="
+          TEMPLATE_FILE="packages/pwa-kit-create-app/assets/templates/@salesforce/retail-react-app/config/default.js.hbs"
+          # Add debug output at the top of the template
+          sed -i '11i\\n// DEBUG: answers.project.login.passwordless.enabled = {{answers.project.login.passwordless.enabled}}\n// DEBUG: answers.project.login.social.enabled = {{answers.project.login.social.enabled}}\n// DEBUG: answers.project.demo.enableDemoSettings = {{answers.project.demo.enableDemoSettings}}\n' "$TEMPLATE_FILE"
+          echo "Debug lines added to template"
+
+      - name: Regenerate with debug template
+        run: |
+          # Clean up previous generation
+          rm -rf ../generated-projects/retail-app-private-client || true
+          # Run generation again
+          COMMAND="node e2e/scripts/generate-project.js --project-key retail-app-private-client"
+          if [[ -n "${{ env.retail_app_template_version }}" ]]; then
+            COMMAND="$COMMAND --templateVersion ${{ env.retail_app_template_version }}"
+          fi
+          $COMMAND
+        id: regenerate_debug
 
       - name: Validate Generated Retail App Private Client
         uses: ./.github/actions/e2e_validate_generated_app
