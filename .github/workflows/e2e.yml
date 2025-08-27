@@ -368,6 +368,23 @@ jobs:
           PROJECT_KEY: "retail-app-private-client"
           TEMPLATE_VERSION: ${{ env.retail_app_template_version }}
 
+      - name: Debug - Show generated app config
+        run: |
+          echo "=== Generated App Structure ==="
+          ls -la ${{ steps.generate_app_private_client.outputs.project_path }}
+          echo ""
+          echo "=== Config Directory ==="
+          ls -la ${{ steps.generate_app_private_client.outputs.project_path }}/config/ || echo "No config directory found"
+          echo ""
+          echo "=== App Directory ==="
+          ls -la ${{ steps.generate_app_private_client.outputs.project_path }}/app/ || echo "No app directory found"
+          echo ""
+          echo "=== Generated config/default.js Content ==="
+          cat ${{ steps.generate_app_private_client.outputs.project_path }}/config/default.js || echo "config/default.js not found"
+          echo ""
+          echo "=== Generated app/config/default.js Content (if exists) ==="
+          cat ${{ steps.generate_app_private_client.outputs.project_path }}/app/config/default.js || echo "app/config/default.js not found"
+
       - name: Create MRT credentials file
         uses: "./.github/actions/create_mrt"
         with:
