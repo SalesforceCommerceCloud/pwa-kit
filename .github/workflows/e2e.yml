@@ -371,75 +371,11 @@ jobs:
           PROJECT_KEY: "retail-app-private-client"
           TEMPLATE_VERSION: ${{ env.retail_app_template_version }}
 
-      - name: Debug template variables (add to template temporarily)
-        run: |
-          echo "=== Adding debug to template to see actual variables ==="
-          TEMPLATE_FILE="packages/pwa-kit-create-app/assets/templates/@salesforce/retail-react-app/config/default.js.hbs"
-          
-          # Create backup
-          cp "$TEMPLATE_FILE" "$TEMPLATE_FILE.backup"
-          
-          # Add debug output after the copyright header (around line 10)
-          sed -i '10a\\n// DEBUG: Full context dump\n// answers = {{json answers}}\n// answers.project.login.passwordless.enabled = {{answers.project.login.passwordless.enabled}}\n// answers.project.login.social.enabled = {{answers.project.login.social.enabled}}\n' "$TEMPLATE_FILE"
-          
-          echo "Debug lines added to template - showing changes:"
-          head -20 "$TEMPLATE_FILE"
-          
-          # Temporarily commit the debug changes to allow lerna publish
-          git config --global user.email "ci@example.com"
-          git config --global user.name "CI Debug"
-          git add "$TEMPLATE_FILE"
-          git commit -m "Temporary debug changes to template" || echo "Already committed"
-
-      - name: Regenerate with debug template
-        run: |
-          # Clean up previous generation
-          rm -rf ../generated-projects/retail-app-private-client || true
-          # Run generation again
-          COMMAND="node e2e/scripts/generate-project.js --project-key retail-app-private-client"
-          if [[ -n "${{ env.retail_app_template_version }}" ]]; then
-            COMMAND="$COMMAND --templateVersion ${{ env.retail_app_template_version }}"
-          fi
-          $COMMAND
-        id: regenerate_debug
-
-      - name: Restore template file after debug
-        if: always()
-        run: |
-          # Revert the debug changes
-          git reset --hard HEAD~1 || echo "Failed to reset, template might remain modified"
-
       - name: Validate Generated Retail App Private Client
         uses: ./.github/actions/e2e_validate_generated_app
         with:
           PROJECT_KEY: "retail-app-private-client"
           TEMPLATE_VERSION: ${{ env.retail_app_template_version }}
-
-      - name: Debug - Show generated app config and preset usage
-        run: |
-          echo "=== Generation Command Debug ==="
-          echo "PROJECT_KEY: retail-app-private-client"
-          echo "PRESET: retail-react-app-private-slas-client"
-          echo "TEMPLATE_VERSION: ${{ env.retail_app_template_version }}"
-          echo ""
-          echo "=== Template Files Check ==="
-          echo "Checking if debug was added to template file:"
-          grep -n "DEBUG:" packages/pwa-kit-create-app/assets/templates/@salesforce/retail-react-app/config/default.js.hbs || echo "No debug lines found in template"
-          echo ""
-          echo "Checking if login template logic exists:"
-          grep -n "answers.project.login" packages/pwa-kit-create-app/assets/templates/@salesforce/retail-react-app/config/default.js.hbs || echo "No login template logic found"
-          echo ""
-          echo "=== Generated App Structure ==="
-          ls -la ${{ steps.generate_app_private_client.outputs.project_path }}
-          echo ""
-          echo "=== Generated config/default.js Content (first 20 lines) ==="
-          head -20 ${{ steps.generate_app_private_client.outputs.project_path }}/config/default.js || echo "config/default.js not found"
-          echo ""
-          echo "=== Generated config login section ==="
-          grep -A 20 "login:" ${{ steps.generate_app_private_client.outputs.project_path }}/config/default.js || echo "No login section found"
-          echo ""
-          echo "=== Check if debug comments exist in generated file ==="
-          grep "DEBUG:" ${{ steps.generate_app_private_client.outputs.project_path }}/config/default.js || echo "No debug comments found in generated config"
 
       - name: Create MRT credentials file
         uses: "./.github/actions/create_mrt"
@@ -454,12 +390,6 @@ jobs:
           TARGET: e2e-pwa-kit-private
           FLAGS: --wait
 
-      - name: Set Retail App Private Client Home
-        run: export RETAIL_APP_HOME=https://scaffold-pwa-e2e-pwa-kit-private.mobify-storefront.com/
-
-      - name: Set PWA Kit E2E Test User
-        run: export PWA_E2E_USER_EMAIL=e2e.pwa.kit@gmail.com PWA_E2E_USER_PASSWORD=hpv_pek-JZK_xkz0wzf
-
       - name: Install Playwright Browsers
         run: npx playwright install --with-deps
 
@@ -468,6 +398,9 @@ jobs:
         run: npm run test:e2e
         env:
           RUN_PRIVATE_CLIENT_TESTS: true
+          PWA_E2E_USER_EMAIL: "e2e.pwa.kit@gmail.com"
+          PWA_E2E_USER_PASSWORD: "hpv_pek-JZK_xkz0wzf"
+          RETAIL_APP_HOME: "https://scaffold-pwa-e2e-pwa-kit-private.mobify-storefront.com/"
 
   notify-slack-pwa-private-client:
     needs: [run-generator-private-client]
