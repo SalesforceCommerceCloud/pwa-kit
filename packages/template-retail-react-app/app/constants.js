@@ -257,9 +257,3 @@ export const PASSWORDLESS_ERROR_MESSAGES = [
 ]
 
 export const INVALID_TOKEN_ERROR = /invalid token/i
-
-/**
- * Constant to enable partial hydration capabilities, i.e. `<Island/>` components
- * @deprecated Use `partialHydrationEnabled` in the config file instead
- */
-export const PARTIAL_HYDRATION_ENABLED = false
