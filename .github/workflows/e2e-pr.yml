@@ -147,6 +147,14 @@ jobs:
                   PROJECT_KEY: 'retail-app-private-client'
                   TEMPLATE_VERSION: ${{ env.retail_app_template_version }}
 
+            - name: Show Generated App Config
+              if: ${{ env.SKIP_WORKFLOW != 'true' }}
+              run: |-
+                  echo "=== Generated config/default.js content ==="
+                  cat ${{ steps.generate_app.outputs.project_path }}/config/default.js
+                  echo ""
+                  echo "=== End of config/default.js ==="
+
             - name: Create MRT credentials file
               if: ${{ env.SKIP_WORKFLOW != 'true' }}
               uses: './.github/actions/create_mrt'
