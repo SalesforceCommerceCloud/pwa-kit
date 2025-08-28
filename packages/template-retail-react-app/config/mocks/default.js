@@ -112,7 +112,9 @@ module.exports = {
         dataCloudAPI: {
             appSourceId: '7ae070a6-f4ec-4def-a383-d9cacc3f20a1',
             tenantId: 'g82wgnrvm-ywk9dggrrw8mtggy.pc-rnd'
-        }
+        },
+        storeLocatorEnabled: true,
+        multishipEnabled: true
     },
     // This list contains server-side only libraries that you don't want to be compiled by webpack
     externals: [],

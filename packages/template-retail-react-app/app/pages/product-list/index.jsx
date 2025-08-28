@@ -94,6 +94,7 @@ import {
     PRODUCT_LIST_SELECTABLE_ATTRIBUTE_ID,
     STORE_LOCATOR_IS_ENABLED
 } from '@salesforce/retail-react-app/app/constants'
+import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
 import LoadingSpinner from '@salesforce/retail-react-app/app/components/loading-spinner'
 import {useWishList} from '@salesforce/retail-react-app/app/hooks/use-wish-list'
@@ -126,6 +127,7 @@ const ProductList = (props) => {
     const {res} = useServerContext()
     const customerId = useCustomerId()
     const [searchParams, {stringify: stringifySearchParams}] = useSearchParams()
+    const storeLocatorEnabled = getConfig()?.app?.storeLocatorEnabled ?? STORE_LOCATOR_IS_ENABLED
 
     /**************** Page State ****************/
     const [filtersLoading, setFiltersLoading] = useState(false)
@@ -400,7 +402,7 @@ const ProductList = (props) => {
 
     // Helper function to create StoreInventoryFilter component
     const createStoreInventoryFilter = () => {
-        if (!STORE_LOCATOR_IS_ENABLED) return null
+        if (!storeLocatorEnabled) return null
         return (
             <StoreInventoryFilter
                 key="storeInventoryFilter"

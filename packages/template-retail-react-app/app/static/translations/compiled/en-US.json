@@ -532,21 +532,45 @@
   "cart.order_type.delivery": [
     {
       "type": 0,
-      "value": "Delivery"
+      "value": "Delivery - "
+    },
+    {
+      "type": 1,
+      "value": "itemsInShipment"
+    },
+    {
+      "type": 0,
+      "value": " out of "
+    },
+    {
+      "type": 1,
+      "value": "totalItemsInCart"
+    },
+    {
+      "type": 0,
+      "value": " items"
     }
   ],
   "cart.order_type.pickup_in_store": [
     {
       "type": 0,
-      "value": "Pick Up in Store ("
+      "value": "Pick Up in Store - "
     },
     {
       "type": 1,
-      "value": "storeName"
+      "value": "itemsInShipment"
     },
     {
       "type": 0,
-      "value": ")"
+      "value": " out of "
+    },
+    {
+      "type": 1,
+      "value": "totalItemsInCart"
+    },
+    {
+      "type": 0,
+      "value": " items"
     }
   ],
   "cart.product_edit_modal.modal_label": [
@@ -721,6 +745,16 @@
       "value": "Delivery Details"
     }
   ],
+  "checkout_confirmation.heading.delivery_number": [
+    {
+      "type": 0,
+      "value": "Delivery "
+    },
+    {
+      "type": 1,
+      "value": "number"
+    }
+  ],
   "checkout_confirmation.heading.order_summary": [
     {
       "type": 0,
@@ -743,6 +777,16 @@
     {
       "type": 0,
       "value": "Pickup Details"
+    }
+  ],
+  "checkout_confirmation.heading.pickup_location_number": [
+    {
+      "type": 0,
+      "value": "Pickup Location "
+    },
+    {
+      "type": 1,
+      "value": "number"
     }
   ],
   "checkout_confirmation.heading.shipping_address": [
@@ -791,24 +835,6 @@
     {
       "type": 0,
       "value": "Shipping"
-    }
-  ],
-  "checkout_confirmation.label.shipping.strikethrough.price": [
-    {
-      "type": 0,
-      "value": "Originally "
-    },
-    {
-      "type": 1,
-      "value": "originalPrice"
-    },
-    {
-      "type": 0,
-      "value": ", now "
-    },
-    {
-      "type": 1,
-      "value": "newPrice"
     }
   ],
   "checkout_confirmation.label.subtotal": [
@@ -1745,6 +1771,12 @@
       "value": "Item removed from wishlist"
     }
   ],
+  "global.info.store_insufficient_inventory": [
+    {
+      "type": 0,
+      "value": "Some items aren't available for pickup at this store."
+    }
+  ],
   "global.link.added_to_wishlist.view_wishlist": [
     {
       "type": 0,
@@ -2007,6 +2039,16 @@
     {
       "type": 0,
       "value": "Quantity: "
+    },
+    {
+      "type": 1,
+      "value": "quantity"
+    }
+  ],
+  "item_attributes.label.quantity_abbreviated": [
+    {
+      "type": 0,
+      "value": "Qty: "
     },
     {
       "type": 1,
@@ -2529,6 +2571,12 @@
       "value": "Order Summary"
     }
   ],
+  "order_summary.label.delivery_items": [
+    {
+      "type": 0,
+      "value": "Delivery Items"
+    }
+  ],
   "order_summary.label.estimated_total": [
     {
       "type": 0,
@@ -2545,6 +2593,12 @@
     {
       "type": 0,
       "value": "Order Total"
+    }
+  ],
+  "order_summary.label.pickup_items": [
+    {
+      "type": 0,
+      "value": "Pickup Items"
     }
   ],
   "order_summary.label.promo_applied": [
@@ -2713,10 +2767,28 @@
       "value": "This is a secure SSL encrypted payment."
     }
   ],
+  "pickup_address.bonus_products.title": [
+    {
+      "type": 0,
+      "value": "Bonus Items"
+    }
+  ],
   "pickup_address.button.continue_to_payment": [
     {
       "type": 0,
       "value": "Continue to Payment"
+    }
+  ],
+  "pickup_address.button.continue_to_shipping_address": [
+    {
+      "type": 0,
+      "value": "Continue to Shipping Address"
+    }
+  ],
+  "pickup_address.button.show_products": [
+    {
+      "type": 0,
+      "value": "Show Products"
     }
   ],
   "pickup_address.title.pickup_address": [
@@ -2729,6 +2801,24 @@
     {
       "type": 0,
       "value": "Store Information"
+    }
+  ],
+  "pickup_or_delivery.label.choose_delivery_option": [
+    {
+      "type": 0,
+      "value": "Choose delivery option"
+    }
+  ],
+  "pickup_or_delivery.label.pickup_in_store": [
+    {
+      "type": 0,
+      "value": "Pick Up in Store"
+    }
+  ],
+  "pickup_or_delivery.label.ship_to_address": [
+    {
+      "type": 0,
+      "value": "Ship to Address"
     }
   ],
   "price_per_item.label.each": [
@@ -3323,10 +3413,34 @@
       "value": "In Stock"
     }
   ],
+  "shipping_address.action.ship_to_multiple_addresses": [
+    {
+      "type": 0,
+      "value": "Ship to Multiple Addresses"
+    }
+  ],
+  "shipping_address.action.ship_to_single_address": [
+    {
+      "type": 0,
+      "value": "Ship to Single Address"
+    }
+  ],
+  "shipping_address.button.add_new_address": [
+    {
+      "type": 0,
+      "value": "+ Add New Address"
+    }
+  ],
   "shipping_address.button.continue_to_shipping": [
     {
       "type": 0,
       "value": "Continue to Shipping Method"
+    }
+  ],
+  "shipping_address.error.update_failed": [
+    {
+      "type": 0,
+      "value": "Something went wrong while updating the shipping address. Try again."
     }
   ],
   "shipping_address.label.edit_button": [
@@ -3349,10 +3463,28 @@
       "value": "address"
     }
   ],
+  "shipping_address.label.shipping_address": [
+    {
+      "type": 0,
+      "value": "Delivery Address"
+    }
+  ],
   "shipping_address.label.shipping_address_form": [
     {
       "type": 0,
       "value": "Shipping Address Form"
+    }
+  ],
+  "shipping_address.message.no_items_in_basket": [
+    {
+      "type": 0,
+      "value": "No items in basket."
+    }
+  ],
+  "shipping_address.summary.multiple_addresses": [
+    {
+      "type": 0,
+      "value": "Your items will be shipped to multiple addresses."
     }
   ],
   "shipping_address.title.shipping_address": [
@@ -3365,6 +3497,12 @@
     {
       "type": 0,
       "value": "Save & Continue to Shipping Method"
+    }
+  ],
+  "shipping_address_form.button.save": [
+    {
+      "type": 0,
+      "value": "Save"
     }
   ],
   "shipping_address_form.heading.edit_address": [
@@ -3403,16 +3541,158 @@
       "value": "Edit Shipping Address"
     }
   ],
-  "shipping_options.action.send_as_a_gift": [
+  "shipping_multi_address.add_new_address.aria_label": [
     {
       "type": 0,
-      "value": "Do you want to send this as a gift?"
+      "value": "Add new delivery address for "
+    },
+    {
+      "type": 1,
+      "value": "productName"
+    }
+  ],
+  "shipping_multi_address.error.duplicate_address": [
+    {
+      "type": 0,
+      "value": "The address you entered already exists."
+    }
+  ],
+  "shipping_multi_address.error.label": [
+    {
+      "type": 0,
+      "value": "Something went wrong while loading products."
+    }
+  ],
+  "shipping_multi_address.error.message": [
+    {
+      "type": 0,
+      "value": "Something went wrong while loading products. Try again."
+    }
+  ],
+  "shipping_multi_address.error.save_failed": [
+    {
+      "type": 0,
+      "value": "Couldn't save the address."
+    }
+  ],
+  "shipping_multi_address.error.submit_failed": [
+    {
+      "type": 0,
+      "value": "Something went wrong while setting up shipments. Try again."
+    }
+  ],
+  "shipping_multi_address.format.address_line_2": [
+    {
+      "type": 1,
+      "value": "city"
+    },
+    {
+      "type": 0,
+      "value": ", "
+    },
+    {
+      "type": 1,
+      "value": "stateCode"
+    },
+    {
+      "type": 0,
+      "value": " "
+    },
+    {
+      "type": 1,
+      "value": "postalCode"
+    }
+  ],
+  "shipping_multi_address.image.alt": [
+    {
+      "type": 0,
+      "value": "Product image for "
+    },
+    {
+      "type": 1,
+      "value": "productName"
+    }
+  ],
+  "shipping_multi_address.loading.message": [
+    {
+      "type": 0,
+      "value": "Loading..."
+    }
+  ],
+  "shipping_multi_address.loading_addresses": [
+    {
+      "type": 0,
+      "value": "Loading addresses..."
+    }
+  ],
+  "shipping_multi_address.no_addresses_available": [
+    {
+      "type": 0,
+      "value": "No address available"
+    }
+  ],
+  "shipping_multi_address.product_attributes.label": [
+    {
+      "type": 0,
+      "value": "Product attributes"
+    }
+  ],
+  "shipping_multi_address.quantity.label": [
+    {
+      "type": 0,
+      "value": "Quantity"
+    }
+  ],
+  "shipping_multi_address.submit.description": [
+    {
+      "type": 0,
+      "value": "Continue to next step with selected delivery addresses"
+    }
+  ],
+  "shipping_multi_address.submit.loading": [
+    {
+      "type": 0,
+      "value": "Setting up shipments..."
+    }
+  ],
+  "shipping_multi_address.success.address_saved": [
+    {
+      "type": 0,
+      "value": "Address saved successfully"
     }
   ],
   "shipping_options.button.continue_to_payment": [
     {
       "type": 0,
       "value": "Continue to Payment"
+    }
+  ],
+  "shipping_options.free": [
+    {
+      "type": 0,
+      "value": "Free"
+    }
+  ],
+  "shipping_options.label.no_method_selected": [
+    {
+      "type": 0,
+      "value": "No shipping method selected"
+    }
+  ],
+  "shipping_options.label.shipping_to": [
+    {
+      "type": 0,
+      "value": "Shipping to "
+    },
+    {
+      "type": 1,
+      "value": "name"
+    }
+  ],
+  "shipping_options.label.total_shipping": [
+    {
+      "type": 0,
+      "value": "Total Shipping"
     }
   ],
   "shipping_options.title.shipping_gift_options": [
@@ -3469,6 +3749,12 @@
     {
       "type": 0,
       "value": " to proceed."
+    }
+  ],
+  "store_display.button.use_recent_store": [
+    {
+      "type": 0,
+      "value": "Use Recent Store"
     }
   ],
   "store_display.format.address_line_2": [
@@ -3741,6 +4027,12 @@
     {
       "type": 0,
       "value": "Edit Shipping Address"
+    }
+  ],
+  "toggle_card.action.editShippingAddresses": [
+    {
+      "type": 0,
+      "value": "Edit Shipping Addresses"
     }
   ],
   "toggle_card.action.editShippingOptions": [

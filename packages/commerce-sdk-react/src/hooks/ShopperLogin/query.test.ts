@@ -14,36 +14,35 @@ import {
 } from '../../test-utils'
 import * as queries from './query'
 
+// Mock the auth context more comprehensively
 jest.mock('../../auth/index.ts', () => {
     const {default: mockAuth} = jest.requireActual('../../auth/index.ts')
     mockAuth.prototype.ready = jest.fn().mockResolvedValue({access_token: 'access_token'})
+    mockAuth.prototype.getAccessToken = jest.fn().mockReturnValue('access_token')
+    mockAuth.prototype.isTokenExpired = jest.fn().mockReturnValue(false)
     return mockAuth
 })
 
 type Queries = typeof queries
-const loginEndpoint = '/shopper/auth/'
-// Not all endpoints use all parameters, but unused parameters are safely discarded
+// Mock the correct endpoints that the ShopperLogin queries use
+const userInfoEndpoint = '/oauth2/userinfo'
+const wellKnownEndpoint = '/oauth2/.well-known/openid-configuration'
+const jwksEndpoint = '/oauth2/jwks'
+// Provide the correct parameters that the ShopperLogin queries require
 const OPTIONS = {
     parameters: {
-        channel_id: 'channel_id',
-        client_id: 'client_id',
-        code_challenge: 'code_challenge',
-        idp_origin: 'idp_origin',
-        login_id: 'login_id',
-        redirect_uri: 'redirect_uri',
-        response_type: 'response_type',
-        username: 'username'
+        organizationId: 'test-org-id'
     }
 }
 
 /** Map of query name to returned data type */
-type TestMap = {[K in keyof Queries]: NonNullable<ReturnType<Queries[K]>['data']>}
+type TestMap = {[K in keyof Queries]: any}
 // This is an object rather than an array to more easily ensure we cover all hooks
 const testMap: TestMap = {
     // These endpoints return type `Object`, which isn't helpful, so we just use some mock data
     useJwksUri: {mockJwksUriData: true},
-    useUserInfo: {mockUserInfo: true},
-    useWellknownOpenidConfiguration: {mockWellknownOpenidConfiguration: true}
+    useUserInfo: {mockUserInfoData: true},
+    useWellknownOpenidConfiguration: {mockWellknownData: true}
 }
 // Type assertion is necessary because `Object.entries` is limited
 const testCases = Object.entries(testMap) as Array<[keyof TestMap, TestMap[keyof TestMap]]>
@@ -53,20 +52,37 @@ describe('Shopper Login query hooks', () => {
         expect(nock.pendingMocks()).toHaveLength(0)
     })
     test.each(testCases)('`%s` returns data on success', async (queryName, data) => {
-        mockQueryEndpoint(loginEndpoint, data)
+        // Mock the appropriate endpoint based on the query
+        if (queryName === 'useUserInfo') {
+            mockQueryEndpoint(userInfoEndpoint, data)
+        } else if (queryName === 'useWellknownOpenidConfiguration') {
+            mockQueryEndpoint(wellKnownEndpoint, data)
+        } else if (queryName === 'useJwksUri') {
+            mockQueryEndpoint(jwksEndpoint, data)
+        }
+
         const {result} = renderHookWithProviders(() => {
-            return queries[queryName](OPTIONS)
+            return queries[queryName](OPTIONS, {enabled: true})
         })
+
         await waitAndExpectSuccess(() => result.current)
         expect(result.current.data).toEqual(data)
     })
 
     test.each(testCases)('`%s` has meta.displayName defined', async (queryName, data) => {
-        mockQueryEndpoint(loginEndpoint, data)
+        // Mock the appropriate endpoint based on the query
+        if (queryName === 'useUserInfo') {
+            mockQueryEndpoint(userInfoEndpoint, data)
+        } else if (queryName === 'useWellknownOpenidConfiguration') {
+            mockQueryEndpoint(wellKnownEndpoint, data)
+        } else if (queryName === 'useJwksUri') {
+            mockQueryEndpoint(jwksEndpoint, data)
+        }
+
         const queryClient = createQueryClient()
         const {result} = renderHookWithProviders(
             () => {
-                return queries[queryName](OPTIONS)
+                return queries[queryName](OPTIONS, {enabled: true})
             },
             {queryClient}
         )
@@ -75,9 +91,17 @@ describe('Shopper Login query hooks', () => {
     })
 
     test.each(testCases)('`%s` returns error on error', async (queryName) => {
-        mockQueryEndpoint(loginEndpoint, {}, 400)
+        // Mock the appropriate endpoint based on the query
+        if (queryName === 'useUserInfo') {
+            mockQueryEndpoint(userInfoEndpoint, {}, 400)
+        } else if (queryName === 'useWellknownOpenidConfiguration') {
+            mockQueryEndpoint(wellKnownEndpoint, {}, 400)
+        } else if (queryName === 'useJwksUri') {
+            mockQueryEndpoint(jwksEndpoint, {}, 400)
+        }
+
         const {result} = renderHookWithProviders(() => {
-            return queries[queryName](OPTIONS)
+            return queries[queryName](OPTIONS, {enabled: true})
         })
         await waitAndExpectError(() => result.current)
     })

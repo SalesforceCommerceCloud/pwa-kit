@@ -6,7 +6,6 @@
  */
 
 const {test, expect} = require('@playwright/test')
-const config = require('../../config')
 const {addProductToCart, searchProduct, checkoutProduct} = require('../../scripts/pageHelpers')
 const {generateUserCredentials, getCreditCardExpiry} = require('../../scripts/utils.js')
 

@@ -42,6 +42,9 @@ export const HOME_SHOP_PRODUCTS_LIMIT = 10
 export const CAT_MENU_DEFAULT_NAV_SSR_DEPTH = 1
 export const CAT_MENU_DEFAULT_ROOT_CATEGORY = 'root'
 
+// Constants for shipments
+export const DEFAULT_SHIPMENT_ID = 'me'
+
 // Default details of badge labels and the corresponding product custom properties that enable badges.
 export const PRODUCT_BADGE_DETAILS = [
     {
@@ -139,6 +142,11 @@ export const TOAST_MESSAGE_REMOVED_FROM_WISHLIST = defineMessage({
     defaultMessage: 'Item removed from wishlist'
 })
 
+export const TOAST_MESSAGE_STORE_INSUFFICIENT_INVENTORY = defineMessage({
+    id: 'global.info.store_insufficient_inventory',
+    defaultMessage: "Some items aren't available for pickup at this store."
+})
+
 // Einstein recommender constants used in <RecommendedProducts/>
 export const EINSTEIN_RECOMMENDERS = {
     ADD_TO_CART_MODAL: 'pdp-similar-items',
@@ -179,6 +187,10 @@ export const REMOVE_UNAVAILABLE_CART_ITEM_DIALOG_CONFIG = {
     }),
     onPrimaryAction: noop
 }
+/**
+ * Constant to enable the store locator and shop the store feature.
+ * @deprecated Use `storeLocatorEnabled` in the config file instead
+ */
 export const STORE_LOCATOR_IS_ENABLED = true
 export const STORE_LOCATOR_SUPPORTED_COUNTRIES = [
     {

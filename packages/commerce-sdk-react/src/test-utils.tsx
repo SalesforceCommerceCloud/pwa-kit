@@ -16,7 +16,6 @@ import {
 import nock from 'nock'
 import CommerceApiProvider, {CommerceApiProviderProps} from './provider'
 import userEvent from '@testing-library/user-event'
-import {PROXY_PATH} from './constant'
 
 // Note: this host does NOT exist
 // it is intentional b/c we can catch those unintercepted requests
@@ -24,7 +23,7 @@ import {PROXY_PATH} from './constant'
 export const DEFAULT_TEST_HOST = 'http://localhost:8888'
 
 export const DEFAULT_TEST_CONFIG = {
-    proxy: `${DEFAULT_TEST_HOST}${PROXY_PATH}/api`,
+    proxy: `${DEFAULT_TEST_HOST}/mobify/proxy/api`,
     redirectURI: `${DEFAULT_TEST_HOST}/callback`,
     clientId: '12345678-1234-1234-1234-123412341234',
     organizationId: 'f_ecom_zzrmy_orgf_001',

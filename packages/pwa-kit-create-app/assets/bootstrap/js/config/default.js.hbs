@@ -10,6 +10,10 @@ const {parseCommerceAgentSettings} = require('./utils.js')
 
 module.exports = {
     app: {
+        // Enable the store locator and shop the store feature.
+        storeLocatorEnabled: true,
+        // Enable the multi-ship feature.
+        multishipEnabled: true,
         // Enable partial hydration capabilities via Island component
         {{#if answers.project.partialHydrationEnabled}}
         partialHydrationEnabled: {{answers.project.partialHydrationEnabled}},
@@ -123,6 +127,10 @@ module.exports = {
             tenantId: '{{answers.project.dataCloud.tenantId}}'
         }
     },
+    // Experimental: The base path for the app. This is the path that will be prepended to all /mobify routes,
+    // callback routes, and Express routes.
+    // Setting this to `/` or an empty string will result in the above routes not having a base path.
+    envBasePath: '/',
     // This list contains server-side only libraries that you don't want to be compiled by webpack
     externals: [],
     // Page not found url for your app

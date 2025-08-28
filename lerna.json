@@ -1,6 +1,4 @@
 {
-  "version": "3.12.0-dev",
-  "packages": [
-    "packages/*"
-  ]
+    "version": "3.12.0-dev",
+    "packages": ["packages/*", "e2e"]
 }

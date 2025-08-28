@@ -9,6 +9,7 @@ import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
 import {useIntl} from 'react-intl'
 import {useAppOrigin} from '@salesforce/retail-react-app/app/hooks/use-app-origin'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
+import {getEnvBasePath} from '@salesforce/pwa-kit-runtime/utils/ssr-namespace-paths'
 import {isAbsoluteURL} from '@salesforce/retail-react-app/app/page-designer/utils'
 
 /**
@@ -23,7 +24,7 @@ export const usePasswordReset = () => {
         config.app.login?.resetPassword?.callbackURI || '/reset-password-callback'
     const callbackURI = isAbsoluteURL(resetPasswordCallback)
         ? resetPasswordCallback
-        : `${appOrigin}${resetPasswordCallback}`
+        : `${appOrigin}${getEnvBasePath()}${resetPasswordCallback}`
 
     const getPasswordResetTokenMutation = useAuthHelper(AuthHelpers.GetPasswordResetToken)
     const resetPasswordMutation = useAuthHelper(AuthHelpers.ResetPassword)

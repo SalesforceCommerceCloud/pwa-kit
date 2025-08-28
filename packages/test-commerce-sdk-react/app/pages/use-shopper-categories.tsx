@@ -19,7 +19,7 @@ function UseShopperCategories() {
         data: result
     } = useCategories({
         parameters: {
-            ids: 'root',
+            ids: ['root'],
             levels: 2
         }
     })
