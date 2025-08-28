@@ -39,7 +39,8 @@ export const useShipmentOperations = (basket) => {
             }
 
             const body = {
-                // Adding shipmentId as a temporary workaround to avoid demo instance issues
+                // For some instance configurations shipmentId is required.
+                // Remove this line to use the server default ID generation
                 shipmentId: `shipment_${nanoid()}`
             }
 
