@@ -7,8 +7,7 @@
 
 import {
     cleanAddressForOrder,
-    areAddressesEqual,
-    isAddressEmpty
+    areAddressesEqual
 } from '@salesforce/retail-react-app/app/utils/address-utils'
 import {DEFAULT_SHIPMENT_ID} from '@salesforce/retail-react-app/app/constants'
 

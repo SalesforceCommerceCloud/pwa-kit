@@ -249,6 +249,60 @@ describe('useProductAddressAssignment', () => {
 
             expect(result.current.availableAddresses).toHaveLength(initialAddressCount)
         })
+
+        test('should reuse same address for multiple items with identical shipping address', () => {
+            mockUseCurrentCustomer.mockReturnValue({
+                data: mockGuestCustomer,
+                isLoading: false
+            })
+
+            // Create a basket where both items are in the same shipment
+            const basketWithSameAddress = {
+                basketId: 'basket-1',
+                productItems: [
+                    {itemId: 'item-1', productId: 'product-1', shipmentId: 'shipment-1'},
+                    {itemId: 'item-2', productId: 'product-2', shipmentId: 'shipment-1'}
+                ],
+                shipments: [
+                    {
+                        shipmentId: 'shipment-1',
+                        shippingMethod: {id: 'delivery-method-1'},
+                        shippingAddress: {
+                            firstName: 'John',
+                            lastName: 'Doe',
+                            address1: '123 Main St',
+                            city: 'San Francisco',
+                            stateCode: 'CA',
+                            postalCode: '94105',
+                            countryCode: 'US',
+                            phone: '4155551234'
+                        }
+                    }
+                ]
+            }
+
+            const {result} = renderHook(() => useProductAddressAssignment(basketWithSameAddress))
+
+            // Should create only one address entry for both items
+            expect(result.current.availableAddresses).toHaveLength(1)
+
+            // Both items should reference the same address ID
+            const addressId1 = result.current.selectedAddresses['item-1']
+            const addressId2 = result.current.selectedAddresses['item-2']
+
+            expect(addressId1).toBeDefined()
+            expect(addressId2).toBeDefined()
+            expect(addressId1).toBe(addressId2)
+
+            // The address should match what was in the shipment
+            const address = result.current.availableAddresses[0]
+            expect(address.firstName).toBe('John')
+            expect(address.lastName).toBe('Doe')
+            expect(address.address1).toBe('123 Main St')
+
+            // All items should have addresses (button should be enabled)
+            expect(result.current.allItemsHaveAddresses).toBe(true)
+        })
     })
 
     describe('addGuestAddress', () => {
