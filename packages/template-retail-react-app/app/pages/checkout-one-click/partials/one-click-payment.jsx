@@ -62,6 +62,8 @@ const Payment = ({
 
     // Track whether user wants to save the payment method
     const [shouldSavePaymentMethod, setShouldSavePaymentMethod] = useState(false)
+    const [hasAutoSelectedPayment, setHasAutoSelectedPayment] = useState(false)
+    const [isApplyingSavedPayment, setIsApplyingSavedPayment] = useState(false)
 
     // Callback when user changes save preference
     const handleSavePreferenceChange = (shouldSave) => {
@@ -185,6 +187,42 @@ const Payment = ({
         })
     }
 
+    // Auto-select a saved payment instrument for registered customers
+    useEffect(() => {
+        const autoSelectSavedPayment = async () => {
+            if (step !== STEPS.PAYMENT || hasAutoSelectedPayment) {
+                return
+            }
+
+            // Only for registered customers with saved instruments and when none is applied
+            if (!customer?.isRegistered || !customer?.paymentInstruments?.length || appliedPayment) {
+                return
+            }
+
+            const preferred =
+                customer.paymentInstruments.find((pi) => pi.preferred === true) ||
+                customer.paymentInstruments[0]
+
+            try {
+                setIsApplyingSavedPayment(true)
+                await addPaymentInstrumentToBasket({
+                    parameters: {basketId: basket?.basketId},
+                    body: {
+                        paymentMethodId: 'CREDIT_CARD',
+                        customerPaymentInstrumentId: preferred.paymentInstrumentId
+                    }
+                })
+                setHasAutoSelectedPayment(true)
+            } catch (e) {
+                // Ignore and allow manual selection
+            } finally {
+                setIsApplyingSavedPayment(false)
+            }
+        }
+
+        autoSelectSavedPayment()
+    }, [step, STEPS, customer, appliedPayment, basket?.basketId, hasAutoSelectedPayment])
+
     const onBillingSubmit = async () => {
         const isFormValid = await billingAddressForm.trigger()
 
@@ -261,7 +299,7 @@ const Payment = ({
                     </Box>
 
                     <Stack spacing={6}>
-                        {!appliedPayment?.paymentCard ? (
+                        {isApplyingSavedPayment ? null : !appliedPayment?.paymentCard ? (
                             <PaymentForm form={paymentMethodForm} onSubmit={onSubmit}>
                                 {/* Save Payment Method - Show right underneath credit card fields */}
                                 {newPaymentInstruments.length > 0 && (
