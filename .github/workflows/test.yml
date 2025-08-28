@@ -121,8 +121,17 @@ jobs:
         run: |-
           version=`jq -r ".version" package.json | cut -d "-" -f 1`
           echo "monorepo_version_base=$version" >> "$GITHUB_ENV"
+          echo "The monorepo version is $monorepo_version_base"
           is_dev_version=`(echo $monorepo_version_base | grep -e "-dev") && echo "true" || echo "false"`
           echo "IS_DEV_VERSION=$is_dev_version" >> "$GITHUB_ENV"
+
+      - name: Verify IS_DEV_VERSION is set
+        run: |-
+          if [ ${{ env.IS_DEV_VERSION }} == 'true' ]; then
+            echo "Dev version detected."
+          else
+            echo "Not a dev version."
+          fi
 
       - name: Publish to NPM
         if: env.IS_NOT_FORK == 'true' && env.IS_MRT_NODE == 'true' && env.RELEASE == 'true' && env.IS_DEV_VERSION == 'false'
@@ -212,8 +221,6 @@ jobs:
         env:
           GENERATOR_PRESET: ${{ matrix.template }}
         timeout-minutes: 8
-
-
 
       - name: Run unit tests
         if: env.IS_TEMPLATE_FROM_RETAIL_REACT_APP == 'true'
