@@ -24,6 +24,7 @@ import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-cur
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
 import ShippingMultiAddress from '@salesforce/retail-react-app/app/pages/checkout/partials/shipping-multi-address'
 import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
+import {useItemShipmentManagement} from '@salesforce/retail-react-app/app/hooks/use-item-shipment-management'
 import {useMultiship} from '@salesforce/retail-react-app/app/hooks/use-multiship'
 import {DEFAULT_SHIPMENT_ID} from '@salesforce/retail-react-app/app/constants'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
@@ -63,7 +64,8 @@ export default function ShippingAddress() {
     const {data: customer} = useCurrentCustomer()
     const {data: basket} = useCurrentBasket()
     const multishipEnabled = getConfig()?.app?.multishipEnabled ?? true
-    const {moveItemsToDeliveryShipment, removeEmptyShipments} = useMultiship(basket)
+    const {removeEmptyShipments} = useMultiship(basket)
+    const {updateItemsToDeliveryShipment} = useItemShipmentManagement(basket?.basketId)
     const selectedShipment = findExistingDeliveryShipment(basket)
     const selectedShippingAddress = selectedShipment?.shippingAddress
     const isAddressFilled = selectedShippingAddress?.address1 && selectedShippingAddress?.city
@@ -132,9 +134,10 @@ export default function ShippingAddress() {
                 ) || []
             const itemsToMove = deliveryItems.filter((item) => item.shipmentId !== targetShipmentId)
             if (itemsToMove.length > 0) {
-                basketAfterItemMoves = await moveItemsToDeliveryShipment(
+                basketAfterItemMoves = await updateItemsToDeliveryShipment(
                     itemsToMove,
                     targetShipmentId
+                    // note: passing defaultInventoryId here is not needed
                 )
             }
             // Remove any empty shipments.
