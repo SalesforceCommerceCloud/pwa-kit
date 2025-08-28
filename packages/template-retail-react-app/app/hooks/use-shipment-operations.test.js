@@ -14,6 +14,10 @@ jest.mock('@salesforce/commerce-sdk-react', () => ({
     useShopperBasketsMutation: jest.fn()
 }))
 
+jest.mock('nanoid', () => ({
+    nanoid: jest.fn(() => 'test-id-123')
+}))
+
 describe('useShipmentOperations', () => {
     let mockCreateShipmentMutation
     let mockRemoveShipmentMutation
@@ -88,6 +92,7 @@ describe('useShipmentOperations', () => {
                     basketId
                 },
                 body: {
+                    shipmentId: 'shipment_test-id-123',
                     shippingAddress: {
                         firstName: 'John',
                         lastName: 'Doe',
@@ -127,6 +132,7 @@ describe('useShipmentOperations', () => {
                     basketId
                 },
                 body: {
+                    shipmentId: 'shipment_test-id-123',
                     shippingMethod: {
                         id: 'shipping-method-1'
                     }
@@ -160,6 +166,7 @@ describe('useShipmentOperations', () => {
                     basketId
                 },
                 body: {
+                    shipmentId: 'shipment_test-id-123',
                     c_fromStoreId: 'store-1'
                 }
             })
