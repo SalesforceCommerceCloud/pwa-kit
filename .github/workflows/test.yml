@@ -87,8 +87,6 @@ jobs:
       - name: Run unit tests
         uses: "./.github/actions/unit_tests"
 
-
-
       - name: Smoke test scripts
         if: env.IS_DEFAULT_NPM == 'true'
         uses: "./.github/actions/smoke_tests"
@@ -119,8 +117,15 @@ jobs:
         if: env.IS_NOT_FORK == 'true' && env.IS_DEFAULT_NPM == 'true'
         uses: "./.github/actions/check_clean"
 
+      - name: Check if monorepo version is a dev version
+        run: |-
+          version=`jq -r ".version" package.json | cut -d "-" -f 1`
+          echo "monorepo_version_base=$version" >> "$GITHUB_ENV"
+          is_dev_version=`(echo $monorepo_version_base | grep -e "-dev") && echo "true" || echo "false"`
+          echo "IS_DEV_VERSION=$is_dev_version" >> "$GITHUB_ENV"
+
       - name: Publish to NPM
-        if: env.IS_NOT_FORK == 'true' && env.IS_MRT_NODE == 'true' && env.RELEASE == 'true'
+        if: env.IS_NOT_FORK == 'true' && env.IS_MRT_NODE == 'true' && env.RELEASE == 'true' && IS_DEV_VERSION == 'false'
         uses: "./.github/actions/publish_to_npm"
         with:
           NODE_AUTH_TOKEN: ${{ secrets.NODE_AUTH_TOKEN }}
