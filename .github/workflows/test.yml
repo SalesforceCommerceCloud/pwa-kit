@@ -120,9 +120,8 @@ jobs:
       - name: Check if monorepo version is a dev version
         run: |-
           version=`jq -r ".version" package.json | cut -d "-" -f 1`
-          echo "monorepo_version_base=$version" >> "$GITHUB_ENV"
-          echo "The monorepo version is $monorepo_version_base"
-          is_dev_version=`(echo $monorepo_version_base | grep -e "-dev") && echo "true" || echo "false"`
+          echo "The version is $version"
+          is_dev_version=`(echo $version | grep -e "-dev") && echo "true" || echo "false"`
           echo "IS_DEV_VERSION=$is_dev_version" >> "$GITHUB_ENV"
 
       - name: Verify IS_DEV_VERSION is set
