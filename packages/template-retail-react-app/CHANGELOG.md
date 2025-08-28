@@ -2,7 +2,7 @@
 - Add support for environment level base paths on /mobify routes [#2892](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2892)
 - Fix private client endpoint prop name [#3177](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3177)
 - This feature introduces an AI-powered shopping assistant that integrates Salesforce Embedded Messaging Service with PWA Kit applications. The shopper agent provides real-time chat support, search assistance, and personalized shopping guidance directly within the e-commerce experience. [#2658](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2658)
-- Added support for Multi-Ship [#3056](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3056) [#3199](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3199) [#3203](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3203)
+- Added support for Multi-Ship [#3056](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3056) [#3199](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3199) [#3203](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3203) [#3211] (https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3211)
 - The feature toggle for partial hydration is now found in the config file (`config.app.partialHydrationEnabled`) [#3058](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3058)
 - Mask user not found messages to prevent user enumeration from passwordless login [#3113](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3113)
 - [Bugfix] Pin `@chakra-ui/react` version to 2.7.0 to avoid breaking changes from 2.10.9 [#2658](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2658)
