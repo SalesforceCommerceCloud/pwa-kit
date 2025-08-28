@@ -148,7 +148,8 @@ const ProductView = forwardRef(
             onOpenStoreLocator = () => {},
             showDeliveryOptions = true,
             customButtons = [],
-            promotionId
+            promotionId,
+            maxOrderQuantity = null
         },
         ref
     ) => {
@@ -633,6 +634,7 @@ const ProductView = forwardRef(
                                         step={stepQuantity}
                                         value={quantity}
                                         min={minOrderQuantity}
+                                        max={maxOrderQuantity}
                                         onChange={(stringValue, numberValue) => {
                                             // Set the Quantity of product to value of input if value number
                                             if (numberValue >= 0) {
@@ -906,7 +908,8 @@ ProductView.propTypes = {
     onOpenStoreLocator: PropTypes.func,
     showDeliveryOptions: PropTypes.bool,
     customButtons: PropTypes.array,
-    promotionId: PropTypes.string
+    promotionId: PropTypes.string,
+    maxOrderQuantity: PropTypes.number
 }
 
 export default ProductView

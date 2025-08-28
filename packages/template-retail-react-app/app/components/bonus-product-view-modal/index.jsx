@@ -22,7 +22,10 @@ import {useProductViewModal} from '@salesforce/retail-react-app/app/hooks/use-pr
 import {useIntl} from 'react-intl'
 import {useShopperBasketsMutationHelper} from '@salesforce/commerce-sdk-react'
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
-import {findAvailableBonusDiscountLineItemId} from '@salesforce/retail-react-app/app/utils/bonus-product-utils'
+import {
+    findAvailableBonusDiscountLineItemId,
+    getRemainingAvailableBonusProductsForProduct
+} from '@salesforce/retail-react-app/app/utils/bonus-product-utils'
 import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
 import {useLocation} from 'react-router-dom'
 import {productViewModalTheme} from '@salesforce/retail-react-app/app/theme/components/project/product-view-modal'
@@ -83,34 +86,59 @@ const BonusProductViewModal = ({
     // Determine context for navigation behavior
     const isFromAddToCartModal = location.pathname !== '/cart'
 
+    // Helper function to calculate max order quantity
+    const getMaxOrderQuantity = () => {
+        if (basket && product) {
+            const bonusData = getRemainingAvailableBonusProductsForProduct(basket, product.id, {
+                [product.id]: product
+            })
+            // Return remaining capacity: total allowed - already in cart
+            return bonusData.aggregatedMaxBonusItems - bonusData.aggregatedSelectedItems
+        }
+        return null
+    }
+
     // Custom addToCart handler for bonus products that includes bonusDiscountLineItemId
     const handleAddToCart = useCallback(
-        async (variant, quantity) => {
+        async (products) => {
             try {
-                // Default quantity to 1 if not provided or invalid
-                const finalQuantity = quantity && quantity > 0 ? quantity : 1
+                const productItems = []
 
-                // Find the first available bonus discount line item with capacity
-                const availableBonusDiscountLineItemId = findAvailableBonusDiscountLineItemId(
-                    basket,
-                    promotionId,
-                    finalQuantity,
-                    bonusDiscountLineItemId // fallback to originally passed id
-                )
+                // Process each item in the selection
+                for (const {variant, quantity} of products) {
+                    // Default quantity to 1 if not provided or invalid
+                    let finalQuantity = quantity && quantity > 0 ? quantity : 1
 
-                if (!availableBonusDiscountLineItemId) {
-                    console.warn('No available bonus discount line item found')
-                    return null
-                }
+                    // Cap quantity to remaining capacity (defensive programming)
+                    const maxAllowed = getMaxOrderQuantity()
+                    if (maxAllowed && finalQuantity > maxAllowed) {
+                        finalQuantity = maxAllowed
+                    }
 
-                const productItems = [
-                    {
+                    // Find the first available bonus discount line item with capacity
+                    const availableBonusDiscountLineItemId = findAvailableBonusDiscountLineItemId(
+                        basket,
+                        promotionId,
+                        finalQuantity,
+                        bonusDiscountLineItemId // fallback to originally passed id
+                    )
+
+                    if (!availableBonusDiscountLineItemId) {
+                        console.warn('No available bonus discount line item found')
+                        continue // Skip this item but process others
+                    }
+
+                    productItems.push({
                         productId: variant?.productId || product?.productId || product?.id,
                         price: variant?.price || product?.price,
                         quantity: parseInt(finalQuantity, 10),
                         bonusDiscountLineItemId: availableBonusDiscountLineItemId
-                    }
-                ]
+                    })
+                }
+
+                if (productItems.length === 0) {
+                    return null
+                }
 
                 const result = await addItemToNewOrExistingBasket(productItems)
 
@@ -184,10 +212,13 @@ const BonusProductViewModal = ({
         }
     }, [productViewModalData.product, safeProduct])
 
+    // Calculate max order quantity for UI
+    const maxOrderQuantity = getMaxOrderQuantity()
+
     return (
-        <Modal 
-            isOpen={isOpen} 
-            onClose={onClose} 
+        <Modal
+            isOpen={isOpen}
+            onClose={onClose}
             size={productViewModalTheme.modal.size}
             closeOnOverlayClick={true}
             closeOnEsc={true}
@@ -221,6 +252,7 @@ const BonusProductViewModal = ({
                             isProductLoading={false}
                             customButtons={customButtons}
                             promotionId={promotionId}
+                            maxOrderQuantity={maxOrderQuantity}
                             {...props}
                         />
                     )}
