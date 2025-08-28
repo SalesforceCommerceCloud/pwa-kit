@@ -96,7 +96,6 @@ beforeEach(() => {
     useMultiship.mockReturnValue({
         createNewDeliveryShipmentWithAddress: jest.fn(),
         updateDeliveryAddressForShipment: jest.fn(),
-        moveItemsToDeliveryShipment: jest.fn(),
         removeEmptyShipments: jest.fn(),
         orchestrateShipmentOperations: jest.fn()
     })

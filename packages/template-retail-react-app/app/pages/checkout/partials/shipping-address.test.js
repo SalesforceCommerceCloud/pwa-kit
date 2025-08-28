@@ -22,6 +22,7 @@ jest.mock('@salesforce/retail-react-app/app/hooks/use-toast')
 // Mock the new multiship and pickup hooks
 jest.mock('@salesforce/retail-react-app/app/hooks/use-multiship')
 jest.mock('@salesforce/retail-react-app/app/hooks/use-pickup-shipment')
+jest.mock('@salesforce/retail-react-app/app/hooks/use-item-shipment-management')
 
 // Mock the constants and getConfig with dynamic values for testing
 let mockMultishipEnabled = true
@@ -302,8 +303,15 @@ describe('ShippingAddress', () => {
             require('@salesforce/retail-react-app/app/hooks/use-multiship').useMultiship
         useMultiship.mockReturnValue({
             findExistingDeliveryShipment: jest.fn().mockReturnValue(mockBasket.shipments[0]),
-            moveItemsToDeliveryShipment: jest.fn().mockResolvedValue(mockBasket),
             removeEmptyShipments: jest.fn().mockResolvedValue()
+        })
+
+        // Mock useItemShipmentManagement hook
+        const useItemShipmentManagement =
+            // eslint-disable-next-line @typescript-eslint/no-var-requires
+            require('@salesforce/retail-react-app/app/hooks/use-item-shipment-management').useItemShipmentManagement
+        useItemShipmentManagement.mockReturnValue({
+            updateItemsToDeliveryShipment: jest.fn().mockResolvedValue(mockBasket)
         })
 
         // Mock useToast hook
