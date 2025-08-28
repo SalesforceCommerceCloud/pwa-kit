@@ -14,7 +14,6 @@ jest.mock('@salesforce/commerce-sdk-react', () => ({
     useShopperBasketsMutation: jest.fn()
 }))
 
-// Mock nanoid to return predictable values
 jest.mock('nanoid', () => ({
     nanoid: jest.fn(() => 'test-id-123')
 }))
