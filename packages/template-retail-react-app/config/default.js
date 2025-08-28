@@ -11,7 +11,7 @@ const {parseCommerceAgentSettings} = require('./utils.js')
 
 module.exports = {
     app: {
-        commerceAgent: parseCommerceAgentSettings(process.env.COMMERCE_AGENT_SETTINGS),
+        // commerceAgent: parseCommerceAgentSettings(process.env.COMMERCE_AGENT_SETTINGS),
         url: {
             site: 'path',
             locale: 'path',
