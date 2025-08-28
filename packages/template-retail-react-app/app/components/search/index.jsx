@@ -93,7 +93,8 @@ const formatSuggestions = (searchSuggestions, input) => {
  */
 const Search = (props) => {
     const config = getConfig()
-    const {enabled, askAgentOnSearch} = config.app.commerceAgent
+    // TODO: should we set default values instead?
+    const {enabled, askAgentOnSearch} = config.app.commerceAgent || {}
     const askAgentOnSearchEnabled = isAskAgentOnSearchEnabled(enabled, askAgentOnSearch)
     const [isOpen, setIsOpen] = useState(false)
     const [searchQuery, setSearchQuery] = useState('')

@@ -217,6 +217,7 @@ const App = (props) => {
     }, [basket?.currency])
 
     const commerceAgentConfiguration = useMemo(() => {
+        // TODO
         return config.app.commerceAgent
     }, [config?.app])
 
