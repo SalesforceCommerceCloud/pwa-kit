@@ -121,8 +121,12 @@ jobs:
         run: |-
           version=`jq -r ".version" package.json`
           echo "The version is $version"
-          is_dev_version=`echo $version | grep -e "\d-dev\b" && echo "true" || echo "false"`
-          echo "$is_dev_version"
+          if [ echo "$version" | grep -eq "\d-dev\b"]; then
+            is_dev_version="true"
+          else
+            is_dev_version="false"
+          fi
+          echo "is_dev_version=$is_dev_version"
           echo "IS_DEV_VERSION=$is_dev_version" >> "$GITHUB_ENV"
           echo "env IS_DEV_VERSION=${{ env.IS_DEV_VERSION }}"
 
