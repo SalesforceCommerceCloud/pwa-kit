@@ -40,4 +40,20 @@ jest.mock('@salesforce/pwa-kit-runtime/utils/ssr-config', () => {
 // The global performance object is available in production
 // environments for both the server and the client.
 // It's just the jest environment that this is not available
-global.performance = performance
+if (global.performance) {
+    // global.performance exists but is missing methods from perf_hooks in jest
+    if (typeof performance.mark === 'function' && !global.performance.mark) {
+        global.performance.mark = performance.mark.bind(performance)
+    }
+    if (typeof performance.measure === 'function' && !global.performance.measure) {
+        global.performance.measure = performance.measure.bind(performance)
+    }
+    if (typeof performance.clearMarks === 'function' && !global.performance.clearMarks) {
+        global.performance.clearMarks = performance.clearMarks.bind(performance)
+    }
+    if (typeof performance.clearMeasures === 'function' && !global.performance.clearMeasures) {
+        global.performance.clearMeasures = performance.clearMeasures.bind(performance)
+    }
+} else {
+    global.performance = performance
+}
