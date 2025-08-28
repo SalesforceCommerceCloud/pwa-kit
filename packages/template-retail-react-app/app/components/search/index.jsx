@@ -42,6 +42,7 @@ import {
     categoryUrlBuilder
 } from '@salesforce/retail-react-app/app/utils/url'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
+import {parseCommerceAgentSettings} from '@salesforce/retail-react-app/config/utils'
 
 const onClient = typeof window !== 'undefined'
 
@@ -93,9 +94,12 @@ const formatSuggestions = (searchSuggestions, input) => {
  */
 const Search = (props) => {
     const config = getConfig()
-    // TODO: should we set default values instead?
-    const {enabled, askAgentOnSearch} = config.app.commerceAgent || {}
-    const askAgentOnSearchEnabled = isAskAgentOnSearchEnabled(enabled, askAgentOnSearch)
+    const askAgentOnSearchEnabled = useMemo(() => {
+        const defaultConfig = parseCommerceAgentSettings()
+        const {enabled, askAgentOnSearch} = config.app.commerceAgent ?? defaultConfig
+        return isAskAgentOnSearchEnabled(enabled, askAgentOnSearch)
+    }, [config.app.commerceAgent])
+
     const [isOpen, setIsOpen] = useState(false)
     const [searchQuery, setSearchQuery] = useState('')
     const navigate = useNavigation()
