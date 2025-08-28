@@ -1,6 +1,7 @@
 {
   "name": "e2e-scripts",
   "version": "3.12.0-dev.1",
+  "private": true,
   "description": "E2E test scripts for PWA Kit",
   "main": "index.js",
   "scripts": {
