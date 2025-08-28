@@ -125,7 +125,7 @@ jobs:
           echo "IS_DEV_VERSION=$is_dev_version" >> "$GITHUB_ENV"
 
       - name: Publish to NPM
-        if: env.IS_NOT_FORK == 'true' && env.IS_MRT_NODE == 'true' && env.RELEASE == 'true' && IS_DEV_VERSION == 'false'
+        if: env.IS_NOT_FORK == 'true' && env.IS_MRT_NODE == 'true' && env.RELEASE == 'true' && env.IS_DEV_VERSION == 'false'
         uses: "./.github/actions/publish_to_npm"
         with:
           NODE_AUTH_TOKEN: ${{ secrets.NODE_AUTH_TOKEN }}
