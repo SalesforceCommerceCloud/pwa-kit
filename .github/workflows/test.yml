@@ -121,7 +121,7 @@ jobs:
         run: |-
           version=`jq -r ".version" package.json`
           echo "The version is $version"
-          isDevVersion=$(echo "$version" | grep -q "\d\-dev\b")
+          isDevVersion=`echo "$version" | grep -q "\d\-dev\b"`
           echo "IsDevVersion is $isDevVersion"
           if [ isDevVersion ]; then
             echo "Dev version detected."
