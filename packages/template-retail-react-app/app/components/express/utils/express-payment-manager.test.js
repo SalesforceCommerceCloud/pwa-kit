@@ -287,6 +287,66 @@ describe('ExpressPaymentManager', () => {
         })
     })
 
+    describe('done listeners', () => {
+        let mockListener
+
+        beforeEach(() => {
+            mockListener = jest.fn()
+            manager.initialize(['applepay', 'googlepay'])
+        })
+
+        it('should add and remove done listeners', () => {
+            manager.addDoneListener(mockListener)
+            expect(manager.doneListeners.has(mockListener)).toBe(true)
+
+            manager.removeDoneListener(mockListener)
+            expect(manager.doneListeners.has(mockListener)).toBe(false)
+        })
+
+        it('should notify done listeners when payment methods are processed', () => {
+            manager.addDoneListener(mockListener)
+
+            manager.setPaymentMethodAvailable('applepay')
+            manager.setPaymentMethodUnavailable('googlepay')
+
+            expect(mockListener).toHaveBeenCalled()
+        })
+
+        it('should notify multiple done listeners', () => {
+            const mockListener2 = jest.fn()
+            manager.addDoneListener(mockListener)
+            manager.addDoneListener(mockListener2)
+
+            manager.setPaymentMethodAvailable('applepay')
+            manager.setPaymentMethodUnavailable('googlepay')
+
+            expect(mockListener).toHaveBeenCalled()
+            expect(mockListener2).toHaveBeenCalled()
+        })
+
+        it('should not notify removed done listeners', () => {
+            manager.addDoneListener(mockListener)
+            manager.removeDoneListener(mockListener)
+
+            manager.setPaymentMethodAvailable('applepay')
+            manager.setPaymentMethodUnavailable('googlepay')
+
+            expect(mockListener).not.toHaveBeenCalled()
+        })
+
+        it('should notify done listeners only once per completion', () => {
+            manager.addDoneListener(mockListener)
+
+            manager.setPaymentMethodAvailable('applepay')
+            manager.setPaymentMethodUnavailable('googlepay')
+
+            // Try to trigger done again
+            manager.setPaymentMethodAvailable('applepay')
+
+            expect(mockListener).toHaveBeenCalledTimes(1)
+        })
+    })
+
     describe('getCurrentHeight', () => {
         beforeEach(() => {
             manager.initialize(['applepay', 'googlepay'])

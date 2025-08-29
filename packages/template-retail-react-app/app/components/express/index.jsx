@@ -45,7 +45,7 @@ function Express() {
     const [currentQuantity, setCurrentQuantity] = useState(1)
 
     // Initialize the express payment manager - always call this hook
-    const {manager, managerError} = useExpressPaymentManager(PAYMENT_METHODS)
+    const {manager, isDone, availableCount, managerError} = useExpressPaymentManager(PAYMENT_METHODS)
 
     // Fetch payment methods and environment data directly
     // Only call this hook when we have all required parameters to prevent hook ordering issues
@@ -137,12 +137,12 @@ function Express() {
         isPdpMode,
         manager
     }
-
+    
     return (
         <div className="express-payment-container">
             <div
                 className={`express-payment-method ${
-                    manager.getNumberOfAvailablePaymentMethods() === 1
+                    availableCount === 1
                         ? 'express-payment-method--single express-payment-method--no-margin'
                         : 'express-payment-method--multiple express-payment-method--with-margin'
                 }`}
@@ -151,7 +151,7 @@ function Express() {
             </div>
             <div
                 className={`express-payment-method ${
-                    manager.getNumberOfAvailablePaymentMethods() === 1
+                    availableCount === 1
                         ? 'express-payment-method--single'
                         : 'express-payment-method--multiple'
                 }`}

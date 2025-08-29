@@ -544,7 +544,6 @@ export const GooglePayExpress = ({
                         getGooglePaymentMethodConfig(adyenPaymentMethods)
 
                     if (!googlePaymentMethodConfig) {
-                        console.warn('Google Pay configuration not found in payment methods')
                         performance.markError(new Error('Google Pay configuration not found'), 'configuration-check')
                         handleGooglePayUnavailable()
                         return

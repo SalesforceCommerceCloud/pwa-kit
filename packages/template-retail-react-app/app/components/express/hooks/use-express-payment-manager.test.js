@@ -20,7 +20,11 @@ jest.mock(
             initialize: jest.fn(),
             getCurrentHeight: jest.fn(),
             addHeightListener: jest.fn(),
-            removeHeightListener: jest.fn()
+            removeHeightListener: jest.fn(),
+            getNumberOfAvailablePaymentMethods: jest.fn(),
+            addDoneListener: jest.fn(),
+            removeDoneListener: jest.fn(),
+            isDone: false
         }
     })
 )
@@ -103,6 +107,55 @@ describe('useExpressPaymentManager', () => {
 
         expect(expressPaymentManager.initialize).toHaveBeenCalledTimes(1)
         expect(expressPaymentManager.initialize).toHaveBeenCalledWith(paymentMethodIds)
+    })
+
+    it('should initialize with available count and done state', () => {
+        expressPaymentManager.getNumberOfAvailablePaymentMethods.mockReturnValue(0)
+        expressPaymentManager.isDone = false
+
+        const paymentMethodIds = ['googlepay', 'applepay']
+        const {result} = renderHook(() => useExpressPaymentManager(paymentMethodIds))
+
+        expect(result.current.availableCount).toBe(0)
+        expect(result.current.isDone).toBe(false)
+    })
+
+    it('should add done listener on mount', () => {
+        const paymentMethodIds = ['googlepay']
+        renderHook(() => useExpressPaymentManager(paymentMethodIds))
+
+        expect(expressPaymentManager.addDoneListener).toHaveBeenCalled()
+    })
+
+    it('should remove done listener on unmount', () => {
+        const paymentMethodIds = ['googlepay']
+        const {unmount} = renderHook(() => useExpressPaymentManager(paymentMethodIds))
+
+        unmount()
+
+        expect(expressPaymentManager.removeDoneListener).toHaveBeenCalled()
+    })
+
+    it('should update available count and done state when done listener is called', () => {
+        const paymentMethodIds = ['googlepay']
+        let doneCallback
+
+        expressPaymentManager.addDoneListener.mockImplementation((callback) => {
+            doneCallback = callback
+        })
+
+        expressPaymentManager.getNumberOfAvailablePaymentMethods
+            .mockReturnValueOnce(0) // Initial call
+            .mockReturnValueOnce(1) // After done callback
+
+        const {result} = renderHook(() => useExpressPaymentManager(paymentMethodIds))
+
+        // Simulate done callback
+        act(() => {
+            doneCallback()
+        })
+
+        expect(result.current.availableCount).toBe(1)
     })
 })
 

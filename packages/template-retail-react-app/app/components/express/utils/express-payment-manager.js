@@ -56,6 +56,8 @@ class ExpressPaymentManager {
         this.isDone = false
         // Height change listeners
         this.heightListeners = new Set()
+        // 'Done' change listeners
+        this.doneListeners = new Set()
     }
 
     /**
@@ -81,6 +83,31 @@ class ExpressPaymentManager {
         const height = this.getCurrentHeight()
         this.heightListeners.forEach((listener) => {
             listener(height)
+        })
+    }
+
+    /**
+     * Adds a listener for 'done' changes
+     * @param {function} listener - Function to call when state changes
+     */
+    addDoneListener(listener) {
+        this.doneListeners.add(listener)
+    }
+
+    /**
+     * Removes a 'done' change listener
+     * @param {function} listener - Function to remove
+     */
+    removeDoneListener(listener) {
+        this.doneListeners.delete(listener)
+    }
+
+    /**
+     * Notifies all 'done' listeners of a change
+     */
+    notifyDoneListeners() {
+        this.doneListeners.forEach((listener) => {
+            listener()
         })
     }
 
@@ -156,6 +183,7 @@ class ExpressPaymentManager {
         if (allReported && this.totalAttempted > 0) {
             this.isDone = true
             this.notifyHeightListeners()
+            this.notifyDoneListeners()
             this.sendDoneMessage()
         }
     }

@@ -40,6 +40,8 @@ export function useExpressPaymentHeight() {
  */
 export function useExpressPaymentManager(paymentMethodIds) {
     const [error, setError] = useState(null)
+    const [availableCount, setAvailableCount] = useState(expressPaymentManager.getNumberOfAvailablePaymentMethods())
+    const [isDone, setIsDone] = useState(expressPaymentManager.isDone)
 
     useEffect(() => {
         try {
@@ -53,10 +55,23 @@ export function useExpressPaymentManager(paymentMethodIds) {
         } catch (err) {
             setError(err)
         }
+    }, [paymentMethodIds])
+
+    useEffect(() => {
+        const handleDone = () => {
+            setAvailableCount(expressPaymentManager.getNumberOfAvailablePaymentMethods())
+            setIsDone(expressPaymentManager.isDone)
+        }
+        expressPaymentManager.addDoneListener(handleDone)
+        return () => {
+            expressPaymentManager.removeDoneListener(handleDone)
+        }
     }, [])
 
     return {
         manager: expressPaymentManager,
+        isDone,
+        availableCount,
         error
     }
 }
