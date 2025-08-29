@@ -7,7 +7,7 @@
 
 // TODO - move this to a more general location
 /**
- * Determines whether the specified URL is absolute
+ * Determines whether the specified URL is absolute.
  *
  * @param {string} url The URL to test
  * @returns {boolean} True if the specified URL is absolute, otherwise false
