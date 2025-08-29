@@ -10,7 +10,7 @@ import {render, screen, waitFor} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
 import {useCurrency} from '@salesforce/retail-react-app/app/hooks'
-import PaymentForm from './one-click-payment-form'
+import PaymentForm from '@salesforce/retail-react-app/../../app/pages/checkout-one-click/partials/one-click-payment-form'
 
 // Mock react-intl
 jest.mock('react-intl', () => ({
@@ -140,8 +140,7 @@ describe('PaymentForm Component', () => {
         })
     })
 
-        describe('Form Interactions', () => {
-    })
+    describe('Form Interactions', () => {})
 
     describe('Data Handling', () => {
         test('handles basket with zero total', () => {
@@ -231,8 +230,7 @@ describe('PaymentForm Component', () => {
         })
     })
 
-    describe('Visual Layout', () => {
-    })
+    describe('Visual Layout', () => {})
 
     describe('Error Handling', () => {
         test('handles missing onSubmit callback gracefully', () => {
@@ -240,7 +238,5 @@ describe('PaymentForm Component', () => {
                 render(<PaymentForm form={mockForm} />)
             }).not.toThrow()
         })
-
-
     })
 })

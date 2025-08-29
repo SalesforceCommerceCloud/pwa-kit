@@ -6,7 +6,7 @@
  */
 import React from 'react'
 import {render, screen} from '@testing-library/react'
-import CheckoutSkeleton from './one-click-checkout-skeleton'
+import CheckoutSkeleton from '@salesforce/retail-react-app/../../app/pages/checkout-one-click/partials/one-click-checkout-skeleton'
 
 describe('CheckoutSkeleton Component', () => {
     describe('Rendering', () => {
