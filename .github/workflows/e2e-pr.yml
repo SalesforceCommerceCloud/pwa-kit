@@ -1,182 +1,182 @@
-# !!!!!! Commented due to this failing for every PR until this is fixed with @W-19450793
-# name: SalesforceCommerceCloud/pwa-kit/e2e-pr
-# on:
-#     workflow_dispatch:
-#     pull_request: # Default: opened, reopened, synchronize (head branch updated)
-#     merge_group: # Trigger GA workflow when a pull request is added to a merge queue.
-#     push:
-#         branches:
-#             - develop
-#             - 'release-*'
+name: SalesforceCommerceCloud/pwa-kit/e2e-pr
+on:
+    workflow_dispatch:
+    pull_request: # Default: opened, reopened, synchronize (head branch updated)
+    merge_group: # Trigger GA workflow when a pull request is added to a merge queue.
+    push:
+        branches:
+            - develop
+            - 'release-*'
 
-# permissions:
-#     id-token: write
-#     contents: read
+permissions:
+    id-token: write
+    contents: read
 
-# jobs:
-#     test_e2e_private_client:
-#         runs-on: ubuntu-latest
-#         env:
-#             AWS_S3_BUCKET: ${{ vars.AWS_S3_BUCKET }}
-#             AWS_REGION: ${{ vars.AWS_REGION }}
-#             AWS_S3_POOL_DATA_FILE_KEY: ${{ vars.AWS_S3_POOL_DATA_FILE_KEY }}
+jobs:
+    test_e2e_private_client:
+        runs-on: ubuntu-latest
+        env:
+            AWS_S3_BUCKET: ${{ vars.AWS_S3_BUCKET }}
+            AWS_REGION: ${{ vars.AWS_REGION }}
+            AWS_S3_POOL_DATA_FILE_KEY: ${{ vars.AWS_S3_POOL_DATA_FILE_KEY }}
 
-#         steps:
-#             - name: Checkout
-#               uses: actions/checkout@v4
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
 
-#             - name: Check PWA Kit Version
-#               run: |-
-#                   version=`jq -r ".version" package.json`
-#                   echo "pwa_kit_version=$version" >> "$GITHUB_ENV"
+            - name: Check PWA Kit Version
+              run: |-
+                  version=`jq -r ".version" package.json`
+                  echo "pwa_kit_version=$version" >> "$GITHUB_ENV"
 
-#               # Skip the entire workflow since we don't have e2e tests for PWA Kit v2.x.
-#             - name: Skip if PWA Kit version older than v3.x
-#               run: |-
-#                   major_version=$(echo "${{ env.pwa_kit_version }}" | cut -d. -f1)
-#                    if [ "$major_version" -ne 3 ]; then
-#                      echo "PWA Kit version is does not match v3.x, skipping workflow."
-#                      echo "SKIP_WORKFLOW=true" >> "$GITHUB_ENV"
-#                    fi
+              # Skip the entire workflow since we don't have e2e tests for PWA Kit v2.x.
+            - name: Skip if PWA Kit version older than v3.x
+              run: |-
+                  major_version=$(echo "${{ env.pwa_kit_version }}" | cut -d. -f1)
+                   if [ "$major_version" -ne 3 ]; then
+                     echo "PWA Kit version is does not match v3.x, skipping workflow."
+                     echo "SKIP_WORKFLOW=true" >> "$GITHUB_ENV"
+                   fi
 
-#               # Only test for latest Node version supported by MRT
-#             - name: Setup Node
-#               if: ${{ env.SKIP_WORKFLOW != 'true' }}
-#               uses: actions/setup-node@v4
-#               with:
-#                   node-version: 22
-#                   cache: npm
+              # Only test for latest Node version supported by MRT
+            - name: Setup Node
+              if: ${{ env.SKIP_WORKFLOW != 'true' }}
+              uses: actions/setup-node@v4
+              with:
+                  node-version: 22
+                  cache: npm
 
-#             - name: Install Monorepo Dependencies
-#               if: ${{ env.SKIP_WORKFLOW != 'true' }}
-#               run: |-
-#                   # Install node dependencies
-#                   node ./scripts/gtime.js monorepo_install npm ci
+            - name: Install Monorepo Dependencies
+              if: ${{ env.SKIP_WORKFLOW != 'true' }}
+              run: |-
+                  # Install node dependencies
+                  node ./scripts/gtime.js monorepo_install npm ci
 
-#               # Check central resource allocation on AWS and get a lock on an available environment from the pool.
-#               # Sets the MRT target details in the workflow output.
-#             - name: Configure AWS Credentials
-#               if: ${{ env.SKIP_WORKFLOW != 'true' }}
-#               uses: aws-actions/configure-aws-credentials@v4
-#               with:
-#                   role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
-#                   aws-region: ${{ vars.AWS_REGION }}
-#                   role-session-name: 'GithubActions-E2E-CI'
+              # Check central resource allocation on AWS and get a lock on an available environment from the pool.
+              # Sets the MRT target details in the workflow output.
+            - name: Configure AWS Credentials
+              if: ${{ env.SKIP_WORKFLOW != 'true' }}
+              uses: aws-actions/configure-aws-credentials@v4
+              with:
+                  role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+                  aws-region: ${{ vars.AWS_REGION }}
+                  role-session-name: 'GithubActions-E2E-CI'
 
-#             - name: Get MRT Target lock
-#               id: get_mrt_target_lock
-#               if: ${{ env.SKIP_WORKFLOW != 'true' }}
-#               uses: ./.github/actions/e2e_acquire_mrt_target
-#               with:
-#                   BRANCH: ${{ github.ref_name }}
-#                   RUN_ID: ${{ github.run_id }}
-#                   PR_NUMBER: ${{ github.event.pull_request.number }}
+            - name: Get MRT Target lock
+              id: get_mrt_target_lock
+              if: ${{ env.SKIP_WORKFLOW != 'true' }}
+              uses: ./.github/actions/e2e_acquire_mrt_target
+              with:
+                  BRANCH: ${{ github.ref_name }}
+                  RUN_ID: ${{ github.run_id }}
+                  PR_NUMBER: ${{ github.event.pull_request.number }}
 
-#             - name: Read MRT Target Details
-#               id: mrt_target_details
-#               if: ${{ env.SKIP_WORKFLOW != 'true' }}
-#               run: |-
-#                   jq -r 'to_entries[] | "\(.key)=\(.value // "")"' e2e/mrt-target/mrt-target-details.json >> "$GITHUB_OUTPUT"
-#                   # Set the RETAIL_APP_HOME environment variable to the MRT target URL.
-#                   # This is used by the e2e tests to run the tests against the MRT target.
-#                   echo "RETAIL_APP_HOME=${{ steps.mrt_target_details.outputs.envURL }}" >> "$GITHUB_ENV"
+            - name: Read MRT Target Details
+              id: mrt_target_details
+              if: ${{ env.SKIP_WORKFLOW != 'true' }}
+              run: |-
+                  jq -r 'to_entries[] | "\(.key)=\(.value // "")"' e2e/mrt-target/mrt-target-details.json >> "$GITHUB_OUTPUT"
 
-#               # Engage post-run cleanup via a Node action that has a post hook.
-#               # - The action defines `runs.post` so its post step runs at the
-#               #   end of this job even if earlier steps fail or the job is cancelled.
-#               # - This step passes the slug, maxRetries and retryDelay; the action's main saves it to state.
-#               # - The actual release happens in the action's post script (post.js).
-#               # - This replaces a separate cleanup job and avoids double-release.
-#               # - This step is only engaged if the workflow is not skipped.
-#             - name: Engage Post hook to release MRT target back to the pool
-#               if: ${{ env.SKIP_WORKFLOW != 'true' }}
-#               uses: ./.github/actions/e2e_release_mrt_target
-#               with:
-#                   SLUG: ${{ steps.mrt_target_details.outputs.slug }}
-#                   MAX_RETRIES: 3
-#                   RETRY_DELAY: 10000
+              # Engage post-run cleanup via a Node action that has a post hook.
+              # - The action defines `runs.post` so its post step runs at the
+              #   end of this job even if earlier steps fail or the job is cancelled.
+              # - This step passes the slug, maxRetries and retryDelay; the action's main saves it to state.
+              # - The actual release happens in the action's post script (post.js).
+              # - This replaces a separate cleanup job and avoids double-release.
+              # - This step is only engaged if the workflow is not skipped.
+            - name: Engage Post hook to release MRT target back to the pool
+              if: ${{ env.SKIP_WORKFLOW != 'true' }}
+              uses: ./.github/actions/e2e_release_mrt_target
+              with:
+                  SLUG: ${{ steps.mrt_target_details.outputs.slug }}
+                  MAX_RETRIES: 3
+                  RETRY_DELAY: 10000
 
-#               # Properties specified in the body for MRT API to update settings must be in MRT_ENV_SETTINGS_E2E_BASE_FILENAME file.
-#               # See: https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/references/mrt-admin?meta=projects_target_partial_update
-#               # Like proxy configs, enabling cookies or other MRT env settings.
-#             - name: Create .env with settings to be updated on the MRT target
-#               run: |-
-#                   echo "MRT_TARGET_SSR_PROXY_CONFIGS=${{ vars.PWA_KIT_E2E_TARGET_PROXY_CONFIGS }}" > ${{ vars.MRT_ENV_SETTINGS_E2E_BASE_FILENAME }}
+              # Properties specified in the body for MRT API to update settings must be in MRT_ENV_SETTINGS_E2E_BASE_FILENAME file.
+              # See: https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/references/mrt-admin?meta=projects_target_partial_update
+              # Like proxy configs, enabling cookies or other MRT env settings.
+            - name: Create .env with settings to be updated on the MRT target
+              run: |-
+                  echo "MRT_TARGET_SSR_PROXY_CONFIGS=${{ vars.PWA_KIT_E2E_TARGET_PROXY_CONFIGS }}" > ${{ vars.MRT_ENV_SETTINGS_E2E_BASE_FILENAME }}
 
-#               # Environment variables you'd like to set on the MRT target must be in MRT_ENV_VARS_E2E_BASE_FILENAME file.
-#               # See: https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/references/mrt-admin?meta=projects_target_env_var_partial_update
-#               # These are the env variables required by the storefront to be set in MRT for the e2e tests to run.
-#               # Like SLAS client secret.
-#             - name: Create .env with environment variables to be set on the MRT target
-#               run: |-
-#                   echo "PWA_KIT_SLAS_CLIENT_SECRET=${{ secrets.ZZRF_002_SLAS_PRIVATE_CLIENT_SECRET }}" > ${{ vars.MRT_ENV_VARS_E2E_BASE_FILENAME }}
+              # Environment variables you'd like to set on the MRT target must be in MRT_ENV_VARS_E2E_BASE_FILENAME file.
+              # See: https://developer.salesforce.com/docs/commerce/pwa-kit-managed-runtime/references/mrt-admin?meta=projects_target_env_var_partial_update
+              # These are the env variables required by the storefront to be set in MRT for the e2e tests to run.
+              # Like SLAS client secret.
+            - name: Create .env with environment variables to be set on the MRT target
+              run: |-
+                  echo "PWA_KIT_SLAS_CLIENT_SECRET=${{ secrets.ZZRF_002_SLAS_PRIVATE_CLIENT_SECRET }}" > ${{ vars.MRT_ENV_VARS_E2E_BASE_FILENAME }}
 
-#               # Call the e2e/scripts/update-mrt-target.js script to update the MRT target config and environment variables.
-#               # This script is a Node.js script that makes a PATCH request to the MRT API to update the MRT target config and environment variables.
-#               # The script is located in the e2e/scripts directory.
-#               # The script is called from the .github/actions/update_mrt_target action.
-#               # The script is called with the following arguments:
-#             - name: Update MRT Target Config and Environment Variables
-#               if: ${{ env.SKIP_WORKFLOW != 'true' }}
-#               uses: ./.github/actions/update_mrt_target
-#               with:
-#                   PROJECT_SLUG: ${{ vars.MRT_STG_PWA_KIT_PROJECT_ID }}
-#                   TARGET_SLUG: ${{ steps.mrt_target_details.outputs.slug }}
-#                   MOBIFY_API_KEY: ${{ secrets.MRT_STG_PWA_KIT_CI_API_KEY }}
-#                   CLOUD_ORIGIN: ${{ vars.MRT_STG_CLOUD_ORIGIN }}
-#                   MRT_TARGET_SETTINGS_FILE_PATH: ${{ vars.MRT_ENV_SETTINGS_E2E_BASE_FILENAME }}
-#                   MRT_TARGET_VARS_FILE_PATH: ${{ vars.MRT_ENV_VARS_E2E_BASE_FILENAME }}
+              # Call the e2e/scripts/update-mrt-target.js script to update the MRT target config and environment variables.
+              # This script is a Node.js script that makes a PATCH request to the MRT API to update the MRT target config and environment variables.
+              # The script is located in the e2e/scripts directory.
+              # The script is called from the .github/actions/update_mrt_target action.
+              # The script is called with the following arguments:
+            - name: Update MRT Target Config and Environment Variables
+              if: ${{ env.SKIP_WORKFLOW != 'true' }}
+              uses: ./.github/actions/update_mrt_target
+              with:
+                  PROJECT_SLUG: ${{ vars.MRT_STG_PWA_KIT_PROJECT_ID }}
+                  TARGET_SLUG: ${{ steps.mrt_target_details.outputs.slug }}
+                  MOBIFY_API_KEY: ${{ secrets.MRT_STG_PWA_KIT_CI_API_KEY }}
+                  CLOUD_ORIGIN: ${{ vars.MRT_STG_CLOUD_ORIGIN }}
+                  MRT_TARGET_SETTINGS_FILE_PATH: ${{ vars.MRT_ENV_SETTINGS_E2E_BASE_FILENAME }}
+                  MRT_TARGET_VARS_FILE_PATH: ${{ vars.MRT_ENV_VARS_E2E_BASE_FILENAME }}
 
-#             - name: Get Template Version
-#               if: ${{ env.SKIP_WORKFLOW != 'true' }}
-#               run: |-
-#                   version=`jq -r ".version" packages/template-retail-react-app/package.json`
-#                   echo "retail_app_template_version=$version" >> "$GITHUB_ENV"
+            - name: Get Template Version
+              if: ${{ env.SKIP_WORKFLOW != 'true' }}
+              run: |-
+                  version=`jq -r ".version" packages/template-retail-react-app/package.json`
+                  echo "retail_app_template_version=$version" >> "$GITHUB_ENV"
 
-#             - name: Generate Retail App Private Client
-#               id: generate_app
-#               if: ${{ env.SKIP_WORKFLOW != 'true' }}
-#               uses: ./.github/actions/e2e_generate_app
-#               with:
-#                   PROJECT_KEY: 'retail-app-private-client'
-#                   TEMPLATE_VERSION: ${{ env.retail_app_template_version }}
+            - name: Generate Retail App Private Client
+              id: generate_app
+              if: ${{ env.SKIP_WORKFLOW != 'true' }}
+              uses: ./.github/actions/e2e_generate_app
+              with:
+                  PROJECT_KEY: 'retail-app-private-client'
+                  TEMPLATE_VERSION: ${{ env.retail_app_template_version }}
 
-#             - name: Validate Generated Retail App
-#               if: ${{ env.SKIP_WORKFLOW != 'true' }}
-#               uses: ./.github/actions/e2e_validate_generated_app
-#               with:
-#                   PROJECT_KEY: 'retail-app-private-client'
-#                   TEMPLATE_VERSION: ${{ env.retail_app_template_version }}
+            - name: Validate Generated Retail App
+              if: ${{ env.SKIP_WORKFLOW != 'true' }}
+              uses: ./.github/actions/e2e_validate_generated_app
+              with:
+                  PROJECT_KEY: 'retail-app-private-client'
+                  TEMPLATE_VERSION: ${{ env.retail_app_template_version }}
 
-#             - name: Create MRT credentials file
-#               if: ${{ env.SKIP_WORKFLOW != 'true' }}
-#               uses: './.github/actions/create_mrt'
-#               with:
-#                   mobify_user: ${{ secrets.MRT_STG_PWA_KIT_CI_USER }}
-#                   mobify_api_key: ${{ secrets.MRT_STG_PWA_KIT_CI_API_KEY }}
+            - name: Create MRT credentials file
+              if: ${{ env.SKIP_WORKFLOW != 'true' }}
+              uses: './.github/actions/create_mrt'
+              with:
+                  mobify_user: ${{ secrets.MRT_STG_PWA_KIT_CI_USER }}
+                  mobify_api_key: ${{ secrets.MRT_STG_PWA_KIT_CI_API_KEY }}
 
-#             - name: Push Bundle to MRT (E2E Test PWA Kit)
-#               if: ${{ env.SKIP_WORKFLOW != 'true' }}
-#               uses: './.github/actions/push_to_mrt'
-#               with:
-#                   CWD: ${{ steps.generate_app.outputs.project_path }}
-#                   PROJECT: ${{ vars.MRT_STG_PWA_KIT_PROJECT_ID }}
-#                   TARGET: ${{ steps.mrt_target_details.outputs.slug }}
-#                   CLOUD_ORIGIN: ${{ vars.MRT_STG_CLOUD_ORIGIN }}
-#                   FLAGS: --wait
+            - name: Push Bundle to MRT (E2E Test PWA Kit)
+              if: ${{ env.SKIP_WORKFLOW != 'true' }}
+              uses: './.github/actions/push_to_mrt'
+              with:
+                  CWD: ${{ steps.generate_app.outputs.project_path }}
+                  PROJECT: ${{ vars.MRT_STG_PWA_KIT_PROJECT_ID }}
+                  TARGET: ${{ steps.mrt_target_details.outputs.slug }}
+                  CLOUD_ORIGIN: ${{ vars.MRT_STG_CLOUD_ORIGIN }}
+                  FLAGS: --wait
 
-#               # Only install chromium since we're only testing for chrome and chrome mobile for per-pr test runs.
-#               # Nightly tests will run against multiple browsers.
-#             - name: Install Playwright Browsers
-#               if: ${{ env.SKIP_WORKFLOW != 'true' }}
-#               run: npx playwright install chromium --with-deps
+              # Only install chromium since we're only testing for chrome and chrome mobile for per-pr test runs.
+              # Nightly tests will run against multiple browsers.
+            - name: Install Playwright Browsers
+              if: ${{ env.SKIP_WORKFLOW != 'true' }}
+              run: npx playwright install chromium --with-deps
 
-#               # Run all 4 playwright projects in parallel to reduce run time.
-#               # Number of workers must match number of projects for parallel runs so we have it set to 4.
-#               # Limit the number of workers to 2x the number of cores on the machine to avoid overloading the machine (Github-hosted runner).
-#               # Note: This job uses "ubuntu-latest" which has 4 cores so we limit the number of workers to 8.
-#               # See: https://docs.github.com/en/actions/reference/runners/github-hosted-runners#standard-github-hosted-runners-for-public-repositories for runner specs.
-#             - name: Run Playwright tests
-#               if: ${{ env.SKIP_WORKFLOW != 'true' }}
-#               run: |
-#                   npx playwright test --project=chromium --project=mobile-chrome --project=a11y-mobile --project=a11y-desktop --workers=4
+              # Run all 4 playwright projects in parallel to reduce run time.
+              # Number of workers must match number of projects for parallel runs so we have it set to 4.
+              # Limit the number of workers to 2x the number of cores on the machine to avoid overloading the machine (Github-hosted runner).
+              # Note: This job uses "ubuntu-latest" which has 4 cores so we limit the number of workers to 8.
+              # See: https://docs.github.com/en/actions/reference/runners/github-hosted-runners#standard-github-hosted-runners-for-public-repositories for runner specs.
+            - name: Run Playwright tests
+              if: ${{ env.SKIP_WORKFLOW != 'true' }}
+              run: |
+                  # Set the RETAIL_APP_HOME environment variable to the MRT target URL.
+                  # This is used by the e2e tests to run the tests against the MRT target.
+                  export RETAIL_APP_HOME="https://${{ steps.mrt_target_details.outputs.ssrExternalHostname }}"
+                  echo "RETAIL_APP_HOME environment variable value: $RETAIL_APP_HOME"
+                  npx playwright test --project=chromium --project=mobile-chrome --project=a11y-mobile-slas-private-client --project=a11y-desktop-slas-private-client --workers=4
