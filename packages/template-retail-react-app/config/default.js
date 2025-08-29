@@ -7,7 +7,7 @@
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const sites = require('./sites.js')
 // eslint-disable-next-line @typescript-eslint/no-var-requires
-const {parseCommerceAgentSettings} = require('./utils.js')
+const {parseCommerceAgentSettings} = require('../app/utils/config-utils.js')
 
 module.exports = {
     app: {

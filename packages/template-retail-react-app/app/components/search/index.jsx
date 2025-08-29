@@ -42,7 +42,7 @@ import {
     categoryUrlBuilder
 } from '@salesforce/retail-react-app/app/utils/url'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
-import {parseCommerceAgentSettings} from '@salesforce/retail-react-app/config/utils'
+import {parseCommerceAgentSettings} from '@salesforce/retail-react-app/app/utils/config-utils'
 
 const onClient = typeof window !== 'undefined'
 
