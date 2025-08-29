@@ -44,8 +44,6 @@ const ShippingMethodOptions = ({shipment, basketId, currency, control}) => {
     }
 
     const fieldName = `shippingMethodId_${shipment.shipmentId}`
-    const defaultValue =
-        shipment.shippingMethod?.id || shippingMethods?.defaultShippingMethodId || ''
 
     // Filter out pickup shipping methods only if store locator/BOPIS is enabled
     const applicableShippingMethods = storeLocatorEnabled
@@ -68,7 +66,7 @@ const ShippingMethodOptions = ({shipment, basketId, currency, control}) => {
                             <Controller
                                 name={fieldName}
                                 control={control}
-                                defaultValue={defaultValue}
+                                defaultValue=""
                                 rules={{required: true}}
                                 render={({field}) => (
                                     <RadioGroup

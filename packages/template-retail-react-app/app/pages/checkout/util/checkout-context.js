@@ -16,7 +16,7 @@ const CheckoutContext = React.createContext()
 
 export const CheckoutProvider = ({children}) => {
     const {data: customer} = useCurrentCustomer()
-    const {data: basket, derivedData} = useCurrentBasket()
+    const {data: basket, derivedData, isLoading: isBasketLoading} = useCurrentBasket()
     const einstein = useEinstein()
     const [step, setStep] = useState()
     const storeLocatorEnabled = getConfig()?.app?.storeLocatorEnabled ?? STORE_LOCATOR_IS_ENABLED
@@ -34,7 +34,7 @@ export const CheckoutProvider = ({children}) => {
     const getCheckoutStepName = (step) => CHECKOUT_STEPS_LIST[step]
 
     useEffect(() => {
-        if (!customer || !basket) {
+        if (isBasketLoading || !customer || !basket) {
             return
         }
         let step = STEPS.REVIEW_ORDER
@@ -51,6 +51,7 @@ export const CheckoutProvider = ({children}) => {
 
         setStep(step)
     }, [
+        isBasketLoading,
         customer?.isGuest,
         basket?.customerInfo?.email,
         basket?.shipments,
