@@ -14,10 +14,21 @@ runs:
   steps:
   - name: Validate generated project
     run: |
-      set -e
-      COMMAND="node e2e/scripts/validate-generated-project.js ${{ inputs.PROJECT_KEY }}"
+      set -euo pipefail
+      
+      COMMAND=(node e2e/scripts/validate-generated-project.js "${{ inputs.PROJECT_KEY }}")
+      
       if [[ -n "${{ inputs.TEMPLATE_VERSION }}" ]]; then
-        COMMAND="$COMMAND --templateVersion ${{ inputs.TEMPLATE_VERSION }}"
+        COMMAND+=(--templateVersion "${{ inputs.TEMPLATE_VERSION }}")
       fi
-      $COMMAND
+      
+      echo "Executing command: ${COMMAND[*]}"
+      
+      if ! "${COMMAND[@]}"; then
+        echo "❌ Node.js validation script failed with exit code $?"
+        echo "::error::Validation of generated project failed"
+        exit 1
+      fi
+      
+      echo "✅ Project validation completed successfully"
     shell: bash
