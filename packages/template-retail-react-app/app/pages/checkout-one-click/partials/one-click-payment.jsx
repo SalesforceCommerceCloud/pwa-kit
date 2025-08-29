@@ -195,7 +195,11 @@ const Payment = ({
             }
 
             // Only for registered customers with saved instruments and when none is applied
-            if (!customer?.isRegistered || !customer?.paymentInstruments?.length || appliedPayment) {
+            if (
+                !customer?.isRegistered ||
+                !customer?.paymentInstruments?.length ||
+                appliedPayment
+            ) {
                 return
             }
 
