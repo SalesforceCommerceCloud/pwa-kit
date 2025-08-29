@@ -25,7 +25,6 @@ jest.mock('react-intl', () => ({
 // Mock dependencies
 jest.mock('@salesforce/retail-react-app/app/hooks/use-current-customer')
 
-// Mock RadioCard components
 jest.mock('@salesforce/retail-react-app/app/components/radio-card', () => ({
     RadioCard: ({children, value, ...props}) => (
         <div data-testid={`radio-card-${value}`} data-value={value} {...props}>
