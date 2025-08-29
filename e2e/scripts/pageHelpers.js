@@ -594,7 +594,7 @@ export const registeredUserHappyPath = async ({page, registeredUserCredentials, 
     // Confirm the shipping details form toggles to show edit button on clicking "Checkout as guest"
     const step1Card = page.locator("div[data-testid='sf-toggle-card-step-1']")
 
-    await expect(step1Card.getByRole('button', {name: /Edit/i})).toBeVisible()
+    await expect(step1Card.getByRole('button', {name: /Edit Shipping Address/i})).toBeVisible()
 
     await expect(page.getByRole('heading', {name: /Shipping & Gift Options/i})).toBeVisible()
     await page.waitForLoadState()
@@ -602,24 +602,15 @@ export const registeredUserHappyPath = async ({page, registeredUserCredentials, 
         await runAccessibilityTest(page, [snapShotName, 'checkout-a11y-violations-step-2.json'])
     }
 
-    const continueToPayment = page.getByRole('button', {
-        name: /Continue to Payment/i
-    })
+    const continueToPayment = page.getByRole('button', {name: /Continue to Payment/i})
 
-    let hasShippingStep = false
-    try {
-        await expect(continueToPayment).toBeVisible({timeout: 2000})
+    // If the Continue to Payment button is not visible, the payment details form is already being shown, so we can skip this step.
+    if ((await continueToPayment.count()) > 0 && (await continueToPayment.isEnabled())) {
         await continueToPayment.click()
-        hasShippingStep = true
-    } catch {
-        // Shipping step was skipped, proceed directly to payment
     }
 
-    // Verify step-2 edit button only if shipping step was present
-    if (hasShippingStep) {
-        const step2Card = page.locator("div[data-testid='sf-toggle-card-step-2']")
-        await expect(step2Card.getByRole('button', {name: /Edit/i})).toBeVisible()
-    }
+    const step2Card = page.locator("div[data-testid='sf-toggle-card-step-2']")
+    await expect(step2Card.getByRole('button', {name: /Edit Shipping Options/i})).toBeVisible()
 
     await expect(page.getByRole('heading', {name: /Payment/i})).toBeVisible()
 
@@ -635,10 +626,9 @@ export const registeredUserHappyPath = async ({page, registeredUserCredentials, 
 
     await page.getByRole('button', {name: /Review Order/i}).click()
 
-    // Confirm the shipping options form toggles to show edit button on clicking "Checkout as guest"
     const step3Card = page.locator("div[data-testid='sf-toggle-card-step-3']")
 
-    await expect(step3Card.getByRole('button', {name: /Edit/i})).toBeVisible()
+    await expect(step3Card.getByRole('button', {name: /Edit Payment Info/i})).toBeVisible()
     page.getByRole('button', {name: /Place Order/i})
         .first()
         .click()
