@@ -76,9 +76,6 @@ jobs:
               if: ${{ env.SKIP_WORKFLOW != 'true' }}
               run: |-
                   jq -r 'to_entries[] | "\(.key)=\(.value // "")"' e2e/mrt-target/mrt-target-details.json >> "$GITHUB_OUTPUT"
-                  # Set the RETAIL_APP_HOME environment variable to the MRT target URL.
-                  # This is used by the e2e tests to run the tests against the MRT target.
-                  echo "RETAIL_APP_HOME=${{ steps.mrt_target_details.outputs.envURL }}" >> "$GITHUB_ENV"
 
               # Engage post-run cleanup via a Node action that has a post hook.
               # - The action defines `runs.post` so its post step runs at the
@@ -179,3 +176,4 @@ jobs:
               if: ${{ env.SKIP_WORKFLOW != 'true' }}
               run: |
                   npx playwright test --project=chromium --project=mobile-chrome --project=a11y-mobile --project=a11y-desktop --workers=4
+

@@ -22,7 +22,7 @@ const validateGeneratedArtifacts = async (project) => {
 
         return new Promise((resolve, reject) => {
             const missingArtifacts = diffArrays(
-                config.EXPECTED_GENERATED_ARTIFACTS[project],
+                config.EXPECTED_GENERATED_ARTIFACTS[project] || [],
                 generatedArtifacts
             )
             if (missingArtifacts && missingArtifacts.length > 0) {
