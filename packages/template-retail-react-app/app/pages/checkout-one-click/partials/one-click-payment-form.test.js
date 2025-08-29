@@ -10,7 +10,7 @@ import {render, screen, waitFor} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
 import {useCurrency} from '@salesforce/retail-react-app/app/hooks'
-import PaymentForm from '@salesforce/retail-react-app/../../app/pages/checkout-one-click/partials/one-click-payment-form'
+import PaymentForm from '@salesforce/retail-react-app/app/pages/checkout-one-click/partials/one-click-payment-form'
 
 // Mock react-intl
 jest.mock('react-intl', () => ({

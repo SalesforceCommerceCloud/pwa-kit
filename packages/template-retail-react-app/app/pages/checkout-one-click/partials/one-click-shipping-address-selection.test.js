@@ -9,7 +9,7 @@ import React from 'react'
 import {render, screen} from '@testing-library/react'
 import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
 import {useShopperCustomersMutation} from '@salesforce/commerce-sdk-react'
-import ShippingAddressSelection from '@salesforce/retail-react-app/../../app/pages/checkout-one-click/partials/one-click-shipping-address-selection'
+import ShippingAddressSelection from '@salesforce/retail-react-app/app/pages/checkout-one-click/partials/one-click-shipping-address-selection'
 
 // Mock react-intl
 jest.mock('react-intl', () => ({

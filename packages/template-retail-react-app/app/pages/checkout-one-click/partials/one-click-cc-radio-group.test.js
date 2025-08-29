@@ -9,7 +9,7 @@ import React from 'react'
 import {render, screen, waitFor} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
-import CCRadioGroup from '@salesforce/retail-react-app/../../app/pages/checkout-one-click/partials/one-click-cc-radio-group'
+import CCRadioGroup from '@salesforce/retail-react-app/app/pages/checkout-one-click/partials/one-click-cc-radio-group'
 
 // Mock react-intl
 jest.mock('react-intl', () => ({

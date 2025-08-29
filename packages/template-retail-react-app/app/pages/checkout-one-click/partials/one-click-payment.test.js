@@ -13,7 +13,7 @@ import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-cur
 import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
 import {useShopperBasketsMutation, useCustomerType} from '@salesforce/commerce-sdk-react'
 import {useCheckout} from '@salesforce/retail-react-app/app/pages/checkout-one-click/util/checkout-context'
-import Payment from '@salesforce/retail-react-app/../../app/pages/checkout-one-click/partials/one-click-payment'
+import Payment from '@salesforce/retail-react-app/app/pages/checkout-one-click/partials/one-click-payment'
 
 // Mock react-intl
 jest.mock('react-intl', () => ({
