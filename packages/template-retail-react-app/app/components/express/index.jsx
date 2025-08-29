@@ -56,6 +56,17 @@ function Express() {
         !!(authToken && site && locale) // Only enable when all params are available
     )
 
+    // Mark when payment methods are being fetched
+    useEffect(() => {
+        if (authToken && site && locale) {
+            performance.mark('express-payment-methods-fetch-start')
+            console.log('🚀 Express Payment: Starting payment methods fetch...')
+            if (!isPdpMode) {
+                console.log(`📦 Waiting for basket data: ${basket?.basketId ? 'available' : 'missing'}`)
+            }
+        }
+    }, [authToken, site?.id, locale?.id, isPdpMode, basket?.basketId]) // Include basket status for non-PDP mode
+
     // PostMessage listener for SKU updates
     useEffect(() => {
         const handleMessage = (event) => {
