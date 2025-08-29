@@ -326,17 +326,13 @@ export default function ShippingMethods() {
                         // Multiple shipments summary
                         <Stack spacing={2}>
                             {deliveryShipments.map((shipment) => {
-                                const shippingItem =
-                                    basket &&
-                                    basket.shippingItems &&
-                                    basket.shippingItems.find(
-                                        (item) => item.shipmentId === shipment.shipmentId
-                                    )
+                                const shippingItem = basket?.shippingItems?.find(
+                                    (item) => item.shipmentId === shipment.shipmentId
+                                )
                                 const itemCost =
-                                    (shippingItem && shippingItem.priceAfterItemDiscount) ||
-                                    (shippingItem && shippingItem.price) ||
-                                    0
-
+                                    shippingItem?.priceAfterItemDiscount !== undefined
+                                        ? shippingItem.priceAfterItemDiscount
+                                        : shippingItem?.price || 0
                                 return (
                                     <Box key={shipment.shipmentId}>
                                         <Flex justify="space-between" w="full">

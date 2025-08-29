@@ -435,6 +435,17 @@ const client =
                 entry: {
                     main: getAppEntryPoint()
                 },
+                // Exclude OpenTelemetry packages from client bundle (server-only)
+                externals: [
+                    {
+                        '@opentelemetry/api': 'commonjs @opentelemetry/api',
+                        '@opentelemetry/core': 'commonjs @opentelemetry/core',
+                        '@opentelemetry/sdk-trace-node': 'commonjs @opentelemetry/sdk-trace-node',
+                        '@opentelemetry/sdk-trace-base': 'commonjs @opentelemetry/sdk-trace-base',
+                        '@opentelemetry/propagator-b3': 'commonjs @opentelemetry/propagator-b3',
+                        '@opentelemetry/resources': 'commonjs @opentelemetry/resources'
+                    }
+                ],
                 plugins: [
                     ...config.plugins,
                     new LoadablePlugin({writeToDisk: true}),
@@ -464,6 +475,17 @@ const clientOptional = baseConfig('web')
                 ...optional('core-polyfill', resolve(projectDir, 'node_modules', 'core-js')),
                 ...optional('fetch-polyfill', resolve(projectDir, 'node_modules', 'whatwg-fetch'))
             },
+            // Exclude OpenTelemetry packages from client bundle (server-only)
+            externals: [
+                {
+                    '@opentelemetry/api': 'commonjs @opentelemetry/api',
+                    '@opentelemetry/core': 'commonjs @opentelemetry/core',
+                    '@opentelemetry/sdk-trace-node': 'commonjs @opentelemetry/sdk-trace-node',
+                    '@opentelemetry/sdk-trace-base': 'commonjs @opentelemetry/sdk-trace-base',
+                    '@opentelemetry/propagator-b3': 'commonjs @opentelemetry/propagator-b3',
+                    '@opentelemetry/resources': 'commonjs @opentelemetry/resources'
+                }
+            ],
             // use source map to make debugging easier
             devtool:
                 mode === development || process.env.PWA_KIT_SOURCE_MAP === 'true'
