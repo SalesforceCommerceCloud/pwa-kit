@@ -11,16 +11,22 @@
 // That conflicts with the monorepo header rule, so we must disable the rule!
 /* eslint-disable header/header */
 import {render, ALLOWLISTED_INLINE_SCRIPTS} from './react-rendering'
-import {randomUUID} from 'crypto'
 import {RemoteServerFactory} from '@salesforce/pwa-kit-runtime/ssr/server/build-remote-server'
-
 import request from 'supertest'
 import {parse} from 'node-html-parser'
+import {initializeServerTracing, shutdownServerTracing} from './opentelemetry-server'
 import path from 'path'
 import {isRemote} from '@salesforce/pwa-kit-runtime/utils/ssr-server'
+import {getAppConfig} from '../universal/compatibility'
+import {randomUUID} from 'crypto'
 import {getLocationSearch} from './react-rendering'
 
-import {getAppConfig} from '../universal/compatibility'
+beforeAll(() => {
+    initializeServerTracing()
+})
+afterAll(async () => {
+    await shutdownServerTracing()
+})
 
 const opts = (overrides = {}) => {
     const fixtures = path.join(__dirname, '..', '..', 'ssr', 'server', 'test_fixtures')
@@ -256,6 +262,15 @@ jest.mock('../universal/routes', () => {
         }
     }
 
+    class UnrecoverableErrorPage extends React.Component {
+        static getProps() {
+            throw new Error('Unrecoverable error')
+        }
+        render() {
+            return <div>Should not render</div>
+        }
+    }
+
     const UseQueryResolvesObject = () => {
         const {data, isLoading} = useQuery(['use-query-resolves-object'], async () => ({
             prop: 'prop-value'
@@ -355,6 +370,10 @@ jest.mock('../universal/routes', () => {
             {
                 path: '/server-context',
                 component: GetServerContext
+            },
+            {
+                path: '/unrecoverable-error/',
+                component: UnrecoverableErrorPage
             }
         ]
     }
@@ -773,6 +792,282 @@ describe('The Node SSR Environment', () => {
                 expectations(res)
             })
         })
+    })
+})
+
+describe('Additional branch coverage for react-rendering', () => {
+    afterEach(() => {
+        jest.restoreAllMocks()
+    })
+
+    test('handles unrecoverable error in render', async () => {
+        const app = RemoteServerFactory._createApp(opts())
+        app.get('/*', render)
+        const res = await request(app).get('/unrecoverable-error/')
+        expect(res.statusCode).toBe(500)
+    })
+
+    test('removes error stack in remote', async () => {
+        isRemote.mockReturnValue(true)
+        const app = RemoteServerFactory._createApp(opts())
+        app.get('/*', render)
+        const res = await request(app).get('/render-throws-error/')
+        const data = JSON.parse(parse(res.text).querySelector('#mobify-data').innerHTML)
+        expect(data.__ERROR__.stack).toBeUndefined()
+    })
+
+    test('keeps error stack in local', async () => {
+        isRemote.mockReturnValue(false)
+        const app = RemoteServerFactory._createApp(opts())
+        app.get('/*', render)
+        const res = await request(app).get('/render-throws-error/')
+        const data = JSON.parse(parse(res.text).querySelector('#mobify-data').innerHTML)
+        expect(typeof data.__ERROR__.stack).toBe('string')
+    })
+
+    test('handles pretty print mode with mobify_pretty', async () => {
+        const app = RemoteServerFactory._createApp(opts())
+        app.get('/*', render)
+        const res = await request(app).get('/pwa/?mobify_pretty=1')
+        expect(res.statusCode).toBe(200)
+        const scriptContent = parse(res.text).querySelector('#mobify-data').innerHTML
+        // Pretty print should have multiple lines
+        expect(scriptContent.split('\n').length).toBeGreaterThan(1)
+    })
+
+    test('handles pretty print mode with __pretty_print', async () => {
+        const app = RemoteServerFactory._createApp(opts())
+        app.get('/*', render)
+        const res = await request(app).get('/pwa/?__pretty_print=1')
+        expect(res.statusCode).toBe(200)
+        const scriptContent = parse(res.text).querySelector('#mobify-data').innerHTML
+        // Pretty print should have multiple lines
+        expect(scriptContent.split('\n').length).toBeGreaterThan(1)
+    })
+
+    test('handles server-only mode with mobify_server_only', async () => {
+        const app = RemoteServerFactory._createApp(opts())
+        app.get('/*', render)
+        const res = await request(app).get('/pwa/?mobify_server_only=1')
+        expect(res.statusCode).toBe(200)
+        const doc = parse(res.text)
+        // All scripts should have type="application/json" in server-only mode
+        doc.querySelectorAll('script').forEach((script) => {
+            expect(script.getAttribute('type')).toBe('application/json')
+        })
+    })
+
+    test('handles server-only mode with __server_only', async () => {
+        const app = RemoteServerFactory._createApp(opts())
+        app.get('/*', render)
+        const res = await request(app).get('/pwa/?__server_only=1')
+        expect(res.statusCode).toBe(200)
+        const doc = parse(res.text)
+        // All scripts should have type="application/json" in server-only mode
+        doc.querySelectorAll('script').forEach((script) => {
+            expect(script.getAttribute('type')).toBe('application/json')
+        })
+    })
+
+    test('handles redirect with custom status code', async () => {
+        const app = RemoteServerFactory._createApp(opts())
+        app.get('/*', render)
+        const res = await request(app).get('/redirectWithStatus/')
+        expect(res.statusCode).toBe(301)
+        expect(res.headers.location).toBe('/elsewhere/')
+    })
+
+    test('handles error with status code from response', async () => {
+        const app = RemoteServerFactory._createApp(opts())
+        app.get('/*', render)
+        const res = await request(app).get('/init-sets-status/')
+        expect(res.statusCode).toBe(418)
+    })
+
+    test('handles error without status code', async () => {
+        const app = RemoteServerFactory._createApp(opts())
+        app.get('/*', render)
+        const res = await request(app).get('/render-throws-error/')
+        expect(res.statusCode).toBe(500)
+    })
+
+    test('handles component that returns object instead of promise', async () => {
+        const app = RemoteServerFactory._createApp(opts())
+        app.get('/*', render)
+        const res = await request(app).get('/get-props-returns-object/')
+        expect(res.statusCode).toBe(200)
+        expect(res.text).toContain('prop-value')
+    })
+
+    test('handles getProps rejection with empty string', async () => {
+        const app = RemoteServerFactory._createApp(opts())
+        app.get('/*', render)
+        const res = await request(app).get('/get-props-rejects-with-empty-string/')
+        expect(res.statusCode).toBe(500)
+        const data = JSON.parse(parse(res.text).querySelector('#mobify-data').innerHTML)
+        expect(data.__ERROR__.message).toBe('Internal Server Error')
+    })
+
+    test('handles string error thrown in getProps', async () => {
+        const app = RemoteServerFactory._createApp(opts())
+        app.get('/*', render)
+        const res = await request(app).get('/throw-string/')
+        expect(res.statusCode).toBe(500)
+    })
+
+    test('handles known HTTP error in getProps', async () => {
+        const app = RemoteServerFactory._createApp(opts())
+        app.get('/*', render)
+        const res = await request(app).get('/known-error/')
+        expect(res.statusCode).toBe(503)
+    })
+
+    test('handles 404 error in getProps', async () => {
+        const app = RemoteServerFactory._createApp(opts())
+        app.get('/*', render)
+        const res = await request(app).get('/404-in-get-props-error/')
+        expect(res.statusCode).toBe(404)
+    })
+
+    test('handles unknown error in getProps', async () => {
+        const app = RemoteServerFactory._createApp(opts())
+        app.get('/*', render)
+        const res = await request(app).get('/unknown-error/')
+        expect(res.statusCode).toBe(500)
+    })
+
+    test('handles useQuery with enabled: false', async () => {
+        const app = RemoteServerFactory._createApp(opts())
+        app.get('/*', render)
+        const res = await request(app).get('/disabled-use-query-isnt-resolved/')
+        expect(res.statusCode).toBe(200)
+        expect(res.text).toContain('loading')
+    })
+
+    test('handles useQuery that resolves object', async () => {
+        const app = RemoteServerFactory._createApp(opts())
+        app.get('/*', render)
+        const res = await request(app).get('/use-query-resolves-object/')
+        expect(res.statusCode).toBe(200)
+        expect(res.text).toContain('prop-value')
+    })
+
+    test('handles server context and sets status', async () => {
+        const app = RemoteServerFactory._createApp(opts())
+        app.get('/*', render)
+        const res = await request(app).get('/server-context')
+        expect(res.statusCode).toBe(404)
+    })
+
+    test('handles XSS prevention in serialized data', async () => {
+        const app = RemoteServerFactory._createApp(opts())
+        app.get('/*', render)
+        const res = await request(app).get('/xss/')
+        expect(res.statusCode).toBe(200)
+        const scriptContent = parse(res.text).querySelector('#mobify-data').innerHTML
+        expect(scriptContent).not.toContain('<script>')
+    })
+
+    test('handles AppConfig render error', async () => {
+        const app = RemoteServerFactory._createApp(opts())
+        app.get('/*', render)
+
+        // Mock AppConfig to throw an error
+        const AppConfig = getAppConfig()
+        jest.spyOn(AppConfig.prototype, 'render').mockImplementation(() => {
+            throw new Error('AppConfig render error')
+        })
+
+        const res = await request(app).get('/pwa/')
+        expect(res.statusCode).toBe(500)
+    })
+
+    test('handles server-only mode with script type override', async () => {
+        const app = RemoteServerFactory._createApp(opts())
+        app.get('/*', render)
+        const res = await request(app).get('/pwa/?__server_only=1')
+        expect(res.statusCode).toBe(200)
+        const doc = parse(res.text)
+        // All scripts should have type="application/json" in server-only mode
+        doc.querySelectorAll('script').forEach((script) => {
+            expect(script.getAttribute('type')).toBe('application/json')
+        })
+    })
+
+    test('handles pretty print with indentation', async () => {
+        const app = RemoteServerFactory._createApp(opts())
+        app.get('/*', render)
+        const res = await request(app).get('/pwa/?__pretty_print=1')
+        expect(res.statusCode).toBe(200)
+        const scriptContent = parse(res.text).querySelector('#mobify-data').innerHTML
+        // Pretty print should have multiple lines with indentation
+        expect(scriptContent.split('\n').length).toBeGreaterThan(1)
+        expect(scriptContent).toContain('  ') // Should have indentation
+    })
+
+    test('handles mobify_pretty with indentation', async () => {
+        const app = RemoteServerFactory._createApp(opts())
+        app.get('/*', render)
+        const res = await request(app).get('/pwa/?mobify_pretty=1')
+        expect(res.statusCode).toBe(200)
+        const scriptContent = parse(res.text).querySelector('#mobify-data').innerHTML
+        // Pretty print should have multiple lines with indentation
+        expect(scriptContent.split('\n').length).toBeGreaterThan(1)
+        expect(scriptContent).toContain('  ') // Should have indentation
+    })
+
+    test('handles error in renderApp with catch block', async () => {
+        const app = RemoteServerFactory._createApp(opts())
+        app.get('/*', render)
+
+        // Mock ReactDOMServer.renderToString to throw an error
+        // eslint-disable-next-line @typescript-eslint/no-var-requires
+        const ReactDOMServer = require('react-dom/server')
+        jest.spyOn(ReactDOMServer, 'renderToString').mockImplementation(() => {
+            throw new Error('Render error')
+        })
+
+        const res = await request(app).get('/pwa/')
+        expect(res.statusCode).toBe(500)
+    })
+
+    test('handles server timing header', async () => {
+        const app = RemoteServerFactory._createApp(opts())
+        app.get('/*', render)
+        const res = await request(app).get('/pwa/?__server_timing=1')
+        expect(res.statusCode).toBe(200)
+        expect(res.headers['server-timing']).toBeDefined()
+    })
+
+    test('handles cache control header', async () => {
+        const app = RemoteServerFactory._createApp(opts())
+        app.get('/*', render)
+        const res = await request(app).get('/pwa/?__server_timing=1')
+        expect(res.statusCode).toBe(200)
+        expect(res.headers['cache-control']).toBeDefined()
+    })
+
+    test('handles redirect with status', async () => {
+        const app = RemoteServerFactory._createApp(opts())
+        app.get('/*', render)
+        const res = await request(app).get('/redirectWithStatus/')
+        expect(res.statusCode).toBe(301)
+        expect(res.headers.location).toBeDefined()
+    })
+
+    test('handles redirect without status', async () => {
+        const app = RemoteServerFactory._createApp(opts())
+        app.get('/*', render)
+        const res = await request(app).get('/redirect/')
+        expect(res.statusCode).toBe(302)
+        expect(res.headers.location).toBeDefined()
+    })
+
+    test('handles unrecoverable error in render (duplicate)', async () => {
+        const app = RemoteServerFactory._createApp(opts())
+        app.get('/*', render)
+        const res = await request(app).get('/unrecoverable-error/')
+        expect(res.statusCode).toBe(500)
     })
 })
 
