@@ -8,8 +8,12 @@ on:
         # Runs on the default branch.
         - cron: '0 3 * * *'
 
+env:
+    MRT_PROJECT_ID: q4-pwa-perf-develop
+    MRT_ENVIRONMENT_ID: production
+
 jobs:
-    run-performance-metrics:
+    deploy-latest-changes:
         runs-on: ubuntu-latest
         steps:
             - name: Checkout
@@ -41,36 +45,36 @@ jobs:
               uses: './.github/actions/push_to_mrt'
               with:
                   CWD: '${{ steps.generate_app.outputs.project_path }}'
-                  PROJECT: q4-pwa-perf-develop
-                  TARGET: production
+                  PROJECT: ${{ env.MRT_PROJECT_ID }}
+                  TARGET: ${{ env.MRT_ENVIRONMENT_ID }}
                   CLOUD_ORIGIN: ${{ vars.MRT_STG_CLOUD_ORIGIN }}
                   FLAGS: --wait
 
     notify-slack:
-        needs: [run-performance-metrics]
+        needs: [deploy-latest-changes]
         if: ${{ always() }}
         runs-on: ubuntu-latest
         steps:
-            - name: Send GitHub Action data to Slack workflow (Performance Metrics Success)
+            - name: Send GitHub Action data to Slack workflow (Success)
               id: slack-success
-              if: ${{ github.event_name == 'schedule' && needs.run-performance-metrics.result == 'success' }}
+              if: ${{ github.event_name == 'schedule' && needs.deploy-latest-changes.result == 'success' }}
               uses: slackapi/slack-github-action@v1.23.0
               with:
                   payload: |
                       {
-                        "message": "✅ Performance metrics workflow: successfully deployed bundle for performance testing."
+                        "message": "✅ Deployed the latest changes from `develop` branch to MRT project `${{ env.MRT_PROJECT_ID }}`: https://runtime-admin-staging.mobify-storefront.com/salesforce-internal/${{ env.MRT_PROJECT_ID }}/${{ env.MRT_ENVIRONMENT_ID }}"
                       }
               env:
-                  SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+                  SLACK_WEBHOOK_URL: ${{ secrets.PERF_WORKFLOW_SLACK_WEBHOOK_URL }}
 
-            - name: Send GitHub Action data to Slack workflow (Performance Metrics Failure)
+            - name: Send GitHub Action data to Slack workflow (Failure)
               id: slack-failure
-              if: ${{ github.event_name == 'schedule' && needs.run-performance-metrics.result != 'success' }}
+              if: ${{ github.event_name == 'schedule' && needs.deploy-latest-changes.result != 'success' }}
               uses: slackapi/slack-github-action@v1.23.0
               with:
                   payload: |
                       {
-                        "message": "❌ Performance metrics workflow: please check the logs for details. (${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})"
+                        "message": "❌ Please check the logs for details. (${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})"
                       }
               env:
-                  SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+                  SLACK_WEBHOOK_URL: ${{ secrets.PERF_WORKFLOW_SLACK_WEBHOOK_URL }}

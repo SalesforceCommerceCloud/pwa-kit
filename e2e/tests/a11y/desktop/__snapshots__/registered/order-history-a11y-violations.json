@@ -14,5 +14,21 @@
         ]
       }
     ]
+  },
+  {
+    "id": "landmark-unique",
+    "impact": "moderate",
+    "description": "Ensure landmarks are unique",
+    "help": "Landmarks should have a unique role or role/label/title (i.e. accessible name) combination",
+    "helpUrl": "https://dequeuniversity.com/rules/axe/4.10/landmark-unique?application=playwright",
+    "nodes": [
+      {
+        "html": "<div role=\"region\" aria-live=\"polite\" id=\"...\" >",
+        "failureSummary": "Fix any of the following:\n  The landmark must have a unique aria-label, aria-labelledby, or title to make landmarks distinguishable",
+        "target": [
+          "#chakra-toast-manager-top"
+        ]
+      }
+    ]
   }
 ]

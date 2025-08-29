@@ -1,0 +1,63 @@
+name: update_mrt_target
+description: Update a MRT target environment. This endpoint automatically re-deploys the current bundle if any of the SSR-related properties are changed.
+inputs:
+    PROJECT_SLUG:
+        description: 'MRT Project slug'
+        required: true
+    TARGET_SLUG:
+        description: 'MRT Target slug'
+        required: true
+    MOBIFY_API_KEY:
+        description: 'Mobify API key'
+        required: true
+    CLOUD_ORIGIN:
+        description: 'MRT Cloud origin'
+        required: false
+        default: 'https://cloud.mobify.com'
+    MRT_TARGET_SETTINGS_FILE_PATH:
+        description: 'Path to .env file containing MRT target environment settings'
+        required: false
+    MRT_TARGET_VARS_FILE_PATH:
+        description: 'Path to .env file containing environment variables to be set on the MRT target environment'
+        required: false
+
+runs:
+    using: composite
+    steps:
+        - name: Update MRT Target Settings
+          id: update_mrt_target_settings
+          if: ${{ inputs.MRT_TARGET_SETTINGS_FILE_PATH != '' }}
+          shell: bash
+          run: |-
+              set -e
+
+              # Build arguments for the Node.js script
+              ARGS=(
+                  "--project-slug" "${{ inputs.PROJECT_SLUG }}"
+                  "--target-slug" "${{ inputs.TARGET_SLUG }}"
+                  "--mobify-api-key" "${{ inputs.MOBIFY_API_KEY }}"
+                  "--cloud-origin" "${{ inputs.CLOUD_ORIGIN }}"
+                  "--env-file" "${{ inputs.MRT_TARGET_SETTINGS_FILE_PATH }}"
+              )
+
+              # Run the Node.js script
+              node e2e/scripts/update-mrt-target.js target "${ARGS[@]}"
+
+        - name: Update MRT Target Environment Variables
+          id: update_mrt_target_env_vars
+          if: ${{ inputs.MRT_TARGET_VARS_FILE_PATH != '' }}
+          shell: bash
+          run: |-
+              set -e
+
+              # Build arguments for the Node.js script
+              ARGS=(
+                  "--project-slug" "${{ inputs.PROJECT_SLUG }}"
+                  "--target-slug" "${{ inputs.TARGET_SLUG }}"
+                  "--mobify-api-key" "${{ inputs.MOBIFY_API_KEY }}"
+                  "--env-file" "${{ inputs.MRT_TARGET_VARS_FILE_PATH }}"
+                  "--cloud-origin" "${{ inputs.CLOUD_ORIGIN }}"
+              )
+
+              # Run the Node.js script
+              node e2e/scripts/update-mrt-target.js env-var "${ARGS[@]}"

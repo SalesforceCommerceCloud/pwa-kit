@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React, {useState} from 'react'
+import React, {useState, useMemo, useEffect} from 'react'
 import PropTypes from 'prop-types'
 import {defineMessage, FormattedMessage, useIntl} from 'react-intl'
 import {
@@ -37,16 +37,30 @@ import ShippingAddressSelection from '@salesforce/retail-react-app/app/pages/che
 import AddressDisplay from '@salesforce/retail-react-app/app/components/address-display'
 import {PromoCode, usePromoCode} from '@salesforce/retail-react-app/app/components/promo-code'
 import {API_ERROR_MESSAGE} from '@salesforce/retail-react-app/app/constants'
+import {isPickupShipment} from '@salesforce/retail-react-app/app/utils/shipment-utils'
 
 const Payment = () => {
     const {formatMessage} = useIntl()
     const {data: basket} = useCurrentBasket()
-    const selectedShippingAddress = basket?.shipments && basket?.shipments[0]?.shippingAddress
+    const isPickupOnly =
+        basket?.shipments?.length > 0 &&
+        basket.shipments.every((shipment) => isPickupShipment(shipment))
+    const selectedShippingAddress = useMemo(() => {
+        if (!basket?.shipments?.length || isPickupOnly) return null
+        const deliveryShipment = basket.shipments.find((shipment) => !isPickupShipment(shipment))
+        return deliveryShipment?.shippingAddress || null
+    }, [basket?.shipments, isPickupShipment, isPickupOnly])
+
     const selectedBillingAddress = basket?.billingAddress
     const appliedPayment = basket?.paymentInstruments && basket?.paymentInstruments[0]
+    const [billingSameAsShipping, setBillingSameAsShipping] = useState(!isPickupOnly)
 
-    const isPickupOrder = basket?.shipments[0]?.shippingMethod?.c_storePickupEnabled === true
-    const [billingSameAsShipping, setBillingSameAsShipping] = useState(!isPickupOrder)
+    useEffect(() => {
+        if (isPickupOnly) {
+            setBillingSameAsShipping(false)
+        }
+    }, [isPickupOnly])
+
     const {mutateAsync: addPaymentInstrumentToBasket} = useShopperBasketsMutation(
         'addPaymentInstrumentToBasket'
     )
@@ -207,7 +221,7 @@ const Payment = () => {
                             />
                         </Heading>
 
-                        {!isPickupOrder && (
+                        {!isPickupOnly && (
                             <Checkbox
                                 name="billingSameAsShipping"
                                 isChecked={billingSameAsShipping}

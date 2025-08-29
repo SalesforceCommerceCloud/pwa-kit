@@ -66,7 +66,9 @@ module.exports = {
             cart: {
                 groupBonusProductsWithQualifyingProduct: true
             }
-        }
+        },
+        storeLocatorEnabled: true,
+        multishipEnabled: true
     },
     envBasePath: '/',
     externals: [],

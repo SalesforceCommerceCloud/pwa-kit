@@ -1,31 +1,31 @@
 name: push_to_mrt
 inputs:
-  CWD:
-    description: Project directory
-    default: ${{ github.workspace }}
-  TARGET:
-    description: MRT target environment
-  FLAGS:
-    description: The rest of the flags for the push command
-  PROJECT:
-    description: MRT target project
-    default: "scaffold-pwa"
-  MESSAGE:
-    description: Bundle message / name
-    default: "build ${{ github.run_id }} on ${{ github.ref }} (${{ github.sha }})"
-  CLOUD_ORIGIN:
-    description: 'MRT Cloud origin'
-    default: 'https://cloud.mobify.com'
-  CREDENTIALS_FILE_PATH:
-    description: 'Path to the credentials file'
-    default: '~/.mobify'
+    CWD:
+        description: Project directory
+        default: ${{ github.workspace }}
+    TARGET:
+        description: MRT target environment
+    FLAGS:
+        description: The rest of the flags for the push command
+    PROJECT:
+        description: MRT target project
+        default: 'scaffold-pwa'
+    MESSAGE:
+        description: Bundle message / name
+        default: 'build ${{ github.run_id }} on ${{ github.ref }} (${{ github.sha }})'
+    CLOUD_ORIGIN:
+        description: MRT Cloud origin
+        default: 'https://cloud.mobify.com'
+    CREDENTIALS_FILE_PATH:
+        description: 'Path to the credentials file'
+        default: '~/.mobify'
 runs:
-  using: composite
-  steps:
-    - name: Push Bundle to MRT
-      run: |-
-        cd ${{ inputs.CWD }}
-        if [[ ${{ inputs.TARGET }} ]]; then
-          npm run push -- --projectSlug ${{ inputs.PROJECT }} --message "${{ inputs.MESSAGE }}" --target ${{ inputs.TARGET }} --cloud-origin ${{ inputs.CLOUD_ORIGIN }} --credentialsFile ${{ inputs.CREDENTIALS_FILE_PATH }} ${{ inputs.FLAGS }}
-        fi
-      shell: bash
+    using: composite
+    steps:
+        - name: Push Bundle to MRT
+          run: |-
+              cd ${{ inputs.CWD }}
+              if [[ ${{ inputs.TARGET }} ]]; then
+                npm run push -- --projectSlug ${{ inputs.PROJECT }} --message "${{ inputs.MESSAGE }}" --target ${{ inputs.TARGET }} --cloud-origin ${{ inputs.CLOUD_ORIGIN }} --credentialsFile ${{ inputs.CREDENTIALS_FILE_PATH }} ${{ inputs.FLAGS }}
+              fi
+          shell: bash
