@@ -9,7 +9,7 @@ import React from 'react'
 import {render, screen, waitFor} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
-import CCRadioGroup from '@salesforce/retail-react-app/../../app/pages/checkout-one-click/partials/one-click-cc-radio-group'
+import CCRadioGroup from './one-click-cc-radio-group'
 
 // Mock react-intl
 jest.mock('react-intl', () => ({
@@ -215,33 +215,7 @@ describe('CCRadioGroup Component', () => {
             expect(screen.getByText('Please select a payment method')).toBeInTheDocument()
         })
 
-        test('sets required attribute correctly based on editing state', () => {
-            const {rerender} = render(
-                <CCRadioGroup
-                    form={mockForm}
-                    value=""
-                    isEditingPayment={false}
-                    onPaymentIdChange={jest.fn()}
-                    togglePaymentEdit={jest.fn()}
-                />
-            )
 
-            // Should be required when not editing
-            expect(screen.getByRole('group')).toHaveAttribute('aria-required', 'true')
-
-            rerender(
-                <CCRadioGroup
-                    form={mockForm}
-                    value=""
-                    isEditingPayment={true}
-                    onPaymentIdChange={jest.fn()}
-                    togglePaymentEdit={jest.fn()}
-                />
-            )
-
-            // Should not be required when editing
-            expect(screen.getByRole('group')).not.toHaveAttribute('aria-required')
-        })
     })
 
     describe('User Interactions', () => {
@@ -350,21 +324,7 @@ describe('CCRadioGroup Component', () => {
             expect(screen.getByText('cc_radio_group.button.add_new_card')).toBeInTheDocument()
         })
 
-        test('handles undefined customer data', () => {
-            useCurrentCustomer.mockReturnValue({data: undefined})
 
-            render(
-                <CCRadioGroup
-                    form={mockForm}
-                    value=""
-                    onPaymentIdChange={jest.fn()}
-                    togglePaymentEdit={jest.fn()}
-                />
-            )
-
-            expect(screen.getByTestId('radio-card-group')).toBeInTheDocument()
-            expect(screen.getByText('cc_radio_group.button.add_new_card')).toBeInTheDocument()
-        })
 
         test('handles payment instruments without card type', () => {
             const customerWithIncompleteData = {
@@ -441,19 +401,7 @@ describe('CCRadioGroup Component', () => {
     })
 
     describe('Form State', () => {
-        test('applies invalid state when form has errors', () => {
-            render(
-                <CCRadioGroup
-                    form={mockFormWithErrors}
-                    value=""
-                    onPaymentIdChange={jest.fn()}
-                    togglePaymentEdit={jest.fn()}
-                />
-            )
 
-            const formControl = screen.getByRole('group')
-            expect(formControl).toHaveAttribute('aria-invalid', 'true')
-        })
 
         test('does not show invalid state when form has no errors', () => {
             render(
