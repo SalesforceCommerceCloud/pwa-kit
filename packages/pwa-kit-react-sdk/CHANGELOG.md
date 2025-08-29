@@ -1,3 +1,4 @@
+## v3.12.0-nightly-20250829080205 (Aug 29, 2025)
 ## v3.12.0-dev.1 (Aug 28, 2025)
 ## v3.12.0-dev (Jul 22, 2025)
 - Opentelemetry integration for SSR tracing [#3133](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3133)
