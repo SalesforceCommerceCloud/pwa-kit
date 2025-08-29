@@ -191,59 +191,22 @@ export const getGoogleButtonConfig = (
     isPdpMode = false,
     quantity = 1
 ) => {
-    console.log('🔧 getGoogleButtonConfig called with params:', {
-        authToken: !!authToken,
-        site: !!site,
-        basket: basket,
-        googlePayConfig: !!googlePayConfig,
-        sku: sku,
-        setTempBasket: !!setTempBasket,
-        tempBasket: tempBasket,
-        isPdpMode: isPdpMode,
-        quantity: quantity
-    })
-
     // Single basket reference that gets updated as needed
     // Initialize basketRef with the actual basket value, not null
     let basketRef = isPdpMode ? tempBasket : basket
     let googlePayAmount = basketRef?.orderTotal || 0
 
-    console.log('🔧 getGoogleButtonConfig initialized:', {
-        isPdpMode,
-        hasBasket: !!basket,
-        hasTempBasket: !!tempBasket,
-        basketRef: basketRef,
-        basketId: basketRef?.basketId,
-        basket: basket,
-        tempBasket: tempBasket
-    })
-
     // Helper function to get or create basket (prevents multiple creation)
     const getOrCreateBasket = async () => {
-        console.log('🔍 getOrCreateBasket called:', { 
-            isPdpMode,
-            sku, 
-            tempBasket, 
-            basket, 
-            basketRef,
-            hasBasketRef: !!basketRef,
-            hasBasketRefId: !!(basketRef?.basketId),
-            skuType: typeof sku,
-            isPdpModeType: typeof isPdpMode
-        })
-        
         // If we already have a basket reference, return it
         if (basketRef && basketRef.basketId) {
-            console.log('✅ Using existing basket:', basketRef.basketId)
             return basketRef
         }
 
         // For PDP flows, create temporary basket if needed (and SKU is available)
         if (isPdpMode && sku && typeof sku === 'string' && setTempBasket) {
-            console.log('🛒 Creating temporary basket for SKU:', sku)
             try {
                 const newBasket = await createTemporaryBasket(sku, authToken, site, quantity)
-                console.log('✅ Temporary basket created:', newBasket)
                 basketRef = newBasket // Update basket reference immediately
                 setTempBasket(newBasket) // Update React state for re-renders
                 return newBasket
@@ -251,28 +214,14 @@ export const getGoogleButtonConfig = (
                 console.error('❌ Failed to create temporary basket:', error)
                 return null
             }
-        } else {
-            console.log('❌ PDP mode conditions not met:', {
-                isPdpMode,
-                hasSku: !!sku,
-                skuType: typeof sku,
-                skuValue: sku,
-                hasSetTempBasket: !!setTempBasket,
-                reason: !isPdpMode ? 'not PDP mode' :
-                         !sku ? 'no SKU' :
-                         typeof sku !== 'string' ? 'SKU is not a string' :
-                         !setTempBasket ? 'no setTempBasket function' : 'unknown'
-            })
         }
 
         // For Cart mode, use the existing basket
         if (basket && basket.basketId) {
-            console.log('🛒 Using existing cart basket:', basket.basketId)
             basketRef = basket // Update basket reference
             return basket
         }
 
-        console.log('❌ No basket available and cannot create one')
         return null
     }
 
@@ -401,16 +350,6 @@ export const getGoogleButtonConfig = (
                             // Get or create basket using basket reference
                             let basketToUse = await getOrCreateBasket()
 
-                            // Add detailed logging for Safari debugging
-                            console.log('🔍 SHIPPING_ADDRESS callback:', {
-                                callbackTrigger,
-                                basketToUse,
-                                basketRef,
-                                tempBasket,
-                                basket,
-                                isPdpMode
-                            })
-
                             if (!basketToUse || !basketToUse.basketId) {
                                 console.error('❌ SHIPPING_ADDRESS: No basket available')
                                 // Return error if we can't get/create a basket
@@ -445,17 +384,6 @@ export const getGoogleButtonConfig = (
                         if (callbackTrigger === 'SHIPPING_OPTION') {
                             // Get current basket
                             let basketToUse = await getOrCreateBasket()
-
-                            // Add detailed logging for Safari debugging
-                            console.log('🔍 SHIPPING_OPTION callback:', {
-                                basketToUse,
-                                basketRef,
-                                tempBasket,
-                                basket,
-                                isPdpMode,
-                                callbackTrigger,
-                                shippingOptionData
-                            })
 
                             if (!basketToUse || !basketToUse.basketId) {
                                 console.error('❌ SHIPPING_OPTION: No basket available')
@@ -559,7 +487,6 @@ export const GooglePayExpress = ({
     useEffect(
         () => {
             let isCanceled = false
-            const buttonCreationStartTime = performance.now()
 
             const createCheckout = async () => {
                 if (isCanceled) {
@@ -579,10 +506,12 @@ export const GooglePayExpress = ({
                         hasRequiredBasketData
                     })
                 ) {
+                    handleGooglePayUnavailable()
                     return
                 }
 
                 if (!adyenPaymentMethods?.environment) {
+                    handleGooglePayUnavailable()
                     return
                 }
 
@@ -643,16 +572,6 @@ export const GooglePayExpress = ({
                     try {
                         await googlePayButton.mount(paymentContainer.current)
                         manager.setPaymentMethodAvailable(PAYMENT_METHOD)
-
-                        // Log the actual button creation and mounting time
-                        const buttonCreationEndTime = performance.now()
-                        const buttonCreationDuration =
-                            buttonCreationEndTime - buttonCreationStartTime
-                        console.log(
-                            `🤖 GooglePayExpress button created and mounted in ${buttonCreationDuration.toFixed(
-                                2
-                            )}ms`
-                        )
                     } catch (error) {
                         handleGooglePayUnavailable()
                     }
@@ -686,22 +605,7 @@ export const GooglePayExpress = ({
         })
     )
 
-    // Check if we should render the Google Pay button
-    const shouldRender = validateExpressPaymentSetup({
-        isPdpMode,
-        adyenPaymentMethods,
-        hasRequiredBasketData
-    })
-
-    if (!shouldRender) {
-        return null
-    }
-
-    return (
-        <>
-            <div ref={paymentContainer} style={{height: '40px'}}></div>
-        </>
-    )
+    return <div ref={paymentContainer}></div>
 }
 
 GooglePayExpress.propTypes = {

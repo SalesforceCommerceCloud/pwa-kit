@@ -12,6 +12,7 @@ import {GooglePayExpress} from '@salesforce/retail-react-app/app/components/goog
 import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
 import {useExpressPaymentManager} from '@salesforce/retail-react-app/app/components/express/hooks/use-express-payment-manager'
 import {useStandalonePaymentMethods} from '@salesforce/retail-react-app/app/components/express/hooks/use-standalone-payment-methods'
+import '@salesforce/retail-react-app/app/components/express/styles/express-payments.css'
 
 // Define the payment methods we will attempt to load
 const PAYMENT_METHODS = ['applepay', 'googlepay']
@@ -126,35 +127,26 @@ function Express() {
         manager
     }
 
-    // NOW check for early return conditions - after all hooks have been called
-    if (!authToken || managerError) {
-        // Do not render express payment components if there is no auth token
-        // or if there was an error setting up the manager
-        return null
-    }
-
-    // Determine if we should render based on mode and requirements
-    let shouldRender = false
-
-    if (isPdpMode) {
-        // In PDP mode, render if we have basic requirements (authToken, payment methods)
-        // Basket will be created dynamically when needed
-        shouldRender = !!(authToken && adyenPaymentMethods)
-    } else {
-        // In checkout mode, render if we have a basket
-        shouldRender = !!(authToken && basket)
-    }
-
-    if (!shouldRender) {
-        return null
-    }
-
     return (
-        <div>
-            <div style={{marginBottom: '8px'}}>
+        <div className="express-payment-container">
+            <div
+                className={`express-payment-method ${
+                    manager.getNumberOfAvailablePaymentMethods() === 1
+                        ? 'express-payment-method--single express-payment-method--no-margin'
+                        : 'express-payment-method--multiple express-payment-method--with-margin'
+                }`}
+            >
                 <ApplePayExpress {...expressPaymentContext} />
             </div>
-            <GooglePayExpress {...expressPaymentContext} />
+            <div
+                className={`express-payment-method ${
+                    manager.getNumberOfAvailablePaymentMethods() === 1
+                        ? 'express-payment-method--single'
+                        : 'express-payment-method--multiple'
+                }`}
+            >
+                <GooglePayExpress {...expressPaymentContext} />
+            </div>
         </div>
     )
 }
