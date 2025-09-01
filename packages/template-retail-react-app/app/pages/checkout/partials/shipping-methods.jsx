@@ -22,7 +22,10 @@ import {
     ToggleCardEdit,
     ToggleCardSummary
 } from '@salesforce/retail-react-app/app/components/toggle-card'
-import {useShopperBasketsMutation} from '@salesforce/commerce-sdk-react'
+import {
+    useShippingMethodsForShipment,
+    useShopperBasketsMutation
+} from '@salesforce/commerce-sdk-react'
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
 import {useCurrency} from '@salesforce/retail-react-app/app/hooks'
 import {isPickupShipment} from '@salesforce/retail-react-app/app/utils/shipment-utils'
@@ -135,6 +138,22 @@ export default function ShippingMethods() {
     const {currency} = useCurrency()
     const updateShippingMethod = useShopperBasketsMutation('updateShippingMethodForShipment')
 
+    // Hook for shipping methods for the main shipment - we'll use this as a fallback
+    //
+    // TODO: Ideally we would not use the shipping methods for the main shipment on all shipments
+    //
+    const {data: shippingMethods} = useShippingMethodsForShipment(
+        {
+            parameters: {
+                basketId: basket?.basketId,
+                shipmentId: 'me'
+            }
+        },
+        {
+            enabled: Boolean(basket?.basketId) && step === STEPS.SHIPPING_OPTIONS
+        }
+    )
+
     const deliveryShipments =
         (basket &&
             basket.shipments &&
@@ -150,7 +169,9 @@ export default function ShippingMethods() {
         const values = {}
         deliveryShipments.forEach((shipment) => {
             values[`shippingMethodId_${shipment.shipmentId}`] =
-                (shipment.shippingMethod && shipment.shippingMethod.id) || ''
+                (shipment.shippingMethod && shipment.shippingMethod.id) ||
+                shippingMethods?.defaultShippingMethodId ||
+                ''
         })
         return values
     }
@@ -165,12 +186,14 @@ export default function ShippingMethods() {
         const currentValues = form.getValues()
         const newDefaults = getInitialValues()
 
-        // Only reset if there are new fields or values have changed
-        const hasNewFields = Object.keys(newDefaults).some((key) => !(key in currentValues))
+        // Only reset if there are new fields or values have not been set yet
+        const hasNewFields = Object.keys(newDefaults).some(
+            (key) => !(key in currentValues) || currentValues[key] === ''
+        )
         if (hasNewFields) {
             form.reset(newDefaults)
         }
-    }, [deliveryShipments.length])
+    }, [deliveryShipments.length, shippingMethods?.defaultShippingMethodId])
 
     const submitForm = async (formData) => {
         // Submit shipping method for each shipment

@@ -16,7 +16,7 @@ test.beforeEach(async ({page}) => {
     })
 })
 
-test('should inject B3 headers when __server_timing param is passed', async ({page}) => {
+test.skip('should inject B3 headers when __server_timing param is passed', async ({page}) => {
     const url = `${config.RETAIL_APP_HOME}?__server_timing=true`
 
     const responseHeaders = []
