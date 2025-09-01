@@ -1,3 +1,6 @@
+## v4.0.0-nightly-20250901080211 (Sep 01, 2025)
+## v4.0.0-dev.1 (Sep 01, 2025)
+## v3.12.0-nightly-20250901080211 (Sep 01, 2025)
 ## v4.0.0-dev.1 (Aug 28, 2025)
 ## v4.0.0-dev (Aug 18, 2025)
 - Upgrade to commerce-sdk-isomorphic v4.0.0 [2879](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2879)
