@@ -1358,7 +1358,7 @@ class Auth {
                 client_id: parameters.client_id || slasClient.clientConfig.parameters.clientId,
                 new_password: parameters.new_password,
                 hint: parameters.hint,
-                code_verifier: parameters.code_verifier,
+                code_verifier: parameters.code_verifier
             }
         }
 
