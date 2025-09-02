@@ -8,6 +8,7 @@
 - [Bugfix] Pin `@chakra-ui/react` version to 2.7.0 to avoid breaking changes from 2.10.9 [#2658](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2658)
 - Introduce optional prop `hybridAuthEnabled` to control Hybrid Auth specific behaviors in commerce-sdk-react [#3151](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3151)
 - Inject sfdc_user_agent request header into all SCAPI requests for debugging and metrics prupose [#3183](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3183)
+- [Bugfix] Fix unit test failures in generated projects [3204](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3204)
 
 ## v7.0.0 (July 22, 2025)
 
