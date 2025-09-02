@@ -7,14 +7,24 @@
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const sites = require('./sites.js')
 const {
-    parseCommerceAgentSettings
+    parseConfig
     // If generating an extensible project, this require path needs to be: @salesforce/retail-react-app/app/utils/config-utils.js
     // eslint-disable-next-line @typescript-eslint/no-var-requires
 } = require('../app/utils/config-utils.js')
 
 module.exports = {
     app: {
-        commerceAgent: parseCommerceAgentSettings(process.env.COMMERCE_AGENT_SETTINGS),
+        commerceAgent: parseConfig(process.env.COMMERCE_AGENT_SETTINGS) || {
+            enabled: 'false',
+            askAgentOnSearch: 'false',
+            embeddedServiceName: '',
+            embeddedServiceEndpoint: '',
+            scriptSourceUrl: '',
+            scrt2Url: '',
+            salesforceOrgId: '',
+            commerceOrgId: '',
+            siteId: ''
+        },
         url: {
             site: 'path',
             locale: 'path',

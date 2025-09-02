@@ -85,7 +85,7 @@ import {
 import Seo from '@salesforce/retail-react-app/app/components/seo'
 import ShopperAgent from '@salesforce/retail-react-app/app/components/shopper-agent'
 import {getPathWithLocale} from '@salesforce/retail-react-app/app/utils/url'
-import {parseCommerceAgentSettings} from '@salesforce/retail-react-app/app/utils/config-utils'
+import {getCommerceAgentConfig} from '@salesforce/retail-react-app/app/utils/config-utils'
 
 const PlaceholderComponent = () => (
     <Center p="2">
@@ -218,9 +218,7 @@ const App = (props) => {
     }, [basket?.currency])
 
     const commerceAgentConfiguration = useMemo(() => {
-        // TODO
-        const defaultConfig = parseCommerceAgentSettings()
-        return config.app.commerceAgent ?? defaultConfig
+        return getCommerceAgentConfig()
     }, [config.app.commerceAgent])
 
     useEffect(() => {

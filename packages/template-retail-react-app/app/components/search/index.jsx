@@ -42,7 +42,7 @@ import {
     categoryUrlBuilder
 } from '@salesforce/retail-react-app/app/utils/url'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
-import {parseCommerceAgentSettings} from '@salesforce/retail-react-app/app/utils/config-utils'
+import {getCommerceAgentConfig} from '@salesforce/retail-react-app/app/utils/config-utils'
 
 const onClient = typeof window !== 'undefined'
 
@@ -95,8 +95,7 @@ const formatSuggestions = (searchSuggestions, input) => {
 const Search = (props) => {
     const config = getConfig()
     const askAgentOnSearchEnabled = useMemo(() => {
-        const defaultConfig = parseCommerceAgentSettings()
-        const {enabled, askAgentOnSearch} = config.app.commerceAgent ?? defaultConfig
+        const {enabled, askAgentOnSearch} = getCommerceAgentConfig()
         return isAskAgentOnSearchEnabled(enabled, askAgentOnSearch)
     }, [config.app.commerceAgent])
 
