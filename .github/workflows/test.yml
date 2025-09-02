@@ -87,8 +87,6 @@ jobs:
       - name: Run unit tests
         uses: "./.github/actions/unit_tests"
 
-
-
       - name: Smoke test scripts
         if: env.IS_DEFAULT_NPM == 'true'
         uses: "./.github/actions/smoke_tests"
@@ -119,8 +117,20 @@ jobs:
         if: env.IS_NOT_FORK == 'true' && env.IS_DEFAULT_NPM == 'true'
         uses: "./.github/actions/check_clean"
 
+      - name: Check if monorepo version is a dev version
+        run: |-
+          version=`jq -r ".version" package.json`
+          echo "The monorepo version is $version"
+          if echo "$version" | grep -Eiq "[0-9]-dev(\.|$)"; then
+            echo "Dev version detected."
+            echo "IS_DEV_VERSION=true" >> "$GITHUB_ENV"
+          else
+            echo "Monorepo is not on a dev version."
+            echo "IS_DEV_VERSION=false" >> "$GITHUB_ENV"
+          fi
+
       - name: Publish to NPM
-        if: env.IS_NOT_FORK == 'true' && env.IS_MRT_NODE == 'true' && env.RELEASE == 'true'
+        if: env.IS_NOT_FORK == 'true' && env.IS_MRT_NODE == 'true' && env.RELEASE == 'true' && env.IS_DEV_VERSION == 'false'
         uses: "./.github/actions/publish_to_npm"
         with:
           NODE_AUTH_TOKEN: ${{ secrets.NODE_AUTH_TOKEN }}
@@ -207,8 +217,6 @@ jobs:
         env:
           GENERATOR_PRESET: ${{ matrix.template }}
         timeout-minutes: 8
-
-
 
       - name: Run unit tests
         if: env.IS_TEMPLATE_FROM_RETAIL_REACT_APP == 'true'
@@ -302,8 +310,6 @@ jobs:
         env:
           GENERATOR_PRESET: ${{ matrix.template }}
         timeout-minutes: 7
-
-
 
       - name: Run unit tests
         if: env.IS_TEMPLATE_FROM_RETAIL_REACT_APP == 'true'
