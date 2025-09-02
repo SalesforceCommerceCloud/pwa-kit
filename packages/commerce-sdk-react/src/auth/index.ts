@@ -1357,8 +1357,8 @@ class Auth {
                 channel_id: parameters.channel_id || slasClient.clientConfig.parameters.siteId,
                 client_id: parameters.client_id || slasClient.clientConfig.parameters.clientId,
                 new_password: parameters.new_password,
-                code_verifier: parameters.code_verifier,
-                hint: parameters.hint
+                hint: parameters.hint,
+                ...(parameters.code_verifier && {code_verifier: parameters.code_verifier}),
             }
         }
 
