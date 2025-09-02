@@ -1326,8 +1326,8 @@ class Auth {
                 callback_uri: parameters.callback_uri,
                 hint: parameters.hint || 'cross_device',
                 locale: parameters.locale,
-                code_challenge: parameters.code_challenge,
-                idp_name: parameters.idp_name
+                idp_name: parameters.idp_name,
+                ...(parameters.code_challenge && {code_challenge: parameters.code_challenge})
             }
         }
 
@@ -1358,7 +1358,7 @@ class Auth {
                 client_id: parameters.client_id || slasClient.clientConfig.parameters.clientId,
                 new_password: parameters.new_password,
                 hint: parameters.hint,
-                ...(parameters.code_verifier && {code_verifier: parameters.code_verifier}),
+                code_verifier: parameters.code_verifier,
             }
         }
 
