@@ -7,9 +7,9 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 const sites = require('./sites.js')
 const {
-    parseConfig
+    parseSettings
     // eslint-disable-next-line @typescript-eslint/no-var-requires
-} = require('../app/utils/config-utils.js')
+} = require('./utils.js')
 
 module.exports = {
     app: {
@@ -26,7 +26,7 @@ module.exports = {
         // Commerce shopping agent configuration for embedded messaging service
         // This enables an agentic shopping experience in the application
         // This property accepts either a JSON string or a plain JavaScript object.
-        commerceAgent: parseConfig(process.env.COMMERCE_AGENT_SETTINGS) || {
+        commerceAgent: parseSettings(process.env.COMMERCE_AGENT_SETTINGS) || {
             enabled: 'false',
             askAgentOnSearch: 'false',
             embeddedServiceName: '',

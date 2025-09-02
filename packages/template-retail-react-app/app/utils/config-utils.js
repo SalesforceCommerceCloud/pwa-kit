@@ -63,21 +63,3 @@ export const getCommerceAgentConfig = () => {
     }
     return getConfig().app.commerceAgent ?? defaults
 }
-
-export const parseConfig = (input) => {
-    // TODO: what's the best way to identify a javascript object?
-    if (typeof input === 'object' && input !== null) {
-        return input
-    }
-
-    if (typeof input === 'string') {
-        try {
-            return JSON.parse(input)
-        } catch (error) {
-            console.warn('Invalid json format', error.message)
-        }
-    }
-
-    console.warn('Cannot parse config from:', input)
-    return
-}
