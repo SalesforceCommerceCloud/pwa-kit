@@ -55,7 +55,8 @@ export const useQuery = <Client extends ApiClient, Options extends ApiOptions, D
     // for this case would add significantly more complexity.
     const wrappedMethod = async () => await authenticatedMethod(apiOptions as Options)
 
-    return useReactQuery(hookConfig.queryKey, wrappedMethod, {
+    // TODO: replace `as any`
+    return useReactQuery(hookConfig.queryKey as any, wrappedMethod as any, {
         enabled:
             // Individual hooks can provide `enabled` checks that are done in ADDITION to
             // the required parameter check

@@ -25,7 +25,7 @@ import {useDNT} from '@salesforce/commerce-sdk-react'
 import {useLocation} from 'react-router-dom'
 
 export const DntNotification = ({isOpen, onOpen, onClose}) => {
-    const {selectedDnt, updateDNT} = useDNT()
+    const {selectedDnt, updateDnt} = useDNT()
     const {formatMessage} = useIntl()
     const location = useLocation()
 
@@ -38,7 +38,7 @@ export const DntNotification = ({isOpen, onOpen, onClose}) => {
     }, [location, selectedDnt])
 
     const onCloseNotification = () => {
-        updateDNT(null)
+        updateDnt(null)
         onClose()
     }
 
@@ -52,7 +52,7 @@ export const DntNotification = ({isOpen, onOpen, onClose}) => {
                 borderColor="gray.100"
                 boxShadow="md"
                 onClick={() => {
-                    updateDNT(true)
+                    updateDnt(true)
                     onClose()
                 }}
                 aria-label={formatMessage({
@@ -65,7 +65,7 @@ export const DntNotification = ({isOpen, onOpen, onClose}) => {
             </Button>
             <Button
                 onClick={() => {
-                    updateDNT(false)
+                    updateDnt(false)
                     onClose()
                 }}
                 boxShadow="md"

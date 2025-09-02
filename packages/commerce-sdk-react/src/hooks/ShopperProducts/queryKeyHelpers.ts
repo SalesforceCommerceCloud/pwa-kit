@@ -56,13 +56,13 @@ export const getProducts: QueryKeyHelper<'getProducts'> = {
     path: (params) => [
         '/commerce-sdk-react',
         '/organizations/',
-        params.organizationId,
+        params?.organizationId,
         '/products'
     ],
     queryKey: (params: Params<'getProducts'>) => {
         return [
             ...getProducts.path(params),
-            pickValidParams(params, ShopperProducts.paramKeys.getProducts)
+            pickValidParams(params || {}, ShopperProducts.paramKeys.getProducts)
         ]
     }
 }
@@ -71,14 +71,14 @@ export const getProduct: QueryKeyHelper<'getProduct'> = {
     path: (params) => [
         '/commerce-sdk-react',
         '/organizations/',
-        params.organizationId,
+        params?.organizationId,
         '/products/',
-        params.id
+        params?.id
     ],
     queryKey: (params: Params<'getProduct'>) => {
         return [
             ...getProduct.path(params),
-            pickValidParams(params, ShopperProducts.paramKeys.getProduct)
+            pickValidParams(params || {}, ShopperProducts.paramKeys.getProduct)
         ]
     }
 }
@@ -87,13 +87,13 @@ export const getCategories: QueryKeyHelper<'getCategories'> = {
     path: (params) => [
         '/commerce-sdk-react',
         '/organizations/',
-        params.organizationId,
+        params?.organizationId,
         '/categories'
     ],
     queryKey: (params: Params<'getCategories'>) => {
         return [
             ...getCategories.path(params),
-            pickValidParams(params, ShopperProducts.paramKeys.getCategories)
+            pickValidParams(params || {}, ShopperProducts.paramKeys.getCategories)
         ]
     }
 }
@@ -102,14 +102,14 @@ export const getCategory: QueryKeyHelper<'getCategory'> = {
     path: (params) => [
         '/commerce-sdk-react',
         '/organizations/',
-        params.organizationId,
+        params?.organizationId,
         '/categories/',
-        params.id
+        params?.id
     ],
     queryKey: (params: Params<'getCategory'>) => {
         return [
             ...getCategory.path(params),
-            pickValidParams(params, ShopperProducts.paramKeys.getCategory)
+            pickValidParams(params || {}, ShopperProducts.paramKeys.getCategory)
         ]
     }
 }

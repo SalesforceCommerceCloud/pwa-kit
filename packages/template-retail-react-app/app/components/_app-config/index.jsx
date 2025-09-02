@@ -40,6 +40,7 @@ import {CommerceApiProvider} from '@salesforce/commerce-sdk-react'
 import {withReactQuery} from '@salesforce/pwa-kit-react-sdk/ssr/universal/components/with-react-query'
 import {useCorrelationId} from '@salesforce/pwa-kit-react-sdk/ssr/universal/hooks'
 import {ReactQueryDevtools} from '@tanstack/react-query-devtools'
+import {generateSfdcUserAgent} from '@salesforce/retail-react-app/app/utils/sfdc-user-agent-utils'
 import {
     DEFAULT_DNT_STATE,
     STORE_LOCATOR_RADIUS,
@@ -50,6 +51,8 @@ import {
     STORE_LOCATOR_DEFAULT_PAGE_SIZE,
     STORE_LOCATOR_SUPPORTED_COUNTRIES
 } from '@salesforce/retail-react-app/app/constants'
+
+const sfdcUserAgent = generateSfdcUserAgent()
 
 /**
  * Use the AppConfig component to inject extra arguments into the getProps
@@ -62,7 +65,8 @@ import {
 const AppConfig = ({children, locals = {}}) => {
     const {correlationId} = useCorrelationId()
     const headers = {
-        'correlation-id': correlationId
+        'correlation-id': correlationId,
+        sfdc_user_agent: sfdcUserAgent
     }
 
     const commerceApiConfig = locals.appConfig.commerceAPI
@@ -105,7 +109,7 @@ const AppConfig = ({children, locals = {}}) => {
             // Set 'enablePWAKitPrivateClient' to true to use SLAS private client login flows.
             // Make sure to also enable useSLASPrivateClient in ssr.js when enabling this setting.
             enablePWAKitPrivateClient={false}
-            slasPrivateClientProxyEndpoint={slasPrivateClientProxyEndpoint}
+            privateClientProxyEndpoint={slasPrivateClientProxyEndpoint}
             // Uncomment 'hybridAuthEnabled' if the current site has Hybrid Auth enabled. Do NOT set this flag for hybrid storefronts using Plugin SLAS.
             // hybridAuthEnabled={true}
             logger={createLogger({packageName: 'commerce-sdk-react'})}
