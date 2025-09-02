@@ -799,3 +799,62 @@ describe('validateOrderability', () => {
         expect(result).toBe(false)
     })
 })
+
+// Test maxOrderQuantity prop functionality
+describe('maxOrderQuantity Prop', () => {
+    test('should limit quantity to maxOrderQuantity and maintain backward compatibility', async () => {
+        const addToCart = jest.fn()
+        
+        const {user} = renderWithProviders(
+            <MockComponent product={mockProductDetail} addToCart={addToCart} maxOrderQuantity={3} />,
+            {
+                wrapperProps: {
+                    messages: frMessages,
+                    locale: 'fr-FR'
+                }
+            }
+        )
+
+        const quantityInput = screen.getAllByDisplayValue('1')[0]
+        const incrementButton = screen.getAllByText('+')[0]
+
+        // Should have max attribute set
+        expect(quantityInput).toHaveAttribute('max', '3')
+
+        // Try to increment beyond max (should stop at 3)
+        await user.click(incrementButton)
+        await user.click(incrementButton) 
+        await user.click(incrementButton) // This should reach max (3)
+        await user.click(incrementButton) // This should not increment beyond max
+
+        await waitFor(() => {
+            expect(quantityInput).toHaveValue('3')
+        })
+
+        // Test backward compatibility - null should keep increment enabled always (no limit)
+        const {user: nullUser} = renderWithProviders(
+            <MockComponent product={mockProductDetail} addToCart={addToCart} maxOrderQuantity={null} />,
+            {
+                wrapperProps: {
+                    messages: frMessages,
+                    locale: 'fr-FR'
+                }
+            }
+        )
+        const nullQuantityInput = screen.getAllByDisplayValue('1')[0]
+        const nullIncrementButton = screen.getAllByText('+')[0]
+        
+        expect(nullQuantityInput).not.toHaveAttribute('max')
+        
+        // Verify unlimited behavior by testing 10 increments (could be any number)
+        for (let i = 0; i < 10; i++) {
+            await nullUser.click(nullIncrementButton)
+        }
+        
+        await waitFor(() => {
+            expect(nullQuantityInput).toHaveValue('11') // Started at 1, clicked 10 times - unlimited
+        })
+    })
+})
+
+

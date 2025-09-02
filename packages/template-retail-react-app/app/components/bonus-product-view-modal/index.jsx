@@ -86,8 +86,8 @@ const BonusProductViewModal = ({
     // Determine context for navigation behavior
     const isFromAddToCartModal = location.pathname !== '/cart'
 
-    // Helper function to calculate max order quantity
-    const getMaxOrderQuantity = () => {
+    // Helper function to calculate remaining bonus quantity
+    const getRemainingBonusQuantity = () => {
         if (basket && product) {
             const bonusData = getRemainingAvailableBonusProductsForProduct(basket, product.id, {
                 [product.id]: product
@@ -106,11 +106,11 @@ const BonusProductViewModal = ({
 
                 // Process each item in the selection
                 for (const {variant, quantity} of products) {
-                    // Default quantity to 1 if not provided or invalid
-                    let finalQuantity = quantity && quantity > 0 ? quantity : 1
+                    // Default quantity to 1 if not provided or invalid, ensure positive
+                    let finalQuantity = Math.max(quantity || 1, 1)
 
                     // Cap quantity to remaining capacity (defensive programming)
-                    const maxAllowed = getMaxOrderQuantity()
+                    const maxAllowed = getRemainingBonusQuantity()
                     if (maxAllowed && finalQuantity > maxAllowed) {
                         finalQuantity = maxAllowed
                     }
@@ -213,7 +213,7 @@ const BonusProductViewModal = ({
     }, [productViewModalData.product, safeProduct])
 
     // Calculate max order quantity for UI
-    const maxOrderQuantity = getMaxOrderQuantity()
+    const maxOrderQuantity = getRemainingBonusQuantity()
 
     return (
         <Modal
