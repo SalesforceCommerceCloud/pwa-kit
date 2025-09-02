@@ -843,18 +843,16 @@ describe('maxOrderQuantity Prop', () => {
         )
         const nullQuantityInput = screen.getAllByDisplayValue('1')[0]
         const nullIncrementButton = screen.getAllByText('+')[0]
-        
+
         expect(nullQuantityInput).not.toHaveAttribute('max')
-        
+
         // Verify unlimited behavior by testing 10 increments (could be any number)
         for (let i = 0; i < 10; i++) {
             await nullUser.click(nullIncrementButton)
         }
-        
+
         await waitFor(() => {
             expect(nullQuantityInput).toHaveValue('11') // Started at 1, clicked 10 times - unlimited
         })
     })
 })
-
-

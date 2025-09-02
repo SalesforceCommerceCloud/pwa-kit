@@ -6,22 +6,27 @@
  */
 
 import React from 'react'
+import PropTypes from 'prop-types'
 import {screen} from '@testing-library/react'
 import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
-import BonusProductViewModal from './index'
+import BonusProductViewModal from '@salesforce/retail-react-app/app/components/bonus-product-view-modal'
 import mockProductDetail from '@salesforce/retail-react-app/app/mocks/variant-750518699578M'
 import {prependHandlersToServer} from '@salesforce/retail-react-app/jest-setup'
+import {getRemainingAvailableBonusProductsForProduct} from '@salesforce/retail-react-app/app/utils/bonus-product-utils'
+import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
 
 // Mock the navigation hook
-jest.mock('@salesforce/retail-react-app/app/hooks/use-navigation', () => 
-    jest.fn(() => jest.fn())
-)
+jest.mock('@salesforce/retail-react-app/app/hooks/use-navigation', () => jest.fn(() => jest.fn()))
 
 // Mock ProductView to test maxOrderQuantity prop functionality
 jest.mock('@salesforce/retail-react-app/app/components/product-view', () => {
-    return function MockProductView({maxOrderQuantity}) {
+    const MockProductView = function ({maxOrderQuantity}) {
         return <div data-testid="max-order-quantity">{maxOrderQuantity ?? 'null'}</div>
     }
+    MockProductView.propTypes = {
+        maxOrderQuantity: PropTypes.number
+    }
+    return MockProductView
 })
 
 // Mock bonus product utils
@@ -46,8 +51,8 @@ beforeEach(() => {
 
 describe('BonusProductViewModal - getRemainingBonusQuantity', () => {
     test('calculates remaining bonus quantity correctly (5 - 2 = 3)', () => {
-        const {getRemainingAvailableBonusProductsForProduct} = require('@salesforce/retail-react-app/app/utils/bonus-product-utils')
-        
+        // Use imported function directly
+
         // Mock calculation: 5 available - 2 selected = 3 remaining
         getRemainingAvailableBonusProductsForProduct.mockReturnValue({
             aggregatedMaxBonusItems: 5,
@@ -56,13 +61,12 @@ describe('BonusProductViewModal - getRemainingBonusQuantity', () => {
 
         // Mock basket to exist (required for getMaxOrderQuantity to work)
         const mockBasket = {bonusDiscountLineItems: []}
-        const {useCurrentBasket} = require('@salesforce/retail-react-app/app/hooks/use-current-basket')
         useCurrentBasket.mockReturnValue({data: mockBasket})
 
         renderWithProviders(
-            <BonusProductViewModal 
-                product={mockProductDetail} 
-                isOpen={true} 
+            <BonusProductViewModal
+                product={mockProductDetail}
+                isOpen={true}
                 onClose={() => {}}
                 bonusDiscountLineItemId="test-id"
                 promotionId="test-promo"
