@@ -177,7 +177,11 @@ const ShippingAddressSelection = ({
     useEffect(() => {
         // If the customer deletes all their saved addresses during checkout,
         // we need to make sure to display the address form.
-        if (!isLoading && (!customer?.addresses || customer.addresses.length === 0) && !isEditingAddress) {
+        if (
+            !isLoading &&
+            (!customer?.addresses || customer.addresses.length === 0) &&
+            !isEditingAddress
+        ) {
             setIsEditingAddress(true)
         }
     }, [customer])
@@ -420,7 +424,11 @@ const ShippingAddressSelection = ({
                             <Button
                                 type="submit"
                                 width="full"
-                                disabled={!form.formState.isValid || form.formState.isSubmitting || !selectedAddressId}
+                                disabled={
+                                    !form.formState.isValid ||
+                                    form.formState.isSubmitting ||
+                                    !selectedAddressId
+                                }
                             >
                                 {formatMessage(submitButtonLabel)}
                             </Button>
