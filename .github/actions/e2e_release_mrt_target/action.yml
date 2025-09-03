@@ -1,0 +1,20 @@
+name: e2e_release_mrt_target
+description: Release MRT Target back to pool of available targets in the MRT staging org.
+inputs:
+    SLUG:
+        description: 'MRT target slug'
+        required: true
+    MAX_RETRIES:
+        description: 'Maximum retry attempts to release MRT target'
+        required: false
+        default: '3'
+    RETRY_DELAY:
+        description: 'Delay between retries in milliseconds'
+        required: false
+        default: '10000'
+
+runs:
+    using: node20 # Only 'node12', 'node16', 'node20' or 'node24' are supported.
+    main: dist/main.js
+    post: dist/post.js
+    post-if: always()

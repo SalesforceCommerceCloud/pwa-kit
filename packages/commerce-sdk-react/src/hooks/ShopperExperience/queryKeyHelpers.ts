@@ -39,11 +39,11 @@ type QueryKeyHelper<T extends keyof QueryKeys> = {
 }
 
 export const getPages: QueryKeyHelper<'getPages'> = {
-    path: (params) => ['/commerce-sdk-react', '/organizations/', params.organizationId, '/pages'],
+    path: (params) => ['/commerce-sdk-react', '/organizations/', params?.organizationId, '/pages'],
     queryKey: (params: Params<'getPages'>) => {
         return [
             ...getPages.path(params),
-            pickValidParams(params, ShopperExperience.paramKeys.getPages)
+            pickValidParams(params || {}, ShopperExperience.paramKeys.getPages)
         ]
     }
 }
@@ -52,14 +52,14 @@ export const getPage: QueryKeyHelper<'getPage'> = {
     path: (params) => [
         '/commerce-sdk-react',
         '/organizations/',
-        params.organizationId,
+        params?.organizationId,
         '/pages/',
-        params.pageId
+        params?.pageId
     ],
     queryKey: (params: Params<'getPage'>) => {
         return [
             ...getPage.path(params),
-            pickValidParams(params, ShopperExperience.paramKeys.getPage)
+            pickValidParams(params || {}, ShopperExperience.paramKeys.getPage)
         ]
     }
 }

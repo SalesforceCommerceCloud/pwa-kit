@@ -8,7 +8,7 @@ import {withReactQuery} from './index'
 import {render, screen} from '@testing-library/react'
 import React from 'react'
 import logger from '../../../../utils/logger-instance'
-import {PERFORMANCE_MARKS} from '../../../../utils/performance'
+import {PERFORMANCE_MARKS} from '../../../../utils/performance-marks'
 
 jest.mock('@tanstack/react-query', () => ({
     ...jest.requireActual('@tanstack/react-query'),

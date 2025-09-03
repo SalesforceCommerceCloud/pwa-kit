@@ -17,11 +17,11 @@ describe('Shopper Baskets hooks', () => {
         // If this test fails: create a new query hook, add the endpoint to the mutations enum,
         // or add it to the `expected` array with a comment explaining "TODO" or "never" (and why).
         expect(unimplemented).toEqual([
-            'updateAsAgentBasket', //TODO: implement later
             'addPriceAdjustmentToBasket', //TODO: implement later
             'removePriceAdjustmentFromBasket', //TODO: implement later
-            'updatePriceAdjustmentInBasket', //TODO: implement later
-            'updateAsStorefrontBasket' //TODO: implement later
+            'updateAsAgentBasket', //TODO: implement later
+            'updateAsStorefrontBasket', //TODO: implement later
+            'updatePriceAdjustmentInBasket' //TODO: implement later
         ])
     })
     test('all mutations have cache update logic', () => {

@@ -14,6 +14,7 @@ runs:
   steps:
   - name: Validate generated project
     run: |
+      set -e
       COMMAND="node e2e/scripts/validate-generated-project.js ${{ inputs.PROJECT_KEY }}"
       if [[ -n "${{ inputs.TEMPLATE_VERSION }}" ]]; then
         COMMAND="$COMMAND --templateVersion ${{ inputs.TEMPLATE_VERSION }}"

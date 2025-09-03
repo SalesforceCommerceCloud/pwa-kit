@@ -1,0 +1,36 @@
+name: e2e_acquire_mrt_target
+description: Acquire MRT Target from pool of available targets in the MRT staging org.
+inputs:
+    BRANCH:
+        description: 'GitHub branch name from workflow invoking this action'
+        required: false
+    RUN_ID:
+        description: 'GitHub workflow run ID from workflow invoking this action'
+        required: true
+    PR_NUMBER:
+        description: 'GitHub PR number from workflow invoking this action'
+        required: false
+    MAX_RETRIES:
+        description: 'Maximum retry attempts to acquire MRT target'
+        required: false
+        default: '3'
+    RETRY_DELAY:
+        description: 'Delay between retries in milliseconds'
+        required: false
+        default: '10000'
+
+runs:
+    using: composite
+    steps:
+        - name: Acquire MRT Target
+          id: acquire_mrt_target
+          shell: bash
+          run: |-
+              set -e
+              cmd="node e2e/scripts/mrt-target-manager.js acquire --run-id ${{inputs.RUN_ID}} --max-retries ${{inputs.MAX_RETRIES}} --retry-delay ${{inputs.RETRY_DELAY}}"
+              if [ -n "${{inputs.PR_NUMBER}}" ]; then
+                cmd="$cmd --pr-number ${{inputs.PR_NUMBER}}"
+              elif [ -n "${{inputs.BRANCH}}" ]; then
+                cmd="$cmd --branch ${{inputs.BRANCH}}"
+              fi
+              eval $cmd

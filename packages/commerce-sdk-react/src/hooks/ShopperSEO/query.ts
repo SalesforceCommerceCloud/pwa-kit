@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import {UseQueryResult} from '@tanstack/react-query'
-import {ShopperSeo} from 'commerce-sdk-isomorphic'
+import {ShopperSEO} from 'commerce-sdk-isomorphic'
 import {ApiClients, ApiQueryOptions, Argument, DataType, NullableParameters} from '../types'
 import {useQuery} from '../useQuery'
 import {mergeOptions, omitNullableParameters, pickValidParams} from '../utils'
@@ -21,7 +21,7 @@ type Client = NonNullable<ApiClients[typeof CLIENT_KEY]>
  *
  * The mapping information is based on URL rules and redirects set up in Business Manager.
  * For more information about prerequisites and sample usage, see [URL Resolution](https://developer.salesforce.com/docs/commerce/commerce-api/guide/url-resolution.html). You can customize the behavior of this endpoint by using hooks.
- * @group ShopperSeo
+ * @group ShopperSEO
  * @category Query
  * @parameter apiOptions - Options to pass through to `commerce-sdk-isomorphic`, with `null` accepted for unset API parameters.
  * @parameter queryOptions - TanStack Query query options, with `enabled` by default set to check that all required API parameters have been set.
@@ -38,12 +38,12 @@ export const useUrlMapping = (
     type Data = DataType<Client['getUrlMapping']>
     const client = useCommerceApi(CLIENT_KEY)
     const methodName = 'getUrlMapping'
-    const requiredParameters = ShopperSeo.paramKeys[`${methodName}Required`]
+    const requiredParameters = ShopperSEO.paramKeys[`${methodName}Required`]
 
     // Parameters can be set in `apiOptions` or `client.clientConfig`;
     // we must merge them in order to generate the correct query key.
     const netOptions = omitNullableParameters(mergeOptions(client, apiOptions))
-    const parameters = pickValidParams(netOptions.parameters, ShopperSeo.paramKeys[methodName])
+    const parameters = pickValidParams(netOptions.parameters, ShopperSEO.paramKeys[methodName])
     const queryKey = queryKeyHelpers[methodName].queryKey(netOptions.parameters)
     // We don't use `netOptions` here because we manipulate the options in `useQuery`.
     const method = async (options: Options) => await client[methodName](options)

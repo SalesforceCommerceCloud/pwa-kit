@@ -56,11 +56,13 @@ function simplifyViolations(violations) {
             // Simplify target selectors for stability
             // #app-header[data-v-12345] > .navigation[data-testid="main-nav"] => #app-header > .navigation
             // Also handle Chakra UI dynamic selectors like #popover-trigger-:r5l4v:
-            target: node.target.map((t) =>
-                t
-                    .split(/\[.*?\]/).join('') // Remove data attributes
-                    .replace(/#([^-\s]+(?:-[^:]*)?):([^"\s]*)/g, '#$1-...') // Remove Chakra UI dynamic IDs
-                    .replace(/\.css-[a-zA-Z0-9]+/g, '.css-...') // Simplify Chakra UI CSS classes
+            target: node.target.map(
+                (t) =>
+                    t
+                        .split(/\[.*?\]/)
+                        .join('') // Remove data attributes
+                        .replace(/#([^-\s]+(?:-[^:]*)?):([^"\s]*)/g, '#$1-...') // Remove Chakra UI dynamic IDs
+                        .replace(/\.css-[a-zA-Z0-9]+/g, '.css-...') // Simplify Chakra UI CSS classes
             )
         }))
     }))
@@ -87,7 +89,10 @@ function sanitizeHtml(html) {
             // Dynamic values - keep stable part:
             // Before: aria-controls="popover-content-:rn:"
             // After:  aria-controls="popover-content-..."
-            .replace(/(aria-(?:controls|describedby|labelledby|owns))="([^:]*?)(?::[^"]*)?"/g, '$1="$2..."')
+            .replace(
+                /(aria-(?:controls|describedby|labelledby|owns))="([^:]*?)(?::[^"]*)?"/g,
+                '$1="$2..."'
+            )
             // Trim whitespace
             .trim()
     )

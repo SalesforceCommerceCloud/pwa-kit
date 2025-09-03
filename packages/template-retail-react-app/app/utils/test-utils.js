@@ -158,13 +158,13 @@ export const TestProviders = ({
                         fetchedToken={bypassAuth ? (isGuest ? guestToken : registerUserToken) : ''}
                     >
                         <CurrencyProvider currency={DEFAULT_CURRENCY}>
-                            <StoreLocatorProvider config={storeLocatorConfig}>
-                                <Router>
+                            <Router>
+                                <StoreLocatorProvider config={storeLocatorConfig}>
                                     <ChakraProvider theme={theme}>
                                         <AddToCartModalProvider>{children}</AddToCartModalProvider>
                                     </ChakraProvider>
-                                </Router>
-                            </StoreLocatorProvider>
+                                </StoreLocatorProvider>
+                            </Router>
                         </CurrencyProvider>
                     </CommerceApiProvider>
                 </MultiSiteProvider>
