@@ -85,6 +85,7 @@ import {
 import Seo from '@salesforce/retail-react-app/app/components/seo'
 import ShopperAgent from '@salesforce/retail-react-app/app/components/shopper-agent'
 import {getPathWithLocale} from '@salesforce/retail-react-app/app/utils/url'
+import {getCommerceAgentConfig} from '@salesforce/retail-react-app/app/utils/config-utils'
 
 const PlaceholderComponent = () => (
     <Center p="2">
@@ -217,8 +218,8 @@ const App = (props) => {
     }, [basket?.currency])
 
     const commerceAgentConfiguration = useMemo(() => {
-        return config.app.commerceAgent
-    }, [config?.app])
+        return getCommerceAgentConfig()
+    }, [config.app.commerceAgent])
 
     useEffect(() => {
         // update the basket customer email
