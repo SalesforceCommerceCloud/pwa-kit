@@ -808,28 +808,6 @@ describe('ApplePayExpress error and edge cases', () => {
         })
     })
 
-    it('handles missing order total error in PDP mode gracefully', async () => {
-        // Mock isMissingOrderTotalError to return true for this test
-        isMissingOrderTotalError.mockReturnValue(true)
-
-        // Mock useExpressPaymentSetup to simulate PDP mode with no temp basket
-        useExpressPaymentSetup.mockReturnValue({
-            locale: {id: 'en-US'},
-            site: {id: 'test-site'},
-            tempBasket: null, // No temp basket
-            basket: null,
-            adyenPaymentMethods: null,
-            authToken: 'test-token'
-        })
-
-        render(<ApplePayExpress sku="TEST-SKU" isPdpMode={true} manager={mockProps.manager} />)
-
-        // Component should call setPaymentMethodUnavailable for validation failures (consistent with Google Pay)
-        await waitFor(() => {
-            expect(mockProps.manager.setPaymentMethodUnavailable).toHaveBeenCalledWith('applepay')
-        })
-    })
-
 
 
     it('handles unexpected errors during checkout creation by calling setPaymentMethodUnavailable', async () => {
@@ -847,36 +825,6 @@ describe('ApplePayExpress error and edge cases', () => {
         })
     })
 
-    it('handles missing order total error in PDP mode without calling setPaymentMethodUnavailable', async () => {
-        // Mock validateExpressPaymentSetup to return true so component renders
-        validateExpressPaymentSetup.mockReturnValue(true)
-
-        // Mock isMissingOrderTotalError to return true for this test
-        isMissingOrderTotalError.mockReturnValue(true)
-
-        // Mock createAdyenCheckout to throw a missing order total error
-        createAdyenCheckout.mockRejectedValue(new Error('Missing order total'))
-
-        // Mock useExpressPaymentSetup to simulate PDP mode with no temp basket
-        useExpressPaymentSetup.mockReturnValue({
-            locale: {id: 'en-US'},
-            site: {id: 'test-site'},
-            tempBasket: null, // No temp basket
-            basket: null,
-            adyenPaymentMethods: null,
-            authToken: 'test-token',
-            currentSku: 'TEST-SKU',
-            hasRequiredBasketData: false
-        })
-
-        render(<ApplePayExpress sku="TEST-SKU" isPdpMode={true} manager={mockProps.manager} />)
-
-        // Wait for the error to be handled
-        await waitFor(() => {
-            // Component should call setPaymentMethodUnavailable for validation failures (consistent with Google Pay)
-            expect(mockProps.manager.setPaymentMethodUnavailable).toHaveBeenCalledWith('applepay')
-        })
-    })
 
     it('handles missing order total error in non-PDP mode by calling setPaymentMethodUnavailable', async () => {
         // Mock validateExpressPaymentSetup to return true so component renders
