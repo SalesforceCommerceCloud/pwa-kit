@@ -68,8 +68,8 @@ export const useCurrentBasket = ({id = ''} = {}) => {
         pickupStoreIds.sort()
 
         // Calculate total shipping cost
-        // Use shipment.shippingTotal instead of looping on shippingItems to include all costs (base _ promotions + surcharges + other fees)
-        const totalShippingCost = currentBasket.shippingTotal || 0
+        // Use currentBasket.shippingTotal to include all costs (base _ promotions + surcharges + other fees)
+        const totalShippingCost = currentBasket?.shippingTotal || 0
 
         return {
             totalItems,
