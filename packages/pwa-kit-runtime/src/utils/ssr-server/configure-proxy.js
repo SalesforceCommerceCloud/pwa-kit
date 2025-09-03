@@ -193,7 +193,7 @@ export const configureProxy = ({
          * @param incomingRequest {http.IncomingMessage} the request made to
          * this Express app that prompted the proxying
          */
-        onProxyReq: (proxyRequest, incomingRequest) => {
+        onProxyReq: (proxyRequest, incomingRequest, res) => {
             applyProxyRequestHeaders({
                 proxyRequest,
                 incomingRequest,
@@ -202,9 +202,15 @@ export const configureProxy = ({
                 targetHost,
                 targetProtocol
             })
+
+            // Add sfdc_server_timing header if performance tracking is enabled
+            if (res && res.__performanceTimer && res.__performanceTimer.enabled) {
+                console.log('Adding sfdc_server_timing header to proxy request:', req.url)
+                proxyRequest.setHeader('sfdc_server_timing', '1')
+            }
         },
 
-        onProxyRes: (proxyResponse, req) => {
+        onProxyRes: (proxyResponse, req, res) => {
             /* istanbul ignore next */
             if (!isRemote() && verboseProxyLogging) {
                 logger.info(
@@ -218,6 +224,38 @@ export const configureProxy = ({
                         }
                     }
                 )
+            }
+
+            // Capture Server-Timing headers for performance tracking
+            if (res && res.__performanceTimer) {
+                console.log('Proxy response headers:', Object.keys(proxyResponse.headers))
+                console.log('Server-Timing header:', proxyResponse.headers['server-timing'])
+                console.log('Performance timer enabled:', res.__performanceTimer.enabled)
+                
+                if (proxyResponse.headers['server-timing']) {
+                    // Determine source based on proxy path and target
+                    let source = 'api'
+                    if (targetHost.includes('commercecloud.salesforce.com')) {
+                        if (proxyPath.includes('slas')) {
+                            source = 'slas'
+                        } else {
+                            source = 'scapi'
+                        }
+                    } else if (req.url.includes('/ocapi/')) {
+                        source = 'ocapi'
+                    }
+
+                    console.log('Adding API timing from proxy response:', {source, url: req.url})
+
+                    // Add API timing from the response headers
+                    const mockResponse = {
+                        headers: {
+                            get: (name) => name.toLowerCase() === 'server-timing' ? proxyResponse.headers['server-timing'] : null
+                        }
+                    }
+                    res.__performanceTimer.addApiTimingFromResponse(mockResponse, source)
+                    console.log('API metrics count after adding:', res.__performanceTimer.apiMetrics.length)
+                }
             }
 
             // In this function, req.originalUrl is the path

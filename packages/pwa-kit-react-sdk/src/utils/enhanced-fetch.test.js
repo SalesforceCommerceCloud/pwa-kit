@@ -34,10 +34,10 @@ describe('Enhanced Fetch', () => {
 
     beforeEach(() => {
         jest.clearAllMocks()
-        
+
         mockPerformanceTimer = new PerformanceTimer({enabled: true})
         mockPerformanceTimer.addApiTimingFromResponse = jest.fn()
-        
+
         mockResponse = {
             status: 200,
             headers: {
@@ -52,14 +52,14 @@ describe('Enhanced Fetch', () => {
                 })
             }
         }
-        
+
         mockContext = {
             performanceTimer: mockPerformanceTimer,
             req: {
                 query: {__server_timing: true}
             }
         }
-        
+
         global.fetch.mockResolvedValue(mockResponse)
     })
 
@@ -77,13 +77,14 @@ describe('Enhanced Fetch', () => {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
-                    'sfdc_server_timing': '1'
+                    sfdc_server_timing: '1'
                 }
             })
         })
 
         it('should capture API timing from response headers', async () => {
-            const url = 'https://kv7kzm78.api.commercecloud.salesforce.com/commerce/shopper-products/v1/organizations/f_ecom_zzrf_001/product-search'
+            const url =
+                'https://kv7kzm78.api.commercecloud.salesforce.com/commerce/shopper-products/v1/organizations/f_ecom_zzrf_001/product-search'
 
             await enhancedFetch(url, {}, mockContext)
 
@@ -95,9 +96,18 @@ describe('Enhanced Fetch', () => {
 
         it('should identify different API sources correctly', async () => {
             const testCases = [
-                {url: 'https://zzrf-001.dx.commercecloud.salesforce.com/ocapi/shop/v22_10', expected: 'ocapi'},
-                {url: 'https://kv7kzm78.api.commercecloud.salesforce.com/slas/oauth2/token', expected: 'slas'},
-                {url: 'https://kv7kzm78.api.commercecloud.salesforce.com/commerce/shopper-products/v1', expected: 'scapi'},
+                {
+                    url: 'https://zzrf-001.dx.commercecloud.salesforce.com/ocapi/shop/v22_10',
+                    expected: 'ocapi'
+                },
+                {
+                    url: 'https://kv7kzm78.api.commercecloud.salesforce.com/slas/oauth2/token',
+                    expected: 'slas'
+                },
+                {
+                    url: 'https://kv7kzm78.api.commercecloud.salesforce.com/commerce/shopper-products/v1',
+                    expected: 'scapi'
+                },
                 {url: 'https://some-other-api.com/api/data', expected: 'api'}
             ]
 
@@ -136,7 +146,7 @@ describe('Enhanced Fetch', () => {
 
             expect(global.fetch).toHaveBeenCalledWith(url, {
                 method: 'POST',
-                headers: {'sfdc_server_timing': '1'}
+                headers: {sfdc_server_timing: '1'}
             })
         })
     })

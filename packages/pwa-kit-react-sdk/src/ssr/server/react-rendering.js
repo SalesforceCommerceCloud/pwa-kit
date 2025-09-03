@@ -132,6 +132,8 @@ const performRender = async (req, res, next) => {
     // Get the application config which should have been stored at this point.
     const config = getConfig()
 
+
+
     AppConfig.restore(res.locals)
 
     const routes = getRoutes(res.locals)
@@ -248,7 +250,7 @@ const performRender = async (req, res, next) => {
         res.set('Cache-Control', NO_CACHE)
     }
 
-    // Cleanup performance timer and OpenTelemetry tracing after response is sent
+        // Cleanup performance timer and OpenTelemetry tracing after response is sent
     res.__performanceTimer.cleanup()
     shutdownServerTracing()
 

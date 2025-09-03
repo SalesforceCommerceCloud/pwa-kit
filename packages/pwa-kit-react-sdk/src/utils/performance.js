@@ -43,17 +43,23 @@ export default class PerformanceTimer {
      * @return {String}
      */
     buildServerTimingHeader() {
-        const ssrMetrics = this.metrics
-            .map((metric) => {
-                return `${metric.name};dur=${metric.duration.toFixed(2)}`
-            })
+        const ssrMetrics = this.metrics.map((metric) => {
+            return `${metric.name};dur=${metric.duration.toFixed(2)}`
+        })
 
-        const apiMetrics = this.apiMetrics
-            .map((metric) => {
-                return `${metric.name};dur=${metric.duration}`
-            })
+        const apiMetrics = this.apiMetrics.map((metric) => {
+            return `${metric.name};dur=${metric.duration}`
+        })
 
         const allMetrics = [...ssrMetrics, ...apiMetrics]
+
+        console.log('Building Server-Timing header:', {
+            ssrCount: ssrMetrics.length,
+            apiCount: apiMetrics.length,
+            totalCount: allMetrics.length,
+            apiMetrics: this.apiMetrics
+        })
+
         return allMetrics.join(', ')
     }
 
@@ -67,16 +73,24 @@ export default class PerformanceTimer {
     log() {
         // Log SSR metrics
         this.metrics.forEach((metric) => {
-            logger.info(`SSR: ${metric.name} - ${metric.duration.toFixed(2)}ms ${metric.detail || ''}`, {
-                namespace: 'performance'
-            })
+            logger.info(
+                `SSR: ${metric.name} - ${metric.duration.toFixed(2)}ms ${metric.detail || ''}`,
+                {
+                    namespace: 'performance'
+                }
+            )
         })
 
         // Log API metrics
         this.apiMetrics.forEach((metric) => {
-            logger.info(`${metric.source.toUpperCase()}: ${metric.name} - ${metric.duration}ms ${metric.detail || ''}`, {
-                namespace: 'performance'
-            })
+            logger.info(
+                `${metric.source.toUpperCase()}: ${metric.name} - ${metric.duration}ms ${
+                    metric.detail || ''
+                }`,
+                {
+                    namespace: 'performance'
+                }
+            )
         })
     }
 

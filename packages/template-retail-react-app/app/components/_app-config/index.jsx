@@ -96,21 +96,6 @@ const AppConfig = ({children, locals = {}}) => {
         ? passwordlessCallback
         : `${appOrigin}${getEnvBasePath()}${passwordlessCallback}`
 
-    // Create enhanced fetch options for performance timing
-    const enhancedFetchOptions = {}
-    if (typeof window === 'undefined' && serverContext?.performanceTimer) {
-        // Server-side: Use enhanced fetch with performance timing
-        enhancedFetchOptions.fetch = createContextualFetch(serverContext)
-    } else if (typeof window !== 'undefined') {
-        // Client-side: Check if server timing is enabled via URL params
-        const urlParams = new URLSearchParams(window.location.search)
-        if (urlParams.has('__server_timing') || process.env.SERVER_TIMING) {
-            enhancedFetchOptions.fetch = createContextualFetch({
-                req: {query: {__server_timing: true}}
-            })
-        }
-    }
-
     return (
         <CommerceApiProvider
             shortCode={commerceApiConfig.parameters.shortCode}
@@ -124,7 +109,6 @@ const AppConfig = ({children, locals = {}}) => {
             proxy={proxy}
             headers={headers}
             defaultDnt={DEFAULT_DNT_STATE}
-            fetchOptions={enhancedFetchOptions}
             // Set 'enablePWAKitPrivateClient' to true to use SLAS private client login flows.
             // Make sure to also enable useSLASPrivateClient in ssr.js when enabling this setting.
             enablePWAKitPrivateClient={false}

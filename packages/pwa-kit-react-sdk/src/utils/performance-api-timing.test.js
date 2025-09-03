@@ -33,8 +33,9 @@ describe('PerformanceTimer API Timing', () => {
 
     describe('addServerTimingMetrics', () => {
         it('should parse and store Server-Timing header values', () => {
-            const serverTimingHeader = 'db;dur=53.2, cache;dur=2.1, app;dur=123.45;desc=Application processing'
-            
+            const serverTimingHeader =
+                'db;dur=53.2, cache;dur=2.1, app;dur=123.45;desc=Application processing'
+
             timer.addServerTimingMetrics(serverTimingHeader, 'scapi')
 
             expect(timer.apiMetrics).toHaveLength(3)
@@ -60,7 +61,7 @@ describe('PerformanceTimer API Timing', () => {
 
         it('should handle malformed Server-Timing headers gracefully', () => {
             const malformedHeader = 'invalid-format'
-            
+
             timer.addServerTimingMetrics(malformedHeader, 'api')
 
             // Should not throw and should create a metric with zero duration
@@ -76,7 +77,7 @@ describe('PerformanceTimer API Timing', () => {
         it('should not process metrics when timer is disabled', () => {
             const disabledTimer = new PerformanceTimer({enabled: false})
             const serverTimingHeader = 'db;dur=53.2'
-            
+
             disabledTimer.addServerTimingMetrics(serverTimingHeader, 'scapi')
 
             expect(disabledTimer.apiMetrics).toHaveLength(0)
@@ -163,7 +164,9 @@ describe('PerformanceTimer API Timing', () => {
 
             const header = timer.buildServerTimingHeader()
 
-            expect(header).toBe('ssr-render;dur=250.50, scapi-products;dur=120.3, scapi-promotions;dur=45.7')
+            expect(header).toBe(
+                'ssr-render;dur=250.50, scapi-products;dur=120.3, scapi-promotions;dur=45.7'
+            )
         })
 
         it('should handle empty metrics gracefully', () => {

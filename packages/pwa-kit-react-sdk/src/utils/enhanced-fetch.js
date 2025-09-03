@@ -41,7 +41,7 @@ const shouldTrackPerformance = (context) => {
  * @returns {Promise<Response>}
  */
 export const enhancedFetch = async (url, options = {}, context = {}) => {
-    const {performanceTimer, req} = context
+    const {performanceTimer} = context
     const trackPerformance = shouldTrackPerformance(context)
     
     // Add sfdc_server_timing header if performance tracking is enabled
