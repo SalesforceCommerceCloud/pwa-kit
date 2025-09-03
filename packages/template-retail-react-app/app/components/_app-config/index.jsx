@@ -63,11 +63,17 @@ const sfdcUserAgent = generateSfdcUserAgent()
  * as Redux, or Mobx, if you like.
  */
 const AppConfig = ({children, locals = {}}) => {
+    console.log('--- locals in AppConfig', locals)
     const {correlationId} = useCorrelationId()
     const headers = {
         'correlation-id': correlationId,
-        sfdc_user_agent: sfdcUserAgent
+        sfdc_user_agent: sfdcUserAgent,
+        ...(locals.serverTimingEnabled && {
+            // Get server timings for SCAPI calls
+            sfdc_server_timing: '1'
+        })
     }
+    console.log('--- headers', headers)
 
     const commerceApiConfig = locals.appConfig.commerceAPI
 
@@ -125,10 +131,15 @@ const AppConfig = ({children, locals = {}}) => {
 }
 
 AppConfig.restore = (locals = {}) => {
+    console.log('--- locals in AppConfig.restore', locals)
     const path =
         typeof window === 'undefined'
             ? locals.originalUrl
             : `${window.location.pathname}${window.location.search}`
+    console.log('--- path', path)
+
+    const url = new URL(path, 'http://localhost') // any domain is ok for this url parsing
+    locals.serverTimingEnabled = url.searchParams.has('__server_timing')
 
     const site = resolveSiteFromUrl(path)
     const locale = resolveLocaleFromUrl(path)
