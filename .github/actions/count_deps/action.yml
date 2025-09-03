@@ -1,4 +1,8 @@
 name: count_deps
+inputs:
+  project_dir:
+    description: 'Path to the project directory'
+    required: true
 runs:
   using: composite
   steps:
@@ -6,7 +10,7 @@ runs:
     # TODO: Can TOTAL_PACKAGES be exported in a cleaner way?
     run: |-
       MAX_PACKAGES="2260"
-      total=$(./scripts/count-dependencies.js generated-${{ matrix.template }})
+      total=$(./scripts/count-dependencies.js "${{ inputs.project_dir }}")
       echo "TOTAL_PACKAGES=${total}" >> $GITHUB_ENV
 
       if [ "$total" -gt "$MAX_PACKAGES" ]; then
