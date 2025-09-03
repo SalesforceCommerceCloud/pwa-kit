@@ -12,17 +12,22 @@ It allows AI agents to query context-aware services like this server to help dev
 👉 **[Read more at modelcontextprotocol.io](https://modelcontextprotocol.io/)**
 
 
+## What is PWA-Kit-MCP?
+
+PWA-Kit-MCP is a local STDIO MCP Server that communicates via STDIO and operates in conjunction with a running local process, making it a fully locally installed MCP server. It provides an initial suite of MCP tools intended to standardize and optimize the developer workflow for PWA Kit storefront development. These tools facilitate project creation, supply development guidelines, enable the generation of new components and pages, and support site validation through performance and accessibility testing.
+
+
 ## 🧰 Features
 
 The PWA Kit MCP Server offers the following intelligent tools tailored to Salesforce Commerce Cloud PWA development:
 
-* **`create_app_guidelines`**:
+* **`create_storefront_app`**:
   Guides agents and developers through creating a new PWA Kit project with `@salesforce/pwa-kit-create-app`.
 
-* **`create_new_sample_component`**:
+* **`create_sample_component`**:
   Walks developers through a brief Q\&A to scaffold a component using the commerce data model, layout, and structure.
 
-* **`create_sample_storefront_page`**:
+* **`create_sample_page`**:
   Interactive tool to generate a new PWA storefront page with custom routing and components.
 
 * **`development_guidelines`**:
@@ -44,10 +49,10 @@ The PWA Kit MCP Server offers the following intelligent tools tailored to Salesf
 1. Open **Cursor**.
 
 2. Navigate to **Settings > Cursor Settings...**
-![](https://raw.githubusercontent.com/SalesforceCommerceCloud/pwa-kit/refs/heads/develop/packages/pwa-kit-mcp/docs/images/cursor-settings.png)
+<img src="https://raw.githubusercontent.com/SalesforceCommerceCloud/pwa-kit/refs/heads/develop/packages/pwa-kit-mcp/docs/images/cursor-settings.png" alt="Cursor Settings Screenshot" width="50%" />
 
 3. Go to **Tools & Integrations > MCP Tools > New MCP Server**
-![](https://raw.githubusercontent.com/SalesforceCommerceCloud/pwa-kit/refs/heads/develop/packages/pwa-kit-mcp/docs/images/cursor-mcp-tools.png)
+<img src="https://raw.githubusercontent.com/SalesforceCommerceCloud/pwa-kit/refs/heads/develop/packages/pwa-kit-mcp/docs/images/cursor-mcp-tools.png" alt="Cursor MCP Tools Screenshot" width="50%" />
 
 4. Update your `mcp.json` like this (edit the placeholders as needed):
 ```json
@@ -86,7 +91,7 @@ Then send JSON-RPC requests like:
 
 ```json
 {"jsonrpc": "2.0", "id": 1, "method": "tools/list", "params": {}}
-{"jsonrpc": "2.0", "id": 2, "method": "tools/call", "params": {"name": "create_new_component", "arguments": {}}}
+{"jsonrpc": "2.0", "id": 2, "method": "tools/call", "params": {"name": "create_sample_component", "arguments": {}}}
 ```
 
 ---
@@ -127,6 +132,5 @@ the output on "MCP Logs".
 | `package.json` | Node.js dependencies and project scripts                              |
 | `mcp.json`     | MCP client configuration (used by Cursor or other IDEs)               |
 | `src/server/`  | Main server entry point (`server.js`)                                 |
-| `src/tools/`   | Contains all MCP tools like `create-app-guideline`, `site-test`, etc. |
+| `src/tools/`   | Contains all MCP tools like `create-storefront-app`, `site-test`, etc. |
 | `src/utils/`   | Shared utility functions                                              |
-| `
