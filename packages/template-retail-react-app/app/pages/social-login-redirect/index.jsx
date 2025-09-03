@@ -39,7 +39,7 @@ const SocialLoginRedirect = () => {
     const {data: customer} = useCurrentCustomer()
     // Build redirectURI from config values
     const appOrigin = useAppOrigin()
-    const redirectPath = getConfig().app.login.social?.redirectURI || ''
+    const redirectPath = getConfig().app.login?.social?.redirectURI || ''
     const redirectURI = buildRedirectURI(appOrigin, redirectPath)
 
     const locatedFrom = getSessionJSONItem('returnToPage')
