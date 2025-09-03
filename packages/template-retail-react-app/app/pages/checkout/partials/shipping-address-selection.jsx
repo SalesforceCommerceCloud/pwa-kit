@@ -169,6 +169,7 @@ const ShippingAddressSelection = ({
             const address = customer.addresses.find((addr) => addr.preferred === true)
             if (address) {
                 form.reset({...address})
+                setSelectedAddressId(address.addressId)
             }
         }
     }, [])
@@ -176,7 +177,7 @@ const ShippingAddressSelection = ({
     useEffect(() => {
         // If the customer deletes all their saved addresses during checkout,
         // we need to make sure to display the address form.
-        if (!isLoading && !customer?.addresses && !isEditingAddress) {
+        if (!isLoading && !customer?.addresses?.length && !isEditingAddress) {
             setIsEditingAddress(true)
         }
     }, [customer])
@@ -187,10 +188,7 @@ const ShippingAddressSelection = ({
                 addressId: matchedAddress.addressId,
                 ...matchedAddress
             })
-        }
-
-        if (!matchedAddress && selectedAddressId) {
-            setIsEditingAddress(true)
+            setSelectedAddressId(matchedAddress.addressId)
         }
     }, [matchedAddress])
 
@@ -213,7 +211,7 @@ const ShippingAddressSelection = ({
         if (addressId && isEditingAddress) {
             setIsEditingAddress(false)
         }
-
+        setSelectedAddressId(addressId)
         const address = customer.addresses.find((addr) => addr.addressId === addressId)
 
         form.reset({...address})
@@ -422,7 +420,11 @@ const ShippingAddressSelection = ({
                             <Button
                                 type="submit"
                                 width="full"
-                                disabled={!form.formState.isValid || form.formState.isSubmitting}
+                                disabled={
+                                    !form.formState.isValid ||
+                                    form.formState.isSubmitting ||
+                                    !selectedAddressId
+                                }
                             >
                                 {formatMessage(submitButtonLabel)}
                             </Button>
