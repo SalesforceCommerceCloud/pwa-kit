@@ -9,8 +9,7 @@ import {
     ShopperLogin,
     ShopperCustomers,
     ShopperLoginTypes,
-    ShopperCustomersTypes,
-    FetchOptions
+    ShopperCustomersTypes
 } from 'commerce-sdk-isomorphic'
 import {jwtDecode, JwtPayload} from 'jwt-decode'
 import {ApiClientConfigParams, Prettify, RemoveStringIndex} from '../hooks/types'
@@ -26,6 +25,8 @@ import {
     extractCustomParameters
 } from '../utils'
 import {
+    MOBIFY_PATH,
+    SLAS_PRIVATE_PROXY_PATH,
     SLAS_SECRET_WARNING_MSG,
     SLAS_SECRET_PLACEHOLDER,
     SLAS_SECRET_OVERRIDE_MSG,
@@ -37,14 +38,13 @@ import {
 import {Logger} from '../types'
 
 type TokenResponse = ShopperLoginTypes.TokenResponse
-type TrustedAgentTokenRequest = ShopperLoginTypes.getTrustedAgentAccessTokenBodyType
+type TrustedAgentTokenRequest = ShopperLoginTypes.TrustedAgentTokenRequest
 type Helpers = typeof helpers
 interface AuthConfig extends ApiClientConfigParams {
     redirectURI: string
     proxy: string
-    headers?: Record<string, string>
     privateClientProxyEndpoint?: string
-    fetchOptions?: FetchOptions
+    fetchOptions?: ShopperLoginTypes.FetchOptions
     fetchedToken?: string
     enablePWAKitPrivateClient?: boolean
     clientSecret?: string
@@ -68,38 +68,19 @@ interface SlasJwtPayload extends JwtPayload {
     dnt: string
 }
 
-type LoginRegisteredUserB2CCredentials = Parameters<Helpers['loginRegisteredUserB2C']>[0]
+type AuthorizeIDPParams = Parameters<Helpers['authorizeIDP']>[1]
+type LoginIDPUserParams = Parameters<Helpers['loginIDPUser']>[2]
+type AuthorizePasswordlessParams = Parameters<Helpers['authorizePasswordless']>[2]
+type LoginPasswordlessParams = Parameters<Helpers['getPasswordLessAccessToken']>[2]
+type LoginRegisteredUserB2CCredentials = Parameters<Helpers['loginRegisteredUserB2C']>[1]
 
 /**
- * Body type for loginRegisteredUserB2C - aligns with register function pattern
+ * This is a temporary type until we can make a breaking change and modify the signature for
+ * loginRegisteredUserB2C so that it takes in a body rather than just credentials
+ *
  */
-type LoginRegisteredUserB2CBody = {
-    username: string
-    password: string
-    customParameters?: helpers.CustomRequestBody
-}
-
-type LoginIDPUserParams = {
-    redirectURI?: string
-    code: string
-    usid?: string
-}
-
-type AuthorizeIDPParams = {
-    redirectURI: string
-    hint: string
-    usid?: string
-    [key: string]: any // Allow custom parameters
-}
-
-type AuthorizePasswordlessParams = {
-    callbackURI?: string
-    userid: string
-    mode?: string
-}
-
-type GetPasswordLessAccessTokenParams = {
-    pwdlessLoginToken: string
+type LoginRegisteredUserCredentialsWithCustomParams = LoginRegisteredUserB2CCredentials & {
+    options?: {body: helpers.CustomRequestBody}
 }
 
 /**
@@ -269,11 +250,17 @@ class Auth {
     constructor(config: AuthConfig) {
         // Special proxy endpoint for injecting SLAS private client secret.
         // We prioritize config.privateClientProxyEndpoint since that allows us to use the new envBasePath feature
+        // The preexisting hard coded privateClientEndpoint is kept here for now to prevent a breaking change.
+        // TODO: We should remove this in the next major release so we do not have a hard coded proxy path inside commerce-sdk-react
+        const baseUrl = config.proxy.split(MOBIFY_PATH)[0]
+        const privateClientEndpoint = `${baseUrl}${SLAS_PRIVATE_PROXY_PATH}`
+
         this.client = new ShopperLogin({
             proxy: config.enablePWAKitPrivateClient
                 ? config.privateClientProxyEndpoint
+                    ? config.privateClientProxyEndpoint
+                    : privateClientEndpoint
                 : config.proxy,
-            headers: config.headers || {},
             parameters: {
                 clientId: config.clientId,
                 organizationId: config.organizationId,
@@ -291,7 +278,6 @@ class Auth {
         })
         this.shopperCustomersClient = new ShopperCustomers({
             proxy: config.proxy,
-            headers: config.headers || {},
             parameters: {
                 clientId: config.clientId,
                 organizationId: config.organizationId,
@@ -359,7 +345,13 @@ class Auth {
         this.isPrivate = !!this.clientSecret
 
         const passwordlessLoginCallbackURI = config.passwordlessLoginCallbackURI
-        this.passwordlessLoginCallbackURI = passwordlessLoginCallbackURI || ''
+        this.passwordlessLoginCallbackURI = passwordlessLoginCallbackURI
+            ? isAbsoluteUrl(passwordlessLoginCallbackURI)
+                ? passwordlessLoginCallbackURI
+                : // This fallback does not take into account the envBasePath feature
+                  // To set an env base path, config.passwordlessLoginCallbackURI must be an absolute url
+                  `${baseUrl}${passwordlessLoginCallbackURI}`
+            : ''
 
         this.hybridAuthEnabled = config.hybridAuthEnabled || false
     }
@@ -482,10 +474,10 @@ class Auth {
             id_token: this.get('id_token'),
             idp_access_token: this.get('idp_access_token'),
             refresh_token: this.get('refresh_token_registered') || this.get('refresh_token_guest'),
-            token_type: this.get('token_type') as 'Bearer',
+            token_type: this.get('token_type'),
             usid: this.get('usid'),
             customer_type: this.get('customer_type') as CustomerType,
-            refresh_token_expires_in: Number(this.get('refresh_token_expires_in'))
+            refresh_token_expires_in: this.get('refresh_token_expires_in')
         }
     }
 
@@ -700,16 +692,16 @@ class Auth {
             try {
                 return await this.queueRequest(
                     () =>
-                        helpers.refreshAccessToken({
-                            slasClient: this.client,
-                            parameters: {
+                        helpers.refreshAccessToken(
+                            this.client,
+                            {
                                 refreshToken,
                                 dnt: dntPref
                             },
-                            credentials: {
+                            {
                                 clientSecret: this.clientSecret
                             }
-                        }),
+                        ),
                     !!refreshTokenGuest
                 )
             } catch (error) {
@@ -903,27 +895,27 @@ class Auth {
         const usid = this.get('usid')
         const dntPref = this.getDnt({includeDefaults: true})
         const isGuest = true
-        const guestPrivateArgs = {
-            slasClient: this.client,
-            parameters: {
+        const guestPrivateArgs = [
+            this.client,
+            {
                 dnt: dntPref,
                 ...(usid && {usid})
             },
-            credentials: {clientSecret: this.clientSecret}
-        } as const
-        const guestPublicArgs = {
-            slasClient: this.client,
-            parameters: {
+            {clientSecret: this.clientSecret}
+        ] as const
+        const guestPublicArgs = [
+            this.client,
+            {
                 redirectURI: this.redirectURI,
                 dnt: dntPref,
                 ...(usid && {usid}),
                 // custom parameters are sent only into the /authorize endpoint.
                 ...parameters
             }
-        } as const
+        ] as const
         const callback = this.clientSecret
-            ? () => helpers.loginGuestUserPrivate({...guestPrivateArgs})
-            : () => helpers.loginGuestUser({...guestPublicArgs})
+            ? () => helpers.loginGuestUserPrivate(...guestPrivateArgs)
+            : () => helpers.loginGuestUser(...guestPublicArgs)
 
         try {
             return await this.queueRequest(callback, isGuest)
@@ -968,7 +960,9 @@ class Auth {
         await this.loginRegisteredUserB2C({
             username: login,
             password,
-            customParameters
+            options: {
+                body: customParameters
+            }
         })
         return res
     }
@@ -976,10 +970,14 @@ class Auth {
     /**
      * A wrapper method for commerce-sdk-isomorphic helper: loginRegisteredUserB2C.
      *
-     * This method uses a body-based API similar to the register function for consistency.
-     * Supports custom parameters through the customParameters field.
+     * Note: This uses the type LoginRegisteredUserCredentialsWithCustomParams rather than LoginRegisteredUserB2CCredentials
+     * as a workaround to allow custom parameters through because the login.mutateAsync hook will only pass through a single
+     * 'body' argument into this function.
+     *
+     * In the next major version release, we should modify this method so that it's input is a body containing credentials,
+     * similar to the input for the register function.
      */
-    async loginRegisteredUserB2C(body: LoginRegisteredUserB2CBody) {
+    async loginRegisteredUserB2C(credentials: LoginRegisteredUserCredentialsWithCustomParams) {
         if (this.clientSecret && onClient() && this.clientSecret !== SLAS_SECRET_PLACEHOLDER) {
             this.logWarning(SLAS_SECRET_WARNING_MSG)
         }
@@ -987,26 +985,20 @@ class Auth {
         const usid = this.get('usid')
         const dntPref = this.getDnt({includeDefaults: true})
         const isGuest = false
-
-        // Extract fields from body parameter (aligned with register function pattern)
-        const {username, password, customParameters} = body
-
-        const loginParams: LoginRegisteredUserB2CCredentials = {
-            slasClient: this.client,
-            credentials: {
-                username,
-                password,
+        const token = await helpers.loginRegisteredUserB2C(
+            this.client,
+            {
+                username: credentials.username,
+                password: credentials.password,
                 clientSecret: this.clientSecret
             },
-            parameters: {
+            {
                 redirectURI,
                 dnt: dntPref,
                 ...(usid && {usid})
             },
-            body: customParameters
-        }
-
-        const token = await helpers.loginRegisteredUserB2C(loginParams)
+            credentials.options
+        )
         this.handleTokenResponse(token, isGuest)
         if (onClient()) {
             void this.clearECOMSession()
@@ -1128,12 +1120,9 @@ class Auth {
     async logout() {
         if (this.get('customer_type') === 'registered') {
             // Not awaiting on purpose because there isn't much we can do if this fails.
-            void helpers.logout({
-                slasClient: this.client,
-                parameters: {
-                    accessToken: this.get('access_token'),
-                    refreshToken: this.get('refresh_token_registered')
-                }
+            void helpers.logout(this.client, {
+                accessToken: this.get('access_token'),
+                refreshToken: this.get('refresh_token_registered')
             })
         }
         this.clearStorage()
@@ -1185,42 +1174,29 @@ class Auth {
 
     /**
      * A wrapper method for commerce-sdk-isomorphic helper: authorizeIDP.
-     * Initiates OAuth2 authorization flow for Identity Provider (IDP) login.
      *
      */
     async authorizeIDP(parameters: AuthorizeIDPParams) {
-        const slasClient = this.client
+        const redirectURI = parameters.redirectURI || this.redirectURI
         const usid = this.get('usid')
-        const dntPref = this.getDnt({includeDefaults: true})
-
-        // Extract known parameters and get custom ones
-        const {redirectURI, hint, ...customParams} = parameters
-        const finalRedirectURI = redirectURI || this.redirectURI
-
-        const authorizeParams = {
-            ...customParams,
-            ...(usid && {usid}),
-            ...(dntPref && {dnt: dntPref}),
-            redirectURI: finalRedirectURI,
-            hint: hint || ''
-        }
-
-        const result = await helpers.authorizeIDP({
-            slasClient,
-            parameters: authorizeParams,
-            privateClient: this.isPrivate
-        })
-
-        // Store code verifier for later use in loginIDPUser
-        this.set('code_verifier', result.codeVerifier)
+        const customParameters = extractCustomParameters(parameters)
+        const {url, codeVerifier} = await helpers.authorizeIDP(
+            this.client,
+            {
+                redirectURI,
+                hint: parameters.hint,
+                ...(usid && {usid}),
+                ...customParameters
+            },
+            this.isPrivate
+        )
 
         if (onClient()) {
-            window.location.assign(result.url)
+            window.location.assign(url)
         } else {
             console.warn('Something went wrong, this client side method is invoked on the server.')
         }
-
-        return result
+        this.set('code_verifier', codeVerifier)
     }
 
     /**
@@ -1229,23 +1205,24 @@ class Auth {
      */
     async loginIDPUser(parameters: LoginIDPUserParams) {
         const codeVerifier = this.get('code_verifier')
-        const redirectURI = parameters.redirectURI || this.redirectURI
+        const code = parameters.code
         const usid = parameters.usid || this.get('usid')
+        const redirectURI = parameters.redirectURI || this.redirectURI
         const dntPref = this.getDnt({includeDefaults: true})
 
-        const token = await helpers.loginIDPUser({
-            slasClient: this.client,
-            credentials: {
+        const token = await helpers.loginIDPUser(
+            this.client,
+            {
                 codeVerifier,
                 clientSecret: this.clientSecret
             },
-            parameters: {
+            {
                 redirectURI,
-                code: parameters.code,
+                code,
                 dnt: dntPref,
                 ...(usid && {usid})
             }
-        })
+        )
         const isGuest = false
         this.handleTokenResponse(token, isGuest)
         // Delete the code verifier once the user has logged in
@@ -1260,22 +1237,23 @@ class Auth {
      * A wrapper method for commerce-sdk-isomorphic helper: authorizePasswordless.
      */
     async authorizePasswordless(parameters: AuthorizePasswordlessParams) {
-        const usid = this.get('usid')
+        const userid = parameters.userid
         const callbackURI = parameters.callbackURI || this.passwordlessLoginCallbackURI
-        const finalMode = callbackURI ? 'callback' : parameters.mode || 'sms'
+        const usid = this.get('usid')
+        const mode = callbackURI ? 'callback' : 'sms'
 
-        const res = await helpers.authorizePasswordless({
-            slasClient: this.client,
-            credentials: {
+        const res = await helpers.authorizePasswordless(
+            this.client,
+            {
                 clientSecret: this.clientSecret
             },
-            parameters: {
+            {
                 ...(callbackURI && {callbackURI: callbackURI}),
                 ...(usid && {usid}),
-                userid: parameters.userid,
-                mode: finalMode
+                userid,
+                mode
             }
-        })
+        )
         if (res && res.status !== 200) {
             const errorData = await res.json()
             throw new Error(`${res.status} ${String(errorData.message)}`)
@@ -1286,19 +1264,19 @@ class Auth {
     /**
      * A wrapper method for commerce-sdk-isomorphic helper: getPasswordLessAccessToken.
      */
-    async getPasswordLessAccessToken(parameters: GetPasswordLessAccessTokenParams) {
-        const pwdlessLoginToken = parameters.pwdlessLoginToken || ''
+    async getPasswordLessAccessToken(parameters: LoginPasswordlessParams) {
+        const pwdlessLoginToken = parameters.pwdlessLoginToken
         const dntPref = this.getDnt({includeDefaults: true})
-        const token = await helpers.getPasswordLessAccessToken({
-            slasClient: this.client,
-            credentials: {
+        const token = await helpers.getPasswordLessAccessToken(
+            this.client,
+            {
                 clientSecret: this.clientSecret
             },
-            parameters: {
+            {
                 pwdlessLoginToken,
                 dnt: dntPref !== undefined ? String(dntPref) : undefined
             }
-        })
+        )
         const isGuest = false
         this.handleTokenResponse(token, isGuest)
         if (onClient()) {
@@ -1311,8 +1289,9 @@ class Auth {
      * A wrapper method for the SLAS endpoint: getPasswordResetToken.
      *
      */
-    async getPasswordResetToken(parameters: ShopperLoginTypes.getPasswordResetTokenBodyType) {
+    async getPasswordResetToken(parameters: ShopperLoginTypes.PasswordActionRequest) {
         const slasClient = this.client
+        const callbackURI = parameters.callback_uri
 
         const options = {
             headers: {
@@ -1320,14 +1299,11 @@ class Auth {
             },
             body: {
                 user_id: parameters.user_id,
-                mode: parameters.mode || 'callback',
-                channel_id: parameters.channel_id || slasClient.clientConfig.parameters.siteId,
-                client_id: parameters.client_id || slasClient.clientConfig.parameters.clientId,
-                callback_uri: parameters.callback_uri,
-                hint: parameters.hint || 'cross_device',
-                locale: parameters.locale,
-                code_challenge: parameters.code_challenge,
-                idp_name: parameters.idp_name
+                mode: 'callback',
+                channel_id: slasClient.clientConfig.parameters.siteId,
+                client_id: slasClient.clientConfig.parameters.clientId,
+                callback_uri: callbackURI,
+                hint: 'cross_device'
             }
         }
 
@@ -1346,7 +1322,7 @@ class Auth {
      * A wrapper method for the SLAS endpoint: resetPassword.
      *
      */
-    async resetPassword(parameters: ShopperLoginTypes.resetPasswordBodyType) {
+    async resetPassword(parameters: ShopperLoginTypes.PasswordActionVerifyRequest) {
         const slasClient = this.client
         const options = {
             headers: {
@@ -1354,11 +1330,10 @@ class Auth {
             },
             body: {
                 pwd_action_token: parameters.pwd_action_token,
-                channel_id: parameters.channel_id || slasClient.clientConfig.parameters.siteId,
-                client_id: parameters.client_id || slasClient.clientConfig.parameters.clientId,
+                channel_id: slasClient.clientConfig.parameters.siteId,
+                client_id: slasClient.clientConfig.parameters.clientId,
                 new_password: parameters.new_password,
-                code_verifier: parameters.code_verifier,
-                hint: parameters.hint
+                user_id: parameters.user_id
             }
         }
 

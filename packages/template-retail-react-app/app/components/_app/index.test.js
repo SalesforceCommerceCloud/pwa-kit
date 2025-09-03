@@ -26,12 +26,12 @@ jest.mock('../../hooks/use-update-shopper-context', () => ({
 
 let windowSpy
 
-const mockUpdateDnt = jest.fn()
+const mockUpdateDNT = jest.fn()
 jest.mock('@salesforce/commerce-sdk-react', () => {
     const originalModule = jest.requireActual('@salesforce/commerce-sdk-react')
     return {
         ...originalModule,
-        useDNT: () => ({selectedDnt: undefined, updateDnt: mockUpdateDnt})
+        useDNT: () => ({selectedDnt: undefined, updateDNT: mockUpdateDNT})
     }
 })
 

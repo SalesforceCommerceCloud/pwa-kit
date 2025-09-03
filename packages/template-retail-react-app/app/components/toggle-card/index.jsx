@@ -31,10 +31,8 @@ export const ToggleCard = ({
     disableEdit,
     onEdit,
     editLabel,
-    editAction,
     isLoading,
     children,
-    onEditActionClick,
     ...props
 }) => {
     const titleRef = useRef()
@@ -81,16 +79,6 @@ export const ToggleCard = ({
                                 )}
                             </Button>
                         )}
-                        {editing && editAction && onEditActionClick && (
-                            <Button
-                                variant="link"
-                                size="sm"
-                                onClick={onEditActionClick}
-                                aria-label={editAction}
-                            >
-                                {editAction}
-                            </Button>
-                        )}
                     </Flex>
                     <Box data-testid={`sf-toggle-card-${id}-content`}>{children}</Box>
                 </Stack>
@@ -120,8 +108,6 @@ ToggleCard.propTypes = {
     disabled: PropTypes.bool,
     disableEdit: PropTypes.bool,
     onEdit: PropTypes.func,
-    editAction: PropTypes.string,
-    onEditActionClick: PropTypes.func,
     children: PropTypes.any
 }
 

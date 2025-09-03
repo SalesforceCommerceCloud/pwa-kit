@@ -80,7 +80,7 @@ const CartItems = ({basket}) => {
                             }
                             return (
                                 <ItemVariantProvider
-                                    key={`order-summary-item-${product.productId}-${product.itemId}`}
+                                    key={product.productId}
                                     index={idx}
                                     variant={variant}
                                 >
@@ -214,7 +214,9 @@ const OrderSummary = ({
                             )}
                         </Flex>
 
-                        {basket.shippingTotal === 0 ? (
+                        {shippingItem?.priceAdjustments?.some(
+                            ({appliedDiscount}) => appliedDiscount?.type === 'free'
+                        ) ? (
                             <Text
                                 as="span"
                                 color="green.700"

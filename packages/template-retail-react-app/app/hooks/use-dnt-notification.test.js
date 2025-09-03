@@ -12,12 +12,12 @@ import {
     useDntNotification
 } from '@salesforce/retail-react-app/app/hooks/use-dnt-notification'
 
-const mockUpdateDnt = jest.fn()
+const mockUpdateDNT = jest.fn()
 jest.mock('@salesforce/commerce-sdk-react', () => {
     const originalModule = jest.requireActual('@salesforce/commerce-sdk-react')
     return {
         ...originalModule,
-        useDNT: () => ({dntStatus: undefined, updateDnt: mockUpdateDnt})
+        useDNT: () => ({dntStatus: undefined, updateDNT: mockUpdateDNT})
     }
 })
 
@@ -47,7 +47,7 @@ test('Clicking out of notification does setDNT(null)', async () => {
     await user.click(closeButton)
 
     await waitFor(() => {
-        expect(mockUpdateDnt).toHaveBeenCalledWith(null)
+        expect(mockUpdateDNT).toHaveBeenCalledWith(null)
     })
 })
 
@@ -60,7 +60,7 @@ test('Clicking Accept does setDNT(false)', async () => {
     await user.click(acceptButton)
 
     await waitFor(() => {
-        expect(mockUpdateDnt).toHaveBeenCalledWith(false)
+        expect(mockUpdateDNT).toHaveBeenCalledWith(false)
     })
 })
 
@@ -73,6 +73,6 @@ test('Clicking Decline does setDNT(true)', async () => {
     await user.click(declineButton)
 
     await waitFor(() => {
-        expect(mockUpdateDnt).toHaveBeenCalledWith(true)
+        expect(mockUpdateDNT).toHaveBeenCalledWith(true)
     })
 })

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025, salesforce.com, inc.
+ * Copyright (c) 2024, salesforce.com, inc.
  * All rights reserved.
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
@@ -12,7 +12,6 @@ import {StoreLocatorListItem} from '@salesforce/retail-react-app/app/components/
 import {useStoreLocator} from '@salesforce/retail-react-app/app/hooks/use-store-locator'
 import {useSelectedStore} from '@salesforce/retail-react-app/app/hooks/use-selected-store'
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
-import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 
 export const StoreLocatorList = () => {
     const intl = useIntl()
@@ -23,11 +22,7 @@ export const StoreLocatorList = () => {
     const [page, setPage] = useState(1)
     const [initialSelectedStoreId, setInitialSelectedStoreId] = useState(selectedStoreId)
 
-    // with BOPIS enabled: store locator selector can't be changed unless basket is emty
-    // with BOPIS and MULTI_SHIP enabled, store locator can be changed any time
     const hasItemsInBasket = derivedData?.totalItems > 0
-    const multishipEnabled = getConfig()?.app?.multishipEnabled ?? true
-    const storeSelectionDisabled = multishipEnabled ? false : hasItemsInBasket
 
     useEffect(() => {
         setPage(1)
@@ -36,7 +31,7 @@ export const StoreLocatorList = () => {
     }, [data])
 
     const handleChange = (selectedStoreId) => {
-        if (!storeSelectionDisabled) {
+        if (!hasItemsInBasket) {
             setSelectedStoreId(selectedStoreId)
         }
     }
@@ -52,7 +47,7 @@ export const StoreLocatorList = () => {
                 id: 'store_locator.description.no_locations',
                 defaultMessage: 'Sorry, there are no locations in this area.'
             })
-        if (storeSelectionDisabled && hasItemsInBasket) {
+        if (hasItemsInBasket) {
             return intl.formatMessage({
                 id: 'store_locator.error.items_in_basket',
                 defaultMessage: 'To change your selected store, remove all items from your cart.'
@@ -150,7 +145,7 @@ export const StoreLocatorList = () => {
                                         value: store.id,
                                         isChecked: selectedStoreId === store.id,
                                         'aria-describedby': `store-info-${store.id}`,
-                                        isDisabled: !store.inventoryId || storeSelectionDisabled
+                                        isDisabled: !store.inventoryId || hasItemsInBasket
                                     }}
                                 />
                             ))}

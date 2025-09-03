@@ -38,14 +38,7 @@ const TEST_COMPONENTS = {
 }
 
 test('Page throws if used outside of a Page component', () => {
-    // Mock console.error to suppress React error boundary warnings
-    const originalError = console.error
-    console.error = jest.fn()
-
-    expect(() => {
-        render(<Component component={SAMPLE_COMPONENT} />)
-    }).toThrow()
-    console.error = originalError
+    expect(() => render(<Component component={SAMPLE_COMPONENT} />)).toThrow()
 })
 
 test('Page renders correct component', () => {

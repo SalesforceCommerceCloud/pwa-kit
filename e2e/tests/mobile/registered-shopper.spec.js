@@ -6,6 +6,7 @@
  */
 
 const {test, expect} = require('@playwright/test')
+const config = require('../../config')
 const {
     registerShopper,
     addProductToCart,

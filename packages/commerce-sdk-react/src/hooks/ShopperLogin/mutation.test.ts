@@ -36,7 +36,7 @@ const OPTIONS = {
         refresh_token: 'token',
         // These parameters are required in the query parameters for certain mutations, while in the request body for others.
         redirect_uri: 'redirect_uri',
-        response_type: 'code' as const,
+        response_type: 'response_type',
         code_challenge: 'code_challenge'
     },
     body: {
@@ -47,7 +47,7 @@ const OPTIONS = {
         code_challenge: 'code_challenge',
         code_verifier: 'code_verifier',
         dwsid: 'dwsid',
-        grant_type: 'client_credentials' as const,
+        grant_type: 'grant_type',
         hint: 'hint',
         idp_origin: 'idp_origin',
         login_id: 'login_id',
@@ -67,20 +67,18 @@ const TOKEN_RESPONSE: ShopperLoginTypes.TokenResponse = {
     expires_in: 0,
     id_token: 'id_token',
     refresh_token: 'refresh_tone',
-    token_type: 'Bearer',
+    token_type: 'token_type',
     usid: 'usid',
     idp_access_token: 'idp_access_token',
-    refresh_token_expires_in: 0
+    refresh_token_expires_in: 'refresh_token_expires_in'
 }
 
 // --- TEST CASES --- //
 type Implemented = ShopperLoginMutation
 // This is an object rather than an array to more easily ensure we cover all mutations
 type TestMap = {[Mut in Implemented]: [Argument<Client[Mut]>, DataType<Client[Mut]>]}
-// @ts-expect-error - skipping for now
 const testMap: TestMap = {
-    // skipping for now
-    // authorizePasswordlessCustomer: [OPTIONS, 'authorizePasswordlessCustomer'],
+    authorizePasswordlessCustomer: [OPTIONS, {}],
     authorizeCustomer: [OPTIONS, undefined],
     getAccessToken: [OPTIONS, TOKEN_RESPONSE],
     getPasswordResetToken: [OPTIONS, undefined],
@@ -88,9 +86,9 @@ const testMap: TestMap = {
     getSessionBridgeAccessToken: [OPTIONS, TOKEN_RESPONSE],
     getTrustedAgentAccessToken: [OPTIONS, TOKEN_RESPONSE],
     getTrustedSystemAccessToken: [OPTIONS, TOKEN_RESPONSE],
-    introspectToken: [OPTIONS, {token: 'token'}],
+    introspectToken: [OPTIONS, {}],
     resetPassword: [OPTIONS, undefined],
-    revokeToken: [OPTIONS, {token: 'token'}],
+    revokeToken: [OPTIONS, TOKEN_RESPONSE],
     logoutCustomer: [OPTIONS, TOKEN_RESPONSE]
 }
 // Type assertion is necessary because `Object.entries` is limited

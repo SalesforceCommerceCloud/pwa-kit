@@ -60,7 +60,6 @@ import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation
 import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
 
 import {STORE_LOCATOR_IS_ENABLED} from '@salesforce/retail-react-app/app/constants'
-import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 // The FONT_SIZES and FONT_WEIGHTS constants are used to control the styling for
 // the accordion buttons as their current depth. In the below definition we assign
 // values for depths 0 - 3, any depth deeper than that will use the default styling.
@@ -101,7 +100,6 @@ const DrawerMenu = ({
     const socialIconVariant = useBreakpointValue({base: 'flex', md: 'flex-start'})
     const {site, buildUrl} = useMultiSite()
     const {l10n} = site
-    const storeLocatorEnabled = getConfig()?.app?.storeLocatorEnabled ?? STORE_LOCATOR_IS_ENABLED
     const [showLoading, setShowLoading] = useState(false)
     const [ariaBusy, setAriaBusy] = useState('true')
     const logout = useAuthHelper(AuthHelpers.Logout)
@@ -276,7 +274,7 @@ const DrawerMenu = ({
                                     </Link>
                                 )}
                             </Box>
-                            {storeLocatorEnabled && (
+                            {STORE_LOCATOR_IS_ENABLED && (
                                 <Box {...styles.actionsItem}>
                                     <Link to={STORE_LOCATOR_HREF}>
                                         <HStack>

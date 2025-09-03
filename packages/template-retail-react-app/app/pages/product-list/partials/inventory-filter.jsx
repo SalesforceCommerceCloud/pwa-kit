@@ -5,18 +5,23 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React, {useEffect, useRef} from 'react'
+import React, {useEffect} from 'react'
 import {useIntl, FormattedMessage} from 'react-intl'
 import PropTypes from 'prop-types'
-import {Heading, Checkbox, Stack, Text} from '@salesforce/retail-react-app/app/components/shared/ui'
-import {useStoreLocatorModal} from '@salesforce/retail-react-app/app/hooks/use-store-locator'
+import {
+    Heading,
+    Checkbox,
+    Stack,
+    Text,
+    useDisclosure
+} from '@salesforce/retail-react-app/app/components/shared/ui'
+import {StoreLocatorModal} from '@salesforce/retail-react-app/app/components/store-locator'
 import {useSelectedStore} from '@salesforce/retail-react-app/app/hooks/use-selected-store'
 
 const StoreInventoryFilter = ({toggleFilter, selectedFilters}) => {
-    const {isOpen, onOpen} = useStoreLocatorModal()
+    const {isOpen, onOpen, onClose} = useDisclosure()
     const {formatMessage} = useIntl()
     const {selectedStore} = useSelectedStore()
-    const storeLocatorModalRef = useRef(false)
 
     const isChecked = selectedFilters?.ilids !== undefined
 
@@ -27,22 +32,10 @@ const StoreInventoryFilter = ({toggleFilter, selectedFilters}) => {
         }
     }, [selectedStore])
 
-    // Handle when modal closes after being opened from this component
-    useEffect(() => {
-        // If modal was opened from here and is now closed, apply filter if store is selected
-        if (storeLocatorModalRef.current && !isOpen) {
-            storeLocatorModalRef.current = false
-            if (selectedStore?.inventoryId) {
-                toggleFilter({value: selectedStore.inventoryId}, 'ilids', false, false)
-            }
-        }
-    }, [isOpen, selectedStore, toggleFilter])
-
     const handleCheckboxChange = (e) => {
         // If no store is selected or no inventoryId, open store locator
         if (!selectedStore?.inventoryId) {
             e.preventDefault()
-            storeLocatorModalRef.current = true
             onOpen()
             return
         }
@@ -56,8 +49,16 @@ const StoreInventoryFilter = ({toggleFilter, selectedFilters}) => {
     const handleStoreNameClick = (e) => {
         e.stopPropagation()
         e.preventDefault()
-        storeLocatorModalRef.current = true
         onOpen()
+    }
+
+    const handleStoreLocatorClose = () => {
+        // Apply the filter when a store is selected from the locator and the modal closes
+        if (selectedStore?.inventoryId) {
+            toggleFilter({value: selectedStore.inventoryId}, 'ilids', false, false)
+        }
+
+        onClose()
     }
 
     const storeLinkText =
@@ -132,6 +133,8 @@ const StoreInventoryFilter = ({toggleFilter, selectedFilters}) => {
                     />
                 </Checkbox>
             </Stack>
+
+            <StoreLocatorModal isOpen={isOpen} onClose={handleStoreLocatorClose} />
         </>
     )
 }

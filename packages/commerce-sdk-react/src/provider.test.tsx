@@ -65,8 +65,7 @@ describe('provider', () => {
             )
         }
         const config = {
-            enablePWAKitPrivateClient: true,
-            privateClientProxyEndpoint: 'http://localhost:3000/mobify/slas/private'
+            enablePWAKitPrivateClient: true
         }
         renderWithProviders(<Component />, config)
         const element = screen.getByTestId('proxy-value')

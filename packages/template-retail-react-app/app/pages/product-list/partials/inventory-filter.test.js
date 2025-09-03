@@ -11,15 +11,25 @@ import userEvent from '@testing-library/user-event'
 import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
 import StoreInventoryFilter from '@salesforce/retail-react-app/app/pages/product-list/partials/inventory-filter'
 import {useSelectedStore} from '@salesforce/retail-react-app/app/hooks/use-selected-store'
-import {useStoreLocatorModal} from '@salesforce/retail-react-app/app/hooks/use-store-locator'
 
 jest.mock('@salesforce/retail-react-app/app/hooks/use-selected-store', () => ({
     useSelectedStore: jest.fn()
 }))
 
-jest.mock('@salesforce/retail-react-app/app/hooks/use-store-locator', () => ({
-    useStoreLocatorModal: jest.fn()
-}))
+jest.mock('@salesforce/retail-react-app/app/components/store-locator', () => {
+    // eslint-disable-next-line react/prop-types
+    function MockStoreLocatorModal({isOpen, onClose}) {
+        return isOpen ? (
+            <div data-testid="store-locator-modal">
+                <button onClick={onClose}>Close Modal</button>
+            </div>
+        ) : null
+    }
+
+    return {
+        StoreLocatorModal: MockStoreLocatorModal
+    }
+})
 
 const mockToggleFilter = jest.fn()
 
@@ -40,9 +50,6 @@ const mockStoreData = {
 }
 
 describe('StoreInventoryFilter', () => {
-    const mockOnOpen = jest.fn()
-    const mockOnClose = jest.fn()
-
     beforeEach(() => {
         jest.clearAllMocks()
         localStorage.clear()
@@ -51,11 +58,6 @@ describe('StoreInventoryFilter', () => {
             isLoading: false,
             error: null,
             hasSelectedStore: false
-        })
-        useStoreLocatorModal.mockReturnValue({
-            isOpen: false,
-            onOpen: mockOnOpen,
-            onClose: mockOnClose
         })
     })
 
@@ -101,7 +103,7 @@ describe('StoreInventoryFilter', () => {
         const checkbox = screen.getByRole('checkbox')
         await user.click(checkbox)
 
-        expect(mockOnOpen).toHaveBeenCalled()
+        expect(screen.getByTestId('store-locator-modal')).toBeInTheDocument()
     })
 
     test('opens store locator modal when store name is clicked', async () => {
@@ -121,7 +123,7 @@ describe('StoreInventoryFilter', () => {
 
         await user.click(screen.getByText('Test Store Location'))
 
-        expect(mockOnOpen).toHaveBeenCalled()
+        expect(screen.getByTestId('store-locator-modal')).toBeInTheDocument()
     })
 
     test('calls toggleFilter when checkbox is changed with selected store', async () => {
@@ -199,7 +201,7 @@ describe('StoreInventoryFilter', () => {
         expect(mockToggleFilter).toHaveBeenCalledWith({value: 'inv-456'}, 'ilids', false, false)
 
         // Ensure no modal was opened
-        expect(mockOnOpen).not.toHaveBeenCalled()
+        expect(screen.queryByTestId('store-locator-modal')).not.toBeInTheDocument()
     })
 
     test('applies filter when selected store changes and checkbox is checked', async () => {

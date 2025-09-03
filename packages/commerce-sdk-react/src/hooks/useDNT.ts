@@ -8,7 +8,9 @@ import useAuthContext from './useAuthContext'
 
 interface useDntReturn {
     selectedDnt: boolean | undefined
+    dntStatus: boolean | undefined
     effectiveDnt: boolean | undefined
+    updateDNT: (preference: boolean | null) => Promise<void>
     updateDnt: (preference: boolean | null) => Promise<void>
 }
 
@@ -24,6 +26,8 @@ interface useDntReturn {
  *              If defaultDnt is undefined as well, then SDK default is used.
  * @property {function} updateDnt - takes a DNT choice and creates the dw_dnt
  *              cookie and reauthorizes with SLAS
+ * @property {function} updateDNT - @deprecated Deprecated since version 3.1.0. Use updateDnt instead.
+ * @property {boolean} dntStatus - @deprecated Deprecated since version 3.1.0. Use selectedDnt instead.
  *
  *
  */
@@ -36,10 +40,14 @@ const useDNT = (): useDntReturn => {
     const updateDnt = async (preference: boolean | null) => {
         await auth.setDnt(preference)
     }
+    const updateDNT = updateDnt
+    const dntStatus = selectedDnt
 
     return {
         selectedDnt,
         effectiveDnt,
+        dntStatus,
+        updateDNT,
         updateDnt
     }
 }

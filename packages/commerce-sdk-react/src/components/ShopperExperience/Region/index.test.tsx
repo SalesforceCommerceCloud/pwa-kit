@@ -39,14 +39,7 @@ const SAMPLE_REGION = {
 }
 
 test('Region throws if used outside of a Page component', () => {
-    // Mock console.error to suppress React error boundary warnings
-    const originalError = console.error
-    console.error = jest.fn()
-
-    expect(() => {
-        render(<Region region={SAMPLE_REGION} />)
-    }).toThrow()
-    console.error = originalError
+    expect(() => render(<Region region={SAMPLE_REGION} />)).toThrow()
 })
 
 test('Region renders without errors', () => {

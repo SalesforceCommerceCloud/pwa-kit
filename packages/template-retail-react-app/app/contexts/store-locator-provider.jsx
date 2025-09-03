@@ -8,7 +8,6 @@
 import React, {useState, useEffect, createContext} from 'react'
 import PropTypes from 'prop-types'
 import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
-import {useDisclosure} from '@salesforce/retail-react-app/app/components/shared/ui'
 
 const onClient = typeof window !== 'undefined'
 
@@ -27,7 +26,6 @@ export const StoreLocatorProvider = ({config, children}) => {
     const {site} = useMultiSite()
     const selectedStoreBySiteId = `selectedStore_${site?.id}`
     const selectedStoreId = readValue(selectedStoreBySiteId)
-    const {isOpen, onOpen, onClose} = useDisclosure()
 
     const [state, setState] = useState({
         mode: 'input',
@@ -51,11 +49,7 @@ export const StoreLocatorProvider = ({config, children}) => {
 
     const value = {
         state,
-        setState,
-        // Modal actions
-        isOpen,
-        onOpen,
-        onClose
+        setState
     }
 
     return <StoreLocatorContext.Provider value={value}>{children}</StoreLocatorContext.Provider>

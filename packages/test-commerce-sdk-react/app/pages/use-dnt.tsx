@@ -13,7 +13,7 @@ const buttonStyle = {
 
 const UseDntHook = () => {
     const [displayButton, setDisplayButton] = useState(false)
-    const {selectedDnt, updateDnt} = useDNT()
+    const {selectedDnt, updateDNT} = useDNT()
     useEffect(() => {
         if (selectedDnt === undefined) setDisplayButton(true)
     }, [])
@@ -23,7 +23,7 @@ const UseDntHook = () => {
             style={buttonStyle}
             onClick={() => {
                 void (async () => {
-                    await updateDnt(null)
+                    await updateDNT(null)
                 })()
                 setDisplayButton(false)
             }}

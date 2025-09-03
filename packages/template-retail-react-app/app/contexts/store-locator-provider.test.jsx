@@ -7,7 +7,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import {render, act} from '@testing-library/react'
-import {MemoryRouter} from 'react-router-dom'
 import {
     StoreLocatorProvider,
     StoreLocatorContext
@@ -48,9 +47,7 @@ describe('StoreLocatorProvider', () => {
 
     const TestWrapper = ({children}) => (
         <MultiSiteProvider site={mockSite}>
-            <MemoryRouter>
-                <StoreLocatorProvider config={mockConfig}>{children}</StoreLocatorProvider>
-            </MemoryRouter>
+            <StoreLocatorProvider config={mockConfig}>{children}</StoreLocatorProvider>
         </MultiSiteProvider>
     )
 
@@ -86,9 +83,6 @@ describe('StoreLocatorProvider', () => {
             config: mockConfig
         })
         expect(typeof contextValue?.setState).toBe('function')
-        expect(typeof contextValue?.isOpen).toBe('boolean')
-        expect(typeof contextValue?.onOpen).toBe('function')
-        expect(typeof contextValue?.onClose).toBe('function')
     })
 
     it('initializes with stored selectedStoreId from localStorage', () => {
@@ -174,34 +168,5 @@ describe('StoreLocatorProvider', () => {
         )
 
         expect(getByText('Test Child')).toBeTruthy()
-    })
-
-    it('handles modal state correctly', () => {
-        let contextValue
-        const TestComponent = () => {
-            contextValue = React.useContext(StoreLocatorContext)
-            return null
-        }
-
-        render(
-            <TestWrapper>
-                <TestComponent />
-            </TestWrapper>
-        )
-
-        // Initially modal should be closed
-        expect(contextValue?.isOpen).toBe(false)
-
-        // Open modal
-        act(() => {
-            contextValue?.onOpen()
-        })
-        expect(contextValue?.isOpen).toBe(true)
-
-        // Close modal
-        act(() => {
-            contextValue?.onClose()
-        })
-        expect(contextValue?.isOpen).toBe(false)
     })
 })

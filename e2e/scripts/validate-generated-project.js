@@ -13,30 +13,24 @@ const path = require('path')
 
 const validateGeneratedArtifacts = async (project) => {
     try {
-        const generatedProjectDirPath = path.join(
-            process.cwd(),
-            config.GENERATED_PROJECTS_DIR,
-            project
-        )
+        const generatedProjectDirPath = path.join(process.cwd(), config.GENERATED_PROJECTS_DIR, project)
         const generatedArtifacts = fs.readdirSync(generatedProjectDirPath)
 
-        return new Promise((resolve, reject) => {
-            const missingArtifacts = diffArrays(
-                config.EXPECTED_GENERATED_ARTIFACTS[project],
-                generatedArtifacts
+    return new Promise((resolve, reject) => {
+        const missingArtifacts = diffArrays(
+            config.EXPECTED_GENERATED_ARTIFACTS[project],
+            generatedArtifacts
+        )
+        if (missingArtifacts && missingArtifacts.length > 0) {
+            reject(
+                `Generated project (${project}) is missing one or more artifacts: ${missingArtifacts}`
             )
-            if (missingArtifacts && missingArtifacts.length > 0) {
-                reject(
-                    `Generated project (${project}) is missing one or more artifacts: ${missingArtifacts}`
-                )
-            } else {
+        } else {
                 resolve(`Successfully validated generated artifacts for: ${project} `)
             }
         })
     } catch (err) {
-        return Promise.reject(
-            `Generated project (${project}) is missing one or more artifacts: ${err}`
-        )
+        reject(`Generated project (${project}) is missing one or more artifacts: ${err}`)
     }
 }
 
@@ -45,11 +39,11 @@ const validateExtensibilityConfig = async (project, templateVersion) => {
     const pkg = require(pkgPath)
     return new Promise((resolve, reject) => {
         if (
-            !pkg.hasOwn('ccExtensibility') ||
-            !pkg['ccExtensibility'].hasOwn('extends') ||
-            !pkg['ccExtensibility'].hasOwn('overridesDir') ||
-            pkg['ccExtensibility'].extends !== '@salesforce/retail-react-app' ||
-            pkg['ccExtensibility'].overridesDir !== 'overrides'
+            !pkg.hasOwnProperty('ccExtensibility') ||
+            !pkg['ccExtensibility'].hasOwnProperty('extends') ||
+            !pkg['ccExtensibility'].hasOwnProperty('overridesDir') ||
+            !pkg['ccExtensibility'].extends === '@salesforce/retail-react-app' ||
+            !pkg['ccExtensibility'].overridesDir === 'overrides'
         ) {
             reject(`Generated project ${project} is missing extensibility config in package.json`)
         }

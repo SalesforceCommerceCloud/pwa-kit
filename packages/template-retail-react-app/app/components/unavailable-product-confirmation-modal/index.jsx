@@ -31,24 +31,14 @@ const UnavailableProductConfirmationModal = ({
 }) => {
     const unavailableProductIdsRef = useRef(null)
     const ids = productIds.length ? productIds : productItems.map((i) => i.productId)
-    const uniqueInventoryIds = [
-        ...new Set(productItems.map((i) => i.inventoryId).filter(Boolean))
-    ].join(',')
-
     useProducts(
-        {
-            parameters: {
-                ids: ids?.join(','),
-                allImages: true,
-                ...(uniqueInventoryIds ? {inventoryIds: uniqueInventoryIds} : {})
-            }
-        },
+        {parameters: {ids: ids?.join(','), allImages: true}},
         {
             enabled: ids?.length > 0,
             onSuccess: (result) => {
                 const resProductIds = []
                 const unOrderableIds = []
-                result.data?.forEach(({id, inventory, inventories}) => {
+                result.data?.forEach(({id, inventory}) => {
                     // when a product is unavailable, the getProducts will not return its product detail.
                     // we compare the response ids with the ones in basket to figure which product has become unavailable
                     resProductIds.push(id)
@@ -60,15 +50,11 @@ const UnavailableProductConfirmationModal = ({
                         const productItem = productItems.find((item) => item.productId === id)
                         // wishlist item will have the property type
                         const isWishlist = !!productItem?.type
-                        // inventory for the product's pickup store or the delivery inventory
-                        const productItemInventory =
-                            inventories?.find((entry) => entry.id === productItem.inventoryId) ||
-                            inventory
                         if (
                             !isWishlist &&
-                            (!productItemInventory?.orderable ||
-                                (productItemInventory?.orderable &&
-                                    productItem?.quantity > productItemInventory.stockLevel))
+                            (!inventory?.orderable ||
+                                (inventory?.orderable &&
+                                    productItem?.quantity > inventory.stockLevel))
                         ) {
                             unOrderableIds.push(id)
                         }
