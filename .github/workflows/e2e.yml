@@ -266,7 +266,7 @@ jobs:
 
       - name: Run a11y test for Node 22 with npm 11
         if: env.IS_MRT_NODE == 'true'
-        run: npm run test:e2e:a11y
+        run: npm run test:e2e:a11y:slas-public-client
 
   notify-slack-pwa-ext:
     needs: [run-generator-retail-app-ext]

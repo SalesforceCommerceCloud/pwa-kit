@@ -1,13 +1,14 @@
-## v7.1.0-dev (July 22, 2025)
+## v8.0.0-dev (August 19, 2025)
 - Add support for environment level base paths on /mobify routes [#2892](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2892)
-
+- Fix private client endpoint prop name [#3177](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3177)
 - This feature introduces an AI-powered shopping assistant that integrates Salesforce Embedded Messaging Service with PWA Kit applications. The shopper agent provides real-time chat support, search assistance, and personalized shopping guidance directly within the e-commerce experience. [#2658](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2658)
+- Added support for Multi-Ship [#3056](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3056) [#3199](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3199) [#3203](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3203) [#3211] (https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3211) [#3217](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3217) [#3216] (https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3216)
 - The feature toggle for partial hydration is now found in the config file (`config.app.partialHydrationEnabled`) [#3058](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3058)
 - Mask user not found messages to prevent user enumeration from passwordless login [#3113](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3113)
-
 - [Bugfix] Pin `@chakra-ui/react` version to 2.7.0 to avoid breaking changes from 2.10.9 [#2658](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2658)
-
 - Introduce optional prop `hybridAuthEnabled` to control Hybrid Auth specific behaviors in commerce-sdk-react [#3151](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3151)
+- Inject sfdc_user_agent request header into all SCAPI requests for debugging and metrics prupose [#3183](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3183)
+- [Bugfix] Fix unit test failures in generated projects [3204](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3204)
 
 ## v7.0.0 (July 22, 2025)
 
@@ -32,7 +33,6 @@
 - Use `<picture>` element for responsive images [#2724](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2724)
 - Add Data Cloud partyIdentification events and improve error handling [#2811](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2811)
 - Introduce the cursor rules to assist project developers [#2820](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2820)
-
 
 ## v6.1.0 (May 22, 2025)
 

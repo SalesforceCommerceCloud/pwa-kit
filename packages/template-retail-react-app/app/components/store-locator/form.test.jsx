@@ -9,6 +9,7 @@ import React from 'react'
 import {render, screen, waitFor} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import {IntlProvider} from 'react-intl'
+import {MemoryRouter} from 'react-router-dom'
 import {StoreLocatorForm} from '@salesforce/retail-react-app/app/components/store-locator/form'
 import {useStoreLocator} from '@salesforce/retail-react-app/app/hooks/use-store-locator'
 import {useGeolocation} from '@salesforce/retail-react-app/app/hooks/use-geo-location'
@@ -75,7 +76,9 @@ describe('StoreLocatorForm', () => {
     const TestWrapper = ({children}) => (
         <IntlProvider locale="en" messages={messages}>
             <MultiSiteProvider site={mockSite}>
-                <StoreLocatorProvider config={mockConfig}>{children}</StoreLocatorProvider>
+                <MemoryRouter>
+                    <StoreLocatorProvider config={mockConfig}>{children}</StoreLocatorProvider>
+                </MemoryRouter>
             </MultiSiteProvider>
         </IntlProvider>
     )
@@ -92,7 +95,10 @@ describe('StoreLocatorForm', () => {
             config: mockConfig,
             formValues: {countryCode: '', postalCode: ''},
             setFormValues: mockSetFormValues,
-            setDeviceCoordinates: mockSetDeviceCoordinates
+            setDeviceCoordinates: mockSetDeviceCoordinates,
+            isOpen: false,
+            onOpen: jest.fn(),
+            onClose: jest.fn()
         }))
 
         useGeolocation.mockImplementation(() => ({
@@ -197,7 +203,10 @@ describe('StoreLocatorForm', () => {
             config: {...mockConfig, supportedCountries: []},
             formValues: {countryCode: '', postalCode: ''},
             setFormValues: mockSetFormValues,
-            setDeviceCoordinates: mockSetDeviceCoordinates
+            setDeviceCoordinates: mockSetDeviceCoordinates,
+            isOpen: false,
+            onOpen: jest.fn(),
+            onClose: jest.fn()
         }))
 
         renderWithProviders(<StoreLocatorForm />)
@@ -220,7 +229,10 @@ describe('StoreLocatorForm', () => {
             config: mockConfig,
             formValues: {countryCode: '', postalCode: ''},
             setFormValues: mockSetFormValues,
-            setDeviceCoordinates: mockSetDeviceCoordinates
+            setDeviceCoordinates: mockSetDeviceCoordinates,
+            isOpen: false,
+            onOpen: jest.fn(),
+            onClose: jest.fn()
         }))
 
         renderWithProviders(<StoreLocatorForm />)

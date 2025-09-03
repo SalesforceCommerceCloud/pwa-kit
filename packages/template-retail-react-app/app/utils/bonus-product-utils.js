@@ -6,7 +6,7 @@
  */
 
 import {useProduct, useProducts} from '@salesforce/commerce-sdk-react'
-import {useCurrentBasket} from '../hooks/use-current-basket'
+import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
 
 /**
  * Enhanced bonus product utilities that fetch product promotion data from the products endpoint.

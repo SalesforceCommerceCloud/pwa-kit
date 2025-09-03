@@ -32,6 +32,7 @@ import {useCurrency, useDerivedProduct} from '@salesforce/retail-react-app/app/h
  * @param {Object} product Product to be represented in the list item.
  * @param {node} primaryAction Child component representing the most prominent action to be performed by the user.
  * @param {node} secondaryActions Child component representing the other actions relevant to the product to be performed by the user.
+ * @param {node} deliveryActions Child component representing the delivery actions relevant to the product to be performed by the user.
  * @param {func} onItemQuantityChange callback function to be invoked whenever item quantity changes.
  * @param {boolean} showLoading Renders a loading spinner with overlay if set to true.
  * @returns A JSX element representing product item in a list (eg: wishlist, cart, etc).
@@ -40,9 +41,11 @@ const ProductItem = ({
     product,
     primaryAction,
     secondaryActions,
+    deliveryActions,
     onItemQuantityChange = noop,
     showLoading = false,
-    hideBorder = false
+    hideBorder = false,
+    containerStyles = {}
 }) => {
     const {stepQuantity, showInventoryMessage, inventoryMessage, quantity, setQuantity} =
         useDerivedProduct(product)
@@ -54,22 +57,31 @@ const ProductItem = ({
         >
             <ItemVariantProvider variant={product}>
                 {showLoading && <LoadingSpinner />}
-                <Stack layerStyle={hideBorder ? undefined : "cardBordered"} align="flex-start">
+                <Stack
+                    layerStyle={hideBorder ? undefined : 'cardBordered'}
+                    align="flex-start"
+                    {...containerStyles}
+                >
                     <Flex width="full" alignItems="flex-start" backgroundColor="white">
                         <CartItemVariantImage width={['88px', '136px']} mr={4} />
                         <Stack spacing={3} flex={1}>
-                            <Stack spacing={1}>
-                                <CartItemVariantName />
-                                <CartItemVariantAttributes excludeBonusLabel />
-                                <HideOnDesktop>
-                                    <Box marginTop={2}>
-                                        <CartItemVariantPrice
-                                            align="left"
-                                            currency={activeCurrency}
-                                        />
-                                    </Box>
-                                </HideOnDesktop>
-                            </Stack>
+                            <Flex align="flex-end" justify="space-between">
+                                <Stack spacing={1}>
+                                    <CartItemVariantName />
+                                    <CartItemVariantAttributes excludeBonusLabel />
+                                    <HideOnDesktop>
+                                        <Box marginTop={2}>
+                                            <CartItemVariantPrice
+                                                align="left"
+                                                currency={activeCurrency}
+                                            />
+                                        </Box>
+                                    </HideOnDesktop>
+                                </Stack>
+                                {deliveryActions && <HideOnMobile>{deliveryActions}</HideOnMobile>}
+                            </Flex>
+
+                            {deliveryActions && <HideOnDesktop>{deliveryActions}</HideOnDesktop>}
 
                             <Flex align="flex-end" justify="space-between">
                                 <Stack spacing={1}>
@@ -126,7 +138,9 @@ ProductItem.propTypes = {
     isWishlistItem: PropTypes.bool,
     primaryAction: PropTypes.node,
     secondaryActions: PropTypes.node,
-    hideBorder: PropTypes.bool
+    hideBorder: PropTypes.bool,
+    deliveryActions: PropTypes.node,
+    containerStyles: PropTypes.object
 }
 
 export default ProductItem

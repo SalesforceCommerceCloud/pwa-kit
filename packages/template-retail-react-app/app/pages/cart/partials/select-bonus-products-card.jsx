@@ -7,8 +7,8 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import {Box, Heading} from '@salesforce/retail-react-app/app/components/shared/ui'
-import SelectBonusProductsButton from '../../../components/select-bonus-products-button'
-import {useBonusProductSelectionModalContext} from '../../../hooks/use-bonus-product-selection-modal'
+import SelectBonusProductsButton from '@salesforce/retail-react-app/app/components/select-bonus-products-button'
+import {useBonusProductSelectionModalContext} from '@salesforce/retail-react-app/app/hooks/use-bonus-product-selection-modal'
 
 /**
  * Fragment component that renders the "Select Bonus Products" card with promotion callout and selection button
@@ -33,7 +33,6 @@ const SelectBonusProductsCard = ({
     onSelectBonusProducts,
     bonusDiscountLineItem
 }) => {
-
     const {onOpen: openBonusSelectionModal} = useBonusProductSelectionModalContext()
     // Use bonusDiscountLineItem data if provided, otherwise fall back to existing logic
     let promotionId
@@ -83,8 +82,10 @@ const SelectBonusProductsCard = ({
         )
     }
 
-    // Calculate remaining available bonus products
-    const remainingAvailable = maxBonusItems - selectedItems
+    // Calculate remaining available bonus products using the correct aggregated data
+    const remainingAvailable =
+        remainingBonusProductsData?.aggregatedMaxBonusItems -
+            remainingBonusProductsData?.aggregatedSelectedItems || 0
 
     // Don't render if no bonus products are available
     if (remainingAvailable <= 0) {
@@ -92,7 +93,7 @@ const SelectBonusProductsCard = ({
     }
 
     const cardJSX = (
-        <Box>
+        <Box data-testid="select-bonus-products-card">
             {/* Combined Promotion Label */}
             {productWithPromotions &&
                 promotionId &&
@@ -102,8 +103,11 @@ const SelectBonusProductsCard = ({
                     // Show selection stats based on available data
                     let selectionText = ''
 
-                    if (maxBonusItems > 0) {
-                        // We have actual bonus discount line items with max limits
+                    // Use the aggregated data from remainingBonusProductsData for accurate stats
+                    if (remainingBonusProductsData?.aggregatedMaxBonusItems > 0) {
+                        selectionText = ` (${remainingBonusProductsData.aggregatedSelectedItems} of ${remainingBonusProductsData.aggregatedMaxBonusItems} selected)`
+                    } else if (maxBonusItems > 0) {
+                        // Fallback to bonus discount line item data
                         selectionText = ` (${selectedItems} of ${maxBonusItems} selected)`
                     } else if (isEligible && selectedItems === 0) {
                         // Product is eligible but no bonus items selected yet
@@ -130,7 +134,7 @@ const SelectBonusProductsCard = ({
                     if (onSelectBonusProducts) {
                         onSelectBonusProducts()
                     }
-                    
+
                     // Then open the bonus selection modal after a brief delay
                     setTimeout(() => {
                         // Build the payload for the bonus selection modal
@@ -155,7 +159,7 @@ const SelectBonusProductsCard = ({
             />
         </Box>
     )
-    
+
     return cardJSX
 }
 
