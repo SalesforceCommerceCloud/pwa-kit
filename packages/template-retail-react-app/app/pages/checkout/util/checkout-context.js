@@ -10,14 +10,16 @@ import useEinstein from '@salesforce/retail-react-app/app/hooks/use-einstein'
 import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
 import {STORE_LOCATOR_IS_ENABLED} from '@salesforce/retail-react-app/app/constants'
+import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 
 const CheckoutContext = React.createContext()
 
 export const CheckoutProvider = ({children}) => {
     const {data: customer} = useCurrentCustomer()
-    const {data: basket} = useCurrentBasket()
+    const {data: basket, derivedData} = useCurrentBasket()
     const einstein = useEinstein()
     const [step, setStep] = useState()
+    const storeLocatorEnabled = getConfig()?.app?.storeLocatorEnabled ?? STORE_LOCATOR_IS_ENABLED
 
     const CHECKOUT_STEPS_LIST = [
         'CONTACT_INFO',
@@ -35,18 +37,13 @@ export const CheckoutProvider = ({children}) => {
         if (!customer || !basket) {
             return
         }
-
         let step = STEPS.REVIEW_ORDER
 
         if (customer.isGuest && !basket.customerInfo?.email) {
             step = STEPS.CONTACT_INFO
-        } else if (!basket.shipments[0]?.shippingAddress?.address1) {
-            // Check if it's a pickup order - only if BOPIS is enabled
-            const isPickupOrder =
-                STORE_LOCATOR_IS_ENABLED &&
-                basket?.shipments[0]?.shippingMethod?.c_storePickupEnabled === true
-            step = isPickupOrder ? STEPS.PICKUP_ADDRESS : STEPS.SHIPPING_ADDRESS
-        } else if (!basket.shipments[0]?.shippingMethod) {
+        } else if (derivedData?.isMissingShippingAddress) {
+            step = STEPS.SHIPPING_ADDRESS
+        } else if (derivedData?.isMissingShippingMethod) {
             step = STEPS.SHIPPING_OPTIONS
         } else if (!basket.paymentInstruments || !basket.billingAddress) {
             step = STEPS.PAYMENT
@@ -56,10 +53,11 @@ export const CheckoutProvider = ({children}) => {
     }, [
         customer?.isGuest,
         basket?.customerInfo?.email,
-        basket?.shipments[0]?.shippingAddress,
-        basket?.shipments[0]?.shippingMethod,
+        basket?.shipments,
         basket?.paymentInstruments,
-        basket?.billingAddress
+        basket?.billingAddress,
+        derivedData?.isMissingShippingAddress,
+        derivedData?.isMissingShippingMethod
     ])
 
     /**************** Einstein ****************/
@@ -80,12 +78,21 @@ export const CheckoutProvider = ({children}) => {
     const goToNextStep = () => {
         // Check if current step is CONTACT_INFO
         if (step === STEPS.CONTACT_INFO) {
-            // Determine if it's a pickup order - only if BOPIS is enabled
-            const isPickupOrder =
-                STORE_LOCATOR_IS_ENABLED &&
-                basket?.shipments[0]?.shippingMethod?.c_storePickupEnabled === true
-            // Skip to appropriate next step
-            setStep(isPickupOrder ? STEPS.PICKUP_ADDRESS : STEPS.SHIPPING_ADDRESS)
+            // If all items are pickup at one store, skip directly to payment
+            const shouldSkipDirectlyToPayment =
+                derivedData?.totalDeliveryShipments === 0 && derivedData?.totalPickupShipments === 1
+            if (shouldSkipDirectlyToPayment) {
+                setStep(STEPS.PAYMENT)
+                return
+            }
+
+            // Otherwise go to pickup address for pickup baskets, or shipping address for delivery baskets
+            const hasAnyPickupShipment =
+                storeLocatorEnabled && derivedData?.totalPickupShipments > 0
+            setStep(hasAnyPickupShipment ? STEPS.PICKUP_ADDRESS : STEPS.SHIPPING_ADDRESS)
+        } else if (step === STEPS.PICKUP_ADDRESS) {
+            const hasDeliveryShipment = derivedData?.totalDeliveryShipments > 0
+            setStep(hasDeliveryShipment ? STEPS.SHIPPING_ADDRESS : STEPS.PAYMENT)
         } else {
             setStep(step + 1)
         }

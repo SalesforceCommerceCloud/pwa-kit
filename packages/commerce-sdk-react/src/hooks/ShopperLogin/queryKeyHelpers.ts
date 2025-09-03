@@ -48,13 +48,13 @@ export const getUserInfo: QueryKeyHelper<'getUserInfo'> = {
     path: (params) => [
         '/commerce-sdk-react',
         '/organizations/',
-        params.organizationId,
+        params?.organizationId,
         '/oauth2/userinfo'
     ],
     queryKey: (params: Params<'getUserInfo'>) => {
         return [
             ...getUserInfo.path(params),
-            pickValidParams(params, ShopperLogin.paramKeys.getUserInfo)
+            pickValidParams(params || {}, ShopperLogin.paramKeys.getUserInfo)
         ]
     }
 }
@@ -63,13 +63,13 @@ export const getWellknownOpenidConfiguration: QueryKeyHelper<'getWellknownOpenid
     path: (params) => [
         '/commerce-sdk-react',
         '/organizations/',
-        params.organizationId,
+        params?.organizationId,
         '/oauth2/.well-known/openid-configuration'
     ],
     queryKey: (params: Params<'getWellknownOpenidConfiguration'>) => {
         return [
             ...getWellknownOpenidConfiguration.path(params),
-            pickValidParams(params, ShopperLogin.paramKeys.getWellknownOpenidConfiguration)
+            pickValidParams(params || {}, ShopperLogin.paramKeys.getWellknownOpenidConfiguration)
         ]
     }
 }
@@ -78,13 +78,13 @@ export const getJwksUri: QueryKeyHelper<'getJwksUri'> = {
     path: (params) => [
         '/commerce-sdk-react',
         '/organizations/',
-        params.organizationId,
+        params?.organizationId,
         '/oauth2/jwks'
     ],
     queryKey: (params: Params<'getJwksUri'>) => {
         return [
             ...getJwksUri.path(params),
-            pickValidParams(params, ShopperLogin.paramKeys.getJwksUri)
+            pickValidParams(params || {}, ShopperLogin.paramKeys.getJwksUri)
         ]
     }
 }

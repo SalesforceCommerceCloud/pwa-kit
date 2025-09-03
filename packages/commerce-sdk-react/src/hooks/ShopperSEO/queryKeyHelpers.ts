@@ -4,11 +4,11 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import {ShopperSeo} from 'commerce-sdk-isomorphic'
+import {ShopperSEO} from 'commerce-sdk-isomorphic'
 import {Argument, ExcludeTail} from '../types'
 import {pickValidParams} from '../utils'
 // We must use a client with no parameters in order to have required/optional match the API spec
-type Client = ShopperSeo<{shortCode: string}>
+type Client = ShopperSEO<{shortCode: string}>
 type Params<T extends keyof QueryKeys> = Partial<Argument<Client[T]>['parameters']>
 export type QueryKeys = {
     getUrlMapping: [
@@ -33,13 +33,13 @@ export const getUrlMapping: QueryKeyHelper<'getUrlMapping'> = {
     path: (params) => [
         '/commerce-sdk-react',
         '/organizations/',
-        params.organizationId,
+        params?.organizationId,
         '/url-mapping'
     ],
     queryKey: (params: Params<'getUrlMapping'>) => {
         return [
             ...getUrlMapping.path(params),
-            pickValidParams(params, ShopperSeo.paramKeys.getUrlMapping)
+            pickValidParams(params || {}, ShopperSEO.paramKeys.getUrlMapping)
         ]
     }
 }

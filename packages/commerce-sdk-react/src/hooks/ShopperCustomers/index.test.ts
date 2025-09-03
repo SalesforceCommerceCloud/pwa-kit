@@ -17,8 +17,8 @@ describe('Shopper Customers hooks', () => {
         // If this test fails: create a new query hook, add the endpoint to the mutations enum,
         // or add it to the `expected` array with a comment explaining "TODO" or "never" (and why).
         expect(unimplemented).toEqual([
-            'registerExternalProfile', // TODO: Implement when the endpoint exits closed beta
-            'getExternalProfile' // TODO: Implement when the endpoint exits closed beta
+            'getExternalProfile', // TODO: Implement when the endpoint exits closed beta
+            'registerExternalProfile' // TODO: Implement when the endpoint exits closed beta
         ])
     })
     test('all mutations have cache update logic', () => {
