@@ -6,6 +6,7 @@
  */
 
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
+import {makeAuthenticatedRequest} from '@salesforce/retail-react-app/app/components/express/utils/token-refresh'
 
 /**
  * Validates common parameters and gets organization config
@@ -68,35 +69,13 @@ export const calculateBasketTotals = async (basketId, authToken, refreshToken, s
         })
     }
 
-    let response = await makeRequest(authToken)
-
-    // Handle 401 unauthorized errors by attempting token refresh
-    if (response.status === 401 && refreshToken) {
-        try {
-            console.log('🔄 Basket calculation failed with 401, attempting token refresh...')
-            
-            const refreshResponse = await fetch('/api/auth/refresh', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    refreshToken: refreshToken,
-                    siteId: site.id
-                })
-            })
-
-            if (refreshResponse.ok) {
-                const refreshData = await refreshResponse.json()
-                const newAuthToken = refreshData.authToken
-                
-                console.log('🔄 Token refresh successful, retrying basket calculation...')
-                response = await makeRequest(newAuthToken)
-            }
-        } catch (refreshError) {
-            console.error('🔄 Token refresh failed during basket calculation:', refreshError)
-        }
-    }
+    const response = await makeAuthenticatedRequest(
+        makeRequest,
+        authToken,
+        refreshToken,
+        site.id,
+        'Basket calculation'
+    )
 
     if (!response.ok) {
         const errorText = await response.text()
@@ -132,35 +111,13 @@ export const getBasketWithTotals = async (basketId, authToken, refreshToken, sit
         })
     }
 
-    let response = await makeRequest(authToken)
-
-    // Handle 401 unauthorized errors by attempting token refresh
-    if (response.status === 401 && refreshToken) {
-        try {
-            console.log('🔄 Basket retrieval failed with 401, attempting token refresh...')
-            
-            const refreshResponse = await fetch('/api/auth/refresh', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    refreshToken: refreshToken,
-                    siteId: site.id
-                })
-            })
-
-            if (refreshResponse.ok) {
-                const refreshData = await refreshResponse.json()
-                const newAuthToken = refreshData.authToken
-                
-                console.log('🔄 Token refresh successful, retrying basket retrieval...')
-                response = await makeRequest(newAuthToken)
-            }
-        } catch (refreshError) {
-            console.error('🔄 Token refresh failed during basket retrieval:', refreshError)
-        }
-    }
+    const response = await makeAuthenticatedRequest(
+        makeRequest,
+        authToken,
+        refreshToken,
+        site.id,
+        'Basket retrieval'
+    )
 
     if (!response.ok) {
         const errorText = await response.text()

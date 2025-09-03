@@ -6,6 +6,7 @@
  */
 
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
+import {makeAuthenticatedRequest} from '@salesforce/retail-react-app/app/components/express/utils/token-refresh'
 
 /**
  * Creates a temporary basket for Apple Pay "Buy Now" functionality using the official Salesforce Commerce API
@@ -61,35 +62,13 @@ export const createTemporaryBasket = async (sku, authToken, refreshToken, site, 
         })
     }
 
-    let response = await makeRequest(authToken)
-
-    // Handle 401 unauthorized errors by attempting token refresh
-    if (response.status === 401 && refreshToken) {
-        try {
-            console.log('🔄 Temporary basket creation failed with 401, attempting token refresh...')
-            
-            const refreshResponse = await fetch('/api/auth/refresh', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    refreshToken: refreshToken,
-                    siteId: site.id
-                })
-            })
-
-            if (refreshResponse.ok) {
-                const refreshData = await refreshResponse.json()
-                const newAuthToken = refreshData.authToken
-                
-                console.log('🔄 Token refresh successful, retrying temporary basket creation...')
-                response = await makeRequest(newAuthToken)
-            }
-        } catch (refreshError) {
-            console.error('🔄 Token refresh failed during temporary basket creation:', refreshError)
-        }
-    }
+    const response = await makeAuthenticatedRequest(
+        makeRequest,
+        authToken,
+        refreshToken,
+        site.id,
+        'Temporary basket creation'
+    )
 
     if (!response.ok) {
         const errorText = await response.text()
@@ -139,7 +118,7 @@ export const deleteTemporaryBasket = async (basketId, authToken, refreshToken, s
 
         const requestUrl = `/mobify/proxy/api/checkout/shopper-baskets/v2/organizations/${organizationId}/baskets/${basketId}?siteId=${site.id}`
 
-        const makeDeleteRequest = async (token) => {
+        const makeRequest = async (token) => {
             return await fetch(requestUrl, {
                 method: 'DELETE',
                 headers: {
@@ -148,35 +127,13 @@ export const deleteTemporaryBasket = async (basketId, authToken, refreshToken, s
             })
         }
 
-        let response = await makeDeleteRequest(authToken)
-
-        // Handle 401 unauthorized errors by attempting token refresh
-        if (response.status === 401 && refreshToken) {
-            try {
-                console.log('🔄 Temporary basket deletion failed with 401, attempting token refresh...')
-                
-                const refreshResponse = await fetch('/api/auth/refresh', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        refreshToken: refreshToken,
-                        siteId: site.id
-                    })
-                })
-
-                if (refreshResponse.ok) {
-                    const refreshData = await refreshResponse.json()
-                    const newAuthToken = refreshData.authToken
-                    
-                    console.log('🔄 Token refresh successful, retrying temporary basket deletion...')
-                    response = await makeDeleteRequest(newAuthToken)
-                }
-            } catch (refreshError) {
-                console.error('🔄 Token refresh failed during temporary basket deletion:', refreshError)
-            }
-        }
+        const response = await makeAuthenticatedRequest(
+            makeRequest,
+            authToken,
+            refreshToken,
+            site.id,
+            'Temporary basket deletion'
+        )
 
         // Return true if deletion was successful (200-299 status codes)
         return response.ok
