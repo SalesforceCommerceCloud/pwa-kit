@@ -10,8 +10,8 @@ export class AdyenShippingMethodsService {
     baseUrl = '/api/adyen/shipping-methods'
     apiClient = null
 
-    constructor(token, site) {
-        this.apiClient = new ApiClient(this.baseUrl, token, site)
+    constructor(token, refreshToken, site) {
+        this.apiClient = new ApiClient(this.baseUrl, token, refreshToken, site)
     }
 
     async _handleResponse(res) {

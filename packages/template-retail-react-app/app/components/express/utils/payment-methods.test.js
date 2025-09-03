@@ -14,6 +14,7 @@ describe('AdyenPaymentMethodsService', () => {
     let paymentMethodsService
     let mockApiClient
     const mockToken = 'test-token'
+    const mockRefreshToken = 'test-refresh-token'
     const mockSite = {id: 'test-site'}
 
     beforeEach(() => {
@@ -21,7 +22,7 @@ describe('AdyenPaymentMethodsService', () => {
             get: jest.fn()
         }
         ApiClient.mockImplementation(() => mockApiClient)
-        paymentMethodsService = new AdyenPaymentMethodsService(mockToken, mockSite)
+        paymentMethodsService = new AdyenPaymentMethodsService(mockToken, mockRefreshToken, mockSite)
     })
 
     afterEach(() => {
@@ -37,6 +38,7 @@ describe('AdyenPaymentMethodsService', () => {
             expect(ApiClient).toHaveBeenCalledWith(
                 '/api/adyen/paymentMethods/standalone',
                 mockToken,
+                mockRefreshToken,
                 mockSite
             )
         })

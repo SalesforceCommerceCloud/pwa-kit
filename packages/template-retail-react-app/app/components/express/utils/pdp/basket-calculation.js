@@ -44,26 +44,59 @@ const validateParamsAndGetConfig = (basketId, authToken, site) => {
  * This ensures orderTotal, shippingTotal, and taxTotal are properly calculated
  * @param {string} basketId - The basket ID to calculate totals for
  * @param {string} authToken - Authentication token
+ * @param {string} refreshToken - Refresh token for token renewal
  * @param {object} site - Site configuration object
  * @returns {Promise<object>} - The updated basket with calculated totals
  */
-export const calculateBasketTotals = async (basketId, authToken, site) => {
+export const calculateBasketTotals = async (basketId, authToken, refreshToken, site) => {
     const organizationId = validateParamsAndGetConfig(basketId, authToken, site)
 
     // Use PATCH method to update/calculate the basket
     // This triggers the Commerce Cloud to recalculate all totals
     const requestUrl = `/mobify/proxy/api/checkout/shopper-baskets/v2/organizations/${organizationId}/baskets/${basketId}?siteId=${site.id}`
 
-    const response = await fetch(requestUrl, {
-        method: 'PATCH',
-        headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${authToken}`
-        },
-        body: JSON.stringify({
-            // Empty body - this triggers recalculation without changing anything
+    const makeRequest = async (token) => {
+        return await fetch(requestUrl, {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${token}`
+            },
+            body: JSON.stringify({
+                // Empty body - this triggers recalculation without changing anything
+            })
         })
-    })
+    }
+
+    let response = await makeRequest(authToken)
+
+    // Handle 401 unauthorized errors by attempting token refresh
+    if (response.status === 401 && refreshToken) {
+        try {
+            console.log('🔄 Basket calculation failed with 401, attempting token refresh...')
+            
+            const refreshResponse = await fetch('/api/auth/refresh', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    refreshToken: refreshToken,
+                    siteId: site.id
+                })
+            })
+
+            if (refreshResponse.ok) {
+                const refreshData = await refreshResponse.json()
+                const newAuthToken = refreshData.authToken
+                
+                console.log('🔄 Token refresh successful, retrying basket calculation...')
+                response = await makeRequest(newAuthToken)
+            }
+        } catch (refreshError) {
+            console.error('🔄 Token refresh failed during basket calculation:', refreshError)
+        }
+    }
 
     if (!response.ok) {
         const errorText = await response.text()
@@ -79,22 +112,55 @@ export const calculateBasketTotals = async (basketId, authToken, site) => {
  * Alternative method using direct basket retrieval to get calculated totals
  * @param {string} basketId - The basket ID to retrieve with calculated totals
  * @param {string} authToken - Authentication token
+ * @param {string} refreshToken - Refresh token for token renewal
  * @param {object} site - Site configuration object
  * @returns {Promise<object>} - The basket with current totals
  */
-export const getBasketWithTotals = async (basketId, authToken, site) => {
+export const getBasketWithTotals = async (basketId, authToken, refreshToken, site) => {
     const organizationId = validateParamsAndGetConfig(basketId, authToken, site)
 
     // GET the basket to retrieve current calculated totals
     const requestUrl = `/mobify/proxy/api/checkout/shopper-baskets/v2/organizations/${organizationId}/baskets/${basketId}?siteId=${site.id}`
 
-    const response = await fetch(requestUrl, {
-        method: 'GET',
-        headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${authToken}`
+    const makeRequest = async (token) => {
+        return await fetch(requestUrl, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${token}`
+            }
+        })
+    }
+
+    let response = await makeRequest(authToken)
+
+    // Handle 401 unauthorized errors by attempting token refresh
+    if (response.status === 401 && refreshToken) {
+        try {
+            console.log('🔄 Basket retrieval failed with 401, attempting token refresh...')
+            
+            const refreshResponse = await fetch('/api/auth/refresh', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    refreshToken: refreshToken,
+                    siteId: site.id
+                })
+            })
+
+            if (refreshResponse.ok) {
+                const refreshData = await refreshResponse.json()
+                const newAuthToken = refreshData.authToken
+                
+                console.log('🔄 Token refresh successful, retrying basket retrieval...')
+                response = await makeRequest(newAuthToken)
+            }
+        } catch (refreshError) {
+            console.error('🔄 Token refresh failed during basket retrieval:', refreshError)
         }
-    })
+    }
 
     if (!response.ok) {
         const errorText = await response.text()
@@ -111,12 +177,13 @@ export const getBasketWithTotals = async (basketId, authToken, site) => {
  * This ensures orderTotal is calculated before payment processing
  * @param {string} basketId - The basket ID to finalize
  * @param {string} authToken - Authentication token
+ * @param {string} refreshToken - Refresh token for token renewal
  * @param {object} site - Site configuration object
  * @returns {Promise<object>} - The finalized basket with orderTotal
  */
-export const forceOrderCalculation = async (basketId, authToken, site) => {
+export const forceOrderCalculation = async (basketId, authToken, refreshToken, site) => {
     // First, get the current basket state
-    const currentBasket = await getBasketWithTotals(basketId, authToken, site)
+    const currentBasket = await getBasketWithTotals(basketId, authToken, refreshToken, site)
 
     // If orderTotal is already calculated, return as-is
     if (currentBasket.orderTotal !== null && currentBasket.orderTotal !== undefined) {
@@ -134,7 +201,7 @@ export const forceOrderCalculation = async (basketId, authToken, site) => {
     }
 
     // Force a final calculation regardless of shipping method success
-    const finalBasket = await calculateBasketTotals(basketId, authToken, site)
+    const finalBasket = await calculateBasketTotals(basketId, authToken, refreshToken, site)
 
     // If still no orderTotal, the basket calculation failed - don't proceed with Apple Pay
     if (finalBasket.orderTotal === null || finalBasket.orderTotal === undefined) {

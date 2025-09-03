@@ -35,6 +35,7 @@ function Express() {
     }, [])
 
     const [authToken, setAuthToken] = useState()
+    const [refreshToken, setRefreshToken] = useState()
 
     // Check for PDP mode flag in URL
     const urlParams = new URLSearchParams(location.search)
@@ -51,6 +52,7 @@ function Express() {
     // Only call this hook when we have all required parameters to prevent hook ordering issues
     const {paymentMethods: adyenPaymentMethods} = useStandalonePaymentMethods(
         authToken || null, // Ensure we always pass a consistent value
+        refreshToken || null, // Ensure we always pass a consistent value
         site || null, // Ensure we always pass a consistent value
         locale || null, // Ensure we always pass a consistent value
         !!(authToken && site && locale) // Only enable when all params are available
@@ -100,6 +102,7 @@ function Express() {
                 if (type === 'basketDataAvailable') {
                     const {basketData, authData} = event.data.data
                     setAuthToken(authData.authToken)
+                    setRefreshToken(authData.refreshToken)
                     setBasketData(basketData)
                 }
 
@@ -107,6 +110,7 @@ function Express() {
                 if (type === 'authDataAvailable') {
                     const authData = event.data.data.authData
                     setAuthToken(authData.authToken)
+                    setRefreshToken(authData.refreshToken)
                 }
             }
         }
@@ -129,6 +133,7 @@ function Express() {
     const expressPaymentContext = {
         adyenPaymentMethods,
         authToken,
+        refreshToken,
         locale,
         site,
         basket,
