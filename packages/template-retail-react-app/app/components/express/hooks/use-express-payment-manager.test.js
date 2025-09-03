@@ -7,31 +7,32 @@
 
 import {renderHook, act} from '@testing-library/react'
 import {
-    useExpressPaymentManager,
-    useExpressPaymentHeight
+    useExpressPaymentHeight,
+    useExpressPaymentManager
 } from '@salesforce/retail-react-app/app/components/express/hooks/use-express-payment-manager'
 import {expressPaymentManager} from '@salesforce/retail-react-app/app/components/express/utils/express-payment-manager'
 
-// Mock the expressPaymentManager
+// Mock the module with inline mock implementation
 jest.mock(
     '@salesforce/retail-react-app/app/components/express/utils/express-payment-manager',
     () => ({
         expressPaymentManager: {
             initialize: jest.fn(),
-            getCurrentHeight: jest.fn(),
+            getCurrentHeight: jest.fn(() => 0),
             addHeightListener: jest.fn(),
             removeHeightListener: jest.fn(),
-            getNumberOfAvailablePaymentMethods: jest.fn(),
             addDoneListener: jest.fn(),
             removeDoneListener: jest.fn(),
+            getNumberOfAvailablePaymentMethods: jest.fn(() => 0),
             isDone: false
         }
-    })
+    }),
 )
 
 describe('useExpressPaymentManager', () => {
     beforeEach(() => {
         jest.clearAllMocks()
+        expressPaymentManager.getNumberOfAvailablePaymentMethods.mockReturnValue(1)
     })
 
     it('should initialize manager with valid payment method IDs', () => {
@@ -45,7 +46,8 @@ describe('useExpressPaymentManager', () => {
     })
 
     it('should set error when no payment method IDs are provided', () => {
-        const {result} = renderHook(() => useExpressPaymentManager([]))
+        const paymentMethodIds = []
+        const {result} = renderHook(() => useExpressPaymentManager(paymentMethodIds))
 
         expect(expressPaymentManager.initialize).not.toHaveBeenCalled()
         expect(result.current.manager).toBe(expressPaymentManager)
@@ -54,7 +56,8 @@ describe('useExpressPaymentManager', () => {
     })
 
     it('should set error when payment method IDs is not an array', () => {
-        const {result} = renderHook(() => useExpressPaymentManager('invalid'))
+        const paymentMethodIds = 'invalid'
+        const {result} = renderHook(() => useExpressPaymentManager(paymentMethodIds))
 
         expect(expressPaymentManager.initialize).not.toHaveBeenCalled()
         expect(result.current.manager).toBe(expressPaymentManager)
@@ -63,7 +66,8 @@ describe('useExpressPaymentManager', () => {
     })
 
     it('should set error when payment method IDs is null', () => {
-        const {result} = renderHook(() => useExpressPaymentManager(null))
+        const paymentMethodIds = null
+        const {result} = renderHook(() => useExpressPaymentManager(paymentMethodIds))
 
         expect(expressPaymentManager.initialize).not.toHaveBeenCalled()
         expect(result.current.manager).toBe(expressPaymentManager)
@@ -72,7 +76,8 @@ describe('useExpressPaymentManager', () => {
     })
 
     it('should set error when payment method IDs is undefined', () => {
-        const {result} = renderHook(() => useExpressPaymentManager(undefined))
+        const paymentMethodIds = undefined
+        const {result} = renderHook(() => useExpressPaymentManager(paymentMethodIds))
 
         expect(expressPaymentManager.initialize).not.toHaveBeenCalled()
         expect(result.current.manager).toBe(expressPaymentManager)
@@ -107,55 +112,6 @@ describe('useExpressPaymentManager', () => {
 
         expect(expressPaymentManager.initialize).toHaveBeenCalledTimes(1)
         expect(expressPaymentManager.initialize).toHaveBeenCalledWith(paymentMethodIds)
-    })
-
-    it('should initialize with available count and done state', () => {
-        expressPaymentManager.getNumberOfAvailablePaymentMethods.mockReturnValue(0)
-        expressPaymentManager.isDone = false
-
-        const paymentMethodIds = ['googlepay', 'applepay']
-        const {result} = renderHook(() => useExpressPaymentManager(paymentMethodIds))
-
-        expect(result.current.availableCount).toBe(0)
-        expect(result.current.isDone).toBe(false)
-    })
-
-    it('should add done listener on mount', () => {
-        const paymentMethodIds = ['googlepay']
-        renderHook(() => useExpressPaymentManager(paymentMethodIds))
-
-        expect(expressPaymentManager.addDoneListener).toHaveBeenCalled()
-    })
-
-    it('should remove done listener on unmount', () => {
-        const paymentMethodIds = ['googlepay']
-        const {unmount} = renderHook(() => useExpressPaymentManager(paymentMethodIds))
-
-        unmount()
-
-        expect(expressPaymentManager.removeDoneListener).toHaveBeenCalled()
-    })
-
-    it('should update available count and done state when done listener is called', () => {
-        const paymentMethodIds = ['googlepay']
-        let doneCallback
-
-        expressPaymentManager.addDoneListener.mockImplementation((callback) => {
-            doneCallback = callback
-        })
-
-        expressPaymentManager.getNumberOfAvailablePaymentMethods
-            .mockReturnValueOnce(0) // Initial call
-            .mockReturnValueOnce(1) // After done callback
-
-        const {result} = renderHook(() => useExpressPaymentManager(paymentMethodIds))
-
-        // Simulate done callback
-        act(() => {
-            doneCallback()
-        })
-
-        expect(result.current.availableCount).toBe(1)
     })
 })
 
@@ -238,12 +194,68 @@ describe('useExpressPaymentHeight', () => {
     })
 })
 
+describe('useDoneListener', () => {
+    const mockDoneListener = jest.fn()
+
+    beforeEach(() => {
+        jest.clearAllMocks()
+        expressPaymentManager.addDoneListener.mockImplementation((listener) => {
+            mockDoneListener.mockImplementation(listener)
+        })
+    })
+
+    it('should initialize with available count and done state', () => {
+        expressPaymentManager.getNumberOfAvailablePaymentMethods.mockReturnValue(0)
+        expressPaymentManager.isDone = false
+
+        const paymentMethodIds = ['googlepay', 'applepay']
+        const {result} = renderHook(() => useExpressPaymentManager(paymentMethodIds))
+
+        expect(result.current.availableCount).toBe(0)
+        expect(result.current.isDone).toBe(false)
+    })
+
+    it('should add done listener on mount', () => {
+        const paymentMethodIds = ['googlepay']
+        renderHook(() => useExpressPaymentManager(paymentMethodIds))
+
+        expect(expressPaymentManager.addDoneListener).toHaveBeenCalled()
+    })
+
+    it('should remove done listener on unmount', () => {
+        const paymentMethodIds = ['googlepay']
+        const {unmount} = renderHook(() => useExpressPaymentManager(paymentMethodIds))
+
+        unmount()
+
+        expect(expressPaymentManager.removeDoneListener).toHaveBeenCalled()
+    })
+
+    it('should update available count and done state when done listener is called', () => {
+        const paymentMethodIds = ['googlepay']
+
+        expressPaymentManager.getNumberOfAvailablePaymentMethods
+            .mockReturnValueOnce(0) // Initial call
+            .mockReturnValueOnce(2) // After done callback
+
+        const {result} = renderHook(() => useExpressPaymentManager(paymentMethodIds))
+
+        // Simulate done callback
+        act(() => {
+            mockDoneListener()
+        })
+
+        expect(result.current.availableCount).toBe(2)
+    })
+})
+
 describe('Hook Integration', () => {
     it('should work together when both hooks are used', () => {
         const paymentMethodIds = ['googlepay', 'applepay']
         const mockHeight = 250
 
         expressPaymentManager.getCurrentHeight.mockReturnValue(mockHeight)
+        expressPaymentManager.getNumberOfAvailablePaymentMethods.mockReturnValue(1)
 
         const {result: managerResult} = renderHook(() => useExpressPaymentManager(paymentMethodIds))
         const {result: heightResult} = renderHook(() => useExpressPaymentHeight())
@@ -254,6 +266,8 @@ describe('Hook Integration', () => {
         expect(expressPaymentManager.initialize).toHaveBeenCalledWith(paymentMethodIds)
         expect(expressPaymentManager.getCurrentHeight).toHaveBeenCalled()
         expect(expressPaymentManager.addHeightListener).toHaveBeenCalled()
+        expect(expressPaymentManager.getNumberOfAvailablePaymentMethods).toHaveBeenCalled()
+        expect(expressPaymentManager.addDoneListener).toHaveBeenCalled()
     })
 
     it('should handle manager errors without affecting height hook', () => {
@@ -266,6 +280,7 @@ describe('Hook Integration', () => {
         const mockHeight = 300
 
         expressPaymentManager.getCurrentHeight.mockReturnValue(mockHeight)
+        expressPaymentManager.getNumberOfAvailablePaymentMethods.mockReturnValue(1)
 
         const {result: managerResult} = renderHook(() => useExpressPaymentManager(paymentMethodIds))
         const {result: heightResult} = renderHook(() => useExpressPaymentHeight())
