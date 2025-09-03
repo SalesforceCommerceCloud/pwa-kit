@@ -1,0 +1,18 @@
+.adyen-checkout__applepay__button {
+    width: 100% !important;
+    height: 40px !important;
+}
+
+.adyen-checkout__paywithgoogle {
+    width: 100% !important;
+    height: 40px !important;
+}
+
+.adyen-checkout__paywithgoogle>div>button, .adyen-checkout__paywithgoogle>div>button.long, .adyen-checkout__paywithgoogle>div>button.short {
+    height: 40px !important; 
+}
+
+.gpay-card-info-container {
+    min-height: 40px !important;
+    min-width: 100% !important;
+}
