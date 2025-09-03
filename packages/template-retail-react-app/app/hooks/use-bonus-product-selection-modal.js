@@ -28,14 +28,14 @@ import {useProducts} from '@salesforce/commerce-sdk-react'
 import DynamicImage from '@salesforce/retail-react-app/app/components/dynamic-image'
 import {findImageGroupBy} from '@salesforce/retail-react-app/app/utils/image-groups-utils'
 import {filterImageGroups} from '@salesforce/retail-react-app/app/utils/product-utils'
-import {useModalState} from './use-modal-state'
-import {useCurrentBasket} from './use-current-basket'
-import BonusProductViewModal from '../components/bonus-product-view-modal'
-import {findAvailableBonusDiscountLineItemId} from '../utils/bonus-product-utils'
-import {addToCartModalTheme} from '../theme/components/project/add-to-cart-modal'
+import {useModalState} from '@salesforce/retail-react-app/app/hooks/use-modal-state'
+import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
+import BonusProductViewModal from '@salesforce/retail-react-app/app/components/bonus-product-view-modal'
+import {findAvailableBonusDiscountLineItemId} from '@salesforce/retail-react-app/app/utils/bonus-product-utils'
+import {addToCartModalTheme} from '@salesforce/retail-react-app/app/theme/components/project/add-to-cart-modal'
 
 // Import AddToCartModal to render it within this provider
-import {AddToCartModal} from './use-add-to-cart-modal'
+import {AddToCartModal} from '@salesforce/retail-react-app/app/hooks/use-add-to-cart-modal'
 
 /**
  * Context for managing the BonusProductSelectionModal.
@@ -293,7 +293,7 @@ export const BonusProductSelectionModal = () => {
                 bonusDiscountLineItemId: computedBonusDiscountLineItemId,
                 promotionId: computedPromotionId
             })
-            
+
             // Close selection modal first, then open view modal after a brief delay
             originalOnClose()
             setTimeout(() => {
@@ -317,83 +317,83 @@ export const BonusProductSelectionModal = () => {
         <>
             {/* Selection Modal - only show if view modal is not open */}
             {!isViewOpen && (
-                <Modal 
-                    size={addToCartModalTheme.modal.size} 
-                    isOpen={isOpen} 
-                    onClose={handleClose} 
-                    scrollBehavior={addToCartModalTheme.modal.scrollBehavior} 
+                <Modal
+                    size={addToCartModalTheme.modal.size}
+                    isOpen={isOpen}
+                    onClose={handleClose}
+                    scrollBehavior={addToCartModalTheme.modal.scrollBehavior}
                     isCentered
                 >
-                <ModalOverlay bg="blackAlpha.300" backdropFilter="blur(10px)" />
-                <ModalContent
-                    margin={addToCartModalTheme.layout.content.margin}
-                    borderRadius={addToCartModalTheme.layout.content.borderRadius}
-                    maxHeight={addToCartModalTheme.layout.content.maxHeight}
-                    overflowY={addToCartModalTheme.layout.content.overflowY}
-                    bg={addToCartModalTheme.colors.background}
-                >
-                    <ModalHeader 
-                        paddingY={addToCartModalTheme.layout.header.paddingY} 
-                        bgColor={addToCartModalTheme.colors.contentBackground} 
-                        borderTopRadius={addToCartModalTheme.layout.content.borderRadius}
-                        borderBottom={addToCartModalTheme.layout.header.borderBottom}
-                        borderColor={addToCartModalTheme.layout.header.borderColor}
+                    <ModalOverlay bg="blackAlpha.300" backdropFilter="blur(10px)" />
+                    <ModalContent
+                        margin={addToCartModalTheme.layout.content.margin}
+                        borderRadius={addToCartModalTheme.layout.content.borderRadius}
+                        maxHeight={addToCartModalTheme.layout.content.maxHeight}
+                        overflowY={addToCartModalTheme.layout.content.overflowY}
+                        bg={addToCartModalTheme.colors.background}
                     >
-                        <Heading as="h3" fontSize={24} fontWeight="700">
-                            {intl.formatMessage(
-                                {
-                                    id: 'bonus_product_modal.title',
-                                    defaultMessage:
-                                        'Select Bonus Product ({selected} of {max} selected)'
-                                },
-                                {selected: selectedBonusItems, max: maxBonusItems}
-                            )}
-                        </Heading>
-                    </ModalHeader>
+                        <ModalHeader
+                            paddingY={addToCartModalTheme.layout.header.paddingY}
+                            bgColor={addToCartModalTheme.colors.contentBackground}
+                            borderTopRadius={addToCartModalTheme.layout.content.borderRadius}
+                            borderBottom={addToCartModalTheme.layout.header.borderBottom}
+                            borderColor={addToCartModalTheme.layout.header.borderColor}
+                        >
+                            <Heading as="h3" fontSize={24} fontWeight="700">
+                                {intl.formatMessage(
+                                    {
+                                        id: 'bonus_product_modal.title',
+                                        defaultMessage:
+                                            'Select Bonus Product ({selected} of {max} selected)'
+                                    },
+                                    {selected: selectedBonusItems, max: maxBonusItems}
+                                )}
+                            </Heading>
+                        </ModalHeader>
 
-                    <ModalBody 
-                        bgColor={addToCartModalTheme.colors.contentBackground} 
-                        padding={addToCartModalTheme.layout.body.padding}
-                        marginBottom={addToCartModalTheme.layout.body.marginBottom}
-                    >
-                        {bonusProducts.length === 0 ? (
-                            <Text textAlign="center" color="gray.500" py="8">
-                                {intl.formatMessage({
-                                    id: 'bonus_product_modal.no_bonus_products',
-                                    defaultMessage: 'No bonus products available'
-                                })}
-                            </Text>
-                        ) : (
-                            <VStack spacing="4">
-                                <SimpleGrid columns={{base: 1, md: 3}} spacing="4" width="100%">
-                                    {uniqueBonusProducts.map((product) => {
-                                        const foundProductData = productData?.data?.find(
-                                            (p) => p.id === product.productId
-                                        )
-                                        return (
-                                            <BonusProductItem
-                                                key={product.productId}
-                                                product={product}
-                                                productData={foundProductData}
-                                                foundProductData={foundProductData}
-                                                onSelect={switchToProductView}
-                                                isLoading={isLoading}
-                                            />
-                                        )
+                        <ModalBody
+                            bgColor={addToCartModalTheme.colors.contentBackground}
+                            padding={addToCartModalTheme.layout.body.padding}
+                            marginBottom={addToCartModalTheme.layout.body.marginBottom}
+                        >
+                            {bonusProducts.length === 0 ? (
+                                <Text textAlign="center" color="gray.500" py="8">
+                                    {intl.formatMessage({
+                                        id: 'bonus_product_modal.no_bonus_products',
+                                        defaultMessage: 'No bonus products available'
                                     })}
-                                </SimpleGrid>
-                            </VStack>
-                        )}
-                    </ModalBody>
-                    <ModalCloseButton 
-                        size="md" 
-                        position="absolute" 
-                        top="4" 
-                        right="4" 
-                        bg="white"
-                        _hover={{bg: "gray.100"}}
-                    />
-                </ModalContent>
+                                </Text>
+                            ) : (
+                                <VStack spacing="4">
+                                    <SimpleGrid columns={{base: 1, md: 3}} spacing="4" width="100%">
+                                        {uniqueBonusProducts.map((product) => {
+                                            const foundProductData = productData?.data?.find(
+                                                (p) => p.id === product.productId
+                                            )
+                                            return (
+                                                <BonusProductItem
+                                                    key={product.productId}
+                                                    product={product}
+                                                    productData={foundProductData}
+                                                    foundProductData={foundProductData}
+                                                    onSelect={switchToProductView}
+                                                    isLoading={isLoading}
+                                                />
+                                            )
+                                        })}
+                                    </SimpleGrid>
+                                </VStack>
+                            )}
+                        </ModalBody>
+                        <ModalCloseButton
+                            size="md"
+                            position="absolute"
+                            top="4"
+                            right="4"
+                            bg="white"
+                            _hover={{bg: 'gray.100'}}
+                        />
+                    </ModalContent>
                 </Modal>
             )}
 

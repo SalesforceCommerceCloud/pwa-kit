@@ -15,6 +15,11 @@ lerna-debug.log
 /playwright-report/
 /playwright/.cache/
 
+# Build directories and distribution files
+build/
+**/build/
+**/dist/
+
 # GitHub Actions (Node.js) require built artifacts to be committed.
 # Runners do not run `npm install` for actions; `runs.main`/`runs.post` must point to files in `dist/`.
 # We generally ignore all dist directories, but allow the action’s dist so the action can execute.

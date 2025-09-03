@@ -185,9 +185,9 @@ const BonusProductViewModal = ({
     }, [productViewModalData.product, safeProduct])
 
     return (
-        <Modal 
-            isOpen={isOpen} 
-            onClose={onClose} 
+        <Modal
+            isOpen={isOpen}
+            onClose={onClose}
             size={productViewModalTheme.modal.size}
             closeOnOverlayClick={true}
             closeOnEsc={true}

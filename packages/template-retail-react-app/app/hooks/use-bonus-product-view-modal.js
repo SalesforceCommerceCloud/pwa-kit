@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import {useModalState} from './use-modal-state'
+import {useModalState} from '@salesforce/retail-react-app/app/hooks/use-modal-state'
 
 /**
  * Hook for managing the bonus product view modal state
@@ -17,4 +17,3 @@ export const useBonusProductViewModal = () => {
     })
     return {isOpen, data, onOpen, onClose}
 }
-

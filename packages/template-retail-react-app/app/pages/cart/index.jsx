@@ -62,8 +62,7 @@ import {
     useShopperBasketsMutation,
     useProducts,
     useShopperCustomersMutation,
-    useStores,
-    useBasketProductsWithPromotions
+    useStores
 } from '@salesforce/commerce-sdk-react'
 import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
 import UnavailableProductConfirmationModal from '@salesforce/retail-react-app/app/components/unavailable-product-confirmation-modal'
@@ -71,8 +70,15 @@ import {getUpdateBundleChildArray} from '@salesforce/retail-react-app/app/utils/
 import {isPickupShipment} from '@salesforce/retail-react-app/app/utils/shipment-utils'
 import {useSelectedStore} from '@salesforce/retail-react-app/app/hooks/use-selected-store'
 import {useMultiship} from '@salesforce/retail-react-app/app/hooks/use-multiship'
-import {useBonusProductViewModal} from '@salesforce/retail-react-app/app/components/product-view-modal/bonus/use-bonus-product-view-modal'
-import {useBonusProductSelectionModalContext} from '@salesforce/retail-react-app/app/components/product-view-modal/bonus/bonus-product-selection-modal-context'
+
+// Bonus Product Utilities
+import {
+    getRemainingAvailableBonusProductsForProduct,
+    getPromotionCalloutText,
+    useBasketProductsWithPromotions
+} from '@salesforce/retail-react-app/app/utils/bonus-product-utils'
+import SelectBonusProductCard from '@salesforce/retail-react-app/app/pages/cart/partials/select-bonus-products-card'
+import {useBonusProductSelectionModalContext} from '@salesforce/retail-react-app/app/hooks/use-bonus-product-selection-modal'
 
 const DEBOUNCE_WAIT = 750
 
@@ -255,11 +261,10 @@ const Cart = () => {
     }, [basket, products, bundleChildProductData])
 
     // Bonus Product Logic
-    const {data: productsWithPromotions, isLoading: isPromotionDataLoading} = useBasketProductsWithPromotions(basket)
+    const {data: productsWithPromotions} = useBasketProductsWithPromotions(basket)
 
-    const bonusProductViewModal = useBonusProductViewModal()
     const {onOpen: openBonusSelectionModal} = useBonusProductSelectionModalContext()
-    
+
     // Handle opening bonus product selection modal (not the view modal directly)
     const handleSelectBonusProducts = () => {
         const bonusDiscountLineItems = basket?.bonusDiscountLineItems || []
@@ -952,6 +957,61 @@ const Cart = () => {
                                                             )
                                                         }
                                                     />
+
+                                                    {/* Select Bonus Products Card */}
+                                                    {(() => {
+                                                        const qualifyingProduct =
+                                                            shipmentInfo.categorizedProducts
+                                                                .regularProducts[0]
+
+                                                        if (!qualifyingProduct) {
+                                                            return null
+                                                        }
+
+                                                        // Use the utility function as intended
+                                                        const remainingBonusProductsData =
+                                                            getRemainingAvailableBonusProductsForProduct(
+                                                                basket,
+                                                                qualifyingProduct.productId,
+                                                                productsWithPromotions
+                                                            )
+
+                                                        if (
+                                                            remainingBonusProductsData.bonusItems
+                                                                ?.length === 0
+                                                        ) {
+                                                            console.log(
+                                                                'Debug - No bonus items found, card hidden'
+                                                            )
+                                                            return null
+                                                        }
+
+                                                        return (
+                                                            <SelectBonusProductCard
+                                                                qualifyingProduct={
+                                                                    qualifyingProduct
+                                                                }
+                                                                basket={basket}
+                                                                productsWithPromotions={
+                                                                    productsWithPromotions
+                                                                }
+                                                                remainingBonusProductsData={
+                                                                    remainingBonusProductsData
+                                                                }
+                                                                isEligible={true}
+                                                                getPromotionCalloutText={
+                                                                    getPromotionCalloutText
+                                                                }
+                                                                onSelectBonusProducts={
+                                                                    handleSelectBonusProducts
+                                                                }
+                                                                bonusDiscountLineItem={
+                                                                    basket
+                                                                        .bonusDiscountLineItems?.[0]
+                                                                }
+                                                            />
+                                                        )
+                                                    })()}
                                                 </>
                                             )}
                                         </Box>

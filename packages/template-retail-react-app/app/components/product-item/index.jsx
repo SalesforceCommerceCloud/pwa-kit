@@ -57,7 +57,11 @@ const ProductItem = ({
         >
             <ItemVariantProvider variant={product}>
                 {showLoading && <LoadingSpinner />}
-                <Stack layerStyle={hideBorder ? undefined : "cardBordered"} align="flex-start" {...containerStyles}>
+                <Stack
+                    layerStyle={hideBorder ? undefined : 'cardBordered'}
+                    align="flex-start"
+                    {...containerStyles}
+                >
                     <Flex width="full" alignItems="flex-start" backgroundColor="white">
                         <CartItemVariantImage width={['88px', '136px']} mr={4} />
                         <Stack spacing={3} flex={1}>

@@ -59,4 +59,3 @@ SelectBonusProductsButton.propTypes = {
 }
 
 export default SelectBonusProductsButton
-
