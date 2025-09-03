@@ -349,13 +349,8 @@ export default function ShippingMethods() {
                         // Multiple shipments summary
                         <Stack spacing={2}>
                             {deliveryShipments.map((shipment) => {
-                                const shippingItem = basket?.shippingItems?.find(
-                                    (item) => item.shipmentId === shipment.shipmentId
-                                )
-                                const itemCost =
-                                    shippingItem?.priceAfterItemDiscount !== undefined
-                                        ? shippingItem.priceAfterItemDiscount
-                                        : shippingItem?.price || 0
+                                // Use shipment.shippingTotal instead of looping on shippingItems to include all costs (base _ promotions + surcharges + other fees)
+                                const itemCost = shipment.shippingTotal || 0
                                 return (
                                     <Box key={shipment.shipmentId}>
                                         <Flex justify="space-between" w="full">
