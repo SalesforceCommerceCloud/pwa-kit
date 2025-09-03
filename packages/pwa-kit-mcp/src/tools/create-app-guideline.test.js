@@ -24,7 +24,7 @@ describe('PWA Create App Guidelines', () => {
     describe('CreateAppGuidelineTool', () => {
         it('should have correct structure', () => {
             expect(CreateAppGuidelineTool).toMatchObject({
-                name: 'create_app_guidelines',
+                name: 'create_storefront_app',
                 description: `
     
 This tool is used to provide the agent with the instructions on how to use the @salesforce/pwa-kit-create-app CLI tool to create a new PWA Kit projects.
