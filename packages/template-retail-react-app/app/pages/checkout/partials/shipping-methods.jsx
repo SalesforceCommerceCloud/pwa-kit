@@ -349,6 +349,7 @@ export default function ShippingMethods() {
                         // Multiple shipments summary
                         <Stack spacing={2}>
                             {deliveryShipments.map((shipment) => {
+                                // Use shipment.shippingTotal instead of looping on shippingItems to include all costs (base _ promotions + surcharges + other fees)
                                 const itemCost = shipment.shippingTotal || 0
                                 return (
                                     <Box key={shipment.shipmentId}>
