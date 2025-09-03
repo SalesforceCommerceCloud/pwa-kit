@@ -70,9 +70,11 @@ jest.mock('@salesforce/retail-react-app/app/hooks/use-refresh-token', () => ({
     default: jest.fn()
 }))
 
-// Mock the useUsid hook
+// Mock the commerce-sdk-react hooks
 jest.mock('@salesforce/commerce-sdk-react', () => ({
-    useUsid: jest.fn()
+    useUsid: jest.fn(),
+    useAccessToken: jest.fn(),
+    useCustomerId: jest.fn()
 }))
 
 // Mock the useMultiSite hook
@@ -89,7 +91,7 @@ jest.mock('@salesforce/retail-react-app/app/components/shared/ui', () => ({
 // Import mocked hooks
 import useScript from '@salesforce/retail-react-app/app/hooks/use-script'
 import useMiaw from '@salesforce/retail-react-app/app/hooks/use-miaw'
-import {useUsid} from '@salesforce/commerce-sdk-react'
+import {useUsid, useAccessToken, useCustomerId} from '@salesforce/commerce-sdk-react'
 import useRefreshToken from '@salesforce/retail-react-app/app/hooks/use-refresh-token'
 import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
 import {useTheme} from '@salesforce/retail-react-app/app/components/shared/ui'
@@ -98,6 +100,8 @@ import {useTheme} from '@salesforce/retail-react-app/app/components/shared/ui'
 const mockedUseScript = useScript
 const mockedUseMiaw = useMiaw
 const mockedUseUsid = useUsid
+const mockedUseAccessToken = useAccessToken
+const mockedUseCustomerId = useCustomerId
 const mockedUseRefreshToken = useRefreshToken
 const mockedUseMultiSite = useMultiSite
 const mockedUseTheme = useTheme
@@ -149,12 +153,20 @@ describe('ShopperAgent Component', () => {
             }
         })
 
+        // Mock useAccessToken hook
+        mockedUseAccessToken.mockReturnValue({
+            getTokenWhenReady: jest.fn().mockResolvedValue('test-access-token')
+        })
+
         // Mock useLocation hook
         mockUseLocation.mockReturnValue({
             pathname: '/current-page',
             search: '',
             hash: ''
         })
+
+        // Mock useCustomerId hook
+        mockedUseCustomerId.mockReturnValue('test-customer-id')
 
         // Mock useAppOrigin hook
         mockUseAppOrigin.mockReturnValue('https://example.com')
@@ -955,7 +967,7 @@ describe('ShopperAgent Component', () => {
         })
     })
 
-    describe('Domain URL Event Functionality', () => {
+    describe('PWA Context Functionality', () => {
         beforeEach(() => {
             // Mock postMessage for iframe communication
             global.postMessage = jest.fn()
@@ -968,64 +980,125 @@ describe('ShopperAgent Component', () => {
                 }
             }
             jest.spyOn(document, 'querySelector').mockReturnValue(mockIframe)
+
+            // Mock window.location.origin
+            Object.defineProperty(window, 'location', {
+                value: {
+                    origin: 'https://test.example.com'
+                },
+                writable: true
+            })
         })
 
         afterEach(() => {
             jest.restoreAllMocks()
         })
 
-        test('should handle lwc.getDomainUrl event and send domain URL', async () => {
-            render(<ShopperAgent {...defaultProps} />)
-
-            // Mock iframe for postMessage
-            const mockIframe = {
-                src: 'https://test.salesforce.com/iframe',
-                contentWindow: {
-                    postMessage: jest.fn()
+        test('should handle PWA context request and send correct data', async () => {
+            const props = {
+                ...defaultProps,
+                commerceAgentConfiguration: {
+                    ...commerceAgentSettings,
+                    siteId: 'test-site-id'
                 }
             }
-            jest.spyOn(document, 'querySelector').mockReturnValue(mockIframe)
 
-            // Simulate MIAW event requesting domain URL
+            render(<ShopperAgent {...props} />)
+
+            // Simulate MIAW event requesting PWA context
             const mockEvent = {
-                source: {postMessage: jest.fn()},
-                data: {type: 'lwc.getDomainUrl'}
+                source: document.createElement('iframe'),
+                data: {type: 'lwc.getPwaContext'}
             }
 
+            // Trigger the event
             await act(async () => {
                 window.dispatchEvent(new MessageEvent('message', mockEvent))
             })
 
-            // Verify postMessage was called with domain URL
+            // Verify postMessage was called with correct data
+            const mockIframe = document.querySelector('div.embedded-messaging iframe')
             expect(mockIframe.contentWindow.postMessage).toHaveBeenCalledWith(
                 {
-                    type: 'conversational.domainUrl',
+                    type: 'lwc.pwaContext',
                     payload: {
-                        domainUrl: 'https://example.com/us/en-US'
+                        pwaDomainUrl: 'https://test.example.com',
+                        pwaSiteId: 'test-site-id',
+                        pwaLocale: 'en-US'
                     }
                 },
                 'https://test.salesforce.com'
             )
         })
 
-        test('should handle lwc.getDomainUrl event properly when iframe not found', async () => {
-            render(<ShopperAgent {...defaultProps} />)
+        test('should handle PWA context request with different site ID', async () => {
+            const props = {
+                ...defaultProps,
+                commerceAgentConfiguration: {
+                    ...commerceAgentSettings,
+                    siteId: 'different-site-id'
+                }
+            }
 
-            // Mock querySelector to return null (iframe not found)
-            jest.spyOn(document, 'querySelector').mockReturnValue(null)
+            render(<ShopperAgent {...props} />)
 
-            // Simulate MIAW event
             const mockEvent = {
                 source: {postMessage: jest.fn()},
-                data: {type: 'lwc.getDomainUrl'}
+                data: {type: 'lwc.getPwaContext'}
             }
 
             await act(async () => {
                 window.dispatchEvent(new MessageEvent('message', mockEvent))
             })
 
-            // Should handle missing iframe gracefully without throwing
-            expect(() => render(<ShopperAgent {...defaultProps} />)).not.toThrow()
+            const mockIframe = document.querySelector('div.embedded-messaging iframe')
+            expect(mockIframe.contentWindow.postMessage).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    payload: expect.objectContaining({
+                        pwaSiteId: 'different-site-id'
+                    })
+                }),
+                expect.any(String)
+            )
+        })
+
+        test('should handle PWA context request with different domain', async () => {
+            // Mock different domain
+            Object.defineProperty(window, 'location', {
+                value: {
+                    origin: 'https://different.example.com'
+                },
+                writable: true
+            })
+
+            const props = {
+                ...defaultProps,
+                commerceAgentConfiguration: {
+                    ...commerceAgentSettings,
+                    siteId: 'test-site-id'
+                }
+            }
+
+            render(<ShopperAgent {...props} />)
+
+            const mockEvent = {
+                source: {postMessage: jest.fn()},
+                data: {type: 'lwc.getPwaContext'}
+            }
+
+            await act(async () => {
+                window.dispatchEvent(new MessageEvent('message', mockEvent))
+            })
+
+            const mockIframe = document.querySelector('div.embedded-messaging iframe')
+            expect(mockIframe.contentWindow.postMessage).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    payload: expect.objectContaining({
+                        pwaDomainUrl: 'https://different.example.com'
+                    })
+                }),
+                expect.any(String)
+            )
         })
     })
 })
