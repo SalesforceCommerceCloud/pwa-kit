@@ -87,8 +87,6 @@ jobs:
       - name: Run unit tests
         uses: "./.github/actions/unit_tests"
 
-
-
       - name: Smoke test scripts
         if: env.IS_DEFAULT_NPM == 'true'
         uses: "./.github/actions/smoke_tests"
@@ -119,8 +117,20 @@ jobs:
         if: env.IS_NOT_FORK == 'true' && env.IS_DEFAULT_NPM == 'true'
         uses: "./.github/actions/check_clean"
 
+      - name: Check if monorepo version is a dev version
+        run: |-
+          version=`jq -r ".version" package.json`
+          echo "The monorepo version is $version"
+          if echo "$version" | grep -Eiq "[0-9]-dev(\.|$)"; then
+            echo "Dev version detected."
+            echo "IS_DEV_VERSION=true" >> "$GITHUB_ENV"
+          else
+            echo "Monorepo is not on a dev version."
+            echo "IS_DEV_VERSION=false" >> "$GITHUB_ENV"
+          fi
+
       - name: Publish to NPM
-        if: env.IS_NOT_FORK == 'true' && env.IS_MRT_NODE == 'true' && env.RELEASE == 'true'
+        if: env.IS_NOT_FORK == 'true' && env.IS_MRT_NODE == 'true' && env.RELEASE == 'true' && env.IS_DEV_VERSION == 'false'
         uses: "./.github/actions/publish_to_npm"
         with:
           NODE_AUTH_TOKEN: ${{ secrets.NODE_AUTH_TOKEN }}
@@ -188,7 +198,6 @@ jobs:
     runs-on: ubuntu-latest
     env:
       IS_TEMPLATE_FROM_RETAIL_REACT_APP: ${{ matrix.template == 'retail-react-app-test-project' || matrix.template == 'retail-react-app-demo' }}
-      PROJECT_DIR: generated-${{ matrix.template }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -201,31 +210,39 @@ jobs:
       - name: Setup Ubuntu Machine
         uses: "./.github/actions/setup_ubuntu"
 
+      - name: Set project directory with generated projects path
+        run: |
+          GENERATED_PROJECTS_DIR=$(node -e "console.log(require('./e2e/config.js').GENERATED_PROJECTS_DIR)")
+          echo "PATH_TO_PROJECT_DIR=$GENERATED_PROJECTS_DIR/generated-${{ matrix.template }}" >> $GITHUB_ENV
+
+      - name: Create generated-projects directory
+        run: mkdir -p "$(dirname "${{ env.PATH_TO_PROJECT_DIR }}")"
+
       - name: Generate ${{ matrix.template }} project
         run: |-
-          node packages/pwa-kit-create-app/scripts/create-mobify-app-dev.js --outputDir ${{ env.PROJECT_DIR }}
+          node packages/pwa-kit-create-app/scripts/create-mobify-app-dev.js --outputDir "${{ env.PATH_TO_PROJECT_DIR }}"
         env:
           GENERATOR_PRESET: ${{ matrix.template }}
         timeout-minutes: 8
-
-
 
       - name: Run unit tests
         if: env.IS_TEMPLATE_FROM_RETAIL_REACT_APP == 'true'
         uses: "./.github/actions/unit_tests"
         with:
-          cwd: ${{ env.PROJECT_DIR }}
+          cwd: ${{ env.PATH_TO_PROJECT_DIR }}
 
       - name: Run smoke tests
         if: env.IS_TEMPLATE_FROM_RETAIL_REACT_APP == 'true'
         uses: "./.github/actions/smoke_tests"
         with:
-          dir: ${{ env.PROJECT_DIR }}
+          dir: ${{ env.PATH_TO_PROJECT_DIR }}
 
       - name: Count Generated Project Dependencies
         id: count_deps
         if: env.IS_TEMPLATE_FROM_RETAIL_REACT_APP == 'true'
         uses: "./.github/actions/count_deps"
+        with:
+          project_dir: ${{ env.PATH_TO_PROJECT_DIR }}
 
       - name: Store Verdaccio logfile artifact
         uses: actions/upload-artifact@v4
@@ -260,7 +277,7 @@ jobs:
         if: env.IS_NOT_FORK == 'true' && env.DEVELOP == 'true' && matrix.template == 'retail-react-app-test-project'
         uses: "./.github/actions/push_to_mrt"
         with:
-          CWD: ${{ env.PROJECT_DIR }}
+          CWD: ${{ env.PATH_TO_PROJECT_DIR }}
           TARGET: generated-pwa
 
       - name: Send GitHub Action data to Slack workflow (Generated)
@@ -283,7 +300,6 @@ jobs:
     runs-on: windows-latest
     env:
       IS_TEMPLATE_FROM_RETAIL_REACT_APP: ${{ matrix.template == 'retail-react-app-test-project' || matrix.template == 'retail-react-app-demo' }}
-      PROJECT_DIR: generated-${{ matrix.template }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -296,30 +312,40 @@ jobs:
       - name: Setup Windows Machine
         uses: "./.github/actions/setup_windows"
 
+      - name: Set project directory with generated projects path
+        run: |
+          GENERATED_PROJECTS_DIR=$(node -e "console.log(require('./e2e/config.js').GENERATED_PROJECTS_DIR)")
+          echo "PATH_TO_PROJECT_DIR=$GENERATED_PROJECTS_DIR/generated-${{ matrix.template }}" >> $GITHUB_ENV
+        shell: bash
+
+      - name: Create generated-projects directory
+        run: mkdir -p "$(dirname "${{ env.PATH_TO_PROJECT_DIR }}")"
+        shell: bash
+
       - name: Generate ${{ matrix.template }} project
         run: |-
-          node packages/pwa-kit-create-app/scripts/create-mobify-app-dev.js --outputDir ${{ env.PROJECT_DIR }}
+          node packages/pwa-kit-create-app/scripts/create-mobify-app-dev.js --outputDir "${{ env.PATH_TO_PROJECT_DIR }}"
         env:
           GENERATOR_PRESET: ${{ matrix.template }}
         timeout-minutes: 7
-
-
 
       - name: Run unit tests
         if: env.IS_TEMPLATE_FROM_RETAIL_REACT_APP == 'true'
         uses: "./.github/actions/unit_tests"
         with:
-          cwd: ${{ env.PROJECT_DIR }}
+          cwd: ${{ env.PATH_TO_PROJECT_DIR }}
 
       - name: Run smoke tests
         if: env.IS_TEMPLATE_FROM_RETAIL_REACT_APP == 'true'
         uses: "./.github/actions/smoke_tests"
         with:
-          dir: ${{ env.PROJECT_DIR }}
+          dir: ${{ env.PATH_TO_PROJECT_DIR }}
 
       - name: Count Generated Project Dependencies
         if: env.IS_TEMPLATE_FROM_RETAIL_REACT_APP == 'true'
         uses: "./.github/actions/count_deps"
+        with:
+          project_dir: ${{ env.PATH_TO_PROJECT_DIR }}
 
       - name: Store Verdaccio logfile artifact
         uses: actions/upload-artifact@v4

@@ -34,7 +34,7 @@ module.exports = {
             },
             {
                 expectedPrompt: /Do you wish to use template extensibility?/i,
-                response: '2\n'
+                response: '1\n'
             },
             {
                 expectedPrompt: /What is the name of your Project?/i,
@@ -72,7 +72,7 @@ module.exports = {
             },
             {
                 expectedPrompt: /Do you wish to use template extensibility?/i,
-                response: '1\n'
+                response: '2\n'
             },
             {
                 expectedPrompt: /What is the name of your Project?/i,

@@ -22,7 +22,7 @@ const validateGeneratedArtifacts = async (project) => {
 
         return new Promise((resolve, reject) => {
             const missingArtifacts = diffArrays(
-                config.EXPECTED_GENERATED_ARTIFACTS[project],
+                config.EXPECTED_GENERATED_ARTIFACTS[project] || [],
                 generatedArtifacts
             )
             if (missingArtifacts && missingArtifacts.length > 0) {
@@ -72,12 +72,13 @@ const main = async (opts) => {
     }
 
     try {
-        console.log(await validateGeneratedArtifacts(project))
-        if (project === 'retail-app-ext' || project === 'retail-app-ext') {
-            console.log(await validateExtensibilityConfig(project, templateVersion))
+        await validateGeneratedArtifacts(project)
+        if (project === 'retail-app-ext') {
+            await validateExtensibilityConfig(project, templateVersion)
         }
     } catch (err) {
         console.error(err)
+        throw err
     }
 }
 

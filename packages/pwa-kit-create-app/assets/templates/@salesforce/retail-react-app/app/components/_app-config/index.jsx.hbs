@@ -97,7 +97,7 @@ const AppConfig = ({children, locals = {}}) => {
             headers={headers}
             defaultDnt={DEFAULT_DNT_STATE}
             logger={createLogger({packageName: 'commerce-sdk-react'})}
-            passwordlessLoginCallbackURI={passwordlessCallback}
+            passwordlessLoginCallbackURI={passwordlessLoginCallbackURI}
             // Set 'enablePWAKitPrivateClient' to true to use SLAS private client login flows.
             // Make sure to also enable useSLASPrivateClient in ssr.js when enabling this setting.
             {{#if answers.project.commerce.isSlasPrivate}}
