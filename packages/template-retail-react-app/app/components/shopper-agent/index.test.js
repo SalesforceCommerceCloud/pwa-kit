@@ -54,9 +54,11 @@ jest.mock('@salesforce/retail-react-app/app/hooks/use-refresh-token', () => ({
     default: jest.fn()
 }))
 
-// Mock the useUsid hook
+// Mock the commerce-sdk-react hooks
 jest.mock('@salesforce/commerce-sdk-react', () => ({
-    useUsid: jest.fn()
+    useUsid: jest.fn(),
+    useAccessToken: jest.fn(),
+    useCustomerId: jest.fn()
 }))
 
 // Mock the useMultiSite hook
@@ -73,7 +75,7 @@ jest.mock('@salesforce/retail-react-app/app/components/shared/ui', () => ({
 // Import mocked hooks
 import useScript from '@salesforce/retail-react-app/app/hooks/use-script'
 import useMiaw from '@salesforce/retail-react-app/app/hooks/use-miaw'
-import {useUsid} from '@salesforce/commerce-sdk-react'
+import {useUsid, useAccessToken, useCustomerId} from '@salesforce/commerce-sdk-react'
 import useRefreshToken from '@salesforce/retail-react-app/app/hooks/use-refresh-token'
 import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
 import {useTheme} from '@salesforce/retail-react-app/app/components/shared/ui'
@@ -82,6 +84,8 @@ import {useTheme} from '@salesforce/retail-react-app/app/components/shared/ui'
 const mockedUseScript = useScript
 const mockedUseMiaw = useMiaw
 const mockedUseUsid = useUsid
+const mockedUseAccessToken = useAccessToken
+const mockedUseCustomerId = useCustomerId
 const mockedUseRefreshToken = useRefreshToken
 const mockedUseMultiSite = useMultiSite
 const mockedUseTheme = useTheme
@@ -119,6 +123,14 @@ describe('ShopperAgent Component', () => {
 
         // Mock useUsid hook
         mockedUseUsid.mockReturnValue({usid: 'test-usid'})
+
+        // Mock useAccessToken hook
+        mockedUseAccessToken.mockReturnValue({
+            getTokenWhenReady: jest.fn().mockResolvedValue('test-access-token')
+        })
+
+        // Mock useCustomerId hook
+        mockedUseCustomerId.mockReturnValue('test-customer-id')
 
         // Mock useMultiSite hook with proper structure
         mockedUseMultiSite.mockReturnValue({

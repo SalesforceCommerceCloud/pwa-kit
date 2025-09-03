@@ -25,6 +25,8 @@ import {getRuntime} from '@salesforce/pwa-kit-runtime/ssr/server/express'
 import {defaultPwaKitSecurityHeaders} from '@salesforce/pwa-kit-runtime/utils/middleware'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import {getAppOrigin} from '@salesforce/pwa-kit-react-sdk/utils/url'
+import {registerAdyenEndpoints} from '@adyen/adyen-salesforce-pwa/dist/ssr/index.js'
+import standalonePaymentMethodsHandler from './api/adyen/paymentMethods/standalone.js'
 
 const config = getConfig()
 
@@ -313,24 +315,36 @@ const {handler} = runtime.createHandler(options, (app) => {
                 directives: {
                     'img-src': [
                         // Default source for product images - replace with your CDN
-                        '*.commercecloud.salesforce.com'
+                        '*.commercecloud.salesforce.com',
+                        'checkoutshopper-test.adyen.com',
+                        // Allow Google Pay specific images
+                        'https://www.gstatic.com/'
                     ],
                     'script-src': [
                         // Used by the service worker in /worker/main.js
-                        'storage.googleapis.com'
+                        'storage.googleapis.com',
+                        '*.adyen.com',
+                        'https://checkoutshopper-test.adyen.com',
+                        'https://pay.google.com/gp/p/js/pay.js'
                     ],
                     'connect-src': [
                         // Connect to Einstein APIs
                         'api.cquotient.com',
                         // Connect to DataCloud APIs
                         '*.c360a.salesforce.com',
+                        'https://api.lab.amplitude.com/sdk/vardata',
+                        '*.adyen.com',
                         // Connect to SCRT2 URLs
                         '*.salesforce-scrt.com'
                     ],
                     'frame-src': [
                         // Allow frames from Salesforce site.com (Needed for MIAW)
-                        '*.site.com'
-                    ]
+                        '*.site.com',
+                        'checkoutshopper-test.adyen.com',
+                        // Allow Google Pay Specific frames
+                        'https://pay.google.com'
+                    ],
+                    'frame-ancestors': ['self']
                 }
             }
         })
@@ -386,6 +400,46 @@ const {handler} = runtime.createHandler(options, (app) => {
     app.get('/favicon.ico', runtime.serveStaticFile('static/ico/favicon.ico'))
 
     app.get('/worker.js(.map)?', runtime.serveServiceWorker)
+    /* -----------------Adyen Begin ------------------------ */
+    /**
+     * Adyen API Endpoints
+     * - Environment
+     * - Payment Methods
+     * - Payments
+     * - Payments Details
+     * - Webhooks
+     *
+     * @param app - express app used to register the routes
+     * @param runtime - express runtime used to render pages after sanitizing the query params
+     * @param overrides (optional) - an object that provides the option for using different endpoint handlers
+     *
+     * @example
+     * const overrides = {
+     *   payments: [PrePaymentsController, PaymentsController, PostPaymentsController],
+     *   webhook: [
+     *      authenticate,
+     *      validateHmac,
+     *      parseNotification,
+     *      authorizationWebhookHandler,
+     *      donationWebhookHandler
+     *  ]
+     * }
+     */
+    registerAdyenEndpoints(app, runtime)
+
+    // Register standalone payment methods endpoint for Apple Pay "Buy Now" flows
+    app.get('/api/adyen/paymentMethods/standalone', async (req, res) => {
+        try {
+            await standalonePaymentMethodsHandler(req, res)
+        } catch (error) {
+            console.error('Error in standalone payment methods endpoint:', error)
+            res.status(500).json({
+                error: 'Internal server error',
+                message: error.message
+            })
+        }
+    })
+
     app.get('*', runtime.render)
 })
 // SSR requires that we export a single handler function called 'get', that
