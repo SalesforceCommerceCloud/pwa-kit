@@ -72,13 +72,13 @@ const main = async (opts) => {
     }
 
     try {
-        console.log(await validateGeneratedArtifacts(project))
-        if (project === 'retail-app-ext' || project === 'retail-app-ext') {
-            console.log(await validateExtensibilityConfig(project, templateVersion))
+        await validateGeneratedArtifacts(project)
+        if (project === 'retail-app-ext') {
+            await validateExtensibilityConfig(project, templateVersion)
         }
     } catch (err) {
         console.error(err)
-        process.exit(1)
+        throw err
     }
 }
 
