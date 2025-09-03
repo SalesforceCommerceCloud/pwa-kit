@@ -25,6 +25,8 @@ import {getRuntime} from '@salesforce/pwa-kit-runtime/ssr/server/express'
 import {defaultPwaKitSecurityHeaders} from '@salesforce/pwa-kit-runtime/utils/middleware'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import {getAppOrigin} from '@salesforce/pwa-kit-react-sdk/utils/url'
+import {registerAdyenEndpoints} from '@adyen/adyen-salesforce-pwa/dist/ssr/index.js'
+import standalonePaymentMethodsHandler from './api/adyen/paymentMethods/standalone.js'
 
 const config = getConfig()
 
@@ -384,6 +386,7 @@ const {handler} = runtime.createHandler(options, (app) => {
                         'api.cquotient.com',
                         // Connect to DataCloud APIs
                         '*.c360a.salesforce.com',
+                        'https://api.lab.amplitude.com/sdk/vardata',
                         'maps.googleapis.com',
                         'places.googleapis.com',
                         // Connect to SCRT2 URLs
@@ -402,9 +405,7 @@ const {handler} = runtime.createHandler(options, (app) => {
                         'google.com/pay',
                         'google.com/pay/',
                         'www.google.com/pay',
-                        'www.google.com/pay/',
-                        // Connect to SFCC/ODS instances
-                        '*.demandware.net'
+                        'www.google.com/pay/'
                     ],
                     'frame-src': [
                         // Allow frames from Salesforce site.com (Needed for MIAW)
@@ -418,7 +419,8 @@ const {handler} = runtime.createHandler(options, (app) => {
                     ],
                     'frame-ancestors': [
                         // Allow Page Designer to embed the storefront in an iframe
-                        '*.demandware.net'
+                        '*.demandware.net',
+                        "'self'"
                     ]
                 }
             }
@@ -512,6 +514,46 @@ const {handler} = runtime.createHandler(options, (app) => {
             res.status(500).json({
                 error: 'Failed to fetch metadata',
                 details: error.message
+            })
+        }
+    })
+
+    /* -----------------Adyen Begin ------------------------ */
+    /**
+     * Adyen API Endpoints
+     * - Environment
+     * - Payment Methods
+     * - Payments
+     * - Payments Details
+     * - Webhooks
+     *
+     * @param app - express app used to register the routes
+     * @param runtime - express runtime used to render pages after sanitizing the query params
+     * @param overrides (optional) - an object that provides the option for using different endpoint handlers
+     *
+     * @example
+     * const overrides = {
+     *   payments: [PrePaymentsController, PaymentsController, PostPaymentsController],
+     *   webhook: [
+     *      authenticate,
+     *      validateHmac,
+     *      parseNotification,
+     *      authorizationWebhookHandler,
+     *      donationWebhookHandler
+     *  ]
+     * }
+     */
+    registerAdyenEndpoints(app, runtime)
+
+    // Register standalone payment methods endpoint for Apple Pay "Buy Now" flows
+    app.get('/api/adyen/paymentMethods/standalone', async (req, res) => {
+        try {
+            await standalonePaymentMethodsHandler(req, res)
+        } catch (error) {
+            console.error('Error in standalone payment methods endpoint:', error)
+            res.status(500).json({
+                error: 'Internal server error',
+                message: error.message
             })
         }
     })

@@ -16,6 +16,7 @@ import {getRuntime} from '@salesforce/pwa-kit-runtime/ssr/server/express'
 import {defaultPwaKitSecurityHeaders} from '@salesforce/pwa-kit-runtime/utils/middleware'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import {getAppOrigin} from '@salesforce/pwa-kit-react-sdk/utils/url'
+import {registerAdyenEndpoints} from '@adyen/adyen-salesforce-pwa/dist/ssr/index.js'
 
 const config = getConfig()
 
@@ -374,6 +375,7 @@ const {handler} = runtime.createHandler(options, (app) => {
                 'api.cquotient.com',
                 // Connect to DataCloud APIs
                 '*.c360a.salesforce.com',
+                'https://api.lab.amplitude.com/sdk/vardata',
                 // Connect to Google Cloud APIs
                 'maps.googleapis.com',
                 'places.googleapis.com',
@@ -404,6 +406,11 @@ const {handler} = runtime.createHandler(options, (app) => {
                 '*.adyen.com',
                 'payments.google.com',
                 'pay.google.com'
+            ],
+            'frame-ancestors': [
+                // Allow Page Designer to embed the storefront in an iframe
+                '*.demandware.net',
+                "'self'"
             ]
         }
     }
@@ -505,6 +512,33 @@ const {handler} = runtime.createHandler(options, (app) => {
             })
         }
     })
+
+    /* -----------------Adyen Begin ------------------------ */
+    /**
+     * Adyen API Endpoints
+     * - Environment
+     * - Payment Methods
+     * - Payments
+     * - Payments Details
+     * - Webhooks
+     *
+     * @param app - express app used to register the routes
+     * @param runtime - express runtime used to render pages after sanitizing the query params
+     * @param overrides (optional) - an object that provides the option for using different endpoint handlers
+     *
+     * @example
+     * const overrides = {
+     *   payments: [PrePaymentsController, PaymentsController, PostPaymentsController],
+     *   webhook: [
+     *      authenticate,
+     *      validateHmac,
+     *      parseNotification,
+     *      authorizationWebhookHandler,
+     *      donationWebhookHandler
+     *  ]
+     * }
+     */
+    registerAdyenEndpoints(app, runtime)
 
     app.get('*', runtime.render)
 })
