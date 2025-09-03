@@ -38,7 +38,8 @@ import {isAbsoluteURL} from '@salesforce/retail-react-app/app/page-designer/util
 
 import {CommerceApiProvider} from '@salesforce/commerce-sdk-react'
 import {withReactQuery} from '@salesforce/pwa-kit-react-sdk/ssr/universal/components/with-react-query'
-import {useCorrelationId} from '@salesforce/pwa-kit-react-sdk/ssr/universal/hooks'
+import {useCorrelationId, useServerContext} from '@salesforce/pwa-kit-react-sdk/ssr/universal/hooks'
+import {createContextualFetch} from '@salesforce/pwa-kit-react-sdk/utils/enhanced-fetch'
 import {ReactQueryDevtools} from '@tanstack/react-query-devtools'
 import {generateSfdcUserAgent} from '@salesforce/retail-react-app/app/utils/sfdc-user-agent-utils'
 import {
@@ -64,6 +65,8 @@ const sfdcUserAgent = generateSfdcUserAgent()
  */
 const AppConfig = ({children, locals = {}}) => {
     const {correlationId} = useCorrelationId()
+    const serverContext = useServerContext()
+
     const headers = {
         'correlation-id': correlationId,
         sfdc_user_agent: sfdcUserAgent
@@ -93,6 +96,21 @@ const AppConfig = ({children, locals = {}}) => {
         ? passwordlessCallback
         : `${appOrigin}${getEnvBasePath()}${passwordlessCallback}`
 
+    // Create enhanced fetch options for performance timing
+    const enhancedFetchOptions = {}
+    if (typeof window === 'undefined' && serverContext?.performanceTimer) {
+        // Server-side: Use enhanced fetch with performance timing
+        enhancedFetchOptions.fetch = createContextualFetch(serverContext)
+    } else if (typeof window !== 'undefined') {
+        // Client-side: Check if server timing is enabled via URL params
+        const urlParams = new URLSearchParams(window.location.search)
+        if (urlParams.has('__server_timing') || process.env.SERVER_TIMING) {
+            enhancedFetchOptions.fetch = createContextualFetch({
+                req: {query: {__server_timing: true}}
+            })
+        }
+    }
+
     return (
         <CommerceApiProvider
             shortCode={commerceApiConfig.parameters.shortCode}
@@ -106,6 +124,7 @@ const AppConfig = ({children, locals = {}}) => {
             proxy={proxy}
             headers={headers}
             defaultDnt={DEFAULT_DNT_STATE}
+            fetchOptions={enhancedFetchOptions}
             // Set 'enablePWAKitPrivateClient' to true to use SLAS private client login flows.
             // Make sure to also enable useSLASPrivateClient in ssr.js when enabling this setting.
             enablePWAKitPrivateClient={false}

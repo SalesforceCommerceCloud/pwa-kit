@@ -70,3 +70,12 @@ export const useOrigin = ({fromXForwardedHeader = false}) => {
     }
     return APP_ORIGIN
 }
+
+/**
+ * Hook to access the performance timer instance from server context
+ * @returns {Object|null} - The performance timer instance or null if not available
+ */
+export const usePerformanceTimer = () => {
+    const context = useServerContext()
+    return context?.performanceTimer || null
+}

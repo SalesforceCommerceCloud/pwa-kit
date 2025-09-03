@@ -88,7 +88,7 @@ const shouldTrackPerformance = (req) => {
 // as best as we can.
 export const getLocationSearch = (req, opts = {}) => {
     const {interpretPlusSignAsSpace = false} = opts
-    const [_, search] = req.originalUrl.split('?')
+    const [_pathname, search] = req.originalUrl.split('?')
     const params = new URLSearchParams(search)
 
     const newParams = new URLSearchParams()
@@ -271,7 +271,7 @@ export const render = (req, res, next) => {
 const OuterApp = ({req, res, error, App, appState, routes, routerContext, location}) => {
     const AppConfig = getAppConfig()
     return (
-        <ServerContext.Provider value={{req, res}}>
+        <ServerContext.Provider value={{req, res, performanceTimer: res.__performanceTimer}}>
             <Router location={location} context={routerContext}>
                 <CorrelationIdProvider
                     correlationId={res.locals.requestId}

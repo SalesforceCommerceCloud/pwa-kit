@@ -24,6 +24,7 @@ export default class PerformanceTimer {
     constructor(options = {}) {
         this.enabled = options.enabled || false
         this.metrics = []
+        this.apiMetrics = [] // Store API timings from Server-Timing headers
         this.spans = new Map()
         this.spanTimeouts = new Map()
         this.maxSpanDuration = options.maxSpanDuration || 30000 // 30 seconds default
@@ -32,6 +33,7 @@ export default class PerformanceTimer {
     /**
      * This is a utility function to build the Server-Timing header.
      * The function receives an array of performance metrics and returns a string that represents the Server-Timing header.
+     * Combines both SSR metrics and API metrics from external services.
      *
      * see https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Server-Timing
      *
@@ -41,24 +43,38 @@ export default class PerformanceTimer {
      * @return {String}
      */
     buildServerTimingHeader() {
-        const header = this.metrics
+        const ssrMetrics = this.metrics
             .map((metric) => {
                 return `${metric.name};dur=${metric.duration.toFixed(2)}`
             })
-            .join(', ')
 
-        return header
+        const apiMetrics = this.apiMetrics
+            .map((metric) => {
+                return `${metric.name};dur=${metric.duration}`
+            })
+
+        const allMetrics = [...ssrMetrics, ...apiMetrics]
+        return allMetrics.join(', ')
     }
 
     /**
      * A utility function to format and log the performance metrics.
+     * Includes both SSR metrics and API metrics from external services.
      *
      * @function
      * @private
      */
     log() {
+        // Log SSR metrics
         this.metrics.forEach((metric) => {
-            logger.info(`${metric.name} - ${metric.duration}ms ${metric.detail || ''}`, {
+            logger.info(`SSR: ${metric.name} - ${metric.duration.toFixed(2)}ms ${metric.detail || ''}`, {
+                namespace: 'performance'
+            })
+        })
+
+        // Log API metrics
+        this.apiMetrics.forEach((metric) => {
+            logger.info(`${metric.source.toUpperCase()}: ${metric.name} - ${metric.duration}ms ${metric.detail || ''}`, {
                 namespace: 'performance'
             })
         })
@@ -198,6 +214,71 @@ export default class PerformanceTimer {
     }
 
     /**
+     * Parse Server-Timing header value and add to API metrics
+     * @param {string} serverTimingHeader - The Server-Timing header value
+     * @param {string} [source='api'] - Source identifier for the timing metrics
+     */
+    addServerTimingMetrics(serverTimingHeader, source = 'api') {
+        if (!this.enabled || !serverTimingHeader) {
+            return
+        }
+
+        try {
+            // Parse Server-Timing header format: name;dur=123.45, name2;dur=67.89
+            const timings = serverTimingHeader.split(',').map((timing) => timing.trim())
+
+            timings.forEach((timing) => {
+                // Match patterns like "name;dur=123.45" or "name;dur=123.45;desc=description"
+                const match = timing.match(/^([^;]+)(?:;dur=([0-9.]+))?(?:;desc=(.+))?/)
+                if (match) {
+                    const [, name, duration, desc] = match
+                    const durationValue = parseFloat(duration) || 0
+
+                    this.apiMetrics.push({
+                        name: `${source}-${name}`,
+                        duration: durationValue,
+                        detail: desc || '',
+                        source
+                    })
+                }
+            })
+        } catch (error) {
+            logger.error('Failed to parse Server-Timing header', {
+                serverTimingHeader,
+                error: error.message,
+                namespace: 'PerformanceTimer.addServerTimingMetrics'
+            })
+        }
+    }
+
+    /**
+     * Add timing metrics from API response headers
+     * @param {Response|Object} response - Fetch Response or similar object with headers
+     * @param {string} [source] - Source identifier (e.g., 'scapi', 'ocapi')
+     */
+    addApiTimingFromResponse(response, source = 'api') {
+        if (!this.enabled || !response) {
+            return
+        }
+
+        try {
+            const serverTimingHeader = response.headers?.get
+                ? response.headers.get('Server-Timing')
+                : response.headers?.['server-timing'] || response.headers?.['Server-Timing']
+
+            if (serverTimingHeader) {
+                this.addServerTimingMetrics(serverTimingHeader, source)
+            }
+        } catch (error) {
+            logger.error('Failed to extract timing from API response', {
+                error: error.message,
+                source,
+                namespace: 'PerformanceTimer.addApiTimingFromResponse'
+            })
+        }
+    }
+
+    /**
      * Clean up all orphaned spans and clear all timeouts
      * Call this when the timer is no longer needed or when you want to force cleanup
      */
@@ -215,5 +296,6 @@ export default class PerformanceTimer {
 
         // Clear metrics as well
         this.metrics = []
+        this.apiMetrics = []
     }
 }
