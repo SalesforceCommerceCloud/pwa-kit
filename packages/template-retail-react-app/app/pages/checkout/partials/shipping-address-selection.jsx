@@ -177,11 +177,7 @@ const ShippingAddressSelection = ({
     useEffect(() => {
         // If the customer deletes all their saved addresses during checkout,
         // we need to make sure to display the address form.
-        if (
-            !isLoading &&
-            (!customer?.addresses || customer.addresses.length === 0) &&
-            !isEditingAddress
-        ) {
+        if (!isLoading && !customer?.addresses?.length && !isEditingAddress) {
             setIsEditingAddress(true)
         }
     }, [customer])
