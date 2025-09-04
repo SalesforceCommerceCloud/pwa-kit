@@ -4,47 +4,82 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import CreateAppGuidelineTool from './create-app-guideline'
+import CreateAppGuidelinesTool from './create-app-guideline.js'
 import {EmptyJsonSchema} from '../utils/utils'
+import shell from 'shelljs'
+import fs from 'fs'
+import path from 'path'
 
+// Mock dependencies
 jest.mock('../utils/utils', () => {
     const originalModule = jest.requireActual('../utils/utils')
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    const path = require('path')
-    const mockScriptPath = path.resolve('../pwa-kit-create-app/scripts/create-mobify-app.js')
+    const mockScriptPath = '../pwa-kit-create-app/scripts/create-mobify-app.js'
 
     return {
         ...originalModule,
         isMonoRepo: jest.fn(() => true),
-        getCreateAppCommand: jest.fn(() => mockScriptPath)
+        getCreateAppCommand: jest.fn(() => mockScriptPath),
+        runCommand: jest.fn().mockResolvedValue(
+            JSON.stringify({
+                data: {},
+                metadata: {description: 'CLI Description'},
+                schemas: {}
+            })
+        )
     }
 })
 
-describe('PWA Create App Guidelines', () => {
-    describe('CreateAppGuidelineTool', () => {
+jest.mock('shelljs', () => ({
+    which: jest.fn(),
+    exec: jest.fn()
+}))
+
+jest.mock('fs', () => ({
+    existsSync: jest.fn(),
+    writeFileSync: jest.fn()
+}))
+
+jest.mock('path', () => ({
+    join: jest.fn()
+}))
+
+describe('CreateAppGuidelinesTool', () => {
+    let tool
+    let mockUtils
+
+    beforeEach(() => {
+        jest.clearAllMocks()
+        tool = new CreateAppGuidelinesTool()
+        mockUtils = require('../utils/utils')
+
+        // Reset mocks
+        shell.which.mockReset()
+        shell.exec.mockReset()
+        fs.existsSync.mockReset()
+        fs.writeFileSync.mockReset()
+        path.join.mockReset()
+    })
+
+    describe('Tool Structure', () => {
         it('should have correct structure', () => {
-            expect(CreateAppGuidelineTool).toMatchObject({
+            expect(tool).toMatchObject({
                 name: 'create_storefront_app',
-                description: `
-    
-This tool is used to provide the agent with the instructions on how to use the @salesforce/pwa-kit-create-app CLI tool to create a new PWA Kit projects.
-
-Do not attempt to create a project without using this tool first.
-
-Example Triggers:
-- "Create a new PWA Kit app"
-- "Start a new storefront using a preset"
-- "What templates are available for PWA Kit?"
-- "What presets are available for PWA Kit?"`,
+                description: expect.stringContaining(
+                    'This tool is used to provide the agent with the instructions'
+                ),
                 inputSchema: EmptyJsonSchema,
                 fn: expect.any(Function)
             })
         })
 
+        it('should be instantiable', () => {
+            expect(tool).toBeInstanceOf(CreateAppGuidelinesTool)
+        })
+    })
+
+    describe('Main Functionality', () => {
         it('should return guidelines content when executed', async () => {
-            // NOTE: THIS TEST IS SIMPLY A SANITY CHECK TO ENSURE THE TOOL IS WORKING.
-            // IT DOES NOT TEST THE CONTENT OF THE GUIDELINES IN ITS ENTIRETY.
-            const result = await CreateAppGuidelineTool.fn()
+            const result = await tool.fn()
 
             expect(result).toEqual({
                 content: [
@@ -57,7 +92,7 @@ Example Triggers:
         })
 
         it('should include all major sections in the guidelines', async () => {
-            const result = await CreateAppGuidelineTool.fn()
+            const result = await tool.fn()
             const guidelineText = result.content[0].text
 
             const requiredSections = [
@@ -71,6 +106,199 @@ Example Triggers:
             requiredSections.forEach((section) => {
                 expect(guidelineText).toContain(section)
             })
+        })
+
+        it('should call runCommand with correct parameters', async () => {
+            await tool.fn()
+
+            expect(mockUtils.runCommand).toHaveBeenCalledWith('node', [
+                '../pwa-kit-create-app/scripts/create-mobify-app.js',
+                '--displayProgram'
+            ])
+        })
+    })
+
+    describe('Git Version Control', () => {
+        const testDirectory = '/test/project/directory'
+
+        beforeEach(() => {
+            path.join.mockImplementation((...args) => args.join('/'))
+        })
+
+        describe('handleGitVersionControl', () => {
+            it('should throw error if git is not installed', () => {
+                shell.which.mockReturnValue(false)
+
+                expect(() => {
+                    tool.handleGitVersionControl(testDirectory)
+                }).toThrow(
+                    'git is not installed or not found in PATH. Please install git to initialize a repository.'
+                )
+            })
+
+            it('should handle existing git repository correctly', () => {
+                shell.which.mockReturnValue(true)
+                fs.existsSync.mockReturnValue(true) // .git exists
+                shell.exec.mockReturnValue({code: 0, stdout: '', stderr: ''})
+
+                expect(() => {
+                    tool.handleGitVersionControl(testDirectory)
+                }).not.toThrow()
+
+                expect(shell.exec).toHaveBeenCalledWith('git add .', {
+                    cwd: testDirectory,
+                    silent: true
+                })
+                expect(shell.exec).toHaveBeenCalledWith('git commit -m "Initial commit"', {
+                    cwd: testDirectory,
+                    silent: true
+                })
+                expect(shell.exec).not.toHaveBeenCalledWith('git init', expect.any(Object))
+            })
+
+            it('should handle new git repository correctly', () => {
+                shell.which.mockReturnValue(true)
+                fs.existsSync.mockReturnValue(false) // .git doesn't exist
+                shell.exec.mockReturnValue({code: 0, stdout: '', stderr: ''})
+
+                expect(() => {
+                    tool.handleGitVersionControl(testDirectory)
+                }).not.toThrow()
+
+                expect(shell.exec).toHaveBeenCalledWith('git init', {
+                    cwd: testDirectory,
+                    silent: true
+                })
+                expect(shell.exec).toHaveBeenCalledWith('git add .', {
+                    cwd: testDirectory,
+                    silent: true
+                })
+                expect(shell.exec).toHaveBeenCalledWith('git commit -m "Initial commit"', {
+                    cwd: testDirectory,
+                    silent: true
+                })
+            })
+
+            it('should throw error if git add fails', () => {
+                shell.which.mockReturnValue(true)
+                fs.existsSync.mockReturnValue(false)
+                shell.exec
+                    .mockReturnValueOnce({code: 0, stdout: '', stderr: ''}) // git init success
+                    .mockReturnValueOnce({code: 1, stdout: '', stderr: 'git add failed'}) // git add fails
+
+                expect(() => {
+                    tool.handleGitVersionControl(testDirectory)
+                }).toThrow('git add failed: git add failed')
+            })
+
+            it('should throw error if git commit fails', () => {
+                shell.which.mockReturnValue(true)
+                fs.existsSync.mockReturnValue(false)
+                shell.exec
+                    .mockReturnValueOnce({code: 0, stdout: '', stderr: ''}) // git init success
+                    .mockReturnValueOnce({code: 0, stdout: '', stderr: ''}) // git add success
+                    .mockReturnValueOnce({code: 1, stdout: '', stderr: 'git commit failed'}) // git commit fails
+
+                expect(() => {
+                    tool.handleGitVersionControl(testDirectory)
+                }).toThrow('git commit failed: git commit failed')
+            })
+
+            it('should throw error if git init fails', () => {
+                shell.which.mockReturnValue(true)
+                fs.existsSync.mockReturnValue(false)
+                shell.exec.mockReturnValue({code: 1, stdout: '', stderr: 'git init failed'})
+
+                expect(() => {
+                    tool.handleGitVersionControl(testDirectory)
+                }).toThrow('git init failed: git init failed')
+            })
+        })
+
+        describe('createBasicGitignore', () => {
+            it('should create .gitignore file if it does not exist', () => {
+                const gitignorePath = `${testDirectory}/.gitignore`
+                fs.existsSync.mockReturnValue(false)
+
+                tool.createBasicGitignore(testDirectory)
+
+                expect(fs.writeFileSync).toHaveBeenCalledWith(
+                    gitignorePath,
+                    expect.stringContaining('# Node\nnode_modules/')
+                )
+            })
+
+            it('should not create .gitignore file if it already exists', () => {
+                const gitignorePath = `${testDirectory}/.gitignore`
+                fs.existsSync.mockReturnValue(true)
+
+                tool.createBasicGitignore(testDirectory)
+
+                expect(fs.writeFileSync).not.toHaveBeenCalled()
+            })
+
+            it('should create .gitignore with correct content', () => {
+                fs.existsSync.mockReturnValue(false)
+
+                tool.createBasicGitignore(testDirectory)
+
+                expect(fs.writeFileSync).toHaveBeenCalledWith(
+                    expect.any(String),
+                    expect.stringContaining('# Node\nnode_modules/\n.env\n.DS_Store')
+                )
+            })
+        })
+
+        describe('setupVersionControl', () => {
+            it('should return success when git operations complete successfully', async () => {
+                shell.which.mockReturnValue(true)
+                fs.existsSync.mockReturnValue(false)
+                shell.exec.mockReturnValue({code: 0, stdout: '', stderr: ''})
+
+                const result = await tool.setupVersionControl(testDirectory)
+
+                expect(result).toEqual({
+                    success: true,
+                    message: 'Git version control initialized and committed locally.'
+                })
+            })
+
+            it('should return error when git operations fail', async () => {
+                shell.which.mockReturnValue(false)
+
+                const result = await tool.setupVersionControl(testDirectory)
+
+                expect(result).toEqual({
+                    success: false,
+                    message:
+                        'Error: git is not installed or not found in PATH. Please install git to initialize a repository.'
+                })
+            })
+
+            it('should handle errors gracefully and return error message', async () => {
+                const errorMessage = 'Test error message'
+                shell.which.mockReturnValue(true)
+                fs.existsSync.mockReturnValue(false)
+                shell.exec.mockImplementation(() => {
+                    throw new Error(errorMessage)
+                })
+
+                const result = await tool.setupVersionControl(testDirectory)
+
+                expect(result).toEqual({
+                    success: false,
+                    message: `Error: ${errorMessage}`
+                })
+            })
+        })
+    })
+
+    describe('Error Handling', () => {
+        it('should handle runCommand errors gracefully', async () => {
+            const errorMessage = 'Command execution failed'
+            mockUtils.runCommand.mockRejectedValue(new Error(errorMessage))
+
+            await expect(tool.fn()).rejects.toThrow(errorMessage)
         })
     })
 })
