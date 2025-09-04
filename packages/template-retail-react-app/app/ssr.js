@@ -34,6 +34,9 @@ import https from 'https'  // ← Anitha Add this line
 const config = getConfig()
 
 const options = {
+    //anitha
+    useSLASPrivateClient: true,
+
     // The build directory (an absolute path)
     buildDir: path.resolve(process.cwd(), 'build'),
 
@@ -56,14 +59,14 @@ const options = {
     // Set this to false if using a SLAS public client
     // When setting this to true, make sure to also set the PWA_KIT_SLAS_CLIENT_SECRET
     // environment variable as this endpoint will return HTTP 501 if it is not set
-    useSLASPrivateClient: false,
+    //useSLASPrivateClient: false,
 
     // If you wish to use additional SLAS endpoints that require private clients,
     // customize this regex to include the additional endpoints the custom SLAS
     // private client secret handler will inject an Authorization header.
     // The default regex is defined in this file: https://github.com/SalesforceCommerceCloud/pwa-kit/blob/develop/packages/pwa-kit-runtime/src/ssr/server/build-remote-server.js
-    // applySLASPrivateClientToEndpoints:
-    //     /\/oauth2\/(token|passwordless\/(login|token)|password\/(reset|action))/,
+     applySLASPrivateClientToEndpoints:
+         /\/oauth2\/(token|passwordless\/(login|token)|password\/(reset|action))/,
 
     // If this is enabled, any HTTP header that has a non ASCII value will be URI encoded
     // If there any HTTP headers that have been encoded, an additional header will be
@@ -323,7 +326,8 @@ const {handler} = runtime.createHandler(options, (app) => {
                         '*.commercecloud.salesforce.com',
                           // ✅ Allow localhost for SFP development
                         'localhost:*',
-                        'https://localhost'
+                        'https://localhost',
+                        '*.demandware.net',
                     ],
                     'script-src': [
                         // Used by the service worker in /worker/main.js
@@ -400,10 +404,24 @@ const {handler} = runtime.createHandler(options, (app) => {
         try {
             console.log('📍 Proxying metadata request to ecom server')
             
+            // Proxy the request through PWA Kit's system
+            const config = getConfig()
+              
+            const proxyConfigs = config.ssrParameters.proxyConfigs
+            if (!proxyConfigs) {
+                throw new Error('proxyConfigs not found in configuration')
+            }
+            
+            const ocapiProxy = proxyConfigs.find(p => p.path === 'ocapi')
+            if (!ocapiProxy) {
+                throw new Error('OCAPI proxy configuration not found')
+            }
+
             // Use Node's https module instead of fetch
             const data = await new Promise((resolve, reject) => {
                 const options = {
-                    hostname: 'localhost',
+                    //hostname: ocapiProxy.host,
+                    hostname: '127.0.0.1',  // ✅ Just change this one line,  Newer Node.js versions prefer IPv6 (::1) over IPv4 (127.0.0.1)
                     path: '/on/demandware.static/Sites-Site/-/-/internal/metadata/v1.json',
                     method: 'GET',
                     rejectUnauthorized: false, // This bypasses SSL verification

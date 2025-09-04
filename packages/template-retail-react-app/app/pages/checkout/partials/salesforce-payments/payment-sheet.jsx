@@ -29,6 +29,8 @@ import ShippingAddressSelection from '@salesforce/retail-react-app/app/pages/che
 import {usePaymentProcessing} from '../../../../hooks/salesforce-payments/use-payment-processing'
 import {getAddressDetails} from '../../../../utils/salesforce-payments/address-mapper'
 import PaymentSheetForm from '../../../../components/salesforce-payments/paymentSheetForm'
+import {useShopperOrdersMutation} from '@salesforce/commerce-sdk-react'
+
 // Module-level storage for paymentSheet
 let paymentSheetInstance = null
 // ✅ ADD this module-level variable declaration
@@ -37,9 +39,16 @@ let confirmPaymentFunction = null
 export const usePaymentSheetSubmission = () => {
     const {processPayment, isProcessing} = usePaymentProcessing()
     const {data: basket} = useCurrentBasket()
-    
-    const createPaymentIntent = async (paymentData) => {
-        const basketId = "1f6a561e694175fff0435dd144" // TODO: use basket.basketId
+    // ✅ Add the mutation hook to update the payment instrument
+    const {mutateAsync: updatePaymentInstrument} = useShopperOrdersMutation('updatePaymentInstrumentForOrder')
+    // ✅ Add the mutation hook to create an order
+    const {mutateAsync: createOrder} = useShopperOrdersMutation('createOrder')
+
+    // ✅ Store order info from API calls
+    let orderInfoFromAPI = null
+
+    const createPaymentIntentOld = async (paymentData) => {
+        const basketId = "6bb365d20010a0e3c5f69c1e65" // TODO: use basket.basketId
         
         try {
             const paymentResult = await processPayment({
@@ -50,6 +59,12 @@ export const usePaymentSheetSubmission = () => {
                 currency: paymentData?.currency || 'USD',
             })
             
+              
+            // ✅ Store order info (will be lost after SDK call)
+            orderInfoFromAPI = {
+                orderNo: paymentResult.order_info.order_no
+            }
+
             return {
                 client_secret: paymentResult.payment_info.client_secret,
                 id: paymentResult.payment_info.payment_intent_id,
@@ -61,7 +76,73 @@ export const usePaymentSheetSubmission = () => {
         }
     }
     
+    const updateOrderPayment = async (orderNo, paymentInstrumentId, paymentData) => {
+      
+        try {
+            // ✅ For Salesforce Payments, provide the minimal required structure
+            const paymentInstrumentUpdate = {
+                paymentMethodId: "SALESFORCE_PAYMENTS",
+                amount: basket.orderTotal || 0
+                // Note: For Salesforce Payments, you typically don't need paymentCard details
+                // as those are handled by the SFP SDK
+            }
+
+            const result = await updatePaymentInstrument({
+                parameters: {
+                    orderNo: orderNo,                      // Order number
+                    paymentInstrumentId: paymentInstrumentId  // Payment instrument ID to update
+                },
+                body: paymentInstrumentUpdate
+            })
+            
+            console.log('✅ Payment instrument updated:', result)
+            return result
+        } catch (error) {
+            console.error('❌ Failed to update payment instrument:', error)
+            throw error
+        }
+    }
+
+    const createPaymentIntent = async (paymentData) => {
+        const basketId = basket.basketId
+      
+        try {
+            // first create an order here using the current basket, which also creates payment instrument against order
+            const order = await createOrder({
+                body: {basketId: basketId}
+            })
+            const orderNo = order.orderNo
+
+            // ✅ Store order info (will be lost after SDK call)??
+            orderInfoFromAPI = {
+                orderNo: orderNo
+            }
+
+            // ✅ Get payment instrument ID from the created order
+            const paymentInstrument = order.paymentInstruments?.find(pi => 
+                pi.paymentMethodId === "SALESFORCE_PAYMENTS"
+            )
+            //now call the payment instrument update API and get the secret and id back
+            const result = await updateOrderPayment(
+                orderNo,
+                paymentInstrument.paymentInstrumentId,
+                {}
+            )
+
+            //TODO read the secret and id from the result
+            return {
+                client_secret: "xx",
+                id: "yy",
+                //customer: paymentResult.payment_info.customer_id
+            }
+        } catch (error) {
+            console.error('Payment intent creation failed:', error)
+            throw error
+        }
+    }
+
     const submitPaymentSheetOrder = async () => {
+        console.log('🔍 submitPaymentSheetOrder triggered')
         if (!confirmPaymentFunction) {
             throw new Error('Payment sheet not ready. Please wait for payment component to load.')
         }
@@ -72,8 +153,18 @@ export const usePaymentSheetSubmission = () => {
             billing.email = "test@test.com"
             billing.address.country = "US"
             
+             // ✅ This already creates the order via processPayment
+            const paymentResult = await confirmPaymentFunction(createPaymentIntent, billing, {})
+            console.log('🔍 Payment result:', paymentResult)
+            // ✅ Extract order info from the payment result
+
+            // (You'll need to check the exact structure of paymentResult)
+            return {
+                paymentResult,
+                orderNo: orderInfoFromAPI?.orderNo,
+            }
             // ✅ Call PaymentSheetForm's confirm function
-            return await confirmPaymentFunction(createPaymentIntent, billing, {})
+            //return await confirmPaymentFunction(createPaymentIntent, billing, {})
         } catch (error) {
             console.error('SFP payment processing failed:', error)
             throw error
@@ -99,7 +190,7 @@ const SFPaymentsSheet = ({paymentState}) => {
     const intl = useIntl()
     
     // Load scripts and SFP
-    const {scriptsLoaded, loading, hasSFP} = usePaymentScripts(['stripe', 'paypal', 'sfp'])
+    const {scriptsLoaded, loading, hasSFP} = usePaymentScripts(['sfp'])
     const {sfpInstance} = useSalesforcePayments(scriptsLoaded, hasSFP)
     
     // Checkout context
@@ -126,63 +217,7 @@ const SFPaymentsSheet = ({paymentState}) => {
     
     const {mutateAsync: addPaymentInstrumentToBasket} = useShopperBasketsMutation('addPaymentInstrumentToBasket')
     const {mutateAsync: updateBillingAddressForBasket} = useShopperBasketsMutation('updateBillingAddressForBasket')
-    
-    // Create SFP component with fresh values (no stale closure)
-    useEffect(() => {
-        return;
-        if (step === STEPS.PAYMENT && editContainerRef.current && isReady && !sfpComponentCreated) {
-            // Create element if it doesn't exist
-            if (!paymentElementRef.current) {
-                const element = document.createElement('div')
-                element.id = 'salesforce-payments-element'
-                element.style.width = '100%'
-                element.style.minHeight = '300px'
-                paymentElementRef.current = element
-            }
-            
-            // Add element to container if not already there
-            if (!editContainerRef.current.contains(paymentElementRef.current)) {
-                editContainerRef.current.appendChild(paymentElementRef.current)
-            }
-            
-            // Create SFP component with fresh values
-            if (sfpInstance && paymentConfig && metadata) {
-                const elementInDOM = document.getElementById('salesforce-payments-element')
-                if (!elementInDOM) return
-                
-                try {
-                    const checkoutParams = createCheckoutParameters(
-                        sfpInstance,
-                        metadata,
-                        paymentConfig,
-                        basket,
-                        {
-                            locale: intl.locale,
-                            paymentFlow: 'checkout',
-                            elementId: 'salesforce-payments-element',
-                            customTheme: {
-                                'color-primary': '#007bff'
-                            }
-                        }
-                    )
-                    
-                    const paymentSheet = sfpInstance.checkout(
-                        checkoutParams.metadata,
-                        checkoutParams.paymentMethodSetForCheckout,
-                        checkoutParams.config,
-                        checkoutParams.paymentRequestInfo,
-                        paymentElementRef.current
-                    )
-                    
-                    paymentSheetInstance = paymentSheet
-                    setSfpComponentCreated(true)
-                } catch (error) {
-                    console.error('Failed to create SFP component:', error)
-                }
-            }
-        }
-    }, [step, isReady, sfpComponentCreated, sfpInstance, paymentConfig, metadata, basket, intl.locale])
-    
+        
     // Cleanup on unmount
     useEffect(() => {
         return () => {
@@ -206,24 +241,15 @@ const SFPaymentsSheet = ({paymentState}) => {
     }
     
     const onReview = async () => {
-        const mockPaymentData = {
-            "amount": 9.99,
-            "paymentCard": {
-                "expirationYear": 1990,
-                "expirationMonth": 7,
-                "validFromMonth": 8,
-                "validFromYear": 2007,
-                "issueNumber": "i117",
-                "maskedNumber": "*********1234",
-                "holder": "Miller",
-                "cardType": "Visa"
-            },
-            "paymentMethodId": "CREDIT_CARD"
+     
+        const paymentData = {
+            "paymentMethodId": "SALESFORCE_PAYMENTS"
+            // Note: amount might not be needed here - the API typically handles this
+            // If you do need it: "amount": basket.orderTotal
         }
-        
         await addPaymentInstrumentToBasket({
             parameters: {basketId: basket?.basketId},
-            body: mockPaymentData
+            body: paymentData
         })
         
         const updatedBasket = await onBillingSubmit()
@@ -235,7 +261,7 @@ const SFPaymentsSheet = ({paymentState}) => {
    // ✅ Memoize paymentRequestInfo so it doesn't recreate on every render
    const paymentRequestInfo = useMemo(() => {
     return basket ? createPaymentRequestInfo(basket, intl.locale) : null
-}, [basket, intl.locale])
+    }, [basket, intl.locale])
 
      // ✅ Callback when PaymentSheetForm is ready
      const handlePaymentSheetReady = (paymentSheet) => {
@@ -259,7 +285,7 @@ const SFPaymentsSheet = ({paymentState}) => {
         customTheme: {
             'color-primary': '#007bff'
         },
-        minHeight: '300px'
+        //minHeight: '300px'
     }), [intl.locale])
 
 
@@ -279,42 +305,28 @@ const SFPaymentsSheet = ({paymentState}) => {
 
 
     return (
-        <Box>
-            {/* Payment container - only shows in edit mode */}
-            {/*<Box
-                ref={editContainerRef}
-                display={step === STEPS.PAYMENT ? "block" : "none"}
-                minH="300px"
-                border="1px solid #E2E8F0"
-                borderRadius="md"
-                p={4}
-                bg="white"
-                mb={4}
-            />*/}
-            {/* ✅ PaymentSheetForm OUTSIDE ToggleCard - persists across edit/summary 
-                  Don't conditionally render based on step. Instead, always render the PaymentSheetForm 
-                  but use CSS to show/hide it. Preserves form data when switching between edit/summary:
-                  Stays mounted across step changes
-                  If you include the step === STEPS.PAYMENT condition, the form will unmount and remount
-                  when you switch between edit/summary, losing form data since the step value changes.
-                  */}
-                {isReady && sfpInstance && paymentRequestInfo && (
-                <PaymentSheetForm
-                    sfpInstance={sfpInstance}
-                    paymentConfig={paymentConfig}
-                    metadata={metadata}
-                    paymentRequestInfo={paymentRequestInfo}
-                    options={paymentSheetOptions}
-                    onConfirmMethodReady={handleConfirmMethodReady}
-                    containerProps={{ 
-                        mb: 4,
-                        // ✅ Use CSS to show/hide instead of unmount/mount
-                        display: step === STEPS.PAYMENT ? "block" : "none"
-                    }}
-                />
+        <Box>           
+           {/* ✅ Keep PaymentSheetForm always mounted, control visibility with CSS */}
+           {isReady && sfpInstance && paymentRequestInfo && (
+                <Box
+                    position={step === STEPS.PAYMENT ? "static" : "absolute"}
+                    visibility={step === STEPS.PAYMENT ? "visible" : "hidden"}
+                    height={step === STEPS.PAYMENT ? "auto" : 0}
+                    overflow="hidden"
+                    width="100%"
+                    zIndex={step === STEPS.PAYMENT ? 1 : -1}
+                >
+                    <PaymentSheetForm
+                        sfpInstance={sfpInstance}
+                        paymentConfig={paymentConfig}
+                        metadata={metadata}
+                        paymentRequestInfo={paymentRequestInfo}
+                        options={paymentSheetOptions}
+                        onConfirmMethodReady={handleConfirmMethodReady}
+                        containerProps={{ mb: 4 }}
+                    />
+                </Box>
             )}
-
-
             <ToggleCard
                 id="step-3"
                 title={intl.formatMessage({defaultMessage: 'Payment', id: 'checkout_payment.title.payment'})}
@@ -328,10 +340,7 @@ const SFPaymentsSheet = ({paymentState}) => {
             >
                 <ToggleCardEdit>
                     <Stack spacing={6}>
-                        <Text fontSize="sm" color="gray.500" fontStyle="italic">
-                            Payment form is above
-                        </Text>
-
+                     
                         <Divider />
                         
                         <Stack spacing={2}>

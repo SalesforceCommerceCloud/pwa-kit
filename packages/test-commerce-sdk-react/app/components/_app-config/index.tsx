@@ -27,12 +27,13 @@ const AppConfig = (props: AppConfigProps): ReactElement => {
     const anotherLocale = locale === defaultLocale ? 'en-CA' : defaultLocale
     return (
         <CommerceApiProvider
+            enablePWAKitPrivateClient={true}
             siteId={siteId}
-            shortCode="kv7kzm78"
-            clientId="4afbc51f-6423-41c8-8b29-d7f2825b5bee"
-            organizationId="f_ecom_zzrf_006"
-            redirectURI="http://localhost:3000/callback"
-            proxy={`http://localhost:3000/${String(proxyBasePath)}/api`}
+            shortCode="sandbox-001"
+            clientId="ea168ae1-3a5d-4676-b637-27bf8bf1b6fc"
+            organizationId="f_ecom_zyoe_002"
+            redirectURI="http://localhost:3002/callback"
+            proxy={`http://localhost:3002/${String(proxyBasePath)}/api`}
             locale={locale}
             currency="USD"
             headers={headers}

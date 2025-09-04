@@ -2,44 +2,47 @@
 import {useEffect, useState} from 'react'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 
-const PAYMENT_SCRIPTS = {
+//Unless you have strict performance requirements, letting SFP handle it is probably the better trade-off for maintainability.
+
+const PAYMENT_SCRIPTSx = {
     stripe: {
         id: 'stripe-js',
         src: 'https://js.stripe.com/v3/',
-        global: 'Stripe'
+        global: 'Stripe',
+        priority: 'low'   // Load when needed
     },
     paypal: {
         id: 'paypal-js', 
         src: 'https://www.paypal.com/sdk/js?client-id=test&currency=USD&components=buttons,messages',
-        global: 'paypal'
+        global: 'paypal',
+        priority: 'low'   // Load when needed
     },
     sfp: {
         id: 'sfp-js',
-        //src: 'https://localhost/on/demandware.static/Sites-Site/-/-/internal/jscript/sfp.js',
-        //src: 'http://localhost:3002/mobify/bundle/development/static/sfp.js',
         src: 'https://localhost/on/demandware.static/Sites-Site/-/-/internal/jscript/sfp/v1/sfp.js',
         global: 'SFPayments',
          // Add this to prevent async chunk loading
         crossorigin: 'anonymous'
     }
 }
-// TODO: don't need any styles right now
-const PAYMENT_STYLES = {
-    plaid: {
-        id: 'plaid-css',
-        href: 'https://localhost/on/demandware.static/Sites-Site/-/-/internal/css/plaid.css'
+const PAYMENT_SCRIPTS = {
+    sfp: {
+        id: 'sfp-js',
+        src: 'https://localhost/on/demandware.static/Sites-Site/-/-/internal/jscript/sfp/v1/sfp.js',
+        global: 'SFPayments',
+         // Add this to prevent async chunk loading
+        crossorigin: 'anonymous'
     }
 }
-
-export const usePaymentScripts = (requiredScripts = ['stripe', 'paypal', 'sfp']) => {
+export const usePaymentScripts = (requiredScripts = ['sfp']) => {
+//export const usePaymentScripts = (requiredScripts = ['stripe', 'paypal', 'sfp']) => {
     const [scriptsLoaded, setScriptsLoaded] = useState(false)
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState(null)
     const [loadedScripts, setLoadedScripts] = useState(new Set())
 
     useEffect(() => {
-        console.log('🚨 usePaymentScripts useEffect TRIGGERED')
-
+        
         const loadPaymentScripts = async () => {
             try {
                 setLoading(true)
@@ -63,10 +66,6 @@ export const usePaymentScripts = (requiredScripts = ['stripe', 'paypal', 'sfp'])
                     loadScript(PAYMENT_SCRIPTS[scriptName])
                 )
                 
-                // Load styles
-                //const stylePromises = Object.values(PAYMENT_STYLES).map(loadCSS)
-
-                //await Promise.all([...scriptPromises, ...stylePromises])
                 await Promise.all([...scriptPromises])
                 
             // IMPORTANT: Only set loaded after verifying globals exist
@@ -123,24 +122,6 @@ export const usePaymentScripts = (requiredScripts = ['stripe', 'paypal', 'sfp'])
             console.log(`${scriptConfig.id} appended to DOM`)
         })
     }
-
-    const loadCSS = (styleConfig) => {
-        return new Promise((resolve) => {
-            if (document.getElementById(styleConfig.id)) {
-                resolve()
-                return
-            }
-
-            const link = document.createElement('link')
-            link.id = styleConfig.id
-            link.type = 'text/css'
-            link.href = styleConfig.href
-            link.rel = 'stylesheet'
-            link.onload = resolve
-            document.head.appendChild(link)
-        })
-    }
-
     return {
         scriptsLoaded,
         loading,

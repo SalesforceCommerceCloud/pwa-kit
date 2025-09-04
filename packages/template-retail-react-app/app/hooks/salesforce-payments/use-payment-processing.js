@@ -4,6 +4,7 @@ import {useMutation, useQueryClient} from '@tanstack/react-query'
 import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
 import {useIntl} from 'react-intl'
 
+//STOP GAP HOOK.  Will be replaced with the new hook
 export const usePaymentProcessing = () => {
     const {getTokenWhenReady} = useAccessToken()
     const queryClient = useQueryClient()

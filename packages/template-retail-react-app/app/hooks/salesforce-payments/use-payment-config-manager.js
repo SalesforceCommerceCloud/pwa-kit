@@ -1,63 +1,69 @@
-// packages/template-retail-react-app/app/hooks/salesforce-payments/use-payment-config-manager.js
-
+// use-payment-config-manager2.js
 import {useState, useEffect} from 'react'
-import {usePaymentConfig} from './use-payment-config'
+import {useAccessToken} from '@salesforce/commerce-sdk-react'
+import { usePaymentConfiguration as useSCAPIPaymentConfig } from '@salesforce/commerce-sdk-react'
+import {useQuery} from '@tanstack/react-query'
+import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 
-/**
- * Manages payment configuration and feature flag from API
- * API returns: { issalesforcePaymentsEnabled: boolean, config: {...}, metadata: {...} }
- */
 export const usePaymentConfigManager = () => {
     const [paymentConfig, setPaymentConfig] = useState(null)
-    const [metadata, setMetadata] = useState(null)  // ✅ Change this
-    const [isSFPEnabled, setIsSFPEnabled] = useState(false)        
+    const [metadata, setMetadata] = useState(null)
     
-    // ✅ Correct usage - get the hook first, then call it
-    const { usePaymentConfiguration, usePaymentMetadata } = usePaymentConfig()
-    const { data: configData, isLoading: configLoading, error: configError } = usePaymentConfiguration()
-    const { data: metadataData, isLoading: metadataLoading, error: metadataError } = usePaymentMetadata()
-
-    
-    useEffect(() => {
-        if (configData) {
-            console.log('🔍 Payment Config Manager Debug:', {
-                configData,
-                metadataData,
-                configLoading,
-                metadataLoading
-            })
-            const isSFPEnabledFromAPI = configData.salesforce_payments_allowed
-            // ✅ Set feature flag from API response
-            setIsSFPEnabled(isSFPEnabledFromAPI)
-            
-            // ✅ Only save config data if SFP is enabled
-            if (isSFPEnabledFromAPI) {
-                setPaymentConfig(configData)
-            } else {
-                // ✅ Clear any existing config if disabled
-                setPaymentConfig(null)
-            }
+    // ✅ SCAPI payment config
+    const { data: scapiConfigData, isLoading: scapiLoading, error: scapiError } = useSCAPIPaymentConfig({
+        parameters: {
+            currency: 'USD',
+            countryCode: 'US'
         }
-    }, [configData])
-
+    })
+    
+    // ✅ Metadata
+    const { data: metadataData, isLoading: metadataLoading, error: metadataError } = useQuery({
+        queryKey: ['payment-metadata'],
+        queryFn: async () => {
+            try {
+                const config = getConfig()
+                //const response = await fetch(`${config.app.commerceAPI.proxyPath}/payment-metadata`)
+                //TEMP STOP GAP (FIXED SOON)
+                const response = await fetch('http://localhost:3002/api/payment-metadata')
+                //const response = await fetch('http://localhost:3002/api/payment-metadata')
+                if (!response.ok) {
+                    throw new Error('Failed to load payment metadata')
+                }
+                const data = await response.json()
+                console.log('✅ Metadata loaded successfully:', data)
+                return data
+            } catch (error) {
+                console.error('❌ Fetch error:', error)
+                throw error
+            }
+        },
+        staleTime: 10 * 60 * 1000, // 10 minutes (decide if we need this latency)
+    })
+    
+    const isSFPEnabled = true // TODO: Replace with actual feature flag from API
+    
+    // Business logic...
+    useEffect(() => {
+        if (scapiConfigData && isSFPEnabled) {
+            setPaymentConfig(scapiConfigData)
+        } else {
+            setPaymentConfig(null)
+        }
+    }, [scapiConfigData, isSFPEnabled])
+    
     useEffect(() => {
         if (metadataData) {
-            console.log('🔍 Processing metadata data:', metadataData)
             setMetadata(metadataData)
         }
     }, [metadataData])
-
-    // ✅ Both API calls must complete
-    const isLoading = configLoading || metadataLoading
-    const error = configError || metadataError
-
-        
+    
     return {
         paymentConfig,
         metadata,
-        paymentConfigLoading: isLoading,
-        paymentConfigError: error,
-        isSFPEnabled, // ✅ This comes from API, not hardcoded
-        isReady: !isLoading && !!configData && !!metadataData && isSFPEnabled // ✅ API call completed
+        paymentConfigLoading: scapiLoading || metadataLoading,
+        paymentConfigError: scapiError || metadataError,
+        isSFPEnabled,
+        isReady: !scapiLoading && !metadataLoading && !!scapiConfigData && !!metadataData && isSFPEnabled
     }
 }

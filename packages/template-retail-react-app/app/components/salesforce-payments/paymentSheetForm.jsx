@@ -36,7 +36,7 @@ const PaymentSheetForm = ({
         paymentFlow = 'checkout',
         customTheme = {},
         enabledMethods = null,
-        minHeight = '300px'
+        //minHeight = '300px'
     } = options
 
     // ✅ Memoize the confirmPayment function to prevent recreating on every render
@@ -60,21 +60,14 @@ const PaymentSheetForm = ({
                 })
                 .catch(function (err) {
                     console.log('❌ SFP payment failed:', err)
-                    // Simulate success for testing
-                    resolve({
-                        responseCode: 0,
-                        data: {
-                            paymentData: {
-                                id: 'pi_test_fake_123',
-                                uuid: 'test-guid-456',
-                                paymentGatewayId: 'test-gateway-id',
-                                gatewayCustomerId: 'test-customer-id',
-                            },
-                            paymentToken: 'pi_test_fake_123',
-                            billingDetails: billingDetails,
-                            testOverride: true,
-                        },
-                    });
+                   // Check if it's a validation error that should be shown to user
+                    if (err.error && err.error.type === 'validation_error') {
+                        // Reject with the actual error so UI can show validation message
+                        reject(new Error(err.error.message || 'Payment validation failed'))
+                    } else {
+                        // For other errors, you might want to reject or handle differently
+                        reject(new Error('Payment processing failed'))
+                    }
                 })
         })
     }, []) // Empty deps since it only uses refs
@@ -95,7 +88,7 @@ const PaymentSheetForm = ({
                 const element = document.createElement('div')
                 element.id = elementId
                 element.style.width = '100%'
-                element.style.minHeight = minHeight
+                //element.style.minHeight = minHeight
                 paymentElementRef.current = element
             }
 
@@ -167,7 +160,7 @@ const PaymentSheetForm = ({
         paymentFlow, 
         customTheme, 
         enabledMethods, 
-        minHeight,
+        //minHeight,
         confirmPayment  // ✅ Add memoized function to dependencies
     ])
 
@@ -182,7 +175,7 @@ const PaymentSheetForm = ({
     return (
         <Box
             ref={containerRef}
-            minH={minHeight}
+            //minH={minHeight}
             border="1px solid #E2E8F0"
             borderRadius="md"
             p={4}

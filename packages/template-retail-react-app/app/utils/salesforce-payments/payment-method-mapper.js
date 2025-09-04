@@ -2,26 +2,41 @@
  * Creates payment method set for different payment flows
  */
 export const createPaymentMethodSet = (paymentConfig, basket, options = {}) => {
-    const { 
-        paymentFlow = 'checkout',
-        locale = 'en-US',
-        enabledMethods = null
-    } = options
-
-    const baseConfig = {
-        id: paymentConfig.id || generatePaymentSetId(),
-        name: `Payment Methods for ${paymentFlow}`,
-        countryCode: getCountryCode(basket),
-        paymentMethodSetAccounts: createAccounts(paymentConfig),
+   
+    if (paymentConfig.paymentMethods && paymentConfig.paymentMethodSetAccounts) {
+        const { paymentFlow = 'checkout', enabledMethods = null } = options
+    
+        // ✅ Filter payment methods by flow
+        const filteredMethods = paymentConfig.paymentMethods.filter(method => {
+            if (paymentFlow === 'express') {
+                return method.paymentModes.includes('Express')
+            } else {
+                return method.paymentModes.includes('Multistep') || method.paymentModes.includes('Singlestep')
+            }
+        })
+        
+        // ✅ Apply enabledMethods filter if provided
+        const finalMethods = enabledMethods 
+            ? filteredMethods.filter(method => enabledMethods.includes(method.paymentMethodType))
+            : filteredMethods
+    
+        return {
+            id: generatePaymentSetId(),
+            name: `Payment Methods for ${paymentFlow}`,
+            countryCode: getCountryCode(basket),
+            paymentMethods: finalMethods,  
+            paymentMethodSetAccounts: paymentConfig.paymentMethodSetAccounts  // ✅ Use SCAPI data directly!
+        }
     }
 
-    if (paymentFlow === 'express') {
+
+    /*if (paymentFlow === 'express') {
         baseConfig.paymentMethods = createExpressPaymentMethods(paymentConfig, enabledMethods)
     } else {
         baseConfig.paymentMethods = createCheckoutPaymentMethods(paymentConfig, enabledMethods)
     }
 
-    return baseConfig
+    return baseConfig*/
 }
 
 /**
@@ -101,7 +116,6 @@ const generateGatewayId = (accountId) => {
     return `gw_${accountId.replace('acct_', '')}`
 }
 
-////////////////////////////////////////
 /**
  * Creates payment request info from basket data
  */
@@ -114,13 +128,6 @@ export const createPaymentRequestInfo = (basket, locale = 'en-US') => {
                 'US',
         locale: locale
     }
-   /*//anitha temp fix
-   return {
-    amount: basket?.orderTotal || basket?.productTotal || 0,
-    currency: 'USD',
-    country:'US',
-    locale: 'en-US'
-   }*/
 }
 
 /**
