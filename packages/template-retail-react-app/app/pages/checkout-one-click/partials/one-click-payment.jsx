@@ -4,14 +4,13 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React, {useState, useMemo, useEffect} from 'react'
+import React, {useState, useMemo, useEffect, useRef} from 'react'
 import PropTypes from 'prop-types'
 import {defineMessage, FormattedMessage, useIntl} from 'react-intl'
 import {
     Box,
     Button,
     Checkbox,
-    Container,
     Heading,
     Stack,
     Text,
@@ -50,7 +49,8 @@ const Payment = ({
     onSavePreferenceChange
 }) => {
     const {formatMessage} = useIntl()
-    const {data: basket} = useCurrentBasket()
+    const currentBasketQuery = useCurrentBasket()
+    const {data: basket} = currentBasketQuery
     const {data: customer} = useCurrentCustomer()
     const {isGuest} = useCustomerType()
     const selectedShippingAddress = basket?.shipments && basket?.shipments[0]?.shippingAddress
@@ -62,7 +62,6 @@ const Payment = ({
 
     // Track whether user wants to save the payment method
     const [shouldSavePaymentMethod, setShouldSavePaymentMethod] = useState(false)
-    const [hasAutoSelectedPayment, setHasAutoSelectedPayment] = useState(false)
     const [isApplyingSavedPayment, setIsApplyingSavedPayment] = useState(false)
 
     // Callback when user changes save preference
@@ -123,7 +122,7 @@ const Payment = ({
     // Watch form values in real-time to detect new payment instruments
     useEffect(() => {
         if (paymentMethodForm && !isGuest) {
-            const subscription = paymentMethodForm.watch((value, {name, type}) => {
+            const subscription = paymentMethodForm.watch((value) => {
                 updateCurrentFormPayment(value)
             })
 
@@ -187,22 +186,19 @@ const Payment = ({
         })
     }
 
-    // Auto-select a saved payment instrument for registered customers
+    // Auto-select a saved payment instrument for registered customers (run at most once)
+    const autoAppliedRef = useRef(false)
     useEffect(() => {
         const autoSelectSavedPayment = async () => {
-            if (step !== STEPS.PAYMENT || hasAutoSelectedPayment) {
-                return
-            }
+            if (step !== STEPS.PAYMENT) return
+            if (autoAppliedRef.current) return
 
-            // Only for registered customers with saved instruments and when none is applied
-            if (
-                !customer?.isRegistered ||
-                !customer?.paymentInstruments?.length ||
-                appliedPayment
-            ) {
-                return
-            }
+            const isRegistered = customer?.isRegistered
+            const hasSaved = customer?.paymentInstruments?.length > 0
+            const alreadyApplied = (basket?.paymentInstruments?.length || 0) > 0
+            if (!isRegistered || !hasSaved || alreadyApplied) return
 
+            autoAppliedRef.current = true
             const preferred =
                 customer.paymentInstruments.find((pi) => pi.preferred === true) ||
                 customer.paymentInstruments[0]
@@ -216,8 +212,14 @@ const Payment = ({
                         customerPaymentInstrumentId: preferred.paymentInstrumentId
                     }
                 })
-                setHasAutoSelectedPayment(true)
-            } catch (e) {
+                // After auto-apply, if we already have a shipping address, submit billing so we can advance
+                if (selectedShippingAddress) {
+                    await onBillingSubmit()
+                    // Ensure basket is refreshed with payment & billing
+                    await currentBasketQuery.refetch()
+                    // Stay on Payment; place-order button is rendered on Payment step in this flow
+                }
+            } catch (_e) {
                 // Ignore and allow manual selection
             } finally {
                 setIsApplyingSavedPayment(false)
@@ -225,17 +227,20 @@ const Payment = ({
         }
 
         autoSelectSavedPayment()
-    }, [step, STEPS, customer, appliedPayment, basket?.basketId, hasAutoSelectedPayment])
+    }, [step])
 
     const onBillingSubmit = async () => {
-        const isFormValid = await billingAddressForm.trigger()
-
-        if (!isFormValid) {
-            return
+        // When billing is same as shipping, skip form validation and use shipping address directly
+        let billingAddress
+        if (billingSameAsShipping) {
+            billingAddress = selectedShippingAddress
+        } else {
+            const isFormValid = await billingAddressForm.trigger()
+            if (!isFormValid) {
+                return
+            }
+            billingAddress = billingAddressForm.getValues()
         }
-        const billingAddress = billingSameAsShipping
-            ? selectedShippingAddress
-            : billingAddressForm.getValues()
         // Using destructuring to remove properties from the object...
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const {addressId, creationDate, lastModified, preferred, ...address} = billingAddress
@@ -306,7 +311,7 @@ const Payment = ({
                         {isApplyingSavedPayment ? null : !appliedPayment?.paymentCard ? (
                             <PaymentForm form={paymentMethodForm} onSubmit={onSubmit}>
                                 {/* Save Payment Method - Show right underneath credit card fields */}
-                                {newPaymentInstruments.length > 0 && (
+                                {isGuest && newPaymentInstruments.length > 0 && (
                                     <SavePaymentMethod
                                         paymentInstrument={newPaymentInstruments[0]}
                                         onSaved={handleSavePreferenceChange}
@@ -403,8 +408,8 @@ const Payment = ({
                             </Stack>
                         )}
 
-                        {/* Save Payment Method - Always check, regardless of appliedPayment */}
-                        {newPaymentInstruments.length > 0 && (
+                        {/* Guest only: offer save for future use */}
+                        {isGuest && newPaymentInstruments.length > 0 && (
                             <SavePaymentMethod
                                 paymentInstrument={newPaymentInstruments[0]}
                                 onSaved={onPaymentMethodSaved}
@@ -425,11 +430,13 @@ const Payment = ({
                             </Stack>
                         )}
 
-                        <UserRegistration
-                            enableUserRegistration={enableUserRegistration}
-                            setEnableUserRegistration={setEnableUserRegistration}
-                            isGuestCheckout={registeredUserChoseGuest}
-                        />
+                        {isGuest && (
+                            <UserRegistration
+                                enableUserRegistration={enableUserRegistration}
+                                setEnableUserRegistration={setEnableUserRegistration}
+                                isGuestCheckout={registeredUserChoseGuest}
+                            />
+                        )}
                     </Stack>
                 </ToggleCardSummary>
             </ToggleCard>

@@ -114,40 +114,34 @@ export default function ShippingAddress() {
         }
     }
 
-    // Auto-select and apply preferred shipping address when component is on this step
+    // Auto-select and apply preferred shipping address for registered users
     useEffect(() => {
         const autoSelectPreferredAddress = async () => {
-            // Only auto-select when on this step and haven't already auto-selected
-            if (step !== STEPS.SHIPPING_ADDRESS || hasAutoSelected || isLoading) {
-                return
-            }
+            // Only auto-select on the shipping address step, and run at most once
+            if (step !== STEPS.SHIPPING_ADDRESS || hasAutoSelected || isLoading) return
 
-            // Only proceed if customer is registered and has addresses
-            if (!customer?.isRegistered || !customer?.addresses?.length) {
-                return
-            }
+            // Only proceed if the shopper is registered and has saved addresses
+            if (!customer?.isRegistered || !customer?.addresses?.length) return
 
-            // Skip to next step if basket already has a shipping address
+            // If a shipping address is already applied, advance to next step
             if (selectedShippingAddress?.address1) {
-                setHasAutoSelected(true) // Prevent further attempts
+                setHasAutoSelected(true)
                 goToNextStep()
                 return
             }
 
-            // Find the preferred address
-            const preferredAddress = customer.addresses.find((addr) => addr.preferred === true)
+            // Choose preferred address if set; otherwise fallback to first address
+            const preferredAddress =
+                customer.addresses.find((addr) => addr.preferred === true) || customer.addresses[0]
 
-            //Auto-selecting preferred shipping address
-            if (preferredAddress) {
-                setHasAutoSelected(true)
+            if (!preferredAddress) return
 
-                try {
-                    // Apply the preferred address and continue to next step
-                    await submitAndContinue(preferredAddress)
-                } catch (error) {
-                    // Reset on error so user can manually select
-                    setHasAutoSelected(false)
-                }
+            setHasAutoSelected(true)
+            try {
+                await submitAndContinue(preferredAddress)
+            } catch (_e) {
+                // Reset so the user can manually select on error
+                setHasAutoSelected(false)
             }
         }
 

@@ -60,14 +60,15 @@ import {nanoid} from 'nanoid'
 const CheckoutOneClick = () => {
     const {formatMessage} = useIntl()
     const navigate = useNavigation()
-    const {step} = useCheckout()
+    const {step, STEPS} = useCheckout()
     const showToast = useToast()
     const [isLoading, setIsLoading] = useState(false)
     const [enableUserRegistration, setEnableUserRegistration] = useState(false)
     const [registeredUserChoseGuest, setRegisteredUserChoseGuest] = useState(false)
     const [savedPaymentMethods, setSavedPaymentMethods] = useState(new Set())
     const [shouldSavePaymentMethod, setShouldSavePaymentMethod] = useState(false)
-    const {data: basket} = useCurrentBasket()
+    const currentBasketQuery = useCurrentBasket()
+    const {data: basket} = currentBasketQuery
     const [error] = useState()
     const {social = {}} = getConfig().app.login || {}
     const idps = social?.idps
@@ -117,7 +118,18 @@ const CheckoutOneClick = () => {
     }
 
     // Form for payment method
-    const paymentMethodForm = useForm()
+    const paymentMethodForm = useForm({
+        defaultValues: appliedPayment
+            ? {
+                  holder: appliedPayment.paymentCard?.holder || '',
+                  number: appliedPayment.paymentCard?.maskedNumber || '',
+                  cardType: appliedPayment.paymentCard?.cardType || '',
+                  expiry: `${
+                      appliedPayment.paymentCard?.expirationMonth?.toString().padStart(2, '0') || ''
+                  }/${appliedPayment.paymentCard?.expirationYear?.toString().slice(-2) || ''}`
+              }
+            : {}
+    })
 
     // Form for billing address
     const billingAddressForm = useForm({
@@ -179,9 +191,10 @@ const CheckoutOneClick = () => {
         // Using destructuring to remove properties from the object...
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const {addressId, creationDate, lastModified, preferred, ...address} = billingAddress
+        const latestBasketId = currentBasketQuery.data?.basketId || basket.basketId
         return await updateBillingAddressForBasket({
             body: address,
-            parameters: {basketId: basket.basketId}
+            parameters: {basketId: latestBasketId}
         })
     }
 
@@ -294,8 +307,11 @@ const CheckoutOneClick = () => {
 
         setIsLoading(true)
         try {
+            // Ensure we are using the freshest basket id
+            const refreshed = await currentBasketQuery.refetch()
+            const latestBasketId = refreshed.data?.basketId || basket.basketId
             const order = await createOrder({
-                body: {basketId: basket.basketId}
+                body: {basketId: latestBasketId}
             })
 
             if (enableUserRegistration) {
@@ -339,14 +355,25 @@ const CheckoutOneClick = () => {
             if (!appliedPayment) {
                 await onPaymentSubmit(paymentFormValues)
             } else {
-                // If payment already exists in basket, still set shopperPaymentInstrument for saving
-                const [expirationMonth, expirationYear] = paymentFormValues.expiry.split('/')
-                shopperPaymentInstrument = {
-                    holder: paymentFormValues.holder,
-                    number: paymentFormValues.number,
-                    cardType: getPaymentInstrumentCardType(paymentFormValues.cardType),
-                    expirationMonth: parseInt(expirationMonth),
-                    expirationYear: parseInt(`20${expirationYear}`)
+                if (paymentFormValues && paymentFormValues.expiry) {
+                    const [expirationMonth, expirationYear] = paymentFormValues.expiry.split('/')
+                    shopperPaymentInstrument = {
+                        holder: paymentFormValues.holder,
+                        number:
+                            appliedPayment.paymentCard?.maskedNumber || paymentFormValues.number,
+                        cardType: getPaymentInstrumentCardType(paymentFormValues.cardType),
+                        expirationMonth: parseInt(expirationMonth),
+                        expirationYear: parseInt(`20${expirationYear}`)
+                    }
+                } else {
+                    // Fallback to using the applied payment data directly
+                    shopperPaymentInstrument = {
+                        holder: appliedPayment.paymentCard?.holder || '',
+                        number: appliedPayment.paymentCard?.maskedNumber || '',
+                        cardType: appliedPayment.paymentCard?.cardType || '',
+                        expirationMonth: appliedPayment.paymentCard?.expirationMonth || 0,
+                        expirationYear: appliedPayment.paymentCard?.expirationYear || 0
+                    }
                 }
             }
 
@@ -403,7 +430,7 @@ const CheckoutOneClick = () => {
                                 onSavePreferenceChange={handleSavePreferenceChange}
                             />
 
-                            {step === 4 && (
+                            {step >= STEPS.PAYMENT && (
                                 <Box display="flex" bottom="0" px={4} pt={2} pb={4}>
                                     <Container variant="form">
                                         <Button

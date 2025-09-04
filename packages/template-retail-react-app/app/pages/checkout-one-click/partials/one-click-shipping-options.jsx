@@ -56,23 +56,8 @@ export default function ShippingOptions() {
     const selectedShippingMethod = basket?.shipments?.[0]?.shippingMethod
     const selectedShippingAddress = basket?.shipments?.[0]?.shippingAddress
 
-    // Calculate if we should show loading state immediately for auto-selection
-    const shouldShowInitialLoading = useMemo(() => {
-        return (
-            step === STEPS.SHIPPING_OPTIONS &&
-            !hasAutoSelected &&
-            customer?.isRegistered &&
-            !selectedShippingMethod?.id &&
-            shippingMethods?.applicableShippingMethods?.length &&
-            shippingMethods.defaultShippingMethodId &&
-            shippingMethods.applicableShippingMethods.find(
-                (method) => method.id === shippingMethods.defaultShippingMethodId
-            )
-        )
-    }, [step, hasAutoSelected, customer, selectedShippingMethod, shippingMethods])
-
-    // Use calculated loading state or manual loading state
-    const effectiveIsLoading = isLoading || shouldShowInitialLoading
+    // Only reflect explicit loading state from user actions
+    const effectiveIsLoading = Boolean(isLoading)
 
     const form = useForm({
         shouldUnregister: false,
@@ -96,8 +81,11 @@ export default function ShippingOptions() {
     // Auto-select default shipping method and proceed for authenticated users
     useEffect(() => {
         const autoSelectDefaultShippingMethod = async () => {
-            // Only auto-select when on this step and haven't already auto-selected
-            if (step !== STEPS.SHIPPING_OPTIONS || hasAutoSelected || isLoading) {
+            if (step !== STEPS.SHIPPING_OPTIONS) return
+            if (hasAutoSelected) return
+
+            // Only proceed for authenticated users
+            if (!customer?.isRegistered) {
                 return
             }
 
@@ -108,50 +96,47 @@ export default function ShippingOptions() {
                 return
             }
 
-            // Only proceed for authenticated users
-            if (!customer?.isRegistered) {
-                return
-            }
-
             // Wait for shipping methods to load
             if (!shippingMethods?.applicableShippingMethods?.length) {
                 return
             }
 
             const defaultMethodId = shippingMethods.defaultShippingMethodId
-            const defaultMethod = shippingMethods.applicableShippingMethods.find(
-                (method) => method.id === defaultMethodId
-            )
+            const defaultMethod =
+                shippingMethods.applicableShippingMethods.find(
+                    (method) => method.id === defaultMethodId
+                ) || shippingMethods.applicableShippingMethods[0]
 
-            if (defaultMethod) {
-                //Auto-selecting default shipping method
-                setHasAutoSelected(true)
-                setIsLoading(true) // Show loading state immediately
+            if (!defaultMethod) return
 
-                try {
-                    // Apply the default shipping method and continue to next step
-                    await updateShippingMethod.mutateAsync({
-                        parameters: {
-                            basketId: basket.basketId,
-                            shipmentId: 'me'
-                        },
-                        body: {
-                            id: defaultMethodId
-                        }
-                    })
-                    //Default shipping method auto-applied successfully
-                    setIsLoading(false) // Clear loading state before navigation
-                    goToNextStep()
-                } catch (error) {
-                    // Reset on error so user can manually select
-                    setHasAutoSelected(false)
-                    setIsLoading(false) // Hide loading state on error
-                }
+            setHasAutoSelected(true)
+            setIsLoading(true)
+            try {
+                await updateShippingMethod.mutateAsync({
+                    parameters: {
+                        basketId: basket.basketId,
+                        shipmentId: 'me'
+                    },
+                    body: {id: defaultMethod.id}
+                })
+                setIsLoading(false)
+                goToNextStep()
+            } catch (error) {
+                setIsLoading(false)
+                setHasAutoSelected(false)
             }
         }
 
         autoSelectDefaultShippingMethod()
-    }, [step, selectedShippingMethod, customer, shippingMethods, hasAutoSelected, basket?.basketId])
+    }, [
+        step,
+        hasAutoSelected,
+        customer?.isRegistered,
+        selectedShippingMethod?.id,
+        shippingMethods?.applicableShippingMethods,
+        shippingMethods?.defaultShippingMethodId,
+        basket?.basketId
+    ])
 
     const submitForm = async ({shippingMethodId}) => {
         await updateShippingMethod.mutateAsync({
