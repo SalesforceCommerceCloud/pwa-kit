@@ -117,14 +117,6 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
     // Only run post-auth recovery for OTP flows initiated from this Contact Info step
     const otpFromContactRef = useRef(false)
 
-    // Helper function to validate email format
-    const isValidEmail = (email) => {
-        const emailRegex =
-            /^[\p{L}\p{N}._!#$%&'*+/=?^`{|}~-]+@(?:[\p{L}\p{N}](?:[\p{L}\p{N}-]{0,61}[\p{L}\p{N}])?\.)+[\p{L}\p{N}](?:[\p{L}\p{N}-]{0,61}[\p{L}\p{N}])?$/u
-
-        return emailRegex.test(email)
-    }
-
     // Handle email field blur/focus events
     const handleEmailBlur = async (e) => {
         // Call original React Hook Form blur handler if it exists
