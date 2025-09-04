@@ -43,9 +43,12 @@ export default async function handler(req, res) {
         const adyenBaseUrl =
             environment === 'live'
                 ? 'https://checkout-live.adyen.com/v70'
-                : 'https://checkout-test.adyen.com/v70'
+                : 'https://checkout-test-us.adyen.com/v70'
 
         // Call Adyen payment methods API without basket dependency
+        const adyenApiStartTime = Date.now()
+        console.log(`[Adyen Payment Methods] Starting API call to ${adyenBaseUrl}/paymentMethods for siteId: ${siteId}`)
+
         const adyenResponse = await fetch(`${adyenBaseUrl}/paymentMethods`, {
             method: 'POST',
             headers: {
@@ -59,6 +62,9 @@ export default async function handler(req, res) {
             })
         })
 
+        const adyenApiDuration = Date.now() - adyenApiStartTime
+        console.log(`[Adyen Payment Methods] API call completed in ${adyenApiDuration}ms for siteId: ${siteId}`)
+
         if (!adyenResponse.ok) {
             const errorBody = await adyenResponse.text()
             console.error('Adyen API error:', errorBody)
@@ -67,7 +73,14 @@ export default async function handler(req, res) {
             })
         }
 
+        // Parse JSON response with timing
+        const jsonParseStartTime = Date.now()
+        console.log(`[Adyen Payment Methods] Starting JSON parsing for siteId: ${siteId}`)
+
         const paymentMethods = await adyenResponse.json()
+
+        const jsonParseDuration = Date.now() - jsonParseStartTime
+        console.log(`[Adyen Payment Methods] JSON parsing completed in ${jsonParseDuration}ms for siteId: ${siteId}`)
 
         // Return the payment methods with environment configuration and application info
         res.status(200).json({
