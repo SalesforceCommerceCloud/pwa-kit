@@ -117,15 +117,19 @@ export default function ShippingAddress() {
     // Auto-select and apply preferred shipping address for registered users
     useEffect(() => {
         const autoSelectPreferredAddress = async () => {
-            // Only auto-select on the shipping address step, and run at most once
-            if (step !== STEPS.SHIPPING_ADDRESS || hasAutoSelected || isLoading) return
+            // Only auto-select when on this step and haven't already auto-selected
+            if (step !== STEPS.SHIPPING_ADDRESS || hasAutoSelected || isLoading) {
+                return
+            }
 
-            // Only proceed if the shopper is registered and has saved addresses
-            if (!customer?.isRegistered || !customer?.addresses?.length) return
+            // Only proceed if customer is registered and has addresses
+            if (!customer?.isRegistered || !customer?.addresses?.length) {
+                return
+            }
 
-            // If a shipping address is already applied, advance to next step
+            // Skip to next step if basket already has a shipping address
             if (selectedShippingAddress?.address1) {
-                setHasAutoSelected(true)
+                setHasAutoSelected(true) // Prevent further attempts
                 goToNextStep()
                 return
             }
@@ -134,17 +138,16 @@ export default function ShippingAddress() {
             const preferredAddress =
                 customer.addresses.find((addr) => addr.preferred === true) || customer.addresses[0]
 
-            if (!preferredAddress) return
-
-            setHasAutoSelected(true)
-            try {
-                await submitAndContinue(preferredAddress)
-            } catch (_e) {
-                // Reset so the user can manually select on error
-                setHasAutoSelected(false)
+            //Auto-selecting preferred shipping address
+            if (preferredAddress) {
+                setHasAutoSelected(true)
+                try {
+                    await submitAndContinue(preferredAddress)
+                } catch (error) {
+                    setHasAutoSelected(false)
+                }
             }
         }
-
         autoSelectPreferredAddress()
     }, [step, customer, selectedShippingAddress, hasAutoSelected, isLoading])
 
