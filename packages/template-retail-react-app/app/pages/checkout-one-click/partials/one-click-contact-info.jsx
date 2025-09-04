@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React, {useRef, useState, useEffect} from 'react'
+import React, {useRef, useState} from 'react'
 import PropTypes from 'prop-types'
 import {
     Alert,
@@ -43,13 +43,13 @@ import {
     AuthHelpers,
     useAuthHelper,
     useShopperBasketsMutation,
-    useCustomerType,
-    useConfig
+    useCustomerType
 } from '@salesforce/commerce-sdk-react'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import {isAbsoluteURL} from '@salesforce/retail-react-app/app/page-designer/utils'
 import {useAppOrigin} from '@salesforce/retail-react-app/app/hooks/use-app-origin'
 import {API_ERROR_MESSAGE} from '@salesforce/retail-react-app/app/constants'
+import {isValidEmail} from '@salesforce/retail-react-app/app/utils/email-utils'
 
 const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseGuest}) => {
     const {formatMessage} = useIntl()
@@ -59,9 +59,7 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
     const currentBasketQuery = useCurrentBasket()
     const {data: basket} = currentBasketQuery
     const {isRegistered} = useCustomerType()
-    const config = useConfig()
 
-    const login = useAuthHelper(AuthHelpers.LoginRegisteredUserB2C)
     const logout = useAuthHelper(AuthHelpers.Logout)
     const updateCustomerForBasket = useShopperBasketsMutation('updateCustomerForBasket')
     const mergeBasket = useShopperBasketsMutation('mergeBasket')
@@ -93,30 +91,12 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
         ? passwordlessConfigCallback
         : `${appOrigin}${passwordlessConfigCallback}`
 
-    // Reset guest checkout flag when user registration status changes
-    useEffect(() => {
-        if (isRegistered) {
-            setRegisteredUserChoseGuest(false)
-            if (onRegisteredUserChoseGuest) {
-                onRegisteredUserChoseGuest(false)
-            }
-        }
-    }, [isRegistered, onRegisteredUserChoseGuest])
-
     // Modal controls for OtpAuth
     const {
         isOpen: isOtpModalOpen,
         onOpen: onOtpModalOpen,
         onClose: onOtpModalClose
     } = useDisclosure()
-
-    // Helper function to validate email format
-    const isValidEmail = (email) => {
-        const emailRegex =
-            /^[\p{L}\p{N}._!#$%&'*+/=?^`{|}~-]+@(?:[\p{L}\p{N}](?:[\p{L}\p{N}-]{0,61}[\p{L}\p{N}])?\.)+[\p{L}\p{N}](?:[\p{L}\p{N}-]{0,61}[\p{L}\p{N}])?$/u
-
-        return emailRegex.test(email)
-    }
 
     // Handle email field blur/focus events
     const handleEmailBlur = async (e) => {
@@ -280,7 +260,7 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
         }
 
         setShowContinueButton(false)
-        goToNextStep()
+        handleSendEmailOtp(data.email)
     }
 
     return (
