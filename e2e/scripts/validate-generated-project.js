@@ -45,9 +45,9 @@ const validateExtensibilityConfig = async (project, templateVersion) => {
     const pkg = require(pkgPath)
     return new Promise((resolve, reject) => {
         if (
-            !pkg.hasOwn('ccExtensibility') ||
-            !pkg['ccExtensibility'].hasOwn('extends') ||
-            !pkg['ccExtensibility'].hasOwn('overridesDir') ||
+            !Object.hasOwn(pkg, 'ccExtensibility') ||
+            !Object.hasOwn(pkg['ccExtensibility'], 'extends') ||
+            !Object.hasOwn(pkg['ccExtensibility'], 'overridesDir') ||
             pkg['ccExtensibility'].extends !== '@salesforce/retail-react-app' ||
             pkg['ccExtensibility'].overridesDir !== 'overrides'
         ) {
@@ -94,6 +94,15 @@ program
     )
     .option('--templateVersion <templateVersion>', 'Template version used to generate the project')
 
-program.parse(process.argv)
+// Export functions for testing
+module.exports = {
+    validateGeneratedArtifacts,
+    validateExtensibilityConfig,
+    main
+}
 
-main(program)
+// Only run CLI when file is executed directly
+if (require.main === module) {
+    program.parse(process.argv)
+    main(program)
+}

@@ -106,6 +106,7 @@ jobs:
             - name: Create .env with environment variables to be set on the MRT target
               run: |-
                   echo "PWA_KIT_SLAS_CLIENT_SECRET=${{ secrets.ZZRF_002_SLAS_PRIVATE_CLIENT_SECRET }}" > ${{ vars.MRT_ENV_VARS_E2E_BASE_FILENAME }}
+                  echo "OTEL_TRACING_ENABLED=true" >> ${{ vars.MRT_ENV_VARS_E2E_BASE_FILENAME }}
 
               # Call the e2e/scripts/update-mrt-target.js script to update the MRT target config and environment variables.
               # This script is a Node.js script that makes a PATCH request to the MRT API to update the MRT target config and environment variables.
