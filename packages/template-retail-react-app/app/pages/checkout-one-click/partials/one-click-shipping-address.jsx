@@ -114,7 +114,7 @@ export default function ShippingAddress() {
         }
     }
 
-    // Auto-select and apply preferred shipping address when component is on this step
+    // Auto-select and apply preferred shipping address for registered users
     useEffect(() => {
         const autoSelectPreferredAddress = async () => {
             // Only auto-select when on this step and haven't already auto-selected
@@ -134,8 +134,9 @@ export default function ShippingAddress() {
                 return
             }
 
-            // Find the preferred address
-            const preferredAddress = customer.addresses.find((addr) => addr.preferred === true)
+            // Choose preferred address if set; otherwise fallback to first address
+            const preferredAddress =
+                customer.addresses.find((addr) => addr.preferred === true) || customer.addresses[0]
 
             //Auto-selecting preferred shipping address
             if (preferredAddress) {
