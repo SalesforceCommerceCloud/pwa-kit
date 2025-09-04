@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import {isValidEmail} from './email-utils'
+import {isValidEmail} from '@salesforce/retail-react-app/app/utils/email-utils'
 
 describe('isValidEmail', () => {
     describe('valid email addresses', () => {
@@ -30,7 +30,7 @@ describe('isValidEmail', () => {
         })
 
         test('should return true for email with various special characters', () => {
-            expect(isValidEmail('user!#$%&\'*+/=?^`{|}~-@example.com')).toBe(true)
+            expect(isValidEmail("user!#$%&'*+/=?^`{|}~-@example.com")).toBe(true)
         })
 
         test('should return true for email with long domain', () => {
