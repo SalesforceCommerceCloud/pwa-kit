@@ -41,7 +41,7 @@ module.exports = {
         checkout: {
             SalesforcePaymentsEnabled: true,
         },
-        commerceAPI: {
+        /*commerceAPI: {
             proxyPath: `/mobify/proxy/api`,
             parameters: {
                 clientId: 'c9c45bfd-0ed3-4aa2-9971-40f88962b836',
@@ -50,6 +50,17 @@ module.exports = {
                 organizationId: 'f_ecom_zzrf_001',
                 shortCode: 'kv7kzm78', // ✅ Match this with proxy host
                 siteId: 'RefArchGlobal'
+            }
+        },*/
+        commerceAPI: {
+            proxyPath: `/mobify/proxy/api`,
+            parameters: {
+                clientId: 'ea168ae1-3a5d-4676-b637-27bf8bf1b6fc',
+                //shortCode: '8o7m175y',
+                organizationId: 'f_ecom_zyoe_002',
+                shortCode: 'sandbox-001', // ✅ Match this with proxy host
+                //shortCode: 'kv7kzm78',
+                siteId: 'RefArch'
             }
         },
         einsteinAPI: {
@@ -79,13 +90,22 @@ module.exports = {
         ssrFunctionNodeVersion: '22.x',
         proxyConfigs: [
             {
-                host: 'kv7kzm78.api.commercecloud.salesforce.com',
+                host: 'sandbox-001.api.commercecloud.salesforce.com',
                 path: 'api'
             },
-            {
-                host: 'zzrf-001.dx.commercecloud.salesforce.com',
+            /*{
+                host: 'zyoe-002.dx.commercecloud.salesforce.com',
                 path: 'ocapi'
-            }
+            },*/
+            {
+                host: 'sandbox-001.api.commercecloud.salesforce.com',
+                path: 'ocapi'
+            },
+            {
+                host: 'localhost',  // ← For local dev static resources
+                path: 'static'
+            },
+
         ]
     }
 }

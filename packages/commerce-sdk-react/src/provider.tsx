@@ -21,6 +21,7 @@ import {
     ShopperExperience,
     ShopperLogin,
     ShopperOrders,
+    ShopperPayments,  
     ShopperProducts,
     ShopperPromotions,
     ShopperGiftCertificates,
@@ -250,6 +251,7 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
                 proxy: enablePWAKitPrivateClient ? privateClientEndpoint : config.proxy
             }),
             shopperOrders: new ShopperOrders(config),
+            shopperPayments: new ShopperPayments(config),  
             shopperProducts: new ShopperProducts(config),
             shopperPromotions: new ShopperPromotions(config),
             shopperSearch: new ShopperSearch(config),

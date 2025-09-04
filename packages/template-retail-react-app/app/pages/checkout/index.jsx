@@ -41,11 +41,11 @@ import LoadingSpinner from '@salesforce/retail-react-app/app/components/loading-
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 
 //we will be importing the submission call from payment sheet here
+//TODO (fix the reference here to salesforce-payments/payment-sheet later
 import {usePaymentSheetSubmission} from '@salesforce/retail-react-app/app/pages/checkout/partials/salesforce-payments/payment-sheet'
 //reads the configuration data here when checkout is loaded
+//import {usePaymentConfigManager} from '@salesforce/retail-react-app/app/hooks/salesforce-payments/use-payment-config-manager'
 import {usePaymentConfigManager} from '@salesforce/retail-react-app/app/hooks/salesforce-payments/use-payment-config-manager'
-
-
 const Checkout = () => {
     const {formatMessage} = useIntl()
     const navigate = useNavigation()
@@ -81,14 +81,12 @@ const Checkout = () => {
     const submitOrder = async () => {
         setIsLoading(true)
         try {
-            // ✅ Anitha: Process payment first if SFP is enabled
+            // check if SFP is enabled (via the hook)
             if (isSFPEnabled) {
                 console.log('🚀 Processing SFP payment before order creation...')
-                await submitPaymentSheetOrder()
+                const order = await submitPaymentSheetOrder()
                 console.log('✅ Payment processed, now creating order...')
-                const order = await createOrder({
-                    body: {basketId: basket.basketId}
-                })
+                console.log(order)
                 navigate(`/checkout/confirmation/${order.orderNo}`)
             } else {
                 const order = await createOrder({

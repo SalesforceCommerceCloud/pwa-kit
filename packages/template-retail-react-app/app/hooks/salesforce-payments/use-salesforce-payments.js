@@ -10,7 +10,9 @@ export const useSalesforcePayments = (scriptsLoaded, hasSFP) => {
 
     useEffect(() => {
         const initializeSFP = async () => {
-            console.log('SFP Hook - checking conditions:', {
+
+               // ✅ ADD: Log the exact values
+               console.log('🔍 SFP Hook - checking conditions:', {
                 scriptsLoaded,
                 hasSFP,
                 windowSFPayments: !!window.SFPayments,
@@ -28,6 +30,12 @@ export const useSalesforcePayments = (scriptsLoaded, hasSFP) => {
                 // Initialize SFP instance
                 const sfp = new window.SFPayments()
                 
+
+                    // ✅ DEBUG: Check what methods are available
+    console.log('🔍 SFP instance:', sfp)
+    console.log('🔍 SFP methods:', Object.getOwnPropertyNames(sfp))
+    console.log('🔍 SFP prototype methods:', Object.getOwnPropertyNames(Object.getPrototypeOf(sfp)))
+    
                 // Store in ref for cleanup and avoid re-initialization
                 sfpRef.current = sfp
                 setSfpInstance(sfp)
