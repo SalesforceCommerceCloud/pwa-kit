@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React, {useRef, useState, useEffect} from 'react'
+import React, {useRef, useState} from 'react'
 import PropTypes from 'prop-types'
 import {
     Alert,
@@ -108,16 +108,6 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
         ? passwordlessConfigCallback
         : `${appOrigin}${passwordlessConfigCallback}`
 
-    // Reset guest checkout flag when user registration status changes
-    useEffect(() => {
-        if (isRegistered) {
-            setRegisteredUserChoseGuest(false)
-            if (onRegisteredUserChoseGuest) {
-                onRegisteredUserChoseGuest(false)
-            }
-        }
-    }, [isRegistered, onRegisteredUserChoseGuest])
-
     // Modal controls for OtpAuth
     const {
         isOpen: isOtpModalOpen,
@@ -126,14 +116,6 @@ const ContactInfo = ({isSocialEnabled = false, idps = [], onRegisteredUserChoseG
     } = useDisclosure()
     // Only run post-auth recovery for OTP flows initiated from this Contact Info step
     const otpFromContactRef = useRef(false)
-
-    // Helper function to validate email format
-    const isValidEmail = (email) => {
-        const emailRegex =
-            /^[\p{L}\p{N}._!#$%&'*+/=?^`{|}~-]+@(?:[\p{L}\p{N}](?:[\p{L}\p{N}-]{0,61}[\p{L}\p{N}])?\.)+[\p{L}\p{N}](?:[\p{L}\p{N}-]{0,61}[\p{L}\p{N}])?$/u
-
-        return emailRegex.test(email)
-    }
 
     // Helper function to validate email format
     const isValidEmail = (email) => {

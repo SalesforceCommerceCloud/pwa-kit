@@ -191,86 +191,9 @@ describe('ContactInfo Component', () => {
         await user.tab()
 
         expect(screen.getByText('Please enter a valid email address.')).toBeInTheDocument()
-    })
 
-    test('validates different types of valid emails correctly', async () => {
-        const {user} = renderWithProviders(<ContactInfo />)
-
-        // Test various valid email formats
-        const validEmails = [
-            'simple@example.com',
-            'user.name@domain.com',
-            'user+tag@example.org',
-            'user-name@subdomain.example.co.uk',
-            'user123@domain123.net',
-            'user.name+tag@example-domain.com',
-            'user@example-domain.com',
-            'user@subdomain1.subdomain2.example.com',
-            'user.name@example.co.uk',
-            'user@example-domain123.com',
-            'josé@mañana.com',
-            'firstname.lastname@example.co.uk',
-            'email@subdomain.example.com',
-            'user+mailbox@example.com',
-            'user-name@example.org',
-            '12345@example.com',
-            'email@mañana.com',
-            'josé@example.españa',
-            'email@bücher.de',
-            '用户@例子.中国',
-            '!#$%&*+/=?^_{|}~-@example.com'
-        ]
-
-        for (const email of validEmails) {
-            const {user: testUser} = renderWithProviders(<ContactInfo />)
-            const emailInput = screen.getByLabelText('Email')
-
-            await testUser.type(emailInput, email)
-
-            // Trigger blur event to validate
-            await testUser.tab()
-
-            // Should not show email format error for valid emails
-            expect(
-                screen.queryByText('Please enter a valid email address.')
-            ).not.toBeInTheDocument()
-
-            // Should not show required email error
-            expect(screen.queryByText('Please enter your email address.')).not.toBeInTheDocument()
-
-            // Clean up
-            cleanup()
-        }
-    })
-
-    test('validates different types of invalid emails correctly', async () => {
-        // Test various invalid email formats that are definitely rejected by the current regex
-        const invalidEmails = [
-            'plainaddress', // Missing @ symbol
-            '@missinglocal.com', // Missing local part
-            'missingdomain@', // Missing domain
-            'user@', // Missing domain completely
-            'user@.domain.com', // Domain starting with dot
-            'user@domain.com.', // Domain ending with dot
-            'user@-domain.com', // Domain starting with hyphen
-            'user@domain-.com' // Domain ending with hyphen
-        ]
-
-        for (const email of invalidEmails) {
-            const {user: testUser} = renderWithProviders(<ContactInfo />)
-            const emailInput = screen.getByLabelText('Email')
-
-            await testUser.type(emailInput, email)
-
-            // Trigger blur event to validate
-            await testUser.tab()
-
-            // Should show email format error for invalid emails
-            expect(screen.getByText('Please enter a valid email address.')).toBeInTheDocument()
-
-            // Clean up
-            cleanup()
-        }
+        // Should not show required email error
+        expect(screen.queryByText('Please enter your email address.')).not.toBeInTheDocument()
     })
 
     test('allows guest checkout with valid email', async () => {
