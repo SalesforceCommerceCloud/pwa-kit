@@ -141,13 +141,17 @@ export default function ShippingAddress() {
             //Auto-selecting preferred shipping address
             if (preferredAddress) {
                 setHasAutoSelected(true)
+
                 try {
+                    // Apply the preferred address and continue to next step
                     await submitAndContinue(preferredAddress)
                 } catch (error) {
+                    // Reset on error so user can manually select
                     setHasAutoSelected(false)
                 }
             }
         }
+
         autoSelectPreferredAddress()
     }, [step, customer, selectedShippingAddress, hasAutoSelected, isLoading])
 
