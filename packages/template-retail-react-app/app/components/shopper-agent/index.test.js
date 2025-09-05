@@ -450,4 +450,360 @@ describe('ShopperAgent Component', () => {
 
         expect(mockedUseScript).toHaveBeenCalledWith('https://test.salesforce.com/script.js')
     })
+
+    describe('Conversation Context Functionality', () => {
+        beforeEach(() => {
+            // Mock postMessage for iframe communication
+            global.postMessage = jest.fn()
+
+            // Mock document.querySelector for iframe
+            const mockIframe = {
+                src: 'https://test.salesforce.com/iframe',
+                contentWindow: {
+                    postMessage: jest.fn()
+                }
+            }
+            jest.spyOn(document, 'querySelector').mockReturnValue(mockIframe)
+        })
+
+        afterEach(() => {
+            jest.restoreAllMocks()
+        })
+
+        test('should handle conversation context when enabled with valid data', async () => {
+            const props = {
+                ...defaultProps,
+                commerceAgentConfiguration: {
+                    ...commerceAgentSettings,
+                    enableConversationContext: 'true',
+                    conversationContext: ['Dry Skin', 'Oily Skin', 'Curly', 'Straight']
+                }
+            }
+
+            render(<ShopperAgent {...props} />)
+
+            // Simulate MIAW event requesting conversation context
+            const mockEvent = {
+                source: {postMessage: jest.fn()},
+                data: {type: 'lwc.getConversationContext'}
+            }
+
+            // Trigger the event
+            await act(async () => {
+                window.dispatchEvent(new MessageEvent('message', mockEvent))
+            })
+
+            // The component should handle the event without errors
+            expect(() => render(<ShopperAgent {...props} />)).not.toThrow()
+        })
+
+        test('should return empty array when conversation context is disabled', async () => {
+            const props = {
+                ...defaultProps,
+                commerceAgentConfiguration: {
+                    ...commerceAgentSettings,
+                    enableConversationContext: 'false',
+                    conversationContext: ['Dry Skin', 'Oily Skin']
+                }
+            }
+
+            render(<ShopperAgent {...props} />)
+
+            // Simulate MIAW event
+            const mockEvent = {
+                source: {postMessage: jest.fn()},
+                data: {type: 'lwc.getConversationContext'}
+            }
+
+            await act(async () => {
+                window.dispatchEvent(new MessageEvent('message', mockEvent))
+            })
+
+            // Should not throw errors even when disabled
+            expect(() => render(<ShopperAgent {...props} />)).not.toThrow()
+        })
+
+        test('should handle missing enableConversationContext property', async () => {
+            const props = {
+                ...defaultProps,
+                commerceAgentConfiguration: {
+                    ...commerceAgentSettings,
+                    // enableConversationContext missing - should default to 'false'
+                    conversationContext: ['Dry Skin', 'Oily Skin']
+                }
+            }
+
+            render(<ShopperAgent {...props} />)
+
+            // Simulate MIAW event
+            const mockEvent = {
+                source: {postMessage: jest.fn()},
+                data: {type: 'lwc.getConversationContext'}
+            }
+
+            await act(async () => {
+                window.dispatchEvent(new MessageEvent('message', mockEvent))
+            })
+
+            // Should handle gracefully with default values
+            expect(() => render(<ShopperAgent {...props} />)).not.toThrow()
+        })
+
+        test('should handle missing conversationContext property', async () => {
+            const props = {
+                ...defaultProps,
+                commerceAgentConfiguration: {
+                    ...commerceAgentSettings,
+                    enableConversationContext: 'true'
+                    // conversationContext missing - should default to []
+                }
+            }
+
+            render(<ShopperAgent {...props} />)
+
+            // Simulate MIAW event
+            const mockEvent = {
+                source: {postMessage: jest.fn()},
+                data: {type: 'lwc.getConversationContext'}
+            }
+
+            await act(async () => {
+                window.dispatchEvent(new MessageEvent('message', mockEvent))
+            })
+
+            // Should handle gracefully with default empty array
+            expect(() => render(<ShopperAgent {...props} />)).not.toThrow()
+        })
+
+        test('should handle invalid conversationContext data type', async () => {
+            const props = {
+                ...defaultProps,
+                commerceAgentConfiguration: {
+                    ...commerceAgentSettings,
+                    enableConversationContext: 'true',
+                    conversationContext: 'not an array' // Invalid data type
+                }
+            }
+
+            render(<ShopperAgent {...props} />)
+
+            // Simulate MIAW event
+            const mockEvent = {
+                source: {postMessage: jest.fn()},
+                data: {type: 'lwc.getConversationContext'}
+            }
+
+            await act(async () => {
+                window.dispatchEvent(new MessageEvent('message', mockEvent))
+            })
+
+            // Should handle gracefully with invalid data
+            expect(() => render(<ShopperAgent {...props} />)).not.toThrow()
+        })
+
+        test('should handle empty conversation context array', async () => {
+            const props = {
+                ...defaultProps,
+                commerceAgentConfiguration: {
+                    ...commerceAgentSettings,
+                    enableConversationContext: 'true',
+                    conversationContext: []
+                }
+            }
+
+            render(<ShopperAgent {...props} />)
+
+            // Simulate MIAW event
+            const mockEvent = {
+                source: {postMessage: jest.fn()},
+                data: {type: 'lwc.getConversationContext'}
+            }
+
+            await act(async () => {
+                window.dispatchEvent(new MessageEvent('message', mockEvent))
+            })
+
+            // Should handle empty array gracefully
+            expect(() => render(<ShopperAgent {...props} />)).not.toThrow()
+        })
+
+        test('should handle iframe not found when sending conversation context', async () => {
+            // Mock querySelector to return null (iframe not found)
+            jest.spyOn(document, 'querySelector').mockReturnValue(null)
+
+            const props = {
+                ...defaultProps,
+                commerceAgentConfiguration: {
+                    ...commerceAgentSettings,
+                    enableConversationContext: 'true',
+                    conversationContext: ['Dry Skin', 'Oily Skin']
+                }
+            }
+
+            render(<ShopperAgent {...props} />)
+
+            // Simulate MIAW event
+            const mockEvent = {
+                source: {postMessage: jest.fn()},
+                data: {type: 'lwc.getConversationContext'}
+            }
+
+            await act(async () => {
+                window.dispatchEvent(new MessageEvent('message', mockEvent))
+            })
+
+            // Should handle missing iframe gracefully
+            expect(() => render(<ShopperAgent {...props} />)).not.toThrow()
+        })
+
+        test('should handle iframe without src when sending conversation context', async () => {
+            // Mock iframe without src
+            const mockIframe = {
+                src: '',
+                contentWindow: {
+                    postMessage: jest.fn()
+                }
+            }
+            jest.spyOn(document, 'querySelector').mockReturnValue(mockIframe)
+
+            const props = {
+                ...defaultProps,
+                commerceAgentConfiguration: {
+                    ...commerceAgentSettings,
+                    enableConversationContext: 'true',
+                    conversationContext: ['Dry Skin', 'Oily Skin']
+                }
+            }
+
+            render(<ShopperAgent {...props} />)
+
+            // Simulate MIAW event
+            const mockEvent = {
+                source: {postMessage: jest.fn()},
+                data: {type: 'lwc.getConversationContext'}
+            }
+
+            await act(async () => {
+                window.dispatchEvent(new MessageEvent('message', mockEvent))
+            })
+
+            // Should handle iframe without src gracefully
+            expect(() => render(<ShopperAgent {...props} />)).not.toThrow()
+        })
+
+        test('should handle non-MIAW events gracefully', async () => {
+            const props = {
+                ...defaultProps,
+                commerceAgentConfiguration: {
+                    ...commerceAgentSettings,
+                    enableConversationContext: 'true',
+                    conversationContext: ['Dry Skin', 'Oily Skin']
+                }
+            }
+
+            render(<ShopperAgent {...props} />)
+
+            // Simulate non-MIAW event
+            const mockEvent = {
+                source: {postMessage: jest.fn()},
+                data: {type: 'other.event.type'}
+            }
+
+            await act(async () => {
+                window.dispatchEvent(new MessageEvent('message', mockEvent))
+            })
+
+            // Should handle non-MIAW events without errors
+            expect(() => render(<ShopperAgent {...props} />)).not.toThrow()
+        })
+
+        test('should handle events from same window source', async () => {
+            const props = {
+                ...defaultProps,
+                commerceAgentConfiguration: {
+                    ...commerceAgentSettings,
+                    enableConversationContext: 'true',
+                    conversationContext: ['Dry Skin', 'Oily Skin']
+                }
+            }
+
+            render(<ShopperAgent {...props} />)
+
+            // Simulate event from same window (should be ignored)
+            const mockEvent = {
+                source: window, // Same as window
+                data: {type: 'lwc.getConversationContext'}
+            }
+
+            await act(async () => {
+                window.dispatchEvent(new MessageEvent('message', mockEvent))
+            })
+
+            // Should ignore events from same window
+            expect(() => render(<ShopperAgent {...props} />)).not.toThrow()
+        })
+
+        test('should validate conversation context configuration properties', () => {
+            // Test with invalid enableConversationContext type
+            const invalidProps1 = {
+                ...defaultProps,
+                commerceAgentConfiguration: {
+                    ...commerceAgentSettings,
+                    enableConversationContext: 123, // Should be string
+                    conversationContext: ['Dry Skin']
+                }
+            }
+
+            // Should not render due to validation failure
+            render(<ShopperAgent {...invalidProps1} />)
+            expect(screen.queryByTestId('shopper-agent')).toBeNull()
+
+            // Test with invalid conversationContext type
+            const invalidProps2 = {
+                ...defaultProps,
+                commerceAgentConfiguration: {
+                    ...commerceAgentSettings,
+                    enableConversationContext: 'true',
+                    conversationContext: 'not an array' // Should be array
+                }
+            }
+
+            // Should not render due to validation failure
+            render(<ShopperAgent {...invalidProps2} />)
+            expect(screen.queryByTestId('shopper-agent')).toBeNull()
+        })
+
+        test('should handle conversation context with various data types in array', async () => {
+            const props = {
+                ...defaultProps,
+                commerceAgentConfiguration: {
+                    ...commerceAgentSettings,
+                    enableConversationContext: 'true',
+                    conversationContext: [
+                        'Dry Skin',
+                        'Oily Skin',
+                        'Curly Hair',
+                        'Straight Hair',
+                        'Sensitive Skin',
+                        'Normal Skin'
+                    ]
+                }
+            }
+
+            render(<ShopperAgent {...props} />)
+
+            // Simulate MIAW event
+            const mockEvent = {
+                source: {postMessage: jest.fn()},
+                data: {type: 'lwc.getConversationContext'}
+            }
+
+            await act(async () => {
+                window.dispatchEvent(new MessageEvent('message', mockEvent))
+            })
+
+            // Should handle various data types in array
+            expect(() => render(<ShopperAgent {...props} />)).not.toThrow()
+        })
+    })
 })
