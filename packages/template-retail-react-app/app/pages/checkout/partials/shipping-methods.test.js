@@ -349,6 +349,75 @@ describe('ShippingMethods', () => {
             expect(screen.getAllByText('Standard Shipping').length).toBeGreaterThan(0)
             expect(screen.getAllByText('Express Shipping').length).toBeGreaterThan(0)
         })
+
+        test('should display correct individual shipping costs in summary mode with all relevant shipping fees - surcharge', () => {
+            const multiShipmentBasketWithSurcharges = {
+                ...mockBasket,
+                shipments: [
+                    {
+                        shipmentId: 'shipment-1',
+                        shippingTotal: 15.99, // Base 5.99 + surcharge 10.00
+                        shippingAddress: {
+                            firstName: 'John',
+                            lastName: 'Doe',
+                            address1: '123 Main St',
+                            city: 'Anytown',
+                            stateCode: 'CA',
+                            postalCode: '12345'
+                        },
+                        shippingMethod: {
+                            id: 'shipping-method-1',
+                            name: 'Ground',
+                            description: 'Order received within 7-10 business days'
+                        }
+                    },
+                    {
+                        shipmentId: 'shipment-2',
+                        shippingTotal: 5.99, // Base only
+                        shippingAddress: {
+                            firstName: 'Jane',
+                            lastName: 'Smith',
+                            address1: '456 Oak Ave',
+                            city: 'Somewhere',
+                            stateCode: 'NY',
+                            postalCode: '67890'
+                        },
+                        shippingMethod: {
+                            id: 'shipping-method-2',
+                            name: 'Ground',
+                            description: 'Order received within 7-10 business days'
+                        }
+                    }
+                ],
+                shippingItems: [
+                    {shipmentId: 'shipment-1', price: 5.99}, // Base
+                    {shipmentId: 'shipment-1', price: 10.0}, // Surcharge
+                    {shipmentId: 'shipment-2', price: 5.99} // Base
+                ]
+            }
+
+            mockUseCurrentBasket.mockReturnValue({
+                data: multiShipmentBasketWithSurcharges,
+                derivedData: {
+                    totalShippingCost: 21.98 // 15.99 + 5.99
+                },
+                isLoading: false
+            })
+
+            // show summary mode
+            mockUseCheckout.mockReturnValue({
+                step: 3,
+                STEPS: {SHIPPING_OPTIONS: 2},
+                goToStep: jest.fn(),
+                goToNextStep: jest.fn()
+            })
+
+            renderWithIntl(<ShippingMethods />)
+
+            expect(screen.getByText('$15.99')).toBeInTheDocument() // First shipment
+            expect(screen.getByText('$5.99')).toBeInTheDocument() // Second shipment
+            expect(screen.getByText('$21.98')).toBeInTheDocument() // Total
+        })
     })
 
     describe('Error Handling', () => {
