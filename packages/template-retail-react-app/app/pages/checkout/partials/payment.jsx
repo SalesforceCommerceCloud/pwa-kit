@@ -306,10 +306,10 @@ const PaymentCardSummary = ({payment}) => {
             {CardIcon && <CardIcon layerStyle="ccIcon" />}
 
             <Stack direction="row">
-                <Text>{payment.paymentCard.cardType}</Text>
-                <Text>&bull;&bull;&bull;&bull; {payment.paymentCard.numberLastDigits}</Text>
+                <Text>{payment?.paymentCard?.cardType}</Text>
+                <Text>&bull;&bull;&bull;&bull; {payment?.paymentCard?.numberLastDigits}</Text>
                 <Text>
-                    {payment.paymentCard.expirationMonth}/{payment.paymentCard.expirationYear}
+                    {payment?.paymentCard?.expirationMonth}/{payment?.paymentCard?.expirationYear}
                 </Text>
             </Stack>
         </Stack>

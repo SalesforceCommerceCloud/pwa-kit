@@ -16,14 +16,17 @@ const options = {
     // The cache time for SSR'd pages (defaults to 600 seconds)
     defaultCacheTimeSeconds: 600,
 
-    // The port that the local dev server listens on
-    port: 3000,
+    // The port that the local dev server listens on (#SFP)
+    port: 3003,
 
     // The protocol on which the development Express app listens.
     // Note that http://localhost is treated as a secure context for development,
     // except by Safari.
     protocol: 'http',
 
+    // ADD THIS LINE:
+    useSLASPrivateClient: true,
+    
     mobify: pkg.mobify
 }
 

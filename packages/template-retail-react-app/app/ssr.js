@@ -25,10 +25,11 @@ import {getRuntime} from '@salesforce/pwa-kit-runtime/ssr/server/express'
 import {defaultPwaKitSecurityHeaders} from '@salesforce/pwa-kit-runtime/utils/middleware'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import {getAppOrigin} from '@salesforce/pwa-kit-react-sdk/utils/url'
+import https from 'https'  // SF Payments - need this for the proxy processing of metadata
 
 const config = getConfig()
 
-const options = {
+const options = {   
     // The build directory (an absolute path)
     buildDir: path.resolve(process.cwd(), 'build'),
 
@@ -39,7 +40,7 @@ const options = {
     mobify: config,
 
     // The port that the local dev server listens on
-    port: 3000,
+    port: 3003,
 
     // The protocol on which the development Express app listens.
     // Note that http://localhost is treated as a secure context for development,
@@ -51,15 +52,14 @@ const options = {
     // Set this to false if using a SLAS public client
     // When setting this to true, make sure to also set the PWA_KIT_SLAS_CLIENT_SECRET
     // environment variable as this endpoint will return HTTP 501 if it is not set
-    useSLASPrivateClient: false,
+    useSLASPrivateClient: true,
 
     // If you wish to use additional SLAS endpoints that require private clients,
     // customize this regex to include the additional endpoints the custom SLAS
     // private client secret handler will inject an Authorization header.
     // The default regex is defined in this file: https://github.com/SalesforceCommerceCloud/pwa-kit/blob/develop/packages/pwa-kit-runtime/src/ssr/server/build-remote-server.js
-    // applySLASPrivateClientToEndpoints:
-    //     /\/oauth2\/(token|passwordless\/(login|token)|password\/(reset|action))/,
-
+     applySLASPrivateClientToEndpoints:
+         /\/oauth2\/(token|passwordless\/(login|token)|password\/(reset|action))/,
     // If this is enabled, any HTTP header that has a non ASCII value will be URI encoded
     // If there any HTTP headers that have been encoded, an additional header will be
     // passed, `x-encoded-headers`, containing a comma separated list
@@ -313,11 +313,16 @@ const {handler} = runtime.createHandler(options, (app) => {
                 directives: {
                     'img-src': [
                         // Default source for product images - replace with your CDN
-                        '*.commercecloud.salesforce.com'
+                        '*.commercecloud.salesforce.com',
+                         // ✅ Temporary -> Allow localhost for SFP development
+                         'localhost:*',
                     ],
                     'script-src': [
                         // Used by the service worker in /worker/main.js
-                        'storage.googleapis.com'
+                        'storage.googleapis.com',
+                         // ✅ Allow scripts for SFP development
+                        '*.stripe.com',
+                        '*.paypal.com'
                     ],
                     'connect-src': [
                         // Connect to Einstein APIs
@@ -329,7 +334,10 @@ const {handler} = runtime.createHandler(options, (app) => {
                     ],
                     'frame-src': [
                         // Allow frames from Salesforce site.com (Needed for MIAW)
-                        '*.site.com'
+                        '*.site.com',
+                          // ✅ Allow frames for SFP development
+                        '*.stripe.com',
+                        '*.paypal.com'
                     ]
                 }
             }
@@ -386,6 +394,82 @@ const {handler} = runtime.createHandler(options, (app) => {
     app.get('/favicon.ico', runtime.serveStaticFile('static/ico/favicon.ico'))
 
     app.get('/worker.js(.map)?', runtime.serveServiceWorker)
+
+    // a custom endpoint and relatd code to fetch the payment metadata
+    // needs to be before the catch all route
+    
+    // Helper function to transform relative icon paths to absolute URLs
+    function transformIconPaths(data, ecomServerHost) {
+        const baseUrl = `https://${ecomServerHost}/on/demandware.static/Sites-Site/-/-/internal`
+    
+
+        const dataStr = JSON.stringify(data)
+        // Replace all relative icon paths with absolute URLs
+        const transformedStr = dataStr.replace(/"src":\s*"\/icons\//g, `"src":"${baseUrl}/icons/`)
+        return JSON.parse(transformedStr)
+    }
+
+    app.get('/api/payment-metadata', async (req, res) => {
+        try {
+            const proxyConfigs = config.ssrParameters.proxyConfigs
+            if (!proxyConfigs) {
+                throw new Error('proxyConfigs not found in configuration')
+            }
+            
+            const ocapiProxy = proxyConfigs.find(p => p.path === 'ocapi')
+            if (!ocapiProxy) {
+                throw new Error('OCAPI proxy configuration not found')
+            }
+
+            // Use Node's https module instead of fetch
+            const data = await new Promise((resolve, reject) => {
+                const options = {
+                    //hostname: ocapiProxy.host,
+                    hostname: '127.0.0.1',  // Temporary code -> Newer Node.js versions prefer IPv6 (::1) over IPv4 (127.0.0.1)
+                    path: '/on/demandware.static/Sites-Site/-/-/internal/metadata/v1.json',
+                    method: 'GET',
+                    rejectUnauthorized: false, // This bypasses SSL verification
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                }
+                
+                const req = https.request(options, (response) => {
+                    let data = ''
+                    response.on('data', (chunk) => {
+                        data += chunk
+                    })
+                    response.on('end', () => {
+                        try {
+                            resolve(JSON.parse(data))
+                        } catch (e) {
+                            reject(e)
+                        }
+                    })
+                })
+                
+                req.on('error', reject)
+                req.end()
+            })
+            
+            // ✅ Transform relative icon paths to absolute URLs
+            // example: https://localhost/on/demandware.static/Sites-Site/-/-/internal/icons/credit_card.svg
+            // prod example: zzte-053.dx.commercecloud.salesforce.com instead of localhost
+            const transformedData = transformIconPaths(data, 'localhost')
+        
+            res.setHeader('Access-Control-Allow-Origin', '*')
+            res.setHeader('Content-Type', 'application/json')
+            res.json(transformedData)
+            
+        } catch (error) {
+            console.error('❌ Proxy error:', error.message)
+            res.status(500).json({ 
+                error: 'Failed to fetch metadata',
+                details: error.message 
+            })
+        }
+    })
+
     app.get('*', runtime.render)
 })
 // SSR requires that we export a single handler function called 'get', that

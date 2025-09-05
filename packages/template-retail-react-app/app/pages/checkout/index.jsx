@@ -41,6 +41,10 @@ import LoadingSpinner from '@salesforce/retail-react-app/app/components/loading-
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import {useMultiship} from '@salesforce/retail-react-app/app/hooks/use-multiship'
 
+import SFPaymentsSheet from '@salesforce/retail-react-app/app/pages/checkout/partials/salesforce-payments/payment-sheet'
+import {usePaymentConfigManager} from '@salesforce/retail-react-app/app/hooks/salesforce-payments/use-payment-config-manager'
+import {usePaymentSheetSubmission} from '@salesforce/retail-react-app/app/pages/checkout/partials/salesforce-payments/payment-sheet'
+
 const Checkout = () => {
     const {formatMessage} = useIntl()
     const navigate = useNavigation()
@@ -68,6 +72,12 @@ const Checkout = () => {
     // Only enable BOPIS functionality if the feature toggle is on
     const isPickupOrderOnly = !isDeliveryAndPickupOrder && hasPickupShipments
 
+    // SF Payments related hooks and state
+    const paymentConfigState = usePaymentConfigManager()
+    const {isSFPEnabled, isPaymentsConfigReady, paymentConfigLoading} = paymentConfigState
+    const {submitPaymentSheetOrder, isProcessing} = usePaymentSheetSubmission()
+
+     
     useEffect(() => {
         if (error || step === 4) {
             window.scrollTo({top: 0})
@@ -85,9 +95,18 @@ const Checkout = () => {
     const submitOrder = async () => {
         setIsLoading(true)
         try {
-            const order = await createOrder({
-                body: {basketId: basket.basketId}
-            })
+            // check if SFP is enabled (via the hook)
+            let order = null
+            if (isSFPEnabled) {
+                console.log('🚀 Processing SFP payment before order creation...')
+                order = await submitPaymentSheetOrder()
+                console.log('✅ Payment processed, now creating order...')
+                console.log(order)
+            } else {
+                order = await createOrder({
+                    body: {basketId: basket.basketId}
+                })
+            }
             navigate(`/checkout/confirmation/${order.orderNo}`)
         } catch (error) {
             const message = formatMessage({
@@ -133,7 +152,32 @@ const Checkout = () => {
                                     <ShippingMethods />
                                 </>
                             )}
-                            <Payment />
+                            
+                           {isPaymentsConfigReady ? (
+                                isSFPEnabled ? (
+                                    <SFPaymentsSheet paymentState={paymentConfigState} />
+                                ) : (
+                                    <Payment />
+                                )
+                            ) : (
+                                <Box
+                                borderWidth="1px"
+                                borderRadius="lg" 
+                                borderColor="gray.200"
+                                bg="white"
+                                minH="78px"
+                                mb={6}
+                                p={6}  // ✅ Add padding like other sections
+                            >
+                                <div style={{
+                                    color: '#666', 
+                                    fontSize: '18px', 
+                                    fontWeight: '600'
+                                }}>
+                                    Payments
+                                </div>
+                            </Box>
+                            )}
 
                             {step === 5 && (
                                 <Box pt={3} display={{base: 'none', lg: 'block'}}>
