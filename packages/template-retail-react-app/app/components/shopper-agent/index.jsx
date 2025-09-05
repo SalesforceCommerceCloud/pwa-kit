@@ -249,13 +249,10 @@ const ShopperAgentWindow = ({commerceAgentConfiguration}) => {
         if (event.source && event.source !== window) {
             try {
                 if (event.data.type === 'lwc.getConversationContext') {
-                    // Check if conversation context is enabled before making the call
-                    if (enableConversationContext && enableConversationContext === 'true') {
-                        const conversationContext = await getConversationContext()
-                        sendConversationContext('conversational.actualConversationContext', {
-                            conversationContext
-                        })
-                    }
+                    const conversationContext = await getConversationContext()
+                    sendConversationContext('conversational.actualConversationContext', {
+                        conversationContext
+                    })
                 }
             } catch (error) {
                 console.error('Error handling Miaw event:', error)
