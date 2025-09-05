@@ -1,5 +1,6 @@
-## v3.12.0-dev.1 (Aug 28, 2025)
-## v3.12.0-dev (Jul 22, 2025)
+## v3.13.0-dev (Sep 04, 2025)
+
+## v3.12.0 (Sep 04, 2025)
 - Add support for environment level base paths on /mobify routes [#2892](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2892)
 - This feature introduces an AI-powered shopping assistant that integrates Salesforce Embedded Messaging Service with PWA Kit applications. The shopper agent provides real-time chat support, search assistance, and personalized shopping guidance directly within the e-commerce experience. [#2658](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2658)
 - Disallow the SLAS private client proxy from handling trusted system on behalf of requests [#3042](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3042)
