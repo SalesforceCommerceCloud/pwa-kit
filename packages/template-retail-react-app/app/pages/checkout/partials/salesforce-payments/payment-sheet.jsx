@@ -36,6 +36,9 @@ let paymentSheetInstance = null
 // ✅ ADD this module-level variable declaration
 let confirmPaymentFunction = null
 
+//TODO: need to address the payment method id issue with ECOM
+const paymentMethodIdSFP ="SALESFORCE_PAYMENTS";
+
 export const usePaymentSheetSubmission = () => {
     const {processPayment, isProcessing} = usePaymentProcessing()
     const {data: basket} = useCurrentBasket()
@@ -46,43 +49,14 @@ export const usePaymentSheetSubmission = () => {
 
     // ✅ Store order info from API calls
     let orderInfoFromAPI = null
+   
 
-    const createPaymentIntentOld = async (paymentData) => {
-        const basketId = "6bb365d20010a0e3c5f69c1e65" // TODO: use basket.basketId
-        
-        try {
-            const paymentResult = await processPayment({
-                basketId: basketId,
-                zoneId: 'default',
-                amount: paymentData?.amount || "99.99",
-                cardCaptureAutomatic: false,
-                currency: paymentData?.currency || 'USD',
-            })
-            
-              
-            // ✅ Store order info (will be lost after SDK call)
-            orderInfoFromAPI = {
-                orderNo: paymentResult.order_info.order_no
-            }
-
-            return {
-                client_secret: paymentResult.payment_info.client_secret,
-                id: paymentResult.payment_info.payment_intent_id,
-                customer: paymentResult.payment_info.customer_id
-            }
-        } catch (error) {
-            console.error('Payment intent creation failed:', error)
-            throw error
-        }
-    }
-    
     const updateOrderPayment = async (orderNo, paymentInstrumentId, paymentData) => {
       
         try {
             // ✅ For Salesforce Payments, provide the minimal required structure
             const paymentInstrumentUpdate = {
-                paymentMethodId: "SALESFORCE_PAYMENTS",
-                amount: basket.orderTotal || 0
+                paymentMethodId: paymentMethodIdSFP,
                 // Note: For Salesforce Payments, you typically don't need paymentCard details
                 // as those are handled by the SFP SDK
             }
@@ -205,7 +179,8 @@ const SFPaymentsSheet = ({paymentState}) => {
     
     const {mutateAsync: addPaymentInstrumentToBasket} = useShopperBasketsMutation('addPaymentInstrumentToBasket')
     const {mutateAsync: updateBillingAddressForBasket} = useShopperBasketsMutation('updateBillingAddressForBasket')
-        
+    const {mutateAsync: removePaymentInstrumentFromBasket} = useShopperBasketsMutation('removePaymentInstrumentFromBasket')
+
     // Cleanup on unmount
     useEffect(() => {
         return () => {
@@ -230,10 +205,31 @@ const SFPaymentsSheet = ({paymentState}) => {
     
     const onReview = async () => {
      
+        // Remove existing instruments first
+        const existingInstruments = basket?.paymentInstruments?.filter(
+            instrument => instrument.paymentMethodId === 'SALESFORCE_PAYMENTS'
+        ) || []
+        
+        for (const instrument of existingInstruments) {
+            await removePaymentInstrumentFromBasket({
+                parameters: {
+                    basketId: basket?.basketId,
+                    paymentInstrumentId: instrument.paymentInstrumentId
+                }
+            })
+        }
+    
+        /*
+            TODO: unless a payment method is already added to ECOM, using anything else throws
+            {
+                "title": "Invalid Payment Method Id",
+                "type": "https://api.commercecloud.salesforce.com/documentation/error/v1/errors/invalid-payment-method-id",
+                "detail": "The payment method with ID 'Salesforce Payments' is unknown or can't be applied.",
+                "paymentMethodId": "Salesforce Payments"
+            }
+        */
         const paymentData = {
-            "paymentMethodId": "SALESFORCE_PAYMENTS"
-            // Note: amount might not be needed here - the API typically handles this
-            // If you do need it: "amount": basket.orderTotal
+            "paymentMethodId": paymentMethodIdSFP
         }
         await addPaymentInstrumentToBasket({
             parameters: {basketId: basket?.basketId},
