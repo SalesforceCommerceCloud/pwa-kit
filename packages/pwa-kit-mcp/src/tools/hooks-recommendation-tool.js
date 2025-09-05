@@ -5,15 +5,43 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
+/**
+ * HooksRecommendationTool
+ * ----------------------
+ * This tool suggests hooks from commerce-sdk-react based on a given page/component name or use case.
+ * It is designed to work in both monorepo and generated app environments, automatically locating the hooks directory.
+ *
+ * Usage:
+ *   - Provide a page name, a list of component names, or a use case description.
+ *   - Optionally, specify exact hook names to get code snippets for.
+ *   - The tool will recommend relevant hooks.
+ *
+ * Main Features:
+ *   - Intelligent tokenization and matching of page/component/use case names to available hooks.
+ *   - Fallback to generic code snippets if no direct match is found.
+ *   - Works with both TypeScript and JavaScript hook files.
+ *
+ * Example input:
+ *   {
+ *     pageName: 'CartPage',
+ *     componentList: ['CartSummary', 'CartItems'],
+ *     useCase: 'basket',
+ *     selectedHooks: ['useBasket'],
+ *     hooksPath: '/absolute/path/to/hooks'
+ *   }
+ */
+
 import fs from 'fs/promises'
 import path from 'path'
 
 /**
- * Suggest hooks from commerce-sdk-react based on page/component name or use case.
- * - If in generated app: node_modules/@salesforce/commerce-sdk-react/hooks
- * - If in monorepo: packages/commerce-sdk-react/src/hooks
+ * Suggests hooks from commerce-sdk-react based on page/component name or use case.
+ * @class HooksRecommendationTool
  */
 export class HooksRecommendationTool {
+    /**
+     * Constructs the HooksRecommendationTool.
+     */
     constructor() {
         this.name = 'recommend_hooks'
         this.description =
@@ -47,6 +75,16 @@ export class HooksRecommendationTool {
         this.handler = this.handler.bind(this)
     }
 
+    /**
+     * Main handler for recommending hooks and generating code snippets.
+     * @param {Object} params - The input parameters.
+     * @param {string} params.pageName - Name of the page (PascalCase).
+     * @param {string[]} params.componentList - List of component names (PascalCase).
+     * @param {string} params.useCase - Optional: primary use case description.
+     * @param {string[]} params.selectedHooks - Optional: exact hook names to return code snippets for.
+     * @param {string} params.hooksPath - Absolute path to hooks directory.
+     * @returns {Promise<Object>} Assistant response with recommendations or code snippets.
+     */
     async handler({pageName, componentList, useCase, hooksPath, selectedHooks}) {
         if (!hooksPath) {
             hooksPath = await this.findHooksPath()
@@ -54,13 +92,6 @@ export class HooksRecommendationTool {
 
         // Verify hooks path exists
         if (!(await this.isValidHooksPath(hooksPath))) {
-            if (Array.isArray(selectedHooks) && selectedHooks.length) {
-                const md = this.buildGenericSnippetsMarkdown(
-                    'Code snippets (generic)',
-                    selectedHooks
-                )
-                return this.createResponse(md)
-            }
             return this.createResponse(`Could not access hooks directory at: ${hooksPath}`)
         }
 
@@ -106,27 +137,34 @@ export class HooksRecommendationTool {
             return this.createResponse(md)
         }
 
-        // If user explicitly asked for hook(s), return snippets for those (fallback to generic when missing)
+        // If no hooks match the tokens, show a message and fallback hooks
+        if (rankedByNames.length) {
+            const tokensString = Array.from(nameTokens).join(', ')
+            let md = `**No hooks found related to: ${tokensString || 'your input'}**\n\n`
+            md += 'However, here are some other hooks you might want to consider:\n\n'
+            const fallback = rankedByNames.slice(0, 5)
+            md += fallback.map((r) => `- **${r.name}**`).join('\n')
+            return this.createResponse(md)
+        }
+
+        // If user explicitly asked for hook(s), return which are found/missing (no code snippets)
         if (Array.isArray(selectedHooks) && selectedHooks.length) {
             const byName = new Map(records.map((r) => [r.name, r]))
             const found = []
             const missing = []
             for (const name of selectedHooks) {
                 const rec = byName.get(name)
-                if (rec) found.push(rec)
+                if (rec) found.push(name)
                 else missing.push(name)
             }
-            const sections = []
+            let response = '**Selected Hooks Check**\n'
             if (found.length) {
-                const items = await this.buildRecommendations(found)
-                sections.push(this.formatRecommendationsSections(items))
+                response += `Found: ${found.join(', ')}\n`
             }
             if (missing.length) {
-                sections.push(
-                    this.buildGenericSnippetsMarkdown('Generic examples for missing hooks', missing)
-                )
+                response += `Missing: ${missing.join(', ')}\n`
             }
-            return this.createResponse(sections.filter(Boolean).join('\n\n'))
+            return this.createResponse(response.trim())
         }
 
         if (useCase && typeof useCase === 'string') {
@@ -146,6 +184,11 @@ export class HooksRecommendationTool {
         return this.createResponse(buildNoMatchesMessage())
     }
 
+    /**
+     * Scans the hooks directory and returns available hook records.
+     * @param {string} hooksPath - Absolute path to hooks directory.
+     * @returns {Promise<Array<{name: string, source: string}>>} List of hook records.
+     */
     async getAvailableHookRecords(hooksPath) {
         try {
             const records = []
@@ -207,6 +250,11 @@ export class HooksRecommendationTool {
         }
     }
 
+    /**
+     * Tokenizes a list of names into a set of tokens for matching.
+     * @param {string[]} names - List of names to tokenize.
+     * @returns {Set<string>} Set of tokens.
+     */
     tokenizeMany(names) {
         const tokens = new Set()
         for (const n of names) {
@@ -215,6 +263,11 @@ export class HooksRecommendationTool {
         return tokens
     }
 
+    /**
+     * Tokenizes a single value into an array of tokens for matching.
+     * @param {string} value - The value to tokenize.
+     * @returns {string[]} Array of tokens.
+     */
     tokenize(value) {
         if (!value) return []
         const stopwords = new Set(['page', 'component', 'view', 'screen', 'details', 'new'])
@@ -276,6 +329,12 @@ export class HooksRecommendationTool {
         return intersection / union
     }
 
+    /**
+     * Ranks hook records by overlap with provided tokens.
+     * @param {Array<{name: string, source: string}>} records - Hook records.
+     * @param {Set<string>} nameTokens - Tokens to match against.
+     * @returns {Array<Object>} Ranked hook records with scores.
+     */
     rankHookRecordsByTokens(records, nameTokens) {
         const nameTokenArray = Array.from(nameTokens)
         const results = []
@@ -315,128 +374,6 @@ export class HooksRecommendationTool {
         return count
     }
 
-    async buildRecommendations(rankedRecords) {
-        const items = []
-        for (const r of rankedRecords) {
-            const exampleCode =
-                (await this.tryExtractExampleFromSource(r)) ||
-                (await this.buildDynamicExampleFromSource(r)) ||
-                this.genericExample(r)
-            items.push({name: r.name, exampleCode})
-        }
-        return items
-    }
-
-    async tryExtractExampleFromSource(record) {
-        try {
-            const fs = await import('fs/promises')
-            const content = await fs.readFile(record.source, 'utf8')
-            const hookName = record.name
-            // Simple best-effort: look for an @example JSDoc block near the hook name
-            const jsdocExampleRegex = /\*\*([\s\S]*?)\*\//g
-            let match
-            while ((match = jsdocExampleRegex.exec(content))) {
-                const block = match[1]
-                if (
-                    /@example/.test(block) &&
-                    new RegExp(hookName).test(content.slice(match.index))
-                ) {
-                    // Extract lines that look like code
-                    const lines = block
-                        .split('\n')
-                        .map((l) => l.replace(/^\s*\* ?/, ''))
-                        .filter((l) => l.trim())
-                    return lines.join('\n')
-                }
-            }
-        } catch (_) {
-            // ignore
-        }
-        return null
-    }
-
-    formatGenericExample(hookName, {isMutation = false} = {}) {
-        const header = `import React from "react"\nimport { ${hookName} } from '@salesforce/commerce-sdk-react'\n\n`
-        if (isMutation) {
-            return (
-                header +
-                `const ExampleComponent = () => {\n    const mutation = ${hookName}()\n    return (<button onClick={() => mutation.mutateAsync({/* variables */})} disabled={mutation.isLoading}>{mutation.isLoading ? 'Loading…' : 'Submit'}</button>)\n}`
-            )
-        }
-        return (
-            header +
-            `const ExampleComponent = () => {\n    const {data, isLoading, error} = ${hookName}({ parameters: {/* required params */} })\n    if (isLoading) return <div>Loading…</div>\n    if (error) return <div>Error: {error.message}</div>\n    return <pre>{JSON.stringify(data, null, 2)}</pre>\n}`
-        )
-    }
-
-    genericExample(record) {
-        const isMutation = /\/(mutation)\.(t|j)sx?$/.test(record.source)
-        return this.generateCodeSnippet(record.name, {isMutation})
-    }
-
-    async buildDynamicExampleFromSource(record) {
-        const hookName = record.name
-        let fileContent = ''
-        try {
-            fileContent = await fs.readFile(record.source, 'utf8')
-        } catch (_) {
-            // ignore
-        }
-        const header = `import React from "react"\nimport { ${hookName} } from '@salesforce/commerce-sdk-react'\n\n`
-        const isMutation = /\/(mutation)\.(t|j)sx?$/.test(record.source)
-        // Try to detect if the hook takes no arguments
-        let takesNoArgs = false
-        try {
-            const declRegex = new RegExp(
-                `export\\s+(?:const|function)\\s+${hookName}\\s*=?\\s*\\(([^)]*)\\)`
-            )
-            const match = fileContent.match(declRegex)
-            if (match) {
-                const paramsInside = (match[1] || '').trim()
-                takesNoArgs = paramsInside.length === 0
-            }
-        } catch (_) {
-            // ignore
-        }
-        if (isMutation) {
-            return (
-                header +
-                `const ExampleComponent = () => {\n    const mutation = ${hookName}()\n    return (<button onClick={() => mutation.mutateAsync({/* variables */})} disabled={mutation.isLoading}>{mutation.isLoading ? 'Loading…' : 'Submit'}</button>)\n}`
-            )
-        }
-        if (takesNoArgs) {
-            return (
-                header +
-                `const ExampleComponent = () => {\n    const {data, isLoading, error} = ${hookName}()\n    if (isLoading) return <div>Loading…</div>\n    if (error) return <div>Error: {error.message}</div>\n    return <pre>{JSON.stringify(data, null, 2)}</pre>\n}`
-            )
-        }
-        return (
-            header +
-            `const ExampleComponent = () => {\n    const {data, isLoading, error} = ${hookName}({ parameters: {/* required params */} })\n    if (isLoading) return <div>Loading…</div>\n    if (error) return <div>Error: {error.message}</div>\n    return <pre>{JSON.stringify(data, null, 2)}</pre>\n}`
-        )
-    }
-
-    formatRecommendationsSections(items) {
-        const parts = []
-        for (const item of items) {
-            parts.push(`- ${item.name}\n\n\`\`\`\n${item.exampleCode}\n\`\`\``)
-        }
-        return parts.join('\n\n')
-    }
-
-    buildGenericSnippetsMarkdown(title, hookNames) {
-        const lines = [`**${title}**`, '', `Found ${hookNames.length} hook(s):`]
-        for (const name of hookNames) {
-            lines.push(`- ${name}`)
-            lines.push('')
-            lines.push('```')
-            lines.push(this.formatGenericExample(name))
-            lines.push('```')
-            lines.push('')
-        }
-        return lines.join('\n')
-    }
-
     buildHookRecommendationsPrompt(title, rankedRecords, context) {
         const lines = [`**${title}**`]
         const ctx = []
@@ -456,13 +393,6 @@ export class HooksRecommendationTool {
         }
 
         lines.push('')
-        lines.push(
-            '**Please let me know which hook you would like to see a sample code snippet for.**'
-        )
-        lines.push(
-            'You can reply with the hook name (e.g., "useProduct") and I will generate a code example for you.'
-        )
-
         return lines.join('\n')
     }
 
@@ -492,6 +422,10 @@ export class HooksRecommendationTool {
         return Array.from(hookNames)
     }
 
+    /**
+     * Attempts to find the hooks directory path in various environments.
+     * @returns {Promise<string|null>} Absolute path to hooks directory, or null if not found.
+     */
     async findHooksPath() {
         const candidates = [
             // 1. Monorepo path
