@@ -15,6 +15,7 @@ const REL_CHAKRA_STOREFRONT_DIR = 'packages/template-chakra-storefront/'
 // The directories to skip when searching for files to merge
 const SKIP_DIRS = ['node_modules', 'dist', 'build']
 const INSTALL_INSTRUCTIONS_TEMPLATE = 'install-instructions.mdc.hbs'
+const UNINSTALL_INSTRUCTIONS_TEMPLATE = 'uninstall-instructions.mdc.hbs'
 
 /**
  * Build the context for the instructions template.
@@ -28,13 +29,20 @@ const getContext = (markerValue, pwaRepo = 'https://github.com/SalesforceCommerc
     if (!pluginConfig.plugins[markerValue]) {
         throw new Error(`Extension ${markerValue} not found in plugin config`)
     }
+    filesToCopy.forEach(file => {
+        const fullPath = path.join(TEMPLATE_CHAKRA_STOREFRONT_DIR, file)
+        if (!fs.existsSync(fullPath)) {
+            throw new Error(`File or directory ${fullPath} not found`)
+        }
+    })    
     const context = {
         extensionName: pluginConfig.plugins[markerValue].name,
         pwaRepo,
         branch,
         markerValue,
         mergeFiles: findMergeFiles(markerValue),
-        copy: getFilesToCopyContext(filesToCopy)
+        copy: getFilesToCopyContext(filesToCopy),
+        delete: filesToCopy
     }
     return context
 }
@@ -101,17 +109,28 @@ const findMergeFiles = (markerValue) => {
  */
 const generateInstructions = (markerValue, pwaRepo, branch, filesToCopy) => {
     const context = getContext(markerValue, pwaRepo, branch, filesToCopy)
-    const templatePath = path.join(__dirname, INSTALL_INSTRUCTIONS_TEMPLATE)
-    const templateContent = fs.readFileSync(templatePath, 'utf8')
-    const template = Handlebars.compile(templateContent)
-    const mdcContent = template(context)
     // Ensure the @instructions directory exists
     const instructionsDir = path.join(__dirname, '../instructions')
     if (!fs.existsSync(instructionsDir)) {
         fs.mkdirSync(instructionsDir)
     }
-    // Write the MDC file
-    const outputFile = path.join(instructionsDir, `install-${context.extensionName.toLowerCase().replace(/ /g, '-')}.mdc`)
+    // Generate the install instructions
+    genertaeAndWriteInstructions(INSTALL_INSTRUCTIONS_TEMPLATE, context, path.join(instructionsDir, `install-${context.extensionName.toLowerCase().replace(/ /g, '-')}.mdc`))
+    // Generate the uninstall instructions
+    genertaeAndWriteInstructions(UNINSTALL_INSTRUCTIONS_TEMPLATE, context, path.join(instructionsDir, `uninstall-${context.extensionName.toLowerCase().replace(/ /g, '-')}.mdc`))
+}
+
+/**
+ * Generate the MDC instructions file based on the template file and context.
+ * @param {string} templateFile 
+ * @param {Object} context 
+ * @param {string} outputFile 
+ */
+const genertaeAndWriteInstructions = (templateFile, context, outputFile) => {
+    const templatePath = path.join(__dirname, templateFile)
+    const templateContent = fs.readFileSync(templatePath, 'utf8')
+    const template = Handlebars.compile(templateContent)
+    const mdcContent = template(context)
     fs.writeFileSync(outputFile, mdcContent, 'utf8')
     console.log(`MDC instructions written to ${outputFile}`)
 }
