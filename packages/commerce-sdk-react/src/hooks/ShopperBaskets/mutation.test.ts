@@ -34,6 +34,7 @@ const CLIENT_KEY = CLIENT_KEYS.SHOPPER_BASKETS
 type Client = NonNullable<ApiClients[typeof CLIENT_KEY]>
 type Basket = ShopperBasketsTypes.Basket
 type BasketsResult = ShopperCustomersTypes.BasketsResult
+type ProductItem = ShopperBasketsTypes.ProductItem
 
 /** Create an options object for Shopper Baskets endpoints, with `basketId` pre-filled. */
 const createOptions = <Method extends Exclude<keyof Client, 'clientConfig'>>(
@@ -119,7 +120,11 @@ const testMap: TestMap = {
         {shipmentId: 'shipmentId'}
     ),
     addCouponToBasket: createOptions<'addCouponToBasket'>({code: 'coupon'}, {}),
-    addItemToBasket: createOptions<'addItemToBasket'>([], {}),
+    addItemToBasket: createOptions<'addItemToBasket'>(
+        [{productId: 'test-product', price: 10, quantity: 1}] as ProductItem[] &
+            Record<`c_${string}`, any>,
+        {}
+    ),
     addPaymentInstrumentToBasket: createOptions<'addPaymentInstrumentToBasket'>({}, {}),
     createBasket: createOptions<'createBasket'>({}, {}),
     mergeBasket: createOptions<'mergeBasket'>(undefined, {}),
@@ -140,7 +145,11 @@ const testMap: TestMap = {
         {}
     ),
     updateItemInBasket: createOptions<'updateItemInBasket'>({}, {itemId: 'itemId'}),
-    updateItemsInBasket: createOptions<'updateItemsInBasket'>([], {}),
+    updateItemsInBasket: createOptions<'updateItemsInBasket'>(
+        [{productId: 'test-product', price: 10, quantity: 1}] as ProductItem[] &
+            Record<`c_${string}`, any>,
+        {}
+    ),
     updatePaymentInstrumentInBasket: createOptions<'updatePaymentInstrumentInBasket'>(
         {},
         {paymentInstrumentId: 'paymentInstrumentId'}
@@ -158,7 +167,10 @@ const createTestCase = ['createBasket', createOptions<'createBasket'>({}, {})] a
 const deleteTestCase = ['deleteBasket', createOptions<'deleteBasket'>(undefined, {})] as const
 const addPriceBooksToBasketTestCase = [
     'addPriceBooksToBasket',
-    createOptions<'addPriceBooksToBasket'>([], {})
+    createOptions<'addPriceBooksToBasket'>(
+        ['price-book-1'] as string[] & Record<`c_${string}`, any>,
+        {}
+    )
 ] as const
 const addTaxesForBasketTestCase = [
     'addTaxesForBasket',

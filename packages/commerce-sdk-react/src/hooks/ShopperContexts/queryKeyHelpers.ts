@@ -34,14 +34,14 @@ export const getShopperContext: QueryKeyHelper<'getShopperContext'> = {
     path: (params) => [
         '/commerce-sdk-react',
         '/organizations/',
-        params.organizationId,
+        params?.organizationId,
         '/shopper-context/',
-        params.usid
+        params?.usid
     ],
     queryKey: (params: Params<'getShopperContext'>) => {
         return [
             ...getShopperContext.path(params),
-            pickValidParams(params, ShopperContexts.paramKeys.getShopperContext)
+            pickValidParams(params || {}, ShopperContexts.paramKeys.getShopperContext)
         ]
     }
 }

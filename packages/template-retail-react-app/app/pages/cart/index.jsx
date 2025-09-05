@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React, {useState, useMemo} from 'react'
+import React, {useState, useMemo, useEffect} from 'react'
 import {FormattedMessage, useIntl} from 'react-intl'
 
 // Chakra Components
@@ -15,28 +15,31 @@ import {
     GridItem,
     Container,
     Button,
-    Text,
     useDisclosure
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 
 // Project Components
+import BonusProductsTitle from '@salesforce/retail-react-app/app/pages/cart/partials/bonus-products-title'
 import CartCta from '@salesforce/retail-react-app/app/pages/cart/partials/cart-cta'
 import CartSecondaryButtonGroup from '@salesforce/retail-react-app/app/pages/cart/partials/cart-secondary-button-group'
 import CartSkeleton from '@salesforce/retail-react-app/app/pages/cart/partials/cart-skeleton'
 import CartTitle from '@salesforce/retail-react-app/app/pages/cart/partials/cart-title'
-import BonusProductsTitle from '@salesforce/retail-react-app/app/pages/cart/partials/bonus-products-title'
 import ConfirmationModal from '@salesforce/retail-react-app/app/components/confirmation-modal'
 import EmptyCart from '@salesforce/retail-react-app/app/pages/cart/partials/empty-cart'
 import OrderSummary from '@salesforce/retail-react-app/app/components/order-summary'
+import OrderTypeDisplay from '@salesforce/retail-react-app/app/pages/cart/partials/order-type-display'
+import PickupOrDelivery from '@salesforce/retail-react-app/app/components/pickup-or-delivery'
 import ProductItemList from '@salesforce/retail-react-app/app/components/product-item-list'
 import ProductViewModal from '@salesforce/retail-react-app/app/components/product-view-modal'
 import BundleProductViewModal from '@salesforce/retail-react-app/app/components/product-view-modal/bundle'
 import RecommendedProducts from '@salesforce/retail-react-app/app/components/recommended-products'
+import {DELIVERY_OPTIONS} from '@salesforce/retail-react-app/app/components/pickup-or-delivery'
 
 // Hooks
 import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
 import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
 import {useWishList} from '@salesforce/retail-react-app/app/hooks/use-wish-list'
+import {useStoreLocatorModal} from '@salesforce/retail-react-app/app/hooks/use-store-locator'
 
 // Constants
 import {
@@ -46,8 +49,10 @@ import {
     TOAST_MESSAGE_ADDED_TO_WISHLIST,
     TOAST_MESSAGE_REMOVED_ITEM_FROM_CART,
     TOAST_MESSAGE_ALREADY_IN_WISHLIST,
+    TOAST_MESSAGE_STORE_INSUFFICIENT_INVENTORY,
     STORE_LOCATOR_IS_ENABLED
 } from '@salesforce/retail-react-app/app/constants'
+import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import {REMOVE_CART_ITEM_CONFIRMATION_DIALOG_CONFIG} from '@salesforce/retail-react-app/app/pages/cart/partials/cart-secondary-button-group'
 
 // Utilities
@@ -55,7 +60,6 @@ import debounce from 'lodash/debounce'
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
 import {
     useShopperBasketsMutation,
-    useShippingMethodsForShipment,
     useProducts,
     useShopperCustomersMutation,
     useStores
@@ -63,32 +67,46 @@ import {
 import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
 import UnavailableProductConfirmationModal from '@salesforce/retail-react-app/app/components/unavailable-product-confirmation-modal'
 import {getUpdateBundleChildArray} from '@salesforce/retail-react-app/app/utils/product-utils'
+import {isPickupShipment} from '@salesforce/retail-react-app/app/utils/shipment-utils'
 import {useSelectedStore} from '@salesforce/retail-react-app/app/hooks/use-selected-store'
+import {useMultiship} from '@salesforce/retail-react-app/app/hooks/use-multiship'
 
 const DEBOUNCE_WAIT = 750
 
 const Cart = () => {
-    const {data: basket, isLoading} = useCurrentBasket()
+    const {data: basket, isLoading, derivedData} = useCurrentBasket()
+    const multishipEnabled = getConfig()?.app?.multishipEnabled ?? true
+    const storeLocatorEnabled = getConfig()?.app?.storeLocatorEnabled ?? STORE_LOCATOR_IS_ENABLED
 
-    // Pickup in Store - only enabled if feature toggle is on
-    const isPickupOrder = STORE_LOCATOR_IS_ENABLED
-        ? basket?.shipments[0]?.shippingMethod?.c_storePickupEnabled === true
-        : false
-    const storeId = basket?.shipments?.[0]?.c_fromStoreId
+    // Pickup in Store - inventory at current store and all unique store IDs from all shipments
+    const {selectedStore} = useSelectedStore()
+    const selectedInventoryId = selectedStore?.inventoryId || null
+    const allStoreIds = derivedData?.pickupStoreIds?.join(',') ?? ''
     const {data: storeData} = useStores(
         {
             parameters: {
-                ids: storeId
+                ids: allStoreIds
             }
         },
         {
-            enabled: !!storeId && STORE_LOCATOR_IS_ENABLED
+            enabled: !!allStoreIds && storeLocatorEnabled
         }
     )
-    const storeName = storeData?.data?.[0]?.name
+    const uniqueInventoryIds = [
+        ...new Set(
+            [selectedInventoryId]
+                .concat(storeData?.data?.map((store) => store.inventoryId))
+                .filter(Boolean)
+        )
+    ].join(',')
 
-    const {selectedStore} = useSelectedStore()
-    const selectedInventoryId = selectedStore?.inventoryId || null
+    const {
+        updateDeliveryOption,
+        updateShipmentsWithoutMethods,
+        getItemsForShipment,
+        findOrCreatePickupShipment,
+        moveItemsToPickupShipment
+    } = useMultiship(basket)
     const productIds = basket?.productItems?.map(({productId}) => productId).join(',') ?? ''
     const {data: products, isLoading: isProductsLoading} = useProducts(
         {
@@ -96,7 +114,7 @@ const Cart = () => {
                 ids: productIds,
                 allImages: true,
                 perPricebook: true,
-                ...(selectedInventoryId ? {inventoryIds: selectedInventoryId} : {})
+                ...(uniqueInventoryIds ? {inventoryIds: uniqueInventoryIds} : {})
             }
         },
         {
@@ -127,9 +145,9 @@ const Cart = () => {
             parameters: {
                 ids: bundleChildVariantIds?.join(','),
                 allImages: false,
+                ...(uniqueInventoryIds ? {inventoryIds: uniqueInventoryIds} : {}),
                 expand: ['availability', 'variations'],
-                select: '(data.(id,inventories,inventory))',
-                ...(selectedInventoryId ? {inventoryIds: selectedInventoryId} : {})
+                select: '(data.(id,inventory,inventories,master))'
             }
         },
         {
@@ -150,25 +168,48 @@ const Cart = () => {
     // variant selection of the bundle children can be different,
     // and require unique references to each product bundle
     const productsByItemId = useMemo(() => {
+        const getLowestStockInfo = (
+            parentProduct,
+            productItem,
+            bundleChildProductData,
+            inventoryId = null
+        ) => {
+            const isDefaultInventory = !inventoryId
+            const parentInventory = isDefaultInventory
+                ? parentProduct.inventory
+                : parentProduct.inventories?.find((inv) => inv.id === inventoryId)
+
+            let lowestStockLevel = parentInventory?.stockLevel ?? Number.MAX_SAFE_INTEGER
+            let productWithLowestInventory = ''
+
+            productItem.bundledProductItems.forEach((bundleChild) => {
+                const childProduct = bundleChildProductData[bundleChild.productId]
+                const childInventory = isDefaultInventory
+                    ? childProduct?.inventory
+                    : childProduct?.inventories?.find((inv) => inv.id === inventoryId)
+                const childStockLevel = childInventory?.stockLevel ?? Number.MAX_SAFE_INTEGER
+
+                if (childStockLevel < lowestStockLevel) {
+                    lowestStockLevel = childStockLevel
+                    productWithLowestInventory = bundleChild.productName
+                }
+            })
+
+            return {lowestStockLevel, productWithLowestInventory}
+        }
+
         const updateProductsByItemId = {}
         basket?.productItems?.forEach((productItem) => {
             let currentProduct = products?.[productItem?.productId]
 
-            // calculate inventory for product bundles based on availability of children
-            if (productItem?.bundledProductItems && bundleChildProductData) {
-                let lowestStockLevel =
-                    currentProduct?.inventory?.stockLevel ?? Number.MAX_SAFE_INTEGER
-                let productWithLowestInventory = ''
-                productItem?.bundledProductItems.forEach((bundleChild) => {
-                    const bundleChildStockLevel =
-                        bundleChildProductData?.[bundleChild.productId]?.inventory?.stockLevel ??
-                        Number.MAX_SAFE_INTEGER
-                    lowestStockLevel = Math.min(lowestStockLevel, bundleChildStockLevel)
-                    if (lowestStockLevel === bundleChildStockLevel)
-                        productWithLowestInventory = bundleChild.productName
-                })
-
-                if (currentProduct?.inventory) {
+            if (currentProduct && productItem?.bundledProductItems && bundleChildProductData) {
+                // Calculate and update the default inventory for the bundle.
+                if (currentProduct.inventory) {
+                    const {lowestStockLevel, productWithLowestInventory} = getLowestStockInfo(
+                        currentProduct,
+                        productItem,
+                        bundleChildProductData
+                    )
                     currentProduct = {
                         ...currentProduct,
                         inventory: {
@@ -179,45 +220,29 @@ const Cart = () => {
                     }
                 }
 
-                // Update in-store inventories for the selected store with the lowest stock level and product name
-                if (selectedInventoryId) {
-                    let selectedStoreInventory = currentProduct?.inventories?.find(
-                        (inventory) => inventory.id === selectedInventoryId
-                    )
-                    let lowestInStoreStockLevel =
-                        selectedStoreInventory?.stockLevel ?? Number.MAX_SAFE_INTEGER
-                    let productWithLowestInventory = ''
-                    productItem?.bundledProductItems.forEach((bundleChild) => {
-                        const bundleChildInstoreInventory = bundleChildProductData?.[
-                            bundleChild.productId
-                        ]?.inventories?.find((inventory) => inventory.id === selectedInventoryId)
-                        const bundleChildInstoreStockLevel =
-                            bundleChildInstoreInventory?.stockLevel ?? Number.MAX_SAFE_INTEGER
-                        lowestInStoreStockLevel = Math.min(
-                            lowestInStoreStockLevel,
-                            bundleChildInstoreStockLevel
+                // Calculate and update in-store inventories for the bundle.
+                if (currentProduct.inventories) {
+                    const updatedInventories = currentProduct.inventories.map((inventory) => {
+                        const {
+                            lowestStockLevel: lowestInStoreStockLevel,
+                            productWithLowestInventory: productWithLowestInventoryForStore
+                        } = getLowestStockInfo(
+                            currentProduct,
+                            productItem,
+                            bundleChildProductData,
+                            inventory.id
                         )
-                        if (lowestInStoreStockLevel === bundleChildInstoreStockLevel)
-                            productWithLowestInventory = bundleChild.productName
+
+                        return {
+                            ...inventory,
+                            stockLevel: lowestInStoreStockLevel,
+                            lowestStockLevelProductName: productWithLowestInventoryForStore
+                        }
                     })
 
-                    // Update in-store inventories for the selected store with the lowest stock level and product name
-                    if (selectedStoreInventory) {
-                        const updatedInventories = currentProduct.inventories.map((inventory) => {
-                            if (inventory.id === selectedInventoryId) {
-                                return {
-                                    ...inventory,
-                                    stockLevel: lowestInStoreStockLevel,
-                                    lowestStockLevelProductName: productWithLowestInventory
-                                }
-                            }
-                            return inventory
-                        })
-
-                        currentProduct = {
-                            ...currentProduct,
-                            inventories: updatedInventories
-                        }
+                    currentProduct = {
+                        ...currentProduct,
+                        inventories: updatedInventories
                     }
                 }
             }
@@ -230,51 +255,98 @@ const Cart = () => {
     const updateItemInBasketMutation = useShopperBasketsMutation('updateItemInBasket')
     const updateItemsInBasketMutation = useShopperBasketsMutation('updateItemsInBasket')
     const removeItemFromBasketMutation = useShopperBasketsMutation('removeItemFromBasket')
-    const updateShippingMethodForShipmentsMutation = useShopperBasketsMutation(
-        'updateShippingMethodForShipment'
-    )
     /*****************Basket Mutation************************/
 
     const [selectedItem, setSelectedItem] = useState(undefined)
     const [localQuantity, setLocalQuantity] = useState({})
     const [localIsGiftItems, setLocalIsGiftItems] = useState({})
     const [isCartItemLoading, setCartItemLoading] = useState(false)
+    const [isProcessingShippingMethods, setIsProcessingShippingMethods] = useState(false)
 
     const {isOpen, onOpen, onClose} = useDisclosure()
     const {formatMessage} = useIntl()
     const toast = useToast()
     const navigate = useNavigation()
     const modalProps = useDisclosure()
+    const storeLocatorModal = useStoreLocatorModal()
 
-    /******************* Shipping Methods for basket shipment *******************/
-    // do this action only if the basket shipping method is not defined
-    // we need to fetch the shippment methods to get the default value before we can add it to the basket
-    useShippingMethodsForShipment(
-        {
-            parameters: {
-                basketId: basket?.basketId,
-                shipmentId: 'me'
-            }
-        },
-        {
-            // only fetch if basket is has no shipping method in the first shipment
-            enabled:
-                !!basket?.basketId &&
-                basket.shipments.length > 0 &&
-                !basket.shipments[0].shippingMethod,
-            onSuccess: (data) => {
-                updateShippingMethodForShipmentsMutation.mutate({
-                    parameters: {
-                        basketId: basket?.basketId,
-                        shipmentId: 'me'
-                    },
-                    body: {
-                        id: data.defaultShippingMethodId
-                    }
-                })
+    // Custom handler for opening store locator from cart's "Change Store" button
+    const handleChangeStoreFromCart = async (shipmentInfo) => {
+        if (
+            !isProductsLoading &&
+            selectedStore?.id &&
+            selectedStore.inventoryId &&
+            shipmentInfo.store?.id !== selectedStore.id &&
+            shipmentInfo.shipment?.shipmentId
+        ) {
+            try {
+                setCartItemLoading(true)
+
+                // Get all items from the source shipment that have inventory at the new store
+                const itemsInShipment = getItemsForShipment(
+                    basket,
+                    shipmentInfo.shipment?.shipmentId
+                )
+                const itemsToMove = itemsInShipment.filter(
+                    (productItem) =>
+                        productsByItemId?.[productItem.itemId]?.inventories?.find(
+                            (inventory) => inventory.id === selectedStore?.inventoryId
+                        )?.stockLevel >= productItem.quantity
+                )
+                if (itemsToMove.length) {
+                    const targetShipment = await findOrCreatePickupShipment(selectedStore)
+                    await moveItemsToPickupShipment(
+                        itemsToMove,
+                        targetShipment?.shipmentId,
+                        selectedStore.inventoryId
+                    )
+                }
+
+                if (itemsInShipment.length !== itemsToMove.length) {
+                    toast({
+                        title: formatMessage(TOAST_MESSAGE_STORE_INSUFFICIENT_INVENTORY),
+                        status: 'error'
+                    })
+                }
+            } catch (error) {
+                console.error('Failed to change store for pickup shipment:', error)
+                showError()
+            } finally {
+                setCartItemLoading(false)
             }
         }
-    )
+    }
+
+    /******************* Assign Default Shipping Methods to Shipments *******************/
+    // Assign default shipping methods to any shipments that don't have one
+    // This runs when the basket is first loaded and whenever shipments change
+    useEffect(() => {
+        const assignDefaultShippingMethods = async () => {
+            if (isProcessingShippingMethods || !basket?.basketId) {
+                return
+            }
+
+            // Check if any shipments need shipping methods to avoid unnecessary processing
+            const hasShipmentsWithoutMethod = basket.shipments?.some(
+                (shipment) => !shipment.shippingMethod
+            )
+
+            if (!hasShipmentsWithoutMethod) {
+                return
+            }
+
+            setIsProcessingShippingMethods(true)
+            try {
+                await updateShipmentsWithoutMethods()
+            } catch (error) {
+                console.error('Failed to assign default shipping methods:', error)
+            } finally {
+                setIsProcessingShippingMethods(false)
+            }
+        }
+
+        assignDefaultShippingMethods()
+    }, [basket?.basketId, basket?.shipments?.length, isProcessingShippingMethods])
 
     /************************* Error handling ***********************/
     const showError = () => {
@@ -526,7 +598,11 @@ const Cart = () => {
     }, DEBOUNCE_WAIT)
 
     const handleChangeItemQuantity = async (product, value) => {
-        const stockLevel = productsByItemId?.[product.itemId]?.inventory?.stockLevel ?? 1
+        const productItemInventory =
+            productsByItemId?.[product.itemId]?.inventories?.find(
+                (inventory) => inventory.id === product.inventoryId
+            ) || productsByItemId?.[product.itemId]?.inventory
+        const stockLevel = productItemInventory?.stockLevel ?? 1
 
         // Handle removing of the items when 0 is selected.
         if (value === 0) {
@@ -585,23 +661,155 @@ const Cart = () => {
         )
     }
 
-    // Categorize products into regular and bonus
-    const categorizedProducts = useMemo(() => {
-        return basket?.productItems?.reduce(
-            (acc, productItem) => {
-                if (productItem.bonusProductLineItem) {
-                    acc.bonusProducts.push(productItem)
+    // Create shipment-specific data, grouping delivery shipments together
+    const shipmentData = useMemo(() => {
+        if (!basket?.shipments?.length) return []
+
+        const pickupShipments = []
+        const deliveryShipments = []
+
+        // Separate pickup and delivery shipments
+        basket.shipments.forEach((shipment) => {
+            const isPickupOrder = storeLocatorEnabled && isPickupShipment(shipment)
+            const storeId = shipment?.c_fromStoreId
+            const store = storeData?.data?.find((store) => store.id === storeId)
+
+            // Filter products for this shipment
+            const shipmentProducts =
+                basket.productItems?.filter(
+                    (productItem) => productItem.shipmentId === shipment.shipmentId
+                ) || []
+
+            // Categorize products into regular and bonus for this shipment
+            const categorizedProducts = shipmentProducts.reduce(
+                (acc, productItem) => {
+                    if (productItem.bonusProductLineItem) {
+                        acc.bonusProducts.push(productItem)
+                    } else {
+                        acc.regularProducts.push(productItem)
+                    }
+                    return acc
+                },
+                {regularProducts: [], bonusProducts: []}
+            )
+
+            const shipmentData = {
+                shipment,
+                isPickupOrder,
+                store,
+                categorizedProducts,
+                itemsInShipment:
+                    categorizedProducts.regularProducts.length +
+                    categorizedProducts.bonusProducts.length
+            }
+
+            // Only add shipments that have items
+            if (shipmentData.itemsInShipment > 0) {
+                if (isPickupOrder) {
+                    pickupShipments.push(shipmentData)
                 } else {
-                    acc.regularProducts.push(productItem)
+                    deliveryShipments.push(shipmentData)
                 }
-                return acc
-            },
-            {regularProducts: [], bonusProducts: []}
+            }
+        })
+
+        const result = [...pickupShipments]
+
+        // Combine all delivery shipments into a single group
+        if (deliveryShipments.length > 0) {
+            const combinedDeliveryProducts = deliveryShipments.reduce(
+                (acc, shipmentData) => {
+                    acc.regularProducts.push(...shipmentData.categorizedProducts.regularProducts)
+                    acc.bonusProducts.push(...shipmentData.categorizedProducts.bonusProducts)
+                    return acc
+                },
+                {regularProducts: [], bonusProducts: []}
+            )
+
+            result.push({
+                shipment: null, // No specific shipment for combined delivery
+                isPickupOrder: false,
+                store: null, // No specific store for combined delivery
+                categorizedProducts: combinedDeliveryProducts,
+                itemsInShipment:
+                    combinedDeliveryProducts.regularProducts.length +
+                    combinedDeliveryProducts.bonusProducts.length
+            })
+        }
+
+        return result
+    }, [basket?.shipments, basket?.productItems, storeData])
+
+    /***************************** Delivery Options **************************/
+
+    const onDeliveryOptionChange = async (productItem, selectedDeliveryOption) => {
+        try {
+            setCartItemLoading(true)
+            setSelectedItem(productItem)
+
+            const selectedPickup = selectedDeliveryOption === DELIVERY_OPTIONS.PICKUP
+
+            // If the user selects pickup and no store is selected, open the store locator modal
+            if (selectedPickup && !selectedStore) {
+                storeLocatorModal.onOpen()
+                return
+            }
+
+            // Get default inventory ID from product data - throw error if not available
+            const productData = products?.[productItem.productId]
+            const defaultInventoryId = productData?.inventory?.id
+
+            if (!defaultInventoryId) {
+                throw new Error(`No inventory ID found for product ${productItem.productId}`)
+            }
+
+            await updateDeliveryOption(
+                productItem,
+                selectedPickup,
+                selectedStore,
+                defaultInventoryId
+            )
+        } catch (error) {
+            console.error('Error changing delivery option:', error)
+            showError()
+        } finally {
+            setCartItemLoading(false)
+            setSelectedItem(undefined)
+        }
+    }
+
+    // Function to render deliveryActions
+    const renderDeliveryActions = (productItem, shipmentInfo) => {
+        const showDeliveryOptions = storeLocatorEnabled && multishipEnabled
+        if (!showDeliveryOptions) {
+            return null
+        }
+
+        const deliveryOption = shipmentInfo.isPickupOrder
+            ? DELIVERY_OPTIONS.PICKUP
+            : DELIVERY_OPTIONS.DELIVERY
+
+        const selectedStoreInventoryAvailable =
+            productsByItemId?.[productItem.itemId]?.inventories?.find(
+                (inventory) => inventory.id === selectedInventoryId
+            )?.stockLevel >= productItem.quantity
+        const defaultInventoryAvailable =
+            productsByItemId?.[productItem.itemId]?.inventory?.stockLevel >= productItem.quantity
+        const isPickupDisabled = !shipmentInfo.isPickupOrder && !selectedStoreInventoryAvailable
+        const isShipDisabled = shipmentInfo.isPickupOrder && !defaultInventoryAvailable
+
+        return (
+            <PickupOrDelivery
+                isPickupDisabled={isPickupDisabled}
+                isShipDisabled={isShipDisabled}
+                value={deliveryOption}
+                onChange={(selectedValue) => onDeliveryOptionChange(productItem, selectedValue)}
+            />
         )
-    }, [basket?.productItems])
+    }
 
     // Function to render secondary actions for product items
-    const renderSecondaryActions = ({productItem, isAGift}) => (
+    const renderSecondaryActions = ({isAGift}) => (
         <CartSecondaryButtonGroup
             isAGift={isAGift}
             onIsAGiftChange={handleIsAGiftChange}
@@ -639,52 +847,49 @@ const Cart = () => {
                             gap={{base: 10, xl: 20}}
                         >
                             <GridItem>
-                                <Stack spacing={4}>
-                                    {/* Order Type Display */}
-                                    {STORE_LOCATOR_IS_ENABLED && (
-                                        <Box layerStyle="cardBordered" p={3}>
-                                            {isPickupOrder ? (
-                                                <Text fontWeight="bold">
-                                                    <FormattedMessage
-                                                        defaultMessage="Pick Up in Store ({storeName})"
-                                                        id="cart.order_type.pickup_in_store"
-                                                        values={{
-                                                            storeName
-                                                        }}
-                                                    />
-                                                </Text>
-                                            ) : (
-                                                <Text fontWeight="bold">
-                                                    <FormattedMessage
-                                                        defaultMessage="Delivery"
-                                                        id="cart.order_type.delivery"
-                                                    />
-                                                </Text>
+                                <Stack spacing={6}>
+                                    {shipmentData.map((shipmentInfo) => (
+                                        <Box
+                                            key={
+                                                shipmentInfo.shipment?.shipmentId ||
+                                                'combined-delivery'
+                                            }
+                                            bg="white"
+                                            borderLeft="1px solid"
+                                            borderRight="1px solid"
+                                            borderBottom="1px solid"
+                                            borderColor="gray.200"
+                                            borderRadius="md"
+                                            borderTopRadius="none"
+                                            overflow="hidden"
+                                            boxShadow="sm"
+                                            p={4}
+                                        >
+                                            {/* Order Type Display */}
+                                            {storeLocatorEnabled && (
+                                                <OrderTypeDisplay
+                                                    isPickupOrder={shipmentInfo.isPickupOrder}
+                                                    store={shipmentInfo.store}
+                                                    itemsInShipment={shipmentInfo.itemsInShipment}
+                                                    totalItemsInCart={
+                                                        basket?.productItems?.length || 0
+                                                    }
+                                                    onChangeStore={
+                                                        selectedStore &&
+                                                        selectedStore.id !== shipmentInfo.store?.id
+                                                            ? () =>
+                                                                  handleChangeStoreFromCart(
+                                                                      shipmentInfo
+                                                                  )
+                                                            : null
+                                                    }
+                                                />
                                             )}
-                                        </Box>
-                                    )}
-                                    {/* Regular Products */}
-                                    <ProductItemList
-                                        productItems={categorizedProducts.regularProducts}
-                                        productsByItemId={productsByItemId}
-                                        isProductsLoading={isProductsLoading}
-                                        localQuantity={localQuantity}
-                                        localIsGiftItems={localIsGiftItems}
-                                        isCartItemLoading={isCartItemLoading}
-                                        selectedItem={selectedItem}
-                                        onItemQuantityChange={handleChangeItemQuantity}
-                                        onRemoveItemClick={handleRemoveItem}
-                                        renderSecondaryActions={renderSecondaryActions}
-                                    />
-
-                                    {/* Bonus Products */}
-                                    {categorizedProducts.bonusProducts.length > 0 && (
-                                        <>
-                                            <Box>
-                                                <BonusProductsTitle />
-                                            </Box>
+                                            {/* Regular Products */}
                                             <ProductItemList
-                                                productItems={categorizedProducts.bonusProducts}
+                                                productItems={
+                                                    shipmentInfo.categorizedProducts.regularProducts
+                                                }
                                                 productsByItemId={productsByItemId}
                                                 isProductsLoading={isProductsLoading}
                                                 localQuantity={localQuantity}
@@ -694,9 +899,44 @@ const Cart = () => {
                                                 onItemQuantityChange={handleChangeItemQuantity}
                                                 onRemoveItemClick={handleRemoveItem}
                                                 renderSecondaryActions={renderSecondaryActions}
+                                                renderDeliveryActions={(productItem) =>
+                                                    renderDeliveryActions(productItem, shipmentInfo)
+                                                }
                                             />
-                                        </>
-                                    )}
+                                            {/* Bonus Products */}
+                                            {shipmentInfo.categorizedProducts.bonusProducts.length >
+                                                0 && (
+                                                <>
+                                                    <BonusProductsTitle />
+                                                    <ProductItemList
+                                                        productItems={
+                                                            shipmentInfo.categorizedProducts
+                                                                .bonusProducts
+                                                        }
+                                                        productsByItemId={productsByItemId}
+                                                        isProductsLoading={isProductsLoading}
+                                                        localQuantity={localQuantity}
+                                                        localIsGiftItems={localIsGiftItems}
+                                                        isCartItemLoading={isCartItemLoading}
+                                                        selectedItem={selectedItem}
+                                                        onItemQuantityChange={
+                                                            handleChangeItemQuantity
+                                                        }
+                                                        onRemoveItemClick={handleRemoveItem}
+                                                        renderSecondaryActions={
+                                                            renderSecondaryActions
+                                                        }
+                                                        renderDeliveryActions={(productItem) =>
+                                                            renderDeliveryActions(
+                                                                productItem,
+                                                                shipmentInfo
+                                                            )
+                                                        }
+                                                    />
+                                                </>
+                                            )}
+                                        </Box>
+                                    ))}
                                 </Stack>
                                 <Box>
                                     {isOpen && !selectedItem.bundledProductItems && (

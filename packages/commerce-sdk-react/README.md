@@ -160,9 +160,27 @@ const Example = () => {
     const login = useAuthHelper(AuthHelpers.LoginRegisteredUserB2C)
     const logout = useAuthHelper(AuthHelpers.LogOut)
 
-    return <button onClick={() => {
-        login.mutate({username: 'kevin', password: 'pa$$word'})
-    }}>
+    return (
+        <div>
+            {/* Simple login */}
+            <button onClick={() => {
+                login.mutate({username: 'kevin', password: 'pa$$word'})
+            }}>
+                Login
+            </button>
+            
+            {/* Login with custom parameters */}
+            <button onClick={() => {
+                login.mutate({
+                    username: 'kevin', 
+                    password: 'pa$$word',
+                    customParameters: {c_customField: 'customValue'}
+                })
+            }}>
+                Login with Custom Parameters
+            </button>
+        </div>
+    )
 }
 ```
 

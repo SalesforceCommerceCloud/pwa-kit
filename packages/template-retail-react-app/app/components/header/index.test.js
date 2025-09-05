@@ -240,7 +240,7 @@ test('shows loading spinner during sign out process', async () => {
 
 test('handles keyboard navigation with Tab+Shift in account menu', async () => {
     // Test keyboard navigation without requiring auth
-    const {user} = renderWithProviders(<Header />)
+    renderWithProviders(<Header />)
 
     // Just verify the component renders without errors when keyboard events occur on any element
     const accountIcon = screen.getByLabelText('My Account')
@@ -250,7 +250,7 @@ test('handles keyboard navigation with Tab+Shift in account menu', async () => {
 })
 
 test('handles mouse leave events without crashing', async () => {
-    const {user} = renderWithProviders(<Header />)
+    renderWithProviders(<Header />)
 
     const accountIcon = screen.getByLabelText('My Account')
 

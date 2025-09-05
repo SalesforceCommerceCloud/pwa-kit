@@ -6,9 +6,13 @@
  */
 import React from 'react'
 import {renderHook, act} from '@testing-library/react'
-import {useStoreLocator} from '@salesforce/retail-react-app/app/hooks/use-store-locator'
+import {
+    useStoreLocator,
+    useStoreLocatorModal
+} from '@salesforce/retail-react-app/app/hooks/use-store-locator'
 import {StoreLocatorProvider} from '@salesforce/retail-react-app/app/contexts/store-locator-provider'
 import {useSearchStores} from '@salesforce/commerce-sdk-react'
+import {useLocation} from 'react-router-dom'
 
 jest.mock('@salesforce/retail-react-app/app/hooks/use-multi-site', () => ({
     __esModule: true,
@@ -23,6 +27,13 @@ jest.mock('@salesforce/retail-react-app/app/hooks/use-multi-site', () => ({
         },
         buildUrl: (path) => path
     })
+}))
+
+jest.mock('react-router-dom', () => ({
+    ...jest.requireActual('react-router-dom'),
+    useLocation: jest.fn(() => ({
+        pathname: '/test-path'
+    }))
 }))
 
 jest.mock('@salesforce/commerce-sdk-react', () => ({
@@ -196,6 +207,27 @@ describe('useStoreLocator', () => {
         expect(result.current.isLoading).toBe(true)
     })
 
+    it('provides modal actions', () => {
+        const {result} = renderHook(() => useStoreLocator(), {wrapper})
+        expect(typeof result.current.onOpen).toBe('function')
+        expect(typeof result.current.onClose).toBe('function')
+        expect(result.current.isOpen).toBe(false)
+    })
+
+    it('can open and close modal', () => {
+        const {result} = renderHook(() => useStoreLocator(), {wrapper})
+
+        act(() => {
+            result.current.onOpen()
+        })
+        expect(result.current.isOpen).toBe(true)
+
+        act(() => {
+            result.current.onClose()
+        })
+        expect(result.current.isOpen).toBe(false)
+    })
+
     describe('useStoreLocator - localStorage behavior', () => {
         it('initializes with stored selectedStoreId from localStorage', () => {
             window.localStorage.setItem('selectedStore_test-site', 'store123')
@@ -257,5 +289,81 @@ describe('useStoreLocator', () => {
                 }
             )
         })
+    })
+})
+
+describe('useStoreLocatorModal', () => {
+    beforeEach(() => {
+        window.localStorage.clear()
+    })
+
+    it('throws error when used outside provider', () => {
+        const consoleError = jest.spyOn(console, 'error').mockImplementation(() => {})
+        expect(() => renderHook(() => useStoreLocatorModal())).toThrow(
+            'useStoreLocatorModal must be used within a StoreLocatorProvider'
+        )
+        consoleError.mockRestore()
+    })
+
+    it('initializes with modal closed', () => {
+        const {result} = renderHook(() => useStoreLocatorModal(), {wrapper})
+        expect(result.current.isOpen).toBe(false)
+        expect(typeof result.current.onOpen).toBe('function')
+        expect(typeof result.current.onClose).toBe('function')
+    })
+
+    it('can open and close modal', () => {
+        const {result} = renderHook(() => useStoreLocatorModal(), {wrapper})
+
+        act(() => {
+            result.current.onOpen()
+        })
+        expect(result.current.isOpen).toBe(true)
+
+        act(() => {
+            result.current.onClose()
+        })
+        expect(result.current.isOpen).toBe(false)
+    })
+
+    it('modal state is shared with useStoreLocator hook', () => {
+        // Render both hooks in a single component to share the same context
+        const TestComponent = () => {
+            const modalHook = useStoreLocatorModal()
+            const storeHook = useStoreLocator()
+            return {modalHook, storeHook}
+        }
+
+        const {result} = renderHook(() => TestComponent(), {wrapper})
+
+        act(() => {
+            result.current.modalHook.onOpen()
+        })
+        expect(result.current.modalHook.isOpen).toBe(true)
+        expect(result.current.storeHook.isOpen).toBe(true)
+
+        act(() => {
+            result.current.storeHook.onClose()
+        })
+        expect(result.current.modalHook.isOpen).toBe(false)
+        expect(result.current.storeHook.isOpen).toBe(false)
+    })
+
+    it('auto-closes modal when pathname changes', () => {
+        const mockUseLocation = useLocation
+        const {result} = renderHook(() => useStoreLocatorModal(), {wrapper})
+
+        // Open the modal
+        act(() => {
+            result.current.onOpen()
+        })
+        expect(result.current.isOpen).toBe(true)
+
+        // Simulate navigation by changing pathname
+        mockUseLocation.mockReturnValue({pathname: '/new-path'})
+
+        // Re-render the hook to trigger the useEffect
+        const {result: newResult} = renderHook(() => useStoreLocatorModal(), {wrapper})
+        expect(newResult.current.isOpen).toBe(false)
     })
 })
