@@ -6,7 +6,7 @@
  */
 
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
-import {makeAuthenticatedRequest} from '@salesforce/retail-react-app/app/components/express/utils/token-refresh'
+import {fetchWithTokenRefresh} from '@salesforce/retail-react-app/app/components/express/utils/token-refresh'
 
 /**
  * Creates a temporary basket for Apple Pay "Buy Now" functionality using the official Salesforce Commerce API
@@ -17,7 +17,7 @@ import {makeAuthenticatedRequest} from '@salesforce/retail-react-app/app/compone
  * @param {number} quantity - Quantity of the product (default: 1)
  * @returns {Promise<object>} - The temporary basket object
  */
-export const createTemporaryBasket = async (sku, authToken, refreshToken, site, quantity = 1) => {
+export const createTemporaryBasket = async (sku, authToken, refreshToken, site, quantity = 1, updateTokens = null) => {
     if (!sku) {
         throw new Error('SKU is required to create temporary basket')
     }
@@ -51,23 +51,17 @@ export const createTemporaryBasket = async (sku, authToken, refreshToken, site, 
 
     const requestUrl = `/mobify/proxy/api/checkout/shopper-baskets/v2/organizations/${organizationId}/baskets?siteId=${site.id}&temporary=true`
 
-    const makeRequest = async (token) => {
-        return await fetch(requestUrl, {
+    const response = await fetchWithTokenRefresh(
+        requestUrl,
+        {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json',
-                Authorization: `Bearer ${token}`
+                'Content-Type': 'application/json'
             },
             body: JSON.stringify(requestBody)
-        })
-    }
-
-    const response = await makeAuthenticatedRequest(
-        makeRequest,
+        },
         authToken,
-        refreshToken,
-        site.id,
-        'Temporary basket creation'
+        updateTokens
     )
 
     if (!response.ok) {
@@ -92,7 +86,7 @@ export const createTemporaryBasket = async (sku, authToken, refreshToken, site, 
  * @param {object} site - Site configuration object
  * @returns {Promise<boolean>} - True if deletion was successful, false otherwise
  */
-export const deleteTemporaryBasket = async (basketId, authToken, refreshToken, site) => {
+export const deleteTemporaryBasket = async (basketId, authToken, refreshToken, site, updateTokens = null) => {
     if (!basketId) {
         return false
     }
@@ -118,21 +112,14 @@ export const deleteTemporaryBasket = async (basketId, authToken, refreshToken, s
 
         const requestUrl = `/mobify/proxy/api/checkout/shopper-baskets/v2/organizations/${organizationId}/baskets/${basketId}?siteId=${site.id}`
 
-        const makeRequest = async (token) => {
-            return await fetch(requestUrl, {
+        const response = await fetchWithTokenRefresh(
+            requestUrl,
+            {
                 method: 'DELETE',
-                headers: {
-                    Authorization: `Bearer ${token}`
-                }
-            })
-        }
-
-        const response = await makeAuthenticatedRequest(
-            makeRequest,
+                headers: {}
+            },
             authToken,
-            refreshToken,
-            site.id,
-            'Temporary basket deletion'
+            updateTokens
         )
 
         // Return true if deletion was successful (200-299 status codes)
@@ -161,11 +148,12 @@ export const cleanupTemporaryBasket = async (
     authToken,
     refreshToken,
     site,
-    setTempBasket
+    setTempBasket,
+    updateTokens = null
 ) => {
     if (isPdpMode && sharedBasketRef?.basketId) {
         try {
-            await deleteTemporaryBasket(sharedBasketRef.basketId, authToken, refreshToken, site)
+            await deleteTemporaryBasket(sharedBasketRef.basketId, authToken, refreshToken, site, updateTokens)
             if (setTempBasket) {
                 setTempBasket(null)
             }
@@ -194,7 +182,8 @@ export const createCleanupFunction = (
     authToken,
     refreshToken,
     site,
-    setTempBasket
+    setTempBasket,
+    updateTokens = null
 ) => {
-    return () => cleanupTemporaryBasket(isPdpMode, sharedBasketRef, authToken, refreshToken, site, setTempBasket)
+    return () => cleanupTemporaryBasket(isPdpMode, sharedBasketRef, authToken, refreshToken, site, setTempBasket, updateTokens)
 }

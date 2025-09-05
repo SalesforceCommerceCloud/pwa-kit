@@ -122,7 +122,7 @@ const cleanupExpiredCache = () => {
  * @param {boolean} enabled - Whether the hook should make API calls (default: true)
  * @returns {object} Payment methods data, loading state, and error
  */
-export const useStandalonePaymentMethods = (authToken, refreshToken, site, locale, enabled = true) => {
+export const useStandalonePaymentMethods = (authToken, refreshToken, site, locale, enabled = true, onTokenUpdate = null) => {
     const [paymentMethods, setPaymentMethods] = useState(null)
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState(null)
@@ -169,7 +169,7 @@ export const useStandalonePaymentMethods = (authToken, refreshToken, site, local
                 setLoading(true)
                 setError(null)
 
-                const service = new AdyenPaymentMethodsService(authToken, refreshToken, site)
+                const service = new AdyenPaymentMethodsService(authToken, refreshToken, site, onTokenUpdate)
                 const data = await service.getPaymentMethods()
 
                 // Mark the successful completion of the API call

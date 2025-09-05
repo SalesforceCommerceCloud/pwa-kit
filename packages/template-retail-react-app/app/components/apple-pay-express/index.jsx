@@ -79,6 +79,7 @@ export const getCustomerBillingDetails = (billingContact) => {
 export const getAppleButtonConfig = (
     authToken,
     refreshToken,
+    updateTokens,
     site,
     basket,
     shippingMethods,
@@ -103,7 +104,7 @@ export const getAppleButtonConfig = (
 
         // For PDP flows, create temporary basket if needed (and SKU is available)
         if (isPdpMode && sku && setTempBasket) {
-            const newBasket = await createTemporaryBasket(sku, authToken, refreshToken, site, quantity)
+            const newBasket = await createTemporaryBasket(sku, authToken, refreshToken, site, quantity, updateTokens)
             basketRef = newBasket // Update basket reference immediately
             setTempBasket(newBasket) // Update React state for re-renders
             return newBasket
@@ -164,7 +165,8 @@ export const getAppleButtonConfig = (
                         authToken,
                         refreshToken,
                         site,
-                        setTempBasket
+                        setTempBasket,
+                        updateTokens
                     )
                     reject()
                 }
@@ -198,7 +200,8 @@ export const getAppleButtonConfig = (
                         authToken,
                         refreshToken,
                         site,
-                        setTempBasket
+                        setTempBasket,
+                        updateTokens
                     )
                     reject()
                     sendExpressMessage(EXPRESS_MESSAGES.PAYMENT_FAILURE, {
@@ -216,7 +219,8 @@ export const getAppleButtonConfig = (
                         basketToUse.basketId,
                         authToken,
                         refreshToken,
-                        site
+                        site,
+                        updateTokens
                     )
                     basketToUse = finalizedBasket
                     basketRef = finalizedBasket // Update basket reference
@@ -247,7 +251,8 @@ export const getAppleButtonConfig = (
                         authToken,
                         refreshToken,
                         site,
-                        setTempBasket
+                        setTempBasket,
+                        updateTokens
                     )
                     reject()
                     sendExpressMessage(EXPRESS_MESSAGES.PAYMENT_FAILURE, {
@@ -261,7 +266,7 @@ export const getAppleButtonConfig = (
                     origin: state.data.origin ? state.data.origin : window.location.origin
                 }
 
-                const adyenPaymentService = new AdyenPaymentsService(authToken, refreshToken, site)
+                const adyenPaymentService = new AdyenPaymentsService(authToken, refreshToken, site, updateTokens)
                 const paymentsResponse = await adyenPaymentService.submitPayment(
                     paymentData,
                     basketToUse?.basketId,
@@ -292,7 +297,8 @@ export const getAppleButtonConfig = (
                         authToken,
                         refreshToken,
                         site,
-                        setTempBasket
+                        setTempBasket,
+                        updateTokens
                     )
                     reject()
                     sendExpressMessage(EXPRESS_MESSAGES.PAYMENT_FAILURE, {
@@ -320,8 +326,8 @@ export const getAppleButtonConfig = (
                     return
                 }
 
-                const adyenShippingAddressService = new AdyenShippingAddressService(authToken, refreshToken, site)
-                const adyenShippingMethodsService = new AdyenShippingMethodsService(authToken, refreshToken, site)
+                const adyenShippingAddressService = new AdyenShippingAddressService(authToken, refreshToken, site, updateTokens)
+                const adyenShippingMethodsService = new AdyenShippingMethodsService(authToken, refreshToken, site, updateTokens)
                 const customerShippingDetails = getCustomerShippingDetails(shippingContact)
                 await adyenShippingAddressService.updateShippingAddress(
                     basketToUse.basketId,
@@ -381,7 +387,8 @@ export const getAppleButtonConfig = (
                                 basketToUse.basketId,
                                 authToken,
                                 refreshToken,
-                                site
+                                site,
+                                updateTokens
                             )
                             finalResponse = calculatedBasket
                         }
@@ -449,7 +456,8 @@ export const getAppleButtonConfig = (
                                 basketToUse.basketId,
                                 authToken,
                                 refreshToken,
-                                site
+                                site,
+                                updateTokens
                             )
                             finalResponse = calculatedBasket
                         }
@@ -485,12 +493,12 @@ export const getAppleButtonConfig = (
         onError: (error) => {
             // Clean up temporary basket when Apple Pay is cancelled or fails
             if (error.name === 'CANCEL') {
-                cleanupTemporaryBasket(isPdpMode, basketRef, authToken, refreshToken, site, setTempBasket)
+                cleanupTemporaryBasket(isPdpMode, basketRef, authToken, refreshToken, site, setTempBasket, updateTokens)
                 sendExpressMessage(EXPRESS_MESSAGES.PAYMENT_CANCEL, {
                     PAYMENT_METHOD
                 })
             } else {
-                cleanupTemporaryBasket(isPdpMode, basketRef, authToken, refreshToken, site, setTempBasket)
+                cleanupTemporaryBasket(isPdpMode, basketRef, authToken, refreshToken, site, setTempBasket, updateTokens)
                 sendExpressMessage(EXPRESS_MESSAGES.PAYMENT_FAILURE, {
                     PAYMENT_METHOD
                 })
@@ -505,6 +513,7 @@ export const ApplePayExpress = ({
     adyenPaymentMethods,
     authToken,
     refreshToken,
+    updateTokens,
     locale: providedLocale,
     site: providedSite,
     basket,
@@ -541,7 +550,7 @@ export const ApplePayExpress = ({
         return () => {
             // Clean up temporary basket when component unmounts (user navigates away)
             if (isPdpMode && currentSku && tempBasket?.basketId && authToken && finalSite) {
-                deleteTemporaryBasket(tempBasket.basketId, authToken, refreshToken, finalSite).catch((error) =>
+                deleteTemporaryBasket(tempBasket.basketId, authToken, refreshToken, finalSite, updateTokens).catch((error) =>
                     console.warn('Failed to cleanup temporary basket on unmount:', error)
                 )
             }
@@ -614,6 +623,7 @@ export const ApplePayExpress = ({
                     const appleButtonConfig = getAppleButtonConfig(
                         authToken,
                         refreshToken,
+                        updateTokens,
                         finalSite,
                         basket,
                         adyenPaymentMethods?.applicableShippingMethods || [],
@@ -707,6 +717,7 @@ ApplePayExpress.propTypes = {
     adyenPaymentMethods: PropTypes.object,
     authToken: PropTypes.string,
     refreshToken: PropTypes.string,
+    updateTokens: PropTypes.func,
     locale: PropTypes.object,
     site: PropTypes.object,
     basket: PropTypes.object,

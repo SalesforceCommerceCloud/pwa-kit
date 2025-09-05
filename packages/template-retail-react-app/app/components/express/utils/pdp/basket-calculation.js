@@ -6,7 +6,7 @@
  */
 
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
-import {makeAuthenticatedRequest} from '@salesforce/retail-react-app/app/components/express/utils/token-refresh'
+import {fetchWithTokenRefresh} from '@salesforce/retail-react-app/app/components/express/utils/token-refresh'
 
 /**
  * Validates common parameters and gets organization config
@@ -49,32 +49,26 @@ const validateParamsAndGetConfig = (basketId, authToken, site) => {
  * @param {object} site - Site configuration object
  * @returns {Promise<object>} - The updated basket with calculated totals
  */
-export const calculateBasketTotals = async (basketId, authToken, refreshToken, site) => {
+export const calculateBasketTotals = async (basketId, authToken, refreshToken, site, updateTokens = null) => {
     const organizationId = validateParamsAndGetConfig(basketId, authToken, site)
 
     // Use PATCH method to update/calculate the basket
     // This triggers the Commerce Cloud to recalculate all totals
     const requestUrl = `/mobify/proxy/api/checkout/shopper-baskets/v2/organizations/${organizationId}/baskets/${basketId}?siteId=${site.id}`
 
-    const makeRequest = async (token) => {
-        return await fetch(requestUrl, {
+    const response = await fetchWithTokenRefresh(
+        requestUrl,
+        {
             method: 'PATCH',
             headers: {
-                'Content-Type': 'application/json',
-                Authorization: `Bearer ${token}`
+                'Content-Type': 'application/json'
             },
             body: JSON.stringify({
                 // Empty body - this triggers recalculation without changing anything
             })
-        })
-    }
-
-    const response = await makeAuthenticatedRequest(
-        makeRequest,
+        },
         authToken,
-        refreshToken,
-        site.id,
-        'Basket calculation'
+        updateTokens
     )
 
     if (!response.ok) {
@@ -95,28 +89,22 @@ export const calculateBasketTotals = async (basketId, authToken, refreshToken, s
  * @param {object} site - Site configuration object
  * @returns {Promise<object>} - The basket with current totals
  */
-export const getBasketWithTotals = async (basketId, authToken, refreshToken, site) => {
+export const getBasketWithTotals = async (basketId, authToken, refreshToken, site, updateTokens = null) => {
     const organizationId = validateParamsAndGetConfig(basketId, authToken, site)
 
     // GET the basket to retrieve current calculated totals
     const requestUrl = `/mobify/proxy/api/checkout/shopper-baskets/v2/organizations/${organizationId}/baskets/${basketId}?siteId=${site.id}`
 
-    const makeRequest = async (token) => {
-        return await fetch(requestUrl, {
+    const response = await fetchWithTokenRefresh(
+        requestUrl,
+        {
             method: 'GET',
             headers: {
-                'Content-Type': 'application/json',
-                Authorization: `Bearer ${token}`
+                'Content-Type': 'application/json'
             }
-        })
-    }
-
-    const response = await makeAuthenticatedRequest(
-        makeRequest,
+        },
         authToken,
-        refreshToken,
-        site.id,
-        'Basket retrieval'
+        updateTokens
     )
 
     if (!response.ok) {
@@ -138,9 +126,9 @@ export const getBasketWithTotals = async (basketId, authToken, refreshToken, sit
  * @param {object} site - Site configuration object
  * @returns {Promise<object>} - The finalized basket with orderTotal
  */
-export const forceOrderCalculation = async (basketId, authToken, refreshToken, site) => {
+export const forceOrderCalculation = async (basketId, authToken, refreshToken, site, updateTokens = null) => {
     // First, get the current basket state
-    const currentBasket = await getBasketWithTotals(basketId, authToken, refreshToken, site)
+    const currentBasket = await getBasketWithTotals(basketId, authToken, refreshToken, site, updateTokens)
 
     // If orderTotal is already calculated, return as-is
     if (currentBasket.orderTotal !== null && currentBasket.orderTotal !== undefined) {
@@ -158,7 +146,7 @@ export const forceOrderCalculation = async (basketId, authToken, refreshToken, s
     }
 
     // Force a final calculation regardless of shipping method success
-    const finalBasket = await calculateBasketTotals(basketId, authToken, refreshToken, site)
+    const finalBasket = await calculateBasketTotals(basketId, authToken, refreshToken, site, updateTokens)
 
     // If still no orderTotal, the basket calculation failed - don't proceed with Apple Pay
     if (finalBasket.orderTotal === null || finalBasket.orderTotal === undefined) {

@@ -10,12 +10,14 @@ export class ApiClient {
     token = null
     refreshToken = null
     site = null
+    onTokenUpdate = null
 
-    constructor(url, token, refreshToken, site) {
+    constructor(url, token, refreshToken, site, onTokenUpdate = null) {
         this.url = url
         this.token = token
         this.refreshToken = refreshToken
         this.site = site
+        this.onTokenUpdate = onTokenUpdate
     }
 
     async base(method, options) {
@@ -46,13 +48,8 @@ export class ApiClient {
         const response = await makeAuthenticatedRequest(
             makeRequest,
             this.token,
-            this.refreshToken,
-            this.site.id,
-            `${method.toUpperCase()} ${this.url}`
+            this.onTokenUpdate
         )
-
-        // Update token if it was refreshed (this would need to be handled differently in a real implementation)
-        // For now, we'll assume the token refresh is handled at a higher level
         
         return response
     }

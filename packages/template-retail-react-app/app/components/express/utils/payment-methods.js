@@ -10,8 +10,8 @@ export class AdyenPaymentMethodsService {
     baseUrl = '/api/adyen/paymentMethods/standalone'
     apiClient = null
 
-    constructor(token, refreshToken, site) {
-        this.apiClient = new ApiClient(this.baseUrl, token, refreshToken, site)
+    constructor(token, refreshToken, site, onTokenUpdate = null) {
+        this.apiClient = new ApiClient(this.baseUrl, token, refreshToken, site, onTokenUpdate)
     }
 
     async _handleResponse(res) {

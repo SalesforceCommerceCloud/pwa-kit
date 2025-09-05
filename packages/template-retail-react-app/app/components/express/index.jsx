@@ -37,6 +37,12 @@ function Express() {
     const [authToken, setAuthToken] = useState()
     const [refreshToken, setRefreshToken] = useState()
 
+    // Token update callback for child components
+    const updateTokens = (newAuthToken, newRefreshToken) => {
+        setAuthToken(newAuthToken)
+        setRefreshToken(newRefreshToken)
+    }
+
     // Check for PDP mode flag in URL
     const urlParams = new URLSearchParams(location.search)
     const isPdpMode = urlParams.get('pdp') === 'true'
@@ -55,7 +61,8 @@ function Express() {
         refreshToken || null, // Ensure we always pass a consistent value
         site || null, // Ensure we always pass a consistent value
         locale || null, // Ensure we always pass a consistent value
-        !!(authToken && site && locale) // Only enable when all params are available
+        !!(authToken && site && locale), // Only enable when all params are available
+        updateTokens // Pass token update callback
     )
 
     // Mark when payment methods are being fetched
@@ -134,6 +141,7 @@ function Express() {
         adyenPaymentMethods,
         authToken,
         refreshToken,
+        updateTokens,
         locale,
         site,
         basket,

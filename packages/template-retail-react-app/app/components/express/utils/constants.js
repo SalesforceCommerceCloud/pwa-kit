@@ -17,7 +17,8 @@ export const EXPRESS_MESSAGES = {
     PAYMENT_UNAVAILABLE: 'express.payment.unavailable',
     PAYMENT_SUCCESS: 'express.payment.success',
     PAYMENT_FAILURE: 'express.payment.failure',
-    PAYMENT_CANCEL: 'express.payment.cancel'
+    PAYMENT_CANCEL: 'express.payment.cancel',
+    TOKEN_REFRESH_NEEDED: 'express.token.refresh.needed'
 }
 
 // Express button constants

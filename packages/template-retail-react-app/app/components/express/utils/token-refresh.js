@@ -5,84 +5,86 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
+import {sendExpressMessage} from './express-payment-utils'
+import {EXPRESS_MESSAGES} from './constants'
+
 /**
  * Centralized token refresh utility for express payments
- * Handles authentication token refresh when API calls receive 401 errors
+ * Uses parent application communication for token refresh
  */
 
 /**
- * Refreshes an access token using a refresh token
- * @param {string} refreshToken - The refresh token to use
- * @param {string} siteId - The site ID for the refresh request
- * @returns {Promise<{authToken: string, refreshToken?: string}>} New tokens
+ * Requests token refresh from parent application and waits for response
+ * @returns {Promise<{authToken: string, refreshToken: string}>} New tokens from parent
  */
-export const refreshAccessToken = async (refreshToken, siteId) => {
-    if (!refreshToken) {
-        throw new Error('No refresh token available')
-    }
+const requestTokenRefreshFromParent = () => {
+    return new Promise((resolve, reject) => {
+        // Set up a timeout to avoid waiting forever
+        const timeout = setTimeout(() => {
+            window.removeEventListener('message', messageHandler)
+            reject(new Error('Token refresh request timed out'))
+        }, 5000) // 5 second timeout
 
-    try {
-        const refreshUrl = `/api/auth/refresh`
-        const refreshResponse = await fetch(refreshUrl, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                refreshToken: refreshToken,
-                siteId: siteId
-            })
-        })
-
-        if (!refreshResponse.ok) {
-            const errorText = await refreshResponse.text()
-            throw new Error(`Token refresh failed: ${refreshResponse.status} ${errorText}`)
+        // Set up message handler for the response
+        const messageHandler = (event) => {
+            if (event.data && event.data.type === 'authDataAvailable') {
+                clearTimeout(timeout)
+                window.removeEventListener('message', messageHandler)
+                
+                const authData = event.data.data.authData
+                if (authData.authToken) {
+                    resolve({
+                        authToken: authData.authToken,
+                        refreshToken: authData.refreshToken
+                    })
+                } else {
+                    reject(new Error('No auth token received from parent'))
+                }
+            }
         }
 
-        const data = await refreshResponse.json()
-        return {
-            authToken: data.authToken,
-            refreshToken: data.refreshToken || refreshToken // Use new refresh token if provided, otherwise keep current
-        }
-    } catch (error) {
-        console.error('Failed to refresh access token:', error)
-        throw error
-    }
+        // Add temporary message listener
+        window.addEventListener('message', messageHandler)
+        
+        // Request token refresh from parent
+        sendExpressMessage(EXPRESS_MESSAGES.TOKEN_REFRESH_NEEDED, {})
+    })
 }
 
 /**
- * Makes an authenticated API request with automatic token refresh on 401 errors
- * @param {Function} makeRequest - Function that makes the API request, should accept a token parameter
+ * Higher-order function that wraps any fetch request with automatic token refresh on 401 errors
+ * @param {function} requestFunction - Function that takes a token and returns a fetch promise
  * @param {string} authToken - Current auth token
- * @param {string} refreshToken - Refresh token for renewal
- * @param {string} siteId - Site ID for refresh requests
- * @param {string} operationName - Name of the operation for logging (optional)
- * @returns {Promise<Response>} The API response
+ * @param {function} onTokenUpdate - Callback to update tokens in parent component
+ * @returns {Promise<Response>} The response from the request (possibly after token refresh)
  */
-export const makeAuthenticatedRequest = async (
-    makeRequest, 
-    authToken, 
-    refreshToken, 
-    siteId, 
-    operationName = 'API call'
-) => {
-    let response = await makeRequest(authToken)
+export const makeAuthenticatedRequest = async (requestFunction, authToken, onTokenUpdate) => {
+    // First attempt with current token
+    let response = await requestFunction(authToken)
     
-    // Handle 401 unauthorized errors by attempting token refresh
-    if (response.status === 401 && refreshToken) {
+    // If we get a 401, request token refresh from parent
+    if (response.status === 401) {
         try {
-            console.log(`🔄 ${operationName} failed with 401, attempting token refresh...`)
+            console.log('🔄 Request failed with 401, requesting token refresh from parent...')
+            const {authToken: newAuthToken, refreshToken: newRefreshToken} = await requestTokenRefreshFromParent()
             
-            const refreshResult = await refreshAccessToken(refreshToken, siteId)
-            const newAuthToken = refreshResult.authToken
+            // Update tokens in the parent component if callback provided
+            if (onTokenUpdate) {
+                onTokenUpdate(newAuthToken, newRefreshToken)
+            }
             
-            console.log(`🔄 Token refresh successful, retrying ${operationName}...`)
-            response = await makeRequest(newAuthToken)
+            // Retry the request with the new token
+            console.log('✅ Token refreshed successfully, retrying request...')
+            response = await requestFunction(newAuthToken)
             
-            console.log(`🔄 ${operationName} retry response: ${response.status}`)
+            if (response.ok) {
+                console.log('✅ Retry after token refresh succeeded')
+            } else {
+                console.log('❌ Retry after token refresh still failed:', response.status)
+            }
         } catch (refreshError) {
-            console.error(`🔄 Token refresh failed during ${operationName}:`, refreshError)
-            // Return original response if refresh fails
+            console.error('❌ Token refresh failed:', refreshError)
+            // Return the original 401 response since refresh failed
         }
     }
     
@@ -90,38 +92,24 @@ export const makeAuthenticatedRequest = async (
 }
 
 /**
- * Higher-order function that wraps a fetch-based API call with token refresh capability
- * @param {string} url - The API endpoint URL
- * @param {Object} requestConfig - The fetch request configuration (without Authorization header)
+ * Convenience wrapper for fetch calls with automatic token refresh via parent communication
+ * @param {string} url - The URL to fetch
+ * @param {object} options - Fetch options (headers, method, body, etc.)
  * @param {string} authToken - Current auth token
- * @param {string} refreshToken - Refresh token for renewal
- * @param {string} siteId - Site ID for refresh requests
- * @param {string} operationName - Name of the operation for logging (optional)
- * @returns {Promise<Response>} The API response
+ * @param {function} onTokenUpdate - Callback to update tokens in parent component
+ * @returns {Promise<Response>} The response from the fetch (possibly after token refresh)
  */
-export const fetchWithTokenRefresh = async (
-    url,
-    requestConfig,
-    authToken,
-    refreshToken,
-    siteId,
-    operationName = 'API call'
-) => {
-    const makeRequest = async (token) => {
-        return await fetch(url, {
-            ...requestConfig,
+export const fetchWithTokenRefresh = async (url, options, authToken, onTokenUpdate) => {
+    const requestFunction = (token) => {
+        const requestOptions = {
+            ...options,
             headers: {
-                ...requestConfig.headers,
+                ...options.headers,
                 Authorization: `Bearer ${token}`
             }
-        })
+        }
+        return fetch(url, requestOptions)
     }
-
-    return await makeAuthenticatedRequest(
-        makeRequest,
-        authToken,
-        refreshToken,
-        siteId,
-        operationName
-    )
+    
+    return makeAuthenticatedRequest(requestFunction, authToken, onTokenUpdate)
 }
