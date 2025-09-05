@@ -1,0 +1,65 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+These are the steps to remove the Store Locator extension from an existing store front application (currently opened project). Follow these instructions carefully and precisely, do NOT deviate from them.
+
+ # Step 1. Prerequisites: First make sure the current project has all the necessary files. If any requirement in the prerequisite is not met, abort the rest of this instruction.
+ <Prerequisites>
+ - The folder `src/pages/store-locator` exists
+ - The file `config/constants` exists
+ - The file `src/components/_app/index.jsx` exists
+ - The file `src/components/_app/partials/app-header.jsx` exists
+ - The file `src/components/_app/partials/app-modals.jsx` exists
+ - The file `src/components/header/index.jsx` exists
+ - The file `src/config/constants.js` exists
+ - The file `src/contexts/index.js` exists
+ - The file `src/routes.tsx` exists
+ - The file `src/utils/test-utils.js` exists
+ </Prerequisites>
+
+# Step 2. Delete exension page code.
+<Delete>
+Delete the `src/pages/store-locator` folder and all of its subfolders.
+</Delete>
+
+# Step 3. Remove code marked by comment markerss.
+<Merge>
+For each of the following files, go through them one by one and carefully follow the steps outlined below:
+        - `config/constants`
+        - `src/components/_app/index.jsx`
+        - `src/components/_app/partials/app-header.jsx`
+        - `src/components/_app/partials/app-modals.jsx`
+        - `src/components/header/index.jsx`
+        - `src/config/constants.js`
+        - `src/contexts/index.js`
+        - `src/routes.tsx`
+        - `src/utils/test-utils.js`
+    1. For each file, find comment line that contains `@sfdc-extension-line SFDC_EXT_STORE_LOCATOR`, remove the comment line as well as the line BELOW it. For example, 
+    ```
+    const a = 'b'
+    // @sfdc-extension-line SFDC_EXT_STORE_LOCATOR
+    const foo = 'bar'
+    const b = 'c'
+    ```
+    Will become
+    ```
+    const a = 'b'
+    const b= 'c'
+    ```
+    2. For each file, find the pair of comment lines that begin with `@sfdc-extension-block-start SFDC_EXT_STORE_LOCATOR` and end with `@sfdc-extension-block-end SFDC_EXT_STORE_LOCATOR`, then remove the entire block including the comment lines. For example:
+    ```
+    const a = 'b'
+    // @sfdc-extension-block-start SFDC_EXT_STORE_LOCATOR
+    const storeLocator = loadable(() => 
+        import('../pages/store-locator')
+    // @sfdc-extension-block-end SFDC_EXT_STORE_LOCATOR
+    const b = 'c'
+    ```
+    will become
+    ```
+    const a = 'b'
+    const b = 'c'
+    ```
+</Merge>

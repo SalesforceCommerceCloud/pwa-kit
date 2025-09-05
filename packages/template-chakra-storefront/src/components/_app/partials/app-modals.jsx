@@ -10,7 +10,8 @@ import PropTypes from 'prop-types'
 import {AuthModal} from '../../../hooks/use-auth-modal'
 import {DntNotification} from '../../../hooks'
 import Toaster, {toaster} from '../../../components/toaster'
-// import StoreLocatorModal from '../../../components/store-locator-modal'
+/* @sfdc-extension-line SFDC_EXT_STORE_LOCATOR */
+import StoreLocatorModal from '../../../pages/store-locator/partial/modal'
 
 /**
  * AppModals component that renders all app-level modals using React Portals
@@ -18,10 +19,11 @@ import Toaster, {toaster} from '../../../components/toaster'
  */
 const AppModals = ({
     authModal,
-    dntNotification
-    // Uncomment when store locator is enabled
-    // isOpenStoreLocator,
-    // onCloseStoreLocator
+    dntNotification,
+    /* @sfdc-extension-block-start SFDC_EXT_STORE_LOCATOR */
+    isOpenStoreLocator,
+    onCloseStoreLocator
+    /* @sfdc-extension-block-end SFDC_EXT_STORE_LOCATOR */
 }) => {
     return (
         <>
@@ -34,23 +36,19 @@ const AppModals = ({
             {/* Toast Notifications */}
             <Toaster toaster={toaster} />
 
-            {/* Store Locator Modal - Disabled until extension is moved */}
-            {/*
-            <StoreLocatorModal
-                isOpen={isOpenStoreLocator}
-                onClose={onCloseStoreLocator}
-            />
-            */}
+            {/* @sfdc-extension-line SFDC_EXT_STORE_LOCATOR */}
+            <StoreLocatorModal isOpen={isOpenStoreLocator} onClose={onCloseStoreLocator} />
         </>
     )
 }
 
 AppModals.propTypes = {
     authModal: PropTypes.object,
-    dntNotification: PropTypes.object
-    // Uncomment when store locator is enabled
-    // isOpenStoreLocator: PropTypes.bool,
-    // onCloseStoreLocator: PropTypes.func
+    dntNotification: PropTypes.object,
+    /* @sfdc-extension-block-start SFDC_EXT_STORE_LOCATOR */
+    isOpenStoreLocator: PropTypes.bool,
+    onCloseStoreLocator: PropTypes.func
+    /* @sfdc-extension-block-end SFDC_EXT_STORE_LOCATOR */
 }
 
 export default AppModals

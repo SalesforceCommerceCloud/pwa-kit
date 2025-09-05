@@ -12,8 +12,9 @@ import {ChakraProvider} from '@chakra-ui/react'
 // Removes focus for non-keyboard interactions for the whole application
 import 'focus-visible/dist/focus-visible'
 
-import theme from '../../../src/theme'
-// import {MultiSiteProvider, AppConfigProvider} from '../../../src/contexts'
+import theme from '../../theme'
+// @sfdc-extension-line SFDC_EXT_STORE_LOCATOR
+import {StoreLocatorProvider} from '../../contexts'
 import {MultiSiteProvider} from '../../contexts'
 import {useAppOrigin} from '../../hooks'
 import {resolveSiteFromUrl, resolveLocaleFromUrl} from '../../utils/site-utils'
@@ -26,6 +27,17 @@ import {CommerceApiProvider, resetDehydratedStateTimeStamp} from '@salesforce/co
 import {withReactQuery} from '@salesforce/pwa-kit-react-sdk/ssr/universal/components/with-react-query'
 import {useCorrelationId} from '@salesforce/pwa-kit-react-sdk/ssr/universal/hooks'
 import {ReactQueryDevtools} from '@tanstack/react-query-devtools'
+/** @sfdc-extension-block-start SFDC_EXT_STORE_LOCATOR */
+import {
+    STORE_LOCATOR_RADIUS,
+    STORE_LOCATOR_RADIUS_UNIT,
+    STORE_LOCATOR_DEFAULT_COUNTRY,
+    STORE_LOCATOR_DEFAULT_COUNTRY_CODE,
+    STORE_LOCATOR_DEFAULT_POSTAL_CODE,
+    STORE_LOCATOR_DEFAULT_PAGE_SIZE,
+    STORE_LOCATOR_SUPPORTED_COUNTRIES
+} from '../../../src/config/constants'
+/** @sfdc-extension-block-end SFDC_EXT_STORE_LOCATOR */
 
 /**
  * Use the AppConfig component to inject extra arguments into the getProps
@@ -67,6 +79,21 @@ const AppConfig = ({children, locals = {}}) => {
     const passwordlessLoginCallbackURI = useMemo(() => passwordlessCallback, [passwordlessCallback])
     const defaultDnt = useMemo(() => locals.appConfig.dnt, [locals.appConfig.dnt])
 
+    /* @sfdc-extension-block-start SFDC_EXT_STORE_LOCATOR */
+    const storeLocatorConfig = useMemo(
+        () => ({
+            radius: STORE_LOCATOR_RADIUS,
+            radiusUnit: STORE_LOCATOR_RADIUS_UNIT,
+            defaultCountry: STORE_LOCATOR_DEFAULT_COUNTRY,
+            defaultCountryCode: STORE_LOCATOR_DEFAULT_COUNTRY_CODE,
+            defaultPostalCode: STORE_LOCATOR_DEFAULT_POSTAL_CODE,
+            defaultPageSize: STORE_LOCATOR_DEFAULT_PAGE_SIZE,
+            supportedCountries: STORE_LOCATOR_SUPPORTED_COUNTRIES
+        }),
+        []
+    )
+    /* @sfdc-extension-block-end SFDC_EXT_STORE_LOCATOR */
+
     return (
         <CommerceApiProvider
             shortCode={commerceApiConfig.parameters.shortCode}
@@ -86,7 +113,11 @@ const AppConfig = ({children, locals = {}}) => {
             // enablePWAKitPrivateClient={true}
         >
             <MultiSiteProvider site={locals.site} locale={locals.locale} buildUrl={locals.buildUrl}>
-                <ChakraProvider value={theme}>{children}</ChakraProvider>
+                {/* @sfdc-extension-line SFDC_EXT_STORE_LOCATOR */}
+                <StoreLocatorProvider config={storeLocatorConfig}>
+                    <ChakraProvider value={theme}>{children}</ChakraProvider>
+                    {/* @sfdc-extension-line SFDC_EXT_STORE_LOCATOR */}
+                </StoreLocatorProvider>
             </MultiSiteProvider>
             <ReactQueryDevtools />
         </CommerceApiProvider>

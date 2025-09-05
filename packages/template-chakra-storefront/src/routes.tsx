@@ -42,13 +42,15 @@ const ProductDetail = loadable(() => import('../src/pages/product-detail'), {fal
 const ProductList = loadable(() => import('../src/pages/product-list'), {
     fallback
 })
+/* @sfdc-extension-block-start SFDC_EXT_STORE_LOCATOR */
+const StoreLocator = loadable(() => import('../src/pages/store-locator'), {
+    fallback
+})
+/* @sfdc-extension-block-end SFDC_EXT_STORE_LOCATOR */
 
 //@sfdc-extension-line SFDC_EXT_SOCIAL_LOGIN
 const SocialLoginRedirect = loadable(() => import('../src/pages/social-login-redirect'), {fallback})
 
-// const StoreLocator = loadable(() => import('../src/pages/store-locator'), {
-//     fallback
-// })
 // @sfdc-extension-line SFDC_EXT_WISHLIST
 const Wishlist = loadable(() => import('../src/pages/account/wishlist'), {fallback})
 const PageNotFound = loadable(() => import('../src/pages/page-not-found'))
@@ -132,10 +134,12 @@ export const routes = [
         component: Wishlist
     },
     // @sfdc-extension-block-end SFDC_EXT_WISHLIST
-    // {
-    //     path: '/store-locator',
-    //     component: StoreLocator
-    // },
+    // @sfdc-extension-block-start SFDC_EXT_STORE_LOCATOR
+    {
+        path: '/store-locator',
+        component: StoreLocator
+    },
+    // @sfdc-extension-block-end SFDC_EXT_STORE_LOCATOR
     {
         path: '*',
         component: PageNotFound

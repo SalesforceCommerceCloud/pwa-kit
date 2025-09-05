@@ -1,0 +1,133 @@
+These are the steps to remove the "{{extensionName}}" extension from an existing store front application (currently opened project). Follow these instructions carefully and precisely, do NOT deviate from them.
+
+ # Step 1. Prerequisites: First make sure the current project has all the necessary files. If any requirement in the prerequisite is not met, abort the rest of this instruction.
+ <Prerequisites>
+{{#each mergeFiles as |mergeFile|}}
+ - The file `{{mergeFile}}` exists
+ {{/each}}
+ </Prerequisites>
+
+# Step 2. Delete files.
+<Delete>
+{{#each delete as |deleteFile|}}
+ - Delete the `{{deleteFile}}` file or folder. Delete recursively if it is a folder.
+ {{/each}}
+</Delete>
+
+# Step 3. Merge. Apply the following code changes to the files specified.
+<Merge>
+ - Go through the following source files one by one, then perform the following instructions with the marker value "{{markerValue}}": 
+ {{#each mergeFiles as |mergeFile|}} 
+    - `{{mergeFile}}`
+ {{/each}}
+    
+    <MergeInstructions>
+    Your job is find ALL the code snippets marked by special comment markers in the given source file and remove them.
+
+    There are two types of comment markers:
+    1. A single line comment marker: "@sfdc-extension-line <marker value>". It is a single line comment that contains the string "@sfdc-extension-line" and a marker value, separated by a space, for example, "@sfdc-extension-line SFDC_EXT_STORE_LOCATOR".
+    2. A pair of block comment markers: "@sfdc-extension-block-start <marker value>" and "@sfdc-extension-block-end <marker value>". They are two separate comment lines that marks the start and end of a code block, with the same marker value, for example, "@sfdc-extension-block-start SFDC_EXT_STORE_LOCATOR" and "@sfdc-extension-block-end SFDC_EXT_STORE_LOCATOR".
+
+    # Step 1
+    There may be multiple code snippets marked by the same line marker value. Perform the action in these steps from the beginning of the source file:
+    1.1. Search for the line marker with the given marker value, e.g., "@sfdc-extension-line SFDC_EXT_STORE_LOCATOR".
+    1.2. If found, remove the comment line and the immediate line below it,
+    1.3. Repeat the steps 1.1-1.2 from the next line until no more matching comment markers are found.
+
+    # Step 2
+    There may be multiple code snippets marked by the same block marker value. Perform the action in these steps from the beginning of the source file:
+    2.1. Search for the beginning comment marker with the given marker value, e.g., "@sfdc-extension-block-start SFDC_EXT_STORE_LOCATOR".
+    2.2. If found, search for the ending comment marker with the given marker value, e.g., "@sfdc-extension-block-end SFDC_EXT_STORE_LOCATOR".
+    2.3. If found, remove the comment lines and the code block between them.
+    2.4. Repeat the steps 2.1-2.3 from the next line until no more matching block comment markers are found.
+
+    Do NOT remove code marked by a different marker.
+    Do NOT modify any code unrelated to the marked code.
+
+    For example, when the comment marker is "@sfdc-extension-line SFDC_EXT_STORE_LOCATOR".
+
+    Input:
+    ```javascript
+    const Header = ({
+        children,
+        onMenuClick = noop,
+        onMyAccountClick = noop,
+        onLogoClick = noop,
+        onMyCartClick = noop,
+        //@sfdc-extension-line SFDC_EXT_WISHLIST
+        onWishlistClick = noop,
+        // @sfdc-extension-line SFDC_EXT_STORE_LOCATOR
+        onStoreLocatorClick = noop,
+        ...props
+    })
+    ```
+
+    Output:
+    ```javascript
+    const Header = ({
+        children,
+        onMenuClick = noop,
+        onMyAccountClick = noop,
+        onLogoClick = noop,
+        onMyCartClick = noop,
+        //@sfdc-extension-line SFDC_EXT_WISHLIST
+        onWishlistClick = noop,
+        ...props
+    })
+    ```
+
+    Note that in the output file, the code snippet marked by the comment marker "@sfdc-extension-line SFDC_EXT_WISHLIST" is not removed, because the marker value is SFDC_EXT_STORE_LOCATOR, not SFDC_EXT_WISHLIST.
+
+    Another example, when a block of code is marked with the beginning comment marker "@sfdc-extension-block-start SFDC_EXT_STORE_LOCATOR" and ending marker "@sfdc-extension-block-end SFDC_EXT_STORE_LOCATOR".
+
+    Input:
+    ```javascript
+    logOut: formatMessage( {
+        defaultMessage: 'Log out',
+        id: 'header.popover.action.log_out'
+    })
+    //@sfdc-extension-block-start SFDC_EXT_WISHLIST
+    wishlist: formatMessage( {
+        defaultMessage: 'Wishlist',
+        id: 'header.button.assistive_msg.wishlist'
+    })
+    //@sfdc-extension-block-end SFDC_EXT_WISHLIST
+    //@sfdc-extension-block-start SFDC_EXT_STORE_LOCATOR
+    storeLocator: formatMessage( {
+        defaultMessage: 'Store Locator',
+        id: 'header.button.assistive_msg.store_locator'
+    })
+    //@sfdc-extension-block-end SFDC_EXT_STORE_LOCATOR
+    myCartWithItems: formatMessage( {
+        {
+            id: 'header.button.assistive_msg.my_cart_with_num_items',
+            defaultMessage: 'My cart, number of items: {numItems}'
+        },
+        {numItems: totalItems}
+    })
+    ```
+
+    Output:
+    ```javascript
+    logOut: formatMessage({
+        defaultMessage: 'Log out',
+        id: 'header.popover.action.log_out'
+    })
+        //@sfdc-extension-block-start SFDC_EXT_WISHLIST
+    wishlist: formatMessage( {
+        defaultMessage: 'Wishlist',
+        id: 'header.button.assistive_msg.wishlist'
+    })
+    //@sfdc-extension-block-end SFDC_EXT_WISHLIST
+    myCartWithItems: formatMessage( {
+        {
+            id: 'header.button.assistive_msg.my_cart_with_num_items',
+            defaultMessage: 'My cart, number of items: {numItems}'
+        },
+        {numItems: totalItems}
+    })
+    ```
+
+    Note that in the destination file, the code snippet marked by the comment markers "@sfdc-extension-block-start SFDC_EXT_WISHLIST" and "@sfdc-extension-block-end SFDC_EXT_WISHLIST" is not removed, because the marker value is SFDC_EXT_STORE_LOCATOR, not SFDC_EXT_WISHLIST.
+    </MergeInstructions>
+</Merge>

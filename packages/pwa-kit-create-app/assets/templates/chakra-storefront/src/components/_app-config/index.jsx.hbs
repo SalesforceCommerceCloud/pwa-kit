@@ -4,7 +4,6 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-
 import React, {useMemo} from 'react'
 import PropTypes from 'prop-types'
 import {ChakraProvider} from '@chakra-ui/react'
@@ -13,7 +12,12 @@ import {ChakraProvider} from '@chakra-ui/react'
 import 'focus-visible/dist/focus-visible'
 
 import theme from '../../../src/theme'
-import {MultiSiteProvider} from '../../contexts'
+
+{{#if selectedPlugins.SFDC_EXT_STORE_LOCATOR}}
+import {MultiSiteProvider, StoreLocatorProvider} from '../../../src/contexts'
+{{else}}
+import {MultiSiteProvider} from '../../../src/contexts'
+{{/if}}
 import {useAppOrigin} from '../../hooks/use-app-origin'
 import {resolveSiteFromUrl, resolveLocaleFromUrl} from '../../utils/site-utils'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
@@ -25,6 +29,22 @@ import {CommerceApiProvider, resetDehydratedStateTimeStamp} from '@salesforce/co
 import {withReactQuery} from '@salesforce/pwa-kit-react-sdk/ssr/universal/components/with-react-query'
 import {useCorrelationId} from '@salesforce/pwa-kit-react-sdk/ssr/universal/hooks'
 import {ReactQueryDevtools} from '@tanstack/react-query-devtools'
+{{#if selectedPlugins.SFDC_EXT_STORE_LOCATOR}}
+import {
+    DEFAULT_DNT_STATE,
+    STORE_LOCATOR_RADIUS,
+    STORE_LOCATOR_RADIUS_UNIT,
+    STORE_LOCATOR_DEFAULT_COUNTRY,
+    STORE_LOCATOR_DEFAULT_COUNTRY_CODE,
+    STORE_LOCATOR_DEFAULT_POSTAL_CODE,
+    STORE_LOCATOR_DEFAULT_PAGE_SIZE,
+    STORE_LOCATOR_SUPPORTED_COUNTRIES
+} from '../../../src/config/constants'
+{{else}}
+import {
+    DEFAULT_DNT_STATE
+} from '../../../src/config/constants'
+{{/if}}
 
 /**
  * Use the AppConfig component to inject extra arguments into the getProps
@@ -66,6 +86,18 @@ const AppConfig = ({children, locals = {}}) => {
     const passwordlessLoginCallbackURI = useMemo(() => passwordlessCallback, [passwordlessCallback])
     const defaultDnt = useMemo(() => locals.appConfig.dnt, [locals.appConfig.dnt])
 
+{{#if selectedPlugins.SFDC_EXT_STORE_LOCATOR}}
+    const storeLocatorConfig = useMemo(() => ({
+        radius: STORE_LOCATOR_RADIUS,
+        radiusUnit: STORE_LOCATOR_RADIUS_UNIT,
+        defaultCountry: STORE_LOCATOR_DEFAULT_COUNTRY,
+        defaultCountryCode: STORE_LOCATOR_DEFAULT_COUNTRY_CODE,
+        defaultPostalCode: STORE_LOCATOR_DEFAULT_POSTAL_CODE,
+        defaultPageSize: STORE_LOCATOR_DEFAULT_PAGE_SIZE,
+        supportedCountries: STORE_LOCATOR_SUPPORTED_COUNTRIES
+    }), [])
+{{/if}}
+
     return (
         <CommerceApiProvider
             shortCode={commerceApiConfig.parameters.shortCode}
@@ -89,7 +121,13 @@ const AppConfig = ({children, locals = {}}) => {
             {{/if}}
         >
             <MultiSiteProvider site={locals.site} locale={locals.locale} buildUrl={locals.buildUrl}>
+            {{#if selectedPlugins.SFDC_EXT_STORE_LOCATOR}}
+                <StoreLocatorProvider config={storeLocatorConfig}>
+                    <ChakraProvider value={theme}>{children}</ChakraProvider>
+                </StoreLocatorProvider>
+            {{else}}
                 <ChakraProvider value={theme}>{children}</ChakraProvider>
+            {{/if}}
             </MultiSiteProvider>
             <ReactQueryDevtools />
         </CommerceApiProvider>

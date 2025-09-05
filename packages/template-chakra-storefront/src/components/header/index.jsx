@@ -111,6 +111,7 @@ const Header = ({
     onMyCartClick = noop,
     //@sfdc-extension-line SFDC_EXT_WISHLIST
     onWishlistClick = noop,
+    // @sfdc-extension-line SFDC_EXT_STORE_LOCATOR
     onStoreLocatorClick = noop,
     ...props
 }) => {
@@ -123,17 +124,11 @@ const Header = ({
     const {isRegistered} = useCustomerType()
     const logout = useAuthHelper(AuthHelpers.Logout)
     const navigate = useNavigation()
-    // TODO: unwire this from upgradeability, it was calling `useApplicationExtension`
-    const storeLocatorExtension = {
-        isEnabled: false
-    }
-    const isStoreLocatorEnabled = !!storeLocatorExtension && storeLocatorExtension.isEnabled
+    /* @sfdc-extension-block-start SFDC_EXT_STORE_LOCATOR */
     const openModal = () => {
-        // TODO: unwire this from upgradeability zustand store slice
-        // onStoreLocatorClick()
-        console.log('openModal')
+        onStoreLocatorClick()
     }
-
+    /* @sfdc-extension-block-end SFDC_EXT_STORE_LOCATOR */
     const [showLoading, setShowLoading] = useState(false)
 
     const recipe = useSlotRecipe({key: 'header'})
@@ -332,19 +327,18 @@ const Header = ({
                         <HeartIcon boxSize="6" />
                     </IconButtonWithRegistration>
                     {/* @sfdc-extension-block-end SFDC_EXT_WISHLIST */}
-                    {isStoreLocatorEnabled && (
-                        <IconButton
-                            aria-label={headerMessages.storeLocator}
-                            css={styles.iconButton}
-                            variant="unstyled"
-                            onClick={() => {
-                                // TODO fix when store locator is ready
-                                openModal()
-                            }}
-                        >
-                            <StoreIcon boxSize="6" />
-                        </IconButton>
-                    )}
+                    {/* @sfdc-extension-block-start SFDC_EXT_STORE_LOCATOR */}
+                    <IconButton
+                        aria-label={headerMessages.storeLocator}
+                        css={styles.iconButton}
+                        variant="unstyled"
+                        onClick={() => {
+                            openModal()
+                        }}
+                    >
+                        <StoreIcon boxSize="6" />
+                    </IconButton>
+                    {/* @sfdc-extension-block-end SFDC_EXT_STORE_LOCATOR */}
                     <IconButton
                         aria-label={headerMessages.myCartWithItems}
                         variant="unstyled"
@@ -375,6 +369,7 @@ Header.propTypes = {
     //@sfdc-extension-line SFDC_EXT_WISHLIST
     onWishlistClick: PropTypes.func,
     onMyCartClick: PropTypes.func,
+    /* @sfdc-extension-line SFDC_EXT_STORE_LOCATOR */
     onStoreLocatorClick: PropTypes.func,
     searchInputRef: PropTypes.oneOfType([
         PropTypes.func,

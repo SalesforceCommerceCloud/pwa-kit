@@ -348,7 +348,8 @@ const PRESETS = [
             'project.selectedPlugins.SFDC_EXT_WISHLIST': true
         },
         assets: ['translations'],
-        private: true
+        private: true,
+        extensions: []
     },
     {
         id: 'chakra-storefront-private-slas-client',
@@ -470,7 +471,8 @@ const PRESETS = [
             type: TEMPLATE_SOURCE_BUNDLE,
             id: 'typescript-minimal'
         },
-        private: true
+        private: true,
+        extensions: []
     },
     {
         id: 'typescript-minimal',
@@ -500,7 +502,8 @@ const PRESETS = [
         answers: {
             'project.name': 'express-minimal'
         },
-        private: true
+        private: true,
+        extensions: []
     },
     {
         id: 'express-minimal',
@@ -812,20 +815,6 @@ const runGenerator = (
     // Copy the base template either from the package or npm.
     copyAllFiles(packagePath, outputDir)
 
-    // Convert selected plugins array to object with true values
-    if (Object.keys(pluginConfig?.plugins || {}).length > 0 && selectedPlugins) {
-        trimExtensions(outputDir, selectedPlugins)
-    }
-
-    // Compute the checksum of the output directory
-    const checksums = computeChecksum(outputDir)
-    const checksumFilePath = p.join(outputDir, 'checksum.json')
-    const timestamp = new Date().toISOString()
-    fs.writeFileSync(
-        checksumFilePath,
-        JSON.stringify({checksums, timestamp, selectedPlugins}, null, 2)
-    )
-
     // Copy template specific assets over.
     const assetsDir = p.join(ASSETS_TEMPLATES_DIR, id)
     if (sh.test('-e', assetsDir)) {
@@ -855,6 +844,20 @@ const runGenerator = (
         // Install dependencies for the newly minted project.
         npmInstall(outputDir, {verbose, projectName: context.answers.project.name})
     }
+
+    // Convert selected plugins array to object with true values
+    if (Object.keys(pluginConfig?.plugins || {}).length > 0 && selectedPlugins) {
+        trimExtensions(outputDir, selectedPlugins)
+    }
+
+    // Compute the checksum of the output directory
+    const checksums = computeChecksum(outputDir)
+    const checksumFilePath = p.join(outputDir, 'checksum.json')
+    const timestamp = new Date().toISOString()
+    fs.writeFileSync(
+        checksumFilePath,
+        JSON.stringify({checksums, timestamp, selectedPlugins}, null, 2)
+    )
 }
 
 const foundNode = process.versions.node
@@ -905,14 +908,16 @@ const main = async (opts) => {
                 value: key
             }))
 
-            const pluginAnswers = await inquirer.prompt([
-                {
-                    type: 'checkbox',
-                    name: 'selectedPlugins',
-                    message: 'Which extensions would you like to enable?',
-                    choices: pluginChoices
-                }
-            ])
+            const pluginAnswers = context.preset?.extensions
+                ? {selectedPlugins: context.preset.extensions}
+                : await inquirer.prompt([
+                      {
+                          type: 'checkbox',
+                          name: 'selectedPlugins',
+                          message: 'Which extensions would you like to enable?',
+                          choices: pluginChoices
+                      }
+                  ])
 
             // Convert selected plugins array to object with true values
             pluginAnswers.selectedPlugins.forEach((plugin) => {
@@ -926,6 +931,8 @@ const main = async (opts) => {
         context = merge(context, {
             answers: expandObject(answers)
         })
+        // add selectedPlugins to context for Handlebars templates
+        context.selectedPlugins = selectedPlugins
     }
 
     // load plugin selected answer from context object to selectedPlugins (which used for code trimming process)

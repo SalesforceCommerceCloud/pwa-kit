@@ -8,6 +8,7 @@
 // Third-Party Imports
 import React from 'react'
 import PropTypes from 'prop-types'
+import {useDisclosure} from '@chakra-ui/react'
 import {useLocation} from 'react-router-dom'
 
 // Removes focus for non-keyboard interactions for the whole application
@@ -54,16 +55,15 @@ const App = (props) => {
         //@sfdc-extension-line SFDC_EXT_WISHLIST
         onWishlistClick
     } = useAppNavigation()
+    const {isDrawerMenuOpen, onDrawerMenuOpen, onDrawerMenuClose, dntNotification} = useAppModals()
+
+    /* @sfdc-extension-block-start SFDC_EXT_STORE_LOCATOR */
     const {
-        isDrawerMenuOpen,
-        onDrawerMenuOpen,
-        onDrawerMenuClose,
-        dntNotification
-        // TODO: Store locator variables will be used when feature is enabled:
-        // isOpenStoreLocator,
-        // onOpenStoreLocator,
-        // onCloseStoreLocator
-    } = useAppModals()
+        open: isOpenStoreLocator,
+        onOpen: onOpenStoreLocator,
+        onClose: onCloseStoreLocator
+    } = useDisclosure()
+    /* @sfdc-extension-block-end SFDC_EXT_STORE_LOCATOR */
 
     useAppBasket(basket, customer, currency)
     const {isOnline} = useAppOnlineStatus()
@@ -89,10 +89,9 @@ const App = (props) => {
         onMyAccountClick: onAccountClick,
         //@sfdc-extension-line SFDC_EXT_WISHLIST
         onWishlistClick,
-        // TODO: Will be enabled when store locator feature is ready
-        // onStoreLocatorClick: onOpenStoreLocator,
-        onStoreLocatorClick: noop,
-        mobileNavigationProps
+        mobileNavigationProps,
+        /* @sfdc-extension-line SFDC_EXT_STORE_LOCATOR */
+        onStoreLocatorClick: onOpenStoreLocator
     }
 
     const seoProps = {
@@ -107,10 +106,11 @@ const App = (props) => {
 
     const modalProps = {
         authModal,
-        dntNotification
-        // TODO: Store locator modal will be added when enabled:
-        // isOpenStoreLocator,
-        // onCloseStoreLocator
+        dntNotification,
+        /* @sfdc-extension-block-start SFDC_EXT_STORE_LOCATOR */
+        isOpenStoreLocator,
+        onCloseStoreLocator
+        /* @sfdc-extension-block-end SFDC_EXT_STORE_LOCATOR */
     }
 
     return (
