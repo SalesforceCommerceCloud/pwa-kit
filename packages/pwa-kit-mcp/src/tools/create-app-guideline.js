@@ -7,6 +7,9 @@
 
 // Project dependencies
 import {EmptyJsonSchema, getCreateAppCommand, isMonoRepo, runCommand} from '../utils/utils'
+import shell from 'shelljs'
+import fs from 'fs'
+import path from 'path'
 
 const CREATE_APP_COMMAND = getCreateAppCommand()
 const DISPLAY_PROGRAM_FLAG = '--displayProgram'
@@ -59,12 +62,15 @@ If the user requests a project using a **template**:
 - Presets and templates are mutually exclusive paths. Do not offer both options unless explicitly requested.
 - Do not pass any flags to the \`${CREATE_APP_COMMAND}\` CLI tool that are not listed in the program.json options".
 - Use the \`${COMMAND_RUNNER}\` command to run the \`${CREATE_APP_COMMAND}\` CLI tool when creating a new project.
-- After project creation, prompt the user if **they want to do version control through git** using the **version_control_git** MCP tool.
+- After project creation, **MANDATORY**: Always ask the user whether they want to do git version control and commit the files locally.**
+- If the user replies "yes" or confirms they want version control:
+  - Use the integrated version control function and call the \`setupVersionControl\` function to handle git setup
+- **IMPORTANT**: You cannot skip asking the user - this interaction is **mandatory** for every project creation.
 `
 
-export default {
-    name: 'create_app_guidelines',
-    description: `
+class CreateAppGuidelinesTool {
+    name = 'create_storefront_app'
+    description = `
     
 This tool is used to provide the agent with the instructions on how to use the @salesforce/pwa-kit-create-app CLI tool to create a new PWA Kit projects.
 
@@ -74,9 +80,102 @@ Example Triggers:
 - "Create a new PWA Kit app"
 - "Start a new storefront using a preset"
 - "What templates are available for PWA Kit?"
-- "What presets are available for PWA Kit?"`,
-    inputSchema: EmptyJsonSchema,
-    fn: async () => {
+- "What presets are available for PWA Kit?"`
+    inputSchema = EmptyJsonSchema
+
+    /**
+     * Handles the version control of your project using git.
+     * If the directory is not a git repo, it creates a basic .gitignore, runs git init, adds all files, and makes an initial commit.
+     * If already a git repo, it skips initialization and .gitignore creation, and just adds and commits all files locally.
+     * @param {string} directory - The directory to initialize the git repository in.
+     */
+    handleGitVersionControl(directory) {
+        if (!shell.which('git')) {
+            throw new Error(
+                'git is not installed or not found in PATH. Please install git to initialize a repository.'
+            )
+        }
+        const isGitRepo = fs.existsSync(path.join(directory, '.git'))
+        let result
+        if (isGitRepo) {
+            // Already a git repo: only add and commit
+            result = shell.exec('git add .', {cwd: directory, silent: true})
+            if (result.code !== 0) {
+                throw new Error(`git add failed: ${result.stderr || result.stdout}`)
+            }
+            result = shell.exec('git commit -m "Initial commit"', {cwd: directory, silent: true})
+            if (result.code !== 0) {
+                throw new Error(`git commit failed: ${result.stderr || result.stdout}`)
+            }
+        } else {
+            // Not a git repo: create .gitignore, init, add, commit
+            this.createBasicGitignore(directory)
+            result = shell.exec('git init', {cwd: directory, silent: true})
+            if (result.code !== 0) {
+                throw new Error(`git init failed: ${result.stderr || result.stdout}`)
+            }
+            result = shell.exec('git add .', {cwd: directory, silent: true})
+            if (result.code !== 0) {
+                throw new Error(`git add failed: ${result.stderr || result.stdout}`)
+            }
+            result = shell.exec('git commit -m "Initial commit"', {cwd: directory, silent: true})
+            if (result.code !== 0) {
+                throw new Error(`git commit failed: ${result.stderr || result.stdout}`)
+            }
+        }
+    }
+
+    /**
+     * Creates a basic .gitignore file in the given directory.
+     * @param {string} directory - The directory to create the .gitignore file in.
+     */
+    createBasicGitignore(directory) {
+        const gitignorePath = path.join(directory, '.gitignore')
+        if (!fs.existsSync(gitignorePath)) {
+            fs.writeFileSync(
+                gitignorePath,
+                `# Node
+node_modules/
+.env
+.DS_Store
+npm-debug.log
+yarn-debug.log
+yarn-error.log
+coverage/
+dist/
+build/
+.next/
+out/
+logs/
+*.log
+.idea/
+.vscode/
+`
+            )
+        }
+    }
+
+    /**
+     * Integrated version control function that can be called after project creation
+     * @param {string} projectDirectory - The directory where the project was created
+     * @returns {Object} Result object with success status and message
+     */
+    async setupVersionControl(projectDirectory) {
+        try {
+            this.handleGitVersionControl(projectDirectory)
+            return {
+                success: true,
+                message: 'Git version control initialized and committed locally.'
+            }
+        } catch (error) {
+            return {
+                success: false,
+                message: `Error: ${error.message}`
+            }
+        }
+    }
+
+    fn = async () => {
         // Run the display program and get the output.
         const programOutput = await runCommand(COMMAND_RUNNER, [
             ...(COMMAND_RUNNER === 'npx' ? ['--yes'] : []),
@@ -110,3 +209,5 @@ Example Triggers:
         }
     }
 }
+
+export default CreateAppGuidelinesTool

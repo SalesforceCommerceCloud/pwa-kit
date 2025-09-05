@@ -43,7 +43,7 @@ What is the main purpose of this component? Reply with exactly one of the follow
 
 class CreateNewComponentTool {
     constructor() {
-        this.name = 'create_new_component'
+        this.name = 'create_sample_component'
         this.description =
             'Create a sample React component. Gather information from user for the MCP tool parameters **one at a time**, in a natural and conversational way. Do **not** ask all the questions at once.'
         this.inputSchema = {

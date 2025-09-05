@@ -5,6 +5,8 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
+import {getEnvBasePath} from '@salesforce/pwa-kit-runtime/utils/ssr-namespace-paths'
+
 /**
  * Call requestIdleCallback in supported browsers.
  *
@@ -205,6 +207,9 @@ export const isHydrated = () => typeof window !== 'undefined' && !window.__HYDRA
  * Ensures that `redirectPath` starts with a '/'.
  * Returns an empty string if `redirectPath` is falsy.
  *
+ * This will insert an envBasePath in between the 'appOrigin' and the 'redirectPath'
+ * if one has been defined in the PWA config.
+ *
  * @param {*} appOrigin
  * @param {*} redirectPath - relative redirect path
  * @returns redirectURI to be passed into the social login flow
@@ -212,7 +217,7 @@ export const isHydrated = () => typeof window !== 'undefined' && !window.__HYDRA
 export const buildRedirectURI = (appOrigin = '', redirectPath = '') => {
     if (redirectPath) {
         const path = redirectPath.startsWith('/') ? redirectPath : `/${redirectPath}`
-        return `${appOrigin}${path}`
+        return `${appOrigin}${getEnvBasePath()}${path}`
     } else {
         return ''
     }

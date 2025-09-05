@@ -363,7 +363,7 @@
                 "description": "",
                 "templateId": "retail-react-app",
                 "answers": {
-                    "project.extend": true,
+                    "project.extend": false,
                     "project.hybrid": false,
                     "project.name": "retail-react-app",
                     "project.commerce.instanceUrl": "https://zzrf-001.dx.commercecloud.salesforce.com",

@@ -37,9 +37,9 @@ describe('useDNT tests', () => {
         })
     })
 
-    it('updateDNT should create dw_dnt cookie', async () => {
-        const {updateDNT} = useDNT()
-        await updateDNT(true)
+    it('updateDnt should create dw_dnt cookie', async () => {
+        const {updateDnt} = useDNT()
+        await updateDnt(true)
         expect(mockSetDnt).toHaveBeenCalledWith(true)
     })
 

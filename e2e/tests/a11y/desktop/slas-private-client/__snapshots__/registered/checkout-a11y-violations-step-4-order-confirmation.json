@@ -1,0 +1,50 @@
+[
+  {
+    "id": "aria-allowed-attr",
+    "impact": "critical",
+    "description": "Ensure an element's role supports its ARIA attributes",
+    "help": "Elements must only use supported ARIA attributes",
+    "helpUrl": "https://dequeuniversity.com/rules/axe/4.10/aria-allowed-attr?application=playwright",
+    "nodes": [
+      {
+        "html": "<form id=\"...\" aria-haspopup=\"dialog\" aria-expanded=\"false\" aria-controls=\"popover-content-...\">",
+        "failureSummary": "Fix all of the following:\n  ARIA attribute is not allowed: aria-expanded=\"false\"",
+        "target": [
+          "#popover-trigger-\\-..."
+        ]
+      }
+    ]
+  },
+  {
+    "id": "color-contrast",
+    "impact": "serious",
+    "description": "Ensure the contrast between foreground and background colors meets WCAG 2 AA minimum contrast ratio thresholds",
+    "help": "Elements must meet minimum color contrast ratio thresholds",
+    "helpUrl": "https://dequeuniversity.com/rules/axe/4.10/color-contrast?application=playwright",
+    "nodes": [
+      {
+        "html": "<a class=\"...\" href=\"/\">Continue Shopping</a>",
+        "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 4.17 (foreground color: #0176d3, background color: #f3f3f3, font size: 12.0pt (16px), font weight: normal). Expected contrast ratio of 4.5:1",
+        "target": [
+          ".css-..."
+        ]
+      }
+    ]
+  },
+  {
+    "id": "landmark-unique",
+    "impact": "moderate",
+    "description": "Ensure landmarks are unique",
+    "help": "Landmarks should have a unique role or role/label/title (i.e. accessible name) combination",
+    "helpUrl": "https://dequeuniversity.com/rules/axe/4.10/landmark-unique?application=playwright",
+    "nodes": [
+      {
+        "html": "<div role=\"region\" aria-live=\"polite\" id=\"...\" >",
+        "failureSummary": "Fix any of the following:\n  The landmark must have a unique aria-label, aria-labelledby, or title to make landmarks distinguishable",
+        "target": [
+          "#chakra-toast-manager-top"
+        ]
+      }
+    ]
+  }
+]

@@ -14,3 +14,10 @@ lerna-debug.log
 /test-results/
 /playwright-report/
 /playwright/.cache/
+e2e/mrt-target/
+
+# GitHub Actions (Node.js) require built artifacts to be committed.
+# Runners do not run `npm install` for actions; `runs.main`/`runs.post` must point to files in `dist/`.
+# We generally ignore all dist directories, but allow the action’s dist so the action can execute.
+# We need this specifically to engage post run hook for the e2e_release_mrt_target action to release the MRT target back to the pool.
+!.github/actions/**/dist/

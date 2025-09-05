@@ -13,10 +13,12 @@ import {CloseIcon} from '@salesforce/retail-react-app/app/components/icons'
 import {REMOVE_FILTER} from '@salesforce/retail-react-app/app/pages/product-list/partials/refinements-utils'
 import {useSelectedStore} from '@salesforce/retail-react-app/app/hooks/use-selected-store'
 import {STORE_LOCATOR_IS_ENABLED} from '@salesforce/retail-react-app/app/constants'
+import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 
 const SelectedRefinements = ({toggleFilter, selectedFilterValues, filters, handleReset}) => {
     const {formatMessage} = useIntl()
     const {selectedStore} = useSelectedStore()
+    const storeLocatorEnabled = getConfig()?.app?.storeLocatorEnabled ?? STORE_LOCATOR_IS_ENABLED
     const priceFilterValues = filters?.find((filter) => filter.attributeId === 'price')
     let selectedFilters = []
     for (const key in selectedFilterValues) {
@@ -28,7 +30,7 @@ const SelectedRefinements = ({toggleFilter, selectedFilterValues, filters, handl
                 uiLabel =
                     priceFilterValues?.values?.find((priceFilter) => priceFilter.value === filter)
                         ?.label || filter
-            } else if (key === 'ilids' && STORE_LOCATOR_IS_ENABLED) {
+            } else if (key === 'ilids' && storeLocatorEnabled) {
                 // Fallback text for in stock selected filter
                 uiLabel = formatMessage({
                     id: 'selected_refinements.filter.in_stock',

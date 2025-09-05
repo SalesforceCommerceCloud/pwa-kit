@@ -1,4 +1,5 @@
 ## v0.2.1-dev (Aug 11, 2025)
+- Normalize tool names; Add introduction section for PWA Kit MCP and resize the images on README. [#3239](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3239)
 
 ## v0.1.1 (Aug 11, 2025)
 - Add missing `shelljs` dependency. [#3053](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3053)

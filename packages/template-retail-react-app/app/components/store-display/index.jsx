@@ -6,9 +6,11 @@
  */
 import React from 'react'
 import PropTypes from 'prop-types'
-import {useIntl} from 'react-intl'
+import {useIntl, FormattedMessage} from 'react-intl'
 import {
     Box,
+    Button,
+    Flex,
     Accordion,
     AccordionItem,
     AccordionButton,
@@ -25,7 +27,8 @@ const StoreDisplay = ({
     nameStyle = {fontSize: 'md', fontWeight: 'bold'},
     textSize = 'sm',
     accordionButtonStyle = {},
-    accordionPanelStyle = {}
+    accordionPanelStyle = {},
+    onChangeStore
 }) => {
     const intl = useIntl()
 
@@ -35,7 +38,26 @@ const StoreDisplay = ({
 
     return (
         <Box id={`store-info-${store.id}`}>
-            {store.name && <Box {...nameStyle}>{store.name}</Box>}
+            {store.name && (
+                <Flex justify="space-between" align="flex-start" mb={1}>
+                    <Box {...nameStyle}>{store.name}</Box>
+                    {onChangeStore && (
+                        <Button
+                            variant="link"
+                            size="sm"
+                            fontWeight="normal"
+                            onClick={onChangeStore}
+                            data-testid="change-store-button"
+                            ml={2}
+                        >
+                            <FormattedMessage
+                                defaultMessage="Use Recent Store"
+                                id="store_display.button.use_recent_store"
+                            />
+                        </Button>
+                    )}
+                </Flex>
+            )}
             <Box fontSize={textSize} color="gray.600">
                 {store.address1}
             </Box>
@@ -161,7 +183,9 @@ StoreDisplay.propTypes = {
     /** Custom style props for accordion button */
     accordionButtonStyle: PropTypes.object,
     /** Custom style props for accordion panel */
-    accordionPanelStyle: PropTypes.object
+    accordionPanelStyle: PropTypes.object,
+    /** Callback function to handle change store action */
+    onChangeStore: PropTypes.func
 }
 
 export default StoreDisplay

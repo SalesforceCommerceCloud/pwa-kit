@@ -52,7 +52,7 @@ export const useStoreLocator = () => {
         throw new Error('useStoreLocator must be used within a StoreLocatorProvider')
     }
 
-    const {state, setState} = context
+    const {state, setState, isOpen, onOpen, onClose} = context
     const storesQuery = useStores(state)
 
     // There are two modes, input and device.
@@ -91,6 +91,28 @@ export const useStoreLocator = () => {
         // Actions
         setFormValues,
         setDeviceCoordinates,
-        setSelectedStoreId
+        setSelectedStoreId,
+        // Modal actions
+        isOpen,
+        onOpen,
+        onClose
+    }
+}
+
+/**
+ * Hook specifically for components that only need modal functionality
+ */
+export const useStoreLocatorModal = () => {
+    const context = useContext(StoreLocatorContext)
+    if (!context) {
+        throw new Error('useStoreLocatorModal must be used within a StoreLocatorProvider')
+    }
+
+    const {isOpen, onOpen, onClose} = context
+
+    return {
+        isOpen,
+        onOpen,
+        onClose
     }
 }
