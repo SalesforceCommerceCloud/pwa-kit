@@ -225,18 +225,22 @@ const BonusProductViewModal = ({
             motionPreset="slideInBottom"
             preserveScrollBarGap={true}
         >
-            <ModalOverlay bg="blackAlpha.600" />
+            <ModalOverlay />
             <ModalContent
                 data-testid="bonus-product-view-modal"
                 aria-label={messages.modalLabel}
-                margin="0"
-                borderRadius={{base: 'none', md: 'base'}}
-                bg="white"
-                maxHeight="85vh"
-                overflowY="auto"
-                boxShadow="xl"
+                margin={productViewModalTheme.layout.content.margin}
+                borderRadius={productViewModalTheme.layout.content.borderRadius}
+                bg={productViewModalTheme.layout.content.background}
+                maxHeight={productViewModalTheme.layout.content.maxHeight}
+                overflowY={productViewModalTheme.layout.content.overflowY}
             >
-                <ModalBody bg="white" p={6} pb={8} mt={6}>
+                <ModalBody 
+                    bg={productViewModalTheme.layout.body.background} 
+                    p={productViewModalTheme.layout.body.padding} 
+                    pb={productViewModalTheme.layout.body.paddingBottom} 
+                    mt={productViewModalTheme.layout.body.marginTop}
+                >
                     {productViewModalData.isFetching && !productViewModalData.product ? (
                         <Box p={8} textAlign="center">
                             <Text>Loading product details...</Text>

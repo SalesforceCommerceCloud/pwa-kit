@@ -324,7 +324,7 @@ export const BonusProductSelectionModal = () => {
                     scrollBehavior={addToCartModalTheme.modal.scrollBehavior} 
                     isCentered
                 >
-                <ModalOverlay bg="blackAlpha.300" backdropFilter="blur(10px)" />
+                <ModalOverlay />
                 <ModalContent
                     margin={addToCartModalTheme.layout.content.margin}
                     borderRadius={addToCartModalTheme.layout.content.borderRadius}
