@@ -75,6 +75,21 @@ const validateCommerceAgentSettings = (commerceAgent) => {
         return false
     }
 
+    // Validate optional conversation context properties if present
+    if (commerceAgent.enableConversationContext !== undefined) {
+        if (typeof commerceAgent.enableConversationContext !== 'string') {
+            console.error('enableConversationContext must be a string.')
+            return false
+        }
+    }
+
+    if (commerceAgent.conversationContext !== undefined) {
+        if (!Array.isArray(commerceAgent.conversationContext)) {
+            console.error('conversationContext must be an array.')
+            return false
+        }
+    }
+
     // Add domain validation for script URL
     if (commerceAgent.scriptSourceUrl) {
         const isTrustedDomain = validateSalesforceDomain(commerceAgent.scriptSourceUrl)
@@ -120,6 +135,8 @@ const isEnabled = (enabled) => {
  * @param {string} props.commerceAgentConfiguration.salesforceOrgId - Salesforce org ID
  * @param {string} props.commerceAgentConfiguration.commerceOrgId - Commerce org ID
  * @param {string} props.commerceAgentConfiguration.siteId - Site identifier
+ * @param {string} [props.commerceAgentConfiguration.enableConversationContext] - Enable conversation context feature
+ * @param {string[]} [props.commerceAgentConfiguration.conversationContext] - Conversation context data array
  * @returns {null} This component doesn't render any visible UI, only manages the messaging service
  *
  * @example
@@ -150,11 +167,105 @@ const ShopperAgentWindow = ({commerceAgentConfiguration}) => {
         scrt2Url,
         salesforceOrgId,
         commerceOrgId,
-        siteId
+        siteId,
+        enableConversationContext = 'false',
+        conversationContext = []
     } = commerceAgentConfiguration
 
     // User session identifier hook
     const {usid} = useUsid()
+
+    /**
+     * Retrieves conversation context data based on configuration.
+     * If conversation context is enabled, returns the array of context values.
+     * If disabled or no data available, returns empty array.
+     *
+     * @returns {Promise<string[]>} Array of conversation context values
+     */
+    const getConversationContext = async () => {
+        try {
+            // Check if conversation context is enabled
+            if (!enableConversationContext || enableConversationContext !== 'true') {
+                return []
+            }
+
+            // Check if conversation context data is available and is an array
+            if (!Array.isArray(conversationContext)) {
+                console.warn('Conversation context is enabled but no valid array data provided')
+                return []
+            }
+
+            // Return the conversation context array directly
+            return conversationContext
+        } catch (error) {
+            console.error('Error retrieving conversation context:', error)
+            return []
+        }
+    }
+
+    /**
+     * Sends conversation context data to the embedded messaging iframe.
+     * Includes proper error handling and null checks for iframe elements.
+     *
+     * @param {string} type - Message type to send
+     * @param {Object} payload - Data payload to send
+     */
+    const sendConversationContext = (type, payload = {}) => {
+        try {
+            const embeddedMessagingFrame = document.querySelector('div.embedded-messaging iframe')
+
+            if (!embeddedMessagingFrame) {
+                console.warn('Embedded messaging iframe not found')
+                return
+            }
+
+            if (!embeddedMessagingFrame.src) {
+                console.warn('Embedded messaging iframe has no source URL')
+                return
+            }
+
+            const eventData = {
+                type,
+                payload
+            }
+
+            const targetOrigin = new URL(embeddedMessagingFrame.src).origin
+            embeddedMessagingFrame.contentWindow.postMessage(eventData, targetOrigin)
+        } catch (error) {
+            console.error('Error sending conversation context:', error)
+        }
+    }
+
+    /**
+     * Handles incoming MIAW events requesting customer data.
+     * Processes conversation context requests and sends appropriate responses.
+     *
+     * @param {MessageEvent} event - The message event from the iframe
+     */
+    const handleMiawEvent = async (event) => {
+        if (event.source && event.source !== window) {
+            try {
+                if (event.data.type === 'lwc.getConversationContext') {
+                    const conversationContext = await getConversationContext()
+                    sendConversationContext('conversational.actualConversationContext', {
+                        conversationContext
+                    })
+                }
+            } catch (error) {
+                console.error('Error handling Miaw event:', error)
+            }
+        }
+    }
+
+    /**
+     * Event listener for the MIAW event
+     */
+    useEffect(() => {
+        window.addEventListener('message', handleMiawEvent)
+        return () => {
+            window.removeEventListener('message', handleMiawEvent)
+        }
+    }, [])
 
     useEffect(() => {
         /**
@@ -247,6 +358,8 @@ ShopperAgentWindow.propTypes = {
      * @property {string} salesforceOrgId - Salesforce organization ID
      * @property {string} commerceOrgId - Commerce Cloud organization ID
      * @property {string} siteId - Site identifier
+     * @property {string} [enableConversationContext] - Enable conversation context feature ('true' or 'false')
+     * @property {string[]} [conversationContext] - Conversation context data array
      */
     commerceAgentConfiguration: PropTypes.object.isRequired
 }
@@ -273,6 +386,8 @@ ShopperAgentWindow.propTypes = {
  * @param {string} props.commerceAgentConfiguration.salesforceOrgId - Salesforce org ID
  * @param {string} props.commerceAgentConfiguration.commerceOrgId - Commerce org ID
  * @param {string} props.commerceAgentConfiguration.siteId - Site identifier
+ * @param {string} [props.commerceAgentConfiguration.enableConversationContext] - Enable conversation context feature
+ * @param {string[]} [props.commerceAgentConfiguration.conversationContext] - Conversation context data array
  * @param {boolean} props.basketDoneLoading - Whether the basket has finished loading
  * @returns {JSX.Element|null} The ShopperAgent component or null if conditions not met
  *
@@ -320,6 +435,8 @@ ShopperAgent.propTypes = {
      * @property {string} salesforceOrgId - Salesforce organization ID
      * @property {string} commerceOrgId - Commerce Cloud organization ID
      * @property {string} siteId - Site identifier
+     * @property {string} [enableConversationContext] - Enable conversation context feature ('true' or 'false')
+     * @property {string[]} [conversationContext] - Conversation context data array
      *
      * @see {@link validateCommerceAgentSettings} - For validation rules
      */
