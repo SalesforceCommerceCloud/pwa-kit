@@ -58,7 +58,7 @@ const systemPromptForUnfoundComponents = (unfoundComponents) =>
 
 class CreateNewPageTool {
     constructor() {
-        this.name = 'create_sample_storefront_page'
+        this.name = 'create_sample_page'
         this.description =
             'Create a sample PWA storefront page. Gather information from user for the MCP tool parameters **one at a time**, in a natural and conversational way. Do **not** ask all the questions at once.'
         this.inputSchema = {
@@ -241,13 +241,7 @@ class CreateNewPageTool {
                 })
                 .join('\n')
 
-            return `/*
- * Copyright (c) ${new Date().getFullYear()}, Salesforce, Inc.
- * All rights reserved.
- * SPDX-License-Identifier: BSD-3-Clause
- * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
- */
-
+            return `
 ${imports.join('\n')}
 
 /**

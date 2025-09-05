@@ -266,4 +266,75 @@ describe('StoreDisplay component', () => {
         expect(screen.queryByText(/Phone:/)).not.toBeInTheDocument()
         expect(screen.queryByText(/Email:/)).not.toBeInTheDocument()
     })
+
+    describe('Change Store Button', () => {
+        test('renders Change Store button when onChangeStore is provided', () => {
+            const mockOnChangeStore = jest.fn()
+            renderWithProviders(
+                <StoreDisplay store={mockStore} onChangeStore={mockOnChangeStore} />
+            )
+
+            const changeStoreButton = screen.getByTestId('change-store-button')
+            expect(changeStoreButton).toBeInTheDocument()
+            expect(changeStoreButton).toHaveTextContent('Use Recent Store')
+        })
+
+        test('does not render Change Store button when onChangeStore is not provided', () => {
+            renderWithProviders(<StoreDisplay store={mockStore} />)
+
+            expect(screen.queryByTestId('change-store-button')).not.toBeInTheDocument()
+        })
+
+        test('calls onChangeStore when Change Store button is clicked', async () => {
+            const mockOnChangeStore = jest.fn()
+            const user = userEvent.setup()
+            renderWithProviders(
+                <StoreDisplay store={mockStore} onChangeStore={mockOnChangeStore} />
+            )
+
+            const changeStoreButton = screen.getByTestId('change-store-button')
+            await user.click(changeStoreButton)
+
+            expect(mockOnChangeStore).toHaveBeenCalledTimes(1)
+        })
+
+        test('does not render Change Store button when store has no name', () => {
+            const storeWithoutName = {
+                ...mockStore,
+                name: null
+            }
+            const mockOnChangeStore = jest.fn()
+            renderWithProviders(
+                <StoreDisplay store={storeWithoutName} onChangeStore={mockOnChangeStore} />
+            )
+
+            expect(screen.queryByTestId('change-store-button')).not.toBeInTheDocument()
+        })
+
+        test('renders Change Store button with correct styling', () => {
+            const mockOnChangeStore = jest.fn()
+            renderWithProviders(
+                <StoreDisplay store={mockStore} onChangeStore={mockOnChangeStore} />
+            )
+
+            const changeStoreButton = screen.getByTestId('change-store-button')
+            expect(changeStoreButton).toBeInTheDocument()
+
+            // Check that it's rendered as a button
+            expect(changeStoreButton.tagName).toBe('BUTTON')
+        })
+
+        test('positions Change Store button next to store name', () => {
+            const mockOnChangeStore = jest.fn()
+            renderWithProviders(
+                <StoreDisplay store={mockStore} onChangeStore={mockOnChangeStore} />
+            )
+
+            const storeName = screen.getByText('Downtown Store')
+            const changeStoreButton = screen.getByTestId('change-store-button')
+
+            // Both should be in the same parent container (Flex)
+            expect(storeName.parentElement).toBe(changeStoreButton.parentElement)
+        })
+    })
 })

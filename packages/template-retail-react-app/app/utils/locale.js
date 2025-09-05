@@ -27,6 +27,7 @@ export const fetchTranslations = async (locale, origin) => {
             : locale
 
     try {
+        // fetchTranslations is not a react hook so we cannot use the useAppOrigin hook here
         const file = `${origin || getAppOrigin()}${getAssetUrl(
             `static/translations/compiled/${targetLocale}.json`
         )}`

@@ -10,14 +10,24 @@ inputs:
     required: false
     type: string
 
+outputs:
+  project_path:
+    description: Path to the generated project directory
+    value: ${{ steps.generate_project.outputs.project_path }}
+
 runs:
   using: composite
   steps:
   - name: Generate new project based on project-key
+    id: generate_project
     run: |
       COMMAND="node e2e/scripts/generate-project.js --project-key ${{ inputs.PROJECT_KEY }}"
       if [[ -n "${{ inputs.TEMPLATE_VERSION }}" ]]; then
         COMMAND="$COMMAND --templateVersion ${{ inputs.TEMPLATE_VERSION }}"
       fi
       $COMMAND
+
+      # Return path to the generated project
+      GENERATED_PROJECTS_DIR=$(node -e "console.log(require('./e2e/config.js').GENERATED_PROJECTS_DIR)")
+      echo "project_path=$GENERATED_PROJECTS_DIR/${{ inputs.PROJECT_KEY }}" >> $GITHUB_OUTPUT
     shell: bash

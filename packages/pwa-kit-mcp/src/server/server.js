@@ -15,11 +15,9 @@ import {
     DeveloperGuidelinesTool,
     TestWithPlaywrightTool,
     CreateNewPageTool,
-    VersionControlGitTool,
     ExploreCommerceAPITool,
     HooksRecommendationTool
 } from '../tools/index.js'
-
 // NOTE: This is a workaround to import JSON files as ES modules.
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const packageJson = require('../../package.json')
@@ -41,7 +39,7 @@ class PwaStorefrontMCPServerHighLevel {
             }
         )
         this.createNewComponentTool = new CreateNewComponentTool()
-        this.versionControlGitTool = new VersionControlGitTool()
+        this.createAppGuidelinesTool = new CreateAppGuidelinesTool()
         this.testWithPlaywrightTool = new TestWithPlaywrightTool()
         this.exploreCommerceAPITool = new ExploreCommerceAPITool()
         this.setupTools()
@@ -50,10 +48,10 @@ class PwaStorefrontMCPServerHighLevel {
     setupTools() {
         // Register CreateProjectTool
         this.server.tool(
-            CreateAppGuidelinesTool.name,
-            CreateAppGuidelinesTool.description,
-            CreateAppGuidelinesTool.inputSchema,
-            CreateAppGuidelinesTool.fn
+            this.createAppGuidelinesTool.name,
+            this.createAppGuidelinesTool.description,
+            this.createAppGuidelinesTool.inputSchema,
+            this.createAppGuidelinesTool.fn
         )
         this.server.tool(
             DeveloperGuidelinesTool.name,
@@ -81,12 +79,6 @@ class PwaStorefrontMCPServerHighLevel {
             CreateNewPageTool.description,
             CreateNewPageTool.inputSchema,
             CreateNewPageTool.handler
-        )
-        this.server.tool(
-            this.versionControlGitTool.name,
-            this.versionControlGitTool.description,
-            this.versionControlGitTool.inputSchema,
-            this.versionControlGitTool.handler
         )
         this.server.tool(
             this.exploreCommerceAPITool.name,

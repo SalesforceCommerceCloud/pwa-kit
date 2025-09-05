@@ -6,16 +6,34 @@
  */
 /* eslint-disable @typescript-eslint/no-var-requires */
 const sites = require('./sites.js')
-const {parseCommerceAgentSettings} = require('./utils.js')
+const {parseSettings} = require('./utils.js')
 
 module.exports = {
     app: {
+        // Enable the store locator and shop the store feature.
+        storeLocatorEnabled: true,
+        // Enable the multi-ship feature.
+        multishipEnabled: true,
+        // Enable partial hydration capabilities via Island component
+        {{#if answers.project.partialHydrationEnabled}}
+        partialHydrationEnabled: {{answers.project.partialHydrationEnabled}},
+        {{else}}
+        partialHydrationEnabled: false,
+        {{/if}}
         // Commerce shopping agent configuration for embedded messaging service
         // This enables an agentic shopping experience in the application
         // This property accepts either a JSON string or a plain JavaScript object.
-        // The value is set from the COMMERCE_AGENT_SETTINGS environment variable.
-        // If the COMMERCE_AGENT_SETTINGS environment variable is not set, the feature is disabled.
-        commerceAgent: parseCommerceAgentSettings(process.env.COMMERCE_AGENT_SETTINGS),
+        commerceAgent: parseSettings(process.env.COMMERCE_AGENT_SETTINGS) || {
+            enabled: 'false',
+            askAgentOnSearch: 'false',
+            embeddedServiceName: '',
+            embeddedServiceEndpoint: '',
+            scriptSourceUrl: '',
+            scrt2Url: '',
+            salesforceOrgId: '',
+            commerceOrgId: '',
+            siteId: ''
+        },
         // Customize how your 'site' and 'locale' are displayed in the url.
         url: {
             {{#if answers.project.demo.enableDemoSettings}}
@@ -117,6 +135,10 @@ module.exports = {
             tenantId: '{{answers.project.dataCloud.tenantId}}'
         }
     },
+    // Experimental: The base path for the app. This is the path that will be prepended to all /mobify routes,
+    // callback routes, and Express routes.
+    // Setting this to `/` or an empty string will result in the above routes not having a base path.
+    envBasePath: '/',
     // This list contains server-side only libraries that you don't want to be compiled by webpack
     externals: [],
     // Page not found url for your app

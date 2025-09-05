@@ -11,7 +11,6 @@ export {default as CreateNewComponentTool} from './create-new-component.js'
 export {default as DeveloperGuidelinesTool} from './developer-guideline.js'
 export {TestWithPlaywrightTool} from './site-test.js'
 export {default as CreateNewPageTool} from './create-new-page-tool.js'
-export {default as VersionControlGitTool} from './version-control-git.js'
 export {default as ExploreCommerceAPITool} from './shopper-products.js'
 export {default as HooksRecommendationTool} from './hooks-recommendation-tool.js'
 

@@ -43,6 +43,53 @@ const mockProductsWithUnavailableProducts = {
     ]
 }
 
+const mockProductsWithBopisInventories = {
+    limit: 0,
+    total: 1,
+    data: [
+        {
+            currency: 'GBP',
+            id: '701642889830M',
+            imageGroups: [],
+            inventories: [
+                {
+                    id: 'bopis-store-1',
+                    orderable: true,
+                    stockLevel: 10
+                }
+            ]
+        }
+    ]
+}
+
+const mockProductWithBopisUnavailableInOneStore = {
+    limit: 0,
+    total: 1,
+    data: [
+        {
+            currency: 'GBP',
+            id: 'product-a',
+            imageGroups: [],
+            inventories: [
+                {
+                    id: 'store-1',
+                    orderable: true,
+                    stockLevel: 10
+                },
+                {
+                    id: 'store-2',
+                    orderable: false, // Not orderable from store-2
+                    stockLevel: 0
+                }
+            ],
+            inventory: {
+                orderable: true,
+                stockLevel: 100
+            }
+        }
+    ]
+}
+
 describe('UnavailableProductConfirmationModal', () => {
     test('renders without crashing', () => {
         prependHandlersToServer([
@@ -103,7 +150,6 @@ describe('UnavailableProductConfirmationModal', () => {
     })
 
     test('opens confirmation modal when unavailable products are found with defined productIds prop', async () => {
-        const mockProductIds = ['701642889899M', '701642889830M']
         prependHandlersToServer([
             {
                 path: '*/products',
@@ -146,4 +192,79 @@ describe('UnavailableProductConfirmationModal', () => {
         })
         expect(removeBtn).not.toBeInTheDocument()
     })
+})
+
+test('does not open confirmation modal with sufficient bopis inventory', async () => {
+    prependHandlersToServer([
+        {
+            path: '*/products',
+            res: () => {
+                return mockProductsWithBopisInventories
+            }
+        }
+    ])
+    const mockFunc = jest.fn()
+    const basket = {
+        productItems: [
+            {
+                productId: '701642889830M',
+                quantity: 2,
+                inventoryId: 'bopis-store-1' // available
+            }
+        ]
+    }
+    const {queryByText} = renderWithProviders(
+        <UnavailableProductConfirmationModal
+            productItems={basket.productItems}
+            handleUnavailableProducts={mockFunc}
+        />
+    )
+
+    await waitFor(() => {
+        expect(queryByText(/Items Unavailable/i)).not.toBeInTheDocument()
+    })
+    expect(mockFunc).not.toHaveBeenCalled()
+})
+
+test('opens confirmation modal for bopis item unavailable in selected store', async () => {
+    prependHandlersToServer([
+        {
+            path: '*/products',
+            res: () => {
+                return mockProductWithBopisUnavailableInOneStore
+            }
+        }
+    ])
+    const mockFunc = jest.fn()
+    const basket = {
+        productItems: [
+            {
+                productId: 'product-a',
+                quantity: 1,
+                inventoryId: 'store-2' // unavailable in this store
+            }
+        ]
+    }
+    const {getByText, queryByText, queryByRole, user} = renderWithProviders(
+        <UnavailableProductConfirmationModal
+            productItems={basket.productItems}
+            handleUnavailableProducts={mockFunc}
+        />
+    )
+
+    await waitFor(async () => {
+        expect(getByText(/^Items Unavailable$/i)).toBeInTheDocument()
+    })
+    const removeBtn = queryByRole('button')
+
+    expect(removeBtn).toBeInTheDocument()
+    await user.click(removeBtn)
+    await waitFor(async () => {
+        expect(mockFunc).toHaveBeenCalledWith(['product-a'])
+    })
+
+    await waitFor(async () => {
+        expect(queryByText(/Items Unavailable/i)).not.toBeInTheDocument()
+    })
+    expect(removeBtn).not.toBeInTheDocument()
 })

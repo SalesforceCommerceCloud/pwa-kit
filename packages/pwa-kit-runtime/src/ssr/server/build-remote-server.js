@@ -42,6 +42,7 @@ import http from 'http'
 import https from 'https'
 import {proxyConfigs, updatePackageMobify} from '../../utils/ssr-shared'
 import {
+    getEnvBasePath,
     proxyBasePath,
     bundleBasePath,
     healthCheckPath,
@@ -51,7 +52,8 @@ import {applyProxyRequestHeaders} from '../../utils/ssr-server/configure-proxy'
 import awsServerlessExpress from 'aws-serverless-express'
 import expressLogging from 'morgan'
 import logger from '../../utils/logger-instance'
-import {createProxyMiddleware} from 'http-proxy-middleware'
+import {createProxyMiddleware, responseInterceptor} from 'http-proxy-middleware'
+import {convertExpressRouteToRegex} from '../../utils/ssr-server/convert-express-route'
 
 /**
  * An Array of mime-types (Content-Type values) that are considered
@@ -361,6 +363,17 @@ export const RemoteServerFactory = {
         this._setCompression(app)
         this._setRequestId(app)
         // this._addEventContext(app)
+
+        // We want to remove any base paths that have made it this far.
+        // Base paths are used to route requests to the correct server.
+        // If the request has reached the server, it is no longer needed.
+        // Note: We use envBasePath as the feature flag for this middleware
+        // If envBasePath is `/`, '', or undefined when the server starts, we don't need to
+        // initialize this middleware.
+        if (getEnvBasePath()) {
+            this._setupBasePathMiddleware(app)
+        }
+
         // Ordering of the next two calls are vital - we don't
         // want request-processors applied to development views.
         this._addSDKInternalHandlers(app)
@@ -471,6 +484,131 @@ export const RemoteServerFactory = {
 
             next()
         })
+    },
+
+    /**
+     * @private
+     */
+    _setupBasePathMiddleware(app) {
+        // Cache the express route regexes to avoid re-calculating them on every request.
+        let expressRouteRegexes
+
+        /**
+         * Remove the base path from a path.
+         *
+         * If path is like '/basepath/something', this returns '/something'
+         * If path is exactly '/basepath', this returns '/'
+         * If path doesn't start with base path or if there is no base path defined,
+         * returns the unmodified path
+         *
+         * @param path {string} the path to remove the base path from
+         * @returns {string} the path with the base path removed
+         */
+        const removeBasePathFromPath = (path) => {
+            const basePath = getEnvBasePath()
+            if (!basePath) {
+                return path
+            }
+
+            if (path.startsWith(basePath + '/')) {
+                return path.substring(basePath.length)
+            } else if (path === basePath) {
+                return '/'
+            }
+            return path
+        }
+
+        /**
+         * Initializes a cache of regexes that correspond to the registered express routes
+         *
+         * This specifically omits the generic wildcard from the express routes where we
+         * want to remove the base path from since it is mapped to the app render. This is
+         * because routes sent to the render are handled by React Router
+         */
+        const initializeExpressRouteRegexes = () => {
+            const expressRoutes = app._router.stack
+                .filter((layer) => layer.route && layer.route.path && layer.route.path !== '*')
+                .map((layer) => layer.route.path)
+
+            expressRouteRegexes = expressRoutes.map((route) => convertExpressRouteToRegex(route))
+        }
+
+        /**
+         * Very early request processing.
+         *
+         * If the server receives a request containing the base path, remove it before allowing
+         * the request through to the other express endpoints
+         *
+         * We scope base path removal to /mobify routes and routes defined by the express app
+         * (For example /callback or /worker.js)
+         * This is to avoid affecting React Router routes where a site id or locale might be present
+         * that is equal to the base path.
+         *
+         * For example, if you have a base path of /us and a site id of /us we don't want
+         * to remove the /us from www.example.com/us/en-US/category/... as this route is handled by
+         * React Router and the PWA multisite implementation.
+         *
+         * @param req {express.req} the incoming request - modified in-place
+         * @private
+         */
+        const removeBasePathMiddleware = (req, res, next) => {
+            const basePath = getEnvBasePath()
+
+            // Fast path: /mobify routes always get the base path removed
+            if (req.path.startsWith(`${basePath}/mobify`)) {
+                const cleanPath = removeBasePathFromPath(req.path)
+                const parsed = URL.parse(req.url)
+                parsed.pathname = cleanPath
+                req.url = URL.format(parsed)
+                return next()
+            }
+
+            // For other routes, only proceed if path actually starts with base path
+            if (!req.path.startsWith(basePath)) {
+                return next()
+            }
+
+            // Now we know path starts with base path, so we can remove it
+            const cleanPath = removeBasePathFromPath(req.path)
+
+            // Initialize express route regexes if needed
+            // We do this here since we want to ensure that any express route defined
+            // after the app is created, such as routes defined in ssr.js, are included.
+            if (!expressRouteRegexes) {
+                initializeExpressRouteRegexes()
+            }
+
+            // Next we check if the clean path matches any existing express routes
+            // (like /callback or /worker.js)
+            const matchesExpressRoute = expressRouteRegexes.some((routeRegex) => {
+                try {
+                    return routeRegex.test(cleanPath)
+                } catch (error) {
+                    logger.warn(
+                        `Invalid express route pattern: ${routeRegex}`,
+                        /* istanbul ignore next */
+                        {
+                            namespace: 'removeBasePathMiddleware',
+                            additionalProperties: {
+                                error: error
+                            }
+                        }
+                    )
+                    return false
+                }
+            })
+
+            // Only update URL if our clean path matches an Express route
+            // This leaves React Router paths (like /en-US/category) unchanged
+            if (matchesExpressRoute) {
+                const parsed = URL.parse(req.url)
+                parsed.pathname = cleanPath
+                req.url = URL.format(parsed)
+            }
+            next()
+        }
+
+        app.use(removeBasePathMiddleware)
     },
 
     /**
@@ -678,7 +816,7 @@ export const RemoteServerFactory = {
     /**
      * @private
      */
-    _handleMissingSlasPrivateEnvVar(app) {
+    _handleMissingSlasPrivateEnvVar(app, slasPrivateProxyPath) {
         app.use(slasPrivateProxyPath, (_, res) => {
             return res.status(501).json({
                 message:
@@ -719,10 +857,36 @@ export const RemoteServerFactory = {
 
         app.use(
             slasPrivateProxyPath,
+            (req, res, next) => {
+                // Check if the request should be blocked before it reaches the proxy
+                // We run this outside of the proxy middleware because modifying the response
+                // to send a 403 in the proxy causes issues with the response interceptor.
+                if (
+                    !req.path?.match(options.slasApiPath) ||
+                    req.path?.match(/\/oauth2\/trusted-system/)
+                ) {
+                    const message = `Request to ${req.path} is not allowed through the SLAS Private Client Proxy`
+                    logger.error(message)
+                    return res.status(403).json({
+                        message: message
+                    })
+                }
+                next()
+            },
             createProxyMiddleware({
                 target: options.slasTarget,
                 changeOrigin: true,
-                pathRewrite: {[slasPrivateProxyPath]: ''},
+
+                // http-proxy-middleware uses the original incoming request path to determine
+                // both proxyRequest and incomingRequest paths.
+                // This cannot be modified by any express middleware
+                // So we need to use the built in pathRewrite to remove the base path
+                pathRewrite: (path) => {
+                    const basePathRegexEntry = getEnvBasePath() ? `${getEnvBasePath()}?` : ''
+                    const regex = new RegExp(`^${basePathRegexEntry}${slasPrivateProxyPath}`)
+                    return path.replace(regex, '')
+                },
+                selfHandleResponse: true,
                 onProxyReq: (proxyRequest, incomingRequest, res) => {
                     applyProxyRequestHeaders({
                         proxyRequest,
@@ -732,33 +896,48 @@ export const RemoteServerFactory = {
                         targetProtocol: 'https'
                     })
 
-                    // We don't want the proxy to handle any non-SLAS requests
-                    // or any trusted system requests
-                    if (
-                        !incomingRequest.path?.match(options.slasApiPath) ||
-                        incomingRequest.path?.match(/\/oauth2\/trusted-system/)
-                    ) {
-                        const message = `Request to ${incomingRequest.path} is not allowed through the SLAS Private Client Proxy`
-                        logger.error(message)
-                        return res.status(403).json({
-                            message: message
-                        })
-                    }
-
-                    // We pattern match and add client secrets only to endpoints that
-                    // match the regex specified by options.applySLASPrivateClientToEndpoints.
-                    //
-                    // Other SLAS endpoints, ie. SLAS authenticate (/oauth2/login) and
-                    // SLAS logout (/oauth2/logout), use the Authorization header for a different
-                    // purpose so we don't want to overwrite the header for those calls.
-                    if (incomingRequest.path?.match(options.applySLASPrivateClientToEndpoints)) {
-                        proxyRequest.setHeader('Authorization', `Basic ${encodedSlasCredentials}`)
-                    } else if (incomingRequest.path?.match(/\/oauth2\/trusted-agent\/token/)) {
+                    if (incomingRequest.path?.match(/\/oauth2\/trusted-agent\/token/)) {
                         // /oauth2/trusted-agent/token endpoint auth header comes from Account Manager
                         // so the SLAS private client is sent via this special header
                         proxyRequest.setHeader('_sfdc_client_auth', encodedSlasCredentials)
+                    } else if (
+                        incomingRequest.path?.match(options.applySLASPrivateClientToEndpoints)
+                    ) {
+                        // We pattern match and add client secrets only to endpoints that
+                        // match the regex specified by options.applySLASPrivateClientToEndpoints.
+                        //
+                        // Other SLAS endpoints, ie. SLAS authenticate (/oauth2/login) and
+                        // SLAS logout (/oauth2/logout), use the Authorization header for a different
+                        // purpose so we don't want to overwrite the header for those calls.
+                        proxyRequest.setHeader('Authorization', `Basic ${encodedSlasCredentials}`)
                     }
-                }
+                },
+                onProxyRes: responseInterceptor((responseBuffer, proxyRes, req, res) => {
+                    try {
+                        // If the passwordless login endpoint returns a 404, which corresponds to a user
+                        // email not being found, we mask it with a 200 OK response so that it is not
+                        // obvious that the user does not exist.
+                        // We do this to prevent user enumeration.
+                        if (
+                            req.path?.match(/\/oauth2\/passwordless\/login/) &&
+                            proxyRes.statusCode === 404
+                        ) {
+                            res.statusCode = 200
+                            res.statusMessage = 'OK'
+
+                            // When a /passwordless/login endpoint response returns 200, it has no body
+                            // so we return an empty body here to match an actual 200 response.
+                            return Buffer.from('', 'utf8')
+                        }
+                        return responseBuffer
+                    } catch (error) {
+                        console.error(
+                            'There is an error processing the response from SLAS. Returning original response.',
+                            error
+                        )
+                        return responseBuffer
+                    }
+                })
             })
         )
     },

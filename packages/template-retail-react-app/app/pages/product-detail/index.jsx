@@ -9,10 +9,7 @@ import React, {Fragment, useCallback, useEffect, useState} from 'react'
 import PropTypes from 'prop-types'
 import {Helmet} from 'react-helmet'
 import {FormattedMessage, useIntl} from 'react-intl'
-import {
-    normalizeSetBundleProduct,
-    getUpdateBundleChildArray
-} from '@salesforce/retail-react-app/app/utils/product-utils'
+import {getUpdateBundleChildArray} from '@salesforce/retail-react-app/app/utils/product-utils'
 
 // Components
 import {Box, Button, Stack} from '@salesforce/retail-react-app/app/components/shared/ui'
@@ -36,12 +33,13 @@ import useActiveData from '@salesforce/retail-react-app/app/hooks/use-active-dat
 import {useServerContext} from '@salesforce/pwa-kit-react-sdk/ssr/universal/hooks'
 import usePickupShipment from '@salesforce/retail-react-app/app/hooks/use-pickup-shipment'
 import {useSelectedStore} from '@salesforce/retail-react-app/app/hooks/use-selected-store'
+import {useMultiship} from '@salesforce/retail-react-app/app/hooks/use-multiship'
 import {STORE_LOCATOR_IS_ENABLED} from '@salesforce/retail-react-app/app/constants'
+import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 // Project Components
 import RecommendedProducts from '@salesforce/retail-react-app/app/components/recommended-products'
 import ProductView from '@salesforce/retail-react-app/app/components/product-view'
 import InformationAccordion from '@salesforce/retail-react-app/app/pages/product-detail/partials/information-accordion'
-import {StoreLocatorModal} from '@salesforce/retail-react-app/app/components/store-locator'
 import Island from '@salesforce/retail-react-app/app/components/island'
 
 import {HTTPNotFound, HTTPError} from '@salesforce/pwa-kit-react-sdk/ssr/universal/errors'
@@ -61,7 +59,9 @@ import {rebuildPathWithParams} from '@salesforce/retail-react-app/app/utils/url'
 import {useHistory, useLocation, useParams} from 'react-router-dom'
 import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
 import {useWishList} from '@salesforce/retail-react-app/app/hooks/use-wish-list'
-import {useDisclosure} from '@salesforce/retail-react-app/app/components/shared/ui'
+import {useStoreLocatorModal} from '@salesforce/retail-react-app/app/hooks/use-store-locator'
+import {isPickupMethod} from '@salesforce/retail-react-app/app/utils/shipment-utils'
+import {useProductInventory} from '@salesforce/retail-react-app/app/hooks/use-product-inventory'
 
 const ProductDetail = () => {
     const {formatMessage} = useIntl()
@@ -73,11 +73,9 @@ const ProductDetail = () => {
     const toast = useToast()
     const navigate = useNavigation()
     const customerId = useCustomerId()
-    const {
-        isOpen: isStoreLocatorOpen,
-        onOpen: onOpenStoreLocator,
-        onClose: onCloseStoreLocator
-    } = useDisclosure()
+    const {onOpen: onOpenStoreLocator} = useStoreLocatorModal()
+    const multishipEnabled = getConfig()?.app?.multishipEnabled ?? true
+    const storeLocatorEnabled = getConfig()?.app?.storeLocatorEnabled ?? STORE_LOCATOR_IS_ENABLED
 
     /****************************** Basket *********************************/
     const {data: basket, isLoading: isBasketLoading} = useCurrentBasket()
@@ -95,18 +93,17 @@ const ProductDetail = () => {
     const {selectedStore} = useSelectedStore()
     const selectedInventoryId = selectedStore?.inventoryId || null
 
-    const {
-        addInventoryIdsToPickupItems,
-        updateShippingMethodIfNeeded,
-        isCurrentShippingMethodPickup,
-        hasPickupItems
-    } = usePickupShipment(basket)
+    const {addInventoryIdsToPickupItems, updateDefaultShipmentIfNeeded, hasPickupItems} =
+        usePickupShipment(basket)
+
+    /*************************** Multiship ********************/
+    const {getShipmentIdForItems} = useMultiship(basket)
 
     /*************************** Product Detail and Category ********************/
     const {productId} = useParams()
     const urlParams = new URLSearchParams(location.search)
     const {
-        data: product,
+        data: productResponse,
         isLoading: isProductLoading,
         isError: isProductError,
         error: productError
@@ -145,7 +142,7 @@ const ProductDetail = () => {
         error: categoryError
     } = useCategory({
         parameters: {
-            id: product?.primaryCategoryId,
+            id: productResponse?.primaryCategoryId,
             levels: 1
         }
     })
@@ -155,51 +152,41 @@ const ProductDetail = () => {
     const [childProductOrderability, setChildProductOrderability] = useState({})
     const [selectedBundleQuantity, setSelectedBundleQuantity] = useState(1)
     const childProductRefs = React.useRef({})
-    const isProductASet = product?.type.set
-    const isProductABundle = product?.type.bundle
+    const isProductASet = productResponse?.type.set
+    const isProductABundle = productResponse?.type.bundle
 
-    let bundleChildProductIds = ''
-    if (isProductABundle)
-        bundleChildProductIds = Object.keys(childProductSelection)
-            ?.map(
-                (key) =>
-                    childProductSelection[key].variant?.productId ||
-                    childProductSelection[key].product?.id
-            )
-            .join(',')
+    const childVariantIds =
+        isProductABundle || isProductASet
+            ? Object.keys(childProductSelection)?.map(
+                  (key) =>
+                      childProductSelection[key].variant?.productId ||
+                      childProductSelection[key].product?.id
+              )
+            : []
 
-    const {data: bundleChildrenData} = useProducts(
+    const {data: variantProductData} = useProducts(
         {
             parameters: {
-                ids: bundleChildProductIds,
+                ids: childVariantIds.join(','),
                 allImages: false,
+                ...(selectedInventoryId ? {inventoryIds: selectedInventoryId} : {}),
                 expand: ['availability', 'variations'],
-                select: '(data.(id,inventories,inventory,master))',
-                ...(selectedInventoryId ? {inventoryIds: selectedInventoryId} : {})
+                select: '(data.(id,inventory,inventories,master))'
             }
         },
         {
-            enabled: bundleChildProductIds?.length > 0,
+            enabled: childVariantIds.length > 0,
             keepPreviousData: true
         }
     )
 
-    if (isProductABundle && bundleChildrenData) {
-        // Loop through the bundle children and update the inventory for variant selection
-        product.bundledProducts.forEach(({product: childProduct}, index) => {
-            const matchingChildProduct = bundleChildrenData.data.find(
-                (bundleChild) => bundleChild?.master?.masterId === childProduct.id
-            )
-            if (matchingChildProduct) {
-                product.bundledProducts[index].product = {
-                    ...childProduct,
-                    inventory: matchingChildProduct.inventory
-                }
-            }
-        })
-    }
-
-    const comboProduct = isProductASet || isProductABundle ? normalizeSetBundleProduct(product) : {}
+    const product = useProductInventory(
+        productResponse,
+        variantProductData,
+        selectedInventoryId,
+        isProductASet,
+        isProductABundle
+    )
 
     /**************** Error Handling ****************/
 
@@ -377,11 +364,11 @@ const ProductDetail = () => {
                 product
             )
 
-            const currentShippingMethodIsPickup = isCurrentShippingMethodPickup(
+            const currentShippingMethodIsPickup = isPickupMethod(
                 basket?.shipments?.[0]?.shippingMethod
             )
             // Only perform the check if the basket exists and has at least one item
-            if (basket && basket.productItems?.length > 0) {
+            if (!multishipEnabled && basket && basket.productItems?.length > 0) {
                 if (hasAnyPickupSelected && !currentShippingMethodIsPickup) {
                     throw new Error(
                         formatMessage({
@@ -402,12 +389,25 @@ const ProductDetail = () => {
                 }
             }
 
+            // Fetch and assign a suitable shipment for product items
+            const targetShipmentId = await getShipmentIdForItems(
+                hasAnyPickupSelected,
+                selectedStore
+            )
+
+            if (targetShipmentId) {
+                productItems = productItems.map((item) => ({
+                    ...item,
+                    shipmentId: targetShipmentId
+                }))
+            }
+
             const basketResponse = await addItemToNewOrExistingBasket(productItems)
 
-            // Configure shipping method based on pickup selection
-            await updateShippingMethodIfNeeded(
+            // Configure shipping method for default shipment based on pickup selection
+            await updateDefaultShipmentIfNeeded(
                 basketResponse,
-                productItems,
+                targetShipmentId,
                 hasAnyPickupSelected,
                 selectedStore
             )
@@ -439,15 +439,13 @@ const ProductDetail = () => {
         // Using ot state for which child products are selected, scroll to the first
         // one that isn't selected and requires a variant selection.
         const selectedProductIds = Object.keys(childProductSelection)
-        const firstUnselectedProduct = comboProduct.childProducts?.find(
-            ({product: childProduct}) => {
-                // Skip validation for standard products (no variations)
-                if (childProduct.type?.item) {
-                    return false
-                }
-                return !selectedProductIds.includes(childProduct.id)
+        const firstUnselectedProduct = product?.childProducts?.find(({product: childProduct}) => {
+            // Skip validation for standard products (no variations)
+            if (childProduct.type?.item) {
+                return false
             }
-        )?.product
+            return !selectedProductIds.includes(childProduct.id)
+        })?.product
 
         if (firstUnselectedProduct) {
             // Get the reference to the product view and scroll to it.
@@ -494,10 +492,9 @@ const ProductDetail = () => {
             )
 
             // Check for delivery method conflicts before adding to cart
-            if (basket && basket.productItems?.length > 0) {
+            if (!multishipEnabled && basket && basket.productItems?.length > 0) {
                 const currentShippingMethod = basket?.shipments?.[0]?.shippingMethod
-                const currentShippingMethodIsPickup =
-                    isCurrentShippingMethodPickup(currentShippingMethod)
+                const currentShippingMethodIsPickup = isPickupMethod(currentShippingMethod)
 
                 // If there's no shipping method, treat it as non-pickup (ship to address)
                 if (
@@ -550,6 +547,19 @@ const ProductDetail = () => {
                 selectedStore
             )
 
+            // Fetch and assign a suitable shipment for product items
+            const targetShipmentId = await getShipmentIdForItems(
+                hasAnyPickupSelected,
+                selectedStore
+            )
+
+            if (targetShipmentId) {
+                productItems = productItems.map((item) => ({
+                    ...item,
+                    shipmentId: targetShipmentId
+                }))
+            }
+
             const res = await addItemToNewOrExistingBasket(productItems)
 
             const bundleChildMasterIds = childProductSelections.map((child) => {
@@ -586,9 +596,9 @@ const ProductDetail = () => {
             }
 
             // Configure shipping method based on pickup selection
-            await updateShippingMethodIfNeeded(
+            await updateDefaultShipmentIfNeeded(
                 res,
-                productItems,
+                targetShipmentId,
                 hasAnyPickupSelected,
                 selectedStore
             )
@@ -677,16 +687,15 @@ const ProductDetail = () => {
                                     product && handlePickupInStoreChange(product.id, checked)
                                 }
                                 onOpenStoreLocator={onOpenStoreLocator}
-                                showDeliveryOptions={STORE_LOCATOR_IS_ENABLED}
+                                showDeliveryOptions={storeLocatorEnabled}
                             />
                         </Island>
 
                         <hr />
 
-                        {/* TODO: consider `childProduct.belongsToSet` */}
                         {
                             // Render the child products
-                            comboProduct.childProducts.map(
+                            product?.childProducts?.map(
                                 ({product: childProduct, quantity: childQuantity}) => (
                                     <Box key={childProduct.id} data-testid="child-product">
                                         <ProductView
@@ -739,14 +748,23 @@ const ProductDetail = () => {
                                             setChildProductOrderability={
                                                 setChildProductOrderability
                                             }
-                                            pickupInStore={!!pickupInStoreMap[childProduct?.id]}
+                                            pickupInStore={
+                                                !!pickupInStoreMap[
+                                                    childProductSelection[childProduct?.id]?.variant
+                                                        ?.productId
+                                                ]
+                                            }
                                             setPickupInStore={(checked) =>
                                                 childProduct &&
-                                                handlePickupInStoreChange(childProduct.id, checked)
+                                                handlePickupInStoreChange(
+                                                    childProductSelection[childProduct?.id]?.variant
+                                                        ?.productId,
+                                                    checked
+                                                )
                                             }
                                             onOpenStoreLocator={onOpenStoreLocator}
                                             showDeliveryOptions={
-                                                STORE_LOCATOR_IS_ENABLED && !isProductABundle
+                                                storeLocatorEnabled && !isProductABundle
                                             }
                                         />
                                         <InformationAccordion product={childProduct} />
@@ -779,7 +797,7 @@ const ProductDetail = () => {
                                     product && handlePickupInStoreChange(product.id, checked)
                                 }
                                 onOpenStoreLocator={onOpenStoreLocator}
-                                showDeliveryOptions={STORE_LOCATOR_IS_ENABLED}
+                                showDeliveryOptions={storeLocatorEnabled}
                             />
                             <InformationAccordion product={product} />
                         </Island>
@@ -836,9 +854,6 @@ const ProductDetail = () => {
                     </Island>
                 </Stack>
             </Stack>
-            {STORE_LOCATOR_IS_ENABLED && (
-                <StoreLocatorModal isOpen={isStoreLocatorOpen} onClose={onCloseStoreLocator} />
-            )}
         </Box>
     )
 }

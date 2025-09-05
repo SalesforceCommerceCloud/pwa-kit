@@ -7,7 +7,7 @@
 import {z} from 'zod'
 import fs from 'fs/promises'
 import path from 'path'
-import {toKebabCase, toPascalCase, getCopyrightHeader} from '../utils/index.js'
+import {toKebabCase, toPascalCase} from '../utils/index.js'
 
 const systemPrompt = `
 You are a smart assistant that helps create new React components.
@@ -43,7 +43,7 @@ What is the main purpose of this component? Reply with exactly one of the follow
 
 class CreateNewComponentTool {
     constructor() {
-        this.name = 'create_new_component'
+        this.name = 'create_sample_component'
         this.description =
             'Create a sample React component. Gather information from user for the MCP tool parameters **one at a time**, in a natural and conversational way. Do **not** ask all the questions at once.'
         this.inputSchema = {
@@ -126,7 +126,7 @@ class CreateNewComponentTool {
         if (entityType === 'product') {
             // If options.list is true, generate a list-of-products component
             if (options.list) {
-                code = `${getCopyrightHeader()}
+                code = `
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Box, Text, Image, Stack } from '@chakra-ui/react';
@@ -165,7 +165,7 @@ export default ${pascalComponentName};
 `
             } else {
                 // Single product component (with selectors, image, etc.)
-                code = `${getCopyrightHeader()}
+                code = `
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { Box, Text, Image, Button, HStack, Stack } from '@chakra-ui/react';

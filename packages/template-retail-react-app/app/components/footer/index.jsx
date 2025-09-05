@@ -31,6 +31,7 @@ import LocaleText from '@salesforce/retail-react-app/app/components/locale-text'
 import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
 import styled from '@emotion/styled'
 import {STORE_LOCATOR_IS_ENABLED} from '@salesforce/retail-react-app/app/constants'
+import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 
 const [StylesProvider, useStyles] = createStylesContext('Footer')
 const Footer = ({...otherProps}) => {
@@ -39,6 +40,7 @@ const Footer = ({...otherProps}) => {
     const [locale, setLocale] = useState(intl.locale)
     const {site, buildUrl} = useMultiSite()
     const {l10n} = site
+    const storeLocatorEnabled = getConfig()?.app?.storeLocatorEnabled ?? STORE_LOCATOR_IS_ENABLED
     const supportedLocaleIds = l10n?.supportedLocales.map((locale) => locale.id)
     const showLocaleSelector = supportedLocaleIds?.length > 1
 
@@ -51,7 +53,7 @@ const Footer = ({...otherProps}) => {
     })
     const makeOurCompanyLinks = () => {
         const links = []
-        if (STORE_LOCATOR_IS_ENABLED)
+        if (storeLocatorEnabled)
             links.push({
                 href: '/store-locator',
                 text: intl.formatMessage({

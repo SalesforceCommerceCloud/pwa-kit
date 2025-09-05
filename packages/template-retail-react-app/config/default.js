@@ -4,14 +4,23 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-// eslint-disable-next-line @typescript-eslint/no-var-requires
+/* eslint-disable @typescript-eslint/no-var-requires */
 const sites = require('./sites.js')
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const {parseCommerceAgentSettings} = require('./utils.js')
+const {parseSettings} = require('./utils.js')
 
 module.exports = {
     app: {
-        commerceAgent: parseCommerceAgentSettings(process.env.COMMERCE_AGENT_SETTINGS),
+        commerceAgent: parseSettings(process.env.COMMERCE_AGENT_SETTINGS) || {
+            enabled: 'false',
+            askAgentOnSearch: 'false',
+            embeddedServiceName: '',
+            embeddedServiceEndpoint: '',
+            scriptSourceUrl: '',
+            scrt2Url: '',
+            salesforceOrgId: '',
+            commerceOrgId: '',
+            siteId: ''
+        },
         url: {
             site: 'path',
             locale: 'path',
@@ -60,8 +69,12 @@ module.exports = {
         dataCloudAPI: {
             appSourceId: '7ae070a6-f4ec-4def-a383-d9cacc3f20a1',
             tenantId: 'g82wgnrvm-ywk9dggrrw8mtggy.pc-rnd'
-        }
+        },
+        partialHydrationEnabled: false,
+        storeLocatorEnabled: true,
+        multishipEnabled: true
     },
+    envBasePath: '/',
     externals: [],
     pageNotFoundURL: '/page-not-found',
     ssrEnabled: true,
