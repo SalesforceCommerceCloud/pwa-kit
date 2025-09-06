@@ -247,7 +247,7 @@ const ShopperAgentWindow = ({commerceAgentConfiguration}) => {
             try {
                 if (event.data.type === 'lwc.getConversationContext') {
                     const conversationContext = await getConversationContext()
-                    sendConversationContext('conversational.actualConversationContext', {
+                    sendConversationContext('welcome.actualConversationContext', {
                         conversationContext
                     })
                 }
