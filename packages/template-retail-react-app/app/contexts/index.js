@@ -11,6 +11,10 @@ export {
     StoreLocatorContext,
     StoreLocatorProvider
 } from '@salesforce/retail-react-app/app/contexts/store-locator-provider'
+export {
+    ComparisonContext,
+    ComparisonProvider
+} from '@salesforce/retail-react-app/app/contexts/comparison-provider'
 
 /**
  * This is the global state for the multiples sites and locales supported in the App.

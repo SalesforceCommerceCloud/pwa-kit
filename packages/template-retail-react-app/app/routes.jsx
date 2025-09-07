@@ -48,6 +48,9 @@ const ProductDetail = loadable(() => import('./pages/product-detail'), {fallback
 const ProductList = loadable(() => import('./pages/product-list'), {
     fallback
 })
+const ProductComparison = loadable(() => import('./pages/product-comparison'), {
+    fallback
+})
 const StoreLocator = loadable(() => import('./pages/store-locator'), {
     fallback
 })
@@ -126,6 +129,11 @@ export const routes = [
     {
         path: '/category/:categoryId',
         component: ProductList
+    },
+    {
+        path: '/compare',
+        component: ProductComparison,
+        exact: true
     },
     {
         path: '/account/wishlist',
