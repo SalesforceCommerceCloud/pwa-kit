@@ -1,4 +1,5 @@
 <div align="center">
+<h1>⚠️ Important! This branch is only a reference implementation for Apple Pay and Google Pay support through Adyen payment gateway for the Shopping Agent.</h1>
 
 <h1>The Progressive Web App (PWA) Kit</h1>
 
