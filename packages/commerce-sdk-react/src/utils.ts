@@ -174,7 +174,7 @@ export const transformSDKClient = <T extends Record<string, (...args: any[]) => 
     client: T,
     config: SDKClientTransformConfig
 ): T => {
-    const {props, transformer, onError} = config
+    const {props, transformer, onError, onResponse} = config
 
     return new Proxy(client, {
         get(target, methodName: string) {
@@ -186,8 +186,42 @@ export const transformSDKClient = <T extends Record<string, (...args: any[]) => 
 
             return async function (options: any = {}) {
                 try {
+                    console.log('--- method options', options)
                     if (transformer) {
                         options = await Promise.resolve(transformer(props, methodName, options))
+                    }
+
+                    // If we have an onResponse callback, use rawResponse to get headers
+                    if (onResponse) {
+                        // Get raw response for header processing, then parse the body
+                        const rawResponse = await originalMethod.call(target, options, {
+                            rawResponse: true
+                        })
+
+                        console.log(`--- SDK rawResponse for ${methodName}:`, rawResponse)
+                        console.log(`--- SDK rawResponse type:`, typeof rawResponse)
+                        console.log(`--- SDK rawResponse headers:`, rawResponse?.headers)
+
+                        // Process the response headers
+                        onResponse(rawResponse, methodName)
+
+                        // Parse and return the response body as the SDK normally would
+                        // This mimics what the SDK does internally when rawResponse is false
+                        if (rawResponse.ok) {
+                            const contentType = rawResponse.headers.get('content-type')
+                            if (contentType && contentType.includes('application/json')) {
+                                return await rawResponse.json()
+                            } else {
+                                return await rawResponse.text()
+                            }
+                        } else {
+                            // Let the SDK handle error responses normally
+                            throw new Error(
+                                `HTTP ${String(rawResponse.status)}: ${String(
+                                    rawResponse.statusText
+                                )}`
+                            )
+                        }
                     }
 
                     return await originalMethod.call(target, options)

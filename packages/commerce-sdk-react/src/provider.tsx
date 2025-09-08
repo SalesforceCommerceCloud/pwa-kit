@@ -47,6 +47,7 @@ export interface CommerceApiProviderProps extends ApiClientConfigParams {
     apiClients?: ApiClients
     disableAuthInit?: boolean
     hybridAuthEnabled?: boolean
+    onResponse?: (response: Response, methodName: string) => void
 }
 
 /**
@@ -144,7 +145,8 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
         refreshTokenGuestCookieTTL,
         apiClients,
         disableAuthInit = false,
-        hybridAuthEnabled = false
+        hybridAuthEnabled = false,
+        onResponse
     } = props
 
     // Set the logger based on provided configuration, or default to the console object if no logger is provided
@@ -229,7 +231,8 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
             Object.entries(apiClients ?? {}).forEach(([key, apiClient]) => {
                 clients[key] = transformSDKClient(apiClient, {
                     props: restProps,
-                    transformer: _defaultTransformer
+                    transformer: _defaultTransformer,
+                    onResponse
                 })
             })
 
@@ -254,7 +257,7 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
             fetchOptions
         }
 
-        return {
+        const defaultClients = {
             shopperBaskets: new ShopperBaskets(config),
             shopperContexts: new ShopperContexts(config),
             shopperCustomers: new ShopperCustomers(config),
@@ -271,6 +274,25 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
             shopperSeo: new ShopperSEO(config),
             shopperStores: new ShopperStores(config)
         }
+
+        // Apply transformations to default clients if needed
+        if (onResponse) {
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
+            const {children, ...restProps} = props
+            const transformedClients: Record<string, any> = {}
+
+            Object.entries(defaultClients).forEach(([key, client]) => {
+                transformedClients[key] = transformSDKClient(client as any, {
+                    props: restProps,
+                    transformer: _defaultTransformer,
+                    onResponse
+                })
+            })
+
+            return transformedClients as ApiClients
+        }
+
+        return defaultClients
     }, [
         clientId,
         organizationId,
@@ -281,7 +303,8 @@ const CommerceApiProvider = (props: CommerceApiProviderProps): ReactElement => {
         locale,
         currency,
         headers?.['correlation-id'],
-        apiClients
+        apiClients,
+        onResponse
     ])
 
     // Initialize the session

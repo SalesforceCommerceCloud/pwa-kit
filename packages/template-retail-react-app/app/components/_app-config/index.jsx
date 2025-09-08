@@ -99,6 +99,38 @@ const AppConfig = ({children, locals = {}}) => {
         ? passwordlessCallback
         : `${appOrigin}${getEnvBasePath()}${passwordlessCallback}`
 
+    // Function to process response headers from Commerce API calls
+    const handleCommerceApiResponse = (response, methodName) => {
+        console.log(`--- Raw response object for ${methodName}:`, response)
+        console.log(`--- Response type:`, typeof response)
+        console.log(`--- Response headers:`, response?.headers)
+
+        if (!response || !response.headers) {
+            console.warn(`--- No response or headers for ${methodName}`)
+            return
+        }
+
+        console.log(`--- Commerce API Response for ${methodName}`, {
+            status: response.status,
+            statusText: response.statusText,
+            headers: Object.fromEntries(response.headers.entries()),
+            url: response.url
+        })
+
+        // Example: Process specific headers
+        const serverTiming = response.headers.get('server-timing')
+        if (serverTiming) {
+            // NOTE: we won't see any API timing because the feature is not released yet
+            console.log(`--- Server Timing for ${methodName}:`, serverTiming)
+        }
+
+        const correlationId =
+            response.headers.get('x-correlation-id') || response.headers.get('correlation-id')
+        if (correlationId) {
+            console.log(`--- Correlation ID for ${methodName}:`, correlationId)
+        }
+    }
+
     return (
         <CommerceApiProvider
             shortCode={commerceApiConfig.parameters.shortCode}
@@ -119,6 +151,7 @@ const AppConfig = ({children, locals = {}}) => {
             // Uncomment 'hybridAuthEnabled' if the current site has Hybrid Auth enabled. Do NOT set this flag for hybrid storefronts using Plugin SLAS.
             // hybridAuthEnabled={true}
             logger={createLogger({packageName: 'commerce-sdk-react'})}
+            onResponse={handleCommerceApiResponse}
         >
             <MultiSiteProvider site={locals.site} locale={locals.locale} buildUrl={locals.buildUrl}>
                 <StoreLocatorProvider config={storeLocatorConfig}>
