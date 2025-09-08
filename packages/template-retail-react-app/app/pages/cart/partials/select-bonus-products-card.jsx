@@ -21,6 +21,7 @@ import {useBonusProductSelectionModalContext} from '../../../hooks/use-bonus-pro
  * @param {Function} props.getPromotionCalloutText - Function to get promotion text
  * @param {Function} props.onSelectBonusProducts - Callback when select bonus products button is clicked
  * @param {Object} props.bonusDiscountLineItem - Optional: specific bonus discount line item to use for calculations
+ * @param {boolean} props.hideSelectionCounter - Optional: if true, hides the selection counter in promotion text
  * @returns {JSX.Element} The select bonus products card
  */
 const SelectBonusProductsCard = ({
@@ -31,7 +32,8 @@ const SelectBonusProductsCard = ({
     isEligible,
     getPromotionCalloutText,
     onSelectBonusProducts,
-    bonusDiscountLineItem
+    bonusDiscountLineItem,
+    hideSelectionCounter = false
 }) => {
 
     const {onOpen: openBonusSelectionModal} = useBonusProductSelectionModalContext()
@@ -102,12 +104,14 @@ const SelectBonusProductsCard = ({
                     // Show selection stats based on available data
                     let selectionText = ''
 
-                    if (maxBonusItems > 0) {
-                        // We have actual bonus discount line items with max limits
-                        selectionText = ` (${selectedItems} of ${maxBonusItems} selected)`
-                    } else if (isEligible && selectedItems === 0) {
-                        // Product is eligible but no bonus items selected yet
-                        selectionText = ` (0 selected)`
+                    if (!hideSelectionCounter) {
+                        if (maxBonusItems > 0) {
+                            // We have actual bonus discount line items with max limits
+                            selectionText = ` (${selectedItems} of ${maxBonusItems} selected)`
+                        } else if (isEligible && selectedItems === 0) {
+                            // Product is eligible but no bonus items selected yet
+                            selectionText = ` (0 selected)`
+                        }
                     }
                     const combinedText = promoText + selectionText
 
@@ -187,7 +191,8 @@ SelectBonusProductsCard.propTypes = {
         promotionId: PropTypes.string.isRequired,
         maxBonusItems: PropTypes.number,
         bonusProducts: PropTypes.array
-    })
+    }),
+    hideSelectionCounter: PropTypes.bool
 }
 
 export default SelectBonusProductsCard

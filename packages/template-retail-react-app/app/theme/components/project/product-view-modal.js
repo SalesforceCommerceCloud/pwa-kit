@@ -8,7 +8,7 @@
 export const productViewModalTheme = {
     // Modal configuration
     modal: {
-        size: '4xl',
+        size: {base: 'full', lg: '2xl', xl: '4xl'},
         placement: 'center',
         scrollBehavior: 'inside',
         closeOnInteractOutside: false
@@ -17,12 +17,11 @@ export const productViewModalTheme = {
     // Layout spacing and positioning
     layout: {
         content: {
-            // No margin for full utilization of modal space
             margin: '0',
             borderRadius: {base: 'none', md: 'base'},
-            // Constrain height to prevent excessive modal size
-            maxHeight: '85vh',
-            overflowY: 'auto'
+            maxHeight: 'auto',
+            overflowY: 'visible',
+            background: 'gray.50'
         },
         body: {
             // Adequate padding for product content

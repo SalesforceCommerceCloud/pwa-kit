@@ -24,7 +24,7 @@
 export const addToCartModalTheme = {
     // Modal configuration
     modal: {
-        size: {base: 'full', lg: 'xl'},
+        size: {base: 'full', lg: '2xl', xl: '4xl'},
         placement: 'center',
         scrollBehavior: 'inside'
     },
@@ -32,10 +32,10 @@ export const addToCartModalTheme = {
     // Layout spacing and positioning
     layout: {
         content: {
-            margin: {base: '0', lg: '8'},
-            borderRadius: {base: 'none', md: 'lg'},
-            maxHeight: {base: '100vh', lg: '85vh'},
-            overflowY: 'auto'
+            margin: '0',
+            borderRadius: {base: 'none', md: 'base'},
+            maxHeight: 'auto',
+            overflowY: 'visible'
         },
         header: {
             paddingY: 8,

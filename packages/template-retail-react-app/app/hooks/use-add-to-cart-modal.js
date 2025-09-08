@@ -356,6 +356,7 @@ export const AddToCartModal = () => {
                                                     remainingBonusProductsData.aggregatedMaxBonusItems,
                                                 bonusProducts: remainingBonusProductsData.bonusItems
                                             }}
+                                            hideSelectionCounter={true} // Hide "(0 of 2 selected)" from promotion text
                                         />
                                     )
                                 })()}
