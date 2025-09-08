@@ -164,7 +164,6 @@ const AppConfig = ({children, locals = {}}) => {
 }
 
 AppConfig.restore = (locals = {}) => {
-    console.log('--- locals in AppConfig.restore', locals)
     const path =
         typeof window === 'undefined'
             ? locals.originalUrl

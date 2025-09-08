@@ -186,7 +186,6 @@ export const transformSDKClient = <T extends Record<string, (...args: any[]) => 
 
             return async function (options: any = {}) {
                 try {
-                    console.log('--- method options', options)
                     if (transformer) {
                         options = await Promise.resolve(transformer(props, methodName, options))
                     }
@@ -197,10 +196,6 @@ export const transformSDKClient = <T extends Record<string, (...args: any[]) => 
                         const rawResponse = await originalMethod.call(target, options, {
                             rawResponse: true
                         })
-
-                        console.log(`--- SDK rawResponse for ${methodName}:`, rawResponse)
-                        console.log(`--- SDK rawResponse type:`, typeof rawResponse)
-                        console.log(`--- SDK rawResponse headers:`, rawResponse?.headers)
 
                         // Process the response headers
                         onResponse(rawResponse, methodName)
