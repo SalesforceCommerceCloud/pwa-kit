@@ -182,7 +182,8 @@ const ShopperAgentWindow = ({commerceAgentConfiguration}) => {
                     const authToken = await getTokenWhenReady()
                     sendExpressMessage('express.actualCustomerData', {
                         customerId,
-                        authToken
+                        authToken,
+                        refreshToken
                     })
                 }
             } catch (error) {

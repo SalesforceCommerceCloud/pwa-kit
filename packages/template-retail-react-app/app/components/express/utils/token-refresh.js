@@ -30,7 +30,7 @@ const requestTokenRefreshFromParent = () => {
             if (event.data && event.data.type === 'authDataAvailable') {
                 clearTimeout(timeout)
                 window.removeEventListener('message', messageHandler)
-                
+
                 const authData = event.data.data.authData
                 if (authData.authToken) {
                     resolve({
@@ -45,7 +45,7 @@ const requestTokenRefreshFromParent = () => {
 
         // Add temporary message listener
         window.addEventListener('message', messageHandler)
-        
+
         // Request token refresh from parent
         sendExpressMessage(EXPRESS_MESSAGES.TOKEN_REFRESH_NEEDED, {})
     })
@@ -61,22 +61,23 @@ const requestTokenRefreshFromParent = () => {
 export const makeAuthenticatedRequest = async (requestFunction, authToken, onTokenUpdate) => {
     // First attempt with current token
     let response = await requestFunction(authToken)
-    
+
     // If we get a 401, request token refresh from parent
     if (response.status === 401) {
         try {
             console.log('🔄 Request failed with 401, requesting token refresh from parent...')
-            const {authToken: newAuthToken, refreshToken: newRefreshToken} = await requestTokenRefreshFromParent()
-            
+            const {authToken: newAuthToken, refreshToken: newRefreshToken} =
+                await requestTokenRefreshFromParent()
+
             // Update tokens in the parent component if callback provided
             if (onTokenUpdate) {
                 onTokenUpdate(newAuthToken, newRefreshToken)
             }
-            
+
             // Retry the request with the new token
             console.log('✅ Token refreshed successfully, retrying request...')
             response = await requestFunction(newAuthToken)
-            
+
             if (response.ok) {
                 console.log('✅ Retry after token refresh succeeded')
             } else {
@@ -87,7 +88,7 @@ export const makeAuthenticatedRequest = async (requestFunction, authToken, onTok
             // Return the original 401 response since refresh failed
         }
     }
-    
+
     return response
 }
 
@@ -110,6 +111,6 @@ export const fetchWithTokenRefresh = async (url, options, authToken, onTokenUpda
         }
         return fetch(url, requestOptions)
     }
-    
+
     return makeAuthenticatedRequest(requestFunction, authToken, onTokenUpdate)
 }
