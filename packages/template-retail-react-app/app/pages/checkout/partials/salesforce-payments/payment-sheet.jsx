@@ -17,8 +17,6 @@ import {
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 import AddressDisplay from '@salesforce/retail-react-app/app/components/address-display'
 import {useForm} from 'react-hook-form'
-import PropTypes from 'prop-types'
-
 import {usePaymentScripts} from '../../../../hooks/salesforce-payments/use-payment-scripts'
 import {useSalesforcePayments} from '../../../../hooks/salesforce-payments/use-salesforce-payments'
 import {useCheckout} from '@salesforce/retail-react-app/app/pages/checkout/util/checkout-context'
@@ -183,7 +181,6 @@ const SFPaymentsSheet = ({paymentState}) => {
     const [sfpComponentCreated, setSfpComponentCreated] = useState(false)
     const [billingSameAsShipping, setBillingSameAsShipping] = useState(true)
 
-    // Form and mutations
     const selectedShippingAddress = basket?.shipments?.[0]?.shippingAddress
     const selectedBillingAddress = basket?.billingAddress
     const appliedPayment = basket?.paymentInstruments?.[0]
