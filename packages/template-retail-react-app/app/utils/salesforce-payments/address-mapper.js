@@ -43,8 +43,12 @@ const mapAddressToSFPFormat = (address, options = {}) => {
     if (address.postalCode) {
         details.address.postal_code = address.postalCode
     }
-    if (address.countryCode?.value) {
-        details.address.country = address.countryCode.value
+
+    if (address.countryCode) {
+        // Handle both direct string and object formats
+        details.address.country = typeof address.countryCode === 'string' 
+        ? address.countryCode 
+        : address.countryCode.value || address.countryCode
     }
 
     return details

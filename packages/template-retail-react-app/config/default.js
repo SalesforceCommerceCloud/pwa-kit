@@ -53,8 +53,10 @@ module.exports = {
         commerceAPI: {
             proxyPath: `/mobify/proxy/api`,
             parameters: {
-                clientId: 'ea168ae1-3a5d-4676-b637-27bf8bf1b6fc',
-                organizationId: 'f_ecom_zyoe_002',
+                //clientId: 'ea168ae1-3a5d-4676-b637-27bf8bf1b6fc',
+                //organizationId: 'f_ecom_zyoe_002',
+                clientId: 'e7c5bcbc-4028-41dd-9e4e-3afa8c8e26ba',
+                organizationId: 'f_ecom_zyoe_003',
                 shortCode: 'sandbox-001', // Match this with proxy host
                 siteId: 'RefArch'
             }

@@ -1,21 +1,17 @@
 // hooks/use-payment-scripts.js
 import {useEffect, useState} from 'react'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
-
+import { buildStaticResourceBaseUrl } from '../../utils/salesforce-payments/static-resource-utils.js'
 
 // Helper function to build the SFP script URL for unified domains
 const buildSFPScriptUrl = () => {
-    const config = getConfig()
-    const { organizationId, siteId } = config.app.commerceAPI.parameters
-    
-    // Extract the instance identifier from organizationId (f_ecom_zyoe_002 -> zyoe-002)
-    const instanceId = organizationId.replace('f_ecom_', '').replace('_', '-')
-    
-    // Build the unified domain URL
-    // Format: https://{instanceId}.unified.demandware.net/on/demandware.static/Sites-{siteId}/-/-/internal/jscript/sfp/v1/sfp.js
-    //return `https://${instanceId}.unified.demandware.net/on/demandware.static/Sites-${siteId}/-/-/internal/jscript/sfp/v1/sfp.js`
-    
-    //temporary code
+
+
+       
+    const baseUrl = buildStaticResourceBaseUrl()
+    const scriptUrl = `${baseUrl}/jscript/sfp/v1/sfp.js`
+    //return metadataUrl               
+    //temporary code until sfp chunks load correctly
     return `https://localhost/on/demandware.static/Sites-Site/-/-/internal/jscript/sfp/v1/sfp.js`
 }
 
