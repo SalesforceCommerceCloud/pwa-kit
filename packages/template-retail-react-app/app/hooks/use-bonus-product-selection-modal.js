@@ -375,23 +375,30 @@ export const BonusProductSelectionModal = () => {
                                 </Text>
                             ) : (
                                 <VStack spacing="4">
-                                    <SimpleGrid columns={{base: 1, md: 3}} spacing="4" width="100%">
-                                        {uniqueBonusProducts.map((product) => {
-                                            const foundProductData = productData?.data?.find(
-                                                (p) => p.id === product.productId
-                                            )
-                                            return (
-                                                <BonusProductItem
-                                                    key={product.productId}
-                                                    product={product}
-                                                    productData={foundProductData}
-                                                    foundProductData={foundProductData}
-                                                    onSelect={switchToProductView}
-                                                    isLoading={isLoading}
-                                                />
-                                            )
-                                        })}
-                                    </SimpleGrid>
+                                    <Box 
+                                        maxHeight={{base: "60vh", md: "70vh"}} 
+                                        overflowY="auto" 
+                                        width="100%"
+                                        px="1"
+                                    >
+                                        <SimpleGrid columns={{base: 1, md: 3}} spacing="4" width="100%">
+                                            {uniqueBonusProducts.map((product) => {
+                                                const foundProductData = productData?.data?.find(
+                                                    (p) => p.id === product.productId
+                                                )
+                                                return (
+                                                    <BonusProductItem
+                                                        key={product.productId}
+                                                        product={product}
+                                                        productData={foundProductData}
+                                                        foundProductData={foundProductData}
+                                                        onSelect={switchToProductView}
+                                                        isLoading={isLoading}
+                                                    />
+                                                )
+                                            })}
+                                        </SimpleGrid>
+                                    </Box>
                                 </VStack>
                             )}
                         </ModalBody>
