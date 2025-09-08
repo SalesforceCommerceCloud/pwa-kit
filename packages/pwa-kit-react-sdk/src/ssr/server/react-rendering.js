@@ -241,6 +241,7 @@ const performRender = async (req, res, next) => {
     res.__performanceTimer.log()
 
     if (shouldTrackPerformance(req)) {
+        // NOTE: this is where the finish line is
         res.setHeader('Server-Timing', res.__performanceTimer.buildServerTimingHeader())
         // Override cache-control header to no caching when __server_timing is used
         // This happens after React rendering is complete, ensuring it overrides any
@@ -270,6 +271,8 @@ export const render = (req, res, next) => {
 
 const OuterApp = ({req, res, error, App, appState, routes, routerContext, location}) => {
     const AppConfig = getAppConfig()
+    res.locals.__performanceTimer = res.__performanceTimer
+
     return (
         <ServerContext.Provider value={{req, res}}>
             <Router location={location} context={routerContext}>

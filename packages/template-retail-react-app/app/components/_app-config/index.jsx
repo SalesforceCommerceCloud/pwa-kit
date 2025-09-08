@@ -122,6 +122,10 @@ const AppConfig = ({children, locals = {}}) => {
         if (serverTiming) {
             // NOTE: we won't see any API timing because the feature is not released yet
             console.log(`--- Server Timing for ${methodName}:`, serverTiming)
+
+            // TODO: for each API call,
+            // - collect its server timing with `locals.__performanceTimer.someNewMethod`
+            // - process the api timing somehow, so that the end result is: our html response header will have its own timing header that includes info re: the api calls
         }
 
         const correlationId =
