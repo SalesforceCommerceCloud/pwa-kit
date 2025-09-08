@@ -72,11 +72,11 @@ class CreateAppGuidelinesTool {
     name = 'create_storefront_app'
     description = `
     
-This tool is used to provide the agent with the instructions on how to use the @salesforce/pwa-kit-create-app CLI tool to create a new PWA Kit projects.
+This tool is used to provide the agent with the instructions on how to use the @salesforce/pwa-kit-create-app CLI tool to create a new PWA Kit project.
 
 Do not attempt to create a project without using this tool first.
 
-Example Triggers:
+Example prompts:
 - "Create a new PWA Kit app"
 - "Start a new storefront using a preset"
 - "What templates are available for PWA Kit?"
