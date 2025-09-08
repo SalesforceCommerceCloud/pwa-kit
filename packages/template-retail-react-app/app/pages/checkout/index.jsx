@@ -42,6 +42,7 @@ import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import {useMultiship} from '@salesforce/retail-react-app/app/hooks/use-multiship'
 
 import SFPaymentsSheet from '@salesforce/retail-react-app/app/pages/checkout/partials/salesforce-payments/payment-sheet'
+import SFPaymentsExpress from '@salesforce/retail-react-app/app/pages/checkout/partials/salesforce-payments/payment-express'
 import {usePaymentConfigManager} from '@salesforce/retail-react-app/app/hooks/salesforce-payments/use-payment-config-manager'
 import {usePaymentSheetSubmission} from '@salesforce/retail-react-app/app/pages/checkout/partials/salesforce-payments/payment-sheet'
 
@@ -135,6 +136,11 @@ const Checkout = () => {
                                     <AlertIcon />
                                     {error}
                                 </Alert>
+                            )}
+                        
+                            {/* ✅ Show SFP Express if enabled */}
+                            {isPaymentsConfigReady && isSFPEnabled && (
+                                <SFPaymentsExpress paymentState={paymentConfigState} />
                             )}
 
                             <ContactInfo
