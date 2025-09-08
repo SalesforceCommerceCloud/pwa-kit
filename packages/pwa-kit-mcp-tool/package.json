@@ -1,0 +1,29 @@
+{
+  "name": "@salesforce/pwa-kit-mcp-tool",
+  "version": "1.0.0",
+  "description": "MCP tool for PWA Kit theming and component management",
+  "main": "src/index.js",
+  "bin": {
+    "pwa-kit-mcp-tool": "./src/index.js"
+  },
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "nodemon src/index.js"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^0.4.0",
+    "glob": "^10.3.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.0"
+  },
+  "keywords": [
+    "mcp",
+    "pwa-kit",
+    "theming",
+    "salesforce",
+    "commerce"
+  ],
+  "author": "Salesforce",
+  "license": "BSD-3-Clause"
+}

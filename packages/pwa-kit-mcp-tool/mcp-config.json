@@ -1,0 +1,15 @@
+{
+  "mcpServers": {
+    "github": {
+      "command": "docker run -i --rm -e GITHUB_PERSONAL_ACCESS_TOKEN=your_token_here ghcr.io/github/github-mcp-server:latest",
+      "args": []
+    },
+    "theming": {
+      "command": "node",
+      "args": ["packages/pwa-kit-mcp-tool/src/index.js"],
+      "env": {
+        "NODE_ENV": "development"
+      }
+    }
+  }
+}
