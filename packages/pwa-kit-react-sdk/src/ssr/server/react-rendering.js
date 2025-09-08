@@ -261,6 +261,10 @@ const performRender = async (req, res, next) => {
 }
 
 export const render = (req, res, next) => {
+    // NOTE: on the architecture:
+    // - the timing header logic starts here and also ends somewhere in the same file
+    // - since the api calls happen in commerce-sdk-react, there we have a callback/prop `onResponse` that gives you the raw response, which includes headers like server-timing
+    // - the AppConfig in retail-react-app will be the glue that implements the onResponse callback
     res.__performanceTimer = new PerformanceTimer({enabled: shouldTrackPerformance(req)})
     if (shouldTrackPerformance(req)) {
         return tracePerformance('ssr.render', () => performRender(req, res, next), res, req)
