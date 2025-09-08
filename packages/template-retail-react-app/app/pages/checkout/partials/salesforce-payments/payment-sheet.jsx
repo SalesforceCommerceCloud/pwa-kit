@@ -30,6 +30,7 @@ import {usePaymentProcessing} from '../../../../hooks/salesforce-payments/use-pa
 import {getAddressDetails} from '../../../../utils/salesforce-payments/address-mapper'
 import PaymentSheetForm from '../../../../components/salesforce-payments/paymentSheetForm'
 import {useShopperOrdersMutation} from '@salesforce/commerce-sdk-react'
+import {useCountryDetection} from '../../../../utils/salesforce-payments/country-detection'
 
 // Module-level storage for paymentSheet
 let paymentSheetInstance = null
@@ -38,14 +39,26 @@ let confirmPaymentFunction = null
 
 //TODO: need to address the payment method id issue with ECOM
 const paymentMethodIdSFP ="SALESFORCE_PAYMENTS";
+//const paymentMethodIdSFP ="CREDIT_CARD";
 
 export const usePaymentSheetSubmission = () => {
     const {processPayment, isProcessing} = usePaymentProcessing()
-    const {data: basket} = useCurrentBasket()
+    
     // ✅ Add the mutation hook to update the payment instrument
     const {mutateAsync: updatePaymentInstrument} = useShopperOrdersMutation('updatePaymentInstrumentForOrder')
     // ✅ Add the mutation hook to create an order
     const {mutateAsync: createOrder} = useShopperOrdersMutation('createOrder')
+    
+    const {data: basket} = useCurrentBasket()
+
+    const {country: detectedCountry} = useCountryDetection()
+    // ✅ Get country directly from address when available
+    const getCountryForPayment = (basket, fallbackCountry) => {
+        return basket?.billingAddress?.countryCode || 
+            basket?.shipments?.[0]?.shippingAddress?.countryCode || 
+            fallbackCountry
+    }
+    //const detectedCountry = 'US'
 
     // ✅ Store order info from API calls
     let orderInfoFromAPI = null
@@ -119,11 +132,14 @@ export const usePaymentSheetSubmission = () => {
         }
         
         try {
+          
             // ✅ Checkout-specific logic: get addresses from basket
             const {billing, shipping} = getAddressDetails(basket)
-            billing.email = "test@test.com"
-            billing.address.country = "US"
-            
+            // Apply country fallback if needed
+            if (!billing.address?.country) {
+                billing.address.country = detectedCountry
+            }
+
             const paymentResult = await confirmPaymentFunction(createPaymentIntent, billing, {})
 
             // (You'll need to check the exact structure of paymentResult)
@@ -297,7 +313,7 @@ const SFPaymentsSheet = ({paymentState}) => {
             )}
             <ToggleCard
                 id="step-3"
-                //title={intl.formatMessage({defaultMessage: 'Payment', id: 'checkout_payment.title.payment'})}
+                title={intl.formatMessage({defaultMessage: 'Payment', id: 'checkout_payment.title.payment'})}
                 editing={step === STEPS.PAYMENT}
                 disabled={appliedPayment == null}
                 onEdit={() => goToStep(STEPS.PAYMENT)}

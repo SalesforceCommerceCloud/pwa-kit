@@ -25,7 +25,10 @@ import {getRuntime} from '@salesforce/pwa-kit-runtime/ssr/server/express'
 import {defaultPwaKitSecurityHeaders} from '@salesforce/pwa-kit-runtime/utils/middleware'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import {getAppOrigin} from '@salesforce/pwa-kit-react-sdk/utils/url'
-import https from 'https'  // SF Payments - need this for the proxy processing of metadata
+
+// SF Payments - need this for the proxy processing of metadata
+import https from 'https' 
+import { buildStaticResourceBaseUrl } from './utils/salesforce-payments/static-resource-utils.js'
 
 const config = getConfig()
 
@@ -320,7 +323,11 @@ const {handler} = runtime.createHandler(options, (app) => {
                     'script-src': [
                         // Used by the service worker in /worker/main.js
                         'storage.googleapis.com',
-                         // ✅ Allow scripts for SFP development
+                        
+                        // ✅ Cover SF Payments all Commerce Cloud environments
+                        '*.unified.demandware.net',           // Sandbox
+                        '*.dx.commercecloud.salesforce.com',  // Production (newer)
+                        '*.demandware.net',                    // Production (legacy) + Staging
                         '*.stripe.com',
                         '*.paypal.com'
                     ],
@@ -411,22 +418,18 @@ const {handler} = runtime.createHandler(options, (app) => {
 
     app.get('/api/payment-metadata', async (req, res) => {
         try {
-            const proxyConfigs = config.ssrParameters.proxyConfigs
-            if (!proxyConfigs) {
-                throw new Error('proxyConfigs not found in configuration')
-            }
-            
-            const ocapiProxy = proxyConfigs.find(p => p.path === 'ocapi')
-            if (!ocapiProxy) {
-                throw new Error('OCAPI proxy configuration not found')
-            }
-
+            const baseUrl = buildStaticResourceBaseUrl()
+            const metadataUrl = `${baseUrl}/metadata/v1.json`
+            // Parse the URL to extract hostname and path
+            const url = new URL(metadataUrl)
+        
             // Use Node's https module instead of fetch
             const data = await new Promise((resolve, reject) => {
                 const options = {
-                    //hostname: ocapiProxy.host,
-                    hostname: '127.0.0.1',  // Temporary code -> Newer Node.js versions prefer IPv6 (::1) over IPv4 (127.0.0.1)
-                    path: '/on/demandware.static/Sites-Site/-/-/internal/metadata/v1.json',
+                    hostname: url.hostname,
+                        //hostname: '127.0.0.1',  // Temporary code -> Newer Node.js versions prefer IPv6 (::1) over IPv4 (127.0.0.1)
+                        //path: '/on/demandware.static/Sites-Site/-/-/internal/metadata/v1.json',
+                    path: url.pathname,
                     method: 'GET',
                     rejectUnauthorized: false, // This bypasses SSL verification
                     headers: {
