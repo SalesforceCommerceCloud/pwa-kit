@@ -4,18 +4,16 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-// Tests cannot run if this require is converted to an import
-/* eslint-disable @typescript-eslint/no-var-requires */
-const request = require('supertest')
-const {LambdaClient, InvokeCommand} = require('@aws-sdk/client-lambda')
-const {S3Client, GetObjectCommand} = require('@aws-sdk/client-s3')
-const {
+import request from 'supertest'
+import {LambdaClient, InvokeCommand} from '@aws-sdk/client-lambda'
+import {S3Client, GetObjectCommand} from '@aws-sdk/client-s3'
+import {
     CloudWatchLogsClient,
     CreateLogStreamCommand,
     AccessDeniedException
-} = require('@aws-sdk/client-cloudwatch-logs')
-const {mockClient} = require('aws-sdk-client-mock')
-const {ServiceException} = require('@smithy/smithy-client')
+} from '@aws-sdk/client-cloudwatch-logs'
+import {mockClient} from 'aws-sdk-client-mock'
+import {ServiceException} from '@smithy/smithy-client'
 
 class AccessDenied extends ServiceException {
     constructor(options) {
@@ -28,7 +26,7 @@ describe('server', () => {
     const lambdaMock = mockClient(LambdaClient)
     const s3Mock = mockClient(S3Client)
     const logsMock = mockClient(CloudWatchLogsClient)
-    beforeEach(() => {
+    beforeEach(async () => {
         originalEnv = process.env
         process.env = Object.assign({}, process.env, {
             MRT_ALLOW_COOKIES: 'true',
@@ -41,7 +39,7 @@ describe('server', () => {
             AWS_REGION: 'us-east-2'
         })
 
-        const ssr = require('./ssr')
+        const ssr = await import('./ssr.mjs')
         app = ssr.app
         server = ssr.server
         lambdaMock.reset()

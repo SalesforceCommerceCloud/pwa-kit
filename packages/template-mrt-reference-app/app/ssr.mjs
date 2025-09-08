@@ -37,12 +37,15 @@
  * where BUNDLE_NUMBER is the most recently published bundle number.
  */
 
-const path = require('path')
-const {getRuntime} = require('@salesforce/pwa-kit-runtime/ssr/server/express')
-const pkg = require('../package.json')
-const basicAuth = require('express-basic-auth')
-const fetch = require('cross-fetch')
-const {isolationTests} = require('./isolation-actions')
+import path from 'path'
+import {getRuntime} from '@salesforce/pwa-kit-runtime/ssr/server/express'
+import {readFileSync} from 'fs'
+import basicAuth from 'express-basic-auth'
+import fetch from 'cross-fetch'
+import {isolationTests} from './isolation-actions.mjs'
+
+// Use process.cwd() instead of import.meta.url for better compatibility
+const pkg = JSON.parse(readFileSync(path.join(process.cwd(), 'package.json'), 'utf8'))
 
 /**
  * Custom error class
@@ -394,7 +397,4 @@ const {handler, app, server} = runtime.createHandler(options, (app) => {
 
 // SSR requires that we export a single handler function called 'get', that
 // supports AWS use of the server that we created above.
-exports.get = handler
-exports.server = server
-
-exports.app = app
+export {handler as get, server, app}

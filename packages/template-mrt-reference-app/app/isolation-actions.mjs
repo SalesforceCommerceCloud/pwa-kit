@@ -4,11 +4,9 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-/* eslint-disable @typescript-eslint/no-var-requires */
-
-const {LambdaClient, InvokeCommand} = require('@aws-sdk/client-lambda')
-const {S3Client, GetObjectCommand} = require('@aws-sdk/client-s3')
-const {CloudWatchLogsClient, CreateLogStreamCommand} = require('@aws-sdk/client-cloudwatch-logs')
+import {LambdaClient, InvokeCommand} from '@aws-sdk/client-lambda'
+import {S3Client, GetObjectCommand} from '@aws-sdk/client-s3'
+import {CloudWatchLogsClient, CreateLogStreamCommand} from '@aws-sdk/client-cloudwatch-logs'
 
 export const isolationOriginLambdaTest = async (input) => {
     const client = new LambdaClient()

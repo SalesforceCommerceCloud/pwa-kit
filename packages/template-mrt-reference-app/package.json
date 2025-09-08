@@ -22,7 +22,8 @@
     "aws-sdk-client-mock": "^3.0.0",
     "cross-fetch": "^3.1.4",
     "express-basic-auth": "^1.2.0",
-    "supertest": "^4.0.2"
+    "supertest": "^4.0.2",
+    "webpack-node-externals": "^3.0.0"
   },
   "engines": {
     "node": "^16.11.0 || ^18.0.0 || ^20.0.0 || ^22.0.0",
@@ -40,8 +41,8 @@
       ]
     },
     "ssrOnly": [
-      "ssr.js",
-      "ssr.js.map",
+      "ssr.mjs",
+      "ssr.mjs.map",
       "node_modules/**/*.*"
     ],
     "ssrShared": [
