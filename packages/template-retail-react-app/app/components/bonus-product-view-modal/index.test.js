@@ -20,12 +20,20 @@ jest.mock('@salesforce/retail-react-app/app/hooks/use-navigation', () => jest.fn
 
 // Mock ProductView to test maxOrderQuantity prop functionality
 jest.mock('@salesforce/retail-react-app/app/components/product-view', () => {
-    const MockProductView = function ({maxOrderQuantity}) {
+    const MockProductView = ({maxOrderQuantity, addToCart}) => {
+        // Store addToCart for testing
+        if (addToCart) {
+            global.addToCart = addToCart
+        }
         return <div data-testid="max-order-quantity">{maxOrderQuantity ?? 'null'}</div>
     }
+
+    // Define propTypes outside the mock factory to avoid Jest scope issues
     MockProductView.propTypes = {
-        maxOrderQuantity: PropTypes.number
+        maxOrderQuantity: PropTypes.number,
+        addToCart: PropTypes.func
     }
+
     return MockProductView
 })
 
@@ -76,4 +84,26 @@ describe('BonusProductViewModal - getRemainingBonusQuantity', () => {
         // Should pass 5 - 2 = 3 to ProductView as maxOrderQuantity
         expect(screen.getByTestId('max-order-quantity')).toHaveTextContent('3')
     })
+})
+
+test('addToCart returns null', async () => {
+    // Mock successful API call
+    const mockAddItemToBasket = jest.fn().mockResolvedValue({basketId: 'test'})
+
+    // Mock commerce SDK
+    jest.doMock('@salesforce/commerce-sdk-react', () => ({
+        useShopperBasketsMutationHelper: () => ({
+            addItemToNewOrExistingBasket: mockAddItemToBasket
+        })
+    }))
+
+    useCurrentBasket.mockReturnValue({data: {}})
+
+    renderWithProviders(
+        <BonusProductViewModal product={mockProductDetail} isOpen={true} onClose={() => {}} />
+    )
+
+    // Test the addToCart function that was captured by the mock
+    const result = await global.addToCart([{variant: {}, quantity: 1}])
+    expect(result).toBeNull()
 })
