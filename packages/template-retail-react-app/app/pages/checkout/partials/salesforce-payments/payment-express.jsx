@@ -12,7 +12,7 @@ import {
 import { useSharedSFPInstance } from '../../../../hooks/salesforce-payments/use-shared-payments-sdk'
 import {useCheckout} from '@salesforce/retail-react-app/app/pages/checkout/util/checkout-context'
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
-import {createCheckoutParameters, createPaymentRequestInfo} from '../../../../utils/salesforce-payments/payment-method-mapper'
+import {createPaymentRequestInfo} from '../../../../utils/salesforce-payments/payment-method-mapper'
 import {useShopperBasketsMutation} from '@salesforce/commerce-sdk-react'
 import ShippingAddressSelection from '@salesforce/retail-react-app/app/pages/checkout/partials/shipping-address-selection'
 import {getAddressDetails} from '../../../../utils/salesforce-payments/address-mapper'
