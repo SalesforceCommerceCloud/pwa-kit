@@ -11,7 +11,7 @@ import SelectBonusProductsCard from '@salesforce/retail-react-app/app/pages/cart
 import {
     getBonusProductsInCartForProduct,
     getRemainingAvailableBonusProductsForProduct,
-    isProductEligibleForBonusProducts
+    shouldShowBonusProductSelection
 } from '@salesforce/retail-react-app/app/utils/bonus-product-utils'
 
 /**
@@ -58,14 +58,16 @@ const CartProductListWithGroupedBonusProducts = ({
                     )
                 }
 
-                // Check if product is eligible for bonus products
-                const isEligible = isProductEligibleForBonusProducts(
+                // Check if product should show bonus product selection
+                // This will return false for products that are themselves bonus products
+                const shouldShowBonusSelection = shouldShowBonusProductSelection(
+                    basket,
                     qualifyingProduct.productId,
                     productsWithPromotions
                 )
 
-                // If not eligible, render as simple card
-                if (!isEligible) {
+                // If not eligible for bonus product selection, render as simple card
+                if (!shouldShowBonusSelection) {
                     return (
                         <Box key={qualifyingProduct.itemId}>
                             {renderProductItem(qualifyingProduct, qualifyingIdx)}
@@ -90,7 +92,8 @@ const CartProductListWithGroupedBonusProducts = ({
                     const hasBonusProductsInCart = bonusProductsForThisProduct.length > 0
                     const hasRemainingCapacity =
                         remainingBonusProductsData.hasRemainingCapacity ||
-                        (isEligible && remainingBonusProductsData.aggregatedMaxBonusItems === 0)
+                        (shouldShowBonusSelection &&
+                            remainingBonusProductsData.aggregatedMaxBonusItems === 0)
 
                     return (
                         <Box
@@ -151,7 +154,7 @@ const CartProductListWithGroupedBonusProducts = ({
                                     basket={basket}
                                     productsWithPromotions={productsWithPromotions}
                                     remainingBonusProductsData={remainingBonusProductsData}
-                                    isEligible={isEligible}
+                                    isEligible={shouldShowBonusSelection}
                                     getPromotionCalloutText={getPromotionCalloutText}
                                     onSelectBonusProducts={onSelectBonusProducts}
                                 />
