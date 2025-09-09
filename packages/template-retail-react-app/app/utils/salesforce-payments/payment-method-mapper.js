@@ -165,7 +165,7 @@ export const createPaymentRequestInfo = (basket, locale = 'en-US') => {
 }
 
 /**
- * Creates SFP configuration with theme, actions, and options
+ * Creates SFP configuration for sheet with theme, actions, and options
  */
 export const createSFPConfig = (paymentConfig, options = {}) => {
     const {
@@ -185,14 +185,36 @@ export const createSFPConfig = (paymentConfig, options = {}) => {
             }
         },
         actions: {
-            createIntentFunction: createIntentFunction || function () {
-                // TODO: Implement payment intent creation
-                throw new Error('createIntentFunction not implemented')
-            },
-            updateIntentFunction: updateIntentFunction || function () {
-                // TODO: Implement payment intent update  
-                throw new Error('updateIntentFunction not implemented')
+            createIntentFunction,
+            updateIntentFunction 
+        },
+        options: {
+            useManualCapture: !paymentConfig.card_capture_automatic
+        }
+    }
+}
+
+/**
+ * Creates SFP configuration for express buttons (one-click payments)
+ */
+export const createSFPExpressConfig = (paymentConfig, options = {}) => {
+    const {
+        expressButtonClickFunction,
+        customTheme = {}
+    } = options
+
+    return {
+        theme: {
+            designTokens: {
+                'color-background': 'var(--skin-background-color-1, transparent)',
+                'input-background-color': '#ffffff',
+                'input-border': '1px solid #ced4da',
+                'input-focus-border': '1px solid rgb(96.5, 210.421875, 255)',
+                ...customTheme
             }
+        },
+        actions: {
+            expressButtonClickFunction 
         },
         options: {
             useManualCapture: !paymentConfig.card_capture_automatic

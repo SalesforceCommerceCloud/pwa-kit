@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react'
 import { 
     createPaymentMethodSet, 
-    createSFPConfig 
+    createSFPExpressConfig 
 } from '../../utils/salesforce-payments/payment-method-mapper'
 import { Box } from '@salesforce/retail-react-app/app/components/shared/ui'
 
@@ -70,7 +70,25 @@ const PaymentExpressButtons = ({
         })
     }, []) // Empty deps since it only uses refs
 
-
+    // Add this callback function before the useEffect
+    const handleExpressButtonClick = useCallback(async (paymentData) => {
+        console.log('Express button clicked with data:', paymentData)
+        try {
+            // Here you would typically:
+            // 1. Extract billing/shipping info from paymentData
+            // 2. Update basket with payment info
+            // 3. Process the payment
+            
+            console.log('Processing express payment:', paymentData)
+            
+            // For now, just log and return success
+            return { success: true }
+            
+        } catch (error) {
+            console.error('Express payment failed:', error)
+            throw error
+        }
+    }, [])
 
 
     // Create SFP component when ready
@@ -110,9 +128,12 @@ const PaymentExpressButtons = ({
                 enabledMethods
             })
         
-            const config = createSFPConfig(paymentConfig, {
-                customTheme
-            })   // Create SFP payment express
+            const config = createSFPExpressConfig(paymentConfig, {
+                customTheme,
+                expressButtonClickFunction: handleExpressButtonClick
+            }) 
+
+            // Create SFP payment express
             const paymentExpress = sfpInstance.express(
                 metadata,
                 paymentMethodSetForCheckout,
