@@ -34,13 +34,13 @@ export const getGiftCertificate: QueryKeyHelper<'getGiftCertificate'> = {
     path: (params) => [
         '/commerce-sdk-react',
         '/organizations/',
-        params.organizationId,
+        params?.organizationId,
         '/gift-certificate'
     ],
     queryKey: (params: Params<'getGiftCertificate'>) => {
         return [
             ...getGiftCertificate.path(params),
-            pickValidParams(params, ShopperGiftCertificates.paramKeys.getGiftCertificate)
+            pickValidParams(params || {}, ShopperGiftCertificates.paramKeys.getGiftCertificate)
         ]
     }
 }

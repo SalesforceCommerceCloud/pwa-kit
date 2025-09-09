@@ -52,6 +52,7 @@ import Island from '@salesforce/retail-react-app/app/components/island'
 
 // Hooks
 import {AuthModal, useAuthModal} from '@salesforce/retail-react-app/app/hooks/use-auth-modal'
+import {useStoreLocatorModal} from '@salesforce/retail-react-app/app/hooks/use-store-locator'
 import {
     DntNotification,
     useDntNotification
@@ -84,6 +85,7 @@ import {
 import Seo from '@salesforce/retail-react-app/app/components/seo'
 import ShopperAgent from '@salesforce/retail-react-app/app/components/shopper-agent'
 import {getPathWithLocale} from '@salesforce/retail-react-app/app/utils/url'
+import {getCommerceAgentConfig} from '@salesforce/retail-react-app/app/utils/config-utils'
 
 const PlaceholderComponent = () => (
     <Center p="2">
@@ -140,15 +142,16 @@ const App = (props) => {
     const authModal = useAuthModal()
     const dntNotification = useDntNotification()
     const {site, locale, buildUrl} = useMultiSite()
+    const {
+        isOpen: isStoreLocatorOpen,
+        onOpen: onOpenStoreLocator,
+        onClose: onCloseStoreLocator
+    } = useStoreLocatorModal()
+    const storeLocatorEnabled = getConfig()?.app?.storeLocatorEnabled ?? STORE_LOCATOR_IS_ENABLED
 
     const [isOnline, setIsOnline] = useState(true)
     const styles = useStyleConfig('App')
     const {isOpen, onOpen, onClose} = useDisclosure()
-    const {
-        isOpen: isOpenStoreLocator,
-        onOpen: onOpenStoreLocator,
-        onClose: onCloseStoreLocator
-    } = useDisclosure()
 
     const targetLocale = getTargetLocale({
         getUserPreferredLocales: () => {
@@ -215,8 +218,8 @@ const App = (props) => {
     }, [basket?.currency])
 
     const commerceAgentConfiguration = useMemo(() => {
-        return config.app.commerceAgent
-    }, [config?.app])
+        return getCommerceAgentConfig()
+    }, [config.app.commerceAgent])
 
     useEffect(() => {
         // update the basket customer email
@@ -374,9 +377,9 @@ const App = (props) => {
 
                         <Box id="app" display="flex" flexDirection="column" flex={1}>
                             <SkipNavLink zIndex="skipLink">Skip to Content</SkipNavLink>
-                            {STORE_LOCATOR_IS_ENABLED && (
+                            {storeLocatorEnabled && (
                                 <StoreLocatorModal
-                                    isOpen={isOpenStoreLocator}
+                                    isOpen={isStoreLocatorOpen}
                                     onClose={onCloseStoreLocator}
                                 />
                             )}

@@ -44,6 +44,49 @@ jest.mock('@salesforce/retail-react-app/app/hooks/use-selected-store', () => ({
     useSelectedStore: () => mockUseSelectedStore()
 }))
 
+// Mock useMultiship hook
+const mockUseMultiship = {
+    updateDeliveryOption: jest.fn().mockResolvedValue(undefined),
+    updateShipmentsWithoutMethods: jest.fn().mockResolvedValue(undefined),
+    findOrCreatePickupShipment: jest.fn().mockResolvedValue({shipmentId: 'pickup-shipment-2'}),
+    moveItemsToPickupShipment: jest.fn().mockResolvedValue(undefined),
+    getItemsForShipment: jest.fn(() => [])
+}
+jest.mock('@salesforce/retail-react-app/app/hooks/use-multiship', () => ({
+    useMultiship: () => mockUseMultiship
+}))
+
+// Mock useStoreLocatorModal hook
+const mockStoreLocatorModal = {
+    isOpen: false,
+    onOpen: jest.fn(),
+    onClose: jest.fn()
+}
+jest.mock('@salesforce/retail-react-app/app/hooks/use-store-locator', () => ({
+    useStoreLocatorModal: () => mockStoreLocatorModal
+}))
+
+// Mock getConfig to return test values
+import mockConfig from '@salesforce/retail-react-app/config/mocks/default'
+jest.mock('@salesforce/pwa-kit-runtime/utils/ssr-config', () => ({
+    getConfig: jest.fn(() => ({
+        ...mockConfig,
+        app: {
+            ...mockConfig.app,
+            storeLocatorEnabled: true,
+            multishipEnabled: true
+        }
+    }))
+}))
+
+jest.mock('@salesforce/retail-react-app/app/constants', () => {
+    const original = jest.requireActual('@salesforce/retail-react-app/app/constants')
+    return {
+        ...original,
+        STORE_LOCATOR_IS_ENABLED: true
+    }
+})
+
 const mockProduct = {
     ...mockVariant,
     id: '750518699660M',
@@ -174,6 +217,12 @@ beforeEach(() => {
 
         rest.get('*/promotions', (req, res, ctx) => {
             return res(ctx.delay(0), ctx.status(200), ctx.json(mockPromotions))
+        }),
+        rest.get('*/shopper-stores/v1/organizations/:organizationId/stores', (req, res, ctx) => {
+            return res(ctx.delay(0), ctx.status(200), ctx.json({}))
+        }),
+        rest.patch('*/baskets/:basketId/items/:itemId', (req, res, ctx) => {
+            return res(ctx.delay(0), ctx.status(200), ctx.json({}))
         })
     )
 })
@@ -761,8 +810,10 @@ describe('Product bundles', () => {
         const quantityElement = screen.getByRole('spinbutton', {id: 'quantity'})
         expect(quantityElement).toBeInTheDocument()
         expect(quantityElement).toHaveValue('1')
-        quantityElement.focus()
-        fireEvent.change(quantityElement, {target: {value: '4'}})
+        act(() => {
+            quantityElement.focus()
+            fireEvent.change(quantityElement, {target: {value: '4'}})
+        })
 
         await waitFor(
             () => {
@@ -1259,6 +1310,196 @@ describe('Bonus products', () => {
     })
 })
 
+describe('Delivery options', () => {
+    beforeEach(() => {
+        jest.clearAllMocks()
+        prependHandlersToServer([
+            {path: '*/customers/:customerId/baskets', res: () => mockBaskets},
+            {path: '*/products', res: () => mockProducts}
+        ])
+        mockUseMultiSite.mockReturnValue({
+            site: {id: 'site-1'},
+            buildUrl: (url) => url
+        })
+        mockUseSelectedStore.mockImplementation(() => ({
+            selectedStore: null,
+            isLoading: false,
+            error: null,
+            hasSelectedStore: false
+        }))
+    })
+    test('should render delivery options for cart items', async () => {
+        renderWithProviders(<Cart />)
+        await waitFor(() => {
+            expect(screen.getByTestId('sf-cart-container')).toBeInTheDocument()
+        })
+        const deliverySelects = await screen.findAllByTestId('delivery-option-select')
+        expect(deliverySelects.length).toBeGreaterThan(0)
+    })
+    test('opens store locator modal when "Pick up at Store" is selected and no store is selected', async () => {
+        renderWithProviders(<Cart />)
+        await waitFor(() => {
+            expect(screen.getByTestId('sf-cart-container')).toBeInTheDocument()
+        })
+        const deliverySelects = await screen.findAllByTestId('delivery-option-select')
+        fireEvent.change(deliverySelects[0], {target: {value: 'pickup'}})
+        expect(mockStoreLocatorModal.onOpen).toHaveBeenCalled()
+    })
+    test('should call handleDeliveryOptionChange when "Pick up at Store" is selected and a store is selected', async () => {
+        const mockStore = {id: 'store-1', name: 'Test Store'}
+        mockUseSelectedStore.mockImplementation(() => ({
+            selectedStore: mockStore,
+            hasSelectedStore: true
+        }))
+        renderWithProviders(<Cart />)
+        await waitFor(() => {
+            expect(screen.getByTestId('sf-cart-container')).toBeInTheDocument()
+        })
+        const deliverySelects = await screen.findAllByTestId('delivery-option-select')
+        fireEvent.change(deliverySelects[0], {target: {value: 'pickup'}})
+        expect(mockStoreLocatorModal.onOpen).not.toHaveBeenCalled()
+        await waitFor(() => expect(mockUseMultiship.updateDeliveryOption).toHaveBeenCalled())
+        const firstProductItem = mockBaskets.baskets[0].productItems[0]
+        const productData = mockProducts.data.find((p) => p.id === firstProductItem.productId)
+        expect(mockUseMultiship.updateDeliveryOption).toHaveBeenCalledWith(
+            expect.objectContaining({productId: firstProductItem.productId}),
+            true, // selectedPickup
+            mockStore,
+            productData.inventory.id
+        )
+    })
+    test('should call handleDeliveryOptionChange when "Ship to Address" is selected', async () => {
+        const basketWithPickup = {
+            ...mockBaskets.baskets[0],
+            productItems: [{...mockBaskets.baskets[0].productItems[0], shipmentId: 'bopis'}],
+            shipments: [
+                ...mockBaskets.baskets[0].shipments,
+                {
+                    shipmentId: 'bopis',
+                    shippingMethod: {id: 'pickup-method', c_storePickupEnabled: true},
+                    c_fromStoreId: 'store-1'
+                }
+            ]
+        }
+        prependHandlersToServer([
+            {
+                path: '*/customers/:customerId/baskets',
+                res: () => ({baskets: [basketWithPickup], total: 1})
+            },
+            {path: '*/products', res: () => mockProducts}
+        ])
+        renderWithProviders(<Cart />)
+        await waitFor(() => {
+            expect(screen.getByTestId('sf-cart-container')).toBeInTheDocument()
+        })
+        const deliverySelects = await screen.findAllByTestId('delivery-option-select')
+        await userEvent.selectOptions(deliverySelects[0], 'delivery')
+        expect(mockStoreLocatorModal.onOpen).not.toHaveBeenCalled()
+        expect(mockUseMultiship.updateDeliveryOption).toHaveBeenCalled()
+        const firstProductItem = basketWithPickup.productItems[0]
+        const productData = mockProducts.data.find((p) => p.id === firstProductItem.productId)
+        expect(mockUseMultiship.updateDeliveryOption).toHaveBeenCalledWith(
+            expect.objectContaining({productId: firstProductItem.productId}),
+            false, // selectedPickup
+            null,
+            productData.inventory.id
+        )
+    })
+
+    test('disables "Ship to Address" when item is for pickup and out of stock for shipping', async () => {
+        const mockProductWithNoDefaultInventory = {
+            ...mockProducts.data[0],
+            id: 'product-out-of-stock-ship',
+            inventory: {
+                ...mockProducts.data[0].inventory,
+                stockLevel: 0
+            }
+        }
+
+        const basketWithPickup = {
+            ...mockBaskets.baskets[0],
+            productItems: [
+                {
+                    ...mockBaskets.baskets[0].productItems[0],
+                    productId: 'product-out-of-stock-ship',
+                    quantity: 1,
+                    shipmentId: 'bopis'
+                }
+            ],
+            shipments: [
+                ...mockBaskets.baskets[0].shipments,
+                {
+                    shipmentId: 'bopis',
+                    shippingMethod: {id: 'pickup-method', c_storePickupEnabled: true},
+                    c_fromStoreId: 'store-1'
+                }
+            ]
+        }
+        prependHandlersToServer([
+            {
+                path: '*/customers/:customerId/baskets',
+                res: () => ({baskets: [basketWithPickup], total: 1})
+            },
+            {path: '*/products', res: () => ({data: [mockProductWithNoDefaultInventory]})}
+        ])
+        renderWithProviders(<Cart />)
+        await waitFor(() => {
+            expect(screen.getByTestId('sf-cart-container')).toBeInTheDocument()
+        })
+        const deliverySelects = await screen.findAllByTestId('delivery-option-select')
+        const shipOption = deliverySelects[0].querySelector('option[value="delivery"]')
+        const pickupOption = deliverySelects[0].querySelector('option[value="pickup"]')
+        expect(shipOption).toBeDisabled()
+        expect(pickupOption).toBeEnabled()
+    })
+
+    test('disables "Pick up at Store" when item is for shipping and out of stock for pickup', async () => {
+        const selectedStoreId = 'store-1'
+        const selectedInventoryId = 'inventory-1'
+        const mockProductWithNoPickupInventory = {
+            ...mockProducts.data[0],
+            id: 'product-out-of-stock-pickup',
+            inventories: [
+                {
+                    id: selectedInventoryId,
+                    stockLevel: 0
+                }
+            ]
+        }
+        const basketForShipping = {
+            ...mockBaskets.baskets[0],
+            productItems: [
+                {
+                    ...mockBaskets.baskets[0].productItems[0],
+                    productId: 'product-out-of-stock-pickup',
+                    quantity: 1,
+                    shipmentId: 'me'
+                }
+            ]
+        }
+        prependHandlersToServer([
+            {
+                path: '*/customers/:customerId/baskets',
+                res: () => ({baskets: [basketForShipping], total: 1})
+            },
+            {path: '*/products', res: () => ({data: [mockProductWithNoPickupInventory]})}
+        ])
+        mockUseSelectedStore.mockImplementation(() => ({
+            selectedStore: {id: selectedStoreId, inventoryId: selectedInventoryId},
+            hasSelectedStore: true
+        }))
+        renderWithProviders(<Cart />)
+        await waitFor(() => {
+            expect(screen.getByTestId('sf-cart-container')).toBeInTheDocument()
+        })
+        const deliverySelects = await screen.findAllByTestId('delivery-option-select')
+        const shipOption = deliverySelects[0].querySelector('option[value="delivery"]')
+        const pickupOption = deliverySelects[0].querySelector('option[value="pickup"]')
+        expect(shipOption).toBeEnabled()
+        expect(pickupOption).toBeDisabled()
+    })
+})
+
 describe('Unavailable products tests', function () {
     test('Remove unavailable/out of stock/low stock products from cart', async () => {
         prependHandlersToServer([
@@ -1412,5 +1653,115 @@ describe('Selected inventory ID tests', function () {
             const url = new URL(lastCall.url)
             expect(url.searchParams.get('inventoryIds')).toBe(mockInventoryId)
         })
+    })
+})
+
+describe('Change store for pickup shipment', () => {
+    const mockProduct = {id: 'product-1', name: 'Test Product'}
+    const mockStore1 = {id: 'store-1', name: 'Old Store'}
+    const mockStore2 = {id: 'store-2', name: 'New Store', inventoryId: 'inventory-2'}
+    const mockBasketWithPickup = {
+        basketId: 'basket-1',
+        currency: 'USD',
+        productItems: [
+            {
+                productId: 'product-1',
+                productName: 'Test Product',
+                itemId: 'item-1',
+                quantity: 1,
+                price: 10,
+                shipmentId: 'pickup-shipment-1',
+                inventoryId: mockStore2.inventoryId
+            }
+        ],
+        shipments: [
+            {
+                shipmentId: 'pickup-shipment-1',
+                shippingMethod: {
+                    id: 'pickup-method-1',
+                    c_storePickupEnabled: true
+                },
+                c_fromStoreId: 'store-1'
+            }
+        ],
+        orderTotal: 10,
+        productSubTotal: 10,
+        taxTotal: 0
+    }
+
+    beforeEach(() => {
+        jest.clearAllMocks()
+        const mockProductWithInventory = {
+            ...mockProduct,
+            inventories: [{id: mockStore2.inventoryId, stockLevel: 10}]
+        }
+        mockUseMultiship.getItemsForShipment.mockReturnValue(mockBasketWithPickup.productItems)
+
+        // Mock selectedStore to be mockStore2 for the change store functionality
+        mockUseSelectedStore.mockImplementation(() => ({
+            selectedStore: mockStore2,
+            isLoading: false,
+            error: null,
+            hasSelectedStore: true
+        }))
+
+        global.server.use(
+            rest.get('*/customers/:customerId/baskets', (req, res, ctx) => {
+                return res(ctx.delay(0), ctx.json({baskets: [mockBasketWithPickup], total: 1}))
+            }),
+            rest.get('*/products', (req, res, ctx) => {
+                return res(ctx.delay(0), ctx.json({data: [mockProductWithInventory]}))
+            }),
+            rest.get('*/stores', (req, res, ctx) => {
+                return res(ctx.delay(0), ctx.json({data: [mockStore1]}))
+            })
+        )
+    })
+
+    test('should move items to new pickup shipment when store is changed via modal', async () => {
+        renderWithProviders(<Cart />)
+
+        await waitFor(() => {
+            expect(screen.getByTestId('change-store-button')).toBeInTheDocument()
+        })
+
+        // Simulate clicking "Change Store"
+        fireEvent.click(screen.getByTestId('change-store-button'))
+
+        // Verify that the shipment is updated with the new store.
+        await waitFor(() => {
+            expect(mockUseMultiship.findOrCreatePickupShipment).toHaveBeenCalledWith(mockStore2)
+            const mockProductItem = mockBasketWithPickup.productItems[0]
+            expect(mockUseMultiship.moveItemsToPickupShipment).toHaveBeenCalledWith(
+                [expect.objectContaining({itemId: mockProductItem.itemId})],
+                'pickup-shipment-2',
+                mockStore2.inventoryId
+            )
+        })
+    })
+
+    test('should show error toast when moving items fails', async () => {
+        // Suppress console.error for this test
+        jest.spyOn(console, 'error').mockImplementation(jest.fn())
+
+        mockUseMultiship.moveItemsToPickupShipment.mockRejectedValue(new Error('Update failed'))
+
+        renderWithProviders(<Cart />)
+
+        await waitFor(() => {
+            expect(screen.getByTestId('change-store-button')).toBeInTheDocument()
+        })
+
+        // Simulate clicking "Change Store"
+        fireEvent.click(screen.getByTestId('change-store-button'))
+
+        // Verify that an error toast is shown.
+        await waitFor(() => {
+            expect(mockUseMultiship.findOrCreatePickupShipment).toHaveBeenCalledWith(mockStore2)
+            expect(screen.getByText(/something went wrong/i)).toBeInTheDocument()
+        })
+
+        // Restore console.error
+        console.error.mockRestore()
     })
 })

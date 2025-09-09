@@ -73,14 +73,14 @@ export const getBasket: QueryKeyHelper<'getBasket'> = {
     path: (params) => [
         '/commerce-sdk-react',
         '/organizations/',
-        params.organizationId,
+        params?.organizationId,
         '/baskets/',
-        params.basketId
+        params?.basketId
     ],
     queryKey: (params: Params<'getBasket'>) => {
         return [
             ...getBasket.path(params),
-            pickValidParams(params, ShopperBaskets.paramKeys.getBasket)
+            pickValidParams(params || {}, ShopperBaskets.paramKeys.getBasket)
         ]
     }
 }
@@ -89,15 +89,15 @@ export const getPaymentMethodsForBasket: QueryKeyHelper<'getPaymentMethodsForBas
     path: (params) => [
         '/commerce-sdk-react',
         '/organizations/',
-        params.organizationId,
+        params?.organizationId,
         '/baskets/',
-        params.basketId,
+        params?.basketId,
         '/payment-methods'
     ],
     queryKey: (params: Params<'getPaymentMethodsForBasket'>) => {
         return [
             ...getPaymentMethodsForBasket.path(params),
-            pickValidParams(params, ShopperBaskets.paramKeys.getPaymentMethodsForBasket)
+            pickValidParams(params || {}, ShopperBaskets.paramKeys.getPaymentMethodsForBasket)
         ]
     }
 }
@@ -106,15 +106,15 @@ export const getPriceBooksForBasket: QueryKeyHelper<'getPriceBooksForBasket'> = 
     path: (params) => [
         '/commerce-sdk-react',
         '/organizations/',
-        params.organizationId,
+        params?.organizationId,
         '/baskets/',
-        params.basketId,
+        params?.basketId,
         '/price-books'
     ],
     queryKey: (params: Params<'getPriceBooksForBasket'>) => {
         return [
             ...getPriceBooksForBasket.path(params),
-            pickValidParams(params, ShopperBaskets.paramKeys.getPriceBooksForBasket)
+            pickValidParams(params || {}, ShopperBaskets.paramKeys.getPriceBooksForBasket)
         ]
     }
 }
@@ -123,17 +123,17 @@ export const getShippingMethodsForShipment: QueryKeyHelper<'getShippingMethodsFo
     path: (params) => [
         '/commerce-sdk-react',
         '/organizations/',
-        params.organizationId,
+        params?.organizationId,
         '/baskets/',
-        params.basketId,
+        params?.basketId,
         '/shipments/',
-        params.shipmentId,
+        params?.shipmentId,
         '/shipping-methods'
     ],
     queryKey: (params: Params<'getShippingMethodsForShipment'>) => {
         return [
             ...getShippingMethodsForShipment.path(params),
-            pickValidParams(params, ShopperBaskets.paramKeys.getShippingMethodsForShipment)
+            pickValidParams(params || {}, ShopperBaskets.paramKeys.getShippingMethodsForShipment)
         ]
     }
 }
@@ -142,15 +142,15 @@ export const getTaxesFromBasket: QueryKeyHelper<'getTaxesFromBasket'> = {
     path: (params) => [
         '/commerce-sdk-react',
         '/organizations/',
-        params.organizationId,
+        params?.organizationId,
         '/baskets/',
-        params.basketId,
+        params?.basketId,
         '/taxes'
     ],
     queryKey: (params: Params<'getTaxesFromBasket'>) => {
         return [
             ...getTaxesFromBasket.path(params),
-            pickValidParams(params, ShopperBaskets.paramKeys.getTaxesFromBasket)
+            pickValidParams(params || {}, ShopperBaskets.paramKeys.getTaxesFromBasket)
         ]
     }
 }

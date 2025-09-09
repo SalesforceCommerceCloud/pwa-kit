@@ -69,6 +69,12 @@ const baseMobify = {
     }
 }
 
+jest.mock('./ssr-config', () => {
+    return {
+        getConfig: () => baseMobify
+    }
+})
+
 let consoleLog
 let consoleWarn
 let consoleError

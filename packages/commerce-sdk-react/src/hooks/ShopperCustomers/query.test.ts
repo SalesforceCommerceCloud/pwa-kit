@@ -58,8 +58,8 @@ const testMap: TestMap = {
     //     customerId: 'customerId',
     //     externalId: 'external'
     // },
-    useProductListItem: {id: 'id', priority: 0, type: 'thing'},
-    usePublicProductList: {id: 'id', public: true, type: 'other'},
+    useProductListItem: {id: 'id', priority: 0, type: 'product'},
+    usePublicProductList: {id: 'id', public: true, type: 'wish_list'},
     usePublicProductListsBySearchTerm: {data: [], limit: 0, total: 0}
 }
 // Type assertion is necessary because `Object.entries` is limited

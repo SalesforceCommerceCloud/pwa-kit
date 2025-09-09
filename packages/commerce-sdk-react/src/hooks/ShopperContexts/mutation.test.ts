@@ -84,7 +84,7 @@ describe('Shopper Contexts mutation hooks', () => {
         // 2. Do creation mutation
         act(() => result.current.mutation.mutate(options))
         await waitAndExpectSuccess(() => result.current.mutation)
-        expect(result.current.mutation.data).toEqual({})
+        expect(result.current.mutation.data).toBeUndefined()
 
         // FIXME: This probably isn't working because the createContext API has changes to not
         // return a value, but the SDK is returning a value anyway (empty string maybe) which is

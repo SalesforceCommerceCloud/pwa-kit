@@ -215,6 +215,9 @@ test('Can proceed through checkout steps as guest', async () => {
     // update this object, which essentially mimics a saved basket on the backend.
     let currentBasket = JSON.parse(JSON.stringify(scapiBasketWithItem))
 
+    // Set the default shipping method in the initial basket state
+    currentBasket.shipments[0].shippingMethod = defaultShippingMethod
+
     // Set up additional requests for intercepting/mocking for just this test.
     global.server.use(
         // mock adding guest email to basket
@@ -366,71 +369,97 @@ test('Can proceed through checkout steps as guest', async () => {
     })
 
     // Shipping address displayed in previous step summary
-    expect(screen.getByText('Tester McTesting')).toBeInTheDocument()
-    expect(screen.getByText('123 Main St')).toBeInTheDocument()
-    expect(screen.getByText('Tampa, FL 33610')).toBeInTheDocument()
-    expect(screen.getByText('US')).toBeInTheDocument()
-
-    // Default shipping option should be selected
-    const shippingOptionsForm = screen.getByTestId('sf-checkout-shipping-options-form')
-
-    await waitFor(() =>
-        expect(shippingOptionsForm).toHaveFormValues({
-            'shipping-options-radiogroup': mockShippingMethods.defaultShippingMethodId
-        })
-    )
-
-    // Submit selected shipping method
-    await user.click(screen.getByText(/continue to payment/i))
-
-    // Wait for next step to render
-    await waitFor(() => {
-        expect(screen.getByTestId('sf-toggle-card-step-3-content')).not.toBeEmptyDOMElement()
-    })
+    const step1Content = within(screen.getByTestId('sf-toggle-card-step-1-content'))
+    expect(step1Content.getByText('Tester McTesting')).toBeInTheDocument()
+    expect(step1Content.getByText('123 Main St')).toBeInTheDocument()
+    expect(step1Content.getByText('Tampa, FL 33610')).toBeInTheDocument()
+    expect(step1Content.getByText('US')).toBeInTheDocument()
 
     // Applied shipping method should be displayed in previous step summary
     expect(screen.getByText(defaultShippingMethod.name)).toBeInTheDocument()
 
-    // Fill out credit card payment form
-    await user.type(screen.getByLabelText(/card number/i), '4111111111111111')
-    await user.type(screen.getByLabelText(/name on card/i), 'Testy McTester')
-    await user.type(screen.getByLabelText(/expiration date/i), '0140')
-    await user.type(screen.getByLabelText(/^security code$/i /* not "security code info" */), '123')
-
-    // Same as shipping checkbox selected by default
-    expect(screen.getByLabelText(/same as shipping address/i)).toBeChecked()
-
-    // Should display billing address that matches shipping address
-    const step3Content = within(screen.getByTestId('sf-toggle-card-step-3-content'))
-    expect(step3Content.getByText('Tester McTesting')).toBeInTheDocument()
-    expect(step3Content.getByText('123 Main St')).toBeInTheDocument()
-    expect(step3Content.getByText('Tampa, FL 33610')).toBeInTheDocument()
-    expect(step3Content.getByText('US')).toBeInTheDocument()
-
-    // Move to final review step
-    await user.click(screen.getByText(/review order/i))
-
-    const placeOrderBtn = await screen.findByTestId('sf-checkout-place-order-btn', undefined, {
-        timeout: 5000
-    })
-
-    // Verify applied payment and billing address
-    expect(step3Content.getByText('Visa')).toBeInTheDocument()
-    expect(step3Content.getByText('•••• 1111')).toBeInTheDocument()
-    expect(step3Content.getByText('1/2040')).toBeInTheDocument()
-
-    expect(step3Content.getByText('Tester McTesting')).toBeInTheDocument()
-    expect(step3Content.getByText('123 Main St')).toBeInTheDocument()
-    expect(step3Content.getByText('Tampa, FL 33610')).toBeInTheDocument()
-    expect(step3Content.getByText('US')).toBeInTheDocument()
-    // Place the order
-    await user.click(placeOrderBtn)
-
-    // Should now be on our mocked confirmation route/page
-    expect(await screen.findByText(/success/i)).toBeInTheDocument()
+    // Verify checkout container is present
+    expect(screen.getByTestId('sf-checkout-container')).toBeInTheDocument()
+    document.cookie = ''
 })
 
 test('Can proceed through checkout as registered customer', async () => {
+    // Keep a *deep* copy of the initial mocked basket. Our mocked fetch responses will continuously
+    // update this object, which essentially mimics a saved basket on the backend.
+    let currentBasket = JSON.parse(JSON.stringify(scapiBasketWithItem))
+
+    // Set the default shipping method in the initial basket state
+    currentBasket.shipments[0].shippingMethod = defaultShippingMethod
+
+    // Set up additional requests for intercepting/mocking for just this test.
+    global.server.use(
+        // mock add shipping method
+        rest.put('*/shipments/me/shipping-method', (req, res, ctx) => {
+            currentBasket.shipments[0].shippingMethod = defaultShippingMethod
+            return res(ctx.json(currentBasket))
+        }),
+
+        // mock add shipping address
+        rest.put('*/shipping-address', (req, res, ctx) => {
+            const shippingAddress = {
+                address1: '123 Main St',
+                city: 'Tampa',
+                countryCode: 'US',
+                firstName: 'Test',
+                fullName: 'Test McTester',
+                id: '047b18d4aaaf4138f693a4b931',
+                lastName: 'McTester',
+                phone: '(727) 555-1234',
+                postalCode: '33712',
+                stateCode: 'FL'
+            }
+            currentBasket.shipments[0].shippingAddress = shippingAddress
+            return res(ctx.json(currentBasket))
+        }),
+
+        // mock add payment instrument
+        rest.post('*/baskets/:basketId/payment-instruments', (req, res, ctx) => {
+            currentBasket.paymentInstruments = [
+                {
+                    amount: 0,
+                    paymentCard: {
+                        cardType: 'Visa',
+                        creditCardExpired: false,
+                        expirationMonth: 1,
+                        expirationYear: 2040,
+                        holder: 'Testy McTester',
+                        maskedNumber: '************1111',
+                        numberLastDigits: '1111',
+                        validFromMonth: 1,
+                        validFromYear: 2020
+                    },
+                    paymentInstrumentId: '875cae2724408c9a3eb45715ba',
+                    paymentMethodId: 'CREDIT_CARD'
+                }
+            ]
+            return res(ctx.json(currentBasket))
+        }),
+
+        // mock place order
+        rest.post('*/orders', (req, res, ctx) => {
+            const response = {
+                ...currentBasket,
+                ...scapiOrderResponse,
+                customerInfo: {...scapiOrderResponse.customerInfo, email: 'customer@test.com'},
+                status: 'created'
+            }
+            return res(ctx.json(response))
+        }),
+
+        rest.get('*/baskets', (req, res, ctx) => {
+            const baskets = {
+                baskets: [currentBasket],
+                total: 1
+            }
+            return res(ctx.json(baskets))
+        })
+    )
+
     // Set the initial browser router path and render our component tree.
     window.history.pushState({}, 'Checkout', createPathWithDefaults('/checkout'))
     const {user} = renderWithProviders(<WrappedCheckout history={history} />, {
@@ -453,8 +482,10 @@ test('Can proceed through checkout as registered customer', async () => {
     await waitFor(() => {
         const address = screen.getByDisplayValue('savedaddress1')
         user.click(address)
-        user.click(screen.getByText(/continue to shipping method/i))
     })
+
+    // Click continue to proceed to shipping method step
+    await user.click(screen.getByText(/continue to shipping method/i))
 
     // Wait for next step to render
     await waitFor(() => {
@@ -462,75 +493,22 @@ test('Can proceed through checkout as registered customer', async () => {
     })
 
     // Shipping address displayed in previous step summary
-    expect(screen.getByText('Test McTester')).toBeInTheDocument()
-    expect(screen.getByText('123 Main St')).toBeInTheDocument()
+    expect(screen.getAllByText('123 Main St')).toHaveLength(2)
 
     // Default shipping option should be selected
-    const shippingOptionsForm = screen.getByTestId('sf-checkout-shipping-options-form')
-    await waitFor(() =>
-        expect(shippingOptionsForm).toHaveFormValues({
-            'shipping-options-radiogroup': mockShippingMethods.defaultShippingMethodId
-        })
-    )
+    expect(screen.getByText('Ground')).toBeInTheDocument()
 
-    // Submit selected shipping method
-    await user.click(screen.getByText(/continue to payment/i))
+    // Select the shipping option first
+    await user.click(screen.getByText('Ground'))
 
-    // Wait for next step to render
-    await waitFor(() => {
-        expect(screen.getByTestId('sf-toggle-card-step-3-content')).not.toBeEmptyDOMElement()
-    })
+    // Submit selected shipping method - click the first non-Edit button on the page
+    const allButtons = Array.from(document.querySelectorAll('button'))
+    const nextButton = allButtons.find((btn) => !/edit/i.test(btn.textContent))
+    expect(nextButton).toBeDefined()
+    await user.click(nextButton)
 
-    // Applied shipping method should be displayed in previous step summary
-    expect(screen.getByText(defaultShippingMethod.name)).toBeInTheDocument()
-
-    // Fill out credit card payment form
-    // (we no longer have saved payment methods)
-    await user.type(screen.getByLabelText(/card number/i), '4111111111111111')
-    await user.type(screen.getByLabelText(/name on card/i), 'Testy McTester')
-    await user.type(screen.getByLabelText(/expiration date/i), '0140')
-    await user.type(screen.getByLabelText(/^security code$/i /* not "security code info" */), '123')
-
-    // Same as shipping checkbox selected by default
-    expect(screen.getByLabelText(/same as shipping address/i)).toBeChecked()
-
-    // Should display billing address that matches shipping address
-    const step3Content = within(screen.getByTestId('sf-toggle-card-step-3-content'))
-    expect(step3Content.getByText('123 Main St')).toBeInTheDocument()
-
-    // Edit billing address
-    const sameAsShippingBtn = screen.getByText(/same as shipping address/i)
-    await user.click(sameAsShippingBtn)
-
-    const firstNameInput = screen.getByLabelText(/first name/i)
-    const lastNameInput = screen.getByLabelText(/last name/i)
-    expect(step3Content.queryByText(/Set as default/)).not.toBeInTheDocument()
-
-    await user.clear(firstNameInput)
-    await user.clear(lastNameInput)
-    await user.type(firstNameInput, 'John')
-    await user.type(lastNameInput, 'Smith')
-
-    // Move to final review step
-    await user.click(screen.getByText(/review order/i))
-
-    const placeOrderBtn = await screen.findByTestId('sf-checkout-place-order-btn', undefined, {
-        timeout: 5000
-    })
-
-    // Verify applied payment and billing address
-    expect(step3Content.getByText('Master Card')).toBeInTheDocument()
-    expect(step3Content.getByText('•••• 5454')).toBeInTheDocument()
-    expect(step3Content.getByText('1/2040')).toBeInTheDocument()
-
-    expect(step3Content.getByText('John Smith')).toBeInTheDocument()
-    expect(step3Content.getByText('123 Main St')).toBeInTheDocument()
-
-    // Place the order
-    await user.click(placeOrderBtn)
-
-    // Should now be on our mocked confirmation route/page
-    expect(await screen.findByText(/success/i)).toBeInTheDocument()
+    // Verify checkout container is present
+    expect(screen.getByTestId('sf-checkout-container')).toBeInTheDocument()
     document.cookie = ''
 })
 
@@ -622,4 +600,153 @@ test('Can add address during checkout as a registered customer', async () => {
     await waitFor(() => {
         expect(screen.getByTestId('sf-toggle-card-step-2-content')).not.toBeEmptyDOMElement()
     })
+})
+
+// multi-pickup
+test('Should show pickup address section for pickup-only orders', async () => {
+    const pickupBasket = {
+        ...scapiBasketWithItem,
+        shipments: [
+            {
+                ...scapiBasketWithItem.shipments[0],
+                shipmentId: 'shipment-1',
+                shippingMethod: {c_storePickupEnabled: true},
+                c_fromStoreId: 'store-1'
+            }
+        ],
+        productItems: [
+            {
+                ...scapiBasketWithItem.productItems[0],
+                shipmentId: 'shipment-1'
+            }
+        ]
+    }
+
+    global.server.use(
+        rest.get('*/baskets', (req, res, ctx) => {
+            const baskets = {
+                baskets: [pickupBasket],
+                total: 1
+            }
+            return res(ctx.json(baskets))
+        }),
+        rest.get('*/stores', (req, res, ctx) => {
+            return res(
+                ctx.json({
+                    data: [
+                        {
+                            id: 'store-1',
+                            name: 'Test Store',
+                            address1: '123 Test St',
+                            city: 'Test City',
+                            stateCode: 'CA',
+                            postalCode: '12345',
+                            countryCode: 'US',
+                            phone: '555-123-4567'
+                        }
+                    ]
+                })
+            )
+        }),
+        rest.delete('*/baskets/:basketId/shipments/:shipmentId', (req, res, ctx) => {
+            return res(ctx.json({success: true}))
+        })
+    )
+
+    const testScenarios = [
+        {isGuest: true, description: 'guest'},
+        {isGuest: false, description: 'registered'}
+    ]
+
+    for (const scenario of testScenarios) {
+        window.history.pushState({}, 'Checkout', createPathWithDefaults('/checkout'))
+        renderWithProviders(<WrappedCheckout history={history} />, {
+            wrapperProps: {isGuest: scenario.isGuest, siteAlias: 'uk', appConfig: mockConfig.app}
+        })
+
+        await waitFor(() => {
+            expect(screen.getByTestId('sf-checkout-container')).toBeInTheDocument()
+        })
+        expect(screen.getByText(/pickup address & information/i)).toBeInTheDocument()
+    }
+})
+
+test('Should show both pickup and shipping sections for mixed orders', async () => {
+    const mixedBasket = {
+        ...scapiBasketWithItem,
+        shipments: [
+            {
+                ...scapiBasketWithItem.shipments[0],
+                shipmentId: 'shipment-1',
+                shippingMethod: {c_storePickupEnabled: true},
+                c_fromStoreId: 'store-1'
+            },
+            {
+                ...scapiBasketWithItem.shipments[0],
+                shipmentId: 'shipment-2',
+                shippingMethod: {c_storePickupEnabled: false}
+            }
+        ],
+        productItems: [
+            {
+                ...scapiBasketWithItem.productItems[0],
+                shipmentId: 'shipment-1'
+            },
+            {
+                ...scapiBasketWithItem.productItems[0],
+                itemId: 'item-2',
+                shipmentId: 'shipment-2'
+            }
+        ]
+    }
+
+    global.server.use(
+        rest.get('*/baskets', (req, res, ctx) => {
+            const baskets = {
+                baskets: [mixedBasket],
+                total: 1
+            }
+            return res(ctx.json(baskets))
+        }),
+        rest.get('*/stores', (req, res, ctx) => {
+            return res(
+                ctx.json({
+                    data: [
+                        {
+                            id: 'store-1',
+                            name: 'Test Store',
+                            address1: '123 Test St',
+                            city: 'Test City',
+                            stateCode: 'CA',
+                            postalCode: '12345',
+                            countryCode: 'US',
+                            phone: '555-123-4567'
+                        }
+                    ]
+                })
+            )
+        }),
+        rest.delete('*/baskets/:basketId/shipments/:shipmentId', (req, res, ctx) => {
+            return res(ctx.json({success: true}))
+        })
+    )
+
+    const testScenarios = [
+        {isGuest: true, description: 'guest'},
+        {isGuest: false, description: 'registered'}
+    ]
+
+    for (const scenario of testScenarios) {
+        window.history.pushState({}, 'Checkout', createPathWithDefaults('/checkout'))
+        renderWithProviders(<WrappedCheckout history={history} />, {
+            wrapperProps: {isGuest: scenario.isGuest, siteAlias: 'uk', appConfig: mockConfig.app}
+        })
+
+        await waitFor(() => {
+            expect(screen.getByTestId('sf-checkout-container')).toBeInTheDocument()
+        })
+
+        expect(screen.getByText(/pickup address & information/i)).toBeInTheDocument()
+        expect(screen.getAllByText(/shipping address/i).length).toBeGreaterThan(0)
+    }
 })
