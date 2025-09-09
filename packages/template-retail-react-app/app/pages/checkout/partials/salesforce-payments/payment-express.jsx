@@ -9,8 +9,7 @@ import {
     Divider
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 
-import {usePaymentScripts} from '../../../../hooks/salesforce-payments/use-payment-scripts'
-import {useSalesforcePayments} from '../../../../hooks/salesforce-payments/use-salesforce-payments'
+import { useSharedSFPInstance } from '../../../../hooks/salesforce-payments/use-shared-payments-sdk'
 import {useCheckout} from '@salesforce/retail-react-app/app/pages/checkout/util/checkout-context'
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
 import {createCheckoutParameters, createPaymentRequestInfo} from '../../../../utils/salesforce-payments/payment-method-mapper'
@@ -21,7 +20,6 @@ import PaymentExpressButtons from '../../../../components/salesforce-payments/pa
 import {useShopperOrdersMutation} from '@salesforce/commerce-sdk-react'
 import {useCountryDetection} from '../../../../utils/salesforce-payments/country-detection'
 
-// Module-level storage for paymentSheet
 let paymentExpressInstance = null
 let confirmPaymentFunction = null
 
@@ -36,11 +34,10 @@ const SFPaymentsExpress = ({paymentState}) => {
     const isReady = !paymentConfigLoading && paymentConfig && metadata
     const intl = useIntl()
 
+    // use the shared SFP intance
+    const { sfpInstance, isReady: sfpReady } = useSharedSFPInstance()
 
-    // Load scripts and SFP
-    const {scriptsLoaded, loading, hasSFP} = usePaymentScripts(['sfp'])
-    const {sfpInstance} = useSalesforcePayments(scriptsLoaded, hasSFP)
-    
+
     // Checkout context but for Express it might be different
     const {step, STEPS, goToStep, goToNextStep} = useCheckout()
     const {data: basket} = useCurrentBasket()
@@ -105,16 +102,19 @@ const SFPaymentsExpress = ({paymentState}) => {
     )*/
     return (
         <Box>           
-            {/* ✅ Keep PaymentSheetForm always mounted, control visibility with CSS */}
-            {isReady && sfpInstance && paymentRequestInfo && (
+            {isReady && sfpReady && sfpInstance && paymentRequestInfo && (
                 <Box
-                    position={step === STEPS.PAYMENT ? "static" : "absolute"}
-                    visibility={step === STEPS.PAYMENT ? "visible" : "hidden"}
-                    height="auto"
-                    overflow="hidden"
-                    width="100%"
-                    zIndex={step === STEPS.PAYMENT ? 1 : -1}
+                    mb={4}
+                    p={4}
+                    border="1px solid #E2E8F0"
+                    borderRadius="md"
                 >
+                    <Text fontSize="sm" mb={3} color="gray.800">
+                        <FormattedMessage 
+                            defaultMessage="Express Checkout" 
+                            id="checkout.express_checkout.title"
+                        />
+                    </Text>
                     <PaymentExpressButtons
                         sfpInstance={sfpInstance}
                         paymentConfig={paymentConfig}

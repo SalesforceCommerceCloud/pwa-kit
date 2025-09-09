@@ -112,8 +112,7 @@ const PaymentExpressButtons = ({
         
             const config = createSFPConfig(paymentConfig, {
                 customTheme
-            })
-            // Create SFP payment express
+            })   // Create SFP payment express
             const paymentExpress = sfpInstance.express(
                 metadata,
                 paymentMethodSetForCheckout,
@@ -121,36 +120,7 @@ const PaymentExpressButtons = ({
                 paymentRequestInfo,
                 paymentElementRef.current,
                 0
-            )
-        // Add after the creation:
-// Replace your current debug log with this more detailed version:
-console.log('🔍 SFP Express Debug - After Creation:', {
-    paymentExpress,
-    paymentExpressType: typeof paymentExpress,
-    paymentExpressKeys: Object.keys(paymentExpress || {}),
-    isComponentCreated: !!paymentExpress,
-    elementChildren: paymentElementRef.current?.children.length,
-    elementHTML: paymentElementRef.current?.innerHTML,
-    elementHasContent: paymentElementRef.current?.innerHTML.length > 0,
-    paymentMethods: paymentExpress?.paymentMethods,
-    vendorPaymentMethodElements: paymentExpress?.vendorPaymentMethodElements
-})
-
-// Add the delayed check to see if buttons appear asynchronously:
-setTimeout(() => {
-    console.log('🔍 Delayed Check (2s) - Element Content:', {
-        elementHTML: paymentElementRef.current?.innerHTML,
-        elementChildren: paymentElementRef.current?.children.length,
-        hasButtons: paymentElementRef.current?.querySelector('button') !== null,
-        hasApplePayButton: paymentElementRef.current?.innerHTML.includes('apple'),
-        hasGooglePayButton: paymentElementRef.current?.innerHTML.includes('google'),
-        allElementClasses: Array.from(paymentElementRef.current?.children || []).map(child => child.className)
-    })
-}, 2000)
-
-
-
-            
+            )            
             // Store SFP instance in PaymentExpressButtons
             paymentExpressInstanceRef.current = paymentExpress
             setIsComponentCreated(true)
