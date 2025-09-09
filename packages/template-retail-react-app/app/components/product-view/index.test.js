@@ -833,7 +833,7 @@ describe('maxOrderQuantity Prop', () => {
         const quantityInput = screen.getAllByDisplayValue('1')[0]
         const incrementButton = screen.getAllByText('+')[0]
 
-        // Note: Chakra UI's useNumberInput handles max constraint internally, 
+        // Note: Chakra UI's useNumberInput handles max constraint internally,
         // not via HTML max attribute. Test the actual behavior instead.
 
         // Try to increment beyond max (should stop at 3)

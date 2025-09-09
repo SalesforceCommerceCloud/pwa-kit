@@ -6,40 +6,49 @@
  */
 import React from 'react'
 import {screen} from '@testing-library/react'
+import PropTypes from 'prop-types'
 import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
-import SelectBonusProductsCard from './select-bonus-products-card'
-import {useBonusProductSelectionModalContext} from '../../../hooks/use-bonus-product-selection-modal'
+import SelectBonusProductsCard from '@salesforce/retail-react-app/app/pages/cart/partials/select-bonus-products-card'
+import {useBonusProductSelectionModalContext} from '@salesforce/retail-react-app/app/hooks/use-bonus-product-selection-modal'
 
 // Mock the bonus product selection modal context
-jest.mock('../../../hooks/use-bonus-product-selection-modal', () => ({
+jest.mock('@salesforce/retail-react-app/app/hooks/use-bonus-product-selection-modal', () => ({
     useBonusProductSelectionModalContext: jest.fn()
 }))
 
 // Mock SelectBonusProductsButton component
 
-jest.mock(
-    '../../../components/select-bonus-products-button',
-    () =>
-        function MockSelectBonusProductsButton({
-            product,
-            bonusDiscountLineItems,
-            itemsAdded,
-            colorScheme,
-            onOpenBonusModal,
-            ...domProps
-        }) {
-            // eslint-disable-next-line @typescript-eslint/no-var-requires
-            const React = require('react')
-            return React.createElement(
-                'button',
-                {
-                    'data-testid': 'select-bonus-products-button',
-                    ...domProps
-                },
-                'Select Bonus Products'
-            )
-        }
-)
+jest.mock('@salesforce/retail-react-app/app/components/select-bonus-products-button', () => {
+    function MockSelectBonusProductsButton({
+        product,
+        bonusDiscountLineItems,
+        itemsAdded,
+        colorScheme,
+        onOpenBonusModal,
+        ...domProps
+    }) {
+        // eslint-disable-next-line @typescript-eslint/no-var-requires
+        const React = require('react')
+        return React.createElement(
+            'button',
+            {
+                'data-testid': 'select-bonus-products-button',
+                ...domProps
+            },
+            'Select Bonus Products'
+        )
+    }
+
+    MockSelectBonusProductsButton.propTypes = {
+        product: PropTypes.object,
+        bonusDiscountLineItems: PropTypes.array,
+        itemsAdded: PropTypes.number,
+        colorScheme: PropTypes.string,
+        onOpenBonusModal: PropTypes.func
+    }
+
+    return MockSelectBonusProductsButton
+})
 
 const mockOnOpen = jest.fn()
 

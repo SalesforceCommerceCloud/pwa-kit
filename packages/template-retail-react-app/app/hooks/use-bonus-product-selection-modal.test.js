@@ -8,6 +8,7 @@
 import React from 'react'
 import {renderHook, act} from '@testing-library/react'
 import {BrowserRouter} from 'react-router-dom'
+import PropTypes from 'prop-types'
 
 // Import the hook we want to test
 import {useBonusProductSelectionModal} from '@salesforce/retail-react-app/app/hooks/use-bonus-product-selection-modal'
@@ -27,13 +28,17 @@ const mockModalState = {
 
 beforeEach(() => {
     jest.clearAllMocks()
-    
+
     // Mock the modal state hook
     useModalState.mockReturnValue(mockModalState)
 })
 
 // Router wrapper for tests that need routing context
 const RouterWrapper = ({children}) => <BrowserRouter>{children}</BrowserRouter>
+
+RouterWrapper.propTypes = {
+    children: PropTypes.node.isRequired
+}
 
 describe('useBonusProductSelectionModal Hook - Basic Tests', () => {
     test('should initialize and return modal state', () => {
@@ -79,7 +84,7 @@ describe('useBonusProductSelectionModal Hook - Basic Tests', () => {
             isOpen: true,
             data: {productId: 'test-product'}
         }
-        
+
         useModalState.mockReturnValue(mockOpenModalState)
 
         const {result} = renderHook(() => useBonusProductSelectionModal(), {
@@ -99,7 +104,7 @@ describe('Modal State Management Tests', () => {
 
         // Test that onOpen function is available
         expect(typeof result.current.onOpen).toBe('function')
-        
+
         // Test calling onOpen
         act(() => {
             result.current.onOpen({productId: 'test'})
@@ -115,7 +120,7 @@ describe('Modal State Management Tests', () => {
 
         // Test that onClose function is available
         expect(typeof result.current.onClose).toBe('function')
-        
+
         // Test calling onClose
         act(() => {
             result.current.onClose()
@@ -205,7 +210,7 @@ describe('Error Handling Tests', () => {
             wrapper: RouterWrapper
         })
 
-        expect(result.current.data).toBe(null)
+        expect(result.current.data).toBeNull()
     })
 
     test('should handle modal state loading states', () => {

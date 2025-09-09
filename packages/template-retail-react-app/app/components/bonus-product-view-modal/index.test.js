@@ -12,7 +12,10 @@ import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-u
 import BonusProductViewModal from '@salesforce/retail-react-app/app/components/bonus-product-view-modal'
 import mockProductDetail from '@salesforce/retail-react-app/app/mocks/variant-750518699578M'
 import {prependHandlersToServer} from '@salesforce/retail-react-app/jest-setup'
-import {getRemainingAvailableBonusProductsForProduct, findAvailableBonusDiscountLineItemId} from '@salesforce/retail-react-app/app/utils/bonus-product-utils'
+import {
+    getRemainingAvailableBonusProductsForProduct,
+    findAvailableBonusDiscountLineItemId
+} from '@salesforce/retail-react-app/app/utils/bonus-product-utils'
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
 import {useShopperBasketsMutationHelper} from '@salesforce/commerce-sdk-react'
 import {useProductViewModal} from '@salesforce/retail-react-app/app/hooks/use-product-view-modal'
@@ -43,17 +46,19 @@ jest.mock(
         function MockProductView({maxOrderQuantity, addToCart}) {
             // eslint-disable-next-line @typescript-eslint/no-var-requires
             const React = require('react')
-            
+
             const handleAddToCart = () => {
                 if (addToCart) {
                     // Call addToCart with the expected format: array of {variant, quantity}
-                    addToCart([{
-                        variant: {productId: 'test-product'},
-                        quantity: 1
-                    }])
+                    addToCart([
+                        {
+                            variant: {productId: 'test-product'},
+                            quantity: 1
+                        }
+                    ])
                 }
             }
-            
+
             return React.createElement(
                 'div',
                 null,
@@ -85,7 +90,6 @@ jest.mock('@salesforce/retail-react-app/app/hooks/use-current-basket', () => ({
     useCurrentBasket: jest.fn()
 }))
 
-
 // Create mock functions that can be referenced in tests
 const mockAddItemToNewOrExistingBasket = jest.fn()
 const mockOnClose = jest.fn()
@@ -93,36 +97,36 @@ const mockOnReturnToSelection = jest.fn()
 
 beforeEach(() => {
     jest.clearAllMocks()
-    
+
     // Setup useProductViewModal mock
     useProductViewModal.mockReturnValue({
         product: mockProductDetail,
         variant: null,
         isFetching: false
     })
-    
+
     // Setup other mocks
     useShopperBasketsMutationHelper.mockReturnValue({
         addItemToNewOrExistingBasket: mockAddItemToNewOrExistingBasket
     })
-    
+
     // Reset mock implementations
     mockAddItemToNewOrExistingBasket.mockResolvedValue({})
-    
+
     // Setup current basket mock
     useCurrentBasket.mockReturnValue({
-        data: { basketId: 'test-basket' }
+        data: {basketId: 'test-basket'}
     })
-    
+
     // Setup bonus product utils mocks
     getRemainingAvailableBonusProductsForProduct.mockReturnValue({
         aggregatedMaxBonusItems: 5,
         aggregatedSelectedItems: 2
     })
-    
+
     // Mock findAvailableBonusDiscountLineItemId to return a valid ID
     findAvailableBonusDiscountLineItemId.mockReturnValue('bonus-1')
-    
+
     prependHandlersToServer([
         {
             path: '*/products/:productId',
@@ -161,7 +165,6 @@ describe('BonusProductViewModal - getRemainingBonusQuantity', () => {
 })
 
 describe('BonusProductViewModal - Return to Selection Flow', () => {
-
     beforeEach(() => {
         // Setup default mocks - using global mock functions
         useShopperBasketsMutationHelper.mockReturnValue({
@@ -184,7 +187,7 @@ describe('BonusProductViewModal - Return to Selection Flow', () => {
 
     test('calls onReturnToSelection when there are remaining bonus products', async () => {
         const user = userEvent.setup()
-        
+
         // Mock successful add to cart with remaining bonus products
         const updatedBasket = {
             bonusDiscountLineItems: [
@@ -226,7 +229,7 @@ describe('BonusProductViewModal - Return to Selection Flow', () => {
 
     test('navigates to cart when no remaining bonus products', async () => {
         const user = userEvent.setup()
-        
+
         // Mock successful add to cart with no remaining bonus products
         const updatedBasket = {
             bonusDiscountLineItems: [
@@ -280,7 +283,7 @@ describe('BonusProductViewModal - Return to Selection Flow', () => {
 
     test('navigates to cart when onReturnToSelection is not provided', async () => {
         const user = userEvent.setup()
-        
+
         // Mock successful add to cart with remaining bonus products but no callback
         const updatedBasket = {
             bonusDiscountLineItems: [{id: 'bonus-1', maxBonusItems: 2}],
@@ -323,7 +326,7 @@ describe('BonusProductViewModal - Return to Selection Flow', () => {
 
     test('handles add to cart failure gracefully', async () => {
         const user = userEvent.setup()
-        
+
         // Mock failed add to cart
         mockAddItemToNewOrExistingBasket.mockRejectedValue(new Error('Add to cart failed'))
 

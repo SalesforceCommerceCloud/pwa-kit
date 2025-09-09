@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import * as bonusProductUtils from './bonus-product-utils'
+import * as bonusProductUtils from '@salesforce/retail-react-app/app/utils/bonus-product-utils'
 
 describe('Enhanced Bonus Product Utilities', () => {
     // Mock basket data
