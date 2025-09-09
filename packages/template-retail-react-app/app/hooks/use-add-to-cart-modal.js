@@ -41,7 +41,8 @@ import SelectBonusProductsCard from '@salesforce/retail-react-app/app/pages/cart
 import {
     getRemainingAvailableBonusProductsForProduct,
     useBasketProductsWithPromotions,
-    getPromotionCalloutText
+    getPromotionCalloutText,
+    shouldShowBonusProductSelection
 } from '@salesforce/retail-react-app/app/utils/bonus-product-utils'
 
 /**
@@ -316,6 +317,19 @@ export const AddToCartModal = () => {
                             {bonusDiscountLineItems &&
                                 bonusDiscountLineItems.length > 0 &&
                                 (() => {
+                                    // Check if this product should show bonus product selection
+                                    // This prevents bonus products added as regular items from showing bonus selection
+                                    const shouldShowBonusSelection =
+                                        shouldShowBonusProductSelection(
+                                            basket,
+                                            product?.id,
+                                            productsWithPromotions
+                                        )
+
+                                    if (!shouldShowBonusSelection) {
+                                        return null
+                                    }
+
                                     // Compute aggregated remaining capacity based on the latest basket data
                                     const remainingBonusProductsData =
                                         getRemainingAvailableBonusProductsForProduct(
@@ -343,7 +357,7 @@ export const AddToCartModal = () => {
                                             basket={basket}
                                             productsWithPromotions={productsWithPromotions}
                                             remainingBonusProductsData={remainingBonusProductsData}
-                                            isEligible={true}
+                                            isEligible={shouldShowBonusSelection}
                                             getPromotionCalloutText={getPromotionCalloutText}
                                             onSelectBonusProducts={() => {
                                                 // Close AddToCart modal first - the SelectBonusProductsCard will handle opening the bonus modal
