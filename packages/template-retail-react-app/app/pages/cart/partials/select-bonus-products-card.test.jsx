@@ -5,36 +5,49 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
-import {render, screen} from '@testing-library/react'
+import {screen} from '@testing-library/react'
+import PropTypes from 'prop-types'
 import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
-import SelectBonusProductsCard from './select-bonus-products-card'
-import {useBonusProductSelectionModalContext} from '../../../hooks/use-bonus-product-selection-modal'
+import SelectBonusProductsCard from '@salesforce/retail-react-app/app/pages/cart/partials/select-bonus-products-card'
+import {useBonusProductSelectionModalContext} from '@salesforce/retail-react-app/app/hooks/use-bonus-product-selection-modal'
 
 // Mock the bonus product selection modal context
-jest.mock('../../../hooks/use-bonus-product-selection-modal', () => ({
+jest.mock('@salesforce/retail-react-app/app/hooks/use-bonus-product-selection-modal', () => ({
     useBonusProductSelectionModalContext: jest.fn()
 }))
 
 // Mock SelectBonusProductsButton component
-jest.mock('../../../components/select-bonus-products-button', () => {
-    return function MockSelectBonusProductsButton({
-        bonusDiscountLineItems,
+
+jest.mock('@salesforce/retail-react-app/app/components/select-bonus-products-button', () => {
+    function MockSelectBonusProductsButton({
         product,
+        bonusDiscountLineItems,
         itemsAdded,
-        onOpenBonusModal,
-        variant,
         colorScheme,
-        size,
-        width,
-        'data-testid': testId,
+        onOpenBonusModal,
         ...domProps
     }) {
-        return (
-            <button data-testid="select-bonus-products-button" {...domProps}>
-                Select Bonus Products
-            </button>
+        // eslint-disable-next-line @typescript-eslint/no-var-requires
+        const React = require('react')
+        return React.createElement(
+            'button',
+            {
+                'data-testid': 'select-bonus-products-button',
+                ...domProps
+            },
+            'Select Bonus Products'
         )
     }
+
+    MockSelectBonusProductsButton.propTypes = {
+        product: PropTypes.object,
+        bonusDiscountLineItems: PropTypes.array,
+        itemsAdded: PropTypes.number,
+        colorScheme: PropTypes.string,
+        onOpenBonusModal: PropTypes.func
+    }
+
+    return MockSelectBonusProductsButton
 })
 
 const mockOnOpen = jest.fn()
@@ -72,7 +85,7 @@ const mockProductsWithPromotions = {
         productPromotions: [
             {
                 promotionId: 'promo-123',
-                calloutMsg: 'Buy one men\'s suit, get 2 free ties'
+                calloutMsg: "Buy one men's suit, get 2 free ties"
             }
         ]
     }
@@ -97,7 +110,7 @@ const mockBonusDiscountLineItem = {
 }
 
 const mockGetPromotionCalloutText = jest.fn((product, promotionId) => {
-    return product.productPromotions.find(p => p.promotionId === promotionId)?.calloutMsg || ''
+    return product.productPromotions.find((p) => p.promotionId === promotionId)?.calloutMsg || ''
 })
 
 const defaultProps = {
@@ -113,13 +126,13 @@ const defaultProps = {
 
 describe('SelectBonusProductsCard', () => {
     test('renders with selection counter by default', () => {
-        renderWithProviders(
-            <SelectBonusProductsCard {...defaultProps} />
-        )
+        renderWithProviders(<SelectBonusProductsCard {...defaultProps} />)
 
         // Should show the promotion text with selection counter
-        expect(screen.getByText('Buy one men\'s suit, get 2 free ties (1 of 2 selected)')).toBeInTheDocument()
-        expect(screen.getByTestId('select-bonus-products-button')).toBeInTheDocument()
+        expect(
+            screen.getByText("Buy one men's suit, get 2 free ties (1 of 2 selected)")
+        ).toBeInTheDocument()
+        expect(screen.getByTestId('select-bonus-products-btn-test-product-123')).toBeInTheDocument()
     })
 
     test('renders without selection counter when hideSelectionCounter is true', () => {
@@ -128,9 +141,11 @@ describe('SelectBonusProductsCard', () => {
         )
 
         // Should show only the promotion text without selection counter
-        expect(screen.getByText('Buy one men\'s suit, get 2 free ties')).toBeInTheDocument()
-        expect(screen.queryByText('Buy one men\'s suit, get 2 free ties (1 of 2 selected)')).not.toBeInTheDocument()
-        expect(screen.getByTestId('select-bonus-products-button')).toBeInTheDocument()
+        expect(screen.getByText("Buy one men's suit, get 2 free ties")).toBeInTheDocument()
+        expect(
+            screen.queryByText("Buy one men's suit, get 2 free ties (1 of 2 selected)")
+        ).not.toBeInTheDocument()
+        expect(screen.getByTestId('select-bonus-products-btn-test-product-123')).toBeInTheDocument()
     })
 
     test('renders with selection counter when hideSelectionCounter is false', () => {
@@ -139,8 +154,10 @@ describe('SelectBonusProductsCard', () => {
         )
 
         // Should show the promotion text with selection counter
-        expect(screen.getByText('Buy one men\'s suit, get 2 free ties (1 of 2 selected)')).toBeInTheDocument()
-        expect(screen.getByTestId('select-bonus-products-button')).toBeInTheDocument()
+        expect(
+            screen.getByText("Buy one men's suit, get 2 free ties (1 of 2 selected)")
+        ).toBeInTheDocument()
+        expect(screen.getByTestId('select-bonus-products-btn-test-product-123')).toBeInTheDocument()
     })
 
     test('renders with "0 selected" counter when no bonus products are selected', () => {
@@ -156,12 +173,12 @@ describe('SelectBonusProductsCard', () => {
             }
         }
 
-        renderWithProviders(
-            <SelectBonusProductsCard {...propsWithNoSelection} />
-        )
+        renderWithProviders(<SelectBonusProductsCard {...propsWithNoSelection} />)
 
         // Should show (0 of 2 selected) when no items are selected
-        expect(screen.getByText('Buy one men\'s suit, get 2 free ties (0 of 2 selected)')).toBeInTheDocument()
+        expect(
+            screen.getByText("Buy one men's suit, get 2 free ties (0 of 2 selected)")
+        ).toBeInTheDocument()
     })
 
     test('does not render selection counter when hideSelectionCounter is true even with no selection', () => {
@@ -178,13 +195,13 @@ describe('SelectBonusProductsCard', () => {
             hideSelectionCounter: true
         }
 
-        renderWithProviders(
-            <SelectBonusProductsCard {...propsWithNoSelection} />
-        )
+        renderWithProviders(<SelectBonusProductsCard {...propsWithNoSelection} />)
 
         // Should show only the promotion text without any counter
-        expect(screen.getByText('Buy one men\'s suit, get 2 free ties')).toBeInTheDocument()
-        expect(screen.queryByText('Buy one men\'s suit, get 2 free ties (0 of 2 selected)')).not.toBeInTheDocument()
+        expect(screen.getByText("Buy one men's suit, get 2 free ties")).toBeInTheDocument()
+        expect(
+            screen.queryByText("Buy one men's suit, get 2 free ties (0 of 2 selected)")
+        ).not.toBeInTheDocument()
     })
 
     test('renders button even when there are no bonus products available', () => {
@@ -201,12 +218,10 @@ describe('SelectBonusProductsCard', () => {
             }
         }
 
-        renderWithProviders(
-            <SelectBonusProductsCard {...propsWithNoCapacity} />
-        )
+        renderWithProviders(<SelectBonusProductsCard {...propsWithNoCapacity} />)
 
         // Component may still render the button
-        expect(screen.getByTestId('select-bonus-products-button')).toBeInTheDocument()
+        expect(screen.getByTestId('select-bonus-products-btn-test-product-123')).toBeInTheDocument()
     })
 
     test('shows selection counter on cart page (when hideSelectionCounter is not provided)', () => {
@@ -218,7 +233,9 @@ describe('SelectBonusProductsCard', () => {
         )
 
         // Should show the promotion text WITH selection counter (cart page behavior)
-        expect(screen.getByText('Buy one men\'s suit, get 2 free ties (1 of 2 selected)')).toBeInTheDocument()
-        expect(screen.getByTestId('select-bonus-products-button')).toBeInTheDocument()
+        expect(
+            screen.getByText("Buy one men's suit, get 2 free ties (1 of 2 selected)")
+        ).toBeInTheDocument()
+        expect(screen.getByTestId('select-bonus-products-btn-test-product-123')).toBeInTheDocument()
     })
 })

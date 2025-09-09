@@ -27,7 +27,6 @@ import {
     getRemainingAvailableBonusProductsForProduct
 } from '@salesforce/retail-react-app/app/utils/bonus-product-utils'
 import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
-import {useLocation} from 'react-router-dom'
 import {productViewModalTheme} from '@salesforce/retail-react-app/app/theme/components/project/product-view-modal'
 import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
 
@@ -40,6 +39,7 @@ const BonusProductViewModal = ({
     onClose,
     bonusDiscountLineItemId,
     promotionId,
+    onReturnToSelection,
     ...props
 }) => {
     // Ensure a safe product shape for the modal hook
@@ -62,7 +62,6 @@ const BonusProductViewModal = ({
     const {addItemToNewOrExistingBasket} = useShopperBasketsMutationHelper()
     const {data: basket} = useCurrentBasket()
     const navigate = useNavigation()
-    const location = useLocation()
 
     const intl = useIntl()
     const {formatMessage} = intl
@@ -85,9 +84,6 @@ const BonusProductViewModal = ({
         [intl]
     )
 
-    // Determine context for navigation behavior
-    const isFromAddToCartModal = location.pathname !== '/cart'
-
     // Helper function to calculate remaining bonus quantity
     const getRemainingBonusQuantity = () => {
         if (basket && product) {
@@ -98,6 +94,31 @@ const BonusProductViewModal = ({
             return bonusData.aggregatedMaxBonusItems - bonusData.aggregatedSelectedItems
         }
         return null
+    }
+
+    // Helper function to check if there are remaining bonus products available
+    const checkForRemainingBonusProducts = (updatedBasket) => {
+        if (!updatedBasket?.bonusDiscountLineItems) {
+            return false
+        }
+
+        // Check if any bonus discount line items still have available capacity
+        return updatedBasket.bonusDiscountLineItems.some((discountItem) => {
+            const maxBonusItems = discountItem.maxBonusItems || 0
+
+            // Calculate how many bonus products are already in cart for this specific discount item
+            const selectedQuantity =
+                updatedBasket.productItems
+                    ?.filter(
+                        (cartItem) =>
+                            cartItem.bonusProductLineItem &&
+                            cartItem.bonusDiscountLineItemId === discountItem.id
+                    )
+                    .reduce((total, cartItem) => total + (cartItem.quantity || 0), 0) || 0
+
+            // Return true if there's still capacity available
+            return selectedQuantity < maxBonusItems
+        })
     }
 
     // Custom addToCart handler for bonus products that includes bonusDiscountLineItemId
@@ -144,8 +165,9 @@ const BonusProductViewModal = ({
 
                 const result = await addItemToNewOrExistingBasket(productItems)
 
-                // Navigate to cart page after successful add to cart
+                // Check for remaining bonus products after successful add to cart
                 if (result) {
+                    // Show success toast notification
                     showToast({
                         title: formatMessage({
                             id: 'bonus_product_view_modal.toast.item_added',
@@ -153,13 +175,29 @@ const BonusProductViewModal = ({
                         }),
                         status: 'success'
                     })
-                    
-                    // Close modal immediately and navigate with proper delay
-                    onClose()
-                    // Always use a delay to ensure modal closes cleanly
-                    setTimeout(() => {
-                        navigate('/cart', 'push')
-                    }, 200)
+
+                    // Get updated basket data to check for remaining bonus products
+                    // addItemToNewOrExistingBasket returns the basket directly
+                    const updatedBasket = result
+
+                    // Check if there are still remaining bonus products available
+                    const hasRemainingBonusProducts = checkForRemainingBonusProducts(updatedBasket)
+
+                    if (hasRemainingBonusProducts && onReturnToSelection) {
+                        // Return to SelectBonusProductModal if there are remaining bonus products
+                        onReturnToSelection()
+                        // Return null to prevent AddToCartModal from opening
+                        return null
+                    } else {
+                        // Navigate to cart page if no remaining bonus products or no callback provided
+                        onClose()
+                        // Always use a delay to ensure modal closes cleanly
+                        setTimeout(() => {
+                            navigate('/cart', 'push')
+                        }, 200)
+                        // Return null to prevent AddToCartModal from opening
+                        return null
+                    }
                 }
 
                 // For bonus products, don't open add-to-cart modal - just return null
@@ -177,7 +215,7 @@ const BonusProductViewModal = ({
             basket,
             onClose,
             navigate,
-            isFromAddToCartModal,
+            onReturnToSelection,
             showToast,
             formatMessage
         ]
@@ -248,10 +286,10 @@ const BonusProductViewModal = ({
                 maxHeight={productViewModalTheme.layout.content.maxHeight}
                 overflowY={productViewModalTheme.layout.content.overflowY}
             >
-                <ModalBody 
-                    bg={productViewModalTheme.layout.body.background} 
-                    p={productViewModalTheme.layout.body.padding} 
-                    pb={productViewModalTheme.layout.body.paddingBottom} 
+                <ModalBody
+                    bg={productViewModalTheme.layout.body.background}
+                    p={productViewModalTheme.layout.body.padding}
+                    pb={productViewModalTheme.layout.body.paddingBottom}
                     mt={productViewModalTheme.layout.body.marginTop}
                 >
                     {productViewModalData.isFetching && !productViewModalData.product ? (
@@ -287,7 +325,8 @@ BonusProductViewModal.propTypes = {
     product: PropTypes.object,
     isLoading: PropTypes.bool,
     bonusDiscountLineItemId: PropTypes.string, // The 'id' from bonusDiscountLineItems
-    promotionId: PropTypes.string // The promotion ID to filter promotions in PromoCallout
+    promotionId: PropTypes.string, // The promotion ID to filter promotions in PromoCallout
+    onReturnToSelection: PropTypes.func // Callback to return to SelectBonusProductModal
 }
 
 export default BonusProductViewModal
