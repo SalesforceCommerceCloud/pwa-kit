@@ -148,7 +148,8 @@ const BonusProductViewModal = ({
                 if (result) {
                     showToast({
                         title: formatMessage({
-                            id: 'bonus_product_view_modal.toast.item_added'
+                            id: 'bonus_product_view_modal.toast.item_added',
+                            defaultMessage: 'Bonus item added to cart'
                         }),
                         status: 'success'
                     })
