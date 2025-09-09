@@ -49,6 +49,12 @@ function isAskAgentOnSearchEnabled(enabled, askAgentOnSearch) {
     return enabled === 'true' && askAgentOnSearch === 'true' && onClient
 }
 
+const onClient = typeof window !== 'undefined'
+
+function isAskAgentOnSearchEnabled(enabled, askAgentOnSearch) {
+    return enabled === 'true' && askAgentOnSearch === 'true' && onClient
+}
+
 const formatSuggestions = (searchSuggestions) => {
     return {
         categorySuggestions: searchSuggestions?.categorySuggestions?.categories?.map(
