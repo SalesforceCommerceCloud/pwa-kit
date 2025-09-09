@@ -24,7 +24,6 @@ const PaymentSheetForm = ({
     onError = () => {},
     containerProps = {}
 }) => {
-    
     const [isComponentCreated, setIsComponentCreated] = useState(false)
     const paymentElementRef = useRef(null)
     const containerRef = useRef(null)

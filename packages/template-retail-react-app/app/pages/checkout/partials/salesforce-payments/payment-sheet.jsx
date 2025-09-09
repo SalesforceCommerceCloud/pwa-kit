@@ -17,8 +17,7 @@ import {
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 import AddressDisplay from '@salesforce/retail-react-app/app/components/address-display'
 import {useForm} from 'react-hook-form'
-import {usePaymentScripts} from '../../../../hooks/salesforce-payments/use-payment-scripts'
-import {useSalesforcePayments} from '../../../../hooks/salesforce-payments/use-salesforce-payments'
+import {useSharedSFPInstance} from '../../../../hooks/salesforce-payments/use-shared-payments-sdk'
 import {useCheckout} from '@salesforce/retail-react-app/app/pages/checkout/util/checkout-context'
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
 import {createCheckoutParameters, createPaymentRequestInfo} from '../../../../utils/salesforce-payments/payment-method-mapper'
@@ -37,7 +36,6 @@ let confirmPaymentFunction = null
 
 //TODO: need to address the payment method id issue with ECOM
 const paymentMethodIdSFP ="SALESFORCE_PAYMENTS";
-//const paymentMethodIdSFP ="CREDIT_CARD";
 
 export const usePaymentSheetSubmission = () => {
     const {processPayment, isProcessing} = usePaymentProcessing()
@@ -56,12 +54,10 @@ export const usePaymentSheetSubmission = () => {
             basket?.shipments?.[0]?.shippingAddress?.countryCode || 
             fallbackCountry
     }
-    //const detectedCountry = 'US'
 
     // ✅ Store order info from API calls
     let orderInfoFromAPI = null
    
-
     const updateOrderPayment = async (orderNo, paymentInstrumentId, paymentData) => {
       
         try {
@@ -169,10 +165,9 @@ const SFPaymentsSheet = ({paymentState}) => {
 
     const intl = useIntl()
     
-    // Load scripts and SFP
-    const {scriptsLoaded, loading, hasSFP} = usePaymentScripts(['sfp'])
-    const {sfpInstance} = useSalesforcePayments(scriptsLoaded, hasSFP)
-    
+    // use the shared SFP instance
+    const { sfpInstance, isReady: sfpReady } = useSharedSFPInstance()
+
     // Checkout context
     const {step, STEPS, goToStep, goToNextStep} = useCheckout()
     const {data: basket} = useCurrentBasket()
@@ -255,13 +250,13 @@ const SFPaymentsSheet = ({paymentState}) => {
         }
     }
     
-   // ✅ Memoize paymentRequestInfo so it doesn't recreate on every render
-   const paymentRequestInfo = useMemo(() => {
-    return basket ? createPaymentRequestInfo(basket, intl.locale) : null
+    // ✅ Memoize paymentRequestInfo so it doesn't recreate on every render
+    const paymentRequestInfo = useMemo(() => {
+        return basket ? createPaymentRequestInfo(basket, intl.locale) : null
     }, [basket, intl.locale])
 
-     // ✅ Callback when PaymentSheetForm is ready
-     const handlePaymentSheetReady = (paymentSheet) => {
+    // ✅ Callback when PaymentSheetForm is ready
+    const handlePaymentSheetReady = (paymentSheet) => {
         console.log('✅ Payment sheet ready')
     }
     
@@ -288,7 +283,7 @@ const SFPaymentsSheet = ({paymentState}) => {
     return (
         <Box>           
            {/* ✅ Keep PaymentSheetForm always mounted, control visibility with CSS */}
-           {isReady && sfpInstance && paymentRequestInfo && (
+           {isReady && sfpReady && sfpInstance && paymentRequestInfo && (
                 <Box
                     position={step === STEPS.PAYMENT ? "static" : "absolute"}
                     visibility={step === STEPS.PAYMENT ? "visible" : "hidden"}

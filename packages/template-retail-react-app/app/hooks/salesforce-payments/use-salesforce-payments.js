@@ -1,6 +1,7 @@
 import {useState, useEffect, useRef} from 'react'
 import {usePaymentScripts} from './use-payment-scripts'
 
+//TODO: Remove this hook and use the shared SFP instance instead
 export const useSalesforcePayments = (scriptsLoaded, hasSFP) => {
     //const {scriptsLoaded, hasSFP} = usePaymentScripts(['stripe', 'paypal', 'sfp'])
     const [sfpInstance, setSfpInstance] = useState(null)

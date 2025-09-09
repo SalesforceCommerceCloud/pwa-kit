@@ -48,7 +48,10 @@ const options = {
     // The protocol on which the development Express app listens.
     // Note that http://localhost is treated as a secure context for development,
     // except by Safari.
-    protocol: 'http',
+    protocol: process.env.DEV_SERVER_PROTOCOL || 'http',
+    
+    // SSL file path for HTTPS development
+    sslFilePath: process.env.DEV_SERVER_SSL_FILE_PATH,
 
     // Option for whether to set up a special endpoint for handling
     // private SLAS clients

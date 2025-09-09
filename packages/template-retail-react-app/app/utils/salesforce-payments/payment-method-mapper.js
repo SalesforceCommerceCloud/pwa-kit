@@ -1,3 +1,32 @@
+
+/**
+ * TEMP CODE
+ * Maps backend payment method types to frontend SFP element types
+ * THIS Mapping is wrong but unblocks from testing until API is fixed!
+ */
+const mapPaymentMethodType = (backendType) => {
+    const typeMapping = {
+        // Express payment methods
+        'apple_pay': 'applepay',
+        'payment_request': 'googlepay', // payment_request from backend = Google Pay in frontend
+        'paypal_express': 'paypalexpress',
+        'venmo_express': 'venmoexpress',
+        
+        // Regular payment methods
+        'card': 'card',
+        'paypal': 'paypal',
+        'venmo': 'venmo',
+        'ideal': 'ideal',
+        'sepa_debit': 'sepa_debit',
+        'bancontact': 'bancontact',
+        'klarna': 'klarna',
+        'eps': 'eps',
+        'afterpay_clearpay': 'afterpay_clearpay'
+    }
+    
+    return typeMapping[backendType] || backendType
+}
+
 /**
  * Creates payment method set for different payment flows
  */
@@ -20,11 +49,16 @@ export const createPaymentMethodSet = (paymentConfig, basket, options = {}) => {
             ? filteredMethods.filter(method => enabledMethods.includes(method.paymentMethodType))
             : filteredMethods
     
+        // ✅ Map backend types to frontend types
+        const mappedMethods = finalMethods.map(method => ({
+            ...method,
+            paymentMethodType: mapPaymentMethodType(method.paymentMethodType)
+        }))
         return {
             id: generatePaymentSetId(),
             name: `Payment Methods for ${paymentFlow}`,
             countryCode: getCountryCode(basket),
-            paymentMethods: finalMethods,  
+            paymentMethods: mappedMethods,  
             paymentMethodSetAccounts: paymentConfig.paymentMethodSetAccounts  // ✅ Use SCAPI data directly!
         }
     }
