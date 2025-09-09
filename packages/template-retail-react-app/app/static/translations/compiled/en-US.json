@@ -525,6 +525,28 @@
       "value": "productName"
     }
   ],
+  "bonus_product_view_modal.title": [
+    {
+      "type": 0,
+      "value": "Select Bonus Product ("
+    },
+    {
+      "type": 1,
+      "value": "selected"
+    },
+    {
+      "type": 0,
+      "value": " of "
+    },
+    {
+      "type": 1,
+      "value": "max"
+    },
+    {
+      "type": 0,
+      "value": " selected)"
+    }
+  ],
   "bonus_product_view_modal.toast.item_added": [
     {
       "type": 0,
