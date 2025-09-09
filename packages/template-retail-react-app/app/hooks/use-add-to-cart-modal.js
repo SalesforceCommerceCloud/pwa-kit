@@ -86,7 +86,7 @@ export const AddToCartModal = () => {
     // Bonus product logic
     const {data: productsWithPromotions} = useBasketProductsWithPromotions(basket)
     // Port v4 logic: Check for bonus discount line items and calculate remaining capacity
-    const {bonusDiscountLineItems = []} = basket || {}
+    let {bonusDiscountLineItems = []} = basket || {}
 
     if (!isOpen) {
         return null
@@ -312,14 +312,63 @@ export const AddToCartModal = () => {
                                     )
                                 })}
 
+                            {/* Override bonusDiscountLineItems for testing */}
+                            {(() => {
+                                bonusDiscountLineItems = [
+                                    {
+                                        "bonusProducts": [
+                                            {
+                                                "productId": "793775370033M",
+                                                "productName": "Striped Silk Tie",
+                                                "title": "Striped Silk Tie"
+                                            }, {
+                                                "productId": "25752218M",
+                                                "productName": "Solid Silk Tie",
+                                                "title": "Solid Silk Tie"
+                                            }, {
+                                                "productId": "25752235M",
+                                                "productName": "Checked Silk Tie",
+                                                "title": "Checked Silk Tie"
+                                            }, {
+                                                "productId": "TG250M",
+                                                "productName": "Oxford Gloves",
+                                                "title": "Oxford Gloves"
+                                            }, {
+                                                "productId": "TG508M",
+                                                "productName": "Classic Deer Gloves",
+                                                "title": "Classic Deer Gloves"
+                                            }, {
+                                                "productId": "TG720M",
+                                                "productName": "Boot II Gloves",
+                                                "title": "Boot II Gloves"
+                                            }, {
+                                                "productId": "TG733M",
+                                                "productName": "Resolve Gloves",
+                                                "title": "Resolve Gloves"
+                                            }
+                                        ],
+                                        "id": "6df076e141a4b6ccc4c975dbd3",
+                                        "maxBonusItems": 2,
+                                        "promotionId": "ChoiceOfBonusProdect-ProductLevel"
+                                    }
+                                ];
+                                console.log('bonusDiscountLineItems:', bonusDiscountLineItems);
+                                return null;
+                            })()}
                             {/* V4 Logic: Render SelectBonusProductsCard right after the product items */}
                             {bonusDiscountLineItems &&
                                 bonusDiscountLineItems.length > 0 &&
                                 (() => {
+                                    // Create a modified basket with our test bonusDiscountLineItems
+                                    const modifiedBasket = {
+                                        ...basket,
+                                        bonusDiscountLineItems: bonusDiscountLineItems
+                                    };
+                                    
                                     // Compute aggregated remaining capacity based on the latest basket data
                                     const remainingBonusProductsData =
                                         getRemainingAvailableBonusProductsForProduct(
-                                            basket,
+                                            modifiedBasket,
                                             product?.id,
                                             productsWithPromotions
                                         )
@@ -340,7 +389,7 @@ export const AddToCartModal = () => {
                                     return (
                                         <SelectBonusProductsCard
                                             qualifyingProduct={{productId: product?.id}}
-                                            basket={basket}
+                                            basket={modifiedBasket}
                                             productsWithPromotions={productsWithPromotions}
                                             remainingBonusProductsData={remainingBonusProductsData}
                                             isEligible={true}
