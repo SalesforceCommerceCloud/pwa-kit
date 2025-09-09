@@ -113,11 +113,7 @@ const CartProductListWithGroupedBonusProducts = ({
                             {/* Bonus products already in cart */}
                             {hasBonusProductsInCart && (
                                 <Box mt={4}>
-                                    <Heading
-                                        fontSize="md"
-                                        pt="1"
-                                        mb={3}
-                                    >
+                                    <Heading fontSize="md" pt="1" mb={3}>
                                         Bonus Products
                                     </Heading>
                                     <Stack gap={0}>

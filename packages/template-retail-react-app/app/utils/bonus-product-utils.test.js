@@ -559,4 +559,3 @@ describe('Enhanced Bonus Product Utilities', () => {
         })
     })
 })
-

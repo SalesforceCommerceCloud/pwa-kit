@@ -273,10 +273,10 @@ const BonusProductViewModal = ({
                 maxHeight={productViewModalTheme.layout.content.maxHeight}
                 overflowY={productViewModalTheme.layout.content.overflowY}
             >
-                <ModalBody 
-                    bg={productViewModalTheme.layout.body.background} 
-                    p={productViewModalTheme.layout.body.padding} 
-                    pb={productViewModalTheme.layout.body.paddingBottom} 
+                <ModalBody
+                    bg={productViewModalTheme.layout.body.background}
+                    p={productViewModalTheme.layout.body.padding}
+                    pb={productViewModalTheme.layout.body.paddingBottom}
                     mt={productViewModalTheme.layout.body.marginTop}
                 >
                     {productViewModalData.isFetching && !productViewModalData.product ? (

@@ -311,7 +311,7 @@ export const AddToCartModal = () => {
                                         </Flex>
                                     )
                                 })}
-                                
+
                             {/* V4 Logic: Render SelectBonusProductsCard right after the product items */}
                             {bonusDiscountLineItems &&
                                 bonusDiscountLineItems.length > 0 &&
@@ -351,7 +351,8 @@ export const AddToCartModal = () => {
                                             }}
                                             bonusDiscountLineItem={{
                                                 id: firstRemainingBonusProduct?.bonusDiscountLineItemId,
-                                                promotionId: firstRemainingBonusProduct?.promotionId,
+                                                promotionId:
+                                                    firstRemainingBonusProduct?.promotionId,
                                                 maxBonusItems:
                                                     remainingBonusProductsData.aggregatedMaxBonusItems,
                                                 bonusProducts: remainingBonusProductsData.bonusItems

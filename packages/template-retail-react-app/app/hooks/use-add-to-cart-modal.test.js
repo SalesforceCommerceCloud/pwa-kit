@@ -28,15 +28,24 @@ jest.mock('@salesforce/retail-react-app/app/hooks/use-current-basket', () => ({
 }))
 
 // Mock SelectBonusProductsCard to verify props being passed
-jest.mock('@salesforce/retail-react-app/app/pages/cart/partials/select-bonus-products-card', () => {
-    return function MockSelectBonusProductsCard({hideSelectionCounter, ...props}) {
-        return (
-            <div data-testid="select-bonus-products-card" data-hide-selection-counter={hideSelectionCounter}>
-                Mock Bonus Products Card
-            </div>
-        )
-    }
-})
+
+jest.mock(
+    '@salesforce/retail-react-app/app/pages/cart/partials/select-bonus-products-card',
+    () =>
+        // eslint-disable-next-line react/prop-types
+        function MockSelectBonusProductsCard({hideSelectionCounter}) {
+            // eslint-disable-next-line @typescript-eslint/no-var-requires
+            const React = require('react')
+            return React.createElement(
+                'div',
+                {
+                    'data-testid': 'select-bonus-products-card',
+                    'data-hide-selection-counter': hideSelectionCounter
+                },
+                'Mock Bonus Products Card'
+            )
+        }
+)
 
 // Mock bonus product utilities
 jest.mock('@salesforce/retail-react-app/app/utils/bonus-product-utils', () => ({
@@ -56,14 +65,16 @@ jest.mock('@salesforce/retail-react-app/app/utils/bonus-product-utils', () => ({
                 productPromotions: [
                     {
                         promotionId: 'promo-123',
-                        calloutMsg: 'Buy one men\'s suit, get 2 free ties'
+                        calloutMsg: "Buy one men's suit, get 2 free ties"
                     }
                 ]
             }
         }
     })),
     getPromotionCalloutText: jest.fn((product, promotionId) => {
-        return product.productPromotions?.find(p => p.promotionId === promotionId)?.calloutMsg || ''
+        return (
+            product.productPromotions?.find((p) => p.promotionId === promotionId)?.calloutMsg || ''
+        )
     })
 }))
 
@@ -919,7 +930,7 @@ test('renders SelectBonusProductsCard with hideSelectionCounter=true in add-to-c
         productPromotions: [
             {
                 promotionId: 'promo-123',
-                calloutMsg: 'Buy one men\'s suit, get 2 free ties'
+                calloutMsg: "Buy one men's suit, get 2 free ties"
             }
         ]
     }
