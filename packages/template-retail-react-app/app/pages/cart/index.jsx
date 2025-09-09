@@ -126,10 +126,11 @@ const Cart = () => {
     const productIds = basket?.productItems?.map(({productId}) => productId).join(',') ?? ''
 
     // Bonus Product Logic
-    const {data: productsWithPromotions, isLoading: isPromotionDataLoading} = useBasketProductsWithPromotions(basket)
+    const {data: productsWithPromotions, isLoading: isPromotionDataLoading} =
+        useBasketProductsWithPromotions(basket)
     const bonusProductViewModal = useBonusProductViewModal()
     const {onOpen: openBonusSelectionModal} = useBonusProductSelectionModalContext()
-    
+
     // Handle opening bonus product selection modal (not the view modal directly)
     const handleSelectBonusProducts = () => {
         const bonusDiscountLineItems = basket?.bonusDiscountLineItems || []
@@ -916,16 +917,23 @@ const Cart = () => {
                                                     }
                                                 />
                                             )}
-                                            
+
                                             {/* Conditional Bonus Product Rendering with Shipment-based Structure */}
                                             {groupBonusProductsWithQualifyingProduct ? (
                                                 /* Grouped layout: Groups bonus products with their qualifying products */
                                                 <CartProductListWithGroupedBonusProducts
-                                                    nonBonusProducts={shipmentInfo.categorizedProducts.regularProducts}
+                                                    nonBonusProducts={
+                                                        shipmentInfo.categorizedProducts
+                                                            .regularProducts
+                                                    }
                                                     basket={basket}
                                                     productsWithPromotions={productsWithPromotions}
                                                     isPromotionDataLoading={isPromotionDataLoading}
-                                                    renderProductItem={(productItem, idx, options) => (
+                                                    renderProductItem={(
+                                                        productItem,
+                                                        idx,
+                                                        options
+                                                    ) => (
                                                         <ProductItemList
                                                             key={productItem.itemId}
                                                             productItems={[productItem]}
@@ -935,96 +943,152 @@ const Cart = () => {
                                                             localIsGiftItems={localIsGiftItems}
                                                             isCartItemLoading={isCartItemLoading}
                                                             selectedItem={selectedItem}
-                                                            onItemQuantityChange={handleChangeItemQuantity}
+                                                            onItemQuantityChange={
+                                                                handleChangeItemQuantity
+                                                            }
                                                             onRemoveItemClick={handleRemoveItem}
-                                                            renderSecondaryActions={renderSecondaryActions}
+                                                            renderSecondaryActions={
+                                                                renderSecondaryActions
+                                                            }
                                                             renderDeliveryActions={(productItem) =>
-                                                                renderDeliveryActions(productItem, shipmentInfo)
+                                                                renderDeliveryActions(
+                                                                    productItem,
+                                                                    shipmentInfo
+                                                                )
                                                             }
                                                             {...options}
                                                         />
                                                     )}
-                                                    getPromotionCalloutText={getPromotionCalloutText}
-                                                    onSelectBonusProducts={handleSelectBonusProducts}
+                                                    getPromotionCalloutText={
+                                                        getPromotionCalloutText
+                                                    }
+                                                    onSelectBonusProducts={
+                                                        handleSelectBonusProducts
+                                                    }
                                                 />
                                             ) : (
                                                 /* Simple layout: Renders all cart items individually with separate bonus product cards */
                                                 <Stack gap={4}>
                                                     {/* Render all cart items in simple layout */}
-                                                    {shipmentInfo.categorizedProducts.regularProducts?.map((productItem, idx) => (
+                                                    {shipmentInfo.categorizedProducts.regularProducts?.map(
+                                                        (productItem, _idx) => (
+                                                            <ProductItemList
+                                                                key={productItem.itemId}
+                                                                productItems={[productItem]}
+                                                                productsByItemId={productsByItemId}
+                                                                isProductsLoading={
+                                                                    isProductsLoading
+                                                                }
+                                                                localQuantity={localQuantity}
+                                                                localIsGiftItems={localIsGiftItems}
+                                                                isCartItemLoading={
+                                                                    isCartItemLoading
+                                                                }
+                                                                selectedItem={selectedItem}
+                                                                onItemQuantityChange={
+                                                                    handleChangeItemQuantity
+                                                                }
+                                                                onRemoveItemClick={handleRemoveItem}
+                                                                renderSecondaryActions={
+                                                                    renderSecondaryActions
+                                                                }
+                                                                renderDeliveryActions={(
+                                                                    productItem
+                                                                ) =>
+                                                                    renderDeliveryActions(
+                                                                        productItem,
+                                                                        shipmentInfo
+                                                                    )
+                                                                }
+                                                            />
+                                                        )
+                                                    )}
+
+                                                    {/* Render SelectBonusProductsCard for each bonusDiscountLineItem */}
+                                                    {basket.bonusDiscountLineItems?.map(
+                                                        (bonusDiscountLineItem) => {
+                                                            // Find a qualifying product that triggered this bonus opportunity
+                                                            const qualifyingProduct =
+                                                                basket.productItems?.find(
+                                                                    (item) =>
+                                                                        !item.bonusProductLineItem &&
+                                                                        item.priceAdjustments?.some(
+                                                                            (adj) =>
+                                                                                adj.promotionId ===
+                                                                                bonusDiscountLineItem.promotionId
+                                                                        )
+                                                                ) || {
+                                                                    productId:
+                                                                        bonusDiscountLineItem.promotionId
+                                                                } // Fallback
+
+                                                            return (
+                                                                <SelectBonusProductsCard
+                                                                    key={bonusDiscountLineItem.id}
+                                                                    qualifyingProduct={
+                                                                        qualifyingProduct
+                                                                    }
+                                                                    basket={basket}
+                                                                    productsWithPromotions={
+                                                                        productsWithPromotions
+                                                                    }
+                                                                    remainingBonusProductsData={{
+                                                                        bonusItems: [],
+                                                                        hasRemainingCapacity: true,
+                                                                        aggregatedMaxBonusItems:
+                                                                            bonusDiscountLineItem.maxBonusItems ||
+                                                                            0,
+                                                                        aggregatedSelectedItems: 0
+                                                                    }}
+                                                                    bonusDiscountLineItem={
+                                                                        bonusDiscountLineItem
+                                                                    }
+                                                                    getPromotionCalloutText={
+                                                                        getPromotionCalloutText
+                                                                    }
+                                                                    onSelectBonusProducts={
+                                                                        handleSelectBonusProducts
+                                                                    }
+                                                                />
+                                                            )
+                                                        }
+                                                    )}
+                                                </Stack>
+                                            )}
+
+                                            {/* Fallback: Orphan Bonus Products (only when grouping is disabled) */}
+                                            {!groupBonusProductsWithQualifyingProduct &&
+                                                shipmentInfo.categorizedProducts.bonusProducts
+                                                    .length > 0 && (
+                                                    <>
+                                                        <BonusProductsTitle />
                                                         <ProductItemList
-                                                            key={productItem.itemId}
-                                                            productItems={[productItem]}
+                                                            productItems={
+                                                                shipmentInfo.categorizedProducts
+                                                                    .bonusProducts
+                                                            }
                                                             productsByItemId={productsByItemId}
                                                             isProductsLoading={isProductsLoading}
                                                             localQuantity={localQuantity}
                                                             localIsGiftItems={localIsGiftItems}
                                                             isCartItemLoading={isCartItemLoading}
                                                             selectedItem={selectedItem}
-                                                            onItemQuantityChange={handleChangeItemQuantity}
+                                                            onItemQuantityChange={
+                                                                handleChangeItemQuantity
+                                                            }
                                                             onRemoveItemClick={handleRemoveItem}
-                                                            renderSecondaryActions={renderSecondaryActions}
+                                                            renderSecondaryActions={
+                                                                renderSecondaryActions
+                                                            }
                                                             renderDeliveryActions={(productItem) =>
-                                                                renderDeliveryActions(productItem, shipmentInfo)
+                                                                renderDeliveryActions(
+                                                                    productItem,
+                                                                    shipmentInfo
+                                                                )
                                                             }
                                                         />
-                                                    ))}
-
-                                                    {/* Render SelectBonusProductsCard for each bonusDiscountLineItem */}
-                                                    {basket.bonusDiscountLineItems?.map((bonusDiscountLineItem) => {
-                                                        // Find a qualifying product that triggered this bonus opportunity
-                                                        const qualifyingProduct = basket.productItems?.find(
-                                                            (item) =>
-                                                                !item.bonusProductLineItem &&
-                                                                item.priceAdjustments?.some(
-                                                                    (adj) => adj.promotionId === bonusDiscountLineItem.promotionId
-                                                                )
-                                                        ) || {productId: bonusDiscountLineItem.promotionId} // Fallback
-
-                                                        return (
-                                                            <SelectBonusProductsCard
-                                                                key={bonusDiscountLineItem.id}
-                                                                qualifyingProduct={qualifyingProduct}
-                                                                basket={basket}
-                                                                productsWithPromotions={productsWithPromotions}
-                                                                remainingBonusProductsData={{
-                                                                    bonusItems: [],
-                                                                    hasRemainingCapacity: true,
-                                                                    aggregatedMaxBonusItems: bonusDiscountLineItem.maxBonusItems || 0,
-                                                                    aggregatedSelectedItems: 0
-                                                                }}
-                                                                bonusDiscountLineItem={bonusDiscountLineItem}
-                                                                getPromotionCalloutText={getPromotionCalloutText}
-                                                                onSelectBonusProducts={handleSelectBonusProducts}
-                                                            />
-                                                        )
-                                                    })}
-                                                </Stack>
-                                            )}
-
-                                            {/* Fallback: Orphan Bonus Products (only when grouping is disabled) */}
-                                            {!groupBonusProductsWithQualifyingProduct && shipmentInfo.categorizedProducts.bonusProducts.length > 0 && (
-                                                <>
-                                                    <BonusProductsTitle />
-                                                    <ProductItemList
-                                                        productItems={
-                                                            shipmentInfo.categorizedProducts.bonusProducts
-                                                        }
-                                                        productsByItemId={productsByItemId}
-                                                        isProductsLoading={isProductsLoading}
-                                                        localQuantity={localQuantity}
-                                                        localIsGiftItems={localIsGiftItems}
-                                                        isCartItemLoading={isCartItemLoading}
-                                                        selectedItem={selectedItem}
-                                                        onItemQuantityChange={handleChangeItemQuantity}
-                                                        onRemoveItemClick={handleRemoveItem}
-                                                        renderSecondaryActions={renderSecondaryActions}
-                                                        renderDeliveryActions={(productItem) =>
-                                                            renderDeliveryActions(productItem, shipmentInfo)
-                                                        }
-                                                    />
-                                                </>
-                                            )}
+                                                    </>
+                                                )}
                                         </Box>
                                     ))}
                                 </Stack>
@@ -1124,7 +1188,7 @@ const Cart = () => {
                 productItems={basket?.productItems}
                 handleUnavailableProducts={handleUnavailableProducts}
             />
-            
+
             {/* Bonus Product View Modal */}
             {bonusProductViewModal.isOpen && bonusProductViewModal.data && (
                 <BonusProductViewModal

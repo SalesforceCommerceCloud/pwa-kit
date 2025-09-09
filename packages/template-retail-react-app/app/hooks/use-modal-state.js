@@ -48,4 +48,3 @@ export const useModalState = ({closeOnRouteChange = true, resetDataOnClose = tru
         }
     }
 }
-

@@ -35,7 +35,6 @@ const SelectBonusProductsCard = ({
     bonusDiscountLineItem,
     hideSelectionCounter = false
 }) => {
-
     const {onOpen: openBonusSelectionModal} = useBonusProductSelectionModalContext()
     // Use bonusDiscountLineItem data if provided, otherwise fall back to existing logic
     let promotionId
@@ -134,7 +133,7 @@ const SelectBonusProductsCard = ({
                     if (onSelectBonusProducts) {
                         onSelectBonusProducts()
                     }
-                    
+
                     // Then open the bonus selection modal after a brief delay
                     setTimeout(() => {
                         // Build the payload for the bonus selection modal
@@ -159,7 +158,7 @@ const SelectBonusProductsCard = ({
             />
         </Box>
     )
-    
+
     return cardJSX
 }
 

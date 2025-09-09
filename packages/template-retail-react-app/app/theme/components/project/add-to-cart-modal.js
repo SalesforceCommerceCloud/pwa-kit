@@ -78,4 +78,3 @@ export const addToCartModalTheme = {
         dividerColor: 'gray.200'
     }
 }
-
