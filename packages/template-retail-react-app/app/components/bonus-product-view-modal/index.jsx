@@ -11,11 +11,13 @@ import {
     Modal,
     ModalOverlay,
     ModalContent,
+    ModalHeader,
     ModalBody,
     ModalCloseButton,
     Button,
     Box,
-    Text
+    Text,
+    Heading
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 import ProductView from '@salesforce/retail-react-app/app/components/product-view'
 import {useProductViewModal} from '@salesforce/retail-react-app/app/hooks/use-product-view-modal'
@@ -66,6 +68,24 @@ const BonusProductViewModal = ({
     const intl = useIntl()
     const {formatMessage} = intl
     const showToast = useToast()
+
+    // Calculate bonus items count for header
+    const {selectedBonusItems, maxBonusItems} = useMemo(() => {
+        if (!basket?.bonusDiscountLineItems) {
+            return {selectedBonusItems: 0, maxBonusItems: 0}
+        }
+
+        const maxItems = basket.bonusDiscountLineItems.reduce(
+            (sum, bli) => sum + (bli.maxBonusItems || 0), 
+            0
+        )
+        
+        const selectedItems = (basket.productItems || [])
+            .filter(item => item.bonusProductLineItem)
+            .reduce((sum, item) => sum + (item.quantity || 0), 0)
+
+        return {selectedBonusItems: selectedItems, maxBonusItems: maxItems}
+    }, [basket])
 
     const messages = useMemo(
         () => ({
@@ -240,16 +260,16 @@ const BonusProductViewModal = ({
         [messages.viewCart, handleViewCart]
     )
 
-    // Aggressively clean product data to prevent SwatchGroup errors while preserving essential fields
+    // Clean product data but preserve variation attributes for size/color selectors
     const productToRender = useMemo(() => {
         const baseProduct = productViewModalData.product || safeProduct
         return {
             ...baseProduct,
-            variationAttributes: [], // Force empty array
-            variants: [], // Also remove variants to be safe
-            variationParams: {},
-            selectedVariationAttributes: {},
-            type: {...baseProduct.type, variant: false, master: false},
+            variationAttributes: baseProduct.variationAttributes,
+            variants: baseProduct.variants,
+            variationParams: baseProduct.variationParams,
+            selectedVariationAttributes: baseProduct.selectedVariationAttributes,
+            type: baseProduct.type,
             // Ensure proper inventory and quantity defaults for bonus products
             inventory: {
                 ...baseProduct.inventory,
@@ -259,7 +279,10 @@ const BonusProductViewModal = ({
             minOrderQuantity: 1,
             stepQuantity: 1,
             // Ensure the product is orderable
-            orderable: true
+            orderable: true,
+            // Add review data for display
+            rating: baseProduct.rating,
+            reviewCount: baseProduct.reviewCount
         }
     }, [productViewModalData.product, safeProduct])
 
@@ -269,10 +292,11 @@ const BonusProductViewModal = ({
     return (
         <Modal
             isOpen={isOpen}
-            onClose={onClose}
+            onClose={onReturnToSelection || onClose}
             size={productViewModalTheme.modal.size}
             closeOnOverlayClick={true}
             closeOnEsc={true}
+            isCentered
             motionPreset="slideInBottom"
             preserveScrollBarGap={true}
         >
@@ -286,11 +310,24 @@ const BonusProductViewModal = ({
                 maxHeight={productViewModalTheme.layout.content.maxHeight}
                 overflowY={productViewModalTheme.layout.content.overflowY}
             >
+                <ModalHeader
+                    bg={productViewModalTheme.colors.contentBackground}
+                >
+                    <Heading size="md">
+                        {formatMessage(
+                            {
+                                id: 'bonus_product_view_modal.title',
+                                defaultMessage: 'Select Bonus Product ({selected} of {max} selected)'
+                            },
+                            {selected: selectedBonusItems, max: maxBonusItems}
+                        )}
+                    </Heading>
+                </ModalHeader>
+
                 <ModalBody
                     bg={productViewModalTheme.layout.body.background}
                     p={productViewModalTheme.layout.body.padding}
                     pb={productViewModalTheme.layout.body.paddingBottom}
-                    mt={productViewModalTheme.layout.body.marginTop}
                 >
                     {productViewModalData.isFetching && !productViewModalData.product ? (
                         <Box p={8} textAlign="center">
@@ -308,6 +345,8 @@ const BonusProductViewModal = ({
                             customButtons={customButtons}
                             promotionId={promotionId}
                             maxOrderQuantity={maxOrderQuantity}
+                            showReviews={true}
+                            showVariationAttributes={true}
                             {...props}
                         />
                     )}

@@ -349,7 +349,7 @@ export const BonusProductSelectionModal = () => {
                             borderBottom={addToCartModalTheme.layout.header.borderBottom}
                             borderColor={addToCartModalTheme.layout.header.borderColor}
                         >
-                            <Heading as="h3" fontSize={24} fontWeight="700">
+                            <Heading as="h3" size="md">
                                 {intl.formatMessage(
                                     {
                                         id: 'bonus_product_modal.title',
