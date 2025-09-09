@@ -75,7 +75,8 @@ jest.mock('@salesforce/retail-react-app/app/utils/bonus-product-utils', () => ({
         return (
             product.productPromotions?.find((p) => p.promotionId === promotionId)?.calloutMsg || ''
         )
-    })
+    }),
+    shouldShowBonusProductSelection: jest.fn(() => true)
 }))
 
 const MOCK_PRODUCT = {

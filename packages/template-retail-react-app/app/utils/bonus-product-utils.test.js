@@ -417,6 +417,55 @@ describe('Enhanced Bonus Product Utilities', () => {
             )
             expect(isNotEligibleNull).toBe(false)
         })
+
+        test('checks if product is available as bonus product', () => {
+            // Test with product that is available as bonus
+            const isAvailableAsBonus = bonusProductUtils.isProductAvailableAsBonus(
+                mockBasket,
+                'bonus-prod-456'
+            )
+            expect(isAvailableAsBonus).toBe(true)
+
+            // Test with product that is not available as bonus
+            const isNotAvailableAsBonus = bonusProductUtils.isProductAvailableAsBonus(
+                mockBasket,
+                'prod-123'
+            )
+            expect(isNotAvailableAsBonus).toBe(false)
+
+            // Test with null basket
+            const isNotAvailableNull = bonusProductUtils.isProductAvailableAsBonus(
+                null,
+                'bonus-prod-456'
+            )
+            expect(isNotAvailableNull).toBe(false)
+        })
+
+        test('determines if product should show bonus product selection', () => {
+            // Test with qualifying product (has promotions but not available as bonus)
+            const shouldShow = bonusProductUtils.shouldShowBonusProductSelection(
+                mockBasket,
+                'prod-123',
+                mockProductsWithPromotions
+            )
+            expect(shouldShow).toBe(true)
+
+            // Test with bonus product (has promotions and is available as bonus)
+            const shouldNotShow = bonusProductUtils.shouldShowBonusProductSelection(
+                mockBasket,
+                'bonus-prod-456',
+                mockProductsWithPromotions
+            )
+            expect(shouldNotShow).toBe(false)
+
+            // Test with product that has no promotions
+            const shouldNotShowNoPromo = bonusProductUtils.shouldShowBonusProductSelection(
+                mockBasket,
+                'non-existent',
+                mockProductsWithPromotions
+            )
+            expect(shouldNotShowNoPromo).toBe(false)
+        })
     })
 
     describe('findAvailableBonusDiscountLineItemId', () => {

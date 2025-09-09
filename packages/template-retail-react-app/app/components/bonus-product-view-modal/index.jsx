@@ -28,6 +28,7 @@ import {
 } from '@salesforce/retail-react-app/app/utils/bonus-product-utils'
 import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
 import {productViewModalTheme} from '@salesforce/retail-react-app/app/theme/components/project/product-view-modal'
+import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
 
 /**
  * A Modal that contains Bonus Product View
@@ -64,6 +65,7 @@ const BonusProductViewModal = ({
 
     const intl = useIntl()
     const {formatMessage} = intl
+    const showToast = useToast()
 
     const messages = useMemo(
         () => ({
@@ -165,6 +167,15 @@ const BonusProductViewModal = ({
 
                 // Check for remaining bonus products after successful add to cart
                 if (result) {
+                    // Show success toast notification
+                    showToast({
+                        title: formatMessage({
+                            id: 'bonus_product_view_modal.toast.item_added',
+                            defaultMessage: 'Bonus item added to cart'
+                        }),
+                        status: 'success'
+                    })
+
                     // Get updated basket data to check for remaining bonus products
                     // addItemToNewOrExistingBasket returns the basket directly
                     const updatedBasket = result
@@ -189,8 +200,8 @@ const BonusProductViewModal = ({
                     }
                 }
 
-                // Return the expected format for AddToCartModal if needed
-                return products
+                // For bonus products, don't open add-to-cart modal - just return null
+                return null
             } catch (error) {
                 console.error('Error adding bonus product to cart:', error)
                 return null
@@ -204,7 +215,9 @@ const BonusProductViewModal = ({
             basket,
             onClose,
             navigate,
-            onReturnToSelection
+            onReturnToSelection,
+            showToast,
+            formatMessage
         ]
     )
 
