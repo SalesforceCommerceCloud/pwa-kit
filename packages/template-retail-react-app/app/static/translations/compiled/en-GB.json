@@ -525,6 +525,12 @@
       "value": "productName"
     }
   ],
+  "bonus_product_view_modal.toast.item_added": [
+    {
+      "type": 0,
+      "value": "Bonus item added to cart"
+    }
+  ],
   "bonus_products_title.title.num_of_items": [
     {
       "type": 0,
