@@ -29,6 +29,7 @@ import {
 import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
 import {useLocation} from 'react-router-dom'
 import {productViewModalTheme} from '@salesforce/retail-react-app/app/theme/components/project/product-view-modal'
+import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
 
 /**
  * A Modal that contains Bonus Product View
@@ -65,6 +66,7 @@ const BonusProductViewModal = ({
 
     const intl = useIntl()
     const {formatMessage} = intl
+    const showToast = useToast()
 
     const messages = useMemo(
         () => ({
@@ -144,6 +146,13 @@ const BonusProductViewModal = ({
 
                 // Navigate to cart page after successful add to cart
                 if (result) {
+                    showToast({
+                        title: formatMessage({
+                            id: 'bonus_product_view_modal.toast.item_added'
+                        }),
+                        status: 'success'
+                    })
+                    
                     // Close modal immediately and navigate with proper delay
                     onClose()
                     // Always use a delay to ensure modal closes cleanly
@@ -152,7 +161,8 @@ const BonusProductViewModal = ({
                     }, 200)
                 }
 
-                return result
+                // For bonus products, don't open add-to-cart modal - just return null
+                return null
             } catch (error) {
                 console.error('Error adding bonus product to cart:', error)
                 return null
@@ -166,7 +176,9 @@ const BonusProductViewModal = ({
             basket,
             onClose,
             navigate,
-            isFromAddToCartModal
+            isFromAddToCartModal,
+            showToast,
+            formatMessage
         ]
     )
 
