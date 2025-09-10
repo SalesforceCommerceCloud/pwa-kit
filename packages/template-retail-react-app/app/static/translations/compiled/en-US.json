@@ -3779,6 +3779,12 @@
       "value": "postalCode"
     }
   ],
+  "store_display.label.store_contact_info": [
+    {
+      "type": 0,
+      "value": "Store Contact Info"
+    }
+  ],
   "store_display.label.store_hours": [
     {
       "type": 0,

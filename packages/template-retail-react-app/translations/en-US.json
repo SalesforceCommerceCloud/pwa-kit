@@ -1586,6 +1586,9 @@
   "store_display.format.address_line_2": {
     "defaultMessage": "{city}, {stateCode} {postalCode}"
   },
+  "store_display.label.store_contact_info": {
+    "defaultMessage": "Store Contact Info"
+  },
   "store_display.label.store_hours": {
     "defaultMessage": "Store Hours"
   },

@@ -16,17 +16,18 @@ export const StoreLocatorListItem = ({store, radioProps}) => {
             <Box margin="10px">
                 <HStack align="flex-start" spacing={3}>
                     <Radio {...radioProps} mt="1px" />
-                    <StoreDisplay
-                        store={store}
-                        showDistance={true}
-                        showStoreHours={true}
-                        showPhone={true}
-                        showEmail={false}
-                        nameStyle={{fontSize: 'lg'}}
-                        textSize="md"
-                        accordionButtonStyle={{style: {marginTop: '10px'}}}
-                        accordionPanelStyle={{mb: 6, mt: 4}}
-                    />
+                    <Box flex={1} minW={0}>
+                        <StoreDisplay
+                            store={store}
+                            showDistance={true}
+                            showStoreHours={true}
+                            showPhone={true}
+                            showEmail={true}
+                            nameStyle={{fontSize: 'lg'}}
+                            textSize="md"
+                            accordionPanelStyle={{mb: 6, mt: 4}}
+                        />
+                    </Box>
                 </HStack>
             </Box>
         </AccordionItem>
