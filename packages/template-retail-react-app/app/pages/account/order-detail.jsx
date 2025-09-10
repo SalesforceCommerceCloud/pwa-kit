@@ -23,7 +23,7 @@ import {
     useDisclosure
 } from '@chakra-ui/react'
 import {getCreditCardIcon} from '@salesforce/retail-react-app/app/utils/cc-utils'
-import {useOrder, useProducts} from '@salesforce/commerce-sdk-react'
+import {useOrder, useProducts, useSomCancelOrder} from '@salesforce/commerce-sdk-react'
 import Link from '@salesforce/retail-react-app/app/components/link'
 import {ChevronLeftIcon} from '@salesforce/retail-react-app/app/components/icons'
 import OrderSummary from '@salesforce/retail-react-app/app/components/order-summary'
@@ -94,6 +94,28 @@ const AccountOrderDetail = () => {
     // When the API is available, replace call with real API request.
     // The handler should update UI (e.g., refetch order, show a toast, navigate back to orders).
     const handleCancelOrder = async () => {
+        const useSomCancelOrderQuery = useSomCancelOrder({
+            parameters: {
+                siteId: 'RefArch',
+                c_orderNumber: '00000707'
+            }
+        }, {
+            enabled: typeof window !== 'undefined',
+            onSuccess: (data) => {
+                console.log("✅ somOrder query successful:", data)
+            },
+            onError: (error) => {
+                console.error("❌ somOrder query failed:", error)
+                console.error("Error details:", {
+                    message: error.message,
+                    stack: error.stack,
+                    response: error.response
+                })
+            }
+        })
+
+        console.log("✅ somOrder query successful:", useSomCancelOrderQuery)
+
         try {
             // const response = await realCancelOrderApi(_order.orderNo, _reasonId)
             const response = undefined // no-op placeholder for now
