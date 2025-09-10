@@ -188,7 +188,24 @@ export const getBonusProductsInCartForProduct = (basket, productId, productsWith
             )
         }) || []
 
-    return bonusProductsInCart
+    // Combine identical bonus products by productId and aggregate quantities
+    const combinedBonusProducts = {}
+    bonusProductsInCart.forEach((item) => {
+        const key = item.productId
+        if (combinedBonusProducts[key]) {
+            // Aggregate quantity for identical products
+            combinedBonusProducts[key].quantity += item.quantity || 0
+        } else {
+            // Create new entry with cloned item data
+            combinedBonusProducts[key] = {
+                ...item,
+                quantity: item.quantity || 0
+            }
+        }
+    })
+
+    // Convert back to array
+    return Object.values(combinedBonusProducts)
 }
 
 /**
