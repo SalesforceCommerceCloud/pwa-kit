@@ -1,5 +1,7 @@
 <div align="center">
 
+<h1>⚠️ Important! This branch is only a reference implementation for Apple Pay support through Adyen payment gateway for the Shopping Agent.</h1>
+
 <h1>The Progressive Web App (PWA) Kit</h1>
 
 [![npm](https://img.shields.io/npm/v/@salesforce/pwa-kit-react-sdk.svg)](https://www.npmjs.com/package/@salesforce/pwa-kit-react-sdk)
