@@ -17,13 +17,18 @@ import {
     ModalBody,
     ModalCloseButton,
     Button,
-    Text
+    Text,
+    Spinner,
+    Alert,
+    AlertIcon,
+    AlertTitle,
+    AlertDescription
 } from '@chakra-ui/react'
 
 /**
  * A Modal for requesting order cancellation
  */
-const CancelOrderModal = ({isOpen, onClose, order, onRequestCancellation, ...props}) => {
+const CancelOrderModal = ({isOpen, onClose, order, onRequestCancellation, isLoading, error, ...props}) => {
     const handleCancelOrder = () => {
         if (!onRequestCancellation) {
             console.error('Cancel order modal: onRequestCancellation is required')
@@ -53,9 +58,25 @@ const CancelOrderModal = ({isOpen, onClose, order, onRequestCancellation, ...pro
                             id="cancel_order_modal.content.placeholder"
                         />
                     </Text>
+                    
+                    {error && (
+                        <Alert status="error" mt={4}>
+                            <AlertIcon />
+                            <AlertTitle>Error!</AlertTitle>
+                            <AlertDescription>
+                                {error.message || 'Failed to cancel order. Please try again.'}
+                            </AlertDescription>
+                        </Alert>
+                    )}
                 </ModalBody>
                 <ModalFooter>
-                    <Button variant="solid" onClick={handleCancelOrder}>
+                    <Button 
+                        variant="solid" 
+                        onClick={handleCancelOrder}
+                        isLoading={isLoading}
+                        loadingText="Canceling..."
+                        disabled={isLoading}
+                    >
                         <FormattedMessage
                             defaultMessage="Request Cancellation"
                             id="cancel_order_modal.button.confirm"
@@ -83,7 +104,15 @@ CancelOrderModal.propTypes = {
     /**
      * Callback when user confirms cancellation request
      */
-    onRequestCancellation: PropTypes.func.isRequired
+    onRequestCancellation: PropTypes.func.isRequired,
+    /**
+     * Whether the cancel order request is loading
+     */
+    isLoading: PropTypes.bool,
+    /**
+     * Error object if cancel order request failed
+     */
+    error: PropTypes.object
 }
 
 export default CancelOrderModal

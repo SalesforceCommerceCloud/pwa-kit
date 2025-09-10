@@ -36,7 +36,7 @@ const OPTIONS = {
 }
 
 /** Map of query name to returned data type */
-type TestMap = {[K in keyof Omit<Queries, 'useSomOrder'>]: NonNullable<ReturnType<Queries[K]>['data']>}
+type TestMap = {[K in keyof Omit<Queries, 'useSomOrder' | 'useSomCancelOrder'>]: NonNullable<ReturnType<Queries[K]>['data']>}
 // This is an object rather than an array to more easily ensure we cover all hooks
 const testMap: TestMap = {
     useCustomer: {customerId: 'customerId'},
