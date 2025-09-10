@@ -25,7 +25,8 @@ const dialogTitle = defineMessage({
 })
 
 const confirmationMessage = defineMessage({
-    defaultMessage: 'If you switch to one address, the shipping addresses you added for each item will be removed.',
+    defaultMessage:
+        'If you switch to one address, the shipping addresses you added for each item will be removed.',
     id: 'multi_ship_warning_modal.message.addresses_will_be_removed'
 })
 
@@ -39,12 +40,7 @@ const cancelButtonLabel = defineMessage({
     id: 'multi_ship_warning_modal.action.cancel'
 })
 
-const SingleAddressToggleModal = ({
-    isOpen,
-    onClose,
-    onConfirm,
-    onCancel
-}) => {
+const SingleAddressToggleModal = ({isOpen, onClose, onConfirm, onCancel}) => {
     const {formatMessage} = useIntl()
 
     const handleConfirm = () => {
@@ -66,19 +62,10 @@ const SingleAddressToggleModal = ({
             closeOnOverlayClick={true}
         >
             <AlertDialogOverlay />
-            <AlertDialogContent
-                maxW="448px"
-                w="448px"
-                h="196px"
-                borderRadius="6px"
-            >
-                <AlertDialogHeader>
-                    {formatMessage(dialogTitle)}
-                </AlertDialogHeader>
+            <AlertDialogContent maxW="448px" w="448px" h="196px" borderRadius="6px">
+                <AlertDialogHeader>{formatMessage(dialogTitle)}</AlertDialogHeader>
                 <AlertDialogBody>
-                    <Text>
-                        {formatMessage(confirmationMessage)}
-                    </Text>
+                    <Text>{formatMessage(confirmationMessage)}</Text>
                 </AlertDialogBody>
                 <AlertDialogFooter>
                     <Button

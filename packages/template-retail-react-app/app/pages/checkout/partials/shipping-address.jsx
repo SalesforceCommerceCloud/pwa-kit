@@ -37,7 +37,6 @@ import {
     isPickupShipment
 } from '@salesforce/retail-react-app/app/utils/shipment-utils'
 import SingleAddressToggleModal from '@salesforce/retail-react-app/app/components/single-address-toggle-modal'
-import {useProductAddressAssignment} from '@salesforce/retail-react-app/app/hooks/use-product-address-assignment'
 
 const submitButtonMessage = defineMessage({
     defaultMessage: 'Continue to Shipping Method',
@@ -88,18 +87,33 @@ export default function ShippingAddress() {
     )
     const showToast = useToast()
 
-    // Get guest address data to check if addresses exist
-    const {availableAddresses} = useProductAddressAssignment(basket)
+    // State to track unsaved addresses from ShippingMultiAddress
+    const [hasUnsavedAddresses, setHasUnsavedAddresses] = useState(false)
 
     // Keep multi-shipping state in sync with basket shipments
     useEffect(() => {
         setIsMultiShipping(hasMultipleDeliveryShipments)
     }, [hasMultipleDeliveryShipments])
 
+    // Handle unsaved address status changes from ShippingMultiAddress
+    const handleAddressesChange = (hasUnsaved) => {
+        console.log('ShippingAddress received hasUnsaved:', hasUnsaved)
+        setHasUnsavedAddresses(hasUnsaved)
+    }
+
     // Handle toggle between single and multi-shipping
     const handleToggleShippingMode = () => {
-        // If switching from multi-ship to single address and user is guest with addresses
-        if (isMultiShipping && customer?.isGuest && availableAddresses?.length >= 1) {
+        console.log('=== Toggle Debug ===')
+        console.log('isMultiShipping:', isMultiShipping)
+        console.log('isGuest:', customer?.isGuest)
+        console.log('hasUnsavedAddresses:', hasUnsavedAddresses)
+        console.log(
+            'Will show warning:',
+            isMultiShipping && customer?.isGuest && hasUnsavedAddresses
+        )
+
+        // If switching from multi-ship to single address and user is guest with unsaved addresses
+        if (isMultiShipping && customer?.isGuest && hasUnsavedAddresses) {
             setShowWarningModal(true)
         } else {
             setIsMultiShipping(!isMultiShipping)
@@ -233,6 +247,7 @@ export default function ShippingAddress() {
                             basket={basket}
                             submitButtonLabel={submitButtonMessage}
                             noItemsInBasketMessage={noItemsInBasketMessage}
+                            onAddressesChange={handleAddressesChange}
                         />
                     )}
                 </ToggleCardEdit>
