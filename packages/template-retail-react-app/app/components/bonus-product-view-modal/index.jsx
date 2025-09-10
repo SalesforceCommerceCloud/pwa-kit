@@ -99,6 +99,10 @@ const BonusProductViewModal = ({
             viewCart: formatMessage({
                 id: 'bonus_product_view_modal.button.view_cart',
                 defaultMessage: 'View Cart'
+            }),
+            backToSelection: formatMessage({
+                id: 'bonus_product_view_modal.button.back_to_selection',
+                defaultMessage: 'Back to Selection'
             })
         }),
         [intl]
@@ -255,9 +259,12 @@ const BonusProductViewModal = ({
         () => [
             <Button key="view-cart" variant="outline" onClick={handleViewCart}>
                 {messages.viewCart}
+            </Button>,
+            <Button key="back-to-selection" variant="outline" onClick={onReturnToSelection}>
+                {messages.backToSelection}
             </Button>
         ],
-        [messages.viewCart, handleViewCart]
+        [messages.viewCart, messages.backToSelection, handleViewCart, onReturnToSelection]
     )
 
     // Clean product data but preserve variation attributes for size/color selectors
@@ -292,7 +299,7 @@ const BonusProductViewModal = ({
     return (
         <Modal
             isOpen={isOpen}
-            onClose={onReturnToSelection || onClose}
+            onClose={onClose}
             size={productViewModalTheme.modal.size}
             closeOnOverlayClick={true}
             closeOnEsc={true}

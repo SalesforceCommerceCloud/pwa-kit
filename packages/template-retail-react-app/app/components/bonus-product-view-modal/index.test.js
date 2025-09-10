@@ -164,6 +164,55 @@ describe('BonusProductViewModal - getRemainingBonusQuantity', () => {
     })
 })
 
+describe('BonusProductViewModal - Header Count Display', () => {
+    const testHeaderCount = (description, bonusItems, productItems, expectedText) => {
+        test(description, () => {
+            const mockBasket = bonusItems ? {
+                bonusDiscountLineItems: bonusItems,
+                productItems: productItems || []
+            } : null
+            
+            useCurrentBasket.mockReturnValue({data: mockBasket})
+
+            renderWithProviders(
+                <BonusProductViewModal
+                    product={mockProductDetail}
+                    isOpen={true}
+                    onClose={() => {}}
+                    bonusDiscountLineItemId="bonus-1"
+                    promotionId="test-promo"
+                />
+            )
+
+            expect(screen.getByRole('heading')).toHaveTextContent(expectedText)
+        })
+    }
+
+    testHeaderCount(
+        'displays "0 of 2 selected" when no bonus items are selected',
+        [{id: 'bonus-1', maxBonusItems: 2}],
+        [],
+        'Select Bonus Product (0 of 2 selected)'
+    )
+
+    testHeaderCount(
+        'displays "1 of 4 selected" when one bonus item is selected',
+        [{id: 'bonus-1', maxBonusItems: 2}, {id: 'bonus-2', maxBonusItems: 2}],
+        [{bonusProductLineItem: true, bonusDiscountLineItemId: 'bonus-1', quantity: 1}],
+        'Select Bonus Product (1 of 4 selected)'
+    )
+
+    testHeaderCount(
+        'displays "5 of 6 selected" when most bonus items are selected',
+        [{id: 'bonus-1', maxBonusItems: 3}, {id: 'bonus-2', maxBonusItems: 3}],
+        [
+            {bonusProductLineItem: true, bonusDiscountLineItemId: 'bonus-1', quantity: 3},
+            {bonusProductLineItem: true, bonusDiscountLineItemId: 'bonus-2', quantity: 2}
+        ],
+        'Select Bonus Product (5 of 6 selected)'
+    )
+})
+
 describe('BonusProductViewModal - Return to Selection Flow', () => {
     beforeEach(() => {
         // Setup default mocks - using global mock functions
