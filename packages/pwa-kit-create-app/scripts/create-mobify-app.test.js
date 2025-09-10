@@ -5,11 +5,6 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-const fs = require('fs')
-const path = require('path')
-const os = require('os')
-const child_proc = require('child_process')
-
 // Mock dependencies
 jest.mock('fs')
 jest.mock('fs/promises')
