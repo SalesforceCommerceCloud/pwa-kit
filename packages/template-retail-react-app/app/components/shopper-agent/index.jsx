@@ -9,7 +9,7 @@ import useScript from '@salesforce/retail-react-app/app/hooks/use-script'
 import {useUsid} from '@salesforce/commerce-sdk-react'
 import PropTypes from 'prop-types'
 import {useTheme} from '@salesforce/retail-react-app/app/components/shared/ui'
-import useMiaw from '@salesforce/retail-react-app/app/hooks/use-miaw'
+import useMiaw, {normalizeLocaleToSalesforce} from '@salesforce/retail-react-app/app/hooks/use-miaw'
 import useRefreshToken from '@salesforce/retail-react-app/app/hooks/use-refresh-token'
 import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
 
@@ -159,6 +159,9 @@ const ShopperAgentWindow = ({commerceAgentConfiguration}) => {
     // Authentication hook for refresh token
     const refreshToken = useRefreshToken()
 
+    // Normalize locale to Salesforce language format
+    const sfLanguage = normalizeLocaleToSalesforce(locale.id)
+
     // Destructure configuration for cleaner access
     const {
         embeddedServiceName,
@@ -284,7 +287,8 @@ const ShopperAgentWindow = ({commerceAgentConfiguration}) => {
                 UsId: usid,
                 IsCartMgmtSupported: 'true',
                 RefreshToken: refreshToken,
-                Currency: locale.preferredCurrency
+                Currency: locale.preferredCurrency,
+                Language: sfLanguage
             })
         }
 
@@ -338,8 +342,7 @@ const ShopperAgentWindow = ({commerceAgentConfiguration}) => {
         embeddedServiceEndpoint,
         scrt2Url,
         locale.id,
-        refreshToken,
-        locale.preferredCurrency
+        refreshToken
     )
 
     // This component doesn't render visible UI, only manages the messaging service
