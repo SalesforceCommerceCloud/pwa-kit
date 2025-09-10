@@ -97,21 +97,11 @@ export default function ShippingAddress() {
 
     // Handle unsaved address status changes from ShippingMultiAddress
     const handleAddressesChange = (hasUnsaved) => {
-        console.log('ShippingAddress received hasUnsaved:', hasUnsaved)
         setHasUnsavedAddresses(hasUnsaved)
     }
 
     // Handle toggle between single and multi-shipping
     const handleToggleShippingMode = () => {
-        console.log('=== Toggle Debug ===')
-        console.log('isMultiShipping:', isMultiShipping)
-        console.log('isGuest:', customer?.isGuest)
-        console.log('hasUnsavedAddresses:', hasUnsavedAddresses)
-        console.log(
-            'Will show warning:',
-            isMultiShipping && customer?.isGuest && hasUnsavedAddresses
-        )
-
         // If switching from multi-ship to single address and user is guest with unsaved addresses
         if (isMultiShipping && customer?.isGuest && hasUnsavedAddresses) {
             setShowWarningModal(true)

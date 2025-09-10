@@ -96,22 +96,13 @@ const ShippingMultiAddress = ({
                 ?.map((shipment) => shipment.shippingAddress)
                 ?.filter(Boolean) || []
 
-        console.log('=== hasUnsavedAddresses Debug ===')
-        console.log('Local addresses:', addresses)
-        console.log('Persisted addresses:', persistedAddresses)
-        console.log('Addresses length:', addresses.length)
-        console.log('Persisted length:', persistedAddresses.length)
-
         // Check if any local address doesn't match a persisted one
-        const hasUnsaved = addresses.some(
+        return addresses.some(
             (localAddr) =>
                 !persistedAddresses.some((persistedAddr) =>
                     areAddressesEqual(localAddr, persistedAddr)
                 )
         )
-
-        console.log('Has unsaved addresses:', hasUnsaved)
-        return hasUnsaved
     }, [customer?.isGuest, addresses, basket?.shipments])
 
     // Notify parent of unsaved address status changes
