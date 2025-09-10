@@ -109,7 +109,7 @@ const ShipmentDetails = ({shipments = []}) => {
                                                 {store ? (
                                                     <StoreDisplay
                                                         store={store}
-                                                        showDistance={false}
+                                                        showDistance={true}
                                                         showEmail={true}
                                                         showPhone={true}
                                                         showStoreHours={true}

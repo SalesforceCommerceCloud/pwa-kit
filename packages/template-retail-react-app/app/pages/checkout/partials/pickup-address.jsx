@@ -253,10 +253,10 @@ const PickupAddress = () => {
                                             <Box mb={4}>
                                                 <StoreDisplay
                                                     store={shipmentInfo.store}
-                                                    showDistance={false}
-                                                    showStoreHours={false}
-                                                    showPhone={false}
-                                                    showEmail={false}
+                                                    showDistance={true}
+                                                    showStoreHours={true}
+                                                    showPhone={true}
+                                                    showEmail={true}
                                                     nameStyle={{
                                                         fontSize: 'sm',
                                                         fontWeight: 'normal'
@@ -326,10 +326,10 @@ const PickupAddress = () => {
                                     </Text>
                                     <StoreDisplay
                                         store={pickupShipmentItems[0].store}
-                                        showDistance={false}
-                                        showStoreHours={false}
-                                        showPhone={false}
-                                        showEmail={false}
+                                        showDistance={true}
+                                        showStoreHours={true}
+                                        showPhone={true}
+                                        showEmail={true}
                                         nameStyle={{
                                             fontSize: 'sm',
                                             fontWeight: 'normal'
