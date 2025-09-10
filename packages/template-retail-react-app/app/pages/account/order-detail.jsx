@@ -90,65 +90,45 @@ const AccountOrderDetail = () => {
         statusEligible &&
         shippingEligible
 
-    // NOTE: intentionally left API call as no-op until the cancel API is ready.
-    // When the API is available, replace call with real API request.
-    // The handler should update UI (e.g., refetch order, show a toast, navigate back to orders).
-    const handleCancelOrder = async () => {
-        const useSomCancelOrderQuery = useSomCancelOrder({
+    const siteId = getConfig().app?.commerceAPI?.parameters?.siteId
+    const {refetch: submitCancelRequest} = useSomCancelOrder(
+        {
             parameters: {
-                siteId: 'RefArch',
-                c_orderNumber: '00000707'
+                siteId,
+                c_orderNumber: order?.orderNo || ''
             }
-        }, {
-            enabled: typeof window !== 'undefined',
-            onSuccess: (data) => {
-                console.log("✅ somOrder query successful:", data)
-            },
-            onError: (error) => {
-                console.error("❌ somOrder query failed:", error)
-                console.error("Error details:", {
-                    message: error.message,
-                    stack: error.stack,
-                    response: error.response
+        },
+        {
+            enabled: false,
+            onSuccess: () => {
+                toast({
+                    title: formatMessage({
+                        defaultMessage: 'Your order cancellation request was submitted.',
+                        id: 'account_order_detail.toast.cancellation_success'
+                    }),
+                    status: 'success',
+                    position: 'top'
                 })
-            }
-        })
-
-        console.log("✅ somOrder query successful:", useSomCancelOrderQuery)
-
-        try {
-            // const response = await realCancelOrderApi(_order.orderNo, _reasonId)
-            const response = undefined // no-op placeholder for now
-
-            // Error (4xx/5xx)
-            if (response && !response.ok) {
+            },
+            onError: () => {
                 toast({
                     title: formatMessage({
                         defaultMessage: 'Something went wrong with the order cancellation.',
                         id: 'account_order_detail.toast.cancellation_failed'
                     }),
-                    status: 'error'
+                    status: 'error',
+                    position: 'top'
                 })
-                return
             }
+        }
+    )
 
-            // Success (2xx)
-            toast({
-                title: formatMessage({
-                    defaultMessage: 'Your order cancellation request was submitted.',
-                    id: 'account_order_detail.toast.cancellation_success'
-                }),
-                status: 'success'
-            })
+    // The handler should update UI (e.g., refetch order, show a toast, navigate back to orders).
+    const handleCancelOrder = async (_order, _reasonId) => {
+        try {
+            await submitCancelRequest()
         } catch (e) {
-            // Network/unexpected error
-            toast({
-                title: formatMessage({
-                    defaultMessage: 'Something went wrong with the order cancellation.',
-                    id: 'account_order_detail.toast.cancellation_failed'
-                }),
-                status: 'error'
-            })
+            // onError callback above will show the toast
         }
     }
 
