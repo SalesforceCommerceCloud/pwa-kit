@@ -7,7 +7,7 @@
 import React from 'react'
 import {screen, fireEvent} from '@testing-library/react'
 import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
-import SingleAddressToggleModal from '@salesforce/retail-react-app/../../app/components/single-address-toggle-modal/index'
+import SingleAddressToggleModal from '@salesforce/retail-react-app/app/components/single-address-toggle-modal'
 
 describe('SingleAddressToggleModal', () => {
     const mockProps = {
