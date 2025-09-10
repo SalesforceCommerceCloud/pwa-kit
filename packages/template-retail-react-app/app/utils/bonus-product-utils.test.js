@@ -258,6 +258,188 @@ describe('Enhanced Bonus Product Utilities', () => {
             )
             expect(result).toEqual([])
         })
+
+        test('combines identical bonus products and aggregates quantities', () => {
+            const basketWithDuplicateBonusProducts = {
+                ...mockBasket,
+                productItems: [
+                    ...mockBasket.productItems,
+                    {
+                        itemId: 'bonus-item-1',
+                        productId: 'bonus-prod-456',
+                        productName: 'Striped Silk Tie',
+                        bonusProductLineItem: true,
+                        quantity: 1
+                    },
+                    {
+                        itemId: 'bonus-item-2',
+                        productId: 'bonus-prod-456',
+                        productName: 'Striped Silk Tie',
+                        bonusProductLineItem: true,
+                        quantity: 2
+                    },
+                    {
+                        itemId: 'bonus-item-3',
+                        productId: 'bonus-prod-456',
+                        productName: 'Striped Silk Tie',
+                        bonusProductLineItem: true,
+                        quantity: 1
+                    }
+                ]
+            }
+
+            const result = bonusProductUtils.getBonusProductsInCartForProduct(
+                basketWithDuplicateBonusProducts,
+                'prod-123',
+                mockProductsWithPromotions
+            )
+
+            expect(result).toHaveLength(1)
+            expect(result[0].productId).toBe('bonus-prod-456')
+            expect(result[0].quantity).toBe(4) // 1 + 2 + 1 = 4
+            expect(result[0].bonusProductLineItem).toBe(true)
+            expect(result[0].productName).toBe('Striped Silk Tie')
+        })
+
+        test('combines bonus products with different productIds separately', () => {
+            const basketWithMultipleBonusProducts = {
+                ...mockBasket,
+                productItems: [
+                    ...mockBasket.productItems,
+                    {
+                        itemId: 'bonus-item-1',
+                        productId: 'bonus-prod-456',
+                        productName: 'Striped Silk Tie',
+                        bonusProductLineItem: true,
+                        quantity: 2
+                    },
+                    {
+                        itemId: 'bonus-item-2',
+                        productId: 'bonus-prod-456',
+                        productName: 'Striped Silk Tie',
+                        bonusProductLineItem: true,
+                        quantity: 1
+                    },
+                    {
+                        itemId: 'bonus-item-3',
+                        productId: 'bonus-prod-789',
+                        productName: 'Different Bonus Product',
+                        bonusProductLineItem: true,
+                        quantity: 3
+                    }
+                ]
+            }
+
+            // Add bonus-prod-789 to mock promotions data
+            const extendedMockPromotions = {
+                ...mockProductsWithPromotions,
+                'bonus-prod-789': {
+                    id: 'bonus-prod-789',
+                    productPromotions: [
+                        {
+                            promotionId: 'BonusProductOnOrderOfAmountAbove250',
+                            calloutMsg: 'Another bonus product!'
+                        }
+                    ]
+                }
+            }
+
+            const result = bonusProductUtils.getBonusProductsInCartForProduct(
+                basketWithMultipleBonusProducts,
+                'prod-123',
+                extendedMockPromotions
+            )
+
+            expect(result).toHaveLength(2)
+            
+            const tieProduct = result.find(item => item.productId === 'bonus-prod-456')
+            expect(tieProduct.quantity).toBe(3) // 2 + 1 = 3
+            expect(tieProduct.productName).toBe('Striped Silk Tie')
+
+            const otherProduct = result.find(item => item.productId === 'bonus-prod-789')
+            expect(otherProduct.quantity).toBe(3)
+            expect(otherProduct.productName).toBe('Different Bonus Product')
+        })
+
+        test('handles bonus products with zero or undefined quantities', () => {
+            const basketWithZeroQuantities = {
+                ...mockBasket,
+                productItems: [
+                    ...mockBasket.productItems,
+                    {
+                        itemId: 'bonus-item-1',
+                        productId: 'bonus-prod-456',
+                        bonusProductLineItem: true,
+                        quantity: 0
+                    },
+                    {
+                        itemId: 'bonus-item-2',
+                        productId: 'bonus-prod-456',
+                        bonusProductLineItem: true,
+                        quantity: undefined
+                    },
+                    {
+                        itemId: 'bonus-item-3',
+                        productId: 'bonus-prod-456',
+                        bonusProductLineItem: true,
+                        quantity: 2
+                    }
+                ]
+            }
+
+            const result = bonusProductUtils.getBonusProductsInCartForProduct(
+                basketWithZeroQuantities,
+                'prod-123',
+                mockProductsWithPromotions
+            )
+
+            expect(result).toHaveLength(1)
+            expect(result[0].productId).toBe('bonus-prod-456')
+            expect(result[0].quantity).toBe(2) // 0 + 0 + 2 = 2 (undefined treated as 0)
+        })
+
+        test('preserves all properties from first occurrence when combining', () => {
+            const basketWithDetailedBonusProducts = {
+                ...mockBasket,
+                productItems: [
+                    ...mockBasket.productItems,
+                    {
+                        itemId: 'bonus-item-1',
+                        productId: 'bonus-prod-456',
+                        productName: 'Striped Silk Tie',
+                        bonusProductLineItem: true,
+                        quantity: 1,
+                        price: 19.19,
+                        bonusDiscountLineItemId: 'discount-123',
+                        customProperty: 'first-item-value'
+                    },
+                    {
+                        itemId: 'bonus-item-2',
+                        productId: 'bonus-prod-456',
+                        productName: 'Striped Silk Tie',
+                        bonusProductLineItem: true,
+                        quantity: 2,
+                        price: 19.19,
+                        bonusDiscountLineItemId: 'discount-456',
+                        customProperty: 'second-item-value'
+                    }
+                ]
+            }
+
+            const result = bonusProductUtils.getBonusProductsInCartForProduct(
+                basketWithDetailedBonusProducts,
+                'prod-123',
+                mockProductsWithPromotions
+            )
+
+            expect(result).toHaveLength(1)
+            expect(result[0].productId).toBe('bonus-prod-456')
+            expect(result[0].quantity).toBe(3) // 1 + 2 = 3
+            expect(result[0].price).toBe(19.19)
+            expect(result[0].bonusDiscountLineItemId).toBe('discount-123') // From first item
+            expect(result[0].customProperty).toBe('first-item-value') // From first item
+            expect(result[0].itemId).toBe('bonus-item-1') // From first item
+        })
     })
 
     describe('getQualifyingProductForBonusProductInCart', () => {
