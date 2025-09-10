@@ -18,6 +18,42 @@ export class ApiClient {
         this.refreshToken = refreshToken
         this.site = site
         this.onTokenUpdate = onTokenUpdate
+
+        // Create a wrapped onTokenUpdate callback that also updates this instance
+        this.wrappedOnTokenUpdate = onTokenUpdate
+            ? (newAuthToken, newRefreshToken) => {
+                  // Update this instance's tokens
+                  console.log('🔄 ApiClient: Auto-updating tokens via callback:', {
+                      oldAuthTokenLength: this.token?.length || 0,
+                      newAuthTokenLength: newAuthToken?.length || 0,
+                      oldRefreshTokenLength: this.refreshToken?.length || 0,
+                      newRefreshTokenLength: newRefreshToken?.length || 0
+                  })
+                  this.token = newAuthToken
+                  this.refreshToken = newRefreshToken
+                  console.log('✅ ApiClient: Tokens auto-updated successfully')
+
+                  // Call the original callback
+                  onTokenUpdate(newAuthToken, newRefreshToken)
+              }
+            : null
+    }
+
+    /**
+     * Update the tokens used by this API client
+     * @param {string} newAuthToken - New authentication token
+     * @param {string} newRefreshToken - New refresh token
+     */
+    updateTokens(newAuthToken, newRefreshToken) {
+        console.log('🔄 ApiClient: Manually updating tokens:', {
+            oldAuthTokenLength: this.token?.length || 0,
+            newAuthTokenLength: newAuthToken?.length || 0,
+            oldRefreshTokenLength: this.refreshToken?.length || 0,
+            newRefreshTokenLength: newRefreshToken?.length || 0
+        })
+        this.token = newAuthToken
+        this.refreshToken = newRefreshToken
+        console.log('✅ ApiClient: Tokens manually updated successfully')
     }
 
     async base(method, options) {
@@ -48,9 +84,11 @@ export class ApiClient {
         const response = await makeAuthenticatedRequest(
             makeRequest,
             this.token,
-            this.onTokenUpdate
+            this.wrappedOnTokenUpdate,
+            this.refreshToken,
+            this.site
         )
-        
+
         return response
     }
 

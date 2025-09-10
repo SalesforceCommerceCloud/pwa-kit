@@ -61,7 +61,9 @@ export const createTemporaryBasket = async (sku, authToken, refreshToken, site, 
             body: JSON.stringify(requestBody)
         },
         authToken,
-        updateTokens
+        updateTokens,
+        refreshToken,
+        site
     )
 
     if (!response.ok) {
@@ -119,7 +121,9 @@ export const deleteTemporaryBasket = async (basketId, authToken, refreshToken, s
                 headers: {}
             },
             authToken,
-            updateTokens
+            updateTokens,
+            refreshToken,
+            site
         )
 
         // Return true if deletion was successful (200-299 status codes)

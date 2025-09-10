@@ -27,19 +27,25 @@ afterAll(() => {
 describe('ApiClient', () => {
     let apiClient
     const mockToken = 'test-token'
+    const mockRefreshToken = 'test-refresh-token'
     const mockSite = {id: 'test-site'}
     const mockUrl = '/api/test'
+    const mockOnTokenUpdate = jest.fn()
 
     beforeEach(() => {
-        apiClient = new ApiClient(mockUrl, mockToken, mockSite)
+        apiClient = new ApiClient(mockUrl, mockToken, mockRefreshToken, mockSite, mockOnTokenUpdate)
         mockFetch.mockClear()
+        mockOnTokenUpdate.mockClear()
     })
 
     describe('constructor', () => {
         it('should initialize with correct properties', () => {
             expect(apiClient.url).toBe(mockUrl)
             expect(apiClient.token).toBe(mockToken)
+            expect(apiClient.refreshToken).toBe(mockRefreshToken)
             expect(apiClient.site).toBe(mockSite)
+            expect(apiClient.onTokenUpdate).toBe(mockOnTokenUpdate)
+            expect(apiClient.wrappedOnTokenUpdate).toBeDefined()
         })
     })
 

@@ -316,9 +316,9 @@ describe('token-refresh', () => {
             await requestPromise
 
             expect(console.log).toHaveBeenCalledWith(
-                '🔄 Request failed with 401, requesting token refresh from parent...'
+                '🔄 Request failed with 401, attempting token refresh...'
             )
-            expect(console.log).toHaveBeenCalledWith('✅ Token refreshed successfully, retrying request...')
+            expect(console.log).toHaveBeenCalledWith('🔄 Retrying request with new token...')
             expect(console.log).toHaveBeenCalledWith('✅ Retry after token refresh succeeded')
         })
 
@@ -351,7 +351,7 @@ describe('token-refresh', () => {
 
             await requestPromise
 
-            expect(console.log).toHaveBeenCalledWith('❌ Retry after token refresh still failed:', 500)
+            expect(console.error).toHaveBeenCalledWith('❌ Retry after token refresh still failed:', 500)
         })
     })
 

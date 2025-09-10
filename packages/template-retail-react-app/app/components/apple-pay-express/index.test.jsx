@@ -59,16 +59,16 @@ jest.mock('@salesforce/retail-react-app/app/components/express/utils/payments', 
 }))
 
 jest.mock('@salesforce/retail-react-app/app/components/express/utils/shipping-address', () => ({
-    AdyenShippingAddressService: jest.fn().mockImplementation(() => ({
-        updateShippingAddress: jest.fn()
-    }))
+        AdyenShippingAddressService: jest.fn().mockImplementation(() => ({
+            updateShippingAddress: jest.fn()
+        }))
 }))
 
 jest.mock('@salesforce/retail-react-app/app/components/express/utils/shipping-methods', () => ({
-    AdyenShippingMethodsService: jest.fn().mockImplementation(() => ({
-        updateShippingMethod: jest.fn(),
-        getShippingMethods: jest.fn()
-    }))
+        AdyenShippingMethodsService: jest.fn().mockImplementation(() => ({
+            updateShippingMethod: jest.fn(),
+            getShippingMethods: jest.fn()
+        }))
 }))
 
 // Mock the useExpressPaymentSetup hook
@@ -97,7 +97,7 @@ jest.mock(
 jest.mock(
     '@salesforce/retail-react-app/app/components/express/hooks/use-standalone-payment-methods',
     () => ({
-        useStandalonePaymentMethods: jest.fn()
+    useStandalonePaymentMethods: jest.fn()
     })
 )
 
@@ -112,8 +112,8 @@ jest.mock('@salesforce/retail-react-app/app/components/express/utils/pdp/tempora
 jest.mock(
     '@salesforce/retail-react-app/app/components/express/utils/pdp/basket-calculation',
     () => ({
-        getBasketWithTotals: jest.fn(),
-        forceOrderCalculation: jest.fn()
+    getBasketWithTotals: jest.fn(),
+    forceOrderCalculation: jest.fn()
     })
 )
 
@@ -379,7 +379,7 @@ describe('getAppleButtonConfig', () => {
 
     beforeEach(() => {
         jest.clearAllMocks()
-
+        
         // Mock the temporary basket functions
         createTemporaryBasket.mockResolvedValue({
             basketId: 'temp-basket-123',
@@ -995,7 +995,7 @@ describe('ApplePayExpress error and edge cases', () => {
             orderTotal: 19.99,
             currency: 'USD'
         }
-
+        
         useExpressPaymentSetup.mockReturnValue({
             locale: {id: 'en-US'},
             site: {id: 'test-site'},
@@ -1024,7 +1024,7 @@ describe('ApplePayExpress error and edge cases', () => {
 
         // Unmount the component to trigger cleanup
         unmount()
-
+        
         // The cleanup logic should be triggered on unmount
         // Since we can't directly test the useEffect cleanup, we verify the component unmounted properly
         expect(true).toBe(true) // Component unmounted successfully

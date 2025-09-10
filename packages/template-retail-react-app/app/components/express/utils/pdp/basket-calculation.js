@@ -68,7 +68,9 @@ export const calculateBasketTotals = async (basketId, authToken, refreshToken, s
             })
         },
         authToken,
-        updateTokens
+        updateTokens,
+        refreshToken,
+        site
     )
 
     if (!response.ok) {
@@ -104,7 +106,9 @@ export const getBasketWithTotals = async (basketId, authToken, refreshToken, sit
             }
         },
         authToken,
-        updateTokens
+        updateTokens,
+        refreshToken,
+        site
     )
 
     if (!response.ok) {
