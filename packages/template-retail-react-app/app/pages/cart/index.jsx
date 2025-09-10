@@ -965,6 +965,7 @@ const Cart = () => {
                                                     onSelectBonusProducts={
                                                         handleSelectBonusProducts
                                                     }
+                                                    hideBorder={true}
                                                 />
                                             ) : (
                                                 /* Simple layout: Renders all cart items individually with separate bonus product cards */
