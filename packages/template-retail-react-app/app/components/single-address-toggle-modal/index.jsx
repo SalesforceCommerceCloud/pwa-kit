@@ -90,21 +90,9 @@ const SingleAddressToggleModal = ({isOpen, onClose, onConfirm, onCancel}) => {
 }
 
 SingleAddressToggleModal.propTypes = {
-    /**
-     * Whether the modal is open
-     */
     isOpen: PropTypes.bool.isRequired,
-    /**
-     * Callback to close the modal
-     */
     onClose: PropTypes.func.isRequired,
-    /**
-     * Callback when user confirms to switch to single address
-     */
     onConfirm: PropTypes.func.isRequired,
-    /**
-     * Callback when user cancels
-     */
     onCancel: PropTypes.func.isRequired
 }
 

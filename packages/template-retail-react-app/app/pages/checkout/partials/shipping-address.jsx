@@ -79,6 +79,7 @@ export default function ShippingAddress() {
     // Initialize multi-shipping state based on existing basket shipments
     const [isMultiShipping, setIsMultiShipping] = useState(hasMultipleDeliveryShipments)
     const [showWarningModal, setShowWarningModal] = useState(false)
+    const [hasUnpersistedGuestAddresses, sethasUnpersistedGuestAddresses] = useState(false)
     const {step, STEPS, goToStep} = useCheckout()
     const createCustomerAddress = useShopperCustomersMutation('createCustomerAddress')
     const updateCustomerAddress = useShopperCustomersMutation('updateCustomerAddress')
@@ -87,36 +88,31 @@ export default function ShippingAddress() {
     )
     const showToast = useToast()
 
-    // State to track unsaved addresses from ShippingMultiAddress
-    const [hasUnsavedAddresses, setHasUnsavedAddresses] = useState(false)
-
     // Keep multi-shipping state in sync with basket shipments
     useEffect(() => {
         setIsMultiShipping(hasMultipleDeliveryShipments)
     }, [hasMultipleDeliveryShipments])
 
-    // Handle unsaved address status changes from ShippingMultiAddress
-    const handleAddressesChange = (hasUnsaved) => {
-        setHasUnsavedAddresses(hasUnsaved)
+    // handle unpersisted address status from ShippingMultiAddress
+    const handleGuestAddressesToggleWarning = (hasUnsaved) => {
+        sethasUnpersistedGuestAddresses(hasUnsaved)
     }
 
     // Handle toggle between single and multi-shipping
     const handleToggleShippingMode = () => {
-        // If switching from multi-ship to single address and user is guest with unsaved addresses
-        if (isMultiShipping && customer?.isGuest && hasUnsavedAddresses) {
+        if (isMultiShipping && customer?.isGuest && hasUnpersistedGuestAddresses) {
             setShowWarningModal(true)
         } else {
             setIsMultiShipping(!isMultiShipping)
         }
     }
 
-    // Handle confirmation to switch to single address
+    // handle confirmation to single address
     const handleConfirmSwitchToSingle = () => {
         setIsMultiShipping(false)
         setShowWarningModal(false)
     }
 
-    // Handle cancellation of switch
     const handleCancelSwitch = () => {
         setShowWarningModal(false)
     }
@@ -237,7 +233,7 @@ export default function ShippingAddress() {
                             basket={basket}
                             submitButtonLabel={submitButtonMessage}
                             noItemsInBasketMessage={noItemsInBasketMessage}
-                            onAddressesChange={handleAddressesChange}
+                            onGuestAddressesToggleWarning={handleGuestAddressesToggleWarning}
                         />
                     )}
                 </ToggleCardEdit>

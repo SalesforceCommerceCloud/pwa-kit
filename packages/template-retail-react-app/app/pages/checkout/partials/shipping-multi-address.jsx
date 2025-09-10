@@ -34,7 +34,7 @@ const ShippingMultiAddress = ({
     basket,
     submitButtonLabel,
     noItemsInBasketMessage,
-    onAddressesChange
+    onGuestAddressesToggleWarning
 }) => {
     const {formatMessage} = useIntl()
     const {STEPS, goToStep} = useCheckout()
@@ -85,18 +85,20 @@ const ShippingMultiAddress = ({
     const addresses = productAddressAssignment.availableAddresses
     const [isSubmitting, setIsSubmitting] = useState(false)
 
-    // Calculate if there are unsaved addresses
-    const hasUnsavedAddresses = useMemo(() => {
+    // guests only products loading since they may not have addresses yet
+    const isLoading = (customer?.isGuest ? false : customerLoading) || productsLoading
+
+    const allShipmentsHaveAddress = productAddressAssignment.allItemsHaveAddresses
+
+    const hasUnpersistedGuestAddresses = useMemo(() => {
         if (!customer?.isGuest || !addresses?.length) return false
 
-        // Get persisted addresses from basket
         const persistedAddresses =
             basket?.shipments
                 ?.filter((shipment) => !isPickupShipment(shipment))
                 ?.map((shipment) => shipment.shippingAddress)
                 ?.filter(Boolean) || []
 
-        // Check if any local address doesn't match a persisted one
         return addresses.some(
             (localAddr) =>
                 !persistedAddresses.some((persistedAddr) =>
@@ -105,15 +107,10 @@ const ShippingMultiAddress = ({
         )
     }, [customer?.isGuest, addresses, basket?.shipments])
 
-    // Notify parent of unsaved address status changes
+    // inform parent of unpersisted local guest addresses
     useEffect(() => {
-        onAddressesChange?.(hasUnsavedAddresses)
-    }, [hasUnsavedAddresses, onAddressesChange])
-
-    // guests only products loading since they may not have addresses yet
-    const isLoading = (customer?.isGuest ? false : customerLoading) || productsLoading
-
-    const allShipmentsHaveAddress = productAddressAssignment.allItemsHaveAddresses
+        onGuestAddressesToggleWarning?.(hasUnpersistedGuestAddresses)
+    }, [hasUnpersistedGuestAddresses, onGuestAddressesToggleWarning])
 
     if (!productAddressAssignment.deliveryItems.length) {
         return (
@@ -286,7 +283,7 @@ ShippingMultiAddress.propTypes = {
     basket: PropTypes.object.isRequired,
     submitButtonLabel: PropTypes.object.isRequired,
     noItemsInBasketMessage: PropTypes.object.isRequired,
-    onAddressesChange: PropTypes.func
+    onGuestAddressesToggleWarning: PropTypes.func
 }
 
 export default ShippingMultiAddress
