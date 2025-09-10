@@ -329,7 +329,9 @@
                     "project.einstein.siteId": "aaij-MobileFirst",
                     "project.dataCloud.appSourceId": "7ae070a6-f4ec-4def-a383-d9cacc3f20a1",
                     "project.dataCloud.tenantId": "g82wgnrvm-ywk9dggrrw8mtggy.pc-rnd",
-                    "project.demo.enableDemoSettings": false
+                    "project.demo.enableDemoSettings": false,
+                    "project.deployment.defaultMRTProject": "",
+                    "project.deployment.defaultMRTTarget": ""
                 },
                 "private": false
             },
@@ -353,7 +355,9 @@
                     "project.einstein.siteId": "aaij-MobileFirst",
                     "project.dataCloud.appSourceId": "7ae070a6-f4ec-4def-a383-d9cacc3f20a1",
                     "project.dataCloud.tenantId": "g82wgnrvm-ywk9dggrrw8mtggy.pc-rnd",
-                    "project.demo.enableDemoSettings": true
+                    "project.demo.enableDemoSettings": true,
+                    "project.deployment.defaultMRTProject": "",
+                    "project.deployment.defaultMRTTarget": ""
                 },
                 "private": true
             },
@@ -376,7 +380,9 @@
                     "project.einstein.siteId": "aaij-MobileFirst",
                     "project.dataCloud.appSourceId": "7ae070a6-f4ec-4def-a383-d9cacc3f20a1",
                     "project.dataCloud.tenantId": "g82wgnrvm-ywk9dggrrw8mtggy.pc-rnd",
-                    "project.demo.enableDemoSettings": false
+                    "project.demo.enableDemoSettings": false,
+                    "project.deployment.defaultMRTProject": "",
+                    "project.deployment.defaultMRTTarget": ""
                 },
                 "private": true
             },
@@ -399,7 +405,9 @@
                     "project.einstein.siteId": "aaij-MobileFirst",
                     "project.dataCloud.appSourceId": "7ae070a6-f4ec-4def-a383-d9cacc3f20a1",
                     "project.dataCloud.tenantId": "g82wgnrvm-ywk9dggrrw8mtggy.pc-rnd",
-                    "project.demo.enableDemoSettings": false
+                    "project.demo.enableDemoSettings": false,
+                    "project.deployment.defaultMRTProject": "",
+                    "project.deployment.defaultMRTTarget": ""
                 },
                 "private": true
             },
@@ -422,7 +430,9 @@
                     "project.einstein.siteId": "aaij-MobileFirst",
                     "project.dataCloud.appSourceId": "7ae070a6-f4ec-4def-a383-d9cacc3f20a1",
                     "project.dataCloud.tenantId": "g82wgnrvm-ywk9dggrrw8mtggy.pc-rnd",
-                    "project.demo.enableDemoSettings": false
+                    "project.demo.enableDemoSettings": false,
+                    "project.deployment.defaultMRTProject": "",
+                    "project.deployment.defaultMRTTarget": ""
                 },
                 "private": true
             },
@@ -445,7 +455,9 @@
                     "project.einstein.siteId": "aaij-MobileFirst",
                     "project.dataCloud.appSourceId": "7ae070a6-f4ec-4def-a383-d9cacc3f20a1",
                     "project.dataCloud.tenantId": "g82wgnrvm-ywk9dggrrw8mtggy.pc-rnd",
-                    "project.demo.enableDemoSettings": false
+                    "project.demo.enableDemoSettings": false,
+                    "project.deployment.defaultMRTProject": "",
+                    "project.deployment.defaultMRTTarget": ""
                 },
                 "private": true
             },
@@ -468,7 +480,9 @@
                     "project.einstein.siteId": "aaij-MobileFirst",
                     "project.dataCloud.appSourceId": "7ae070a6-f4ec-4def-a383-d9cacc3f20a1",
                     "project.dataCloud.tenantId": "g82wgnrvm-ywk9dggrrw8mtggy.pc-rnd",
-                    "project.demo.enableDemoSettings": false
+                    "project.demo.enableDemoSettings": false,
+                    "project.deployment.defaultMRTProject": "",
+                    "project.deployment.defaultMRTTarget": ""
                 },
                 "private": true
             },
@@ -492,7 +506,8 @@
                     "project.dataCloud.appSourceId": "7ae070a6-f4ec-4def-a383-d9cacc3f20a1",
                     "project.dataCloud.tenantId": "g82wgnrvm-ywk9dggrrw8mtggy.pc-rnd",
                     "project.demo.enableDemoSettings": false,
-
+                    "project.deployment.defaultMRTProject": "",
+                    "project.deployment.defaultMRTTarget": "",
                     "project.partialHydrationEnabled": true,
                     "project.contentSecurityPolicy": {
                         "useDefaults": true,
@@ -634,6 +649,26 @@
                         "_ai": {
                             "instruction": "Should validate the user input using the 'validShortCode' validator.",
                             "expectedUse": "Instruct agent on how to validate user input."
+                        }
+                    },
+                    {
+                        "name": "project.deployment.defaultMRTProject",
+                        "message": "What is your default MRT Project (optional - leave blank to skip)?",
+                        "type": "input",
+                        "default": "",
+                        "_ai": {
+                            "instruction": "Ask for the default MRT Project name, can be left blank",
+                            "expectedUse": "Used to configure deployment settings for Managed Runtime"
+                        }
+                    },
+                    {
+                        "name": "project.deployment.defaultMRTTarget",
+                        "message": "What is your default MRT Target (optional - leave blank to skip)?",
+                        "type": "input",
+                        "default": "",
+                        "_ai": {
+                            "instruction": "Ask for the default MRT Target name, can be left blank",
+                            "expectedUse": "Used to configure deployment settings for Managed Runtime"
                         }
                     }
                 ],
