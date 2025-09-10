@@ -33,7 +33,8 @@ const CartProductListWithGroupedBonusProducts = ({
     isPromotionDataLoading,
     renderProductItem,
     getPromotionCalloutText,
-    onSelectBonusProducts
+    onSelectBonusProducts,
+    hideBorder = false
 }) => {
     // Fallback: if no non-bonus products, render all products in simple layout
     if (!nonBonusProducts || nonBonusProducts.length === 0) {
@@ -99,12 +100,18 @@ const CartProductListWithGroupedBonusProducts = ({
                         <Box
                             key={qualifyingProduct.itemId}
                             data-testid={`product-group-${qualifyingProduct.productId}`}
-                            layerStyle="cardBordered"
+                            layerStyle={hideBorder ? "card" : "cardBordered"}
                             p={4}
                             backgroundColor="white"
-                            borderWidth="1px"
-                            borderColor="gray.200"
-                            borderRadius="base"
+                            {...(hideBorder ? {
+                                border: 'none',
+                                borderWidth: '0px',
+                                borderRadius: 'base'
+                            } : {
+                                borderWidth: "1px",
+                                borderColor: "gray.200",
+                                borderRadius: "base"
+                            })}
                         >
                             {/* Main product */}
                             <Box>
@@ -142,10 +149,9 @@ const CartProductListWithGroupedBonusProducts = ({
                                 </Box>
                             )}
 
-                            {/* Separator between bonus products and select card */}
-                            {hasBonusProductsInCart && hasRemainingCapacity && (
-                                <Box borderTop="1px solid" borderColor="gray.200" mt={4} mb={4} />
-                            )}
+
+                            {/* Space between bonus products and SelectBonusProductsCard */}
+                            {hasBonusProductsInCart && hasRemainingCapacity && <Box mt={4} mb={4} />}
 
                             {/* Select Bonus Products card */}
                             {hasRemainingCapacity && (
@@ -160,10 +166,6 @@ const CartProductListWithGroupedBonusProducts = ({
                                 />
                             )}
 
-                            {/* Add divider between product groups if not the last item */}
-                            {qualifyingIdx < nonBonusProducts.length - 1 && (
-                                <Box borderTop="1px solid" borderColor="gray.200" mt={4} mb={4} />
-                            )}
                         </Box>
                     )
                 } catch (error) {
@@ -202,7 +204,8 @@ CartProductListWithGroupedBonusProducts.propTypes = {
     isPromotionDataLoading: PropTypes.bool.isRequired,
     renderProductItem: PropTypes.func.isRequired,
     getPromotionCalloutText: PropTypes.func.isRequired,
-    onSelectBonusProducts: PropTypes.func.isRequired
+    onSelectBonusProducts: PropTypes.func.isRequired,
+    hideBorder: PropTypes.bool
 }
 
 export default CartProductListWithGroupedBonusProducts

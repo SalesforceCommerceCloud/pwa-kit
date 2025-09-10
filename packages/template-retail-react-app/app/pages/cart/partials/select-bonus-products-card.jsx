@@ -116,7 +116,7 @@ const SelectBonusProductsCard = ({
 
                     return (
                         combinedText && (
-                            <Heading fontSize="md" pt="1" mb={3}>
+                            <Heading fontSize="md" pt="1" mb={3} textAlign="center">
                                 {combinedText}
                             </Heading>
                         )
