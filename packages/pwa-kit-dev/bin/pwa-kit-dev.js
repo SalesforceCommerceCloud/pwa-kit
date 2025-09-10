@@ -60,14 +60,14 @@ const getProjectName = async () => {
 }
 
 const getAppEntrypoint = async () => {
-    const defaultPath = p.join(process.cwd(), 'app', 'ssr.js')
+    const defaultPath = p.join(process.cwd(), 'app', 'ssr.mjs')
     if (await fse.pathExists(defaultPath)) return defaultPath
 
     const projectPkg = await scriptUtils.getProjectPkg()
     const {overridesDir} = projectPkg?.ccExtensibility ?? {}
     if (!overridesDir || typeof overridesDir !== 'string') return null
 
-    const overridePath = p.join(process.cwd(), p.sep + overridesDir, 'app', 'ssr.js')
+    const overridePath = p.join(process.cwd(), p.sep + overridesDir, 'app', 'ssr.mjs')
     if (await fse.pathExists(overridePath)) return overridePath
     return null
 }

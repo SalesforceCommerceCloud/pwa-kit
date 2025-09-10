@@ -550,12 +550,14 @@ const ssr = (() => {
                         ? {devtool: 'source-map'}
                         : {}),
                     // Must *not* be named "server". See - https://www.npmjs.com/package/webpack-hot-server-middleware#usage
+                    experiments: {outputModule: true},
                     name: SSR,
-                    entry: `.${EXT_OVERRIDES_DIR}/app/ssr.js`,
+                    entry: `.${EXT_OVERRIDES_DIR}/app/ssr.mjs`,
                     output: {
                         path: buildDir,
-                        filename: 'ssr.js',
-                        libraryTarget: 'commonjs2'
+                        filename: 'ssr.mjs',
+                        libraryTarget: 'module',
+                        chunkFormat: 'module'
                     },
                     plugins: [
                         ...config.plugins,

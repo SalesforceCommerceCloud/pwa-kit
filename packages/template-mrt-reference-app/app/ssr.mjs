@@ -38,7 +38,7 @@
  */
 
 import path from 'path'
-import {getRuntime} from '@salesforce/pwa-kit-runtime/ssr/server/express'
+import {getRuntime} from '@salesforce/pwa-kit-runtime/ssr/server/express.js'
 import {readFileSync} from 'fs'
 import basicAuth from 'express-basic-auth'
 import fetch from 'cross-fetch'
