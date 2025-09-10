@@ -26,7 +26,8 @@ import {useShopperBasketsMutationHelper} from '@salesforce/commerce-sdk-react'
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
 import {
     findAvailableBonusDiscountLineItemId,
-    getRemainingAvailableBonusProductsForProduct
+    getRemainingAvailableBonusProductsForProduct,
+    getBonusProductCountsForPromotion
 } from '@salesforce/retail-react-app/app/utils/bonus-product-utils'
 import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
 import {productViewModalTheme} from '@salesforce/retail-react-app/app/theme/components/project/product-view-modal'
@@ -69,23 +70,10 @@ const BonusProductViewModal = ({
     const {formatMessage} = intl
     const showToast = useToast()
 
-    // Calculate bonus items count for header
-    const {selectedBonusItems, maxBonusItems} = useMemo(() => {
-        if (!basket?.bonusDiscountLineItems) {
-            return {selectedBonusItems: 0, maxBonusItems: 0}
-        }
-
-        const maxItems = basket.bonusDiscountLineItems.reduce(
-            (sum, bli) => sum + (bli.maxBonusItems || 0), 
-            0
-        )
-        
-        const selectedItems = (basket.productItems || [])
-            .filter(item => item.bonusProductLineItem)
-            .reduce((sum, item) => sum + (item.quantity || 0), 0)
-
-        return {selectedBonusItems: selectedItems, maxBonusItems: maxItems}
-    }, [basket])
+    // Calculate bonus counts using promotionId and utility method
+    const {selectedBonusItems: finalSelectedBonusItems, maxBonusItems: finalMaxBonusItems} = useMemo(() => {
+        return getBonusProductCountsForPromotion(basket, promotionId)
+    }, [basket, promotionId])
 
     const messages = useMemo(
         () => ({
@@ -100,9 +88,9 @@ const BonusProductViewModal = ({
                 id: 'bonus_product_view_modal.button.view_cart',
                 defaultMessage: 'View Cart'
             }),
-            backToSelection: formatMessage({
-                id: 'bonus_product_view_modal.button.back_to_selection',
-                defaultMessage: 'Back to Selection'
+            cancel: formatMessage({
+                id: 'form_action_buttons.button.cancel',
+                defaultMessage: 'Cancel'
             })
         }),
         [intl]
@@ -261,10 +249,10 @@ const BonusProductViewModal = ({
                 {messages.viewCart}
             </Button>,
             <Button key="back-to-selection" variant="outline" onClick={onReturnToSelection}>
-                {messages.backToSelection}
+                {messages.cancel}
             </Button>
         ],
-        [messages.viewCart, messages.backToSelection, handleViewCart, onReturnToSelection]
+        [messages.viewCart, messages.cancel, handleViewCart, onReturnToSelection]
     )
 
     // Clean product data but preserve variation attributes for size/color selectors
@@ -325,9 +313,9 @@ const BonusProductViewModal = ({
                             {
                                 id: 'bonus_product_view_modal.title',
                                 defaultMessage: 'Select Bonus Product ({selected} of {max} selected)'
-                            },
-                            {selected: selectedBonusItems, max: maxBonusItems}
-                        )}
+                    },
+                    {selected: finalSelectedBonusItems, max: finalMaxBonusItems}
+                )}
                     </Heading>
                 </ModalHeader>
 
