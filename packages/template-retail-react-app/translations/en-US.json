@@ -126,6 +126,9 @@
   "account_order_history.title.order_history": {
     "defaultMessage": "Order History"
   },
+  "account_payments.button.add_payment": {
+    "defaultMessage": "Add Payment"
+  },
   "account_wishlist.button.continue_shopping": {
     "defaultMessage": "Continue Shopping"
   },

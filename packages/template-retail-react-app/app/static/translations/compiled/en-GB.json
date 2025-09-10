@@ -279,6 +279,12 @@
       "value": "Order History"
     }
   ],
+  "account_payments.button.add_payment": [
+    {
+      "type": 0,
+      "value": "Add Payment"
+    }
+  ],
   "account_wishlist.button.continue_shopping": [
     {
       "type": 0,

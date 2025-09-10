@@ -8,12 +8,39 @@ import React from 'react'
 import {screen, waitFor} from '@testing-library/react'
 import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
 import AccountPayments from '@salesforce/retail-react-app/app/pages/account/payments'
+import {useShopperCustomersMutation} from '@salesforce/commerce-sdk-react'
+
+// Make card validation always pass to simplify form submission in tests
+jest.mock('card-validator', () => ({
+    number: () => ({
+        isValid: true,
+        card: {type: 'visa', gaps: [4, 8, 12], lengths: [16]}
+    }),
+    expirationDate: () => ({isValid: true}),
+    cardholderName: () => ({isValid: true}),
+    cvv: () => ({isValid: true})
+}))
 
 // Mock the useCurrentCustomer hook
 const mockUseCurrentCustomer = jest.fn()
 jest.mock('@salesforce/retail-react-app/app/hooks/use-current-customer', () => ({
     useCurrentCustomer: () => mockUseCurrentCustomer()
 }))
+
+// Mock the mutation
+const mockMutate = jest.fn()
+jest.mock('@salesforce/commerce-sdk-react', () => {
+    const original = jest.requireActual('@salesforce/commerce-sdk-react')
+    return {
+        ...original,
+        useShopperCustomersMutation: (action) => {
+            if (action === 'createCustomerPaymentInstrument') {
+                return {mutateAsync: mockMutate}
+            }
+            return original.useShopperCustomersMutation(action)
+        }
+    }
+})
 
 describe('AccountPayments', () => {
     const mockCustomer = {
@@ -56,6 +83,38 @@ describe('AccountPayments', () => {
         renderWithProviders(<AccountPayments />)
 
         expect(screen.getByText(/payment methods/i)).toBeInTheDocument()
+    })
+
+    test('adds a payment instrument via form submit', async () => {
+        const mockRefetch = jest.fn()
+        mockUseCurrentCustomer.mockReturnValue({
+            data: mockCustomer,
+            isLoading: false,
+            error: null,
+            refetch: mockRefetch
+        })
+        mockMutate.mockResolvedValueOnce({})
+
+        const {user} = renderWithProviders(<AccountPayments />)
+
+        // Open form
+        await user.click(screen.getByRole('button', {name: /add payment/i}))
+
+        // Fill fields
+        await user.type(
+            screen.getByLabelText(/card number/i, {selector: 'input'}),
+            '4111111111111111'
+        )
+        await user.type(screen.getByLabelText(/name on card/i), 'John Smith')
+        await user.type(screen.getByLabelText(/expiration date/i), '12/30')
+        await user.type(screen.getByLabelText(/security code/i, {selector: 'input'}), '123')
+
+        // Save
+        await user.click(screen.getByRole('button', {name: /save/i}))
+
+        await waitFor(() => expect(mockMutate).toHaveBeenCalled())
+        // Should refetch after save
+        expect(mockRefetch).toHaveBeenCalled()
     })
 
     test('displays saved payment methods', () => {
