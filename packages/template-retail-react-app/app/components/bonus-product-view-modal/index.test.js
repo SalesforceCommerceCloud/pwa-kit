@@ -14,7 +14,8 @@ import mockProductDetail from '@salesforce/retail-react-app/app/mocks/variant-75
 import {prependHandlersToServer} from '@salesforce/retail-react-app/jest-setup'
 import {
     getRemainingAvailableBonusProductsForProduct,
-    findAvailableBonusDiscountLineItemId
+    findAvailableBonusDiscountLineItemId,
+    getBonusProductCountsForPromotion
 } from '@salesforce/retail-react-app/app/utils/bonus-product-utils'
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
 import {useShopperBasketsMutationHelper} from '@salesforce/commerce-sdk-react'
@@ -82,7 +83,8 @@ jest.mock(
 // Mock bonus product utils
 jest.mock('@salesforce/retail-react-app/app/utils/bonus-product-utils', () => ({
     getRemainingAvailableBonusProductsForProduct: jest.fn(),
-    findAvailableBonusDiscountLineItemId: jest.fn()
+    findAvailableBonusDiscountLineItemId: jest.fn(),
+    getBonusProductCountsForPromotion: jest.fn()
 }))
 
 // Mock current basket hook
@@ -124,6 +126,12 @@ beforeEach(() => {
         aggregatedSelectedItems: 2
     })
 
+    // Mock getBonusProductCountsForPromotion to return default values
+    getBonusProductCountsForPromotion.mockReturnValue({
+        selectedBonusItems: 2,
+        maxBonusItems: 5
+    })
+
     // Mock findAvailableBonusDiscountLineItemId to return a valid ID
     findAvailableBonusDiscountLineItemId.mockReturnValue('bonus-1')
 
@@ -162,6 +170,55 @@ describe('BonusProductViewModal - getRemainingBonusQuantity', () => {
         // Should pass 5 - 2 = 3 to ProductView as maxOrderQuantity
         expect(screen.getByTestId('max-order-quantity')).toHaveTextContent('3')
     })
+})
+
+describe('BonusProductViewModal - Header Count Display', () => {
+    const testHeaderCount = (description, maxBonusItems, selectedBonusItems, expectedText) => {
+        test(description, () => {
+            const mockBasket = {basketId: 'test-basket'}
+            
+            useCurrentBasket.mockReturnValue({data: mockBasket})
+            
+            // Mock getBonusProductCountsForPromotion to return specific test values
+            getBonusProductCountsForPromotion.mockReturnValue({
+                selectedBonusItems,
+                maxBonusItems
+            })
+
+            renderWithProviders(
+                <BonusProductViewModal
+                    product={mockProductDetail}
+                    isOpen={true}
+                    onClose={() => {}}
+                    bonusDiscountLineItemId="bonus-1"
+                    promotionId="test-promo"
+                />
+            )
+
+            expect(screen.getByRole('heading')).toHaveTextContent(expectedText)
+        })
+    }
+
+    testHeaderCount(
+        'displays "0 of 2 selected" when no bonus items are selected',
+        2, // maxBonusItems
+        0, // selectedBonusItems
+        'Select Bonus Product (0 of 2 selected)'
+    )
+
+    testHeaderCount(
+        'displays "1 of 4 selected" when one bonus item is selected',
+        4, // maxBonusItems
+        1, // selectedBonusItems
+        'Select Bonus Product (1 of 4 selected)'
+    )
+
+    testHeaderCount(
+        'displays "5 of 6 selected" when most bonus items are selected',
+        6, // maxBonusItems
+        5, // selectedBonusItems
+        'Select Bonus Product (5 of 6 selected)'
+    )
 })
 
 describe('BonusProductViewModal - Return to Selection Flow', () => {

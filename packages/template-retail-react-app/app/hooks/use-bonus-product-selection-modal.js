@@ -31,7 +31,7 @@ import {filterImageGroups} from '@salesforce/retail-react-app/app/utils/product-
 import {useModalState} from '@salesforce/retail-react-app/app/hooks/use-modal-state'
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
 import BonusProductViewModal from '@salesforce/retail-react-app/app/components/bonus-product-view-modal'
-import {findAvailableBonusDiscountLineItemId} from '@salesforce/retail-react-app/app/utils/bonus-product-utils'
+import {findAvailableBonusDiscountLineItemId, getBonusProductCountsForPromotion} from '@salesforce/retail-react-app/app/utils/bonus-product-utils'
 import {addToCartModalTheme} from '@salesforce/retail-react-app/app/theme/components/project/add-to-cart-modal'
 
 // Import AddToCartModal to render it within this provider
@@ -179,27 +179,18 @@ export const BonusProductSelectionModal = () => {
     })
     const intl = useIntl()
 
-    // Extract bonus products and basket for selection counts
+    // Extract bonus products from modal data and derive promotionId using same logic as products card
     const bonusProducts = data?.bonusDiscountLineItems || []
     const {data: basket} = useCurrentBasket()
-    const bonusLineItemIds = useMemo(
-        () => bonusProducts.map((bli) => bli.id).filter(Boolean),
-        [bonusProducts]
-    )
-    const maxBonusItems = useMemo(
-        () => bonusProducts.reduce((sum, bli) => sum + (bli.maxBonusItems || 0), 0),
-        [bonusProducts]
-    )
-    const selectedBonusItems = useMemo(() => {
-        const items = basket?.productItems || []
-        return items
-            .filter(
-                (it) =>
-                    it?.bonusProductLineItem &&
-                    bonusLineItemIds.includes(it?.bonusDiscountLineItemId)
-            )
-            .reduce((acc, it) => acc + (it?.quantity || 0), 0)
-    }, [basket, bonusLineItemIds])
+    
+    // Get promotionId from bonus products - all items have the same promotionId since they're 
+    // pre-filtered in select-bonus-products-card.jsx (line 143: bli.promotionId === promotionId)
+    const promotionId = bonusProducts.length > 0 ? bonusProducts[0]?.promotionId : null
+    
+    // Calculate promotion-specific bonus counts using utility method
+    const {selectedBonusItems, maxBonusItems} = useMemo(() => {
+        return getBonusProductCountsForPromotion(basket, promotionId)
+    }, [basket, promotionId])
 
     // Get product IDs for fetching product data, deduplicating by productId
     const uniqueBonusProducts = bonusProducts
@@ -349,7 +340,7 @@ export const BonusProductSelectionModal = () => {
                             borderBottom={addToCartModalTheme.layout.header.borderBottom}
                             borderColor={addToCartModalTheme.layout.header.borderColor}
                         >
-                            <Heading as="h3" fontSize={24} fontWeight="700">
+                            <Heading as="h3" size="md">
                                 {intl.formatMessage(
                                     {
                                         id: 'bonus_product_modal.title',
