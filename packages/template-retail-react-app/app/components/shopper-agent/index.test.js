@@ -35,7 +35,17 @@ jest.mock('@salesforce/retail-react-app/app/hooks/use-script', () => ({
 // Mock the useMiaw hook
 jest.mock('@salesforce/retail-react-app/app/hooks/use-miaw', () => ({
     __esModule: true,
-    default: jest.fn()
+    default: jest.fn(),
+    normalizeLocaleToSalesforce: jest.fn((locale) => {
+        const map = {
+            'en-US': 'en_US',
+            'en-GB': 'en_GB',
+            'fr-FR': 'fr',
+            'de-DE': 'de',
+            'ja-JP': 'ja'
+        }
+        return map[locale] || 'en_US'
+    })
 }))
 
 // Mock the useRefreshToken hook
@@ -190,7 +200,8 @@ describe('ShopperAgent Component', () => {
             UsId: 'test-usid',
             IsCartMgmtSupported: 'true',
             RefreshToken: 'test-refresh-token',
-            Currency: 'USD'
+            Currency: 'USD',
+            Language: 'en_US'
         })
     })
 
@@ -212,7 +223,8 @@ describe('ShopperAgent Component', () => {
             UsId: 'test-usid',
             IsCartMgmtSupported: 'true',
             RefreshToken: 'initial-token',
-            Currency: 'USD'
+            Currency: 'USD',
+            Language: 'en_US'
         })
 
         // Clear mock and change refresh token
@@ -234,7 +246,8 @@ describe('ShopperAgent Component', () => {
             UsId: 'test-usid',
             IsCartMgmtSupported: 'true',
             RefreshToken: 'updated-token',
-            Currency: 'USD'
+            Currency: 'USD',
+            Language: 'en_US'
         })
     })
 
@@ -255,7 +268,8 @@ describe('ShopperAgent Component', () => {
             UsId: 'test-usid',
             IsCartMgmtSupported: 'true',
             RefreshToken: null,
-            Currency: 'USD'
+            Currency: 'USD',
+            Language: 'en_US'
         })
     })
 
@@ -279,7 +293,8 @@ describe('ShopperAgent Component', () => {
             UsId: 'test-usid',
             IsCartMgmtSupported: 'true',
             RefreshToken: 'test-refresh-token',
-            Currency: 'USD'
+            Currency: 'USD',
+            Language: 'en_US'
         })
 
         // Clear mock and change currency to EUR
@@ -303,7 +318,8 @@ describe('ShopperAgent Component', () => {
             UsId: 'test-usid',
             IsCartMgmtSupported: 'true',
             RefreshToken: 'test-refresh-token',
-            Currency: 'EUR'
+            Currency: 'EUR',
+            Language: 'en_US'
         })
     })
 
@@ -327,7 +343,8 @@ describe('ShopperAgent Component', () => {
             UsId: 'test-usid',
             IsCartMgmtSupported: 'true',
             RefreshToken: 'test-refresh-token',
-            Currency: 'USD'
+            Currency: 'USD',
+            Language: 'en_US'
         })
 
         // Clear mock and change locale to en-GB
@@ -351,7 +368,8 @@ describe('ShopperAgent Component', () => {
             UsId: 'test-usid',
             IsCartMgmtSupported: 'true',
             RefreshToken: 'test-refresh-token',
-            Currency: 'GBP'
+            Currency: 'GBP',
+            Language: 'en_GB'
         })
     })
 
@@ -380,7 +398,8 @@ describe('ShopperAgent Component', () => {
             UsId: 'test-usid',
             IsCartMgmtSupported: 'true',
             RefreshToken: 'test-refresh-token',
-            Currency: 'USD'
+            Currency: 'USD',
+            Language: 'en_US'
         })
     })
 
@@ -440,8 +459,7 @@ describe('ShopperAgent Component', () => {
             'https://test.salesforce.com', // embeddedServiceEndpoint
             'https://test.salesforce.com/scrt2.js', // scrt2Url
             'en-US', // locale.id
-            'test-refresh-token', // refreshToken
-            'USD' // locale.preferredCurrency
+            'test-refresh-token' // refreshToken
         )
     })
 
