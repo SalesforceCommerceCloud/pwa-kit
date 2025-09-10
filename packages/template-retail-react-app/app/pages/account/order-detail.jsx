@@ -95,12 +95,35 @@ const AccountOrderDetail = () => {
         {
             parameters: {
                 siteId,
-                c_orderNumber: order?.orderNo || ''
+                c_orderNumber: '00000807'
             }
         },
         {
-            enabled: false,
-            onSuccess: () => {
+            enabled: false
+        }
+    )
+
+    const handleCancelOrder = async (_order, _reasonId) => {
+        try {
+            const result = await submitCancelRequest()
+            const somDataResponse = result?.data?.response
+
+            if (somDataResponse[0].isSuccess === false) {
+                const errorText = somDataResponse[0].errors[0].message
+                toast({title: errorText, status: 'error', position: 'top'})
+                return
+            }
+
+            if (somDataResponse.isValidJSON !== true || somDataResponse.isError === true) {
+                const errorText = somDataResponse.errorText || formatMessage({
+                    defaultMessage: 'Something went wrong with the order cancellation.',
+                    id: 'account_order_detail.toast.cancellation_failed'
+                })
+                toast({title: errorText, status: 'error', position: 'top'})
+                return
+            }
+
+            if (somDataResponse.responseObj?.isSuccess === true) {
                 toast({
                     title: formatMessage({
                         defaultMessage: 'Your order cancellation request was submitted.',
@@ -109,26 +132,17 @@ const AccountOrderDetail = () => {
                     status: 'success',
                     position: 'top'
                 })
-            },
-            onError: () => {
-                toast({
-                    title: formatMessage({
-                        defaultMessage: 'Something went wrong with the order cancellation.',
-                        id: 'account_order_detail.toast.cancellation_failed'
-                    }),
-                    status: 'error',
-                    position: 'top'
-                })
+                return
             }
-        }
-    )
-
-    const handleCancelOrder = async (_order, _reasonId) => {
-        try {
-            await submitCancelRequest()
-            await refetchOrder()
         } catch (e) {
-            // onError callback above will show the toast
+            toast({
+                title: formatMessage({
+                    defaultMessage: 'Something went wrong with the order cancellation.',
+                    id: 'account_order_detail.toast.cancellation_failed'
+                }),
+                status: 'error',
+                position: 'top'
+            })
         }
     }
 
