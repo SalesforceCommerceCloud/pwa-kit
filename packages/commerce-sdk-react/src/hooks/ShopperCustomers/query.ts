@@ -233,6 +233,78 @@ export const useCustomerOrders = (
         requiredParameters
     })
 }
+
+/**
+ * Custom order endpoint hook for SOM orders using useCustomQuery.
+ * @group ShopperCustomers
+ * @category Query
+ * @parameter apiOptions - Options to pass through to the custom API endpoint.
+ * @parameter queryOptions - TanStack Query query options.
+ * @returns A TanStack Query query hook for the SOM order endpoint.
+ */
+export const useSomOrder = (
+    apiOptions: {
+        parameters: {
+            siteId: string
+            c_orderNumber: string
+            c_emailId: string
+        }
+    },
+    queryOptions?: {
+        enabled?: boolean
+        onSuccess?: (data: any) => void
+        onError?: (error: any) => void
+    }
+) => {
+    return useCustomQuery({
+        options: {
+            method: 'GET',
+            customApiPathParameters: {
+                endpointPath: 'order',
+                apiName: 'orders',
+                apiVersion: 'v1',
+                organizationId: 'f_ecom_zzrf_017'
+            },
+            parameters: apiOptions.parameters
+        }
+    }, queryOptions);
+}
+
+/**
+ * Custom order endpoint hook for SOM orders using useCustomQuery.
+ * @group ShopperCustomers
+ * @category Query
+ * @parameter apiOptions - Options to pass through to the custom API endpoint.
+ * @parameter queryOptions - TanStack Query query options.
+ * @returns A TanStack Query query hook for the SOM order endpoint.
+ */
+export const useSomCancelOrder = (
+    apiOptions: {
+        parameters: {
+            siteId: string
+            c_orderNumber: string
+        }
+    },
+    queryOptions?: {
+        enabled?: boolean
+        onSuccess?: (data: any) => void
+        onError?: (error: any) => void
+    }
+) => {
+    return useCustomQuery({
+        options: {
+            method: 'GET',
+            customApiPathParameters: {
+                endpointPath: 'cancelOrder',
+                apiName: 'orders',
+                apiVersion: 'v1',
+                organizationId: 'f_ecom_zzrf_017'
+            },
+            parameters: apiOptions.parameters
+        }
+    }, queryOptions);
+}
+
 /**
  * Retrieves a customer's payment instrument by its ID.
  * @group ShopperCustomers
