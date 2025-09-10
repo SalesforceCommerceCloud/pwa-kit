@@ -47,10 +47,16 @@
       "value": "Loading payment methods..."
     }
   ],
-  "account.payments.message.no_payment_methods": [
+  "account.payments.placeholder.heading": [
     {
       "type": 0,
-      "value": "No saved payment methods found."
+      "value": "No Saved Payments"
+    }
+  ],
+  "account.payments.placeholder.text": [
+    {
+      "type": 0,
+      "value": "Add a new payment method for faster checkout."
     }
   ],
   "account_addresses.badge.default": [

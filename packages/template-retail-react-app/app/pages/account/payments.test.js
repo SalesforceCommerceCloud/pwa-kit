@@ -27,8 +27,9 @@ jest.mock('@salesforce/retail-react-app/app/hooks/use-current-customer', () => (
     useCurrentCustomer: () => mockUseCurrentCustomer()
 }))
 
-// Mock the mutation
+// Mock the mutations
 const mockMutate = jest.fn()
+const mockDelete = jest.fn()
 jest.mock('@salesforce/commerce-sdk-react', () => {
     const original = jest.requireActual('@salesforce/commerce-sdk-react')
     return {
@@ -36,6 +37,9 @@ jest.mock('@salesforce/commerce-sdk-react', () => {
         useShopperCustomersMutation: (action) => {
             if (action === 'createCustomerPaymentInstrument') {
                 return {mutateAsync: mockMutate}
+            }
+            if (action === 'deleteCustomerPaymentInstrument') {
+                return {mutateAsync: mockDelete}
             }
             return original.useShopperCustomersMutation(action)
         }
@@ -71,6 +75,26 @@ describe('AccountPayments', () => {
 
     beforeEach(() => {
         jest.clearAllMocks()
+    })
+
+    test('removes a payment instrument via remove link', async () => {
+        const mockRefetch = jest.fn()
+        mockUseCurrentCustomer.mockReturnValue({
+            data: mockCustomer,
+            isLoading: false,
+            error: null,
+            refetch: mockRefetch
+        })
+        mockDelete.mockResolvedValueOnce({})
+
+        const {user} = renderWithProviders(<AccountPayments />)
+
+        // Click the first Remove link
+        const removeButtons = screen.getAllByRole('button', {name: /remove/i})
+        await user.click(removeButtons[0])
+
+        await waitFor(() => expect(mockDelete).toHaveBeenCalled())
+        expect(mockRefetch).toHaveBeenCalled()
     })
 
     test('renders payment methods heading', () => {
@@ -169,7 +193,7 @@ describe('AccountPayments', () => {
 
         renderWithProviders(<AccountPayments />)
 
-        expect(screen.getByText(/no saved payment methods found/i)).toBeInTheDocument()
+        expect(screen.getByText(/no saved payments/i)).toBeInTheDocument()
     })
 
     test('shows no payment methods message when paymentInstruments is undefined', () => {
@@ -181,7 +205,7 @@ describe('AccountPayments', () => {
 
         renderWithProviders(<AccountPayments />)
 
-        expect(screen.getByText(/no saved payment methods found/i)).toBeInTheDocument()
+        expect(screen.getByText(/no saved payments/i)).toBeInTheDocument()
     })
 
     test('displays refresh button', () => {
