@@ -95,7 +95,7 @@ const AccountOrderDetail = () => {
         {
             parameters: {
                 siteId,
-                c_orderNumber: '00000807'
+                c_orderNumber: order?.orderNo || ''
             }
         },
         {
