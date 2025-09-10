@@ -117,10 +117,17 @@ describe('CreateNewPageTool', () => {
         jest.spyOn(createNewPageTool, 'generatePageContent').mockResolvedValue(
             `const productId = '25592300M';\nexport default function Page() { return <div>{productId}</div>; }`
         )
+        const internalPaths = {
+            nodeModulesPath: '/mock/node_modules',
+            componentsPath: '/mock/app/components',
+            pagesPath: '/mock/app/pages',
+            routesPath: '/mock/app/routes.jsx',
+            hasOverridesDir: false
+        }
         const pageContent = await createNewPageTool.generatePageContent(
             'Test',
             ['ProductView'],
-            mockAbsolutePaths
+            internalPaths
         )
         expect(pageContent).toContain('25592300M')
         expect(pageContent).not.toMatch(/error|exception|fail/i)
@@ -131,10 +138,17 @@ describe('CreateNewPageTool', () => {
         jest.spyOn(createNewPageTool, 'generatePageContent').mockResolvedValue(
             `import Image from 'somewhere';\n${imageComponentString}`
         )
+        const internalPaths = {
+            nodeModulesPath: '/mock/node_modules',
+            componentsPath: '/mock/app/components',
+            pagesPath: '/mock/app/pages',
+            routesPath: '/mock/app/routes.jsx',
+            hasOverridesDir: false
+        }
         const pageContent = await createNewPageTool.generatePageContent(
             'Test',
             ['Image'],
-            mockAbsolutePaths
+            internalPaths
         )
         expect(pageContent).toContain('Image')
         expect(pageContent).toContain('static/img/hero.png')
@@ -146,10 +160,17 @@ describe('CreateNewPageTool', () => {
             `import Image from 'somewhere';\n${defaultImageString}`
         )
         // Simulate user says no to custom image (in real flow, this would be a follow-up, here we just check the generated content)
+        const internalPaths = {
+            nodeModulesPath: '/mock/node_modules',
+            componentsPath: '/mock/app/components',
+            pagesPath: '/mock/app/pages',
+            routesPath: '/mock/app/routes.jsx',
+            hasOverridesDir: false
+        }
         const pageContent = await createNewPageTool.generatePageContent(
             'Test',
             ['Image'],
-            mockAbsolutePaths
+            internalPaths
         )
         expect(pageContent).toContain('static/img/hero.png')
         expect(pageContent).not.toMatch(/https?:\/\//)
@@ -159,10 +180,17 @@ describe('CreateNewPageTool', () => {
         if (createNewPageTool.generatePageContent.mockRestore) {
             createNewPageTool.generatePageContent.mockRestore()
         }
+        const internalPaths = {
+            nodeModulesPath: '/mock/node_modules',
+            componentsPath: '/mock/app/components',
+            pagesPath: '/mock/app/pages',
+            routesPath: '/mock/app/routes.jsx',
+            hasOverridesDir: false
+        }
         const pageContent = await createNewPageTool.generatePageContent(
             'Test',
             ['Test'],
-            mockAbsolutePaths
+            internalPaths
         )
         expect(pageContent).toContain('import TestComponent from')
         expect(pageContent).toContain('<TestComponent />')
@@ -213,10 +241,17 @@ describe('CreateNewPageTool', () => {
         imgSrc: ["'self'", "https://edge.disstg.commercecloud.salesforce.com"]
       }
     }`
+        const internalPaths = {
+            nodeModulesPath: '/mock/node_modules',
+            componentsPath: '/mock/app/components',
+            pagesPath: '/mock/app/pages',
+            routesPath: '/mock/app/routes.jsx',
+            hasOverridesDir: false
+        }
         const pageContent = await createNewPageTool.generatePageContent(
             'Test',
             ['Image'],
-            mockAbsolutePaths
+            internalPaths
         )
         expect(pageContent).toContain(customSrc)
         expect(ssrContent).toContain('.commercecloud.salesforce.com')
@@ -239,10 +274,17 @@ describe('CreateNewPageTool', () => {
         imgSrc: ["'self'", "https://some-other-domain.com"]
       }
     }`
+        const internalPaths = {
+            nodeModulesPath: '/mock/node_modules',
+            componentsPath: '/mock/app/components',
+            pagesPath: '/mock/app/pages',
+            routesPath: '/mock/app/routes.jsx',
+            hasOverridesDir: false
+        }
         const pageContent = await createNewPageTool.generatePageContent(
             'Test',
             ['Image'],
-            mockAbsolutePaths
+            internalPaths
         )
         const isAllowed = ssrContent.includes('.commercecloud.salesforce.com')
         expect(isAllowed).toBe(false)

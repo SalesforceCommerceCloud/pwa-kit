@@ -1,8 +1,10 @@
-## v3.12.0-dev.1 (Aug 28, 2025)
-## v3.12.0-dev (Jul 22, 2025)
-## v3.11.0 (Jul 22, 2025)-
+## v3.13.0-dev (Sep 04, 2025)
 - Exclude opentelemetry packages from client side bundling [#3133](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3133)
+
+## v3.12.0 (Sep 04, 2025)
 - Add support for environment level base paths on /mobify routes [#2892](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2892)
+
+## v3.11.0 (Jul 22, 2025)
 
 ## v3.10.0 (May 22, 2025)
 - Support source map for both client and server on MRT [#240](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2240)

@@ -32,9 +32,9 @@ const systemPromptForCreatePage = `You are a smart assistant that can use tools 
         - Is ccExtensibility.overridesDir set in your package.json? (true/false) \
         Collect answers to these questions, then call the tool with the collected information as input parameters.`
 
-const systemPromptForProductHook = `User have added the ProductView component to the new page. Please ask user: \
+const systemPromptForProductHook = `User has added the ProductView component to the new page. Please ask user: \
         "To make it work, would you like to add the hook useProduct to your page?" \
-        If user answers yes, please make sure do do following: \
+        If user answers yes, please make sure to do following: \
         1. add the useProduct with ALL parameters following product-detail's useProduct as example, \
         2. update ProductView tag to pass product and isProductLoading as props, \
         3. in routes.jsx, update the path for the new page with '/:productId'. \
@@ -71,11 +71,11 @@ const systemPromptForUnfoundComponents = (unfoundComponents) =>
 
 class CreateNewPageTool {
     constructor() {
-        this.name = 'create_sample_page'
+        this.name = 'create_page'
         this.description =
             'Create a sample PWA storefront page. Gather information from user for the MCP tool parameters **one at a time**, in a natural and conversational way. Do **not** ask all the questions at once.'
         this.inputSchema = {
-            pageName: z.string().describe('The name of the new page to create?'),
+            pageName: z.string().describe('The name of the new page to create'),
             componentList: z
                 .array(z.string())
                 .describe(
@@ -83,7 +83,7 @@ class CreateNewPageTool {
                 ),
             route: z
                 .string()
-                .describe('The URL route for this page? (e.g., /new-home, /my-product-view)'),
+                .describe('The URL route for this page (e.g., /new-home, /my-product-view)'),
             nodeModulesPath: z.string().describe('The absolute path to the node_modules directory'),
             componentsPath: z.string().describe('The absolute path to the components directory'),
             pagesPath: z.string().describe('The absolute path to the pages directory'),
