@@ -653,7 +653,7 @@
                     },
                     {
                         "name": "project.deployment.defaultMRTProject",
-                        "message": "What is your default MRT Project (optional - leave blank to skip)?",
+                        "message": "What is your default MRT Project (optional)?",
                         "type": "input",
                         "default": "",
                         "_ai": {
@@ -663,7 +663,7 @@
                     },
                     {
                         "name": "project.deployment.defaultMRTTarget",
-                        "message": "What is your default MRT Target (optional - leave blank to skip)?",
+                        "message": "What is your default MRT Target (optional)?",
                         "type": "input",
                         "default": "",
                         "_ai": {
