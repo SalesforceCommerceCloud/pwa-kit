@@ -35,7 +35,6 @@ import CartItemVariantPrice from '@salesforce/retail-react-app/app/components/it
 import CancelOrderModal from '@salesforce/retail-react-app/app/components/cancel-order-modal'
 import PropTypes from 'prop-types'
 import OrderStatusBar from '@salesforce/retail-react-app/app/components/order-status-bar/index'
-import {useSomOrder, useSomCancelOrder} from '@salesforce/commerce-sdk-react'
 
 const onClient = typeof window !== 'undefined'
 
@@ -129,46 +128,6 @@ const AccountOrderDetail = () => {
             enabled: onClient && !!params.orderNo
         }
     )
-    const somOrderQuery = useSomOrder({
-        parameters: {
-            siteId: 'RefArch',
-            c_orderNumber: '00000202',
-            c_emailId: 'madhuri.uppu96@gmail.com'
-        }
-    }, {
-        enabled: typeof window !== 'undefined',
-        onSuccess: (data) => {
-            console.log("✅ somOrder query successful:", data)
-        },
-        onError: (error) => {
-            console.error("❌ somOrder query failed:", error)
-            console.error("Error details:", {
-                message: error.message,
-                stack: error.stack,
-                response: error.response
-            })
-        }
-    })
-
-    const useSomCancelOrderQuery = useSomCancelOrder({
-        parameters: {
-            siteId: 'RefArch',
-            c_orderNumber: '00000707'
-        }
-    }, {
-        enabled: typeof window !== 'undefined',
-        onSuccess: (data) => {
-            console.log("✅ somOrder query successful:", data)
-        },
-        onError: (error) => {
-            console.error("❌ somOrder query failed:", error)
-            console.error("Error details:", {
-                message: error.message,
-                stack: error.stack,
-                response: error.response
-            })
-        }
-    })
     
     const isLoading = isOrderLoading || !order
     const shipment = order?.shipments[0]
