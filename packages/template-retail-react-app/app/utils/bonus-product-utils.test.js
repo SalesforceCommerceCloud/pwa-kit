@@ -258,6 +258,194 @@ describe('Enhanced Bonus Product Utilities', () => {
             )
             expect(result).toEqual([])
         })
+
+        // Template function for testing bonus product combining
+        const testBonusProductCombining = (
+            description,
+            bonusProducts,
+            expectedResults,
+            customPromotions = mockProductsWithPromotions
+        ) => {
+            test(description, () => {
+                const basketWithBonusProducts = {
+                    ...mockBasket,
+                    productItems: [
+                        ...mockBasket.productItems,
+                        ...bonusProducts
+                    ]
+                }
+
+                const result = bonusProductUtils.getBonusProductsInCartForProduct(
+                    basketWithBonusProducts,
+                    'prod-123',
+                    customPromotions
+                )
+
+                expect(result).toHaveLength(expectedResults.length)
+                
+                expectedResults.forEach((expected, index) => {
+                    const actualProduct = expected.productId 
+                        ? result.find(item => item.productId === expected.productId)
+                        : result[index]
+                    
+                    Object.entries(expected).forEach(([key, value]) => {
+                        expect(actualProduct[key]).toBe(value)
+                    })
+                })
+            })
+        }
+
+        testBonusProductCombining(
+            'combines identical bonus products and aggregates quantities',
+            [
+                {
+                    itemId: 'bonus-item-1',
+                    productId: 'bonus-prod-456',
+                    productName: 'Striped Silk Tie',
+                    bonusProductLineItem: true,
+                    quantity: 1
+                },
+                {
+                    itemId: 'bonus-item-2',
+                    productId: 'bonus-prod-456',
+                    productName: 'Striped Silk Tie',
+                    bonusProductLineItem: true,
+                    quantity: 2
+                },
+                {
+                    itemId: 'bonus-item-3',
+                    productId: 'bonus-prod-456',
+                    productName: 'Striped Silk Tie',
+                    bonusProductLineItem: true,
+                    quantity: 1
+                }
+            ],
+            [
+                {
+                    productId: 'bonus-prod-456',
+                    quantity: 4, // 1 + 2 + 1 = 4
+                    bonusProductLineItem: true,
+                    productName: 'Striped Silk Tie'
+                }
+            ]
+        )
+
+        testBonusProductCombining(
+            'combines bonus products with different productIds separately',
+            [
+                {
+                    itemId: 'bonus-item-1',
+                    productId: 'bonus-prod-456',
+                    productName: 'Striped Silk Tie',
+                    bonusProductLineItem: true,
+                    quantity: 2
+                },
+                {
+                    itemId: 'bonus-item-2',
+                    productId: 'bonus-prod-456',
+                    productName: 'Striped Silk Tie',
+                    bonusProductLineItem: true,
+                    quantity: 1
+                },
+                {
+                    itemId: 'bonus-item-3',
+                    productId: 'bonus-prod-789',
+                    productName: 'Different Bonus Product',
+                    bonusProductLineItem: true,
+                    quantity: 3
+                }
+            ],
+            [
+                {
+                    productId: 'bonus-prod-456',
+                    quantity: 3, // 2 + 1 = 3
+                    productName: 'Striped Silk Tie'
+                },
+                {
+                    productId: 'bonus-prod-789',
+                    quantity: 3,
+                    productName: 'Different Bonus Product'
+                }
+            ],
+            {
+                ...mockProductsWithPromotions,
+                'bonus-prod-789': {
+                    id: 'bonus-prod-789',
+                    productPromotions: [
+                        {
+                            promotionId: 'BonusProductOnOrderOfAmountAbove250',
+                            calloutMsg: 'Another bonus product!'
+                        }
+                    ]
+                }
+            }
+        )
+
+        testBonusProductCombining(
+            'handles bonus products with zero or undefined quantities',
+            [
+                {
+                    itemId: 'bonus-item-1',
+                    productId: 'bonus-prod-456',
+                    bonusProductLineItem: true,
+                    quantity: 0
+                },
+                {
+                    itemId: 'bonus-item-2',
+                    productId: 'bonus-prod-456',
+                    bonusProductLineItem: true,
+                    quantity: undefined
+                },
+                {
+                    itemId: 'bonus-item-3',
+                    productId: 'bonus-prod-456',
+                    bonusProductLineItem: true,
+                    quantity: 2
+                }
+            ],
+            [
+                {
+                    productId: 'bonus-prod-456',
+                    quantity: 2 // 0 + 0 + 2 = 2 (undefined treated as 0)
+                }
+            ]
+        )
+
+        testBonusProductCombining(
+            'preserves all properties from first occurrence when combining',
+            [
+                {
+                    itemId: 'bonus-item-1',
+                    productId: 'bonus-prod-456',
+                    productName: 'Striped Silk Tie',
+                    bonusProductLineItem: true,
+                    quantity: 1,
+                    price: 19.19,
+                    bonusDiscountLineItemId: 'discount-123',
+                    customProperty: 'first-item-value'
+                },
+                {
+                    itemId: 'bonus-item-2',
+                    productId: 'bonus-prod-456',
+                    productName: 'Striped Silk Tie',
+                    bonusProductLineItem: true,
+                    quantity: 2,
+                    price: 19.19,
+                    bonusDiscountLineItemId: 'discount-456',
+                    customProperty: 'second-item-value'
+                }
+            ],
+            [
+                {
+                    productId: 'bonus-prod-456',
+                    quantity: 3, // 1 + 2 = 3
+                    price: 19.19,
+                    bonusDiscountLineItemId: 'discount-123', // From first item
+                    customProperty: 'first-item-value', // From first item
+                    itemId: 'bonus-item-1' // From first item
+                }
+            ]
+        )
     })
 
     describe('getQualifyingProductForBonusProductInCart', () => {
