@@ -51,7 +51,7 @@ const AccountOrderDetail = () => {
         onClose: onCancelModalClose
     } = useDisclosure()
 
-    const {data: order, isLoading: isOrderLoading} = useOrder(
+    const {data: order, isLoading: isOrderLoading, refetch: refetchOrder} = useOrder(
         {
             parameters: {orderNo: params.orderNo}
         },
@@ -123,10 +123,10 @@ const AccountOrderDetail = () => {
         }
     )
 
-    // The handler should update UI (e.g., refetch order, show a toast, navigate back to orders).
     const handleCancelOrder = async (_order, _reasonId) => {
         try {
             await submitCancelRequest()
+            await refetchOrder()
         } catch (e) {
             // onError callback above will show the toast
         }
