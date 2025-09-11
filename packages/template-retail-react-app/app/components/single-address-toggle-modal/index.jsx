@@ -62,7 +62,7 @@ const SingleAddressToggleModal = ({isOpen, onClose, onConfirm, onCancel}) => {
             closeOnOverlayClick={true}
         >
             <AlertDialogOverlay />
-            <AlertDialogContent maxW="448px" w="448px" h="196px" borderRadius="6px">
+            <AlertDialogContent maxW="448px" w="448px" minH="196px" borderRadius="6px">
                 <AlertDialogHeader>{formatMessage(dialogTitle)}</AlertDialogHeader>
                 <AlertDialogBody>
                     <Text>{formatMessage(confirmationMessage)}</Text>
