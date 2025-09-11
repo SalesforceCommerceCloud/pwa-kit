@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import React, {useRef, useEffect, useLayoutEffect} from 'react'
+import React, {useRef, useEffect, useLayoutEffect, useState} from 'react'
 import {Redirect} from 'react-router-dom'
 import {FormattedMessage} from 'react-intl'
 import {
@@ -18,8 +18,9 @@ import {
     Stack
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 import {BrandLogo} from '@salesforce/retail-react-app/app/components/icons'
-import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
 import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
+import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
+import {useSomOrderQuery} from '@salesforce/retail-react-app/app/hooks/use-som-order-query'
 import OrderLookup from '@salesforce/retail-react-app/app/components/order-lookup/index'
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 
@@ -28,18 +29,42 @@ const OrderStatusPage = () => {
     const {data: customer} = useCurrentCustomer()
     const {isRegistered, customerType} = customer
     const headingRef = useRef()
+    const [lookupParams, setLookupParams] = useState(null)
+    const [shouldQuery, setShouldQuery] = useState(false)
+
+    // Track order query - only enabled when user submits form
+    const trackOrderQuery = useSomOrderQuery('trackOrder', lookupParams, {
+        enabled: shouldQuery && !!lookupParams
+    })
 
     useEffect(() => {
         // Focus the 'Order Status' header when the component mounts for accessibility
         headingRef?.current?.focus()
     }, [])
 
+    // Handle successful order lookup
+    useEffect(() => {
+        if (trackOrderQuery.data?.order) {
+            // Navigate to order details page with order data
+            const orderNumber = trackOrderQuery.data.order.OrderNumber || trackOrderQuery.data.order.orderNo
+            navigate(`/guest/orders/${orderNumber}`, {
+                orderData: trackOrderQuery.data.order,
+                isGuestUser: true
+            })
+        }
+    }, [trackOrderQuery.data, navigate])
+
     const handleSignInClick = () => {
         navigate('/login')
     }
 
-    const handleOrderLookup = () => {
-        // TODO: API integration for order lookup
+    const handleOrderLookup = (formData) => {
+        setLookupParams({
+            siteId: 'RefArch',
+            c_orderNumber: formData.orderNumber,
+            c_emailId: formData.email
+        })
+        setShouldQuery(true)
     }
 
     // Check if user is not registered and customer data has loaded
@@ -50,7 +75,7 @@ const OrderStatusPage = () => {
     // Redirect to home if user navigates to order status page manually
     useLayoutEffect(() => {
         if (isOmsEnabled === false) {
-            navigate('/', 'replace')
+            navigate('/', {replace: true})
         }
     }, [isOmsEnabled, navigate])
 

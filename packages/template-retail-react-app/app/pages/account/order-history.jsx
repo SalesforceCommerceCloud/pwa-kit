@@ -24,6 +24,7 @@ import {
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
 import {useCustomerOrders, useProducts} from '@salesforce/commerce-sdk-react'
+import {useSomOrderQuery} from '@salesforce/retail-react-app/app/hooks/use-som-order-query'
 import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
 import {usePageUrls, useSearchParams} from '@salesforce/retail-react-app/app/hooks'
 import PageActionPlaceHolder from '@salesforce/retail-react-app/app/components/page-action-placeholder'
@@ -128,6 +129,39 @@ const AccountOrderHistory = () => {
 
     const hasOrders = orders?.length > 0
 
+    // Call orderHistory API for additional order information
+    const orderHistoryQuery = useSomOrderQuery('orderHistory', {
+        siteId: 'RefArch'
+    }, {
+        enabled: onClient && !!customerId
+    })
+
+    // Extract order status from orderHistory API response
+    const orderHistoryData = orderHistoryQuery.data
+    const orderRecords = orderHistoryData?.orders?.find(order => order.referenceId === 'refOrderSummaries')?.body?.records || []
+
+    // Create maps of order numbers to their data from API
+    const orderStatusMap = orderRecords.reduce((map, record) => {
+        if (record.OrderNumber && record.Status) {
+            map[String(record.OrderNumber)] = record.Status
+        }
+        return map
+    }, {})
+
+    const orderDateMap = orderRecords.reduce((map, record) => {
+        if (record.OrderNumber && record.OrderedDate) {
+            map[String(record.OrderNumber)] = record.OrderedDate
+        }
+        return map
+    }, {})
+
+    const orderTotalMap = orderRecords.reduce((map, record) => {
+        if (record.OrderNumber && record.GrandTotalAmount) {
+            map[String(record.OrderNumber)] = record.GrandTotalAmount
+        }
+        return map
+    }, {})
+
     const pageUrls = usePageUrls({total: paging.total, limit})
 
     const headingRef = useRef()
@@ -178,7 +212,7 @@ const AccountOrderHistory = () => {
                                                 defaultMessage="Ordered: {date}"
                                                 id="account_order_history.label.ordered_date"
                                                 values={{
-                                                    date: formatDate(new Date(order.creationDate), {
+                                                    date: formatDate(new Date(orderDateMap[String(order.orderNo)] || order.creationDate), {
                                                         year: 'numeric',
                                                         day: 'numeric',
                                                         month: 'short'
@@ -211,14 +245,18 @@ const AccountOrderHistory = () => {
                                                 values={{orderNumber: order.orderNo}}
                                             />
                                         </Text>
-                                        {order.status} &&
-                                        <Badge
-                                            bg={getOrderStatusColorScheme(order.status).bg}
-                                            color={getOrderStatusColorScheme(order.status).color}
-                                            variant="solid"
-                                        >
-                                            {getLocalizedOrderStatus(order.status, formatMessage)}
-                                        </Badge>
+                                        {(() => {
+                                            const status = orderStatusMap[String(order.orderNo)] || order.status
+                                            return status && (
+                                                <Badge
+                                                    bg={getOrderStatusColorScheme(status).bg}
+                                                    color={getOrderStatusColorScheme(status).color}
+                                                    variant="solid"
+                                                >
+                                                    {getLocalizedOrderStatus(status, formatMessage)}
+                                                </Badge>
+                                            )
+                                        })()}
                                     </Stack>
                                 </Box>
                                 <Grid templateColumns={{base: 'repeat(auto-fit, 88px)'}} gap={4}>
@@ -249,7 +287,7 @@ const AccountOrderHistory = () => {
                                         <FormattedNumber
                                             style="currency"
                                             currency={order.currency}
-                                            value={order.orderTotal}
+                                            value={orderTotalMap[String(order.orderNo)] || order.orderTotal}
                                         />
                                     </Text>
                                     <Text>
