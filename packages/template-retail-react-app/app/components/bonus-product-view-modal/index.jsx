@@ -32,6 +32,7 @@ import {
 } from '@salesforce/retail-react-app/app/utils/bonus-product-utils'
 import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
 import {productViewModalTheme} from '@salesforce/retail-react-app/app/theme/components/project/product-view-modal'
+import {bonusProductViewModalTheme} from '@salesforce/retail-react-app/app/theme/components/project/bonus-product-view-modal'
 import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
 
 /**
@@ -301,7 +302,7 @@ const BonusProductViewModal = ({
                 margin={productViewModalTheme.layout.content.margin}
                 borderRadius={productViewModalTheme.layout.content.borderRadius}
                 bg={productViewModalTheme.layout.content.background}
-                maxHeight={productViewModalTheme.layout.content.maxHeight}
+                maxHeight={bonusProductViewModalTheme.layout.content.maxHeight}
                 overflowY={productViewModalTheme.layout.content.overflowY}
             >
                 <ModalHeader bg={productViewModalTheme.colors.contentBackground}>
@@ -340,6 +341,7 @@ const BonusProductViewModal = ({
                             maxOrderQuantity={maxOrderQuantity}
                             showReviews={true}
                             showVariationAttributes={true}
+                            alignItems="stretch"
                             imageGalleryFooter={
                                 onReturnToSelection ? (
                                     <Text

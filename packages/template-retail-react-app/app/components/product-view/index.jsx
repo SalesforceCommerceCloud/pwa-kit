@@ -151,7 +151,8 @@ const ProductView = forwardRef(
             customButtons = [],
             promotionId,
             maxOrderQuantity = null,
-            imageGalleryFooter = null
+            imageGalleryFooter = null,
+            alignItems = "flex-end",
         },
         ref
     ) => {
@@ -483,7 +484,7 @@ const ProductView = forwardRef(
                         isProductPartOfBundle={isProductPartOfBundle}
                     />
                 </Box>
-                <Flex direction={['column', 'column', 'column', 'row']} align="flex-end">
+                <Flex direction={['column', 'column', 'column', 'row']} align={alignItems}>
                     {showImageGallery && (
                         <Box flex={1} mr={[0, 0, 0, 6, 6]}>
                             {product ? (
@@ -919,7 +920,9 @@ ProductView.propTypes = {
     showDeliveryOptions: PropTypes.bool,
     customButtons: PropTypes.array,
     promotionId: PropTypes.string,
-    maxOrderQuantity: PropTypes.number
+    maxOrderQuantity: PropTypes.number,
+    imageGalleryFooter: PropTypes.node,
+    alignItems: PropTypes.string,
 }
 
 export default ProductView
