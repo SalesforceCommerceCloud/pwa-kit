@@ -341,7 +341,8 @@ const BonusProductViewModal = ({
                             maxOrderQuantity={maxOrderQuantity}
                             showReviews={true}
                             showVariationAttributes={true}
-                            alignItems="stretch"
+                            flexAlignment="stretch"
+                            buttonGroupPosition="relative"
                             imageGalleryFooter={
                                 onReturnToSelection ? (
                                     <Text

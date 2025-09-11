@@ -152,7 +152,8 @@ const ProductView = forwardRef(
             promotionId,
             maxOrderQuantity = null,
             imageGalleryFooter = null,
-            alignItems = "flex-end",
+            flexAlignment = "flex-end",
+            buttonGroupPosition = "fixed",
         },
         ref
     ) => {
@@ -484,7 +485,7 @@ const ProductView = forwardRef(
                         isProductPartOfBundle={isProductPartOfBundle}
                     />
                 </Box>
-                <Flex direction={['column', 'column', 'column', 'row']} align={alignItems}>
+                <Flex direction={['column', 'column', 'column', 'row']} align={flexAlignment}>
                     {showImageGallery && (
                         <Box flex={1} mr={[0, 0, 0, 6, 6]}>
                             {product ? (
@@ -869,7 +870,7 @@ const ProductView = forwardRef(
 
                 {/* Sticky call-to-action buttons for mobile and certain product types */}
                 <Box
-                    position="fixed"
+                    position={buttonGroupPosition}
                     bg="white"
                     width="100%"
                     display={
@@ -922,7 +923,8 @@ ProductView.propTypes = {
     promotionId: PropTypes.string,
     maxOrderQuantity: PropTypes.number,
     imageGalleryFooter: PropTypes.node,
-    alignItems: PropTypes.string,
+    flexAlignment: PropTypes.string,
+    buttonGroupPosition: PropTypes.string,
 }
 
 export default ProductView
