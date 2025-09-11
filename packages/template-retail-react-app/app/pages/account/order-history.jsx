@@ -130,15 +130,21 @@ const AccountOrderHistory = () => {
     const hasOrders = orders?.length > 0
 
     // Call orderHistory API for additional order information
-    const orderHistoryQuery = useSomOrderQuery('orderHistory', {
-        siteId: 'RefArch'
-    }, {
-        enabled: onClient && !!customerId
-    })
+    const orderHistoryQuery = useSomOrderQuery(
+        'orderHistory',
+        {
+            siteId: 'RefArch'
+        },
+        {
+            enabled: onClient && !!customerId
+        }
+    )
 
     // Extract order status from orderHistory API response
     const orderHistoryData = orderHistoryQuery.data
-    const orderRecords = orderHistoryData?.orders?.find(order => order.referenceId === 'refOrderSummaries')?.body?.records || []
+    const orderRecords =
+        orderHistoryData?.orders?.find((order) => order.referenceId === 'refOrderSummaries')?.body
+            ?.records || []
 
     // Create maps of order numbers to their data from API
     const orderStatusMap = orderRecords.reduce((map, record) => {
@@ -212,11 +218,17 @@ const AccountOrderHistory = () => {
                                                 defaultMessage="Ordered: {date}"
                                                 id="account_order_history.label.ordered_date"
                                                 values={{
-                                                    date: formatDate(new Date(orderDateMap[String(order.orderNo)] || order.creationDate), {
-                                                        year: 'numeric',
-                                                        day: 'numeric',
-                                                        month: 'short'
-                                                    })
+                                                    date: formatDate(
+                                                        new Date(
+                                                            orderDateMap[String(order.orderNo)] ||
+                                                                order.creationDate
+                                                        ),
+                                                        {
+                                                            year: 'numeric',
+                                                            day: 'numeric',
+                                                            month: 'short'
+                                                        }
+                                                    )
                                                 }}
                                             />
                                         </Text>
@@ -246,15 +258,24 @@ const AccountOrderHistory = () => {
                                             />
                                         </Text>
                                         {(() => {
-                                            const status = orderStatusMap[String(order.orderNo)] || order.status
-                                            return status && (
-                                                <Badge
-                                                    bg={getOrderStatusColorScheme(status).bg}
-                                                    color={getOrderStatusColorScheme(status).color}
-                                                    variant="solid"
-                                                >
-                                                    {getLocalizedOrderStatus(status, formatMessage)}
-                                                </Badge>
+                                            const status =
+                                                orderStatusMap[String(order.orderNo)] ||
+                                                order.status
+                                            return (
+                                                status && (
+                                                    <Badge
+                                                        bg={getOrderStatusColorScheme(status).bg}
+                                                        color={
+                                                            getOrderStatusColorScheme(status).color
+                                                        }
+                                                        variant="solid"
+                                                    >
+                                                        {getLocalizedOrderStatus(
+                                                            status,
+                                                            formatMessage
+                                                        )}
+                                                    </Badge>
+                                                )
                                             )
                                         })()}
                                     </Stack>
@@ -287,7 +308,10 @@ const AccountOrderHistory = () => {
                                         <FormattedNumber
                                             style="currency"
                                             currency={order.currency}
-                                            value={orderTotalMap[String(order.orderNo)] || order.orderTotal}
+                                            value={
+                                                orderTotalMap[String(order.orderNo)] ||
+                                                order.orderTotal
+                                            }
                                         />
                                     </Text>
                                     <Text>

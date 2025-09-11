@@ -1,8 +1,8 @@
 /*
- * Copyright (c) 2023, salesforce.com, inc.
+ * Copyright (c) 2025, Salesforce, Inc.
  * All rights reserved.
  * SPDX-License-Identifier: BSD-3-Clause
- * For full license text, see the LICENSE file in the repo root or https://opensource.com/licenses/BSD-3-Clause
+ * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
 import React, {useEffect, useRef} from 'react'
@@ -45,7 +45,7 @@ const AccountOrderDetail = () => {
     const {formatMessage, formatDate} = useIntl()
     const toast = useToast()
     const {data: customer} = useCurrentCustomer()
-    
+
     // Get order data from navigation state (for guest users)
     const location = history.location
     const passedOrderData = location.state?.orderData
@@ -68,80 +68,92 @@ const AccountOrderDetail = () => {
 
     // Call OrderDetails API for additional order information (for registered users)
     // or use passed data for guest users
-    const orderDetailsQuery = useSomOrderQuery('orderDetails', {
-        siteId: 'RefArch',
-        c_orderNumber: params.orderNo
-    }, {
-        enabled: !isGuestUser && onClient && !!params.orderNo
-    })
+    const orderDetailsQuery = useSomOrderQuery(
+        'orderDetails',
+        {
+            siteId: 'RefArch',
+            c_orderNumber: params.orderNo
+        },
+        {
+            enabled: !isGuestUser && onClient && !!params.orderNo
+        }
+    )
 
     // Extract order data from API response or passed data
     const orderDetailsData = orderDetailsQuery.data
     const orderFromAPI = isGuestUser ? passedOrderData : orderDetailsData?.order
-    
+
     const orderStatus = orderFromAPI?.Status || order?.status
     const orderNumber = orderFromAPI?.OrderNumber || order?.orderNo
     const orderedDate = orderFromAPI?.OrderedDate || order?.creationDate
-    
+
     // Simple pricing - use trackOrder data directly for guest users, original data for registered users
-    const grandTotal = isGuestUser ? (orderFromAPI?.GrandTotalAmount || 0) : (order?.orderTotal || 0)
-    
+    const grandTotal = isGuestUser ? orderFromAPI?.GrandTotalAmount || 0 : order?.orderTotal || 0
+
     // Try multiple possible field names for subtotal/product total
-    const productTotal = isGuestUser ? (
-        orderFromAPI?.TotalAdjustedProductAmount || 
-        orderFromAPI?.SubtotalAmount || 
-        orderFromAPI?.ProductTotalAmount || 
-        orderFromAPI?.ItemTotalAmount || 
-        orderFromAPI?.NetAmount || 
-        0
-    ) : (order?.productTotal || 0)
-    
-    const shippingTotal = isGuestUser ? (orderFromAPI?.TotalAdjustedDeliveryAmount || 0) : (order?.shippingTotal || 0)
-    const taxTotal = isGuestUser ? (orderFromAPI?.TotalTaxAmount || 0) : (order?.taxTotal || 0)
-    const currency = isGuestUser ? (orderFromAPI?.Currency || 'USD') : (order?.currency || 'USD')
-    
-    
-    const paymentSummaries = orderFromAPI?.OrderPaymentSummaries?.records || order?.paymentInstruments || []
+    const productTotal = isGuestUser
+        ? orderFromAPI?.TotalAdjustedProductAmount ||
+          orderFromAPI?.SubtotalAmount ||
+          orderFromAPI?.ProductTotalAmount ||
+          orderFromAPI?.ItemTotalAmount ||
+          orderFromAPI?.NetAmount ||
+          0
+        : order?.productTotal || 0
+
+    const shippingTotal = isGuestUser
+        ? orderFromAPI?.TotalAdjustedDeliveryAmount || 0
+        : order?.shippingTotal || 0
+    const taxTotal = isGuestUser ? orderFromAPI?.TotalTaxAmount || 0 : order?.taxTotal || 0
+    const currency = isGuestUser ? orderFromAPI?.Currency || 'USD' : order?.currency || 'USD'
+
+    const paymentSummaries =
+        orderFromAPI?.OrderPaymentSummaries?.records || order?.paymentInstruments || []
     const orderItems = orderFromAPI?.OrderItemSummaries?.records || order?.productItems || []
 
-    const isLoading = isOrderLoading || (!isGuestUser && orderDetailsQuery.isLoading) || (!order && !orderFromAPI)
+    const isLoading =
+        isOrderLoading || (!isGuestUser && orderDetailsQuery.isLoading) || (!order && !orderFromAPI)
     const paymentCard = order?.paymentInstruments?.[0]?.paymentCard
     const CardIcon = getCreditCardIcon(paymentCard?.cardType)
-    const itemCount = orderItems.length > 0 
-        ? orderItems.reduce((count, item) => item.Quantity + count, 0) 
-        : order?.productItems?.reduce((count, item) => item.quantity + count, 0) || 0
+    const itemCount =
+        orderItems.length > 0
+            ? orderItems.reduce((count, item) => item.Quantity + count, 0)
+            : order?.productItems?.reduce((count, item) => item.quantity + count, 0) || 0
 
     // Create product items array for both registered and guest users
-    const productItems = isGuestUser && orderItems.length > 0 
-        ? orderItems
-            .filter(item => {
-                // Filter out delivery charges, taxes, and other non-product items
-                const type = item.Type || item.TypeCode || ''
-                const isProduct = type.toLowerCase().includes('product') || 
-                                 type.toLowerCase().includes('item') ||
-                                 (!type.toLowerCase().includes('delivery') && 
-                                  !type.toLowerCase().includes('shipping') && 
-                                  !type.toLowerCase().includes('tax') &&
-                                  !type.toLowerCase().includes('discount') &&
-                                  !type.toLowerCase().includes('fee'))
-                return isProduct && item.ProductCode
-            })
-            .map((item, index) => {
-                // Calculate unit price from total price and quantity
-                const unitPrice = item.UnitPrice || (item.TotalPrice && item.Quantity ? item.TotalPrice / item.Quantity : 0)
-                return {
-                    itemId: item.Id || `guest-item-${index}`,
-                    productId: item.ProductCode, // Use ProductCode instead of ProductId
-                    productName: item.ProductName || `Product ${item.ProductCode}`,
-                    quantity: item.Quantity || 1,
-                    price: unitPrice,
-                    priceAfterItemDiscount: unitPrice,
-                    currency: orderFromAPI?.Currency || 'USD',
-                    attributes: item.ProductAttributes || [],
-                    image: item.ProductImage || item.Product?.Image
-                }
-            })
-        : order?.productItems || []
+    const productItems =
+        isGuestUser && orderItems.length > 0
+            ? orderItems
+                  .filter((item) => {
+                      // Filter out delivery charges, taxes, and other non-product items
+                      const type = item.Type || item.TypeCode || ''
+                      const isProduct =
+                          type.toLowerCase().includes('product') ||
+                          type.toLowerCase().includes('item') ||
+                          (!type.toLowerCase().includes('delivery') &&
+                              !type.toLowerCase().includes('shipping') &&
+                              !type.toLowerCase().includes('tax') &&
+                              !type.toLowerCase().includes('discount') &&
+                              !type.toLowerCase().includes('fee'))
+                      return isProduct && item.ProductCode
+                  })
+                  .map((item, index) => {
+                      // Calculate unit price from total price and quantity
+                      const unitPrice =
+                          item.UnitPrice ||
+                          (item.TotalPrice && item.Quantity ? item.TotalPrice / item.Quantity : 0)
+                      return {
+                          itemId: item.Id || `guest-item-${index}`,
+                          productId: item.ProductCode, // Use ProductCode instead of ProductId
+                          productName: item.ProductName || `Product ${item.ProductCode}`,
+                          quantity: item.Quantity || 1,
+                          price: unitPrice,
+                          priceAfterItemDiscount: unitPrice,
+                          currency: orderFromAPI?.Currency || 'USD',
+                          attributes: item.ProductAttributes || [],
+                          image: item.ProductImage || item.Product?.Image
+                      }
+                  })
+            : order?.productItems || []
 
     // Cancel order gating
     const customerId = useCustomerId()
@@ -151,7 +163,9 @@ const AccountOrderDetail = () => {
     const isOmsEnabled = getConfig().app?.oms?.enabled
     const orderStatusLower = (order?.status || '').toLowerCase()
     const shipmentStatus = (order?.shippingStatus || '').toLowerCase()
-    const statusEligible = !['cancelled', 'canceled', 'completed', 'failed'].includes(orderStatusLower)
+    const statusEligible = !['cancelled', 'canceled', 'completed', 'failed'].includes(
+        orderStatusLower
+    )
     const shippingEligible = shipmentStatus === 'not_shipped'
     const ownsOrder =
         (order?.customerInfo?.customerId && order.customerInfo.customerId === customerId) ||
@@ -209,7 +223,7 @@ const AccountOrderDetail = () => {
 
     // Fetch product data for order items
     const productIds = productItems.map((product) => product.productId).filter(Boolean)
-    
+
     const {data: products, isLoading: isProductsLoading} = useProducts(
         {
             parameters: {
@@ -257,7 +271,6 @@ const AccountOrderDetail = () => {
         productSubTotal: Number(productTotal) || 0, // OrderSummary expects productSubTotal, not subtotal
         paymentInstruments: order?.paymentInstruments || []
     }
-    
 
     const headingRef = useRef()
     useEffect(() => {
@@ -411,11 +424,9 @@ const AccountOrderDetail = () => {
                                         )}
                                         <Box>
                                             <Text fontSize="sm">
-                                                {paymentSummaries.length > 0 ? (
-                                                    paymentSummaries[0].Method
-                                                ) : (
-                                                    paymentCard?.cardType
-                                                )}
+                                                {paymentSummaries.length > 0
+                                                    ? paymentSummaries[0].Method
+                                                    : paymentCard?.cardType}
                                             </Text>
                                             {paymentSummaries.length > 0 ? (
                                                 <Text fontSize="sm">
@@ -462,9 +473,9 @@ const AccountOrderDetail = () => {
                             background="gray.50"
                             borderRadius="base"
                         >
-                            <OrderSummary 
-                                basket={basketForSummary} 
-                                fontSize="sm" 
+                            <OrderSummary
+                                basket={basketForSummary}
+                                fontSize="sm"
                                 orderTotal={grandTotal}
                             />
                         </Box>
@@ -507,7 +518,11 @@ const AccountOrderDetail = () => {
                             </Box>
                         ))
                     ) : !isProductsLoading ? (
-                        <ProductList variants={variants} currency={basketForSummary.currency} spacing={2} />
+                        <ProductList
+                            variants={variants}
+                            currency={basketForSummary.currency}
+                            spacing={2}
+                        />
                     ) : (
                         <Stack spacing={2}>
                             {Array.from({length: 3}).map((_, index) => (

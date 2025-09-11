@@ -46,7 +46,8 @@ const OrderStatusPage = () => {
     useEffect(() => {
         if (trackOrderQuery.data?.order) {
             // Navigate to existing order details page with trackOrder data
-            const orderNumber = trackOrderQuery.data.order.OrderNumber || trackOrderQuery.data.order.orderNo
+            const orderNumber =
+                trackOrderQuery.data.order.OrderNumber || trackOrderQuery.data.order.orderNo
             // Navigate to the regular order details page and pass data via state
             navigate(`/account/orders/${orderNumber}`, 'push', {
                 orderData: trackOrderQuery.data.order,

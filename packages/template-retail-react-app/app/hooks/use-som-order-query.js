@@ -43,20 +43,23 @@ export const useSomOrderMutation = (endpoint = 'trackOrder') => {
  * @param {Object} parameters - API parameters
  */
 export const useSomOrderQuery = (endpoint, parameters, options = {}) => {
-    const query = useCustomQuery({
-        options: {
-            method: 'GET',
-            customApiPathParameters: {
-                apiName: 'orders',
-                apiVersion: 'v1',
-                endpointPath: endpoint
+    const query = useCustomQuery(
+        {
+            options: {
+                method: 'GET',
+                customApiPathParameters: {
+                    apiName: 'orders',
+                    apiVersion: 'v1',
+                    endpointPath: endpoint
+                },
+                parameters
             },
-            parameters
+            rawResponse: false
         },
-        rawResponse: false
-    }, {
-        enabled: typeof window !== 'undefined' && (options.enabled !== false)
-    })
+        {
+            enabled: typeof window !== 'undefined' && options.enabled !== false
+        }
+    )
 
     return query
 }
