@@ -76,11 +76,12 @@ jest.mock(
                     },
                     'Add to Cart'
                 ),
-                imageGalleryFooter && React.createElement(
-                    'div',
-                    {'data-testid': 'image-gallery-footer'},
-                    imageGalleryFooter
-                )
+                imageGalleryFooter &&
+                    React.createElement(
+                        'div',
+                        {'data-testid': 'image-gallery-footer'},
+                        imageGalleryFooter
+                    )
             )
         }
 )
@@ -181,9 +182,9 @@ describe('BonusProductViewModal - Header Count Display', () => {
     const testHeaderCount = (description, maxBonusItems, selectedBonusItems, expectedText) => {
         test(description, () => {
             const mockBasket = {basketId: 'test-basket'}
-            
+
             useCurrentBasket.mockReturnValue({data: mockBasket})
-            
+
             // Mock getBonusProductCountsForPromotion to return specific test values
             getBonusProductCountsForPromotion.mockReturnValue({
                 selectedBonusItems,
@@ -551,7 +552,7 @@ describe('BonusProductViewModal - Back to Selection Link', () => {
         // Find and click the Back to Selection link
         const backToSelectionLink = screen.getByText('← Back to Selection')
         expect(backToSelectionLink).toBeInTheDocument()
-        
+
         await user.click(backToSelectionLink)
 
         // Verify onReturnToSelection was called
@@ -574,13 +575,12 @@ describe('BonusProductViewModal - Back to Selection Link', () => {
         )
 
         const backToSelectionLink = screen.getByText('← Back to Selection')
-        
+
         // Check that it's rendered as a clickable element (Text with as="button")
         expect(backToSelectionLink.tagName.toLowerCase()).toBe('button')
-        
+
         // Check styling classes/attributes that indicate it's styled as a link
         const computedStyle = window.getComputedStyle(backToSelectionLink)
         expect(computedStyle.cursor).toBe('pointer')
     })
-
 })

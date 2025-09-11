@@ -72,9 +72,10 @@ const BonusProductViewModal = ({
     const showToast = useToast()
 
     // Calculate bonus counts using promotionId and utility method
-    const {selectedBonusItems: finalSelectedBonusItems, maxBonusItems: finalMaxBonusItems} = useMemo(() => {
-        return getBonusProductCountsForPromotion(basket, promotionId)
-    }, [basket, promotionId])
+    const {selectedBonusItems: finalSelectedBonusItems, maxBonusItems: finalMaxBonusItems} =
+        useMemo(() => {
+            return getBonusProductCountsForPromotion(basket, promotionId)
+        }, [basket, promotionId])
 
     const messages = useMemo(
         () => ({
@@ -303,17 +304,16 @@ const BonusProductViewModal = ({
                 maxHeight={productViewModalTheme.layout.content.maxHeight}
                 overflowY={productViewModalTheme.layout.content.overflowY}
             >
-                <ModalHeader
-                    bg={productViewModalTheme.colors.contentBackground}
-                >
+                <ModalHeader bg={productViewModalTheme.colors.contentBackground}>
                     <Heading size="md">
                         {formatMessage(
                             {
                                 id: 'bonus_product_view_modal.title',
-                                defaultMessage: 'Select Bonus Product ({selected} of {max} selected)'
-                    },
-                    {selected: finalSelectedBonusItems, max: finalMaxBonusItems}
-                )}
+                                defaultMessage:
+                                    'Select Bonus Product ({selected} of {max} selected)'
+                            },
+                            {selected: finalSelectedBonusItems, max: finalMaxBonusItems}
+                        )}
                     </Heading>
                 </ModalHeader>
 
@@ -348,7 +348,7 @@ const BonusProductViewModal = ({
                                         cursor="pointer"
                                         onClick={onReturnToSelection}
                                         _hover={{
-                                            color: "blue.700"
+                                            color: 'blue.700'
                                         }}
                                     >
                                         {messages.backToSelection}

@@ -100,18 +100,20 @@ const CartProductListWithGroupedBonusProducts = ({
                         <Box
                             key={qualifyingProduct.itemId}
                             data-testid={`product-group-${qualifyingProduct.productId}`}
-                            layerStyle={hideBorder ? "card" : "cardBordered"}
+                            layerStyle={hideBorder ? 'card' : 'cardBordered'}
                             p={4}
                             backgroundColor="white"
-                            {...(hideBorder ? {
-                                border: 'none',
-                                borderWidth: '0px',
-                                borderRadius: 'base'
-                            } : {
-                                borderWidth: "1px",
-                                borderColor: "gray.200",
-                                borderRadius: "base"
-                            })}
+                            {...(hideBorder
+                                ? {
+                                      border: 'none',
+                                      borderWidth: '0px',
+                                      borderRadius: 'base'
+                                  }
+                                : {
+                                      borderWidth: '1px',
+                                      borderColor: 'gray.200',
+                                      borderRadius: 'base'
+                                  })}
                         >
                             {/* Main product */}
                             <Box>
@@ -149,9 +151,10 @@ const CartProductListWithGroupedBonusProducts = ({
                                 </Box>
                             )}
 
-
                             {/* Space between bonus products and SelectBonusProductsCard */}
-                            {hasBonusProductsInCart && hasRemainingCapacity && <Box mt={4} mb={4} />}
+                            {hasBonusProductsInCart && hasRemainingCapacity && (
+                                <Box mt={4} mb={4} />
+                            )}
 
                             {/* Select Bonus Products card */}
                             {hasRemainingCapacity && (
@@ -165,7 +168,6 @@ const CartProductListWithGroupedBonusProducts = ({
                                     onSelectBonusProducts={onSelectBonusProducts}
                                 />
                             )}
-
                         </Box>
                     )
                 } catch (error) {
