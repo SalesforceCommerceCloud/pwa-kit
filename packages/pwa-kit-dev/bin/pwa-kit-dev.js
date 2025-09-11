@@ -378,16 +378,15 @@ const main = async () => {
                 const mobify = getConfig({buildDirectory}) || {}
 
                 if (!projectSlug) {
-                    projectSlug =
-                        mobify.app?.deployment?.defaultMRTProject || (await getProjectName())
+                    projectSlug = mobify.deployment?.defaultMRTProject || (await getProjectName())
                 }
 
                 // Set the deployment target env var, this is required to ensure we
                 // get the correct configuration object. Do not assign the variable it if
                 // the target value is `undefined` as it will serialied as a "undefined"
                 // string value.
-                if (!target && mobify.app?.deployment?.defaultMRTTarget) {
-                    target = mobify.app.deployment.defaultMRTTarget
+                if (!target && mobify.deployment?.defaultMRTTarget) {
+                    target = mobify.deployment.defaultMRTTarget
                 }
                 if (target) {
                     process.env.DEPLOY_TARGET = target
