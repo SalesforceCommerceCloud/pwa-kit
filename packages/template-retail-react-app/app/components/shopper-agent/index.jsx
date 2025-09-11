@@ -267,9 +267,22 @@ const ShopperAgentWindow = ({commerceAgentConfiguration}) => {
         if (event.source && event.source !== window) {
             try {
                 if (event.data.type === 'lwc.getConversationContext') {
-                    const conversationContext = await getConversationContext()
-                    sendConversationContext('conversational.actualConversationContext', {
-                        conversationContext
+                    // Check if conversation context is enabled before making the call
+                    if (enableConversationContext && enableConversationContext === 'true') {
+                        const conversationContext = await getConversationContext()
+                        sendConversationContext('conversational.actualConversationContext', {
+                            conversationContext
+                        })
+                    }
+                } else if (event.data.type === 'lwc.getPwaContext') {
+                    const pwaDomainUrl = window.location.origin;
+                    const pwaSiteId = siteId;
+                    const pwaLocale = locale.id;
+
+                    sendExpressMessage('lwc.pwaContext', {
+                        pwaDomainUrl,
+                        pwaSiteId,
+                        pwaLocale
                     })
                 } else if (event.data.type === 'lwc.getCustomerData') {
                     const authToken = await getTokenWhenReady()
