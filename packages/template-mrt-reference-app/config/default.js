@@ -12,7 +12,8 @@ module.exports = {
     ssrShared: [
         "static/example.txt",
         "static/favicon.ico",
-        "static/robots.txt"
+        "static/robots.txt",
+        "config/default.js"
     ],
     ssrParameters: {
         ssrFunctionNodeVersion: '22.x',

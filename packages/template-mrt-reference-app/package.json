@@ -50,7 +50,8 @@
     "ssrShared": [
       "static/example.txt",
       "static/favicon.ico",
-      "static/robots.txt"
+      "static/robots.txt",
+      "config/default.js"
     ]
   },
   "dependencies": {

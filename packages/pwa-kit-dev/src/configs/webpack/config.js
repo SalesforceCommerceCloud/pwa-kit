@@ -559,6 +559,9 @@ const ssr = (() => {
                         libraryTarget: 'module',
                         chunkFormat: 'module'
                     },
+                    optimization: {
+                        minimize: false,
+                    },
                     plugins: [
                         ...config.plugins,
                         staticFolderCopyPlugin,
