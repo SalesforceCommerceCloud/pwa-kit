@@ -136,8 +136,8 @@ module.exports = {
         },
         // Deployment configuration for Managed Runtime
         deployment: {
-            defaultMRTProject: '{{answers.project.deployment.defaultMRTProject}}',
-            defaultMRTTarget: '{{answers.project.deployment.defaultMRTTarget}}'
+            defaultMRTProject: '{{#if answers.project.deployment.defaultMRTProject}}{{answers.project.deployment.defaultMRTProject}}{{else}}{{/if}}',
+            defaultMRTTarget: '{{#if answers.project.deployment.defaultMRTTarget}}{{answers.project.deployment.defaultMRTTarget}}{{else}}{{/if}}'
         }
     },
     // Experimental: The base path for the app. This is the path that will be prepended to all /mobify routes,

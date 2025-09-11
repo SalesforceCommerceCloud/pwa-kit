@@ -666,9 +666,10 @@
                         "message": "What is your default MRT Target (optional)?",
                         "type": "input",
                         "default": "",
+                        "when": "project.deployment.defaultMRTProject",
                         "_ai": {
-                            "instruction": "Ask for the default MRT Target name, can be left blank",
-                            "expectedUse": "Used to configure deployment settings for Managed Runtime"
+                            "instruction": "Ask for the default MRT Target name only when defaultMRTProject is provided",
+                            "expectedUse": "Used to configure deployment settings for Managed Runtime when project is specified"
                         }
                     }
                 ],

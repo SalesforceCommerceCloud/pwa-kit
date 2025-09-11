@@ -602,14 +602,28 @@ const main = async (opts) => {
     let {questions} = selectedTemplate
 
     // Inquirer doesn't support Regex values for the "validate" property. So lets make a function for it.
+    // Also handle custom "when" logic for deployment questions.
     questions = questions.map((question) => {
         const validator = VALIDATORS.find(({id}) => id === question.validator)
+
+        // Custom when logic for deployment questions
+        let whenFunction = question.when
+        if (
+            question.name === 'project.deployment.defaultMRTTarget' &&
+            question.when === 'project.deployment.defaultMRTProject'
+        ) {
+            whenFunction = (answers) => {
+                const projectValue = answers['project.deployment.defaultMRTProject']
+                return projectValue && projectValue.trim() !== ''
+            }
+        }
 
         return {
             ...question,
             validate: validator?.regex
                 ? (input) => new RegExp(validator.regex, 'i').test(input) || validator.message
-                : undefined
+                : undefined,
+            when: whenFunction
         }
     })
 
