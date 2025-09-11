@@ -31,14 +31,6 @@ export const useSomOrderMutation = (endpoint = 'trackOrder') => {
         })
     }
 
-    // Log mutation state
-    console.log("🔄 useSomOrderMutation response:", {
-        data: mutation.data,
-        isLoading: mutation.isPending,
-        error: mutation.error,
-        isSuccess: mutation.isSuccess
-    })
-
     return {
         ...mutation,
         mutateAsync: mutateWithParams
@@ -64,14 +56,6 @@ export const useSomOrderQuery = (endpoint, parameters, options = {}) => {
         rawResponse: false
     }, {
         enabled: typeof window !== 'undefined' && (options.enabled !== false)
-    })
-
-    // Log query state
-    console.log("🔄 useSomOrderQuery response: " +endpoint, {
-        data: query.data,
-        isLoading: query.isLoading,
-        error: query.error,
-        isSuccess: query.isSuccess
     })
 
     return query
