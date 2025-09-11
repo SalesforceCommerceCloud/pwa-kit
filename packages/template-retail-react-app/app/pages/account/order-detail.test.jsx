@@ -29,6 +29,12 @@ jest.mock('@salesforce/pwa-kit-runtime/utils/ssr-config', () => ({
     getConfig: jest.fn()
 }))
 
+// Mock the toast hook to capture toast calls
+const mockToast = jest.fn()
+jest.mock('@salesforce/retail-react-app/app/hooks/use-toast', () => ({
+    useToast: () => mockToast
+}))
+
 jest.mock('@salesforce/commerce-sdk-react', () => ({
     __esModule: true,
     ...jest.requireActual('@salesforce/commerce-sdk-react'),
@@ -148,6 +154,9 @@ describe('Cancel Order toast', () => {
         const {user} = renderAtOrderDetailPath()
         await screen.findByText(/Order Number:/i)
 
+        // Clear any previous toast calls
+        mockToast.mockClear()
+
         // Open cancel modal
         const cancelButton = screen.getByRole('button', {name: /cancel order/i})
         await user.click(cancelButton)
@@ -158,8 +167,14 @@ describe('Cancel Order toast', () => {
         expect(modalButton).toBeInTheDocument()
         await user.click(modalButton)
 
+        // Check that the toast function was called with success message
         await waitFor(() => {
-            expect(screen.getByRole('status')).toHaveTextContent(/cancellation request submitted/i)
+            expect(mockToast).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    title: expect.stringMatching(/order cancellation request was submitted/i),
+                    status: 'success'
+                })
+            )
         })
     })
 })
