@@ -43,9 +43,7 @@ import {readFileSync} from 'fs'
 import basicAuth from 'express-basic-auth'
 import fetch from 'cross-fetch'
 import {isolationTests} from './isolation-actions.mjs'
-
-// Use process.cwd() instead of import.meta.url for better compatibility
-const pkg = JSON.parse(readFileSync(path.join(process.cwd(), 'package.json'), 'utf8'))
+import pkg from '../package.json'
 
 /**
  * Custom error class
