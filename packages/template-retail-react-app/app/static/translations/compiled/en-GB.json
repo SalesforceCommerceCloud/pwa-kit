@@ -2518,7 +2518,7 @@
   "multi_ship_warning_modal.message.addresses_will_be_removed": [
     {
       "type": 0,
-      "value": "If you switch to one address, the shipping addresses you added for each item will be removed."
+      "value": "If you switch to one address, the shipping addresses you added for the items will be removed."
     }
   ],
   "multi_ship_warning_modal.title.switch_to_one_address": [

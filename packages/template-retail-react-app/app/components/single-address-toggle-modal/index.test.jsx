@@ -27,7 +27,7 @@ describe('SingleAddressToggleModal', () => {
         expect(screen.getByText('Switch to one address?')).toBeInTheDocument()
         expect(
             screen.getByText(
-                /If you switch to one address, the shipping addresses you added for each item will be removed/
+                /If you switch to one address, the shipping addresses you added for the items will be removed/
             )
         ).toBeInTheDocument()
     })

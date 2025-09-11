@@ -26,7 +26,7 @@ const dialogTitle = defineMessage({
 
 const confirmationMessage = defineMessage({
     defaultMessage:
-        'If you switch to one address, the shipping addresses you added for each item will be removed.',
+        'If you switch to one address, the shipping addresses you added for the items will be removed.',
     id: 'multi_ship_warning_modal.message.addresses_will_be_removed'
 })
 
