@@ -2084,4 +2084,170 @@ describe('ShippingMultiAddress - handleSubmit', () => {
             expect(screen.queryByTestId('address-form')).not.toBeInTheDocument()
         })
     })
+
+    describe('Unsaved guest addresses toggle warning', () => {
+        const mockOnUnsavedGuestAddressesToggleWarning = jest.fn()
+        beforeEach(() => {
+            mockOnUnsavedGuestAddressesToggleWarning.mockClear()
+        })
+
+        test('should call onUnsavedGuestAddressesToggleWarning with false when no unpersisted addresses exist', () => {
+            const basketWithPersistedAddresses = {
+                ...mockBasket,
+                shipments: [
+                    {
+                        shipmentId: 'shipment-1',
+                        shippingAddress: {
+                            firstName: 'John',
+                            lastName: 'Doe',
+                            address1: '123 Test St',
+                            city: 'Test City',
+                            stateCode: 'CA',
+                            postalCode: '12345'
+                        }
+                    }
+                ]
+            }
+
+            useCurrentCustomer.mockReturnValue({
+                data: {
+                    customerId: 'guest-1',
+                    isGuest: true,
+                    addresses: []
+                },
+                isLoading: false
+            })
+
+            useCurrentBasket.mockReturnValue({
+                data: basketWithPersistedAddresses
+            })
+
+            renderWithIntl(
+                <ShippingMultiAddress
+                    {...defaultProps}
+                    basket={basketWithPersistedAddresses}
+                    onUnsavedGuestAddressesToggleWarning={mockOnUnsavedGuestAddressesToggleWarning}
+                />
+            )
+            expect(mockOnUnsavedGuestAddressesToggleWarning).toHaveBeenCalledWith(false)
+        })
+
+        test('should call onUnsavedGuestAddressesToggleWarning with true when unpersisted guest addresses exist', async () => {
+            useCurrentCustomer.mockReturnValue({
+                data: {
+                    customerId: 'guest-1',
+                    isGuest: true,
+                    addresses: []
+                },
+                isLoading: false
+            })
+
+            useCurrentBasket.mockReturnValue({
+                data: mockBasket
+            })
+
+            renderWithIntl(
+                <ShippingMultiAddress
+                    {...defaultProps}
+                    onUnsavedGuestAddressesToggleWarning={mockOnUnsavedGuestAddressesToggleWarning}
+                />
+            )
+
+            const addNewAddressButtons = screen.getAllByText('+ Add New Address')
+            fireEvent.click(addNewAddressButtons[0])
+
+            fireEvent.change(screen.getByLabelText('First Name'), {target: {value: 'Guest'}})
+            fireEvent.change(screen.getByLabelText('Last Name'), {target: {value: 'User'}})
+            fireEvent.change(screen.getByLabelText('Phone'), {target: {value: '1234567890'}})
+            fireEvent.change(screen.getByLabelText('Address'), {target: {value: '123 Guest St'}})
+            fireEvent.change(screen.getByLabelText('City'), {target: {value: 'Guest City'}})
+            fireEvent.change(screen.getByLabelText('State'), {target: {value: 'CA'}})
+            fireEvent.change(screen.getByLabelText('Zip Code'), {target: {value: '12345'}})
+            fireEvent.click(screen.getByText('Save'))
+
+            await waitFor(() => {
+                expect(mockOnUnsavedGuestAddressesToggleWarning).toHaveBeenCalledWith(true)
+            })
+        })
+
+        test('should call onUnsavedGuestAddressesToggleWarning with false when guest addresses are persisted', async () => {
+            const basketWithPersistedGuestAddresses = {
+                ...mockBasket,
+                shipments: [
+                    {
+                        shipmentId: 'shipment-1',
+                        shippingAddress: {
+                            firstName: 'Guest',
+                            lastName: 'User',
+                            address1: '123 Guest St',
+                            city: 'Guest City',
+                            stateCode: 'CA',
+                            postalCode: '12345'
+                        }
+                    }
+                ]
+            }
+
+            useCurrentCustomer.mockReturnValue({
+                data: {
+                    customerId: 'guest-1',
+                    isGuest: true,
+                    addresses: []
+                },
+                isLoading: false
+            })
+
+            useCurrentBasket.mockReturnValue({
+                data: basketWithPersistedGuestAddresses
+            })
+
+            renderWithIntl(
+                <ShippingMultiAddress
+                    {...defaultProps}
+                    basket={basketWithPersistedGuestAddresses}
+                    onUnsavedGuestAddressesToggleWarning={mockOnUnsavedGuestAddressesToggleWarning}
+                />
+            )
+
+            // same guest address that's already persisted
+            const addNewAddressButtons = screen.getAllByText('+ Add New Address')
+            fireEvent.click(addNewAddressButtons[0])
+
+            fireEvent.change(screen.getByLabelText('First Name'), {target: {value: 'Guest'}})
+            fireEvent.change(screen.getByLabelText('Last Name'), {target: {value: 'User'}})
+            fireEvent.change(screen.getByLabelText('Phone'), {target: {value: '1234567890'}})
+            fireEvent.change(screen.getByLabelText('Address'), {target: {value: '123 Guest St'}})
+            fireEvent.change(screen.getByLabelText('City'), {target: {value: 'Guest City'}})
+            fireEvent.change(screen.getByLabelText('State'), {target: {value: 'CA'}})
+            fireEvent.change(screen.getByLabelText('Zip Code'), {target: {value: '12345'}})
+            fireEvent.click(screen.getByText('Save'))
+
+            await waitFor(() => {
+                expect(mockOnUnsavedGuestAddressesToggleWarning).toHaveBeenCalledWith(false)
+            })
+        })
+
+        test('should call onUnsavedGuestAddressesToggleWarning with false for registered users', () => {
+            useCurrentCustomer.mockReturnValue({
+                data: {
+                    customerId: 'customer-1',
+                    isGuest: false,
+                    addresses: mockCustomer.addresses
+                },
+                isLoading: false
+            })
+
+            useCurrentBasket.mockReturnValue({
+                data: mockBasket
+            })
+
+            renderWithIntl(
+                <ShippingMultiAddress
+                    {...defaultProps}
+                    onUnsavedGuestAddressesToggleWarning={mockOnUnsavedGuestAddressesToggleWarning}
+                />
+            )
+            expect(mockOnUnsavedGuestAddressesToggleWarning).toHaveBeenCalledWith(false)
+        })
+    })
 })
