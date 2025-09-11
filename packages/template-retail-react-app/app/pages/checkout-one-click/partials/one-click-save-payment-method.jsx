@@ -21,8 +21,8 @@ export default function SavePaymentMethod({paymentInstrument, onSaved}) {
         onSaved?.(newValue) // Pass the boolean preference to parent
     }
 
-    // Don't render if no customer or payment instrument
-    if (!customer?.customerId || !paymentInstrument) {
+    // Don't render if no customer
+    if (!customer?.customerId) {
         return null
     }
 

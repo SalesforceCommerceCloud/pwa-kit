@@ -310,10 +310,10 @@ const Payment = ({
                     <Stack spacing={6}>
                         {isApplyingSavedPayment ? null : !appliedPayment?.paymentCard ? (
                             <PaymentForm form={paymentMethodForm} onSubmit={onSubmit}>
-                                {/* Save Payment Method - Show right underneath credit card fields */}
-                                {isGuest && newPaymentInstruments.length > 0 && (
+                                {/* Show for returning users (registered) while editing/adding a new card */}
+                                {!isGuest && (
                                     <SavePaymentMethod
-                                        paymentInstrument={newPaymentInstruments[0]}
+                                        paymentInstrument={currentFormPayment}
                                         onSaved={handleSavePreferenceChange}
                                     />
                                 )}
