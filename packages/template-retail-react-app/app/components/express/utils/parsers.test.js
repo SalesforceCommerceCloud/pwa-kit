@@ -6,7 +6,9 @@
  */
 import {
     getCurrencyValueForApi,
-    getGPShippingOptionParameters
+    getGPShippingOptionParameters,
+    getGooglePayCardNetworks,
+    getApplePayCardNetworks
 } from '@salesforce/retail-react-app/app/components/express/utils/parsers'
 
 describe('parsers', () => {
@@ -246,6 +248,97 @@ describe('parsers', () => {
         it('should handle undefined shipping methods', () => {
             const result = getGPShippingOptionParameters(undefined)
             expect(result).toBeUndefined()
+        })
+    })
+
+    describe('getGooglePayCardNetworks', () => {
+        it('should return Google Pay brand names from Credit Card', () => {
+            const paymentMethods = [{name: 'Credit Card', brands: ['visa', 'mc']}]
+
+            const result = getGooglePayCardNetworks(paymentMethods)
+            expect(result).toEqual(['VISA', 'MASTERCARD'])
+        })
+
+        it('should return empty array when no methods have brands', () => {
+            const paymentMethods = [{name: 'Google Pay'}, {name: 'Credit Card'}]
+
+            const result = getGooglePayCardNetworks(paymentMethods)
+            expect(result).toEqual([])
+        })
+
+        it('should return empty array when no payment methods provided', () => {
+            const result = getGooglePayCardNetworks([])
+            expect(result).toEqual([])
+        })
+
+        it('should handle undefined payment methods', () => {
+            const result = getGooglePayCardNetworks(undefined)
+            expect(result).toEqual([])
+        })
+
+        it('should filter out unsupported brands', () => {
+            const paymentMethods = [
+                {name: 'Credit Card', brands: ['visa', 'mc', 'unsupported', 'amex']}
+            ]
+
+            const result = getGooglePayCardNetworks(paymentMethods)
+            expect(result).toEqual(['VISA', 'MASTERCARD', 'AMEX'])
+        })
+
+        it('should handle empty brands array', () => {
+            const paymentMethods = [{name: 'Credit Card', brands: []}]
+
+            const result = getGooglePayCardNetworks(paymentMethods)
+            expect(result).toEqual([])
+        })
+    })
+
+    describe('getApplePayCardNetworks', () => {
+        it('should return Apple Pay brands when Apple Pay method has brands', () => {
+            const paymentMethods = [{name: 'Apple Pay', brands: ['visa', 'mc', 'amex']}]
+
+            const result = getApplePayCardNetworks(paymentMethods)
+            expect(result).toEqual(['visa', 'masterCard', 'amex'])
+        })
+
+        it('should return empty array when Apple Pay method has no brands', () => {
+            const paymentMethods = [{name: 'Apple Pay'}]
+
+            const result = getApplePayCardNetworks(paymentMethods)
+            expect(result).toEqual([])
+        })
+
+        it('should return empty array when no Apple Pay method found', () => {
+            const paymentMethods = [{name: 'Credit Card', brands: ['visa', 'mc']}]
+
+            const result = getApplePayCardNetworks(paymentMethods)
+            expect(result).toEqual([])
+        })
+
+        it('should return empty array when no payment methods provided', () => {
+            const result = getApplePayCardNetworks([])
+            expect(result).toEqual([])
+        })
+
+        it('should handle undefined payment methods', () => {
+            const result = getApplePayCardNetworks(undefined)
+            expect(result).toEqual([])
+        })
+
+        it('should filter out unsupported brands', () => {
+            const paymentMethods = [
+                {name: 'Apple Pay', brands: ['visa', 'mc', 'unsupported', 'amex']}
+            ]
+
+            const result = getApplePayCardNetworks(paymentMethods)
+            expect(result).toEqual(['visa', 'masterCard', 'amex'])
+        })
+
+        it('should handle empty brands array', () => {
+            const paymentMethods = [{name: 'Apple Pay', brands: []}]
+
+            const result = getApplePayCardNetworks(paymentMethods)
+            expect(result).toEqual([])
         })
     })
 })

@@ -128,6 +128,17 @@ jest.mock('@salesforce/retail-react-app/app/hooks/use-navigation', () => ({
     default: jest.fn()
 }))
 
+// Mock the parsers module
+jest.mock('@salesforce/retail-react-app/app/components/express/utils/parsers', () => ({
+    getCurrencyValueForApi: jest.fn((amount) => amount * 100),
+    getGPShippingOptionParameters: jest.fn(() => ({
+        defaultSelectedOptionId: 'method-1',
+        shippingOptions: [{id: 'method-1', label: 'Standard Shipping', description: '5-7 days'}]
+    })),
+    getGooglePayCardNetworks: jest.fn(() => ['VISA', 'MASTERCARD', 'AMEX']),
+    getApplePayCardNetworks: jest.fn(() => ['visa', 'masterCard', 'amex'])
+}))
+
 // Suppress MSW 'Found an unhandled' warnings for this test file
 const originalConsoleError = console.error
 beforeAll(() => {
@@ -426,6 +437,7 @@ describe('getAppleButtonConfig', () => {
             null, // no existing basket
             [],
             mockApplePayConfig,
+            [], // paymentMethods
             null, // no fetchShippingMethods in PDP
             'TEST-SKU-PDP',
             jest.fn(), // setTempBasket
@@ -461,6 +473,7 @@ describe('getAppleButtonConfig', () => {
             null,
             [],
             mockApplePayConfig,
+            [], // paymentMethods
             null, // no fetchShippingMethods in PDP
             'TEST-SKU-PDP',
             jest.fn(), // setTempBasket
@@ -487,6 +500,7 @@ describe('getAppleButtonConfig', () => {
             null,
             [],
             mockApplePayConfig,
+            [], // paymentMethods
             null, // no fetchShippingMethods in PDP
             'TEST-SKU-PDP',
             jest.fn(), // setTempBasket
@@ -511,6 +525,7 @@ describe('getAppleButtonConfig', () => {
             null, // no existing basket
             [],
             mockApplePayConfig,
+            [], // paymentMethods
             null, // no fetchShippingMethods in PDP
             'TEST-SKU-PDP',
             jest.fn(), // setTempBasket
@@ -575,8 +590,8 @@ describe('getAppleButtonConfig', () => {
             null,
             [],
             mockApplePayConfig,
-            mockNavigate,
-            null,
+            [], // paymentMethods
+            mockFetchShippingMethods,
             'TEST-SKU-PDP',
             jest.fn(), // setTempBasket
             {basketId: 'temp-basket-123'},
@@ -612,8 +627,8 @@ describe('getAppleButtonConfig', () => {
             null,
             [],
             mockApplePayConfig,
-            mockNavigate,
-            null,
+            [], // paymentMethods
+            mockFetchShippingMethods,
             'TEST-SKU-PDP',
             jest.fn(), // setTempBasket
             {basketId: 'temp-basket-123'},
@@ -662,6 +677,7 @@ describe('getAppleButtonConfig', () => {
             mockBasket,
             mockShippingMethods,
             mockApplePayConfig,
+            [], // paymentMethods
             mockFetchShippingMethods
         )
 
@@ -808,8 +824,6 @@ describe('ApplePayExpress error and edge cases', () => {
         })
     })
 
-
-
     it('handles unexpected errors during checkout creation by calling setPaymentMethodUnavailable', async () => {
         // Mock validateExpressPaymentSetup to return true so component renders
         validateExpressPaymentSetup.mockReturnValue(true)
@@ -824,7 +838,6 @@ describe('ApplePayExpress error and edge cases', () => {
             expect(mockProps.manager.setPaymentMethodUnavailable).toHaveBeenCalledWith('applepay')
         })
     })
-
 
     it('handles missing order total error in non-PDP mode by calling setPaymentMethodUnavailable', async () => {
         // Mock validateExpressPaymentSetup to return true so component renders

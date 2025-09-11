@@ -8,7 +8,10 @@ import React, {useEffect, useRef} from 'react'
 import '@adyen/adyen-web/dist/adyen.css'
 import PropTypes from 'prop-types'
 
-import {getCurrencyValueForApi} from '@salesforce/retail-react-app/app/components/express/utils/parsers'
+import {
+    getCurrencyValueForApi, 
+    getApplePayCardNetworks
+} from '@salesforce/retail-react-app/app/components/express/utils/parsers'
 import {AdyenShippingMethodsService} from '@salesforce/retail-react-app/app/components/express/utils/shipping-methods'
 import {AdyenShippingAddressService} from '@salesforce/retail-react-app/app/components/express/utils/shipping-address'
 import {AdyenPaymentsService} from '@salesforce/retail-react-app/app/components/express/utils/payments'
@@ -82,6 +85,7 @@ export const getAppleButtonConfig = (
     basket,
     shippingMethods,
     applePayConfig,
+    paymentMethods,
     fetchShippingMethods,
     sku = null,
     setTempBasket = null,
@@ -116,6 +120,7 @@ export const getAppleButtonConfig = (
         showPayButton: true,
         isExpress: true,
         configuration: applePayConfig,
+        supportedNetworks: getApplePayCardNetworks(paymentMethods),
         amount: {
             value: getCurrencyValueForApi(basketRef?.orderTotal || 0, basketRef?.currency || 'USD'),
             currency: basketRef?.currency || 'USD'
@@ -608,6 +613,7 @@ export const ApplePayExpress = ({
                         basket,
                         adyenPaymentMethods?.applicableShippingMethods || [],
                         applePaymentMethodConfig,
+                        adyenPaymentMethods?.paymentMethods,
                         adyenPaymentMethods?.fetchShippingMethods,
                         currentSku,
                         setTempBasket,

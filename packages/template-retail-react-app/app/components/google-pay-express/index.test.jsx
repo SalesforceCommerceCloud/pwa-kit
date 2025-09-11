@@ -73,7 +73,9 @@ jest.mock('@salesforce/retail-react-app/app/components/express/utils/parsers', (
     getGPShippingOptionParameters: jest.fn(() => ({
         defaultSelectedOptionId: 'method-1',
         shippingOptions: [{id: 'method-1', label: 'Standard Shipping', description: '5-7 days'}]
-    }))
+    })),
+    getGooglePayCardNetworks: jest.fn(() => ['VISA', 'MASTERCARD', 'AMEX']),
+    getApplePayCardNetworks: jest.fn(() => ['visa', 'masterCard', 'amex'])
 }))
 
 // Mock the useStandalonePaymentMethods hook
@@ -683,12 +685,14 @@ describe('GooglePayExpress Button Configuration', () => {
             const mockSite = {id: 'site1'}
             const mockBasket = {basketId: 'basket123', orderTotal: 100.0, currency: 'USD'}
             const mockGooglePayConfig = {merchantId: 'merchant123'}
+            const mockAdyenPaymentMethods = {paymentMethods: []}
 
             const result = getGoogleButtonConfig(
                 mockAuthToken,
                 mockSite,
                 mockBasket,
                 mockGooglePayConfig,
+                mockAdyenPaymentMethods,
                 null, // sku
                 null, // setTempBasket
                 null, // tempBasket
@@ -708,6 +712,7 @@ describe('GooglePayExpress Button Configuration', () => {
             const mockSite = {id: 'site1'}
             const mockBasket = null
             const mockGooglePayConfig = {merchantId: 'merchant123'}
+            const mockAdyenPaymentMethods = {paymentMethods: []}
             const mockTempBasket = {basketId: 'temp123', orderTotal: 50.0, currency: 'USD'}
             const mockSetTempBasket = jest.fn()
 
@@ -716,6 +721,7 @@ describe('GooglePayExpress Button Configuration', () => {
                 mockSite,
                 mockBasket,
                 mockGooglePayConfig,
+                mockAdyenPaymentMethods,
                 'SKU123', // sku
                 mockSetTempBasket, // setTempBasket
                 mockTempBasket, // tempBasket

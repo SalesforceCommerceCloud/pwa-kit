@@ -11,6 +11,28 @@ export const PAYMENT_METHODS = {
     GOOGLE_PAY: 'googlepay'
 }
 
+// A map of Adyen credit card network names to their corresponding Google Pay card network names
+export const cardNetworkNamesGPay = {
+    visa: 'VISA',
+    mc: 'MASTERCARD',
+    amex: 'AMEX',
+    discover: 'DISCOVER',
+    jcb: 'JCB',
+    maestro: 'MAESTRO',
+    elo: 'ELO'
+}
+
+// A map of Adyen card network names to their corresponding Apple Pay card network names
+export const cardNetworkNamesAPay = {
+    visa: 'visa',
+    mc: 'masterCard',
+    amex: 'amex',
+    discover: 'discover',
+    jcb: 'jcb',
+    maestro: 'maestro',
+    elo: 'elo'
+}
+
 // Express payment message types
 export const EXPRESS_MESSAGES = {
     PAYMENT_AVAILABLE: 'express.payment.available',

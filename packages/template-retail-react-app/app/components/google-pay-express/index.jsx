@@ -10,7 +10,8 @@ import PropTypes from 'prop-types'
 
 import {
     getCurrencyValueForApi,
-    getGPShippingOptionParameters
+    getGPShippingOptionParameters,
+    getGooglePayCardNetworks
 } from '@salesforce/retail-react-app/app/components/express/utils/parsers'
 import {AdyenShippingMethodsService} from '@salesforce/retail-react-app/app/components/express/utils/shipping-methods'
 import {AdyenShippingAddressService} from '@salesforce/retail-react-app/app/components/express/utils/shipping-address'
@@ -186,6 +187,7 @@ export const getGoogleButtonConfig = (
     site,
     basket,
     googlePayConfig,
+    adyenPaymentMethods,
     sku = null,
     setTempBasket = null,
     tempBasket = null,
@@ -237,6 +239,7 @@ export const getGoogleButtonConfig = (
         billingAddressParameters: {format: 'FULL'},
         emailRequired: true,
         configuration: googlePayConfig,
+        allowedCardNetworks: getGooglePayCardNetworks(adyenPaymentMethods?.paymentMethods),
         amount: {
             value: getCurrencyValueForApi(googlePayAmount, basketRef?.currency || 'USD'),
             currency: basketRef?.currency || 'USD'
@@ -554,6 +557,7 @@ export const GooglePayExpress = ({
                         finalSite,
                         basket,
                         googlePaymentMethodConfig,
+                        adyenPaymentMethods,
                         currentSku,
                         setTempBasket,
                         tempBasket,
