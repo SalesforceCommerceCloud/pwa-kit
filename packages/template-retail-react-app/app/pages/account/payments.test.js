@@ -306,7 +306,10 @@ describe('AccountPayments', () => {
         const {user} = renderWithProviders(<AccountPayments />)
 
         await user.click(screen.getByRole('button', {name: /add payment/i}))
-        await user.type(screen.getByLabelText(/card number/i, {selector: 'input'}), '4111111111111111')
+        await user.type(
+            screen.getByLabelText(/card number/i, {selector: 'input'}),
+            '4111111111111111'
+        )
         await user.type(screen.getByLabelText(/name on card/i), 'John Smith')
         await user.type(screen.getByLabelText(/expiration date/i), '12/30')
         await user.type(screen.getByLabelText(/security code/i, {selector: 'input'}), '123')

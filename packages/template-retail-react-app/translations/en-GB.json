@@ -17,6 +17,12 @@
   "account.payments.heading.payment_methods": {
     "defaultMessage": "Payment Methods"
   },
+  "account.payments.info.payment_method_removed": {
+    "defaultMessage": "Payment method removed"
+  },
+  "account.payments.info.payment_method_saved": {
+    "defaultMessage": "New payment method saved"
+  },
   "account.payments.message.error": {
     "defaultMessage": "Error loading payment methods. Please try again."
   },

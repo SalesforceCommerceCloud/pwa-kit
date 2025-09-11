@@ -35,6 +35,18 @@
       "value": "Payment Methods"
     }
   ],
+  "account.payments.info.payment_method_removed": [
+    {
+      "type": 0,
+      "value": "Payment method removed"
+    }
+  ],
+  "account.payments.info.payment_method_saved": [
+    {
+      "type": 0,
+      "value": "New payment method saved"
+    }
+  ],
   "account.payments.message.error": [
     {
       "type": 0,
