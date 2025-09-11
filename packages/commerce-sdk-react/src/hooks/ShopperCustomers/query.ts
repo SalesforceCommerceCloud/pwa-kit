@@ -256,18 +256,21 @@ export const useSomOrder = (
         onError?: (error: any) => void
     }
 ) => {
-    return useCustomQuery({
-        options: {
-            method: 'GET',
-            customApiPathParameters: {
-                endpointPath: 'order',
-                apiName: 'orders',
-                apiVersion: 'v1',
-                organizationId: 'f_ecom_zzrf_017'
-            },
-            parameters: apiOptions.parameters
-        }
-    }, queryOptions);
+    return useCustomQuery(
+        {
+            options: {
+                method: 'GET',
+                customApiPathParameters: {
+                    endpointPath: 'order',
+                    apiName: 'orders',
+                    apiVersion: 'v1',
+                    organizationId: 'f_ecom_zzrf_017'
+                },
+                parameters: apiOptions.parameters
+            }
+        },
+        queryOptions
+    )
 }
 
 /**
@@ -291,18 +294,21 @@ export const useSomCancelOrder = (
         onError?: (error: any) => void
     }
 ) => {
-    return useCustomQuery({
-        options: {
-            method: 'GET',
-            customApiPathParameters: {
-                endpointPath: 'cancelOrder',
-                apiName: 'orders',
-                apiVersion: 'v1',
-                organizationId: 'f_ecom_zzrf_017'
-            },
-            parameters: apiOptions.parameters
-        }
-    }, queryOptions);
+    return useCustomQuery(
+        {
+            options: {
+                method: 'GET',
+                customApiPathParameters: {
+                    endpointPath: 'cancelOrder',
+                    apiName: 'orders',
+                    apiVersion: 'v1',
+                    organizationId: 'f_ecom_zzrf_017'
+                },
+                parameters: apiOptions.parameters
+            }
+        },
+        queryOptions
+    )
 }
 
 /**

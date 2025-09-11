@@ -51,7 +51,11 @@ const AccountOrderDetail = () => {
         onClose: onCancelModalClose
     } = useDisclosure()
 
-    const {data: order, isLoading: isOrderLoading, refetch: refetchOrder} = useOrder(
+    const {
+        data: order,
+        isLoading: isOrderLoading,
+        refetch: refetchOrder
+    } = useOrder(
         {
             parameters: {orderNo: params.orderNo}
         },
@@ -106,24 +110,24 @@ const AccountOrderDetail = () => {
     const handleCancelOrder = async (_order, _reasonId) => {
         try {
             const result = await submitCancelRequest()
-            const somDataResponse = result?.data?.response
+            const somData = result?.data?.response
 
-            if (somDataResponse[0].isSuccess === false) {
-                const errorText = somDataResponse[0].errors[0].message
+            if (!somData || somData.isValidJSON !== true || somData.isError === true) {
+                const errorText =
+                    somData?.errorText ||
+                    formatMessage({
+                        defaultMessage: 'Something went wrong with the order cancellation.',
+                        id: 'account_order_detail.toast.cancellation_failed'
+                    })
                 toast({title: errorText, status: 'error', position: 'top'})
                 return
             }
 
-            if (somDataResponse.isValidJSON !== true || somDataResponse.isError === true) {
-                const errorText = somDataResponse.errorText || formatMessage({
-                    defaultMessage: 'Something went wrong with the order cancellation.',
-                    id: 'account_order_detail.toast.cancellation_failed'
-                })
-                toast({title: errorText, status: 'error', position: 'top'})
-                return
-            }
+            const firstAction = Array.isArray(somData.responseObj)
+                ? somData.responseObj[0]
+                : somData.responseObj
 
-            if (somDataResponse.responseObj?.isSuccess === true) {
+            if (firstAction?.isSuccess === true) {
                 toast({
                     title: formatMessage({
                         defaultMessage: 'Your order cancellation request was submitted.',
@@ -132,8 +136,21 @@ const AccountOrderDetail = () => {
                     status: 'success',
                     position: 'top'
                 })
+                await refetchOrder()
+                history.push('/account/orders')
                 return
             }
+
+            const actionErr = firstAction?.errors?.[0]?.message
+            const outputErr = firstAction?.outputValues?.submitCancelOutput?.errors?.[0]?.message
+            const errorText =
+                actionErr ||
+                outputErr ||
+                formatMessage({
+                    defaultMessage: 'Something went wrong with the order cancellation.',
+                    id: 'account_order_detail.toast.cancellation_failed'
+                })
+            toast({title: errorText, status: 'error', position: 'top'})
         } catch (e) {
             toast({
                 title: formatMessage({
