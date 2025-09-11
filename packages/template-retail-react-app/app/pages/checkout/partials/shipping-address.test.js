@@ -158,7 +158,7 @@ jest.mock(
     '@salesforce/retail-react-app/app/pages/checkout/partials/shipping-multi-address',
     () => ({
         __esModule: true,
-        default: function MockMultiShipping({onGuestAddressesToggleWarning}) {
+        default: function MockMultiShipping({onUnsavedGuestAddressesToggleWarning}) {
             const {
                 useCheckout
                 // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -167,8 +167,8 @@ jest.mock(
             const {goToStep, STEPS} = useCheckout()
 
             // simulate calling the callback with true to trigger warning modal
-            if (onGuestAddressesToggleWarning) {
-                onGuestAddressesToggleWarning(true)
+            if (onUnsavedGuestAddressesToggleWarning) {
+                onUnsavedGuestAddressesToggleWarning(true)
             }
 
             return (

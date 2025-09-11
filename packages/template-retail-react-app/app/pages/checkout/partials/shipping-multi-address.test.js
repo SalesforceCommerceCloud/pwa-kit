@@ -2086,12 +2086,12 @@ describe('ShippingMultiAddress - handleSubmit', () => {
     })
 
     describe('Unsaved guest addresses toggle warning', () => {
-        const mockOnGuestAddressesToggleWarning = jest.fn()
+        const mockOnUnsavedGuestAddressesToggleWarning = jest.fn()
         beforeEach(() => {
-            mockOnGuestAddressesToggleWarning.mockClear()
+            mockOnUnsavedGuestAddressesToggleWarning.mockClear()
         })
 
-        test('should call onGuestAddressesToggleWarning with false when no unpersisted addresses exist', () => {
+        test('should call onUnsavedGuestAddressesToggleWarning with false when no unpersisted addresses exist', () => {
             const basketWithPersistedAddresses = {
                 ...mockBasket,
                 shipments: [
@@ -2126,13 +2126,13 @@ describe('ShippingMultiAddress - handleSubmit', () => {
                 <ShippingMultiAddress
                     {...defaultProps}
                     basket={basketWithPersistedAddresses}
-                    onGuestAddressesToggleWarning={mockOnGuestAddressesToggleWarning}
+                    onUnsavedGuestAddressesToggleWarning={mockOnUnsavedGuestAddressesToggleWarning}
                 />
             )
-            expect(mockOnGuestAddressesToggleWarning).toHaveBeenCalledWith(false)
+            expect(mockOnUnsavedGuestAddressesToggleWarning).toHaveBeenCalledWith(false)
         })
 
-        test('should call onGuestAddressesToggleWarning with true when unpersisted guest addresses exist', async () => {
+        test('should call onUnsavedGuestAddressesToggleWarning with true when unpersisted guest addresses exist', async () => {
             useCurrentCustomer.mockReturnValue({
                 data: {
                     customerId: 'guest-1',
@@ -2149,7 +2149,7 @@ describe('ShippingMultiAddress - handleSubmit', () => {
             renderWithIntl(
                 <ShippingMultiAddress
                     {...defaultProps}
-                    onGuestAddressesToggleWarning={mockOnGuestAddressesToggleWarning}
+                    onUnsavedGuestAddressesToggleWarning={mockOnUnsavedGuestAddressesToggleWarning}
                 />
             )
 
@@ -2166,11 +2166,11 @@ describe('ShippingMultiAddress - handleSubmit', () => {
             fireEvent.click(screen.getByText('Save'))
 
             await waitFor(() => {
-                expect(mockOnGuestAddressesToggleWarning).toHaveBeenCalledWith(true)
+                expect(mockOnUnsavedGuestAddressesToggleWarning).toHaveBeenCalledWith(true)
             })
         })
 
-        test('should call onGuestAddressesToggleWarning with false when guest addresses are persisted', async () => {
+        test('should call onUnsavedGuestAddressesToggleWarning with false when guest addresses are persisted', async () => {
             const basketWithPersistedGuestAddresses = {
                 ...mockBasket,
                 shipments: [
@@ -2205,7 +2205,7 @@ describe('ShippingMultiAddress - handleSubmit', () => {
                 <ShippingMultiAddress
                     {...defaultProps}
                     basket={basketWithPersistedGuestAddresses}
-                    onGuestAddressesToggleWarning={mockOnGuestAddressesToggleWarning}
+                    onUnsavedGuestAddressesToggleWarning={mockOnUnsavedGuestAddressesToggleWarning}
                 />
             )
 
@@ -2223,11 +2223,11 @@ describe('ShippingMultiAddress - handleSubmit', () => {
             fireEvent.click(screen.getByText('Save'))
 
             await waitFor(() => {
-                expect(mockOnGuestAddressesToggleWarning).toHaveBeenCalledWith(false)
+                expect(mockOnUnsavedGuestAddressesToggleWarning).toHaveBeenCalledWith(false)
             })
         })
 
-        test('should call onGuestAddressesToggleWarning with false for registered users', () => {
+        test('should call onUnsavedGuestAddressesToggleWarning with false for registered users', () => {
             useCurrentCustomer.mockReturnValue({
                 data: {
                     customerId: 'customer-1',
@@ -2244,10 +2244,10 @@ describe('ShippingMultiAddress - handleSubmit', () => {
             renderWithIntl(
                 <ShippingMultiAddress
                     {...defaultProps}
-                    onGuestAddressesToggleWarning={mockOnGuestAddressesToggleWarning}
+                    onUnsavedGuestAddressesToggleWarning={mockOnUnsavedGuestAddressesToggleWarning}
                 />
             )
-            expect(mockOnGuestAddressesToggleWarning).toHaveBeenCalledWith(false)
+            expect(mockOnUnsavedGuestAddressesToggleWarning).toHaveBeenCalledWith(false)
         })
     })
 })

@@ -33,7 +33,7 @@ const ShippingMultiAddress = ({
     basket,
     submitButtonLabel,
     noItemsInBasketMessage,
-    onGuestAddressesToggleWarning
+    onUnsavedGuestAddressesToggleWarning
 }) => {
     const {formatMessage} = useIntl()
     const {STEPS, goToStep} = useCheckout()
@@ -103,8 +103,8 @@ const ShippingMultiAddress = ({
 
     // inform parent of unpersisted local guest addresses
     useEffect(() => {
-        onGuestAddressesToggleWarning?.(hasUnpersistedGuestAddresses)
-    }, [hasUnpersistedGuestAddresses, onGuestAddressesToggleWarning])
+        onUnsavedGuestAddressesToggleWarning?.(hasUnpersistedGuestAddresses)
+    }, [hasUnpersistedGuestAddresses, onUnsavedGuestAddressesToggleWarning])
 
     if (!productAddressAssignment.deliveryItems.length) {
         return (
@@ -277,7 +277,7 @@ ShippingMultiAddress.propTypes = {
     basket: PropTypes.object.isRequired,
     submitButtonLabel: PropTypes.object.isRequired,
     noItemsInBasketMessage: PropTypes.object.isRequired,
-    onGuestAddressesToggleWarning: PropTypes.func
+    onUnsavedGuestAddressesToggleWarning: PropTypes.func
 }
 
 export default ShippingMultiAddress

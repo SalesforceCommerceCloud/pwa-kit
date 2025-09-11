@@ -98,7 +98,7 @@ export default function ShippingAddress() {
     }, [hasMultipleDeliveryShipments])
 
     // handle unpersisted address status from ShippingMultiAddress
-    const handleGuestAddressesToggleWarning = (hasUnsaved) => {
+    const handleUnsavedGuestAddressesToggleWarning = (hasUnsaved) => {
         sethasUnpersistedGuestAddresses(hasUnsaved)
     }
 
@@ -237,7 +237,9 @@ export default function ShippingAddress() {
                             basket={basket}
                             submitButtonLabel={submitButtonMessage}
                             noItemsInBasketMessage={noItemsInBasketMessage}
-                            onGuestAddressesToggleWarning={handleGuestAddressesToggleWarning}
+                            onUnsavedGuestAddressesToggleWarning={
+                                handleUnsavedGuestAddressesToggleWarning
+                            }
                         />
                     )}
                 </ToggleCardEdit>
