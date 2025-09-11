@@ -45,9 +45,10 @@ const OrderStatusPage = () => {
     // Handle successful order lookup
     useEffect(() => {
         if (trackOrderQuery.data?.order) {
-            // Navigate to order details page with order data
+            // Navigate to existing order details page with trackOrder data
             const orderNumber = trackOrderQuery.data.order.OrderNumber || trackOrderQuery.data.order.orderNo
-            navigate(`/guest/orders/${orderNumber}`, {
+            // Navigate to the regular order details page and pass data via state
+            navigate(`/account/orders/${orderNumber}`, 'push', {
                 orderData: trackOrderQuery.data.order,
                 isGuestUser: true
             })
@@ -75,7 +76,7 @@ const OrderStatusPage = () => {
     // Redirect to home if user navigates to order status page manually
     useLayoutEffect(() => {
         if (isOmsEnabled === false) {
-            navigate('/', {replace: true})
+            navigate('/', 'replace')
         }
     }, [isOmsEnabled, navigate])
 

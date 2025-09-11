@@ -2,11 +2,11 @@
  * Copyright (c) 2023, salesforce.com, inc.
  * All rights reserved.
  * SPDX-License-Identifier: BSD-3-Clause
- * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
+ * For full license text, see the LICENSE file in the repo root or https://opensource.com/licenses/BSD-3-Clause
  */
 
 import React, {useEffect, useRef} from 'react'
-import {FormattedMessage, useIntl} from 'react-intl'
+import {FormattedMessage, FormattedNumber, useIntl} from 'react-intl'
 import {useHistory, useRouteMatch} from 'react-router'
 import {
     Box,
@@ -23,7 +23,9 @@ import {
     useDisclosure
 } from '@chakra-ui/react'
 import {getCreditCardIcon} from '@salesforce/retail-react-app/app/utils/cc-utils'
-import {useOrder, useProducts} from '@salesforce/commerce-sdk-react'
+import {useOrder, useProducts, useCustomerId, useCustomerType} from '@salesforce/commerce-sdk-react'
+import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
+import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
 import Link from '@salesforce/retail-react-app/app/components/link'
 import {ChevronLeftIcon} from '@salesforce/retail-react-app/app/components/icons'
 import OrderSummary from '@salesforce/retail-react-app/app/components/order-summary'
@@ -33,9 +35,7 @@ import OrderStatusBar from '@salesforce/retail-react-app/app/components/order-st
 import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
 import {getOrderStatusColorScheme} from '@salesforce/retail-react-app/app/pages/account/order-history'
 import {getLocalizedOrderStatus} from '@salesforce/retail-react-app/app/pages/account/order-history'
-import {useCustomerId, useCustomerType} from '@salesforce/commerce-sdk-react'
-import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
-import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
+import {useSomOrderQuery} from '@salesforce/retail-react-app/app/hooks/use-som-order-query'
 
 const onClient = typeof window !== 'undefined'
 
@@ -44,6 +44,12 @@ const AccountOrderDetail = () => {
     const history = useHistory()
     const {formatMessage, formatDate} = useIntl()
     const toast = useToast()
+    const {data: customer} = useCurrentCustomer()
+    
+    // Get order data from navigation state (for guest users)
+    const location = history.location
+    const passedOrderData = location.state?.orderData
+    const isGuestUser = location.state?.isGuestUser
 
     const {
         isOpen: isCancelModalOpen,
@@ -59,12 +65,83 @@ const AccountOrderDetail = () => {
             enabled: onClient && !!params.orderNo
         }
     )
-    const isLoading = isOrderLoading || !order
-    const shipment = order?.shipments[0]
-    const {shippingAddress, shippingMethod, shippingStatus, trackingNumber} = shipment || {}
-    const paymentCard = order?.paymentInstruments[0]?.paymentCard
+
+    // Call OrderDetails API for additional order information (for registered users)
+    // or use passed data for guest users
+    const orderDetailsQuery = useSomOrderQuery('orderDetails', {
+        siteId: 'RefArch',
+        c_orderNumber: params.orderNo
+    }, {
+        enabled: !isGuestUser && onClient && !!params.orderNo
+    })
+
+    // Extract order data from API response or passed data
+    const orderDetailsData = orderDetailsQuery.data
+    const orderFromAPI = isGuestUser ? passedOrderData : orderDetailsData?.order
+    
+    const orderStatus = orderFromAPI?.Status || order?.status
+    const orderNumber = orderFromAPI?.OrderNumber || order?.orderNo
+    const orderedDate = orderFromAPI?.OrderedDate || order?.creationDate
+    
+    // Simple pricing - use trackOrder data directly for guest users, original data for registered users
+    const grandTotal = isGuestUser ? (orderFromAPI?.GrandTotalAmount || 0) : (order?.orderTotal || 0)
+    
+    // Try multiple possible field names for subtotal/product total
+    const productTotal = isGuestUser ? (
+        orderFromAPI?.TotalAdjustedProductAmount || 
+        orderFromAPI?.SubtotalAmount || 
+        orderFromAPI?.ProductTotalAmount || 
+        orderFromAPI?.ItemTotalAmount || 
+        orderFromAPI?.NetAmount || 
+        0
+    ) : (order?.productTotal || 0)
+    
+    const shippingTotal = isGuestUser ? (orderFromAPI?.TotalAdjustedDeliveryAmount || 0) : (order?.shippingTotal || 0)
+    const taxTotal = isGuestUser ? (orderFromAPI?.TotalTaxAmount || 0) : (order?.taxTotal || 0)
+    const currency = isGuestUser ? (orderFromAPI?.Currency || 'USD') : (order?.currency || 'USD')
+    
+    
+    const paymentSummaries = orderFromAPI?.OrderPaymentSummaries?.records || order?.paymentInstruments || []
+    const orderItems = orderFromAPI?.OrderItemSummaries?.records || order?.productItems || []
+
+    const isLoading = isOrderLoading || (!isGuestUser && orderDetailsQuery.isLoading) || (!order && !orderFromAPI)
+    const paymentCard = order?.paymentInstruments?.[0]?.paymentCard
     const CardIcon = getCreditCardIcon(paymentCard?.cardType)
-    const itemCount = order?.productItems.reduce((count, item) => item.quantity + count, 0) || 0
+    const itemCount = orderItems.length > 0 
+        ? orderItems.reduce((count, item) => item.Quantity + count, 0) 
+        : order?.productItems?.reduce((count, item) => item.quantity + count, 0) || 0
+
+    // Create product items array for both registered and guest users
+    const productItems = isGuestUser && orderItems.length > 0 
+        ? orderItems
+            .filter(item => {
+                // Filter out delivery charges, taxes, and other non-product items
+                const type = item.Type || item.TypeCode || ''
+                const isProduct = type.toLowerCase().includes('product') || 
+                                 type.toLowerCase().includes('item') ||
+                                 (!type.toLowerCase().includes('delivery') && 
+                                  !type.toLowerCase().includes('shipping') && 
+                                  !type.toLowerCase().includes('tax') &&
+                                  !type.toLowerCase().includes('discount') &&
+                                  !type.toLowerCase().includes('fee'))
+                return isProduct && item.ProductCode
+            })
+            .map((item, index) => {
+                // Calculate unit price from total price and quantity
+                const unitPrice = item.UnitPrice || (item.TotalPrice && item.Quantity ? item.TotalPrice / item.Quantity : 0)
+                return {
+                    itemId: item.Id || `guest-item-${index}`,
+                    productId: item.ProductCode, // Use ProductCode instead of ProductId
+                    productName: item.ProductName || `Product ${item.ProductCode}`,
+                    quantity: item.Quantity || 1,
+                    price: unitPrice,
+                    priceAfterItemDiscount: unitPrice,
+                    currency: orderFromAPI?.Currency || 'USD',
+                    attributes: item.ProductAttributes || [],
+                    image: item.ProductImage || item.Product?.Image
+                }
+            })
+        : order?.productItems || []
 
     // Cancel order gating
     const customerId = useCustomerId()
@@ -72,9 +149,9 @@ const AccountOrderDetail = () => {
     const {data: currentCustomer} = useCurrentCustomer()
 
     const isOmsEnabled = getConfig().app?.oms?.enabled
-    const orderStatus = (order?.status || '').toLowerCase()
-    const shipmentStatus = (shippingStatus || '').toLowerCase()
-    const statusEligible = !['cancelled', 'canceled', 'completed', 'failed'].includes(orderStatus)
+    const orderStatusLower = (order?.status || '').toLowerCase()
+    const shipmentStatus = (order?.shippingStatus || '').toLowerCase()
+    const statusEligible = !['cancelled', 'canceled', 'completed', 'failed'].includes(orderStatusLower)
     const shippingEligible = shipmentStatus === 'not_shipped'
     const ownsOrder =
         (order?.customerInfo?.customerId && order.customerInfo.customerId === customerId) ||
@@ -131,7 +208,8 @@ const AccountOrderDetail = () => {
     }
 
     // Fetch product data for order items
-    const productIds = order?.productItems?.map((product) => product.productId) || []
+    const productIds = productItems.map((product) => product.productId).filter(Boolean)
+    
     const {data: products, isLoading: isProductsLoading} = useProducts(
         {
             parameters: {
@@ -152,15 +230,34 @@ const AccountOrderDetail = () => {
     )
 
     // Merge product data with order items
-    const variants =
-        order?.productItems?.map((item) => {
-            const product = products?.[item.productId]
-            return {
-                ...(product ? product : {}),
-                isProductUnavailable: !product,
-                ...item
-            }
-        }) || []
+    const variants = productItems.map((item) => {
+        const product = products?.[item.productId]
+        const variant = {
+            ...(product ? product : {}),
+            isProductUnavailable: !product,
+            // Ensure item data (including price) takes precedence over product data
+            ...item,
+            // Explicitly set the price to ensure it's not overridden
+            price: item.price
+        }
+        return variant
+    })
+
+    // Create basket-like object for OrderSummary component
+    const basketForSummary = {
+        orderNo: orderNumber,
+        currency: currency,
+        orderTotal: Number(grandTotal) || 0,
+        productTotal: Number(productTotal) || 0,
+        productItems: variants, // Use variants which have merged product data
+        shippingItems: order?.shippingItems || [],
+        couponItems: order?.couponItems || [],
+        shippingTotal: Number(shippingTotal) || 0,
+        taxTotal: Number(taxTotal) || 0,
+        productSubTotal: Number(productTotal) || 0, // OrderSummary expects productSubTotal, not subtotal
+        paymentInstruments: order?.paymentInstruments || []
+    }
+    
 
     const headingRef = useRef()
     useEffect(() => {
@@ -228,7 +325,7 @@ const AccountOrderDetail = () => {
                                     defaultMessage="Ordered: {date}"
                                     id="account_order_detail.label.ordered_date"
                                     values={{
-                                        date: formatDate(new Date(order.creationDate), {
+                                        date: formatDate(new Date(orderedDate), {
                                             year: 'numeric',
                                             day: 'numeric',
                                             month: 'short'
@@ -241,15 +338,15 @@ const AccountOrderDetail = () => {
                                     <FormattedMessage
                                         defaultMessage="Order Number: {orderNumber}"
                                         id="account_order_detail.label.order_number"
-                                        values={{orderNumber: order.orderNo}}
+                                        values={{orderNumber: orderNumber}}
                                     />
                                 </Text>
                                 <Badge
-                                    bg={getOrderStatusColorScheme(order.status).bg}
-                                    color={getOrderStatusColorScheme(order.status).color}
+                                    bg={getOrderStatusColorScheme(orderStatus).bg}
+                                    color={getOrderStatusColorScheme(orderStatus).color}
                                     variant="solid"
                                 >
-                                    {getLocalizedOrderStatus(order.status, formatMessage)}
+                                    {getLocalizedOrderStatus(orderStatus, formatMessage)}
                                 </Badge>
                             </Stack>
                         </Stack>
@@ -259,7 +356,7 @@ const AccountOrderDetail = () => {
                 </Stack>
             </Stack>
 
-            {!isLoading && isOmsEnabled && <OrderStatusBar currentStepLabel={order.status} />}
+            {!isLoading && isOmsEnabled && <OrderStatusBar currentStepLabel={orderStatus} />}
 
             <Box layerStyle="cardBordered">
                 <Grid templateColumns={{base: '1fr', xl: '60% 1fr'}} gap={{base: 6, xl: 2}}>
@@ -280,54 +377,25 @@ const AccountOrderDetail = () => {
                                     <Skeleton h="20px" w="84px" />
                                     <Skeleton h="20px" w="56px" />
                                 </Stack>
-                                <Stack>
-                                    <Skeleton h="20px" w="60px" />
-                                    <Skeleton h="20px" w="84px" />
-                                    <Skeleton h="20px" w="56px" />
-                                </Stack>
                             </>
                         ) : (
                             <>
                                 <Stack spacing={1}>
                                     <Heading as="h2" fontSize="sm" pt={1}>
                                         <FormattedMessage
-                                            defaultMessage="Shipping Method"
-                                            id="account_order_detail.heading.shipping_method"
+                                            defaultMessage="Order Status"
+                                            id="account_order_detail.heading.order_status"
                                         />
                                     </Heading>
                                     <Box>
-                                        <Text fontSize="sm" textTransform="titlecase">
-                                            {
-                                                {
-                                                    not_shipped: formatMessage({
-                                                        defaultMessage: 'Not shipped',
-                                                        id: 'account_order_detail.shipping_status.not_shipped'
-                                                    }),
-
-                                                    part_shipped: formatMessage({
-                                                        defaultMessage: 'Partially shipped',
-                                                        id: 'account_order_detail.shipping_status.part_shipped'
-                                                    }),
-                                                    shipped: formatMessage({
-                                                        defaultMessage: 'Shipped',
-                                                        id: 'account_order_detail.shipping_status.shipped'
-                                                    })
-                                                }[shippingStatus]
-                                            }
-                                        </Text>
-                                        <Text fontSize="sm">{shippingMethod.name}</Text>
-                                        <Text fontSize="sm">
-                                            <FormattedMessage
-                                                defaultMessage="Tracking Number"
-                                                id="account_order_detail.label.tracking_number"
-                                            />
-                                            :{' '}
-                                            {trackingNumber ||
-                                                formatMessage({
-                                                    defaultMessage: 'Pending',
-                                                    id: 'account_order_detail.label.pending_tracking_number'
-                                                })}
-                                        </Text>
+                                        <Badge
+                                            bg={getOrderStatusColorScheme(orderStatus).bg}
+                                            color={getOrderStatusColorScheme(orderStatus).color}
+                                            variant="solid"
+                                            fontSize="sm"
+                                        >
+                                            {getLocalizedOrderStatus(orderStatus, formatMessage)}
+                                        </Badge>
                                     </Box>
                                 </Stack>
                                 <Stack spacing={1}>
@@ -342,57 +410,46 @@ const AccountOrderDetail = () => {
                                             <CardIcon layerStyle="ccIcon" aria-hidden="true" />
                                         )}
                                         <Box>
-                                            <Text fontSize="sm">{paymentCard?.cardType}</Text>
-                                            <Stack direction="row">
+                                            <Text fontSize="sm">
+                                                {paymentSummaries.length > 0 ? (
+                                                    paymentSummaries[0].Method
+                                                ) : (
+                                                    paymentCard?.cardType
+                                                )}
+                                            </Text>
+                                            {paymentSummaries.length > 0 ? (
                                                 <Text fontSize="sm">
-                                                    &bull;&bull;&bull;&bull;{' '}
-                                                    {paymentCard?.numberLastDigits}
+                                                    {paymentSummaries[0].FullName}
                                                 </Text>
-                                                <Text fontSize="sm">
-                                                    {paymentCard?.expirationMonth}/
-                                                    {paymentCard?.expirationYear}
-                                                </Text>
-                                            </Stack>
+                                            ) : (
+                                                <Stack direction="row">
+                                                    <Text fontSize="sm">
+                                                        &bull;&bull;&bull;&bull;{' '}
+                                                        {paymentCard?.numberLastDigits}
+                                                    </Text>
+                                                    <Text fontSize="sm">
+                                                        {paymentCard?.expirationMonth}/
+                                                        {paymentCard?.expirationYear}
+                                                    </Text>
+                                                </Stack>
+                                            )}
                                         </Box>
                                     </Stack>
                                 </Stack>
                                 <Stack spacing={1}>
                                     <Heading as="h2" fontSize="sm" pt={1}>
                                         <FormattedMessage
-                                            defaultMessage="Shipping Address"
-                                            id="account_order_detail.heading.shipping_address"
+                                            defaultMessage="Order Total"
+                                            id="account_order_detail.heading.order_total"
                                         />
                                     </Heading>
-                                    <Box>
-                                        <Text fontSize="sm">
-                                            {shippingAddress.firstName} {shippingAddress.lastName}
-                                        </Text>
-                                        <Text fontSize="sm">{shippingAddress.address1}</Text>
-                                        <Text fontSize="sm">
-                                            {shippingAddress.city}, {shippingAddress.stateCode}{' '}
-                                            {shippingAddress.postalCode}
-                                        </Text>
-                                    </Box>
-                                </Stack>
-                                <Stack spacing={1}>
-                                    <Heading as="h2" fontSize="sm" pt={1}>
-                                        <FormattedMessage
-                                            defaultMessage="Billing Address"
-                                            id="account_order_detail.heading.billing_address"
+                                    <Text fontSize="lg" fontWeight="bold">
+                                        <FormattedNumber
+                                            style="currency"
+                                            currency={order?.currency || 'USD'}
+                                            value={grandTotal}
                                         />
-                                    </Heading>
-                                    <Box>
-                                        <Text fontSize="sm">
-                                            {order.billingAddress.firstName}{' '}
-                                            {order.billingAddress.lastName}
-                                        </Text>
-                                        <Text fontSize="sm">{order.billingAddress.address1}</Text>
-                                        <Text fontSize="sm">
-                                            {order.billingAddress.city},{' '}
-                                            {order.billingAddress.stateCode}{' '}
-                                            {order.billingAddress.postalCode}
-                                        </Text>
-                                    </Box>
+                                    </Text>
                                 </Stack>
                             </>
                         )}
@@ -405,7 +462,11 @@ const AccountOrderDetail = () => {
                             background="gray.50"
                             borderRadius="base"
                         >
-                            <OrderSummary basket={order} fontSize="sm" />
+                            <OrderSummary 
+                                basket={basketForSummary} 
+                                fontSize="sm" 
+                                orderTotal={grandTotal}
+                            />
                         </Box>
                     ) : (
                         <Skeleton h="full" />
@@ -446,7 +507,7 @@ const AccountOrderDetail = () => {
                             </Box>
                         ))
                     ) : !isProductsLoading ? (
-                        <ProductList variants={variants} currency={order.currency} spacing={2} />
+                        <ProductList variants={variants} currency={basketForSummary.currency} spacing={2} />
                     ) : (
                         <Stack spacing={2}>
                             {Array.from({length: 3}).map((_, index) => (

@@ -98,6 +98,10 @@ const Account = () => {
     const dataCloud = useDataCloud()
 
     const {buildUrl} = useMultiSite()
+    
+    // Check if this is a guest user viewing order details
+    const isGuestUser = location.state?.isGuestUser
+    
     /**************** Einstein ****************/
     useEffect(() => {
         einstein.sendViewPage(location.pathname)
@@ -113,7 +117,7 @@ const Account = () => {
     // If we have customer data and they are not registered, push to login page
     // Using Redirect allows us to store the directed page to location
     // so we can direct users back after they are successfully log in
-    if (customerType !== null && !isRegistered && onClient) {
+    if (customerType !== null && !isRegistered && onClient && !isGuestUser) {
         const path = buildUrl('/login')
         return <Redirect to={{pathname: path, state: {directedFrom: '/account'}}} />
     }
@@ -125,15 +129,16 @@ const Account = () => {
             paddingTop={[4, 4, 12, 12, 16]}
         >
             <Seo title="My Account" description="Customer Account Page" />
-            <Grid templateColumns={{base: '1fr', lg: '320px 1fr'}} gap={{base: 10, lg: 24}}>
+            <Grid templateColumns={isGuestUser ? '1fr' : {base: '1fr', lg: '320px 1fr'}} gap={{base: 10, lg: 24}}>
                 {/* small screen nav accordion */}
-                <Accordion
-                    display={{base: 'block', lg: 'none'}}
-                    allowToggle={true}
-                    reduceMotion={true}
-                    index={mobileNavIndex}
-                    onChange={setMobileNavIndex}
-                >
+                {!isGuestUser && (
+                    <Accordion
+                        display={{base: 'block', lg: 'none'}}
+                        allowToggle={true}
+                        reduceMotion={true}
+                        index={mobileNavIndex}
+                        onChange={setMobileNavIndex}
+                    >
                     <AccordionItem border="none" background="gray.50" borderRadius="base">
                         {({isExpanded}) => (
                             <>
@@ -193,9 +198,11 @@ const Account = () => {
                         )}
                     </AccordionItem>
                 </Accordion>
+                )}
 
                 {/* large screen nav sidebar */}
-                <Stack display={{base: 'none', lg: 'flex'}} spacing={4}>
+                {!isGuestUser && (
+                    <Stack display={{base: 'none', lg: 'flex'}} spacing={4}>
                     {showLoading && <LoadingSpinner wrapperStyles={{height: '100vh'}} />}
 
                     <Heading as="h2" fontSize="18px">
@@ -224,6 +231,7 @@ const Account = () => {
                         <LogoutButton onClick={onSignoutClick} />
                     </Flex>
                 </Stack>
+                )}
 
                 <Switch>
                     <Route exact path={path}>
