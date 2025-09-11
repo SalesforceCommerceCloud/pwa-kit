@@ -106,5 +106,6 @@
       "path": "build/vendor.js",
       "maxSize": "333 kB"
     }
-  ]
+  ],
+  "gitHead": "bf65c39be307363aeda7f45295c6d95c6c7c5d89"
 }
