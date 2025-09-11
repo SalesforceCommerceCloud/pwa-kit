@@ -13,7 +13,7 @@ import {
     ToggleCardEdit,
     ToggleCardSummary
 } from '@salesforce/retail-react-app/app/components/toggle-card'
-import {Text} from '@salesforce/retail-react-app/app/components/shared/ui'
+import {Text, useDisclosure} from '@salesforce/retail-react-app/app/components/shared/ui'
 import ShippingAddressSelection from '@salesforce/retail-react-app/app/pages/checkout/partials/shipping-address-selection'
 import AddressDisplay from '@salesforce/retail-react-app/app/components/address-display'
 import {
@@ -78,7 +78,11 @@ export default function ShippingAddress() {
 
     // Initialize multi-shipping state based on existing basket shipments
     const [isMultiShipping, setIsMultiShipping] = useState(hasMultipleDeliveryShipments)
-    const [showWarningModal, setShowWarningModal] = useState(false)
+    const {
+        isOpen: showWarningModal,
+        onOpen: openWarningModal,
+        onClose: closeWarningModal
+    } = useDisclosure()
     const [hasUnpersistedGuestAddresses, sethasUnpersistedGuestAddresses] = useState(false)
     const {step, STEPS, goToStep} = useCheckout()
     const createCustomerAddress = useShopperCustomersMutation('createCustomerAddress')
@@ -101,7 +105,7 @@ export default function ShippingAddress() {
     // Handle toggle between single and multi-shipping
     const handleToggleShippingMode = () => {
         if (isMultiShipping && customer?.isGuest && hasUnpersistedGuestAddresses) {
-            setShowWarningModal(true)
+            openWarningModal()
         } else {
             setIsMultiShipping(!isMultiShipping)
         }
@@ -110,11 +114,11 @@ export default function ShippingAddress() {
     // handle confirmation to single address
     const handleConfirmSwitchToSingle = () => {
         setIsMultiShipping(false)
-        setShowWarningModal(false)
+        closeWarningModal()
     }
 
     const handleCancelSwitch = () => {
-        setShowWarningModal(false)
+        closeWarningModal()
     }
 
     const submitAndContinue = async (address) => {
@@ -256,7 +260,7 @@ export default function ShippingAddress() {
 
             <SingleAddressToggleModal
                 isOpen={showWarningModal}
-                onClose={() => setShowWarningModal(false)}
+                onClose={closeWarningModal}
                 onConfirm={handleConfirmSwitchToSingle}
                 onCancel={handleCancelSwitch}
             />
