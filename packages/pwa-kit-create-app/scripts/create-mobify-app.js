@@ -609,12 +609,9 @@ const main = async (opts) => {
         const whenFunction =
             typeof question.when === 'string'
                 ? (answers) => {
-                      // Handle dot notation access for nested objects
-                      const keys = question.when.split('.')
-                      let value = answers
-                      for (const key of keys) {
-                          value = value?.[key]
-                      }
+                      const value = question.when
+                          .split('.')
+                          .reduce((obj, key) => obj?.[key], answers)
                       return Boolean(value && value.trim() !== '')
                   }
                 : question.when
