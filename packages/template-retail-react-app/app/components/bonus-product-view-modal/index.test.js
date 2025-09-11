@@ -44,7 +44,7 @@ jest.mock(
     '@salesforce/retail-react-app/app/components/product-view',
     () =>
         // eslint-disable-next-line react/prop-types
-        function MockProductView({maxOrderQuantity, addToCart}) {
+        function MockProductView({maxOrderQuantity, addToCart, imageGalleryFooter}) {
             // eslint-disable-next-line @typescript-eslint/no-var-requires
             const React = require('react')
 
@@ -75,6 +75,11 @@ jest.mock(
                         onClick: handleAddToCart
                     },
                     'Add to Cart'
+                ),
+                imageGalleryFooter && React.createElement(
+                    'div',
+                    {'data-testid': 'image-gallery-footer'},
+                    imageGalleryFooter
                 )
             )
         }
@@ -484,4 +489,98 @@ describe('BonusProductViewModal - checkForRemainingBonusProducts', () => {
         // Component should render without errors
         expect(screen.getByTestId('add-to-cart-button')).toBeInTheDocument()
     })
+})
+
+describe('BonusProductViewModal - Back to Selection Link', () => {
+    test('renders Back to Selection link when onReturnToSelection is provided', () => {
+        const mockBasket = {basketId: 'test-basket'}
+        useCurrentBasket.mockReturnValue({data: mockBasket})
+
+        renderWithProviders(
+            <BonusProductViewModal
+                product={mockProductDetail}
+                isOpen={true}
+                onClose={mockOnClose}
+                onReturnToSelection={mockOnReturnToSelection}
+                bonusDiscountLineItemId="bonus-1"
+                promotionId="test-promo"
+            />
+        )
+
+        // Check that the Back to Selection link is rendered
+        expect(screen.getByTestId('image-gallery-footer')).toBeInTheDocument()
+        expect(screen.getByText('← Back to Selection')).toBeInTheDocument()
+    })
+
+    test('does not render Back to Selection link when onReturnToSelection is not provided', () => {
+        const mockBasket = {basketId: 'test-basket'}
+        useCurrentBasket.mockReturnValue({data: mockBasket})
+
+        renderWithProviders(
+            <BonusProductViewModal
+                product={mockProductDetail}
+                isOpen={true}
+                onClose={mockOnClose}
+                // No onReturnToSelection provided
+                bonusDiscountLineItemId="bonus-1"
+                promotionId="test-promo"
+            />
+        )
+
+        // Check that the Back to Selection link is not rendered
+        expect(screen.queryByTestId('image-gallery-footer')).not.toBeInTheDocument()
+        expect(screen.queryByText('← Back to Selection')).not.toBeInTheDocument()
+    })
+
+    test('Back to Selection link calls onReturnToSelection when clicked', async () => {
+        const user = userEvent.setup()
+        const mockBasket = {basketId: 'test-basket'}
+        useCurrentBasket.mockReturnValue({data: mockBasket})
+
+        renderWithProviders(
+            <BonusProductViewModal
+                product={mockProductDetail}
+                isOpen={true}
+                onClose={mockOnClose}
+                onReturnToSelection={mockOnReturnToSelection}
+                bonusDiscountLineItemId="bonus-1"
+                promotionId="test-promo"
+            />
+        )
+
+        // Find and click the Back to Selection link
+        const backToSelectionLink = screen.getByText('← Back to Selection')
+        expect(backToSelectionLink).toBeInTheDocument()
+        
+        await user.click(backToSelectionLink)
+
+        // Verify onReturnToSelection was called
+        expect(mockOnReturnToSelection).toHaveBeenCalledTimes(1)
+    })
+
+    test('Back to Selection link has correct styling attributes', () => {
+        const mockBasket = {basketId: 'test-basket'}
+        useCurrentBasket.mockReturnValue({data: mockBasket})
+
+        renderWithProviders(
+            <BonusProductViewModal
+                product={mockProductDetail}
+                isOpen={true}
+                onClose={mockOnClose}
+                onReturnToSelection={mockOnReturnToSelection}
+                bonusDiscountLineItemId="bonus-1"
+                promotionId="test-promo"
+            />
+        )
+
+        const backToSelectionLink = screen.getByText('← Back to Selection')
+        
+        // Check that it's rendered as a clickable element (Text with as="button")
+        expect(backToSelectionLink.tagName.toLowerCase()).toBe('button')
+        
+        // Check styling classes/attributes that indicate it's styled as a link
+        const computedStyle = window.getComputedStyle(backToSelectionLink)
+        expect(computedStyle.cursor).toBe('pointer')
+    })
+
 })

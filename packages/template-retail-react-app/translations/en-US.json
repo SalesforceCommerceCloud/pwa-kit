@@ -195,6 +195,9 @@
   "bonus_product_modal.title": {
     "defaultMessage": "Select Bonus Product ({selected} of {max} selected)"
   },
+  "bonus_product_view_modal.button.back_to_selection": {
+    "defaultMessage": "← Back to Selection"
+  },
   "bonus_product_view_modal.button.view_cart": {
     "defaultMessage": "View Cart"
   },

@@ -150,7 +150,8 @@ const ProductView = forwardRef(
             showDeliveryOptions = true,
             customButtons = [],
             promotionId,
-            maxOrderQuantity = null
+            maxOrderQuantity = null,
+            imageGalleryFooter = null
         },
         ref
     ) => {
@@ -482,7 +483,7 @@ const ProductView = forwardRef(
                         isProductPartOfBundle={isProductPartOfBundle}
                     />
                 </Box>
-                <Flex direction={['column', 'column', 'column', 'row']}>
+                <Flex direction={['column', 'column', 'column', 'row']} align="flex-end">
                     {showImageGallery && (
                         <Box flex={1} mr={[0, 0, 0, 6, 6]}>
                             {product ? (
@@ -509,6 +510,12 @@ const ProductView = forwardRef(
                                 </>
                             ) : (
                                 <ImageGallerySkeleton />
+                            )}
+                            {/* Custom footer content (e.g., Back to Selection button) */}
+                            {imageGalleryFooter && (
+                                <Box mt={6} mb={2}>
+                                    {imageGalleryFooter}
+                                </Box>
                             )}
                         </Box>
                     )}

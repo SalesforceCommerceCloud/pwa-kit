@@ -17,7 +17,8 @@ import {
     Button,
     Box,
     Text,
-    Heading
+    Heading,
+    VStack
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 import ProductView from '@salesforce/retail-react-app/app/components/product-view'
 import {useProductViewModal} from '@salesforce/retail-react-app/app/hooks/use-product-view-modal'
@@ -88,9 +89,9 @@ const BonusProductViewModal = ({
                 id: 'bonus_product_view_modal.button.view_cart',
                 defaultMessage: 'View Cart'
             }),
-            cancel: formatMessage({
-                id: 'form_action_buttons.button.cancel',
-                defaultMessage: 'Cancel'
+            backToSelection: formatMessage({
+                id: 'bonus_product_view_modal.button.back_to_selection',
+                defaultMessage: '← Back to Selection'
             })
         }),
         [intl]
@@ -247,12 +248,9 @@ const BonusProductViewModal = ({
         () => [
             <Button key="view-cart" variant="outline" onClick={handleViewCart}>
                 {messages.viewCart}
-            </Button>,
-            <Button key="back-to-selection" variant="outline" onClick={onReturnToSelection}>
-                {messages.cancel}
             </Button>
         ],
-        [messages.viewCart, messages.cancel, handleViewCart, onReturnToSelection]
+        [messages.viewCart, handleViewCart]
     )
 
     // Clean product data but preserve variation attributes for size/color selectors
@@ -342,6 +340,21 @@ const BonusProductViewModal = ({
                             maxOrderQuantity={maxOrderQuantity}
                             showReviews={true}
                             showVariationAttributes={true}
+                            imageGalleryFooter={
+                                onReturnToSelection ? (
+                                    <Text
+                                        as="button"
+                                        color="blue.600"
+                                        cursor="pointer"
+                                        onClick={onReturnToSelection}
+                                        _hover={{
+                                            color: "blue.700"
+                                        }}
+                                    >
+                                        {messages.backToSelection}
+                                    </Text>
+                                ) : null
+                            }
                             {...props}
                         />
                     )}
