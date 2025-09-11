@@ -602,14 +602,26 @@ const main = async (opts) => {
     let {questions} = selectedTemplate
 
     // Inquirer doesn't support Regex values for the "validate" property. So lets make a function for it.
+    // Also handle custom "when" logic for string-based conditions.
     questions = questions.map((question) => {
         const validator = VALIDATORS.find(({id}) => id === question.validator)
+
+        const whenFunction =
+            typeof question.when === 'string'
+                ? (answers) => {
+                      const value = question.when
+                          .split('.')
+                          .reduce((obj, key) => obj?.[key], answers)
+                      return Boolean(value && value.trim() !== '')
+                  }
+                : question.when
 
         return {
             ...question,
             validate: validator?.regex
                 ? (input) => new RegExp(validator.regex, 'i').test(input) || validator.message
-                : undefined
+                : undefined,
+            when: whenFunction
         }
     })
 
