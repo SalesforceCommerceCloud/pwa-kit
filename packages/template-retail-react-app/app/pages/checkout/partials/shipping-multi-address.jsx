@@ -26,7 +26,6 @@ import {useCheckout} from '@salesforce/retail-react-app/app/pages/checkout/util/
 import {useProductAddressAssignment} from '@salesforce/retail-react-app/app/hooks/use-product-address-assignment'
 import {useAddressForm} from '@salesforce/retail-react-app/app/hooks/use-address-form'
 import {useMultiship} from '@salesforce/retail-react-app/app/hooks/use-multiship'
-import {areAddressesEqual} from '@salesforce/retail-react-app/app/utils/address-utils'
 import {isPickupShipment} from '@salesforce/retail-react-app/app/utils/shipment-utils'
 import ProductShippingAddressCard from '@salesforce/retail-react-app/app/pages/checkout/partials/product-shipping-address-card.jsx'
 
@@ -99,12 +98,7 @@ const ShippingMultiAddress = ({
                 ?.map((shipment) => shipment.shippingAddress)
                 ?.filter(Boolean) || []
 
-        return addresses.some(
-            (localAddr) =>
-                !persistedAddresses.some((persistedAddr) =>
-                    areAddressesEqual(localAddr, persistedAddr)
-                )
-        )
+        return addresses.length > persistedAddresses.length
     }, [customer?.isGuest, addresses, basket?.shipments])
 
     // inform parent of unpersisted local guest addresses

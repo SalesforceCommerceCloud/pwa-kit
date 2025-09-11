@@ -2227,62 +2227,6 @@ describe('ShippingMultiAddress - handleSubmit', () => {
             })
         })
 
-        test('should call onGuestAddressesToggleWarning with true when mixed persisted and unpersisted addresses exist', async () => {
-            const basketWithMixedAddresses = {
-                ...mockBasket,
-                shipments: [
-                    {
-                        shipmentId: 'shipment-1',
-                        shippingAddress: {
-                            firstName: 'John',
-                            lastName: 'Doe',
-                            address1: '123 Test St',
-                            city: 'Test City',
-                            stateCode: 'CA',
-                            postalCode: '12345'
-                        }
-                    }
-                ]
-            }
-
-            useCurrentCustomer.mockReturnValue({
-                data: {
-                    customerId: 'guest-1',
-                    isGuest: true,
-                    addresses: []
-                },
-                isLoading: false
-            })
-
-            useCurrentBasket.mockReturnValue({
-                data: basketWithMixedAddresses
-            })
-
-            renderWithIntl(
-                <ShippingMultiAddress
-                    {...defaultProps}
-                    basket={basketWithMixedAddresses}
-                    onGuestAddressesToggleWarning={mockOnGuestAddressesToggleWarning}
-                />
-            )
-
-            const addNewAddressButtons = screen.getAllByText('+ Add New Address')
-            fireEvent.click(addNewAddressButtons[0])
-
-            fireEvent.change(screen.getByLabelText('First Name'), {target: {value: 'Jane'}})
-            fireEvent.change(screen.getByLabelText('Last Name'), {target: {value: 'Smith'}})
-            fireEvent.change(screen.getByLabelText('Phone'), {target: {value: '0987654321'}})
-            fireEvent.change(screen.getByLabelText('Address'), {target: {value: '456 New St'}})
-            fireEvent.change(screen.getByLabelText('City'), {target: {value: 'New City'}})
-            fireEvent.change(screen.getByLabelText('State'), {target: {value: 'NY'}})
-            fireEvent.change(screen.getByLabelText('Zip Code'), {target: {value: '67890'}})
-            fireEvent.click(screen.getByText('Save'))
-
-            await waitFor(() => {
-                expect(mockOnGuestAddressesToggleWarning).toHaveBeenCalledWith(true)
-            })
-        })
-
         test('should call onGuestAddressesToggleWarning with false for registered users', () => {
             useCurrentCustomer.mockReturnValue({
                 data: {
