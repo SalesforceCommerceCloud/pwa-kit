@@ -1054,7 +1054,7 @@
     "defaultMessage": "Cancel"
   },
   "multi_ship_warning_modal.action.switch_to_one_address": {
-    "defaultMessage": "Switch to one address"
+    "defaultMessage": "Switch"
   },
   "multi_ship_warning_modal.message.addresses_will_be_removed": {
     "defaultMessage": "If you switch to one address, the shipping addresses you added for the items will be removed."

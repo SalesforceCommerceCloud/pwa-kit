@@ -2512,7 +2512,7 @@
   "multi_ship_warning_modal.action.switch_to_one_address": [
     {
       "type": 0,
-      "value": "Switch to one address"
+      "value": "Switch"
     }
   ],
   "multi_ship_warning_modal.message.addresses_will_be_removed": [
