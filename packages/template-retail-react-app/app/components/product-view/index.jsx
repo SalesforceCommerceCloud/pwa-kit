@@ -152,7 +152,7 @@ const ProductView = forwardRef(
             promotionId,
             maxOrderQuantity = null,
             imageGalleryFooter = null,
-            alignItems = "flex-end",
+            alignItems = "flex-start",
         },
         ref
     ) => {
@@ -484,7 +484,7 @@ const ProductView = forwardRef(
                         isProductPartOfBundle={isProductPartOfBundle}
                     />
                 </Box>
-                <Flex direction={['column', 'column', 'column', 'row']} align={alignItems}>
+                <Flex direction={['column', 'column', 'column', 'row']}>
                     {showImageGallery && (
                         <Box flex={1} mr={[0, 0, 0, 6, 6]}>
                             {product ? (
