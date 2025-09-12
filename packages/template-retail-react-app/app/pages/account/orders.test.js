@@ -25,6 +25,12 @@ jest.mock('@salesforce/pwa-kit-runtime/utils/ssr-config', () => ({
     getConfig: jest.fn()
 }))
 
+// Mock the toast hook to capture toast function calls in tests
+const mockToast = jest.fn()
+jest.mock('@salesforce/retail-react-app/app/hooks/use-toast', () => ({
+    useToast: () => mockToast
+}))
+
 // Ensure ownsOrder gating passes by matching current customer email with mock order data
 jest.mock('@salesforce/retail-react-app/app/hooks/use-current-customer', () => ({
     __esModule: true,
