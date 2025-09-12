@@ -1,6 +1,38 @@
 name: SalesforceCommerceCloud/pwa-kit/e2e-pr
 on:
     workflow_dispatch:
+      # Manually deploy e2e test setup to your own MRT Target for debugging tests.
+      inputs:
+        mrt_project_slug:
+          type: string
+          description: 'MRT Project ID'
+          required: true
+        mrt_target_slug:
+          type: string
+          description: 'MRT Environment ID'
+          required: true
+        mrt_target_external_hostname:
+          type: string
+          description: 'MRT Target External Hostname'
+          required: true
+        mrt_admin_cloud_origin:
+          type: string
+          description: 'MRT Org hostname for your project'
+          required: false
+          default: 'https://cloud.mobify.com'
+        mrt_admin_user:
+            type: string
+            description: 'MRT Admin Username'
+            required: true
+        mrt_admin_api_key:
+          type: string
+          description: 'MRT Admin API key'
+          required: true
+        skip_tests:
+          type: boolean
+          description: 'Skip Tests - Uncheck if you want to run the tests as a part of this deployment'
+          required: false
+          default: true
     pull_request: # Default: opened, reopened, synchronize (head branch updated)
     merge_group: # Trigger GA workflow when a pull request is added to a merge queue.
     push:
@@ -55,7 +87,7 @@ jobs:
               # Check central resource allocation on AWS and get a lock on an available environment from the pool.
               # Sets the MRT target details in the workflow output.
             - name: Configure AWS Credentials
-              if: ${{ env.SKIP_WORKFLOW != 'true' }}
+              if: ${{ env.SKIP_WORKFLOW != 'true' && github.event_name != 'workflow_dispatch' }}
               uses: aws-actions/configure-aws-credentials@v4
               with:
                   role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
@@ -64,7 +96,7 @@ jobs:
 
             - name: Get MRT Target lock
               id: get_mrt_target_lock
-              if: ${{ env.SKIP_WORKFLOW != 'true' }}
+              if: ${{ env.SKIP_WORKFLOW != 'true' && github.event_name != 'workflow_dispatch' }}
               uses: ./.github/actions/e2e_acquire_mrt_target
               with:
                   BRANCH: ${{ github.ref_name }}
@@ -73,7 +105,7 @@ jobs:
 
             - name: Read MRT Target Details
               id: mrt_target_details
-              if: ${{ env.SKIP_WORKFLOW != 'true' }}
+              if: ${{ env.SKIP_WORKFLOW != 'true' && github.event_name != 'workflow_dispatch' }}
               run: |-
                   jq -r 'to_entries[] | "\(.key)=\(.value // "")"' e2e/mrt-target/mrt-target-details.json >> "$GITHUB_OUTPUT"
 
@@ -85,7 +117,7 @@ jobs:
               # - This replaces a separate cleanup job and avoids double-release.
               # - This step is only engaged if the workflow is not skipped.
             - name: Engage Post hook to release MRT target back to the pool
-              if: ${{ env.SKIP_WORKFLOW != 'true' }}
+              if: ${{ env.SKIP_WORKFLOW != 'true' && github.event_name != 'workflow_dispatch' }}
               uses: ./.github/actions/e2e_release_mrt_target
               with:
                   SLUG: ${{ steps.mrt_target_details.outputs.slug }}
@@ -117,10 +149,10 @@ jobs:
               if: ${{ env.SKIP_WORKFLOW != 'true' }}
               uses: ./.github/actions/update_mrt_target
               with:
-                  PROJECT_SLUG: ${{ vars.MRT_STG_PWA_KIT_PROJECT_ID }}
-                  TARGET_SLUG: ${{ steps.mrt_target_details.outputs.slug }}
-                  MOBIFY_API_KEY: ${{ secrets.MRT_STG_PWA_KIT_CI_API_KEY }}
-                  CLOUD_ORIGIN: ${{ vars.MRT_STG_CLOUD_ORIGIN }}
+                  PROJECT_SLUG: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.mrt_project_slug || vars.MRT_STG_PWA_KIT_PROJECT_ID }}
+                  TARGET_SLUG: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.mrt_target_slug || steps.mrt_target_details.outputs.slug }}
+                  MOBIFY_API_KEY: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.mrt_admin_api_key || secrets.MRT_STG_PWA_KIT_CI_API_KEY }}
+                  CLOUD_ORIGIN: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.mrt_admin_cloud_origin || vars.MRT_STG_CLOUD_ORIGIN }}
                   MRT_TARGET_SETTINGS_FILE_PATH: ${{ vars.MRT_ENV_SETTINGS_E2E_BASE_FILENAME }}
                   MRT_TARGET_VARS_FILE_PATH: ${{ vars.MRT_ENV_VARS_E2E_BASE_FILENAME }}
 
@@ -149,23 +181,23 @@ jobs:
               if: ${{ env.SKIP_WORKFLOW != 'true' }}
               uses: './.github/actions/create_mrt'
               with:
-                  mobify_user: ${{ secrets.MRT_STG_PWA_KIT_CI_USER }}
-                  mobify_api_key: ${{ secrets.MRT_STG_PWA_KIT_CI_API_KEY }}
+                  mobify_user: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.mrt_admin_user || secrets.MRT_STG_PWA_KIT_CI_USER }}
+                  mobify_api_key: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.mrt_admin_api_key || secrets.MRT_STG_PWA_KIT_CI_API_KEY }}
 
             - name: Push Bundle to MRT (E2E Test PWA Kit)
               if: ${{ env.SKIP_WORKFLOW != 'true' }}
               uses: './.github/actions/push_to_mrt'
               with:
                   CWD: ${{ steps.generate_app.outputs.project_path }}
-                  PROJECT: ${{ vars.MRT_STG_PWA_KIT_PROJECT_ID }}
-                  TARGET: ${{ steps.mrt_target_details.outputs.slug }}
-                  CLOUD_ORIGIN: ${{ vars.MRT_STG_CLOUD_ORIGIN }}
+                  PROJECT: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.mrt_project_slug || vars.MRT_STG_PWA_KIT_PROJECT_ID }}
+                  TARGET: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.mrt_target_slug || steps.mrt_target_details.outputs.slug }}
+                  CLOUD_ORIGIN: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.mrt_admin_cloud_origin || vars.MRT_STG_CLOUD_ORIGIN }}
                   FLAGS: --wait
 
               # Only install chromium since we're only testing for chrome and chrome mobile for per-pr test runs.
               # Nightly tests will run against multiple browsers.
             - name: Install Playwright Browsers
-              if: ${{ env.SKIP_WORKFLOW != 'true' }}
+              if: ${{ env.SKIP_WORKFLOW != 'true' && !github.event.inputs.skip_tests }}
               run: npx playwright install chromium --with-deps
 
               # Run all 4 playwright projects in parallel to reduce run time.
@@ -174,10 +206,10 @@ jobs:
               # Note: This job uses "ubuntu-latest" which has 4 cores so we limit the number of workers to 8.
               # See: https://docs.github.com/en/actions/reference/runners/github-hosted-runners#standard-github-hosted-runners-for-public-repositories for runner specs.
             - name: Run Playwright tests
-              if: ${{ env.SKIP_WORKFLOW != 'true' }}
+              if: ${{ env.SKIP_WORKFLOW != 'true' && !github.event.inputs.skip_tests }}
               run: |
                   # Set the RETAIL_APP_HOME environment variable to the MRT target URL.
                   # This is used by the e2e tests to run the tests against the MRT target.
-                  export RETAIL_APP_HOME="https://${{ steps.mrt_target_details.outputs.ssrExternalHostname }}"
+                  export RETAIL_APP_HOME="https://${{ github.event_name == 'workflow_dispatch' && github.event.inputs.mrt_target_external_hostname || steps.mrt_target_details.outputs.ssrExternalHostname }}"
                   echo "RETAIL_APP_HOME environment variable value: $RETAIL_APP_HOME"
                   npx playwright test --project=chromium --project=mobile-chrome --project=a11y-mobile-slas-private-client --project=a11y-desktop-slas-private-client --workers=4
