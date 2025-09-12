@@ -38,9 +38,9 @@ describe('SingleAddressToggleModal', () => {
         expect(screen.queryByText('Switch to one address?')).not.toBeInTheDocument()
     })
 
-    it('calls onConfirm when Switch to one address button is clicked', () => {
+    it('calls onConfirm when Switch button is clicked', () => {
         renderWithProviders(<SingleAddressToggleModal {...mockProps} />)
-        const continueButton = screen.getByRole('button', {name: /switch to one address/i})
+        const continueButton = screen.getByRole('button', {name: /switch/i})
         fireEvent.click(continueButton)
         expect(mockProps.onConfirm).toHaveBeenCalledTimes(1)
     })
@@ -61,7 +61,7 @@ describe('SingleAddressToggleModal', () => {
 
     it('handles keyboard navigation', () => {
         renderWithProviders(<SingleAddressToggleModal {...mockProps} />)
-        const continueButton = screen.getByRole('button', {name: /switch to one address/i})
+        const continueButton = screen.getByRole('button', {name: /switch/i})
         const cancelButton = screen.getByRole('button', {name: /cancel/i})
         continueButton.focus()
         expect(document.activeElement).toBe(continueButton)
