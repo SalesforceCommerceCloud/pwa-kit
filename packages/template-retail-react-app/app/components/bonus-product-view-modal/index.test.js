@@ -14,7 +14,7 @@ import mockProductDetail from '@salesforce/retail-react-app/app/mocks/variant-75
 import {prependHandlersToServer} from '@salesforce/retail-react-app/jest-setup'
 import {
     getRemainingAvailableBonusProductsForProduct,
-    findAvailableBonusDiscountLineItemId,
+    findAvailableBonusDiscountLineItemIds,
     getBonusProductCountsForPromotion
 } from '@salesforce/retail-react-app/app/utils/bonus-product-utils'
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
@@ -89,7 +89,7 @@ jest.mock(
 // Mock bonus product utils
 jest.mock('@salesforce/retail-react-app/app/utils/bonus-product-utils', () => ({
     getRemainingAvailableBonusProductsForProduct: jest.fn(),
-    findAvailableBonusDiscountLineItemId: jest.fn(),
+    findAvailableBonusDiscountLineItemIds: jest.fn(),
     getBonusProductCountsForPromotion: jest.fn()
 }))
 
@@ -138,8 +138,8 @@ beforeEach(() => {
         maxBonusItems: 5
     })
 
-    // Mock findAvailableBonusDiscountLineItemId to return a valid ID
-    findAvailableBonusDiscountLineItemId.mockReturnValue('bonus-1')
+    // Mock findAvailableBonusDiscountLineItemIds to return array of pairs
+    findAvailableBonusDiscountLineItemIds.mockReturnValue([['bonus-1', 1]])
 
     prependHandlersToServer([
         {
@@ -582,5 +582,236 @@ describe('BonusProductViewModal - Back to Selection Link', () => {
         // Check styling classes/attributes that indicate it's styled as a link
         const computedStyle = window.getComputedStyle(backToSelectionLink)
         expect(computedStyle.cursor).toBe('pointer')
+    })
+})
+
+describe('BonusProductViewModal - Quantity Distribution Across Multiple BonusDiscountLineItemIds', () => {
+    beforeEach(() => {
+        // Setup mocks for quantity distribution tests
+        useShopperBasketsMutationHelper.mockReturnValue({
+            addItemToNewOrExistingBasket: mockAddItemToNewOrExistingBasket
+        })
+
+        const mockBasket = {
+            bonusDiscountLineItems: [
+                {id: 'bonus-1', maxBonusItems: 2, promotionId: 'test-promo'},
+                {id: 'bonus-2', maxBonusItems: 1, promotionId: 'test-promo'}
+            ],
+            productItems: []
+        }
+        useCurrentBasket.mockReturnValue({data: mockBasket})
+
+        getRemainingAvailableBonusProductsForProduct.mockReturnValue({
+            aggregatedMaxBonusItems: 3,
+            aggregatedSelectedItems: 0
+        })
+    })
+
+    test('distributes quantity 3 across two discount line items (2+1)', async () => {
+        const user = userEvent.setup()
+
+        // Mock findAvailableBonusDiscountLineItemIds to return pairs with available capacity
+        findAvailableBonusDiscountLineItemIds.mockReturnValue([
+            ['bonus-1', 2], // First discount item has capacity for 2
+            ['bonus-2', 1]  // Second discount item has capacity for 1
+        ])
+
+        mockAddItemToNewOrExistingBasket.mockResolvedValue({
+            bonusDiscountLineItems: [],
+            productItems: []
+        })
+
+        renderWithProviders(
+            <BonusProductViewModal
+                product={mockProductDetail}
+                isOpen={true}
+                onClose={mockOnClose}
+                bonusDiscountLineItemId="bonus-1"
+                promotionId="test-promo"
+            />
+        )
+
+        // Trigger add to cart with quantity 3
+        await user.click(screen.getByTestId('add-to-cart-button'))
+
+        await waitFor(() => {
+            expect(mockAddItemToNewOrExistingBasket).toHaveBeenCalledWith([
+                {
+                    productId: 'test-product',
+                    price: undefined,
+                    quantity: 2,
+                    bonusDiscountLineItemId: 'bonus-1'
+                },
+                {
+                    productId: 'test-product',
+                    price: undefined,
+                    quantity: 1,
+                    bonusDiscountLineItemId: 'bonus-2'
+                }
+            ])
+        })
+    })
+
+    test('distributes quantity 4 when only 3 capacity available (caps at 3)', async () => {
+        const user = userEvent.setup()
+
+        // Mock getRemainingBonusQuantity to return 3 (should cap quantity to 3)
+        getRemainingAvailableBonusProductsForProduct.mockReturnValue({
+            aggregatedMaxBonusItems: 3,
+            aggregatedSelectedItems: 0
+        })
+
+        // Mock findAvailableBonusDiscountLineItemIds to return pairs with total capacity of 3
+        findAvailableBonusDiscountLineItemIds.mockReturnValue([
+            ['bonus-1', 2],
+            ['bonus-2', 1]
+        ])
+
+        mockAddItemToNewOrExistingBasket.mockResolvedValue({
+            bonusDiscountLineItems: [],
+            productItems: []
+        })
+
+        renderWithProviders(
+            <BonusProductViewModal
+                product={mockProductDetail}
+                isOpen={true}
+                onClose={mockOnClose}
+                bonusDiscountLineItemId="bonus-1"
+                promotionId="test-promo"
+            />
+        )
+
+        await user.click(screen.getByTestId('add-to-cart-button'))
+
+        await waitFor(() => {
+            expect(mockAddItemToNewOrExistingBasket).toHaveBeenCalledWith([
+                {
+                    productId: 'test-product',
+                    price: undefined,
+                    quantity: 2,
+                    bonusDiscountLineItemId: 'bonus-1'
+                },
+                {
+                    productId: 'test-product',
+                    price: undefined,
+                    quantity: 1,
+                    bonusDiscountLineItemId: 'bonus-2'
+                }
+            ])
+        })
+    })
+
+    test('handles single discount line item with partial capacity', async () => {
+        const user = userEvent.setup()
+
+        // Mock findAvailableBonusDiscountLineItemIds to return single pair with limited capacity
+        findAvailableBonusDiscountLineItemIds.mockReturnValue([
+            ['bonus-1', 1] // Only 1 item capacity available
+        ])
+
+        mockAddItemToNewOrExistingBasket.mockResolvedValue({
+            bonusDiscountLineItems: [],
+            productItems: []
+        })
+
+        renderWithProviders(
+            <BonusProductViewModal
+                product={mockProductDetail}
+                isOpen={true}
+                onClose={mockOnClose}
+                bonusDiscountLineItemId="bonus-1"
+                promotionId="test-promo"
+            />
+        )
+
+        await user.click(screen.getByTestId('add-to-cart-button'))
+
+        await waitFor(() => {
+            expect(mockAddItemToNewOrExistingBasket).toHaveBeenCalledWith([
+                {
+                    productId: 'test-product',
+                    price: undefined,
+                    quantity: 1,
+                    bonusDiscountLineItemId: 'bonus-1'
+                }
+            ])
+        })
+    })
+
+    test('skips when no available discount line items', async () => {
+        const user = userEvent.setup()
+
+        // Mock findAvailableBonusDiscountLineItemIds to return empty array
+        findAvailableBonusDiscountLineItemIds.mockReturnValue([])
+
+        renderWithProviders(
+            <BonusProductViewModal
+                product={mockProductDetail}
+                isOpen={true}
+                onClose={mockOnClose}
+                bonusDiscountLineItemId="bonus-1"
+                promotionId="test-promo"
+            />
+        )
+
+        await user.click(screen.getByTestId('add-to-cart-button'))
+
+        await waitFor(() => {
+            // Should not call addItemToNewOrExistingBasket when no capacity available
+            expect(mockAddItemToNewOrExistingBasket).not.toHaveBeenCalled()
+        })
+    })
+
+    test('distributes across three discount line items with varying capacities', async () => {
+        const user = userEvent.setup()
+
+        // Mock findAvailableBonusDiscountLineItemIds to return three pairs
+        findAvailableBonusDiscountLineItemIds.mockReturnValue([
+            ['bonus-1', 3], // First has capacity for 3
+            ['bonus-2', 2], // Second has capacity for 2  
+            ['bonus-3', 1]  // Third has capacity for 1
+        ])
+
+        // Update remaining bonus quantity to allow for 5 items
+        getRemainingAvailableBonusProductsForProduct.mockReturnValue({
+            aggregatedMaxBonusItems: 6,
+            aggregatedSelectedItems: 1 // 6-1=5 remaining
+        })
+
+        mockAddItemToNewOrExistingBasket.mockResolvedValue({
+            bonusDiscountLineItems: [],
+            productItems: []
+        })
+
+        renderWithProviders(
+            <BonusProductViewModal
+                product={mockProductDetail}
+                isOpen={true}
+                onClose={mockOnClose}
+                bonusDiscountLineItemId="bonus-1"
+                promotionId="test-promo"
+            />
+        )
+
+        await user.click(screen.getByTestId('add-to-cart-button'))
+
+        await waitFor(() => {
+            expect(mockAddItemToNewOrExistingBasket).toHaveBeenCalledWith([
+                {
+                    productId: 'test-product',
+                    price: undefined,
+                    quantity: 3,
+                    bonusDiscountLineItemId: 'bonus-1'
+                },
+                {
+                    productId: 'test-product',
+                    price: undefined,
+                    quantity: 2,
+                    bonusDiscountLineItemId: 'bonus-2'
+                }
+                // Should stop at 5 total (3+2), not use bonus-3
+            ])
+        })
     })
 })

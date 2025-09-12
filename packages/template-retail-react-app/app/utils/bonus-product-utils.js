@@ -471,24 +471,20 @@ export const getRemainingAvailableBonusProductsForProduct = (
 }
 
 /**
- * Finds the first available bonus discount line item ID that has capacity for the given quantity.
- * When multiple bonusDiscountLineItems exist with the same promotionId, this function finds
- * the first one that hasn't reached its maxBonusItems limit.
+ * Finds all available bonus discount line item IDs with their available capacity.
+ * Returns a list of pairs where each pair contains [bonusDiscountLineItemId, availableQuantity].
+ * Only includes pairs where availableQuantity > 0.
  *
  * @param {Object} basket - The current basket data
  * @param {string} promotionId - The promotion ID to match
- * @param {number} quantity - The quantity to be added
- * @param {string} fallbackId - Fallback bonusDiscountLineItemId if none are available
- * @returns {string} The ID of the first available bonus discount line item
+ * @returns {Array<Array>} Array of pairs [bonusDiscountLineItemId, availableQuantity]
  */
-export const findAvailableBonusDiscountLineItemId = (
+export const findAvailableBonusDiscountLineItemIds = (
     basket,
-    promotionId,
-    quantity = 1,
-    fallbackId = null
+    promotionId
 ) => {
     if (!basket?.bonusDiscountLineItems || !promotionId) {
-        return fallbackId
+        return []
     }
 
     // Find all bonus discount line items with the same promotionId
@@ -497,10 +493,12 @@ export const findAvailableBonusDiscountLineItemId = (
     )
 
     if (matchingDiscountItems.length === 0) {
-        return fallbackId
+        return []
     }
 
-    // Check each discount item to find one with available capacity
+    const availablePairs = []
+
+    // Check each discount item and calculate available capacity
     for (const discountItem of matchingDiscountItems) {
         const maxBonusItems = discountItem.maxBonusItems || 0
 
@@ -514,14 +512,15 @@ export const findAvailableBonusDiscountLineItemId = (
                 )
                 .reduce((total, cartItem) => total + (cartItem.quantity || 0), 0) || 0
 
-        // Check if this discount item has available capacity
-        if (selectedQuantity + quantity <= maxBonusItems) {
-            return discountItem.id
+        const availableQuantity = Math.max(0, maxBonusItems - selectedQuantity)
+
+        // Only include pairs where availableQuantity > 0
+        if (availableQuantity > 0) {
+            availablePairs.push([discountItem.id, availableQuantity])
         }
     }
 
-    // If no available capacity found, return the first matching discount item id as fallback
-    return matchingDiscountItems[0]?.id || fallbackId
+    return availablePairs
 }
 
 //==============================================================================

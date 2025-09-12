@@ -26,7 +26,7 @@ import {useIntl} from 'react-intl'
 import {useShopperBasketsMutationHelper} from '@salesforce/commerce-sdk-react'
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
 import {
-    findAvailableBonusDiscountLineItemId,
+    findAvailableBonusDiscountLineItemIds,
     getRemainingAvailableBonusProductsForProduct,
     getBonusProductCountsForPromotion
 } from '@salesforce/retail-react-app/app/utils/bonus-product-utils'
@@ -153,25 +153,37 @@ const BonusProductViewModal = ({
                         finalQuantity = maxAllowed
                     }
 
-                    // Find the first available bonus discount line item with capacity
-                    const availableBonusDiscountLineItemId = findAvailableBonusDiscountLineItemId(
-                        basket,
-                        promotionId,
-                        finalQuantity,
-                        bonusDiscountLineItemId // fallback to originally passed id
-                    )
 
-                    if (!availableBonusDiscountLineItemId) {
-                        console.warn('No available bonus discount line item found')
+                    // Get list of available bonus discount line items with their capacities
+                    const availablePairs = findAvailableBonusDiscountLineItemIds(basket, promotionId)
+
+                    if (availablePairs.length === 0) {
                         continue // Skip this item but process others
                     }
 
-                    productItems.push({
-                        productId: variant?.productId || product?.productId || product?.id,
-                        price: variant?.price || product?.price,
-                        quantity: parseInt(finalQuantity, 10),
-                        bonusDiscountLineItemId: availableBonusDiscountLineItemId
-                    })
+
+                    let remainingQuantity = finalQuantity
+
+                    // Distribute quantity across available bonus discount line items
+                    for (const [bonusDiscountLineItemId, availableCapacity] of availablePairs) {
+                        if (remainingQuantity <= 0) {
+                            break // All quantity has been distributed
+                        }
+
+                        // Calculate amount to add: minimum of remaining quantity and available capacity
+                        const quantityToAdd = Math.min(remainingQuantity, availableCapacity)
+
+
+                        productItems.push({
+                            productId: variant?.productId || product?.productId || product?.id,
+                            price: variant?.price || product?.price,
+                            quantity: parseInt(quantityToAdd, 10),
+                            bonusDiscountLineItemId
+                        })
+
+                        remainingQuantity -= quantityToAdd
+                    }
+
                 }
 
                 if (productItems.length === 0) {
