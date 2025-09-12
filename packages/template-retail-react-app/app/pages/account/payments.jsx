@@ -235,7 +235,16 @@ const AccountPayments = () => {
             )
             await refetch()
         } catch (e) {
-            // Ignore errors for failure-path tests; UI remains unchanged
+            showToast({
+                title: (
+                    <FormattedMessage
+                        defaultMessage="Unable to remove payment method"
+                        id="account.payments.error.payment_method_remove_failed"
+                    />
+                ),
+                status: 'error',
+                isClosable: true
+            })
         } finally {
             setDeletingId(null)
         }
