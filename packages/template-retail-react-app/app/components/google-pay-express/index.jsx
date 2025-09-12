@@ -192,12 +192,14 @@ export const getGoogleButtonConfig = (
     setTempBasket = null,
     tempBasket = null,
     isPdpMode = false,
-    quantity = 1
+    quantity = 1,
+    currency = null
 ) => {
     // Single basket reference that gets updated as needed
     // Initialize basketRef with the actual basket value, not null
     let basketRef = isPdpMode ? tempBasket : basket
     let googlePayAmount = basketRef?.orderTotal || 0
+    let googlePayCurrency = basketRef?.currency || currency || 'USD'
 
     // Helper function to get or create basket (prevents multiple creation)
     const getOrCreateBasket = async () => {
@@ -209,9 +211,10 @@ export const getGoogleButtonConfig = (
         // For PDP flows, create temporary basket if needed (and SKU is available)
         if (isPdpMode && sku && typeof sku === 'string' && setTempBasket) {
             try {
-                const newBasket = await createTemporaryBasket(sku, authToken, site, quantity)
+                const newBasket = await createTemporaryBasket(sku, authToken, site, quantity, currency)
                 basketRef = newBasket // Update basket reference immediately
                 setTempBasket(newBasket) // Update React state for re-renders
+                console.log('⏳⏳⏳ Google Pay: temporary basket created:', newBasket)
                 return newBasket
             } catch (error) {
                 console.error('❌ Failed to create temporary basket:', error)
@@ -228,6 +231,8 @@ export const getGoogleButtonConfig = (
         return null
     }
 
+    console.log('🪞🪞🪞 Google Pay: basketRef:', basketRef)
+
     const buttonConfig = {
         showPayButton: true,
         buttonType: 'plain',
@@ -241,8 +246,8 @@ export const getGoogleButtonConfig = (
         configuration: googlePayConfig,
         allowedCardNetworks: getGooglePayCardNetworks(adyenPaymentMethods?.paymentMethods),
         amount: {
-            value: getCurrencyValueForApi(googlePayAmount, basketRef?.currency || 'USD'),
-            currency: basketRef?.currency || 'USD'
+            value: getCurrencyValueForApi(googlePayAmount, googlePayCurrency),
+            currency: googlePayCurrency
         },
         requiredShippingContactFields: ['postalAddress', 'name', 'email', 'phone'],
         requiredBillingContactFields: ['postalAddress'],
@@ -455,6 +460,7 @@ export const GooglePayExpress = ({
     basket,
     sku,
     quantity = 1,
+    currency,
     isPdpMode = false,
     manager
 }) => {
@@ -502,6 +508,7 @@ export const GooglePayExpress = ({
                 
                 // Log initialization attempt
                 console.log(`🚀 Google Pay: Starting initialization (PDP mode: ${isPdpMode}, Basket: ${basket?.basketId ? 'available' : 'missing'})`)
+                console.log('🧺🧺🧺 Google Pay: Basket data available:', basket)
                 
                 // Mark initialization start
                 performance.markInitializationStart()
@@ -562,7 +569,8 @@ export const GooglePayExpress = ({
                         setTempBasket,
                         tempBasket,
                         isPdpMode,
-                        quantity
+                        quantity,
+                        currency
                     )
 
                     // Mark button creation start

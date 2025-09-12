@@ -443,7 +443,8 @@ describe('getAppleButtonConfig', () => {
             jest.fn(), // setTempBasket
             null, // no initial temp basket
             true, // isPdpMode
-            1 // quantity
+            1, // quantity
+            null // currency
         )
 
         const resolve = jest.fn()
@@ -455,7 +456,8 @@ describe('getAppleButtonConfig', () => {
             'TEST-SKU-PDP',
             mockAuthToken,
             mockSite,
-            1
+            1,
+            null
         )
         expect(resolve).toHaveBeenCalled()
     })
@@ -506,7 +508,8 @@ describe('getAppleButtonConfig', () => {
             jest.fn(), // setTempBasket
             null, // no initial temp basket
             true, // isPdpMode
-            1 // quantity
+            1, // quantity
+            null // currency
         )
 
         const resolve = jest.fn()
@@ -516,6 +519,38 @@ describe('getAppleButtonConfig', () => {
 
         expect(cleanupTemporaryBasket).toHaveBeenCalled()
         expect(reject).toHaveBeenCalled()
+    })
+
+    it('creates temporary basket with currency in PDP mode', async () => {
+        const config = getAppleButtonConfig(
+            mockAuthToken,
+            mockSite,
+            null, // no existing basket
+            [],
+            mockApplePayConfig,
+            [], // paymentMethods
+            null, // no fetchShippingMethods in PDP
+            'TEST-SKU-PDP',
+            jest.fn(), // setTempBasket
+            null, // no initial temp basket
+            true, // isPdpMode
+            1, // quantity
+            'EUR' // currency
+        )
+
+        const resolve = jest.fn()
+        const reject = jest.fn()
+
+        await config.onClick(resolve, reject)
+
+        expect(createTemporaryBasket).toHaveBeenCalledWith(
+            'TEST-SKU-PDP',
+            mockAuthToken,
+            mockSite,
+            1,
+            'EUR'
+        )
+        expect(resolve).toHaveBeenCalled()
     })
 
     it('forces order calculation before payment in PDP mode', async () => {

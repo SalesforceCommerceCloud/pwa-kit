@@ -82,6 +82,77 @@ describe('Temporary Basket', () => {
             expect(result).toEqual(mockTempBasket)
         })
 
+        it('should create a temporary basket with currency when provided', async () => {
+            const mockTempBasket = {basketId: mockBasketId}
+            const currency = 'EUR'
+            global.fetch.mockResolvedValue(mockSuccessResponse(mockTempBasket))
+
+            const result = await createTemporaryBasket(mockSku, mockAuthToken, mockSite, 1, currency)
+
+            expect(global.fetch).toHaveBeenCalledWith(
+                `/mobify/proxy/api/checkout/shopper-baskets/v2/organizations/${mockOrganizationId}/baskets?siteId=${mockSite.id}&temporary=true`,
+                {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: `Bearer ${mockAuthToken}`
+                    },
+                    body: JSON.stringify({
+                        productItems: [{productId: mockSku, quantity: 1}],
+                        currency: currency
+                    })
+                }
+            )
+            expect(result).toEqual(mockTempBasket)
+        })
+
+        it('should create a temporary basket with custom quantity and currency', async () => {
+            const mockTempBasket = {basketId: mockBasketId}
+            const quantity = 3
+            const currency = 'GBP'
+            global.fetch.mockResolvedValue(mockSuccessResponse(mockTempBasket))
+
+            const result = await createTemporaryBasket(mockSku, mockAuthToken, mockSite, quantity, currency)
+
+            expect(global.fetch).toHaveBeenCalledWith(
+                `/mobify/proxy/api/checkout/shopper-baskets/v2/organizations/${mockOrganizationId}/baskets?siteId=${mockSite.id}&temporary=true`,
+                {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: `Bearer ${mockAuthToken}`
+                    },
+                    body: JSON.stringify({
+                        productItems: [{productId: mockSku, quantity: quantity}],
+                        currency: currency
+                    })
+                }
+            )
+            expect(result).toEqual(mockTempBasket)
+        })
+
+        it('should not include currency in request body when currency is null', async () => {
+            const mockTempBasket = {basketId: mockBasketId}
+            global.fetch.mockResolvedValue(mockSuccessResponse(mockTempBasket))
+
+            const result = await createTemporaryBasket(mockSku, mockAuthToken, mockSite, 1, null)
+
+            expect(global.fetch).toHaveBeenCalledWith(
+                `/mobify/proxy/api/checkout/shopper-baskets/v2/organizations/${mockOrganizationId}/baskets?siteId=${mockSite.id}&temporary=true`,
+                {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: `Bearer ${mockAuthToken}`
+                    },
+                    body: JSON.stringify({
+                        productItems: [{productId: mockSku, quantity: 1}]
+                    })
+                }
+            )
+            expect(result).toEqual(mockTempBasket)
+        })
+
         it('should throw an error if SKU is not provided', async () => {
             await expect(createTemporaryBasket(null, mockAuthToken, mockSite)).rejects.toThrow(
                 'SKU is required to create temporary basket'

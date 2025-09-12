@@ -697,7 +697,8 @@ describe('GooglePayExpress Button Configuration', () => {
                 null, // setTempBasket
                 null, // tempBasket
                 false, // isPdpMode
-                1 // quantity
+                1, // quantity
+                null // currency
             )
 
             expect(result).toBeDefined()
@@ -726,14 +727,15 @@ describe('GooglePayExpress Button Configuration', () => {
                 mockSetTempBasket, // setTempBasket
                 mockTempBasket, // tempBasket
                 true, // isPdpMode
-                2 // quantity
+                2, // quantity
+                'EUR' // currency
             )
 
             expect(result).toBeDefined()
             expect(result.showPayButton).toBe(true)
             expect(result.isExpress).toBe(true)
             expect(result.amount.value).toBe(5000) // 50 * 100
-            expect(result.amount.currency).toBe('USD')
+            expect(result.amount.currency).toBe('EUR')
         })
 
         it('handles missing order total gracefully', () => {

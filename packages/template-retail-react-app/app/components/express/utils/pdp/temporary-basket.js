@@ -13,9 +13,10 @@ import {getConfig} from '@salesforce/pwa-kit-runtime/utils/ssr-config'
  * @param {string} authToken - Authentication token
  * @param {object} site - Site configuration object
  * @param {number} quantity - Quantity of the product (default: 1)
+ * @param {string} currency - Currency code for the basket (optional)
  * @returns {Promise<object>} - The temporary basket object
  */
-export const createTemporaryBasket = async (sku, authToken, site, quantity = 1) => {
+export const createTemporaryBasket = async (sku, authToken, site, quantity = 1, currency = null) => {
     if (!sku) {
         throw new Error('SKU is required to create temporary basket')
     }
@@ -45,6 +46,12 @@ export const createTemporaryBasket = async (sku, authToken, site, quantity = 1) 
                 quantity: quantity
             }
         ]
+    }
+
+    // Add currency if provided
+    if (currency) {
+        console.log('💰💰💰 Creating temporary basket with currency:', currency)
+        requestBody.currency = currency
     }
 
     const requestUrl = `/mobify/proxy/api/checkout/shopper-baskets/v2/organizations/${organizationId}/baskets?siteId=${site.id}&temporary=true`

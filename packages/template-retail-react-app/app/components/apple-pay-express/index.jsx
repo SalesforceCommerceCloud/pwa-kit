@@ -91,11 +91,13 @@ export const getAppleButtonConfig = (
     setTempBasket = null,
     tempBasket = null,
     isPdpMode = false,
-    quantity = 1
+    quantity = 1,
+    currency = null
 ) => {
     // Single basket reference that gets updated as needed
     let basketRef = isPdpMode ? tempBasket : basket
     let applePayAmount = basketRef?.orderTotal || 0
+    let applePayCurrency = basketRef?.currency || currency || 'USD'
 
     // Helper function to get or create basket (prevents multiple creation)
     const getOrCreateBasket = async () => {
@@ -106,9 +108,10 @@ export const getAppleButtonConfig = (
 
         // For PDP flows, create temporary basket if needed (and SKU is available)
         if (isPdpMode && sku && setTempBasket) {
-            const newBasket = await createTemporaryBasket(sku, authToken, site, quantity)
+            const newBasket = await createTemporaryBasket(sku, authToken, site, quantity, currency)
             basketRef = newBasket // Update basket reference immediately
             setTempBasket(newBasket) // Update React state for re-renders
+            console.log('⏳⏳⏳ Apple Pay: temporary basket created:', newBasket)
             return newBasket
         }
 
@@ -116,14 +119,16 @@ export const getAppleButtonConfig = (
         return null
     }
 
+    console.log('🪞🪞🪞 Apple Pay: basketRef:', basketRef)
+
     const buttonConfig = {
         showPayButton: true,
         isExpress: true,
         configuration: applePayConfig,
         supportedNetworks: getApplePayCardNetworks(paymentMethods),
         amount: {
-            value: getCurrencyValueForApi(basketRef?.orderTotal || 0, basketRef?.currency || 'USD'),
-            currency: basketRef?.currency || 'USD'
+            value: getCurrencyValueForApi(applePayAmount, applePayCurrency), // OVERWRITING TO MAKE SURE THIS WORKS
+            currency: applePayCurrency // OVERWRITING TO MAKE SURE THIS WORKS
         },
         requiredShippingContactFields: ['postalAddress', 'name', 'email', 'phone'],
         requiredBillingContactFields: ['postalAddress'],
@@ -506,6 +511,7 @@ export const ApplePayExpress = ({
     basket,
     sku,
     quantity = 1,
+    currency,
     isPdpMode = false,
     manager
 }) => {
@@ -555,6 +561,7 @@ export const ApplePayExpress = ({
                 
                 // Log initialization attempt
                 console.log(`🚀 Apple Pay: Starting initialization (PDP mode: ${isPdpMode}, Basket: ${basket?.basketId ? 'available' : 'missing'})`)
+                console.log('🧺🧺🧺 Apple Pay: Basket data available:', basket)
                 
                 // Mark initialization start
                 performance.markInitializationStart()
@@ -619,7 +626,8 @@ export const ApplePayExpress = ({
                         setTempBasket,
                         tempBasket,
                         isPdpMode,
-                        quantity
+                        quantity,
+                        currency
                     )
 
                     // Mark button creation start

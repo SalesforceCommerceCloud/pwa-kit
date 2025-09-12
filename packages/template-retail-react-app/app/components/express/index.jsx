@@ -40,9 +40,10 @@ function Express() {
     const urlParams = new URLSearchParams(location.search)
     const isPdpMode = urlParams.get('pdp') === 'true'
 
-    // State to track current SKU and quantity (will be set via postMessage)
+    // State to track current SKU, quantity, and currency (will be set via postMessage)
     const [currentSku, setCurrentSku] = useState(null)
     const [currentQuantity, setCurrentQuantity] = useState(1)
+    const [currentCurrency, setCurrentCurrency] = useState(null)
 
     // Initialize the express payment manager - always call this hook
     const {manager, isDone, availableCount, managerError} = useExpressPaymentManager(PAYMENT_METHODS)
@@ -74,17 +75,26 @@ function Express() {
             // In production, you might want to restrict this to specific origins
 
             if (event.data && typeof event.data === 'object') {
-                const {type, sku, quantity} = event.data
+                const {type, sku, quantity, currency} = event.data
 
                 // Handle SKU update messages
                 if (type === 'UPDATE_SKU' && typeof sku === 'string') {
+                    console.log('💬💬💬 Express Payment: SKU update:', sku, 'currency:', currency)
                     setCurrentSku(sku)
                     // Always set quantity to 1 when SKU changes
                     setCurrentQuantity(1)
+
+                    setCurrentCurrency('EUR') // HARD-SETTING THIS FOR NOW -- IT WILL COME FROM THE MESSAGE EVENTUALLY
+
+                    // Update currency if provided
+                    if (typeof currency === 'string') {
+                        setCurrentCurrency(currency)
+                    }
                 }
 
                 // Handle quantity update messages
                 if (type === 'UPDATE_QUANTITY' && typeof quantity === 'number') {
+                    console.log('💬💬💬 Express Payment: Quantity update:', quantity)
                     // Validate quantity is a positive integer with reasonable limits
                     const validatedQuantity = Math.max(1, Math.min(999, Math.floor(quantity)))
                     setCurrentQuantity(validatedQuantity)
@@ -92,6 +102,7 @@ function Express() {
 
                 // Handle SKU clear messages (for regular checkout)
                 if (type === 'CLEAR_SKU') {
+                    console.log('💬💬💬 Express Payment: Clear SKU')
                     setCurrentSku(null)
                     setCurrentQuantity(1) // Reset quantity when clearing
                 }
@@ -99,6 +110,10 @@ function Express() {
                 // Handle basket data messages
                 if (type === 'basketDataAvailable') {
                     const {basketData, authData} = event.data.data
+
+                    basketData.currency = 'EUR' // OVERWRITING THIS FOR NOW TO WHAT IT SHOULD BE -- COMPONENTS ARE PULLING THIS WRONG AND DEFAULTING TO USD
+                    
+                    console.log('💬💬💬 Express Payment: Basket data available:', basketData)
                     setAuthToken(authData.authToken)
                     setBasketData(basketData)
                 }
@@ -106,6 +121,7 @@ function Express() {
                 // Handle authentication data messages
                 if (type === 'authDataAvailable') {
                     const authData = event.data.data.authData
+                    console.log('💬💬💬 Express Payment: Auth data available:', authData)
                     setAuthToken(authData.authToken)
                 }
             }
@@ -134,6 +150,7 @@ function Express() {
         basket,
         sku: currentSku,
         quantity: currentQuantity,
+        currency: currentCurrency,
         isPdpMode,
         manager
     }
