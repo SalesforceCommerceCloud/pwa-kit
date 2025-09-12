@@ -69,13 +69,14 @@ jest.mock('@salesforce/retail-react-app/app/components/promo-code', () => ({
 jest.mock(
     '@salesforce/retail-react-app/app/pages/checkout-one-click/partials/one-click-payment-form',
     () => {
-        const MockPaymentForm = function ({onSubmit}) {
+        const MockPaymentForm = function ({onSubmit, children}) {
             return (
                 <div data-testid="payment-form">
                     <div>Credit Card</div>
                     <input aria-label="Card Number" data-testid="card-number" />
                     <input aria-label="Expiry Date" data-testid="expiry-date" />
                     <input aria-label="CVV" data-testid="cvv" />
+                    {children}
                     <button
                         type="button"
                         onClick={() =>
@@ -132,10 +133,8 @@ jest.mock(
 jest.mock(
     '@salesforce/retail-react-app/app/pages/checkout-one-click/partials/one-click-save-payment-method',
     () => {
-        const MockSavePaymentMethod = function ({isRegistered}) {
-            return isRegistered ? (
-                <div data-testid="save-payment-method">Save Payment Method</div>
-            ) : null
+        const MockSavePaymentMethod = function () {
+            return <div data-testid="save-payment-method">Save Payment Method</div>
         }
 
         return MockSavePaymentMethod
@@ -294,6 +293,7 @@ const TestWrapper = ({
                 cardType: 'Visa'
             })
         }),
+        watch: jest.fn(() => ({unsubscribe: jest.fn()})),
         formState: {isSubmitting: false}
     }
 
@@ -425,6 +425,22 @@ describe('Payment Component', () => {
             render(<TestWrapper isRegistered={false} />)
 
             expect(screen.queryByTestId('save-payment-method')).not.toBeInTheDocument()
+        })
+
+        test('shows save payment method option for registered users entering a new card', async () => {
+            const user = userEvent.setup()
+            render(<TestWrapper isRegistered={true} />)
+
+            // Payment form is visible
+            expect(screen.getByTestId('payment-form')).toBeInTheDocument()
+
+            // Simulate typing to trigger form watcher
+            await user.type(screen.getByLabelText('Card Number'), '4111111111111111')
+            await user.type(screen.getByLabelText('Expiry Date'), '12/25')
+            await user.type(screen.getByLabelText('CVV'), '123')
+
+            // Our mocked SavePaymentMethod renders this test id for registered users
+            expect(await screen.findByTestId('save-payment-method')).toBeInTheDocument()
         })
     })
 
