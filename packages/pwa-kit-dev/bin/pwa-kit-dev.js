@@ -334,7 +334,10 @@ const main = async () => {
             )
                 // We load the slug from the package.json by default, but we don't want to do that
                 // unless we need to, so it is loaded conditionally in the action implementation
-                .default(null, "the 'name' key from the package.json")
+                .default(
+                    null,
+                    "configured 'deployment' values if specified, or the 'name' key from the package.json"
+                )
         )
         .addOption(
             new program.Option(
@@ -357,18 +360,6 @@ const main = async () => {
                 user,
                 key
             }) => {
-                // Set the deployment target env var, this is required to ensure we
-                // get the correct configuration object. Do not assign the variable it if
-                // the target value is `undefined` as it will serialied as a "undefined"
-                // string value.
-                if (target) {
-                    process.env.DEPLOY_TARGET = target
-                } else if (wait) {
-                    throw new Error(
-                        'You must provide a target to deploy to when using --wait to wait for deployment to finish.'
-                    )
-                }
-
                 /** @type {Credentials} */
                 let credentials
                 if (user && key) {
@@ -387,7 +378,22 @@ const main = async () => {
                 const mobify = getConfig({buildDirectory}) || {}
 
                 if (!projectSlug) {
-                    projectSlug = await getProjectName()
+                    projectSlug = mobify.deployment?.defaultMRTProject || (await getProjectName())
+                }
+
+                // Set the deployment target env var, this is required to ensure we
+                // get the correct configuration object. Do not assign the variable it if
+                // the target value is `undefined` as it will serialied as a "undefined"
+                // string value.
+                if (!target && mobify.deployment?.defaultMRTTarget) {
+                    target = mobify.deployment.defaultMRTTarget
+                }
+                if (target) {
+                    process.env.DEPLOY_TARGET = target
+                } else if (wait) {
+                    throw new Error(
+                        'You must provide a target to deploy to when using --wait to wait for deployment to finish.'
+                    )
                 }
 
                 const bundle = await scriptUtils.createBundle({
