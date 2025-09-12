@@ -69,6 +69,34 @@
       "value": "]"
     }
   ],
+  "account.payments.error.payment_method_remove_failed": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ŭƞȧȧƀŀḗḗ ŧǿǿ řḗḗḿǿǿṽḗḗ ƥȧȧẏḿḗḗƞŧ ḿḗḗŧħǿǿḓ"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "account.payments.error.payment_method_save_failed": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ŭƞȧȧƀŀḗḗ ŧǿǿ şȧȧṽḗḗ ƥȧȧẏḿḗḗƞŧ ḿḗḗŧħǿǿḓ"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
   "account.payments.heading.payment_methods": [
     {
       "type": 0,

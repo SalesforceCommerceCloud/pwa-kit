@@ -29,6 +29,18 @@
       "value": "Retry"
     }
   ],
+  "account.payments.error.payment_method_remove_failed": [
+    {
+      "type": 0,
+      "value": "Unable to remove payment method"
+    }
+  ],
+  "account.payments.error.payment_method_save_failed": [
+    {
+      "type": 0,
+      "value": "Unable to save payment method"
+    }
+  ],
   "account.payments.heading.payment_methods": [
     {
       "type": 0,

@@ -14,6 +14,12 @@
   "account.payments.action.retry": {
     "defaultMessage": "Retry"
   },
+  "account.payments.error.payment_method_remove_failed": {
+    "defaultMessage": "Unable to remove payment method"
+  },
+  "account.payments.error.payment_method_save_failed": {
+    "defaultMessage": "Unable to save payment method"
+  },
   "account.payments.heading.payment_methods": {
     "defaultMessage": "Payment Methods"
   },

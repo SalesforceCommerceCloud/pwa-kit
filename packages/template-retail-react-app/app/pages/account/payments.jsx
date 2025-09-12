@@ -92,7 +92,16 @@ const AccountPayments = () => {
             setIsAdding(false)
             await refetch()
         } catch (e) {
-            // Swallow errors to avoid unhandled rejections in tests; UI can remain unchanged
+            showToast({
+                title: (
+                    <FormattedMessage
+                        defaultMessage="Unable to save payment method"
+                        id="account.payments.error.payment_method_save_failed"
+                    />
+                ),
+                status: 'error',
+                isClosable: true
+            })
         }
     }
     const toggleAdd = () => setIsAdding((v) => !v)
@@ -121,7 +130,16 @@ const AccountPayments = () => {
             )
             await refetch()
         } catch (e) {
-            // Ignore errors for failure-path tests; UI remains unchanged
+            showToast({
+                title: (
+                    <FormattedMessage
+                        defaultMessage="Unable to remove payment method"
+                        id="account.payments.error.payment_method_remove_failed"
+                    />
+                ),
+                status: 'error',
+                isClosable: true
+            })
         } finally {
             setDeletingId(null)
         }

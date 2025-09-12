@@ -291,7 +291,7 @@ describe('AccountPayments', () => {
         expect(screen.getByText('Expires 6/2026')).toBeInTheDocument()
     })
 
-    test('shows error handling when add payment fails (no toast, no refetch)', async () => {
+    test('shows error toast when add payment fails', async () => {
         const mockRefetch = jest.fn()
         mockUseCurrentCustomer.mockReturnValue({
             data: mockCustomer,
@@ -316,11 +316,13 @@ describe('AccountPayments', () => {
         await user.click(screen.getByRole('button', {name: /save/i}))
 
         await waitFor(() => expect(mockMutate).toHaveBeenCalled())
-        expect(mockToast).not.toHaveBeenCalled()
+        expect(mockToast).toHaveBeenCalled()
+        const toastArg = useToast.mock.results[0].value.mock.calls[0][0]
+        expect(toastArg.status).toBe('error')
         expect(mockRefetch).not.toHaveBeenCalled()
     })
 
-    test('shows error handling when remove payment fails (no toast, no refetch)', async () => {
+    test('shows error toast when remove payment fails', async () => {
         const mockRefetch = jest.fn()
         mockUseCurrentCustomer.mockReturnValue({
             data: mockCustomer,
@@ -338,7 +340,9 @@ describe('AccountPayments', () => {
         await user.click(removeButtons[0])
 
         await waitFor(() => expect(mockDelete).toHaveBeenCalled())
-        expect(mockToast).not.toHaveBeenCalled()
+        expect(mockToast).toHaveBeenCalled()
+        const toastArg = useToast.mock.results[0].value.mock.calls[0][0]
+        expect(toastArg.status).toBe('error')
         expect(mockRefetch).not.toHaveBeenCalled()
     })
 })
