@@ -152,8 +152,7 @@ const ProductView = forwardRef(
             promotionId,
             maxOrderQuantity = null,
             imageGalleryFooter = null,
-            flexAlignment = "flex-end",
-            buttonGroupPosition = "fixed",
+            alignItems = "flex-end",
         },
         ref
     ) => {
@@ -485,7 +484,7 @@ const ProductView = forwardRef(
                         isProductPartOfBundle={isProductPartOfBundle}
                     />
                 </Box>
-                <Flex direction={['column', 'column', 'column', 'row']} align={flexAlignment}>
+                <Flex direction={['column', 'column', 'column', 'row']} align={alignItems}>
                     {showImageGallery && (
                         <Box flex={1} mr={[0, 0, 0, 6, 6]}>
                             {product ? (
@@ -523,7 +522,17 @@ const ProductView = forwardRef(
                     )}
 
                     {/* Variations & Quantity Selector & CTA buttons */}
-                    <VStack align="stretch" spacing={8} flex={1}>
+                    <VStack 
+                        align="stretch" 
+                        spacing={8} 
+                        flex={1}
+                        pb={[
+                            isProductPartOfSet || isProductPartOfBundle ? 4 : '120px',
+                            isProductPartOfSet || isProductPartOfBundle ? 4 : '120px', 
+                            isProductPartOfSet || isProductPartOfBundle ? 4 : '120px',
+                            4
+                        ]}
+                    >
                         <Box display={['none', 'none', 'none', 'block']}>
                             <ProductViewHeader
                                 name={product?.name}
@@ -870,7 +879,7 @@ const ProductView = forwardRef(
 
                 {/* Sticky call-to-action buttons for mobile and certain product types */}
                 <Box
-                    position={buttonGroupPosition}
+                    position="fixed"
                     bg="white"
                     width="100%"
                     display={
@@ -923,8 +932,7 @@ ProductView.propTypes = {
     promotionId: PropTypes.string,
     maxOrderQuantity: PropTypes.number,
     imageGalleryFooter: PropTypes.node,
-    flexAlignment: PropTypes.string,
-    buttonGroupPosition: PropTypes.string,
+    alignItems: PropTypes.string,
 }
 
 export default ProductView
