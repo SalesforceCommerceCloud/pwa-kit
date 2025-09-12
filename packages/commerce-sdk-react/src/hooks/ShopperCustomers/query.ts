@@ -264,7 +264,7 @@ export const useSomOrder = (
                     endpointPath: 'order',
                     apiName: 'orders',
                     apiVersion: 'v1',
-                    organizationId: 'f_ecom_zzrf_017'
+                    organizationId: apiOptions.parameters.siteId
                 },
                 parameters: apiOptions.parameters
             }
@@ -302,7 +302,7 @@ export const useSomCancelOrder = (
                     endpointPath: 'cancelOrder',
                     apiName: 'orders',
                     apiVersion: 'v1',
-                    organizationId: 'f_ecom_zzrf_017'
+                    organizationId: apiOptions.parameters.siteId
                 },
                 parameters: apiOptions.parameters
             }
