@@ -20,8 +20,33 @@ export function getCurrencyValueForApi(amount, currencyCode) {
     return Math.round(amount * Math.pow(10, currency.Decimals))
 }
 
+/**
+ * Formats a price with the appropriate currency symbol using browser's Intl API
+ * @param {number} price - The price to format
+ * @param {string} currencyCode - The currency code (e.g., 'USD', 'EUR', 'GBP')
+ * @returns {string} - Formatted price string with currency symbol
+ */
+function formatCurrency(price, currencyCode) {
+    try {
+        // Get currency info from our currency list to determine decimal places
+        const currency = CurrencyList.find((currency) => currency.Code === currencyCode)
+        const decimals = currency ? parseInt(currency.Decimals) : 2
+        
+        return new Intl.NumberFormat('en-US', {
+            style: 'currency',
+            currency: currencyCode,
+            minimumFractionDigits: decimals,
+            maximumFractionDigits: decimals
+        }).format(price)
+    } catch (error) {
+        // Fallback if currency code is invalid
+        console.warn(`Invalid currency code: ${currencyCode}. Using default formatting.`)
+        return `${currencyCode} ${price.toFixed(2)}`
+    }
+}
+
 // converts shipping methods to the shippingOptionParameters that Google Pay expects
-export function getGPShippingOptionParameters(shippingMethods) {
+export function getGPShippingOptionParameters(shippingMethods, currencyCode = 'USD') {
     if (
         !shippingMethods ||
         !shippingMethods.applicableShippingMethods ||
@@ -32,7 +57,7 @@ export function getGPShippingOptionParameters(shippingMethods) {
 
     let shippingOptions = shippingMethods?.applicableShippingMethods?.map((sm) => ({
         id: sm.id,
-        label: sm.price !== undefined ? `$${sm.price.toFixed(2)}: ${sm.name}` : sm.name, // TODO: support for other currencies?
+        label: sm.price !== undefined ? `${formatCurrency(sm.price, currencyCode)}: ${sm.name}` : sm.name,
         description: sm.description
     }))
 

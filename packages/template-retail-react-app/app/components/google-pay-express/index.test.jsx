@@ -70,7 +70,7 @@ jest.mock('@salesforce/retail-react-app/app/components/express/utils/shipping-me
 
 jest.mock('@salesforce/retail-react-app/app/components/express/utils/parsers', () => ({
     getCurrencyValueForApi: jest.fn((amount) => amount * 100),
-    getGPShippingOptionParameters: jest.fn(() => ({
+    getGPShippingOptionParameters: jest.fn((shippingMethods, currency) => ({
         defaultSelectedOptionId: 'method-1',
         shippingOptions: [{id: 'method-1', label: 'Standard Shipping', description: '5-7 days'}]
     })),
@@ -714,7 +714,7 @@ describe('GooglePayExpress Button Configuration', () => {
             const mockBasket = null
             const mockGooglePayConfig = {merchantId: 'merchant123'}
             const mockAdyenPaymentMethods = {paymentMethods: []}
-            const mockTempBasket = {basketId: 'temp123', orderTotal: 50.0, currency: 'USD'}
+            const mockTempBasket = {basketId: 'temp123', orderTotal: 50.0}
             const mockSetTempBasket = jest.fn()
 
             const result = getGoogleButtonConfig(

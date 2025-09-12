@@ -164,7 +164,7 @@ export const updateShippingOption = async (
         // We need to update the shippingOptionParameters for applicable shipping methods to the new address
         if (shippingMethodResponse) {
             paymentDataRequestUpdate.newShippingOptionParameters = {
-                ...getGPShippingOptionParameters(shippingMethodResponse)
+                ...getGPShippingOptionParameters(shippingMethodResponse, response.currency)
             }
         }
         return {

@@ -249,6 +249,41 @@ describe('parsers', () => {
             const result = getGPShippingOptionParameters(undefined)
             expect(result).toBeUndefined()
         })
+
+        it('should format prices with different currencies', () => {
+            const shippingMethods = {
+                applicableShippingMethods: [
+                    {
+                        id: 'shipping-1',
+                        name: 'Standard Shipping',
+                        description: '5-7 business days',
+                        price: 5.99
+                    },
+                    {
+                        id: 'shipping-2',
+                        name: 'Express Shipping',
+                        description: '2-3 business days',
+                        price: 12.99
+                    }
+                ],
+                defaultShippingMethodId: 'shipping-1'
+            }
+
+            // Test EUR currency
+            const resultEUR = getGPShippingOptionParameters(shippingMethods, 'EUR')
+            expect(resultEUR.shippingOptions[0].label).toBe('€5.99: Standard Shipping')
+            expect(resultEUR.shippingOptions[1].label).toBe('€12.99: Express Shipping')
+
+            // Test GBP currency
+            const resultGBP = getGPShippingOptionParameters(shippingMethods, 'GBP')
+            expect(resultGBP.shippingOptions[0].label).toBe('£5.99: Standard Shipping')
+            expect(resultGBP.shippingOptions[1].label).toBe('£12.99: Express Shipping')
+
+            // Test JPY currency (no decimals)
+            const resultJPY = getGPShippingOptionParameters(shippingMethods, 'JPY')
+            expect(resultJPY.shippingOptions[0].label).toBe('¥6: Standard Shipping')
+            expect(resultJPY.shippingOptions[1].label).toBe('¥13: Express Shipping')
+        })
     })
 
     describe('getGooglePayCardNetworks', () => {

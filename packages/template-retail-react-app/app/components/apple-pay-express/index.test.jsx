@@ -131,7 +131,7 @@ jest.mock('@salesforce/retail-react-app/app/hooks/use-navigation', () => ({
 // Mock the parsers module
 jest.mock('@salesforce/retail-react-app/app/components/express/utils/parsers', () => ({
     getCurrencyValueForApi: jest.fn((amount) => amount * 100),
-    getGPShippingOptionParameters: jest.fn(() => ({
+    getGPShippingOptionParameters: jest.fn((shippingMethods, currency) => ({
         defaultSelectedOptionId: 'method-1',
         shippingOptions: [{id: 'method-1', label: 'Standard Shipping', description: '5-7 days'}]
     })),

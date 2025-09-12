@@ -75,21 +75,14 @@ function Express() {
             // In production, you might want to restrict this to specific origins
 
             if (event.data && typeof event.data === 'object') {
-                const {type, sku, quantity, currency} = event.data
+                const {type, sku, quantity} = event.data
 
                 // Handle SKU update messages
                 if (type === 'UPDATE_SKU' && typeof sku === 'string') {
-                    console.log('💬💬💬 Express Payment: SKU update:', sku, 'currency:', currency)
+                    console.log('💬💬💬 Express Payment: SKU update:', sku)
                     setCurrentSku(sku)
                     // Always set quantity to 1 when SKU changes
                     setCurrentQuantity(1)
-
-                    setCurrentCurrency('EUR') // HARD-SETTING THIS FOR NOW -- IT WILL COME FROM THE MESSAGE EVENTUALLY
-
-                    // Update currency if provided
-                    if (typeof currency === 'string') {
-                        setCurrentCurrency(currency)
-                    }
                 }
 
                 // Handle quantity update messages
@@ -121,8 +114,12 @@ function Express() {
                 // Handle authentication data messages
                 if (type === 'authDataAvailable') {
                     const authData = event.data.data.authData
+                    
+                    authData.currency = 'EUR' // OVERWRITING THIS FOR NOW TO WHAT IT SHOULD BE -- COMPONENTS ARE PULLING THIS WRONG AND DEFAULTING TO USD
+                    
                     console.log('💬💬💬 Express Payment: Auth data available:', authData)
                     setAuthToken(authData.authToken)
+                    setCurrentCurrency(authData.currency)
                 }
             }
         }
