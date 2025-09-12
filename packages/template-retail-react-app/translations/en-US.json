@@ -17,14 +17,23 @@
   "account.payments.heading.payment_methods": {
     "defaultMessage": "Payment Methods"
   },
+  "account.payments.info.payment_method_removed": {
+    "defaultMessage": "Payment method removed"
+  },
+  "account.payments.info.payment_method_saved": {
+    "defaultMessage": "New payment method saved"
+  },
   "account.payments.message.error": {
     "defaultMessage": "Error loading payment methods. Please try again."
   },
   "account.payments.message.loading": {
     "defaultMessage": "Loading payment methods..."
   },
-  "account.payments.message.no_payment_methods": {
-    "defaultMessage": "No saved payment methods found."
+  "account.payments.placeholder.heading": {
+    "defaultMessage": "No Saved Payments"
+  },
+  "account.payments.placeholder.text": {
+    "defaultMessage": "Add a new payment method for faster checkout."
   },
   "account_addresses.badge.default": {
     "defaultMessage": "Default"

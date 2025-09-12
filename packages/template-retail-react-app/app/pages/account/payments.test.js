@@ -9,6 +9,7 @@ import {screen, waitFor} from '@testing-library/react'
 import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
 import AccountPayments from '@salesforce/retail-react-app/app/pages/account/payments'
 import {useShopperCustomersMutation} from '@salesforce/commerce-sdk-react'
+import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
 
 // Make card validation always pass to simplify form submission in tests
 jest.mock('card-validator', () => ({
@@ -26,9 +27,11 @@ const mockUseCurrentCustomer = jest.fn()
 jest.mock('@salesforce/retail-react-app/app/hooks/use-current-customer', () => ({
     useCurrentCustomer: () => mockUseCurrentCustomer()
 }))
+jest.mock('@salesforce/retail-react-app/app/hooks/use-toast')
 
-// Mock the mutation
+// Mock the mutations
 const mockMutate = jest.fn()
+const mockDelete = jest.fn()
 jest.mock('@salesforce/commerce-sdk-react', () => {
     const original = jest.requireActual('@salesforce/commerce-sdk-react')
     return {
@@ -36,6 +39,9 @@ jest.mock('@salesforce/commerce-sdk-react', () => {
         useShopperCustomersMutation: (action) => {
             if (action === 'createCustomerPaymentInstrument') {
                 return {mutateAsync: mockMutate}
+            }
+            if (action === 'deleteCustomerPaymentInstrument') {
+                return {mutateAsync: mockDelete}
             }
             return original.useShopperCustomersMutation(action)
         }
@@ -73,6 +79,32 @@ describe('AccountPayments', () => {
         jest.clearAllMocks()
     })
 
+    test('removes a payment instrument via remove link (shows toast)', async () => {
+        const mockRefetch = jest.fn()
+        mockUseCurrentCustomer.mockReturnValue({
+            data: mockCustomer,
+            isLoading: false,
+            error: null,
+            refetch: mockRefetch
+        })
+        const mockToast = jest.fn()
+        useToast.mockReturnValue(mockToast)
+        mockDelete.mockImplementationOnce((opts, cfg) => {
+            cfg?.onSuccess?.()
+            return Promise.resolve({})
+        })
+
+        const {user} = renderWithProviders(<AccountPayments />)
+
+        // Click the first Remove link
+        const removeButtons = screen.getAllByRole('button', {name: /remove/i})
+        await user.click(removeButtons[0])
+
+        await waitFor(() => expect(mockDelete).toHaveBeenCalled())
+        expect(mockRefetch).toHaveBeenCalled()
+        expect(mockToast).toHaveBeenCalled()
+    })
+
     test('renders payment methods heading', () => {
         mockUseCurrentCustomer.mockReturnValue({
             data: mockCustomer,
@@ -85,7 +117,7 @@ describe('AccountPayments', () => {
         expect(screen.getByText(/payment methods/i)).toBeInTheDocument()
     })
 
-    test('adds a payment instrument via form submit', async () => {
+    test('adds a payment instrument via form submit (shows toast)', async () => {
         const mockRefetch = jest.fn()
         mockUseCurrentCustomer.mockReturnValue({
             data: mockCustomer,
@@ -93,7 +125,12 @@ describe('AccountPayments', () => {
             error: null,
             refetch: mockRefetch
         })
-        mockMutate.mockResolvedValueOnce({})
+        const mockToast = jest.fn()
+        useToast.mockReturnValue(mockToast)
+        mockMutate.mockImplementationOnce((opts, cfg) => {
+            cfg?.onSuccess?.()
+            return Promise.resolve({})
+        })
 
         const {user} = renderWithProviders(<AccountPayments />)
 
@@ -115,6 +152,8 @@ describe('AccountPayments', () => {
         await waitFor(() => expect(mockMutate).toHaveBeenCalled())
         // Should refetch after save
         expect(mockRefetch).toHaveBeenCalled()
+        // Toast shown
+        expect(mockToast).toHaveBeenCalled()
     })
 
     test('displays saved payment methods', () => {
@@ -169,7 +208,7 @@ describe('AccountPayments', () => {
 
         renderWithProviders(<AccountPayments />)
 
-        expect(screen.getByText(/no saved payment methods found/i)).toBeInTheDocument()
+        expect(screen.getByText(/no saved payments/i)).toBeInTheDocument()
     })
 
     test('shows no payment methods message when paymentInstruments is undefined', () => {
@@ -181,7 +220,7 @@ describe('AccountPayments', () => {
 
         renderWithProviders(<AccountPayments />)
 
-        expect(screen.getByText(/no saved payment methods found/i)).toBeInTheDocument()
+        expect(screen.getByText(/no saved payments/i)).toBeInTheDocument()
     })
 
     test('displays refresh button', () => {
@@ -250,5 +289,56 @@ describe('AccountPayments', () => {
         expect(screen.getByText('•••• 5678')).toBeInTheDocument()
         expect(screen.getByText('Jane Smith')).toBeInTheDocument()
         expect(screen.getByText('Expires 6/2026')).toBeInTheDocument()
+    })
+
+    test('shows error handling when add payment fails (no toast, no refetch)', async () => {
+        const mockRefetch = jest.fn()
+        mockUseCurrentCustomer.mockReturnValue({
+            data: mockCustomer,
+            isLoading: false,
+            error: null,
+            refetch: mockRefetch
+        })
+        const mockToast = jest.fn()
+        useToast.mockReturnValue(mockToast)
+        mockMutate.mockRejectedValueOnce(new Error('add failed'))
+
+        const {user} = renderWithProviders(<AccountPayments />)
+
+        await user.click(screen.getByRole('button', {name: /add payment/i}))
+        await user.type(
+            screen.getByLabelText(/card number/i, {selector: 'input'}),
+            '4111111111111111'
+        )
+        await user.type(screen.getByLabelText(/name on card/i), 'John Smith')
+        await user.type(screen.getByLabelText(/expiration date/i), '12/30')
+        await user.type(screen.getByLabelText(/security code/i, {selector: 'input'}), '123')
+        await user.click(screen.getByRole('button', {name: /save/i}))
+
+        await waitFor(() => expect(mockMutate).toHaveBeenCalled())
+        expect(mockToast).not.toHaveBeenCalled()
+        expect(mockRefetch).not.toHaveBeenCalled()
+    })
+
+    test('shows error handling when remove payment fails (no toast, no refetch)', async () => {
+        const mockRefetch = jest.fn()
+        mockUseCurrentCustomer.mockReturnValue({
+            data: mockCustomer,
+            isLoading: false,
+            error: null,
+            refetch: mockRefetch
+        })
+        const mockToast = jest.fn()
+        useToast.mockReturnValue(mockToast)
+        mockDelete.mockRejectedValueOnce(new Error('remove failed'))
+
+        const {user} = renderWithProviders(<AccountPayments />)
+
+        const removeButtons = screen.getAllByRole('button', {name: /remove/i})
+        await user.click(removeButtons[0])
+
+        await waitFor(() => expect(mockDelete).toHaveBeenCalled())
+        expect(mockToast).not.toHaveBeenCalled()
+        expect(mockRefetch).not.toHaveBeenCalled()
     })
 })

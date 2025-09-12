@@ -83,6 +83,34 @@
       "value": "]"
     }
   ],
+  "account.payments.info.payment_method_removed": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ƥȧȧẏḿḗḗƞŧ ḿḗḗŧħǿǿḓ řḗḗḿǿǿṽḗḗḓ"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "account.payments.info.payment_method_saved": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ƞḗḗẇ ƥȧȧẏḿḗḗƞŧ ḿḗḗŧħǿǿḓ şȧȧṽḗḗḓ"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
   "account.payments.message.error": [
     {
       "type": 0,
@@ -111,14 +139,28 @@
       "value": "]"
     }
   ],
-  "account.payments.message.no_payment_methods": [
+  "account.payments.placeholder.heading": [
     {
       "type": 0,
       "value": "["
     },
     {
       "type": 0,
-      "value": "Ƞǿǿ şȧȧṽḗḗḓ ƥȧȧẏḿḗḗƞŧ ḿḗḗŧħǿǿḓş ƒǿǿŭŭƞḓ."
+      "value": "Ƞǿǿ Şȧȧṽḗḗḓ Ƥȧȧẏḿḗḗƞŧş"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
+  "account.payments.placeholder.text": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "Ȧḓḓ ȧȧ ƞḗḗẇ ƥȧȧẏḿḗḗƞŧ ḿḗḗŧħǿǿḓ ƒǿǿř ƒȧȧşŧḗḗř ƈħḗḗƈķǿǿŭŭŧ."
     },
     {
       "type": 0,
