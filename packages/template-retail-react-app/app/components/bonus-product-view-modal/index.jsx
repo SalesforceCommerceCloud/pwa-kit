@@ -17,7 +17,8 @@ import {
     Button,
     Box,
     Text,
-    Heading
+    Heading,
+    VStack
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 import ProductView from '@salesforce/retail-react-app/app/components/product-view'
 import {useProductViewModal} from '@salesforce/retail-react-app/app/hooks/use-product-view-modal'
@@ -31,6 +32,7 @@ import {
 } from '@salesforce/retail-react-app/app/utils/bonus-product-utils'
 import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
 import {productViewModalTheme} from '@salesforce/retail-react-app/app/theme/components/project/product-view-modal'
+import {bonusProductViewModalTheme} from '@salesforce/retail-react-app/app/theme/components/project/bonus-product-view-modal'
 import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
 
 /**
@@ -71,9 +73,10 @@ const BonusProductViewModal = ({
     const showToast = useToast()
 
     // Calculate bonus counts using promotionId and utility method
-    const {selectedBonusItems: finalSelectedBonusItems, maxBonusItems: finalMaxBonusItems} = useMemo(() => {
-        return getBonusProductCountsForPromotion(basket, promotionId)
-    }, [basket, promotionId])
+    const {selectedBonusItems: finalSelectedBonusItems, maxBonusItems: finalMaxBonusItems} =
+        useMemo(() => {
+            return getBonusProductCountsForPromotion(basket, promotionId)
+        }, [basket, promotionId])
 
     const messages = useMemo(
         () => ({
@@ -88,9 +91,9 @@ const BonusProductViewModal = ({
                 id: 'bonus_product_view_modal.button.view_cart',
                 defaultMessage: 'View Cart'
             }),
-            cancel: formatMessage({
-                id: 'form_action_buttons.button.cancel',
-                defaultMessage: 'Cancel'
+            backToSelection: formatMessage({
+                id: 'bonus_product_view_modal.button.back_to_selection',
+                defaultMessage: '← Back to Selection'
             })
         }),
         [intl]
@@ -247,12 +250,9 @@ const BonusProductViewModal = ({
         () => [
             <Button key="view-cart" variant="outline" onClick={handleViewCart}>
                 {messages.viewCart}
-            </Button>,
-            <Button key="back-to-selection" variant="outline" onClick={onReturnToSelection}>
-                {messages.cancel}
             </Button>
         ],
-        [messages.viewCart, messages.cancel, handleViewCart, onReturnToSelection]
+        [messages.viewCart, handleViewCart]
     )
 
     // Clean product data but preserve variation attributes for size/color selectors
@@ -302,20 +302,19 @@ const BonusProductViewModal = ({
                 margin={productViewModalTheme.layout.content.margin}
                 borderRadius={productViewModalTheme.layout.content.borderRadius}
                 bg={productViewModalTheme.layout.content.background}
-                maxHeight={productViewModalTheme.layout.content.maxHeight}
+                maxHeight={bonusProductViewModalTheme.layout.content.maxHeight}
                 overflowY={productViewModalTheme.layout.content.overflowY}
             >
-                <ModalHeader
-                    bg={productViewModalTheme.colors.contentBackground}
-                >
+                <ModalHeader bg={productViewModalTheme.colors.contentBackground}>
                     <Heading size="md">
                         {formatMessage(
                             {
                                 id: 'bonus_product_view_modal.title',
-                                defaultMessage: 'Select Bonus Product ({selected} of {max} selected)'
-                    },
-                    {selected: finalSelectedBonusItems, max: finalMaxBonusItems}
-                )}
+                                defaultMessage:
+                                    'Select Bonus Product ({selected} of {max} selected)'
+                            },
+                            {selected: finalSelectedBonusItems, max: finalMaxBonusItems}
+                        )}
                     </Heading>
                 </ModalHeader>
 
@@ -342,6 +341,22 @@ const BonusProductViewModal = ({
                             maxOrderQuantity={maxOrderQuantity}
                             showReviews={true}
                             showVariationAttributes={true}
+                            alignItems="stretch"
+                            imageGalleryFooter={
+                                onReturnToSelection ? (
+                                    <Text
+                                        as="button"
+                                        color="blue.600"
+                                        cursor="pointer"
+                                        onClick={onReturnToSelection}
+                                        _hover={{
+                                            color: 'blue.700'
+                                        }}
+                                    >
+                                        {messages.backToSelection}
+                                    </Text>
+                                ) : null
+                            }
                             {...props}
                         />
                     )}

@@ -150,7 +150,9 @@ const ProductView = forwardRef(
             showDeliveryOptions = true,
             customButtons = [],
             promotionId,
-            maxOrderQuantity = null
+            maxOrderQuantity = null,
+            imageGalleryFooter = null,
+            alignItems = "flex-start",
         },
         ref
     ) => {
@@ -510,11 +512,27 @@ const ProductView = forwardRef(
                             ) : (
                                 <ImageGallerySkeleton />
                             )}
+                            {/* Custom footer content (e.g., Back to Selection button) */}
+                            {imageGalleryFooter && (
+                                <Box mt={6} mb={2}>
+                                    {imageGalleryFooter}
+                                </Box>
+                            )}
                         </Box>
                     )}
 
                     {/* Variations & Quantity Selector & CTA buttons */}
-                    <VStack align="stretch" spacing={8} flex={1}>
+                    <VStack 
+                        align="stretch" 
+                        spacing={8} 
+                        flex={1}
+                        pb={[
+                            isProductPartOfSet || isProductPartOfBundle ? 4 : '120px',
+                            isProductPartOfSet || isProductPartOfBundle ? 4 : '120px', 
+                            isProductPartOfSet || isProductPartOfBundle ? 4 : '120px',
+                            4
+                        ]}
+                    >
                         <Box display={['none', 'none', 'none', 'block']}>
                             <ProductViewHeader
                                 name={product?.name}
@@ -912,7 +930,9 @@ ProductView.propTypes = {
     showDeliveryOptions: PropTypes.bool,
     customButtons: PropTypes.array,
     promotionId: PropTypes.string,
-    maxOrderQuantity: PropTypes.number
+    maxOrderQuantity: PropTypes.number,
+    imageGalleryFooter: PropTypes.node,
+    alignItems: PropTypes.string,
 }
 
 export default ProductView

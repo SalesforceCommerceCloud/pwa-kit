@@ -31,7 +31,10 @@ import {filterImageGroups} from '@salesforce/retail-react-app/app/utils/product-
 import {useModalState} from '@salesforce/retail-react-app/app/hooks/use-modal-state'
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
 import BonusProductViewModal from '@salesforce/retail-react-app/app/components/bonus-product-view-modal'
-import {findAvailableBonusDiscountLineItemId, getBonusProductCountsForPromotion} from '@salesforce/retail-react-app/app/utils/bonus-product-utils'
+import {
+    findAvailableBonusDiscountLineItemId,
+    getBonusProductCountsForPromotion
+} from '@salesforce/retail-react-app/app/utils/bonus-product-utils'
 import {addToCartModalTheme} from '@salesforce/retail-react-app/app/theme/components/project/add-to-cart-modal'
 
 // Import AddToCartModal to render it within this provider
@@ -182,11 +185,11 @@ export const BonusProductSelectionModal = () => {
     // Extract bonus products from modal data and derive promotionId using same logic as products card
     const bonusProducts = data?.bonusDiscountLineItems || []
     const {data: basket} = useCurrentBasket()
-    
-    // Get promotionId from bonus products - all items have the same promotionId since they're 
+
+    // Get promotionId from bonus products - all items have the same promotionId since they're
     // pre-filtered in select-bonus-products-card.jsx (line 143: bli.promotionId === promotionId)
     const promotionId = bonusProducts.length > 0 ? bonusProducts[0]?.promotionId : null
-    
+
     // Calculate promotion-specific bonus counts using utility method
     const {selectedBonusItems, maxBonusItems} = useMemo(() => {
         return getBonusProductCountsForPromotion(basket, promotionId)
@@ -366,13 +369,17 @@ export const BonusProductSelectionModal = () => {
                                 </Text>
                             ) : (
                                 <VStack spacing="4">
-                                    <Box 
-                                        maxHeight={{base: "60vh", md: "70vh"}} 
-                                        overflowY="auto" 
+                                    <Box
+                                        maxHeight={{base: '60vh', md: '70vh'}}
+                                        overflowY="auto"
                                         width="100%"
                                         px="1"
                                     >
-                                        <SimpleGrid columns={{base: 1, md: 3}} spacing="4" width="100%">
+                                        <SimpleGrid
+                                            columns={{base: 1, md: 3}}
+                                            spacing="4"
+                                            width="100%"
+                                        >
                                             {uniqueBonusProducts.map((product) => {
                                                 const foundProductData = productData?.data?.find(
                                                     (p) => p.id === product.productId

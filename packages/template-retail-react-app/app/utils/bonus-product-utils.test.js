@@ -269,10 +269,7 @@ describe('Enhanced Bonus Product Utilities', () => {
             test(description, () => {
                 const basketWithBonusProducts = {
                     ...mockBasket,
-                    productItems: [
-                        ...mockBasket.productItems,
-                        ...bonusProducts
-                    ]
+                    productItems: [...mockBasket.productItems, ...bonusProducts]
                 }
 
                 const result = bonusProductUtils.getBonusProductsInCartForProduct(
@@ -282,12 +279,12 @@ describe('Enhanced Bonus Product Utilities', () => {
                 )
 
                 expect(result).toHaveLength(expectedResults.length)
-                
+
                 expectedResults.forEach((expected, index) => {
-                    const actualProduct = expected.productId 
-                        ? result.find(item => item.productId === expected.productId)
+                    const actualProduct = expected.productId
+                        ? result.find((item) => item.productId === expected.productId)
                         : result[index]
-                    
+
                     Object.entries(expected).forEach(([key, value]) => {
                         expect(actualProduct[key]).toBe(value)
                     })

@@ -1029,6 +1029,20 @@
       "value": "]"
     }
   ],
+  "bonus_product_view_modal.button.back_to_selection": [
+    {
+      "type": 0,
+      "value": "["
+    },
+    {
+      "type": 0,
+      "value": "← Ɓȧȧƈķ ŧǿǿ Şḗḗŀḗḗƈŧīǿǿƞ"
+    },
+    {
+      "type": 0,
+      "value": "]"
+    }
+  ],
   "bonus_product_view_modal.button.view_cart": [
     {
       "type": 0,
