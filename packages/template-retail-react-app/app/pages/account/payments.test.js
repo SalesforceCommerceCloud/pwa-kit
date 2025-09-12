@@ -121,6 +121,32 @@ describe('AccountPayments', () => {
         expect(mockToast).toHaveBeenCalled()
     })
 
+    test('removes a payment instrument via remove link (shows toast)', async () => {
+        const mockRefetch = jest.fn()
+        mockUseCurrentCustomer.mockReturnValue({
+            data: mockCustomer,
+            isLoading: false,
+            error: null,
+            refetch: mockRefetch
+        })
+        const mockToast = jest.fn()
+        useToast.mockReturnValue(mockToast)
+        mockDelete.mockImplementationOnce((opts, cfg) => {
+            cfg?.onSuccess?.()
+            return Promise.resolve({})
+        })
+
+        const {user} = renderWithProviders(<AccountPayments />)
+
+        // Click the first Remove link
+        const removeButtons = screen.getAllByRole('button', {name: /remove/i})
+        await user.click(removeButtons[0])
+
+        await waitFor(() => expect(mockDelete).toHaveBeenCalled())
+        expect(mockRefetch).toHaveBeenCalled()
+        expect(mockToast).toHaveBeenCalled()
+    })
+
     test('renders payment methods heading', () => {
         mockUseCurrentCustomer.mockReturnValue({
             data: mockCustomer,

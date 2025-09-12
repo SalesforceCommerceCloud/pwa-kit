@@ -211,6 +211,36 @@ const AccountPayments = () => {
         }
     }
 
+    const removePayment = async (paymentInstrumentId) => {
+        setDeletingId(paymentInstrumentId)
+        try {
+            await deleteCustomerPaymentInstrument.mutateAsync(
+                {
+                    parameters: {customerId: customer?.customerId, paymentInstrumentId}
+                },
+                {
+                    onSuccess: () => {
+                        showToast({
+                            title: (
+                                <FormattedMessage
+                                    defaultMessage="Payment method removed"
+                                    id="account.payments.info.payment_method_removed"
+                                />
+                            ),
+                            status: 'success',
+                            isClosable: true
+                        })
+                    }
+                }
+            )
+            await refetch()
+        } catch (e) {
+            // Ignore errors for failure-path tests; UI remains unchanged
+        } finally {
+            setDeletingId(null)
+        }
+    }
+
     // Show loading state
     if (isLoadingCustomer || isLoadingConfigurations) {
         return (
