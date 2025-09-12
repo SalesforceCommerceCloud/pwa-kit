@@ -23,7 +23,7 @@ import {
     useDisclosure
 } from '@chakra-ui/react'
 import {getCreditCardIcon} from '@salesforce/retail-react-app/app/utils/cc-utils'
-import {useOrder, useProducts} from '@salesforce/commerce-sdk-react'
+import {useOrder, useProducts, useSomCancelOrder} from '@salesforce/commerce-sdk-react'
 import Link from '@salesforce/retail-react-app/app/components/link'
 import {ChevronLeftIcon} from '@salesforce/retail-react-app/app/components/icons'
 import OrderSummary from '@salesforce/retail-react-app/app/components/order-summary'
@@ -51,7 +51,11 @@ const AccountOrderDetail = () => {
         onClose: onCancelModalClose
     } = useDisclosure()
 
-    const {data: order, isLoading: isOrderLoading} = useOrder(
+    const {
+        data: order,
+        isLoading: isOrderLoading,
+        refetch: refetchOrder
+    } = useOrder(
         {
             parameters: {orderNo: params.orderNo}
         },
@@ -90,42 +94,71 @@ const AccountOrderDetail = () => {
         statusEligible &&
         shippingEligible
 
-    // NOTE: intentionally left API call as no-op until the cancel API is ready.
-    // When the API is available, replace call with real API request.
-    // The handler should update UI (e.g., refetch order, show a toast, navigate back to orders).
-    const handleCancelOrder = async () => {
-        try {
-            // const response = await realCancelOrderApi(_order.orderNo, _reasonId)
-            const response = undefined // no-op placeholder for now
+    const siteId = getConfig().app?.commerceAPI?.parameters?.siteId
+    const {refetch: submitCancelRequest} = useSomCancelOrder(
+        {
+            parameters: {
+                siteId,
+                c_orderNumber: order?.orderNo || ''
+            }
+        },
+        {
+            enabled: false
+        }
+    )
 
-            // Error (4xx/5xx)
-            if (response && !response.ok) {
-                toast({
-                    title: formatMessage({
+    const handleCancelOrder = async (_order, _reasonId) => {
+        try {
+            const result = await submitCancelRequest()
+            const somData = result?.data?.response
+
+            if (!somData || somData.isValidJSON !== true || somData.isError === true) {
+                const errorText =
+                    somData?.errorText ||
+                    formatMessage({
                         defaultMessage: 'Something went wrong with the order cancellation.',
                         id: 'account_order_detail.toast.cancellation_failed'
-                    }),
-                    status: 'error'
-                })
+                    })
+                toast({title: errorText, status: 'error', position: 'top'})
                 return
             }
 
-            // Success (2xx)
-            toast({
-                title: formatMessage({
-                    defaultMessage: 'Your order cancellation request was submitted.',
-                    id: 'account_order_detail.toast.cancellation_success'
-                }),
-                status: 'success'
-            })
+            const firstAction = Array.isArray(somData.responseObj)
+                ? somData.responseObj[0]
+                : somData.responseObj
+
+            if (firstAction?.isSuccess === true) {
+                toast({
+                    title: formatMessage({
+                        defaultMessage: 'Your order cancellation request was submitted.',
+                        id: 'account_order_detail.toast.cancellation_success'
+                    }),
+                    status: 'success',
+                    position: 'top'
+                })
+                await refetchOrder()
+                history.push('/account/orders')
+                return
+            }
+
+            const actionErr = firstAction?.errors?.[0]?.message
+            const outputErr = firstAction?.outputValues?.submitCancelOutput?.errors?.[0]?.message
+            const errorText =
+                actionErr ||
+                outputErr ||
+                formatMessage({
+                    defaultMessage: 'Something went wrong with the order cancellation.',
+                    id: 'account_order_detail.toast.cancellation_failed'
+                })
+            toast({title: errorText, status: 'error', position: 'top'})
         } catch (e) {
-            // Network/unexpected error
             toast({
                 title: formatMessage({
                     defaultMessage: 'Something went wrong with the order cancellation.',
                     id: 'account_order_detail.toast.cancellation_failed'
                 }),
-                status: 'error'
+                status: 'error',
+                position: 'top'
             })
         }
     }
