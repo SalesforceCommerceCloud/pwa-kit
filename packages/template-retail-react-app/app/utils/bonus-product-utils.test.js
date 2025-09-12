@@ -653,126 +653,6 @@ describe('Enhanced Bonus Product Utilities', () => {
         })
     })
 
-    describe('findAvailableBonusDiscountLineItemId', () => {
-        test('finds first discount line item with available capacity', () => {
-            const basketWithMultipleDiscountItems = {
-                bonusDiscountLineItems: [
-                    {
-                        id: 'discount-1',
-                        promotionId: 'BonusProductOnOrderOfAmountAbove250',
-                        maxBonusItems: 2
-                    },
-                    {
-                        id: 'discount-2',
-                        promotionId: 'BonusProductOnOrderOfAmountAbove250',
-                        maxBonusItems: 3
-                    }
-                ],
-                productItems: [
-                    {productId: 'prod-123', quantity: 1},
-                    // discount-1 is full (2 items)
-                    {
-                        productId: 'bonus-1',
-                        quantity: 1,
-                        bonusProductLineItem: true,
-                        bonusDiscountLineItemId: 'discount-1'
-                    },
-                    {
-                        productId: 'bonus-2',
-                        quantity: 1,
-                        bonusProductLineItem: true,
-                        bonusDiscountLineItemId: 'discount-1'
-                    },
-                    // discount-2 has 1 item (capacity for 2 more)
-                    {
-                        productId: 'bonus-3',
-                        quantity: 1,
-                        bonusProductLineItem: true,
-                        bonusDiscountLineItemId: 'discount-2'
-                    }
-                ]
-            }
-
-            const result = bonusProductUtils.findAvailableBonusDiscountLineItemId(
-                basketWithMultipleDiscountItems,
-                'BonusProductOnOrderOfAmountAbove250',
-                1,
-                'fallback-id'
-            )
-
-            expect(result).toBe('discount-2') // Should return discount-2 since discount-1 is full
-        })
-
-        test('returns fallback when no capacity available', () => {
-            const basketWithFullDiscountItems = {
-                bonusDiscountLineItems: [
-                    {
-                        id: 'discount-1',
-                        promotionId: 'BonusProductOnOrderOfAmountAbove250',
-                        maxBonusItems: 1
-                    }
-                ],
-                productItems: [
-                    {productId: 'prod-123', quantity: 1},
-                    {
-                        productId: 'bonus-1',
-                        quantity: 1,
-                        bonusProductLineItem: true,
-                        bonusDiscountLineItemId: 'discount-1'
-                    }
-                ]
-            }
-
-            const result = bonusProductUtils.findAvailableBonusDiscountLineItemId(
-                basketWithFullDiscountItems,
-                'BonusProductOnOrderOfAmountAbove250',
-                1,
-                'fallback-id'
-            )
-
-            expect(result).toBe('discount-1') // Should return first matching item as fallback
-        })
-
-        test('returns fallback when no matching promotion found', () => {
-            const basketWithDifferentPromotion = {
-                bonusDiscountLineItems: [
-                    {
-                        id: 'discount-1',
-                        promotionId: 'DifferentPromotion',
-                        maxBonusItems: 2
-                    }
-                ],
-                productItems: []
-            }
-
-            const result = bonusProductUtils.findAvailableBonusDiscountLineItemId(
-                basketWithDifferentPromotion,
-                'BonusProductOnOrderOfAmountAbove250',
-                1,
-                'fallback-id'
-            )
-
-            expect(result).toBe('fallback-id') // Should return fallback when no matching promotion
-        })
-
-        test('returns fallback when basket is null or empty', () => {
-            const result1 = bonusProductUtils.findAvailableBonusDiscountLineItemId(
-                null,
-                'BonusProductOnOrderOfAmountAbove250',
-                1,
-                'fallback-id'
-            )
-            expect(result1).toBe('fallback-id')
-
-            const result2 = bonusProductUtils.findAvailableBonusDiscountLineItemId(
-                {},
-                'BonusProductOnOrderOfAmountAbove250',
-                1,
-                'fallback-id'
-            )
-            expect(result2).toBe('fallback-id')
-        })
-    })
 
     // Test hook functions exports (can't test actual React hooks in Jest environment)
     describe('React Hooks', () => {
@@ -790,6 +670,169 @@ describe('Enhanced Bonus Product Utilities', () => {
             expect(typeof bonusProductUtils.useRemainingAvailableBonusProductsForProduct).toBe(
                 'function'
             )
+        })
+    })
+
+    describe('findAvailableBonusDiscountLineItemIds', () => {
+        test('returns pairs with available capacity for matching promotion', () => {
+            const basket = {
+                bonusDiscountLineItems: [
+                    {id: 'bonus-1', promotionId: 'promo-123', maxBonusItems: 3},
+                    {id: 'bonus-2', promotionId: 'promo-123', maxBonusItems: 2}
+                ],
+                productItems: [
+                    {bonusProductLineItem: true, bonusDiscountLineItemId: 'bonus-1', quantity: 1}
+                ]
+            }
+
+            const result = bonusProductUtils.findAvailableBonusDiscountLineItemIds(basket, 'promo-123')
+
+            expect(result).toEqual([
+                ['bonus-1', 2], // 3 max - 1 selected = 2 available
+                ['bonus-2', 2]  // 2 max - 0 selected = 2 available
+            ])
+        })
+
+        test('excludes pairs with zero available capacity', () => {
+            const basket = {
+                bonusDiscountLineItems: [
+                    {id: 'bonus-1', promotionId: 'promo-123', maxBonusItems: 2},
+                    {id: 'bonus-2', promotionId: 'promo-123', maxBonusItems: 1}
+                ],
+                productItems: [
+                    {bonusProductLineItem: true, bonusDiscountLineItemId: 'bonus-1', quantity: 2},
+                    {bonusProductLineItem: true, bonusDiscountLineItemId: 'bonus-2', quantity: 1}
+                ]
+            }
+
+            const result = bonusProductUtils.findAvailableBonusDiscountLineItemIds(basket, 'promo-123')
+
+            expect(result).toEqual([])
+        })
+
+        test('handles multiple quantities for same discount line item', () => {
+            const basket = {
+                bonusDiscountLineItems: [
+                    {id: 'bonus-1', promotionId: 'promo-123', maxBonusItems: 5}
+                ],
+                productItems: [
+                    {bonusProductLineItem: true, bonusDiscountLineItemId: 'bonus-1', quantity: 2},
+                    {bonusProductLineItem: true, bonusDiscountLineItemId: 'bonus-1', quantity: 1}
+                ]
+            }
+
+            const result = bonusProductUtils.findAvailableBonusDiscountLineItemIds(basket, 'promo-123')
+
+            expect(result).toEqual([
+                ['bonus-1', 2] // 5 max - (2+1) selected = 2 available
+            ])
+        })
+
+        test('returns empty array when no matching promotion found', () => {
+            const basket = {
+                bonusDiscountLineItems: [
+                    {id: 'bonus-1', promotionId: 'different-promo', maxBonusItems: 3}
+                ],
+                productItems: []
+            }
+
+            const result = bonusProductUtils.findAvailableBonusDiscountLineItemIds(basket, 'promo-123')
+
+            expect(result).toEqual([])
+        })
+
+        test('returns empty array when basket is null or undefined', () => {
+            expect(bonusProductUtils.findAvailableBonusDiscountLineItemIds(null, 'promo-123')).toEqual([])
+            expect(bonusProductUtils.findAvailableBonusDiscountLineItemIds(undefined, 'promo-123')).toEqual([])
+        })
+
+        test('returns empty array when promotionId is null or undefined', () => {
+            const basket = {
+                bonusDiscountLineItems: [{id: 'bonus-1', promotionId: 'promo-123', maxBonusItems: 3}],
+                productItems: []
+            }
+
+            expect(bonusProductUtils.findAvailableBonusDiscountLineItemIds(basket, null)).toEqual([])
+            expect(bonusProductUtils.findAvailableBonusDiscountLineItemIds(basket, undefined)).toEqual([])
+        })
+
+        test('returns empty array when no bonusDiscountLineItems exist', () => {
+            const basket = {
+                productItems: []
+            }
+
+            const result = bonusProductUtils.findAvailableBonusDiscountLineItemIds(basket, 'promo-123')
+
+            expect(result).toEqual([])
+        })
+
+        test('handles missing maxBonusItems (defaults to 0)', () => {
+            const basket = {
+                bonusDiscountLineItems: [
+                    {id: 'bonus-1', promotionId: 'promo-123'} // No maxBonusItems
+                ],
+                productItems: []
+            }
+
+            const result = bonusProductUtils.findAvailableBonusDiscountLineItemIds(basket, 'promo-123')
+
+            expect(result).toEqual([])
+        })
+
+        test('handles missing productItems array', () => {
+            const basket = {
+                bonusDiscountLineItems: [
+                    {id: 'bonus-1', promotionId: 'promo-123', maxBonusItems: 3}
+                ]
+                // No productItems array
+            }
+
+            const result = bonusProductUtils.findAvailableBonusDiscountLineItemIds(basket, 'promo-123')
+
+            expect(result).toEqual([
+                ['bonus-1', 3] // 3 max - 0 selected = 3 available
+            ])
+        })
+
+        test('ignores non-bonus product items when calculating capacity', () => {
+            const basket = {
+                bonusDiscountLineItems: [
+                    {id: 'bonus-1', promotionId: 'promo-123', maxBonusItems: 3}
+                ],
+                productItems: [
+                    {bonusProductLineItem: false, bonusDiscountLineItemId: 'bonus-1', quantity: 2}, // Should be ignored
+                    {bonusProductLineItem: true, bonusDiscountLineItemId: 'bonus-1', quantity: 1}   // Should count
+                ]
+            }
+
+            const result = bonusProductUtils.findAvailableBonusDiscountLineItemIds(basket, 'promo-123')
+
+            expect(result).toEqual([
+                ['bonus-1', 2] // 3 max - 1 selected = 2 available (ignores non-bonus item)
+            ])
+        })
+
+        test('handles mixed scenario with partial and full capacity', () => {
+            const basket = {
+                bonusDiscountLineItems: [
+                    {id: 'bonus-1', promotionId: 'promo-123', maxBonusItems: 4},
+                    {id: 'bonus-2', promotionId: 'promo-123', maxBonusItems: 2},
+                    {id: 'bonus-3', promotionId: 'promo-123', maxBonusItems: 1}
+                ],
+                productItems: [
+                    {bonusProductLineItem: true, bonusDiscountLineItemId: 'bonus-1', quantity: 1},
+                    {bonusProductLineItem: true, bonusDiscountLineItemId: 'bonus-2', quantity: 2},
+                    // bonus-3 has no items yet
+                ]
+            }
+
+            const result = bonusProductUtils.findAvailableBonusDiscountLineItemIds(basket, 'promo-123')
+
+            expect(result).toEqual([
+                ['bonus-1', 3], // 4 max - 1 selected = 3 available
+                ['bonus-3', 1]  // 1 max - 0 selected = 1 available
+                // bonus-2 excluded because 2 max - 2 selected = 0 available
+            ])
         })
     })
 })
