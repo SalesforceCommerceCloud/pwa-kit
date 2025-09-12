@@ -17,7 +17,7 @@ import {fetchWithTokenRefresh} from '@salesforce/retail-react-app/app/components
  * @param {number} quantity - Quantity of the product (default: 1)
  * @returns {Promise<object>} - The temporary basket object
  */
-export const createTemporaryBasket = async (sku, authToken, refreshToken, site, quantity = 1, updateTokens = null) => {
+export const createTemporaryBasket = async (sku, authToken, refreshToken, site, quantity = 1, updateTokens = null, tokenProvider = null) => {
     if (!sku) {
         throw new Error('SKU is required to create temporary basket')
     }
@@ -63,7 +63,8 @@ export const createTemporaryBasket = async (sku, authToken, refreshToken, site, 
         authToken,
         updateTokens,
         refreshToken,
-        site
+        site,
+        tokenProvider
     )
 
     if (!response.ok) {
@@ -88,7 +89,7 @@ export const createTemporaryBasket = async (sku, authToken, refreshToken, site, 
  * @param {object} site - Site configuration object
  * @returns {Promise<boolean>} - True if deletion was successful, false otherwise
  */
-export const deleteTemporaryBasket = async (basketId, authToken, refreshToken, site, updateTokens = null) => {
+export const deleteTemporaryBasket = async (basketId, authToken, refreshToken, site, updateTokens = null, tokenProvider = null) => {
     if (!basketId) {
         return false
     }
@@ -123,7 +124,8 @@ export const deleteTemporaryBasket = async (basketId, authToken, refreshToken, s
             authToken,
             updateTokens,
             refreshToken,
-            site
+            site,
+            tokenProvider
         )
 
         // Return true if deletion was successful (200-299 status codes)
@@ -153,11 +155,12 @@ export const cleanupTemporaryBasket = async (
     refreshToken,
     site,
     setTempBasket,
-    updateTokens = null
+    updateTokens = null,
+    tokenProvider = null
 ) => {
     if (isPdpMode && sharedBasketRef?.basketId) {
         try {
-            await deleteTemporaryBasket(sharedBasketRef.basketId, authToken, refreshToken, site, updateTokens)
+            await deleteTemporaryBasket(sharedBasketRef.basketId, authToken, refreshToken, site, updateTokens, tokenProvider)
             if (setTempBasket) {
                 setTempBasket(null)
             }
@@ -187,7 +190,8 @@ export const createCleanupFunction = (
     refreshToken,
     site,
     setTempBasket,
-    updateTokens = null
+    updateTokens = null,
+    tokenProvider = null
 ) => {
-    return () => cleanupTemporaryBasket(isPdpMode, sharedBasketRef, authToken, refreshToken, site, setTempBasket, updateTokens)
+    return () => cleanupTemporaryBasket(isPdpMode, sharedBasketRef, authToken, refreshToken, site, setTempBasket, updateTokens, tokenProvider)
 }

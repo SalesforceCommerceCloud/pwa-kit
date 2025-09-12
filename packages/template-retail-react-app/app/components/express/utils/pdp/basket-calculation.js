@@ -49,7 +49,14 @@ const validateParamsAndGetConfig = (basketId, authToken, site) => {
  * @param {object} site - Site configuration object
  * @returns {Promise<object>} - The updated basket with calculated totals
  */
-export const calculateBasketTotals = async (basketId, authToken, refreshToken, site, updateTokens = null) => {
+export const calculateBasketTotals = async (
+    basketId,
+    authToken,
+    refreshToken,
+    site,
+    updateTokens = null,
+    tokenProvider = null
+) => {
     const organizationId = validateParamsAndGetConfig(basketId, authToken, site)
 
     // Use PATCH method to update/calculate the basket
@@ -70,7 +77,8 @@ export const calculateBasketTotals = async (basketId, authToken, refreshToken, s
         authToken,
         updateTokens,
         refreshToken,
-        site
+        site,
+        tokenProvider
     )
 
     if (!response.ok) {
@@ -91,7 +99,14 @@ export const calculateBasketTotals = async (basketId, authToken, refreshToken, s
  * @param {object} site - Site configuration object
  * @returns {Promise<object>} - The basket with current totals
  */
-export const getBasketWithTotals = async (basketId, authToken, refreshToken, site, updateTokens = null) => {
+export const getBasketWithTotals = async (
+    basketId,
+    authToken,
+    refreshToken,
+    site,
+    updateTokens = null,
+    tokenProvider = null
+) => {
     const organizationId = validateParamsAndGetConfig(basketId, authToken, site)
 
     // GET the basket to retrieve current calculated totals
@@ -108,7 +123,8 @@ export const getBasketWithTotals = async (basketId, authToken, refreshToken, sit
         authToken,
         updateTokens,
         refreshToken,
-        site
+        site,
+        tokenProvider
     )
 
     if (!response.ok) {
@@ -130,9 +146,23 @@ export const getBasketWithTotals = async (basketId, authToken, refreshToken, sit
  * @param {object} site - Site configuration object
  * @returns {Promise<object>} - The finalized basket with orderTotal
  */
-export const forceOrderCalculation = async (basketId, authToken, refreshToken, site, updateTokens = null) => {
+export const forceOrderCalculation = async (
+    basketId,
+    authToken,
+    refreshToken,
+    site,
+    updateTokens = null,
+    tokenProvider = null
+) => {
     // First, get the current basket state
-    const currentBasket = await getBasketWithTotals(basketId, authToken, refreshToken, site, updateTokens)
+    const currentBasket = await getBasketWithTotals(
+        basketId,
+        authToken,
+        refreshToken,
+        site,
+        updateTokens,
+        tokenProvider
+    )
 
     // If orderTotal is already calculated, return as-is
     if (currentBasket.orderTotal !== null && currentBasket.orderTotal !== undefined) {
@@ -150,7 +180,14 @@ export const forceOrderCalculation = async (basketId, authToken, refreshToken, s
     }
 
     // Force a final calculation regardless of shipping method success
-    const finalBasket = await calculateBasketTotals(basketId, authToken, refreshToken, site, updateTokens)
+    const finalBasket = await calculateBasketTotals(
+        basketId,
+        authToken,
+        refreshToken,
+        site,
+        updateTokens,
+        tokenProvider
+    )
 
     // If still no orderTotal, the basket calculation failed - don't proceed with Apple Pay
     if (finalBasket.orderTotal === null || finalBasket.orderTotal === undefined) {

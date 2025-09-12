@@ -17,6 +17,9 @@ export const useExpressPaymentSetup = ({
     isPdpMode = false,
     basket,
     authToken,
+    refreshToken,
+    tokenProvider,
+    updateTokens,
     locale: providedLocale,
     site: providedSite
 }) => {
@@ -37,7 +40,7 @@ export const useExpressPaymentSetup = ({
         if (sku !== currentSku) {
             // Clean up previous temporary basket if switching SKUs
             if (currentSku && tempBasket?.basketId && authToken && site) {
-                deleteTemporaryBasket(tempBasket.basketId, authToken, site).catch((error) =>
+                deleteTemporaryBasket(tempBasket.basketId, authToken, refreshToken, site, updateTokens, tokenProvider).catch((error) =>
                     console.warn('Failed to cleanup previous temporary basket:', error)
                 )
                 setTempBasket(null)
@@ -51,7 +54,7 @@ export const useExpressPaymentSetup = ({
         return () => {
             // Clean up temporary basket when component unmounts (user navigates away)
             if (isPdpMode && currentSku && tempBasket?.basketId && authToken && site) {
-                deleteTemporaryBasket(tempBasket.basketId, authToken, site).catch((error) =>
+                deleteTemporaryBasket(tempBasket.basketId, authToken, refreshToken, site, updateTokens, tokenProvider).catch((error) =>
                     console.warn('Failed to cleanup temporary basket on unmount:', error)
                 )
             }

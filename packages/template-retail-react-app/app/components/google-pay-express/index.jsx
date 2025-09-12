@@ -75,9 +75,9 @@ export const getCustomerBillingDetails = (inputAddress) => {
     }
 }
 
-export const updateShippingAddress = async (authToken, refreshToken, site, basket, shippingAddress, updateTokens = null) => {
+export const updateShippingAddress = async (tokenProvider, basket, shippingAddress) => {
     try {
-        const adyenShippingAddressService = new AdyenShippingAddressService(authToken, refreshToken, site, updateTokens)
+        const adyenShippingAddressService = new AdyenShippingAddressService(tokenProvider)
         const response = await adyenShippingAddressService.updateShippingAddress(
             basket.basketId,
             getCustomerShippingDetails(shippingAddress, basket?.customerInfo?.email)
@@ -93,7 +93,7 @@ export const updateShippingAddress = async (authToken, refreshToken, site, baske
             }
         }
 
-        const adyenShippingMethodsService = new AdyenShippingMethodsService(authToken, refreshToken, site, updateTokens)
+        const adyenShippingMethodsService = new AdyenShippingMethodsService(tokenProvider)
         const shippingMethodResponse = await adyenShippingMethodsService.getShippingMethods(
             basket.basketId
         )
@@ -109,9 +109,7 @@ export const updateShippingAddress = async (authToken, refreshToken, site, baske
             shippingMethodResponse.defaultShippingMethodId = shippingOptionId
         }
         return updateShippingOption(
-            authToken,
-            refreshToken,
-            site,
+            tokenProvider,
             basket,
             shippingOptionId,
             shippingMethodResponse
@@ -128,16 +126,13 @@ export const updateShippingAddress = async (authToken, refreshToken, site, baske
 }
 
 export const updateShippingOption = async (
-    authToken,
-    refreshToken,
-    site,
+    tokenProvider,
     basket,
     shippingOptionId,
-    shippingMethodResponse = null,
-    updateTokens = null
+    shippingMethodResponse = null
 ) => {
     try {
-        const adyenShippingMethodsService = new AdyenShippingMethodsService(authToken, refreshToken, site, updateTokens)
+        const adyenShippingMethodsService = new AdyenShippingMethodsService(tokenProvider)
         const response = await adyenShippingMethodsService.updateShippingMethod(
             shippingOptionId,
             basket.basketId
@@ -185,17 +180,18 @@ export const updateShippingOption = async (
 }
 
 export const getGoogleButtonConfig = (
-    authToken,
-    refreshToken,
-    updateTokens,
-    site,
+    tokenProvider,
     basket,
     googlePayConfig,
     sku = null,
     setTempBasket = null,
     tempBasket = null,
     isPdpMode = false,
-    quantity = 1
+    quantity = 1,
+    authToken = null,
+    refreshToken = null,
+    site = null,
+    updateTokens = null
 ) => {
     // Single basket reference that gets updated as needed
     // Initialize basketRef with the actual basket value, not null
@@ -212,7 +208,17 @@ export const getGoogleButtonConfig = (
         // For PDP flows, create temporary basket if needed (and SKU is available)
         if (isPdpMode && sku && typeof sku === 'string' && setTempBasket) {
             try {
-                const newBasket = await createTemporaryBasket(sku, authToken, refreshToken, site, quantity, updateTokens)
+                const currentAuthToken = tokenProvider?.getCurrentAuthToken() || authToken
+                const currentRefreshToken = tokenProvider?.getCurrentRefreshToken() || refreshToken
+                const newBasket = await createTemporaryBasket(
+                    sku, 
+                    currentAuthToken, 
+                    currentRefreshToken, 
+                    site, 
+                    quantity, 
+                    updateTokens,
+                    tokenProvider
+                )
                 basketRef = newBasket // Update basket reference immediately
                 setTempBasket(newBasket) // Update React state for re-renders
                 return newBasket
@@ -271,11 +277,12 @@ export const getGoogleButtonConfig = (
                     await cleanupTemporaryBasket(
                         isPdpMode,
                         basketRef,
-                        authToken,
-                        refreshToken,
+                        tokenProvider?.getCurrentAuthToken() || authToken,
+                        tokenProvider?.getCurrentRefreshToken() || refreshToken,
                         site,
                         setTempBasket,
-                        updateTokens
+                        updateTokens,
+                        tokenProvider
                     )
                     sendExpressMessage(EXPRESS_MESSAGES.PAYMENT_FAILURE, {
                         PAYMENT_METHOD
@@ -292,11 +299,12 @@ export const getGoogleButtonConfig = (
                     await cleanupTemporaryBasket(
                         isPdpMode,
                         basketRef,
-                        authToken,
-                        refreshToken,
+                        tokenProvider?.getCurrentAuthToken() || authToken,
+                        tokenProvider?.getCurrentRefreshToken() || refreshToken,
                         site,
                         setTempBasket,
-                        updateTokens
+                        updateTokens,
+                        tokenProvider
                     )
                     sendExpressMessage(EXPRESS_MESSAGES.PAYMENT_FAILURE, {
                         PAYMENT_METHOD
@@ -309,7 +317,7 @@ export const getGoogleButtonConfig = (
                     origin: state.data.origin ? state.data.origin : window.location.origin
                 }
 
-                const adyenPaymentService = new AdyenPaymentsService(authToken, refreshToken, site, updateTokens)
+                const adyenPaymentService = new AdyenPaymentsService(tokenProvider)
                 const paymentsResponse = await adyenPaymentService.submitPayment(
                     paymentData,
                     basketToUse?.basketId,
@@ -327,11 +335,12 @@ export const getGoogleButtonConfig = (
                     await cleanupTemporaryBasket(
                         isPdpMode,
                         basketRef,
-                        authToken,
-                        refreshToken,
+                        tokenProvider?.getCurrentAuthToken() || authToken,
+                        tokenProvider?.getCurrentRefreshToken() || refreshToken,
                         site,
                         setTempBasket,
-                        updateTokens
+                        updateTokens,
+                        tokenProvider
                     )
                     sendExpressMessage(EXPRESS_MESSAGES.PAYMENT_FAILURE, {
                         PAYMENT_METHOD
@@ -339,7 +348,16 @@ export const getGoogleButtonConfig = (
                 }
             } catch (err) {
                 // Clean up temporary basket on any unexpected error
-                await cleanupTemporaryBasket(isPdpMode, basketRef, authToken, site, setTempBasket)
+                await cleanupTemporaryBasket(
+                    isPdpMode, 
+                    basketRef, 
+                    tokenProvider?.getCurrentAuthToken() || authToken, 
+                    tokenProvider?.getCurrentRefreshToken() || refreshToken, 
+                    site, 
+                    setTempBasket, 
+                    updateTokens,
+                    tokenProvider
+                )
                 sendExpressMessage(EXPRESS_MESSAGES.PAYMENT_FAILURE, {
                     PAYMENT_METHOD
                 })
@@ -377,12 +395,9 @@ export const getGoogleButtonConfig = (
                             }
 
                             const updateShippingAddressResponse = await updateShippingAddress(
-                                authToken,
-                                refreshToken,
-                                site,
+                                tokenProvider,
                                 basketToUse,
-                                shippingAddress,
-                                updateTokens
+                                shippingAddress
                             )
 
                             paymentDataRequestUpdate =
@@ -414,13 +429,10 @@ export const getGoogleButtonConfig = (
                             }
 
                             const updateShippingOptionResponse = await updateShippingOption(
-                                authToken,
-                                refreshToken,
-                                site,
+                                tokenProvider,
                                 basketToUse,
                                 shippingOptionData?.id,
-                                null,
-                                updateTokens
+                                null
                             )
 
                             paymentDataRequestUpdate =
@@ -444,12 +456,30 @@ export const getGoogleButtonConfig = (
         onError: (error) => {
             // Clean up temporary basket when Google Pay is cancelled or fails
             if (error.name === 'CANCEL') {
-                cleanupTemporaryBasket(isPdpMode, basketRef, authToken, refreshToken, site, setTempBasket, updateTokens)
+                cleanupTemporaryBasket(
+                    isPdpMode, 
+                    basketRef, 
+                    tokenProvider?.getCurrentAuthToken() || authToken, 
+                    tokenProvider?.getCurrentRefreshToken() || refreshToken, 
+                    site, 
+                    setTempBasket, 
+                    updateTokens,
+                    tokenProvider
+                )
                 sendExpressMessage(EXPRESS_MESSAGES.PAYMENT_CANCEL, {
                     PAYMENT_METHOD
                 })
             } else {
-                cleanupTemporaryBasket(isPdpMode, basketRef, authToken, refreshToken, site, setTempBasket, updateTokens)
+                cleanupTemporaryBasket(
+                    isPdpMode, 
+                    basketRef, 
+                    tokenProvider?.getCurrentAuthToken() || authToken, 
+                    tokenProvider?.getCurrentRefreshToken() || refreshToken, 
+                    site, 
+                    setTempBasket, 
+                    updateTokens,
+                    tokenProvider
+                )
                 sendExpressMessage(EXPRESS_MESSAGES.PAYMENT_FAILURE, {
                     PAYMENT_METHOD
                 })
@@ -465,6 +495,7 @@ export const GooglePayExpress = ({
     authToken,
     refreshToken,
     updateTokens,
+    tokenProvider,
     locale: providedLocale,
     site: providedSite,
     basket,
@@ -492,6 +523,9 @@ export const GooglePayExpress = ({
         isPdpMode,
         basket,
         authToken,
+        refreshToken,
+        tokenProvider,
+        updateTokens,
         locale: providedLocale,
         site: providedSite
     })
@@ -501,7 +535,14 @@ export const GooglePayExpress = ({
         return () => {
             // Clean up temporary basket when component unmounts (user navigates away)
             if (isPdpMode && currentSku && tempBasket?.basketId && authToken && finalSite) {
-                deleteTemporaryBasket(tempBasket.basketId, authToken, refreshToken, finalSite, updateTokens).catch(() => {})
+                deleteTemporaryBasket(
+                    tempBasket.basketId, 
+                    tokenProvider?.getCurrentAuthToken() || authToken, 
+                    tokenProvider?.getCurrentRefreshToken() || refreshToken, 
+                    finalSite, 
+                    updateTokens,
+                    tokenProvider
+                ).catch(() => {})
             }
         }
     }, [tempBasket?.basketId, authToken, refreshToken, finalSite?.id, currentSku, isPdpMode])
@@ -568,17 +609,18 @@ export const GooglePayExpress = ({
                     }
 
                     const googleButtonConfig = getGoogleButtonConfig(
-                        authToken,
-                        refreshToken,
-                        updateTokens,
-                        finalSite,
+                        tokenProvider,
                         basket,
                         googlePaymentMethodConfig,
                         currentSku,
                         setTempBasket,
                         tempBasket,
                         isPdpMode,
-                        quantity
+                        quantity,
+                        authToken,
+                        refreshToken,
+                        finalSite,
+                        updateTokens
                     )
 
                     // Mark button creation start
@@ -661,6 +703,7 @@ GooglePayExpress.propTypes = {
     authToken: PropTypes.string,
     refreshToken: PropTypes.string,
     updateTokens: PropTypes.func,
+    tokenProvider: PropTypes.object,
     locale: PropTypes.object,
     site: PropTypes.object,
     basket: PropTypes.object,

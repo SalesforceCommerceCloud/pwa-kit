@@ -115,14 +115,13 @@ const cleanupExpiredCache = () => {
 
 /**
  * Hook for fetching payment methods without basket dependency (for "Buy Now" flows)
- * @param {string} authToken - Authentication token
- * @param {string} refreshToken - Refresh token for token renewal
+ * @param {object} tokenProvider - Shared TokenProvider instance
  * @param {object} site - Site configuration
  * @param {object} locale - Locale configuration
  * @param {boolean} enabled - Whether the hook should make API calls (default: true)
  * @returns {object} Payment methods data, loading state, and error
  */
-export const useStandalonePaymentMethods = (authToken, refreshToken, site, locale, enabled = true, onTokenUpdate = null) => {
+export const useStandalonePaymentMethods = (tokenProvider, site, locale, enabled = true) => {
     const [paymentMethods, setPaymentMethods] = useState(null)
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState(null)
@@ -132,7 +131,13 @@ export const useStandalonePaymentMethods = (authToken, refreshToken, site, local
         cleanupExpiredCache()
         
         // Only make API call if enabled and required parameters are available
-        if (!enabled || !authToken || !site) {
+        if (!enabled || !tokenProvider || !site) {
+            console.log('🔍 use-standalone-payment-methods: Skipping API call:', {
+                enabled,
+                hasTokenProvider: !!tokenProvider,
+                hasSite: !!site,
+                tokenProviderId: tokenProvider?.providerId
+            })
             return
         }
 
@@ -169,7 +174,15 @@ export const useStandalonePaymentMethods = (authToken, refreshToken, site, local
                 setLoading(true)
                 setError(null)
 
-                const service = new AdyenPaymentMethodsService(authToken, refreshToken, site, onTokenUpdate)
+                // Use the shared TokenProvider passed from Express component
+                console.log('🔄 use-standalone-payment-methods: Using shared TokenProvider:', {
+                    providerId: tokenProvider.providerId,
+                    updateCount: tokenProvider.updateCount,
+                    accessCount: tokenProvider.accessCount,
+                    siteId: site?.id
+                })
+                
+                const service = new AdyenPaymentMethodsService(tokenProvider)
                 const data = await service.getPaymentMethods()
 
                 // Mark the successful completion of the API call
@@ -222,7 +235,7 @@ export const useStandalonePaymentMethods = (authToken, refreshToken, site, local
         }
 
         fetchPaymentMethods()
-    }, [authToken, refreshToken, site, locale, enabled])
+    }, [tokenProvider, site, locale, enabled])
 
     return {
         paymentMethods,

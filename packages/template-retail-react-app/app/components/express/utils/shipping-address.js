@@ -10,8 +10,8 @@ export class AdyenShippingAddressService {
     baseUrl = '/api/adyen/shipping-address'
     apiClient = null
 
-    constructor(token, refreshToken, site, onTokenUpdate = null) {
-        this.apiClient = new ApiClient(this.baseUrl, token, refreshToken, site, onTokenUpdate)
+    constructor(tokenProvider) {
+        this.apiClient = new ApiClient(this.baseUrl, tokenProvider)
     }
 
     async updateShippingAddress(basketId, data) {

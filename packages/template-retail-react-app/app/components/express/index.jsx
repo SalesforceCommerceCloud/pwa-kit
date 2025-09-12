@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React, {useEffect, useState} from 'react'
+import React, {useEffect, useState, useRef} from 'react'
 import {useLocation} from 'react-router-dom'
 
 import {ApplePayExpress} from '@salesforce/retail-react-app/app/components/apple-pay-express/index'
@@ -12,6 +12,7 @@ import {GooglePayExpress} from '@salesforce/retail-react-app/app/components/goog
 import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
 import {useExpressPaymentManager} from '@salesforce/retail-react-app/app/components/express/hooks/use-express-payment-manager'
 import {useStandalonePaymentMethods} from '@salesforce/retail-react-app/app/components/express/hooks/use-standalone-payment-methods'
+import {TokenProvider} from '@salesforce/retail-react-app/app/components/express/utils/token-provider'
 import '@salesforce/retail-react-app/app/components/express/styles/express-payments.css'
 
 // Define the payment methods we will attempt to load
@@ -37,19 +38,100 @@ function Express() {
     const [authToken, setAuthToken] = useState()
     const [refreshToken, setRefreshToken] = useState()
 
+    // Create a TokenProvider that will be shared across all services
+    const tokenProviderRef = useRef(null)
+    const [tokenProviderReady, setTokenProviderReady] = useState(false)
+
+    // Initialize or update the TokenProvider when tokens change
+    useEffect(() => {
+        console.log('🔍 Express: TokenProvider effect triggered:', {
+            hasAuthToken: !!authToken,
+            hasRefreshToken: !!refreshToken,
+            hasSite: !!site,
+            authTokenStart: authToken?.substring(0, 10) + '...',
+            refreshTokenStart: refreshToken?.substring(0, 10) + '...',
+            siteId: site?.id,
+            hasExistingProvider: !!tokenProviderRef.current,
+            existingProviderId: tokenProviderRef.current?.providerId
+        })
+
+        if (authToken && refreshToken && site) {
+            if (!tokenProviderRef.current) {
+                // Create new TokenProvider
+                console.log('🏭 Express: Creating new TokenProvider:', {
+                    authTokenStart: authToken?.substring(0, 10) + '...',
+                    refreshTokenStart: refreshToken?.substring(0, 10) + '...',
+                    siteId: site?.id
+                })
+                tokenProviderRef.current = new TokenProvider(
+                    authToken,
+                    refreshToken,
+                    site,
+                    updateTokens
+                )
+                console.log('✅ Express: TokenProvider created:', {
+                    providerId: tokenProviderRef.current.providerId
+                })
+                setTokenProviderReady(true)
+            } else {
+                // Update existing TokenProvider
+                console.log('🔄 Express: Updating existing TokenProvider:', {
+                    existingProviderId: tokenProviderRef.current.providerId,
+                    existingUpdateCount: tokenProviderRef.current.updateCount,
+                    newAuthTokenStart: authToken?.substring(0, 10) + '...',
+                    newRefreshTokenStart: refreshToken?.substring(0, 10) + '...',
+                    authTokenChanged: authToken !== tokenProviderRef.current.authToken,
+                    refreshTokenChanged: refreshToken !== tokenProviderRef.current.refreshToken
+                })
+                tokenProviderRef.current.updateTokens(authToken, refreshToken)
+                console.log('✅ Express: TokenProvider updated:', {
+                    providerId: tokenProviderRef.current.providerId,
+                    newUpdateCount: tokenProviderRef.current.updateCount
+                })
+                // TokenProvider is already ready, no need to set state again
+            }
+        } else {
+            console.warn('⚠️ Express: Missing required data for TokenProvider:', {
+                hasAuthToken: !!authToken,
+                hasRefreshToken: !!refreshToken,
+                hasSite: !!site
+            })
+            if (tokenProviderReady) {
+                console.log('🔄 Express: Resetting TokenProvider ready state')
+                setTokenProviderReady(false)
+            }
+        }
+    }, [authToken, refreshToken, site?.id])
+
     // Token update callback for child components
     const updateTokens = (newAuthToken, newRefreshToken) => {
+        const updateId = Math.random().toString(36).substring(2, 8)
+
         console.log('🔄 Express: Updating tokens via callback:', {
             hasNewAuthToken: !!newAuthToken,
             hasNewRefreshToken: !!newRefreshToken,
             newAuthTokenLength: newAuthToken?.length || 0,
             newRefreshTokenLength: newRefreshToken?.length || 0,
             oldAuthTokenLength: authToken?.length || 0,
-            oldRefreshTokenLength: refreshToken?.length || 0
+            oldRefreshTokenLength: refreshToken?.length || 0,
+            newAuthTokenStart: newAuthToken?.substring(0, 10) + '...',
+            newRefreshTokenStart: newRefreshToken?.substring(0, 10) + '...',
+            oldAuthTokenStart: authToken?.substring(0, 10) + '...',
+            oldRefreshTokenStart: refreshToken?.substring(0, 10) + '...',
+            authTokenChanged: newAuthToken !== authToken,
+            refreshTokenChanged: newRefreshToken !== refreshToken,
+            updateId,
+            timestamp: new Date().toISOString()
         })
+
         setAuthToken(newAuthToken)
         setRefreshToken(newRefreshToken)
-        console.log('✅ Express: Tokens updated successfully')
+
+        console.log('✅ Express: Tokens updated successfully:', {
+            updateId,
+            newAuthTokenSet: !!newAuthToken,
+            newRefreshTokenSet: !!newRefreshToken
+        })
     }
 
     // Check for PDP mode flag in URL
@@ -66,12 +148,10 @@ function Express() {
     // Fetch payment methods and environment data directly
     // Only call this hook when we have all required parameters to prevent hook ordering issues
     const {paymentMethods: adyenPaymentMethods} = useStandalonePaymentMethods(
-        authToken || null, // Ensure we always pass a consistent value
-        refreshToken || null, // Ensure we always pass a consistent value
+        tokenProviderRef.current, // Pass the shared TokenProvider
         site || null, // Ensure we always pass a consistent value
         locale || null, // Ensure we always pass a consistent value
-        !!(authToken && site && locale), // Only enable when all params are available
-        updateTokens // Pass token update callback
+        !!(tokenProviderReady && tokenProviderRef.current && site && locale) // Only enable when TokenProvider is ready
     )
 
     // Mark when payment methods are being fetched
@@ -135,7 +215,15 @@ function Express() {
                         hasAuthData: !!authData,
                         hasAuthToken: !!authData?.authToken,
                         hasRefreshToken: !!authData?.refreshToken,
-                        authTokenLength: authData?.authToken?.length || 0
+                        authTokenLength: authData?.authToken?.length || 0,
+                        refreshTokenLength: authData?.refreshToken?.length || 0,
+                        authTokenStart: authData?.authToken?.substring(0, 10) + '...',
+                        refreshTokenStart: authData?.refreshToken?.substring(0, 10) + '...',
+                        currentAuthTokenStart: authToken?.substring(0, 10) + '...',
+                        currentRefreshTokenStart: refreshToken?.substring(0, 10) + '...',
+                        authTokenChanging: authData?.authToken !== authToken,
+                        refreshTokenChanging: authData?.refreshToken !== refreshToken,
+                        timestamp: new Date().toISOString()
                     })
                     setAuthToken(authData.authToken)
                     setRefreshToken(authData.refreshToken)
@@ -145,12 +233,101 @@ function Express() {
                 // Handle authentication data messages
                 if (type === 'authDataAvailable') {
                     const authData = event.data.data.authData
-                    console.log('🔐 Express: Received auth data:', {
+
+                    // Enhanced token reception diagnostics
+                    console.log('🔐 Express: Received auth data with enhanced analysis:', {
                         hasAuthToken: !!authData?.authToken,
                         hasRefreshToken: !!authData?.refreshToken,
                         authTokenLength: authData?.authToken?.length || 0,
-                        refreshTokenLength: authData?.refreshToken?.length || 0
+                        refreshTokenLength: authData?.refreshToken?.length || 0,
+                        authTokenStart: authData?.authToken?.substring(0, 10) + '...',
+                        refreshTokenStart: authData?.refreshToken?.substring(0, 10) + '...',
+                        refreshTokenEnd: authData?.refreshToken?.substring(-10) + '...',
+                        currentAuthTokenStart: authToken?.substring(0, 10) + '...',
+                        currentRefreshTokenStart: refreshToken?.substring(0, 10) + '...',
+                        authTokenChanging: authData?.authToken !== authToken,
+                        refreshTokenChanging: authData?.refreshToken !== refreshToken,
+                        timestamp: new Date().toISOString(),
+                        timestampMs: Date.now()
                     })
+
+                    // Analyze refresh token for potential issues
+                    if (authData?.refreshToken) {
+                        const refreshToken = authData.refreshToken
+                        const tokenIssues = []
+
+                        if (refreshToken !== refreshToken.trim()) tokenIssues.push('HAS_WHITESPACE')
+                        if (/\s/.test(refreshToken)) tokenIssues.push('CONTAINS_SPACES')
+                        if (refreshToken.includes('\n')) tokenIssues.push('CONTAINS_NEWLINES')
+                        if (refreshToken.startsWith('"') || refreshToken.endsWith('"'))
+                            tokenIssues.push('QUOTED')
+                        if (refreshToken.includes('undefined'))
+                            tokenIssues.push('CONTAINS_UNDEFINED')
+                        if (refreshToken.length < 10) tokenIssues.push('TOO_SHORT')
+                        if (refreshToken.length > 2000) tokenIssues.push('TOO_LONG')
+
+                        if (tokenIssues.length > 0) {
+                            console.warn(
+                                '⚠️ Express: Refresh token issues detected on reception:',
+                                {
+                                    issues: tokenIssues,
+                                    tokenSample:
+                                        refreshToken.substring(0, 20) +
+                                        '...' +
+                                        refreshToken.substring(-10),
+                                    tokenBytes: new TextEncoder().encode(refreshToken).length
+                                }
+                            )
+                        }
+
+                        // Try to decode if JWT-like
+                        if (refreshToken.includes('.')) {
+                            try {
+                                const parts = refreshToken.split('.')
+                                if (parts.length >= 2) {
+                                    const payload = JSON.parse(
+                                        atob(parts[1].replace(/-/g, '+').replace(/_/g, '/'))
+                                    )
+                                    const now = Math.floor(Date.now() / 1000)
+
+                                    console.log('🔍 Express: Received refresh token analysis:', {
+                                        exp: payload.exp,
+                                        iat: payload.iat,
+                                        currentTime: now,
+                                        isExpired: payload.exp ? payload.exp < now : 'UNKNOWN',
+                                        expiresInSeconds: payload.exp
+                                            ? payload.exp - now
+                                            : 'UNKNOWN',
+                                        expiresInHours: payload.exp
+                                            ? ((payload.exp - now) / 3600).toFixed(2)
+                                            : 'UNKNOWN',
+                                        ageInHours: payload.iat
+                                            ? ((now - payload.iat) / 3600).toFixed(2)
+                                            : 'UNKNOWN',
+                                        tokenSource: 'parent_page'
+                                    })
+
+                                    if (payload.exp && payload.exp < now) {
+                                        console.error(
+                                            '❌ Express: RECEIVED EXPIRED REFRESH TOKEN FROM PARENT!',
+                                            {
+                                                expiredSinceSeconds: now - payload.exp,
+                                                expiredSinceHours: (
+                                                    (now - payload.exp) /
+                                                    3600
+                                                ).toFixed(2)
+                                            }
+                                        )
+                                    }
+                                }
+                            } catch (e) {
+                                console.log(
+                                    '🔍 Express: Could not decode received refresh token as JWT'
+                                )
+                            }
+                        }
+                    }
+
                     setAuthToken(authData.authToken)
                     setRefreshToken(authData.refreshToken)
                 }
@@ -194,6 +371,7 @@ function Express() {
         authToken,
         refreshToken,
         updateTokens,
+        tokenProvider: tokenProviderRef.current,
         locale,
         site,
         basket,
@@ -202,6 +380,38 @@ function Express() {
         isPdpMode,
         manager
     }
+
+    // Log context preparation
+    useEffect(() => {
+        console.log('📦 Express: Payment context prepared:', {
+            hasAdyenPaymentMethods: !!adyenPaymentMethods,
+            hasAuthToken: !!authToken,
+            hasRefreshToken: !!refreshToken,
+            hasTokenProvider: !!tokenProviderRef.current,
+            tokenProviderId: tokenProviderRef.current?.providerId,
+            tokenProviderUpdateCount: tokenProviderRef.current?.updateCount,
+            tokenProviderReady,
+            hasUpdateCallback: !!updateTokens,
+            hasSite: !!site,
+            hasBasket: !!basket,
+            currentSku,
+            isPdpMode,
+            authTokenStart: authToken?.substring(0, 10) + '...',
+            refreshTokenStart: refreshToken?.substring(0, 10) + '...',
+            hookEnabled: !!(tokenProviderReady && tokenProviderRef.current && site && locale)
+        })
+    }, [
+        adyenPaymentMethods,
+        authToken,
+        refreshToken,
+        tokenProviderRef.current,
+        tokenProviderReady,
+        site,
+        basket,
+        currentSku,
+        isPdpMode,
+        locale
+    ])
 
     return (
         <div className="express-payment-container">

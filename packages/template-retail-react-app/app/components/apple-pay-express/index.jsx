@@ -77,6 +77,7 @@ export const getCustomerBillingDetails = (billingContact) => {
 }
 
 export const getAppleButtonConfig = (
+    tokenProvider,
     authToken,
     refreshToken,
     updateTokens,
@@ -97,20 +98,56 @@ export const getAppleButtonConfig = (
 
     // Helper function to get or create basket (prevents multiple creation)
     const getOrCreateBasket = async () => {
+        console.log('🛒 Apple Pay: getOrCreateBasket called:', {
+            hasBasketRef: !!basketRef,
+            basketId: basketRef?.basketId,
+            isPdpMode,
+            hasSku: !!sku,
+            sku,
+            hasSetTempBasket: !!setTempBasket,
+            hasAuthToken: !!authToken,
+            hasRefreshToken: !!refreshToken,
+            hasSite: !!site,
+            siteId: site?.id,
+            quantity
+        })
+
         // If we already have a basket reference, return it
         if (basketRef && basketRef.basketId) {
+            console.log('✅ Apple Pay: Using existing basket:', basketRef.basketId)
             return basketRef
         }
 
         // For PDP flows, create temporary basket if needed (and SKU is available)
         if (isPdpMode && sku && setTempBasket) {
-            const newBasket = await createTemporaryBasket(sku, authToken, refreshToken, site, quantity, updateTokens)
-            basketRef = newBasket // Update basket reference immediately
-            setTempBasket(newBasket) // Update React state for re-renders
-            return newBasket
+            try {
+                console.log('🏭 Apple Pay: Creating temporary basket...')
+                const currentAuthToken = tokenProvider?.getCurrentAuthToken() || authToken
+                const currentRefreshToken = tokenProvider?.getCurrentRefreshToken() || refreshToken
+                const newBasket = await createTemporaryBasket(
+                    sku,
+                    currentAuthToken,
+                    currentRefreshToken,
+                    site,
+                    quantity,
+                    updateTokens,
+                    tokenProvider
+                )
+                basketRef = newBasket // Update basket reference immediately
+                setTempBasket(newBasket) // Update React state for re-renders
+                console.log('✅ Apple Pay: Temporary basket created:', {
+                    basketId: newBasket?.basketId,
+                    orderTotal: newBasket?.orderTotal,
+                    currency: newBasket?.currency
+                })
+                return newBasket
+            } catch (error) {
+                console.error('❌ Apple Pay: Failed to create temporary basket:', error)
+                return null
+            }
         }
 
-        // Return null if no basket can be created/found
+        console.log('⚠️ Apple Pay: No basket could be created/found')
         return null
     }
 
@@ -162,11 +199,12 @@ export const getAppleButtonConfig = (
                     await cleanupTemporaryBasket(
                         isPdpMode,
                         basketRef,
-                        authToken,
-                        refreshToken,
+                        tokenProvider?.getCurrentAuthToken() || authToken,
+                        tokenProvider?.getCurrentRefreshToken() || refreshToken,
                         site,
                         setTempBasket,
-                        updateTokens
+                        updateTokens,
+                        tokenProvider
                     )
                     reject()
                 }
@@ -197,11 +235,12 @@ export const getAppleButtonConfig = (
                     await cleanupTemporaryBasket(
                         isPdpMode,
                         basketRef,
-                        authToken,
-                        refreshToken,
+                        tokenProvider?.getCurrentAuthToken() || authToken,
+                        tokenProvider?.getCurrentRefreshToken() || refreshToken,
                         site,
                         setTempBasket,
-                        updateTokens
+                        updateTokens,
+                        tokenProvider
                     )
                     reject()
                     sendExpressMessage(EXPRESS_MESSAGES.PAYMENT_FAILURE, {
@@ -220,7 +259,8 @@ export const getAppleButtonConfig = (
                         authToken,
                         refreshToken,
                         site,
-                        updateTokens
+                        updateTokens,
+                        tokenProvider
                     )
                     basketToUse = finalizedBasket
                     basketRef = finalizedBasket // Update basket reference
@@ -233,9 +273,12 @@ export const getAppleButtonConfig = (
                         await cleanupTemporaryBasket(
                             isPdpMode,
                             basketRef,
-                            authToken,
+                            tokenProvider?.getCurrentAuthToken() || authToken,
+                            tokenProvider?.getCurrentRefreshToken() || refreshToken,
                             site,
-                            setTempBasket
+                            setTempBasket,
+                            updateTokens,
+                            tokenProvider
                         )
                         reject()
                         sendExpressMessage(EXPRESS_MESSAGES.PAYMENT_FAILURE, {
@@ -266,7 +309,7 @@ export const getAppleButtonConfig = (
                     origin: state.data.origin ? state.data.origin : window.location.origin
                 }
 
-                const adyenPaymentService = new AdyenPaymentsService(authToken, refreshToken, site, updateTokens)
+                const adyenPaymentService = new AdyenPaymentsService(tokenProvider)
                 const paymentsResponse = await adyenPaymentService.submitPayment(
                     paymentData,
                     basketToUse?.basketId,
@@ -326,8 +369,8 @@ export const getAppleButtonConfig = (
                     return
                 }
 
-                const adyenShippingAddressService = new AdyenShippingAddressService(authToken, refreshToken, site, updateTokens)
-                const adyenShippingMethodsService = new AdyenShippingMethodsService(authToken, refreshToken, site, updateTokens)
+                const adyenShippingAddressService = new AdyenShippingAddressService(tokenProvider)
+                const adyenShippingMethodsService = new AdyenShippingMethodsService(tokenProvider)
                 const customerShippingDetails = getCustomerShippingDetails(shippingContact)
                 await adyenShippingAddressService.updateShippingAddress(
                     basketToUse.basketId,
@@ -388,7 +431,8 @@ export const getAppleButtonConfig = (
                                 authToken,
                                 refreshToken,
                                 site,
-                                updateTokens
+                                updateTokens,
+                                tokenProvider
                             )
                             finalResponse = calculatedBasket
                         }
@@ -409,14 +453,13 @@ export const getAppleButtonConfig = (
                     const formattedAmount = parseFloat(applePayAmount).toFixed(2)
 
                     const finalPriceUpdate = {
-                        newShippingMethods: newShippingMethods?.applicableShippingMethods?.map(
-                            (sm) => ({
+                        newShippingMethods:
+                            newShippingMethods?.applicableShippingMethods?.map((sm) => ({
                                 label: sm.name,
                                 detail: sm.description,
                                 identifier: sm.id,
                                 amount: parseFloat(sm.price).toFixed(2)
-                            })
-                        ),
+                            })) || [],
                         newTotal: {
                             type: 'final',
                             label: applePayConfig.merchantName || 'Total',
@@ -440,7 +483,7 @@ export const getAppleButtonConfig = (
                     return
                 }
 
-                const adyenShippingMethodsService = new AdyenShippingMethodsService(authToken, refreshToken, site)
+                const adyenShippingMethodsService = new AdyenShippingMethodsService(tokenProvider)
                 const response = await adyenShippingMethodsService.updateShippingMethod(
                     shippingMethod.identifier,
                     basketToUse.basketId
@@ -457,7 +500,8 @@ export const getAppleButtonConfig = (
                                 authToken,
                                 refreshToken,
                                 site,
-                                updateTokens
+                                updateTokens,
+                                tokenProvider
                             )
                             finalResponse = calculatedBasket
                         }
@@ -493,12 +537,28 @@ export const getAppleButtonConfig = (
         onError: (error) => {
             // Clean up temporary basket when Apple Pay is cancelled or fails
             if (error.name === 'CANCEL') {
-                cleanupTemporaryBasket(isPdpMode, basketRef, authToken, refreshToken, site, setTempBasket, updateTokens)
+                cleanupTemporaryBasket(
+                    isPdpMode,
+                    basketRef,
+                    authToken,
+                    refreshToken,
+                    site,
+                    setTempBasket,
+                    updateTokens
+                )
                 sendExpressMessage(EXPRESS_MESSAGES.PAYMENT_CANCEL, {
                     PAYMENT_METHOD
                 })
             } else {
-                cleanupTemporaryBasket(isPdpMode, basketRef, authToken, refreshToken, site, setTempBasket, updateTokens)
+                cleanupTemporaryBasket(
+                    isPdpMode,
+                    basketRef,
+                    authToken,
+                    refreshToken,
+                    site,
+                    setTempBasket,
+                    updateTokens
+                )
                 sendExpressMessage(EXPRESS_MESSAGES.PAYMENT_FAILURE, {
                     PAYMENT_METHOD
                 })
@@ -514,6 +574,7 @@ export const ApplePayExpress = ({
     authToken,
     refreshToken,
     updateTokens,
+    tokenProvider,
     locale: providedLocale,
     site: providedSite,
     basket,
@@ -523,7 +584,7 @@ export const ApplePayExpress = ({
     manager
 }) => {
     const paymentContainer = useRef(null)
-    
+
     // Initialize performance monitoring
     const performance = usePaymentPerformance('applepay')
 
@@ -541,6 +602,9 @@ export const ApplePayExpress = ({
         isPdpMode,
         basket,
         authToken,
+        refreshToken,
+        tokenProvider,
+        updateTokens,
         locale: providedLocale,
         site: providedSite
     })
@@ -550,7 +614,14 @@ export const ApplePayExpress = ({
         return () => {
             // Clean up temporary basket when component unmounts (user navigates away)
             if (isPdpMode && currentSku && tempBasket?.basketId && authToken && finalSite) {
-                deleteTemporaryBasket(tempBasket.basketId, authToken, refreshToken, finalSite, updateTokens).catch((error) =>
+                deleteTemporaryBasket(
+                    tempBasket.basketId,
+                    tokenProvider?.getCurrentAuthToken() || authToken,
+                    tokenProvider?.getCurrentRefreshToken() || refreshToken,
+                    finalSite,
+                    updateTokens,
+                    tokenProvider
+                ).catch((error) =>
                     console.warn('Failed to cleanup temporary basket on unmount:', error)
                 )
             }
@@ -565,10 +636,14 @@ export const ApplePayExpress = ({
                 if (isCanceled) {
                     return
                 }
-                
+
                 // Log initialization attempt
-                console.log(`🚀 Apple Pay: Starting initialization (PDP mode: ${isPdpMode}, Basket: ${basket?.basketId ? 'available' : 'missing'})`)
-                
+                console.log(
+                    `🚀 Apple Pay: Starting initialization (PDP mode: ${isPdpMode}, Basket: ${
+                        basket?.basketId ? 'available' : 'missing'
+                    })`
+                )
+
                 // Mark initialization start
                 performance.markInitializationStart()
 
@@ -595,7 +670,7 @@ export const ApplePayExpress = ({
                 try {
                     // Mark checkout creation start
                     performance.markCheckoutCreationStart()
-                    
+
                     let checkout
                     try {
                         checkout = await createAdyenCheckout(
@@ -615,12 +690,16 @@ export const ApplePayExpress = ({
 
                     if (!applePaymentMethodConfig) {
                         console.warn('Apple Pay configuration not found in payment methods')
-                        performance.markError(new Error('Apple Pay configuration not found'), 'configuration-check')
+                        performance.markError(
+                            new Error('Apple Pay configuration not found'),
+                            'configuration-check'
+                        )
                         handleApplePayUnavailable()
                         return
                     }
 
                     const appleButtonConfig = getAppleButtonConfig(
+                        tokenProvider,
                         authToken,
                         refreshToken,
                         updateTokens,
@@ -638,7 +717,7 @@ export const ApplePayExpress = ({
 
                     // Mark button creation start
                     performance.markButtonCreationStart()
-                    
+
                     let applePayButton
                     try {
                         applePayButton = await checkout.create('applepay', appleButtonConfig)
@@ -651,7 +730,7 @@ export const ApplePayExpress = ({
 
                     // Mark availability check start
                     performance.markAvailabilityCheckStart()
-                    
+
                     let isApplePayButtonAvailable = false
                     try {
                         isApplePayButtonAvailable = await applePayButton.isAvailable()
@@ -660,18 +739,21 @@ export const ApplePayExpress = ({
                     }
 
                     if (!isApplePayButtonAvailable) {
-                        performance.markError(new Error('Apple Pay not available'), 'availability-check')
+                        performance.markError(
+                            new Error('Apple Pay not available'),
+                            'availability-check'
+                        )
                         handleApplePayUnavailable()
                         return
                     }
 
                     // Mark mounting start
                     performance.markMountingStart()
-                    
+
                     try {
                         await applePayButton.mount(paymentContainer.current)
                         manager.setPaymentMethodAvailable(PAYMENT_METHOD)
-                        
+
                         // Mark payment ready
                         performance.markPaymentReady()
                     } catch (error) {
@@ -718,6 +800,7 @@ ApplePayExpress.propTypes = {
     authToken: PropTypes.string,
     refreshToken: PropTypes.string,
     updateTokens: PropTypes.func,
+    tokenProvider: PropTypes.object,
     locale: PropTypes.object,
     site: PropTypes.object,
     basket: PropTypes.object,

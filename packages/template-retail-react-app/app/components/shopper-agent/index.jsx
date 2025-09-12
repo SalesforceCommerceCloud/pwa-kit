@@ -180,6 +180,8 @@ const ShopperAgentWindow = ({commerceAgentConfiguration}) => {
             try {
                 if (event.data.type === 'lwc.getCustomerData') {
                     const authToken = await getTokenWhenReady()
+                    console.log('🔍 Sending Shopper Agent: authToken', authToken)
+                    console.log('🔍 Sending Shopper Agent: refreshToken', refreshToken)
                     sendExpressMessage('express.actualCustomerData', {
                         customerId,
                         authToken,
