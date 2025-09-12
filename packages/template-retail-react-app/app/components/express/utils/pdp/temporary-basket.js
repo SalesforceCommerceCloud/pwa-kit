@@ -50,7 +50,6 @@ export const createTemporaryBasket = async (sku, authToken, site, quantity = 1, 
 
     // Add currency if provided
     if (currency) {
-        console.log('💰💰💰 Creating temporary basket with currency:', currency)
         requestBody.currency = currency
     }
 

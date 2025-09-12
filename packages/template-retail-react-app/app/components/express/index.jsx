@@ -79,7 +79,6 @@ function Express() {
 
                 // Handle SKU update messages
                 if (type === 'UPDATE_SKU' && typeof sku === 'string') {
-                    console.log('💬💬💬 Express Payment: SKU update:', sku)
                     setCurrentSku(sku)
                     // Always set quantity to 1 when SKU changes
                     setCurrentQuantity(1)
@@ -87,7 +86,6 @@ function Express() {
 
                 // Handle quantity update messages
                 if (type === 'UPDATE_QUANTITY' && typeof quantity === 'number') {
-                    console.log('💬💬💬 Express Payment: Quantity update:', quantity)
                     // Validate quantity is a positive integer with reasonable limits
                     const validatedQuantity = Math.max(1, Math.min(999, Math.floor(quantity)))
                     setCurrentQuantity(validatedQuantity)
@@ -95,7 +93,6 @@ function Express() {
 
                 // Handle SKU clear messages (for regular checkout)
                 if (type === 'CLEAR_SKU') {
-                    console.log('💬💬💬 Express Payment: Clear SKU')
                     setCurrentSku(null)
                     setCurrentQuantity(1) // Reset quantity when clearing
                 }
@@ -103,10 +100,6 @@ function Express() {
                 // Handle basket data messages
                 if (type === 'basketDataAvailable') {
                     const {basketData, authData} = event.data.data
-
-                    basketData.currency = 'EUR' // OVERWRITING THIS FOR NOW TO WHAT IT SHOULD BE -- COMPONENTS ARE PULLING THIS WRONG AND DEFAULTING TO USD
-                    
-                    console.log('💬💬💬 Express Payment: Basket data available:', basketData)
                     setAuthToken(authData.authToken)
                     setBasketData(basketData)
                 }
@@ -114,10 +107,6 @@ function Express() {
                 // Handle authentication data messages
                 if (type === 'authDataAvailable') {
                     const authData = event.data.data.authData
-                    
-                    authData.currency = 'EUR' // OVERWRITING THIS FOR NOW TO WHAT IT SHOULD BE -- COMPONENTS ARE PULLING THIS WRONG AND DEFAULTING TO USD
-                    
-                    console.log('💬💬💬 Express Payment: Auth data available:', authData)
                     setAuthToken(authData.authToken)
                     setCurrentCurrency(authData.currency)
                 }

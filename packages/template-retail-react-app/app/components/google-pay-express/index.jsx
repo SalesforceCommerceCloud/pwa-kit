@@ -214,7 +214,6 @@ export const getGoogleButtonConfig = (
                 const newBasket = await createTemporaryBasket(sku, authToken, site, quantity, currency)
                 basketRef = newBasket // Update basket reference immediately
                 setTempBasket(newBasket) // Update React state for re-renders
-                console.log('⏳⏳⏳ Google Pay: temporary basket created:', newBasket)
                 return newBasket
             } catch (error) {
                 console.error('❌ Failed to create temporary basket:', error)
@@ -230,8 +229,6 @@ export const getGoogleButtonConfig = (
 
         return null
     }
-
-    console.log('🪞🪞🪞 Google Pay: basketRef:', basketRef)
 
     const buttonConfig = {
         showPayButton: true,
@@ -508,7 +505,6 @@ export const GooglePayExpress = ({
                 
                 // Log initialization attempt
                 console.log(`🚀 Google Pay: Starting initialization (PDP mode: ${isPdpMode}, Basket: ${basket?.basketId ? 'available' : 'missing'})`)
-                console.log('🧺🧺🧺 Google Pay: Basket data available:', basket)
                 
                 // Mark initialization start
                 performance.markInitializationStart()
