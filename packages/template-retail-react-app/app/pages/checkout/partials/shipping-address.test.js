@@ -158,13 +158,18 @@ jest.mock(
     '@salesforce/retail-react-app/app/pages/checkout/partials/shipping-multi-address',
     () => ({
         __esModule: true,
-        default: function MockMultiShipping() {
+        default: function MockMultiShipping({onUnsavedGuestAddressesToggleWarning}) {
             const {
                 useCheckout
                 // eslint-disable-next-line @typescript-eslint/no-var-requires
             } = require('@salesforce/retail-react-app/app/pages/checkout/util/checkout-context')
 
             const {goToStep, STEPS} = useCheckout()
+
+            // simulate calling the callback with true to trigger warning modal
+            if (onUnsavedGuestAddressesToggleWarning) {
+                onUnsavedGuestAddressesToggleWarning(true)
+            }
 
             return (
                 <div data-testid="multi-shipping" role="button" tabIndex={0}>
@@ -182,6 +187,33 @@ jest.mock(
         }
     })
 )
+
+// mock the SingleAddressToggleModal component
+jest.mock('@salesforce/retail-react-app/app/components/single-address-toggle-modal', () => ({
+    __esModule: true,
+    default: function MockSingleAddressToggleModal({isOpen, onConfirm, onCancel, onClose}) {
+        if (!isOpen) return null
+
+        return (
+            <div data-testid="single-address-toggle-modal" role="alertdialog">
+                <div>Switch to one address?</div>
+                <div>
+                    If you switch to one address, the shipping addresses you added for the items
+                    will be removed
+                </div>
+                <button data-testid="confirm-switch" onClick={onConfirm}>
+                    Switch to one address
+                </button>
+                <button data-testid="cancel-switch" onClick={onCancel}>
+                    Cancel
+                </button>
+                <button data-testid="close-modal" onClick={onClose}>
+                    Close
+                </button>
+            </div>
+        )
+    }
+}))
 
 const mockCustomer = {
     customerId: 'customer-1',
@@ -676,6 +708,142 @@ describe('ShippingAddress', () => {
                 const toggleCard = screen.getByTestId('toggle-card')
                 expect(toggleCard).toHaveAttribute('data-editing', 'false')
             })
+        })
+    })
+
+    describe('Warning Modal for unsaved guest address after ship to single address toggle action', () => {
+        const mockGuestCustomer = {
+            customerId: 'guest-1',
+            isGuest: true,
+            addresses: []
+        }
+
+        beforeEach(() => {
+            useCurrentCustomer.mockReturnValue({
+                data: mockGuestCustomer
+            })
+        })
+
+        it('should show warning modal when guest toggles from multi-ship to single address', () => {
+            const editingContext = {
+                ...mockCheckoutContext,
+                step: 3
+            }
+            useCheckout.mockReturnValue(editingContext)
+
+            renderWithIntl(<ShippingAddress {...defaultProps} customer={mockGuestCustomer} />)
+
+            // Enable multi-shipping mode
+            fireEvent.click(screen.getByTestId('edit-action-button'))
+            expect(screen.getByTestId('multi-shipping')).toBeInTheDocument()
+
+            // Toggle back to single address mode - show warning modal
+            fireEvent.click(screen.getByTestId('edit-action-button'))
+
+            // Modal should be shown
+            expect(screen.getByTestId('single-address-toggle-modal')).toBeInTheDocument()
+            expect(screen.getByText('Switch to one address?')).toBeInTheDocument()
+            expect(
+                screen.getByText(
+                    'If you switch to one address, the shipping addresses you added for the items will be removed'
+                )
+            ).toBeInTheDocument()
+        })
+
+        it('should handle confirm action in warning modal', () => {
+            const editingContext = {
+                ...mockCheckoutContext,
+                step: 3
+            }
+            useCheckout.mockReturnValue(editingContext)
+
+            renderWithIntl(<ShippingAddress {...defaultProps} customer={mockGuestCustomer} />)
+
+            // Enable multi-shipping mode
+            fireEvent.click(screen.getByTestId('edit-action-button'))
+            expect(screen.getByTestId('multi-shipping')).toBeInTheDocument()
+
+            // Toggle back to single address mode - show warning modal
+            fireEvent.click(screen.getByTestId('edit-action-button'))
+
+            // Modal should be shown
+            expect(screen.getByTestId('single-address-toggle-modal')).toBeInTheDocument()
+            fireEvent.click(screen.getByTestId('confirm-switch'))
+
+            // Modal should be closed and should be back to single address
+            expect(screen.queryByTestId('single-address-toggle-modal')).not.toBeInTheDocument()
+            expect(screen.queryByTestId('multi-shipping')).not.toBeInTheDocument()
+        })
+
+        it('should handle cancel action in warning modal', () => {
+            const editingContext = {
+                ...mockCheckoutContext,
+                step: 3
+            }
+            useCheckout.mockReturnValue(editingContext)
+
+            renderWithIntl(<ShippingAddress {...defaultProps} customer={mockGuestCustomer} />)
+
+            fireEvent.click(screen.getByTestId('edit-action-button'))
+            expect(screen.getByTestId('multi-shipping')).toBeInTheDocument()
+
+            // toggle back to single address mode - show warning modal
+            fireEvent.click(screen.getByTestId('edit-action-button'))
+
+            // Modal should be shown
+            expect(screen.getByTestId('single-address-toggle-modal')).toBeInTheDocument()
+            fireEvent.click(screen.getByTestId('cancel-switch'))
+
+            // Modal should be closed and should stay in multi-shipping
+            expect(screen.queryByTestId('single-address-toggle-modal')).not.toBeInTheDocument()
+            expect(screen.getByTestId('multi-shipping')).toBeInTheDocument()
+        })
+
+        it('should handle close action in warning modal', () => {
+            const editingContext = {
+                ...mockCheckoutContext,
+                step: 3
+            }
+            useCheckout.mockReturnValue(editingContext)
+
+            renderWithIntl(<ShippingAddress {...defaultProps} customer={mockGuestCustomer} />)
+
+            // Enable multi-shipping mode
+            fireEvent.click(screen.getByTestId('edit-action-button'))
+            expect(screen.getByTestId('multi-shipping')).toBeInTheDocument()
+
+            // Toggle back to single address mode - show warning modal
+            fireEvent.click(screen.getByTestId('edit-action-button'))
+
+            expect(screen.getByTestId('single-address-toggle-modal')).toBeInTheDocument()
+            fireEvent.click(screen.getByTestId('close-modal'))
+
+            // Modal should be closed and user stay in multi-shipping
+            expect(screen.queryByTestId('single-address-toggle-modal')).not.toBeInTheDocument()
+            expect(screen.getByTestId('multi-shipping')).toBeInTheDocument()
+        })
+
+        it('should not show warning modal for registered users', () => {
+            const editingContext = {
+                ...mockCheckoutContext,
+                step: 3
+            }
+            useCheckout.mockReturnValue(editingContext)
+
+            // registered customer
+            useCurrentCustomer.mockReturnValue({
+                data: mockCustomer
+            })
+
+            renderWithIntl(<ShippingAddress {...defaultProps} />)
+
+            // multi-shipping mode
+            fireEvent.click(screen.getByTestId('edit-action-button'))
+            expect(screen.getByTestId('multi-shipping')).toBeInTheDocument()
+            // toggle back to single address mode
+            fireEvent.click(screen.getByTestId('edit-action-button'))
+            // Modal not shown for registered users
+            expect(screen.queryByTestId('single-address-toggle-modal')).not.toBeInTheDocument()
         })
     })
 })
