@@ -46,7 +46,8 @@ import {useStoreLocatorModal} from '@salesforce/retail-react-app/app/hooks/use-s
 // Bonus Product Utilities
 import {
     useBasketProductsWithPromotions,
-    getPromotionCalloutText
+    getPromotionCalloutText,
+    findAllBonusProductItemsToRemove
 } from '@salesforce/retail-react-app/app/utils/bonus-product-utils'
 import {useBonusProductViewModal} from '@salesforce/retail-react-app/app/hooks/use-bonus-product-view-modal'
 import {useBonusProductSelectionModalContext} from '@salesforce/retail-react-app/app/hooks/use-bonus-product-selection-modal'
@@ -88,6 +89,10 @@ const Cart = () => {
     const {data: basket, isLoading, derivedData} = useCurrentBasket()
     const multishipEnabled = getConfig()?.app?.multishipEnabled ?? true
     const storeLocatorEnabled = getConfig()?.app?.storeLocatorEnabled ?? STORE_LOCATOR_IS_ENABLED
+
+    // State for tracking items being removed (for UI feedback)
+    const [removingItemIds, setRemovingItemIds] = React.useState([])
+
 
     // Get configuration for bonus product grouping
     const config = getConfig()
@@ -667,30 +672,118 @@ const Cart = () => {
     /***************************** Update quantity **************************/
 
     /***************************** Remove Item from basket **************************/
-    const handleRemoveItem = async (product) => {
+    const handleRemoveItem = (product) => {
         setSelectedItem(product)
         setCartItemLoading(true)
-        await removeItemFromBasketMutation.mutateAsync(
-            {
-                parameters: {basketId: basket.basketId, itemId: product.itemId}
-            },
-            {
-                onSettled: () => {
-                    // reset the state
-                    setCartItemLoading(false)
-                    setSelectedItem(undefined)
-                },
-                onSuccess: () => {
-                    toast({
-                        title: formatMessage(TOAST_MESSAGE_REMOVED_ITEM_FROM_CART, {quantity: 1}),
-                        status: 'success'
-                    })
-                },
-                onError: () => {
-                    showError()
+
+        // Check if this is a bonus product that needs bulk removal
+        if (product.bonusProductLineItem) {
+            // Find all bonus product items that should be removed together
+            const itemsToRemove = findAllBonusProductItemsToRemove(basket, product)
+            
+            if (itemsToRemove.length > 1) {
+                // Set removing state for UI feedback
+                const itemIdsToRemove = itemsToRemove.map(item => item.itemId)
+                setRemovingItemIds(itemIdsToRemove)
+                
+                // Track removal progress
+                let index = 0
+                let successfulRemovals = 0
+                
+                // Sequential removal function to avoid race conditions
+                const removeNextItem = () => {
+                    if (index >= itemsToRemove.length) {
+                        // All items processed
+                        setCartItemLoading(false)
+                        setSelectedItem(undefined)
+                        setRemovingItemIds([])
+                        
+                        // Show success toast for successful removals
+                        if (successfulRemovals > 0) {
+                            const totalQuantity = itemsToRemove
+                                .slice(0, successfulRemovals)
+                                .reduce((total, item) => total + (item.quantity || 0), 0)
+                            toast({
+                                title: formatMessage(TOAST_MESSAGE_REMOVED_ITEM_FROM_CART, {
+                                    quantity: totalQuantity
+                                }),
+                                status: 'success'
+                            })
+                        }
+                        return
+                    }
+                    
+                    const currentItem = itemsToRemove[index]
+                    
+                    removeItemFromBasketMutation.mutate(
+                        {
+                            parameters: {basketId: basket.basketId, itemId: currentItem.itemId}
+                        },
+                        {
+                            onSettled: () => {
+                                index++
+                                // Process next item after this one settles
+                                setTimeout(removeNextItem, 100)
+                            },
+                            onSuccess: () => {
+                                successfulRemovals++
+                            },
+                            onError: (error) => {
+                                console.error('Item removal error:', error)
+                            }
+                        }
+                    )
                 }
+                
+                removeNextItem()
+            } else {
+                // Single bonus product item
+                removeItemFromBasketMutation.mutate(
+                    {
+                        parameters: {basketId: basket.basketId, itemId: product.itemId}
+                    },
+                    {
+                        onSettled: () => {
+                            setCartItemLoading(false)
+                            setSelectedItem(undefined)
+                        },
+                        onSuccess: () => {
+                            toast({
+                                title: formatMessage(TOAST_MESSAGE_REMOVED_ITEM_FROM_CART, {quantity: 1}),
+                                status: 'success'
+                            })
+                        },
+                        onError: (error) => {
+                            console.error('Bonus product removal error:', error)
+                            showError()
+                        }
+                    }
+                )
             }
-        )
+        } else {
+            // Regular (non-bonus) product removal
+            removeItemFromBasketMutation.mutate(
+                {
+                    parameters: {basketId: basket.basketId, itemId: product.itemId}
+                },
+                {
+                    onSettled: () => {
+                        setCartItemLoading(false)
+                        setSelectedItem(undefined)
+                    },
+                    onSuccess: () => {
+                        toast({
+                            title: formatMessage(TOAST_MESSAGE_REMOVED_ITEM_FROM_CART, {quantity: 1}),
+                            status: 'success'
+                        })
+                    },
+                    onError: (error) => {
+                        console.error('Product removal error:', error)
+                        showError()
+                    }
+                }
+            )
+        }
     }
 
     // Create shipment-specific data, grouping delivery shipments together
@@ -943,6 +1036,7 @@ const Cart = () => {
                                                             localIsGiftItems={localIsGiftItems}
                                                             isCartItemLoading={isCartItemLoading}
                                                             selectedItem={selectedItem}
+                                                            removingItemIds={removingItemIds}
                                                             onItemQuantityChange={
                                                                 handleChangeItemQuantity
                                                             }
@@ -986,6 +1080,7 @@ const Cart = () => {
                                                                     isCartItemLoading
                                                                 }
                                                                 selectedItem={selectedItem}
+                                                                removingItemIds={removingItemIds}
                                                                 onItemQuantityChange={
                                                                     handleChangeItemQuantity
                                                                 }
@@ -1074,6 +1169,7 @@ const Cart = () => {
                                                             localIsGiftItems={localIsGiftItems}
                                                             isCartItemLoading={isCartItemLoading}
                                                             selectedItem={selectedItem}
+                                                            removingItemIds={removingItemIds}
                                                             onItemQuantityChange={
                                                                 handleChangeItemQuantity
                                                             }

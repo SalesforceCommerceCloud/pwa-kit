@@ -32,7 +32,7 @@ import {useModalState} from '@salesforce/retail-react-app/app/hooks/use-modal-st
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
 import BonusProductViewModal from '@salesforce/retail-react-app/app/components/bonus-product-view-modal'
 import {
-    findAvailableBonusDiscountLineItemId,
+    findAvailableBonusDiscountLineItemIds,
     getBonusProductCountsForPromotion
 } from '@salesforce/retail-react-app/app/utils/bonus-product-utils'
 import {addToCartModalTheme} from '@salesforce/retail-react-app/app/theme/components/project/add-to-cart-modal'
@@ -262,15 +262,13 @@ export const BonusProductSelectionModal = () => {
 
             if (candidates.length > 0) {
                 for (const candidate of candidates) {
-                    const availableId = findAvailableBonusDiscountLineItemId(
+                    const availablePairs = findAvailableBonusDiscountLineItemIds(
                         basket,
-                        candidate.promotionId,
-                        1,
-                        candidate.id
+                        candidate.promotionId
                     )
-                    if (availableId) {
+                    if (availablePairs.length > 0) {
                         computedPromotionId = candidate.promotionId
-                        computedBonusDiscountLineItemId = availableId
+                        computedBonusDiscountLineItemId = availablePairs[0][0] // Use first available ID
                         break
                     }
                 }

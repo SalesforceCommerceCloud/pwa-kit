@@ -691,3 +691,47 @@ export const getBonusProductCountsForPromotion = (basket, promotionId) => {
 
     return {selectedBonusItems, maxBonusItems}
 }
+
+/**
+ * Finds all bonus product items in the basket that should be removed when a user clicks "Remove"
+ * on a specific bonus product. This includes all items with the same productId and from the same promotion,
+ * across all bonusDiscountLineItemIds.
+ * 
+ * @param {Object} basket - The current basket data
+ * @param {Object} targetBonusProduct - The bonus product item that the user clicked "Remove" on
+ * @returns {Array} Array of bonus product items to remove (including the target item)
+ */
+export const findAllBonusProductItemsToRemove = (basket, targetBonusProduct) => {
+    if (!basket?.productItems || !targetBonusProduct || !targetBonusProduct.bonusProductLineItem) {
+        return []
+    }
+
+    // Find the bonusDiscountLineItem associated with the target product to get the promotionId
+    const targetBonusDiscountLineItem = basket.bonusDiscountLineItems?.find(
+        (item) => item.id === targetBonusProduct.bonusDiscountLineItemId
+    )
+
+    if (!targetBonusDiscountLineItem) {
+        // If we can't find the promotion, fall back to removing just this single item
+        return [targetBonusProduct]
+    }
+
+    const promotionId = targetBonusDiscountLineItem.promotionId
+    const productId = targetBonusProduct.productId
+
+    // Find all bonusDiscountLineItemIds for this promotion
+    const promotionBonusDiscountLineItemIds = (basket.bonusDiscountLineItems || [])
+        .filter((item) => item.promotionId === promotionId)
+        .map((item) => item.id)
+
+    // Find all bonus product items with the same productId and from the same promotion
+    const itemsToRemove = basket.productItems.filter((item) => {
+        return (
+            item.bonusProductLineItem &&
+            item.productId === productId &&
+            promotionBonusDiscountLineItemIds.includes(item.bonusDiscountLineItemId)
+        )
+    })
+
+    return itemsToRemove
+}
