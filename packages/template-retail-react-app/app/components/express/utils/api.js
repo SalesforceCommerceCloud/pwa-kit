@@ -20,12 +20,6 @@ export class ApiClient {
         this.tokenUsageCount = 0
         this.lastTokenUpdate = new Date().toISOString()
 
-        console.log('🔧 ApiClient: New instance created with TokenProvider:', {
-            instanceId: this.instanceId,
-            url: this.url,
-            providerId: this.tokenProvider?.providerId,
-            providerInfo: this.tokenProvider?.getTokenInfo()
-        })
     }
 
     /**
@@ -53,17 +47,6 @@ export class ApiClient {
         // Get current tokens from provider
         const {authToken, refreshToken, site, onTokenUpdate} = this.getCurrentTokens()
         
-        console.log('📡 ApiClient: Making request with current tokens:', {
-            instanceId: this.instanceId,
-            method: method.toUpperCase(),
-            url: this.url,
-            tokenUsageCount: this.tokenUsageCount,
-            timeSinceLastUpdate: `${timeSinceLastUpdate}ms`,
-            tokenStart: authToken?.substring(0, 10) + '...',
-            refreshTokenStart: refreshToken?.substring(0, 10) + '...',
-            providerId: this.tokenProvider?.providerId,
-            requestStartTime
-        })
 
         const queryParams = {
             siteId: site?.id,
@@ -80,13 +63,6 @@ export class ApiClient {
         }
 
         const makeRequest = async (token) => {
-            console.log('🔑 ApiClient: Using token for request:', {
-                instanceId: this.instanceId,
-                tokenStart: token?.substring(0, 10) + '...',
-                isCurrentToken: token === authToken,
-                tokenAge: timeSinceLastUpdate,
-                providerId: this.tokenProvider?.providerId
-            })
             
             return await fetch(fullUrl, {
                 ...requestConfig,
@@ -100,12 +76,6 @@ export class ApiClient {
         // Create a wrapped callback that updates the token provider
         const wrappedOnTokenUpdate = onTokenUpdate 
             ? (newAuthToken, newRefreshToken) => {
-                console.log('🔄 ApiClient: Received token update, forwarding to provider:', {
-                    instanceId: this.instanceId,
-                    providerId: this.tokenProvider?.providerId,
-                    newAuthTokenStart: newAuthToken?.substring(0, 10) + '...',
-                    newRefreshTokenStart: newRefreshToken?.substring(0, 10) + '...'
-                })
                 
                 // Update the token provider
                 this.tokenProvider?.updateTokens(newAuthToken, newRefreshToken)
@@ -124,13 +94,6 @@ export class ApiClient {
             // Always get the most current refresh token from the provider
             const latestRefreshToken = this.tokenProvider?.getCurrentRefreshToken() || currentRefreshToken
             
-            console.log('🔧 ApiClient: Using current refresh token for request:', {
-                instanceId: this.instanceId,
-                providerId: this.tokenProvider?.providerId,
-                originalRefreshTokenStart: currentRefreshToken?.substring(0, 10) + '...',
-                latestRefreshTokenStart: latestRefreshToken?.substring(0, 10) + '...',
-                refreshTokenUpdated: latestRefreshToken !== currentRefreshToken
-            })
             
             return makeAuthenticatedRequest(
                 requestFunction,
@@ -150,13 +113,6 @@ export class ApiClient {
             site
         )
 
-        console.log('📡 ApiClient: Request completed:', {
-            instanceId: this.instanceId,
-            status: response.status,
-            ok: response.ok,
-            tokenUsageCount: this.tokenUsageCount,
-            providerId: this.tokenProvider?.providerId
-        })
 
         return response
     }

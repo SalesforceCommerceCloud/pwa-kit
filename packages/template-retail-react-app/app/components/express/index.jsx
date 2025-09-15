@@ -44,60 +44,23 @@ function Express() {
 
     // Initialize or update the TokenProvider when tokens change
     useEffect(() => {
-        console.log('🔍 Express: TokenProvider effect triggered:', {
-            hasAuthToken: !!authToken,
-            hasRefreshToken: !!refreshToken,
-            hasSite: !!site,
-            authTokenStart: authToken?.substring(0, 10) + '...',
-            refreshTokenStart: refreshToken?.substring(0, 10) + '...',
-            siteId: site?.id,
-            hasExistingProvider: !!tokenProviderRef.current,
-            existingProviderId: tokenProviderRef.current?.providerId
-        })
-
         if (authToken && refreshToken && site) {
             if (!tokenProviderRef.current) {
                 // Create new TokenProvider
-                console.log('🏭 Express: Creating new TokenProvider:', {
-                    authTokenStart: authToken?.substring(0, 10) + '...',
-                    refreshTokenStart: refreshToken?.substring(0, 10) + '...',
-                    siteId: site?.id
-                })
                 tokenProviderRef.current = new TokenProvider(
                     authToken,
                     refreshToken,
                     site,
                     updateTokens
                 )
-                console.log('✅ Express: TokenProvider created:', {
-                    providerId: tokenProviderRef.current.providerId
-                })
                 setTokenProviderReady(true)
             } else {
                 // Update existing TokenProvider
-                console.log('🔄 Express: Updating existing TokenProvider:', {
-                    existingProviderId: tokenProviderRef.current.providerId,
-                    existingUpdateCount: tokenProviderRef.current.updateCount,
-                    newAuthTokenStart: authToken?.substring(0, 10) + '...',
-                    newRefreshTokenStart: refreshToken?.substring(0, 10) + '...',
-                    authTokenChanged: authToken !== tokenProviderRef.current.authToken,
-                    refreshTokenChanged: refreshToken !== tokenProviderRef.current.refreshToken
-                })
                 tokenProviderRef.current.updateTokens(authToken, refreshToken)
-                console.log('✅ Express: TokenProvider updated:', {
-                    providerId: tokenProviderRef.current.providerId,
-                    newUpdateCount: tokenProviderRef.current.updateCount
-                })
                 // TokenProvider is already ready, no need to set state again
             }
         } else {
-            console.warn('⚠️ Express: Missing required data for TokenProvider:', {
-                hasAuthToken: !!authToken,
-                hasRefreshToken: !!refreshToken,
-                hasSite: !!site
-            })
             if (tokenProviderReady) {
-                console.log('🔄 Express: Resetting TokenProvider ready state')
                 setTokenProviderReady(false)
             }
         }
@@ -105,33 +68,8 @@ function Express() {
 
     // Token update callback for child components
     const updateTokens = (newAuthToken, newRefreshToken) => {
-        const updateId = Math.random().toString(36).substring(2, 8)
-
-        console.log('🔄 Express: Updating tokens via callback:', {
-            hasNewAuthToken: !!newAuthToken,
-            hasNewRefreshToken: !!newRefreshToken,
-            newAuthTokenLength: newAuthToken?.length || 0,
-            newRefreshTokenLength: newRefreshToken?.length || 0,
-            oldAuthTokenLength: authToken?.length || 0,
-            oldRefreshTokenLength: refreshToken?.length || 0,
-            newAuthTokenStart: newAuthToken?.substring(0, 10) + '...',
-            newRefreshTokenStart: newRefreshToken?.substring(0, 10) + '...',
-            oldAuthTokenStart: authToken?.substring(0, 10) + '...',
-            oldRefreshTokenStart: refreshToken?.substring(0, 10) + '...',
-            authTokenChanged: newAuthToken !== authToken,
-            refreshTokenChanged: newRefreshToken !== refreshToken,
-            updateId,
-            timestamp: new Date().toISOString()
-        })
-
         setAuthToken(newAuthToken)
         setRefreshToken(newRefreshToken)
-
-        console.log('✅ Express: Tokens updated successfully:', {
-            updateId,
-            newAuthTokenSet: !!newAuthToken,
-            newRefreshTokenSet: !!newRefreshToken
-        })
     }
 
     // Check for PDP mode flag in URL
@@ -158,12 +96,6 @@ function Express() {
     useEffect(() => {
         if (authToken && site && locale) {
             performance.mark('express-payment-methods-fetch-start')
-            console.log('🚀 Express Payment: Starting payment methods fetch...')
-            if (!isPdpMode) {
-                console.log(
-                    `📦 Waiting for basket data: ${basket?.basketId ? 'available' : 'missing'}`
-                )
-            }
         }
     }, [authToken, site?.id, locale?.id, isPdpMode, basket?.basketId]) // Include basket status for non-PDP mode
 
@@ -173,19 +105,11 @@ function Express() {
             // Basic security check - accept messages from any origin for now
             // In production, you might want to restrict this to specific origins
 
-            console.log('📨 Express: Received message:', {
-                type: event.data?.type,
-                origin: event.origin,
-                hasData: !!event.data?.data,
-                timestamp: new Date().toISOString()
-            })
-
             if (event.data && typeof event.data === 'object') {
                 const {type, sku, quantity} = event.data
 
                 // Handle SKU update messages
                 if (type === 'UPDATE_SKU' && typeof sku === 'string') {
-                    console.log('📦 Express: Updating SKU:', sku)
                     setCurrentSku(sku)
                     // Always set quantity to 1 when SKU changes
                     setCurrentQuantity(1)
@@ -195,13 +119,11 @@ function Express() {
                 if (type === 'UPDATE_QUANTITY' && typeof quantity === 'number') {
                     // Validate quantity is a positive integer with reasonable limits
                     const validatedQuantity = Math.max(1, Math.min(999, Math.floor(quantity)))
-                    console.log('🔢 Express: Updating quantity:', validatedQuantity)
                     setCurrentQuantity(validatedQuantity)
                 }
 
                 // Handle SKU clear messages (for regular checkout)
                 if (type === 'CLEAR_SKU') {
-                    console.log('🗑️ Express: Clearing SKU')
                     setCurrentSku(null)
                     setCurrentQuantity(1) // Reset quantity when clearing
                 }
@@ -209,7 +131,7 @@ function Express() {
                 // Handle basket data messages
                 if (type === 'basketDataAvailable') {
                     const {basketData, authData} = event.data.data
-                    console.log('🛒 Express: Received basket data:', {
+                    console.debug('Express: basket/auth data received', {
                         hasBasketData: !!basketData,
                         basketId: basketData?.basketId,
                         hasAuthData: !!authData,
@@ -235,7 +157,7 @@ function Express() {
                     const authData = event.data.data.authData
 
                     // Enhanced token reception diagnostics
-                    console.log('🔐 Express: Received auth data with enhanced analysis:', {
+                    console.debug('Express: auth data received', {
                         hasAuthToken: !!authData?.authToken,
                         hasRefreshToken: !!authData?.refreshToken,
                         authTokenLength: authData?.authToken?.length || 0,
@@ -267,17 +189,7 @@ function Express() {
                         if (refreshToken.length > 2000) tokenIssues.push('TOO_LONG')
 
                         if (tokenIssues.length > 0) {
-                            console.warn(
-                                '⚠️ Express: Refresh token issues detected on reception:',
-                                {
-                                    issues: tokenIssues,
-                                    tokenSample:
-                                        refreshToken.substring(0, 20) +
-                                        '...' +
-                                        refreshToken.substring(-10),
-                                    tokenBytes: new TextEncoder().encode(refreshToken).length
-                                }
-                            )
+                            console.debug('Express: refresh token issues detected', {tokenIssues})
                         }
 
                         // Try to decode if JWT-like
@@ -290,7 +202,7 @@ function Express() {
                                     )
                                     const now = Math.floor(Date.now() / 1000)
 
-                                    console.log('🔍 Express: Received refresh token analysis:', {
+                                    console.debug('Express: parsed refresh token JWT payload', {
                                         exp: payload.exp,
                                         iat: payload.iat,
                                         currentTime: now,
@@ -308,22 +220,14 @@ function Express() {
                                     })
 
                                     if (payload.exp && payload.exp < now) {
-                                        console.error(
-                                            '❌ Express: RECEIVED EXPIRED REFRESH TOKEN FROM PARENT!',
-                                            {
-                                                expiredSinceSeconds: now - payload.exp,
-                                                expiredSinceHours: (
-                                                    (now - payload.exp) /
-                                                    3600
-                                                ).toFixed(2)
-                                            }
-                                        )
+                                        console.warn('Express: refresh token appears expired', {
+                                            exp: payload.exp,
+                                            now
+                                        })
                                     }
                                 }
                             } catch (e) {
-                                console.log(
-                                    '🔍 Express: Could not decode received refresh token as JWT'
-                                )
+                                console.debug('Express: failed to parse refresh token JWT', e)
                             }
                         }
                     }
@@ -334,33 +238,21 @@ function Express() {
 
                 // Handle token refresh needed messages (for debugging)
                 if (type === 'TOKEN_REFRESH_NEEDED') {
-                    console.log(
-                        '🔄 Express: Token refresh needed message received (this should be handled by parent)'
-                    )
+                    console.debug('Express: token refresh needed message received')
                 }
             }
         }
 
         // Add event listener
         window.addEventListener('message', handleMessage)
-        console.log('👂 Express: Message listener added')
 
         // Request basket data from parent with a small delay to ensure listener is active
         setTimeout(() => {
-            console.log('📤 Express: Requesting basket data from parent')
-            console.log('🔍 Express: Context check:', {
-                isIframe: window !== window.parent,
-                parentExists: !!window.parent,
-                locationOrigin: window.location.origin
-                // Note: Cannot access parent origin due to cross-origin restrictions
-            })
             window.parent.postMessage({type: 'basketDataRequested'}, '*')
-            console.log('✅ Express: Basket data request sent')
         }, 200)
 
         // Cleanup event listener on unmount
         return () => {
-            console.log('🧹 Express: Cleaning up message listener')
             window.removeEventListener('message', handleMessage)
         }
     }, [])
@@ -380,38 +272,6 @@ function Express() {
         isPdpMode,
         manager
     }
-
-    // Log context preparation
-    useEffect(() => {
-        console.log('📦 Express: Payment context prepared:', {
-            hasAdyenPaymentMethods: !!adyenPaymentMethods,
-            hasAuthToken: !!authToken,
-            hasRefreshToken: !!refreshToken,
-            hasTokenProvider: !!tokenProviderRef.current,
-            tokenProviderId: tokenProviderRef.current?.providerId,
-            tokenProviderUpdateCount: tokenProviderRef.current?.updateCount,
-            tokenProviderReady,
-            hasUpdateCallback: !!updateTokens,
-            hasSite: !!site,
-            hasBasket: !!basket,
-            currentSku,
-            isPdpMode,
-            authTokenStart: authToken?.substring(0, 10) + '...',
-            refreshTokenStart: refreshToken?.substring(0, 10) + '...',
-            hookEnabled: !!(tokenProviderReady && tokenProviderRef.current && site && locale)
-        })
-    }, [
-        adyenPaymentMethods,
-        authToken,
-        refreshToken,
-        tokenProviderRef.current,
-        tokenProviderReady,
-        site,
-        basket,
-        currentSku,
-        isPdpMode,
-        locale
-    ])
 
     return (
         <div className="express-payment-container">
