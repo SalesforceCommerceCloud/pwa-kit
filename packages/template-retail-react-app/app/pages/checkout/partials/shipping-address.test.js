@@ -202,7 +202,7 @@ jest.mock('@salesforce/retail-react-app/app/components/single-address-toggle-mod
                     will be removed
                 </div>
                 <button data-testid="confirm-switch" onClick={onConfirm}>
-                    Switch to one address
+                    Switch
                 </button>
                 <button data-testid="cancel-switch" onClick={onCancel}>
                     Cancel

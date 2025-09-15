@@ -31,7 +31,7 @@ const confirmationMessage = defineMessage({
 })
 
 const continueButtonLabel = defineMessage({
-    defaultMessage: 'Switch to one address',
+    defaultMessage: 'Switch',
     id: 'multi_ship_warning_modal.action.switch_to_one_address'
 })
 
