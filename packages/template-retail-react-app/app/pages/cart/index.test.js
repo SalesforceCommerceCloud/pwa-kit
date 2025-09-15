@@ -99,7 +99,9 @@ const mockBonusProductSelectionModalContext = {
     onOpen: jest.fn()
 }
 jest.mock('@salesforce/retail-react-app/app/hooks/use-bonus-product-selection-modal', () => ({
-    ...jest.requireActual('@salesforce/retail-react-app/app/hooks/use-bonus-product-selection-modal'),
+    ...jest.requireActual(
+        '@salesforce/retail-react-app/app/hooks/use-bonus-product-selection-modal'
+    ),
     useBonusProductSelectionModalContext: () => mockBonusProductSelectionModalContext
 }))
 
@@ -185,18 +187,22 @@ beforeEach(() => {
                 {
                     id: '701642889830M',
                     name: 'Belted Cardigan With Studs',
-                    productPromotions: [{
-                        promotionId: 'test-promotion-1',
-                        calloutMsg: 'Buy One Get One Free'
-                    }]
+                    productPromotions: [
+                        {
+                            promotionId: 'test-promotion-1',
+                            calloutMsg: 'Buy One Get One Free'
+                        }
+                    ]
                 },
                 {
-                    id: '013742335262M', 
+                    id: '013742335262M',
                     name: 'Free Gift with Purchase',
-                    productPromotions: [{
-                        promotionId: 'test-promotion-1',
-                        calloutMsg: 'Free Gift with Purchase'
-                    }]
+                    productPromotions: [
+                        {
+                            promotionId: 'test-promotion-1',
+                            calloutMsg: 'Free Gift with Purchase'
+                        }
+                    ]
                 }
             ]
         },
@@ -849,14 +855,14 @@ describe('Product bundles', () => {
             }),
             rest.patch('*/baskets/:basketId/items/:itemId', () => {})
         )
-        
+
         // Configure bonus product mocks and disable grouping for bundle products
         // Bundle products work better with the traditional rendering approach
-        const getConfig = require('@salesforce/pwa-kit-runtime/utils/ssr-config').getConfig
+        const {getConfig} = jest.requireMock('@salesforce/pwa-kit-runtime/utils/ssr-config')
         getConfig.mockReturnValue({
-            ...require('@salesforce/retail-react-app/config/mocks/default'),
+            ...mockConfig,
             app: {
-                ...require('@salesforce/retail-react-app/config/mocks/default').app,
+                ...mockConfig.app,
                 pages: {
                     cart: {
                         groupBonusProductsWithQualifyingProduct: false
@@ -864,7 +870,7 @@ describe('Product bundles', () => {
                 }
             }
         })
-        
+
         mockUseBasketProductsWithPromotions.mockReturnValue({
             data: {
                 products: [
@@ -1374,11 +1380,11 @@ describe('Product bundles', () => {
 describe('Bonus products', () => {
     beforeEach(() => {
         // Mock getConfig to disable bonus product grouping for this test
-        const getConfig = require('@salesforce/pwa-kit-runtime/utils/ssr-config').getConfig
+        const {getConfig} = jest.requireMock('@salesforce/pwa-kit-runtime/utils/ssr-config')
         getConfig.mockReturnValue({
-            ...require('@salesforce/retail-react-app/config/mocks/default'),
+            ...mockConfig,
             app: {
-                ...require('@salesforce/retail-react-app/config/mocks/default').app,
+                ...mockConfig.app,
                 pages: {
                     cart: {
                         groupBonusProductsWithQualifyingProduct: false
@@ -1386,7 +1392,7 @@ describe('Bonus products', () => {
                 }
             }
         })
-        
+
         prependHandlersToServer([
             {
                 path: '*/customers/:customerId/baskets',

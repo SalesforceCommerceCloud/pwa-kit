@@ -149,10 +149,8 @@ const ProductView = forwardRef(
             onOpenStoreLocator = () => {},
             showDeliveryOptions = true,
             customButtons = [],
-            promotionId,
             maxOrderQuantity = null,
-            imageGalleryFooter = null,
-            alignItems = 'flex-start'
+            imageGalleryFooter = null
         },
         ref
     ) => {

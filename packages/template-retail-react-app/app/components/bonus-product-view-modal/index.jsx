@@ -17,8 +17,7 @@ import {
     Button,
     Box,
     Text,
-    Heading,
-    VStack
+    Heading
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 import ProductView from '@salesforce/retail-react-app/app/components/product-view'
 import {useProductViewModal} from '@salesforce/retail-react-app/app/hooks/use-product-view-modal'
