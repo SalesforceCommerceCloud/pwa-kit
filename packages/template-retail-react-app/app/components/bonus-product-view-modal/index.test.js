@@ -50,11 +50,15 @@ jest.mock(
 
             const handleAddToCart = () => {
                 if (addToCart) {
+                    // For distribution tests, use maxOrderQuantity as the quantity to test with
+                    // This simulates a user selecting the maximum available quantity
+                    const quantity = maxOrderQuantity && maxOrderQuantity > 1 ? maxOrderQuantity : 1
+                    
                     // Call addToCart with the expected format: array of {variant, quantity}
                     addToCart([
                         {
                             variant: {productId: 'test-product'},
-                            quantity: 1
+                            quantity: quantity
                         }
                     ])
                 }
@@ -638,13 +642,13 @@ describe('BonusProductViewModal - Quantity Distribution Across Multiple BonusDis
             expect(mockAddItemToNewOrExistingBasket).toHaveBeenCalledWith([
                 {
                     productId: 'test-product',
-                    price: undefined,
+                    price: 299.99,
                     quantity: 2,
                     bonusDiscountLineItemId: 'bonus-1'
                 },
                 {
                     productId: 'test-product',
-                    price: undefined,
+                    price: 299.99,
                     quantity: 1,
                     bonusDiscountLineItemId: 'bonus-2'
                 }
@@ -688,13 +692,13 @@ describe('BonusProductViewModal - Quantity Distribution Across Multiple BonusDis
             expect(mockAddItemToNewOrExistingBasket).toHaveBeenCalledWith([
                 {
                     productId: 'test-product',
-                    price: undefined,
+                    price: 299.99,
                     quantity: 2,
                     bonusDiscountLineItemId: 'bonus-1'
                 },
                 {
                     productId: 'test-product',
-                    price: undefined,
+                    price: 299.99,
                     quantity: 1,
                     bonusDiscountLineItemId: 'bonus-2'
                 }
@@ -731,7 +735,7 @@ describe('BonusProductViewModal - Quantity Distribution Across Multiple BonusDis
             expect(mockAddItemToNewOrExistingBasket).toHaveBeenCalledWith([
                 {
                     productId: 'test-product',
-                    price: undefined,
+                    price: 299.99,
                     quantity: 1,
                     bonusDiscountLineItemId: 'bonus-1'
                 }
@@ -800,13 +804,13 @@ describe('BonusProductViewModal - Quantity Distribution Across Multiple BonusDis
             expect(mockAddItemToNewOrExistingBasket).toHaveBeenCalledWith([
                 {
                     productId: 'test-product',
-                    price: undefined,
+                    price: 299.99,
                     quantity: 3,
                     bonusDiscountLineItemId: 'bonus-1'
                 },
                 {
                     productId: 'test-product',
-                    price: undefined,
+                    price: 299.99,
                     quantity: 2,
                     bonusDiscountLineItemId: 'bonus-2'
                 }

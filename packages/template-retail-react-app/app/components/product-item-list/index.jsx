@@ -30,6 +30,7 @@ const ProductItemList = ({
     localIsGiftItems = {},
     isCartItemLoading = false,
     selectedItem = null,
+    removingItemIds = [],
     // Styling options
     hideBorder = false
 }) => {
@@ -37,11 +38,13 @@ const ProductItemList = ({
         <Stack spacing={4}>
             {productItems.map((productItem) => {
                 const isBonusProductItem = productItem.bonusProductLineItem
+                const isRemoving = removingItemIds.includes(productItem.itemId)
 
                 return (
                     <ProductItem
                         key={productItem.itemId}
                         isBonusProduct={isBonusProductItem}
+                        isRemoving={isRemoving}
                         containerStyles={{
                             borderX: 'none',
                             borderTop: 'none',
@@ -73,7 +76,8 @@ const ProductItemList = ({
                         }}
                         onItemQuantityChange={onItemQuantityChange?.bind(this, productItem)}
                         showLoading={
-                            isCartItemLoading && selectedItem?.itemId === productItem.itemId
+                            (isCartItemLoading && selectedItem?.itemId === productItem.itemId) ||
+                            isRemoving
                         }
                         handleRemoveItem={onRemoveItemClick}
                         hideBorder={hideBorder}
@@ -96,6 +100,7 @@ ProductItemList.propTypes = {
     localIsGiftItems: PropTypes.object,
     isCartItemLoading: PropTypes.bool,
     selectedItem: PropTypes.object,
+    removingItemIds: PropTypes.arrayOf(PropTypes.string),
     hideBorder: PropTypes.bool
 }
 
