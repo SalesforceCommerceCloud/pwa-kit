@@ -221,12 +221,10 @@ const AccountPayments = () => {
                 {
                     onSuccess: () => {
                         showToast({
-                            title: (
-                                <FormattedMessage
-                                    defaultMessage="Payment method removed"
-                                    id="account.payments.info.payment_method_removed"
-                                />
-                            ),
+                            title: formatMessage({
+                                defaultMessage: 'Payment method removed',
+                                id: 'account.payments.info.payment_method_removed'
+                            }),
                             status: 'success',
                             isClosable: true
                         })
@@ -236,12 +234,10 @@ const AccountPayments = () => {
             await refetch()
         } catch (e) {
             showToast({
-                title: (
-                    <FormattedMessage
-                        defaultMessage="Unable to remove payment method"
-                        id="account.payments.error.payment_method_remove_failed"
-                    />
-                ),
+                title: formatMessage({
+                    defaultMessage: 'Unable to remove payment method',
+                    id: 'account.payments.error.payment_method_remove_failed'
+                }),
                 status: 'error',
                 isClosable: true
             })
