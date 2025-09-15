@@ -73,17 +73,36 @@ import {
  *
  * @private
  */
-const binaryMimeTypes = ['application/', 'audio/', 'font/', 'image/', 'video/']
-const isBinary = (headers) => {
-    const contentType = headers['content-type'] || headers['Content-Type']
+const binaryMimeTypesRegexes = [
+    new RegExp('^application/.*$'),
+    new RegExp('^audio/.*$'),
+    new RegExp('^font/.*$'),
+    new RegExp('^image/.*$'),
+    new RegExp('^video/.*$')
+]
+
+const isContentEncodingBinary = (headers) => {
+    const contentEncoding = headers['content-encoding'] || headers['Content-Encoding']
+    if (!contentEncoding) {
+        return false
+    }
+    return DEFAULT_BINARY_ENCODINGS.includes(contentEncoding)
+}
+
+const isContentTypeBinary = (headers) => {
+    // Replicating the aws-serverless-express behavior
+    let contentType = headers['content-type'] || headers['Content-Type']
     if (!contentType) {
         return false
     }
-    const contentEncoding = headers['content-encoding'] || headers['Content-Encoding']
-    return (
-        binaryMimeTypes.some((type) => contentType.startsWith(type)) ||
-        DEFAULT_BINARY_ENCODINGS.includes(contentEncoding)
-    )
+    // Remove the encoding from the content type
+    contentType = contentType.split(';')[0]
+
+    return binaryMimeTypesRegexes.some((binaryContentType) => binaryContentType.test(contentType))
+}
+
+const isBinary = (headers) => {
+    return isContentEncodingBinary(headers) || isContentTypeBinary(headers)
 }
 
 /**

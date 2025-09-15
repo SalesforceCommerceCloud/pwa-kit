@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import {once, RemoteServerFactory} from './build-remote-server'
+import {once, RemoteServerFactory, isBinary} from './build-remote-server'
 import {X_ENCODED_HEADERS} from './constants'
 import awsServerlessExpress from 'aws-serverless-express'
 
@@ -124,5 +124,48 @@ describe('encodeNonAsciiHttpHeaders flag in options to createHandler', () => {
         // confirm ASCII headers are not modified
         res.setHeader(regularHeaderKey, regularHeaderValue)
         expect(res.getHeader(regularHeaderKey)).toEqual(regularHeaderValue)
+    })
+})
+
+describe('isBinary function', () => {
+    test('returns true if the content type is binary', () => {
+        const headers = {
+            'content-type': 'application/json'
+        }
+        expect(isBinary(headers)).toBe(true)
+    })
+
+    test('returns true if the content encoding is binary', () => {
+        const headers = {
+            'content-encoding': 'gzip'
+        }
+        expect(isBinary(headers)).toBe(true)
+    })
+
+    test('returns false if neither content type nor content encoding is binary', () => {
+        const headers = {
+            'content-type': 'text/plain',
+            'content-encoding': 'identity'
+        }
+        expect(isBinary(headers)).toBe(false)
+    })
+
+    test('returns false if headers are empty', () => {
+        const headers = {}
+        expect(isBinary(headers)).toBe(false)
+    })
+
+    test('returns false if content type is non-binary and content encoding is missing', () => {
+        const headers = {
+            'content-type': 'text/html'
+        }
+        expect(isBinary(headers)).toBe(false)
+    })
+
+    test('returns false if content encoding is non-binary and content type is missing', () => {
+        const headers = {
+            'content-encoding': 'identity'
+        }
+        expect(isBinary(headers)).toBe(false)
     })
 })
