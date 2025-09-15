@@ -23,7 +23,6 @@ import SearchSuggestions from '@salesforce/retail-react-app/app/components/searc
 import {SearchIcon} from '@salesforce/retail-react-app/app/components/icons'
 import {
     capitalize,
-    boldString,
     getSessionJSONItem,
     setSessionJSONItem
 } from '@salesforce/retail-react-app/app/utils/utils'
@@ -50,7 +49,7 @@ function isAskAgentOnSearchEnabled(enabled, askAgentOnSearch) {
     return enabled === 'true' && askAgentOnSearch === 'true' && onClient
 }
 
-const formatSuggestions = (searchSuggestions, input) => {
+const formatSuggestions = (searchSuggestions) => {
     return {
         categorySuggestions: searchSuggestions?.categorySuggestions?.categories?.map(
             (suggestion) => {
@@ -58,7 +57,9 @@ const formatSuggestions = (searchSuggestions, input) => {
                     type: 'category',
                     id: suggestion.id,
                     link: categoryUrlBuilder({id: suggestion.id}),
-                    name: boldString(suggestion.name, capitalize(input))
+                    name: capitalize(suggestion.name),
+                    image: suggestion.image?.disBaseLink,
+                    parentCategoryName: suggestion.parentCategoryName
                 }
             }
         ),
@@ -68,19 +69,30 @@ const formatSuggestions = (searchSuggestions, input) => {
                 currency: product.currency,
                 price: product.price,
                 productId: product.productId,
-                name: boldString(product.productName, capitalize(input)),
-                link: productUrlBuilder({id: product.productId})
+                name: capitalize(product.productName),
+                link: productUrlBuilder({id: product.productId}),
+                image: product.image?.disBaseLink
             }
         }),
-        phraseSuggestions: searchSuggestions?.categorySuggestions?.suggestedPhrases?.map(
+        brandSuggestions: searchSuggestions?.brandSuggestions?.suggestedPhrases?.map((brand) => {
+            // Init cap the brand name
+            return {
+                type: 'brand',
+                name: capitalize(brand.phrase),
+                link: searchUrlBuilder(brand.phrase)
+            }
+        }),
+        phraseSuggestions: searchSuggestions?.productSuggestions?.suggestedPhrases?.map(
             (phrase) => {
                 return {
                     type: 'phrase',
-                    name: boldString(phrase.phrase, capitalize(input)),
-                    link: searchUrlBuilder(phrase.phrase)
+                    name: phrase.phrase,
+                    link: searchUrlBuilder(phrase.phrase),
+                    exactMatch: phrase.exactMatch
                 }
             }
-        )
+        ),
+        searchPhrase: searchSuggestions?.searchPhrase
     }
 }
 
@@ -102,10 +114,12 @@ const Search = (props) => {
     const [isOpen, setIsOpen] = useState(false)
     const [searchQuery, setSearchQuery] = useState('')
     const navigate = useNavigation()
+
     const searchSuggestion = useSearchSuggestions(
         {
             parameters: {
-                q: searchQuery
+                q: searchQuery,
+                expand: 'images,prices'
             }
         },
         {
@@ -119,7 +133,7 @@ const Search = (props) => {
     })
     const recentSearches = getSessionJSONItem(RECENT_SEARCH_KEY)
     const searchSuggestions = useMemo(
-        () => formatSuggestions(searchSuggestion.data, searchInputRef?.current?.value),
+        () => formatSuggestions(searchSuggestion.data),
         [searchSuggestion]
     )
 
@@ -257,7 +271,7 @@ const Search = (props) => {
         // or we have search suggestions available and have inputed some text (empty text in this scenario should show recent searches)
         if (
             (document.activeElement.id === 'search-input' && recentSearches?.length > 0) ||
-            (searchSuggestionsAvailable && searchInputRef.current.value.length > 0)
+            (searchSuggestionsAvailable && searchInputRef.current?.value?.length > 0)
         ) {
             setIsOpen(true)
         } else {
@@ -310,7 +324,15 @@ const Search = (props) => {
                 </PopoverTrigger>
 
                 <HideOnMobile>
-                    <PopoverContent data-testid="sf-suggestion-popover">
+                    <PopoverContent
+                        data-testid="sf-suggestion-popover"
+                        width="100vw"
+                        maxWidth="100vw"
+                        left={0}
+                        right={0}
+                        marginLeft={0}
+                        marginRight={0}
+                    >
                         <SearchSuggestions
                             closeAndNavigate={closeAndNavigate}
                             recentSearches={recentSearches}

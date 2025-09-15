@@ -1439,6 +1439,18 @@
   "search.action.cancel": {
     "defaultMessage": "Cancel"
   },
+  "search.suggestions.categories": {
+    "defaultMessage": "Categories"
+  },
+  "search.suggestions.didYouMean": {
+    "defaultMessage": "Did you mean"
+  },
+  "search.suggestions.products": {
+    "defaultMessage": "Products"
+  },
+  "search.suggestions.viewAll": {
+    "defaultMessage": "View All"
+  },
   "selected_refinements.action.assistive_msg.clear_all": {
     "defaultMessage": "Clear all filters"
   },

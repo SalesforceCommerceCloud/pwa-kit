@@ -3419,6 +3419,30 @@
       "value": "Cancel"
     }
   ],
+  "search.suggestions.categories": [
+    {
+      "type": 0,
+      "value": "Categories"
+    }
+  ],
+  "search.suggestions.didYouMean": [
+    {
+      "type": 0,
+      "value": "Did you mean"
+    }
+  ],
+  "search.suggestions.products": [
+    {
+      "type": 0,
+      "value": "Products"
+    }
+  ],
+  "search.suggestions.viewAll": [
+    {
+      "type": 0,
+      "value": "View All"
+    }
+  ],
   "selected_refinements.action.assistive_msg.clear_all": [
     {
       "type": 0,
