@@ -50,10 +50,7 @@ import {useWishList} from '@salesforce/retail-react-app/app/hooks/use-wish-list'
 import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
 import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
 import BonusProductViewModal from '@salesforce/retail-react-app/app/components/bonus-product-view-modal'
-import {
-    findAvailableBonusDiscountLineItemIds,
-    getBonusProductCountsForPromotion
-} from '@salesforce/retail-react-app/app/utils/bonus-product-utils'
+import {findAvailableBonusDiscountLineItemId} from '@salesforce/retail-react-app/app/utils/bonus-product-utils'
 import {addToCartModalTheme} from '@salesforce/retail-react-app/app/theme/components/project/add-to-cart-modal'
 
 // Import AddToCartModal to render it within this provider
@@ -320,14 +317,29 @@ export const BonusProductSelectionModal = () => {
         'deleteCustomerProductListItem'
     )
 
-    // Get promotionId from bonus products - all items have the same promotionId since they're
-    // pre-filtered in select-bonus-products-card.jsx (line 143: bli.promotionId === promotionId)
-    const promotionId = bonusProducts.length > 0 ? bonusProducts[0]?.promotionId : null
+    // Calculate bonus item IDs for tracking
+    const bonusLineItemIds = useMemo(
+        () => bonusProducts.map((bli) => bli.id).filter(Boolean),
+        [bonusProducts]
+    )
 
-    // Calculate promotion-specific bonus counts using utility method
-    const {selectedBonusItems, maxBonusItems} = useMemo(() => {
-        return getBonusProductCountsForPromotion(basket, promotionId)
-    }, [basket, promotionId])
+    // Calculate maximum available bonus items
+    const maxBonusItems = useMemo(
+        () => bonusProducts.reduce((sum, bli) => sum + (bli.maxBonusItems || 0), 0),
+        [bonusProducts]
+    )
+
+    // Calculate currently selected bonus items
+    const selectedBonusItems = useMemo(() => {
+        const items = basket?.productItems || []
+        return items
+            .filter(
+                (it) =>
+                    it?.bonusProductLineItem &&
+                    bonusLineItemIds.includes(it?.bonusDiscountLineItemId)
+            )
+            .reduce((acc, it) => acc + (it?.quantity || 0), 0)
+    }, [basket, bonusLineItemIds])
 
     // Get product IDs for fetching product data, deduplicating by productId
     const uniqueBonusProducts = bonusProducts
@@ -396,13 +408,13 @@ export const BonusProductSelectionModal = () => {
 
             if (candidates.length > 0) {
                 for (const candidate of candidates) {
-                    const availablePairs = findAvailableBonusDiscountLineItemIds(
+                    const availableId = findAvailableBonusDiscountLineItemId(
                         basket,
                         candidate.promotionId
                     )
-                    if (availablePairs.length > 0) {
+                    if (availableId) {
                         computedPromotionId = candidate.promotionId
-                        computedBonusDiscountLineItemId = availablePairs[0][0] // Use first available ID
+                        computedBonusDiscountLineItemId = availableId
                         break
                     }
                 }

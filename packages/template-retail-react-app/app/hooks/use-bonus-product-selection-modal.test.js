@@ -17,6 +17,35 @@ import {useBonusProductSelectionModal} from '@salesforce/retail-react-app/app/ho
 
 // Mock all dependencies
 jest.mock('@salesforce/retail-react-app/app/hooks/use-modal-state')
+jest.mock('@salesforce/retail-react-app/app/utils/bonus-product-utils', () => ({
+    findAvailableBonusDiscountLineItemId: jest.fn(() => null)
+}))
+
+jest.mock('@salesforce/commerce-sdk-react', () => ({
+    ...jest.requireActual('@salesforce/commerce-sdk-react'),
+    useCustomerId: jest.fn(() => 'test-customer-id'),
+    useShopperCustomersMutation: jest.fn(() => ({
+        mutateAsync: jest.fn()
+    }))
+}))
+
+jest.mock('@salesforce/retail-react-app/app/hooks/use-wish-list', () => ({
+    useWishList: jest.fn(() => ({
+        data: {
+            id: 'test-wishlist-id',
+            customerProductListItems: []
+        }
+    }))
+}))
+
+jest.mock('@salesforce/retail-react-app/app/hooks/use-toast', () => ({
+    useToast: jest.fn(() => jest.fn())
+}))
+
+jest.mock('@salesforce/retail-react-app/app/hooks/use-navigation', () => ({
+    __esModule: true,
+    default: jest.fn(() => jest.fn())
+}))
 
 import {useModalState} from '@salesforce/retail-react-app/app/hooks/use-modal-state'
 
