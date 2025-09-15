@@ -50,7 +50,7 @@ import {useWishList} from '@salesforce/retail-react-app/app/hooks/use-wish-list'
 import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
 import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
 import BonusProductViewModal from '@salesforce/retail-react-app/app/components/bonus-product-view-modal'
-import {findAvailableBonusDiscountLineItemId} from '@salesforce/retail-react-app/app/utils/bonus-product-utils'
+import {findAvailableBonusDiscountLineItemIds} from '@salesforce/retail-react-app/app/utils/bonus-product-utils'
 import {addToCartModalTheme} from '@salesforce/retail-react-app/app/theme/components/project/add-to-cart-modal'
 
 // Import AddToCartModal to render it within this provider
@@ -408,13 +408,13 @@ export const BonusProductSelectionModal = () => {
 
             if (candidates.length > 0) {
                 for (const candidate of candidates) {
-                    const availableId = findAvailableBonusDiscountLineItemId(
+                    const availablePairs = findAvailableBonusDiscountLineItemIds(
                         basket,
                         candidate.promotionId
                     )
-                    if (availableId) {
+                    if (availablePairs.length > 0) {
                         computedPromotionId = candidate.promotionId
-                        computedBonusDiscountLineItemId = availableId
+                        computedBonusDiscountLineItemId = availablePairs[0][0] // Use first available ID
                         break
                     }
                 }
@@ -555,7 +555,7 @@ export const BonusProductSelectionModal = () => {
                     scrollBehavior={addToCartModalTheme.modal.scrollBehavior}
                     isCentered
                 >
-                    <ModalOverlay bg="blackAlpha.300" backdropFilter="blur(10px)" />
+                    <ModalOverlay bg="blackAlpha.300" />
                     <ModalContent
                         margin={addToCartModalTheme.layout.content.margin}
                         borderRadius={addToCartModalTheme.layout.content.borderRadius}
