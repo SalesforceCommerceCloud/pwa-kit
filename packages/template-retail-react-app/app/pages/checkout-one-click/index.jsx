@@ -63,7 +63,6 @@ const CheckoutOneClick = () => {
     const {step, STEPS} = useCheckout()
     const showToast = useToast()
     const [isLoading, setIsLoading] = useState(false)
-    const [enableUserRegistration, setEnableUserRegistration] = useState(false)
     const [registeredUserChoseGuest, setRegisteredUserChoseGuest] = useState(false)
     const [savedPaymentMethods, setSavedPaymentMethods] = useState(new Set())
     const [shouldSavePaymentMethod, setShouldSavePaymentMethod] = useState(false)
@@ -313,29 +312,13 @@ const CheckoutOneClick = () => {
             const order = await createOrder({
                 body: {basketId: latestBasketId}
             })
-
-            if (enableUserRegistration) {
-                // Remove the id property from the address
-                const {id, ...address} = order.shipments[0].shippingAddress
-                address.addressId = nanoid()
-
-                await registerUser({
-                    firstName: order.billingAddress.firstName,
-                    lastName: order.billingAddress.lastName,
-                    email: order.customerInfo.email,
-                    phoneHome: order.billingAddress.phone,
-                    address: address,
-                    paymentMethodId: order.paymentInstruments[0].paymentMethodId
-                })
-            } else {
-                // For existing registered users, save payment instrument if they checked the save box
-                if (shouldSavePaymentMethod && order.paymentInstruments?.[0]) {
-                    const paymentInstrument = order.paymentInstruments[0]
-                    await savePaymentInstrumentForRegisteredUser(
-                        order.customerInfo.customerId,
-                        paymentInstrument
-                    )
-                }
+            // For existing registered users, save payment instrument if they checked the save box
+            if (shouldSavePaymentMethod && order.paymentInstruments?.[0]) {
+                const paymentInstrument = order.paymentInstruments[0]
+                await savePaymentInstrumentForRegisteredUser(
+                    order.customerInfo.customerId,
+                    paymentInstrument
+                )
             }
 
             navigate(`/checkout/confirmation/${order.orderNo}`)
@@ -421,8 +404,6 @@ const CheckoutOneClick = () => {
                             {isPickupOrder ? <PickupAddress /> : <ShippingAddress />}
                             {!isPickupOrder && <ShippingOptions />}
                             <Payment
-                                enableUserRegistration={enableUserRegistration}
-                                setEnableUserRegistration={setEnableUserRegistration}
                                 paymentMethodForm={paymentMethodForm}
                                 billingAddressForm={billingAddressForm}
                                 registeredUserChoseGuest={registeredUserChoseGuest}

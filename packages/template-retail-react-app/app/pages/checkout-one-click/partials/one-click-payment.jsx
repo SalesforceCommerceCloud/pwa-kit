@@ -33,7 +33,6 @@ import {
 } from '@salesforce/retail-react-app/app/components/toggle-card'
 import PaymentForm from '@salesforce/retail-react-app/app/pages/checkout-one-click/partials/one-click-payment-form'
 import ShippingAddressSelection from '@salesforce/retail-react-app/app/pages/checkout-one-click/partials/one-click-shipping-address-selection'
-import UserRegistration from '@salesforce/retail-react-app/app/pages/checkout-one-click/partials/one-click-user-registration'
 import SavePaymentMethod from '@salesforce/retail-react-app/app/pages/checkout-one-click/partials/one-click-save-payment-method'
 import AddressDisplay from '@salesforce/retail-react-app/app/components/address-display'
 import {PromoCode, usePromoCode} from '@salesforce/retail-react-app/app/components/promo-code'
@@ -42,8 +41,6 @@ import {API_ERROR_MESSAGE} from '@salesforce/retail-react-app/app/constants'
 const Payment = ({
     paymentMethodForm,
     billingAddressForm,
-    enableUserRegistration,
-    setEnableUserRegistration,
     registeredUserChoseGuest = false,
     onPaymentMethodSaved,
     onSavePreferenceChange
@@ -384,13 +381,6 @@ const Payment = ({
                                 isBillingAddress
                             />
                         )}
-                        {isGuest && (
-                            <UserRegistration
-                                enableUserRegistration={enableUserRegistration}
-                                setEnableUserRegistration={setEnableUserRegistration}
-                                isGuestCheckout={registeredUserChoseGuest}
-                            />
-                        )}
                     </Stack>
                 </ToggleCardEdit>
 
@@ -429,14 +419,6 @@ const Payment = ({
                                 <AddressDisplay address={selectedBillingAddress} />
                             </Stack>
                         )}
-
-                        {isGuest && (
-                            <UserRegistration
-                                enableUserRegistration={enableUserRegistration}
-                                setEnableUserRegistration={setEnableUserRegistration}
-                                isGuestCheckout={registeredUserChoseGuest}
-                            />
-                        )}
                     </Stack>
                 </ToggleCardSummary>
             </ToggleCard>
@@ -448,10 +430,6 @@ const Payment = ({
 }
 
 Payment.propTypes = {
-    /** Whether user registration is enabled */
-    enableUserRegistration: PropTypes.bool,
-    /** Callback to set user registration state */
-    setEnableUserRegistration: PropTypes.func,
     /** Whether a registered user has chosen guest checkout */
     registeredUserChoseGuest: PropTypes.bool,
     /** Callback when payment method is successfully saved */

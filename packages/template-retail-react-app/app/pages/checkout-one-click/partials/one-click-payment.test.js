@@ -118,19 +118,6 @@ jest.mock(
 )
 
 jest.mock(
-    '@salesforce/retail-react-app/app/pages/checkout-one-click/partials/one-click-user-registration',
-    () => {
-        const MockUserRegistration = function ({enableUserRegistration}) {
-            return enableUserRegistration ? (
-                <div data-testid="user-registration">User Registration</div>
-            ) : null
-        }
-
-        return MockUserRegistration
-    }
-)
-
-jest.mock(
     '@salesforce/retail-react-app/app/pages/checkout-one-click/partials/one-click-save-payment-method',
     () => {
         const MockSavePaymentMethod = function () {
@@ -233,8 +220,6 @@ const TestWrapper = ({
     basketData = mockBasket,
     customerData = mockCustomer,
     isRegistered = false,
-    enableUserRegistration = false,
-    setEnableUserRegistration = jest.fn(),
     onPaymentMethodSaved = jest.fn(),
     onSavePreferenceChange = jest.fn(),
     registeredUserChoseGuest = false
@@ -327,8 +312,6 @@ const TestWrapper = ({
         <Payment
             paymentMethodForm={mockPaymentMethodForm}
             billingAddressForm={mockBillingAddressForm}
-            enableUserRegistration={enableUserRegistration}
-            setEnableUserRegistration={setEnableUserRegistration}
             registeredUserChoseGuest={registeredUserChoseGuest}
             onPaymentMethodSaved={onPaymentMethodSaved}
             onSavePreferenceChange={onSavePreferenceChange}
@@ -399,24 +382,6 @@ describe('Payment Component', () => {
             expect(
                 screen.queryByText('checkout_payment.label.same_as_shipping')
             ).not.toBeInTheDocument()
-        })
-    })
-
-    describe('User Registration', () => {
-        test('hides user registration when user chose guest checkout', () => {
-            render(<TestWrapper enableUserRegistration={true} registeredUserChoseGuest={true} />)
-
-            // User registration should be hidden
-            expect(screen.getByText('Review Order')).toBeInTheDocument()
-        })
-
-        test('calls setEnableUserRegistration when registration preference changes', () => {
-            const mockSetEnableUserRegistration = jest.fn()
-
-            render(<TestWrapper setEnableUserRegistration={mockSetEnableUserRegistration} />)
-
-            // The component should set up the registration preference handler
-            expect(mockSetEnableUserRegistration).toBeDefined()
         })
     })
 
