@@ -291,7 +291,7 @@ describe('AccountPayments', () => {
         expect(screen.getByText('Expires 6/2026')).toBeInTheDocument()
     })
 
-    test('shows error handling when add payment fails (no toast, no refetch)', async () => {
+    test('shows error toast when add payment fails', async () => {
         const mockRefetch = jest.fn()
         mockUseCurrentCustomer.mockReturnValue({
             data: mockCustomer,
@@ -322,7 +322,7 @@ describe('AccountPayments', () => {
         expect(mockRefetch).not.toHaveBeenCalled()
     })
 
-    test('shows error handling when remove payment fails (no toast, no refetch)', async () => {
+    test('shows error toast when remove payment fails', async () => {
         const mockRefetch = jest.fn()
         mockUseCurrentCustomer.mockReturnValue({
             data: mockCustomer,
