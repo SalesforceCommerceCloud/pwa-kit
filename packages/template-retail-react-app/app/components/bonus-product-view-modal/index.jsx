@@ -321,7 +321,7 @@ const BonusProductViewModal = ({
                             {
                                 id: 'bonus_product_view_modal.title',
                                 defaultMessage:
-                                    'Select Bonus Product ({selected} of {max} selected)'
+                                    'Select bonus product ({selected} of {max} selected)'
                             },
                             {selected: finalSelectedBonusItems, max: finalMaxBonusItems}
                         )}

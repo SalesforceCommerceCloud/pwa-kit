@@ -220,19 +220,19 @@ describe('BonusProductViewModal - Header Count Display', () => {
     testHeaderCount(
         2, // maxBonusItems
         0, // selectedBonusItems
-        'Select Bonus Product (0 of 2 selected)'
+        'Select bonus product (0 of 2 selected)'
     )
 
     testHeaderCount(
         4, // maxBonusItems
         1, // selectedBonusItems
-        'Select Bonus Product (1 of 4 selected)'
+        'Select bonus product (1 of 4 selected)'
     )
 
     testHeaderCount(
         6, // maxBonusItems
         5, // selectedBonusItems
-        'Select Bonus Product (5 of 6 selected)'
+        'Select bonus product (5 of 6 selected)'
     )
 })
 

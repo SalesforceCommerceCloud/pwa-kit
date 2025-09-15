@@ -193,7 +193,7 @@
     "defaultMessage": "No Image"
   },
   "bonus_product_modal.title": {
-    "defaultMessage": "Select Bonus Product ({selected} of {max} selected)"
+    "defaultMessage": "Select bonus product ({selected} of {max} selected)"
   },
   "bonus_product_view_modal.button.back_to_selection": {
     "defaultMessage": "← Back to Selection"
@@ -205,7 +205,7 @@
     "defaultMessage": "Bonus product selection modal for {productName}"
   },
   "bonus_product_view_modal.title": {
-    "defaultMessage": "Select Bonus Product ({selected} of {max} selected)"
+    "defaultMessage": "Select bonus product ({selected} of {max} selected)"
   },
   "bonus_product_view_modal.toast.item_added": {
     "defaultMessage": "Bonus item added to cart"
