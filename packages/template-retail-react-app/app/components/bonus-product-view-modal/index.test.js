@@ -53,7 +53,7 @@ jest.mock(
                     // For distribution tests, use maxOrderQuantity as the quantity to test with
                     // This simulates a user selecting the maximum available quantity
                     const quantity = maxOrderQuantity && maxOrderQuantity > 1 ? maxOrderQuantity : 1
-                    
+
                     // Call addToCart with the expected format: array of {variant, quantity}
                     addToCart([
                         {
@@ -617,7 +617,7 @@ describe('BonusProductViewModal - Quantity Distribution Across Multiple BonusDis
         // Mock findAvailableBonusDiscountLineItemIds to return pairs with available capacity
         findAvailableBonusDiscountLineItemIds.mockReturnValue([
             ['bonus-1', 2], // First discount item has capacity for 2
-            ['bonus-2', 1]  // Second discount item has capacity for 1
+            ['bonus-2', 1] // Second discount item has capacity for 1
         ])
 
         mockAddItemToNewOrExistingBasket.mockResolvedValue({
@@ -773,8 +773,8 @@ describe('BonusProductViewModal - Quantity Distribution Across Multiple BonusDis
         // Mock findAvailableBonusDiscountLineItemIds to return three pairs
         findAvailableBonusDiscountLineItemIds.mockReturnValue([
             ['bonus-1', 3], // First has capacity for 3
-            ['bonus-2', 2], // Second has capacity for 2  
-            ['bonus-3', 1]  // Third has capacity for 1
+            ['bonus-2', 2], // Second has capacity for 2
+            ['bonus-3', 1] // Third has capacity for 1
         ])
 
         // Update remaining bonus quantity to allow for 5 items

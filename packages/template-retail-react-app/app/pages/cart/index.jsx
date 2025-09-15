@@ -93,7 +93,6 @@ const Cart = () => {
     // State for tracking items being removed (for UI feedback)
     const [removingItemIds, setRemovingItemIds] = React.useState([])
 
-
     // Get configuration for bonus product grouping
     const config = getConfig()
     const groupBonusProductsWithQualifyingProduct =
@@ -680,16 +679,16 @@ const Cart = () => {
         if (product.bonusProductLineItem) {
             // Find all bonus product items that should be removed together
             const itemsToRemove = findAllBonusProductItemsToRemove(basket, product)
-            
+
             if (itemsToRemove.length > 1) {
                 // Set removing state for UI feedback
-                const itemIdsToRemove = itemsToRemove.map(item => item.itemId)
+                const itemIdsToRemove = itemsToRemove.map((item) => item.itemId)
                 setRemovingItemIds(itemIdsToRemove)
-                
+
                 // Track removal progress
                 let index = 0
                 let successfulRemovals = 0
-                
+
                 // Sequential removal function to avoid race conditions
                 const removeNextItem = () => {
                     if (index >= itemsToRemove.length) {
@@ -697,7 +696,7 @@ const Cart = () => {
                         setCartItemLoading(false)
                         setSelectedItem(undefined)
                         setRemovingItemIds([])
-                        
+
                         // Show success toast for successful removals
                         if (successfulRemovals > 0) {
                             const totalQuantity = itemsToRemove
@@ -712,9 +711,9 @@ const Cart = () => {
                         }
                         return
                     }
-                    
+
                     const currentItem = itemsToRemove[index]
-                    
+
                     removeItemFromBasketMutation.mutate(
                         {
                             parameters: {basketId: basket.basketId, itemId: currentItem.itemId}
@@ -734,7 +733,7 @@ const Cart = () => {
                         }
                     )
                 }
-                
+
                 removeNextItem()
             } else {
                 // Single bonus product item
@@ -749,7 +748,9 @@ const Cart = () => {
                         },
                         onSuccess: () => {
                             toast({
-                                title: formatMessage(TOAST_MESSAGE_REMOVED_ITEM_FROM_CART, {quantity: 1}),
+                                title: formatMessage(TOAST_MESSAGE_REMOVED_ITEM_FROM_CART, {
+                                    quantity: 1
+                                }),
                                 status: 'success'
                             })
                         },
@@ -773,7 +774,9 @@ const Cart = () => {
                     },
                     onSuccess: () => {
                         toast({
-                            title: formatMessage(TOAST_MESSAGE_REMOVED_ITEM_FROM_CART, {quantity: 1}),
+                            title: formatMessage(TOAST_MESSAGE_REMOVED_ITEM_FROM_CART, {
+                                quantity: 1
+                            }),
                             status: 'success'
                         })
                     },

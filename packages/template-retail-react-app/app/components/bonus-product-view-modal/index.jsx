@@ -153,14 +153,15 @@ const BonusProductViewModal = ({
                         finalQuantity = maxAllowed
                     }
 
-
                     // Get list of available bonus discount line items with their capacities
-                    const availablePairs = findAvailableBonusDiscountLineItemIds(basket, promotionId)
+                    const availablePairs = findAvailableBonusDiscountLineItemIds(
+                        basket,
+                        promotionId
+                    )
 
                     if (availablePairs.length === 0) {
                         continue // Skip this item but process others
                     }
-
 
                     let remainingQuantity = finalQuantity
 
@@ -173,7 +174,6 @@ const BonusProductViewModal = ({
                         // Calculate amount to add: minimum of remaining quantity and available capacity
                         const quantityToAdd = Math.min(remainingQuantity, availableCapacity)
 
-
                         productItems.push({
                             productId: variant?.productId || product?.productId || product?.id,
                             price: variant?.price || product?.price,
@@ -183,7 +183,6 @@ const BonusProductViewModal = ({
 
                         remainingQuantity -= quantityToAdd
                     }
-
                 }
 
                 if (productItems.length === 0) {

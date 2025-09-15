@@ -152,7 +152,7 @@ const ProductView = forwardRef(
             promotionId,
             maxOrderQuantity = null,
             imageGalleryFooter = null,
-            alignItems = "flex-start",
+            alignItems = 'flex-start'
         },
         ref
     ) => {
@@ -522,13 +522,13 @@ const ProductView = forwardRef(
                     )}
 
                     {/* Variations & Quantity Selector & CTA buttons */}
-                    <VStack 
-                        align="stretch" 
-                        spacing={8} 
+                    <VStack
+                        align="stretch"
+                        spacing={8}
                         flex={1}
                         pb={[
                             isProductPartOfSet || isProductPartOfBundle ? 4 : '120px',
-                            isProductPartOfSet || isProductPartOfBundle ? 4 : '120px', 
+                            isProductPartOfSet || isProductPartOfBundle ? 4 : '120px',
                             isProductPartOfSet || isProductPartOfBundle ? 4 : '120px',
                             4
                         ]}
@@ -932,7 +932,7 @@ ProductView.propTypes = {
     promotionId: PropTypes.string,
     maxOrderQuantity: PropTypes.number,
     imageGalleryFooter: PropTypes.node,
-    alignItems: PropTypes.string,
+    alignItems: PropTypes.string
 }
 
 export default ProductView

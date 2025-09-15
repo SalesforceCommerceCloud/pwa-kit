@@ -81,8 +81,8 @@ const ProductItem = ({
 
                             <Flex align="flex-end" justify="space-between">
                                 <Stack spacing={1}>
-                                    {!(isRemoving && product.bonusProductLineItem) && (
-                                        product.bonusProductLineItem ? (
+                                    {!(isRemoving && product.bonusProductLineItem) &&
+                                        (product.bonusProductLineItem ? (
                                             <BonusProductQuantity product={product} />
                                         ) : (
                                             <ProductQuantityPicker
@@ -92,8 +92,7 @@ const ProductItem = ({
                                                 quantity={quantity}
                                                 setQuantity={setQuantity}
                                             />
-                                        )
-                                    )}
+                                        ))}
                                 </Stack>
                                 <Stack>
                                     <HideOnMobile>
