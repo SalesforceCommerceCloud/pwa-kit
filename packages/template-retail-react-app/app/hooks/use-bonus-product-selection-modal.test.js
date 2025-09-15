@@ -285,7 +285,7 @@ describe('BonusProductSelectionModal Component - Scrolling Behavior', () => {
         const componentSource = fs.readFileSync(componentPath, 'utf8')
 
         // Verify that our scrolling container exists in the source
-        expect(componentSource).toContain('maxHeight={{base: "60vh", md: "70vh"}}')
+        expect(componentSource).toContain("maxHeight={{base: '60vh', md: '70vh'}}")
         expect(componentSource).toContain('overflowY="auto"')
         expect(componentSource).toContain('<Box ')
         expect(componentSource).toContain('width="100%"')
@@ -298,8 +298,8 @@ describe('BonusProductSelectionModal Component - Scrolling Behavior', () => {
         const componentSource = fs.readFileSync(componentPath, 'utf8')
 
         // Verify responsive maxHeight configuration
-        expect(componentSource).toContain('"60vh"') // base size
-        expect(componentSource).toContain('"70vh"') // md+ size
+        expect(componentSource).toContain("'60vh'") // base size
+        expect(componentSource).toContain("'70vh'") // md+ size
         expect(componentSource).toContain('base:') // responsive object structure
         expect(componentSource).toContain('md:') // responsive object structure
     })
@@ -328,7 +328,7 @@ describe('BonusProductSelectionModal Component - Scrolling Behavior', () => {
         // Check that the modal body contains both VStack and Box with scrolling
         expect(componentSource).toContain('<VStack spacing="4">')
         expect(componentSource).toContain('overflowY="auto"')
-        expect(componentSource).toContain('maxHeight={{base: "60vh", md: "70vh"}}')
+        expect(componentSource).toContain("maxHeight={{base: '60vh', md: '70vh'}}")
 
         // Verify the structure prevents infinite expansion by having constrained height
         const modalBodySection = componentSource.substring(
