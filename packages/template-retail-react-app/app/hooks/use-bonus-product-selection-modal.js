@@ -131,10 +131,18 @@ const BonusProductItem = ({product, productData, foundProductData, onSelect, isL
                         </Box>
                     )}
                 </AspectRatio>
-                <Text fontSize="md" fontWeight="semibold" noOfLines={2} textAlign="center">
-                    {productName}
-                </Text>
-                <Box display="flex" alignItems="center" justifyContent="center" gap="2">
+                <Box width="162px">
+                    <Text fontSize="md" fontWeight="semibold" noOfLines={2} textAlign="left">
+                        {productName}
+                    </Text>
+                </Box>
+                <Box
+                    width="162px"
+                    display="flex"
+                    alignItems="center"
+                    justifyContent="flex-start"
+                    gap="2"
+                >
                     <Text fontSize="sm" color="gray.400" textDecoration="line-through">
                         {foundProductData?.price ? `$${foundProductData.price}` : ''}
                     </Text>
