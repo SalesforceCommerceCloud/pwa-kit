@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React, {useState} from 'react'
+import React, {useState, useEffect, useMemo} from 'react'
 import {useIntl} from 'react-intl'
 import PropTypes from 'prop-types'
 import {useProducts} from '@salesforce/commerce-sdk-react'
@@ -26,9 +26,15 @@ import {useCheckout} from '@salesforce/retail-react-app/app/pages/checkout/util/
 import {useProductAddressAssignment} from '@salesforce/retail-react-app/app/hooks/use-product-address-assignment'
 import {useAddressForm} from '@salesforce/retail-react-app/app/hooks/use-address-form'
 import {useMultiship} from '@salesforce/retail-react-app/app/hooks/use-multiship'
+import {isPickupShipment} from '@salesforce/retail-react-app/app/utils/shipment-utils'
 import ProductShippingAddressCard from '@salesforce/retail-react-app/app/pages/checkout/partials/product-shipping-address-card.jsx'
 
-const ShippingMultiAddress = ({basket, submitButtonLabel, noItemsInBasketMessage}) => {
+const ShippingMultiAddress = ({
+    basket,
+    submitButtonLabel,
+    noItemsInBasketMessage,
+    onUnsavedGuestAddressesToggleWarning
+}) => {
     const {formatMessage} = useIntl()
     const {STEPS, goToStep} = useCheckout()
     const showToast = useToast()
@@ -82,6 +88,23 @@ const ShippingMultiAddress = ({basket, submitButtonLabel, noItemsInBasketMessage
     const isLoading = (customer?.isGuest ? false : customerLoading) || productsLoading
 
     const allShipmentsHaveAddress = productAddressAssignment.allItemsHaveAddresses
+
+    const hasUnpersistedGuestAddresses = useMemo(() => {
+        if (!customer?.isGuest || !addresses?.length) return false
+
+        const persistedAddresses =
+            basket?.shipments
+                ?.filter((shipment) => !isPickupShipment(shipment))
+                ?.map((shipment) => shipment.shippingAddress)
+                ?.filter(Boolean) || []
+
+        return addresses.length > persistedAddresses.length
+    }, [customer?.isGuest, addresses, basket?.shipments])
+
+    // inform parent of unpersisted local guest addresses
+    useEffect(() => {
+        onUnsavedGuestAddressesToggleWarning?.(hasUnpersistedGuestAddresses)
+    }, [hasUnpersistedGuestAddresses, onUnsavedGuestAddressesToggleWarning])
 
     if (!productAddressAssignment.deliveryItems.length) {
         return (
@@ -253,7 +276,8 @@ const ShippingMultiAddress = ({basket, submitButtonLabel, noItemsInBasketMessage
 ShippingMultiAddress.propTypes = {
     basket: PropTypes.object.isRequired,
     submitButtonLabel: PropTypes.object.isRequired,
-    noItemsInBasketMessage: PropTypes.object.isRequired
+    noItemsInBasketMessage: PropTypes.object.isRequired,
+    onUnsavedGuestAddressesToggleWarning: PropTypes.func
 }
 
 export default ShippingMultiAddress
