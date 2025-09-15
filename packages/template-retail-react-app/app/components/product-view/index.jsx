@@ -653,7 +653,7 @@ const ProductView = forwardRef(
                                         step={stepQuantity}
                                         value={quantity}
                                         min={minOrderQuantity}
-                                        max={maxOrderQuantity}
+                                        {...(maxOrderQuantity != null && {max: maxOrderQuantity})}
                                         onChange={(stringValue, numberValue) => {
                                             // Set the Quantity of product to value of input if value number
                                             if (numberValue >= 0) {
