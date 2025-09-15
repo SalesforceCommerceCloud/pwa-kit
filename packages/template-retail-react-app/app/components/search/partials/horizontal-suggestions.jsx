@@ -9,15 +9,18 @@ import PropTypes from 'prop-types'
 import {Text, Box, Flex, AspectRatio} from '@salesforce/retail-react-app/app/components/shared/ui'
 import DynamicImage from '@salesforce/retail-react-app/app/components/dynamic-image'
 import Link from '@salesforce/retail-react-app/app/components/link'
+import {useStyleConfig} from '@chakra-ui/react'
 
 const HorizontalSuggestions = ({suggestions, closeAndNavigate, dynamicImageProps}) => {
+    const styles = useStyleConfig('HorizontalSuggestions')
+
     if (!suggestions) {
         return null
     }
 
     return (
-        <Box data-testid="sf-horizontal-product-suggestions">
-            <Flex gap="4" overflowX="auto" pb="2">
+        <Box data-testid="sf-horizontal-product-suggestions" sx={styles.container}>
+            <Flex sx={styles.flexContainer}>
                 {suggestions.map((suggestion, idx) => (
                     <Link
                         data-testid="product-tile"
@@ -25,29 +28,15 @@ const HorizontalSuggestions = ({suggestions, closeAndNavigate, dynamicImageProps
                         key={idx}
                         onClick={() => closeAndNavigate(suggestion.link)}
                     >
-                        <Box width={{base: '50vw', md: '50vw', lg: '10vw'}} flex="0 0 auto">
+                        <Box sx={styles.suggestionItem}>
                             {/* Product Image */}
-                            <Box mb="2">
+                            <Box sx={styles.imageContainer}>
                                 {suggestion.image ? (
-                                    <AspectRatio ratio={1}>
+                                    <AspectRatio sx={styles.aspectRatio}>
                                         <DynamicImage
                                             src={`${suggestion.image}[?sw={width}&q=60]`}
                                             widths={dynamicImageProps?.widths}
-                                            sx={{
-                                                height: '100%',
-                                                width: '100%',
-                                                '& picture': {
-                                                    display: 'block',
-                                                    height: '100%',
-                                                    width: '100%'
-                                                },
-                                                '& img': {
-                                                    display: 'block',
-                                                    height: '100%',
-                                                    width: '100%',
-                                                    objectFit: 'cover'
-                                                }
-                                            }}
+                                            sx={styles.dynamicImage}
                                             imageProps={{
                                                 alt: '',
                                                 loading: 'eager'
@@ -57,20 +46,10 @@ const HorizontalSuggestions = ({suggestions, closeAndNavigate, dynamicImageProps
                                 ) : null}
                             </Box>
 
-                            <Text
-                                fontSize="sm"
-                                fontWeight="medium"
-                                color="gray.900"
-                                mb="1"
-                                noOfLines={2}
-                            >
-                                {suggestion.name}
-                            </Text>
+                            <Text sx={styles.productName}>{suggestion.name}</Text>
 
                             {suggestion.price && (
-                                <Text fontSize="sm" color="gray.900" fontWeight="medium">
-                                    ${suggestion.price}
-                                </Text>
+                                <Text sx={styles.productPrice}>${suggestion.price}</Text>
                             )}
                         </Box>
                     </Link>

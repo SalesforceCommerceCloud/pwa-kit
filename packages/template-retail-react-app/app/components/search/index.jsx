@@ -58,8 +58,8 @@ const formatSuggestions = (searchSuggestions) => {
                     id: suggestion.id,
                     link: categoryUrlBuilder({id: suggestion.id}),
                     name: capitalize(suggestion.name),
-                    image: suggestion.image?.disBaseLink, // Add image if available
-                    parentCategoryName: suggestion.parentCategoryName // Add parent category if available
+                    image: suggestion.image?.disBaseLink,
+                    parentCategoryName: suggestion.parentCategoryName
                 }
             }
         ),
@@ -71,7 +71,7 @@ const formatSuggestions = (searchSuggestions) => {
                 productId: product.productId,
                 name: capitalize(product.productName),
                 link: productUrlBuilder({id: product.productId}),
-                image: product.image?.disBaseLink // Add image if available
+                image: product.image?.disBaseLink
             }
         }),
         brandSuggestions: searchSuggestions?.brandSuggestions?.suggestedPhrases?.map((brand) => {
