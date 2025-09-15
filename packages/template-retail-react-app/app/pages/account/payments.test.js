@@ -316,7 +316,9 @@ describe('AccountPayments', () => {
         await user.click(screen.getByRole('button', {name: /save/i}))
 
         await waitFor(() => expect(mockMutate).toHaveBeenCalled())
-        expect(mockToast).not.toHaveBeenCalled()
+        expect(mockToast).toHaveBeenCalled()
+        const toastArgAdd = useToast.mock.results[0].value.mock.calls[0][0]
+        expect(toastArgAdd.status).toBe('error')
         expect(mockRefetch).not.toHaveBeenCalled()
     })
 
@@ -338,7 +340,9 @@ describe('AccountPayments', () => {
         await user.click(removeButtons[0])
 
         await waitFor(() => expect(mockDelete).toHaveBeenCalled())
-        expect(mockToast).not.toHaveBeenCalled()
+        expect(mockToast).toHaveBeenCalled()
+        const toastArgDel = useToast.mock.results[0].value.mock.calls[0][0]
+        expect(toastArgDel.status).toBe('error')
         expect(mockRefetch).not.toHaveBeenCalled()
     })
 })

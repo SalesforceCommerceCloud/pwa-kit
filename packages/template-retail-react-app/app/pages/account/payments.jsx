@@ -6,7 +6,7 @@
  */
 
 import React, {useState} from 'react'
-import {FormattedMessage} from 'react-intl'
+import {FormattedMessage, useIntl} from 'react-intl'
 import {
     Box,
     Button,
@@ -49,9 +49,11 @@ const BoxArrow = () => {
 }
 
 const AccountPayments = () => {
+    const {formatMessage} = useIntl()
     const {data: customer, isLoading, error, refetch} = useCurrentCustomer()
     const showToast = useToast()
     const [isAdding, setIsAdding] = useState(false)
+    const [formKey, setFormKey] = useState(0)
     const [deletingId, setDeletingId] = useState(null)
     const addPaymentForm = useForm()
     const createCustomerPaymentInstrument = useShopperCustomersMutation(
@@ -77,12 +79,10 @@ const AccountPayments = () => {
                 {
                     onSuccess: () => {
                         showToast({
-                            title: (
-                                <FormattedMessage
-                                    defaultMessage="New payment method saved"
-                                    id="account.payments.info.payment_method_saved"
-                                />
-                            ),
+                            title: formatMessage({
+                                defaultMessage: 'New payment method saved',
+                                id: 'account.payments.info.payment_method_saved'
+                            }),
                             status: 'success',
                             isClosable: true
                         })
@@ -92,10 +92,30 @@ const AccountPayments = () => {
             setIsAdding(false)
             await refetch()
         } catch (e) {
-            // Swallow errors to avoid unhandled rejections in tests; UI can remain unchanged
+            showToast({
+                title: formatMessage({
+                    defaultMessage: 'Unable to save payment method',
+                    id: 'account.payments.error.payment_method_save_failed'
+                }),
+                status: 'error',
+                isClosable: true
+            })
         }
     }
-    const toggleAdd = () => setIsAdding((v) => !v)
+    const openAdd = () => {
+        // Reset all card fields to ensure a blank form
+        addPaymentForm.reset({
+            number: '',
+            cardType: '',
+            holder: '',
+            expiry: '',
+            securityCode: ''
+        })
+        // Force form subtree remount to clear any internal state
+        setFormKey((k) => k + 1)
+        setIsAdding(true)
+    }
+    const closeAdd = () => setIsAdding(false)
 
     const removePayment = async (paymentInstrumentId) => {
         setDeletingId(paymentInstrumentId)
@@ -107,12 +127,10 @@ const AccountPayments = () => {
                 {
                     onSuccess: () => {
                         showToast({
-                            title: (
-                                <FormattedMessage
-                                    defaultMessage="Payment method removed"
-                                    id="account.payments.info.payment_method_removed"
-                                />
-                            ),
+                            title: formatMessage({
+                                defaultMessage: 'Payment method removed',
+                                id: 'account.payments.info.payment_method_removed'
+                            }),
                             status: 'success',
                             isClosable: true
                         })
@@ -121,7 +139,14 @@ const AccountPayments = () => {
             )
             await refetch()
         } catch (e) {
-            // Ignore errors for failure-path tests; UI remains unchanged
+            showToast({
+                title: formatMessage({
+                    defaultMessage: 'Unable to remove payment method',
+                    id: 'account.payments.error.payment_method_remove_failed'
+                }),
+                status: 'error',
+                isClosable: true
+            })
         } finally {
             setDeletingId(null)
         }
@@ -207,7 +232,7 @@ const AccountPayments = () => {
                                 id="account.payments.placeholder.text"
                             />
                         </Text>
-                        <Button mt={4} onClick={toggleAdd} leftIcon={<PlusIcon boxSize={3} />}>
+                        <Button mt={4} onClick={openAdd} leftIcon={<PlusIcon boxSize={3} />}>
                             <FormattedMessage
                                 defaultMessage="Add Payment"
                                 id="account_payments.button.add_payment"
@@ -228,10 +253,11 @@ const AccountPayments = () => {
                         >
                             <Container variant="form">
                                 <AccountPaymentForm
+                                    key={formKey}
                                     form={addPaymentForm}
                                     onSubmit={onAddPaymentSubmit}
                                 >
-                                    <FormActionButtons onCancel={toggleAdd} />
+                                    <FormActionButtons onCancel={closeAdd} />
                                 </AccountPaymentForm>
                             </Container>
                         </Box>
@@ -275,7 +301,7 @@ const AccountPayments = () => {
                         rounded="base"
                         fontWeight="medium"
                         leftIcon={<PlusIcon display="block" boxSize={'15px'} />}
-                        onClick={toggleAdd}
+                        onClick={openAdd}
                     >
                         <FormattedMessage
                             defaultMessage="Add Payment"
@@ -303,7 +329,7 @@ const AccountPayments = () => {
                                         form={addPaymentForm}
                                         onSubmit={onAddPaymentSubmit}
                                     >
-                                        <FormActionButtons onCancel={toggleAdd} />
+                                        <FormActionButtons onCancel={closeAdd} />
                                     </AccountPaymentForm>
                                 </Container>
                             </Box>
