@@ -6,19 +6,46 @@
  */
 
 import React from 'react'
-import {renderHook, act, render, screen} from '@testing-library/react'
+import {renderHook, act} from '@testing-library/react'
 import {BrowserRouter} from 'react-router-dom'
+import fs from 'fs'
+import path from 'path'
 import PropTypes from 'prop-types'
 
 // Import the hook and component we want to test
-import {
-    useBonusProductSelectionModal,
-    BonusProductSelectionModal,
-    BonusProductSelectionModalProvider
-} from '@salesforce/retail-react-app/../../app/hooks/use-bonus-product-selection-modal'
+import {useBonusProductSelectionModal} from '@salesforce/retail-react-app/app/hooks/use-bonus-product-selection-modal'
 
 // Mock all dependencies
 jest.mock('@salesforce/retail-react-app/app/hooks/use-modal-state')
+jest.mock('@salesforce/retail-react-app/app/utils/bonus-product-utils', () => ({
+    findAvailableBonusDiscountLineItemIds: jest.fn(() => [])
+}))
+
+jest.mock('@salesforce/commerce-sdk-react', () => ({
+    ...jest.requireActual('@salesforce/commerce-sdk-react'),
+    useCustomerId: jest.fn(() => 'test-customer-id'),
+    useShopperCustomersMutation: jest.fn(() => ({
+        mutateAsync: jest.fn()
+    }))
+}))
+
+jest.mock('@salesforce/retail-react-app/app/hooks/use-wish-list', () => ({
+    useWishList: jest.fn(() => ({
+        data: {
+            id: 'test-wishlist-id',
+            customerProductListItems: []
+        }
+    }))
+}))
+
+jest.mock('@salesforce/retail-react-app/app/hooks/use-toast', () => ({
+    useToast: jest.fn(() => jest.fn())
+}))
+
+jest.mock('@salesforce/retail-react-app/app/hooks/use-navigation', () => ({
+    __esModule: true,
+    default: jest.fn(() => jest.fn())
+}))
 
 import {useModalState} from '@salesforce/retail-react-app/app/hooks/use-modal-state'
 
@@ -254,13 +281,11 @@ describe('BonusProductSelectionModal Component - Scrolling Behavior', () => {
         // This ensures our maxHeight and overflowY changes are preserved
 
         // Read the component source to verify scrolling structure
-        const fs = require('fs')
-        const path = require('path')
         const componentPath = path.join(__dirname, 'use-bonus-product-selection-modal.js')
         const componentSource = fs.readFileSync(componentPath, 'utf8')
 
         // Verify that our scrolling container exists in the source
-        expect(componentSource).toContain('maxHeight={{base: "60vh", md: "70vh"}}')
+        expect(componentSource).toContain("maxHeight={{base: '60vh', md: '70vh'}}")
         expect(componentSource).toContain('overflowY="auto"')
         expect(componentSource).toContain('<Box ')
         expect(componentSource).toContain('width="100%"')
@@ -269,22 +294,18 @@ describe('BonusProductSelectionModal Component - Scrolling Behavior', () => {
 
     it('should have correct responsive maxHeight values', () => {
         // Test that we have the correct responsive breakpoints for maxHeight
-        const fs = require('fs')
-        const path = require('path')
         const componentPath = path.join(__dirname, 'use-bonus-product-selection-modal.js')
         const componentSource = fs.readFileSync(componentPath, 'utf8')
 
         // Verify responsive maxHeight configuration
-        expect(componentSource).toContain('"60vh"') // base size
-        expect(componentSource).toContain('"70vh"') // md+ size
+        expect(componentSource).toContain("'60vh'") // base size
+        expect(componentSource).toContain("'70vh'") // md+ size
         expect(componentSource).toContain('base:') // responsive object structure
         expect(componentSource).toContain('md:') // responsive object structure
     })
 
     it('should wrap SimpleGrid with scrollable container', () => {
         // Verify that SimpleGrid is properly nested within the scrollable Box
-        const fs = require('fs')
-        const path = require('path')
         const componentPath = path.join(__dirname, 'use-bonus-product-selection-modal.js')
         const componentSource = fs.readFileSync(componentPath, 'utf8')
 
@@ -301,15 +322,13 @@ describe('BonusProductSelectionModal Component - Scrolling Behavior', () => {
     it('should prevent modal height regression', () => {
         // This test ensures that the modal doesn't expand infinitely with many products
         // by checking that the scrollable container structure is maintained
-        const fs = require('fs')
-        const path = require('path')
         const componentPath = path.join(__dirname, 'use-bonus-product-selection-modal.js')
         const componentSource = fs.readFileSync(componentPath, 'utf8')
 
         // Check that the modal body contains both VStack and Box with scrolling
         expect(componentSource).toContain('<VStack spacing="4">')
         expect(componentSource).toContain('overflowY="auto"')
-        expect(componentSource).toContain('maxHeight={{base: "60vh", md: "70vh"}}')
+        expect(componentSource).toContain("maxHeight={{base: '60vh', md: '70vh'}}")
 
         // Verify the structure prevents infinite expansion by having constrained height
         const modalBodySection = componentSource.substring(

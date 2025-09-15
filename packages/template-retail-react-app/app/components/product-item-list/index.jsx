@@ -32,7 +32,8 @@ const ProductItemList = ({
     selectedItem = null,
     removingItemIds = [],
     // Styling options
-    hideBorder = false
+    hideBorder = false,
+    hideBottomBorder = false
 }) => {
     return (
         <Stack spacing={4}>
@@ -48,7 +49,8 @@ const ProductItemList = ({
                         containerStyles={{
                             borderX: 'none',
                             borderTop: 'none',
-                            boxShadow: 'none'
+                            boxShadow: 'none',
+                            ...(hideBottomBorder && {borderBottom: 'none'})
                         }}
                         secondaryActions={
                             renderSecondaryActions
@@ -101,7 +103,8 @@ ProductItemList.propTypes = {
     isCartItemLoading: PropTypes.bool,
     selectedItem: PropTypes.object,
     removingItemIds: PropTypes.arrayOf(PropTypes.string),
-    hideBorder: PropTypes.bool
+    hideBorder: PropTypes.bool,
+    hideBottomBorder: PropTypes.bool
 }
 
 export default ProductItemList

@@ -130,22 +130,29 @@ const CartProductListWithGroupedBonusProducts = ({
                                     </Heading>
                                     <Stack gap={0}>
                                         {bonusProductsForThisProduct.map(
-                                            (bonusProduct, bonusIdx) => (
-                                                <Box
-                                                    key={bonusProduct.itemId}
-                                                    data-testid={`bonus-product-${bonusProduct.productId}`}
-                                                    border="none"
-                                                    borderBottom="none"
-                                                    borderTop="none"
-                                                    borderLeft="none"
-                                                    borderRight="none"
-                                                >
-                                                    {renderProductItem(bonusProduct, bonusIdx, {
-                                                        showQuantitySelector: false,
-                                                        hideBorder: true
-                                                    })}
-                                                </Box>
-                                            )
+                                            (bonusProduct, bonusIdx) => {
+                                                const isLastBonusProduct =
+                                                    bonusIdx ===
+                                                    bonusProductsForThisProduct.length - 1
+
+                                                return (
+                                                    <Box
+                                                        key={bonusProduct.itemId}
+                                                        data-testid={`bonus-product-${bonusProduct.productId}`}
+                                                        border="none"
+                                                        borderBottom="none"
+                                                        borderTop="none"
+                                                        borderLeft="none"
+                                                        borderRight="none"
+                                                    >
+                                                        {renderProductItem(bonusProduct, bonusIdx, {
+                                                            showQuantitySelector: false,
+                                                            hideBorder: true,
+                                                            hideBottomBorder: isLastBonusProduct
+                                                        })}
+                                                    </Box>
+                                                )
+                                            }
                                         )}
                                     </Stack>
                                 </Box>

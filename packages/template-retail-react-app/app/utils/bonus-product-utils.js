@@ -479,10 +479,7 @@ export const getRemainingAvailableBonusProductsForProduct = (
  * @param {string} promotionId - The promotion ID to match
  * @returns {Array<Array>} Array of pairs [bonusDiscountLineItemId, availableQuantity]
  */
-export const findAvailableBonusDiscountLineItemIds = (
-    basket,
-    promotionId
-) => {
+export const findAvailableBonusDiscountLineItemIds = (basket, promotionId) => {
     if (!basket?.bonusDiscountLineItems || !promotionId) {
         return []
     }
@@ -696,7 +693,7 @@ export const getBonusProductCountsForPromotion = (basket, promotionId) => {
  * Finds all bonus product items in the basket that should be removed when a user clicks "Remove"
  * on a specific bonus product. This includes all items with the same productId and from the same promotion,
  * across all bonusDiscountLineItemIds.
- * 
+ *
  * @param {Object} basket - The current basket data
  * @param {Object} targetBonusProduct - The bonus product item that the user clicked "Remove" on
  * @returns {Array} Array of bonus product items to remove (including the target item)

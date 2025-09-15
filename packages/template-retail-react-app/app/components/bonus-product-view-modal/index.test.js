@@ -53,7 +53,7 @@ jest.mock(
                     // For distribution tests, use maxOrderQuantity as the quantity to test with
                     // This simulates a user selecting the maximum available quantity
                     const quantity = maxOrderQuantity && maxOrderQuantity > 1 ? maxOrderQuantity : 1
-                    
+
                     // Call addToCart with the expected format: array of {variant, quantity}
                     addToCart([
                         {
@@ -183,8 +183,16 @@ describe('BonusProductViewModal - getRemainingBonusQuantity', () => {
 })
 
 describe('BonusProductViewModal - Header Count Display', () => {
-    const testHeaderCount = (description, maxBonusItems, selectedBonusItems, expectedText) => {
-        test(description, () => {
+    const testHeaderCount = (maxBonusItems, selectedBonusItems, expectedText) => {
+        it(`displays "${selectedBonusItems} of ${maxBonusItems} selected" when ${
+            selectedBonusItems === 0
+                ? 'no'
+                : selectedBonusItems === maxBonusItems
+                ? 'all'
+                : selectedBonusItems === 1
+                ? 'one'
+                : 'some'
+        } bonus items are selected`, () => {
             const mockBasket = {basketId: 'test-basket'}
 
             useCurrentBasket.mockReturnValue({data: mockBasket})
@@ -210,24 +218,21 @@ describe('BonusProductViewModal - Header Count Display', () => {
     }
 
     testHeaderCount(
-        'displays "0 of 2 selected" when no bonus items are selected',
         2, // maxBonusItems
         0, // selectedBonusItems
-        'Select Bonus Product (0 of 2 selected)'
+        'Select bonus product (0 of 2 selected)'
     )
 
     testHeaderCount(
-        'displays "1 of 4 selected" when one bonus item is selected',
         4, // maxBonusItems
         1, // selectedBonusItems
-        'Select Bonus Product (1 of 4 selected)'
+        'Select bonus product (1 of 4 selected)'
     )
 
     testHeaderCount(
-        'displays "5 of 6 selected" when most bonus items are selected',
         6, // maxBonusItems
         5, // selectedBonusItems
-        'Select Bonus Product (5 of 6 selected)'
+        'Select bonus product (5 of 6 selected)'
     )
 })
 
@@ -617,7 +622,7 @@ describe('BonusProductViewModal - Quantity Distribution Across Multiple BonusDis
         // Mock findAvailableBonusDiscountLineItemIds to return pairs with available capacity
         findAvailableBonusDiscountLineItemIds.mockReturnValue([
             ['bonus-1', 2], // First discount item has capacity for 2
-            ['bonus-2', 1]  // Second discount item has capacity for 1
+            ['bonus-2', 1] // Second discount item has capacity for 1
         ])
 
         mockAddItemToNewOrExistingBasket.mockResolvedValue({
@@ -773,8 +778,8 @@ describe('BonusProductViewModal - Quantity Distribution Across Multiple BonusDis
         // Mock findAvailableBonusDiscountLineItemIds to return three pairs
         findAvailableBonusDiscountLineItemIds.mockReturnValue([
             ['bonus-1', 3], // First has capacity for 3
-            ['bonus-2', 2], // Second has capacity for 2  
-            ['bonus-3', 1]  // Third has capacity for 1
+            ['bonus-2', 2], // Second has capacity for 2
+            ['bonus-3', 1] // Third has capacity for 1
         ])
 
         // Update remaining bonus quantity to allow for 5 items

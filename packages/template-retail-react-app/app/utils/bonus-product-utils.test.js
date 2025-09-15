@@ -261,12 +261,12 @@ describe('Enhanced Bonus Product Utilities', () => {
 
         // Template function for testing bonus product combining
         const testBonusProductCombining = (
-            description,
+            testCase,
             bonusProducts,
             expectedResults,
             customPromotions = mockProductsWithPromotions
         ) => {
-            test(description, () => {
+            it(`combines bonus products correctly: ${testCase}`, () => {
                 const basketWithBonusProducts = {
                     ...mockBasket,
                     productItems: [...mockBasket.productItems, ...bonusProducts]
@@ -293,7 +293,7 @@ describe('Enhanced Bonus Product Utilities', () => {
         }
 
         testBonusProductCombining(
-            'combines identical bonus products and aggregates quantities',
+            'identical products aggregate quantities',
             [
                 {
                     itemId: 'bonus-item-1',
@@ -328,7 +328,7 @@ describe('Enhanced Bonus Product Utilities', () => {
         )
 
         testBonusProductCombining(
-            'combines bonus products with different productIds separately',
+            'different productIds stay separate',
             [
                 {
                     itemId: 'bonus-item-1',
@@ -379,7 +379,7 @@ describe('Enhanced Bonus Product Utilities', () => {
         )
 
         testBonusProductCombining(
-            'handles bonus products with zero or undefined quantities',
+            'zero or undefined quantities',
             [
                 {
                     itemId: 'bonus-item-1',
@@ -409,7 +409,7 @@ describe('Enhanced Bonus Product Utilities', () => {
         )
 
         testBonusProductCombining(
-            'preserves all properties from first occurrence when combining',
+            'preserves properties from first occurrence',
             [
                 {
                     itemId: 'bonus-item-1',
@@ -653,7 +653,6 @@ describe('Enhanced Bonus Product Utilities', () => {
         })
     })
 
-
     // Test hook functions exports (can't test actual React hooks in Jest environment)
     describe('React Hooks', () => {
         test('hook utilities are exported and are functions', () => {
@@ -685,11 +684,14 @@ describe('Enhanced Bonus Product Utilities', () => {
                 ]
             }
 
-            const result = bonusProductUtils.findAvailableBonusDiscountLineItemIds(basket, 'promo-123')
+            const result = bonusProductUtils.findAvailableBonusDiscountLineItemIds(
+                basket,
+                'promo-123'
+            )
 
             expect(result).toEqual([
                 ['bonus-1', 2], // 3 max - 1 selected = 2 available
-                ['bonus-2', 2]  // 2 max - 0 selected = 2 available
+                ['bonus-2', 2] // 2 max - 0 selected = 2 available
             ])
         })
 
@@ -705,7 +707,10 @@ describe('Enhanced Bonus Product Utilities', () => {
                 ]
             }
 
-            const result = bonusProductUtils.findAvailableBonusDiscountLineItemIds(basket, 'promo-123')
+            const result = bonusProductUtils.findAvailableBonusDiscountLineItemIds(
+                basket,
+                'promo-123'
+            )
 
             expect(result).toEqual([])
         })
@@ -721,7 +726,10 @@ describe('Enhanced Bonus Product Utilities', () => {
                 ]
             }
 
-            const result = bonusProductUtils.findAvailableBonusDiscountLineItemIds(basket, 'promo-123')
+            const result = bonusProductUtils.findAvailableBonusDiscountLineItemIds(
+                basket,
+                'promo-123'
+            )
 
             expect(result).toEqual([
                 ['bonus-1', 2] // 5 max - (2+1) selected = 2 available
@@ -736,24 +744,37 @@ describe('Enhanced Bonus Product Utilities', () => {
                 productItems: []
             }
 
-            const result = bonusProductUtils.findAvailableBonusDiscountLineItemIds(basket, 'promo-123')
+            const result = bonusProductUtils.findAvailableBonusDiscountLineItemIds(
+                basket,
+                'promo-123'
+            )
 
             expect(result).toEqual([])
         })
 
         test('returns empty array when basket is null or undefined', () => {
-            expect(bonusProductUtils.findAvailableBonusDiscountLineItemIds(null, 'promo-123')).toEqual([])
-            expect(bonusProductUtils.findAvailableBonusDiscountLineItemIds(undefined, 'promo-123')).toEqual([])
+            expect(
+                bonusProductUtils.findAvailableBonusDiscountLineItemIds(null, 'promo-123')
+            ).toEqual([])
+            expect(
+                bonusProductUtils.findAvailableBonusDiscountLineItemIds(undefined, 'promo-123')
+            ).toEqual([])
         })
 
         test('returns empty array when promotionId is null or undefined', () => {
             const basket = {
-                bonusDiscountLineItems: [{id: 'bonus-1', promotionId: 'promo-123', maxBonusItems: 3}],
+                bonusDiscountLineItems: [
+                    {id: 'bonus-1', promotionId: 'promo-123', maxBonusItems: 3}
+                ],
                 productItems: []
             }
 
-            expect(bonusProductUtils.findAvailableBonusDiscountLineItemIds(basket, null)).toEqual([])
-            expect(bonusProductUtils.findAvailableBonusDiscountLineItemIds(basket, undefined)).toEqual([])
+            expect(bonusProductUtils.findAvailableBonusDiscountLineItemIds(basket, null)).toEqual(
+                []
+            )
+            expect(
+                bonusProductUtils.findAvailableBonusDiscountLineItemIds(basket, undefined)
+            ).toEqual([])
         })
 
         test('returns empty array when no bonusDiscountLineItems exist', () => {
@@ -761,7 +782,10 @@ describe('Enhanced Bonus Product Utilities', () => {
                 productItems: []
             }
 
-            const result = bonusProductUtils.findAvailableBonusDiscountLineItemIds(basket, 'promo-123')
+            const result = bonusProductUtils.findAvailableBonusDiscountLineItemIds(
+                basket,
+                'promo-123'
+            )
 
             expect(result).toEqual([])
         })
@@ -774,7 +798,10 @@ describe('Enhanced Bonus Product Utilities', () => {
                 productItems: []
             }
 
-            const result = bonusProductUtils.findAvailableBonusDiscountLineItemIds(basket, 'promo-123')
+            const result = bonusProductUtils.findAvailableBonusDiscountLineItemIds(
+                basket,
+                'promo-123'
+            )
 
             expect(result).toEqual([])
         })
@@ -787,7 +814,10 @@ describe('Enhanced Bonus Product Utilities', () => {
                 // No productItems array
             }
 
-            const result = bonusProductUtils.findAvailableBonusDiscountLineItemIds(basket, 'promo-123')
+            const result = bonusProductUtils.findAvailableBonusDiscountLineItemIds(
+                basket,
+                'promo-123'
+            )
 
             expect(result).toEqual([
                 ['bonus-1', 3] // 3 max - 0 selected = 3 available
@@ -801,11 +831,14 @@ describe('Enhanced Bonus Product Utilities', () => {
                 ],
                 productItems: [
                     {bonusProductLineItem: false, bonusDiscountLineItemId: 'bonus-1', quantity: 2}, // Should be ignored
-                    {bonusProductLineItem: true, bonusDiscountLineItemId: 'bonus-1', quantity: 1}   // Should count
+                    {bonusProductLineItem: true, bonusDiscountLineItemId: 'bonus-1', quantity: 1} // Should count
                 ]
             }
 
-            const result = bonusProductUtils.findAvailableBonusDiscountLineItemIds(basket, 'promo-123')
+            const result = bonusProductUtils.findAvailableBonusDiscountLineItemIds(
+                basket,
+                'promo-123'
+            )
 
             expect(result).toEqual([
                 ['bonus-1', 2] // 3 max - 1 selected = 2 available (ignores non-bonus item)
@@ -821,16 +854,19 @@ describe('Enhanced Bonus Product Utilities', () => {
                 ],
                 productItems: [
                     {bonusProductLineItem: true, bonusDiscountLineItemId: 'bonus-1', quantity: 1},
-                    {bonusProductLineItem: true, bonusDiscountLineItemId: 'bonus-2', quantity: 2},
+                    {bonusProductLineItem: true, bonusDiscountLineItemId: 'bonus-2', quantity: 2}
                     // bonus-3 has no items yet
                 ]
             }
 
-            const result = bonusProductUtils.findAvailableBonusDiscountLineItemIds(basket, 'promo-123')
+            const result = bonusProductUtils.findAvailableBonusDiscountLineItemIds(
+                basket,
+                'promo-123'
+            )
 
             expect(result).toEqual([
                 ['bonus-1', 3], // 4 max - 1 selected = 3 available
-                ['bonus-3', 1]  // 1 max - 0 selected = 1 available
+                ['bonus-3', 1] // 1 max - 0 selected = 1 available
                 // bonus-2 excluded because 2 max - 2 selected = 0 available
             ])
         })
@@ -846,14 +882,43 @@ describe('Enhanced Bonus Product Utilities', () => {
                 ],
                 productItems: [
                     // Same product across multiple discount line items of same promotion - should all be removed
-                    {itemId: 'item-1', productId: 'product-A', bonusProductLineItem: true, bonusDiscountLineItemId: 'bonus-1', quantity: 1},
-                    {itemId: 'item-2', productId: 'product-A', bonusProductLineItem: true, bonusDiscountLineItemId: 'bonus-2', quantity: 1},
+                    {
+                        itemId: 'item-1',
+                        productId: 'product-A',
+                        bonusProductLineItem: true,
+                        bonusDiscountLineItemId: 'bonus-1',
+                        quantity: 1
+                    },
+                    {
+                        itemId: 'item-2',
+                        productId: 'product-A',
+                        bonusProductLineItem: true,
+                        bonusDiscountLineItemId: 'bonus-2',
+                        quantity: 1
+                    },
                     // Different product in same promotion - should not be removed
-                    {itemId: 'item-3', productId: 'product-B', bonusProductLineItem: true, bonusDiscountLineItemId: 'bonus-1', quantity: 1},
+                    {
+                        itemId: 'item-3',
+                        productId: 'product-B',
+                        bonusProductLineItem: true,
+                        bonusDiscountLineItemId: 'bonus-1',
+                        quantity: 1
+                    },
                     // Same product but different promotion - should not be removed
-                    {itemId: 'item-4', productId: 'product-A', bonusProductLineItem: true, bonusDiscountLineItemId: 'bonus-3', quantity: 1},
+                    {
+                        itemId: 'item-4',
+                        productId: 'product-A',
+                        bonusProductLineItem: true,
+                        bonusDiscountLineItemId: 'bonus-3',
+                        quantity: 1
+                    },
                     // Regular product - should not be removed
-                    {itemId: 'item-5', productId: 'product-A', bonusProductLineItem: false, quantity: 1}
+                    {
+                        itemId: 'item-5',
+                        productId: 'product-A',
+                        bonusProductLineItem: false,
+                        quantity: 1
+                    }
                 ]
             }
 
@@ -874,8 +939,20 @@ describe('Enhanced Bonus Product Utilities', () => {
                     {id: 'bonus-1', promotionId: 'promo-123', maxBonusItems: 2}
                 ],
                 productItems: [
-                    {itemId: 'item-1', productId: 'product-A', bonusProductLineItem: true, bonusDiscountLineItemId: 'bonus-1', quantity: 1},
-                    {itemId: 'item-2', productId: 'product-B', bonusProductLineItem: true, bonusDiscountLineItemId: 'bonus-1', quantity: 1}
+                    {
+                        itemId: 'item-1',
+                        productId: 'product-A',
+                        bonusProductLineItem: true,
+                        bonusDiscountLineItemId: 'bonus-1',
+                        quantity: 1
+                    },
+                    {
+                        itemId: 'item-2',
+                        productId: 'product-B',
+                        bonusProductLineItem: true,
+                        bonusDiscountLineItemId: 'bonus-1',
+                        quantity: 1
+                    }
                 ]
             }
 
@@ -884,14 +961,21 @@ describe('Enhanced Bonus Product Utilities', () => {
             const result = bonusProductUtils.findAllBonusProductItemsToRemove(basket, targetProduct)
 
             expect(result).toHaveLength(1)
-            expect(result[0]).toEqual(expect.objectContaining({itemId: 'item-1', productId: 'product-A'}))
+            expect(result[0]).toEqual(
+                expect.objectContaining({itemId: 'item-1', productId: 'product-A'})
+            )
         })
 
         test('returns empty array when target product is not a bonus product', () => {
             const basket = {
                 bonusDiscountLineItems: [],
                 productItems: [
-                    {itemId: 'item-1', productId: 'product-A', bonusProductLineItem: false, quantity: 1}
+                    {
+                        itemId: 'item-1',
+                        productId: 'product-A',
+                        bonusProductLineItem: false,
+                        quantity: 1
+                    }
                 ]
             }
 
@@ -908,7 +992,13 @@ describe('Enhanced Bonus Product Utilities', () => {
                     {id: 'bonus-2', promotionId: 'promo-123', maxBonusItems: 2}
                 ],
                 productItems: [
-                    {itemId: 'item-1', productId: 'product-A', bonusProductLineItem: true, bonusDiscountLineItemId: 'bonus-1', quantity: 1}
+                    {
+                        itemId: 'item-1',
+                        productId: 'product-A',
+                        bonusProductLineItem: true,
+                        bonusDiscountLineItemId: 'bonus-1',
+                        quantity: 1
+                    }
                 ]
             }
 
@@ -927,8 +1017,20 @@ describe('Enhanced Bonus Product Utilities', () => {
                     {id: 'bonus-2', promotionId: 'promo-123', maxBonusItems: 2}
                 ],
                 productItems: [
-                    {itemId: 'item-1', productId: 'product-A', bonusProductLineItem: true, bonusDiscountLineItemId: 'bonus-1', quantity: 3},
-                    {itemId: 'item-2', productId: 'product-A', bonusProductLineItem: true, bonusDiscountLineItemId: 'bonus-2', quantity: 2}
+                    {
+                        itemId: 'item-1',
+                        productId: 'product-A',
+                        bonusProductLineItem: true,
+                        bonusDiscountLineItemId: 'bonus-1',
+                        quantity: 3
+                    },
+                    {
+                        itemId: 'item-2',
+                        productId: 'product-A',
+                        bonusProductLineItem: true,
+                        bonusDiscountLineItemId: 'bonus-2',
+                        quantity: 2
+                    }
                 ]
             }
 
@@ -945,7 +1047,9 @@ describe('Enhanced Bonus Product Utilities', () => {
             expect(bonusProductUtils.findAllBonusProductItemsToRemove(null, {})).toEqual([])
             expect(bonusProductUtils.findAllBonusProductItemsToRemove(undefined, {})).toEqual([])
             expect(bonusProductUtils.findAllBonusProductItemsToRemove({}, {})).toEqual([])
-            expect(bonusProductUtils.findAllBonusProductItemsToRemove({productItems: []}, {})).toEqual([])
+            expect(
+                bonusProductUtils.findAllBonusProductItemsToRemove({productItems: []}, {})
+            ).toEqual([])
         })
 
         test('returns empty array when target product is null/undefined', () => {
@@ -955,13 +1059,21 @@ describe('Enhanced Bonus Product Utilities', () => {
             }
 
             expect(bonusProductUtils.findAllBonusProductItemsToRemove(basket, null)).toEqual([])
-            expect(bonusProductUtils.findAllBonusProductItemsToRemove(basket, undefined)).toEqual([])
+            expect(bonusProductUtils.findAllBonusProductItemsToRemove(basket, undefined)).toEqual(
+                []
+            )
         })
 
         test('handles edge case with no bonusDiscountLineItems array', () => {
             const basket = {
                 productItems: [
-                    {itemId: 'item-1', productId: 'product-A', bonusProductLineItem: true, bonusDiscountLineItemId: 'bonus-1', quantity: 1}
+                    {
+                        itemId: 'item-1',
+                        productId: 'product-A',
+                        bonusProductLineItem: true,
+                        bonusDiscountLineItemId: 'bonus-1',
+                        quantity: 1
+                    }
                 ]
             }
 
@@ -1020,7 +1132,10 @@ describe('Enhanced Bonus Product Utilities', () => {
             // Simulate clicking remove on one of the bonus product items
             const targetBonusProduct = basket.productItems[1] // bonus-item-1
 
-            const result = bonusProductUtils.findAllBonusProductItemsToRemove(basket, targetBonusProduct)
+            const result = bonusProductUtils.findAllBonusProductItemsToRemove(
+                basket,
+                targetBonusProduct
+            )
 
             // Should find ALL bonus products with same productId and promotionId
             expect(result).toHaveLength(2)
@@ -1088,7 +1203,10 @@ describe('Enhanced Bonus Product Utilities', () => {
             // Simulate clicking remove on one of the bonus product2 items
             const targetBonusProduct = basket.productItems[1] // bonus-product2-item-1
 
-            const result = bonusProductUtils.findAllBonusProductItemsToRemove(basket, targetBonusProduct)
+            const result = bonusProductUtils.findAllBonusProductItemsToRemove(
+                basket,
+                targetBonusProduct
+            )
 
             // Should find ONLY bonus products with same productId, NOT regular products
             expect(result).toHaveLength(2)
@@ -1108,7 +1226,7 @@ describe('Enhanced Bonus Product Utilities', () => {
             ])
 
             // Verify that regular product2s are NOT included
-            const regularProducts = result.filter(item => item.bonusProductLineItem === false)
+            const regularProducts = result.filter((item) => item.bonusProductLineItem === false)
             expect(regularProducts).toHaveLength(0)
 
             // Verify total bonus quantity that would be removed
@@ -1162,15 +1280,20 @@ describe('Enhanced Bonus Product Utilities', () => {
             // Simulate clicking remove on the regular (non-bonus) product2 item
             const targetRegularProduct = basket.productItems[3] // regular-product2-item-1
 
-            const result = bonusProductUtils.findAllBonusProductItemsToRemove(basket, targetRegularProduct)
+            const result = bonusProductUtils.findAllBonusProductItemsToRemove(
+                basket,
+                targetRegularProduct
+            )
 
             // Should return empty array because target is not a bonus product
             expect(result).toEqual([])
 
             // Verify that bonus products would remain untouched
-            const bonusProducts = basket.productItems.filter(item => item.bonusProductLineItem === true)
+            const bonusProducts = basket.productItems.filter(
+                (item) => item.bonusProductLineItem === true
+            )
             expect(bonusProducts).toHaveLength(2) // Both bonus product items should still exist
-            
+
             const totalBonusQuantity = bonusProducts.reduce((sum, item) => sum + item.quantity, 0)
             expect(totalBonusQuantity).toBe(6) // All 6 bonus quantities should remain
         })

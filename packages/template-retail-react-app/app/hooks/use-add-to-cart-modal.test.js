@@ -27,6 +27,36 @@ jest.mock('@salesforce/retail-react-app/app/hooks/use-current-basket', () => ({
     useCurrentBasket: jest.fn()
 }))
 
+jest.mock('@salesforce/retail-react-app/app/utils/bonus-product-utils', () => ({
+    findAvailableBonusDiscountLineItemIds: jest.fn(() => [])
+}))
+
+jest.mock('@salesforce/commerce-sdk-react', () => ({
+    ...jest.requireActual('@salesforce/commerce-sdk-react'),
+    useCustomerId: jest.fn(() => 'test-customer-id'),
+    useShopperCustomersMutation: jest.fn(() => ({
+        mutateAsync: jest.fn()
+    }))
+}))
+
+jest.mock('@salesforce/retail-react-app/app/hooks/use-wish-list', () => ({
+    useWishList: jest.fn(() => ({
+        data: {
+            id: 'test-wishlist-id',
+            customerProductListItems: []
+        }
+    }))
+}))
+
+jest.mock('@salesforce/retail-react-app/app/hooks/use-toast', () => ({
+    useToast: jest.fn(() => jest.fn())
+}))
+
+jest.mock('@salesforce/retail-react-app/app/hooks/use-navigation', () => ({
+    __esModule: true,
+    default: jest.fn(() => jest.fn())
+}))
+
 // Mock SelectBonusProductsCard to verify props being passed
 
 jest.mock(

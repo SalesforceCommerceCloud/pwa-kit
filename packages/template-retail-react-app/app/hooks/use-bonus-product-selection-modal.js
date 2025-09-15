@@ -22,23 +22,41 @@ import {
     Skeleton,
     SimpleGrid,
     Button,
-    Heading
+    Heading,
+    IconButton,
+    Badge,
+    HStack
 } from '@salesforce/retail-react-app/app/components/shared/ui'
-import {useProducts} from '@salesforce/commerce-sdk-react'
+import {
+    useProducts,
+    useShopperCustomersMutation,
+    useCustomerId
+} from '@salesforce/commerce-sdk-react'
 import DynamicImage from '@salesforce/retail-react-app/app/components/dynamic-image'
+import {HeartIcon, HeartSolidIcon} from '@salesforce/retail-react-app/app/components/icons'
+import withRegistration from '@salesforce/retail-react-app/app/components/with-registration'
 import {findImageGroupBy} from '@salesforce/retail-react-app/app/utils/image-groups-utils'
 import {filterImageGroups} from '@salesforce/retail-react-app/app/utils/product-utils'
+import {
+    PRODUCT_BADGE_DETAILS,
+    API_ERROR_MESSAGE,
+    TOAST_MESSAGE_ADDED_TO_WISHLIST,
+    TOAST_MESSAGE_REMOVED_FROM_WISHLIST,
+    TOAST_ACTION_VIEW_WISHLIST
+} from '@salesforce/retail-react-app/app/constants'
 import {useModalState} from '@salesforce/retail-react-app/app/hooks/use-modal-state'
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
+import {useWishList} from '@salesforce/retail-react-app/app/hooks/use-wish-list'
+import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
+import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
 import BonusProductViewModal from '@salesforce/retail-react-app/app/components/bonus-product-view-modal'
-import {
-    findAvailableBonusDiscountLineItemIds,
-    getBonusProductCountsForPromotion
-} from '@salesforce/retail-react-app/app/utils/bonus-product-utils'
+import {findAvailableBonusDiscountLineItemIds} from '@salesforce/retail-react-app/app/utils/bonus-product-utils'
 import {addToCartModalTheme} from '@salesforce/retail-react-app/app/theme/components/project/add-to-cart-modal'
 
 // Import AddToCartModal to render it within this provider
 import {AddToCartModal} from '@salesforce/retail-react-app/app/hooks/use-add-to-cart-modal'
+
+const IconButtonWithRegistration = withRegistration(IconButton)
 
 /**
  * Context for managing the BonusProductSelectionModal.
@@ -64,7 +82,17 @@ BonusProductSelectionModalProvider.propTypes = {
 }
 
 // Component to display individual bonus product with checkbox for selection
-const BonusProductItem = ({product, productData, foundProductData, onSelect, isLoading}) => {
+const BonusProductItem = ({
+    product,
+    productData,
+    foundProductData,
+    onSelect,
+    isLoading,
+    enableFavourite = false,
+    isFavourite = false,
+    onFavouriteToggle,
+    badgeDetails = PRODUCT_BADGE_DETAILS
+}) => {
     const intl = useIntl()
     const productName = product?.productName || product?.title
 
@@ -90,6 +118,23 @@ const BonusProductItem = ({product, productData, foundProductData, onSelect, isL
         return defaultSmallImage
     }, [productData, product])
 
+    // Retrieve product badges (similar to ProductTile logic)
+    const filteredLabels = useMemo(() => {
+        const labelsMap = new Map()
+        if (productData) {
+            badgeDetails.forEach((item) => {
+                if (
+                    item.propertyName &&
+                    typeof productData[item.propertyName] === 'boolean' &&
+                    productData[item.propertyName] === true
+                ) {
+                    labelsMap.set(intl.formatMessage(item.label), item.color)
+                }
+            })
+        }
+        return labelsMap
+    }, [productData, badgeDetails, intl])
+
     if (isLoading) {
         return (
             <Box borderWidth="1px" borderRadius="lg" p="4">
@@ -103,38 +148,108 @@ const BonusProductItem = ({product, productData, foundProductData, onSelect, isL
     }
 
     return (
-        <Box p="4" bg="white">
+        <Box p="4" bg="white" position="relative">
             <VStack spacing="3" align="center" justify="flex-start">
-                <AspectRatio ratio={1} width="162px" maxWidth="162px">
-                    {imageGroup && imageGroup.images && imageGroup.images[0] ? (
-                        <DynamicImage
-                            src={imageGroup.images[0].disBaseLink || imageGroup.images[0].link}
-                            widths={[162]}
-                            imageProps={{
-                                alt: productName,
-                                loading: 'lazy'
-                            }}
-                        />
-                    ) : (
+                <Box position="relative" width="162px" maxWidth="162px">
+                    <AspectRatio ratio={1}>
+                        {imageGroup && imageGroup.images && imageGroup.images[0] ? (
+                            <DynamicImage
+                                src={imageGroup.images[0].disBaseLink || imageGroup.images[0].link}
+                                widths={[162]}
+                                imageProps={{
+                                    alt: productName,
+                                    loading: 'lazy'
+                                }}
+                            />
+                        ) : (
+                            <Box
+                                bg="gray.100"
+                                display="flex"
+                                alignItems="center"
+                                justifyContent="center"
+                            >
+                                <Text color="gray.500" fontSize="sm">
+                                    {intl.formatMessage({
+                                        id: 'bonus_product_modal.no_image',
+                                        defaultMessage: 'No Image'
+                                    })}
+                                </Text>
+                            </Box>
+                        )}
+                    </AspectRatio>
+
+                    {/* Wishlist Icon - positioned like ProductTile */}
+                    {enableFavourite && (
                         <Box
-                            bg="gray.100"
-                            display="flex"
-                            alignItems="center"
-                            justifyContent="center"
+                            position="absolute"
+                            top="2"
+                            right="2"
+                            onClick={(e) => {
+                                // stop click event from bubbling
+                                e.preventDefault()
+                                e.stopPropagation()
+                            }}
                         >
-                            <Text color="gray.500" fontSize="sm">
-                                {intl.formatMessage({
-                                    id: 'bonus_product_modal.no_image',
-                                    defaultMessage: 'No Image'
-                                })}
-                            </Text>
+                            <IconButtonWithRegistration
+                                data-testid="bonus-product-wishlist-button"
+                                aria-label={
+                                    isFavourite
+                                        ? intl.formatMessage(
+                                              {
+                                                  id: 'product_tile.assistive_msg.remove_from_wishlist',
+                                                  defaultMessage: 'Remove {product} from wishlist'
+                                              },
+                                              {product: productName}
+                                          )
+                                        : intl.formatMessage(
+                                              {
+                                                  id: 'product_tile.assistive_msg.add_to_wishlist',
+                                                  defaultMessage: 'Add {product} to wishlist'
+                                              },
+                                              {product: productName}
+                                          )
+                                }
+                                icon={isFavourite ? <HeartSolidIcon /> : <HeartIcon />}
+                                size="sm"
+                                borderRadius="full"
+                                colorScheme="whiteAlpha"
+                                onClick={async () => {
+                                    if (onFavouriteToggle) {
+                                        await onFavouriteToggle(!isFavourite)
+                                    }
+                                }}
+                            />
                         </Box>
                     )}
-                </AspectRatio>
-                <Text fontSize="md" fontWeight="semibold" noOfLines={2} textAlign="center">
-                    {productName}
-                </Text>
-                <Box display="flex" alignItems="center" justifyContent="center" gap="2">
+
+                    {/* Product Badges - positioned like ProductTile */}
+                    {filteredLabels.size > 0 && (
+                        <HStack position="absolute" top="2" left="2" spacing="1">
+                            {Array.from(filteredLabels.entries()).map(([label, colorScheme]) => (
+                                <Badge
+                                    key={label}
+                                    data-testid="bonus-product-badge"
+                                    colorScheme={colorScheme}
+                                    fontSize="xs"
+                                >
+                                    {label}
+                                </Badge>
+                            ))}
+                        </HStack>
+                    )}
+                </Box>
+                <Box width="162px">
+                    <Text fontSize="md" fontWeight="semibold" noOfLines={2} textAlign="left">
+                        {productName}
+                    </Text>
+                </Box>
+                <Box
+                    width="162px"
+                    display="flex"
+                    alignItems="center"
+                    justifyContent="flex-start"
+                    gap="2"
+                >
                     <Text fontSize="sm" color="gray.400" textDecoration="line-through">
                         {foundProductData?.price ? `$${foundProductData.price}` : ''}
                     </Text>
@@ -165,7 +280,11 @@ BonusProductItem.propTypes = {
     productData: PropTypes.object,
     foundProductData: PropTypes.object,
     onSelect: PropTypes.func.isRequired,
-    isLoading: PropTypes.bool
+    isLoading: PropTypes.bool,
+    enableFavourite: PropTypes.bool,
+    isFavourite: PropTypes.bool,
+    onFavouriteToggle: PropTypes.func,
+    badgeDetails: PropTypes.array
 }
 
 /**
@@ -181,19 +300,46 @@ export const BonusProductSelectionModal = () => {
         promotionId: null
     })
     const intl = useIntl()
+    const toast = useToast()
+    const navigate = useNavigation()
+    const customerId = useCustomerId()
 
     // Extract bonus products from modal data and derive promotionId using same logic as products card
     const bonusProducts = data?.bonusDiscountLineItems || []
     const {data: basket} = useCurrentBasket()
 
-    // Get promotionId from bonus products - all items have the same promotionId since they're
-    // pre-filtered in select-bonus-products-card.jsx (line 143: bli.promotionId === promotionId)
-    const promotionId = bonusProducts.length > 0 ? bonusProducts[0]?.promotionId : null
+    // Wishlist functionality
+    const {data: wishlist} = useWishList()
+    const createCustomerProductListItem = useShopperCustomersMutation(
+        'createCustomerProductListItem'
+    )
+    const deleteCustomerProductListItem = useShopperCustomersMutation(
+        'deleteCustomerProductListItem'
+    )
 
-    // Calculate promotion-specific bonus counts using utility method
-    const {selectedBonusItems, maxBonusItems} = useMemo(() => {
-        return getBonusProductCountsForPromotion(basket, promotionId)
-    }, [basket, promotionId])
+    // Calculate bonus item IDs for tracking
+    const bonusLineItemIds = useMemo(
+        () => bonusProducts.map((bli) => bli.id).filter(Boolean),
+        [bonusProducts]
+    )
+
+    // Calculate maximum available bonus items
+    const maxBonusItems = useMemo(
+        () => bonusProducts.reduce((sum, bli) => sum + (bli.maxBonusItems || 0), 0),
+        [bonusProducts]
+    )
+
+    // Calculate currently selected bonus items
+    const selectedBonusItems = useMemo(() => {
+        const items = basket?.productItems || []
+        return items
+            .filter(
+                (it) =>
+                    it?.bonusProductLineItem &&
+                    bonusLineItemIds.includes(it?.bonusDiscountLineItemId)
+            )
+            .reduce((acc, it) => acc + (it?.quantity || 0), 0)
+    }, [basket, bonusLineItemIds])
 
     // Get product IDs for fetching product data, deduplicating by productId
     const uniqueBonusProducts = bonusProducts
@@ -295,6 +441,89 @@ export const BonusProductSelectionModal = () => {
         [productById, bonusProducts, basket]
     )
 
+    // Wishlist handlers
+    const handleAddToWishlist = useCallback(
+        async (product) => {
+            if (!wishlist || !customerId) return
+
+            try {
+                await createCustomerProductListItem.mutateAsync({
+                    parameters: {
+                        listId: wishlist.id,
+                        customerId
+                    },
+                    body: {
+                        quantity: 1,
+                        productId: product.productId,
+                        public: false,
+                        priority: 1,
+                        type: 'product'
+                    }
+                })
+
+                toast({
+                    title: intl.formatMessage(TOAST_MESSAGE_ADDED_TO_WISHLIST, {quantity: 1}),
+                    status: 'success',
+                    action: (
+                        <Button variant="link" onClick={() => navigate('/account/wishlist')}>
+                            {intl.formatMessage(TOAST_ACTION_VIEW_WISHLIST)}
+                        </Button>
+                    )
+                })
+            } catch (error) {
+                toast({
+                    title: intl.formatMessage(API_ERROR_MESSAGE),
+                    status: 'error'
+                })
+            }
+        },
+        [wishlist, customerId, createCustomerProductListItem, toast, intl, navigate]
+    )
+
+    const handleRemoveFromWishlist = useCallback(
+        async (product) => {
+            if (!wishlist || !customerId) return
+
+            const wishlistItem = wishlist.customerProductListItems?.find(
+                (item) => item.productId === product.productId
+            )
+
+            if (!wishlistItem) return
+
+            try {
+                await deleteCustomerProductListItem.mutateAsync({
+                    parameters: {
+                        customerId,
+                        itemId: wishlistItem.id,
+                        listId: wishlist.id
+                    }
+                })
+
+                toast({
+                    title: intl.formatMessage(TOAST_MESSAGE_REMOVED_FROM_WISHLIST),
+                    status: 'success'
+                })
+            } catch (error) {
+                toast({
+                    title: intl.formatMessage(API_ERROR_MESSAGE),
+                    status: 'error'
+                })
+            }
+        },
+        [wishlist, customerId, deleteCustomerProductListItem, toast, intl]
+    )
+
+    const handleWishlistToggle = useCallback(
+        async (product, shouldAdd) => {
+            if (shouldAdd) {
+                await handleAddToWishlist(product)
+            } else {
+                await handleRemoveFromWishlist(product)
+            }
+        },
+        [handleAddToWishlist, handleRemoveFromWishlist]
+    )
+
     const handleClose = useCallback(() => {
         // Auto-reset on close; also ensure view modal is closed
         setSelectedProduct(null)
@@ -326,7 +555,7 @@ export const BonusProductSelectionModal = () => {
                     scrollBehavior={addToCartModalTheme.modal.scrollBehavior}
                     isCentered
                 >
-                    <ModalOverlay bg="blackAlpha.300" backdropFilter="blur(10px)" />
+                    <ModalOverlay bg="blackAlpha.300" />
                     <ModalContent
                         margin={addToCartModalTheme.layout.content.margin}
                         borderRadius={addToCartModalTheme.layout.content.borderRadius}
@@ -346,7 +575,7 @@ export const BonusProductSelectionModal = () => {
                                     {
                                         id: 'bonus_product_modal.title',
                                         defaultMessage:
-                                            'Select Bonus Product ({selected} of {max} selected)'
+                                            'Select bonus product ({selected} of {max} selected)'
                                     },
                                     {selected: selectedBonusItems, max: maxBonusItems}
                                 )}
@@ -382,6 +611,11 @@ export const BonusProductSelectionModal = () => {
                                                 const foundProductData = productData?.data?.find(
                                                     (p) => p.id === product.productId
                                                 )
+                                                const isInWishlist =
+                                                    wishlist?.customerProductListItems?.some(
+                                                        (item) =>
+                                                            item.productId === product.productId
+                                                    )
                                                 return (
                                                     <BonusProductItem
                                                         key={product.productId}
@@ -390,6 +624,11 @@ export const BonusProductSelectionModal = () => {
                                                         foundProductData={foundProductData}
                                                         onSelect={switchToProductView}
                                                         isLoading={isLoading}
+                                                        enableFavourite={true}
+                                                        isFavourite={isInWishlist}
+                                                        onFavouriteToggle={(shouldAdd) =>
+                                                            handleWishlistToggle(product, shouldAdd)
+                                                        }
                                                     />
                                                 )
                                             })}

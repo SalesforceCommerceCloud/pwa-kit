@@ -149,10 +149,8 @@ const ProductView = forwardRef(
             onOpenStoreLocator = () => {},
             showDeliveryOptions = true,
             customButtons = [],
-            promotionId,
             maxOrderQuantity = null,
-            imageGalleryFooter = null,
-            alignItems = "flex-start",
+            imageGalleryFooter = null
         },
         ref
     ) => {
@@ -522,13 +520,13 @@ const ProductView = forwardRef(
                     )}
 
                     {/* Variations & Quantity Selector & CTA buttons */}
-                    <VStack 
-                        align="stretch" 
-                        spacing={8} 
+                    <VStack
+                        align="stretch"
+                        spacing={8}
                         flex={1}
                         pb={[
                             isProductPartOfSet || isProductPartOfBundle ? 4 : '120px',
-                            isProductPartOfSet || isProductPartOfBundle ? 4 : '120px', 
+                            isProductPartOfSet || isProductPartOfBundle ? 4 : '120px',
                             isProductPartOfSet || isProductPartOfBundle ? 4 : '120px',
                             4
                         ]}
@@ -655,7 +653,7 @@ const ProductView = forwardRef(
                                         step={stepQuantity}
                                         value={quantity}
                                         min={minOrderQuantity}
-                                        max={maxOrderQuantity}
+                                        {...(maxOrderQuantity != null && {max: maxOrderQuantity})}
                                         onChange={(stringValue, numberValue) => {
                                             // Set the Quantity of product to value of input if value number
                                             if (numberValue >= 0) {
@@ -932,7 +930,7 @@ ProductView.propTypes = {
     promotionId: PropTypes.string,
     maxOrderQuantity: PropTypes.number,
     imageGalleryFooter: PropTypes.node,
-    alignItems: PropTypes.string,
+    alignItems: PropTypes.string
 }
 
 export default ProductView

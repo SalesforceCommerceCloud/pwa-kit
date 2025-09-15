@@ -17,8 +17,7 @@ import {
     Button,
     Box,
     Text,
-    Heading,
-    VStack
+    Heading
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 import ProductView from '@salesforce/retail-react-app/app/components/product-view'
 import {useProductViewModal} from '@salesforce/retail-react-app/app/hooks/use-product-view-modal'
@@ -153,14 +152,15 @@ const BonusProductViewModal = ({
                         finalQuantity = maxAllowed
                     }
 
-
                     // Get list of available bonus discount line items with their capacities
-                    const availablePairs = findAvailableBonusDiscountLineItemIds(basket, promotionId)
+                    const availablePairs = findAvailableBonusDiscountLineItemIds(
+                        basket,
+                        promotionId
+                    )
 
                     if (availablePairs.length === 0) {
                         continue // Skip this item but process others
                     }
-
 
                     let remainingQuantity = finalQuantity
 
@@ -173,7 +173,6 @@ const BonusProductViewModal = ({
                         // Calculate amount to add: minimum of remaining quantity and available capacity
                         const quantityToAdd = Math.min(remainingQuantity, availableCapacity)
 
-
                         productItems.push({
                             productId: variant?.productId || product?.productId || product?.id,
                             price: variant?.price || product?.price,
@@ -183,7 +182,6 @@ const BonusProductViewModal = ({
 
                         remainingQuantity -= quantityToAdd
                     }
-
                 }
 
                 if (productItems.length === 0) {
@@ -323,7 +321,7 @@ const BonusProductViewModal = ({
                             {
                                 id: 'bonus_product_view_modal.title',
                                 defaultMessage:
-                                    'Select Bonus Product ({selected} of {max} selected)'
+                                    'Select bonus product ({selected} of {max} selected)'
                             },
                             {selected: finalSelectedBonusItems, max: finalMaxBonusItems}
                         )}
