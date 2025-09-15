@@ -13,7 +13,7 @@ import path from 'path'
 import PropTypes from 'prop-types'
 
 // Import the hook and component we want to test
-import {useBonusProductSelectionModal} from '@salesforce/retail-react-app/../../app/hooks/use-bonus-product-selection-modal'
+import {useBonusProductSelectionModal} from '@salesforce/retail-react-app/app/hooks/use-bonus-product-selection-modal'
 
 // Mock all dependencies
 jest.mock('@salesforce/retail-react-app/app/hooks/use-modal-state')
