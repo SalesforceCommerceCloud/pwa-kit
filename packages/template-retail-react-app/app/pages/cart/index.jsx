@@ -1069,7 +1069,7 @@ const Cart = () => {
                                                 <Stack gap={4}>
                                                     {/* Render all cart items in simple layout */}
                                                     {shipmentInfo.categorizedProducts.regularProducts?.map(
-                                                        (productItem, _idx) => (
+                                                        (productItem) => (
                                                             <ProductItemList
                                                                 key={productItem.itemId}
                                                                 productItems={[productItem]}

@@ -6,16 +6,14 @@
  */
 
 import React from 'react'
-import {renderHook, act, render, screen} from '@testing-library/react'
+import {renderHook, act} from '@testing-library/react'
 import {BrowserRouter} from 'react-router-dom'
+import fs from 'fs'
+import path from 'path'
 import PropTypes from 'prop-types'
 
 // Import the hook and component we want to test
-import {
-    useBonusProductSelectionModal,
-    BonusProductSelectionModal,
-    BonusProductSelectionModalProvider
-} from '@salesforce/retail-react-app/../../app/hooks/use-bonus-product-selection-modal'
+import {useBonusProductSelectionModal} from '@salesforce/retail-react-app/../../app/hooks/use-bonus-product-selection-modal'
 
 // Mock all dependencies
 jest.mock('@salesforce/retail-react-app/app/hooks/use-modal-state')
@@ -254,8 +252,6 @@ describe('BonusProductSelectionModal Component - Scrolling Behavior', () => {
         // This ensures our maxHeight and overflowY changes are preserved
 
         // Read the component source to verify scrolling structure
-        const fs = require('fs')
-        const path = require('path')
         const componentPath = path.join(__dirname, 'use-bonus-product-selection-modal.js')
         const componentSource = fs.readFileSync(componentPath, 'utf8')
 
@@ -269,8 +265,6 @@ describe('BonusProductSelectionModal Component - Scrolling Behavior', () => {
 
     it('should have correct responsive maxHeight values', () => {
         // Test that we have the correct responsive breakpoints for maxHeight
-        const fs = require('fs')
-        const path = require('path')
         const componentPath = path.join(__dirname, 'use-bonus-product-selection-modal.js')
         const componentSource = fs.readFileSync(componentPath, 'utf8')
 
@@ -283,8 +277,6 @@ describe('BonusProductSelectionModal Component - Scrolling Behavior', () => {
 
     it('should wrap SimpleGrid with scrollable container', () => {
         // Verify that SimpleGrid is properly nested within the scrollable Box
-        const fs = require('fs')
-        const path = require('path')
         const componentPath = path.join(__dirname, 'use-bonus-product-selection-modal.js')
         const componentSource = fs.readFileSync(componentPath, 'utf8')
 
@@ -301,8 +293,6 @@ describe('BonusProductSelectionModal Component - Scrolling Behavior', () => {
     it('should prevent modal height regression', () => {
         // This test ensures that the modal doesn't expand infinitely with many products
         // by checking that the scrollable container structure is maintained
-        const fs = require('fs')
-        const path = require('path')
         const componentPath = path.join(__dirname, 'use-bonus-product-selection-modal.js')
         const componentSource = fs.readFileSync(componentPath, 'utf8')
 

@@ -183,8 +183,16 @@ describe('BonusProductViewModal - getRemainingBonusQuantity', () => {
 })
 
 describe('BonusProductViewModal - Header Count Display', () => {
-    const testHeaderCount = (description, maxBonusItems, selectedBonusItems, expectedText) => {
-        test(description, () => {
+    const testHeaderCount = (maxBonusItems, selectedBonusItems, expectedText) => {
+        it(`displays "${selectedBonusItems} of ${maxBonusItems} selected" when ${
+            selectedBonusItems === 0
+                ? 'no'
+                : selectedBonusItems === maxBonusItems
+                ? 'all'
+                : selectedBonusItems === 1
+                ? 'one'
+                : 'some'
+        } bonus items are selected`, () => {
             const mockBasket = {basketId: 'test-basket'}
 
             useCurrentBasket.mockReturnValue({data: mockBasket})
@@ -210,21 +218,18 @@ describe('BonusProductViewModal - Header Count Display', () => {
     }
 
     testHeaderCount(
-        'displays "0 of 2 selected" when no bonus items are selected',
         2, // maxBonusItems
         0, // selectedBonusItems
         'Select Bonus Product (0 of 2 selected)'
     )
 
     testHeaderCount(
-        'displays "1 of 4 selected" when one bonus item is selected',
         4, // maxBonusItems
         1, // selectedBonusItems
         'Select Bonus Product (1 of 4 selected)'
     )
 
     testHeaderCount(
-        'displays "5 of 6 selected" when most bonus items are selected',
         6, // maxBonusItems
         5, // selectedBonusItems
         'Select Bonus Product (5 of 6 selected)'

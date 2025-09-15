@@ -19,14 +19,7 @@ jest.mock('@salesforce/retail-react-app/app/hooks/use-bonus-product-selection-mo
 // Mock SelectBonusProductsButton component
 
 jest.mock('@salesforce/retail-react-app/app/components/select-bonus-products-button', () => {
-    function MockSelectBonusProductsButton({
-        product,
-        bonusDiscountLineItems,
-        itemsAdded,
-        colorScheme,
-        onOpenBonusModal,
-        ...domProps
-    }) {
+    function MockSelectBonusProductsButton({...domProps}) {
         // eslint-disable-next-line @typescript-eslint/no-var-requires
         const React = require('react')
         return React.createElement(

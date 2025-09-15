@@ -12,6 +12,7 @@ import PropTypes from 'prop-types'
 
 import theme from '@salesforce/retail-react-app/app/theme'
 import {AddToCartModalProvider} from '@salesforce/retail-react-app/app/hooks/use-add-to-cart-modal'
+import {BonusProductSelectionModalProvider} from '@salesforce/retail-react-app/app/hooks/use-bonus-product-selection-modal'
 import {ServerContext} from '@salesforce/pwa-kit-react-sdk/ssr/universal/contexts'
 import {IntlProvider} from 'react-intl'
 import {CommerceApiProvider} from '@salesforce/commerce-sdk-react'
@@ -161,7 +162,11 @@ export const TestProviders = ({
                             <Router>
                                 <StoreLocatorProvider config={storeLocatorConfig}>
                                     <ChakraProvider theme={theme}>
-                                        <AddToCartModalProvider>{children}</AddToCartModalProvider>
+                                        <AddToCartModalProvider>
+                                            <BonusProductSelectionModalProvider>
+                                                {children}
+                                            </BonusProductSelectionModalProvider>
+                                        </AddToCartModalProvider>
                                     </ChakraProvider>
                                 </StoreLocatorProvider>
                             </Router>

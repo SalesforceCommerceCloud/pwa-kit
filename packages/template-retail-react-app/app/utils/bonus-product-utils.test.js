@@ -261,12 +261,12 @@ describe('Enhanced Bonus Product Utilities', () => {
 
         // Template function for testing bonus product combining
         const testBonusProductCombining = (
-            description,
+            testCase,
             bonusProducts,
             expectedResults,
             customPromotions = mockProductsWithPromotions
         ) => {
-            test(description, () => {
+            it(`combines bonus products correctly: ${testCase}`, () => {
                 const basketWithBonusProducts = {
                     ...mockBasket,
                     productItems: [...mockBasket.productItems, ...bonusProducts]
@@ -293,7 +293,7 @@ describe('Enhanced Bonus Product Utilities', () => {
         }
 
         testBonusProductCombining(
-            'combines identical bonus products and aggregates quantities',
+            'identical products aggregate quantities',
             [
                 {
                     itemId: 'bonus-item-1',
@@ -328,7 +328,7 @@ describe('Enhanced Bonus Product Utilities', () => {
         )
 
         testBonusProductCombining(
-            'combines bonus products with different productIds separately',
+            'different productIds stay separate',
             [
                 {
                     itemId: 'bonus-item-1',
@@ -379,7 +379,7 @@ describe('Enhanced Bonus Product Utilities', () => {
         )
 
         testBonusProductCombining(
-            'handles bonus products with zero or undefined quantities',
+            'zero or undefined quantities',
             [
                 {
                     itemId: 'bonus-item-1',
@@ -409,7 +409,7 @@ describe('Enhanced Bonus Product Utilities', () => {
         )
 
         testBonusProductCombining(
-            'preserves all properties from first occurrence when combining',
+            'preserves properties from first occurrence',
             [
                 {
                     itemId: 'bonus-item-1',
