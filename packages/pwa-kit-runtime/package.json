@@ -30,6 +30,7 @@
     "version": "node ./scripts/version.js"
   },
   "dependencies": {
+    "@h4ad/serverless-adapter": "4.4.0",
     "@loadable/babel-plugin": "^5.15.3",
     "aws-sdk": "^2.1354.0",
     "aws-serverless-express": "3.4.0",
