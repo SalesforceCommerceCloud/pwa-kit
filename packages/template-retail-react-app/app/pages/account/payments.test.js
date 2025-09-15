@@ -317,8 +317,8 @@ describe('AccountPayments', () => {
 
         await waitFor(() => expect(mockMutate).toHaveBeenCalled())
         expect(mockToast).toHaveBeenCalled()
-        const toastArg = useToast.mock.results[0].value.mock.calls[0][0]
-        expect(toastArg.status).toBe('error')
+        const toastArgAdd = useToast.mock.results[0].value.mock.calls[0][0]
+        expect(toastArgAdd.status).toBe('error')
         expect(mockRefetch).not.toHaveBeenCalled()
     })
 
@@ -341,8 +341,8 @@ describe('AccountPayments', () => {
 
         await waitFor(() => expect(mockDelete).toHaveBeenCalled())
         expect(mockToast).toHaveBeenCalled()
-        const toastArg = useToast.mock.results[0].value.mock.calls[0][0]
-        expect(toastArg.status).toBe('error')
+        const toastArgDel = useToast.mock.results[0].value.mock.calls[0][0]
+        expect(toastArgDel.status).toBe('error')
         expect(mockRefetch).not.toHaveBeenCalled()
     })
 })
