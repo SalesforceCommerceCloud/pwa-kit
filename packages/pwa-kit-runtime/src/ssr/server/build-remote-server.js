@@ -55,14 +55,10 @@ import logger from '../../utils/logger-instance'
 import {createProxyMiddleware, responseInterceptor} from 'http-proxy-middleware'
 import {convertExpressRouteToRegex} from '../../utils/ssr-server/convert-express-route'
 import {ServerlessAdapter} from '@h4ad/serverless-adapter'
-import {ExpressFramework} from '@h4ad/serverless-adapter/lib/frameworks/express'
 import {DefaultHandler} from '@h4ad/serverless-adapter/lib/handlers/default'
 import {CallbackResolver} from '@h4ad/serverless-adapter/lib/resolvers/callback'
 import {ApiGatewayV1Adapter} from '@h4ad/serverless-adapter/lib/adapters/aws'
-import {
-    DEFAULT_BINARY_ENCODINGS,
-    DEFAULT_BINARY_CONTENT_TYPES
-} from '@h4ad/serverless-adapter/lib/constants'
+import {ExpressFramework} from '@h4ad/serverless-adapter/lib/frameworks/express'
 
 /**
  * An Array of mime-types (Content-Type values) that are considered
@@ -80,16 +76,17 @@ const binaryMimeTypesRegexes = [
     new RegExp('^image/.*$'),
     new RegExp('^video/.*$')
 ]
+const binaryEncodings = ['gzip', 'deflate', 'br']
 
-const isContentEncodingBinary = (headers) => {
+export const isContentEncodingBinary = (headers) => {
     const contentEncoding = headers['content-encoding'] || headers['Content-Encoding']
     if (!contentEncoding) {
         return false
     }
-    return DEFAULT_BINARY_ENCODINGS.includes(contentEncoding)
+    return binaryEncodings.includes(contentEncoding)
 }
 
-const isContentTypeBinary = (headers) => {
+export const isContentTypeBinary = (headers) => {
     // Replicating the aws-serverless-express behavior
     let contentType = headers['content-type'] || headers['Content-Type']
     if (!contentType) {
@@ -101,7 +98,7 @@ const isContentTypeBinary = (headers) => {
     return binaryMimeTypesRegexes.some((binaryContentType) => binaryContentType.test(contentType))
 }
 
-const isBinary = (headers) => {
+export const isBinary = (headers) => {
     return isContentEncodingBinary(headers) || isContentTypeBinary(headers)
 }
 
@@ -1322,7 +1319,25 @@ export const RemoteServerFactory = {
             //         )
             //     }
             // )
-            return serverlessAdapterHandler(event, context, callback)
+
+            // const managedCallback = (err, response) => {
+            //     return (
+            //         app._requestMonitor
+            //             ._waitForResponses()
+            //             .then(() => app.metrics.flush())
+            //             // Now call the Lambda callback to complete the response
+            //             .then(() => callback(err, processLambdaResponse(response, event)))
+            //         // DON'T add any then() handlers here, after the callback.
+            //         // They won't be called after the response is sent, but they
+            //         // *might* be called if the Lambda container running this code
+            //         // is reused, which can lead to odd and unpredictable
+            //         // behaviour.
+            //     )
+            // }
+            const managedCallback = (err, response) => {
+                return callback(err, processLambdaResponse(response, event))
+            }
+            return serverlessAdapterHandler(event, context, managedCallback)
         }
         // Upgrading to serverless-adapter removes the server property
         // return a null server to maintain backwards compatibility

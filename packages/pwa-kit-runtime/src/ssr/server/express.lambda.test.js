@@ -124,9 +124,6 @@ describe('SSRServer Lambda integration', () => {
 
     afterEach(() => {
         nock.cleanAll()
-        if (server) {
-            server.close()
-        }
     })
 
     const fakeBinaryPayload = crypto.randomBytes(16)
