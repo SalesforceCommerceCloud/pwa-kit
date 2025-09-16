@@ -1320,22 +1320,19 @@ export const RemoteServerFactory = {
             //     }
             // )
 
-            // const managedCallback = (err, response) => {
-            //     return (
-            //         app._requestMonitor
-            //             ._waitForResponses()
-            //             .then(() => app.metrics.flush())
-            //             // Now call the Lambda callback to complete the response
-            //             .then(() => callback(err, processLambdaResponse(response, event)))
-            //         // DON'T add any then() handlers here, after the callback.
-            //         // They won't be called after the response is sent, but they
-            //         // *might* be called if the Lambda container running this code
-            //         // is reused, which can lead to odd and unpredictable
-            //         // behaviour.
-            //     )
-            // }
             const managedCallback = (err, response) => {
-                return callback(err, processLambdaResponse(response, event))
+                return (
+                    app._requestMonitor
+                        ._waitForResponses()
+                        .then(() => app.metrics.flush())
+                        // Now call the Lambda callback to complete the response
+                        .then(() => callback(err, processLambdaResponse(response, event)))
+                    // DON'T add any then() handlers here, after the callback.
+                    // They won't be called after the response is sent, but they
+                    // *might* be called if the Lambda container running this code
+                    // is reused, which can lead to odd and unpredictable
+                    // behaviour.
+                )
             }
             return serverlessAdapterHandler(event, context, managedCallback)
         }
