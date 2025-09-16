@@ -8,6 +8,7 @@ const SecureS3Client = require('./aws-s3-client')
 const {Command} = require('commander')
 const fs = require('fs-extra')
 const {MRT_TARGET_DETAILS_FILE} = require('../config')
+const {sleep} = require('./utils')
 const {
     GITHUB_ACTIONS_E2E_SESSION,
     PWA_KIT_BOT_USER_SESSION,
@@ -16,7 +17,8 @@ const {
     AWS_S3_ERR_NO_SUCH_KEY,
     AWS_S3_ERR_PRECONDITION_FAILED,
     ACQUIRE_TARGET_STATUS_SUCCESS,
-    ACQUIRE_TARGET_STATUS_FAILED
+    ACQUIRE_TARGET_STATUS_FAILED,
+    MRT_CLEANUP_TTL_MINUTES_DEFAULT
 } = require('./constants')
 
 class MRTTargetManager {
@@ -223,7 +225,7 @@ class MRTTargetManager {
                     console.log(`⚠️ ETag mismatch on attempt ${retryCount}, retrying...`)
 
                     if (retryCount < this.maxRetries) {
-                        await this.sleep(this.retryDelay)
+                        await sleep(this.retryDelay)
                         continue
                     } else {
                         throw new Error(
@@ -285,7 +287,7 @@ class MRTTargetManager {
                 if (error.name === AWS_S3_ERR_PRECONDITION_FAILED) {
                     console.log(`⚠️ ETag mismatch on release attempt ${retryCount}, retrying...`)
                     if (retryCount < this.maxRetries) {
-                        await this.sleep(this.retryDelay)
+                        await sleep(this.retryDelay)
                         continue
                     } else {
                         throw new Error(
@@ -304,10 +306,116 @@ class MRTTargetManager {
     }
 
     /**
-     * Utility function for delays
+     * Clean up expired environments that have been in-use for longer than the TTL.
+     * Releases environments back to the pool if they've been acquired for more than the specified time.
+     * @param {number} ttlMinutes - Time-to-live in minutes (defaults to MRT_CLEANUP_TTL_MINUTES_DEFAULT)
+     * @returns {Promise<Object>} - Cleanup result with released environments count and details
+     * @throws {Error} - If there is an error accessing the pool file or releasing environments
      */
-    sleep(ms) {
-        return new Promise((resolve) => setTimeout(resolve, ms))
+    async cleanupExpiredEnvironments(ttlMinutes = MRT_CLEANUP_TTL_MINUTES_DEFAULT) {
+        console.log(`🧹 Starting cleanup of environments older than ${ttlMinutes} minute(s)`)
+
+        let retryCount = 0
+        let releasedCount = 0
+        const releasedEnvironments = []
+        const ttlMs = ttlMinutes * 60 * 1000 // Convert minutes to milliseconds
+        const cutoffTime = new Date(Date.now() - ttlMs)
+
+        while (retryCount < this.maxRetries) {
+            try {
+                // Step 1: Download pool file and get current state
+                const downloadResponse = await this.downloadPoolFile()
+                const poolData = downloadResponse.poolData
+
+                // Step 2: Find expired in-use environments
+                const expiredEnvironments = poolData.environments.filter((env) => {
+                    if (env.ciAvailability !== CI_AVAILABILITY_IN_USE) {
+                        return false
+                    }
+
+                    const acquiredAt = new Date(env.ciRunInfo.ciAcquiredAt)
+                    return acquiredAt < cutoffTime
+                })
+
+                if (expiredEnvironments.length === 0) {
+                    console.log('✅ No expired environments found')
+                    return {
+                        releasedCount: 0,
+                        releasedEnvironments: [],
+                        attempt: retryCount + 1
+                    }
+                }
+
+                console.log(`🔍 Found ${expiredEnvironments.length} expired environment(s):`)
+                expiredEnvironments.forEach((env) => {
+                    const acquiredAt = new Date(env.ciRunInfo.ciAcquiredAt)
+                    const ageMinutes = Math.round((Date.now() - acquiredAt.getTime()) / (1000 * 60))
+                    console.log(`   - ${env.slug} (acquired ${ageMinutes}m ago)`)
+                })
+
+                // Step 3: Release all expired environments
+                let updatedPoolData = {...poolData}
+
+                for (const expiredEnv of expiredEnvironments) {
+                    updatedPoolData = this.updateMRTTargetStatus(
+                        updatedPoolData,
+                        expiredEnv,
+                        CI_AVAILABILITY_AVAILABLE
+                    )
+
+                    releasedEnvironments.push({
+                        slug: expiredEnv.slug,
+                        acquiredAt: expiredEnv.ciRunInfo.ciAcquiredAt,
+                        ageMinutes: Math.round(
+                            (Date.now() - new Date(expiredEnv.ciRunInfo.ciAcquiredAt).getTime()) /
+                                (1000 * 60)
+                        ),
+                        prNumber: expiredEnv.ciRunInfo.prNumber,
+                        branch: expiredEnv.ciRunInfo.branch,
+                        runId: expiredEnv.ciRunInfo.runId
+                    })
+                }
+
+                releasedCount = expiredEnvironments.length
+
+                // Step 4: Upload updated pool data with ETag precondition
+                await this.s3Client.upload(
+                    this.bucket,
+                    this.poolDataFileKey,
+                    JSON.stringify(updatedPoolData, null, 2),
+                    downloadResponse.etag
+                )
+
+                console.log(`✅ Successfully released ${releasedCount} expired environment(s)`)
+                return {
+                    releasedCount,
+                    releasedEnvironments,
+                    attempt: retryCount + 1
+                }
+            } catch (error) {
+                retryCount++
+
+                if (error.name === AWS_S3_ERR_PRECONDITION_FAILED) {
+                    console.log(`⚠️ ETag mismatch on cleanup attempt ${retryCount}, retrying...`)
+
+                    if (retryCount < this.maxRetries) {
+                        await sleep(this.retryDelay)
+                        continue
+                    } else {
+                        throw new Error(
+                            `❌ Failed to cleanup expired environments after ${this.maxRetries} attempts due to concurrent modifications`
+                        )
+                    }
+                } else {
+                    // Non-retryable error
+                    throw error
+                }
+            }
+        }
+
+        throw new Error(
+            `❌ Failed to cleanup expired environments after ${this.maxRetries} attempts`
+        )
     }
 }
 
@@ -315,7 +423,7 @@ async function main() {
     const program = new Command()
 
     program
-        .description('Acquire and manage MRT environments with optimistic locking')
+        .description('Acquire, manage, and cleanup MRT environments with optimistic locking')
         .option('--max-retries <number>', 'Maximum retry attempts', '3')
         .option('--retry-delay <ms>', 'Delay between retries in milliseconds', '10000')
 
@@ -451,6 +559,62 @@ async function main() {
                     console.error('❌ Error:', error.message)
                     process.exit(1)
                 }
+            }
+        })
+
+    program
+        .command('cleanup')
+        .description('Clean up expired environments that have been in-use for longer than the TTL')
+        .option(
+            '--ttl-minutes <minutes>',
+            'Time-to-live in minutes (can also be set via MRT_CLEANUP_TTL_MINUTES env var)',
+            process.env.MRT_CLEANUP_TTL_MINUTES || MRT_CLEANUP_TTL_MINUTES_DEFAULT
+        )
+        .action(async ({ttlMinutes}) => {
+            const globalOpts = program.opts()
+
+            const mrtTargetManager = new MRTTargetManager({
+                bucket: process.env.AWS_S3_BUCKET,
+                poolDataFileKey: process.env.AWS_S3_POOL_DATA_FILE_KEY,
+                roleArn: process.env.AWS_ROLE_ARN,
+                region: process.env.AWS_REGION,
+                externalId: process.env.AWS_EXTERNAL_ID,
+                maxRetries: parseInt(globalOpts.maxRetries),
+                retryDelay: parseInt(globalOpts.retryDelay),
+                roleSessionName: process.env.CI
+                    ? GITHUB_ACTIONS_E2E_SESSION
+                    : PWA_KIT_BOT_USER_SESSION
+            })
+
+            await mrtTargetManager.initialize()
+
+            try {
+                const ttl = parseFloat(ttlMinutes)
+                if (isNaN(ttl) || ttl <= 0) {
+                    throw new Error('TTL minutes must be a positive number')
+                }
+
+                const result = await mrtTargetManager.cleanupExpiredEnvironments(ttl)
+
+                console.log('\n📊 Cleanup Summary:')
+                console.log(`   Released: ${result.releasedCount} environment(s)`)
+                console.log(`   Attempts: ${result.attempt}`)
+
+                if (result.releasedEnvironments.length > 0) {
+                    console.log('\n📋 Released Environments:')
+                    result.releasedEnvironments.forEach((env) => {
+                        const details = []
+                        if (env.prNumber) details.push(`PR #${env.prNumber}`)
+                        if (env.branch) details.push(`branch: ${env.branch}`)
+                        if (env.runId) details.push(`run: ${env.runId}`)
+
+                        const detailsStr = details.length > 0 ? ` (${details.join(', ')})` : ''
+                        console.log(`   - ${env.slug}: ${env.ageMinutes}m old${detailsStr}`)
+                    })
+                }
+            } catch (error) {
+                console.error('❌ Error:', error.message)
+                process.exit(1)
             }
         })
 
