@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import React from 'react'
-import {screen, fireEvent, waitFor, act} from '@testing-library/react'
+import {screen, fireEvent, waitFor} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import OtpAuth from '@salesforce/retail-react-app/app/components/otp-auth/index'
 import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
