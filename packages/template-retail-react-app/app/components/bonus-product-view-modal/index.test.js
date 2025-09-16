@@ -29,6 +29,18 @@ jest.mock('@salesforce/retail-react-app/app/hooks/use-product-view-modal', () =>
 // Mock commerce-sdk-react for CommerceApiProvider
 jest.mock('@salesforce/commerce-sdk-react', () => ({
     useShopperBasketsMutationHelper: jest.fn(),
+    useCustomerId: jest.fn(() => 'test-customer-id'),
+    useCustomerType: jest.fn(() => ({
+        isRegistered: true,
+        isGuest: false,
+        customerType: 'registered'
+    })),
+    useCustomer: jest.fn(() => ({data: null})),
+    useProducts: jest.fn(() => ({data: null, isPending: false})),
+    useCustomerProductLists: jest.fn(() => ({data: null})),
+    useShopperCustomersMutation: jest.fn(() => ({
+        mutateAsync: jest.fn()
+    })),
     CommerceApiProvider: ({children}) => children
 }))
 
@@ -94,7 +106,12 @@ jest.mock(
 jest.mock('@salesforce/retail-react-app/app/utils/bonus-product-utils', () => ({
     getRemainingAvailableBonusProductsForProduct: jest.fn(),
     findAvailableBonusDiscountLineItemIds: jest.fn(),
-    getBonusProductCountsForPromotion: jest.fn()
+    getBonusProductCountsForPromotion: jest.fn(),
+    useBasketProductsWithPromotions: jest.fn(() => ({
+        data: {},
+        isLoading: false,
+        hasPromotionData: false
+    }))
 }))
 
 // Mock current basket hook
@@ -127,7 +144,8 @@ beforeEach(() => {
 
     // Setup current basket mock
     useCurrentBasket.mockReturnValue({
-        data: {basketId: 'test-basket'}
+        data: {basketId: 'test-basket'},
+        derivedData: {totalItems: 0}
     })
 
     // Setup bonus product utils mocks
@@ -165,7 +183,7 @@ describe('BonusProductViewModal - getRemainingBonusQuantity', () => {
 
         // Mock basket to exist (required for getMaxOrderQuantity to work)
         const mockBasket = {bonusDiscountLineItems: []}
-        useCurrentBasket.mockReturnValue({data: mockBasket})
+        useCurrentBasket.mockReturnValue({data: mockBasket, derivedData: {totalItems: 0}})
 
         renderWithProviders(
             <BonusProductViewModal
@@ -195,7 +213,7 @@ describe('BonusProductViewModal - Header Count Display', () => {
         } bonus items are selected`, () => {
             const mockBasket = {basketId: 'test-basket'}
 
-            useCurrentBasket.mockReturnValue({data: mockBasket})
+            useCurrentBasket.mockReturnValue({data: mockBasket, derivedData: {totalItems: 0}})
 
             // Mock getBonusProductCountsForPromotion to return specific test values
             getBonusProductCountsForPromotion.mockReturnValue({
@@ -254,7 +272,7 @@ describe('BonusProductViewModal - Return to Selection Flow', () => {
                 {id: 'bonus-2', maxBonusItems: 1}
             ]
         }
-        useCurrentBasket.mockReturnValue({data: mockBasket})
+        useCurrentBasket.mockReturnValue({data: mockBasket, derivedData: {totalItems: 0}})
     })
 
     test('calls onReturnToSelection when there are remaining bonus products', async () => {
@@ -450,7 +468,7 @@ describe('BonusProductViewModal - checkForRemainingBonusProducts', () => {
 
         // This tests the internal logic - bonus-1 has 1 remaining (3-2), bonus-2 has 1 remaining (2-1)
         // We can't directly test the internal function, but we can test the behavior through the component
-        useCurrentBasket.mockReturnValue({data: updatedBasket})
+        useCurrentBasket.mockReturnValue({data: updatedBasket, derivedData: {totalItems: 0}})
 
         const mockAddItemToNewOrExistingBasket = jest.fn().mockResolvedValue(updatedBasket)
         useShopperBasketsMutationHelper.mockReturnValue({
@@ -478,7 +496,7 @@ describe('BonusProductViewModal - checkForRemainingBonusProducts', () => {
             productItems: []
         }
 
-        useCurrentBasket.mockReturnValue({data: updatedBasket})
+        useCurrentBasket.mockReturnValue({data: updatedBasket, derivedData: {totalItems: 0}})
 
         const mockAddItemToNewOrExistingBasket = jest.fn().mockResolvedValue(updatedBasket)
         useShopperBasketsMutationHelper.mockReturnValue({
@@ -504,7 +522,7 @@ describe('BonusProductViewModal - checkForRemainingBonusProducts', () => {
 describe('BonusProductViewModal - Back to Selection Link', () => {
     test('renders Back to Selection link when onReturnToSelection is provided', () => {
         const mockBasket = {basketId: 'test-basket'}
-        useCurrentBasket.mockReturnValue({data: mockBasket})
+        useCurrentBasket.mockReturnValue({data: mockBasket, derivedData: {totalItems: 0}})
 
         renderWithProviders(
             <BonusProductViewModal
@@ -524,7 +542,7 @@ describe('BonusProductViewModal - Back to Selection Link', () => {
 
     test('does not render Back to Selection link when onReturnToSelection is not provided', () => {
         const mockBasket = {basketId: 'test-basket'}
-        useCurrentBasket.mockReturnValue({data: mockBasket})
+        useCurrentBasket.mockReturnValue({data: mockBasket, derivedData: {totalItems: 0}})
 
         renderWithProviders(
             <BonusProductViewModal
@@ -545,7 +563,7 @@ describe('BonusProductViewModal - Back to Selection Link', () => {
     test('Back to Selection link calls onReturnToSelection when clicked', async () => {
         const user = userEvent.setup()
         const mockBasket = {basketId: 'test-basket'}
-        useCurrentBasket.mockReturnValue({data: mockBasket})
+        useCurrentBasket.mockReturnValue({data: mockBasket, derivedData: {totalItems: 0}})
 
         renderWithProviders(
             <BonusProductViewModal
@@ -570,7 +588,7 @@ describe('BonusProductViewModal - Back to Selection Link', () => {
 
     test('Back to Selection link has correct styling attributes', () => {
         const mockBasket = {basketId: 'test-basket'}
-        useCurrentBasket.mockReturnValue({data: mockBasket})
+        useCurrentBasket.mockReturnValue({data: mockBasket, derivedData: {totalItems: 0}})
 
         renderWithProviders(
             <BonusProductViewModal
@@ -608,7 +626,7 @@ describe('BonusProductViewModal - Quantity Distribution Across Multiple BonusDis
             ],
             productItems: []
         }
-        useCurrentBasket.mockReturnValue({data: mockBasket})
+        useCurrentBasket.mockReturnValue({data: mockBasket, derivedData: {totalItems: 0}})
 
         getRemainingAvailableBonusProductsForProduct.mockReturnValue({
             aggregatedMaxBonusItems: 3,
