@@ -395,6 +395,4 @@ const {handler, app, server} = runtime.createHandler(options, (app) => {
 // SSR requires that we export a single handler function called 'get', that
 // supports AWS use of the server that we created above.
 exports.get = handler
-exports.server = server
-
 exports.app = app
