@@ -9,6 +9,7 @@ import {FormattedMessage, FormattedNumber, useIntl} from 'react-intl'
 import PropTypes from 'prop-types'
 import {
     Box,
+    Collapse,
     Flex,
     Radio,
     RadioGroup,
@@ -20,8 +21,36 @@ import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-curre
 import {LockIcon, PaypalIcon} from '@salesforce/retail-react-app/app/components/icons'
 import CreditCardFields from '@salesforce/retail-react-app/app/components/forms/credit-card-fields'
 import {useCurrency} from '@salesforce/retail-react-app/app/hooks'
+import {getCreditCardIcon} from '@salesforce/retail-react-app/app/utils/cc-utils'
 
-const PaymentForm = ({form, onSubmit, children}) => {
+const PaymentCardSummary = ({payment}) => {
+    const CardIcon = getCreditCardIcon(payment?.paymentCard?.cardType)
+
+    return (
+        <Stack direction="row" alignItems="center" spacing={3}>
+            {CardIcon && <CardIcon layerStyle="ccIcon" />}
+
+            <Stack direction="row">
+                <Text>{payment.paymentCard.cardType}</Text>
+                <Text>&bull;&bull;&bull;&bull; {payment.paymentCard.numberLastDigits}</Text>
+                <Text>
+                    {payment.paymentCard.expirationMonth}/{payment.paymentCard.expirationYear}
+                </Text>
+            </Stack>
+        </Stack>
+    )
+}
+
+PaymentCardSummary.propTypes = {payment: PropTypes.object}
+
+const PaymentForm = ({
+    form,
+    onSubmit,
+    savedPaymentInstruments,
+    children,
+    onPaymentMethodChange,
+    selectedPaymentMethod
+}) => {
     const {formatMessage} = useIntl()
     const {data: basket} = useCurrentBasket()
     const {currency} = useCurrency()
@@ -32,7 +61,8 @@ const PaymentForm = ({form, onSubmit, children}) => {
                 <Stack spacing={5}>
                     <Box border="1px solid" borderColor="gray.100" rounded="base" overflow="hidden">
                         <RadioGroup
-                            value="cc"
+                            value={selectedPaymentMethod}
+                            onChange={onPaymentMethodChange}
                             aria-label={formatMessage({
                                 defaultMessage: 'Payment',
                                 id: 'payment_selection.radio_group.assistive_msg'
@@ -77,15 +107,34 @@ const PaymentForm = ({form, onSubmit, children}) => {
                                     </Flex>
                                 </Radio>
                             </Box>
-
-                            <Box p={[4, 4, 6]} borderBottom="1px solid" borderColor="gray.100">
-                                <Stack spacing={6}>
+                            <Collapse in={selectedPaymentMethod === 'cc'} animateOpacity>
+                                <Box p={[4, 4, 6]} borderBottom="1px solid" borderColor="gray.100">
                                     <Stack spacing={6}>
-                                        <CreditCardFields form={form} />
+                                        <Stack spacing={6}>
+                                            <CreditCardFields form={form} />
+                                        </Stack>
+                                        {children && <Box pt={2}>{children}</Box>}
                                     </Stack>
-                                    {children && <Box pt={2}>{children}</Box>}
-                                </Stack>
-                            </Box>
+                                </Box>
+                            </Collapse>
+
+                            {savedPaymentInstruments?.map((paymentInstrument) => (
+                                <Box
+                                    py={3}
+                                    px={[4, 4, 6]}
+                                    bg="gray.50"
+                                    borderBottom="1px solid"
+                                    borderColor="gray.100"
+                                    key={paymentInstrument.paymentInstrumentId}
+                                >
+                                    <Radio
+                                        value={paymentInstrument.paymentInstrumentId}
+                                        key={paymentInstrument.paymentInstrumentId}
+                                    >
+                                        <PaymentCardSummary payment={paymentInstrument} />
+                                    </Radio>
+                                </Box>
+                            ))}
 
                             <Box py={3} px={[4, 4, 6]} bg="gray.50" borderColor="gray.100">
                                 <Radio value="paypal">
@@ -110,7 +159,16 @@ PaymentForm.propTypes = {
     onSubmit: PropTypes.func,
 
     /** Additional content to render after credit card fields */
-    children: PropTypes.node
+    children: PropTypes.node,
+
+    /** Saved payment instruments */
+    savedPaymentInstruments: PropTypes.array,
+
+    /** Callback for payment method selection change */
+    onPaymentMethodChange: PropTypes.func,
+
+    /** Currently selected payment method */
+    selectedPaymentMethod: PropTypes.string
 }
 
 export default PaymentForm

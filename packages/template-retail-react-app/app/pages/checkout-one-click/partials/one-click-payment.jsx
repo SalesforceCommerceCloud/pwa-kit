@@ -46,7 +46,9 @@ const Payment = ({
     setEnableUserRegistration,
     registeredUserChoseGuest = false,
     onPaymentMethodSaved,
-    onSavePreferenceChange
+    onSavePreferenceChange,
+    selectedPaymentMethod,
+    onSelectedPaymentMethodChange
 }) => {
     const {formatMessage} = useIntl()
     const currentBasketQuery = useCurrentBasket()
@@ -215,12 +217,13 @@ const Payment = ({
                 // After auto-apply, if we already have a shipping address, submit billing so we can advance
                 if (selectedShippingAddress) {
                     await onBillingSubmit()
-                    // Ensure basket is refreshed with payment & billing
-                    await currentBasketQuery.refetch()
                     // Stay on Payment; place-order button is rendered on Payment step in this flow
                 }
+                // Ensure basket is refreshed with payment & billing
+                await currentBasketQuery.refetch()
             } catch (_e) {
                 // Ignore and allow manual selection
+                console.error(_e)
             } finally {
                 setIsApplyingSavedPayment(false)
             }
@@ -309,9 +312,15 @@ const Payment = ({
 
                     <Stack spacing={6}>
                         {isApplyingSavedPayment ? null : !appliedPayment?.paymentCard ? (
-                            <PaymentForm form={paymentMethodForm} onSubmit={onSubmit}>
+                            <PaymentForm
+                                form={paymentMethodForm}
+                                onSubmit={onSubmit}
+                                savedPaymentInstruments={customer.paymentInstruments}
+                                onPaymentMethodChange={onSelectedPaymentMethodChange}
+                                selectedPaymentMethod={selectedPaymentMethod}
+                            >
                                 {/* Show for returning users (registered) while editing/adding a new card */}
-                                {!isGuest && (
+                                {isGuest && (
                                     <SavePaymentMethod
                                         paymentInstrument={currentFormPayment}
                                         onSaved={handleSavePreferenceChange}
@@ -457,7 +466,11 @@ Payment.propTypes = {
     /** Callback when payment method is successfully saved */
     onPaymentMethodSaved: PropTypes.func,
     /** Callback when save preference changes */
-    onSavePreferenceChange: PropTypes.func
+    onSavePreferenceChange: PropTypes.func,
+    /** Currently selected payment method */
+    selectedPaymentMethod: PropTypes.string,
+    /** Callback when selected payment method changes */
+    onSelectedPaymentMethodChange: PropTypes.func
 }
 
 const PaymentCardSummary = ({payment}) => {

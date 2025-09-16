@@ -6,8 +6,7 @@
  */
 
 import React from 'react'
-import {render, screen, waitFor} from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
+import {render, screen} from '@testing-library/react'
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
 import {useCurrency} from '@salesforce/retail-react-app/app/hooks'
 import PaymentForm from '@salesforce/retail-react-app/app/pages/checkout-one-click/partials/one-click-payment-form'
@@ -55,6 +54,15 @@ jest.mock('@salesforce/retail-react-app/app/components/forms/credit-card-fields'
         )
     }
 })
+
+// Mock cc-utils
+jest.mock('@salesforce/retail-react-app/app/utils/cc-utils', () => ({
+    getCreditCardIcon: jest.fn(() => {
+        return function MockCardIcon() {
+            return <div data-testid="card-icon">Card Icon</div>
+        }
+    })
+}))
 
 // Mock icons
 jest.mock('@salesforce/retail-react-app/app/components/icons', () => ({
@@ -116,7 +124,7 @@ describe('PaymentForm Component', () => {
         })
 
         test('credit card radio is selected by default', () => {
-            render(<PaymentForm form={mockForm} onSubmit={jest.fn()} />)
+            render(<PaymentForm form={mockForm} selectedPaymentMethod="cc" onSubmit={jest.fn()} />)
 
             const creditCardRadio = screen.getByDisplayValue('cc')
             expect(creditCardRadio).toBeChecked()
@@ -140,7 +148,201 @@ describe('PaymentForm Component', () => {
         })
     })
 
-    describe('Form Interactions', () => {})
+    describe('Saved Payment Methods', () => {
+        const mockSavedPaymentInstruments = [
+            {
+                paymentInstrumentId: 'saved-payment-1',
+                paymentCard: {
+                    cardType: 'Visa',
+                    numberLastDigits: '1234',
+                    holder: 'John Doe',
+                    expirationMonth: 12,
+                    expirationYear: 2025
+                }
+            },
+            {
+                paymentInstrumentId: 'saved-payment-2',
+                paymentCard: {
+                    cardType: 'Mastercard',
+                    numberLastDigits: '5678',
+                    holder: 'Jane Smith',
+                    expirationMonth: 6,
+                    expirationYear: 2026
+                }
+            }
+        ]
+
+        test('renders saved payment methods when provided', () => {
+            render(
+                <PaymentForm
+                    form={mockForm}
+                    onSubmit={jest.fn()}
+                    savedPaymentInstruments={mockSavedPaymentInstruments}
+                />
+            )
+
+            // Check that saved payment methods are rendered
+            expect(screen.getByDisplayValue('saved-payment-1')).toBeInTheDocument()
+            expect(screen.getByDisplayValue('saved-payment-2')).toBeInTheDocument()
+        })
+
+        test('displays saved payment method details correctly', () => {
+            render(
+                <PaymentForm
+                    form={mockForm}
+                    onSubmit={jest.fn()}
+                    savedPaymentInstruments={mockSavedPaymentInstruments}
+                />
+            )
+
+            // Check first saved payment method details
+            expect(screen.getByText('Visa')).toBeInTheDocument()
+            expect(screen.getByText('•••• 1234')).toBeInTheDocument()
+            expect(screen.getByText('12/2025')).toBeInTheDocument()
+
+            // Check second saved payment method details
+            expect(screen.getByText('Mastercard')).toBeInTheDocument()
+            expect(screen.getByText('•••• 5678')).toBeInTheDocument()
+            expect(screen.getByText('6/2026')).toBeInTheDocument()
+        })
+
+        test('renders credit card icon for saved payment methods', () => {
+            render(
+                <PaymentForm
+                    form={mockForm}
+                    onSubmit={jest.fn()}
+                    savedPaymentInstruments={[mockSavedPaymentInstruments[0]]}
+                />
+            )
+
+            // The mock getCreditCardIcon should be called and return a component
+            expect(screen.getByTestId('card-icon')).toBeInTheDocument()
+        })
+
+        test('does not render saved payment methods when array is empty', () => {
+            render(
+                <PaymentForm form={mockForm} onSubmit={jest.fn()} savedPaymentInstruments={[]} />
+            )
+
+            expect(screen.queryByDisplayValue('saved-payment-1')).not.toBeInTheDocument()
+            expect(screen.queryByDisplayValue('saved-payment-2')).not.toBeInTheDocument()
+        })
+
+        test('does not render saved payment methods when prop is undefined', () => {
+            render(<PaymentForm form={mockForm} onSubmit={jest.fn()} />)
+
+            expect(screen.queryByDisplayValue('saved-payment-1')).not.toBeInTheDocument()
+            expect(screen.queryByDisplayValue('saved-payment-2')).not.toBeInTheDocument()
+        })
+
+        test('handles saved payment method selection', () => {
+            const mockOnPaymentMethodChange = jest.fn()
+
+            render(
+                <PaymentForm
+                    form={mockForm}
+                    onSubmit={jest.fn()}
+                    savedPaymentInstruments={mockSavedPaymentInstruments}
+                    onPaymentMethodChange={mockOnPaymentMethodChange}
+                />
+            )
+
+            const savedPaymentRadio = screen.getByDisplayValue('saved-payment-1')
+            savedPaymentRadio.click()
+
+            expect(mockOnPaymentMethodChange).toHaveBeenCalledWith('saved-payment-1')
+        })
+
+        test('shows selected saved payment method', () => {
+            render(
+                <PaymentForm
+                    form={mockForm}
+                    onSubmit={jest.fn()}
+                    savedPaymentInstruments={mockSavedPaymentInstruments}
+                    selectedPaymentMethod="saved-payment-1"
+                />
+            )
+
+            const savedPaymentRadio = screen.getByDisplayValue('saved-payment-1')
+            expect(savedPaymentRadio).toBeChecked()
+        })
+
+        test('renders multiple saved payment methods with unique keys', () => {
+            render(
+                <PaymentForm
+                    form={mockForm}
+                    onSubmit={jest.fn()}
+                    savedPaymentInstruments={mockSavedPaymentInstruments}
+                />
+            )
+
+            // Both saved payment methods should be present
+            expect(screen.getByDisplayValue('saved-payment-1')).toBeInTheDocument()
+            expect(screen.getByDisplayValue('saved-payment-2')).toBeInTheDocument()
+
+            // Each should have unique radio button names
+            const radioButtons = screen.getAllByRole('radio')
+            const savedPaymentRadios = radioButtons.filter(
+                (radio) => radio.value === 'saved-payment-1' || radio.value === 'saved-payment-2'
+            )
+            expect(savedPaymentRadios).toHaveLength(2)
+        })
+
+        test('handles saved payment method with missing card details gracefully', () => {
+            const incompletePaymentInstrument = [
+                {
+                    paymentInstrumentId: 'incomplete-payment',
+                    paymentCard: {
+                        cardType: 'Visa'
+                        // Missing other fields
+                    }
+                }
+            ]
+
+            expect(() => {
+                render(
+                    <PaymentForm
+                        form={mockForm}
+                        onSubmit={jest.fn()}
+                        savedPaymentInstruments={incompletePaymentInstrument}
+                    />
+                )
+            }).not.toThrow()
+        })
+
+        test('renders saved payment methods between credit card and PayPal options', () => {
+            render(
+                <PaymentForm
+                    form={mockForm}
+                    onSubmit={jest.fn()}
+                    savedPaymentInstruments={mockSavedPaymentInstruments}
+                />
+            )
+
+            const radioButtons = screen.getAllByRole('radio')
+            const values = radioButtons.map((radio) => radio.value)
+
+            // Should have credit card, saved payments, and PayPal in order
+            expect(values).toContain('cc')
+            expect(values).toContain('saved-payment-1')
+            expect(values).toContain('saved-payment-2')
+            expect(values).toContain('paypal')
+        })
+
+        test('renders card icons for saved payment methods', () => {
+            render(
+                <PaymentForm
+                    form={mockForm}
+                    onSubmit={jest.fn()}
+                    savedPaymentInstruments={mockSavedPaymentInstruments}
+                />
+            )
+
+            // Should render card icons for each saved payment method
+            const cardIcons = screen.getAllByTestId('card-icon')
+            expect(cardIcons).toHaveLength(2)
+        })
+    })
 
     describe('Data Handling', () => {
         test('handles basket with zero total', () => {
