@@ -1,4 +1,11 @@
 name: SalesforceCommerceCloud/pwa-kit/e2e-pr
+
+# WARNING: This workflow runs against MRT target acquired from the shared target pool.
+# If this workflow runs longer than the configured cleanup TTL (default: 60 minutes),
+# the acquired MRT target may be automatically released back to the pool by the 
+# cleanup workflow, potentially causing unexpected outcomes.
+# Monitor workflow execution time and cancel/re-run the workflow with issues resolved to acquire a new MRT target.
+
 on:
     workflow_dispatch:
       # Manually deploy e2e test setup to your own MRT Target for debugging tests.

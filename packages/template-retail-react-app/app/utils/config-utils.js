@@ -17,7 +17,9 @@ export const getCommerceAgentConfig = () => {
         scrt2Url: '',
         salesforceOrgId: '',
         commerceOrgId: '',
-        siteId: ''
+        siteId: '',
+        enableConversationContext: 'false',
+        conversationContext: []
     }
     return getConfig().app.commerceAgent ?? defaults
 }

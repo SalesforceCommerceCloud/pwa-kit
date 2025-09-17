@@ -19,7 +19,9 @@ module.exports = {
             scrt2Url: '',
             salesforceOrgId: '',
             commerceOrgId: '',
-            siteId: ''
+            siteId: '',
+            enableConversationContext: 'false',
+            conversationContext: []
         },
         url: {
             site: 'path',
