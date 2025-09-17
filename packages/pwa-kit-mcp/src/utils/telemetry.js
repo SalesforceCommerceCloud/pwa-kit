@@ -6,6 +6,7 @@
  */
 import os from 'os'
 import path from 'path'
+import fs from 'fs'
 import {TelemetryReporter} from '@salesforce/telemetry'
 import {Telemetry as McpTelemetry} from '@salesforce/mcp/lib/telemetry.js'
 
@@ -13,9 +14,20 @@ import {Telemetry as McpTelemetry} from '@salesforce/mcp/lib/telemetry.js'
 const packageJson = require('../../package.json')
 
 let telemetryInstance = null
-// Allow overriding or disabling telemetry via environment
-// Preferred Key format: InstrumentationKey=<key>;IngestionEndpoint=<endpoint>;LiveEndpoint=<liveEndpoint>;ApplicationId=<applicationId>
-const customAppInsightsKey = process.env.PWA_KIT_MCP_APP_INSIGHTS_KEY
+const loadLocalConnectionString = () => {
+    try {
+        const cfgPath = path.resolve(__dirname, '../../config.json')
+        if (!fs.existsSync(cfgPath)) return null
+        const raw = fs.readFileSync(cfgPath, 'utf8')
+        const cfg = JSON.parse(raw)
+        const v = cfg?.applicationInsightsConnectionString
+        return typeof v === 'string' && v.trim() ? v.trim() : null
+    } catch {
+        return null
+    }
+}
+
+const customAppInsightsKey = loadLocalConnectionString()
 
 const computeCacheDir = () => {
     // Try to mirror oclif's cache location shape so @salesforce/mcp can find CLIID if present.

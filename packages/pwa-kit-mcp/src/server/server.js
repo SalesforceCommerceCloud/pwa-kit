@@ -80,8 +80,21 @@ class PwaStorefrontMCPServerHighLevel {
     }
 
     async run() {
-        await startTelemetry({project: 'pwa-kit-mcp'})
+        try {
+            await startTelemetry({project: 'pwa-kit-mcp'})
+        } catch (e) {
+            console.error(
+                'Telemetry initialization failed; continuing without telemetry:',
+                e?.message || e
+            )
+        }
         // Create server AFTER telemetry is started, so it's injected into server options
+        let telemetryOption
+        try {
+            telemetryOption = getTelemetry()
+        } catch {
+            telemetryOption = undefined
+        }
         this.server = new SfMcpServer(
             {
                 name: 'pwa-kit-mcp',
@@ -91,7 +104,7 @@ class PwaStorefrontMCPServerHighLevel {
                 capabilities: {
                     tools: {}
                 },
-                telemetry: getTelemetry()
+                telemetry: telemetryOption
             }
         )
         this.setupTools()
