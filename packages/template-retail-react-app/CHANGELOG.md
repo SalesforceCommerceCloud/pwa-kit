@@ -2,6 +2,8 @@
 - Updated search UX - prices, images, suggestions new layout [#3271](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3271)
 - Updated the UI for StoreDisplay component which displays pickup in-store information on different pages. [#3248](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3248)
 - Added warning modal for guest users when toggling between multi ship and ship to one address. [3280] (https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3280) [3302] (https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3302)
+- Enhanced the shopping assistant that integrates Salesforce Embedded Messaging Service with PWA Kit applications, adding comprehensive context support, localization capabilities, and improved user experience features. [#3259](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3259)
+- [Breaking] Removed domainUrl, locale, basetId properties as part off the ShopperAgent during initialization. [#3259](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3259)
 
 ## v8.0.0 (Sep 04, 2025)
 - Add support for environment level base paths on /mobify routes [#2892](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/2892)
