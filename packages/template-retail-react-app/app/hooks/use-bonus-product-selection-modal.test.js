@@ -17,7 +17,7 @@ import {useBonusProductSelectionModal} from '@salesforce/retail-react-app/app/ho
 
 // Mock all dependencies
 jest.mock('@salesforce/retail-react-app/app/hooks/use-modal-state')
-jest.mock('@salesforce/retail-react-app/app/utils/bonus-product-utils', () => ({
+jest.mock('@salesforce/retail-react-app/app/utils/bonus-product', () => ({
     findAvailableBonusDiscountLineItemIds: jest.fn(() => [])
 }))
 

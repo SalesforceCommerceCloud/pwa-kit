@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import * as hooksUtils from '@salesforce/retail-react-app/app/utils/bonus-product-hooks'
+import * as hooksUtils from '@salesforce/retail-react-app/app/utils/bonus-product/hooks'
 
 describe('Bonus Product Hooks', () => {
     // Test hook functions exports (can't test actual React hooks in Jest environment)

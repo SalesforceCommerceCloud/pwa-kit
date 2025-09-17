@@ -12,7 +12,7 @@ import {
     getBonusProductsInCartForProduct,
     getRemainingAvailableBonusProductsForProduct,
     shouldShowBonusProductSelection
-} from '@salesforce/retail-react-app/app/utils/bonus-product-utils'
+} from '@salesforce/retail-react-app/app/utils/bonus-product'
 
 /**
  * Fragment component that renders cart items with bonus products grouped with their qualifying products

@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import * as calculationUtils from '@salesforce/retail-react-app/app/utils/bonus-product-calculations'
+import * as calculationUtils from '@salesforce/retail-react-app/app/utils/bonus-product/calculations'
 
 describe('Bonus Product Calculations', () => {
     describe('findAvailableBonusDiscountLineItemIds', () => {

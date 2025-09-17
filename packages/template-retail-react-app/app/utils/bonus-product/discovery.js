@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import {getPromotionIdsForProduct} from '@salesforce/retail-react-app/app/utils/bonus-product-promotions'
+import {getPromotionIdsForProduct} from '@salesforce/retail-react-app/app/utils/bonus-product/promotions'
 
 /**
  * Discovery utilities for bonus products.

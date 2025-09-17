@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import * as discoveryUtils from '@salesforce/retail-react-app/app/utils/bonus-product-discovery'
+import * as discoveryUtils from '@salesforce/retail-react-app/app/utils/bonus-product/discovery'
 
 describe('Bonus Product Discovery', () => {
     // Mock basket data

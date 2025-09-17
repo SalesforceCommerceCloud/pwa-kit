@@ -20,7 +20,7 @@ export {
     isProductAvailableAsBonus,
     isProductEligibleForBonusProducts,
     shouldShowBonusProductSelection
-} from './bonus-product-promotions'
+} from '@salesforce/retail-react-app/app/utils/bonus-product/promotions'
 
 // Re-export discovery utilities
 export {
@@ -29,14 +29,14 @@ export {
     getBonusProductsInCartForProduct,
     getQualifyingProductForBonusProductInCart,
     getRemainingAvailableBonusProductsForProduct
-} from './bonus-product-discovery'
+} from '@salesforce/retail-react-app/app/utils/bonus-product/discovery'
 
 // Re-export calculation utilities
 export {
     findAvailableBonusDiscountLineItemIds,
     getBonusProductCountsForPromotion,
     findAllBonusProductItemsToRemove
-} from './bonus-product-calculations'
+} from '@salesforce/retail-react-app/app/utils/bonus-product/calculations'
 
 // Re-export React hooks
 export {
@@ -44,4 +44,4 @@ export {
     useBasketProductsWithPromotions,
     useAvailableBonusItemsForProduct,
     useRemainingAvailableBonusProductsForProduct
-} from './bonus-product-hooks'
+} from '@salesforce/retail-react-app/app/utils/bonus-product/hooks'

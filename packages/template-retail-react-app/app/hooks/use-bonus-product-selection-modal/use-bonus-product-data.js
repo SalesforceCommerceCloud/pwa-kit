@@ -8,7 +8,7 @@
 import {useMemo} from 'react'
 import {useProducts} from '@salesforce/commerce-sdk-react'
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
-import {findAvailableBonusDiscountLineItemIds} from '@salesforce/retail-react-app/app/utils/bonus-product-utils'
+import {findAvailableBonusDiscountLineItemIds} from '@salesforce/retail-react-app/app/utils/bonus-product'
 
 export const useBonusProductData = (modalData) => {
     const {data: basket} = useCurrentBasket()

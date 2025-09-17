@@ -5,7 +5,7 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import * as promotionUtils from '@salesforce/retail-react-app/app/utils/bonus-product-promotions'
+import * as promotionUtils from '@salesforce/retail-react-app/app/utils/bonus-product/promotions'
 
 describe('Bonus Product Promotions', () => {
     // Mock products with promotion data

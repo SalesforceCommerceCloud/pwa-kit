@@ -16,7 +16,7 @@ import {
     getRemainingAvailableBonusProductsForProduct,
     findAvailableBonusDiscountLineItemIds,
     getBonusProductCountsForPromotion
-} from '@salesforce/retail-react-app/app/utils/bonus-product-utils'
+} from '@salesforce/retail-react-app/app/utils/bonus-product'
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
 import {useShopperBasketsMutationHelper} from '@salesforce/commerce-sdk-react'
 import {useProductViewModal} from '@salesforce/retail-react-app/app/hooks/use-product-view-modal'
@@ -103,7 +103,7 @@ jest.mock(
 )
 
 // Mock bonus product utils
-jest.mock('@salesforce/retail-react-app/app/utils/bonus-product-utils', () => ({
+jest.mock('@salesforce/retail-react-app/app/utils/bonus-product', () => ({
     getRemainingAvailableBonusProductsForProduct: jest.fn(),
     findAvailableBonusDiscountLineItemIds: jest.fn(),
     getBonusProductCountsForPromotion: jest.fn(),

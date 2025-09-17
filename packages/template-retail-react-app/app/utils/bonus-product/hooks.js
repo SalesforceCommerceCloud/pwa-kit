@@ -6,11 +6,11 @@
  */
 
 import {useProduct, useProducts} from '@salesforce/commerce-sdk-react'
-import {useCurrentBasket} from '../hooks/use-current-basket'
+import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
 import {
     getAvailableBonusItemsForProduct,
     getRemainingAvailableBonusProductsForProduct
-} from '@salesforce/retail-react-app/app/utils/bonus-product-discovery'
+} from '@salesforce/retail-react-app/app/utils/bonus-product/discovery'
 
 /**
  * React hooks for fetching and managing bonus product data.

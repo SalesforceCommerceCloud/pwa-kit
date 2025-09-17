@@ -75,7 +75,7 @@ const mockGetBonusProductCountsForPromotion = jest.fn(() => ({
     maxBonusItems: 0
 }))
 const mockShouldShowBonusProductSelection = jest.fn(() => true)
-jest.mock('@salesforce/retail-react-app/app/utils/bonus-product-utils', () => ({
+jest.mock('@salesforce/retail-react-app/app/utils/bonus-product', () => ({
     useBasketProductsWithPromotions: (...args) => mockUseBasketProductsWithPromotions(...args),
     getPromotionCalloutText: (...args) => mockGetPromotionCalloutText(...args),
     findAllBonusProductItemsToRemove: (...args) => mockFindAllBonusProductItemsToRemove(...args),
