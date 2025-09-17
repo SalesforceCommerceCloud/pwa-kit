@@ -5,11 +5,22 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import path from 'path'
+import fs from 'fs'
 import {spawn} from 'child_process'
 
-const BABEL_NODE_PATH = path.resolve(
-    './node_modules/.bin/babel-node' + (process.platform === 'win32' ? '.cmd' : '')
-)
+// Resolve the @babel/node CLI entry file without relying on import.meta or .bin shims
+const BABEL_NODE_CLI = [
+    // package-local node_modules (from this package root)
+    path.resolve(__dirname, '../../node_modules/@babel/node/bin/babel-node.js'),
+    // repo root fallback
+    path.resolve(process.cwd(), 'node_modules/@babel/node/bin/babel-node.js')
+].find((candidate) => {
+    try {
+        return fs.existsSync(candidate)
+    } catch {
+        return false
+    }
+})
 
 function sendJsonRpcRequest(child, request) {
     return new Promise((resolve, reject) => {
@@ -54,7 +65,10 @@ describe('PWA Storefront MCP server', () => {
 
     const startServer = () => {
         const serverEntry = path.resolve(__dirname, 'server.js')
-        child = spawn(BABEL_NODE_PATH, [serverEntry], {
+        if (!BABEL_NODE_CLI) {
+            throw new Error('Could not locate @babel/node CLI (babel-node.js)')
+        }
+        child = spawn(process.execPath, [BABEL_NODE_CLI, serverEntry], {
             stdio: ['pipe', 'pipe', 'pipe'],
             env: {
                 ...process.env
