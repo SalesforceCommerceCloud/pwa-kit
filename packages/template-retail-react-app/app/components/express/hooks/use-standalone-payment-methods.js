@@ -20,24 +20,20 @@ const getCachedPaymentMethods = (cacheKey) => {
     try {
         const storageKey = `${CACHE_PREFIX}:${cacheKey}`
         const cached = localStorage.getItem(storageKey)
-        
+
         if (!cached) {
-            console.log(`💾 Cache miss: No data found for key "${cacheKey}"`)
             return null
         }
-        
+
         const parsed = JSON.parse(cached)
         const now = Date.now()
         const age = now - parsed.timestamp
-        
+
         if (age > CACHE_TTL) {
-            // Cache expired, remove it
-            console.log(`💾 Cache expired: Data for key "${cacheKey}" is ${age}ms old (TTL: ${CACHE_TTL}ms)`)
             localStorage.removeItem(storageKey)
             return null
         }
-        
-        console.log(`💾 Cache hit: Data for key "${cacheKey}" is ${age}ms old (TTL: ${CACHE_TTL}ms)`)
+
         return parsed.data
     } catch (error) {
         console.warn('💾 Cache read error:', error)
@@ -57,12 +53,8 @@ const setCachedPaymentMethods = (cacheKey, data) => {
             data,
             timestamp: Date.now()
         }
-        
+
         localStorage.setItem(storageKey, JSON.stringify(cacheEntry))
-        
-        // Log cache operation
-        console.log(`💾 Payment Methods: Cached data for key "${cacheKey}"`)
-        console.log(`💾 Cache entries in localStorage: ${Object.keys(localStorage).filter(key => key.startsWith(CACHE_PREFIX)).length}`)
     } catch (error) {
         console.warn('💾 Cache write error:', error)
     }
@@ -85,8 +77,8 @@ const cleanupExpiredCache = () => {
     try {
         const now = Date.now()
         const keysToRemove = []
-        
-        Object.keys(localStorage).forEach(key => {
+
+        Object.keys(localStorage).forEach((key) => {
             if (key.startsWith(CACHE_PREFIX)) {
                 try {
                     const cached = JSON.parse(localStorage.getItem(key))
@@ -99,15 +91,10 @@ const cleanupExpiredCache = () => {
                 }
             }
         })
-        
-        keysToRemove.forEach(key => {
+
+        keysToRemove.forEach((key) => {
             localStorage.removeItem(key)
-            console.log(`🧹 Removed expired cache entry: ${key}`)
         })
-        
-        if (keysToRemove.length > 0) {
-            console.log(`🧹 Cleaned up ${keysToRemove.length} expired cache entries`)
-        }
     } catch (error) {
         console.warn('💾 Cache cleanup error:', error)
     }
@@ -129,7 +116,7 @@ export const useStandalonePaymentMethods = (authToken, site, locale, enabled = t
     useEffect(() => {
         // Clean up expired cache entries on hook initialization
         cleanupExpiredCache()
-        
+
         // Only make API call if enabled and required parameters are available
         if (!enabled || !authToken || !site) {
             return
@@ -137,32 +124,19 @@ export const useStandalonePaymentMethods = (authToken, site, locale, enabled = t
 
         const fetchPaymentMethods = async () => {
             const cacheKey = generateCacheKey(site, locale)
-            console.log(`🔑 Generated cache key: "${cacheKey}"`)
-            
+
             // Show current localStorage cache status
-            const cacheEntries = Object.keys(localStorage).filter(key => key.startsWith(CACHE_PREFIX))
-            console.log(`💾 Current localStorage cache entries: ${cacheEntries.length}`)
-            if (cacheEntries.length > 0) {
-                console.log('💾 Cache keys:', cacheEntries.map(key => key.replace(CACHE_PREFIX + ':', '')))
-            }
-            
+            const cacheEntries = Object.keys(localStorage).filter((key) =>
+                key.startsWith(CACHE_PREFIX)
+            )
+
             // Try to get data from cache first
-            const cacheStartTime = performance.now()
             const cachedData = getCachedPaymentMethods(cacheKey)
-            const cacheEndTime = performance.now()
-            const cacheDuration = cacheEndTime - cacheStartTime
-            
+
             if (cachedData) {
-                console.log(`💾 Payment Methods: Using cached data (retrieved in ${cacheDuration.toFixed(2)}ms)`)
                 setPaymentMethods(cachedData)
                 return
             }
-            
-            console.log(`💾 Payment Methods: Cache miss, fetching from API (cache lookup took ${cacheDuration.toFixed(2)}ms)`)
-            
-            // Mark the start of payment methods API call
-            const startTime = performance.now()
-            performance.mark('payment-methods-api-start')
 
             try {
                 setLoading(true)
@@ -171,49 +145,13 @@ export const useStandalonePaymentMethods = (authToken, site, locale, enabled = t
                 const service = new AdyenPaymentMethodsService(authToken, site)
                 const data = await service.getPaymentMethods()
 
-                // Mark the successful completion of the API call
-                const endTime = performance.now()
-                const duration = endTime - startTime
-                
-                performance.mark('payment-methods-api-success')
-                performance.measure(
-                    'payment-methods-api-duration',
-                    'payment-methods-api-start',
-                    'payment-methods-api-success'
-                )
-
                 // Cache the successful response
                 setCachedPaymentMethods(cacheKey, data)
 
-                // Log performance metrics
-                console.log(`🚀 Payment Methods API: ${duration.toFixed(2)}ms`)
-                console.group('📊 Payment Methods API Performance')
-                console.log(`✅ Success: ${duration.toFixed(2)}ms`)
-                console.log(`📡 Network + Processing: ${duration.toFixed(2)}ms`)
-                console.log(`🔗 Endpoint: ${site?.adyen?.environment || 'unknown'}`)
-                console.log(`💾 Cached: false`)
-                console.log(`⚡ Cache lookup: ${cacheDuration.toFixed(2)}ms`)
-                console.log(`🚀 Total time: ${(cacheDuration + duration).toFixed(2)}ms`)
                 console.groupEnd()
 
                 setPaymentMethods(data)
-                
-                // Log successful completion summary
-                console.log('✅ Payment Methods API: Successfully loaded payment methods')
-                console.log(`📊 Total methods available: ${Object.keys(data?.paymentMethods || {}).length}`)
-                
             } catch (err) {
-                // Mark the error completion of the API call
-                const endTime = performance.now()
-                const duration = endTime - startTime
-                
-                performance.mark('payment-methods-api-error')
-                performance.measure(
-                    'payment-methods-api-duration-error',
-                    'payment-methods-api-start',
-                    'payment-methods-api-error'
-                )
-
                 setError(err)
             } finally {
                 setLoading(false)

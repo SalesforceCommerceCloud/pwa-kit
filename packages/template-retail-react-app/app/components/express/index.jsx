@@ -46,7 +46,8 @@ function Express() {
     const [currentCurrency, setCurrentCurrency] = useState(null)
 
     // Initialize the express payment manager - always call this hook
-    const {manager, isDone, availableCount, managerError} = useExpressPaymentManager(PAYMENT_METHODS)
+    const {manager, isDone, availableCount, managerError} =
+        useExpressPaymentManager(PAYMENT_METHODS)
 
     // Fetch payment methods and environment data directly
     // Only call this hook when we have all required parameters to prevent hook ordering issues
@@ -56,17 +57,6 @@ function Express() {
         locale || null, // Ensure we always pass a consistent value
         !!(authToken && site && locale) // Only enable when all params are available
     )
-
-    // Mark when payment methods are being fetched
-    useEffect(() => {
-        if (authToken && site && locale) {
-            performance.mark('express-payment-methods-fetch-start')
-            console.log('🚀 Express Payment: Starting payment methods fetch...')
-            if (!isPdpMode) {
-                console.log(`📦 Waiting for basket data: ${basket?.basketId ? 'available' : 'missing'}`)
-            }
-        }
-    }, [authToken, site?.id, locale?.id, isPdpMode, basket?.basketId]) // Include basket status for non-PDP mode
 
     // PostMessage listener for SKU updates
     useEffect(() => {
@@ -140,7 +130,7 @@ function Express() {
         isPdpMode,
         manager
     }
-    
+
     return (
         <div className="express-payment-container">
             <div

@@ -22,7 +22,6 @@ import {
     cleanupTemporaryBasket
 } from '@salesforce/retail-react-app/app/components/express/utils/pdp/temporary-basket'
 import {useExpressPaymentSetup} from '@salesforce/retail-react-app/app/components/express/hooks/use-express-payment-setup'
-import {usePaymentPerformance} from '@salesforce/retail-react-app/app/components/express/hooks/use-payment-performance'
 import {
     validateExpressPaymentSetup,
     getExpressPaymentDependencies,
@@ -211,7 +210,13 @@ export const getGoogleButtonConfig = (
         // For PDP flows, create temporary basket if needed (and SKU is available)
         if (isPdpMode && sku && typeof sku === 'string' && setTempBasket) {
             try {
-                const newBasket = await createTemporaryBasket(sku, authToken, site, quantity, currency)
+                const newBasket = await createTemporaryBasket(
+                    sku,
+                    authToken,
+                    site,
+                    quantity,
+                    currency
+                )
                 basketRef = newBasket // Update basket reference immediately
                 setTempBasket(newBasket) // Update React state for re-renders
                 return newBasket
@@ -462,9 +467,6 @@ export const GooglePayExpress = ({
     manager
 }) => {
     const paymentContainer = useRef(null)
-    
-    // Initialize performance monitoring
-    const performance = usePaymentPerformance('googlepay')
 
     // Use the shared express payment setup hook
     const {
@@ -502,12 +504,6 @@ export const GooglePayExpress = ({
                 if (isCanceled) {
                     return
                 }
-                
-                // Log initialization attempt
-                console.log(`🚀 Google Pay: Starting initialization (PDP mode: ${isPdpMode}, Basket: ${basket?.basketId ? 'available' : 'missing'})`)
-                
-                // Mark initialization start
-                performance.markInitializationStart()
 
                 const handleGooglePayUnavailable = () => {
                     manager.setPaymentMethodUnavailable(PAYMENT_METHOD)
@@ -530,9 +526,6 @@ export const GooglePayExpress = ({
                 }
 
                 try {
-                    // Mark checkout creation start
-                    performance.markCheckoutCreationStart()
-                    
                     let checkout
                     try {
                         checkout = await createAdyenCheckout(
@@ -541,7 +534,6 @@ export const GooglePayExpress = ({
                             adyenPaymentMethods?.applicationInfo
                         )
                     } catch (ex) {
-                        performance.markError(ex, 'checkout-creation')
                         handleGooglePayUnavailable()
                         return
                     }
@@ -550,7 +542,6 @@ export const GooglePayExpress = ({
                         getGooglePaymentMethodConfig(adyenPaymentMethods)
 
                     if (!googlePaymentMethodConfig) {
-                        performance.markError(new Error('Google Pay configuration not found'), 'configuration-check')
                         handleGooglePayUnavailable()
                         return
                     }
@@ -569,21 +560,14 @@ export const GooglePayExpress = ({
                         currency
                     )
 
-                    // Mark button creation start
-                    performance.markButtonCreationStart()
-                    
                     let googlePayButton
                     try {
                         googlePayButton = await checkout.create('googlepay', googleButtonConfig)
                     } catch (ex) {
-                        performance.markError(ex, 'button-creation')
                         handleGooglePayUnavailable()
                         return
                     }
 
-                    // Mark availability check start
-                    performance.markAvailabilityCheckStart()
-                    
                     let isGooglePayButtonAvailable = false
                     try {
                         isGooglePayButtonAvailable = await googlePayButton.isAvailable()
@@ -592,22 +576,14 @@ export const GooglePayExpress = ({
                     }
 
                     if (!isGooglePayButtonAvailable) {
-                        performance.markError(new Error('Google Pay not available'), 'availability-check')
                         handleGooglePayUnavailable()
                         return
                     }
 
-                    // Mark mounting start
-                    performance.markMountingStart()
-                    
                     try {
                         await googlePayButton.mount(paymentContainer.current)
                         manager.setPaymentMethodAvailable(PAYMENT_METHOD)
-                        
-                        // Mark payment ready
-                        performance.markPaymentReady()
                     } catch (error) {
-                        performance.markError(error, 'mounting')
                         handleGooglePayUnavailable()
                     }
                 } catch (err) {
