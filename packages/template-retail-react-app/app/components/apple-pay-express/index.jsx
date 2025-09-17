@@ -9,7 +9,7 @@ import '@adyen/adyen-web/dist/adyen.css'
 import PropTypes from 'prop-types'
 
 import {
-    getCurrencyValueForApi, 
+    getCurrencyValueForApi,
     getApplePayCardNetworks
 } from '@salesforce/retail-react-app/app/components/express/utils/parsers'
 import {AdyenShippingMethodsService} from '@salesforce/retail-react-app/app/components/express/utils/shipping-methods'
@@ -25,7 +25,6 @@ import {
     forceOrderCalculation
 } from '@salesforce/retail-react-app/app/components/express/utils/pdp/basket-calculation'
 import {useExpressPaymentSetup} from '@salesforce/retail-react-app/app/components/express/hooks/use-express-payment-setup'
-import {usePaymentPerformance} from '@salesforce/retail-react-app/app/components/express/hooks/use-payment-performance'
 import {
     validateExpressPaymentSetup,
     getExpressPaymentDependencies,
@@ -513,9 +512,6 @@ export const ApplePayExpress = ({
     manager
 }) => {
     const paymentContainer = useRef(null)
-    
-    // Initialize performance monitoring
-    const performance = usePaymentPerformance('applepay')
 
     // Use the shared express payment setup hook
     const {
@@ -555,12 +551,6 @@ export const ApplePayExpress = ({
                 if (isCanceled) {
                     return
                 }
-                
-                // Log initialization attempt
-                console.log(`🚀 Apple Pay: Starting initialization (PDP mode: ${isPdpMode}, Basket: ${basket?.basketId ? 'available' : 'missing'})`)
-                
-                // Mark initialization start
-                performance.markInitializationStart()
 
                 const handleApplePayUnavailable = () => {
                     manager.setPaymentMethodUnavailable(PAYMENT_METHOD)
@@ -583,9 +573,6 @@ export const ApplePayExpress = ({
                 }
 
                 try {
-                    // Mark checkout creation start
-                    performance.markCheckoutCreationStart()
-                    
                     let checkout
                     try {
                         checkout = await createAdyenCheckout(
@@ -595,7 +582,6 @@ export const ApplePayExpress = ({
                         )
                     } catch (ex) {
                         console.error('Failed to initialize AdyenCheckout:', ex)
-                        performance.markError(ex, 'checkout-creation')
                         handleApplePayUnavailable()
                         return
                     }
@@ -605,7 +591,6 @@ export const ApplePayExpress = ({
 
                     if (!applePaymentMethodConfig) {
                         console.warn('Apple Pay configuration not found in payment methods')
-                        performance.markError(new Error('Apple Pay configuration not found'), 'configuration-check')
                         handleApplePayUnavailable()
                         return
                     }
@@ -626,22 +611,15 @@ export const ApplePayExpress = ({
                         currency
                     )
 
-                    // Mark button creation start
-                    performance.markButtonCreationStart()
-                    
                     let applePayButton
                     try {
                         applePayButton = await checkout.create('applepay', appleButtonConfig)
                     } catch (ex) {
                         console.error('Failed to create Apple Pay button:', ex)
-                        performance.markError(ex, 'button-creation')
                         handleApplePayUnavailable()
                         return
                     }
 
-                    // Mark availability check start
-                    performance.markAvailabilityCheckStart()
-                    
                     let isApplePayButtonAvailable = false
                     try {
                         isApplePayButtonAvailable = await applePayButton.isAvailable()
@@ -650,23 +628,15 @@ export const ApplePayExpress = ({
                     }
 
                     if (!isApplePayButtonAvailable) {
-                        performance.markError(new Error('Apple Pay not available'), 'availability-check')
                         handleApplePayUnavailable()
                         return
                     }
 
-                    // Mark mounting start
-                    performance.markMountingStart()
-                    
                     try {
                         await applePayButton.mount(paymentContainer.current)
                         manager.setPaymentMethodAvailable(PAYMENT_METHOD)
-                        
-                        // Mark payment ready
-                        performance.markPaymentReady()
                     } catch (error) {
                         console.error('Failed to mount Apple Pay button:', error)
-                        performance.markError(error, 'mounting')
                         handleApplePayUnavailable()
                     }
                 } catch (err) {
