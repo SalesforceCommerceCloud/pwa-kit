@@ -45,6 +45,7 @@
     "@axe-core/playwright": "^4.10.1",
     "@babel/runtime": "^7.21.0",
     "@modelcontextprotocol/sdk": "^1.13.2",
+    "@salesforce/mcp": "^0.20.1",
     "axe-core": "^4.10.3",
     "cross-spawn": "^7.0.6",
     "playwright": "^1.49.0",

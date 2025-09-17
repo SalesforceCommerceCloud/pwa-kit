@@ -13,23 +13,37 @@ const BABEL_NODE_PATH = path.resolve(
 
 function sendJsonRpcRequest(child, request) {
     return new Promise((resolve, reject) => {
-        let data = ''
+        let buffer = ''
         const onData = (chunk) => {
-            data += chunk.toString()
-            // MCP server sends each message as a line-delimited JSON
-            if (data.includes('\n')) {
-                child.stdout.off('data', onData)
+            buffer += chunk.toString()
+            const lines = buffer.split('\n')
+            buffer = lines.pop() || ''
+            for (const raw of lines) {
+                const line = raw.trim()
+                if (!line) continue
+                // Ignore non-JSON lines (e.g., startup logs)
+                if (!(line.startsWith('{') || line.startsWith('['))) continue
                 try {
-                    // Only parse the first line (response)
-                    const line = data.split('\n').find((l) => l.trim().length > 0)
-                    resolve(JSON.parse(line))
-                } catch (e) {
-                    reject(e)
+                    const parsed = JSON.parse(line)
+                    child.stdout.off('data', onData)
+                    resolve(parsed)
+                    return
+                } catch {
+                    // Ignore parse errors for non-JSON lines and continue
                 }
             }
         }
         child.stdout.on('data', onData)
         child.stdin.write(JSON.stringify(request) + '\n')
+        // Safety timeout to avoid hanging tests
+        setTimeout(() => {
+            try {
+                child.stdout.off('data', onData)
+            } catch {
+                // ignore
+            }
+            reject(new Error('Timed out waiting for JSON-RPC response'))
+        }, 5000)
     })
 }
 
