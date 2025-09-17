@@ -13,8 +13,9 @@ import {Telemetry as McpTelemetry} from '@salesforce/mcp/lib/telemetry.js'
 const packageJson = require('../../package.json')
 
 let telemetryInstance = null
-const customAppInsightsKey =
-    'InstrumentationKey=71d27171-35a8-4e40-84eb-3475c21e3b0d;IngestionEndpoint=https://eastus-8.in.applicationinsights.azure.com/;LiveEndpoint=https://eastus.livediagnostics.monitor.azure.com/;ApplicationId=d94f8e29-c0fa-414b-b0b8-4c6c05411114'
+// Allow overriding or disabling telemetry via environment
+// Preferred Key format: InstrumentationKey=<key>;IngestionEndpoint=<endpoint>;LiveEndpoint=<liveEndpoint>;ApplicationId=<applicationId>
+const customAppInsightsKey = process.env.PWA_KIT_MCP_APP_INSIGHTS_KEY
 
 const computeCacheDir = () => {
     // Try to mirror oclif's cache location shape so @salesforce/mcp can find CLIID if present.

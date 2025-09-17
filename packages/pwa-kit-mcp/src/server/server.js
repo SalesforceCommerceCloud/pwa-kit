@@ -97,7 +97,7 @@ class PwaStorefrontMCPServerHighLevel {
         this.setupTools()
         const transport = new StdioServerTransport()
         await this.server.connect(transport)
-        console.info('PWA Storefront MCP server (McpServer version) running on stdio')
+        console.error('PWA Storefront MCP server (McpServer version) running on stdio')
         process.stdin.on('close', (err) => {
             try {
                 const t = err ? 'SERVER_STOPPED_ERROR' : 'SERVER_STOPPED_SUCCESS'

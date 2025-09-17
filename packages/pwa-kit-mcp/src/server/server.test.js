@@ -14,6 +14,7 @@ const BABEL_NODE_PATH = path.resolve(
 function sendJsonRpcRequest(child, request) {
     return new Promise((resolve, reject) => {
         let buffer = ''
+        let timeoutId
         const onData = (chunk) => {
             buffer += chunk.toString()
             const lines = buffer.split('\n')
@@ -26,6 +27,7 @@ function sendJsonRpcRequest(child, request) {
                 try {
                     const parsed = JSON.parse(line)
                     child.stdout.off('data', onData)
+                    if (timeoutId) clearTimeout(timeoutId)
                     resolve(parsed)
                     return
                 } catch {
@@ -36,7 +38,7 @@ function sendJsonRpcRequest(child, request) {
         child.stdout.on('data', onData)
         child.stdin.write(JSON.stringify(request) + '\n')
         // Safety timeout to avoid hanging tests
-        setTimeout(() => {
+        timeoutId = setTimeout(() => {
             try {
                 child.stdout.off('data', onData)
             } catch {
@@ -76,6 +78,17 @@ describe('PwaStorefrontMCPServerHighLevel integration', () => {
         const toolNames = response.result.tools.map((t) => t.name)
         expect(toolNames).toContain('get_development_guidelines')
 
-        child.kill()
+        // Explicit teardown: close stdin, terminate child, and await exit
+        try {
+            child.stdin.end()
+        } catch {
+            // ignore
+        }
+        try {
+            child.kill('SIGTERM')
+        } catch {
+            // ignore
+        }
+        await new Promise((resolve) => child.once('exit', resolve))
     }, 10000)
 })
