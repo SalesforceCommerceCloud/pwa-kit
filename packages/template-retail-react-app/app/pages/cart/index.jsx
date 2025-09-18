@@ -48,7 +48,7 @@ import {
     useBasketProductsWithPromotions,
     getPromotionCalloutText,
     findAllBonusProductItemsToRemove
-} from '@salesforce/retail-react-app/app/utils/bonus-product-utils'
+} from '@salesforce/retail-react-app/app/utils/bonus-product'
 import {useBonusProductViewModal} from '@salesforce/retail-react-app/app/hooks/use-bonus-product-view-modal'
 import {useBonusProductSelectionModalContext} from '@salesforce/retail-react-app/app/hooks/use-bonus-product-selection-modal'
 import BonusProductViewModal from '@salesforce/retail-react-app/app/components/bonus-product-view-modal'

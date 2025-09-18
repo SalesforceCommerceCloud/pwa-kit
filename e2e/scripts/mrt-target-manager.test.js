@@ -13,17 +13,22 @@ const {
     CI_AVAILABILITY_AVAILABLE,
     CI_AVAILABILITY_IN_USE,
     AWS_S3_ERR_NO_SUCH_KEY,
-    AWS_S3_ERR_PRECONDITION_FAILED
+    AWS_S3_ERR_PRECONDITION_FAILED,
+    MRT_CLEANUP_TTL_MINUTES_DEFAULT
 } = require('./constants')
 
 // Mock dependencies
 jest.mock('./aws-s3-client')
 jest.mock('fs-extra')
 jest.mock('commander')
+jest.mock('./utils', () => ({
+    sleep: jest.fn()
+}))
 
 // Mock console methods to avoid cluttering test output
 const originalConsoleLog = console.log
 const originalConsoleError = console.error
+const originalConsoleWarn = console.warn
 
 describe('MRTTargetManager', () => {
     let manager
@@ -37,6 +42,7 @@ describe('MRTTargetManager', () => {
         // Mock console methods
         console.log = jest.fn()
         console.error = jest.fn()
+        console.warn = jest.fn()
 
         // Setup mock S3 client
         mockS3Client = {
@@ -54,6 +60,10 @@ describe('MRTTargetManager', () => {
         fs.ensureFile = mockFs.ensureFile
         fs.writeJson = mockFs.writeJson
 
+        // Mock sleep function
+        const {sleep} = require('./utils')
+        sleep.mockImplementation((ms) => new Promise((resolve) => setTimeout(resolve, ms)))
+
         // Mock process.env - default to non-CI environment
         process.env.CI = 'false'
         process.env.GITHUB_PR_NUMBER = '123'
@@ -63,6 +73,7 @@ describe('MRTTargetManager', () => {
         // Restore console methods
         console.log = originalConsoleLog
         console.error = originalConsoleError
+        console.warn = originalConsoleWarn
 
         // Reset process.env
         delete process.env.CI
@@ -590,20 +601,6 @@ describe('MRTTargetManager', () => {
         })
     })
 
-    describe('sleep', () => {
-        beforeEach(() => {
-            manager = new MRTTargetManager()
-        })
-
-        test('should delay for specified milliseconds', async () => {
-            const start = Date.now()
-            await manager.sleep(100)
-            const end = Date.now()
-
-            expect(end - start).toBeGreaterThanOrEqual(100)
-        })
-    })
-
     describe('releaseEnvironment', () => {
         beforeEach(() => {
             manager = new MRTTargetManager({
@@ -918,6 +915,383 @@ describe('MRTTargetManager', () => {
             expect(mockProgram.command).toHaveBeenCalledWith('release')
             expect(mockCommand.description).toHaveBeenCalledWith('Release an MRT environment')
             expect(mockCommand.argument).toHaveBeenCalledWith('<slug>', 'Environment Id to release')
+        })
+
+        test('should set up cleanup command', async () => {
+            // Mock the main function execution
+            const {main} = require('./mrt-target-manager')
+            await main()
+
+            expect(mockProgram.command).toHaveBeenCalledWith('cleanup')
+            expect(mockCommand.description).toHaveBeenCalledWith(
+                'Clean up expired environments that have been in-use for longer than the TTL'
+            )
+            // Check that the cleanup command's option was called with the correct parameters
+            const optionCalls = mockCommand.option.mock.calls
+            const cleanupOptionCall = optionCalls.find(
+                (call) => call[0] === '--ttl-minutes <minutes>'
+            )
+            expect(cleanupOptionCall).toBeDefined()
+            expect(cleanupOptionCall[1]).toBe(
+                'Time-to-live in minutes (can also be set via MRT_CLEANUP_TTL_MINUTES env var)'
+            )
+            expect(cleanupOptionCall[2]).toBe(MRT_CLEANUP_TTL_MINUTES_DEFAULT) // Default value from constant
+        })
+    })
+
+    describe('cleanupExpiredEnvironments', () => {
+        beforeEach(() => {
+            manager = new MRTTargetManager({
+                bucket: 'test-bucket',
+                poolDataFileKey: 'test-key'
+            })
+        })
+
+        test('should return early when no expired environments found', async () => {
+            const mockPoolData = {
+                environments: [
+                    {
+                        slug: 'env1',
+                        ciAvailability: CI_AVAILABILITY_AVAILABLE
+                    },
+                    {
+                        slug: 'env2',
+                        ciAvailability: CI_AVAILABILITY_IN_USE,
+                        ciRunInfo: {
+                            ciAcquiredAt: new Date().toISOString() // Current time, not expired
+                        }
+                    }
+                ]
+            }
+
+            const mockDownloadResult = {
+                body: {
+                    [Symbol.asyncIterator]: async function* () {
+                        yield Buffer.from(JSON.stringify(mockPoolData))
+                    }
+                },
+                etag: '"test-etag"',
+                poolData: mockPoolData
+            }
+
+            mockS3Client.download.mockResolvedValue(mockDownloadResult)
+
+            const result = await manager.cleanupExpiredEnvironments(60)
+
+            expect(result).toEqual({
+                releasedCount: 0,
+                releasedEnvironments: [],
+                attempt: 1
+            })
+            expect(console.log).toHaveBeenCalledWith('✅ No expired environments found')
+            expect(mockS3Client.upload).not.toHaveBeenCalled()
+        })
+
+        test('should cleanup single expired environment', async () => {
+            const expiredTime = new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString() // 2 hours ago
+            const mockPoolData = {
+                environments: [
+                    {
+                        slug: 'env1',
+                        ciAvailability: CI_AVAILABILITY_IN_USE,
+                        ciRunInfo: {
+                            ciAcquiredAt: expiredTime,
+                            prNumber: '123',
+                            branch: 'feature/test',
+                            runId: 'run-456'
+                        }
+                    }
+                ]
+            }
+
+            const mockDownloadResult = {
+                body: {
+                    [Symbol.asyncIterator]: async function* () {
+                        yield Buffer.from(JSON.stringify(mockPoolData))
+                    }
+                },
+                etag: '"test-etag"',
+                poolData: mockPoolData
+            }
+
+            mockS3Client.download.mockResolvedValue(mockDownloadResult)
+            mockS3Client.upload.mockResolvedValue({})
+
+            const result = await manager.cleanupExpiredEnvironments(MRT_CLEANUP_TTL_MINUTES_DEFAULT)
+
+            expect(result.releasedCount).toBe(1)
+            expect(result.releasedEnvironments).toHaveLength(1)
+            expect(result.releasedEnvironments[0]).toEqual({
+                slug: 'env1',
+                acquiredAt: expiredTime,
+                ageMinutes: expect.any(Number),
+                prNumber: '123',
+                branch: 'feature/test',
+                runId: 'run-456'
+            })
+
+            expect(console.log).toHaveBeenCalledWith(
+                '🧹 Starting cleanup of environments older than 60 minute(s)'
+            )
+            expect(console.log).toHaveBeenCalledWith('🔍 Found 1 expired environment(s):')
+            expect(console.log).toHaveBeenCalledWith(
+                '✅ Successfully released 1 expired environment(s)'
+            )
+
+            // Verify the uploaded data
+            const uploadCall = mockS3Client.upload.mock.calls[0]
+            const uploadedData = JSON.parse(uploadCall[2])
+            expect(uploadedData.environments[0].ciAvailability).toBe(CI_AVAILABILITY_AVAILABLE)
+            expect(uploadedData.environments[0].ciRunInfo).toBeUndefined()
+        })
+
+        test('should cleanup multiple expired environments', async () => {
+            const expiredTime1 = new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString()
+            const expiredTime2 = new Date(Date.now() - 3 * 60 * 60 * 1000).toISOString()
+            const recentTime = new Date(Date.now() - 30 * 60 * 1000).toISOString() // 30 minutes ago
+
+            const mockPoolData = {
+                environments: [
+                    {
+                        slug: 'env1',
+                        ciAvailability: CI_AVAILABILITY_IN_USE,
+                        ciRunInfo: {
+                            ciAcquiredAt: expiredTime1,
+                            prNumber: '123'
+                        }
+                    },
+                    {
+                        slug: 'env2',
+                        ciAvailability: CI_AVAILABILITY_IN_USE,
+                        ciRunInfo: {
+                            ciAcquiredAt: recentTime // Not expired
+                        }
+                    },
+                    {
+                        slug: 'env3',
+                        ciAvailability: CI_AVAILABILITY_IN_USE,
+                        ciRunInfo: {
+                            ciAcquiredAt: expiredTime2,
+                            branch: 'main'
+                        }
+                    }
+                ]
+            }
+
+            const mockDownloadResult = {
+                body: {
+                    [Symbol.asyncIterator]: async function* () {
+                        yield Buffer.from(JSON.stringify(mockPoolData))
+                    }
+                },
+                etag: '"test-etag"',
+                poolData: mockPoolData
+            }
+
+            mockS3Client.download.mockResolvedValue(mockDownloadResult)
+            mockS3Client.upload.mockResolvedValue({})
+
+            const result = await manager.cleanupExpiredEnvironments(MRT_CLEANUP_TTL_MINUTES_DEFAULT)
+
+            expect(result.releasedCount).toBe(2)
+            expect(result.releasedEnvironments).toHaveLength(2)
+            expect(result.releasedEnvironments.map((env) => env.slug)).toEqual(['env1', 'env3'])
+
+            // Verify only expired environments were updated
+            const uploadCall = mockS3Client.upload.mock.calls[0]
+            const uploadedData = JSON.parse(uploadCall[2])
+            expect(uploadedData.environments[0].ciAvailability).toBe(CI_AVAILABILITY_AVAILABLE) // env1
+            expect(uploadedData.environments[1].ciAvailability).toBe(CI_AVAILABILITY_IN_USE) // env2 - still in use
+            expect(uploadedData.environments[2].ciAvailability).toBe(CI_AVAILABILITY_AVAILABLE) // env3
+        })
+
+        test('should use custom TTL minutes', async () => {
+            const expiredTime = new Date(Date.now() - 45 * 60 * 1000).toISOString() // 45 minutes ago
+            const mockPoolData = {
+                environments: [
+                    {
+                        slug: 'env1',
+                        ciAvailability: CI_AVAILABILITY_IN_USE,
+                        ciRunInfo: {
+                            ciAcquiredAt: expiredTime
+                        }
+                    }
+                ]
+            }
+
+            const mockDownloadResult = {
+                body: {
+                    [Symbol.asyncIterator]: async function* () {
+                        yield Buffer.from(JSON.stringify(mockPoolData))
+                    }
+                },
+                etag: '"test-etag"',
+                poolData: mockPoolData
+            }
+
+            mockS3Client.download.mockResolvedValue(mockDownloadResult)
+            mockS3Client.upload.mockResolvedValue({})
+
+            // Use 30 minute TTL - should cleanup the 45 minute old environment
+            const result = await manager.cleanupExpiredEnvironments(30)
+
+            expect(result.releasedCount).toBe(1)
+            expect(console.log).toHaveBeenCalledWith(
+                '🧹 Starting cleanup of environments older than 30 minute(s)'
+            )
+        })
+
+        test('should not cleanup recent environment with short TTL', async () => {
+            const recentTime = new Date(Date.now() - 45 * 60 * 1000).toISOString() // 45 minutes ago
+            const mockPoolData = {
+                environments: [
+                    {
+                        slug: 'env1',
+                        ciAvailability: CI_AVAILABILITY_IN_USE,
+                        ciRunInfo: {
+                            ciAcquiredAt: recentTime
+                        }
+                    }
+                ]
+            }
+
+            const mockDownloadResult = {
+                body: {
+                    [Symbol.asyncIterator]: async function* () {
+                        yield Buffer.from(JSON.stringify(mockPoolData))
+                    }
+                },
+                etag: '"test-etag"',
+                poolData: mockPoolData
+            }
+
+            mockS3Client.download.mockResolvedValue(mockDownloadResult)
+
+            // Use 60 minute TTL - should NOT cleanup the 45 minute old environment
+            const result = await manager.cleanupExpiredEnvironments(MRT_CLEANUP_TTL_MINUTES_DEFAULT)
+
+            expect(result.releasedCount).toBe(0)
+            expect(mockS3Client.upload).not.toHaveBeenCalled()
+        })
+
+        test('should retry on ETag mismatch during cleanup', async () => {
+            const expiredTime = new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString()
+            const mockPoolData = {
+                environments: [
+                    {
+                        slug: 'env1',
+                        ciAvailability: CI_AVAILABILITY_IN_USE,
+                        ciRunInfo: {
+                            ciAcquiredAt: expiredTime
+                        }
+                    }
+                ]
+            }
+
+            const mockDownloadResult = {
+                body: {
+                    [Symbol.asyncIterator]: async function* () {
+                        yield Buffer.from(JSON.stringify(mockPoolData))
+                    }
+                },
+                etag: '"test-etag"',
+                poolData: mockPoolData
+            }
+
+            manager.maxRetries = 2
+            manager.retryDelay = 100
+
+            mockS3Client.download.mockResolvedValue(mockDownloadResult)
+
+            // First attempt fails with ETag mismatch
+            const etagError = new Error('Precondition failed')
+            etagError.name = AWS_S3_ERR_PRECONDITION_FAILED
+            mockS3Client.upload.mockRejectedValueOnce(etagError)
+
+            // Second attempt succeeds
+            mockS3Client.upload.mockResolvedValueOnce({})
+
+            const result = await manager.cleanupExpiredEnvironments(MRT_CLEANUP_TTL_MINUTES_DEFAULT)
+
+            expect(result.attempt).toBe(2)
+            expect(result.releasedCount).toBe(1)
+            expect(console.log).toHaveBeenCalledWith(
+                '⚠️ ETag mismatch on cleanup attempt 1, retrying...'
+            )
+        })
+
+        test('should throw error after max retries on cleanup', async () => {
+            const expiredTime = new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString()
+            const mockPoolData = {
+                environments: [
+                    {
+                        slug: 'env1',
+                        ciAvailability: CI_AVAILABILITY_IN_USE,
+                        ciRunInfo: {
+                            ciAcquiredAt: expiredTime
+                        }
+                    }
+                ]
+            }
+
+            const mockDownloadResult = {
+                body: {
+                    [Symbol.asyncIterator]: async function* () {
+                        yield Buffer.from(JSON.stringify(mockPoolData))
+                    }
+                },
+                etag: '"test-etag"',
+                poolData: mockPoolData
+            }
+
+            manager.maxRetries = 2
+            manager.retryDelay = 100
+
+            mockS3Client.download.mockResolvedValue(mockDownloadResult)
+
+            const etagError = new Error('Precondition failed')
+            etagError.name = AWS_S3_ERR_PRECONDITION_FAILED
+            mockS3Client.upload.mockRejectedValue(etagError)
+
+            await expect(
+                manager.cleanupExpiredEnvironments(MRT_CLEANUP_TTL_MINUTES_DEFAULT)
+            ).rejects.toThrow(
+                '❌ Failed to cleanup expired environments after 2 attempts due to concurrent modifications'
+            )
+        })
+
+        test('should throw non-retryable errors immediately during cleanup', async () => {
+            const expiredTime = new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString()
+            const mockPoolData = {
+                environments: [
+                    {
+                        slug: 'env1',
+                        ciAvailability: CI_AVAILABILITY_IN_USE,
+                        ciRunInfo: {
+                            ciAcquiredAt: expiredTime
+                        }
+                    }
+                ]
+            }
+
+            const mockDownloadResult = {
+                body: {
+                    [Symbol.asyncIterator]: async function* () {
+                        yield Buffer.from(JSON.stringify(mockPoolData))
+                    }
+                },
+                etag: '"test-etag"',
+                poolData: mockPoolData
+            }
+
+            mockS3Client.download.mockResolvedValue(mockDownloadResult)
+
+            const error = new Error('Upload failed')
+            mockS3Client.upload.mockRejectedValue(error)
+
+            await expect(
+                manager.cleanupExpiredEnvironments(MRT_CLEANUP_TTL_MINUTES_DEFAULT)
+            ).rejects.toThrow('Upload failed')
         })
     })
 })

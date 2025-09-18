@@ -188,7 +188,8 @@ const Search = (props) => {
             if (!miawChatRef.current.hasFired && miawChatRef.current.newChatLaunched) {
                 if (
                     e.detail.conversationEntry?.sender?.role === 'Chatbot' &&
-                    searchInputRef?.current?.value
+                    searchInputRef?.current?.value &&
+                    window.embeddedservice_bootstrap?.utilAPI
                 ) {
                     miawChatRef.current.hasFired = true
                     setTimeout(() => {
@@ -208,9 +209,13 @@ const Search = (props) => {
         }
     }, [])
     const launchChat = () => {
-        window.embeddedservice_bootstrap.utilAPI
-            .launchChat()
-            .then((successMessage) => {
+        if (window.embeddedservice_bootstrap?.settings) {
+            window.embeddedservice_bootstrap.settings.disableStreamingResponses = true
+            window.embeddedservice_bootstrap.settings.enableUserInputForConversationWithBot = false
+        }
+        window.embeddedservice_bootstrap?.utilAPI
+            ?.launchChat()
+            ?.then((successMessage) => {
                 /* TODO: With the Salesforce Winter '26 release, we will be able to use the
                  * onEmbeddedMessagingFirstBotMessageSent event instead, and get rid of this logic. */
                 if (successMessage.includes('Successfully initialized the messaging client')) {
@@ -218,7 +223,7 @@ const Search = (props) => {
                     miawChatRef.current.newChatLaunched = true
                 }
             })
-            .catch((err) => {
+            ?.catch((err) => {
                 console.error('launchChat error', err)
             })
     }
@@ -232,7 +237,7 @@ const Search = (props) => {
             return
         }
 
-        if (askAgentOnSearchEnabled && window.embeddedservice_bootstrap) {
+        if (askAgentOnSearchEnabled && window.embeddedservice_bootstrap?.utilAPI) {
             // Add a 500ms delay before sending the message to ensure the experience isn't jarring to the user
             setTimeout(() => {
                 window.embeddedservice_bootstrap.utilAPI

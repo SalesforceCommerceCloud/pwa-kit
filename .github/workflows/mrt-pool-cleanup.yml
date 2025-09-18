@@ -1,0 +1,52 @@
+name: SalesforceCommerceCloud/pwa-kit/mrt-pool-cleanup
+on:
+    workflow_dispatch:
+    schedule:
+        # Run every day at 1am PST (9am UTC) - cron uses UTC times
+        # Staggering run by an hour to avoid rate-limiting on NPM.
+        - cron: '0 9 * * *'
+
+permissions:
+    id-token: write
+    contents: read
+
+jobs:
+    cleanup_mrt_pool:
+        runs-on: ubuntu-latest
+
+        env:
+            AWS_S3_BUCKET: ${{ vars.AWS_S3_BUCKET }}
+            AWS_REGION: ${{ vars.AWS_REGION }}
+            AWS_S3_POOL_DATA_FILE_KEY: ${{ vars.AWS_S3_POOL_DATA_FILE_KEY }}
+
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+
+            # Only test for latest Node version supported by MRT
+            - name: Setup Node
+              uses: actions/setup-node@v4
+              with:
+                  node-version: 22
+                  cache: npm
+
+            - name: Install Monorepo Dependencies
+              run: |-
+                  # Install node dependencies
+                  node ./scripts/gtime.js monorepo_install npm ci
+
+            - name: Configure AWS Credentials
+              uses: aws-actions/configure-aws-credentials@v4
+              with:
+                  role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+                  aws-region: ${{ vars.AWS_REGION }}
+                  role-session-name: 'GithubActions-MRT-Pool-Cleanup'
+
+            - name: Cleanup Expired MRT Environments
+              run: |-
+                  # Clean up environments that have been in-use for more than the configured TTL
+                  # TTL can be configured via MRT_CLEANUP_TTL_MINUTES environment variable (defaults to 60 minutes)
+                  echo "Starting MRT pool cleanup with TTL: ${MRT_CLEANUP_TTL_MINUTES:-60} minutes"
+                  node e2e/scripts/mrt-target-manager.js cleanup
+              env:
+                  MRT_CLEANUP_TTL_MINUTES: ${{ vars.MRT_CLEANUP_TTL_MINUTES }}
