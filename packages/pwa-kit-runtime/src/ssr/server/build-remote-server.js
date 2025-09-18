@@ -59,6 +59,7 @@ import {DefaultHandler} from '@h4ad/serverless-adapter/lib/handlers/default'
 import {CallbackResolver} from '@h4ad/serverless-adapter/lib/resolvers/callback'
 import {ApiGatewayV1Adapter} from '@h4ad/serverless-adapter/lib/adapters/aws'
 import {ExpressFramework} from '@h4ad/serverless-adapter/lib/frameworks/express'
+import {is as typeis} from 'type-is'
 
 /**
  * An Array of mime-types (Content-Type values) that are considered
@@ -67,24 +68,20 @@ import {ExpressFramework} from '@h4ad/serverless-adapter/lib/frameworks/express'
  * encoding and there's no reason to bulk up the response by base64
  * encoding the result.
  *
+ * We can use '*' in these types as a wildcard - see
+ * https://www.npmjs.com/package/type-is#type--typeisismediatype-types
  * @private
  */
-const binaryMimeTypesRegexes = [
-    new RegExp('^application/.*$'),
-    new RegExp('^audio/.*$'),
-    new RegExp('^font/.*$'),
-    new RegExp('^image/.*$'),
-    new RegExp('^video/.*$')
-]
-const binaryEncodings = ['gzip', 'deflate', 'br']
+const binaryMimeTypes = ['application/*', 'audio/*', 'font/*', 'image/*', 'video/*']
+// const binaryEncodings = ['gzip', 'deflate', 'br']
 
-export const isContentEncodingBinary = (headers) => {
-    const contentEncoding = headers['content-encoding'] || headers['Content-Encoding']
-    if (!contentEncoding) {
-        return false
-    }
-    return binaryEncodings.includes(contentEncoding)
-}
+// export const isContentEncodingBinary = (headers) => {
+//     const contentEncoding = headers['content-encoding'] || headers['Content-Encoding']
+//     if (!contentEncoding) {
+//         return false
+//     }
+//     return binaryEncodings.includes(contentEncoding)
+// }
 
 export const isContentTypeBinary = (headers) => {
     // Replicating the aws-serverless-express behavior
@@ -94,12 +91,11 @@ export const isContentTypeBinary = (headers) => {
     }
     // Remove the encoding from the content type
     contentType = contentType.split(';')[0]
-
-    return binaryMimeTypesRegexes.some((binaryContentType) => binaryContentType.test(contentType))
+    return !!typeis(contentType, binaryMimeTypes)
 }
 
 export const isBinary = (headers) => {
-    return isContentEncodingBinary(headers) || isContentTypeBinary(headers)
+    return isContentTypeBinary(headers)
 }
 
 /**
@@ -1221,9 +1217,9 @@ export const RemoteServerFactory = {
         let lambdaContainerReused = false
 
         const serverlessAdapterHandler = ServerlessAdapter.new(app)
-            // .setBinarySettings({
-            //     isBinary
-            // })
+            .setBinarySettings({
+                isBinary: isBinary
+            })
             .setFramework(new ExpressFramework())
             .setHandler(new DefaultHandler())
             .setResolver(new CallbackResolver())
@@ -1534,9 +1530,10 @@ const applyPatches = once((options) => {
     https.request = outgoingRequestHook(https.request, options)
     https.get = outgoingRequestHook(https.get, options)
 
-    // Patch the ExpressJS Response class's redirect function to suppress
-    // the creation of a body (DESKTOP-485). Including the body may
-    // trigger a parsing error in aws-serverless-express.
+    // We no longer use aws-serverless-express but to maintain compatibility with the old code, we still patch the redirect function.
+    // - Patch the ExpressJS Response class's redirect function to suppress
+    // - the creation of a body (DESKTOP-485). Including the body may
+    // - trigger a parsing error in aws-serverless-express.
     express.response.redirect = function (status, url) {
         let workingStatus = status
         let workingUrl = url
@@ -1548,6 +1545,9 @@ const applyPatches = once((options) => {
 
         // Duplicate behaviour in node_modules/express/lib/response.js
         const address = this.location(workingUrl).get('Location')
+
+        // aws-serverless-express would add a Content-Length header to the response even if there was no body
+        this.set('Content-Length', 0)
 
         // Send a minimal response with just a status and location
         this.status(workingStatus).location(address).end()

@@ -20,6 +20,7 @@ const nock = require('nock')
 const https = require('https')
 const path = require('path')
 const zlib = require('zlib')
+const {ApiGatewayV1Adapter} = require('@h4ad/serverless-adapter/lib/adapters/aws')
 
 const {X_HEADERS_TO_REMOVE_ORIGIN} = require('../../utils/ssr-proxying')
 
@@ -89,8 +90,10 @@ function createApiGatewayEvent() {
     })
 
     if (event.queryStringParameters) {
-        delete event.queryStringParameters
+        event.queryStringParameters = {}
     }
+    // aws-serverless-express added this header
+    event.headers['x-apigateway-event'] = 'apig-event'
 
     const context = AWSMockContext({
         functionName: 'SSRTest'
@@ -320,9 +323,17 @@ describe('SSRServer Lambda integration', () => {
                 path: testCase.path,
                 body: undefined
             })
+            // aws-serverless-express added this header
+            event.headers['x-apigateway-event'] = 'apig-event'
 
+            // Check to make sure the adapter can handle the event
+            const adapter = new ApiGatewayV1Adapter()
+            adapter.canHandle(event)
+            expect(adapter.canHandle(event)).toBe(true)
+
+            // AWS API Gateway adapter expects queryStringParameters key to exist within the event
             if (event.queryStringParameters) {
-                delete event.queryStringParameters
+                event.queryStringParameters = {}
             }
 
             // Add a fake X-Amz-Cf-Id header
@@ -398,7 +409,7 @@ describe('SSRServer Lambda integration', () => {
         })
 
         if (event.queryStringParameters) {
-            delete event.queryStringParameters
+            event.queryStringParameters = {}
         }
 
         const context = AWSMockContext({
