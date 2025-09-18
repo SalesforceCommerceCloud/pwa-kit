@@ -28,7 +28,7 @@ import {
     findAvailableBonusDiscountLineItemIds,
     getRemainingAvailableBonusProductsForProduct,
     getBonusProductCountsForPromotion
-} from '@salesforce/retail-react-app/app/utils/bonus-product-utils'
+} from '@salesforce/retail-react-app/app/utils/bonus-product'
 import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
 import {productViewModalTheme} from '@salesforce/retail-react-app/app/theme/components/project/product-view-modal'
 import {bonusProductViewModalTheme} from '@salesforce/retail-react-app/app/theme/components/project/bonus-product-view-modal'

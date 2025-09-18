@@ -43,7 +43,7 @@ import {
     useBasketProductsWithPromotions,
     getPromotionCalloutText,
     shouldShowBonusProductSelection
-} from '@salesforce/retail-react-app/app/utils/bonus-product-utils'
+} from '@salesforce/retail-react-app/app/utils/bonus-product'
 
 /**
  * This is the context for managing the AddToCartModal.
