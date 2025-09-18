@@ -46,12 +46,12 @@ class PwaStorefrontMCPServerHighLevel {
             const wrappedHandler = async (...handlerArgs) => {
                 const start = Date.now()
                 try {
+                    const result = await handler(...handlerArgs)
                     this.telemetry?.sendEvent('TOOL_CALLED', {
                         toolName: name,
                         runTimeMs: Date.now() - start,
                         isError: false
                     })
-                    const result = await handler(...handlerArgs)
                     return result
                 } catch (error) {
                     this.telemetry?.sendEvent('TOOL_CALLED', {
@@ -122,14 +122,15 @@ class PwaStorefrontMCPServerHighLevel {
         const noTelemetry = !!readFlag('no-telemetry', false)
         const transport = new StdioServerTransport()
         await this.server.connect(transport)
+        console.error('PWA Storefront MCP server (McpServer version) running on stdio')
         // when telemetry is enabled, then send telemetry events
         if (!noTelemetry) {
             warn(
                 'You acknowledge and agree that the MCP server may collect usage information, user environment, and crash reports for the purposes of providing services or functions that are relevant to use of the MCP server and product improvements.'
             )
-            this.telemetry = new Telemetry()
-            await this.telemetry.start()
             try {
+                this.telemetry = new Telemetry()
+                await this.telemetry.start()
                 const clientInfo = this.server.getClientVersion?.()
                 if (clientInfo) {
                     this.telemetry.addAttributes({
@@ -137,15 +138,15 @@ class PwaStorefrontMCPServerHighLevel {
                         clientVersion: clientInfo.version
                     })
                 }
-                this.telemetry?.sendEvent('SERVER_START_SUCCESS')
+                this.telemetry?.sendEvent('SERVER_STATUS', {status: 'started'})
             } catch (error) {
-                this.telemetry?.sendEvent('SERVER_START_ERROR', {
-                    error: error instanceof Error ? error.message : String(error)
+                this.telemetry?.sendEvent('SERVER_STATUS', {
+                    status: 'error'
                 })
                 throw error
             }
             const sendStop = (signal) => {
-                this.telemetry?.sendEvent('SERVER_STOP', {signal})
+                this.telemetry?.sendEvent('SERVER_STATUS', {status: 'stopped', signal})
                 this.telemetry.stop()
             }
             process.on('exit', () => sendStop('exit'))
@@ -157,9 +158,6 @@ class PwaStorefrontMCPServerHighLevel {
                 sendStop('SIGTERM')
                 process.exit(0)
             })
-        } else {
-            // when telemetry is disabled, then no need to send any telemetry events
-            console.error('PWA Storefront MCP server (McpServer version) running on stdio')
         }
     }
 }

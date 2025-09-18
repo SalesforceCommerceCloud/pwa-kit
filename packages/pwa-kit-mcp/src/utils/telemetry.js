@@ -42,28 +42,24 @@ const getOwnCliIdPath = () => {
 }
 
 const readOrCreateOwnCliId = () => {
-    try {
-        const loc = getOwnCliIdPath()
-        if (!loc) return null
-        if (fs.existsSync(loc.file)) {
-            const value = fs.readFileSync(loc.file, 'utf8')
-            const trimmed = value?.trim()
-            if (trimmed) return trimmed
-        }
-        // Create new
-        const newId = generateRandomId()
-        try {
-            if (!fs.existsSync(loc.dir)) {
-                fs.mkdirSync(loc.dir, {recursive: true, mode: 0o700})
-            }
-            fs.writeFileSync(loc.file, newId, {encoding: 'utf8', mode: 0o600})
-        } catch {
-            // If we can't persist, still return the generated id
-        }
-        return newId
-    } catch {
-        return null
+    const loc = getOwnCliIdPath()
+    if (!loc) return null
+    if (fs.existsSync(loc.file)) {
+        const value = fs.readFileSync(loc.file, 'utf8')
+        const trimmed = value?.trim()
+        if (trimmed) return trimmed
     }
+    // Create new
+    const newId = generateRandomId()
+    try {
+        if (!fs.existsSync(loc.dir)) {
+            fs.mkdirSync(loc.dir, {recursive: true, mode: 0o700})
+        }
+        fs.writeFileSync(loc.file, newId, {encoding: 'utf8', mode: 0o600})
+    } catch {
+        // If we can't persist, still return the generated id
+    }
+    return newId
 }
 
 const readCliIdIfPresent = () => {
@@ -136,7 +132,10 @@ export class Telemetry {
             })
             this.reporter.start()
         } catch (error) {
-            // Minimal reliability tweak: retry once after a short delay
+            // Best-effort retry after ~1s: first runs can hit transient failures
+            // establishing the Application Insights connection (DNS/proxy/VPN warm-up,
+            // brief network blips, or backend cold start). One short delay usually fixes it.
+            // If the retry still fails, ignore it to avoid impacting the server.
             try {
                 await new Promise((r) => setTimeout(r, 1000))
                 this.reporter = await McpTelemetryReporter.create({
