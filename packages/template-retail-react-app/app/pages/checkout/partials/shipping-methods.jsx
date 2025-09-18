@@ -227,6 +227,9 @@ export default function ShippingMethods() {
     const hasValidShippingInfo =
         deliveryShipments.length > 0 && deliveryShipments.every((s) => s.shippingAddress)
 
+    // Check if any shipments are missing shipping methods
+    const hasMissingShippingMethods = deliveryShipments.some((s) => !s.shippingMethod || !s.shippingMethod.id)
+
     const isFormValid =
         form.formState.isValid ||
         deliveryShipments.every((s) => s.shippingMethod && s.shippingMethod.id)
@@ -240,7 +243,7 @@ export default function ShippingMethods() {
                     defaultMessage: 'Shipping & Gift Options',
                     id: 'shipping_options.title.shipping_gift_options'
                 })}
-                editing={step === STEPS.SHIPPING_OPTIONS}
+                editing={step === STEPS.SHIPPING_OPTIONS && hasMissingShippingMethods}
                 isLoading={true}
                 disabled={true}
                 onEdit={() => goToStep(STEPS.SHIPPING_OPTIONS)}
@@ -265,7 +268,7 @@ export default function ShippingMethods() {
                 defaultMessage: 'Shipping & Gift Options',
                 id: 'shipping_options.title.shipping_gift_options'
             })}
-            editing={step === STEPS.SHIPPING_OPTIONS}
+            editing={step === STEPS.SHIPPING_OPTIONS && hasMissingShippingMethods}
             isLoading={form.formState.isSubmitting}
             disabled={!hasValidShippingInfo}
             onEdit={() => goToStep(STEPS.SHIPPING_OPTIONS)}
