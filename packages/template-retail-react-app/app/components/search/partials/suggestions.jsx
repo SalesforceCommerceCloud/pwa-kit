@@ -6,28 +6,46 @@
  */
 import React from 'react'
 import PropTypes from 'prop-types'
-import {Text, Button, Stack, Box} from '@salesforce/retail-react-app/app/components/shared/ui'
+import {
+    Text,
+    Button,
+    Stack,
+    Box,
+    Flex,
+    Image,
+    useMultiStyleConfig
+} from '@salesforce/retail-react-app/app/components/shared/ui'
 
 const Suggestions = ({suggestions, closeAndNavigate}) => {
+    const styles = useMultiStyleConfig('SearchSuggestions')
+
     if (!suggestions) {
         return null
     }
     return (
-        <Stack spacing={0} data-testid="sf-suggestion">
-            <Box mx={'-16px'}>
+        <Stack {...styles.suggestionsContainer} data-testid="sf-suggestion">
+            <Box {...styles.suggestionsBox}>
                 {suggestions.map((suggestion, idx) => (
                     <Button
-                        width="full"
+                        {...styles.suggestionButton}
                         onMouseDown={() => closeAndNavigate(suggestion.link)}
-                        fontSize={'md'}
                         key={idx}
-                        marginTop={0}
-                        variant="menu-link"
                     >
-                        <Text
-                            fontWeight="400"
-                            dangerouslySetInnerHTML={{__html: suggestion.name}}
-                        />
+                        <Flex align="center">
+                            {/* Reserve space for image for all, but only render if present */}
+                            <Box {...styles.imageContainer}>
+                                {suggestion.type === 'product' && suggestion.image && (
+                                    <Image
+                                        src={suggestion.image}
+                                        alt=""
+                                        {...styles.suggestionImage}
+                                    />
+                                )}
+                            </Box>
+                            <Box {...styles.textContainer}>
+                                <Text {...styles.suggestionName}>{suggestion.name}</Text>
+                            </Box>
+                        </Flex>
                     </Button>
                 ))}
             </Box>

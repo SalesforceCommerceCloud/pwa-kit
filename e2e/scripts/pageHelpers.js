@@ -439,6 +439,7 @@ export const searchProduct = async ({page, query, isMobile = false}) => {
 
     let searchInput = isMobile ? searchInputs.nth(1) : searchInputs.nth(0)
     await searchInput.fill(query)
+    await page.waitForTimeout(1000)
     await searchInput.press('Enter')
 
     await page.waitForLoadState()

@@ -140,8 +140,12 @@ test('suggestions render when there are some', async () => {
     const suggestionPopoverEl = await screen.getByTestId('sf-suggestion-popover')
 
     await waitFor(() => {
-        const suggestionsEl = within(suggestionPopoverEl).getByTestId('sf-suggestion')
-        expect(suggestionsEl.querySelector('button').textContent).toBe('Dresses')
+        const suggestionsEls = within(suggestionPopoverEl).getAllByTestId('sf-suggestion')
+        expect(suggestionsEls.length).toBeGreaterThan(0)
+        const hasDressesSuggestion = suggestionsEls.some((el) =>
+            el.querySelector('button')?.textContent?.includes('Dresses')
+        )
+        expect(hasDressesSuggestion).toBe(true)
     })
 })
 
@@ -422,4 +426,97 @@ test('when sendTextMessage and launchChat both fail, no additional send text is 
 
     // Verify sendTextMessage was only called once
     expect(sendTextMessageSpy).toHaveBeenCalledTimes(1)
+})
+
+test('handles search phrase in formatSuggestions', async () => {
+    const user = setupUserEvent()
+
+    const mockResultsWithPhrase = {
+        ...mockSearchResults,
+        searchPhrase: 'test search phrase'
+    }
+
+    global.server.use(
+        rest.get('*/search-suggestions', (req, res, ctx) => {
+            return res(ctx.delay(0), ctx.status(200), ctx.json(mockResultsWithPhrase))
+        })
+    )
+
+    renderWithProviders(<SearchInput />)
+    const searchInput = document.querySelector('input[type="search"]')
+
+    await user.type(searchInput, 'test')
+
+    // Wait for suggestions to load with search phrase
+    await waitFor(() => {
+        expect(screen.getByTestId('sf-suggestion-popover')).toBeInTheDocument()
+    })
+})
+
+test('handles phrase suggestions in formatSuggestions', async () => {
+    const user = setupUserEvent()
+
+    // Mock search results with phrase suggestions
+    const mockResultsWithPhrases = {
+        ...mockSearchResults,
+        productSuggestions: {
+            ...mockSearchResults.productSuggestions,
+            suggestedPhrases: [
+                {phrase: 'running shoes', exactMatch: true},
+                {phrase: 'athletic wear', exactMatch: false}
+            ]
+        }
+    }
+
+    global.server.use(
+        rest.get('*/search-suggestions', (req, res, ctx) => {
+            return res(ctx.delay(0), ctx.status(200), ctx.json(mockResultsWithPhrases))
+        })
+    )
+
+    renderWithProviders(<SearchInput />)
+    const searchInput = document.querySelector('input[type="search"]')
+
+    await user.type(searchInput, 'running')
+
+    // Wait for suggestions to load with phrase suggestions
+    await waitFor(() => {
+        expect(screen.getByTestId('sf-suggestion-popover')).toBeInTheDocument()
+    })
+})
+
+test('handles product suggestions with images', async () => {
+    const user = setupUserEvent()
+
+    // Mock search results with product suggestions that have images
+    const mockResultsWithProductImages = {
+        ...mockSearchResults,
+        productSuggestions: {
+            ...mockSearchResults.productSuggestions,
+            products: [
+                {
+                    ...mockSearchResults.productSuggestions.products[0],
+                    image: {
+                        disBaseLink: 'https://example.com/product-image.jpg'
+                    }
+                }
+            ]
+        }
+    }
+
+    global.server.use(
+        rest.get('*/search-suggestions', (req, res, ctx) => {
+            return res(ctx.delay(0), ctx.status(200), ctx.json(mockResultsWithProductImages))
+        })
+    )
+
+    renderWithProviders(<SearchInput />)
+    const searchInput = document.querySelector('input[type="search"]')
+
+    await user.type(searchInput, 'Dress')
+
+    // Wait for suggestions to load with product images
+    await waitFor(() => {
+        expect(screen.getByTestId('sf-suggestion-popover')).toBeInTheDocument()
+    })
 })

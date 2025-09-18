@@ -2503,6 +2503,30 @@
       "value": "Incorrect username or password, please try again."
     }
   ],
+  "multi_ship_warning_modal.action.cancel": [
+    {
+      "type": 0,
+      "value": "Cancel"
+    }
+  ],
+  "multi_ship_warning_modal.action.switch_to_one_address": [
+    {
+      "type": 0,
+      "value": "Switch"
+    }
+  ],
+  "multi_ship_warning_modal.message.addresses_will_be_removed": [
+    {
+      "type": 0,
+      "value": "If you switch to one address, the shipping addresses you added for the items will be removed."
+    }
+  ],
+  "multi_ship_warning_modal.title.switch_to_one_address": [
+    {
+      "type": 0,
+      "value": "Switch to one address?"
+    }
+  ],
   "offline_banner.description.browsing_offline_mode": [
     {
       "type": 0,
@@ -3395,6 +3419,30 @@
       "value": "Cancel"
     }
   ],
+  "search.suggestions.categories": [
+    {
+      "type": 0,
+      "value": "Categories"
+    }
+  ],
+  "search.suggestions.didYouMean": [
+    {
+      "type": 0,
+      "value": "Did you mean"
+    }
+  ],
+  "search.suggestions.products": [
+    {
+      "type": 0,
+      "value": "Products"
+    }
+  ],
+  "search.suggestions.viewAll": [
+    {
+      "type": 0,
+      "value": "View All"
+    }
+  ],
   "selected_refinements.action.assistive_msg.clear_all": [
     {
       "type": 0,
@@ -3777,6 +3825,12 @@
     {
       "type": 1,
       "value": "postalCode"
+    }
+  ],
+  "store_display.label.store_contact_info": [
+    {
+      "type": 0,
+      "value": "Store Contact Info"
     }
   ],
   "store_display.label.store_hours": [
