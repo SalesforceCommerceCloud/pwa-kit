@@ -66,6 +66,13 @@ The PWA Kit MCP Server offers the following intelligent tools tailored to Salesf
 ```
 _NOTE: Replace `{{path-to-app-directory}}` with the absolute path to your generated project's `app` subfolder. For example: `"/Users/username/mcp-server-folder/mystorefront/app"`._
 
+These are the available flags that you can pass to the `args` option. 
+
+| Flag Name | Description | Required? |Notes |
+| -----------------| -------| ------- | ----- |
+| `--no-telemetry` | Boolean flag to disable telemetry, the automatic collection of data for monitoring and analysis. | No | Telemetry is enabled by default, so specify this flag to disable it.  |
+| `"-y", "@salesforce/mcp"` | Tells `npx` to automatically install the `@salesforce/mcp` package instead of asking permission. | Yes | Don't change this.
+
 Once saved, Cursor will:
 
 * Launch the MCP server
