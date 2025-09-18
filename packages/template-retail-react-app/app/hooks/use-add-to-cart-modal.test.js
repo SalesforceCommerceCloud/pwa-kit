@@ -27,7 +27,7 @@ jest.mock('@salesforce/retail-react-app/app/hooks/use-current-basket', () => ({
     useCurrentBasket: jest.fn()
 }))
 
-jest.mock('@salesforce/retail-react-app/app/utils/bonus-product-utils', () => ({
+jest.mock('@salesforce/retail-react-app/app/utils/bonus-product', () => ({
     findAvailableBonusDiscountLineItemIds: jest.fn(() => [])
 }))
 
@@ -78,7 +78,7 @@ jest.mock(
 )
 
 // Mock bonus product utilities
-jest.mock('@salesforce/retail-react-app/app/utils/bonus-product-utils', () => ({
+jest.mock('@salesforce/retail-react-app/app/utils/bonus-product', () => ({
     getRemainingAvailableBonusProductsForProduct: jest.fn(() => ({
         bonusItems: [
             {
