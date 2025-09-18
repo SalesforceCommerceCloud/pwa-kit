@@ -10,10 +10,10 @@ module.exports = {
     ssrEnabled: true,
     ssrOnly: ['ssr.js', 'node_modules/**/*.*'],
     ssrShared: [
-        "static/example.txt",
-        "static/favicon.ico",
-        "static/robots.txt",
-        "config/default.js"
+        'static/example.txt',
+        'static/favicon.ico',
+        'static/robots.txt',
+        'config/default.js'
     ],
     ssrParameters: {
         ssrFunctionNodeVersion: '22.x',
