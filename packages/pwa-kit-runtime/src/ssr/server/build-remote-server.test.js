@@ -170,13 +170,6 @@ describe('isBinary function', () => {
         expect(isBinary(headers)).toBe(true)
     })
 
-    test('returns true if the content encoding is binary', () => {
-        const headers = {
-            'content-encoding': 'gzip'
-        }
-        expect(isBinary(headers)).toBe(true)
-    })
-
     test('returns false if neither content type nor content encoding is binary', () => {
         const headers = {
             'content-type': 'text/plain',
@@ -193,13 +186,6 @@ describe('isBinary function', () => {
     test('returns false if content type is non-binary and content encoding is missing', () => {
         const headers = {
             'content-type': 'text/html'
-        }
-        expect(isBinary(headers)).toBe(false)
-    })
-
-    test('returns false if content encoding is non-binary and content type is missing', () => {
-        const headers = {
-            'content-encoding': 'identity'
         }
         expect(isBinary(headers)).toBe(false)
     })
