@@ -27,7 +27,7 @@ const FALLBACK_VERSION = '0.1.0'
 class PwaStorefrontMCPServerHighLevel {
     constructor() {
         // Using McpServer instead of Server
-        this.telemetry = new Telemetry()
+        this.telemetry = undefined
         this.server = new McpServer(
             {
                 name: 'pwa-kit-mcp',
@@ -120,44 +120,47 @@ class PwaStorefrontMCPServerHighLevel {
         }
 
         const noTelemetry = !!readFlag('no-telemetry', false)
+        const transport = new StdioServerTransport()
+        await this.server.connect(transport)
+        // when telemetry is enabled, then send telemetry events
         if (!noTelemetry) {
             warn(
                 'You acknowledge and agree that the MCP server may collect usage information, user environment, and crash reports for the purposes of providing services or functions that are relevant to use of the MCP server and product improvements.'
             )
             this.telemetry = new Telemetry()
-        }
-
-        const transport = new StdioServerTransport()
-        await this.telemetry.start()
-        try {
-            await this.server.connect(transport)
-            const clientInfo = this.server.getClientVersion?.()
-            if (clientInfo) {
-                this.telemetry.addAttributes({
-                    clientName: clientInfo.name,
-                    clientVersion: clientInfo.version
+            await this.telemetry.start()
+            try {
+                const clientInfo = this.server.getClientVersion?.()
+                if (clientInfo) {
+                    this.telemetry.addAttributes({
+                        clientName: clientInfo.name,
+                        clientVersion: clientInfo.version
+                    })
+                }
+                this.telemetry?.sendEvent('SERVER_START_SUCCESS')
+            } catch (error) {
+                this.telemetry?.sendEvent('SERVER_START_ERROR', {
+                    error: error instanceof Error ? error.message : String(error)
                 })
+                throw error
             }
-            this.telemetry?.sendEvent('SERVER_START_SUCCESS')
-        } catch (error) {
-            this.telemetry?.sendEvent('SERVER_START_ERROR', {
-                error: error instanceof Error ? error.message : String(error)
+            const sendStop = (signal) => {
+                this.telemetry?.sendEvent('SERVER_STOP', {signal})
+                this.telemetry.stop()
+            }
+            process.on('exit', () => sendStop('exit'))
+            process.on('SIGINT', () => {
+                sendStop('SIGINT')
+                process.exit(0)
             })
-            throw error
+            process.on('SIGTERM', () => {
+                sendStop('SIGTERM')
+                process.exit(0)
+            })
+        } else {
+            // when telemetry is disabled, then no need to send any telemetry events
+            console.error('PWA Storefront MCP server (McpServer version) running on stdio')
         }
-        const sendStop = (signal) => {
-            this.telemetry?.sendEvent('SERVER_STOP', {signal})
-            this.telemetry.stop()
-        }
-        process.on('exit', () => sendStop('exit'))
-        process.on('SIGINT', () => {
-            sendStop('SIGINT')
-            process.exit(0)
-        })
-        process.on('SIGTERM', () => {
-            sendStop('SIGTERM')
-            process.exit(0)
-        })
     }
 }
 
