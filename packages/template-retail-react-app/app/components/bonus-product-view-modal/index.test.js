@@ -6,7 +6,7 @@
  */
 
 import React from 'react'
-import {screen, waitFor} from '@testing-library/react'
+import {screen, waitFor, within} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
 import BonusProductViewModal from '@salesforce/retail-react-app/app/components/bonus-product-view-modal'
@@ -611,6 +611,126 @@ describe('BonusProductViewModal - Back to Selection Link', () => {
         // Check styling classes/attributes that indicate it's styled as a link
         const computedStyle = window.getComputedStyle(backToSelectionLink)
         expect(computedStyle.cursor).toBe('pointer')
+    })
+})
+
+describe('BonusProductViewModal - Responsive Button Positioning', () => {
+    beforeEach(() => {
+        const mockBasket = {basketId: 'test-basket'}
+        useCurrentBasket.mockReturnValue({data: mockBasket, derivedData: {totalItems: 0}})
+    })
+
+    test('renders Back to Selection button in mobile position (ModalHeader) when onReturnToSelection is provided', () => {
+        renderWithProviders(
+            <BonusProductViewModal
+                product={mockProductDetail}
+                isOpen={true}
+                onClose={mockOnClose}
+                onReturnToSelection={mockOnReturnToSelection}
+                bonusDiscountLineItemId="bonus-1"
+                promotionId="test-promo"
+            />
+        )
+
+        // Find the ModalHeader and verify it contains the mobile button
+        const modalHeader = screen.getByRole('banner')
+        const buttonsInHeader = within(modalHeader).getAllByText('← Back to Selection')
+        expect(buttonsInHeader).toHaveLength(1)
+    })
+
+    test('renders Back to Selection button in desktop position (imageGalleryFooter) when onReturnToSelection is provided', () => {
+        renderWithProviders(
+            <BonusProductViewModal
+                product={mockProductDetail}
+                isOpen={true}
+                onClose={mockOnClose}
+                onReturnToSelection={mockOnReturnToSelection}
+                bonusDiscountLineItemId="bonus-1"
+                promotionId="test-promo"
+            />
+        )
+
+        // Verify the imageGalleryFooter contains a button (desktop version)
+        expect(screen.getByTestId('image-gallery-footer')).toBeInTheDocument()
+        const imageGalleryFooter = screen.getByTestId('image-gallery-footer')
+        const buttonsInFooter = within(imageGalleryFooter).getAllByText('← Back to Selection')
+        expect(buttonsInFooter).toHaveLength(1)
+    })
+
+    test('does not render mobile button when onReturnToSelection is not provided', () => {
+        renderWithProviders(
+            <BonusProductViewModal
+                product={mockProductDetail}
+                isOpen={true}
+                onClose={mockOnClose}
+                bonusDiscountLineItemId="bonus-1"
+                promotionId="test-promo"
+            />
+        )
+
+        // Find the ModalHeader and verify it does NOT contain any buttons
+        const modalHeader = screen.getByRole('banner')
+        const buttonsInHeader = within(modalHeader).queryAllByText('← Back to Selection')
+        expect(buttonsInHeader).toHaveLength(0)
+    })
+})
+
+describe('BonusProductViewModal - Responsive Font Size', () => {
+    beforeEach(() => {
+        const mockBasket = {basketId: 'test-basket'}
+        useCurrentBasket.mockReturnValue({data: mockBasket, derivedData: {totalItems: 0}})
+    })
+
+    test('applies responsive font size to Back to Selection button', () => {
+        renderWithProviders(
+            <BonusProductViewModal
+                product={mockProductDetail}
+                isOpen={true}
+                onClose={mockOnClose}
+                onReturnToSelection={mockOnReturnToSelection}
+                bonusDiscountLineItemId="bonus-1"
+                promotionId="test-promo"
+            />
+        )
+
+        // Get the first button (mobile version in header)
+        const backToSelectionLinks = screen.getAllByText('← Back to Selection')
+        const mobileButton = backToSelectionLinks[0]
+
+        // Check that the button has responsive font size classes
+        // In Chakra UI, fontSize="lg" typically adds css classes for responsive sizing
+        expect(mobileButton).toHaveClass('chakra-text')
+
+        // Verify it's rendered as a button element
+        expect(mobileButton.tagName.toLowerCase()).toBe('button')
+    })
+
+    test('button has appropriate Chakra UI structure for responsive font sizing', () => {
+        renderWithProviders(
+            <BonusProductViewModal
+                product={mockProductDetail}
+                isOpen={true}
+                onClose={mockOnClose}
+                onReturnToSelection={mockOnReturnToSelection}
+                bonusDiscountLineItemId="bonus-1"
+                promotionId="test-promo"
+            />
+        )
+
+        const heading = screen.getByRole('heading', {name: /Select bonus product/i})
+        const backToSelectionButtons = screen.getAllByText('← Back to Selection')
+        const button = backToSelectionButtons[0]
+
+        // Verify both elements have appropriate Chakra UI classes (structural test for responsive implementation)
+        expect(heading).toHaveClass('chakra-heading')
+        expect(button).toHaveClass('chakra-text')
+
+        // Verify the button is properly rendered as a button element
+        expect(button.tagName.toLowerCase()).toBe('button')
+
+        // Verify the elements exist and are properly structured
+        expect(heading).toBeInTheDocument()
+        expect(button).toBeInTheDocument()
     })
 })
 

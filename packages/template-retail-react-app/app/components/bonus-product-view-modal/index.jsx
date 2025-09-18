@@ -335,7 +335,7 @@ const BonusProductViewModal = ({
                 maxHeight={bonusProductViewModalTheme.layout.content.maxHeight}
                 overflowY={productViewModalTheme.layout.content.overflowY}
             >
-                <ModalHeader 
+                <ModalHeader
                     bg={productViewModalTheme.colors.contentBackground}
                     pb={onReturnToSelection ? {base: 1, lg: 6} : 6}
                     px={6}
@@ -354,7 +354,9 @@ const BonusProductViewModal = ({
                     {/* Mobile-only Back to Selection button */}
                     {onReturnToSelection && (
                         <HideOnDesktop>
-                            <Box mt={2} mb={0}>{BackToSelectionButton}</Box>
+                            <Box mt={2} mb={0}>
+                                {BackToSelectionButton}
+                            </Box>
                         </HideOnDesktop>
                     )}
                 </ModalHeader>
@@ -362,7 +364,11 @@ const BonusProductViewModal = ({
                 <ModalBody
                     bg={productViewModalTheme.layout.body.background}
                     px={productViewModalTheme.layout.body.padding}
-                    pt={onReturnToSelection ? {base: 1, lg: productViewModalTheme.layout.body.padding} : productViewModalTheme.layout.body.padding}
+                    pt={
+                        onReturnToSelection
+                            ? {base: 1, lg: productViewModalTheme.layout.body.padding}
+                            : productViewModalTheme.layout.body.padding
+                    }
                     pb={productViewModalTheme.layout.body.paddingBottom}
                 >
                     {productViewModalData.isFetching && !productViewModalData.product ? (
