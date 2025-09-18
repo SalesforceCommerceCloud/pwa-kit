@@ -13,8 +13,18 @@ import {
 } from '@salesforce/retail-react-app/app/utils/bonus-product/discovery'
 
 /**
- * React hooks for fetching and managing bonus product data.
- * This module provides hooks for data fetching and state management.
+ * React hooks for bonus product data fetching and state management.
+ *
+ * This module provides React hooks that integrate with the Commerce SDK and other
+ * bonus product utilities to fetch and manage bonus product data. These hooks
+ * handle data fetching, loading states, and provide a React-friendly interface
+ * to the underlying bonus product utility functions.
+ *
+ * Functions in this file:
+ * - React hooks for data fetching
+ * - State management hooks
+ * - Commerce SDK integration hooks
+ * - Loading state management
  */
 
 /**

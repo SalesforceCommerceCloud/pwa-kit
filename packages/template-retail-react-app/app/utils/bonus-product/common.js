@@ -6,8 +6,17 @@
  */
 
 /**
- * Promotion-related utilities for bonus products.
- * This module handles promotion IDs, callout messages, and product eligibility.
+ * Core utilities for bonus products.
+ *
+ * This module contains foundational utility functions that are used across other bonus product modules.
+ * These are pure functions that handle core operations like text processing, product eligibility checks,
+ * and promotion data extraction. Other bonus product modules depend on these utilities.
+ *
+ * Functions in this file:
+ * - Text processing (callout messages)
+ * - Core product eligibility logic
+ * - Promotion ID extraction
+ * - Basic product availability checks
  */
 
 /**
@@ -90,28 +99,4 @@ export const isProductEligibleForBonusProducts = (productId, productsWithPromoti
     // Check if any of the product's promotions exist in the system
     // This indicates the product could potentially trigger bonus products
     return productWithPromotions.productPromotions.length > 0
-}
-
-/**
- * Enhanced check if a product should show bonus product selection.
- * A product is eligible if:
- * 1. It has promotions that can trigger bonus products
- * 2. It is NOT itself available as a bonus product in the current basket
- * @param {Object} basket - The current basket data
- * @param {string} productId - The product ID to check
- * @param {Object} productsWithPromotions - Object mapping productId to product data with promotions
- * @returns {boolean} Whether the product should show bonus product selection
- */
-export const shouldShowBonusProductSelection = (basket, productId, productsWithPromotions) => {
-    // First check if the product is eligible for bonus products
-    const isEligible = isProductEligibleForBonusProducts(productId, productsWithPromotions)
-    if (!isEligible) {
-        return false
-    }
-
-    // Then check if this product is itself available as a bonus product
-    // If it is, it shouldn't show bonus product selection when added as a regular item
-    const isAvailableAsBonus = isProductAvailableAsBonus(basket, productId)
-
-    return !isAvailableAsBonus
 }

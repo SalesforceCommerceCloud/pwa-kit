@@ -13,30 +13,34 @@
  * specialized modules for backward compatibility.
  */
 
-// Re-export promotion-related utilities
+// Re-export common utilities
 export {
     getPromotionCalloutText,
     getPromotionIdsForProduct,
     isProductAvailableAsBonus,
-    isProductEligibleForBonusProducts,
-    shouldShowBonusProductSelection
-} from '@salesforce/retail-react-app/app/utils/bonus-product/promotions'
+    isProductEligibleForBonusProducts
+} from '@salesforce/retail-react-app/app/utils/bonus-product/common'
+
+// Re-export cart state utilities
+export {
+    getQualifyingProductIdForBonusItem,
+    getBonusProductsInCartForProduct,
+    getQualifyingProductForBonusProductInCart,
+    findAllBonusProductItemsToRemove
+} from '@salesforce/retail-react-app/app/utils/bonus-product/cart'
 
 // Re-export discovery utilities
 export {
-    getQualifyingProductIdForBonusItem,
     getAvailableBonusItemsForProduct,
-    getBonusProductsInCartForProduct,
-    getQualifyingProductForBonusProductInCart,
-    getRemainingAvailableBonusProductsForProduct
+    getRemainingAvailableBonusProductsForProduct,
+    findAvailableBonusDiscountLineItemIds
 } from '@salesforce/retail-react-app/app/utils/bonus-product/discovery'
 
 // Re-export calculation utilities
-export {
-    findAvailableBonusDiscountLineItemIds,
-    getBonusProductCountsForPromotion,
-    findAllBonusProductItemsToRemove
-} from '@salesforce/retail-react-app/app/utils/bonus-product/calculations'
+export {getBonusProductCountsForPromotion} from '@salesforce/retail-react-app/app/utils/bonus-product/calculations'
+
+// Re-export business logic utilities
+export {shouldShowBonusProductSelection} from '@salesforce/retail-react-app/app/utils/bonus-product/business-logic'
 
 // Re-export React hooks
 export {

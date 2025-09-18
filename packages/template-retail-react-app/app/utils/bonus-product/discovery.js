@@ -5,53 +5,23 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import {getPromotionIdsForProduct} from '@salesforce/retail-react-app/app/utils/bonus-product/promotions'
+import {getPromotionIdsForProduct} from '@salesforce/retail-react-app/app/utils/bonus-product/common'
 
 /**
- * Discovery utilities for bonus products.
- * This module handles finding available bonus products and their relationships.
- */
-
-/**
- * Gets the qualifying product ID(s) for a bonus product from the bonusDiscountLineItems collection.
- * This function matches bonus discount line items with qualifying products in the cart
- * using the promotionId field.
+ * Discovery utilities for finding available bonus products.
  *
- * @param {Object} basket - The current basket/cart object
- * @param {string} bonusDiscountLineItemId - The ID of the bonus discount line item to find qualifying products for
- * @returns {Array<string>} - Array of qualifying product IDs that triggered this bonus item
+ * This module handles discovering and calculating what bonus products are available
+ * for selection and addition to the cart. It focuses on finding NEW items that can
+ * be added, calculating remaining capacity, and determining available discount line items.
+ *
+ * Functions in this file:
+ * - Discovery of available bonus items to add
+ * - Calculation of remaining capacity/availability
+ * - Finding available discount line item IDs
+ * - Determining what bonus products can still be selected
+ *
+ * Note: This is different from cart.js which deals with existing cart state.
  */
-export const getQualifyingProductIdForBonusItem = (basket, bonusDiscountLineItemId) => {
-    if (!basket?.bonusDiscountLineItems || !basket?.productItems || !bonusDiscountLineItemId) {
-        return []
-    }
-
-    // Find the specific bonus discount line item
-    const bonusDiscountLineItem = basket.bonusDiscountLineItems.find(
-        (item) => item.id === bonusDiscountLineItemId
-    )
-
-    if (!bonusDiscountLineItem) {
-        return []
-    }
-
-    const promotionId = bonusDiscountLineItem.promotionId
-
-    // Find all products that have this promotion ID in their price adjustments
-    const qualifyingProductIds = []
-    basket.productItems.forEach((product) => {
-        if (product.priceAdjustments) {
-            const hasMatchingPromotion = product.priceAdjustments.some(
-                (adjustment) => adjustment.promotionId === promotionId
-            )
-            if (hasMatchingPromotion) {
-                qualifyingProductIds.push(product.productId)
-            }
-        }
-    })
-
-    return qualifyingProductIds
-}
 
 /**
  * Gets all available bonus discount line items that are triggered by a specific product.
@@ -92,128 +62,6 @@ export const getAvailableBonusItemsForProduct = (basket, productId, productsWith
     })
 
     return availableBonusItems
-}
-
-/**
- * Gets all bonus products that are already in the cart for a specific product.
- *
- * @param {Object} basket - The current basket data
- * @param {string} productId - The product ID to find bonus products for
- * @param {Object} productsWithPromotions - Products data with promotion info
- * @returns {Array<Object>} Array of bonus products in cart for the qualifying product
- */
-export const getBonusProductsInCartForProduct = (basket, productId, productsWithPromotions) => {
-    if (!basket || !productId || !productsWithPromotions) {
-        return []
-    }
-
-    // Get promotion IDs for the qualifying product using enhanced data
-    const qualifyingPromotionIds = getPromotionIdsForProduct(
-        basket,
-        productId,
-        productsWithPromotions
-    )
-
-    if (qualifyingPromotionIds.length === 0) {
-        return []
-    }
-
-    // Find bonus products in cart that match the promotion IDs
-    const bonusProductsInCart =
-        basket.productItems?.filter((item) => {
-            if (!item.bonusProductLineItem) {
-                return false
-            }
-
-            // Get promotion IDs for this bonus product
-            const bonusPromotionIds = getPromotionIdsForProduct(
-                basket,
-                item.productId,
-                productsWithPromotions
-            )
-
-            // Check if any promotion IDs match
-            return bonusPromotionIds.some((promotionId) =>
-                qualifyingPromotionIds.includes(promotionId)
-            )
-        }) || []
-
-    // Combine identical bonus products by productId and aggregate quantities
-    const combinedBonusProducts = {}
-    bonusProductsInCart.forEach((item) => {
-        const key = item.productId
-        if (combinedBonusProducts[key]) {
-            // Aggregate quantity for identical products
-            combinedBonusProducts[key].quantity += item.quantity || 0
-        } else {
-            // Create new entry with cloned item data
-            combinedBonusProducts[key] = {
-                ...item,
-                quantity: item.quantity || 0
-            }
-        }
-    })
-
-    // Convert back to array
-    return Object.values(combinedBonusProducts)
-}
-
-/**
- * Gets the qualifying product ID(s) for a bonus product that's already in the cart.
- *
- * @param {Object} basket - The current basket data
- * @param {string} bonusProductId - The product ID of the bonus product in the cart
- * @param {Object} productsWithPromotions - Products data with promotion info
- * @returns {Array<string>} Array of qualifying product IDs that triggered this bonus product
- */
-export const getQualifyingProductForBonusProductInCart = (
-    basket,
-    bonusProductId,
-    productsWithPromotions
-) => {
-    // Validate inputs
-    if (!basket?.productItems || !bonusProductId || !productsWithPromotions) {
-        return []
-    }
-
-    // Find the bonus product in the cart
-    const bonusProduct = basket.productItems.find(
-        (item) => item.productId === bonusProductId && item.bonusProductLineItem === true
-    )
-
-    if (!bonusProduct) {
-        return []
-    }
-
-    // Get promotion IDs from the bonus product using enhanced data
-    const bonusPromotionIds = getPromotionIdsForProduct(
-        basket,
-        bonusProductId,
-        productsWithPromotions
-    )
-
-    if (bonusPromotionIds.length === 0) {
-        return []
-    }
-
-    // Find regular products (not bonus products) that have matching promotion IDs
-    const qualifyingProducts = basket.productItems.filter((item) => {
-        // Skip if this is a bonus product
-        if (item.bonusProductLineItem === true) {
-            return false
-        }
-
-        // Get promotion IDs for this product using enhanced data
-        const productPromotionIds = getPromotionIdsForProduct(
-            basket,
-            item.productId,
-            productsWithPromotions
-        )
-
-        return productPromotionIds.some((promotionId) => bonusPromotionIds.includes(promotionId))
-    })
-
-    return qualifyingProducts.map((product) => product.productId)
 }
 
 /**
@@ -357,4 +205,54 @@ export const getRemainingAvailableBonusProductsForProduct = (
         aggregatedSelectedItems: overallAggregatedSelectedItems,
         hasRemainingCapacity: overallAggregatedSelectedItems < overallAggregatedMaxBonusItems
     }
+}
+
+/**
+ * Finds all available bonus discount line item IDs with their available capacity.
+ * Returns a list of pairs where each pair contains [bonusDiscountLineItemId, availableQuantity].
+ * Only includes pairs where availableQuantity > 0.
+ *
+ * @param {Object} basket - The current basket data
+ * @param {string} promotionId - The promotion ID to match
+ * @returns {Array<Array>} Array of pairs [bonusDiscountLineItemId, availableQuantity]
+ */
+export const findAvailableBonusDiscountLineItemIds = (basket, promotionId) => {
+    if (!basket?.bonusDiscountLineItems || !promotionId) {
+        return []
+    }
+
+    // Find all bonus discount line items with the same promotionId
+    const matchingDiscountItems = basket.bonusDiscountLineItems.filter(
+        (item) => item.promotionId === promotionId
+    )
+
+    if (matchingDiscountItems.length === 0) {
+        return []
+    }
+
+    const availablePairs = []
+
+    // Check each discount item and calculate available capacity
+    for (const discountItem of matchingDiscountItems) {
+        const maxBonusItems = discountItem.maxBonusItems || 0
+
+        // Calculate how many bonus products are already in cart for this specific discount item
+        const selectedQuantity =
+            basket.productItems
+                ?.filter(
+                    (cartItem) =>
+                        cartItem.bonusProductLineItem &&
+                        cartItem.bonusDiscountLineItemId === discountItem.id
+                )
+                .reduce((total, cartItem) => total + (cartItem.quantity || 0), 0) || 0
+
+        const availableQuantity = Math.max(0, maxBonusItems - selectedQuantity)
+
+        // Only include pairs where availableQuantity > 0
+        if (availableQuantity > 0) {
+            availablePairs.push([discountItem.id, availableQuantity])
+        }
+    }
+
+    return availablePairs
 }

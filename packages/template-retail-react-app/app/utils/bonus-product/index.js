@@ -14,7 +14,9 @@
 export * from './utils'
 
 // Also provide direct access to individual modules if needed
-export * as promotions from './promotions'
+export * as common from './common'
+export * as cart from './cart'
 export * as discovery from './discovery'
 export * as calculations from './calculations'
+export * as businessLogic from './business-logic'
 export * as hooks from './hooks'
