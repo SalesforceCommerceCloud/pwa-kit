@@ -90,7 +90,7 @@ const CartSecondaryButtonGroup = ({
                             id="cart_secondary_button_group.action.remove"
                         />
                     </Button>
-                    {customer.isRegistered && !isBonusProduct && (
+                    {customer.isRegistered && (
                         <Button
                             variant="link"
                             size="sm"
