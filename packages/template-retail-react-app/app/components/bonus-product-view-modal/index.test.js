@@ -535,9 +535,10 @@ describe('BonusProductViewModal - Back to Selection Link', () => {
             />
         )
 
-        // Check that the Back to Selection link is rendered
+        // Check that the Back to Selection links are rendered (mobile and desktop versions)
         expect(screen.getByTestId('image-gallery-footer')).toBeInTheDocument()
-        expect(screen.getByText('← Back to Selection')).toBeInTheDocument()
+        const backToSelectionLinks = screen.getAllByText('← Back to Selection')
+        expect(backToSelectionLinks).toHaveLength(2) // Mobile and desktop versions
     })
 
     test('does not render Back to Selection link when onReturnToSelection is not provided', () => {
@@ -576,11 +577,11 @@ describe('BonusProductViewModal - Back to Selection Link', () => {
             />
         )
 
-        // Find and click the Back to Selection link
-        const backToSelectionLink = screen.getByText('← Back to Selection')
-        expect(backToSelectionLink).toBeInTheDocument()
+        // Find and click the Back to Selection link (use the first one found - either will work)
+        const backToSelectionLinks = screen.getAllByText('← Back to Selection')
+        expect(backToSelectionLinks[0]).toBeInTheDocument()
 
-        await user.click(backToSelectionLink)
+        await user.click(backToSelectionLinks[0])
 
         // Verify onReturnToSelection was called
         expect(mockOnReturnToSelection).toHaveBeenCalledTimes(1)
@@ -601,7 +602,8 @@ describe('BonusProductViewModal - Back to Selection Link', () => {
             />
         )
 
-        const backToSelectionLink = screen.getByText('← Back to Selection')
+        const backToSelectionLinks = screen.getAllByText('← Back to Selection')
+        const backToSelectionLink = backToSelectionLinks[0] // Test the first button found
 
         // Check that it's rendered as a clickable element (Text with as="button")
         expect(backToSelectionLink.tagName.toLowerCase()).toBe('button')

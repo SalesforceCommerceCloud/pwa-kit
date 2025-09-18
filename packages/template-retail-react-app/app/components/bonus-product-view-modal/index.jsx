@@ -33,6 +33,7 @@ import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation
 import {productViewModalTheme} from '@salesforce/retail-react-app/app/theme/components/project/product-view-modal'
 import {bonusProductViewModalTheme} from '@salesforce/retail-react-app/app/theme/components/project/bonus-product-view-modal'
 import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
+import {HideOnDesktop, HideOnMobile} from '@salesforce/retail-react-app/app/components/responsive'
 
 /**
  * A Modal that contains Bonus Product View
@@ -256,6 +257,25 @@ const BonusProductViewModal = ({
         }, 200)
     }, [onClose, navigate])
 
+    // Reusable Back to Selection button component
+    const BackToSelectionButton = useMemo(
+        () => (
+            <Text
+                as="button"
+                color="blue.600"
+                cursor="pointer"
+                onClick={onReturnToSelection}
+                fontSize={{base: 'lg', lg: 'md'}}
+                _hover={{
+                    color: 'blue.700'
+                }}
+            >
+                {messages.backToSelection}
+            </Text>
+        ),
+        [messages.backToSelection, onReturnToSelection]
+    )
+
     const customButtons = useMemo(
         () => [
             <Button key="view-cart" variant="outline" onClick={handleViewCart}>
@@ -315,7 +335,12 @@ const BonusProductViewModal = ({
                 maxHeight={bonusProductViewModalTheme.layout.content.maxHeight}
                 overflowY={productViewModalTheme.layout.content.overflowY}
             >
-                <ModalHeader bg={productViewModalTheme.colors.contentBackground}>
+                <ModalHeader 
+                    bg={productViewModalTheme.colors.contentBackground}
+                    pb={onReturnToSelection ? {base: 1, lg: 6} : 6}
+                    px={6}
+                    pt={6}
+                >
                     <Heading size="md">
                         {formatMessage(
                             {
@@ -326,11 +351,18 @@ const BonusProductViewModal = ({
                             {selected: finalSelectedBonusItems, max: finalMaxBonusItems}
                         )}
                     </Heading>
+                    {/* Mobile-only Back to Selection button */}
+                    {onReturnToSelection && (
+                        <HideOnDesktop>
+                            <Box mt={2} mb={0}>{BackToSelectionButton}</Box>
+                        </HideOnDesktop>
+                    )}
                 </ModalHeader>
 
                 <ModalBody
                     bg={productViewModalTheme.layout.body.background}
-                    p={productViewModalTheme.layout.body.padding}
+                    px={productViewModalTheme.layout.body.padding}
+                    pt={onReturnToSelection ? {base: 1, lg: productViewModalTheme.layout.body.padding} : productViewModalTheme.layout.body.padding}
                     pb={productViewModalTheme.layout.body.paddingBottom}
                 >
                     {productViewModalData.isFetching && !productViewModalData.product ? (
@@ -354,17 +386,7 @@ const BonusProductViewModal = ({
                             alignItems="stretch"
                             imageGalleryFooter={
                                 onReturnToSelection ? (
-                                    <Text
-                                        as="button"
-                                        color="blue.600"
-                                        cursor="pointer"
-                                        onClick={onReturnToSelection}
-                                        _hover={{
-                                            color: 'blue.700'
-                                        }}
-                                    >
-                                        {messages.backToSelection}
-                                    </Text>
+                                    <HideOnMobile>{BackToSelectionButton}</HideOnMobile>
                                 ) : null
                             }
                             {...props}
