@@ -44,6 +44,7 @@
   "dependencies": {
     "@axe-core/playwright": "^4.10.1",
     "@babel/runtime": "^7.21.0",
+    "@salesforce/telemetry": "^6.1.0",
     "@modelcontextprotocol/sdk": "^1.13.2",
     "axe-core": "^4.10.3",
     "cross-spawn": "^7.0.6",
