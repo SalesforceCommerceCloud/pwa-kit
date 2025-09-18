@@ -166,7 +166,9 @@ describe('useBonusProductData', () => {
             imageGroups: [],
             variants: [],
             variationAttributes: [],
-            type: {set: false, bundle: false}
+            type: {set: false, bundle: false},
+            selectedVariant: null,
+            variationValues: {}
         })
     })
 
@@ -225,5 +227,292 @@ describe('useBonusProductData', () => {
             promotionId: 'promo-1',
             bonusDiscountLineItemId: 'bonus-1'
         })
+    })
+
+    test('normalizeProduct extracts variant information when productId matches a variant', () => {
+        const {result} = renderHook(() => useBonusProductData(mockModalData))
+        const bonusProduct = {productId: 'variant-123'}
+        const foundData = {
+            id: 'master-product',
+            name: 'Master Product',
+            imageGroups: [],
+            variants: [
+                {
+                    productId: 'variant-123',
+                    variationValues: {color: 'red', size: 'M'}
+                },
+                {
+                    productId: 'variant-456',
+                    variationValues: {color: 'blue', size: 'L'}
+                }
+            ],
+            variationAttributes: [],
+            type: {set: false, bundle: false}
+        }
+
+        const normalized = result.current.normalizeProduct(bonusProduct, foundData)
+
+        expect(normalized.selectedVariant).toEqual({
+            productId: 'variant-123',
+            variationValues: {color: 'red', size: 'M'}
+        })
+        expect(normalized.variationValues).toEqual({color: 'red', size: 'M'})
+    })
+
+    test('normalizeProduct returns empty variationValues when productId matches master product', () => {
+        const {result} = renderHook(() => useBonusProductData(mockModalData))
+        const bonusProduct = {productId: 'master-product'} // Master product ID
+        const foundData = {
+            id: 'master-product',
+            name: 'Master Product',
+            imageGroups: [],
+            variants: [
+                {
+                    productId: 'variant-123',
+                    variationValues: {color: 'red', size: 'M'}
+                },
+                {
+                    productId: 'variant-456',
+                    variationValues: {color: 'blue', size: 'L'}
+                }
+            ],
+            variationAttributes: [],
+            type: {set: false, bundle: false}
+        }
+
+        const normalized = result.current.normalizeProduct(bonusProduct, foundData)
+
+        expect(normalized.selectedVariant).toBeNull()
+        expect(normalized.variationValues).toEqual({})
+        expect(normalized.productId).toBe('master-product')
+    })
+
+    test('handles multiple bonusDiscountLineItems with mixed variant and master product IDs', () => {
+        const complexModalData = {
+            bonusDiscountLineItems: [
+                {
+                    id: 'bonus-line-1',
+                    promotionId: 'promo-ties',
+                    maxBonusItems: 2,
+                    bonusProducts: [
+                        {productId: 'tie-variant-red', productName: 'Red Tie', title: 'Red Tie'},
+                        {productId: 'tie-variant-blue', productName: 'Blue Tie', title: 'Blue Tie'}
+                    ]
+                },
+                {
+                    id: 'bonus-line-2',
+                    promotionId: 'promo-accessories',
+                    maxBonusItems: 1,
+                    bonusProducts: [
+                        {
+                            productId: 'accessories-master',
+                            productName: 'Accessories',
+                            title: 'Accessories'
+                        },
+                        {
+                            productId: 'watch-variant-silver',
+                            productName: 'Silver Watch',
+                            title: 'Silver Watch'
+                        }
+                    ]
+                }
+            ]
+        }
+
+        // Mock product data for the complex scenario
+        const complexProductData = {
+            data: [
+                {
+                    id: 'tie-master',
+                    name: 'Silk Tie',
+                    imageGroups: [],
+                    variants: [
+                        {productId: 'tie-variant-red', variationValues: {color: 'red'}},
+                        {productId: 'tie-variant-blue', variationValues: {color: 'blue'}}
+                    ],
+                    variationAttributes: [],
+                    type: {set: false, bundle: false}
+                },
+                {
+                    id: 'accessories-master',
+                    name: 'Accessories Collection',
+                    imageGroups: [],
+                    variants: [
+                        {productId: 'acc-variant-1', variationValues: {style: 'classic'}},
+                        {productId: 'acc-variant-2', variationValues: {style: 'modern'}}
+                    ],
+                    variationAttributes: [],
+                    type: {set: false, bundle: false}
+                },
+                {
+                    id: 'watch-master',
+                    name: 'Premium Watch',
+                    imageGroups: [],
+                    variants: [
+                        {
+                            productId: 'watch-variant-silver',
+                            variationValues: {color: 'silver', size: '42mm'}
+                        },
+                        {
+                            productId: 'watch-variant-gold',
+                            variationValues: {color: 'gold', size: '38mm'}
+                        }
+                    ],
+                    variationAttributes: [],
+                    type: {set: false, bundle: false}
+                }
+            ]
+        }
+
+        useProducts.mockReturnValue({
+            data: complexProductData,
+            isLoading: false
+        })
+
+        const {result} = renderHook(() => useBonusProductData(complexModalData))
+
+        // Test deduplication and correct product extraction
+        expect(result.current.uniqueBonusProducts).toHaveLength(4)
+        expect(result.current.maxBonusItems).toBe(3) // 2 + 1
+
+        // Test normalizeProduct for each type
+        // 1. Variant ID (should extract variant info)
+        const redTie = result.current.normalizeProduct(
+            {productId: 'tie-variant-red'},
+            complexProductData.data[0]
+        )
+        expect(redTie.selectedVariant).toEqual({
+            productId: 'tie-variant-red',
+            variationValues: {color: 'red'}
+        })
+        expect(redTie.variationValues).toEqual({color: 'red'})
+
+        // 2. Master product ID (should not extract variant info)
+        const accessories = result.current.normalizeProduct(
+            {productId: 'accessories-master'},
+            complexProductData.data[1]
+        )
+        expect(accessories.selectedVariant).toBeNull()
+        expect(accessories.variationValues).toEqual({})
+        expect(accessories.productId).toBe('accessories-master')
+
+        // 3. Another variant ID with multiple variation values
+        const silverWatch = result.current.normalizeProduct(
+            {productId: 'watch-variant-silver'},
+            complexProductData.data[2]
+        )
+        expect(silverWatch.selectedVariant).toEqual({
+            productId: 'watch-variant-silver',
+            variationValues: {color: 'silver', size: '42mm'}
+        })
+        expect(silverWatch.variationValues).toEqual({color: 'silver', size: '42mm'})
+    })
+
+    test('handles variant ID that does not exist in product variants array', () => {
+        const {result} = renderHook(() => useBonusProductData(mockModalData))
+        const bonusProduct = {productId: 'non-existent-variant-999'}
+        const foundData = {
+            id: 'master-product',
+            name: 'Master Product',
+            imageGroups: [],
+            variants: [
+                {productId: 'variant-123', variationValues: {color: 'red'}},
+                {productId: 'variant-456', variationValues: {color: 'blue'}}
+            ],
+            variationAttributes: [],
+            type: {set: false, bundle: false}
+        }
+
+        const normalized = result.current.normalizeProduct(bonusProduct, foundData)
+
+        // Should gracefully fallback to master product behavior
+        expect(normalized.selectedVariant).toBeNull()
+        expect(normalized.variationValues).toEqual({})
+        expect(normalized.productId).toBe('master-product')
+    })
+
+    test('handles product data with no variants array', () => {
+        const {result} = renderHook(() => useBonusProductData(mockModalData))
+        const bonusProduct = {productId: 'some-variant-id'}
+        const foundData = {
+            id: 'master-product-no-variants',
+            name: 'Simple Product',
+            imageGroups: [],
+            // variants: undefined (intentionally missing)
+            variationAttributes: [],
+            type: {set: false, bundle: false}
+        }
+
+        const normalized = result.current.normalizeProduct(bonusProduct, foundData)
+
+        // Should handle gracefully without crashing
+        expect(normalized.selectedVariant).toBeNull()
+        expect(normalized.variationValues).toEqual({})
+        expect(normalized.productId).toBe('master-product-no-variants')
+    })
+
+    test('handles variant with null/undefined variationValues', () => {
+        const {result} = renderHook(() => useBonusProductData(mockModalData))
+        const bonusProduct = {productId: 'variant-with-null-values'}
+        const foundData = {
+            id: 'master-product',
+            name: 'Master Product',
+            imageGroups: [],
+            variants: [
+                {
+                    productId: 'variant-with-null-values',
+                    variationValues: null // Malformed data
+                },
+                {
+                    productId: 'variant-with-undefined-values'
+                    // variationValues: undefined (missing property)
+                }
+            ],
+            variationAttributes: [],
+            type: {set: false, bundle: false}
+        }
+
+        const normalized = result.current.normalizeProduct(bonusProduct, foundData)
+
+        // Should handle null variationValues gracefully
+        expect(normalized.selectedVariant).toEqual({
+            productId: 'variant-with-null-values',
+            variationValues: null
+        })
+        expect(normalized.variationValues).toEqual({}) // Our code converts null to empty object
+    })
+
+    test('handles product bundles and sets correctly', () => {
+        const {result} = renderHook(() => useBonusProductData(mockModalData))
+
+        // Test bundle
+        const bundleProduct = {productId: 'bundle-variant-123'}
+        const bundleData = {
+            id: 'bundle-master',
+            name: 'Product Bundle',
+            imageGroups: [],
+            variants: [{productId: 'bundle-variant-123', variationValues: {size: 'large'}}],
+            variationAttributes: [],
+            type: {set: false, bundle: true} // This is a bundle
+        }
+
+        const normalizedBundle = result.current.normalizeProduct(bundleProduct, bundleData)
+        expect(normalizedBundle.selectedVariant.variationValues).toEqual({size: 'large'})
+        expect(normalizedBundle.type.bundle).toBe(true)
+
+        // Test set
+        const setProduct = {productId: 'set-variant-456'}
+        const setData = {
+            id: 'set-master',
+            name: 'Product Set',
+            imageGroups: [],
+            variants: [{productId: 'set-variant-456', variationValues: {color: 'multi'}}],
+            variationAttributes: [],
+            type: {set: true, bundle: false} // This is a set
+        }
+
+        const normalizedSet = result.current.normalizeProduct(setProduct, setData)
+        expect(normalizedSet.selectedVariant.variationValues).toEqual({color: 'multi'})
+        expect(normalizedSet.type.set).toBe(true)
     })
 })

@@ -47,13 +47,30 @@ const BonusProductItem = ({
             return null
         }
 
-        const variantImages = filterImageGroups(productData.imageGroups, product)
+        // Use variant-specific variation values if available for image filtering
+        const variationValues = productData.variationValues || {}
+        const hasVariationValues = Object.keys(variationValues).length > 0
 
-        if (variantImages?.length > 0) {
-            const largeImage = findImageGroupBy(variantImages, {
-                viewType: 'large'
+        if (hasVariationValues) {
+            // Filter images based on the specific variant's variation values
+            const variantImages = filterImageGroups(productData.imageGroups, {
+                variationValues
             })
-            return largeImage
+
+            if (variantImages?.length > 0) {
+                const largeImage = findImageGroupBy(variantImages, {
+                    viewType: 'large'
+                })
+                return largeImage || variantImages[0]
+            }
+        }
+
+        // Fallback: try to find any large image, then small image
+        const defaultLargeImage = findImageGroupBy(productData.imageGroups, {
+            viewType: 'large'
+        })
+        if (defaultLargeImage) {
+            return defaultLargeImage
         }
 
         const defaultSmallImage = findImageGroupBy(productData.imageGroups, {
