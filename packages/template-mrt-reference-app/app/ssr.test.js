@@ -50,7 +50,6 @@ describe('server', () => {
     })
     afterEach(() => {
         process.env = originalEnv
-        server.close()
         jest.restoreAllMocks()
     })
     test.each([
