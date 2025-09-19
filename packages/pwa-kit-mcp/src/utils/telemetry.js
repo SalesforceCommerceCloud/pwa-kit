@@ -149,10 +149,6 @@ export class Telemetry {
     }
 
     async createMcpTelemetryReporter() {
-        // Temporarily suppress console output during telemetry reporter creation to avoid
-        // non-JSON output from O11y reporter
-        const originalConsoleLog = console.log
-        console.log = () => {}
         this.reporter = await McpTelemetryReporter.create({
             project: PROJECT,
             key: customAppInsightsKey,
@@ -163,7 +159,5 @@ export class Telemetry {
             waitForConnection: true
         })
         this.reporter.start()
-        await new Promise((resolve) => setTimeout(resolve, 1000))
-        console.log = originalConsoleLog
     }
 }
