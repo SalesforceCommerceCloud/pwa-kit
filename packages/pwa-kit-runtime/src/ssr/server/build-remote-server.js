@@ -49,7 +49,6 @@ import {
     slasPrivateProxyPath
 } from '../../utils/ssr-namespace-paths'
 import {applyProxyRequestHeaders} from '../../utils/ssr-server/configure-proxy'
-// import awsServerlessExpress from 'aws-serverless-express'
 import expressLogging from 'morgan'
 import logger from '../../utils/logger-instance'
 import {createProxyMiddleware, responseInterceptor} from 'http-proxy-middleware'
@@ -73,15 +72,6 @@ import {is as typeis} from 'type-is'
  * @private
  */
 const binaryMimeTypes = ['application/*', 'audio/*', 'font/*', 'image/*', 'video/*']
-// const binaryEncodings = ['gzip', 'deflate', 'br']
-
-// export const isContentEncodingBinary = (headers) => {
-//     const contentEncoding = headers['content-encoding'] || headers['Content-Encoding']
-//     if (!contentEncoding) {
-//         return false
-//     }
-//     return binaryEncodings.includes(contentEncoding)
-// }
 
 export const isContentTypeBinary = (headers) => {
     // Replicating the aws-serverless-express behavior
@@ -1280,41 +1270,6 @@ export const RemoteServerFactory = {
                 lambdaContainerReused = true
                 app.sendMetric('LambdaCreated')
             }
-
-            // // Proxy the request through to the server. When the response
-            // // is done, context.succeed will be called with the response
-            // // data.
-            // awsServerlessExpress.proxy(
-            //     server,
-            //     event, // The incoming event
-            //     context, // The event context
-            //     'CALLBACK', // How the proxy signals completion
-            //     (err, response) => {
-            //         // The 'response' parameter here is NOT the same response
-            //         // object handled by ExpressJS code. The awsServerlessExpress
-            //         // middleware works by sending an http.Request to the Express
-            //         // server and parsing the HTTP response that it returns.
-            //         // Wait util all pending metrics have been sent, and any pending
-            //         // response caching to complete. We have to do this now, before
-            //         // sending the response; there's no way to do it afterwards
-            //         // because the Lambda container is frozen inside the callback.
-
-            //         // We return this Promise, but the awsServerlessExpress object
-            //         // doesn't make any use of it.
-            //         return (
-            //             app._requestMonitor
-            //                 ._waitForResponses()
-            //                 .then(() => app.metrics.flush())
-            //                 // Now call the Lambda callback to complete the response
-            //                 .then(() => callback(err, processLambdaResponse(response, event)))
-            //             // DON'T add any then() handlers here, after the callback.
-            //             // They won't be called after the response is sent, but they
-            //             // *might* be called if the Lambda container running this code
-            //             // is reused, which can lead to odd and unpredictable
-            //             // behaviour.
-            //         )
-            //     }
-            // )
 
             const managedCallback = (err, response) => {
                 return (

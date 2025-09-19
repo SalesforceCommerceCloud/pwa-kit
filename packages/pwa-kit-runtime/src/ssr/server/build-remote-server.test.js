@@ -6,13 +6,7 @@
  */
 import {once, RemoteServerFactory, isBinary} from './build-remote-server'
 import {X_ENCODED_HEADERS} from './constants'
-// const createEvent = require('@serverless/event-mocks').default
 import {default as createEvent} from '@serverless/event-mocks'
-// import {ServerlessAdapter} from '@h4ad/serverless-adapter'
-// import {DefaultHandler} from '@h4ad/serverless-adapter/handlers/default'
-// import {CallbackResolver} from '@h4ad/serverless-adapter/resolvers/callback'
-// import {ApiGatewayV1Adapter} from '@h4ad/serverless-adapter/adapters/aws'
-// import {ExpressFramework} from '@h4ad/serverless-adapter/frameworks/express'
 
 jest.mock('../../utils/ssr-config', () => {
     return {
@@ -20,33 +14,6 @@ jest.mock('../../utils/ssr-config', () => {
     }
 })
 
-// jest.mock('@h4ad/serverless-adapter', () => ({
-//     ServerlessAdapter: {
-//         new: jest.fn(() => ({
-//             setFramework: jest.fn().mockReturnThis(),
-//             setHandler: jest.fn().mockReturnThis(),
-//             setResolver: jest.fn().mockReturnThis(),
-//             addAdapter: jest.fn().mockReturnThis(),
-//             build: jest.fn().mockReturnValue(jest.fn())
-//         }))
-//     }
-// }))
-
-// jest.mock('@h4ad/serverless-adapter/handlers/default', () => ({
-//     DefaultHandler: jest.fn()
-// }))
-
-// jest.mock('@h4ad/serverless-adapter/resolvers/callback', () => ({
-//     CallbackResolver: jest.fn()
-// }))
-
-// jest.mock('@h4ad/serverless-adapter/adapters/aws', () => ({
-//     ApiGatewayV1Adapter: jest.fn()
-// }))
-
-// jest.mock('@h4ad/serverless-adapter/frameworks/express', () => ({
-//     ExpressFramework: jest.fn()
-// }))
 
 describe('the once function', () => {
     test('should prevent a function being called more than once', () => {
