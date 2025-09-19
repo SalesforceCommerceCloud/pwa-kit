@@ -152,6 +152,7 @@ export class Telemetry {
     // To include o11y, set enableO11y to true and provide the o11yUploadEndpoint and extensionName
     // If only o11y is needed, set enableAppInsights to false and exclude the key field
     async createMcpTelemetryReporter() {
+        // TODO: update configs based on approved telemetry approach
         this.reporter = await McpTelemetryReporter.create({
             project: PROJECT,
             key: customAppInsightsKey,
