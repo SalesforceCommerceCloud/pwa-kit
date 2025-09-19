@@ -148,15 +148,23 @@ export class Telemetry {
         this.reporter?.stop()
     }
 
-    // Configuration options for sending telemetry to App Insights (and/or o11y):
-    // To include o11y, set enableO11y to true and provide the o11yUploadEndpoint and extensionName
-    // If only o11y is needed, set enableAppInsights to false and exclude the key field
+    /**
+     * Creates and initializes the MCP telemetry reporter with App Insights and/or o11y support.
+     *
+     * Configuration options:
+     * - To include App Insights: set enableAppInsights to true and provide the key field
+     * - To include o11y: set enableO11y to true and provide o11yUploadEndpoint and extensionName fields
+     * - If both are provided, telemetry will be sent to both App Insights and o11y
+     *
+     * @returns {Promise<void>}
+     */
     async createMcpTelemetryReporter() {
         // TODO: update configs based on approved telemetry approach
         this.reporter = await McpTelemetryReporter.create({
             project: PROJECT,
             key: customAppInsightsKey,
             userId: this.cliId,
+            enableAppInsights: true,
             enableO11y: true,
             o11yUploadEndpoint: o11yUploadEndpoint,
             extensionName: PROJECT,
