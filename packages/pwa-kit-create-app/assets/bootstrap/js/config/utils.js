@@ -26,7 +26,6 @@ function parseSettings(settings) {
         }
     }
 
-    console.warn('Cannot parse settings from:', settings)
     return
 }
 
