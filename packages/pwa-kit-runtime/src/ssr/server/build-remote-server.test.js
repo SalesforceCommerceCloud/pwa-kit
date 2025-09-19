@@ -14,7 +14,6 @@ jest.mock('../../utils/ssr-config', () => {
     }
 })
 
-
 describe('the once function', () => {
     test('should prevent a function being called more than once', () => {
         const fn = jest.fn(() => ({test: 'test'}))
