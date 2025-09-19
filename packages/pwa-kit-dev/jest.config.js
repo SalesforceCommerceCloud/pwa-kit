@@ -12,13 +12,13 @@ module.exports = {
     moduleNameMapper: {
         ...base.moduleNameMapper,
         '^@h4ad/serverless-adapter/lib/handlers/default$':
-            '../pwa-kit-runtime/node_modules/@h4ad/serverless-adapter/lib/handlers/default/index.cjs',
+            '<rootDir>/node_modules/@h4ad/serverless-adapter/lib/handlers/default/index.cjs',
         '^@h4ad/serverless-adapter/lib/resolvers/callback$':
-            '../pwa-kit-runtime/node_modules/@h4ad/serverless-adapter/lib/resolvers/callback/index.cjs',
+            '<rootDir>/node_modules/@h4ad/serverless-adapter/lib/resolvers/callback/index.cjs',
         '^@h4ad/serverless-adapter/lib/adapters/aws$':
-            '../pwa-kit-runtime/node_modules/@h4ad/serverless-adapter/lib/adapters/aws/index.cjs',
+            '<rootDir>/node_modules/@h4ad/serverless-adapter/lib/adapters/aws/index.cjs',
         '^@h4ad/serverless-adapter/lib/frameworks/express$':
-            '../pwa-kit-runtime/node_modules/@h4ad/serverless-adapter/lib/frameworks/express/index.cjs'
+            '<rootDir>/node_modules/@h4ad/serverless-adapter/lib/frameworks/express/index.cjs'
     },
     coverageThreshold: {
         global: {
