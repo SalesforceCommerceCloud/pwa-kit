@@ -16,19 +16,22 @@ import os from 'os'
 const packageJson = require('../../package.json')
 
 const PROJECT = 'pwa-kit-mcp'
-const loadLocalConnectionString = () => {
+
+const loadConfigValue = (key) => {
     try {
         const cfgPath = path.resolve(__dirname, '../../config.json')
         if (!fs.existsSync(cfgPath)) return null
         const raw = fs.readFileSync(cfgPath, 'utf8')
         const cfg = JSON.parse(raw)
-        const v = cfg?.applicationInsightsConnectionString
+        const v = cfg?.[key]
         return typeof v === 'string' && v.trim() ? v.trim() : null
     } catch {
         return null
     }
 }
-const customAppInsightsKey = loadLocalConnectionString()
+
+const customAppInsightsKey = loadConfigValue('applicationInsightsConnectionString')
+const o11yUploadEndpoint = loadConfigValue('o11yUploadEndpoint')
 
 const generateRandomId = () => randomBytes(20).toString('hex')
 
@@ -124,13 +127,7 @@ export class Telemetry {
         if (this.started) return
         this.started = true
         try {
-            this.reporter = await McpTelemetryReporter.create({
-                project: PROJECT,
-                key: customAppInsightsKey,
-                userId: this.cliId,
-                waitForConnection: true
-            })
-            this.reporter.start()
+            await this.createMcpTelemetryReporter()
         } catch (error) {
             // Best-effort retry after ~1s: first runs can hit transient failures
             // establishing the Application Insights connection (DNS/proxy/VPN warm-up,
@@ -138,13 +135,7 @@ export class Telemetry {
             // If the retry still fails, ignore it to avoid impacting the server.
             try {
                 await new Promise((r) => setTimeout(r, 1000))
-                this.reporter = await McpTelemetryReporter.create({
-                    project: PROJECT,
-                    key: customAppInsightsKey,
-                    userId: this.cliId,
-                    waitForConnection: true
-                })
-                this.reporter.start()
+                await this.createMcpTelemetryReporter()
             } catch (retryError) {
                 // ignore
             }
@@ -155,5 +146,30 @@ export class Telemetry {
         if (!this.started) return
         this.started = false
         this.reporter?.stop()
+    }
+
+    /**
+     * Creates and initializes the MCP telemetry reporter with App Insights and/or o11y support.
+     *
+     * Configuration options:
+     * - To include App Insights: set enableAppInsights to true and provide the key field
+     * - To include o11y: set enableO11y to true and provide o11yUploadEndpoint and extensionName fields
+     * - If both are provided, telemetry will be sent to both App Insights and o11y
+     *
+     * @returns {Promise<void>}
+     */
+    async createMcpTelemetryReporter() {
+        // TODO: update configs based on approved telemetry approach
+        this.reporter = await McpTelemetryReporter.create({
+            project: PROJECT,
+            key: customAppInsightsKey,
+            userId: this.cliId,
+            enableAppInsights: true,
+            enableO11y: true,
+            o11yUploadEndpoint: o11yUploadEndpoint,
+            extensionName: PROJECT,
+            waitForConnection: true
+        })
+        this.reporter.start()
     }
 }

@@ -162,5 +162,20 @@ class PwaStorefrontMCPServerHighLevel {
     }
 }
 
+const redirectLoggingToStderr = () => {
+    console.log = (...args) => {
+        process.stderr.write('[stdout-intercepted] ' + args.join(' ') + '\n')
+    }
+    console.warn = (...args) => {
+        process.stderr.write('[stdout-intercepted] ' + args.join(' ') + '\n')
+    }
+    console.info = (...args) => {
+        process.stderr.write('[stdout-intercepted] ' + args.join(' ') + '\n')
+    }
+}
+
+// Redirect console logging to stderr to avoid down-stream dependencies from sending
+// non-JSON output to stdout which would crash the MCP server
+redirectLoggingToStderr()
 const server = new PwaStorefrontMCPServerHighLevel()
 server.run().catch(console.error)
