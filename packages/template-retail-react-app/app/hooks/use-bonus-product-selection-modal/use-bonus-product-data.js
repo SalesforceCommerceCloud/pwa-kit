@@ -106,22 +106,31 @@ export const useBonusProductData = (modalData) => {
 
     const normalizeProduct = (bonusProduct, foundProductData) => {
         const initial = foundProductData || productById.get(bonusProduct?.productId)
-        return initial
-            ? {
-                  productId: initial.id,
-                  ...initial,
-                  imageGroups: initial.imageGroups || [],
-                  variants: initial.variants || [],
-                  variationAttributes: initial.variationAttributes || [],
-                  type: initial.type || {set: false, bundle: false}
-              }
-            : {
-                  productId: bonusProduct?.productId,
-                  imageGroups: [],
-                  variants: [],
-                  variationAttributes: [],
-                  type: {set: false, bundle: false}
-              }
+
+        if (!initial) {
+            return {
+                productId: bonusProduct?.productId,
+                imageGroups: [],
+                variants: [],
+                variationAttributes: [],
+                type: {set: false, bundle: false}
+            }
+        }
+
+        // Find the specific variant if the bonusProduct.productId is a variant
+        const variant = initial.variants?.find((v) => v.productId === bonusProduct?.productId)
+
+        return {
+            productId: initial.id,
+            ...initial,
+            imageGroups: initial.imageGroups || [],
+            variants: initial.variants || [],
+            variationAttributes: initial.variationAttributes || [],
+            type: initial.type || {set: false, bundle: false},
+            // Include variant information if this is a specific variant
+            selectedVariant: variant || null,
+            variationValues: variant?.variationValues || {}
+        }
     }
 
     return {
