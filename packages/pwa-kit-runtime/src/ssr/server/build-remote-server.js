@@ -52,7 +52,7 @@ import {applyProxyRequestHeaders} from '../../utils/ssr-server/configure-proxy'
 import awsServerlessExpress from 'aws-serverless-express'
 import expressLogging from 'morgan'
 import logger from '../../utils/logger-instance'
-import {createProxyMiddleware, responseInterceptor} from 'http-proxy-middleware'
+import {createProxyMiddleware} from 'http-proxy-middleware'
 import {convertExpressRouteToRegex} from '../../utils/ssr-server/convert-express-route'
 
 /**
@@ -886,8 +886,8 @@ export const RemoteServerFactory = {
                     const regex = new RegExp(`^${basePathRegexEntry}${slasPrivateProxyPath}`)
                     return path.replace(regex, '')
                 },
-                selfHandleResponse: true,
-                onProxyReq: (proxyRequest, incomingRequest, res) => {
+                selfHandleResponse: false,
+                onProxyReq: (proxyRequest, incomingRequest) => {
                     applyProxyRequestHeaders({
                         proxyRequest,
                         incomingRequest,
@@ -911,33 +911,7 @@ export const RemoteServerFactory = {
                         // purpose so we don't want to overwrite the header for those calls.
                         proxyRequest.setHeader('Authorization', `Basic ${encodedSlasCredentials}`)
                     }
-                },
-                onProxyRes: responseInterceptor((responseBuffer, proxyRes, req, res) => {
-                    try {
-                        // If the passwordless login endpoint returns a 404, which corresponds to a user
-                        // email not being found, we mask it with a 200 OK response so that it is not
-                        // obvious that the user does not exist.
-                        // We do this to prevent user enumeration.
-                        if (
-                            req.path?.match(/\/oauth2\/passwordless\/login/) &&
-                            proxyRes.statusCode === 404
-                        ) {
-                            res.statusCode = 200
-                            res.statusMessage = 'OK'
-
-                            // When a /passwordless/login endpoint response returns 200, it has no body
-                            // so we return an empty body here to match an actual 200 response.
-                            return Buffer.from('', 'utf8')
-                        }
-                        return responseBuffer
-                    } catch (error) {
-                        console.error(
-                            'There is an error processing the response from SLAS. Returning original response.',
-                            error
-                        )
-                        return responseBuffer
-                    }
-                })
+                }
             })
         )
     },
