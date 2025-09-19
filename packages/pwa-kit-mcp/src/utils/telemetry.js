@@ -86,9 +86,7 @@ export class Telemetry {
         this.cliId = readCliIdIfPresent()
         this.started = false
         this.reporter = undefined
-        this.attributes = {...initialAttributes},
-        this.o11yUploadEndpoint =
-            'https://b2c-integration-spring-2025.my.site.com/webruntime/log/metrics'
+        this.attributes = {...initialAttributes}
     }
 
     addAttributes(attributes) {
@@ -151,7 +149,7 @@ export class Telemetry {
     }
 
     async createMcpTelemetryReporter() {
-        // Temporarily suppress console output during telemetry reporter creation to avoid 
+        // Temporarily suppress console output during telemetry reporter creation to avoid
         // non-JSON output from O11y reporter
         const originalConsoleLog = console.log
         console.log = () => {}
@@ -165,7 +163,7 @@ export class Telemetry {
             waitForConnection: true
         })
         this.reporter.start()
-        await new Promise(resolve => setTimeout(resolve, 1000))
+        await new Promise((resolve) => setTimeout(resolve, 1000))
         console.log = originalConsoleLog
     }
 }
