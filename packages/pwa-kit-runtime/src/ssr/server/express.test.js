@@ -1395,3 +1395,22 @@ describe('Base path tests', () => {
             })
     }, 15000)
 })
+
+describe('Forwarded headers', () => {
+    test('sets xForwardedOrigin from x-forwarded-* headers', async () => {
+        const app = RemoteServerFactory._createApp(opts())
+
+        app.get('/xfo', (req, res) => {
+            res.json({origin: res.locals.xForwardedOrigin || null})
+        })
+
+        return request(app)
+            .get('/xfo')
+            .set('x-forwarded-host', 'example.com')
+            .set('x-forwarded-proto', 'http')
+            .then((response) => {
+                expect(response.status).toBe(200)
+                expect(response.body.origin).toBe('http://example.com')
+            })
+    }, 15000)
+})
