@@ -176,6 +176,6 @@ const redirectLoggingToStderr = () => {
 
 // Redirect console logging to stderr to avoid down-stream dependencies from sending
 // non-JSON output to stdout which would crash the MCP server
-redirectLoggingToStderr()   
+redirectLoggingToStderr()
 const server = new PwaStorefrontMCPServerHighLevel()
 server.run().catch(console.error)
