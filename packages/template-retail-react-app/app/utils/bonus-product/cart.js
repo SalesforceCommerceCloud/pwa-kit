@@ -6,6 +6,7 @@
  */
 
 import {getPromotionIdsForProduct} from '@salesforce/retail-react-app/app/utils/bonus-product/common'
+import {findAvailableBonusDiscountLineItemIds} from '@salesforce/retail-react-app/app/utils/bonus-product/discovery'
 
 /**
  * Cart state operations and product relationship utilities for bonus products.
@@ -226,4 +227,110 @@ export const findAllBonusProductItemsToRemove = (basket, targetBonusProduct) => 
     })
 
     return itemsToRemove
+}
+
+/**
+ * Validates and caps the requested quantity based on maximum allowed
+ * @param {number} requestedQuantity - The quantity requested by user
+ * @param {number} maxAllowed - Maximum allowed quantity (can be null/undefined)
+ * @returns {number} - Validated and capped quantity (minimum 1)
+ */
+export const validateAndCapQuantity = (requestedQuantity, maxAllowed) => {
+    // Default quantity to 1 if not provided or invalid, ensure positive
+    let finalQuantity = Math.max(requestedQuantity || 1, 1)
+
+    // Cap quantity to remaining capacity (defensive programming)
+    if (maxAllowed && finalQuantity > maxAllowed) {
+        finalQuantity = maxAllowed
+    }
+
+    return finalQuantity
+}
+
+/**
+ * Distributes quantity across available bonus discount line items
+ * @param {number} quantity - Total quantity to distribute
+ * @param {Array<[string, number]>} availablePairs - Array of [bonusDiscountLineItemId, availableCapacity] pairs
+ * @returns {Array<{bonusDiscountLineItemId: string, quantity: number}>} - Distribution result
+ */
+export const distributeQuantityAcrossBonusItems = (quantity, availablePairs) => {
+    const distribution = []
+    let remainingQuantity = quantity
+
+    // Distribute quantity across available bonus discount line items
+    for (const [bonusDiscountLineItemId, availableCapacity] of availablePairs) {
+        if (remainingQuantity <= 0) {
+            break // All quantity has been distributed
+        }
+
+        // Calculate amount to add: minimum of remaining quantity and available capacity
+        const quantityToAdd = Math.min(remainingQuantity, availableCapacity)
+
+        distribution.push({
+            bonusDiscountLineItemId,
+            quantity: quantityToAdd
+        })
+
+        remainingQuantity -= quantityToAdd
+    }
+
+    return distribution
+}
+
+/**
+ * Builds product items from quantity distribution
+ * @param {Array<{bonusDiscountLineItemId: string, quantity: number}>} distribution - Quantity distribution
+ * @param {Object} variant - Product variant object
+ * @param {Object} product - Product object
+ * @returns {Array<Object>} - Array of product items ready for cart
+ */
+export const buildProductItemsFromDistribution = (distribution, variant, product) => {
+    return distribution.map(({bonusDiscountLineItemId, quantity}) => ({
+        productId: variant?.productId || product?.productId || product?.id,
+        price: variant?.price || product?.price,
+        quantity: parseInt(quantity, 10),
+        bonusDiscountLineItemId
+    }))
+}
+
+/**
+ * Processes products for bonus cart addition by validating quantities and distributing across available slots
+ * @param {Array} products - Array of {variant, quantity} objects
+ * @param {Object} basket - Current basket object
+ * @param {string} promotionId - The promotion ID
+ * @param {Object} product - The main product object
+ * @param {Function} getRemainingBonusQuantity - Function to get remaining bonus quantity
+ * @returns {Array<Object>} - Array of product items ready for cart
+ */
+export const processProductsForBonusCart = (
+    products,
+    basket,
+    promotionId,
+    product,
+    getRemainingBonusQuantity
+) => {
+    const productItems = []
+
+    // Process each item in the selection
+    for (const {variant, quantity} of products) {
+        // Validate and cap quantity
+        const maxAllowed = getRemainingBonusQuantity()
+        const finalQuantity = validateAndCapQuantity(quantity, maxAllowed)
+
+        // Get list of available bonus discount line items with their capacities
+        const availablePairs = findAvailableBonusDiscountLineItemIds(basket, promotionId)
+
+        if (availablePairs.length === 0) {
+            continue // Skip this item but process others
+        }
+
+        // Distribute quantity across available bonus discount line items
+        const distribution = distributeQuantityAcrossBonusItems(finalQuantity, availablePairs)
+
+        // Build product items from distribution
+        const items = buildProductItemsFromDistribution(distribution, variant, product)
+        productItems.push(...items)
+    }
+
+    return productItems
 }

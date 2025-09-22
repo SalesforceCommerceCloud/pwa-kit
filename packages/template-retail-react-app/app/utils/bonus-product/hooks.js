@@ -5,12 +5,14 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
+import {useMemo} from 'react'
 import {useProduct, useProducts} from '@salesforce/commerce-sdk-react'
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
 import {
     getAvailableBonusItemsForProduct,
     getRemainingAvailableBonusProductsForProduct
 } from '@salesforce/retail-react-app/app/utils/bonus-product/discovery'
+import {getBonusProductCountsForPromotion} from '@salesforce/retail-react-app/app/utils/bonus-product'
 
 /**
  * React hooks for bonus product data fetching and state management.
@@ -152,5 +154,25 @@ export const useRemainingAvailableBonusProductsForProduct = (productId) => {
         data: remainingBonusProducts,
         isLoading,
         hasPromotionData: Object.keys(productsWithPromotions || {}).length > 0
+    }
+}
+
+/**
+ * Hook to get bonus product counts for a specific promotion.
+ * This hook memoizes the calculation to prevent unnecessary re-computations.
+ *
+ * @param {Object} basket - The current basket data
+ * @param {string} promotionId - The promotion ID to calculate counts for
+ * @returns {Object} Object containing finalSelectedBonusItems and finalMaxBonusItems
+ */
+export const useBonusProductCounts = (basket, promotionId) => {
+    const {selectedBonusItems: finalSelectedBonusItems, maxBonusItems: finalMaxBonusItems} =
+        useMemo(() => {
+            return getBonusProductCountsForPromotion(basket, promotionId)
+        }, [basket, promotionId])
+
+    return {
+        finalSelectedBonusItems,
+        finalMaxBonusItems
     }
 }

@@ -39,13 +39,14 @@ const ProductItemList = ({
         <Stack spacing={4}>
             {productItems.map((productItem) => {
                 const isBonusProductItem = productItem.bonusProductLineItem
-                const isRemoving = removingItemIds.includes(productItem.itemId)
+                // Check if this product item (regular or bonus) is being removed
+                const isBeingRemoved = removingItemIds.includes(productItem.itemId)
 
                 return (
                     <ProductItem
                         key={productItem.itemId}
                         isBonusProduct={isBonusProductItem}
-                        isRemoving={isRemoving}
+                        isRemoving={isBeingRemoved}
                         containerStyles={{
                             borderX: 'none',
                             borderTop: 'none',
@@ -79,7 +80,7 @@ const ProductItemList = ({
                         onItemQuantityChange={onItemQuantityChange?.bind(this, productItem)}
                         showLoading={
                             (isCartItemLoading && selectedItem?.itemId === productItem.itemId) ||
-                            isRemoving
+                            isBeingRemoved
                         }
                         handleRemoveItem={onRemoveItemClick}
                         hideBorder={hideBorder}

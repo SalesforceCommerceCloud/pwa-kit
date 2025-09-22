@@ -17,6 +17,8 @@ import {
     findAvailableBonusDiscountLineItemIds,
     getBonusProductCountsForPromotion
 } from '@salesforce/retail-react-app/app/utils/bonus-product'
+import {useBonusProductCounts} from '@salesforce/retail-react-app/app/utils/bonus-product/hooks'
+import {processProductsForBonusCart} from '@salesforce/retail-react-app/app/utils/bonus-product/cart'
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
 import {useShopperBasketsMutationHelper} from '@salesforce/commerce-sdk-react'
 import {useProductViewModal} from '@salesforce/retail-react-app/app/hooks/use-product-view-modal'
@@ -114,6 +116,16 @@ jest.mock('@salesforce/retail-react-app/app/utils/bonus-product', () => ({
     }))
 }))
 
+// Mock bonus product hooks
+jest.mock('@salesforce/retail-react-app/app/utils/bonus-product/hooks', () => ({
+    useBonusProductCounts: jest.fn()
+}))
+
+// Mock bonus product cart helpers
+jest.mock('@salesforce/retail-react-app/app/utils/bonus-product/cart', () => ({
+    processProductsForBonusCart: jest.fn()
+}))
+
 // Mock current basket hook
 jest.mock('@salesforce/retail-react-app/app/hooks/use-current-basket', () => ({
     useCurrentBasket: jest.fn()
@@ -154,14 +166,24 @@ beforeEach(() => {
         aggregatedSelectedItems: 2
     })
 
-    // Mock getBonusProductCountsForPromotion to return default values
-    getBonusProductCountsForPromotion.mockReturnValue({
-        selectedBonusItems: 2,
-        maxBonusItems: 5
+    // Mock useBonusProductCounts to return default values
+    useBonusProductCounts.mockReturnValue({
+        finalSelectedBonusItems: 2,
+        finalMaxBonusItems: 5
     })
 
     // Mock findAvailableBonusDiscountLineItemIds to return array of pairs
     findAvailableBonusDiscountLineItemIds.mockReturnValue([['bonus-1', 1]])
+
+    // Mock processProductsForBonusCart to return product items
+    processProductsForBonusCart.mockReturnValue([
+        {
+            productId: 'test-product',
+            price: 99.99,
+            quantity: 1,
+            bonusDiscountLineItemId: 'bonus-1'
+        }
+    ])
 
     prependHandlersToServer([
         {
@@ -215,10 +237,10 @@ describe('BonusProductViewModal - Header Count Display', () => {
 
             useCurrentBasket.mockReturnValue({data: mockBasket, derivedData: {totalItems: 0}})
 
-            // Mock getBonusProductCountsForPromotion to return specific test values
-            getBonusProductCountsForPromotion.mockReturnValue({
-                selectedBonusItems,
-                maxBonusItems
+            // Mock useBonusProductCounts to return specific test values
+            useBonusProductCounts.mockReturnValue({
+                finalSelectedBonusItems: selectedBonusItems,
+                finalMaxBonusItems: maxBonusItems
             })
 
             renderWithProviders(
@@ -759,10 +781,20 @@ describe('BonusProductViewModal - Quantity Distribution Across Multiple BonusDis
     test('distributes quantity 3 across two discount line items (2+1)', async () => {
         const user = userEvent.setup()
 
-        // Mock findAvailableBonusDiscountLineItemIds to return pairs with available capacity
-        findAvailableBonusDiscountLineItemIds.mockReturnValue([
-            ['bonus-1', 2], // First discount item has capacity for 2
-            ['bonus-2', 1] // Second discount item has capacity for 1
+        // Mock processProductsForBonusCart to return expected distribution
+        processProductsForBonusCart.mockReturnValue([
+            {
+                productId: 'test-product',
+                price: 299.99,
+                quantity: 2,
+                bonusDiscountLineItemId: 'bonus-1'
+            },
+            {
+                productId: 'test-product', 
+                price: 299.99,
+                quantity: 1,
+                bonusDiscountLineItemId: 'bonus-2'
+            }
         ])
 
         mockAddItemToNewOrExistingBasket.mockResolvedValue({
@@ -810,10 +842,20 @@ describe('BonusProductViewModal - Quantity Distribution Across Multiple BonusDis
             aggregatedSelectedItems: 0
         })
 
-        // Mock findAvailableBonusDiscountLineItemIds to return pairs with total capacity of 3
-        findAvailableBonusDiscountLineItemIds.mockReturnValue([
-            ['bonus-1', 2],
-            ['bonus-2', 1]
+        // Mock processProductsForBonusCart to return capped distribution (quantity 4 capped to 3)
+        processProductsForBonusCart.mockReturnValue([
+            {
+                productId: 'test-product',
+                price: 299.99,
+                quantity: 2,
+                bonusDiscountLineItemId: 'bonus-1'
+            },
+            {
+                productId: 'test-product',
+                price: 299.99,
+                quantity: 1,
+                bonusDiscountLineItemId: 'bonus-2'
+            }
         ])
 
         mockAddItemToNewOrExistingBasket.mockResolvedValue({
@@ -854,9 +896,14 @@ describe('BonusProductViewModal - Quantity Distribution Across Multiple BonusDis
     test('handles single discount line item with partial capacity', async () => {
         const user = userEvent.setup()
 
-        // Mock findAvailableBonusDiscountLineItemIds to return single pair with limited capacity
-        findAvailableBonusDiscountLineItemIds.mockReturnValue([
-            ['bonus-1', 1] // Only 1 item capacity available
+        // Mock processProductsForBonusCart to return single item with limited capacity
+        processProductsForBonusCart.mockReturnValue([
+            {
+                productId: 'test-product',
+                price: 299.99,
+                quantity: 1,
+                bonusDiscountLineItemId: 'bonus-1'
+            }
         ])
 
         mockAddItemToNewOrExistingBasket.mockResolvedValue({
@@ -891,8 +938,8 @@ describe('BonusProductViewModal - Quantity Distribution Across Multiple BonusDis
     test('skips when no available discount line items', async () => {
         const user = userEvent.setup()
 
-        // Mock findAvailableBonusDiscountLineItemIds to return empty array
-        findAvailableBonusDiscountLineItemIds.mockReturnValue([])
+        // Mock processProductsForBonusCart to return empty array (no available items)
+        processProductsForBonusCart.mockReturnValue([])
 
         renderWithProviders(
             <BonusProductViewModal
@@ -915,18 +962,27 @@ describe('BonusProductViewModal - Quantity Distribution Across Multiple BonusDis
     test('distributes across three discount line items with varying capacities', async () => {
         const user = userEvent.setup()
 
-        // Mock findAvailableBonusDiscountLineItemIds to return three pairs
-        findAvailableBonusDiscountLineItemIds.mockReturnValue([
-            ['bonus-1', 3], // First has capacity for 3
-            ['bonus-2', 2], // Second has capacity for 2
-            ['bonus-3', 1] // Third has capacity for 1
-        ])
-
         // Update remaining bonus quantity to allow for 5 items
         getRemainingAvailableBonusProductsForProduct.mockReturnValue({
             aggregatedMaxBonusItems: 6,
             aggregatedSelectedItems: 1 // 6-1=5 remaining
         })
+
+        // Mock processProductsForBonusCart to return distribution across three items
+        processProductsForBonusCart.mockReturnValue([
+            {
+                productId: 'test-product',
+                price: 299.99,
+                quantity: 3,
+                bonusDiscountLineItemId: 'bonus-1'
+            },
+            {
+                productId: 'test-product',
+                price: 299.99,
+                quantity: 2,
+                bonusDiscountLineItemId: 'bonus-2'
+            }
+        ])
 
         mockAddItemToNewOrExistingBasket.mockResolvedValue({
             bonusDiscountLineItems: [],
