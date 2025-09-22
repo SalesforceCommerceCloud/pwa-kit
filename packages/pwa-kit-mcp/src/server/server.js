@@ -7,7 +7,6 @@
  */
 import {McpServer} from '@modelcontextprotocol/sdk/server/mcp.js'
 import {StdioServerTransport} from '@modelcontextprotocol/sdk/server/stdio.js'
-
 import {z} from 'zod'
 import {
     CreateAppGuidelinesTool,
@@ -16,6 +15,7 @@ import {
     TestWithPlaywrightTool,
     CreateNewPageTool
 } from '../tools'
+import {Telemetry} from '../utils/telemetry'
 
 // NOTE: This is a workaround to import JSON files as ES modules.
 // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -37,6 +37,32 @@ class PwaStorefrontMCPServerHighLevel {
                 }
             }
         )
+
+        // Wrap server.tool so all handlers are decorated with telemetry
+        const _origTool = this.server.tool.bind(this.server)
+        this.server.tool = (name, description, inputSchema, handler) => {
+            const wrappedHandler = async (...handlerArgs) => {
+                const start = Date.now()
+                try {
+                    const result = await handler(...handlerArgs)
+                    this.telemetry?.sendEvent('TOOL_CALLED', {
+                        toolName: name,
+                        runTimeMs: Date.now() - start,
+                        isError: false
+                    })
+                    return result
+                } catch (error) {
+                    this.telemetry?.sendEvent('TOOL_CALLED', {
+                        toolName: name,
+                        runTimeMs: Date.now() - start,
+                        isError: true
+                    })
+                    throw error
+                }
+            }
+            return _origTool(name, description, inputSchema, wrappedHandler)
+        }
+
         this.createNewComponentTool = new CreateNewComponentTool()
         this.createAppGuidelinesTool = new CreateAppGuidelinesTool()
         this.testWithPlaywrightTool = new TestWithPlaywrightTool()
@@ -81,9 +107,52 @@ class PwaStorefrontMCPServerHighLevel {
     }
 
     async run() {
+        // Read args passed by the MCP client (from mcp.json "args")
+        const argv = process.argv.slice(2)
+        const readFlag = (name, def) => {
+            const i = argv.findIndex((a) => a === `--${name}` || a.startsWith(`--${name}=`))
+            if (i === -1) return process.env[name.toUpperCase()] ?? def
+            const curr = argv[i]
+            if (curr.includes('=')) return curr.split('=').slice(1).join('=')
+            return argv[i + 1] ?? true
+        }
+
+        const noTelemetry = !!readFlag('no-telemetry', false)
         const transport = new StdioServerTransport()
         await this.server.connect(transport)
-        console.error('PWA Storefront MCP server (McpServer version) running on stdio')
+        // when telemetry is enabled, then send telemetry events
+        if (!noTelemetry) {
+            try {
+                this.telemetry = new Telemetry()
+                await this.telemetry.start()
+                const clientInfo = this.server.getClientVersion?.()
+                if (clientInfo) {
+                    this.telemetry.addAttributes({
+                        clientName: clientInfo.name,
+                        clientVersion: clientInfo.version
+                    })
+                }
+                this.telemetry?.sendEvent('SERVER_STATUS', {status: 'started'})
+            } catch (error) {
+                this.telemetry?.sendEvent('SERVER_STATUS', {
+                    status: 'error'
+                })
+                throw error
+            }
+            const sendStop = (signal) => {
+                this.telemetry?.sendEvent('SERVER_STATUS', {status: 'stopped', signal})
+                this.telemetry.stop()
+            }
+            process.on('exit', () => sendStop('exit'))
+            process.on('SIGINT', () => {
+                sendStop('SIGINT')
+                process.exit(0)
+            })
+            process.on('SIGTERM', () => {
+                sendStop('SIGTERM')
+                process.exit(0)
+            })
+        }
     }
 }
 
