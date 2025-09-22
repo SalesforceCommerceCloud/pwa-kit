@@ -16,6 +16,7 @@ It allows AI agents to query context-aware services like this server to help dev
 
 PWA-Kit-MCP is a local STDIO MCP Server that communicates via STDIO and operates in conjunction with a running local process, making it a fully locally installed MCP server. It provides an initial suite of MCP tools intended to standardize and optimize the developer workflow for PWA Kit storefront development. These tools facilitate project creation, supply development guidelines, enable the generation of new components and pages, and support site validation through performance and accessibility testing.
 
+_NOTE: Cursor provides multiple LLMs for your use. These PWA Kit MCP tools were tested with the Claude 4 Sonnet LLM_
 
 ## 🧰 Features
 
@@ -65,6 +66,27 @@ The PWA Kit MCP Server offers the following intelligent tools tailored to Salesf
 }
 ```
 _NOTE: Replace `{{path-to-app-directory}}` with the absolute path to your generated project's `app` subfolder. For example: `"/Users/username/mcp-server-folder/mystorefront/app"`._
+
+## 📊 Telemetry
+
+The server collects minimal, anonymous usage data to improve reliability and the developer experience.
+
+- **What's included**:
+  - Server lifecycle events: started, stopped, errors (`SERVER_STATUS`).
+  - Tool usage: tool name, run time, success/error (`TOOL_CALLED`).
+- **What’s not included**:
+  - No source code, file contents, prompts, or secrets are collected by default.
+- **How to disable/opt out**:
+  - Add `--no-telemetry` to your `args`.
+
+**Beta:** Telemetry for the PWA Kit MCP server is in beta and subject to change. Event names, payloads, and destinations may change without notice; the feature may be modified or removed.
+
+These are the available flags that you can pass to the `args` option. 
+
+| Flag Name | Description | Required? |Notes |
+| -----------------| -------| ------- | ----- |
+| `--no-telemetry` | Boolean flag to disable telemetry, the automatic collection of data for monitoring and analysis. | No | Telemetry is enabled by default, so specify this flag to disable it.  |
+| `"-y", "@salesforce/mcp"` | Tells `npx` to automatically install the `@salesforce/mcp` package instead of asking permission. | Yes | Don't change this.
 
 Once saved, Cursor will:
 
