@@ -5,6 +5,7 @@
   "license": "See license in LICENSE",
   "scripts": {
     "build": "pwa-kit-dev build",
+    "save-bundle": "pwa-kit-dev save-bundle",
     "format": "pwa-kit-dev format \"**/*.{js,jsx}\"",
     "lint": "pwa-kit-dev lint \"**/*.{js,jsx}\"",
     "lint:fix": "npm run lint -- --fix",
