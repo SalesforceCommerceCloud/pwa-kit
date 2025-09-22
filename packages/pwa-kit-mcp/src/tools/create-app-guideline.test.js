@@ -65,7 +65,7 @@ describe('CreateAppGuidelinesTool', () => {
             expect(tool).toMatchObject({
                 name: 'create_storefront_app',
                 description: expect.stringContaining(
-                    'This tool is used to provide the agent with the instructions'
+                    'Provide the agent with the instructions on how to use the @salesforce/pwa-kit-create-app CLI tool to create a new PWA Kit project.'
                 ),
                 inputSchema: EmptyJsonSchema,
                 fn: expect.any(Function)
