@@ -170,11 +170,59 @@ describe('CartSecondaryButtonGroup Edit button conditional rendering', () => {
     })
 })
 
-test('hides remove, wishlist, edit button and gift checkbox for bonus product', async () => {
+test('hides edit button and gift checkbox for bonus product but shows remove and wishlist buttons', async () => {
     renderWithProviders(<MockedComponent isBonusProduct={true} />)
 
     expect(screen.queryByRole('button', {name: /edit/i})).not.toBeInTheDocument()
-    expect(screen.queryByRole('button', {name: /remove/i})).not.toBeInTheDocument()
-    expect(screen.queryByRole('button', {name: /add to wishlist/i})).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', {name: /remove/i})).toBeInTheDocument() // Remove button should be shown for bonus products
+    expect(screen.queryByRole('button', {name: /add to wishlist/i})).toBeInTheDocument() // Wishlist button should now be shown for bonus products
     expect(screen.queryByRole('checkbox', {name: /this is a gift/i})).not.toBeInTheDocument()
+})
+
+describe('Bonus Product Wishlist Functionality', () => {
+    test('bonus product wishlist button is clickable and calls handler', async () => {
+        const onAddToWishlistClick = jest.fn()
+        const {user} = renderWithProviders(
+            <MockedComponent isBonusProduct={true} onAddToWishlistClick={onAddToWishlistClick} />
+        )
+
+        const wishlistButton = screen.getByRole('button', {name: /add to wishlist/i})
+        expect(wishlistButton).toBeInTheDocument()
+
+        await user.click(wishlistButton)
+        expect(onAddToWishlistClick).toHaveBeenCalledTimes(1)
+    })
+
+    test('regular product shows all buttons including wishlist', async () => {
+        const onAddToWishlistClick = jest.fn()
+        const {user} = renderWithProviders(
+            <MockedComponent isBonusProduct={false} onAddToWishlistClick={onAddToWishlistClick} />
+        )
+
+        // Regular products should show all buttons
+        expect(screen.getByRole('button', {name: /edit/i})).toBeInTheDocument()
+        expect(screen.getByRole('button', {name: /remove/i})).toBeInTheDocument()
+        expect(screen.getByRole('button', {name: /add to wishlist/i})).toBeInTheDocument()
+        expect(screen.getByRole('checkbox', {name: /this is a gift/i})).toBeInTheDocument()
+
+        // Test wishlist functionality works for regular products too
+        const wishlistButton = screen.getByRole('button', {name: /add to wishlist/i})
+        await user.click(wishlistButton)
+        expect(onAddToWishlistClick).toHaveBeenCalledTimes(1)
+    })
+
+    test('bonus product wishlist button receives correct product data', async () => {
+        const onAddToWishlistClick = jest.fn()
+        const {user} = renderWithProviders(
+            <MockedComponent isBonusProduct={true} onAddToWishlistClick={onAddToWishlistClick} />
+        )
+
+        const wishlistButton = screen.getByRole('button', {name: /add to wishlist/i})
+        await user.click(wishlistButton)
+
+        // Verify the handler was called with the bonus product variant
+        expect(onAddToWishlistClick).toHaveBeenCalledTimes(1)
+        const calledWithProduct = onAddToWishlistClick.mock.calls[0][0]
+        expect(calledWithProduct.bonusProductLineItem).toBe(true)
+    })
 })

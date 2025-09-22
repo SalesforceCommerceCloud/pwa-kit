@@ -126,6 +126,9 @@
   "action_card.action.remove": {
     "defaultMessage": "Remove"
   },
+  "add_to_cart_modal.button.select_bonus_products": {
+    "defaultMessage": "Select Bonus Products"
+  },
   "add_to_cart_modal.info.added_to_cart": {
     "defaultMessage": "{quantity} {quantity, plural, one {item} other {items}} added to cart"
   },
@@ -179,6 +182,33 @@
   },
   "bonus_product_item.label.quantity": {
     "defaultMessage": "Quantity: {quantity}"
+  },
+  "bonus_product_modal.button_select": {
+    "defaultMessage": "Select"
+  },
+  "bonus_product_modal.no_bonus_products": {
+    "defaultMessage": "No bonus products available"
+  },
+  "bonus_product_modal.no_image": {
+    "defaultMessage": "No Image"
+  },
+  "bonus_product_modal.title": {
+    "defaultMessage": "Select bonus product ({selected} of {max} selected)"
+  },
+  "bonus_product_view_modal.button.back_to_selection": {
+    "defaultMessage": "← Back to Selection"
+  },
+  "bonus_product_view_modal.button.view_cart": {
+    "defaultMessage": "View Cart"
+  },
+  "bonus_product_view_modal.modal_label": {
+    "defaultMessage": "Bonus product selection modal for {productName}"
+  },
+  "bonus_product_view_modal.title": {
+    "defaultMessage": "Select bonus product ({selected} of {max} selected)"
+  },
+  "bonus_product_view_modal.toast.item_added": {
+    "defaultMessage": "Bonus item added to cart"
   },
   "bonus_products_title.title.num_of_items": {
     "defaultMessage": "Bonus Products ({itemCount, plural, =0 {0 items} one {# item} other {# items}})"
