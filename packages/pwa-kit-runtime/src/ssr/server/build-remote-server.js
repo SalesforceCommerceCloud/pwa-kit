@@ -925,8 +925,8 @@ export const RemoteServerFactory = {
                     const regex = new RegExp(`^${basePathRegexEntry}${slasPrivateProxyPath}`)
                     return path.replace(regex, '')
                 },
-                selfHandleResponse: true,
-                onProxyReq: (proxyRequest, incomingRequest, res) => {
+                selfHandleResponse: false,
+                onProxyReq: (proxyRequest, incomingRequest) => {
                     applyProxyRequestHeaders({
                         proxyRequest,
                         incomingRequest,
