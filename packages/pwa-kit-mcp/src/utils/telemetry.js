@@ -31,7 +31,6 @@ const loadConfigValue = (key) => {
 }
 
 const customAppInsightsKey = loadConfigValue('applicationInsightsConnectionString')
-const o11yUploadEndpoint = loadConfigValue('o11yUploadEndpoint')
 
 const generateRandomId = () => randomBytes(20).toString('hex')
 
@@ -149,13 +148,7 @@ export class Telemetry {
     }
 
     /**
-     * Creates and initializes the MCP telemetry reporter with App Insights and/or o11y support.
-     *
-     * Configuration options:
-     * - To include App Insights: set enableAppInsights to true and provide the key field
-     * - To include o11y: set enableO11y to true and provide o11yUploadEndpoint and extensionName fields
-     * - If both are provided, telemetry will be sent to both App Insights and o11y
-     *
+     * Creates and initializes the MCP telemetry reporter with App Insights.
      * @returns {Promise<void>}
      */
     async createMcpTelemetryReporter() {
@@ -164,10 +157,6 @@ export class Telemetry {
             project: PROJECT,
             key: customAppInsightsKey,
             userId: this.cliId,
-            enableAppInsights: true,
-            enableO11y: true,
-            o11yUploadEndpoint: o11yUploadEndpoint,
-            extensionName: PROJECT,
             waitForConnection: true
         })
         this.reporter.start()

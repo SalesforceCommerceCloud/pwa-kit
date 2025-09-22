@@ -7,7 +7,6 @@
  */
 import {McpServer} from '@modelcontextprotocol/sdk/server/mcp.js'
 import {StdioServerTransport} from '@modelcontextprotocol/sdk/server/stdio.js'
-import {warn} from 'console'
 import {z} from 'zod'
 import {
     CreateAppGuidelinesTool,
@@ -27,7 +26,6 @@ const FALLBACK_VERSION = '0.1.0'
 class PwaStorefrontMCPServerHighLevel {
     constructor() {
         // Using McpServer instead of Server
-        this.telemetry = undefined
         this.server = new McpServer(
             {
                 name: 'pwa-kit-mcp',
@@ -122,12 +120,8 @@ class PwaStorefrontMCPServerHighLevel {
         const noTelemetry = !!readFlag('no-telemetry', false)
         const transport = new StdioServerTransport()
         await this.server.connect(transport)
-        console.error('PWA Storefront MCP server (McpServer version) running on stdio')
         // when telemetry is enabled, then send telemetry events
         if (!noTelemetry) {
-            warn(
-                'You acknowledge and agree that the MCP server may collect usage information, user environment, and crash reports for the purposes of providing services or functions that are relevant to use of the MCP server and product improvements.'
-            )
             try {
                 this.telemetry = new Telemetry()
                 await this.telemetry.start()
@@ -162,20 +156,5 @@ class PwaStorefrontMCPServerHighLevel {
     }
 }
 
-const redirectLoggingToStderr = () => {
-    console.log = (...args) => {
-        process.stderr.write('[stdout-intercepted] ' + args.join(' ') + '\n')
-    }
-    console.warn = (...args) => {
-        process.stderr.write('[stdout-intercepted] ' + args.join(' ') + '\n')
-    }
-    console.info = (...args) => {
-        process.stderr.write('[stdout-intercepted] ' + args.join(' ') + '\n')
-    }
-}
-
-// Redirect console logging to stderr to avoid down-stream dependencies from sending
-// non-JSON output to stdout which would crash the MCP server
-redirectLoggingToStderr()
 const server = new PwaStorefrontMCPServerHighLevel()
 server.run().catch(console.error)

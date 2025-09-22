@@ -64,40 +64,4 @@ describe('PwaStorefrontMCPServerHighLevel integration', () => {
 
         child.kill()
     }, 10000)
-
-    it('emits telemetry warning by default', async () => {
-        const child = spawn(BABEL_NODE_PATH, ['src/server/server.js'], {
-            cwd: process.cwd(),
-            stdio: ['ignore', 'pipe', 'pipe'],
-            env: {
-                ...process.env,
-                // Ensure any unusual env var does not disable telemetry implicitly
-                'NO-TELEMETRY': '',
-                WORKSPACE_FOLDER_PATHS: path.resolve(process.cwd(), '..', '..')
-            }
-        })
-
-        const expected =
-            'You acknowledge and agree that the MCP server may collect usage information'
-
-        const found = await new Promise((resolve) => {
-            let buffer = ''
-            const onData = (chunk) => {
-                buffer += chunk.toString()
-                if (buffer.includes(expected)) {
-                    child.stderr.off('data', onData)
-                    resolve(true)
-                }
-            }
-            child.stderr.on('data', onData)
-            setTimeout(() => {
-                child.stderr.off('data', onData)
-                resolve(false)
-            }, 5000)
-        })
-
-        expect(found).toBe(true)
-
-        child.kill()
-    }, 20000)
 })
