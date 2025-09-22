@@ -1,5 +1,6 @@
 ## v0.3.0-dev (Sep 4, 2025)
-- Added telemetry for MCP tools. [#3320](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3320) [#3328](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3328)
+- Added telemetry for MCP tools for Azure. [#3320](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3320) 
+- Added telemetry for MCP tools for o11y. [#3328](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3328)
 
 ## v0.2.0 (Sep 4, 2025)
 - Normalize tool names; Add introduction section for PWA Kit MCP and resize the images on README. [#3239](https://github.com/SalesforceCommerceCloud/pwa-kit/pull/3239)
