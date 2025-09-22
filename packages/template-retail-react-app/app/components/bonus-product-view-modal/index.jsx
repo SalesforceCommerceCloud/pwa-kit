@@ -25,10 +25,11 @@ import {useIntl} from 'react-intl'
 import {useShopperBasketsMutationHelper} from '@salesforce/commerce-sdk-react'
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
 import {
-    findAvailableBonusDiscountLineItemIds,
-    getRemainingAvailableBonusProductsForProduct,
-    getBonusProductCountsForPromotion
+    getRemainingAvailableBonusProductsForProduct
 } from '@salesforce/retail-react-app/app/utils/bonus-product'
+import {processProductsForBonusCart} from '@salesforce/retail-react-app/app/utils/bonus-product/cart'
+import {useBonusProductCounts} from '@salesforce/retail-react-app/app/utils/bonus-product/hooks'
+import {createGetRemainingBonusQuantity, checkForRemainingBonusProducts} from './utils'
 import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
 import {productViewModalTheme} from '@salesforce/retail-react-app/app/theme/components/project/product-view-modal'
 import {bonusProductViewModalTheme} from '@salesforce/retail-react-app/app/theme/components/project/bonus-product-view-modal'
@@ -72,11 +73,8 @@ const BonusProductViewModal = ({
     const {formatMessage} = intl
     const showToast = useToast()
 
-    // Calculate bonus counts using promotionId and utility method
-    const {selectedBonusItems: finalSelectedBonusItems, maxBonusItems: finalMaxBonusItems} =
-        useMemo(() => {
-            return getBonusProductCountsForPromotion(basket, promotionId)
-        }, [basket, promotionId])
+    // Calculate bonus counts using promotionId and custom hook
+    const {finalSelectedBonusItems, finalMaxBonusItems} = useBonusProductCounts(basket, promotionId)
 
     const messages = useMemo(
         () => ({
@@ -99,91 +97,29 @@ const BonusProductViewModal = ({
         [intl]
     )
 
-    // Helper function to calculate remaining bonus quantity
-    const getRemainingBonusQuantity = () => {
-        if (basket && product) {
-            const bonusData = getRemainingAvailableBonusProductsForProduct(basket, product.id, {
-                [product.id]: product
-            })
-            // Return remaining capacity: total allowed - already in cart
-            return bonusData.aggregatedMaxBonusItems - bonusData.aggregatedSelectedItems
-        }
-        return null
-    }
-
-    // Helper function to check if there are remaining bonus products available
-    const checkForRemainingBonusProducts = (updatedBasket) => {
-        if (!updatedBasket?.bonusDiscountLineItems) {
-            return false
-        }
-
-        // Check if any bonus discount line items still have available capacity
-        return updatedBasket.bonusDiscountLineItems.some((discountItem) => {
-            const maxBonusItems = discountItem.maxBonusItems || 0
-
-            // Calculate how many bonus products are already in cart for this specific discount item
-            const selectedQuantity =
-                updatedBasket.productItems
-                    ?.filter(
-                        (cartItem) =>
-                            cartItem.bonusProductLineItem &&
-                            cartItem.bonusDiscountLineItemId === discountItem.id
-                    )
-                    .reduce((total, cartItem) => total + (cartItem.quantity || 0), 0) || 0
-
-            // Return true if there's still capacity available
-            return selectedQuantity < maxBonusItems
-        })
-    }
+    // Create getRemainingBonusQuantity function using the factory
+    const getRemainingBonusQuantity = useMemo(
+        () =>
+            createGetRemainingBonusQuantity(
+                basket,
+                product,
+                getRemainingAvailableBonusProductsForProduct
+            ),
+        [basket, product]
+    )
 
     // Custom addToCart handler for bonus products that includes bonusDiscountLineItemId
     const handleAddToCart = useCallback(
         async (products) => {
             try {
-                const productItems = []
-
-                // Process each item in the selection
-                for (const {variant, quantity} of products) {
-                    // Default quantity to 1 if not provided or invalid, ensure positive
-                    let finalQuantity = Math.max(quantity || 1, 1)
-
-                    // Cap quantity to remaining capacity (defensive programming)
-                    const maxAllowed = getRemainingBonusQuantity()
-                    if (maxAllowed && finalQuantity > maxAllowed) {
-                        finalQuantity = maxAllowed
-                    }
-
-                    // Get list of available bonus discount line items with their capacities
-                    const availablePairs = findAvailableBonusDiscountLineItemIds(
-                        basket,
-                        promotionId
-                    )
-
-                    if (availablePairs.length === 0) {
-                        continue // Skip this item but process others
-                    }
-
-                    let remainingQuantity = finalQuantity
-
-                    // Distribute quantity across available bonus discount line items
-                    for (const [bonusDiscountLineItemId, availableCapacity] of availablePairs) {
-                        if (remainingQuantity <= 0) {
-                            break // All quantity has been distributed
-                        }
-
-                        // Calculate amount to add: minimum of remaining quantity and available capacity
-                        const quantityToAdd = Math.min(remainingQuantity, availableCapacity)
-
-                        productItems.push({
-                            productId: variant?.productId || product?.productId || product?.id,
-                            price: variant?.price || product?.price,
-                            quantity: parseInt(quantityToAdd, 10),
-                            bonusDiscountLineItemId
-                        })
-
-                        remainingQuantity -= quantityToAdd
-                    }
-                }
+                // Process products using the extracted helper function
+                const productItems = processProductsForBonusCart(
+                    products,
+                    basket,
+                    promotionId,
+                    product,
+                    getRemainingBonusQuantity
+                )
 
                 if (productItems.length === 0) {
                     return null
@@ -235,10 +171,10 @@ const BonusProductViewModal = ({
         },
         [
             addItemToNewOrExistingBasket,
-            product,
-            bonusDiscountLineItemId,
-            promotionId,
             basket,
+            promotionId,
+            product,
+            getRemainingBonusQuantity,
             onClose,
             navigate,
             onReturnToSelection,

@@ -7,8 +7,8 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import {Box, Heading} from '@salesforce/retail-react-app/app/components/shared/ui'
-import SelectBonusProductsButton from '../../../components/select-bonus-products-button'
-import {useBonusProductSelectionModalContext} from '../../../hooks/use-bonus-product-selection-modal'
+import SelectBonusProductsButton from '@salesforce/retail-react-app/app/components/select-bonus-products-button'
+import {useBonusProductSelectionModalContext} from '@salesforce/retail-react-app/app/hooks/use-bonus-product-selection-modal'
 
 /**
  * Fragment component that renders the "Select Bonus Products" card with promotion callout and selection button

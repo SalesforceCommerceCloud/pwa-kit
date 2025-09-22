@@ -6,7 +6,6 @@
  */
 import React from 'react'
 import {screen} from '@testing-library/react'
-import PropTypes from 'prop-types'
 import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
 import SelectBonusProductsCard from '@salesforce/retail-react-app/app/pages/cart/partials/select-bonus-products-card'
 import {useBonusProductSelectionModalContext} from '@salesforce/retail-react-app/app/hooks/use-bonus-product-selection-modal'
@@ -30,14 +29,6 @@ jest.mock('@salesforce/retail-react-app/app/components/select-bonus-products-but
             },
             'Select Bonus Products'
         )
-    }
-
-    MockSelectBonusProductsButton.propTypes = {
-        product: PropTypes.object,
-        bonusDiscountLineItems: PropTypes.array,
-        itemsAdded: PropTypes.number,
-        colorScheme: PropTypes.string,
-        onOpenBonusModal: PropTypes.func
     }
 
     return MockSelectBonusProductsButton
