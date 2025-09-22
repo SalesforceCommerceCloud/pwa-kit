@@ -24,12 +24,13 @@ import {useProductViewModal} from '@salesforce/retail-react-app/app/hooks/use-pr
 import {useIntl} from 'react-intl'
 import {useShopperBasketsMutationHelper} from '@salesforce/commerce-sdk-react'
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
-import {
-    getRemainingAvailableBonusProductsForProduct
-} from '@salesforce/retail-react-app/app/utils/bonus-product'
+import {getRemainingAvailableBonusProductsForProduct} from '@salesforce/retail-react-app/app/utils/bonus-product'
 import {processProductsForBonusCart} from '@salesforce/retail-react-app/app/utils/bonus-product/cart'
 import {useBonusProductCounts} from '@salesforce/retail-react-app/app/utils/bonus-product/hooks'
-import {createGetRemainingBonusQuantity, checkForRemainingBonusProducts} from './utils'
+import {
+    createGetRemainingBonusQuantity,
+    checkForRemainingBonusProducts
+} from '@salesforce/retail-react-app/app/components/bonus-product-view-modal/utils'
 import useNavigation from '@salesforce/retail-react-app/app/hooks/use-navigation'
 import {productViewModalTheme} from '@salesforce/retail-react-app/app/theme/components/project/product-view-modal'
 import {bonusProductViewModalTheme} from '@salesforce/retail-react-app/app/theme/components/project/bonus-product-view-modal'

@@ -8,11 +8,9 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import {Stack, Box, Heading} from '@salesforce/retail-react-app/app/components/shared/ui'
 import SelectBonusProductsCard from '@salesforce/retail-react-app/app/pages/cart/partials/select-bonus-products-card'
-import {
-    getBonusProductsInCartForProduct,
-    getRemainingAvailableBonusProductsForProduct,
-    shouldShowBonusProductSelection
-} from '@salesforce/retail-react-app/app/utils/bonus-product'
+import {getBonusProductsInCartForProduct} from '@salesforce/retail-react-app/app/utils/bonus-product/cart'
+import {getRemainingAvailableBonusProductsForProduct} from '@salesforce/retail-react-app/app/utils/bonus-product/discovery'
+import {shouldShowBonusProductSelection} from '@salesforce/retail-react-app/app/utils/bonus-product/business-logic'
 
 /**
  * Fragment component that renders cart items with bonus products grouped with their qualifying products

@@ -14,8 +14,7 @@ import mockProductDetail from '@salesforce/retail-react-app/app/mocks/variant-75
 import {prependHandlersToServer} from '@salesforce/retail-react-app/jest-setup'
 import {
     getRemainingAvailableBonusProductsForProduct,
-    findAvailableBonusDiscountLineItemIds,
-    getBonusProductCountsForPromotion
+    findAvailableBonusDiscountLineItemIds
 } from '@salesforce/retail-react-app/app/utils/bonus-product'
 import {useBonusProductCounts} from '@salesforce/retail-react-app/app/utils/bonus-product/hooks'
 import {processProductsForBonusCart} from '@salesforce/retail-react-app/app/utils/bonus-product/cart'
@@ -790,7 +789,7 @@ describe('BonusProductViewModal - Quantity Distribution Across Multiple BonusDis
                 bonusDiscountLineItemId: 'bonus-1'
             },
             {
-                productId: 'test-product', 
+                productId: 'test-product',
                 price: 299.99,
                 quantity: 1,
                 bonusDiscountLineItemId: 'bonus-2'
