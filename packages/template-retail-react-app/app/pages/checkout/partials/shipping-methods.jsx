@@ -245,7 +245,7 @@ export default function ShippingMethods() {
                     defaultMessage: 'Shipping & Gift Options',
                     id: 'shipping_options.title.shipping_gift_options'
                 })}
-                editing={step === STEPS.SHIPPING_OPTIONS && hasMissingShippingMethods}
+                editing={step === STEPS.SHIPPING_OPTIONS}
                 isLoading={true}
                 disabled={true}
                 onEdit={() => goToStep(STEPS.SHIPPING_OPTIONS)}
