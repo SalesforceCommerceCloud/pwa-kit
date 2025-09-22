@@ -191,6 +191,13 @@ describe('ShippingMethods', () => {
         })
 
         test('should show loading spinner for shipping methods when shipping methods are loading', async () => {
+            mockUseCurrentBasket.mockReturnValue({
+                data: null,
+                derivedData: {
+                    totalShippingCost: undefined
+                },
+                isLoading: true
+            })
             mockUseShippingMethodsForShipment.mockReturnValue({
                 data: null,
                 isLoading: true
