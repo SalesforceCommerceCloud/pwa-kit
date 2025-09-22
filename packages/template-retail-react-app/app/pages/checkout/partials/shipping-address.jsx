@@ -71,7 +71,7 @@ export default function ShippingAddress() {
     const selectedShippingAddress = selectedShipment?.shippingAddress
     const isAddressFilled = selectedShippingAddress?.address1 && selectedShippingAddress?.city
 
-    // Check if there are multiple product items (required for multi-shipping)
+    // Check if there are multiple product items to show option to ship to multiple addresses
     const productItemsCount = basket?.productItems?.length || 0
     const hasMultipleProductItems = productItemsCount > 1
 
