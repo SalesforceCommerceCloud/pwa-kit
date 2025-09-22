@@ -228,7 +228,9 @@ export default function ShippingMethods() {
         deliveryShipments.length > 0 && deliveryShipments.every((s) => s.shippingAddress)
 
     // Check if any shipments are missing shipping methods
-    const hasMissingShippingMethods = deliveryShipments.some((s) => !s.shippingMethod || !s.shippingMethod.id)
+    const hasMissingShippingMethods = deliveryShipments.some(
+        (s) => !s.shippingMethod || !s.shippingMethod.id
+    )
 
     const isFormValid =
         form.formState.isValid ||
