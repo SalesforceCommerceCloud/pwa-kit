@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import React from 'react'
+import React, {useState} from 'react'
 import {FormattedMessage, FormattedNumber, useIntl} from 'react-intl'
 import PropTypes from 'prop-types'
 import {
@@ -22,6 +22,8 @@ import {LockIcon, PaypalIcon} from '@salesforce/retail-react-app/app/components/
 import CreditCardFields from '@salesforce/retail-react-app/app/components/forms/credit-card-fields'
 import {useCurrency} from '@salesforce/retail-react-app/app/hooks'
 import {getCreditCardIcon} from '@salesforce/retail-react-app/app/utils/cc-utils'
+
+const INITIAL_DISPLAYED_SAVED_PAYMENT_INSTRUMENTS = 1
 
 const PaymentCardSummary = ({payment}) => {
     const CardIcon = getCreditCardIcon(payment?.paymentCard?.cardType)
@@ -54,6 +56,18 @@ const PaymentForm = ({
     const {formatMessage} = useIntl()
     const {data: basket} = useCurrentBasket()
     const {currency} = useCurrency()
+    const [showAllPaymentInstruments, setShowAllPaymentInstruments] = useState(false)
+
+    const hasSavedPaymentInstruments = savedPaymentInstruments?.length > 0
+    const displayedSavedPaymentInstruments =
+        savedPaymentInstruments?.slice(
+            0,
+            showAllPaymentInstruments
+                ? savedPaymentInstruments.length
+                : INITIAL_DISPLAYED_SAVED_PAYMENT_INSTRUMENTS
+        ) || []
+    const isDisplayingAllPaymentInstruments =
+        displayedSavedPaymentInstruments?.length === (savedPaymentInstruments?.length || 0)
 
     return (
         <form onSubmit={form.handleSubmit(onSubmit)}>
@@ -69,6 +83,24 @@ const PaymentForm = ({
                             })}
                             name="payment-selection"
                         >
+                            {displayedSavedPaymentInstruments?.map((paymentInstrument) => (
+                                <Box
+                                    py={3}
+                                    px={[4, 4, 6]}
+                                    bg="gray.50"
+                                    borderBottom="1px solid"
+                                    borderColor="gray.100"
+                                    key={paymentInstrument.paymentInstrumentId}
+                                >
+                                    <Radio
+                                        value={paymentInstrument.paymentInstrumentId}
+                                        key={paymentInstrument.paymentInstrumentId}
+                                    >
+                                        <PaymentCardSummary payment={paymentInstrument} />
+                                    </Radio>
+                                </Box>
+                            ))}
+
                             <Box
                                 py={3}
                                 px={[4, 4, 6]}
@@ -118,24 +150,6 @@ const PaymentForm = ({
                                 </Box>
                             </Collapse>
 
-                            {savedPaymentInstruments?.map((paymentInstrument) => (
-                                <Box
-                                    py={3}
-                                    px={[4, 4, 6]}
-                                    bg="gray.50"
-                                    borderBottom="1px solid"
-                                    borderColor="gray.100"
-                                    key={paymentInstrument.paymentInstrumentId}
-                                >
-                                    <Radio
-                                        value={paymentInstrument.paymentInstrumentId}
-                                        key={paymentInstrument.paymentInstrumentId}
-                                    >
-                                        <PaymentCardSummary payment={paymentInstrument} />
-                                    </Radio>
-                                </Box>
-                            ))}
-
                             <Box py={3} px={[4, 4, 6]} bg="gray.50" borderColor="gray.100">
                                 <Radio value="paypal">
                                     <Box py="2px">
@@ -145,6 +159,25 @@ const PaymentForm = ({
                             </Box>
                         </RadioGroup>
                     </Box>
+                    {!isDisplayingAllPaymentInstruments && hasSavedPaymentInstruments && (
+                        <Box py={3} px={[4, 4, 6]}>
+                            <button
+                                onClick={() =>
+                                    setShowAllPaymentInstruments(!showAllPaymentInstruments)
+                                }
+                            >
+                                <FormattedMessage
+                                    defaultMessage="View All ({count} more)"
+                                    id="payment_selection.button.view_all"
+                                    values={{
+                                        count:
+                                            savedPaymentInstruments?.length -
+                                            INITIAL_DISPLAYED_SAVED_PAYMENT_INSTRUMENTS
+                                    }}
+                                />
+                            </button>
+                        </Box>
+                    )}
                 </Stack>
             </Stack>
         </form>

@@ -533,12 +533,6 @@ describe('Checkout One Click', () => {
             expect(step1.getAllByText('123 Main St').length).toBeGreaterThan(0)
         }
 
-        // Submit selected shipping method if button present
-        const contToPayment = screen.queryByText(/continue to payment/i)
-        if (contToPayment) {
-            await user.click(contToPayment)
-        }
-
         // Wait for next step to render
         await waitFor(() => {
             expect(screen.getByTestId('sf-toggle-card-step-3-content')).not.toBeEmptyDOMElement()
@@ -587,6 +581,7 @@ describe('Checkout One Click', () => {
         const placeOrderBtn = await screen.findByTestId('place-order-button', undefined, {
             timeout: 5000
         })
+        expect(placeOrderBtn).toBeEnabled()
         // Place the order
         await user.click(placeOrderBtn)
 

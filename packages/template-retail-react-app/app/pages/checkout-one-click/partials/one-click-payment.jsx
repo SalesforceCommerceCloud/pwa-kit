@@ -46,14 +46,12 @@ const Payment = ({
     setEnableUserRegistration,
     registeredUserChoseGuest = false,
     onPaymentMethodSaved,
-    onSavePreferenceChange,
-    selectedPaymentMethod,
-    onSelectedPaymentMethodChange
+    onSavePreferenceChange
 }) => {
     const {formatMessage} = useIntl()
     const currentBasketQuery = useCurrentBasket()
     const {data: basket} = currentBasketQuery
-    const {data: customer} = useCurrentCustomer()
+    const {data: customer, isLoading: isCustomerLoading} = useCurrentCustomer()
     const {isGuest} = useCustomerType()
     const selectedShippingAddress = basket?.shipments && basket?.shipments[0]?.shippingAddress
     const selectedBillingAddress = basket?.billingAddress
@@ -65,6 +63,9 @@ const Payment = ({
     // Track whether user wants to save the payment method
     const [shouldSavePaymentMethod, setShouldSavePaymentMethod] = useState(false)
     const [isApplyingSavedPayment, setIsApplyingSavedPayment] = useState(false)
+    const [selectedPaymentMethod, setSelectedPaymentMethod] = useState(
+        appliedPayment?.paymentMethodId || 'cc'
+    )
 
     // Callback when user changes save preference
     const handleSavePreferenceChange = (shouldSave) => {
@@ -192,19 +193,16 @@ const Payment = ({
     const autoAppliedRef = useRef(false)
     useEffect(() => {
         const autoSelectSavedPayment = async () => {
-            if (step !== STEPS.PAYMENT) return
+            if (step !== STEPS.PAYMENT || isCustomerLoading) return
             if (autoAppliedRef.current) return
-
             const isRegistered = customer?.isRegistered
             const hasSaved = customer?.paymentInstruments?.length > 0
             const alreadyApplied = (basket?.paymentInstruments?.length || 0) > 0
             if (!isRegistered || !hasSaved || alreadyApplied) return
-
             autoAppliedRef.current = true
             const preferred =
                 customer.paymentInstruments.find((pi) => pi.preferred === true) ||
                 customer.paymentInstruments[0]
-
             try {
                 setIsApplyingSavedPayment(true)
                 await addPaymentInstrumentToBasket({
@@ -217,6 +215,8 @@ const Payment = ({
                 // After auto-apply, if we already have a shipping address, submit billing so we can advance
                 if (selectedShippingAddress) {
                     await onBillingSubmit()
+                    // Ensure basket is refreshed with payment & billing
+                    await currentBasketQuery.refetch()
                     // Stay on Payment; place-order button is rendered on Payment step in this flow
                 }
                 // Ensure basket is refreshed with payment & billing
@@ -228,9 +228,26 @@ const Payment = ({
                 setIsApplyingSavedPayment(false)
             }
         }
-
         autoSelectSavedPayment()
-    }, [step])
+    }, [step, isCustomerLoading])
+
+    const onPaymentMethodChange = async (paymentInstrumentId) => {
+        if (paymentInstrumentId === 'cc') {
+            setSelectedPaymentMethod('cc')
+        } else {
+            setIsApplyingSavedPayment(true)
+            await addPaymentInstrumentToBasket({
+                parameters: {basketId: basket?.basketId},
+                body: {
+                    paymentMethodId: 'CREDIT_CARD',
+                    customerPaymentInstrumentId: paymentInstrumentId
+                }
+            })
+            await currentBasketQuery.refetch()
+            setIsApplyingSavedPayment(false)
+            setSelectedPaymentMethod(paymentInstrumentId)
+        }
+    }
 
     const onBillingSubmit = async () => {
         // When billing is same as shipping, skip form validation and use shipping address directly
@@ -261,6 +278,7 @@ const Payment = ({
                     paymentInstrumentId: appliedPayment.paymentInstrumentId
                 }
             })
+            setSelectedPaymentMethod('cc')
         } catch (e) {
             showError()
         }
@@ -296,7 +314,9 @@ const Payment = ({
                 editing={step === STEPS.PAYMENT}
                 isLoading={
                     paymentMethodForm.formState.isSubmitting ||
-                    billingAddressForm.formState.isSubmitting
+                    billingAddressForm.formState.isSubmitting ||
+                    isApplyingSavedPayment ||
+                    (isCustomerLoading && !isGuest)
                 }
                 disabled={appliedPayment == null}
                 onEdit={() => goToStep(STEPS.PAYMENT)}
@@ -311,16 +331,16 @@ const Payment = ({
                     </Box>
 
                     <Stack spacing={6}>
-                        {isApplyingSavedPayment ? null : !appliedPayment?.paymentCard ? (
+                        {isApplyingSavedPayment || !appliedPayment?.paymentCard ? (
                             <PaymentForm
                                 form={paymentMethodForm}
                                 onSubmit={onSubmit}
                                 savedPaymentInstruments={customer.paymentInstruments}
-                                onPaymentMethodChange={onSelectedPaymentMethodChange}
+                                onPaymentMethodChange={onPaymentMethodChange}
                                 selectedPaymentMethod={selectedPaymentMethod}
                             >
                                 {/* Show for returning users (registered) while editing/adding a new card */}
-                                {isGuest && (
+                                {!isGuest && (
                                     <SavePaymentMethod
                                         paymentInstrument={currentFormPayment}
                                         onSaved={handleSavePreferenceChange}
@@ -466,11 +486,7 @@ Payment.propTypes = {
     /** Callback when payment method is successfully saved */
     onPaymentMethodSaved: PropTypes.func,
     /** Callback when save preference changes */
-    onSavePreferenceChange: PropTypes.func,
-    /** Currently selected payment method */
-    selectedPaymentMethod: PropTypes.string,
-    /** Callback when selected payment method changes */
-    onSelectedPaymentMethodChange: PropTypes.func
+    onSavePreferenceChange: PropTypes.func
 }
 
 const PaymentCardSummary = ({payment}) => {

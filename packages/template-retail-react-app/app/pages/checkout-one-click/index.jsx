@@ -58,7 +58,7 @@ const CheckoutOneClick = () => {
     const [enableUserRegistration, setEnableUserRegistration] = useState(false)
     const [registeredUserChoseGuest, setRegisteredUserChoseGuest] = useState(false)
     const [shouldSavePaymentMethod, setShouldSavePaymentMethod] = useState(false)
-    const [selectedPaymentMethod, setSelectedPaymentMethod] = useState('cc')
+
     const currentBasketQuery = useCurrentBasket()
     const {data: basket} = currentBasketQuery
     const [error] = useState()
@@ -84,10 +84,6 @@ const CheckoutOneClick = () => {
     // that have been applied to the basket via addPaymentInstrumentToBasket
     const appliedPayment = basket?.paymentInstruments && basket?.paymentInstruments[0]
 
-    // Check if a saved payment instrument is selected (not 'cc' or 'paypal')
-    const isSavedPaymentSelected =
-        selectedPaymentMethod !== 'cc' && selectedPaymentMethod !== 'paypal'
-
     const {mutateAsync: addPaymentInstrumentToBasket} = useShopperBasketsMutation(
         ShopperBasketsMutations.AddPaymentInstrumentToBasket
     )
@@ -104,30 +100,6 @@ const CheckoutOneClick = () => {
         setShouldSavePaymentMethod(shouldSave)
     }
 
-    const handleSelectedPaymentMethodChange = (paymentMethod) => {
-        setSelectedPaymentMethod(paymentMethod)
-    }
-
-    const isPlaceOrderButtonDisabled = () => {
-        // Enable button if there is an applied payment
-        if (appliedPayment) {
-            return false
-        }
-
-        // Enable button if a saved payment method is selected
-        if (isSavedPaymentSelected) {
-            return false
-        }
-
-        // Enable button if paymentMethodForm is valid and 'cc' is the current payment method selection
-        if (paymentMethodForm.formState.isValid && selectedPaymentMethod === 'cc') {
-            return false
-        }
-
-        // Disable button in all other cases
-        return true
-    }
-
     const showError = (message) => {
         showToast({
             title: message || formatMessage(API_ERROR_MESSAGE),
@@ -137,16 +109,12 @@ const CheckoutOneClick = () => {
 
     // Form for payment method
     const paymentMethodForm = useForm({
-        defaultValues: appliedPayment
-            ? {
-                  holder: appliedPayment.paymentCard?.holder || '',
-                  number: appliedPayment.paymentCard?.maskedNumber || '',
-                  cardType: appliedPayment.paymentCard?.cardType || '',
-                  expiry: `${
-                      appliedPayment.paymentCard?.expirationMonth?.toString().padStart(2, '0') || ''
-                  }/${appliedPayment.paymentCard?.expirationYear?.toString().slice(-2) || ''}`
-              }
-            : {}
+        defaultValues: {
+            holder: '',
+            number: '',
+            cardType: '',
+            expiry: ''
+        }
     })
 
     // Form for billing address
@@ -369,32 +337,11 @@ const CheckoutOneClick = () => {
         }
     }
 
-    // Handle payment processing for different scenarios
-    const processPayment = async () => {
+    const onPlaceOrder = paymentMethodForm.handleSubmit(async (paymentFormValues) => {
         try {
-            // Check if a saved payment instrument is selected
-            if (isSavedPaymentSelected) {
-                // Apply the selected saved payment instrument to the basket
-                await addPaymentInstrumentToBasket({
-                    parameters: {basketId: basket?.basketId},
-                    body: {
-                        paymentMethodId: 'CREDIT_CARD',
-                        customerPaymentInstrumentId: selectedPaymentMethod
-                    }
-                })
-                // Refresh basket to get the applied payment instrument
-                await currentBasketQuery.refetch()
-            } else if (!appliedPayment) {
-                // No saved payment selected and no payment applied, validate and submit new payment
-                const isFormValid = await paymentMethodForm.trigger()
-                if (!isFormValid) {
-                    return false
-                }
-                const paymentFormValues = paymentMethodForm.getValues()
+            if (!appliedPayment) {
                 await onPaymentSubmit(paymentFormValues)
             } else {
-                // Payment already applied, update shopperPaymentInstrument for saving
-                const paymentFormValues = paymentMethodForm.getValues()
                 if (paymentFormValues && paymentFormValues.expiry) {
                     const [expirationMonth, expirationYear] = paymentFormValues.expiry.split('/')
                     shopperPaymentInstrument = {
@@ -416,21 +363,6 @@ const CheckoutOneClick = () => {
                     }
                 }
             }
-            return true
-        } catch (error) {
-            showError()
-            return false
-        }
-    }
-
-    // Unified place order handler that works for all scenarios
-    const onPlaceOrder = async () => {
-        try {
-            // Process payment based on current state
-            const paymentProcessed = await processPayment()
-            if (!paymentProcessed) {
-                return
-            }
 
             // If successful `onBillingSubmit` returns the updated basket. If the form was invalid on
             // submit, `undefined` is returned.
@@ -442,7 +374,7 @@ const CheckoutOneClick = () => {
         } catch (error) {
             showError()
         }
-    }
+    })
 
     useEffect(() => {
         if (error || step === 4) {
@@ -482,8 +414,6 @@ const CheckoutOneClick = () => {
                                 billingAddressForm={billingAddressForm}
                                 registeredUserChoseGuest={registeredUserChoseGuest}
                                 onSavePreferenceChange={handleSavePreferenceChange}
-                                selectedPaymentMethod={selectedPaymentMethod}
-                                onSelectedPaymentMethodChange={handleSelectedPaymentMethodChange}
                             />
 
                             {step >= STEPS.PAYMENT && (
@@ -493,7 +423,10 @@ const CheckoutOneClick = () => {
                                             w="full"
                                             onClick={onPlaceOrder}
                                             isLoading={isLoading}
-                                            isDisabled={isPlaceOrderButtonDisabled()}
+                                            isDisabled={
+                                                !paymentMethodForm.formState.isValid &&
+                                                !appliedPayment
+                                            }
                                             data-testid="place-order-button"
                                             size="lg"
                                             px={8}

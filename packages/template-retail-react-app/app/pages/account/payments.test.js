@@ -8,7 +8,6 @@ import React from 'react'
 import {screen, waitFor} from '@testing-library/react'
 import {renderWithProviders} from '@salesforce/retail-react-app/app/utils/test-utils'
 import AccountPayments from '@salesforce/retail-react-app/app/pages/account/payments'
-import {useShopperCustomersMutation} from '@salesforce/commerce-sdk-react'
 import {useToast} from '@salesforce/retail-react-app/app/hooks/use-toast'
 
 // Make card validation always pass to simplify form submission in tests
@@ -149,7 +148,29 @@ describe('AccountPayments', () => {
         // Save
         await user.click(screen.getByRole('button', {name: /save/i}))
 
-        await waitFor(() => expect(mockMutate).toHaveBeenCalled())
+        await waitFor(() =>
+            expect(mockMutate).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    body: {
+                        paymentCard: {
+                            cardType: 'Visa',
+                            expirationMonth: 12,
+                            expirationYear: 20,
+                            holder: 'John Smith',
+                            issueNumber: '',
+                            number: '4111111111111111',
+                            validFromMonth: 1,
+                            validFromYear: 2020
+                        },
+                        paymentMethodId: 'CREDIT_CARD'
+                    },
+                    parameters: {
+                        customerId: 'test-customer-id'
+                    }
+                }),
+                {onSuccess: expect.anything()}
+            )
+        )
         // Should refetch after save
         expect(mockRefetch).toHaveBeenCalled()
         // Toast shown
