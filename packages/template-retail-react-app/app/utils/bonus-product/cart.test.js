@@ -539,14 +539,18 @@ describe('Bonus Product Cart Utilities', () => {
                                 productId: 'suit-product-1',
                                 quantity: 1,
                                 shipmentId: 'some-shipment',
-                                priceAdjustments: [{promotionId: 'BonusProductOnOrderOfAmountAbove250'}]
+                                priceAdjustments: [
+                                    {promotionId: 'BonusProductOnOrderOfAmountAbove250'}
+                                ]
                             },
                             {
                                 itemId: 'suit-2',
                                 productId: 'suit-product-1',
                                 quantity: 1,
                                 shipmentId: 'another-shipment',
-                                priceAdjustments: [{promotionId: 'BonusProductOnOrderOfAmountAbove250'}]
+                                priceAdjustments: [
+                                    {promotionId: 'BonusProductOnOrderOfAmountAbove250'}
+                                ]
                             },
                             {
                                 itemId: 'tie-1',
@@ -598,14 +602,18 @@ describe('Bonus Product Cart Utilities', () => {
                                 productId: 'suit-product-1',
                                 quantity: 1,
                                 shipmentId: 'pickup-shipment',
-                                priceAdjustments: [{promotionId: 'BonusProductOnOrderOfAmountAbove250'}]
+                                priceAdjustments: [
+                                    {promotionId: 'BonusProductOnOrderOfAmountAbove250'}
+                                ]
                             },
                             {
                                 itemId: 'orphan-suit',
                                 productId: 'suit-product-1',
                                 quantity: 1,
                                 shipmentId: 'missing-shipment', // This shipment doesn't exist
-                                priceAdjustments: [{promotionId: 'BonusProductOnOrderOfAmountAbove250'}]
+                                priceAdjustments: [
+                                    {promotionId: 'BonusProductOnOrderOfAmountAbove250'}
+                                ]
                             },
                             {
                                 itemId: 'tie-1',
@@ -657,14 +665,18 @@ describe('Bonus Product Cart Utilities', () => {
                                 productId: 'suit-product-1',
                                 quantity: 1,
                                 shipmentId: 'pickup-shipment',
-                                priceAdjustments: [{promotionId: 'BonusProductOnOrderOfAmountAbove250'}]
+                                priceAdjustments: [
+                                    {promotionId: 'BonusProductOnOrderOfAmountAbove250'}
+                                ]
                             },
                             {
                                 itemId: 'null-shipment-suit',
                                 productId: 'suit-product-1',
                                 quantity: 1,
                                 shipmentId: null, // Null shipmentId
-                                priceAdjustments: [{promotionId: 'BonusProductOnOrderOfAmountAbove250'}]
+                                priceAdjustments: [
+                                    {promotionId: 'BonusProductOnOrderOfAmountAbove250'}
+                                ]
                             },
                             {
                                 itemId: 'tie-1',
@@ -725,21 +737,27 @@ describe('Bonus Product Cart Utilities', () => {
                                 productId: 'suit-product-1',
                                 quantity: 1,
                                 shipmentId: 'good-pickup',
-                                priceAdjustments: [{promotionId: 'BonusProductOnOrderOfAmountAbove250'}]
+                                priceAdjustments: [
+                                    {promotionId: 'BonusProductOnOrderOfAmountAbove250'}
+                                ]
                             },
                             {
                                 itemId: 'null-method-suit',
                                 productId: 'suit-product-1',
                                 quantity: 1,
                                 shipmentId: 'null-method',
-                                priceAdjustments: [{promotionId: 'BonusProductOnOrderOfAmountAbove250'}]
+                                priceAdjustments: [
+                                    {promotionId: 'BonusProductOnOrderOfAmountAbove250'}
+                                ]
                             },
                             {
                                 itemId: 'undefined-suit',
                                 productId: 'suit-product-1',
                                 quantity: 1,
                                 shipmentId: 'undefined-pickup',
-                                priceAdjustments: [{promotionId: 'BonusProductOnOrderOfAmountAbove250'}]
+                                priceAdjustments: [
+                                    {promotionId: 'BonusProductOnOrderOfAmountAbove250'}
+                                ]
                             },
                             {
                                 itemId: 'tie-1',
@@ -802,7 +820,9 @@ describe('Bonus Product Cart Utilities', () => {
                                 productId: 'suit-product-1',
                                 quantity: 1,
                                 shipmentId: 'delivery-shipment',
-                                priceAdjustments: [{promotionId: 'BonusProductOnOrderOfAmountAbove250'}]
+                                priceAdjustments: [
+                                    {promotionId: 'BonusProductOnOrderOfAmountAbove250'}
+                                ]
                             },
                             {
                                 itemId: 'tie-1',
@@ -886,7 +906,9 @@ describe('Bonus Product Cart Utilities', () => {
                                 productId: 'suit-product-1',
                                 quantity: 1,
                                 shipmentId: 'pickup-shipment',
-                                priceAdjustments: [{promotionId: 'BonusProductOnOrderOfAmountAbove250'}]
+                                priceAdjustments: [
+                                    {promotionId: 'BonusProductOnOrderOfAmountAbove250'}
+                                ]
                             }
                             // No bonus products in cart
                         ]
@@ -924,7 +946,9 @@ describe('Bonus Product Cart Utilities', () => {
                                 productId: 'suit-product-1',
                                 quantity: 1,
                                 shipmentId: 'pickup-shipment',
-                                priceAdjustments: [{promotionId: 'BonusProductOnOrderOfAmountAbove250'}]
+                                priceAdjustments: [
+                                    {promotionId: 'BonusProductOnOrderOfAmountAbove250'}
+                                ]
                             },
                             {
                                 itemId: 'tie-1',
@@ -981,7 +1005,9 @@ describe('Bonus Product Cart Utilities', () => {
                                 productId: 'suit-product-1',
                                 quantity: 3,
                                 shipmentId: 'delivery-shipment',
-                                priceAdjustments: [{promotionId: 'BonusProductOnOrderOfAmountAbove250'}]
+                                priceAdjustments: [
+                                    {promotionId: 'BonusProductOnOrderOfAmountAbove250'}
+                                ]
                             },
                             // Pickup suit with low quantity (position 1)
                             {
@@ -989,7 +1015,9 @@ describe('Bonus Product Cart Utilities', () => {
                                 productId: 'suit-product-1',
                                 quantity: 1,
                                 shipmentId: 'pickup-shipment',
-                                priceAdjustments: [{promotionId: 'BonusProductOnOrderOfAmountAbove250'}]
+                                priceAdjustments: [
+                                    {promotionId: 'BonusProductOnOrderOfAmountAbove250'}
+                                ]
                             },
                             // 8 bonus ties
                             {
@@ -1051,7 +1079,9 @@ describe('Bonus Product Cart Utilities', () => {
                                 productId: 'suit-product-1',
                                 quantity: 2,
                                 shipmentId: 'pickup-shipment-a',
-                                priceAdjustments: [{promotionId: 'BonusProductOnOrderOfAmountAbove250'}]
+                                priceAdjustments: [
+                                    {promotionId: 'BonusProductOnOrderOfAmountAbove250'}
+                                ]
                             },
                             // Second pickup suit with low quantity (position 1)
                             {
@@ -1059,7 +1089,9 @@ describe('Bonus Product Cart Utilities', () => {
                                 productId: 'suit-product-1',
                                 quantity: 1,
                                 shipmentId: 'pickup-shipment-b',
-                                priceAdjustments: [{promotionId: 'BonusProductOnOrderOfAmountAbove250'}]
+                                priceAdjustments: [
+                                    {promotionId: 'BonusProductOnOrderOfAmountAbove250'}
+                                ]
                             },
                             // 6 bonus ties
                             {
@@ -1121,14 +1153,18 @@ describe('Bonus Product Cart Utilities', () => {
                                 productId: 'suit-product-1',
                                 quantity: 1,
                                 shipmentId: 'delivery-shipment',
-                                priceAdjustments: [{promotionId: 'BonusProductOnOrderOfAmountAbove250'}]
+                                priceAdjustments: [
+                                    {promotionId: 'BonusProductOnOrderOfAmountAbove250'}
+                                ]
                             },
                             {
                                 itemId: 'delivery-suit-2',
                                 productId: 'suit-product-1',
                                 quantity: 1,
                                 shipmentId: 'delivery-shipment',
-                                priceAdjustments: [{promotionId: 'BonusProductOnOrderOfAmountAbove250'}]
+                                priceAdjustments: [
+                                    {promotionId: 'BonusProductOnOrderOfAmountAbove250'}
+                                ]
                             },
                             // Pickup suits (added later)
                             {
@@ -1136,14 +1172,18 @@ describe('Bonus Product Cart Utilities', () => {
                                 productId: 'suit-product-1',
                                 quantity: 1,
                                 shipmentId: 'pickup-shipment',
-                                priceAdjustments: [{promotionId: 'BonusProductOnOrderOfAmountAbove250'}]
+                                priceAdjustments: [
+                                    {promotionId: 'BonusProductOnOrderOfAmountAbove250'}
+                                ]
                             },
                             {
                                 itemId: 'pickup-suit-2',
                                 productId: 'suit-product-1',
                                 quantity: 1,
                                 shipmentId: 'pickup-shipment',
-                                priceAdjustments: [{promotionId: 'BonusProductOnOrderOfAmountAbove250'}]
+                                priceAdjustments: [
+                                    {promotionId: 'BonusProductOnOrderOfAmountAbove250'}
+                                ]
                             },
                             // Only 3 bonus ties (insufficient for all 4 suits)
                             {
@@ -1184,7 +1224,7 @@ describe('Bonus Product Cart Utilities', () => {
                         insufficientBonusBasket.productItems[1], // delivery-suit-2
                         baseProductsWithPromotions
                     )
-                    expect(delivery2Result.length).toBe(0) // No allocation left
+                    expect(delivery2Result).toHaveLength(0) // No allocation left
                 })
             })
 
@@ -1225,35 +1265,45 @@ describe('Bonus Product Cart Utilities', () => {
                                 productId: 'suit-product-1',
                                 quantity: 1,
                                 shipmentId: 'delivery-shipment',
-                                priceAdjustments: [{promotionId: 'BonusProductOnOrderOfAmountAbove250'}]
+                                priceAdjustments: [
+                                    {promotionId: 'BonusProductOnOrderOfAmountAbove250'}
+                                ]
                             },
                             {
                                 itemId: 'pickup-suit-1',
                                 productId: 'suit-product-1',
                                 quantity: 1,
                                 shipmentId: 'pickup-shipment-1',
-                                priceAdjustments: [{promotionId: 'BonusProductOnOrderOfAmountAbove250'}]
+                                priceAdjustments: [
+                                    {promotionId: 'BonusProductOnOrderOfAmountAbove250'}
+                                ]
                             },
                             {
                                 itemId: 'delivery-suit-2',
                                 productId: 'suit-product-1',
                                 quantity: 2,
                                 shipmentId: 'delivery-shipment',
-                                priceAdjustments: [{promotionId: 'BonusProductOnOrderOfAmountAbove250'}]
+                                priceAdjustments: [
+                                    {promotionId: 'BonusProductOnOrderOfAmountAbove250'}
+                                ]
                             },
                             {
                                 itemId: 'pickup-suit-2',
                                 productId: 'suit-product-1',
                                 quantity: 1,
                                 shipmentId: 'pickup-shipment-2',
-                                priceAdjustments: [{promotionId: 'BonusProductOnOrderOfAmountAbove250'}]
+                                priceAdjustments: [
+                                    {promotionId: 'BonusProductOnOrderOfAmountAbove250'}
+                                ]
                             },
                             {
                                 itemId: 'delivery-suit-3',
                                 productId: 'suit-product-1',
                                 quantity: 1,
                                 shipmentId: 'delivery-shipment',
-                                priceAdjustments: [{promotionId: 'BonusProductOnOrderOfAmountAbove250'}]
+                                priceAdjustments: [
+                                    {promotionId: 'BonusProductOnOrderOfAmountAbove250'}
+                                ]
                             },
                             // 10 bonus ties
                             {
@@ -1309,9 +1359,12 @@ describe('Bonus Product Cart Utilities', () => {
                         baseProductsWithPromotions
                     )
                     // Verify total allocations add up correctly (not exceeding available)
-                    const totalAllocated = pickup1Result[0].quantity + pickup2Result[0].quantity +
-                                         delivery1Result[0].quantity + delivery2Result[0].quantity +
-                                         (delivery3Result.length > 0 ? delivery3Result[0].quantity : 0)
+                    const totalAllocated =
+                        pickup1Result[0].quantity +
+                        pickup2Result[0].quantity +
+                        delivery1Result[0].quantity +
+                        delivery2Result[0].quantity +
+                        (delivery3Result.length > 0 ? delivery3Result[0].quantity : 0)
                     expect(totalAllocated).toBeLessThanOrEqual(10)
                 })
 
@@ -1353,7 +1406,9 @@ describe('Bonus Product Cart Utilities', () => {
                                 productId: 'suit-product-1',
                                 quantity: 1,
                                 shipmentId: 'delivery-shipment',
-                                priceAdjustments: [{promotionId: 'BonusProductOnOrderOfAmountAbove250'}]
+                                priceAdjustments: [
+                                    {promotionId: 'BonusProductOnOrderOfAmountAbove250'}
+                                ]
                             },
                             // Store A pickup added second
                             {
@@ -1361,7 +1416,9 @@ describe('Bonus Product Cart Utilities', () => {
                                 productId: 'suit-product-1',
                                 quantity: 2,
                                 shipmentId: 'pickup-store-a',
-                                priceAdjustments: [{promotionId: 'BonusProductOnOrderOfAmountAbove250'}]
+                                priceAdjustments: [
+                                    {promotionId: 'BonusProductOnOrderOfAmountAbove250'}
+                                ]
                             },
                             // Store B pickup added third
                             {
@@ -1369,7 +1426,9 @@ describe('Bonus Product Cart Utilities', () => {
                                 productId: 'suit-product-1',
                                 quantity: 1,
                                 shipmentId: 'pickup-store-b',
-                                priceAdjustments: [{promotionId: 'BonusProductOnOrderOfAmountAbove250'}]
+                                priceAdjustments: [
+                                    {promotionId: 'BonusProductOnOrderOfAmountAbove250'}
+                                ]
                             },
                             // 8 bonus ties
                             {
@@ -1420,11 +1479,11 @@ describe('Bonus Product Cart Utilities', () => {
                     largeShipments.push(
                         {
                             shipmentId: 'delivery-shipment',
-                            shippingMethod: { c_storePickupEnabled: false }
+                            shippingMethod: {c_storePickupEnabled: false}
                         },
                         {
                             shipmentId: 'pickup-shipment',
-                            shippingMethod: { c_storePickupEnabled: true }
+                            shippingMethod: {c_storePickupEnabled: true}
                         }
                     )
 
