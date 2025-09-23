@@ -192,6 +192,37 @@ export default function ShippingMethods() {
         )
         if (hasNewFields) {
             form.reset(newDefaults)
+
+            // Auto-submit default methods for shipments that don't have methods yet
+            deliveryShipments.forEach(async (shipment) => {
+                const methodId = newDefaults[`shippingMethodId_${shipment.shipmentId}`]
+                const hasMethodInBasket = shipment.shippingMethod && shipment.shippingMethod.id
+
+                // Only auto-submit if:
+                // 1. There's a default method to submit
+                // 2. The shipment doesn't already have a method in the basket
+                // 3. The user hasn't manually selected anything (form value matches default)
+                if (
+                    methodId &&
+                    !hasMethodInBasket &&
+                    methodId === shippingMethods?.defaultShippingMethodId
+                ) {
+                    try {
+                        await updateShippingMethod.mutateAsync({
+                            parameters: {
+                                basketId: basket.basketId,
+                                shipmentId: shipment.shipmentId
+                            },
+                            body: {
+                                id: methodId
+                            }
+                        })
+                    } catch (error) {
+                        // If auto-submit fails, continue normally
+                        console.warn('Failed to auto-submit shipping method:', error)
+                    }
+                }
+            })
         }
     }, [deliveryShipments.length, shippingMethods?.defaultShippingMethodId])
 
