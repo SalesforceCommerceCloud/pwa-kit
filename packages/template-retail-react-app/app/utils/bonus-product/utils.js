@@ -25,6 +25,7 @@ export {
 export {
     getQualifyingProductIdForBonusItem,
     getBonusProductsInCartForProduct,
+    getBonusProductsForSpecificCartItem,
     getQualifyingProductForBonusProductInCart,
     findAllBonusProductItemsToRemove
 } from '@salesforce/retail-react-app/app/utils/bonus-product/cart'

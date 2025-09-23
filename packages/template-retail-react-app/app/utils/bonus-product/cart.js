@@ -7,6 +7,7 @@
 
 import {getPromotionIdsForProduct} from '@salesforce/retail-react-app/app/utils/bonus-product/common'
 import {findAvailableBonusDiscountLineItemIds} from '@salesforce/retail-react-app/app/utils/bonus-product/discovery'
+import {isPickupShipment} from '@salesforce/retail-react-app/app/utils/shipment-utils'
 
 /**
  * Cart state operations and product relationship utilities for bonus products.
@@ -63,6 +64,153 @@ export const getQualifyingProductIdForBonusItem = (basket, bonusDiscountLineItem
     })
 
     return qualifyingProductIds
+}
+
+/**
+ * Gets bonus products allocated to a specific cart item using capacity-based sequential allocation.
+ * This function distributes available bonus products across qualifying cart items based on:
+ * - Individual item capacity (calculated from promotion rules and item quantity)
+ * - First-come-first-served allocation order (based on cart item position)
+ *
+ * @param {Object} basket - The current basket data
+ * @param {Object} targetCartItem - The specific cart item to get bonus products for
+ * @param {Object} productsWithPromotions - Products data with promotion info
+ * @returns {Array<Object>} Array of bonus products allocated to this specific cart item
+ */
+export const getBonusProductsForSpecificCartItem = (
+    basket,
+    targetCartItem,
+    productsWithPromotions
+) => {
+    if (!basket || !targetCartItem || !productsWithPromotions) {
+        return []
+    }
+
+    const productId = targetCartItem.productId
+
+    // Get all available bonus products for this productId using existing function
+    const allBonusProducts = getBonusProductsInCartForProduct(
+        basket,
+        productId,
+        productsWithPromotions
+    )
+
+    if (allBonusProducts.length === 0) {
+        return []
+    }
+
+    // Find all qualifying cart items (non-bonus items with same productId)
+    const qualifyingCartItems =
+        basket.productItems?.filter(
+            (item) => item.productId === productId && !item.bonusProductLineItem
+        ) || []
+
+    if (qualifyingCartItems.length <= 1) {
+        // If only one qualifying item, it gets all bonus products
+        return allBonusProducts
+    }
+
+    // Calculate total qualifying quantity across all items
+    const totalQualifyingQuantity = qualifyingCartItems.reduce(
+        (sum, item) => sum + (item.quantity || 1),
+        0
+    )
+
+    if (totalQualifyingQuantity === 0) {
+        return []
+    }
+
+    // Get promotion data to understand per-item capacity
+    const promotionIds = getPromotionIdsForProduct(basket, productId, productsWithPromotions)
+    const matchingDiscountItems =
+        basket.bonusDiscountLineItems?.filter((bonusItem) => {
+            return promotionIds.includes(bonusItem.promotionId)
+        }) || []
+
+    // Calculate total available capacity from promotion rules
+    const totalPromotionCapacity = matchingDiscountItems.reduce(
+        (sum, item) => sum + (item.maxBonusItems || 0),
+        0
+    )
+
+    // Create a flattened list of individual bonus product items for allocation
+    const bonusItemsToAllocate = []
+    allBonusProducts.forEach((aggregatedItem) => {
+        // Create individual items based on quantity
+        for (let i = 0; i < (aggregatedItem.quantity || 1); i++) {
+            bonusItemsToAllocate.push({
+                ...aggregatedItem,
+                quantity: 1 // Each item represents 1 unit
+            })
+        }
+    })
+
+    // Sort qualifying items with composite priority:
+    // 1. Store pickup items first (higher priority for bonus product allocation)
+    // 2. Then by cart position (first-come-first-served within same delivery type)
+    //
+    // Rationale: Store pickup items are always shown first on the cart page. So we
+    // assign bonus products to them first.
+    const sortedQualifyingItems = [...qualifyingCartItems].sort((a, b) => {
+        // Get shipment information for both items
+        const aShipment = basket.shipments?.find((s) => s.shipmentId === a.shipmentId)
+        const bShipment = basket.shipments?.find((s) => s.shipmentId === b.shipmentId)
+
+        // Determine if items are store pickup or delivery
+        const aIsPickup = isPickupShipment(aShipment)
+        const bIsPickup = isPickupShipment(bShipment)
+
+        // Primary sort: Store pickup items first
+        if (aIsPickup && !bIsPickup) return -1 // a (pickup) comes before b (delivery)
+        if (!aIsPickup && bIsPickup) return 1 // b (pickup) comes before a (delivery)
+
+        // Secondary sort: Cart position within same delivery type
+        const aIndex = basket.productItems?.findIndex((item) => item.itemId === a.itemId) || 0
+        const bIndex = basket.productItems?.findIndex((item) => item.itemId === b.itemId) || 0
+        return aIndex - bIndex
+    })
+
+    // Allocate bonus items sequentially
+    let remainingBonusItems = [...bonusItemsToAllocate]
+    const allocations = new Map() // itemId -> allocated bonus items
+
+    for (const qualifyingItem of sortedQualifyingItems) {
+        if (remainingBonusItems.length === 0) break
+
+        // Calculate capacity for this specific item
+        // Capacity = (total promotion capacity / total qualifying quantity) * this item's quantity
+        const itemCapacity = Math.floor(
+            (totalPromotionCapacity / totalQualifyingQuantity) * (qualifyingItem.quantity || 1)
+        )
+
+        // Allocate up to itemCapacity bonus items to this qualifying item
+        const allocatedItems = remainingBonusItems.splice(0, itemCapacity)
+        allocations.set(qualifyingItem.itemId, allocatedItems)
+    }
+
+    // Return allocation for the target cart item
+    const targetAllocation = allocations.get(targetCartItem.itemId) || []
+
+    // Re-aggregate quantities for the same productId
+    const productQuantityMap = new Map()
+    targetAllocation.forEach((item) => {
+        const existingQuantity = productQuantityMap.get(item.productId) || 0
+        productQuantityMap.set(item.productId, existingQuantity + 1)
+    })
+
+    // Convert back to array format with aggregated quantities
+    const result = []
+    productQuantityMap.forEach((quantity, productId) => {
+        const sampleItem = targetAllocation.find((item) => item.productId === productId)
+        if (sampleItem) {
+            result.push({
+                ...sampleItem,
+                quantity: quantity
+            })
+        }
+    })
+
+    return result
 }
 
 /**
