@@ -198,10 +198,10 @@ export default function ShippingMethods() {
                 const methodId = newDefaults[`shippingMethodId_${shipment.shipmentId}`]
                 const hasMethodInBasket = shipment.shippingMethod && shipment.shippingMethod.id
 
-                // Only auto-submit if:
-                // 1. There's a default method to submit
-                // 2. The shipment doesn't already have a method in the basket
-                // 3. The user hasn't manually selected anything (form value matches default)
+                // auto-submit if;
+                // - default method to submit present
+                // - the shipment doesn't already have a method in basket
+                // - user hasn't manually selected
                 if (
                     methodId &&
                     !hasMethodInBasket &&
@@ -218,8 +218,7 @@ export default function ShippingMethods() {
                             }
                         })
                     } catch (error) {
-                        // If auto-submit fails, continue normally
-                        console.warn('Failed to auto-submit shipping method:', error)
+                        console.warn(error)
                     }
                 }
             })
