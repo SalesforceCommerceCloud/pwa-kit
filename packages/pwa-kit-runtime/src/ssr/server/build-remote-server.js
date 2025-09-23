@@ -1213,7 +1213,7 @@ export const RemoteServerFactory = {
             .setFramework(new ExpressFramework())
             .setHandler(new DefaultHandler())
             .setResolver(new CallbackResolver())
-            .addAdapter(new ApiGatewayV1Adapter())
+            .addAdapter(new ApiGatewayV1Adapter({lowercaseRequestHeaders: true}))
             .build()
 
         const handler = (event, context, callback) => {

@@ -82,8 +82,8 @@ describe('server', () => {
         expect(response.body.headers['random-header']).toBe('random')
     })
 
-    test('Path "/cookie" sets cookie', () => {
-        return request(app)
+    test('Path "/cookie" sets cookie', async () => {
+        return await request(app)
             .get('/cookie?name=test-cookie&value=test-value')
             .expect('set-cookie', 'test-cookie=test-value; Path=/')
     })
@@ -124,5 +124,16 @@ describe('server', () => {
         ]
         const calls = console.error.mock.calls.map((call) => call[0])
         expect(errors.some((error) => calls.includes(error))).toBe(true)
+    })
+
+    test('Check incoming headers are lowercase', async () => {
+        const response = await request(app)
+            .get('/headers')
+            .set('Random-Header', 'random')
+            .set('Another-Mixed-Case-Header', 'value')
+            .set('UPPERCASE-HEADER', 'test')
+        for (const header in response.body.headers) {
+            expect(header).toBe(header.toLowerCase())
+        }
     })
 })

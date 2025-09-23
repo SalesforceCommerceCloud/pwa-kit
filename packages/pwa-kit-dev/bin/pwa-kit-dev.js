@@ -416,7 +416,7 @@ const main = async () => {
             }
         )
 
-        managedRuntimeCommand('save-bundle')
+    managedRuntimeCommand('save-bundle')
         .description(`save a bundle locally`)
         .addOption(
             new program.Option(
@@ -447,9 +447,7 @@ const main = async () => {
                 // unless we need to, so it is loaded conditionally in the action implementation
                 .default(null, "the 'name' key from the package.json")
         )
-        .addOption(
-            new program.Option('-n, --name <name>', 'name of the bundle')
-        )
+        .addOption(new program.Option('-n, --name <name>', 'name of the bundle'))
         .action(
             async ({
                 buildDirectory,
@@ -462,7 +460,6 @@ const main = async () => {
                 key,
                 name
             }) => {
-                
                 if (!fse.pathExistsSync(buildDirectory)) {
                     throw new Error(`Supplied "buildDirectory" does not exist!`)
                 }
@@ -485,9 +482,15 @@ const main = async () => {
                     buildDirectory,
                     projectSlug
                 })
-                fse.outputFileSync(p.join(outputDirectory, name, 'bundle.tar'), Buffer.from(bundle.data, 'base64'))
+                fse.outputFileSync(
+                    p.join(outputDirectory, name, 'bundle.tar'),
+                    Buffer.from(bundle.data, 'base64')
+                )
                 let {data: _, ...bundleJson} = bundle
-                fse.outputFileSync(p.join(outputDirectory, name, 'bundle.json'), JSON.stringify(bundleJson, null, 4))
+                fse.outputFileSync(
+                    p.join(outputDirectory, name, 'bundle.json'),
+                    JSON.stringify(bundleJson, null, 4)
+                )
             }
         )
 

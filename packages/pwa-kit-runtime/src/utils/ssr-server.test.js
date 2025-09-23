@@ -606,12 +606,12 @@ describe('processLambdaResponse', () => {
             name: 'Convert from multiValueHeaders to headers',
             response: {
                 multiValueHeaders: {
-                    'accept-language': ['en-US', 'en;q=0.9']
+                    'Accept-Language': ['en-US', 'en;q=0.9']
                 }
             },
             event: {},
             validate: (headers) => {
-                expect(headers['accept-language']).toBe('en-US,en;q=0.9')
+                expect(headers['accept-language']).toBe('en-US, en;q=0.9')
             }
         }
     ]
