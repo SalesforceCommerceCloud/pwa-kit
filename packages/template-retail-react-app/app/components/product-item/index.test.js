@@ -103,4 +103,41 @@ describe('ProductItem Component', () => {
         expect(screen.getByText(/Quantity:/i)).toBeInTheDocument()
         expect(screen.queryByRole('spinbutton')).not.toBeInTheDocument()
     })
+
+    test('does not render delivery actions for bonus products', () => {
+        renderWithProviders(
+            <MockedComponent
+                product={mockBonusProduct}
+                deliveryActions={<button>Delivery Action</button>}
+            />
+        )
+
+        expect(screen.queryByText(/Delivery Action/i)).not.toBeInTheDocument()
+    })
+
+    test('renders delivery actions for regular products but not bonus products', () => {
+        // Test regular product first
+        const {unmount} = renderWithProviders(
+            <MockedComponent
+                product={mockProduct}
+                deliveryActions={<button>Delivery Action</button>}
+            />
+        )
+
+        // Regular product should show delivery actions (appears twice - mobile and desktop)
+        expect(screen.getAllByText(/Delivery Action/i)).toHaveLength(2)
+
+        // Cleanup completely
+        unmount()
+
+        // Test bonus product with fresh render
+        renderWithProviders(
+            <MockedComponent
+                product={mockBonusProduct}
+                deliveryActions={<button>Delivery Action</button>}
+            />
+        )
+
+        expect(screen.queryAllByText(/Delivery Action/i)).toHaveLength(0)
+    })
 })

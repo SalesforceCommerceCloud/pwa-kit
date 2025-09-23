@@ -74,10 +74,14 @@ const ProductItem = ({
                                         </Box>
                                     </HideOnDesktop>
                                 </Stack>
-                                {deliveryActions && <HideOnMobile>{deliveryActions}</HideOnMobile>}
+                                {deliveryActions && !product.bonusProductLineItem && (
+                                    <HideOnMobile>{deliveryActions}</HideOnMobile>
+                                )}
                             </Flex>
 
-                            {deliveryActions && <HideOnDesktop>{deliveryActions}</HideOnDesktop>}
+                            {deliveryActions && !product.bonusProductLineItem && (
+                                <HideOnDesktop>{deliveryActions}</HideOnDesktop>
+                            )}
 
                             <Flex align="flex-end" justify="space-between">
                                 <Stack spacing={1}>
