@@ -71,6 +71,9 @@ const Payment = ({
     // Track whether user wants to save the payment method
     const [shouldSavePaymentMethod, setShouldSavePaymentMethod] = useState(false)
     const [isApplyingSavedPayment, setIsApplyingSavedPayment] = useState(false)
+    const [selectedPaymentMethod, setSelectedPaymentMethod] = useState(
+        appliedPayment?.paymentMethodId || 'cc'
+    )
 
     const activeBasketIdRef = useRef(null)
 
@@ -278,6 +281,8 @@ const Payment = ({
                 // After auto-apply, if we already have a shipping address, submit billing so we can advance
                 if (selectedShippingAddress) {
                     await onBillingSubmit()
+                    // Ensure basket is refreshed with payment & billing
+                    await currentBasketQuery.refetch()
                     // Stay on Payment; place-order button is rendered on Payment step in this flow
                 }
                 // Ensure basket is refreshed with payment & billing

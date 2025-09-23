@@ -82,10 +82,6 @@ const CheckoutOneClick = () => {
     // that have been applied to the basket via addPaymentInstrumentToBasket
     const appliedPayment = basket?.paymentInstruments && basket?.paymentInstruments[0]
 
-    // Check if a saved payment instrument is selected (not 'cc' or 'paypal')
-    const isSavedPaymentSelected =
-        selectedPaymentMethod !== 'cc' && selectedPaymentMethod !== 'paypal'
-
     const {mutateAsync: addPaymentInstrumentToBasket} = useShopperBasketsMutation(
         ShopperBasketsMutations.AddPaymentInstrumentToBasket
     )
@@ -102,30 +98,6 @@ const CheckoutOneClick = () => {
 
     const handleSavePreferenceChange = (shouldSave) => {
         setShouldSavePaymentMethod(shouldSave)
-    }
-
-    const handleSelectedPaymentMethodChange = (paymentMethod) => {
-        setSelectedPaymentMethod(paymentMethod)
-    }
-
-    const isPlaceOrderButtonDisabled = () => {
-        // Enable button if there is an applied payment
-        if (appliedPayment) {
-            return false
-        }
-
-        // Enable button if a saved payment method is selected
-        if (isSavedPaymentSelected) {
-            return false
-        }
-
-        // Enable button if paymentMethodForm is valid and 'cc' is the current payment method selection
-        if (paymentMethodForm.formState.isValid && selectedPaymentMethod === 'cc') {
-            return false
-        }
-
-        // Disable button in all other cases
-        return true
     }
 
     const showError = (message) => {
@@ -402,21 +374,6 @@ const CheckoutOneClick = () => {
                     await onPaymentSubmit(paymentFormValues)
                 }
             }
-            return true
-        } catch (error) {
-            showError()
-            return false
-        }
-    }
-
-    // Unified place order handler that works for all scenarios
-    const onPlaceOrder = async () => {
-        try {
-            // Process payment based on current state
-            const paymentProcessed = await processPayment()
-            if (!paymentProcessed) {
-                return
-            }
 
             // If successful `onBillingSubmit` returns the updated basket. If the form was invalid on
             // submit, `undefined` is returned.
@@ -428,7 +385,7 @@ const CheckoutOneClick = () => {
         } catch (error) {
             showError()
         }
-    }
+    })
 
     useEffect(() => {
         if (error || step === 4) {
