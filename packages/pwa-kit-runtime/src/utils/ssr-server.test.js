@@ -611,7 +611,7 @@ describe('processLambdaResponse', () => {
             },
             event: {},
             validate: (headers) => {
-                expect(headers['accept-language']).toBe('en-US, en;q=0.9')
+                expect(headers['accept-language']).toBe('en-US,en;q=0.9')
             }
         }
     ]
