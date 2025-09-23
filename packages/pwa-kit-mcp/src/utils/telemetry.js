@@ -19,7 +19,7 @@ const PROJECT = 'pwa-kit-mcp'
 
 const loadConfigValue = (key) => {
     try {
-        const cfgPath = path.resolve(__dirname, '../../config.json')
+        const cfgPath = path.resolve(__dirname, './config.json')
         if (!fs.existsSync(cfgPath)) return null
         const raw = fs.readFileSync(cfgPath, 'utf8')
         const cfg = JSON.parse(raw)
