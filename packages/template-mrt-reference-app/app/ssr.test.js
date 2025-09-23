@@ -107,6 +107,18 @@ describe('server', () => {
         expect(response.body.logs).toBe(true)
     })
 
+    test('Path "/isolation" succeeds with Region', async () => {
+        jest.spyOn(console, 'error')
+        lambdaMock.on(InvokeCommand).rejects(new AccessDeniedException())
+        s3Mock.on(GetObjectCommand).rejects(new AccessDenied())
+        logsMock.on(CreateLogStreamCommand).rejects(new AccessDeniedException())
+        const params = `FunctionName=name&Bucket=bucket&Key=key&logGroupName=lgName&Region=us-west-1`
+        const response = await request(app).get(`/isolation?${params}`)
+        expect(response.body.origin).toBe(true)
+        expect(response.body.storage).toBe(true)
+        expect(response.body.logs).toBe(true)
+    })
+
     test('Path "/isolation" fails', async () => {
         jest.spyOn(console, 'error')
         lambdaMock.on(InvokeCommand).resolves()
