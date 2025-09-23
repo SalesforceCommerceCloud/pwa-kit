@@ -8,7 +8,7 @@
 module.exports = {
     envBasePath: '/',
     ssrEnabled: true,
-    ssrOnly: ['ssr.js', 'node_modules/**/*.*'],
+    ssrOnly: ['ssr.js', 'ssr.js.map', 'node_modules/**/*.*'],
     ssrShared: [
         'static/example.txt',
         'static/favicon.ico',
