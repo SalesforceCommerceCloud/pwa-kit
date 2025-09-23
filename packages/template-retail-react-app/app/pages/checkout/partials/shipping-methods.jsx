@@ -192,8 +192,6 @@ export default function ShippingMethods() {
         )
         if (hasNewFields) {
             form.reset(newDefaults)
-
-            // Auto-submit default methods for shipments that don't have methods yet
             deliveryShipments.forEach(async (shipment) => {
                 const methodId = newDefaults[`shippingMethodId_${shipment.shipmentId}`]
                 const hasMethodInBasket = shipment.shippingMethod && shipment.shippingMethod.id
