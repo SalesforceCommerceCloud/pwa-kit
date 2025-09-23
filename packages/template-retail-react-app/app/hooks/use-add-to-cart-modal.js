@@ -36,6 +36,14 @@ import {
 } from '@salesforce/retail-react-app/app/utils/product-utils'
 import {EINSTEIN_RECOMMENDERS} from '@salesforce/retail-react-app/app/constants'
 import DisplayPrice from '@salesforce/retail-react-app/app/components/display-price'
+import SelectBonusProductsCard from '@salesforce/retail-react-app/app/pages/cart/partials/select-bonus-products-card'
+
+import {
+    getRemainingAvailableBonusProductsForProduct,
+    useBasketProductsWithPromotions,
+    getPromotionCalloutText,
+    shouldShowBonusProductSelection
+} from '@salesforce/retail-react-app/app/utils/bonus-product'
 
 /**
  * This is the context for managing the AddToCartModal.
@@ -48,7 +56,6 @@ export const AddToCartModalProvider = ({children}) => {
     return (
         <AddToCartModalContext.Provider value={addToCartModal}>
             {children}
-            <AddToCartModal />
         </AddToCartModalContext.Provider>
     )
 }
@@ -73,7 +80,14 @@ export const AddToCartModal = () => {
     const {currency, productSubTotal} = basket
     const numberOfItemsAdded = isProductABundle
         ? selectedQuantity
-        : itemsAdded.reduce((acc, {quantity}) => acc + quantity, 0)
+        : Array.isArray(itemsAdded)
+        ? itemsAdded.reduce((acc, {quantity}) => acc + quantity, 0)
+        : 0
+
+    // Bonus product logic
+    const {data: productsWithPromotions} = useBasketProductsWithPromotions(basket)
+    // Port v4 logic: Check for bonus discount line items and calculate remaining capacity
+    const {bonusDiscountLineItems = []} = basket || {}
 
     if (!isOpen) {
         return null
@@ -298,6 +312,69 @@ export const AddToCartModal = () => {
                                         </Flex>
                                     )
                                 })}
+
+                            {/* V4 Logic: Render SelectBonusProductsCard right after the product items */}
+                            {bonusDiscountLineItems &&
+                                bonusDiscountLineItems.length > 0 &&
+                                (() => {
+                                    // Check if this product should show bonus product selection
+                                    // This prevents bonus products added as regular items from showing bonus selection
+                                    const shouldShowBonusSelection =
+                                        shouldShowBonusProductSelection(
+                                            basket,
+                                            product?.id,
+                                            productsWithPromotions
+                                        )
+
+                                    if (!shouldShowBonusSelection) {
+                                        return null
+                                    }
+
+                                    // Compute aggregated remaining capacity based on the latest basket data
+                                    const remainingBonusProductsData =
+                                        getRemainingAvailableBonusProductsForProduct(
+                                            basket,
+                                            product?.id,
+                                            productsWithPromotions
+                                        )
+
+                                    // Only render if there is remaining capacity across the collection
+                                    const hasCapacity =
+                                        remainingBonusProductsData?.aggregatedMaxBonusItems > 0 &&
+                                        remainingBonusProductsData?.aggregatedSelectedItems <
+                                            remainingBonusProductsData?.aggregatedMaxBonusItems
+
+                                    if (!hasCapacity) {
+                                        return null
+                                    }
+
+                                    // Get the first remaining available bonus product which contains the complete bonus discount line item data
+                                    const firstRemainingBonusProduct =
+                                        remainingBonusProductsData.bonusItems[0]
+                                    return (
+                                        <SelectBonusProductsCard
+                                            qualifyingProduct={{productId: product?.id}}
+                                            basket={basket}
+                                            productsWithPromotions={productsWithPromotions}
+                                            remainingBonusProductsData={remainingBonusProductsData}
+                                            isEligible={shouldShowBonusSelection}
+                                            getPromotionCalloutText={getPromotionCalloutText}
+                                            onSelectBonusProducts={() => {
+                                                // Close AddToCart modal first - the SelectBonusProductsCard will handle opening the bonus modal
+                                                if (onClose) onClose()
+                                            }}
+                                            bonusDiscountLineItem={{
+                                                id: firstRemainingBonusProduct?.bonusDiscountLineItemId,
+                                                promotionId:
+                                                    firstRemainingBonusProduct?.promotionId,
+                                                maxBonusItems:
+                                                    remainingBonusProductsData.aggregatedMaxBonusItems,
+                                                bonusProducts: remainingBonusProductsData.bonusItems
+                                            }}
+                                            hideSelectionCounter={true} // Hide "(0 of 2 selected)" from promotion text
+                                        />
+                                    )
+                                })()}
                         </Box>
                         <Box
                             display={['none', 'none', 'none', 'block']}
@@ -347,6 +424,7 @@ export const AddToCartModal = () => {
                             </Stack>
                         </Box>
                     </Flex>
+
                     <Box padding="8" bgColor="gray.50">
                         <RecommendedProducts
                             title={

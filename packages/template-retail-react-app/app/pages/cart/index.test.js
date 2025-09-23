@@ -66,6 +66,45 @@ jest.mock('@salesforce/retail-react-app/app/hooks/use-store-locator', () => ({
     useStoreLocatorModal: () => mockStoreLocatorModal
 }))
 
+// Mock bonus product utilities
+const mockGetPromotionCalloutText = jest.fn(() => 'Free Gift with Purchase')
+const mockFindAllBonusProductItemsToRemove = jest.fn((basket, product) => [product])
+const mockUseBasketProductsWithPromotions = jest.fn()
+const mockGetBonusProductCountsForPromotion = jest.fn(() => ({
+    selectedBonusItems: 0,
+    maxBonusItems: 0
+}))
+const mockShouldShowBonusProductSelection = jest.fn(() => true)
+jest.mock('@salesforce/retail-react-app/app/utils/bonus-product', () => ({
+    useBasketProductsWithPromotions: (...args) => mockUseBasketProductsWithPromotions(...args),
+    getPromotionCalloutText: (...args) => mockGetPromotionCalloutText(...args),
+    findAllBonusProductItemsToRemove: (...args) => mockFindAllBonusProductItemsToRemove(...args),
+    getBonusProductCountsForPromotion: (...args) => mockGetBonusProductCountsForPromotion(...args),
+    shouldShowBonusProductSelection: (...args) => mockShouldShowBonusProductSelection(...args)
+}))
+
+// Mock bonus product view modal hook
+const mockBonusProductViewModal = {
+    isOpen: false,
+    onOpen: jest.fn(),
+    onClose: jest.fn(),
+    data: null
+}
+jest.mock('@salesforce/retail-react-app/app/hooks/use-bonus-product-view-modal', () => ({
+    useBonusProductViewModal: () => mockBonusProductViewModal
+}))
+
+// Mock bonus product selection modal context hook
+const mockBonusProductSelectionModalContext = {
+    onOpen: jest.fn()
+}
+jest.mock('@salesforce/retail-react-app/app/hooks/use-bonus-product-selection-modal', () => ({
+    ...jest.requireActual(
+        '@salesforce/retail-react-app/app/hooks/use-bonus-product-selection-modal'
+    ),
+    useBonusProductSelectionModalContext: () => mockBonusProductSelectionModalContext
+}))
+
 // Mock getConfig to return test values
 import mockConfig from '@salesforce/retail-react-app/config/mocks/default'
 jest.mock('@salesforce/pwa-kit-runtime/utils/ssr-config', () => ({
@@ -140,6 +179,35 @@ beforeEach(() => {
         error: null,
         hasSelectedStore: false
     }))
+
+    // Default mock for bonus product utilities
+    mockUseBasketProductsWithPromotions.mockReturnValue({
+        data: {
+            products: [
+                {
+                    id: '701642889830M',
+                    name: 'Belted Cardigan With Studs',
+                    productPromotions: [
+                        {
+                            promotionId: 'test-promotion-1',
+                            calloutMsg: 'Buy One Get One Free'
+                        }
+                    ]
+                },
+                {
+                    id: '013742335262M',
+                    name: 'Free Gift with Purchase',
+                    productPromotions: [
+                        {
+                            promotionId: 'test-promotion-1',
+                            calloutMsg: 'Free Gift with Purchase'
+                        }
+                    ]
+                }
+            ]
+        },
+        isLoading: false
+    })
 
     global.server.use(
         rest.get('*/customers/:customerId/product-lists', (req, res, ctx) => {
@@ -787,6 +855,34 @@ describe('Product bundles', () => {
             }),
             rest.patch('*/baskets/:basketId/items/:itemId', () => {})
         )
+
+        // Configure bonus product mocks and disable grouping for bundle products
+        // Bundle products work better with the traditional rendering approach
+        const {getConfig} = jest.requireMock('@salesforce/pwa-kit-runtime/utils/ssr-config')
+        getConfig.mockReturnValue({
+            ...mockConfig,
+            app: {
+                ...mockConfig.app,
+                pages: {
+                    cart: {
+                        groupBonusProductsWithQualifyingProduct: false
+                    }
+                }
+            }
+        })
+
+        mockUseBasketProductsWithPromotions.mockReturnValue({
+            data: {
+                products: [
+                    {
+                        id: 'test-bundle',
+                        name: "Women's clothing test bundle",
+                        productPromotions: []
+                    }
+                ]
+            },
+            isLoading: false
+        })
     })
 
     test('displays inventory message when incrementing quantity above available stock', async () => {
@@ -1283,6 +1379,20 @@ describe('Product bundles', () => {
 
 describe('Bonus products', () => {
     beforeEach(() => {
+        // Mock getConfig to disable bonus product grouping for this test
+        const {getConfig} = jest.requireMock('@salesforce/pwa-kit-runtime/utils/ssr-config')
+        getConfig.mockReturnValue({
+            ...mockConfig,
+            app: {
+                ...mockConfig.app,
+                pages: {
+                    cart: {
+                        groupBonusProductsWithQualifyingProduct: false
+                    }
+                }
+            }
+        })
+
         prependHandlersToServer([
             {
                 path: '*/customers/:customerId/baskets',

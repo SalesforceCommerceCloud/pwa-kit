@@ -73,6 +73,11 @@ module.exports = {
             tenantId: 'g82wgnrvm-ywk9dggrrw8mtggy.pc-rnd'
         },
         partialHydrationEnabled: false,
+        pages: {
+            cart: {
+                groupBonusProductsWithQualifyingProduct: true
+            }
+        },
         storeLocatorEnabled: true,
         multishipEnabled: true
     },

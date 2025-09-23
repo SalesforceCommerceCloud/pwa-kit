@@ -44,7 +44,8 @@ const ProductItem = ({
     deliveryActions,
     onItemQuantityChange = noop,
     showLoading = false,
-    containerStyles = {}
+    containerStyles = {},
+    isRemoving = false
 }) => {
     const {stepQuantity, showInventoryMessage, inventoryMessage, quantity, setQuantity} =
         useDerivedProduct(product)
@@ -80,17 +81,18 @@ const ProductItem = ({
 
                             <Flex align="flex-end" justify="space-between">
                                 <Stack spacing={1}>
-                                    {product.bonusProductLineItem ? (
-                                        <BonusProductQuantity product={product} />
-                                    ) : (
-                                        <ProductQuantityPicker
-                                            product={product}
-                                            onItemQuantityChange={onItemQuantityChange}
-                                            stepQuantity={stepQuantity}
-                                            quantity={quantity}
-                                            setQuantity={setQuantity}
-                                        />
-                                    )}
+                                    {!(isRemoving && product.bonusProductLineItem) &&
+                                        (product.bonusProductLineItem ? (
+                                            <BonusProductQuantity product={product} />
+                                        ) : (
+                                            <ProductQuantityPicker
+                                                product={product}
+                                                onItemQuantityChange={onItemQuantityChange}
+                                                stepQuantity={stepQuantity}
+                                                quantity={quantity}
+                                                setQuantity={setQuantity}
+                                            />
+                                        ))}
                                 </Stack>
                                 <Stack>
                                     <HideOnMobile>
@@ -134,7 +136,8 @@ ProductItem.propTypes = {
     primaryAction: PropTypes.node,
     secondaryActions: PropTypes.node,
     deliveryActions: PropTypes.node,
-    containerStyles: PropTypes.object
+    containerStyles: PropTypes.object,
+    isRemoving: PropTypes.bool
 }
 
 export default ProductItem

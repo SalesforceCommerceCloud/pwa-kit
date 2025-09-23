@@ -58,6 +58,7 @@ import {
     useDntNotification
 } from '@salesforce/retail-react-app/app/hooks/use-dnt-notification'
 import {AddToCartModalProvider} from '@salesforce/retail-react-app/app/hooks/use-add-to-cart-modal'
+import {BonusProductSelectionModalProvider} from '@salesforce/retail-react-app/app/hooks/use-bonus-product-selection-modal'
 import useMultiSite from '@salesforce/retail-react-app/app/hooks/use-multi-site'
 import {useCurrentCustomer} from '@salesforce/retail-react-app/app/hooks/use-current-customer'
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
@@ -430,34 +431,36 @@ const App = (props) => {
                             </Island>
                             {!isOnline && <OfflineBanner />}
                             <AddToCartModalProvider>
-                                <SkipNavContent
-                                    style={{
-                                        display: 'flex',
-                                        flexDirection: 'column',
-                                        flex: 1,
-                                        outline: 0
-                                    }}
-                                >
-                                    <Box
-                                        as="main"
-                                        id="app-main"
-                                        role="main"
-                                        display="flex"
-                                        flexDirection="column"
-                                        flex="1"
+                                <BonusProductSelectionModalProvider>
+                                    <SkipNavContent
+                                        style={{
+                                            display: 'flex',
+                                            flexDirection: 'column',
+                                            flex: 1,
+                                            outline: 0
+                                        }}
                                     >
-                                        <OfflineBoundary isOnline={false}>
-                                            {children}
-                                        </OfflineBoundary>
-                                    </Box>
-                                </SkipNavContent>
+                                        <Box
+                                            as="main"
+                                            id="app-main"
+                                            role="main"
+                                            display="flex"
+                                            flexDirection="column"
+                                            flex="1"
+                                        >
+                                            <OfflineBoundary isOnline={false}>
+                                                {children}
+                                            </OfflineBoundary>
+                                        </Box>
+                                    </SkipNavContent>
 
-                                <Island hydrateOn={'visible'}>
-                                    {!isCheckout ? <Footer /> : <CheckoutFooter />}
-                                </Island>
+                                    <Island hydrateOn={'visible'}>
+                                        {!isCheckout ? <Footer /> : <CheckoutFooter />}
+                                    </Island>
 
-                                <AuthModal {...authModal} />
-                                <DntNotification {...dntNotification} />
+                                    <AuthModal {...authModal} />
+                                    <DntNotification {...dntNotification} />
+                                </BonusProductSelectionModalProvider>
                             </AddToCartModalProvider>
                         </Box>
                     </CurrencyProvider>

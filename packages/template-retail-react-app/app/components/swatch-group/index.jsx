@@ -83,9 +83,10 @@ const SwatchGroup = (props) => {
     // Whenever the selected index changes ensure that we call the change handler.
     useEffect(() => {
         const childrenArray = Children.toArray(children)
-        const newValue = childrenArray[selectedIndex].props.value
-
-        handleChange(newValue)
+        if (childrenArray[selectedIndex]) {
+            const newValue = childrenArray[selectedIndex].props.value
+            handleChange(newValue)
+        }
     }, [selectedIndex])
 
     return (
