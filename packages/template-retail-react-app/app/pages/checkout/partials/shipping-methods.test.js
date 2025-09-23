@@ -12,7 +12,11 @@ import ShippingMethods from '@salesforce/retail-react-app/app/pages/checkout/par
 import {useCheckout} from '@salesforce/retail-react-app/app/pages/checkout/util/checkout-context'
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
 import {useCurrency} from '@salesforce/retail-react-app/app/hooks'
-import {useShippingMethodsForShipment, useProducts} from '@salesforce/commerce-sdk-react'
+import {
+    useShippingMethodsForShipment,
+    useProducts,
+    useShopperBasketsMutation
+} from '@salesforce/commerce-sdk-react'
 
 // Mock the hooks
 jest.mock('@salesforce/retail-react-app/app/pages/checkout/util/checkout-context')
@@ -25,6 +29,7 @@ const mockUseCurrentBasket = useCurrentBasket
 const mockUseCurrency = useCurrency
 const mockUseShippingMethodsForShipment = useShippingMethodsForShipment
 const mockUseProducts = useProducts
+const mockUseShopperBasketsMutation = useShopperBasketsMutation
 
 // Mock data
 const mockBasket = {
@@ -169,6 +174,7 @@ describe('ShippingMethods', () => {
             data: mockProductsMap,
             isLoading: false
         })
+        mockUseShopperBasketsMutation.mockReturnValue(jest.fn().mockResolvedValue({}))
     })
 
     afterEach(() => {
@@ -563,11 +569,10 @@ describe('ShippingMethods', () => {
             }
 
             const mockUpdateShippingMethod = jest.fn().mockResolvedValue({})
+            mockUpdateShippingMethod.mutateAsync = jest.fn().mockResolvedValue({})
 
-            jest.doMock('@salesforce/commerce-sdk-react', () => ({
-                ...jest.requireActual('@salesforce/commerce-sdk-react'),
-                useShopperBasketsMutation: jest.fn(() => mockUpdateShippingMethod)
-            }))
+            // Mock the mutation hook
+            mockUseShopperBasketsMutation.mockReturnValue(mockUpdateShippingMethod)
 
             mockUseCurrentBasket.mockReturnValue({
                 data: basketWithoutMethods,
@@ -575,16 +580,31 @@ describe('ShippingMethods', () => {
                 isLoading: false
             })
 
+            // First render with no shipping methods
+            mockUseShippingMethodsForShipment.mockReturnValue({
+                data: null,
+                isLoading: true
+            })
+
+            const {rerender} = renderWithIntl(<ShippingMethods />)
+
+            // Then update to trigger the useEffect
             mockUseShippingMethodsForShipment.mockReturnValue({
                 data: mockShippingMethods,
                 isLoading: false
             })
 
-            renderWithIntl(<ShippingMethods />)
+            rerender(
+                <CurrencyProvider currency="USD">
+                    <IntlProvider locale="en">
+                        <ShippingMethods />
+                    </IntlProvider>
+                </CurrencyProvider>
+            )
 
             // Wait for auto-submit to happen
             await waitFor(() => {
-                expect(mockUpdateShippingMethod).toHaveBeenCalledWith({
+                expect(mockUpdateShippingMethod.mutateAsync).toHaveBeenCalledWith({
                     parameters: {
                         basketId: 'basket-1',
                         shipmentId: 'shipment-1'
@@ -612,11 +632,10 @@ describe('ShippingMethods', () => {
             }
 
             const mockUpdateShippingMethod = jest.fn().mockResolvedValue({})
+            mockUpdateShippingMethod.mutateAsync = jest.fn().mockResolvedValue({})
 
-            jest.doMock('@salesforce/commerce-sdk-react', () => ({
-                ...jest.requireActual('@salesforce/commerce-sdk-react'),
-                useShopperBasketsMutation: jest.fn(() => mockUpdateShippingMethod)
-            }))
+            // Mock the mutation hook
+            mockUseShopperBasketsMutation.mockReturnValue(mockUpdateShippingMethod)
 
             mockUseCurrentBasket.mockReturnValue({
                 data: basketWithMethod,
@@ -667,11 +686,10 @@ describe('ShippingMethods', () => {
             }
 
             const mockUpdateShippingMethod = jest.fn().mockResolvedValue({})
+            mockUpdateShippingMethod.mutateAsync = jest.fn().mockResolvedValue({})
 
-            jest.doMock('@salesforce/commerce-sdk-react', () => ({
-                ...jest.requireActual('@salesforce/commerce-sdk-react'),
-                useShopperBasketsMutation: jest.fn(() => mockUpdateShippingMethod)
-            }))
+            // Mock the mutation hook
+            mockUseShopperBasketsMutation.mockReturnValue(mockUpdateShippingMethod)
 
             mockUseCurrentBasket.mockReturnValue({
                 data: basketWithoutMethods,
