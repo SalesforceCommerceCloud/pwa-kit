@@ -8,7 +8,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import {Stack, Box, Heading} from '@salesforce/retail-react-app/app/components/shared/ui'
 import SelectBonusProductsCard from '@salesforce/retail-react-app/app/pages/cart/partials/select-bonus-products-card'
-import {getBonusProductsInCartForProduct} from '@salesforce/retail-react-app/app/utils/bonus-product/cart'
+import {getBonusProductsForSpecificCartItem} from '@salesforce/retail-react-app/app/utils/bonus-product/cart'
 import {getRemainingAvailableBonusProductsForProduct} from '@salesforce/retail-react-app/app/utils/bonus-product/discovery'
 import {shouldShowBonusProductSelection} from '@salesforce/retail-react-app/app/utils/bonus-product/business-logic'
 
@@ -76,10 +76,10 @@ const CartProductListWithGroupedBonusProducts = ({
 
                 // Enhanced rendering for eligible products
                 try {
-                    // Get bonus product data for this qualifying product
-                    const bonusProductsForThisProduct = getBonusProductsInCartForProduct(
+                    // Get bonus products allocated specifically to this cart item
+                    const bonusProductsForThisProduct = getBonusProductsForSpecificCartItem(
                         basket,
-                        qualifyingProduct.productId,
+                        qualifyingProduct,
                         productsWithPromotions
                     )
                     const remainingBonusProductsData = getRemainingAvailableBonusProductsForProduct(
