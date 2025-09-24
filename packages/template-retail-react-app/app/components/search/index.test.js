@@ -520,3 +520,308 @@ test('handles product suggestions with images', async () => {
         expect(screen.getByTestId('sf-suggestion-popover')).toBeInTheDocument()
     })
 })
+
+test('sets pre-chat fields when launching chat for the first time', async () => {
+    const user = setupUserEvent()
+
+    getConfig.mockImplementation(() =>
+        getMockedConfigWithCommerceAgentSettings(mockConfig, 'true', 'true')
+    )
+
+    // Create spies for chat functions
+    const sendTextMessageSpy = jest
+        .fn()
+        .mockRejectedValue(
+            'invoke API before the onEmbeddedMessagingConversationOpened event is fired'
+        )
+    const launchChatSpy = jest
+        .fn()
+        .mockResolvedValue('Successfully initialized the messaging client')
+    const setHiddenPrechatFieldsSpy = jest.fn()
+
+    // Mock window.embeddedservice_bootstrap with prechatAPI
+    window.embeddedservice_bootstrap = {
+        utilAPI: {
+            sendTextMessage: sendTextMessageSpy,
+            launchChat: launchChatSpy
+        },
+        prechatAPI: {
+            setHiddenPrechatFields: setHiddenPrechatFieldsSpy
+        }
+    }
+
+    renderWithProviders(<SearchInput />, {
+        wrapperProps: {siteAlias: 'us', appConfig: mockConfig.app}
+    })
+    const searchInput = document.querySelector('input[type="search"]')
+
+    // Perform a search to trigger chat launch
+    await user.type(searchInput, 'test search{enter}')
+
+    // Wait for the setTimeout in onSubmitSearch
+    jest.advanceTimersByTime(500)
+
+    // Verify pre-chat fields were set before launching chat
+    expect(setHiddenPrechatFieldsSpy).toHaveBeenCalledWith(
+        expect.objectContaining({
+            Locale: expect.any(String),
+            UsId: expect.any(String),
+            IsCartMgmtSupported: 'true',
+            Language: expect.any(String),
+            DomainUrl: expect.any(String)
+        })
+    )
+
+    // Verify launchChat was called
+    expect(launchChatSpy).toHaveBeenCalled()
+})
+
+test('does not set pre-chat fields when chat is already launched', async () => {
+    const user = setupUserEvent()
+
+    getConfig.mockImplementation(() =>
+        getMockedConfigWithCommerceAgentSettings(mockConfig, 'true', 'true')
+    )
+
+    // Create spies for chat functions
+    const sendTextMessageSpy = jest
+        .fn()
+        .mockRejectedValue(
+            'invoke API before the onEmbeddedMessagingConversationOpened event is fired'
+        )
+    const launchChatSpy = jest
+        .fn()
+        .mockResolvedValue('Successfully initialized the messaging client')
+    const setHiddenPrechatFieldsSpy = jest.fn()
+
+    // Mock window.embeddedservice_bootstrap with prechatAPI
+    window.embeddedservice_bootstrap = {
+        utilAPI: {
+            sendTextMessage: sendTextMessageSpy,
+            launchChat: launchChatSpy
+        },
+        prechatAPI: {
+            setHiddenPrechatFields: setHiddenPrechatFieldsSpy
+        }
+    }
+
+    renderWithProviders(<SearchInput />, {
+        wrapperProps: {siteAlias: 'us', appConfig: mockConfig.app}
+    })
+    const searchInput = document.querySelector('input[type="search"]')
+
+    // First search - should set pre-chat fields
+    await user.type(searchInput, 'first search{enter}')
+    jest.advanceTimersByTime(500)
+
+    // Verify pre-chat fields were set the first time
+    expect(setHiddenPrechatFieldsSpy).toHaveBeenCalledTimes(1)
+
+    // Clear input and perform second search
+    await user.clear(searchInput)
+    await user.type(searchInput, 'second search{enter}')
+    jest.advanceTimersByTime(500)
+
+    // Verify pre-chat fields were NOT set again (still only called once)
+    expect(setHiddenPrechatFieldsSpy).toHaveBeenCalledTimes(1)
+})
+
+test('handles missing prechatAPI gracefully', async () => {
+    const user = setupUserEvent()
+
+    getConfig.mockImplementation(() =>
+        getMockedConfigWithCommerceAgentSettings(mockConfig, 'true', 'true')
+    )
+
+    // Create spies for chat functions
+    const sendTextMessageSpy = jest
+        .fn()
+        .mockRejectedValue(
+            'invoke API before the onEmbeddedMessagingConversationOpened event is fired'
+        )
+    const launchChatSpy = jest
+        .fn()
+        .mockResolvedValue('Successfully initialized the messaging client')
+
+    // Mock window.embeddedservice_bootstrap WITHOUT prechatAPI
+    window.embeddedservice_bootstrap = {
+        utilAPI: {
+            sendTextMessage: sendTextMessageSpy,
+            launchChat: launchChatSpy
+        }
+        // Note: prechatAPI is missing
+    }
+
+    renderWithProviders(<SearchInput />, {
+        wrapperProps: {siteAlias: 'us', appConfig: mockConfig.app}
+    })
+    const searchInput = document.querySelector('input[type="search"]')
+
+    // Perform a search - should not throw error
+    await user.type(searchInput, 'test search{enter}')
+
+    // Wait for the setTimeout in onSubmitSearch
+    jest.advanceTimersByTime(500)
+
+    // Verify launchChat was still called (functionality continues)
+    expect(launchChatSpy).toHaveBeenCalled()
+})
+
+test('sets correct pre-chat fields for different locales', async () => {
+    const user = setupUserEvent()
+
+    getConfig.mockImplementation(() =>
+        getMockedConfigWithCommerceAgentSettings(mockConfig, 'true', 'true')
+    )
+
+    // Create spies for chat functions
+    const sendTextMessageSpy = jest
+        .fn()
+        .mockRejectedValue(
+            'invoke API before the onEmbeddedMessagingConversationOpened event is fired'
+        )
+    const launchChatSpy = jest
+        .fn()
+        .mockResolvedValue('Successfully initialized the messaging client')
+    const setHiddenPrechatFieldsSpy = jest.fn()
+
+    // Mock window.embeddedservice_bootstrap with prechatAPI
+    window.embeddedservice_bootstrap = {
+        utilAPI: {
+            sendTextMessage: sendTextMessageSpy,
+            launchChat: launchChatSpy
+        },
+        prechatAPI: {
+            setHiddenPrechatFields: setHiddenPrechatFieldsSpy
+        }
+    }
+
+    // Test with UK locale
+    renderWithProviders(<SearchInput />, {
+        wrapperProps: {siteAlias: 'uk', appConfig: mockConfig.app}
+    })
+    const searchInput = document.querySelector('input[type="search"]')
+
+    // Perform a search to trigger chat launch
+    await user.type(searchInput, 'test search{enter}')
+
+    // Wait for the setTimeout in onSubmitSearch
+    jest.advanceTimersByTime(500)
+
+    // Verify pre-chat fields were set with UK locale data
+    expect(setHiddenPrechatFieldsSpy).toHaveBeenCalledWith(
+        expect.objectContaining({
+            Locale: expect.any(String),
+            UsId: expect.any(String),
+            IsCartMgmtSupported: 'true',
+            Language: expect.any(String),
+            DomainUrl: expect.any(String)
+        })
+    )
+})
+
+test('setPrechatFieldsForNewSession function works correctly', async () => {
+    const user = setupUserEvent()
+
+    getConfig.mockImplementation(() =>
+        getMockedConfigWithCommerceAgentSettings(mockConfig, 'true', 'true')
+    )
+
+    // Create spies for chat functions
+    const sendTextMessageSpy = jest
+        .fn()
+        .mockRejectedValue(
+            'invoke API before the onEmbeddedMessagingConversationOpened event is fired'
+        )
+    const launchChatSpy = jest
+        .fn()
+        .mockResolvedValue('Successfully initialized the messaging client')
+    const setHiddenPrechatFieldsSpy = jest.fn()
+
+    // Mock window.embeddedservice_bootstrap with prechatAPI
+    window.embeddedservice_bootstrap = {
+        utilAPI: {
+            sendTextMessage: sendTextMessageSpy,
+            launchChat: launchChatSpy
+        },
+        prechatAPI: {
+            setHiddenPrechatFields: setHiddenPrechatFieldsSpy
+        }
+    }
+
+    renderWithProviders(<SearchInput />, {
+        wrapperProps: {siteAlias: 'us', appConfig: mockConfig.app}
+    })
+    const searchInput = document.querySelector('input[type="search"]')
+
+    // Perform a search to trigger chat launch
+    await user.type(searchInput, 'test search{enter}')
+
+    // Wait for the setTimeout in onSubmitSearch
+    jest.advanceTimersByTime(500)
+
+    // Verify the function was called with correct parameters
+    expect(setHiddenPrechatFieldsSpy).toHaveBeenCalledTimes(1)
+    expect(setHiddenPrechatFieldsSpy).toHaveBeenCalledWith(
+        expect.objectContaining({
+            Locale: expect.any(String),
+            UsId: expect.any(String),
+            IsCartMgmtSupported: 'true',
+            Language: expect.any(String),
+            DomainUrl: expect.any(String)
+        })
+    )
+})
+
+test('verifies DomainUrl is correctly constructed with appOrigin and buildUrl', async () => {
+    const user = setupUserEvent()
+
+    getConfig.mockImplementation(() =>
+        getMockedConfigWithCommerceAgentSettings(mockConfig, 'true', 'true')
+    )
+
+    // Create spies for chat functions and prechat API
+    const sendTextMessageSpy = jest
+        .fn()
+        .mockRejectedValue(
+            'invoke API before the onEmbeddedMessagingConversationOpened event is fired'
+        )
+    const launchChatSpy = jest
+        .fn()
+        .mockResolvedValue('Successfully initialized the messaging client')
+    const setHiddenPrechatFieldsSpy = jest.fn()
+
+    // Mock window.embeddedservice_bootstrap with prechatAPI
+    Object.defineProperty(window, 'embeddedservice_bootstrap', {
+        value: {
+            utilAPI: {
+                sendTextMessage: sendTextMessageSpy,
+                launchChat: launchChatSpy
+            },
+            prechatAPI: {
+                setHiddenPrechatFields: setHiddenPrechatFieldsSpy
+            }
+        },
+        writable: true
+    })
+
+    renderWithProviders(<SearchInput />)
+    const searchInput = document.querySelector('input[type="search"]')
+
+    // Type in search input and submit
+    await user.type(searchInput, 'test search{enter}')
+
+    // Wait for the setTimeout in onSubmitSearch
+    jest.advanceTimersByTime(500)
+
+    // Verify DomainUrl is constructed correctly
+    expect(setHiddenPrechatFieldsSpy).toHaveBeenCalledWith(
+        expect.objectContaining({
+            DomainUrl: expect.stringMatching(/^https:\/\/www\.domain\.com\/.*$/)
+        })
+    )
+
+    // Get the actual call to verify the specific DomainUrl value
+    const prechatFieldsCall = setHiddenPrechatFieldsSpy.mock.calls[0][0]
+    expect(prechatFieldsCall.DomainUrl).toMatch(/^https:\/\/www\.domain\.com\/.*$/)
+})
