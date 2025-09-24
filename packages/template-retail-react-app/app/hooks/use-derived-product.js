@@ -26,8 +26,7 @@ const getInventoryById = (product, inventoryId) => {
 export const useDerivedProduct = (
     product,
     isProductPartOfSet = false,
-    isProductPartOfBundle = false,
-    availableBonusProductIds = []
+    isProductPartOfBundle = false
 ) => {
     const showLoading = !product
     const isProductABundle = product?.type?.bundle
@@ -45,8 +44,7 @@ export const useDerivedProduct = (
     const variationAttributes = useVariationAttributes(
         product,
         isProductPartOfSet,
-        isProductPartOfBundle,
-        availableBonusProductIds
+        isProductPartOfBundle
     )
     const [quantity, setQuantity] = useState(initialQuantity)
     const {selectedStore} = useSelectedStore()

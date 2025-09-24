@@ -81,6 +81,11 @@ const BonusProductViewModal = ({
             .filter(Boolean)
     }, [basket, promotionId])
 
+    // Check if bonus product data is ready
+    const isBonusDataReady = useMemo(() => {
+        return !!basket?.bonusDiscountLineItems && !!promotionId
+    }, [basket, promotionId])
+
     const intl = useIntl()
     const {formatMessage} = intl
     const showToast = useToast()
@@ -233,31 +238,113 @@ const BonusProductViewModal = ({
         [messages.viewCart, handleViewCart]
     )
 
-    // Clean product data but preserve variation attributes for size/color selectors
+    // Clean product data and pre-filter variants based on available bonus products
     const productToRender = useMemo(() => {
         const baseProduct = productViewModalData.product || safeProduct
-        return {
+
+        // If bonus data is not ready, return null to prevent rendering
+        if (!isBonusDataReady) {
+            return null
+        }
+
+        // If no bonus products are available, still render but with original product
+        if (availableBonusProductIds.length === 0) {
+            return {
+                ...baseProduct,
+                variationAttributes: baseProduct.variationAttributes,
+                variants: baseProduct.variants,
+                variationParams: baseProduct.variationParams,
+                selectedVariationAttributes: baseProduct.selectedVariationAttributes,
+                type: baseProduct.type,
+                inventory: {
+                    ...baseProduct.inventory,
+                    orderable: true,
+                    stockLevel: 999
+                },
+                minOrderQuantity: 1,
+                stepQuantity: 1,
+                orderable: true,
+                rating: baseProduct.rating,
+                reviewCount: baseProduct.reviewCount
+            }
+        }
+
+        // Check if we should filter variants
+        // Only treat it as base product ID if it's NOT found in the variants array
+        const isBaseProductId = !baseProduct.variants?.some((v) => v.productId === baseProduct.id)
+        const hasBaseProductId =
+            isBaseProductId && availableBonusProductIds.includes(baseProduct.id)
+        const hasVariantIds = availableBonusProductIds.some((id) =>
+            baseProduct.variants?.some((v) => v.productId === id)
+        )
+
+        let filteredVariants = baseProduct.variants || []
+        let filteredVariationAttributes = baseProduct.variationAttributes || []
+
+        // If we have specific variant IDs (not base product), filter variants and variation attributes
+        if (hasVariantIds && !hasBaseProductId) {
+            // Filter variants to only include available ones
+            filteredVariants =
+                baseProduct.variants?.filter((variant) =>
+                    availableBonusProductIds.includes(variant.productId)
+                ) || []
+
+            // Filter variation attribute values to only show available combinations
+            filteredVariationAttributes =
+                baseProduct.variationAttributes
+                    ?.map((attr) => {
+                        const availableValues =
+                            attr.values?.filter((value) => {
+                                // Check if this value leads to an available variant
+                                return filteredVariants.some(
+                                    (variant) => variant.variationValues?.[attr.id] === value.value
+                                )
+                            }) || []
+
+                        return {
+                            ...attr,
+                            values: availableValues
+                        }
+                    })
+                    .filter((attr) => attr.values.length > 0) || []
+        }
+
+        // KEY FIX: Ensure the correct variant is pre-selected to prevent flash
+        // When we have only one available variant, make sure it's the selected one
+        let finalProduct = {
             ...baseProduct,
-            variationAttributes: baseProduct.variationAttributes,
-            variants: baseProduct.variants,
+            variationAttributes: filteredVariationAttributes,
+            variants: filteredVariants,
             variationParams: baseProduct.variationParams,
             selectedVariationAttributes: baseProduct.selectedVariationAttributes,
             type: baseProduct.type,
-            // Ensure proper inventory and quantity defaults for bonus products
             inventory: {
                 ...baseProduct.inventory,
                 orderable: true,
-                stockLevel: 999 // High stock level for bonus products
+                stockLevel: 999
             },
             minOrderQuantity: 1,
             stepQuantity: 1,
-            // Ensure the product is orderable
             orderable: true,
-            // Add review data for display
             rating: baseProduct.rating,
             reviewCount: baseProduct.reviewCount
         }
-    }, [productViewModalData.product, safeProduct])
+
+        // If we filtered to only one variant, ensure it's pre-selected
+        if (filteredVariants.length === 1 && filteredVariants[0].variationValues) {
+            const selectedVariant = filteredVariants[0]
+            finalProduct = {
+                ...finalProduct,
+                // Override the product ID to be the selected variant
+                id: selectedVariant.productId,
+                // Pre-set the variation values to match the selected variant
+                selectedVariant,
+                variationValues: selectedVariant.variationValues
+            }
+        }
+
+        return finalProduct
+    }, [productViewModalData.product, safeProduct, isBonusDataReady, availableBonusProductIds])
 
     // Calculate max order quantity for UI
     const maxOrderQuantity = getRemainingBonusQuantity()
@@ -319,7 +406,8 @@ const BonusProductViewModal = ({
                     }
                     pb={productViewModalTheme.layout.body.paddingBottom}
                 >
-                    {productViewModalData.isFetching && !productViewModalData.product ? (
+                    {(productViewModalData.isFetching && !productViewModalData.product) ||
+                    !productToRender ? (
                         <Box p={8} textAlign="center">
                             <Text>Loading product details...</Text>
                         </Box>
@@ -338,7 +426,6 @@ const BonusProductViewModal = ({
                             showReviews={true}
                             showVariationAttributes={true}
                             alignItems="stretch"
-                            availableBonusProductIds={availableBonusProductIds}
                             imageGalleryFooter={
                                 onReturnToSelection ? (
                                     <HideOnMobile>{BackToSelectionButton}</HideOnMobile>
