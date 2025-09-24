@@ -69,20 +69,19 @@ jest.mock('@salesforce/retail-react-app/app/hooks/use-store-locator', () => ({
 // Mock bonus product utilities
 const mockGetPromotionCalloutText = jest.fn(() => 'Free Gift with Purchase')
 const mockFindAllBonusProductItemsToRemove = jest.fn((basket, product) => [product])
-const mockGetBonusProductsForQualifyingItems = jest.fn(() => [])
 const mockUseBasketProductsWithPromotions = jest.fn()
 const mockGetBonusProductCountsForPromotion = jest.fn(() => ({
     selectedBonusItems: 0,
     maxBonusItems: 0
 }))
+const mockGetBonusProductsForSpecificCartItem = jest.fn(() => [])
 const mockShouldShowBonusProductSelection = jest.fn(() => true)
 jest.mock('@salesforce/retail-react-app/app/utils/bonus-product', () => ({
     useBasketProductsWithPromotions: (...args) => mockUseBasketProductsWithPromotions(...args),
     getPromotionCalloutText: (...args) => mockGetPromotionCalloutText(...args),
     findAllBonusProductItemsToRemove: (...args) => mockFindAllBonusProductItemsToRemove(...args),
-    getBonusProductsForQualifyingItems: (...args) =>
-        mockGetBonusProductsForQualifyingItems(...args),
     getBonusProductCountsForPromotion: (...args) => mockGetBonusProductCountsForPromotion(...args),
+    getBonusProductsForSpecificCartItem: (...args) => mockGetBonusProductsForSpecificCartItem(...args),
     shouldShowBonusProductSelection: (...args) => mockShouldShowBonusProductSelection(...args)
 }))
 

@@ -14,7 +14,6 @@ import {
     Grid,
     GridItem,
     Container,
-    Button,
     useDisclosure
 } from '@salesforce/retail-react-app/app/components/shared/ui'
 
@@ -48,7 +47,7 @@ import {
     useBasketProductsWithPromotions,
     getPromotionCalloutText,
     findAllBonusProductItemsToRemove,
-    getBonusProductsForQualifyingItems
+    getBonusProductsForSpecificCartItem
 } from '@salesforce/retail-react-app/app/utils/bonus-product'
 import {useBonusProductViewModal} from '@salesforce/retail-react-app/app/hooks/use-bonus-product-view-modal'
 import {useBonusProductSelectionModalContext} from '@salesforce/retail-react-app/app/hooks/use-bonus-product-selection-modal'
@@ -73,7 +72,6 @@ import debounce from 'lodash/debounce'
 import {useCurrentBasket} from '@salesforce/retail-react-app/app/hooks/use-current-basket'
 import {
     useShopperBasketsMutation,
-    useShopperBasketsMutationHelper,
     useProducts,
     useShopperCustomersMutation,
     useStores
@@ -294,7 +292,6 @@ const Cart = () => {
     const updateItemInBasketMutation = useShopperBasketsMutation('updateItemInBasket')
     const updateItemsInBasketMutation = useShopperBasketsMutation('updateItemsInBasket')
     const removeItemFromBasketMutation = useShopperBasketsMutation('removeItemFromBasket')
-    const {addItemToNewOrExistingBasket} = useShopperBasketsMutationHelper()
     /*****************Basket Mutation************************/
 
     const [selectedItem, setSelectedItem] = useState(undefined)
@@ -894,42 +891,12 @@ const Cart = () => {
                 throw new Error(`No inventory ID found for product ${productItem.productId}`)
             }
 
-            const bonusProductsToMove = getBonusProductsForQualifyingItems(basket, [productItem])
-
-            // Remove bonus products before moving qualifying item
-            await Promise.all(
-                bonusProductsToMove.map((bonusProduct) =>
-                    removeItemFromBasketMutation.mutateAsync({
-                        parameters: {
-                            basketId: basket.basketId,
-                            itemId: bonusProduct.itemId
-                        }
-                    })
-                )
-            )
-
             await updateDeliveryOption(
                 productItem,
                 selectedPickup,
                 selectedStore,
                 defaultInventoryId
             )
-
-            if (bonusProductsToMove.length > 0) {
-                const targetShipment = selectedPickup
-                    ? await findOrCreatePickupShipment(selectedStore)
-                    : await findOrCreateDeliveryShipment()
-
-                const bonusProductsToAdd = bonusProductsToMove.map((bonusProduct) => ({
-                    productId: bonusProduct.productId,
-                    quantity: bonusProduct.quantity,
-                    bonusDiscountLineItemId: bonusProduct.bonusDiscountLineItemId,
-                    shipmentId: targetShipment?.shipmentId || 'me',
-                    ...(selectedPickup && {inventoryId: selectedStore.inventoryId})
-                }))
-
-                await addItemToNewOrExistingBasket(bonusProductsToAdd)
-            }
         } catch (error) {
             console.error('Error changing delivery option:', error)
             showError()
@@ -943,6 +910,18 @@ const Cart = () => {
     const renderDeliveryActions = (productItem, shipmentInfo) => {
         const showDeliveryOptions = storeLocatorEnabled && multishipEnabled
         if (!showDeliveryOptions) {
+            return null
+        }
+
+        // Check if this product has bonus products associated with it
+        // If it does, hide the delivery group selector
+        const hasBonusProducts = getBonusProductsForSpecificCartItem(
+            basket,
+            productItem,
+            productsWithPromotions
+        ).length > 0
+
+        if (hasBonusProducts) {
             return null
         }
 
