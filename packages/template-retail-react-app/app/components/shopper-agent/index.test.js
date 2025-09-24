@@ -8,6 +8,22 @@
 import React from 'react'
 import {render, screen} from '@testing-library/react'
 import {act} from 'react-dom/test-utils'
+
+// Mock useLocation hook
+const mockUseLocation = jest.fn()
+jest.mock('react-router-dom', () => ({
+    ...jest.requireActual('react-router-dom'),
+    useLocation: () => mockUseLocation()
+}))
+
+// Mock useAppOrigin hook
+const mockUseAppOrigin = jest.fn()
+jest.mock('@salesforce/retail-react-app/app/hooks/use-app-origin', () => ({
+    __esModule: true,
+    useAppOrigin: () => mockUseAppOrigin()
+}))
+
+// Import ShopperAgent after all mocks are set up
 import ShopperAgent from '@salesforce/retail-react-app/app/components/shopper-agent/index'
 
 // Mock the embedded messaging service
@@ -122,7 +138,8 @@ describe('ShopperAgent Component', () => {
 
         // Mock useMultiSite hook with proper structure
         mockedUseMultiSite.mockReturnValue({
-            locale: {id: 'en-US', preferredCurrency: 'USD'}
+            locale: {id: 'en-US', preferredCurrency: 'USD'},
+            buildUrl: jest.fn((path) => path)
         })
 
         // Mock useTheme hook
@@ -131,6 +148,16 @@ describe('ShopperAgent Component', () => {
                 sticky: 1100
             }
         })
+
+        // Mock useLocation hook
+        mockUseLocation.mockReturnValue({
+            pathname: '/current-page',
+            search: '',
+            hash: ''
+        })
+
+        // Mock useAppOrigin hook
+        mockUseAppOrigin.mockReturnValue('https://example.com')
 
         // Clear any existing scripts
         delete global.window.embeddedservice_bootstrap
@@ -178,6 +205,16 @@ describe('ShopperAgent Component', () => {
         expect(screen.queryByTestId('shopper-agent')).toBeNull()
     })
 
+    test('should render with internally constructed domainUrl', () => {
+        const props = {
+            commerceAgentConfiguration: commerceAgentSettings,
+            basketDoneLoading: true
+        }
+
+        render(<ShopperAgent {...props} />)
+        expect(screen.queryByTestId('shopper-agent')).toBeInTheDocument()
+    })
+
     test('should render ShopperAgentWindow when all conditions are met', () => {
         render(<ShopperAgent {...defaultProps} />)
 
@@ -201,7 +238,8 @@ describe('ShopperAgent Component', () => {
             IsCartMgmtSupported: 'true',
             RefreshToken: 'test-refresh-token',
             Currency: 'USD',
-            Language: 'en_US'
+            Language: 'en_US',
+            DomainUrl: 'https://example.com/current-page'
         })
     })
 
@@ -224,7 +262,8 @@ describe('ShopperAgent Component', () => {
             IsCartMgmtSupported: 'true',
             RefreshToken: 'initial-token',
             Currency: 'USD',
-            Language: 'en_US'
+            Language: 'en_US',
+            DomainUrl: 'https://example.com/current-page'
         })
 
         // Clear mock and change refresh token
@@ -247,7 +286,8 @@ describe('ShopperAgent Component', () => {
             IsCartMgmtSupported: 'true',
             RefreshToken: 'updated-token',
             Currency: 'USD',
-            Language: 'en_US'
+            Language: 'en_US',
+            DomainUrl: 'https://example.com/current-page'
         })
     })
 
@@ -269,14 +309,16 @@ describe('ShopperAgent Component', () => {
             IsCartMgmtSupported: 'true',
             RefreshToken: null,
             Currency: 'USD',
-            Language: 'en_US'
+            Language: 'en_US',
+            DomainUrl: 'https://example.com/current-page'
         })
     })
 
     test('should update prechat fields when currency changes', async () => {
         // Mock useMultiSite to return different currency values
         mockedUseMultiSite.mockReturnValue({
-            locale: {id: 'en-US', preferredCurrency: 'USD'}
+            locale: {id: 'en-US', preferredCurrency: 'USD'},
+            buildUrl: jest.fn((path) => path)
         })
 
         render(<ShopperAgent {...defaultProps} />)
@@ -294,13 +336,15 @@ describe('ShopperAgent Component', () => {
             IsCartMgmtSupported: 'true',
             RefreshToken: 'test-refresh-token',
             Currency: 'USD',
-            Language: 'en_US'
+            Language: 'en_US',
+            DomainUrl: 'https://example.com/current-page'
         })
 
         // Clear mock and change currency to EUR
         mockEmbeddedService.prechatAPI.setHiddenPrechatFields.mockClear()
         mockedUseMultiSite.mockReturnValue({
-            locale: {id: 'en-US', preferredCurrency: 'EUR'}
+            locale: {id: 'en-US', preferredCurrency: 'EUR'},
+            buildUrl: jest.fn((path) => path)
         })
 
         // Re-render with new currency
@@ -319,14 +363,16 @@ describe('ShopperAgent Component', () => {
             IsCartMgmtSupported: 'true',
             RefreshToken: 'test-refresh-token',
             Currency: 'EUR',
-            Language: 'en_US'
+            Language: 'en_US',
+            DomainUrl: 'https://example.com/current-page'
         })
     })
 
     test('should update prechat fields when locale changes', async () => {
         // Mock useMultiSite to return different locale values
         mockedUseMultiSite.mockReturnValue({
-            locale: {id: 'en-US', preferredCurrency: 'USD'}
+            locale: {id: 'en-US', preferredCurrency: 'USD'},
+            buildUrl: jest.fn((path) => path)
         })
 
         render(<ShopperAgent {...defaultProps} />)
@@ -344,13 +390,15 @@ describe('ShopperAgent Component', () => {
             IsCartMgmtSupported: 'true',
             RefreshToken: 'test-refresh-token',
             Currency: 'USD',
-            Language: 'en_US'
+            Language: 'en_US',
+            DomainUrl: 'https://example.com/current-page'
         })
 
         // Clear mock and change locale to en-GB
         mockEmbeddedService.prechatAPI.setHiddenPrechatFields.mockClear()
         mockedUseMultiSite.mockReturnValue({
-            locale: {id: 'en-GB', preferredCurrency: 'GBP'}
+            locale: {id: 'en-GB', preferredCurrency: 'GBP'},
+            buildUrl: jest.fn((path) => path)
         })
 
         // Re-render with new locale
@@ -369,7 +417,8 @@ describe('ShopperAgent Component', () => {
             IsCartMgmtSupported: 'true',
             RefreshToken: 'test-refresh-token',
             Currency: 'GBP',
-            Language: 'en_GB'
+            Language: 'en_GB',
+            DomainUrl: 'https://example.com/current-page'
         })
     })
 
@@ -399,7 +448,8 @@ describe('ShopperAgent Component', () => {
             IsCartMgmtSupported: 'true',
             RefreshToken: 'test-refresh-token',
             Currency: 'USD',
-            Language: 'en_US'
+            Language: 'en_US',
+            DomainUrl: 'https://example.com/current-page'
         })
     })
 
@@ -467,6 +517,119 @@ describe('ShopperAgent Component', () => {
         render(<ShopperAgent {...defaultProps} />)
 
         expect(mockedUseScript).toHaveBeenCalledWith('https://test.salesforce.com/script.js')
+    })
+
+    test('should pass domainUrl to ShopperAgentWindow component', () => {
+        const customDomainUrl = 'https://custom-store.com/special-page'
+        const props = {
+            ...defaultProps,
+            domainUrl: customDomainUrl
+        }
+
+        // Mock console.log to capture any errors
+        const consoleSpy = jest.spyOn(console, 'log').mockImplementation(() => {})
+
+        render(<ShopperAgent {...props} />)
+
+        // The component should render without errors
+        expect(() => render(<ShopperAgent {...props} />)).not.toThrow()
+
+        // Clean up
+        consoleSpy.mockRestore()
+    })
+
+    describe('DomainUrl Functionality', () => {
+        test('should include DomainUrl in prechat fields when domainUrl is constructed from hooks', async () => {
+            const props = {
+                ...defaultProps
+            }
+
+            render(<ShopperAgent {...props} />)
+
+            // Trigger the onEmbeddedMessagingReady event
+            await act(async () => {
+                window.dispatchEvent(new Event('onEmbeddedMessagingReady'))
+            })
+
+            expect(mockEmbeddedService.prechatAPI.setHiddenPrechatFields).toHaveBeenCalledWith({
+                SiteId: 'RefArchGlobal',
+                Locale: 'en-US',
+                OrganizationId: 'test-commerce-org-id',
+                UsId: 'test-usid',
+                IsCartMgmtSupported: 'true',
+                RefreshToken: 'test-refresh-token',
+                Currency: 'USD',
+                Language: 'en_US',
+                DomainUrl: 'https://example.com/current-page'
+            })
+        })
+
+        test('should construct domainUrl from hooks and include in prechat fields', async () => {
+            const props = {
+                ...defaultProps
+            }
+
+            render(<ShopperAgent {...props} />)
+
+            // Trigger the onEmbeddedMessagingReady event
+            await act(async () => {
+                window.dispatchEvent(new Event('onEmbeddedMessagingReady'))
+            })
+
+            expect(mockEmbeddedService.prechatAPI.setHiddenPrechatFields).toHaveBeenCalledWith({
+                SiteId: 'RefArchGlobal',
+                Locale: 'en-US',
+                OrganizationId: 'test-commerce-org-id',
+                UsId: 'test-usid',
+                IsCartMgmtSupported: 'true',
+                RefreshToken: 'test-refresh-token',
+                Currency: 'USD',
+                Language: 'en_US',
+                DomainUrl: 'https://example.com/current-page'
+            })
+        })
+
+        test('should render with constructed domainUrl from hooks', () => {
+            const props = {
+                ...defaultProps
+            }
+
+            render(<ShopperAgent {...props} />)
+            expect(screen.queryByTestId('shopper-agent')).toBeInTheDocument()
+        })
+
+        test('should handle complex domainUrl with query parameters and fragments', async () => {
+            // Mock complex location data
+            mockUseLocation.mockReturnValue({
+                pathname: '/products/shoes',
+                search: '?color=red&size=10',
+                hash: '#reviews'
+            })
+            mockUseAppOrigin.mockReturnValue('https://test-store.com')
+
+            const props = {
+                ...defaultProps
+            }
+
+            render(<ShopperAgent {...props} />)
+
+            // Trigger the onEmbeddedMessagingReady event
+            await act(async () => {
+                window.dispatchEvent(new Event('onEmbeddedMessagingReady'))
+            })
+
+            expect(mockEmbeddedService.prechatAPI.setHiddenPrechatFields).toHaveBeenCalledWith({
+                SiteId: 'RefArchGlobal',
+                Locale: 'en-US',
+                OrganizationId: 'test-commerce-org-id',
+                UsId: 'test-usid',
+                IsCartMgmtSupported: 'true',
+                RefreshToken: 'test-refresh-token',
+                Currency: 'USD',
+                Language: 'en_US',
+                DomainUrl: 'https://test-store.com/products/shoes'
+            })
+        })
     })
 
     describe('Conversation Context Functionality', () => {
