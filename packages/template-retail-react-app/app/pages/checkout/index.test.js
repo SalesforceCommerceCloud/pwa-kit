@@ -552,7 +552,8 @@ test('Can edit address during checkout as a registered customer', async () => {
         expect(screen.getByTestId('sf-toggle-card-step-2-content')).not.toBeEmptyDOMElement()
     })
 
-    expect(screen.getByText('369 Main Street')).toBeInTheDocument()
+    const shippingAddressCard = screen.getByTestId('sf-toggle-card-step-1-content')
+    expect(within(shippingAddressCard).getByText('369 Main Street')).toBeInTheDocument()
 })
 
 test('Can add address during checkout as a registered customer', async () => {
