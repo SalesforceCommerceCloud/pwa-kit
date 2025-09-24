@@ -13,7 +13,8 @@ import {
     CreateNewComponentTool,
     DeveloperGuidelinesTool,
     TestWithPlaywrightTool,
-    CreateNewPageTool
+    CreateNewPageTool,
+    InstallAgentRulesTool
 } from '../tools'
 import {Telemetry} from '../utils/telemetry'
 
@@ -91,6 +92,12 @@ class PwaStorefrontMCPServerHighLevel {
                 siteUrl: z.string().optional().describe('Site URL to test (optional)')
             },
             ({testType, siteUrl}) => this.testWithPlaywrightTool.run(testType, siteUrl)
+        )
+        this.server.tool(
+            InstallAgentRulesTool.name,
+            InstallAgentRulesTool.description,
+            InstallAgentRulesTool.inputSchema,
+            InstallAgentRulesTool.fn
         )
         this.server.tool(
             this.createNewComponentTool.name,
